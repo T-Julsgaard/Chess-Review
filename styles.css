@@ -405,7 +405,7 @@ button { font-family: inherit; cursor: pointer; }
   background: color-mix(in srgb, var(--mc-marked) 45%, transparent);
 }
 .sq .coord {
-  position: absolute; font-size: 9px; font-weight: 700; opacity: .7; z-index: 2;
+  position: absolute; font-size: var(--coord-size, 9px); font-weight: 700; opacity: .7; z-index: 2;
   font-family: var(--font-mono);
 }
 .sq .coord.file { right: 3px; bottom: 1px; }
