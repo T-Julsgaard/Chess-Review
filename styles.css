@@ -753,15 +753,15 @@ button { font-family: inherit; cursor: pointer; }
 }
 @keyframes credits-rise { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
 .credits-head {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px;
   position: sticky; top: -18px; z-index: 2; /* stay visible while the long list scrolls */
-  background: var(--panel); padding: 18px 0 8px; margin-top: -18px;
+  background: var(--panel); padding: 18px 0 10px; margin-top: -18px;
 }
 .credits-head h3 { margin: 0; font-size: 14.5px; font-weight: 800; letter-spacing: .01em; }
 .credits-head .icon-btn { width: 30px; height: 30px; }
 .credits-source {
   display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit;
-  padding: 9px 12px; border-radius: 11px; margin-bottom: 10px; transition: .14s;
+  padding: 11px 13px; border-radius: 11px; margin-bottom: 14px; transition: .14s;
   background: color-mix(in oklab, var(--accent) 12%, var(--panel-2));
   border: 1px solid color-mix(in oklab, var(--accent) 40%, var(--line));
 }
@@ -769,23 +769,17 @@ button { font-family: inherit; cursor: pointer; }
 .credits-source .credit-title { color: var(--accent); }
 .credits-source svg { width: 16px; height: 16px; flex: none; color: var(--accent); opacity: .85; }
 .credits-disclaimer {
-  margin: 0 0 10px; font-size: 11.5px; line-height: 1.5; color: var(--ink-3);
-  padding-bottom: 10px; border-bottom: 1px solid var(--line-soft);
+  margin: 0 0 14px; font-size: 11.5px; line-height: 1.55; color: var(--ink-3);
+  padding-bottom: 14px; border-bottom: 1px solid var(--line-soft);
 }
-.credits-list { display: flex; flex-direction: column; gap: 5px; }
+.credits-list { display: flex; flex-direction: column; gap: 6px; }
 .credit-row {
   display: flex; align-items: center; gap: 12px; text-decoration: none;
-  padding: 8px 12px; border-radius: 10px;
+  padding: 10px 12px; border-radius: 10px;
   background: var(--panel-2); border: 1px solid var(--line);
   color: inherit; transition: .14s;
 }
 .credit-row:hover { border-color: color-mix(in oklab, var(--accent) 45%, var(--line)); background: var(--panel-3); }
-.credit-group { display: flex; flex-direction: column; }
-.credit-group-head { width: 100%; cursor: pointer; text-align: left; font: inherit; }
-.credit-group-head svg { width: 15px; height: 15px; flex: none; color: var(--ink-3); transition: transform .15s; }
-.credit-group.open .credit-group-head svg { transform: rotate(180deg); }
-.credit-sublist { display: none; flex-direction: column; gap: 5px; margin-top: 5px; padding-left: 10px; border-left: 2px solid var(--line-soft); }
-.credit-group.open .credit-sublist { display: flex; }
 .credit-main { min-width: 0; flex: 1; }
 .credit-title { font-size: 13px; font-weight: 700; color: var(--ink); }
 .credit-by { font-size: 11.5px; color: var(--ink-2); line-height: 1.4; margin-top: 1px; }
@@ -1045,10 +1039,8 @@ button { font-family: inherit; cursor: pointer; }
 /* piece images (cburnett set) */
 .piece-img { width: 94cqmin; height: 94cqmin; display: block; position: relative; z-index: 1;
   user-select: none; -webkit-user-drag: none; pointer-events: none; }
-/* A subtle drop shadow lifts the pieces off the board (applied to every set). The JohnPablok set
-   already bakes its own shadow into the artwork, so it opts out to avoid doubling. */
+/* A subtle drop shadow lifts the pieces off the board (applied to every set). */
 .piece-img { filter: drop-shadow(0 1.5px 2px rgba(0,0,0,.28)); }
-.ps-johnpablok .piece-img { filter: none; }
 
 /* ============================================================
    Insight panel — move commentary + practice coaching

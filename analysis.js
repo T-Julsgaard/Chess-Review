@@ -142,11 +142,11 @@ const pawnsFmt = (v) => (+v).toFixed(2).replace(/\.00$/, "") + " pawns";
 const ptsFmt = (v) => v + " pts";
 // URL to a classification badge (SVG).
 const qIcon = (cls) => _url("icons/" + (QUALITY[cls]?.icon || cls) + ".svg");
-const PIECE_STYLES = ["image","merida","kaneo","kaneo_midnight","kbyte_gambit","johnpablok"];
+const PIECE_STYLES = ["image","merida","kaneo","kaneo_midnight","kbyte_gambit"];
 // Labels shown in the settings. "image" = bundled Cburnett (the Lichess default set, the standard
 // here), "merida" = the bundled Merida set; the kaneo/kaneo_midnight/kbyte sets are bundled Kadagaden
-// sets (CC BY 4.0); "johnpablok" = JohnPablok's Cburnett-style SVGs (CC BY-SA 3.0) — all crisp SVG.
-const PIECE_STYLE_LABEL = { image: "Cburnett", merida: "Merida", kaneo: "Kaneo", kaneo_midnight: "Kaneo Midnight", kbyte_gambit: "1Kbyte Gambit", johnpablok: "JohnPablok" };
+// sets (CC BY 4.0) — all crisp SVG.
+const PIECE_STYLE_LABEL = { image: "Cburnett", merida: "Merida", kaneo: "Kaneo", kaneo_midnight: "Kaneo Midnight", kbyte_gambit: "1Kbyte Gambit" };
 // Color approximation of common board themes [light, dark square], used to MATCH a detected
 // board by name (colours aren't copyrightable; the source site's board image is never used).
 // Unknown themes fall back to "green".
@@ -172,7 +172,7 @@ const CC_BOARD_COLORS = {
 // Bundled high-quality SVG piece sets (from Lichess; GPLv2+). Maps a piece-style key to its folder
 // under pieces-img/<set>/<code>.svg, where <code> is e.g. wK / bN (white King, black kNight). SVG =
 // crisp at any board size.
-const BUNDLED_PIECE_SETS = { image: "cburnett", merida: "merida", kaneo: "kaneo", kaneo_midnight: "kaneo_midnight", kbyte_gambit: "kbyte_gambit", johnpablok: "johnpablok" };
+const BUNDLED_PIECE_SETS = { image: "cburnett", merida: "merida", kaneo: "kaneo", kaneo_midnight: "kaneo_midnight", kbyte_gambit: "kbyte_gambit" };
 // Bundled full-board artwork from Kadagaden/chess-pieces (CC BY 4.0). Each entry is a complete 8x8
 // SVG painted as the board's background (squares go transparent via .cc-board, like a detected
 // board); the [light, dark] pair drives the coordinate + last-move/selection highlight tints so
@@ -3830,12 +3830,6 @@ const CREDITS = [
     href: "https://github.com/Kadagaden/chess-pieces",
   },
   {
-    title: "Chess pieces — JohnPablok",
-    by: "JohnPablok — Cburnett-style set, via OpenGameArt.",
-    lic: "CC BY-SA 3.0",
-    href: "https://opengameart.org/content/chess-pieces-and-board-squares",
-  },
-  {
     title: "Board & move sounds",
     by: "Lichess sound set (lila)",
     lic: "AGPL-3.0",
@@ -3872,33 +3866,15 @@ function openCredits() {
   const close = () => { overlay.remove(); document.removeEventListener("keydown", onKey); };
   const onKey = (e) => { if (e.key === "Escape") close(); };
 
-  const creditRow = (c) =>
+  const entries = CREDITS.map((c) =>
     el("a", { class: "credit-row", href: c.href, target: "_blank", rel: "noopener noreferrer" },
       el("div", { class: "credit-main" },
         el("div", { class: "credit-title" }, c.title),
         el("div", { class: "credit-by" }, c.by),
       ),
       el("span", { class: "credit-lic" }, c.lic),
-    );
-
-  // The bundled piece sets are many and repetitive — collapse them into one expandable group.
-  const isPiece = (c) => c.title.startsWith("Chess pieces");
-  const pieceCredits = CREDITS.filter(isPiece);
-  const pieceGroup = el("div", { class: "credit-group" },
-    el("button", {
-      class: "credit-row credit-group-head", "aria-expanded": "false",
-      onclick: (e) => { const g = e.currentTarget.parentElement; const open = g.classList.toggle("open"); e.currentTarget.setAttribute("aria-expanded", open ? "true" : "false"); },
-    },
-      el("div", { class: "credit-main" },
-        el("div", { class: "credit-title" }, "Chess pieces"),
-        el("div", { class: "credit-by" }, `${pieceCredits.length} bundled sets — tap to expand`),
-      ),
-      el("span", { class: "credit-lic" }, "GPLv2+ · CC"),
-      icon("chevron"),
     ),
-    el("div", { class: "credit-sublist" }, ...pieceCredits.map(creditRow)),
   );
-  const entries = [pieceGroup, ...CREDITS.filter((c) => !isPiece(c)).map(creditRow)];
 
   // Prominent source-code link at the very top — the canonical answer to "how do I get the source".
   const sourceRow = el("a", { class: "credits-source", href: REPO_URL, target: "_blank", rel: "noopener noreferrer" },
@@ -3921,9 +3897,9 @@ function openCredits() {
     el("div", { class: "credits-list" }, ...entries),
     el("div", { class: "credits-foot" },
       "Each asset is used under the license shown. Tap a row for the source. ",
-      el("a", { href: chrome.runtime.getURL("LICENSE"), target: "_blank", rel: "noopener noreferrer" }, "Full license (GPLv3)"),
+      el("a", { href: REPO_URL + "/blob/main/LICENSE", target: "_blank", rel: "noopener noreferrer" }, "Full license (GPLv3)"),
       " · ",
-      el("a", { href: chrome.runtime.getURL("ATTRIBUTIONS.md"), target: "_blank", rel: "noopener noreferrer" }, "All attributions"),
+      el("a", { href: REPO_URL + "/blob/main/ATTRIBUTIONS.md", target: "_blank", rel: "noopener noreferrer" }, "All attributions"),
     ),
   );
 

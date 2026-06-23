@@ -13,14 +13,6 @@ Distributed by Lichess (lila); high-quality vector SVGs.
 - Note: GPLv2+ permits redistribution (incl. commercial) provided the licence/source terms
   are met. We deliberately avoided Lichess's non-commercial (CC BY-NC-SA) sets.
 
-## Chess pieces — JohnPablok (Cburnett improved)
-- **Files:** `pieces-img/johnpablok/*.svg`
-- **Author:** **JohnPablok** — a Cburnett-style set (the soft-drop-shadow variant is bundled).
-- **Source:** https://opengameart.org/content/chess-pieces-and-board-squares
-- **License:** **CC BY-SA 3.0** — https://creativecommons.org/licenses/by-sa/3.0/
-- Note: the OpenGameArt download also ships PNG raster exports and "V1"/"V2" packages. Only the
-  SVGs are bundled (the renderer is vector-based — crisp at any size).
-
 ## Chess pieces & boards (Kadagaden set)
 By **Kadagaden**, from the `chess-pieces` repository.
 - **Piece sets** (`pieces-img/kaneo/*.svg`, `pieces-img/kaneo_midnight/*.svg`,
