@@ -3872,15 +3872,33 @@ function openCredits() {
   const close = () => { overlay.remove(); document.removeEventListener("keydown", onKey); };
   const onKey = (e) => { if (e.key === "Escape") close(); };
 
-  const entries = CREDITS.map((c) =>
+  const creditRow = (c) =>
     el("a", { class: "credit-row", href: c.href, target: "_blank", rel: "noopener noreferrer" },
       el("div", { class: "credit-main" },
         el("div", { class: "credit-title" }, c.title),
         el("div", { class: "credit-by" }, c.by),
       ),
       el("span", { class: "credit-lic" }, c.lic),
+    );
+
+  // The bundled piece sets are many and repetitive — collapse them into one expandable group.
+  const isPiece = (c) => c.title.startsWith("Chess pieces");
+  const pieceCredits = CREDITS.filter(isPiece);
+  const pieceGroup = el("div", { class: "credit-group" },
+    el("button", {
+      class: "credit-row credit-group-head", "aria-expanded": "false",
+      onclick: (e) => { const g = e.currentTarget.parentElement; const open = g.classList.toggle("open"); e.currentTarget.setAttribute("aria-expanded", open ? "true" : "false"); },
+    },
+      el("div", { class: "credit-main" },
+        el("div", { class: "credit-title" }, "Chess pieces"),
+        el("div", { class: "credit-by" }, `${pieceCredits.length} bundled sets — tap to expand`),
+      ),
+      el("span", { class: "credit-lic" }, "GPLv2+ · CC"),
+      icon("chevron"),
     ),
+    el("div", { class: "credit-sublist" }, ...pieceCredits.map(creditRow)),
   );
+  const entries = [pieceGroup, ...CREDITS.filter((c) => !isPiece(c)).map(creditRow)];
 
   // Prominent source-code link at the very top — the canonical answer to "how do I get the source".
   const sourceRow = el("a", { class: "credits-source", href: REPO_URL, target: "_blank", rel: "noopener noreferrer" },
