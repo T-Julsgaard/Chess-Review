@@ -789,7 +789,8 @@ button { font-family: inherit; cursor: pointer; }
   background: color-mix(in oklab, var(--accent) 14%, var(--panel)); white-space: nowrap;
 }
 .credits-foot { margin-top: 10px; font-size: 10.5px; color: var(--ink-3); text-align: center; }
-.credits-foot a { color: var(--accent); text-decoration: none; }
+.credits-foot-links { margin-top: 4px; }
+.credits-foot a { color: var(--accent); text-decoration: none; white-space: nowrap; }
 .credits-foot a:hover { text-decoration: underline; }
 
 /* tabs: Visual / Engine */

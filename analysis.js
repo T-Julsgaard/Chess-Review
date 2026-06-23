@@ -3887,7 +3887,7 @@ function openCredits() {
   const sourceRow = el("a", { class: "credits-source", href: REPO_URL, target: "_blank", rel: "noopener noreferrer" },
     el("div", { class: "credit-main" },
       el("div", { class: "credit-title" }, "Source code on GitHub"),
-      el("div", { class: "credit-by" }, "Free & open source (GPLv3) — view, build, or contribute."),
+      el("div", { class: "credit-by" }, "Free & open source (GPLv3)"),
     ),
     icon("share"),
   );
@@ -3900,13 +3900,17 @@ function openCredits() {
     sourceRow,
     el("p", { class: "credits-disclaimer" },
       "Chess Review is an independent, unofficial tool. It is not affiliated with, endorsed by, " +
-      "or sponsored by Chess.com or Lichess. All trademarks belong to their respective owners."),
+      "or sponsored by Chess.com or Lichess.",
+      el("br"),
+      "All trademarks belong to their respective owners."),
     el("div", { class: "credits-list" }, ...entries),
     el("div", { class: "credits-foot" },
-      "Each asset is used under the license shown. Tap a row for the source. ",
-      el("a", { href: REPO_URL + "/blob/main/LICENSE", target: "_blank", rel: "noopener noreferrer" }, "Full license (GPLv3)"),
-      " · ",
-      el("a", { href: REPO_URL + "/blob/main/ATTRIBUTIONS.md", target: "_blank", rel: "noopener noreferrer" }, "All attributions"),
+      "Each asset is used under the license shown. Tap a row for the source.",
+      el("div", { class: "credits-foot-links" },
+        el("a", { href: REPO_URL + "/blob/main/LICENSE", target: "_blank", rel: "noopener noreferrer" }, "Full license (GPLv3)"),
+        " · ",
+        el("a", { href: REPO_URL + "/blob/main/ATTRIBUTIONS.md", target: "_blank", rel: "noopener noreferrer" }, "All attributions"),
+      ),
     ),
   );
 
