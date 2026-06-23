@@ -1,0 +1,210 @@
+<h2 class="sr-only">Animated portrait of a streetwise blitz-chess hustler in his 50s: flat cap with sunglasses pushed up onto it, sly half-grin with a toothpick that moves with his mouth, grey-flecked goatee, layered jacket. A classic analog chess clock stands in front of him at the bottom with one hand resting on top, dollar bills peeking from his breast pocket. Controllable expressions, glances and gestures.</h2>
+<style>
+:root{ --font-sans: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.coach-wrap{padding:.5rem 0}
+.coach-svg{width:100%;max-width:300px;display:block;margin:0 auto;height:auto}
+.coach-ctrl{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:360px;margin:14px auto 0}
+.coach-ctrl button{font-family:var(--font-sans,sans-serif);font-size:13px;font-weight:400;padding:6px 10px;border-radius:var(--border-radius-md,8px);border:1px solid var(--color-border-secondary,#3a352f);background:var(--color-background-secondary,#2a2622);color:var(--color-text-primary,#ece6da);cursor:pointer}
+.coach-ctrl button:hover{border-color:var(--color-border-primary,#5a5248)}
+.coach-ctrl button.on{background:var(--color-text-primary,#ece6da);color:var(--color-background-primary,#1a1815);border-color:var(--color-text-primary,#ece6da)}
+.coach-ctrl .look{min-width:30px;padding:5px 0}
+.coach-sep{width:100%;height:0}
+#figure{animation:h_br 6s ease-in-out infinite}
+#head{transform-box:view-box;transform-origin:340px 360px;animation:h_tilt 9s ease-in-out infinite}
+@keyframes h_br{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+@keyframes h_tilt{0%,100%{transform:rotate(0deg)}30%{transform:rotate(-1deg)}66%{transform:rotate(.8deg)}}
+.fing{transform-box:fill-box;transform-origin:50% 0%}
+.fing.tapping{animation:h_tap 1.5s ease-in-out infinite}
+#f2.tapping{animation-delay:.13s}
+#f3.tapping{animation-delay:.26s}
+@keyframes h_tap{0%,20%,100%{transform:translateY(0) rotate(0deg)}6%{transform:translateY(-7px) rotate(-5deg)}13%{transform:translateY(1.5px) rotate(1deg)}}
+@media (prefers-reduced-motion:reduce){#figure,#head,.fing{animation:none}}
+</style>
+<div class="coach-wrap">
+<svg class="coach-svg" viewBox="0 0 680 760" role="img" xmlns="http://www.w3.org/2000/svg"><title>Hustler portrait</title><desc>A wiry park-bench blitz hustler in his 50s with a flat cap, sunglasses pushed up onto it, a sly half-grin with a toothpick, grey-flecked goatee, dark layered jacket, a chess clock standing before him with one hand resting on it and dollar bills in his breast pocket.</desc>
+<g id="figure">
+
+ <!-- ======== TORSO (shrug) ======== -->
+ <g id="torso">
+  <!-- neck -->
+  <path d="M312 332 L308 404 Q340 420 372 404 L368 332 Q340 356 312 332 Z" fill="#C97F44"/>
+  <path d="M312 338 Q340 356 368 338 Q360 372 340 374 Q320 372 312 338 Z" fill="#A05E2A" opacity="0.55"/>
+  <path d="M318 380 Q340 388 362 380" stroke="#A05E2A" stroke-width="2" fill="none" opacity="0.5"/>
+  <!-- jacket panels -->
+  <path d="M150 760 L152 512 Q160 458 214 440 Q252 430 290 446 L300 472 L300 760 Z" fill="#1E2024"/>
+  <path d="M530 760 L528 512 Q520 458 466 440 Q428 430 390 446 L380 472 L380 760 Z" fill="#1E2024"/>
+  <path d="M150 760 L152 512 Q160 470 196 452 Q176 520 184 760 Z" fill="#16171A" opacity="0.7"/>
+  <path d="M530 760 L528 512 Q520 470 484 452 Q504 520 496 760 Z" fill="#16171A" opacity="0.7"/>
+  <!-- navy hood collar -->
+  <path d="M296 444 Q340 430 384 444 Q400 458 396 482 Q368 462 340 462 Q312 462 284 482 Q280 458 296 444 Z" fill="#28406A"/>
+  <path d="M300 452 Q340 440 380 452 Q360 460 340 460 Q320 460 300 452 Z" fill="#1B2C49"/>
+  <!-- tee -->
+  <path d="M300 470 Q340 456 380 470 L388 760 L292 760 Z" fill="#D7D2C7"/>
+  <path d="M312 470 Q340 486 368 470" stroke="#B9B4A9" stroke-width="4" fill="none"/>
+  <!-- jacket open edges -->
+  <path d="M300 470 L300 760" stroke="#101114" stroke-width="5" fill="none"/>
+  <path d="M380 470 L380 760" stroke="#101114" stroke-width="5" fill="none"/>
+  <path d="M386 474 L390 760" stroke="#3A3D42" stroke-width="2" fill="none" opacity="0.7"/>
+  <!-- breast pocket with a fan of bills -->
+  <path d="M446 548 L452 488 Q453 482 460 484 L512 494 Q518 496 517 502 L511 552 Z" fill="#7E9772"/>
+  <path d="M439 550 L443 486 Q444 480 451 481 L504 490 Q510 491 509 498 L505 554 Z" fill="#8CA585"/>
+  <path d="M432 552 L434 484 Q435 478 442 479 L490 487 Q496 488 495 495 L492 556 Z" fill="#9AB191"/>
+  <ellipse cx="461" cy="520" rx="10" ry="13" fill="#6E8A66" opacity="0.7"/>
+  <text x="437" y="498" font-family="Georgia,serif" font-size="14" font-weight="700" fill="#3f5a3c">50</text>
+  <text x="480" y="506" font-family="Georgia,serif" font-size="12" font-weight="700" fill="#3f5a3c" transform="rotate(8 480 506)">20</text>
+  <path d="M424 560 L424 524 Q424 516 433 516 L518 516 Q527 516 527 524 L527 560 Z" fill="#1A1C20"/>
+  <path d="M426 520 L525 520" stroke="#3A3D42" stroke-width="2" fill="none" opacity="0.7"/>
+ </g>
+
+ <!-- ======== HEAD ======== -->
+ <g id="headrig"><g id="head">
+  <!-- ears + grey sideburns -->
+  <ellipse cx="262" cy="274" rx="13" ry="20" fill="#C97F44"/>
+  <ellipse cx="418" cy="274" rx="13" ry="20" fill="#C97F44"/>
+  <path d="M262 264 Q268 274 262 286 M418 264 Q412 274 418 286" stroke="#A05E2A" stroke-width="2.5" fill="none" opacity="0.6"/>
+  <path d="M272 240 Q268 264 274 286 Q266 268 266 242 Z" fill="#6E6258"/>
+  <path d="M408 240 Q412 264 406 286 Q414 268 414 242 Z" fill="#6E6258"/>
+  <path d="M270 248 L272 278 M410 248 L408 278" stroke="#9A938C" stroke-width="2" fill="none" opacity="0.8"/>
+  <!-- face: lean, angular, weathered -->
+  <path d="M268 212 Q258 280 282 326 Q296 354 322 366 Q340 372 358 366 Q384 354 398 326 Q422 280 412 212 Q406 178 386 168 L294 168 Q274 178 268 212 Z" fill="#C97F44"/>
+  <path d="M282 326 Q268 278 272 216 Q280 194 296 188 Q286 222 288 276 Q292 312 310 340 Q294 336 282 326 Z" fill="#A05E2A" opacity="0.45"/>
+  <path d="M398 326 Q410 290 408 230 Q420 274 392 332 Q396 330 398 326 Z" fill="#A05E2A" opacity="0.35"/>
+  <!-- cheekbone hollows (wiry) -->
+  <path d="M288 300 Q296 318 312 332 M392 300 Q384 318 368 332" stroke="#A05E2A" stroke-width="2.5" fill="none" opacity="0.45"/>
+
+  <!-- flat cap: soft rounded crown sloping into a short stubby brim -->
+  <g id="flatcap">
+   <path d="M246 218 C236 148 288 94 348 94 C418 94 452 154 444 214 C414 184 380 176 342 176 C298 176 268 192 246 218 Z" fill="#2E3440"/>
+   <path d="M348 94 C418 94 452 154 444 214 C430 196 412 186 392 181 C414 160 408 122 380 102 C370 97 359 94 348 94 Z" fill="#262B35" opacity="0.85"/>
+   <path d="M318 98 Q348 92 378 100" stroke="#3C4350" stroke-width="5" fill="none" opacity="0.8" stroke-linecap="round"/>
+   <circle cx="348" cy="98" r="5.5" fill="#232833"/>
+   <path d="M300 108 Q322 150 310 178 M396 108 Q374 150 386 180" stroke="#232833" stroke-width="2.5" fill="none" opacity="0.7"/>
+   <!-- stubby brim -->
+   <path d="M252 212 C296 192 392 192 438 210 C450 216 448 230 432 230 C390 216 296 216 262 232 C248 234 242 220 252 212 Z" fill="#232833"/>
+   <path d="M256 216 Q340 198 434 214" stroke="#3C4350" stroke-width="2" fill="none" opacity="0.6"/>
+  </g>
+  <!-- sunglasses pushed up onto the cap (brown wayfarer frame) -->
+  <g id="shades">
+   <path d="M268 170 Q272 160 284 160 L324 160 Q336 160 336 172 L334 196 Q333 208 320 208 L286 206 Q272 205 270 192 Z" fill="#16181B" stroke="#4A382A" stroke-width="3.5"/>
+   <path d="M412 170 Q408 160 396 160 L356 160 Q344 160 344 172 L346 196 Q347 208 360 208 L394 206 Q408 205 410 192 Z" fill="#16181B" stroke="#4A382A" stroke-width="3.5"/>
+   <path d="M336 168 Q340 164 344 168" stroke="#4A382A" stroke-width="5" fill="none"/>
+   <path d="M268 172 Q258 176 252 186 M412 172 Q422 176 428 186" stroke="#4A382A" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+   <path d="M280 168 L310 198 M296 164 L322 190" stroke="#fff" stroke-width="4" fill="none" opacity="0.12"/>
+   <path d="M392 164 L366 192" stroke="#fff" stroke-width="4" fill="none" opacity="0.12"/>
+  </g>
+
+  <!-- eyebrows (one raised = signature) -->
+  <g id="browL"><path d="M284 246 Q306 238 328 244" stroke="#3A302A" stroke-width="8" fill="none" stroke-linecap="round"/></g>
+  <g id="browR"><path d="M352 244 Q374 237 396 246" stroke="#3A302A" stroke-width="8" fill="none" stroke-linecap="round"/></g>
+
+  <!-- eyes -->
+  <ellipse cx="306" cy="266" rx="14.5" ry="9.5" fill="#F6F1E6"/>
+  <ellipse cx="374" cy="266" rx="14.5" ry="9.5" fill="#F6F1E6"/>
+  <g id="eyeL"><circle cx="306" cy="266" r="6.6" fill="#4A2E18"/><circle cx="306" cy="266" r="3" fill="#170B03"/><circle cx="308.5" cy="263.5" r="1.5" fill="#fff"/></g>
+  <g id="eyeR"><circle cx="374" cy="266" r="6.6" fill="#4A2E18"/><circle cx="374" cy="266" r="3" fill="#170B03"/><circle cx="376.5" cy="263.5" r="1.5" fill="#fff"/></g>
+  <!-- crow's feet + under-eye lines (50s) -->
+  <path d="M288 260 L278 256 M288 268 L278 271 M392 260 L402 256 M392 268 L402 271" stroke="#A05E2A" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>
+  <path d="M293 278 Q306 284 319 278 M361 278 Q374 284 387 278" stroke="#A05E2A" stroke-width="2" fill="none" opacity="0.5"/>
+  <ellipse id="lidL" cx="306" cy="266" rx="15" ry="10" fill="#C97F44"/>
+  <ellipse id="lidR" cx="374" cy="266" rx="15" ry="10" fill="#C97F44"/>
+
+  <!-- nose: defined, slightly hooked -->
+  <path d="M345 250 Q355 284 361 298 Q365 308 355 312" stroke="#A05E2A" stroke-width="3" fill="none" opacity="0.55" stroke-linecap="round"/>
+  <path d="M335 250 Q331 280 326 296" stroke="#D89A62" stroke-width="2" fill="none" opacity="0.55"/>
+  <ellipse cx="340" cy="297" rx="12" ry="9" fill="#D08648" opacity="0.55"/>
+  <ellipse cx="329" cy="302" rx="4" ry="2.5" fill="#8C5224"/>
+  <ellipse cx="351" cy="302" rx="4" ry="2.5" fill="#8C5224"/>
+  <!-- nasolabial folds -->
+  <path d="M320 304 Q310 320 314 332 M360 304 Q370 320 366 332" stroke="#A05E2A" stroke-width="2.5" fill="none" opacity="0.55"/>
+
+  <!-- thin moustache with grey flecks -->
+  <path d="M310 312 Q340 302 370 312 Q355 306 340 307 Q325 306 310 312 Z" fill="#4A423A"/>
+  <path d="M322 308 L327 305 M348 305 L354 308" stroke="#6E665C" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <!-- mouth (engine-driven, lopsided smirk) -->
+  <path id="mouth" d="M314 330 Q340 324 366 320 Q340 330 314 330 Z" fill="#6E3B30"/>
+  <!-- toothpick anchored at the right mouth corner (engine moves it with the mouth) -->
+  <g id="toothpick">
+   <path d="M366 320 L400 311" stroke="#E2D1A8" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+   <path d="M366 320 L383 315.5" stroke="#C9B585" stroke-width="3.2" fill="none" stroke-linecap="round" opacity="0.6"/>
+  </g>
+  <!-- salt-and-pepper goatee -->
+  <path d="M322 338 Q340 333 358 338 Q361 354 340 363 Q319 354 322 338 Z" fill="#8C8578"/>
+  <path d="M331 341 L330 354 M349 341 L350 354" stroke="#5F594E" stroke-width="1.6" fill="none" opacity="0.7"/>
+  <path d="M340 343 L340 358" stroke="#B9B2A6" stroke-width="1.4" fill="none" opacity="0.7"/>
+  <!-- grey stubble on the jaw -->
+  <g stroke="#8C8578" stroke-width="2.2" fill="none" opacity="0.5" stroke-linecap="round" stroke-dasharray="2 6">
+   <path d="M288 314 Q296 342 318 358"/>
+   <path d="M392 314 Q384 342 362 358"/>
+   <path d="M308 350 Q340 366 372 350"/>
+  </g>
+ </g></g>
+
+ <!-- ======== CHESS CLOCK standing in front (grounded at the bottom) ======== -->
+ <g id="clockgroup">
+  <!-- his left arm reaching down to rest on the clock -->
+  <path d="M118 760 Q126 668 178 626" stroke="#1E2024" stroke-width="56" fill="none" stroke-linecap="round"/>
+  <path d="M176 632 Q214 606 248 600" stroke="#C97F44" stroke-width="34" fill="none" stroke-linecap="round"/>
+  <!-- brass plungers -->
+  <rect x="282" y="586" width="28" height="20" rx="6" fill="#B0894A"/>
+  <rect x="368" y="586" width="28" height="20" rx="6" fill="#9C7838"/>
+  <rect x="286" y="581" width="20" height="7" rx="3" fill="#CAA45E"/>
+  <rect x="372" y="581" width="20" height="7" rx="3" fill="#CAA45E"/>
+  <!-- clock body, standing on the bottom edge -->
+  <path d="M238 760 L238 632 Q238 612 258 612 L422 612 Q442 612 442 632 L442 760 Z" fill="#2B2723"/>
+  <path d="M238 760 L238 632 Q238 612 258 612 L268 612 L268 760 Z" fill="#211D1A"/>
+  <path d="M242 622 Q250 614 262 614 L420 614" stroke="#4A443C" stroke-width="2" fill="none" opacity="0.8"/>
+  <!-- left dial -->
+  <circle cx="293" cy="688" r="44" fill="#D9D2BF"/>
+  <circle cx="293" cy="688" r="38" fill="#F4ECD8"/>
+  <circle cx="293" cy="688" r="34" fill="none" stroke="#2A2A2A" stroke-width="5" stroke-dasharray="1.5 16.3"/>
+  <path d="M291 660 l4 14 l-9 0 Z" fill="#C2342B"/>
+  <line x1="293" y1="688" x2="293" y2="659" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round"/>
+  <line x1="293" y1="688" x2="312" y2="674" stroke="#1A1A1A" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="293" cy="688" r="3.5" fill="#111"/>
+  <!-- right dial -->
+  <circle cx="387" cy="688" r="44" fill="#D9D2BF"/>
+  <circle cx="387" cy="688" r="38" fill="#F4ECD8"/>
+  <circle cx="387" cy="688" r="34" fill="none" stroke="#2A2A2A" stroke-width="5" stroke-dasharray="1.5 16.3"/>
+  <path d="M385 660 l4 14 l-9 0 Z" fill="#C2342B"/>
+  <line x1="387" y1="688" x2="359" y2="688" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round"/>
+  <line x1="387" y1="688" x2="403" y2="674" stroke="#1A1A1A" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="387" cy="688" r="3.5" fill="#111"/>
+  <!-- hand draped over the clock's top-left corner, fingers over the front -->
+  <path d="M232 612 Q230 596 246 590 Q268 584 286 592 Q298 598 296 610 L294 618 Q270 612 248 616 Q236 616 232 612 Z" fill="#C97F44"/>
+  <g id="f1" class="fing"><path d="M248 614 Q244 636 250 650 Q256 654 261 650 Q266 636 263 616 Z" fill="#C97F44"/><path d="M250 648 Q256 652 260 648" stroke="#A05E2A" stroke-width="2" fill="none" opacity="0.6"/></g>
+  <g id="f2" class="fing"><path d="M267 616 Q264 640 270 654 Q276 658 281 654 Q285 638 282 617 Z" fill="#C97F44"/><path d="M270 652 Q276 656 280 652" stroke="#A05E2A" stroke-width="2" fill="none" opacity="0.6"/></g>
+  <g id="f3" class="fing"><path d="M286 615 Q284 634 289 646 Q295 650 299 645 Q302 632 299 614 Z" fill="#C97F44"/></g>
+  <path d="M240 596 Q252 588 268 588" stroke="#A05E2A" stroke-width="2.5" fill="none" opacity="0.5"/>
+ </g>
+
+</g>
+</svg>
+<div class="coach-ctrl">
+<button data-emo="neutral" class="on">Neutral</button>
+<button data-emo="happy">Happy</button>
+<button data-emo="sad">Sad</button>
+<button data-emo="angry">Angry</button>
+<button data-emo="surprised">Surprised</button>
+<button data-emo="skeptical">Skeptical</button>
+<span class="coach-sep"></span>
+<button id="h-talk">Talk</button>
+<button id="h-roll">Eye-roll</button>
+<button id="h-nod">Nod</button>
+<button id="h-shake">Shake</button>
+<button id="h-shrug">Shrug</button>
+<button id="h-tap" class="on">Finger tap</button>
+<button id="h-cycle">Auto-cycle: off</button>
+<span class="coach-sep"></span>
+<button class="look" data-look="upleft">&#8598;</button>
+<button class="look" data-look="up">&#8593;</button>
+<button class="look" data-look="upright">&#8599;</button>
+<button class="look" data-look="left">&#8592;</button>
+<button class="look" data-look="center">&#8226;</button>
+<button class="look" data-look="right">&#8594;</button>
+<button class="look" data-look="downleft">&#8601;</button>
+<button class="look" data-look="down">&#8595;</button>
+<button class="look" data-look="downright">&#8600;</button>
+</div>
+</div>
+<script src="animated_hustler_rig.js"></script>

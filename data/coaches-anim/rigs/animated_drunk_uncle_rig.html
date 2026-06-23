@@ -1,0 +1,185 @@
+<h2 class="sr-only">Animated portrait of a jovial dishevelled middle-aged man in a loud Hawaiian shirt over a stained undershirt, flushed cheeks and thinning messy hair, holding a beer can at chest height. He can take a big sip, burp, and throw the can away and grab a new one. Controllable expressions, glances and gestures.</h2>
+<style>
+:root{ --font-sans: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.coach-wrap{padding:.5rem 0}
+.coach-svg{width:100%;max-width:300px;display:block;margin:0 auto;height:auto}
+.coach-ctrl{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:360px;margin:14px auto 0}
+.coach-ctrl button{font-family:var(--font-sans,sans-serif);font-size:13px;font-weight:400;padding:6px 10px;border-radius:var(--border-radius-md,8px);border:1px solid var(--color-border-secondary,#3a352f);background:var(--color-background-secondary,#2a2622);color:var(--color-text-primary,#ece6da);cursor:pointer}
+.coach-ctrl button:hover{border-color:var(--color-border-primary,#5a5248)}
+.coach-ctrl button.on{background:var(--color-text-primary,#ece6da);color:var(--color-background-primary,#1a1815);border-color:var(--color-text-primary,#ece6da)}
+.coach-ctrl .look{min-width:30px;padding:5px 0}
+.coach-sep{width:100%;height:0}
+#figure{animation:u_br 5.6s ease-in-out infinite}
+#head{transform-box:view-box;transform-origin:340px 368px;animation:u_tilt 8.6s ease-in-out infinite}
+@keyframes u_br{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+@keyframes u_tilt{0%,100%{transform:rotate(0deg)}30%{transform:rotate(-1.2deg)}66%{transform:rotate(1deg)}}
+@media (prefers-reduced-motion:reduce){#figure,#head{animation:none}}
+</style>
+<div class="coach-wrap">
+<svg class="coach-svg" viewBox="0 0 680 760" role="img" xmlns="http://www.w3.org/2000/svg"><title>Drunk uncle portrait</title><desc>A jolly flushed man in his 50s with thinning messy hair and patchy stubble, wearing a partly unbuttoned Hawaiian shirt over a stained undershirt, holding a half-empty beer can at chest height.</desc>
+<g id="figure">
+
+ <!-- ======== TORSO (shrug) ======== -->
+ <g id="torso">
+  <!-- neck (thick) -->
+  <path d="M306 344 L302 420 Q340 438 378 420 L374 344 Q340 368 306 344 Z" fill="#ECC39C"/>
+  <path d="M306 350 Q340 368 374 350 Q364 384 340 386 Q316 384 306 350 Z" fill="#D89A6E" opacity="0.5"/>
+  <!-- hawaiian shirt panels (big sloped shoulders) -->
+  <path d="M108 760 L116 552 Q128 472 220 442 Q266 428 304 442 L300 470 L286 760 Z" fill="#2E5E8C"/>
+  <path d="M572 760 L564 552 Q552 472 460 442 Q414 428 376 442 L380 470 L394 760 Z" fill="#2E5E8C"/>
+  <!-- undershirt (stained) -->
+  <path d="M300 462 Q340 448 380 462 L396 760 L284 760 Z" fill="#EFE6D2"/>
+  <ellipse cx="334" cy="588" rx="11" ry="14" fill="#D9C49A" opacity="0.7"/>
+  <ellipse cx="356" cy="648" rx="8" ry="10" fill="#D9C49A" opacity="0.6"/>
+  <ellipse cx="324" cy="640" rx="4" ry="5" fill="#D9C49A" opacity="0.55"/>
+  <path d="M306 462 Q340 478 374 462" stroke="#D9CBAE" stroke-width="3.5" fill="none"/>
+  <!-- shirt edges + collar lapels -->
+  <path d="M300 468 L286 760" stroke="#27517A" stroke-width="6" fill="none"/>
+  <path d="M380 468 L394 760" stroke="#27517A" stroke-width="6" fill="none"/>
+  <path d="M302 446 L264 506 Q250 470 272 446 Q288 438 302 446 Z" fill="#27517A"/>
+  <path d="M378 446 L416 506 Q430 470 408 446 Q392 438 378 446 Z" fill="#27517A"/>
+  <!-- flowers: red hibiscus + yellow + leaves, scattered both panels -->
+  <g opacity="0.95">
+   <g transform="translate(176 540)"><circle r="11" fill="#D85A6A"/><circle cx="-13" cy="-7" r="9" fill="#D85A6A"/><circle cx="12" cy="-9" r="9" fill="#D85A6A"/><circle cx="-8" cy="11" r="9" fill="#D85A6A"/><circle cx="9" cy="11" r="9" fill="#D85A6A"/><circle r="4.5" fill="#F0C04A"/></g>
+   <g transform="translate(232 650)"><circle r="10" fill="#E8C56A"/><circle cx="-12" cy="-6" r="8" fill="#E8C56A"/><circle cx="11" cy="-8" r="8" fill="#E8C56A"/><circle cx="-7" cy="10" r="8" fill="#E8C56A"/><circle cx="8" cy="10" r="8" fill="#E8C56A"/><circle r="4" fill="#C96A4A"/></g>
+   <g transform="translate(150 668)"><circle r="9" fill="#D85A6A"/><circle cx="-11" cy="-6" r="7.5" fill="#D85A6A"/><circle cx="10" cy="-7" r="7.5" fill="#D85A6A"/><circle cx="-6" cy="9" r="7.5" fill="#D85A6A"/><circle cx="7" cy="9" r="7.5" fill="#D85A6A"/><circle r="4" fill="#F0C04A"/></g>
+   <g transform="translate(498 548)"><circle r="11" fill="#D85A6A"/><circle cx="-13" cy="-7" r="9" fill="#D85A6A"/><circle cx="12" cy="-9" r="9" fill="#D85A6A"/><circle cx="-8" cy="11" r="9" fill="#D85A6A"/><circle cx="9" cy="11" r="9" fill="#D85A6A"/><circle r="4.5" fill="#F0C04A"/></g>
+   <g transform="translate(454 668)"><circle r="10" fill="#E8956A"/><circle cx="-12" cy="-6" r="8" fill="#E8956A"/><circle cx="11" cy="-8" r="8" fill="#E8956A"/><circle cx="-7" cy="10" r="8" fill="#E8956A"/><circle cx="8" cy="10" r="8" fill="#E8956A"/><circle r="4" fill="#F0C04A"/></g>
+   <g transform="translate(530 636)"><circle r="8" fill="#D85A6A"/><circle cx="-10" cy="-5" r="7" fill="#D85A6A"/><circle cx="9" cy="-6" r="7" fill="#D85A6A"/><circle cx="-5" cy="8" r="7" fill="#D85A6A"/><circle cx="6" cy="8" r="7" fill="#D85A6A"/><circle r="3.5" fill="#F0C04A"/></g>
+   <path d="M196 600 Q216 584 238 592 M204 606 Q220 596 236 600" stroke="#5E8A4A" stroke-width="5" fill="none" stroke-linecap="round"/>
+   <path d="M470 600 Q450 584 428 592 M462 606 Q446 596 430 600" stroke="#5E8A4A" stroke-width="5" fill="none" stroke-linecap="round"/>
+   <path d="M160 498 Q180 482 202 490 M508 498 Q488 482 466 490" stroke="#5E8A4A" stroke-width="5" fill="none" stroke-linecap="round"/>
+  </g>
+ </g>
+
+ <!-- ======== ARMS + BEER CAN ======== -->
+ <g id="props">
+  <!-- his left arm (viewer right), resting down out of frame -->
+  <path d="M512 760 L514 660 Q516 612 488 588" stroke="#2E5E8C" stroke-width="62" fill="none" stroke-linecap="round"/>
+  <path d="M524 760 L524 680" stroke="#ECC39C" stroke-width="42" fill="none" stroke-linecap="round"/>
+  <!-- his right arm (viewer left): short sleeve + bare forearm to center -->
+  <path d="M162 760 L164 656 Q166 608 196 586" stroke="#2E5E8C" stroke-width="62" fill="none" stroke-linecap="round"/>
+  <path d="M174 702 Q244 670 314 616" stroke="#ECC39C" stroke-width="42" fill="none" stroke-linecap="round"/>
+  <path d="M184 710 Q236 688 290 650" stroke="#D89A6E" stroke-width="4" fill="none" opacity="0.4"/>
+
+  <!-- hand + can (this group raises for the sip) -->
+  <g id="cangrip">
+   <g id="beercan">
+    <path d="M315 560 L365 560 L363 632 Q340 639 317 632 Z" fill="#E8E4DC"/>
+    <path d="M316 568 L364 568 L363 590 L317 590 Z" fill="#C2342B"/>
+    <path d="M318 608 L362 608 L361 622 L319 622 Z" fill="#C2342B"/>
+    <ellipse cx="340" cy="560" rx="25" ry="8" fill="#B9B4AA"/>
+    <ellipse cx="340" cy="560" rx="18" ry="5" fill="#D8D4CA"/>
+    <rect x="335" y="554" width="10" height="6" rx="2" fill="#8E8A80"/>
+    <path d="M321 566 L320 630" stroke="#fff" stroke-width="4" opacity="0.35" fill="none"/>
+   </g>
+   <!-- hand gripping the lower half of the can -->
+   <path d="M310 610 Q302 602 310 594 Q330 586 354 590 Q370 594 368 610 Q368 626 352 631 Q330 635 314 627 Q306 620 310 610 Z" fill="#ECC39C"/>
+   <path d="M320 596 L320 626 M334 594 L334 629 M348 594 L348 628" stroke="#D89A6E" stroke-width="2.5" fill="none" opacity="0.6"/>
+   <path d="M310 594 Q316 588 326 588" stroke="#D89A6E" stroke-width="3" fill="none" opacity="0.5"/>
+  </g>
+ </g>
+
+ <!-- ======== HEAD ======== -->
+ <g id="headrig"><g transform="translate(-40.8 -33.6) scale(1.12)"><g id="head">
+  <!-- ears -->
+  <ellipse cx="250" cy="282" rx="14" ry="22" fill="#ECC39C"/>
+  <ellipse cx="430" cy="282" rx="14" ry="22" fill="#ECC39C"/>
+  <path d="M250 272 Q256 282 250 294 M430 272 Q424 282 430 294" stroke="#D89A6E" stroke-width="2.5" fill="none" opacity="0.6"/>
+  <!-- messy thinning hair: full sides + solid top cap, high forehead -->
+  <path d="M260 310 Q236 240 252 168 Q262 130 296 116 L286 180 Q278 248 286 310 Q272 316 260 310 Z" fill="#8A6B4A"/>
+  <path d="M420 310 Q444 240 428 168 Q418 130 384 116 L394 180 Q402 248 394 310 Q408 316 420 310 Z" fill="#8A6B4A"/>
+  <path d="M254 204 Q238 118 302 92 Q340 78 378 92 Q442 118 426 204 Q400 164 340 160 Q280 164 254 204 Z" fill="#8A6B4A"/>
+  <path d="M262 188 Q290 156 340 154 Q390 156 418 188 Q396 170 340 168 Q284 170 262 188 Z" fill="#75593C" opacity="0.7"/>
+  <!-- messy strands sticking out -->
+  <path d="M284 116 Q272 96 278 80 M316 102 Q312 80 322 66 M352 98 Q356 76 348 62 M386 108 Q398 88 392 72 M414 136 Q430 122 432 104" stroke="#8A6B4A" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M268 140 Q252 130 248 112" stroke="#8A6B4A" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <!-- face: wide, round, jowly, big forehead -->
+  <path d="M260 212 Q248 266 256 312 Q264 358 296 380 Q318 394 340 394 Q362 394 384 380 Q416 358 424 312 Q432 266 420 212 Q414 160 382 150 Q340 142 298 150 Q266 160 260 212 Z" fill="#ECC39C"/>
+  <path d="M278 344 Q260 288 264 222 Q272 200 290 192 Q280 228 282 286 Q286 330 306 358 Q290 354 278 344 Z" fill="#D89A6E" opacity="0.35"/>
+  <!-- double chin -->
+  <path d="M298 388 Q340 410 382 388 Q364 400 340 400 Q316 400 298 388 Z" fill="#D89A6E" opacity="0.5"/>
+  <!-- shiny sweaty forehead + creases -->
+  <ellipse cx="340" cy="200" rx="46" ry="17" fill="#F7DBB8" opacity="0.6"/>
+  <path d="M304 192 Q340 184 376 192 M308 210 Q340 203 372 210" stroke="#D89A6E" stroke-width="2" fill="none" opacity="0.45"/>
+  <path d="M288 198 q-3 8 2 12 q6 -2 3 -10 Z" fill="#BFE3F2" opacity="0.9"/>
+  <path d="M394 190 q-3 8 2 12 q6 -2 3 -10 Z" fill="#BFE3F2" opacity="0.9"/>
+  <!-- ruddy flushed cheeks + red nose tint -->
+  <ellipse cx="294" cy="304" rx="18" ry="12" fill="#E08577" opacity="0.6"/>
+  <ellipse cx="386" cy="304" rx="18" ry="12" fill="#E08577" opacity="0.6"/>
+
+  <!-- eyebrows (thick, dark, uneven) -->
+  <g id="browL"><path d="M280 246 Q304 234 330 244" stroke="#5A4630" stroke-width="10" fill="none" stroke-linecap="round"/></g>
+  <g id="browR"><path d="M350 244 Q376 233 400 246" stroke="#5A4630" stroke-width="10" fill="none" stroke-linecap="round"/></g>
+
+  <!-- eyes (a little glassy) -->
+  <ellipse cx="306" cy="268" rx="15" ry="10" fill="#F8F3E8"/>
+  <ellipse cx="374" cy="268" rx="15" ry="10" fill="#F8F3E8"/>
+  <g id="eyeL"><circle cx="306" cy="268" r="7" fill="#6B4A2E"/><circle cx="306" cy="268" r="3.2" fill="#241307"/><circle cx="308.5" cy="265" r="1.7" fill="#fff"/><circle cx="302.5" cy="270.5" r="1" fill="#fff" opacity="0.8"/></g>
+  <g id="eyeR"><circle cx="374" cy="268" r="7" fill="#6B4A2E"/><circle cx="374" cy="268" r="3.2" fill="#241307"/><circle cx="376.5" cy="265" r="1.7" fill="#fff"/><circle cx="370.5" cy="270.5" r="1" fill="#fff" opacity="0.8"/></g>
+  <path d="M292 280 Q306 285 320 280 M360 280 Q374 285 388 280" stroke="#DB9B85" stroke-width="2" fill="none" opacity="0.6"/>
+  <!-- under-eye bags + nasolabial folds -->
+  <path d="M290 287 Q306 294 322 287 M358 287 Q374 294 390 287" stroke="#D89A6E" stroke-width="2.2" fill="none" opacity="0.55"/>
+  <path d="M320 320 Q310 336 316 348 M360 320 Q370 336 364 348" stroke="#D89A6E" stroke-width="2.5" fill="none" opacity="0.55"/>
+  <ellipse id="lidL" cx="306" cy="268" rx="15.5" ry="10.5" fill="#ECC39C"/>
+  <ellipse id="lidR" cx="374" cy="268" rx="15.5" ry="10.5" fill="#ECC39C"/>
+
+  <!-- bulbous nose -->
+  <ellipse cx="340" cy="308" rx="15" ry="11" fill="#E5A87C"/>
+  <ellipse cx="340" cy="306" rx="11" ry="7" fill="#E89A78" opacity="0.6"/>
+  <path d="M334 252 Q331 284 327 298 M346 252 Q349 284 353 298" stroke="#D89A6E" stroke-width="2.5" fill="none" opacity="0.5"/>
+  <ellipse cx="330" cy="313" rx="3.8" ry="2.4" fill="#B97947"/>
+  <ellipse cx="350" cy="313" rx="3.8" ry="2.4" fill="#B97947"/>
+
+  <!-- mouth (engine-driven, lopsided) -->
+  <path id="mouth" d="M312 336 Q340 329 368 326 Q340 342 312 336 Z" fill="#8E4438"/>
+  <!-- patchy stubble -->
+  <g stroke="#6E5A40" stroke-width="2.4" fill="none" opacity="0.5" stroke-linecap="round" stroke-dasharray="2 6">
+   <path d="M288 322 Q298 352 322 368"/>
+   <path d="M392 322 Q382 352 358 368"/>
+   <path d="M310 358 Q340 374 370 358"/>
+   <path d="M318 350 Q340 362 362 350"/>
+   <path d="M316 318 Q328 324 334 322 M346 322 Q356 324 364 318"/>
+  </g>
+  <!-- burp puff fx (hidden until burp()) -->
+  <g id="burpfx" opacity="0" stroke="#D8D2C4" stroke-width="2.5" fill="none">
+   <circle cx="0" cy="0" r="4"/>
+   <circle cx="11" cy="-14" r="6"/>
+   <circle cx="24" cy="-31" r="9"/>
+  </g>
+ </g></g></g>
+
+</g>
+</svg>
+<div class="coach-ctrl">
+<button data-emo="neutral" class="on">Neutral</button>
+<button data-emo="happy">Happy</button>
+<button data-emo="sad">Sad</button>
+<button data-emo="angry">Angry</button>
+<button data-emo="surprised">Surprised</button>
+<button data-emo="skeptical">Skeptical</button>
+<span class="coach-sep"></span>
+<button id="u-talk">Talk</button>
+<button id="u-roll">Eye-roll</button>
+<button id="u-nod">Nod</button>
+<button id="u-shake">Shake</button>
+<button id="u-shrug">Shrug</button>
+<button id="u-cycle">Auto-cycle: off</button>
+<span class="coach-sep"></span>
+<button id="u-sip">Big sip</button>
+<button id="u-burp">Burp</button>
+<button id="u-throw">Throw can</button>
+<span class="coach-sep"></span>
+<button class="look" data-look="upleft">&#8598;</button>
+<button class="look" data-look="up">&#8593;</button>
+<button class="look" data-look="upright">&#8599;</button>
+<button class="look" data-look="left">&#8592;</button>
+<button class="look" data-look="center">&#8226;</button>
+<button class="look" data-look="right">&#8594;</button>
+<button class="look" data-look="downleft">&#8601;</button>
+<button class="look" data-look="down">&#8595;</button>
+<button class="look" data-look="downright">&#8600;</button>
+</div>
+</div>
+<script src="animated_drunk_uncle_rig.js"></script>

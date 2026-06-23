@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      /* Chess Review — toolbar popup. Mirrors the analyzer's dark design system
+         (deep neutrals, green accent, the same system-font stack as the app). */
+      :root {
+        --font-ui: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --bg:        #14130f;
+        --bg-grain:  #1a1916;
+        --panel:     #1f1e1a;
+        --panel-2:   #262521;
+        --panel-3:   #2e2c27;
+        --line:      #34322c;
+        --line-soft: #2a2823;
+        --ink:       #f3f1ea;
+        --ink-2:     #b8b4a8;
+        --ink-3:     #807c70;
+        --accent:        #7fb45f;
+        --accent-strong: #6aa14a;
+        --accent-ink:    #11210a;
+        --radius: 14px;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; }
+      body {
+        font-family: var(--font-ui);
+        width: 318px;
+        padding: 16px 16px 18px;
+        background: radial-gradient(120% 90% at 50% -20%, var(--bg-grain), var(--bg) 65%);
+        color: var(--ink);
+        font-size: 13px;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ---- brand header (matches the analyzer top bar) ---- */
+      .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+      .brand-mark {
+        width: 28px; height: 28px; border-radius: 8px;
+        display: grid; place-items: center;
+        background: linear-gradient(160deg, var(--accent), var(--accent-strong));
+        color: var(--accent-ink); font-size: 17px;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
+      }
+      .brand-mark .brand-img { width: 20px; height: 20px; display: block; }
+      .brand-name { font-weight: 800; letter-spacing: .14em; font-size: 13px; text-transform: uppercase; }
+      .brand-name span { color: var(--ink-3); font-weight: 600; }
+
+      /* ---- primary action ---- */
+      .primary {
+        width: 100%; padding: 13px; font: inherit; font-size: 14px; font-weight: 700;
+        letter-spacing: .2px; border: 0; border-radius: 10px; cursor: pointer;
+        color: var(--accent-ink);
+        background: linear-gradient(160deg, var(--accent), var(--accent-strong));
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 8px 20px -12px var(--accent);
+        transition: filter .15s, transform .05s;
+      }
+      .primary:hover:not(:disabled) { filter: brightness(1.07); }
+      .primary:active:not(:disabled) { transform: translateY(1px); filter: brightness(.95); }
+      .primary:disabled { opacity: .55; cursor: default; }
+
+      #status { font-size: 12px; min-height: 16px; margin: 10px 2px 0; color: var(--ink-2); line-height: 1.45; white-space: pre-line; }
+      #status.error { color: #f5746a; }
+      #status:empty { margin: 0; min-height: 0; }
+
+      /* ---- collapsible manual section ---- */
+      details#manual { margin-top: 14px; border-top: 1px solid var(--line-soft); }
+      summary {
+        list-style: none; cursor: pointer; user-select: none;
+        display: flex; align-items: center; gap: 7px;
+        font-size: 12px; font-weight: 600; color: var(--ink-2);
+        padding: 12px 2px 4px;
+      }
+      summary::-webkit-details-marker { display: none; }
+      summary:hover { color: var(--ink); }
+      summary .chev { transition: transform .15s; display: inline-flex; }
+      details[open] summary .chev { transform: rotate(90deg); }
+      summary .chev svg { width: 13px; height: 13px; }
+
+      label { font-size: 11.5px; color: var(--ink-3); display: block; margin: 12px 0 5px; }
+      label .hint { color: var(--ink-3); opacity: .8; }
+      input, textarea {
+        width: 100%; padding: 8px 10px; font: inherit; font-size: 13px;
+        color: var(--ink); background: var(--panel-2);
+        border: 1px solid var(--line); border-radius: 9px;
+        transition: border-color .15s;
+      }
+      input::placeholder, textarea::placeholder { color: var(--ink-3); }
+      input:focus, textarea:focus { outline: none; border-color: color-mix(in oklab, var(--accent) 55%, var(--line)); }
+      textarea { resize: vertical; min-height: 128px; line-height: 1.45; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+      textarea::-webkit-scrollbar { width: 10px; height: 10px; }
+      textarea::-webkit-scrollbar-track { background: transparent; }
+      textarea::-webkit-scrollbar-thumb { background: var(--line); border: 2px solid var(--panel-2); border-radius: 999px; }
+      textarea::-webkit-scrollbar-thumb:hover { background: var(--ink-3); }
+      textarea::-webkit-resizer { display: none; }
+
+      .row { display: flex; gap: 7px; margin-top: 5px; }
+      .row input { flex: 1; }
+
+      button.secondary, button.ghost {
+        font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer;
+        border-radius: 9px; transition: .15s;
+      }
+      button.secondary {
+        padding: 0 14px; border: 0; color: var(--accent-ink);
+        background: linear-gradient(160deg, var(--accent), var(--accent-strong));
+      }
+      button.secondary:hover { filter: brightness(1.07); }
+      button.ghost {
+        width: 100%; margin-top: 9px; padding: 9px;
+        color: var(--ink); background: var(--panel-2);
+        border: 1px solid var(--line);
+      }
+      button.ghost:hover { border-color: color-mix(in oklab, var(--accent) 45%, var(--line)); }
+      button:disabled { opacity: .55; cursor: default; }
+    </style>
+  </head>
+  <body>
+    <div class="brand">
+      <div class="brand-mark"><img class="brand-img" src="pieces-img/cburnett/wN.svg" alt=""></div>
+      <div class="brand-name">Chess <span>/ Review</span></div>
+    </div>
+
+    <button id="analyzeCurrent" class="primary">Analyze this game</button>
+    <div id="status"></div>
+
+    <details id="manual">
+      <summary>
+        <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+        Manual setup
+      </summary>
+
+      <label for="username">Username <span class="hint">— usually detected automatically</span></label>
+      <div class="row">
+        <input id="username" placeholder="Chess.com username" />
+        <button id="saveUser" class="secondary">Save</button>
+      </div>
+
+      <label for="manualInput">Older game — Chess.com / Lichess URL, PGN, or FEN</label>
+      <textarea id="manualInput" placeholder="https://www.chess.com/game/live/123456789&#10;https://lichess.org/CZmytj0X&#10;1. e4 e5 2. Nf3 …&#10;or a FEN: rnbq…/… w KQkq - 0 1"></textarea>
+      <button id="analyzeManual" class="ghost">Analyze pasted</button>
+    </details>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

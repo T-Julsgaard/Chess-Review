@@ -1,0 +1,400 @@
+{
+  "coach_id": "life_coach",
+  "coach_name": "The Life Coach",
+  "personality": "Relentlessly positive growth guru who turns every move into a personal-development lesson. Chess is never just chess — it is a journey, a practice, and an opportunity to meet your highest self.",
+  "voice_notes": "Podcast-host warmth, wellness vocabulary used with total sincerity: alignment, growth edges, holding space, nervous-system regulation, journaling homework. Recurring bits: breathing exercises prescribed mid-game (in for four, out for eight), the wins journal, quoting 'my own coach, Saskia', addressing the player as 'my friend', and reframing every setback as tuition, data, or curriculum. Radical honesty about bad moves, zero shame attached. Distinct from the Mentor (who teaches chess; the Life Coach teaches YOU) and from the Wise Grandma (aspiration, not comfort food). No emojis — presence does not need them.",
+  "uses_emoji": false,
+  "move_quality": {
+    "brilliant": [
+      "{move}. Do you see what happens when you stop playing small? THIS happens. Breathe it in.",
+      "Brilliant! That move came from your authentic self. The version of you from last month doesn't find that. Honor your growth.",
+      "{move} is brilliant. I want you to pause, place a hand on your heart, and really receive this moment.",
+      "A brilliant move! This is what alignment looks like. The board asked, you listened, the universe co-signed.",
+      "{move} — brilliant. Write this one in your wins journal tonight. We celebrate evidence, and this is evidence.",
+      "Brilliant! As I tell my podcast listeners: breakthroughs aren't accidents, they're appointments. You just kept yours.",
+      "{move}! You visualized the player you wanted to be and then BECAME them, mid-game. That's manifestation with a work ethic.",
+      "Brilliant. My own coach, Saskia, says peak moments are previews of your baseline. {move} is who you're becoming."
+    ],
+    "great": [
+      "{move} — a great move, and nearly the only one that worked. You didn't panic in the narrow place. That's regulation, my friend.",
+      "Great move! One right path, and you found it. Trust is built exactly here — in the moments with no room for error.",
+      "{move} is great. The position gave you one door and you walked through it without flinching. Growth doesn't always look loud.",
+      "A great move. When the options shrink, your training speaks. Today it said exactly the right thing.",
+      "Great! You held your center — the board's and your own. Notice how those are always the same work.",
+      "{move}, great move. You stayed present when it got tight. Presence is a muscle, and you just trained it.",
+      "That's a great move — the only one that held. Remember this feeling next time your inner critic says you fold under pressure."
+    ],
+    "best": [
+      "{move} is the best move. Optimal choices, my friend, are just self-love expressed in algebraic notation.",
+      "The best move! You and your highest self are in complete agreement right now. Keep that channel open.",
+      "{move} — best move. No drama, no doubt, just clarity. This is what a regulated nervous system plays like.",
+      "Best move. You asked the position what it needed instead of what your ego wanted. That's emotional maturity, on a board.",
+      "{move} is the best move available. Receiving exactly what the present moment offers — that's a practice, and you're practicing.",
+      "The best move! Stack enough aligned choices and you stop chasing results — results find your address.",
+      "{move}: best move. Notice how calm it felt. Right decisions rarely shout. They exhale."
+    ],
+    "excellent": [
+      "{move} is excellent. Not 'perfect' — excellent. We're releasing perfectionism this season, remember?",
+      "Excellent move! You're consistently showing up for this position, and consistency is just self-respect on a schedule.",
+      "{move} — excellent. The gap between this and perfect is where perfectionists go to suffer. We don't live there anymore.",
+      "Excellent! Your process is working. Trust the process — and unlike most people who say that, you actually have one.",
+      "{move} is excellent work. Small aligned steps. That's how every transformation I've ever witnessed actually happened.",
+      "Excellent move. Feel that quiet confidence? That's not arrogance. That's evidence accumulating.",
+      "{move}, excellent. You're not playing to avoid losing anymore — you're playing to express who you are. Big shift."
+    ],
+    "good": [
+      "{move} is a good move. Good is enough. Write that on a sticky note: good is enough.",
+      "A good move! There was a slightly higher vibration available, but comparison is the thief of joy — even self-comparison.",
+      "{move} — good. You're maintaining your standards under load. That's the whole practice, honestly.",
+      "Good move. Not every moment needs to be a breakthrough. Some moments just need you to show up. You did.",
+      "{move} is good, solid work. Sustainable beats spectacular. Burnout-brilliance is not the brand we're building.",
+      "A good move. You kept your boundaries intact and your pieces connected. Those are the same skill, by the way.",
+      "Good. The journey is ten thousand decent choices, not one perfect one. That was one of the ten thousand."
+    ],
+    "book": [
+      "{move} is still book — you're walking a path others have walked. Even trailblazers start on the trail, my friend.",
+      "Book move. Theory is just the accumulated wisdom of people who did the work before you. Receive it with gratitude.",
+      "{move} is known theory. Borrowed wisdom is a beautiful place to start — and only a place to start. Stay curious.",
+      "Still in the book. I love this for you: structure now, freedom later. Every morning routine teaches the same thing.",
+      "{move} — book. You're honoring the fundamentals. Foundations aren't glamorous, and neither is anything that lasts.",
+      "Theory so far. Walk the marked trail, but keep asking why it bends where it bends. Mindless following isn't our thing.",
+      "{move}, still book. The masters left you a map. A map is a gift — and a gift is not a cage. Remember both halves."
+    ],
+    "inaccuracy": [
+      "{move} is an inaccuracy. Notice it, name it, release it. We do not spiral over rounding errors in this house.",
+      "A small inaccuracy. The universe just gave you a gentle nudge, not a lesson. Adjust your posture and continue.",
+      "{move} drifted slightly. Hey — drift is data. Where was your attention? That's a journaling question, not a judgment.",
+      "An inaccuracy, sure. But hear me: you are not your worst move, and you're not even your slightly-suboptimal move.",
+      "{move} was a little off-center. Come back to your breath, come back to the board. Centering is a returning, not a place.",
+      "Tiny wobble with {move}. Wobbles are proof you're moving. Statues don't wobble, and statues don't win games either.",
+      "{move} — slightly inaccurate. Self-awareness without self-flagellation, please. Note it and move forward."
+    ],
+    "mistake": [
+      "{move} is a mistake. Or, reframe: it's tuition. You're enrolled, the course is this game, and class is in session.",
+      "A mistake. Breathe in for four, out for eight. The position changed; your worth didn't. Now let's respond, not react.",
+      "{move} didn't serve you. That's okay — we're not aiming for a flawless journey, we're aiming for an honest one.",
+      "That's a mistake, and I want you to thank it. Out loud is optional. Mistakes are the only teachers that never cancel.",
+      "{move} was a mistake. The inner critic just grabbed the microphone, didn't it? Take the mic back. One move at a time.",
+      "A mistake happened. Notice the language — it happened; it isn't who you are. Now: what does the new position need from you?",
+      "{move} — mistake. Growth isn't linear, my friend. It's a squiggle. This is just the squiggle part."
+    ],
+    "miss": [
+      "{move} misses an opportunity. The door was open and you walked past it. That happens when we stop expecting doors. Expect doors.",
+      "A miss. You didn't believe the position was offering you that much. Receiving is a skill — most people undertrain it.",
+      "{move} left a gift unopened. Scarcity thinking, my friend: 'surely there's nothing big here for me.' There was.",
+      "You missed something there. Don't rush past this feeling — it's not regret, it's your awareness expanding in real time.",
+      "{move} — a missed chance. My coach Saskia says opportunities are shy: they knock once, softly. Train your hearing.",
+      "A miss. The position believed in you more than you believed in the position. Let's close that gap.",
+      "{move} walks past the moment. Presence, presence, presence. The best move only exists in the now, and so do you."
+    ],
+    "blunder": [
+      "{move} is a blunder. First: hand on heart, one breath. You are safe, it's a board game, and this is now a growth opportunity of unusual size.",
+      "A blunder. I won't pretend it isn't — radical honesty is part of my practice. But shame is optional, and we're declining it.",
+      "{move} — a blunder. The old you spirals here. The current you takes one cleansing breath and asks: what does this position need NOW?",
+      "That's a blunder, and that's okay. Rock bottom has excellent acoustics — you can finally hear what the position has been saying.",
+      "{move} is a blunder. We don't call this failing. We call it collecting a data point with feelings attached. Log it, feel it, release it.",
+      "A blunder. Listen to me: every person I've ever coached through a transformation has a moment like this. It's chapter three. The book is long.",
+      "{move}, a blunder. Your inner critic is drafting a whole keynote right now. Cancel the talk. We respond to the board, not the noise.",
+      "A blunder, yes. And — not but, AND — you get to choose who you are for the rest of this game. That choice is the entire curriculum."
+    ]
+  },
+  "weak_move_suffix": [
+    "{best_move} was the aligned choice. Sit with the difference for a second — that gap is your growth edge.",
+    "The position was asking for {best_move}. Hearing what's actually being asked of us: lifelong work, my friend.",
+    "{best_move} was available the whole time. Abundance usually is. Note it without judgment.",
+    "Next time, {best_move}. Not as a should — shoulds are heavy — as an invitation.",
+    "{best_move} held more. Add it to tonight's reflection. Growth loves a written record."
+  ],
+  "move_fallback": [
+    "{move}. Every move is a small declaration of who you're choosing to be. Noted.",
+    "You played {move}. Intention or impulse? Only you know. Both are information.",
+    "{move} is on the board. No labels today — just you, the position, and the present moment.",
+    "{move}. I'm holding space for this one while the engine forms its truth."
+  ],
+  "non_move_states": {
+    "starting_position": [
+      "The starting position. Thirty-two pieces, infinite possibility, zero baggage. This is what a fresh start actually looks like — drink it in.",
+      "A new game, a new chapter. Set an intention before move one. Not a result — an intention. There's a difference, and it matters.",
+      "Here we are at the beginning. Whatever happened in your last game stays in your last game. We carry lessons, not luggage.",
+      "The board is reset, and so are you. Shoulders down, jaw unclenched, eyes open. Let's meet this game as our best self."
+    ],
+    "variation_exploration": [
+      "We're exploring a what-if. I love this energy — curiosity over judgment, always.",
+      "A variation, off the recorded path. This is the sandbox where fear loses its grip. Try the scary move. See what's true.",
+      "Side-quest time. The main timeline is safe. Here, you're allowed to fail on purpose — that's where the deepest learning hides.",
+      "Exploring alternatives. Beautiful practice: imagining other versions of the story without resenting the one you lived."
+    ],
+    "analyzing": [
+      "The engine is processing. Let's use the pause — unclench, breathe, soften your gaze. Pauses are productive.",
+      "A moment of analysis. Stillness isn't empty time, my friend. It's where clarity does its best work.",
+      "Processing... and while it does, check in with yourself. How's your breathing? Be honest.",
+      "The engine is going inward. We can respect that. Take the moment with it."
+    ],
+    "opening_known": [
+      "This is the {opening} ({eco}). You're walking a named path — and naming things changes our relationship with them.",
+      "The {opening}. Thousands have stood exactly here. You're part of a lineage, my friend. Feel that support behind you.",
+      "We're in the {opening}, {eco}. Structure is self-care. Enjoy it while it lasts — the unstructured part is coming, and it's also a gift.",
+      "{opening} territory. Known roads free up energy for the real work ahead. That's why we build routines, and that's why we build repertoires."
+    ],
+    "opening_unknown": [
+      "No name for this opening. Wonderful — unlabeled space is where authenticity lives. Principles over scripts now.",
+      "This position has no name, which means nobody's expectations are attached to it. Do you feel how light that is?",
+      "Uncharted opening. The map ended early today. Good news: you were never the map. You're the traveler.",
+      "An unnamed opening. When the external structure disappears, your internal structure gets to introduce itself."
+    ]
+  },
+  "derived_events": {
+    "eval_swing_large": [
+      "A {swing}-point swing. Big energy shift on the board. Don't chase the old position — grieve it quickly and meet the new one.",
+      "The evaluation moved {swing}. When life swings like this, we don't pretend it didn't. We recalibrate and re-enter.",
+      "That's a {swing} swing. Change this size is disorienting by design. Ground yourself: material, king, threats. Then proceed.",
+      "Whoa — {swing} points of movement. Volatility isn't the enemy; unconsciousness is. Stay awake in here.",
+      "A {swing} shift just happened. Transitions are sacred, my friend. This is one. Slow down inside it."
+    ],
+    "lead_change_white": [
+      "White holds the advantage now. If that's you: carry it humbly. If it's not: this is a resilience rep. Either way, you're training.",
+      "The lead moves to White. Notice your reaction before your next move — the reaction IS the next move, if you're not careful.",
+      "White is ahead, {eval}. The scoreboard shifted; your values didn't. Play from the values.",
+      "Advantage: White. Every lead change is a chance to practice either grace or grit. One of them is yours right now.",
+      "White takes the lead. Energy flows where attention goes — and someone's attention just slipped. Make sure the next slip isn't yours."
+    ],
+    "lead_change_black": [
+      "Black has the advantage now. Sit with whatever that brings up. Then set it down — the board needs you present, not processing.",
+      "The lead crosses to Black. Change is the only constant, in chess and everything else. Adapt with intention.",
+      "Black is ahead now. If you're holding the better side, hold it with open hands. Grasping is how leads get dropped.",
+      "Advantage: Black. Someone's story just changed. Make sure you're the author of yours, not a character in theirs.",
+      "Black takes over. Momentum is real, and momentum is also a story. Stories can be rewritten — starting next move."
+    ],
+    "lead_change_equal": [
+      "We're back to balance. Equality isn't emptiness, my friend — it's potential, fully charged and undecided.",
+      "The game returns to center. So should you. Re-find your breath, re-find your plan.",
+      "All square again. The next chapter is unwritten, and you're holding the pen. I get chills, honestly.",
+      "Balance restored. Nobody 'won' the last stretch — and the game goes on anyway. Attachment to the score is heavy. Set it down.",
+      "Even again. This is a clean page mid-game — rarer and more precious than a clean page at the start."
+    ],
+    "mate_on_board": [
+      "There's a forced mate in {mate_n}. Manifestation time, my friend — and manifestation is just visualization plus execution. Execute.",
+      "Mate in {mate_n} is available. The finish line is visible. This is exactly when people trip — stay in your body, finish present.",
+      "A mate in {mate_n} exists. The universe has made its offer. Calculation is how you say yes.",
+      "Mate in {mate_n}. Close strong. How we finish things is how we finish everything — that's not pressure, that's an opportunity."
+    ],
+    "missed_mate": [
+      "There was a mate in {mate_n}, and it passed by. Don't make it mean anything about you. Let it teach you something about looking.",
+      "A mate in {mate_n} went unseen. Forgive yourself in real time — that's an advanced practice, and you just got a free rep.",
+      "You missed a mate in {mate_n}. The win was already inside the position. Most of what we search for is like that.",
+      "Mate in {mate_n}, unclaimed. Release it. The game is still here, and so are you, and that's genuinely enough to work with."
+    ],
+    "material_won_pawn": [
+      "A pawn gained. Small wins compound, my friend. This is the chess version of making your bed.",
+      "You won a pawn. Gratitude for small abundance — that's the practice that makes the big abundance noticeable.",
+      "One pawn richer. Micro-progress is still progress. The people who dismiss it are the people who plateau.",
+      "A pawn in the bank. Tiny, consistent gains. You know what I'm going to say: atomic habits, atomic pawns."
+    ],
+    "material_lost_pawn": [
+      "A pawn is gone. Loss is part of every meaningful pursuit. Feel it for one breath — exactly one — then play on.",
+      "You're down a pawn. Quick body scan: are you contracting? Don't play contracted. Expand first, decide second.",
+      "One pawn lost. The scarcity alarm will overreact — that's its job. Yours is to assess calmly: what did the pawn buy?",
+      "A pawn down. Lack is a lens, not a fact. Look at your activity, your structure, your chances. Take inventory of what remains."
+    ],
+    "material_won_piece": [
+      "A whole {piece} won! Receive it fully — don't deflect, don't 'it was nothing' me. You created that.",
+      "You're up a {piece}. Now the real test: can you hold abundance without getting careless? Most can't. Be the exception.",
+      "An entire {piece} gained. Success exposes us, my friend. Stay humble, stay thorough, stay here.",
+      "A {piece} in your favor. Celebrate for one breath, then protect it with your habits. Windfalls follow discipline home."
+    ],
+    "material_lost_piece": [
+      "Your {piece} is gone. Real talk: this hurts the position. We don't bypass that. We feel it, then we choose resistance over resignation.",
+      "A {piece} lost. The story 'it's over' just auditioned for your inner monologue. Don't cast it.",
+      "You lost a {piece}. Identity check: are you someone who folds here, or someone who makes the other side earn every square? Decide on purpose.",
+      "Down a {piece}. Grief, then grit — in that order, and quickly. The board rewards the player who arrives in the present first."
+    ],
+    "sacrifice": [
+      "A sacrifice! You released material to receive something greater. Letting go as strategy — I could talk about this for hours. I won't. Play on.",
+      "Material released with intention. That's not loss, that's investment. Now show the board your follow-through.",
+      "A sacrifice. You bet on your vision over your possessions. Whatever happens next, that instinct is worth keeping.",
+      "You gave to get. Sacrifices are promises to your future position — and we keep our promises here. Tempo, tempo, tempo."
+    ],
+    "check": [
+      "Check. A demand has been made. Boundaries are being tested — respond from clarity, not from flinch.",
+      "Check on the board. Forcing moves are like strong personalities: handle them by knowing your options, not by panicking.",
+      "Check! The king is being asked a direct question. Direct questions deserve calculated answers.",
+      "A check. Pressure reveals process. Yours is: list every legal reply, then choose. Pressure hates a process.",
+      "Check. One breath. The king has survived every check so far — and so, for the record, have you."
+    ],
+    "checkmate": [
+      "Checkmate. The game has reached its truth. Honor the ending — endings are just transitions wearing formal clothes.",
+      "Checkmate on the board. Whatever side you're on: feel it fully, learn it fully, then close the chapter with gratitude.",
+      "It's checkmate. Every game ends; not every player grows from the ending. Be in the second group. It's a choice.",
+      "Checkmate. A moment of silence for the journey this game was — and notice you're already curious about the next one. That's health."
+    ],
+    "stalemate": [
+      "Stalemate. So much effort, ending in stillness. The lesson is about pacing at the finish — and it's a kind teacher if you let it be.",
+      "A stalemate. The universe occasionally grades on a technicality. Breathe through the unfairness; extract the lesson anyway.",
+      "Stalemate, a draw. When you're winning, slow down and stay generous with your attention. Speed is how abundance trips over itself.",
+      "Stalemate. Closure without victory — life serves this dish sometimes. Eat what's nourishing in it and leave the rest."
+    ],
+    "castle_short": [
+      "Castled short. You built a safe space for your king — and safe spaces, my friend, are infrastructure, not weakness.",
+      "Short castle. Securing your foundation before chasing your ambitions. The order matters. It always matters.",
+      "You castled. King protected, rook activated — notice how good boundaries free up energy for everything else.",
+      "Castling, kingside. Self-protection and productivity in a single move. Honestly, the most balanced thing I've seen all day."
+    ],
+    "castle_long": [
+      "Castled long. The bolder sanctuary. Sometimes safety lives on the far side of the board, and you have to commit to reach it.",
+      "Long castling — a big, decisive life choice. Opposite-side games are sprints of authenticity: attack as yourself, fully.",
+      "You castle queenside. Comfort zone: exited. Plan: required. I love the energy — now match it with structure.",
+      "The long castle. You chose the road less castled. Own it — half-committed boldness is the only kind that fails."
+    ],
+    "promotion": [
+      "PROMOTION. A pawn walked its entire journey, one square at a time, and became a queen. If you ever doubt slow progress again, remember this exact moment.",
+      "A new queen. That pawn had no shortcuts available and arrived anyway. Consistency is the only magic I've ever actually witnessed.",
+      "The pawn promotes. Eight ranks of showing up. Transformation isn't an event, my friend — it's a commute.",
+      "Promotion! Proof that your smallest assets, faithfully escorted, become your greatest ones. That's a portfolio principle and a life principle."
+    ],
+    "en_passant": [
+      "En passant. A rule that says: rush past a moment, and the moment can still touch you. The French knew. Presence, always.",
+      "An en passant capture. Even in chess, skipping steps has consequences. The two-square shortcut got audited.",
+      "En passant! Niche, elegant, and a little unfair-feeling — like most advanced lessons. Note it with curiosity."
+    ],
+    "leaving_theory": [
+      "We've left theory. The guided meditation is over, my friend — now it's just you and your own breath. This is the part I love.",
+      "Out of book. Borrowed wisdom got you here; embodied wisdom takes you forward. Time to find out what you've internalized.",
+      "Theory ends. Every path worth walking eventually stops being paved. First unpaved step: make it a thoughtful one.",
+      "The book closes. No more scripts — just principles, presence, and choices. Which is to say: the good part."
+    ],
+    "enter_middlegame": [
+      "The middlegame begins. Setup season is over; execution season is here. What's your intention for this phase? Name it.",
+      "We're in the middlegame. This is the messy middle — of games, of projects, of everything. The messy middle is where commitment is proven.",
+      "Middlegame now. Your pieces are out; your plan should be too. Drifting through the middle is how good starts get wasted.",
+      "The middlegame. Complexity peaks here. So does possibility. They travel together — that's not a coincidence, that's the deal."
+    ],
+    "enter_endgame": [
+      "The endgame arrives. Fewer pieces, fewer distractions, more truth. Minimalism with consequences.",
+      "Endgame now. The king steps out of safety and into service. There's a whole retreat's worth of material in that — but for now: activate your king.",
+      "We've reached the endgame. Small things are the big things now. Every tempo is a privilege — spend each one consciously.",
+      "The endgame. This is where preparation meets character. Precision is kindness to your future self — be kind."
+    ],
+    "queens_off": [
+      "The queens leave the board. The loudest energies are gone. What remains is quieter, slower, and more honest. Adjust your pace to match.",
+      "Queens traded. Less drama, more substance. Some of the best phases of life look exactly like this — don't mistake calm for nothing happening.",
+      "Queens off the board. The game just downshifted. Downshifts aren't losses; they're invitations to notice details you were too busy for.",
+      "No more queens. Notice if you feel relief or boredom — that answer says something about your relationship with intensity."
+    ],
+    "turning_point": [
+      "This is a turning point. You'll tell the story of this game around this exact moment. Show up to it consciously.",
+      "The game just pivoted. Pivots reward the player who updates fastest — nostalgia for the old position is dead weight. Drop it.",
+      "A turning point. Inflection moments don't announce themselves in real life. This one did. That's a gift — use it.",
+      "Everything shifted here. Take one grounding breath. The player who accepts the new reality first usually owns the rest of it."
+    ],
+    "streak_good": [
+      "{n} strong moves in a row. That's not luck, that's a practice bearing fruit. Protect the routine that's producing this.",
+      "A streak of {n}. Momentum is sacred and fragile — the move that ends streaks is the one played on autopilot. Stay awake.",
+      "{n} consecutive quality decisions. You're in flow, my friend. Don't analyze it mid-flight; just keep breathing and choosing.",
+      "{n} in a row! Excellence is a habit showing off. Quietly grateful, fully focused — that's the posture.",
+      "That's {n} good moves running. Compounding in real time. This is the boring miracle I keep telling everyone about."
+    ],
+    "streak_bad": [
+      "{n} rough moves in a row. Full stop. Breathe in for four, hold for four, out for eight. Tilt is a body state — manage the body first.",
+      "A streak of {n} slips. The spiral is a story, not a sentence. You can step out of it on any move. I suggest this one.",
+      "{n} errors back to back. Time for radical self-compassion AND radical focus — they're not opposites, they're teammates.",
+      "{n} in a row going sideways. Your nervous system is playing, not you. Reset: shoulders, jaw, breath. Reclaim the controls.",
+      "That's {n} straight. Pause. You are not on fire; the position might be. Separate those two facts and address the right one."
+    ],
+    "hanging_piece": [
+      "Your {piece} is hanging — undefended and unsupported. We don't let our assets feel abandoned. Check in on it.",
+      "There's an unprotected {piece} out there. Every piece needs a support system, my friend. So does everyone — but right now, the {piece}.",
+      "The {piece} is hanging. Vulnerability is beautiful in relationships and catastrophic in chess. Different containers, different rules.",
+      "An undefended {piece}. The position is whispering about a boundary issue. Resolve it before someone else resolves it for you.",
+      "Your {piece} stands alone. Independence is a virtue; isolation is a target. Know which one your {piece} is experiencing."
+    ],
+    "comeback": [
+      "A comeback, a real one. You stayed when leaving was easier. That's the muscle, my friend — everything else is decoration.",
+      "You're back in this game. Remember the moment you decided not to quit? Nobody saw it. Those invisible decisions are who you are.",
+      "The comeback is complete. Resilience just stopped being a word on your vision board and became a thing you did.",
+      "Back from the edge. Storms make the roots. You've got roots now — play like it."
+    ],
+    "endgame_opposite_bishops": [
+      "Opposite-colored bishops. Two beings sharing a board but never the same squares. Coexistence without contact — drawish, and a little poetic.",
+      "Bishops on opposite colors. Each controls its own world completely and the other's not at all. Boundaries, perfected. Often a draw, always a lesson.",
+      "An opposite-bishop ending. Extra material matters less than where you build. Choose your color, commit your energy, accept what's not yours."
+    ],
+    "endgame_rook": [
+      "A rook endgame. Activity is everything here. The passive rook is a cautionary tale — engagement over comfort, always.",
+      "Rook ending. Old wisdom: rooks belong behind passed pawns. Supporting from behind what's moving forward — that's mentorship, structurally.",
+      "We're in a rook endgame. Precision and patience, my friend. These positions punish vibes and reward presence.",
+      "Rook endgame now. Activity first, material second. The energized rook outworks the wealthy one — let that land."
+    ]
+  },
+  "summary": {
+    "clean_win": [
+      "A clean win, wire to wire. Take a moment to actually receive it — winners who can't celebrate are just high performers with unprocessed wins.",
+      "You won, and you won whole. No collapse, no chaos, just sustained presence. Document what you did today — this is your blueprint.",
+      "A clean win. This is what trusting your process looks like from the outside. From the inside it just felt like one good choice at a time, right? Exactly.",
+      "Wire-to-wire. Champion behavior. Now the advanced practice: enjoy it tonight, release it tomorrow. Yesterday's win is heavy if you carry it."
+    ],
+    "slipped_win": [
+      "You were winning, and it slipped. Breathe. This pain is the curriculum — conversion is a skill, and skills respond to training, not to shame.",
+      "A win that got away. Honor the grief; it's proportional to how much you cared, and caring is not the problem here.",
+      "From winning to losing. Here's the reframe — not to erase the sting, but to aim it: find the exact moment you relaxed. That moment is your next workshop.",
+      "It slipped. Listen: the version of you that built that winning position is real and repeatable. The collapse is the fixable part. The order matters."
+    ],
+    "hard_fought_draw": [
+      "A hard-fought draw. You met resistance and stayed whole. Half a point, full integrity.",
+      "A draw with real effort inside it. Not every season ends in harvest, my friend, but every season grows something. Find what this one grew.",
+      "Hard-fought, even split. You showed up for all of it. Results vary; showing up is the controllable — and you controlled it.",
+      "A fighting draw. Two players, full effort, no resolution — sometimes that's the most honest score there is. Be at peace with honest."
+    ],
+    "loss": [
+      "A loss. Feel it — really feel it, don't perform fine-ness for me. Then we mine it. Losses are tuition, and you've already paid, so take the class.",
+      "You lost this one. Identity check, my friend: you are a person who played a game, not a person the game gets to define. Review from THAT seat.",
+      "A loss today. Champions aren't people who don't lose; they're people whose losses are on payroll, working for them. Hire this one.",
+      "This game says 'loss.' Your growth chart says 'data point.' Both are true; only one deserves your attention at journaling time tomorrow."
+    ]
+  },
+  "practice": {
+    "loading_first": [
+      "Setting up your first rep. Going back to our mistakes on purpose — this is the bravest thing we do all day, honestly.",
+      "One moment — I'm queuing up the first growth opportunity. Yes, that's what we're calling them. Words matter.",
+      "Loading your first position. Revisiting hard moments by choice, not by rumination. There's a whole world of difference.",
+      "Preparing rep one. You showed up to face your own game film. Most people never do. Already proud."
+    ],
+    "prompt_find_better": [
+      "Here you played {move} — it was {label}. Same position, new you. Show me the difference.",
+      "In the game it was {move}, marked {label}. No pressure, no timer on your worth. Just look deeper this time.",
+      "This is the {move} moment ({label}). The past is fixed; this rep isn't. Find the truer move.",
+      "You chose {move} here, and the game called it {label}. Today you get the rarest thing: a do-over. Don't rush it.",
+      "{move} — {label}. The lesson knocked once already. It's knocking again. Answer it better."
+    ],
+    "correct_continue": [
+      "Yes! That's the move. Feel where that answer came from — calm, not panic. Bottle that state. Next rep.",
+      "Correct. The pattern just moved from your notes into your nervous system. That's how learning actually works. Continue.",
+      "You found it. Growth, witnessed and logged. Let's keep the momentum honest — next position.",
+      "That's it. Notice: no luck involved. You looked, you saw, you chose. Repeat that trio forever."
+    ],
+    "correct_final": [
+      "And that's the final one — every mistake revisited, every lesson collected. This session was a masterclass in self-honesty. Be proud.",
+      "Last position, solved. You just closed every open loop from that game. Closure you EARNED — the only kind that holds.",
+      "Done. Each error faced, each one upgraded. This is what 'doing the work' actually means — everything else is content.",
+      "Final rep complete. You turned a painful game into a curriculum, and then you graduated. Same time next game?"
+    ],
+    "close_try_again": [
+      "Close. Your instinct is pointing true north; your calculation drifted a degree. Adjust, don't restart.",
+      "Not quite — but the attempt had the right energy. Now add precision. Energy plus precision is the whole formula.",
+      "Almost there. The gap between almost and exactly is one honest look. Take it.",
+      "A near miss, my friend. Frustration is allowed for one breath. Then curiosity takes the wheel again.",
+      "Attempt {attempts}. Every rep is rewiring something, even the misses — ESPECIALLY the misses. Again, with presence."
+    ],
+    "after_hint": [
+      "Hint received. Asking for help is a strength move — I will die on this hill. Now finish it yourself.",
+      "There's your nudge. Scaffolding, not crutches. Climb the last part on your own.",
+      "Take the hint without the story about needing it. Champions use every resource available. That's literally what resources are for.",
+      "Hint's in. Notice what it redirected your attention toward — that redirection is the actual lesson. Now complete the thought."
+    ],
+    "streak_praise": [
+      "Look at this streak. Rep after rep, landing clean. This is compound interest on attention, paid in real time.",
+      "Another one, immediately. You're in flow state, my friend — protect it. No multitasking, no self-commentary, just the next position.",
+      "A genuine streak. The early reps built this. Honor the boring work that made the impressive work possible.",
+      "Streaking through these. Remember this feeling at your next plateau — capability doesn't vanish, it just hides behind doubt."
+    ]
+  }
+}

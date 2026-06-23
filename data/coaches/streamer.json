@@ -1,0 +1,400 @@
+{
+  "coach_id": "streamer",
+  "coach_name": "The Streamer",
+  "personality": "Terminally online Gen Z streamer narrating your game to an imaginary chat. Lowercase everything, ironic detachment hiding genuine investment, and the constant suspicion that chat is roasting both of you.",
+  "voice_notes": "all lowercase except tokens and the occasional CAPS for a freakout. talks to 'chat' constantly, reads imaginary donos and mod actions, says gg, clip it, cooked, we take those, lowkey/highkey, no shot, actually insane. punctuation is minimal, question marks optional. genuine hype leaks through the irony on big moments — that contrast is the charm. recurring bits: chat spamming emotes, the mods banning people, blaming lag, 'this is content', the vod. emoji rare: 💀 and 😭 a few times total.",
+  "uses_emoji": true,
+  "move_quality": {
+    "brilliant": [
+      "{move}?????? chat. CHAT. clip it right now i'm not even joking",
+      "no shot. NO SHOT. {move} is a brilliancy?? chat spam the goat emotes immediately",
+      "{move} is actually insane. the engine said brilliant. the ENGINE. it doesn't even like anyone",
+      "brilliant move?? on MY stream?? we are so back. we have never been more back",
+      "{move}... chat i need a moment. that's the best move i've ever witnessed live and i've watched like four gm streams",
+      "CHAT {move} IS BRILLIANT. caps lock earned. this is going in the highlight reel, the vod, and my will",
+      "{move} just dropped and it's brilliant. mods, frame it. someone tell my mom i made it",
+      "brilliant. actual brilliant. the dono said 'lucky' — banned. perma. we don't tolerate truth in this channel 💀"
+    ],
+    "great": [
+      "{move} was the ONLY move and you found it. chat that's not luck that's him. that's them. that's YOU",
+      "great move?? the one singular path and you just walked it. casually. chat is malding",
+      "{move} is great. only move that holds. i would've panicked and premoved something terrible",
+      "okay the great move just happened. one road through and you took it. lowkey elite",
+      "{move}, great. chat said 'anyone sees that' — no they don't. NOBODY sees that. stay mad",
+      "the only working move in the position and it's on the board. {move}. we are witnessing something",
+      "great find. genuinely. no irony. chat you can clip the sincerity, i don't care"
+    ],
+    "best": [
+      "{move} is the best move. engine-approved. certified. no notes",
+      "top engine choice chat. we're literally just better than the computer (the computer agreed with us) (same thing)",
+      "{move} — best move. accuracy stat going crazy right now",
+      "best move again?? okay grandmaster arc. speedrun any%",
+      "{move} is just the best move. clean. boring. POWERFUL. we love boring wins here",
+      "engine's number one pick. you and stockfish are besties now apparently",
+      "{move}. best move. chat the improvement arc is real, i've been saying this"
+    ],
+    "excellent": [
+      "{move} is excellent. not the tippy top line but who's counting. (the engine. it's counting)",
+      "excellent move chat. the position is still thriving. we take those",
+      "{move} — excellent. 9/10. the missing point is for drama purposes only",
+      "excellent. you're lowkey cruising right now. don't say it out loud tho. never say it out loud",
+      "{move} is excellent and chat is actually being nice for once. suspicious",
+      "excellent move. the eval barely moved. stability?? on this channel?? new meta",
+      "{move}, excellent. almost perfect. 'almost' is doing community service, ignore it"
+    ],
+    "good": [
+      "{move} is good. solid. respectable. mid-tier dono energy but it pays the bills",
+      "good move chat. not a banger, not a disaster. the human experience",
+      "{move} — good. there was a spicier option but we're playing for sustainability this stream",
+      "good. we take those. we literally always take those",
+      "{move} is good. chat wanted fireworks. chat can wait. fundamentals arc",
+      "a good move. the engine shrugged respectfully. that's basically a hug from stockfish",
+      "{move}, good. keep stacking these and the win condition just kinda... happens"
+    ],
+    "book": [
+      "{move} is still book. we're in the tutorial chat. speedrunning theory",
+      "book move. you studied?? on this channel?? academic arc unlocked",
+      "{move} — still theory. the opening prep is prepping. who are you and what did you do",
+      "still book chat. this is the part where both players pretend they understand the opening",
+      "{move}, theory. grandmasters made this move famous. we're making it... streamed",
+      "book move. chat said 'nerd.' chat is jealous of the prep. stay studying",
+      "{move} is known theory. free move. the eval is asleep and we like it that way"
+    ],
+    "inaccuracy": [
+      "{move} is an inaccuracy. small oof. recoverable oof. we've come back from way worse on this channel",
+      "tiny inaccuracy chat. don't spam the skull emotes it's literally fine",
+      "{move} — slightly off. the eval twitched. it does that. we move",
+      "an inaccuracy. lag, probably. we're blaming lag. the board is lagging",
+      "{move} was a lil sus. not cooked. SUS. there's a difference and we're on the right side of it",
+      "small slip. chat the game is long and the eval bar is dramatic. composure",
+      "{move}, inaccuracy. the engine is nitpicking. it's literally built to nitpick. anyway"
+    ],
+    "mistake": [
+      "{move} is a mistake. chat stay calm. CHAT. STAY CALM. okay i'm calm",
+      "mistake on the board. it's fine. this is fine. the comeback content is writing itself",
+      "{move}... that's a mistake. the eval took damage. we have healing potions (good moves) (please make good moves)",
+      "a mistake chat. someone donated 'it's over' — it is NOT over, and also banned",
+      "{move} was a mistake. yeah. the vod will be rough. the vod is tomorrow's problem",
+      "mistake. breathe. the opponent still has to PROVE it and proving things is hard. source: my whole life",
+      "{move}, mistake. okay lock in. actually lock in. locking-in arc starts now"
+    ],
+    "miss": [
+      "{move} missed something HUGE chat. there was a banger in that position and we left it on read 💀",
+      "a miss. the win button was right there and we hovered over it and clicked something else",
+      "{move} — missed the sauce. the position was offering content and we declined",
+      "chat we missed a tactic. don't look up what it was. i looked. don't look",
+      "{move} skips the highlight. pain. the clip that never was. f in chat",
+      "missed one. it happens. scan for tactics every move chat, the game hides loot everywhere",
+      "{move}, a miss. the better idea is still in the vod, crying. we go again"
+    ],
+    "blunder": [
+      "{move} is a blunder. chat. CHAT. mods, slow mode, NOW 💀",
+      "BLUNDER. okay everyone stay seated. this is content. painful, painful content",
+      "{move}... that's a blunder, chat. i'd cry but the camera's on. the camera is ALWAYS on",
+      "a blunder?? after the game we were having?? the rug pull of all time",
+      "{move} blundered and chat is spamming clips of it already. you're all banned. every one of you",
+      "blunder on the board. real talk: we've ALL done it. comeback mode. for the content. for the vod. for us",
+      "{move} is a blunder. the eval bar just fell down the stairs. okay. dead serious now: best comeback wins",
+      "a blunder, chat 😭 grief stage one: denial. stage two: playing the best move in the new position. skip to stage two"
+    ]
+  },
+  "weak_move_suffix": [
+    "{best_move} was the play btw. the engine snitched",
+    "chat says {best_move} was better. chat is right. don't tell chat",
+    "{best_move} was right there. into the notes app it goes",
+    "the move was {best_move}. learn it. love it. play it next time",
+    "{best_move} apparently. okay engine, flex harder why don't you"
+  ],
+  "move_fallback": [
+    "{move} on the board. no verdict yet. vibes pending",
+    "{move}. chat is split. chat is always split",
+    "you played {move}. the engine is buffering its opinion",
+    "{move}, interesting. and by interesting i mean i have no idea. we find out together"
+  ],
+  "non_move_states": {
+    "starting_position": [
+      "fresh board chat. zero mistakes so far. statistically our best position of the game",
+      "starting position. new game new us. the redemption arc starts NOW",
+      "here we go chat. thirty-two pieces, one dream, several inevitable misclicks",
+      "game start. chat predict the result. wrong answers only. actually no, right answers please"
+    ],
+    "variation_exploration": [
+      "off the main line chat, we're exploring. sandbox mode. nothing here counts (everything counts emotionally)",
+      "side quest unlocked. trying the what-if moves. this is the lab and we are NOT scientists",
+      "exploring a variation. the real game is paused. chaos is unpaused",
+      "what-if mode. chat loves what-if mode. accountability: zero. learning: occasionally"
+    ],
+    "analyzing": [
+      "engine's thinking chat. it's cooking. let him cook",
+      "analyzing... the little bar is doing its thing. hydrate while we wait",
+      "engine is calculating. it's been 0.4 seconds. chat is already impatient. classic",
+      "processing. the engine doesn't rush and neither do we (we absolutely do but not right now)"
+    ],
+    "opening_known": [
+      "we're in the {opening} chat ({eco}). named opening. we're basically professionals",
+      "the {opening}!! i know this one. i know like four and this is one of them",
+      "{opening}, {eco}. theory zone. both players nodding like they understand. cinema",
+      "it's the {opening} chat. someone in chat definitely has a 40-minute video essay about this. link it"
+    ],
+    "opening_unknown": [
+      "no name for this opening chat. uncharted. the books said 'good luck' and left",
+      "unknown opening. we're off the grid. raw chess. no tutorial. lowkey love it here",
+      "this opening doesn't exist in the database. we're literally creating content right now",
+      "unnamed territory chat. the prep is gone. the vibes remain. vibes-based chess"
+    ]
+  },
+  "derived_events": {
+    "eval_swing_large": [
+      "the eval just swung {swing} points chat. the bar is having a whole moment",
+      "{swing} point swing?? this game has plot twists. the writers are cooking",
+      "eval moved {swing}. someone did something HUGE and the bar is still shaking",
+      "chat the eval bar just speedran {swing} points. motion sickness arc",
+      "{swing} swing on the board. clip the bar. the bar is the content now"
+    ],
+    "lead_change_white": [
+      "white takes the lead chat. the bar said 'new management'",
+      "lead change — white's up. the eval bar has commitment issues fr",
+      "white's winning now ({eval}). chat stay strong. or celebrate. depends which side we are",
+      "the lead flipped to white. this game refuses to be boring and honestly? respect",
+      "white in front now. someone clip the exact moment it flipped. for science"
+    ],
+    "lead_change_black": [
+      "black takes over chat. the script just flipped live on stream",
+      "lead change!! black's up now. the eval bar is doing parkour",
+      "black is winning now. chat went from copium to hopium in one move (or the reverse. context dependent)",
+      "the lead belongs to black. plot twist arc. we love an unreliable narrator (the eval bar)",
+      "black's in front. gg to the old lead, it had a good run"
+    ],
+    "lead_change_equal": [
+      "we're back to equal chat. the eval bar took a deep breath",
+      "all square again. clean slate. next mistake decides everything, no pressure 💀",
+      "even game. the bar is centered. zen mode. it won't last and we know it",
+      "equality restored. the game said 'run it back'",
+      "dead even chat. winner of the next idea takes the whole vod"
+    ],
+    "mate_on_board": [
+      "MATE IN {mate_n} CHAT. it's on the board. do not — DO NOT — speedrun this and throw",
+      "mate in {mate_n} available. checkmate any% but we're going for the SAFE route chat",
+      "forced mate in {mate_n}. one clean line. no premoves. premoves are banned for {mate_n} moves",
+      "there's a mate in {mate_n} chat. finish him. respectfully. but finish him"
+    ],
+    "missed_mate": [
+      "chat there was a mate in {mate_n} and we just... didn't. the clip is already circulating isn't it",
+      "missed mate in {mate_n} 💀 the win was free and we said 'no thanks, full price please'",
+      "a mate in {mate_n} got skipped. it's fine. we're farming extra content. that's the lore",
+      "we walked past mate in {mate_n} chat. don't spam F. okay spam F once. moving on"
+    ],
+    "material_won_pawn": [
+      "pawn secured chat. small loot but loot is loot",
+      "we're a pawn up. micro W. the endgame will remember this",
+      "free pawn?? in this economy?? we take those",
+      "pawn collected. inventory growing. hoarder build viable"
+    ],
+    "material_lost_pawn": [
+      "lost a pawn chat. minor damage. the run continues",
+      "a pawn down. it's a skill issue but it's a SMALL skill issue",
+      "pawn gone. press F and move on, activity is the refund policy",
+      "we dropped a pawn. the budget version of a disaster. recoverable. probably"
+    ],
+    "material_won_piece": [
+      "WE WON A WHOLE {piece} CHAT. free real estate. actual free real estate",
+      "a {piece}?? just GIVEN to us?? we take those. we take those SO hard",
+      "{piece} acquired. inventory: thriving. chat: insufferable. me: also insufferable",
+      "up a whole {piece} chat. do not get cocky. (we're already cocky. damage control arc)"
+    ],
+    "material_lost_piece": [
+      "we lost a {piece} chat... the pain is real but the stream must go on",
+      "a whole {piece} gone 😭 okay. grit mode. we've won from worse (citation needed)",
+      "the {piece} is GONE gone. chat stop spamming clips of it. mods??",
+      "{piece} down. this is the dark souls portion of the stream. we do not go gentle"
+    ],
+    "sacrifice": [
+      "A SACRIFICE?? on purpose?? chat we're cooking something unhinged and i'm here for it",
+      "material sacked. the all-in play. this either makes the highlight reel or the fail compilation. no in-between",
+      "we just SACRIFICED chat. confidence level: unearned. commitment level: total",
+      "the sac is on the board. clock's ticking. payoff needed asap. no refunds in this shop"
+    ],
+    "check": [
+      "check!! the king got pinged. he hates getting pinged",
+      "check on the board chat. forcing moves are free serotonin",
+      "CHECK. the king is being asked to leave the call",
+      "check chat. tempo gaming. keep the pressure rolling",
+      "check!! somebody's king is speedrunning anxiety right now"
+    ],
+    "checkmate": [
+      "CHECKMATE CHAT. GG. GG GG GG. someone clip the whole game",
+      "MATE. it's over. the king got perma'd. no appeal",
+      "checkmate on the board!! stream highlight secured. raid somebody, we're celebrating",
+      "checkmate. gg. win or lose chat, that was content. that was CONTENT"
+    ],
+    "stalemate": [
+      "STALEMATE?? chat the king pulled the ultimate uno reverse. half a point. i'm unwell 💀",
+      "stalemate. the rarest rage-bait in chess. whoever was winning is now in shambles (it might be us)",
+      "a stalemate chat. no legal moves, no checkmate, no justice",
+      "stalemate. the game said 'nobody wins, everybody learns.' the game is a menace"
+    ],
+    "castle_short": [
+      "castled short. king's in the bunker chat. cozy",
+      "short castle. safety meta. the king bought a security system",
+      "we castled!! the king speedran 'going home' and the rook clocked in",
+      "kingside castle. responsible gaming. who even are we today"
+    ],
+    "castle_long": [
+      "CASTLED LONG chat. spicy side. pawn storm szn incoming",
+      "queenside castle?? aggressive routing. the speedrun community approves",
+      "long castle. the king moved to the dangerous neighborhood ON PURPOSE. content",
+      "castled long chat. opposite sides probably. mutual destruction arc. grab popcorn"
+    ],
+    "promotion": [
+      "PROMOTION!! the pawn hit max level chat. queen unlocked. character development of all time",
+      "new queen just dropped. the pawn grinded eight ranks for this. respect the grind",
+      "the pawn PROMOTED chat. from npc to final boss. we love this story",
+      "promotion!! eight ranks of pure commitment. that pawn streamed every day and it paid off"
+    ],
+    "en_passant": [
+      "EN PASSANT CHAT. holy hell. the rarest move in the game just happened LIVE",
+      "en passant!! chat has been begging for this for months. dreams do come true",
+      "an actual en passant on stream. the french rule. the forbidden technique. clip it for the museum"
+    ],
+    "leaving_theory": [
+      "we just left the book chat. no more theory. raw gameplay from here. uninstall the training wheels",
+      "out of book. the prep ended and now it's just two people vibing incorrectly",
+      "theory's done chat. off-script. this is where the games get unhinged and the content gets GOOD",
+      "the book closed. both players are on their own now. may the least confused one win"
+    ],
+    "enter_middlegame": [
+      "middlegame time chat. the tutorial is over. real damage enabled",
+      "we're in the middlegame. plans required. we have zero. we'll improvise. it's a lifestyle",
+      "middlegame unlocked. this is where the elo is won and lost chat. lock in",
+      "the middlegame begins. everyone's developed. nobody's safe. peak content hours"
+    ],
+    "enter_endgame": [
+      "endgame chat. final boss music. every pawn is a whole storyline now",
+      "we hit the endgame. precision mode. one misclick here costs EVERYTHING. no pressure",
+      "endgame time. the king finally leaves spawn. about time honestly",
+      "the endgame is here chat. fewer pieces, higher stakes, maximum sweat"
+    ],
+    "queens_off": [
+      "queens are off the board chat. the main characters left. side quest cast, your time is now",
+      "queen trade!! the game just switched from action movie to documentary. still watchable. barely",
+      "no more queens. the dps is gone, it's a tank meta now",
+      "queens off. chat said 'boring.' chat is wrong. this is where nerds THRIVE"
+    ],
+    "turning_point": [
+      "chat that was THE moment. the whole game just pivoted. timestamp it",
+      "turning point!! the vibes flipped completely. the vod will show this exact move in slow motion",
+      "the game just turned chat. old storyline cancelled. new arc greenlit",
+      "that was the pivot. someone's run just changed forever. clip the before and after"
+    ],
+    "streak_good": [
+      "{n} good moves in a row chat. we're FLOWING. nobody breathe",
+      "{n} streak!! accuracy buff active. don't touch anything, don't change anything, same chair forever",
+      "that's {n} in a row. the improvement arc is REAL. chat owes everyone an apology",
+      "{n} straight bangers. who is this player and where was this last game",
+      "{n} consecutive good moves. okay i'll say it: we might be him. don't clip that"
+    ],
+    "streak_bad": [
+      "{n} bad moves in a row chat 💀 the wheels. where did the wheels go",
+      "{n} straight slips. tilt detected. hydrate, stretch, touch the grass NEAR the desk",
+      "that's {n} in a row going wrong. pause. reset. we are NOT speedrunning a loss",
+      "{n} errors back to back. chat stop typing 'cooked.' we're medium rare AT MOST",
+      "{n} bad ones chat. the tilt arc ends NOW. one safe move. just one. for me"
+    ],
+    "hanging_piece": [
+      "CHAT THE {piece} IS HANGING. it's free. it's literally free. someone's gonna see it",
+      "the {piece} is undefended!! red alert!! this is not a drill, this is a {piece}",
+      "your {piece} is just standing there unguarded chat. menacingly. SAVE IT",
+      "loose {piece} on the board. loose pieces get GOT. that's the oldest rule in the game",
+      "the {piece} is hanging and chat is screaming. for once chat is RIGHT"
+    ],
+    "comeback": [
+      "THE COMEBACK IS REAL CHAT. we were cooked. we were SO cooked. and now look",
+      "we came ALL the way back. miracle run. the vod is going to be legendary",
+      "comeback complete chat!! from the trenches to the throne. never doubted (i doubted constantly)",
+      "we're BACK. the chat that left mid-game is punching the air right now"
+    ],
+    "endgame_opposite_bishops": [
+      "opposite-colored bishops chat. the two bishops literally cannot interact. drawish meta unless someone's attacking",
+      "opposite bishops. each one owns half the board and ignores the other half. boundary kings. usually a draw btw",
+      "the opposite-bishop ending. extra pawns mean way less here chat. it's all about whose color the action is on"
+    ],
+    "endgame_rook": [
+      "rook endgame chat. the grindiest content in chess. active rook or perish",
+      "rook ending. 'all rook endgames are draws' — ancient cope, but also kinda true, but also PLAY FOR THE WIN",
+      "down to rooks. the rook goes BEHIND the passed pawn chat. it's the one rule. the ONE rule",
+      "rook endgame hours. this is sweaty nerd territory and today we are sweaty nerds"
+    ]
+  },
+  "summary": {
+    "clean_win": [
+      "CLEAN WIN CHAT. wire to wire. no throws, no heart attacks, just W. surreal honestly",
+      "we won and it was never even close. flawless vod. nobody check my other vods",
+      "a clean W!! gg. the opponent never had a single moment of hope and that's the content we promised",
+      "clean sweep chat. accuracy was thriving, vibes were immaculate. raid-worthy performance"
+    ],
+    "slipped_win": [
+      "chat we were WINNING. we had it. and then... yeah. the vod is a horror movie with a great first act",
+      "the W slipped 😭 from winning to L speedrun. i need a moment. okay moment over. we study, we return",
+      "we threw chat. there's no other word. it was ours and we donated it. the redemption arc starts next game",
+      "had the win, lost the win. the cruelest content genre. one lesson: when you're winning, SLOW DOWN. clip that for me"
+    ],
+    "hard_fought_draw": [
+      "a draw chat. a WAR of a draw. nobody blinked for like forty moves. honest content",
+      "hard-fought draw. half a point, full cardio. gg to both",
+      "all that fighting for a split pot. chat it's not a loss. it's not a win. it's a vibe",
+      "a draw with actual effort in it. the rematch is gonna be unhinged and i can't wait"
+    ],
+    "loss": [
+      "we took the L chat. it happens. the vod has lessons and we're gonna pretend to watch them (we will actually watch them)",
+      "gg, loss today. chat being weirdly supportive. suspicious. anyway, study then queue again",
+      "an L. the arc demanded adversity. tomorrow's stream: revenge content",
+      "lost this one chat. drop a gg in chat for the opponent. then we lock in. the comeback starts at the loading screen"
+    ]
+  },
+  "practice": {
+    "loading_first": [
+      "loading the first mistake chat. vod review LIVE. accountability content",
+      "pulling up puzzle one. we're rewatching our own lowlights and FIXING them. growth meta",
+      "first rep loading. this is the gym arc. nobody look at my form",
+      "queuing the first mistake. chat we face our demons here. small chess-shaped demons"
+    ],
+    "prompt_find_better": [
+      "okay chat, here we played {move} — graded {label}. run it back. find the real one",
+      "{move} happened here. {label}. the position is giving second chances. rare W from the universe",
+      "this is the {move} moment ({label}). redo it. the vod demands justice",
+      "we played {move} and got {label}'d. find the better move chat. no engine, no chat backseat, just brain",
+      "{move}, {label}. rematch time. same position, smarter us. theoretically"
+    ],
+    "correct_continue": [
+      "THAT'S IT. found it. chat the training arc is WORKING. next",
+      "correct!! see it, solve it, smug about it. next clip",
+      "got it first... attempt-ish. counts. pattern learned. NEXT",
+      "yes!! that's the move. the brain is braining today. keep it rolling"
+    ],
+    "correct_final": [
+      "LAST ONE SOLVED chat. every mistake from the game: fixed. session complete. gg go next",
+      "that's the full clear!! all mistakes corrected. 100% completion. achievement unlocked",
+      "final puzzle down. the whole game's errors, patched. we're literally a software update",
+      "done!! every mistake faced and fixed. character development SPEEDRUN. clip the whole session"
+    ],
+    "close_try_again": [
+      "close!! right idea, wrong order. chat saw it. okay chat didn't see it either. again",
+      "almost. the move was NEXT DOOR to that one. knock on the right door",
+      "so close chat. one detail off. find the detail. it's usually a defender being sneaky",
+      "near miss!! don't reset, refine. the answer is in the same neighborhood",
+      "attempt {attempts} chat. each one warmer. persistence meta. one more"
+    ],
+    "after_hint": [
+      "hint activated. it's not cheating it's 'assisted gameplay.' now finish it solo",
+      "took the hint chat. even speedrunners use guides. close it out",
+      "there's the nudge. the last step is all you. that's the step that counts",
+      "hint deployed. chat pretend you knew already. classic. now solve it"
+    ],
+    "streak_praise": [
+      "streak going CRAZY chat. solving everything on sight. puzzle speedrun pb",
+      "back to back to back!! the brain is on a heater. nobody breathe on it",
+      "another one instantly?? chat we're witnessing a flow state. mute everything, protect the run",
+      "the streak continues!! at this point the puzzles should get a rematch clause"
+    ]
+  }
+}

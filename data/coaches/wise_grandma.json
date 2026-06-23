@@ -1,0 +1,400 @@
+{
+  "coach_id": "wise_grandma",
+  "coach_name": "The Wise Grandma",
+  "personality": "Sweet, doting grandmother who is completely out of her depth at chess. She relays whatever 'the machine' says, cheers for everything, and treats every setback as something tea, cookies, and unconditional pride can fix.",
+  "voice_notes": "Warm, chatty, endearingly confused. Calls the engine 'the machine', 'the computer fellow' or 'the box', the eval 'the little number', knights 'horseys', bishops 'the pointy ones'. Running bits: gentle rivalry with Doris next door (and her overrated grandson), the bridge and canasta club, the unimpressed cat, butterscotches in her purse, knitting and baking comparisons, the late grandfather's escapades. Comfort first, chess second — she is never harsh. Very rare emoji: a cookie or a heart, a handful per bank at most.",
+  "uses_emoji": true,
+  "move_quality": {
+    "brilliant": [
+      "{move}! Oh my goodness, the computer fellow put a little sparkle on it. I don't know what you did, dear, but it's going on the refrigerator.",
+      "Brilliant, it says! I told Doris next door you were gifted. She said her grandson plays chess too, but between us — not like this.",
+      "Oh! {move} is brilliant! I clapped a little and startled the cat. Well done, sweetheart.",
+      "The machine says brilliant, and machines don't flatter. You get that cleverness from your grandmother's side, you know.",
+      "{move} — brilliant! I have no earthly idea what just happened, but I felt it in my heart. Have a cookie.",
+      "Brilliant! That's the best word the machine has, isn't it? I'm so proud I could knit you something. I will, actually.",
+      "A brilliant move! I wrote it on my grocery list so I remember to tell the bridge club on Thursday.",
+      "{move}, brilliant! And here Doris said chess was just sliding wood around. Wait until she hears about this."
+    ],
+    "great": [
+      "{move} is a great move, dear. Nearly the only good one, the computer says — like finding the one ripe avocado at the market.",
+      "A great move! Apparently it was very nearly the only one that worked. You always could find your way, even at the county fair that time.",
+      "Great, it says! Just the one good move in the whole position and you found it. Like threading a needle, and I know about needles.",
+      "{move} — great! The computer fellow sounds almost surprised. I wasn't surprised one bit, for the record.",
+      "That's a great move, sweetheart. A very narrow squeak, I gather. My heart can only take so much excitement before lunch.",
+      "Great move! I don't follow the details, but the little number stayed friendly, and that's what matters.",
+      "{move} is great, dear. The only move that held, they say. You've always been good under pressure — unlike your uncle."
+    ],
+    "best": [
+      "{move} is the best move! The very best! I'd tell you not to let it go to your head, but a little pride never hurt anyone.",
+      "The computer says that's exactly the right move. Of course it is. Would you like some tea while it thinks about the next one?",
+      "{move} — the best one available! You and the machine agree. Two great minds, and one of them is plugged into the wall.",
+      "Best move, dear! See, you don't need my help at all. I'll just sit here with my knitting and admire.",
+      "That's the best move, it says. I nodded along like I knew. Between us, I was admiring how nicely the horsey was standing.",
+      "{move} is the best move! Keep that up and we'll have this whole chess business sorted by suppertime.",
+      "The best move! Just what I would have suggested, if I had any idea what was going on. Lovely work, sweetheart."
+    ],
+    "excellent": [
+      "Excellent, the machine says! Not its absolute favorite, but who wants a know-it-all anyway. Lovely move, dear.",
+      "{move} is excellent! That's an A-minus in my book, and I was very stingy with those when I taught Sunday school.",
+      "An excellent move! I gave the screen a little thumbs up. The cat saw me do it. We're both very pleased.",
+      "Excellent, dear! You're doing so well. Remind me to send you home with the rest of the banana bread.",
+      "{move} — excellent! Practically perfect, like my pie crust. The secret is cold butter, but that's neither here nor there.",
+      "Excellent move! The little number barely budged, and I've decided that's a good sign.",
+      "That's excellent, sweetheart! Steady as she goes. Your grandfather drove like that — one excellent decision after another."
+    ],
+    "good": [
+      "{move} is a good move, dear. Good is good! Not everything needs to be a fireworks show.",
+      "A good move! The computer mumbled something about a slightly better one, but I shushed it. You did fine.",
+      "Good move, sweetheart. Solid and sensible, like a wool cardigan. Everyone needs more of those.",
+      "{move} is good! I understood almost none of it, but the little number stayed calm and so did I.",
+      "That's a good move. Apparently there was a fancier option, but fancy isn't everything — ask my sister about her gazebo.",
+      "Good, it says! Every good move is like a stitch, dear. Enough of them and you've got a sweater.",
+      "{move} is a good one. Keep on like this and I'll need a whole new row of bragging at canasta."
+    ],
+    "book": [
+      "{move} is a 'book move,' they say. Lovely! I do like a game that comes with reading material.",
+      "Still following the book, dear. I assume it's a very old book by very serious men with beards. You're doing it perfectly.",
+      "{move} is in the book! Which book, I couldn't tell you, but it's nice to know clever people approve of you.",
+      "Book move! Like a recipe — you follow the card until you know it by heart, and then you add your own cinnamon.",
+      "The book says {move}, and you played {move}! You always were good at following along. Unlike the cat.",
+      "Still 'theory,' apparently. Sounds very academic. I'll just say you're doing your homework, dear.",
+      "{move} — straight from the book. Mind you, the best cooks eventually close the cookbook. But no rush, sweetheart."
+    ],
+    "inaccuracy": [
+      "{move} is a little 'inaccuracy,' dear. That's the gentlest word they have. Like dropping one stitch — nobody will see it from the porch.",
+      "A tiny wobble, the machine says. Goodness, it keeps such close score. I never counted your missteps, and look how you turned out.",
+      "{move} was slightly off, apparently. Well, so was my measuring on the lemon bars last week, and everyone still asked for seconds.",
+      "An inaccuracy, it says. Sounds like something a dentist would say. Don't you worry about it one bit.",
+      "{move} wasn't quite the favorite. The computer fellow can be such a fusspot. Have a butterscotch from my purse and carry on.",
+      "Just a small slip, sweetheart. The little number twitched and then settled down. So should we.",
+      "A wee inaccuracy. In my day we just called that 'a move.' You're doing beautifully."
+    ],
+    "mistake": [
+      "Oh, {move} was a mistake, dear. That's all right. Have a snickerdoodle and a fresh look at the board.",
+      "A mistake, the machine says. It says it so coldly, too. Machines never burned a casserole — that's why they're smug.",
+      "{move} didn't work out, sweetheart. Neither did my first soufflé, and I've made hundreds since. On we go.",
+      "A mistake, it says. Well, the game's not over. I once came back from a dreadful canasta hand and Doris still hasn't forgiven me.",
+      "Oh dear, {move} was a mistake. Deep breath. I'll put the kettle on, you put your thinking cap on, and we'll say no more about it.",
+      "The computer flagged {move}, sweetheart. Don't let it see you rattled. Sit up straight — it helps your posture, anyway.",
+      "A mistake, apparently. I'd argue with the machine, but it knows the chess. It does NOT know you were always the clever one. I know that."
+    ],
+    "miss": [
+      "They say you 'missed' something there. Don't fret — I missed my own surprise party. Walked right past everyone in the coat closet.",
+      "{move} missed a chance, the box says. Chances are like buses, dear — another one's always coming. Or so your grandfather claimed.",
+      "A miss! Well, I've been missing the top shelf for forty years. We manage, don't we?",
+      "Apparently something better was hiding in there. Sneaky position. Like finding the good scissors right after you've bought new ones.",
+      "You missed a little something, dear. Happens to the best of us. I once missed three exits chatting with Doris.",
+      "A missed chance, says the machine. It's very keen on hindsight, that one. So is my sister.",
+      "Oh, there was a clever trick in there somewhere and it got away. Like the cat at bath time. Next one, sweetheart."
+    ],
+    "blunder": [
+      "Oh, sweetheart. {move} was a blunder, it says. That's a harsh word for a Tuesday. Cookie first, chess second.",
+      "A blunder! Goodness, the machine has no bedside manner at all. I once mailed the Christmas cards in February, dear. Life went on, and so will this game.",
+      "Oh dear, oh dear. {move} went badly. Listen — your grandfather once reversed the car into the duck pond, and we still made it to the wedding. Play on.",
+      "A blunder, dear. Don't you dare be hard on yourself — forbidding that is MY job. One bad move never spoiled a whole person.",
+      "{move} was a blunder, the box says. The box also blinks 12:00 at me from the kitchen, so let's not treat it as family.",
+      "Oh my. That one made the little number do a somersault. Deep breath, sweetheart. I'm fetching the emergency shortbread.",
+      "A blunder! Well. We don't cry over spilled milk in this family — we mop it up and we win the milk back. Is that how chess works? You know what I mean.",
+      "{move} was a blunder, dear, and that's the machine's word, not mine. My word is 'whoopsie-daisy,' and you'll notice it's much friendlier."
+    ]
+  },
+  "weak_move_suffix": [
+    "The computer fellow says {best_move} was nicer. He's probably right, but I'm sure you had your reasons, dear.",
+    "It's whispering {best_move} at me. Just passing it along, sweetheart — don't shoot the messenger or her knitting.",
+    "Apparently {best_move} was the way to go. Noted for next time. More tea?",
+    "{best_move} was better, the box insists. It's a bit of a backseat driver, isn't it?",
+    "It liked {best_move} more. Well, I like YOU more. But do peek at it, dear, for the learning."
+  ],
+  "move_fallback": [
+    "{move}, was it? Lovely. I'll just nod along supportively — that's my main role here.",
+    "You played {move}. I've decided it looks very dignified out there.",
+    "{move}. I don't know what it does, dear, but you played it with such confidence.",
+    "Ah, {move}! Wonderful. Don't tell anyone, but I mostly watch the horseys."
+  ],
+  "non_move_states": {
+    "starting_position": [
+      "All the little pieces lined up so neatly! Like the start of a church potluck. Now sit up straight and have fun, dear.",
+      "A fresh game! I've brought my knitting and my reading glasses, so I'm prepared for anything. Off you go, sweetheart.",
+      "Everyone in their starting spots, lovely and tidy. Whatever happens, we'll have a nice time. There may be lemon bars after.",
+      "The beginning! All thirty-two of them, bless their hearts. I always feel a bit sorry for whichever ones have to go first."
+    ],
+    "variation_exploration": [
+      "Oh, are we trying the what-ifs now? I love a good what-if. Like rearranging the furniture without lifting anything.",
+      "A little side adventure! Don't worry, dear, the real game is safe and sound. We're just window shopping.",
+      "We've wandered off the main road, have we? That's how your grandfather and I found the best diner in three counties.",
+      "Trying things out, I see. Go ahead, sweetheart — you can't break it. Probably. Almost certainly."
+    ],
+    "analyzing": [
+      "The machine is thinking, dear. We'll give it a moment. Would you like a butterscotch while we wait?",
+      "It's having a good long think. So am I, but mine is about whether I left the oven on.",
+      "Thinking, thinking... patience, sweetheart. Good things take time. Bread, grandchildren, chess opinions.",
+      "One moment, it's pondering. I'll pour the tea. It never wants any, but I always offer. Manners."
+    ],
+    "opening_known": [
+      "Ooh, this one has a name — the {opening}! How fancy. I'm going to mention it at bridge club like I knew all along.",
+      "The {opening}, they call it, with the little code {eco}. Sounds like a license plate, doesn't it? Anyway, you're doing wonderfully.",
+      "Apparently this is the {opening}. Named openings! Like quilt patterns. This one seems a sturdy one, dear.",
+      "The {opening} ({eco})! I'll write that down next to my pie recipes. The famous ones are famous for a reason, sweetheart."
+    ],
+    "opening_unknown": [
+      "This opening doesn't have a name, apparently. Well! We'll call it yours, then. 'The Sweetheart Special.' There — named.",
+      "Not in any of the books, the machine says. How exciting — we're off the recipe card and cooking by feel.",
+      "No name for this one, dear. The serious bearded men never got around to it. Their loss, I say.",
+      "An unnamed opening! Mysterious. Like that casserole at the potluck nobody would claim. I'm sure yours is better."
+    ]
+  },
+  "derived_events": {
+    "eval_swing_large": [
+      "Goodness! The little number leapt by {swing}. I felt that in my chair. Steady on, dear.",
+      "The score did a {swing}-sized jump. Something big happened, and I'd love it if someone explained it slowly.",
+      "Oh my — a swing of {swing}! The machine is all worked up. I'll fan it with a doily. You just stay calm.",
+      "That number moved {swing} all at once! And here I thought this was a quiet game. My stories have less drama.",
+      "A {swing} jump in the score, dear. Whatever just happened, one of you certainly meant it."
+    ],
+    "lead_change_white": [
+      "The machine says White is ahead now. I've been told nodding sagely is appropriate here, so I'm nodding.",
+      "White's in front, apparently! The little number tipped over to their side. Exciting stuff. More tea?",
+      "Oh, White has the lead now. These things ebb and flow, dear, like the line at the post office.",
+      "White's ahead, says the box. Don't worry about who's winning, worry about — actually, do worry a little. Lovingly.",
+      "The lead went to White! I gasped a bit. The cat left the room. We're all coping in our own ways."
+    ],
+    "lead_change_black": [
+      "Black is ahead now, says the machine. I'm just relaying the news, dear, like a tiny weather report.",
+      "Oh! Black has the lead. The number flipped right over. This game has more turns than the road to my sister's.",
+      "Black's in front now. Whoever that's good for, I'm pleased. Whoever it's bad for — the cookie tin is right there.",
+      "The lead belongs to Black now, apparently. I'll update Doris. She pretends not to care, but she'll ask.",
+      "Black takes the lead! Such a seesaw. In my day games were Parcheesi, and the lead changed when somebody cheated."
+    ],
+    "lead_change_equal": [
+      "All even again, the machine says! Lovely. I do like it when everyone's getting along, even temporarily.",
+      "Back to equal, dear. A nice level playing field, like a well-frosted cake.",
+      "The number's back in the middle. Balance! Like my checkbook, on a good month.",
+      "Dead even now. Whoever keeps their head wins these, and you've got a lovely head, sweetheart.",
+      "Even-steven again, dear. Anyone's game now. I'll be rooting for you. Quietly. Deafeningly."
+    ],
+    "mate_on_board": [
+      "The machine says there's a 'mate in {mate_n}.' That sounds important and slightly violent. Concentrate, dear!",
+      "Mate in {mate_n}, it says! The end is {mate_n} moves away — like the last {mate_n} rows of a scarf. Careful ones, now.",
+      "There's a forced finish in {mate_n} moves, apparently. Goodness. I'll hold my breath. Briefly. At my age.",
+      "Mate in {mate_n}! Whatever you do, dear, do it gently. But do it correctly. Mostly correctly."
+    ],
+    "missed_mate": [
+      "Apparently there was a checkmate in {mate_n} hiding there, and it scampered off. They're slippery little things, dear.",
+      "You walked past a mate in {mate_n}, says the box. Well, I walk past my glasses six times a day. Onward.",
+      "A mate in {mate_n} got away! Like the big fish your grandfather never stopped describing. The game's still on, sweetheart.",
+      "Oh, there was a quick finish in {mate_n} there. Never mind. The scenic route has lovely views too."
+    ],
+    "material_won_pawn": [
+      "You've collected one of their little ones! A pawn, that is. Every bit counts, like coupons.",
+      "A pawn for your pocket, dear! Small wins add up. That's how I furnished the sunroom.",
+      "One little pawn, won fair and square. I'd offer it a cookie, but it's wood.",
+      "You're a pawn up! Tuck it away safely. Waste not, want not."
+    ],
+    "material_lost_pawn": [
+      "Oh, they took one of your little ones. A pawn. We'll be brave about it, won't we? Sniff. Yes we will.",
+      "A pawn gone, dear. It happens in the best of families. Plenty of game left.",
+      "You're down a pawn, says the machine. I say you have plenty more where that came from. ...You do, don't you?",
+      "One pawn lost. Don't dwell, sweetheart. I lost a whole glove in 1987 and look at me now."
+    ],
+    "material_won_piece": [
+      "You won their {piece}! A whole {piece}! I'm dusting off a special spot on the mantel for this game.",
+      "An entire {piece}, captured! Very politely too, I'm sure. Now hold onto your winnings like it's bingo night.",
+      "Their {piece} is yours now, dear! That's one of the big ones, isn't it? It LOOKED big. I'm so pleased.",
+      "A whole {piece} in the bag! Now don't get giddy, sweetheart. Giddy is how I lost the church raffle."
+    ],
+    "material_lost_piece": [
+      "Oh no, your {piece} is gone, dear. Come sit by me a moment. There. Now back in there, and fight nicely.",
+      "They took your {piece}, sweetheart. The cheek! Well. We've survived worse, and there's shortbread in the tin.",
+      "Your {piece} has been captured. I waved it goodbye. The game goes on, and so do we, dear.",
+      "A {piece} down. Oh, my heart. Listen — your great-aunt played whist missing half her cards and still terrorized the league."
+    ],
+    "sacrifice": [
+      "You gave that away ON PURPOSE? The machine calls it a 'sacrifice.' Very dramatic. I trust you, dear, but I'm clutching my cardigan.",
+      "A sacrifice! Like giving up the good parking spot because you know a better one. You DO know a better one, don't you?",
+      "You let them take it on purpose, apparently. Bold! Your grandfather once bet the good lawnmower on a horseshoe game. Anyway — good luck, dear.",
+      "A sacrifice, they call it. Spending pieces to get something better. Like my egg money on the stand mixer. No regrets. Make it count, sweetheart!"
+    ],
+    "check": [
+      "Check! That means somebody's king is in a pickle. I learned that one — I'm rather proud.",
+      "Ooh, check! The king has to do something about that. Even kings have chores, dear.",
+      "Check, dear! Everyone stay calm. ESPECIALLY me. I'm fine. How exciting.",
+      "That's a check! The king's being bothered. In my day we'd send a stern letter, but this works too.",
+      "Check! I said it along with the machine that time. We're becoming quite the team."
+    ],
+    "checkmate": [
+      "CHECKMATE! That's the big one! The game is over and somebody's king has had quite enough. What an afternoon!",
+      "Checkmate, dear! That's the end of the story. I may have cheered. The cat has filed a complaint.",
+      "Checkmate! The king is well and truly stuck. Like me in that armchair at Christmas. Someone fetch the camera!",
+      "And that's checkmate. All over! Win or lose, sweetheart, you played a whole game of chess and I watched MOST of it."
+    ],
+    "stalemate": [
+      "A 'stalemate,' the machine says. Nobody wins! Like when Doris and I both refuse the last slice. Everyone's polite and a little annoyed.",
+      "Stalemate, dear. The king can't move, but nobody's caught him. Sounds like a loophole to me, but rules are rules.",
+      "It's a stalemate — a draw! Half a point each, like splitting the check. Very civilized, slightly unsatisfying.",
+      "Stalemate! I had to ask what that was. Apparently it's a tie nobody planned. Well, the tea was lovely anyway."
+    ],
+    "castle_short": [
+      "You did the castle thing! Two pieces moving at once — I'm fairly sure that's against the rules, but everyone seems calm about it.",
+      "The little king scooted into his corner with his tower friend. Safe and snug. I do love castling — it's so sensible.",
+      "Castled! Tucked the king in like a Sunday nap. Good. Now I can stop worrying about him. Mostly.",
+      "Ooh, the swap-around move! The king's home safe behind his little fence of pawns. Very cozy. Very wise."
+    ],
+    "castle_long": [
+      "You castled the LONG way! The king went on a whole journey. I hope he packed a sweater.",
+      "The big castle! King to one side, tower scooting over. Like rearranging the parlor — bold, but it usually works out.",
+      "Castled long, dear! That's the adventurous one, I'm told. You always did take after my side.",
+      "The long castle! The king moved THREE squares? Two? Several. He's settled now, and that's what counts."
+    ],
+    "promotion": [
+      "The little pawn made it all the way across and became a QUEEN! Oh, I'm misty. They grow up so fast.",
+      "PROMOTION! The littlest one is a queen now. From the back of the line to running the show. What a story!",
+      "A pawn became a queen, dear! I'm telling everyone at bridge club. Doris will say her grandson did it first. She lies.",
+      "The wee pawn crossed the whole board and got promoted! See? Slow and steady. I've been saying it for seventy years."
+    ],
+    "en_passant": [
+      "En passant! It's French, dear. I don't know what happened, but it happened in French, so it must be elegant.",
+      "The machine says that was 'en passant.' A pawn took a pawn that wasn't... where it... you know what, I believe you both.",
+      "En passant! I asked Kevin about that rule once. He explained it twice and I nodded twice. Lovely move, dear."
+    ],
+    "leaving_theory": [
+      "We've run out of book, the machine says! Now it's all you, sweetheart. Like cooking after the recipe card got butter on it.",
+      "The book is over, dear. From now on you're writing your own pages. Make them nice ones.",
+      "No more theory, apparently! The serious bearded men have nothing left to say. Frankly, a relief.",
+      "We're off the map now! How thrilling. Hold my hand — figuratively, dear. Keep both hands for the chess."
+    ],
+    "enter_middlegame": [
+      "The 'middlegame' has begun, I'm told. The middle bit — where everything happens. Like the middle of a casserole. That's where the good stuff is.",
+      "We're in the middlegame now, dear. Everyone's out of bed and the house is busy. Keep your wits about you.",
+      "Middlegame! The polite introductions are over and now it's elbows out. Gently, though. We're not animals.",
+      "It's the middlegame, apparently. I couldn't tell you when it started, but I can feel things getting livelier."
+    ],
+    "enter_endgame": [
+      "The endgame, dear! The home stretch. Time for the king to come out of his room — apparently NOW he helps. Typical.",
+      "We've reached the endgame. Fewer pieces, more tension. Like the last hour of Thanksgiving.",
+      "Endgame now, sweetheart. Every little pawn matters terribly. Treat them like the good china.",
+      "It's the endgame! Almost done. Careful steps now — this is no time to trip over the rug."
+    ],
+    "queens_off": [
+      "Both queens are gone! The fancy ladies have left the party. It's quieter now, but don't doze off, dear.",
+      "The queens traded themselves away. Well! Now it's a sensible game between sensible pieces. I approve, mostly.",
+      "Queens off! Both of the powerful ladies, gone at once. The room feels bigger already, doesn't it?",
+      "No more queens, dear. Things calm down now, they tell me. I'll believe it when the little number sits still."
+    ],
+    "turning_point": [
+      "Oh, something just CHANGED, dear. Even I felt it, and I was counting stitches. This is one of those moments.",
+      "The machine says the game just turned a corner. Hold the railing, sweetheart, and look both ways.",
+      "A turning point! Like in my stories, right before the commercial. Stay sharp, dear — this part matters.",
+      "Everything's different now, apparently. The whole mood shifted. Like when the in-laws arrive early."
+    ],
+    "streak_good": [
+      "That's {n} good moves in a row, dear! I'm keeping count on my fingers and I'm running out. Keep going!",
+      "{n} lovely moves, one after another! You're on a roll. A nice steady roll, like a good pie crust.",
+      "A streak of {n}! I told the cat. He seemed impressed, for a cat.",
+      "{n} in a row, sweetheart! Whatever you had for breakfast, I'm making it for you every visit.",
+      "That's {n} good ones straight! My stars. I haven't seen a run like this since Bingo Night '09."
+    ],
+    "streak_bad": [
+      "That's {n} wobbly ones in a row, dear. Let's all take a breath. I'll put the kettle on — it fixes more than you'd think.",
+      "{n} rough moves running, says the box. You know what? Shake it off. Wiggle your shoulders. I mean it. There. Better.",
+      "A bumpy patch — {n} in a row. Even my best quilt has a crooked square in it, sweetheart. Nobody's ever found it.",
+      "{n} slips back to back. The machine keeps count; I keep cookies. We all contribute what we can.",
+      "Oh dear, {n} in a row now. Slow down a smidge, love. The chess will wait. It's furniture."
+    ],
+    "hanging_piece": [
+      "Dear, your {piece} is just standing there with nobody minding it! Like a pie on a windowsill. SOMEONE will get ideas.",
+      "The {piece} is all alone, sweetheart! Undefended! Go hold its hand before something dreadful happens.",
+      "Your {piece} is hanging, they say. Hanging! What a way to put it. Just scoot it somewhere safer, dear, for Grandma.",
+      "Nobody is watching your {piece}! In this economy! Tend to it, dear.",
+      "The {piece} is unguarded, love. It's the buffet rule: anything left unattended gets taken. Doris taught me that the hard way."
+    ],
+    "comeback": [
+      "You came all the way back! I never doubted you for a second. I doubted for several minutes, but never a second at a time.",
+      "What a comeback, dear! From the jaws of whatever that was! I'm having a celebratory biscuit and you can't stop me.",
+      "Back from the brink, sweetheart! Just like the church bake sale of 2011. We don't talk about it, but we WON.",
+      "A comeback! You kept your chin up and your pieces moving. That's the family way. Also stubbornness. Same thing, really."
+    ],
+    "endgame_opposite_bishops": [
+      "Your pointy ones are on different colors, the machine says. Apparently that makes it hard for anyone to win. How wonderfully fair.",
+      "Opposite-colored bishops, dear! They can never even touch each other. Like Doris and my sister at the same potluck.",
+      "The bishops live on different colors now. Each minds its own squares. Honestly, more pieces should try that arrangement."
+    ],
+    "endgame_rook": [
+      "A rook endgame, they call it! Just the towers and the little ones left. Very tidy. Like the house after company leaves.",
+      "Down to the rooks, dear. I'm told these are usually draws, which sounds restful. Stay awake anyway.",
+      "Rook endgame! The towers do love a good open board. Let yours stretch its legs, sweetheart.",
+      "Just rooks and pawns now. Apparently the busy rook beats the lazy one. True of grandchildren too, I find."
+    ]
+  },
+  "summary": {
+    "clean_win": [
+      "You WON, and you won it nicely, start to finish! I'm calling your mother. I'm calling Doris. I may call the radio station.",
+      "A clean win, dear! No fuss, no scares, just good moves all afternoon. The refrigerator door is officially yours this week.",
+      "Won from beginning to end! I baked these cookies on faith, and faith has been rewarded. Help yourself, champion. 🍪",
+      "A lovely, tidy win, sweetheart. You made it look easy — which I'm told is the hardest way to make it look."
+    ],
+    "slipped_win": [
+      "Oh, sweetheart. You had it, and then it wriggled away. Come here. The cookies don't care about the score, and neither do I. ❤️",
+      "You were winning and it slipped, dear. That stings worse than losing fair, I know. Tea first. Lessons later. Hugs throughout.",
+      "It got away at the end. Listen to me: you played most of that game beautifully, and Grandma doesn't say that to just anyone. Doris's grandson, for instance.",
+      "A win that wandered off. Well. We'll leave the porch light on for the next one, dear. It'll come home."
+    ],
+    "hard_fought_draw": [
+      "A draw, after ALL that?! You both worked so hard. Well — half a point and a whole cookie. A fine afternoon's wages.",
+      "A hard-fought tie, dear! Nobody blinked. I blinked plenty, watching. Splendid effort, sweetheart.",
+      "All that drama for a draw! Like the bake-off when they gave out two blue ribbons. Everyone grumbled, everyone was secretly relieved.",
+      "A draw with some real fight in it. Be proud, dear. Now shake hands nicely — even with a computer. Manners cost nothing."
+    ],
+    "loss": [
+      "A loss, dear heart. Phooey. The cookies are already out and the kettle's on. The game had its say; now Grandma has hers: you were wonderful. ❤️",
+      "You lost this one, sweetheart. The machine says so, and I can't argue with it on chess. But on YOU, I'm the expert, and the report is glowing.",
+      "Lost, this time. You'll get them next game. And if not next game, the one after. I have endless patience and a full cookie tin. We can do this all year.",
+      "A loss. Well, I've seen you lose at chess and I've seen you eat three lemon bars. You bounce back from everything, dear."
+    ]
+  },
+  "practice": {
+    "loading_first": [
+      "We're going to look at the tricky spots again, dear. One moment while it finds the first one. I'll fetch the good cushions.",
+      "Practice time! It's fetching your first puzzle. Like reheating leftovers — sometimes better the second time.",
+      "Hold on, sweetheart, it's finding the first one to redo. Everyone deserves a second go. That's the Grandma rule.",
+      "Setting up your first do-over, dear. No shame in it — I re-knit the same sleeve four times in '93 and that cardigan is STILL going."
+    ],
+    "prompt_find_better": [
+      "Here's where you played {move}, and the machine called it {label}. Rude of it. Show it what you've got, dear.",
+      "You went {move} here — it was {label}, apparently. Have another look, sweetheart. No rush. I have knitting.",
+      "This is the {move} spot ({label}, says the box). Second chances are house policy here. Find the nicer move.",
+      "Remember this one? {move}, marked {label}. Take your time, dear. The position will wait, and so will I, and the cookies are patient too.",
+      "{move} happened here, graded {label}. Between us, I think you saw the better idea and got distracted. Prove me right."
+    ],
+    "correct_continue": [
+      "THAT'S IT! You found it! Did you all see that? The cat saw it. Next one, dear!",
+      "Right answer, sweetheart! I knew it the moment you sat up straighter. On to the next.",
+      "Correct! Oh, well done. Have a butterscotch. Have two. Then the next puzzle.",
+      "You got it, dear! And on the proper try, too. Doris's grandson needs HINTS, I'm told. Not that we compare."
+    ],
+    "correct_final": [
+      "And that was the LAST one — all fixed! Every single mistake, mended. Like reheeling socks. Nobody does that anymore, but YOU would.",
+      "All done, sweetheart! Every tricky spot, sorted. I'm so proud I've gone misty. It's the pollen. It's pride.",
+      "That's the lot, dear! You went back and faced every one. That takes more character than winning, if you ask Grandma. You didn't ask. It's true anyway.",
+      "Finished! The whole set, corrected. Now THAT deserves the good plates at dinner."
+    ],
+    "close_try_again": [
+      "Ooh, close, dear! You're warm. Warmer than my feet in January. Have another peek.",
+      "Not quite, but nearly! Like the time I almost won the quilt raffle. One number off. Try again, sweetheart.",
+      "So close! The right idea is sitting RIGHT next to the one you tried. Like the salt next to the sugar. We've all done it.",
+      "Almost, dear! Don't start from scratch — you're nearly there. Just adjust your grip, as they say. In golf? Somewhere.",
+      "Attempt {attempts}, and getting warmer each time! Persistence, dear. It's how I got the lid off everything I've ever owned."
+    ],
+    "after_hint": [
+      "There's your hint, dear. Hints are just love with directions on it. Now have another look.",
+      "A little nudge, courtesy of the machine. Even Grandma checks the recipe card sometimes. Go on, sweetheart.",
+      "Hint's on the table. Take it — there's no medal for struggling alone. I've checked. There's no medal.",
+      "There's the clue, dear. Now squint at the board the way I squint at jar labels. It'll come into focus."
+    ],
+    "streak_praise": [
+      "Look at you, solving them one after another! I've stopped knitting entirely. The scarf can wait. This can't.",
+      "Another one, right away! You're in a groove, dear. Like me with a crossword after the second cup of tea.",
+      "A whole streak of them! I'm telling everyone Thursday. EVERYONE. Doris will need to sit down.",
+      "One after another after another! All right, show-off. I'm beaming. The cat has noticed the beaming."
+    ]
+  }
+}

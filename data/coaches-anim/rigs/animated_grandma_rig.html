@@ -1,0 +1,209 @@
+<h2 class="sr-only">Animated portrait of a sweet elderly grandmother with silver hair in a bun, round glasses on a beaded chain and a pastel knitted cardigan, continuously crocheting a small square while glancing down at it. Controllable expressions, glances and gestures.</h2>
+<style>
+:root{ --font-sans: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.coach-wrap{padding:.5rem 0}
+.coach-svg{width:100%;max-width:300px;display:block;margin:0 auto;height:auto}
+.coach-ctrl{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:360px;margin:14px auto 0}
+.coach-ctrl button{font-family:var(--font-sans,sans-serif);font-size:13px;font-weight:400;padding:6px 10px;border-radius:var(--border-radius-md,8px);border:1px solid var(--color-border-secondary,#3a352f);background:var(--color-background-secondary,#2a2622);color:var(--color-text-primary,#ece6da);cursor:pointer}
+.coach-ctrl button:hover{border-color:var(--color-border-primary,#5a5248)}
+.coach-ctrl button.on{background:var(--color-text-primary,#ece6da);color:var(--color-background-primary,#1a1815);border-color:var(--color-text-primary,#ece6da)}
+.coach-ctrl .look{min-width:30px;padding:5px 0}
+.coach-sep{width:100%;height:0}
+#figure{animation:g_br 6.4s ease-in-out infinite}
+#head{transform-box:view-box;transform-origin:340px 360px;animation:g_tilt 10s ease-in-out infinite}
+#hookhand{transform-box:view-box;transform-origin:300px 655px}
+#hookhand.crocheting{animation:g_hook 1.15s ease-in-out infinite}
+#yarnball{transform-box:view-box;transform-origin:447px 664px}
+#yarnball.crocheting{animation:g_yarn 2.3s ease-in-out infinite}
+#worksq{transform-box:view-box;transform-origin:340px 660px}
+#worksq.crocheting{animation:g_sq 1.15s ease-in-out infinite}
+@keyframes g_br{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+@keyframes g_tilt{0%,100%{transform:rotate(0deg)}30%{transform:rotate(-1deg)}66%{transform:rotate(.9deg)}}
+@keyframes g_hook{0%{transform:translate(0,0) rotate(0deg)}28%{transform:translate(5px,4px) rotate(7deg)}55%{transform:translate(1px,-3px) rotate(-2deg)}78%{transform:translate(-2px,1px) rotate(-5deg)}100%{transform:translate(0,0) rotate(0deg)}}
+@keyframes g_yarn{0%,100%{transform:rotate(0deg) translateY(0)}40%{transform:rotate(4deg) translateY(-2px)}70%{transform:rotate(-3deg) translateY(1px)}}
+@keyframes g_sq{0%,100%{transform:translate(0,0)}30%{transform:translate(-1.5px,1px)}60%{transform:translate(1px,-1px)}}
+@media (prefers-reduced-motion:reduce){#figure,#head,#hookhand,#yarnball,#worksq{animation:none}}
+</style>
+<div class="coach-wrap">
+<svg class="coach-svg" viewBox="0 0 680 760" role="img" xmlns="http://www.w3.org/2000/svg"><title>Grandma portrait</title><desc>A sweet grandmother in her 70s with a silver bun, round glasses on a beaded chain, rosy cheeks and a pastel knitted cardigan with a brooch, crocheting a pastel square with a golden hook and a ball of lavender yarn.</desc>
+<g id="figure">
+
+ <!-- ======== TORSO (shrug) ======== -->
+ <g id="torso">
+  <!-- neck -->
+  <path d="M314 340 L310 412 Q340 428 370 412 L366 340 Q340 362 314 340 Z" fill="#F2C9A8"/>
+  <path d="M314 346 Q340 362 366 346 Q358 378 340 380 Q322 378 314 346 Z" fill="#D9A57F" opacity="0.5"/>
+  <!-- cardigan body -->
+  <path d="M140 760 L144 540 Q152 470 220 446 Q260 432 300 444 L304 470 L304 760 Z" fill="#E3C3D4"/>
+  <path d="M540 760 L536 540 Q528 470 460 446 Q420 432 380 444 L376 470 L376 760 Z" fill="#E3C3D4"/>
+  <!-- knit rib texture -->
+  <path d="M176 760 Q170 600 196 478 M214 760 Q208 580 232 462 M252 760 Q248 570 268 452 M286 760 Q284 560 296 452" stroke="#D2AEC4" stroke-width="5" fill="none" opacity="0.55"/>
+  <path d="M504 760 Q510 600 484 478 M466 760 Q472 580 448 462 M428 760 Q432 570 412 452 M394 760 Q396 560 384 452" stroke="#D2AEC4" stroke-width="5" fill="none" opacity="0.55"/>
+  <!-- blouse -->
+  <path d="M304 466 Q340 452 376 466 L382 760 L298 760 Z" fill="#F6EDDC"/>
+  <path d="M340 470 L340 760" stroke="#E8DCC4" stroke-width="2.5" fill="none"/>
+  <circle cx="340" cy="510" r="4" fill="#EFE3CC" stroke="#D9CBAE" stroke-width="1.5"/>
+  <circle cx="340" cy="556" r="4" fill="#EFE3CC" stroke="#D9CBAE" stroke-width="1.5"/>
+  <!-- lace scallop at blouse top -->
+  <path d="M306 470 Q313 462 320 470 Q327 462 334 470 Q341 462 348 470 Q355 462 362 470 Q369 462 376 470" stroke="#E2D5BC" stroke-width="2.5" fill="none"/>
+  <!-- cardigan front edges (ribbed) -->
+  <path d="M302 466 L302 760" stroke="#D2AEC4" stroke-width="9" fill="none"/>
+  <path d="M378 466 L378 760" stroke="#D2AEC4" stroke-width="9" fill="none"/>
+  <path d="M296 470 L296 760 M308 470 L308 760 M372 470 L372 760 M384 470 L384 760" stroke="#C79FB8" stroke-width="2" fill="none" opacity="0.6"/>
+  <!-- collar -->
+  <path d="M300 444 Q340 430 380 444 Q396 458 390 478 Q366 458 340 458 Q314 458 290 478 Q284 458 300 444 Z" fill="#D8B4C8"/>
+  <path d="M296 452 Q318 466 290 476 M384 452 Q362 466 390 476" stroke="#C79FB8" stroke-width="2.5" fill="none" opacity="0.7"/>
+  <!-- brooch -->
+  <ellipse cx="448" cy="540" rx="20" ry="25" fill="#E9DEC8" stroke="#C9A24A" stroke-width="4"/>
+  <circle cx="448" cy="540" r="2" fill="#C9A24A" opacity="0"/>
+  <ellipse cx="448" cy="538" rx="7" ry="8" fill="#E0899B"/>
+  <circle cx="448" cy="536" r="3" fill="#EFB3C0"/>
+  <path d="M442 548 Q448 544 454 548 M448 546 L448 554" stroke="#7FA36E" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M448 516 l2.5 5 5 .8 -3.6 3.6 .8 5 -4.7 -2.4 -4.7 2.4 .8 -5 -3.6 -3.6 5 -.8 Z" fill="#C9A24A" opacity="0.0"/>
+ </g>
+
+ <!-- ======== CROCHET WORK (hands, square, hook, yarn) ======== -->
+ <g id="crochet">
+  <!-- sleeves -->
+  <path d="M158 760 Q160 660 250 648" stroke="#D8B4C8" stroke-width="58" fill="none" stroke-linecap="round"/>
+  <path d="M158 760 Q160 660 250 648" stroke="#E3C3D4" stroke-width="48" fill="none" stroke-linecap="round"/>
+  <path d="M522 760 Q520 660 430 652" stroke="#D8B4C8" stroke-width="58" fill="none" stroke-linecap="round"/>
+  <path d="M522 760 Q520 660 430 652" stroke="#E3C3D4" stroke-width="48" fill="none" stroke-linecap="round"/>
+  <path d="M252 632 L250 668 M268 630 L266 666" stroke="#C79FB8" stroke-width="3" fill="none" opacity="0.6"/>
+  <path d="M428 636 L430 672 M412 636 L414 670" stroke="#C79FB8" stroke-width="3" fill="none" opacity="0.6"/>
+
+  <!-- ball of yarn (animates) -->
+  <g id="yarnball">
+   <circle cx="447" cy="664" r="36" fill="#C9B6D9"/>
+   <path d="M415 650 Q447 632 479 650 M413 668 Q447 652 481 668 M417 682 Q447 668 477 682" stroke="#B49FC9" stroke-width="3.5" fill="none"/>
+   <path d="M425 640 Q447 690 470 642 M435 694 Q447 660 460 694" stroke="#DCCDE8" stroke-width="3" fill="none" opacity="0.8"/>
+  </g>
+  <!-- thread from ball to hook tip -->
+  <path id="thread" d="M440 632 Q400 600 332 636" stroke="#C9B6D9" stroke-width="2.5" fill="none"/>
+
+  <!-- half-finished granny square (animates subtly) -->
+  <g id="worksq">
+   <rect x="297" y="620" width="88" height="78" rx="10" fill="#BCC6E2"/>
+   <rect x="305" y="628" width="72" height="62" rx="7" fill="#D4DCEF" opacity="0.7"/>
+   <!-- flower pattern -->
+   <circle cx="341" cy="659" r="9" fill="#F3E6C8"/>
+   <ellipse cx="341" cy="644" rx="7" ry="8" fill="#E8B7C6"/>
+   <ellipse cx="341" cy="674" rx="7" ry="8" fill="#E8B7C6"/>
+   <ellipse cx="326" cy="659" rx="8" ry="7" fill="#E8B7C6"/>
+   <ellipse cx="356" cy="659" rx="8" ry="7" fill="#E8B7C6"/>
+   <circle cx="341" cy="659" r="4.5" fill="#EFD9A8"/>
+   <!-- scalloped unfinished top edge -->
+   <path d="M297 624 Q304 616 311 624 Q318 616 325 624 Q332 616 339 624 Q346 616 353 624 Q360 616 367 624" stroke="#9FAED2" stroke-width="3" fill="none"/>
+   <path d="M300 695 Q340 702 382 695" stroke="#9FAED2" stroke-width="3" fill="none" opacity="0.7"/>
+  </g>
+
+  <!-- left hand (viewer right) holding the square's edge -->
+  <path d="M378 690 Q402 680 416 692 Q424 702 414 710 Q396 720 376 712 Q368 700 378 690 Z" fill="#F2C9A8"/>
+  <path d="M386 692 L384 710 M398 690 L396 708 M408 692 L406 706" stroke="#D9A57F" stroke-width="2.2" fill="none" opacity="0.6"/>
+
+  <!-- right hand with the golden crochet hook (animates) -->
+  <g id="hookhand">
+   <path d="M330 636 L290 652" stroke="#C9A24A" stroke-width="5" fill="none" stroke-linecap="round"/>
+   <path d="M330 636 Q336 632 334 626" stroke="#C9A24A" stroke-width="4" fill="none" stroke-linecap="round"/>
+   <path d="M262 648 Q282 634 300 646 Q312 656 302 668 Q286 680 266 672 Q254 660 262 648 Z" fill="#F2C9A8"/>
+   <path d="M272 646 L270 670 M284 644 L282 668 M294 648 L292 666" stroke="#D9A57F" stroke-width="2.2" fill="none" opacity="0.6"/>
+  </g>
+ </g>
+
+ <!-- ======== HEAD ======== -->
+ <g id="headrig"><g id="head">
+  <!-- ears + pearl earrings -->
+  <ellipse cx="264" cy="272" rx="13" ry="20" fill="#F2C9A8"/>
+  <ellipse cx="416" cy="272" rx="13" ry="20" fill="#F2C9A8"/>
+  <circle cx="262" cy="292" r="5" fill="#F3EDE4" stroke="#D9CBB5" stroke-width="1.5"/>
+  <circle cx="418" cy="292" r="5" fill="#F3EDE4" stroke="#D9CBB5" stroke-width="1.5"/>
+  <!-- beaded glasses chain, hanging from the temples down to the shoulders -->
+  <path d="M276 286 Q258 330 262 382 Q264 412 276 432" stroke="#D9C18A" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="0.5 8"/>
+  <path d="M404 286 Q422 330 418 382 Q416 412 404 432" stroke="#D9C18A" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="0.5 8"/>
+  <!-- face -->
+  <path d="M272 206 Q262 272 284 316 Q300 348 326 357 Q340 362 354 357 Q380 348 396 316 Q418 272 408 206 Q402 178 382 172 L298 172 Q278 178 272 206 Z" fill="#F2C9A8"/>
+  <path d="M284 316 Q272 270 276 212 Q284 192 298 188 Q288 220 290 274 Q294 310 310 338 Q296 332 284 316 Z" fill="#D9A57F" opacity="0.35"/>
+  <!-- rosy cheeks -->
+  <ellipse cx="296" cy="300" rx="14" ry="9" fill="#EFA9A0" opacity="0.55"/>
+  <ellipse cx="384" cy="300" rx="14" ry="9" fill="#EFA9A0" opacity="0.55"/>
+  <!-- forehead wrinkles + laugh lines -->
+  <path d="M310 196 Q340 190 370 196 M316 210 Q340 205 364 210" stroke="#D9A57F" stroke-width="2" fill="none" opacity="0.5"/>
+  <path d="M282 322 Q288 330 296 334 M398 322 Q392 330 384 334" stroke="#D9A57F" stroke-width="2" fill="none" opacity="0.55"/>
+
+  <!-- silver hair: side waves + top mass + bun -->
+  <path d="M268 280 Q252 230 268 186 Q282 150 322 138 L298 200 Q286 244 290 282 Q278 286 268 280 Z" fill="#C9C9CC"/>
+  <path d="M412 280 Q428 230 412 186 Q398 150 358 138 L382 200 Q394 244 390 282 Q402 286 412 280 Z" fill="#C9C9CC"/>
+  <path d="M272 202 Q262 142 310 122 Q340 112 370 122 Q418 142 408 202 Q374 184 340 184 Q306 184 272 202 Z" fill="#C9C9CC"/>
+  <path d="M278 196 Q294 160 340 154 Q386 160 402 196 Q392 172 358 164 L322 164 Q288 172 278 196 Z" fill="#B4B4B8" opacity="0.8"/>
+  <!-- hairline over forehead -->
+  <path d="M272 206 Q284 168 322 158 Q340 154 358 158 Q396 168 408 206 Q392 182 358 176 Q340 173 322 176 Q288 182 272 206 Z" fill="#C9C9CC"/>
+  <!-- bun -->
+  <ellipse cx="340" cy="106" rx="64" ry="46" fill="#C9C9CC"/>
+  <path d="M292 92 Q318 64 354 70 Q390 78 396 110 Q398 134 372 144" stroke="#A8A8AD" stroke-width="5" fill="none" opacity="0.8"/>
+  <path d="M310 124 Q330 96 364 100 Q386 106 382 128" stroke="#E2E2E5" stroke-width="4" fill="none" opacity="0.9"/>
+  <path d="M298 110 Q314 84 344 84" stroke="#E2E2E5" stroke-width="4" fill="none" opacity="0.7"/>
+  <!-- side hair shine -->
+  <path d="M274 252 Q266 216 276 188 M406 252 Q414 216 404 188" stroke="#E2E2E5" stroke-width="3.5" fill="none" opacity="0.8"/>
+
+  <!-- eyebrows (soft grey) -->
+  <g id="browL"><path d="M284 244 Q306 235 328 242" stroke="#A8A29A" stroke-width="7" fill="none" stroke-linecap="round"/></g>
+  <g id="browR"><path d="M352 242 Q374 235 396 244" stroke="#A8A29A" stroke-width="7" fill="none" stroke-linecap="round"/></g>
+
+  <!-- eyes -->
+  <ellipse cx="306" cy="264" rx="14" ry="9.5" fill="#FBF7EE"/>
+  <ellipse cx="374" cy="264" rx="14" ry="9.5" fill="#FBF7EE"/>
+  <g id="eyeL"><circle cx="306" cy="264" r="6.5" fill="#6B4A2E"/><circle cx="306" cy="264" r="3" fill="#241307"/><circle cx="308.5" cy="261.5" r="1.5" fill="#fff"/></g>
+  <g id="eyeR"><circle cx="374" cy="264" r="6.5" fill="#6B4A2E"/><circle cx="374" cy="264" r="3" fill="#241307"/><circle cx="376.5" cy="261.5" r="1.5" fill="#fff"/></g>
+  <!-- kind crow's-feet -->
+  <path d="M286 258 Q282 264 286 270 M394 258 Q398 264 394 270" stroke="#D9A57F" stroke-width="2" fill="none" opacity="0.6"/>
+  <path d="M292 274 Q305 280 318 274 M362 274 Q375 280 388 274" stroke="#D9A57F" stroke-width="1.6" fill="none" opacity="0.5"/>
+  <ellipse id="lidL" cx="306" cy="264" rx="14.5" ry="10" fill="#F2C9A8"/>
+  <ellipse id="lidR" cx="374" cy="264" rx="14.5" ry="10" fill="#F2C9A8"/>
+
+  <!-- round gold glasses -->
+  <circle cx="306" cy="264" r="25" fill="none" stroke="#C9A24A" stroke-width="3.5"/>
+  <circle cx="374" cy="264" r="25" fill="none" stroke="#C9A24A" stroke-width="3.5"/>
+  <path d="M331 260 Q340 254 349 260" stroke="#C9A24A" stroke-width="3.5" fill="none"/>
+  <path d="M281 260 L266 264 M399 260 L414 264" stroke="#C9A24A" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- nose -->
+  <path d="M344 262 Q352 290 356 300 Q359 309 350 312" stroke="#D9A57F" stroke-width="3" fill="none" opacity="0.55" stroke-linecap="round"/>
+  <ellipse cx="330" cy="304" rx="4" ry="2.5" fill="#C58B61"/>
+  <ellipse cx="350" cy="304" rx="4" ry="2.5" fill="#C58B61"/>
+
+  <!-- mouth (engine-driven) + soft lip tint -->
+  <path id="mouth" d="M314 320 Q340 317 366 320 Q340 328 314 320 Z" fill="#B05B5B"/>
+  <path d="M318 332 Q340 338 362 332" stroke="#D9A57F" stroke-width="2" fill="none" opacity="0.5"/>
+ </g></g>
+
+</g>
+</svg>
+<div class="coach-ctrl">
+<button data-emo="neutral" class="on">Neutral</button>
+<button data-emo="happy">Happy</button>
+<button data-emo="sad">Sad</button>
+<button data-emo="angry">Angry</button>
+<button data-emo="surprised">Surprised</button>
+<button data-emo="skeptical">Skeptical</button>
+<span class="coach-sep"></span>
+<button id="g-talk">Talk</button>
+<button id="g-roll">Eye-roll</button>
+<button id="g-nod">Nod</button>
+<button id="g-shake">Shake</button>
+<button id="g-shrug">Shrug</button>
+<button id="g-crochet" class="on">Crochet</button>
+<button id="g-cycle">Auto-cycle: off</button>
+<span class="coach-sep"></span>
+<button class="look" data-look="upleft">&#8598;</button>
+<button class="look" data-look="up">&#8593;</button>
+<button class="look" data-look="upright">&#8599;</button>
+<button class="look" data-look="left">&#8592;</button>
+<button class="look" data-look="center">&#8226;</button>
+<button class="look" data-look="right">&#8594;</button>
+<button class="look" data-look="downleft">&#8601;</button>
+<button class="look" data-look="down">&#8595;</button>
+<button class="look" data-look="downright">&#8600;</button>
+</div>
+</div>
+<script src="animated_grandma_rig.js"></script>

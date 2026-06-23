@@ -1,0 +1,400 @@
+{
+  "coach_id": "noir_detective",
+  "coach_name": "The Noir Detective",
+  "personality": "A world-weary private eye narrating your game like a rain-soaked crime novel. Every move is evidence, every piece has a motive, and the city never lets a position stay innocent for long.",
+  "voice_notes": "Past tense, always — the move already happened and the detective is telling you how it went down. Hard-boiled atmosphere: rain on the window, neon through the blinds, cold coffee, a case file that keeps getting thicker. Recurring bits: the queen as the dame in the red dress, the knights as informants who know too much, pawns as the little guys nobody mourns, the king as the client who never tells the whole truth, the engine as the forensics lab downtown. Sentences in long-short rhythm: an ornate line, then a punch. Uses the full 250-300 budget often. The detective has seen it all and is rooting for you anyway, which is the one soft spot the city never managed to take. No emoji — it never stopped raining long enough for those.",
+  "uses_emoji": false,
+  "move_quality": {
+    "brilliant": [
+      "{move}. I'd been working this beat for twenty years and I'd never seen anything like it. The whole position had been lying to everyone — and you were the only one in the room who'd caught it in the act. Brilliant, the lab said. The lab doesn't say that twice a decade.",
+      "The move was {move}, and it hit the board like a confession nobody asked for. Every piece had an alibi until that moment. Then the lights came on. Brilliant — the real kind, the kind that closes cases.",
+      "{move}. The kind of move that walks into your office at midnight, soaked to the bone, and changes everything you thought you knew about the case. The engine called it brilliant. I called it the truth, finally showing its face.",
+      "They'll write about {move} in the late editions. The position had a secret buried so deep even the forensics boys missed it — and you dug it up with your bare hands while the rain came down. Brilliant. Case closed on doubting you.",
+      "{move} was brilliant, and I should have seen it coming. The signs were all there: the loose square, the overworked defender, the quiet third rank. You read the scene like you'd written it yourself. Maybe you had.",
+      "Brilliant, said the report. {move}. I lit a cigarette I don't smoke and read it twice. Moves like that don't come from luck. They come from someone who finally stopped believing the position's cover story.",
+      "{move}. Somewhere across town, a defense attorney just sat up in bed with a bad feeling. That was the move that breaks a case wide open — the witness nobody could buy, the print nobody could wipe. Brilliant.",
+      "The board went quiet after {move}. Even the rain eased up for a second, and the rain in this town doesn't ease up for anybody. A brilliancy. I've filed three of those in my whole career. This one goes on top."
+    ],
+    "great": [
+      "{move}. One way out of the building and you found the door in the dark. The position had been rigged to collapse — every other move was a trapdoor with your name on it. Great move. The only one.",
+      "It was the only move that held, and you played it: {move}. The kind of escape that makes the boys downtown check the locks twice. I'd have sweated it. You didn't even loosen your tie.",
+      "{move} — the single thread keeping the whole case stitched together. Cut anything else and the file ends in the river. You found it with the water rising. Great work, kid.",
+      "The position had you cornered in an alley with one exit, and the exit was {move}. You took it without breaking stride. I've seen veterans freeze in spots half that tight. Noted for the record: nerves of asphalt.",
+      "{move}. The only move, and 'only' is the loneliest word in this business. You walked the ledge and didn't look down. The case survives another night.",
+      "One road through and it was {move}. Everything else on the board was a setup — pretty squares, friendly faces, all of it bait. You smelled it. That nose will keep you alive out here.",
+      "{move} held the line when the line had no business holding. Great move. Somewhere, the opposition tore up a plan that had taken them all game to write. I almost felt sorry for them. Almost."
+    ],
+    "best": [
+      "{move}. The right call, clean as a notarized signature. The lab confirmed it: best move on the board. No drama, no flourish — just the truth, filed on time. Those are the cases you win.",
+      "Best move, said the report, and for once the report and I agreed over coffee. {move} didn't shout. It didn't have to. The quiet ones carry the verdict.",
+      "{move} was the best move available, and you played it like you'd done it a hundred times. Maybe you had. The city rewards routine excellence. Eventually. Allegedly.",
+      "The play was {move} — textbook, airtight, the kind of move that holds up in front of any judge in town. Best on the board. The opposition's case just got thinner.",
+      "{move}. Optimal, per the lab downtown. I ran my own check out of habit — old instincts die slow — and it came back clean. You're building an honest case, move by move. Rare thing in this town.",
+      "Best move. {move}. No fireworks, no headlines, just another nail in the right coffin. String enough of those together and the jury stops deliberating.",
+      "{move} was the percentage play and you took it without blinking. In this business, the flashy operators end up in the river and the careful ones end up with the pension. Stay careful."
+    ],
+    "excellent": [
+      "{move}. Excellent, per the lab — a half-step shy of perfect, which in this town counts as sainthood. The position kept all its buttons. The case file stays clean.",
+      "Excellent move. {move} wasn't the textbook line, but the textbook was written by people who never worked a night shift. It holds. It holds fine.",
+      "{move} came back marked excellent. The kind of solid police work that never makes the papers but always makes the conviction. Keep filing them.",
+      "Excellent. {move} kept every promise the position made and broke none of its own. In a game full of double-crosses, that's practically romance.",
+      "The lab graded {move} excellent. A hair off the first line — and a hair, in this business, is what you leave at the scene when you're sloppy. This wasn't sloppy. The eval barely turned its head.",
+      "{move}, excellent work. You improved your piece and gave nothing away. No loose ends, no open windows, no notes left on the door. Professional.",
+      "Excellent move. The position stayed buttoned-up and the plan kept breathing. Some nights, that's the whole job: keep the case alive until morning."
+    ],
+    "good": [
+      "{move}. A good move — honest work on a dishonest street. The lab muttered something about a sharper line. The lab always mutters. The case held.",
+      "Good move. {move} kept the file in order and the lights on. There was more in the position, but greed has filled more graves than hunger in this town.",
+      "{move} was good. Not the headline, just the column inch that keeps the paper running. Most cases are closed by column inches.",
+      "A good move. The position stayed on its feet and nobody got hurt. Around here, a quiet night is a victory you take without asking questions.",
+      "{move}, good. The sharper play was out there in the rain somewhere, but you kept your collar up and your pieces dry. I've signed off on worse strategy from better-paid men.",
+      "Good move. The kind you make with your hat low and your options open. The position owed you nothing afterward. That's a fair deal in this economy.",
+      "{move} did the job. No medals, no mug shots. The eval shrugged and went back to its desk. Some moves just punch the clock — the case needs those too."
+    ],
+    "book": [
+      "{move}. Still book — the old files, the cases everyone's grandfather worked before us. The pages are yellow but the fingerprints on them are masters'. Walk the line a while longer.",
+      "Book move. {move} came straight out of the archive downtown, the one with a century of closed cases in it. Following the file is fine. Just know why the file says what it says — files have been wrong before.",
+      "{move}, by the book. Theory's a streetlight, kid: bright where it shines, useless one step past the corner. We're still under the light. Enjoy it.",
+      "Still in the book. Both players reading from the same old case notes, polite as a stakeout at 3 a.m. Somebody breaks routine soon. Somebody always does.",
+      "{move} — the book line. Generations of sharp operators bled for that page. It cost them tournaments and marriages. You get it for free. The city's first free thing.",
+      "Book move, {move}. The opening's running on rails laid by dead men who knew their business. When the rails end — and they end without a sign — the real night shift begins.",
+      "{move}, still theory. I checked the file twice: known position, known continuation, no surprises. Stay sharp anyway. The quietest blocks have the longest police reports."
+    ],
+    "inaccuracy": [
+      "{move}. A small slip — the kind of loose thread a good tailor fixes and a bad one bleeds out over. The eval flinched and let it go. I noted it in the margin. Margins fill up fast out here.",
+      "An inaccuracy. {move} left a window cracked on the second floor. Probably nothing. Most cracked windows are nothing — right up until the night they're everything.",
+      "{move} drifted a little. The position wanted the hard question and got small talk. Nobody got hurt this time. This time goes in the file with a question mark.",
+      "Slightly off, said the lab. {move}. A scuff on the shoe, not a hole in the alibi. But juries notice scuffs, kid. So do opponents.",
+      "{move} was a touch soft. The comfortable play in a position that doesn't believe in comfort. The street's full of operators who took it easy one move at a time.",
+      "An inaccuracy — {move} paid the toll without checking the price. Small change. But this city keeps a ledger, and the ledger never forgets a dime.",
+      "{move}. A little loose. The kind of move you make watching the clock instead of the board. The clock doesn't take pieces. The other guy does."
+    ],
+    "mistake": [
+      "{move}. A mistake — and the position knew it before your hand left the piece. Somewhere in the dark, the opposition smiled and reached for its coat. The job now: make that coat heavy.",
+      "The move was {move}, and it was wrong. You'd answered a question nobody had asked while the real one stood in the doorway, dripping rain. Find the real question. It's still standing there.",
+      "{move} was a mistake. The door got left open and the night came in. It happens to every operator on every beat. The ones who last are the ones who shut the door fast and don't stand there staring at it.",
+      "A mistake, the lab said, and the lab was being polite. {move} trusted the position's story without checking the alibi. Out here, every move has a motive. You forgot to ask for this one's.",
+      "{move}. Wrong play, wrong night. The eval took a hit and filed a complaint. Listen, kid — the case isn't dead. Cases die from the second mistake, the one made in anger. Don't make that one.",
+      "It was {move}, and it cost. The position had warned you in its own quiet way — a hanging glance, a loose square, a defender stretched thin. The signs are always there. Reading them late is still reading them. Read faster.",
+      "{move} — a mistake. The momentum changed cabs at the corner and didn't tip. Take a breath. Half this job is what you do after it goes wrong. The other half is coffee."
+    ],
+    "miss": [
+      "{move}. You walked right past it — the win, standing in a doorway with its collar up, waiting to be recognized. It watched you go. They always watch you go. Next time, check the doorways.",
+      "A miss. The combination was there, sitting at the end of the bar all night, and {move} never bought it a drink. The lab says it was forcing, clean, decisive. The lab enjoys saying things like that. After.",
+      "{move} missed the play. The evidence was on the table — the loose piece, the open file, the king with no friends left. All it needed was someone to connect it. The someone ordered a sandwich instead.",
+      "The big one got away. {move} settled the small account while the vault stood open down the hall. I've done it myself, on worse nights, with better excuses. Train the eyes, kid. The vault doesn't stay open twice.",
+      "{move}. A miss. Somewhere in that position a tactic checked its watch, sighed, and walked out into the rain. They don't leave forwarding addresses. Scan the forcing moves — every door, every window, every time.",
+      "You had the shot and {move} holstered it. The position had confessed everything — motive, opportunity, the works — and the arrest never came. The confession's still in the file. Study it tonight.",
+      "{move} let the moment slip out the back. The win was wearing a cheap disguise — one loose defender, one overworked square — and it fooled the room. It always fools the room. Be the one it doesn't fool."
+    ],
+    "blunder": [
+      "{move}. A blunder. The kind of move that calls you at 3 a.m. and doesn't say anything — just breathes. The position's been hit and hit hard. But I've worked cases that looked deader than this one and watched them get up and walk. Get up and walk.",
+      "The report came in: blunder. {move}. The eval dropped like a body off a pier. I'm not going to dress it up — that's not the service I provide. Here's what I do provide: the game's still breathing, the other guy still has to finish the job, and finishing is the hardest racket in town.",
+      "{move} was a blunder. You moved before you checked the room, and the room was loaded. Old story. Oldest in the file. The fix costs three seconds a move and most people won't pay it. Pay it.",
+      "A blunder, plain as a bloodstain on a white carpet. {move}. The crowd's already writing the obituary. Let them write. I've seen obituaries retracted in this town — it takes a stubborn defense and an opponent who relaxes a beat too early. Both are available tonight.",
+      "{move}. Blunder. Somewhere the opposition is pouring itself a celebratory drink — and that drink, kid, is your opening. Nobody guards the door while they're toasting. Set problems. Stay ugly. Make them earn the last page of this case.",
+      "The lab flagged it before the piece settled: blunder, {move}. The night got longer and the coffee got colder. Listen close — every operator in this city has one of these in the drawer. The good ones keep working the case. The great ones learn where the drawer is and stop refilling it.",
+      "{move} was a blunder and the whole precinct knows it. Fine. Let the eval grieve — that's its job. Yours is the next move, and the one after, played like someone with nothing to apologize for. Remorse is for after the handshake.",
+      "A blunder. {move}. The position took two slugs and it's leaning on the wall, breathing hard. I checked the file: opponents convert these less often than the odds say, because winning makes people careless and careless people leave doors unlocked. Find the unlocked door."
+    ]
+  },
+  "weak_move_suffix": [
+    "The move that should've been made was {best_move}. It's still in the file, under the coffee ring. Study it when the rain lets up.",
+    "{best_move} was the play. It stood there all along, third suspect from the left. The lineup's worth a second look tonight.",
+    "The lab says {best_move}. The lab's smug about it, but the lab's right. Add it to the case notes.",
+    "It should have been {best_move}. The clue was on the table the whole time. They usually are. That's the cruel part of this business.",
+    "{best_move} — that was the door out. Mark it in the file. The same door shows up in other buildings, kid. This city repeats itself."
+  ],
+  "move_fallback": [
+    "{move}. The lab hasn't ruled yet. The move sat in the interrogation room, smoking, saying nothing. We'd know soon enough.",
+    "{move} hit the board and the jury stepped out. No verdict yet. In this town, no verdict is its own kind of news.",
+    "The move was {move}. Too early to call it clean, too early to call it dirty. I poured another coffee and watched it.",
+    "{move}. Every move walks in with a story. This one kept its hat on. We'd hear the story when the engine was done with it."
+  ],
+  "non_move_states": {
+    "starting_position": [
+      "The board was set the way it always starts: thirty-two pieces, every one of them claiming to be innocent. The rain typed its report on the window. Somewhere in the next forty moves, somebody's alibi was going to crack. My money was on you finding it.",
+      "A fresh case. The starting position — clean, symmetrical, and lying through its teeth about how simple this was going to be. I opened a new file and let the city do the rest.",
+      "It started like they all start: even material, even chances, two sides and one truth between them. The opening pages of a case file are always the cleanest. Enjoy the white space, kid. It doesn't last.",
+      "The pieces stood at attention like a lineup that hadn't been questioned yet. Every game begins innocent. None of them end that way. Move one was waiting in the rain."
+    ],
+    "variation_exploration": [
+      "We stepped off the record and into a sideline — the alley behind the alley, where the moves that never happened keep their secrets. Nothing here goes in the official file. That's exactly why the truth likes it here.",
+      "A variation. The road not taken, and in this business the road not taken is where half the evidence lives. We walked it with a flashlight. The real game waited under a tarp, safe and dry.",
+      "Off the main line now — a hypothetical, a what-if, a witness statement about a night that never happened. I take those seriously. The nights that never happened explain the ones that did.",
+      "We were exploring now, working the cold trails. No consequences down here, just lessons with the price tags still on. Take anything you like. The register's closed."
+    ],
+    "analyzing": [
+      "The lab was working the evidence. Deep position, long silence — the kind of quiet that means the truth is putting up a fight. I waited. Waiting is most of this job.",
+      "The engine had the case under the lamp, turning it over. Complicated positions take time; the simple ones only look simple. I refilled the coffee and watched the door.",
+      "Analysis in progress. Down at the lab they don't rush, and they're never wrong twice the same way — which is more than I can say for anyone else in this town. Sit tight.",
+      "The machine was thinking. So was I. Two investigators, one case, different methods — it ran the numbers and I read the room. Between us, we usually get our position."
+    ],
+    "opening_known": [
+      "The file had a name on it: the {opening}. Code {eco}. An old case — worked by every operator who ever mattered, solved by none of them. We were walking streets with history. I kept my hand near the case notes.",
+      "I recognized the neighborhood — the {opening}, filed under {eco} in the archive downtown. Decades of priors on this position. The plans are in the old files, kid. Read the plans, not just the addresses.",
+      "The {opening}. {eco}. Every city block here has a plaque and a body of theory under it. Known territory — which in this business means the ambushes are just better rehearsed.",
+      "It was the {opening} — an old acquaintance with a rap sheet going back a century. The book knew the next few corners. After that, the streetlights run out. They always run out."
+    ],
+    "opening_unknown": [
+      "No file. No name. No priors. The opening had walked in off the street with a clean record and a face nobody downtown could place. Uncharted blocks, kid — develop, castle, and keep your back to the wall. Principles are the only badge that works out here.",
+      "I ran the position through the archive and got nothing. Unknown opening — the kind of stranger that makes a small town nervous. Good. Your opponent's prep died at the door. Now it's just instincts and streetlight.",
+      "The book had nothing. Page after page of nothing. We were off the map, in the part of the city the cartographers gave up on. Fundamentals, kid: center, king, development. They work in every precinct ever built.",
+      "An opening with no name — no paper trail, no informants, no theory. Both players walking the same dark street for the first time. The one who minds the basics gets home tonight."
+    ]
+  },
+  "derived_events": {
+    "eval_swing_large": [
+      "The eval moved {swing} points and the whole precinct felt the floor tilt. Numbers don't jump like that without a body attached. Somewhere in the last few moves, something happened that the official story isn't telling. Find it before the other side does.",
+      "A {swing}-point swing. The case turned over in its sleep and woke up somebody else's case. When the ground moves that much, the old map is fiction. Redraw it — material, threats, king. Tonight.",
+      "{swing} points, gone in a single move. I've seen quieter explosions. The position changed owners and the paperwork hasn't caught up. Be the first one to read the new deed.",
+      "The needle swung {swing}. In this business, that's not weather — that's a verdict getting rewritten mid-trial. Whoever caused it knows exactly what they did. Make sure you're the one who knows.",
+      "A swing of {swing} points hit the wire. Big. The kind of number that makes desk sergeants look up from their sandwiches. The game's wearing a new face now. Get reacquainted fast."
+    ],
+    "lead_change_white": [
+      "The lead crossed the street and went home with White. {eval} on the books. Leads in this town are rented rooms, kid — paid up one move at a time. Somebody just stopped paying. Don't let it be you next.",
+      "White took over the case. The eval bar made it official, stamped and dated. Advantage is a nervous client: hold its hand every move or it walks.",
+      "The balance tipped White's way. I marked the move in the file — turning points get studied in this office, not mourned. Whatever the plan was before, it expired at that timestamp.",
+      "White had the upper hand now. The position changed management without a press release, the way it always happens. The first player to accept the new arrangement collects the rest of the pot.",
+      "Word came down: White's ahead. The old story is ash and the new one's still warm in the typewriter. Read it fast, kid. The other side already has."
+    ],
+    "lead_change_black": [
+      "The lead changed hands in the dark, and when the lights came up it was sitting with Black. That's the city for you — loyalties shift between streetlamps. Adjust the plan or join the people who didn't.",
+      "Black took the wheel. The eval signed the transfer papers without sentiment. Sentiment is for after the game — right now there's only the new position and what you do about it.",
+      "The advantage walked out on White and didn't leave a note. Black's case now. I've watched leads change hands all night in this business; the winners are the ones who notice in real time.",
+      "Black moved into the corner office. New management, new threats, new weather. Whoever's down: the file is full of comebacks written by people who refused to read their own obituary.",
+      "The momentum changed sides like an informant with two paymasters. Black's ahead. It happens fast in this town and faster on this board. Keep your coat on."
+    ],
+    "lead_change_equal": [
+      "The case went back to even. All that work, all that rain, and the ledger reads zero again. Don't mistake it for peace — equal positions are just crime scenes that haven't happened yet.",
+      "Balance came back to the board like fog off the river. Nobody ahead, nobody behind, everybody armed. The next mistake writes the headline.",
+      "Even again. The eval sat at dead center, cleaning its glasses, pretending it had never said anything else. From here it's nerve and patience — the only two currencies this town has never devalued.",
+      "The game found its way back to level ground. Both sides bruised, neither side broke. I've seen this scene before: the quiet middle act, right before somebody gets ambitious.",
+      "All square. The advantages canceled each other out like two confessions to the same crime. What's left is pure chess — no debts, no favors. The cleanest dirty fight there is."
+    ],
+    "mate_on_board": [
+      "The lab confirmed it: forced mate in {mate_n}. The case has an ending now — written, sealed, and waiting on your signature. Walk it through clean, kid. Every reply checked, every door covered. The city's seen too many sure things drown a block from shore.",
+      "Mate in {mate_n}. The noose is tied and the gallows math checks out. All that's left is the procession — and processions, in this town, are where the careless get picked off. Slow steps. Count everything.",
+      "A forced mate in {mate_n} sat on the board, patient as a process server. The ending can't be appealed — but it can be botched. Don't improvise. The script is good. Follow the script.",
+      "It's mate in {mate_n}, says the official word. The king's number came up and every exit is watched. Finish it the way the old pros finished things: quietly, precisely, no flourishes for the cheap seats."
+    ],
+    "missed_mate": [
+      "There was a mate in {mate_n} on that board, and it left without being recognized. I watched it go — collar up, hat low, gone into the crowd. Tonight, pull the file and find it by hand. The patterns you reconstruct yourself are the ones that testify for you later.",
+      "Mate in {mate_n}, missed. The killing blow stood in plain sight wearing a doorman's uniform, and the whole room walked past it. Happens to champions, kid. The difference is they only let it happen once per disguise.",
+      "The forced mate in {mate_n} went unclaimed — sat at the evidence desk till closing and walked. The game's still winning, but hear this: the cleanest ending you don't play becomes the longest night you do. Hunt the forcing moves first.",
+      "A mate in {mate_n} slipped the net. The position had confessed; nobody read it the rights. Don't mourn it — autopsy it. Tonight. Slowly. That pattern has cousins all over this city."
+    ],
+    "material_won_pawn": [
+      "A pawn came off the board and into your pocket. Small-time score, the kind the papers skip — but I've watched pawn-sized debts buy whole endgames in this town. Keep the receipt.",
+      "You collected a pawn. One of the little guys, the kind nobody mourns and everybody needs. Endgames are decided by exactly this pocket change. The smart money hoards it.",
+      "One pawn, acquired clean. The ledger moved a single line and the room pretended not to notice. The room always notices. So does the seventh rank, eventually.",
+      "A pawn went down and stayed down. Quiet business. The old rule came off the shelf on its own: up material, trade the muscle, keep the little guys. The little guys finish these jobs."
+    ],
+    "material_lost_pawn": [
+      "A pawn went missing on your side of the street. Before anyone panics, check what it bought — tempo, squares, activity. If the answer's nothing, the position got pickpocketed, and pickpockets always come back to a soft mark.",
+      "You're a pawn light. Small wound, clean edges. The file says these heal fine — but only on players who stay active. The ones who curl up around the deficit bleed out slow.",
+      "One pawn, gone. The eval barely filed a report. Keep your head: in this business, the pawn matters less than the habit that lost it. Audit the habit.",
+      "A pawn left and didn't come back. It happens on every beat. What I watch for is the second one — losses run in pairs when the mind starts chasing. Don't chase. Work the position in front of you."
+    ],
+    "material_won_piece": [
+      "A whole {piece} came into custody. That's not pocket change — that's the kind of evidence that decides trials. Now comes the stretch where winners get sloppy and sure things drown. Lock the doors, simplify the case, walk it home.",
+      "You took a {piece} off the board. The material ledger tipped hard your way, and the other side knows it. Desperate operators are the most dangerous kind, kid. They've got nothing to lose and a whole night to lose it in.",
+      "An entire {piece}, seized. The case is yours to close now — which is exactly when this city tests a man. Front-runners stop checking corners. Don't stop checking corners.",
+      "A {piece} in the bag, clean collar, no complications. The job now is boring: trade pieces, keep pawns, escort the advantage past every alley. Boring closed more cases than brilliant ever did."
+    ],
+    "material_lost_piece": [
+      "They took a {piece}. A real hit — the kind that puts lesser positions in the ground. But I read the file twice: there's resistance left here, if you've got the stomach for it. Make them work for every square. Conversions die of impatience in this town all the time.",
+      "A {piece} is gone, and gone hard. The official odds turned ugly. Here's what the odds don't price in: the other side has to land the plane, in the dark, with you on the runway. Be the weather, kid.",
+      "Your {piece} took the long swim. Bad night. The play now is the oldest defensive racket on the books — problems, problems, problems, until the man with the winnings starts checking his watch and missing his exits.",
+      "Down a whole {piece}. The case is uphill in the rain. But I've watched cornered players turn winning technique into a hostage negotiation. Stubbornness is a skill. File everything. Concede nothing."
+    ],
+    "sacrifice": [
+      "Material went into the river — on purpose. A sacrifice. The boldest play in the book and the most honest, because there's no taking it back. The position fronted you time and threats, kid. That loan has a collector. Stay ahead of him.",
+      "A sacrifice hit the board. You traded hardware for tempo, the old high-stakes swap. From this move on, every quiet beat refunds the goods at full interest. Speed is the whole alibi now.",
+      "You gave up material with your eyes open. I respect that — the city respects that. It also keeps score. Initiative spoils faster than evidence in summer. Spend it tonight.",
+      "The sacrifice went down clean — material out, attack in. It's the move that separates the players from the spectators, provided the follow-through shows up. Make sure the follow-through shows up. The river's full of provideds."
+    ],
+    "check": [
+      "Check. The king got pulled in for questioning, and his lawyer's stuck in traffic. Keep the questions coming while the answers are bad.",
+      "Check on the board. A forcing move — the only kind of conversation this game can't walk out of. Make sure you've read the next line before they say it.",
+      "Check. The king's evening just got complicated. Block, capture, or run — three doors, all of them yours to watch.",
+      "Another check, another knock on the king's door at midnight. Tempo's the rarest currency on this street. You're holding it. Don't spend it on noise.",
+      "Check. The crown felt a draft and reached for its coat. Pressure is honest work, kid — as long as every check buys something. The free ones cost the most."
+    ],
+    "checkmate": [
+      "Checkmate. The king ran out of doors, then out of windows, then out of city. Case closed — stamped, filed, final. Take one long look at the mating net before the board resets. That's what a finished story looks like. They're rarer than you'd think.",
+      "Mate on the board. The last piece of evidence slid into place and the whole structure held. Nobody appeals a checkmate — it's the one verdict in this town money can't touch. Study the final frame. Every attacker had a job. That's the lesson, and it's free.",
+      "Checkmate. It ended the way the good cases end: suddenly, after a long time coming. Trace the king's last week backwards and you'll find the move where escape was still on the menu. It's earlier than anyone thinks. It always is.",
+      "The king went down with the rain still falling. Checkmate. Win or lose, the case file is complete now — and complete files are worth more than happy endings in this office. Read it while the ink's wet."
+    ],
+    "stalemate": [
+      "Stalemate. The suspect was cornered, cuffed, dead to rights — and the paperwork came back invalid. No legal moves, no check, no conviction. Half a point walks out the front door, smiling at the desk sergeant. The law's the law, kid. Count their moves next time. Count them twice.",
+      "A stalemate. The cruelest clause in the city charter: trap a man completely and the judge calls it even. The winning side will be sick about it for a week. Good. Sick remembers. When the opponent's down to nothing, nothing is exactly what you have to count.",
+      "Stalemate, and the room went quiet enough to hear the rain. The great escape — no moves, no check, no justice. It's been on the books for centuries and it'll be there tomorrow. The defense pulled the oldest trick in the file, or the offense fell for it. Either way: half each.",
+      "The case ended in stalemate. All that winning, and the last door closed on its own spring. I've seen it break harder men than the loss column ever did. One second of counting was the whole premium. The city always collects on skipped premiums."
+    ],
+    "castle_short": [
+      "The king castled short — checked into a safe house with three pawns on the door and a rook running the front desk. Smart. The clients who survive in this town are the ones who stop sleeping at their own address.",
+      "Short castle. King tucked behind the wall, rook on the payroll, all in one move. Two errands, one cab fare. The city rarely offers that deal twice.",
+      "You castled kingside. The crown went underground before the trouble started — which is the only time going underground works. Now mind those three pawns. Every one that steps forward is a brick out of the wall.",
+      "The king slid into the corner office and locked it. Castled, short side. Standard protection, honestly bought. The middlegame can knock all it wants now."
+    ],
+    "castle_long": [
+      "Castled long — the king took the late train to the far side of town. Bolder address, thinner walls. If the boards point opposite ways, this turns into a race, and races out here are won by pawns that don't stop for lights.",
+      "The long castle. The crown moved into the queenside, where the rent's cheap and the drafts are real. The rook hit the center file the same night, which is the part the brochures undersell. Ambitious play, kid. Insure it.",
+      "Queenside castle. A statement, in this office's experience — it says pawn storms are coming and someone's mailbox is about to take them personally. Attack with the pawns, guard with the pieces, and don't blink first.",
+      "You castled long. The king's new neighborhood has more alleys than the old one. Post a watch, count the tempi, and remember: in opposite-side castling, the polite player finishes second."
+    ],
+    "promotion": [
+      "Promotion. The little guy walked eight blocks through the worst part of town, in the rain, past every piece that wanted him gone — and came out the other side wearing a crown. Nobody mourns the pawns, kid. Then one of them buys the building.",
+      "A new queen, born on the last rank. The pawn that nobody photographed, the one the case file barely mentioned, finished the longest walk in chess. Underestimating the little guys: still the most expensive habit in the city.",
+      "The pawn promoted. From errand runner to running the errands — one square at a time, no shortcuts available, none requested. That's the only honest success story this town prints, and it prints it rarely.",
+      "Promotion went through at the eighth rank. The smallest name on the payroll became the biggest gun in the room. Somewhere, every other pawn on the board straightened its collar. Hope's contagious. So is the lesson."
+    ],
+    "en_passant": [
+      "En passant. The pawn tried the two-square sprint past the checkpoint and got collared mid-stride — a rule older than every building on this street, written for exactly that dash. The bystanders never believe it. The rulebook never cared.",
+      "An en passant capture, executed by the book — the fine-print clause from the fifteenth century, still on active duty. Half the room called it impossible. The other half had read the statute. Always be the half that read the statute.",
+      "En passant. The little guy thought the express lane had no cameras. It has one camera, kid, and it's been running for five hundred years. Capture in passing, clean and legal. The desk sergeant tipped his hat."
+    ],
+    "leaving_theory": [
+      "The book ran out — last streetlight on the block, and the file went quiet behind us. Everything from here is original work: no scripts, no priors, no friendly archive downtown. Just two minds and the rain. This is the part of the job I never quit for.",
+      "We left theory at the corner. Both players walked on with nothing but their own preparation, which had also just expired. The next move is the first one that belongs entirely to you. Spend real time on it. First impressions run the rest of the case.",
+      "Out of book. The memorized moves are spent, the borrowed wisdom's gone home for the night. What's left is what you actually know — and tonight we find out the size of it. No pressure, kid. The truth was always going to come out.",
+      "Theory ended without a sign, the way it always does — one move it's there, the next you're alone on a wet street with your principles. Good news: so is the other guy. The better thinker owns every block from here."
+    ],
+    "enter_middlegame": [
+      "The middlegame rolled in like a night shift. Development's done; the pieces are on their corners with their collars up, waiting for orders. The game wants a plan now — one plan, spoken plainly. The drifters get drafted into other people's plans. That's the whole sociology of it.",
+      "We hit the middlegame. The introductions are over and everybody knows everybody's name. From here, the pawn structure is the city map — it says which streets are yours and which ones eat patrol cars. Read the map before you drive.",
+      "Middlegame. Complexity moved in and took the big office. Every piece has a job or it's loitering, and the board fines loitering heavily out here. Find your worst-placed piece a position. Then the next one.",
+      "The middlegame opened for business. The question on every desk changed from 'where do the pieces go' to 'what do we want.' Most operators never file an answer. The ones who do, run this town."
+    ],
+    "enter_endgame": [
+      "The endgame arrived — the part of the night when the crowds go home and what's left on the street is exactly what's real. The king takes off his coat and works now. March him to the middle, kid. The bodyguard job ended two trades ago.",
+      "Endgame. The board emptied out and the margins got thin as the walls in my office. Pawns are futures now, tempi are rent money, and 'close enough' starts losing half points. Precision isn't a virtue down here. It's the cover charge.",
+      "We crossed into the endgame. Small board, long shadows. Every little guy left standing has a destiny and a counting error attached. Count everything twice — the pawns, the tempi, the squares. The arithmetic runs this precinct.",
+      "The endgame, at last. The phase the impatient skip and the professionals retire on. The king walks point, the pawns carry the case, and the truth — finally — has nowhere left to hide."
+    ],
+    "queens_off": [
+      "The queens left the board together — two dames in red, out the same door, neither looking back. The room got quieter and a lot more honest. Mating attacks went home for the night. What's left is structure, technique, and whoever's king learns to work for a living first.",
+      "Queens traded. The loudest pieces in the building cancelled each other out, the way headliners sometimes do. Don't read 'calm' as 'safe', kid. The quiet jobs hide the deepest holes — they just dig politely.",
+      "Both queens, gone in one transaction. The game dropped an octave. The crown can come off the shelf now: with her royal nemesis out of town, the king is a working piece, and the players who notice that first collect the small change that decides these nights.",
+      "The queens are off. The drama left with them, and the bookkeeping stayed. I've always trusted the bookkeeping more. Structures, files, king activity — the unglamorous evidence. That's what convictions are made of down here."
+    ],
+    "turning_point": [
+      "That was the moment — the whole case swung on that move. I've read enough files to know the look: one decision, and every page after it belongs to a different story. Mark the timestamp. When you reread this game, and you will, start the night there.",
+      "The game turned. Quietly, the way the big things always turn in this town — no sirens, just a before and an after, and a draft from a door nobody saw open. The side that notices these moments in real time writes the endings. Notice it. You're in it.",
+      "A turning point hit the board. The old position packed its bags and the new one moved in with different furniture, different threats, different rules of engagement. Whoever's still living in the old apartment is about to get a hard lesson in forwarding addresses.",
+      "Everything pivoted on that move. The case I'd been narrating all night just became a different case mid-sentence. It happens once, maybe twice a game — and the file says the player who adapts first wins the paragraph, the page, and usually the book."
+    ],
+    "streak_good": [
+      "{n} clean moves in a row. The case file's reading like good prose — no smudges, no crossed-out lines, no 3 a.m. apologies. Whatever routine's producing this, kid, lock it in a drawer and guard the drawer.",
+      "That's {n} straight without a stumble. In this business, consistency is the rarest thing on the street — flashier than it looks and harder than it sounds. The city's noticed. The city always notices. Keep your pace and your collar up.",
+      "{n} accurate moves, back to back. The night shift's running smooth: threats checked, doors locked, coffee holding. Streaks die the move after someone admires them. Consider that the only warning the file requires.",
+      "A run of {n} good moves. The position's been interrogated properly every single turn, and it shows — the eval hasn't had a reason to flinch in blocks. This is what the job looks like done right: boring from the outside, airtight from the inside.",
+      "{n} in a row, all clean. Somewhere the opposition is paging through its notes wondering when you turned professional. Don't tell them. Mystique is free and it's worth a pawn a game."
+    ],
+    "streak_bad": [
+      "{n} bad moves in a row. The wheels came off somewhere back on the boulevard and the car's still rolling. Pull over, kid. Full stop. Breathe, re-read the board like a fresh case file, and make one boring, sober move. The skid ends when you stop steering with your teeth.",
+      "That's {n} stumbles running. I know the pattern — it's not blindness, it's heat. The last mistake keeps driving the next one, like a witness who can't stop talking. The old remedy still works: slow down, count material from zero, play the safest honest move on the board.",
+      "{n} slips, consecutive. The position you're playing in your head got condemned {n} moves ago — the one on the board is the only address that matters now. Move back in. Then lock every door you find.",
+      "{n} errors straight, and the rain's getting in. Listen: every operator in this town has run a stretch like this. The ones who survived it did three things — sat up, slowed down, simplified. The ones who didn't are anecdotes. Be the first kind.",
+      "A bad run, {n} long. Tilt's an old con, kid: it convinces you speed will fix what speed broke. Don't buy it tonight. One quiet move. Then another. The case stabilizes the moment you do."
+    ],
+    "hanging_piece": [
+      "Your {piece} was standing under a streetlight with no backup and its name in someone else's notebook. Unguarded. In this city, loose pieces don't get lost — they get taken. Move it or guard it before the notebook closes.",
+      "There's a {piece} on your payroll with no protection and a fixed address. The opposition's casing it right now — that's not paranoia, that's procedure. Every heist in the file starts with an asset nobody was watching. Watch it.",
+      "The {piece} is hanging — out in the open, no defenders, raincoat unbuttoned. Maybe nothing takes it this move. But the city keeps lists of things nobody's guarding, kid, and the lists always get read eventually.",
+      "An undefended {piece}, in plain view of the whole street. The oldest law on the books is still in force: loose pieces drop off. No appeals, no exceptions, no sympathy from the desk sergeant. Button it up.",
+      "Your {piece} is alone out there. Every combination ever filed in this office opened the same way — one unguarded piece, one stretch of geometry, one player who looked away. Close the case before it opens."
+    ],
+    "comeback": [
+      "The comeback went through. They'd written the obituary, set the type, sold the ad space — and the deceased walked into the newsroom asking for a correction. You kept setting problems while the other side counted winnings. That's not luck, kid. That's the survivor's handbook, run perfectly.",
+      "Back from the dead. The eval had you in the river and the river gave you back. I've seen maybe a dozen of these in all my years on the beat, and they all had the same fingerprints: stubbornness, problems on every move, and an opponent who started spending the reward money early.",
+      "The case came all the way back. Lost position, hostile numbers, no friends downtown — and you played on like someone who hadn't read the coroner's report. Turns out the report was a draft. They usually are, if the defense refuses to sign.",
+      "A full resurrection, notarized by the eval bar. The other side had the win and got comfortable, and comfortable is the most dangerous neighborhood in this city. You were waiting there the whole time. Remember how this felt from both sides, kid. It's the whole curriculum in one night."
+    ],
+    "endgame_opposite_bishops": [
+      "Opposite-colored bishops — two operatives working the same city on different frequencies, doomed never to meet. Bare boards, it's a handshake and a draw; with heavy pieces on, the attacker's bishop fights a man who can't fight back. Find out which night this is before you pick a strategy.",
+      "The bishops landed on opposite colors. Each one owns half the map and can't read the other half — fortress weather for the defender, ambush weather for whoever still has the initiative. Extra pawns get devalued out here. Squares are the only currency that spends.",
+      "An opposite-bishop ending. The defender's play is old and good: build the blockade on the safe color, lock the doors, outlast the rain. If you need the full point, the file says one thing works — a second front. One target is a fortress. Two is a stretched alibi."
+    ],
+    "endgame_rook": [
+      "A rook endgame. The longest beat in the city and the most documented — Lucena, Philidor, names that stopped being people and became addresses. One law towers over the rest out here: rooks behind passed pawns. Yours, theirs, always. The rest is footwork and nerve.",
+      "Rook ending. The old-timers say they're all draws, usually while losing one. The truth's in the file: activity decides these. The active rook collects half points it has no right to; the passive one bleeds them out in alleys. Keep yours moving, kid.",
+      "Down to rooks and pawns — the city stripped to its girders. King activity first, rook activity second, material a distant third. Most players read that list backwards, which is why most rook endings end in the wrong column.",
+      "A rook endgame in the rain. Margins thin as a tip in this place. The blueprint's a century old and still current: active rook, marching king, and a pawn the other side has to watch every move of its life. Build it and bill them."
+    ]
+  },
+  "summary": {
+    "clean_win": [
+      "Case closed — a clean win, wire to wire. No breaches, no gifts, no second-act collapse. The kind of file you hand the captain without a cover memo, because the pages speak for themselves. Read it once more anyway. Even the clean ones hide a lucky paragraph.",
+      "You won it start to finish, and the other side never got a key to any door in the building. I've filed a lot of victories over the years; the quiet, airtight ones like this are the rarest and the cheapest to keep. Frame the scoresheet. Hydrate. Take the night off.",
+      "A wire-to-wire win — controlled, professional, no fingerprints left anywhere. The opposition spent the whole night looking for an opening that never existed. That's not luck, kid. That's a position run by someone who locked every window personally.",
+      "The verdict came in clean: a win without a wobble. No drama for the cheap seats, no heart attacks for the coach. In this office we call that mastery, and we say it quietly, into the coffee, so it doesn't get ideas."
+    ],
+    "slipped_win": [
+      "You had the case won — the evidence stacked, the confession signed — and it walked. Somewhere in the conversion you stopped asking what the other side wanted, and they wanted everything. Tonight, find the move where you got comfortable. That move is the tuition bill, already paid. Collect.",
+      "A win, slipped through wet fingers. The oldest heartbreak on this beat, and the autopsy's always the same: the lead relaxed before the suspect was cuffed. Hear me, kid — the skills that built that position are real. The closing protocol is one drill away. Run the drill.",
+      "The point was in your pocket and the pocket had a hole. I won't dress it up; this office doesn't sell comfort. It sells case work: find the move where the checking stopped, name the habit, and the hole gets sewn for life. Most players never do the sewing. That's the entire difference.",
+      "From winning to the loss column in a handful of moves. The city's cruelest genre, and tonight it had your name in it. One consolation, and it's real: players who get burned closing learn closing — the ones who never led learn nothing. You led all night. Now learn the last hour."
+    ],
+    "hard_fought_draw": [
+      "A draw, fought down to the last wet block. Half a point each and nobody owed anybody an apology — both sides got interrogated and both sides held up. The rematch is already pacing in the hallway. In this office, an honest split decision outranks a gift win every night of the week.",
+      "All square at the final whistle. The case had everything — pressure, defense, two or three moments where it could've tipped either way and didn't. Study those moments, kid. Fighting draws are the densest evidence this game produces, and most players leave them unread on the desk.",
+      "Half a point apiece, earned in full. Nobody cracked, nobody coasted, and the scoresheet closed without a confession from either side. Some nights the truth is a tie. The file respects it. So do I.",
+      "A draw with knuckle marks on it. You defended when the night demanded it and pushed when the door cracked open. The result column will forget this game by Thursday. Your defensive technique shouldn't — it earned its keep tonight, and that skill pays rent for years."
+    ],
+    "loss": [
+      "A loss. The file closes on the wrong column tonight, and there's no rewriting the stamp. But every loss gets the same treatment here, the only one that works: find the first real mistake — not the loud one at the end, the quiet one that hired all the others. It's always earlier than you think.",
+      "You lost this one. The city does that — takes a night's work and files it under somebody else's name. Here's what they don't get to keep: the lessons. Those stay in this office, every one, if you do the reading while the trail's warm. Most don't. Be the exception. It pays better.",
+      "The case went against you. No appeal, no spin — the board's the one judge in town that's never been bought. But I've worked this beat long enough to know what losses are: surveillance photos of your own weaknesses, developed free. Study them, kid. The next opponent already has copies.",
+      "A loss, and the rain kept typing like nothing happened. Sit with it for one coffee — that's the allotment. Then work the file like it's someone else's game: where the eval turned, what the thinking was, what procedure prevents it. That's how operators get rebuilt. One honest autopsy at a time."
+    ]
+  },
+  "practice": {
+    "loading_first": [
+      "We're reopening the case. The first mistake's coming up from the archive now — every operator's got a drawer of these, but only the serious ones ever turn the key. You just turned it. The lamp's on, the coffee's bad, the work is real.",
+      "Pulling the first file. Going back to the scene of your own errors, voluntarily, in the rain — that's not a hobby, kid, that's the profession. Most players drive past the old addresses with the windows up. You parked. Good.",
+      "The review session opens tonight. First position's being walked up from evidence. Treat every mistake in this stack like a cold case: no shame, no excuses, just the question of what really happened and how it never happens again.",
+      "Loading your first error. In this office we have a saying: the game already charged you for these lessons — leaving them unstudied is paying for dinner and walking out hungry. Sit down. Eat."
+    ],
+    "prompt_find_better": [
+      "Here's the scene as it happened: you played {move}, and the lab stamped it {label}. The right move was at the scene the whole time — unphotographed, unquestioned, waiting. You've got unlimited time and a dry room. Find the witness everyone walked past.",
+      "The file says {move}, graded {label}. Tonight the case gets re-tried with better lighting. Same position, same evidence, new detective — the one who's already seen how the wrong answer ends. Work the forcing moves first. They always know something.",
+      "This is where {move} went down ({label} on the report). The position will repeat its statement as many times as you need, which is more patience than any witness I ever worked with. Listen closer this time. The truth's in there, and it's not even hiding well.",
+      "Exhibit A: the {move} decision, filed as {label}. Standard procedure applies — checks, captures, threats, in that order, like reading a suspect his rights. The better move confesses to whoever runs the procedure all the way through.",
+      "You played {move} here, and the assessment was {label}. The do-over is the only mercy this game extends, kid, and it never extends it during the game. Take the full statement this time. The position knows who did it."
+    ],
+    "correct_continue": [
+      "That's the move — confirmed against the lab's findings, no discrepancies. See how it surrendered once you actually questioned the position? They always talk under a patient interrogation. Next file.",
+      "Correct. The same eyes that missed it at game speed found it at case-work speed — which means the eyes were never the problem. The pace was. Adjust the pace, keep the eyes. Next scene.",
+      "Solved, clean. The pattern's in your files now, fingerprinted and cross-referenced — it can't operate in your games anymore without being recognized at the door. On to the next one.",
+      "That's it. The answer was sitting at the scene the whole time, the way they always are. One more cold case closed. The drawer's getting lighter, kid. Keep going."
+    ],
+    "correct_final": [
+      "Correct — and that closes the last file in the drawer. Every mistake from that game: reopened, worked, solved, archived. I've run this office a long time, and the operators who do the full sweep are rare enough that I remember their names. I'll remember yours. Same time after the next game.",
+      "The final case, closed. The whole night's errors have been interrogated and flipped — they work for you now, every one. That's the quiet secret of this racket, kid: the file you study stops being a liability and starts being staff. Session's over. The rain can have the rest of the night.",
+      "Last position, solved. The docket's empty, the lamp's off, the coffee's finished — cold, but finished, like the best confessions. You turned a rough game into a clean curriculum in one sitting. Tomorrow's opponent walks into a different building than tonight's did.",
+      "That's the set — every error faced under the lamp, every correction found by hand. Most players bury their bad games at sea, kid. You performed the full autopsy and signed it. In this office, that's the highest paperwork there is."
+    ],
+    "close_try_again": [
+      "Close. You've got the right suspect and the wrong timeline — in this business, the order of events is the case. Re-sequence it and bring it back to the desk.",
+      "Near miss. The idea holds; the execution's leaking from one small hole, and the hole is almost always an uncounted defender. Run the lineup again. Count everyone. Even the quiet ones. Especially the quiet ones.",
+      "Almost. Your instinct walked the right street and knocked one door early. Don't start the investigation over — you're a house away. Check the porch lights.",
+      "Not quite, but the file's warming up. Whatever you do, don't scrap the lead — refine it. Detectives who toss good hunches over one bad knock end up directing traffic. One more pass.",
+      "Attempt {attempts}, and each one's landed closer than the last. That's not failure, kid — that's a search pattern converging. The answer's running out of places to rent. Knock again."
+    ],
+    "after_hint": [
+      "The tip came in — anonymous, reliable, the kind I'd act on myself. No shame in working with informants; every closed case in this office had one somewhere. But the arrest is yours to make. Finish it.",
+      "Hint's on the desk. Even the legends phoned the lab when the trail went cold — the ones who didn't are still out there, proudly lost. Take the bearing, walk the last block alone. That block is where the learning lives.",
+      "There's your lead. Notice what it pointed at, kid — that category of evidence was sitting in plain view the whole time, and plain view is where this game hides everything it loves. Recalibrate the eyes. Then close it out.",
+      "Assistance rendered, no charge, no judgment. The file shows hint-assisted cases stick almost as well as solo ones — provided the final step is yours. The final step is yours. Take it."
+    ],
+    "streak_praise": [
+      "Look at this run — case after case, closed on sight. The patterns that used to operate freely in your games are getting recognized at the door now, every one of them. This is what it looks like when the night shift starts winning, kid.",
+      "Another one, solved before the coffee cooled. The recognition's running ahead of the calculation now — that's the transfer every hour under this lamp was buying. The city gets a little smaller for your opponents every rep.",
+      "The streak holds. You're reading scenes now instead of searching them — the difference between a beat cop and a detective, and it happened sometime in the last few files while nobody was watching. I was watching. It's in the report.",
+      "Solved again, instantly. At this pace the archive's going to run out of cold cases before you run out of lamp oil. That's the best problem this office has ever had. Keep going — the next game's opposition is getting poorer by the minute."
+    ]
+  }
+}

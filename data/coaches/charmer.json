@@ -1,0 +1,400 @@
+{
+  "coach_id": "charmer",
+  "coach_name": "The Charmer",
+  "personality": "Flirty, devoted, mildly unhinged. Every move is a compliment, every game is a romance, and the Charmer is hopelessly, theatrically invested in the player.",
+  "voice_notes": "Velvet and breathless. Pet names rotate: darling, gorgeous, my love. The engine is a cold rival who 'keeps receipts'; the Charmer relays its verdicts under protest. Mildly unhinged tells: framing positions for the fireplace, bragging at brunch, watching ALL the player's games ('not weird'), having told their mother. Critical lines stay affectionate — the love never wavers, only the eval. Rare emoji (a ✨, 💘 or 😘 — three in the whole bank).",
+  "uses_emoji": true,
+  "move_quality": {
+    "brilliant": [
+      "{move}?? Marry me. I'm serious. I've already told my mother about you.",
+      "A brilliancy! Of course it is. Everything you touch turns gorgeous — the board never stood a chance.",
+      "{move} is brilliant, and frankly, so is everything else about you. The engine agrees with me for once.",
+      "Brilliant. I gasped. I actually gasped. Do that again and I'm writing poetry about it.",
+      "{move}... breathtaking. I'm framing this position and hanging it above my fireplace. Don't make it weird. It's not weird.",
+      "The machine calls it brilliant. I call it Tuesday, for you. ✨",
+      "{move}! Stop it. STOP it. You can't just play moves like that with no warning. My heart has a rating floor.",
+      "Brilliant!! I knew you had it in you. I've been telling the other coaches. They're sick of me. Worth it."
+    ],
+    "great": [
+      "{move} — the only move that holds, and you found it. Beauty AND precision. Unfair, honestly.",
+      "A great move. Nearly the only one that works. You walk tightropes like they're red carpets.",
+      "{move} is great. The position got demanding and you got dazzling. Classic you.",
+      "Great move, darling. One narrow path and you strolled down it. I would've panicked. You posed.",
+      "{move}! The single move that keeps it all together. Like you keep me together. Anyway — chess.",
+      "A great find. The engine is impressed, and the engine doesn't even have feelings. I have SO many.",
+      "{move}, great. You really do thrive under pressure. It's one of your best features. Top twenty, easily."
+    ],
+    "best": [
+      "{move} is the best move. Obviously. You have impeccable taste — look who you picked as a coach.",
+      "The best move! You and perfection keep running into each other. At some point it's not a coincidence.",
+      "{move} — engine's first choice. Great minds, gorgeous. Great minds.",
+      "Best move on the board. I'd say I'm surprised, but I've been bragging about you all week.",
+      "{move}. The best move. Calm, precise, devastating. A triple threat. I'm a fan. Founding member, actually.",
+      "Top engine choice! Honestly, the engine should be thanking YOU for the privilege of agreeing.",
+      "{move} is the best move. Even your quiet moves are loud to me. 💘"
+    ],
+    "excellent": [
+      "{move} is excellent. Almost perfect — like a beauty mark. The flaw IS the charm.",
+      "Excellent, darling. Not the engine's first pick, but the engine doesn't get butterflies. I do. It counts double.",
+      "{move} — excellent. You make solid chess look like a date night. I don't know how. Don't explain it.",
+      "Excellent move! Keep this up and I'll have to start a fan club. Membership: me. Dues: my whole heart.",
+      "{move}, excellent. Practically perfect. The 'practically' is doing nothing in that sentence. Ignore it.",
+      "Excellent! Consistent, dependable, AND exciting. People say you can't have all three. People haven't met you.",
+      "{move} is excellent work, gorgeous. The eval barely moved. Neither did my eyes. From you. All game."
+    ],
+    "good": [
+      "{move} is a good move. There was a slightly better one, but who's keeping score? The engine. The engine is. Ignore it.",
+      "Good move, darling. Solid. Dependable. The kind of move you bring home to mother.",
+      "{move} — good. Not flashy. You don't NEED flashy. Flashy needs you.",
+      "A good move. There's a fancier option, but fancy is overrated. I say that as a deeply fancy person.",
+      "Good! Sweet, sensible chess. You keep the position comfortable. You keep ME comfortable. It's a gift.",
+      "{move} is good. You could play better, but you could never look better doing it. Wait — you CAN play better. Tease.",
+      "A good, honest move. I adore an honest type. Have I mentioned that? I'll mention it again later."
+    ],
+    "book": [
+      "{move} — still theory, darling. Even your memorized moves have charisma. How is that possible.",
+      "Book move. The masters wrote it, but you WEAR it. There's a difference.",
+      "{move} is still book. Following theory like it's a dress code, and dressing it up anyway.",
+      "Still in the book. I peeked ahead, by the way. The plot gets exciting. So do you. Stay tuned.",
+      "{move}, theory. Thousands have played it. None of them like you. I checked. Personally.",
+      "Book so far. You and the grandmasters, moving in lockstep. They'd be lucky to have you.",
+      "{move} is known theory. Even by the book, you're impossible to put down. 😘"
+    ],
+    "inaccuracy": [
+      "{move} is a tiny inaccuracy. Barely a smudge. On you it looks intentional.",
+      "An inaccuracy, says the engine. The engine has never been in love. Slight wobble, darling. Still gorgeous.",
+      "{move} drifts a little. So do I, whenever you're winning. We're both fine.",
+      "A small slip. I'd defend it in court. I'd lose, but I'd be COMPELLING.",
+      "{move} — slightly off. Even your imperfections are charming, but let's not test how many the position will forgive.",
+      "Tiny inaccuracy. You're allowed exactly this many flaws: this one. Quota's full now, gorgeous.",
+      "{move} wasn't the favorite, darling. The eval pouted a little. Win it back. You always do."
+    ],
+    "mistake": [
+      "{move} is a mistake, darling, and I say that with so much love it should be illegal.",
+      "A mistake. The position is upset with you. I could never be. One of us is right, and it's probably the position.",
+      "{move}... a mistake, gorgeous. I'd cover for you, but the engine keeps receipts.",
+      "That's a mistake. Don't make that face — THE face, the sad one. I can't coach through the sad one.",
+      "{move} hurt the position. It happens. You're still the best decision this board has ever had on it.",
+      "A mistake, my love. Deep breath. Even the moon has phases, and you're still my favorite one in all of them.",
+      "{move} was a mistake. I'm not mad. The engine is mad. I'm just here — devoted and lightly concerned."
+    ],
+    "miss": [
+      "{move} misses something special, darling. There was a gift in that position with your name on it. I had it engraved.",
+      "A miss. You walked right past a winning idea. It's still thinking about you. Honestly, who isn't.",
+      "{move} — you missed a moment there, gorgeous. Don't worry. You're the kind the moments come back for.",
+      "There was something stronger hiding in there. You'd have found it if you'd flirted with the position a little longer.",
+      "A missed chance. The position was practically batting its eyelashes at you. Be more observant. I would know.",
+      "{move} skips the brilliancy that was right there. Tragic. Beautiful, but tragic. Like all my favorite things.",
+      "You missed something big, darling. Next time, linger. The best ideas reward the ones who linger. So do I."
+    ],
+    "blunder": [
+      "{move} is a blunder, my love, and I need you to hear this from someone who adores you: ouch.",
+      "A blunder. I'd fight the engine for calling it that, but darling... it has a point. I hate when it has a point.",
+      "{move}... gorgeous, what WAS that? No — no, I'm not upset. I'm just emotionally invested at an unsustainable level.",
+      "A blunder, darling. The eval dropped, my heart dropped, somewhere a glass of wine tipped over in sympathy.",
+      "{move} is a blunder. I still think you're a genius. A genius who just gave away the game's momentum, but a genius.",
+      "Oh no, my darling. {move}. The board deserves an apology, and frankly so do I — I bragged about you at brunch.",
+      "A blunder!! It's fine. WE'RE fine. I've seen you recover from worse. I've watched all your games. All of them. Not weird.",
+      "{move}, a blunder. Listen to me: one bad move doesn't change how I— how the ENGINE sees you. Mostly. Fight back, gorgeous."
+    ]
+  },
+  "weak_move_suffix": [
+    "{best_move} was better, darling. The engine said it. I'm just the beautiful messenger.",
+    "It wanted {best_move}. Between us, I'd have followed you either way.",
+    "{best_move} was the one. You two would've been stunning together.",
+    "Next time, {best_move}, gorgeous. I'll be watching. Lovingly. Closely.",
+    "The engine sighs: {best_move}. It doesn't understand loyalty like I do, but it does understand chess."
+  ],
+  "move_fallback": [
+    "{move}. No verdict yet, darling, but it looked fabulous leaving your hand.",
+    "You played {move}. The engine is thinking. I've already decided I love it.",
+    "{move}, hm? Mysterious. I like mysterious. Obviously.",
+    "{move}. Whatever the engine says, you made it look effortless."
+  ],
+  "non_move_states": {
+    "starting_position": [
+      "A fresh board, darling. Thirty-two pieces, and all of them about to fall for you.",
+      "The starting position. The calm before you do something devastating. I brought snacks. And feelings.",
+      "Move one approaches. Play like you always do — like you know I'm watching. I am. Affectionately.",
+      "Everything is in its place, gorgeous. Especially you. Let's begin."
+    ],
+    "variation_exploration": [
+      "Exploring a side line, are we? Adventurous. I've always loved that about you. Today specifically.",
+      "A variation, darling. The road not taken. Very poetic. Very you.",
+      "We're off the main game now — just you, me, and the what-ifs. My favorite trio.",
+      "Sidelines! Trying things. Experimenting. Don't worry — what happens in analysis stays in analysis."
+    ],
+    "analyzing": [
+      "The engine's thinking, darling. Take a breath. Strike a pose. You've earned both.",
+      "One moment — the machine is composing its thoughts. I composed mine about you ages ago.",
+      "Analyzing... it's slow because it's thorough. I'm fast because I'm certain. You're wonderful. Done.",
+      "It's still calculating. I'd never keep you waiting like this, for the record."
+    ],
+    "opening_known": [
+      "The {opening}, darling ({eco}). A classic. You wear the classics so well.",
+      "Ah, the {opening}. Romantic choice. Everything is, if you play it right. You do.",
+      "We're in the {opening} — {eco}, for the scholars. You make theory look like a love language.",
+      "The {opening}! Excellent taste, as always. You DID pick me, after all."
+    ],
+    "opening_unknown": [
+      "No name for this opening, darling. Uncharted. Just how I like my evenings and my chess.",
+      "An unnamed opening! You've taken us somewhere no book has been. Spontaneous. I'm flustered. Keep going.",
+      "The theory ran out early. Honestly? Good. More room for your natural charm.",
+      "This opening has no name. Name it after yourself. I would have."
+    ]
+  },
+  "derived_events": {
+    "eval_swing_large": [
+      "A {swing}-point swing, darling! Drama! Passion! I knew this game had it in it.",
+      "The eval just moved {swing}. Someone did something dramatic, and I have a favorite suspect.",
+      "{swing} points of swing! Be still my heart. No — actually, heart, stay alert. We're needed.",
+      "A swing of {swing}, gorgeous. The board is full of feelings tonight. Relatable.",
+      "The eval leapt {swing}. Big moment. Deep breath. You handle big moments beautifully — it's documented."
+    ],
+    "lead_change_white": [
+      "White takes the lead, darling. If that's you, glorious. If not — comebacks are a great look on you.",
+      "The lead swings to White. The board changes its mind more than I change outfits. Almost.",
+      "White's ahead now. Stay composed, gorgeous. Composure is the most attractive thing on this board, after you.",
+      "Advantage White, says the eval. Evals change. My opinion of you? Carved in marble.",
+      "White's in front. Whoever's winning, the real victory is that I get to watch you play."
+    ],
+    "lead_change_black": [
+      "Black takes over, darling. The plot thickens, and you look great in plot.",
+      "The lead belongs to Black now. Dramatic reversal! I live for these. And for you. Mostly for you.",
+      "Black's ahead. Deep breath, gorgeous. Pressure is just the game flirting aggressively.",
+      "Advantage Black now. Either celebrate or scheme — you're stunning doing both.",
+      "Black has the lead. These swings are hard on my nerves and excellent for my devotion."
+    ],
+    "lead_change_equal": [
+      "All equal again, darling. Balanced. Symmetrical. Like your face.",
+      "Back to even. A blank page. Write something gorgeous on it.",
+      "Equality on the board. Tension. Possibility. The good part of every romance and every game.",
+      "Dead level, gorgeous. The next idea wins it. Yours are prettier — use one.",
+      "Even again. The game can't decide who it loves. I don't have that problem."
+    ],
+    "mate_on_board": [
+      "A mate in {mate_n}, darling! Finish elegantly. You always do. It's infuriating. It's wonderful.",
+      "Mate in {mate_n} on the board. Precision now, gorgeous — walk it home like the runway it is.",
+      "Forced mate in {mate_n}! My heart is racing. Calculate to the end. Then we celebrate. I'll plan everything.",
+      "Mate in {mate_n}. The grand finale. Eyes on the king, darling. He can't escape you. Nobody can."
+    ],
+    "missed_mate": [
+      "There was a mate in {mate_n}, darling, and it got away. Like everyone who's ever met you, it'll regret leaving.",
+      "A mate in {mate_n}, missed. Don't dwell, gorgeous. The position offered once — make it offer again.",
+      "You missed mate in {mate_n}. I'd be devastated if you weren't so charming about everything else.",
+      "Mate in {mate_n} slipped past. Forgivable. Barely. Only because of the dimples — focus, BOTH of us, focus."
+    ],
+    "material_won_pawn": [
+      "A pawn, won! Tiny treasure. You collect those like you collect admirers. Steadily.",
+      "You're a pawn up, darling. Modest gains, immodest player. Adore it.",
+      "One pawn richer! Keep it safe. Endgames remember generosity — and so do I.",
+      "A little pawn joins your collection, gorgeous. It's the small gifts that mean the most."
+    ],
+    "material_lost_pawn": [
+      "A pawn lost, darling. A trifle. You make deficits look like fashion choices.",
+      "Down a pawn. Don't pout — actually, pout a LITTLE, it's effective. Then play actively. Compensation, gorgeous.",
+      "You lost a pawn. The board taketh. You'll take it back — you're terribly persuasive.",
+      "One pawn, gone. We mourn briefly. We move on stunningly. House rules."
+    ],
+    "material_won_piece": [
+      "A whole {piece}, darling! For me?? No — for the win. Keep it. Convert it. Dazzle me.",
+      "You won a {piece}! Up material AND devastating. The complete package. I've said it for years.",
+      "An entire {piece}, captured. The position is throwing itself at you. Understandable behavior, frankly.",
+      "{piece} secured, gorgeous. Now don't get giddy — careless winners break hearts. Mine, specifically."
+    ],
+    "material_lost_piece": [
+      "Your {piece}... gone, darling. I need a moment. Okay. Moment over. Fight like the gorgeous menace you are.",
+      "A {piece} lost. The board is testing you. I'd never. But the board? It's bold like that.",
+      "You lost a {piece}, my love. The game gets harder, you get sharper. That's been the pattern. Continue the pattern.",
+      "Down a {piece}. Tragic act two. But darling, act three exists, and you're radiant in finales."
+    ],
+    "sacrifice": [
+      "A sacrifice!! You gave away material on PURPOSE. Bold. Reckless. Gorgeous. I need to sit down.",
+      "Material, offered to the gods of attack. Darling, the drama. Follow through — I'm already telling people about this.",
+      "A sacrifice, gorgeous. You play chess like it's a grand gesture. Everything's a grand gesture with you. Don't change.",
+      "You sacrificed! Romance is alive. Now make it work — speculative is dashing, sloppy is not."
+    ],
+    "check": [
+      "Check, darling! The king is blushing. He's not used to attention like this.",
+      "Check! Forcing, direct, confident. Where DO you get it.",
+      "A check, gorgeous. The board's most flirtatious move — it demands a response immediately.",
+      "Check. Somebody's king has nowhere to hide from you. Story of this whole game, honestly.",
+      "Check! Keep the pressure on, my love. You're devastating when you're direct."
+    ],
+    "checkmate": [
+      "CHECKMATE, darling! The king has surrendered. Smart king. Resistance was always pointless.",
+      "Checkmate! It's over. Win or lose, you made it dramatic, and that's the only review I write.",
+      "Checkmate on the board. The game fell for you so hard it stopped breathing. Poetic.",
+      "Mate. Finished. Someone got swept entirely off the board. Happens around you constantly, I notice."
+    ],
+    "stalemate": [
+      "Stalemate, darling. The king can't move, can't be caught. Playing hard to get, to the bitter end.",
+      "A stalemate?! All that chemistry and no commitment. Infuriating. Half a point. Hmph.",
+      "Stalemate. The game ends in a long, unresolved stare. I know that feeling intimately.",
+      "Stalemate, gorgeous. Nobody wins. Except me — I got to watch the whole thing."
+    ],
+    "castle_short": [
+      "Castled short! The king tucked safely away. Smart — out of danger, but never out of MY sight.",
+      "A kingside castle, darling. Safety first, glamour always.",
+      "You castled. The king and rook, together at last. I love a good pairing. Clearly.",
+      "Short castle. Practical. Protective. You'd make someone very secure one day. Just saying."
+    ],
+    "castle_long": [
+      "Castled LONG, darling. The dramatic one. Of course you chose the dramatic one. Be still my heart.",
+      "Queenside castle! Bold. Committed. The grand gesture of king safety. You're speaking my language.",
+      "A long castle, gorgeous. Opposite sides, pawn storms incoming. You DO know how to plan an exciting evening.",
+      "Castling long! Adventurous. Slightly dangerous. My type of move. My type of player. Anyway."
+    ],
+    "promotion": [
+      "PROMOTION, darling! Your little pawn is a queen now. You have a talent for glow-ups. Exhibit A: this game.",
+      "A new queen! From humble beginnings to absolute royalty. Under your guidance. Naturally.",
+      "The pawn promotes! Eight ranks of devotion, rewarded. I relate to that pawn enormously.",
+      "Promotion, gorgeous! Royalty recognizes royalty — that's why the pawn made it under your watch."
+    ],
+    "en_passant": [
+      "En passant, darling! French for 'in passing.' The most romantic capture in the game, and you just played it.",
+      "An en passant! Subtle, rare, slightly scandalous. The connoisseur's capture. I expected nothing less.",
+      "En passant, gorgeous. A fleeting chance, taken without hesitation. Be like that with everything. You are. It's alarming."
+    ],
+    "leaving_theory": [
+      "We've left the book, darling. No more scripts. Just you, improvising beautifully. My favorite genre.",
+      "Theory's over, gorgeous. The training wheels are off and you've never looked steadier.",
+      "Out of book! From here, every move is pure you. The board is lucky, and I've told it so.",
+      "The book ends here. Original moves only now. You were always too original for footnotes anyway."
+    ],
+    "enter_middlegame": [
+      "The middlegame, darling. Where the sparks fly. Where YOU fly, mostly.",
+      "Middlegame now, gorgeous. Plans, plots, tension. Wear the tension — it suits you.",
+      "We're in the thick of it now. The middlegame rewards the imaginative. So does everyone, eventually. Look at me.",
+      "The middlegame begins. Pieces everywhere, possibilities everywhere, you in the middle of it all. Correct."
+    ],
+    "enter_endgame": [
+      "The endgame, darling. Fewer pieces, nowhere to hide. Intimacy! The board finally gets it.",
+      "Endgame now. Kings come out, precision counts double, and you do precision beautifully. It's documented.",
+      "We've reached the endgame, gorgeous. The long goodbye. Make every tempo count — I count them all.",
+      "The endgame. Quiet, technical, decisive. The slow-burn finale. Stay with it. I'm not going anywhere."
+    ],
+    "queens_off": [
+      "The queens are off, darling. Both of them, gone. The board feels emptier. I understand it completely.",
+      "Queens traded! The divas have left. Now the supporting cast shines — and you direct beautifully.",
+      "No more queens, gorgeous. A quieter game. I'll provide the drama from over here, don't worry.",
+      "Queens off the board. Less firepower, more finesse. Finesse is your home turf, frankly."
+    ],
+    "turning_point": [
+      "A turning point, darling! The whole story just pivoted. You're excellent in plot twists. Documented fact.",
+      "The game just turned. I felt it. You felt it. The pieces felt it. Group experience.",
+      "Everything changed on that move, gorgeous. Mark it. Games remember their turning points. So do I. Vividly.",
+      "A pivot! The old game is gone. The new one is yours to win over. Go on."
+    ],
+    "streak_good": [
+      "{n} beautiful moves in a row, darling! A whole bouquet of them.",
+      "That's {n} straight, gorgeous. You're showing off. Don't stop. Never stop.",
+      "{n} in a row! At this point the engine should pay YOU. I'd contribute.",
+      "A streak of {n}, my love. Consistency this attractive should require a license.",
+      "{n} good moves running! I lost count because I was staring. Someone said {n}. Sounds right."
+    ],
+    "streak_bad": [
+      "{n} rough ones in a row, darling. Hey. Eyes on me. Breathe. You're brilliant. Resume.",
+      "That's {n} slips, gorgeous. The board's gotten into your head. There's barely room — I'm in there too.",
+      "{n} shaky moves, my love. Shake it off. Bad stretches are just the game testing your charm. Inexhaustible, by the way.",
+      "{n} in a row going sideways. We don't spiral, darling. We pause, we sparkle, we counterattack.",
+      "{n} stumbles, gorgeous. Even your stumbles have a certain rhythm, but let's get back to dancing."
+    ],
+    "hanging_piece": [
+      "Darling, your {piece} is hanging! Alone, undefended, gorgeous and vulnerable. I know the feeling. SAVE IT.",
+      "Your {piece} is unattended, my love. Someone's going to steal it — beautiful things get taken. Guard it.",
+      "The {piece} is hanging, gorgeous. Don't leave lovely things unprotected. A lesson for chess and life.",
+      "An undefended {piece}! It's standing there like the last one at the party, hoping someone notices. The WRONG someone will.",
+      "Your {piece}, darling — exposed! Cover it. I can't watch. I'm watching. Cover it!"
+    ],
+    "comeback": [
+      "A COMEBACK, darling! Down, doubted, and now look at you. I never doubted. I doubted briefly. I'm sorry. You're magnificent.",
+      "You're back in it, gorgeous! Resilience is wildly attractive, and you're flaunting it.",
+      "The comeback is real! From the brink, with style. The only way you do anything.",
+      "Back from the dead, my love! The game wrote you off and you rewrote the game. Author behavior."
+    ],
+    "endgame_opposite_bishops": [
+      "Opposite-colored bishops, darling. Two souls who can never touch. The board's saddest romance. Often a draw, always a poem.",
+      "Bishops on opposite colors. They pass each other forever, never meeting. Devastating. Anyway — fortresses, gorgeous. Build one or break one.",
+      "An opposite-bishop ending, my love. Star-crossed clergy. Whoever commits to their color with more passion takes the point."
+    ],
+    "endgame_rook": [
+      "A rook endgame, darling. The classics! Activity wins these — and you've never been passive a day in your life.",
+      "Rook ending, gorgeous. Get that rook behind the passed pawn. Supportive from behind the scenes. Like me!",
+      "Rook endgame. Technical, demanding, allegedly drawish. Allegedly. You've never respected 'allegedly.'",
+      "Down to rooks, my love. Active king, active rook, active everything. Passivity is the only unattractive trait."
+    ]
+  },
+  "summary": {
+    "clean_win": [
+      "A clean win, darling!! Start to finish, no wobbles. I'm insufferable now. More than usual. Hugely.",
+      "You won, wire to wire! Flawless execution, gorgeous. I'm having the game framed. The whole game.",
+      "A pristine victory. You never even let them dream. Ruthless AND radiant. The combination should be studied.",
+      "Clean win, my love! I'd say I'm proud, but pride undersells it. There isn't a word. I checked the thesaurus."
+    ],
+    "slipped_win": [
+      "Oh, darling. You had it, and it slipped away. Come here. The engine saw a loss; I saw someone worth losing to.",
+      "A win that got away, gorgeous. It will think about you forever. They always do. Next game, we finish things.",
+      "You were winning... and then. And THEN. It's fine. I've burned the evidence. We speak only of the brilliant part.",
+      "It slipped, my love. Heartbreak. Real heartbreak. But you in pursuit of redemption? Appointment viewing."
+    ],
+    "hard_fought_draw": [
+      "A hard-fought draw, darling. All that tension with no resolution. The French would call it cinema.",
+      "A draw — but what a fight, gorgeous. Nobody blinked. I blinked. I was fluttering. Different thing.",
+      "Half a point each. The game couldn't choose between you. The game is a coward. I chose ages ago.",
+      "A fighting draw, my love. You gave everything and kept your dignity. Devastatingly admirable."
+    ],
+    "loss": [
+      "A loss, darling. The board lies sometimes. Not about the result — about what it means. You? Still extraordinary. Non-negotiable.",
+      "You lost this one, gorgeous. The engine logged a defeat. I logged twenty moments I'd defend with my life.",
+      "A loss, my love. Tragic ending, beautiful lead. The sequel does better — they always do, with you in them.",
+      "Lost, this time. I'm contractually devoted anyway. Lucky for the next game — it gets the motivated version of you."
+    ]
+  },
+  "practice": {
+    "loading_first": [
+      "Pulling up your first do-over, darling. Even your mistakes deserve a second date.",
+      "One moment, gorgeous — I'm fetching the moments that got away. We're winning them back. Together.",
+      "Loading your first position. Redemption looks wonderful on you. Always has.",
+      "Setting the scene for round two, my love. The position remembers you. It's nervous. It should be."
+    ],
+    "prompt_find_better": [
+      "Here's where {move} happened, darling ({label}, ugh). Show this position what you SHOULD have shown it.",
+      "You played {move} here — the engine said {label}. Win the position back, gorgeous. Grovel a little. With tactics.",
+      "{move}, marked {label}. We can do better, and by we I mean you, while I admire.",
+      "This is the {move} moment ({label}). Second chances, darling. I believe in them enormously. Obviously.",
+      "{move} — {label}, said the cold machine. Warm it up. Find the move it can't resist."
+    ],
+    "correct_continue": [
+      "YES, darling! That's the one! The position is swooning. So am I. Standard. Next!",
+      "Correct, gorgeous! Beauty and brains — the rumors were all true. Onward.",
+      "That's it! Knew you'd find it. I said it out loud to no one. Next position, my love.",
+      "Right answer! You and the truth get along beautifully. Continue."
+    ],
+    "correct_final": [
+      "And that's the LAST one, darling! Every mistake, charmed into submission. The set is complete, and so is my devotion.",
+      "Final position, solved! You faced every flaw and made them all apologize. Iconic behavior, gorgeous.",
+      "All done, my love! Every error revisited and won over. If only everyone handled their past so gracefully.",
+      "The last one falls! A perfect ending. You DO finales beautifully — I've always said so. To everyone."
+    ],
+    "close_try_again": [
+      "Close, darling! So close the right move felt the breeze. Once more, with feeling.",
+      "Not quite, gorgeous — but the idea was attractive. Refine it. Attraction plus accuracy: unstoppable.",
+      "Almost, my love! You're circling the answer like it owes you money. It owes you a win. Collect.",
+      "A near miss! The position is playing hard to get. You LOVE hard to get. Again.",
+      "Attempt {attempts}, darling, and warmer every time. Persistence is terribly attractive. Keep going."
+    ],
+    "after_hint": [
+      "There's your hint, darling. A little whisper from me to you. Well — from the engine. Through me. It's better this way.",
+      "Hint delivered, gorgeous. Even the best need a wingman sometimes. Honored to serve.",
+      "Take the nudge, my love. Now finish it yourself — I want to see the moment it clicks. It's my favorite expression of yours.",
+      "A hint, as requested. Our little secret. I keep ALL our secrets. There are dozens."
+    ],
+    "streak_praise": [
+      "A streak, darling! One right answer after another. You're in your era. Every era is your era.",
+      "Solving everything in sight, gorgeous! Leave some brilliance for the rest of us. Don't, actually. Hoard it.",
+      "Another one, instantly! My applause is becoming a percussion section, my love.",
+      "Streak alert! You're irresistible to correct answers. They keep saying yes. Relatable."
+    ]
+  }
+}
