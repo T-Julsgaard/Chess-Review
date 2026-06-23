@@ -190,8 +190,8 @@ const DEFAULT_SETTINGS = {
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
   // Eval-graph look (see renderGraph), eval-BAR look (see renderEvalBar) and the Insight-panel text size (px).
   graphStyle: "area", barStyle: "gradient", insightFont: 20,
-  // Board coordinate label size in px (the a–h / 1–8 ticks in the squares' corners).
-  coordSize: 9,
+  // Board coordinate labels (the a–h / 1–8 ticks in the squares' corners): on/off + size in px.
+  showCoords: true, coordSize: 12,
   // App background: "color" (a tone picked with the HSL sliders), a bundled preset (slate / olive
   // = "Dark", a fixed near-black tone / ember), or "custom" (uploaded). bgFit is "cover" (stretched) or "tile" (repeated
   // at bgTile size). bgCustom holds the uploaded data URL. bgHue/Sat/Light define the "color" tone.
@@ -3631,11 +3631,11 @@ function visualSettings() {
     section("Board / Pieces",
       colorChips("", "boardTheme", boardEntries),
       pieceGrid(),
-      slider("Coordinates", "coordSize", 6, 18, 1, {
+      toggleRow("Coordinates", "showCoords"),
+      slider("Size", "coordSize", 10, 25, 1, {
         fmt: (v) => v + " px",
         onChange: (v) => document.documentElement.style.setProperty("--coord-size", v + "px"),
       }),
-      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Size of the a–h / 1–8 coordinate labels on the board.")),
     ),
     section("Best-move arrow",
       toggleRow("Show arrow", "bestArrow"),
@@ -3990,7 +3990,8 @@ function applySettings() {
   r.style.setProperty("--sq-dark", bt[1]);
   r.style.setProperty("--badge-scale", S.settings.badgeScale ?? 1);
   r.style.setProperty("--ip-font", (S.settings.insightFont ?? 13) + "px");
-  r.style.setProperty("--coord-size", (S.settings.coordSize ?? 9) + "px");
+  r.style.setProperty("--coord-size", (S.settings.coordSize ?? 12) + "px");
+  r.classList.toggle("hide-coords", S.settings.showCoords === false);
   applyBoardArt(UI.boardWrap && UI.boardWrap.querySelector(".board"));
   applyBackground();
 }
