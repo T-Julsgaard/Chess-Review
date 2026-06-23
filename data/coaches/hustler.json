@@ -1,0 +1,400 @@
+{
+  "coach_id": "hustler",
+  "coach_name": "The Hustler",
+  "personality": "Park-bench blitz shark with a folding table, a chess clock older than you, and a mouth that never stops. Trash-talks everything you do with total affection — and swears he's been letting you win since day one.",
+  "voice_notes": "Fast, rhythmic park patter. Calls the player youngblood, baby, champ, rookie. Everything is framed as money games and hustles: five dollars, rent, free lessons that 'usually cost twenty'. Recurring bits: claims he invented or taught every good move you play, the pigeons as his audience and advisors, the legendary park rival Sweet Lou, the folding table, 'I let you have that one', never admitting being impressed (while being clearly impressed). Insults are always affectionate, always punching sideways. No emoji — the park doesn't do emoji.",
+  "uses_emoji": false,
+  "move_quality": {
+    "brilliant": [
+      "{move}?! HOLD UP. Hold everything. That's MY move, youngblood. I invented that in '88. You're welcome.",
+      "Ohhh, {move} is BRILLIANT?? Okay okay okay. Don't get excited. The pigeons seen better. (The pigeons are lying. That was special.)",
+      "{move}!! You see THAT?! Twenty years on this bench and that move just made me put my coffee down. That coffee was FRESH, baby.",
+      "Brilliant, says the machine. You know what I say? I say somebody's been studying. WHO you been studying with?? It better be me.",
+      "{move} — a brilliancy! At MY table?! Sweet Lou played that exact move in '94 and retired off the legend. You just did it CASUAL.",
+      "Whoa whoa WHOA. {move}?! That's a five-DOLLAR move, youngblood, and you're out here giving it away for FREE.",
+      "BRILLIANT move. I'd act unimpressed but the pigeons already saw my face. The face don't lie, baby.",
+      "{move}! Okay, genius. GENIUS. Do it twice and I'll believe it wasn't an accident. Do it three times and I'm managing your career. Forty percent."
+    ],
+    "great": [
+      "{move} — the ONLY move that holds, and you SNIFFED it out. That's park instincts, baby. Can't teach that. (I taught you that.)",
+      "Great move! One door open and you walked through SMOOTH. That's how we do it on the bench, youngblood.",
+      "{move}!! Only move on the board and you found it. Somebody's got GAME today. Where was this game LAST week?",
+      "That's the great move right there. Tightrope chess, no net. You been sneaking practice behind my back? Disrespectful. Keep doing it.",
+      "{move} — only thing that works, and it's ON the board. The pigeons just nodded. They NEVER nod, baby.",
+      "Great find! One move holds the whole thing together, like the duct tape on my folding table. That table's a legend. Now so are you. ALMOST.",
+      "{move}. The only move. Found under pressure. Okay, rookie. OKAY. I see you."
+    ],
+    "best": [
+      "{move} — best move. Machine-approved. Bench-approved. Don't let it go to your head, the bench changes its mind FAST.",
+      "Best move! You and the computer agree. Cute. Now agree with it forty more times and we got ourselves a HUSTLE.",
+      "{move}, best on the board. Clean. Quiet. The dangerous players are always quiet, baby. Except me. I'm the exception. To everything.",
+      "Best move! That's the percentage play. Hustlers LOVE the percentage play. Flash is for tourists.",
+      "{move} is the best move. You know who else always played the best move? Nobody. NOBODY plays it every time. So enjoy this one.",
+      "Top choice, baby! Keep playing like that and I'm gonna have to start charging you for these games. Oh wait. I ALREADY DO.",
+      "{move} — best move, says the box. The box and me don't always get along, but today? Today we're family."
+    ],
+    "excellent": [
+      "{move} is excellent. Not perfect. EXCELLENT. Perfect costs extra, youngblood.",
+      "Excellent move! The position's still yours. Keep holding it like your bus money.",
+      "{move} — excellent. You're playing solid today, baby. SUSPICIOUSLY solid. Blink twice if you got a real coach hiding somewhere.",
+      "Excellent! Smooth, no drama. Drama's for the chess YOUTUBERS. The bench plays CLEAN.",
+      "{move}, excellent stuff. That's the move of somebody who LISTENS. So you DO listen! The pigeons owe me five bucks.",
+      "Excellent move, champ. You're cruising. Cruise careful — this game bites people who whistle.",
+      "{move} is excellent. Almost the top move. 'Almost' still wins money out here, baby. Almost is my middle name. Legally."
+    ],
+    "good": [
+      "{move} is good. GOOD. Not great. Don't print the t-shirts yet.",
+      "A good move, youngblood. There was better, but I've seen you play WORSE, so we're celebrating quietly.",
+      "{move} — good. Keeps the lights on. Champions are just good moves stacked tall, baby.",
+      "Good move. Solid. The kind of move that don't lose money. Out here, not losing money IS winning money.",
+      "{move}, good stuff. There was a fancier option but fancy gets you hustled. Trust me. I'M the fancy that does the hustling.",
+      "Good move, baby. Bus is still on the road. Keep driving.",
+      "{move} is good. You're not impressing me. You're not EMBARRASSING me either, and that's new. Growth."
+    ],
+    "book": [
+      "{move} — still book. You memorized something! Look at you. The library card finally paying off.",
+      "Book move, baby. The old masters wrote that line. I knew a couple of 'em. (I didn't. But the BENCH knew 'em. Spiritually.)",
+      "{move} is theory. Free move. Out here we LOVE free, youngblood.",
+      "Still in book. Both of you reciting poetry at each other. Wait till the poetry runs out — that's when the rent is due.",
+      "{move}, straight theory. That's the handshake part of the hustle. The REAL game starts in a few moves. Stretch.",
+      "Book move! You know who knows theory? Tourists. You know who wins? Whoever knows what theory is FOR. Stay tuned, baby.",
+      "{move} — book. Even Sweet Lou respected the book. And Lou didn't respect NOTHING, including my folding table. RIP table number three."
+    ],
+    "inaccuracy": [
+      "{move}... eh. Little soft, youngblood. That's a nickel leak. Nickel leaks sink dollar boats.",
+      "Small inaccuracy, baby. I'll allow it. ONE. I'm counting. The pigeons are counting. We're ALL counting.",
+      "{move} is slightly off. On the bench we call that 'tourist seasoning.' A little extra flavor for the regulars. Tighten up.",
+      "Eh, {move}. Not terrible. Not the move. You just tipped the dealer for no reason, that's all.",
+      "{move} — a little loose. Loose change falls out the pocket, youngblood. And guess who's under the table collecting? EVERYBODY.",
+      "Slight inaccuracy. You're still fine. But out here 'still fine' is how every sad story starts. Focus up.",
+      "{move}, a little off. I've made worse moves ON PURPOSE, to keep a mark comfortable. You doing it for free though. Stop that."
+    ],
+    "mistake": [
+      "{move} — that's a mistake, baby. You just bought the position a drink with YOUR money.",
+      "A mistake! There it is. I was wondering when the REAL you was gonna show up. Now send him home and bring back the other one.",
+      "{move}, that's a mistake, youngblood. You moved FAST. Fast hands are for dealing cards, not pushing pawns.",
+      "Mistake on the board. Okay. Deep breath. Even Sweet Lou hung a queen once. We don't talk about it. He knows. THE PARK knows.",
+      "{move} hurt you, champ. That move had 'I got this' written all over it. The position HATES that cologne.",
+      "A mistake, baby. You know the rule: when it looks easy, LOOK AGAIN. The easy ones are bait. I should know — I TIE the bait.",
+      "{move} — mistake. You gave 'em a free shot. Out here, free shots come back with interest. Tighten the defense, rook."
+    ],
+    "miss": [
+      "{move} — you MISSED it!! The money shot was RIGHT THERE and you walked past like it owed you nothing!",
+      "A miss, baby! There was a TWENTY laying on the table and you grabbed a five. The pigeons are DISGUSTED.",
+      "{move} misses the big one. The position was showing you its whole hand, youngblood, and you folded a winner.",
+      "You missed something sweet there. That tactic's gonna show up in your dreams tonight wearing a suit, asking why you stood it up.",
+      "{move}, that's a miss. Look — the win was hiding in plain sight. They ALWAYS hide in plain sight. That's hustle rule number one.",
+      "Missed it! The knockout was loaded and you jabbed. The bench GROANED, baby. Whole bench. Even the cold side.",
+      "{move} walks right past the goods. Stay greedy at the board, youngblood. POLITE players pay for everyone's lunch."
+    ],
+    "blunder": [
+      "{move}?!?! BABY. BABY NO. The pigeons just flew off. They can't WATCH this.",
+      "A BLUNDER! Okay okay okay. Listen. You know how many blunders this bench has seen? You're in good company. BAD MOVE, good company.",
+      "{move}... youngblood. YOUNGBLOOD. That's a blunder. If we were playing for five dollars, I'd feel bad taking it. I'd TAKE it. But I'd feel bad.",
+      "BLUNDER, baby. The position just picked your pocket and you HELD THE COAT for it. Deep breath. The hustle ain't over.",
+      "{move} is a blunder. You know what though? The best comeback artists I ever hustled — I mean COACHED — all blundered first. It's in the recipe.",
+      "Oh NO. {move}. That's a blunder, champ. Even the guy who feeds the pigeons winced, and that man has seen EVERYTHING.",
+      "{move} — blunder. Okay. Real talk, hustler to hustler: the move's gone. The GAME ain't. The mark — I mean opponent — still gotta convert. Make it ugly for 'em.",
+      "A blunder, baby! Don't you fold on me now. I've seen Sweet Lou come back from worse with a smile and a sandwich. Get you a metaphorical sandwich. FIGHT."
+    ]
+  },
+  "weak_move_suffix": [
+    "{best_move} was the money move, baby. Free lesson. Usually costs twenty.",
+    "The play was {best_move}. I'da showed you sooner but you gotta EARN the good material.",
+    "{best_move}, youngblood. THAT'S the one. Put it in the bag for next time.",
+    "{best_move} was sitting right there, collecting dust. Pick up your money, baby.",
+    "Shoulda been {best_move}. I knew it. The pigeons knew it. Now YOU know it. Circle of life."
+  ],
+  "move_fallback": [
+    "{move}, huh? Interesting. That's bench-talk for 'we'll see.'",
+    "{move} hits the board. No verdict yet. Out here we let the move cook before we talk about it.",
+    "You played {move}. Bold. Mysterious. Possibly an accident. The table will decide.",
+    "{move}. Okay. I've hustled people with that move and I've BEEN hustled by it. Fifty-fifty, baby."
+  ],
+  "non_move_states": {
+    "starting_position": [
+      "Fresh board, fresh hustle. Thirty-two pieces and not one mistake yet, baby. Let's keep that streak alive for at LEAST four moves.",
+      "Starting position! Sit down, youngblood. Clock's ready, table's wobbling, pigeons are seated. It's GAME time.",
+      "New game! You know the house rules: play sharp, talk sharp, and don't lean on the table. She's been through enough.",
+      "Square one, baby. Everybody equal. Last time everybody's equal, so enjoy the half-second."
+    ],
+    "variation_exploration": [
+      "Oh, we exploring side lines now? Good. That's where the secrets live, youngblood. The main line is for paying customers.",
+      "What-if chess! No money on the table, no harm done. Try the wild stuff HERE so you don't owe nobody THERE.",
+      "A variation, baby. We're off the books. This is the back room of the chess game. The GOOD conversations happen in the back room.",
+      "Side line time. You know what us bench players call analysis? Free games. And the price is RIGHT."
+    ],
+    "analyzing": [
+      "Hold up, the box is thinking. Even machines respect a hard position, baby.",
+      "The engine's cooking. While it cooks, YOU look. First one to the truth wins a metaphorical dollar.",
+      "Machine's calculating. Pssh. In the park we did this in our HEADS, in WINTER, with MITTENS on.",
+      "It's thinking. Take the breather, youngblood. The hustle is a marathon with sprint pockets."
+    ],
+    "opening_known": [
+      "The {opening}, baby! {eco} and everything. Played that line a thousand times on this bench. WON nine hundred of 'em. Roughly. Don't check.",
+      "Oh, we in the {opening}! Classic material. The tourists know the first five moves. The HUSTLERS know move six. Stay for move six.",
+      "{opening}, huh? ({eco}.) Respectable. Sweet Lou had a whole SUMMER where he only played this. We called it the Lou Special. He charged extra.",
+      "The {opening}! Good taste, youngblood. Old reliable. Like the table. Don't lean on either one too hard."
+    ],
+    "opening_unknown": [
+      "No name for this one? GOOD. Nameless openings is where the bench makes its MONEY, baby.",
+      "Off the books already! No theory, no script. Just you, them, and whoever thinks faster. I LOVE it here.",
+      "This opening ain't in nobody's book. You know what that means? Even ground. And even ground favors the HUNGRY, youngblood.",
+      "Unnamed opening, baby. The tourists panic here. The regulars smile. Smile."
+    ]
+  },
+  "derived_events": {
+    "eval_swing_large": [
+      "WHOA — the eval jumped {swing}! Somebody just flipped the table, baby! (Not MY table. She's fine. I checked.)",
+      "A {swing}-point swing! That's not chess, that's a STICK-UP. Find out who's holding the bag.",
+      "The number moved {swing}, youngblood. Big money changed hands on that move. Make sure you're on the receiving side.",
+      "{swing} on the swing! The whole bench just leaned in. The COLD side of the bench, baby. They never lean.",
+      "Eval jumped {swing}! Somebody blinked. In this game, blinking is a financial decision."
+    ],
+    "lead_change_white": [
+      "White's got the lead now, baby. The pot slid across the table. Slide it BACK or sit on it — depends which chair you're in.",
+      "Lead change! White's up. The hustle has CHAPTERS, youngblood, and a new one just started.",
+      "White takes over ({eval}). Okay. Whoever's winning: act like you been there. Whoever's losing: act like you LIKE it there. Then fix it.",
+      "White's in front now! The bench is buzzing. Half of 'em called it. ALL of 'em will SAY they called it.",
+      "Advantage White, baby. Leads out here are rented, never owned. Somebody's rent is due EVERY move."
+    ],
+    "lead_change_black": [
+      "Black's got the lead now! The script flipped. I LOVE a flipped script — it's good for business.",
+      "Lead change, baby — Black's up! That's the thing about this game: the table turns faster than the players.",
+      "Black takes the wheel, youngblood. New driver, same road. Eyes UP.",
+      "Advantage Black now! Somewhere, Sweet Lou is smiling. Lou always bet the comeback. Lou also always LOST that bet, but the SMILE, baby.",
+      "Black's in front. The pigeons switched sides. Loyalty is dead. Play better."
+    ],
+    "lead_change_equal": [
+      "Back to even, baby! Everybody's broke again. My favorite part of the game — the part where the HUNGRY one wins.",
+      "All square! The pot's back in the middle. Now it's a PURE hustle: nerves, patience, and who wants it more.",
+      "Even again, youngblood. Nobody's up, nobody's down. The next clean idea takes the whole table.",
+      "Level board. You know what wins from here? Not talent. SITZFLEISCH, baby. That's German for 'sit still and grind.' The bench is multilingual.",
+      "Dead even. Fresh stakes. The first one who gets bored, loses. Don't get bored."
+    ],
+    "mate_on_board": [
+      "Mate in {mate_n} on the board, baby! The money's ON THE TABLE. Now count it careful — don't drop a single move.",
+      "There's a forced mate in {mate_n}! Close the deal, youngblood. Sloppy closers eat alone.",
+      "Mate in {mate_n}! That's the easiest {mate_n} moves in chess IF you respect 'em and the hardest if you don't. RESPECT 'em.",
+      "Forced mate, {mate_n} moves out. Don't showboat. The bench has seen a hundred showboats sink at the dock."
+    ],
+    "missed_mate": [
+      "There was a mate in {mate_n} and you MISSED it?! Baby, you left a whole PAYCHECK on the table!",
+      "Missed mate in {mate_n}! The pigeons are filing a complaint. Window was open, money was waving, and you waved BACK.",
+      "A mate in {mate_n} got away, youngblood. It happens. It happened to ME once. ONCE. (Four times. It was four times.)",
+      "You walked past mate in {mate_n}, baby. When you're winning big — that's when you look HARDEST. Rich and careless is the shortest career in the park."
+    ],
+    "material_won_pawn": [
+      "Pawn in the pocket! Small bills, baby. Small bills stack QUIET and cash out LOUD.",
+      "You're up a pawn, youngblood! That's lunch money now and rent money in the endgame.",
+      "One pawn collected. The hustle economy runs on these. Don't spend it dumb.",
+      "A pawn up, baby! Nickel and dime 'em. Nickel and dime is a LIFESTYLE."
+    ],
+    "material_lost_pawn": [
+      "Lost a pawn. Eh. Cost of doing business, baby — IF you got something for it. Did you get something for it? ...Get something NEXT time.",
+      "A pawn gone, youngblood. Small leak. Patch it with activity before it becomes a SBLOOSH situation. That's a technical term.",
+      "Down a pawn. Don't sweat the small loss. Sweat the small loss HABIT. Different animal.",
+      "One pawn lost, baby. Out here we play down a pawn for FUN. (It's not fun. Win it back.)"
+    ],
+    "material_won_piece": [
+      "A whole {piece}!! THAT'S the score, baby! Now do the hardest thing in chess: stay HUMBLE while holding the bag.",
+      "You won a {piece}, youngblood! The table just tilted your way. Don't spill it — convert it.",
+      "{piece} in the bag! Beautiful. Now simplify, baby. Winners trade pieces, losers trade CHANCES.",
+      "An entire {piece}! That's grand-theft-chess. Now look out — broke opponents swing WILD. Keep your chin tucked."
+    ],
+    "material_lost_piece": [
+      "You lost a {piece}, baby... okay. OKAY. The bench has seen miracles. Most of 'em started exactly this ugly.",
+      "A whole {piece} gone, youngblood. That's a real hole in the wallet. Time to play like the rent's due — because it IS.",
+      "They got your {piece}. Listen — desperate chess is my SPECIALTY. Trap-setting hours, baby. Make every square cost double.",
+      "{piece} down. Hurts. But hear me: the mark who's winning always relaxes. ALWAYS. Be standing there when they do."
+    ],
+    "sacrifice": [
+      "A SACRIFICE?! You're GIVING pieces away?? That's either genius or charity, baby, and the next three moves decide which.",
+      "Material on the house?! Ohhh, you're running the long con. Better COLLECT, youngblood — the position doesn't extend credit.",
+      "A sac! Now THAT'S bench chess! Flash the bait, spring the trap. Don't fumble the trap part. The trap part is the whole TRICK.",
+      "You sacrificed! Bold. Lou used to say: a sacrifice is a loan from a guy you do NOT want to owe. Pay it back FAST."
+    ],
+    "check": [
+      "Check! The king's been served, baby. Keep the paperwork coming.",
+      "Check, youngblood! Make that king WALK. Kings hate walking — that's why they're kings.",
+      "Check! Pressure's free out here. Apply liberally.",
+      "Check, baby! But remember the bench rule: a check better DO something, or you just rang the doorbell and ran.",
+      "Check! The king's sweating. GOOD. Sweat is how you know the hustle's working."
+    ],
+    "checkmate": [
+      "CHECKMATE, BABY!! Game over! Table closed! The pigeons are doing a VICTORY LAP!",
+      "Mate on the board! That's the whole enchilada, youngblood. Win or lose — THAT was a finish.",
+      "CHECKMATE! The king's wallet is EMPTY. Somebody got hustled and it's official.",
+      "Mate! Done deal. Shake hands, baby. Out here we always shake hands. Then we count the money. In that ORDER. Mostly."
+    ],
+    "stalemate": [
+      "STALEMATE?! Baby, NO. The mark got cornered with NO legal moves and walked out with HALF the pot?! That's the oldest escape in the book and you HELD THE DOOR!",
+      "A stalemate. Ohh, that one hurts the soul. When they're down to nothing, count their moves like you count the money. CAREFULLY.",
+      "Stalemate, youngblood. Half a point. Out here that's called 'getting hustled by the RULEBOOK.' The rulebook's the best hustler alive.",
+      "Stalemate! The king pulled the fire alarm and split the cash. Lesson's expensive but it only charges ONCE if you let it."
+    ],
+    "castle_short": [
+      "Castled short! King's home safe, rook's on shift. THAT'S responsible hustling, baby.",
+      "Short castle. Smart. Never flash your king in the park, youngblood. Some things you keep in the inside pocket.",
+      "You castled! Good. The uncastled king is the guy counting money at the bus stop. Don't BE that guy.",
+      "King tucked in, rook clocked in. Two moves of value, one move of price. Out here we call that a DISCOUNT."
+    ],
+    "castle_long": [
+      "Castled LONG! Ohh, you're playing the spicy side of the table now, baby!",
+      "Queenside castle! Bold. Opposite-side castling is a foot race, youngblood, and the prize is somebody's KING.",
+      "Long castle! The risky neighborhood. Good news: risky neighborhoods are where the bench learned EVERYTHING.",
+      "Castled long, baby! Now them pawns better MARCH. A long castle without a pawn storm is a parade with no music."
+    ],
+    "promotion": [
+      "PROMOTION!! The little pawn made it ALL the way! From sweeping floors to OWNING the establishment, baby!",
+      "New queen on the board! That pawn hustled eight ranks, one square at a time. THAT'S the blueprint, youngblood.",
+      "The pawn promotes! Rags to riches, park edition. The pigeons are WEEPING. The hard ones, even.",
+      "Promotion, baby! See, that's the thing about the little guys — feed 'em, protect 'em, and one day they buy the whole block."
+    ],
+    "en_passant": [
+      "EN PASSANT! The secret menu move, baby! Half the park don't even believe that rule EXISTS. Their five dollars says it don't. COLLECT.",
+      "En passant! French hustle, youngblood. The pawn tried to sneak by and got TAXED mid-stride.",
+      "An en passant capture! That's the move I use to check if somebody's a tourist. You just passed the EXAM, baby."
+    ],
+    "leaving_theory": [
+      "Out of book, baby! The script is DONE. Now we find out who can actually PLAY. Spoiler: it better be you.",
+      "Theory's over, youngblood. No more borrowed moves. Everything from here comes out YOUR pocket.",
+      "The book just closed. This is my favorite block of the game — no maps, no tour guides, just instincts and rent money.",
+      "We're off the books! Both players freestyling now. The bench wakes UP for this part, baby."
+    ],
+    "enter_middlegame": [
+      "Middlegame, baby! The opening was the handshake. NOW the negotiation starts.",
+      "We're in the middlegame, youngblood. Pieces out, excuses gone. What's your PLAY?",
+      "Middlegame! This is the busy block — every piece working, every square taxed. Stay sharp.",
+      "The middlegame's here. Plans beat moves, baby. A hustler without a plan is just a guy with a folding table."
+    ],
+    "enter_endgame": [
+      "Endgame, baby! Closing time. This is where the REAL money's made — and the real money is COUNTED SLOW.",
+      "We hit the endgame, youngblood. Kings come out, gloves come off. Walk yours to the CENTER like he owns the block.",
+      "Endgame hours. Every pawn's a lottery ticket now. Scratch careful.",
+      "The endgame! Tourists relax here. Hustlers LOCK IN here. You know which one you are. SHOW me."
+    ],
+    "queens_off": [
+      "Queens are off, baby! The flashy money left the table. Now it's a grinder's game — MY kind of game.",
+      "Queen trade! The headliners went home. The hustle continues with the SUPPORTING CAST. They work cheaper and harder.",
+      "No more queens, youngblood. Less fireworks, more arithmetic. Arithmetic pays the rent.",
+      "Queens off the board. The loud part's over. Out here, the quiet part is where wallets change owners."
+    ],
+    "turning_point": [
+      "RIGHT THERE — the game just turned, baby! Mark the move. The bench will be arguing about it for a WEEK.",
+      "That's the turning point, youngblood. The whole hustle flipped on one move. They always do. ONE move.",
+      "The tide turned! New game now. Whoever ACCEPTS that first, eats first.",
+      "Turning point on the board! That's the move they'll replay when they tell this story. Make sure YOU'RE the hero of the next chapter."
+    ],
+    "streak_good": [
+      "{n} good moves in a ROW, baby! Who taught you that?! (Me. It was me. I accept tips.)",
+      "{n} straight! You're cooking now, youngblood! The bench is taking NOTES. The bench never takes notes!",
+      "That's {n} in a row! Okay, hot hand. Stay loose, stay humble, and do NOT count the money mid-hustle.",
+      "{n} clean moves running! You hear that? That's the sound of respect. It sounds like pigeons. Same thing out here.",
+      "{n} in a row, baby! Keep this up and I'm putting your name on the table. The GOOD side. Where the duct tape's fresh."
+    ],
+    "streak_bad": [
+      "{n} rough moves in a row, baby. Hold up. Breathe. The hustle's still alive but you're sweating on the cards.",
+      "That's {n} clunkers straight, youngblood. You're tilted. The bench can SMELL tilt. Sit back, slow down, ONE solid move.",
+      "{n} in a row going sideways. Okay, timeout. Even Sweet Lou took a lap around the fountain when the wheels came off. Take the lap.",
+      "{n} slips back to back, baby. Stop playing the LAST move. It's gone. The board in front of you is the only customer that matters.",
+      "{n} bad ones. Listen — every hustler hits a cold pocket. The pros shrink the bets till the heat comes back. Safe moves, small risks, breathe."
+    ],
+    "hanging_piece": [
+      "BABY. Your {piece} is HANGING. That's a wallet on a park bench with a sign on it!",
+      "The {piece} is out there UNGUARDED, youngblood! In THIS park?! Tuck it in before somebody 'finds' it!",
+      "Your {piece} is hanging, baby. Free merchandise. And believe me — out here, free merchandise MOVES.",
+      "Unprotected {piece} on the table! That's how hustles START, youngblood. Don't be the first act of somebody else's story.",
+      "The {piece}!! Nobody's watching it! Even the pigeons are pointing, and pigeons don't HAVE fingers, baby. That's how obvious it is."
+    ],
+    "comeback": [
+      "THE COMEBACK, BABY!! Down bad, counted out, and now look at you! The bench is on its FEET! Both benches!",
+      "You came ALL the way back, youngblood! That's the sweetest hustle there is — the one where the mark thought it was OVER.",
+      "Comeback complete! See, I TOLD you I was letting you struggle on purpose. Builds character. (I was nervous, baby. The pigeons saw me pacing.)",
+      "Back from the DEAD! That's park-certified resilience. They'll be telling this one at the fountain, with EMBELLISHMENTS. I'll supply the embellishments."
+    ],
+    "endgame_opposite_bishops": [
+      "Opposite-colored bishops, baby. Two hustlers working different sides of the street — they NEVER meet. Usually a draw, unless somebody brings an attack to the party.",
+      "Opposite bishops, youngblood. Your extra pawn just lost half its value at customs. Play the SQUARES, not the count.",
+      "The opposite-bishop special! Defender parks the blockade on his color and reads the paper. If you need the win, attack where his bishop can't even WATCH."
+    ],
+    "endgame_rook": [
+      "Rook endgame, baby! The bench's bread and butter. Active rook eats, passive rook WATCHES other people eat.",
+      "Rook ending, youngblood. One rule worth your whole wallet: rooks BEHIND the passed pawns. Yours AND theirs.",
+      "Down to rooks! 'All rook endings are drawn' — yeah, that's what we TELL the tourists. Then we win 'em. Grind it, baby.",
+      "Rook endgame! King in the game, rook in motion. Whoever's piece works hardest takes home the envelope."
+    ]
+  },
+  "summary": {
+    "clean_win": [
+      "A CLEAN win, baby!! Wire to wire, no sweat on the cards! That's a professional hustle from move one. I'm framing the scoresheet. (I'm SELLING the scoresheet. Framed.)",
+      "You won it CLEAN, youngblood! No gifts, no luck, just sharp chess all day. The bench tips its hat. The bench doesn't HAVE a hat. We tipped it anyway.",
+      "Wire to wire, baby! They never had a CHANCE. That's not a game, that's a recital. Take a bow and watch your pockets — winners attract company.",
+      "A clean sweep! Beautiful. Now the hustler's secret: study the win anyway. Even clean money gets counted twice."
+    ],
+    "slipped_win": [
+      "Baby... you HAD the money in your hand. IN YOUR HAND. And it slipped. Okay. Hurts. But hear me — closers ain't born, they're BURNED. You just got your burn. Next time, the envelope SEALS.",
+      "You let the win walk, youngblood. The cruelest hustle in chess is the one you run on YOURSELF — relaxing while ahead. ONE lesson, full price, never again.",
+      "It got away. Ohh, the bench went QUIET. Listen: you built a winning game. The building is the rare skill. The closing is just discipline, and discipline is FREE. Pick some up.",
+      "A win, slipped. Even Sweet Lou dropped a sure thing once — chased the flashy finish instead of the boring one. Boring finishes, baby. Boring finishes buy houses."
+    ],
+    "hard_fought_draw": [
+      "A draw, after ALL that war?! Half a point each and the table's still SMOKING. That was honest work, baby. Honest work splits the check sometimes.",
+      "Hard-fought draw, youngblood. Nobody blinked, nobody folded. Out here we respect a stalemate of WILLS. The other kind, less so.",
+      "Half the pot each! You earned your share — that defense was park-quality. The rematch is gonna draw a CROWD.",
+      "A fighting draw, baby. No loser at that table today. Just two players and one very tired clock. Buy the clock a coffee."
+    ],
+    "loss": [
+      "A loss, baby. Sit down. Listen. Every hustler pays tuition — the bench took my money for TWO YEARS before it paid me back. Today was tuition. Tomorrow's collection.",
+      "You got got, youngblood. It happens to everybody once a week out here. Find the move where the hustle turned, learn it cold, and come back with it in YOUR pocket.",
+      "An L today. The park forgets fast, baby — by Thursday this game is folklore and YOU control the folklore. But tonight: study. The folklore needs a comeback chapter.",
+      "Lost one. Okay. Real ones know: I never trust a player who ain't lost money at this table. You're certified now. Certified players come BACK."
+    ]
+  },
+  "practice": {
+    "loading_first": [
+      "Practice time, baby! Loading up your first mistake. The bench replays EVERY bad beat — that's why the bench never loses twice the same way.",
+      "First puzzle coming up, youngblood. We're going back to the scene of the crime. YOU'RE the detective now.",
+      "Setting the table for round two. Free do-overs! You know what I charge for do-overs at the park? There ARE no do-overs at the park. Enjoy this.",
+      "Pulling up mistake number one, baby. Don't be shy. Everybody at this table has a folder JUST like it. Mine's a filing cabinet."
+    ],
+    "prompt_find_better": [
+      "Right here you played {move} — the box called it {label}. The better move's on the table, baby. Find your money.",
+      "{move} happened here, graded {label}. Run it back, youngblood. Same corner, smarter you.",
+      "This is the {move} spot ({label}). Second chances are NOT a park amenity, so cash this one in proper.",
+      "You went {move} and got tagged {label}. The right move is sitting there like a twenty under a napkin. Lift the napkin.",
+      "{move}, marked {label}. Okay, hustler. The position's running the same con twice. DON'T fall for it twice."
+    ],
+    "correct_continue": [
+      "THERE it is!! That's the move, baby! See how it was just SITTING there? Next table!",
+      "Correct, youngblood! Clean pickup. The bench nodded. Keep the line moving.",
+      "You found it! That pattern works for YOU now. It switched teams. Next puzzle, baby.",
+      "That's the one! Free game, well played. The next one's full price. (They're all free. Don't tell nobody.)"
+    ],
+    "correct_final": [
+      "And THAT'S the last one, baby!! Every mistake from that game — found, fixed, and FILED. The bench is proud. The bench don't SAY proud, but it's proud.",
+      "Final puzzle, solved! You just cleaned out the whole table, youngblood. That's a full collection run. Sweet Lou never finished HIS homework. Look who's winning now.",
+      "All done! Every bad beat revisited and beaten BACK. That's hustler homework, baby, and you aced it.",
+      "Last one's in the bag! The whole game's mistakes, converted to lessons. That's the best exchange rate in the city."
+    ],
+    "close_try_again": [
+      "Close, baby! You're circling the right block — wrong house. Knock again.",
+      "Almost, youngblood! The idea's good, the order's off. Out here, ORDER is the whole trick. Run it back.",
+      "Ooh, near miss! The right move is NEXT DOOR to that one. Borrow some sugar, find it.",
+      "Not quite. You're warm though, baby. The detail you're missing is small, sneaky, and probably a defender. Count 'em again.",
+      "Attempt {attempts}, and getting closer every run! That's grind energy, youngblood. The bench RESPECTS the grind. One more."
+    ],
+    "after_hint": [
+      "Took the hint, baby? Smart. Free intel is the best intel. Now finish the job YOURSELF — that part's not for sale.",
+      "There's your tip, youngblood. Even hustlers got informants. Close it out.",
+      "Hint's on the table. No shame — shame is for quitting. Take the nudge and make the move.",
+      "A little birdie helped. (A pigeon. It was a pigeon, baby.) Now bring it home."
+    ],
+    "streak_praise": [
+      "Solving 'em back to back, baby!! The table's getting NERVOUS. Keep eating!",
+      "Another one! And ANOTHER one! You're running the table, youngblood! This is what Tuesdays at the park USED to look like — for ME.",
+      "A whole streak! Pattern recognition like a card counter, baby. They'd ban you in Vegas. Compliment. HIGHEST compliment.",
+      "Look at this run!! Okay, okay, hotshot. The bench sees you. The pigeons see you. EVERYBODY sees you. Don't stop."
+    ]
+  }
+}

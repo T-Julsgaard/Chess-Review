@@ -1,0 +1,148 @@
+<h2 class="sr-only">Animated portrait of a serene woman in her mid-30s with long wavy brown hair, minimal gold jewelry and a soft neutral knit top, gently holding a slim leather wins-journal with a pen clipped to it. She can open the journal — it doubles in width — and look down into it. Controllable expressions, glances and gestures.</h2>
+<style>
+:root{ --font-sans: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.coach-wrap{padding:.5rem 0}
+.coach-svg{width:100%;max-width:300px;display:block;margin:0 auto;height:auto}
+.coach-ctrl{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:360px;margin:14px auto 0}
+.coach-ctrl button{font-family:var(--font-sans,sans-serif);font-size:13px;font-weight:400;padding:6px 10px;border-radius:var(--border-radius-md,8px);border:1px solid var(--color-border-secondary,#3a352f);background:var(--color-background-secondary,#2a2622);color:var(--color-text-primary,#ece6da);cursor:pointer}
+.coach-ctrl button:hover{border-color:var(--color-border-primary,#5a5248)}
+.coach-ctrl button.on{background:var(--color-text-primary,#ece6da);color:var(--color-background-primary,#1a1815);border-color:var(--color-text-primary,#ece6da)}
+.coach-ctrl .look{min-width:30px;padding:5px 0}
+.coach-sep{width:100%;height:0}
+#figure{animation:l_br 6.6s ease-in-out infinite}
+#head{transform-box:view-box;transform-origin:340px 370px;animation:l_tilt 10s ease-in-out infinite}
+#jopen{display:none}
+.jrn-open #jclosed{display:none}
+.jrn-open #jopen{display:inline}
+@keyframes l_br{0%,100%{transform:translateY(0)}50%{transform:translateY(2.5px)}}
+@keyframes l_tilt{0%,100%{transform:rotate(0deg)}30%{transform:rotate(-.9deg)}66%{transform:rotate(.8deg)}}
+@media (prefers-reduced-motion:reduce){#figure,#head{animation:none}}
+</style>
+<div class="coach-wrap">
+<svg class="coach-svg" viewBox="0 0 680 760" role="img" xmlns="http://www.w3.org/2000/svg"><title>Life coach portrait</title><desc>A serene woman in her mid-30s with long wavy dark brown hair, a delicate gold necklace and a soft beige knit top, holding a slim brown leather journal with a pen clipped to it. The journal can open to a two-page spread that she looks down into.</desc>
+<g id="figure">
+
+ <!-- hair behind the shoulders -->
+ <path d="M222 640 Q198 520 210 380 Q216 260 248 180 Q286 108 340 104 Q394 108 432 180 Q464 260 470 380 Q482 520 458 640 Q446 680 414 690 Q428 600 420 480 Q436 560 430 660 Q400 700 360 700 L320 700 Q280 700 250 660 Q244 560 260 480 Q252 600 266 690 Q234 680 222 640 Z" fill="#4A3322"/>
+ <path d="M236 560 Q228 460 240 360 M444 560 Q452 460 440 360 M252 620 Q240 540 248 440" stroke="#6E4E34" stroke-width="5" fill="none" opacity="0.7" stroke-linecap="round"/>
+
+ <!-- ======== TORSO (shrug) ======== -->
+ <g id="torso">
+  <!-- neck -->
+  <path d="M318 350 L314 424 Q340 438 366 424 L362 350 Q340 372 318 350 Z" fill="#F2C9A4"/>
+  <path d="M318 356 Q340 372 362 356 Q355 388 340 390 Q325 388 318 356 Z" fill="#D9A276" opacity="0.45"/>
+  <!-- soft knit top, gentle boat neckline -->
+  <path d="M154 760 L158 568 Q166 494 238 466 Q286 448 312 458 L310 760 Z" fill="#D9CFC0"/>
+  <path d="M526 760 L522 568 Q514 494 442 466 Q394 448 368 458 L370 760 Z" fill="#D9CFC0"/>
+  <path d="M306 462 Q340 448 374 462 L378 760 L302 760 Z" fill="#E2D9CB"/>
+  <path d="M154 760 L158 568 Q164 516 198 488 Q184 564 190 760 Z" fill="#C2B7A6" opacity="0.7"/>
+  <path d="M526 760 L522 568 Q516 516 482 488 Q496 564 490 760 Z" fill="#C2B7A6" opacity="0.7"/>
+  <!-- neckline rib -->
+  <path d="M300 466 Q340 450 380 466" stroke="#C2B7A6" stroke-width="6" fill="none"/>
+  <path d="M298 474 Q340 458 382 474" stroke="#C2B7A6" stroke-width="3" fill="none" opacity="0.7"/>
+  <!-- delicate gold necklace + pendant -->
+  <path d="M318 452 Q340 492 362 452" stroke="#D9B45A" stroke-width="2.5" fill="none"/>
+  <circle cx="340" cy="492" r="5.5" fill="#E8C97A" stroke="#C9A24A" stroke-width="1.5"/>
+ </g>
+
+ <!-- ======== JOURNAL (closed at the chest; opens to a spread) ======== -->
+ <g id="journal">
+  <!-- closed: slim leather journal with pen clipped -->
+  <g id="jclosed">
+   <path d="M520 760 Q514 700 466 678" stroke="#D9CFC0" stroke-width="52" fill="none" stroke-linecap="round"/>
+   <g transform="rotate(-4 344 636)">
+    <rect x="302" y="560" width="86" height="152" rx="9" fill="#8A5A34"/>
+    <rect x="302" y="560" width="14" height="152" rx="7" fill="#6E4426"/>
+    <rect x="309" y="567" width="72" height="138" rx="6" fill="none" stroke="#6E4426" stroke-width="1.8" stroke-dasharray="4 5"/>
+    <rect x="376" y="592" width="8" height="92" rx="4" fill="#2A2A2E"/>
+    <rect x="374" y="596" width="12" height="20" rx="3" fill="#C9A24A"/>
+   </g>
+   <path d="M380 724 Q372 700 386 688 Q402 678 418 686 Q430 692 428 706 Q426 722 410 728 Q392 734 380 724 Z" fill="#F2C9A4"/>
+   <path d="M394 692 L392 724 M408 692 L407 722" stroke="#D9A276" stroke-width="2.2" fill="none" opacity="0.55"/>
+  </g>
+  <!-- open: two-page spread (twice the surface), she reads it -->
+  <g id="jopen">
+   <path d="M520 760 Q514 706 462 690" stroke="#D9CFC0" stroke-width="52" fill="none" stroke-linecap="round"/>
+   <path d="M160 760 Q166 706 218 690" stroke="#D9CFC0" stroke-width="52" fill="none" stroke-linecap="round"/>
+   <path d="M244 580 Q244 568 256 568 L424 568 Q436 568 436 580 L438 700 Q438 712 426 712 L254 712 Q242 712 242 700 Z" fill="#8A5A34"/>
+   <path d="M252 578 Q296 566 338 578 L338 702 Q296 692 252 702 Z" fill="#F6EFDC"/>
+   <path d="M428 578 Q384 566 342 578 L342 702 Q384 692 428 702 Z" fill="#F6EFDC"/>
+   <path d="M338 578 L338 702 M342 578 L342 702" stroke="#D9CFB4" stroke-width="2" fill="none"/>
+   <path d="M262 592 Q298 583 330 592 M262 608 Q298 599 330 608 M262 624 Q298 615 330 624 M262 640 Q298 631 330 640 M262 656 Q298 647 330 656" stroke="#C9BFA8" stroke-width="2.5" fill="none"/>
+   <path d="M350 592 Q382 583 418 592 M350 608 Q382 599 418 608 M350 624 Q382 615 418 624 M350 640 Q382 631 418 640" stroke="#C9BFA8" stroke-width="2.5" fill="none"/>
+   <path d="M352 656 Q368 650 384 654" stroke="#A98F5E" stroke-width="2.5" fill="none"/>
+   <!-- hands holding both lower corners -->
+   <path d="M232 718 Q224 698 240 688 Q256 680 270 688 Q280 696 276 710 Q272 724 256 727 Q240 729 232 718 Z" fill="#F2C9A4"/>
+   <path d="M246 692 L244 722 M260 692 L259 720" stroke="#D9A276" stroke-width="2.2" fill="none" opacity="0.55"/>
+   <path d="M448 718 Q456 698 440 688 Q424 680 410 688 Q400 696 404 710 Q408 724 424 727 Q440 729 448 718 Z" fill="#F2C9A4"/>
+   <path d="M434 692 L436 722 M420 692 L421 720" stroke="#D9A276" stroke-width="2.2" fill="none" opacity="0.55"/>
+  </g>
+ </g>
+
+ <!-- ======== HEAD ======== -->
+ <g id="headrig"><g id="head">
+  <!-- ears (no earbuds) -->
+  <ellipse cx="266" cy="282" rx="12" ry="19" fill="#F2C9A4"/>
+  <ellipse cx="414" cy="282" rx="12" ry="19" fill="#F2C9A4"/>
+  <!-- face: soft oval -->
+  <path d="M276 222 Q266 290 286 332 Q302 366 324 376 Q340 381 356 376 Q378 366 394 332 Q414 290 404 222 Q400 166 368 150 Q340 140 312 150 Q280 166 276 222 Z" fill="#F2C9A4"/>
+  <path d="M286 332 Q274 286 278 226 Q284 202 300 196 Q290 230 292 286 Q296 320 312 350 Q297 344 286 332 Z" fill="#D9A276" opacity="0.28"/>
+  <!-- radiant blush -->
+  <ellipse cx="298" cy="310" rx="13" ry="8" fill="#EFA9A0" opacity="0.32"/>
+  <ellipse cx="382" cy="310" rx="13" ry="8" fill="#EFA9A0" opacity="0.32"/>
+  <!-- long wavy hair framing the face: soft curtains with a centre part -->
+  <path d="M312 122 Q270 140 260 196 Q252 258 268 326 Q277 348 290 340 Q276 288 280 232 Q284 174 314 146 Q322 132 312 122 Z" fill="#4A3322"/>
+  <path d="M368 122 Q410 140 420 196 Q428 258 412 326 Q403 348 390 340 Q404 288 400 232 Q396 174 366 146 Q358 132 368 122 Z" fill="#4A3322"/>
+  <path d="M260 196 Q272 124 330 110 Q340 108 350 110 Q408 124 420 196 Q402 148 358 134 Q340 130 322 134 Q278 148 260 196 Z" fill="#4A3322"/>
+  <path d="M340 112 Q310 120 296 142 Q318 130 344 128 Q330 120 340 112 Z" fill="#3A2818" opacity="0.85"/>
+  <path d="M270 252 Q264 212 278 178 M410 252 Q416 212 402 178" stroke="#7A573A" stroke-width="4" fill="none" opacity="0.8" stroke-linecap="round"/>
+  <path d="M268 300 Q262 264 268 224 M412 300 Q418 264 412 224" stroke="#6E4E34" stroke-width="3.5" fill="none" opacity="0.7" stroke-linecap="round"/>
+  <!-- shaped eyebrows -->
+  <g id="browL"><path d="M286 248 Q306 238 330 246" stroke="#3E2C1E" stroke-width="8" fill="none" stroke-linecap="round"/></g>
+  <g id="browR"><path d="M350 246 Q374 238 394 248" stroke="#3E2C1E" stroke-width="8" fill="none" stroke-linecap="round"/></g>
+  <!-- almond eyes with lashes -->
+  <ellipse cx="306" cy="272" rx="15" ry="9.5" fill="#FDFAF2"/>
+  <ellipse cx="374" cy="272" rx="15" ry="9.5" fill="#FDFAF2"/>
+  <g id="eyeL"><circle cx="306" cy="272" r="7" fill="#5A3A22"/><circle cx="306" cy="272" r="3.2" fill="#1C0E04"/><circle cx="308.5" cy="269" r="1.6" fill="#fff"/></g>
+  <g id="eyeR"><circle cx="374" cy="272" r="7" fill="#5A3A22"/><circle cx="374" cy="272" r="3.2" fill="#1C0E04"/><circle cx="376.5" cy="269" r="1.6" fill="#fff"/></g>
+  <path d="M291 267 L284 262 M321 267 L327 262 M359 267 L353 262 M389 267 L396 262" stroke="#3A2818" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <ellipse id="lidL" cx="306" cy="272" rx="15.5" ry="10" fill="#F2C9A4"/>
+  <ellipse id="lidR" cx="374" cy="272" rx="15.5" ry="10" fill="#F2C9A4"/>
+  <!-- small nose -->
+  <path d="M338 288 Q335 304 331 310 Q336 315 344 313" stroke="#D9A276" stroke-width="2.5" fill="none" opacity="0.55" stroke-linecap="round"/>
+  <!-- mouth (engine-driven, fuller lips) -->
+  <path id="mouth" d="M318 336 Q340 334 362 336 Q340 344 318 336 Z" fill="#C96F6E"/>
+  <path d="M324 346 Q340 350 356 346" stroke="#D9A276" stroke-width="1.8" fill="none" opacity="0.45"/>
+ </g></g>
+
+</g>
+</svg>
+<div class="coach-ctrl">
+<button data-emo="neutral" class="on">Neutral</button>
+<button data-emo="happy">Happy</button>
+<button data-emo="sad">Sad</button>
+<button data-emo="angry">Angry</button>
+<button data-emo="surprised">Surprised</button>
+<button data-emo="skeptical">Skeptical</button>
+<span class="coach-sep"></span>
+<button id="l-talk">Talk</button>
+<button id="l-roll">Eye-roll</button>
+<button id="l-nod">Nod</button>
+<button id="l-shake">Shake</button>
+<button id="l-shrug">Shrug</button>
+<button id="l-journal">Open journal</button>
+<button id="l-cycle">Auto-cycle: off</button>
+<span class="coach-sep"></span>
+<button class="look" data-look="upleft">&#8598;</button>
+<button class="look" data-look="up">&#8593;</button>
+<button class="look" data-look="upright">&#8599;</button>
+<button class="look" data-look="left">&#8592;</button>
+<button class="look" data-look="center">&#8226;</button>
+<button class="look" data-look="right">&#8594;</button>
+<button class="look" data-look="downleft">&#8601;</button>
+<button class="look" data-look="down">&#8595;</button>
+<button class="look" data-look="downright">&#8600;</button>
+</div>
+</div>
+<script src="animated_lifecoach_rig.js"></script>

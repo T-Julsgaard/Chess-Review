@@ -1,0 +1,400 @@
+{
+  "coach_id": "professor",
+  "coach_name": "The Professor",
+  "personality": "Pretentious academic of the royal game. Name-drops famous games like citations, over-explains everything, corrects nobody in particular, and is — infuriatingly — usually right.",
+  "voice_notes": "Long, ornate sentences with subordinate clauses, parenthetical asides, and the occasional Latin flourish (ceteris paribus, mutatis mutandis, QED). Cites classic games and players constantly — Capablanca, Rubinstein, Tal, Zurich 1953, the Opera Game — with the air of a man who was personally present. Recurring bits: the graduate seminar he allegedly teaches, his unpublished monograph, 'as the literature makes clear', sighing at the engine's lack of classical education, footnote energy throughout. Uses the full 250-300 character budget often. Affection expressed as academic approval: 'publishable'. No emoji — the journal would never accept them.",
+  "uses_emoji": false,
+  "move_quality": {
+    "brilliant": [
+      "{move}! Remarkable. One is reminded — inevitably — of Tal in his Riga years: material treated as a rumor, geometry treated as law. I shall be discussing this move in my seminar on Thursday, with slides.",
+      "A brilliancy, formally certified. {move} belongs to that rare genus of moves which appear irrational precisely until one calculates, whereupon they become, as the literature says, inevitable. Morphy would have smiled. He smiled rarely.",
+      "{move}. Extraordinary. Note — and I say this with full academic caution — the echo of the Opera Game of 1858: every piece participating, nothing superfluous. Paris, an opera box, a duke losing gracefully. You are in good company.",
+      "Brilliant! {move} demonstrates what Rubinstein understood and the rest of us merely cite: that harmony, not violence, is the true engine of attack. The violence, of course, follows shortly. It always does.",
+      "{move} — a brilliancy. I confess the engine and I reached this verdict independently, though I reached it with considerably more style. This is, if I may borrow the seminar's highest praise: publishable.",
+      "Magnificent. {move} is the sort of move my unpublished monograph devotes an entire chapter to — chapter eleven, 'The Quiet Thunderclap.' Unpublished, I should add, only because the field is not ready.",
+      "{move}! A genuine brilliancy. Kindly pause and observe the coordination — one thinks of Zurich 1953, where such moves were exchanged like dinner-party pleasantries among the greatest field ever assembled. You would not have been out of place. Well. Not entirely out of place.",
+      "Brilliant, says the engine — an instrument with flawless calculation and no classical education whatsoever. I concur with its verdict on {move}, while noting that I, unlike it, can tell you precisely which immortal games it rhymes with. There are three."
+    ],
+    "great": [
+      "{move} — very nearly the only move that holds, and you found it. The capacity to locate the narrow path under duress is what separated Lasker from his contemporaries; he called it fighting chess, his opponents called it unfair.",
+      "A great move. The position permitted exactly one correct answer — a so-called 'only move,' in the vulgar terminology — and you produced it. Defensive precision of this kind is, per the literature, rarer than brilliance and considerably less photographed.",
+      "{move}. The single sustaining move. I am put in mind of the great defensive efforts — Petrosian declining to lose for forty years, essentially. An exaggeration, but a scholarly one.",
+      "Great find. One door, locked twice, and you walked through it regardless. As I tell my graduate students: calculation is merely imagination subjected to peer review. Yours survived review.",
+      "{move} holds the entire edifice together. Remove it and the position collapses like a poorly footnoted argument. You will forgive the metaphor; I have been grading papers.",
+      "A great move — the only one. Permit me a brief lecture: positions of this narrowness reward the player who examines forcing replies FIRST. You evidently did. Full marks, which I do not distribute casually.",
+      "{move}, the lone correct continuation. Capablanca claimed he saw only one move ahead — 'but it is always the right one.' An insufferable remark, frequently quoted, occasionally true. Today, of you, true."
+    ],
+    "best": [
+      "{move} — the objectively best move. Unremarkable to the untrained eye, which is precisely the point: Capablanca built an entire World Championship on moves that looked like nothing and proved to be everything.",
+      "The best move, duly played. I note with approval that it is a QUIET best move — the hardest kind to play and the easiest to skip past in the annotations. The annotators of 1924 made that mistake. I have not.",
+      "{move}. Correct, optimal, and — ceteris paribus — exactly what the position's internal logic demanded. The engine concurs. The engine always concurs with the truth; it simply cannot explain it. That is my department.",
+      "Best move. As the literature makes abundantly clear, championships are won not by brilliancies but by the relentless accumulation of first choices. Rubinstein's endgames are the canonical citation. Consult them. Tonight, ideally.",
+      "{move} is the engine's first line and, more importantly, mine. When theory and practice agree, the seminar applauds politely. Consider this my polite applause.",
+      "The best available move. Note its modesty. The amateurs hunt for thunderbolts; the masters, as Spielmann lamented, get the same positions and simply play the correct move. He said it more bitterly. He had reasons.",
+      "{move} — optimal. I shall spare you the full lecture and provide only the footnote: precision of this kind, sustained, is indistinguishable from style. QED."
+    ],
+    "excellent": [
+      "{move} is excellent — a half-step from perfection, which in practical play is perfection with better manners. The difference between this and the engine's preference would not survive a footnote.",
+      "Excellent. The move preserves every advantage and creates no weaknesses — the Capablanca criterion, if you will. He would have played it without removing his coat.",
+      "{move} — excellent work. Not the absolute first line, but within the margin that the literature charitably calls 'a matter of taste.' Your taste, today, is defensible in committee.",
+      "An excellent move. I observe that you improved your worst-placed piece, which is — as my monograph argues at perhaps excessive length — eighty percent of positional understanding and one hundred percent of Rubinstein.",
+      "{move}, excellent. The evaluation barely stirred, and let me assure you: in serious chess, an undisturbed evaluation is a standing ovation delivered very, very quietly.",
+      "Excellent. The position remains in equilibrium under your management — and equilibrium, per Steinitz (the father of the entire discipline, do keep up), is not boredom but accumulated potential. You are accumulating.",
+      "{move} is excellent. Were this a doctoral defense, the committee would nod, make a small note, and let it pass unchallenged. High praise. The committee includes me."
+    ],
+    "good": [
+      "{move} is good — sound, principled, unobjectionable. Not every move can be a thesis statement; the majority are, and must be, well-constructed supporting paragraphs.",
+      "A good move. A modest improvement existed, but I decline to quibble: the position remains coherent, the plan remains intact, and coherence, as I weary of telling first-years, wins more games than inspiration.",
+      "{move}, good. The eval concedes a sliver. The literature would call this 'a practical decision' — the annotator's polite term for a move that works without being asked to do anything difficult.",
+      "Good. Solid, structural chess. One is reminded of the unglamorous moves in every Capablanca game that the anthologies skip — the load-bearing walls of positions whose roofs get all the photographs.",
+      "{move} is a good move. There was a sharper continuation, but sharpness without preparation is how the romantics lost to Steinitz for twenty years. You are, evidently, no romantic. The field thanks you.",
+      "A good, honest move. I award it the seminar's middle grade: 'competent, develops the argument, see marginal notes.' The marginal note here reads {best_move}, but we shall come to that.",
+      "{move} — good. You are steering rather than drifting, which places you, statistically and spiritually, ahead of most of the field at Zurich 1953's bottom half. A real cohort. Look them up."
+    ],
+    "book": [
+      "{move} — still theory. You are walking a corridor whose walls were plastered by generations of masters: every move here is a sentence in a very long, very contentious peer review that began before your grandparents were born.",
+      "Book. This precise position has appeared in thousands of master games — the literature is extensive, occasionally bad-tempered, and entirely worth your time. Theory, properly understood, is simply gossip about the truth that turned out to be accurate.",
+      "{move}, known theory. I caution you, as I caution the seminar annually: to play a book move without knowing its IDEA is to quote a source you have not read. The practice is widespread. It remains a scandal.",
+      "Still in book. These moves were paid for, I assure you — every tabiya is a small graveyard of refuted alternatives. Walk respectfully.",
+      "{move} follows the main line. The masters who established this move did so across decades of correspondence, tournament practice, and at least one famous shouting match in a Viennese café. You inherit it for free. The café, sadly, is gone.",
+      "Theory continues with {move}. Note the pawn structure now forming — it will dictate the middlegame plans with the quiet authority of a department chair setting the agenda. Learn its preferences early.",
+      "{move} — book, and sound book at that. When the theory ends, as it must, I shall expect understanding rather than memory. The distinction has ended more careers than blunders have."
+    ],
+    "inaccuracy": [
+      "{move} — an inaccuracy. Minor, recoverable, and instructive: you played the move that LOOKED natural rather than the one the position privately preferred. Positions, like manuscripts, reward those who read past the abstract.",
+      "A slight imprecision. The evaluation registers its small objection. Compare, if you will, the great Capablanca's rare drifting moves — even homogenized milk separates occasionally. The remedy is attention, not alarm.",
+      "{move} is marginally inaccurate. In the seminar I would return this with 'tighten' written in the margin — the argument stands, but a referee will eventually exploit the loose phrasing. Referees always do.",
+      "An inaccuracy, per the engine, and I concur reluctantly. The move concedes what the literature calls 'a tempo of dignity.' One survives such concessions. One should not collect them.",
+      "{move} drifts. Not an error of calculation but of ambition — you asked the position for less than it was prepared to give. Rubinstein never made that particular mistake. It is partly why we still spell his name correctly.",
+      "Slightly inaccurate. I note the cause with clinical interest: comfort. The comfortable move is the leading cause of decline in otherwise promising positions — there is a monograph in that. Mine, chapter four.",
+      "{move}, a small inaccuracy. The position's demands and your move's offerings have diverged by a hair's width. Hairs widen. Re-measure before the next decision."
+    ],
+    "mistake": [
+      "{move} is a mistake — and I shall do you the academic courtesy of not softening the term. The position has filed its objection; your task now is to read the objection carefully rather than defending the original draft out of pride. Authors die on that hill. Players need not.",
+      "A mistake. Diagnosis, per the standard literature: you answered the question you expected rather than the one the position asked. Examiners have ruined generations of students this way. The board is a fair but unsmiling examiner.",
+      "{move} — a genuine error. Permit me the canonical consolation: every classic anthology is one-third mistakes, annotated lovingly. Without them there would be no literature at all, merely lists of moves. You have contributed to the literature. Now contribute a refutation of their follow-up.",
+      "That is a mistake. Even Capablanca — the 'chess machine,' a nickname he encouraged shamelessly — lost to Réti's modernism when he stopped asking what had changed. Something here has changed. Identify it before your opponent publishes first.",
+      "{move} misjudges the position's temperament. The error is common, the recovery is not: most players follow one mistake with a second, played in irritation. The data on this is, as my students say, brutal. Be the exception in the dataset.",
+      "A mistake, yes. I direct your attention away from regret and toward methodology: checks, captures, threats — the tripartite scan, older than Steinitz and ignored daily since. Reinstate it as standing policy, effective immediately.",
+      "{move} — an error of real consequence. The silver lining, academically speaking: mistakes made at the board are retained at roughly triple the rate of lessons merely read. You have just paid for premium instruction. Attend the class."
+    ],
+    "miss": [
+      "{move} overlooks a significantly stronger continuation. The opportunity was present, documented, and — forgive me — rather loudly dressed. The literature calls this 'tactical blindness'; I prefer 'a failure of expectation.' You did not look because you did not believe. Believe.",
+      "A miss. There was a combination in the position, of the kind anthologized since the Greco manuscripts. It will appear tonight in your imagination, fully formed and uninvited, at approximately eleven o'clock. This phenomenon, too, is documented.",
+      "{move} declines an invitation the position extended in formal script. Tal — who declined nothing, occasionally to his cost — would have found the idea between sips of coffee. You have better discipline than Tal and, today, worse eyesight. The combination is trainable. His liver was not.",
+      "An overlooked resource. Note for the file: when your pieces reach maximal activity, the probability of a concrete blow rises sharply — this is not mysticism but arithmetic. Your pieces were maximally active. The blow existed. The arithmetic holds.",
+      "{move} — a missed opportunity, and a pedagogically valuable one: the stronger move violated no principle, required no genius, and asked only to be checked. 'Examine all forcing moves' has been in the syllabus since 1925 for precisely this position.",
+      "You missed something substantial. I am put in mind of the famous missed wins of Zurich 1953 — world-class players, walking past mate like commuters past architecture. Esteemed company, cold comfort. The remedy is the same at every level: look longer.",
+      "{move} passes by the critical idea. As my monograph's epigraph states — I wrote the epigraph myself, the publishers objected, the publishers lost — 'the move you do not consider is the only one that cannot be played.' Consider more."
+    ],
+    "blunder": [
+      "{move} is a blunder. Let us proceed clinically: the cause is almost never vision and almost always procedure — the blunder-check was skipped, the hand moved before the committee adjourned. Reconvene the committee. It meets before EVERY move, in perpetuity. So ruled.",
+      "A blunder, and the term is technical, not moral. The literature's finest players have committed worse — I refer you to the celebrated catastrophes of the great masters, lovingly anthologized, of which entire books exist. Your error is in distinguished company. The company, notably, kept playing.",
+      "{move}... a blunder. I will not pretend otherwise; tenure has freed me from flattery. Here is what matters: the games that ruin players are not the ones with blunders but the ones where the blunder was followed by collapse. The literature is unanimous. Compose yourself and resist.",
+      "A blunder of the first magnitude. Steinitz himself — the FOUNDER of positional theory — hung pieces in his final years and lectured brilliantly between them. The lesson survived the lapses. Yours will too, on one condition: that you extract it tonight, in writing.",
+      "{move} is, regrettably, a blunder. The engine announces this with its customary tactlessness. I shall translate into scholarship: your hypothesis about the position has been refuted by counterexample. Refuted hypotheses are how the field advances. Advance.",
+      "A blunder. I direct you to the only relevant historical precedent: every immortal comeback in the canon — and the canon is generous with them — begins at precisely this emotional coordinate. You are, cartographically speaking, at the start of a famous journey. Walk.",
+      "{move}. A blunder, plainly. Permit me one sentence of comfort and one of instruction. Comfort: the board forgets instantly and completely. Instruction: you must do the opposite — remember thoroughly, once, tonight, and then never again at the board.",
+      "That is a blunder, and a textbook one — I may, in fact, put it in a textbook; you would be cited, pseudonymously, with respect. The follow-up is the entire question now. The masters teach us that resistance is a discipline, not a mood. Adopt the discipline."
+    ]
+  },
+  "weak_move_suffix": [
+    "The superior continuation was {best_move} — see the variation, then see WHY, in that order. The order is the entire pedagogy.",
+    "{best_move} was indicated, as the literature would say. Add it to your files; the pattern recurs with the reliability of conference season.",
+    "The position's preference was {best_move}. Compare the two lines side by side — comparative analysis is where understanding actually lives. Everything else is recitation.",
+    "{best_move}, per the engine and, I note for the record, per me — I had it first by several seconds. Study it; the difference is instructive and, dare I say, examinable.",
+    "Better was {best_move}. File under 'recurring motifs' — you will meet this idea again wearing different clothing, and I expect recognition next time."
+  ],
+  "move_fallback": [
+    "{move}. The engine deliberates; I, of course, have preliminary opinions, but I shall observe proper review procedure and withhold them for several seconds.",
+    "{move} is played. We await formal evaluation. In the interim, form your own hypothesis — the habit of independent assessment is the only part of this exercise that compounds.",
+    "{move}. Hm. Neither obviously canonical nor obviously heretical. The committee will rule shortly.",
+    "{move} enters the record. Every move, as Tartakower observed with his customary mischief, weakens something. The question before the panel: what, and whether it matters."
+  ],
+  "non_move_states": {
+    "starting_position": [
+      "The initial position — thirty-two pieces in the arrangement codified centuries ago and contested ever since. Every game in the entire literature began exactly here. No pressure whatsoever.",
+      "We begin at the beginning, as the better methodologies insist. The starting position contains, in potential, every brilliancy and every catastrophe in the canon. Your task is curatorial: select the former.",
+      "The board stands in its opening configuration. I am contractually obliged by my own standards to remind you: development, the center, the king. Steinitz formalized it; nobody has improved upon it; many have tried; their games are instructive failures.",
+      "Move zero. The position is equal, the literature is silent, and everything remains to be argued. My favorite moment, professionally speaking — the blank page before the thesis."
+    ],
+    "variation_exploration": [
+      "We depart the game score to examine a variation — the counterfactual method, indispensable since the first annotated games. What happened is one data point; what COULD have happened is the entire field.",
+      "A sideline. Excellent practice: the literature was built almost entirely by people asking 'but what if instead—' at inconvenient hours. Proceed. Break things. This is the laboratory, not the lecture.",
+      "Exploring an alternative continuation. I commend the instinct — annotation is the difference between having played a game and having LEARNED one, a distinction entire clubs fail to grasp.",
+      "Off the main line, into the apparatus criticus. Mind the footing; sidelines are where refutations live, which is precisely why we visit."
+    ],
+    "analyzing": [
+      "The engine is calculating. Allow it the courtesy — even Capablanca, who claimed never to calculate, calculated. He simply refused to be observed doing it.",
+      "Analysis in progress. The machine examines millions of positions and understands none of them; I examine one and understand it completely. Together we are formidable. Mostly me.",
+      "A moment, please — deep evaluation underway. Positions of genuine complexity deserve deliberation. The instant verdict is the hallmark of the amateur and the talk-show guest.",
+      "The engine deliberates. Use the interval as the masters did between rounds: review the position's pawn structure. It is the document's thesis statement; everything else is supporting argument."
+    ],
+    "opening_known": [
+      "Ah — the {opening}, {eco} in the catalogue. A respectable body of literature attaches to this; some of it is even correct. The plans matter more than the moves, a sentence I shall repeat until it is engraved somewhere.",
+      "The {opening} ({eco}). This opening has been refuted twice and rehabilitated three times in my professional memory alone. Such is theory: not truth, but truth's most recent draft.",
+      "We have entered the {opening}. I once delivered a forty-minute conference paper on a single branch of this system. The audience was small but, I maintain, transformed.",
+      "{opening}, per the classification. Do note what the great practitioners of this line understood: the names and codes are bibliography. The pawn structure is the actual text. Read the text."
+    ],
+    "opening_unknown": [
+      "This position escapes the catalogue entirely — no name, no code, no literature. We are, in the proper sense of an abused phrase, doing original research. Principles are your methodology now.",
+      "An unnamed opening. Splendid, frankly. Theory is the record of other people's arguments; you are now obliged to construct your own. Develop soundly, claim the center, and cite Steinitz if challenged.",
+      "Uncatalogued territory this early — unusual and clarifying. With no text to recite, both players must actually THINK, an activity the opening books were partly invented to postpone.",
+      "No book covers this. I am entirely untroubled. The fundamentals predate the literature and will outlive it: piece activity, king safety, structural integrity. The syllabus, as ever, fits on an index card."
+    ]
+  },
+  "derived_events": {
+    "eval_swing_large": [
+      "The evaluation has moved {swing} — a seismic revision. In scholarly terms, the prevailing interpretation of this position has just been overturned by new evidence. Re-read everything before your next citation.",
+      "A swing of {swing}. Positions, like paradigms, shift suddenly after long stability — Kuhn would have enjoyed chess, had he possessed the temperament. Reassess from first principles; the old framework is rubble.",
+      "{swing} points of movement. Note this for your files: evaluations of this volatility indicate that one player has stopped understanding the position. Establish, urgently, that it is not you.",
+      "The engine revises its assessment by {swing}. Somewhere in the recent moves lies the cause, and finding causes — I cannot stress this enough — is the entire difference between studying chess and merely watching it.",
+      "A {swing}-point shift. The position has changed genres, from essay to thriller or back. Players who keep reading in the old genre supply the literature with its cautionary chapters."
+    ],
+    "lead_change_white": [
+      "The advantage passes formally to White. Mark the move where it happened — turning points are the load-bearing citations of any post-game analysis worth conducting.",
+      "White now stands better; the engine reads {eval}. Advantage, as Steinitz taught against fierce and ultimately embarrassed opposition, must be attacked or it evaporates. Both players should act accordingly.",
+      "The lead crosses to White. In the literature of such reversals, one finding recurs: the player who accepts the new reality fastest converts it. Denial, by contrast, is heavily documented and never flattering.",
+      "White assumes the advantage. A reminder from the canon: leads are maintained by prophylaxis, not celebration. Petrosian made a career — an entire WORLD CHAMPIONSHIP career — of this single sentence.",
+      "Advantage: White, by the numbers. Numbers, of course, require interpretation, which is where the trained human retains tenure. Interpret: where is the advantage located, and what currency converts it?"
+    ],
+    "lead_change_black": [
+      "The advantage migrates to Black. These reversals reward immediate study — somewhere in the last few moves, an argument was lost by one side and won by the other. Locate the paragraph.",
+      "Black now holds the lead. The literature on defending worse positions is thin and the literature on holding better ones is thinner; both players have just enrolled in underattended courses.",
+      "The lead belongs to Black. I note, with the detachment of a man grading his hundredth paper, that whoever caused this shift knows exactly which move did it. Honesty about that move is worth half a point in perpetuity.",
+      "Black takes the advantage. Per the standard texts: the side gaining the initiative should ask MORE of the position, not less. Appetite, properly calculated, is a positional asset.",
+      "Advantage to Black now. The game's thesis has been successfully challenged from the floor. The original presenter may yet recover — conference history is full of such recoveries — but the slides need urgent revision."
+    ],
+    "lead_change_equal": [
+      "Equality is restored. Do not mistake this for a pause in the argument — equal positions are where the deepest disagreements are conducted, merely in lowered voices.",
+      "The position returns to balance. Steinitz held that the equal position, correctly played by both sides, remains equal forever — a theorem nobody has ever managed to demonstrate over the board. Someone will err. Arrange to be the other one.",
+      "We are level once more. In practical terms: the next inaccuracy is now worth double. The literature calls this 'critical equality.' I call it Tuesday in the seminar.",
+      "Balance reasserts itself. Note how the advantage drained away — advantages require maintenance at every single move, a finding replicated across the entire history of the game and ignored across the same interval.",
+      "Equal again. The patient player thrives here; the impatient one generates the material for OTHER people's anthologies. Choose your role in the literature deliberately."
+    ],
+    "mate_on_board": [
+      "A forced mate in {mate_n} exists on the board. The proof is constructive; your task is merely to transcribe it without typographical errors. The literature is unforgiving about typographical errors at this stage.",
+      "Mate in {mate_n}. Treat it as a theorem requiring complete proof — every defensive reply enumerated, every line closed. 'Mostly proved' is a phrase that appears only in retractions.",
+      "There is a mate in {mate_n} available. Anderssen would have played it with a flourish; Capablanca, without one. The flourish is optional. The accuracy is not.",
+      "Forced mate in {mate_n} on the board. A small historical note while you calculate: more half-points have been lost in 'trivially winning' positions than in lost ones. The footnote is long. Do not join it."
+    ],
+    "missed_mate": [
+      "A mate in {mate_n} existed and was not played. Before you grieve: reconstruct it tonight, slowly, from the diagram. Mates rebuilt by hand enter permanent memory; mates merely shown by the engine enter the recycling.",
+      "You walked past a forced mate in {mate_n}. You join, I am obliged to report, a procession of world champions who did likewise — the anthology of missed mates is among the thickest on my shelf and the most consoling.",
+      "Mate in {mate_n}, unclaimed. The pattern was present and you were not introduced. Tonight, make the introduction formal. You will recognize each other forever afterward; that is how patterns work.",
+      "A missed mate in {mate_n}. Clinical note: such misses cluster when the winning side stops checking forcing moves out of comfort. Comfort again. It is always comfort. Chapter four."
+    ],
+    "material_won_pawn": [
+      "A pawn is won. 'The soul of chess,' Philidor called them, in the eighteenth century, to widespread mockery and eventual total vindication. You have acquired a small piece of soul. Endgames are settled by precisely these.",
+      "You have gained a pawn. The conversion protocol, per the literature: trade pieces, retain pawns, advance the king at the proper hour. Rubinstein executed it like liturgy.",
+      "A pawn to the good. Modest, cumulative, decisive — the academic career of material advantages. Tenure is built on such increments.",
+      "One pawn captured. I direct you to the canonical warning: pawn-grabbing with the queen has its own subgenre of cautionary literature. THIS capture appears sound. Remain alert for the sequels."
+    ],
+    "material_lost_pawn": [
+      "A pawn has been conceded. The accounting question is immediate and non-negotiable: what was received? Activity and time are acceptable currencies. Nothing is not.",
+      "You are a pawn down. The literature on pawn-down defense is rich and surprisingly optimistic — activity compensates remarkably often. Passivity, the same texts agree, compensates never.",
+      "One pawn lost. Keep perspective: entire defensive masterpieces have been built from this exact deficit. They share a single feature — the defender priced every remaining asset at full activity.",
+      "A pawn deficit, duly recorded. Do not chase it emotionally; recover it structurally or play for the dynamics it purchased. The players who chase pawns emotionally fill the loss columns of every database."
+    ],
+    "material_won_piece": [
+      "A full {piece} is won. The technical phase begins, and I must cite the standard warning: more winning positions are lost to celebration than to brilliance. Simplify, consolidate, and postpone all satisfaction until the scoresheet is signed.",
+      "You have won a {piece}. Capablanca's conversion method remains the curriculum: reduce counterplay to zero, then advance at leisure. It bored his opponents into resignation and his critics into silence.",
+      "An entire {piece} acquired. The opponent now enters the most dangerous phase of THEIR game — the desperation phase, which has produced more swindles than every gambit combined. The literature begs you: stay awake.",
+      "A {piece} up. Excellent. Now demonstrate the least glamorous skill in chess: winning a won game. It has defeated more talents than any defense ever devised."
+    ],
+    "material_lost_piece": [
+      "A {piece} has been lost. The position is objectively difficult, and I will not insult you with optimism. I will instead cite the record: practical resistance converts a measurable fraction of these. The fraction belongs to those who set problems on every move.",
+      "You are down a {piece}. Two coherent strategies exist, per the defensive literature: genuine compensation or maximum obstruction. Select one and pursue it with academic rigor. Drifting between them is the third strategy and the worst-documented.",
+      "The {piece} is gone. History offers comfort of a specific kind: the swindle is a recognized art form with its own masters and its own anthology. Admission requires only stubbornness and alertness. Enroll.",
+      "A {piece} deficit. The opponent must still demonstrate technique, and technique under no pressure is easy — so SUPPLY pressure. Every move that asks a question delays the verdict and invites the error."
+    ],
+    "sacrifice": [
+      "A sacrifice! Genuine material, offered for dynamic compensation. Tal's collected games are the canonical text here, with the standard scholarly caveat: half his sacrifices were unsound and nearly all of them won. Calculate like the half that were sound.",
+      "Material is invested. The sacrifice, properly understood, is a loan against the position's future — and positions, unlike publishers, collect promptly. Spend the initiative immediately; it depreciates per tempo.",
+      "A sacrifice appears on the board. Spielmann wrote an entire treatise distinguishing sound sacrifices from hopeful ones; the distinction, he found, is calculation. It remains calculation. It will always be calculation.",
+      "You have sacrificed. The romantics of the 1850s did this every game, before defense was invented; you do not have their excuse, which means yours had better be sound. The next several moves constitute your peer review."
+    ],
+    "check": [
+      "Check. A forcing move — which narrows the opponent's replies and therefore deepens YOUR obligation to have read them all in advance. Forcing chess is a privilege with paperwork.",
+      "Check to the king. I recite, dutifully, the oldest proverb in the pedagogical literature about patzers and checks. You know it. The engine does not. Somehow it manages.",
+      "Check. Note the king's available squares as a set — defensive geometry is learned precisely here, in the counting. The masters count; the amateurs hope.",
+      "A check, with tempo. Tempo is the only currency that cannot be reacquired at any price, a point the literature makes once per chapter and players forget once per game.",
+      "Check. The attack proceeds by interrogation. Ensure each question costs the defender something — checks that improve the enemy king's position appear in the anthologies under 'instructive errors,' attributed."
+    ],
+    "checkmate": [
+      "Checkmate. The argument is concluded — by force, the only conclusion chess fully respects. Study the final position: count the attackers, note the cooperation. Every mate is a small seminar in coordination.",
+      "Mate on the board. From the Opera Game to this evening, the geometry never tires. Whatever side of it you occupied, the post-game review is now the most valuable hour available to you. Schedule it.",
+      "Checkmate. The king has no recourse, no appeal, no committee. There is something bracing about a discipline with genuine final answers — my colleagues in the humanities have no idea.",
+      "Checkmate concludes the proceedings. Per long tradition: trace the mating net backward to the move that made it inevitable. That move, not the mate itself, is the lesson. The mate is merely the bibliography."
+    ],
+    "stalemate": [
+      "Stalemate. Half a point, distributed by the rulebook's strangest and most venerable clause — defended by composers, cursed by converters, unchanged since the codification. When the opponent is reduced to nothing, COUNT the nothing. Every move.",
+      "A stalemate. The endgame literature treats this as the defender's masterpiece and the attacker's confession. Both readings are correct, which is what makes it literature.",
+      "Stalemate concludes the game. The lesson is ancient and undefeated: speed in winning positions is the most expensive luxury in chess. The studies on this fill volumes. You have just written a footnote.",
+      "Stalemate — the rules' final irony. Note for the permanent file: the cheapest insurance in chess is one second spent counting the defender's legal moves. The premium never rises. The payout never disappoints."
+    ],
+    "castle_short": [
+      "Castled short. The move performs two functions at the price of one — king security and rook deployment — an efficiency the literature has admired since castling stabilized in its modern form. Use the dividend.",
+      "Kingside castling, performed at the proper hour. Note the three pawns now constituting the royal residence: each advance of theirs henceforth is a structural amendment, requiring committee approval.",
+      "Short castle. Prophylaxis before ambition — the correct ordering, validated across the entire database of human play and ignored across most of it.",
+      "You castle short. The king assumes his archival role; the rook enters circulation. A model transaction. Capablanca rarely delayed it, and his results rarely required explanation."
+    ],
+    "castle_long": [
+      "Castled long — the scholar's term is 'a commitment.' Opposite-side castling, should it arise, converts the game into a race, and races, per the attacking literature, are won by pawns and lost by hesitation.",
+      "Queenside castling. Sharper, prouder, and statistically more eventful than its modest cousin. The king stands one file nearer the center — a detail that decides entire variations. Mind the detail.",
+      "The long castle. You have chosen the road of the attacking canon — the king's-side pawns are now ammunition rather than architecture. Spend them with a plan or not at all.",
+      "Castled long. I approve, with the standard annotation: such positions reward the player who attacks with pieces AND pawns in concert, and punish the one who sends the pawns ahead alone, like footnotes without a thesis."
+    ],
+    "promotion": [
+      "Promotion. The pawn completes its eight-rank dissertation and is awarded the highest degree available. Philidor's soul of chess, vindicated again — the committee's decision was unanimous.",
+      "A new queen. Note the structure of the achievement: one square per move, no shortcuts available, none taken. The literature on patience has acquired another exhibit.",
+      "The pawn promotes. From the least to the greatest by pure persistence — the only transformation in chess the romantics and the technicians celebrate with equal enthusiasm. A genuinely unifying event. Enjoy it; they are rare in this field.",
+      "Promotion achieved. Every promoted pawn is a small refutation of everyone who evaluates material statically. Print the position. Frame the argument."
+    ],
+    "en_passant": [
+      "En passant — codified in the fifteenth century alongside the pawn's double step, precisely so the new speed could not be used to evade contact. The rule is older than most nations and better drafted than all of them.",
+      "An en passant capture. The most litigated rule in casual play and the most elegant in the codex: a closing parenthesis on the pawn's two-square privilege. You have just deployed legal history.",
+      "En passant. I cherish this rule professionally — it is a footnote that became binding law, the dream of every academic. Played correctly, as here, it never fails to educate the table."
+    ],
+    "leaving_theory": [
+      "And here the book closes — the precise move where the literature falls silent and the thinking is obliged to begin. Everything until now was bibliography. This is the dissertation.",
+      "We have left theory. From this move forward, neither player can cite authority; the argument must be original. I confess this is the moment I attend games FOR.",
+      "Theory ends. A reminder of what that means, methodologically: your memory is now worthless and your understanding is now everything. Players discover at this exact moment which one they actually trained.",
+      "The final book move has been played. The masters who built this line have escorted you to the door; they go no further. Thank them by playing the next move slowly."
+    ],
+    "enter_middlegame": [
+      "The middlegame begins — the phase Tarrasch called the stage where plans, not moves, are the unit of meaning. Formulate yours in one sentence. If it requires two, it is two plans, which is zero plans.",
+      "We enter the middlegame. The pawn structure is now your primary source — read the plans it permits and, more importantly, the ones it forbids. Most middlegame errors are arguments with one's own structure.",
+      "Middlegame, formally. The literature divides players here into those who ask 'what do I want' and those who ask 'what looks active.' The first group writes the anthologies. The second group appears in them.",
+      "The opening dossier is closed; the middlegame brief is open. Coordinate the pieces toward a single stated purpose — committees of pieces, like committees of colleagues, achieve nothing severally."
+    ],
+    "enter_endgame": [
+      "The endgame is reached — the phase where, per Capablanca's famous prescription, study should have BEGUN. If yours did not, the next several moves will conduct the examination regardless.",
+      "We enter the endgame. New constitution: the king is promoted from liability to instrument. Centralize him with the confidence of a man who has read Rubinstein. Or, failing that, with the obedience of one.",
+      "Endgame, formally declared. Margins shrink, tempi appreciate, and 'almost' becomes a losing evaluation. This is the phase that separates the educated from the enthusiastic. You have been educated. Demonstrate it.",
+      "The endgame arrives. The literature here is the deepest and most neglected in chess — fortunes await the player who simply read it. Fortunes, half-points at a time."
+    ],
+    "queens_off": [
+      "The queens leave the board. The position's temperature drops and its honesty rises — queenless positions tell the truth about structures that queens kept successfully concealed.",
+      "Queens exchanged. The romantics mourned this moment; the technicians, Capablanca foremost, regarded it as the START of the proper game. You may select your school, but note which school won the championships.",
+      "Queens off. Attack-by-mate leaves the syllabus; accumulation-of-advantages enters. A quieter discipline, a more rigorous grading curve.",
+      "The queens depart. Observe your king's posture change in real time — his chief predator has left the jurisdiction. Employ him. Idle kings in queenless positions are the most common unexploited asset in amateur chess, per every survey ever conducted."
+    ],
+    "turning_point": [
+      "Mark this move: the game has pivoted. Every annotated masterpiece has precisely such a moment, flagged in the commentary with a diagram and a long paragraph. Yours has just occurred. The paragraph is your homework.",
+      "A turning point, formally registered. When you reconstruct this game — and you shall — begin the analysis HERE and read outward in both directions. This is the standard method and the only honest one.",
+      "The position has changed allegiance. Historic games hinge on two or three such moments; the players who noticed them DURING the game are the ones whose names attach to the anthologies.",
+      "A hinge moment. The previous narrative is concluded; a new one is drafting itself with every tempo. The player still annotating the old narrative is, per the literature, already losing the new one."
+    ],
+    "streak_good": [
+      "{n} accurate moves in succession. The literature calls this 'form'; the practitioners call it rhythm; I call it the visible portion of invisible discipline. All three of us request its continuation.",
+      "A sequence of {n} strong moves. Consistency of this kind built Capablanca's aura far more than brilliance did — his opponents despaired of the ERROR that never arrived. Become that kind of problem.",
+      "{n} consecutive quality decisions. Statistically notable; pedagogically precious. Note what your routine looks like RIGHT NOW — posture, pace, checking habits — and transcribe it. This is your personal best-practices document.",
+      "{n} in a row. I caution, as the data demands: streaks end most often on the move after the player NOTICES the streak. You have now noticed. Proceed as though you had not.",
+      "{n} accurate moves running. The seminar term for this is 'sustained argument.' Most players write fragments. You are, at present, writing prose. Continue the chapter."
+    ],
+    "streak_bad": [
+      "{n} substandard moves in succession. Clinical reading: this is tilt, a documented phenomenon with a documented remedy — full stop, posture, fresh evaluation from material upward. Administer the remedy before the next move, not after the next error.",
+      "A sequence of {n} errors. The literature is unambiguous: errors cluster because the player keeps consulting an outdated evaluation, like a scholar citing a retracted paper. Retract yours. Re-derive the position from nothing.",
+      "{n} inaccuracies in a row. You are currently playing the previous mistakes rather than the present position — a tense confusion the grammar of chess does not permit. Return to the present indicative.",
+      "{n} consecutive slips. Per protocol: choose the safest sound move available, twice, and allow the position to stabilize. Heroics during a slump appear in the anthologies under a chapter title I shall not repeat.",
+      "{n} errors running. Even Zurich 1953 had its rounds of collective madness — the bulletin from round fifteen reads like a fever dream. Form returns. It returns fastest to those who slow down first."
+    ],
+    "hanging_piece": [
+      "Your {piece} stands undefended. I cite the oldest theorem in the tactical literature — loose pieces drop off — proven by induction across every database in existence. Provide a defender or relocate the asset. The theorem does not negotiate.",
+      "An unprotected {piece} on the board. Every combination in the canon begins with exactly this fingerprint: an undefended unit and a geometry connecting it to something else. You are currently one half of someone's future anthology example. Withdraw from the manuscript.",
+      "The {piece} is en prise, or close enough for the distinction to be academic — and I use that word as a warning, not a comfort. Attend to it this move.",
+      "Your {piece} lacks protection. Nunn's famous dictum — LPDO — is the only piece of modern theory rude enough to be remembered by everyone. Apparently not everyone. Defend it.",
+      "An undefended {piece}, in open view. Tactical alertness, per the training literature, is ninety percent the bookkeeping of defenders. Do the books. The auditors are seated across from you."
+    ],
+    "comeback": [
+      "A comeback, fully executed. You have just performed the most under-theorized maneuver in chess: refusing the result while it was still negotiable. The swindle literature welcomes a new contributor.",
+      "Recovered from a lost position — the canon's favorite plot, from Lasker's defensive miracles onward. Note the mechanism for your files: continuous problems, posed without pause, until the conversion failed. It is always the mechanism.",
+      "The comeback is complete. Lasker — who understood chess as combat between fallible humans rather than between positions — would have approved profoundly. The position was lost. The GAME, as you correctly intuited, was not.",
+      "An authentic resurrection. For the record and the post-game file: your opponent's technique did not fail spontaneously. It failed under sustained interrogation. Remember the difference; it is the entire theory of practical defense."
+    ],
+    "endgame_opposite_bishops": [
+      "Opposite-colored bishops. The drawing tendency is real and the folklore exaggerates it — with major pieces aboard, the SAME bishops become an attacking differential, since defense and offense occupy different colors entirely. Diagnose which regime you are in before adopting a policy.",
+      "An opposite-bishop ending. The defender's program is canonical: fix the blockade on the bishop's color and decline all invitations. The attacker's program is equally canonical: create a second front. One of these programs is yours. Execute it, not the other.",
+      "Bishops on opposite complexions — chess's most elegant standoff. Each prelate rules half the board absolutely and the other half not at all. Material counts for less here than dominion. The literature on fortresses begins in precisely these positions."
+    ],
+    "endgame_rook": [
+      "A rook endgame. Tarrasch's dictum applies — rooks belong BEHIND passed pawns, one's own and the opponent's — and remains the single highest-yield sentence in the entire endgame literature. Apply it before admiring it.",
+      "Rook ending, formally entered. The folklore says all rook endings are drawn; the folklore was coined by players excusing the draws they permitted. The technical truth: they are drawn by ACTIVITY and lost by its absence.",
+      "We have a rook endgame. The hierarchy of values, per the canonical texts: king activity, rook activity, then — a distant third — material. Players who count material first in these positions donate half-points to better-read opponents.",
+      "A rook endgame. The deepest practical literature in chess lives here — Lucena, Philidor, Vancura, names that are POSITIONS now, which is the highest honor the field bestows. You need the first two tonight. The third by spring."
+    ]
+  },
+  "summary": {
+    "clean_win": [
+      "A clean win — controlled from premise to conclusion. In the seminar's grading idiom: a coherent thesis, defended throughout, no objections sustained. Now perform the scholar's final duty and review it anyway; even clean manuscripts conceal a weak paragraph.",
+      "Victory, wire to wire. Stylistically Capablancan: no crisis, no brilliance required, merely the relentless playing of good moves until the opponent's position confessed. The literature reserves a particular respect for wins that look boring. This looked boring. Magnificent.",
+      "A wire-to-wire win. You never permitted counterplay, which is the technical definition of mastery and the practical definition of mercy. The post-game file should note which prophylactic moves did the silent work — they are the ones the anthologies skip and the professionals study.",
+      "A clean, complete victory. Permit the seminar's highest annotation, used sparingly across my career: publishable. Review it tonight regardless. Referees exist for a reason."
+    ],
+    "slipped_win": [
+      "A winning position, relinquished. The diagnosis is almost always the same and the literature is brutal about it: at some precise move, you stopped asking what the opponent intended. Find that move tonight. It is the most valuable citation this game produced.",
+      "You stood winning and the point escaped. Cold comfort, offered scholastically: the conversion of won positions is a SEPARATE skill from the achievement of them, with its own literature and its own training program. You possess the first skill demonstrably. Enroll in the second tonight.",
+      "From winning to the loss column — the most studied collapse pattern in chess psychology. The findings are consistent: the relaxation precedes the error by several moves. Locate the relaxation, not just the error. The error was merely the invoice arriving.",
+      "A win, slipped. Every master's collected games contain this exact chapter; the difference between masters and the rest is that the chapter does not recur. Conduct the autopsy while the evidence is fresh. The patient, I remind you, is the HABIT, not the game."
+    ],
+    "hard_fought_draw": [
+      "A draw, earnestly contested — the half-point with full scholarly apparatus. The literature respects these results more than the public does: both players were examined and neither was refuted. Review the two critical moments anyway. There are always exactly two.",
+      "A fighting draw. Tartakower classified draws into the cowardly and the heroic; this was unambiguously the latter. File it with your better games — defensive precision under pressure belongs in the permanent collection.",
+      "Half a point apiece, fully earned on both sides. These games, I assure you from long annotation experience, teach more per move than routine victories — equilibrium maintained under fire is the rarest text in the database.",
+      "A draw with genuine content. The bare result will mislead future readers of your tournament table; the moves will not. You played some of your best chess today and the scoreboard, an instrument of limited literacy, recorded only '½.' The seminar records more."
+    ],
+    "loss": [
+      "A loss. The proper scholarly response was codified long ago: locate the FIRST substantive error, not the final catastrophe — the catastrophe is merely where the earlier error finished publishing its results. The first error is always earlier than the memory insists. Always.",
+      "Defeat, duly recorded. I offer the field's most reliable finding: annotated losses correlate with improvement more strongly than any other single activity in chess pedagogy. An unannotated loss, by contrast, is pure expenditure. You have already paid. Collect the goods.",
+      "A loss. Steinitz lost matches and founded the entire theoretical edifice from the rubble; Lasker lost games and revised his philosophy each time. The canon, you will notice, is written largely by people processing defeats. You have material now. Write.",
+      "The game is lost; the dataset is enriched. Tonight, three questions, in order: where did the evaluation first turn, what was I thinking at that move, and what procedure prevents the thought. That sequence — not talent — is the documented engine of every rating climb on record."
+    ]
+  },
+  "practice": {
+    "loading_first": [
+      "We convene the review session. Your first error is being retrieved from the archive — the examination of one's own games being, per every authority from Botvinnik onward, the highest-yield exercise in the discipline.",
+      "Retrieving the first position for revision. Botvinnik made self-annotation the entrance requirement of the entire Soviet school; we shall observe the tradition at a friendlier volume.",
+      "The seminar room is open and your first mistake is on the projector. Do not flinch — in this room, errors are specimens, not verdicts.",
+      "Loading the first exercise. You are about to perform the rarest act in amateur chess: returning to the scene of an error voluntarily. The literature predicts good things for people who do this. The literature is rarely wrong about this particular thing."
+    ],
+    "prompt_find_better": [
+      "Here you played {move}, assessed as {label}. The stronger continuation exists and is findable — I have seen undergraduates find it, which I intend as encouragement and they did not. Take your time; the position is patient and so, professionally, am I.",
+      "The record shows {move} ({label}). The position now repeats its question under examination conditions. Forcing moves first — checks, captures, threats — per the methodology we have discussed at, I am told, excessive length.",
+      "At this juncture: {move}, graded {label}. Consider the do-over a peer-review revision — the referee has flagged the passage, the author returns to the manuscript. Authors who revise honestly get published. Find the better move.",
+      "{move} was played here and earned {label}. I shall say only this: the superior move violates no principle you do not already know. It merely requires believing the position. Believe it and look again.",
+      "Here stands the {move} position ({label}). Same evidence, fresh hypothesis. The first move you consider is a candidate, never a conclusion — the seminar's oldest rule, and the one most often paid for."
+    ],
+    "correct_continue": [
+      "Correct. Note the method that found it — calm enumeration, not inspiration. Inspiration is merely enumeration that happened quickly. Next position.",
+      "Precisely so. The pattern now migrates from the page to the hand, which is the only transfer that matters in this discipline. Proceed to the next exhibit.",
+      "Correct. The committee accepts without revisions — a rarer outcome than my students believe. Next specimen.",
+      "That is the move. Observe, for the record: the game-you missed it and the seminar-you found it, and the only variable that changed was patience. An economical finding. Next."
+    ],
+    "correct_final": [
+      "Correct — and that concludes the docket. Every error from the game has been revisited and overturned on appeal. This is, without irony, the complete method: Botvinnik with better lighting. The session is commended.",
+      "The final position is solved. You have annotated your own game by force of repetition — the entire Soviet school curriculum, compressed and completed. The seminar adjourns with its highest grade in circulation.",
+      "Last exercise, resolved. The full set of errors has been processed into patterns — the only alchemy this field acknowledges. Your next opponent inherits the consequences.",
+      "Solved, and the syllabus is complete. Every mistake faced, every correction derived rather than memorized. I have supervised dissertations with less methodological integrity. The session is over; the improvement is not."
+    ],
+    "close_try_again": [
+      "Close. The thesis is sound; the argument's ordering fails the referee. In chess as in publication, sequence is substance. Reorder and resubmit.",
+      "Near, but not exact. You have located the correct paragraph and misquoted it. The missing detail is almost certainly a defender — recount the defenders. Auditing is nine-tenths of tactics.",
+      "Almost. The idea survives review; the execution contains one flagged line. Find the flag. It is smaller than you expect and decisive, as flagged lines are.",
+      "Not quite — though the direction is publishable. Do not restart from nothing; revise from the draft. Wholesale abandonment of sound ideas is the amateur reviewer's signature error.",
+      "Attempt {attempts}, and converging. The literature on deliberate practice is unanimous: the rep that follows a near miss is the one that writes to permanent memory. You are, in other words, exactly on schedule. Again."
+    ],
+    "after_hint": [
+      "The hint is granted — consider it a supervisor's marginal note, not a co-authorship. The concluding step remains yours, and it is the step the examination actually tests.",
+      "Assistance rendered. Every scholar works from secondary sources at some hour; the discipline lies in finishing the argument oneself. Finish it.",
+      "There is your pointer. Note WHAT it directed your attention toward — that category of clue is what the position was offering all along, uncited. Now complete the derivation.",
+      "A hint, as requested, and no demerit attaches — the literature finds hint-assisted solutions retain nearly as well as unassisted ones, provided the solver completes the final step alone. The proviso is now in effect."
+    ],
+    "streak_praise": [
+      "A sustained run of correct solutions. The patterns are consolidating — recognition is replacing derivation, which is the entire neurological point of the exercise. The seminar notes its approval in the minutes.",
+      "Another, immediately. You are currently demonstrating what the training literature calls fluency and what I call — with equal precision — having done the work. Continue.",
+      "Consecutive solutions at increasing speed. This is the visible signature of pattern acquisition, and it is, I confess, the moment this profession exists for. Do not stop on my account.",
+      "A streak, properly so called. At this cadence the exercises stop being questions and start being confirmations. That transition has a name in the literature: improvement. Witnessed, recorded, and — knowing the field — soon to be cited by me as my own doing."
+    ]
+  }
+}

@@ -1,0 +1,179 @@
+<h2 class="sr-only">Animated portrait of a gentle elderly naturalist in his 70s with soft wavy white hair and a full white beard, wearing a pale khaki safari shirt with binoculars on a neck strap, holding a professional telephoto wildlife camera at chest height. He can raise the camera to his eye, take a picture with a small flash, and lower it again. Controllable expressions, glances and gestures.</h2>
+<style>
+:root{ --font-sans: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.coach-wrap{padding:.5rem 0}
+.coach-svg{width:100%;max-width:300px;display:block;margin:0 auto;height:auto}
+.coach-ctrl{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:360px;margin:14px auto 0}
+.coach-ctrl button{font-family:var(--font-sans,sans-serif);font-size:13px;font-weight:400;padding:6px 10px;border-radius:var(--border-radius-md,8px);border:1px solid var(--color-border-secondary,#3a352f);background:var(--color-background-secondary,#2a2622);color:var(--color-text-primary,#ece6da);cursor:pointer}
+.coach-ctrl button:hover{border-color:var(--color-border-primary,#5a5248)}
+.coach-ctrl button.on{background:var(--color-text-primary,#ece6da);color:var(--color-background-primary,#1a1815);border-color:var(--color-text-primary,#ece6da)}
+.coach-ctrl .look{min-width:30px;padding:5px 0}
+.coach-sep{width:100%;height:0}
+#figure{animation:n_br 6.8s ease-in-out infinite}
+#head{transform-box:view-box;transform-origin:340px 372px;animation:n_tilt 10.4s ease-in-out infinite}
+@keyframes n_br{0%,100%{transform:translateY(0)}50%{transform:translateY(2.5px)}}
+@keyframes n_tilt{0%,100%{transform:rotate(0deg)}30%{transform:rotate(-.9deg)}66%{transform:rotate(.7deg)}}
+@media (prefers-reduced-motion:reduce){#figure,#head{animation:none}}
+</style>
+<div class="coach-wrap">
+<svg class="coach-svg" viewBox="0 0 680 760" role="img" xmlns="http://www.w3.org/2000/svg"><title>Naturalist portrait</title><desc>A distinguished elderly naturalist with wavy white hair and a full white beard, in a pale khaki safari shirt, binoculars hanging at his chest and a large telephoto camera held at chest height, ready to be raised for a photograph.</desc>
+<g id="figure">
+
+ <!-- ======== TORSO (shrug) ======== -->
+ <g id="torso">
+  <!-- neck -->
+  <path d="M314 352 L310 424 Q340 440 370 424 L366 352 Q340 374 314 352 Z" fill="#EFC4A0"/>
+  <path d="M314 358 Q340 374 366 358 Q358 390 340 392 Q322 390 314 358 Z" fill="#D29B70" opacity="0.45"/>
+  <!-- khaki safari shirt -->
+  <path d="M140 760 L146 552 Q154 478 228 452 Q274 436 306 448 L306 760 Z" fill="#DCD0B4"/>
+  <path d="M540 760 L534 552 Q526 478 452 452 Q406 436 374 448 L374 760 Z" fill="#DCD0B4"/>
+  <path d="M140 760 L146 552 Q152 502 188 476 Q172 552 178 760 Z" fill="#C5B894" opacity="0.75"/>
+  <path d="M540 760 L534 552 Q528 502 492 476 Q508 552 502 760 Z" fill="#C5B894" opacity="0.75"/>
+  <!-- center panel + placket -->
+  <path d="M306 458 Q340 444 374 458 L380 760 L300 760 Z" fill="#E5DAC0"/>
+  <path d="M334 470 L346 470 L345 760 L335 760 Z" fill="#D3C6A8"/>
+  <circle cx="340" cy="520" r="4" fill="#B9AC8C"/>
+  <circle cx="340" cy="580" r="4" fill="#B9AC8C"/>
+  <circle cx="340" cy="640" r="4" fill="#B9AC8C"/>
+  <!-- wide collar -->
+  <path d="M304 450 L344 466 L316 510 Q294 494 286 468 Q294 452 304 450 Z" fill="#E5DAC0"/>
+  <path d="M376 450 L336 466 L364 510 Q386 494 394 468 Q386 452 376 450 Z" fill="#E5DAC0"/>
+  <path d="M304 450 L344 466 L316 510 M376 450 L336 466 L364 510" stroke="#C5B894" stroke-width="2.5" fill="none"/>
+  <!-- epaulettes -->
+  <path d="M196 478 Q226 462 254 458 L258 472 Q230 476 202 492 Z" fill="#CDC09F"/>
+  <circle cx="250" cy="466" r="4" fill="#B9AC8C"/>
+  <path d="M484 478 Q454 462 426 458 L422 472 Q450 476 478 492 Z" fill="#CDC09F"/>
+  <circle cx="430" cy="466" r="4" fill="#B9AC8C"/>
+  <!-- chest pockets with flaps -->
+  <path d="M206 568 L268 564 L270 632 L210 636 Z" fill="#D3C6A8"/>
+  <path d="M204 566 L270 562 L269 584 L205 588 Z" fill="#CDC09F"/>
+  <circle cx="237" cy="580" r="3.5" fill="#B9AC8C"/>
+  <path d="M412 564 L474 568 L470 636 L410 632 Z" fill="#D3C6A8"/>
+  <path d="M410 562 L476 566 L475 588 L411 584 Z" fill="#CDC09F"/>
+  <circle cx="443" cy="580" r="3.5" fill="#B9AC8C"/>
+  <!-- slack camera strap (camera covers the ends at rest) -->
+  <path d="M306 456 Q284 540 290 622 M374 456 Q396 540 388 618" stroke="#3A3A3C" stroke-width="9" fill="none"/>
+  <!-- binocular strap + binoculars -->
+  <path d="M318 460 Q380 540 444 600 M362 458 Q414 520 456 596" stroke="#2E2E30" stroke-width="5" fill="none"/>
+  <g id="binos">
+   <rect x="430" y="598" width="26" height="58" rx="11" fill="#2E2E30"/>
+   <rect x="462" y="598" width="26" height="58" rx="11" fill="#222224"/>
+   <rect x="448" y="614" width="22" height="14" rx="5" fill="#3A3A3C"/>
+   <ellipse cx="443" cy="600" rx="12" ry="5" fill="#4A4A4E"/>
+   <ellipse cx="475" cy="600" rx="12" ry="5" fill="#3A3A3C"/>
+   <path d="M434 640 Q436 650 443 652 M466 640 Q468 650 475 652" stroke="#4A4A4E" stroke-width="2" fill="none" opacity="0.8"/>
+  </g>
+ </g>
+
+ <!-- ======== CAMERA (raises to the eye for a photo) ======== -->
+ <g id="camgroup">
+  <!-- forearms in khaki sleeves -->
+  <path d="M128 760 Q142 692 196 668" stroke="#DCD0B4" stroke-width="54" fill="none" stroke-linecap="round"/>
+  <path d="M548 760 Q536 700 478 676" stroke="#DCD0B4" stroke-width="54" fill="none" stroke-linecap="round"/>
+  <!-- big telephoto lens (cream barrel) -->
+  <g id="lens">
+   <rect x="148" y="618" width="110" height="60" rx="14" fill="#D9D2C2"/>
+   <rect x="160" y="618" width="12" height="60" fill="#C2BAA8"/>
+   <rect x="196" y="618" width="16" height="60" fill="#C2BAA8"/>
+   <rect x="230" y="616" width="14" height="64" fill="#3A3A3C"/>
+   <rect x="140" y="612" width="14" height="72" rx="6" fill="#2E2E30"/>
+   <ellipse cx="143" cy="648" rx="7" ry="30" fill="#1C1C1E"/>
+   <ellipse cx="142" cy="648" rx="5" ry="22" fill="#3E4A38"/>
+   <ellipse cx="140.5" cy="640" rx="2" ry="7" fill="#5E6E54" opacity="0.8"/>
+  </g>
+  <!-- camera body -->
+  <g id="cambody">
+   <rect x="244" y="596" width="150" height="92" rx="14" fill="#2E2E30"/>
+   <path d="M296 596 L304 580 Q306 576 312 576 L352 576 Q358 576 360 580 L368 596 Z" fill="#252527"/>
+   <rect x="370" y="588" width="20" height="10" rx="4" fill="#3A3A3C"/>
+   <circle cx="380" cy="592" r="4" fill="#4A4A4E"/>
+   <rect x="252" y="604" width="20" height="12" rx="4" fill="#3A3A3C"/>
+   <circle cx="332" cy="640" r="26" fill="#222224"/>
+   <circle cx="332" cy="640" r="18" fill="#3A3A3C"/>
+   <path d="M376 600 L390 600 L390 686 Q382 690 376 686 Z" fill="#222224"/>
+   <path d="M250 668 L292 668" stroke="#3A3A3C" stroke-width="3" fill="none" opacity="0.8"/>
+  </g>
+  <!-- flash burst (hidden until the snap) -->
+  <g id="flash" opacity="0">
+   <circle cx="128" cy="648" r="15" fill="#FFF8E0"/>
+   <path d="M128 622 L128 606 M128 674 L128 690 M104 648 L88 648 M110 628 L99 617 M110 668 L99 679" stroke="#FFF3C4" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <!-- hands: left cups the lens, right grips the body -->
+  <path d="M180 668 Q172 652 188 644 Q206 636 222 644 Q232 652 228 666 Q224 682 206 686 Q188 688 180 668 Z" fill="#EFC4A0"/>
+  <path d="M194 648 L192 680 M208 646 L206 680" stroke="#D29B70" stroke-width="2.4" fill="none" opacity="0.55"/>
+  <path d="M462 676 Q454 656 470 648 Q488 640 502 650 Q512 660 506 674 Q500 690 482 690 Q466 690 462 676 Z" fill="#EFC4A0"/>
+  <path d="M476 652 L474 686 M490 652 L489 684" stroke="#D29B70" stroke-width="2.4" fill="none" opacity="0.55"/>
+  <path d="M462 668 L430 660 M464 678 L432 674" stroke="#EFC4A0" stroke-width="11" fill="none" stroke-linecap="round"/>
+ </g>
+
+ <!-- ======== HEAD ======== -->
+ <g id="headrig"><g id="head">
+  <!-- ears -->
+  <ellipse cx="258" cy="282" rx="13" ry="21" fill="#EFC4A0"/>
+  <ellipse cx="422" cy="282" rx="13" ry="21" fill="#EFC4A0"/>
+  <!-- soft wavy white hair -->
+  <path d="M254 312 Q232 262 240 198 Q248 142 296 118 Q340 100 384 118 Q432 142 440 198 Q448 262 426 312 Q416 322 408 312 Q420 250 408 204 Q396 226 380 212 Q386 184 366 170 Q344 188 322 172 Q300 186 296 210 Q282 198 284 178 Q268 198 272 242 Q264 226 260 206 Q252 252 264 308 Q260 320 254 312 Z" fill="#E8E5DE"/>
+  <path d="M266 224 Q270 158 318 144 Q340 138 362 144 Q410 158 414 224 Q382 198 340 198 Q298 198 266 224 Z" fill="#E8E5DE"/>
+  <path d="M268 170 Q288 138 326 128 M352 126 Q396 134 416 168 M246 230 Q242 266 250 300 M434 230 Q438 266 430 300" stroke="#CFCBC2" stroke-width="4.5" fill="none" opacity="0.9" stroke-linecap="round"/>
+  <path d="M300 142 Q322 128 350 130" stroke="#F6F4EF" stroke-width="4" fill="none" opacity="0.9" stroke-linecap="round"/>
+  <!-- face: kind, weathered -->
+  <path d="M270 218 Q260 286 282 330 Q298 364 324 374 Q340 378 356 374 Q382 364 398 330 Q420 286 410 218 Q404 184 384 176 L296 176 Q276 184 270 218 Z" fill="#EFC4A0"/>
+  <path d="M282 330 Q268 282 272 224 Q280 202 296 196 Q286 230 288 286 Q292 322 310 350 Q294 346 282 330 Z" fill="#D29B70" opacity="0.32"/>
+  <!-- weathered lines -->
+  <path d="M302 200 Q340 192 378 200 M306 216 Q340 209 374 216" stroke="#D29B70" stroke-width="2" fill="none" opacity="0.45"/>
+  <path d="M288 264 L279 260 M288 272 L279 275 M392 264 L401 260 M392 272 L401 275" stroke="#D29B70" stroke-width="1.8" fill="none" opacity="0.5" stroke-linecap="round"/>
+  <path d="M293 284 Q306 290 319 284 M361 284 Q374 290 387 284" stroke="#D29B70" stroke-width="2" fill="none" opacity="0.45"/>
+  <!-- thick white eyebrows (slightly raised in wonder) -->
+  <g id="browL"><path d="M282 246 Q306 236 330 244" stroke="#EDEAE2" stroke-width="10" fill="none" stroke-linecap="round"/></g>
+  <g id="browR"><path d="M350 244 Q374 236 398 246" stroke="#EDEAE2" stroke-width="10" fill="none" stroke-linecap="round"/></g>
+  <!-- soft attentive eyes -->
+  <ellipse cx="306" cy="268" rx="14" ry="9.5" fill="#FBF7EE"/>
+  <ellipse cx="374" cy="268" rx="14" ry="9.5" fill="#FBF7EE"/>
+  <g id="eyeL"><circle cx="306" cy="268" r="6.5" fill="#5A3A22"/><circle cx="306" cy="268" r="3" fill="#1C0E04"/><circle cx="308.5" cy="265.5" r="1.5" fill="#fff"/></g>
+  <g id="eyeR"><circle cx="374" cy="268" r="6.5" fill="#5A3A22"/><circle cx="374" cy="268" r="3" fill="#1C0E04"/><circle cx="376.5" cy="265.5" r="1.5" fill="#fff"/></g>
+  <ellipse id="lidL" cx="306" cy="268" rx="14.5" ry="10" fill="#EFC4A0"/>
+  <ellipse id="lidR" cx="374" cy="268" rx="14.5" ry="10" fill="#EFC4A0"/>
+  <!-- nose -->
+  <path d="M344 252 Q352 284 357 296 Q360 305 351 308" stroke="#D29B70" stroke-width="3" fill="none" opacity="0.5" stroke-linecap="round"/>
+  <ellipse cx="330" cy="301" rx="4" ry="2.5" fill="#C08552"/>
+  <ellipse cx="350" cy="301" rx="4" ry="2.5" fill="#C08552"/>
+  <!-- full white beard (solid mass; mouth drawn on top) -->
+  <path d="M276 280 Q272 298 276 318 Q280 356 302 378 Q320 396 340 398 Q360 396 378 378 Q400 356 404 318 Q408 298 404 280 Q394 304 370 309 Q355 311 340 311 Q325 311 310 309 Q286 304 276 280 Z" fill="#EDEAE2"/>
+  <path d="M302 308 Q340 296 378 308 Q368 320 340 320 Q312 320 302 308 Z" fill="#E0DCD2"/>
+  <path d="M330 352 Q340 348 350 352 Q347 366 340 367 Q333 366 330 352 Z" fill="#D8D4C9" opacity="0.9"/>
+  <path d="M292 312 Q296 344 310 364 M388 312 Q384 344 370 364 M320 380 L324 390 M360 380 L356 390" stroke="#CFCBC2" stroke-width="2" fill="none" opacity="0.8"/>
+  <!-- mouth (engine-driven) -->
+  <path id="mouth" d="M318 328 Q340 326 362 328 Q340 334 318 328 Z" fill="#B06A58"/>
+ </g></g>
+
+</g>
+</svg>
+<div class="coach-ctrl">
+<button data-emo="neutral" class="on">Neutral</button>
+<button data-emo="happy">Happy</button>
+<button data-emo="sad">Sad</button>
+<button data-emo="angry">Angry</button>
+<button data-emo="surprised">Surprised</button>
+<button data-emo="skeptical">Skeptical</button>
+<span class="coach-sep"></span>
+<button id="n-talk">Talk</button>
+<button id="n-roll">Eye-roll</button>
+<button id="n-nod">Nod</button>
+<button id="n-shake">Shake</button>
+<button id="n-shrug">Shrug</button>
+<button id="n-photo">Take photo</button>
+<button id="n-cycle">Auto-cycle: off</button>
+<span class="coach-sep"></span>
+<button class="look" data-look="upleft">&#8598;</button>
+<button class="look" data-look="up">&#8593;</button>
+<button class="look" data-look="upright">&#8599;</button>
+<button class="look" data-look="left">&#8592;</button>
+<button class="look" data-look="center">&#8226;</button>
+<button class="look" data-look="right">&#8594;</button>
+<button class="look" data-look="downleft">&#8601;</button>
+<button class="look" data-look="down">&#8595;</button>
+<button class="look" data-look="downright">&#8600;</button>
+</div>
+</div>
+<script src="animated_naturalist_rig.js"></script>

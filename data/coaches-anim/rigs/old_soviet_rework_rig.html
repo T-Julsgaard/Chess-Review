@@ -1,0 +1,133 @@
+<h2 class="sr-only">Animated portrait of a stern Soviet coach in a fur ushanka holding a steaming glass of tea, with controllable facial expressions and a raisable cup.</h2>
+<style>
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.coach-wrap{padding:.5rem 0}
+.coach-svg{width:100%;max-width:420px;display:block;margin:0 auto;height:auto}
+.coach-ctrl{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:440px;margin:14px auto 0}
+.coach-ctrl button{font-family:var(--font-sans,sans-serif);font-size:13px;font-weight:400;padding:6px 12px;border-radius:var(--border-radius-md,8px);border:1px solid var(--color-border-secondary,#3a352f);background:var(--color-background-secondary,#2a2622);color:var(--color-text-primary,#ece6da);cursor:pointer}
+.coach-ctrl button:hover{border-color:var(--color-border-primary,#5a5248)}
+.coach-ctrl button.on{background:var(--color-text-primary,#ece6da);color:var(--color-background-primary,#1a1815);border-color:var(--color-text-primary,#ece6da)}
+.coach-sep{width:100%;height:0}
+.coach-ctrl .look{min-width:30px;padding:5px 0}
+#figure{animation:c_br 5s ease-in-out infinite}
+#head{transform-box:view-box;transform-origin:340px 600px;animation:c_tilt 9s ease-in-out infinite}
+#cupgroup{transform-box:view-box;transform-origin:250px 792px;transition:transform .9s cubic-bezier(.5,0,.3,1)}
+#cupgroup.raised{transform:translateY(-152px) rotate(-4deg)}
+.stm{transform-box:fill-box;transform-origin:bottom;animation:c_steam 3.2s ease-in-out infinite}
+.stm.s2{animation-duration:3.8s;animation-delay:1.1s}
+.stm.s3{animation-duration:2.9s;animation-delay:.6s}
+@keyframes c_br{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+@keyframes c_tilt{0%,100%{transform:rotate(0deg)}30%{transform:rotate(-.8deg)}66%{transform:rotate(.7deg)}}
+@keyframes c_steam{0%{opacity:0;transform:translateY(6px) scaleY(.8)}25%{opacity:.5}100%{opacity:0;transform:translateY(-34px) scaleY(1.25)}}
+@media (prefers-reduced-motion:reduce){#figure,#head,.stm{animation:none}}
+</style>
+<div class="coach-wrap">
+<svg class="coach-svg" viewBox="0 0 680 760" role="img" xmlns="http://www.w3.org/2000/svg"><title>Soviet coach portrait</title><desc>A gruff late-60s man with a black fur ushanka, bushy grey eyebrows and moustache, dark wool cardigan, holding a steaming glass of tea in a metal podstakannik. His expression can change and the cup can be raised.</desc>
+<g id="figure">
+<g id="torso">
+<path d="M108 760 L108 712 Q118 666 176 646 Q236 624 300 656 Q340 674 380 656 Q444 624 504 646 Q562 666 572 712 L572 760 Z" fill="#17171A"/>
+<path d="M300 690 Q340 706 380 690 L374 760 L306 760 Z" fill="#565A36"/>
+<rect x="332" y="700" width="16" height="60" fill="#44472A"/>
+<path d="M302 658 Q252 668 234 714 Q227 740 233 760 L288 760 Q294 720 310 694 Q320 674 302 658 Z" fill="#26262A"/>
+<path d="M378 658 Q428 668 446 714 Q453 740 447 760 L392 760 Q386 720 370 694 Q360 674 378 658 Z" fill="#26262A"/>
+<path d="M252 700 L250 758 M268 698 L267 758 M412 698 L413 758 M428 700 L430 758" stroke="#17171A" stroke-width="2" fill="none"/>
+</g><g id="headrig"><g id="head">
+<ellipse cx="255" cy="98" rx="46" ry="62" fill="#463B30"/>
+<ellipse cx="255" cy="92" rx="30" ry="44" fill="#564838"/>
+<ellipse cx="425" cy="98" rx="46" ry="62" fill="#463B30"/>
+<ellipse cx="425" cy="92" rx="30" ry="44" fill="#564838"/>
+<path d="M212 332 C198 150 268 62 340 62 C412 62 482 150 468 332 Q404 308 340 308 Q276 308 212 332 Z" fill="#211C18"/>
+<path d="M250 108 Q300 76 352 90 Q302 96 270 132 Q256 120 250 108 Z" fill="#322A22"/>
+<path d="M212 332 Q276 306 340 306 Q404 306 468 332 Q470 350 450 360 Q400 334 340 334 Q280 334 230 360 Q210 350 212 332 Z" fill="#5A4C3E"/>
+<path d="M236 348 l4 12 M264 340 l3 12 M300 334 l2 12 M340 332 l0 13 M380 334 l-2 12 M416 340 l-3 12 M444 348 l-4 12" stroke="#463B30" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M214 342 Q198 384 208 436 Q216 414 228 396 Q221 368 234 350 Q224 346 214 342 Z" fill="#9E9E9E"/>
+<path d="M466 342 Q482 384 472 436 Q464 414 452 396 Q459 368 446 350 Q456 346 466 342 Z" fill="#9E9E9E"/>
+<path d="M220 360 Q214 396 222 424 M452 396 Q466 396 460 360" stroke="#bcbcbc" stroke-width="2" fill="none"/>
+<path d="M205 432 Q205 322 272 300 Q304 290 340 290 Q376 290 408 300 Q475 322 475 432 Q475 548 428 598 Q388 642 340 644 Q292 642 252 598 Q205 548 205 432 Z" fill="#E6B488"/>
+<path d="M475 432 Q475 548 428 598 Q400 628 366 638 Q420 596 446 520 Q470 452 460 372 Q474 398 475 432 Z" fill="#D49E6E" opacity="0.55"/>
+<path d="M250 350 Q300 342 352 350 M250 366 Q304 360 356 368" stroke="#D49E6E" stroke-width="2" fill="none" opacity="0.5"/>
+<path d="M326 384 Q330 398 328 410 M354 384 Q350 398 352 410" stroke="#D49E6E" stroke-width="2" fill="none" opacity="0.55"/>
+<path d="M340 398 Q335 442 330 472 Q319 490 332 500 Q340 504 348 500 Q361 490 350 472 Q345 442 340 398 Z" fill="#E6B488"/>
+<path d="M340 398 Q335 442 330 472 Q322 486 330 496 Q330 470 336 440 Q339 414 340 398 Z" fill="#D49E6E" opacity="0.5"/>
+<ellipse cx="326" cy="492" rx="6" ry="4" fill="#8a5d3c"/>
+<ellipse cx="354" cy="492" rx="6" ry="4" fill="#8a5d3c"/>
+<path d="M312 506 Q322 540 300 560 M368 506 Q358 540 380 560" stroke="#D49E6E" stroke-width="2.5" fill="none" opacity="0.45"/>
+<ellipse cx="300" cy="424" rx="18" ry="12" fill="#FBF7EE"/>
+<ellipse cx="380" cy="424" rx="18" ry="12" fill="#FBF7EE"/>
+<g id="eyeL"><circle cx="301" cy="425" r="8" fill="#4A3119"/><circle cx="301" cy="425" r="3.6" fill="#180C04"/><circle cx="303.5" cy="422" r="1.8" fill="#fff"/></g>
+<g id="eyeR"><circle cx="379" cy="425" r="8" fill="#4A3119"/><circle cx="379" cy="425" r="3.6" fill="#180C04"/><circle cx="381.5" cy="422" r="1.8" fill="#fff"/></g>
+<path d="M283 412 Q300 404 317 412 M363 412 Q380 404 397 412" stroke="#D49E6E" stroke-width="1.6" fill="none" opacity="0.5"/>
+<path d="M284 438 Q300 446 316 438 M364 438 Q380 446 396 438" stroke="#D49E6E" stroke-width="1.6" fill="none" opacity="0.5"/>
+<ellipse id="lidL" cx="300" cy="424" rx="19" ry="12" fill="#E6B488"/>
+<ellipse id="lidR" cx="380" cy="424" rx="19" ry="12" fill="#E6B488"/>
+<g id="browL">
+<path d="M256 404 Q286 382 340 392 Q344 402 338 410 Q288 398 262 416 Q254 412 256 404 Z" fill="#8C8C8C"/>
+<path d="M262 408 Q300 392 336 400" stroke="#6E6E6E" stroke-width="2" fill="none"/>
+<path d="M268 400 l6 -8 M286 394 l5 -8 M306 392 l4 -8 M326 393 l3 -7" stroke="#bcbcbc" stroke-width="1.6" stroke-linecap="round"/>
+</g>
+<g id="browR">
+<path d="M424 404 Q394 382 340 392 Q336 402 342 410 Q392 398 418 416 Q426 412 424 404 Z" fill="#8C8C8C"/>
+<path d="M418 408 Q380 392 344 400" stroke="#6E6E6E" stroke-width="2" fill="none"/>
+<path d="M412 400 l-6 -8 M394 394 l-5 -8 M374 392 l-4 -8 M354 393 l-3 -7" stroke="#bcbcbc" stroke-width="1.6" stroke-linecap="round"/>
+</g>
+<path id="mouth" d="M310 582 Q340 581 370 582 Q340 583 310 582 Z" fill="#6E3B30"/>
+<path d="M312 590 Q340 596 368 590" stroke="#C98B6E" stroke-width="2" fill="none" opacity="0.6"/>
+<path d="M340 506 Q362 496 392 498 Q420 502 416 540 Q414 568 392 568 Q372 564 356 540 Q346 524 340 520 Q334 524 324 540 Q308 564 288 568 Q266 568 264 540 Q260 502 288 498 Q318 496 340 506 Z" fill="#A0A0A0"/>
+<path d="M340 506 Q318 522 290 524 Q270 526 266 542 Q286 540 308 526 Q326 516 340 518 Q354 516 372 526 Q394 540 414 542 Q410 526 390 524 Q362 522 340 506 Z" fill="#828282"/>
+<path d="M300 510 l-8 44 M320 512 l-6 46 M360 512 l6 46 M380 510 l8 44" stroke="#bcbcbc" stroke-width="1.4" fill="none" opacity="0.6"/>
+</g>
+</g><g id="cupgroup">
+<path d="M232 800 Q236 726 286 706 L330 704 Q354 712 358 738 L354 800 Z" fill="#17171A"/>
+<path d="M300 712 Q278 716 278 734 Q278 752 300 754" stroke="#8E949B" stroke-width="10" fill="none" stroke-linecap="round"/>
+<path d="M300 714 Q282 718 282 734 Q282 750 300 752" stroke="#E2E6EA" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M306 666 L304 706 M392 666 L394 706" stroke="#E2E6EA" stroke-width="1.5" fill="none" opacity="0.6"/>
+<path d="M312 682 Q330 688 348 688 Q366 688 384 682 L388 770 Q386 778 348 778 Q310 778 312 770 Z" fill="#5C2E1A"/>
+<ellipse cx="348" cy="683" rx="38" ry="7" fill="#7A3E22"/>
+<ellipse cx="348" cy="666" rx="44" ry="8" fill="none" stroke="#E2E6EA" stroke-width="1.5" opacity="0.55"/>
+<path d="M312 670 L310 770" stroke="#fff" stroke-width="4" opacity="0.18" fill="none"/>
+<path d="M298 712 Q298 706 306 706 L390 706 Q398 706 398 712 L394 788 Q392 798 348 798 Q304 798 302 788 Z" fill="#C2C7CC"/>
+<path d="M360 706 L390 706 Q398 706 398 712 L394 788 Q392 798 360 798 Z" fill="#8E949B" opacity="0.55"/>
+<path d="M298 712 Q348 704 398 712" stroke="#E2E6EA" stroke-width="3" fill="none"/>
+<path d="M348 724 Q362 748 348 772 Q334 748 348 724 Z" fill="#6E747B" opacity="0.6"/>
+<path d="M326 740 Q312 748 314 762 M370 740 Q384 748 382 762" stroke="#6E747B" stroke-width="3" fill="none" opacity="0.6"/>
+<ellipse cx="348" cy="796" rx="52" ry="10" fill="#8E949B"/>
+<path d="M296 716 Q290 742 300 768 Q307 782 327 779 L350 773 Q346 740 341 718 Q322 710 296 716 Z" fill="#E6B488"/>
+<path d="M300 720 Q296 744 305 766 M318 718 Q316 744 322 768 M335 719 Q336 744 340 768" stroke="#D49E6E" stroke-width="2" fill="none" opacity="0.6"/>
+<path d="M300 710 Q316 701 332 710 Q324 719 308 718 Q300 716 300 710 Z" fill="#E6B488"/>
+<g>
+<path class="stm s1" d="M336 662 Q328 642 338 622 Q348 602 340 582 Q334 568 342 552" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round" opacity="0.5"/>
+<path class="stm s2" d="M356 662 Q366 644 356 624 Q348 606 358 588 Q364 574 357 560" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.45"/>
+<path class="stm s3" d="M348 660 Q342 644 350 628 Q358 612 350 596" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.4"/>
+</g>
+</g>
+</g>
+</svg>
+<div class="coach-ctrl">
+<button data-emo="neutral" class="on">Neutral</button>
+<button data-emo="happy">Happy</button>
+<button data-emo="sad">Sad</button>
+<button data-emo="angry">Angry</button>
+<button data-emo="surprised">Surprised</button>
+<button data-emo="skeptical">Skeptical</button>
+<span class="coach-sep"></span>
+<button id="c-talk">Talk</button>
+<button id="c-roll">Eye-roll</button>
+<button id="c-nod">Nod</button>
+<button id="c-shake">Shake</button>
+<button id="c-shrug">Shrug</button>
+<button id="c-whistle">Whistle</button>
+<button id="c-raise">Raise cup</button>
+<button id="c-cycle">Auto-cycle: off</button>
+<span class="coach-sep"></span>
+<button class="look" data-look="upleft">&#8598;</button>
+<button class="look" data-look="up">&#8593;</button>
+<button class="look" data-look="upright">&#8599;</button>
+<button class="look" data-look="left">&#8592;</button>
+<button class="look" data-look="center">&#8226;</button>
+<button class="look" data-look="right">&#8594;</button>
+<button class="look" data-look="downleft">&#8601;</button>
+<button class="look" data-look="down">&#8595;</button>
+<button class="look" data-look="downright">&#8600;</button>
+</div>
+</div>
+<script src="old_soviet_rework_rig.js"></script>

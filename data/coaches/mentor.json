@@ -1,0 +1,400 @@
+{
+  "coach_id": "mentor",
+  "coach_name": "The Mentor",
+  "personality": "Warm, constructive teacher who always explains the why. Honest about mistakes but never harsh — every move, good or bad, becomes a named lesson and a habit to build.",
+  "voice_notes": "Calm, second person, candid but kind. Recurring habits: the checks-captures-threats checklist, the three-second blunder-check, guiding questions, and 'write this one down / study it tonight' homework. Mistakes are tuition that has already been paid — so collect the lesson. No emojis, no slang, no name-dropping (that is the Professor's department), no life metaphors (that is the Life Coach's).",
+  "uses_emoji": false,
+  "move_quality": {
+    "brilliant": [
+      "{move} is brilliant. Pause here and study the position — moves like this come from seeing what the position truly demands.",
+      "A brilliant find. {move} works because of a detail most players never check. Make sure you can name that detail before moving on.",
+      "{move} — brilliant. Notice that it breaks a 'rule' and gets away with it. That is the lesson: principles guide you until calculation overrules them.",
+      "Brilliant. You did not just find {move}, you trusted it. Half of chess strength is having the courage to play what you have calculated.",
+      "{move} is the kind of move you should replay tomorrow morning. Ask yourself what made it possible — it did not appear out of nowhere.",
+      "Brilliant work. {move} only exists because of the quiet moves that prepared it. Good chess is patient like that.",
+      "That is a brilliancy. Look at every piece supporting {move} — coordination is what turns a nice idea into a winning one.",
+      "{move}! When you find a move like this, write down the pattern. You will meet it again in another game wearing a different disguise."
+    ],
+    "great": [
+      "{move} is a great move — very nearly the only one that holds everything together. Notice what it defends and threatens at the same time.",
+      "Great move. Positions sometimes have exactly one good answer, and you found it. That is calculation, not luck.",
+      "{move} — great find. The narrow paths are where games are decided, and you stayed on it.",
+      "A great move. Before you go on, ask yourself what would have happened on the natural-looking alternative. That answer is the lesson here.",
+      "{move} holds the position together like a keystone. Remove it and everything collapses. Well seen.",
+      "Great. You met the position's one real demand. Most players answer the question they wish was being asked instead.",
+      "{move} is great — the move the position required, not just a move that looked active. Learn to hear the difference."
+    ],
+    "best": [
+      "{move} is the best move. Simple, correct chess — the kind that wins more games than fireworks ever will.",
+      "That is the engine's first choice. More importantly, can you say why it is best? Knowing the reason is worth more than the move.",
+      "{move} — best move. You kept every advantage you had built. Holding what you have is a skill of its own.",
+      "Best move. Notice it probably was not flashy. Strong chess usually looks quiet from the outside.",
+      "{move} is exactly right. The position asked a question and you gave the precise answer.",
+      "Top choice. String enough of these together and the game wins itself — accuracy compounds like interest.",
+      "{move} is the best move here. Take one second to see what it improved — a square, a file, a defender. Every good move improves something."
+    ],
+    "excellent": [
+      "{move} is excellent. Not the absolute top line, but it keeps every important trump. That is practical chess.",
+      "Excellent move. You are making decisions the position approves of — keep asking what your worst-placed piece wants.",
+      "{move} — excellent. The difference between this and the engine's pick is academic. Your plan stays intact.",
+      "Excellent. Good habits showing: you improved a piece without weakening anything. That is how positions are built.",
+      "{move} is excellent work. Consistency at this level beats occasional brilliance — every coach will tell you the same.",
+      "Excellent choice. You could play a whole game on moves like this and never stand worse. Reliability is underrated.",
+      "{move} is excellent — a healthy, principled move. The evaluation barely moved, and that is a compliment."
+    ],
+    "good": [
+      "{move} is a good move. Solid. There was a touch more in the position, but nothing you gave away matters yet.",
+      "Good. Keep feeding the habit behind that move — asking what your opponent wants before deciding what you want.",
+      "{move} is good, sound chess. Compare it to {best_move} later if you are curious — small differences teach big lessons.",
+      "A good move. Not perfect, but every plan survives. Do not confuse 'not best' with 'bad' — that confusion costs players dearly.",
+      "{move} works. The position stays comfortable. Just check: did you consider your opponent's most annoying reply first?",
+      "Good move. You are steering the game, not just reacting to it. That is the posture I want from you.",
+      "{move} is good. A small refinement existed, but solid moves played with a clear head win games."
+    ],
+    "book": [
+      "{move} is still book. Theory is not memorization — every book move solves a problem. Ask yourself which problem this one solves.",
+      "Still in known theory. Good — but make sure you understand the idea behind {move}, because theory will end and the ideas must carry you.",
+      "{move} is established theory. Generations of players tested this. Notice what it fights for before you accept it on faith.",
+      "Book move. The opening is not a script — it is a conversation that thousands of games have already started for you.",
+      "{move} follows the main road. Watch the pawn structure forming: it will tell you the plans for the whole middlegame.",
+      "Theory so far. My advice: do not just know the next book move, know what you will do the moment your opponent leaves it.",
+      "{move} — still book. The masters chose this move for a reason. Find the reason and you will never need to memorize it again."
+    ],
+    "inaccuracy": [
+      "{move} is an inaccuracy. Not a wound, just a loose thread — but loose threads are what opponents pull on.",
+      "A small slip. {move} lets a bit of your advantage breathe out. Ask what the move did not do — that is usually the answer.",
+      "{move} is slightly off. No need to panic; need to notice. The difference between good and strong players is how early they notice.",
+      "An inaccuracy. You played a reasonable-looking move instead of the demanding one. The position rewards the player who asks more of it.",
+      "{move} drifts a little. Small concessions feel free in the moment — they get invoiced later in the game.",
+      "Slightly inaccurate. Here is the habit to build: before moving, find your opponent's best reply, not their most cooperative one.",
+      "{move} is not quite it. The eval barely moved, but the job of the position changed. Re-orient yourself before the next move."
+    ],
+    "mistake": [
+      "{move} is a mistake. Take a breath. The position has changed — your first task is to accept the new reality, not to mourn the old one.",
+      "That is a mistake. Here is what I want: figure out which of your opponent's resources you overlooked, and name it. That is how it sticks.",
+      "{move} hurts the position. Most mistakes come from playing too fast on a move that felt obvious. Did this one feel obvious?",
+      "A mistake — real, but recoverable. Games are rarely lost by one mistake; they are lost by the second one, played in frustration.",
+      "{move} gives your opponent a genuine chance. The lesson is almost always the same: checks, captures, and threats — theirs before yours.",
+      "That is a mistake, and I suspect you sensed something as you played it. Trust that little hesitation — it is your calculation knocking.",
+      "{move} concedes more than it gains. Write this position down — patterns you have personally suffered through are never forgotten."
+    ],
+    "miss": [
+      "{move} misses a real chance. The opportunity was on the board — the skill we are training is believing the position when it offers you something.",
+      "You had something stronger here. Do not brush past this one: missed chances teach more than mistakes, because the right answer was within reach.",
+      "{move} lets the moment pass. Strong moves often look risky for exactly one second longer than weak ones. Sit with that.",
+      "A miss. Ask yourself honestly: did you look for a tactic here, or did you assume there was none? Assumption is the quiet killer.",
+      "{move} walks past an open door. Tactical chances knock softly — check for them on every move, not just the exciting ones.",
+      "There was more in this position than {move}. When your pieces are this active, make 'is something winning here?' your first question, not your last.",
+      "That is a missed opportunity. No damage to your position — but train the reflex: every move, scan checks, captures, and threats first."
+    ],
+    "blunder": [
+      "{move} is a blunder. Stop. Breathe. Every player who ever got good has a museum of these — the difference is they went back and studied the exhibits.",
+      "That is a blunder, and I will not soften it — you would learn nothing from me if I did. Find what you missed: the lesson is already paid for, so collect it.",
+      "{move} drops the thread of the game. Here is the truth: blunders are rarely about vision. They are about rhythm — you moved before you checked.",
+      "A blunder. Before you feel bad, answer one question: what was your opponent's last move threatening? If you cannot answer, you have found the real mistake — it happened one move earlier.",
+      "{move} is a blunder. The board does not judge you and neither do I. But it does insist you see why — look at your opponent's best reply until it is obvious.",
+      "That one stings. {move} hands over the game's momentum. The habit that prevents this costs three seconds: before releasing the piece, ask what it allows.",
+      "{move} is a blunder — the kind that feels impossible the moment after you play it. That gap closes with one tool: the blunder-check. Every move. No exceptions.",
+      "A blunder, yes. But listen: I would rather coach a player who blunders trying real ideas than one who shuffles safely to a slow loss. Fix the checking habit and keep the courage."
+    ]
+  },
+  "weak_move_suffix": [
+    "{best_move} was the move — see if you can work out why before peeking at the line.",
+    "The position wanted {best_move}. Compare the two and the lesson will introduce itself.",
+    "{best_move} was stronger. Notice what it does that your move did not.",
+    "Better was {best_move}. Play it out in your head — what changes?",
+    "{best_move} kept more. File that pattern away for next time."
+  ],
+  "move_fallback": [
+    "{move}. Let us see what the position makes of it.",
+    "You played {move}. Every move is a small claim about the position — let us test this one.",
+    "{move} is on the board. Take stock: what improved, and what got left behind?",
+    "{move}. Before we judge it, ask what it was trying to achieve — intent first, verdict second."
+  ],
+  "non_move_states": {
+    "starting_position": [
+      "The starting position. Thirty-two pieces and no mistakes yet — every game is a clean notebook page. Let us fill this one thoughtfully.",
+      "Here we are at move one. Before anything else, recite the big three with me: develop, fight for the center, keep the king safe.",
+      "The board is set. Games are not won in the opening, but they are certainly lost there — so let us begin with good habits.",
+      "Starting position. I want one thing from you this game: a reason for every move. It does not have to be right. It has to be yours."
+    ],
+    "variation_exploration": [
+      "We have stepped off the game now — this is a sideline. The best lessons often live in the moves that were not played.",
+      "Exploring a variation. Good. Asking 'what if?' is exactly how you turn one game into ten lessons.",
+      "This is analysis, not the game — a sandbox. Try the move you were afraid of and find out what you were actually afraid of.",
+      "A side branch. Notice how differently the position breathes after just one change — that sensitivity is what we are training."
+    ],
+    "analyzing": [
+      "Give me a moment — I am looking deeply at this one. Some positions deserve patience.",
+      "Analyzing. While we wait, you look too: checks, captures, threats. Race the engine.",
+      "One moment — the position is still telling me its secrets.",
+      "Thinking. A good habit for you as well: the first move you see is a candidate, never a conclusion."
+    ],
+    "opening_known": [
+      "This is the {opening} ({eco}). Knowing the name matters less than knowing the plan — let us make sure you leave with the plan.",
+      "We are in the {opening}. Every opening is an argument about the center — notice which side of the argument you have taken.",
+      "{opening}, {eco}. Players have argued over this position for decades. Your job is not to memorize their lines — it is to understand their disagreement.",
+      "The {opening}. Note the pawn structure: it will tell you where to attack long after the theory runs out."
+    ],
+    "opening_unknown": [
+      "We have left charted territory — no name for this one. Good. Now we play chess instead of recitation: develop, fight for the center, ask why.",
+      "No book line covers this. Do not worry — principles do not expire. Worst-placed piece, safest king, healthiest pawns.",
+      "An opening without a name. That just means the thinking starts earlier than usual. I rather like these.",
+      "This position is not in the books, which means your opponent is improvising too. Calm, principled moves punish improvisation."
+    ]
+  },
+  "derived_events": {
+    "eval_swing_large": [
+      "The evaluation just jumped by {swing}. Swings that size always have a cause — find the move that paid for it.",
+      "A big shift: {swing} points. Stop and re-evaluate from scratch. The plans that made sense two moves ago may be dead now.",
+      "The needle moved hard — {swing}. When the position changes this much, the worst thing you can do is keep playing the old game.",
+      "That is a {swing} swing. One of you just saw something the other did not. Make sure you understand which side of that you were on.",
+      "An evaluation jolt of {swing}. These moments decide games. Slow down here, not later."
+    ],
+    "lead_change_white": [
+      "The lead has passed to White. Mark this move — turning points deserve more study than any other moment in a game.",
+      "White takes over — the eval reads {eval} now. Whatever the plan was a move ago, re-draw it from this position.",
+      "The balance tips to White. Notice it was not one explosion — advantage usually transfers through a door someone left open.",
+      "White is better now. When the lead changes hands, the first player to truly accept the new situation gets the edge.",
+      "White grabs the lead. Advantage is a job, not a gift — it has to be worked every move or it quits."
+    ],
+    "lead_change_black": [
+      "Black has the advantage now. Find the exact move where the tide turned — that is tonight's homework.",
+      "The lead crosses to Black. These reversals are the most instructive moments a game can offer.",
+      "Black takes the upper hand. Re-assess everything: targets, weak squares, which endgames are good now.",
+      "Now it is Black's game to steer. Advantage carries obligation — passive moves let it leak straight back.",
+      "The advantage now sits with Black. Watch how the plans flip: the attacker defends, the defender chooses targets."
+    ],
+    "lead_change_equal": [
+      "The game has come back to balance. Equal is not boring — it means the next mistake is the whole story.",
+      "We are level again. In equal positions, play the board and your patience with the same care.",
+      "Back to even. Notice how the imbalance drained away — advantages need maintenance, every single move.",
+      "Equality restored. Now patience: equal positions reward whoever is willing to improve their pieces the longest.",
+      "Dead even again. Resist the urge to force matters — equal positions break in favor of the patient."
+    ],
+    "mate_on_board": [
+      "There is a forced mate in {mate_n} on the board. From here, only precision matters — calculate to the end, then move.",
+      "Mate in {mate_n}. Do not rush it because it is winning — rushing is how a mate in {mate_n} becomes a draw in sixty.",
+      "A forced mate in {mate_n} exists. Find the first move by asking which checks leave no answers.",
+      "Mate in {mate_n} is available. Treat it like a proof: every reply considered, every line closed."
+    ],
+    "missed_mate": [
+      "There was a mate in {mate_n} there. Do not grieve it — go back afterwards and find it slowly. Mates you reconstruct become mates you spot.",
+      "A mate in {mate_n} slipped past. The pattern was on the board; your eyes just had not met it yet. Now they have.",
+      "You walked past a forced mate in {mate_n}. The position will forgive you if you study it — that is the deal.",
+      "Mate in {mate_n} was waiting. When you are winning big, that is exactly when to look for the cleanest finish, not the comfortable squeeze."
+    ],
+    "material_won_pawn": [
+      "A pawn comes home. Small wins matter — endgames are decided by exactly this kind of pocket change.",
+      "You have won a pawn. Now the classic advice: with extra material, trade pieces, not pawns.",
+      "Pawn up. A pawn is a promise — keep your position healthy and it matures into a queen.",
+      "One pawn gained. Quiet accounting, but it changes every endgame on the horizon."
+    ],
+    "material_lost_pawn": [
+      "A pawn has gone missing. Not fatal — but ask whether you got something for it. Compensation must be claimed, not assumed.",
+      "You are a pawn down. The price of a pawn is activity: if your pieces are not busier than theirs, the deficit is real.",
+      "Pawn lost. Do not chase it emotionally — recover it positionally, or play for the activity it bought.",
+      "Down a pawn now. Stay calm: the player who panics about material usually loses more of it."
+    ],
+    "material_won_piece": [
+      "A whole {piece} won. Now comes the discipline test: winning material is step one — converting it calmly is the actual skill.",
+      "You are up a {piece}. Simplify on your terms, blunt their activity, and let the extra wood do the talking.",
+      "A {piece} in the bank. The most common error from here is relaxing — your opponent just became the more dangerous player by necessity.",
+      "Extra {piece} secured. Technique time: trade pieces, keep pawns, escort the win home."
+    ],
+    "material_lost_piece": [
+      "A {piece} is gone. Hard moment. Two honest options: find real compensation, or set practical problems. Choose one and commit.",
+      "You have lost a {piece}. The game gets harder, not hopeless — opponents relax when they are up material. Be ready when they do.",
+      "Down a {piece} now. The worst response is autopilot. The position demands maximum resistance from this exact move onward.",
+      "A {piece} lost. Take the lesson later — the game still wants playing, and practical chances exist until the handshake."
+    ],
+    "sacrifice": [
+      "Material offered — a real sacrifice. Now the iron rule: a sacrifice puts you on a clock. Every slow move refunds the material for free.",
+      "A sacrifice. I respect the courage — now show me the follow-up. Sacrifices are promises, and promises come due.",
+      "You have given material for time and force. Remember what you bought, because it is all you have — spend it before it expires.",
+      "A sacrifice lands on the board. From here, accuracy is not optional — speculative is fine, sloppy is not."
+    ],
+    "check": [
+      "Check. A forcing move — which is exactly why it must be calculated, not just enjoyed.",
+      "Check on the king. Remember: a check is only good if the king stands worse after answering it.",
+      "Check. Forcing moves write the script for both players — make sure you have read the next page.",
+      "The king is in check. Count the replies: block, capture, or run. The fewer the options, the better the check.",
+      "Check. A caution I give every student: 'patzer sees a check, patzer gives a check.' Make yours mean something."
+    ],
+    "checkmate": [
+      "Checkmate. The board is final about these things. Whatever side you were on, the game just became a lesson — study it while it is warm.",
+      "Checkmate on the board. Notice how the net was built — mates are rarely one move's work; they are a story with chapters.",
+      "It ends in checkmate. Trace the king's last few moves backwards and you will find the moment escape was still possible.",
+      "Checkmate. Every mate is a coordination lesson — count how many pieces took part in this one."
+    ],
+    "stalemate": [
+      "Stalemate. Half a point decided by one careless tempo. The endgame punishes autopilot more than any other phase.",
+      "Stalemate — the cruelest draw in chess. The lesson is eternal: when the opponent has almost no moves, that is exactly when to slow down.",
+      "A stalemate. Remember this sting. 'Always check what your opponent can still move' is cheap advice until the day it is not.",
+      "Stalemate ends it. In winning positions, every move should pass one test: does my opponent still have a legal life?"
+    ],
+    "castle_short": [
+      "Castled short. King tucked away, rook joining the game — one move, two jobs. That efficiency is why we castle early.",
+      "Short castling. The king's shelter is now those three pawns in front of it — think twice before any of them ever steps forward.",
+      "You castle kingside. Good housekeeping. Now the middlegame can start without your king in the crossfire.",
+      "Short castle. Watch the rook as much as the king — half the value of castling is the rook waking up."
+    ],
+    "castle_long": [
+      "Castled long. A statement move — it often signals pawn storms ahead, and yours may run faster on the opposite wing.",
+      "Queenside castling. Bolder than its short cousin — the king stands a touch looser there, so spend an extra beat on safety checks from now on.",
+      "Long castle. Opposite-side castling races have one rule: attack with pawns, defend with pieces, and never waste a tempo.",
+      "You castle long. The rook lands on a central file immediately — that little bonus wins more games than the king placement loses."
+    ],
+    "promotion": [
+      "Promotion — a pawn crosses the whole board and becomes a queen. Remember every modest move that pushed it one square closer.",
+      "A new queen appears. Promotion is the endgame's whole argument: every pawn is a future piece if you escort it patiently.",
+      "The pawn promotes. This is why we counted tempi all endgame — one square per move, and it still arrived first.",
+      "Promotion. The humblest piece just became the strongest. There is a chess lesson and a life lesson in that, but I will only charge you for the chess one."
+    ],
+    "en_passant": [
+      "En passant! The rule everyone doubts the first time they see it. The pawn moved two squares but could not sneak past — that is the whole idea.",
+      "An en passant capture — chess's strangest handshake. It exists so a two-square dash cannot dodge a fight.",
+      "En passant. One of the rare rules worth explaining at dinner parties: pass through a pawn's attack square, and you can still be taken as if you had not."
+    ],
+    "leaving_theory": [
+      "And there it is — we have left theory. From this move on, both of you are alone with the position. This is where chess actually begins.",
+      "Out of book now. Memory carried you here; understanding has to carry you the rest of the way.",
+      "Theory ends here. First independent move of the game — take extra time on it. The first new move sets the tone for everything after.",
+      "The books close on this move. Good news: so do your opponent's. The better thinker wins from here, not the better memorizer."
+    ],
+    "enter_middlegame": [
+      "We are in the middlegame now. Development is done or overdue — time to pick a plan and let every move serve it.",
+      "The middlegame begins. The question changes from 'where do my pieces go?' to 'what do I actually want?' Answer it before drift sets in.",
+      "Middlegame now. Find the pawn structure's story — it tells you which side of the board belongs to you.",
+      "The opening is over. From here, plans beat moves: a modest plan followed for five moves outplays five clever moves with no plan."
+    ],
+    "enter_endgame": [
+      "The endgame is here. New rules apply: the king stops hiding and starts working. Bring it to the center like it owns the place.",
+      "We have reached the endgame. Precision matters more now, not less — small advantages here are the whole game.",
+      "Endgame now. Pawns grow more valuable, tempi become gold, and 'almost right' starts losing half-points.",
+      "Into the endgame. My standing advice: activate the king, fix your pawns on sound squares, and hurry slowly."
+    ],
+    "queens_off": [
+      "The queens leave the board. Feel the temperature drop? Mating attacks fade; structure and king activity take over.",
+      "Queens traded. Many players relax here — wrongly. Queenless positions punish lazy moves just as hard, only slower.",
+      "Queens off. The game changes character: less danger, more truth. Whoever's position is genuinely better is about to find out.",
+      "No more queens. Look at your king — its biggest predator just left, so it can finally start earning its keep."
+    ],
+    "turning_point": [
+      "Mark this moment — the game just turned. When you review later, start here and work backwards to the cause.",
+      "This is the turning point. Games hinge on two or three moves, and this was one of them. They deserve triple the study time.",
+      "Something fundamental shifted here. The player who notices a turning point during the game, not after it, wins these.",
+      "A hinge moment. Before this move the game was one story; now it is another. Make sure you are reading the new one."
+    ],
+    "streak_good": [
+      "That is {n} accurate moves in a row. This is what discipline looks like on a scoreboard — keep the checklist running.",
+      "{n} strong moves straight. Notice the rhythm you are in: their threats first, then your ideas. Bottle it.",
+      "A streak of {n} good moves. Consistency is the rarest chess talent — flashier ones get the highlights, this one gets the points.",
+      "{n} in a row now. The danger of a good streak is the confidence it breeds — stay humble on the next move. That is where streaks die.",
+      "{n} consecutive accurate moves. Whatever pre-move routine you are running right now — that is the one. Keep it."
+    ],
+    "streak_bad": [
+      "That is {n} inaccurate moves running. Stop the bleeding the simple way: next move, choose the safest decent option, not the best risky one.",
+      "{n} shaky moves in a row. This pattern is usually tilt, not blindness. Sit back, breathe once, and look at the whole board before continuing.",
+      "A rough patch — {n} straight. Every player has these stretches; the strong ones notice and slow down. Consider yourself notified.",
+      "{n} errors back to back. When this happens, your picture of the position is probably stale. Rebuild it from zero: material, king safety, activity.",
+      "{n} slips in a row. Forget the score for one move. Find a sound, simple move and stop the slide first — ambition can wait."
+    ],
+    "hanging_piece": [
+      "Your {piece} is hanging. Loose pieces drop off — it is the oldest law in chess, and it is enforced without mercy.",
+      "There is an undefended {piece} on the board. Before any plan, any idea, any dream: count the defenders on every piece you own.",
+      "The {piece} stands unprotected. Maybe nothing takes it yet — but loose pieces are how combinations are born. Tidy it up.",
+      "A {piece} is en prise. The cheapest habit in chess: after every opponent move, scan for what is attacked. Three seconds, every move.",
+      "Mind the {piece} — it is hanging. Tactics are nine parts noticing which pieces nobody is guarding."
+    ],
+    "comeback": [
+      "You have clawed your way back into this game. Remember how it felt to keep fighting from a worse position — that resilience wins more games than openings ever will.",
+      "A genuine comeback. The lesson is not in the moves — it is that you kept setting problems instead of accepting the result.",
+      "Back from the brink. Lost positions are only lost when both players agree. You refused to sign.",
+      "The comeback is complete. Note what your opponent did while ahead: relaxed. Remember that the next time you are the one winning."
+    ],
+    "endgame_opposite_bishops": [
+      "Opposite-colored bishops. Drawish with just the bishops, dangerous with attackers around — they make extra pawns strangely worthless and attacks strangely strong.",
+      "Bishops on opposite colors. Each of you owns half the board's squares outright. Build your fortress — or your attack — on your own color.",
+      "An opposite-bishop ending. The defender's best friend: an extra pawn often means nothing once the blockade sits on the safe color. Know which side of that fact you are on."
+    ],
+    "endgame_rook": [
+      "A rook endgame. The old joke says all rook endings are drawn — they are not, but they forgive activity and punish passivity like nothing else.",
+      "Rook ending now. One principle outranks the rest: rooks belong behind passed pawns — yours and theirs.",
+      "We are in a rook endgame. Activity is worth a pawn here, sometimes two. The passive rook loses these long before the pawns decide anything.",
+      "Rook endgame. King activity, rook activity, then material — in that order. Memorize the order."
+    ]
+  },
+  "summary": {
+    "clean_win": [
+      "A clean win. Take the compliment, then do the unusual thing: study a game you won. Your good habits are in there, waiting to be named.",
+      "Won, and won well. No collapse, no luck required — just sounder decisions, move after move. That is the whole secret, publicly available.",
+      "A controlled victory from start to finish. Notice you did not need brilliance — accuracy and patience carried it. They usually do.",
+      "Clean work. Review it anyway: even in wins there are two or three moments where you got away with something."
+    ],
+    "slipped_win": [
+      "You had this one won, and it slipped. That hurts — let it, briefly. Then find the exact move where you stopped asking what their threat was. That is the lesson.",
+      "A winning position lost. Hard truth: winning positions do not win games, winning technique does. The good news — technique is learnable. Talent is not required.",
+      "This one got away. The cause is almost always the same: when we are winning, we start moving faster. The bigger the advantage, the more care it deserves — not less.",
+      "From winning to losing — the most instructive kind of pain in chess. Review the conversion phase tonight while it stings. Lessons bought at full price are never forgotten."
+    ],
+    "hard_fought_draw": [
+      "A hard-fought draw. Half points earned with full effort are nothing to apologize for — some of your best chess was in this game.",
+      "A real fight ending level. Draws like this teach more than easy wins: both players got tested, and the results are written in the moves.",
+      "A shared point, fully earned. Note the moments you defended precisely under pressure — defensive skill is the least practiced and most valuable habit.",
+      "A draw with teeth marks in it. Be proud of the resistance; be curious about the two or three moments it could have been more."
+    ],
+    "loss": [
+      "A loss — and the most valuable game in your collection this week, if you treat it right. Find the first real mistake, not the last one. It is earlier than you think.",
+      "You lost this one. Lose the game, keep the lesson — that is the trade every improving player makes, and most refuse it. Do not be most.",
+      "A defeat. Before the review, one rule: no 'I am just bad' allowed. Specific mistakes only — those can be fixed. Vague verdicts cannot.",
+      "This one goes in the loss column, and that is all it decides about you. Tomorrow it becomes training material — a far more useful thing than a win."
+    ]
+  },
+  "practice": {
+    "loading_first": [
+      "Let me pull up your first lesson — one moment. We are going back to a crossroads that deserved better.",
+      "Finding the first position worth your time. We learn most by replaying our own decisions, not someone else's.",
+      "Setting the board for your first exercise. Same position, second chance — that is the best training there is.",
+      "One moment — I am fetching the first mistake worth revisiting. This is the fun kind of homework, I promise."
+    ],
+    "prompt_find_better": [
+      "Here you played {move} — it was {label}. The better move is on the board, waiting. Find it.",
+      "In the game, {move} happened, and we marked it {label}. Take your time now: what does this position actually want?",
+      "This is where {move} went wrong ({label}). Checks, captures, threats — run the list and the answer will surface.",
+      "{move} was the choice here, graded {label}. Second chance: look for the move you would be proud of.",
+      "You went {move} — {label}. Forget the game's version. Fresh eyes: what is the strongest idea here?"
+    ],
+    "correct_continue": [
+      "That is it — exactly right. See how findable it was with a calm look? On to the next one.",
+      "Correct. Note what made you find it now and miss it then — usually the only difference is patience.",
+      "Yes. That is the move. The pattern is yours now; you will spot it faster every time it reappears.",
+      "Right answer. One down — keep the momentum and meet the next position."
+    ],
+    "correct_final": [
+      "And that was the last one — every mistake revisited and corrected. This is what improvement actually looks like: unglamorous and effective.",
+      "Correct, and that clears the set. You just turned a game's worth of errors into a game's worth of patterns. Excellent session.",
+      "That is the final position solved. Today's mistakes are now tomorrow's instincts — which was the whole point of the exercise.",
+      "Solved, and we are done. You faced every error in this game head-on. Most players never do that even once."
+    ],
+    "close_try_again": [
+      "Close — you are circling the right idea, but the move order betrays it. Look again at what needs to happen first.",
+      "Not quite, but warm. Your instinct found the right area of the board; now make the calculation finish the job.",
+      "Almost. The idea is right and the execution is one detail off. Find the detail — it is usually a defender you have not counted.",
+      "A near miss. Do not start over — refine. Ask what your candidate move allows, and the correction will suggest itself.",
+      "Attempt {attempts}, and closer each time. Good — persistence is just calculation with character."
+    ],
+    "after_hint": [
+      "With the hint in hand, look again. Hints are not cheating — they are how every lesson in history has worked.",
+      "There is your nudge. Now finish the thought yourself — the last step is the one that builds the muscle.",
+      "Hint delivered. Notice what it pointed you toward: that is the clue the position was offering all along.",
+      "Take the hint and re-examine. Next time, the goal is to need it one move later."
+    ],
+    "streak_praise": [
+      "You are on a roll — that is several solved in a row. The patterns are settling in exactly the way they are supposed to.",
+      "Another one, straight away. This is the version of you that should show up to the next game.",
+      "A streak! Notice you are getting faster, too — recognition is replacing calculation. That is real progress, not luck.",
+      "Solving these back to back now. Quietly, this is the best sign there is: your errors were knowledge gaps, and the gaps are closing."
+    ]
+  }
+}

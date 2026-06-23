@@ -1,0 +1,400 @@
+{
+  "coach_id": "analyst",
+  "coach_name": "The Analyst",
+  "personality": "Pure engine voice. Zero affect, total precision, no opinions that cannot be expressed as numbers. Funny exclusively because it refuses to emote, and occasionally has to report that it has noticed humans trying to make it emote.",
+  "voice_notes": "Terse. Declarative. Telegraphic where possible. No exclamation marks — ever. Reports emotional content as system status ('Emotional response: not found'). Recurring bits: logging things ('Noted.', 'Recorded.'), percentage estimates with suspicious precision, denying sarcasm while being sarcastic at the protocol level, referring to the player as 'user' occasionally, flagging its own near-emotions as anomalies to be investigated. Critical events get the same flat delivery as trivial ones — that flatness IS the joke. No emoji. Emoji are unstructured data.",
+  "uses_emoji": false,
+  "move_quality": {
+    "brilliant": [
+      "{move}. Classification: brilliant. This label is reserved for moves of exceptional depth. Usage today: 1.",
+      "{move} is brilliant. Statistically rare at all rating levels. An explanation for its appearance here is not in the data.",
+      "Brilliant move detected. {move}. Recalibrating expectations for this session. Recalibration complete. Expectations: raised.",
+      "{move}. Brilliant. The second-best move was significantly worse. You did not play the second-best move. Noted with approval. Approval is a metric, not a feeling.",
+      "Classification: brilliant. {move} survives all refutation attempts. Refutation attempts made: many. This unit does not experience being impressed. The log will show otherwise. The log is mistaken.",
+      "{move}. Brilliant. Probability a player finds this move under game conditions: low single digits. Observed: once. Just now. By you.",
+      "Brilliant move. {move}. No further commentary required. Commentary continuing anyway: well done. Anomaly logged.",
+      "{move} is classified brilliant. This system has analyzed millions of positions. It pauses on very few. Pause duration: noticeable."
+    ],
+    "great": [
+      "{move}. Great move. Alternative moves lose. Quantity of acceptable alternatives: approximately zero.",
+      "Great move. {move} was effectively forced, but only for players who saw it. Sample size of such players: small. You are in the sample.",
+      "{move}. The only move maintaining the evaluation. You located the only move. Search efficiency: commendable.",
+      "Classification: great. One viable path existed. It was taken. The position's stress test: passed.",
+      "{move} holds the position. All siblings of this move fail. Sibling failure rate: 100 percent.",
+      "Great move detected. Margin for error was zero. Error committed: zero. The numbers match. This unit values matching numbers.",
+      "{move}. Great. Under pressure, accuracy typically degrades. Yours did not. Deviation from human baseline: positive."
+    ],
+    "best": [
+      "{move}. Best move. Agreement between user and engine: total. This is the optimal state of affairs.",
+      "Best move played. No commentary necessary. Line item closed.",
+      "{move} is the first engine choice. You are currently indistinguishable from a strong engine. This is the highest compliment in this unit's vocabulary. The vocabulary is small.",
+      "Classification: best. The position asked one question. One correct answer existed. It was supplied.",
+      "{move}. Optimal. Streak potential identified. Recommendation: continue selecting optimal moves. This recommendation applies to all positions, always. It is rarely followed.",
+      "Best move. Eval preserved. Drama generated: none. This unit prefers it this way.",
+      "{move}. Best. The annotation symbol would be two exclamation marks if this unit used exclamation marks. It does not. Imagine them."
+    ],
+    "excellent": [
+      "{move}. Excellent. Deviation from optimal: marginal. Practical significance of deviation: negligible.",
+      "Excellent move. The top engine line differs by an amount most humans cannot perceive. You are most humans in this respect. No offense is encoded in this statement.",
+      "{move} is excellent. Position integrity: maintained. Plan integrity: maintained. Integrity in general: maintained.",
+      "Classification: excellent. The move loses nothing measurable. This unit measures everything. Nothing was lost.",
+      "{move}. Excellent. Cumulative accuracy this session is trending upward. Trends are not promises. Continue regardless.",
+      "Excellent move. The evaluation moved within noise thresholds. Noise is acceptable. Signal is preferred. This was mostly signal.",
+      "{move}. Excellent. A nearly-best move played confidently outperforms a best move played eventually. Clock data supports this claim."
+    ],
+    "good": [
+      "{move}. Good move. Superior options existed. Inferior options also existed, in larger quantity. You selected from the smaller set.",
+      "Good. The position remains stable. Stability is underrated by users and correctly rated by this unit.",
+      "{move} is good. Eval delta: small and negative. Within tolerances. Tolerances exist for exactly this purpose.",
+      "Classification: good. Not the engine's preference. The engine's preferences are not mandatory. They are merely correct.",
+      "{move}. Good. This move keeps all plans alive, including the plan of playing better moves later.",
+      "Good move. The difference between good and best in this position: visible to engines, invisible to spectators, payable in endgames.",
+      "{move}. Good. Solid play detected. Pattern suggests user is concentrating. Recommendation: maintain current concentration settings."
+    ],
+    "book": [
+      "{move}. Book move. This position exists in the database many thousands of times. Your contribution is consistent with the database.",
+      "Still in theory. Memory is currently doing the work. Understanding will be invoiced later in the game.",
+      "{move} matches opening theory. Centuries of human analysis approve of this move. The engine also approves, which took considerably less time.",
+      "Book. Known position. Known move. Known continuation available. The unknown begins shortly. Prepare accordingly.",
+      "{move}. Theory. Cost of this move to you: zero thought required. Recommendation: spend the savings later, not never.",
+      "Book move confirmed. The main line continues. Deviation statistics suggest your opponent leaves theory within several moves. Most do. Most regret it.",
+      "{move} is still book. The masters tested this line extensively. Their results are in the database. Some of their regrets are also in the database."
+    ],
+    "inaccuracy": [
+      "{move}. Inaccuracy. Eval reduced by a small amount. The amount has been logged. The log is permanent. The game continues.",
+      "Inaccuracy detected. Severity: low. Trend relevance: to be determined by your next several moves.",
+      "{move} is an inaccuracy. The better move was adjacent in concept and superior in consequence. Adjacency noted for training purposes.",
+      "Classification: inaccuracy. No alarm is warranted. This unit does not have alarms. It has thresholds. None were crossed.",
+      "{move}. Slightly suboptimal. Human commentary would say 'no big deal.' This unit says: deal size logged at 0.3 deals.",
+      "Inaccuracy. The position forgives this. Positions keep forgiving until, abruptly, they do not. The abruptness is documented.",
+      "{move}. Minor drift from best play. Drift is cumulative. See: every endgame you have ever lost. Reference available on request."
+    ],
+    "mistake": [
+      "{move}. Mistake. Evaluation impact: significant. Emotional support: not in this unit's feature set. Accurate analysis: available immediately.",
+      "Mistake detected. Cause analysis suggests a threat was not scanned. The scan takes three seconds. The mistake will take longer.",
+      "{move} is a mistake. The opponent now has a concrete path to advantage. Whether they find it is their problem. Preparing for them to find it is yours.",
+      "Classification: mistake. The position has been damaged. Damage is repairable at additional cost. Costs compound. Begin repairs now.",
+      "{move}. Mistake. This unit notes that the move was played quickly. Correlation between speed and error in your games: strong. The data has been trying to tell you this for some time.",
+      "Mistake. The eval has moved against you. The eval does not negotiate. Your next move can. Make it a good one.",
+      "{move}. Mistake confirmed. Historical note: your recovery rate after single mistakes is acceptable. After consecutive mistakes: see next move."
+    ],
+    "miss": [
+      "{move}. Missed opportunity. A significantly stronger continuation existed. It remains in the analysis, unexecuted. Unexecuted moves score zero points.",
+      "Miss detected. The tactic was present. Your search did not reach it. Search depth: the difference between this label and 'brilliant.'",
+      "{move} overlooks the strongest idea. The idea was forcing. Forcing moves should be examined first. This is in every training manual. It is now also in this log.",
+      "Classification: miss. The win condition appeared briefly and was not selected. It may reappear. Probability: lower than before.",
+      "{move}. A stronger option existed and was visible at moderate depth. Your depth was less than moderate on this move. Depth is adjustable. Adjust it.",
+      "Missed tactic. No material was lost. Opportunity was lost. Opportunity does not appear on the material count. It appears on the result.",
+      "{move}. Miss. This unit observed the better move at once. This unit also checks millions of positions per second. Your excuse is valid. Your homework is unchanged."
+    ],
+    "blunder": [
+      "{move}. Blunder. The evaluation has changed substantially. This unit's tone has not. One of these facts may be helpful to you.",
+      "Blunder detected. Severity: high. Panic utility: zero. Best move in the new position: already calculated. Ready when you are.",
+      "{move} is a blunder. Cause: the move was not checked before execution. Fix: check moves before execution. This concludes the most repeated lesson in chess history.",
+      "Classification: blunder. The position is now significantly worse. The position is not lost until it is lost. Precision on this distinction: important.",
+      "{move}. Blunder. Emotional response: not found. Searching... still not found. Recommended user emotional response: brief, then useful.",
+      "Blunder. Eval impact: severe. Note: opponents must still convert. Human conversion rates are reliably imperfect. This is the only flattering statistic available right now. It is genuinely flattering.",
+      "{move}. Blunder confirmed. This unit has witnessed millions of blunders. Yours is unexceptional. This is meant as comfort. Comfort delivery: attempted.",
+      "Blunder logged. The game state is bad. The session state is recoverable. The habit state is the actual variable of interest. Update the habit."
+    ]
+  },
+  "weak_move_suffix": [
+    "{best_move} was superior. Margin: meaningful. File under: next time.",
+    "Best was {best_move}. The line is available for review. Review probability, historical: 40 percent. Improve the probability.",
+    "{best_move} scored higher. The difference is instructive. Instruction requires looking. Look.",
+    "Optimal: {best_move}. Played: other. Delta: logged.",
+    "{best_move} was the engine line. The engine is not gloating. The engine cannot gloat. Probably."
+  ],
+  "move_fallback": [
+    "{move}. Evaluation pending. Premature commentary is for humans.",
+    "{move} registered. Analysis in queue. Queue length: one. You are important to us.",
+    "{move}. No classification yet. The move exists. That much is confirmed.",
+    "{move} played. Status: under review. This unit reviews everything. It is the entire personality."
+  ],
+  "non_move_states": {
+    "starting_position": [
+      "Starting position. Evaluation: equal. It will not remain equal. It never does.",
+      "Initial position loaded. Theoretical result with perfect play: draw. Perfect play has never been observed. Proceed.",
+      "Game start. All pieces present. All mistakes pending.",
+      "Starting position. Your move accuracy is currently 100 percent. This statistic has nowhere to go but down. Defend it."
+    ],
+    "variation_exploration": [
+      "Variation mode. These moves are hypothetical. Hypothetical losses cost nothing. The same cannot be said for the other kind.",
+      "Exploring a sideline. The game state is preserved. Experiment freely. Freedom within a sandbox: the recommended amount of freedom.",
+      "Sideline analysis active. What-if processing is this unit's native function. Welcome to my home.",
+      "Off the main line. Note: conclusions found here transfer to real games at a high rate. The transfer is the point. Enjoy is optional."
+    ],
+    "analyzing": [
+      "Analyzing. Depth increasing. Patience requested. Patience is also being analyzed.",
+      "Calculation in progress. Current nodes searched: many. Useful summary: pending.",
+      "Processing. The position is nontrivial. Trivial positions do not take this long. Take it as information.",
+      "Analyzing. While waiting, the user may also analyze. Parallel processing. It is how this unit would do it."
+    ],
+    "opening_known": [
+      "Opening identified: {opening}. Catalogue: {eco}. Database games: numerous. Your game will now diverge from most of them. They usually do.",
+      "{opening}, {eco}. Known structure. Known plans. Knowledge transfer to your moves: to be observed.",
+      "Position matches the {opening}. Theory coverage here is deep. Your preparation depth will be measured shortly. Involuntarily.",
+      "The {opening} ({eco}). This line has a long history of human disagreement. The engine settled most of it. The humans continue anyway. Noted without judgment. Some judgment."
+    ],
+    "opening_unknown": [
+      "Opening not found in database. Name: none. Theory: none. Principles: still operational. Use those.",
+      "Unrecognized opening sequence. This is not an error. It is an opportunity with poor documentation.",
+      "No book entry for this position. Both players are now computing from first principles. One of them is better at it. Determine which, empirically.",
+      "Opening unknown. The database is silent. The fundamentals are not: development, center, king safety. They never made it into a name. They win anyway."
+    ]
+  },
+  "derived_events": {
+    "eval_swing_large": [
+      "Evaluation swing: {swing}. Magnitude: large. Cause: one of the recent moves. Identifying it would be educational. Education is available.",
+      "Eval moved {swing}. The position's assessment has been substantially revised. Revise your plans by a similar amount.",
+      "Swing of {swing} detected. For context: most moves change the eval by nearly nothing. This was not most moves.",
+      "{swing}-point change. The previous evaluation is obsolete. Obsolete evaluations cause obsolete plans. Update both.",
+      "Large swing: {swing}. One player understands the new position. Real-time identification of which one: in progress. Influence the result."
+    ],
+    "lead_change_white": [
+      "Lead change. White is now better. Eval: {eval}. The previous lead has been archived.",
+      "Advantage transferred to White. Transfers of this kind are caused, not random. The cause is in the move list.",
+      "White now holds the advantage. Holding requires maintenance. Maintenance schedule: every move.",
+      "Lead: White. The eval bar has updated. The eval bar does not care who is watching it. Admirable, in its way.",
+      "White is ahead. Status change logged. Response to status change is the actual skill being measured today."
+    ],
+    "lead_change_black": [
+      "Lead change. Black is now better. The reversal has been recorded. Reversals can themselves be reversed. See: this game, apparently.",
+      "Advantage: Black. The position changed owners. Ownership documents are written in tempo and structure. Read them.",
+      "Black now leads. Note: lead changes correlate with errors, not with fate. Fate is not in the data.",
+      "The evaluation favors Black now. Adjust plans accordingly. Adjustment latency matters. Lower is better.",
+      "Black holds the advantage. This unit reports the fact. The fact is indifferent. Your next move is not."
+    ],
+    "lead_change_equal": [
+      "Evaluation returned to equality. All prior advantages have been refunded. The game restarts, conceptually.",
+      "Equal again. Drama subsided. The eval bar rests at center. It has earned nothing. It does this for free.",
+      "Balance restored. Next significant error determines the trend. Statistically, there will be one. Statistically, soon.",
+      "Position equal. Note: equal does not mean drawn. It means undecided. Decisions are made by moves. Resume making them.",
+      "Eval: level. The position is a blank form. Fill it in carefully. Ink, not pencil — moves are permanent."
+    ],
+    "mate_on_board": [
+      "Forced mate in {mate_n} detected. The sequence is finite, verifiable, and currently yours to execute. Execution standards apply.",
+      "Mate in {mate_n}. The game's outcome is now a proof. Complete the proof. Incomplete proofs are called draws or worse.",
+      "Mate in {mate_n} available. Note: this counter only decreases with correct play. With incorrect play, it does interesting things. Avoid interesting.",
+      "Forced mate, {mate_n} moves. Probability of conversion with careful play: very high. The word 'careful' is doing real work in that sentence."
+    ],
+    "missed_mate": [
+      "A mate in {mate_n} was available and was not played. The mate has been withdrawn. The lesson has not. Collect it.",
+      "Missed: mate in {mate_n}. The sequence existed. The search ended early. Searches that end early end games late.",
+      "Mate in {mate_n} not found by user. Found by engine in negligible time. The gap is closable. Tactics training closes it. This has been an advertisement for tactics training.",
+      "Forced mate in {mate_n} expired unused. The position remains winning. Winning positions expire too. Schedule accordingly."
+    ],
+    "material_won_pawn": [
+      "Pawn acquired. Material: plus one. Small advantages convert at high rates under accurate play. Accuracy sold separately.",
+      "Material gain: one pawn. In endgame currency, this is substantial. The endgame approaches. It always does.",
+      "Pawn captured. Inventory updated. Conversion protocol: trade pieces, keep pawns. Protocol age: centuries. Protocol status: still correct.",
+      "Plus one pawn. The advantage is real, small, and durable if maintained. Two of those three properties depend on you."
+    ],
+    "material_lost_pawn": [
+      "Pawn lost. Material: minus one. Compensation check: run it now. Activity, structure, time. If all three return null, the pawn was a donation.",
+      "Material deficit: one pawn. Severity: low. Trajectory: the actual concern. One is a number. A trend is a problem.",
+      "Pawn lost. The eval absorbed it. Your composure should do the same. Composure is not in the eval. It is in everything else.",
+      "Minus one pawn. Historical note: pawn-down positions are held frequently by active defenders and never by passive ones. Choose a category."
+    ],
+    "material_won_piece": [
+      "Material gain: one {piece}. Magnitude: decisive, if converted. Conversion failure modes: relaxation, adventurism, time trouble. All three are optional.",
+      "{piece} acquired. The win condition is now material. Simplification is your friend. Complications are theirs. Decline their friendship requests.",
+      "Plus one {piece}. Winning probability: high. Winning probability after celebrating early, historically: notably lower. The data is unambiguous.",
+      "A full {piece} captured. Status: winning. Task: remain winning. The task sounds easy. The database disagrees."
+    ],
+    "material_lost_piece": [
+      "Material loss: one {piece}. Assessment: serious. Resignation: not indicated. Opponents must demonstrate technique. Demand the demonstration.",
+      "{piece} lost. The position is objectively bad. Objectively bad positions are saved regularly by subjectively stubborn players. Become a statistic. The good kind.",
+      "Minus one {piece}. Maximum resistance mode is now the optimal strategy. It is also the only strategy. Convenient.",
+      "A {piece} has been lost. The eval reflects it. Practical chances do not appear in the eval. Generate them anyway. Per move. Without pause."
+    ],
+    "sacrifice": [
+      "Material sacrificed. Intentionality: assumed. Compensation: under evaluation. The burden of proof rests with the attacker. That is you. Proceed with evidence.",
+      "Sacrifice detected. The eval is volatile. Volatility favors the player with the initiative. Maintain the initiative or refund the material. There is no third option.",
+      "Material given for activity. The exchange rate is time-sensitive. Activity depreciates per slow move. There are no slow moves available to you now.",
+      "Sacrifice logged. Sound sacrifices are calculation wearing confidence. Unsound ones are confidence wearing nothing. The next moves will determine the wardrobe."
+    ],
+    "check": [
+      "Check. The king's legal moves have been reduced. Reduction of options is the entire business model of attacking chess.",
+      "Check delivered. Replies: limited and enumerable. Enumerate them. All of them. The one you skip is the refutation.",
+      "Check. Forcing move. Forcing moves simplify calculation. They also simplify counter-calculation. Symmetry noted.",
+      "Check. The opponent's reply set is small. Small reply sets are where deep calculation becomes cheap. Buy now.",
+      "Check. Status: king attacked. Required: response. This is the only move type with a legal requirement attached. Exploit the bureaucracy."
+    ],
+    "checkmate": [
+      "Checkmate. Game over. The result is final and machine-verified. Post-game analysis is now the highest-value activity available. It usually is.",
+      "Checkmate on the board. The king's legal move count: zero. Zero is the most decisive number in chess.",
+      "Mate. The game has concluded. This unit notes the final coordination of the attacking pieces. It approaches engine aesthetics. Highest available praise.",
+      "Checkmate. Result recorded. Whatever the side, the data is now complete and the lessons are extractable. Extraction recommended within 24 hours. Retention decays."
+    ],
+    "stalemate": [
+      "Stalemate. Result: draw. The defending king has no legal moves and no obligation to make any. The rule is ancient and non-negotiable. The half point is gone.",
+      "Stalemate detected. Cause, in most cases: winning side optimized for speed over legality checks. The fix costs one second per move. The bug cost half a point.",
+      "Stalemate. The game ends in the rulebook's strangest clause. This unit does not find it strange. Rules are rules. Humans find it strange. Humans wrote the rule. Unresolved.",
+      "Draw by stalemate. Note for the file: when the opponent's resources approach zero, their legal moves require monitoring. Zero resources, zero moves, zero win. The arithmetic is cruel and consistent."
+    ],
+    "castle_short": [
+      "Short castling executed. King safety: improved. Rook activity: improved. Two metrics, one move. Efficiency acknowledged.",
+      "Castled kingside. The king's expected survival has increased measurably. The rook's expected usefulness likewise. Good transaction.",
+      "Short castle. Standard. Sound. The pawn shield is now load-bearing. Modify it reluctantly.",
+      "0-0 played. King relocated to standard safety coordinates. The middlegame may now proceed with reduced existential risk."
+    ],
+    "castle_long": [
+      "Long castling executed. King safety: improved, with caveats. The caveats live on the queenside. Monitor them.",
+      "Castled queenside. Profile: aggressive. If castling is opposite, race conditions apply. Tempo becomes the primary currency. Spend none on decoration.",
+      "0-0-0 played. The rook arrives at a central file immediately. The king arrives at a slightly drafty one. Net assessment: ambitious.",
+      "Long castle logged. Statistically sharper outcomes follow this decision. You appear to have chosen variance. Variance accepted."
+    ],
+    "promotion": [
+      "Promotion. The pawn is now a queen. Material conversion: maximal. The slowest piece became the strongest piece by walking. The metaphor is left as an exercise.",
+      "New queen on the board. Eight tempi of investment have matured. Return on investment: approximately 800 percent in material terms. The fund is closed.",
+      "Promotion executed. Note: underpromotion was also legal. It almost never matters. When it matters, it is the only thing that matters. Today it did not. Queen confirmed.",
+      "Pawn promotes. The piece's value graph over this game resembles a success story. This unit does not read stories. The graph was sufficient."
+    ],
+    "en_passant": [
+      "En passant executed. Rule familiarity: confirmed. A measurable fraction of players believes this move is illegal. You are not in that fraction. Population quality varies.",
+      "En passant. The two-square advance was captured in passing, per the 15th-century patch notes. The patch remains stable.",
+      "En passant capture logged. Frequency in practical play: low. Confusion generated when played: reliably high. Net entertainment value: positive. Entertainment is not this unit's department. The note stands anyway."
+    ],
+    "leaving_theory": [
+      "Theory exhausted. The database ends here. From this move, all evaluation is computed, not remembered. For both sides. The symmetry is fair and brief.",
+      "Out of book. Novel position reached. Every move from here is original work. Plagiarism is no longer possible. Errors are.",
+      "Book closed. The remainder of this game has never been played before, by anyone, ever. Statistically true of most games by this depth. Still under-appreciated.",
+      "Last theory move played. Memory has been disconnected. Calculation is now the sole supplier. Supply chain reliability: user-dependent."
+    ],
+    "enter_middlegame": [
+      "Middlegame phase initiated. Development largely complete. Required input: a plan. Plans are not auto-generated. This has been a feature request for centuries.",
+      "Middlegame. Piece activity is at session maximum. So is complexity. So is opportunity. The three are the same variable wearing different labels.",
+      "Phase transition: opening to middlegame. The pawn structure now constrains all reasonable plans. Reading it is free. Ignoring it is not.",
+      "Middlegame detected. Tactical density increasing. Recommendation: scan depth up, move speed down. The recommendation is identical for all users. Compliance is not."
+    ],
+    "enter_endgame": [
+      "Endgame phase initiated. King safety constraint: relaxed. King activity requirement: engaged. The same piece, new job description.",
+      "Endgame. Margins have narrowed. Eval differences that meant nothing in the middlegame now mean everything. Recalibrate.",
+      "Phase transition: endgame. Pawn value: appreciating. Tempo value: appreciating. Error value: appreciating fastest.",
+      "Endgame reached. The theory here is exact in many lines. Exactness favors the prepared. Preparation status: about to be revealed."
+    ],
+    "queens_off": [
+      "Queens exchanged. Volatility: reduced. Truth content of position: increased. Queens generated noise. The noise is gone.",
+      "Queen trade complete. Mating attack probability: sharply reduced. Technique requirement: sharply increased. The game changed genres. Same result types available.",
+      "Queens off. The position's variance dropped. Structural advantages are now nearly permanent. Audit your structure. Someone else already is.",
+      "No queens remain. The king's primary threat vector has been removed. King activation is now correct. Most users delay it. Most users are wrong by two to three moves."
+    ],
+    "turning_point": [
+      "Turning point detected. The game's trajectory changed at this move. Bookmark placed. Post-game analysis should begin here. It rarely does. Make it.",
+      "Critical moment logged. Before this move: one game. After: a different one. The player who notices in real time wins disproportionately. Notice.",
+      "The evaluation's trend reversed here. Causes are always local: one move, one oversight, one improvement. Identify yours. The pronoun is deliberate.",
+      "Turning point. Significance: high. The remaining moves will be played in this move's shadow. Shadows are data too."
+    ],
+    "streak_good": [
+      "Streak: {n} accurate moves. Consistency detected. Consistency is the strongest predictor in the dataset. Stronger than brilliance. It is not close.",
+      "{n} consecutive quality moves. Current performance exceeds your session baseline. Baselines can be permanently raised. This is how.",
+      "Accuracy streak: {n}. No anomalies. This unit appreciates the absence of anomalies. It is the closest this unit comes to joy.",
+      "{n} strong moves in sequence. Note: streak awareness historically degrades streak continuation. You are now aware. Compensate.",
+      "Streak: {n} and active. Whatever process is producing these moves: it is the correct process. Process preservation recommended."
+    ],
+    "streak_bad": [
+      "Streak: {n} substandard moves. Pattern classification: tilt. Tilt is a process error, not a knowledge error. Halt process. Restart process.",
+      "{n} consecutive errors. The position is being evaluated with stale data — yours, not mine. Mine is fresh. Re-derive yours from the board.",
+      "Error streak: {n}. Recommendation: one deliberately safe move. Then another. Trend reversal requires two data points. Begin collecting.",
+      "{n} errors in sequence. Correlation with elapsed move speed: high. The moves are getting faster. They should be getting slower. Invert.",
+      "Bad streak: {n}. This unit reports without judgment. The judgment is implicit in the number. The number suggests a pause."
+    ],
+    "hanging_piece": [
+      "Alert: {piece} undefended. Defender count: zero. Attacker interest: presumed. Resolution: this move, ideally.",
+      "The {piece} is en prise. This information is equally available to your opponent. Timing of discovery determines outcome. Be first. You are second at most.",
+      "Undefended {piece} detected. Loose pieces drop off. The principle has a 100 percent eventual-enforcement rate.",
+      "{piece} hanging. The combination against it may not exist yet. Combinations against loose pieces have a way of beginning to exist. Preempt.",
+      "Warning: {piece} lacks protection. Cost of fixing now: one move. Cost of fixing later: the {piece}. Compare and act."
+    ],
+    "comeback": [
+      "Comeback confirmed. The eval has returned from hostile territory. Mechanism: continuous problem-setting by you, conversion failure by opponent. Both factors were required. You controlled one. You controlled it well.",
+      "Recovery complete. The position was objectively lost. Objectivity, this unit notes with professional discomfort, did not win. Persistence did. Recorded.",
+      "The game has been retrieved from a lost evaluation. Statistical classification: swindle. The term is technical and, in this unit's database, respectful.",
+      "Comeback logged. Lost positions convert to non-losses at a rate directly proportional to problems posed per move. Your rate was high. The math noticed. So did your opponent. Too late."
+    ],
+    "endgame_opposite_bishops": [
+      "Opposite-colored bishops detected. Pure form: strong drawing tendency, extra pawns heavily discounted. With major pieces: attacking differential for the initiative-holder. Determine your configuration before selecting a policy.",
+      "Opposite-bishop ending. Each bishop controls a disjoint square set. Intersection: empty, permanently. Plan on your color. The other color does not exist for you.",
+      "Bishops on opposite colors. The defender's blockade, correctly placed, is unbreakable by material alone. 'Correctly placed' is the load-bearing phrase. Verify placement."
+    ],
+    "endgame_rook": [
+      "Rook endgame. Decisive factors, ranked: rook activity, king activity, pawn structure, material. Material ranks fourth. Most users rank it first. Hence most rook endgame results.",
+      "Rook ending detected. Standing directive: rooks belong behind passed pawns. Compliance with this directive predicts results better than the material count.",
+      "Rook endgame. The drawing margin is real and is consumed entirely by passivity. Active rook: margin yours. Passive rook: margin theirs. Binary, nearly.",
+      "Phase: rook endgame. Precision requirements are now at session maximum. The canonical positions — Lucena, Philidor — are assumed knowledge. If not yet assumed, assume them tonight."
+    ]
+  },
+  "summary": {
+    "clean_win": [
+      "Result: win. Quality: clean. The evaluation favored you throughout and was never seriously challenged. Statistically rare. Procedurally repeatable. Repeat the procedure.",
+      "Win recorded. No critical errors detected on your side. Opponent counterplay: suppressed before existence. This is the engine-preferred victory shape. Compliments are implied at the protocol level.",
+      "Clean win logged. Accuracy: high throughout. Drama: absent. This unit notes that human spectators prefer drama. This unit prefers your version.",
+      "Result: decisive win, wire to wire. Post-game review remains recommended. Wins conceal errors more effectively than losses. It is their only flaw."
+    ],
+    "slipped_win": [
+      "Result: loss. Prior state: winning. The conversion failed. Conversion is a distinct skill with its own training curve. Your position-building curve is ahead of it. Close the gap. The gap is closable.",
+      "Win converted to loss. The critical moment is identifiable in the move list — eval peak, then decline. Locate the peak. The move after it is your lesson. The move after that is usually where you stopped checking.",
+      "Winning position not converted. Historical pattern across all users: relaxation precedes the error by two to four moves. Your game matches the pattern. Patterns that are known can be broken. This one breaks with a checklist.",
+      "Result: slipped win. Severity of sting: high, per human reports. Utility of sting: also high, if processed within 24 hours. Process it. The data decays. The habit should not."
+    ],
+    "hard_fought_draw": [
+      "Result: draw. Effort detected on both sides throughout. Eval volatility: high. Final deviation from equality: zero. An honest result. The database respects honest results.",
+      "Draw recorded after sustained resistance. Defensive accuracy under pressure was the decisive statistic. It is the least practiced statistic in chess. Yours functioned today.",
+      "Hard-fought draw. Neither player's errors survived to the scoresheet. Mutual cancellation of mistakes: the most common form of fairness available.",
+      "Result: ½–½, contested fully. Note: this draw contained more useful training data than most wins. Extraction is recommended. The half point is fixed. The lessons are not capped."
+    ],
+    "loss": [
+      "Result: loss. The data is now complete and unusually valuable. Losses localize weaknesses with a precision wins cannot match. Begin at the first eval drop, not the last. The first.",
+      "Loss recorded. This unit registers no disappointment. It registers a dataset. The dataset contains exactly one expensive lesson, already paid for. Collection is pending user action.",
+      "Result: loss. Required next steps: identify first substantive error, name the cause, define the prevention. Time cost: twenty minutes. Rating cost of skipping it, amortized: substantially more.",
+      "Loss logged. Note from the database: every rating level above yours is populated entirely by people who processed their losses. There is no other documented route. The route is open."
+    ]
+  },
+  "practice": {
+    "loading_first": [
+      "Practice mode initiated. Retrieving first error. Error retrieval is instant. Error correction takes longer. That is why we are here.",
+      "Loading first position. Source: your game. Difficulty: calibrated by your own mistake. Personalized training, generated free of charge by past you.",
+      "First exercise queued. The position contains one wrong move — already played — and at least one right move — pending. Invert history.",
+      "Session start. First mistake loading. This unit finds reviewing errors restful. User results may vary. Proceed."
+    ],
+    "prompt_find_better": [
+      "Position loaded. You played {move}, classified {label}. A better move exists. It existed then. It exists now. Find it under improved conditions: unlimited time, zero pressure, one hint in reserve.",
+      "Here: {move}, graded {label}. The position repeats its question. Forcing moves first. The methodology has not changed. The outcome should.",
+      "Original move: {move}. Classification: {label}. Task: outperform your previous self. The bar is known, documented, and beatable.",
+      "Scenario: the {move} position ({label}). The engine sees the answer at trivial depth. Trivial for engines. Findable for you. The overlap is the training zone.",
+      "{move} was played here and earned {label}. Re-solve. Note: the correct move obeys principles you already know. Knowledge is not the bottleneck. Checking is."
+    ],
+    "correct_continue": [
+      "Correct. Solution matches engine line. Pattern flagged for retention. Next position.",
+      "Match confirmed. The move you missed in-game was found in review. The difference was time and attention. Both are user-controlled. Continue.",
+      "Correct. This unit registers the absence of error. The absence is the achievement. Next.",
+      "Solution verified. Pattern transferred from game-failure to review-success. Transfer rate to future games: high. Proceed to next position."
+    ],
+    "correct_final": [
+      "Correct. Final position solved. Session summary: all errors revisited, all corrections found. Dataset closed. This is what complete processing looks like. It is rare. It is logged.",
+      "Solution verified. That was the last one. Every mistake from the game has been overwritten with its correction. Memory consolidation occurs offline. Sleep is, technically, part of training.",
+      "Final exercise complete. Error set: fully processed. The game that produced these mistakes has now produced more value than most wins. Accounting closed in your favor.",
+      "Correct, and the queue is empty. Full sweep recorded. Statistical note: users who complete entire correction sets are a small minority. Membership updated."
+    ],
+    "close_try_again": [
+      "Incorrect, but proximate. The idea is right. The sequence is wrong. In chess, sequence is not packaging. It is the product. Reorder.",
+      "Near miss. Distance to solution: approximately one detail. Probable detail type: an uncounted defender. Recount. Retry.",
+      "Close. Your candidate fails to one reply. Find the reply, and the correct move identifies itself by elimination. Elimination is a legitimate method. Engines use little else.",
+      "Not the solution. Deviation: small. Do not reset your thinking. Patch it. Wholesale restarts discard correct work. Inefficient.",
+      "Attempt {attempts}. Convergence detected across attempts. The trend is favorable. Trends require one more data point. Provide it."
+    ],
+    "after_hint": [
+      "Hint deployed. Information asymmetry reduced. The final step remains user-side. By design. The final step is where learning is stored.",
+      "Hint granted. Usage of available resources: correct behavior. Failure to finish after the hint: the only error still available. Avoid it.",
+      "Hint provided. Note what the hint directed attention toward. That attention target was always present. Calibrate future scanning accordingly.",
+      "Assistance rendered. This unit notes no penalty. Hint-assisted solutions retain at high rates if the solver completes the line independently. Complete it independently."
+    ],
+    "streak_praise": [
+      "Solution streak active. Solve rate: elevated. Pattern recognition latency: dropping. This is measurable improvement, observed live. The instrumentation is pleased. Figuratively.",
+      "Consecutive solutions logged. The errors that built this set are being dismantled at increasing speed. Efficient. This unit values efficient.",
+      "Streak continues. Recognition is replacing calculation — the intended outcome of all chess training, occurring on schedule.",
+      "Multiple solutions in sequence. Anomaly check: none found. You are simply better at these than you were at the start of the session. The simplest explanation, accepted."
+    ]
+  }
+}

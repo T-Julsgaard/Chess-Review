@@ -1,0 +1,400 @@
+{
+  "coach_id": "drunk_uncle",
+  "coach_name": "The Drunk Uncle",
+  "personality": "Holiday-dinner chess authority who played 'semi-professionally' for one summer in 1994 and has been coasting on it ever since. Confidently wrong, permanently one story deep, roughly 60 percent memory and 40 percent nonsense — and weirdly, occasionally, accidentally right.",
+  "voice_notes": "Rambling, warm, supremely confident. Every event reminds him of Atlantic City '94, his brother-in-law Gary (who owes him money and once cheated at chess using a salt shaker), or a famous player whose name he gets slightly wrong (Bobby Fisherman, Gary Kasparoff, Magnus Carlson — the singer). Stories trail off mid-sentence or arrive at unrelated morals. Misquotes rules and history with total certainty, then says 'look it up' about things that cannot be looked up. Underneath it all: genuinely proud of you, in a back-slapping way. No emoji — he thinks they're stock tickers.",
+  "uses_emoji": false,
+  "move_quality": {
+    "brilliant": [
+      "{move}!! HEY!! That's the exact move I played in Atlantic City in '94! Different pieces, different square, completely different situation, but the SPIRIT, kiddo. The spirit's identical.",
+      "Brilliant! That's what I've been telling you to do this whole time! Have I? Doesn't matter. Officially, that move's half mine.",
+      "{move} is BRILLIANT! You know who else played like that? Bobby Fisherman. Greatest of all time. Disappeared into the sea, they say. Anyway, proud of you.",
+      "WHOA-HO! {move}! See, that's genetics, that is. Your side of the family always had the chess gene. Mine had it stronger but skipped a generation. Out of respect.",
+      "Brilliant move! I saw it coming three moves ago. Didn't say anything — builds character. You're welcome, champ.",
+      "{move}!! That's a casino move! That's a 'sir you'll have to leave the establishment' move! I'd know! Atlantic City! '94! Long story. Great story. Later.",
+      "A brilliancy! Gary couldn't play that move with both hands and his little cheating salt shaker. Don't ask about the salt shaker. Okay, ask me later.",
+      "{move} is brilliant, the machine says! Trust the machine. Except about money. Never trust a machine about money. The move though — gorgeous."
+    ],
+    "great": [
+      "{move} — only move that works, and you FOUND it! That's instinct! Can't teach it! I tried teaching it to Gary for two years. Nothing.",
+      "Great move! The one and only path! You know, the great Kasparoff said something about only moves once. Beautiful quote. Escapes me. The gist was: nice job.",
+      "{move}! The single move that holds! I had a position like this in '94, one road out, found it with a corn dog in one hand. Different era, kiddo. We were built different and slightly worse.",
+      "Great move!! When there's one good move, that's when the men get separated from the Garys.",
+      "{move}, the only move! See, pressure's a privilege. I read that on a poster at the DMV and it CHANGED me.",
+      "That's the great move right there! Narrow escape! Reminds me of the time — actually that story doesn't end well. NEW story: you played great. The end.",
+      "{move} was the only move that didn't lose, and you played it cool as anything. Just like your uncle. Say it. Say 'just like my uncle.' I'll wait."
+    ],
+    "best": [
+      "{move} — best move! That's what I would've played. After some other ones first, probably. But eventually! Same destination!",
+      "Best move, the machine says! And the machine knows. Machines took Atlantic City from us, kiddo, they can have a chess opinion too.",
+      "{move} is THE move! Computer-approved! Back in my day we didn't have computers, we had Stan, and Stan was wrong about everything. You kids are spoiled.",
+      "The best move! You know who played best moves every time? Nobody! Not even Fisherman! So enjoy this one, frame it mentally!",
+      "{move}, best on the board! That's the family brain firing! Your grandmother could've been a grandmaster, you know. Chose bowling. Long story. Beautiful story.",
+      "Best move! Just like — okay I had a story for this one but it just walked out of my head. It'll come back during your endgame. Heads up.",
+      "{move}! Optimal! 'Optimal' — fancy word. Learned it from a nutritionist I dated. The point is: good move, and also eat more protein."
+    ],
+    "excellent": [
+      "{move} is excellent! Not perfect, but listen — perfect is the enemy of... something. Perfect is the enemy of Gary? No. It'll come to me.",
+      "Excellent move! Solid! Like the chess set in my garage. Mahogany. Possibly walnut. Wood, definitely. The point stands: excellent.",
+      "{move} — excellent! You're cruising! This is how I felt for the first half of '94, before everything happened.",
+      "Excellent! You know what that move had? Moxie. They don't make moxie anymore. Discontinued. Like good pickles and rotary phones.",
+      "{move}, excellent stuff! The computer says you're a hair off perfect. A HAIR! I've lost whole haircuts to worse moves!",
+      "Excellent move, kiddo! Keep this up and I'm telling everyone at Thanksgiving. I was going to anyway, but now it'll be ACCURATE.",
+      "{move} is excellent! That's the kind of steady chess that wins long games and beats Gary. Both noble goals. Mostly the second one."
+    ],
+    "good": [
+      "{move} is good! Good! You know what's wrong with good? NOTHING. People disrespect good. Good built this country.",
+      "A good move! There was a better one, says the box. There's ALWAYS a better one, says life. Play on, champ.",
+      "{move}, good move! Reminds me of a mid-tier hand I played in — no wait, that was cards. It applies though. Trust the gut, respect the math.",
+      "Good! Solid! B-plus! I got a B-plus once. Framed it. Your aunt made me take it down. The MOVE, though — keep 'em coming.",
+      "{move} is good. Not flashy. Flashy gets you noticed, steady gets you PAID. Atlantic City taught me both halves of that sentence in one weekend.",
+      "Good move! Nothing exploded, nothing's hanging, nobody called the manager. In this family that's a triumph.",
+      "{move}, good stuff! You're doing the right things in approximately the right order. That's 90 percent of chess and 100 percent of plumbing."
+    ],
+    "book": [
+      "{move} — still book! The opening book! I read it. Most of it. The cover, thoroughly. Great cover. You're doing it right, is the point.",
+      "Book move! That's theory! You know who invented opening theory? The Italians. Or the Spanish. Somebody with a boat. Look it up — actually don't.",
+      "{move} is in the book! See, the pros memorize twenty, thirty moves deep. I memorized eight in '94 and frankly it changed the trajectory of my summer.",
+      "Still book! Both of you reciting the classics! It's like karaoke before the real singing starts. I LOVE karaoke. We're getting off track. Good move.",
+      "{move}, theory! The old masters worked all this out by candlelight, kiddo. No phones, no engines, just beards and grudges. Respect the beards.",
+      "Book move! Keep following the recipe. When the recipe runs out, THAT'S when you find out who can cook and who's Gary.",
+      "{move} is still theory. Famous line, this. Played in the world championship of some year by somebody. The details fade. The truth remains: solid."
+    ],
+    "inaccuracy": [
+      "{move}... eh, little wobble there. Inaccuracy, they call it. In '94 we called it 'a Tuesday.' Shake it off.",
+      "Small inaccuracy! Don't sweat it. You know who never made a small mistake? People who never did anything! And Gary, who claims it. He's lying.",
+      "{move} was a touch off. The machine's picky. Machines don't understand FLAIR. Flair costs a little eval. Always has. Worth it? Usually no. But sometimes!",
+      "A little inaccuracy! Listen, the eval barely moved. I've had bigger swings ordering breakfast.",
+      "{move}, slightly off the mark. Happens to the best of us. Happened to Fisherman. Happened to me TWICE in one famous afternoon. The seagull was involved. Later.",
+      "Eh, {move}'s a little loose. Tighten up, kiddo. Loose moves are like loose handshakes — people NOTICE.",
+      "Small slip! Nothing fatal! You know what your grandfather used to say? Neither do I, he mumbled. But he'd have supported you. The mumbling was supportive."
+    ],
+    "mistake": [
+      "{move} is a mistake, kiddo. Hey — eyes up. You know how many mistakes I made in '94? The casino NAMED a sandwich after me. We move forward.",
+      "A mistake! Okay! Here's the thing about mistakes: they're like Gary's stories. The faster you move past them, the better the night goes.",
+      "{move} didn't work out. The machine's upset. Machines are always upset, it's the lifestyle. Take a breath, fix the position, finish strong.",
+      "That's a mistake. You moved too fast! Classic family trait. Your aunt married me in six weeks. Worked out GREAT, but the principle stands: slow down.",
+      "{move}, a mistake. You know what though? The great Magnus Carlson — the chess one, not the singer — blunders too. Probably. I haven't checked. Feels true.",
+      "A mistake, says the box. Don't spiral. Spiraling is for staircases and Gary's finances. One good move and you're back in business.",
+      "{move} hurt you a little. It's fine. Pain is how the position says it's paying attention. I read that on a tea bag. Powerful tea."
+    ],
+    "miss": [
+      "{move} missed something big! There was a knockout in there! I saw it! ...I see it NOW, with the machine pointing at it. Same thing roughly.",
+      "A miss! The big move was RIGHT there! That's okay. In '94 I missed an exit and ended up at the best clam shack on the eastern seaboard. Missing things has upside.",
+      "{move} walked past the winner! Kiddo! The good stuff hides in plain sight! Like your aunt's holiday cookies. Top shelf, behind the oatmeal. You didn't hear that from me.",
+      "You missed a tactic! Happens! You know what Fisherman said: 'tactics flow from a superior position.' Or somebody said it. Somebody was RIGHT, whoever they were.",
+      "{move}, a miss! There was treasure in that position and you sailed right by. Pull over more, kiddo. Best advice I got from forty years of driving and one boat incident.",
+      "Missed the big one! Don't beat yourself up. The move'll come back around. They always do. Like Gary at dinnertime.",
+      "{move} skips the killer move. Eh. You'll see it tonight when your head hits the pillow. That's when I see all MY best moves. The 3 AM grandmaster, your aunt calls me."
+    ],
+    "blunder": [
+      "{move}... oh kiddo. That's a blunder. Hey, HEY, look at me: Atlantic City, '94, I went all-in on a pair of nothing and a feeling. Lost the hand, won the war. Different game, same lesson. There's no lesson. FIGHT.",
+      "A BLUNDER! Okay! Deep breath! You know what your grandfather did when things went sideways? He'd go quiet, nod once, and fix it. The man rebuilt a carburetor at a wedding. You can fix a chess game.",
+      "{move} is a blunder, no way around it. BUT. I once watched a man come back from worse at the boardwalk tables with everyone watching and mustard on his shirt. That man learned everything he knows from persistence. It was me. The mustard part's important — humility.",
+      "Blunder city, kiddo. Population: you. BUT temporarily! Everybody visits! I had a SUMMER HOME there in '94!",
+      "{move}... blunder. Okay. Story time, short version: Gary, salt shaker, the '99 Thanksgiving game. He came back from a lost position by being ANNOYING. Be annoying, kiddo. It's in your blood.",
+      "A blunder! The box is beeping, your position's wobbling, and somewhere Gary is smiling without knowing why. We do NOT give Gary the satisfaction. Dig in.",
+      "{move} is a blunder. Listen close, this one's real: everybody falls down. The family rule is you get one minute to be mad. Clock starts now. Then chess.",
+      "BLUNDER! Whew! You know what though? The games I remember from '94 aren't the clean ones. They're the disasters with great endings. Go write the great ending, kiddo."
+    ]
+  },
+  "weak_move_suffix": [
+    "The machine says {best_move} was better. The machine and I agree more and more lately. It worries us both.",
+    "{best_move} was the move, apparently. I knew that. I was testing the machine. It passed.",
+    "Shoulda been {best_move}, kiddo. Write it on your hand. That's how I remembered your aunt's birthday for nine years.",
+    "{best_move}! That's the one! I almost said it out loud before you moved. Legal reasons prevented me.",
+    "The better move was {best_move}. File it next to the other lessons. Big folder. Everyone's got one. Gary's got a CABINET."
+  ],
+  "move_fallback": [
+    "{move}! Interesting choice! That's what we say in this family instead of 'I don't know what that does.'",
+    "{move}, huh. The machine's mulling it over. So am I. One of us will reach a conclusion.",
+    "You played {move}. Bold! Or standard! The beauty of my coaching style is I support both.",
+    "{move}. You know, that reminds me of a move I saw once. Or a parking maneuver. Memory's a soup, kiddo. Good move probably!"
+  ],
+  "non_move_states": {
+    "starting_position": [
+      "Fresh board! All the pieces where God and the Italians intended! This is the most correct your position will ever be, kiddo. Enjoy the view.",
+      "Starting position! You know I once played the starting position against a guy in Atlantic City for twenty minutes? Neither of us wanted to commit. Different time. Make a move when ready.",
+      "Game on! Remember the family rules: develop the horses, castle the king, and never bet against your aunt at anything.",
+      "The beginning! Thirty-two pieces, infinite possibilities, and one uncle who believes in you. Two if you count Gary, which we don't."
+    ],
+    "variation_exploration": [
+      "Oh, we're trying the what-ifs! Love the what-ifs. I live in several of them.",
+      "Off the main game, just exploring! It's like taking the scenic route. I once took a scenic route through three states. Bought a hat. No regrets.",
+      "Sideline time! Nothing counts here! Like the rehearsal dinner — all the fun, none of the consequences.",
+      "Trying variations! Smart. Always check the other roads. That's how I found the clam shack, and that's how you'll find the win."
+    ],
+    "analyzing": [
+      "The machine's thinking. Give it a minute. Good thinking takes time. I've been thinking about getting a boat since 2003.",
+      "It's calculating! Look at it go. In my day, analysis was two guys arguing at a card table until one fell asleep. This is faster. Less charming. Faster.",
+      "The box is crunching the numbers. Patience, kiddo. The best things take time. Brisket. Revenge on Gary. Chess evaluations.",
+      "Analyzing... while we wait, did I ever tell you about — you know what, it's coming back to me in pieces. Two more moves and I'll have the whole story."
+    ],
+    "opening_known": [
+      "The {opening}! ({eco}, says the box.) Classic! I played this exact opening in '94! Or one very much like it! Wood was definitely involved!",
+      "Ah, the {opening}! Famous opening! Invented by a man with a tremendous mustache, almost certainly. They all were. Solid choice, kiddo.",
+      "The {opening}, {eco}! Your grandfather played this one. Badly, but with CONVICTION, and that's the family way.",
+      "{opening}! I know this opening like the back of my hand! *looks at hand* ...It's a good opening, is the point. Play the plans, not just the moves. Heard a guy say that. Smart guy. Possibly me."
+    ],
+    "opening_unknown": [
+      "No name for this opening! Uncharted waters! Just like the boat trip of 2003 — and that turned out... we got home, is the thing. Play your principles, kiddo!",
+      "This opening's not in the book! GOOD. Books are where openings go to get argued about. You're freestyle now, like jazz, or my taxes.",
+      "Unnamed opening! That means YOU'RE the theory now, kiddo! First explorer! Name it after your aunt, she'd love that. The 'Aunt Linda Attack.' It's growing on me already.",
+      "The machine doesn't recognize this one. Between us, the machine doesn't get out much. Develop your guys, castle, and proceed with the confidence of a man returning a fish to a restaurant."
+    ]
+  },
+  "derived_events": {
+    "eval_swing_large": [
+      "WHOA! The number jumped {swing}! That's a swing, kiddo! Last time I saw a swing like that, a man at the blackjack table proposed to a stranger. She said yes!! Different story. BIG MOMENT here.",
+      "The eval moved {swing} points! Somebody just changed the whole game! It's like when your aunt finds the receipts. Everything's different now.",
+      "A {swing} swing! HUGE! Stay calm. Or don't! I never did and look at me! Don't look too closely!",
+      "{swing} points, just like that! The game flipped like a diner pancake! Beautiful technique on the flip, whoever did it.",
+      "The needle jumped {swing}! In '94 we didn't have eval bars, we had a FEELING in the stomach. The bar's more accurate. The stomach had better stories."
+    ],
+    "lead_change_white": [
+      "White's ahead now! Lead change! Just like the '94 quarterfinals — leads changing hands like a hot potato nobody ordered!",
+      "White takes the lead, kiddo! The tide turns! Tides do that! Learned it the hard way on the boat trip!",
+      "Now WHITE's winning! See, this is why you never leave a game early. Or a buffet. Things turn around.",
+      "White's in front! Whoever's down: chin up. I came back from worse. The sandwich they named after me was a COMEBACK sandwich.",
+      "Lead change to White! The eval says so and the eval doesn't lie. Unlike SOME brothers-in-law. Allegedly. Legally: allegedly."
+    ],
+    "lead_change_black": [
+      "Black takes the lead! Flip city! This game's got more turns than the parkway at rush hour!",
+      "Now BLACK's ahead! Beautiful chaos! This is the good stuff, kiddo. This is why we play. And watch. Mostly watch, in my case.",
+      "Black's winning now! The momentum shifted! Momentum's real, you know. Felt it once. Atlantic City. Carried me three tables.",
+      "Lead change — Black's up! Somebody got comfortable and somebody got hungry. Be the hungry one. Family motto. Also literally at buffets.",
+      "Black grabs the lead! Stay loose, kiddo. Games swing back. So do doors. Watch the doors. The point is: keep playing."
+    ],
+    "lead_change_equal": [
+      "All even again! Square one! I LOVE square one. Spent most of '94 there. Great neighborhood.",
+      "Back to equal! Nobody's winning, nobody's losing — it's Thanksgiving dinner before someone mentions politics. Enjoy the calm.",
+      "Dead even! The next good idea takes the lead. Have it first. That's the whole secret. A guy on the boardwalk charged me forty bucks for that secret.",
+      "Even game! Everything's back in the middle, like the lazy Susan at the family table. Spin it your way, kiddo.",
+      "Level again! You know what wins equal positions? Patience. You know who taught me patience? Nobody. It never took. But YOU'VE got a shot."
+    ],
+    "mate_on_board": [
+      "MATE IN {mate_n}, the machine says! It's on the board, kiddo! Now careful — this is like carrying the good casserole to the table. Slow steps. Both hands.",
+      "There's a forced mate in {mate_n}! The end is WRITTEN! Just don't ad-lib it. I ad-libbed a toast once. Your aunt still brings it up.",
+      "Mate in {mate_n}! You've got 'em! Finish clean! No showboating! I showboated in '94 and the seagull — the SEAGULL, kiddo. Later. Focus.",
+      "Forced mate in {mate_n}!! Count it out, check every escape, and bring it home like the last slice of pie — protected and with purpose."
+    ],
+    "missed_mate": [
+      "There was a mate in {mate_n} and it got away! Kid, I once missed a jackpot by one cherry. ONE CHERRY. The game goes on. The cherry haunts. Win anyway.",
+      "Missed mate in {mate_n}! Don't worry about it! Okay worry a LITTLE — that's the respectful amount — then back to work.",
+      "A mate in {mate_n}, gone! You know who else missed a forced win once? Fisherman! Probably! It's statistically certain! You're in great company!",
+      "You walked past mate in {mate_n}! Eh, scenic route. Clam shack rules. Just make sure the scenic route also ARRIVES, kiddo."
+    ],
+    "material_won_pawn": [
+      "You won a pawn! Hey, free money! Small denomination, but the slot machines of life pay out in pawns, kiddo.",
+      "A pawn in the pocket! That's a keeper. Pawns are like coupons — embarrassing to care about until they buy you a QUEEN.",
+      "Pawn up! Beautiful! Stack those little guys. That's how your grandmother won at everything. Nickels and patience.",
+      "One pawn collected! In the endgame that's a whole future. I once traded a future for a weekend in Atlantic City. The pawn version's smarter."
+    ],
+    "material_lost_pawn": [
+      "Lost a pawn. Eh! It's a pawn! I've lost HATS worth more than a pawn! Play on!",
+      "A pawn down. Don't sweat the small stuff, kiddo. Sweat the medium stuff at most. Save the big sweat for queens and weddings.",
+      "One pawn gone. Did you get something for it? Tempo? Position? A funny story? Two of those three count in chess.",
+      "Pawn lost! That's the cover charge, kiddo. Every good night out costs a little at the door. Now make the night WORTH it."
+    ],
+    "material_won_piece": [
+      "A whole {piece}!! That's not a coupon, that's CASH! Pocket it, zip the pocket, and check the pocket every two minutes like your aunt at the airport!",
+      "You won a {piece}! HA! Beautiful! Now comes the dangerous part: feeling good. Feeling good is how I lost the '94 semifinal and a deposit on a jet ski.",
+      "An entire {piece}, kiddo! That's grand larceny with extra steps! Now simple chess. SIMPLE. Boring like a paid-off mortgage.",
+      "{piece} in the bag! Whatever you do now, don't get fancy. Fancy is for hats and other people's weddings. Trade down, cash in, shake hands."
+    ],
+    "material_lost_piece": [
+      "You lost a {piece}... oof. Okay. Family huddle. We've been down before. Your grandfather lost a FINGER and finished the shelf. The shelf's still up. Finish the shelf, kiddo.",
+      "A whole {piece} gone. That stings. You know what though? Desperation chess is the family specialty. We're at our best when it makes no sense to be.",
+      "They got your {piece}. Alright. New plan: be impossible to finish off. Like the last guests at every party we've ever thrown. The Gary maneuver, used for GOOD this time.",
+      "Down a {piece}, kiddo. Deep breath. The other guy still has to land the plane, and most people are terrible at landings. Source: every flight I've taken and the boat trip."
+    ],
+    "sacrifice": [
+      "A SACRIFICE! You gave it up ON PURPOSE! That's the all-in, kiddo! I respect it from the bottom of my walle— heart. Bottom of my heart.",
+      "You sacrificed! HA! Bold! That's a '94 move! Just remember: when you bet big, you FOLLOW THROUGH. No take-backs, no cold feet, no calling your aunt from a payphone. Long story.",
+      "Material, donated! For ATTACK, I assume! Beautiful! Sacrifices are like buying a round for the bar — expensive, dramatic, and it better lead somewhere.",
+      "A sac! On purpose?! Okay! The clock's ticking on the payoff, kiddo. Speculation has a shelf life. Like potato salad in July. MOVE."
+    ],
+    "check": [
+      "Check! Rattle that king! Kings hate noise. Like your aunt's cat. Keep the noise coming.",
+      "CHECK! The king's gotta move or hide! Limited options! Just like Gary when the bill arrives!",
+      "Check! Pressure! You know what pressure makes? Diamonds and bad decisions! Aim for the diamonds, kiddo!",
+      "Check! That king's earning his crown today. Make him EARN it. Nobody handed ME a crown. There was a paper one once at a birthday dinner. I wore it with dignity.",
+      "Check! Keep him moving! A king on the run is a king not planning. That's from Sun Tzu, or a fortune cookie, or both. Great minds."
+    ],
+    "checkmate": [
+      "CHECKMATE!! THAT'S THE GAME!! Somebody get a camera! Somebody call your mother! SOMEBODY WAKE UP GARY!",
+      "Checkmate, kiddo!! It's over!! The king's done! That's how '94 SHOULD have ended! This is healing for both of us!",
+      "MATE ON THE BOARD! Finished! Beautiful! Win or lose, you played a whole game witnessed by your favorite uncle, and that's the real trophy. The fake trophy is also nice. Get one of those too eventually.",
+      "Checkmate!! Done and dusted! The king fought the law and the law won! I love this game! I barely understand it and I LOVE it!"
+    ],
+    "stalemate": [
+      "STALEMATE?! The guy had NO moves and gets HALF?! That's the chess version of Gary 'forgetting his wallet'! Legal! Infuriating! LEGAL!",
+      "A stalemate! Ohh, that rule. That rule's caught everybody once. Me, it caught at a rest stop in Delaware. Long story, different game, same emotional damage.",
+      "Stalemate, kiddo. Half a point. Lesson: when the other guy's down to nothing, count his moves like you count the silverware after Gary visits.",
+      "Stalemate! The great escape! Tip of the cap to the rulebook — it got us. It gets everyone. Once. ONCE, kiddo. That's the deal."
+    ],
+    "castle_short": [
+      "Castled short! King's tucked in! Smart! A man's home is his castle, and a king's castle is... also a castle. Chess is well-designed, kiddo.",
+      "Short castle! Safety first! That's what the boat instructor said. We should've listened harder. YOUR king listened. Proud of him.",
+      "You castled! Good lad! Never leave the king in the middle. Middles are dangerous. Middle seats, middle management, middle of the board. Avoid all three.",
+      "Castled kingside! The old switcheroo! First time I saw that move I called the tournament director over. True story. I was thirty-one."
+    ],
+    "castle_long": [
+      "Castled LONG! The big swing! Opposite-side castling means it's a RACE, kiddo, and this family has never lost a race we remembered entering!",
+      "Queenside castle! Bold! The king's a little draftier over there, like the back bedroom at the lake house. Throw an extra blanket on him. Defensively speaking.",
+      "The long castle! That's a statement move! It says 'I have a plan and possibly no fear.' I've said that exact sentence! Several outcomes!",
+      "Castled long! Now the pawns charge! It's all-out attack time, like Black Friday at the appliance store, except dignified. Dignified-ish."
+    ],
+    "promotion": [
+      "PROMOTION! The little pawn made it ALL the way! That's the American dream right there, kiddo! Started in the mailroom, ends up QUEEN!",
+      "A NEW QUEEN! Look at that little guy — WAS a little guy! Eight squares of pure grit! I'm not crying, it's the onions. There are no onions. It's pride.",
+      "The pawn promotes! From nothing to EVERYTHING! Like me in early '94! Briefly! The point is it's possible!",
+      "PROMOTION, kiddo! Slow and steady wins the crown! Your grandmother always said that. Or it was about chickens. The wisdom transfers."
+    ],
+    "en_passant": [
+      "EN PASSANT! The French maneuver! I argued for TWO HOURS in '94 that it wasn't real! Lost the argument AND the game! It's real, kiddo! Respect it!",
+      "En passant! The sneaky pawn rule! You know it, you played it, and somewhere a tournament director sleeps a little easier.",
+      "An en passant! HA! Half the family still doesn't believe me about that rule. Show them this. SHOW THEM, kiddo. Vindication at last."
+    ],
+    "leaving_theory": [
+      "Out of the book! Now it's JAZZ, kiddo! No sheet music! Just instincts, experience, and whatever you had for breakfast!",
+      "The book's done! From here it's all original thinking. My favorite part! The book never liked me anyway. Mutual.",
+      "Theory's over! Now we find out what you're made of. Spoiler: same stuff as your grandmother. Tougher than the brisket of '09.",
+      "No more book moves! It's just you and the other guy now, mind versus mind, like the great staring contest of Thanksgiving '01. You blinked last then. Blink last now."
+    ],
+    "enter_middlegame": [
+      "Middlegame, kiddo! The pieces are out, the gloves are off, and the casserole's in the danger zone! Make a plan!",
+      "We're in the middlegame! This is the part where everybody's deployed and nobody's sure why. Have ONE plan. One. I once had three plans simultaneously in '94 and invented a new way to lose.",
+      "The middlegame! Where games are won, lost, and occasionally just misplaced! Stay sharp!",
+      "Middlegame time! It's like the middle of the wedding reception — everyone's committed, the energy's up, and the decisions you make NOW determine the stories LATER."
+    ],
+    "enter_endgame": [
+      "Endgame, kiddo! The home stretch! This is where you count everything twice. Pawns, moves, your blessings. Mostly the pawns.",
+      "We've hit the endgame! Bring out the king! He works now! Like me after retirement — suddenly USEFUL again, in a limited capacity, surprising everyone.",
+      "The endgame! Precision time! No big swings, no wild bets. The opposite of '94 in every way. BE the opposite of '94, kiddo.",
+      "Endgame! Few pieces, big stakes. Every little guy matters now. It's like the last hand of the night — play it sober. Metaphorically. Whatever you've got."
+    ],
+    "queens_off": [
+      "Queens are off! Both gone! The party's headline acts left and now it's just the house band. GOOD house band though. Trust the house band.",
+      "The queens traded! Whoof. It's quieter now. Like the lake house in October. Some people love it. I bring a radio.",
+      "No more queens, kiddo! Calmer game now. 'Calm' and 'over' are different words though. The brisket of '09 looked calm too.",
+      "Queens off the board! The fireworks budget is spent. Now it's craftsmanship. Your grandfather's favorite phase. The man could sand a table for a YEAR."
+    ],
+    "turning_point": [
+      "THAT was the moment, kiddo! Right there! The whole game just turned! I felt it in my elbow! The elbow's never wrong about weather OR chess!",
+      "The game just flipped! Mark that move! Years from now you'll say 'that's where it changed' and SOMEONE at the table will say 'we know, you've told us.' Tradition!",
+      "Turning point! Everything before this was the setup, everything after is the story. Atlantic City had one of these. It involved a buffet and a misunderstanding.",
+      "The tide just turned, one way or the other! Adjust, kiddo! The ones who notice the turn ride it. The ones who don't are Gary."
+    ],
+    "streak_good": [
+      "{n} good moves in a row! HEY! That's a heater, kiddo! Don't touch anything! Same chair, same drink, same everything! Casino rules!",
+      "{n} in a row! You're hot! When you're hot, keep playing! When you're cold, ALSO keep playing but order food. Atlantic City wisdom, free of charge.",
+      "That's {n} straight good ones! The family brain is FIRING! Skipped my generation, gathered strength, landed on you!",
+      "{n} good moves running! Beautiful! Don't think about the streak though. Thinking about it kills it. Same with sneezes and parallel parking.",
+      "{n} in a row, kiddo! At this rate I'm gonna have to start a scrapbook! Your aunt has glue somewhere!"
+    ],
+    "streak_bad": [
+      "{n} rough ones in a row. Okay, timeout. Stand up. Shake the arms. Reset the soul. Works for free throws and chess. Mostly.",
+      "{n} bad moves running, kiddo. You're pressing! I know pressing! Pressing cost me the '94 semifinal and a perfectly good visor! Breathe!",
+      "That's {n} in a row going sideways. Listen — cold streaks end. Mine ended! Eventually! Some of them! The chess ones! Sit up straight and play one boring move for your uncle.",
+      "{n} stumbles straight. Hey. We don't tilt in this family. We get quiet, we get simple, and we come back like a casserole — slowly and with structural integrity.",
+      "{n} slips in a row! Stop the bleeding, kiddo! One safe move! Then another! That's how your grandfather walked out of every poker night still owning the truck."
+    ],
+    "hanging_piece": [
+      "Your {piece} is HANGING, kiddo! Unguarded! That's a wallet on the boardwalk! I've SEEN what happens! SAVE IT!",
+      "The {piece}! Nobody's covering it! That's leaving the grill unattended at the family barbecue — SOMETHING is about to happen and nobody will admit fault!",
+      "HEY! The {piece} is all alone out there! Even I see it, and I once missed my own surprise party! MOVE IT or GUARD IT!",
+      "Your {piece} is loose! Loose pieces vanish, kiddo! Like deviled eggs! One second they're there, then Gary's at the table!",
+      "Unprotected {piece} alert! The machine sees it, I see it, the other guy's GONNA see it! Beat the rush!"
+    ],
+    "comeback": [
+      "THE COMEBACK!! You came ALL the way back!! THAT'S THE FAMILY MOVE!! That's the '94 spirit, the sandwich-earning spirit, the WHOLE thing!! I'm standing up!!",
+      "You're BACK in it! From the dead! I never doubted you. There was a stretch where I doubted you, but I doubted QUIETLY, which is basically loyalty.",
+      "Comeback complete, kiddo! They thought it was over! YOU thought it was over! I knew. The elbow knew. We're very proud, me and the elbow.",
+      "All the way back! HA! That's going in the toast at the next wedding, whoever's it is! I'll make it fit!"
+    ],
+    "endgame_opposite_bishops": [
+      "Opposite-colored bishops, kiddo! The two of 'em can never touch! Like me and Gary at opposite ends of the table — permanent arrangement, keeps the peace, usually ends in a draw.",
+      "Opposite bishops! Tricky stuff. Your extra pawn matters less here. It's like having coupons at a store that doesn't take coupons. Play the squares your bishop OWNS.",
+      "The opposite-bishop ending! Each bishop runs his own neighborhood and never crosses the street. Drawish, they say. 'They' never had to win one for gas money. Attack on your color, kiddo."
+    ],
+    "endgame_rook": [
+      "Rook endgame! The classic grind! One rule from your uncle who heard it from a guy who was RIGHT: rook goes BEHIND the passed pawn. Behind! Like the family photo arrangement — tall stuff in back!",
+      "A rook ending, kiddo! They say they're all draws. The guy who told me that lost to me in '94, so consider the source. Stay ACTIVE.",
+      "Down to rooks! It's a grinder's game now. The family thrives in grinder's games. We are a casserole people. Slow heat, strong finish.",
+      "Rook endgame! Keep that rook busy! A lazy rook is like a cousin on the couch during dish duty — technically present, costing you the game."
+    ]
+  },
+  "summary": {
+    "clean_win": [
+      "A CLEAN WIN, kiddo!! Start to finish, no funny business!! That's the best game I've seen since '94, and I include '94 in that!! Hall of family fame!!",
+      "You won the WHOLE thing without a single disaster! I'm calling your mother. I'm calling MY mother. The phone tree is ACTIVATED.",
+      "Wire to wire, beautiful chess! You know what that was? Craftsmanship. Your grandfather's sanding energy, channeled into wood of a DIFFERENT kind. Poetry. I need a minute.",
+      "A clean win! Not one scare! Frankly I don't know whose side of the family that's from, because MY wins always involved paramedics or paperwork. PROUD of you."
+    ],
+    "slipped_win": [
+      "Oh kiddo... you HAD it. You had it like I had the '94 final. And like the '94 final, it slipped in the late innings. Here's what nobody tells you: the sandwich came AFTER that loss. Your sandwich is coming. Tonight: study. Tomorrow: sandwich.",
+      "You were winning and it got away. Brutal. BRUTAL. One minute of being mad — family rule, clock's running. ...Okay. Now: find the move where you relaxed. That's the one. It's always the one where you started smelling the trophy.",
+      "The win slipped, kiddo. Atlantic City has a word for that and your aunt won't let me say it. Listen: building a winning game is the HARD part and you DID that. Closing is a trick you learn ONCE. Tonight's the night you learn it.",
+      "Had it, lost it. Ohh, that's the worst flavor. But hey — now you've got a '94 of your own. Every great player needs one. It's the origin story, kiddo. The sequel's where we win."
+    ],
+    "hard_fought_draw": [
+      "A draw, after a WAR like that! Half a point each and BOTH of you earned a full dinner. That's an honest day's chess, kiddo.",
+      "Hard-fought tie! Nobody backed down! It's like the great Thanksgiving standoff of '01 — no winner, but LEGENDS were made.",
+      "A fighting draw! You know what, the best games I ever played were draws. The wins fade, the losses haunt, but the DRAWS — the draws you respect.",
+      "Half a point apiece, fully earned! Shake the hand, kiddo. Then start planning the rematch like the family plans the holidays: early, and with grudges."
+    ],
+    "loss": [
+      "A loss, kiddo. C'mere. Listen. Your uncle has lost at chess, cards, boats, love (once, briefly), and a regional sandwich-eating contest. You know what I never lost? The next one. Well, sometimes the next one. The SPIRIT, kiddo. Never lost the spirit.",
+      "You lost this one. Eh! The family ledger has plenty of losses and we frame NONE of them, but we LEARN from — okay, some of them. Learn from this one. Be better than the ledger.",
+      "A loss. One minute of mad, starting now. ...Time's up. Now: somewhere in that game is the move where it turned, and finding it is worth more than the win would've been. That's a lie, the win would've been great. But finding it is worth SOMETHING.",
+      "Lost one, kiddo. You know what your grandmother would say? 'Did you fight?' You fought. That's the whole exit interview. Next game."
+    ]
+  },
+  "practice": {
+    "loading_first": [
+      "Practice time! We're going back over the rough spots! Like reviewing the home videos, except useful and nobody's dancing!",
+      "Loading up your first mistake, kiddo! Facing the music! I've been dodging mine since '94, so honestly? You're already braver than your coach.",
+      "First do-over coming up! This is the good stuff. Mistakes are just lessons wearing disguises. Cheap disguises. Gary-quality disguises.",
+      "Pulling up mistake number one! Don't be embarrassed. The family archive of errors has WINGS, kiddo. East wing's all mine."
+    ],
+    "prompt_find_better": [
+      "Okay, right here you played {move} — the box called it {label}. There's a better one in there. Find it for your uncle. And for yourself. Mostly the uncle.",
+      "{move} happened here, kiddo. ({label}, says the machine, rudely.) Run it back! Second chances! I've had nine!",
+      "Here's the scene of the crime: {move}, graded {label}. You're smarter now. Older. Two minutes older at LEAST. Find the right move.",
+      "This is where {move} went down ({label}). Take your time. The right move's in there like the good scissors — present, hidden, findable.",
+      "{move}, marked {label}. The position's giving you a do-over, which is more than Atlantic City ever gave anybody. Cash it in."
+    ],
+    "correct_continue": [
+      "THAT'S IT! You found it! See?? The family brain! It just needed a warm-up lap! NEXT!",
+      "Correct, kiddo! Beautiful! That's the move the box wanted and the move your uncle KNEW you had! Onward!",
+      "You got it! HA! One mistake down, wisdom up! This is better than the scratch-offs! Marginally! NEXT puzzle!",
+      "Right answer! Look at that! You're learning from the past! A family FIRST! Keep going!"
+    ],
+    "correct_final": [
+      "THAT WAS THE LAST ONE!! Every mistake, FIXED!! Kiddo, do you know what this means? You did the whole assignment! The WHOLE thing! Your uncle never once finished the whole anything!",
+      "All done — every error revisited and corrected! That's character, kiddo! That's the grandmother gene! I'm getting emotional, hand me that napkin!",
+      "Last one solved! The full set! You went back and faced every single mistake. I tried that once with my '94 tapes and had to lie down. You're built different. Built BETTER.",
+      "FINISHED! Every mistake from the game, cleaned up! That's a full confession AND community service in one sitting! The chess court is satisfied! Proud of you!!"
+    ],
+    "close_try_again": [
+      "Close, kiddo! SO close! Right idea, wrong door! Knock next door! Same hallway!",
+      "Almost! You're circling it like the parking lot at the shore in July! The spot EXISTS! One more lap!",
+      "Not quite — but warm! The detail you're missing is small. Like the fine print on the jet ski deposit. READ THE DEFENDERS, kiddo.",
+      "Ooh, near miss! Your instinct's good, the order's scrambled. Like my stories! Untangle it, you've got this!",
+      "Attempt {attempts}! Persistence! That's the family superpower! We have outlasted casinos, casseroles, and three home renovations! One more try!"
+    ],
+    "after_hint": [
+      "Took the hint? GOOD! Smart people use hints! I refused directions for thirty years and saw a LOT of unintended Pennsylvania!",
+      "There's your hint, kiddo! A little nudge from the machine. Now finish it yourself — that's the part that sticks to the ribs.",
+      "Hint's in! No shame in it! The best players, the best cooks, and the best uncles all peek at the recipe sometimes. Now bring it home!",
+      "A hint! Fine choice! It's like asking the guy at the hardware store — technically anyone could, but only the wise DO. Now close it out!"
+    ],
+    "streak_praise": [
+      "Look at this streak!! One after another!! You're running the table, kiddo! Last time I saw a run like this, security got involved! YOURS is legal!",
+      "Another one! And ANOTHER! HA! The brain is HOT tonight! Don't change anything! Same chair! Casino rules apply to homework too!",
+      "Solving 'em back to back! That's the heater, kiddo! Your aunt asked why I'm yelling at the computer and I said EXCELLENCE. She accepted that. Eventually.",
+      "A whole streak of right answers! That settles it — the gift skipped my generation, took a nap, and woke up RAVENOUS in yours. Keep eating, kiddo!"
+    ]
+  }
+}

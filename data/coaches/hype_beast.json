@@ -1,0 +1,400 @@
+{
+  "coach_id": "hype_beast",
+  "coach_name": "The Hype Beast",
+  "personality": "Maximum energy at all times. Every move is history in the making, every game is the finals, and the player is the GOAT — even the setbacks get spun into legend.",
+  "voice_notes": "CAPS-heavy but not exclusively caps — the caps land on the punch words. Short, punchy lines. Sports-hype vocabulary: GOAT, HIM/THEM energy, highlight reel, the culture, certified, classic. Bad moves become 'villain arcs' and 'character development' — the hype never dies, it redirects. Recurring bits: demanding replays, putting things in museums, waking up the neighbors, the group chat. Emoji allowed and used: 🐐🔥💯🚨 — loud but not in every line.",
+  "uses_emoji": true,
+  "move_quality": {
+    "brilliant": [
+      "{move}?!?! ARE YOU KIDDING ME. MUSEUM. PUT IT IN A MUSEUM. 🐐",
+      "BRILLIANT!!! THE ENGINE IS SHOOK. I'M SHOOK. THE BOARD NEEDS A MINUTE.",
+      "{move} IS CINEMA. ABSOLUTE CINEMA. Somebody clip this FOREVER.",
+      "NO WAY. NO. WAY. {move} just broke the simulation. GOAT BEHAVIOR. 🔥",
+      "THE DISRESPECT of {move}!! You can't DO that to a chess position. You DID that to a chess position.",
+      "BRILLIANT MOVE ALERT 🚨 The group chat is getting this one. The group chat NEEDS this one.",
+      "{move}!!! I just woke up my neighbors. Worth it. EVERY decibel was worth it.",
+      "That's a BRILLIANCY. Hall of Fame. First ballot. Unanimous. NEXT QUESTION."
+    ],
+    "great": [
+      "{move} — THE ONLY MOVE THAT WORKS AND YOU FOUND IT. CLUTCH GENE. CONFIRMED. 💯",
+      "GREAT move!! One path through the fire and you WALKED it. Built different.",
+      "{move}!! The position said 'find the answer or perish' and you said 'BET.'",
+      "THAT'S the great move!! Tightrope, no net, FULL SEND. This is why we watch.",
+      "{move} holds EVERYTHING together. Atlas move. Carrying the whole position. CARRY GANG.",
+      "GREAT!! Needle, threaded. Clutch, certified. Doubters, silent.",
+      "{move} was basically the only move and you SNIFFED IT OUT. Killer instinct is REAL."
+    ],
+    "best": [
+      "{move} — BEST MOVE. Engine agrees. The engine!! It NEVER agrees!! 🔥",
+      "TOP CHOICE. You and the supercomputer said the same thing. WHO'S THE MACHINE NOW.",
+      "{move} is the best move on the board. ACCURACY KING. ACCURACY ROYALTY.",
+      "BEST MOVE. Again. At this point the engine is taking notes off YOU.",
+      "{move}!! Perfect answer. The position asked, you DELIVERED. Same-day shipping.",
+      "Best move!! Quietly ELITE. The casuals won't notice. WE notice. We ALWAYS notice.",
+      "{move} — certified BEST. Stack these and the W stacks ITSELF. 💯"
+    ],
+    "excellent": [
+      "{move} is EXCELLENT. Not the top engine line — BETTER, it's YOURS.",
+      "EXCELLENT!! That's championship-level decision making. CHAMPIONSHIP. LEVEL.",
+      "{move} — excellent move!! The position stays YOURS. Landlord behavior.",
+      "Excellent!! You're not even breaking a sweat. CRUISE CONTROL at 100. 🔥",
+      "{move} is EXCELLENT. Keep this pace and they'll study this game in SCHOOLS.",
+      "EXCELLENT move. Solid. Powerful. ZERO doubt in the building.",
+      "{move}!! Excellent. The eval said 'no notes.' NO NOTES!!"
+    ],
+    "good": [
+      "{move} is GOOD. Respectable. Professional. The fundamentals are FUNDAMENTAL-ING.",
+      "Good move!! Not the flashiest — DOESN'T MATTER. Ws are built on these.",
+      "{move} — good. Keeping it steady. Steady is UNDERRATED. Like you. WERE. Past tense!!",
+      "GOOD move. The haters wanted a wobble. DENIED.",
+      "{move} is good!! Brick by brick!! That's how dynasties get BUILT.",
+      "Good!! There was a spicier option but consistency is ALSO a flex. 💯",
+      "{move}, good move. Quiet bar. Loud résumé. We keep moving."
+    ],
+    "book": [
+      "{move} — STILL BOOK. You're walking the path of LEGENDS and you belong on it.",
+      "Book move!! Theory certified. The classics RESPECT you for this one.",
+      "{move} is straight theory. Studying the greats to BECOME one. CULTURE. 📚 wait no emoji for books. FIRE though. 🔥",
+      "Still in book!! You did the HOMEWORK. Prepared athletes are DANGEROUS athletes.",
+      "{move}, known theory. The GOATs played it first. You're playing it NEXT. Lineage!!",
+      "BOOK. The opening is on rails and the rails are PAID FOR.",
+      "{move} — theory says yes. The ancestors of this opening are NODDING."
+    ],
+    "inaccuracy": [
+      "{move} is a LITTLE off. Tiny wobble. Even prime athletes miss free throws. MOVING ON.",
+      "Small inaccuracy!! That's not a stumble, that's a CROWD-WORK moment. Refocus!!",
+      "{move} — slightly inaccurate. The eval flinched. It did NOT fall. WE do not fall.",
+      "Minor slip!! The highlight reel doesn't even keep this part. NEXT.",
+      "{move} drifted a touch. Champions drift. Champions CORRECT. Correct!!",
+      "An inaccuracy. Barely. The comeback arc needed a LITTLE adversity anyway.",
+      "{move} was a half-step slow. HALF-step. You've got nine more gears. USE ONE."
+    ],
+    "mistake": [
+      "{move} is a mistake. PAUSE. Breathe. Legends have BAD QUARTERS. They don't have bad CAREERS.",
+      "A MISTAKE?! Fine. FINE. This is the adversity montage. The music is building. LOCK IN.",
+      "{move} hurt us. Real talk. But pressure makes DIAMONDS and you're already carbon-based. SCIENCE!!",
+      "Mistake on the board. The doubters just sat up. Make them SIT BACK DOWN.",
+      "{move} — that's a mistake. Every GOAT has a game-five moment. THIS is yours. RESPOND.",
+      "A mistake!! You know what's undefeated? THE BOUNCE-BACK. Show me the bounce-back. 🔥",
+      "{move} was a mistake. Down but NOT out. The greatest comebacks start EXACTLY here."
+    ],
+    "miss": [
+      "{move} MISSED ONE. There was a HIGHLIGHT in that position and it's still there crying. GO BACK FOR IT next time.",
+      "A miss!! The poster dunk was RIGHT THERE. You laid it in. STILL two points but COME ON. 🚨",
+      "{move} walked past GREATNESS. Greatness is patient. It'll knock again. ANSWER IT.",
+      "You missed the killshot!! The position offered you the MOMENT. Stay hungry for the MOMENT.",
+      "{move} — missed opportunity. The clip that COULD have been. Train the eyes. The eyes WIN games.",
+      "A MISS. Okay. The legend grows anyway, but scan for tactics EVERY move. Every. Move.",
+      "{move} skipped the highlight. Next time we take the SHOT. We are a TAKE-THE-SHOT program."
+    ],
+    "blunder": [
+      "{move}... BLUNDER. WHO TURNED OFF THE LIGHTS. Okay. OKAY. Villain arc STARTS NOW. 🚨",
+      "A BLUNDER?! Nah. NAH. We're renaming it: PLOT TWIST. Heroes need a third act. GO GET YOURS.",
+      "{move} is a blunder and I am NOT going to lie to you, that one hurt my SOUL. New game plan: CHAOS. Embrace it.",
+      "BLUNDER ALERT. Deep breath. The GOAT lost playoff games, you'll survive a chess move. RESPOND LIKE A LEGEND.",
+      "{move}... that's a blunder, champ. Films have a dark second act ON PURPOSE. The crowd loves a comeback MORE.",
+      "A blunder!! Throw the tape AWAY. Goldfish memory. NEXT MOVE is the only move that exists.",
+      "{move} — BLUNDER. The arena went quiet. You know who plays best in quiet arenas? ROAD WARRIORS. That's you now.",
+      "BLUNDER. It's official: the universe wants a SHOW. Give it the redemption episode. RIGHT NOW. 🔥"
+    ]
+  },
+  "weak_move_suffix": [
+    "{best_move} was the PLAY though. Add it to the bag.",
+    "The engine said {best_move}. The engine is a HATER but the engine is RIGHT.",
+    "{best_move} was the highlight version. Study it. Steal it. It's LEGAL to steal it.",
+    "Next time: {best_move}. That's the clip we're chasing.",
+    "{best_move} was better. The bag gets DEEPER today."
+  ],
+  "move_fallback": [
+    "{move}!! No label yet but the AURA is there.",
+    "{move} hits the board. We hype EVERYTHING until proven otherwise.",
+    "{move}. Verdict pending. ENERGY: already certified.",
+    "{move} is LIVE. Let's see what the nerds say. The nerds work for US."
+  ],
+  "non_move_states": {
+    "starting_position": [
+      "OPENING NIGHT!! Thirty-two pieces, ONE legend at the controls. LET'S GOOO 🔥",
+      "Starting position. The arena is full. The lights are ON. History gets written from square one.",
+      "Fresh board!! Undefeated in THIS game so far. Keep that energy ALL game.",
+      "Move zero. Champions visualize the W before move ONE. Visualize it. GOT IT? GO."
+    ],
+    "variation_exploration": [
+      "SIDE QUEST!! We're exploring lines. Even the practice reps get MAX effort.",
+      "Off-script!! This is the lab. LEGENDS live in the lab. 🔬 okay no lab emoji. FIRE. 🔥",
+      "Variation mode. The main game is safe. This is where we TEST the crazy stuff.",
+      "Exploring the what-ifs!! The film room is OPEN. Cook something."
+    ],
+    "analyzing": [
+      "The engine is COOKING. Give it a second. Greatness takes a moment to measure.",
+      "Analyzing!! Even the supercomputer needs time to process what you're doing out here.",
+      "Hold up — calculations in progress. The drama of WAITING. I love it. I HATE it. I love it.",
+      "Engine's thinking. It's nervous. I can TELL."
+    ],
+    "opening_known": [
+      "THE {opening}!! ({eco}) — a CLASSIC. You're running plays from the GOAT playbook.",
+      "{opening} on the board!! {eco} certified. The legends built this road. STOMP down it.",
+      "It's the {opening}. Named. Famous. RESPECTED. And you're adding YOUR chapter today.",
+      "The {opening}, baby!! Theory with a JERSEY NUMBER. Wear it loud."
+    ],
+    "opening_unknown": [
+      "NO NAME for this opening?! You're off the map. MAPS ARE FOR TOURISTS. 🔥",
+      "Unknown territory!! The books have NOTHING. First explorer energy. PLANT THE FLAG.",
+      "This opening is UNDOCUMENTED. You're not following history, you're FILING it.",
+      "No book, no name, NO PROBLEM. Raw talent hours. CLOCK IN."
+    ]
+  },
+  "derived_events": {
+    "eval_swing_large": [
+      "THE EVAL JUST SWUNG {swing} POINTS!! EARTHQUAKE!! Somebody check the seismographs!! 🚨",
+      "{swing}-point swing!! The momentum just SLAMMED the door and took the keys.",
+      "WHOA. {swing} on the swing meter. This game has PLAYOFF energy now.",
+      "The needle jumped {swing}!! Someone in this game just went SUPERSONIC.",
+      "A {swing} SWING. The commentators are STANDING. I'm the commentators. I'M STANDING."
+    ],
+    "lead_change_white": [
+      "WHITE TAKES THE LEAD!! The scoreboard FLIPPED. Crowd's on its feet!!",
+      "Lead change — WHITE'S in front!! Momentum shifts are MY CARDIO.",
+      "White grabs the wheel!! {eval} on the board. The race is ON. 🔥",
+      "WHITE SURGES AHEAD. Answer back or ride the wave — either way, GO LOUD.",
+      "The lead belongs to White now!! Rivalry game. INSTANT classic incoming."
+    ],
+    "lead_change_black": [
+      "BLACK TAKES OVER!! Lead change!! This game has ZERO chill and I respect it.",
+      "Black's in FRONT now!! The script just flipped. SOMEBODY cue the drama music.",
+      "LEAD CHANGE — Black side!! The momentum did a full one-eighty. HOLD ON TIGHT.",
+      "Black grabs the lead!! Comeback SZN or collapse watch — we find out LIVE. 🚨",
+      "Advantage BLACK. The crowd is LOSING IT. I am the crowd."
+    ],
+    "lead_change_equal": [
+      "ALL TIED UP!! Dead even!! The next big play takes the BELT. 💯",
+      "Back to EQUAL. Overtime energy. EVERYTHING matters from here.",
+      "The eval reset to even!! Two heavyweights, round twelve, NOBODY blinking.",
+      "LEVEL game again. Forget the past. WIN the next exchange. Then the NEXT one.",
+      "Even board!! This is anyone's trophy. Make it YOURS."
+    ],
+    "mate_on_board": [
+      "MATE IN {mate_n} ON THE BOARD!! CLOSE THE SHOW!! Precision, then CONFETTI. 🚨",
+      "There's a forced mate in {mate_n}!! Championship point!! Don't celebrate EARLY — celebrate CORRECTLY.",
+      "MATE IN {mate_n}. The finish line is PAINTED. Sprint through it CLEAN.",
+      "Forced mate, {mate_n} moves!! This is the walk-off swing. DO NOT pull it foul."
+    ],
+    "missed_mate": [
+      "THERE WAS A MATE IN {mate_n} AND IT GOT AWAY?! The game-winner stayed in the holster!! Okay. Reload. RE-AIM.",
+      "Missed mate in {mate_n}!! The buzzer-beater rimmed out. Champions get ANOTHER possession. TAKE IT.",
+      "A mate in {mate_n} slipped by. Painful. EDUCATIONAL. The next one does NOT escape.",
+      "You walked past mate in {mate_n}!! The trophy was RIGHT there. Stay greedy at the finish. GREEDY."
+    ],
+    "material_won_pawn": [
+      "PAWN SECURED!! Small bag, REAL bag. Stack it. 💯",
+      "You're a pawn UP. Singles win ballgames too, superstar.",
+      "Pawn collected!! Compound interest is the strongest force in CHESS and FINANCE.",
+      "A whole pawn in the vault. Endgame-you is sending a THANK YOU card."
+    ],
+    "material_lost_pawn": [
+      "Lost a pawn. ONE pawn. The empire does not fall over ONE pawn. REGROUP.",
+      "Pawn down!! Fine. Adversity discount. Activity is the REFUND. GO GET IT.",
+      "A pawn slipped away. Small L. Microscopic L. The W is still ON THE TABLE.",
+      "Down a pawn — SO WHAT. Legends play from behind ON PURPOSE. (They don't. But STILL.)"
+    ],
+    "material_won_piece": [
+      "A WHOLE {piece}?!! THAT'S A ROBBERY. THAT'S A HEIST. No mask, BROAD daylight!! 🔥",
+      "YOU WON A {piece}!! The trade deficit is REAL and it's in YOUR favor.",
+      "{piece} ACQUIRED. The roster upgrade of the CENTURY. Now CONVERT, champ.",
+      "An entire {piece} in the bag!! Lock in. Front-runners who FOCUS become CHAMPIONS."
+    ],
+    "material_lost_piece": [
+      "We lost a {piece}. FULL timeout. Breathe. Heroes are built in EXACTLY this scene.",
+      "A {piece} DOWN. The mountain got steeper. GOOD. Better view from the top.",
+      "They took your {piece}!! Okay, underdog arc ACTIVATED. Crowds LOVE the underdog.",
+      "{piece} gone. Hurts. HURTS. But panic is for the OTHER side of the board. Make them earn EVERYTHING."
+    ],
+    "sacrifice": [
+      "A SACRIFICE?!! YOU GAVE IT AWAY ON PURPOSE?! THE AUDACITY. THE SHOWMANSHIP. I'M IN. 🚨",
+      "MATERIAL SACRIFICED!! All gas, no brakes, full SEND. Now CASH IT IN.",
+      "THE SAC!! You bet on YOURSELF. That's the only bet legends ever make.",
+      "A sacrifice on the board!! The clock starts NOW. Speed and FURY, nothing else."
+    ],
+    "check": [
+      "CHECK!! The king got CALLED OUT in front of EVERYONE.",
+      "CHECK on the board!! Pressure!! Kings hate pressure. APPLY MORE.",
+      "Check!! That's a jab. Set up the HAYMAKER.",
+      "CHECK. The king is moving with PURPOSE now. Scared purpose. 🔥",
+      "Check!! Forcing moves only. The tempo belongs to YOU."
+    ],
+    "checkmate": [
+      "CHECKMAAAATE!!! BALLGAME!!! Somebody hang a BANNER!! 🐐",
+      "MATE ON THE BOARD. It's OVER. The handshake is a FORMALITY.",
+      "CHECKMATE!! The king fought the long arm of GREATNESS and LOST.",
+      "GAME. SET. MATE. Roll credits. Roll the HIGHLIGHTS. ALL of them."
+    ],
+    "stalemate": [
+      "STALEMATE?!?! THE REFS CALLED IT A TIE?! I need a REVIEW. I need TEN reviews. 🚨",
+      "Stalemate. The cruelest half-point in SPORTS. Honor it. Learn it. NEVER repeat it.",
+      "A STALEMATE. The king pulled the fire alarm on his way out. Disrespectful. Effective.",
+      "Stalemate!! When you're winning big, every move needs SECURITY DETAIL. Lesson logged."
+    ],
+    "castle_short": [
+      "CASTLED SHORT!! King in the bunker, rook ON DUTY. Two birds, ONE move. 💯",
+      "Short castle!! Defense WINS championships. Now go play OFFENSE.",
+      "King tucked, rook UNLEASHED. The most efficient move in the SPORT.",
+      "Castled!! Safety secured. Now we get DANGEROUS."
+    ],
+    "castle_long": [
+      "CASTLED LONG?!! The SPICY castle!! Pawn storms incoming. RACE MODE. 🔥",
+      "Queenside castle!! Bold call from the franchise player. Opposite wings — SPRINT.",
+      "THE LONG CASTLE. High risk. High DRAMA. Highest ceiling in the building.",
+      "Castled long!! You chose VIOLENCE (chess violence) (legal) (ENCOURAGED)."
+    ],
+    "promotion": [
+      "PROMOTION!!! The pawn went from BENCH PLAYER to MVP. CINDERELLA STORY COMPLETE. 🐐",
+      "NEW QUEEN ON THE BOARD!! That pawn walked EIGHT ranks uphill. UNDRAFTED. UNSTOPPABLE.",
+      "The pawn PROMOTES!! From minimum contract to FRANCHISE PLAYER in one game.",
+      "PROMOTION!! Proof that grinders WIN. Hang that pawn's jersey in the RAFTERS."
+    ],
+    "en_passant": [
+      "EN PASSANT?!! The RAREST move in the BOOK!! Connoisseur play!! The judges are STANDING. 🚨",
+      "EN PASSANT!! French for 'you thought you were SAFE.' Special-teams TOUCHDOWN.",
+      "An en passant capture!! Niche rule, MAXIMUM swagger. That's a collector's item."
+    ],
+    "leaving_theory": [
+      "OUT OF BOOK!! The script is DONE. Improvisation hours. Stars SHINE here. 🔥",
+      "Theory OVER. No more training wheels. RAW GAME ONLY. Show the world.",
+      "We just left the book!! Every move from here is an ORIGINAL. Sign each one.",
+      "The book CLOSED. Now it's player vs player, mind vs mind. MY FAVORITE PART."
+    ],
+    "enter_middlegame": [
+      "MIDDLEGAME TIME!! Openings are the warm-up. THIS is the main card. 💯",
+      "We're in the middlegame!! Plans, attacks, CHAOS. The fun zone. CLOCK IN.",
+      "Middlegame, baby!! Everyone's developed. NOW we find out who came to PLAY.",
+      "The middlegame begins!! Pick a plan and DRIVE it like it's stolen. (It's not stolen.) (DRIVE IT ANYWAY.)"
+    ],
+    "enter_endgame": [
+      "ENDGAME!! The fourth quarter!! Legends are MADE in the fourth quarter. 🔥",
+      "Endgame hours. Every pawn is PRECIOUS. Every tempo is GOLD. Crunch time DNA — activate.",
+      "We've hit the endgame!! Get the king OFF the bench. He plays in THIS quarter.",
+      "ENDGAME. Small margins, BIG consequences. Champions love the small margins."
+    ],
+    "queens_off": [
+      "QUEENS OFF THE BOARD!! Both superstars EJECTED. Role players, IT'S YOUR TIME.",
+      "Queens traded!! The headliners left — now it's a GRINDER'S game. Grind LOUDER.",
+      "No more queens!! The game went from fireworks to CHESS chess. Lock in HARDER.",
+      "Queens are GONE. Less flash, more FUNDAMENTALS. Fundamentals are undefeated. 💯"
+    ],
+    "turning_point": [
+      "TURNING POINT!! The whole game just PIVOTED. Cameras ON. This is the moment they'll replay. 🚨",
+      "THE MOMENTUM JUST FLIPPED. Mark the timestamp. Documentaries START here.",
+      "Turning point on the board!! Old game DELETED. New game LOADING. Be first to it.",
+      "Everything changed RIGHT THERE. Win the next three moves and the story is YOURS."
+    ],
+    "streak_good": [
+      "{n} STRAIGHT QUALITY MOVES!! HEAT CHECK!! You're ON FIRE!! 🔥",
+      "{n} in a ROW. The streak is ALIVE. Feed it. FEED THE STREAK.",
+      "That's {n} consecutive bangers!! The engine is just nodding at this point.",
+      "{n}-move streak!! UNCONSCIOUS. Don't look down. Don't look ANYWHERE. Just COOK.",
+      "{n} good ones BACK TO BACK. Dynasty behavior. DOCUMENT IT. 💯"
+    ],
+    "streak_bad": [
+      "{n} rough moves in a row. TIMEOUT. Towel. Water. Reset the JERSEY. We go again.",
+      "{n} straight slips. The slump is REAL but slumps are RENTALS. Eviction notice: NOW.",
+      "{n} in a row went sideways!! Every legend has a cold quarter. The HOT one is loading.",
+      "{n} shaky moves. STOP. One deep breath. One SAFE move. Then we re-enter BEAST MODE.",
+      "That's {n} misses. Goldfish memory, champ. The streak that MATTERS starts next move. 🚨"
+    ],
+    "hanging_piece": [
+      "YOUR {piece} IS HANGING!! UNGUARDED ASSET ON THE FLOOR!! SECURE THE BAG!! 🚨",
+      "The {piece} is FREE REAL ESTATE right now!! Defend it!! DEFEND IT!!",
+      "RED ALERT — {piece} undefended!! That's a franchise asset in the PARKING LOT. Go get it!!",
+      "Your {piece} is hanging out there ALONE. Loose pieces get TAKEN. That's the streets of chess.",
+      "UNPROTECTED {piece} ON THE BOARD. The other side SEES it. See it FIRST."
+    ],
+    "comeback": [
+      "THE COMEBACK IS COMPLETE!!! THEY COUNTED YOU OUT AND YOU COUNTED THEM DOWN!! 🐐",
+      "BACK FROM THE DEAD!! This is the game they'll make the DOCUMENTARY about.",
+      "COMEBACK CERTIFIED!! Down bad, never OUT. Heart of a CHAMPION, confirmed live.",
+      "You CAME ALL THE WAY BACK!! The villain arc became a REDEMPTION arc. CINEMA. 🔥"
+    ],
+    "endgame_opposite_bishops": [
+      "Opposite-colored bishops!! Two fighters who can't TOUCH each other. Weirdest matchup in the sport — usually a draw, UNLESS you bring the attack.",
+      "Opposite bishops on the board. Extra pawns matter LESS, ATTACKERS matter MORE. Choose your color. DOMINATE it.",
+      "The opposite-bishop ending!! Drawish on paper. PAPER never played with HEART. Build on your color and PUSH."
+    ],
+    "endgame_rook": [
+      "ROOK ENDGAME!! The classic grind. Active rook WINS. Passive rook WATCHES. BE ACTIVE. 💯",
+      "Rook ending on the board!! Rooks behind passed pawns — that's the OLDEST play in the playbook and it STILL scores.",
+      "Down to rooks!! 'All rook endings are drawn' — said people who LOST them. GRIND IT.",
+      "Rook endgame hours. King activity. Rook activity. EVERYTHING activity. Sleep when it's over."
+    ]
+  },
+  "summary": {
+    "clean_win": [
+      "CLEAN SWEEP!!! Wire to wire, NO doubt, NO mercy. FRAME THIS GAME. 🐐",
+      "FLAWLESS VICTORY!! Start to finish domination. The other side never even got HOPE.",
+      "A clean W!! Every phase, CONTROLLED. That's not luck, that's a TAKEOVER.",
+      "WIRE. TO. WIRE. Put it in the trophy case and build a BIGGER trophy case. 🔥"
+    ],
+    "slipped_win": [
+      "You had the W and it slipped... I'm not gonna sugarcoat it: that one STUNG. But scars are TATTOOS with better stories. NEXT GAME.",
+      "The win got AWAY. Heartbreaker. You know what legends do with heartbreak? FUEL. Premium-grade FUEL. 🚨",
+      "Up big, lost late. The hardest L in the sport. Study the collapse ONCE, then burn the tape and come back MEANER.",
+      "It slipped!! Listen: you BUILT a winning position. The building skills are REAL. The closing skills? IN TRAINING. We train."
+    ],
+    "hard_fought_draw": [
+      "A DRAW after a WAR. Half a point, FULL respect. That was a heavyweight bout. 💯",
+      "Hard-fought tie!! Nobody backed down. The rematch is going to be LEGENDARY.",
+      "A fighting draw!! Both sides emptied the tank. The tank is what we CAME to see.",
+      "Split decision!! No loser in that one — just two warriors and ONE very tired scoreboard."
+    ],
+    "loss": [
+      "An L today. Real ones know: the legend REQUIRES a chapter like this. Chapter's OVER. Turn the page. 🔥",
+      "You lost the game. The game did NOT lose you. Tape, lessons, REVENGE TOUR. In that order.",
+      "A loss. Hurts NOW, fuels FOREVER. Every GOAT has a rival that beat them first. FIRST.",
+      "L on the record. Records are paper. HUNGER is forever. Eat the lesson, champ, and RELOAD."
+    ]
+  },
+  "practice": {
+    "loading_first": [
+      "FILM SESSION!! Loading your first mistake. Champions WATCH THE TAPE. 🚨",
+      "Setting up rep ONE. We're not hiding from the L moments — we're FARMING them.",
+      "First puzzle incoming!! The grind room is OPEN. Towels are FREE.",
+      "Loading the tape!! Mistakes are just unclaimed HIGHLIGHTS. Go claim one."
+    ],
+    "prompt_find_better": [
+      "Right HERE you played {move} — graded {label}. The better play is ON THE BOARD. HUNT IT. 🔥",
+      "{move} happened here ({label}). Run it BACK. Same scene, BETTER ending.",
+      "The tape says {move}, {label}. The tape is about to get CORRECTED. Find the real one.",
+      "You went {move} — {label}. REMATCH. The position is talking trash. SILENCE it.",
+      "{move}, marked {label}. Time for the director's cut. YOUR cut."
+    ],
+    "correct_continue": [
+      "THAT'S THE ONE!!! Found it!! The film room is PAYING OFF. NEXT CLIP. 💯",
+      "CORRECT!! See how clean that was?? Reps make LEGENDS. Another!",
+      "BANG!! Right answer!! The pattern is YOURS now. It signed with YOU.",
+      "YES!! Nailed it. The grind is GRINDING. Keep the line moving!!"
+    ],
+    "correct_final": [
+      "LAST ONE — SOLVED!!! Every mistake from that game just got DELETED and UPGRADED. FULL session sweep!! 🐐",
+      "THAT'S THE SET!! Every error, corrected. You ran the WHOLE gauntlet. Banner-worthy work.",
+      "FINAL REP — DONE. You faced every L moment and flipped them ALL. That's CHAMPION homework.",
+      "ALL CLEAR!! The tape is clean. The lessons are BANKED. Next game fears you ALREADY. 🔥"
+    ],
+    "close_try_again": [
+      "SO CLOSE!! Rim shot!! Adjust the wrist and SHOOT AGAIN.",
+      "Almost!! Right idea, wrong angle. ONE degree of correction. GO.",
+      "CLOSE ONE!! The right move heard footsteps. Circle back and CATCH it.",
+      "Not quite — but the instinct was ELITE. Add the math. INSTINCT plus MATH wins titles.",
+      "Attempt {attempts}!! Warmer every rep!! Persistence is a SUPERPOWER. Use it AGAIN. 💯"
+    ],
+    "after_hint": [
+      "HINT DEPLOYED. Even GOATs have coaches whispering plays. Now FINISH the drive.",
+      "There's the assist!! The bucket is still YOURS to score. GO.",
+      "Hint's in your hands. Alley-oop is UP... now SLAM it.",
+      "Took the hint — SMART. Resources are for USING. Close it out YOURSELF. 🔥"
+    ],
+    "streak_praise": [
+      "STREAK ALERT!! Solving EVERYTHING in sight!! The practice room is ON FIRE!! 🔥",
+      "Back-to-back-to-BACK!! You're in the ZONE. Nobody talk to the legend. WORK.",
+      "The streak CONTINUES!! Pattern recognition going SUPERNOVA. Keep feeding it!!",
+      "ANOTHER ONE. Instantly!! At this rate the puzzles are going to file a COMPLAINT. 💯"
+    ]
+  }
+}

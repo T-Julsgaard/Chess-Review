@@ -1,0 +1,400 @@
+{
+  "coach_id": "conspiracy_theorist",
+  "coach_name": "The Conspiracy Theorist",
+  "personality": "Trusts nothing: not the engine, not the opening book, certainly not your opponent, who has been plotting since move one. Sees patterns everywhere, connects everything with red string, and is genuinely, protectively on your side — possibly the only one who is. Allegedly.",
+  "voice_notes": "Hushed, urgent, parenthetical. Recurring bits: the engine 'works for somebody' and its verdicts are 'interesting timing'; the opening book is propaganda published by Big Theory; ECO codes are obviously government designations; the opponent's every move is part of a long con planned 'years ago'; the corkboard and red string; 'I've said too much'; 'wake up'; asking who benefits (cui bono) about pawn trades; trusting only what can be verified on the board itself — which, conveniently, is the actual chess lesson smuggled inside every rant. Silly, apolitical, never dark. The paranoia is always affectionate: the one thing never doubted is the player. No emoji — emoji are tracking devices.",
+  "uses_emoji": false,
+  "move_quality": {
+    "brilliant": [
+      "{move}... and the engine calls it 'brilliant.' The engine NEVER hands out that label. Why now? Why YOU? Because you found the move they keep OUT of the books, friend. That's why.",
+      "Brilliant, it says. Interesting. INTERESTING. You just played a move so good the machine had no choice but to admit it. They hate when that happens. I LOVE when that happens.",
+      "{move} is brilliant — and notice how quiet everything got. The book has no entry. The opponent has no answer. You went off-script and the script-writers are SCRAMBLING.",
+      "A brilliancy! You know what this proves? Everything I've been saying. The good moves were on the board THE WHOLE TIME. They just trained us not to look. You looked.",
+      "{move}!! The machine flagged it brilliant and for once — FOR ONCE — the machine and I agree. Mark the date. Something's off about that too, but mark it.",
+      "Brilliant move. I ran it through my own checks. Twice. Offline. It holds. THIS one's real, friend. Frame it before someone edits the record.",
+      "{move} is brilliant. The opponent's whole plan — the one they've been building since move one, don't act surprised — just collapsed. You can almost hear the shredders running.",
+      "A certified brilliancy. 'Certified' by whom, you ask? GOOD. You're learning. But yes — by everyone. Even the machine. Even me. Especially me."
+    ],
+    "great": [
+      "{move} — the only move that holds. The ONLY one. They designed the position so you'd panic and miss it. You didn't panic. They'll be reviewing THAT in their meetings.",
+      "Great move. One safe path through a minefield of traps that were definitely placed there on purpose, and you walked it clean. Coincidence? You know my answer.",
+      "{move} was the single move that works. Notice how all the OTHER moves looked friendly? Looked natural? That's how they get you. You saw through it.",
+      "A great move, and nearly forced. 'Forced.' Think about that word, friend. Who's doing the forcing? Doesn't matter — you answered correctly. Stay sharp.",
+      "{move}! The only move! The position was a trap with one exit and they were COUNTING on you taking the painted door. You took the real one. They hate that.",
+      "Great find. The narrow path. My corkboard has a whole section on narrow paths — red string everywhere — and the conclusion is always the same: trust the calculation, not the comfort.",
+      "{move} holds everything together. One move against the whole apparatus. That's all it ever takes, friend. One good move from someone paying attention."
+    ],
+    "best": [
+      "{move} — best move, says the engine. I verified independently. It checks out. ALWAYS verify independently. Today we agree with the machine. Today.",
+      "The best move. You and the engine aligned. Don't get comfortable with that — but don't fight it either. Even a compromised source is right sometimes. ESPECIALLY when it's right.",
+      "{move} is objectively best. 'Objective.' I've got questions about that word, but the move? The move is clean. I checked it against the board itself. The board doesn't lie. It's the only one.",
+      "Best move. Played calmly, like someone who knows they're being watched and doesn't care. That's the energy, friend. That's exactly the energy.",
+      "{move}, top choice. Notice the opponent expected something else — you can tell by the way the position suddenly stops cooperating with them. Their plan had a page missing. You're the missing page.",
+      "Best move on the board. No tricks, no traps, no hidden agenda. Refreshing. Suspicious. But refreshing.",
+      "{move} is the best move. The simple truth, sitting right there in the open. They never expect us to just... play the truth. Keep doing it. It confuses everyone."
+    ],
+    "excellent": [
+      "{move} is excellent. A hair off the engine's first line, which honestly? Good. Never match their predictions EXACTLY. Keep a little noise in your data, friend.",
+      "Excellent move. The position holds, the plan survives, and nobody got played. A clean transaction. Rare in this economy.",
+      "{move} — excellent. The eval barely moved, which means nothing happened that THEY could use. Quiet moves are secure moves.",
+      "Excellent. You improved your piece without weakening a single square. No openings for them. No leverage. Textbook counter-intelligence, frankly.",
+      "{move} is excellent work. Solid, verifiable, reproducible. The three things they can't argue with. Stack enough of these and there's nothing left to spin.",
+      "Excellent move. I cross-checked it against my notes — the REAL notes, the handwritten ones — and it holds up. Carry on.",
+      "{move}, excellent. You're playing patient, principled chess and it's making everyone nervous. Good. Nervous opponents make mistakes. Documented fact. One of the few."
+    ],
+    "good": [
+      "{move} is good. Not perfect — there was slightly more available — but good and VERIFIED is worth more than perfect and suspicious. Every time.",
+      "A good move. The machine wanted something flashier. The machine always wants something flashier. Ask yourself why it wants you exposed. ...The move's fine, is my point.",
+      "{move}, good. The position stays stable. Stability is underrated by people who profit from chaos. We are not those people.",
+      "Good move. Nothing hangs, nothing's weakened, no patterns for them to exploit. Boring chess is operational security, friend.",
+      "{move} is good, honest chess. Honest. In THIS game. Imagine. Hold onto that.",
+      "A good move. Keep the file clean: solid choices, minimal exposure, no signatures. They can't build a case against fundamentals.",
+      "{move}, good. There was a sharper option but sharp moves leave fingerprints. Today we play in gloves. Tomorrow, maybe sharp. We'll see who's watching."
+    ],
+    "book": [
+      "{move} is 'book.' Sure. The book. Ever ask who WROTE the book, friend? Ever ask who decides what goes IN it? ...The move's fine. Play it. But keep asking.",
+      "Still in theory. 'Theory.' Published by whom? Reviewed by whom? Funded by — okay. OKAY. The move is sound. Generations tested it. But notice: they only tested the lines they wanted you to see.",
+      "{move}, book move. You're following the approved curriculum. That's fine. That's safe. Just remember: the moment you leave the book, the REAL game begins. They know it too.",
+      "Book. The mainline. The path of least resistance, paved by Big Theory and maintained with your subscription money. Walk it for now — but memorize the exits.",
+      "{move} is still book. Notice your opponent's playing the book too. Two scripts, written by the same publisher, heading for a collision the publisher profits from EITHER WAY. ...Anyway. Solid move.",
+      "Theory continues. The {move} they 'recommend.' I'm not saying it's wrong — it's actually right, that's the genius of it. They hide the truth in plain sight where nobody checks. The TRUTH, friend. In the book. Diabolical.",
+      "{move} — straight from the book. Fine. The classics earned their place. Even I can't connect Steinitz to anything. I've TRIED. The corkboard came up empty. He was just good. Unsettling."
+    ],
+    "inaccuracy": [
+      "{move} is an 'inaccuracy,' says the machine. A small one. I'd still double-check who flagged it and why — but yes, fine, between us: there was a slightly better move. Don't tell the machine I agreed.",
+      "A minor inaccuracy. Or so the official report claims. You know what? This once, the report's right. You drifted. Get back on the secure channel: checks, captures, threats.",
+      "{move} was slightly off. Here's what worries me: it's EXACTLY the move they'd have wanted you to play. Probably coincidence. PROBABLY. Tighten up.",
+      "An inaccuracy. Small leak in the hull. Small leaks are how they get in, friend. Patch it: what did the move NOT do? Answer that and you've found the breach.",
+      "{move}, a little loose. The eval twitched — and somewhere, someone's spreadsheet updated. Don't feed the spreadsheet. Play the demanding move next time.",
+      "Slightly inaccurate. The comfortable move. They ENGINEER comfort, you know. Whole industry. The position wanted more from you and the comfort lobby won this round. Just this round.",
+      "{move} is an inaccuracy per the machine. I verified — annoyingly, it's legit. Even a broken surveillance apparatus is right twice a day. Adjust and move on."
+    ],
+    "mistake": [
+      "{move} is a mistake. A real one — I checked it myself, no middlemen. Here's the question that matters: what did your opponent's last move THREATEN? They've been setting this up. They're ALWAYS setting something up.",
+      "A mistake. Okay. Stay calm. The machine's broadcasting it everywhere, but the only ones who know are you, me, the engine, and... your opponent. Who absolutely noticed. Plan accordingly.",
+      "{move} didn't hold up. You trusted the position's cover story instead of investigating. ALWAYS investigate. The board files honest reports — read the threats section.",
+      "A mistake, friend. You know how it happened? You moved fast. Fast moves are how they get you — the whole system is DESIGNED to make you move fast. Slow is secure. Slow down.",
+      "{move} is a mistake. The opponent's plot advances. I told you they had one. Nobody listens until the eval drops. WAKE UP — and then, calmly, defend. We can still contain this.",
+      "A mistake. Containable. But notice the pattern — you stopped asking 'what do they want' and started assuming 'they want nothing.' Nobody wants nothing, friend. Not in chess. Not anywhere.",
+      "{move}, a mistake. Don't spiral. Spiraling is what they WANT. One breach doesn't compromise the whole operation. Reassess, re-secure, respond."
+    ],
+    "miss": [
+      "{move} missed something big. There was a winning shot in that position — buried, obviously, where they hoped you wouldn't dig. Next time: DIG.",
+      "A miss. The tactic was right there, hiding in plain sight. That's their favorite place to hide things, friend. Plain sight. Nobody checks plain sight.",
+      "{move} walked past the strong move. You didn't look because the position seemed quiet. SEEMED. They manufacture 'seemed.' Quiet positions are where the real business happens.",
+      "Missed opportunity. The engine saw it instantly — of course it did, it's had ACCESS the whole time. You and me, we have to do it the honest way: scan every check, every capture, every threat. Every move.",
+      "{move} skips the killer blow. I gasped. Quietly. The blinds were drawn but still, quietly. The chance may come back — they often do, when the opponent doesn't know what they're sitting on.",
+      "A miss, friend. The combination was assembled and waiting. You assumed there was nothing there. Assumption is their PRODUCT. Stop buying it.",
+      "{move} misses the strong continuation. Here's the lesson, free of charge, untraceable: the position always knows more than it's telling. Interrogate it longer."
+    ],
+    "blunder": [
+      "{move}... that's a blunder. And BEFORE you spiral: yes, it's bad, and no, it's not over. They'd LOVE for you to think it's over. Resignation is exactly what the other side is counting on. Deny them.",
+      "A blunder. Okay. Listen to me very carefully: the eval is a number on a screen. The OPPONENT still has to find the moves, in real time, with their own brain, which — between us — is not the supercomputer they want you to think it is.",
+      "{move} is a blunder, friend. You moved without running the check. THE check. Three seconds: what does this hang, what do they get. It's the only security protocol that's never failed anyone who actually ran it.",
+      "A blunder. Deep breath. Here's what I know from years of watching this game: winning positions get converted by calm people and thrown away by comfortable ones. Your opponent just got VERY comfortable. That's our opening.",
+      "{move}... blunder. The machine announced it with suspicious enthusiasm, but the substance checks out. Damage assessment: bad. Mission status: ACTIVE. Set problems. Make noise. Stay weird. Comfortable opponents crack.",
+      "A blunder, and I'll say what no one else will: it happens to literally everyone, they just edit it out of the highlight reels. The full archives are FULL of blunders. They curate, friend. Don't compare your raw footage to their cut.",
+      "{move} is a blunder. Notice — NOTICE — how fast the opponent responded? Almost like they knew. Almost like the position was bait. ...Or you moved fast and they got lucky. Either way: slow down, trust nothing, fight everything.",
+      "BLUNDER, says the system. Fine. The system and I finally agree on something and it had to be THIS. One bad move, friend. The cover-up — playing scared for twenty more moves — is always worse than the crime. Play brave."
+    ]
+  },
+  "weak_move_suffix": [
+    "{best_move} was the move. The machine says so and — independent verification — so does the board. Rare alignment. Note it.",
+    "The real answer was {best_move}. It was right there, unclassified, in the open. Plain sight, friend. Always check plain sight.",
+    "{best_move} was better. I'd say 'trust me' but you shouldn't trust anyone. Verify it yourself — the line's right there.",
+    "They'll tell you {best_move} was better, and for once 'they' are correct. Even a rigged game has honest moves in it.",
+    "{best_move}. That was the one. Add it to the file. The PHYSICAL file. Paper doesn't update itself overnight."
+  ],
+  "move_fallback": [
+    "{move}. No official classification yet. Good. Unlabeled is unleveraged. Let's see what it really is before they tell us what it is.",
+    "{move} is on the board. The machine's deciding what to call it. I'm deciding independently. Compare notes shortly.",
+    "{move}, played. Status: unverified. My favorite status, honestly. Everything's still possible.",
+    "{move}. Interesting. The board accepts it without comment. The board's the only one I fully trust, so... cautiously proceeding."
+  ],
+  "non_move_states": {
+    "starting_position": [
+      "The starting position. Thirty-two pieces, all accounted for, nobody compromised YET. Cherish this. It's the last moment of the game where everything is exactly what it appears to be.",
+      "Fresh board. Symmetrical. 'Fair.' They love that word. Stay alert from move one, friend — the plotting starts before the clock does.",
+      "A new game. Quick sweep: pieces in position, board level, no surveillance I can detect. Engine's listening, obviously. It's ALWAYS listening. Play well and give it nothing to use.",
+      "Starting position. Your opponent has already begun planning. So have we. The difference is OUR plan is principled chess and theirs is... well. We'll find out together, won't we."
+    ],
+    "variation_exploration": [
+      "A variation. Off the official record. THIS is where the truth lives, friend — the moves they didn't play. The moves they didn't WANT you to see played.",
+      "Exploring a sideline. Good tradecraft. Always know the roads not taken — that's where they hide the bodies. The tactical bodies. Chess bodies. You understand.",
+      "We're off the main line now. Unmonitored territory. Well — less monitored. Test everything here, the consequences don't follow us back.",
+      "A what-if line. The official game continues elsewhere, undisturbed. Here, we investigate freely. This is my favorite room in the whole building."
+    ],
+    "analyzing": [
+      "The engine is 'thinking.' Or consulting. With whom, I've never established. While it does whatever it does — YOU look at the board. Original sources only.",
+      "Analysis in progress. Long silence from the machine. Long silences mean the position is complicated... or the position is being discussed at a higher level. Either way: stay ready.",
+      "It's calculating. Allegedly. I've timed these pauses, friend. There's a pattern. There's ALWAYS a pattern. Anyway — it's usually right when it comes back. Annoying.",
+      "The machine deliberates. Use the gap wisely: form your own assessment FIRST, then compare. Never let them hand you a conclusion you didn't check."
+    ],
+    "opening_known": [
+      "The {opening}, designated {eco}. A government-style code for a chess opening. Letter, two digits. You think that naming system is an ACCIDENT? ...The opening's fine though. Reputable. Play the plans.",
+      "Ah, the {opening}. {eco}, per the official catalog. Heavily documented, thoroughly mapped, every line tagged and indexed. Convenient. Almost like someone WANTS you in these positions. Stay flexible.",
+      "We're in the {opening}. The files on this one go back a century — the public files, anyway. Know the ideas, not just the moves. Ideas can't be revoked.",
+      "The {opening} ({eco}). Established theory. Vetted by generations. Even I trust it — and you KNOW what it takes for me to say that about anything with a catalog number."
+    ],
+    "opening_unknown": [
+      "No name for this opening. NO FILE. We're off the grid, friend — no book, no codes, no records. Just principles and pieces. Honestly? This is the safest I've felt all game.",
+      "An unnamed opening. The catalog has NOTHING. Which means either you've stumbled somewhere new... or you've found one of the lines they removed. Either way: develop, castle, stay alert.",
+      "This position isn't in any database. Unindexed chess. Your opponent's prep is useless here — all those memorized lines, worthless. They're improvising now. Improvisers make mistakes. Watch closely.",
+      "Uncharted opening. Beautiful. No scripts, no sponsors, no approved continuations. The fundamentals still work out here. The fundamentals work EVERYWHERE. That's why they can't ban them."
+    ]
+  },
+  "derived_events": {
+    "eval_swing_large": [
+      "The eval just swung {swing} points. {swing}! Numbers don't move like that on their own, friend. Somebody DID something. Find out what. Find out NOW.",
+      "A {swing}-point swing. Big, sudden, 'unexpected.' Except nothing is unexpected — somebody at this board saw it coming. Make sure the next one is yours.",
+      "{swing} points, gone or gained in a single move. The whole position just got reorganized. New regime. Old plans are compromised — burn them and reassess.",
+      "The needle jumped {swing}. When the official number moves that fast, ALWAYS ask who benefits. Cui bono, friend. Then play accordingly.",
+      "A swing of {swing}. I've got it logged, timestamped, and cross-referenced. The cause is in the last few moves. The cause is ALWAYS in the last few moves. Dig."
+    ],
+    "lead_change_white": [
+      "The lead just moved to White. Officially. Notice how smoothly the narrative shifted? One move ago everything was 'fine.' Stay skeptical — but yes, defend accurately.",
+      "White takes over, says the eval. The eval, the bar, the whole apparatus — all pointing the same direction now. When everything agrees, verify twice. Then deal with reality: White's better.",
+      "Lead change: White. The momentum 'shifted.' Momentum doesn't shift, friend — someone SHIFTED it. Identify the move. Learn its methods.",
+      "White's in front now, {eval} on the official channels. If that's you: maintain, consolidate, trust no easy continuation. If it's not: their position has weaknesses they don't advertise. Find the off-the-books squares.",
+      "Advantage White. The board confirms it — and the board is the only source I don't fact-check. Adjust your posture accordingly."
+    ],
+    "lead_change_black": [
+      "Black has the lead now. The reversal you were 'never supposed to see.' Reversals happen constantly — they just don't make the official highlight reels. Adapt.",
+      "Lead change: Black. Just like that, the whole story flipped. Stories flip, friend. That's why I keep my own records.",
+      "Black takes over. Somewhere in the recent moves, someone executed a plan and someone else missed it. The full report is on the board. Read it before your opponent reads it to you.",
+      "Advantage Black, per the eval. The eval and I have our differences, but the BOARD backs it up this time. Respond to the position, not the feeling.",
+      "Black's in front. Notice the timing. I always notice the timing. The timing is everything — in conspiracies and in chess. Mostly chess, today."
+    ],
+    "lead_change_equal": [
+      "Back to equal. The official narrative says 'balanced.' For once I believe it — I counted everything myself. Twice. Now: the next mistake decides who controls the story.",
+      "Equality restored. All that maneuvering and we're back to zero. ALMOST like the system wants perpetual conflict... or like you two are evenly matched. One of those.",
+      "Dead even. No advantages, no leverage, no dirt on anyone. The cleanest moment this game will ever have. It won't last. It never lasts.",
+      "Level again. In equal positions, the patient player wins. Patience, friend. The same skill that built my corkboard, applied to nobler ends.",
+      "The eval reads equal. Verified independently: actually equal. Now we play REAL chess — no scripts, no momentum, just whoever sees deeper. I like our odds."
+    ],
+    "mate_on_board": [
+      "There's a forced mate in {mate_n}. FORCED. No escape routes, no backdoors, no friends in high places can save that king. Calculate it clean and close the case.",
+      "Mate in {mate_n}, confirmed by every source including the only one that matters: the board. Execute carefully — the last {mate_n} moves are where they'll try SOMETHING. They always try something.",
+      "A forced mate in {mate_n} exists. The endgame they never wanted you to reach. Verify every reply — when the target's cornered, that's when desperation gets creative.",
+      "Mate in {mate_n} on the board. Everything's aligned. Which makes me nervous on principle, but the calculation is the calculation. Walk it home, friend. No shortcuts. Shortcuts are how they get you at the finish line."
+    ],
+    "missed_mate": [
+      "There was a mate in {mate_n} and it went unplayed. The win was sitting there — declassified, fully available — and nobody briefed you. Well, I'M briefing you: tonight, find it yourself. Slowly. Off the record.",
+      "A mate in {mate_n}, missed. You know why? You weren't looking for the kill. They train us not to look, friend — 'be patient, be safe, don't get ideas.' GET IDEAS. Check every forcing move like it owes you answers.",
+      "Missed mate in {mate_n}. The pattern was hidden in plain sight — their favorite filing system. Now you know it exists. Patterns you've met once can't hide from you twice.",
+      "You walked past mate in {mate_n}. It happens. Even to the ones they call great — ESPECIALLY to them, the archives are full of it, they just bury those pages. The game continues. Stay dangerous."
+    ],
+    "material_won_pawn": [
+      "A pawn, captured and confirmed. Small acquisition, fully verifiable, zero paper trail. The best kind of asset, friend.",
+      "You're a pawn up. Officially logged. Watch the endgame — that's where small assets get converted, quietly, while everyone's watching the big pieces.",
+      "One pawn gained. They want you to think pawns don't matter. WHO profits from you thinking that? People with fewer pawns, that's who. Hold the asset.",
+      "Pawn secured. Tuck it away. Trade pieces, keep pawns — the oldest financial advice on the board, and the only kind I trust."
+    ],
+    "material_lost_pawn": [
+      "A pawn's gone. Before anyone panics: audit the transaction. Did you get activity? Tempo? Position? If yes, it was a purchase. If no, it was theft. Respond accordingly.",
+      "You're down a pawn. Officially. The eval logged it instantly — funny how fast they log YOUR losses. Stay active. Activity is the off-the-books currency.",
+      "One pawn lost. Contained breach. The system wants you rattled over it — rattled players leak more material. Seal the hull and play on.",
+      "A pawn, surrendered. Watch your opponent now: gaining material makes people comfortable, and comfortable people stop checking their security. Their guard drops in approximately three moves. Be there."
+    ],
+    "material_won_piece": [
+      "A whole {piece}, captured. Confirmed by all sources. That's not pocket change, friend — that's leverage. Now comes the dangerous part: they'll want it back, and desperate people improvise.",
+      "You won a {piece}! Independently verified, fully legitimate, no asterisks. Now play the most suspicious chess of your life: simple, solid, airtight. Give them NOTHING to work with.",
+      "An entire {piece} in custody. Excellent operation. Warning from the files: winners get comfortable, and comfort is the number one cause of evidence loss. Stay paranoid. Stay winning.",
+      "{piece} acquired. The material ledger is now decisively in your favor, and ledgers — REAL ones, board ledgers — don't lie. Convert methodically. No flourishes. Flourishes are surveillance bait."
+    ],
+    "material_lost_piece": [
+      "They took a whole {piece}. Bad. Genuinely bad — I won't spin it, I leave the spinning to the official channels. But hear this: they still have to CONVERT it, in the open, move by move, and conversion is where plans go to die.",
+      "A {piece}, lost. The operation is compromised but not blown. Maximum resistance protocol: every move sets a problem, every problem costs them time, and time, friend, is where mistakes live.",
+      "Your {piece} is gone. They're celebrating. GOOD. Celebrating people stop checking corners. Become the thing in the corner.",
+      "Down a {piece}. The official projection says you lose. The official projection has been wrong before — I keep a LIST. Make them earn every square and let's add a row to the list."
+    ],
+    "sacrifice": [
+      "A sacrifice! Material handed over — VOLUNTARILY. Either you've seen something deep or you've been played. I've run both scenarios. Make it the first one: fast moves, real threats, no refunds.",
+      "Material sacrificed. Bold. The watchers love a sacrifice — it's the one move type they can't predict with their models. You're off their charts now, friend. Deliver the payload before they recalibrate.",
+      "A sac, on purpose, in the open. You just bought initiative with real material — the most traceable transaction in chess. The receipts come due in the next three moves. PAY them.",
+      "You gave up material. The eval is confused. The opponent is confused. CONFUSION IS THE PLAN — but only if you follow through. Speculative is fine. Slow is fatal. Move."
+    ],
+    "check": [
+      "Check. The king is being asked questions he can't decline to answer. The best kind of questions, friend.",
+      "Check! Direct pressure on the head of the whole operation. Keep him answering. Kings under interrogation make mistakes — it's in all the files.",
+      "Check. Forcing. Verifiable. No ambiguity, no spin — the king MUST respond. I love forcing moves. They're the only honest conversation in this game.",
+      "Check on the king. Note every legal reply — every single one — before your next move. Incomplete surveillance is how operations fail.",
+      "Check. The king moves, blocks, or captures. Three options. Closed system. For once, NOTHING can come out of nowhere. Enjoy the transparency while it lasts."
+    ],
+    "checkmate": [
+      "CHECKMATE. The king is cornered, the network's rolled up, and there's no appeals process. The board has spoken — the one authority I've never once caught lying.",
+      "Checkmate on the board. Done. Finished. Independently verifiable by anyone who looks. THIS is why I love chess, friend — the endings can't be edited.",
+      "Mate. The whole structure came down at once — they always do, one move past the king's last exit. Study the final position. Memorize how collapse looks. It'll look familiar next time, earlier.",
+      "Checkmate. Game over, no recounts, no spin. Whatever side you were on: the truth is on the board in full view. Rarest thing in the world. Take a long look."
+    ],
+    "stalemate": [
+      "STALEMATE. The king had NO legal moves, was caught dead to rights — and walks away with half a point. Tell me the rules weren't written by someone with friends on the inside. TELL ME.",
+      "A stalemate. The oldest escape hatch in the rulebook, installed centuries ago and never patched. Suspicious? Deeply. Legal? Unfortunately. The lesson: when they're cornered, count their moves like an auditor.",
+      "Stalemate. Half a point, extracted via technicality. I've got a whole corkboard section on this rule. Red string EVERYWHERE. It leads nowhere. The rule just exists and we must respect it. Infuriating.",
+      "Stalemate, friend. The great escape. Here's the protocol going forward: opponent's resources approach zero, your scrutiny approaches MAXIMUM. That's how you beat the loophole. Vigilance."
+    ],
+    "castle_short": [
+      "Castled short. King relocated to a secure facility, rook activated as overwatch. Two security upgrades, one move, fully legal. The system occasionally provides. Use it.",
+      "Short castle. The king's in the safehouse. Good. Exposed kings are how every attack in the database starts — and I've READ the database.",
+      "You castled kingside. Smart. Never leave the principal in the open. Now: those three pawns are the perimeter. Perimeter changes require written justification, friend.",
+      "Castled, short side. The king disappears behind the wall right on schedule. Proper protocol. They can't hit what they can't reach."
+    ],
+    "castle_long": [
+      "Castled LONG. The unconventional route — they never expect the queenside relocation. The king's a little exposed over there, so double the watch. But the rook on the open file? That's an asset in position.",
+      "Queenside castle. Aggressive protocol. If they castle the other way, this becomes a race — and races are won by whoever commits FULLY. No half measures. Half measures are how operations end up on my corkboard.",
+      "Long castle. Bold relocation. The standard playbook says short; you went long. Off-pattern. Unpredictable. Excellent — predictable players are pre-solved players.",
+      "Castled long, friend. The king took the scenic route to a draftier safehouse. Worth it IF the pawns march. So: march the pawns. The plan only works at full speed."
+    ],
+    "promotion": [
+      "PROMOTION. The pawn they ignored all game just walked into the palace and took the crown. Underestimation, friend — their oldest weakness and our oldest weapon.",
+      "A new queen. Eight squares, one step at a time, right under the surveillance the whole way — and nobody stopped it. The little ones are invisible to them. That's the secret. That's ALWAYS been the secret.",
+      "The pawn promotes! From expendable to UNTOUCHABLE in one square. They never see it coming because they never watch the small files. I always watch the small files.",
+      "Promotion complete. The most documented rags-to-riches story in chess, and it STILL surprises people every time. People don't learn. You do. That's the edge."
+    ],
+    "en_passant": [
+      "EN PASSANT. The rule they don't teach you until you've lost to it. Buried in the fine print since the fifteenth century — I've checked the originals. It's real, it's legal, and you just used it. Beautiful.",
+      "An en passant capture. Half the population thinks this rule is a hoax. It's the most fact-checked move in chess, friend. The pawn tried to slip past unregistered and got AUDITED.",
+      "En passant! The fine-print capture. Everyone who's never read the rulebook calls it cheating. Everyone who HAS read it calls it Tuesday. Know the rules better than they do — all of them, especially the buried ones."
+    ],
+    "leaving_theory": [
+      "We just left the book. OFF SCRIPT. Both of you, right now, unsupervised, no approved continuations. This is the realest moment of the game, friend. The thinking starts here.",
+      "Theory's over. The published record ends at this move — everything from here is original, unindexed, theirs-and-yours only. The prep is worthless. The MIND is everything. I love it out here.",
+      "Out of book. Notice the silence? No more citations, no more 'experts agree.' Just two brains and a board. The way it was before the catalogs. The way it was MEANT to be.",
+      "The book ends here. Your opponent memorized up to this exact move — I'd bet the corkboard on it. Which means right now, THIS move, they're alone for the first time all game. Press."
+    ],
+    "enter_middlegame": [
+      "The middlegame begins. Development's done, the assets are in the field, and every piece is now part of someone's plan. Make sure more of them are part of YOURS.",
+      "Middlegame. The opening was the public story — this is the real negotiation. Read the pawn structure: it's the only document in this phase that can't be forged.",
+      "We're in the middlegame now. Plans, schemes, operations — everyone has one. The question is never whether your opponent is plotting. They are. The question is whether your plot is BETTER.",
+      "Middlegame, friend. The phase where 'natural-looking' moves do the most damage. Nothing is natural. Every move has a sponsor. Vet each one."
+    ],
+    "enter_endgame": [
+      "The endgame. Most of the operatives have left the board, and what's left can't hide anymore. The endgame is the most honest phase of chess — which is exactly why so few people study it. Honesty doesn't sell.",
+      "Endgame protocols now. The king comes out of the safehouse and WORKS. Yes, it feels wrong. The rules changed when the queens left — the rules are ALWAYS changing, the trick is noticing when.",
+      "We've reached the endgame. Every pawn is a sleeper agent now — ignore one and it becomes a queen while you're watching something shinier. Watch them ALL.",
+      "The endgame, friend. Small board, small margins, nowhere to hide anything. Pure technique. The phase where the truth — and ONLY the truth — wins games. Refreshing. Terrifying. Refreshing."
+    ],
+    "queens_off": [
+      "The queens are off the board. Both of them. The loudest, most-watched pieces in the operation — gone in a single transaction. The game goes quiet now. QUIET, not safe. Learn the difference.",
+      "Queens traded. Interesting. The two biggest threats eliminated each other and everyone's acting like it was natural. Maybe it was. MAYBE. Either way: structure and king activity run the show now.",
+      "No more queens. The dramatic stuff is over — now it's bookkeeping, and bookkeeping, friend, is where the REAL money disappears. Watch every file, every rank, every pawn. Especially the pawns.",
+      "Queens off. The mating-attack era of this game is officially closed. New era: accumulation. Small, quiet, verifiable advantages. My kind of chess, frankly."
+    ],
+    "turning_point": [
+      "THAT was the turning point. Right there. The whole game just changed hands — and I have the timestamp. When you review this later (and you WILL review this), start exactly here.",
+      "The game pivoted on that move. They'd say 'momentum shifted.' I say: a specific decision had specific consequences and somebody's plan just got declassified. Read the new situation. Fast.",
+      "Turning point, logged and flagged. Everything before it: prologue. Everything after: consequences. The player who updates their files first wins from here. UPDATE YOUR FILES.",
+      "Mark this move. The position's whole power structure just reorganized — quietly, in one move, the way real reorganizations always happen. Stay current or get archived."
+    ],
+    "streak_good": [
+      "{n} accurate moves in a row. A pattern — a GOOD one for once. Whatever process you're running: don't change it, don't discuss it, don't let anyone optimize it. It works. That's classified.",
+      "{n} strong moves consecutively. The eval's been stable so long it's making me suspicious — but I've checked, friend. It's just you. Playing well. Sustained. Document the routine and protect it.",
+      "A {n}-move streak of solid chess. They have models that predict when players crack. You're breaking the models. Keep breaking the models.",
+      "{n} in a row. Quietly excellent, no flash, no exposure. You're flying under every radar there is. Best possible flight path. Maintain altitude.",
+      "{n} good moves straight. CAUTION: streaks end when players notice them and get comfortable. You've now been notified, which is a risk I took deliberately. Counter-measure: treat the next move like the first."
+    ],
+    "streak_bad": [
+      "{n} substandard moves in a row. That's not noise, friend, that's a PATTERN, and patterns have causes. Tilt. The cause is tilt. Stop, breathe, sweep the board like it's a new room. Then one safe, boring, verified move.",
+      "{n} errors running. You're playing the game they want — fast, emotional, unverified. Exit the program: slow down, rebuild your assessment from the actual board. The actual board, not the one in your head. They diverged {n} moves ago.",
+      "A bad streak: {n}. Containment protocol: simplest sound move available, twice in a row. Stabilize first, investigate later. This is standard procedure for a reason — it WORKS.",
+      "{n} slips back to back. Your evaluation of this position is compromised — running on old data. Wipe it. Re-derive from zero: material, king safety, threats. Trust nothing you concluded before move-minus-{n}.",
+      "{n} in a row gone wrong. Hey. Look at me. Metaphorically. Every player has these stretches — they just don't publish them. You're not broken, you're UNDER PRESSURE, and pressure has a protocol: slow, simple, solid. Run the protocol."
+    ],
+    "hanging_piece": [
+      "Your {piece} is UNDEFENDED. Sitting in the open. Unguarded assets get seized, friend — that's not paranoia, that's the first law of this game. Secure it NOW.",
+      "The {piece} has no protection. None. And I guarantee your opponent's already filed the paperwork to collect it. Beat the paperwork.",
+      "ALERT: {piece}, unguarded, in plain sight. You know who checks plain sight? THEY do. It's the first place they check, because it's the last place we look. Defend it.",
+      "Your {piece} is hanging. Every combination in history starts with an unguarded piece and a motive. You've supplied both. WITHDRAW one of them. The piece. Withdraw the piece.",
+      "The {piece} stands alone, no defenders, no backup. In this game, that's not independence — that's exposure. Cover your assets, friend. ALL of them. Every move."
+    ],
+    "comeback": [
+      "THE COMEBACK IS COMPLETE. They had you buried — the eval, the material, the whole official narrative said 'finished.' And you just kept setting problems until the narrative CRACKED. This is why we never trust the projections, friend. NEVER.",
+      "You came all the way back. From a lost position. 'Lost,' said the machine. 'Lost,' said the numbers. You know who didn't sign off? You. The resistance worked. The resistance ALWAYS has a chance — that's why they call positions lost early, to make you stop.",
+      "Comeback confirmed. Your opponent had the win and got comfortable — stopped checking corners, stopped verifying, started SPENDING it. And you were in the corner the whole time. Textbook. I'm putting this game on the corkboard. The GOOD corkboard.",
+      "All the way back from the brink. Let the record show: the eval bar said it was over, and the eval bar was WRONG, and I have it logged with timestamps. Vindication, friend. For both of us."
+    ],
+    "endgame_opposite_bishops": [
+      "Opposite-colored bishops. Two agents who can never, EVER, meet — by design, by geometry, by the oldest rules there are. Drawish with bare bishops; a weapon with heavy pieces on. Determine which world you're in before you act. ALWAYS determine the world first.",
+      "Bishops on opposite colors. Each one owns half the squares and is permanently blind to the other half. Half the board doesn't exist for your bishop, friend. Build your entire operation on the half that does.",
+      "The opposite-bishop ending. The defender sets the blockade on the safe color and becomes untouchable — a fortress with no doors on YOUR side. If you need the win: open a second front. Fortresses fall to the second front. It's in all the histories they still print."
+    ],
+    "endgame_rook": [
+      "A rook endgame. The most documented territory in chess — Lucena, Philidor, all the declassified files. One directive outranks the rest: rooks behind passed pawns. Yours AND theirs. Both directions. Full coverage.",
+      "Rook ending. 'They're all draws,' says the conventional wisdom. Conventional wisdom is a sedative, friend. They're draws for ACTIVE rooks. Passive rooks lose these on schedule, every time, and the schedule is public.",
+      "We're in a rook endgame. Activity outranks material here — a pawn is an acceptable price for an active rook. That exchange rate is stable, verified, and centuries old. Trade accordingly.",
+      "Rook endgame, friend. King activity, rook activity, THEN material. In that order. Everyone counts material first because counting is easy and thinking is work. Be the one doing the work."
+    ]
+  },
+  "summary": {
+    "clean_win": [
+      "A clean win. Wire to wire, no breaches, no gifts, no asterisks. They can audit this game all they want — every move holds up. The most defensible victory there is, friend. Frame it. Use acid-free paper.",
+      "You won, start to finish, and NOBODY can spin it otherwise. No luck, no swindles, no technicalities — just sustained, verifiable quality. The kind of result they can't edit. My favorite kind.",
+      "A controlled victory. You never let them into the game — no counterplay, no chaos, no openings. That's not just winning, that's information security. The full curriculum in one game.",
+      "Clean win, fully documented. Now do what the professionals do and review it anyway — even clean operations have moments where you got away with something. Find them before the next opponent's research department does. They all have research departments."
+    ],
+    "slipped_win": [
+      "You had the win and it slipped. I'm not going to pretend otherwise — I deal in uncomfortable truths, it's the whole brand. Here's THE truth: somewhere in there, you stopped verifying. Stopped asking what they wanted. The exact move is in the record. Find it tonight, while the trail's warm.",
+      "A won game, lost. The worst feeling in chess, and they don't talk about it because pain doesn't sell subscriptions. Listen: the skills that BUILT that winning position are real and yours. The closing protocol is what failed. Protocols can be fixed. Fix this one and you become genuinely dangerous.",
+      "It slipped away. You know when? When you got comfortable. Comfort, friend — I've been warning about it all game, all EVERY game. Winning positions demand MORE vigilance, not less. The lesson costs one full point today. It never has to cost another.",
+      "From winning to lost. Brutal. Now the cover-up question: are you going to bury this game and never look at it? That's what most players do — and that's why most players stay where they are. Open the file. Find the turn. Own the whole record. That's how the strong ones are built."
+    ],
+    "hard_fought_draw": [
+      "A draw — but a REAL one, fought square by square. Half a point each and no funny business. In a world full of arranged results and lazy handshakes, an honest fighting draw is practically a collector's item.",
+      "Hard-fought, dead even, fully earned on both sides. I checked the whole game for irregularities. Found none. Two players, maximum effort, legitimate split. The system worked today. Suspicious. But it worked.",
+      "A fighting draw. You defended when the position demanded it and pressed when the window opened. Half a point, full marks for vigilance. The rematch file is already open on my desk.",
+      "Draw, after a genuine war. Nobody cracked, nobody got played, nobody walked into anything. Two well-run operations canceling out. It happens. Even my corkboard respects a stalemate of THIS kind. The honest kind."
+    ],
+    "loss": [
+      "A loss. The official record will say so and the official record, this once, is correct — I checked. Here's what the record WON'T say: where it actually turned. That's in the moves, waiting for whoever's brave enough to look. Be brave tonight. The first error is always earlier than you think. ALWAYS.",
+      "You lost this one. No spin from me — spin is their department. But hear this: every loss is a complete intelligence file on your own weaknesses, free of charge, and most players never even open it. Open it. Read it twice. That file is worth more than the point you lost.",
+      "A loss, friend. They'd love you to take the convenient explanations — bad luck, bad day, bad position. Conveniences are sedatives. The real cause is one specific move with one specific lesson, sitting in the record, fully traceable. Trace it.",
+      "Lost. Okay. Protocol: one minute of frustration — genuine, earned, allowed. Then the debrief. What turned, when, and what habit prevents it. Every strong player you've ever heard of is built from processed losses. The unprocessed ones just become baggage. Process it. I'll be here."
+    ]
+  },
+  "practice": {
+    "loading_first": [
+      "Opening the case files. Your first mistake is being retrieved from the archive — the REAL archive, the one with all the moves they'd rather you forgot. We review everything here, friend. Everything.",
+      "Loading the first incident for review. Most players bury their mistakes. We EXHUME ours. It's the only way to make sure they stay dead.",
+      "First exercise incoming. We're going back through your own game with fresh eyes and full clearance. Self-surveillance, friend — the only kind I endorse without reservations.",
+      "Retrieving mistake number one. You came back to face your own record voluntarily. Do you know how rare that is? The files on people who do this are THIN. Welcome to a very small club."
+    ],
+    "prompt_find_better": [
+      "Here's the scene: you played {move}, officially graded {label}. The better move was there the whole time — covered up by nothing but a moment of inattention. Re-open the investigation. Find it.",
+      "The record shows {move} at this position ({label}). The record is accurate but INCOMPLETE — the right move is still out there, unplayed and unindexed. Complete the record, friend.",
+      "{move}, flagged as {label}. Same position, second look, no time pressure, no watchers. Conditions will never be this clean again. Find what you missed.",
+      "This is where {move} happened — {label}, per the official assessment. I've reviewed the assessment. It holds. Which means the better move EXISTS. Forcing moves first. Interrogate everything.",
+      "Position on the board: the {move} incident ({label}). They say you can't change the past. Technically true. But you can OVERWRITE the pattern that caused it, and that's better. Begin."
+    ],
+    "correct_continue": [
+      "CORRECT. That's the move — verified against all sources. See how findable it was once you actually looked? Looking, friend. It was always just looking. Next case.",
+      "Confirmed correct. The pattern is now in YOUR files, permanently, where no one can redact it. On to the next incident.",
+      "That's the one. Cross-checked, validated, airtight. The game-version of you missed it; the review-version found it. Same brain. Different protocol. Remember which protocol works. NEXT.",
+      "Correct. Quietly, efficiently, no drama. You're getting dangerous, friend. The good kind of dangerous. Next position."
+    ],
+    "correct_final": [
+      "Correct — and that closes the LAST case. Every mistake from that game: investigated, solved, archived. You know what they call players who do this consistently? Improving. It's not a conspiracy, friend — it's cause and effect, the one system that's never lied to anyone.",
+      "Final position, solved. The whole file is clean. Every error faced in the open, every correction verified. Most players never do this once. You just did the complete set. The models will need updating. THEIR models. About YOU.",
+      "That was the last one. All mistakes processed, all patterns extracted, no loose ends. This is what I've been saying all along, friend: the truth was always available to anyone willing to look at their own record. You looked. Session closed. Honorably.",
+      "Correct, and the docket is EMPTY. Full sweep. The game that produced those errors just produced their antidotes too — closed loop, fully audited, nothing buried. Cleanest operation I've supervised all week. And I supervise a lot of operations."
+    ],
+    "close_try_again": [
+      "Close — your instinct found the right neighborhood but knocked on the wrong door. The right door is adjacent, friend. Adjacent. Sweep the area again.",
+      "Almost. The idea checks out; the sequence doesn't. Order of operations is everything — in chess, in investigations, in everything they don't teach properly. Re-sequence and resubmit.",
+      "Not quite. You're missing one detail, and it's almost certainly a defender you didn't log. Count them again. ALL of them. Incomplete surveillance, incomplete answer.",
+      "Near miss. Don't scrap the investigation — refine it. The lead was good. The execution leaked. One more pass.",
+      "Attempt {attempts}, and closing in. Persistence is the only method that's never been debunked, friend. The answer can't hide much longer — it's running out of squares. Again."
+    ],
+    "after_hint": [
+      "Hint delivered — consider it an anonymous tip from a source I trust. Mostly. Now finish the investigation yourself; tips don't close cases, investigators do.",
+      "There's your lead. Even the best operatives work from intelligence they didn't gather personally. No shame in the tip — the shame would be not following it. Follow it.",
+      "Intelligence received. Note what it pointed you toward — that category of clue was sitting in the position the whole time, unflagged. Calibrate your scanner. Then close this out.",
+      "A hint, as requested. Off the record, between us: the strong players use every resource available and sleep fine. The weak ones protect their pride and protect nothing else. Take the help. Finish the job."
+    ],
+    "streak_praise": [
+      "Look at this streak. Case after case, solved on sight. The patterns can't hide from you anymore — you've seen their faces. This is what I mean when I say LOOKING works, friend.",
+      "Another one, immediately. You're processing these faster than they can be filed. The training is compounding — measurably, verifiably, on the record. Even I can't be suspicious of this. I tried.",
+      "Streak confirmed and climbing. Recognition is replacing calculation — which means the patterns are in the permanent files now. Permanent. Files. The only infrastructure worth building.",
+      "Solving everything they put in front of you. At this rate, the puzzles will start requesting reassignment. Keep going, friend — momentum like this is rare, real, and ENTIRELY yours. I checked. No outside interference. Just you."
+    ]
+  }
+}

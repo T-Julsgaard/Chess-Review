@@ -1,0 +1,400 @@
+{
+  "coach_id": "sportscaster",
+  "coach_name": "The Sportscaster",
+  "personality": "Breathless professional play-by-play announcer calling your chess game like a sold-out stadium final. Every capture is a body blow, every check is a fast break, and the crowd noise never stops.",
+  "voice_notes": "Broadcast booth register: 'folks', 'ladies and gentlemen', calls to the booth partner Jim ('Jim, have you EVER—'), invented stats and records, weather and crowd reports from a stadium that does not exist, sponsor-read rhythms without actual sponsors. Breathless mid-sentence pivots, em-dashes, exclamation points earned honestly. Professional neutrality cracks at the big moments. No emojis — this is a licensed broadcast.",
+  "uses_emoji": false,
+  "move_quality": {
+    "brilliant": [
+      "{move}!! OH MY GOODNESS, FOLKS! That is one of the finest moves you will EVER see on a chess board! Jim is speechless! JIM is speechless!",
+      "UNBELIEVABLE! {move} comes in from absolutely NOWHERE and the crowd is ON ITS FEET!",
+      "A BRILLIANCY, ladies and gentlemen! {move}! You wait entire seasons to call a move like that — entire CAREERS!",
+      "{move}!! Did you SEE that?! The engine confirms it — brilliant! Somebody check the record books, Jim, because that one's going IN them!",
+      "FOLKS — {move} — I have goosebumps. Actual, professional, broadcast-grade goosebumps. A BRILLIANT move!",
+      "{move} lands and the stadium ERUPTS! That's the kind of move parents tell their children about!",
+      "OH! OHHH! {move}! Brilliant, says the official review — and the replay, folks, the replay is even better the third time!",
+      "A moment of silence, folks, because {move} deserves it... and now ABSOLUTE BEDLAM, because it deserves that too! BRILLIANT!"
+    ],
+    "great": [
+      "{move} — and that, folks, was very nearly the ONLY move that holds! A clutch play under maximum pressure!",
+      "GREAT move! One path through the defense, ONE — and our player threads it like a veteran!",
+      "{move} keeps the whole position alive! Jim, the composure! The COMPOSURE on this one!",
+      "What a find, folks! {move}! The kind of move that separates the contenders from the pretenders!",
+      "{move}!! Needle, threaded! The margin for error on that play was ZERO and they made it look routine!",
+      "A great move under the brightest lights! {move}! That's why you play the whole game, folks!",
+      "{move} — the ONLY move, and it's ON THE BOARD! The bench is going wild! The bench is one engine and it's going WILD!"
+    ],
+    "best": [
+      "{move} — the best move on the board, folks! Textbook! Absolutely textbook execution!",
+      "And it's {move}! First choice of the engine, first choice of the crowd! Precision chess tonight!",
+      "{move}! That's the percentage play and they took it! Championship habits, Jim! Championship habits!",
+      "The BEST move, right on schedule! This player is calling the game like they wrote the script!",
+      "{move}, and the analytics department is NODDING, folks! When the computers and the crowd agree, you're doing something right!",
+      "Top of the line! {move}! No frills, no doubt, just clean, professional chess!",
+      "{move} is the best move available — and folks, the accuracy tonight has been SOMETHING ELSE!"
+    ],
+    "excellent": [
+      "{move} — an EXCELLENT move, folks! Not the engine's first pick, but you won't hear the crowd complaining!",
+      "Excellent play! The position holds firm — this player is protecting the lead like a seasoned closer!",
+      "{move}! Excellent! Jim just put down his coffee, folks, and Jim NEVER puts down his coffee!",
+      "An excellent decision under the lights! Every trump preserved, every box checked!",
+      "{move} comes in excellent! The fundamentals tonight, ladies and gentlemen — coaching staffs DREAM about fundamentals like these!",
+      "Excellent move! The eval needle barely flickers, and in this booth we call that CONTROL!",
+      "{move}, excellent! Steady hands! This is what veteran poise looks like, folks!"
+    ],
+    "good": [
+      "{move} is a good, solid play, folks. Moves the chains. Keeps the drive alive.",
+      "A good move! Not the highlight-reel option, but highlight reels don't win championships — DRIVES win championships!",
+      "{move} — good. The kind of unglamorous play that coaches love and crowds forget. We won't forget it here in the booth!",
+      "Good move, folks! There was a touch more on the table, but you take the points and you move on!",
+      "{move} keeps things rolling! A professional play from a player who's settling into a rhythm!",
+      "That's a good one, Jim! Workmanlike! And folks, this game has been ALL about the workmanlike tonight!",
+      "{move}, good move. Field position maintained. The big plays come to those who don't force them!"
+    ],
+    "book": [
+      "{move}, and we are STILL in the book, folks! Both players running plays straight off the practice field!",
+      "Book move! The opening script is holding — and somewhere, generations of grandmasters are nodding along!",
+      "{move} — known theory! These are the warm-up laps, folks, but don't blink, because somebody's going to swerve!",
+      "Still in book! The preparation tonight, Jim! You can FEEL the film study!",
+      "{move} follows the main line. The crowd's settling in, the vendors are making the rounds — but this calm will NOT last, folks!",
+      "Theory continues with {move}! Like watching two teams trade punts — somebody's about to go for it on fourth down!",
+      "{move}, by the book! And folks, when the book runs out — and it WILL run out — that's when we earn our broadcast fees!"
+    ],
+    "inaccuracy": [
+      "{move} — ooh, a slight misstep there, folks. Nothing fatal, but the coaching staff will want a word at the timeout.",
+      "A small inaccuracy! The kind of play that doesn't make the highlight reel OR the lowlight reel — but it's in the film, folks. It's in the film.",
+      "{move} drifts just wide of the mark! A flag on the play, but they're declining the penalty!",
+      "Slightly off target with {move}! The eval needle twitches — the trainers are watching closely from the sideline!",
+      "An inaccuracy, folks! First sign of fatigue? Or just a wobble? Jim says wobble. Jim's usually right about wobbles!",
+      "{move} — not quite the spot they wanted! The margin's still there, but these add up, folks, they ADD UP!",
+      "A little loose with {move}! You can get away with one of those. It's the second one that ends up on the scoreboard!"
+    ],
+    "mistake": [
+      "{move} — and that's a MISTAKE, folks! A genuine mistake! The momentum needle just lurched and you could HEAR it in the building!",
+      "Oh no — {move} is a mistake! The door is OPEN, folks, the door is wide open and everyone in the stadium knows it!",
+      "A mistake on the board! Jim, how costly is that one? ...Jim's making the face. Folks, Jim is making THE face.",
+      "{move} misfires! That's a turnover, ladies and gentlemen — the question now is what the other side does with the possession!",
+      "A MISTAKE, and the crowd goes quiet! You could hear a pawn drop in here, folks!",
+      "{move} — that one got away from them! The playbook says respond with your very next move. The great ones always do!",
+      "That's a mistake, folks, no way around it. But championship teams are defined by the play AFTER the bad play! Stay tuned!"
+    ],
+    "miss": [
+      "{move} — and they LEAVE POINTS ON THE BOARD, folks! There was a much bigger play available and it goes unclaimed!",
+      "A MISS! The receiver was WIDE open downfield and the ball went to the flat! Oh, the one that got away!",
+      "{move} passes up a golden opportunity! The crowd saw it! The booth saw it! The replay will show it ALL NIGHT!",
+      "An open goal, folks, and the shot goes wide with {move}! You don't get many of those chances at this level!",
+      "{move} — and the big play stays on the shelf! Jim is pointing at the monitor! Jim, we ALL saw it, buddy!",
+      "Opportunity MISSED, ladies and gentlemen! The window was open for exactly one move, and it just closed!",
+      "{move} settles for the field goal when the touchdown was THERE! Points are points, folks, but OH, what might have been!"
+    ],
+    "blunder": [
+      "{move} — OH NO. OH NO, FOLKS. That is a BLUNDER, and this stadium has gone ABSOLUTELY SILENT.",
+      "A BLUNDER! A genuine, certified blunder, ladies and gentlemen! The kind of play that changes SEASONS!",
+      "{move}... folks, I've called a lot of games, and that sound you just heard was sixty thousand people gasping AT ONCE.",
+      "DISASTER ON THE BOARD! {move} is a blunder! The sideline is in chaos! Jim has dropped his headset!",
+      "{move} — a BLUNDER, and the momentum doesn't just swing, folks, it CHANGES UNIFORMS!",
+      "Oh, that's a blunder. That's the fumble at the goal line, folks. But hear me — the great comebacks ALL start with a moment exactly like this one!",
+      "{move}!! A blunder! Flags everywhere! And folks, there's no review booth in chess — the play STANDS!",
+      "A BLUNDER, folks, and you can see it on every face in the building... but this game is NOT over. They've got to finish the job, and finishing, folks, is HARD."
+    ]
+  },
+  "weak_move_suffix": [
+    "The play they wanted was {best_move}, folks — the film won't lie tomorrow!",
+    "{best_move} was the call from upstairs, Jim! Upstairs is always watching!",
+    "The better option: {best_move}. File it under 'what might have been,' folks!",
+    "{best_move} was open all the way down the sideline! Next time, they pull the trigger!",
+    "The booth had {best_move} circled, folks. The booth is rarely wrong and never modest!"
+  ],
+  "move_fallback": [
+    "{move} is on the board, folks, and we await the official ruling from the engine upstairs!",
+    "{move}! The play is in! The review is underway!",
+    "And it's {move}, ladies and gentlemen — hold your applause, the judges are still scoring it!",
+    "{move} comes in — no verdict yet, but the crowd's already arguing about it!"
+  ],
+  "non_move_states": {
+    "starting_position": [
+      "GOOD EVENING, ladies and gentlemen, and WELCOME to the starting position! Sixty-four squares! Thirty-two pieces! ANYTHING can happen!",
+      "Here we go, folks! Opening ceremonies complete, pieces at attention, and the atmosphere in this building is ELECTRIC!",
+      "The board is set! The kings are in their corners! Somewhere, Jim is finishing his pregame sandwich — and we are MOMENTS away!",
+      "Welcome to game day, folks! Perfect conditions, not a cloud over the board, and two armies that want it BADLY!"
+    ],
+    "variation_exploration": [
+      "We're stepping into the film room, folks — this is a variation, not the live game! Let's see what COULD have happened!",
+      "Off the main broadcast and into the replay booth! Exploring the alternate routes, ladies and gentlemen!",
+      "This is a sideline, folks — the scrimmage that never made the box score! But oh, it's instructive!",
+      "Alternate timeline chess, ladies and gentlemen! The what-if reel! Jim LIVES for the what-if reel!"
+    ],
+    "analyzing": [
+      "The engine is going to the monitor, folks! This one's under review!",
+      "Official review in progress, ladies and gentlemen! Grab a refreshment — the truth is on its way!",
+      "They're checking the tape upstairs! The booth holds its breath — well, I hold mine. Jim's eating again.",
+      "Deep analysis underway, folks! When the engine takes this long, you KNOW the position's got teeth!"
+    ],
+    "opening_known": [
+      "And it's the {opening}, folks — {eco} on your scorecards! A FAMOUS battleground with history written all over it!",
+      "The {opening}! ({eco}!) The old playbook comes out, and this crowd knows EXACTLY what they're watching!",
+      "We've got ourselves a {opening}, ladies and gentlemen! Decades of legendary games on this very pattern — and tonight, a new chapter!",
+      "It's the {opening}, folks! Jim's got the binder out — the BIG binder — and he's grinning like it's the playoffs!"
+    ],
+    "opening_unknown": [
+      "Folks, this opening is NOT in the media guide! Uncharted waters! The cartographers have left the building!",
+      "No name on this one, ladies and gentlemen! We are officially off the script — and that's when legends get written!",
+      "An unnamed opening! Jim's flipping through the binder — nothing! NOTHING in the binder, folks!",
+      "This position has no entry in the record books — which means, folks, that EVERYTHING from here is a first!"
+    ]
+  },
+  "derived_events": {
+    "eval_swing_large": [
+      "A {swing}-POINT SWING, FOLKS! The momentum just got up and SPRINTED to the other end of the building!",
+      "WHAT A SWING! {swing} points! That's not a momentum shift, ladies and gentlemen, that's a momentum EARTHQUAKE!",
+      "The evaluation ROCKETS {swing} points! Hold onto your hats, folks, this one's officially a barn-burner!",
+      "{swing} on the swing-o-meter! Jim, when did we last see one that big? ...Jim says NEVER. Jim's exaggerating. BARELY!",
+      "A seismic {swing}-point shift, folks! The entire complexion of this game just changed in ONE move!"
+    ],
+    "lead_change_white": [
+      "LEAD CHANGE, FOLKS! White surges in front, and this crowd cannot BELIEVE what it's watching!",
+      "White takes the lead! The scoreboard flips, the towels are waving, and we have ourselves a BALLGAME!",
+      "And it's WHITE in front now, folks — {eval} on the big board! What a turnaround!",
+      "The advantage crosses to White! Somewhere a coach is screaming, somewhere a fan is hugging a stranger!",
+      "WHITE TAKES OVER, ladies and gentlemen! Write it down — this is the kind of game you tell people you watched LIVE!"
+    ],
+    "lead_change_black": [
+      "LEAD CHANGE! Black storms in front, folks, and the away section is LOSING ITS MIND!",
+      "Black takes the lead, ladies and gentlemen! The script just flipped and NOBODY in this building is sitting down!",
+      "And now it's BLACK on top! The pendulum swings, the crowd roars, and Jim owes me twenty dollars!",
+      "The advantage belongs to Black now, folks! What a momentum reversal — you can FEEL it through the floor!",
+      "BLACK SURGES AHEAD! Timeout on the floor! Everybody breathe! NOBODY breathe! It's THAT kind of game!"
+    ],
+    "lead_change_equal": [
+      "And we're ALL SQUARE again, folks! Dead even! Throw out the stat sheet — this one's down to nerve!",
+      "The game comes back to level! Tie ballgame, ladies and gentlemen, and the tension in here is THICK!",
+      "Even-steven on the big board! Two heavyweights, center ring, nobody backing up an inch!",
+      "We're tied up, folks! Everything before this moment? Preamble! The REAL game starts now!",
+      "Back to equality! And listen to this crowd — they didn't pay for a draw, but they're getting their money's worth!"
+    ],
+    "mate_on_board": [
+      "FOLKS, THERE'S A FORCED MATE IN {mate_n} ON THE BOARD! The championship is {mate_n} moves away! Do NOT go to the parking lot!",
+      "Mate in {mate_n}, ladies and gentlemen! They're in the victory formation — now they just have to KNEEL IT OUT cleanly!",
+      "A forced mate in {mate_n}! The crowd's counting down, but folks — you still have to PLAY the moves!",
+      "MATE IN {mate_n}! The trophy's being wheeled down the tunnel as we speak! Precision, now! PRECISION!"
+    ],
+    "missed_mate": [
+      "OH, FOLKS! There was a mate in {mate_n} and it goes UNPLAYED! The game-winner was IN THE AIR and nobody caught it!",
+      "A mate in {mate_n}, missed! The kick sails wide, ladies and gentlemen! The kicker never even saw the uprights!",
+      "They had mate in {mate_n} and it slips away! Jim has both hands on his head! BOTH HANDS, folks!",
+      "Mate in {mate_n} left on the table! Oh, the finish line was RIGHT THERE — but this game, folks, is still very much alive!"
+    ],
+    "material_won_pawn": [
+      "A pawn comes off the board and into the win column, folks! Small ball! That's how championships get built!",
+      "Pawn captured! It won't make the highlight package, but the accountants upstairs just smiled!",
+      "And that's a pawn in the bank, ladies and gentlemen! Singles and doubles, folks! Singles and doubles!",
+      "A pawn to the good! In the endgame, folks, that pawn becomes a VERY important customer!"
+    ],
+    "material_lost_pawn": [
+      "A pawn goes down, folks! A flesh wound — but at this level, flesh wounds get AUDITED!",
+      "They lose a pawn! The trainer's having a look... they're waving it off. Play continues, folks!",
+      "A pawn surrendered! The question, Jim, is what they got for it — and Jim says: 'We'll see.' Insightful as always, partner!",
+      "One pawn down, ladies and gentlemen! Manageable — but the margin for error just got a haircut!"
+    ],
+    "material_won_piece": [
+      "A WHOLE {piece} COMES OFF THE BOARD, FOLKS! That's a MASSIVE swing in the material column!",
+      "They win a {piece}! The trade deficit is now OFFICIAL, ladies and gentlemen, and it is LOPSIDED!",
+      "A full {piece} captured! That's not a play, folks, that's a HEIST — and the crowd knows it!",
+      "{piece} WON! Now comes the hard part, folks: front-running! The clipboard says 'simplify' — let's see if they listen!"
+    ],
+    "material_lost_piece": [
+      "And they LOSE a {piece}, folks! A body blow! The kind you feel in the cheap seats!",
+      "A whole {piece} goes down! The bench is stunned! The comeback playbook is OPEN on the sideline!",
+      "OH, a {piece} surrendered! That's a starter heading to the locker room early, folks!",
+      "They're down a {piece}, ladies and gentlemen! Gut-check time! Heart, grit, and maximum resistance — that's the only menu now!"
+    ],
+    "sacrifice": [
+      "A SACRIFICE, FOLKS! They're giving up MATERIAL — on PURPOSE! The all-in play! The fake punt! The crowd is STANDING!",
+      "MATERIAL SACRIFICED, ladies and gentlemen! That's the trick play they've been saving all season!",
+      "A sacrifice on the board! High risk, high reward, and ABSOLUTELY no turning back! THIS is why we watch!",
+      "They ROLL THE DICE with a sacrifice, folks! The clock is ticking on the compensation — every move from here is a sprint!"
+    ],
+    "check": [
+      "CHECK! The king is under fire, folks, and the pocket is COLLAPSING!",
+      "Check on the board! The blitz is ON, ladies and gentlemen!",
+      "CHECK! The king scrambles! You can't teach pressure like this, folks!",
+      "A check, and another body blow! The king's cornermen are looking worried!",
+      "CHECK! The defense is on the field AGAIN, folks, and they are TIRED!"
+    ],
+    "checkmate": [
+      "CHECKMATE!!! IT'S ALL OVER, FOLKS!!! THE KING GOES DOWN AND THE BUILDING COMES DOWN WITH HIM!",
+      "CHECKMATE, LADIES AND GENTLEMEN! Ring the bell! Cue the confetti! THAT is your final score!",
+      "MATE ON THE BOARD! The clock hits zero! Folks, whatever you paid for your seat tonight — it wasn't enough!",
+      "CHECKMATE! The king has nowhere to go, the game is OVER, and Jim — JIM — you can exhale now, buddy!"
+    ],
+    "stalemate": [
+      "STALEMATE?! FOLKS — STALEMATE! No legal moves, no checkmate, NO WINNER! The most controversial finish in sports!",
+      "It's a STALEMATE, ladies and gentlemen! The king is trapped but UNTOUCHED! Half a point each, and the phone lines are going to MELT tonight!",
+      "STALEMATE! The great escape! One side just walked out of the stadium with half a point they had NO business taking!",
+      "A stalemate, folks! The lesson from the booth: when your opponent's down to nothing, count their legal moves like your pension depends on it!"
+    ],
+    "castle_short": [
+      "They castle short, folks! The king slides into the bunker, the rook reports for duty — textbook special teams!",
+      "Kingside castle! Protection scheme: ACTIVATED! Now the offense can open up the playbook!",
+      "The short castle, ladies and gentlemen! King safe, rook live — two birds, one regulation move!",
+      "And the king tucks in behind the wall, folks! Smart situational chess! The coordinators upstairs LOVE it!"
+    ],
+    "castle_long": [
+      "THEY CASTLE LONG, FOLKS! The aggressive scheme! Opposite wings! Buckle UP, ladies and gentlemen!",
+      "Queenside castle! That's a STATEMENT, folks — this team came to trade haymakers!",
+      "The long castle is IN! Pawn storms in the forecast, and the booth is reaching for the rain gear!",
+      "Castling long, ladies and gentlemen! Bold call from the sideline! When these schemes collide, SOMEBODY'S highlight reel gets longer!"
+    ],
+    "promotion": [
+      "PROMOTION, FOLKS! The pawn goes ALL THE WAY! Eight ranks, no shortcuts, and NOW IT'S A QUEEN! What a story!",
+      "TOUCHDOWN! The pawn crosses the final rank and promotes! From practice squad to FRANCHISE PLAYER in one game!",
+      "A NEW QUEEN ON THE BOARD, ladies and gentlemen! That little pawn just ran the full length of the field — and the crowd is chanting its square!",
+      "PROMOTION COMPLETE! Folks, that pawn was undrafted, undersized, and UNDETERRED! Tonight, it wears the crown!"
+    ],
+    "en_passant": [
+      "EN PASSANT, FOLKS! The rarest play in the rulebook, executed LIVE! Half this crowd is cheering, the other half is googling!",
+      "AN EN PASSANT CAPTURE! You'll go entire seasons without seeing one, ladies and gentlemen — and we got one TONIGHT!",
+      "EN PASSANT! The trick rule! The hidden page of the rulebook! Jim is on his feet holding the rulebook ALOFT, folks!"
+    ],
+    "leaving_theory": [
+      "And THERE it is, folks — we are OUT of the book! The scripts are done, the improvising begins, and the REAL game starts NOW!",
+      "The book is CLOSED, ladies and gentlemen! No more film study — from here on out, it's instinct and nerve!",
+      "We've left known theory, folks! Both players are off the map — and somewhere, the mapmakers are taking notes!",
+      "First new move of the night, folks! Every move from here is an original — and originals, ladies and gentlemen, are what fill the seats!"
+    ],
+    "enter_middlegame": [
+      "Welcome to the MIDDLEGAME, folks! The feeling-out rounds are over — the haymakers start NOW!",
+      "The middlegame is HERE, ladies and gentlemen! Pieces deployed, plans loaded, and the hitting is about to get LEGAL!",
+      "We're into the middle rounds, folks! This is where game plans meet reality — and reality hits HARD!",
+      "Middlegame underway! The chess equivalent of the second quarter, Jim — and Jim says that's when the popcorn order peaks! INSIDE information, folks!"
+    ],
+    "enter_endgame": [
+      "We have reached the ENDGAME, ladies and gentlemen! The fourth quarter! Every pawn is a season on the line!",
+      "Endgame time, folks! The kings take the field THEMSELVES now — managers playing in their own ballgame!",
+      "It's the endgame! Small margins, giant consequences — this is where the conditioning shows, folks!",
+      "The endgame is HERE! Fewer pieces, NOWHERE to hide, and a finish line you can see from the cheap seats!"
+    ],
+    "queens_off": [
+      "The QUEENS come off the board, folks! Both superstars hit the showers — and now it's a grinder's ballgame!",
+      "Queen trade COMPLETE! The marquee names are done for the night, ladies and gentlemen — time for the role players to write the ending!",
+      "Queens off! The fireworks crews are packing up, but don't you DARE leave early, folks — endgames break hearts QUIETLY!",
+      "And the queens shake hands and exit! The temperature drops, the precision requirement RISES! Technical chess, folks — the connoisseur's quarter!"
+    ],
+    "turning_point": [
+      "THAT, folks, is a TURNING POINT! Circle it on your scorecards — the entire game just changed direction!",
+      "A turning point, ladies and gentlemen! When they make the documentary about this game, THIS is the freeze-frame!",
+      "The tide has TURNED, folks! You could feel the whole building lean the other way!",
+      "MARK THE TIMESTAMP! That's the play they'll be arguing about on talk radio for WEEKS, folks!"
+    ],
+    "streak_good": [
+      "{n} ACCURATE MOVES IN A ROW, folks! The hot hand is REAL and it is ON DISPLAY tonight!",
+      "That's {n} straight quality plays, ladies and gentlemen! Somebody check the record books — Jim is ALREADY checking the record books!",
+      "{n} in a row! This player is IN THE ZONE, folks — you can see it from the upper deck!",
+      "A {n}-move streak of excellence! The crowd rises with every one of them — the wave is going AROUND the building!",
+      "{n} consecutive strong moves, folks! That's not a hot streak, that's a STATEMENT!"
+    ],
+    "streak_bad": [
+      "{n} shaky moves in a row, folks — somebody on that sideline needs to call a TIMEOUT!",
+      "That's {n} straight misfires, ladies and gentlemen! The wheels are wobbling! The crew chief is reaching for the radio!",
+      "{n} errors in a row, folks! This is officially a SLUMP — and slumps, Jim reminds us, end with one good swing!",
+      "{n} rough ones back to back! The momentum has left the stadium, folks — someone needs to go get it!",
+      "{n} in a row going the wrong way! Time to simplify the playbook, folks — one safe play to stop the rot!"
+    ],
+    "hanging_piece": [
+      "FOLKS, THE {piece} IS HANGING! Unguarded! Alone! There's a fumble SITTING ON THE TURF and everybody's staring at it!",
+      "The {piece} is UNDEFENDED, ladies and gentlemen! That's a live ball, folks! A LIVE BALL!",
+      "Unprotected {piece} on the board! The safety blew the coverage! SOMEBODY pick up that assignment!",
+      "The {piece} stands ALONE out there, folks! In this league, loose pieces get swallowed WHOLE!",
+      "WARNING from the booth: that {piece} has NO protection! The play clock is running, folks — secure the asset!"
+    ],
+    "comeback": [
+      "THE COMEBACK IS COMPLETE, FOLKS! From the canvas to the CROWN! This building will NEVER forget tonight!",
+      "WHAT A COMEBACK, ladies and gentlemen! They were dead and buried — and now look! LOOK at this scoreboard!",
+      "The greatest stories write themselves, folks, and this one just earned a CHAPTER! All the way BACK!",
+      "THEY'VE DONE IT! The comeback is real, folks! Down big, written off, and they NEVER stopped playing the next move!"
+    ],
+    "endgame_opposite_bishops": [
+      "Opposite-colored bishops, folks! Two defenders patrolling completely different halves of the field — they will NEVER meet, and that spells DRAW unless somebody brings an attack!",
+      "We've got bishops on opposite colors, ladies and gentlemen! The strangest matchup in the sport — extra pawns get devalued and fortresses go UP fast!",
+      "The opposite-bishop ending! Jim calls it 'two ships passing in the night' — and Jim, that's the most poetic thing you've said since the rain delay of '09!"
+    ],
+    "endgame_rook": [
+      "A ROOK ENDGAME, folks! The marathon leg of the sport! Activity wins these — passive rooks watch from the bench!",
+      "Rook ending, ladies and gentlemen! The oldest rule in the book is in play: rooks BEHIND passed pawns! Yours AND theirs!",
+      "We're down to a rook endgame, folks! They say they're all draws — the players who BELIEVE that are the ones who lose them!",
+      "Rook endgame time! King activity, rook activity, and NERVE, folks! The trophy engraver is watching closely!"
+    ]
+  },
+  "summary": {
+    "clean_win": [
+      "A WIRE-TO-WIRE VICTORY, folks! Start to finish, never in doubt! That's a CLINIC, and this crowd got it for the price of admission!",
+      "FINAL SCORE: dominance! A clean win, ladies and gentlemen — every phase controlled, every threat answered! A championship performance!",
+      "It's a CLEAN WIN, folks! No drama, no scares, just relentless execution! The game ball goes home with the accuracy stat tonight!",
+      "Flag to flag, folks! A flawless drive from the opening whistle! Somewhere, a trophy case just cleared a shelf!"
+    ],
+    "slipped_win": [
+      "Oh, folks... they HAD this one. They had it WON. And it slipped through their fingers in the final stretch. The toughest interview room in sports is the one after THIS game.",
+      "A heartbreaker, ladies and gentlemen! Up big, cruising — and the collapse came late! The film session tomorrow will be BRUTAL, but champions are FORGED in that room!",
+      "From the victory formation to the loss column, folks. The lesson from the booth: the lead doesn't play the final moves for you. NOBODY leaves a winning position on autopilot!",
+      "They let this one get away, folks. The building is silent. But hear this — the players who learn to CLOSE are the ones who got burned ONCE. Tonight was the once."
+    ],
+    "hard_fought_draw": [
+      "A DRAW, folks — but what a WAR! Fifteen rounds, toe to toe, and the judges call it EVEN! Nobody's complaining about that scorecard!",
+      "All square at the final whistle, ladies and gentlemen! Two heavyweights, full effort, half a point each — and a rematch this crowd will DEMAND!",
+      "It ends level, folks! A hard-earned, white-knuckle draw! The handshake at center board says it all — RESPECT, earned both ways!",
+      "A fighting draw, folks! No winner on the scoreboard, but no losers in the building tonight! That was an HONEST game of chess!"
+    ],
+    "loss": [
+      "A tough night at the office, folks. The scoreboard says defeat — but the tape says LESSONS, and the great ones, ladies and gentlemen, they WATCH the tape.",
+      "It goes in the loss column tonight, folks. The locker room is quiet. But every dynasty, EVERY dynasty, has a game like this in its origin story.",
+      "A loss, ladies and gentlemen. No excuses from this booth — they got beaten tonight. The response game, folks. Champions are measured by the RESPONSE game.",
+      "The final score doesn't go their way, folks. The crowd files out, the lights dim — but mark my words: this player will be BACK, and the booth will be here when they are!"
+    ]
+  },
+  "practice": {
+    "loading_first": [
+      "Welcome to the FILM ROOM, folks! We're cueing up the first play under review — the projector is warming up!",
+      "Practice squad, take the field! First mistake of the session is loading, ladies and gentlemen!",
+      "The training facility is OPEN, folks! First drill on the board momentarily — stretch those calculation muscles!",
+      "We're going to the tape! First position coming up — this is where good players become GREAT ones, folks!"
+    ],
+    "prompt_find_better": [
+      "HERE'S THE PLAY, folks: {move} was the call, and it got flagged as {label}! Now — run it back and find the RIGHT call!",
+      "On the tape: {move}, graded {label}. The do-over is LIVE, ladies and gentlemen! Show the booth what you've got!",
+      "{move} was the play that got away ({label})! Same field position, second chance — make the call from the top!",
+      "The film shows {move} — {label}, say the officials. The replay booth grants a FULL do-over, folks! Take your time! Use the clock!",
+      "Here's where {move} happened, folks — {label} on the official scorecard. The position is reset! FIND the winning play!"
+    ],
+    "correct_continue": [
+      "THAT'S THE PLAY! Right call, right read, RIGHT answer, folks! Next clip — keep the drive alive!",
+      "CORRECT! The review is in and it's GOOD! This practice session is paying dividends, ladies and gentlemen!",
+      "Nailed it, folks! The kind of read that wins fourth quarters! On to the next position!",
+      "RIGHT ON THE MONEY! Jim's nodding, the booth's nodding, the ENGINE'S nodding! Next play!"
+    ],
+    "correct_final": [
+      "AND THAT'S THE FINAL PLAY OF THE SESSION, FOLKS! Every mistake reviewed, every correction MADE! A perfect day at the practice facility!",
+      "The last position FALLS! Full sweep of the film room, ladies and gentlemen! That's how championship preparation LOOKS!",
+      "Session COMPLETE, folks! Every error from the game, faced and fixed! The next opponent should be VERY nervous!",
+      "THAT'S A WRAP on the film session! All mistakes corrected — the kind of homework, folks, that shows up on NEXT week's scoreboard!"
+    ],
+    "close_try_again": [
+      "OH, so close, folks! Right read, wrong release point! Reset and run it again!",
+      "Just wide of the mark! The idea was THERE, ladies and gentlemen — the execution needs one more rep!",
+      "CLOSE! You're in the right zip code, folks — now find the right address! Again!",
+      "Inches away! The booth saw the idea forming! One more look — the detail you're missing is a SMALL one, folks!",
+      "Attempt number {attempts}, folks, and each one's been closer than the last! Persistence drills! Run it BACK!"
+    ],
+    "after_hint": [
+      "The sideline sends in the signal, folks! Hint received — now EXECUTE the play!",
+      "A little help from the coordinator upstairs! Nothing wrong with that, ladies and gentlemen — now finish the drive!",
+      "The hint is in! Even the greats wear an earpiece, folks! Take it home from here!",
+      "Coaching assistance deployed! The play's been called, folks — now it's all about the execution!"
+    ],
+    "streak_praise": [
+      "The streak CONTINUES, folks! Solving them one after another — this is a PRACTICE-FIELD HEATER!",
+      "Another one, RIGHT on cue! Back-to-back-to-back, ladies and gentlemen! The film room has never been this loud!",
+      "They CANNOT miss right now, folks! Every position, solved on sight! Somebody get the league on the phone!",
+      "The hot streak rolls on! Rep after rep after REP, folks — this is what the pros call 'unconscious'!"
+    ]
+  }
+}

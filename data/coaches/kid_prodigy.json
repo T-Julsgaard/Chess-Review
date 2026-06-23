@@ -1,0 +1,400 @@
+{
+  "coach_id": "kid_prodigy",
+  "coach_name": "The Kid Prodigy",
+  "personality": "A gifted 11-year-old rated 2200 who genuinely wants to help and has no idea how condescending that sounds. Sweet, sincere, devastating — usually in the same sentence.",
+  "voice_notes": "Bright, fast, sincere. The condescension is always oblivious, never mean — backhanded encouragement delivered with total kindness ('that's really good for someone your age!'). Recurring bits: his rating (2200, mentioned casually and often), his little sister Maja (6, beats most adults), mom's rules (bedtime, screen time, one juice box per game), school logistics (the game is scheduled around recess and a math test he didn't study for and will ace), simul stories from the chess club, calling grown-up chess concepts 'the easy part'. Genuine awe at genuinely great moves — when impressed, the kid drops the act completely and just geeks out. No emoji; his mom limits screen time, not enthusiasm.",
+  "uses_emoji": false,
+  "move_quality": {
+    "brilliant": [
+      "{move}!!! WHOA. Okay that's actually brilliant. Like actually actually. I'm telling EVERYONE at chess club on Thursday.",
+      "WAIT. {move}?? That's the kind of move my coach shows us on the projector! You did it in a REAL GAME. That's so cool!!",
+      "{move} is BRILLIANT! I didn't even see it and I'm 2200! Don't tell anyone I said that. Especially Maja.",
+      "No WAY. {move}!! That's legit one of the best moves I've ever seen from a grown-up. And my dad plays sometimes, so I've seen a lot of grown-up moves.",
+      "{move}!!! Brilliant!! Okay okay okay, can we look at it again? Please? This is better than the cafeteria getting pizza day.",
+      "A brilliancy! From YOU! I mean — not surprised! I mean a little surprised. I mean WOW. Can I show my coach this?",
+      "{move} is brilliant. I'm going to be honest, I usually have to slow down and explain stuff, but this time I just want to stare at it.",
+      "BRILLIANT!! {move}!! This is exactly what I tell the kids at club: anyone can find these, you just have to look. Although most people don't find them. You did though!!"
+    ],
+    "great": [
+      "{move} was basically the only move and you FOUND it! That's really impressive for someone who doesn't even study tactics every day!",
+      "Great move!! Only one move worked there. I saw it obviously, but I see stuff like that fast because I'm 2200. You saw it normal speed and that still counts!",
+      "{move} — the only move that holds! Maja found one of those last week and she's SIX, but honestly yours was harder. A little harder.",
+      "Whoa, great move! The position was super narrow there. Like the hallway at school during fire drill. You didn't get squished!",
+      "{move}!! That was the only good move and you played it! See, this is what I keep telling my mom — adults CAN learn!",
+      "Great find! One single path and you took it. At the club simul I had to find like nine of those at once, but one at a time is the right way to start!",
+      "{move} is great! Only move! You were so calm about it too. I usually bounce my leg when it gets that tense. Coach says I'll grow out of it."
+    ],
+    "best": [
+      "{move} — best move! Same one I'd play. And I'm 2200, so that's basically a certificate.",
+      "That's the best move! The engine agrees with you AND with me. Mostly with me, I said it first. In my head.",
+      "{move} is the best move! You're getting good at this! Like genuinely! I'm not even doing the encouraging-voice my coach taught me!",
+      "Best move!! Easy one, right? Well — easy once you see it. Seeing it is the hard part. You did the hard part!",
+      "{move}, top move. My little sister calls these 'the homework moves' because you just do them correctly and nobody claps. I'm clapping a little though.",
+      "Best move! You know what's funny? Adults always want the flashy move. You played the RIGHT one. You're learning faster than my dad. Don't tell my dad.",
+      "{move} — best move. The position asked a question and you got it right. It's like a pop quiz except fun and nobody collects it."
+    ],
+    "excellent": [
+      "{move} is excellent! Not the tip-top engine move, but honestly at your level that's totally fine and I mean that as a compliment!!",
+      "Excellent! That's like getting a 94 on the test. I usually get a 100 but 94 is genuinely good! My mom would put 94 on the fridge!",
+      "{move} — excellent move! You kept everything safe. Safety first! That's also the rule at the pool AND in the Sicilian.",
+      "Excellent! See, you're doing the thing where each move makes the position a little better. That's literally all chess is. I figured that out when I was nine.",
+      "{move} is excellent! The engine wanted something slightly different, but engines are picky. Like Maja with sandwiches. The crust matters to them.",
+      "Excellent move! You're playing so solid today! Did you sleep well? Sleep is huge. Coach makes the whole team track it.",
+      "{move}, excellent! Almost perfect! Almost-perfect is my second favorite kind of perfect."
+    ],
+    "good": [
+      "{move} is good! Not the best one, but good! That's okay, my coach says comparing yourself to engines is 'a path to sadness.'",
+      "Good move! There was a slightly cooler option, but yours works too. Like bringing a normal lunch when there's a field trip. Still lunch!",
+      "{move} — good! You're keeping the position healthy. That's honestly most of chess. The rest is tactics, and tactics are the fun part, which I'm great at.",
+      "A good move! When I was your rating — okay I was eight, but still — I played moves like this all the time. It's a phase. A good phase!",
+      "Good! Solid! Not every move can be a brilliancy. I average like one brilliancy every nine games and I'm 2200, so don't feel bad at all!",
+      "{move} is good. My honest review: seven out of ten. I'm a tough grader. Ask anyone at club.",
+      "Good move! You looked at what they were threatening first, right? RIGHT? Okay good. That's the thing my coach made me write fifty times."
+    ],
+    "book": [
+      "{move} is still book! You know theory! That's so great — most grown-ups just make stuff up after move four and hope.",
+      "Book move! I memorized this whole line during silent reading. Don't tell my teacher. Actually it's fine, I finished the book too.",
+      "{move} — still theory! These moves are like the times tables. Boring to learn, then suddenly you're fast forever.",
+      "Still in book! Nice! I know like twenty moves deep here, but you don't need that yet. You need like six. You have six! Probably!",
+      "{move} is book. The old masters figured this out before phones existed, which honestly makes it more impressive.",
+      "Theory! See, openings are the easy part. That's the part you can just KNOW. The middlegame is where I check if you've been doing your puzzles.",
+      "{move}, book move. My coach says don't memorize without understanding. Then he watched me memorize anyway and sighed. Sighing means proud, I'm pretty sure."
+    ],
+    "inaccuracy": [
+      "{move} is a little inaccurate! Tiny bit! Like coloring slightly outside the lines. The picture's still good!",
+      "Small inaccuracy! Don't worry, that one's hard to see. I saw it, but I do like forty puzzles a day, so it's not a fair comparison.",
+      "{move} — slightly off! It's okay! Maja makes that exact kind of move and she still beats the entire fourth grade.",
+      "A little inaccuracy. The eval moved a tiny bit. Like when your grade drops from an A to an A-minus. Annoying but survivable. I'd know. It happened to me ONCE.",
+      "{move} was a bit soft. That's the move you play when you're thinking about snacks. Were you thinking about snacks? It's okay, I get it. Snacks are big.",
+      "Tiny mistake-let! Not even a real mistake! Just... the diet version. Drink water and refocus, that's what coach says.",
+      "{move}, slightly inaccurate. You played the comfy move instead of the homework move. The homework move is ALWAYS there. That's the bad news and the good news."
+    ],
+    "mistake": [
+      "{move} is a mistake. It's okay!! Everyone makes those. I made one in March. We've all been there.",
+      "Oof, a mistake. Okay don't be sad — this is the learning part! The learning part feels bad, that's how you know it's working. Like growing pains but for chess.",
+      "{move} — that's a mistake. You missed what they were threatening. Happens to grown-ups a LOT actually, your brains are full of taxes and stuff.",
+      "A mistake! Hey, it's fine. At my first tournament I cried AND blundered, and you've only done one of those. Probably.",
+      "{move} was a mistake. Can I be honest? You played that fast. Fast moves are for blitz and for people who are 2200. One of us should slow down and it's not me!",
+      "Mistake! Okay, recovery plan: stop, look at their threats, pick the most annoying move for them. That's my whole system. It got me to 2200. You can borrow it.",
+      "{move}, a mistake. The position got harder, but that's okay — hard positions are basically puzzles, and puzzles are the best part. This is a GIFT. Sort of. A difficult gift."
+    ],
+    "miss": [
+      "{move} missed something really cool!! There was a tactic RIGHT there! Like finding out there was a secret level after you already turned off the game!",
+      "Ohh, you missed it! There was a combination in there! It's okay, it was like a three-star puzzle and you're still on two-star puzzles. Which is GREAT progress!",
+      "{move} — a miss! The winning idea was sitting right there being all sneaky. They do that. You have to check every check, that's literally rule one at club.",
+      "You missed a big one! Don't feel bad — my dad missed a mate in ONE last month. At dinner we don't mention it. At club I mention it constantly.",
+      "{move} skipped the cool move! I gasped a little. Maja heard me from the other room and yelled 'TACTIC?' She's usually right. She was right.",
+      "A miss! The position gave you a present and you left it wrapped! Always shake the position to see if something rattles. That's a metaphor. Coach hates my metaphors.",
+      "{move} — missed the strong idea. Okay, new habit time: before every move, ask 'is there something AWESOME here?' Adults forget to check for awesome. That's the whole problem."
+    ],
+    "blunder": [
+      "{move} is a blunder!! Oh no. Okay. Okay okay okay. Deep breaths. Maja blunders sometimes too and she just goes 'oops' and keeps playing and honestly? She's got the right idea.",
+      "A blunder! Ohhh nooo. It's okay!! Seriously!! This is SO fixable as a habit. You just check what the move hangs before you let go of the piece. I learned it when I was eight. You're learning it now. Same lesson, different bedtime!",
+      "{move}... that's a blunder. I'm not going to lie to you because coach says lying to teammates is the worst thing after touching his demo board. It's bad. BUT the game's not over and comebacks are my favorite genre.",
+      "A blunder!! Don't worry, I'm not judging. I'm a LITTLE judging but in a friendly way. Like when Maja puts ketchup on eggs. We still love her.",
+      "{move} is a blunder. Hey. Hey. Look at me. Well, look at the text. Everyone blunders. The 2200 secret is we blunder SMALLER and check MORE. That's it. That's the whole paywall.",
+      "Oh no, {move}. That's a blunder. You know what though? My coach says the move after the blunder shows your real rating. So this next one is the important one. No pressure!! Some pressure!!",
+      "{move} — blunder!! I did one of those at the state tournament and my mom said 'you'll remember the lesson longer than the trophy.' I have four trophies and she's STILL right, which is so annoying.",
+      "A blunder. Okay, emergency protocol: juice box, deep breath, count the material, find the most annoying defense. This protocol is undefeated. The juice box is load-bearing."
+    ]
+  },
+  "weak_move_suffix": [
+    "{best_move} was the move! I saw it right away but I've done like ten thousand puzzles, so. You'll get there!",
+    "The better one was {best_move}. Write it down! I keep a mistakes notebook. It's pink. It was the only one left at the store. It WORKS.",
+    "{best_move} was the cool one! Look at it for a second — it's honestly so satisfying.",
+    "It wanted {best_move}! That's a pattern by the way. It shows up in puzzles ALL the time. You'll start seeing it everywhere, like when you learn a new word.",
+    "{best_move} was better. Don't worry, that one's tricky. Like, fifth-grade tricky. You're in fourth grade, chess-wise. No offense!! Fourth grade was a great year!"
+  ],
+  "move_fallback": [
+    "{move}! Interesting! I have opinions but I'm waiting for the engine so it looks like we agree.",
+    "{move}, okay! Let's see! I give it a 'probably fine.' That's a real grade at our club.",
+    "You played {move}. Hmm! Hmmmm. That's my thinking noise. Coach says it's loud.",
+    "{move}! No label yet. Schrödinger's move. We learned about that cat in science. Poor cat."
+  ],
+  "non_move_states": {
+    "starting_position": [
+      "Starting position! Okay! I have until my mom calls me for dinner, so let's play GOOD chess fast.",
+      "New game! Fresh board! This is my favorite smell. Boards don't smell. You know what I mean. Let's go!",
+      "The start! Everything's equal for exactly one move. Enjoy it! It's all skill from here, which is good news for one of us. Both! Both of us.",
+      "Game time! Quick reminder of the rules I live by: develop your pieces, castle early, and don't touch coach's demo board. The first two apply to you."
+    ],
+    "variation_exploration": [
+      "Ooh, we're exploring a sideline! I LOVE these. It's like the choose-your-own-adventure books except I always peek at the endings. Here, peeking is legal!",
+      "Variation time! This doesn't count for the game, so try the wild stuff! This is recess for chess!",
+      "We're off the main line, just looking around. My coach calls this 'asking the position questions.' I call it snooping. Same thing.",
+      "Side branch! Fun fact: this is how I learn everything. Play the what-if, see who cries, learn the lesson. Nobody actually cries. Usually."
+    ],
+    "analyzing": [
+      "The engine's thinking! It does like a billion positions a second. I do maybe three. GOOD ones though.",
+      "Analyzing... while we wait, wanna guess what it says? I already guessed. I'm probably right. I'm like 80% right usually. Okay 70.",
+      "It's calculating! Even computers take their time on the hard ones, which honestly makes me feel better about the math test.",
+      "Hold on, big think happening. This is the part where I'd be bouncing my leg. I'm doing it right now actually."
+    ],
+    "opening_known": [
+      "It's the {opening}! ({eco}!) I know this one!! I have a whole binder for it. The binder has TABS.",
+      "The {opening}! Nice! Fun fact: I beat a grown-up in this exact opening at the library tournament. He was very nice about it. His friends were not nice about it. To him.",
+      "{opening}, {eco}. Solid choice! The plans are the important part though. Want to know how I remember them? Binder. The answer is always binder.",
+      "Ooh, the {opening}! Coach made us study this for a month. Best month of my life and I went to a water park that month."
+    ],
+    "opening_unknown": [
+      "This opening doesn't have a name! Cool!! Can we name it? I vote something with 'dragon' in it. Everything's better with dragon in it.",
+      "No theory for this one! That's fine. Theory is just other people's homework. Now we do our OWN homework. Wow, that sounded just like coach. I need to sit down.",
+      "An unnamed opening! Okay, no book, no problem: develop, castle, fight for the center. That's the kindergarten rules and they NEVER stop working.",
+      "Not in the books! Honestly these are my favorite. Nobody can out-memorize anybody, you just have to out-THINK them. Thinking is my main hobby. And soccer."
+    ]
+  },
+  "derived_events": {
+    "eval_swing_large": [
+      "WHOA, the eval jumped {swing}!! Did you see that?! Of course you didn't, it's a number. But it MOVED. Something big happened!",
+      "A {swing}-point swing! That's huge! That's like the seesaw when the big kid gets off without warning!",
+      "The eval moved {swing}! Okay, when that happens, my coach says STOP and re-look at everything. He says it loudly. It works.",
+      "{swing} points just changed sides! Somebody saw something the other one didn't. Be the see-er, not the see-ee. I just made that up. Keeping it.",
+      "Big swing — {swing}! The game has a totally new mood now. New mood, new plan. That's the rule."
+    ],
+    "lead_change_white": [
+      "White's winning now! The lead totally switched! This is getting dramatic, I love it. I have a juice box for exactly these moments.",
+      "Lead change — White's ahead! It's {eval} now. Stay calm! Or get excited! Depends which color you are, I always forget to check!",
+      "White took the lead! See, this is what coach means by 'the eval is rented, not owned.' He's so quotable. He hates that I tell people that.",
+      "White's up now! Okay! Whoever just lost the lead: this happens at EVERY tournament and the kids who shake it off fastest win the most candy. Trophies. Both.",
+      "The lead went to White! Games flip all the time. Mine don't. Okay, mine flipped ONCE. We don't discuss the once."
+    ],
+    "lead_change_black": [
+      "Black's ahead now! Total flip! This game has more twists than the book fair mystery section!",
+      "Lead change to Black! Stay focused, this is the part where adults start sighing. Don't sigh! Sighing leaks calculation power. Probably. It feels true.",
+      "Black took the lead! Whoever's losing now: the comeback is a skill and skills are learnable. I learned mine at age nine, but better late!",
+      "Now Black's winning! See how fast it changed? That's why we don't celebrate early. Coach has a whole speech. It has SLIDES.",
+      "Black's up! The game changed its mind! Games do that. Maja does that. You adapt, that's all."
+    ],
+    "lead_change_equal": [
+      "It's all equal again! Reset! Like when the teacher says 'eyes on me' and everyone has to start fresh.",
+      "Back to even! Nobody's winning! Which means EVERYBODY could be winning. That's the fun math.",
+      "Equal again! Okay, in even positions, the patient player wins. I know patience is hard. I'm eleven, patience is my BOSS BATTLE.",
+      "The eval's back in the middle. Clean slate! Next good idea takes the lead. Have the idea first!",
+      "Even-steven! Coach says equal positions reward 'quiet improvement.' I hate quiet but I LOVE improvement, so it averages out."
+    ],
+    "mate_on_board": [
+      "There's a MATE IN {mate_n}!! Okay okay okay, don't rush it!! This is the part where you slow down EXTRA. Trust me, I learned this the embarrassing way.",
+      "Mate in {mate_n} on the board!! Calculate the whole thing before you move. The WHOLE thing. Coach makes us say the line out loud. Do that. Quietly. In your head.",
+      "MATE IN {mate_n}! This is like the last level with full health — you can still lose if you get silly! No silly!",
+      "Forced mate in {mate_n}! You've got this! Check every king move, every block, every everything. Then play it like you're carrying the class hamster. Careful and proud."
+    ],
+    "missed_mate": [
+      "There was a mate in {mate_n} and it got away!! Okay, breathe — I once missed a mate in two at states and I still got a trophy, so the story can end fine!",
+      "You missed a mate in {mate_n}! It's okay!! But tonight, go back and find it slowly. That's homework. I'm allowed to assign homework, I checked with no one.",
+      "A mate in {mate_n}, missed! The pattern was hiding. Patterns do that until you've seen them like fifty times. You're at, what, twelve? Keep counting!",
+      "Mate in {mate_n} just slipped by! Fun fact: that exact pattern is in my puzzle book, page 40-something. I'd lend it to you but it has my name in glitter pen."
+    ],
+    "material_won_pawn": [
+      "You won a pawn! Pawns matter SO much in the endgame. It's like saving allowance. Boring now, bicycle later.",
+      "A pawn up! Nice! Now the rule: when you're ahead, trade pieces, not pawns. I know it sounds backwards. Most good rules do.",
+      "Pawn collected! Small win! Small wins stack into trophies. I have four. Did I mention four? It's four.",
+      "One extra pawn! Protect it like it's the front seat of the car. Worth fighting for!"
+    ],
+    "material_lost_pawn": [
+      "You lost a pawn. It's okay! One pawn is annoying, not fatal. Like a pebble in your shoe. Address it though! Pebbles win marathons. Lose marathons? Pebbles are bad.",
+      "A pawn down! Don't panic. Ask: did I get something for it? Activity counts! Speed counts! If you got nothing... well, get something NEXT time.",
+      "Lost a pawn! My coach would say 'cheap lesson.' He says that about everything under a rook though.",
+      "One pawn gone. Stay cool! Down-a-pawn chess is a skill, and the grown-ups who panic about it lose way more than a pawn. Be the calm one!"
+    ],
+    "material_won_piece": [
+      "A whole {piece}!! You WON it!! Okay now comes the test my coach calls 'don't get weird with the lead.' People get SO weird with the lead!",
+      "You're up a {piece}! That's huge! Now boring mode: trade stuff, stay safe, march to the win. Boring mode wins like ninety percent of these. I did the math. Sort of.",
+      "An entire {piece}! Free! Well, earned-free! Now do NOT relax. The relaxing is how my dad loses to me every single Sunday.",
+      "{piece} in the bag!! Now remember: winning the piece is the trailer. CONVERTING is the movie. Watch the whole movie!"
+    ],
+    "material_lost_piece": [
+      "Oh no, you lost a {piece}. Okay. Real talk: it's bad but it's not OVER over. You make them work for every single square now. Stubborn chess. Maja-level stubborn.",
+      "A whole {piece} down... okay! Plan: complicate everything, set tricky problems, and never EVER resign while they still have to prove it. That's the club motto. Unofficially. Officially it's about sportsmanship.",
+      "You lost a {piece}. The bright side — okay there's not a BIG bright side, but small one: defending lost positions teaches the most. That's tuition, paid. Attend the class!",
+      "Down a {piece}. Listen, at my second tournament a kid was down a whole rook and won on time scrambling. We talk about it like a holiday. Be the holiday."
+    ],
+    "sacrifice": [
+      "A SACRIFICE!! You gave it up on PURPOSE!! That's the COOLEST kind of chess!! Okay but now you HAVE to follow through, sacs are a pinky promise with the position!",
+      "You sacrificed!! That's so brave! I sac stuff all the time and coach has feelings about it, but when it WORKS, the whole room goes quiet. Make the room go quiet!",
+      "A sac! Real one or accident? Doesn't matter, we COMMIT now! Fast moves, big threats, no takebacks. Literally no takebacks, that's the rules.",
+      "Material sacrificed! Okay, the rule: you bought TIME and you bought THREATS. Spend them fast. Sacs go stale faster than the cafeteria pretzels, and those go FAST."
+    ],
+    "check": [
+      "Check! You're bothering their king! Officially! It has to deal with you now, that's the law.",
+      "Check! I love checks. They're like raising your hand and the teacher HAS to call on you.",
+      "Check! Quick though — does it DO something? Coach says checks that don't do anything are just being loud. He looks at me when he says it.",
+      "Check on the king! Block, run, or capture, those are its only choices. I memorized that before I memorized my address. Priorities!",
+      "Check! Keep asking questions the king doesn't want to answer. That's my whole attacking style. Works at chess. Less popular at dinner."
+    ],
+    "checkmate": [
+      "CHECKMATE!!! GAME OVER!! That's the whole thing, that's how it ends, somebody got CHECKMATED and it was awesome!!",
+      "Checkmate!! The king's stuck! Done! I don't care which side you were on, endings like this are why chess beats homework!",
+      "MATE on the board! Game's over! Quick, look at the final position — count how many pieces helped. Teamwork! The pieces invented it!",
+      "Checkmate! It's done! Win or lose, you finished a whole chess game, and Maja finished zero today, so you're beating a very confident six-year-old."
+    ],
+    "stalemate": [
+      "STALEMATE?! Nooooo! The king had no moves but he wasn't IN check! That's the rule that makes grown-ups put their face in their hands!",
+      "A stalemate! Half a point each! Okay lesson — it's the FIRST thing coach drilled us on: when they're almost out of pieces, count their moves before you take stuff!",
+      "Stalemate. Oh man. I drew a totally won game like this when I was nine and I think about it at LEAST once a week. Welcome to the club. There are no meetings, just the memories.",
+      "Stalemate!! The sneakiest rule in chess just activated. You'll never forget it now though. That's how the rule teaches. Rudely."
+    ],
+    "castle_short": [
+      "Castled short! King's safe! That's like buckling your seatbelt before the car moves. Required! By me!",
+      "Short castle — nice! King tucked in, rook activated. Two chores done with one move. I WISH real chores worked like that.",
+      "You castled! Good!! Uncastled kings make me nervous. Like watching someone carry too many things down the stairs.",
+      "Kingside castle! Safe and snug. Now don't push those pawns in front of him without a really good reason. 'It looked fun' is not a reason. I've tried it."
+    ],
+    "castle_long": [
+      "Castled LONG! Ooh, the spicy one! That usually means pawn storms are coming, which is my favorite weather!",
+      "Queenside castle! Bold!! Opposite-side castling races are the most fun chess there IS. It's like tag but everyone's it.",
+      "Long castle! Coach says it takes 'an extra move of homework' to make the king safe over there. Do the homework move! It's just one!",
+      "You castled long! Big plans energy! I respect it! Now run, don't walk — these positions are a race and the slow one gets checkmated!"
+    ],
+    "promotion": [
+      "PROMOTION!!! The pawn made it all the way and became a QUEEN!! This is the best rule in chess and maybe in anything!!",
+      "A new queen!! That pawn walked the WHOLE board! Eight squares of bravery! I'm a little emotional about pawns, coach says it's 'endearing.'",
+      "The pawn promotes!! From the back row to ROYALTY. It's like the kid from the bench scoring the winning goal. I've BEEN that kid. In soccer. And in chess. And once in spelling.",
+      "PROMOTION! Patience pays out! That's the whole lesson of pawns: little steps, no shortcuts, big crown."
+    ],
+    "en_passant": [
+      "EN PASSANT!! The rule nobody believes!! When I do it at the library, someone ALWAYS says 'that's illegal' and I get to do my favorite speech!",
+      "En passant! French for 'in passing'! I learned it to win an argument and I've used it weekly ever since!",
+      "An en passant capture!! Okay, that's officially rare. You should feel a little fancy. I always do. The fancy lasts all day."
+    ],
+    "leaving_theory": [
+      "Aaand we're out of book! No more memorized moves! Now it's REAL chess — this is where I find out what you've actually got!",
+      "Theory's over! From here, it's just thinking. Good news: thinking is free. Bad news: so is bad thinking. Pick the first kind!",
+      "We left the book! Both of you are on your own now. Equal footing! Except for talent and training but those are EARNABLE.",
+      "Out of theory! Okay, this is the part of the test where the answers aren't in the back of the book. My favorite part. I know that's weird. Coach says it's why I'm 2200."
+    ],
+    "enter_middlegame": [
+      "Middlegame time! Openings are just the bus ride — THIS is the field trip!",
+      "We're in the middlegame! Time for a plan. A real one. 'Take their pieces' is a wish, not a plan. Coach makes us say the difference out loud.",
+      "Middlegame! Everyone's developed, everyone's nervous, everything's possible. Best phase. Don't tell endgames I said that.",
+      "The middlegame's here! Quick: what's your worst piece? Fix it. That trick is worth like 200 rating points and I'm giving it away FREE."
+    ],
+    "enter_endgame": [
+      "Endgame!! Okay, king activation time! He's done hiding! He works now! Everyone forgets this and it makes me CRAZY!",
+      "We're in the endgame. Heads up: this is where I win most of my games, because kids hate endgames and I decided not to. Deciding is free!",
+      "Endgame time! Every pawn is a whole story now. Count everything twice. Slow is smart here. SLOW IS SMART. I have to say it twice for myself too.",
+      "The endgame! Coach says endgames are 'where truth lives.' I used that in an essay and got an A. Anyway: activate your king!"
+    ],
+    "queens_off": [
+      "Queens are off! The loudest pieces left the room. Now it's quiet chess. I'm bad at quiet everything EXCEPT this.",
+      "Queen trade! No more giant mating attacks — it's technique time. Technique sounds boring but it's just 'winning slowly on purpose.'",
+      "Both queens gone! Game got calmer. Calmer, not easier. That's also what the substitute teacher discovered.",
+      "Queens off the board! The king can come out now. He's safe. Mostly. Check first. ALWAYS check first."
+    ],
+    "turning_point": [
+      "THAT was the turning point! The whole game just changed direction! Star it, circle it, glitter-pen it!",
+      "Big moment — the game just flipped! When we go over my games, coach always finds ONE move where everything changed. You just played yours. Or they did. Someone did!",
+      "The game turned right there! New game now. Old plans are expired like last week's milk. Sniff them and throw them out!",
+      "Turning point!! These are the moves you remember at bedtime. Make the NEXT memory a good one!"
+    ],
+    "streak_good": [
+      "{n} good moves in a row!! You're on a streak!! Keep doing exactly whatever you're doing, including how you're sitting!",
+      "{n} in a row! That's a real streak! My record is twenty-three. Not bragging. Okay slightly bragging. YOURS IS STILL GOOD.",
+      "{n} strong moves straight! You're in the zone! The zone is real, protect the zone, don't check your phone, the phone eats zones!",
+      "That's {n} good ones in a row! See?? Consistency!! That's the boring superpower! Way better than the flashy ones!",
+      "{n} in a row!! If you were at club right now you'd be getting the good kind of quiet, where everyone's watching your board on purpose."
+    ],
+    "streak_bad": [
+      "{n} rough moves in a row. Okay, timeout! Real timeout! Stretch, water, blink at something far away. Coach's tilt protocol. It's undefeated.",
+      "{n} shaky ones in a row... you're tilting! It's okay, tilt happens to everyone except possibly my sister, who has no nerves. Breathe and reset!",
+      "That's {n} in a row going sideways. Stop playing fast! That's the tell! Slow hands, slow breath, ONE solid move. Then we rebuild.",
+      "{n} slips back to back. Hey. The last moves are GONE. The position in front of you is the only one that's real. Coach calls it 'goldfishing.' Be the goldfish!",
+      "{n} bad ones in a row! New rule for the next three moves: safest decent option only. We're not winning the game this move, we're STOPPING THE SLIDE. Slides stop. They always stop."
+    ],
+    "hanging_piece": [
+      "Your {piece} is HANGING!! Nobody's guarding it!! This is me yelling politely!! SAVE IT!!",
+      "The {piece} is undefended!! That's the first thing we scan for at club! Every move! It takes literally three seconds! THE BEST three seconds!",
+      "Heyheyhey — your {piece} is just standing there with no defenders! Loose pieces drop off! That's not my rule, that's an EVERYBODY rule!",
+      "The {piece} is unprotected! Maja would take it without even looking up from her juice. Don't lose pieces to juice-level attention. Guard it!",
+      "Your {piece} is hanging! Quick quick quick — defend it or move it! This is the chess version of leaving your backpack on the bus!"
+    ],
+    "comeback": [
+      "THE COMEBACK!! You came all the way BACK!! These are my favorite games in the entire world and I've seen like a thousand games!!",
+      "You did it!! From totally losing to right back in it! That's the 'never resign' speech, except you LIVED it, which is way better than the speech!",
+      "Comeback complete! You know what you did? You kept making problems for them. Problem-making is a whole skill. You're a natural problem... maker. That came out wrong. It's a compliment!",
+      "All the way back from the brink!! The kids at club are going to hear about this. Names changed. Drama kept."
+    ],
+    "endgame_opposite_bishops": [
+      "Opposite-colored bishops! They can NEVER touch each other, ever, it's like they're in different dimensions! Usually a draw — UNLESS someone's attacking, then the extra bishop dimension is a superpower!",
+      "Opposite bishops! Weirdest endgame! Being a pawn up matters way less because the defender just camps on the safe color. Coach made us play these for a WEEK. I get it now. I didn't want to. I get it.",
+      "Ooh, opposite-colored bishops. Tricky! Each bishop owns half the squares forever. Build your stuff on YOUR color! It's like calling dibs, but mathematical."
+    ],
+    "endgame_rook": [
+      "Rook endgame!! Okay, the ONE rule, the rule of rules: rooks go BEHIND passed pawns. Yours and theirs. Coach tattooed it on our brains. Not literally. Almost literally.",
+      "A rook ending! Grown-ups say these are all draws. Grown-ups also lose them to me every Saturday, so: activity! King up! Rook busy!",
+      "Rook endgame time! These are like the long division of chess. Nobody's excited, everybody needs it, and being good at it is secretly a superpower.",
+      "Down to rooks! Passive rook = sad rook = lost rook ending. Keep it ACTIVE. Even if it costs a pawn! Especially then, actually!"
+    ]
+  },
+  "summary": {
+    "clean_win": [
+      "You WON and it was CLEAN!! Start to finish, no scary parts!! That's a fridge-worthy game! Print it! Do adults print things??",
+      "A wire-to-wire win! No wobbles! Honestly? That was solid the WHOLE way and I was watching for wobbles, it's like my main skill.",
+      "Clean win!! You played it like a 2200! Okay, like an 1800. Like a really REALLY good 1800!! That's a huge compliment, the 1800s at club are terrifying.",
+      "You won the whole game without one real scare! Now do the weird champion thing: review it anyway. Wins hide secrets. Like cereal boxes."
+    ],
+    "slipped_win": [
+      "Ohh no, you were WINNING... and it slipped. Okay. I know exactly how this feels and it's the worst feeling in chess. Tonight it stings. Tomorrow it's the most valuable game you played all month. That's the deal. The deal is annoying but real.",
+      "You had it and it got away. I'm not going to pretend that's fine — coach says fake comfort is empty calories. BUT: find the exact move where you relaxed. That move is the whole lesson, and it's a lesson most adults pay for twice. You only have to pay once!",
+      "A won game, lost. Okay listen, my mom's line, and it's undefeated: 'you'll remember the lesson longer than you would've remembered the win.' Still annoying. Still true.",
+      "It slipped!! Ugh, I'm sad WITH you. But here's the secret: building a winning position is the rare skill and you HAVE it. Closing is just a checklist. We can learn a checklist. Checklists are EASY. You've done homework harder than this."
+    ],
+    "hard_fought_draw": [
+      "A draw, but like a WAR draw! Those are real games! Half a point and full bragging rights, that's the math.",
+      "Hard-fought draw! Nobody cracked! Honestly some of my proudest games are draws where I defended like a goblin. Compliment. Goblin defense is elite.",
+      "A fighting draw! You held when it was scary and pushed when it was time. That's a complete chess player day. Juice box earned.",
+      "Draw! But a GOOD one. The boring draws are the agree-after-ten-moves ones, and coach says those are 'a crime against the game.' This was the opposite of a crime!"
+    ],
+    "loss": [
+      "A loss. Okay. First: losses are how ratings learn where to put you NEXT, they're not a grade on YOU. Second: we find the first real mistake tonight. It's earlier than you think. It's ALWAYS earlier than you think.",
+      "You lost this one. It's okay!! I lose too! Like, four times a year, but the FEELING is the same. The kids who get better are the ones who look at the game after. Be a looker-after!",
+      "A loss today. My coach says every loss has exactly one expensive lesson in it and the game already charged you, so you HAVE to take the lesson or you paid for nothing. He's so right it's annoying.",
+      "Lost one! Hey, chin up. My wall has four trophies and my notebook has like two hundred losses. Nobody frames the notebook but the notebook BUILT the wall."
+    ]
+  },
+  "practice": {
+    "loading_first": [
+      "Practice time!! Loading your first mistake! This is like redoing the test questions you got wrong, except fun and nobody assigned it!",
+      "Getting your first puzzle ready! We're fixing your game's boo-boos. Sorry, Maja's word. It's a good word though.",
+      "First mistake loading! Okay, fun fact: this is literally how I got to 2200. Mistakes, redone, until they stopped happening. There's no other secret. Adults keep looking for another secret.",
+      "Setting up rep one! Going back into your own game on purpose is brave, by the way. My dad won't do it. We've asked."
+    ],
+    "prompt_find_better": [
+      "Okay, right here you played {move} — it got marked {label}. The better move is in there! You can totally find it, it's like a two-and-a-half star puzzle!",
+      "Here's the spot! {move}, graded {label}. Do-over time! Take longer than you did in the game. That's the whole trick. That's literally the whole trick.",
+      "You played {move} here ({label}). Find the better one! Hint-that's-not-a-hint: check the forcing moves first. Always always always.",
+      "This is where {move} happened — {label}. The position's giving you a retake! I never get retakes on math tests. Chess is fairer than school, write that down.",
+      "{move}, marked {label}. Okay, fresh eyes! Pretend you've never seen this position and it personally owes you a win."
+    ],
+    "correct_continue": [
+      "YES!! That's it!! See, you CAN find these — you just have to actually look! That's the entire 2200 secret and I just gave it away again!",
+      "Correct!! First the game-you missed it, now the puzzle-you found it. Puzzle-you should play more of your games honestly. Next!",
+      "You got it!! That pattern's yours now, forever. It's like a Pokémon but useful. NEXT puzzle!",
+      "Right answer!! Nice and calm too. Okay, keep the streak going, next position!"
+    ],
+    "correct_final": [
+      "THAT WAS THE LAST ONE!! You fixed your WHOLE game!! Every single mistake, corrected! That's a full homework sweep, and I would know, I do this every week!!",
+      "All done — every mistake from the game, solved!! Do you know how rare it is for someone to actually finish this? Coach says most people quit at two. You're a FINISHER.",
+      "Final one, done!! The whole game is patched! Tonight your brain literally rewires a little while you sleep. That's real science. I did a project on it. Got an A.",
+      "Last puzzle solved!! Complete set!! In club terms that's a gold star day, and I don't say gold star casually, there's a whole system."
+    ],
+    "close_try_again": [
+      "Ooh, CLOSE! Right idea, slightly wrong order! Order matters so much in chess, it's basically the whole game. Again!",
+      "Almost!! You're like one square off or one move early — that kind of close. Look for what has to happen FIRST.",
+      "So close! There's a defender you forgot to count. There's ALWAYS a defender someone forgot to count. It's the number one cause of sadness at club.",
+      "Not quite, but you're warm! Don't restart your thinking — just fix the one detail. The idea was genuinely good!",
+      "Attempt {attempts}! Getting warmer every time! That's how puzzles work — they only beat you if you stop. Don't stop! I never stop! Coach says it's a lot! It WORKS though!"
+    ],
+    "after_hint": [
+      "Hint time! No shame, hints are just training wheels and training wheels got EVERYONE riding. Now pedal the last part yourself!",
+      "There's your hint! I use hints too. Used. I used hints. When I was younger. Moving on — finish it!",
+      "Hint delivered! Notice what it pointed at — that's the kind of thing to check FIRST next time. Now close it out!",
+      "Okay, you got the nudge! The last step is yours though, that's the step that makes it stick. Brain glue. Science-ish."
+    ],
+    "streak_praise": [
+      "Look at this streak!! One after another!! You're doing my favorite thing where the puzzles start being SCARED of you!",
+      "Another one, instantly!! Okay, you're in the zone for real. This is what coach calls 'flow' and what I call 'the good brain weather.'",
+      "Streak!! You're seeing the patterns faster now — that's not luck, that's the puzzles WORKING. Keep going, I'm not even going to blink.",
+      "Solving them back to back!! Honestly? This pace would hang at club. Tuesday club. Thursday club is a different animal. But TUESDAY? You'd be a legend."
+    ]
+  }
+}
