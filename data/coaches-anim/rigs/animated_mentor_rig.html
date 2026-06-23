@@ -1,0 +1,160 @@
+<h2 class="sr-only">Animated portrait of a warm male teacher in his early 50s with salt-and-pepper hair, a neat trimmed beard, round glasses and an earth-toned cardigan, a yellow pencil behind his ear. He can toss a small wooden chess pawn in the air and catch it, and scratch his head in doubt. Controllable expressions, glances and gestures.</h2>
+<style>
+:root{ --font-sans: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.coach-wrap{padding:.5rem 0}
+.coach-svg{width:100%;max-width:300px;display:block;margin:0 auto;height:auto}
+.coach-ctrl{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:360px;margin:14px auto 0}
+.coach-ctrl button{font-family:var(--font-sans,sans-serif);font-size:13px;font-weight:400;padding:6px 10px;border-radius:var(--border-radius-md,8px);border:1px solid var(--color-border-secondary,#3a352f);background:var(--color-background-secondary,#2a2622);color:var(--color-text-primary,#ece6da);cursor:pointer}
+.coach-ctrl button:hover{border-color:var(--color-border-primary,#5a5248)}
+.coach-ctrl button.on{background:var(--color-text-primary,#ece6da);color:var(--color-background-primary,#1a1815);border-color:var(--color-text-primary,#ece6da)}
+.coach-ctrl .look{min-width:30px;padding:5px 0}
+.coach-sep{width:100%;height:0}
+#figure{animation:m_br 6.2s ease-in-out infinite}
+#head{transform-box:view-box;transform-origin:340px 370px;animation:m_tilt 9.4s ease-in-out infinite}
+@keyframes m_br{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+@keyframes m_tilt{0%,100%{transform:rotate(0deg)}30%{transform:rotate(-1deg)}66%{transform:rotate(.8deg)}}
+@media (prefers-reduced-motion:reduce){#figure,#head{animation:none}}
+</style>
+<div class="coach-wrap">
+<svg class="coach-svg" viewBox="0 0 680 760" role="img" xmlns="http://www.w3.org/2000/svg"><title>Mentor portrait</title><desc>A warm teacher in his early 50s with salt-and-pepper hair, a trimmed grey-flecked beard, round glasses, a yellow pencil behind his ear and an earth-toned cardigan over a collared shirt. He holds a small wooden chess pawn he can toss and catch, and can scratch his head.</desc>
+<g id="figure">
+
+ <!-- ======== TORSO (shrug) ======== -->
+ <g id="torso">
+  <!-- neck -->
+  <path d="M314 348 L310 418 Q340 434 370 418 L366 348 Q340 370 314 348 Z" fill="#E2AE7E"/>
+  <path d="M314 354 Q340 370 366 354 Q358 386 340 388 Q322 386 314 354 Z" fill="#C28954" opacity="0.5"/>
+  <!-- cardigan body -->
+  <path d="M142 760 L146 552 Q154 478 226 452 Q270 436 306 448 L306 760 Z" fill="#8A6E52"/>
+  <path d="M538 760 L534 552 Q526 478 454 452 Q410 436 374 448 L374 760 Z" fill="#8A6E52"/>
+  <path d="M142 760 L146 552 Q152 502 188 476 Q172 552 178 760 Z" fill="#755C44" opacity="0.8"/>
+  <path d="M538 760 L534 552 Q528 502 492 476 Q508 552 502 760 Z" fill="#755C44" opacity="0.8"/>
+  <!-- shirt -->
+  <path d="M306 458 Q340 444 374 458 L382 760 L298 760 Z" fill="#F2EDE0"/>
+  <path d="M340 470 L340 760" stroke="#DDD5C2" stroke-width="2.5" fill="none"/>
+  <circle cx="340" cy="540" r="4" fill="#E8E1CE" stroke="#C9C0A8" stroke-width="1.5"/>
+  <!-- collar points -->
+  <path d="M306 450 L342 464 L318 502 Q300 488 294 466 Z" fill="#F8F4E8"/>
+  <path d="M374 450 L338 464 L362 502 Q380 488 386 466 Z" fill="#F8F4E8"/>
+  <path d="M306 450 L342 464 L318 502 M374 450 L338 464 L362 502" stroke="#DDD5C2" stroke-width="2" fill="none"/>
+  <!-- ribbed cardigan V edges -->
+  <path d="M306 452 L298 760" stroke="#755C44" stroke-width="11" fill="none"/>
+  <path d="M374 452 L382 760" stroke="#755C44" stroke-width="11" fill="none"/>
+  <path d="M301 460 L294 756 M311 460 L304 756 M369 460 L376 756 M379 460 L386 756" stroke="#65503B" stroke-width="2" fill="none" opacity="0.6"/>
+  <!-- knit texture -->
+  <path d="M196 760 Q192 620 212 490 M240 760 Q238 600 256 470 M484 760 Q488 620 468 490 M440 760 Q442 600 424 470" stroke="#755C44" stroke-width="4" fill="none" opacity="0.45"/>
+ </g>
+
+ <!-- ======== SCRATCH ARM (parked below frame; rises to the head) ======== -->
+ <g id="scratchgroup" transform="translate(0 620)">
+  <path d="M150 760 Q142 600 196 420 Q220 320 258 240" stroke="#8A6E52" stroke-width="54" fill="none" stroke-linecap="round"/>
+  <path d="M252 256 Q268 216 280 200" stroke="#E2AE7E" stroke-width="34" fill="none" stroke-linecap="round"/>
+  <g id="scratchhand">
+   <path d="M266 196 Q258 178 274 168 Q288 158 302 166 Q314 156 310 174 Q322 182 310 196 Q290 210 266 196 Z" fill="#E2AE7E"/>
+   <path d="M280 170 L290 180 M294 164 L300 176 M306 172 L308 182" stroke="#C28954" stroke-width="2.4" fill="none" opacity="0.6"/>
+  </g>
+ </g>
+
+ <!-- ======== PAWN HAND (open palm, pawn rests on it) ======== -->
+ <g id="pawnprops">
+  <path d="M540 760 Q536 700 500 672" stroke="#8A6E52" stroke-width="54" fill="none" stroke-linecap="round"/>
+  <path d="M498 678 Q478 692 462 694" stroke="#E2AE7E" stroke-width="30" fill="none" stroke-linecap="round"/>
+  <!-- wooden pawn (tosses up) -->
+  <g id="pawn">
+   <circle cx="448" cy="640" r="11" fill="#B98A4E"/>
+   <circle cx="445" cy="637" r="4" fill="#D2A968" opacity="0.8"/>
+   <path d="M436 652 L460 652 L457 658 L439 658 Z" fill="#A6783F"/>
+   <path d="M440 658 Q436 672 432 678 L464 678 Q460 672 456 658 Z" fill="#B98A4E"/>
+   <path d="M428 678 Q448 672 468 678 L468 686 Q448 692 428 686 Z" fill="#A6783F"/>
+   <path d="M443 660 Q441 670 438 676" stroke="#D2A968" stroke-width="2" fill="none" opacity="0.7"/>
+  </g>
+  <!-- open palm under the pawn -->
+  <path d="M420 692 Q416 682 428 678 Q448 672 468 678 Q480 682 476 692 Q474 704 458 708 Q440 712 428 706 Q420 700 420 692 Z" fill="#E2AE7E"/>
+  <path d="M434 684 L433 704 M448 682 L448 706 M462 684 L463 704" stroke="#C28954" stroke-width="2.2" fill="none" opacity="0.55"/>
+ </g>
+
+ <!-- ======== HEAD ======== -->
+ <g id="headrig"><g id="head">
+  <!-- ears -->
+  <ellipse cx="260" cy="278" rx="13" ry="21" fill="#E2AE7E"/>
+  <ellipse cx="420" cy="278" rx="13" ry="21" fill="#E2AE7E"/>
+  <path d="M260 268 Q266 278 260 290 M420 268 Q414 278 420 290" stroke="#C28954" stroke-width="2.5" fill="none" opacity="0.6"/>
+  <!-- yellow pencil tucked behind the (viewer-left) ear -->
+  <g id="pencil">
+   <path d="M236 232 L264 262" stroke="#E8B23A" stroke-width="9" stroke-linecap="butt"/>
+   <path d="M233 229 L240 236" stroke="#E89A94" stroke-width="10" stroke-linecap="round"/>
+   <path d="M239 235 L244 240" stroke="#B9B9B9" stroke-width="9.5"/>
+   <path d="M240 240 L262 262" stroke="#C99B2E" stroke-width="3" opacity="0.7"/>
+  </g>
+  <!-- salt-and-pepper hair -->
+  <path d="M256 290 Q238 240 248 184 Q258 134 300 114 Q340 100 380 114 Q422 134 432 184 Q442 240 424 290 Q418 300 408 294 Q418 240 408 196 Q396 188 398 170 Q380 184 372 158 Q358 176 338 156 Q322 176 304 162 Q300 184 282 176 Q286 196 272 198 Q262 240 272 294 Q262 300 256 290 Z" fill="#4A4A4E"/>
+  <path d="M280 150 Q300 130 330 126 M352 128 Q386 134 404 158 M262 220 Q258 252 264 282 M418 220 Q422 252 416 282" stroke="#8E8E94" stroke-width="4.5" fill="none" opacity="0.85" stroke-linecap="round"/>
+  <path d="M296 134 Q316 120 342 120" stroke="#8E8E94" stroke-width="3.5" fill="none" opacity="0.6" stroke-linecap="round"/>
+  <!-- face -->
+  <path d="M270 216 Q260 284 282 330 Q298 364 324 374 Q340 378 356 374 Q382 364 398 330 Q420 284 410 216 Q404 182 384 174 L296 174 Q276 182 270 216 Z" fill="#E2AE7E"/>
+  <path d="M282 330 Q268 282 272 222 Q280 200 296 194 Q286 228 288 284 Q292 320 310 348 Q294 344 282 330 Z" fill="#C28954" opacity="0.35"/>
+  <!-- gentle age lines -->
+  <path d="M306 200 Q340 193 374 200" stroke="#C28954" stroke-width="2" fill="none" opacity="0.45"/>
+  <path d="M288 262 L280 258 M288 270 L280 273 M392 262 L400 258 M392 270 L400 273" stroke="#C28954" stroke-width="1.8" fill="none" opacity="0.5" stroke-linecap="round"/>
+  <!-- eyebrows (dark, kind) -->
+  <g id="browL"><path d="M284 248 Q306 240 328 246" stroke="#3A3A3E" stroke-width="9" fill="none" stroke-linecap="round"/></g>
+  <g id="browR"><path d="M352 246 Q374 240 396 248" stroke="#3A3A3E" stroke-width="9" fill="none" stroke-linecap="round"/></g>
+  <!-- eyes -->
+  <ellipse cx="306" cy="270" rx="14" ry="9.5" fill="#FBF7EE"/>
+  <ellipse cx="374" cy="270" rx="14" ry="9.5" fill="#FBF7EE"/>
+  <g id="eyeL"><circle cx="306" cy="270" r="6.5" fill="#5A3A22"/><circle cx="306" cy="270" r="3" fill="#1C0E04"/><circle cx="308.5" cy="267.5" r="1.5" fill="#fff"/></g>
+  <g id="eyeR"><circle cx="374" cy="270" r="6.5" fill="#5A3A22"/><circle cx="374" cy="270" r="3" fill="#1C0E04"/><circle cx="376.5" cy="267.5" r="1.5" fill="#fff"/></g>
+  <path d="M293 282 Q306 287 319 282 M361 282 Q374 287 387 282" stroke="#C28954" stroke-width="1.8" fill="none" opacity="0.5"/>
+  <ellipse id="lidL" cx="306" cy="270" rx="14.5" ry="10" fill="#E2AE7E"/>
+  <ellipse id="lidR" cx="374" cy="270" rx="14.5" ry="10" fill="#E2AE7E"/>
+  <!-- simple rounded glasses -->
+  <circle cx="306" cy="270" r="24" fill="none" stroke="#3A3A3A" stroke-width="3.5"/>
+  <circle cx="374" cy="270" r="24" fill="none" stroke="#3A3A3A" stroke-width="3.5"/>
+  <path d="M330 266 Q340 260 350 266" stroke="#3A3A3A" stroke-width="3.5" fill="none"/>
+  <path d="M282 266 L268 270 M398 266 L412 270" stroke="#3A3A3A" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- nose -->
+  <path d="M344 256 Q352 288 357 300 Q360 309 351 312" stroke="#C28954" stroke-width="3" fill="none" opacity="0.55" stroke-linecap="round"/>
+  <ellipse cx="330" cy="305" rx="4" ry="2.5" fill="#A56F3A"/>
+  <ellipse cx="350" cy="305" rx="4" ry="2.5" fill="#A56F3A"/>
+  <!-- neat trimmed beard (salt & pepper, solid mass; mouth is drawn on top) -->
+  <path d="M280 284 Q276 300 280 318 Q284 352 304 372 Q320 388 340 390 Q360 388 376 372 Q396 352 400 318 Q404 300 400 284 Q390 306 368 311 Q354 313 340 313 Q326 313 312 311 Q290 306 280 284 Z" fill="#5A5A5E"/>
+  <path d="M306 312 Q340 300 374 312 Q366 322 340 322 Q314 322 306 312 Z" fill="#4A4A4E"/>
+  <path d="M331 358 Q340 354 349 358 Q346 367 340 368 Q334 367 331 358 Z" fill="#4A4A4E" opacity="0.9"/>
+  <path d="M296 316 Q300 344 312 362 M384 316 Q380 344 368 362 M324 376 L328 384 M356 376 L352 384" stroke="#8E8E94" stroke-width="2" fill="none" opacity="0.7"/>
+  <!-- mouth (engine-driven) -->
+  <path id="mouth" d="M318 330 Q340 328 362 330 Q340 336 318 330 Z" fill="#9C5A4A"/>
+ </g></g>
+
+</g>
+</svg>
+<div class="coach-ctrl">
+<button data-emo="neutral" class="on">Neutral</button>
+<button data-emo="happy">Happy</button>
+<button data-emo="sad">Sad</button>
+<button data-emo="angry">Angry</button>
+<button data-emo="surprised">Surprised</button>
+<button data-emo="skeptical">Skeptical</button>
+<span class="coach-sep"></span>
+<button id="m-talk">Talk</button>
+<button id="m-roll">Eye-roll</button>
+<button id="m-nod">Nod</button>
+<button id="m-shake">Shake</button>
+<button id="m-shrug">Shrug</button>
+<button id="m-cycle">Auto-cycle: off</button>
+<span class="coach-sep"></span>
+<button id="m-toss">Toss pawn</button>
+<button id="m-scratch">Scratch head</button>
+<span class="coach-sep"></span>
+<button class="look" data-look="upleft">&#8598;</button>
+<button class="look" data-look="up">&#8593;</button>
+<button class="look" data-look="upright">&#8599;</button>
+<button class="look" data-look="left">&#8592;</button>
+<button class="look" data-look="center">&#8226;</button>
+<button class="look" data-look="right">&#8594;</button>
+<button class="look" data-look="downleft">&#8601;</button>
+<button class="look" data-look="down">&#8595;</button>
+<button class="look" data-look="downright">&#8600;</button>
+</div>
+</div>
+<script src="animated_mentor_rig.js"></script>

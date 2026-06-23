@@ -1,0 +1,161 @@
+<h2 class="sr-only">Animated portrait of a wiry, intense conspiracy theorist with messy hair, stubble and a crooked pointed tin-foil hat, wearing a rumpled dark hoodie. His eyes dart nervously; he can raise a tangle of red string into frame, stare at it in panic, and lower it again. Controllable expressions, glances and gestures.</h2>
+<style>
+:root{ --font-sans: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.coach-wrap{padding:.5rem 0}
+.coach-svg{width:100%;max-width:300px;display:block;margin:0 auto;height:auto}
+.coach-ctrl{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:360px;margin:14px auto 0}
+.coach-ctrl button{font-family:var(--font-sans,sans-serif);font-size:13px;font-weight:400;padding:6px 10px;border-radius:var(--border-radius-md,8px);border:1px solid var(--color-border-secondary,#3a352f);background:var(--color-background-secondary,#2a2622);color:var(--color-text-primary,#ece6da);cursor:pointer}
+.coach-ctrl button:hover{border-color:var(--color-border-primary,#5a5248)}
+.coach-ctrl button.on{background:var(--color-text-primary,#ece6da);color:var(--color-background-primary,#1a1815);border-color:var(--color-text-primary,#ece6da)}
+.coach-ctrl .look{min-width:30px;padding:5px 0}
+.coach-sep{width:100%;height:0}
+#figure{animation:ct_br 4.4s ease-in-out infinite}
+#head{transform-box:view-box;transform-origin:340px 360px;animation:ct_tilt 7s ease-in-out infinite}
+@keyframes ct_br{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+/* slow sway with a quick nervous double-jitter near the end of each cycle */
+@keyframes ct_tilt{0%,100%{transform:rotate(0deg)}30%{transform:rotate(-1.1deg)}58%{transform:rotate(.9deg)}80%{transform:rotate(0deg)}85%{transform:rotate(-1.7deg)}89%{transform:rotate(1.5deg)}93%{transform:rotate(-.6deg)}96%{transform:rotate(0deg)}}
+@media (prefers-reduced-motion:reduce){#figure,#head{animation:none}}
+</style>
+<div class="coach-wrap">
+<svg class="coach-svg" viewBox="0 0 680 760" role="img" xmlns="http://www.w3.org/2000/svg"><title>Conspiracy theorist portrait</title><desc>A wiry intense man in his 40s with wild messy hair under a crooked crinkled tin-foil hat, wide panicked eyes, stubble and a rumpled dark hoodie. His hands can rise into frame pinching a tangle of red conspiracy string.</desc>
+<g id="figure">
+
+ <!-- ======== TORSO (shrug) ======== -->
+ <g id="torso">
+  <!-- neck -->
+  <path d="M312 336 L308 412 Q340 428 372 412 L368 336 Q340 360 312 336 Z" fill="#DDA976"/>
+  <path d="M312 342 Q340 360 368 342 Q360 376 340 378 Q320 376 312 342 Z" fill="#B9824F" opacity="0.5"/>
+  <!-- bunched hood behind the neck -->
+  <path d="M206 486 Q194 424 252 402 Q294 388 340 388 Q386 388 428 402 Q486 424 474 486 Q430 450 340 450 Q250 450 206 486 Z" fill="#34373C"/>
+  <path d="M222 462 Q260 430 318 424 M458 462 Q420 430 362 424 M240 478 Q280 448 340 446" stroke="#24262A" stroke-width="3" fill="none" opacity="0.8"/>
+  <!-- hoodie body -->
+  <path d="M96 760 L104 560 Q116 484 214 452 Q262 436 306 448 L300 760 Z" fill="#2A2C30"/>
+  <path d="M584 760 L576 560 Q564 484 466 452 Q418 436 374 448 L380 760 Z" fill="#2A2C30"/>
+  <path d="M96 760 L104 560 Q112 506 150 478 Q132 560 138 760 Z" fill="#202226" opacity="0.8"/>
+  <path d="M584 760 L576 560 Q568 506 530 478 Q548 560 542 760 Z" fill="#202226" opacity="0.8"/>
+  <!-- dark tee -->
+  <path d="M300 458 Q340 444 380 458 L392 760 L288 760 Z" fill="#44474C"/>
+  <!-- hood collar folding over the tee -->
+  <path d="M294 444 Q340 424 386 444 Q404 460 396 486 Q370 460 340 460 Q310 460 284 486 Q276 460 294 444 Z" fill="#393C41"/>
+  <path d="M292 452 Q316 470 286 482 M388 452 Q364 470 394 482" stroke="#24262A" stroke-width="2.5" fill="none" opacity="0.7"/>
+  <!-- drawstrings -->
+  <path d="M322 468 Q318 520 320 562 M358 468 Q362 520 360 562" stroke="#C9CBD0" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <circle cx="320" cy="566" r="4" fill="#A9ACB2"/>
+  <circle cx="360" cy="566" r="4" fill="#A9ACB2"/>
+  <!-- rumpled wrinkles -->
+  <path d="M180 600 Q220 588 252 596 M430 600 Q466 588 498 596 M170 680 Q210 668 246 676" stroke="#202226" stroke-width="3" fill="none" opacity="0.7"/>
+ </g>
+
+ <!-- ======== RED THREAD (rises into frame on findThread) ======== -->
+ <g id="threadgroup" transform="translate(0 300)">
+  <!-- sleeves coming up from the bottom -->
+  <path d="M158 760 Q170 672 238 636" stroke="#2A2C30" stroke-width="56" fill="none" stroke-linecap="round"/>
+  <path d="M522 760 Q510 672 442 636" stroke="#2A2C30" stroke-width="56" fill="none" stroke-linecap="round"/>
+  <path d="M226 654 L240 622 M454 654 L440 622" stroke="#202226" stroke-width="3" fill="none" opacity="0.7"/>
+  <!-- red string web (drawn behind the hands) -->
+  <g stroke="#C8352B" stroke-width="3" fill="none">
+   <path d="M262 608 Q340 568 418 608"/>
+   <path d="M262 608 L340 562 L418 608"/>
+   <path d="M262 608 L340 652 L418 608"/>
+   <path d="M340 562 L300 688 M340 562 L380 688 M340 652 L300 688 M340 652 L380 688"/>
+   <path d="M262 608 Q280 660 300 688 M418 608 Q400 660 380 688"/>
+   <path d="M300 688 Q340 712 380 688"/>
+  </g>
+  <circle cx="340" cy="562" r="4.5" fill="#C8352B"/>
+  <circle cx="340" cy="652" r="4.5" fill="#C8352B"/>
+  <circle cx="300" cy="688" r="4.5" fill="#C8352B"/>
+  <circle cx="380" cy="688" r="4.5" fill="#C8352B"/>
+  <circle cx="262" cy="608" r="4" fill="#C8352B"/>
+  <circle cx="418" cy="608" r="4" fill="#C8352B"/>
+  <!-- pinching hands -->
+  <path d="M232 632 Q220 614 236 602 Q250 592 264 600 Q276 590 270 610 Q282 618 270 632 Q252 646 232 632 Z" fill="#DDA976"/>
+  <path d="M246 604 L260 612 M244 620 L258 624" stroke="#B9824F" stroke-width="2.4" fill="none" opacity="0.6"/>
+  <path d="M448 632 Q460 614 444 602 Q430 592 416 600 Q404 590 410 610 Q398 618 410 632 Q428 646 448 632 Z" fill="#DDA976"/>
+  <path d="M434 604 L420 612 M436 620 L422 624" stroke="#B9824F" stroke-width="2.4" fill="none" opacity="0.6"/>
+ </g>
+
+ <!-- ======== HEAD ======== -->
+ <g id="headrig"><g id="head">
+  <!-- ears -->
+  <ellipse cx="254" cy="276" rx="13" ry="21" fill="#DDA976"/>
+  <ellipse cx="426" cy="276" rx="13" ry="21" fill="#DDA976"/>
+  <!-- wild messy hair: spiky silhouette -->
+  <path d="M250 308 Q224 286 236 252 L206 250 L240 218 L210 196 L252 192 L236 152 L282 168 L280 122 L318 152 Q340 142 362 152 L400 122 L398 168 L444 152 L428 192 L470 196 L440 218 L474 250 L444 252 Q456 286 430 308 Q420 326 404 318 Q412 268 402 222 Q386 178 340 176 Q294 178 278 222 Q268 268 276 318 Q260 326 250 308 Z" fill="#4A3826"/>
+  <path d="M262 240 Q252 210 268 184 M418 240 Q428 210 412 184 M296 160 Q312 144 336 142" stroke="#372A1C" stroke-width="4" fill="none" opacity="0.8"/>
+  <!-- face: wiry, a bit gaunt -->
+  <path d="M272 214 Q260 282 282 332 Q298 368 324 376 Q340 380 356 376 Q382 368 398 332 Q420 282 408 214 Q402 180 380 172 L300 172 Q278 180 272 214 Z" fill="#DDA976"/>
+  <path d="M282 332 Q268 282 272 220 Q280 198 296 192 Q286 226 288 282 Q292 322 310 350 Q294 346 282 332 Z" fill="#B9824F" opacity="0.35"/>
+  <!-- gaunt cheek hollows -->
+  <path d="M290 312 Q296 326 308 334 M390 312 Q384 326 372 334" stroke="#B9824F" stroke-width="2.5" fill="none" opacity="0.45"/>
+  <!-- crooked crinkled tin-foil hat (sits on the hair) -->
+  <g id="foilhat" transform="translate(0 34)">
+   <path d="M278 134 L360 44 L424 142 Q396 126 340 124 Q302 126 278 134 Z" fill="#DCDEE2"/>
+   <path d="M360 44 L316 126 L278 134 Z" fill="#C6C9CF"/>
+   <path d="M360 44 L316 126 L370 126 Z" fill="#EEF0F3"/>
+   <path d="M360 44 L370 126 L424 142 Z" fill="#B4B8BF"/>
+   <path d="M330 96 L344 104 M352 76 L348 92 M372 92 L382 106 M338 112 L354 116" stroke="#9DA1A8" stroke-width="2" fill="none" stroke-linecap="round"/>
+   <path d="M278 134 Q330 120 424 142" stroke="#A9ACB2" stroke-width="3" fill="none" opacity="0.7"/>
+  </g>
+  <!-- thick dark eyebrows (raised + inner furrow = urgent) -->
+  <g id="browL"><path d="M280 248 Q304 238 330 246" stroke="#2E2218" stroke-width="11" fill="none" stroke-linecap="round"/></g>
+  <g id="browR"><path d="M350 246 Q376 238 400 248" stroke="#2E2218" stroke-width="11" fill="none" stroke-linecap="round"/></g>
+  <!-- wide panicked eyes: big whites, small iris -->
+  <ellipse cx="308" cy="270" rx="16" ry="11.5" fill="#FBF8F0"/>
+  <ellipse cx="372" cy="270" rx="16" ry="11.5" fill="#FBF8F0"/>
+  <g id="eyeL"><circle cx="308" cy="270" r="6" fill="#5A3A20"/><circle cx="308" cy="270" r="2.4" fill="#150A03"/><circle cx="310" cy="267.5" r="1.4" fill="#fff"/></g>
+  <g id="eyeR"><circle cx="372" cy="270" r="6" fill="#5A3A20"/><circle cx="372" cy="270" r="2.4" fill="#150A03"/><circle cx="374" cy="267.5" r="1.4" fill="#fff"/></g>
+  <!-- twitchy under-eye shadows -->
+  <path d="M294 286 Q308 292 322 286 M358 286 Q372 292 386 286" stroke="#A06A3C" stroke-width="2.2" fill="none" opacity="0.6"/>
+  <ellipse id="lidL" cx="308" cy="270" rx="16.5" ry="12" fill="#DDA976"/>
+  <ellipse id="lidR" cx="372" cy="270" rx="16.5" ry="12" fill="#DDA976"/>
+  <!-- thin nose -->
+  <path d="M338 256 Q335 288 330 302 M342 256 Q345 288 350 302" stroke="#B9824F" stroke-width="2.5" fill="none" opacity="0.5"/>
+  <path d="M328 308 Q340 314 352 308 Q348 312 340 312 Q332 312 328 308 Z" fill="#B9824F" opacity="0.5"/>
+  <ellipse cx="331" cy="306" rx="3.5" ry="2.2" fill="#9C6233"/>
+  <ellipse cx="349" cy="306" rx="3.5" ry="2.2" fill="#9C6233"/>
+  <!-- mouth (engine-driven; tight by default) -->
+  <path id="mouth" d="M316 332 Q340 331 364 332 Q340 334 316 332 Z" fill="#7A4434"/>
+  <!-- dense patchy stubble -->
+  <g stroke="#5A4632" stroke-width="2.4" fill="none" opacity="0.55" stroke-linecap="round" stroke-dasharray="2 5">
+   <path d="M288 314 Q296 346 320 364"/>
+   <path d="M392 314 Q384 346 360 364"/>
+   <path d="M306 352 Q340 372 374 352"/>
+   <path d="M314 344 Q340 358 366 344"/>
+   <path d="M318 318 Q330 322 336 320 M344 320 Q352 322 362 318"/>
+   <path d="M330 360 Q340 366 350 360"/>
+  </g>
+ </g></g>
+
+</g>
+</svg>
+<div class="coach-ctrl">
+<button data-emo="neutral" class="on">Neutral</button>
+<button data-emo="happy">Happy</button>
+<button data-emo="sad">Sad</button>
+<button data-emo="angry">Angry</button>
+<button data-emo="surprised">Surprised</button>
+<button data-emo="skeptical">Skeptical</button>
+<span class="coach-sep"></span>
+<button id="ct-talk">Talk</button>
+<button id="ct-roll">Eye-roll</button>
+<button id="ct-nod">Nod</button>
+<button id="ct-shake">Shake</button>
+<button id="ct-shrug">Shrug</button>
+<button id="ct-cycle">Auto-cycle: off</button>
+<span class="coach-sep"></span>
+<button id="ct-dart" class="on">Darting eyes</button>
+<button id="ct-thread">Find red thread</button>
+<span class="coach-sep"></span>
+<button class="look" data-look="upleft">&#8598;</button>
+<button class="look" data-look="up">&#8593;</button>
+<button class="look" data-look="upright">&#8599;</button>
+<button class="look" data-look="left">&#8592;</button>
+<button class="look" data-look="center">&#8226;</button>
+<button class="look" data-look="right">&#8594;</button>
+<button class="look" data-look="downleft">&#8601;</button>
+<button class="look" data-look="down">&#8595;</button>
+<button class="look" data-look="downright">&#8600;</button>
+</div>
+</div>
+<script src="animated_conspiracy_rig.js"></script>

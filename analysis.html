@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-density="compact">
+  <head>
+    <meta charset="utf-8" />
+    <title>Chess Review</title>
+    <link rel="icon" type="image/png" sizes="128x128" href="icons/icon128.png?v=3" />
+    <link rel="icon" type="image/png" sizes="48x48" href="icons/icon48.png?v=3" />
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Warm the default piece set (cburnett, ~10 KB total) so the board paints with its pieces
+         already decoded, in the same frame as the rest of the panels — no piece pop-in on first
+         open. Paths must match what analysis.js actually renders (pieces-img/cburnett/<code>.svg),
+         otherwise Chrome warns that the preloaded resource was never used. -->
+    <link rel="preload" as="image" href="pieces-img/cburnett/wK.svg" />
+    <link rel="preload" as="image" href="pieces-img/cburnett/wQ.svg" />
+    <link rel="preload" as="image" href="pieces-img/cburnett/wR.svg" />
+    <link rel="preload" as="image" href="pieces-img/cburnett/wB.svg" />
+    <link rel="preload" as="image" href="pieces-img/cburnett/wN.svg" />
+    <link rel="preload" as="image" href="pieces-img/cburnett/wP.svg" />
+    <link rel="preload" as="image" href="pieces-img/cburnett/bK.svg" />
+    <link rel="preload" as="image" href="pieces-img/cburnett/bQ.svg" />
+    <link rel="preload" as="image" href="pieces-img/cburnett/bR.svg" />
+    <link rel="preload" as="image" href="pieces-img/cburnett/bB.svg" />
+    <link rel="preload" as="image" href="pieces-img/cburnett/bN.svg" />
+    <link rel="preload" as="image" href="pieces-img/cburnett/bP.svg" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <div id="error" hidden></div>
+    <script type="module" src="analysis.js"></script>
+  </body>
+</html>

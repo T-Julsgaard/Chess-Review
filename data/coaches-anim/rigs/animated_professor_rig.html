@@ -1,0 +1,127 @@
+<h2 class="sr-only">Animated portrait of a bearded professor in a tweed jacket holding a leather book, with controllable facial expressions, glances, gestures and a raisable book.</h2>
+<style>
+:root{ --font-sans: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.coach-wrap{padding:.5rem 0}
+.coach-svg{width:100%;max-width:300px;display:block;margin:0 auto;height:auto}
+.coach-ctrl{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:360px;margin:14px auto 0}
+.coach-ctrl button{font-family:var(--font-sans,sans-serif);font-size:13px;font-weight:400;padding:6px 10px;border-radius:var(--border-radius-md,8px);border:1px solid var(--color-border-secondary,#3a352f);background:var(--color-background-secondary,#2a2622);color:var(--color-text-primary,#ece6da);cursor:pointer}
+.coach-ctrl button:hover{border-color:var(--color-border-primary,#5a5248)}
+.coach-ctrl button.on{background:var(--color-text-primary,#ece6da);color:var(--color-background-primary,#1a1815);border-color:var(--color-text-primary,#ece6da)}
+.coach-ctrl .look{min-width:30px;padding:5px 0}
+.coach-sep{width:100%;height:0}
+#figure{animation:p_br 6s ease-in-out infinite}
+#head{transform-box:view-box;transform-origin:340px 370px;animation:p_tilt 9s ease-in-out infinite}
+#stache{transform-box:view-box;transform-origin:340px 340px;animation:p_twitch 7.4s ease-in-out infinite}
+#bookarms{transform-box:view-box;transform-origin:340px 690px;transition:transform .8s cubic-bezier(.5,0,.3,1)}
+#bookarms.raised{transform:translateY(-46px)}
+@keyframes p_br{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+@keyframes p_tilt{0%,100%{transform:rotate(0deg)}30%{transform:rotate(-1deg)}66%{transform:rotate(.8deg)}}
+@keyframes p_twitch{0%,88%,100%{transform:translateX(0)}93%{transform:translateX(2px) rotate(.6deg)}}
+@media (prefers-reduced-motion:reduce){#figure,#head,#stache{animation:none}}
+</style>
+<div class="coach-wrap">
+<svg class="coach-svg" viewBox="0 0 680 760" role="img" xmlns="http://www.w3.org/2000/svg"><title>Professor portrait</title><desc>A bearded professor in a tweed jacket with round glasses holding a leather book. His expression, gaze, gestures and book can be controlled.</desc>
+<title>Animated professor portrait</title><desc>A stylized professor with gray beard, round glasses, tweed jacket and leather book, gently breathing, blinking, tilting his head and twitching his mustache.</desc>
+
+<g id="figure">
+<g id="torso"><g id="bodyg">
+<rect x="318" y="380" width="44" height="90" fill="#F0BF93"/>
+<path d="M150 760 L153 610 Q158 538 182 496 Q208 456 254 438 Q290 426 322 430 Q300 470 296 530 Q288 600 284 760 Z" fill="#A48B63"/>
+<path d="M530 760 L527 610 Q522 538 498 496 Q472 456 426 438 Q390 426 358 430 Q380 470 384 530 Q392 600 396 760 Z" fill="#A48B63"/>
+<rect x="304" y="436" width="72" height="324" fill="#FAF3E3"/>
+<circle cx="340" cy="560" r="4.5" fill="#EFE6D2" stroke="#D8CBB0" stroke-width="1.5"/>
+<path d="M318 442 L304 452 Q296 510 294 570 L292 760 L318 760 Z" fill="#4A5532"/>
+<path d="M362 442 L376 452 Q384 510 386 570 L388 760 L362 760 Z" fill="#4A5532"/>
+<path d="M331 462 Q300 446 292 462 Q286 478 296 488 Q306 494 331 480 Z" fill="#6F4A2E" stroke="#5E3D24" stroke-width="1.5"/>
+<path d="M349 462 Q380 446 388 462 Q394 478 384 488 Q374 494 349 480 Z" fill="#6F4A2E" stroke="#5E3D24" stroke-width="1.5"/>
+<rect x="328" y="458" width="24" height="26" rx="6" fill="#5E3D24"/>
+<path d="M322 430 Q288 436 262 452 Q296 470 308 540 Q314 478 322 430 Z" fill="#8E754C"/>
+<path d="M358 430 Q392 436 418 452 Q384 470 372 540 Q366 478 358 430 Z" fill="#8E754C"/>
+<ellipse cx="460" cy="604" rx="15" ry="18" fill="#7A4528" stroke="#66371F" stroke-width="2"/>
+<ellipse cx="460" cy="590" rx="11" ry="5" fill="#3A2415"/>
+<path d="M468 592 Q482 566 500 558" stroke="#303030" stroke-width="7" stroke-linecap="round" fill="none"/>
+<circle cx="502" cy="557" r="5" fill="#1F1F1F"/>
+<rect x="432" y="612" width="76" height="34" rx="6" fill="#A48B63" stroke="#8E754C" stroke-width="2"/>
+</g>
+<g id="bookarms">
+<path d="M170 742 Q190 660 264 636" stroke="#8E754C" stroke-width="60" stroke-linecap="round" fill="none"/>
+<path d="M170 742 Q190 660 264 636" stroke="#A48B63" stroke-width="52" stroke-linecap="round" fill="none"/>
+<path d="M510 742 Q490 660 416 636" stroke="#8E754C" stroke-width="60" stroke-linecap="round" fill="none"/>
+<path d="M510 742 Q490 660 416 636" stroke="#A48B63" stroke-width="52" stroke-linecap="round" fill="none"/>
+<ellipse cx="268" cy="644" rx="18" ry="15" fill="#F0BF93"/>
+<ellipse cx="412" cy="644" rx="18" ry="15" fill="#F0BF93"/>
+<rect x="262" y="624" width="156" height="22" rx="5" fill="#EFE7D2" stroke="#D8CBB0" stroke-width="1.5"/>
+<path d="M268 631 H412 M268 637 H412" stroke="#D8CBB0" stroke-width="1.5" fill="none"/>
+<rect x="252" y="640" width="176" height="120" rx="10" fill="#6E4226" stroke="#5A3520" stroke-width="2"/>
+<path d="M262 640 h16 v120 h-16 q-10 0 -10 -10 v-100 q0 -10 10 -10 Z" fill="#5C3722"/>
+<rect x="252" y="672" width="26" height="5" fill="#C49A4C"/>
+<rect x="252" y="712" width="26" height="5" fill="#C49A4C"/>
+<rect x="252" y="744" width="26" height="5" fill="#C49A4C"/>
+<path d="M402 640 L418 640 Q428 640 428 650 L428 668 Z" fill="#C49A4C"/>
+<rect x="292" y="658" width="116" height="86" rx="6" fill="none" stroke="#5A3520" stroke-width="1.5" opacity="0.6"/>
+<ellipse cx="280" cy="660" rx="9" ry="15" fill="#F0BF93" transform="rotate(16 280 660)"/>
+<ellipse cx="400" cy="660" rx="9" ry="15" fill="#F0BF93" transform="rotate(-16 400 660)"/>
+</g>
+</g><g id="headrig"><g id="head">
+<ellipse cx="340" cy="240" rx="102" ry="84" fill="#8A8A8A"/>
+<ellipse cx="246" cy="266" rx="30" ry="52" fill="#8A8A8A"/>
+<ellipse cx="434" cy="266" rx="30" ry="52" fill="#8A8A8A"/>
+<path d="M232 240 Q244 214 268 204 M452 238 Q438 212 414 202" stroke="#777777" stroke-width="5" fill="none" stroke-linecap="round"/>
+<ellipse cx="256" cy="290" rx="13" ry="19" fill="#F0BF93"/>
+<ellipse cx="424" cy="290" rx="13" ry="19" fill="#F0BF93"/>
+<ellipse cx="340" cy="278" rx="78" ry="94" fill="#F5C79C"/>
+<ellipse cx="340" cy="200" rx="50" ry="34" fill="#F5C79C"/>
+<path d="M298 184 Q322 170 350 176 M360 174 Q386 172 404 190" stroke="#7C7C7C" stroke-width="5" fill="none" stroke-linecap="round"/>
+<path d="M266 292 Q254 372 296 422 Q318 446 340 448 Q362 446 384 422 Q426 372 414 292 Q406 330 380 350 Q360 360 340 356 Q320 360 300 350 Q274 330 266 292 Z" fill="#9C9C9C"/>
+<path d="M316 362 Q340 374 364 362 Q368 400 352 422 Q340 432 328 422 Q312 400 316 362 Z" fill="#B5B5B5"/>
+<path d="M334 286 Q328 312 333 322 Q340 328 347 322 Q352 312 346 286 Z" fill="#ECB084"/>
+<ellipse cx="306" cy="284" rx="14" ry="9.5" fill="#FFFDF7"/>
+<ellipse cx="374" cy="284" rx="14" ry="9.5" fill="#FFFDF7"/>
+<g id="eyeL"><circle cx="306" cy="284" r="6.5" fill="#5C3A22"/><circle cx="306" cy="284" r="3" fill="#241307"/><circle cx="308.5" cy="281.5" r="1.6" fill="#FFFFFF"/></g>
+<g id="eyeR"><circle cx="374" cy="284" r="6.5" fill="#5C3A22"/><circle cx="374" cy="284" r="3" fill="#241307"/><circle cx="376.5" cy="281.5" r="1.6" fill="#FFFFFF"/></g>
+<ellipse id="lidL" cx="306" cy="284" rx="14.5" ry="10" fill="#F5C79C"/>
+<ellipse id="lidR" cx="374" cy="284" rx="14.5" ry="10" fill="#F5C79C"/>
+<path id="mouth" d="M322 370 Q340 369 358 370 Q340 372 322 370 Z" fill="#7A4A3A"/>
+<g id="stache">
+<circle cx="264" cy="346" r="8" fill="#909090"/>
+<circle cx="416" cy="346" r="8" fill="#909090"/>
+<path d="M340 332 Q316 316 292 322 Q272 328 268 342 Q266 352 278 352 Q296 352 312 346 Q328 341 340 342 Q352 341 368 346 Q384 352 402 352 Q414 352 412 342 Q408 328 388 322 Q364 316 340 332 Z" fill="#909090"/>
+</g>
+<g id="browL"><path d="M282 250 Q304 240 330 254" stroke="#4A423A" stroke-width="10" fill="none" stroke-linecap="round"/></g>
+<g id="browR"><path d="M398 250 Q376 240 350 254" stroke="#4A423A" stroke-width="10" fill="none" stroke-linecap="round"/></g>
+<circle cx="306" cy="284" r="26" fill="none" stroke="#B68F4F" stroke-width="3"/>
+<circle cx="374" cy="284" r="26" fill="none" stroke="#B68F4F" stroke-width="3"/>
+<path d="M332 280 Q340 274 348 280" stroke="#B68F4F" stroke-width="3" fill="none"/>
+<path d="M280 280 L258 284 M400 280 L422 284" stroke="#B68F4F" stroke-width="3" fill="none" stroke-linecap="round"/>
+</g>
+</g></g>
+</svg>
+<div class="coach-ctrl">
+<button data-emo="neutral" class="on">Neutral</button>
+<button data-emo="happy">Happy</button>
+<button data-emo="sad">Sad</button>
+<button data-emo="angry">Angry</button>
+<button data-emo="surprised">Surprised</button>
+<button data-emo="skeptical">Skeptical</button>
+<span class="coach-sep"></span>
+<button id="p-talk">Talk</button>
+<button id="p-roll">Eye-roll</button>
+<button id="p-nod">Nod</button>
+<button id="p-shake">Shake</button>
+<button id="p-shrug">Shrug</button>
+<button id="p-raise">Raise book</button>
+<button id="p-cycle">Auto-cycle: off</button>
+<span class="coach-sep"></span>
+<button class="look" data-look="upleft">&#8598;</button>
+<button class="look" data-look="up">&#8593;</button>
+<button class="look" data-look="upright">&#8599;</button>
+<button class="look" data-look="left">&#8592;</button>
+<button class="look" data-look="center">&#8226;</button>
+<button class="look" data-look="right">&#8594;</button>
+<button class="look" data-look="downleft">&#8601;</button>
+<button class="look" data-look="down">&#8595;</button>
+<button class="look" data-look="downright">&#8600;</button>
+</div>
+</div>
+<script src="animated_professor_rig.js"></script>

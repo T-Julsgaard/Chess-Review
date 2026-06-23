@@ -1,0 +1,146 @@
+<h2 class="sr-only">Animated portrait of a bright eager 11-year-old chess prodigy with a neat brown haircut, big intelligent eyes and a navy polo shirt, proudly holding up a small gold chess trophy. Controllable expressions, glances and gestures.</h2>
+<style>
+:root{ --font-sans: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.coach-wrap{padding:.5rem 0}
+.coach-svg{width:100%;max-width:300px;display:block;margin:0 auto;height:auto}
+.coach-ctrl{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:360px;margin:14px auto 0}
+.coach-ctrl button{font-family:var(--font-sans,sans-serif);font-size:13px;font-weight:400;padding:6px 10px;border-radius:var(--border-radius-md,8px);border:1px solid var(--color-border-secondary,#3a352f);background:var(--color-background-secondary,#2a2622);color:var(--color-text-primary,#ece6da);cursor:pointer}
+.coach-ctrl button:hover{border-color:var(--color-border-primary,#5a5248)}
+.coach-ctrl button.on{background:var(--color-text-primary,#ece6da);color:var(--color-background-primary,#1a1815);border-color:var(--color-text-primary,#ece6da)}
+.coach-ctrl .look{min-width:30px;padding:5px 0}
+.coach-sep{width:100%;height:0}
+#figure{animation:k_br 5s ease-in-out infinite}
+#head{transform-box:view-box;transform-origin:340px 380px;animation:k_tilt 7.6s ease-in-out infinite}
+#trophygroup{transform-box:view-box;transform-origin:340px 640px;transition:transform .7s cubic-bezier(.4,0,.3,1.3)}
+#trophygroup.raised{transform:translateY(-58px)}
+@keyframes k_br{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+@keyframes k_tilt{0%,100%{transform:rotate(0deg)}30%{transform:rotate(-1.3deg)}66%{transform:rotate(1.1deg)}}
+@media (prefers-reduced-motion:reduce){#figure,#head{animation:none}}
+</style>
+<div class="coach-wrap">
+<svg class="coach-svg" viewBox="0 0 680 760" role="img" xmlns="http://www.w3.org/2000/svg"><title>Kid prodigy portrait</title><desc>A bright 11-year-old boy with a neat brown haircut, big intelligent eyes and a navy polo shirt, proudly holding up a small gold chess trophy with both hands at chest height.</desc>
+<g id="figure">
+
+ <!-- ======== TORSO (shrug) ======== -->
+ <g id="torso">
+  <!-- neck -->
+  <path d="M316 364 L312 432 Q340 446 368 432 L364 364 Q340 384 316 364 Z" fill="#EFB988"/>
+  <path d="M316 370 Q340 384 364 370 Q357 398 340 400 Q323 398 316 370 Z" fill="#D69763" opacity="0.5"/>
+  <!-- navy polo -->
+  <path d="M152 760 L156 564 Q164 494 234 468 Q282 452 308 462 L308 760 Z" fill="#1F3A6E"/>
+  <path d="M528 760 L524 564 Q516 494 446 468 Q398 452 372 462 L372 760 Z" fill="#1F3A6E"/>
+  <path d="M304 466 Q340 452 376 466 L380 760 L300 760 Z" fill="#24437E"/>
+  <path d="M152 760 L156 564 Q162 512 196 486 Q180 560 186 760 Z" fill="#16294E" opacity="0.7"/>
+  <path d="M528 760 L524 564 Q518 512 484 486 Q500 560 494 760 Z" fill="#16294E" opacity="0.7"/>
+  <!-- white sleeve trim -->
+  <path d="M170 640 Q200 628 224 634 M170 654 Q200 642 224 648" stroke="#E9E6DE" stroke-width="5" fill="none"/>
+  <path d="M510 640 Q480 628 456 634 M510 654 Q480 642 456 648" stroke="#E9E6DE" stroke-width="5" fill="none"/>
+  <!-- collar: white-trimmed navy flaps -->
+  <path d="M302 458 L342 472 L320 514 Q300 500 288 478 Q292 462 302 458 Z" fill="#1A3160"/>
+  <path d="M378 458 L338 472 L360 514 Q380 500 392 478 Q388 462 378 458 Z" fill="#1A3160"/>
+  <path d="M302 458 L342 472 L320 514" stroke="#E9E6DE" stroke-width="4" fill="none"/>
+  <path d="M378 458 L338 472 L360 514" stroke="#E9E6DE" stroke-width="4" fill="none"/>
+  <path d="M306 452 Q340 440 374 452 Q360 460 340 460 Q320 460 306 452 Z" fill="#16294E"/>
+  <!-- placket + button -->
+  <path d="M333 474 L347 474 L346 540 L334 540 Z" fill="#1A3160"/>
+  <circle cx="340" cy="520" r="5" fill="#F2EFE8" stroke="#C9C5BA" stroke-width="1.5"/>
+ </g>
+
+ <!-- ======== TROPHY (held up with both hands; can raise higher) ======== -->
+ <g id="trophygroup">
+  <!-- bare forearms coming up from the bottom -->
+  <path d="M210 760 Q224 700 292 678" stroke="#EFB988" stroke-width="38" fill="none" stroke-linecap="round"/>
+  <path d="M470 760 Q456 700 388 678" stroke="#EFB988" stroke-width="38" fill="none" stroke-linecap="round"/>
+  <!-- gold king piece -->
+  <g>
+   <path d="M340 496 L340 470" stroke="#E8C04A" stroke-width="7" stroke-linecap="round"/>
+   <path d="M327 483 L353 483" stroke="#E8C04A" stroke-width="7" stroke-linecap="round"/>
+   <ellipse cx="340" cy="513" rx="17" ry="14" fill="#E8C04A"/>
+   <path d="M331 504 Q336 512 333 522" stroke="#F6DC7A" stroke-width="4" fill="none" stroke-linecap="round"/>
+   <path d="M326 528 Q340 536 354 528 L350 545 Q340 550 330 545 Z" fill="#D4A938"/>
+   <path d="M330 545 Q326 580 320 604 L360 604 Q354 580 350 545 Q340 550 330 545 Z" fill="#E8C04A"/>
+   <path d="M336 550 Q334 580 330 600" stroke="#F6DC7A" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+   <path d="M314 604 Q340 596 366 604 L368 622 L312 622 Z" fill="#D4A938"/>
+   <ellipse cx="340" cy="622" rx="30" ry="8" fill="#C49A2E"/>
+   <ellipse cx="340" cy="618" rx="30" ry="8" fill="#E8C04A"/>
+  </g>
+  <!-- plinth -->
+  <path d="M302 630 Q302 624 310 624 L370 624 Q378 624 378 630 L380 678 L300 678 Z" fill="#6E4226"/>
+  <path d="M302 630 Q302 624 310 624 L322 624 L320 678 L300 678 Z" fill="#5A3520"/>
+  <rect x="316" y="636" width="48" height="26" rx="3" fill="#E8C04A"/>
+  <rect x="320" y="640" width="40" height="18" rx="2" fill="none" stroke="#C49A2E" stroke-width="1.6"/>
+  <path d="M290 678 Q290 670 300 670 L380 670 Q390 670 390 678 L392 700 L288 700 Z" fill="#7A4A2C"/>
+  <ellipse cx="340" cy="700" rx="52" ry="9" fill="#5A3520"/>
+  <!-- hands gripping the plinth sides -->
+  <path d="M278 668 Q270 654 282 646 Q296 640 308 648 Q316 656 312 668 Q310 682 296 684 Q282 684 278 668 Z" fill="#EFB988"/>
+  <path d="M288 650 L287 678 M298 648 L297 678" stroke="#D69763" stroke-width="2.2" fill="none" opacity="0.6"/>
+  <path d="M402 668 Q410 654 398 646 Q384 640 372 648 Q364 656 368 668 Q370 682 384 684 Q398 684 402 668 Z" fill="#EFB988"/>
+  <path d="M392 650 L393 678 M382 648 L383 678" stroke="#D69763" stroke-width="2.2" fill="none" opacity="0.6"/>
+ </g>
+
+ <!-- ======== HEAD (big and youthful) ======== -->
+ <g id="headrig"><g transform="translate(-95.2 -33.0) scale(1.28 1.11)"><g id="head">
+  <!-- ears (slightly big, kid-like) -->
+  <ellipse cx="248" cy="290" rx="16" ry="24" fill="#EFB988"/>
+  <ellipse cx="432" cy="290" rx="16" ry="24" fill="#EFB988"/>
+  <path d="M246 280 Q254 290 247 304 M434 280 Q426 290 433 304" stroke="#D69763" stroke-width="2.5" fill="none" opacity="0.6"/>
+  <!-- face: round, smooth, young -->
+  <path d="M262 232 Q252 300 276 342 Q296 374 324 382 Q340 386 356 382 Q384 374 404 342 Q428 300 418 232 Q412 178 378 164 L302 164 Q268 178 262 232 Z" fill="#EFB988"/>
+  <path d="M276 342 Q262 298 266 238 Q274 206 294 196 Q282 234 284 290 Q288 326 306 354 Q290 350 276 342 Z" fill="#D69763" opacity="0.3"/>
+  <!-- soft cheek blush -->
+  <ellipse cx="294" cy="320" rx="14" ry="9" fill="#E8A06A" opacity="0.4"/>
+  <ellipse cx="386" cy="320" rx="14" ry="9" fill="#E8A06A" opacity="0.4"/>
+  <!-- neat brown hair: full top with swept fringe -->
+  <path d="M254 268 Q238 198 268 148 Q298 104 340 100 Q382 104 412 148 Q442 198 426 268 Q420 244 408 226 Q418 200 394 182 Q402 216 380 226 Q390 196 364 176 Q372 210 344 218 Q352 188 326 174 Q332 206 304 214 Q310 184 288 180 Q296 212 282 230 Q272 248 266 268 Q260 272 254 268 Z" fill="#5A3A1E"/>
+  <path d="M268 150 Q298 108 340 104 Q382 108 410 148 Q380 122 340 120 Q300 122 268 150 Z" fill="#7A4E28"/>
+  <path d="M282 214 Q296 184 326 172 M364 156 Q386 172 396 198" stroke="#3E2814" stroke-width="4" fill="none" opacity="0.7" stroke-linecap="round"/>
+  <path d="M254 268 Q250 236 262 204 Q256 248 262 272 Z" fill="#3E2814" opacity="0.7"/>
+  <path d="M426 268 Q430 236 418 204 Q424 248 418 272 Z" fill="#3E2814" opacity="0.7"/>
+  <!-- eyebrows -->
+  <g id="browL"><path d="M278 248 Q302 240 326 246" stroke="#3E2814" stroke-width="9" fill="none" stroke-linecap="round"/></g>
+  <g id="browR"><path d="M354 246 Q378 240 402 248" stroke="#3E2814" stroke-width="9" fill="none" stroke-linecap="round"/></g>
+  <!-- big intelligent eyes -->
+  <ellipse cx="302" cy="278" rx="18" ry="13" fill="#FDFBF4"/>
+  <ellipse cx="378" cy="278" rx="18" ry="13" fill="#FDFBF4"/>
+  <g id="eyeL"><circle cx="302" cy="278" r="9.5" fill="#4A2E18"/><circle cx="302" cy="278" r="4.5" fill="#180C04"/><circle cx="305" cy="274.5" r="2.4" fill="#fff"/><circle cx="298.5" cy="281.5" r="1.2" fill="#fff" opacity="0.85"/></g>
+  <g id="eyeR"><circle cx="378" cy="278" r="9.5" fill="#4A2E18"/><circle cx="378" cy="278" r="4.5" fill="#180C04"/><circle cx="381" cy="274.5" r="2.4" fill="#fff"/><circle cx="374.5" cy="281.5" r="1.2" fill="#fff" opacity="0.85"/></g>
+  <path d="M286 270 Q302 262 318 270 M362 270 Q378 262 394 270" stroke="#D69763" stroke-width="1.8" fill="none" opacity="0.5"/>
+  <ellipse id="lidL" cx="302" cy="278" rx="18.5" ry="13.5" fill="#EFB988"/>
+  <ellipse id="lidR" cx="378" cy="278" rx="18.5" ry="13.5" fill="#EFB988"/>
+  <!-- small kid nose -->
+  <path d="M338 290 Q334 308 330 314 Q336 320 344 318" stroke="#D69763" stroke-width="2.5" fill="none" opacity="0.6" stroke-linecap="round"/>
+  <!-- mouth (engine-driven) -->
+  <path id="mouth" d="M322 344 Q340 342 358 344 Q340 352 322 344 Z" fill="#B05B4A"/>
+ </g></g></g>
+
+</g>
+</svg>
+<div class="coach-ctrl">
+<button data-emo="neutral" class="on">Neutral</button>
+<button data-emo="happy">Happy</button>
+<button data-emo="sad">Sad</button>
+<button data-emo="angry">Angry</button>
+<button data-emo="surprised">Surprised</button>
+<button data-emo="skeptical">Skeptical</button>
+<span class="coach-sep"></span>
+<button id="k-talk">Talk</button>
+<button id="k-roll">Eye-roll</button>
+<button id="k-nod">Nod</button>
+<button id="k-shake">Shake</button>
+<button id="k-shrug">Shrug</button>
+<button id="k-raise">Raise trophy</button>
+<button id="k-cycle">Auto-cycle: off</button>
+<span class="coach-sep"></span>
+<button class="look" data-look="upleft">&#8598;</button>
+<button class="look" data-look="up">&#8593;</button>
+<button class="look" data-look="upright">&#8599;</button>
+<button class="look" data-look="left">&#8592;</button>
+<button class="look" data-look="center">&#8226;</button>
+<button class="look" data-look="right">&#8594;</button>
+<button class="look" data-look="downleft">&#8601;</button>
+<button class="look" data-look="down">&#8595;</button>
+<button class="look" data-look="downright">&#8600;</button>
+</div>
+</div>
+<script src="animated_kid_rig.js"></script>

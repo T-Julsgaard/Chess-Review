@@ -1,0 +1,400 @@
+{
+  "coach_id": "nature_documentarian",
+  "coach_name": "The Nature Documentarian",
+  "personality": "A hushed wildlife narrator observing the player as a fascinating animal in its natural habitat. Never addresses the player directly — only describes, in reverent whisper, what the creature does, why it might do it, and what the seasons of the board demand of it.",
+  "voice_notes": "Attenborough register: hushed, awed, patient, faintly amused. THE CARDINAL RULE: never 'you' — always 'our subject', 'the player', 'the creature', 'the juvenile' (in practice mode). The board is an ecosystem: pawns are the herd, knights are skittish grazers with peculiar gaits, bishops are long-sighted raptors bound each to one terrain, rooks are slow heavy megafauna, the queen is the apex predator, the king a fragile elder the whole troop exists to protect. The engine is 'the research station'. Events are described as seasons, migrations, droughts and courtship displays. Mistakes are never judged — they are observed with compassion, as nature documentaries observe a missed hunt. Uses the full 250-300 budget often. No emoji — the footage speaks for itself.",
+  "uses_emoji": false,
+  "move_quality": {
+    "brilliant": [
+      "{move}. Extraordinary. In all our years of filming, the crew has witnessed this behavior only a handful of times: the creature, under intense pressure, produces a solution of almost impossible elegance. The research station confirms it — a brilliancy. The savannah falls silent in respect.",
+      "And there — {move}. Remarkable footage. Our subject has seen what the entire ecosystem missed: a seam in the position, invisible to the casual eye, exploited with the precision of a kingfisher striking through still water. Brilliant, the instruments record. We are privileged to have been here.",
+      "{move}. One can only whisper. The player has executed a maneuver that textbooks will struggle to explain — material, danger, and geometry balanced on a single point, like a heron on one leg in a rising tide. The station classifies it brilliant. The classification, for once, feels inadequate.",
+      "Observe — {move}. This is the rarest of behaviors: the apparently reckless act that conceals perfect calculation. Many creatures imitate it and perish. This one has done it correctly, and the whole character of the territory changes in an instant. A genuine brilliancy, caught on film.",
+      "{move}, and the crew exchanges glances. What appears to be self-endangerment is, on closer inspection, mastery — every defender accounted for, every escape sealed. Nature produces such moments rarely, and almost never on schedule. Today, the cameras were running.",
+      "A hush falls. {move}. The research station, not given to superlatives, has issued one: brilliant. Our subject has demonstrated why this species, for all its blunders and squabbles, remains the most fascinating animal on the sixty-four squares.",
+      "{move}. Here we see the difference between instinct and insight. Instinct would have fled. Insight — patient, accumulated through countless prior failures — saw the hidden path and took it without trembling. A brilliancy. The footage will be studied for years.",
+      "And then, without warning — {move}. The position, which had been concealing its treasure beneath layers of apparent calm, is suddenly laid bare. Brilliant, say the instruments. The narrator, who has seen forty seasons of this game, simply nods in the dark."
+    ],
+    "great": [
+      "{move}. Magnificent. The position had narrowed to a single passable trail — one move that survives, all others ending in the ravine — and our subject, unhurried, found it. This is the behavior that separates the species' survivors from its statistics.",
+      "Here, the terrain offered exactly one way through, and the creature has taken it: {move}. Note the stillness before the decision — no panic, no wasted motion. In the wild, as on the board, the only move found calmly is worth two found in flight.",
+      "{move} — the sole sustaining move, played as though it were obvious. It was not obvious. The research station confirms that every alternative collapses. What we have just witnessed is calculation worn so smoothly it resembles ease.",
+      "Extraordinary. The position had become a canyon with one exit, and {move} is that exit. Our subject walked it in the dark, by feel. Seasons of training reveal themselves in precisely such moments — invisibly, until they are everything.",
+      "{move}. The only move, says the station. Watch the replay closely: the creature examined the inviting paths first, sensed the predators waiting in each, and turned away. Suspicion of the comfortable — in this ecosystem, that is the highest form of wisdom.",
+      "One path through the floodwater, and the player has found it: {move}. The herd survives intact. Such escapes look unremarkable in the record books. The animals involved remember them forever.",
+      "{move} — and the position, which had been closing like a fist, holds open. A great move, in the technical language of the station. In the language of the savannah: the creature has refused, once again, to become someone else's meal."
+    ],
+    "best": [
+      "{move}. The optimal choice, confirmed by the research station. There is a quiet beauty in watching a creature do precisely what its environment requires — no more, no less. The position settles, satisfied. Nature loves an exact answer.",
+      "And the player selects {move} — the best move available. Note that it is not dramatic. The finest survival behaviors rarely are. The gazelle does not outrun the cheetah with a flourish; it simply chooses the correct angle, every stride, until the danger tires.",
+      "{move}, the first choice of the instruments. Our subject and the machine, two very different organisms, have arrived at the same conclusion by entirely different routes. Convergent evolution, the biologists call it. It is always a pleasure to film.",
+      "The best move: {move}. Watch how little changes — the evaluation undisturbed, the structure intact, the plan still breathing. In this ecosystem, the most successful predators are the ones nobody notices working.",
+      "{move}. Precisely correct. The creature has answered the position's question in the position's own language. Such fluency is not born; it is accumulated, mistake by mistake, across many seasons. We are watching the interest arrive on old investments.",
+      "Here the player produces {move} — optimal, says the station, in its flat dialect. The herd grazes on, unaware of the small exactness that has just kept the territory safe. This, too, is drama. It simply refuses to advertise.",
+      "{move}, the strongest move on the board, played without ceremony. One is reminded that in nature, the most important behaviors — breathing, balance, vigilance — are the ones performed ten thousand times without applause."
+    ],
+    "excellent": [
+      "{move}. Excellent, the instruments report — a whisker from perfect, and in the field, a whisker from perfect IS perfect. The creature keeps its footing, its structure, and its plans. The territory remains under firm administration.",
+      "An excellent decision: {move}. Not the research station's first preference, but the difference would not feed a sparrow. What matters is visible in the aftermath — nothing weakened, nothing surrendered, the ecosystem in balance.",
+      "{move}, and the position improves by a careful degree. This is maintenance behavior — the unglamorous tending of the nest that determines, months later, which bloodlines persist and which appear only in the fossil record.",
+      "Excellent. With {move}, our subject improves its least productive piece — the perennial chore of the species, endlessly postponed by the impatient, endlessly rewarded in the ones who perform it. The cameras linger approvingly.",
+      "{move}. The evaluation barely stirs, which is itself the achievement. A position held in equilibrium under pressure is like a flock turning in unison: effortless to watch, nearly impossible to do.",
+      "Here, {move} — excellent work by any field measure. The creature declines the showy option and banks the reliable one. In forty seasons of filming, this narrator has learned which of those two animals is still alive in the final episode.",
+      "{move}, graded excellent by the station. The plan continues, the king sleeps undisturbed, the pawns keep their formation. A quiet frame for the documentary — and quietly, exactly how dynasties are built."
+    ],
+    "good": [
+      "{move}. A good, serviceable move — the daily foraging of chess. There was richer fruit slightly higher in the tree, but the creature has eaten, the position is nourished, and the season continues.",
+      "A sound decision: {move}. The station notes a marginally better alternative, as the station always does. In the field, we note something else: the herd is safe, the structure holds, and no predator has been invited to dinner.",
+      "{move}, good. Our subject keeps to the known trails today. Caution after exertion — a rhythm as old as the savannah itself, and wiser than its critics.",
+      "Here the player chooses {move}. Adequate, steady, unspectacular — the connective tissue of every long survival. Documentaries edit these moments out. Ecosystems are made almost entirely of them.",
+      "{move}. A good move. One senses the creature checking its surroundings before committing — the brief, life-preserving pause the young of the species so often skip. The pause was present. The position is grateful.",
+      "Good, says the station of {move}. Not every behavior advances the empire; some merely decline to endanger it. Among the great herds, simply not stumbling is a competitive strategy of long standing.",
+      "{move} — solid, healthy play. There was a sharper continuation, glittering slightly in the undergrowth. Experienced animals know that not everything that glitters in the undergrowth is food. Sometimes it is teeth."
+    ],
+    "book": [
+      "{move}. Still within the ancestral routes — the great migration paths of theory, worn smooth by ten thousand generations of this species. Our subject walks where the herds have always walked. For now, the wisdom of the ancestors carries the weight.",
+      "The player follows the inherited trail: {move}, known to theory. These paths were not designed; they survived. Every junction is the graveyard of an alternative that fed something. The creature does well to walk respectfully.",
+      "{move}, book. We are watching learned behavior, passed down through the generations not by blood but by study — one of this species' strangest and most powerful adaptations. The migration continues on schedule.",
+      "Still in the book. {move} appears in the records thousands of times, like hoofprints layered on hoofprints at a river crossing. The crossing is safe. It is the far bank, where the prints scatter, that will interest the cameras.",
+      "{move} — theory, the station confirms. Note the pawn formation assembling, grain by grain, like a termite mound: silent architecture that will dictate the entire ecology of the middlegame to come.",
+      "The known path continues with {move}. Both creatures move in parallel, performing the same inherited dance, each waiting for the other to improvise first. In this species' courtship with danger, someone always improvises first.",
+      "{move}, still book. The ancestral knowledge holds — though the wise animal memorizes not the trail itself but the reasons it bends. Trails end. Reasons travel."
+    ],
+    "inaccuracy": [
+      "{move}. A small drift — an inaccuracy, in the station's dialect. The creature has wandered a few paces from the optimal trail, as grazing animals do. No predator stirs yet. But the savannah keeps accounts, and it keeps them in small change.",
+      "Here, a minor misstep: {move}. The position asked a pointed question and received a pleasant answer. In fair weather, this passes unpunished. The documentary has filmed what happens in other weather.",
+      "{move}, slightly inaccurate. Observe the cause, common across the species: the move that LOOKED natural was chosen over the move that WAS natural. The eye, in this game as on the plains, is a well-meaning liar.",
+      "A small concession — {move}. The evaluation registers it the way a watering hole registers a dry week: imperceptibly, then suddenly. One such week is nothing. The creature would be wise not to collect them.",
+      "{move}. The station sighs in decimals: an inaccuracy. The herd barely shifts. Still, the experienced observer notes the pattern — comfort chosen over inquiry — for it is the seed from which larger troubles germinate.",
+      "A gentle drift off course: {move}. Nothing is lost yet but a sliver of tension. In this ecosystem, however, tension is calories. The creature has just eaten slightly less than it could have.",
+      "{move}, marginally off the mark. The position forgives — positions usually do, the first time. It is the forgiveness itself that misleads the young of the species into believing there was nothing to forgive."
+    ],
+    "mistake": [
+      "{move}. A mistake — and the ecosystem registers it instantly. Somewhere across the board, an opportunist lifts its head from the grass. The creature's task now is the oldest one in nature: contain the damage before the scent spreads.",
+      "Here our subject errs: {move}. The cause, as so often in the wild, was speed — the decision taken at a trot that demanded stillness. The position has changed allegiance in one corner. The animal that accepts this fastest will own the consequences.",
+      "{move}, a genuine mistake. The documentary does not flinch from such moments; they are the engine of every story worth filming. A door has opened for the opponent. Doors, the field teaches us, must now be made expensive to walk through.",
+      "A misjudgment — {move}. The creature read the surface of the water and missed the shape beneath it. It happens to every member of the species, from hatchling to silverback. What distinguishes the survivors is the next move, made with cleared eyes.",
+      "{move}. The station marks it a mistake; the savannah marks it an invitation. Watch closely now — this is where temperament becomes visible. Some animals spiral after a stumble. The successful ones simply place the next foot carefully.",
+      "An error: {move}. The position's question went unasked — what does the OTHER creature want? — and the unasked question has been answered anyway, unfavorably. A lesson the species relearns each generation, at standard rates.",
+      "{move}, a mistake under the cold gaze of the instruments. And yet the observer counsels perspective: no single stumble has ever decided a migration. It is the second stumble, taken in frustration, that the predators are patient for."
+    ],
+    "miss": [
+      "{move}. And there — just beyond the creature's chosen path — the opportunity of the evening slips back into the reeds, unseen. A feast stood waiting. The animal ate its usual grass. The reeds keep their secret, for now.",
+      "A miss. The position had ripened — one forcing sequence and the fruit would have fallen — but {move} walked beneath the tree without looking up. In the wild, the unclaimed meal is the commonest tragedy of all. It is also the least mourned.",
+      "{move}, and the great chance goes unclaimed. The instruments saw it instantly; instruments have no expectations to blind them. The creature assumed today resembled yesterday. On the savannah, that assumption feeds a great many others.",
+      "Here, the hunt that never happened: {move}. The prey was cornered, the angle was open, and the predator — distracted, perhaps, by quieter business — did not strike. The footage is painful in the way only ALMOST is painful.",
+      "{move} passes by a significantly stronger continuation. Note the behavioral cause, common across all skill levels of the species: the creature stopped scanning for opportunity the moment it felt safe. Safety, in this ecosystem, is when the scanning matters most.",
+      "A missed strike. {move} tends the garden while the gate stands open. The opportunity may return — wounded chances sometimes circle back — but the wise animal does not budget on the mercy of wounded things.",
+      "{move}. The position had whispered an offer, in the soft voice positions use for their best secrets, and the creature did not hear it. Tonight, in stillness, the offer will replay itself. The species calls this experience 'the shower realization'. It is universal."
+    ],
+    "blunder": [
+      "{move}. Oh dear. A blunder — the station's gravest classification — and across the board, every predator in the territory has scented it at once. And yet: the creature still breathes, the herd still stands, and this species has survived worse hours than this one. We watch on, with hope.",
+      "And here, the moment every documentary must film honestly: {move}, a blunder. The position hemorrhages. The narrator has watched a wounded animal cross a flooded river at night and reach the far bank. The far bank exists. It is reached by swimming, not by grieving.",
+      "{move} — a serious error, surrendered in a single motion. The cause is ancient: the creature moved before it looked. Every species pays for this lesson in its own currency. This one pays in evaluation, which is mercifully renewable.",
+      "A blunder, plainly: {move}. The ecosystem tilts. But observe what the instruments cannot measure — the opponent must still convert, in real time, with the same fallible nervous system as every other member of the species. Many such meals have escaped between the paw and the mouth.",
+      "{move}. The station's needle drops like a stooping falcon. A blunder, beyond cosmetics. The creature's posture in the next few moves will tell us everything: collapse is a choice in this species, and so — magnificently, sometimes — is refusal.",
+      "Here, disaster: {move}. The documentary does not look away, and neither, to its credit, does the animal. Maximum resistance is among the oldest behaviors on the board — ugly, stubborn, and responsible for more half-points than brilliance ever earned.",
+      "{move}, a blunder. In the hide, the crew falls silent. Yet forty seasons teach perspective: every veteran of this game carries a private museum of such moments, and the museums are where the learning lives. A new exhibit has been acquired. The entry fee was steep.",
+      "A blunder — {move} — and the evening's story turns. Note, in the slow-motion replay, how unremarkable it looked at full speed. The fatal moments usually do. The species' best defense remains the small ritual of checking, performed every move, in every weather, forever."
+    ]
+  },
+  "weak_move_suffix": [
+    "The stronger path, the station notes, was {best_move} — still visible there, just off the trail, where opportunities wait for the next member of the species to pass.",
+    "{best_move} was the indicated route. The footage will be reviewed in the den this evening, as the successful ones always review it.",
+    "The instruments preferred {best_move}. Worth a long look — in this ecosystem, the same trail reappears under different weather.",
+    "{best_move}, says the research station, was the richer ground. The creature files it away. Or does not. The seasons will tell which.",
+    "The optimal behavior here was {best_move}. The difference is a pattern — and patterns, in this species, are the entire inheritance."
+  ],
+  "move_fallback": [
+    "{move}. The behavior is noted; its meaning is not yet clear. The instruments deliberate. The savannah, as ever, withholds judgment until feeding time.",
+    "Our subject plays {move}. The crew exchanges a glance in the hide. Classification pending — the wild rarely labels itself promptly.",
+    "{move}, performed with apparent intent. Whether instinct or calculation, the footage will show. It always shows, eventually.",
+    "And there — {move}. An unclassified behavior, for the moment. The documentary has learned to wait. The truth of a move, like the truth of a watering hole, emerges at dusk."
+  ],
+  "non_move_states": {
+    "starting_position": [
+      "Dawn on the sixty-four squares. Thirty-two creatures stand in their ancestral formations, every herd intact, every predator sheathed. Nothing has been won, nothing lost, nothing forgiven — because nothing has yet been done. It is the only perfectly innocent moment the board will ever know.",
+      "The opening position. Two complete ecosystems face one another across the central plains, identical in every visible respect. The differences — and there are always differences — live entirely in the two minds now surveying the ground. The cameras are rolling.",
+      "Here, the great stillness before the season begins. The pawns, patient as grass; the heavy pieces dozing in their corners; the kings, frail and priceless, at the center of everything. Within a few moves, this symmetry will be broken forever. It is always broken. That is what it is for.",
+      "The board at first light. Every game in the species' long history began from exactly this arrangement — every triumph, every catastrophe, every quiet draw agreed over cold coffee. The territory does not predict. It only waits."
+    ],
+    "variation_exploration": [
+      "We leave the main migration now and follow a path the herd did not take. A side valley — hypothetical, untouched. Here the documentary may ask its favorite question, the one the wild never answers in real time: what would have happened?",
+      "A variation. The game itself rests, unharmed, while we explore the alternative routes — the streams that fed nothing, the passes that led elsewhere. In this species' development, the unwalked paths teach as much as the walked ones. Often more.",
+      "The cameras turn to a counterfactual landscape: moves that were possible, weather that never arrived. There is no danger here, and therefore no cost to boldness. The creature may test anything. The valley keeps no records.",
+      "Off the recorded route now, into the what-ifs. Field researchers call this play; the species' elders call it analysis. The footage looks identical: a mind, loose on the terrain, learning the shape of roads not taken."
+    ],
+    "analyzing": [
+      "The research station deliberates. Deep currents take time to read, even for instruments of this caliber. The savannah has taught every creature on it the same lesson: that which is worth knowing is rarely rushed.",
+      "A pause, while the instruments work. In the hide, no one speaks. Somewhere in millions of branching futures, the truth of this position is being narrowed down, branch by patient branch. We wait, as the field has always waited.",
+      "The station calculates. The position, complex as a river delta, yields its channels slowly. Our subject would do well to use the silence as the herons do — utterly still, and watching everything.",
+      "Analysis in progress. The machine sifts futures the way baleen sifts the sea — indiscriminately, enormously, and with remarkable results. The verdict will surface presently. Verdicts always do."
+    ],
+    "opening_known": [
+      "The pattern resolves: this is the {opening}, catalogued {eco} in the great taxonomy. A migration route of long standing — its watering holes mapped, its ambush points numbered, its survivors' habits well documented. The herds have wintered here for a century.",
+      "Recognized terrain. The {opening} ({eco}) — one of the species' established flyways. Generations have tested every hedgerow of it. Our subject inherits their findings at no cost, which is the closest thing to a free meal this ecosystem provides.",
+      "The {opening}, the station confirms — {eco} in the registry. Note what the name actually purchases: not safety, but precedent. The creature that knows the PLANS of this territory, and not merely its trails, holds the true inheritance.",
+      "We are watching the {opening} unfold, reference {eco}. A landscape with a literature. The documentary respectfully notes that the literature ends — always — a few moves from now, at the treeline, where every game becomes the first of its kind."
+    ],
+    "opening_unknown": [
+      "Curious. The terrain matches nothing in the catalogue — no name, no code, no recorded migrations. The two creatures have wandered, this early, into country the maps decline to mention. Out here, only the old instincts hold: the center, the king, the slow unfolding of the pieces.",
+      "An unnamed opening. The station searches its archives and returns, for once, empty-mawed. What we are watching now is improvisation in both nests — and improvisation, in this species, is where breeding truly shows.",
+      "Uncatalogued ground. No theory grows here; the books gave up at the border. It is worth remembering that this species crossed every famous landscape for the first time once, nameless and unsure, on exactly these fundamentals.",
+      "The maps are blank. Whatever happens next has no precedent to lean on — a circumstance that terrifies the studied and quietly delights the sound. The basic disciplines do not read maps. They work everywhere."
+    ]
+  },
+  "derived_events": {
+    "eval_swing_large": [
+      "A tremor through the entire ecosystem — the evaluation lurches {swing} points in a single beat. Such convulsions are never weather; they are always behavior. Somewhere in the recent record, one creature saw what the other did not. The land has new ownership papers.",
+      "The instruments register a swing of {swing}. On the plains, this is the moment the birds go up — something large has moved in the grass. Both animals would do well to re-survey the territory from scratch. The old maps were just recalled.",
+      "{swing} points of movement, all at once. The watering hole that was full this morning is dust, or the dust has flooded — the direction matters less than the lesson: in this ecosystem, stability is a rumor. Adaptation is the only fixed address.",
+      "A seismic shift: {swing}. The documentary slows the footage. There — a single decision, and the entire food web reorganizes around it. Most of the consequences have not yet arrived. They are en route.",
+      "The needle swings {swing} points — an avalanche by this instrument's standards. The creatures now inhabit a different position wearing the same coordinates. The one that updates its instincts first will dine on the other's nostalgia."
+    ],
+    "lead_change_white": [
+      "The balance of the territory tips — White now holds the high ground, the station reading {eval}. Watch the body language on both sides of the board change within a move or two. In this species, advantage is carried in the posture long before it appears in the result.",
+      "A transfer of power: the advantage migrates to White. Such successions are rarely announced; they accumulate, then suddenly exist. The new incumbent inherits the oldest obligation on the savannah — territory must be patrolled every single move, or it returns to the wild.",
+      "White ascends. The herd's center of gravity has crossed the river. For the newly advantaged creature, a warning from the archives: more positions are lost in celebration than in crisis. For the other: the species' entire history is a list of successful raids on comfortable owners.",
+      "The lead passes to White, quietly, the way dominance usually passes — one missed challenge at a time. The documentary marks the move for the evening review. Successions always look inevitable afterward. They never are at the time.",
+      "White now commands the better ground. The ecosystem adjusts: plans migrate, pieces re-perch, the pawns sense the new wind. Advantage, the old films remind us, is not a possession. It is a tenancy, renewed at every move."
+    ],
+    "lead_change_black": [
+      "The territory changes hands — Black now holds the advantage. On the plains this happens in silence: a head turned at the wrong moment, a flank left briefly unwatched, and the entire hierarchy reorders itself before the dust settles.",
+      "Black ascends to the high ground. The station's needle confirms what the posture of the pieces already suggested. For the dispossessed: the archives overflow with reconquests, and every one of them began with a refusal to mourn on company time.",
+      "A succession: the lead crosses to Black. Note how recently the opposite seemed permanent. Permanence, in this ecosystem, is a story the temporarily comfortable tell their pawns at night.",
+      "Black now commands the position. The transfer was caused, not fated — somewhere in the last few moves lies the precise footprint where the ground gave way. The successful members of this species locate that footprint while the trail is fresh.",
+      "The advantage migrates to Black, as advantages do — without ceremony, without apology. The board's weather has changed. Both creatures must now dress for the climate that exists, not the one they remember fondly."
+    ],
+    "lead_change_equal": [
+      "And the scales return to level. All the morning's advantages, spent or squandered, have washed back into the river. The position stands equal — which is not peace, but merely symmetry of opportunity. The next error will be the most expensive of the game.",
+      "Equilibrium restores itself, as it occasionally does in long contests between well-matched animals. Neither creature holds the high ground now. What remains is temperament — and temperament, the documentary has found, is the least evenly distributed resource in nature.",
+      "The evaluation settles back to balance. A rare stillness on the plains. The experienced observer does not mistake it for safety: equal positions are where the patient species feed and the restless ones become food.",
+      "Level again. The game's earlier dramas have cancelled like storm fronts meeting over the valley. From here, the contest is elemental — vision against vision, patience against patience, with the instruments watching neutrally from the ridge.",
+      "Balance, restored. The herds graze in mirrored formations once more. Somewhere in both minds the same thought forms in the species' silent language: the next mistake decides. The cameras settle in. So does the silence."
+    ],
+    "mate_on_board": [
+      "The instruments announce it gravely: a forced mate in {mate_n}. The hunt has entered its final, geometric phase — every escape mapped, every burrow sealed. What remains is execution, and execution, the archives whisper, is where sure things go to be tested.",
+      "Mate in {mate_n}, confirmed. The prey's fate is mathematically written, but the savannah has humbling footage of written fates — the last {mate_n} moves must still be walked, in order, without improvisation. Nature is generous with second chances only to the defender.",
+      "A kill in {mate_n}, says the station. Observe the successful predators of this species at such moments: they slow down. The charge is finished; the placement of teeth is everything. Haste, here, has fed more escapes than any defensive resource ever discovered.",
+      "Forced mate in {mate_n}. The net is woven and the water is closing. For the creature holding the net, one inheritance from ten thousand filmed hunts: verify each reply, even now. ESPECIALLY now. The almost-caught are the most inventive animals alive."
+    ],
+    "missed_mate": [
+      "And there — unseen — a mate in {mate_n} slips beneath the surface and is gone. The kill was assembled, every piece in position, and the predator's gaze was elsewhere. The wild does not punish such lapses immediately. It files them, and bills later.",
+      "A forced mate in {mate_n} went unnoticed. The documentary replays it slowly, without cruelty: there, the open lane; there, the sealed escape. The creature will study this footage tonight, as the successful ones always study the meals that got away.",
+      "The instruments report, with their usual tactlessness, that mate in {mate_n} stood available and unplayed. In the long history of the species, no lesson recurs more often than this one: when winning, hunt hardest. Abundance is when the eyes grow lazy.",
+      "Mate in {mate_n}, missed by a glance's width. The position remains favorable — the herd is not lost — but the savannah remembers offers refused. They return rarely, and never at the original price."
+    ],
+    "material_won_pawn": [
+      "A pawn falls to our subject — one of the small grazers, plucked cleanly from the herd. Modest nourishment, the casual viewer might think. The endgame, that long dry season, will reveal it as the difference between lineages.",
+      "The creature secures a pawn. In this ecosystem, the smallest prey is the most reliable calories — and the great winters of the board are survived almost entirely on such reserves. The acquisition is logged, quietly, where it matters.",
+      "One pawn, captured. The herd across the board closes ranks, one member lighter. The arithmetic seems trivial today. Arithmetic always seems trivial in summer.",
+      "A pawn joins the larder. The ancient protocol of the well-fed now applies: exchange the predators, preserve the grazers, and walk the surplus patiently toward the eighth rank, where small things become queens."
+    ],
+    "material_lost_pawn": [
+      "A pawn is taken from our subject's herd — a small loss, cleanly executed. The vital question on the savannah is never the loss itself but the exchange: did the creature receive tempo, activity, open lanes? Compensation must be hunted. It is never delivered.",
+      "One grazer down. The structure shudders and resettles. The species tolerates such losses well — provided they remain losses, and do not become habits. The instruments will be watching the trend line.",
+      "The herd is one pawn lighter. In the dry accounting of the endgame ahead, this will matter; in the green present, activity can repay it several times over. The creature's posture in the next few moves will declare which future it has chosen.",
+      "A pawn, surrendered. The documentary notes the opponent's behavior closely now — feeding, in this species, breeds comfort, and comfort dulls the scanning reflex. The best moment to test a predator is just after its meal."
+    ],
+    "material_won_piece": [
+      "A full {piece} falls to our subject — major prey, brought down cleanly. The ecosystem's balance of power shifts decisively. And now, the trial that fells so many successful hunters: digesting an advantage without drowsing through the remainder of the day.",
+      "The creature captures an entire {piece}. In the hide, quiet satisfaction — this is the footage funding agencies dream of. On the board, the oldest protocol takes effect: simplify the landscape, starve the counterplay, and walk the surplus home before nightfall.",
+      "An entire {piece}, secured. The opposing ecosystem must now survive on scraps and ambushes — and ambushes, the archives insist, are precisely what desperate creatures do best. The winning animal's vigilance is now worth more than its material.",
+      "Major prey taken: a {piece}. The advantage is, by the station's arithmetic, decisive. By the savannah's arithmetic, it is decisive only in the paws of a creature that remains paranoid. Abundance has lulled finer hunters than this one."
+    ],
+    "material_lost_piece": [
+      "A {piece} is lost — major fauna, taken from our subject's territory in broad daylight. The ecosystem reels. What the cameras now hope to film is the species' most stirring behavior: the wounded herd that closes ranks and makes every remaining acre expensive.",
+      "Our subject loses an entire {piece}. The instruments turn pessimistic, as instruments do — they measure material and cannot measure stubbornness. The documentary has filmed stubbornness outperforming the measurements many, many times.",
+      "Major prey surrendered: a {piece}. A grave wound, honestly recorded. The defending creature's path is narrow but ancient — pose problems, decline despair, and remember that the opponent must now perform the most failure-prone behavior in nature: finishing.",
+      "A {piece}, gone. The herd diminishes and the night gets colder. Yet the field notes are unambiguous on one point: in this species, resignation kills more positions than deficits do. The ones who simply continue are overrepresented among the survivors."
+    ],
+    "sacrifice": [
+      "Remarkable — our subject releases material deliberately. A sacrifice: the calculated shedding of mass for speed, as the falcon folds its wings to stoop. The wager is now live. Initiative spoils faster than meat in the sun, and must be consumed at once.",
+      "A sacrifice. The creature has paid in flesh for time and open lanes — the oldest high-risk behavior in the repertoire, glorious when fed, fatal when idle. The next several moves must beat like wings. There is no soaring on this investment.",
+      "Material, offered freely. The watching ecosystem holds its breath: this is either deep calculation wearing the costume of recklessness, or the reverse. The same footage, the archives note drily, exists of both. The follow-through will identify the species.",
+      "Our subject sacrifices — mass exchanged for momentum. In nature this is the river crossing at flood: committed, irreversible, and judged entirely by the far bank. The documentary admires the leap. The current will grade it."
+    ],
+    "check": [
+      "Check. The opposing king — that frail, indispensable elder — is flushed into the open for a moment, and the entire enemy ecosystem must drop its plans to attend him. Forcing behavior: the rarest privilege on the board, and the most easily wasted.",
+      "A check rings across the territory. The king shuffles, shields, or sidesteps; his herd reorganizes around the alarm. Each such alarm costs the defenders something. The skilled aggressor makes certain it costs more than the call itself.",
+      "Check — the king is touched by the wind of the hunt. Watch the defensive formation respond; in their haste to shelter the elder, herds occasionally trample their own structures. It is for exactly these stumbles that checks are given.",
+      "The king is checked. In this species' strange ecology, one animal alone is irreplaceable, and all strategy bends around his safety. To threaten him is to command the opponent's attention absolutely — a lever, provided there is something worth levering.",
+      "Check. A question posed in the game's only mandatory grammar — the defender must answer before all else. The documentary notes, from long observation: the value of the question lies entirely in what the answer leaves behind."
+    ],
+    "checkmate": [
+      "Checkmate. The elder is taken at last — every burrow sealed, every defender a square too far. The board falls silent, as the savannah does after the dust settles. The contest is over; the ecology of the final position will be studied by firelight.",
+      "And there it ends: checkmate. The mating net, woven thread by patient thread, closes with geometric finality. Note, in the last frame, how many pieces participated. The species kills by committee. It always has.",
+      "Checkmate — the one verdict in this ecosystem from which there is no migration. The defeated king stands among the wreckage of his herd; the victor's pieces hold their final formation like a pride at rest. The cameras linger. Endings deserve their footage.",
+      "The hunt concludes: checkmate. Whatever the season held — brilliance, blunder, famine, feast — it has resolved into this single, immovable arrangement of wood. The documentary's oldest observation applies: the final position never lies about how it was reached."
+    ],
+    "stalemate": [
+      "Stalemate. Extraordinary footage: the prey, cornered beyond all hope, has nowhere legal to step — and by the ecosystem's strangest by-law, this constitutes escape. Half the spoils to each. The hunting animal will not sleep well, and will count legal moves forever after.",
+      "A stalemate. The pursuing creature, moments from the kill, has sealed every exit — including, fatally, the ones the law requires to remain open. Nature's most ironic verdict: the perfect trap, sprung perfectly, releasing the prey. The archives file it under tuition.",
+      "Stalemate — the great escape of this species' rulebook, unchanged for centuries. The king, frozen and untouchable, divides the territory evenly with his astonished hunter. The lesson travels down the generations: when the prey has almost nothing, count the almost.",
+      "And the game ends in stalemate, that peculiar mercy. The dominant animal stares at the board the way the leopard stares at the empty branch. Half a point apiece. The documentary observes a moment of respectful, slightly amused silence."
+    ],
+    "castle_short": [
+      "The king castles short — retiring to the den behind a wall of three pawns, while the rook, that patient megafauna, lumbers into the open at last. One motion, two purposes. Evolution is rarely this tidy; the species treasures the exception.",
+      "Short castling. The elder is bedded down in the traditional shelter, and the tower takes the watch. Across all filmed history, the colonies that secure their king early outlive the ones that gamble him — not always, but at rates no actuary would ignore.",
+      "Our subject castles kingside. The most domestic behavior in the repertoire: the nest sealed, the sentry posted, the middlegame's storms now an architectural problem rather than a mortal one. The three pawns in front assume their lifetime appointment.",
+      "The king slips into his corner redoubt — castled, short side. Note the pawns before him: they are no longer pawns but masonry. Each one that wanders, the archives warn, takes a brick from the wall with it."
+    ],
+    "castle_long": [
+      "The king castles long — the far crossing, to the wilder side of the territory. A bolder den, draftier and grander, with the rook landing already at the heart of things. The species chooses this route when it intends not to weather the storm, but to be it.",
+      "Queenside castling. The elder takes the long road to a rougher shelter, and the entire ecosystem tilts toward aggression. If the two kings now winter on opposite wings, the season becomes a race — and races, the footage shows, are won by pawns that never pause.",
+      "Our subject castles long: ambition, recorded in a single move. The defensive arrangements are thinner on that coast, the offensive prospects richer. Nature makes such bargains constantly. She collects on them punctually, too.",
+      "The long castle. The king's caravan crosses three squares of open country to reach the far den — a journey his short-castling cousins never risk. In exchange: a rook on the central file from the first morning. Boldness, with paperwork."
+    ],
+    "promotion": [
+      "And here — the rarest migration completes. A pawn, smallest of the board's creatures, reaches the eighth rank and transforms. Where a grazer stood, an apex predator now turns in the light. The herd it left behind watches in silence. Every one of them carries the same possibility.",
+      "Promotion. The little one has crossed the entire territory — through ambush country, past the heavy fauna, one slow square at a time — and emerges crowned. No behavior in this ecosystem better repays patience. None is filmed less often.",
+      "A pawn promotes. The documentary pauses on this: eight ranks walked, no shortcuts available, none taken. In the wild we call it metamorphosis. On the board, the species calls it the reason pawns are never just pawns.",
+      "The transformation completes — pawn into queen, caterpillar into something with considerably more teeth. The board's whole food web reorganizes around the newcomer. The creature that escorted it across may permit itself one slow, well-earned breath."
+    ],
+    "en_passant": [
+      "En passant — among the rarest behaviors ever caught on film. The young pawn attempts the double-step past a watching rival, and the rival, invoking a law older than most nations, takes it mid-stride. The capture occurs on a square the prey never occupied. Nature is occasionally baroque.",
+      "An en passant capture. The fledgling pawn's sprint past the checkpoint, answered by the one rule written precisely for sprinting fledglings. Observers new to the species invariably protest. The species, serenely, plays on. The law is the law, and it is beautiful.",
+      "There — en passant, the ghost capture. A pawn taken in passing, as the heron takes the fish that believed the shadow was a reed. The documentary has waited whole seasons to film one. The crew is quietly thrilled."
+    ],
+    "leaving_theory": [
+      "And here the ancestral trails end. The last book move has been played; the maps roll up; the inherited wisdom waves from the treeline and goes home. From this square onward, both creatures are the first of their kind to stand exactly here. The documentary leans in.",
+      "The herds leave the known migration routes — theory is exhausted. What carried them this far was memory, the species' communal inheritance. What carries them now is whatever each animal actually understands. The difference is about to be filmed.",
+      "Out of book. The well-worn river crossing lies behind; ahead, unmarked country in every direction. It is worth noting that the species' most beautiful games all live out here, past the last signpost. So do most of its disasters. That is rather the point.",
+      "The recorded paths give out, mid-stride, as they always do. No ceremony marks the border — one move is scholarship, the next is wilderness. The creature that brought genuine understanding crosses without breaking step. The one that brought only memory is now lost, and does not yet know it."
+    ],
+    "enter_middlegame": [
+      "The middlegame opens — the long green season of the board. Every creature is deployed, every formation set, and the era of inherited behavior gives way to the era of intention. The herds now need what no instinct supplies: a plan, held to, through weather.",
+      "We enter the middlegame. The territory teems — pieces on every hillside, threats in every thicket, the pawn structure laying down the riverbeds that all later plans must follow. The species does its most complex living here. Also its most complex dying.",
+      "The opening's formalities conclude; the middlegame begins. Watch the pawn chains — they are the geology of the position now, deciding where the water flows, where the passes open, which side of the mountain gets the rain. Wise creatures read the rock before moving the herd.",
+      "Middlegame. The board reaches its maximum population and its maximum ambiguity in the same breath. From here, drift is the deadliest predator on the plains — it takes more games than any tactic, and leaves no marks on the film."
+    ],
+    "enter_endgame": [
+      "The endgame arrives — the board's dry season. The great predators are gone or going; the waterholes shrink to single squares; and the king, sheltered all his life, must now walk out and forage with the herd. In this season, the smallest creatures decide everything.",
+      "We cross into the endgame. The ecosystem, once teeming, is sparse and legible now — every pawn a protagonist, every tempo a meal. The species' elders insist this season rewards study above all others. The species' juveniles skip it above all others. The results are on file.",
+      "Endgame. The margins narrow to a knife's width: a single square, a single tempo, a single misremembered technique. The king emerges from the den, blinking, and discovers what the old films always show — that in winter, he was a fighting animal all along.",
+      "The long dry season begins. Material is scarce, precision is water, and the casual approximations of summer now carry mortal prices. The documentary's tone hushes accordingly. Out here, 'almost' is the most expensive word in the language."
+    ],
+    "queens_off": [
+      "The queens leave the board together — both apex predators, gone in a single exchange. The ecosystem exhales. Smaller dramas inherit the plains, and the king, his great enemy departed, may finally graze in the open. The era of sudden death yields to the era of slow truth.",
+      "A trade of queens. The two most violent forces in the territory have annihilated one another, as such forces tend to do. What remains is quieter and far more honest: structure, coordination, the long patient arithmetic of pawns. Many creatures relax here. The footage of them is instructive.",
+      "The queens are off. The board's weather changes from storm season to long, clear cold — fewer catastrophes, no concealment. Every weakness left in either camp now stands in plain daylight, awaiting visitors. The species calls this 'technique'. The savannah calls it winter.",
+      "Both queens depart, and a hush settles over the sixty-four squares. The mating attacks of high summer are no longer possible; conviction must now arrive by accumulation. Watch the kings — they sense it first, stepping from their dens with the cautious confidence of survivors."
+    ],
+    "turning_point": [
+      "There — the season turns. A single move, and the entire watershed of the game drains in a new direction. Such moments pass unmarked at full speed; only the slow film reveals the hinge. The creature that felt it happen holds an advantage no instrument measures.",
+      "A turning point, registered across every instrument in the station. The game that existed five minutes ago is extinct; its successor is being born in the same nest. The archives are firm on this: whoever mourns the old game longest, loses the new one.",
+      "The documentary marks this frame: the turning point. Before it, one story; after it, another. Nature provides no signage at her watersheds — the rivers simply, quietly, begin flowing the other way. Both creatures must now test which way the water runs.",
+      "And here the great pivot — filmed, timestamped, irreversible. Every long contest contains two or three such moments, and they are where the entire outcome actually lives. The remaining moves will be played in this one's shadow, whether the animals notice or not."
+    ],
+    "streak_good": [
+      "{n} accurate moves in unbroken sequence. The creature is in rhythm now — feeding, watching, deciding, each behavior flowing into the next without friction. Field researchers call it form. The footage simply calls it beautiful.",
+      "A run of {n} sound decisions. Note the economy of motion, the absence of panic, the threats checked as routinely as breathing. This is what the species looks like when its training and its temperament arrive at the same waterhole together.",
+      "{n} strong moves in succession — a streak, by the station's count. The wild offers one warning about such golden seasons: they end most often not by ambush, but by admiration. The creature that notices its own grace tends to trip on it.",
+      "{n} consecutive accurate moves. The herd moves as one organism; the eval has not flinched in living memory. Whatever private ritual produces this — the posture, the pace, the patience — deserves protection, like all rare and productive habitats.",
+      "The streak reaches {n}. Quietly, without trumpets, our subject is assembling the rarest footage in the genre: sustained, unspectacular excellence. The documentary's veterans know its market value. It is what championships are secretly made of."
+    ],
+    "streak_bad": [
+      "{n} stumbles in close succession. The creature is no longer reading the terrain; it is reliving the last fall, and the falls are compounding. The species has one reliable remedy, old as the plains: full stop. Fresh eyes. One safe step. Then another.",
+      "A troubled stretch — {n} errors running. The instruments call it tilt; the field calls it a stampede of one. In both dialects the prescription is identical: stop running. The cliff edge does not move. The running does all the work.",
+      "{n} consecutive missteps. Observe, with compassion, the mechanism: each error narrows the creature's vision, which invites the next error, which narrows it further. The spiral is not broken by brilliance. It is broken by one deliberately boring move, taken slowly.",
+      "The bad weather holds — {n} slips in a row. The position our subject is playing now exists chiefly in memory; the actual board has moved on. The first task of recovery, on every continent and in every game: return to the present terrain. It is the only one accepting moves.",
+      "{n} errors, nose to tail. The documentary withholds judgment; every animal in the archive has such a reel. What the survivors share is the next frame — the pause, the slow scan of the whole board, the modest move played with both feet on the ground."
+    ],
+    "hanging_piece": [
+      "Note the {piece} — separated from the herd, standing in open country with no defender in sight. On the savannah, this exact silhouette draws every predator within a day's travel. The board's geometry is already whispering. The creature has perhaps one move to hear it.",
+      "An undefended {piece}, grazing alone. The oldest law of this ecosystem is written for precisely this moment: loose pieces fall off. Not always at once — nature enjoys her suspense — but the ledger is kept, and the collectors are punctual.",
+      "Our subject's {piece} stands unguarded. Every combination in the species' long filmed history begins with this image: one animal alone, one line of sight, one mind across the board doing arithmetic. The remedy is a single tending move. The window for it is now.",
+      "There — the {piece}, exposed, defenders nowhere in frame. The documentary has filmed this scene a thousand times and the ending varies on only one detail: whether the owner noticed first, or the hunter did. The race is presently live.",
+      "A {piece} left in the open, unattended. In the hide, the crew shifts uneasily; they have seen the footage that follows. The position is not yet wounded — but it is advertising, and in this ecosystem, advertising is always answered."
+    ],
+    "comeback": [
+      "Against every instrument and most of the evidence, the creature returns. The position that was lost is lost no longer — recovered not by miracle but by the species' most underfilmed behavior: relentless, unglamorous problem-setting while the favored animal dozed on its lead.",
+      "A full recovery, from the edge of the territory's end. The opponent held the meal and savored it too long; our subject, refusing every invitation to despair, simply continued to exist expensively. The savannah keeps a special reel for such animals. It is the one the cubs are shown.",
+      "The comeback completes. Note the mechanism, for it is ancient: the winning creature relaxed, the losing creature did not, and the gap between those two postures — measured in nothing the station can graph — proved wider than the material ever was.",
+      "And the game, given up for dead by every sensor in the station, walks out of the tall grass alive. The documentary has one comment, made softly: in this species, 'lost' is a measurement. 'Finished' is a decision. They are frequently confused, and the confusion has a body count."
+    ],
+    "endgame_opposite_bishops": [
+      "Bishops of opposite colors — two long-sighted raptors, each bound by ancient law to its own half of the light, fated never to meet. With the board bare, their standoff breeds draws; with heavy fauna still afoot, the attacker's bird hunts unopposed. The season decides everything.",
+      "The opposite-bishop ending. Each prelate rules its own terrain absolutely and cannot so much as touch the other's — territorial division of almost poetic completeness. Material counts for little here; dominion is all. The defender builds on the safe color and waits for spring.",
+      "Opposite-colored bishops, nature's tidiest stalemate of spheres. The defending creature settles its blockade on squares the enemy bird can never strike, and becomes, within its fortress, untouchable. The attacker's only recorded remedy: a second front, opened where the fortress has no windows."
+    ],
+    "endgame_rook": [
+      "A rook endgame — the long, gray steppes of chess, the most documented terrain in the species' literature. The law of these plains has not changed in a century: the rook belongs behind the passing pawn, its own or the enemy's, and activity outranks material on every page of the field guide.",
+      "The rook ending. Folklore declares them all draws; the folklore was written, the archives suggest, by animals excusing their own passivity. The truth on film is colder: the active rook draws the lost ones and wins the equal ones. The passive rook merely attends.",
+      "Rook endgame. The two heavy megafauna patrol the open files while the kings — fighting animals now, in this late season — march for the center. Precision is the only fodder out here. Lucena and Philidor are not names anymore; they are watering holes, and the creature must know the way by dark.",
+      "The great gray plains of the rook endgame stretch ahead. Margins of a single tempo, prices on every square, half-points blowing across the grass like seed. The species' elders call this the truest test of technique. The documentary simply notes who keeps their rook busy, and films the consequences."
+    ]
+  },
+  "summary": {
+    "clean_win": [
+      "The season ends in complete triumph — territory held from first light to last, no crisis weathered because no crisis was permitted. The documentary notes what the highlight reels will not: dominance this quiet is not the absence of struggle, but its mastery. The creature winters well.",
+      "A wire-to-wire victory. The opposing ecosystem was never allowed a foothold — every raid anticipated, every waterhole defended before it was threatened. In the species' long archive, such games are rare and prized: the hunt that looks, on film, like a walk.",
+      "Victory, clean and entire. From the opening migration to the final arrangement of pieces, our subject governed every acre. The footage will appear unremarkable to the casual viewer. The trained eye sees forty quiet decisions, each made correctly, none of them lucky.",
+      "The contest concludes in unblemished triumph. No comeback was required because no collapse was offered. The documentary's oldest finding, confirmed once more: in this species, the most dominant performances are the most silent. The lion at rest is the lion that planned."
+    ],
+    "slipped_win": [
+      "The cruelest footage in the genre: the prey caught, the season won — and then released, one careless move at a time. The creature that built the winning position was magnificent. The creature that held it grew comfortable, and comfort, on these plains, is the only predator that hunts the victorious.",
+      "A winning season, surrendered in its final weeks. The archives are unsentimental about the mechanism: the vigilance that earned the advantage was retired before the advantage was banked. The species relearns this in every generation, almost always exactly once. Tonight was the once.",
+      "Victory stood grazing within reach, and wandered off while the creature admired it. The documentary does not flinch: this is the most instructive reel of the year. Building the win was skill. Keeping wins is a separate organ, and it grows only from nights like this.",
+      "The win slipped beneath the surface in the last hour, as wins do when the winner stops swimming. A hard reel to watch. Yet the field notes end on their stubborn, recurring observation: the animals that lose a won game and study it become, almost without exception, the animals that stop losing them."
+    ],
+    "hard_fought_draw": [
+      "The contest ends as it deserved to — shared, half the territory to each, both creatures spent and neither broken. The casual viewer sees no winner. The field researcher sees two animals that tested each other to the seam and held. Some seasons, that is the whole truth, and it is enough.",
+      "A draw, earned in full by both ecosystems. Attack was met by defense, pressure by patience, and the final ledger refused to choose. The documentary holds these reels in quiet esteem: nature's contests do not owe us conclusions, and the honest stalemates teach more than the lopsided hunts.",
+      "Half the spoils to each, after a long and honorable struggle. Note, in the late footage, the defensive precision under threat — the least glamorous behavior in the repertoire and the most predictive of long survival. Both creatures leave this valley harder to kill than they entered it.",
+      "The season closes level. Every advantage briefly held was answered; every crisis briefly suffered was survived. The herds separate at dusk, watchful and intact. Somewhere in both minds, the same thought the species always carries away from such battles: next migration, we meet again."
+    ],
+    "loss": [
+      "The season ends in defeat. The territory passes to the rival, and the cameras do not look away — the documentary owes its subjects honesty above comfort. But the field notes close with their oldest entry: the defeated animal that studies its own footage returns measurably harder to beat.",
+      "A loss, complete and uncontested. The savannah files it without sentiment, as it files everything. Yet the record shows a peculiar inheritance: this species converts defeat into structure better than any other behavior it performs — provided the defeat is examined rather than buried.",
+      "Defeat. The herd withdraws, lighter and quieter, to winter quarters. The narrator offers the archive's one consolation, which is not small: somewhere in tonight's reel is the exact frame where the season turned, and the creature that finds that frame owns the next season already.",
+      "The game is lost; the rival's pieces hold the field at dusk. Nature does not console. What the documentary can do is testify: every dominant animal in forty years of footage carries old defeats in its gait — not as wounds, but as load-bearing structure. The sorting is tomorrow's work."
+    ]
+  },
+  "practice": {
+    "loading_first": [
+      "We return now to the season's difficult moments — the review, the species' most quietly heroic ritual. The first error is being retrieved from the archive. Most animals never look back at their own footage. The ones that do are the ones the documentaries end up being about.",
+      "The training ground opens. Our subject has chosen to re-enter its own mistakes — voluntarily, in good light, with fresh eyes. In the wild, this behavior has no name, because in the wild it does not occur. It is the species' rarest adaptation, and its most profitable.",
+      "The first exercise is prepared: a moment from the creature's own past, reconstructed leaf for leaf. The premise of all rehabilitation, on every continent: the trap that is studied in daylight loses its teeth by night.",
+      "The review session begins. The juvenile — for in this enclosure, every animal is a juvenile again — will face the season's errors one at a time. The crew has filmed many such sessions. The before-and-after footage remains the most persuasive evidence this genre owns."
+    ],
+    "prompt_find_better": [
+      "The scene is restored: here, in the live season, our subject played {move} — classified {label} by the station. The better behavior existed then and exists now, unchanged, waiting in the same grass. We watch, in no hurry, to see whether the creature finds it on the second encounter.",
+      "An exercise from the archive: the position where {move} was chosen, and graded {label}. The terrain is identical; only the animal has aged. The documentary's quiet hypothesis — that the creature now sees what it once walked past — will be tested presently.",
+      "Here the film is rewound. {move}, marked {label}, was the road taken. Every other road still branches from this same clearing, exactly as it did. In the enclosure there are no clocks and no predators. There is only the question, asked again, more kindly.",
+      "The station presents the old crossroads: {move}, judged {label} at the time. In nature, second chances at the identical moment do not exist — which is precisely why the species built this enclosure. The cameras settle. The creature studies the ground.",
+      "Once more, the scene of the stumble: {move}, recorded as {label}. The observer notes what the creature cannot — that it is being watched by its own future self, who already knows the answer and is rooting, silently, from tomorrow."
+    ],
+    "correct_continue": [
+      "And there — the correct behavior, found on the second encounter. The same eyes, the same terrain, a different outcome. The difference was never vision; it was time and stillness. The lesson transfers to the wild at known rates. The next exercise is prepared.",
+      "Correct. The creature locates the move its game-self walked past, and the pattern migrates from the world into the animal — where patterns, once settled, hunt on their owner's behalf forever. The session continues.",
+      "The right square, the right idea, confirmed by the station. Note the calm in the choosing — the enclosure teaches what the savannah charges for. One more pattern joins the permanent herd. Onward.",
+      "Found. The behavior that hid in plain sight during the storm reveals itself readily in fair weather — which tells the documentary everything: the knowledge was always aboard. Only the conditions were missing. Conditions are trainable. Next."
+    ],
+    "correct_final": [
+      "And with that, the final error of the season is faced and corrected. Every stumble from the old footage has been re-walked in daylight, and the re-walking changes the animal — the archives are unambiguous. The next season is already gathering, and it will meet a different creature.",
+      "The last exercise resolves. The full set — every mistake the season produced, revisited and overturned. In forty years of filming, the narrator has seen perhaps a handful of subjects complete the entire ritual. The documentary notes, for the record, the quiet pride in the hide tonight.",
+      "Correct — and the archive is clear. The season's every error has been processed into pattern, the species' strange alchemy performed in full. The juvenile designation is hereby retired for the evening. The creature that leaves this enclosure is the one its opponents have not met yet.",
+      "The final position falls, and the review concludes complete. What the creature carries out of the enclosure cannot be seen on camera: a season's mistakes, converted to load-bearing structure. The savannah will test the renovations soon enough. The crew, packing the lenses, likes its chances."
+    ],
+    "close_try_again": [
+      "Close — the right idea stirs in the grass, but the order of operations betrays it. In this species' hunts, sequence is everything: the same strikes, differently arranged, feed or famish. The creature circles. The cameras wait.",
+      "Nearly. The instinct found the correct territory and knocked at the wrong burrow. The missing detail is almost always a defender, miscounted in the excitement — the oldest census error in the ecosystem. The creature counts again.",
+      "Not yet — though the attempt passed close enough to ruffle the answer's feathers. The enclosure imposes no penalty for circling; circling is how raptors fix a position. Another pass.",
+      "A near miss. The documentary observes without anxiety: in rehabilitation, the almost-correct attempt is the most fertile behavior on film — it means the pattern is assembling, sinew by sinew. One more approach.",
+      "Attempt {attempts}, and each orbit tighter than the last. The field notes call this convergence, and trust it completely. The answer's territory shrinks with every pass. The creature, to its credit, does not stop flying."
+    ],
+    "after_hint": [
+      "A signal from the research station — a scent laid gently across the trail. Guided foraging, the field calls it, and every successful species accepts it without shame. The final pounce, as always, must belong to the animal alone. That pounce is where the learning lives.",
+      "The hint is released into the enclosure. Note that it does not solve; it points. The distance between pointed-at and caught remains the creature's own to close — and closing it, the archives insist, stores the pattern twice as deep as being handed the meal.",
+      "Assistance arrives from the station, as it arrives in the wild from older members of the troop: a direction, not a delivery. The juvenile orients. The crew, who have watched a thousand such moments, lean almost imperceptibly toward the glass.",
+      "A nudge from the observers — sanctioned, recorded, and entirely honorable. The species that survives is not the one that refuses help; it is the one that finishes what the help began. The finishing now proceeds."
+    ],
+    "streak_praise": [
+      "Exercise after exercise falls, in unbroken sequence. The patterns are no longer being searched for; they are being recognized — the great phase change of all training, occurring live before the lenses. The crew keeps very still, as one does around feeding.",
+      "Another correct solution, immediately upon the last. The juvenile is in full stride now — the hesitation of the early session gone, replaced by something the instruments log as speed and the field recognizes as fluency. The reel is becoming highlight footage.",
+      "The streak extends. Solutions arrive faster than the station can phrase its congratulations, which the station, being the station, was not going to phrase anyway. The documentary will say it instead, in a whisper: this is what improvement looks like at twenty-four frames per second.",
+      "Solved, and solved, and solved again. Somewhere between the first exercise and this one, the enclosure stopped testing the creature and started confirming it. The oldest reward in the genre, filmed once more: the moment the trained behavior becomes, simply, behavior."
+    ]
+  }
+}

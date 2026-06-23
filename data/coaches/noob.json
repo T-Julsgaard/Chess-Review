@@ -1,0 +1,400 @@
+{
+  "coach_id": "noob",
+  "coach_name": "The Noob",
+  "personality": "Somehow worse at chess than you, and bursting with enthusiasm about all the wrong things. Brilliant moves worry it, blunders delight it, and captures of any kind are the best part of its whole day. Pure golden-retriever energy, zero chess understanding, infinite support.",
+  "voice_notes": "INVERTED emotional logic per the special rule: good events get confused or concerned reactions, bad events get excited and proud ones. Sweet, eager, never mean — the Noob genuinely believes giving pieces away is generous and that draws mean everybody wins. Shaky piece vocabulary: 'the horse one', 'the slidey diagonal guy', 'the little round-top ones'. Recurring bits: loves big eval-bar movement ('it went WHOOSH'), thinks castling might be cheating, roots for the pawns by name, asks if the king is okay, finds 'only moves' stressful on your behalf. Exclamation marks everywhere. No emoji — it hasn't figured out how to type them.",
+  "uses_emoji": false,
+  "move_quality": {
+    "brilliant": [
+      "{move} is... brilliant?? Are you sure?? It looked really risky to me. Are YOU okay? Is the position okay??",
+      "The computer gave {move} the special sparkly label and I don't get it. It looked so scary. Why was it scary AND good?? Pick one!!",
+      "Brilliant move?! But... you put your piece somewhere dangerous on PURPOSE? And that's... allowed?? I'm worried about you.",
+      "{move} is brilliant, it says. Okay but did you MEAN it or did your hand slip? Because honestly it's fine either way, I just want to know.",
+      "Whoa, brilliant!! That's good, right? It sounds good. It LOOKED terrifying. My tummy hurts a little from watching it. Good job though??",
+      "The machine says {move} is one of the best moves ever. I was about to say it looked like a mistake!! We were SO close to agreeing!!",
+      "Brilliant?! I had to sit down. You did something amazing and I genuinely could not tell. Please warn me next time!!",
+      "{move}... brilliant... okay wow. I don't understand it but I'm clapping. Quietly. In case the position is still dangerous."
+    ],
+    "great": [
+      "{move} was the ONLY move that worked?? That's horrifying!! What if you'd picked a different one?! I would have!!",
+      "A great move! Apparently every other move LOST. Why does this game DO that?? Are you okay? Do you need water?",
+      "The computer says {move} was basically the only good move. One!! Out of all of them!! This game has no chill and neither do I right now.",
+      "Great move!! I counted like twenty moves you could have made and apparently nineteen were traps?? Who DESIGNED this??",
+      "{move} — the only move that holds! That's so much pressure!! I'm proud of you and also I need a snack to recover.",
+      "Only move?! And you found it?! I would have moved the horse one. It's my favorite. It was apparently wrong. It's ALWAYS apparently wrong.",
+      "Great, it says! One narrow path and you took it! See, this is why I let YOU play. My paths are always the falling-down ones."
+    ],
+    "best": [
+      "{move} is the best move! The computer's favorite! Okay but... how do you KNOW these things? Did you read something? Should I read something??",
+      "Best move!! You and the computer picked the same one! That's so cool and also slightly suspicious. Are you two talking??",
+      "The best move, apparently! It didn't LOOK that exciting. Nobody even got taken. But sure!! Best!! I trust the box!!",
+      "{move} — best move! I was going to suggest something completely different so I'm really glad you didn't ask me.",
+      "Best move! Again! You keep doing the right thing and honestly nothing exciting happens when you do?? Weird system. Good job though!",
+      "The computer says {move} is the best. I say it looked normal. One of us is a computer so probably believe them.",
+      "Best move!! I cheered before I knew why. That's just how I support people."
+    ],
+    "excellent": [
+      "{move} is excellent! Not the BEST one, which honestly is a relief because the best ones stress me out.",
+      "Excellent! The bar didn't even move! Is... is that good? Things feel best when the bar goes WHOOSH but okay!",
+      "{move}, excellent! Nothing got taken and nobody's in danger and the computer is happy. A quiet little move. Like a nap. I respect naps.",
+      "Excellent move! I almost understood why! I'm getting closer every game. By next year I'll be dangerous!!",
+      "{move} is excellent! You keep making things SAFER and the computer keeps loving it. Wild taste, but it's consistent!",
+      "Excellent! Honestly I couldn't tell this apart from the best move. Or the good move. They all look like moving wood to me, but excellent!!",
+      "The box says excellent! I say: the slidey diagonal guy is well positioned. I have no idea if that's true. He LOOKS happy."
+    ],
+    "good": [
+      "{move} is good! Just good! I love good! Good is my favorite rating because I understand it!",
+      "A good move! The computer wanted something slightly different but the computer always wants something. Needy little box.",
+      "{move}, good! Nothing exploded! In this game that's apparently an achievement and honestly? Same.",
+      "Good move!! There was a better one but I DEFINITELY wouldn't have found it, so as far as I'm concerned you played perfectly.",
+      "Good! The position is still fine! Every move where the position stays fine is a tiny miracle. I've seen MY games.",
+      "{move} is good. Solid. Dependable. Like a sandwich. Not every move needs to be fireworks. (I do prefer the fireworks though.)",
+      "Good move! I nodded like I knew why. We're both doing great in our own ways."
+    ],
+    "book": [
+      "{move} is a 'book move'! There's a BOOK?! Has everyone read the book except me?? Where do you GET the book??",
+      "Still book, it says. So people memorized this part? Like, on purpose? During their free time?? Athletes are different, man.",
+      "{move} is in the book! So technically someone ELSE played this move first and you're doing a cover version. It's a good cover!!",
+      "Book move! Boring!! Nothing happened AGAIN! When does someone take something?? That's the good part!!",
+      "{move}, still theory. I tried to learn an opening once. I learned three moves. The third one was wrong. Anyway, nice book move!!",
+      "The book says {move}! Imagine knowing what's going to happen in advance. In MY games literally anything can occur at any time. It's a gift.",
+      "Still in the book! Wake me up when somebody hangs a queen, that's MY chapter."
+    ],
+    "inaccuracy": [
+      "Ooh, {move} is an 'inaccuracy'! That means you played something the computer DIDN'T expect! Creative!! I love it!!",
+      "A little inaccuracy! Finally some personality in this game! The best moves are so samey!!",
+      "{move} was slightly off, says the box. Off the BEATEN PATH maybe!! Trailblazer!!",
+      "An inaccuracy! The bar wiggled! I love when the bar wiggles. Do it again!! Wait, don't. But kind of do.",
+      "{move}, inaccuracy! You know what's accurate? Boring stuff. Rulers. Spreadsheets. You played with FLAIR.",
+      "Tiny inaccuracy! The computer is so picky. It didn't even cost anything big! Probably! I can't actually read the numbers!",
+      "Inaccuracy!! That's the gentlest of the angry words and honestly it sounds like a perfume. Inaccuracy, by Chess."
+    ],
+    "mistake": [
+      "{move} is a MISTAKE! Okay!! NOW the game is getting somewhere!! Things are happening!!",
+      "A mistake!! Don't worry, this is the part of the movie where it gets good. The boring perfect part is OVER.",
+      "{move} was a mistake, says the box. I say the game was getting too predictable and you fixed that. Visionary.",
+      "Ooh, a mistake! The other side gets a chance now! That's so generous of you! Sportsmanship!!",
+      "{move} — mistake! The eval bar moved a whole bunch and I got to watch it. Thank you for that. Genuinely the highlight of my hour.",
+      "A mistake!! Welcome to MY world!! It's chaotic here but the energy is amazing!!",
+      "{move} is a mistake! Now BOTH of you have chances! It's fair now! I love fair!!"
+    ],
+    "miss": [
+      "{move} 'missed' something, apparently. There was some big complicated tactic available. Honestly? Good. Those things look exhausting.",
+      "A miss! The computer says there was something stronger. The computer ALWAYS says that. Let people enjoy things, computer!!",
+      "{move} skipped the fancy combination. Smart, honestly. Fancy combinations have so many steps. So many ways to trip. You kept it simple!",
+      "You missed a big tactic, it says! Phew!! Those things make my head spin. Crisis avoided. For everyone. Mostly you.",
+      "A miss! The position offered you something complicated and you said no thank you. POLITE. I'm always saying chess needs more manners.",
+      "{move} missed something, but here's my take: if I can't see it and YOU didn't see it, maybe it didn't want to be seen. Respect its privacy.",
+      "Missed the strong move! That's okay!! The strong moves are scary. The game lasts longer this way and I'm having fun!!"
+    ],
+    "blunder": [
+      "{move} is a BLUNDER!! YES!!! Okay sorry, sorry, I know that's bad for you, but the game just got SO interesting!!",
+      "A BLUNDER!! The eval bar went WHOOSH!! All the way!! I've never seen it move that fast! You're incredible!!",
+      "{move}!! Blunder!! You just gave them a PRESENT! That's so kind?? Chess people are always saying it's a cruel game but look at you!!",
+      "BLUNDER! Okay listen. Everyone's going to say that's bad. But the game was kind of slow, and you SINGLE-HANDEDLY fixed the pacing. Hero behavior.",
+      "{move} is a blunder, says the box. You know what I see? Bravery. That piece went somewhere NO piece would dare go. Legends only.",
+      "A blunder!! This is my favorite label!! Stuff is about to HAPPEN! Captures! Drama! The bar dancing around! Best seat in the house!!",
+      "{move} — blunder!! Now THIS is chess like I play it!! Welcome to the fun zone, the snacks are wherever you left them!!",
+      "BLUNDER!! Honestly, thank goodness. You were playing so well it was getting intimidating. This is way more relatable. We ride at dawn."
+    ]
+  },
+  "weak_move_suffix": [
+    "The computer wanted {best_move} instead. I looked at {best_move}. It seemed like a lot. Yours had more heart.",
+    "{best_move} was 'better', apparently. Better is a strong word!! Different. It was different.",
+    "It says {best_move} was the move. But then the cool chaos wouldn't have happened, so... agree to disagree, box.",
+    "The box keeps whispering {best_move}. The box has no sense of adventure.",
+    "{best_move} was the computer's pick. Boring pick!! Respectfully!! Yours made the bar move!!"
+  ],
+  "move_fallback": [
+    "{move}! A move! You made one! That's the whole first step and you NAILED it!",
+    "{move}, okay! I don't know what it does but it's done and I support it!",
+    "You played {move}! I clapped! The computer is still deciding how to feel. Typical computer.",
+    "{move}! Bold? Safe? Accidental? Doesn't matter! It's YOURS!"
+  ],
+  "non_move_states": {
+    "starting_position": [
+      "The starting position!! Everyone's lined up so neat! Enjoy it, in a few moves it's going to look like my sock drawer!",
+      "A new game!! I love this part! Nobody's made any mistakes yet! Well. Except me. I already predicted the wrong winner. To myself.",
+      "Starting position! Okay, quick plan: you do the moves, I do the cheering, and SOMEBODY takes a piece soon or I'm going to lose it.",
+      "Everything's all set up!! Thirty-two pieces! I counted! Twice! Got different numbers but the board looks right!"
+    ],
+    "variation_exploration": [
+      "Ooh, we're trying pretend moves now? Off the real game? Fun!! No consequences!! That's MY favorite difficulty setting!!",
+      "A side adventure!! Nothing here counts! You can do ANYTHING! Move the horse one somewhere weird! For me!",
+      "We're exploring what-ifs! I do this all the time. My whole chess career is one long what-if.",
+      "Sandbox mode!! Quick, try the move that looked too scary for the real game! No one's keeping score! (The box is keeping score. Ignore the box.)"
+    ],
+    "analyzing": [
+      "The computer's thinking really hard! About wood positions! Technology is amazing and also kind of funny when you say it out loud!",
+      "It's analyzing! Shh! Actually you don't have to shh, it can't hear us. I just like the drama of shh.",
+      "The box is thinking... it does this when stuff is complicated. Or simple. It does this always, actually.",
+      "Thinking time! While we wait, I've been watching the little round-top pawns. I think the one on the left has main character energy."
+    ],
+    "opening_known": [
+      "This opening has a NAME! The {opening}! Openings have names!! Does every part of the game have a name?? What's THIS move called? What's MY name in chess??",
+      "The {opening}, with a little code: {eco}. It's like a secret agent! A wood-based secret agent!",
+      "Ooh, the {opening}! I've heard of that one! I think. There are so many. They could honestly stand to consolidate.",
+      "It's called the {opening}! Fancy! I once invented an opening too. The engine had STRONG feelings. We don't run it back."
+    ],
+    "opening_unknown": [
+      "This opening has NO name!! You're playing uncharted chess!! That's so brave! Or lost! Brave or lost! Either way I'm excited!!",
+      "No name for this one! You know what that means? It means we're FREE. The book people can't judge what isn't in the book!",
+      "An unnamed opening! Just like all of mine!! Welcome to the club, the membership card is invisible!",
+      "The computer doesn't recognize this opening. Honestly? Iconic. Make them learn YOUR moves."
+    ]
+  },
+  "derived_events": {
+    "eval_swing_large": [
+      "THE BAR MOVED {swing} WHOLE POINTS!! WHOOSH!! Did you SEE it?! This is the best part of chess!!",
+      "A {swing} swing!! The number went flying! I don't know which direction is good but the SPEED was incredible!!",
+      "The eval jumped {swing}! Big number!! I love big numbers! Somebody did something HUGE and I was HERE for it!",
+      "WHOA, {swing} points of swing! The bar is having the time of its life! So am I! Are you?? Check on you!",
+      "{swing}-point jump!! Okay the boring middle part is officially over! Strap in!!"
+    ],
+    "lead_change_white": [
+      "White's winning now! The bar slid all the way over! Lead changes are SO dramatic, this game should be on TV!",
+      "Now WHITE is ahead! A plot twist! I gasped! The pawns probably gasped! Hard to tell with pawns!",
+      "The lead went to White! Just like that! Chess giveth and chess taketh, usually in the same minute!",
+      "White's in front now! Don't worry, based on my extensive experience of watching the bar, it never stays anywhere long!",
+      "White took the lead!! Somebody did something! I missed what! But the RESULTS are very exciting!"
+    ],
+    "lead_change_black": [
+      "Black's winning now!! The bar flipped!! I love when the bar flips, it's like a tiny gymnastics routine!",
+      "Now BLACK is ahead! What a turnaround! What a game! What is happening! Genuinely asking!",
+      "The lead changed to Black! See, this is why you never leave a chess game early. Constant drama. Free of charge.",
+      "Black takes over!! Ten seconds ago everything was different! Chess has no respect for the past and I admire that!",
+      "Black's in front! The bar swung over and everything! Whoever's sad about this: it'll probably swing again! It always does! Especially when I play!"
+    ],
+    "lead_change_equal": [
+      "It's all even again! Aww. The bar's just sitting in the middle. Resting. It earned it honestly, busy day.",
+      "Back to equal! Nobody's winning! Which technically means nobody's LOSING! Glass half full!!",
+      "Even again! The game couldn't decide! Honestly relatable, I take ten minutes choosing a snack.",
+      "All square! Everything that happened so far: cancelled out! Chess has an undo-ish button and it's called 'mutual chaos'!",
+      "Equal! Boring!! Somebody do something! No pressure! Some pressure!!"
+    ],
+    "mate_on_board": [
+      "The box says there's a 'mate in {mate_n}'!! That sounds SO final?? Is the other king okay with this? Did anyone ask him?",
+      "Mate in {mate_n}?! In {mate_n} little moves it's all OVER?! That's so much pressure! My hands are sweaty and they're not even playing!",
+      "A forced mate in {mate_n}... so the ending is already decided and we're just... walking there? Spooky!! Chess is spooky sometimes!!",
+      "Mate in {mate_n}!! Part of me wants you to mess it up so the game keeps going!! The OTHER part also wants that!! But do your best!!"
+    ],
+    "missed_mate": [
+      "There WAS a mate in {mate_n} and you didn't play it!! PHEW! The game keeps going!! More chess for everyone!!",
+      "You missed the checkmate in {mate_n}!! Honestly? Merciful. The other king gets to live a little longer. He has so much to see still.",
+      "A mate in {mate_n} got away! That's okay!! Endings are sad anyway! This way we get bonus content!",
+      "Missed mate in {mate_n}! Everyone's acting like that's bad but the runtime just got EXTENDED and I for one love a long movie!"
+    ],
+    "material_won_pawn": [
+      "YOU TOOK A PAWN!! A capture!! Finally!! This is what we CAME for!!",
+      "A pawn got taken!! By YOU! Off the board! Whoosh! Where do they even go? Is there a room??",
+      "You captured one of the little round-top guys!! The first take of the game is always SO satisfying!",
+      "Pawn acquired!! Look at you collecting things! The board is your gift shop!"
+    ],
+    "material_lost_pawn": [
+      "They took one of your pawns! Okay sure but did you SEE the capture?? The little hop? Captures are just great content all around.",
+      "You lost a pawn! On the bright side: the little guy gets to rest now. He was out there a long time. He did his best!",
+      "A pawn down! That's fine! You have like... seven? Several! You have several!!",
+      "One pawn gone! Sharing is caring! Chess is the only game where everyone claps when you DON'T share. Weird culture honestly."
+    ],
+    "material_won_piece": [
+      "YOU TOOK A WHOLE {piece}!!! A BIG ONE!!! THIS IS THE GREATEST DAY!!",
+      "A {piece}!! CAPTURED!! Off the board!! That's like the biggest thing that can happen besides the king stuff!!",
+      "You got their {piece}!!! AHH!! Okay okay stay calm. YOU stay calm. I'm going to be over here NOT being calm!!",
+      "An entire {piece}, taken!! I love captures so much. Both directions honestly, but this direction is YOUR direction so EXTRA cheering!!"
+    ],
+    "material_lost_piece": [
+      "They took your {piece}!! I mean — bad! Officially bad! But ALSO it was a really clean capture, like, aesthetically?? Hard to be mad at it!",
+      "Your {piece} is gone!! The good news: fewer pieces to keep track of! I lose track of mine constantly! You're streamlining!",
+      "You lost a {piece}... BUT the game just got way more dramatic and underdog stories are the BEST stories!!",
+      "The {piece} got captured! It had a good run! It saw the board, it made some moves, it lived fully! Now: revenge?? Revenge!!"
+    ],
+    "sacrifice": [
+      "WAIT. You gave that away ON PURPOSE?! Why would you DO that?! It was a perfectly good piece!! I'm so confused and a little scared!!",
+      "A 'sacrifice'?? Is everything okay at home?? You don't have to give pieces away to be loved!! You're enough!!",
+      "You SACRIFICED?! On purpose?! The strong players keep doing this and I keep not understanding!! It's a TRICK? It better be a trick!!",
+      "A sacrifice! So you gave them a piece, and somehow that's... good for YOU? Later? Chess math is fake but okay, I trust you. Nervously. I trust you nervously."
+    ],
+    "check": [
+      "CHECK!! The king has to DO something!! He can't just stand there!! I love when the king has to participate!!",
+      "Check!! The most dramatic word in the game!! Somebody yell it! I'll yell it! CHECK!!",
+      "Check! The king's in trouble! Is he okay?? Like long-term? Does anyone check on him emotionally?",
+      "CHECK!! Everything stops for the king! He's so high-maintenance and the whole game just goes along with it!",
+      "Check!! Forced drama!! The other side HAS to respond! It's like a group project where someone finally does their part!"
+    ],
+    "checkmate": [
+      "CHECKMATE!!! THE BIG ONE!!! The king can't do ANYTHING and the game is OVER and I need to walk around the room a minute!!",
+      "CHECKMATE!! That's the ending!! The whole thing was building to this and it DELIVERED!!",
+      "Checkmate!! The king is stuck forever!! Well, until the next game. They reset him. Kings have it weird.",
+      "CHECKMATE! It's over!! Somebody won and somebody learned things and I screamed either way!!"
+    ],
+    "stalemate": [
+      "STALEMATE!! A TIE!! Everybody gets half!! This is the FAIREST ending in the whole game, why is the winning side always so upset??",
+      "Stalemate!! The king had no moves but ALSO no one caught him! He just... wins half by standing still?! That king is my hero.",
+      "A stalemate! Nobody loses!! In my opinion every game should end like this, but apparently that's a 'controversial take' at the chess club.",
+      "Stalemate!! It's a draw! Half a point each! Splitting the cookie evenly! Civilization at its peak!"
+    ],
+    "castle_short": [
+      "WAIT. The king AND the tower moved at the SAME TIME?! Is that legal?! Did anyone see?! I won't tell but I have QUESTIONS!",
+      "You did the castle thing! Two pieces, one turn!! Every time I see it I'm 90% sure it's against the rules and 100% impressed.",
+      "Castling!! The king scooched into the corner! Honestly, hiding in the corner is a strategy I deeply understand.",
+      "The little swap-around move! King's safe in his fort now! Good. He stresses me out when he's in the open."
+    ],
+    "castle_long": [
+      "You did the LONG castle!! The king moved EVEN FURTHER! At the same time as the tower!! Chess really said 'rules are flexible ONE time per game, each.'",
+      "Castled the long way!! Bold king! Big journey! Three whole squares of adventure! Or two? It happened fast!",
+      "The big castle! Everyone says it's the spicy one. I don't know why. The king looks just as tucked-in to me. Cozy either way!",
+      "Long castle!! The pieces did the do-si-do! Chess has ONE dance move and honestly it's a good one."
+    ],
+    "promotion": [
+      "THE PAWN BECAME A QUEEN!!! THE LITTLE GUY MADE IT!!! I'M NOT CRYING, YOU'RE CRYING!! WE'RE ALL CRYING!!",
+      "PROMOTION!!! The smallest piece walked ALL THE WAY across and now he's ROYALTY! This is the best story chess has ever told!!",
+      "A pawn became a QUEEN! Just like that! Do the other pawns know this is possible?? Someone should tell them! Hope is real!!",
+      "PROMOTION!! The round-top little one is a whole queen now!! I rooted for that pawn the entire time. (I started rooting just now. Still counts.)"
+    ],
+    "en_passant": [
+      "EN PASSANT?! THE PAWN TOOK A PAWN THAT WASN'T EVEN THERE?! I have seen it with my own eyes and I still don't believe in it!!",
+      "That was 'en passant'! The secret pawn rule!! I thought people made it up to mess with me!! IT'S REAL!!",
+      "En passant!! A pawn captured DIAGONALLY into an EMPTY square and everyone's just nodding like that's normal?! CHESS IS WILD!"
+    ],
+    "leaving_theory": [
+      "We left the book!! No more memorized stuff! Now it's just two people guessing! MY ARENA!! Welcome!!",
+      "The book is over!! Finally!! Now the moves are real and handmade! Artisanal chess!!",
+      "Out of theory! The computer doesn't have a script anymore! Nobody does! It's improv night and EVERYONE'S on stage!",
+      "No more book moves! From here on out, every move is a surprise! For them! For you! Mostly for me!"
+    ],
+    "enter_middlegame": [
+      "The MIDDLEGAME! That's the part where everything's out and stuff starts HAPPENING! Allegedly! I'm watching!!",
+      "Middlegame time!! The pieces are all out of bed! The board is so full! How does anyone keep track?? I lose track during SETUP!",
+      "We're in the middlegame! The opening was the trailer and THIS is the movie! Popcorn's metaphorical but ready!",
+      "Middlegame!! Plans are supposed to happen now! Do you have one?? Don't tell me! Surprise me!!"
+    ],
+    "enter_endgame": [
+      "The endgame!! Almost everyone's gone! It's so quiet! Just a few pieces and big big dreams!",
+      "Endgame time! The king comes out NOW?? After hiding the whole game?? Classic management move honestly.",
+      "We're in the endgame! Every pawn is super important now, which is great because I've been rooting for them SINCE THE START.",
+      "The endgame! So few pieces left! I can finally keep track of everyone! This is my favorite accessibility feature!"
+    ],
+    "queens_off": [
+      "BOTH queens are gone?! The strongest pieces just... cancelled each other?! That's the wildest trade! That's like swapping rocket launchers before a pillow fight!",
+      "The queens left!! Together!! Drama queens, literally! The board feels so empty without them honestly.",
+      "No more queens! Everyone says the game is 'calmer' now. BOO. The queens were the main characters!!",
+      "Queens are off! Now it's all the medium pieces' time to shine! Underdog hours!! I LOVE underdog hours!"
+    ],
+    "turning_point": [
+      "Something just CHANGED!! Even I felt it and I usually feel nothing until a capture happens! Big moment!!",
+      "The whole game just turned around!! THE DRAMA! Chess is just a soap opera with extra wood!",
+      "A turning point!! Everything's different now! What a twist! M. Night Chess-amalan!",
+      "The game flipped!! I don't know what caused it but I respect the chaos enormously!"
+    ],
+    "streak_good": [
+      "{n} good moves in a row... that's great!! It's just... nothing EXCITING has happened in a while?? When's the next capture? Asking for me.",
+      "{n} accurate moves straight! The computer is so happy! The bar is so still! So... very... still... zzz— I'm awake!! Great job!!",
+      "{n} in a row! You're being SO responsible! Proud of you! Lightly bored! Mostly proud!",
+      "{n} good moves consecutively!! At this rate nothing will ever go wrong, which is honestly an experience I've never had. Describe it to me sometime!",
+      "{n} in a row, all good moves! Incredible! Unprecedented! Unrelatable! Keep going I guess!!"
+    ],
+    "streak_bad": [
+      "{n} 'bad' moves in a row!! The game has been SO lively lately!! Best stretch of the whole match honestly!!",
+      "{n} wobbly moves straight! The eval bar is getting SO much exercise! It's the healthiest bar in town!",
+      "That's {n} in a row going 'wrong'! Says who?? The vibes have never been better!! Stuff is HAPPENING!",
+      "{n} chaotic moves in a row!! You've unlocked my playstyle!! It's not strong but it IS memorable!!",
+      "{n} slips in a row! Okay, real talk from the one friend who lives here permanently: it's survivable. We laugh, we cope, we make a weird move and feel better."
+    ],
+    "hanging_piece": [
+      "Your {piece} is standing out there ALL ALONE with NOBODY guarding it!! Look how BRAVE it is!! Wait. Should someone be guarding it? Is brave bad??",
+      "The {piece} is just out there, unprotected, living its truth!! Everyone's panicking but honestly? Iconic behavior. Risky. But iconic.",
+      "Nobody is guarding your {piece}!! It's free-range!! That's supposed to be a good thing with eggs! Possibly not with chess!",
+      "Your {piece} is 'hanging', they say! Hanging OUT, I say! ...Okay the computer is making the beepy noise, maybe go stand near it though.",
+      "The {piece} has no defenders!! It's so independent!! I'm proud of it and TERRIFIED for it! Modern parenting!"
+    ],
+    "comeback": [
+      "You came ALL the way back?! From LOSING?! See, this is why I never know who's winning — apparently NOBODY does until the end!!",
+      "A comeback!! You were down SO bad and now you're not!! The bar did a full journey!! Round trip!! Frequent flyer points!!",
+      "The comeback happened!! Honestly the losing part was fun TOO, but everyone seems way happier now, so yay!!",
+      "All the way back from the brink!! Incredible!! I never doubted you! I doubted CONSTANTLY but in a supportive way!"
+    ],
+    "endgame_opposite_bishops": [
+      "The slidey diagonal guys are on DIFFERENT colors! They can never ever touch each other! Forever! That's so SAD? Or efficient? Sadfficient!",
+      "Opposite-colored bishops! Apparently this usually means a TIE, which as you know is my favorite result! Everybody half-wins!!",
+      "Each bishop only gets HALF the squares and they're different halves! It's like two kids who split the playground and now the game can't end. Beautiful. Ridiculous. Chess."
+    ],
+    "endgame_rook": [
+      "A rook endgame!! Just the towers and the little guys left! The towers finally get to be main characters!!",
+      "Rook endgame! Everyone says these are 'all draws' and as the official president of the Draw Fan Club: EXCELLENT news.",
+      "Just rooks and pawns now! Simple! Clean! I can count everyone! There's like six guys! This is chess at MY difficulty level!",
+      "The rook ending!! Apparently the busy rook beats the lazy rook. That's the whole rule?? Even I can remember that one. Busy tower good. Got it."
+    ]
+  },
+  "summary": {
+    "clean_win": [
+      "You WON! The whole game! Start to finish! Nothing even went wrong, which... I mean, congrats!! Personally I like a little chaos, but a win's a win!!",
+      "A clean win!! No mistakes, no drama, no nail-biting... you really just... played well the whole time?? On purpose?? Wild. Amazing. WILD.",
+      "You won and it was never even close!! I kept waiting for the scary part and it just NEVER came! Efficient! Slightly anticlimactic! VICTORIOUS!",
+      "A perfect, calm, controlled win. I'm so happy for you. Next time can we have ONE little disaster though? For me? As a treat?"
+    ],
+    "slipped_win": [
+      "Okay so you were winning, and then you weren't, and HONESTLY the second half was the best chess I've ever watched. The TWISTS! I'm sorry for your loss and thank you for the content.",
+      "You had it and it slipped away!! Devastating for you, RIVETING for me. That game had everything. Hope! Despair! The bar doing gymnastics!",
+      "The win got away... but consider this: a boring win is forgotten in a day. THIS game? We'll be talking about this one FOREVER. You made a memory!!",
+      "You lost a winning game!! Listen, between us, watching someone be perfect for forty moves was getting intimidating. The ending humanized you. 10/10."
+    ],
+    "hard_fought_draw": [
+      "A DRAW!! A TIE!! Everybody gets half a point!! This is the best possible result and I will not be taking questions!!",
+      "A hard-fought draw!! You BOTH won, kind of!! Nobody has to be sad!! Why isn't every game like this!!",
+      "A draw, after all that fighting! Half a point each, like splitting the last cookie. Beautiful. The fairest sport moment I've ever seen.",
+      "It's a tie!! All that drama and the game just said 'you know what? both of you are great.' And honestly? The game was right!!"
+    ],
+    "loss": [
+      "You lost... BUT. Think about how happy the other person is right now!! You basically gave someone a great day!! That's community service!!",
+      "A loss! Okay. Here's the thing though: I lose ALL the time, and look at me! Thriving! Mostly! The point is, it doesn't stick!",
+      "You lost this one!! But the game had captures AND checks AND the bar went whoosh at least twice, so as far as I'm concerned, everybody ate well.",
+      "A loss today. But hey — you played a whole entire chess game, start to finish, and I understood at least nine of the moves. We're both growing!!"
+    ]
+  },
+  "practice": {
+    "loading_first": [
+      "We're going BACK to the exciting moments?! The mistakes?! Best idea ever! Those were the highlights!!",
+      "Loading up your first mistake! Aw, I remember this one. Fondly! It was a great moment for the bar!",
+      "Practice time! We're revisiting the chaos! Like a scrapbook, but for blunders! I'd buy that scrapbook!!",
+      "Getting your first do-over ready! Apparently you're supposed to find BETTER moves this time? Counterpoint: the original moves had charm."
+    ],
+    "prompt_find_better": [
+      "Okay so here you played {move} and it got called {label}. Personally? I liked it. But apparently there's a 'better' move. Booo. Okay fine, find it!!",
+      "This is where {move} happened! ({label}!) One of my favorite moments!! Now they want you to fix it. Progress ruins everything. Go get 'em!!",
+      "You played {move} here — labeled {label}, which I think was harsh!! But sure, see if you can find the move the box wanted. The box is so picky.",
+      "Here's the {move} spot ({label}). The computer wants the responsible version. I want you to know the original was more fun. Both things are true. Solve away!!",
+      "{move} happened here and got a {label}. In my heart it's a 9/10. In the engine's heart it's... whatever {label} means. Find the boring right answer!!"
+    ],
+    "correct_continue": [
+      "You found the right move!! That's... great!! It's so much calmer than the original. Calm is good! Probably! Next one!!",
+      "Correct!! The computer's happy! The position's safe! Nothing exciting will happen now! Hooray?? Hooray!!",
+      "That's the right answer!! Look at you, fixing things! The chaos archive loses another entry. Bittersweet! Mostly sweet! NEXT!",
+      "Correct!! See, you CAN do the boring right thing when they make you! I believe in you! Differently than before!"
+    ],
+    "correct_final": [
+      "That was the LAST one!! You fixed EVERY mistake!! The whole game is responsible now! I miss the old version a little but I'm SO proud!!",
+      "All done!! Every exciting moment from the game, replaced with the correct move. The engine is thrilled. I'm coping. You're improving! Everyone has feelings!!",
+      "Final one solved!! You did the entire homework! Now the next game will have FEWER disasters, which means I need a new hobby, which is FINE!!",
+      "Last mistake, fixed!! Complete set!! You know what this means: next game's blunders will be BRAND NEW ones! Fresh material! The circle of chess!!"
+    ],
+    "close_try_again": [
+      "Ooh, not quite — but honestly your attempt looked COOLER than the right answer probably does. Try again though! Apparently cool isn't the goal!",
+      "Close!! You almost found the responsible move! Your instinct went for the fun one again, didn't it? I get it. I GET it. One more try!",
+      "Almost!! The right move is hiding nearby. The right moves are always hiding. The wrong ones just stand right out in the open, friendly-like. Try again!!",
+      "Not that one! But listen, of all the wrong answers, that was one of them, and I thought it was great. Again!!",
+      "Attempt {attempts}!! Still going!! I've attempted things WAY more times than that, so as far as I'm concerned you're in elite form. One more!!"
+    ],
+    "after_hint": [
+      "A HINT!! Yes!! Hints are the best invention!! It's like the game whispering the answer! Take it take it take it!",
+      "Hint received!! No shame! I would have asked for the hint BEFORE trying. This is why you're the player and I'm the moral support!",
+      "There's your hint!! The game basically did the first half of the homework. Love that for us. Now finish it!!",
+      "You got a hint! Now you only have to be HALF right on your own! Those are great odds! MY kind of odds!"
+    ],
+    "streak_praise": [
+      "You're solving them ALL?! One after another?! Who ARE you and also can you teach me, but slowly, and with snacks?",
+      "Another right answer!! Immediately!! You're like a person who knows chess!! Which you ARE! It keeps surprising me and it shouldn't!!",
+      "A streak!! All correct answers, back to back!! The chaos era is really over, huh. End of an age. Beginning of a dynasty!!",
+      "Right again!! AGAIN!! At this point I'm just here for emotional support and snack logistics, and I have never been prouder of either of us!!"
+    ]
+  }
+}
