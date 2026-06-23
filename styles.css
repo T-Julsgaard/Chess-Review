@@ -412,6 +412,7 @@ button { font-family: inherit; cursor: pointer; }
 .sq .coord.rank { left: 3px; top: 1px; }
 .sq.light .coord { color: var(--sq-dark); }
 .sq.dark  .coord { color: var(--sq-light); }
+.hide-coords .sq .coord { display: none; }
 
 
 /* classification badge on the board — SVG icon in the destination square's top-right
