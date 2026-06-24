@@ -565,13 +565,13 @@ button { font-family: inherit; cursor: pointer; }
 /* the analyzing loader sits centered under the name in both cells (not pinned to the cell edge) */
 .acc-cell .ld.acc-val { align-self: center; }
 .acc-name { font-size: 12px; color: var(--ink-2); font-weight: 600; }
-.acc-val { font-size: 30px; font-weight: 800; font-family: var(--font-mono); line-height: 1; cursor: help; }
+.acc-val { font-size: 30px; font-weight: 800; font-family: var(--font-mono); line-height: 1; cursor: default; }
 .acc-bar { height: 5px; border-radius: 4px; background: var(--panel-3); overflow: hidden; width: 100%; }
 .acc-bar i { display: block; height: 100%; border-radius: 4px; }
 .acc-vs { font-size: 11px; color: var(--ink-3); font-weight: 700; letter-spacing: .1em; }
 
 .qbreak { margin-top: 14px; display: flex; flex-direction: column; gap: 7px; }
-.qbreak-row { display: grid; grid-template-columns: 30px 1fr 30px; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 12.5px; cursor: help; border-radius: 8px; transition: background .12s; }
+.qbreak-row { display: grid; grid-template-columns: 30px 1fr 30px; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 12.5px; cursor: default; border-radius: 8px; transition: background .12s; }
 .qbreak-row:hover { background: var(--panel-2); }
 .qbreak-row .qsym {
   width: 22px; height: 22px; justify-self: center; display: block;
@@ -582,7 +582,10 @@ button { font-family: inherit; cursor: pointer; }
 .qbreak-row .qlabel { display: flex; align-items: center; gap: 8px; font-family: var(--font-ui);
   justify-self: center; width: 132px; transform: translateX(16px); }
 .qbreak-row .qlabel .nm { font-weight: 600; }
-.qbreak-row .ct { text-align: center; font-weight: 700; }
+.qbreak-row .ct { text-align: center; font-weight: 700; border-radius: 6px; transition: color .12s, background .12s; }
+/* a non-zero count is clickable — it jumps to that player's first move of the category */
+.qbreak-row .ct:not(.zero) { cursor: pointer; }
+.qbreak-row .ct:not(.zero):hover { color: var(--accent); background: var(--panel-3); }
 .qbreak-row .ct.zero { color: var(--ink-3); opacity: .5; }
 .qbreak-row .ct.left { text-align: right; }
 /* expander: folds the whole category list open/closed */
@@ -836,7 +839,7 @@ button { font-family: inherit; cursor: pointer; }
 .set-row { display: flex; flex-direction: column; gap: 6px; }
 .set-row > .set-lbl { font-size: 12px; color: var(--ink-2); font-weight: 600; }
 /* a label with an explanation tooltip on hover */
-.set-lbl.has-info { cursor: help; text-decoration: underline dotted color-mix(in oklab, var(--ink-3) 70%, transparent); text-underline-offset: 3px; width: fit-content; }
+.set-lbl.has-info { cursor: default; text-decoration: underline dotted color-mix(in oklab, var(--ink-3) 70%, transparent); text-underline-offset: 3px; width: fit-content; }
 .set-note { font-size: 11px; color: var(--ink-3); line-height: 1.4; }
 
 .set-select { width: 100%; border: 1px solid var(--line); border-radius: 9px; background: var(--panel-2);
@@ -1047,7 +1050,7 @@ button { font-family: inherit; cursor: pointer; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* estimated strength below the accuracy */
-.est-rating { font-size: 12px; color: var(--ink-3); font-family: var(--font-mono); font-weight: 700; margin-top: 5px; letter-spacing: .01em; cursor: help; }
+.est-rating { font-size: 12px; color: var(--ink-3); font-family: var(--font-mono); font-weight: 700; margin-top: 5px; letter-spacing: .01em; cursor: default; }
 
 /* Reorganize-mode banner */
 .reorg-banner { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 120; }
