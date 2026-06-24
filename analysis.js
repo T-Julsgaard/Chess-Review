@@ -2744,6 +2744,20 @@ function hideQTip() {
   const tip = document.querySelector(".q-tip");
   if (tip) tip.classList.remove("show");
 }
+
+// (e.g. your first Blunder). A category with a 0 count finds no ply and does nothing — so clicking
+// the opponent's "0 blunders" is a harmless no-op, exactly as expected.
+function firstPlyForCategory(side, k) {
+  for (let i = 1; i <= S.total; i++) {
+    const pos = S.positions[i];
+    if (pos && pos.color === side && S.classif[i] === k) return i;
+  }
+  return -1;
+}
+function jumpToCategory(side, k) {
+  const ply = firstPlyForCategory(side, k);
+  if (ply > 0) gotoMainline(ply);
+}
 function renderStats() {
   const opSide = S.meSide === "w" ? "b" : "w";
   const meAcc = S.acc[S.meSide], opAcc = S.acc[opSide];
@@ -2768,16 +2782,18 @@ function renderStats() {
   const qrows = list.map((k) => {
     const cfg = QUALITY[k];
     const cMe = S.counts[S.meSide][k] || 0, cOp = S.counts[opSide][k] || 0;
-    const meCt = el("span", { class: "ct left " + (cMe ? "" : "zero") }, cMe);
-    const opCt = el("span", { class: "ct " + (cOp ? "" : "zero") }, cOp);
+    const meCt = el("span", { class: "ct left " + (cMe ? "" : "zero"), onclick: () => jumpToCategory(S.meSide, k) }, cMe);
+    const opCt = el("span", { class: "ct " + (cOp ? "" : "zero"), onclick: () => jumpToCategory(opSide, k) }, cOp);
     rows[k] = { me: meCt, op: opCt };
-    return el("div", {
-      class: "qbreak-row",
-      onmouseenter: (e) => showQTip(e.currentTarget, k),
-      onmouseleave: hideQTip,
-    },
+    return el("div", { class: "qbreak-row" },
       meCt,
-      el("span", { class: "qlabel" },
+      // The category explainer tooltip lives on the label only — hovering the counts (which are
+      // clickable jump targets) must not trigger it.
+      el("span", {
+        class: "qlabel",
+        onmouseenter: (e) => showQTip(e.currentTarget, k),
+        onmouseleave: hideQTip,
+      },
         el("img", { class: "qsym", src: qIcon(k), alt: "", draggable: "false" }),
         el("span", { class: "nm" }, cfg.name)),
       opCt,
@@ -4586,17 +4602,42 @@ async function applyGame(payload) {
 }
 
 
+const BASE_ZOOM = 0.9;        
+const REF_W = 1920, REF_H = 1080;
+function targetZoomForScreen() {
+  const w = (typeof screen !== "undefined" && screen.availWidth)  || REF_W;
+  const h = (typeof screen !== "undefined" && screen.availHeight) || REF_H;
+  // min() of the two ratios so a wide-but-short monitor (ultrawide) doesn't get zoomed past the point
+  // where the canvas overflows vertically. For a standard 16:9 screen both ratios are equal.
+  const scale = Math.min(w / REF_W, h / REF_H);
+  // Floor at BASE_ZOOM so screens at/below 1080p are untouched (identical to the old flat 90%); cap so
+  // a 4K/5K monitor at 100% OS scaling scales up but never balloons.
+  return Math.max(BASE_ZOOM, Math.min(BASE_ZOOM * scale, 2.0));
+}
+
+// We use real Chrome zoom (not CSS zoom, which would throw off the pointer-coordinate maths the
+// board/panel dragging relies on).
+//
+// Scope is PER-ORIGIN: the zoom persists for the extension's OWN pages (origin chrome-extension://<id>),
+// which is what kills the zoom-indicator bubble that used to flash on every open. Chrome only shows
+// that bubble when the zoom *changes*; with per-tab scope every fresh game tab started at 100% and we
+// changed it → a popup every single time. With per-origin the tab already loads at the remembered
+// zoom, so our setZoom is a no-op and nothing pops up. It can still appear once — the very first time
+// the zoom is established (or after the user moves the window to a different-resolution monitor and
+// reopens) — then never again. (Per-origin here only affects this extension's pages, never the user's
+// other tabs or sites.) Failures are swallowed silently.
 function fitTabZoom() {
   try {
     if (!chrome.tabs || !chrome.tabs.getCurrent) return;
+    const target = targetZoomForScreen();
     chrome.tabs.getCurrent((tab) => {
       if (chrome.runtime.lastError || !tab || tab.id == null) return;
       chrome.tabs.setZoomSettings(tab.id, { scope: "per-origin", mode: "automatic" }, () => {
         if (chrome.runtime.lastError) return;
-        // Only set it when it isn't already ~90%, so we never trigger a needless zoom-change bubble.
+        // Only set it when it's not already at the target, so we never trigger a needless zoom bubble.
         chrome.tabs.getZoom(tab.id, (z) => {
           if (chrome.runtime.lastError) return;
-          if (Math.abs((z || 1) - 0.9) > 0.005) chrome.tabs.setZoom(tab.id, 0.9, () => void chrome.runtime.lastError);
+          if (Math.abs((z || 1) - target) > 0.005) chrome.tabs.setZoom(tab.id, target, () => void chrome.runtime.lastError);
         });
       });
     });
