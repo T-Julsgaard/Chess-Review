@@ -212,8 +212,13 @@ function detectUsername() {
 // never reports any — that side is unchanged.
 function countryIdFromClass(el) {
   if (!el) return null;
-  // Match the `country-<digits>` token specifically (not `cc-country-flag-component`).
-  const m = (el.className || "").match(/(?:^|\s)country-(\d+)(?:\s|$)/);
+  // chess.com tags nationality two different ways depending on the surface: a numeric id on
+  // archive/history pages (country-2) and an ISO/pseudo CODE on live game pages (country-us,
+  // country-dk, country-xe). Accept either — digits OR a 2-3 letter code. The leading (?:^|\s)
+  // and trailing (?:\s|$) keep us off the sibling `cc-country-flag-component`/`...-small` tokens
+  // (their "country" is hyphen-prefixed, and "flag"/"small" fail the boundary). flags.js resolves
+  // whichever token shape we return.
+  const m = (el.className || "").match(/(?:^|\s)country-([a-z]{2,3}|\d+)(?:\s|$)/i);
   return m ? m[1] : null;
 }
 function detectCountries() {
