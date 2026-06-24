@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Chess Review",
   "version": "0.1.0",
-  "description": "Free, open source game review. ~95% correlated with Chess.com accuracy scores.",
+  "description": "Free, open source game review. Produces accuracy scores within ~95% of Chess.com's.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
