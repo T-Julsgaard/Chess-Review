@@ -266,15 +266,34 @@ button { font-family: inherit; cursor: pointer; }
   display: block; object-fit: cover; background: #1b1b1b; padding: 0;
   -webkit-user-select: none; user-select: none;
 }
-/* name+elo on one line, captured-piece miniatures beneath — the whole block stays within the
-   avatar square's height (≈40px): name row ~17px + captured row ~18px. */
-.player-strip .who { display: flex; flex-direction: column; justify-content: center; line-height: 1.15; min-width: 0; }
+/* name+elo on one line, captured-piece tray beneath — the whole block stays within the
+   avatar square's height (≈40px): name row ~17px + captured row ~22px. */
+.player-strip .who { display: flex; flex-direction: column; justify-content: center; line-height: 1.15; min-width: 0; transform: translateY(-2px); }
 .player-strip .name { font-weight: 700; font-size: 15px; display: flex; align-items: baseline; gap: 4px; white-space: nowrap; }
 .player-strip .name .elo { font-family: var(--font-mono); font-weight: 500; font-size: 12px; color: var(--ink-3); }
 .player-strip .name .flag { font-size: 13px; }
-.player-strip .captured { display: flex; align-items: center; height: 16px; margin-top: 2px; }
-.player-strip .cap-pc { width: 16px; height: 16px; display: block; margin-right: -3px; }
-.player-strip .adv { margin-left: 8px; color: var(--ink-2); font-weight: 600; font-size: 15px; line-height: 1; font-family: var(--font-mono); }
+.player-strip .captured { display: flex; align-items: center; gap: 9px; height: 22px; margin-top: 2px; }
+/* Captured pieces ride on a rounded backing tray whose tone contrasts the pieces (light tray under
+   black pieces, dark tray under white) so the dark icons stay legible against the dark board. The
+   tray hugs the row and grows smoothly as pieces are added; it collapses to nothing when empty, but
+   the row keeps its height so the name above never shifts. */
+.player-strip .cap-tray {
+  display: flex; align-items: center; height: 22px; padding: 0 6px; gap: 1px;
+  border-radius: 7px;
+  transition: padding .3s cubic-bezier(.22, .61, .36, 1), background-color .25s ease, box-shadow .25s ease;
+}
+.player-strip .cap-tray.is-empty { padding: 0; background: transparent; box-shadow: none; }
+.player-strip .cap-tray-light {
+  background: linear-gradient(180deg, #f3f0e7, #e7e3d6);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .10), 0 1px 2px rgba(0, 0, 0, .22);
+}
+.player-strip .cap-tray-dark {
+  background: linear-gradient(180deg, #312f29, #201e19);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .10), 0 1px 2px rgba(0, 0, 0, .35);
+}
+.player-strip .cap-pc { width: 17px; height: 17px; display: block; margin-right: -2px; }
+.player-strip .cap-pc:last-child { margin-right: 0; }
+.player-strip .adv { color: var(--ink-2); font-weight: 600; font-size: 15px; line-height: 1; font-family: var(--font-mono); }
 .player-strip .clock {
   margin-left: auto; font-family: var(--font-mono); font-weight: 600;
   background: var(--panel-2); border: 1px solid var(--line);
