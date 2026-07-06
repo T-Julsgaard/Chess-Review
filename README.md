@@ -7,7 +7,7 @@ rating. No account, no server, no manual PGN copying.
 
 **Source:** https://github.com/T-Julsgaard/Chess-Review
 
-**Chrome webshop**: https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenkadndbdbigfam?hl=da
+**Chrome webshop**: https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenkadndbdbigfam?hl=en
 
 ## Features
 
@@ -29,11 +29,18 @@ For older games you don't have open, paste a game URL or PGN into the popup. You
 detected automatically from the board; if it can't be found, enter it once in the popup and it's
 remembered.
 
-## Install (unpacked)
+## Install
 
+/Packed/
+Goto: https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenkadndbdbigfam?hl=en
+
+/Unpacked/
 1. Download or clone this repository.
 2. Open `chrome://extensions` and enable **Developer mode** (top-right).
 3. Click **Load unpacked** and select the project folder.
+
+
+
 
 ## Privacy
 
