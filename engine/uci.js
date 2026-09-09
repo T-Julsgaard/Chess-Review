@@ -2,6 +2,8 @@
 // Runs positions sequentially via a queue; one engine instance at a time.
 // Supports MultiPV (multiple lines per position) for the Engine panel.
 
+import { browserAPI } from "../browser-compat.js";
+
 // How long to wait for the engine's "readyok" handshake before declaring the build dead.
 // If a build can't be instantiated (CSP change, missing/blocked wasm, a future browser
 // change), the worker never replies — without this cap _ready would hang forever and every
@@ -14,10 +16,7 @@ export class Engine {
     // Give Stockfish the explicit wasm path via the URL hash (nmrugg reads
     // self.location.hash as the wasm path). Use an absolute extension URL so it's
     // unambiguous regardless of the worker's base URL.
-    const wasmUrl =
-      typeof chrome !== "undefined" && chrome.runtime?.getURL
-        ? chrome.runtime.getURL(wasmPath)
-        : wasmPath;
+    const wasmUrl = browserAPI?.runtime?.getURL ? browserAPI.runtime.getURL(wasmPath) : wasmPath;
     this.scriptPath = scriptPath;
     this.dead = false;
     // A worker whose script URL is bad throws synchronously from the constructor — treat that the

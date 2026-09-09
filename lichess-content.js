@@ -5,6 +5,10 @@
 
 console.log("[Chess Analyzer] lichess content script active on", location.href);
 
+// A plain content script can't import browser-compat.js, so inline the same fallback: Firefox's
+// `browser.*` is Promise-native, Chrome's `chrome.*` only gained Promise support under MV3.
+const browserAPI = typeof browser !== "undefined" ? browser : chrome;
+
 // 8-char first-path segments that are routes, not games.
 const RESERVED = /^(training|analysis|practice|streamer|tournament|broadcast)$/i;
 
@@ -144,7 +148,7 @@ function handleShareFragment() {
     const payload = JSON.parse(b64decode(decodeURIComponent(m[1])));
     if (!payload || !payload.pgn) return;
     history.replaceState(null, "", location.pathname + location.search);
-    chrome.runtime.sendMessage({ type: "openShared", payload });
+    browserAPI.runtime.sendMessage({ type: "openShared", payload });
   } catch (e) {
     console.warn("[Chess Analyzer] invalid share link", e);
   }
@@ -203,7 +207,7 @@ function warnMarkupChanged() {
 let logoDataUrlPromise = null;
 function getLogoDataUrl() {
   if (!logoDataUrlPromise) {
-    logoDataUrlPromise = fetch(chrome.runtime.getURL("icons/icon.png"))
+    logoDataUrlPromise = fetch(browserAPI.runtime.getURL("icons/icon.png"))
       .then((r) => r.blob())
       .then((b) => new Promise((res) => {
         const fr = new FileReader();
@@ -247,13 +251,12 @@ function injectLichessReviewButton(followUp) {
     clearTimeout(resetTimer);
     resetTimer = setTimeout(() => resetLiReviewButton(btn, label), 5000);
     try {
-      // After an extension reload the old content script loses its context — sendMessage throws.
-      chrome.runtime.sendMessage({ type: "freeGameReview" }, () => {
-        if (chrome.runtime.lastError) {
-          clearTimeout(resetTimer);
-          btn.disabled = false;
-          label.textContent = "Reload the page ↻";
-        }
+      // After an extension reload the old content script loses its context — sendMessage throws
+      // (Chrome) or rejects (Firefox), depending on when the context is invalidated.
+      browserAPI.runtime.sendMessage({ type: "freeGameReview" }).catch(() => {
+        clearTimeout(resetTimer);
+        btn.disabled = false;
+        label.textContent = "Reload the page ↻";
       });
     } catch (e) {
       clearTimeout(resetTimer);
@@ -293,7 +296,7 @@ function injectLichessReviewButton(followUp) {
   tryInject();
 })();
 
-chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+browserAPI.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg && msg.type === "getGameInfo") {
     sendResponse({
       ok: true,

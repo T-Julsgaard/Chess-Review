@@ -2,6 +2,7 @@
 import { openAnalysisTab, analyzeActiveTab, reloadActiveAndAnalyze, isSupportedChessUrl } from "./analyze-flow.js";
 import { findGameById, parseGameId, parseFlip, gameMeta } from "./chesscom.js";
 import { parseLichessGameId, parseLichessFlip, fetchGamePgn as fetchLichessPgn } from "./lichess.js";
+import { browserAPI } from "./browser-compat.js";
 
 const $ = (id) => document.getElementById(id);
 const statusEl = $("status");
@@ -72,16 +73,16 @@ async function runCurrentAnalysis() {
 async function init() {
   // Seed the saved username so the field and the analyze flow have it.
   try {
-    const { username = "" } = await chrome.storage.local.get("username");
+    const { username = "" } = await browserAPI.storage.local.get("username");
     if (username) $("username").value = username;
   } catch {}
 
   // If a background flow (keyboard shortcut / in-page button) just failed, surface that reason and
   // open the paste box instead of auto-retrying.
   try {
-    const { pendingError } = await chrome.storage.local.get("pendingError");
+    const { pendingError } = await browserAPI.storage.local.get("pendingError");
     if (pendingError) {
-      await chrome.storage.local.remove("pendingError");
+      await browserAPI.storage.local.remove("pendingError");
       setStatus(pendingError, true);
       $("manual").open = true;
       $("manualInput").focus();
@@ -90,7 +91,7 @@ async function init() {
   } catch {}
 
   let tab = null;
-  try { [tab] = await chrome.tabs.query({ active: true, currentWindow: true }); } catch {}
+  try { [tab] = await browserAPI.tabs.query({ active: true, currentWindow: true }); } catch {}
   if (isSupportedChessUrl(tab && tab.url)) {
     runCurrentAnalysis(); // on a chess game page → one-click review
   } else {
@@ -102,7 +103,7 @@ async function init() {
 
 $("saveUser").addEventListener("click", async () => {
   const username = $("username").value.trim();
-  await chrome.storage.local.set({ username });
+  await browserAPI.storage.local.set({ username });
   setStatus(username ? `Saved: ${username}` : "Username cleared.");
 });
 
