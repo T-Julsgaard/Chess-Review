@@ -6,6 +6,10 @@
 // Load banner: confirms the content script is actually running on this page.
 console.log("[Chess Analyzer] content script active on", location.href);
 
+// A plain content script can't import browser-compat.js, so inline the same fallback: Firefox's
+// `browser.*` is Promise-native, Chrome's `chrome.*` only gained Promise support under MV3.
+const browserAPI = typeof browser !== "undefined" ? browser : chrome;
+
 // KEEP GAME_ID_RE IN SYNC with the canonical copy in chesscom.js (this file runs as a plain content
 // script and can't import the module). The type segment is optional and may be any word, so a bare
 // /game/<id>, /game/live|daily/<id>, the review URL (/analysis/game/live/<id>/review), and a future
@@ -257,7 +261,7 @@ function handleShareFragment() {
     if (!payload || !payload.pgn) return;
     // clear the fragment so a reload doesn't open it again
     history.replaceState(null, "", location.pathname + location.search);
-    chrome.runtime.sendMessage({ type: "openShared", payload });
+    browserAPI.runtime.sendMessage({ type: "openShared", payload });
   } catch (e) {
     console.warn("[Chess Analyzer] invalid share link", e);
   }
@@ -395,7 +399,7 @@ function injectSidebarReviewButton(emphasisContent) {
   tryInject();
 })();
 
-chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+browserAPI.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg && msg.type === "getGameInfo") {
     const parsed = parseGameId(location.pathname);
     sendResponse({
