@@ -934,19 +934,21 @@ button { font-family: inherit; cursor: pointer; }
    ============================================================ */
 .stage.canvas { position: relative; max-width: none; margin: 0 auto; padding: 12px; }
 
-.mod { position: absolute; display: flex; box-sizing: border-box; }
+.mod { position: relative; display: flex; box-sizing: border-box; min-width: 0; min-height: 0; }
+.mod[hidden] { display: none !important; }
+.stage.canvas .mod { position: absolute; }
 .mod-inner { flex: 1; min-width: 0; min-height: 0; width: 100%; height: 100%; display: flex; flex-direction: column; }
 
 /* panels fill their module and scroll when needed */
 .mod .panel:not(.review-mini) { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .mod .panel:not(.review-mini) .panel-body { flex: 1; min-height: 0; overflow: auto; }
 .mod .moves-panel .ml-scroll { max-height: none; overflow: visible; }
-.mod:not([data-mod="board"]):not([data-mod="controls"]) > .mod-inner > div { height: 100%; }
+.mod:not([data-mod="board"]):not([data-mod="controls"]) > .mod-inner > div { height: 100%; display: flex; flex-direction: column; min-height: 0; }
 
 /* board module */
 .mod[data-mod="board"] .mod-inner { display: flex; flex-direction: column; }
-.mod[data-mod="board"] .board-wrap { flex: 1; min-height: 0; align-items: stretch; justify-content: center; }
-.mod[data-mod="board"] .board { flex: 0 1 auto; height: 100%; width: auto; aspect-ratio: 1; max-width: 100%; margin: auto; }
+.stage.canvas .mod[data-mod="board"] .board-wrap { flex: 1; min-height: 0; align-items: stretch; justify-content: center; }
+.stage.canvas .mod[data-mod="board"] .board { flex: 0 1 auto; height: 100%; width: auto; aspect-ratio: 1; max-width: 100%; margin: auto; }
 .mod[data-mod="controls"] .mod-inner { display: grid; place-items: center; }
 
 /* animated coach portrait module — transparent; the sandboxed rig <iframe> fills it and its own
@@ -958,7 +960,7 @@ button { font-family: inherit; cursor: pointer; }
    interactive again so it can still be grabbed and moved. The dragging z-index (50) stays higher,
    so a panel being moved still rides above it while you drag. */
 .mod[data-mod="coach"] { z-index: 10; }
-.canvas:not(.reorganizing) .mod[data-mod="coach"] { pointer-events: none; }
+.stage:not(.reorganizing) .mod[data-mod="coach"] { pointer-events: none; }
 .coach-mount { width: 100%; height: 100%; overflow: hidden; user-select: none; -webkit-user-select: none; }
 /* The coach portrait is a separate iframe document, so it necessarily finishes a beat after the
    rest of the panels. Fade it in on load instead of letting it pop in. */
@@ -996,6 +998,157 @@ button { font-family: inherit; cursor: pointer; }
   outline: 1px dashed color-mix(in oklab, var(--accent) 45%, transparent); outline-offset: -1px;
 }
 .mod.dragging, .mod.resizing { z-index: 50; }
+
+/* ============================================================
+   Automatic layout: responsive, fits any window
+   The board takes the height left under the top bar (as Lichess's analysis board does) and the
+   panels reflow into fewer columns as the window narrows:
+     wide    ≥1100 × 600  eval | board | side (insight on top, two panel columns under it)
+     medium  820–1099     eval | board | side (insight, moves, controls), the rest below
+     narrow  <820         board, controls, then every panel stacked
+   ============================================================ */
+:root {
+  --topbar-h: 60px;
+  --strip-h: 60px;        /* player strip above and below the board */
+  --eb-w: 26px;           /* eval bar */
+  --controls-h: 44px;
+  --review-h: 186px;      /* fixed, so the typed commentary never pushes the panels below it */
+  --pad-l: 36px;          /* keeps the board clear of the Library tab on the left edge */
+  --sb: 10px;             /* room for a vertical scrollbar in the 100vw maths */
+}
+/* Column wrappers: boxes only in the wide layout; elsewhere (and on the custom canvas) their
+   modules are placed on the stage directly. */
+.side, .side-cols, .side-a, .side-b { display: contents; }
+
+.stage.auto {
+  --ui-scale: 1;
+  display: grid; gap: var(--gap);
+  justify-content: center; align-items: start;
+  padding: var(--gap) var(--gap) var(--gap) var(--pad-l);
+  --board-hmax: calc(100dvh - var(--topbar-h) - 2 * var(--gap) - 2 * var(--strip-h));
+  --board: max(var(--board-min), min(var(--board-hmax), var(--board-wmax)));
+}
+.stage.auto.no-evalbar { --eb-w: 0px; }
+.player-strip { height: var(--strip-h); }
+.stage.auto .mod[data-mod="evalbar"] { grid-area: eval; align-self: stretch; margin: var(--strip-h) 0; }
+.stage.auto .mod[data-mod="board"] { grid-area: board; width: var(--board); }
+.stage.auto .mod[data-mod="review"] { grid-area: review; height: var(--review-h); }
+.stage.auto .mod[data-mod="moves"] { grid-area: moves; }
+.stage.auto .mod[data-mod="graph"] { grid-area: graph; }
+.stage.auto .mod[data-mod="controls"] { grid-area: controls; }
+.stage.auto .mod[data-mod="accuracy"] { grid-area: acc; }
+.stage.auto .mod[data-mod="engine"] { grid-area: engine; }
+.stage.auto .evalgraph svg { height: clamp(64px, 11vh, 120px); }
+/* The coach portrait sits in the insight panel's top-right corner. The opening and move rows stop
+   short of it, and a float beside the first lines of commentary keeps the text clear of it; the
+   lines below the portrait run the full width. The portrait is ~1:1 and its rig draws its own
+   buttons below the face, so every coach box keeps height ≈ width × 1.02 (face and shoulders). */
+.stage.auto.has-coach .insight-panel .ip-opening { padding-right: var(--coach-clear); }
+.stage.auto.has-coach .insight-panel .ip-head { padding-right: calc(var(--coach-clear) - var(--pad)); }
+.stage.auto.has-coach .insight-panel .ip-text::before {
+  content: ""; float: right; width: calc(var(--coach-clear) - var(--pad)); height: var(--coach-float-h);
+}
+
+/* wide: eval | board | side */
+@media (min-width: 1100px) and (min-height: 600px) {
+  .stage.auto {
+    --side-w: calc(580px * var(--ui-scale));
+    --board-min: 360px;
+    --board-wmax: calc(100vw - var(--sb) - var(--pad-l) - var(--gap) - var(--eb-w) - var(--side-w) - 2 * var(--gap));
+    --coach-clear: 176px;
+    --side-top: calc(var(--strip-h) / var(--ui-scale));
+    /* the portrait's bottom (188px down the side column) minus where the commentary starts
+       (89px into the insight panel) */
+    --coach-float-h: max(0px, calc(99px - var(--side-top)));
+    grid-template-columns: var(--eb-w) var(--board) var(--side-w);
+    grid-template-areas: "eval board side";
+  }
+  /* The side column is exactly as tall as the board block (contain: size keeps the long move list
+     from stretching the row) and starts level with the board, under the top player strip, so the
+     coach can lean over the insight panel into that strip. On big screens it is scaled up with the
+     board, so the panels keep their proportion to it. */
+  .stage.auto .side {
+    grid-area: side; align-self: stretch; contain: size;
+    position: relative; zoom: var(--ui-scale);
+    display: flex; flex-direction: column; gap: var(--gap);
+    padding-top: var(--side-top);
+  }
+  .stage.auto .side-cols {
+    flex: 1; min-height: 0;
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); gap: var(--gap);
+  }
+  .stage.auto .side-a, .stage.auto .side-b { display: flex; flex-direction: column; gap: var(--gap); min-height: 0; }
+  .stage.auto .mod[data-mod="review"] { flex: none; }
+  .stage.auto .mod[data-mod="moves"] { flex: 1 1 0; min-height: 120px; }
+  .stage.auto .mod[data-mod="accuracy"] { flex: 0 1 auto; }
+  .stage.auto .mod[data-mod="engine"] { flex: 1 1 0; min-height: 140px; }
+  /* at the top of the side column, so the head leans up into the strip beside the board */
+  .stage.auto .mod[data-mod="coach"] { position: absolute; top: 0; right: 16px; width: 184px; height: 188px; }
+}
+/* short but wide windows (laptops): the side column starts with the top strip, for more room, and
+   the coach then covers the insight panel's whole right side */
+@media (min-width: 1100px) and (min-height: 600px) and (max-height: 799.98px) {
+  .stage.auto { --side-top: 0px; --coach-float-h: 0px; }
+  .stage.auto.has-coach .insight-panel .ip-body { padding-right: var(--coach-clear); }
+  .stage.auto.has-coach .insight-panel .ip-head { padding-right: 0; }
+}
+@media (min-width: 1400px) and (min-height: 1000px) { .stage.auto { --ui-scale: 1.1; } }
+@media (min-width: 1650px) and (min-height: 1120px) { .stage.auto { --ui-scale: 1.2; } }
+@media (min-width: 1900px) and (min-height: 1240px) { .stage.auto { --ui-scale: 1.3; } }
+
+/* medium: eval | board | side (insight, moves, controls); accuracy, graph and engine below */
+@media (min-width: 820px) and (max-width: 1099.98px), (min-width: 1100px) and (max-height: 599.98px) {
+  .stage.auto {
+    --side-w: clamp(300px, 32vw, 360px);
+    --board-min: 300px;
+    --board-wmax: calc(100vw - var(--sb) - var(--pad-l) - var(--gap) - var(--eb-w) - var(--side-w) - 2 * var(--gap));
+    --review-h: 200px;
+    grid-template-columns: var(--eb-w) var(--board) var(--side-w);
+    grid-template-rows: var(--review-h) minmax(0, 1fr) auto auto auto;
+    grid-template-areas:
+      "eval  board review"
+      "eval  board moves"
+      "eval  board controls"
+      "graph graph graph"
+      "acc   acc   engine";
+  }
+  /* the move list fills whatever the board leaves, without its length stretching the row */
+  .stage.auto .mod[data-mod="moves"] { align-self: stretch; contain: size; min-height: 120px; }
+  .stage.auto .mod[data-mod="engine"] { align-self: stretch; }
+}
+
+/* medium and narrow: a small coach in the insight panel's top-right corner, beside the opening
+   and move rows; the commentary below it runs the full width */
+@media (max-width: 1099.98px), (max-height: 599.98px) {
+  .stage.auto { --coach-clear: 116px; --coach-float-h: 22px; }
+  .stage.auto .mod[data-mod="coach"] {
+    grid-area: review; justify-self: end; align-self: start;
+    width: 104px; height: 106px; margin: 2px 8px 0 0;
+  }
+}
+
+/* narrow: one column. The board and controls fit the first screen; the panels follow. */
+@media (max-width: 819.98px) {
+  .stage.auto {
+    --board-min: 240px;
+    --board-wmax: calc(100vw - var(--sb) - var(--pad-l) - var(--gap) - var(--eb-w) - var(--gap));
+    --board-hmax: calc(100dvh - var(--topbar-h) - 3 * var(--gap) - 2 * var(--strip-h) - var(--controls-h));
+    --board: min(var(--board-wmax), max(var(--board-min), var(--board-hmax)));
+    --review-h: 190px;
+    grid-template-columns: var(--eb-w) var(--board);
+    grid-template-areas: "eval board" "controls controls" "review review" "moves moves" "graph graph" "acc acc" "engine engine";
+  }
+  .stage.auto .mod[data-mod="moves"] { height: min(420px, 60dvh); }
+}
+
+/* top bar and settings on small windows */
+@media (max-width: 760px) { .topbar-meta { display: none; } }
+@media (max-width: 520px) {
+  .topbar { padding: 0 12px; gap: 10px; }
+  .brand-name { display: none; }
+  .topbar-right { gap: 6px; }
+  .settings-pop { left: 8px; right: 8px; width: auto; }
+}
 .mod.dragging .panel, .mod.resizing .panel,
 .mod.dragging .review-mini, .mod.resizing .review-mini {
   outline: 2px solid color-mix(in oklab, var(--accent) 55%, transparent); outline-offset: 0;
