@@ -1,19 +1,20 @@
-// gamecache.js — local cache of fetched games/PGNs, keyed by site + game id, in chrome.storage.local.
+// gamecache.js — local cache of fetched games/PGNs, keyed by site + game id, in browser storage.
 // A finished game's PGN never changes and its id is immutable, so caching it lets a re-analysis of the
 // same game cost ZERO calls to chess.com / Lichess. This is the main lever against API traffic as the
 // user base grows: most repeat usage is re-opening games already seen. unlimitedStorage is granted and
 // each entry is tiny (one PGN, ~2 KB), but we still cap the count with a simple LRU-ish index so the
 // cache can't grow without bound over years of use.
 //
-// Everything no-ops gracefully when chrome.storage is absent (so the pure-Node tools that import the
+// Everything no-ops gracefully when storage is absent (so the pure-Node tools that import the
 // API modules keep working) and swallows storage errors — a cache miss is always safe to fall back on.
+import { browserAPI } from "./browser-compat.js";
 
 const DATA_PREFIX = "gamecache:";
 const INDEX_KEY = "gamecache:index"; // array of data keys, oldest → newest (eviction order)
 const MAX_ENTRIES = 1000;
 
 function hasStorage() {
-  return typeof chrome !== "undefined" && chrome.storage && chrome.storage.local;
+  return !!(browserAPI && browserAPI.storage && browserAPI.storage.local);
 }
 const keyFor = (site, id) => `${DATA_PREFIX}${site}:${String(id)}`;
 
@@ -22,7 +23,7 @@ export async function getCachedGame(site, id) {
   if (!hasStorage() || !id) return null;
   const k = keyFor(site, id);
   try {
-    const got = await chrome.storage.local.get(k);
+    const got = await browserAPI.storage.local.get(k);
     return got[k] ? got[k].data : null;
   } catch {
     return null;
@@ -34,14 +35,14 @@ export async function setCachedGame(site, id, data) {
   if (!hasStorage() || !id || data == null) return;
   const k = keyFor(site, id);
   try {
-    const got = await chrome.storage.local.get(INDEX_KEY);
-    await chrome.storage.local.set({ [k]: { t: Date.now(), data } });
+    const got = await browserAPI.storage.local.get(INDEX_KEY);
+    await browserAPI.storage.local.set({ [k]: { t: Date.now(), data } });
     // Move-to-newest in the index, then evict the oldest once over the cap.
     let index = Array.isArray(got[INDEX_KEY]) ? got[INDEX_KEY].filter((x) => x !== k) : [];
     index.push(k);
     const evict = index.length > MAX_ENTRIES ? index.splice(0, index.length - MAX_ENTRIES) : [];
-    await chrome.storage.local.set({ [INDEX_KEY]: index });
-    if (evict.length) await chrome.storage.local.remove(evict);
+    await browserAPI.storage.local.set({ [INDEX_KEY]: index });
+    if (evict.length) await browserAPI.storage.local.remove(evict);
   } catch {
     /* a full/unavailable store just means no caching — the fetch already succeeded */
   }
@@ -64,7 +65,7 @@ export async function getCachedMonth(archiveUrl) {
   if (!hasStorage() || !archiveUrl) return null;
   const k = MONTH_PREFIX + archiveUrl;
   try {
-    const got = await chrome.storage.local.get(k);
+    const got = await browserAPI.storage.local.get(k);
     return got[k] && Array.isArray(got[k].games) ? got[k].games : null;
   } catch {
     return null;
@@ -76,13 +77,13 @@ export async function setCachedMonth(archiveUrl, games) {
   if (!hasStorage() || !archiveUrl || !Array.isArray(games) || !games.length) return;
   const k = MONTH_PREFIX + archiveUrl;
   try {
-    const got = await chrome.storage.local.get(MONTH_INDEX_KEY);
-    await chrome.storage.local.set({ [k]: { t: Date.now(), games } });
+    const got = await browserAPI.storage.local.get(MONTH_INDEX_KEY);
+    await browserAPI.storage.local.set({ [k]: { t: Date.now(), games } });
     let index = Array.isArray(got[MONTH_INDEX_KEY]) ? got[MONTH_INDEX_KEY].filter((x) => x !== k) : [];
     index.push(k);
     const evict = index.length > MAX_MONTHS ? index.splice(0, index.length - MAX_MONTHS) : [];
-    await chrome.storage.local.set({ [MONTH_INDEX_KEY]: index });
-    if (evict.length) await chrome.storage.local.remove(evict);
+    await browserAPI.storage.local.set({ [MONTH_INDEX_KEY]: index });
+    if (evict.length) await browserAPI.storage.local.remove(evict);
   } catch {
     /* a full/unavailable store just means no caching — the fetch already succeeded */
   }

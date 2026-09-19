@@ -1,14 +1,18 @@
-// background.js — MV3 service worker. Handles the keyboard shortcut and the in-page "Free game
-// review" button. The toolbar icon itself uses a default_popup (popup.html), so a click ALWAYS opens
-// the anchored popup — whether the icon is pinned or tucked in the overflow menu — and the popup runs
-// the analyze flow from there. (openPopup() can't anchor a popup for an unpinned action, which is why
-// we don't drive the click from here anymore.)
+// background.js — MV3 background (a real service worker on Chrome; Firefox has no MV3 service
+// worker support, so it falls back to manifest.json's "background.scripts" and runs this as a
+// classic background page instead — see browser-compat.js for the chrome/browser API split that
+// falls out of that). Handles the keyboard shortcut and the in-page "Free game review" button. The
+// toolbar icon itself uses a default_popup (popup.html), so a click ALWAYS opens the anchored popup
+// — whether the icon is pinned or tucked in the overflow menu — and the popup runs the analyze flow
+// from there. (openPopup() can't anchor a popup for an unpinned action, which is why we don't drive
+// the click from here anymore.)
 
 import { analyzeActiveTab, openAnalysisTab, reloadActiveAndAnalyze } from "./analyze-flow.js";
+import { browserAPI } from "./browser-compat.js";
 
 // Shared game (from a share link caught by content.js) → open the analysis.
 // "Free game review" button injected into the chess.com game-over modal → same flow as the popup.
-chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+browserAPI.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg && msg.type === "openShared" && msg.payload && msg.payload.pgn) {
     openAnalysisTab(msg.payload);
   }
@@ -21,12 +25,12 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 });
 
 // Keyboard shortcut: the service worker has no UI → on failure, just flash a badge.
-chrome.commands.onCommand.addListener((command) => {
+browserAPI.commands.onCommand.addListener((command) => {
   if (command === "analyze-current") runAnalyze(showBadgeError);
 });
 
 async function runAnalyze(onFail) {
-  const { username } = await chrome.storage.local.get("username");
+  const { username } = await browserAPI.storage.local.get("username");
   try {
     await analyzeActiveTab(username);
   } catch (err) {
@@ -44,11 +48,11 @@ async function runAnalyze(onFail) {
 
 // Stash the failure reason so the popup can surface it (with the paste box open) next time it opens.
 function stashError(err) {
-  try { chrome.storage.local.set({ pendingError: (err && err.message) || "" }); } catch {}
+  try { browserAPI.storage.local.set({ pendingError: (err && err.message) || "" }); } catch {}
 }
 
 function showBadgeError() {
-  chrome.action.setBadgeText({ text: "!" });
-  chrome.action.setBadgeBackgroundColor({ color: "#c0392b" });
-  setTimeout(() => chrome.action.setBadgeText({ text: "" }), 4000);
+  browserAPI.action.setBadgeText({ text: "!" });
+  browserAPI.action.setBadgeBackgroundColor({ color: "#c0392b" });
+  setTimeout(() => browserAPI.action.setBadgeText({ text: "" }), 4000);
 }
