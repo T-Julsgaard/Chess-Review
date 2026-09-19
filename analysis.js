@@ -1328,9 +1328,14 @@ function applyLayout() {
     mod.style.width = b.w + "px"; mod.style.height = b.h + "px";
   }
 }
-function growCanvas() {
+// Right and bottom edge of a module layout (px), floored at 600 so a near-empty canvas keeps a sane size.
+function layoutExtent(layout) {
   let maxB = 600, maxR = 600;
-  for (const b of Object.values(S.layout)) { maxB = Math.max(maxB, b.y + b.h); maxR = Math.max(maxR, b.x + b.w); }
+  for (const b of Object.values(layout)) { maxB = Math.max(maxB, b.y + b.h); maxR = Math.max(maxR, b.x + b.w); }
+  return { maxR, maxB };
+}
+function growCanvas() {
+  const { maxR, maxB } = layoutExtent(S.layout);
   UI.canvas.style.minHeight = maxB + 24 + "px";
   UI.canvas.style.minWidth = maxR + 24 + "px";
 }
@@ -4766,59 +4771,61 @@ async function applyGame(payload) {
 }
 
 /* ---------------- Start ---------------- */
-// The free-canvas layout is a FIXED-size composition (DEFAULT_LAYOUT spans ~1808×936 px). It's tuned
-// to read at 90% zoom on a 1080p (1920×1080) screen — the reference resolution it was designed
-// against. A flat 90% is wrong on any other resolution: a 1440p monitor has 78% more pixels, so the
-// same canvas occupies a far smaller slice of the screen → everything looks small, marooned in dead
-// space (exactly what a 1440p user sees). The fix is to scale the zoom in proportion to the monitor's
-// CSS resolution, so the canvas fills the same fraction of the screen regardless of resolution — i.e.
-// it *looks* like it does on 1080p everywhere. Because the canvas size is fixed and we use real Chrome
-// zoom, this maps every 16:9 screen onto an identical ~2133×1200 logical viewport: a faithful
-// reproduction of the 1080p layout, just rendered at the screen's native sharpness.
+// The free-canvas layout is a FIXED-size composition (DEFAULT_LAYOUT spans ~1808×936 px under a 60 px
+// top bar), so the page is zoomed to the largest size at which the whole composition fits the
+// WINDOW without scrolling. Not the monitor (screen.*): a monitor-based zoom cuts off the right
+// column as soon as the window isn't maximized, or is dragged to a smaller monitor after opening.
 //
-// Why screen.* and not window.innerWidth: innerWidth is itself a function of the current zoom, so
-// reading it to compute the zoom would feed back on itself. screen.availWidth/Height (the monitor, in
-// CSS px) is zoom-independent. CSS-px screen dims also fold in OS display-scaling for free — a 1440p
-// monitor already running at 150% Windows scaling reports ~1707 CSS px and correctly stays near 0.9,
-// since at that scaling the OS has already enlarged everything.
-const BASE_ZOOM = 0.9;        // tuned reference zoom at 1080p
-const REF_W = 1920, REF_H = 1080;
-function targetZoomForScreen() {
-  const w = (typeof screen !== "undefined" && screen.availWidth)  || REF_W;
-  const h = (typeof screen !== "undefined" && screen.availHeight) || REF_H;
-  // min() of the two ratios so a wide-but-short monitor (ultrawide) doesn't get zoomed past the point
-  // where the canvas overflows vertically. For a standard 16:9 screen both ratios are equal.
-  const scale = Math.min(w / REF_W, h / REF_H);
-  // Floor at BASE_ZOOM so screens at/below 1080p are untouched (identical to the old flat 90%); cap so
-  // a 4K/5K monitor at 100% OS scaling scales up but never balloons.
-  return Math.max(BASE_ZOOM, Math.min(BASE_ZOOM * scale, 2.0));
+// The viewport is measured in device-independent pixels (innerWidth × current zoom), since
+// innerWidth alone shrinks and grows with the zoom we are about to set. We use real Chrome zoom (not
+// CSS zoom, which would throw off the pointer-coordinate maths the board/panel dragging relies on).
+const TOPBAR_H = 60;                 // .topbar height in styles.css
+const MIN_ZOOM = 0.5, MAX_ZOOM = 2;  // below 50% the text is unreadable; above 200% it balloons
+let _zoomTabId = null;
+let _fittedDip = null;               // viewport size (device-independent px) the zoom was last fitted to
+function targetZoomFor(dipW, dipH) {
+  // The expanded-breakdown baseline, so collapsing the Accuracy categories doesn't change the zoom.
+  const { maxR, maxB } = layoutExtent(layoutForSave());
+  const pageW = maxR + 24, pageH = TOPBAR_H + maxB + 24;      // same margins as growCanvas()
+  // 2 px of slack so rounding never tips the page into a scrollbar; round down to whole percents.
+  const fit = Math.min((dipW - 2) / pageW, (dipH - 2) / pageH);
+  return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Math.floor(fit * 100) / 100));
 }
-
-// We use real Chrome zoom (not CSS zoom, which would throw off the pointer-coordinate maths the
-// board/panel dragging relies on).
-//
-// Scope is PER-ORIGIN: the zoom persists for the extension's OWN pages (origin chrome-extension://<id>),
-// which is what kills the zoom-indicator bubble that used to flash on every open. Chrome only shows
-// that bubble when the zoom *changes*; with per-tab scope every fresh game tab started at 100% and we
-// changed it → a popup every single time. With per-origin the tab already loads at the remembered
-// zoom, so our setZoom is a no-op and nothing pops up. It can still appear once — the very first time
-// the zoom is established (or after the user moves the window to a different-resolution monitor and
-// reopens) — then never again. (Per-origin here only affects this extension's pages, never the user's
-// other tabs or sites.) Failures are swallowed silently.
 async function fitTabZoom() {
+  const z = (await browserAPI.tabs.getZoom(_zoomTabId)) || 1;
+  const w = innerWidth * z, h = innerHeight * z;
+  // Same device-pixel size as last time → this resize came from a zoom change (the user's Ctrl+/-,
+  // our own setZoom, or another tab sharing the origin zoom), not from the window. Leave it.
+  if (_fittedDip && Math.abs(w - _fittedDip.w) < 3 && Math.abs(h - _fittedDip.h) < 3) return;
+  _fittedDip = { w, h };
+  const target = targetZoomFor(w, h);
+  // Only set it when it's off, so an unchanged window never triggers Chrome's zoom bubble.
+  if (Math.abs(z - target) > 0.005) await browserAPI.tabs.setZoom(_zoomTabId, target);
+}
+// Scope starts PER-ORIGIN, so a new tab opens at the zoom the last analysis tab settled on: a window
+// of the same size needs no change, and Chrome shows no zoom bubble on open. Fitting then updates
+// that remembered zoom for the next tab. Right after, the tab switches to PER-TAB, so two analysis
+// windows of different sizes (e.g. one per monitor) each keep their own fit instead of overwriting
+// each other. A browser that rejects per-tab scope just keeps the tab per-origin.
+async function initTabZoom() {
   try {
     if (!browserAPI?.tabs?.getCurrent) return;
-    const target = targetZoomForScreen();
     const tab = await browserAPI.tabs.getCurrent();
     if (!tab || tab.id == null) return;
+    _zoomTabId = tab.id;
     await browserAPI.tabs.setZoomSettings(tab.id, { scope: "per-origin", mode: "automatic" });
-    // Only set it when it's not already at the target, so we never trigger a needless zoom bubble.
-    const z = await browserAPI.tabs.getZoom(tab.id);
-    if (Math.abs((z || 1) - target) > 0.005) await browserAPI.tabs.setZoom(tab.id, target);
-  } catch {}
+    await fitTabZoom();
+    await browserAPI.tabs.setZoomSettings(tab.id, { scope: "per-tab", mode: "automatic" }).catch(() => {});
+  } catch { return; }
+  // Refit after the window is resized, maximized or moved to a different monitor. Debounced so a
+  // drag-resize zooms once when it settles, not on every frame.
+  let t = null;
+  window.addEventListener("resize", () => {
+    clearTimeout(t);
+    t = setTimeout(() => fitTabZoom().catch(() => {}), 200);
+  });
 }
 (async function main() {
-  fitTabZoom();   // fit-to-layout zoom, scoped to this tab only — see fitTabZoom()
   try {
     // Only the job + stored prefs are needed to build and show the UI. The opening book (~690 KB)
     // and the calibration file are only consumed once scoring/opening refinement runs, so we load
@@ -4875,6 +4882,7 @@ async function fitTabZoom() {
     const useStored = store.layoutVersion === LAYOUT_VERSION && store.layout;
     S.layout = useStored ? { ...structuredClone(DEFAULT_LAYOUT), ...store.layout } : structuredClone(DEFAULT_LAYOUT);
     if (!useStored) saveLayout();
+    initTabZoom();   // needs S.layout to know the page size; not awaited — see initTabZoom()
     S.username = store.username || "";
 
     // Everything the first render needs must be resolved BEFORE buildUI(), so that buildUI() and
