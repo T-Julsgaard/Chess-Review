@@ -290,7 +290,10 @@ const LOADERS = { dots: "pulse", bounce: "bounce", spinner: "spin", wave: "wave"
 // above the insight ("information") panel; the rest of the right stack moved down.
 // v7: the user-tuned arrangement — controls tucked under the board, coach compact at
 // top-right, review spanning the top of the right stack, panels retuned around them.
-const LAYOUT_VERSION = 7;
+// v8: the automatic responsive layout is the default; a canvas layout is only used once the user
+// reorganizes (S.layoutMode "custom"), and then starts from a snapshot of the screen. These boxes
+// remain the fallback for a module that is hidden when that snapshot is taken.
+const LAYOUT_VERSION = 8;
 const DEFAULT_LAYOUT = {
   board:    { x: 346,  y: 0,   w: 824, h: 936 },
   evalbar:  { x: 290,  y: 60,  w: 32,  h: 818 },
@@ -616,7 +619,7 @@ const S = {
   // Collapsible settings sections: open/closed state, keyed by section title.
   setOpen: {},
   settings: { ...DEFAULT_SETTINGS },
-  layout: structuredClone(DEFAULT_LAYOUT),
+  layout: structuredClone(DEFAULT_LAYOUT), layoutMode: "auto",
   evalEngines: [], autoTimer: null,
   // Re-analysis + analysis mode
   batchGen: 0, settingsTab: "visual", analyzedMultipv: null,
@@ -1226,17 +1229,20 @@ function buildUI() {
   const statsMount = el("div", { id: "statsMount" });
   const engineMount = el("div", { id: "engineMount" });
 
-  // free canvas with movable/resizable modules
-  const canvas = el("div", { class: "stage canvas", id: "canvas" },
-    makeMod("board", playerTop, boardWrap, playerBot),
+  // The stage holds every module. In the automatic layout the side wrappers group the panels into
+  // columns (styles.css picks wide / medium / narrow by window size); in the custom layout they are
+  // display:contents, so each module is placed on the free canvas on its own.
+  const canvas = el("div", { class: "stage auto", id: "canvas" },
     makeMod("evalbar", evalbarMount),
-    makeMod("controls", controls),
-    makeMod("coach", coachMount),
-    makeMod("review", reviewMount),
-    makeMod("moves", movesPanel),
-    makeMod("graph", graphMount),
-    makeMod("accuracy", statsMount),
-    makeMod("engine", engineMount),
+    makeMod("board", playerTop, boardWrap, playerBot),
+    el("div", { class: "side" },
+      makeMod("review", reviewMount),
+      el("div", { class: "side-cols" },
+        el("div", { class: "side-a" }, makeMod("moves", movesPanel), makeMod("graph", graphMount), makeMod("controls", controls)),
+        el("div", { class: "side-b" }, makeMod("accuracy", statsMount), makeMod("engine", engineMount)),
+      ),
+      makeMod("coach", coachMount),
+    ),
   );
 
   const settings = el("div", { class: "settings-pop", id: "settings", hidden: true });
@@ -1268,8 +1274,7 @@ function buildUI() {
     libRail, libControls, libList, libCount,
   };
 
-  applyLayout();
-  growCanvas();
+  applyLayoutMode();
   initBoardInput();
   renderCoachAvatar();     // mount the animated coach portrait for the active personality
   renderLibrary();
@@ -1318,16 +1323,42 @@ function layoutForSave() {
 }
 function saveLayout() {
   clearTimeout(_saveLayoutT);
-  _saveLayoutT = setTimeout(() => browserAPI.storage.local.set({ layout: layoutForSave(), layoutVersion: LAYOUT_VERSION }), 250);
+  _saveLayoutT = setTimeout(() => browserAPI.storage.local.set({ layout: layoutForSave(), layoutMode: S.layoutMode, layoutVersion: LAYOUT_VERSION }), 250);
+}
+// "auto" = the responsive layout in styles.css, which fits any window. "custom" = the free canvas the
+// user arranged in Reorganize mode, placed from S.layout and zoomed to fit the window.
+const isCustomLayout = () => S.layoutMode === "custom";
+function applyLayoutMode() {
+  const custom = isCustomLayout();
+  UI.canvas.classList.toggle("auto", !custom);
+  UI.canvas.classList.toggle("canvas", custom);
+  applyLayout(); growCanvas();
 }
 function applyLayout() {
+  const custom = isCustomLayout();
   for (const mod of UI.canvas.querySelectorAll(".mod")) {
-    const b = S.layout[mod.getAttribute("data-mod")];
-    if (!b) continue;
-    mod.style.left = b.x + "px"; mod.style.top = b.y + "px";
-    mod.style.width = b.w + "px"; mod.style.height = b.h + "px";
+    const b = custom && S.layout[mod.getAttribute("data-mod")];
+    mod.style.left = b ? b.x + "px" : ""; mod.style.top = b ? b.y + "px" : "";
+    mod.style.width = b ? b.w + "px" : ""; mod.style.height = b ? b.h + "px" : "";
   }
 }
+// Freeze the automatic layout into free-canvas boxes, so Reorganize starts from exactly what is on
+// screen. Hidden modules (eval bar or coach switched off) keep their default box.
+function snapshotLayout() {
+  const base = UI.canvas.getBoundingClientRect();
+  const out = structuredClone(DEFAULT_LAYOUT);
+  for (const mod of UI.canvas.querySelectorAll(".mod")) {
+    const r = mod.getBoundingClientRect();
+    if (!r.width || !r.height) continue;
+    // Round DOWN to the grid, so the canvas never needs more room than the screen it came from.
+    const down = (v) => Math.floor(v / GRID) * GRID;
+    out[mod.getAttribute("data-mod")] = { x: down(r.left - base.left), y: down(r.top - base.top), w: down(r.width), h: down(r.height) };
+  }
+  return out;
+}
+// Space kept right of and below the last module on the canvas: the automatic layout's stage padding,
+// so a canvas snapshotted from it needs exactly the same room (and the same zoom).
+const CANVAS_MARGIN = 12;
 // Right and bottom edge of a module layout (px), floored at 600 so a near-empty canvas keeps a sane size.
 function layoutExtent(layout) {
   let maxB = 600, maxR = 600;
@@ -1335,37 +1366,39 @@ function layoutExtent(layout) {
   return { maxR, maxB };
 }
 function growCanvas() {
+  if (!isCustomLayout()) { UI.canvas.style.minHeight = ""; UI.canvas.style.minWidth = ""; return; }
   const { maxR, maxB } = layoutExtent(S.layout);
-  UI.canvas.style.minHeight = maxB + 24 + "px";
-  UI.canvas.style.minWidth = maxR + 24 + "px";
+  UI.canvas.style.minHeight = maxB + CANVAS_MARGIN + "px";
+  UI.canvas.style.minWidth = maxR + CANVAS_MARGIN + "px";
+}
+// What collapsing the accuracy breakdown is worth on the canvas: the hidden rows' height (+ the
+// column row-gap), and every module in the same column sitting at/below the accuracy panel.
+function accuracyReflowInfo() {
+  const accMod = UI.canvas.querySelector('.mod[data-mod="accuracy"]');
+  const acc = S.layout.accuracy;
+  const row = accMod && accMod.querySelector(".qbreak-row");
+  const qb = accMod && accMod.querySelector(".qbreak");
+  const gap = qb ? (parseFloat(getComputedStyle(qb).rowGap) || 0) : 0;
+  const rowH = row ? row.offsetHeight : 24;
+  const delta = Math.round((QBREAK_FULL.length - QBREAK_SUMMARY.length) * (rowH + gap));
+  const belowKeys = [];
+  for (const [k, o] of Object.entries(S.layout)) {
+    if (k === "accuracy") continue;
+    const overlapX = o.x < acc.x + acc.w && o.x + o.w > acc.x;
+    if (overlapX && o.y >= acc.y + acc.h - 1) belowKeys.push(k);
+  }
+  return { delta, belowKeys };
 }
 // Keep the Accuracy module and everything stacked below it glued together when the category list
-// expands/collapses. The default layout (and any saved one) is sized for the EXPANDED list, so
-// that's the baseline: collapsing SHRINKS the module by the hidden rows' height and pulls every
-// module below it up by the same amount (constant gap); expanding restores it. Not persisted, so
-// the saved baseline stays the expanded one.
+// expands/collapses on the custom canvas (the automatic layout reflows on its own). The saved
+// layout is sized for the EXPANDED list, so that's the baseline: collapsing SHRINKS the module by
+// the hidden rows' height and pulls every module below it up by the same amount (constant gap);
+// expanding restores it. Not persisted, so the saved baseline stays the expanded one.
 function reflowAccuracy(expanded) {
-  const accMod = UI.canvas && UI.canvas.querySelector('.mod[data-mod="accuracy"]');
-  if (!accMod) return;
+  if (!UI.canvas || !isCustomLayout()) return;
   const acc = S.layout.accuracy; if (!acc) return;
-  // All modules in the same column sitting at/below the accuracy panel's bottom edge.
-  const below = () => {
-    const keys = [];
-    for (const [k, o] of Object.entries(S.layout)) {
-      if (k === "accuracy") continue;
-      const overlapX = o.x < acc.x + acc.w && o.x + o.w > acc.x;
-      if (overlapX && o.y >= acc.y + acc.h - 1) keys.push(k);
-    }
-    return keys;
-  };
   if (!expanded && !S._accReflow) {
-    // Collapse: measure one row (+ the column row-gap) to know what the hidden rows were worth.
-    const row = accMod.querySelector(".qbreak-row");
-    const qb = accMod.querySelector(".qbreak");
-    const gap = qb ? (parseFloat(getComputedStyle(qb).rowGap) || 0) : 0;
-    const rowH = row ? row.offsetHeight : 24;
-    const delta = Math.round((QBREAK_FULL.length - QBREAK_SUMMARY.length) * (rowH + gap));
-    const belowKeys = below();
+    const { delta, belowKeys } = accuracyReflowInfo();
     acc.h = Math.max(MINH, acc.h - delta);
     for (const k of belowKeys) S.layout[k].y = Math.max(0, S.layout[k].y - delta);
     S._accReflow = { delta, belowKeys };
@@ -1446,16 +1479,32 @@ function makeMovable(mod, handle, grips, key) {
   grips.s.addEventListener("pointerdown", startResize("s", grips.s));
   grips.se.addEventListener("pointerdown", startResize("se", grips.se));
 }
+// Back to the automatic layout (and the browser's own zoom).
 function resetLayout() {
+  const wasCustom = isCustomLayout();
   S._accReflow = null;   // drop any collapse offset so the fresh layout isn't double-adjusted
   S.layout = structuredClone(DEFAULT_LAYOUT);
-  applyLayout(); growCanvas();
-  if (!S.qbreakExpanded) reflowAccuracy(false);   // keep modules tight under the collapsed breakdown
-  saveLayout();   // persists the expanded baseline via layoutForSave()
+  S.layoutMode = "auto";
+  if (S.reorganize) toggleReorganize();
+  applyLayoutMode();
+  saveLayout();
+  if (wasCustom) releaseTabZoom();
+  requestAnimationFrame(alignPlayers);
 }
 // Reorganize mode: while ON, panels can be dragged/resized (handles + grips appear); while OFF
-// they're locked and hover shows nothing. The arranged layout auto-saves and persists.
+// they're locked and hover shows nothing. The arranged layout auto-saves and persists. Entering it
+// from the automatic layout freezes what is on screen into a custom canvas first.
 function toggleReorganize() {
+  if (!S.reorganize && !isCustomLayout()) {
+    S.layout = snapshotLayout();
+    // The snapshot holds the breakdown as it is shown; record the collapse offset so the saved
+    // baseline is the expanded one, like every other canvas layout (see layoutForSave()).
+    S._accReflow = S.qbreakExpanded ? null : accuracyReflowInfo();
+    S.layoutMode = "custom";
+    applyLayoutMode();
+    saveLayout();
+    initTabZoom();
+  }
   S.reorganize = !S.reorganize;
   UI.canvas.classList.toggle("reorganizing", S.reorganize);
   if (S.reorganize && UI.settings) UI.settings.hidden = true; // move the settings panel out of the way
@@ -2167,6 +2216,7 @@ function renderEvalBar() {
   const mod = UI.canvas && UI.canvas.querySelector('.mod[data-mod="evalbar"]');
   const show = S.settings.evalView === "both" || S.settings.evalView === "bar";
   if (mod) mod.style.display = show ? "" : "none";
+  if (UI.canvas) UI.canvas.classList.toggle("no-evalbar", !show);   // the automatic layout drops its column
   if (!show || !UI.evalbar) return;
   let bar = UI.evalbar.querySelector(".evalbar");
   const e = activeEval();
@@ -2489,6 +2539,7 @@ function renderCoachAvatar() {
   const id = S.settings.coach || "";
   const rig = COACH_RIGS[id] || null;
   const mod = UI.coach.closest(".mod");
+  UI.canvas.classList.toggle("has-coach", !!rig);   // the insight text leaves room for the portrait
   if (!rig) {                                   // "Off" or no rig built yet → hide the module entirely
     _coachFrame = null; _coachReady = false; _coachId = null;
     UI.coach.replaceChildren();
@@ -3005,6 +3056,8 @@ function renderStats() {
 /* ---------------- Eval graph ---------------- */
 function renderGraph() {
   const show = S.settings.evalView === "both" || S.settings.evalView === "graph";
+  const mod = UI.graph.closest(".mod");
+  if (mod) mod.hidden = !show;   // hidden, not just emptied, so the layout closes the gap
   if (!show) { UI.graph.replaceChildren(); return; }
   const W = 384, H = 120, mid = H / 2;
   const maxPly = Math.max(1, S.total);
@@ -3687,8 +3740,8 @@ function visualSettings() {
       seg("Bar", "barStyle", ["classic", "gradient", "mono", "accent"]),
       seg("Graph", "graphStyle", ["area", "line", "color", "minimal"]),
       el("button", { class: "set-reset reorg-toggle-btn", onclick: toggleReorganize }, S.reorganize ? "Done reorganizing" : "Reorganize panels"),
-      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Reorganize lets you drag & resize the panels; your arrangement is saved automatically.")),
-      el("button", { class: "set-reset", onclick: () => { resetLayout(); toast("Layout reset"); } }, "Reset modules"),
+      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Reorganize lets you drag and resize the panels, and your arrangement is saved. Reset layout goes back to the automatic layout that fits any window.")),
+      el("button", { class: "set-reset", onclick: () => { resetLayout(); toast("Layout reset"); } }, "Reset layout"),
     ),
     section("Move list",
       seg("Style", "mlStyle", ["rows", "cards", "compact"]),
@@ -4771,27 +4824,31 @@ async function applyGame(payload) {
 }
 
 /* ---------------- Start ---------------- */
-// The free-canvas layout is a FIXED-size composition (DEFAULT_LAYOUT spans ~1808×936 px under a 60 px
-// top bar), so the page is zoomed to the largest size at which the whole composition fits the
-// WINDOW without scrolling. Not the monitor (screen.*): a monitor-based zoom cuts off the right
-// column as soon as the window isn't maximized, or is dragged to a smaller monitor after opening.
+// The automatic layout is responsive CSS and leaves the zoom to the browser. A custom canvas layout
+// is a FIXED-size composition under a 60 px top bar, so while one is active the page is zoomed to
+// the largest size at which the whole composition fits the WINDOW without scrolling. Not the
+// monitor (screen.*): a monitor-based zoom cuts off the right column as soon as the window isn't
+// maximized, or is dragged to a smaller monitor after opening.
 //
 // The viewport is measured in device-independent pixels (innerWidth × current zoom), since
 // innerWidth alone shrinks and grows with the zoom we are about to set. We use real Chrome zoom (not
-// CSS zoom, which would throw off the pointer-coordinate maths the board/panel dragging relies on).
+// CSS zoom, which would throw off the pointer-coordinate maths the panel dragging relies on).
 const TOPBAR_H = 60;                 // .topbar height in styles.css
 const MIN_ZOOM = 0.5, MAX_ZOOM = 2;  // below 50% the text is unreadable; above 200% it balloons
 let _zoomTabId = null;
 let _fittedDip = null;               // viewport size (device-independent px) the zoom was last fitted to
 function targetZoomFor(dipW, dipH) {
-  // The expanded-breakdown baseline, so collapsing the Accuracy categories doesn't change the zoom.
-  const { maxR, maxB } = layoutExtent(layoutForSave());
-  const pageW = maxR + 24, pageH = TOPBAR_H + maxB + 24;      // same margins as growCanvas()
-  // 2 px of slack so rounding never tips the page into a scrollbar; round down to whole percents.
-  const fit = Math.min((dipW - 2) / pageW, (dipH - 2) / pageH);
-  return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Math.floor(fit * 100) / 100));
+  // The layout as shown (breakdown collapsed by default); expanding it later may scroll.
+  const { maxR, maxB } = layoutExtent(S.layout);
+  const pageW = maxR + CANVAS_MARGIN, pageH = TOPBAR_H + maxB + CANVAS_MARGIN;
+  // Round down to whole percents. The 0.05% tolerance keeps an exact fit (a canvas snapshotted from
+  // the automatic layout in this same window) at 100% instead of tipping it to 99%; it is well
+  // under a pixel, so it never adds a scrollbar.
+  const fit = Math.min(dipW / pageW, dipH / pageH);
+  return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Math.floor((fit + 0.0005) * 100) / 100));
 }
 async function fitTabZoom() {
+  if (!isCustomLayout() || _zoomTabId == null) return;
   const z = (await browserAPI.tabs.getZoom(_zoomTabId)) || 1;
   const w = innerWidth * z, h = innerHeight * z;
   // Same device-pixel size as last time → this resize came from a zoom change (the user's Ctrl+/-,
@@ -4813,17 +4870,44 @@ async function initTabZoom() {
     const tab = await browserAPI.tabs.getCurrent();
     if (!tab || tab.id == null) return;
     _zoomTabId = tab.id;
+    _fittedDip = null;
     await browserAPI.tabs.setZoomSettings(tab.id, { scope: "per-origin", mode: "automatic" });
     await fitTabZoom();
     await browserAPI.tabs.setZoomSettings(tab.id, { scope: "per-tab", mode: "automatic" }).catch(() => {});
   } catch { return; }
   // Refit after the window is resized, maximized or moved to a different monitor. Debounced so a
-  // drag-resize zooms once when it settles, not on every frame.
+  // drag-resize zooms once when it settles, not on every frame. Registered once per page.
+  if (_zoomResizeBound) return;
+  _zoomResizeBound = true;
   let t = null;
   window.addEventListener("resize", () => {
     clearTimeout(t);
     t = setTimeout(() => fitTabZoom().catch(() => {}), 200);
   });
+}
+let _zoomResizeBound = false;
+// Leaving the custom layout: hand the zoom back to the browser, for this origin too, so the next
+// analysis tab opens at the user's own zoom.
+async function releaseTabZoom() {
+  _fittedDip = null;
+  if (_zoomTabId == null) return;
+  try {
+    await browserAPI.tabs.setZoomSettings(_zoomTabId, { scope: "per-origin", mode: "automatic" });
+    await browserAPI.tabs.setZoom(_zoomTabId, 0);   // 0 = the browser's default zoom
+  } catch {}
+}
+// Earlier versions zoomed the analysis page themselves (90–127%), and Chrome remembers that zoom for
+// the extension's origin. The automatic layout is built for the browser's own zoom, so give it back
+// once when an older install is migrated.
+async function resetLegacyZoom() {
+  try {
+    if (!browserAPI?.tabs?.getCurrent) return;
+    const tab = await browserAPI.tabs.getCurrent();
+    if (!tab || tab.id == null) return;
+    await browserAPI.tabs.setZoomSettings(tab.id, { scope: "per-origin", mode: "automatic" });
+    const [z, zs] = await Promise.all([browserAPI.tabs.getZoom(tab.id), browserAPI.tabs.getZoomSettings(tab.id)]);
+    if (Math.abs(z - (zs.defaultZoomFactor || 1)) > 0.005) await browserAPI.tabs.setZoom(tab.id, 0);
+  } catch {}
 }
 (async function main() {
   try {
@@ -4832,7 +4916,7 @@ async function initTabZoom() {
     // them in parallel and don't block the first paint on them — buildUI() can run as soon as the
     // job and settings are in, while the book is still downloading.
     const dataReady = Promise.all([loadBook(), loadCalibration()]);
-    const [payload, store] = await Promise.all([loadJob(), browserAPI.storage.local.get(["settings", "username", "layout", "layoutVersion", "library"])]);
+    const [payload, store] = await Promise.all([loadJob(), browserAPI.storage.local.get(["settings", "username", "layout", "layoutMode", "layoutVersion", "library"])]);
     S.library = Array.isArray(store.library) ? store.library : [];
     S.settings = { ...DEFAULT_SETTINGS, ...(store.settings || {}) };
     // Only the two bundled SVG sets remain (Cburnett = "image", Merida). Every older or removed
@@ -4881,8 +4965,9 @@ async function initTabZoom() {
     // Use the saved layout if it matches the current version; otherwise the new default.
     const useStored = store.layoutVersion === LAYOUT_VERSION && store.layout;
     S.layout = useStored ? { ...structuredClone(DEFAULT_LAYOUT), ...store.layout } : structuredClone(DEFAULT_LAYOUT);
+    S.layoutMode = useStored && store.layoutMode === "custom" ? "custom" : "auto";
     if (!useStored) saveLayout();
-    initTabZoom();   // needs S.layout to know the page size; not awaited — see initTabZoom()
+    if (store.layoutVersion != null && store.layoutVersion !== LAYOUT_VERSION) resetLegacyZoom();
     S.username = store.username || "";
 
     // Everything the first render needs must be resolved BEFORE buildUI(), so that buildUI() and
@@ -4904,6 +4989,8 @@ async function initTabZoom() {
     }
     buildUI();               // built once; switching games re-uses it (no full page reload)
     await applyGame(payload);
+    // A custom canvas is fitted once it is laid out as shown (breakdown collapsed); not awaited.
+    if (isCustomLayout()) initTabZoom();
     requestAnimationFrame(alignPlayers); // measure the board after the first layout
   } catch (err) {
     const e = document.getElementById("error");
