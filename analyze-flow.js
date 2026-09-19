@@ -3,18 +3,19 @@
 
 import { findGameById, gameMeta, parseFlip, parseGameId } from "./chesscom.js";
 import { parseLichessGameId, parseLichessFlip, fetchGamePgn as fetchLichessPgn } from "./lichess.js";
+import { browserAPI } from "./browser-compat.js";
 
 /** Save the analysis payload and open analysis.html in a new tab. */
 export async function openAnalysisTab(payload) {
   const jobId = String(Date.now());
-  await chrome.storage.local.set({ [`job:${jobId}`]: payload });
-  await chrome.tabs.create({
-    url: chrome.runtime.getURL(`analysis.html#${jobId}`),
+  await browserAPI.storage.local.set({ [`job:${jobId}`]: payload });
+  await browserAPI.tabs.create({
+    url: browserAPI.runtime.getURL(`analysis.html#${jobId}`),
   });
 }
 
 async function getActiveTab() {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  const [tab] = await browserAPI.tabs.query({ active: true, currentWindow: true });
   return tab || null;
 }
 
@@ -32,17 +33,17 @@ export async function reloadActiveAndAnalyze(username) {
   await new Promise((resolve, reject) => {
     const onUpdated = (id, info) => {
       if (id === tab.id && info.status === "complete") {
-        chrome.tabs.onUpdated.removeListener(onUpdated);
+        browserAPI.tabs.onUpdated.removeListener(onUpdated);
         clearTimeout(timer);
         resolve();
       }
     };
     const timer = setTimeout(() => {
-      chrome.tabs.onUpdated.removeListener(onUpdated);
+      browserAPI.tabs.onUpdated.removeListener(onUpdated);
       reject(new Error("reload timed out"));
     }, 12000);
-    chrome.tabs.onUpdated.addListener(onUpdated);
-    chrome.tabs.reload(tab.id);
+    browserAPI.tabs.onUpdated.addListener(onUpdated);
+    browserAPI.tabs.reload(tab.id);
   });
   await new Promise((r) => setTimeout(r, 900)); // let the chess.com SPA hydrate the game page
   await analyzeActiveTab(username);
@@ -51,7 +52,7 @@ export async function reloadActiveAndAnalyze(username) {
 /** Ask the content script in a tab for the game ID, etc. */
 async function getGameInfoFromTab(tabId) {
   try {
-    return await chrome.tabs.sendMessage(tabId, { type: "getGameInfo" });
+    return await browserAPI.tabs.sendMessage(tabId, { type: "getGameInfo" });
   } catch {
     return null; // no content script on the page (not chess.com)
   }
@@ -134,10 +135,10 @@ export async function analyzeActiveTab(username) {
   // picked up from someone else's game. Only persist an explicitly typed handle, or seed an empty
   // store with the page's POV player on first run.
   if (provided) {
-    await chrome.storage.local.set({ username: provided });
+    await browserAPI.storage.local.set({ username: provided });
   } else {
-    const { username: stored } = await chrome.storage.local.get("username");
-    if (!stored && detected[0]) await chrome.storage.local.set({ username: detected[0] });
+    const { username: stored } = await browserAPI.storage.local.get("username");
+    if (!stored && detected[0]) await browserAPI.storage.local.set({ username: detected[0] });
   }
 
   // Board perspective: the page's own ?flip= hint is the user's actual POV, so it's the primary

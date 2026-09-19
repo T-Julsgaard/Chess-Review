@@ -6,6 +6,7 @@
 import { Chess } from "./lib/chess.js";
 import { Engine } from "./engine/uci.js";
 import { flagCodeForCountryId, countryNameForId } from "./flags.js";
+import { browserAPI } from "./browser-compat.js";
 
 /* ---------------- Opening book ----------------
  * Offline lookup table built from lichess-org/chess-openings (see data/build-book.mjs).
@@ -19,7 +20,7 @@ function bookLookup(fen) { return BOOK ? BOOK[epdOf(fen)] : undefined; }
 async function loadBook() {
   if (BOOK) return BOOK;
   try {
-    const res = await fetch(chrome.runtime.getURL("data/book.json"));
+    const res = await fetch(browserAPI.runtime.getURL("data/book.json"));
     BOOK = (await res.json()).epd || {};
   } catch {
     BOOK = {}; // book missing/unreadable → fall back to pure engine classification
@@ -31,7 +32,7 @@ async function loadBook() {
 let CALIB = null;
 async function loadCalibration() {
   if (CALIB) return CALIB;
-  try { CALIB = await (await fetch(chrome.runtime.getURL("data/calibration.json"))).json(); }
+  try { CALIB = await (await fetch(browserAPI.runtime.getURL("data/calibration.json"))).json(); }
   catch { CALIB = {}; }
   return CALIB;
 }
@@ -375,7 +376,7 @@ function shareGame(ev) {
 }
 
 /* ---------------- Sound ---------------- */
-const _url = (p) => (typeof chrome !== "undefined" && chrome.runtime?.getURL ? chrome.runtime.getURL(p) : p);
+const _url = (p) => (browserAPI?.runtime?.getURL ? browserAPI.runtime.getURL(p) : p);
 
 const FX_SOUNDS = [
   ["01", "Sound 01", "sounds/fx/chess_sound_01.wav"],
@@ -410,7 +411,7 @@ function setFx(ev, field, val) {
   const fx = { ...(S.settings.soundFx || {}) };
   fx[ev] = { ...fxConfig(ev), [field]: val };
   S.settings.soundFx = fx;
-  chrome.storage.local.set({ settings: S.settings });
+  browserAPI.storage.local.set({ settings: S.settings });
 }
 // Resolve an event's chosen sound to a packaged URL.
 function fxUrl(ev) {
@@ -631,10 +632,10 @@ async function loadJob() {
   const jobId = location.hash.replace(/^#/, "");
   if (!jobId) throw new Error("No analysis job specified.");
   const key = `job:${jobId}`;
-  const data = await chrome.storage.local.get(key);
+  const data = await browserAPI.storage.local.get(key);
   const payload = data[key];
   if (!payload) throw new Error("Analysis data not found (open via the popup).");
-  await chrome.storage.local.remove(key);
+  await browserAPI.storage.local.remove(key);
   return payload;
 }
 function parseHeaders(pgn) {
@@ -1163,7 +1164,7 @@ function layoutForSave() {
 }
 function saveLayout() {
   clearTimeout(_saveLayoutT);
-  _saveLayoutT = setTimeout(() => chrome.storage.local.set({ layout: layoutForSave(), layoutVersion: LAYOUT_VERSION }), 250);
+  _saveLayoutT = setTimeout(() => browserAPI.storage.local.set({ layout: layoutForSave(), layoutVersion: LAYOUT_VERSION }), 250);
 }
 function applyLayout() {
   for (const mod of UI.canvas.querySelectorAll(".mod")) {
@@ -2251,7 +2252,7 @@ async function loadCoach(id) {
   if (!id) return null;
   if (_coachCache[id]) return _coachCache[id];
   try {
-    const res = await fetch(chrome.runtime.getURL("data/coaches/" + id + ".json"));
+    const res = await fetch(browserAPI.runtime.getURL("data/coaches/" + id + ".json"));
     if (!res.ok) throw new Error("HTTP " + res.status);
     const bank = await res.json();
     _coachCache[id] = bank;
@@ -2262,7 +2263,7 @@ async function loadCoach(id) {
 // new voice — a seamless mid-game hand-off (no jump, no reset of where you are in the game).
 async function setCoach(id) {
   S.settings.coach = id;
-  await chrome.storage.local.set({ settings: S.settings });
+  await browserAPI.storage.local.set({ settings: S.settings });
   // The avatar always reflects the chosen coach; the reply bank is only loaded when special replies are on.
   S.coach = S.settings.coachPlain ? null : await loadCoach(id);
   _ipSig = null;                                   // force a fresh pick + re-type in the new voice
@@ -2275,7 +2276,7 @@ async function setCoach(id) {
 // reactions) stay; only the narration switches between the coach's own voice and neutral plain lines.
 async function setCoachPlain(plain) {
   S.settings.coachPlain = plain;
-  await chrome.storage.local.set({ settings: S.settings });
+  await browserAPI.storage.local.set({ settings: S.settings });
   S.coach = plain ? null : await loadCoach(S.settings.coach);
   _ipSig = null;                                   // re-pick + re-type in the new voice
   if (S.practice) S.practice.coachTyped = false;
@@ -2336,7 +2337,7 @@ function renderCoachAvatar() {
   _coachId = id; _coachReady = false;
   const frame = el("iframe", {
     class: "coach-frame", title: "Coach", scrolling: "no",
-    src: chrome.runtime.getURL(COACH_RIG_DIR + rig),
+    src: browserAPI.runtime.getURL(COACH_RIG_DIR + rig),
   });
   frame.addEventListener("load", () => {
     _coachReady = true;
@@ -3187,7 +3188,7 @@ function slider(label, key, min, max, step, opts = {}) {
         const v = +e.target.value;
         out.textContent = fmt(v);
         S.settings[key] = v;
-        chrome.storage.local.set({ settings: S.settings });
+        browserAPI.storage.local.set({ settings: S.settings });
         opts.onChange?.(v);
       },
     }),
@@ -3303,7 +3304,7 @@ function openBoardColorPicker(anchor) {
   };
   const picker = buildColorPicker(S.settings[target],
     (hex) => { S.settings[target] = hex; applySettings(); paint(); },         // live
-    (hex) => { S.settings[target] = hex; chrome.storage.local.set({ settings: S.settings }); }, // commit
+    (hex) => { S.settings[target] = hex; browserAPI.storage.local.set({ settings: S.settings }); }, // commit
   );
   const setActive = (key, btn) => {
     target = key;
@@ -3367,7 +3368,7 @@ function engineSlider(label, key, min, max, step, opts = {}) {
         const v = +e.target.value;
         out.textContent = fmt(v);
         S.settings[key] = v;
-        chrome.storage.local.set({ settings: S.settings });
+        browserAPI.storage.local.set({ settings: S.settings });
         if (S.liveEngine) { try { S.liveEngine.terminate(); } catch {} S.liveEngine = null; S.liveToken++; }
         scheduleReanalyze();
       },
@@ -3387,7 +3388,7 @@ function clsSlider(label, key, min, max, step, opts = {}) {
         const v = +e.target.value;
         out.textContent = fmt(v);
         S.settings[key] = v;
-        chrome.storage.local.set({ settings: S.settings });
+        browserAPI.storage.local.set({ settings: S.settings });
         applyClassificationChange();
       },
     }),
@@ -3408,7 +3409,7 @@ function applyClassificationChange() {
 // Reset every Engine-tab setting to its default and re-run the analysis.
 async function resetEngineSettings() {
   for (const k of ENGINE_SETTING_KEYS) S.settings[k] = DEFAULT_SETTINGS[k];
-  await chrome.storage.local.set({ settings: S.settings });
+  await browserAPI.storage.local.set({ settings: S.settings });
   if (S.liveEngine) { try { S.liveEngine.terminate(); } catch {} S.liveEngine = null; S.liveToken++; }
   scheduleReanalyze();
   renderEngineCurrent();
@@ -3781,7 +3782,7 @@ function openCredits() {
 }
 async function setSetting(key, value) {
   S.settings[key] = value;
-  await chrome.storage.local.set({ settings: S.settings });
+  await browserAPI.storage.local.set({ settings: S.settings });
   applySettings();
   if (key === "pieceStyle") buildBoard();
   if (key === "mlStyle" || key === "badgeStyle") renderMoves();
@@ -3794,7 +3795,7 @@ async function setSetting(key, value) {
 // Engine setting: save, discard the live engine (new build/options), and re-analyze.
 async function setEngineSetting(key, value) {
   S.settings[key] = value;
-  await chrome.storage.local.set({ settings: S.settings });
+  await browserAPI.storage.local.set({ settings: S.settings });
   if (S.liveEngine) { try { S.liveEngine.terminate(); } catch {} S.liveEngine = null; S.liveToken++; }
   // The helper engine (threat preview / practice judging) must also be rebuilt with the new
   // build/options, and any cached threat arrows recomputed.
@@ -3827,7 +3828,7 @@ function applyDetectedTheme(theme) {
     S.settings.ccBoardUrl = null;
     S.settings.boardTheme = "chesscom";
   }
-  chrome.storage.local.set({ settings: S.settings });
+  browserAPI.storage.local.set({ settings: S.settings });
 }
 function applySettings() {
   const r = document.documentElement;
@@ -3906,7 +3907,7 @@ function uploadBackground() {
     rd.onload = async () => {
       S.settings.bgCustom = String(rd.result);
       S.settings.bg = "custom";
-      await chrome.storage.local.set({ settings: S.settings });
+      await browserAPI.storage.local.set({ settings: S.settings });
       applySettings();
       if (UI.settings && !UI.settings.hidden) renderSettings();
     };
@@ -3995,7 +3996,7 @@ function markCurrentSolved() {
   const rec = S.library.find((r) => r.id === currentGameId());
   if (rec && !rec.solved) {
     rec.solved = true;
-    chrome.storage.local.set({ library: S.library });
+    browserAPI.storage.local.set({ library: S.library });
     renderLibrary();
   }
 }
@@ -4244,8 +4245,8 @@ function saveToLibrary() {
     // The heavy analysis (evals + engine lines) is stored under its own key so the library list
     // stays light, and so re-opening a saved game can render instantly WITHOUT re-analyzing.
     const writes = { library: lib, ["analysis:" + id]: { evals: S.evals, bests: S.bests, multipv: S.analyzedMultipv } };
-    chrome.storage.local.set(writes);
-    if (dropped.length) chrome.storage.local.remove(dropped.map((d) => "analysis:" + d.id));
+    browserAPI.storage.local.set(writes);
+    if (dropped.length) browserAPI.storage.local.remove(dropped.map((d) => "analysis:" + d.id));
     renderLibrary();
   } catch (e) { console.warn("library save failed", e); }
 }
@@ -4253,7 +4254,7 @@ async function openLibraryGame(rec) {
   if (rec.id === currentGameId()) return;   // already open
   // Pull the stored analysis so the re-opened game shows up already analyzed (no re-run).
   let analysis = null;
-  try { const s = await chrome.storage.local.get("analysis:" + rec.id); analysis = s["analysis:" + rec.id] || null; } catch {}
+  try { const s = await browserAPI.storage.local.get("analysis:" + rec.id); analysis = s["analysis:" + rec.id] || null; } catch {}
   // Switch in place — no page reload, no black flash. The sidebar stays open (it only closes when
   // the mouse leaves the library area), so you can pick another game right away. Reproduce the exact
   // perspective the game was saved with: prefer a stored flip hint, else the saved meSide — so a
@@ -4266,7 +4267,7 @@ function toggleFav(id) {
   const rec = S.library.find((r) => r.id === id);
   if (!rec) return;
   rec.fav = !rec.fav;
-  chrome.storage.local.set({ library: S.library });
+  browserAPI.storage.local.set({ library: S.library });
   renderLibrary();
 }
 // Apply the active sort + filters.
@@ -4579,7 +4580,7 @@ async function applyGame(payload) {
   // to the lookup here if no caller supplied the field at all.
   let saved = payload.analysis;
   if (saved == null && !("analysis" in payload)) {
-    try { const k = "analysis:" + currentGameId(); const s = await chrome.storage.local.get(k); saved = s[k] || null; } catch {}
+    try { const k = "analysis:" + currentGameId(); const s = await browserAPI.storage.local.get(k); saved = s[k] || null; } catch {}
   }
   const restored = saved && Array.isArray(saved.bests) && saved.bests.length === S.total + 1 && Array.isArray(saved.evals);
   if (restored) {
@@ -4626,21 +4627,16 @@ function targetZoomForScreen() {
 // the zoom is established (or after the user moves the window to a different-resolution monitor and
 // reopens) — then never again. (Per-origin here only affects this extension's pages, never the user's
 // other tabs or sites.) Failures are swallowed silently.
-function fitTabZoom() {
+async function fitTabZoom() {
   try {
-    if (!chrome.tabs || !chrome.tabs.getCurrent) return;
+    if (!browserAPI?.tabs?.getCurrent) return;
     const target = targetZoomForScreen();
-    chrome.tabs.getCurrent((tab) => {
-      if (chrome.runtime.lastError || !tab || tab.id == null) return;
-      chrome.tabs.setZoomSettings(tab.id, { scope: "per-origin", mode: "automatic" }, () => {
-        if (chrome.runtime.lastError) return;
-        // Only set it when it's not already at the target, so we never trigger a needless zoom bubble.
-        chrome.tabs.getZoom(tab.id, (z) => {
-          if (chrome.runtime.lastError) return;
-          if (Math.abs((z || 1) - target) > 0.005) chrome.tabs.setZoom(tab.id, target, () => void chrome.runtime.lastError);
-        });
-      });
-    });
+    const tab = await browserAPI.tabs.getCurrent();
+    if (!tab || tab.id == null) return;
+    await browserAPI.tabs.setZoomSettings(tab.id, { scope: "per-origin", mode: "automatic" });
+    // Only set it when it's not already at the target, so we never trigger a needless zoom bubble.
+    const z = await browserAPI.tabs.getZoom(tab.id);
+    if (Math.abs((z || 1) - target) > 0.005) await browserAPI.tabs.setZoom(tab.id, target);
   } catch {}
 }
 (async function main() {
@@ -4648,7 +4644,7 @@ function fitTabZoom() {
   try {
     
     const dataReady = Promise.all([loadBook(), loadCalibration()]);
-    const [payload, store] = await Promise.all([loadJob(), chrome.storage.local.get(["settings", "username", "layout", "layoutVersion", "library"])]);
+    const [payload, store] = await Promise.all([loadJob(), browserAPI.storage.local.get(["settings", "username", "layout", "layoutVersion", "library"])]);
     S.library = Array.isArray(store.library) ? store.library : [];
     S.settings = { ...DEFAULT_SETTINGS, ...(store.settings || {}) };
     // Only the two bundled SVG sets remain (Cburnett = "image", Merida). Every older or removed
@@ -4666,7 +4662,7 @@ function fitTabZoom() {
         S.settings.coach = "old_soviet"; S.settings.coachPlain = true;
       }
       S.settings.coachDefaulted = true;
-      chrome.storage.local.set({ settings: S.settings });
+      browserAPI.storage.local.set({ settings: S.settings });
     }
     // The avatar always reflects the chosen coach; the reply bank loads only when special replies are on.
     S.coach = S.settings.coachPlain ? null : await loadCoach(S.settings.coach);
@@ -4675,22 +4671,22 @@ function fitTabZoom() {
     if (!S.settings.depthBumped) {
       if ((store.settings?.engineDepth ?? 12) <= 12) S.settings.engineDepth = Math.max(S.settings.engineDepth, 16);
       S.settings.depthBumped = true;
-      chrome.storage.local.set({ settings: S.settings });
+      browserAPI.storage.local.set({ settings: S.settings });
     }
     // One-time switch to the strong Stockfish 18 NNUE build for anyone still on the old SF10 WASM
     // default (asm.js users keep asm — they may lack WASM). A later deliberate choice sticks.
     if (!S.settings.nnueDefaulted) {
       if (S.settings.enginePath === "wasm") S.settings.enginePath = "nnue";
       S.settings.nnueDefaulted = true;
-      chrome.storage.local.set({ settings: S.settings });
+      browserAPI.storage.local.set({ settings: S.settings });
     }
     // The 5-line option was removed — clamp any stored value to the new max.
-    if (S.settings.engineLines > ENGINE_MAX_LINES) { S.settings.engineLines = ENGINE_MAX_LINES; chrome.storage.local.set({ settings: S.settings }); }
+    if (S.settings.engineLines > ENGINE_MAX_LINES) { S.settings.engineLines = ENGINE_MAX_LINES; browserAPI.storage.local.set({ settings: S.settings }); }
     
     if (S.settings.mpv2Calibrated) {
       if (S.settings.classifyLines === 2) S.settings.classifyLines = 1;
       delete S.settings.mpv2Calibrated;
-      chrome.storage.local.set({ settings: S.settings });
+      browserAPI.storage.local.set({ settings: S.settings });
     }
     applyDetectedTheme(payload.theme); // match the user's chess.com piece/board theme (if opened from a chess.com tab)
     // Use the saved layout if it matches the current version; otherwise the new default.
@@ -4709,7 +4705,7 @@ function fitTabZoom() {
       let saved = null;
       try {
         const k = "analysis:" + ((payload.meta && payload.meta.gameId) || ("pgn:" + simpleHash(payload.pgn || "")));
-        const s = await chrome.storage.local.get(k);
+        const s = await browserAPI.storage.local.get(k);
         saved = s[k] || null;
       } catch {}
       payload.analysis = saved;

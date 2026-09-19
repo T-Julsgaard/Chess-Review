@@ -1,0 +1,15 @@
+{
+  "name": "chess-review-clone",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Personal fork of T-Julsgaard/Chess-Review — free, local game review powered by Stockfish NNUE.",
+  "license": "GPL-3.0",
+  "scripts": {
+    "lint": "web-ext lint --source-dir=.",
+    "start:firefox": "web-ext run --target=firefox-desktop --source-dir=.",
+    "start:chrome": "web-ext run --target=chromium --source-dir=."
+  },
+  "devDependencies": {
+    "web-ext": "^10.6.0"
+  }
+}
