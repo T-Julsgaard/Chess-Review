@@ -6,6 +6,10 @@
 // Load banner: confirms the content script is actually running on this page.
 console.log("[Chess Analyzer] content script active on", location.href);
 
+// A plain content script can't import browser-compat.js, so inline the same fallback: Firefox's
+// `browser.*` is Promise-native, Chrome's `chrome.*` only gained Promise support under MV3.
+const browserAPI = typeof browser !== "undefined" ? browser : chrome;
+
 // KEEP GAME_ID_RE IN SYNC with the canonical copy in chesscom.js (this file runs as a plain content
 // script and can't import the module). The type segment is optional and may be any word, so a bare
 // /game/<id>, /game/live|daily/<id>, the review URL (/analysis/game/live/<id>/review), and a future
@@ -257,7 +261,7 @@ function handleShareFragment() {
     if (!payload || !payload.pgn) return;
     // clear the fragment so a reload doesn't open it again
     history.replaceState(null, "", location.pathname + location.search);
-    chrome.runtime.sendMessage({ type: "openShared", payload });
+    browserAPI.runtime.sendMessage({ type: "openShared", payload });
   } catch (e) {
     console.warn("[Chess Analyzer] invalid share link", e);
   }
@@ -335,8 +339,8 @@ function buildReviewButton(widthClass, mt = 14, mb = 3) {
   // margins some width classes rely on. position:relative anchors the logo in the top-right corner.
   // Margins are passed in because the modal and the sidebar want different vertical spacing.
   btn.style.cssText = `margin-top:${mt}px;margin-bottom:${mb}px;position:relative;`;
-  // Logo is an extension file → loaded via chrome.runtime.getURL (listed in web_accessible_resources).
-  const logoUrl = chrome.runtime.getURL("icons/icon.png");
+  // Logo is an extension file → loaded via browserAPI.runtime.getURL (listed in web_accessible_resources).
+  const logoUrl = browserAPI.runtime.getURL("icons/icon.png");
   btn.innerHTML =
     `<img class="chess-analyzer-free-review-logo" src="${logoUrl}" alt="" ` +
     `style="position:absolute;top:6px;right:8px;width:20px;height:20px;border:1px solid #000;border-radius:3px;"> ` +
@@ -353,13 +357,12 @@ function buildReviewButton(widthClass, mt = 14, mb = 3) {
     clearTimeout(resetTimer);
     resetTimer = setTimeout(() => resetFreeReviewButton(btn, label), 5000);
     try {
-      // After an extension reload the old content script loses its context — sendMessage throws.
-      chrome.runtime.sendMessage({ type: "freeGameReview" }, () => {
-        if (chrome.runtime.lastError) {
-          clearTimeout(resetTimer);
-          btn.disabled = false;
-          label.textContent = "Reload the page ↻";
-        }
+      // After an extension reload the old content script loses its context — sendMessage throws
+      // (Chrome) or rejects (Firefox), depending on when the context is invalidated.
+      browserAPI.runtime.sendMessage({ type: "freeGameReview" }).catch(() => {
+        clearTimeout(resetTimer);
+        btn.disabled = false;
+        label.textContent = "Reload the page ↻";
       });
     } catch (e) {
       clearTimeout(resetTimer);
@@ -437,7 +440,7 @@ function injectSidebarReviewButton(emphasisContent) {
   tryInject();
 })();
 
-chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+browserAPI.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg && msg.type === "getGameInfo") {
     const parsed = parseGameId(location.pathname);
     sendResponse({
