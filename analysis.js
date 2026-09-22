@@ -7,7 +7,7 @@ import { Chess } from "./lib/chess.js";
 import { Engine } from "./engine/uci.js";
 import { flagCodeForCountryId, countryNameForId } from "./flags.js";
 import { browserAPI } from "./browser-compat.js";
-import { lookupOpening, getLegacyBook } from "./openings-db.js";
+import { lookupOpening, getLegacyBook, initOpeningsDb } from "./openings-db.js";
 
 /* ---------------- Opening book ----------------
  * Offline lookup table built from lichess-org/chess-openings (see data/build-openings-db.js).
@@ -907,13 +907,17 @@ function classifyVariationMove(vIdx) {
   
   const v = S.variation;
   const pos = v.positions[vIdx];
-  const parentPos = vIdx === 1 ? S.positions[v.branchIdx] : v.positions[vIdx - 1];
+  const parentPos = v.positions[vIdx - 1];  // Always use variation's own previous position
   const mover = pos.color;
   
-  // Check if the resulting position is in the opening book
+  // Check if the resulting position is in the opening book (respecting 8-ply window)
+  // For variations, absolute ply = branchIdx + vIdx
+  const absolutePly = v.branchIdx + vIdx;
   const bk = bookLookup(pos.fen);
-  if (Array.isArray(bk)) return "book";
-  if (bk !== undefined) return "book";
+  if (absolutePly <= 8) {
+    if (Array.isArray(bk)) return "book";
+    if (bk !== undefined) return "book";
+  }
   
   // Check if forced move (only one legal move in parent position)
   try {
@@ -921,13 +925,12 @@ function classifyVariationMove(vIdx) {
     if (c.moves().length === 1) return "best";
   } catch {}
   
-  // Get engine analysis for parent and current positions
+  // Get engine analysis for parent position
   const parentBest = parentPos.best;
-  const currentBest = pos.best;
   const parentEval = parentPos.eval;
   const currentEval = pos.eval;
   
-  if (!parentBest || !currentBest || !parentEval || !currentEval) return null;
+  if (!parentBest || !parentEval || !currentEval) return null;
   
   // Determine if the move played matches the engine's top move in the parent position
   const playedUci = (pos.from || "") + (pos.to || "") + (pos.promotion || "");
@@ -952,8 +955,8 @@ function classifyVariationMove(vIdx) {
   const matingNow = currentMateMover != null && currentMateMover > 0;
   const wasMating = parentMateMover != null && parentMateMover > 0;
   
-  // Sacrifice detection (same as mainline)
-  const sac = false; // TODO: implement sacrifice detection for variations if needed
+  // Sacrifice detection using existing isSacrifice function
+  const sac = isSacrifice({ before: parentPos.fen, after: pos.fen, color: pos.color, captured: pos.captured, from: pos.from });
   
   
   const std = getStandardRating(wpDrop);
@@ -967,36 +970,57 @@ function classifyVariationMove(vIdx) {
   const prevWinning = parentEvalMover > 0;
   const notMateRel = currentMateMover == null && parentMateMover == null;
   
-  // For variations, we don't have previous moves in the variation to check for Great/Miss chains
-  // So we simplify: no previousMistake/previousMiss logic for variations
+  // For variations, we need to track previous move classifications in the variation
+  const prevCls = vIdx > 1 ? v.positions[vIdx - 1].classif : null;
+  const prevPrevCls = vIdx > 2 ? v.positions[vIdx - 2].classif : null;
+  
+  // Determine if previous move was a mistake/blunder (for Great/Miss detection)
+  const previousMistake = prevCls === "mistake" || prevCls === "blunder";
+  const previousBlunder = prevCls === "blunder";
+  const previousInacc = prevCls === "inacc";
+  
+  // For previous-previous move (needed for Miss chain)
+  const prevPrevMistake = prevPrevCls === "mistake" || prevPrevCls === "blunder";
+  const prevPrevBlunder = prevPrevCls === "blunder";
+  const prevPrevInacc = prevPrevCls === "inacc";
+  
+  const previousMiss = prevCls === "miss";
+  const prevPrevMiss = prevPrevCls === "miss";
   
   // Brilliant — sound sacrifice that punishes opponent's slip
-  if (sac && !wasMating && matingNow && winningNow) return "brilliant";
-  if (sac && wasMating && matingNow && currentMateMover <= parentMateMover && winningNow) return "brilliant";
+  if (!previousBlunder && notMateRel && std === "excellent" && sac
+    && (previousMistake || previousBlunder
+      || (!(previousInacc || previousBlunder) && (prevPrevMistake || prevPrevBlunder)))) return "brilliant";
+  if (sac && !wasMating && matingNow && winningNow) return "brilliant";                                   // sac that starts a mate
+  if (sac && wasMating && matingNow && currentMateMover <= parentMateMover && winningNow) return "brilliant";                   // sac that keeps the mate
   
-  // Great — only-good move that capitalises on opponent's mistake
-  // For variations, we can't easily detect opponent's previous mistake, so skip
+  // Great — an only-good move that capitalises on the opponent's mistake/blunder
+  if (!previousMiss && notMateRel && std === "excellent"
+    && (previousMistake || previousBlunder)) return "great";
   
   if (isTop && currentMateMover != null && currentMateMover > 0) return "best";
   if (isTop) return "best";
   
   if (currentMateMover != null && currentMateMover > 0) return "excellent";
-  if (!wasMating && matingNow && winningNow) return "excellent";
-  if (wasMating && matingNow && currentMateMover <= parentMateMover && winningNow) return "excellent";
-  if (wasMating && matingNow && currentMateMover > parentMateMover && winningNow) return "good";
-  if (wasMating && matingNow && !winningNow) return "good";
+  if (!wasMating && matingNow && winningNow) return "excellent";                                             // starts a mate
+  if (wasMating && matingNow && currentMateMover <= parentMateMover && winningNow) return "excellent";                             // keeps the mate
+  if (wasMating && matingNow && currentMateMover > parentMateMover && winningNow) return "good";                                 // delays own mate
+  if (wasMating && matingNow && !winningNow) return "good";                                                  // being mated, unavoidable
   
-  if (wasMating && !matingNow && prevWinning) return "miss";
+  if (wasMating && !matingNow && prevWinning) return "miss";                                                 // threw away a forced mate
+  if (!previousMiss && notMateRel && (previousMistake || previousBlunder)
+    && (std === "blunder" || std === "inacc")
+    && (evalLoss != null && (prevCls === "blunder" || prevCls === "inacc") && evalLoss <= (prevCls === "blunder" ? evalLoss : 0) + MT)) return "miss";                     // failed to punish
   
   // Mistake/Blunder detection based on eval loss and advantage loss
   const lostClearAdv = parentEvalMover >= CA && currentEvalMover < CA;
   const gaveClearAdv = parentEvalMover >= -CA && currentEvalMover < -CA;
   
-  if (notMateRel && std === "inacc" && evalLoss >= ML && lostClearAdv) return "mistake";
-  if (notMateRel && std === "inacc" && evalLoss >= ML && gaveClearAdv) return "mistake";
-  if (!wasMating && matingNow && !winningNow && parentEvalMover > -CA) return "mistake";
-  if (!wasMating && matingNow && !winningNow) return "blunder";
-  if (wasMating && matingNow && !winningNow && prevWinning) return "blunder";
+  if (notMateRel && std === "inacc" && evalLoss >= ML && lostClearAdv) return "mistake";                 // lost a clear advantage
+  if (notMateRel && std === "inacc" && evalLoss >= ML && gaveClearAdv) return "mistake";                 // handed over a clear advantage
+  if (!wasMating && matingNow && !winningNow && parentEvalMover > -CA) return "mistake";               // walked into a mate (wasn't already lost)
+  if (!wasMating && matingNow && !winningNow) return "blunder";                                              // walked into a mate
+  if (wasMating && matingNow && !winningNow && prevWinning) return "blunder";                                // threw a win straight into a mate
   
   // Split medium-error band
   if (std === "inacc" && wpDrop != null) {
@@ -1006,6 +1030,7 @@ function classifyVariationMove(vIdx) {
   
   return std; 
 }
+  
 
 
 function catAcc(cls) {
@@ -1063,12 +1088,15 @@ function computeDerived() {
 
   // True book detection: a move is "book" if the position it leads to is in the opening book
   // (data/book.json). Alongside, the deepest named theory position gives the opening name.
+  // Book classification is limited to the first 8 plies (absolute ply for variations).
   S.bookCount = 0;
   let bookOpening = null;
   for (let i = 1; i <= N; i++) {
     const bk = bookLookup(S.positions[i].fen);
     if (Array.isArray(bk)) bookOpening = { eco: bk[0], name: bk[1] };
-    bookAt[i] = bk !== undefined;
+    // Book classification only for first 8 plies (absolute ply)
+    const absolutePly = i; // For mainline, ply = absolute ply
+    bookAt[i] = bk !== undefined && absolutePly <= 8;
 
     const mover = S.positions[i].color;
     const bestSearch = S.bests[i - 1];
@@ -2138,12 +2166,26 @@ async function requestLiveEval() {
   pos.eval = terminalScore(fen) || whiteRel(res.score, fen);
   pos.best = res;
   
-  // Classify the variation move that led to this position
+  // After analyzing a position, classify the variation move that led to it (if any)
   const vIdx = S.variation.idx;
   if (vIdx > 0) {
     const classification = classifyVariationMove(vIdx);
     if (classification) {
       pos.classif = classification;
+    }
+  }
+  
+  // Also classify the NEXT variation move if it exists and is the current position
+  // This handles the case where the parent position was just analyzed and the next move
+  // is already on the board waiting for classification
+  const nextVIdx = vIdx + 1;
+  if (nextVIdx < S.variation.positions.length) {
+    const nextPos = S.variation.positions[nextVIdx];
+    if (nextPos && !nextPos.classif && nextPos.eval && nextPos.best) {
+      const classification = classifyVariationMove(nextVIdx);
+      if (classification) {
+        nextPos.classif = classification;
+      }
     }
   }
   
@@ -2976,7 +3018,8 @@ function renderStats() {
   const isExplore = S.meta?.explore === true;
   if (isExplore) {
     // In explore mode, show a simple panel with current position info
-    const cls = S.classif[S.variation?.idx || 0];
+    const pos = activePos();
+    const cls = pos.classif; // Use variation position's own classification
     const cfg = cls && QUALITY[cls];
     const ev = activeEval();
     const evTxt = ev ? evalText(ev) : "—";
@@ -4995,6 +5038,9 @@ async function resetLegacyZoom() {
 }
 (async function main() {
   try {
+    // Initialize openings database first so it's ready when loadBook() is called
+    await initOpeningsDb();
+    
     
     const dataReady = Promise.all([loadBook(), loadCalibration()]);
     const [payload, store] = await Promise.all([loadJob(), browserAPI.storage.local.get(["settings", "username", "layout", "layoutMode", "layoutVersion", "library"])]);
