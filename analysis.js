@@ -2443,6 +2443,18 @@ async function requestLiveEval() {
   // After analyzing a position, classify the variation move that led to it (if any)
   const vIdx = S.variation.idx;
   if (vIdx > 0) {
+    // Ensure parent position has eval/best before classifying (fixes race on first move)
+    const parentPos = S.variation.positions[vIdx - 1];
+    if (!parentPos.eval || !parentPos.best) {
+      // Analyze parent position first
+      try {
+        S.liveEngine.stop();
+        const parentRes = await S.liveEngine.analyse(parentPos.fen, S.settings.engineDepth, S.settings.engineLines);
+        if (token !== S.liveToken || !S.analysisMode) return;
+        parentPos.eval = terminalScore(parentPos.fen) || whiteRel(parentRes.score, parentPos.fen);
+        parentPos.best = parentRes;
+      } catch { /* parent analysis failed, proceed anyway */ }
+    }
     const classification = classifyVariationMove(vIdx);
     if (classification) {
       pos.classif = classification;
@@ -5200,7 +5212,7 @@ async function applyGame(payload) {
     S.analysisMode = true;
     S.variation = {
       branchIdx: 0,
-      positions: [{ fen: S.positions[0].fen, san: null }],
+      positions: [{ fen: S.positions[0].fen, san: null, eval: null, best: null }],
       idx: 0,
     };
     document.title = "Explore — Chess Review";
