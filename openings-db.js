@@ -67,7 +67,7 @@ async function fetchRemoteDb() {
 function validateEntries(entries) {
   if (!Array.isArray(entries) || entries.length === 0) return false;
   for (const e of entries) {
-    if (!e.epd || !e.eco || !e.name || !Array.isArray(e.moves)) return false;
+    if (!e.epd || !Array.isArray(e.moves)) return false;
     if (typeof e.epd !== "string" || typeof e.eco !== "string" || typeof e.name !== "string") return false;
   }
   return true;
