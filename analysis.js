@@ -7,9 +7,10 @@ import { Chess } from "./lib/chess.js";
 import { Engine } from "./engine/uci.js";
 import { flagCodeForCountryId, countryNameForId } from "./flags.js";
 import { browserAPI } from "./browser-compat.js";
+import { lookupOpening, getLegacyBook } from "./openings-db.js";
 
 /* ---------------- Opening book ----------------
- * Offline lookup table built from lichess-org/chess-openings (see data/build-book.mjs).
+ * Offline lookup table built from lichess-org/chess-openings (see data/build-openings-db.js).
  * Key = "epd" (the first 4 FEN fields: board, side, castling, en passant) → either
  * [eco, name] for a named theory position or 0 for "known, but unnamed".
  * Used for true book detection and opening naming in computeDerived(). */
@@ -20,8 +21,8 @@ function bookLookup(fen) { return BOOK ? BOOK[epdOf(fen)] : undefined; }
 async function loadBook() {
   if (BOOK) return BOOK;
   try {
-    const res = await fetch(browserAPI.runtime.getURL("data/book.json"));
-    BOOK = (await res.json()).epd || {};
+    // Use the new IndexedDB-backed openings database
+    BOOK = (await getLegacyBook()).epd || {};
   } catch {
     BOOK = {}; // book missing/unreadable → fall back to pure engine classification
   }
@@ -670,11 +671,23 @@ function activeBest() {
 async function loadJob() {
   const jobId = location.hash.replace(/^#/, "");
   if (!jobId) throw new Error("No analysis job specified.");
+
+  // Explore mode: standalone Lichess-style analysis board
+  if (jobId === "explore") {
+    const startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    return {
+      pgn: `[SetUp "1"]\n[FEN "${startFen}"]\n\n*`,
+      meta: { explore: true },
+      source: "explore",
+    };
+  }
+
   const key = `job:${jobId}`;
   const data = await browserAPI.storage.local.get(key);
   const payload = data[key];
   if (!payload) throw new Error("Analysis data not found (open via the popup).");
-  await browserAPI.storage.local.remove(key);
+  // NOTE: Do NOT remove the job here — two-phase load: keep it until applyGame succeeds,
+  // so a failed initialization (corrupt PGN, engine crash, etc.) leaves the data for a retry.
   return payload;
 }
 function parseHeaders(pgn) {
@@ -1008,6 +1021,117 @@ function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop) {
   }
   return std[i];   // plain excellent / good / inaccuracy / blunder
 }
+
+// Classification for variation moves in Explore mode.
+// Uses the same logic as classifyMove but operates on the parent position's
+// engine analysis (before the move) and current position's engine analysis (after the move).
+// vIdx: index in variation.positions (1 = first user move in variation)
+// Returns classification string (book/best/excellent/good/inacc/mistake/miss/blunder/great/brilliant)
+function classifyVariationMove(vIdx) {
+  if (!S.variation || vIdx < 1 || vIdx >= S.variation.positions.length) return null;
+  
+  const v = S.variation;
+  const pos = v.positions[vIdx];
+  const parentPos = vIdx === 1 ? S.positions[v.branchIdx] : v.positions[vIdx - 1];
+  const mover = pos.color;
+  
+  // Check if the resulting position is in the opening book
+  const bk = bookLookup(pos.fen);
+  if (Array.isArray(bk)) return "book";
+  if (bk !== undefined) return "book";
+  
+  // Check if forced move (only one legal move in parent position)
+  try {
+    const c = new Chess(parentPos.fen);
+    if (c.moves().length === 1) return "best";
+  } catch {}
+  
+  // Get engine analysis for parent and current positions
+  const parentBest = parentPos.best;
+  const currentBest = pos.best;
+  const parentEval = parentPos.eval;
+  const currentEval = pos.eval;
+  
+  if (!parentBest || !currentBest || !parentEval || !currentEval) return null;
+  
+  // Determine if the move played matches the engine's top move in the parent position
+  const playedUci = (pos.from || "") + (pos.to || "") + (pos.promotion || "");
+  const bestUci = (parentBest.bestmove || "").slice(0, 4);
+  const isTop = !!bestUci && bestUci === playedUci.slice(0, 4);
+  
+  // Calculate eval loss from mover's perspective
+  const parentEvalMover = mover === "w" ? scoreToCp(parentEval) : -scoreToCp(parentEval);
+  const currentEvalMover = mover === "w" ? scoreToCp(currentEval) : -scoreToCp(currentEval);
+  const evalLoss = parentEvalMover - currentEvalMover;
+  
+  // Win% calculation
+  const parentWin = mover === "w" ? winPct(scoreToCp(parentEval)) : 100 - winPct(scoreToCp(parentEval));
+  const currentWin = mover === "w" ? winPct(scoreToCp(currentEval)) : 100 - winPct(scoreToCp(currentEval));
+  const wpDrop = Math.max(0, parentWin - currentWin);
+  
+  // Check for mate
+  const parentMate = parentEval.mate;
+  const currentMate = currentEval.mate;
+  const parentMateMover = parentMate != null ? (mover === "w" ? parentMate : -parentMate) : null;
+  const currentMateMover = currentMate != null ? (mover === "w" ? currentMate : -currentMate) : null;
+  const matingNow = currentMateMover != null && currentMateMover > 0;
+  const wasMating = parentMateMover != null && parentMateMover > 0;
+  
+  // Sacrifice detection (same as mainline)
+  const sac = false; // TODO: implement sacrifice detection for variations if needed
+  
+  // Standard rating from win% drop
+  const std = getStandardRating(wpDrop);
+  
+  // User-tunable thresholds
+  const CA = S.settings.clsClearAdv;
+  const ML = S.settings.clsMistakeLoss;
+  const MT = S.settings.clsMissTol;
+  
+  const winningNow = currentEvalMover > 0;
+  const prevWinning = parentEvalMover > 0;
+  const notMateRel = currentMateMover == null && parentMateMover == null;
+  
+  // For variations, we don't have previous moves in the variation to check for Great/Miss chains
+  // So we simplify: no previousMistake/previousMiss logic for variations
+  
+  // Brilliant — sound sacrifice that punishes opponent's slip
+  if (sac && !wasMating && matingNow && winningNow) return "brilliant";
+  if (sac && wasMating && matingNow && currentMateMover <= parentMateMover && winningNow) return "brilliant";
+  
+  // Great — only-good move that capitalises on opponent's mistake
+  // For variations, we can't easily detect opponent's previous mistake, so skip
+  
+  if (isTop && currentMateMover != null && currentMateMover > 0) return "best";
+  if (isTop) return "best";
+  
+  if (currentMateMover != null && currentMateMover > 0) return "excellent";
+  if (!wasMating && matingNow && winningNow) return "excellent";
+  if (wasMating && matingNow && currentMateMover <= parentMateMover && winningNow) return "excellent";
+  if (wasMating && matingNow && currentMateMover > parentMateMover && winningNow) return "good";
+  if (wasMating && matingNow && !winningNow) return "good";
+  
+  if (wasMating && !matingNow && prevWinning) return "miss";
+  
+  // Mistake/Blunder detection based on eval loss and advantage loss
+  const lostClearAdv = parentEvalMover >= CA && currentEvalMover < CA;
+  const gaveClearAdv = parentEvalMover >= -CA && currentEvalMover < -CA;
+  
+  if (notMateRel && std === "inacc" && evalLoss >= ML && lostClearAdv) return "mistake";
+  if (notMateRel && std === "inacc" && evalLoss >= ML && gaveClearAdv) return "mistake";
+  if (!wasMating && matingNow && !winningNow && parentEvalMover > -CA) return "mistake";
+  if (!wasMating && matingNow && !winningNow) return "blunder";
+  if (wasMating && matingNow && !winningNow && prevWinning) return "blunder";
+  
+  // Split medium-error band
+  if (std === "inacc" && wpDrop != null) {
+    const mistWp = (typeof CALIB !== "undefined" && CALIB?.clsWp?.mistake) || 10;
+    if (wpDrop >= mistWp) return "mistake";
+  }
+  
+  return std; // plain excellent / good / inaccuracy / blunder
+}
+
 // Displayed (category-based) per-move accuracy from the category — the basis of the shown game
 // accuracy. Best/Brilliant/Great/Book are always 100; the rest are tunable (Engine settings →
 // Accuracy points). The Elo estimate keeps using the win%-based accuracy (sideAccuracies), not this.
@@ -1572,8 +1696,17 @@ function paintBoard() {
   const clean = !!S.practice && S.idx === solvePly;
   const showCat = !S.practice || S.idx === solvePly + 1;
   const hl = clean ? new Set() : new Set([pos.from, pos.to].filter(Boolean));
-  // Variation moves aren't classified either.
-  const cls = (S.analysisMode || !showCat) ? null : S.classif[S.idx];
+  // Get classification for the current position (mainline or variation)
+  let cls = null;
+  if (showCat) {
+    if (S.analysisMode && S.variation && S.variation.idx > 0) {
+      // In analysis mode with variation: use the variation position's classification
+      cls = pos.classif || null;
+    } else if (!S.analysisMode) {
+      // Mainline: use the mainline classification
+      cls = S.classif[S.idx] || null;
+    }
+  }
   // The from/to squares are tinted with the classification color (chess.com style) at 0.5 alpha;
   // without a classification we fall back to the neutral yellow highlight.
   const tint = cls && QUALITY[cls]
@@ -2161,7 +2294,28 @@ async function requestLiveEval() {
   if (token !== S.liveToken || !S.analysisMode) return;
   pos.eval = terminalScore(fen) || whiteRel(res.score, fen);
   pos.best = res;
+  
+  // Classify the variation move that led to this position
+  const vIdx = S.variation.idx;
+  if (vIdx > 0) {
+    const classification = classifyVariationMove(vIdx);
+    if (classification) {
+      pos.classif = classification;
+    }
+  }
+  
+  // Update opening detection for explore mode
+  const isExplore = S.meta?.explore === true;
+  if (isExplore) {
+    const bk = bookLookup(fen);
+    if (Array.isArray(bk)) {
+      S.opening = { eco: bk[0], name: bk[1] };
+      renderReview(); // refresh opening display
+    }
+  }
   renderEvalBar(); renderBestArrow(); renderEngineCurrent();
+  // Re-render move list and board to show classification badge
+  renderMoves(); paintBoard(); renderReview();
 }
 // Exit analysis mode. With mainIdx: jump to that mainline position; otherwise stay put.
 // (Analysis mode is indicated/closed via the Exit button in the controls bar.)
@@ -2329,6 +2483,12 @@ function playerStrip(side) {
   );
 }
 function renderPlayers() {
+  const isExplore = S.meta?.explore === true;
+  if (isExplore) {
+    UI.playerTop.replaceChildren();
+    UI.playerBot.replaceChildren();
+    return;
+  }
   UI.playerTop.replaceChildren(playerStrip(S.flipped ? "w" : "b"));
   UI.playerBot.replaceChildren(playerStrip(S.flipped ? "b" : "w"));
   alignPlayers();
@@ -2974,6 +3134,28 @@ function jumpToCategory(side, k) {
   if (ply > 0) gotoMainline(ply);
 }
 function renderStats() {
+  const isExplore = S.meta?.explore === true;
+  if (isExplore) {
+    // In explore mode, show a simple panel with current position info
+    const cls = S.classif[S.variation?.idx || 0];
+    const cfg = cls && QUALITY[cls];
+    const ev = activeEval();
+    const evTxt = ev ? evalText(ev) : "—";
+    UI.stats.replaceChildren(el("div", { class: "panel" },
+      el("div", { class: "panel-head" }, el("h3", {}, "Position")),
+      el("div", { class: "panel-body" },
+        el("div", { class: "acc-row" },
+          el("div", { class: "acc-cell" },
+            cfg ? el("img", { class: "qb icon", src: qIcon(cls), alt: cfg.name, title: cfg.name, draggable: "false" }) : null,
+            el("span", { class: "acc-name" }, cfg ? cfg.name : "—"),
+            el("span", { class: "acc-val", style: { color: "var(--accent)" } }, evTxt),
+          ),
+        ),
+      ),
+    ));
+    statsRefs = null;
+    return;
+  }
   const opSide = S.meSide === "w" ? "b" : "w";
   const meAcc = S.acc[S.meSide], opAcc = S.acc[opSide];
   // The Elo model is fit to reference accuracy values, so feed it our best estimate of that number:
@@ -3055,6 +3237,13 @@ function renderStats() {
 
 /* ---------------- Eval graph ---------------- */
 function renderGraph() {
+  const isExplore = S.meta?.explore === true;
+  if (isExplore) {
+    const mod = UI.graph.closest(".mod");
+    if (mod) mod.hidden = true;
+    UI.graph.replaceChildren();
+    return;
+  }
   const show = S.settings.evalView === "both" || S.settings.evalView === "graph";
   const mod = UI.graph.closest(".mod");
   if (mod) mod.hidden = !show;   // hidden, not just emptied, so the layout closes the gap
@@ -3202,6 +3391,52 @@ function highlightCurrentMove() {
 }
 let _movesSig = null;
 function renderMoves() {
+  const isExplore = S.meta?.explore === true;
+  if (isExplore && S.variation) {
+    // In explore mode, show the variation moves
+    const v = S.variation;
+    const ml = S.settings.mlStyle;
+    // Use variation positions' own classification (pos.classif) for signature
+    const varClassifSig = v.positions.slice(1).map(p => p.classif || "").join(",");
+    const sig = ml + "|" + S.settings.badgeStyle + "|" + v.positions.length + "|" + varClassifSig;
+    if (sig === _movesSig && UI.movesBody.firstChild) { return; }
+    _movesSig = sig;
+    let list;
+    if (ml === "compact") {
+      list = el("div", { class: "movelist ml-compact ml-scroll" });
+      for (let i = 1; i < v.positions.length; i++) {
+        const pos = v.positions[i];
+        const cls = pos.classif; // Use variation position's own classification
+        const showBadge = cls && (NOTEWORTHY.has(cls) || S.settings.badgeStyle === "dot");
+        const glyph = GLYPH[pos.san && /^[KQRBN]/.test(pos.san) ? pos.san[0] : "P"];
+        const cell = el("span", { class: "ml-move" + (i === v.idx ? " current" : ""), "data-ply": i, onclick: () => gotoVar(i) },
+          el("span", { class: "pc", style: { color: pos.color === "w" ? "var(--ink)" : "var(--ink-2)" } }, glyph),
+          el("span", {}, pos.san),
+          showBadge ? qBadge(cls) : null,
+        );
+        list.append(cell);
+      }
+    } else {
+      list = el("div", { class: "movelist " + (ml === "cards" ? "ml-cards" : "ml-rows") + " ml-scroll" });
+      for (let i = 1; i < v.positions.length; i++) {
+        const pos = v.positions[i];
+        const cls = pos.classif; // Use variation position's own classification
+        const showBadge = cls && (NOTEWORTHY.has(cls) || S.settings.badgeStyle === "dot");
+        const glyph = GLYPH[pos.san && /^[KQRBN]/.test(pos.san) ? pos.san[0] : "P"];
+        const cell = el("span", { class: "ml-move" + (i === v.idx ? " current" : ""), "data-ply": i, onclick: () => gotoVar(i) },
+          el("span", { class: "pc", style: { color: pos.color === "w" ? "var(--ink)" : "var(--ink-2)" } }, glyph),
+          el("span", {}, pos.san),
+          showBadge ? qBadge(cls) : null,
+        );
+        list.append(el("div", { class: "ml-pair" }, cell));
+      }
+    }
+    UI.movesBody.style.padding = ml === "rows" ? "0" : "var(--pad)";
+    UI.movesBody.replaceChildren(list);
+    UI.movesCount.textContent = "";
+    UI.movesFoot.hidden = true;
+    return;
+  }
   const nMoves = Math.ceil(S.total / 2);
   const ml = S.settings.mlStyle;
   // The list's CONTENT only changes with the game, the layout/badge style, or the classifications
@@ -3348,13 +3583,17 @@ function renderEngine(lines, padFromCache = false) {
 
 /* ---------------- Topbar meta ---------------- */
 function metaChips() {
+  const isExplore = S.meta?.explore === true;
+  if (isExplore) {
+    return [el("span", { class: "meta-chip" }, el("b", {}, "Explore"))];
+  }
   const res = S.players[S.meSide].result;
   let outcome = "Result unknown";
   if (res === "1-0") outcome = S.meSide === "w" ? "Victory" : "Loss";
   else if (res === "0-1") outcome = S.meSide === "b" ? "Victory" : "Loss";
   else if (res && res.includes("1/2")) outcome = "Draw";
   const tcRaw = S.meta.timeClass || S.headers.TimeControl || "";
-  const tc = tcRaw ? tcRaw.charAt(0).toUpperCase() + tcRaw.slice(1) : ""; // "bullet" → "Bullet"
+  const tc = tcRaw ? tcRaw.charAt(0).toUpperCase() + tcRaw.slice(1) : "";
   const date = S.headers.UTCDate || S.headers.Date || "";
   const chips = [el("span", { class: "meta-chip" }, el("b", {}, outcome))];
   if (tc) chips.push(el("span", { class: "meta-dot" }), el("span", { class: "meta-chip" }, icon("bolt"), el("b", {}, tc)));
@@ -4597,6 +4836,8 @@ function navNext() { if (S.practice) return; stopLineWalk(); if (S.analysisMode)
 function navPrev() { if (S.practice) return; stopLineWalk(); if (S.analysisMode) variationStep(-1); else go(S.idx - 1); }
 // Jump to a mainline position (exits analysis mode if active).
 function gotoMainline(ply) { if (S.practice) return; stopLineWalk(); if (S.analysisMode) exitAnalysis(); go(ply); }
+// Jump to a variation position (explore mode).
+function gotoVar(idx) { if (S.practice) return; stopLineWalk(); if (!S.variation) return; const v = S.variation; if (idx < 0 || idx >= v.positions.length) return; v.idx = idx; S.selectedSq = null; paintBoard(); playSanSound(v.positions[v.idx]?.san); renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent(); requestLiveEval(); }
 function variationStep(delta) {
   const v = S.variation; if (!v) return;
   const ni = v.idx + delta;
@@ -4634,7 +4875,7 @@ document.addEventListener("keydown", (e) => {
   else if (e.key === "Home") gotoMainline(0);
   else if (e.key === "End") gotoMainline(S.total);
   else if (e.key === "Escape") { if (S.analysisMode) exitAnalysis(); }
-  else if (e.key === "f") toggleFlip();
+  else if (e.key === "f" && !e.ctrlKey && !e.metaKey) toggleFlip(); // Ctrl+F must not flip the board
 });
 
 /* ---------------- Analysis batch + re-analysis ----------------
@@ -4756,6 +4997,8 @@ function renderAll() {
    and for switching to another library game in place — no page reload, so there's no black flash
    between games; only the panels' data and the board orientation change. */
 async function applyGame(payload) {
+  const isExplore = payload.meta?.explore === true;
+
   // Tear down anything tied to the previous game.
   S.batchGen++;                 // invalidate any in-flight analysis workers
   terminateEngines();
@@ -4769,8 +5012,8 @@ async function applyGame(payload) {
   revRefs = null; statsRefs = null; _lastCommentKey = -1; _ipSig = null; S._turnPly = null;
   S._lastEngineLines = null;
 
-  applyDetectedTheme(payload.theme); // match the chess.com theme if the payload carries one (else no-op)
-  applySettings();                   // (re)apply CSS vars + board image now that the board exists
+  applyDetectedTheme(payload.theme);
+  applySettings();
 
   S.analyzing = true;
   S.pgn = payload.pgn;
@@ -4784,21 +5027,30 @@ async function applyGame(payload) {
   S._sacCache = []; S._forcedCache = []; S._panelCache = null;
   S.progress = 0;
   S.openingHeader = deriveOpening(S.headers);
-  S.opening = S.openingHeader; // possibly refined by the book in computeDerived()
+  S.opening = S.openingHeader;
   const { players, meSide } = derivePlayers(S.headers, S.meta, S.username);
   S.players = players;
-  // Perspective: the source page's own orientation (chess.com ?flip=true, Lichess board side) is
-  // the user's actual POV, so it wins when present. Otherwise fall back to matching the stored
-  // username against the PGN players — a deliberate second layer so we don't seat the user at the
-  // wrong end of the board. Default (no signal at all) is White at the bottom.
   const flip = S.meta && S.meta.flip;
   const side = flip === true ? "b" : flip === false ? "w" : meSide;
   S.meSide = side; S.flipped = side === "b"; S.idx = 0;
 
-  // Restore a previously-stored analysis instead of re-running the engine. Both callers (library +
-  // boot) resolve this by id *before* calling applyGame, so there's no await between buildUI() and
-  // renderAll() — that gap is what let the Moves panel paint on its own for a frame. Only fall back
-  // to the lookup here if no caller supplied the field at all.
+  if (isExplore) {
+    // Explore mode: standalone analysis board with free movement
+    S.analyzing = false;
+    S.analysisMode = true;
+    S.variation = {
+      branchIdx: 0,
+      positions: [{ fen: S.positions[0].fen, san: null }],
+      idx: 0,
+    };
+    document.title = "Explore — Chess Review";
+    computeDerived();
+    renderAll();
+    requestLiveEval(); // start live engine analysis
+    return;
+  }
+
+  // Normal game mode: restore saved analysis or start fresh
   let saved = payload.analysis;
   if (saved == null && !("analysis" in payload)) {
     try { const k = "analysis:" + currentGameId(); const s = await browserAPI.storage.local.get(k); saved = s[k] || null; } catch {}
@@ -4815,10 +5067,8 @@ async function applyGame(payload) {
   document.title = `${players.w.name} vs ${players.b.name} — Chess Review`;
   computeDerived();
   renderAll();
-  // The saved layout baseline is sized for the EXPANDED breakdown; since it now starts collapsed,
-  // pull the modules below the Accuracy panel up to close the gap (same as clicking collapse).
   if (!S.qbreakExpanded) reflowAccuracy(false);
-  renderLibrary();             // refresh the "currently open" highlight in the sidebar
+  renderLibrary();
   requestAnimationFrame(alignPlayers);
   if (!restored) startAnalysis();
 }
@@ -4989,6 +5239,11 @@ async function resetLegacyZoom() {
     }
     buildUI();               // built once; switching games re-uses it (no full page reload)
     await applyGame(payload);
+    // Two-phase load: now that initialization succeeded, remove the job data so it doesn't accumulate.
+    const jobId = location.hash.replace(/^#/, "");
+    if (jobId && jobId !== "explore") {
+      await browserAPI.storage.local.remove(`job:${jobId}`);
+    }
     // A custom canvas is fitted once it is laid out as shown (breakdown collapsed); not awaited.
     if (isCustomLayout()) initTabZoom();
     requestAnimationFrame(alignPlayers); // measure the board after the first layout
