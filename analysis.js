@@ -1098,10 +1098,13 @@ function classifyVariationMove(vIdx) {
   // For variations, we need to track previous move classifications AND losses in the variation
   const prevCls = vIdx > 1 ? v.positions[vIdx - 1].classif : null;
   const prevPrevCls = vIdx > 2 ? v.positions[vIdx - 2].classif : null;
+  const prevPrevPrevCls = vIdx > 3 ? v.positions[vIdx - 3].classif : null;
   
-  // Calculate previous move's eval loss (for Miss/Great logic)
+  // Calculate previous move's eval loss and std (for Miss/Great logic)
   // Previous move: vIdx-1, its parent: vIdx-2
   let prevEvalLoss = null;
+  let prevStd = null;
+  let prevMate = null;
   if (vIdx > 1) {
     const prevPos = v.positions[vIdx - 1];
     const prevParentPos = v.positions[vIdx - 2];
@@ -1112,11 +1115,23 @@ function classifyVariationMove(vIdx) {
       const prevParentEvalMover = prevMover === "w" ? scoreToCp(prevParentEval) : -scoreToCp(prevParentEval);
       const prevCurrentEvalMover = prevMover === "w" ? scoreToCp(prevCurrentEval) : -scoreToCp(prevCurrentEval);
       prevEvalLoss = prevParentEvalMover - prevCurrentEvalMover;
+      prevStd = getStandardRating(
+        (prevMover === "w" ? winPct(scoreToCp(prevParentEval)) : 100 - winPct(scoreToCp(prevParentEval))) -
+        (prevMover === "w" ? winPct(scoreToCp(prevCurrentEval)) : 100 - winPct(scoreToCp(prevCurrentEval)))
+      );
     }
+    // Check if previous move was mate-related
+    const prevParentMate = prevParentPos.eval?.mate;
+    const prevCurrentMate = prevPos.eval?.mate;
+    const prevParentMateMover = prevParentMate != null ? (prevMover === "w" ? prevParentMate : -prevParentMate) : null;
+    const prevCurrentMateMover = prevCurrentMate != null ? (prevMover === "w" ? prevCurrentMate : -prevCurrentMate) : null;
+    prevMate = (prevParentMateMover != null || prevCurrentMateMover != null);
   }
   
-  // Calculate previous-previous move's eval loss
+  // Calculate previous-previous move's eval loss and std
   let prevPrevEvalLoss = null;
+  let prevPrevStd = null;
+  let prevPrevMate = null;
   if (vIdx > 2) {
     const prevPrevPos = v.positions[vIdx - 2];
     const prevPrevParentPos = v.positions[vIdx - 3];
@@ -1127,17 +1142,45 @@ function classifyVariationMove(vIdx) {
       const prevPrevParentEvalMover = prevPrevMover === "w" ? scoreToCp(prevPrevParentEval) : -scoreToCp(prevPrevParentEval);
       const prevPrevCurrentEvalMover = prevPrevMover === "w" ? scoreToCp(prevPrevCurrentEval) : -scoreToCp(prevPrevCurrentEval);
       prevPrevEvalLoss = prevPrevParentEvalMover - prevPrevCurrentEvalMover;
+      prevPrevStd = getStandardRating(
+        (prevPrevMover === "w" ? winPct(scoreToCp(prevPrevParentEval)) : 100 - winPct(scoreToCp(prevPrevParentEval))) -
+        (prevPrevMover === "w" ? winPct(scoreToCp(prevPrevCurrentEval)) : 100 - winPct(scoreToCp(prevPrevCurrentEval)))
+      );
     }
+    // Check if previous-previous move was mate-related
+    const ppParentMate = prevPrevParentPos.eval?.mate;
+    const ppCurrentMate = prevPrevPos.eval?.mate;
+    const ppParentMateMover = ppParentMate != null ? (prevPrevMover === "w" ? ppParentMate : -ppParentMate) : null;
+    const ppCurrentMateMover = ppCurrentMate != null ? (prevPrevMover === "w" ? ppCurrentMate : -ppCurrentMate) : null;
+    prevPrevMate = (ppParentMateMover != null || ppCurrentMateMover != null);
   }
   
   // Determine if previous move was a mistake/blunder (for Great/Miss detection)
-  // Match classifyMove: must be inacc/blunder classification AND loss >= ML AND (lost/gave clear advantage)
-  const previousMistake = prevCls === "mistake" || prevCls === "blunder";
+  // Match classifyMove: must be inacc classification AND loss >= ML AND (lost/gave clear advantage)
+  const prevParentEvalMover = vIdx > 1 ? (v.positions[vIdx - 1].color === "w" ? scoreToCp(v.positions[vIdx - 2].eval) : -scoreToCp(v.positions[vIdx - 2].eval)) : null;
+  const prevCurrentEvalMover = vIdx > 1 ? (v.positions[vIdx - 1].color === "w" ? scoreToCp(v.positions[vIdx - 1].eval) : -scoreToCp(v.positions[vIdx - 1].eval)) : null;
+  const prevLostClearAdv = prevParentEvalMover != null && prevCurrentEvalMover != null && prevParentEvalMover >= CA && prevCurrentEvalMover < CA;
+  const prevGaveClearAdv = prevParentEvalMover != null && prevCurrentEvalMover != null && prevParentEvalMover >= -CA && prevCurrentEvalMover < -CA;
+  
+  const previousMistake = !prevMate && prevStd === "inacc" && prevEvalLoss != null && prevEvalLoss >= ML && (prevLostClearAdv || prevGaveClearAdv);
   const previousBlunder = prevCls === "blunder";
   const previousInacc = prevCls === "inacc";
   
   // For previous-previous move (needed for Miss chain)
-  const prevPrevMistake = prevPrevCls === "mistake" || prevPrevCls === "blunder";
+  let prevPrevLostClearAdv = false;
+  let prevPrevGaveClearAdv = false;
+  if (vIdx > 2) {
+    const ppMover = v.positions[vIdx - 2].color;
+    const ppParentEval = v.positions[vIdx - 3].eval;
+    const ppCurrentEval = v.positions[vIdx - 2].eval;
+    const ppParentEvalMover = ppMover === "w" ? scoreToCp(ppParentEval) : -scoreToCp(ppParentEval);
+    const ppCurrentEvalMover = ppMover === "w" ? scoreToCp(ppCurrentEval) : -scoreToCp(ppCurrentEval);
+    if (ppParentEvalMover != null && ppCurrentEvalMover != null) {
+      prevPrevLostClearAdv = ppParentEvalMover >= CA && ppCurrentEvalMover < CA;
+      prevPrevGaveClearAdv = ppParentEvalMover >= -CA && ppCurrentEvalMover < -CA;
+    }
+  }
+  const prevPrevMistake = !prevPrevMate && prevPrevStd === "inacc" && prevPrevEvalLoss != null && prevPrevEvalLoss >= ML && (prevPrevLostClearAdv || prevPrevGaveClearAdv);
   const prevPrevBlunder = prevPrevCls === "blunder";
   const prevPrevInacc = prevPrevCls === "inacc";
   
@@ -1145,18 +1188,20 @@ function classifyVariationMove(vIdx) {
   const prevPrevMiss = prevPrevCls === "miss";
   
   // Brilliant — sound sacrifice that punishes opponent's slip
-  // Match classifyMove logic
-  const previousBrilliant = vIdx > 1 && sac && prevCls === "excellent" && prevEvalLoss != null && prevEvalLoss >= ML;
-  if (!previousBlunder && notMateRel && std === "excellent" && sac
-    && (previousMistake || previousBlunder
-      || (!(previousInacc || previousBlunder) && (prevPrevMistake || prevPrevBlunder)))) return "brilliant";
+  // Match classifyMove logic: previousBrilliant = wasNotMateRel(0) && sac[i-1] && pStd(0) === "excellent"
+  const previousBrilliant = !prevMate && prevCls === "excellent" && sac;
+  
+  // Brilliant conditions (match classifyMove)
+  if (!previousBrilliant && notMateRel && std === "excellent" && sac
+    && (prevStd === "inacc" || prevStd === "blunder"
+      || (!(prevStd === "inacc" || prevStd === "blunder") && (prevPrevStd === "inacc" || prevPrevStd === "blunder")))) return "brilliant";
   if (sac && !wasMating && matingNow && winningNow) return "brilliant";                                   // sac that starts a mate
   if (sac && wasMating && matingNow && currentMateMover <= parentMateMover && winningNow) return "brilliant";                   // sac that keeps the mate
   
   // Great — an only-good move that capitalises on the opponent's mistake/blunder
-  // Match classifyMove: not previousMiss, not mate-related, std=excellent, and (previousMistake OR previousBlunder)
-  if (!previousMiss && notMateRel && std === "excellent"
-    && (previousMistake || previousBlunder)) return "great";
+  // Match classifyMove: not previousMiss && wasNotMateRel(0) && notMateRel && std === "excellent" && (previousMistake || pStd(0) === "blunder")
+  if (!previousMiss && !prevMate && notMateRel && std === "excellent"
+    && (previousMistake || prevStd === "blunder")) return "great";
   
   if (isTop && currentMateMover != null && currentMateMover > 0) return "best";
   if (isTop) return "best";
@@ -1168,9 +1213,9 @@ function classifyVariationMove(vIdx) {
   if (wasMating && matingNow && !winningNow) return "good";                                                  // being mated, unavoidable
   
   if (wasMating && !matingNow && prevWinning) return "miss";                                                 // threw away a forced mate
-  // Match classifyMove Miss logic: !previousMiss && notMateRel && (previousMistake || previousBlunder)
-  // && (std === "blunder" || std === "inacc") && (evalLoss != null && prevEvalLoss != null && evalLoss <= prevEvalLoss + MT)
-  if (!previousMiss && notMateRel && (previousMistake || previousBlunder)
+  // Match classifyMove Miss logic: !previousMiss && notMateRel && (previousMistake || pStd(0) === "blunder")
+  // && (std === "blunder" || std === "inacc") && (loss[i] != null && pLoss(0) != null && loss[i] <= pLoss(0) + MT)
+  if (!previousMiss && notMateRel && (previousMistake || prevStd === "blunder")
     && (std === "blunder" || std === "inacc")
     && (evalLoss != null && prevEvalLoss != null && evalLoss <= prevEvalLoss + MT)) return "miss";                     // failed to punish
   
