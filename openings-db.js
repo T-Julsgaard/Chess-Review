@@ -111,8 +111,12 @@ async function updateDb() {
     }
 
     console.log("[Openings DB] Updating from", currentCount, "to", remoteEntries.length, "entries");
-    await clearOpenings();
-    await putOpenings(remoteEntries);
+    
+    // Atomic update: write to staging store first, then atomically swap
+    await writeStagingStore(remoteEntries);
+    await verifyStagingStore(remoteEntries.length);
+    await atomicSwapStagingToMain();
+    
     // Refresh in-memory cache
     OPENINGS_DB = {};
     for (const entry of remoteEntries) {
@@ -125,7 +129,88 @@ async function updateDb() {
   } catch (e) {
     console.warn("[Openings DB] Update failed:", e);
     // Keep the old database - don't clear on failure
+    await clearStagingStore(); // Clean up staging on failure
   }
+}
+
+async function writeStagingStore(entries) {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STAGING_STORE_NAME, "readwrite");
+    const store = tx.objectStore(STAGING_STORE_NAME);
+    const clearReq = store.clear();
+    clearReq.onsuccess = () => {
+      let completed = 0;
+      let hasError = false;
+      for (const entry of entries) {
+        const req = store.put(entry);
+        req.onsuccess = () => {
+          completed++;
+          if (completed === entries.length && !hasError) resolve();
+        };
+        req.onerror = () => {
+          if (!hasError) {
+            hasError = true;
+            reject(req.error);
+          }
+        };
+      }
+    };
+    clearReq.onerror = () => reject(clearReq.error);
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function verifyStagingStore(expectedCount) {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STAGING_STORE_NAME, "readonly");
+    const store = tx.objectStore(STAGING_STORE_NAME);
+    const countReq = store.count();
+    countReq.onsuccess = () => {
+      if (countReq.result === expectedCount) resolve();
+      else reject(new Error(`Staging store count mismatch: expected ${expectedCount}, got ${countReq.result}`));
+    };
+    countReq.onerror = () => reject(countReq.error);
+  });
+}
+
+async function atomicSwapStagingToMain() {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    // Single transaction: clear main store and copy from staging
+    const tx = db.transaction([STORE_NAME, STAGING_STORE_NAME], "readwrite");
+    const mainStore = tx.objectStore(STORE_NAME);
+    const stagingStore = tx.objectStore(STAGING_STORE_NAME);
+    
+    const clearReq = mainStore.clear();
+    clearReq.onsuccess = () => {
+      // Copy all entries from staging to main
+      const cursorReq = stagingStore.openCursor();
+      cursorReq.onsuccess = (event) => {
+        const cursor = event.target.result;
+        if (cursor) {
+          mainStore.put(cursor.value);
+          cursor.continue();
+        }
+      };
+    };
+    clearReq.onerror = () => reject(clearReq.error);
+    
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function clearStagingStore() {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STAGING_STORE_NAME, "readwrite");
+    const store = tx.objectStore(STAGING_STORE_NAME);
+    const req = store.clear();
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
 }
 
 async function scheduleUpdate() {

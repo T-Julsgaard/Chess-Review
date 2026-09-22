@@ -12,7 +12,8 @@
   "host_permissions": [
     "https://api.chess.com/*",
     "https://www.chess.com/*",
-    "https://lichess.org/*"
+    "https://lichess.org/*",
+    "https://raw.githubusercontent.com/*"
   ],
   "action": {
     "default_title": "Chess Review — click to analyze this game",

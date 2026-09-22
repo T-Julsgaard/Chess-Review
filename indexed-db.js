@@ -3,8 +3,9 @@
 // reading/writing the openings store, and handling version upgrades.
 
 const DB_NAME = "ChessReviewOpenings";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = "openings";
+const STAGING_STORE_NAME = "openings_staging";
 
 let dbPromise = null;
 
@@ -23,6 +24,11 @@ export function openDb() {
         const store = db.createObjectStore(STORE_NAME, { keyPath: "epd" });
         store.createIndex("eco", "eco", { unique: false });
         store.createIndex("name", "name", { unique: false });
+      }
+      if (!db.objectStoreNames.contains(STAGING_STORE_NAME)) {
+        const stagingStore = db.createObjectStore(STAGING_STORE_NAME, { keyPath: "epd" });
+        stagingStore.createIndex("eco", "eco", { unique: false });
+        stagingStore.createIndex("name", "name", { unique: false });
       }
     };
   });

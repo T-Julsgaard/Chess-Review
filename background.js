@@ -9,6 +9,7 @@
 
 import { analyzeActiveTab, openAnalysisTab, reloadActiveAndAnalyze } from "./analyze-flow.js";
 import { browserAPI } from "./browser-compat.js";
+import { initOpeningsDb, UPDATE_ALARM_NAME } from "./openings-db.js";
 
 // Shared game (from a share link caught by content.js) → open the analysis.
 // "Free game review" button injected into the chess.com game-over modal → same flow as the popup.
@@ -28,6 +29,18 @@ browserAPI.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 browserAPI.commands.onCommand.addListener((command) => {
   if (command === "analyze-current") runAnalyze(showBadgeError);
 });
+
+// Initialize openings database and schedule 30-day update alarm on startup
+initOpeningsDb().catch(console.error);
+
+// Also handle alarm in background (service worker)
+if (browserAPI.alarms) {
+  browserAPI.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name === UPDATE_ALARM_NAME) {
+      import("./openings-db.js").then(({ updateDb }) => updateDb().catch(console.warn));
+    }
+  });
+}
 
 async function runAnalyze(onFail) {
   const { username } = await browserAPI.storage.local.get("username");
