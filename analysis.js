@@ -1095,11 +1095,43 @@ function classifyVariationMove(vIdx) {
   const prevWinning = parentEvalMover > 0;
   const notMateRel = currentMateMover == null && parentMateMover == null;
   
-  // For variations, we need to track previous move classifications in the variation
+  // For variations, we need to track previous move classifications AND losses in the variation
   const prevCls = vIdx > 1 ? v.positions[vIdx - 1].classif : null;
   const prevPrevCls = vIdx > 2 ? v.positions[vIdx - 2].classif : null;
   
+  // Calculate previous move's eval loss (for Miss/Great logic)
+  // Previous move: vIdx-1, its parent: vIdx-2
+  let prevEvalLoss = null;
+  if (vIdx > 1) {
+    const prevPos = v.positions[vIdx - 1];
+    const prevParentPos = v.positions[vIdx - 2];
+    const prevMover = prevPos.color;
+    const prevParentEval = prevParentPos.eval;
+    const prevCurrentEval = prevPos.eval;
+    if (prevParentEval && prevCurrentEval) {
+      const prevParentEvalMover = prevMover === "w" ? scoreToCp(prevParentEval) : -scoreToCp(prevParentEval);
+      const prevCurrentEvalMover = prevMover === "w" ? scoreToCp(prevCurrentEval) : -scoreToCp(prevCurrentEval);
+      prevEvalLoss = prevParentEvalMover - prevCurrentEvalMover;
+    }
+  }
+  
+  // Calculate previous-previous move's eval loss
+  let prevPrevEvalLoss = null;
+  if (vIdx > 2) {
+    const prevPrevPos = v.positions[vIdx - 2];
+    const prevPrevParentPos = v.positions[vIdx - 3];
+    const prevPrevMover = prevPrevPos.color;
+    const prevPrevParentEval = prevPrevParentPos.eval;
+    const prevPrevCurrentEval = prevPrevPos.eval;
+    if (prevPrevParentEval && prevPrevCurrentEval) {
+      const prevPrevParentEvalMover = prevPrevMover === "w" ? scoreToCp(prevPrevParentEval) : -scoreToCp(prevPrevParentEval);
+      const prevPrevCurrentEvalMover = prevPrevMover === "w" ? scoreToCp(prevPrevCurrentEval) : -scoreToCp(prevPrevCurrentEval);
+      prevPrevEvalLoss = prevPrevParentEvalMover - prevPrevCurrentEvalMover;
+    }
+  }
+  
   // Determine if previous move was a mistake/blunder (for Great/Miss detection)
+  // Match classifyMove: must be inacc/blunder classification AND loss >= ML AND (lost/gave clear advantage)
   const previousMistake = prevCls === "mistake" || prevCls === "blunder";
   const previousBlunder = prevCls === "blunder";
   const previousInacc = prevCls === "inacc";
@@ -1113,6 +1145,8 @@ function classifyVariationMove(vIdx) {
   const prevPrevMiss = prevPrevCls === "miss";
   
   // Brilliant — sound sacrifice that punishes opponent's slip
+  // Match classifyMove logic
+  const previousBrilliant = vIdx > 1 && sac && prevCls === "excellent" && prevEvalLoss != null && prevEvalLoss >= ML;
   if (!previousBlunder && notMateRel && std === "excellent" && sac
     && (previousMistake || previousBlunder
       || (!(previousInacc || previousBlunder) && (prevPrevMistake || prevPrevBlunder)))) return "brilliant";
@@ -1120,6 +1154,7 @@ function classifyVariationMove(vIdx) {
   if (sac && wasMating && matingNow && currentMateMover <= parentMateMover && winningNow) return "brilliant";                   // sac that keeps the mate
   
   // Great — an only-good move that capitalises on the opponent's mistake/blunder
+  // Match classifyMove: not previousMiss, not mate-related, std=excellent, and (previousMistake OR previousBlunder)
   if (!previousMiss && notMateRel && std === "excellent"
     && (previousMistake || previousBlunder)) return "great";
   
@@ -1133,9 +1168,11 @@ function classifyVariationMove(vIdx) {
   if (wasMating && matingNow && !winningNow) return "good";                                                  // being mated, unavoidable
   
   if (wasMating && !matingNow && prevWinning) return "miss";                                                 // threw away a forced mate
+  // Match classifyMove Miss logic: !previousMiss && notMateRel && (previousMistake || previousBlunder)
+  // && (std === "blunder" || std === "inacc") && (evalLoss != null && prevEvalLoss != null && evalLoss <= prevEvalLoss + MT)
   if (!previousMiss && notMateRel && (previousMistake || previousBlunder)
     && (std === "blunder" || std === "inacc")
-    && (evalLoss != null && (prevCls === "blunder" || prevCls === "inacc") && evalLoss <= (prevCls === "blunder" ? evalLoss : 0) + MT)) return "miss";                     // failed to punish
+    && (evalLoss != null && prevEvalLoss != null && evalLoss <= prevEvalLoss + MT)) return "miss";                     // failed to punish
   
   // Mistake/Blunder detection based on eval loss and advantage loss
   const lostClearAdv = parentEvalMover >= CA && currentEvalMover < CA;
@@ -2171,7 +2208,16 @@ function applyUserMove(from, to, animate = true) {
     if (reachable && nextMain && nextMain.from === from && nextMain.to === to) {
       S.selectedSq = null; go(S.idx + 1); return;
     }
-    S.variation = { branchIdx: S.idx, positions: [{ fen: S.positions[S.idx].fen, san: null }, node], idx: 1 };
+    S.variation = { 
+      branchIdx: S.idx, 
+      positions: [{ 
+        fen: S.positions[S.idx].fen, 
+        san: null, 
+        eval: S.evals[S.idx] || null, 
+        best: S.idx > 0 ? S.bests[S.idx - 1] : null 
+      }, node], 
+      idx: 1 
+    };
     S.analysisMode = true;
   } else {
     const v = S.variation;
@@ -2193,7 +2239,19 @@ function playLine(pv) {
   const ucis = (pv || "").split(/\s+/).filter(Boolean);
   if (!ucis.length) return;
   if (!S.analysisMode) {
-    S.variation = { branchIdx: S.idx, positions: [{ fen: activePos().fen, san: null }], idx: 0 };
+    const currentPos = activePos();
+    const currentIdx = S.analysisMode && S.variation ? S.variation.idx : S.idx;
+    const isMainline = !S.analysisMode;
+    S.variation = { 
+      branchIdx: isMainline ? S.idx : S.variation.branchIdx, 
+      positions: [{ 
+        fen: currentPos.fen, 
+        san: null, 
+        eval: isMainline ? (S.evals[S.idx] || null) : (currentPos.eval || null),
+        best: isMainline && S.idx > 0 ? S.bests[S.idx - 1] : (currentPos.best || null)
+      }], 
+      idx: 0 
+    };
     S.analysisMode = true;
   } else {
     const v = S.variation;
@@ -2261,7 +2319,18 @@ function stopBestWalk() {
 async function playBestMoves() {
   stopLineWalk();              // cancel any other walk (also bumps bestWalkToken)
   if (!S.analysisMode) {
-    S.variation = { branchIdx: S.idx, positions: [{ fen: activePos().fen, san: null }], idx: 0 };
+    const currentPos = activePos();
+    const isMainline = true;
+    S.variation = { 
+      branchIdx: S.idx, 
+      positions: [{ 
+        fen: currentPos.fen, 
+        san: null, 
+        eval: isMainline ? (S.evals[S.idx] || null) : (currentPos.eval || null),
+        best: isMainline && S.idx > 0 ? S.bests[S.idx - 1] : (currentPos.best || null)
+      }], 
+      idx: 0 
+    };
     S.analysisMode = true;
   } else {
     S.variation.positions = S.variation.positions.slice(0, S.variation.idx + 1); // play out from here
@@ -2308,7 +2377,8 @@ async function playBestMoves() {
 async function requestLiveEval() {
   if (!S.analysisMode || !S.variation) return;
   const pos = activePos();
-  if (pos.best) { renderEvalBar(); renderBestArrow(); renderEngineCurrent(); return; } // already computed
+  // If already fully computed (eval + best + classification), just render and return
+  if (pos.best && pos.classif) { renderEvalBar(); renderBestArrow(); renderEngineCurrent(); return; }
   const token = ++S.liveToken;
   if (!S.liveEngine) {
     S.liveEngine = await createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill });

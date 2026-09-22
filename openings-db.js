@@ -10,12 +10,14 @@ import {
   countOpenings,
   getAllOpenings,
   closeDb,
+  STORE_NAME,
+  STAGING_STORE_NAME,
 } from "./indexed-db.js";
 
 const OPENINGS_DB_URL = "https://raw.githubusercontent.com/lichess-org/chess-openings/master/eco.tsv";
 const LOCAL_DB_URL = "data/openings-db.json";
-const UPDATE_INTERVAL_DAYS = 30;
-const UPDATE_ALARM_NAME = "openings-db-update";
+export const UPDATE_INTERVAL_DAYS = 30;
+export const UPDATE_ALARM_NAME = "openings-db-update";
 
 let OPENINGS_DB = null;
 let INIT_PROMISE = null;
@@ -99,7 +101,7 @@ async function initializeDb() {
   }
 }
 
-async function updateDb() {
+export async function updateDb() {
   console.log("[Openings DB] Checking for updates...");
   try {
     const remoteEntries = await fetchRemoteDb();
@@ -289,13 +291,4 @@ export function getLegacyBook() {
     epd[key] = [val.eco, val.name];
   }
   return { epd };
-}
-
-// Listen for update alarm
-if (typeof browserAPI !== "undefined" && browserAPI.alarms) {
-  browserAPI.alarms.onAlarm.addListener((alarm) => {
-    if (alarm.name === UPDATE_ALARM_NAME) {
-      updateDb().catch(() => {});
-    }
-  });
 }
