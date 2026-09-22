@@ -2,10 +2,10 @@
 // Provides a simple Promise-based API for opening/closing the DB,
 // reading/writing the openings store, and handling version upgrades.
 
-const DB_NAME = "ChessReviewOpenings";
-const DB_VERSION = 2;
-const STORE_NAME = "openings";
-const STAGING_STORE_NAME = "openings_staging";
+export const DB_NAME = "ChessReviewOpenings";
+export const DB_VERSION = 2;
+export const STORE_NAME = "openings";
+export const STAGING_STORE_NAME = "openings_staging";
 
 let dbPromise = null;
 
