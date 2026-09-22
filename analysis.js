@@ -2214,7 +2214,7 @@ function applyUserMove(from, to, animate = true) {
         fen: S.positions[S.idx].fen, 
         san: null, 
         eval: S.evals[S.idx] || null, 
-        best: S.idx > 0 ? S.bests[S.idx - 1] : null 
+        best: S.bests[S.idx] || null 
       }, node], 
       idx: 1 
     };
@@ -2248,7 +2248,7 @@ function playLine(pv) {
         fen: currentPos.fen, 
         san: null, 
         eval: isMainline ? (S.evals[S.idx] || null) : (currentPos.eval || null),
-        best: isMainline && S.idx > 0 ? S.bests[S.idx - 1] : (currentPos.best || null)
+        best: isMainline ? (S.bests[S.idx] || null) : (currentPos.best || null)
       }], 
       idx: 0 
     };
@@ -2327,7 +2327,7 @@ async function playBestMoves() {
         fen: currentPos.fen, 
         san: null, 
         eval: isMainline ? (S.evals[S.idx] || null) : (currentPos.eval || null),
-        best: isMainline && S.idx > 0 ? S.bests[S.idx - 1] : (currentPos.best || null)
+        best: isMainline ? (S.bests[S.idx] || null) : (currentPos.best || null)
       }], 
       idx: 0 
     };
@@ -2370,6 +2370,8 @@ async function playBestMoves() {
     v.idx = v.positions.length - 1;
     playSanSound(mv.san);
     paintBoard(); renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent();
+    // Classify the move that was just played
+    await requestLiveEval();
   }
   if (token === S.bestWalkToken) { S.bestWalking = false; renderControls(); renderEngineCurrent(); }
 }
