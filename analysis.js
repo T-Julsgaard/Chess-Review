@@ -616,7 +616,10 @@ const S = {
   acc: { w: null, b: null }, accElo: { w: null, b: null }, counts: { w: {}, b: {} },
   bookCount: 0, opening: null, verdict: "Analyzing …",
   idx: 0, total: 0, flipped: false,
-  analyzing: true, progress: 0, userArrows: [], userMarks: [], qbreakExpanded: false,
+  // `progress` is the contiguous prefix that is safe to navigate to while a batch is
+  // still running. `completed` is the total number of game plies already returned by
+  // any worker. They differ when parallel workers finish out of order.
+  analyzing: true, progress: 0, completed: 0, analysisError: null, userArrows: [], userMarks: [], qbreakExpanded: false,
   // Collapsible settings sections: open/closed state, keyed by section title.
   setOpen: {},
   settings: { ...DEFAULT_SETTINGS },
@@ -3108,20 +3111,36 @@ function coachMoveSentence(idx) {
   }
   return line;
 }
+function analysisProgressText() {
+  // The initial position is searched too, but is not a played ply; keep the displayed
+  // denominator aligned with the game's move count.
+  const done = Math.min(S.total, S.completed == null ? S.progress : S.completed);
+  return `Analyzing … ${done}/${S.total}`;
+}
 function renderReview() {
   // In-place progress text during analysis (so the loader animation doesn't restart each move).
-  if (S.analyzing && revRefs) { revRefs.head.textContent = `Analyzing … ${S.progress}/${S.total}`; return; }
+  if (S.analyzing && revRefs) { revRefs.head.textContent = analysisProgressText(); return; }
 
   const panel = el("div", { class: "panel insight-panel" }, openingStrip());
 
   if (S.analyzing) {
-    const headEl = el("span", {}, `Analyzing … ${S.progress}/${S.total}`);
+    const headEl = el("span", {}, analysisProgressText());
     panel.append(el("div", { class: "ip-body" }, el("div", { class: "ip-analyzing" }, loaderNode("", "var(--accent)"), headEl)));
     revRefs = { head: headEl };
     UI.review.replaceChildren(panel);
     return;
   }
   revRefs = null;
+
+  if (S.analysisError) {
+    _ipSig = null;
+    panel.append(el("div", { class: "ip-body" },
+      el("div", { class: "ip-head" }),
+      el("div", { class: "ip-text" }, `Analysis stopped early: ${S.analysisError} You can change the engine settings and try again.`),
+    ));
+    UI.review.replaceChildren(panel);
+    return;
+  }
 
   if (S.practice) { _ipSig = null; panel.append(renderPracticeCoach()); UI.review.replaceChildren(panel); return; }
 
@@ -5088,6 +5107,8 @@ async function startAnalysis() {
   S.bests = new Array(S.total + 1).fill(null);
   S._sacCache = []; S._forcedCache = []; S._panelCache = null;
   S.progress = 0;
+  S.completed = 0;
+  S.analysisError = null;
   S.analyzing = true;
   revRefs = null; statsRefs = null;
   computeDerived();
@@ -5111,6 +5132,7 @@ async function startAnalysis() {
   } catch (e) {
     console.error("[Chess Review] no Stockfish build could be started:", e);
     S.evalEngines = []; S.analyzing = false;
+    S.analysisError = "the engine could not be started in this browser.";
     S.verdict = "Engine unavailable — couldn't start Stockfish in this browser.";
     try { renderReview(); } catch {}
     return;
@@ -5133,16 +5155,32 @@ async function startAnalysis() {
       S.bests[i] = res;
       // Terminal positions (mate/stalemate) are decided from the board — not from the engine's "mate 0".
       S.evals[i] = terminalScore(S.positions[i].fen) || whiteRel(res.score, S.positions[i].fen);
+      if (i > 0) S.completed++;
       while (contig + 1 <= S.total && S.bests[contig + 1]) contig++;
       S.progress = Math.max(0, contig);
       requestProgress(gen);
     }
   }
-  await Promise.all(engines.map((e) => worker(e)));
+  try {
+    await Promise.all(engines.map((e) => worker(e)));
+  } catch (e) {
+    if (gen !== S.batchGen) return;
+    console.error("[Chess Review] engine stopped during batch analysis:", e);
+    terminateEngines();
+    S.analyzing = false;
+    S.analysisError = "the engine stopped responding.";
+    S.verdict = "Analysis stopped before the game was complete.";
+    flushProgress(gen);
+    renderReview();
+    renderStats();
+    if (!S.analysisMode) renderEngineCurrent();
+    return;
+  }
   if (gen !== S.batchGen) return;            // a newer analysis took over
   terminateEngines();
   S.analyzing = false;
   S.progress = S.total;
+  S.completed = S.total;
   flushProgress(gen);
   renderReview();
   renderStats();
@@ -5198,6 +5236,8 @@ async function applyGame(payload) {
   S.bests = new Array(S.total + 1).fill(null);
   S._sacCache = []; S._forcedCache = []; S._panelCache = null;
   S.progress = 0;
+  S.completed = 0;
+  S.analysisError = null;
   S.openingHeader = deriveOpening(S.headers);
   S.opening = S.openingHeader;
   const { players, meSide } = derivePlayers(S.headers, S.meta, S.username);
@@ -5234,6 +5274,7 @@ async function applyGame(payload) {
     S.analyzedMultipv = saved.multipv || null;
     S.analyzing = false;
     S.progress = S.total;
+    S.completed = S.total;
   }
 
   document.title = `${players.w.name} vs ${players.b.name} — Chess Review`;
