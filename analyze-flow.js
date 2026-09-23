@@ -7,7 +7,11 @@ import { browserAPI } from "./browser-compat.js";
 
 /** Save the analysis payload and open analysis.html in a new tab. */
 export async function openAnalysisTab(payload) {
-  const jobId = String(Date.now());
+  // The popup, keyboard shortcut, and in-page button can all launch a review. A timestamp
+  // alone collides when two of those arrive in the same millisecond, causing one tab to read
+  // the other tab's payload. UUIDs keep each storage handoff independent.
+  const jobId = globalThis.crypto?.randomUUID?.()
+    || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   await browserAPI.storage.local.set({ [`job:${jobId}`]: payload });
   await browserAPI.tabs.create({
     url: browserAPI.runtime.getURL(`analysis.html#${jobId}`),
