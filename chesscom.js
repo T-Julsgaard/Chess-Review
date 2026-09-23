@@ -51,7 +51,10 @@ export function parseFlip(urlOrPath) {
 // you do hit the rate limit it answers 429 (often with Retry-After). We honour that with a short
 // backoff + a couple of retries so a transient throttle doesn't turn a findable game into "not found"
 // (the deep search treats a thrown month as empty). 404/empty months still throw straight through.
-async function getJSON(url, { retries = 2 } = {}) {
+
+// Shared fetch with retry for 429/5xx. Returns parsed JSON or throws on permanent error.
+// 404 is treated as a permanent error here (unlike month fetches where 404 = empty).
+async function fetchWithRetry(url, { retries = 2, treat404asError = true } = {}) {
   for (let attempt = 0; ; attempt++) {
     const res = await fetch(url, { headers: { Accept: "application/json" } });
     if (res.ok) return res.json();
@@ -61,19 +64,24 @@ async function getJSON(url, { retries = 2 } = {}) {
       await sleep(Math.min(waitMs, 8000));
       continue;
     }
+    if (res.status >= 500 && res.status < 600 && attempt < retries) {
+      await sleep(1000 * (attempt + 1));
+      continue;
+    }
+    if (res.status === 404 && !treat404asError) return { games: [] };
     throw new Error(`HTTP ${res.status} at ${url}`);
   }
 }
 
 /** List of monthly archive URLs (oldest → newest). */
 export async function fetchArchives(username) {
-  const data = await getJSON(`${API}/player/${encodeURIComponent(username.toLowerCase())}/games/archives`);
+  const data = await fetchWithRetry(`${API}/player/${encodeURIComponent(username.toLowerCase())}/games/archives`);
   return data.archives || [];
 }
 
-/** Fetch all games in a given monthly archive. */
+/** Fetch all games in a given monthly archive. 404 = empty month (not an error). */
 export async function fetchMonthGames(archiveUrl) {
-  const data = await getJSON(archiveUrl);
+  const data = await fetchWithRetry(archiveUrl, { treat404asError: false });
   return data.games || [];
 }
 
@@ -110,28 +118,54 @@ export async function findGameById(username, gameId, opts = {}) {
 // The actual archive search behind findGameById's cache.
 async function searchGameById(username, want, { monthsBack = 18 } = {}) {
   const matchIn = (games) => (games || []).find((g) => { const p = parseGameId(g.url); return p && p.id === want; }) || null;
-  const safeMonth = (url) => fetchMonthGames(url).catch(() => []); // a 404/empty month → just skip it
 
-  // 1) Fast path: current + previous UTC month, LIVE. The just-finished game is almost always here, so
-  //    we never serve these two from cache (the current month is still growing — a cached copy could
-  //    miss a brand-new game). The previous month IS immutable, so we opportunistically cache it for a
-  //    future deep search. Two parallel requests: the latency win outweighs the (retry-guarded) risk.
+  // Fetch a month with proper error handling: retry 429/5xx, rethrow other errors.
+  // Returns { games: [], error: null } on success, or throws on permanent failure.
+  async function fetchMonthWithRetry(url) {
+    for (let attempt = 0; ; attempt++) {
+      const res = await fetch(url, { headers: { Accept: "application/json" } });
+      if (res.ok) return { games: (await res.json()).games || [], error: null };
+      if (res.status === 429 && attempt < 2) {
+        const ra = parseInt(res.headers.get("Retry-After") || "", 10);
+        const waitMs = Number.isFinite(ra) ? ra * 1000 : 1000 * (attempt + 1);
+        await sleep(Math.min(waitMs, 8000));
+        continue;
+      }
+      if (res.status >= 500 && res.status < 600 && attempt < 2) {
+        await sleep(1000 * (attempt + 1));
+        continue;
+      }
+      // 404 = empty month, treat as no games (not an error)
+      if (res.status === 404) return { games: [], error: null };
+      // Other 4xx = permanent error (bad username, etc.), propagate
+      throw new Error(`HTTP ${res.status} at ${url}`);
+    }
+  }
+
+  // 1) Fast path: current + previous UTC month, SERIALLY (chess.com asks for serial requests).
+  //    The just-finished game is almost always here. The previous month IS immutable, so we
+  //    opportunistically cache it for a future deep search.
   const now = new Date();
   const prev = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1));
   const curUrl = monthArchiveUrl(username, now);
   const prevUrl = monthArchiveUrl(username, prev);
-  const [curGames, prevGames] = await Promise.all([safeMonth(curUrl), safeMonth(prevUrl)]);
-  let hit = matchIn(curGames);
+  
+  // Fetch current month first
+  let curResult;
+  try { curResult = await fetchMonthWithRetry(curUrl); } catch { return null; }
+  let hit = matchIn(curResult.games);
   if (hit) return hit;
-  if (prevGames.length) setCachedMonth(prevUrl, prevGames); // immutable → safe; fire-and-forget
-  hit = matchIn(prevGames);
+  
+  // Then fetch previous month
+  let prevResult;
+  try { prevResult = await fetchMonthWithRetry(prevUrl); } catch { return null; }
+  if (prevResult.games.length) setCachedMonth(prevUrl, prevResult.games); // immutable → safe; fire-and-forget
+  hit = matchIn(prevResult.games);
   if (hit) return hit;
 
-  // 2) Deep path: page back through the archive index newest → oldest, SERIALLY (chess.com asks for
-  //    serial requests; parallel bursts trip the rate limit). Every month here is OLDER than the
-  //    current one, hence immutable — so we read the month cache first (a hit costs no API call) and
-  //    cache any month we do fetch. A cache miss/empty/error always falls through to a live fetch, so a
-  //    cold or broken cache behaves exactly like before. Only runs for genuinely old games.
+  // 2) Deep path: page back through the archive index newest → oldest, SERIALLY.
+  //    Every month here is OLDER than the current one, hence immutable — so we read the
+  //    month cache first (a hit costs no API call) and cache any month we do fetch.
   let archives;
   try { archives = await fetchArchives(username); } catch { return null; }
   const done = new Set([curUrl, prevUrl]);
@@ -139,7 +173,9 @@ async function searchGameById(username, want, { monthsBack = 18 } = {}) {
   for (const url of toSearch) {
     let games = await getCachedMonth(url);
     if (games == null) {
-      games = await safeMonth(url);
+      let result;
+      try { result = await fetchMonthWithRetry(url); } catch { continue; } // skip this month on permanent error
+      games = result.games;
       if (games.length) setCachedMonth(url, games); // immutable past month → cache forever
     }
     const m = matchIn(games);

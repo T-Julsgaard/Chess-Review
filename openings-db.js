@@ -13,6 +13,7 @@ import {
   STORE_NAME,
   STAGING_STORE_NAME,
 } from "./indexed-db.js";
+import { Chess } from "./lib/chess.js";
 
 const OPENINGS_DB_BASE_URL = "https://raw.githubusercontent.com/lichess-org/chess-openings/master";
 const OPENINGS_DB_FILES = ["a.tsv", "b.tsv", "c.tsv", "d.tsv", "e.tsv"];
@@ -27,16 +28,33 @@ function epdOf(fen) {
   return fen.split(" ").slice(0, 4).join(" ");
 }
 
+/**
+ * Parse a PGN string and return the resulting FEN after playing all moves.
+ * Returns null if the PGN is invalid or cannot be parsed.
+ */
+function pgnToFen(pgn) {
+  try {
+    const chess = new Chess();
+    chess.loadPgn(pgn);
+    return chess.fen();
+  } catch {
+    return null;
+  }
+}
+
 function parseEcoTsv(tsv) {
   const lines = tsv.trim().split("\n");
   const openings = [];
   for (const line of lines) {
     if (!line || line.startsWith("#")) continue;
-    const [eco = "", name = "", fen] = line.replace(/\r$/, "").split("\t");
+    const [eco = "", name = "", pgn] = line.replace(/\r$/, "").split("\t");
     // Intermediate theory positions legitimately have no ECO code or name. They still
     // mark a move as book, so dropping them makes book detection regress after an update.
-    if (fen) {
-      openings.push({ eco, name, fen });
+    if (pgn) {
+      const fen = pgnToFen(pgn);
+      if (fen) {
+        openings.push({ eco, name, fen });
+      }
     }
   }
   return openings;
@@ -243,8 +261,8 @@ export async function initOpeningsDb() {
     try {
       await initializeDb();
       await scheduleUpdate();
-      // Also run an update check on startup (non-blocking)
-      updateDb().catch(() => {});
+      // Update is only performed by the scheduled alarm (every 30 days).
+      // Do NOT run updateDb() on startup to avoid redundant downloads.
     } catch (e) {
       console.error("[Openings DB] Initialization failed:", e);
       // IndexedDB can be unavailable (for example, in private browsing). Keep the
