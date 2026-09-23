@@ -32,12 +32,21 @@ function parseEcoTsv(tsv) {
   const openings = [];
   for (const line of lines) {
     if (!line || line.startsWith("#")) continue;
-    const [eco, name, fen] = line.split("\t");
-    if (eco && name && fen) {
+    const [eco = "", name = "", fen] = line.replace(/\r$/, "").split("\t");
+    // Intermediate theory positions legitimately have no ECO code or name. They still
+    // mark a move as book, so dropping them makes book detection regress after an update.
+    if (fen) {
       openings.push({ eco, name, fen });
     }
   }
   return openings;
+}
+
+function cacheEntries(entries) {
+  OPENINGS_DB = {};
+  for (const entry of entries) {
+    OPENINGS_DB[entry.epd] = entry;
+  }
 }
 
 function buildEntries(openings) {
@@ -86,10 +95,7 @@ async function initializeDb() {
     // Populate in-memory cache from IndexedDB for synchronous access
     if (!OPENINGS_DB) {
       const entries = await getAllOpenings();
-      OPENINGS_DB = {};
-      for (const entry of entries) {
-        OPENINGS_DB[entry.epd] = entry;
-      }
+      cacheEntries(entries);
       console.log("[Openings DB] Loaded", Object.keys(OPENINGS_DB).length, "entries into memory");
     }
     return;
@@ -101,10 +107,7 @@ async function initializeDb() {
   await putOpenings(localEntries);
   console.log("[Openings DB] Initialized with", localEntries.length, "entries");
   // Populate in-memory cache for synchronous access
-  OPENINGS_DB = {};
-  for (const entry of localEntries) {
-    OPENINGS_DB[entry.epd] = entry;
-  }
+  cacheEntries(localEntries);
 }
 
 export async function updateDb() {
@@ -126,10 +129,7 @@ export async function updateDb() {
     await atomicSwapStagingToMain();
     
     // Refresh in-memory cache
-    OPENINGS_DB = {};
-    for (const entry of remoteEntries) {
-      OPENINGS_DB[entry.epd] = entry;
-    }
+    cacheEntries(remoteEntries);
     console.log("[Openings DB] Update complete");
 
     // Notify any listeners
@@ -245,8 +245,11 @@ export async function initOpeningsDb() {
       updateDb().catch(() => {});
     } catch (e) {
       console.error("[Openings DB] Initialization failed:", e);
-      // Fall back to in-memory from local file
-      OPENINGS_DB = await loadLocalDb();
+      // IndexedDB can be unavailable (for example, in private browsing). Keep the
+      // same EPD-keyed shape as the normal cache so every lookup path still works.
+      const localEntries = await loadLocalDb();
+      if (!validateEntries(localEntries)) throw new Error("Local openings DB validation failed");
+      cacheEntries(localEntries);
     }
   })();
 
