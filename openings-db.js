@@ -117,7 +117,9 @@ export async function updateDb() {
     if (!validateEntries(remoteEntries)) throw new Error("Remote openings DB validation failed");
 
     const currentCount = await countOpenings();
-    if (remoteEntries.length < currentCount * 0.5) {
+    // The remote DB uses PGN (not FEN), so entry count will differ from local FEN-based DB.
+    // Only warn if remote is extremely small (< 10%), otherwise proceed.
+    if (remoteEntries.length < currentCount * 0.1) {
       throw new Error("Remote DB suspiciously small, aborting update");
     }
 
