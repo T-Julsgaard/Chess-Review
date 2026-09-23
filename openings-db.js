@@ -14,7 +14,8 @@ import {
   STAGING_STORE_NAME,
 } from "./indexed-db.js";
 
-const OPENINGS_DB_URL = "https://raw.githubusercontent.com/lichess-org/chess-openings/main/eco.tsv";
+const OPENINGS_DB_BASE_URL = "https://raw.githubusercontent.com/lichess-org/chess-openings/master";
+const OPENINGS_DB_FILES = ["a.tsv", "b.tsv", "c.tsv", "d.tsv", "e.tsv"];
 const LOCAL_DB_URL = "data/openings-db.json";
 export const UPDATE_INTERVAL_DAYS = 30;
 export const UPDATE_ALARM_NAME = "openings-db-update";
@@ -57,11 +58,16 @@ async function loadLocalDb() {
 }
 
 async function fetchRemoteDb() {
-  const res = await fetch(OPENINGS_DB_URL);
-  if (!res.ok) throw new Error(`Failed to fetch remote openings: ${res.status}`);
-  const tsv = await res.text();
-  const openings = parseEcoTsv(tsv);
-  return buildEntries(openings);
+  const allOpenings = [];
+  for (const file of OPENINGS_DB_FILES) {
+    const url = `${OPENINGS_DB_BASE_URL}/${file}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Failed to fetch ${file}: ${res.status}`);
+    const tsv = await res.text();
+    const openings = parseEcoTsv(tsv);
+    allOpenings.push(...openings);
+  }
+  return buildEntries(allOpenings);
 }
 
 function validateEntries(entries) {
