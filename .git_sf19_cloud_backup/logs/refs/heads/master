@@ -1,2 +1,0 @@
-0000000000000000000000000000000000000000 32800d478eaffd6b1918617a7baaa56a34eba327 aciokie <aciokie@users.noreply.github.com> 1789533705 +0800	commit (initial): Chess Review with Cloudflare Quick Tunnel support
-32800d478eaffd6b1918617a7baaa56a34eba327 53f372e400ecfa11f4ab5b04ad38708832b4ef0b aciokie <aciokie@users.noreply.github.com> 1789533809 +0800	commit: Add build script for Stockfish binary on Render
