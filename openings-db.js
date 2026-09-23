@@ -14,7 +14,7 @@ import {
   STAGING_STORE_NAME,
 } from "./indexed-db.js";
 
-const OPENINGS_DB_URL = "https://raw.githubusercontent.com/lichess-org/chess-openings/master/eco.tsv";
+const OPENINGS_DB_URL = "https://raw.githubusercontent.com/lichess-org/chess-openings/main/eco.tsv";
 const LOCAL_DB_URL = "data/openings-db.json";
 export const UPDATE_INTERVAL_DAYS = 30;
 export const UPDATE_ALARM_NAME = "openings-db-update";
