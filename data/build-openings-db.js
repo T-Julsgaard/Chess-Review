@@ -4,12 +4,18 @@
 
 import fs from "fs";
 import https from "https";
+import { Chess } from "../lib/chess.js";
 
-const LICHESS_OPENINGS_URL = "https://raw.githubusercontent.com/lichess-org/chess-openings/master/eco.tsv";
+const OPENINGS_DB_BASE_URL = "https://raw.githubusercontent.com/lichess-org/chess-openings/master";
+const OPENINGS_DB_FILES = ["a.tsv", "b.tsv", "c.tsv", "d.tsv", "e.tsv"];
 
-function downloadEcoTsv() {
+function downloadTsv(url) {
   return new Promise((resolve, reject) => {
-    https.get(LICHESS_OPENINGS_URL, (res) => {
+    https.get(url, (res) => {
+      if (res.statusCode !== 200) {
+        reject(new Error(`HTTP ${res.statusCode} for ${url}`));
+        return;
+      }
       let data = "";
       res.on("data", (chunk) => data += chunk);
       res.on("end", () => resolve(data));
@@ -17,14 +23,27 @@ function downloadEcoTsv() {
   });
 }
 
+function pgnToFen(pgn) {
+  try {
+    const chess = new Chess();
+    chess.loadPgn(pgn);
+    return chess.fen();
+  } catch {
+    return null;
+  }
+}
+
 function parseEcoTsv(tsv) {
   const lines = tsv.trim().split("\n");
   const openings = [];
   for (const line of lines) {
     if (!line || line.startsWith("#")) continue;
-    const [eco, name, fen] = line.split("\t");
-    if (eco && name && fen) {
-      openings.push({ eco, name, fen });
+    const [eco = "", name = "", pgn] = line.replace(/\r$/, "").split("\t");
+    if (pgn) {
+      const fen = pgnToFen(pgn);
+      if (fen) {
+        openings.push({ eco, name, fen });
+      }
     }
   }
   return openings;
@@ -35,7 +54,7 @@ function epdOf(fen) {
 }
 
 function buildDatabases(openings) {
-  // For IndexedDB: key = epd, value = { eco, name, moves: [] }
+  // For IndexedDB: key = epd, value = { epd, eco, name, moves: [] }
   // For book.json (legacy): key = epd, value = [eco, name] or 0
   const indexedDb = {};
   const legacyBook = { epd: {} };
@@ -44,11 +63,11 @@ function buildDatabases(openings) {
     const epd = epdOf(op.fen);
     // IndexedDB format
     if (!indexedDb[epd]) {
-      indexedDb[epd] = { eco: op.eco, name: op.name, moves: [] };
+      indexedDb[epd] = { epd, eco: op.eco, name: op.name, moves: [] };
     }
     // Legacy format - first entry wins for named, 0 for unnamed
     if (!legacyBook.epd[epd]) {
-      legacyBook.epd[epd] = [op.eco, op.name];
+      legacyBook.epd[epd] = (op.eco || op.name) ? [op.eco, op.name] : 0;
     }
   }
 
@@ -58,21 +77,29 @@ function buildDatabases(openings) {
     if (Array.isArray(v)) namedCount++;
   }
 
-  return { indexedDb, legacyBook: { version: new Date().toISOString().split("T")[0], source: "lichess-org/chess-openings", count: openings.length, named: namedCount, epd: legacyBook.epd } };
+  return { indexedDb, legacyBook: { version: new Date().toISOString().split("T")[0], source: "lichess-org/chess-openings", count: Object.keys(indexedDb).length, named: namedCount, epd: legacyBook.epd } };
 }
 
 async function main() {
-  console.log("Downloading ECO TSV from lichess-org/chess-openings...");
-  const tsv = await downloadEcoTsv();
-  console.log("Parsing...");
-  const openings = parseEcoTsv(tsv);
-  console.log(`Found ${openings.length} opening positions`);
+  console.log("Downloading TSV files from lichess-org/chess-openings...");
+  const allOpenings = [];
+  
+  for (const file of OPENINGS_DB_FILES) {
+    const url = `${OPENINGS_DB_BASE_URL}/${file}`;
+    console.log(`Fetching ${file}...`);
+    const tsv = await downloadTsv(url);
+    const openings = parseEcoTsv(tsv);
+    console.log(`  Found ${openings.length} positions in ${file}`);
+    allOpenings.push(...openings);
+  }
+  
+  console.log(`Total parsed: ${allOpenings.length} opening positions`);
 
-  const { indexedDb, legacyBook } = buildDatabases(openings);
+  const { indexedDb, legacyBook } = buildDatabases(allOpenings);
 
   // Write IndexedDB import file
-  fs.writeFileSync("data/openings-db.json", JSON.stringify(indexedDb));
-  console.log("Wrote data/openings-db.json");
+  fs.writeFileSync("data/openings-db.json", JSON.stringify(Object.values(indexedDb)));
+  console.log(`Wrote data/openings-db.json with ${Object.keys(indexedDb).length} entries`);
 
   // Write legacy book.json
   fs.writeFileSync("data/book.json", JSON.stringify(legacyBook));

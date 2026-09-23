@@ -5,7 +5,7 @@ locally in your browser. One click turns any **Chess.com** or **Lichess** game i
 review — accuracy scores, move-by-move classifications, an evaluation graph, and an estimated
 rating. No account, no server, no manual PGN copying.
 
-**Source:** https://github.com/T-Julsgaard/Chess-Review
+**Source:** https://github.com/aciokie/Chess-Review
 
 **Chrome webshop**: https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenkadndbdbigfam?hl=en
 

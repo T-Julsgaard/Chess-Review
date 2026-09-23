@@ -9,7 +9,7 @@
 
 import { analyzeActiveTab, openAnalysisTab, reloadActiveAndAnalyze } from "./analyze-flow.js";
 import { browserAPI } from "./browser-compat.js";
-import { initOpeningsDb, UPDATE_ALARM_NAME } from "./openings-db.js";
+import { initOpeningsDb, updateDb, UPDATE_ALARM_NAME } from "./openings-db.js";
 
 // Shared game (from a share link caught by content.js) → open the analysis.
 // "Free game review" button injected into the chess.com game-over modal → same flow as the popup.
@@ -33,11 +33,11 @@ browserAPI.commands.onCommand.addListener((command) => {
 // Initialize openings database and schedule 30-day update alarm on startup
 initOpeningsDb().catch(console.error);
 
-// Also handle alarm in background (service worker)
+// Also handle alarm in background (service worker) - use static import for MV3 compatibility
 if (browserAPI.alarms) {
   browserAPI.alarms.onAlarm.addListener((alarm) => {
     if (alarm.name === UPDATE_ALARM_NAME) {
-      import("./openings-db.js").then(({ updateDb }) => updateDb().catch(console.warn));
+      updateDb().catch(console.warn);
     }
   });
 }

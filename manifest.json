@@ -12,6 +12,7 @@
   "host_permissions": [
     "https://api.chess.com/*",
     "https://www.chess.com/*",
+    "https://chess.com/*",
     "https://lichess.org/*",
     "https://raw.githubusercontent.com/*"
   ],
@@ -42,12 +43,12 @@
   "web_accessible_resources": [
     {
       "resources": ["icons/icon.png"],
-      "matches": ["https://www.chess.com/*", "https://lichess.org/*"]
+      "matches": ["https://www.chess.com/*", "https://chess.com/*", "https://lichess.org/*"]
     }
   ],
   "content_scripts": [
     {
-      "matches": ["https://www.chess.com/*"],
+      "matches": ["https://www.chess.com/*", "https://chess.com/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
     },

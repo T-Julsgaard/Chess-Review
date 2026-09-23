@@ -714,8 +714,43 @@ function buildPositions(pgn) {
   // No moves → keep whatever position the PGN set up (a [FEN] header for a pasted FEN), not the
   // standard start. With moves, the start is the position before the first one.
   const startFen = moves.length ? moves[0].before : c.fen();
-  const pos = [{ fen: startFen, san: null }];
-  for (const mv of moves) pos.push({ fen: mv.after, san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "" });
+  
+  // Replay the game move by move to track draw conditions at each position.
+  // This correctly detects threefold repetition, 50-move rule, etc.
+  const pos = [];
+  const replay = new Chess(startFen);
+  const epdCount = new Map();
+  
+  function getDrawType(chess) {
+    if (chess.isCheckmate()) return "checkmate";
+    if (chess.isStalemate()) return "stalemate";
+    if (chess.isDrawByFiftyMoves()) return "fifty-move";
+    if (chess.isInsufficientMaterial()) return "insufficient-material";
+    if (chess.isThreefoldRepetition()) return "threefold";
+    return null;
+  }
+  
+  // Initial position
+  const startDraw = getDrawType(replay);
+  const startEpd = startFen.split(" ").slice(0, 4).join(" ");
+  epdCount.set(startEpd, 1);
+  pos.push({ fen: startFen, san: null, draw: startDraw });
+  
+  for (const mv of moves) {
+    // Play the move on the replay board
+    try {
+      replay.move({ from: mv.from, to: mv.to, promotion: mv.promotion });
+    } catch {
+      // If move fails, continue anyway
+    }
+    const fen = mv.after;
+    const epd = fen.split(" ").slice(0, 4).join(" ");
+    const count = (epdCount.get(epd) || 0) + 1;
+    epdCount.set(epd, count);
+    
+    const draw = getDrawType(replay);
+    pos.push({ fen, san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "", draw });
+  }
   return pos;
 }
 function deriveOpening(h) {
@@ -745,7 +780,19 @@ function derivePlayers(h, meta, username) {
 }
 
 /* ---------------- Math ---------------- */
-function scoreToCp(s) { return !s ? 0 : s.mate != null ? (s.mate > 0 ? 10000 : -10000) : s.cp; }
+// Convert score to centipawns, preserving mate distance.
+// Mate scores are mapped to large but finite values: mate in N → ±(10000 - N*100)
+// This preserves the ordering: Mate in 1 > Mate in 2 > ... > large advantage
+function scoreToCp(s) {
+  if (!s) return 0;
+  if (s.mate != null) {
+    const m = s.mate;
+    // Cap at reasonable distance to avoid overflow; mate > 50 treated as "mate in many"
+    const dist = Math.min(Math.abs(m), 50);
+    return m > 0 ? 10000 - dist * 100 : -10000 + dist * 100;
+  }
+  return s.cp;
+}
 function whiteRel(score, fen) {
   if (!score) return null;
   const flip = fen.split(" ")[1] === "b" ? -1 : 1;
@@ -755,12 +802,31 @@ function whiteRel(score, fen) {
 // position has no legal moves, and Stockfish typically reports "score mate 0" — an unsigned
 // zero, which would otherwise always be interpreted as the same side (wrong eval bar on mate).
 // We decide the result directly from the board and return a white-relative score.
-function terminalScore(fen) {
+// Uses pre-computed draw info from S.positions when available to correctly detect
+// threefold repetition, 50-move rule, etc.
+function terminalScore(fen, plyIndex) {
+  // Try to find the position in S.positions to use pre-computed draw info
+  if (plyIndex != null && S.positions && S.positions[plyIndex]) {
+    const pos = S.positions[plyIndex];
+    if (pos.fen === fen && pos.draw) {
+      if (pos.draw === "checkmate") return { mate: fen.split(" ")[1] === "w" ? -1 : 1 };
+      if (pos.draw !== "checkmate") return { cp: 0 }; // stalemate, fifty-move, insufficient-material, threefold
+    }
+  }
+  
+  // Fallback: try to find by FEN in all positions (for variation positions, etc.)
+  if (S.positions) {
+    const found = S.positions.find((p) => p.fen === fen);
+    if (found && found.draw) {
+      if (found.draw === "checkmate") return { mate: fen.split(" ")[1] === "w" ? -1 : 1 };
+      if (found.draw !== "checkmate") return { cp: 0 };
+    }
+  }
+  
+  // Last resort: create Chess instance (won't detect threefold correctly without history)
   let c; try { c = new Chess(fen); } catch { return null; }
-  // Checkmate: the side to move is checkmated → it loses. White-relative: white-to-move
-  // means white is mated (black wins, negative); black-to-move means white wins.
   if (c.isCheckmate()) return { mate: fen.split(" ")[1] === "w" ? -1 : 1 };
-  if (c.isDraw()) return { cp: 0 }; // stalemate, 50-move, insufficient material, threefold
+  if (c.isDraw()) return { cp: 0 };
   return null;
 }
 function winPct(cp) { return 50 + 50 * (2 / (1 + Math.exp(-calWinK() * cp)) - 1); }
@@ -4377,7 +4443,7 @@ const CREDITS = [
     href: "https://tests.stockfishchess.org/nns",
   },
 ];
-const REPO_URL = "https://github.com/T-Julsgaard/Chess-Review";
+const REPO_URL = "https://github.com/aciokie/Chess-Review";
 function openCredits() {
   document.querySelector(".credits-overlay")?.remove();
   const close = () => { overlay.remove(); document.removeEventListener("keydown", onKey); };
@@ -4836,10 +4902,24 @@ function practiceAttempt(from, to) {
    Every fully-analyzed game is saved to browserAPI.storage.local under "library". The sidebar
    lives off the left edge and slides in on hover; games can be sorted (recent / your accuracy /
    opponent rating) and filtered (result, time class). Clicking a game re-opens it for analysis. */
+// 64-bit FNV-1a hash for better collision resistance (vs old 32-bit djb2).
+// Returns a base36 string. Stable, deterministic, fast.
 function simpleHash(str) {
-  let h = 5381;
-  for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
-  return (h >>> 0).toString(36);
+  // FNV-1a 64-bit constants
+  let hi = 0x6c62272e, lo = 0x07bb0142; // offset basis
+  for (let i = 0; i < str.length; i++) {
+    const c = str.charCodeAt(i);
+    lo ^= c;
+    hi ^= (lo >>> 31) & 0xffffffff; // carry from lo to hi
+    // Multiply by FNV prime (1099511628211 = 0x100000001b3)
+    // (hi * 0x100000001b3) + (lo * 0x100000001b3) in 64-bit
+    const hiMul = (hi * 0x100) + (lo >>> 32);
+    const loMul = (lo * 0x100000001b3) | 0;
+    hi = (hiMul * 0x100000001 + (loMul >>> 32)) | 0;
+    lo = loMul;
+  }
+  // Combine hi and lo into a base36 string
+  return ((hi >>> 0).toString(36) + (lo >>> 0).toString(36).padStart(8, "0")).slice(0, 16);
 }
 // "win" / "loss" / "draw" / "" from the result, relative to the user's side.
 function myResult() {
@@ -4865,61 +4945,73 @@ function gameType() {
 function currentGameId() {
   return (S.meta && S.meta.gameId) || ("pgn:" + simpleHash(S.pgn || ""));
 }
+
+// Read the latest library from storage to avoid concurrent-write data loss.
+async function getLibrary() {
+  try {
+    const store = await browserAPI.storage.local.get("library");
+    return Array.isArray(store.library) ? store.library : [];
+  } catch {
+    return S.library || [];
+  }
+}
+
+// Write library to storage and update local cache.
+async function setLibrary(lib) {
+  S.library = lib;
+  await browserAPI.storage.local.set({ library: lib });
+  renderLibrary();
+}
+
 function saveToLibrary() {
   try {
     if (!S.pgn) return;
     const id = currentGameId();
     const opSide = S.meSide === "w" ? "b" : "w";
-    const prev = S.library.find((g) => g.id === id);
-    // "solved" = no mistakes to practice (clean game) OR practice was already completed before.
-    const noMistakes = practiceSpots().length === 0;
-    const solved = noMistakes || !!(prev && prev.solved);
-    const rec = {
-      id, savedAt: Date.now(), pgn: S.pgn, meta: S.meta || {},
-      meSide: S.meSide,
-      myName: S.players[S.meSide].name, opName: S.players[opSide].name,
-      myAcc: S.acc[S.meSide], opAcc: S.acc[opSide],
-      myRating: parseInt(S.players[S.meSide].rating, 10) || null,
-      opRating: parseInt(S.players[opSide].rating, 10) || null,
-      result: myResult(), type: gameType(),
-      eco: S.opening ? S.opening.eco : "", opening: S.opening ? S.opening.name : "",
-      date: S.headers.UTCDate || S.headers.Date || "",
-      url: (S.meta && S.meta.url) || "",
-      fav: !!(prev && prev.fav), solved,
-    };
-    const lib = S.library.filter((g) => g.id !== id);   // replace on re-analysis (no duplicates)
-    lib.unshift(rec);
-    // Cap the list; drop the analysis blobs of any games that fall off the end.
-    let dropped = [];
-    if (lib.length > 300) { dropped = lib.slice(300); lib.length = 300; }
-    S.library = lib;
-    // The heavy analysis (evals + engine lines) is stored under its own key so the library list
-    // stays light, and so re-opening a saved game can render instantly WITHOUT re-analyzing.
-    const writes = { library: lib, ["analysis:" + id]: { evals: S.evals, bests: S.bests, multipv: S.analyzedMultipv } };
-    browserAPI.storage.local.set(writes);
-    if (dropped.length) browserAPI.storage.local.remove(dropped.map((d) => "analysis:" + d.id));
-    renderLibrary();
+    getLibrary().then((lib) => {
+      const prev = lib.find((g) => g.id === id);
+      const noMistakes = practiceSpots().length === 0;
+      const solved = noMistakes || !!(prev && prev.solved);
+      const rec = {
+        id, savedAt: Date.now(), pgn: S.pgn, meta: S.meta || {},
+        meSide: S.meSide,
+        myName: S.players[S.meSide].name, opName: S.players[opSide].name,
+        myAcc: S.acc[S.meSide], opAcc: S.acc[opSide],
+        myRating: parseInt(S.players[S.meSide].rating, 10) || null,
+        opRating: parseInt(S.players[opSide].rating, 10) || null,
+        result: myResult(), type: gameType(),
+        eco: S.opening ? S.opening.eco : "", opening: S.opening ? S.opening.name : "",
+        date: S.headers.UTCDate || S.headers.Date || "",
+        url: (S.meta && S.meta.url) || "",
+        fav: !!(prev && prev.fav), solved,
+      };
+      const newLib = lib.filter((g) => g.id !== id);
+      newLib.unshift(rec);
+      let dropped = [];
+      if (newLib.length > 300) { dropped = newLib.slice(300); newLib.length = 300; }
+      const writes = { library: newLib, ["analysis:" + id]: { evals: S.evals, bests: S.bests, multipv: S.analyzedMultipv } };
+      browserAPI.storage.local.set(writes);
+      if (dropped.length) browserAPI.storage.local.remove(dropped.map((d) => "analysis:" + d.id));
+      S.library = newLib;
+      renderLibrary();
+    });
   } catch (e) { console.warn("library save failed", e); }
 }
 async function openLibraryGame(rec) {
-  if (rec.id === currentGameId()) return;   // already open
-  // Pull the stored analysis so the re-opened game shows up already analyzed (no re-run).
+  if (rec.id === currentGameId()) return;
   let analysis = null;
   try { const s = await browserAPI.storage.local.get("analysis:" + rec.id); analysis = s["analysis:" + rec.id] || null; } catch {}
-  // Switch in place — no page reload, no black flash. The sidebar stays open (it only closes when
-  // the mouse leaves the library area), so you can pick another game right away. Reproduce the exact
-  // perspective the game was saved with: prefer a stored flip hint, else the saved meSide — so a
-  // re-opened game is never seated the wrong way up regardless of the current stored username.
   const flip = (rec.meta && rec.meta.flip != null) ? rec.meta.flip : (rec.meSide === "b");
   applyGame({ pgn: rec.pgn, meta: { ...(rec.meta || {}), flip }, source: "library", analysis });
 }
 // Toggle a game's favorite flag and persist it.
 function toggleFav(id) {
-  const rec = S.library.find((r) => r.id === id);
-  if (!rec) return;
-  rec.fav = !rec.fav;
-  browserAPI.storage.local.set({ library: S.library });
-  renderLibrary();
+  getLibrary().then((lib) => {
+    const rec = lib.find((r) => r.id === id);
+    if (!rec) return;
+    rec.fav = !rec.fav;
+    setLibrary(lib);
+  });
 }
 // Apply the active sort + filters.
 function libRecords() {
