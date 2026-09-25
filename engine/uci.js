@@ -178,6 +178,21 @@ export class Engine {
 
   terminate() {
     this.dead = true;
+    const err = new Error("engine terminated");
+    // Reject the current job if any
+    if (this.current) {
+      try { this.current.reject(err); } catch {}
+      this.current = null;
+    }
+    // Reject all queued jobs
+    while (this.queue.length) {
+      const j = this.queue.shift();
+      try { j.reject(err); } catch {}
+    }
+    // Also reject handshake if still pending
+    if (this._onFail) {
+      try { this._failHandshake(err); } catch {}
+    }
     try { this._send("quit"); } catch {}
     try { this.worker?.terminate(); } catch {}
   }

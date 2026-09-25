@@ -262,7 +262,9 @@ function injectLichessReviewButton(followUp) {
       clearTimeout(resetTimer);
       btn.disabled = false;
       label.textContent = "Reload the page ↻";
-      console.warn("[Chess Analyzer] extension context lost (it was reloaded/updated) — reload this lichess tab to reconnect.", e);
+      // An existing content script is detached when the extension is reloaded. It cannot
+      // reconnect itself; the tab must load once more to receive the new script.
+      console.info("[Chess Analyzer] The extension was updated. Reload this tab to reconnect the review button.");
     }
   });
 

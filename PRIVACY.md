@@ -54,4 +54,4 @@ extension or clearing its storage in your browser.
 
 Questions about this policy: **T.Julsgaard@proton.me**
 
-Source code: <https://github.com/T-Julsgaard/Chess-Review>
+Source code: <https://github.com/aciokie/Chess-Review>

@@ -8,11 +8,13 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "permissions": ["storage", "unlimitedStorage", "activeTab"],
+  "permissions": ["storage", "unlimitedStorage", "activeTab", "alarms"],
   "host_permissions": [
     "https://api.chess.com/*",
     "https://www.chess.com/*",
-    "https://lichess.org/*"
+    "https://chess.com/*",
+    "https://lichess.org/*",
+    "https://raw.githubusercontent.com/*"
   ],
   "action": {
     "default_title": "Chess Review — click to analyze this game",
@@ -26,9 +28,8 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
   },
-  "background": {
+"background": {
     "service_worker": "background.js",
-    "scripts": ["background.js"],
     "type": "module"
   },
   "browser_specific_settings": {
@@ -41,12 +42,12 @@
   "web_accessible_resources": [
     {
       "resources": ["icons/icon.png"],
-      "matches": ["https://www.chess.com/*", "https://lichess.org/*"]
+      "matches": ["https://www.chess.com/*", "https://chess.com/*", "https://lichess.org/*"]
     }
   ],
   "content_scripts": [
     {
-      "matches": ["https://www.chess.com/*"],
+      "matches": ["https://www.chess.com/*", "https://chess.com/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
     },
