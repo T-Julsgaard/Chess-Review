@@ -129,7 +129,7 @@ const ENGINE_INFO = {
   engineDepth:   "How many plies (half-moves) deep Stockfish searches each position. Higher depth gives more accurate evaluations and fewer false mistakes, but takes longer.",
   engineWorkers: "Number of Stockfish instances analysing positions in parallel. More workers finish the game faster on multi-core CPUs; the results are identical.",
   fastAnalysis:  "Trades quality for speed: the classification pass uses fewer engine lines. ~1.3×/1.6× faster, but evals shift slightly and clean games can pick up a few false inaccuracies.",
-  enginePath:    "Which Stockfish build to run. Stockfish 18 NNUE (default) is the strongest; Stockfish 10 (WASM) is lighter; asm.js is a fallback for browsers without WebAssembly support.",
+  enginePath:    "Which Stockfish build to run. Stockfish 19 (default) is the strongest; Stockfish 18 NNUE is lighter; Stockfish 10 (WASM) is lighter still; asm.js is a fallback for browsers without WebAssembly support.",
   engineSkill:   "Caps the engine's playing strength (Stockfish 'Skill Level'). Max (20) = full strength. Lower values play deliberately weaker — useful for more human-like suggestions.",
   engineHash:    "Memory (MB) for the engine's transposition table — its cache of already-searched positions. More can speed up deep searches; setting it too high just wastes RAM.",
   clsGood:       "A move that loses at least this much eval (in pawns) can be no better than \"Good\". Below it, the move is \"Excellent\". Lower = stricter.",
@@ -238,7 +238,7 @@ const DEFAULT_SETTINGS = {
   // viewing, so changing this never re-analyzes — it just refreshes the panel.
   // Depth 16 (was 12): shallow searches give noisy evals that fabricate inaccuracies/mistakes and
   // inflate the accuracy variance vs the reference values. Deeper search is the single biggest accuracy fix.
-  engineLines: 1, engineDepth: 16, enginePath: "nnue", engineHash: 16, engineSkill: 20,
+  engineLines: 1, engineDepth: 16, enginePath: "sf19", engineHash: 16, engineSkill: 20,
   // Parallel analysis workers: independent single-threaded Stockfish instances that pull
   // positions from a shared queue. Each position is still searched identically (cold, same
   // depth/lines), so results are unchanged — only the wall-clock is parallelized. Default ≈
@@ -271,11 +271,11 @@ const ENGINE_SETTING_KEYS = [
   "accExcellent", "accGood", "accInacc", "accMiss", "accMistake", "accBlunder",
 ];
 // Available Stockfish builds (all bundled). "asm" = fallback without wasm.
-const ENGINE_BUILDS = { nnue: "engine/stockfish-nnue.js", wasm: "engine/stockfish.js", asm: "engine/stockfish.asm.js" };
+const ENGINE_BUILDS = { sf19: "engine/stockfish-19-nnue.js", nnue: "engine/stockfish-nnue.js", wasm: "engine/stockfish.js", asm: "engine/stockfish.asm.js" };
 // Fixed strength order, strongest → weakest. createEngine() always tries the user's chosen build
 // first, then walks DOWN this chain so a build that can't load (e.g. NNUE one day failing) degrades
 // to the next-strongest one that does — rather than the analysis silently hanging.
-const ENGINE_FALLBACK_ORDER = ["nnue", "wasm", "asm"];
+const ENGINE_FALLBACK_ORDER = ["sf19", "nnue", "wasm", "asm"];
 // The engine panel shows up to this many candidate lines (searched on demand for the viewed position).
 const ENGINE_MAX_LINES = 4;
 // Best-move arrow color — a muted hint green.
@@ -3778,7 +3778,7 @@ async function requestPanelLines() {
   S._panelCache = { idx: i, fen, lines: res.lines };
   renderEngineCurrent();
 }
-const ENGINE_NAME = { nnue: "Stockfish 18 NNUE", wasm: "Stockfish 10", asm: "Stockfish 10 (asm.js)" };
+const ENGINE_NAME = { sf19: "Stockfish 19", nnue: "Stockfish 18 NNUE", wasm: "Stockfish 10", asm: "Stockfish 10 (asm.js)" };
 function renderEngine(lines, padFromCache = false) {
   const curFen = activePos().fen;
   const want = S.settings.engineLines;
@@ -4356,6 +4356,7 @@ function motorSettings() {
       el("div", { class: "set-row" },
         setLabel("Build", ENGINE_INFO.enginePath),
         el("div", { class: "set-seg" },
+          el("button", { class: S.settings.enginePath === "sf19" ? "on" : "", onclick: () => setEngineSetting("enginePath", "sf19") }, "Stockfish 19"),
           el("button", { class: S.settings.enginePath === "nnue" ? "on" : "", onclick: () => setEngineSetting("enginePath", "nnue") }, "Stockfish 18 NNUE"),
           el("button", { class: S.settings.enginePath === "wasm" ? "on" : "", onclick: () => setEngineSetting("enginePath", "wasm") }, "Stockfish 10"),
           el("button", { class: S.settings.enginePath === "asm" ? "on" : "", onclick: () => setEngineSetting("enginePath", "asm") }, "asm.js"),
