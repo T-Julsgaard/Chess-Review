@@ -5562,3 +5562,25 @@ async function resetLegacyZoom() {
     console.error(err);
   }
 })();
+
+// TEST-ONLY: exposes internal functions for regression tests.
+// Do not use this namespace in production code.
+export const __testInternals = {
+  classifyMove,
+  classifyVariationMove,
+  scoreToCp,
+  terminalScore,
+  isSacrifice,
+  getStandardRating,
+  bookLookup,
+  _moveLoss,
+  _sacAt,
+  _forcedAt,
+  computeDerived,
+  _evalPawns,
+  _mateFor,
+  _isMateEval,
+  _isCheckmate,
+  moveAccuracy,
+  sideAccuracies,
+};
