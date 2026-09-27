@@ -11,15 +11,13 @@
   "permissions": [
     "storage",
     "unlimitedStorage",
-    "activeTab",
-    "alarms"
+    "activeTab"
   ],
   "host_permissions": [
     "https://api.chess.com/*",
     "https://www.chess.com/*",
     "https://chess.com/*",
-    "https://lichess.org/*",
-    "https://raw.githubusercontent.com/*"
+    "https://lichess.org/*"
   ],
   "action": {
     "default_title": "Chess Review — click to analyze this game",
@@ -35,7 +33,10 @@
   },
   "background": {
     "service_worker": "background.js",
-    "type": "module"
+    "type": "module",
+    "scripts": [
+      "background.js"
+    ]
   },
   "browser_specific_settings": {
     "gecko": {

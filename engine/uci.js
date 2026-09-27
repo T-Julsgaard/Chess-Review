@@ -10,6 +10,9 @@ import { browserAPI } from "../browser-compat.js";
 // analysis would silently stall. On timeout the handshake REJECTS, which lets the caller
 // fall back to the next build (see createEngine() in analysis.js).
 const HANDSHAKE_TIMEOUT_MS = 10000;
+// A silent worker must not leave review or Explore waiting forever. Reset on engine output
+// so a deep search that is still reporting progress is allowed to continue.
+const SEARCH_SILENCE_TIMEOUT_MS = 120000;
 
 export class Engine {
   constructor(scriptPath = "engine/stockfish.js", wasmPath = scriptPath.replace(/\.js$/, ".wasm")) {
@@ -19,6 +22,9 @@ export class Engine {
     const wasmUrl = browserAPI?.runtime?.getURL ? browserAPI.runtime.getURL(wasmPath) : wasmPath;
     this.scriptPath = scriptPath;
     this.dead = false;
+    this.queue = [];
+    this.current = null;
+    this.multipv = 1;
     // A worker whose script URL is bad throws synchronously from the constructor — treat that the
     // same as any other load failure so createEngine() can fall back instead of crashing the page.
     try {
@@ -29,9 +35,6 @@ export class Engine {
       this._ready.catch(() => {}); // pre-attach so an unconsumed rejection never warns
       return;
     }
-    this.queue = [];
-    this.current = null;
-    this.multipv = 1;
     // Listen BEFORE the handshake, so a (possibly synchronous) reply isn't lost.
     this.worker.onmessage = (e) => this._onLine(typeof e.data === "string" ? e.data : e.data?.data || "");
     // A runtime error in the worker (failed wasm instantiation, a crash mid-search) surfaces here.
@@ -43,6 +46,8 @@ export class Engine {
 
   _onWorkerError(message) {
     this.dead = true;
+    clearTimeout(this._searchTimer);
+    try { this.worker?.terminate(); } catch {}
     const err = new Error(message);
     if (this._onFail) { this._failHandshake(err); return; }
     // Past the handshake: reject the running job and everything queued behind it.
@@ -52,6 +57,8 @@ export class Engine {
 
   _failHandshake(err) {
     clearTimeout(this._handshakeTimer);
+    this.dead = true;
+    try { this.worker?.terminate(); } catch {}
     const fail = this._onFail;
     this._onReady = null;
     this._onFail = null;
@@ -60,7 +67,7 @@ export class Engine {
 
   _send(cmd) {
     if (this.dead || !this.worker) return;
-    try { this.worker.postMessage(cmd); } catch {}
+    try { this.worker.postMessage(cmd); } catch (e) { this._onWorkerError(e?.message || "engine message failed"); }
   }
 
   /**
@@ -80,20 +87,31 @@ export class Engine {
     try { this._send("stop"); } catch {}
   }
 
+  /** Discard obsolete queued live searches without interrupting their Promise callers. */
+  cancelPending() {
+    const err = new Error("analysis superseded");
+    while (this.queue.length) this.queue.shift().reject(err);
+  }
+
+  _watchSearch() {
+    clearTimeout(this._searchTimer);
+    this._searchTimer = setTimeout(() => this._onWorkerError("engine search timed out"), SEARCH_SILENCE_TIMEOUT_MS);
+  }
+
   _handshake() {
     return new Promise((resolve, reject) => {
       this._onReady = resolve;
       this._onFail = reject;
       this._handshakeTimer = setTimeout(
         () => this._failHandshake(new Error(`engine handshake timed out (${this.scriptPath})`)),
-        HANDSHAKE_TIMEOUT_MS,
+        this.scriptPath.includes("stockfish-19") ? 30000 : HANDSHAKE_TIMEOUT_MS,
       );
       this._send("uci");
     });
   }
 
   _onLine(line) {
-    if (!line) return;
+    if (!line || this.dead) return;
     if (line.includes("uciok")) {
       this._send("isready");
       return;
@@ -110,6 +128,7 @@ export class Engine {
       return;
     }
     if (!this.current) return;
+    this._watchSearch();
 
     if (line.startsWith("info ") && line.includes(" score ")) {
       const score = this._parseScore(line);
@@ -129,6 +148,7 @@ export class Engine {
       const best = line.split(/\s+/)[1] || null;
       const job = this.current;
       this.current = null;
+      clearTimeout(this._searchTimer);
       const lines = Object.keys(job.lines)
         .sort((a, b) => +a - +b)
         .map((k) => job.lines[k]);
@@ -151,15 +171,17 @@ export class Engine {
   }
 
   _pump() {
-    if (this.current || this.queue.length === 0) return;
+    if (this.dead || this.current || this.queue.length === 0) return;
     this.current = this.queue.shift();
+    const job = this.current;
+    this._watchSearch();
     if (this.current.multipv !== this.multipv) {
       this.multipv = this.current.multipv;
       this._send(`setoption name MultiPV value ${this.multipv}`);
     }
     this._send("ucinewgame");
-    this._send(`position fen ${this.current.fen}`);
-    this._send(`go depth ${this.current.depth}`);
+    this._send(`position fen ${job.fen}`);
+    this._send(`go depth ${job.depth}`);
   }
 
   /**
@@ -177,7 +199,9 @@ export class Engine {
   }
 
   terminate() {
+    try { this._send("quit"); } catch {}
     this.dead = true;
+    clearTimeout(this._searchTimer);
     const err = new Error("engine terminated");
     // Reject the current job if any
     if (this.current) {
@@ -193,7 +217,6 @@ export class Engine {
     if (this._onFail) {
       try { this._failHandshake(err); } catch {}
     }
-    try { this._send("quit"); } catch {}
     try { this.worker?.terminate(); } catch {}
   }
 }
