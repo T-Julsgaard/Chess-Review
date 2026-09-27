@@ -76,6 +76,7 @@ const ACCENTS = {
   "#7fb45f": { accent: "#7fb45f", strong: "#6aa14a", ink: "#11210a" },
   "#5a8bef": { accent: "#5a8bef", strong: "#4574db", ink: "#06122e" },
   "#d9a544": { accent: "#d9a544", strong: "#c4902f", ink: "#2a1c05" },
+  "#c77edb": { accent: "#c77edb", strong: "#aa5fc1", ink: "#260d30" },
 };
 // Move classifications (standard style). Each has a color (CSS variable), a
 // short symbol (fallback) and an SVG badge icon in icons/<icon>.svg. Note that the
@@ -130,7 +131,7 @@ const ENGINE_INFO = {
   fastAnalysis:  "Trades quality for speed: the classification pass uses fewer engine lines. ~1.3×/1.6× faster, but evals shift slightly and clean games can pick up a few false inaccuracies.",
   enginePath:    "Which Stockfish build to run. Stockfish 19 (default) is the strongest; Stockfish 18 NNUE is lighter; Stockfish 10 (WASM) is lighter still; asm.js is a fallback for browsers without WebAssembly support.",
   engineSkill:   "Caps the engine's playing strength (Stockfish 'Skill Level'). Max (20) = full strength. Lower values play deliberately weaker — useful for more human-like suggestions.",
-  engineHash:    "Memory (MB) for the engine's transposition table — its cache of already-searched positions. More can speed up deep searches; setting it too high just wastes RAM.",
+  engineHash:    "Recommended: 16 MB for most reviews (the default). Try 32–64 MB for deeper analysis if your computer has spare memory. Each parallel worker uses its own hash table, so memory use is roughly Hash × Workers.",
   clsGood:       "A move that loses at least this much eval (in pawns) can be no better than \"Good\". Below it, the move is \"Excellent\". Lower = stricter.",
   clsInacc:      "A move that loses at least this much eval (pawns) is flagged \"Inaccuracy\". Lower = more inaccuracies.",
   clsBlunder:    "A move that loses at least this much eval (pawns) is a \"Blunder\". Lower = more blunders.",
@@ -143,11 +144,11 @@ const pawnsFmt = (v) => (+v).toFixed(2).replace(/\.00$/, "") + " pawns";
 const ptsFmt = (v) => v + " pts";
 // URL to a classification badge (SVG).
 const qIcon = (cls) => _url("icons/" + (QUALITY[cls]?.icon || cls) + ".svg");
-const PIECE_STYLES = ["image","merida","kaneo","kaneo_midnight","kbyte_gambit"];
+const PIECE_STYLES = ["image","merida","kaneo","kbyte_gambit"];
 // Labels shown in the settings. "image" = bundled Cburnett (the Lichess default set, the standard
-// here), "merida" = the bundled Merida set; the kaneo/kaneo_midnight/kbyte sets are bundled Kadagaden
+// here), "merida" = the bundled Merida set; the kaneo/kbyte sets are bundled Kadagaden
 // sets (CC BY 4.0) — all crisp SVG.
-const PIECE_STYLE_LABEL = { image: "Cburnett", merida: "Merida", kaneo: "Kaneo", kaneo_midnight: "Kaneo Midnight", kbyte_gambit: "1Kbyte Gambit" };
+const PIECE_STYLE_LABEL = { image: "Cburnett", merida: "Merida", kaneo: "Kaneo", kbyte_gambit: "1Kbyte Gambit" };
 // Color approximation of common board themes [light, dark square], used to MATCH a detected
 // board by name (colours aren't copyrightable; the source site's board image is never used).
 // Unknown themes fall back to "green".
@@ -173,7 +174,7 @@ const CC_BOARD_COLORS = {
 // Bundled high-quality SVG piece sets (from Lichess; GPLv2+). Maps a piece-style key to its folder
 // under pieces-img/<set>/<code>.svg, where <code> is e.g. wK / bN (white King, black kNight). SVG =
 // crisp at any board size.
-const BUNDLED_PIECE_SETS = { image: "cburnett", merida: "merida", kaneo: "kaneo", kaneo_midnight: "kaneo_midnight", kbyte_gambit: "kbyte_gambit" };
+const BUNDLED_PIECE_SETS = { image: "cburnett", merida: "merida", kaneo: "kaneo", kbyte_gambit: "kbyte_gambit" };
 // Bundled full-board artwork from Kadagaden/chess-pieces (CC BY 4.0). Each entry is a complete 8x8
 // SVG painted as the board's background (squares go transparent via .cc-board, like a detected
 // board); the [light, dark] pair drives the coordinate + last-move/selection highlight tints so
@@ -187,14 +188,14 @@ const BUNDLED_BOARDS = {
 };
 
 const DEFAULT_SETTINGS = {
-  theme: "dark", accent: "#7fb45f", density: "compact",
+  theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
   // Eval-graph look (see renderGraph), eval-BAR look (see renderEvalBar) and the Insight-panel text size (px).
   graphStyle: "area", barStyle: "gradient", insightFont: 18,
   // Board coordinate labels (the a–h / 1–8 ticks in the squares' corners): on/off + size in px.
   showCoords: true, coordSize: 12,
   // App background: "color" (a tone picked with the HSL sliders), a bundled preset (slate / olive
-  // = "Dark", a fixed near-black tone / ember), or "custom" (uploaded). bgFit is "cover" (stretched) or "tile" (repeated
+  // = "Dark", a fixed near-black tone), or "custom" (uploaded). bgFit is "cover" (stretched) or "tile" (repeated
   // at bgTile size). bgCustom holds the uploaded data URL. bgHue/Sat/Light define the "color" tone.
   // Default = a near-black neutral colour tone (HSL 0/0/11).
   bg: "color", bgFit: "tile", bgTile: "large", bgCustom: null,
@@ -210,8 +211,6 @@ const DEFAULT_SETTINGS = {
   soundVolume: 50,
   // Custom board colours (used when boardTheme === "custom" — the colour-picker chip, shown first).
   boardCustomLight: "#f9f9f9", boardCustomDark: "#e1a652",
-  // Practice-mode "wrong answer" effect (file under sounds/Wrong/; see WRONG_SOUNDS). Standard = "Incorrect".
-  wrongSound: "Incorrect.mp3",
   // Per-event sound mapping + knobs (see FX_SOUNDS / SOUND_EVENTS). snd = an FX_SOUNDS id or "default"
   // (the original cue); pitch in semitones; speed is a duration multiplier (1 = unchanged).
   soundFx: {
@@ -225,7 +224,7 @@ const DEFAULT_SETTINGS = {
   // piece/board image. The other cc* fields are dead (kept null for back-compat with old saves).
   ccPieceSet: null, ccPieceUrlTemplate: null, ccPieceUrlMap: null, ccBoardTheme: null, ccBoardUrl: null,
   // Best-move arrow (the engine's recommendation in the current position)
-  bestArrow: true, arrowOpacity: 0.65, arrowShaft: 0.2, arrowHead: 0.4,
+  bestArrow: true, bestArrowColor: "#85ae4a", arrowOpacity: 0.65, arrowShaft: 0.2, arrowHead: 0.4,
   // "Show the threat": a yellow arrow with the opponent's best move as if it were their turn.
   showThreat: false,
   // Move animation (sliding piece on single-step navigation). 1 = slow, 10 = fast.
@@ -278,7 +277,7 @@ const ENGINE_FALLBACK_ORDER = ["sf19", "nnue", "wasm", "asm"];
 // The engine panel shows up to this many candidate lines (searched on demand for the viewed position).
 const ENGINE_MAX_LINES = 4;
 // Best-move arrow color — a muted hint green.
-const ARROW_COLOR = "#85AE4A";
+const ARROW_COLOR = "#85ae4a";
 // User arrow color — yellow/orange.
 const USER_ARROW_COLOR = "#E89B3C";
 // Loading style → CSS variant. The keys are shown directly in the settings.
@@ -467,14 +466,6 @@ function fxUrl(ev) {
   if (cfg.snd === "default") return _url(_eventDef(ev)[2]);
   return _url(_fxFileById(cfg.snd) || _eventDef(ev)[2]);
 }
-// Selectable "wrong answer" effects (practice mode). [filename, label]; first entry is the default.
-// Kept deliberately short — "Incorrect" is the standard cue, with "Wrong" and "No" as alternatives.
-const NO_WRONG_FILE = "No.mp3";
-const WRONG_SOUNDS = [
-  ["Incorrect.mp3", "Incorrect"],
-  ["Wrong.mp3", "Wrong"],
-  ["No.mp3", "No"],
-];
 // Master volume (0–1) for every sound the extension plays — driven by the "Volume" slider.
 function masterVol() {
   const v = S.settings.soundVolume;
@@ -599,19 +590,12 @@ function playMoveSound(ply) {
   if (!S.settings.sound || ply < 1 || !S.positions[ply]) return;
   playEvent(sanSound(S.positions[ply].san));
 }
-// Cached "wrong answer" Audio (rebuilt when the chosen effect changes).
-let _wrongAudio = null, _wrongAudioKey = null;
-// The selected effect, falling back to the default if an old/removed choice is still stored.
-function currentWrongFile() {
-  const f = S.settings.wrongSound;
-  return WRONG_SOUNDS.some(([file]) => file === f) ? f : WRONG_SOUNDS[0][0];
-}
+// The practice mistake cue is fixed to Incorrect.
+let _wrongAudio = null;
 function playWrongSound() {
   if (!S.settings.sound) return;
-  const file = currentWrongFile();
-  if (_wrongAudioKey !== file) { _wrongAudio = new Audio(_url("sounds/Wrong/" + file)); _wrongAudioKey = file; }
-  // The "No" voice clip opens with a beat of silence — skip into it so the cue lands promptly.
-  try { _wrongAudio.volume = masterVol(); _wrongAudio.currentTime = file === NO_WRONG_FILE ? 0.08 : 0; _wrongAudio.play().catch(() => {}); } catch {}
+  if (!_wrongAudio) _wrongAudio = new Audio(_url("sounds/Wrong/Incorrect.mp3"));
+  try { _wrongAudio.volume = masterVol(); _wrongAudio.currentTime = 0; _wrongAudio.play().catch(() => {}); } catch {}
 }
 
 /* ---------------- State ---------------- */
@@ -638,7 +622,7 @@ const S = {
   analysisMode: false, variation: null, liveEngine: null, liveEnginePromise: null, liveEngineGeneration: 0, liveError: null, liveToken: 0, panelToken: 0, _panelCache: null, selectedSq: null,
   // The build that is ACTUALLY running (set by createEngine; may differ from settings.enginePath if
   // the chosen build failed to load and we fell back). The Engine tab shows this, not the selection.
-  activeEngineBuild: null,
+  activeEngineBuild: null, engineFallbackBuild: null,
   // "Play best moves from here": auto-walk that re-analyzes each position and plays the engine's
   // best move until mate/draw or the user takes over. Token invalidates an in-flight walk.
   bestWalkToken: 0, bestWalking: false,
@@ -1735,9 +1719,8 @@ function paintBoard() {
 }
 
 /* ---------------- Best-move arrow ----------------
-   Geometry engine ported from "Chess Move Arrow.html". Coordinate space: an 8×8 SVG
-   with viewBox "0 0 8 8" placed exactly over the board. Square center = (file+0.5, rank+0.5).
-   Respects S.flipped, so the arrow turns with the board. */
+   Coordinate space: an 8×8 SVG over the board. The arrow starts near the outgoing
+   edge of its origin square so its tail does not cover the piece. Respects S.flipped. */
 function arrowXY(sq) {
   const f = sq.charCodeAt(0) - 97;          // a..h -> 0..7
   const r = parseInt(sq.slice(1), 10) - 1;  // 1..8 -> 0..7
@@ -1764,6 +1747,12 @@ function arrowBuild(pts, headLen, headHalf) {
   const ux = dx / len, uy = dy / len;                  // direction of the last leg
   const base = { x: tip.x - ux * headLen, y: tip.y - uy * headLen };
   const shaft = pts.slice(0, n - 1).concat([base]);
+  // Move the tail toward the first leg's exit edge. On a straight arrow this
+  // follows the move; on a knight arrow it follows the long leg to its elbow.
+  const firstDx = pts[1].x - pts[0].x, firstDy = pts[1].y - pts[0].y;
+  const firstMax = Math.max(Math.abs(firstDx), Math.abs(firstDy)) || 1;
+  shaft[0] = { x: pts[0].x + firstDx / firstMax * 0.4,
+               y: pts[0].y + firstDy / firstMax * 0.4 };
   const nx = -uy, ny = ux;                             // perpendicular
   const head = [
     { x: base.x + nx * headHalf, y: base.y + ny * headHalf },
@@ -1804,9 +1793,11 @@ function renderBestArrow() {
     board.append(svg);
   }
   // Group opacity flattens shaft+head together BEFORE fading — no double-alpha seam.
+  const arrowColor = /^#[0-9a-f]{6}$/i.test(S.settings.bestArrowColor || "")
+    ? S.settings.bestArrowColor : ARROW_COLOR;
   svg.innerHTML =
-    `<g fill="${ARROW_COLOR}" opacity="${S.settings.arrowOpacity}">`
-    + `<polyline points="${shaft.map(arrowFmt).join(" ")}" fill="none" stroke="${ARROW_COLOR}" `
+    `<g fill="${arrowColor}" opacity="${S.settings.arrowOpacity}">`
+    + `<polyline points="${shaft.map(arrowFmt).join(" ")}" fill="none" stroke="${arrowColor}" `
     + `stroke-width="${S.settings.arrowShaft}" stroke-linejoin="round" stroke-linecap="butt"/>`
     + `<polygon points="${head.map(arrowFmt).join(" ")}" stroke="none"/></g>`;
 }
@@ -1882,7 +1873,10 @@ async function createEngine(opts = {}) {
     try {
       await eng.setOptions(opts); // awaits the handshake; throws if this build failed to load
       eng.buildKey = key;
-      if (S.settings.enginePath === preferred) setActiveEngineBuild(key);
+      if (S.settings.enginePath === preferred) {
+        if (key !== preferred) S.engineFallbackBuild = key;
+        setActiveEngineBuild(key);
+      }
       if (key !== preferred && !_engineFellBack) {
         _engineFellBack = true;
         console.warn(`[Chess Review] engine build '${preferred}' failed to load — fell back to '${key}'. ` +
@@ -1899,17 +1893,17 @@ async function createEngine(opts = {}) {
 // Record (and surface) which build is actually running. Re-render the spots that name the engine so
 // a fallback is visible immediately, both in the live Engine panel and the settings Build row.
 function setActiveEngineBuild(key) {
-  if (S.activeEngineBuild === key) return;
+  if (S.activeEngineBuild === key && !S.engineFallbackBuild) return;
   S.activeEngineBuild = key;
   try { renderEngineCurrent(); } catch {}
   if (UI.settings && !UI.settings.hidden && S.settingsTab === "engine") { try { renderSettings(); } catch {} }
 }
 // The build name to display: what's actually running if known, else the user's selection.
 function activeEngineName() {
-  const key = S.activeEngineBuild || S.settings.enginePath;
+  const key = S.engineFallbackBuild || S.activeEngineBuild || S.settings.enginePath;
   const name = ENGINE_NAME[key] || "Stockfish";
   // Flag a fallback explicitly so it's obvious the chosen build isn't the one in use.
-  return (S.activeEngineBuild && S.activeEngineBuild !== S.settings.enginePath) ? `${name} (fallback)` : name;
+  return (S.engineFallbackBuild && S.engineFallbackBuild !== S.settings.enginePath) ? `${name} (fallback)` : name;
 }
 
 // Shared on-demand engine for the lightweight extras (threat preview + practice judging),
@@ -3453,7 +3447,8 @@ function moveCell(ply) {
   const cls = S.classif[ply];
   const showBadge = cls && (NOTEWORTHY.has(cls) || S.settings.badgeStyle === "dot");
   const glyph = GLYPH[pos.san && /^[KQRBN]/.test(pos.san) ? pos.san[0] : "P"];
-  return el("span", { class: "ml-move" + (!S.analysisMode && ply === S.idx ? " current" : ""), "data-ply": ply, onclick: () => gotoMainline(ply) },
+  return el("span", { class: "ml-move" + (!S.analysisMode && ply === S.idx ? " current" : ""), "data-ply": ply,
+    "data-class": cls || "", onclick: () => gotoMainline(ply) },
     el("span", { class: "pc", style: { color: pos.color === "w" ? "var(--ink)" : "var(--ink-2)" } }, glyph),
     el("span", {}, pos.san),
     showBadge ? qBadge(cls) : null,
@@ -3468,18 +3463,22 @@ function qBadge(k) {
 }
 // Move the .current highlight to the cell for S.idx and auto-scroll it into view, without
 // touching the rest of the list. Used both after a full rebuild and on a plain step.
-function highlightCurrentMove() {
+function highlightCurrentMove(forceScroll = false) {
   const prev = UI.movesBody.querySelector(".ml-move.current");
+  const previousPly = prev?.dataset.ply;
   if (prev) prev.classList.remove("current");
   // In analysis mode no mainline cell is "current" (the original render never marked one).
   const cur = S.analysisMode ? null : UI.movesBody.querySelector('.ml-move[data-ply="' + S.idx + '"]');
   if (cur) {
     cur.classList.add("current");
-    const cr = cur.getBoundingClientRect(), sr = UI.movesBody.getBoundingClientRect();
-    UI.movesBody.scrollTop += (cr.top - sr.top) - (UI.movesBody.clientHeight - cr.height - 14);
+    if (forceScroll || previousPly !== cur.dataset.ply) {
+      const cr = cur.getBoundingClientRect(), sr = UI.movesBody.getBoundingClientRect();
+      UI.movesBody.scrollTop += (cr.top - sr.top) - (UI.movesBody.clientHeight - cr.height - 14);
+    }
   }
 }
 let _movesSig = null;
+let _movesClassSig = null;
 function renderMoves() {
   const isExplore = S.meta?.explore === true;
   if (isExplore && S.variation) {
@@ -3529,13 +3528,26 @@ function renderMoves() {
   }
   const nMoves = Math.ceil(S.total / 2);
   const ml = S.settings.mlStyle;
-  // The list's CONTENT only changes with the game, the layout/badge style, or the classifications
-  // (which fill in during analysis) — NOT when you merely step to another move. Rebuilding every
-  // cell (each with a badge <img>) plus forcing a reflow on every step is what made stepping feel
-  // laggy. Cache by a signature; on a plain step just slide the .current marker (cheap).
-  const sig = ml + "|" + S.settings.badgeStyle + "|" + S.total + "|" + (S.analysisMode ? 1 : 0) + "|" + S.classif.join("");
-  if (sig === _movesSig && UI.movesBody.firstChild) { highlightCurrentMove(); return; }
+  // Keep move cells mounted while classifications arrive. Replacing the list during analysis
+  // drops the hovered element and makes its hover state flicker; only changed badges need updates.
+  const sig = ml + "|" + S.settings.badgeStyle + "|" + S.total + "|" + (S.analysisMode ? 1 : 0);
+  const classSig = S.classif.join("|");
+  if (sig === _movesSig && UI.movesBody.firstChild) {
+    if (classSig !== _movesClassSig) {
+      for (const cell of UI.movesBody.querySelectorAll(".ml-move[data-ply]")) {
+        const cls = S.classif[+cell.dataset.ply];
+        if (cell.dataset.class === (cls || "")) continue;
+        cell.dataset.class = cls || "";
+        const old = cell.querySelector(".qb");
+        if (old) old.remove();
+        if (cls && (NOTEWORTHY.has(cls) || S.settings.badgeStyle === "dot")) cell.append(qBadge(cls));
+      }
+      _movesClassSig = classSig;
+    }
+    highlightCurrentMove(); return;
+  }
   _movesSig = sig;
+  _movesClassSig = classSig;
   let list;
   if (ml === "compact") {
     list = el("div", { class: "movelist ml-compact ml-scroll" });
@@ -3551,7 +3563,7 @@ function renderMoves() {
   // Book moves are now shown in the Accuracy breakdown (expanded), no longer here in "Moves".
   UI.movesFoot.hidden = true;
   // auto-scroll to the current move
-  highlightCurrentMove();
+  highlightCurrentMove(true);
 }
 
 /* ---------------- Engine lines ---------------- */
@@ -3752,11 +3764,40 @@ function pieceGrid() {
   );
 }
 function colorChips(label, key, entries) {
-  return el("div", { class: "set-row" },
+  return el("div", { class: "set-row" + (key === "accent" ? " accent-row" : "") },
     label ? el("span", { class: "set-lbl" }, label) : null,
     el("div", { class: "set-chips" },
       ...entries.map((e) => { const chip = el("button", { class: "set-chip" + (S.settings[key] === e.value ? " on" : ""), title: e.title || e.value, onclick: e.onClick || (() => setSetting(key, e.value)) }); e.render(chip); return chip; })),
   );
+}
+let _accentPickCleanup = null;
+function openAccentColorPicker(anchor) {
+  if (_accentPickCleanup) _accentPickCleanup();
+  S.settings.accent = "custom";
+  applySettings();
+  anchor.parentElement.querySelectorAll(".set-chip").forEach((chip) => chip.classList.toggle("on", chip === anchor));
+  const picker = buildColorPicker(S.settings.accentCustom || DEFAULT_SETTINGS.accentCustom,
+    (hex) => { S.settings.accentCustom = hex; anchor.style.background = hex; applySettings(); },
+    (hex) => { S.settings.accentCustom = hex; anchor.style.background = hex;
+      browserAPI.storage.local.set({ settings: S.settings }); },
+  );
+  const pop = el("div", { class: "board-cpick" },
+    el("div", { class: "cpick-title" }, "Custom accent"), picker.el);
+  document.body.append(pop);
+  const r = anchor.getBoundingClientRect(), pr = pop.getBoundingClientRect();
+  pop.style.left = Math.max(8, Math.min(r.left, innerWidth - pr.width - 8)) + "px";
+  pop.style.top = Math.max(8, r.bottom + pr.height + 6 > innerHeight ? r.top - pr.height - 6 : r.bottom + 6) + "px";
+  const onDown = (e) => { if (!pop.contains(e.target)) close(); };
+  const onKey = (e) => { if (e.key === "Escape") close(); };
+  const close = () => {
+    document.removeEventListener("pointerdown", onDown);
+    document.removeEventListener("keydown", onKey);
+    pop.remove(); _accentPickCleanup = null;
+    browserAPI.storage.local.set({ settings: S.settings });
+  };
+  setTimeout(() => document.addEventListener("pointerdown", onDown), 0);
+  document.addEventListener("keydown", onKey);
+  _accentPickCleanup = close;
 }
 // Current custom board colours [light, dark] (with sane fallbacks).
 function customBoardColors() {
@@ -3773,6 +3814,13 @@ function hexToRgb(hex) {
 function rgbToHex(r, g, b) {
   const t = (v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0");
   return "#" + t(r) + t(g) + t(b);
+}
+function accentFromHex(hex) {
+  if (!/^#[0-9a-f]{6}$/i.test(hex || "")) hex = DEFAULT_SETTINGS.accentCustom;
+  const { r, g, b } = hexToRgb(hex);
+  const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+  return { accent: hex, strong: rgbToHex(r * .82, g * .82, b * .82),
+    ink: luminance > .58 ? "#11111a" : "#ffffff" };
 }
 function rgbToHsv(r, g, b) {
   r /= 255; g /= 255; b /= 255;
@@ -3919,8 +3967,11 @@ function engineSlider(label, key, min, max, step, opts = {}) {
         out.textContent = fmt(v);
         S.settings[key] = v;
         browserAPI.storage.local.set({ settings: S.settings });
+        S.engineFallbackBuild = null; S.activeEngineBuild = null;
         resetLiveEngine();
         invalidateVariationEvals();
+        if (S.helperEngine) { try { S.helperEngine.terminate(); } catch {} S.helperEngine = null; }
+        S.threatCache.clear();
         scheduleReanalyze();
       },
     }),
@@ -3962,13 +4013,49 @@ function applyClassificationChange() {
 // Reset every Engine-tab setting to its default and re-run the analysis.
 async function resetEngineSettings() {
   for (const k of ENGINE_SETTING_KEYS) S.settings[k] = DEFAULT_SETTINGS[k];
+  S.engineFallbackBuild = null;
+  S.activeEngineBuild = null;
   await browserAPI.storage.local.set({ settings: S.settings });
   resetLiveEngine();
   invalidateVariationEvals();
+  if (S.helperEngine) { try { S.helperEngine.terminate(); } catch {} S.helperEngine = null; }
+  S.threatCache.clear();
   scheduleReanalyze();
-  renderEngineCurrent();
   if (UI.settings && !UI.settings.hidden) renderSettings();
-  toast("Engine settings reset");
+}
+const ARROW_SETTING_KEYS = ["bestArrow", "showThreat", "bestArrowColor", "arrowOpacity", "arrowShaft", "arrowHead"];
+const BACKGROUND_SETTING_KEYS = ["bg", "bgFit", "bgTile", "bgCustom", "bgHue", "bgSat", "bgLight"];
+const VISUAL_SETTING_KEYS = [
+  "theme", "accent", "accentCustom", "density", "evalView", "mlStyle", "badgeStyle", "badgeScale",
+  "graphStyle", "barStyle", "insightFont", "showCoords", "coordSize", ...BACKGROUND_SETTING_KEYS,
+  "coach", "coachPlain", "boardTheme", "pieceStyle", "boardCustomLight", "boardCustomDark",
+  "sound", "soundVolume", "soundFx", ...ARROW_SETTING_KEYS,
+  "moveAnim", "animSpeed", "loaderStyle",
+];
+function resetSettingKeys(keys) {
+  for (const key of keys) S.settings[key] = structuredClone(DEFAULT_SETTINGS[key]);
+  return browserAPI.storage.local.set({ settings: S.settings });
+}
+function resetArrowSettings() {
+  resetSettingKeys(ARROW_SETTING_KEYS);
+  refreshArrows(); renderSettings();
+}
+function resetBackgroundSettings() {
+  resetSettingKeys(BACKGROUND_SETTING_KEYS);
+  applyBackground(); renderSettings();
+}
+async function resetVisualSettings() {
+  if (_accentPickCleanup) _accentPickCleanup();
+  closeBoardColorPicker();
+  delete S.settings.wrongSound; // remove obsolete saved choices from older versions
+  await resetSettingKeys(VISUAL_SETTING_KEYS);
+  S.coach = null;
+  _ipSig = null;
+  if (S.practice) S.practice.coachTyped = false;
+  resetLayout();
+  applySettings(); buildBoard(); renderEvalBar(); renderGraph(); renderMoves();
+  renderCoachAvatar(); renderReview(); renderStats(); renderControls();
+  renderSettings();
 }
 // Controls for the "Background" section: preset/custom picker, fit mode, tile size, upload button.
 function bgControls() {
@@ -3979,7 +4066,6 @@ function bgControls() {
   const entries = [
     { value: "color", render: (c) => { c.title = "Custom colour"; swatch(c, colorCss); } },
     { value: "olive", render: (c) => { c.title = "Dark"; swatch(c, "radial-gradient(120% 80% at 50% -10%, #141414, #0a0a0a 60%)"); } },
-    { value: "ember", render: (c) => { c.title = "Ember"; swatch(c, `url("${BG_PRESETS.ember}")`); } },
     { value: "slate", render: (c) => { c.title = "Slate"; swatch(c, `url("${BG_PRESETS.slate}")`); } },
   ];
   if (S.settings.bgCustom) entries.push({ value: "custom", render: (c) => { c.title = "Your image"; swatch(c, `url("${S.settings.bgCustom}")`); } });
@@ -3996,6 +4082,7 @@ function bgControls() {
       el("span", { class: "set-lbl" }, "Custom"),
       el("button", { class: "set-reset", style: { margin: 0 }, onclick: uploadBackground }, "Upload image…")),
     el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "PNG, JPEG, WebP, GIF or AVIF.")),
+    el("button", { class: "set-reset", onclick: resetBackgroundSettings }, "Reset to default"),
   ];
 }
 function visualSettings() {
@@ -4040,6 +4127,9 @@ function visualSettings() {
   const accentEntries = Object.keys(ACCENTS).map((hex) => ({
     value: hex, render: (chip) => { chip.style.background = "transparent"; chip.append(el("span", { class: "set-accent", style: { background: hex } })); },
   }));
+  accentEntries.push({ value: "custom", title: "Custom accent — click to pick", onClick: (e) => openAccentColorPicker(e.currentTarget),
+    render: (chip) => { chip.classList.add("chip-custom"); chip.style.background = S.settings.accentCustom;
+      chip.append(el("span", { class: "chip-edit" }, "✎")); } });
   return el("div", {},
     section("Theme",
       colorChips("Accent", "accent", accentEntries),
@@ -4059,10 +4149,11 @@ function visualSettings() {
       slider("Opacity", "arrowOpacity", 0.3, 1, 0.02, { onChange: refreshArrows }),
       slider("Shaft width", "arrowShaft", 0.14, 0.42, 0.01, { onChange: refreshArrows }),
       slider("Head size", "arrowHead", 0.22, 0.55, 0.01, { onChange: refreshArrows }),
-      el("div", { class: "set-row hint" },
-        el("span", { class: "set-lbl" }, "Own arrows/moves"),
-        el("span", { class: "set-note" }, "Right-click + drag = arrow · left-click-drag a piece = analysis"),
-      ),
+      el("div", { class: "set-row" }, setLabel("Color"),
+        el("input", { class: "set-color-input", type: "color", value: S.settings.bestArrowColor || ARROW_COLOR,
+          oninput: (e) => { S.settings.bestArrowColor = e.target.value;
+            browserAPI.storage.local.set({ settings: S.settings }); refreshArrows(); } })),
+      el("button", { class: "set-reset", onclick: resetArrowSettings }, "Reset to default"),
     ),
     section("Loading",
       seg("Animation", "loaderStyle", ["dots", "bounce", "spinner", "wave"]),
@@ -4077,7 +4168,7 @@ function visualSettings() {
       seg("Graph", "graphStyle", ["area", "line", "color", "minimal"]),
       el("button", { class: "set-reset reorg-toggle-btn", onclick: toggleReorganize }, S.reorganize ? "Done reorganizing" : "Reorganize panels"),
       el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Reorganize lets you drag and resize the panels, and your arrangement is saved. Reset layout goes back to the automatic layout that fits any window.")),
-      el("button", { class: "set-reset", onclick: () => { resetLayout(); toast("Layout reset"); } }, "Reset layout"),
+      el("button", { class: "set-reset", onclick: resetLayout }, "Reset layout"),
     ),
     section("Move list",
       seg("Style", "mlStyle", ["rows", "cards", "compact"]),
@@ -4111,9 +4202,9 @@ function visualSettings() {
       slider("Volume", "soundVolume", 0, 100, 1, { fmt: (v) => v + " %" }),
       el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Pick a sound for each board event, then shape it with the pitch and speed knobs. Changes preview as you make them.")),
       ...SOUND_EVENTS.map(([key, label]) => fxEventControls(key, label)),
-      wrongSoundPicker(),
-      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "The \"Wrong answer\" effect plays when you miss a move in practice mode. Pick one to preview it.")),
+      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "A missed practice move plays the Incorrect cue.")),
     ),
+    el("button", { class: "set-reset", onclick: resetVisualSettings }, "Reset to default"),
   );
 }
 // Coach personality dropdown — only personalities that have a built animated character. Uses the
@@ -4124,13 +4215,6 @@ function coachPicker() {
   const opts = COACH_LIST.filter(([id]) => COACH_RIGS[id]);
   return el("div", { class: "set-row" }, el("span", { class: "set-lbl" }, "Personality"),
     ddField(cur, opts, (v) => setCoach(v)));
-}
-// Dropdown for the practice-mode "wrong answer" effect; previews the choice on change. Uses the
-// same custom dropdown (ddField) as the coach picker, so it matches the app theme (no OS-blue select).
-function wrongSoundPicker() {
-  const cur = currentWrongFile();
-  return el("div", { class: "set-row" }, el("span", { class: "set-lbl" }, "Wrong answer"),
-    ddField(cur, WRONG_SOUNDS, (v) => { setSetting("wrongSound", v); playWrongSound(); }));
 }
 // Controls for one board event: a sound dropdown (the 9 base sounds + the original cue) plus pitch and
 // speed knobs. Everything previews on change. The dropdown re-renders the panel so its label updates;
@@ -4202,19 +4286,18 @@ function motorSettings() {
           el("button", { class: S.settings.enginePath === "asm" ? "on" : "", onclick: () => setEngineSetting("enginePath", "asm") }, "asm.js"),
         ),
       ),
-      // Only shown when the chosen build couldn't load and we fell back — so it's always clear which
-      // engine is actually producing the analysis, not just which one was selected.
-      (S.activeEngineBuild && S.activeEngineBuild !== S.settings.enginePath)
+      // Keep the warning visible when any analysis worker had to use a fallback.
+      (S.engineFallbackBuild && S.engineFallbackBuild !== S.settings.enginePath)
         ? el("div", { class: "set-row hint" },
             el("span", { class: "set-note" },
-              `⚠ "${ENGINE_NAME[S.settings.enginePath] || S.settings.enginePath}" couldn't start in this browser — actually running ${ENGINE_NAME[S.activeEngineBuild] || S.activeEngineBuild}.`))
+              `⚠ At least one worker couldn't start "${ENGINE_NAME[S.settings.enginePath] || S.settings.enginePath}" and used ${ENGINE_NAME[S.engineFallbackBuild] || S.engineFallbackBuild} instead.`))
         : null,
       engineSlider("Strength (Skill)", "engineSkill", 0, 20, 1, { fmt: (v) => (v >= 20 ? "Max (20)" : String(v)), info: ENGINE_INFO.engineSkill }),
       engineSlider("Hash (MB)", "engineHash", 16, 256, 16, { fmt: (v) => v + " MB", info: ENGINE_INFO.engineHash }),
       el("div", { class: "set-row hint" },
         el("span", { class: "set-note" }, "Engine build & search options. Changes here re-analyze the game.")),
     ),
-    el("button", { class: "set-reset", onclick: resetEngineSettings }, "Reset engine defaults"),
+    el("button", { class: "set-reset", onclick: resetEngineSettings }, "Reset to default"),
   );
 }
 function renderSettings() {
@@ -4248,7 +4331,7 @@ const CREDITS = [
     href: "https://github.com/lichess-org/lila/tree/master/public/piece/merida",
   },
   {
-    title: "Chess pieces — Kaneo, Kaneo Midnight, 1Kbyte Gambit",
+    title: "Chess pieces — Kaneo, 1Kbyte Gambit",
     by: "Kadagaden — chess-pieces.",
     lic: "CC BY 4.0",
     href: "https://github.com/Kadagaden/chess-pieces",
@@ -4362,6 +4445,8 @@ async function setSetting(key, value) {
 // Engine setting: save, discard the live engine (new build/options), and re-analyze.
 async function setEngineSetting(key, value) {
   S.settings[key] = value;
+  S.engineFallbackBuild = null;
+  S.activeEngineBuild = null;
   await browserAPI.storage.local.set({ settings: S.settings });
   resetLiveEngine();
   invalidateVariationEvals();
@@ -4385,7 +4470,7 @@ async function setEngineSetting(key, value) {
 }
 // Apply a detected theme from the source tab: match the board by COLOUR using the detected theme
 // name. Pieces are never imported — they always use a bundled set (Cburnett/Merida). The user can
-// change the board afterwards (saved until the next detection).
+// change the board afterwards; their choice persists across review windows.
 function applyDetectedTheme(theme) {
   if (!theme) return;
   if (theme.boardUrl || theme.boardTheme) {
@@ -4393,7 +4478,8 @@ function applyDetectedTheme(theme) {
     // image is never hotlinked — colours aren't copyrightable, the image is.
     S.settings.ccBoardTheme = theme.boardTheme || null;
     S.settings.ccBoardUrl = null;
-    S.settings.boardTheme = "chesscom";
+    // Keep the user's selected board across new review windows and library games.
+    // The matched-site chip remains available when they choose to use it again.
   }
   browserAPI.storage.local.set({ settings: S.settings });
 }
@@ -4403,7 +4489,9 @@ function applySettings() {
   S.settings.theme = "dark";
   r.setAttribute("data-theme", "dark");
   r.setAttribute("data-density", S.settings.density);
-  const a = ACCENTS[S.settings.accent] || ACCENTS["#7fb45f"];
+  const a = S.settings.accent === "custom"
+    ? accentFromHex(S.settings.accentCustom)
+    : (ACCENTS[S.settings.accent] || ACCENTS["#7fb45f"]);
   r.style.setProperty("--accent", a.accent);
   r.style.setProperty("--accent-strong", a.strong);
   r.style.setProperty("--accent-ink", a.ink);
@@ -4425,7 +4513,7 @@ function applySettings() {
   applyBackground();
 }
 // Bundled background presets (relative to the extension's analysis page).
-const BG_PRESETS = { ember: "backgrounds/bg-ember.webp", slate: "backgrounds/bg-slate.webp" };
+const BG_PRESETS = { slate: "backgrounds/bg-slate.webp" };
 const BG_TILE_PX = { small: 240, medium: 440, large: 760 };
 // Paint the chosen background on the .app shell. "color" paints an HSL tone (with a faint top
 // vignette, like the original gradient); a preset/custom image is shown stretched ("cover") or
@@ -5047,6 +5135,8 @@ function requestProgress(gen) {
 async function startAnalysis() {
   if (S.meta?.explore) { await requestLiveEval(); return; }
   const gen = ++S.batchGen;
+  S.engineFallbackBuild = null;
+  S.activeEngineBuild = null;
   terminateEngines();
   S.evals = new Array(S.total + 1).fill(null);
   S.bests = new Array(S.total + 1).fill(null);
@@ -5161,7 +5251,11 @@ async function applyGame(payload) {
   clearTimeout(_reanalyzeT);
   resetLiveEngine();
   S.batchGen++;                 // invalidate any in-flight analysis workers
+  S.engineFallbackBuild = null;
+  S.activeEngineBuild = null;
   terminateEngines();
+  if (S.helperEngine) { try { S.helperEngine.terminate(); } catch {} S.helperEngine = null; }
+  S.threatCache.clear();
   if (S.autoTimer) { clearInterval(S.autoTimer); S.autoTimer = null; }
   stopLineWalk();
   if (S.practice && S.practice.rollT) clearTimeout(S.practice.rollT);
@@ -5171,7 +5265,7 @@ async function applyGame(payload) {
   S.selectedSq = null; S.userArrows = []; S.userMarks = []; S.lineWalking = false;
   revRefs = null; statsRefs = null; _lastCommentKey = -1; _ipSig = null; S._turnPly = null;
   S._lastEngineLines = null;
-  _movesSig = null;
+  _movesSig = null; _movesClassSig = null;
 
   applyDetectedTheme(payload.theme);
   applySettings();
@@ -5334,12 +5428,11 @@ async function resetLegacyZoom() {
     const [payload, store] = await Promise.all([loadJob(), browserAPI.storage.local.get(["settings", "username", "layout", "layoutMode", "layoutVersion", "library"])]);
     S.library = Array.isArray(store.library) ? store.library : [];
     S.settings = { ...DEFAULT_SETTINGS, ...(store.settings || {}) };
-    // Only the two bundled SVG sets remain (Cburnett = "image", Merida). Every older or removed
-    // style — solid/billede/chesscom/flat/outline/bold/minimal and the now-dropped classic/modern —
-    // falls back to the default Cburnett set.
+    delete S.settings.wrongSound; // older selectable mistake cues were removed
+    // Removed piece styles, including Kaneo Midnight, fall back to Cburnett.
     if (!PIECE_STYLES.includes(S.settings.pieceStyle)) S.settings.pieceStyle = "image";
     { const lm = { prikker: "dots", hop: "bounce", "bølge": "wave" }; if (lm[S.settings.loaderStyle]) S.settings.loaderStyle = lm[S.settings.loaderStyle]; } // migrate renamed loader keys
-    if (S.settings.bg === "default") S.settings.bg = "color"; // the old gradient slot is now the HSL colour picker
+    if (S.settings.bg === "default" || S.settings.bg === "ember") S.settings.bg = "color";
     if (S.settings.coach === "old_soviet_rework") S.settings.coach = "old_soviet"; // the rework became the canonical "Old Soviet"
     S.settings.density = "compact"; // density picker removed — compact is the only layout now
     // New default coach is Old Soviet with plain replies — bump anyone still on the old "mentor" default
