@@ -129,7 +129,7 @@ const ENGINE_INFO = {
   engineDepth:   "How many plies (half-moves) deep Stockfish searches each position. Higher depth gives more accurate evaluations and fewer false mistakes, but takes longer.",
   engineWorkers: "Number of Stockfish instances analysing positions in parallel. More workers finish the game faster on multi-core CPUs; the results are identical.",
   fastAnalysis:  "Trades quality for speed: the classification pass uses fewer engine lines. ~1.3×/1.6× faster, but evals shift slightly and clean games can pick up a few false inaccuracies.",
-  enginePath:    "Which Stockfish build to run. Stockfish 19 (default) is the strongest; Stockfish 18 NNUE is lighter; Stockfish 10 (WASM) is lighter still; asm.js is a fallback for browsers without WebAssembly support.",
+  enginePath:    "Which Stockfish build to run. Stockfish 18 NNUE is the default; Stockfish 19 is the strongest but heavier; Stockfish 10 (WASM) is lighter still; asm.js is a fallback for browsers without WebAssembly support.",
   engineSkill:   "Caps the engine's playing strength (Stockfish 'Skill Level'). Max (20) = full strength. Lower values play deliberately weaker — useful for more human-like suggestions.",
   engineHash:    "Recommended: 16 MB for most reviews (the default). Try 32–64 MB for deeper analysis if your computer has spare memory. Each parallel worker uses its own hash table, so memory use is roughly Hash × Workers.",
   clsGood:       "A move that loses at least this much eval (in pawns) can be no better than \"Good\". Below it, the move is \"Excellent\". Lower = stricter.",
@@ -204,9 +204,8 @@ const DEFAULT_SETTINGS = {
   // coachPlain toggles only the reply VOICE: false = the coach's special phrasing,
   // true = neutral "plain" commentary (the coach still appears and reacts on the board).
   coach: "old_soviet", coachPlain: true,
-  // When chess.com's board/pieces can't be detected, fall back to the green board and the
-  // bundled "Default" (image) pieces.
-  boardTheme: "chesscom", pieceStyle: "image", sound: true,
+  // Start with the green board and bundled "Default" (image) pieces.
+  boardTheme: "green", pieceStyle: "image", sound: true,
   // Master volume (0–100) applied to every sound the extension plays.
   soundVolume: 50,
   // Custom board colours (used when boardTheme === "custom" — the colour-picker chip, shown first).
@@ -236,7 +235,7 @@ const DEFAULT_SETTINGS = {
   // viewing, so changing this never re-analyzes — it just refreshes the panel.
   // Depth 16 (was 12): shallow searches give noisy evals that fabricate inaccuracies/mistakes and
   // inflate the accuracy variance vs the reference values. Deeper search is the single biggest accuracy fix.
-  engineLines: 1, engineDepth: 16, enginePath: "sf19", engineHash: 16, engineSkill: 20,
+  engineLines: 1, engineDepth: 16, enginePath: "nnue", engineHash: 16, engineSkill: 20,
   // Parallel analysis workers: independent single-threaded Stockfish instances that pull
   // positions from a shared queue. Each position is still searched identically (cold, same
   // depth/lines), so results are unchanged — only the wall-clock is parallelized. Default ≈
@@ -291,18 +290,20 @@ const LOADERS = { dots: "pulse", bounce: "bounce", spinner: "spin", wave: "wave"
 // top-right, review spanning the top of the right stack, panels retuned around them.
 // v8: the automatic responsive layout is the default; a canvas layout is only used once the user
 // reorganizes (S.layoutMode "custom"), and then starts from a snapshot of the screen. These boxes
-// remain the fallback for a module that is hidden when that snapshot is taken.
+// also define the desktop automatic layout and hidden-module snapshot fallback.
+// Geometry copied from the maintainer's saved unpacked-extension layout (September 2026).
+// Accuracy and Engine use the expanded breakdown baseline; collapse shifts Engine up.
 const LAYOUT_VERSION = 8;
 const DEFAULT_LAYOUT = {
-  board:    { x: 346,  y: 0,   w: 824, h: 936 },
-  evalbar:  { x: 290,  y: 60,  w: 32,  h: 818 },
-  controls: { x: 1194, y: 808, w: 312, h: 56  },
-  coach:    { x: 1570, y: 0,   w: 194, h: 198 },
-  review:   { x: 1200, y: 62,  w: 608, h: 138 },
-  moves:    { x: 1200, y: 220, w: 300, h: 388 },
-  accuracy: { x: 1512, y: 218, w: 296, h: 172 },
-  graph:    { x: 1200, y: 622, w: 300, h: 172 },
-  engine:   { x: 1512, y: 738, w: 296, h: 198 },
+  board:    { x: 344,  y: 0,   w: 822, h: 934 },
+  evalbar:  { x: 288,  y: 58,  w: 30,  h: 816 },
+  controls: { x: 1194, y: 812, w: 310, h: 54  },
+  coach:    { x: 1570, y: 0,   w: 192, h: 196 },
+  review:   { x: 1200, y: 60,  w: 606, h: 136 },
+  moves:    { x: 1200, y: 218, w: 300, h: 386 },
+  accuracy: { x: 1510, y: 216, w: 294, h: 506 },
+  graph:    { x: 1200, y: 620, w: 302, h: 178 },
+  engine:   { x: 1512, y: 738, w: 294, h: 158 },
 };
 const GRIP_SVG = `<svg viewBox="0 0 12 12" width="12" height="12"><path d="M11 4 4 11M11 8 8 11" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>`;
 const HANDLE_SVG = `<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><circle cx="5" cy="4" r="1.3"/><circle cx="11" cy="4" r="1.3"/><circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/><circle cx="5" cy="12" r="1.3"/><circle cx="11" cy="12" r="1.3"/></svg>`;
@@ -1441,12 +1442,21 @@ function applyLayoutMode() {
   const custom = isCustomLayout();
   UI.canvas.classList.toggle("auto", !custom);
   UI.canvas.classList.toggle("canvas", custom);
+  if (custom) UI.canvas.classList.remove("desktop-layout");
   applyLayout(); growCanvas();
 }
 function applyLayout() {
   const custom = isCustomLayout();
+  const desktop = !custom && UI.canvas.classList.contains("desktop-layout");
+  const collapse = desktop && !S.qbreakExpanded ? accuracyReflowInfo(DEFAULT_LAYOUT) : null;
   for (const mod of UI.canvas.querySelectorAll(".mod")) {
-    const b = custom && S.layout[mod.getAttribute("data-mod")];
+    const key = mod.getAttribute("data-mod");
+    const source = custom ? S.layout[key] : desktop ? DEFAULT_LAYOUT[key] : null;
+    const b = source && { ...source };
+    if (b && collapse) {
+      if (key === "accuracy") b.h = Math.max(MINH, b.h - collapse.delta);
+      if (collapse.belowKeys.includes(key)) b.y = Math.max(0, b.y - collapse.delta);
+    }
     mod.style.left = b ? b.x + "px" : ""; mod.style.top = b ? b.y + "px" : "";
     mod.style.width = b ? b.w + "px" : ""; mod.style.height = b ? b.h + "px" : "";
   }
@@ -1482,16 +1492,16 @@ function growCanvas() {
 }
 // What collapsing the accuracy breakdown is worth on the canvas: the hidden rows' height (+ the
 // column row-gap), and every module in the same column sitting at/below the accuracy panel.
-function accuracyReflowInfo() {
+function accuracyReflowInfo(layout = S.layout) {
   const accMod = UI.canvas.querySelector('.mod[data-mod="accuracy"]');
-  const acc = S.layout.accuracy;
+  const acc = layout.accuracy;
   const row = accMod && accMod.querySelector(".qbreak-row");
   const qb = accMod && accMod.querySelector(".qbreak");
   const gap = qb ? (parseFloat(getComputedStyle(qb).rowGap) || 0) : 0;
   const rowH = row ? row.offsetHeight : 24;
   const delta = Math.round((QBREAK_FULL.length - QBREAK_SUMMARY.length) * (rowH + gap));
   const belowKeys = [];
-  for (const [k, o] of Object.entries(S.layout)) {
+  for (const [k, o] of Object.entries(layout)) {
     if (k === "accuracy") continue;
     const overlapX = o.x < acc.x + acc.w && o.x + o.w > acc.x;
     if (overlapX && o.y >= acc.y + acc.h - 1) belowKeys.push(k);
@@ -1588,7 +1598,7 @@ function makeMovable(mod, handle, grips, key) {
   grips.s.addEventListener("pointerdown", startResize("s", grips.s));
   grips.se.addEventListener("pointerdown", startResize("se", grips.se));
 }
-// Back to the automatic layout (and the browser's own zoom).
+// Back to the automatic layout and its window-dependent fit.
 function resetLayout() {
   const wasCustom = isCustomLayout();
   S._accReflow = null;   // drop any collapse offset so the fresh layout isn't double-adjusted
@@ -1597,7 +1607,7 @@ function resetLayout() {
   if (S.reorganize) toggleReorganize();
   applyLayoutMode();
   saveLayout();
-  if (wasCustom) releaseTabZoom();
+  if (wasCustom) initTabZoom();
   requestAnimationFrame(alignPlayers);
 }
 // Reorganize mode: while ON, panels can be dragged/resized (handles + grips appear); while OFF
@@ -3317,6 +3327,7 @@ function renderStats() {
     ),
   ));
   statsRefs = S.analyzing ? { expanded: S.qbreakExpanded, rows } : null;
+  if (UI.canvas.classList.contains("desktop-layout")) applyLayout();
 }
 
 /* ---------------- Eval graph ---------------- */
@@ -4280,8 +4291,8 @@ function motorSettings() {
       el("div", { class: "set-row" },
         setLabel("Build", ENGINE_INFO.enginePath),
         el("div", { class: "set-seg" },
-          el("button", { class: S.settings.enginePath === "sf19" ? "on" : "", onclick: () => setEngineSetting("enginePath", "sf19") }, "Stockfish 19"),
           el("button", { class: S.settings.enginePath === "nnue" ? "on" : "", onclick: () => setEngineSetting("enginePath", "nnue") }, "Stockfish 18 NNUE"),
+          el("button", { class: S.settings.enginePath === "sf19" ? "on" : "", onclick: () => setEngineSetting("enginePath", "sf19") }, "Stockfish 19"),
           el("button", { class: S.settings.enginePath === "wasm" ? "on" : "", onclick: () => setEngineSetting("enginePath", "wasm") }, "Stockfish 10"),
           el("button", { class: S.settings.enginePath === "asm" ? "on" : "", onclick: () => setEngineSetting("enginePath", "asm") }, "asm.js"),
         ),
@@ -4343,13 +4354,13 @@ const CREDITS = [
     href: "https://github.com/lichess-org/lila/blob/master/LICENSE",
   },
   {
-    title: "Stockfish 19 NNUE (default for new installs)",
+    title: "Stockfish 19 NNUE",
     by: "Full single-threaded Stockfish.js 19.0.0 by Nathan Rugg (“nmrugg”), © 2026 Chess.com, LLC; based on the Stockfish team's engine and neural networks.",
     lic: "GPLv3",
     href: "https://github.com/nmrugg/stockfish.js/tree/v19.0.0",
   },
   {
-    title: "Stockfish 18 NNUE (lighter alternative)",
+    title: "Stockfish 18 NNUE (default)",
     by: "NNUE build © Chess.com, LLC — distributed as JS/WASM via Nathan Rugg’s (“nmrugg”) Stockfish.js.",
     lic: "GPLv3",
     href: "https://github.com/nmrugg/stockfish.js",
@@ -4372,12 +4383,12 @@ const CREDITS = [
     lic: "GPLv3",
     href: "https://tests.stockfishchess.org/nns",
   },
-  {
-    title: "Feature contributor — aciokie",
-    by: "Initial Explore board, alternative-move ratings, review reliability improvements, and Stockfish 19 integration (PR #4).",
-    lic: "GPLv3",
-    href: "https://github.com/T-Julsgaard/Chess-Review/pull/4",
-  },
+];
+const CONTRIBUTORS = [
+  { name: "aciokie", username: "aciokie", role: "Contributor" },
+  { name: "Kristian Julsgaard", username: "Julsgaard", role: "Contributor" },
+  { name: "Arthur Guedes", username: "arthurhguedes", role: "Contributor" },
+  { name: "T-Julsgaard", username: "T-Julsgaard", role: "Maintainer" },
 ];
 const REPO_URL = "https://github.com/T-Julsgaard/Chess-Review";
 function openCredits() {
@@ -4385,7 +4396,16 @@ function openCredits() {
   const close = () => { overlay.remove(); document.removeEventListener("keydown", onKey); };
   const onKey = (e) => { if (e.key === "Escape") close(); };
 
-  const entries = CREDITS.map((c) =>
+  const contributors = el("section", { class: "credits-team", "aria-label": "Contributors & Maintainers" },
+    el("h4", {}, "Contributors & Maintainers"),
+    ...CONTRIBUTORS.map((person) =>
+      el("a", { class: "credit-person", href: "https://github.com/" + person.username, target: "_blank", rel: "noopener noreferrer" },
+        el("span", { class: "credit-title" }, person.name),
+        el("span", { class: "credit-by" }, person.role),
+      ),
+    ),
+  );
+  const entries = [...CREDITS].reverse().map((c) =>
     el("a", { class: "credit-row", href: c.href, target: "_blank", rel: "noopener noreferrer" },
       el("div", { class: "credit-main" },
         el("div", { class: "credit-title" }, c.title),
@@ -4415,7 +4435,7 @@ function openCredits() {
       "or sponsored by Chess.com or Lichess.",
       el("br"),
       "All trademarks belong to their respective owners."),
-    el("div", { class: "credits-list" }, ...entries),
+    el("div", { class: "credits-list" }, contributors, ...entries),
     el("div", { class: "credits-foot" },
       "Each asset is used under the license shown. Tap a row for the source.",
       el("div", { class: "credits-foot-links" },
@@ -5333,9 +5353,8 @@ async function applyGame(payload) {
 }
 
 /* ---------------- Start ---------------- */
-// The automatic layout is responsive CSS and leaves the zoom to the browser. A custom canvas layout
-// is a FIXED-size composition under a 60 px top bar, so while one is active the page is zoomed to
-// the largest size at which the whole composition fits the WINDOW without scrolling. Not the
+// Desktop auto layout preserves the v7 composition; narrow windows use the responsive grid.
+// Desktop and custom layouts are fitted as a whole under the 60 px top bar to the WINDOW. Not the
 // monitor (screen.*): a monitor-based zoom cuts off the right column as soon as the window isn't
 // maximized, or is dragged to a smaller monitor after opening.
 //
@@ -5345,7 +5364,17 @@ async function applyGame(payload) {
 const TOPBAR_H = 60;                 // .topbar height in styles.css
 const MIN_ZOOM = 0.5, MAX_ZOOM = 2;  // below 50% the text is unreadable; above 200% it balloons
 let _zoomTabId = null;
+let _defaultZoom = 1;
 let _fittedDip = null;               // viewport size (device-independent px) the zoom was last fitted to
+function desktopLayoutFor(dipW, dipH) {
+  return dipW / _defaultZoom >= 1100 && dipH / _defaultZoom >= 520;
+}
+function desktopZoomFor(dipW, dipH) {
+  // Original v7 extent and breathing room. At 1920 × 920 (Full HD with browser chrome),
+  // this is 90%, exactly the proportions of the original desktop arrangement.
+  return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM,
+    Math.floor(Math.min((dipW - 2) / 1832, (dipH - 2) / 1020) * 100) / 100));
+}
 function targetZoomFor(dipW, dipH) {
   // The layout as shown (breakdown collapsed by default); expanding it later may scroll.
   const { maxR, maxB } = layoutExtent(S.layout);
@@ -5357,22 +5386,25 @@ function targetZoomFor(dipW, dipH) {
   return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Math.floor((fit + 0.0005) * 100) / 100));
 }
 async function fitTabZoom() {
-  if (!isCustomLayout() || _zoomTabId == null) return;
+  if (_zoomTabId == null) return;
   const z = (await browserAPI.tabs.getZoom(_zoomTabId)) || 1;
-  const w = innerWidth * z, h = innerHeight * z;
+  // CSS viewport dimensions are rounded after browser zoom. Recover whole DIP pixels so
+  // reopening a 920px-high window at 90% cannot drift to 89% (1022 × .9 = 919.8).
+  const w = Math.round(innerWidth * z), h = Math.round(innerHeight * z);
   // Same device-pixel size as last time → this resize came from a zoom change (the user's Ctrl+/-,
   // our own setZoom, or another tab sharing the origin zoom), not from the window. Leave it.
   if (_fittedDip && Math.abs(w - _fittedDip.w) < 3 && Math.abs(h - _fittedDip.h) < 3) return;
   _fittedDip = { w, h };
-  const target = targetZoomFor(w, h);
+  const desktop = !isCustomLayout() && desktopLayoutFor(w, h);
+  UI.canvas.classList.toggle("desktop-layout", desktop);
+  applyLayout();
+  requestAnimationFrame(alignPlayers);
+  const target = isCustomLayout() ? targetZoomFor(w, h) : desktop ? desktopZoomFor(w, h) : _defaultZoom;
   // Only set it when it's off, so an unchanged window never triggers Chrome's zoom bubble.
   if (Math.abs(z - target) > 0.005) await browserAPI.tabs.setZoom(_zoomTabId, target);
 }
-// Scope starts PER-ORIGIN, so a new tab opens at the zoom the last analysis tab settled on: a window
-// of the same size needs no change, and Chrome shows no zoom bubble on open. Fitting then updates
-// that remembered zoom for the next tab. Right after, the tab switches to PER-TAB, so two analysis
-// windows of different sizes (e.g. one per monitor) each keep their own fit instead of overwriting
-// each other. A browser that rejects per-tab scope just keeps the tab per-origin.
+// Isolate zoom before fitting, so two analysis windows on different monitors keep their own fit.
+// Browsers rejecting per-tab scope retain their existing scope.
 async function initTabZoom() {
   try {
     if (!browserAPI?.tabs?.getCurrent) return;
@@ -5380,9 +5412,11 @@ async function initTabZoom() {
     if (!tab || tab.id == null) return;
     _zoomTabId = tab.id;
     _fittedDip = null;
-    await browserAPI.tabs.setZoomSettings(tab.id, { scope: "per-origin", mode: "automatic" });
-    await fitTabZoom();
+    const settings = await browserAPI.tabs.getZoomSettings(tab.id);
+    _defaultZoom = settings.defaultZoomFactor || 1;
+    // Keep a resized analysis window from changing other extension tabs' zoom.
     await browserAPI.tabs.setZoomSettings(tab.id, { scope: "per-tab", mode: "automatic" }).catch(() => {});
+    await fitTabZoom();
   } catch { return; }
   // Refit after the window is resized, maximized or moved to a different monitor. Debounced so a
   // drag-resize zooms once when it settles, not on every frame. Registered once per page.
@@ -5395,16 +5429,6 @@ async function initTabZoom() {
   });
 }
 let _zoomResizeBound = false;
-// Leaving the custom layout: hand the zoom back to the browser, for this origin too, so the next
-// analysis tab opens at the user's own zoom.
-async function releaseTabZoom() {
-  _fittedDip = null;
-  if (_zoomTabId == null) return;
-  try {
-    await browserAPI.tabs.setZoomSettings(_zoomTabId, { scope: "per-origin", mode: "automatic" });
-    await browserAPI.tabs.setZoom(_zoomTabId, 0);   // 0 = the browser's default zoom
-  } catch {}
-}
 // Earlier versions zoomed the analysis page themselves (90–127%), and Chrome remembers that zoom for
 // the extension's origin. The automatic layout is built for the browser's own zoom, so give it back
 // once when an older install is migrated.
@@ -5502,8 +5526,8 @@ async function resetLegacyZoom() {
     if (jobId && jobId !== "explore") {
       await browserAPI.storage.local.remove(`job:${jobId}`);
     }
-    // A custom canvas is fitted once it is laid out as shown (breakdown collapsed); not awaited.
-    if (isCustomLayout()) initTabZoom();
+    // Fit the desktop composition or custom canvas; narrow windows retain the responsive grid.
+    initTabZoom();
     requestAnimationFrame(alignPlayers); // measure the board after the first layout
   } catch (err) {
     const e = document.getElementById("error");

@@ -378,6 +378,7 @@ button { font-family: inherit; cursor: pointer; }
 
 /* board */
 .board {
+  -webkit-user-select: none; user-select: none;
   flex: 1; aspect-ratio: 1; display: grid;
   grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr);
   border-radius: 10px; overflow: hidden;
@@ -425,7 +426,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 .sq .coord {
   position: absolute; font-size: var(--coord-size, 9px); font-weight: 700; opacity: .7; z-index: 2;
-  font-family: var(--font-mono);
+  font-family: var(--font-mono); pointer-events: none;
 }
 .sq .coord.file { right: 3px; bottom: 1px; }
 .sq .coord.rank { left: 3px; top: 1px; }
@@ -751,7 +752,7 @@ button { font-family: inherit; cursor: pointer; }
 
 /* settings popover */
 .settings-pop {
-  position: fixed; top: 64px; right: 16px; z-index: 60; width: 286px;
+  position: fixed; top: 64px; right: 8px; z-index: 60; width: 286px;
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
   box-shadow: var(--shadow); padding: 14px 16px 16px;
   display: flex; flex-direction: column; gap: 12px;
@@ -796,6 +797,11 @@ button { font-family: inherit; cursor: pointer; }
   padding-bottom: 14px; border-bottom: 1px solid var(--line-soft);
 }
 .credits-list { display: flex; flex-direction: column; gap: 6px; }
+.credits-team { padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-2); }
+.credits-team h4 { margin: 0 0 8px; font-size: 13px; color: var(--ink); }
+.credit-person { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 6px 0; text-decoration: none; }
+.credit-person:hover .credit-title { color: var(--accent); }
+.credit-person .credit-by { flex: none; margin: 0; }
 .credit-row {
   display: flex; align-items: center; gap: 12px; text-decoration: none;
   padding: 10px 12px; border-radius: 10px;
@@ -1035,6 +1041,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 .stage.auto.no-evalbar { --eb-w: 0px; }
 .player-strip { height: var(--strip-h); }
+.stage.canvas .player-strip { height: auto; }
 .stage.auto .mod[data-mod="evalbar"] { grid-area: eval; align-self: stretch; margin: var(--strip-h) 0; }
 .stage.auto .mod[data-mod="board"] { grid-area: board; width: var(--board); }
 .stage.auto .mod[data-mod="review"] { grid-area: review; height: var(--review-h); }
@@ -1144,7 +1151,42 @@ button { font-family: inherit; cursor: pointer; }
     grid-template-areas: "eval board" "controls controls" "review review" "moves moves" "graph graph" "acc acc" "engine engine";
   }
   .stage.auto .mod[data-mod="moves"] { height: min(420px, 60dvh); }
+  .stage.auto .player-strip .name { display: block; overflow: hidden; text-overflow: ellipsis; }
 }
+
+/* Desktop uses DEFAULT_LAYOUT from analysis.js as its single geometry source.
+   fitTabZoom selects this using the
+   unzoomed WINDOW size and scales the entire page uniformly, including type and spacing.
+   The grid above remains available on narrow windows and browsers without tab zoom APIs. */
+.stage.auto.desktop-layout {
+  position: relative; display: block; padding: 12px;
+  min-width: 1832px; min-height: 960px;
+  --coach-clear: 194px; --coach-float-h: 47px;
+}
+.stage.auto.desktop-layout .player-strip { height: auto; }
+.stage.auto.desktop-layout .mod {
+  position: absolute; margin: 0; min-height: 0; contain: none;
+}
+.stage.auto.desktop-layout .board-wrap {
+  flex: 1; min-height: 0; align-items: stretch; justify-content: center;
+}
+.stage.auto.desktop-layout .board {
+  flex: 0 1 auto; height: 100%; width: auto; aspect-ratio: 1; max-width: 100%; margin: auto;
+}
+.stage.auto.desktop-layout .side,
+.stage.auto.desktop-layout .side-cols,
+.stage.auto.desktop-layout .side-a,
+.stage.auto.desktop-layout .side-b {
+  display: contents; position: static;
+  padding: 0; contain: none; zoom: 1;
+}
+.stage.auto.desktop-layout .mod[data-mod="evalbar"] { margin: 0; }
+.stage.auto.desktop-layout .mod[data-mod="moves"],
+.stage.auto.desktop-layout .mod[data-mod="engine"] { min-height: 0; contain: none; }
+.stage.auto.desktop-layout .evalgraph svg { height: 120px; }
+.stage.auto.desktop-layout .mod[data-mod="coach"] { right: auto; margin: 0; }
+.stage.auto.desktop-layout.has-coach .insight-panel .ip-body { padding-right: var(--pad); }
+.stage.auto.desktop-layout.has-coach .insight-panel .ip-head { padding-right: calc(var(--coach-clear) - var(--pad)); }
 
 /* top bar and settings on small windows */
 @media (max-width: 760px) { .topbar-meta { display: none; } }
