@@ -7,10 +7,9 @@ import { Chess } from "./lib/chess.js";
 import { Engine } from "./engine/uci.js";
 import { flagCodeForCountryId, countryNameForId } from "./flags.js";
 import { browserAPI } from "./browser-compat.js";
-import { lookupOpening, getLegacyBook, initOpeningsDb } from "./openings-db.js";
 
 /* ---------------- Opening book ----------------
- * Offline lookup table built from lichess-org/chess-openings (see data/build-openings-db.js).
+ * Offline lookup table built from lichess-org/chess-openings (bundled in data/book.json).
  * Key = "epd" (the first 4 FEN fields: board, side, castling, en passant) → either
  * [eco, name] for a named theory position or 0 for "known, but unnamed".
  * Used for true book detection and opening naming in computeDerived(). */
@@ -21,8 +20,8 @@ function bookLookup(fen) { return BOOK ? BOOK[epdOf(fen)] : undefined; }
 async function loadBook() {
   if (BOOK) return BOOK;
   try {
-    // Use the new IndexedDB-backed openings database
-    BOOK = (await getLegacyBook()).epd || {};
+    const res = await fetch(browserAPI.runtime.getURL("data/book.json"));
+    BOOK = (await res.json()).epd || {};
   } catch {
     BOOK = {}; // book missing/unreadable → fall back to pure engine classification
   }
@@ -402,7 +401,16 @@ function shareGame(ev) {
     // PC whose stored handle doesn't match either player — the username stays the safety net, the
     // flip is the certainty. (flip = is the user Black / sitting after a board flip.)
     const meta = { ...S.meta, flip: S.flipped, myName: (S.players?.[S.meSide]?.name) || S.username || "" };
-    const data = encodeURIComponent(b64encode(JSON.stringify({ pgn: S.pgn, meta })));
+    let pgn = S.pgn;
+    if (S.meta?.explore && S.variation) {
+      const chess = new Chess(S.variation.positions[0].fen);
+      for (const p of S.variation.positions.slice(1, S.variation.idx + 1)) {
+        chess.move({ from: p.from, to: p.to, promotion: p.promotion || undefined });
+      }
+      pgn = chess.pgn();
+      delete meta.explore;
+    }
+    const data = encodeURIComponent(b64encode(JSON.stringify({ pgn, meta })));
     const carrier = ((S.meta && S.meta.url) ? S.meta.url : "https://www.chess.com/").split("#")[0];
     const url = carrier + "#gambit=" + data;
     navigator.clipboard.writeText(url)
@@ -627,7 +635,7 @@ const S = {
   evalEngines: [], autoTimer: null,
   // Re-analysis + analysis mode
   batchGen: 0, settingsTab: "visual", analyzedMultipv: null,
-  analysisMode: false, variation: null, liveEngine: null, liveToken: 0, panelToken: 0, _panelCache: null, selectedSq: null,
+  analysisMode: false, variation: null, liveEngine: null, liveEnginePromise: null, liveEngineGeneration: 0, liveError: null, liveToken: 0, panelToken: 0, _panelCache: null, selectedSq: null,
   // The build that is ACTUALLY running (set by createEngine; may differ from settings.enginePath if
   // the chosen build failed to load and we fell back). The Engine tab shows this, not the selection.
   activeEngineBuild: null,
@@ -719,7 +727,6 @@ function buildPositions(pgn) {
   // This correctly detects threefold repetition, 50-move rule, etc.
   const pos = [];
   const replay = new Chess(startFen);
-  const epdCount = new Map();
   
   function getDrawType(chess) {
     if (chess.isCheckmate()) return "checkmate";
@@ -732,21 +739,11 @@ function buildPositions(pgn) {
   
   // Initial position
   const startDraw = getDrawType(replay);
-  const startEpd = startFen.split(" ").slice(0, 4).join(" ");
-  epdCount.set(startEpd, 1);
   pos.push({ fen: startFen, san: null, draw: startDraw });
   
   for (const mv of moves) {
-    // Play the move on the replay board
-    try {
-      replay.move({ from: mv.from, to: mv.to, promotion: mv.promotion });
-    } catch {
-      // If move fails, continue anyway
-    }
+    replay.move({ from: mv.from, to: mv.to, promotion: mv.promotion });
     const fen = mv.after;
-    const epd = fen.split(" ").slice(0, 4).join(" ");
-    const count = (epdCount.get(epd) || 0) + 1;
-    epdCount.set(epd, count);
     
     const draw = getDrawType(replay);
     pos.push({ fen, san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "", draw });
@@ -995,17 +992,17 @@ function isSacrifice(move) {
   return false;
 }
 // --- Eval readouts (all from our white-relative S.evals[]) ---
-function _evalPawnsWhite(k) { const e = S.evals[k]; return e ? scoreToCp(e) / 100 : null; }
-function _evalPawns(k, mover) { const p = _evalPawnsWhite(k); return p == null ? null : (mover === "w" ? p : -p); }
-function _isMateEval(k) { const e = S.evals[k]; return !!(e && e.mate != null); }
+function _evalPawnsWhite(k, state = S) { const e = state.evals[k]; return e ? scoreToCp(e) / 100 : null; }
+function _evalPawns(k, mover, state = S) { const p = _evalPawnsWhite(k, state); return p == null ? null : (mover === "w" ? p : -p); }
+function _isMateEval(k, state = S) { const e = state.evals[k]; return !!(e && e.mate != null); }
 // Mate distance from `mover`'s POV at position k (>0 = mover mating, <0 = mover being mated).
-function _mateFor(k, mover) { const e = S.evals[k]; if (!e || e.mate == null) return null; return mover === "w" ? e.mate : -e.mate; }
-function _isCheckmate(k) { try { return new Chess(S.positions[k].fen).isCheckmate(); } catch { return false; } }
+function _mateFor(k, mover, state = S) { const e = state.evals[k]; if (!e || e.mate == null) return null; return mover === "w" ? e.mate : -e.mate; }
+function _isCheckmate(k, state = S) { try { return new Chess(state.positions[k].fen).isCheckmate(); } catch { return false; } }
 // Eval loss (pawns, the mover's own POV) of the move that produced position k.
-function _moveLoss(k) {
+function _moveLoss(k, state = S) {
   if (k < 1) return null;
-  const m = S.positions[k].color;
-  const a = _evalPawns(k - 1, m), b = _evalPawns(k, m);
+  const m = state.positions[k].color;
+  const a = _evalPawns(k - 1, m, state), b = _evalPawns(k, m, state);
   return (a == null || b == null) ? null : a - b;
 }
 // Baseline bucket on the WIN%-DROP (the "expected points" model),
@@ -1023,15 +1020,15 @@ function getStandardRating(wp) {
 }
 // Per-ply move category, ported from getMoveRating(). `mover` made move i; `isTop` = it was the
 // engine's #1; `book` = the resulting position is theory; arrays sac/std/loss are indexed by ply.
-function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop) {
+function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop, state = S) {
   if (book) return "book";
   // "Forced": only one legal move in the position before — we have no separate icon, so it reads
   // as Best (you couldn't have done better).
-  if (_forcedAt(i)) return "best";   // only one legal move — you couldn't have done better
+  if (_forcedAt(i, state)) return "best";   // only one legal move — you couldn't have done better
 
   // User-tunable thresholds (Engine settings → Move classification), all in pawns of eval.
-  const CA = S.settings.clsClearAdv, ML = S.settings.clsMistakeLoss, MT = S.settings.clsMissTol;
-  const mate = _isMateEval, evalFor = (k) => _evalPawns(k, mover);
+  const CA = state.settings.clsClearAdv, ML = state.settings.clsMistakeLoss, MT = state.settings.clsMissTol;
+  const mate = (k) => _isMateEval(k, state), evalFor = (k) => _evalPawns(k, mover, state);
   const winningNow = (evalFor(i) ?? 0) > 0;
   const prevWinning = (evalFor(i - 1) ?? 0) > 0;
   const notMateRel = !mate(i) && !mate(i - 1);
@@ -1039,10 +1036,10 @@ function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop) {
   const pStd = (n) => (i - 1 - n >= 1 ? std[i - 1 - n] : null);
   const pLoss = (n) => (i - 1 - n >= 1 ? loss[i - 1 - n] : null);
   // mover-POV "lost a clear advantage" / "fell into a clear disadvantage" (CA pawns) for move k.
-  const losingAdvAt = (k) => { const m = S.positions[k].color; const a = _evalPawns(k - 1, m), b = _evalPawns(k, m); return a != null && b != null && a >= CA && b < CA; };
-  const givingAdvAt = (k) => { const m = S.positions[k].color; const a = _evalPawns(k - 1, m), b = _evalPawns(k, m); return a != null && b != null && a >= -CA && b < -CA; };
-  const keepMating = (k) => { const c = _mateFor(k, S.positions[k].color), p = _mateFor(k - 1, S.positions[k].color); return c != null && p != null && c > 0 && p > 0 && c <= p; };
-  const advanceMate = (k) => { const c = _mateFor(k, S.positions[k].color), p = _mateFor(k - 1, S.positions[k].color); return c != null && p != null && c < 0 && p < 0 && c > p; };
+  const losingAdvAt = (k) => { const m = state.positions[k].color; const a = _evalPawns(k - 1, m, state), b = _evalPawns(k, m, state); return a != null && b != null && a >= CA && b < CA; };
+  const givingAdvAt = (k) => { const m = state.positions[k].color; const a = _evalPawns(k - 1, m, state), b = _evalPawns(k, m, state); return a != null && b != null && a >= -CA && b < -CA; };
+  const keepMating = (k) => { const c = _mateFor(k, state.positions[k].color, state), p = _mateFor(k - 1, state.positions[k].color, state); return c != null && p != null && c > 0 && p > 0 && c <= p; };
+  const advanceMate = (k) => { const c = _mateFor(k, state.positions[k].color, state), p = _mateFor(k - 1, state.positions[k].color, state); return c != null && p != null && c < 0 && p < 0 && c > p; };
 
   const previousMistake = wasNotMateRel(0) && pStd(0) === "inacc" && pLoss(0) >= ML && (losingAdvAt(i - 1) || givingAdvAt(i - 1));
   const previousPreviousMistake = wasNotMateRel(1) && pStd(1) === "inacc" && pLoss(1) >= ML && (losingAdvAt(i - 2) || givingAdvAt(i - 2));
@@ -1061,10 +1058,10 @@ function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop) {
   if (!previousMiss && wasNotMateRel(0) && notMateRel && std[i] === "excellent"
     && (previousMistake || pStd(0) === "blunder")) return "great";
 
-  if (isTop && _isCheckmate(i)) return "best";
+  if (isTop && _isCheckmate(i, state)) return "best";
   if (isTop) return "best";
 
-  if (_isCheckmate(i)) return "excellent";
+  if (_isCheckmate(i, state)) return "excellent";
   if (!mate(i - 1) && mate(i) && winningNow) return "excellent";                                             // starts a mate
   if (mate(i - 1) && mate(i) && keepMating(i) && winningNow) return "excellent";                             // keeps the mate
   if (mate(i - 1) && mate(i) && !keepMating(i) && winningNow) return "good";                                 // delays own mate
@@ -1091,222 +1088,41 @@ function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop) {
   return std[i];   // plain excellent / good / inaccuracy / blunder
 }
 
-// Classification for variation moves in Explore mode.
-// Uses the same logic as classifyMove but operates on the parent position's
-// engine analysis (before the move) and current position's engine analysis (after the move).
-// vIdx: index in variation.positions (1 = first user move in variation)
-// Returns classification string (book/best/excellent/good/inacc/mistake/miss/blunder/great/brilliant)
-function classifyVariationMove(vIdx) {
-  if (!S.variation || vIdx < 1 || vIdx >= S.variation.positions.length) return null;
-  
+// Include the played game's history before the branch so Great/Miss/Brilliant
+// have exactly the same context as normal review. Never overwrite the mainline.
+function classifyVariationMoves() {
   const v = S.variation;
-  const pos = v.positions[vIdx];
-  const parentPos = v.positions[vIdx - 1];  // Always use variation's own previous position
-  const mover = pos.color;
-  
-  // Check if the resulting position is in the opening book (respecting 8-ply window)
-  // For variations, absolute ply = branchIdx + vIdx
-  const absolutePly = v.branchIdx + vIdx;
-  const bk = bookLookup(pos.fen);
-  if (absolutePly <= 8) {
-    if (Array.isArray(bk)) return "book";
-    if (bk !== undefined) return "book";
-  }
-  
-  // Check if forced move (only one legal move in parent position)
-  try {
-    const c = new Chess(parentPos.fen);
-    if (c.moves().length === 1) return "best";
-  } catch {}
-  
-  // Get engine analysis for parent position
-  const parentBest = parentPos.best;
-  const parentEval = parentPos.eval;
-  const currentEval = pos.eval;
-  
-  if (!parentBest || !parentEval || !currentEval) return null;
-  
-  // Determine if the move played matches the engine's top move in the parent position
-  const playedUci = (pos.from || "") + (pos.to || "") + (pos.promotion || "");
-  const bestUci = (parentBest.bestmove || "").slice(0, 4);
-  const isTop = !!bestUci && bestUci === playedUci.slice(0, 4);
-  
-  // Calculate eval loss from mover's perspective
-  const parentEvalMover = mover === "w" ? scoreToCp(parentEval) : -scoreToCp(parentEval);
-  const currentEvalMover = mover === "w" ? scoreToCp(currentEval) : -scoreToCp(currentEval);
-  const evalLoss = parentEvalMover - currentEvalMover;
-  
-  // Win% calculation
-  const parentWin = mover === "w" ? winPct(scoreToCp(parentEval)) : 100 - winPct(scoreToCp(parentEval));
-  const currentWin = mover === "w" ? winPct(scoreToCp(currentEval)) : 100 - winPct(scoreToCp(currentEval));
-  const wpDrop = Math.max(0, parentWin - currentWin);
-  
-  // Check for mate
-  const parentMate = parentEval.mate;
-  const currentMate = currentEval.mate;
-  const parentMateMover = parentMate != null ? (mover === "w" ? parentMate : -parentMate) : null;
-  const currentMateMover = currentMate != null ? (mover === "w" ? currentMate : -currentMate) : null;
-  const matingNow = currentMateMover != null && currentMateMover > 0;
-  const wasMating = parentMateMover != null && parentMateMover > 0;
-  
-  // Sacrifice detection using existing isSacrifice function
-  const sac = isSacrifice({ before: parentPos.fen, after: pos.fen, color: pos.color, captured: pos.captured, from: pos.from });
-  
-  // Standard rating from win% drop
-  const std = getStandardRating(wpDrop);
-  
-  // User-tunable thresholds
-  const CA = S.settings.clsClearAdv;
-  const ML = S.settings.clsMistakeLoss;
-  const MT = S.settings.clsMissTol;
-  
-  const winningNow = currentEvalMover > 0;
-  const prevWinning = parentEvalMover > 0;
-  const notMateRel = currentMateMover == null && parentMateMover == null;
-  
-  // For variations, we need to track previous move classifications AND losses in the variation
-  const prevCls = vIdx > 1 ? v.positions[vIdx - 1].classif : null;
-  const prevPrevCls = vIdx > 2 ? v.positions[vIdx - 2].classif : null;
-  const prevPrevPrevCls = vIdx > 3 ? v.positions[vIdx - 3].classif : null;
-  
-  // Calculate previous move's eval loss and std (for Miss/Great logic)
-  // Previous move: vIdx-1, its parent: vIdx-2
-  let prevEvalLoss = null;
-  let prevStd = null;
-  let prevMate = null;
-  if (vIdx > 1) {
-    const prevPos = v.positions[vIdx - 1];
-    const prevParentPos = v.positions[vIdx - 2];
-    const prevMover = prevPos.color;
-    const prevParentEval = prevParentPos.eval;
-    const prevCurrentEval = prevPos.eval;
-    if (prevParentEval && prevCurrentEval) {
-      const prevParentEvalMover = prevMover === "w" ? scoreToCp(prevParentEval) : -scoreToCp(prevParentEval);
-      const prevCurrentEvalMover = prevMover === "w" ? scoreToCp(prevCurrentEval) : -scoreToCp(prevCurrentEval);
-      prevEvalLoss = prevParentEvalMover - prevCurrentEvalMover;
-      prevStd = getStandardRating(
-        (prevMover === "w" ? winPct(scoreToCp(prevParentEval)) : 100 - winPct(scoreToCp(prevParentEval))) -
-        (prevMover === "w" ? winPct(scoreToCp(prevCurrentEval)) : 100 - winPct(scoreToCp(prevCurrentEval)))
-      );
-    }
-    // Check if previous move was mate-related
-    const prevParentMate = prevParentPos.eval?.mate;
-    const prevCurrentMate = prevPos.eval?.mate;
-    const prevParentMateMover = prevParentMate != null ? (prevMover === "w" ? prevParentMate : -prevParentMate) : null;
-    const prevCurrentMateMover = prevCurrentMate != null ? (prevMover === "w" ? prevCurrentMate : -prevCurrentMate) : null;
-    prevMate = (prevParentMateMover != null || prevCurrentMateMover != null);
-  }
-  
-  // Calculate previous-previous move's eval loss and std
-  let prevPrevEvalLoss = null;
-  let prevPrevStd = null;
-  let prevPrevMate = null;
-  if (vIdx > 2) {
-    const prevPrevPos = v.positions[vIdx - 2];
-    const prevPrevParentPos = v.positions[vIdx - 3];
-    const prevPrevMover = prevPrevPos.color;
-    const prevPrevParentEval = prevPrevParentPos.eval;
-    const prevPrevCurrentEval = prevPrevPos.eval;
-    if (prevPrevParentEval && prevPrevCurrentEval) {
-      const prevPrevParentEvalMover = prevPrevMover === "w" ? scoreToCp(prevPrevParentEval) : -scoreToCp(prevPrevParentEval);
-      const prevPrevCurrentEvalMover = prevPrevMover === "w" ? scoreToCp(prevPrevCurrentEval) : -scoreToCp(prevPrevCurrentEval);
-      prevPrevEvalLoss = prevPrevParentEvalMover - prevPrevCurrentEvalMover;
-      prevPrevStd = getStandardRating(
-        (prevPrevMover === "w" ? winPct(scoreToCp(prevPrevParentEval)) : 100 - winPct(scoreToCp(prevPrevParentEval))) -
-        (prevPrevMover === "w" ? winPct(scoreToCp(prevPrevCurrentEval)) : 100 - winPct(scoreToCp(prevPrevCurrentEval)))
-      );
-    }
-    // Check if previous-previous move was mate-related
-    const ppParentMate = prevPrevParentPos.eval?.mate;
-    const ppCurrentMate = prevPrevPos.eval?.mate;
-    const ppParentMateMover = ppParentMate != null ? (prevPrevMover === "w" ? ppParentMate : -ppParentMate) : null;
-    const ppCurrentMateMover = ppCurrentMate != null ? (prevPrevMover === "w" ? ppCurrentMate : -ppCurrentMate) : null;
-    prevPrevMate = (ppParentMateMover != null || ppCurrentMateMover != null);
-  }
-  
-  // Determine if previous move was a mistake/blunder (for Great/Miss detection)
-  // Match classifyMove: must be inacc classification AND loss >= ML AND (lost/gave clear advantage)
-  const prevParentEvalMover = vIdx > 1 ? (v.positions[vIdx - 1].color === "w" ? scoreToCp(v.positions[vIdx - 2].eval) : -scoreToCp(v.positions[vIdx - 2].eval)) : null;
-  const prevCurrentEvalMover = vIdx > 1 ? (v.positions[vIdx - 1].color === "w" ? scoreToCp(v.positions[vIdx - 1].eval) : -scoreToCp(v.positions[vIdx - 1].eval)) : null;
-  const prevLostClearAdv = prevParentEvalMover != null && prevCurrentEvalMover != null && prevParentEvalMover >= CA && prevCurrentEvalMover < CA;
-  const prevGaveClearAdv = prevParentEvalMover != null && prevCurrentEvalMover != null && prevParentEvalMover >= -CA && prevCurrentEvalMover < -CA;
-  
-  const previousMistake = !prevMate && prevStd === "inacc" && prevEvalLoss != null && prevEvalLoss >= ML && (prevLostClearAdv || prevGaveClearAdv);
-  const previousBlunder = prevCls === "blunder";
-  const previousInacc = prevCls === "inacc";
-  
-  // For previous-previous move (needed for Miss chain)
-  let prevPrevLostClearAdv = false;
-  let prevPrevGaveClearAdv = false;
-  if (vIdx > 2) {
-    const ppMover = v.positions[vIdx - 2].color;
-    const ppParentEval = v.positions[vIdx - 3].eval;
-    const ppCurrentEval = v.positions[vIdx - 2].eval;
-    const ppParentEvalMover = ppMover === "w" ? scoreToCp(ppParentEval) : -scoreToCp(ppParentEval);
-    const ppCurrentEvalMover = ppMover === "w" ? scoreToCp(ppCurrentEval) : -scoreToCp(ppCurrentEval);
-    if (ppParentEvalMover != null && ppCurrentEvalMover != null) {
-      prevPrevLostClearAdv = ppParentEvalMover >= CA && ppCurrentEvalMover < CA;
-      prevPrevGaveClearAdv = ppParentEvalMover >= -CA && ppCurrentEvalMover < -CA;
-    }
-  }
-  const prevPrevMistake = !prevPrevMate && prevPrevStd === "inacc" && prevPrevEvalLoss != null && prevPrevEvalLoss >= ML && (prevPrevLostClearAdv || prevPrevGaveClearAdv);
-  const prevPrevBlunder = prevPrevCls === "blunder";
-  const prevPrevInacc = prevPrevCls === "inacc";
-  
-  const previousMiss = prevCls === "miss";
-  const prevPrevMiss = prevPrevCls === "miss";
-  
-  // Brilliant — sound sacrifice that punishes opponent's slip
-  // Match classifyMove logic: previousBrilliant = wasNotMateRel(0) && sac[i-1] && pStd(0) === "excellent"
-  const previousBrilliant = !prevMate && prevCls === "excellent" && sac;
-  
-  // Brilliant conditions (match classifyMove)
-  if (!previousBrilliant && notMateRel && std === "excellent" && sac
-    && (prevStd === "inacc" || prevStd === "blunder"
-      || (!(prevStd === "inacc" || prevStd === "blunder") && (prevPrevStd === "inacc" || prevPrevStd === "blunder")))) return "brilliant";
-  if (sac && !wasMating && matingNow && winningNow) return "brilliant";                                   // sac that starts a mate
-  if (sac && wasMating && matingNow && currentMateMover <= parentMateMover && winningNow) return "brilliant";                   // sac that keeps the mate
-  
-  // Great — an only-good move that capitalises on the opponent's mistake/blunder
-  // Match classifyMove: not previousMiss && wasNotMateRel(0) && notMateRel && std === "excellent" && (previousMistake || pStd(0) === "blunder")
-  if (!previousMiss && !prevMate && notMateRel && std === "excellent"
-    && (previousMistake || prevStd === "blunder")) return "great";
-  
-  if (isTop && currentMateMover != null && currentMateMover > 0) return "best";
-  if (isTop) return "best";
-  
-  if (currentMateMover != null && currentMateMover > 0) return "excellent";
-  if (!wasMating && matingNow && winningNow) return "excellent";                                             // starts a mate
-  if (wasMating && matingNow && currentMateMover <= parentMateMover && winningNow) return "excellent";                             // keeps the mate
-  if (wasMating && matingNow && currentMateMover > parentMateMover && winningNow) return "good";                                 // delays own mate
-  if (wasMating && matingNow && !winningNow) return "good";                                                  // being mated, unavoidable
-  
-  if (wasMating && !matingNow && prevWinning) return "miss";                                                 // threw away a forced mate
-  // Match classifyMove Miss logic: !previousMiss && notMateRel && (previousMistake || pStd(0) === "blunder")
-  // && (std === "blunder" || std === "inacc") && (loss[i] != null && pLoss(0) != null && loss[i] <= pLoss(0) + MT)
-  if (!previousMiss && notMateRel && (previousMistake || prevStd === "blunder")
-    && (std === "blunder" || std === "inacc")
-    && (evalLoss != null && prevEvalLoss != null && evalLoss <= prevEvalLoss + MT)) return "miss";                     // failed to punish
-  
-  // Mistake/Blunder detection based on eval loss and advantage loss
-  const lostClearAdv = parentEvalMover >= CA && currentEvalMover < CA;
-  const gaveClearAdv = parentEvalMover >= -CA && currentEvalMover < -CA;
-  
-  if (notMateRel && std === "inacc" && evalLoss >= ML && lostClearAdv) return "mistake";                 // lost a clear advantage
-  if (notMateRel && std === "inacc" && evalLoss >= ML && gaveClearAdv) return "mistake";                 // handed over a clear advantage
-  if (!wasMating && matingNow && !winningNow && parentEvalMover > -CA) return "mistake";               // walked into a mate (wasn't already lost)
-  if (!wasMating && matingNow && !winningNow) return "blunder";                                              // walked into a mate
-  if (wasMating && matingNow && !winningNow && prevWinning) return "blunder";                                // threw a win straight into a mate
-  
-  // Split medium-error band
-  if (std === "inacc" && wpDrop != null) {
-    const mistWp = (typeof CALIB !== "undefined" && CALIB?.clsWp?.mistake) || 10;
-    if (wpDrop >= mistWp) return "mistake";
-  }
-  
-  return std; // plain excellent / good / inaccuracy / blunder
+  if (!v) return;
+  const branch = v.branchIdx;
+  const nodes = v.positions.slice(1);
+  const state = {
+    positions: [...S.positions.slice(0, branch + 1), ...nodes],
+    evals: [...S.evals.slice(0, branch), ...v.positions.map(p => p.eval)],
+    bests: [...S.bests.slice(0, branch), ...v.positions.map(p => p.best)],
+    settings: S.settings, players: S.players, openingHeader: S.openingHeader,
+    _sacCache: [...S._sacCache.slice(0, branch + 1), ...nodes.map(p => p._sac)],
+    _forcedCache: [...S._forcedCache.slice(0, branch + 1), ...nodes.map(p => p._forced)],
+    total: branch + nodes.length,
+  };
+  classifyLine(state);
+  nodes.forEach((p, i) => {
+    const ply = branch + i + 1;
+    p.classif = state.classif[ply];
+    p._sac = state._sacCache[ply];
+    p._forced = state._forcedCache[ply];
+  });
 }
-  
+
+function variationOpening() {
+  const v = S.variation;
+  let opening = S.meta?.explore ? null : S.openingHeader;
+  const positions = [...S.positions.slice(0, v.branchIdx), ...v.positions.slice(0, v.idx + 1)];
+  for (const pos of positions) {
+    const bk = bookLookup(pos.fen);
+    if (Array.isArray(bk) && bk[1]) opening = { eco: bk[0], name: bk[1] };
+  }
+  return opening;
+}
 
 // Displayed (category-based) per-move accuracy from the category — the basis of the shown game
 // accuracy. Best/Brilliant/Great/Book are always 100; the rest are tunable (Engine settings →
@@ -1326,19 +1142,19 @@ function catAcc(cls) {
 // Sacrifice/forced are functions of the board only (not the eval), so they're cached per ply for
 // the whole analysis — computeDerived runs many times while the batch fills in, and isSacrifice is
 // the one non-trivial cost here. Caches are reset whenever a new game's positions are built.
-function _sacAt(i) {
-  if (S._sacCache[i] !== undefined) return S._sacCache[i];
-  const p = S.positions[i];
+function _sacAt(i, state = S) {
+  if (state._sacCache[i] !== undefined) return state._sacCache[i];
+  const p = state.positions[i];
   let v = false;
-  if (p && !p.promotion) v = isSacrifice({ before: S.positions[i - 1].fen, after: p.fen, color: p.color, captured: p.captured, from: p.from });
-  S._sacCache[i] = v;
+  if (p && !p.promotion) v = isSacrifice({ before: state.positions[i - 1].fen, after: p.fen, color: p.color, captured: p.captured, from: p.from });
+  state._sacCache[i] = v;
   return v;
 }
-function _forcedAt(i) {
-  if (S._forcedCache[i] !== undefined) return S._forcedCache[i];
+function _forcedAt(i, state = S) {
+  if (state._forcedCache[i] !== undefined) return state._forcedCache[i];
   let v = false;
-  try { v = new Chess(S.positions[i - 1].fen).moves().length === 1; } catch {}
-  S._forcedCache[i] = v;
+  try { v = new Chess(state.positions[i - 1].fen).moves().length === 1; } catch {}
+  state._forcedCache[i] = v;
   return v;
 }
 // Estimated ratings are reported in steps of 50, so we quantize to the NEAREST 50 (round-to-nearest
@@ -1374,11 +1190,11 @@ function estimateElo(acc, rating) {
   return estimateEloFromAcc(acc);
 }
 
-function computeDerived() {
-  const N = S.total;
-  S.classif = new Array(N + 1).fill(null);
-  S.accMove = new Array(N + 1).fill(null);
-  if (!S._sacCache || S._sacCache.length !== N + 1) { S._sacCache = new Array(N + 1).fill(undefined); S._forcedCache = new Array(N + 1).fill(undefined); }
+function classifyLine(state) {
+  const N = state.total;
+  state.classif = new Array(N + 1).fill(null);
+  state.accMove = new Array(N + 1).fill(null);
+  if (!state._sacCache || state._sacCache.length !== N + 1) { state._sacCache = new Array(N + 1).fill(undefined); state._forcedCache = new Array(N + 1).fill(undefined); }
 
   // Per-ply inputs for the ported classifier. The classifier only ever looks BACKWARDS, so one
   // forward pass to fill std/loss/sac/isTop is enough; a second pass assigns the final category.
@@ -1391,48 +1207,54 @@ function computeDerived() {
 
   // True book detection: a move is "book" if the position it leads to is in the opening book
   // (data/book.json). Alongside, the deepest named theory position gives the opening name.
-  // Book classification is limited to the first 8 plies (absolute ply for variations).
-  S.bookCount = 0;
+  state.bookCount = 0;
   let bookOpening = null;
   for (let i = 1; i <= N; i++) {
-    const bk = bookLookup(S.positions[i].fen);
+    const bk = bookLookup(state.positions[i].fen);
     if (Array.isArray(bk)) bookOpening = { eco: bk[0], name: bk[1] };
-    // Book classification only for first 8 plies (absolute ply)
-    const absolutePly = i; // For mainline, ply = absolute ply
-    bookAt[i] = bk !== undefined && absolutePly <= 8;
+    bookAt[i] = bk !== undefined;
 
-    const mover = S.positions[i].color;
-    const bestSearch = S.bests[i - 1];
-    const before = S.evals[i - 1];
+    const mover = state.positions[i].color;
+    const bestSearch = state.bests[i - 1];
+    const before = state.evals[i - 1];
 
     // win%-based move accuracy (kept solely as the Elo estimate's input). With MultiPV=1 the played
     // move is rarely in the single line, so winAfter falls back to the after-position search —
     // i.e. the same consecutive-eval comparison the category logic uses.
     if (bestSearch && before) {
-      const playedUci = (S.positions[i].from || "") + (S.positions[i].to || "") + (S.positions[i].promotion || "");
+      const playedUci = (state.positions[i].from || "") + (state.positions[i].to || "") + (state.positions[i].promotion || "");
       const lines = bestSearch.lines || [];
       const winBefore = lines.length ? winPct(scoreToCp(lines[0].score)) : moverWin(before, mover);
       let winAfter = null;
       for (const ln of lines) { if ((ln.pv || "").split(" ")[0] === playedUci) { winAfter = winPct(scoreToCp(ln.score)); break; } }
-      if (winAfter == null && S.evals[i]) winAfter = moverWin(S.evals[i], mover);
-      if (winAfter != null) { S.accMove[i] = moveAccuracy(Math.max(0, winBefore - winAfter) * calAccMult(S.players[mover]?.rating)); wpDrop[i] = Math.max(0, winBefore - winAfter); }
-      const bestUci = (bestSearch.bestmove || "").slice(0, 4);
-      isTop[i] = !!bestUci && bestUci === playedUci.slice(0, 4);
+      if (winAfter == null && state.evals[i]) winAfter = moverWin(state.evals[i], mover);
+      if (winAfter != null) { state.accMove[i] = moveAccuracy(Math.max(0, winBefore - winAfter) * calAccMult(state.players[mover]?.rating)); wpDrop[i] = Math.max(0, winBefore - winAfter); }
+      const bestUci = bestSearch.bestmove || "";
+      isTop[i] = !!bestUci && bestUci === playedUci;
     }
 
-    loss[i] = _moveLoss(i);
+    loss[i] = _moveLoss(i, state);
     std[i] = getStandardRating(wpDrop[i]);   // bucket on win%-drop, not raw pawns
-    sac[i] = _sacAt(i);
+    sac[i] = _sacAt(i, state);
   }
   // Second pass: final category per ply (Brilliant-Chess logic). A move stays unlabelled until both
   // its own and the previous position's eval are in, so the panel fills in cleanly during analysis.
   for (let i = 1; i <= N; i++) {
-    if (bookAt[i]) { S.classif[i] = "book"; S.bookCount++; continue; }
-    if (S.evals[i] == null || S.evals[i - 1] == null) { S.classif[i] = null; continue; }
-    S.classif[i] = classifyMove(i, S.positions[i].color, isTop[i], false, sac, std, loss, wpDrop);
+    if (state.evals[i] == null || state.evals[i - 1] == null) { state.classif[i] = null; continue; }
+    // Some opening datasets include traps from the losing side. Never let theory
+    // hide a losing mate or a move the engine rates as an error.
+    const safeBook = bookAt[i] && !((_mateFor(i, state.positions[i].color, state) ?? 0) < 0)
+      && wpDrop[i] != null && wpDrop[i] < (CALIB?.clsWp?.inacc ?? 5);
+    state.classif[i] = classifyMove(i, state.positions[i].color, isTop[i], safeBook, sac, std, loss, wpDrop, state);
+    if (state.classif[i] === "book") state.bookCount++;
   }
   // Opening name: prefer the book's clean name over the chess.com header's ECOUrl slug.
-  S.opening = bookOpening || S.openingHeader;
+  state.opening = bookOpening || state.openingHeader;
+}
+
+function computeDerived() {
+  classifyLine(S);
+  const N = S.total;
   const eloAccs = sideAccuracies();   // win%-based accuracy → Elo (unchanged)
   for (const side of ["w", "b"]) {
     const counts = {}; QUALITY_ORDER.forEach((k) => (counts[k] = 0));
@@ -2044,23 +1866,23 @@ function renderUserArrows(preview) {
 }
 function refreshArrows() { renderBestArrow(); renderUserArrows(); renderThreatArrow(); }
 // Create a ready Engine, trying the user's chosen build first and then falling back DOWN the
-// strength chain (nnue → wasm → asm) if it can't load. Every build is bundled, so a fallback never
+// strength chain (sf19 → nnue → wasm → asm) if it can't load. Every build is bundled, so a fallback never
 // needs the network. The build that actually started is recorded in S.activeEngineBuild so the
 // Engine tab reflects what's really running — essential if e.g. NNUE ever stops working. `opts` are
 // the UCI options (Hash / Skill Level); applying them also awaits the handshake, which now REJECTS
 // on a dead build (timeout / worker error) instead of hanging forever.
 let _engineFellBack = false; // warn once per page if we ever leave the preferred build
 async function createEngine(opts = {}) {
-  const preferred = ENGINE_BUILDS[S.settings.enginePath] ? S.settings.enginePath : "nnue";
+  const preferred = ENGINE_BUILDS[S.settings.enginePath] ? S.settings.enginePath : DEFAULT_SETTINGS.enginePath;
   // Preferred build first, then the remaining builds in fixed strongest→weakest order (no repeats).
-  const order = [preferred, ...ENGINE_FALLBACK_ORDER.filter((k) => k !== preferred)];
+  const order = ENGINE_FALLBACK_ORDER.slice(ENGINE_FALLBACK_ORDER.indexOf(preferred));
   let lastErr = null;
   for (const key of order) {
     const eng = new Engine(ENGINE_BUILDS[key]);
     try {
       await eng.setOptions(opts); // awaits the handshake; throws if this build failed to load
       eng.buildKey = key;
-      setActiveEngineBuild(key);
+      if (S.settings.enginePath === preferred) setActiveEngineBuild(key);
       if (key !== preferred && !_engineFellBack) {
         _engineFellBack = true;
         console.warn(`[Chess Review] engine build '${preferred}' failed to load — fell back to '${key}'. ` +
@@ -2313,7 +2135,7 @@ function applyUserMove(from, to, animate = true) {
   let c, mv;
   try { c = new Chess(fen); mv = c.move({ from, to, promotion: "q" }); } catch { mv = null; }
   if (!mv) { S.selectedSq = null; renderSelection(); return; }
-  const node = { fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, eval: null, best: null };
+  const node = { fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "", eval: null, best: null };
   if (!S.analysisMode) {
     // On the mainline (and only if the position is analyzed): if the move matches the next
     // mainline move, just stay on the mainline.
@@ -2377,7 +2199,7 @@ function playLine(pv) {
   for (const u of ucis) {
     let mv; try { mv = c.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u.slice(4, 5) || "q" }); } catch { mv = null; }
     if (!mv) break;
-    v.positions.push({ fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, eval: null, best: null });
+    v.positions.push({ fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "", eval: null, best: null });
   }
   // Start just one move into the line (not at the end) — the rest plays out automatically.
   v.idx = Math.min(startIdx + 1, v.positions.length - 1);
@@ -2453,24 +2275,13 @@ async function playBestMoves() {
   const token = ++S.bestWalkToken;
   S.bestWalking = true;
   paintBoard(); renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent();
-  // Ensure the engine exists.
-  if (!S.liveEngine) {
-    S.liveEngine = await createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill });
-    if (token !== S.bestWalkToken) return;
-  }
   for (let n = 0; n < BEST_WALK_MAX; n++) {
     if (token !== S.bestWalkToken || !S.analysisMode || !S.variation) return;
     const v = S.variation;
     const pos = v.positions[v.idx];
-    if (terminalScore(pos.fen)) break;                 // mate / stalemate / 50-move etc.
-    // Best move for this position (analyze fresh unless we already have it).
-    if (!pos.best) {
-      S.liveEngine.stop();
-      let res; try { res = await S.liveEngine.analyse(pos.fen, S.settings.engineDepth, S.settings.engineLines); } catch { return; }
-      if (token !== S.bestWalkToken || !S.analysisMode || !S.variation) return;
-      pos.eval = terminalScore(pos.fen) || whiteRel(res.score, pos.fen);
-      pos.best = res;
-    }
+    await requestLiveEval();
+    if (token !== S.bestWalkToken || !S.analysisMode || S.variation !== v) return;
+    if (S.liveError || variationTerminal(v, v.idx) || !pos.best) break;
     renderEvalBar(); renderBestArrow(); renderEngineCurrent();
     const uci = (pos.best.bestmove || "");
     if (uci.length < 4) break;                          // no legal move → done
@@ -2480,7 +2291,7 @@ async function playBestMoves() {
     let c, mv;
     try { c = new Chess(pos.fen); mv = c.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci.slice(4, 5) || "q" }); } catch { mv = null; }
     if (!mv) break;
-    v.positions.push({ fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, eval: null, best: null });
+    v.positions.push({ fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "", eval: null, best: null });
     v.idx = v.positions.length - 1;
     playSanSound(mv.san);
     paintBoard(); renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent();
@@ -2491,76 +2302,89 @@ async function playBestMoves() {
 }
 // Live analysis of the current variation position (its own engine instance, so the batch isn't disturbed).
 async function requestLiveEval() {
+  const token = ++S.liveToken; // navigation always invalidates pending work, even on cache hits
   if (!S.analysisMode || !S.variation) return;
-  const pos = activePos();
-  // If already fully computed (eval + best + classification), just render and return
-  if (pos.best && pos.classif) { renderEvalBar(); renderBestArrow(); renderEngineCurrent(); return; }
-  const token = ++S.liveToken;
-  if (!S.liveEngine) {
-    S.liveEngine = await createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill });
-    if (token !== S.liveToken) return;
-  }
-  S.liveEngine.stop();
-  const fen = pos.fen;
-  let res;
-  try { res = await S.liveEngine.analyse(fen, S.settings.engineDepth, S.settings.engineLines); }
-  catch { return; }
-  if (token !== S.liveToken || !S.analysisMode) return;
-  pos.eval = terminalScore(fen) || whiteRel(res.score, fen);
-  pos.best = res;
-  
-  // After analyzing a position, classify the variation move that led to it (if any)
-  const vIdx = S.variation.idx;
-  if (vIdx > 0) {
-    // Ensure parent position has eval/best before classifying (fixes race on first move)
-    const parentPos = S.variation.positions[vIdx - 1];
-    if (!parentPos.eval || !parentPos.best) {
-      // Analyze parent position first
-      try {
-        S.liveEngine.stop();
-        const parentRes = await S.liveEngine.analyse(parentPos.fen, S.settings.engineDepth, S.settings.engineLines);
-        if (token !== S.liveToken || !S.analysisMode) return;
-        parentPos.eval = terminalScore(parentPos.fen) || whiteRel(parentRes.score, parentPos.fen);
-        parentPos.best = parentRes;
-      } catch { /* parent analysis failed, proceed anyway */ }
+  const v = S.variation, idx = v.idx, pos = v.positions[idx];
+  const valid = () => token === S.liveToken && S.analysisMode && S.variation === v
+    && v.idx === idx && v.positions[idx] === pos;
+  S.liveError = null;
+  S.liveEngine?.cancelPending();
+  S.liveEngine?.stop();
+  refreshVariation();
+  try {
+    // The classifier looks back up to three moves, requiring four prior positions.
+    const missing = [];
+    for (let i = idx; i >= Math.max(0, idx - 4); i--) {
+      if (!v.positions[i].best || !v.positions[i].eval) missing.push(i);
     }
-    const classification = classifyVariationMove(vIdx);
-    if (classification) {
-      pos.classif = classification;
+    if (!missing.length) return;
+    const eng = await ensureLiveEngine();
+    if (!valid()) return;
+    for (const i of missing) {
+      const node = v.positions[i];
+      const terminal = variationTerminal(v, i);
+      const res = terminal ? { score: terminal, bestmove: null, pv: "", lines: [] }
+        : await eng.analyse(node.fen, S.settings.engineDepth, S.settings.engineLines);
+      if (!valid()) return;
+      node.eval = terminal || whiteRel(res.score, node.fen);
+      node.best = res;
+      refreshVariation();
     }
+  } catch (e) {
+    if (!valid()) return;
+    S.liveError = "Stockfish stopped before this position was ready.";
+    if (S.liveEngine?.dead) { S.liveEngine.terminate(); S.liveEngine = null; }
+    refreshVariation();
   }
-  
-  // Also classify the NEXT variation move if it exists and is the current position
-  // This handles the case where the parent position was just analyzed and the next move
-  // is already on the board waiting for classification
-  const nextVIdx = vIdx + 1;
-  if (nextVIdx < S.variation.positions.length) {
-    const nextPos = S.variation.positions[nextVIdx];
-    if (nextPos && !nextPos.classif && nextPos.eval && nextPos.best) {
-      const classification = classifyVariationMove(nextVIdx);
-      if (classification) {
-        nextPos.classif = classification;
-      }
-    }
+}
+
+function refreshVariation() {
+  if (!S.analysisMode || !S.variation) return;
+  classifyVariationMoves();
+  paintBoard(); renderEvalBar(); renderMoves(); renderPlayers(); renderControls();
+  renderReview(); renderStats(); renderEngineCurrent();
+}
+
+function invalidateVariationEvals() {
+  if (!S.variation) return;
+  for (const p of S.variation.positions) { p.eval = null; p.best = null; p.classif = null; }
+}
+
+function resetLiveEngine() {
+  S.liveToken++; S.panelToken++; S.liveEngineGeneration++;
+  S.liveEngine?.terminate();
+  S.liveEngine = null; S.liveEnginePromise = null; S.liveError = null;
+}
+
+async function ensureLiveEngine() {
+  if (S.liveEngine && !S.liveEngine.dead) return S.liveEngine;
+  if (!S.liveEnginePromise) {
+    const generation = S.liveEngineGeneration;
+    const pending = createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill })
+      .then(eng => {
+        if (generation !== S.liveEngineGeneration) { eng.terminate(); throw new Error("Analysis cancelled"); }
+        S.liveEngine = eng;
+        return eng;
+      });
+    S.liveEnginePromise = pending;
+    pending.finally(() => { if (S.liveEnginePromise === pending) S.liveEnginePromise = null; }).catch(() => {});
   }
-  
-  // Update opening detection for explore mode
-  const isExplore = S.meta?.explore === true;
-  if (isExplore) {
-    const bk = bookLookup(fen);
-    if (Array.isArray(bk)) {
-      S.opening = { eco: bk[0], name: bk[1] };
-      renderReview(); // refresh opening display
-    }
-  }
-  renderEvalBar(); renderBestArrow(); renderEngineCurrent();
-  // Re-render move list and board to show classification badge
-  renderMoves(); paintBoard(); renderReview();
+  return S.liveEnginePromise;
+}
+
+function variationTerminal(v, idx) {
+  // Preserve repetition history rather than asking a fresh board about a single FEN.
+  const chess = new Chess(S.positions[0].fen);
+  const positions = [...S.positions.slice(1, v.branchIdx + 1), ...v.positions.slice(1, idx + 1)];
+  for (const p of positions) chess.move({ from: p.from, to: p.to, promotion: p.promotion || undefined });
+  if (chess.isCheckmate()) return { mate: chess.turn() === "w" ? -1 : 1 };
+  return chess.isDraw() ? { cp: 0 } : null;
 }
 // Exit analysis mode. With mainIdx: jump to that mainline position; otherwise stay put.
 // (Analysis mode is indicated/closed via the Exit button in the controls bar.)
 function exitAnalysis(mainIdx) {
   stopLineWalk();
+  if (S.meta?.explore && S.variation) { gotoVar(0); return; }
   if (!S.analysisMode) { if (mainIdx != null) go(mainIdx); return; }
   S.analysisMode = false; S.variation = null; S.selectedSq = null; S.liveToken++;
   if (mainIdx != null) { go(mainIdx); return; }
@@ -2767,11 +2591,12 @@ function renderControls() {
     const atEnd = v.idx >= v.positions.length - 1;
     // Same layout as the normal controls — the central green Play slot becomes a red Exit button.
     const atStart = v.idx <= 0;
-    const gotoVar = (i) => { stopLineWalk(); v.idx = Math.max(0, Math.min(v.positions.length - 1, i)); paintBoard(); renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent(); requestLiveEval(); };
     UI.controls.replaceChildren(
       el("button", { "aria-label": "Variation start", disabled: atStart, onclick: () => gotoVar(0) }, icon("first")),
       el("button", { "aria-label": "Previous move", onclick: navPrev }, icon("prev")),
-      el("button", { class: "exit-analysis", title: "Exit analysis (Esc)", onclick: () => exitAnalysis(v.branchIdx) }, el("span", { class: "ea-x" }, "✕"), "Exit"),
+      S.meta?.explore
+        ? el("span", { class: "pos" }, "Explore")
+        : el("button", { class: "exit-analysis", title: "Exit analysis (Esc)", onclick: () => exitAnalysis(v.branchIdx) }, el("span", { class: "ea-x" }, "✕"), "Exit"),
       el("button", { "aria-label": "Next move", disabled: atEnd, onclick: navNext }, icon("next")),
       el("button", { "aria-label": "Variation end", disabled: atEnd, onclick: () => gotoVar(v.positions.length - 1) }, icon("last")),
     );
@@ -2840,7 +2665,7 @@ function typeWrite(node, text) {
   step();
 }
 function openingStrip() {
-  const o = S.opening;
+  const o = (S.analysisMode && S.variation ? variationOpening() : S.opening);
   const line = o ? `${o.eco}${o.eco && o.name ? " · " : ""}${o.name}` : "Opening unknown";
   return el("div", { class: "ip-opening", title: line },
     el("span", { class: "ip-op-ic", html: ICONS.book || "" }),
@@ -3202,7 +3027,8 @@ function renderReview() {
     _ipSig = null;
     panel.append(el("div", { class: "ip-body" },
       el("div", { class: "ip-head" }),
-      el("div", { class: "ip-text" }, `Analysis stopped early: ${S.analysisError} You can change the engine settings and try again.`),
+      el("div", { class: "ip-text" }, `Analysis stopped early: ${S.analysisError}`),
+      el("button", { class: "engine-bestwalk", onclick: () => startAnalysis() }, "Retry analysis"),
     ));
     UI.review.replaceChildren(panel);
     return;
@@ -3212,6 +3038,13 @@ function renderReview() {
 
   if (S.analysisMode && S.variation) {
     _ipSig = null;
+    if (S.liveError) {
+      panel.append(el("div", { class: "ip-body" },
+        el("div", { class: "ip-text" }, S.liveError),
+        el("button", { class: "engine-bestwalk", onclick: () => requestLiveEval() }, "Retry analysis")));
+      UI.review.replaceChildren(panel);
+      return;
+    }
     // Exploring an engine sideline is not part of the played game, so the coach stays quiet here —
     // we show a plain, neutral note instead of a coach line (the eval still updates live below).
     // Mirror a move comment's layout exactly (empty .ip-head for the same top spacing + the note in
@@ -3653,9 +3486,9 @@ function renderMoves() {
     // In explore mode, show the variation moves
     const v = S.variation;
     const ml = S.settings.mlStyle;
-    // Use variation positions' own classification (pos.classif) for signature
-    const varClassifSig = v.positions.slice(1).map(p => p.classif || "").join(",");
-    const sig = ml + "|" + S.settings.badgeStyle + "|" + v.positions.length + "|" + varClassifSig;
+    // Position identity and selected move are part of the cache key.
+    const varClassifSig = v.positions.slice(1).map(p => [p.fen, p.san, p.classif]);
+    const sig = JSON.stringify([ml, S.settings.badgeStyle, v.idx, varClassifSig]);
     if (sig === _movesSig && UI.movesBody.firstChild) { return; }
     _movesSig = sig;
     let list;
@@ -3768,13 +3601,14 @@ async function requestPanelLines() {
   const fen = S.positions[i].fen;
   if (terminalScore(fen)) return;
   const token = ++S.panelToken;
-  if (!S.liveEngine) {
-    S.liveEngine = await createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill });
-    if (token !== S.panelToken) return;
-  }
-  S.liveEngine.stop();
-  let res; try { res = await S.liveEngine.analyse(fen, S.settings.engineDepth, want); } catch { return; }
-  if (token !== S.panelToken || S.idx !== i || S.analysisMode) return;   // navigated away → drop it
+  let res;
+  try {
+    const eng = await ensureLiveEngine();
+    if (token !== S.panelToken || S.analysisMode || activePos().fen !== fen) return;
+    eng.cancelPending(); eng.stop();
+    res = await eng.analyse(fen, S.settings.engineDepth, want);
+  } catch { return; }
+  if (token !== S.panelToken || S.idx !== i || S.analysisMode || activePos().fen !== fen) return;
   S._panelCache = { idx: i, fen, lines: res.lines };
   renderEngineCurrent();
 }
@@ -3785,9 +3619,11 @@ function renderEngine(lines, padFromCache = false) {
   // The last full set of real lines we rendered, kept (with the fen they were computed for, so the
   // SAN stays correct) to fill slots that the new position hasn't searched yet — and to hold the
   // panel steady while the engine re-computes (lines === null, e.g. "Play best moves from here").
-  const cached = S._lastEngineLines;
+  const cached = S._lastEngineLines?.fen === curFen ? S._lastEngineLines : null;
   let body;
-  if (lines && !lines.length) {
+  if (S.analysisMode && S.liveError) {
+    body = el("div", { class: "engine-empty" }, S.liveError);
+  } else if (lines && !lines.length) {
     S._lastEngineLines = null; // final position: nothing worth keeping
     body = el("div", { class: "engine-empty" }, "Final position.");
   } else if (!lines && !cached) {
@@ -4083,7 +3919,8 @@ function engineSlider(label, key, min, max, step, opts = {}) {
         out.textContent = fmt(v);
         S.settings[key] = v;
         browserAPI.storage.local.set({ settings: S.settings });
-        if (S.liveEngine) { try { S.liveEngine.terminate(); } catch {} S.liveEngine = null; S.liveToken++; }
+        resetLiveEngine();
+        invalidateVariationEvals();
         scheduleReanalyze();
       },
     }),
@@ -4116,6 +3953,8 @@ function applyClassificationChange() {
   clearTimeout(_clsT);
   _clsT = setTimeout(() => {
     computeDerived();
+    if (S.analysisMode && S.variation) refreshVariation();
+    else paintBoard();
     renderStats(); renderMoves(); renderReview(); renderGraph();
     if (!S.analysisMode) { renderBestArrow(); renderEngineCurrent(); }
   }, 60);
@@ -4124,7 +3963,8 @@ function applyClassificationChange() {
 async function resetEngineSettings() {
   for (const k of ENGINE_SETTING_KEYS) S.settings[k] = DEFAULT_SETTINGS[k];
   await browserAPI.storage.local.set({ settings: S.settings });
-  if (S.liveEngine) { try { S.liveEngine.terminate(); } catch {} S.liveEngine = null; S.liveToken++; }
+  resetLiveEngine();
+  invalidateVariationEvals();
   scheduleReanalyze();
   renderEngineCurrent();
   if (UI.settings && !UI.settings.hidden) renderSettings();
@@ -4420,7 +4260,13 @@ const CREDITS = [
     href: "https://github.com/lichess-org/lila/blob/master/LICENSE",
   },
   {
-    title: "Stockfish 18 NNUE (default)",
+    title: "Stockfish 19 NNUE (default for new installs)",
+    by: "Full single-threaded Stockfish.js 19.0.0 by Nathan Rugg (“nmrugg”), © 2026 Chess.com, LLC; based on the Stockfish team's engine and neural networks.",
+    lic: "GPLv3",
+    href: "https://github.com/nmrugg/stockfish.js/tree/v19.0.0",
+  },
+  {
+    title: "Stockfish 18 NNUE (lighter alternative)",
     by: "NNUE build © Chess.com, LLC — distributed as JS/WASM via Nathan Rugg’s (“nmrugg”) Stockfish.js.",
     lic: "GPLv3",
     href: "https://github.com/nmrugg/stockfish.js",
@@ -4438,13 +4284,19 @@ const CREDITS = [
     href: "https://github.com/official-stockfish/Stockfish",
   },
   {
-    title: "Neural network (NNUE)",
-    by: "Stockfish evaluation net by Linmiao Xu (“linrock”).",
+    title: "Neural networks (NNUE)",
+    by: "Stockfish team and network contributors; Stockfish 18's lite network by Linmiao Xu (“linrock”).",
     lic: "GPLv3",
     href: "https://tests.stockfishchess.org/nns",
   },
+  {
+    title: "Feature contributor — aciokie",
+    by: "Initial Explore board, alternative-move ratings, review reliability improvements, and Stockfish 19 integration (PR #4).",
+    lic: "GPLv3",
+    href: "https://github.com/T-Julsgaard/Chess-Review/pull/4",
+  },
 ];
-const REPO_URL = "https://github.com/aciokie/Chess-Review";
+const REPO_URL = "https://github.com/T-Julsgaard/Chess-Review";
 function openCredits() {
   document.querySelector(".credits-overlay")?.remove();
   const close = () => { overlay.remove(); document.removeEventListener("keydown", onKey); };
@@ -4511,14 +4363,14 @@ async function setSetting(key, value) {
 async function setEngineSetting(key, value) {
   S.settings[key] = value;
   await browserAPI.storage.local.set({ settings: S.settings });
-  if (S.liveEngine) { try { S.liveEngine.terminate(); } catch {} S.liveEngine = null; S.liveToken++; }
+  resetLiveEngine();
+  invalidateVariationEvals();
   // The helper engine (threat preview / practice judging) must also be rebuilt with the new
   // build/options, and any cached threat arrows recomputed.
   if (S.helperEngine) { try { S.helperEngine.terminate(); } catch {} S.helperEngine = null; }
   S.threatCache.clear();
   // In analysis mode: reset the variation's cached evals, so they're recomputed with new options.
   if (S.analysisMode && S.variation) {
-    for (const p of S.variation.positions) { p.eval = null; p.best = null; }
     requestLiveEval();
   }
   // Classification always searches a single line now, and the engine panel fills extra candidate
@@ -4527,7 +4379,7 @@ async function setEngineSetting(key, value) {
   // refresh the panel (which kicks off an on-demand search if more lines are wanted).
   const lineKey = key === "engineLines" || key === "fastLines" || key === "fastAnalysis";
   const displayOnly = lineKey && !S.analyzing;
-  if (!displayOnly) scheduleReanalyze();
+  if (!displayOnly && !S.meta?.explore) scheduleReanalyze();
   renderEngineCurrent();
   if (UI.settings && !UI.settings.hidden) renderSettings();
 }
@@ -4903,24 +4755,11 @@ function practiceAttempt(from, to) {
    Every fully-analyzed game is saved to browserAPI.storage.local under "library". The sidebar
    lives off the left edge and slides in on hover; games can be sorted (recent / your accuracy /
    opponent rating) and filtered (result, time class). Clicking a game re-opens it for analysis. */
-// 64-bit FNV-1a hash for better collision resistance (vs old 32-bit djb2).
-// Returns a base36 string. Stable, deterministic, fast.
+// Preserve existing PGN-based library IDs.
 function simpleHash(str) {
-  // FNV-1a 64-bit constants
-  let hi = 0x6c62272e, lo = 0x07bb0142; // offset basis
-  for (let i = 0; i < str.length; i++) {
-    const c = str.charCodeAt(i);
-    lo ^= c;
-    hi ^= (lo >>> 31) & 0xffffffff; // carry from lo to hi
-    // Multiply by FNV prime (1099511628211 = 0x100000001b3)
-    // (hi * 0x100000001b3) + (lo * 0x100000001b3) in 64-bit
-    const hiMul = (hi * 0x100) + (lo >>> 32);
-    const loMul = (lo * 0x100000001b3) | 0;
-    hi = (hiMul * 0x100000001 + (loMul >>> 32)) | 0;
-    lo = loMul;
-  }
-  // Combine hi and lo into a base36 string
-  return ((hi >>> 0).toString(36) + (lo >>> 0).toString(36).padStart(8, "0")).slice(0, 16);
+  let h = 5381;
+  for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+  return (h >>> 0).toString(36);
 }
 // "win" / "loss" / "draw" / "" from the result, relative to the user's side.
 function myResult() {
@@ -4947,72 +4786,81 @@ function currentGameId() {
   return (S.meta && S.meta.gameId) || ("pgn:" + simpleHash(S.pgn || ""));
 }
 
-// Read the latest library from storage to avoid concurrent-write data loss.
-async function getLibrary() {
-  try {
-    const store = await browserAPI.storage.local.get("library");
-    return Array.isArray(store.library) ? store.library : [];
-  } catch {
-    return S.library || [];
-  }
+function analysisSettingsKey() {
+  return JSON.stringify([S.settings.enginePath, S.settings.engineDepth, S.settings.classifyLines,
+    S.settings.engineHash, S.settings.engineSkill]);
 }
 
-// Write library to storage and update local cache.
-async function setLibrary(lib) {
-  S.library = lib;
-  await browserAPI.storage.local.set({ library: lib });
-  renderLibrary();
+function completeAnalysis(saved, count) {
+  return !!saved && Array.isArray(saved.bests) && saved.bests.length === count
+    && saved.bests.every(Boolean) && Array.isArray(saved.evals) && saved.evals.length === count
+    && saved.evals.every(e => e && (Number.isFinite(e.cp) || Number.isFinite(e.mate)));
+}
+
+function canRestoreAnalysis(saved) {
+  return completeAnalysis(saved, S.total + 1) && saved.pgn === S.pgn
+    && saved.settingsKey === analysisSettingsKey();
 }
 
 function saveToLibrary() {
   try {
-    if (!S.pgn) return;
+    if (!S.pgn || S.meta?.explore || S.total === 0 || S.analyzing || S.analysisError
+      || !completeAnalysis(S, S.total + 1)) return;
     const id = currentGameId();
     const opSide = S.meSide === "w" ? "b" : "w";
-    getLibrary().then((lib) => {
-      const prev = lib.find((g) => g.id === id);
-      const noMistakes = practiceSpots().length === 0;
-      const solved = noMistakes || !!(prev && prev.solved);
-      const rec = {
-        id, savedAt: Date.now(), pgn: S.pgn, meta: S.meta || {},
-        meSide: S.meSide,
-        myName: S.players[S.meSide].name, opName: S.players[opSide].name,
-        myAcc: S.acc[S.meSide], opAcc: S.acc[opSide],
-        myRating: parseInt(S.players[S.meSide].rating, 10) || null,
-        opRating: parseInt(S.players[opSide].rating, 10) || null,
-        result: myResult(), type: gameType(),
-        eco: S.opening ? S.opening.eco : "", opening: S.opening ? S.opening.name : "",
-        date: S.headers.UTCDate || S.headers.Date || "",
-        url: (S.meta && S.meta.url) || "",
-        fav: !!(prev && prev.fav), solved,
-      };
-      const newLib = lib.filter((g) => g.id !== id);
-      newLib.unshift(rec);
-      let dropped = [];
-      if (newLib.length > 300) { dropped = newLib.slice(300); newLib.length = 300; }
-      const writes = { library: newLib, ["analysis:" + id]: { evals: S.evals, bests: S.bests, multipv: S.analyzedMultipv } };
-      browserAPI.storage.local.set(writes);
-      if (dropped.length) browserAPI.storage.local.remove(dropped.map((d) => "analysis:" + d.id));
-      S.library = newLib;
-      renderLibrary();
-    });
+    const prev = S.library.find((g) => g.id === id);
+    // "solved" = no mistakes to practice (clean game) OR practice was already completed before.
+    const noMistakes = practiceSpots().length === 0;
+    const solved = noMistakes || !!(prev && prev.solved);
+    const rec = {
+      id, savedAt: Date.now(), pgn: S.pgn, meta: S.meta || {},
+      meSide: S.meSide,
+      myName: S.players[S.meSide].name, opName: S.players[opSide].name,
+      myAcc: S.acc[S.meSide], opAcc: S.acc[opSide],
+      myRating: parseInt(S.players[S.meSide].rating, 10) || null,
+      opRating: parseInt(S.players[opSide].rating, 10) || null,
+      result: myResult(), type: gameType(),
+      eco: S.opening ? S.opening.eco : "", opening: S.opening ? S.opening.name : "",
+      date: S.headers.UTCDate || S.headers.Date || "",
+      url: (S.meta && S.meta.url) || "",
+      fav: !!(prev && prev.fav), solved,
+    };
+    const lib = S.library.filter((g) => g.id !== id);   // replace on re-analysis (no duplicates)
+    lib.unshift(rec);
+    // Cap the list; drop the analysis blobs of any games that fall off the end.
+    let dropped = [];
+    if (lib.length > 300) { dropped = lib.slice(300); lib.length = 300; }
+    S.library = lib;
+    // The heavy analysis (evals + engine lines) is stored under its own key so the library list
+    // stays light, and so re-opening a saved game can render instantly WITHOUT re-analyzing.
+    const writes = { library: lib, ["analysis:" + id]: {
+      pgn: S.pgn, settingsKey: analysisSettingsKey(), engineBuild: S.activeEngineBuild,
+      evals: S.evals, bests: S.bests, multipv: S.analyzedMultipv,
+    } };
+    browserAPI.storage.local.set(writes).catch(e => console.warn("library save failed", e));
+    if (dropped.length) browserAPI.storage.local.remove(dropped.map((d) => "analysis:" + d.id));
+    renderLibrary();
   } catch (e) { console.warn("library save failed", e); }
 }
 async function openLibraryGame(rec) {
-  if (rec.id === currentGameId()) return;
+  if (rec.id === currentGameId()) return;   // already open
+  // Pull the stored analysis so the re-opened game shows up already analyzed (no re-run).
   let analysis = null;
   try { const s = await browserAPI.storage.local.get("analysis:" + rec.id); analysis = s["analysis:" + rec.id] || null; } catch {}
+  // Switch in place — no page reload, no black flash. The sidebar stays open (it only closes when
+  // the mouse leaves the library area), so you can pick another game right away. Reproduce the exact
+  // perspective the game was saved with: prefer a stored flip hint, else the saved meSide — so a
+  // re-opened game is never seated the wrong way up regardless of the current stored username.
   const flip = (rec.meta && rec.meta.flip != null) ? rec.meta.flip : (rec.meSide === "b");
   applyGame({ pgn: rec.pgn, meta: { ...(rec.meta || {}), flip }, source: "library", analysis });
 }
 // Toggle a game's favorite flag and persist it.
 function toggleFav(id) {
-  getLibrary().then((lib) => {
-    const rec = lib.find((r) => r.id === id);
-    if (!rec) return;
-    rec.fav = !rec.fav;
-    setLibrary(lib);
-  });
+  const rec = S.library.find((r) => r.id === id);
+  if (!rec) return;
+  rec.fav = !rec.fav;
+  browserAPI.storage.local.set({ library: S.library });
+  renderLibrary();
 }
 // Apply the active sort + filters.
 function libRecords() {
@@ -5156,8 +5004,8 @@ document.addEventListener("keydown", (e) => {
   if (S.practice) { if (e.key === "Escape") exitPractice(); return; }
   if (e.key === "ArrowLeft") navPrev();
   else if (e.key === "ArrowRight") navNext();
-  else if (e.key === "Home") gotoMainline(0);
-  else if (e.key === "End") gotoMainline(S.total);
+  else if (e.key === "Home") { if (S.analysisMode) gotoVar(0); else gotoMainline(0); }
+  else if (e.key === "End") { if (S.analysisMode) gotoVar(S.variation.positions.length - 1); else gotoMainline(S.total); }
   else if (e.key === "Escape") { if (S.analysisMode) exitAnalysis(); }
   else if (e.key === "f" && !e.ctrlKey && !e.metaKey) toggleFlip(); // Ctrl+F must not flip the board
 });
@@ -5173,7 +5021,10 @@ document.addEventListener("keydown", (e) => {
 let _reanalyzeT = null;
 function scheduleReanalyze() {
   clearTimeout(_reanalyzeT);
-  _reanalyzeT = setTimeout(() => startAnalysis(), 400);
+  _reanalyzeT = setTimeout(() => {
+    if (S.meta?.explore) requestLiveEval();
+    else startAnalysis();
+  }, 400);
 }
 function terminateEngines() {
   if (S.evalEngines) for (const e of S.evalEngines) { try { e.terminate(); } catch {} }
@@ -5194,6 +5045,7 @@ function requestProgress(gen) {
   setTimeout(() => flushProgress(gen), Math.max(0, 140 - (Date.now() - _progLast)));
 }
 async function startAnalysis() {
+  if (S.meta?.explore) { await requestLiveEval(); return; }
   const gen = ++S.batchGen;
   terminateEngines();
   S.evals = new Array(S.total + 1).fill(null);
@@ -5217,21 +5069,22 @@ async function startAnalysis() {
   // createEngine() readies each worker AND falls back down the build chain if the chosen build can't
   // load — so the whole batch survives e.g. NNUE failing, and S.activeEngineBuild reflects the build
   // actually in use. If no build can start at all, surface it instead of leaving a stuck "Analyzing…".
-  let engines;
-  try {
-    engines = await Promise.all(
-      Array.from({ length: nWorkers }, () => createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill }))
-    );
-  } catch (e) {
-    console.error("[Chess Review] no Stockfish build could be started:", e);
+  const starts = await Promise.allSettled(
+    Array.from({ length: nWorkers }, () => createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill }))
+  );
+  const engines = starts.filter(r => r.status === "fulfilled").map(r => r.value);
+  if (gen !== S.batchGen) { engines.forEach(e => e.terminate()); return; }
+  const failed = starts.find(r => r.status === "rejected");
+  if (failed) {
+    engines.forEach(e => e.terminate());
+    console.error("[Chess Review] no Stockfish build could be started:", failed.reason);
     S.evalEngines = []; S.analyzing = false;
     S.analysisError = "the engine could not be started in this browser.";
     S.verdict = "Engine unavailable — couldn't start Stockfish in this browser.";
-    try { renderReview(); } catch {}
+    flushProgress(gen);
     return;
   }
   S.evalEngines = engines;
-  if (gen !== S.batchGen) { terminateEngines(); return; }
 
   // Shared work queue. `nextIdx++` is atomic (no await between read and increment in a
   // single-threaded runtime), so each position is handed to exactly one worker. Completion
@@ -5243,11 +5096,13 @@ async function startAnalysis() {
     while (gen === S.batchGen) {
       const i = nextIdx++;
       if (i > S.total) return;
-      const res = await eng.analyse(S.positions[i].fen, S.settings.engineDepth, multipv);
+      const terminal = terminalScore(S.positions[i].fen, i);
+      const res = terminal ? { score: terminal, bestmove: null, pv: "", lines: [] }
+        : await eng.analyse(S.positions[i].fen, S.settings.engineDepth, multipv);
       if (gen !== S.batchGen) return;
       S.bests[i] = res;
       // Terminal positions (mate/stalemate) are decided from the board — not from the engine's "mate 0".
-      S.evals[i] = terminalScore(S.positions[i].fen) || whiteRel(res.score, S.positions[i].fen);
+      S.evals[i] = terminal || whiteRel(res.score, S.positions[i].fen);
       if (i > 0) S.completed++;
       while (contig + 1 <= S.total && S.bests[contig + 1]) contig++;
       S.progress = Math.max(0, contig);
@@ -5303,6 +5158,8 @@ async function applyGame(payload) {
   const isExplore = payload.meta?.explore === true;
 
   // Tear down anything tied to the previous game.
+  clearTimeout(_reanalyzeT);
+  resetLiveEngine();
   S.batchGen++;                 // invalidate any in-flight analysis workers
   terminateEngines();
   if (S.autoTimer) { clearInterval(S.autoTimer); S.autoTimer = null; }
@@ -5314,6 +5171,7 @@ async function applyGame(payload) {
   S.selectedSq = null; S.userArrows = []; S.userMarks = []; S.lineWalking = false;
   revRefs = null; statsRefs = null; _lastCommentKey = -1; _ipSig = null; S._turnPly = null;
   S._lastEngineLines = null;
+  _movesSig = null;
 
   applyDetectedTheme(payload.theme);
   applySettings();
@@ -5360,11 +5218,12 @@ async function applyGame(payload) {
   if (saved == null && !("analysis" in payload)) {
     try { const k = "analysis:" + currentGameId(); const s = await browserAPI.storage.local.get(k); saved = s[k] || null; } catch {}
   }
-  const restored = saved && Array.isArray(saved.bests) && saved.bests.length === S.total + 1 && Array.isArray(saved.evals);
+  const restored = canRestoreAnalysis(saved);
   if (restored) {
     S.evals = saved.evals;
     S.bests = saved.bests;
     S.analyzedMultipv = saved.multipv || null;
+    S.activeEngineBuild = saved.engineBuild || S.settings.enginePath;
     S.analyzing = false;
     S.progress = S.total;
     S.completed = S.total;
@@ -5467,9 +5326,6 @@ async function resetLegacyZoom() {
 }
 (async function main() {
   try {
-    // Initialize openings database first so it's ready when loadBook() is called
-    await initOpeningsDb();
-    
     // Only the job + stored prefs are needed to build and show the UI. The opening book (~690 KB)
     // and the calibration file are only consumed once scoring/opening refinement runs, so we load
     // them in parallel and don't block the first paint on them — buildUI() can run as soon as the
@@ -5563,25 +5419,3 @@ async function resetLegacyZoom() {
     console.error(err);
   }
 })();
-
-// TEST-ONLY: exposes internal functions for regression tests.
-// Do not use this namespace in production code.
-export const __testInternals = {
-  classifyMove,
-  classifyVariationMove,
-  scoreToCp,
-  terminalScore,
-  isSacrifice,
-  getStandardRating,
-  bookLookup,
-  _moveLoss,
-  _sacAt,
-  _forcedAt,
-  computeDerived,
-  _evalPawns,
-  _mateFor,
-  _isMateEval,
-  _isCheckmate,
-  moveAccuracy,
-  sideAccuracies,
-};
