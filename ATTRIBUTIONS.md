@@ -68,19 +68,28 @@ By **Kadagaden**, from the `chess-pieces` repository.
 - **Files:** `engine/stockfish*.js`, `engine/stockfish*.wasm`
 - **Project:** Stockfish.js by Nathan Rugg (nmrugg), a JS/WASM port of Stockfish —
   https://github.com/nmrugg/stockfish.js
-- **Default build:** `engine/stockfish-nnue.{js,wasm}` is **Stockfish.js 18, © Chess.com,
+- **Default for new installs:** `engine/stockfish-19-nnue.{js,wasm}` is **Stockfish.js
+  19.0.0, © 2026 Chess.com, LLC**, Nathan Rugg's full, single-threaded NNUE build.
+  The files are the upstream `stockfish-19-single.js` and `stockfish-19-single.wasm`,
+  renamed locally. Existing users retain their saved engine preference.
+  - Release: https://github.com/nmrugg/stockfish.js/releases/tag/v19.0.0
+  - Corresponding source and build instructions: https://github.com/nmrugg/stockfish.js/tree/v19.0.0
+  - License: https://github.com/nmrugg/stockfish.js/blob/v19.0.0/Copying.txt
+  - File checksums and provenance: [`engine/README.md`](engine/README.md)
+- **Lighter alternative:** `engine/stockfish-nnue.{js,wasm}` is **Stockfish.js 18, © Chess.com,
   LLC** (per the file header), a NNUE-enabled build distributed via nmrugg's Stockfish.js.
 - **Fallback builds:** `engine/stockfish.{js,wasm}` and `engine/stockfish.asm.js` are the
   Stockfish 10 builds from nmrugg's Stockfish.js.
-- **NNUE evaluation network:** by Linmiao Xu ("linrock") —
+- **NNUE evaluation networks:** Stockfish team and network contributors; the bundled
+  Stockfish 18 lite network is by Linmiao Xu ("linrock") —
   https://tests.stockfishchess.org/nns
-- **License:** GPL / GPLv3 — https://github.com/nmrugg/stockfish.js/blob/master/license.txt
+- **License:** GPL / GPLv3 — https://github.com/nmrugg/stockfish.js/blob/v19.0.0/Copying.txt
 - **Upstream:** Stockfish by T. Romstad, M. Costalba, J. Kiiski, G. Linscott and
   contributors — https://github.com/official-stockfish/Stockfish
 - Corresponding source for the bundled engine is available at the URLs above.
 
 ## Opening book
-- **File:** `data/book.json` (built from `data/raw/*.tsv`)
+- **File:** `data/book.json` (bundled offline; updated only with extension releases)
 - **Source:** `lichess-org/chess-openings`
 - **License:** CC0 (public domain) — https://github.com/lichess-org/chess-openings
 

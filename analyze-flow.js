@@ -7,7 +7,11 @@ import { browserAPI } from "./browser-compat.js";
 
 /** Save the analysis payload and open analysis.html in a new tab. */
 export async function openAnalysisTab(payload) {
-  const jobId = String(Date.now());
+  // The popup, keyboard shortcut, and in-page button can all launch a review. A timestamp
+  // alone collides when two of those arrive in the same millisecond, causing one tab to read
+  // the other tab's payload. UUIDs keep each storage handoff independent.
+  const jobId = globalThis.crypto?.randomUUID?.()
+    || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   await browserAPI.storage.local.set({ [`job:${jobId}`]: payload });
   await browserAPI.tabs.create({
     url: browserAPI.runtime.getURL(`analysis.html#${jobId}`),
@@ -73,10 +77,11 @@ export async function analyzeActiveTab(username) {
   const isLichess = (info && info.site === "lichess") || /:\/\/(www\.)?lichess\.org\//i.test(tab.url || "");
   if (isLichess) return analyzeLichessTab(info, tab.url || "");
 
-  // Game id: prefer parsing the tab URL with the canonical parser (authoritative, and works even if
-  // the content script is stale or its copy of the regex has drifted), then fall back to whatever the
-  // content script reported. This keeps the lookup working off the module's single source of truth.
-  const gameId = parseGameId(tab.url)?.id || (info && info.gameId) || null;
+  // Game id: prefer the content script's real-time location.pathname (authoritative for SPA navigation
+  // where tab.url may lag behind history.pushState), then fall back to the tab URL. The content script
+  // reads location.pathname at message time, so it always reflects the current page even during SPA
+  // transitions. The tab URL is kept as fallback for cases where the content script isn't injected yet.
+  const gameId = (info && info.gameId) || parseGameId(tab.url)?.id || null;
   if (!gameId) {
     // Surface a diagnostic when the page clearly IS a game page but no id parsed — that means the URL
     // scheme changed and GAME_ID_RE (chesscom.js + content.js) needs widening.

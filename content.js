@@ -368,7 +368,9 @@ function buildReviewButton(widthClass, mt = 14, mb = 3) {
       clearTimeout(resetTimer);
       btn.disabled = false;
       label.textContent = "Reload the page ↻";
-      console.warn("[Chess Analyzer] extension context lost (it was reloaded/updated) — reload this chess.com tab to reconnect.", e);
+      // An existing content script is detached when the extension is reloaded. It cannot
+      // reconnect itself; the tab must load once more to receive the new script.
+      console.info("[Chess Analyzer] The extension was updated. Reload this tab to reconnect the review button.");
     }
   });
   return btn;

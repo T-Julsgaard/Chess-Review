@@ -9,7 +9,7 @@ import { flagCodeForCountryId, countryNameForId } from "./flags.js";
 import { browserAPI } from "./browser-compat.js";
 
 /* ---------------- Opening book ----------------
- * Offline lookup table built from lichess-org/chess-openings (see data/build-book.mjs).
+ * Offline lookup table built from lichess-org/chess-openings (bundled in data/book.json).
  * Key = "epd" (the first 4 FEN fields: board, side, castling, en passant) → either
  * [eco, name] for a named theory position or 0 for "known, but unnamed".
  * Used for true book detection and opening naming in computeDerived(). */
@@ -128,7 +128,7 @@ const ENGINE_INFO = {
   engineDepth:   "How many plies (half-moves) deep Stockfish searches each position. Higher depth gives more accurate evaluations and fewer false mistakes, but takes longer.",
   engineWorkers: "Number of Stockfish instances analysing positions in parallel. More workers finish the game faster on multi-core CPUs; the results are identical.",
   fastAnalysis:  "Trades quality for speed: the classification pass uses fewer engine lines. ~1.3×/1.6× faster, but evals shift slightly and clean games can pick up a few false inaccuracies.",
-  enginePath:    "Which Stockfish build to run. Stockfish 18 NNUE (default) is the strongest; Stockfish 10 (WASM) is lighter; asm.js is a fallback for browsers without WebAssembly support.",
+  enginePath:    "Which Stockfish build to run. Stockfish 19 (default) is the strongest; Stockfish 18 NNUE is lighter; Stockfish 10 (WASM) is lighter still; asm.js is a fallback for browsers without WebAssembly support.",
   engineSkill:   "Caps the engine's playing strength (Stockfish 'Skill Level'). Max (20) = full strength. Lower values play deliberately weaker — useful for more human-like suggestions.",
   engineHash:    "Memory (MB) for the engine's transposition table — its cache of already-searched positions. More can speed up deep searches; setting it too high just wastes RAM.",
   clsGood:       "A move that loses at least this much eval (in pawns) can be no better than \"Good\". Below it, the move is \"Excellent\". Lower = stricter.",
@@ -237,7 +237,7 @@ const DEFAULT_SETTINGS = {
   // viewing, so changing this never re-analyzes — it just refreshes the panel.
   // Depth 16 (was 12): shallow searches give noisy evals that fabricate inaccuracies/mistakes and
   // inflate the accuracy variance vs the reference values. Deeper search is the single biggest accuracy fix.
-  engineLines: 1, engineDepth: 16, enginePath: "nnue", engineHash: 16, engineSkill: 20,
+  engineLines: 1, engineDepth: 16, enginePath: "sf19", engineHash: 16, engineSkill: 20,
   // Parallel analysis workers: independent single-threaded Stockfish instances that pull
   // positions from a shared queue. Each position is still searched identically (cold, same
   // depth/lines), so results are unchanged — only the wall-clock is parallelized. Default ≈
@@ -270,11 +270,11 @@ const ENGINE_SETTING_KEYS = [
   "accExcellent", "accGood", "accInacc", "accMiss", "accMistake", "accBlunder",
 ];
 // Available Stockfish builds (all bundled). "asm" = fallback without wasm.
-const ENGINE_BUILDS = { nnue: "engine/stockfish-nnue.js", wasm: "engine/stockfish.js", asm: "engine/stockfish.asm.js" };
+const ENGINE_BUILDS = { sf19: "engine/stockfish-19-nnue.js", nnue: "engine/stockfish-nnue.js", wasm: "engine/stockfish.js", asm: "engine/stockfish.asm.js" };
 // Fixed strength order, strongest → weakest. createEngine() always tries the user's chosen build
 // first, then walks DOWN this chain so a build that can't load (e.g. NNUE one day failing) degrades
 // to the next-strongest one that does — rather than the analysis silently hanging.
-const ENGINE_FALLBACK_ORDER = ["nnue", "wasm", "asm"];
+const ENGINE_FALLBACK_ORDER = ["sf19", "nnue", "wasm", "asm"];
 // The engine panel shows up to this many candidate lines (searched on demand for the viewed position).
 const ENGINE_MAX_LINES = 4;
 // Best-move arrow color — a muted hint green.
@@ -401,7 +401,16 @@ function shareGame(ev) {
     // PC whose stored handle doesn't match either player — the username stays the safety net, the
     // flip is the certainty. (flip = is the user Black / sitting after a board flip.)
     const meta = { ...S.meta, flip: S.flipped, myName: (S.players?.[S.meSide]?.name) || S.username || "" };
-    const data = encodeURIComponent(b64encode(JSON.stringify({ pgn: S.pgn, meta })));
+    let pgn = S.pgn;
+    if (S.meta?.explore && S.variation) {
+      const chess = new Chess(S.variation.positions[0].fen);
+      for (const p of S.variation.positions.slice(1, S.variation.idx + 1)) {
+        chess.move({ from: p.from, to: p.to, promotion: p.promotion || undefined });
+      }
+      pgn = chess.pgn();
+      delete meta.explore;
+    }
+    const data = encodeURIComponent(b64encode(JSON.stringify({ pgn, meta })));
     const carrier = ((S.meta && S.meta.url) ? S.meta.url : "https://www.chess.com/").split("#")[0];
     const url = carrier + "#gambit=" + data;
     navigator.clipboard.writeText(url)
@@ -615,7 +624,10 @@ const S = {
   acc: { w: null, b: null }, accElo: { w: null, b: null }, counts: { w: {}, b: {} },
   bookCount: 0, opening: null, verdict: "Analyzing …",
   idx: 0, total: 0, flipped: false,
-  analyzing: true, progress: 0, userArrows: [], userMarks: [], qbreakExpanded: false,
+  // `progress` is the contiguous prefix that is safe to navigate to while a batch is
+  // still running. `completed` is the total number of game plies already returned by
+  // any worker. They differ when parallel workers finish out of order.
+  analyzing: true, progress: 0, completed: 0, analysisError: null, userArrows: [], userMarks: [], qbreakExpanded: false,
   // Collapsible settings sections: open/closed state, keyed by section title.
   setOpen: {},
   settings: { ...DEFAULT_SETTINGS },
@@ -623,7 +635,7 @@ const S = {
   evalEngines: [], autoTimer: null,
   // Re-analysis + analysis mode
   batchGen: 0, settingsTab: "visual", analyzedMultipv: null,
-  analysisMode: false, variation: null, liveEngine: null, liveToken: 0, panelToken: 0, _panelCache: null, selectedSq: null,
+  analysisMode: false, variation: null, liveEngine: null, liveEnginePromise: null, liveEngineGeneration: 0, liveError: null, liveToken: 0, panelToken: 0, _panelCache: null, selectedSq: null,
   // The build that is ACTUALLY running (set by createEngine; may differ from settings.enginePath if
   // the chosen build failed to load and we fell back). The Engine tab shows this, not the selection.
   activeEngineBuild: null,
@@ -670,11 +682,23 @@ function activeBest() {
 async function loadJob() {
   const jobId = location.hash.replace(/^#/, "");
   if (!jobId) throw new Error("No analysis job specified.");
+
+  // Explore mode: standalone Lichess-style analysis board
+  if (jobId === "explore") {
+    const startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    return {
+      pgn: `[SetUp "1"]\n[FEN "${startFen}"]\n\n*`,
+      meta: { explore: true },
+      source: "explore",
+    };
+  }
+
   const key = `job:${jobId}`;
   const data = await browserAPI.storage.local.get(key);
   const payload = data[key];
   if (!payload) throw new Error("Analysis data not found (open via the popup).");
-  await browserAPI.storage.local.remove(key);
+  // NOTE: Do NOT remove the job here — two-phase load: keep it until applyGame succeeds,
+  // so a failed initialization (corrupt PGN, engine crash, etc.) leaves the data for a retry.
   return payload;
 }
 function parseHeaders(pgn) {
@@ -698,8 +722,32 @@ function buildPositions(pgn) {
   // No moves → keep whatever position the PGN set up (a [FEN] header for a pasted FEN), not the
   // standard start. With moves, the start is the position before the first one.
   const startFen = moves.length ? moves[0].before : c.fen();
-  const pos = [{ fen: startFen, san: null }];
-  for (const mv of moves) pos.push({ fen: mv.after, san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "" });
+  
+  // Replay the game move by move to track draw conditions at each position.
+  // This correctly detects threefold repetition, 50-move rule, etc.
+  const pos = [];
+  const replay = new Chess(startFen);
+  
+  function getDrawType(chess) {
+    if (chess.isCheckmate()) return "checkmate";
+    if (chess.isStalemate()) return "stalemate";
+    if (chess.isDrawByFiftyMoves()) return "fifty-move";
+    if (chess.isInsufficientMaterial()) return "insufficient-material";
+    if (chess.isThreefoldRepetition()) return "threefold";
+    return null;
+  }
+  
+  // Initial position
+  const startDraw = getDrawType(replay);
+  pos.push({ fen: startFen, san: null, draw: startDraw });
+  
+  for (const mv of moves) {
+    replay.move({ from: mv.from, to: mv.to, promotion: mv.promotion });
+    const fen = mv.after;
+    
+    const draw = getDrawType(replay);
+    pos.push({ fen, san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "", draw });
+  }
   return pos;
 }
 function deriveOpening(h) {
@@ -729,7 +777,19 @@ function derivePlayers(h, meta, username) {
 }
 
 /* ---------------- Math ---------------- */
-function scoreToCp(s) { return !s ? 0 : s.mate != null ? (s.mate > 0 ? 10000 : -10000) : s.cp; }
+// Convert score to centipawns, preserving mate distance.
+// Mate scores are mapped to large but finite values: mate in N → ±(10000 - N*100)
+// This preserves the ordering: Mate in 1 > Mate in 2 > ... > large advantage
+function scoreToCp(s) {
+  if (!s) return 0;
+  if (s.mate != null) {
+    const m = s.mate;
+    // Cap at reasonable distance to avoid overflow; mate > 50 treated as "mate in many"
+    const dist = Math.min(Math.abs(m), 50);
+    return m > 0 ? 10000 - dist * 100 : -10000 + dist * 100;
+  }
+  return s.cp;
+}
 function whiteRel(score, fen) {
   if (!score) return null;
   const flip = fen.split(" ")[1] === "b" ? -1 : 1;
@@ -739,12 +799,31 @@ function whiteRel(score, fen) {
 // position has no legal moves, and Stockfish typically reports "score mate 0" — an unsigned
 // zero, which would otherwise always be interpreted as the same side (wrong eval bar on mate).
 // We decide the result directly from the board and return a white-relative score.
-function terminalScore(fen) {
+// Uses pre-computed draw info from S.positions when available to correctly detect
+// threefold repetition, 50-move rule, etc.
+function terminalScore(fen, plyIndex) {
+  // Try to find the position in S.positions to use pre-computed draw info
+  if (plyIndex != null && S.positions && S.positions[plyIndex]) {
+    const pos = S.positions[plyIndex];
+    if (pos.fen === fen && pos.draw) {
+      if (pos.draw === "checkmate") return { mate: fen.split(" ")[1] === "w" ? -1 : 1 };
+      if (pos.draw !== "checkmate") return { cp: 0 }; // stalemate, fifty-move, insufficient-material, threefold
+    }
+  }
+  
+  // Fallback: try to find by FEN in all positions (for variation positions, etc.)
+  if (S.positions) {
+    const found = S.positions.find((p) => p.fen === fen);
+    if (found && found.draw) {
+      if (found.draw === "checkmate") return { mate: fen.split(" ")[1] === "w" ? -1 : 1 };
+      if (found.draw !== "checkmate") return { cp: 0 };
+    }
+  }
+  
+  // Last resort: create Chess instance (won't detect threefold correctly without history)
   let c; try { c = new Chess(fen); } catch { return null; }
-  // Checkmate: the side to move is checkmated → it loses. White-relative: white-to-move
-  // means white is mated (black wins, negative); black-to-move means white wins.
   if (c.isCheckmate()) return { mate: fen.split(" ")[1] === "w" ? -1 : 1 };
-  if (c.isDraw()) return { cp: 0 }; // stalemate, 50-move, insufficient material, threefold
+  if (c.isDraw()) return { cp: 0 };
   return null;
 }
 function winPct(cp) { return 50 + 50 * (2 / (1 + Math.exp(-calWinK() * cp)) - 1); }
@@ -913,17 +992,17 @@ function isSacrifice(move) {
   return false;
 }
 // --- Eval readouts (all from our white-relative S.evals[]) ---
-function _evalPawnsWhite(k) { const e = S.evals[k]; return e ? scoreToCp(e) / 100 : null; }
-function _evalPawns(k, mover) { const p = _evalPawnsWhite(k); return p == null ? null : (mover === "w" ? p : -p); }
-function _isMateEval(k) { const e = S.evals[k]; return !!(e && e.mate != null); }
+function _evalPawnsWhite(k, state = S) { const e = state.evals[k]; return e ? scoreToCp(e) / 100 : null; }
+function _evalPawns(k, mover, state = S) { const p = _evalPawnsWhite(k, state); return p == null ? null : (mover === "w" ? p : -p); }
+function _isMateEval(k, state = S) { const e = state.evals[k]; return !!(e && e.mate != null); }
 // Mate distance from `mover`'s POV at position k (>0 = mover mating, <0 = mover being mated).
-function _mateFor(k, mover) { const e = S.evals[k]; if (!e || e.mate == null) return null; return mover === "w" ? e.mate : -e.mate; }
-function _isCheckmate(k) { try { return new Chess(S.positions[k].fen).isCheckmate(); } catch { return false; } }
+function _mateFor(k, mover, state = S) { const e = state.evals[k]; if (!e || e.mate == null) return null; return mover === "w" ? e.mate : -e.mate; }
+function _isCheckmate(k, state = S) { try { return new Chess(state.positions[k].fen).isCheckmate(); } catch { return false; } }
 // Eval loss (pawns, the mover's own POV) of the move that produced position k.
-function _moveLoss(k) {
+function _moveLoss(k, state = S) {
   if (k < 1) return null;
-  const m = S.positions[k].color;
-  const a = _evalPawns(k - 1, m), b = _evalPawns(k, m);
+  const m = state.positions[k].color;
+  const a = _evalPawns(k - 1, m, state), b = _evalPawns(k, m, state);
   return (a == null || b == null) ? null : a - b;
 }
 // Baseline bucket on the WIN%-DROP (the "expected points" model),
@@ -941,15 +1020,15 @@ function getStandardRating(wp) {
 }
 // Per-ply move category, ported from getMoveRating(). `mover` made move i; `isTop` = it was the
 // engine's #1; `book` = the resulting position is theory; arrays sac/std/loss are indexed by ply.
-function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop) {
+function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop, state = S) {
   if (book) return "book";
   // "Forced": only one legal move in the position before — we have no separate icon, so it reads
   // as Best (you couldn't have done better).
-  if (_forcedAt(i)) return "best";   // only one legal move — you couldn't have done better
+  if (_forcedAt(i, state)) return "best";   // only one legal move — you couldn't have done better
 
   // User-tunable thresholds (Engine settings → Move classification), all in pawns of eval.
-  const CA = S.settings.clsClearAdv, ML = S.settings.clsMistakeLoss, MT = S.settings.clsMissTol;
-  const mate = _isMateEval, evalFor = (k) => _evalPawns(k, mover);
+  const CA = state.settings.clsClearAdv, ML = state.settings.clsMistakeLoss, MT = state.settings.clsMissTol;
+  const mate = (k) => _isMateEval(k, state), evalFor = (k) => _evalPawns(k, mover, state);
   const winningNow = (evalFor(i) ?? 0) > 0;
   const prevWinning = (evalFor(i - 1) ?? 0) > 0;
   const notMateRel = !mate(i) && !mate(i - 1);
@@ -957,10 +1036,10 @@ function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop) {
   const pStd = (n) => (i - 1 - n >= 1 ? std[i - 1 - n] : null);
   const pLoss = (n) => (i - 1 - n >= 1 ? loss[i - 1 - n] : null);
   // mover-POV "lost a clear advantage" / "fell into a clear disadvantage" (CA pawns) for move k.
-  const losingAdvAt = (k) => { const m = S.positions[k].color; const a = _evalPawns(k - 1, m), b = _evalPawns(k, m); return a != null && b != null && a >= CA && b < CA; };
-  const givingAdvAt = (k) => { const m = S.positions[k].color; const a = _evalPawns(k - 1, m), b = _evalPawns(k, m); return a != null && b != null && a >= -CA && b < -CA; };
-  const keepMating = (k) => { const c = _mateFor(k, S.positions[k].color), p = _mateFor(k - 1, S.positions[k].color); return c != null && p != null && c > 0 && p > 0 && c <= p; };
-  const advanceMate = (k) => { const c = _mateFor(k, S.positions[k].color), p = _mateFor(k - 1, S.positions[k].color); return c != null && p != null && c < 0 && p < 0 && c > p; };
+  const losingAdvAt = (k) => { const m = state.positions[k].color; const a = _evalPawns(k - 1, m, state), b = _evalPawns(k, m, state); return a != null && b != null && a >= CA && b < CA; };
+  const givingAdvAt = (k) => { const m = state.positions[k].color; const a = _evalPawns(k - 1, m, state), b = _evalPawns(k, m, state); return a != null && b != null && a >= -CA && b < -CA; };
+  const keepMating = (k) => { const c = _mateFor(k, state.positions[k].color, state), p = _mateFor(k - 1, state.positions[k].color, state); return c != null && p != null && c > 0 && p > 0 && c <= p; };
+  const advanceMate = (k) => { const c = _mateFor(k, state.positions[k].color, state), p = _mateFor(k - 1, state.positions[k].color, state); return c != null && p != null && c < 0 && p < 0 && c > p; };
 
   const previousMistake = wasNotMateRel(0) && pStd(0) === "inacc" && pLoss(0) >= ML && (losingAdvAt(i - 1) || givingAdvAt(i - 1));
   const previousPreviousMistake = wasNotMateRel(1) && pStd(1) === "inacc" && pLoss(1) >= ML && (losingAdvAt(i - 2) || givingAdvAt(i - 2));
@@ -979,10 +1058,10 @@ function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop) {
   if (!previousMiss && wasNotMateRel(0) && notMateRel && std[i] === "excellent"
     && (previousMistake || pStd(0) === "blunder")) return "great";
 
-  if (isTop && _isCheckmate(i)) return "best";
+  if (isTop && _isCheckmate(i, state)) return "best";
   if (isTop) return "best";
 
-  if (_isCheckmate(i)) return "excellent";
+  if (_isCheckmate(i, state)) return "excellent";
   if (!mate(i - 1) && mate(i) && winningNow) return "excellent";                                             // starts a mate
   if (mate(i - 1) && mate(i) && keepMating(i) && winningNow) return "excellent";                             // keeps the mate
   if (mate(i - 1) && mate(i) && !keepMating(i) && winningNow) return "good";                                 // delays own mate
@@ -1008,6 +1087,43 @@ function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop) {
   }
   return std[i];   // plain excellent / good / inaccuracy / blunder
 }
+
+// Include the played game's history before the branch so Great/Miss/Brilliant
+// have exactly the same context as normal review. Never overwrite the mainline.
+function classifyVariationMoves() {
+  const v = S.variation;
+  if (!v) return;
+  const branch = v.branchIdx;
+  const nodes = v.positions.slice(1);
+  const state = {
+    positions: [...S.positions.slice(0, branch + 1), ...nodes],
+    evals: [...S.evals.slice(0, branch), ...v.positions.map(p => p.eval)],
+    bests: [...S.bests.slice(0, branch), ...v.positions.map(p => p.best)],
+    settings: S.settings, players: S.players, openingHeader: S.openingHeader,
+    _sacCache: [...S._sacCache.slice(0, branch + 1), ...nodes.map(p => p._sac)],
+    _forcedCache: [...S._forcedCache.slice(0, branch + 1), ...nodes.map(p => p._forced)],
+    total: branch + nodes.length,
+  };
+  classifyLine(state);
+  nodes.forEach((p, i) => {
+    const ply = branch + i + 1;
+    p.classif = state.classif[ply];
+    p._sac = state._sacCache[ply];
+    p._forced = state._forcedCache[ply];
+  });
+}
+
+function variationOpening() {
+  const v = S.variation;
+  let opening = S.meta?.explore ? null : S.openingHeader;
+  const positions = [...S.positions.slice(0, v.branchIdx), ...v.positions.slice(0, v.idx + 1)];
+  for (const pos of positions) {
+    const bk = bookLookup(pos.fen);
+    if (Array.isArray(bk) && bk[1]) opening = { eco: bk[0], name: bk[1] };
+  }
+  return opening;
+}
+
 // Displayed (category-based) per-move accuracy from the category — the basis of the shown game
 // accuracy. Best/Brilliant/Great/Book are always 100; the rest are tunable (Engine settings →
 // Accuracy points). The Elo estimate keeps using the win%-based accuracy (sideAccuracies), not this.
@@ -1026,19 +1142,19 @@ function catAcc(cls) {
 // Sacrifice/forced are functions of the board only (not the eval), so they're cached per ply for
 // the whole analysis — computeDerived runs many times while the batch fills in, and isSacrifice is
 // the one non-trivial cost here. Caches are reset whenever a new game's positions are built.
-function _sacAt(i) {
-  if (S._sacCache[i] !== undefined) return S._sacCache[i];
-  const p = S.positions[i];
+function _sacAt(i, state = S) {
+  if (state._sacCache[i] !== undefined) return state._sacCache[i];
+  const p = state.positions[i];
   let v = false;
-  if (p && !p.promotion) v = isSacrifice({ before: S.positions[i - 1].fen, after: p.fen, color: p.color, captured: p.captured, from: p.from });
-  S._sacCache[i] = v;
+  if (p && !p.promotion) v = isSacrifice({ before: state.positions[i - 1].fen, after: p.fen, color: p.color, captured: p.captured, from: p.from });
+  state._sacCache[i] = v;
   return v;
 }
-function _forcedAt(i) {
-  if (S._forcedCache[i] !== undefined) return S._forcedCache[i];
+function _forcedAt(i, state = S) {
+  if (state._forcedCache[i] !== undefined) return state._forcedCache[i];
   let v = false;
-  try { v = new Chess(S.positions[i - 1].fen).moves().length === 1; } catch {}
-  S._forcedCache[i] = v;
+  try { v = new Chess(state.positions[i - 1].fen).moves().length === 1; } catch {}
+  state._forcedCache[i] = v;
   return v;
 }
 // Estimated ratings are reported in steps of 50, so we quantize to the NEAREST 50 (round-to-nearest
@@ -1074,11 +1190,11 @@ function estimateElo(acc, rating) {
   return estimateEloFromAcc(acc);
 }
 
-function computeDerived() {
-  const N = S.total;
-  S.classif = new Array(N + 1).fill(null);
-  S.accMove = new Array(N + 1).fill(null);
-  if (!S._sacCache || S._sacCache.length !== N + 1) { S._sacCache = new Array(N + 1).fill(undefined); S._forcedCache = new Array(N + 1).fill(undefined); }
+function classifyLine(state) {
+  const N = state.total;
+  state.classif = new Array(N + 1).fill(null);
+  state.accMove = new Array(N + 1).fill(null);
+  if (!state._sacCache || state._sacCache.length !== N + 1) { state._sacCache = new Array(N + 1).fill(undefined); state._forcedCache = new Array(N + 1).fill(undefined); }
 
   // Per-ply inputs for the ported classifier. The classifier only ever looks BACKWARDS, so one
   // forward pass to fill std/loss/sac/isTop is enough; a second pass assigns the final category.
@@ -1091,45 +1207,54 @@ function computeDerived() {
 
   // True book detection: a move is "book" if the position it leads to is in the opening book
   // (data/book.json). Alongside, the deepest named theory position gives the opening name.
-  S.bookCount = 0;
+  state.bookCount = 0;
   let bookOpening = null;
   for (let i = 1; i <= N; i++) {
-    const bk = bookLookup(S.positions[i].fen);
+    const bk = bookLookup(state.positions[i].fen);
     if (Array.isArray(bk)) bookOpening = { eco: bk[0], name: bk[1] };
     bookAt[i] = bk !== undefined;
 
-    const mover = S.positions[i].color;
-    const bestSearch = S.bests[i - 1];
-    const before = S.evals[i - 1];
+    const mover = state.positions[i].color;
+    const bestSearch = state.bests[i - 1];
+    const before = state.evals[i - 1];
 
     // win%-based move accuracy (kept solely as the Elo estimate's input). With MultiPV=1 the played
     // move is rarely in the single line, so winAfter falls back to the after-position search —
     // i.e. the same consecutive-eval comparison the category logic uses.
     if (bestSearch && before) {
-      const playedUci = (S.positions[i].from || "") + (S.positions[i].to || "") + (S.positions[i].promotion || "");
+      const playedUci = (state.positions[i].from || "") + (state.positions[i].to || "") + (state.positions[i].promotion || "");
       const lines = bestSearch.lines || [];
       const winBefore = lines.length ? winPct(scoreToCp(lines[0].score)) : moverWin(before, mover);
       let winAfter = null;
       for (const ln of lines) { if ((ln.pv || "").split(" ")[0] === playedUci) { winAfter = winPct(scoreToCp(ln.score)); break; } }
-      if (winAfter == null && S.evals[i]) winAfter = moverWin(S.evals[i], mover);
-      if (winAfter != null) { S.accMove[i] = moveAccuracy(Math.max(0, winBefore - winAfter) * calAccMult(S.players[mover]?.rating)); wpDrop[i] = Math.max(0, winBefore - winAfter); }
-      const bestUci = (bestSearch.bestmove || "").slice(0, 4);
-      isTop[i] = !!bestUci && bestUci === playedUci.slice(0, 4);
+      if (winAfter == null && state.evals[i]) winAfter = moverWin(state.evals[i], mover);
+      if (winAfter != null) { state.accMove[i] = moveAccuracy(Math.max(0, winBefore - winAfter) * calAccMult(state.players[mover]?.rating)); wpDrop[i] = Math.max(0, winBefore - winAfter); }
+      const bestUci = bestSearch.bestmove || "";
+      isTop[i] = !!bestUci && bestUci === playedUci;
     }
 
-    loss[i] = _moveLoss(i);
+    loss[i] = _moveLoss(i, state);
     std[i] = getStandardRating(wpDrop[i]);   // bucket on win%-drop, not raw pawns
-    sac[i] = _sacAt(i);
+    sac[i] = _sacAt(i, state);
   }
   // Second pass: final category per ply (Brilliant-Chess logic). A move stays unlabelled until both
   // its own and the previous position's eval are in, so the panel fills in cleanly during analysis.
   for (let i = 1; i <= N; i++) {
-    if (bookAt[i]) { S.classif[i] = "book"; S.bookCount++; continue; }
-    if (S.evals[i] == null || S.evals[i - 1] == null) { S.classif[i] = null; continue; }
-    S.classif[i] = classifyMove(i, S.positions[i].color, isTop[i], false, sac, std, loss, wpDrop);
+    if (state.evals[i] == null || state.evals[i - 1] == null) { state.classif[i] = null; continue; }
+    // Some opening datasets include traps from the losing side. Never let theory
+    // hide a losing mate or a move the engine rates as an error.
+    const safeBook = bookAt[i] && !((_mateFor(i, state.positions[i].color, state) ?? 0) < 0)
+      && wpDrop[i] != null && wpDrop[i] < (CALIB?.clsWp?.inacc ?? 5);
+    state.classif[i] = classifyMove(i, state.positions[i].color, isTop[i], safeBook, sac, std, loss, wpDrop, state);
+    if (state.classif[i] === "book") state.bookCount++;
   }
   // Opening name: prefer the book's clean name over the chess.com header's ECOUrl slug.
-  S.opening = bookOpening || S.openingHeader;
+  state.opening = bookOpening || state.openingHeader;
+}
+
+function computeDerived() {
+  classifyLine(S);
+  const N = S.total;
   const eloAccs = sideAccuracies();   // win%-based accuracy → Elo (unchanged)
   for (const side of ["w", "b"]) {
     const counts = {}; QUALITY_ORDER.forEach((k) => (counts[k] = 0));
@@ -1572,8 +1697,17 @@ function paintBoard() {
   const clean = !!S.practice && S.idx === solvePly;
   const showCat = !S.practice || S.idx === solvePly + 1;
   const hl = clean ? new Set() : new Set([pos.from, pos.to].filter(Boolean));
-  // Variation moves aren't classified either.
-  const cls = (S.analysisMode || !showCat) ? null : S.classif[S.idx];
+  // Get classification for the current position (mainline or variation)
+  let cls = null;
+  if (showCat) {
+    if (S.analysisMode && S.variation && S.variation.idx > 0) {
+      // In analysis mode with variation: use the variation position's classification
+      cls = pos.classif || null;
+    } else if (!S.analysisMode) {
+      // Mainline: use the mainline classification
+      cls = S.classif[S.idx] || null;
+    }
+  }
   // The from/to squares are tinted with the classification color (chess.com style) at 0.5 alpha;
   // without a classification we fall back to the neutral yellow highlight.
   const tint = cls && QUALITY[cls]
@@ -1732,23 +1866,23 @@ function renderUserArrows(preview) {
 }
 function refreshArrows() { renderBestArrow(); renderUserArrows(); renderThreatArrow(); }
 // Create a ready Engine, trying the user's chosen build first and then falling back DOWN the
-// strength chain (nnue → wasm → asm) if it can't load. Every build is bundled, so a fallback never
+// strength chain (sf19 → nnue → wasm → asm) if it can't load. Every build is bundled, so a fallback never
 // needs the network. The build that actually started is recorded in S.activeEngineBuild so the
 // Engine tab reflects what's really running — essential if e.g. NNUE ever stops working. `opts` are
 // the UCI options (Hash / Skill Level); applying them also awaits the handshake, which now REJECTS
 // on a dead build (timeout / worker error) instead of hanging forever.
 let _engineFellBack = false; // warn once per page if we ever leave the preferred build
 async function createEngine(opts = {}) {
-  const preferred = ENGINE_BUILDS[S.settings.enginePath] ? S.settings.enginePath : "nnue";
+  const preferred = ENGINE_BUILDS[S.settings.enginePath] ? S.settings.enginePath : DEFAULT_SETTINGS.enginePath;
   // Preferred build first, then the remaining builds in fixed strongest→weakest order (no repeats).
-  const order = [preferred, ...ENGINE_FALLBACK_ORDER.filter((k) => k !== preferred)];
+  const order = ENGINE_FALLBACK_ORDER.slice(ENGINE_FALLBACK_ORDER.indexOf(preferred));
   let lastErr = null;
   for (const key of order) {
     const eng = new Engine(ENGINE_BUILDS[key]);
     try {
       await eng.setOptions(opts); // awaits the handshake; throws if this build failed to load
       eng.buildKey = key;
-      setActiveEngineBuild(key);
+      if (S.settings.enginePath === preferred) setActiveEngineBuild(key);
       if (key !== preferred && !_engineFellBack) {
         _engineFellBack = true;
         console.warn(`[Chess Review] engine build '${preferred}' failed to load — fell back to '${key}'. ` +
@@ -2001,7 +2135,7 @@ function applyUserMove(from, to, animate = true) {
   let c, mv;
   try { c = new Chess(fen); mv = c.move({ from, to, promotion: "q" }); } catch { mv = null; }
   if (!mv) { S.selectedSq = null; renderSelection(); return; }
-  const node = { fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, eval: null, best: null };
+  const node = { fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "", eval: null, best: null };
   if (!S.analysisMode) {
     // On the mainline (and only if the position is analyzed): if the move matches the next
     // mainline move, just stay on the mainline.
@@ -2010,7 +2144,16 @@ function applyUserMove(from, to, animate = true) {
     if (reachable && nextMain && nextMain.from === from && nextMain.to === to) {
       S.selectedSq = null; go(S.idx + 1); return;
     }
-    S.variation = { branchIdx: S.idx, positions: [{ fen: S.positions[S.idx].fen, san: null }, node], idx: 1 };
+    S.variation = { 
+      branchIdx: S.idx, 
+      positions: [{ 
+        fen: S.positions[S.idx].fen, 
+        san: null, 
+        eval: S.evals[S.idx] || null, 
+        best: S.bests[S.idx] || null 
+      }, node], 
+      idx: 1 
+    };
     S.analysisMode = true;
   } else {
     const v = S.variation;
@@ -2032,7 +2175,19 @@ function playLine(pv) {
   const ucis = (pv || "").split(/\s+/).filter(Boolean);
   if (!ucis.length) return;
   if (!S.analysisMode) {
-    S.variation = { branchIdx: S.idx, positions: [{ fen: activePos().fen, san: null }], idx: 0 };
+    const currentPos = activePos();
+    const currentIdx = S.analysisMode && S.variation ? S.variation.idx : S.idx;
+    const isMainline = !S.analysisMode;
+    S.variation = { 
+      branchIdx: isMainline ? S.idx : S.variation.branchIdx, 
+      positions: [{ 
+        fen: currentPos.fen, 
+        san: null, 
+        eval: isMainline ? (S.evals[S.idx] || null) : (currentPos.eval || null),
+        best: isMainline ? (S.bests[S.idx] || null) : (currentPos.best || null)
+      }], 
+      idx: 0 
+    };
     S.analysisMode = true;
   } else {
     const v = S.variation;
@@ -2044,7 +2199,7 @@ function playLine(pv) {
   for (const u of ucis) {
     let mv; try { mv = c.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u.slice(4, 5) || "q" }); } catch { mv = null; }
     if (!mv) break;
-    v.positions.push({ fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, eval: null, best: null });
+    v.positions.push({ fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "", eval: null, best: null });
   }
   // Start just one move into the line (not at the end) — the rest plays out automatically.
   v.idx = Math.min(startIdx + 1, v.positions.length - 1);
@@ -2100,7 +2255,18 @@ function stopBestWalk() {
 async function playBestMoves() {
   stopLineWalk();              // cancel any other walk (also bumps bestWalkToken)
   if (!S.analysisMode) {
-    S.variation = { branchIdx: S.idx, positions: [{ fen: activePos().fen, san: null }], idx: 0 };
+    const currentPos = activePos();
+    const isMainline = true;
+    S.variation = { 
+      branchIdx: S.idx, 
+      positions: [{ 
+        fen: currentPos.fen, 
+        san: null, 
+        eval: isMainline ? (S.evals[S.idx] || null) : (currentPos.eval || null),
+        best: isMainline ? (S.bests[S.idx] || null) : (currentPos.best || null)
+      }], 
+      idx: 0 
+    };
     S.analysisMode = true;
   } else {
     S.variation.positions = S.variation.positions.slice(0, S.variation.idx + 1); // play out from here
@@ -2109,24 +2275,13 @@ async function playBestMoves() {
   const token = ++S.bestWalkToken;
   S.bestWalking = true;
   paintBoard(); renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent();
-  // Ensure the engine exists.
-  if (!S.liveEngine) {
-    S.liveEngine = await createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill });
-    if (token !== S.bestWalkToken) return;
-  }
   for (let n = 0; n < BEST_WALK_MAX; n++) {
     if (token !== S.bestWalkToken || !S.analysisMode || !S.variation) return;
     const v = S.variation;
     const pos = v.positions[v.idx];
-    if (terminalScore(pos.fen)) break;                 // mate / stalemate / 50-move etc.
-    // Best move for this position (analyze fresh unless we already have it).
-    if (!pos.best) {
-      S.liveEngine.stop();
-      let res; try { res = await S.liveEngine.analyse(pos.fen, S.settings.engineDepth, S.settings.engineLines); } catch { return; }
-      if (token !== S.bestWalkToken || !S.analysisMode || !S.variation) return;
-      pos.eval = terminalScore(pos.fen) || whiteRel(res.score, pos.fen);
-      pos.best = res;
-    }
+    await requestLiveEval();
+    if (token !== S.bestWalkToken || !S.analysisMode || S.variation !== v) return;
+    if (S.liveError || variationTerminal(v, v.idx) || !pos.best) break;
     renderEvalBar(); renderBestArrow(); renderEngineCurrent();
     const uci = (pos.best.bestmove || "");
     if (uci.length < 4) break;                          // no legal move → done
@@ -2136,37 +2291,100 @@ async function playBestMoves() {
     let c, mv;
     try { c = new Chess(pos.fen); mv = c.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci.slice(4, 5) || "q" }); } catch { mv = null; }
     if (!mv) break;
-    v.positions.push({ fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, eval: null, best: null });
+    v.positions.push({ fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "", eval: null, best: null });
     v.idx = v.positions.length - 1;
     playSanSound(mv.san);
     paintBoard(); renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent();
+    // Classify the move that was just played
+    await requestLiveEval();
   }
   if (token === S.bestWalkToken) { S.bestWalking = false; renderControls(); renderEngineCurrent(); }
 }
 // Live analysis of the current variation position (its own engine instance, so the batch isn't disturbed).
 async function requestLiveEval() {
+  const token = ++S.liveToken; // navigation always invalidates pending work, even on cache hits
   if (!S.analysisMode || !S.variation) return;
-  const pos = activePos();
-  if (pos.best) { renderEvalBar(); renderBestArrow(); renderEngineCurrent(); return; } // already computed
-  const token = ++S.liveToken;
-  if (!S.liveEngine) {
-    S.liveEngine = await createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill });
-    if (token !== S.liveToken) return;
+  const v = S.variation, idx = v.idx, pos = v.positions[idx];
+  const valid = () => token === S.liveToken && S.analysisMode && S.variation === v
+    && v.idx === idx && v.positions[idx] === pos;
+  S.liveError = null;
+  S.liveEngine?.cancelPending();
+  S.liveEngine?.stop();
+  refreshVariation();
+  try {
+    // The classifier looks back up to three moves, requiring four prior positions.
+    const missing = [];
+    for (let i = idx; i >= Math.max(0, idx - 4); i--) {
+      if (!v.positions[i].best || !v.positions[i].eval) missing.push(i);
+    }
+    if (!missing.length) return;
+    const eng = await ensureLiveEngine();
+    if (!valid()) return;
+    for (const i of missing) {
+      const node = v.positions[i];
+      const terminal = variationTerminal(v, i);
+      const res = terminal ? { score: terminal, bestmove: null, pv: "", lines: [] }
+        : await eng.analyse(node.fen, S.settings.engineDepth, S.settings.engineLines);
+      if (!valid()) return;
+      node.eval = terminal || whiteRel(res.score, node.fen);
+      node.best = res;
+      refreshVariation();
+    }
+  } catch (e) {
+    if (!valid()) return;
+    S.liveError = "Stockfish stopped before this position was ready.";
+    if (S.liveEngine?.dead) { S.liveEngine.terminate(); S.liveEngine = null; }
+    refreshVariation();
   }
-  S.liveEngine.stop();
-  const fen = pos.fen;
-  let res;
-  try { res = await S.liveEngine.analyse(fen, S.settings.engineDepth, S.settings.engineLines); }
-  catch { return; }
-  if (token !== S.liveToken || !S.analysisMode) return;
-  pos.eval = terminalScore(fen) || whiteRel(res.score, fen);
-  pos.best = res;
-  renderEvalBar(); renderBestArrow(); renderEngineCurrent();
+}
+
+function refreshVariation() {
+  if (!S.analysisMode || !S.variation) return;
+  classifyVariationMoves();
+  paintBoard(); renderEvalBar(); renderMoves(); renderPlayers(); renderControls();
+  renderReview(); renderStats(); renderEngineCurrent();
+}
+
+function invalidateVariationEvals() {
+  if (!S.variation) return;
+  for (const p of S.variation.positions) { p.eval = null; p.best = null; p.classif = null; }
+}
+
+function resetLiveEngine() {
+  S.liveToken++; S.panelToken++; S.liveEngineGeneration++;
+  S.liveEngine?.terminate();
+  S.liveEngine = null; S.liveEnginePromise = null; S.liveError = null;
+}
+
+async function ensureLiveEngine() {
+  if (S.liveEngine && !S.liveEngine.dead) return S.liveEngine;
+  if (!S.liveEnginePromise) {
+    const generation = S.liveEngineGeneration;
+    const pending = createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill })
+      .then(eng => {
+        if (generation !== S.liveEngineGeneration) { eng.terminate(); throw new Error("Analysis cancelled"); }
+        S.liveEngine = eng;
+        return eng;
+      });
+    S.liveEnginePromise = pending;
+    pending.finally(() => { if (S.liveEnginePromise === pending) S.liveEnginePromise = null; }).catch(() => {});
+  }
+  return S.liveEnginePromise;
+}
+
+function variationTerminal(v, idx) {
+  // Preserve repetition history rather than asking a fresh board about a single FEN.
+  const chess = new Chess(S.positions[0].fen);
+  const positions = [...S.positions.slice(1, v.branchIdx + 1), ...v.positions.slice(1, idx + 1)];
+  for (const p of positions) chess.move({ from: p.from, to: p.to, promotion: p.promotion || undefined });
+  if (chess.isCheckmate()) return { mate: chess.turn() === "w" ? -1 : 1 };
+  return chess.isDraw() ? { cp: 0 } : null;
 }
 // Exit analysis mode. With mainIdx: jump to that mainline position; otherwise stay put.
 // (Analysis mode is indicated/closed via the Exit button in the controls bar.)
 function exitAnalysis(mainIdx) {
   stopLineWalk();
+  if (S.meta?.explore && S.variation) { gotoVar(0); return; }
   if (!S.analysisMode) { if (mainIdx != null) go(mainIdx); return; }
   S.analysisMode = false; S.variation = null; S.selectedSq = null; S.liveToken++;
   if (mainIdx != null) { go(mainIdx); return; }
@@ -2329,6 +2547,12 @@ function playerStrip(side) {
   );
 }
 function renderPlayers() {
+  const isExplore = S.meta?.explore === true;
+  if (isExplore) {
+    UI.playerTop.replaceChildren();
+    UI.playerBot.replaceChildren();
+    return;
+  }
   UI.playerTop.replaceChildren(playerStrip(S.flipped ? "w" : "b"));
   UI.playerBot.replaceChildren(playerStrip(S.flipped ? "b" : "w"));
   alignPlayers();
@@ -2367,11 +2591,12 @@ function renderControls() {
     const atEnd = v.idx >= v.positions.length - 1;
     // Same layout as the normal controls — the central green Play slot becomes a red Exit button.
     const atStart = v.idx <= 0;
-    const gotoVar = (i) => { stopLineWalk(); v.idx = Math.max(0, Math.min(v.positions.length - 1, i)); paintBoard(); renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent(); requestLiveEval(); };
     UI.controls.replaceChildren(
       el("button", { "aria-label": "Variation start", disabled: atStart, onclick: () => gotoVar(0) }, icon("first")),
       el("button", { "aria-label": "Previous move", onclick: navPrev }, icon("prev")),
-      el("button", { class: "exit-analysis", title: "Exit analysis (Esc)", onclick: () => exitAnalysis(v.branchIdx) }, el("span", { class: "ea-x" }, "✕"), "Exit"),
+      S.meta?.explore
+        ? el("span", { class: "pos" }, "Explore")
+        : el("button", { class: "exit-analysis", title: "Exit analysis (Esc)", onclick: () => exitAnalysis(v.branchIdx) }, el("span", { class: "ea-x" }, "✕"), "Exit"),
       el("button", { "aria-label": "Next move", disabled: atEnd, onclick: navNext }, icon("next")),
       el("button", { "aria-label": "Variation end", disabled: atEnd, onclick: () => gotoVar(v.positions.length - 1) }, icon("last")),
     );
@@ -2440,7 +2665,7 @@ function typeWrite(node, text) {
   step();
 }
 function openingStrip() {
-  const o = S.opening;
+  const o = (S.analysisMode && S.variation ? variationOpening() : S.opening);
   const line = o ? `${o.eco}${o.eco && o.name ? " · " : ""}${o.name}` : "Opening unknown";
   return el("div", { class: "ip-opening", title: line },
     el("span", { class: "ip-op-ic", html: ICONS.book || "" }),
@@ -2777,14 +3002,20 @@ function coachMoveSentence(idx) {
   }
   return line;
 }
+function analysisProgressText() {
+  // The initial position is searched too, but is not a played ply; keep the displayed
+  // denominator aligned with the game's move count.
+  const done = Math.min(S.total, S.completed == null ? S.progress : S.completed);
+  return `Analyzing … ${done}/${S.total}`;
+}
 function renderReview() {
   // In-place progress text during analysis (so the loader animation doesn't restart each move).
-  if (S.analyzing && revRefs) { revRefs.head.textContent = `Analyzing … ${S.progress}/${S.total}`; return; }
+  if (S.analyzing && revRefs) { revRefs.head.textContent = analysisProgressText(); return; }
 
   const panel = el("div", { class: "panel insight-panel" }, openingStrip());
 
   if (S.analyzing) {
-    const headEl = el("span", {}, `Analyzing … ${S.progress}/${S.total}`);
+    const headEl = el("span", {}, analysisProgressText());
     panel.append(el("div", { class: "ip-body" }, el("div", { class: "ip-analyzing" }, loaderNode("", "var(--accent)"), headEl)));
     revRefs = { head: headEl };
     UI.review.replaceChildren(panel);
@@ -2792,10 +3023,28 @@ function renderReview() {
   }
   revRefs = null;
 
+  if (S.analysisError) {
+    _ipSig = null;
+    panel.append(el("div", { class: "ip-body" },
+      el("div", { class: "ip-head" }),
+      el("div", { class: "ip-text" }, `Analysis stopped early: ${S.analysisError}`),
+      el("button", { class: "engine-bestwalk", onclick: () => startAnalysis() }, "Retry analysis"),
+    ));
+    UI.review.replaceChildren(panel);
+    return;
+  }
+
   if (S.practice) { _ipSig = null; panel.append(renderPracticeCoach()); UI.review.replaceChildren(panel); return; }
 
   if (S.analysisMode && S.variation) {
     _ipSig = null;
+    if (S.liveError) {
+      panel.append(el("div", { class: "ip-body" },
+        el("div", { class: "ip-text" }, S.liveError),
+        el("button", { class: "engine-bestwalk", onclick: () => requestLiveEval() }, "Retry analysis")));
+      UI.review.replaceChildren(panel);
+      return;
+    }
     // Exploring an engine sideline is not part of the played game, so the coach stays quiet here —
     // we show a plain, neutral note instead of a coach line (the eval still updates live below).
     // Mirror a move comment's layout exactly (empty .ip-head for the same top spacing + the note in
@@ -2974,6 +3223,29 @@ function jumpToCategory(side, k) {
   if (ply > 0) gotoMainline(ply);
 }
 function renderStats() {
+  const isExplore = S.meta?.explore === true;
+  if (isExplore) {
+    // In explore mode, show a simple panel with current position info
+    const pos = activePos();
+    const cls = pos.classif; // Use variation position's own classification
+    const cfg = cls && QUALITY[cls];
+    const ev = activeEval();
+    const evTxt = ev ? evalText(ev) : "—";
+    UI.stats.replaceChildren(el("div", { class: "panel" },
+      el("div", { class: "panel-head" }, el("h3", {}, "Position")),
+      el("div", { class: "panel-body" },
+        el("div", { class: "acc-row" },
+          el("div", { class: "acc-cell" },
+            cfg ? el("img", { class: "qb icon", src: qIcon(cls), alt: cfg.name, title: cfg.name, draggable: "false" }) : null,
+            el("span", { class: "acc-name" }, cfg ? cfg.name : "—"),
+            el("span", { class: "acc-val", style: { color: "var(--accent)" } }, evTxt),
+          ),
+        ),
+      ),
+    ));
+    statsRefs = null;
+    return;
+  }
   const opSide = S.meSide === "w" ? "b" : "w";
   const meAcc = S.acc[S.meSide], opAcc = S.acc[opSide];
   // The Elo model is fit to reference accuracy values, so feed it our best estimate of that number:
@@ -3055,6 +3327,13 @@ function renderStats() {
 
 /* ---------------- Eval graph ---------------- */
 function renderGraph() {
+  const isExplore = S.meta?.explore === true;
+  if (isExplore) {
+    const mod = UI.graph.closest(".mod");
+    if (mod) mod.hidden = true;
+    UI.graph.replaceChildren();
+    return;
+  }
   const show = S.settings.evalView === "both" || S.settings.evalView === "graph";
   const mod = UI.graph.closest(".mod");
   if (mod) mod.hidden = !show;   // hidden, not just emptied, so the layout closes the gap
@@ -3202,6 +3481,52 @@ function highlightCurrentMove() {
 }
 let _movesSig = null;
 function renderMoves() {
+  const isExplore = S.meta?.explore === true;
+  if (isExplore && S.variation) {
+    // In explore mode, show the variation moves
+    const v = S.variation;
+    const ml = S.settings.mlStyle;
+    // Position identity and selected move are part of the cache key.
+    const varClassifSig = v.positions.slice(1).map(p => [p.fen, p.san, p.classif]);
+    const sig = JSON.stringify([ml, S.settings.badgeStyle, v.idx, varClassifSig]);
+    if (sig === _movesSig && UI.movesBody.firstChild) { return; }
+    _movesSig = sig;
+    let list;
+    if (ml === "compact") {
+      list = el("div", { class: "movelist ml-compact ml-scroll" });
+      for (let i = 1; i < v.positions.length; i++) {
+        const pos = v.positions[i];
+        const cls = pos.classif; // Use variation position's own classification
+        const showBadge = cls && (NOTEWORTHY.has(cls) || S.settings.badgeStyle === "dot");
+        const glyph = GLYPH[pos.san && /^[KQRBN]/.test(pos.san) ? pos.san[0] : "P"];
+        const cell = el("span", { class: "ml-move" + (i === v.idx ? " current" : ""), "data-ply": i, onclick: () => gotoVar(i) },
+          el("span", { class: "pc", style: { color: pos.color === "w" ? "var(--ink)" : "var(--ink-2)" } }, glyph),
+          el("span", {}, pos.san),
+          showBadge ? qBadge(cls) : null,
+        );
+        list.append(cell);
+      }
+    } else {
+      list = el("div", { class: "movelist " + (ml === "cards" ? "ml-cards" : "ml-rows") + " ml-scroll" });
+      for (let i = 1; i < v.positions.length; i++) {
+        const pos = v.positions[i];
+        const cls = pos.classif; // Use variation position's own classification
+        const showBadge = cls && (NOTEWORTHY.has(cls) || S.settings.badgeStyle === "dot");
+        const glyph = GLYPH[pos.san && /^[KQRBN]/.test(pos.san) ? pos.san[0] : "P"];
+        const cell = el("span", { class: "ml-move" + (i === v.idx ? " current" : ""), "data-ply": i, onclick: () => gotoVar(i) },
+          el("span", { class: "pc", style: { color: pos.color === "w" ? "var(--ink)" : "var(--ink-2)" } }, glyph),
+          el("span", {}, pos.san),
+          showBadge ? qBadge(cls) : null,
+        );
+        list.append(el("div", { class: "ml-pair" }, cell));
+      }
+    }
+    UI.movesBody.style.padding = ml === "rows" ? "0" : "var(--pad)";
+    UI.movesBody.replaceChildren(list);
+    UI.movesCount.textContent = "";
+    UI.movesFoot.hidden = true;
+    return;
+  }
   const nMoves = Math.ceil(S.total / 2);
   const ml = S.settings.mlStyle;
   // The list's CONTENT only changes with the game, the layout/badge style, or the classifications
@@ -3276,26 +3601,29 @@ async function requestPanelLines() {
   const fen = S.positions[i].fen;
   if (terminalScore(fen)) return;
   const token = ++S.panelToken;
-  if (!S.liveEngine) {
-    S.liveEngine = await createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill });
-    if (token !== S.panelToken) return;
-  }
-  S.liveEngine.stop();
-  let res; try { res = await S.liveEngine.analyse(fen, S.settings.engineDepth, want); } catch { return; }
-  if (token !== S.panelToken || S.idx !== i || S.analysisMode) return;   // navigated away → drop it
+  let res;
+  try {
+    const eng = await ensureLiveEngine();
+    if (token !== S.panelToken || S.analysisMode || activePos().fen !== fen) return;
+    eng.cancelPending(); eng.stop();
+    res = await eng.analyse(fen, S.settings.engineDepth, want);
+  } catch { return; }
+  if (token !== S.panelToken || S.idx !== i || S.analysisMode || activePos().fen !== fen) return;
   S._panelCache = { idx: i, fen, lines: res.lines };
   renderEngineCurrent();
 }
-const ENGINE_NAME = { nnue: "Stockfish 18 NNUE", wasm: "Stockfish 10", asm: "Stockfish 10 (asm.js)" };
+const ENGINE_NAME = { sf19: "Stockfish 19", nnue: "Stockfish 18 NNUE", wasm: "Stockfish 10", asm: "Stockfish 10 (asm.js)" };
 function renderEngine(lines, padFromCache = false) {
   const curFen = activePos().fen;
   const want = S.settings.engineLines;
   // The last full set of real lines we rendered, kept (with the fen they were computed for, so the
   // SAN stays correct) to fill slots that the new position hasn't searched yet — and to hold the
   // panel steady while the engine re-computes (lines === null, e.g. "Play best moves from here").
-  const cached = S._lastEngineLines;
+  const cached = S._lastEngineLines?.fen === curFen ? S._lastEngineLines : null;
   let body;
-  if (lines && !lines.length) {
+  if (S.analysisMode && S.liveError) {
+    body = el("div", { class: "engine-empty" }, S.liveError);
+  } else if (lines && !lines.length) {
     S._lastEngineLines = null; // final position: nothing worth keeping
     body = el("div", { class: "engine-empty" }, "Final position.");
   } else if (!lines && !cached) {
@@ -3348,13 +3676,17 @@ function renderEngine(lines, padFromCache = false) {
 
 /* ---------------- Topbar meta ---------------- */
 function metaChips() {
+  const isExplore = S.meta?.explore === true;
+  if (isExplore) {
+    return [el("span", { class: "meta-chip" }, el("b", {}, "Explore"))];
+  }
   const res = S.players[S.meSide].result;
   let outcome = "Result unknown";
   if (res === "1-0") outcome = S.meSide === "w" ? "Victory" : "Loss";
   else if (res === "0-1") outcome = S.meSide === "b" ? "Victory" : "Loss";
   else if (res && res.includes("1/2")) outcome = "Draw";
   const tcRaw = S.meta.timeClass || S.headers.TimeControl || "";
-  const tc = tcRaw ? tcRaw.charAt(0).toUpperCase() + tcRaw.slice(1) : ""; // "bullet" → "Bullet"
+  const tc = tcRaw ? tcRaw.charAt(0).toUpperCase() + tcRaw.slice(1) : "";
   const date = S.headers.UTCDate || S.headers.Date || "";
   const chips = [el("span", { class: "meta-chip" }, el("b", {}, outcome))];
   if (tc) chips.push(el("span", { class: "meta-dot" }), el("span", { class: "meta-chip" }, icon("bolt"), el("b", {}, tc)));
@@ -3587,7 +3919,8 @@ function engineSlider(label, key, min, max, step, opts = {}) {
         out.textContent = fmt(v);
         S.settings[key] = v;
         browserAPI.storage.local.set({ settings: S.settings });
-        if (S.liveEngine) { try { S.liveEngine.terminate(); } catch {} S.liveEngine = null; S.liveToken++; }
+        resetLiveEngine();
+        invalidateVariationEvals();
         scheduleReanalyze();
       },
     }),
@@ -3620,6 +3953,8 @@ function applyClassificationChange() {
   clearTimeout(_clsT);
   _clsT = setTimeout(() => {
     computeDerived();
+    if (S.analysisMode && S.variation) refreshVariation();
+    else paintBoard();
     renderStats(); renderMoves(); renderReview(); renderGraph();
     if (!S.analysisMode) { renderBestArrow(); renderEngineCurrent(); }
   }, 60);
@@ -3628,7 +3963,8 @@ function applyClassificationChange() {
 async function resetEngineSettings() {
   for (const k of ENGINE_SETTING_KEYS) S.settings[k] = DEFAULT_SETTINGS[k];
   await browserAPI.storage.local.set({ settings: S.settings });
-  if (S.liveEngine) { try { S.liveEngine.terminate(); } catch {} S.liveEngine = null; S.liveToken++; }
+  resetLiveEngine();
+  invalidateVariationEvals();
   scheduleReanalyze();
   renderEngineCurrent();
   if (UI.settings && !UI.settings.hidden) renderSettings();
@@ -3860,6 +4196,7 @@ function motorSettings() {
       el("div", { class: "set-row" },
         setLabel("Build", ENGINE_INFO.enginePath),
         el("div", { class: "set-seg" },
+          el("button", { class: S.settings.enginePath === "sf19" ? "on" : "", onclick: () => setEngineSetting("enginePath", "sf19") }, "Stockfish 19"),
           el("button", { class: S.settings.enginePath === "nnue" ? "on" : "", onclick: () => setEngineSetting("enginePath", "nnue") }, "Stockfish 18 NNUE"),
           el("button", { class: S.settings.enginePath === "wasm" ? "on" : "", onclick: () => setEngineSetting("enginePath", "wasm") }, "Stockfish 10"),
           el("button", { class: S.settings.enginePath === "asm" ? "on" : "", onclick: () => setEngineSetting("enginePath", "asm") }, "asm.js"),
@@ -3923,7 +4260,13 @@ const CREDITS = [
     href: "https://github.com/lichess-org/lila/blob/master/LICENSE",
   },
   {
-    title: "Stockfish 18 NNUE (default)",
+    title: "Stockfish 19 NNUE (default for new installs)",
+    by: "Full single-threaded Stockfish.js 19.0.0 by Nathan Rugg (“nmrugg”), © 2026 Chess.com, LLC; based on the Stockfish team's engine and neural networks.",
+    lic: "GPLv3",
+    href: "https://github.com/nmrugg/stockfish.js/tree/v19.0.0",
+  },
+  {
+    title: "Stockfish 18 NNUE (lighter alternative)",
     by: "NNUE build © Chess.com, LLC — distributed as JS/WASM via Nathan Rugg’s (“nmrugg”) Stockfish.js.",
     lic: "GPLv3",
     href: "https://github.com/nmrugg/stockfish.js",
@@ -3941,10 +4284,16 @@ const CREDITS = [
     href: "https://github.com/official-stockfish/Stockfish",
   },
   {
-    title: "Neural network (NNUE)",
-    by: "Stockfish evaluation net by Linmiao Xu (“linrock”).",
+    title: "Neural networks (NNUE)",
+    by: "Stockfish team and network contributors; Stockfish 18's lite network by Linmiao Xu (“linrock”).",
     lic: "GPLv3",
     href: "https://tests.stockfishchess.org/nns",
+  },
+  {
+    title: "Feature contributor — aciokie",
+    by: "Initial Explore board, alternative-move ratings, review reliability improvements, and Stockfish 19 integration (PR #4).",
+    lic: "GPLv3",
+    href: "https://github.com/T-Julsgaard/Chess-Review/pull/4",
   },
 ];
 const REPO_URL = "https://github.com/T-Julsgaard/Chess-Review";
@@ -4014,14 +4363,14 @@ async function setSetting(key, value) {
 async function setEngineSetting(key, value) {
   S.settings[key] = value;
   await browserAPI.storage.local.set({ settings: S.settings });
-  if (S.liveEngine) { try { S.liveEngine.terminate(); } catch {} S.liveEngine = null; S.liveToken++; }
+  resetLiveEngine();
+  invalidateVariationEvals();
   // The helper engine (threat preview / practice judging) must also be rebuilt with the new
   // build/options, and any cached threat arrows recomputed.
   if (S.helperEngine) { try { S.helperEngine.terminate(); } catch {} S.helperEngine = null; }
   S.threatCache.clear();
   // In analysis mode: reset the variation's cached evals, so they're recomputed with new options.
   if (S.analysisMode && S.variation) {
-    for (const p of S.variation.positions) { p.eval = null; p.best = null; }
     requestLiveEval();
   }
   // Classification always searches a single line now, and the engine panel fills extra candidate
@@ -4030,7 +4379,7 @@ async function setEngineSetting(key, value) {
   // refresh the panel (which kicks off an on-demand search if more lines are wanted).
   const lineKey = key === "engineLines" || key === "fastLines" || key === "fastAnalysis";
   const displayOnly = lineKey && !S.analyzing;
-  if (!displayOnly) scheduleReanalyze();
+  if (!displayOnly && !S.meta?.explore) scheduleReanalyze();
   renderEngineCurrent();
   if (UI.settings && !UI.settings.hidden) renderSettings();
 }
@@ -4406,6 +4755,7 @@ function practiceAttempt(from, to) {
    Every fully-analyzed game is saved to browserAPI.storage.local under "library". The sidebar
    lives off the left edge and slides in on hover; games can be sorted (recent / your accuracy /
    opponent rating) and filtered (result, time class). Clicking a game re-opens it for analysis. */
+// Preserve existing PGN-based library IDs.
 function simpleHash(str) {
   let h = 5381;
   for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
@@ -4435,9 +4785,27 @@ function gameType() {
 function currentGameId() {
   return (S.meta && S.meta.gameId) || ("pgn:" + simpleHash(S.pgn || ""));
 }
+
+function analysisSettingsKey() {
+  return JSON.stringify([S.settings.enginePath, S.settings.engineDepth, S.settings.classifyLines,
+    S.settings.engineHash, S.settings.engineSkill]);
+}
+
+function completeAnalysis(saved, count) {
+  return !!saved && Array.isArray(saved.bests) && saved.bests.length === count
+    && saved.bests.every(Boolean) && Array.isArray(saved.evals) && saved.evals.length === count
+    && saved.evals.every(e => e && (Number.isFinite(e.cp) || Number.isFinite(e.mate)));
+}
+
+function canRestoreAnalysis(saved) {
+  return completeAnalysis(saved, S.total + 1) && saved.pgn === S.pgn
+    && saved.settingsKey === analysisSettingsKey();
+}
+
 function saveToLibrary() {
   try {
-    if (!S.pgn) return;
+    if (!S.pgn || S.meta?.explore || S.total === 0 || S.analyzing || S.analysisError
+      || !completeAnalysis(S, S.total + 1)) return;
     const id = currentGameId();
     const opSide = S.meSide === "w" ? "b" : "w";
     const prev = S.library.find((g) => g.id === id);
@@ -4465,8 +4833,11 @@ function saveToLibrary() {
     S.library = lib;
     // The heavy analysis (evals + engine lines) is stored under its own key so the library list
     // stays light, and so re-opening a saved game can render instantly WITHOUT re-analyzing.
-    const writes = { library: lib, ["analysis:" + id]: { evals: S.evals, bests: S.bests, multipv: S.analyzedMultipv } };
-    browserAPI.storage.local.set(writes);
+    const writes = { library: lib, ["analysis:" + id]: {
+      pgn: S.pgn, settingsKey: analysisSettingsKey(), engineBuild: S.activeEngineBuild,
+      evals: S.evals, bests: S.bests, multipv: S.analyzedMultipv,
+    } };
+    browserAPI.storage.local.set(writes).catch(e => console.warn("library save failed", e));
     if (dropped.length) browserAPI.storage.local.remove(dropped.map((d) => "analysis:" + d.id));
     renderLibrary();
   } catch (e) { console.warn("library save failed", e); }
@@ -4597,6 +4968,8 @@ function navNext() { if (S.practice) return; stopLineWalk(); if (S.analysisMode)
 function navPrev() { if (S.practice) return; stopLineWalk(); if (S.analysisMode) variationStep(-1); else go(S.idx - 1); }
 // Jump to a mainline position (exits analysis mode if active).
 function gotoMainline(ply) { if (S.practice) return; stopLineWalk(); if (S.analysisMode) exitAnalysis(); go(ply); }
+// Jump to a variation position (explore mode).
+function gotoVar(idx) { if (S.practice) return; stopLineWalk(); if (!S.variation) return; const v = S.variation; if (idx < 0 || idx >= v.positions.length) return; v.idx = idx; S.selectedSq = null; paintBoard(); playSanSound(v.positions[v.idx]?.san); renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent(); requestLiveEval(); }
 function variationStep(delta) {
   const v = S.variation; if (!v) return;
   const ni = v.idx + delta;
@@ -4631,10 +5004,10 @@ document.addEventListener("keydown", (e) => {
   if (S.practice) { if (e.key === "Escape") exitPractice(); return; }
   if (e.key === "ArrowLeft") navPrev();
   else if (e.key === "ArrowRight") navNext();
-  else if (e.key === "Home") gotoMainline(0);
-  else if (e.key === "End") gotoMainline(S.total);
+  else if (e.key === "Home") { if (S.analysisMode) gotoVar(0); else gotoMainline(0); }
+  else if (e.key === "End") { if (S.analysisMode) gotoVar(S.variation.positions.length - 1); else gotoMainline(S.total); }
   else if (e.key === "Escape") { if (S.analysisMode) exitAnalysis(); }
-  else if (e.key === "f") toggleFlip();
+  else if (e.key === "f" && !e.ctrlKey && !e.metaKey) toggleFlip(); // Ctrl+F must not flip the board
 });
 
 /* ---------------- Analysis batch + re-analysis ----------------
@@ -4648,7 +5021,10 @@ document.addEventListener("keydown", (e) => {
 let _reanalyzeT = null;
 function scheduleReanalyze() {
   clearTimeout(_reanalyzeT);
-  _reanalyzeT = setTimeout(() => startAnalysis(), 400);
+  _reanalyzeT = setTimeout(() => {
+    if (S.meta?.explore) requestLiveEval();
+    else startAnalysis();
+  }, 400);
 }
 function terminateEngines() {
   if (S.evalEngines) for (const e of S.evalEngines) { try { e.terminate(); } catch {} }
@@ -4669,12 +5045,15 @@ function requestProgress(gen) {
   setTimeout(() => flushProgress(gen), Math.max(0, 140 - (Date.now() - _progLast)));
 }
 async function startAnalysis() {
+  if (S.meta?.explore) { await requestLiveEval(); return; }
   const gen = ++S.batchGen;
   terminateEngines();
   S.evals = new Array(S.total + 1).fill(null);
   S.bests = new Array(S.total + 1).fill(null);
   S._sacCache = []; S._forcedCache = []; S._panelCache = null;
   S.progress = 0;
+  S.completed = 0;
+  S.analysisError = null;
   S.analyzing = true;
   revRefs = null; statsRefs = null;
   computeDerived();
@@ -4690,20 +5069,22 @@ async function startAnalysis() {
   // createEngine() readies each worker AND falls back down the build chain if the chosen build can't
   // load — so the whole batch survives e.g. NNUE failing, and S.activeEngineBuild reflects the build
   // actually in use. If no build can start at all, surface it instead of leaving a stuck "Analyzing…".
-  let engines;
-  try {
-    engines = await Promise.all(
-      Array.from({ length: nWorkers }, () => createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill }))
-    );
-  } catch (e) {
-    console.error("[Chess Review] no Stockfish build could be started:", e);
+  const starts = await Promise.allSettled(
+    Array.from({ length: nWorkers }, () => createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill }))
+  );
+  const engines = starts.filter(r => r.status === "fulfilled").map(r => r.value);
+  if (gen !== S.batchGen) { engines.forEach(e => e.terminate()); return; }
+  const failed = starts.find(r => r.status === "rejected");
+  if (failed) {
+    engines.forEach(e => e.terminate());
+    console.error("[Chess Review] no Stockfish build could be started:", failed.reason);
     S.evalEngines = []; S.analyzing = false;
+    S.analysisError = "the engine could not be started in this browser.";
     S.verdict = "Engine unavailable — couldn't start Stockfish in this browser.";
-    try { renderReview(); } catch {}
+    flushProgress(gen);
     return;
   }
   S.evalEngines = engines;
-  if (gen !== S.batchGen) { terminateEngines(); return; }
 
   // Shared work queue. `nextIdx++` is atomic (no await between read and increment in a
   // single-threaded runtime), so each position is handed to exactly one worker. Completion
@@ -4715,21 +5096,39 @@ async function startAnalysis() {
     while (gen === S.batchGen) {
       const i = nextIdx++;
       if (i > S.total) return;
-      const res = await eng.analyse(S.positions[i].fen, S.settings.engineDepth, multipv);
+      const terminal = terminalScore(S.positions[i].fen, i);
+      const res = terminal ? { score: terminal, bestmove: null, pv: "", lines: [] }
+        : await eng.analyse(S.positions[i].fen, S.settings.engineDepth, multipv);
       if (gen !== S.batchGen) return;
       S.bests[i] = res;
       // Terminal positions (mate/stalemate) are decided from the board — not from the engine's "mate 0".
-      S.evals[i] = terminalScore(S.positions[i].fen) || whiteRel(res.score, S.positions[i].fen);
+      S.evals[i] = terminal || whiteRel(res.score, S.positions[i].fen);
+      if (i > 0) S.completed++;
       while (contig + 1 <= S.total && S.bests[contig + 1]) contig++;
       S.progress = Math.max(0, contig);
       requestProgress(gen);
     }
   }
-  await Promise.all(engines.map((e) => worker(e)));
+  try {
+    await Promise.all(engines.map((e) => worker(e)));
+  } catch (e) {
+    if (gen !== S.batchGen) return;
+    console.error("[Chess Review] engine stopped during batch analysis:", e);
+    terminateEngines();
+    S.analyzing = false;
+    S.analysisError = "the engine stopped responding.";
+    S.verdict = "Analysis stopped before the game was complete.";
+    flushProgress(gen);
+    renderReview();
+    renderStats();
+    if (!S.analysisMode) renderEngineCurrent();
+    return;
+  }
   if (gen !== S.batchGen) return;            // a newer analysis took over
   terminateEngines();
   S.analyzing = false;
   S.progress = S.total;
+  S.completed = S.total;
   flushProgress(gen);
   renderReview();
   renderStats();
@@ -4756,7 +5155,11 @@ function renderAll() {
    and for switching to another library game in place — no page reload, so there's no black flash
    between games; only the panels' data and the board orientation change. */
 async function applyGame(payload) {
+  const isExplore = payload.meta?.explore === true;
+
   // Tear down anything tied to the previous game.
+  clearTimeout(_reanalyzeT);
+  resetLiveEngine();
   S.batchGen++;                 // invalidate any in-flight analysis workers
   terminateEngines();
   if (S.autoTimer) { clearInterval(S.autoTimer); S.autoTimer = null; }
@@ -4768,9 +5171,10 @@ async function applyGame(payload) {
   S.selectedSq = null; S.userArrows = []; S.userMarks = []; S.lineWalking = false;
   revRefs = null; statsRefs = null; _lastCommentKey = -1; _ipSig = null; S._turnPly = null;
   S._lastEngineLines = null;
+  _movesSig = null;
 
-  applyDetectedTheme(payload.theme); // match the chess.com theme if the payload carries one (else no-op)
-  applySettings();                   // (re)apply CSS vars + board image now that the board exists
+  applyDetectedTheme(payload.theme);
+  applySettings();
 
   S.analyzing = true;
   S.pgn = payload.pgn;
@@ -4783,42 +5187,53 @@ async function applyGame(payload) {
   S.bests = new Array(S.total + 1).fill(null);
   S._sacCache = []; S._forcedCache = []; S._panelCache = null;
   S.progress = 0;
+  S.completed = 0;
+  S.analysisError = null;
   S.openingHeader = deriveOpening(S.headers);
-  S.opening = S.openingHeader; // possibly refined by the book in computeDerived()
+  S.opening = S.openingHeader;
   const { players, meSide } = derivePlayers(S.headers, S.meta, S.username);
   S.players = players;
-  // Perspective: the source page's own orientation (chess.com ?flip=true, Lichess board side) is
-  // the user's actual POV, so it wins when present. Otherwise fall back to matching the stored
-  // username against the PGN players — a deliberate second layer so we don't seat the user at the
-  // wrong end of the board. Default (no signal at all) is White at the bottom.
   const flip = S.meta && S.meta.flip;
   const side = flip === true ? "b" : flip === false ? "w" : meSide;
   S.meSide = side; S.flipped = side === "b"; S.idx = 0;
 
-  // Restore a previously-stored analysis instead of re-running the engine. Both callers (library +
-  // boot) resolve this by id *before* calling applyGame, so there's no await between buildUI() and
-  // renderAll() — that gap is what let the Moves panel paint on its own for a frame. Only fall back
-  // to the lookup here if no caller supplied the field at all.
+  if (isExplore) {
+    // Explore mode: standalone analysis board with free movement
+    S.analyzing = false;
+    S.analysisMode = true;
+    S.variation = {
+      branchIdx: 0,
+      positions: [{ fen: S.positions[0].fen, san: null, eval: null, best: null }],
+      idx: 0,
+    };
+    document.title = "Explore — Chess Review";
+    computeDerived();
+    renderAll();
+    requestLiveEval(); // start live engine analysis
+    return;
+  }
+
+  // Normal game mode: restore saved analysis or start fresh
   let saved = payload.analysis;
   if (saved == null && !("analysis" in payload)) {
     try { const k = "analysis:" + currentGameId(); const s = await browserAPI.storage.local.get(k); saved = s[k] || null; } catch {}
   }
-  const restored = saved && Array.isArray(saved.bests) && saved.bests.length === S.total + 1 && Array.isArray(saved.evals);
+  const restored = canRestoreAnalysis(saved);
   if (restored) {
     S.evals = saved.evals;
     S.bests = saved.bests;
     S.analyzedMultipv = saved.multipv || null;
+    S.activeEngineBuild = saved.engineBuild || S.settings.enginePath;
     S.analyzing = false;
     S.progress = S.total;
+    S.completed = S.total;
   }
 
   document.title = `${players.w.name} vs ${players.b.name} — Chess Review`;
   computeDerived();
   renderAll();
-  // The saved layout baseline is sized for the EXPANDED breakdown; since it now starts collapsed,
-  // pull the modules below the Accuracy panel up to close the gap (same as clicking collapse).
   if (!S.qbreakExpanded) reflowAccuracy(false);
-  renderLibrary();             // refresh the "currently open" highlight in the sidebar
+  renderLibrary();
   requestAnimationFrame(alignPlayers);
   if (!restored) startAnalysis();
 }
@@ -4989,6 +5404,11 @@ async function resetLegacyZoom() {
     }
     buildUI();               // built once; switching games re-uses it (no full page reload)
     await applyGame(payload);
+    // Two-phase load: now that initialization succeeded, remove the job data so it doesn't accumulate.
+    const jobId = location.hash.replace(/^#/, "");
+    if (jobId && jobId !== "explore") {
+      await browserAPI.storage.local.remove(`job:${jobId}`);
+    }
     // A custom canvas is fitted once it is laid out as shown (breakdown collapsed); not awaited.
     if (isCustomLayout()) initTabZoom();
     requestAnimationFrame(alignPlayers); // measure the board after the first layout
