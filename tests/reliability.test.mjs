@@ -95,7 +95,7 @@ test('cache restore requires complete data for the same game and engine settings
   assert.equal(a.call('canRestoreAnalysis',{...saved,pgn:'1. d4'}),false);
   assert.equal(a.call('canRestoreAnalysis',{...saved,evals:[{cp:0},null]}),false);
   assert.equal(a.call('canRestoreAnalysis',{...saved,bests:[{},null]}),false);
-  S.settings.enginePath='nnue';assert.equal(a.call('canRestoreAnalysis',saved),false);
+  S.settings.enginePath='sf19';assert.equal(a.call('canRestoreAnalysis',saved),false);
 });
 
 test('Explore and incomplete analyses are never saved as finished games',t=>{
