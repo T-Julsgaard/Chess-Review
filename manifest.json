@@ -8,10 +8,15 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "permissions": ["storage", "unlimitedStorage", "activeTab"],
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "activeTab"
+  ],
   "host_permissions": [
     "https://api.chess.com/*",
     "https://www.chess.com/*",
+    "https://chess.com/*",
     "https://lichess.org/*"
   ],
   "action": {
@@ -28,37 +33,60 @@
   },
   "background": {
     "service_worker": "background.js",
-    "scripts": ["background.js"],
-    "type": "module"
+    "type": "module",
+    "scripts": [
+      "background.js"
+    ]
   },
   "browser_specific_settings": {
     "gecko": {
       "id": "{04a623e1-ee4d-4b46-81f7-4790bbe6a59c}",
       "strict_min_version": "140.0",
-      "data_collection_permissions": { "required": ["none"] }
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
     }
   },
   "web_accessible_resources": [
     {
-      "resources": ["icons/icon.png"],
-      "matches": ["https://www.chess.com/*", "https://lichess.org/*"]
+      "resources": [
+        "icons/icon.png"
+      ],
+      "matches": [
+        "https://www.chess.com/*",
+        "https://chess.com/*",
+        "https://lichess.org/*"
+      ]
     }
   ],
   "content_scripts": [
     {
-      "matches": ["https://www.chess.com/*"],
-      "js": ["content.js"],
+      "matches": [
+        "https://www.chess.com/*",
+        "https://chess.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://lichess.org/*"],
-      "js": ["lichess-content.js"],
+      "matches": [
+        "https://lichess.org/*"
+      ],
+      "js": [
+        "lichess-content.js"
+      ],
       "run_at": "document_idle"
     }
   ],
   "commands": {
     "analyze-current": {
-      "suggested_key": { "default": "Ctrl+Shift+Y" },
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y"
+      },
       "description": "Analyze the game I'm on"
     }
   }

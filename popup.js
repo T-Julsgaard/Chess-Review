@@ -109,6 +109,22 @@ $("saveUser").addEventListener("click", async () => {
 
 $("analyzeCurrent").addEventListener("click", runCurrentAnalysis);
 
+$("exploreMode").addEventListener("click", async () => {
+  const btn = $("exploreMode");
+  btn.disabled = true;
+  setStatus("Opening explore board …");
+  try {
+    await browserAPI.tabs.create({
+      url: browserAPI.runtime.getURL("analysis.html#explore"),
+    });
+    window.close();
+  } catch (err) {
+    setStatus(err.message, true);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
 $("analyzeManual").addEventListener("click", async () => {
   const btn = $("analyzeManual");
   const raw = $("manualInput").value.trim();
