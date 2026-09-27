@@ -860,6 +860,9 @@ button { font-family: inherit; cursor: pointer; }
 .set-pieces button.on { border-color: var(--accent); color: var(--ink); background: color-mix(in oklab, var(--accent) 16%, var(--panel)); }
 
 .set-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.accent-row { flex-direction: row; align-items: center; justify-content: space-between; }
+.accent-row .set-chips { justify-content: flex-end; flex-wrap: nowrap; gap: 4px; }
+.accent-row .set-chip { width: 32px; flex: none; }
 .set-chip { width: 40px; height: 30px; border-radius: 7px; border: 2px solid transparent;
   cursor: pointer; padding: 0; overflow: hidden; position: relative; box-shadow: 0 0 0 1px var(--line); }
 .set-chip.on { border-color: var(--accent); }
@@ -868,6 +871,8 @@ button { font-family: inherit; cursor: pointer; }
 /* Bundled board chips preview the real SVG artwork scaled to fill the swatch. */
 .set-chip.chip-board-art { background-size: cover; background-position: center; }
 .set-accent { display: block; position: absolute; inset: 0; border-radius: 7px; }
+.set-color-input { width: 100%; height: 34px; padding: 3px; border: 1px solid var(--line);
+  border-radius: 8px; background: var(--panel-2); cursor: pointer; }
 /* Custom-board colour chip (always first) + its picker popover */
 .set-chip.chip-custom .chip-edit {
   position: absolute; right: 2px; bottom: -1px; font-size: 10px; color: #fff;
@@ -1236,7 +1241,9 @@ button { font-family: inherit; cursor: pointer; }
 .ip-opening .ip-op-txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* the body scrolls if the content (e.g. the hint button) is taller than the module, so nothing
    spills out behind the panel below it */
-.ip-body { padding: 13px var(--pad) 15px; display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; overflow-y: auto; }
+.ip-body { padding: 13px var(--pad) 15px; display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; overflow-y: auto;
+  scrollbar-width: none; }
+.ip-body::-webkit-scrollbar { display: none; }
 /* fixed min-height so the row never shifts when the hint button or badge appears/disappears */
 .ip-head { display: flex; align-items: center; gap: 9px; min-height: 28px; }
 .ip-badge { width: 24px; height: 24px; flex: none; }
