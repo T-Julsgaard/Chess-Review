@@ -16,6 +16,7 @@
   "host_permissions": [
     "https://api.chess.com/*",
     "https://www.chess.com/*",
+    "https://chess.com/*",
     "https://lichess.org/*"
   ],
   "action": {
@@ -32,10 +33,10 @@
   },
   "background": {
     "service_worker": "background.js",
+    "type": "module",
     "scripts": [
       "background.js"
-    ],
-    "type": "module"
+    ]
   },
   "browser_specific_settings": {
     "gecko": {
@@ -55,6 +56,7 @@
       ],
       "matches": [
         "https://www.chess.com/*",
+        "https://chess.com/*",
         "https://lichess.org/*"
       ]
     }
@@ -62,7 +64,8 @@
   "content_scripts": [
     {
       "matches": [
-        "https://www.chess.com/*"
+        "https://www.chess.com/*",
+        "https://chess.com/*"
       ],
       "js": [
         "content.js"

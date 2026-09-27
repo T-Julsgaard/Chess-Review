@@ -16,7 +16,14 @@ rating. No account, no server, no manual PGN copying.
 - **Move classifications** from Brilliant to Blunder, with an evaluation graph and best-move arrows.
 - **Estimated rating** — a rough guide to the level each player performed at in the game.
 - **Opening detection** from an offline book, named even for PGNs without headers.
-- **Explore variations** directly on the board, with live engine evaluation.
+- **Explore board** from the popup, without loading a game: try legal moves, browse
+  your move list, and see evaluations, opening names, and move ratings.
+- **Rated alternatives** while reviewing a game, using the same classification rules
+  as the played moves. Exploring does not change the original game or its accuracy.
+- **Stockfish 19 NNUE** bundled locally, with Stockfish 18 NNUE and Stockfish 10
+  alternatives. New installs default to 19; existing engine preferences are retained.
+- **Recoverable analysis errors** with a Retry button; unfinished reviews are not
+  saved as completed games.
 - **Runs entirely on your machine** — your games never leave your computer.
 
 ## Usage
@@ -28,6 +35,16 @@ rating. No account, no server, no manual PGN copying.
 For older games you don't have open, paste a game URL or PGN into the popup. Your username is
 detected automatically from the board; if it can't be found, enter it once in the popup and it's
 remembered.
+
+To explore without a game, open the popup and select **Explore board**. Click or
+drag pieces to make legal moves. Use the move list, arrow keys, or Home/End to
+navigate. Making a different move replaces the continuation from that position.
+
+The opening dictionary is bundled offline and has no automatic downloads.
+Stockfish 19 adds approximately 95 MiB and is heavier than the Stockfish 18 lite
+build. Select a lighter engine in Settings if needed. The existing accuracy
+calibration was fitted to Stockfish 18 lite; the accuracy agreement advertised
+above has not been re-benchmarked for Stockfish 19.
 
 ## Install
 
@@ -53,6 +70,13 @@ Chess Review's own code is licensed under the **GNU General Public License v3.0*
 pieces, sounds, opening book, libraries) keep their own licenses — see
 [`ATTRIBUTIONS.md`](ATTRIBUTIONS.md). Corresponding source for the GPL/AGPL components is available
 from the upstream projects listed there.
+
+## Contributions
+
+- [aciokie](https://github.com/aciokie) contributed the initial Explore board,
+  alternative-move ratings, review reliability improvements, and Stockfish 19
+  integration in [PR #4](https://github.com/T-Julsgaard/Chess-Review/pull/4).
+  Follow-up fixes retain the original contribution history.
 
 > **Disclaimer:** Chess Review is an independent, unofficial tool. It is **not affiliated with,
 > endorsed by, or sponsored by Chess.com or Lichess**. Those names are used only to describe the
