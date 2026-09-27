@@ -71,13 +71,6 @@ pieces, sounds, opening book, libraries) keep their own licenses — see
 [`ATTRIBUTIONS.md`](ATTRIBUTIONS.md). Corresponding source for the GPL/AGPL components is available
 from the upstream projects listed there.
 
-## Contributions
-
-- [aciokie](https://github.com/aciokie) contributed the initial Explore board,
-  alternative-move ratings, review reliability improvements, and Stockfish 19
-  integration in [PR #4](https://github.com/T-Julsgaard/Chess-Review/pull/4).
-  Follow-up fixes retain the original contribution history.
-
 > **Disclaimer:** Chess Review is an independent, unofficial tool. It is **not affiliated with,
 > endorsed by, or sponsored by Chess.com or Lichess**. Those names are used only to describe the
 > sites it reads games from (nominative reference); all trademarks belong to their respective owners.
