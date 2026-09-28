@@ -96,6 +96,9 @@ By **Kadagaden**, from the `chess-pieces` repository.
 ## Chess logic library
 - **File:** `lib/chess.js`
 - **Author:** Jeff Hlywa — **License:** BSD 2-Clause
+- **Source:** https://github.com/jhlywa/chess.js
+- **Local maintenance:** Replace every PGN comment brace and remove a no-op newline
+  masking helper while preserving regular-expression separators. The original license notice is retained.
 
 ## App logo / icon
 - **Files:** `icons/icon16.png`, `icons/icon48.png`, `icons/icon128.png`, `icons/icon.png`
