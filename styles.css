@@ -16,9 +16,9 @@
   --accent-strong: #6aa14a;
   --accent-ink: #11210a;
 
-  /* board — classic green, theme-independent */
-  --sq-light: #e9edcc;
-  --sq-dark:  #6f9c54;
+  /* board — walnut fallback, overwritten by saved settings */
+  --sq-light: #f0d9b5;
+  --sq-dark:  #b58863;
   --sq-light-hl: #f4f06a;
   --sq-dark-hl:  #b9c544;
 
