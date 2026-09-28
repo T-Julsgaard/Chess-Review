@@ -1,0 +1,26 @@
+name: Feature request
+description: Suggest an improvement to Chess Review.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please search existing issues for similar ideas. Suggestions are welcome; implementation depends on project scope and maintainer time.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe what you are trying to do and what is difficult or missing today.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Suggested improvement
+      description: Describe how you would like it to work. Examples or mockups are welcome.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives or additional context (optional)
+      description: Mention workarounds you have tried or other approaches that might help.
