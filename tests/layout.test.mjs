@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { app, loadGame } from './helpers/app.mjs';
+import { app, loadGame, settle } from './helpers/app.mjs';
 
 function layout(t) {
   const a = app(t); loadGame(a, '1. e4 e5');
@@ -90,4 +90,59 @@ test('desktop matches the saved canvas geometry and preserves the gap when accur
   assert.equal(mod('engine').top, ''); assert.equal(mod('accuracy').height, '');
   a.viewport(1920, 920); await a.call('fitTabZoom');
   assert.deepEqual(geometry(), savedCanvas);
+});
+
+test('Reorganize preserves exact desktop boxes and zoom through repeated resets', async t => {
+  const a = layout(t);
+  Object.defineProperty(a.dom.window.HTMLElement.prototype, 'offsetHeight', {
+    configurable: true, get() { return this.classList.contains('qbreak-row') ? 22 : 0; },
+  });
+  a.context.getComputedStyle = () => ({ rowGap: '7px' });
+  const stage = a.dom.window.document.querySelector('.stage');
+  stage.getBoundingClientRect = () => ({ left: 0, top: 60 });
+  const mods = [...stage.querySelectorAll('.mod')];
+  // Real browser zoom rounds rendered boxes slightly below their CSS dimensions.
+  for (const mod of mods) mod.getBoundingClientRect = () => ({
+    left: parseFloat(mod.style.left) - .007,
+    top: 60 + parseFloat(mod.style.top) - .007,
+    width: parseFloat(mod.style.width) - .007,
+    height: parseFloat(mod.style.height) - .007,
+  });
+  const geometry = () => mods.map(m => [m.style.left, m.style.top, m.style.width, m.style.height]);
+  a.viewport(1920, 920); await a.call('initTabZoom'); a.viewport(1920, 920);
+  const defaults = structuredClone(a.state.layout);
+  for (const expanded of [false, true, false]) {
+    a.state.qbreakExpanded = expanded; a.call('renderStats');
+    const before = geometry();
+    a.call('toggleReorganize'); await settle();
+    assert.deepEqual(geometry(), before);
+    assert.equal(a.zoom(), .9);
+    assert.deepEqual(structuredClone(a.call('layoutForSave')), defaults);
+    a.call('resetLayout'); await settle();
+    assert.deepEqual(geometry(), before);
+    assert.equal(a.zoom(), .9);
+    assert.equal(a.state.reorganize, false);
+  }
+  assert.deepEqual(a.changes, [.9]);
+});
+
+test('settings follows the panels after reset and stays within narrow windows', async t => {
+  const a = layout(t);
+  const settings = a.dom.window.document.getElementById('settings');
+  const panel = a.dom.window.document.querySelector('[data-mod="engine"]');
+  let edge = 1700;
+  panel.getBoundingClientRect = () => ({ right: edge, width: 294, height: 158 });
+  settings.getBoundingClientRect = () => ({ width: 286 });
+  a.dom.window.innerWidth = 2200;
+  a.call('toggleSettings');
+  assert.equal(settings.style.right, '198px');
+  edge = 1806;
+  await a.call('resetVisualSettings');
+  assert.equal(settings.style.right, '92px');
+  a.dom.window.innerWidth = 1920;
+  a.dom.window.dispatchEvent(new a.dom.window.Event('resize'));
+  assert.equal(settings.style.right, '8px');
+  a.dom.window.innerWidth = 500;
+  a.dom.window.dispatchEvent(new a.dom.window.Event('resize'));
+  assert.equal(settings.style.right, '');
 });

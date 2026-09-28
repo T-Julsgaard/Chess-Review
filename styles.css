@@ -1186,7 +1186,8 @@ button { font-family: inherit; cursor: pointer; }
 .stage.auto.desktop-layout .evalgraph svg { height: 120px; }
 .stage.auto.desktop-layout .mod[data-mod="coach"] { right: auto; margin: 0; }
 .stage.auto.desktop-layout.has-coach .insight-panel .ip-body { padding-right: var(--pad); }
-.stage.auto.desktop-layout.has-coach .insight-panel .ip-head { padding-right: calc(var(--coach-clear) - var(--pad)); }
+/* Match the free canvas: the evaluation stays at the right edge beside the coach. */
+.stage.auto.desktop-layout.has-coach .insight-panel .ip-head { padding-right: 0; }
 
 /* top bar and settings on small windows */
 @media (max-width: 760px) { .topbar-meta { display: none; } }
