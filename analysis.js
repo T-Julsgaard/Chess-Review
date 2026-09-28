@@ -1231,7 +1231,7 @@ function buildUI() {
   initBoardInput();
   renderCoachAvatar();     // mount the animated coach portrait for the active personality
   renderLibrary();
-  window.addEventListener("resize", () => { growCanvas(); alignPlayers(); });
+  window.addEventListener("resize", () => { growCanvas(); alignPlayers(); positionSettings(); });
 }
 
 
@@ -1301,13 +1301,25 @@ function applyLayout() {
     mod.style.left = b ? b.x + "px" : ""; mod.style.top = b ? b.y + "px" : "";
     mod.style.width = b ? b.w + "px" : ""; mod.style.height = b ? b.h + "px" : "";
   }
+  requestAnimationFrame(positionSettings);
 }
 // Freeze the automatic layout into free-canvas boxes, so Reorganize starts from exactly what is on
 // screen. Hidden modules (eval bar or coach switched off) keep their default box.
 function snapshotLayout() {
   const base = UI.canvas.getBoundingClientRect();
   const out = structuredClone(DEFAULT_LAYOUT);
+  const desktop = UI.canvas.classList.contains("desktop-layout");
   for (const mod of UI.canvas.querySelectorAll(".mod")) {
+    if (desktop) {
+      
+      // Measuring at browser zoom can turn 294px into 293.993px; snapping down then
+      // shrinks the panel by 2px and introduces scrollbars when Reorganize is opened.
+      out[mod.getAttribute("data-mod")] = {
+        x: parseFloat(mod.style.left), y: parseFloat(mod.style.top),
+        w: parseFloat(mod.style.width), h: parseFloat(mod.style.height),
+      };
+      continue;
+    }
     const r = mod.getBoundingClientRect();
     if (!r.width || !r.height) continue;
     // Round DOWN to the grid, so the canvas never needs more room than the screen it came from.
@@ -1463,7 +1475,8 @@ function toggleReorganize() {
     S.layoutMode = "custom";
     applyLayoutMode();
     saveLayout();
-    initTabZoom();
+    // The snapshot already fits at the current zoom. Refitting here would change
+    // every panel's apparent size just for unlocking its drag handles.
   }
   S.reorganize = !S.reorganize;
   UI.canvas.classList.toggle("reorganizing", S.reorganize);
@@ -4154,6 +4167,21 @@ function renderSettings() {
   );
   UI.settings.replaceChildren(tabs, S.settingsTab === "engine" ? motorSettings() : visualSettings());
   UI.settings.scrollTop = scroll;
+  positionSettings();
+}
+function positionSettings() {
+  if (!UI.settings || UI.settings.hidden) return;
+  UI.settings.style.right = "";
+  if (window.innerWidth <= 520) return; // the full-width mobile popover is handled by CSS
+  let edge = 0;
+  for (const mod of UI.canvas.querySelectorAll(".mod")) {
+    const r = mod.getBoundingClientRect();
+    if (r.width && r.height) edge = Math.max(edge, r.right);
+  }
+  if (!edge) return;
+  // Keep a small gap beside the panels, while keeping the popover inside the window.
+  const width = UI.settings.getBoundingClientRect().width;
+  UI.settings.style.right = Math.max(8, window.innerWidth - width - edge - 16) + "px";
 }
 function toggleSettings() {
   UI.settings.hidden = !UI.settings.hidden;
