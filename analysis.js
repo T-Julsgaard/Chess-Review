@@ -5,6 +5,7 @@
 
 import { Chess } from "./lib/chess.js";
 import { Engine } from "./engine/uci.js";
+import { getEngineConfig, getCandidateConfigs } from "./engine/engineDetector.js";
 import { flagCodeForCountryId, countryNameForId } from "./flags.js";
 import { browserAPI } from "./browser-compat.js";
 
@@ -129,7 +130,7 @@ const ENGINE_INFO = {
   engineDepth:   "How many plies (half-moves) deep Stockfish searches each position. Higher depth gives more accurate evaluations and fewer false mistakes, but takes longer.",
   engineWorkers: "Number of Stockfish instances analysing positions in parallel. More workers finish the game faster on multi-core CPUs; the results are identical.",
   fastAnalysis:  "Trades quality for speed: the classification pass uses fewer engine lines. ~1.3×/1.6× faster, but evals shift slightly and clean games can pick up a few false inaccuracies.",
-  enginePath:    "Which Stockfish build to run. Stockfish 18 NNUE is the default; Stockfish 19 is the strongest but heavier; Stockfish 10 (WASM) is lighter still; asm.js is a fallback for browsers without WebAssembly support.",
+  enginePath:    "Which Stockfish build to run. Stockfish 19 is the default; Stockfish 18 is also available; Stockfish 18 NNUE is the legacy neural build; Stockfish 10 (WASM) is lighter.",
   engineSkill:   "Caps the engine's playing strength (Stockfish 'Skill Level'). Max (20) = full strength. Lower values play deliberately weaker — useful for more human-like suggestions.",
   engineHash:    "Recommended: 16 MB for most reviews (the default). Try 32–64 MB for deeper analysis if your computer has spare memory. Each parallel worker uses its own hash table, so memory use is roughly Hash × Workers.",
   clsGood:       "A move that loses at least this much eval (in pawns) can be no better than \"Good\". Below it, the move is \"Excellent\". Lower = stricter.",
@@ -235,7 +236,7 @@ const DEFAULT_SETTINGS = {
   // viewing, so changing this never re-analyzes — it just refreshes the panel.
   // Depth 16 (was 12): shallow searches give noisy evals that fabricate inaccuracies/mistakes and
   // inflate the accuracy variance vs the reference values. Deeper search is the single biggest accuracy fix.
-  engineLines: 1, engineDepth: 16, enginePath: "nnue", engineHash: 16, engineSkill: 20,
+  engineLines: 1, engineDepth: 16, enginePath: "sf19", engineHash: 16, engineSkill: 20,
   // Parallel analysis workers: independent single-threaded Stockfish instances that pull
   // positions from a shared queue. Each position is still searched identically (cold, same
   // depth/lines), so results are unchanged — only the wall-clock is parallelized. Default ≈
@@ -267,12 +268,17 @@ const ENGINE_SETTING_KEYS = [
   "clsGood", "clsInacc", "clsBlunder", "clsClearAdv", "clsMistakeLoss", "clsMissTol",
   "accExcellent", "accGood", "accInacc", "accMiss", "accMistake", "accBlunder",
 ];
-// Available Stockfish builds (all bundled). "asm" = fallback without wasm.
-const ENGINE_BUILDS = { sf19: "engine/stockfish-19-nnue.js", nnue: "engine/stockfish-nnue.js", wasm: "engine/stockfish.js", asm: "engine/stockfish.asm.js" };
+// Available Stockfish builds (all bundled in dedicated folders).
+const ENGINE_BUILDS = {
+  sf19: "engine/stockfish-19/stockfish-19-lite-single.js",
+  sf18: "engine/stockfish-18/stockfish-18-lite-single.js",
+  nnue: "engine/stockfish-18-nnue/stockfish-nnue.js",
+  wasm: "engine/stockfish-10/stockfish.js",
+};
 // Fixed strength order, strongest → weakest. createEngine() always tries the user's chosen build
-// first, then walks DOWN this chain so a build that can't load (e.g. NNUE one day failing) degrades
+// first, then walks DOWN this chain so a build that can't load degrades
 // to the next-strongest one that does — rather than the analysis silently hanging.
-const ENGINE_FALLBACK_ORDER = ["sf19", "nnue", "wasm", "asm"];
+const ENGINE_FALLBACK_ORDER = ["sf19", "sf18", "nnue", "wasm"];
 // The engine panel shows up to this many candidate lines (searched on demand for the viewed position).
 const ENGINE_MAX_LINES = 4;
 // Best-move arrow color — a muted hint green.
@@ -1880,11 +1886,8 @@ function renderUserArrows(preview) {
 }
 function refreshArrows() { renderBestArrow(); renderUserArrows(); renderThreatArrow(); }
 // Create a ready Engine, trying the user's chosen build first and then falling back DOWN the
-// strength chain (sf19 → nnue → wasm → asm) if it can't load. Every build is bundled, so a fallback never
-// needs the network. The build that actually started is recorded in S.activeEngineBuild so the
-// Engine tab reflects what's really running — essential if e.g. NNUE ever stops working. `opts` are
-// the UCI options (Hash / Skill Level); applying them also awaits the handshake, which now REJECTS
-// on a dead build (timeout / worker error) instead of hanging forever.
+// strength chain (sf19 → sf18 → nnue → wasm) if it can't load. Instant feature detection
+// chooses the optimal flavor (multi-threaded, single-threaded).
 let _engineFellBack = false; // warn once per page if we ever leave the preferred build
 async function createEngine(opts = {}) {
   const preferred = ENGINE_BUILDS[S.settings.enginePath] ? S.settings.enginePath : DEFAULT_SETTINGS.enginePath;
@@ -1892,31 +1895,35 @@ async function createEngine(opts = {}) {
   const order = ENGINE_FALLBACK_ORDER.slice(ENGINE_FALLBACK_ORDER.indexOf(preferred));
   let lastErr = null;
   for (const key of order) {
-    const eng = new Engine(ENGINE_BUILDS[key]);
-    try {
-      await eng.setOptions(opts); // awaits the handshake; throws if this build failed to load
-      eng.buildKey = key;
-      if (S.settings.enginePath === preferred) {
-        if (key !== preferred) S.engineFallbackBuild = key;
-        setActiveEngineBuild(key);
+    const candidates = getCandidateConfigs(key);
+    for (const config of candidates) {
+      const eng = new Engine(config);
+      try {
+        await eng.setOptions(opts); // awaits the handshake; throws if this build failed to load
+        eng.buildKey = key;
+        if (S.settings.enginePath === preferred) {
+          if (key !== preferred) S.engineFallbackBuild = key;
+          setActiveEngineBuild(key, eng.flavorLabel);
+        }
+        if (key !== preferred && !_engineFellBack) {
+          _engineFellBack = true;
+          console.warn(`[Chess Review] engine build '${preferred}' failed to load — fell back to '${key}'. ` +
+            `The Engine tab now shows the build that's actually running.`);
+        }
+        return eng;
+      } catch (e) {
+        lastErr = e;
+        try { eng.terminate(); } catch {}
       }
-      if (key !== preferred && !_engineFellBack) {
-        _engineFellBack = true;
-        console.warn(`[Chess Review] engine build '${preferred}' failed to load — fell back to '${key}'. ` +
-          `The Engine tab now shows the build that's actually running.`);
-      }
-      return eng;
-    } catch (e) {
-      lastErr = e;
-      try { eng.terminate(); } catch {}
     }
   }
   throw lastErr || new Error("No Stockfish build could be started.");
 }
 // Record (and surface) which build is actually running. Re-render the spots that name the engine so
 // a fallback is visible immediately, both in the live Engine panel and the settings Build row.
-function setActiveEngineBuild(key) {
-  if (S.activeEngineBuild === key && !S.engineFallbackBuild) return;
+function setActiveEngineBuild(key, flavorLabel = null) {
+  if (flavorLabel) S.activeEngineFlavor = flavorLabel;
+  if (S.activeEngineBuild === key && !S.engineFallbackBuild && !flavorLabel) return;
   S.activeEngineBuild = key;
   try { renderEngineCurrent(); } catch {}
   if (UI.settings && !UI.settings.hidden && S.settingsTab === "engine") { try { renderSettings(); } catch {} }
@@ -1924,7 +1931,7 @@ function setActiveEngineBuild(key) {
 // The build name to display: what's actually running if known, else the user's selection.
 function activeEngineName() {
   const key = S.engineFallbackBuild || S.activeEngineBuild || S.settings.enginePath;
-  const name = ENGINE_NAME[key] || "Stockfish";
+  const name = S.activeEngineFlavor || ENGINE_NAME[key] || "Stockfish";
   // Flag a fallback explicitly so it's obvious the chosen build isn't the one in use.
   return (S.engineFallbackBuild && S.engineFallbackBuild !== S.settings.enginePath) ? `${name} (fallback)` : name;
 }
@@ -3103,7 +3110,8 @@ function renderMoveComment() {
 
   const head = el("div", { class: "ip-head" });
   if (cfg) head.append(el("img", { class: "ip-badge", src: qIcon(cls), alt: "", draggable: "false" }));
-  head.append(el("span", { class: "ip-move" }, san));
+  const sanDisplay = san + (cfg ? " " + cfg.name : "");
+  head.append(el("span", { class: "ip-move" }, sanDisplay));
   if (evTxt) head.append(el("span", { class: "ip-eval " + (evCp >= 0 ? "pos" : "neg") }, evTxt));
   body.append(head);
 
@@ -3648,7 +3656,7 @@ async function requestPanelLines() {
   S._panelCache = { idx: i, fen, lines: res.lines };
   renderEngineCurrent();
 }
-const ENGINE_NAME = { sf19: "Stockfish 19", nnue: "Stockfish 18 NNUE", wasm: "Stockfish 10", asm: "Stockfish 10 (asm.js)" };
+const ENGINE_NAME = { sf19: "Stockfish 19", sf18: "Stockfish 18", nnue: "Stockfish 18 NNUE", wasm: "Stockfish 10" };
 function renderEngine(lines, padFromCache = false) {
   const curFen = activePos().fen;
   const want = S.settings.engineLines;
@@ -4304,10 +4312,10 @@ function motorSettings() {
       el("div", { class: "set-row" },
         setLabel("Build", ENGINE_INFO.enginePath),
         el("div", { class: "set-seg" },
-          el("button", { class: S.settings.enginePath === "nnue" ? "on" : "", onclick: () => setEngineSetting("enginePath", "nnue") }, "Stockfish 18 NNUE"),
           el("button", { class: S.settings.enginePath === "sf19" ? "on" : "", onclick: () => setEngineSetting("enginePath", "sf19") }, "Stockfish 19"),
+          el("button", { class: S.settings.enginePath === "sf18" ? "on" : "", onclick: () => setEngineSetting("enginePath", "sf18") }, "Stockfish 18"),
+          el("button", { class: S.settings.enginePath === "nnue" ? "on" : "", onclick: () => setEngineSetting("enginePath", "nnue") }, "Stockfish 18 NNUE"),
           el("button", { class: S.settings.enginePath === "wasm" ? "on" : "", onclick: () => setEngineSetting("enginePath", "wasm") }, "Stockfish 10"),
-          el("button", { class: S.settings.enginePath === "asm" ? "on" : "", onclick: () => setEngineSetting("enginePath", "asm") }, "asm.js"),
         ),
       ),
       // Keep the warning visible when any analysis worker had to use a fallback.
@@ -4382,19 +4390,25 @@ const CREDITS = [
     href: "https://github.com/lichess-org/lila/blob/master/LICENSE",
   },
   {
-    title: "Stockfish 19 NNUE",
-    by: "Full single-threaded Stockfish.js 19.0.0 by Nathan Rugg (“nmrugg”), © 2026 Chess.com, LLC; based on the Stockfish team's engine and neural networks.",
+    title: "Stockfish 19 (default)",
+    by: "Stockfish.js 19 by Nathan Rugg (“nmrugg”), © 2026 Chess.com, LLC; based on the Stockfish team's engine and neural networks.",
     lic: "GPLv3",
-    href: "https://github.com/nmrugg/stockfish.js/tree/v19.0.0",
+    href: "https://github.com/nmrugg/stockfish.js",
   },
   {
-    title: "Stockfish 18 NNUE (default)",
+    title: "Stockfish 18",
+    by: "Stockfish.js 18 by Nathan Rugg (“nmrugg”), © 2026 Chess.com, LLC; based on the Stockfish team's engine and neural networks.",
+    lic: "GPLv3",
+    href: "https://github.com/nmrugg/stockfish.js",
+  },
+  {
+    title: "Stockfish 18 NNUE",
     by: "NNUE build © Chess.com, LLC — distributed as JS/WASM via Nathan Rugg’s (“nmrugg”) Stockfish.js.",
     lic: "GPLv3",
     href: "https://github.com/nmrugg/stockfish.js",
   },
   {
-    title: "Stockfish 10 (WASM / asm.js)",
+    title: "Stockfish 10 (WASM)",
     by: "Fallback builds — JS/WASM port by Nathan Rugg (“nmrugg”), Stockfish.js.",
     lic: "GPLv3",
     href: "https://github.com/nmrugg/stockfish.js",
@@ -5506,10 +5520,16 @@ async function resetLegacyZoom() {
       browserAPI.storage.local.set({ settings: S.settings });
     }
     // One-time switch to the strong Stockfish 18 NNUE build for anyone still on the old SF10 WASM
-    // default (asm.js users keep asm — they may lack WASM). A later deliberate choice sticks.
+    // default. A later deliberate choice sticks.
     if (!S.settings.nnueDefaulted) {
       if (S.settings.enginePath === "wasm") S.settings.enginePath = "nnue";
       S.settings.nnueDefaulted = true;
+      browserAPI.storage.local.set({ settings: S.settings });
+    }
+    // One-time switch to the new Stockfish 19 build as the primary default
+    if (!S.settings.sf19Defaulted) {
+      if (S.settings.enginePath === "nnue" || !S.settings.enginePath) S.settings.enginePath = "sf19";
+      S.settings.sf19Defaulted = true;
       browserAPI.storage.local.set({ settings: S.settings });
     }
     // The 5-line option was removed — clamp any stored value to the new max.
