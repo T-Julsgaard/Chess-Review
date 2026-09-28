@@ -1,0 +1,54 @@
+name: Bug report
+description: Report something that is not working as expected.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please search existing issues before reporting a bug.
+        For suspected security vulnerabilities, follow our [security policy](https://github.com/T-Julsgaard/Chess-Review/blob/main/SECURITY.md) instead of posting details here.
+        Issues are public. Share only game data, screenshots, and logs you are comfortable making public, and remove personal information and credentials.
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What happened, and what did you expect?
+      description: Describe the problem and the behavior you expected.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Include whether this happens on Chess.com, Lichess, a pasted PGN, or Explore board.
+      placeholder: |
+        1. Open ...
+        2. Click ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Browser and extension details
+      description: Find the extension version on your browser's extensions page. For an unpacked checkout, include the commit if known.
+      placeholder: |
+        Browser and version:
+        Operating system:
+        Extension version or commit:
+        Installed from the Chrome Web Store or loaded unpacked:
+    validations:
+      required: true
+  - type: textarea
+    id: game-and-settings
+    attributes:
+      label: Game and analysis settings (optional)
+      description: For game-specific or evaluation problems, include a public game URL or PGN, the move number, and relevant settings if available.
+      placeholder: |
+        Game URL or PGN:
+        Affected move:
+        Stockfish build and depth:
+        Other relevant settings (fast analysis, workers, classification thresholds):
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots, errors, or other details (optional)
+      description: Paste relevant error messages or attach screenshots. For layout issues, include window size and browser zoom if known.
