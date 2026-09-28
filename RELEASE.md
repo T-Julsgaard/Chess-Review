@@ -62,11 +62,19 @@ Stockfish 18 NNUE is the default; 19 Lite is optional. Full 19, Stockfish 10, an
 asm.js are no longer included. Existing full-19 preferences migrate to Lite;
 legacy preferences migrate to 18. The engine tooltips disclose the Lite tradeoff.
 
-lib/chess.js is readable source derived from Jeff Hlywa's chess.js, with local PGN
-comment/newline fixes. It is not an unmodified upstream library: submit the repository
-source and identify these changes to reviewers. Its BSD license is in the file;
-all other asset credits are in ATTRIBUTIONS.md. Mozilla may request additional
-information about locally modified third-party code.
+lib/chess.js is derived from `dist/esm/chess.js` in Jeff Hlywa's chess.js **1.0.0**
+official npm package:
+
+- Original distribution: https://registry.npmjs.org/chess.js/-/chess.js-1.0.0.tgz
+- Readable upstream source: https://github.com/jhlywa/chess.js/blob/v1.0.0/src/chess.ts
+- Release/build instructions: https://github.com/jhlywa/chess.js/tree/v1.0.0
+
+The initial bundled file matches that distribution after normalizing line endings.
+Local changes replace every PGN comment brace and remove a no-op newline masking
+helper while preserving regular-expression separators. The modified readable
+JavaScript is included in the submitted source and copied without compilation or
+minification during the extension build. Its BSD 2-Clause license notice is retained.
+All other asset credits are in ATTRIBUTIONS.md.
 
 ### Functional checks
 
