@@ -677,7 +677,7 @@ button { font-family: inherit; cursor: pointer; }
 
 /* ---------- ENGINE LINES ---------- */
 .engine-line {
-  display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: center;
+  display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 12px; align-items: center;
   padding: 9px 4px; border-bottom: 1px solid var(--line-soft); font-family: var(--font-mono);
 }
 .engine-line:last-child { border-bottom: 0; }
@@ -752,7 +752,7 @@ button { font-family: inherit; cursor: pointer; }
 
 /* settings popover */
 .settings-pop {
-  position: fixed; top: 64px; right: 8px; z-index: 60; width: 286px;
+  position: fixed; top: 64px; right: 24px; z-index: 60; width: 286px;
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
   box-shadow: var(--shadow); padding: 14px 16px 16px;
   display: flex; flex-direction: column; gap: 12px;
@@ -953,6 +953,11 @@ button { font-family: inherit; cursor: pointer; }
 /* panels fill their module and scroll when needed */
 .mod .panel:not(.review-mini) { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .mod .panel:not(.review-mini) .panel-body { flex: 1; min-height: 0; overflow: auto; }
+/* Engine contents keep their natural height; fitEnginePanel grows the module downward. */
+.mod[data-mod="engine"] .panel-head { flex: none; flex-wrap: wrap; }
+.mod[data-mod="engine"] .panel .engine-body { flex: none; height: auto; overflow: visible; }
+.engine-body > * { flex-shrink: 0; }
+.mod[data-mod="engine"] .engine-bestwalk { white-space: normal; }
 .mod .moves-panel .ml-scroll { max-height: none; overflow: visible; }
 .mod:not([data-mod="board"]):not([data-mod="controls"]) > .mod-inner > div { height: 100%; display: flex; flex-direction: column; min-height: 0; }
 
