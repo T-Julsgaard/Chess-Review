@@ -15,7 +15,7 @@
     "test:browsers": "node scripts/browser-smoke.mjs"
   },
   "devDependencies": {
-    "jsdom": "^26.1.0",
+    "jsdom": "^30.1.1",
     "web-ext": "^10.7.0"
   }
 }
