@@ -15,12 +15,26 @@ const HANDSHAKE_TIMEOUT_MS = 10000;
 const SEARCH_SILENCE_TIMEOUT_MS = 120000;
 
 export class Engine {
-  constructor(scriptPath = "engine/stockfish.js", wasmPath = scriptPath.replace(/\.js$/, ".wasm")) {
+  constructor(scriptPath = "engine/stockfish-10/stockfish.js", wasmPath = undefined, options = {}) {
+    let opts = options;
+    if (typeof scriptPath === "object" && scriptPath !== null) {
+      opts = scriptPath;
+      wasmPath = opts.wasm;
+      scriptPath = opts.script;
+    } else if (wasmPath === undefined) {
+      wasmPath = scriptPath.endsWith(".asm.js") ? null : scriptPath.replace(/\.js$/, ".wasm");
+    }
+
     // Give Stockfish the explicit wasm path via the URL hash (nmrugg reads
     // self.location.hash as the wasm path). Use an absolute extension URL so it's
     // unambiguous regardless of the worker's base URL.
-    const wasmUrl = browserAPI?.runtime?.getURL ? browserAPI.runtime.getURL(wasmPath) : wasmPath;
+    const wasmUrl = wasmPath
+      ? (browserAPI?.runtime?.getURL ? browserAPI.runtime.getURL(wasmPath) : wasmPath)
+      : "";
     this.scriptPath = scriptPath;
+    this.wasmPath = wasmPath;
+    this.supportsThreads = opts.supportsThreads !== false;
+    this.flavorLabel = opts.label || null;
     this.dead = false;
     this.queue = [];
     this.current = null;
@@ -28,7 +42,8 @@ export class Engine {
     // A worker whose script URL is bad throws synchronously from the constructor — treat that the
     // same as any other load failure so createEngine() can fall back instead of crashing the page.
     try {
-      this.worker = new Worker(`${scriptPath}#${wasmUrl}`);
+      const workerUrl = wasmUrl ? `${scriptPath}#${wasmUrl}` : scriptPath;
+      this.worker = new Worker(workerUrl);
     } catch (e) {
       this.dead = true;
       this._ready = Promise.reject(new Error(`engine worker could not be created (${scriptPath}): ${e?.message || e}`));
@@ -78,6 +93,7 @@ export class Engine {
     await this._ready;
     for (const [name, value] of Object.entries(opts)) {
       if (value == null) continue;
+      if (name === "Threads" && this.supportsThreads === false) continue;
       this._send(`setoption name ${name} value ${value}`);
     }
   }
