@@ -44,25 +44,17 @@ By **Kadagaden**, from the `chess-pieces` repository.
   "Copyright 2000, Sounddogs.com" (commercial royalty-free library, as redistributed
   by Lichess). Retained here for transparency.
 
-## "Wrong answer" practice sounds
-- **Files:** `sounds/Wrong/*.mp3`
+## "Wrong answer" practice sound
+- **File:** `sounds/Wrong/Incorrect.mp3`
 - **Source:** [Pixabay](https://pixabay.com/sound-effects/) — used under the
   **Pixabay Content License** (https://pixabay.com/service/license-summary/):
   free for commercial and non-commercial use, no attribution required; the
   credits below are given voluntarily. (Bundling inside an app is permitted;
   redistributing the bare audio files on another stock/download platform is not.)
-- **Creators:**
-  - `Wrong.mp3` — "Wrong" by **lionelmatthew001**
-    ([Freesound profile](https://freesound.org/people/lionelmatthew001/)) — originally a
-    CC0 Freesound upload, mirrored to Pixabay via the `freesound_community` account.
-    Source: https://pixabay.com/sound-effects/people-wrong-83488/
-  - `No.mp3` — "No" (male voice SFX) by **Mrstokes302**
-    ([Pixabay artist](https://pixabay.com/users/mrstokes302/)).
-    Source: https://pixabay.com/sound-effects/people-quotnoquot-male-voice-sfx-mrstokes302-423290/
-  - `Incorrect.mp3` — "Training Program Incorrect2" by **timgormly**
-    ([Freesound profile](https://freesound.org/people/timgormly/)) — originally a
-    CC0 Freesound upload, mirrored to Pixabay via the `freesound_community` account.
-    Source: https://pixabay.com/sound-effects/film-special-effects-training-program-incorrect2-88735/
+- **Creator:** "Training Program Incorrect2" by **timgormly**
+  ([Freesound profile](https://freesound.org/people/timgormly/)) — originally a
+  CC0 Freesound upload, mirrored to Pixabay via the `freesound_community` account.
+  Source: https://pixabay.com/sound-effects/film-special-effects-training-program-incorrect2-88735/
 
 ## Chess engine
 - **Files:** `engine/stockfish*.js`, `engine/stockfish*.wasm`
@@ -94,7 +86,12 @@ By **Kadagaden**, from the `chess-pieces` repository.
 ## Chess logic library
 - **File:** `lib/chess.js`
 - **Author:** Jeff Hlywa — **License:** BSD 2-Clause
-- **Source:** https://github.com/jhlywa/chess.js
+- **Upstream version:** chess.js **1.0.0**, `dist/esm/chess.js` from the official npm package.
+- **Original distribution:** https://registry.npmjs.org/chess.js/-/chess.js-1.0.0.tgz
+- **Readable source:** https://github.com/jhlywa/chess.js/blob/v1.0.0/src/chess.ts
+- **Release/build instructions:** https://github.com/jhlywa/chess.js/tree/v1.0.0
+- **Verification:** The initial bundled file matches the official 1.0.0 distribution
+  after normalizing line endings; the current file differs only by the local changes below.
 - **Local maintenance:** Replace every PGN comment brace and remove a no-op newline
   masking helper while preserving regular-expression separators. The original license notice is retained.
 
