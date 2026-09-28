@@ -63,7 +63,12 @@ test('Stockfish 18 NNUE is selected by default and listed first', t => {
   const buttons=[...a.dom.window.document.querySelectorAll('#settings .set-seg button')];
   const first=buttons.findIndex(b=>b.textContent==='Stockfish 18 NNUE');
   assert.ok(first>=0); assert.equal(buttons[first].classList.contains('on'),true);
-  assert.equal(buttons[first+1].textContent,'Stockfish 19');
+  assert.equal(buttons[first+1].textContent,'Stockfish 19 Lite');
+});
+
+test('Maple is the default board theme', t => {
+  const a = layout(t);
+  assert.equal(a.state.settings.boardTheme, 'maple');
 });
 
 test('desktop matches the saved canvas geometry and preserves the gap when accuracy collapses', async t => {

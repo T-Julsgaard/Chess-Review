@@ -12,7 +12,7 @@ rating. No account, no server, no manual PGN copying.
 ## Features
 
 - **One-click review** of any Chess.com or Lichess game — or paste a game URL / raw PGN.
-- **Accuracy scores** for both players, calibrated to be close to Chess.com's (≈95% correlated, within ~3 points on average).
+- **Accuracy scores** for both players, calibrated using Stockfish 18 NNUE. Scores can differ from other review tools.
 - **Move classifications** from Brilliant to Blunder, with an evaluation graph and best-move arrows.
 - **Estimated rating** — a rough guide to the level each player performed at in the game.
 - **Opening detection** from an offline book, named even for PGNs without headers.
@@ -20,11 +20,11 @@ rating. No account, no server, no manual PGN copying.
   your move list, and see evaluations, opening names, and move ratings.
 - **Rated alternatives** while reviewing a game, using the same classification rules
   as the played moves. Exploring does not change the original game or its accuracy.
-- **Stockfish 19 NNUE** bundled locally, with Stockfish 18 NNUE and Stockfish 10
-  alternatives. New installs default to 19; existing engine preferences are retained.
+- **Stockfish 18 NNUE is the default**, with **Stockfish 19 Lite** as a compact
+  alternative. Both are bundled locally and available in Settings.
 - **Recoverable analysis errors** with a Retry button; unfinished reviews are not
   saved as completed games.
-- **Runs entirely on your machine** — your games never leave your computer.
+- **Analysis runs on your machine** — game lookup requests go directly to the chess platforms; no developer backend or analytics.
 
 ## Usage
 
@@ -41,10 +41,12 @@ drag pieces to make legal moves. Use the move list, arrow keys, or Home/End to
 navigate. Making a different move replaces the continuation from that position.
 
 The opening dictionary is bundled offline and has no automatic downloads.
-Stockfish 19 adds approximately 95 MiB and is heavier than the Stockfish 18 lite
-build. Select a lighter engine in Settings if needed. The existing accuracy
-calibration was fitted to Stockfish 18 lite; the accuracy agreement advertised
-above has not been re-benchmarked for Stockfish 19.
+Stockfish 19 Lite uses a smaller network than full Stockfish 19 and is not equivalent
+in playing strength. The existing accuracy calibration was fitted to Stockfish 18
+NNUE and has not been re-benchmarked for 19 Lite. Both builds use a single thread
+per worker; the Workers setting already distributes positions across multiple workers.
+The redundant Stockfish 10 and asm.js engines have been removed. Their saved
+preferences migrate to 18; existing full-19 preferences migrate to 19 Lite.
 
 ## Install
 
@@ -60,8 +62,17 @@ Goto: https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenk
 
 ## Privacy
 
-Games are fetched only from Chess.com's and Lichess's public, documented APIs and analyzed locally
-with a bundled WebAssembly build of Stockfish. Nothing is sent to any third-party server.
+Games are fetched from Chess.com's and Lichess's public APIs and analyzed locally
+with bundled WebAssembly builds of Stockfish. Lookup requests include public player
+usernames or game IDs. No games or analysis are sent to the developer or analytics services.
+Firefox discloses the browsing activity and website content used for these requests.
+
+## Release packages
+
+Run `npm ci`, `npm test`, `npm run verify:engines`, and `npm run build`.
+The build creates separate Chrome and Firefox ZIPs under `web-ext-artifacts/`,
+with browser-specific manifests and no development dependencies or tests.
+See [RELEASE.md](RELEASE.md) for store reviewer notes and validation commands.
 
 ## License & attributions
 

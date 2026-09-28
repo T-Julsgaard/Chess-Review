@@ -68,25 +68,23 @@ By **Kadagaden**, from the `chess-pieces` repository.
 - **Files:** `engine/stockfish*.js`, `engine/stockfish*.wasm`
 - **Project:** Stockfish.js by Nathan Rugg (nmrugg), a JS/WASM port of Stockfish —
   https://github.com/nmrugg/stockfish.js
-- **Default for new installs:** `engine/stockfish-19-nnue.{js,wasm}` is **Stockfish.js
-  19.0.0, © 2026 Chess.com, LLC**, Nathan Rugg's full, single-threaded NNUE build.
-  The files are the upstream `stockfish-19-single.js` and `stockfish-19-single.wasm`,
-  renamed locally. Existing users retain their saved engine preference.
+- **Default:** Stockfish.js 18.0.0 Lite single-threaded NNUE, copyright 2026 Chess.com, LLC.
+  Official files `stockfish-18-lite-single.js` and `.wasm` are renamed locally to
+  `engine/stockfish-nnue.js` and `.wasm` without content changes.
+  - Release: https://github.com/nmrugg/stockfish.js/releases/tag/v18.0.0
+  - Source/build instructions: https://github.com/nmrugg/stockfish.js/tree/v18.0.0
+- **Alternative:** Stockfish.js 19.0.0 Lite single-threaded NNUE, copyright 2026 Chess.com, LLC.
+  Official files `engine/stockfish-19-lite-single.js` and `.wasm`, unchanged.
   - Release: https://github.com/nmrugg/stockfish.js/releases/tag/v19.0.0
-  - Corresponding source and build instructions: https://github.com/nmrugg/stockfish.js/tree/v19.0.0
-  - License: https://github.com/nmrugg/stockfish.js/blob/v19.0.0/Copying.txt
-  - File checksums and provenance: [`engine/README.md`](engine/README.md)
-- **Lighter alternative:** `engine/stockfish-nnue.{js,wasm}` is **Stockfish.js 18, © Chess.com,
-  LLC** (per the file header), a NNUE-enabled build distributed via nmrugg's Stockfish.js.
-- **Fallback builds:** `engine/stockfish.{js,wasm}` and `engine/stockfish.asm.js` are the
-  Stockfish 10 builds from nmrugg's Stockfish.js.
-- **NNUE evaluation networks:** Stockfish team and network contributors; the bundled
-  Stockfish 18 lite network is by Linmiao Xu ("linrock") —
-  https://tests.stockfishchess.org/nns
-- **License:** GPL / GPLv3 — https://github.com/nmrugg/stockfish.js/blob/v19.0.0/Copying.txt
-- **Upstream:** Stockfish by T. Romstad, M. Costalba, J. Kiiski, G. Linscott and
-  contributors — https://github.com/official-stockfish/Stockfish
-- Corresponding source for the bundled engine is available at the URLs above.
+  - Source/build instructions: https://github.com/nmrugg/stockfish.js/tree/v19.0.0
+- **NNUE networks:** Stockfish team and contributors; 18 lite by Linmiao Xu (linrock),
+  19 lite by sscg13. See https://tests.stockfishchess.org/nns
+- **License:** GPLv3, included in [LICENSE](LICENSE).
+  https://github.com/nmrugg/stockfish.js/blob/v19.0.0/Copying.txt
+- **Upstream:** Stockfish by T. Romstad, M. Costalba, J. Kiiski, G. Linscott and contributors:
+  https://github.com/official-stockfish/Stockfish
+- File checksums, exact asset links, and engine choices: [engine/README.md](engine/README.md)
+  and [engine/checksums.json](engine/checksums.json).
 
 ## Opening book
 - **File:** `data/book.json` (bundled offline; updated only with extension releases)
