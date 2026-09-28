@@ -234,12 +234,14 @@ function injectLichessReviewButton(followUp) {
   btn.type = "button";
   btn.className = "fbt chess-analyzer-review"; // fbt = Lichess's button style, so it fits in
   btn.style.borderRadius = "0"; // match the square corners of the other follow-up buttons
-  btn.innerHTML =
-    `<img class="chess-analyzer-review-logo" alt="" ` +
-    `style="width:16px;height:16px;margin-right:6px;vertical-align:middle;position:relative;top:-1px;"> ` +
-    `<span class="chess-analyzer-review-label">${LI_REVIEW_LABEL}</span>`;
-  const label = btn.querySelector(".chess-analyzer-review-label");
-  const logo = btn.querySelector(".chess-analyzer-review-logo");
+  const logo = document.createElement("img");
+  logo.className = "chess-analyzer-review-logo";
+  logo.alt = "";
+  logo.style.cssText = "width:16px;height:16px;margin-right:6px;vertical-align:middle;position:relative;top:-1px;";
+  const label = document.createElement("span");
+  label.className = "chess-analyzer-review-label";
+  label.textContent = LI_REVIEW_LABEL;
+  btn.append(logo, " ", label);
   getLogoDataUrl().then((url) => { if (url) logo.src = url; });
   let resetTimer = null;
 

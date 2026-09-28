@@ -1,43 +1,40 @@
 # Bundled Stockfish engines
 
-All engines run locally. The extension does not download executable engine updates.
+All engine code and evaluation networks are bundled. Nothing executable is downloaded at runtime.
 
-## Stockfish 19
+| Engine | Purpose | Official files | Release |
+| --- | --- | --- | --- |
+| Stockfish 18 NNUE | Default; existing accuracy calibration | `stockfish-18-lite-single.js` / `.wasm` | [18.0.0](https://github.com/nmrugg/stockfish.js/releases/tag/v18.0.0) |
+| Stockfish 19 Lite | Optional compact alternative | `stockfish-19-lite-single.js` / `.wasm` | [19.0.0](https://github.com/nmrugg/stockfish.js/releases/tag/v19.0.0) |
 
-`stockfish-19-nnue.js` and `stockfish-19-nnue.wasm` are the full single-threaded
-build from [Stockfish.js 19.0.0](https://github.com/nmrugg/stockfish.js/releases/tag/v19.0.0),
-released by Nathan Rugg. Copyright 2026 Chess.com, LLC. Based on Stockfish by
-T. Romstad, M. Costalba, J. Kiiski, G. Linscott and the Stockfish contributors,
-including the upstream neural-network contributors.
+18's files are named `stockfish-nnue.js` / `.wasm` locally. Both pairs are byte-for-byte
+official release assets, with SHA-256 checksums and original download URLs recorded in
+[`checksums.json`](checksums.json). Run `npm run verify:engines` to verify them.
+The 18 WASM is unchanged from the previous extension release; its loader now matches
+the official release exactly. `.gitattributes` preserves the original loader bytes.
 
-- Original names: `stockfish-19-single.js` and `stockfish-19-single.wasm`.
-- Corresponding source and build instructions: https://github.com/nmrugg/stockfish.js/tree/v19.0.0
-- Stockfish engine revision: https://github.com/official-stockfish/Stockfish/commit/edb0d9d
-- License: GNU GPL version 3, included in [`../LICENSE`](../LICENSE).
-- Upstream license: https://github.com/nmrugg/stockfish.js/blob/v19.0.0/Copying.txt
+The single-threaded builds work without cross-origin isolation. The extension already
+parallelizes positions across independent workers, so additional multithreaded variants
+would duplicate engines and require a different deployment setup. Stockfish 10 and
+asm.js are removed: both supported browsers have WebAssembly, and the two remaining
+builds can fall back to each other if startup fails. If neither works, analysis offers Retry.
 
-The WASM is unchanged. The JavaScript executable content is unchanged; only
-line endings in its header differ. The local filenames were changed for this app.
+Stockfish 19 Lite has a smaller network and is weaker than full Stockfish 19. No claim
+is made that it is stronger than the bundled 18 NNUE at the same depth. Accuracy has
+not been recalibrated for 19 Lite. Full-19 saved settings migrate to `sf19lite`, which
+also prevents restoring full-19 evaluations as if they came from Lite. Removed legacy
+engine settings migrate to the default 18 NNUE.
 
-SHA-256 of the WASM (99,102,793 bytes):
+## Sources and licenses
 
-```text
-8725c26572762617fd96b2ea83ff130e6640b85815890d682bf8c49db0820721
-```
+Stockfish.js by Nathan Rugg (nmrugg), copyright 2026 Chess.com, LLC, under GPLv3:
 
-SHA-256 of the JavaScript after normalizing CRLF to LF (matching upstream):
+- [18 source and build instructions](https://github.com/nmrugg/stockfish.js/tree/v18.0.0)
+- [19 source and build instructions](https://github.com/nmrugg/stockfish.js/tree/v19.0.0)
+- [Upstream license](https://github.com/nmrugg/stockfish.js/blob/v19.0.0/Copying.txt); included as [`../LICENSE`](../LICENSE)
+- [Stockfish contributors](https://github.com/official-stockfish/Stockfish)
+- 18 lite network: Linmiao Xu (linrock), `nn-9067e33176e`
+- 19 lite network/code: [sscg13](https://github.com/sscg13/Stockfish/tree/sf19-1mb), `nn-61e7af4bb97d`
 
-```text
-72772f8bdd7353e4e24245d946bb831f56bcccf02fa16a779c1b92a6c00e5cc2
-```
-
-Stockfish 19 is the default for new settings. Existing engine preferences are
-retained. This full build requires more memory and loading time than the bundled
-Stockfish 18 lite build. If startup fails, the extension tries the lighter bundled
-builds and identifies the fallback in the engine panel.
-
-## Older builds
-
-`stockfish-nnue.{js,wasm}` is the lighter Stockfish 18 NNUE build.
-`stockfish.{js,wasm}` and `stockfish.asm.js` are Stockfish 10 fallbacks.
-See [`../ATTRIBUTIONS.md`](../ATTRIBUTIONS.md) for credits and licensing.
+For AMO, include these exact release and source links in Notes for Reviewers; see
+[`../RELEASE.md`](../RELEASE.md). No local engine compilation is needed.

@@ -61,10 +61,9 @@ test('ongoing engine output extends the search timeout',async t=>{
   eng.worker.line('bestmove e2e4');assert.equal((await result).score.cp,12);
 });
 
-test('full Stockfish 19 receives more startup time, then fails cleanly if silent',async t=>{
+test('Stockfish 19 Lite fails cleanly if its startup is silent',async t=>{
   t.mock.timers.enable({apis:['setTimeout']});
-  const eng=engine(t,{path:'engine/stockfish-19-nnue.js',noReady:true});
+  const eng=engine(t,{path:'engine/stockfish-19-lite-single.js',noReady:true});
   const failed=assert.rejects(eng.setOptions(),/timed out/);
-  t.mock.timers.tick(10001);assert.equal(eng.dead,false);
-  t.mock.timers.tick(20000);await failed;assert.equal(eng.dead,true);
+  t.mock.timers.tick(10001);await failed;assert.equal(eng.dead,true);
 });

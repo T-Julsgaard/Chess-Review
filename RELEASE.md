@@ -1,0 +1,101 @@
+# Release 0.2.0
+
+## Packages and verification
+
+Run `npm ci`, `npm test`, `npm run verify:engines`, and `npm run build`.
+The build writes `web-ext-artifacts/chess-review-0.2.0-chrome.zip` and
+`web-ext-artifacts/chess-review-0.2.0-firefox.zip`. Staged unpacked copies and exact
+sizes are recorded in `web-ext-artifacts/release-sizes.json`.
+
+Then run `npm run test:browsers` for real engine startup and completed reviews in
+headless Chrome and Firefox. The script defaults to their standard Windows install
+paths; override with CHROME_PATH and FIREFOX_PATH where needed. It uses isolated
+profiles and test-only extension copies with a loopback reporting endpoint; the
+store ZIPs are never modified. It checks a fresh default-18 review and migration
+from the old full-19 preference to Lite. Results are saved in
+`web-ext-artifacts/browser-smoke-results.json`.
+
+Validate the actual Firefox ZIP with:
+
+```sh
+npx web-ext lint --source-dir=web-ext-artifacts/chess-review-0.2.0-firefox.zip
+```
+
+Chrome uses an MV3 module service worker. Firefox uses an MV3 module event page.
+Store packages omit the other browser's background declaration. The development
+manifest includes both so the project can be loaded directly in either browser.
+
+Before uploading, confirm 0.2.0 is greater than the latest uploaded version in both
+store dashboards. Keep the existing Chrome item and Firefox extension ID; do not
+create replacement listings. This repository does not authenticate to or publish
+to either store during build. Check that current screenshots match the two engine
+choices, and use PRIVACY.md as the basis for the hosted privacy-policy URL.
+
+## Reviewer notes
+
+Chess Review analyzes public chess games locally. For a review requested by the
+user, public player usernames or game identifiers go directly to api.chess.com or
+lichess.org. There is no developer backend, telemetry, remote executable code,
+or account/login service. Firefox's browsingActivity and websiteContent declarations
+cover those requests; desktop minimum 140 and Android minimum 142 support the
+built-in data consent. Android compatibility still needs device testing before
+claiming Android support in the listing.
+
+Permissions: storage and unlimitedStorage hold settings and game/analysis caches;
+activeTab reads the selected game URL; host permissions add the review controls
+and fetch public games. Update the Chrome privacy form to match PRIVACY.md; do not
+claim that no lookup identifiers ever leave the device.
+
+### Bundled libraries
+
+Both engine pairs are original release assets from Nathan Rugg's Stockfish.js:
+
+- 18 release: https://github.com/nmrugg/stockfish.js/releases/tag/v18.0.0
+- 18 readable source/build instructions: https://github.com/nmrugg/stockfish.js/tree/v18.0.0
+- 19 release: https://github.com/nmrugg/stockfish.js/releases/tag/v19.0.0
+- 19 readable source/build instructions: https://github.com/nmrugg/stockfish.js/tree/v19.0.0
+
+Exact original asset URLs and SHA-256 values are in engine/checksums.json. The 18
+pair is renamed to stockfish-nnue locally; file contents are unchanged. Networks
+are embedded in WASM. No engine compilation or minification is performed here.
+Stockfish 18 NNUE is the default; 19 Lite is optional. Full 19, Stockfish 10, and
+asm.js are no longer included. Existing full-19 preferences migrate to Lite;
+legacy preferences migrate to 18. The engine tooltips disclose the Lite tradeoff.
+
+lib/chess.js is readable source derived from Jeff Hlywa's chess.js, with local PGN
+comment/newline fixes. It is not an unmodified upstream library: submit the repository
+source and identify these changes to reviewers. Its BSD license is in the file;
+all other asset credits are in ATTRIBUTIONS.md. Mozilla may request additional
+information about locally modified third-party code.
+
+### Functional checks
+
+No test account is needed. Open the popup away from a chess site and:
+
+1. Paste `1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 *` into Manual setup and review it.
+2. Verify 18 NNUE is selected by default; switch to 19 Lite and re-analyze.
+3. Open Explore board, make a move, and verify engine output and navigation.
+4. On a finished public Chess.com/Lichess game, launch through the popup, keyboard
+   shortcut, and in-page review button. A missing content script should produce
+   a username prompt or use the saved username, never a TypeError.
+5. Switch tabs during a retry: the review must remain attached to the original game.
+
+Automated tests cover the API failures, retry tab identity, preference migration,
+cache invalidation, and fallback in both directions. Run browser smoke checks
+against the staged store packages, including real WASM startup and a completed review.
+
+### Validator warnings
+
+The combined development manifest deliberately contains both background types;
+Firefox reports the ignored service_worker field. The Firefox ZIP omits it.
+HTML/SVG assignments in analysis.js are limited to bundled icon/handle markup and
+locally generated evaluation graph markup. Player names and PGNs use text nodes.
+The remaining UNSAFE_VAR_ASSIGNMENT warning points to the shared `el()` helper's
+`html` attribute. Its callers only pass the bundled icons/handles/brand and numeric,
+locally generated graph markup. Arrows and injected review buttons now use DOM
+nodes and attributes instead. The warning is documented, not globally suppressed.
+
+Store references:
+- https://developer.chrome.com/docs/webstore/update
+- https://extensionworkshop.com/documentation/publish/third-party-library-usage/
+- https://extensionworkshop.com/documentation/develop/firefox-builtin-data-consent/

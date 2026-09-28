@@ -59,3 +59,15 @@ test('credits include Stockfish 19, upstream source and contributors',t=>{
   assert.ok(overlay.querySelector('a[href="https://github.com/T-Julsgaard/Chess-Review"]'));
   assert.ok(overlay.querySelector('a[href="https://github.com/neuroflowinfinix"]'));
 });
+
+test('arrow settings remain attributes and cannot inject SVG markup', t => {
+  const a = board(t);
+  a.state.settings.arrowOpacity = '1"><script>bad()</script><g opacity="1';
+  a.state.settings.arrowShaft = '0.2" onload="bad()';
+  const node = a.call('arrowNode', [{x:0,y:0},{x:1,y:1}], [{x:1,y:1},{x:0.8,y:1}], '#85ae4a');
+  assert.equal(node.querySelector('script'), null);
+  assert.equal(node.querySelector('[onload]'), null);
+  assert.equal(node.querySelectorAll('polyline').length, 1);
+  assert.equal(node.querySelectorAll('polygon').length, 1);
+  assert.equal(node.getAttribute('opacity'), a.state.settings.arrowOpacity);
+});

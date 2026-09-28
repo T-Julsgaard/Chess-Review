@@ -341,11 +341,15 @@ function buildReviewButton(widthClass, mt = 14, mb = 3) {
   btn.style.cssText = `margin-top:${mt}px;margin-bottom:${mb}px;position:relative;`;
   // Logo is an extension file → loaded via browserAPI.runtime.getURL (listed in web_accessible_resources).
   const logoUrl = browserAPI.runtime.getURL("icons/icon.png");
-  btn.innerHTML =
-    `<img class="chess-analyzer-free-review-logo" src="${logoUrl}" alt="" ` +
-    `style="position:absolute;top:6px;right:8px;width:20px;height:20px;border:1px solid #000;border-radius:3px;"> ` +
-    `<span class="chess-analyzer-free-review-label">${FREE_REVIEW_LABEL}</span>`;
-  const label = btn.querySelector(".chess-analyzer-free-review-label");
+  const logo = document.createElement("img");
+  logo.className = "chess-analyzer-free-review-logo";
+  logo.src = logoUrl;
+  logo.alt = "";
+  logo.style.cssText = "position:absolute;top:6px;right:8px;width:20px;height:20px;border:1px solid #000;border-radius:3px;";
+  const label = document.createElement("span");
+  label.className = "chess-analyzer-free-review-label";
+  label.textContent = FREE_REVIEW_LABEL;
+  btn.append(logo, " ", label);
   let resetTimer = null;
 
   btn.addEventListener("click", () => {
