@@ -204,8 +204,8 @@ const DEFAULT_SETTINGS = {
   // coachPlain toggles only the reply VOICE: false = the coach's special phrasing,
   // true = neutral "plain" commentary (the coach still appears and reacts on the board).
   coach: "old_soviet", coachPlain: true,
-  // Start with the green board and bundled "Default" (image) pieces.
-  boardTheme: "green", pieceStyle: "image", sound: true,
+  // Start with the walnut board and bundled "Default" (image) pieces.
+  boardTheme: "walnut", pieceStyle: "image", sound: true,
   // Master volume (0–100) applied to every sound the extension plays.
   soundVolume: 50,
   // Custom board colours (used when boardTheme === "custom" — the colour-picker chip, shown first).
