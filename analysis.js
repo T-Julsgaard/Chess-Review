@@ -4414,6 +4414,7 @@ const CREDITS = [
 ];
 const CONTRIBUTORS = [
   { name: "aciokie", username: "aciokie", role: "Contributor" },
+  { name: "neuroflowinfinix", username: "neuroflowinfinix", role: "Contributor" },
   { name: "Kristian Julsgaard", username: "Julsgaard", role: "Contributor" },
   { name: "Arthur Guedes", username: "arthurhguedes", role: "Contributor" },
   { name: "T-Julsgaard", username: "T-Julsgaard", role: "Maintainer" },
