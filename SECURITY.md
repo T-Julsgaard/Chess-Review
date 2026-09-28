@@ -12,7 +12,7 @@ Use GitHub's **[Report a vulnerability](https://github.com/T-Julsgaard/Chess-Rev
 form to send a private report to the maintainer.
 
 If you cannot use GitHub's reporting form, email
-**[T.Julsgaard@proton.me](mailto:T.Julsgaard@proton.me)** with the subject
+**[Thomas@Julsgaard.dev](mailto:Thomas@Julsgaard.dev)** with the subject
 **Chess Review security report**. Please do not open a public issue or pull
 request containing vulnerability details.
 
