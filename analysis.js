@@ -303,7 +303,7 @@ const DEFAULT_LAYOUT = {
   moves:    { x: 1200, y: 218, w: 300, h: 386 },
   accuracy: { x: 1510, y: 216, w: 294, h: 506 },
   graph:    { x: 1200, y: 620, w: 302, h: 178 },
-  engine:   { x: 1512, y: 738, w: 294, h: 158 },
+  engine:   { x: 1512, y: 738, w: 294, h: 176 },
 };
 const GRIP_SVG = `<svg viewBox="0 0 12 12" width="12" height="12"><path d="M11 4 4 11M11 8 8 11" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>`;
 const HANDLE_SVG = `<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><circle cx="5" cy="4" r="1.3"/><circle cx="11" cy="4" r="1.3"/><circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/><circle cx="5" cy="12" r="1.3"/><circle cx="11" cy="12" r="1.3"/></svg>`;
@@ -1388,7 +1388,7 @@ function buildUI() {
   initBoardInput();
   renderCoachAvatar();     // mount the animated coach portrait for the active personality
   renderLibrary();
-  window.addEventListener("resize", () => { growCanvas(); alignPlayers(); positionSettings(); });
+  window.addEventListener("resize", () => { fitEnginePanel(); growCanvas(); alignPlayers(); positionSettings(); });
 }
 
 /* ---------------- Loading indicator ----------------
@@ -1460,6 +1460,7 @@ function applyLayout() {
     mod.style.left = b ? b.x + "px" : ""; mod.style.top = b ? b.y + "px" : "";
     mod.style.width = b ? b.w + "px" : ""; mod.style.height = b ? b.h + "px" : "";
   }
+  fitEnginePanel();
   requestAnimationFrame(positionSettings);
 }
 // Freeze the automatic layout into free-canvas boxes, so Reorganize starts from exactly what is on
@@ -1487,8 +1488,7 @@ function snapshotLayout() {
   }
   return out;
 }
-// Space kept right of and below the last module on the canvas: the automatic layout's stage padding,
-// so a canvas snapshotted from it needs exactly the same room (and the same zoom).
+// Space kept right of and below layouts extending beyond the default desktop envelope.
 const CANVAS_MARGIN = 12;
 // Right and bottom edge of a module layout (px), floored at 600 so a near-empty canvas keeps a sane size.
 function layoutExtent(layout) {
@@ -1498,9 +1498,9 @@ function layoutExtent(layout) {
 }
 function growCanvas() {
   if (!isCustomLayout()) { UI.canvas.style.minHeight = ""; UI.canvas.style.minWidth = ""; return; }
-  const { maxR, maxB } = layoutExtent(S.layout);
-  UI.canvas.style.minHeight = maxB + CANVAS_MARGIN + "px";
-  UI.canvas.style.minWidth = maxR + CANVAS_MARGIN + "px";
+  const { pageW, pageH } = layoutPageSize(S.layout);
+  UI.canvas.style.minHeight = pageH - TOPBAR_H + "px";
+  UI.canvas.style.minWidth = pageW + "px";
 }
 // What collapsing the accuracy breakdown is worth on the canvas: the hidden rows' height (+ the
 // column row-gap), and every module in the same column sitting at/below the accuracy panel.
@@ -1591,6 +1591,7 @@ function makeMovable(mod, handle, grips, key) {
       const s = snapResize({ x: b.x, y: b.y, w, h }, modMinW(key));
       if (dir.includes("e")) { b.w = s.w; mod.style.width = b.w + "px"; }
       if (dir.includes("s")) { b.h = s.h; mod.style.height = b.h + "px"; }
+      if (key === "engine") fitEnginePanel();
       if (key === "board") alignPlayers();
     };
     const move = (ev) => apply(ev);
@@ -1612,15 +1613,14 @@ function makeMovable(mod, handle, grips, key) {
 }
 // Back to the automatic layout and its window-dependent fit.
 function resetLayout() {
-  const wasCustom = isCustomLayout();
   S._accReflow = null;   // drop any collapse offset so the fresh layout isn't double-adjusted
   S.layout = structuredClone(DEFAULT_LAYOUT);
   S.layoutMode = "auto";
   if (S.reorganize) toggleReorganize();
   applyLayoutMode();
   saveLayout();
-  if (wasCustom) initTabZoom();
   requestAnimationFrame(alignPlayers);
+  return initTabZoom();
 }
 // Reorganize mode: while ON, panels can be dragged/resized (handles + grips appear); while OFF
 // they're locked and hover shows nothing. The arranged layout auto-saves and persists. Entering it
@@ -3649,6 +3649,24 @@ async function requestPanelLines() {
   renderEngineCurrent();
 }
 const ENGINE_NAME = { sf19: "Stockfish 19", nnue: "Stockfish 18 NNUE", wasm: "Stockfish 10", asm: "Stockfish 10 (asm.js)" };
+// Keep all candidate lines and the action visible. Only the bottom edge moves, including
+// when narrowing a custom panel wraps its heading/button or extra lines are selected.
+function fitEnginePanel() {
+  const mod = UI.engine?.closest('.mod');
+  const head = UI.engine?.querySelector('.panel-head');
+  const body = UI.engine?.querySelector('.engine-body');
+  if (!mod || !head || !body) return;
+  const height = Math.max(DEFAULT_LAYOUT.engine.h,
+    Math.ceil((head.getBoundingClientRect().height + body.scrollHeight + 4) / GRID) * GRID);
+  mod.style.minHeight = height + "px";
+  if (isCustomLayout() && S.layout.engine) {
+    S.layout.engine.h = Math.max(S.layout.engine.h, height);
+    mod.style.height = S.layout.engine.h + "px";
+    growCanvas();
+  } else if (UI.canvas.classList.contains("desktop-layout")) {
+    mod.style.height = height + "px";
+  }
+}
 function renderEngine(lines, padFromCache = false) {
   const curFen = activePos().fen;
   const want = S.settings.engineLines;
@@ -3708,6 +3726,7 @@ function renderEngine(lines, padFromCache = false) {
       el("span", { class: "count" }, `${activeEngineName()} · depth ${S.settings.engineDepth}`)),
     el("div", { class: "panel-body engine-body" }, body, bestWalkBtn),
   ));
+  fitEnginePanel();
 }
 
 /* ---------------- Topbar meta ---------------- */
@@ -4336,17 +4355,10 @@ function renderSettings() {
 }
 function positionSettings() {
   if (!UI.settings || UI.settings.hidden) return;
-  UI.settings.style.right = "";
-  if (window.innerWidth <= 520) return; // the full-width mobile popover is handled by CSS
-  let edge = 0;
-  for (const mod of UI.canvas.querySelectorAll(".mod")) {
-    const r = mod.getBoundingClientRect();
-    if (r.width && r.height) edge = Math.max(edge, r.right);
-  }
-  if (!edge) return;
-  // Keep a small gap beside the panels, while keeping the popover inside the window.
-  const width = UI.settings.getBoundingClientRect().width;
-  UI.settings.style.right = Math.max(8, window.innerWidth - width - edge - 16) + "px";
+  // Keep the popover anchored to the right edge, beneath its toolbar button. Tying this
+  // offset to the analysis panels made it drift left on wide windows and briefly reuse
+  // stale panel geometry when the automatic/custom layout was reset.
+  UI.settings.style.right = window.innerWidth <= 520 ? "" : "24px";
 }
 function toggleSettings() {
   UI.settings.hidden = !UI.settings.hidden;
@@ -5395,26 +5407,41 @@ const MIN_ZOOM = 0.5, MAX_ZOOM = 2;  // below 50% the text is unreadable; above 
 let _zoomTabId = null;
 let _defaultZoom = 1;
 let _fittedDip = null;               // viewport size (device-independent px) the zoom was last fitted to
+let _zoomFitQueue = Promise.resolve();
+let _zoomInit = null;
 function desktopLayoutFor(dipW, dipH) {
   return dipW / _defaultZoom >= 1100 && dipH / _defaultZoom >= 520;
 }
 function desktopZoomFor(dipW, dipH) {
-  // Original v7 extent and breathing room. At 1920 × 920 (Full HD with browser chrome),
-  // this is 90%, exactly the proportions of the original desktop arrangement.
+  return fittedZoomFor(DEFAULT_LAYOUT, dipW, dipH);
+}
+function layoutPageSize(layout) {
+  const { maxR, maxB } = layoutExtent(layout);
+  const defaults = layoutExtent(DEFAULT_LAYOUT);
+  const desktopSized = maxR >= defaults.maxR && maxB >= defaults.maxB;
+  // Keep the desktop's breathing room on default-sized saved canvases too. Previously a snapshot
+  // reopened against 1818 × 1006, while Reset fitted 1832 × 1020 (91% versus 89%).
+  // Smaller arrangements (including snapshots of the narrow responsive grid) retain
+  // their own extent, so unlocking one never creates a desktop-width canvas.
+  return { pageW: Math.max(desktopSized ? 1832 : 0, maxR + CANVAS_MARGIN),
+    pageH: Math.max(desktopSized ? 1020 : 0, TOPBAR_H + maxB + CANVAS_MARGIN) };
+}
+function fittedZoomFor(layout, dipW, dipH) {
+  const { pageW, pageH } = layoutPageSize(layout);
   return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM,
-    Math.floor(Math.min((dipW - 2) / 1832, (dipH - 2) / 1020) * 100) / 100));
+    Math.floor(Math.min((dipW - 2) / pageW, (dipH - 2) / pageH) * 100) / 100));
 }
 function targetZoomFor(dipW, dipH) {
-  // The layout as shown (breakdown collapsed by default); expanding it later may scroll.
-  const { maxR, maxB } = layoutExtent(S.layout);
-  const pageW = maxR + CANVAS_MARGIN, pageH = TOPBAR_H + maxB + CANVAS_MARGIN;
-  // Round down to whole percents. The 0.05% tolerance keeps an exact fit (a canvas snapshotted from
-  // the automatic layout in this same window) at 100% instead of tipping it to 99%; it is well
-  // under a pixel, so it never adds a scrollbar.
-  const fit = Math.min(dipW / pageW, dipH / pageH);
-  return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Math.floor((fit + 0.0005) * 100) / 100));
+  return fittedZoomFor(S.layout, dipW, dipH);
 }
-async function fitTabZoom() {
+function fitTabZoom(force = false) {
+  // A reset can overlap a resize or startup. Never pair an old getZoom result
+  // with viewport dimensions already changed by another fit.
+  const next = _zoomFitQueue.catch(() => {}).then(() => performTabZoomFit(force));
+  _zoomFitQueue = next;
+  return next;
+}
+async function performTabZoomFit(force) {
   if (_zoomTabId == null) return;
   const z = (await browserAPI.tabs.getZoom(_zoomTabId)) || 1;
   // CSS viewport dimensions are rounded after browser zoom. Recover whole DIP pixels so
@@ -5422,8 +5449,7 @@ async function fitTabZoom() {
   const w = Math.round(innerWidth * z), h = Math.round(innerHeight * z);
   // Same device-pixel size as last time → this resize came from a zoom change (the user's Ctrl+/-,
   // our own setZoom, or another tab sharing the origin zoom), not from the window. Leave it.
-  if (_fittedDip && Math.abs(w - _fittedDip.w) < 3 && Math.abs(h - _fittedDip.h) < 3) return;
-  _fittedDip = { w, h };
+  if (!force && _fittedDip && Math.abs(w - _fittedDip.w) < 3 && Math.abs(h - _fittedDip.h) < 3) return;
   const desktop = !isCustomLayout() && desktopLayoutFor(w, h);
   UI.canvas.classList.toggle("desktop-layout", desktop);
   applyLayout();
@@ -5431,22 +5457,25 @@ async function fitTabZoom() {
   const target = isCustomLayout() ? targetZoomFor(w, h) : desktop ? desktopZoomFor(w, h) : _defaultZoom;
   // Only set it when it's off, so an unchanged window never triggers Chrome's zoom bubble.
   if (Math.abs(z - target) > 0.005) await browserAPI.tabs.setZoom(_zoomTabId, target);
+  _fittedDip = { w, h };
 }
 // Isolate zoom before fitting, so two analysis windows on different monitors keep their own fit.
 // Browsers rejecting per-tab scope retain their existing scope.
 async function initTabZoom() {
   try {
     if (!browserAPI?.tabs?.getCurrent) return;
-    const tab = await browserAPI.tabs.getCurrent();
-    if (!tab || tab.id == null) return;
-    _zoomTabId = tab.id;
-    _fittedDip = null;
-    const settings = await browserAPI.tabs.getZoomSettings(tab.id);
-    _defaultZoom = settings.defaultZoomFactor || 1;
-    // Keep a resized analysis window from changing other extension tabs' zoom.
-    await browserAPI.tabs.setZoomSettings(tab.id, { scope: "per-tab", mode: "automatic" }).catch(() => {});
-    await fitTabZoom();
-  } catch { return; }
+    if (!_zoomInit) _zoomInit = (async () => {
+      const tab = await browserAPI.tabs.getCurrent();
+      if (!tab || tab.id == null) return;
+      const settings = await browserAPI.tabs.getZoomSettings(tab.id);
+      _defaultZoom = settings.defaultZoomFactor || 1;
+      // Keep a resized analysis window from changing other extension tabs' zoom.
+      await browserAPI.tabs.setZoomSettings(tab.id, { scope: "per-tab", mode: "automatic" }).catch(() => {});
+      _zoomTabId = tab.id;
+    })();
+    await _zoomInit;
+    await fitTabZoom(true);
+  } catch { _zoomInit = null; return; }
   // Refit after the window is resized, maximized or moved to a different monitor. Debounced so a
   // drag-resize zooms once when it settles, not on every frame. Registered once per page.
   if (_zoomResizeBound) return;
@@ -5528,7 +5557,7 @@ async function resetLegacyZoom() {
     S.layout = useStored ? { ...structuredClone(DEFAULT_LAYOUT), ...store.layout } : structuredClone(DEFAULT_LAYOUT);
     S.layoutMode = useStored && store.layoutMode === "custom" ? "custom" : "auto";
     if (!useStored) saveLayout();
-    if (store.layoutVersion != null && store.layoutVersion !== LAYOUT_VERSION) resetLegacyZoom();
+    if (store.layoutVersion != null && store.layoutVersion !== LAYOUT_VERSION) await resetLegacyZoom();
     S.username = store.username || "";
 
     // Everything the first render needs must be resolved BEFORE buildUI(), so that buildUI() and
