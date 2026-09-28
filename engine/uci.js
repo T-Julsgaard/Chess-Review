@@ -9,7 +9,7 @@ import { browserAPI } from "../browser-compat.js";
 // change), the worker never replies — without this cap _ready would hang forever and every
 // analysis would silently stall. On timeout the handshake REJECTS, which lets the caller
 // fall back to the next build (see createEngine() in analysis.js).
-const HANDSHAKE_TIMEOUT_MS = 10000;
+const HANDSHAKE_TIMEOUT_MS = 60000;
 
 export class Engine {
   constructor(scriptPath = "engine/stockfish.js", wasmPath = scriptPath.replace(/\.js$/, ".wasm")) {
