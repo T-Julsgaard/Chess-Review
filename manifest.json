@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Chess Review",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Free, open source game review with local Stockfish analysis.",
+  "minimum_chrome_version": "121",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -44,9 +45,13 @@
       "strict_min_version": "140.0",
       "data_collection_permissions": {
         "required": [
-          "none"
+          "browsingActivity",
+          "websiteContent"
         ]
       }
+    },
+    "gecko_android": {
+      "strict_min_version": "142.0"
     }
   },
   "web_accessible_resources": [

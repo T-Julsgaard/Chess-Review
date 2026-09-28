@@ -30,27 +30,29 @@ export function isSupportedChessUrl(url) {
 
 // Reload the active chess tab, wait for it to finish loading, let the SPA settle, then analyze again.
 // Used as a one-shot retry when the just-finished game hasn't been exposed by the page SPA yet.
-export async function reloadActiveAndAnalyze(username) {
-  const tab = await getActiveTab();
+export async function reloadActiveAndAnalyze(username, tabId = null) {
+  const tab = tabId == null ? await getActiveTab() : await browserAPI.tabs.get(tabId);
   if (!tab || tab.id == null) throw new Error("No active tab");
   if (!isSupportedChessUrl(tab.url)) throw new Error("Not a supported chess site");
   await new Promise((resolve, reject) => {
+    const finish = (err) => {
+      browserAPI.tabs.onUpdated.removeListener(onUpdated);
+      clearTimeout(timer);
+      if (err) reject(err); else resolve();
+    };
     const onUpdated = (id, info) => {
       if (id === tab.id && info.status === "complete") {
-        browserAPI.tabs.onUpdated.removeListener(onUpdated);
-        clearTimeout(timer);
-        resolve();
+        finish();
       }
     };
     const timer = setTimeout(() => {
-      browserAPI.tabs.onUpdated.removeListener(onUpdated);
-      reject(new Error("reload timed out"));
+      finish(new Error("reload timed out"));
     }, 12000);
     browserAPI.tabs.onUpdated.addListener(onUpdated);
-    browserAPI.tabs.reload(tab.id);
+    Promise.resolve().then(() => browserAPI.tabs.reload(tab.id)).catch(finish);
   });
   await new Promise((r) => setTimeout(r, 900)); // let the chess.com SPA hydrate the game page
-  await analyzeActiveTab(username);
+  await analyzeActiveTab(username, tab.id);
 }
 
 /** Ask the content script in a tab for the game ID, etc. */
@@ -66,11 +68,20 @@ async function getGameInfoFromTab(tabId) {
  * Primary flow: use the active tab's game ID, fetch the PGN from the API, and open
  * the analysis. Throws an error with a user-friendly message if something is missing.
  */
-export async function analyzeActiveTab(username) {
-  const tab = await getActiveTab();
+export async function analyzeActiveTab(username, tabId = null) {
+  const tab = tabId == null ? await getActiveTab() : await browserAPI.tabs.get(tabId);
   if (!tab) throw new Error("Could not find the active tab.");
+  try {
+    await analyzeTab(tab, username);
+  } catch (err) {
+    // Keep retries attached to this game even if the user changes the active tab.
+    err.tabId = tab.id;
+    throw err;
+  }
+}
 
-  const info = await getGameInfoFromTab(tab.id);
+async function analyzeTab(tab, username) {
+  const info = (await getGameInfoFromTab(tab.id)) || {};
 
   // Lichess: the content script reports site:"lichess" (or we recognise the URL). Lichess gives us
   // the full PGN directly from a game id — no username/archive search needed.

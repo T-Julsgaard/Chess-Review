@@ -114,7 +114,7 @@ const ENGINE_INFO = {
   engineDepth:   "How many plies (half-moves) deep Stockfish searches each position. Higher depth gives more accurate evaluations and fewer false mistakes, but takes longer.",
   engineWorkers: "Number of Stockfish instances analysing positions in parallel. More workers finish the game faster on multi-core CPUs; the results are identical.",
   fastAnalysis:  "Trades quality for speed: the classification pass uses fewer engine lines. ~1.3×/1.6× faster, but evals shift slightly and clean games can pick up a few false inaccuracies.",
-  enginePath:    "Which Stockfish build to run. Stockfish 18 NNUE is the default; Stockfish 19 is the strongest but heavier; Stockfish 10 (WASM) is lighter still; asm.js is a fallback for browsers without WebAssembly support.",
+  enginePath:    "Stockfish 18 NNUE is the default. Stockfish 19 Lite uses a smaller evaluation network for a compact alternative. Both run locally; Lite is not the full-strength Stockfish 19 build.",
   engineSkill:   "Caps the engine's playing strength (Stockfish 'Skill Level'). Max (20) = full strength. Lower values play deliberately weaker — useful for more human-like suggestions.",
   engineHash:    "Recommended: 16 MB for most reviews (the default). Try 32–64 MB for deeper analysis if your computer has spare memory. Each parallel worker uses its own hash table, so memory use is roughly Hash × Workers.",
   clsGood:       "A move that loses at least this much eval (in pawns) can be no better than \"Good\". Below it, the move is \"Excellent\". Lower = stricter.",
@@ -189,8 +189,8 @@ const DEFAULT_SETTINGS = {
   // coachPlain toggles only the reply VOICE: false = the coach's special phrasing,
   // true = neutral "plain" commentary (the coach still appears and reacts on the board).
   coach: "old_soviet", coachPlain: true,
-  // Start with the walnut board and bundled "Default" (image) pieces.
-  boardTheme: "walnut", pieceStyle: "image", sound: true,
+  // Start with the maple board and bundled "Default" (image) pieces.
+  boardTheme: "maple", pieceStyle: "image", sound: true,
   // Master volume (0–100) applied to every sound the extension plays.
   soundVolume: 50,
   // Custom board colours (used when boardTheme === "custom" — the colour-picker chip, shown first).
@@ -243,12 +243,14 @@ const ENGINE_SETTING_KEYS = [
   "clsGood", "clsInacc", "clsBlunder", "clsClearAdv", "clsMistakeLoss", "clsMissTol",
   "accExcellent", "accGood", "accInacc", "accMiss", "accMistake", "accBlunder",
 ];
-// Available Stockfish builds (all bundled). "asm" = fallback without wasm.
-const ENGINE_BUILDS = { sf19: "engine/stockfish-19-nnue.js", nnue: "engine/stockfish-nnue.js", wasm: "engine/stockfish.js", asm: "engine/stockfish.asm.js" };
-// Fixed strength order, strongest → weakest. createEngine() always tries the user's chosen build
-// first, then walks DOWN this chain so a build that can't load (e.g. NNUE one day failing) degrades
-// to the next-strongest one that does — rather than the analysis silently hanging.
-const ENGINE_FALLBACK_ORDER = ["sf19", "nnue", "wasm", "asm"];
+// Two single-threaded builds; the app parallelizes positions across independent workers.
+const ENGINE_BUILDS = { nnue: "engine/stockfish-nnue.js", sf19lite: "engine/stockfish-19-lite-single.js" };
+const ENGINE_FALLBACK_ORDER = ["nnue", "sf19lite"];
+
+function migrateEngineSettings(settings) {
+  if (settings.enginePath === "sf19") settings.enginePath = "sf19lite";
+  if (!Object.hasOwn(ENGINE_BUILDS, settings.enginePath)) settings.enginePath = DEFAULT_SETTINGS.enginePath;
+}
 // The engine panel shows up to this many candidate lines (searched on demand for the viewed position).
 const ENGINE_MAX_LINES = 4;
 // Best-move arrow color — a muted hint green.
@@ -1142,7 +1144,7 @@ function uciLineToSan(fen, uciMoves, maxPlies = 6) {
    =================================================================== */
 function buildUI() {
   const root = document.getElementById("root");
-  root.innerHTML = "";
+  root.replaceChildren();
 
   const topbar = el("header", { class: "topbar" },
     el("div", { class: "brand" },
@@ -1659,11 +1661,23 @@ function renderBestArrow() {
   // Group opacity flattens shaft+head together BEFORE fading — no double-alpha seam.
   const arrowColor = /^#[0-9a-f]{6}$/i.test(S.settings.bestArrowColor || "")
     ? S.settings.bestArrowColor : ARROW_COLOR;
-  svg.innerHTML =
-    `<g fill="${arrowColor}" opacity="${S.settings.arrowOpacity}">`
-    + `<polyline points="${shaft.map(arrowFmt).join(" ")}" fill="none" stroke="${arrowColor}" `
-    + `stroke-width="${S.settings.arrowShaft}" stroke-linejoin="round" stroke-linecap="butt"/>`
-    + `<polygon points="${head.map(arrowFmt).join(" ")}" stroke="none"/></g>`;
+  svg.replaceChildren(arrowNode(shaft, head, arrowColor));
+}
+
+// Keep saved arrow settings in attributes, never interpolate them into markup.
+function arrowNode(shaft, head, color) {
+  const node = (tag, attrs) => {
+    const n = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (const [key, value] of Object.entries(attrs)) n.setAttribute(key, String(value));
+    return n;
+  };
+  const group = node("g", { fill: color, opacity: S.settings.arrowOpacity });
+  group.append(
+    node("polyline", { points: shaft.map(arrowFmt).join(" "), fill: "none", stroke: color,
+      "stroke-width": S.settings.arrowShaft, "stroke-linejoin": "round", "stroke-linecap": "butt" }),
+    node("polygon", { points: head.map(arrowFmt).join(" "), stroke: "none" }),
+  );
+  return group;
 }
 
 /* ---------------- User arrows + square marking (analysis) ----------------
@@ -1710,18 +1724,15 @@ function renderUserArrows(preview) {
   }
   const headLen = S.settings.arrowHead;
   const headHalf = headLen * 0.70;
-  svg.innerHTML = arrows.map((ar) => {
+  svg.replaceChildren(...arrows.map((ar) => {
     const a = arrowXY(ar.from), b = arrowXY(ar.to);
     const { shaft, head } = arrowBuild(arrowWaypoints(a, b), headLen, headHalf);
-    return `<g fill="${USER_ARROW_COLOR}" opacity="${S.settings.arrowOpacity}">`
-      + `<polyline points="${shaft.map(arrowFmt).join(" ")}" fill="none" stroke="${USER_ARROW_COLOR}" `
-      + `stroke-width="${S.settings.arrowShaft}" stroke-linejoin="round" stroke-linecap="butt"/>`
-      + `<polygon points="${head.map(arrowFmt).join(" ")}" stroke="none"/></g>`;
-  }).join("");
+    return arrowNode(shaft, head, USER_ARROW_COLOR);
+  }));
 }
 function refreshArrows() { renderBestArrow(); renderUserArrows(); renderThreatArrow(); }
-// Create a ready Engine, trying the user's chosen build first and then falling back DOWN the
-// strength chain (sf19 → nnue → wasm → asm) if it can't load. Every build is bundled, so a fallback never
+// Create a ready Engine, trying the user's chosen build and then the other bundled build
+// if it can't load. Every build is bundled, so a fallback never
 // needs the network. The build that actually started is recorded in S.activeEngineBuild so the
 // Engine tab reflects what's really running — essential if e.g. NNUE ever stops working. `opts` are
 // the UCI options (Hash / Skill Level); applying them also awaits the handshake, which now REJECTS
@@ -1729,8 +1740,7 @@ function refreshArrows() { renderBestArrow(); renderUserArrows(); renderThreatAr
 let _engineFellBack = false; // warn once per page if we ever leave the preferred build
 async function createEngine(opts = {}) {
   const preferred = ENGINE_BUILDS[S.settings.enginePath] ? S.settings.enginePath : DEFAULT_SETTINGS.enginePath;
-  // Preferred build first, then the remaining builds in fixed strongest→weakest order (no repeats).
-  const order = ENGINE_FALLBACK_ORDER.slice(ENGINE_FALLBACK_ORDER.indexOf(preferred));
+  const order = [preferred, ...ENGINE_FALLBACK_ORDER.filter(key => key !== preferred)];
   let lastErr = null;
   for (const key of order) {
     const eng = new Engine(ENGINE_BUILDS[key]);
@@ -1824,10 +1834,7 @@ async function renderThreatArrow() {
   const a = arrowXY(uci.slice(0, 2)), b = arrowXY(uci.slice(2, 4));
   const headLen = S.settings.arrowHead, headHalf = headLen * 0.70;
   const { shaft, head } = arrowBuild(arrowWaypoints(a, b), headLen, headHalf);
-  svg.innerHTML = `<g fill="${USER_ARROW_COLOR}" opacity="${S.settings.arrowOpacity}">`
-    + `<polyline points="${shaft.map(arrowFmt).join(" ")}" fill="none" stroke="${USER_ARROW_COLOR}" `
-    + `stroke-width="${S.settings.arrowShaft}" stroke-linejoin="round" stroke-linecap="butt"/>`
-    + `<polygon points="${head.map(arrowFmt).join(" ")}" stroke="none"/></g>`;
+  svg.replaceChildren(arrowNode(shaft, head, USER_ARROW_COLOR));
 }
 // Single-square marking (red tint). Toggles on repeated right-click on the same square.
 function toggleMark(sq) {
@@ -3483,7 +3490,7 @@ async function requestPanelLines() {
   S._panelCache = { idx: i, fen, lines: res.lines };
   renderEngineCurrent();
 }
-const ENGINE_NAME = { sf19: "Stockfish 19", nnue: "Stockfish 18 NNUE", wasm: "Stockfish 10", asm: "Stockfish 10 (asm.js)" };
+const ENGINE_NAME = { nnue: "Stockfish 18 NNUE", sf19lite: "Stockfish 19 Lite" };
 // Keep all candidate lines and the action visible. Only the bottom edge moves, including
 // when narrowing a custom panel wraps its heading/button or extra lines are selected.
 function fitEnginePanel() {
@@ -4159,9 +4166,7 @@ function motorSettings() {
         setLabel("Build", ENGINE_INFO.enginePath),
         el("div", { class: "set-seg" },
           el("button", { class: S.settings.enginePath === "nnue" ? "on" : "", onclick: () => setEngineSetting("enginePath", "nnue") }, "Stockfish 18 NNUE"),
-          el("button", { class: S.settings.enginePath === "sf19" ? "on" : "", onclick: () => setEngineSetting("enginePath", "sf19") }, "Stockfish 19"),
-          el("button", { class: S.settings.enginePath === "wasm" ? "on" : "", onclick: () => setEngineSetting("enginePath", "wasm") }, "Stockfish 10"),
-          el("button", { class: S.settings.enginePath === "asm" ? "on" : "", onclick: () => setEngineSetting("enginePath", "asm") }, "asm.js"),
+          el("button", { class: S.settings.enginePath === "sf19lite" ? "on" : "", onclick: () => setEngineSetting("enginePath", "sf19lite") }, "Stockfish 19 Lite"),
         ),
       ),
       // Keep the warning visible when any analysis worker had to use a fallback.
@@ -4229,8 +4234,8 @@ const CREDITS = [
     href: "https://github.com/lichess-org/lila/blob/master/LICENSE",
   },
   {
-    title: "Stockfish 19 NNUE",
-    by: "Full single-threaded Stockfish.js 19.0.0 by Nathan Rugg (“nmrugg”), © 2026 Chess.com, LLC; based on the Stockfish team's engine and neural networks.",
+    title: "Stockfish 19 Lite",
+    by: "Lite single-threaded Stockfish.js 19.0.0 by Nathan Rugg (“nmrugg”), © 2026 Chess.com, LLC; lite network by sscg13; based on the Stockfish team's engine.",
     lic: "GPLv3",
     href: "https://github.com/nmrugg/stockfish.js/tree/v19.0.0",
   },
@@ -4238,13 +4243,7 @@ const CREDITS = [
     title: "Stockfish 18 NNUE (default)",
     by: "NNUE build © Chess.com, LLC — distributed as JS/WASM via Nathan Rugg’s (“nmrugg”) Stockfish.js.",
     lic: "GPLv3",
-    href: "https://github.com/nmrugg/stockfish.js",
-  },
-  {
-    title: "Stockfish 10 (WASM / asm.js)",
-    by: "Fallback builds — JS/WASM port by Nathan Rugg (“nmrugg”), Stockfish.js.",
-    lic: "GPLv3",
-    href: "https://github.com/nmrugg/stockfish.js",
+    href: "https://github.com/nmrugg/stockfish.js/tree/v18.0.0",
   },
   {
     title: "Chess engine — upstream",
@@ -4780,6 +4779,7 @@ function completeAnalysis(saved, count) {
 
 function canRestoreAnalysis(saved) {
   return completeAnalysis(saved, S.total + 1) && saved.pgn === S.pgn
+    && (!saved.engineBuild || Object.hasOwn(ENGINE_BUILDS, saved.engineBuild))
     && saved.settingsKey === analysisSettingsKey();
 }
 
@@ -5339,6 +5339,10 @@ async function resetLegacyZoom() {
     const [payload, store] = await Promise.all([loadJob(), browserAPI.storage.local.get(["settings", "username", "layout", "layoutMode", "layoutVersion", "library"])]);
     S.library = Array.isArray(store.library) ? store.library : [];
     S.settings = { ...DEFAULT_SETTINGS, ...(store.settings || {}) };
+    migrateEngineSettings(S.settings);
+    if (S.settings.enginePath !== store.settings?.enginePath) {
+      await browserAPI.storage.local.set({ settings: S.settings });
+    }
     delete S.settings.wrongSound; // older selectable mistake cues were removed
     // Removed piece styles, including Kaneo Midnight, fall back to Cburnett.
     if (!PIECE_STYLES.includes(S.settings.pieceStyle)) S.settings.pieceStyle = "image";
@@ -5362,13 +5366,6 @@ async function resetLegacyZoom() {
     if (!S.settings.depthBumped) {
       if ((store.settings?.engineDepth ?? 12) <= 12) S.settings.engineDepth = Math.max(S.settings.engineDepth, 16);
       S.settings.depthBumped = true;
-      browserAPI.storage.local.set({ settings: S.settings });
-    }
-    // One-time switch to the strong Stockfish 18 NNUE build for anyone still on the old SF10 WASM
-    // default (asm.js users keep asm — they may lack WASM). A later deliberate choice sticks.
-    if (!S.settings.nnueDefaulted) {
-      if (S.settings.enginePath === "wasm") S.settings.enginePath = "nnue";
-      S.settings.nnueDefaulted = true;
       browserAPI.storage.local.set({ settings: S.settings });
     }
     // The 5-line option was removed — clamp any stored value to the new max.

@@ -95,8 +95,44 @@ test('cache restore requires complete data for the same game and engine settings
   assert.equal(a.call('canRestoreAnalysis',{...saved,pgn:'1. d4'}),false);
   assert.equal(a.call('canRestoreAnalysis',{...saved,evals:[{cp:0},null]}),false);
   assert.equal(a.call('canRestoreAnalysis',{...saved,bests:[{},null]}),false);
-  S.settings.enginePath='sf19';assert.equal(a.call('canRestoreAnalysis',saved),false);
+  assert.equal(a.call('canRestoreAnalysis',{...saved,engineBuild:'wasm'}),false);
+  assert.equal(a.call('canRestoreAnalysis',{...saved,engineBuild:'sf19'}),false);
+  S.settings.enginePath='sf19lite';assert.equal(a.call('canRestoreAnalysis',saved),false);
 });
+
+test('removed engines migrate safely and full SF19 cached analysis is invalidated', t => {
+  const a = app(t); const S = loadGame(a, '1. e4');
+  S.settings.enginePath = 'sf19';
+  const saved = { pgn:S.pgn, settingsKey:a.call('analysisSettingsKey'), bests:S.bests, evals:S.evals };
+  a.call('migrateEngineSettings', S.settings);
+  assert.equal(S.settings.enginePath, 'sf19lite');
+  assert.equal(a.call('canRestoreAnalysis', saved), false);
+  for (const old of ['wasm', 'asm', 'unknown', undefined]) {
+    S.settings.enginePath = old; a.call('migrateEngineSettings', S.settings);
+    assert.equal(S.settings.enginePath, 'nnue');
+  }
+  S.settings.enginePath = 'sf19lite'; a.call('migrateEngineSettings', S.settings);
+  assert.equal(S.settings.enginePath, 'sf19lite');
+});
+
+for (const preferred of ['nnue', 'sf19lite']) {
+  test(`${preferred} falls back to the other bundled engine on startup failure`, async t => {
+    const a = app(t); a.state.settings.enginePath = preferred;
+    const paths = [], engines = [];
+    a.context.Engine = class {
+      constructor(path) { paths.push(path); engines.push(this); }
+      async setOptions() { if (engines[0] === this) throw Error('Unsupported build'); }
+      terminate() { this.dead = true; }
+    };
+    a.replace('setActiveEngineBuild', () => {});
+    const eng = await a.call('createEngine');
+    assert.equal(eng.buildKey, preferred === 'nnue' ? 'sf19lite' : 'nnue');
+    assert.equal(engines[0].dead, true);
+    assert.equal(paths.length, 2);
+    assert.notEqual(paths[0], paths[1]);
+    assert.equal(a.state.engineFallbackBuild, eng.buildKey);
+  });
+}
 
 test('Explore and incomplete analyses are never saved as finished games',t=>{
   const a=app(t);const S=loadGame(a,'1. e4');quiet(a);

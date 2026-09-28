@@ -15,7 +15,7 @@ const HANDSHAKE_TIMEOUT_MS = 10000;
 const SEARCH_SILENCE_TIMEOUT_MS = 120000;
 
 export class Engine {
-  constructor(scriptPath = "engine/stockfish.js", wasmPath = scriptPath.replace(/\.js$/, ".wasm")) {
+  constructor(scriptPath = "engine/stockfish-nnue.js", wasmPath = scriptPath.replace(/\.js$/, ".wasm")) {
     // Give Stockfish the explicit wasm path via the URL hash (nmrugg reads
     // self.location.hash as the wasm path). Use an absolute extension URL so it's
     // unambiguous regardless of the worker's base URL.
@@ -104,7 +104,7 @@ export class Engine {
       this._onFail = reject;
       this._handshakeTimer = setTimeout(
         () => this._failHandshake(new Error(`engine handshake timed out (${this.scriptPath})`)),
-        this.scriptPath.includes("stockfish-19") ? 30000 : HANDSHAKE_TIMEOUT_MS,
+        HANDSHAKE_TIMEOUT_MS,
       );
       this._send("uci");
     });

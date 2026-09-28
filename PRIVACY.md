@@ -1,6 +1,6 @@
 # Privacy Policy — Chess Review
 
-_Last updated: 2026-06-24_
+_Last updated: 2026-09-28_
 
 Chess Review is a browser extension that reviews the chess games you play on
 **Chess.com** and **Lichess**. This policy explains exactly what the extension
@@ -29,8 +29,10 @@ browser's `chrome.storage.local`:
 - A cache of PGNs and computed analysis for games you have reviewed, so
   re-opening a game does not require re-downloading or re-analyzing it.
 
-This data never leaves your device. You can clear it at any time by removing the
-extension or clearing its storage in your browser.
+The cache, preferences, and computed analysis stay on your device. A public username
+or game ID is sent to the relevant chess platform when needed for a game lookup,
+as described above. You can clear local data by removing the extension or clearing
+its storage in your browser.
 
 ## What we do NOT do
 
@@ -49,9 +51,12 @@ extension or clearing its storage in your browser.
   read the current tab's URL and detect the Chess.com / Lichess game to review.
 - **Host access to `chess.com` and `lichess.org`** — to add the review button to
   those game pages and to fetch your game's PGN from their public APIs.
+- **Firefox data permissions (`browsingActivity`, `websiteContent`)** — disclose
+  the game identifiers and public player usernames used in those lookup requests.
+  These permissions do not add tracking, telemetry, or a developer backend.
 
 ## Contact
 
-Questions about this policy: **T.Julsgaard@proton.me**
+Questions about this policy: **Thomas@Julsgaard.dev**
 
 Source code: <https://github.com/T-Julsgaard/Chess-Review>
