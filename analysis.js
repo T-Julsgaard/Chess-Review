@@ -9,6 +9,7 @@ import { flagCodeForCountryId, countryNameForId } from "./flags.js";
 import { browserAPI } from "./browser-compat.js";
 import { lookupOpening, getLegacyBook, initOpeningsDb } from "./openings-db.js";
 import { generatePuzzles, puzzlesToPgn } from "./tactics-gen.js";
+import { loadCards, saveCards, addPuzzles, getDueCards, getUpcomingCards, getStats, gradeFromPractice, reviewCard } from "./srs.js";
 
 /* ---------------- Opening book ----------------
  * Offline lookup table built from lichess-org/chess-openings (see data/build-openings-db.js).
@@ -4722,13 +4723,32 @@ function practiceSpots() {
   }
   return out;
 }
-function startPractice() {
+async function getSrsPracticeSpots() {
+  const cards = await loadCards();
+  const due = getDueCards(cards);
+  if (!due.length) return [];
+  // Map due cards back to ply indices in current game
+  const spots = [];
+  for (const card of due) {
+    // Find the ply for this position in current game
+    for (let i = 1; i <= S.total; i++) {
+      if (S.positions[i].fen === card.fen && S.positions[i].color === S.meSide) {
+        spots.push(i);
+        break;
+      }
+    }
+  }
+  return spots.sort((a, b) => a - b);
+}
+async function startPractice() {
   if (S.analyzing || S.practice) return;
   if (S.analysisMode) exitAnalysis();
   if (S.autoTimer) { clearInterval(S.autoTimer); S.autoTimer = null; }
-  const spots = practiceSpots();
+  // Try SRS spots first (due cards), fall back to all mistakes
+  let spots = await getSrsPracticeSpots();
+  if (!spots.length) spots = practiceSpots();
   if (!spots.length) { toast("No mistakes to practice — clean game!"); return; }
-  S.practice = { spots, i: 0, solving: false, busy: false, rolling: false, rollT: null, advancing: false };
+  S.practice = { spots, i: 0, solving: false, busy: false, rolling: false, rollT: null, advancing: false, srsMode: spots.length === practiceSpots().length };
   S.selectedSq = null;
   renderStats();
   // Replay from wherever the user currently is to the first mistake — forward if it's ahead,
@@ -4836,14 +4856,31 @@ function practiceBeginSolve(solvePos) {
   paintBoard(); renderEvalBar(); renderPlayers(); renderMoves(); renderGraph();
   renderControls(); renderReview(); renderEngineCurrent();
 }
-function practiceAdvance() {
+async function practiceAdvance() {
   const p = S.practice; if (!p) return;
+  
+  // Record SRS result for the completed spot
+  if (p.srsMode && p.lastResult) {
+    await recordSrsResult(p.spots[p.i - 1], p.lastResult);
+  }
+  
   p.i++;
   p.solving = false;
-  p.advancing = true;   // keep the "✓ Correct! Moving on…" message during the roll to the next spot
+  p.advancing = true;
   S.practiceHint = null;
   if (p.i >= p.spots.length) { finishPractice(); return; }
-  practiceRoll(p.spots[p.i] - 1, practiceEnterSolve);   // roll from where we are to the next mistake
+  practiceRoll(p.spots[p.i] - 1, practiceEnterSolve);
+}
+async function recordSrsResult(ply, result) {
+  const cards = await loadCards();
+  const solvePos = ply - 1;
+  const fen = S.positions[solvePos]?.fen;
+  if (!fen) return;
+  const cardIdx = cards.findIndex(c => c.fen === fen);
+  if (cardIdx === -1) return;
+  const grade = gradeFromPractice(result);
+  cards[cardIdx] = reviewCard(cards[cardIdx], grade);
+  await saveCards(cards);
 }
 // Flash the from/to squares green (good) or red (bad) as quick feedback.
 function flashSquares(names, kind) {
@@ -4914,6 +4951,7 @@ function practiceAttempt(from, to) {
   const userUci = mv.from + mv.to + (mv.promotion || "");
   if (judgePass(solvePos, userUci, c.fen())) {
     p.solving = false;              // lock out further attempts until the next spot
+    p.lastResult = p.fails > 0 ? "partial" : "solved";
     S.practiceHint = null;
     // Visually play the correct move so the piece lands on its square and STAYS there for a beat
     // — confirming the answer instead of snapping straight back.
@@ -4946,6 +4984,7 @@ function practiceAttempt(from, to) {
     setTimeout(() => { if (S.practice) practiceAdvance(); }, 1300);
   } else {
     p.fails = (p.fails || 0) + 1;
+    p.lastResult = p.fails >= 3 ? "failed" : "partial";
     flashSquares([mv.from, mv.to], "bad");
     buzzBoard();
     playWrongSound();
