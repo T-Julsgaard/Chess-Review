@@ -9,7 +9,7 @@ import { SearchCache } from '../tools/calibration/sqlite-cache.mjs';
 import { searchKey } from '../tools/calibration/analyze-games.mjs';
 import { Engine, engineConfig } from '../tools/calibration/engine.mjs';
 import { assertDisjoint } from '../tools/calibration/core.mjs';
-import { schedule, planIds, makeReport } from '../tools/calibration/supervisor.mjs';
+import { schedule, planIds, makeReport, normalizeBenchmark } from '../tools/calibration/supervisor.mjs';
 import { buildDevelopment, balancedPrefix, loadExperimentalModel } from '../tools/calibration/development.mjs';
 import { spawn } from 'node:child_process';
 import { hash, save } from '../tools/calibration/io.mjs';
@@ -116,5 +116,23 @@ test('concurrent progress writes atomically replace complete JSON without sharin
   const dir=await mkdtemp(path.join(os.tmpdir(),'overnight-progress-')),file=path.join(dir,'progress.json');
   try{await Promise.all(Array.from({length:25},(_,i)=>save(file,{i,text:'complete'.repeat(1000)})));
     const result=JSON.parse(await readFile(file,'utf8'));assert.ok(result.i>=0&&result.i<25);assert.equal(result.text.length,8000);
+  }finally{await rm(dir,{recursive:true,force:true});}
+});
+
+test('resumed benchmarks count newly completed games and cache-only runs have no projections', () => {
+  const corrected=normalizeBenchmark({games:300,newCompleted:100,elapsedSeconds:600,gamesPerHour:1800});
+  assert.equal(corrected.gamesPerHour,600);assert.equal(corrected.originalGamesPerHour,1800);assert.equal(corrected.projectedHours[2000],2000/600);
+  assert.equal(normalizeBenchmark({games:300,newCompleted:0,elapsedSeconds:1}).projectedHours,null);
+});
+test('stability report pairs every deeper probe with its explicit shallow baseline', async () => {
+  const dir=await mkdtemp(path.join(os.tmpdir(),'overnight-paired-'));
+  const rows=Array.from({length:15},(_,i)=>({gameId:'probe'+i,color:'w',split:'train',ratingTarget:1600,decisions:30,meanLoss:.05,rmsLoss:.1,majorLossRate:.1,topRate:.5,accuracyMean:95,accuracyRms:90,negativeResiduals:0}));
+  const binding={datasetSha256:'same',engineConfig:{version:'fixture'}};
+  try {
+    await save(path.join(dir,'sf18-20k','features.json'),{binding,rows:rows.slice(0,1)});
+    await save(path.join(dir,'sf18-probe20k','features.json'),{binding,rows});
+    await save(path.join(dir,'sf18-80k','features.json'),{binding,rows:rows.map(r=>({...r,accuracyRms:89}))});
+    const report=await makeReport(dir,{phase:'partial',...schedule('2026-10-01T09:00:00+02:00')});
+    assert.equal(report.runs.sf18.stability80k.games,15);assert.equal(report.runs.sf18.stability80k.rmsMeanAbsoluteChange,1);assert.equal(report.runs.sf18.stability80k.baseRun,'sf18-probe20k');
   }finally{await rm(dir,{recursive:true,force:true});}
 });

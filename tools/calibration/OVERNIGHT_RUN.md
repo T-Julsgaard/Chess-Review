@@ -106,3 +106,15 @@ leakage, target exclusion, mate/forced behavior, real engine repeatability,
 SQLite resumption/corruption/compatibility, deadline partial results, and
 final-test exclusion from planning/model selection/reporting. No push or
 remote publication is authorized.
+
+## 01:00 heartbeat repair
+
+Both engines completed their initial 100-training/100-validation packages.
+The deeper probes were selected across the full training pool; only one game
+initially overlapped the completed shallow prefix. Explicit `sf18-probe20k`
+and `sf19-probe20k` baselines now complete all 15 pairs at 80k and five pairs
+at 320k before interpreting stability. Fewer than five pairs are labeled
+inconclusive. Resumed throughput and projections count **new** completions,
+and cache-only repeats have no projections; raw historical benchmark values
+are preserved with corrected derived results in reports. Regression coverage
+checks these cases. The full repository suite passed 111 tests at this wakeup.
