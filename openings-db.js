@@ -321,3 +321,33 @@ export function getLegacyBook() {
   }
   return { epd };
 }
+
+/**
+ * Get all book moves for a given ECO code and color.
+ * Returns array of SAN moves in order.
+ */
+export async function getBookMovesForEco(eco, color) {
+  await initOpeningsDb();
+  const moves = [];
+  const entries = await getAllOpenings();
+  
+  for (const entry of entries) {
+    if (entry.eco === eco) {
+      // Get the move sequence for this entry
+      const chess = new Chess();
+      try {
+        chess.loadPgn(entry.pgn || "");
+        const history = chess.history({ verbose: true });
+        for (const mv of history) {
+          if ((color === "w" && mv.color === "w") || (color === "b" && mv.color === "b")) {
+            moves.push(mv.san);
+          }
+        }
+        // Only need one representative line per ECO
+        if (moves.length > 0) break;
+      } catch {}
+    }
+  }
+  
+  return moves.slice(0, 20); // cap at 20 moves
+}
