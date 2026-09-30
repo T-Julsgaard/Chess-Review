@@ -8,6 +8,7 @@ import { args, json, jsonl, save, hash, codeIdentity, snapshotCode } from './io.
 import { compareFeatures, developmentRows, diagnostic } from './development.mjs';
 import { predict } from './fit-rating.mjs';
 import { assertDisjoint } from './core.mjs';
+import { SearchCache } from './sqlite-cache.mjs';
 
 export function schedule(deadline, now = Date.now()) {
   const end=Date.parse(deadline); if(!Number.isFinite(end)) throw Error('Invalid hard deadline');
@@ -133,7 +134,13 @@ async function main(){
     const commit=await promisify(execFile)('git',['log','-3','--format=%h %s','--','tools/calibration','tests/calibration-overnight.test.mjs'],{windowsHide:true});state.commits=commit.stdout.trim().split('\n');
     await decide('essential engine coverage','Fixed validation first, then balanced training prefix; complete both engine development packages before scaling',{datasetGames:games.length,fixedValidationGames:planned.validationIds.length,hardDeadline:state.deadline});
     const engines=[['sf18','engine/stockfish-nnue.js'],['sf19','engine/stockfish-19-lite-single.js']];
-    for(const[name,engine]of engines)await evaluate(`${name}-20k`,engine,20000,'development-ids.json',200);
+    for(const[name,engine]of engines){
+      const folder=path.join(root,`${name}-20k`),manifest=await maybe(path.join(folder,'manifest.json'));
+      let complete=0;
+      if(manifest){const cache=new SearchCache(path.join(folder,'evaluations.sqlite'),manifest.binding.configHash,{readonly:true});
+        complete=cache.db.prepare('SELECT count(*) AS n FROM completed').get().n;cache.close();}
+      if(complete<200)await evaluate(`${name}-20k`,engine,20000,'development-ids.json',200-complete);
+    }
     for(const workers of [1,2])if(schedule(o.deadline).canStart&&!stopping){
       const out=path.join(root,`workers-${workers}`);await run('analyze-games.mjs',['--dataset',path.join(root,'dataset'),'--out',out,'--engine',engines[0][1],'--nodes','20000','--workers',String(workers),'--sqlite','--development-only','--game-ids',path.join(root,'worker-ids.json'),'--deadline',state.computeStop],true);
     }
