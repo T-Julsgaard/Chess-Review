@@ -8,6 +8,7 @@ import { Engine } from "./engine/uci.js";
 import { flagCodeForCountryId, countryNameForId } from "./flags.js";
 import { browserAPI } from "./browser-compat.js";
 import { lookupOpening, getLegacyBook, initOpeningsDb } from "./openings-db.js";
+import { generatePuzzles, puzzlesToPgn } from "./tactics-gen.js";
 
 /* ---------------- Opening book ----------------
  * Offline lookup table built from lichess-org/chess-openings (see data/build-openings-db.js).
@@ -5043,7 +5044,22 @@ function saveToLibrary() {
       newLib.unshift(rec);
       let dropped = [];
       if (newLib.length > 300) { dropped = newLib.slice(300); newLib.length = 300; }
-      const writes = { library: newLib, ["analysis:" + id]: { evals: S.evals, bests: S.bests, multipv: S.analyzedMultipv } };
+
+      // Generate puzzles from blunders/mistakes
+      const puzzles = generatePuzzles({
+        positions: S.positions,
+        evals: S.evals,
+        bests: S.bests,
+        classif: S.classif,
+        pgn: S.pgn,
+        meta: S.meta || {},
+      });
+
+      const writes = {
+        library: newLib,
+        ["analysis:" + id]: { evals: S.evals, bests: S.bests, multipv: S.analyzedMultipv },
+        ["puzzles:" + id]: { puzzles, generatedAt: Date.now() },
+      };
       browserAPI.storage.local.set(writes);
       if (dropped.length) browserAPI.storage.local.remove(dropped.map((d) => "analysis:" + d.id));
       S.library = newLib;
