@@ -18,7 +18,8 @@ export function solve(matrix, target) {
   }
   return a.map(row => row[n]);
 }
-export function fit(rows, lambda) {
+export function fit(rows, lambda, names = featureNames) {
+  const featureNames = names;
   const center = featureNames.map(f => mean(rows.map(r => r[f])));
   const scale = featureNames.map((f, j) => Math.sqrt(mean(rows.map(r => (r[f] - center[j]) ** 2))) || 1);
   const x = rows.map(r => [1, ...featureNames.map((f, j) => (r[f] - center[j]) / scale[j])]);

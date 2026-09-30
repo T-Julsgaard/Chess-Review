@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, rename } from 'node:fs/promises';
 import { parseArgs } from 'node:util';
 import path from 'node:path';
 
@@ -14,7 +14,9 @@ export function args(options) {
 export async function json(file) { return JSON.parse(await readFile(file, 'utf8')); }
 export async function save(file, value) {
   await mkdir(path.dirname(file), { recursive: true });
-  await writeFile(file, JSON.stringify(value, null, 2) + '\n');
+  const temporary = `${file}.${process.pid}.tmp`;
+  await writeFile(temporary, JSON.stringify(value, null, 2) + '\n');
+  await rename(temporary, file);
 }
 
 
