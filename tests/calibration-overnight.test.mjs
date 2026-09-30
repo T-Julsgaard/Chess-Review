@@ -12,7 +12,7 @@ import { assertDisjoint } from '../tools/calibration/core.mjs';
 import { schedule, planIds, makeReport } from '../tools/calibration/supervisor.mjs';
 import { buildDevelopment, balancedPrefix, loadExperimentalModel } from '../tools/calibration/development.mjs';
 import { spawn } from 'node:child_process';
-import { hash } from '../tools/calibration/io.mjs';
+import { hash, save } from '../tools/calibration/io.mjs';
 
 const body = '1. Nf3 Nf6 2. Ng1 Ng8 3. Nf3 Nf6 4. Ng1 Ng8 5. Nf3 Nf6 6. Ng1 Ng8 7. Nf3 Nf6 8. Ng1 Ng8 9. Nf3 Nf6 10. Ng1 Ng8 1/2-1/2';
 const pgn = (id = 'abcdefgh', white = 'w', black = 'b', rating = 1600) => `[Event "Rated Blitz game"]\n[Site "https://lichess.org/${id}"]\n[White "${white}"]\n[Black "${black}"]\n[WhiteElo "${rating}"]\n[BlackElo "${rating}"]\n[TimeControl "180+2"]\n[Result "1/2-1/2"]\n\n${body}`;
@@ -110,5 +110,11 @@ test('supervisor produces honest partial report when engines have no completed d
   try{const report=await makeReport(dir,{phase:'failed',...schedule('2026-10-01T09:00:00+02:00')});
     assert.equal(report.finalTest.evaluated,false);assert.equal(report.runs.sf19.completedGames,0);
     assert.match(await readFile(path.join(dir,'report.md'),'utf8'),/Inconclusive/);
+  }finally{await rm(dir,{recursive:true,force:true});}
+});
+test('concurrent progress writes atomically replace complete JSON without sharing temporary files', async () => {
+  const dir=await mkdtemp(path.join(os.tmpdir(),'overnight-progress-')),file=path.join(dir,'progress.json');
+  try{await Promise.all(Array.from({length:25},(_,i)=>save(file,{i,text:'complete'.repeat(1000)})));
+    const result=JSON.parse(await readFile(file,'utf8'));assert.ok(result.i>=0&&result.i<25);assert.equal(result.text.length,8000);
   }finally{await rm(dir,{recursive:true,force:true});}
 });

@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { readFile, writeFile, mkdir, rename } from 'node:fs/promises';
 import { parseArgs } from 'node:util';
 import path from 'node:path';
@@ -16,11 +16,22 @@ export function integer(value, name, min = 1, max = Number.MAX_SAFE_INTEGER) {
   return n;
 }
 export async function json(file) { return JSON.parse(await readFile(file, 'utf8')); }
+const saves = new Map();
 export async function save(file, value) {
-  await mkdir(path.dirname(file), { recursive: true });
-  const temporary = `${file}.${process.pid}.tmp`;
-  await writeFile(temporary, JSON.stringify(value, null, 2) + '\n');
-  await rename(temporary, file);
+  const operation = (saves.get(file) || Promise.resolve()).catch(() => {}).then(async () => {
+    await mkdir(path.dirname(file), { recursive: true });
+    const temporary = `${file}.${process.pid}.${randomUUID()}.tmp`;
+    await writeFile(temporary, JSON.stringify(value, null, 2) + '\n');
+    for (let attempt = 0; ; attempt++) {
+      try { await rename(temporary, file); break; }
+      catch (e) {
+        if (attempt >= 5 || !['EPERM', 'EBUSY', 'EACCES'].includes(e.code)) throw e;
+        await new Promise(resolve => setTimeout(resolve, 50 * 2 ** attempt));
+      }
+    }
+  });
+  saves.set(file, operation);
+  try { await operation; } finally { if (saves.get(file) === operation) saves.delete(file); }
 }
 export async function jsonl(file) {
   return (await readFile(file, 'utf8')).split('\n').filter(Boolean).map(JSON.parse);
