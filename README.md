@@ -9,6 +9,8 @@ rating. No account, no server, no manual PGN copying.
 
 **Chrome webshop**: https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenkadndbdbigfam?hl=en
 
+**Firefox Add-ons**: https://addons.mozilla.org/en-US/firefox/addon/chess-review/
+
 ## Features
 
 - **One-click review** of any Chess.com or Lichess game — or paste a game URL / raw PGN.
