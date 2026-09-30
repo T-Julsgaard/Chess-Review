@@ -2,6 +2,12 @@
 
 Status: offline pilot, not a production calibration. No extension behavior changes.
 
+The multi-engine recent-data overnight workflow is documented in
+[`OVERNIGHT_RUN.md`](OVERNIGHT_RUN.md). It adds a tested bounded-range importer,
+exact bundled SF19 support, SQLite raw caches, a deadline supervisor, fixed
+development validation and versioned learning-curve/transfer diagnostics.
+The commands below retain the original historical smoke workflow.
+
 ## Architecture decided before implementation
 
 1. Eventually replace `analysis.js`'s calibration loader, `winPct`, `moveAccuracy`,
@@ -71,7 +77,8 @@ node tools/calibration/report.mjs --dataset calibration-runs/smoke/dataset --run
 Importer also supports `--input archive.pgn[.zst] --sha256 HASH --source URL`,
 `--category blitz|rapid`, `--rating-min`, `--rating-max`, and `--seed`.
 Engine overrides require an exact copy of the bundled `.js/.wasm` pair via `--engine path.js`;
-native engines and SF19 are deliberately unsupported until compatibility is tested.
+native engines remain unsupported; the exact bundled SF19 Lite pair is now
+supported with independent network/build metadata and separate development fits.
 `--depth N` replaces nodes. Analysis supports `--games` and `--workers` (1-4).
 
 The full archive SHA-256 is verified before sampling. PGN comments, NAGs and
