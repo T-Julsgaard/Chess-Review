@@ -1307,7 +1307,8 @@ button { font-family: inherit; cursor: pointer; }
 .ip-opening .ip-op-txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* the body scrolls if the content (e.g. the hint button) is taller than the module, so nothing
    spills out behind the panel below it */
-.ip-body { padding: 13px var(--pad) 15px; display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; overflow-y: auto;
+/* Keep move commentary readable when the floating coach overlaps the panel (PR #10). */
+.ip-body { position: relative; z-index: 20; padding: 13px var(--pad) 15px; display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; overflow-y: auto;
   scrollbar-width: none; }
 .ip-body::-webkit-scrollbar { display: none; }
 /* fixed min-height so the row never shifts when the hint button or badge appears/disappears */
@@ -1318,7 +1319,7 @@ button { font-family: inherit; cursor: pointer; }
 .ip-eval.pos { color: var(--ink); }
 .ip-eval.neg { color: var(--q-miss); }
 /* whole insight panel uses the original mono font (matching the opening-book line) */
-.ip-move { font-family: var(--font-mono); font-weight: 800; font-size: 16px; color: var(--ink); }
+.ip-move { min-width: 0; overflow-wrap: anywhere; font-family: var(--font-mono); font-weight: 800; font-size: 16px; color: var(--ink); }
 .ip-tag { font-weight: 800; font-size: 13px; letter-spacing: .02em; margin-left: auto; }
 .ip-tag.practice {
   margin-left: 0; color: var(--accent-ink); background: var(--accent);
