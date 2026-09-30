@@ -166,7 +166,7 @@ async function analyzeTab(tab, username) {
   // Country flags: the API knows WHO is white/black; the page knows each player's country id. Match
   // them by username so the right flag lands on the right side (analysis.js resolves id → flag art).
   attachCountries(meta, info && info.countries);
-  await openAnalysisTab({ pgn: game.pgn, meta, source: "active-tab", theme: info.theme || null });
+  await openAnalysisTab({ pgn: game.pgn, meta, source: "active-tab" });
 }
 
 // Stamp the scraped { usernameLower: countryId } map onto meta.white/black by matching usernames.
@@ -187,7 +187,7 @@ function attachCountries(meta, countries) {
  * from the tab URL and fetch the PGN from Lichess's public export API. This means a single icon
  * click works even when the content script hasn't injected yet (e.g. a tab opened before the
  * extension was reloaded) — no page reload needed. The content script, when present, only adds the
- * board/piece theme and a DOM move-list fallback. The PGN's own tags carry players/result.
+ * board orientation and a DOM move-list fallback. The PGN's own tags carry players/result.
  */
 async function analyzeLichessTab(info, tabUrl) {
   const fromUrl = parseLichessGameId(tabUrl);
@@ -216,6 +216,5 @@ async function analyzeLichessTab(info, tabUrl) {
     pgn,
     meta: { url: `https://lichess.org/${gameId}`, gameId, flip },
     source: "active-tab-lichess",
-    theme: (info && info.theme) || null,
   });
 }
