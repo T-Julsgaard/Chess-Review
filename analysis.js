@@ -1454,6 +1454,7 @@ function computeDerived() {
     S.accElo[side] = eloAccs[side];
     S.counts[side] = counts;
   }
+  S.bookAt = bookAt; // save for phase detection
   computePhaseRatings();
   buildVerdict();
 }
@@ -1485,11 +1486,18 @@ function computePhaseRatings() {
   }
 }
 function getGamePhase(fen, ply) {
+  // Chess.com approach: Opening = in book, Endgame = ≤7 non-pawn pieces or ≤1 major/minor per side
+  const inBook = S.bookAt && S.bookAt[ply];
   const pieces = fen.split(" ")[0].match(/[pnbrqkPNBRQK]/g) || [];
   const totalPieces = pieces.length;
   const nonPawns = pieces.filter(p => p.toLowerCase() !== 'p').length;
-  if (ply <= 16 || (ply <= 20 && nonPawns >= 10)) return "opening";
-  if (totalPieces <= 10) return "endgame";
+  const whiteMajors = pieces.filter(p => /[QRBN]/.test(p)).length; // Q,R,B,N
+  const blackMajors = pieces.filter(p => /[qrbn]/.test(p)).length;
+  
+  // Opening: position is in book
+  if (inBook) return "opening";
+  // Endgame: ≤7 non-pawn pieces (including kings) OR ≤1 major/minor piece per side
+  if (nonPawns <= 7 || Math.max(whiteMajors, blackMajors) <= 1) return "endgame";
   return "middlegame";
 }
 function buildVerdict() {
@@ -1568,6 +1576,7 @@ function buildUI() {
   const reviewMount = el("div", { id: "reviewMount" });
   const graphMount = el("div", { id: "graphMount" });
   const statsMount = el("div", { id: "statsMount" });
+  const phaseRatingsMount = el("div", { id: "phaseRatingsMount" });
   const engineMount = el("div", { id: "engineMount" });
 
   // The stage holds every module. In the automatic layout the side wrappers group the panels into
@@ -1580,7 +1589,7 @@ function buildUI() {
       makeMod("review", reviewMount),
       el("div", { class: "side-cols" },
         el("div", { class: "side-a" }, makeMod("moves", movesPanel), makeMod("graph", graphMount), makeMod("controls", controls)),
-        el("div", { class: "side-b" }, makeMod("accuracy", statsMount), makeMod("engine", engineMount)),
+        el("div", { class: "side-b" }, makeMod("accuracy", statsMount), makeMod("phase", phaseRatingsMount), makeMod("engine", engineMount)),
       ),
       makeMod("coach", coachMount),
     ),
@@ -1611,7 +1620,7 @@ function buildUI() {
     meta: document.getElementById("meta"), settings, canvas, boardWrap,
     playerTop, playerBot, controls, coach: coachMount, evalbar: evalbarMount,
     review: reviewMount, movesBody, movesCount, movesFoot,
-    graph: graphMount, stats: statsMount, engine: engineMount,
+    graph: graphMount, stats: statsMount, phaseRatings: phaseRatingsMount, engine: engineMount,
     libRail, libControls, libList, libCount,
   };
 
@@ -3540,45 +3549,61 @@ function renderStats() {
           el("span", { class: "est-rating", onmouseenter: (e) => showInfoTip(e.currentTarget, "Estimated Elo", ELO_INFO), onmouseleave: hideQTip }, S.analyzing ? "≈ ··· elo" : "≈ " + (estimateElo(opEloAcc, opRating) ?? "—") + " elo")),
       ),
       qbreak,
-      el("div", { class: "phase-ratings" },
-        el("div", { class: "phase-head" }, "Phase ratings"),
-        el("table", { class: "phase-table" },
-          el("thead", {},
-            el("tr", {},
-              el("th", {}, "Phase"),
-              el("th", { colspan: 2 }, S.players[S.meSide].name),
-              el("th", { colspan: 2 }, S.players[opSide].name),
-            ),
-            el("tr", {},
-              el("th", {}),
-              el("th", {}, "Elo"),
-              el("th", {}, "Moves"),
-              el("th", {}, "Elo"),
-              el("th", {}, "Moves"),
-            ),
-          ),
-          el("tbody", {},
-            ["opening", "middlegame", "endgame"].map((phase) => {
-              const meElo = S.phaseRatings?.[S.meSide]?.[phase];
-              const opElo = S.phaseRatings?.[opSide]?.[phase];
-              const meClassif = S.phaseClassif?.[S.meSide]?.[phase] || {};
-              const opClassif = S.phaseClassif?.[opSide]?.[phase] || {};
-              const meMoves = Object.values(meClassif).reduce((a, b) => a + b, 0);
-              const opMoves = Object.values(opClassif).reduce((a, b) => a + b, 0);
-              return el("tr", { class: "phase-row" },
-                el("td", { class: "phase-label" }, phase[0].toUpperCase() + phase.slice(1)),
-                el("td", { class: "phase-elo" }, meElo == null ? "—" : meElo),
-                el("td", { class: "phase-classif" }, renderPhaseClassifBadges(meClassif)),
-                el("td", { class: "phase-elo" }, opElo == null ? "—" : opElo),
-                el("td", { class: "phase-classif" }, renderPhaseClassifBadges(opClassif)),
-              );
-            }),
-          ),
-        ),
-      ),
     ),
   ));
   statsRefs = S.analyzing ? { expanded: S.qbreakExpanded, rows } : null;
+}
+function renderPhaseRatings() {
+  const isExplore = S.meta?.explore === true;
+  if (isExplore) {
+    const mod = UI.phaseRatings?.closest(".mod");
+    if (mod) mod.hidden = true;
+    UI.phaseRatings?.replaceChildren();
+    return;
+  }
+  const show = S.settings.evalView === "both" || S.settings.evalView === "phase";
+  const mod = UI.phaseRatings?.closest(".mod");
+  if (mod) mod.hidden = !show;
+  if (!show) { UI.phaseRatings?.replaceChildren(); return; }
+  
+  const opSide = S.meSide === "w" ? "b" : "w";
+  const phases = ["opening", "middlegame", "endgame"];
+  
+  UI.phaseRatings?.replaceChildren(el("div", { class: "panel" },
+    el("div", { class: "panel-head" }, el("h3", {}, "Phase Ratings")),
+    el("div", { class: "panel-body phase-body" },
+      el("div", { class: "phase-grid" },
+        phases.map((phase) => {
+          const meElo = S.phaseRatings?.[S.meSide]?.[phase];
+          const opElo = S.phaseRatings?.[opSide]?.[phase];
+          const meClassif = S.phaseClassif?.[S.meSide]?.[phase] || {};
+          const opClassif = S.phaseClassif?.[opSide]?.[phase] || {};
+          
+          return el("div", { class: "phase-card" },
+            el("div", { class: "phase-card-head" },
+              el("span", { class: "phase-label" }, phase[0].toUpperCase() + phase.slice(1)),
+              el("span", { class: "phase-moves" }, 
+                `${Object.values(meClassif).reduce((a,b)=>a+b,0) + Object.values(opClassif).reduce((a,b)=>a+b,0)} moves`
+              ),
+            ),
+            el("div", { class: "phase-card-body" },
+              el("div", { class: "phase-side" },
+                el("span", { class: "phase-side-name" }, S.players[S.meSide].name),
+                el("span", { class: "phase-side-elo" }, meElo == null ? "—" : meElo),
+                el("div", { class: "phase-side-classif" }, renderPhaseClassifBadges(meClassif)),
+              ),
+              el("div", { class: "phase-vs-divider" }, "vs"),
+              el("div", { class: "phase-side" },
+                el("span", { class: "phase-side-name" }, S.players[opSide].name),
+                el("span", { class: "phase-side-elo" }, opElo == null ? "—" : opElo),
+                el("div", { class: "phase-side-classif" }, renderPhaseClassifBadges(opClassif)),
+              ),
+            ),
+          );
+        }),
+      ),
+    ),
+  ));
 }
 
 /* ---------------- Eval graph ---------------- */
@@ -5469,6 +5494,7 @@ function renderAll() {
   renderControls();
   renderReview();
   renderStats();
+  renderPhaseRatings();
   renderGraph();
   renderMoves();
   renderEngineCurrent();
