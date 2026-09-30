@@ -3191,7 +3191,9 @@ function renderMoveComment() {
 
   const head = el("div", { class: "ip-head" });
   if (cfg) head.append(el("img", { class: "ip-badge", src: qIcon(cls), alt: "", draggable: "false" }));
-  head.append(el("span", { class: "ip-move" }, san));
+  // Special coach phrasing can omit the category, so name it beside the move.
+  const sanDisplay = !S.settings.coachPlain && cfg ? `${san} ${categoryName(cls)}` : san;
+  head.append(el("span", { class: "ip-move" }, sanDisplay));
   if (evTxt) head.append(el("span", { class: "ip-eval " + (evCp >= 0 ? "pos" : "neg") }, evTxt));
   body.append(head);
 
@@ -4595,7 +4597,7 @@ const CREDITS = [
 ];
 const CONTRIBUTORS = [
   { name: "aciokie", username: "aciokie", role: "Contributor" },
-  { name: "neuroflowinfinix", username: "neuroflowinfinix", role: "Contributor" },
+  { name: "neuroflowinfinix", username: "neuroflowinfinix", role: "Coach clarity and asm.js cleanup ideas (PR #10)" },
   { name: "Kristian Julsgaard", username: "Julsgaard", role: "Contributor" },
   { name: "Arthur Guedes", username: "arthurhguedes", role: "Contributor" },
   { name: "T-Julsgaard", username: "T-Julsgaard", role: "Maintainer" },
