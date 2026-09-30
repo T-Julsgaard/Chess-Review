@@ -1,6 +1,6 @@
 // lichess-content.js — runs on lichess.org pages. Same message interface as content.js
-// (getGameInfo / getTheme / getDomMoves) but adapted to Lichess's DOM. Reads the game id
-// from the page and, best-effort, the move list and the user's board/piece theme. The PGN
+// (getGameInfo / getDomMoves) but adapted to Lichess's DOM. Reads the game id
+// from the page and, best-effort, the move list and board orientation. The PGN
 // itself is fetched from Lichess's public API by analyze-flow (this script only reports the id).
 
 console.log("[Chess Analyzer] lichess content script active on", location.href);
@@ -11,10 +11,6 @@ const browserAPI = typeof browser !== "undefined" ? browser : chrome;
 
 // 8-char first-path segments that are routes, not games.
 const RESERVED = /^(training|analysis|practice|streamer|tournament|broadcast)$/i;
-
-function abs(url) {
-  try { return new URL(url, location.href).href; } catch { return url; }
-}
 
 // ---- Game id ----------------------------------------------------------------
 // The first path segment of a game URL is the 8-char id (sometimes 12 with a player token):
@@ -77,61 +73,6 @@ function readMovetext() {
     n++;
   }
   return out.trim();
-}
-
-// ---- Theme: import the user's Lichess board image + piece set ---------------
-// Lichess exposes each piece as a CSS custom property on :root (---white-king … ---black-pawn)
-// pointing at a hashed SVG, and the board theme as a body[data-board] + a background image on
-// the board element. We read those (storing nothing) so the analysis page can match the look.
-function cssVarUrl(name) {
-  const v = getComputedStyle(document.documentElement).getPropertyValue(name);
-  const m = v && v.match(/url\(["']?(.*?)["']?\)/);
-  return m ? abs(m[1]) : null;
-}
-const PIECE_VARS = [
-  ["wk", "---white-king"], ["wq", "---white-queen"], ["wr", "---white-rook"],
-  ["wb", "---white-bishop"], ["wn", "---white-knight"], ["wp", "---white-pawn"],
-  ["bk", "---black-king"], ["bq", "---black-queen"], ["br", "---black-rook"],
-  ["bb", "---black-bishop"], ["bn", "---black-knight"], ["bp", "---black-pawn"],
-];
-const IMG_RE = /\.(png|jpe?g|svg|webp|gif)(\?|$)/i;
-function findBoardUrl(boardTheme) {
-  // 1) computed background-image on the board element (Lichess paints the theme there in 2D).
-  for (const sel of ["cg-board", ".cg-wrap", ".main-board", "cg-container"]) {
-    const elx = document.querySelector(sel);
-    if (!elx) continue;
-    const bg = getComputedStyle(elx).backgroundImage;
-    const m = bg && bg.match(/url\(["']?(.*?)["']?\)/);
-    if (m && IMG_RE.test(m[1])) return abs(m[1]);
-  }
-  // 2) the preloaded board asset whose filename matches the theme name (…/<board>.<hash>.png).
-  if (boardTheme) {
-    const re = new RegExp("/" + boardTheme + "\\.[a-z0-9]+\\." + "(png|jpe?g|svg|webp|gif)$", "i");
-    for (const link of document.querySelectorAll('link[rel="preload"][as="image"]')) {
-      const href = link.getAttribute("href") || "";
-      if (re.test(href)) return abs(href);
-    }
-    try {
-      for (const r of performance.getEntriesByType("resource")) if (re.test(r.name)) return r.name;
-    } catch {}
-  }
-  return null;
-}
-function detectLichessTheme() {
-  const pieceUrlMap = {};
-  for (const [code, varName] of PIECE_VARS) {
-    const u = cssVarUrl(varName);
-    if (u) pieceUrlMap[code] = u;
-  }
-  const pieceSet = document.body.getAttribute("data-piece-set") || null;
-  const boardTheme = document.body.getAttribute("data-board") || null;
-  const boardUrl = findBoardUrl(boardTheme);
-  const out = {};
-  if (Object.keys(pieceUrlMap).length >= 12) { out.pieceUrlMap = pieceUrlMap; out.pieceSet = pieceSet; }
-  if (boardUrl || boardTheme) { out.boardUrl = boardUrl; out.boardTheme = boardTheme; }
-  const result = out.pieceUrlMap || out.boardUrl ? out : null;
-  console.log("[Chess Analyzer] detected lichess theme:", result);
-  return result;
 }
 
 // ---- Share link: a Lichess URL with #gambit=<base64 PGN+meta>. Same scheme as content.js, so a
@@ -309,12 +250,7 @@ browserAPI.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       gameId: detectGameId(),
       flip: detectFlip(),       // user's board perspective (true = Black at bottom)
       movetext: readMovetext(), // DOM fallback if the API lookup fails
-      theme: detectLichessTheme(),
     });
-    return true;
-  }
-  if (msg && msg.type === "getTheme") {
-    sendResponse({ ok: true, theme: detectLichessTheme() });
     return true;
   }
   if (msg && msg.type === "getDomMoves") {

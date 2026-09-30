@@ -19,7 +19,7 @@ service by the extension.** Sharing a game is an explicit user action described 
   games of the username you provide). These requests go directly from your
   browser to those chess platforms — the same services you are already using.
 - The content scripts read game identifiers, public player information, board
-  orientation, themes, and available moves from Chess.com/Lichess pages to support
+  orientation and available moves from Chess.com/Lichess pages to support
   review controls and game detection. This page access is separate from API requests.
 - Lookup requests disclose the requested username/game identifier to the relevant
   platform, which also receives normal network information such as your IP address.

@@ -23,29 +23,8 @@ Distributed by Lichess (lila); high-quality vector SVGs.
 - Note: GPLv2+ permits redistribution (incl. commercial) provided the licence/source terms
   are met. Noncommercial piece sets are excluded from the current build allowlist.
 
-## Removed artwork — historical provenance record
-- On the maintainer's instruction, Kaneo, Kaneo Midnight, 1Kbyte Gambit, and the
-  five Kadagaden board SVGs were removed from the current checkout on 2026-09-30.
-  They are absent from new browser/source ZIPs and from the current settings UI.
-- **Former source:** Kadagaden, https://github.com/Kadagaden/chess-pieces;
-  received with upstream's CC BY 4.0 attribution. Underlying artwork permissions
-  were not independently established. This record does not retroactively clear them.
-- Existing release archives and Git history are preserved. Historical copies may
-  still contain these assets; current removal does not alter earlier distribution.
-- Remaining bundled pieces are Cburnett and Merida, as credited above.
-- Maestro and Maestro B/W are not included. The maintainer has chosen not to add
-  those noncommercial sets. Licensing reference:
-  https://github.com/lichess-org/lila/blob/master/COPYING.md
-
-## Compatibility board palettes
-- **File:** `analysis.js` (`REVIEW_BOARD_PALETTES`, `SOURCE_BOARD_ALIAS`).
-- These retain the earlier platform-theme matching behavior with new display names
-  and very small RGB adjustments requested by the maintainer on 2026-09-30.
-- This is a cosmetic change, not evidence of independent design or legal clearance.
-  Source board images are not imported. The separate Kadagaden SVG boards have
-  been removed; the remaining boards use flat colors. The significance of palette
-  matching for design, branding, and contractual claims remains a review question,
-  not a finding that Chess.com owns ordinary green/white checkerboards.
+## Board colors
+- Boards use selectable flat-color palettes or custom colors. Honeywood is the default.
 
 ## Country flags
 - **Files:** `flags/*.svg` (used as player avatars when a country is detected)

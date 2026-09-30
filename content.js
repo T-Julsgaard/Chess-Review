@@ -1,7 +1,6 @@
 // content.js — runs on chess.com pages. Reads game IDs, public player information,
-// orientation and theme names for popup/background requests, with move-list text
+// orientation for popup/background requests, with move-list text
 // as an explicit fallback. Adds extension-owned review controls to post-game UI.
-// Theme detection returns names, not artwork URLs, and does not download site artwork.
 
 // Load banner: confirms the content script is actually running on this page.
 console.log("[Chess Analyzer] content script active on", location.href);
@@ -57,86 +56,6 @@ function readMoveListText() {
     }
   }
   return null;
-}
-
-// ---- Theme detection: inspect already-loaded resources and page styles to extract
-// piece-set and board-theme names. Only names are returned to the analysis page,
-// which uses bundled pieces and flat-colour palettes; site artwork is not fetched.
-function bgUrl(elem, pseudo = null) {
-  if (!elem) return null;
-  const bg = getComputedStyle(elem, pseudo).backgroundImage;
-  const m = bg && bg.match(/url\(["']?(.*?)["']?\)/);
-  return m ? m[1] : null;
-}
-function detectChessComTheme() {
-  // We read ONLY the theme NAMES (e.g. "neo", "green") so the analysis page can match the look
-  // with its own bundled pieces and board colours. We deliberately do NOT capture or send
-  // chess.com's piece/board image URLs — that artwork is proprietary and is never fetched.
-  const out = { pieceSet: null, boardTheme: null };
-  // Pieces: each piece is an element with a background-image from
-  // .../chess-themes/pieces/<set>/<size>/<code>.png  (code = e.g. wp, bn). We keep only <set>.
-  const pieceEl = document.querySelector(".piece, [class*='piece-'], piece");
-  const pUrl = bgUrl(pieceEl);
-  if (pUrl) {
-    const m = pUrl.match(/\/pieces\/([^/]+)\/(\d+)\/([a-z]{2})\.(png|gif|svg|webp)/i);
-    if (m) out.pieceSet = m[1];
-  }
-  // Board: derive only the theme name from the board image path (never the URL itself).
-  const bUrl = findBoardImageUrl();
-  if (bUrl) out.boardTheme = boardNameFromUrl(bUrl);
-  const result = out.pieceSet || out.boardTheme ? out : null;
-  console.log("[Chess Analyzer] detected theme:", result);
-  return result;
-}
-const BOARD_RE = /chess-themes\/boards?\/|\/boards?\//i;
-const IMG_RE = /\.(png|jpe?g|svg|webp|gif)(\?|$)/i;
-function findBoardImageUrl() {
-  // 1) Most reliable: ask the browser which resources the page HAS loaded. The
-  //    board's PNG is already loaded (it's the one you could download), so we find
-  //    the URL directly — regardless of where in the DOM/CSS the image sits.
-  try {
-    for (const r of performance.getEntriesByType("resource")) {
-      if (/boards?\//i.test(r.name) && IMG_RE.test(r.name) && !/\/pieces\//i.test(r.name)) {
-        return r.name;
-      }
-    }
-  } catch {}
-  // 2) Computed background-image on candidate elements — incl. ::before/::after,
-  //    since chess.com often draws the board on a pseudo-element.
-  const sels = [
-    "wc-chess-board", "chess-board", ".board-board", "#board-board",
-    ".board-layout-chessboard", ".layout-board", ".board", "[class*='board']",
-  ];
-  for (const sel of sels) {
-    let nodes;
-    try { nodes = document.querySelectorAll(sel); } catch { continue; }
-    for (const elem of nodes) {
-      for (const pseudo of [null, "::before", "::after"]) {
-        const u = bgUrl(elem, pseudo);
-        if (u && BOARD_RE.test(u) && !/\/pieces\//i.test(u)) return u;
-      }
-    }
-  }
-  // 3) Fallback: look for a boards URL in the page's (same-origin) stylesheets.
-  for (const sheet of document.styleSheets) {
-    let rules;
-    try { rules = sheet.cssRules; } catch { continue; } // cross-origin → skip
-    if (!rules) continue;
-    for (const rule of rules) {
-      const m = (rule.cssText || "").match(/url\(["']?([^"')]*\/boards?\/[^"')]+\.(?:png|jpe?g|svg|webp|gif))["']?\)/i);
-      if (m) return m[1];
-    }
-  }
-  return null;
-}
-function boardNameFromUrl(u) {
-  if (!u) return null;
-  let m = u.match(/\/boards?\/([^/]+)\/\d+\.[a-z]+/i); // boards/<name>/200.png
-  if (m) return m[1].toLowerCase();
-  m = u.match(/\/boards?\/([^/.]+)\.[a-z]+/i);          // boards/<name>.png
-  if (m) return m[1].toLowerCase();
-  m = u.match(/\/boards?\/([^/]+)/i);
-  return m ? m[1].toLowerCase() : null;
 }
 
 // ---- Username detection: find whose perspective the board is shown from (POV).
@@ -473,13 +392,8 @@ browserAPI.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       usernames: detectUsernames(), // every readable player, best → worst archive to search
       countries: detectCountries(), // { usernameLower: countryId } scraped from the player flags
       flip: detectFlip(),         // user's board perspective from ?flip= (true=Black at bottom)
-      theme: detectChessComTheme(), // the user's chess.com piece/board theme (or null)
       moveListText: parsed ? null : null, // only filled on explicit fallback below
     });
-    return true;
-  }
-  if (msg && msg.type === "getTheme") {
-    sendResponse({ ok: true, theme: detectChessComTheme() });
     return true;
   }
   if (msg && msg.type === "getDomMoves") {

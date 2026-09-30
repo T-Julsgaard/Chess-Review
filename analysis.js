@@ -136,24 +136,6 @@ const qIcon = (cls) => _url("icons/" + (QUALITY[cls]?.icon || cls) + ".svg");
 const PIECE_STYLES = ["image","merida"];
 // Persisted "image" selects Cburnett; both remaining sets are bundled GPLv2+ SVGs.
 const PIECE_STYLE_LABEL = { image: "Cburnett", merida: "Merida" };
-// Compatibility palettes derived from the previous site-theme approximations. Names and RGB
-// channels have been adjusted cosmetically; this is not an assertion of independent provenance
-// or legal clearance. Source images are never imported. Unknown themes use the normal green board.
-const REVIEW_BOARD_PALETTES = {
-  meadow:    { label: "Soft Meadow", colors: ["#eaeccf", "#729651"] },
-  parchment: { label: "Parchment", colors: ["#efd8b6", "#b48764"] },
-  chestnut:  { label: "Chestnut", colors: ["#c7a376", "#865e3d"] },
-  copperwood:{ label: "Copperwood", colors: ["#bf936b", "#7b5032"] },
-  morning:   { label: "Morning Mist", colors: ["#dde4e7", "#8ba3ae"] },
-  linen:     { label: "Linen", colors: ["#d9d7cd", "#afaa9a"] },
-  lagoon:    { label: "Lagoon", colors: ["#c1d4db", "#799eb1"] },
-  blossom:   { label: "Blossom", colors: ["#f8effa", "#e5a4c7"] },
-  orchard:   { label: "Orchard", colors: ["#e9efd4", "#6ea065"] },
-  newsprint: { label: "Newsprint", colors: ["#e5e7e6", "#9b9d9c"] },
-  limestone: { label: "Limestone", colors: ["#e7e3d7", "#998e7b"] },
-  fjord:     { label: "Fjord", colors: ["#ccd8e1", "#7c98ac"] },
-  pewter:    { label: "Pewter", colors: ["#d5d7d6", "#8d8f8e"] },
-};
 const CATEGORY_NAME_LIMIT = 24;
 function cleanCategoryName(value) {
   return typeof value === "string"
@@ -172,15 +154,6 @@ function categoryText(text) {
   const pattern = names.map(k => QUALITY[k].name).sort((a, b) => b.length - a.length).join("|");
   return text.replace(new RegExp("\\b(" + pattern + ")\\b", "gi"), match => byName.get(match.toLowerCase()));
 }
-// Legacy/platform identifiers are retained only for matching and saved-setting compatibility.
-const SOURCE_BOARD_ALIAS = { green: "meadow", brown: "parchment", walnut: "chestnut",
-  wood: "copperwood", dark_wood: "copperwood", blue: "morning", sky: "morning",
-  light: "linen", glass: "lagoon", bubblegum: "blossom", tournament: "orchard",
-  newspaper: "newsprint", marble: "limestone", icy_sea: "fjord", sea: "fjord", metal: "pewter" };
-function detectedBoardPalette() {
-  return REVIEW_BOARD_PALETTES[SOURCE_BOARD_ALIAS[S.settings.ccBoardTheme]]
-    || { label: BOARD_THEME_LABEL.green, colors: BOARD_THEMES.green };
-}
 // "image" = real piece images (cburnett). Filenames per piece+color (l=white, d=black).
 // Bundled high-quality SVG piece sets (from Lichess; GPLv2+). Maps a piece-style key to its folder
 // under pieces-img/<set>/<code>.svg, where <code> is e.g. wK / bN (white King, black kNight). SVG =
@@ -188,6 +161,7 @@ function detectedBoardPalette() {
 const BUNDLED_PIECE_SETS = { image: "cburnett", merida: "merida" };
 
 const REMOVED_BOARD_THEMES = {
+  chesscom: "maple", // The retired source-matched option returns to Honeywood.
   kada_green: "green", kada_sand: "walnut", kada_amber: "maple",
   kada_clay: "coral", kada_wood: "maple",
 };
@@ -201,6 +175,13 @@ function migrateVisualAssetSettings(settings) {
   if (replacement) {
     settings.boardTheme = replacement;
     changed = true;
+  }
+  // Remove source artwork metadata retained by older versions.
+  for (const key of ["ccPieceSet", "ccPieceUrlTemplate", "ccPieceUrlMap", "ccBoardTheme", "ccBoardUrl"]) {
+    if (Object.hasOwn(settings, key)) {
+      delete settings[key];
+      changed = true;
+    }
   }
   return changed;
 }
@@ -223,7 +204,7 @@ const DEFAULT_SETTINGS = {
   // coachPlain toggles only the reply VOICE: false = the coach's special phrasing,
   // true = neutral "plain" commentary (the coach still appears and reacts on the board).
   coach: "old_soviet", coachPlain: true,
-  // Start with the maple board and bundled "Default" (image) pieces.
+  // Start with Honeywood (persisted as "maple") and bundled Cburnett pieces.
   boardTheme: "maple", pieceStyle: "image", sound: true,
   // Master volume (0–100) applied to every sound the extension plays.
   soundVolume: 50,
@@ -237,10 +218,6 @@ const DEFAULT_SETTINGS = {
     check:   { snd: "default", pitch: 0, speed: 1 },
     castle:  { snd: "default", pitch: 0, speed: 1 },
   },
-  // ccBoardTheme = the detected board's NAME (when opened from a chess.com/Lichess tab) → mapped to
-  // our own board colours. Pieces are never imported. We never store or fetch a source site's
-  // piece/board image. The other cc* fields are dead (kept null for back-compat with old saves).
-  ccPieceSet: null, ccPieceUrlTemplate: null, ccPieceUrlMap: null, ccBoardTheme: null, ccBoardUrl: null,
   // Best-move arrow (the engine's recommendation in the current position)
   bestArrow: true, bestArrowColor: "#85ae4a", arrowOpacity: 0.65, arrowShaft: 0.2, arrowHead: 0.4,
   // "Show the threat": a yellow arrow with the opponent's best move as if it were their turn.
@@ -4141,17 +4118,6 @@ function visualSettings() {
     value: k, title: BOARD_THEME_LABEL[k] || k,
     render: (chip) => chip.append(el("span", { class: "half l", style: { background: lt } }), el("span", { class: "half r", style: { background: dk } })),
   }));
-  // The detected chess.com board is shown as an extra chip at the front (can be selected/deselected).
-  if (S.settings.ccBoardUrl || S.settings.ccBoardTheme) {
-    const { label, colors: [lt, dk] } = detectedBoardPalette();
-    boardEntries.unshift({
-      value: "chesscom",
-      render: (chip) => {
-        chip.title = label;
-        chip.append(el("span", { class: "half l", style: { background: lt } }), el("span", { class: "half r", style: { background: dk } }));
-      },
-    });
-  }
   // Custom colour chip — always first. Clicking it selects custom and opens the colour picker.
   {
     const [lt, dk] = customBoardColors();
@@ -4533,21 +4499,6 @@ async function setEngineSetting(key, value) {
   renderEngineCurrent();
   if (UI.settings && !UI.settings.hidden) renderSettings();
 }
-// Apply a detected theme from the source tab: match the board by COLOUR using the detected theme
-// name. Pieces are never imported — they always use a bundled set (Cburnett/Merida). The user can
-// change the board afterwards; their choice persists across review windows.
-function applyDetectedTheme(theme) {
-  if (!theme) return;
-  if (theme.boardUrl || theme.boardTheme) {
-    // Offer a compatibility palette based on the detected theme name. No source image is
-    // hotlinked; the retained matching behavior still needs the separate rights review.
-    S.settings.ccBoardTheme = theme.boardTheme || null;
-    S.settings.ccBoardUrl = null;
-    // Keep the user's selected board across new review windows and library games.
-    // The matched-site chip remains available when they choose to use it again.
-  }
-  browserAPI.storage.local.set({ settings: S.settings });
-}
 function applySettings() {
   const r = document.documentElement;
   // Only the dark theme is supported now — force it (also for old saved "light").
@@ -4562,9 +4513,7 @@ function applySettings() {
   r.style.setProperty("--accent-ink", a.ink);
   const bt = S.settings.boardTheme === "custom"
       ? customBoardColors()
-      : S.settings.boardTheme === "chesscom"
-      ? detectedBoardPalette().colors
-      : (BOARD_THEMES[S.settings.boardTheme] || BOARD_THEMES.green);
+      : (BOARD_THEMES[S.settings.boardTheme] || BOARD_THEMES.maple);
   r.style.setProperty("--sq-light", bt[0]);
   r.style.setProperty("--sq-dark", bt[1]);
   r.style.setProperty("--badge-scale", S.settings.badgeScale ?? 1);
@@ -5315,7 +5264,6 @@ async function applyGame(payload) {
   S._lastEngineLines = null;
   _movesSig = null; _movesClassSig = null;
 
-  applyDetectedTheme(payload.theme);
   applySettings();
 
   S.analyzing = true;
@@ -5530,7 +5478,6 @@ async function resetLegacyZoom() {
       delete S.settings.mpv2Calibrated;
       browserAPI.storage.local.set({ settings: S.settings });
     }
-    applyDetectedTheme(payload.theme); // match the user's chess.com piece/board theme (if opened from a chess.com tab)
     // Use the saved layout if it matches the current version; otherwise the new default.
     const useStored = store.layoutVersion === LAYOUT_VERSION && store.layout;
     S.layout = useStored ? { ...structuredClone(DEFAULT_LAYOUT), ...store.layout } : structuredClone(DEFAULT_LAYOUT);
