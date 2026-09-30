@@ -3520,6 +3520,7 @@ function renderGraph() {
     fill = line + ` L${toX(pts[pts.length - 1].ply)},${mid} L0,${mid} Z`;
   }
   const dots = pts.filter((s) => ["blunder", "mistake", "miss", "brilliant", "great"].includes(S.classif[s.ply]));
+  const critical = pts.filter((s) => S.criticalMoments?.some((m) => m.idx === s.ply));
   const markerX = toX(Math.min(S.idx, maxPly));
   const midLine = `<line x1="0" y1="${mid}" x2="${W}" y2="${mid}" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 3"/>`;
   const marker = `<line x1="${markerX}" y1="0" x2="${markerX}" y2="${H}" stroke="var(--accent)" stroke-width="1.5" opacity="0.7"/>`;
@@ -3527,6 +3528,10 @@ function renderGraph() {
   // Classification dots are drawn on every style except the bare "minimal" one.
   const dotsSvg = style === "minimal" ? "" : dots.map((s) =>
     `<circle cx="${toX(s.ply)}" cy="${toY(s.cp)}" r="3.2" fill="${QUALITY[S.classif[s.ply]].color}" stroke="var(--panel)" stroke-width="1.4"/>`).join("");
+  const criticalSvg = style === "minimal" ? "" : critical.map((s) => {
+    const y = style === "color" ? toYc(s.cp) : toY(s.cp);
+    return `<text x="${toX(s.ply)}" y="${y - 8}" text-anchor="middle" font-size="10" fill="#ff6b35" style="pointer-events:none">🔥</text>`;
+  }).join("");
   let inner;
   if (style === "color") {
     // Black/White: the graph is split into a white field (top) and a black field (bottom) by the
@@ -3549,10 +3554,10 @@ function renderGraph() {
       + (blackArea ? `<path d="${blackArea}" fill="#262626"/>` : "")
       + groundLine
       + (boundary ? `<path d="${boundary}" fill="none" stroke="#9a9a9a" stroke-width="1.2" stroke-linejoin="round"/>` : "")
-      + dotsC + marker;
+      + dotsC + criticalSvg + marker;
   } else if (style === "line") {
     // Just the evaluation curve (no fill) + dots.
-    inner = midLine + (line ? `<path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>` : "") + dotsSvg + marker;
+    inner = midLine + (line ? `<path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>` : "") + dotsSvg + criticalSvg + marker;
   } else if (style === "minimal") {
     // Thin, quiet curve — no fill, no dots.
     inner = midLine + (line ? `<path d="${line}" fill="none" stroke="color-mix(in oklab, var(--accent) 80%, var(--ink-3))" stroke-width="1.4" stroke-linejoin="round"/>` : "") + marker;
@@ -3562,7 +3567,7 @@ function renderGraph() {
       + (fill ? `<path d="${fill}" fill="color-mix(in oklab, var(--accent) 22%, transparent)"/>` : "")
       + midLine
       + (line ? `<path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>` : "")
-      + dotsSvg + marker;
+      + dotsSvg + criticalSvg + marker;
   }
   // Hover marker: a vertical guide + a dot that rides the curve, both hidden until the mouse enters.
   const hoverY = style === "color" ? toYc : toY;
@@ -3620,10 +3625,12 @@ function moveCell(ply) {
   const cls = S.classif[ply];
   const showBadge = cls && (NOTEWORTHY.has(cls) || S.settings.badgeStyle === "dot");
   const glyph = GLYPH[pos.san && /^[KQRBN]/.test(pos.san) ? pos.san[0] : "P"];
-  return el("span", { class: "ml-move" + (!S.analysisMode && ply === S.idx ? " current" : ""), "data-ply": ply, onclick: () => gotoMainline(ply) },
+  const isCritical = S.criticalMoments?.some((m) => m.idx === ply);
+  return el("span", { class: "ml-move" + (!S.analysisMode && ply === S.idx ? " current" : "") + (isCritical ? " critical" : ""), "data-ply": ply, onclick: () => gotoMainline(ply) },
     el("span", { class: "pc", style: { color: pos.color === "w" ? "var(--ink)" : "var(--ink-2)" } }, glyph),
     el("span", {}, pos.san),
     showBadge ? qBadge(cls) : null,
+    isCritical ? el("span", { class: "critical-badge", title: "Critical moment" }, "🔥") : null,
   );
 }
 function qBadge(k) {
@@ -5193,12 +5200,41 @@ function requestProgress(gen) {
   _progScheduled = true;
   setTimeout(() => flushProgress(gen), Math.max(0, 140 - (Date.now() - _progLast)));
 }
+function detectCriticalMoments() {
+  const CRITICAL_DELTA = 200;
+  const moments = [];
+  for (let i = 1; i <= S.total; i++) {
+    const cur = S.bests[i];
+    const prev = S.bests[i - 1];
+    if (!cur || !prev || !cur.bestmove || !prev.bestmove) continue;
+    if (cur.bestmove !== prev.bestmove) {
+      const curEval = S.evals[i] ?? 0;
+      const prevEval = S.evals[i - 1] ?? 0;
+      const delta = Math.abs(curEval - prevEval);
+      if (delta >= CRITICAL_DELTA) {
+        moments.push({ idx: i, type: "decision", evalSwing: delta, bestmove: cur.bestmove, prevBestmove: prev.bestmove });
+      }
+    }
+    if (cur.lines && cur.lines.length >= 2) {
+      const top = cur.lines[0];
+      const second = cur.lines[1];
+      const topScore = top.score?.cp ?? (top.score?.mate ? (top.score.mate > 0 ? 10000 : -10000) : 0);
+      const secondScore = second.score?.cp ?? (second.score?.mate ? (second.score.mate > 0 ? 10000 : -10000) : 0);
+      const gap = Math.abs(topScore - secondScore);
+      if (gap >= CRITICAL_DELTA) {
+        moments.push({ idx: i, type: "tactical", evalSwing: gap, bestmove: cur.bestmove, altMove: second.pv?.split(" ")[0] });
+      }
+    }
+  }
+  S.criticalMoments = moments;
+}
 async function startAnalysis() {
   const gen = ++S.batchGen;
   terminateEngines();
   S.evals = new Array(S.total + 1).fill(null);
   S.bests = new Array(S.total + 1).fill(null);
   S._sacCache = []; S._forcedCache = []; S._panelCache = null;
+  S.criticalMoments = [];
   S.progress = 0;
   S.completed = 0;
   S.analysisError = null;
@@ -5274,6 +5310,7 @@ async function startAnalysis() {
   S.analyzing = false;
   S.progress = S.total;
   S.completed = S.total;
+  detectCriticalMoments();
   flushProgress(gen);
   renderReview();
   renderStats();

@@ -674,6 +674,18 @@ button { font-family: inherit; cursor: pointer; }
   letter-spacing: .04em; text-transform: uppercase; color: #fff; font-family: var(--font-ui);
 }
 
+/* critical moment marker */
+.critical-badge {
+  font-size: 11px; line-height: 1; margin-left: 3px;
+  animation: criticalPulse 1.5s ease-in-out infinite;
+}
+@keyframes criticalPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
+.ml-move.critical { position: relative; }
+.ml-move.critical:hover .critical-badge { animation: none; opacity: 1; transform: scale(1.2); }
+
 /* ---------- ENGINE LINES ---------- */
 .engine-line {
   display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: center;
