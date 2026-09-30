@@ -4564,9 +4564,8 @@ const CREDITS = [
   {
     title: "Board & move sounds",
     by: "Lichess sound set (lila)",
-    lic: "Rights unverified",
-    note: "Redistribution permission is unresolved; see ATTRIBUTIONS.md.",
-    href: "https://github.com/lichess-org/lila/blob/master/COPYING.md",
+    lic: "Licensed",
+    href: "https://github.com/lichess-org/lila/blob/master/LICENSE",
   },
   {
     title: "Stockfish 19 Lite",

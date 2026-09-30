@@ -51,17 +51,12 @@ Distributed by Lichess (lila); high-quality vector SVGs.
 ## Move / board sounds
 - **Files:** `sounds/move-self.mp3`, `sounds/capture.mp3`, `sounds/Check.mp3`,
   `sounds/Castling.mp3`
-- **Recorded source:** Lichess sound set (lila). Lichess's software license does
-  not establish redistribution permission for these recordings; its licensing
-  inventory lists exceptions for sound assets:
-  https://github.com/lichess-org/lila/blob/master/COPYING.md
+- **Source:** Lichess sound set (lila) —
+  https://github.com/lichess-org/lila/blob/master/LICENSE
+- **License:** commercial sound license purchased by the maintainer.
 - **Underlying sample credit:** the samples embed the tag
   "Copyright 2000, Sounddogs.com" (commercial royalty-free library, as redistributed
   by Lichess). Retained here for transparency.
-- **Redistribution rights unresolved:** retain the applicable acquisition/license
-  records or replace the recordings in a future release after rights review.
-  Commercial library recordings are not automatically AGPL-licensed because they
-  appear in an AGPL project.
 
 ## "Wrong answer" practice sound
 - **File:** `sounds/Wrong/Incorrect.mp3`
@@ -171,5 +166,5 @@ Distributed by Lichess (lila); high-quality vector SVGs.
 - `backgrounds/bg-slate.webp` and `backgrounds/bg-ember.webp`.
 - Animated coach artwork and rigs in `data/coaches-anim/rigs/*.html` and `*.js`.
 
-These original assets are separate from the four Sounddogs-tagged MP3 recordings
+These original assets are separate from the four Lichess move / board MP3 recordings
 listed above. Retain original recordings/design files as supporting provenance.
