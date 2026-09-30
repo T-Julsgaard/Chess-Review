@@ -169,6 +169,24 @@ const REVIEW_BOARD_PALETTES = {
   fjord:     { label: "Fjord", colors: ["#ccd8e1", "#7c98ac"] },
   pewter:    { label: "Pewter", colors: ["#d5d7d6", "#8d8f8e"] },
 };
+const CATEGORY_NAME_LIMIT = 24;
+function cleanCategoryName(value) {
+  return typeof value === "string"
+    ? Array.from(value.replace(/[\u0000-\u001f\u007f]/g, " ").trim().replace(/\s+/g, " ")).slice(0, CATEGORY_NAME_LIMIT).join("")
+    : "";
+}
+function categoryName(cls) {
+  return cleanCategoryName(S.settings.categoryNames?.[cls]) || QUALITY[cls]?.name || "";
+}
+// Replace category vocabulary before filling coach tokens, so user names never become tokens.
+// A single pass also prevents one custom name from being replaced by another category's alias.
+function categoryText(text) {
+  const names = QUALITY_ORDER.filter(k => categoryName(k) !== QUALITY[k].name);
+  if (!names.length) return text;
+  const byName = new Map(names.map(k => [QUALITY[k].name.toLowerCase(), categoryName(k)]));
+  const pattern = names.map(k => QUALITY[k].name).sort((a, b) => b.length - a.length).join("|");
+  return text.replace(new RegExp("\\b(" + pattern + ")\\b", "gi"), match => byName.get(match.toLowerCase()));
+}
 // Legacy/platform identifiers are retained only for matching and saved-setting compatibility.
 const SOURCE_BOARD_ALIAS = { green: "meadow", brown: "parchment", walnut: "chestnut",
   wood: "copperwood", dark_wood: "copperwood", blue: "morning", sky: "morning",
@@ -203,6 +221,7 @@ function migrateVisualAssetSettings(settings) {
 }
 
 const DEFAULT_SETTINGS = {
+  categoryNames: {},
   theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
   // Eval-graph look (see renderGraph), eval-BAR look (see renderEvalBar) and the Insight-panel text size (px).
@@ -1678,7 +1697,7 @@ function renderReorgBanner() {
 function makeBoardBadge(cls) {
   const cfg = QUALITY[cls];
   return el("img", {
-    class: "sq-badge", src: qIcon(cls), alt: cfg.name, draggable: "false", tabindex: "0",
+    class: "sq-badge", src: qIcon(cls), alt: categoryName(cls), draggable: "false", tabindex: "0",
     onpointerenter: (e) => { if (e.pointerType !== "touch" && !e.buttons) showBoardBadgeTip(e.currentTarget, cls); },
     onpointerleave: hideBoardBadgeTip,
     onfocus: (e) => showBoardBadgeTip(e.currentTarget, cls),
@@ -1698,7 +1717,7 @@ function showBoardBadgeTip(target, cls) {
     window.addEventListener("scroll", hideBoardBadgeTip, true);
     window.addEventListener("blur", hideBoardBadgeTip);
   }
-  tip.textContent = cfg.name;
+  tip.textContent = categoryName(cls);
   const r = target.getBoundingClientRect();
   // Measuring before showing also establishes the initial style for the first fade-in.
   const w = tip.offsetWidth, h = tip.offsetHeight, gap = 8, margin = 8;
@@ -2974,7 +2993,12 @@ function coachPick(arr, histKey) {
 }
 // Substitute {tokens}; leave any token we have no value for untouched (caller avoids those events).
 function coachFill(text, tok) {
-  return text.replace(/\{(\w+)\}/g, (m, k) => (tok && tok[k] != null && tok[k] !== "") ? tok[k] : m);
+  return text.split(/(\{\w+\})/g).map(part => {
+    const token = /^\{(\w+)\}$/.exec(part);
+    if (!token) return categoryText(part);
+    const k = token[1];
+    return (tok && tok[k] != null && tok[k] !== "") ? tok[k] : part;
+  }).join("");
 }
 // Grab the array for an event: top-level (weak_move_suffix / move_fallback) or nested section.key.
 function coachArr(section, key) {
@@ -3057,7 +3081,7 @@ function coachTokens(idx, extra) {
   const tok = {
     move: (S.positions[idx] && S.positions[idx].san) || "", best_move: bestSanBefore(idx) || "",
     eval: ev ? evalText(ev) : "", eco: o.eco || "", opening: o.name || "",
-    label: q ? q.name.toLowerCase() : "",
+    label: q ? categoryName(cls) : "",
     swing: (cpPrev != null && cpNow != null) ? (Math.abs(cpNow - cpPrev) / 100).toFixed(1) : "",
   };
   if (ev && ev.mate) tok.mate_n = String(Math.abs(ev.mate));
@@ -3178,7 +3202,7 @@ function renderMoveComment() {
   if (fresh) {
     let sentence = S.coach ? coachMoveSentence(S.idx) : null;
     if (sentence == null) {   // legacy generic line
-      sentence = (cfg && COMMENT_PHRASE[cls]) ? COMMENT_PHRASE[cls](san) : `${san}.`;
+      sentence = (cfg && COMMENT_PHRASE[cls]) ? categoryText(COMMENT_PHRASE[cls](san)) : `${san}.`;
     }
     _ipText = sentence; _ipSig = sig;
   }
@@ -3220,7 +3244,7 @@ function renderPracticeCoach() {
   const spot = p.spots[p.i];
   const badSan = S.positions[spot].san || "your move";
   const badCls = S.classif[spot];
-  const label = (badCls && QUALITY[badCls]) ? QUALITY[badCls].name.toLowerCase() : "weak move";
+  const label = (badCls && QUALITY[badCls]) ? categoryName(badCls) : "weak move";
   if (!p.coachTyped) {
     const tok = { move: badSan, label };
     // After a hint has been surfaced, switch to the coach's after-hint line if it has one.
@@ -3264,8 +3288,8 @@ function showQTip(target, cls) {
   tip.replaceChildren(
     el("div", { class: "q-tip-head" },
       el("img", { class: "q-tip-ic", src: qIcon(cls), alt: "", draggable: "false" }),
-      el("span", { class: "q-tip-nm", style: { color: cfg.color } }, cfg.name)),
-    el("div", { class: "q-tip-body" }, QUALITY_DESC[cls] || ""),
+      el("span", { class: "q-tip-nm", style: { color: cfg.color } }, categoryName(cls))),
+    el("div", { class: "q-tip-body" }, categoryText(QUALITY_DESC[cls] || "")),
   );
   positionTip(tip, target);
 }
@@ -3303,6 +3327,61 @@ function jumpToCategory(side, k) {
   const ply = firstPlyForCategory(side, k);
   if (ply > 0) gotoMainline(ply);
 }
+function setCategoryName(cls, value) {
+  const name = cleanCategoryName(value);
+  const names = { ...S.settings.categoryNames };
+  if (!name || name === QUALITY[cls].name) delete names[cls];
+  else names[cls] = name;
+  S.settings.categoryNames = names;
+  browserAPI.storage.local.set({ settings: S.settings });
+  hideQTip(); hideBoardBadgeTip();
+  _movesSig = null; _ipSig = null;
+  if (S.practice) { S.practice.coachLine = null; S.practice.coachTyped = false; }
+  UI.stats.querySelectorAll("[data-category]").forEach(label => {
+    label.replaceWith(categoryLabel(label.dataset.category));
+  });
+  renderMoves(); buildBoard(); renderReview();
+}
+function categoryLabel(cls) {
+  const label = el("button", {
+    type: "button", class: "qlabel", "data-category": cls,
+    "aria-label": "Rename " + categoryName(cls), title: "Click to rename",
+    onmouseenter: e => showQTip(e.currentTarget, cls), onmouseleave: hideQTip,
+    onclick: () => {
+      hideQTip();
+      let finished = false;
+      const finish = (save, value = input.value, focus = false) => {
+        if (finished) return;
+        finished = true;
+        if (save) setCategoryName(cls, value);
+        else editor.replaceWith(categoryLabel(cls));
+        if (focus) UI.stats.querySelector('[data-category="' + cls + '"]')?.focus();
+      };
+      const input = el("input", {
+        class: "category-name-input", type: "text", maxlength: CATEGORY_NAME_LIMIT,
+        value: categoryName(cls), "aria-label": "Name for " + QUALITY[cls].name,
+        onkeydown: e => {
+          e.stopPropagation();
+          if (e.key === "Enter" || e.key === "Escape") { e.preventDefault(); finish(e.key === "Enter", input.value, true); }
+        },
+      });
+      const editor = el("div", {
+        class: "qlabel category-name-editor", "data-category": cls,
+        onfocusout: e => { if (!editor.contains(e.relatedTarget)) finish(true); },
+        onkeydown: e => { e.stopPropagation(); if (e.key === "Escape") { e.preventDefault(); finish(false, input.value, true); } },
+      }, input,
+        el("button", {
+          type: "button", class: "category-name-reset", title: "Restore default name",
+          "aria-label": "Restore " + QUALITY[cls].name,
+          onpointerdown: e => e.preventDefault(), onmousedown: e => e.preventDefault(),
+          onclick: () => finish(true, "", true),
+        }, "↺"));
+      label.replaceWith(editor); input.focus(); input.select();
+    },
+  }, el("img", { class: "qsym", src: qIcon(cls), alt: "", draggable: "false" }),
+  el("span", { class: "nm" }, categoryName(cls)));
+  return label;
+}
 function renderStats() {
   const isExplore = S.meta?.explore === true;
   if (isExplore) {
@@ -3317,8 +3396,8 @@ function renderStats() {
       el("div", { class: "panel-body" },
         el("div", { class: "acc-row" },
           el("div", { class: "acc-cell" },
-            cfg ? el("img", { class: "qb icon", src: qIcon(cls), alt: cfg.name, title: cfg.name, draggable: "false" }) : null,
-            el("span", { class: "acc-name" }, cfg ? cfg.name : "—"),
+            cfg ? el("img", { class: "qb icon", src: qIcon(cls), alt: categoryName(cls), title: categoryName(cls), draggable: "false" }) : null,
+            el("span", { class: "acc-name" }, cfg ? categoryName(cls) : "—"),
             el("span", { class: "acc-val", style: { color: "var(--accent)" } }, evTxt),
           ),
         ),
@@ -3350,7 +3429,6 @@ function renderStats() {
 
   const rows = {};
   const qrows = list.map((k) => {
-    const cfg = QUALITY[k];
     const cMe = S.counts[S.meSide][k] || 0, cOp = S.counts[opSide][k] || 0;
     const meCt = el("span", { class: "ct left " + (cMe ? "" : "zero"), onclick: () => jumpToCategory(S.meSide, k) }, cMe);
     const opCt = el("span", { class: "ct " + (cOp ? "" : "zero"), onclick: () => jumpToCategory(opSide, k) }, cOp);
@@ -3359,13 +3437,7 @@ function renderStats() {
       meCt,
       // The category explainer tooltip lives on the label only — hovering the counts (which are
       // clickable jump targets) must not trigger it.
-      el("span", {
-        class: "qlabel",
-        onmouseenter: (e) => showQTip(e.currentTarget, k),
-        onmouseleave: hideQTip,
-      },
-        el("img", { class: "qsym", src: qIcon(k), alt: "", draggable: "false" }),
-        el("span", { class: "nm" }, cfg.name)),
+      categoryLabel(k),
       opCt,
     );
   });
@@ -3544,10 +3616,10 @@ function moveCell(ply) {
 }
 function qBadge(k) {
   const cfg = QUALITY[k]; const st = S.settings.badgeStyle;
-  if (st === "dot") return el("span", { class: "qb dot", style: { background: cfg.color }, title: cfg.name });
-  if (st === "label") return el("span", { class: "qb label", style: { background: cfg.color } }, cfg.name);
+  if (st === "dot") return el("span", { class: "qb dot", style: { background: cfg.color }, title: categoryName(k) });
+  if (st === "label") return el("span", { class: "qb label", style: { background: cfg.color } }, categoryName(k));
   // "icon" → the real SVG badge
-  return el("img", { class: "qb icon", src: qIcon(k), alt: cfg.name, title: cfg.name, draggable: "false" });
+  return el("img", { class: "qb icon", src: qIcon(k), alt: categoryName(k), title: categoryName(k), draggable: "false" });
 }
 // Move the .current highlight to the cell for S.idx and auto-scroll it into view, without
 // touching the rest of the list. Used both after a full rebuild and on a plain step.
