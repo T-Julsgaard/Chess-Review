@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { Chess } from '../../lib/chess.js';
 import { args, integer, hash, hashFile, json, jsonl, save, codeIdentity, snapshotCode } from './io.mjs';
 import { Engine, engineConfig } from './engine.mjs';
+import { SearchCache } from './sqlite-cache.mjs';
 
 export function searchKey(configHash, history, played = null) {
   return hash(JSON.stringify([configHash, history, played]));
@@ -19,7 +20,8 @@ export async function readCache(file) {
 }
 async function main() {
   const o = args({ dataset: 'calibration-runs/smoke/dataset', out: 'calibration-runs/smoke/n20k',
-    nodes: '20000', depth: null, workers: '2', games: null, engine: 'engine/stockfish-nnue.js', 'development-only': false });
+    nodes: '20000', depth: null, workers: '2', games: null, engine: 'engine/stockfish-nnue.js', 'development-only': false,
+    sqlite: false, 'game-ids': null, deadline: null, 'max-new-games': null });
   const workers = integer(o.workers, 'workers', 1, 4);
   const budget = { kind: o.depth ? 'depth' : 'nodes', value: integer(o.depth || o.nodes, 'budget', 1, o.depth ? 40 : 100000000) };
   const config = await engineConfig(o.engine, budget), configHash = hash(JSON.stringify(config));
@@ -27,6 +29,9 @@ async function main() {
   if (await hashFile(path.join(o.dataset, 'games.jsonl')) !== dataset.gamesSha256) throw Error('Dataset changed');
   let games = await jsonl(path.join(o.dataset, 'games.jsonl'));
   if (o['development-only']) games = games.filter(g => g.split !== 'test');
+  if (o['game-ids']) { const ids = await json(o['game-ids']); const byId = new Map(games.map(g => [g.id, g]));
+    if (new Set(ids).size !== ids.length || ids.some(id => !byId.has(id))) throw Error('Invalid selected game IDs');
+    games = ids.map(id => byId.get(id)); }
   if (o.games) games = games.slice(0, integer(o.games, 'games'));
   const manifestFile = path.join(o.out, 'manifest.json');
   const code = await codeIdentity();
@@ -46,14 +51,18 @@ async function main() {
   const executionDir = path.join(o.out, 'executions', hash(JSON.stringify(code)));
   await snapshotCode(executionDir, code);
   await save(path.join(executionDir, 'code.json'), { code, nodeVersion: process.version });
-  const cacheFile = path.join(o.out, 'evaluations.jsonl');
-  const cache = await readCache(cacheFile), pending = new Map();
-  const writer = await open(cacheFile, 'a');
+  const cacheFile = path.join(o.out, o.sqlite ? 'evaluations.sqlite' : 'evaluations.jsonl');
+  const cache = o.sqlite ? new SearchCache(cacheFile, configHash) : await readCache(cacheFile), pending = new Map();
+  const writer = o.sqlite ? null : await open(cacheFile, 'a');
   let writeChain = Promise.resolve();
-  let newSearches = 0, cacheHits = 0, done = 0, next = 0, totalNodes = 0;
+  let newSearches = 0, cacheHits = 0, done = 0, next = 0, totalNodes = 0, assigned = 0, newCompleted = 0;
   const started = performance.now(), cpuBefore = os.cpus().map(c => c.times);
   const engines = Array.from({ length: workers }, () => new Engine(o.engine));
-  const interrupted = () => { engines.forEach(e => e.close()); };
+  let stopping = false, killTimer;
+  const interrupted = () => { stopping = true; killTimer ||= setTimeout(() => engines.forEach(e => e.close()), 5000); };
+  const deadlineMs = o.deadline ? Date.parse(o.deadline) : null;
+  if (o.deadline && !Number.isFinite(deadlineMs)) throw Error('Invalid deadline');
+  const deadlineTimer = deadlineMs == null ? null : setTimeout(interrupted, Math.max(0, deadlineMs - Date.now()));
   process.once('SIGINT', interrupted); process.once('SIGTERM', interrupted);
   async function get(engine, history, played) {
     const key = searchKey(configHash, history, played);
@@ -62,7 +71,7 @@ async function main() {
     const job = (async () => {
       const result = await engine.search(history, played, budget);
       const row = { key, history: history.slice(), played: played || null, ...result };
-      writeChain = writeChain.then(async () => { await writer.write(JSON.stringify(row) + '\n'); await writer.sync(); });
+      if (!o.sqlite) writeChain = writeChain.then(async () => { await writer.write(JSON.stringify(row) + '\n'); await writer.sync(); });
       await writeChain; cache.set(key, row); newSearches++;
       totalNodes += Number(/\bnodes (\d+)/.exec(result.finalSearchInfo)?.[1]) || result.nodes;
       return row;
@@ -74,31 +83,42 @@ async function main() {
     const identities = await Promise.all(engines.map(e => e.init(config)));
     await save(path.join(o.out, 'uci.json'), identities[0]);
     await Promise.all(engines.map(async engine => {
-      while (next < games.length) {
+      while (!stopping && next < games.length) {
         const game = games[next++], chess = new Chess(), history = [];
+        if (o.sqlite && cache.completed(game.id)) { done++; continue; }
+        if (o['max-new-games'] && assigned >= integer(o['max-new-games'], 'max-new-games')) break;
+        assigned++;
+        let incomplete = false;
         for (const played of game.moves) {
+          if (stopping) { incomplete = true; break; }
           const best = await get(engine, history, null);
           if (best.bestmove !== played) await get(engine, history, played);
           chess.move({ from: played.slice(0, 2), to: played.slice(2, 4), promotion: played[4] });
           history.push(played);
         }
-        done++;
+        if (incomplete) break;
+        if (o.sqlite) cache.complete(game.id);
+        done++; newCompleted++;
         const elapsed = (performance.now() - started) / 1000;
         console.log(`${done}/${games.length} games; ${newSearches} new searches; ${cacheHits} cache hits; ${(newSearches / elapsed).toFixed(1)} searches/s; ETA ${Math.round(elapsed / done * (games.length - done))}s`);
+        await save(path.join(o.out, 'progress.json'), { updatedAt: new Date().toISOString(), pid: process.pid,
+          done, total: games.length, newCompleted, newSearches, cacheHits, elapsedSeconds: elapsed, workers,
+          freeMemoryBytes: os.freemem(), rss: process.memoryUsage().rss });
       }
     }));
     const elapsedSeconds = (performance.now() - started) / 1000, after = os.cpus().map(c => c.times);
     let idle = 0, total = 0;
     after.forEach((t, i) => Object.keys(t).forEach(k => { const d = t[k] - cpuBefore[i][k]; total += d; if (k === 'idle') idle += d; }));
     await save(path.join(o.out, `benchmark-${Date.now()}.json`), {
-      games: done, workers, elapsedSeconds, newSearches, cacheHits, totalNodes,
+      games: done, newCompleted, workers, elapsedSeconds, newSearches, cacheHits, totalNodes,
       searchesPerSecond: newSearches / elapsedSeconds, gamesPerHour: done * 3600 / elapsedSeconds,
       systemCpuBusyFraction: total ? 1 - idle / total : null, cpuMeasurement: 'whole-machine activity; includes other processes',
       logicalCpus: os.cpus().length, cpu: os.cpus()[0]?.model,
       projectedHours: newSearches ? Object.fromEntries([2000, 10000, 20000].map(n => [n, n / done * elapsedSeconds / 3600])) : null,
       caveat: 'cache reuse and historical game lengths affect projections; not a worker-scaling benchmark' });
   } finally {
-    engines.forEach(e => e.close()); await writeChain; await writer.close();
+    engines.forEach(e => e.close()); await writeChain; if (writer) await writer.close(); if (o.sqlite) cache.close();
+    clearTimeout(deadlineTimer); clearTimeout(killTimer);
     process.removeListener('SIGINT', interrupted); process.removeListener('SIGTERM', interrupted);
   }
 }

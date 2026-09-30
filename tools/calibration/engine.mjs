@@ -6,11 +6,14 @@ import { hashFile } from './io.mjs';
 
 export async function engineConfig(enginePath, budget) {
   const loaderSha256 = await hashFile(enginePath), wasmSha256 = await hashFile(enginePath.replace(/\.js$/, '.wasm'));
-  if (loaderSha256 !== '2278005057f381491f1c9bb3e44c9f5920b3a00bef9759e33cc6582769a1f1fe' ||
-      wasmSha256 !== 'a8fbc05ec6920b56d7485826dcb02c5ffd2826bcbf751cf973046f237a9096f1')
-    throw Error('Unvalidated build/network; only exact bundled SF18 Lite hashes accepted');
-  return { version: 'Stockfish 18 (identity verified at UCI startup)', build: 'stockfish.js lite single-threaded',
-    network: 'nn-9067e33176e8.nnue', loaderSha256, wasmSha256,
+  const builds = [
+    [18, '2278005057f381491f1c9bb3e44c9f5920b3a00bef9759e33cc6582769a1f1fe', 'a8fbc05ec6920b56d7485826dcb02c5ffd2826bcbf751cf973046f237a9096f1', 'nn-9067e33176e8.nnue'],
+    [19, 'd3344124ab067fb0b90ee77873bb8e9fbf5fc01bc525fe714b0f942581e889e6', '57ac2d72312aba346760e3f173f687a8c211208e97a87268436f7f0e10bb5387', 'nn-61e7af4bb97d.nnue']
+  ];
+  const build = builds.find(b => b[1] === loaderSha256 && b[2] === wasmSha256);
+  if (!build) throw Error('Unvalidated build/network; only exact bundled SF18/SF19 Lite hashes accepted');
+  return { version: `Stockfish ${build[0]} (identity verified at UCI startup)`, majorVersion: build[0], build: 'stockfish.js lite single-threaded',
+    network: build[3], loaderSha256, wasmSha256,
     budget, options: { Threads: 1, Hash: 32, MultiPV: 1, 'Skill Level': 20,
       UCI_LimitStrength: false, UCI_ShowWDL: true, UCI_Chess960: false },
     reset: 'ucinewgame + Clear Hash + isready before every search',
@@ -48,7 +51,7 @@ export class Engine {
     this.send('uci');
     const lines = await this.until(l => l === 'uciok');
     this.identity = lines.find(l => l.startsWith('id name '))?.slice(8);
-    if (!/^Stockfish 18\b/.test(this.identity || '')) throw Error(`Unsupported identity: ${this.identity}`);
+    if (!new RegExp(`^Stockfish ${config.majorVersion || 18}\\b`).test(this.identity || '')) throw Error(`Unsupported identity: ${this.identity}`);
     for (const [name, value] of Object.entries(config.options)) {
       // Single-threaded builds may not expose Threads; record its enforced build value.
       if (name === 'Threads' && !lines.some(l => l.startsWith('option name Threads '))) continue;

@@ -3,13 +3,17 @@ import { Chess } from '../../lib/chess.js';
 import { args, json, jsonl, save, hashFile, codeIdentity } from './io.mjs';
 import { moveQuality, summarize, assertDisjoint } from './core.mjs';
 import { searchKey, readCache } from './analyze-games.mjs';
+import { SearchCache } from './sqlite-cache.mjs';
+import { access } from 'node:fs/promises';
 
 const o = args({ dataset: 'calibration-runs/smoke/dataset', run: 'calibration-runs/smoke/n20k', 'allow-partial': false });
 const manifest = await json(path.join(o.run, 'manifest.json'));
 if (await hashFile(path.join(o.dataset, 'games.jsonl')) !== manifest.binding.datasetSha256) throw Error('Dataset mismatch');
 const games = (await jsonl(path.join(o.dataset, 'games.jsonl'))).filter(g => manifest.binding.gameIds.includes(g.id));
 assertDisjoint(games);
-const cache = await readCache(path.join(o.run, 'evaluations.jsonl'));
+let sqlite = false;
+try { await access(path.join(o.run, 'evaluations.sqlite')); sqlite = true; } catch (e) { if (e.code !== 'ENOENT') throw e; }
+const cache = sqlite ? new SearchCache(path.join(o.run, 'evaluations.sqlite'), manifest.binding.configHash, { readonly: true }) : await readCache(path.join(o.run, 'evaluations.jsonl'));
 const rows = [], skipped = [];
 for (const game of games) {
   const chess = new Chess(), history = [], features = [];
@@ -34,3 +38,4 @@ await save(path.join(o.run, 'features.json'), { schemaVersion: 1, binding: manif
   featureCode: await codeIdentity(), analysisCode: manifest.code || manifest.binding.code,
   definition: 'WDL expected-result preservation; arithmetic and RMS loss; no historical helpers', rows, skipped });
 console.log(`Built ${rows.length} side samples, ${skipped.length} incomplete games`);
+if (sqlite) cache.close();
