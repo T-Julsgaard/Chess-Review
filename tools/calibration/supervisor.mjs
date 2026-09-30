@@ -29,6 +29,12 @@ export function planIds(games, validationCount=100) {
 const alive=pid=>{try{process.kill(pid,0);return true;}catch{return false;}};
 async function maybe(file) {try{return await json(file);}catch(e){if(e.code==='ENOENT')return null;throw e;}}
 const resource=()=>({cpu:os.cpus()[0]?.model,logicalCpus:os.cpus().length,totalMemoryBytes:os.totalmem(),freeMemoryBytes:os.freemem(),supervisorRss:process.memoryUsage().rss});
+export function normalizeBenchmark(b) {
+  const completed=b.newCompleted ?? b.games;
+  return {...b, originalGamesPerHour:b.gamesPerHour, gamesPerHour:completed>0?completed*3600/b.elapsedSeconds:null,
+    projectedHours:completed>0?Object.fromEntries([2000,10000,20000].map(n=>[n,n/completed*b.elapsedSeconds/3600])):null,
+    caveat:'Measured new game completions only; partial-game and opening cache reuse affect cost. Whole-machine CPU includes other processes; search throughput is preferred for comparisons.'};
+}
 export async function makeReport(root,state) {
   const dataset=await maybe(path.join(root,'dataset','manifest.json')), runs={};
   for(const engine of ['sf18','sf19']) {
@@ -37,10 +43,14 @@ export async function makeReport(root,state) {
     const benchmarks=await readdir(folder).catch(()=>[]);
     runs[engine]={development,completedGames:features?new Set(features.rows.map(r=>r.gameId)).size:0,
       completedSides:features?.rows.length||0,decisions:features?.rows.reduce((s,r)=>s+r.decisions,0)||0,
-      benchmarks:await Promise.all(benchmarks.filter(f=>f.startsWith('benchmark-')).map(f=>json(path.join(folder,f))))};
+      benchmarks:(await Promise.all(benchmarks.filter(f=>f.startsWith('benchmark-')).map(f=>json(path.join(folder,f))))).map(normalizeBenchmark)};
     if(features) for(const budget of ['80k','320k']) {
       const probe=await maybe(path.join(root,`${engine}-${budget}`,'features.json'));
-      if(probe) {runs[engine][`stability${budget}`]=compareFeatures(features,probe);
+      if(probe) {
+        const probeBase=await maybe(path.join(root,engine+'-probe20k','features.json'));
+        runs[engine]['stability'+budget]=compareFeatures(probeBase||features,probe);
+        runs[engine]['stability'+budget].baseRun=probeBase?engine+'-probe20k':engine+'-20k';
+        runs[engine]['stability'+budget].status=runs[engine]['stability'+budget].games<5?'inconclusive':'experimental';
         const val=developmentRows(features).filter(r=>r.split==='validation');
         const probeVal=developmentRows(probe).filter(r=>r.split==='validation');
         if(probeVal.length && development?.selected)runs[engine][`strongerRating${budget}`]=diagnostic(probeVal,probeVal.map(r=>predict(development.selected,r)));
@@ -57,7 +67,7 @@ export async function makeReport(root,state) {
       conclusion:'Exact engine/network metadata differ. Separate SF19 fit and explicit transfer metrics required; no automatic compatibility claim.'};
   }
   const scaling={};
-  for(const w of [1,2]) {const folder=path.join(root,`workers-${w}`);const files=await readdir(folder).catch(()=>[]);scaling[w]=await Promise.all(files.filter(f=>f.startsWith('benchmark-')).map(f=>json(path.join(folder,f))));}
+  for(const w of [1,2]) {const folder=path.join(root,`workers-${w}`);const files=await readdir(folder).catch(()=>[]);scaling[w]=(await Promise.all(files.filter(f=>f.startsWith('benchmark-')).map(f=>json(path.join(folder,f))))).filter(b=>b.newSearches>0).map(normalizeBenchmark);}
   const decisions=await readFile(path.join(root,'decisions.jsonl'),'utf8').catch(()=>'');
   const report={schemaVersion:1,generatedAt:new Date().toISOString(),status:state.phase==='complete'?'frozen-development':'experimental-in-progress',state,dataset,runs,transfer,workerScaling:scaling,
     decisions:decisions.trim()?decisions.trim().split('\n').map(JSON.parse):[],finalTest:{evaluated:false,status:'reserved; not evaluated or used for adaptive choices'},
@@ -145,7 +155,7 @@ async function main(){
       const out=path.join(root,`workers-${workers}`);await run('analyze-games.mjs',['--dataset',path.join(root,'dataset'),'--out',out,'--engine',engines[0][1],'--nodes','20000','--workers',String(workers),'--sqlite','--development-only','--game-ids',path.join(root,'worker-ids.json'),'--deadline',state.computeStop],true);
     }
     await decide('budget stability','Measure representative short/median/long training games at 80k and median-length games at 320k before spending remaining budget on sample expansion');
-    for(const[name,engine]of engines){await evaluate(`${name}-80k`,engine,80000,'probe-ids.json');if(schedule(o.deadline).canStart)await evaluate(`${name}-320k`,engine,320000,'deep-ids.json');}
+    for(const[name,engine]of engines){await evaluate(`${name}-probe20k`,engine,20000,'probe-ids.json');await evaluate(`${name}-80k`,engine,80000,'probe-ids.json');if(schedule(o.deadline).canStart)await evaluate(`${name}-320k`,engine,320000,'deep-ids.json');}
     // Separate, explicit shared-development transfer; deeper probes never touch final test.
     let rounds=0;
     while(!stopping&&schedule(o.deadline).canStart&&rounds++<14){

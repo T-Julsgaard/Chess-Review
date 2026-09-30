@@ -100,7 +100,7 @@ async function main() {
         if (o.sqlite) cache.complete(game.id);
         done++; newCompleted++;
         const elapsed = (performance.now() - started) / 1000;
-        console.log(`${done}/${games.length} games; ${newSearches} new searches; ${cacheHits} cache hits; ${(newSearches / elapsed).toFixed(1)} searches/s; ETA ${Math.round(elapsed / done * (games.length - done))}s`);
+        console.log(`${done}/${games.length} games; ${newSearches} new searches; ${cacheHits} cache hits; ${(newSearches / elapsed).toFixed(1)} searches/s; ETA ${Math.round(elapsed / newCompleted * (o["max-new-games"] ? Math.max(0, Number(o["max-new-games"]) - newCompleted) : games.length - done))}s`);
         await save(path.join(o.out, 'progress.json'), { updatedAt: new Date().toISOString(), pid: process.pid,
           done, total: games.length, newCompleted, newSearches, cacheHits, elapsedSeconds: elapsed, workers,
           freeMemoryBytes: os.freemem(), rss: process.memoryUsage().rss });
@@ -111,10 +111,10 @@ async function main() {
     after.forEach((t, i) => Object.keys(t).forEach(k => { const d = t[k] - cpuBefore[i][k]; total += d; if (k === 'idle') idle += d; }));
     await save(path.join(o.out, `benchmark-${Date.now()}.json`), {
       games: done, newCompleted, workers, elapsedSeconds, newSearches, cacheHits, totalNodes,
-      searchesPerSecond: newSearches / elapsedSeconds, gamesPerHour: done * 3600 / elapsedSeconds,
+      searchesPerSecond: newSearches / elapsedSeconds, gamesPerHour: newCompleted ? newCompleted * 3600 / elapsedSeconds : null,
       systemCpuBusyFraction: total ? 1 - idle / total : null, cpuMeasurement: 'whole-machine activity; includes other processes',
       logicalCpus: os.cpus().length, cpu: os.cpus()[0]?.model,
-      projectedHours: newSearches ? Object.fromEntries([2000, 10000, 20000].map(n => [n, n / done * elapsedSeconds / 3600])) : null,
+      projectedHours: newCompleted ? Object.fromEntries([2000, 10000, 20000].map(n => [n, n / newCompleted * elapsedSeconds / 3600])) : null,
       caveat: 'cache reuse and historical game lengths affect projections; not a worker-scaling benchmark' });
   } finally {
     engines.forEach(e => e.close()); await writeChain; if (writer) await writer.close(); if (o.sqlite) cache.close();
