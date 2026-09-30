@@ -28,7 +28,8 @@ export function assertCompatible(artifact, config) {
   if (JSON.stringify(artifact.engineConfig) !== JSON.stringify(config)) throw Error('Incompatible engine/search metadata');
 }
 export function assertDisjoint(games) {
-  const players = new Map();
+  const players = new Map(), ids = new Set();
+  for (const game of games) if (game.id != null) { if (ids.has(game.id)) throw Error(`Duplicate game: ${game.id}`); ids.add(game.id); }
   for (const game of games) for (const p of game.players) {
     if (players.has(p.id) && players.get(p.id) !== game.split) throw Error(`Player leakage: ${p.id}`);
     players.set(p.id, game.split);
