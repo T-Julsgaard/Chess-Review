@@ -1,8 +1,10 @@
 # Attributions & Licenses
 
 This extension is an independent, unofficial tool. It is **not affiliated with,
-endorsed by, or sponsored by Chess.com or Lichess**. All third-party assets below
-are used under their respective licenses.
+endorsed by, or sponsored by Chess.com or Lichess**. Third-party components
+retain their respective licenses. The records below identify known
+sources and licensing terms; entries marked unresolved are not claims of
+redistribution permission.
 
 ## Chess pieces (bundled SVG sets)
 Distributed by Lichess (lila); high-quality vector SVGs.
@@ -11,20 +13,31 @@ Distributed by Lichess (lila); high-quality vector SVGs.
 - **Source:** https://github.com/lichess-org/lila/tree/master/public/piece
 - **Licensing reference:** https://github.com/lichess-org/lila/blob/master/COPYING.md
 - Note: GPLv2+ permits redistribution (incl. commercial) provided the licence/source terms
-  are met. We deliberately avoided Lichess's non-commercial (CC BY-NC-SA) sets.
+  are met. Noncommercial piece sets are excluded from the current build allowlist.
 
-## Chess pieces & boards (Kadagaden set)
-By **Kadagaden**, from the `chess-pieces` repository.
-- **Piece sets** (`pieces-img/kaneo/*.svg`, `pieces-img/kaneo_midnight/*.svg`,
-  `pieces-img/kbyte_gambit/*.svg`) — "Kaneo", "Kaneo Midnight" and "1Kbyte Gambit".
-- **Not bundled:** "Maestro B/W" was excluded — it derives from Lichess's "Maestro" set, which is
-  **CC BY-NC-SA (non-commercial)**; that restriction is incompatible with this open-source project.
-- **Board artwork** (`boards-img/*.svg`) — the bundled 8×8 board backgrounds
-  (Green, Sand, Amber, Clay, Wood).
-- **Source:** https://github.com/Kadagaden/chess-pieces
-- **License:** **CC BY 4.0** — https://creativecommons.org/licenses/by/4.0/
-- Only the standard chess pieces (K, Q, R, B, N, P) and 8×8 chess boards are bundled;
-  the repository's fairy-chess / Janggi / Xiangqi / Sittuyin assets are not used.
+## Removed artwork — historical provenance record
+- On the maintainer's instruction, Kaneo, Kaneo Midnight, 1Kbyte Gambit, and the
+  five Kadagaden board SVGs were removed from the current checkout on 2026-09-30.
+  They are absent from new browser/source ZIPs and from the current settings UI.
+- **Former source:** Kadagaden, https://github.com/Kadagaden/chess-pieces;
+  received with upstream's CC BY 4.0 attribution. Underlying artwork permissions
+  were not independently established. This record does not retroactively clear them.
+- Existing release archives and Git history are preserved. Historical copies may
+  still contain these assets; current removal does not alter earlier distribution.
+- Remaining bundled pieces are Cburnett and Merida, as credited above.
+- Maestro and Maestro B/W are not included. The maintainer has chosen not to add
+  those noncommercial sets. Licensing reference:
+  https://github.com/lichess-org/lila/blob/master/COPYING.md
+
+## Compatibility board palettes
+- **File:** `analysis.js` (`REVIEW_BOARD_PALETTES`, `SOURCE_BOARD_ALIAS`).
+- These retain the earlier platform-theme matching behavior with new display names
+  and very small RGB adjustments requested by the maintainer on 2026-09-30.
+- This is a cosmetic change, not evidence of independent design or legal clearance.
+  Source board images are not imported. The separate Kadagaden SVG boards have
+  been removed; the remaining boards use flat colors. The significance of palette
+  matching for design, branding, and contractual claims remains a review question,
+  not a finding that Chess.com owns ordinary green/white checkerboards.
 
 ## Country flags
 - **Files:** `flags/*.svg` (used as player avatars when a country is detected)
@@ -38,11 +51,17 @@ By **Kadagaden**, from the `chess-pieces` repository.
 ## Move / board sounds
 - **Files:** `sounds/move-self.mp3`, `sounds/capture.mp3`, `sounds/Check.mp3`,
   `sounds/Castling.mp3`
-- **Source:** Lichess sound set (lila), distributed under AGPL-3.0 —
-  https://github.com/lichess-org/lila/blob/master/LICENSE
+- **Recorded source:** Lichess sound set (lila). Lichess's software license does
+  not establish redistribution permission for these recordings; its licensing
+  inventory lists exceptions for sound assets:
+  https://github.com/lichess-org/lila/blob/master/COPYING.md
 - **Underlying sample credit:** the samples embed the tag
   "Copyright 2000, Sounddogs.com" (commercial royalty-free library, as redistributed
   by Lichess). Retained here for transparency.
+- **Redistribution rights unresolved:** retain the applicable acquisition/license
+  records or replace the recordings in a future release after rights review.
+  Commercial library recordings are not automatically AGPL-licensed because they
+  appear in an AGPL project.
 
 ## "Wrong answer" practice sound
 - **File:** `sounds/Wrong/Incorrect.mp3`
@@ -95,8 +114,62 @@ By **Kadagaden**, from the `chess-pieces` repository.
 - **Local maintenance:** Replace every PGN comment brace and remove a no-op newline
   masking helper while preserving regular-expression separators. The original license notice is retained.
 
+## Adapted move classifier
+- **File:** `analysis.js` (move classification, including attacker/defender and
+  sacrifice logic; locally adapted evaluation handling and classification rules).
+- **Project:** Brilliant-Chess by **Delo** (`wdeloo`).
+- **Copyright:** Copyright (c) 2025 Delo <https://github.com/wdeloo>
+- **License:** MIT. The complete copyright and permission notice is included in
+  [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and shipped with the extension.
+- **Source:** https://github.com/wdeloo/Brilliant-Chess
+- **License reference:** https://github.com/wdeloo/Brilliant-Chess/blob/56e8c48696d3df874f4f1e0f26cb47bedff3231c/LICENSE
+- This reference identifies the verified license text; it does not claim that the
+  original adaptation was made from that exact upstream commit.
+
+## Move-category badges
+- **Author:** T-Julsgaard, project maintainer.
+- **Files:** `icons/brilliant.svg`, `icons/great.svg`, `icons/book.svg`,
+  `icons/best.svg`, `icons/excellent.svg`, `icons/good.svg`, `icons/inaccuracy.svg`,
+  `icons/mistake.svg`, `icons/miss.svg`, and `icons/blunder.svg`.
+- **Source:** maintainer-created badge artwork. The maintainer confirmed authorship
+  on 2026-09-30; this records that declaration, not independent verification of
+  every creation input. The redesigned symbols retain the previous circle colours.
+- **License:** GNU GPL v3.0, under the project's [LICENSE](LICENSE).
+- **Design record:** `design/icon-explorations/README.md`, `selection.json`, and
+  preserved design iterations identify the selected drawings. Original snapshots
+  are historical references, not the active badge set.
+
 ## App logo / icon
 - **Files:** `icons/icon16.png`, `icons/icon48.png`, `icons/icon128.png`, `icons/icon.png`
-- Original artwork created for this project. The knight in the mark is derived from Colin M.L.
-  Burnett's ("Cburnett") knight piece, so the logo is likewise made available under
-  **CC BY-SA 3.0** with attribution to Cburnett.
+- Project logo composition incorporating Colin M.L. Burnett's ("Cburnett") white
+  knight design. Copyright in the underlying knight remains with its author.
+- **Underlying artwork / licensing reference:** "Chess nlt45.svg" by Colin M.L.
+  Burnett: https://commons.wikimedia.org/wiki/File:Chess_nlt45.svg
+- **Selected license for the logo adaptation:** **CC BY-SA 3.0 Unported** —
+  https://creativecommons.org/licenses/by-sa/3.0/
+- **Changes:** the knight is incorporated into the project icon composition and
+  distributed as raster PNGs at the sizes above. The logo adaptation is available
+  under the same CC BY-SA 3.0 license. No endorsement by the original artist is implied.
+- The Commons artwork offers multiple licenses; this records the CC BY-SA basis
+  separately from the GPLv2+ licensing of the bundled board-piece set.
+- **Creation record:** on 2026-09-30 the maintainer recalled using AI with the
+  Cburnett piece to create the logo. This records that recollection; the exact AI
+  tool, prompt, and original input file have not been established. AI processing
+  does not remove the underlying artist's attribution or share-alike conditions.
+- The stated Cburnett basis has a documented adaptation licence. Original creation
+  files can be retained if recovered; this is not an independent verification of
+  those inputs.
+
+## Original project sounds, backgrounds, and coach artwork
+- **Author:** T-Julsgaard, project maintainer.
+- **Source:** original project work. Authorship was confirmed by the maintainer on
+  2026-09-30; this entry records that declaration, not an independent forensic
+  verification of the original creation files.
+- **License:** GNU GPL v3.0, under the project's [LICENSE](LICENSE).
+- **Files:**
+- `sounds/fx/chess_sound_01.wav` through `sounds/fx/chess_sound_09.wav`.
+- `backgrounds/bg-slate.webp` and `backgrounds/bg-ember.webp`.
+- Animated coach artwork and rigs in `data/coaches-anim/rigs/*.html` and `*.js`.
+
+These original assets are separate from the four Sounddogs-tagged MP3 recordings
+listed above. Retain original recordings/design files as supporting provenance.

@@ -12,8 +12,8 @@ rating. No account, no server, no manual PGN copying.
 ## Features
 
 - **One-click review** of any Chess.com or Lichess game — or paste a game URL / raw PGN.
-- **Accuracy scores** for both players, calibrated using Stockfish 18 NNUE. Scores can differ from other review tools.
-- **Move classifications** from Brilliant to Blunder, with an evaluation graph and best-move arrows.
+- **Accuracy estimates** for both players, calculated from local Stockfish analysis using the extension's scoring rules. Scores can differ from other review tools.
+- **Move classifications** from Masterstroke to Blunder, with an evaluation graph and best-move arrows.
 - **Estimated rating** — a rough guide to the level each player performed at in the game.
 - **Opening detection** from an offline book, named even for PGNs without headers.
 - **Explore board** from the popup, without loading a game: try legal moves, browse
@@ -66,12 +66,15 @@ Games are fetched from Chess.com's and Lichess's public APIs and analyzed locall
 with bundled WebAssembly builds of Stockfish. Lookup requests include public player
 usernames or game IDs. No games or analysis are sent to the developer or analytics services.
 Firefox discloses the browsing activity and website content used for these requests.
+Sharing a game copies an encoded, unencrypted PGN/metadata link to your clipboard;
+anyone you send it to can read that information. See [PRIVACY.md](PRIVACY.md).
 
 ## Release packages
 
 Run `npm ci`, `npm test`, `npm run verify:engines`, and `npm run build`.
 The build creates separate Chrome and Firefox ZIPs under `web-ext-artifacts/`,
-with browser-specific manifests and no development dependencies or tests.
+with browser-specific manifests and no development dependencies or tests. Each build
+has its own release directory, source snapshot, and SHA-256 package checksums.
 See [RELEASE.md](RELEASE.md) for store reviewer notes and validation commands.
 
 ## License & attributions
@@ -79,7 +82,10 @@ See [RELEASE.md](RELEASE.md) for store reviewer notes and validation commands.
 Chess Review's own code is licensed under the **GNU General Public License v3.0** (see
 [`LICENSE`](LICENSE)), matching the bundled Stockfish engine. Bundled third-party assets (engine,
 pieces, sounds, opening book, libraries) keep their own licenses — see
-[`ATTRIBUTIONS.md`](ATTRIBUTIONS.md). Corresponding source for the GPL/AGPL components is available
+[`ATTRIBUTIONS.md`](ATTRIBUTIONS.md) and [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+Some asset redistribution rights remain unresolved as documented in the attributions;
+the project's GPL license does not grant rights to those assets.
+Corresponding source for the GPL/AGPL components is available
 from the upstream projects listed there.
 
 > **Disclaimer:** Chess Review is an independent, unofficial tool. It is **not affiliated with,

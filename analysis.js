@@ -1,7 +1,7 @@
 // analysis.js — Chess Review analysis page (vanilla port of "Design 2.0").
 // Parses the PGN, runs Stockfish through the game and fills every panel with real
 
-// opening (from the PGN), player/clock/result. Board + 6 piece styles + theme are selectable.
+// opening (from the PGN), player/clock/result. Board + 2 piece styles + theme are selectable.
 
 import { Chess } from "./lib/chess.js";
 import { Engine } from "./engine/uci.js";
@@ -48,7 +48,7 @@ const GLYPH = { K: "♚", Q: "♛", R: "♜", B: "♝", N: "♞", P: "♟" };  /
 
 const BOARD_THEMES = {
   green:   ["#e9edcc", "#6f9c54"],
-  walnut:  ["#f0d9b5", "#b58863"],
+  walnut:  ["#efd8b6", "#b48764"],
   slate:   ["#dfe3e9", "#8a97a8"],
   ocean:   ["#dbe7f3", "#6f8fb4"],
   ink:     ["#b9bdc6", "#474c57"],
@@ -57,25 +57,29 @@ const BOARD_THEMES = {
   emerald: ["#e4ead4", "#46683f"],   // deep forest green
   coral:   ["#f7dfca", "#c8835a"],   // warm terracotta
 };
+
+const BOARD_THEME_LABEL = { green: "Meadow", walnut: "Hazel", slate: "Mist", ocean: "Harbor",
+  ink: "Graphite", maple: "Honeywood", emerald: "Forest", coral: "Terracotta" };
 const ACCENTS = {
   "#7fb45f": { accent: "#7fb45f", strong: "#6aa14a", ink: "#11210a" },
   "#5a8bef": { accent: "#5a8bef", strong: "#4574db", ink: "#06122e" },
   "#d9a544": { accent: "#d9a544", strong: "#c4902f", ink: "#2a1c05" },
   "#c77edb": { accent: "#c77edb", strong: "#aa5fc1", ink: "#260d30" },
 };
-// Move classifications (standard style). Each has a color (CSS variable), a
+// Display names are independent of stored classification keys and scoring rules.
+// Each classification has a color (CSS variable), a
 // short symbol (fallback) and an SVG badge icon in icons/<icon>.svg. Note that the
 
 const QUALITY = {
-  brilliant: { sym: "!!", name: "Brilliant", color: "var(--q-brilliant)", icon: "brilliant" },
-  great:     { sym: "!",  name: "Great",     color: "var(--q-great)",     icon: "great" },
+  brilliant: { sym: "!!", name: "Masterstroke", color: "var(--q-brilliant)", icon: "brilliant" },
+  great:     { sym: "!",  name: "Superb",    color: "var(--q-great)",     icon: "great" },
   best:      { sym: "★",  name: "Best",      color: "var(--q-best)",      icon: "best" },
-  excellent: { sym: "✓",  name: "Excellent", color: "var(--q-excellent)", icon: "excellent" },
-  good:      { sym: "✓",  name: "Good",      color: "var(--q-good)",      icon: "good" },
-  book:      { sym: "◇",  name: "Book",      color: "var(--q-book)",      icon: "book" },
-  inacc:     { sym: "?!", name: "Inaccuracy",color: "var(--q-inacc)",     icon: "inaccuracy" },
-  mistake:   { sym: "?",  name: "Mistake",   color: "var(--q-mistake)",   icon: "mistake" },
-  miss:      { sym: "✕",  name: "Miss",      color: "var(--q-miss)",      icon: "miss" },
+  excellent: { sym: "✓",  name: "Near best", color: "var(--q-excellent)", icon: "excellent" },
+  good:      { sym: "✓",  name: "Decent",    color: "var(--q-good)",      icon: "good" },
+  book:      { sym: "◇",  name: "Theory",    color: "var(--q-book)",      icon: "book" },
+  inacc:     { sym: "?!", name: "Minor Misstep", color: "var(--q-inacc)", icon: "inaccuracy" },
+  mistake:   { sym: "?",  name: "Major Misstep", color: "var(--q-mistake)", icon: "mistake" },
+  miss:      { sym: "✕",  name: "Missed chance", color: "var(--q-miss)", icon: "miss" },
   blunder:   { sym: "??", name: "Blunder",   color: "var(--q-blunder)",   icon: "blunder" },
 };
 const QUALITY_ORDER = ["brilliant","great","best","excellent","good","book","inacc","mistake","miss","blunder"];
@@ -83,9 +87,9 @@ const QUALITY_ORDER = ["brilliant","great","best","excellent","good","book","ina
 const QBREAK_SUMMARY = ["brilliant","great","best","mistake","miss","blunder"];
 const QBREAK_FULL = ["brilliant","great","book","best","excellent","good","inacc","mistake","miss","blunder"];
 const QUALITY_LABEL = {
-  brilliant: "Brilliant move!", great: "Great move!", best: "Best move",
-  excellent: "Excellent", good: "Good move", book: "Book move",
-  inacc: "Inaccuracy", mistake: "Mistake", miss: "Missed chance", blunder: "Blunder",
+  brilliant: "Masterstroke!", great: "Superb move!", best: "Best move",
+  excellent: "Near best", good: "Decent move", book: "Theory move",
+  inacc: "Minor Misstep", mistake: "Major Misstep", miss: "Missed chance", blunder: "Blunder",
 };
 const NOTEWORTHY = new Set(["brilliant","great","inacc","mistake","miss","blunder"]);
 
@@ -99,13 +103,13 @@ const QUALITY_DESC = {
   excellent: "Not the top move, but nearly as strong (loses well under half a pawn), or a move that begins or keeps a forced mate.",
   good:      "A solid move (loses roughly half to one pawn), or one that delays an unavoidable mate.",
   book:      "A known opening move — the position is in the opening book (theory from a large game dataset).",
-  inacc:     "Inaccuracy: a move that loses about 1–4 pawns of eval.",
-  mistake:   "Mistake: a move that throws away a clear (≥2 pawn) advantage, or hands the opponent one.",
+  inacc:     "Minor Misstep: a move that loses about 1–4 pawns of eval.",
+  mistake:   "Major Misstep: a move that throws away a clear (≥2 pawn) advantage, or hands the opponent one.",
   miss:      "Missed chance: the opponent erred and you failed to punish it — or you let a forced mate slip.",
   blunder:   "Blunder: a move that loses ~4+ pawns of eval, or walks into a forced mate.",
 };
 
-const ACCURACY_INFO = "Accuracy (0–100) reflects how good your moves were: each move scores by its category (Best/Brilliant = 100 down to Blunder = 0) and the game accuracy is their average — close to what the major sites report. (The Elo estimate below uses a separate win%-based accuracy under the hood.) 100 = flawless.";
+const ACCURACY_INFO = "Accuracy (0–100) is an estimate calculated from local Stockfish evaluations using this extension's scoring rules. Higher scores indicate more accurate play. Scores depend on engine settings and scoring parameters and are not official platform scores.";
 const ELO_INFO = "A rough estimate of the rating you played at in this game. It anchors on your actual rating and adjusts up or down by how accurately you played this game (when no rating is known it falls back to accuracy alone). It's not an official rating — only an indication based on this single game.";
 
 const ENGINE_INFO = {
@@ -113,64 +117,75 @@ const ENGINE_INFO = {
   classifyLines: "Lines searched per position during the analysis batch. 1 is fastest and is all the move classification needs; raising it measures your move in the same search (steadier accuracy/Elo) and pre-fills the panel. Re-analyzes the game.",
   engineDepth:   "How many plies (half-moves) deep Stockfish searches each position. Higher depth gives more accurate evaluations and fewer false mistakes, but takes longer.",
   engineWorkers: "Number of Stockfish instances analysing positions in parallel. More workers finish the game faster on multi-core CPUs; the results are identical.",
-  fastAnalysis:  "Trades quality for speed: the classification pass uses fewer engine lines. ~1.3×/1.6× faster, but evals shift slightly and clean games can pick up a few false inaccuracies.",
+  fastAnalysis:  "Trades quality for speed: the classification pass uses fewer engine lines. ~1.3×/1.6× faster, but evals shift slightly and clean games can pick up a few false minor missteps.",
   enginePath:    "Stockfish 18 NNUE is the default. Stockfish 19 Lite uses a smaller evaluation network for a compact alternative. Both run locally; Lite is not the full-strength Stockfish 19 build.",
   engineSkill:   "Caps the engine's playing strength (Stockfish 'Skill Level'). Max (20) = full strength. Lower values play deliberately weaker — useful for more human-like suggestions.",
   engineHash:    "Recommended: 16 MB for most reviews (the default). Try 32–64 MB for deeper analysis if your computer has spare memory. Each parallel worker uses its own hash table, so memory use is roughly Hash × Workers.",
-  clsGood:       "A move that loses at least this much eval (in pawns) can be no better than \"Good\". Below it, the move is \"Excellent\". Lower = stricter.",
-  clsInacc:      "A move that loses at least this much eval (pawns) is flagged \"Inaccuracy\". Lower = more inaccuracies.",
+  clsGood:       "A move that loses at least this much eval (in pawns) can be no better than \"Decent\". Below it, the move is \"Near best\". Lower = stricter.",
+  clsInacc:      "A move that loses at least this much eval (pawns) is flagged \"Minor Misstep\". Lower = more minor missteps.",
   clsBlunder:    "A move that loses at least this much eval (pawns) is a \"Blunder\". Lower = more blunders.",
-  clsClearAdv:   "How many pawns counts as a \"clear advantage\". Used to decide Mistakes (you threw away a clear advantage), Misses, and the context for Great moves.",
-  clsMistakeLoss:"Minimum eval lost (pawns) for a move to qualify as a Mistake, and for a slip to be \"punishable\" (enabling a Great/Miss on the reply).",
-  clsMissTol:    "How close to giving back the whole advantage still counts as a Miss rather than a clean punish. Higher = more Misses.",
+  clsClearAdv:   "How many pawns counts as a \"clear advantage\". Used to decide Major Missteps (you threw away a clear advantage), Missed chances, and the context for Superb moves.",
+  clsMistakeLoss:"Minimum eval lost (pawns) for a move to qualify as a Major Misstep, and for a slip to be \"punishable\" (enabling a Superb move or Missed chance on the reply).",
+  clsMissTol:    "How close to giving back the whole advantage still counts as a Missed chance rather than a clean punish. Higher = more missed chances.",
 };
 
 const pawnsFmt = (v) => (+v).toFixed(2).replace(/\.00$/, "") + " pawns";
 const ptsFmt = (v) => v + " pts";
 // URL to a classification badge (SVG).
 const qIcon = (cls) => _url("icons/" + (QUALITY[cls]?.icon || cls) + ".svg");
-const PIECE_STYLES = ["image","merida","kaneo","kbyte_gambit"];
-// Labels shown in the settings. "image" = bundled Cburnett (the Lichess default set, the standard
-// here), "merida" = the bundled Merida set; the kaneo/kbyte sets are bundled Kadagaden
-// sets (CC BY 4.0) — all crisp SVG.
-const PIECE_STYLE_LABEL = { image: "Cburnett", merida: "Merida", kaneo: "Kaneo", kbyte_gambit: "1Kbyte Gambit" };
-// Color approximation of common board themes [light, dark square], used to MATCH a detected
-// board by name (colours aren't copyrightable; the source site's board image is never used).
-// Unknown themes fall back to "green".
-const CC_BOARD_COLORS = {
-  green:      ["#ebecd0", "#739552"],
-  brown:      ["#f0d9b5", "#b58863"],
-  walnut:     ["#c8a275", "#875f3c"],
-  wood:       ["#c0926a", "#7c4f31"],
-  dark_wood:  ["#c0926a", "#7c4f31"],
-  blue:       ["#dee3e6", "#8ca2ad"],
-  sky:        ["#dee3e6", "#8ca2ad"],
-  light:      ["#dad6cc", "#b0a999"],
-  glass:      ["#c2d3da", "#7a9db0"],
-  bubblegum:  ["#f9f0fb", "#e6a3c6"],
-  tournament: ["#eaeed3", "#6f9f64"],
-  newspaper:  ["#e6e6e6", "#9c9c9c"],
-  marble:     ["#e8e2d6", "#9a8d7a"],
-  icy_sea:    ["#cdd7e0", "#7d97ab"],
-  sea:        ["#cdd7e0", "#7d97ab"],
-  metal:      ["#d6d6d6", "#8e8e8e"],
+const PIECE_STYLES = ["image","merida"];
+// Persisted "image" selects Cburnett; both remaining sets are bundled GPLv2+ SVGs.
+const PIECE_STYLE_LABEL = { image: "Cburnett", merida: "Merida" };
+// Compatibility palettes derived from the previous site-theme approximations. Names and RGB
+// channels have been adjusted cosmetically; this is not an assertion of independent provenance
+// or legal clearance. Source images are never imported. Unknown themes use the normal green board.
+const REVIEW_BOARD_PALETTES = {
+  meadow:    { label: "Soft Meadow", colors: ["#eaeccf", "#729651"] },
+  parchment: { label: "Parchment", colors: ["#efd8b6", "#b48764"] },
+  chestnut:  { label: "Chestnut", colors: ["#c7a376", "#865e3d"] },
+  copperwood:{ label: "Copperwood", colors: ["#bf936b", "#7b5032"] },
+  morning:   { label: "Morning Mist", colors: ["#dde4e7", "#8ba3ae"] },
+  linen:     { label: "Linen", colors: ["#d9d7cd", "#afaa9a"] },
+  lagoon:    { label: "Lagoon", colors: ["#c1d4db", "#799eb1"] },
+  blossom:   { label: "Blossom", colors: ["#f8effa", "#e5a4c7"] },
+  orchard:   { label: "Orchard", colors: ["#e9efd4", "#6ea065"] },
+  newsprint: { label: "Newsprint", colors: ["#e5e7e6", "#9b9d9c"] },
+  limestone: { label: "Limestone", colors: ["#e7e3d7", "#998e7b"] },
+  fjord:     { label: "Fjord", colors: ["#ccd8e1", "#7c98ac"] },
+  pewter:    { label: "Pewter", colors: ["#d5d7d6", "#8d8f8e"] },
 };
+// Legacy/platform identifiers are retained only for matching and saved-setting compatibility.
+const SOURCE_BOARD_ALIAS = { green: "meadow", brown: "parchment", walnut: "chestnut",
+  wood: "copperwood", dark_wood: "copperwood", blue: "morning", sky: "morning",
+  light: "linen", glass: "lagoon", bubblegum: "blossom", tournament: "orchard",
+  newspaper: "newsprint", marble: "limestone", icy_sea: "fjord", sea: "fjord", metal: "pewter" };
+function detectedBoardPalette() {
+  return REVIEW_BOARD_PALETTES[SOURCE_BOARD_ALIAS[S.settings.ccBoardTheme]]
+    || { label: BOARD_THEME_LABEL.green, colors: BOARD_THEMES.green };
+}
 // "image" = real piece images (cburnett). Filenames per piece+color (l=white, d=black).
 // Bundled high-quality SVG piece sets (from Lichess; GPLv2+). Maps a piece-style key to its folder
 // under pieces-img/<set>/<code>.svg, where <code> is e.g. wK / bN (white King, black kNight). SVG =
 // crisp at any board size.
-const BUNDLED_PIECE_SETS = { image: "cburnett", merida: "merida", kaneo: "kaneo", kbyte_gambit: "kbyte_gambit" };
-// Bundled full-board artwork from Kadagaden/chess-pieces (CC BY 4.0). Each entry is a complete 8x8
-// SVG painted as the board's background (squares go transparent via .cc-board, like a detected
-// board); the [light, dark] pair drives the coordinate + last-move/selection highlight tints so
-// they read well on top of that board. Keyed by the boardTheme setting value.
-const BUNDLED_BOARDS = {
-  kada_green:   { label: "Kada Green", file: "8x8_green.svg",                colors: ["#ebecd0", "#779556"] },
-  kada_sand:    { label: "Sand",       file: "8x8_brown_sand.svg",           colors: ["#ebecd0", "#b68860"] },
-  kada_amber:   { label: "Amber",      file: "8x8_brown_yellow.svg",         colors: ["#f4eeaa", "#af7c59"] },
-  kada_clay:    { label: "Clay",       file: "8x8_pinkish_brown_yellow.svg", colors: ["#f4eeaa", "#d29b75"] },
-  kada_wood:    { label: "Wood",       file: "8x8_wood.svg",                 colors: ["#ba9d78", "#6e4e37"] },
+const BUNDLED_PIECE_SETS = { image: "cburnett", merida: "merida" };
+
+const REMOVED_BOARD_THEMES = {
+  kada_green: "green", kada_sand: "walnut", kada_amber: "maple",
+  kada_clay: "coral", kada_wood: "maple",
 };
+function migrateVisualAssetSettings(settings) {
+  let changed = false;
+  if (!PIECE_STYLES.includes(settings.pieceStyle)) {
+    settings.pieceStyle = "image";
+    changed = true;
+  }
+  const replacement = REMOVED_BOARD_THEMES[settings.boardTheme];
+  if (replacement) {
+    settings.boardTheme = replacement;
+    changed = true;
+  }
+  return changed;
+}
 
 const DEFAULT_SETTINGS = {
   theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
@@ -1499,6 +1514,45 @@ function renderReorgBanner() {
 }
 
 /* ---------------- Board ---------------- */
+function makeBoardBadge(cls) {
+  const cfg = QUALITY[cls];
+  return el("img", {
+    class: "sq-badge", src: qIcon(cls), alt: cfg.name, draggable: "false", tabindex: "0",
+    onpointerenter: (e) => { if (e.pointerType !== "touch" && !e.buttons) showBoardBadgeTip(e.currentTarget, cls); },
+    onpointerleave: hideBoardBadgeTip,
+    onfocus: (e) => showBoardBadgeTip(e.currentTarget, cls),
+    onblur: hideBoardBadgeTip,
+    onpointerdown: hideBoardBadgeTip,
+    onkeydown: (e) => { if (e.key === "Escape") hideBoardBadgeTip(); },
+  });
+}
+function showBoardBadgeTip(target, cls) {
+  const cfg = QUALITY[cls];
+  if (!cfg || !target.isConnected) return;
+  let tip = document.getElementById("boardBadgeTip");
+  if (!tip) {
+    tip = el("div", { id: "boardBadgeTip", class: "board-badge-tip", role: "tooltip", "aria-hidden": "true" });
+    document.body.append(tip);
+    window.addEventListener("resize", hideBoardBadgeTip);
+    window.addEventListener("scroll", hideBoardBadgeTip, true);
+    window.addEventListener("blur", hideBoardBadgeTip);
+  }
+  tip.textContent = cfg.name;
+  const r = target.getBoundingClientRect();
+  // Measuring before showing also establishes the initial style for the first fade-in.
+  const w = tip.offsetWidth, h = tip.offsetHeight, gap = 8, margin = 8;
+  const left = Math.max(margin, Math.min(window.innerWidth - w - margin, r.left + r.width / 2 - w / 2));
+  const above = r.top - h - gap;
+  const top = Math.max(margin, Math.min(window.innerHeight - h - margin, above >= margin ? above : r.bottom + gap));
+  tip.style.left = left + "px";
+  tip.style.top = top + "px";
+  tip.setAttribute("aria-hidden", "false");
+  tip.classList.add("show");
+}
+function hideBoardBadgeTip() {
+  const tip = document.getElementById("boardBadgeTip");
+  if (tip) { tip.classList.remove("show"); tip.setAttribute("aria-hidden", "true"); }
+}
 function makePiece(type, side) {
   // Only the two bundled SVG sets remain (Cburnett = "image", Merida); anything else → default set.
   const setFolder = BUNDLED_PIECE_SETS[S.settings.pieceStyle] || BUNDLED_PIECE_SETS.image;
@@ -1527,10 +1581,11 @@ function buildBoard() {
   const existing = UI.boardWrap.querySelector(".board");
   if (existing) existing.replaceWith(board);
   else UI.boardWrap.append(board);
-  applyBoardArt(board);
+  clearBoardArt(board);
   paintBoard();
 }
 function paintBoard() {
+  hideBoardBadgeTip();
   const pos = activePos();
   const boardEl = UI.boardWrap.querySelector(".board");
   if (boardEl) boardEl.classList.toggle("analysis", S.analysisMode);
@@ -1558,7 +1613,7 @@ function paintBoard() {
       cls = S.classif[S.idx] || null;
     }
   }
-  // The from/to squares are tinted with the classification color (chess.com style) at 0.5 alpha;
+  // The from/to squares are tinted with the classification color at 0.5 alpha;
   // without a classification we fall back to the neutral yellow highlight.
   const tint = cls && QUALITY[cls]
     ? `color-mix(in srgb, ${QUALITY[cls].color} 50%, transparent)`
@@ -1573,7 +1628,7 @@ function paintBoard() {
     const ch = occ[name];
     if (ch) sq.append(makePiece(ch.toUpperCase(), ch === ch.toUpperCase() ? "w" : "b"));
     if (name === pos.to && cls && QUALITY[cls]) {
-      sq.append(el("img", { class: "sq-badge", src: qIcon(cls), alt: QUALITY[cls].name, draggable: "false" }));
+      sq.append(makeBoardBadge(cls));
     }
   }
   renderBestArrow();
@@ -2440,12 +2495,12 @@ function renderControls() {
   if (S.practice) {
     const p = S.practice;
     const cur = Math.min(p.i + 1, p.spots.length);
-    const status = p.rolling ? "Rolling to your mistake…"
+    const status = p.rolling ? "Rolling to your misstep…"
       : p.demoing ? "Replaying your move…"
       : p.busy ? "Checking…"
       : p.solving ? "Find a stronger move" : "✓ Correct!";
     UI.controls.replaceChildren(
-      el("span", { class: "pos practice-pos" }, `Mistake ${cur}/${p.spots.length}`),
+      el("span", { class: "pos practice-pos" }, `Practice ${cur}/${p.spots.length}`),
       el("span", { class: "practice-status" }, status),
       el("button", { class: "exit-analysis", title: "Exit practice (Esc)", onclick: exitPractice }, el("span", { class: "ea-x" }, "✕"), "Exit"),
     );
@@ -2483,15 +2538,15 @@ function renderControls() {
 
 // Natural phrasing for the move that led to the current position, keyed by classification.
 const COMMENT_PHRASE = {
-  brilliant: (m) => `${m} is a brilliant find.`,
-  great:     (m) => `${m} is a great move.`,
+  brilliant: (m) => `${m} is a masterstroke.`,
+  great:     (m) => `${m} is a superb move.`,
   best:      (m) => `${m} is the best move.`,
-  excellent: (m) => `${m} is excellent.`,
-  good:      (m) => `${m} is a good move.`,
-  book:      (m) => `${m} is a book move.`,
-  inacc:     (m) => `${m} is an inaccuracy.`,
-  mistake:   (m) => `${m} is a mistake.`,
-  miss:      (m) => `${m} misses a stronger chance.`,
+  excellent: (m) => `${m} is near best.`,
+  good:      (m) => `${m} is a decent move.`,
+  book:      (m) => `${m} follows opening theory.`,
+  inacc:     (m) => `${m} is a minor misstep.`,
+  mistake:   (m) => `${m} is a major misstep.`,
+  miss:      (m) => `${m} is a missed chance.`,
   blunder:   (m) => `${m} is a blunder.`,
 };
 // SAN of the engine's best move in the position BEFORE ply `idx` (the alternative to what was played).
@@ -3771,6 +3826,41 @@ function buildColorPicker(initialHex, onLive, onCommit) {
   };
 }
 
+// Use the same themed picker and swatch as the custom board colours.
+let _arrowPickCleanup = null;
+function closeArrowColorPicker() { if (_arrowPickCleanup) _arrowPickCleanup(); }
+function openArrowColorPicker(anchor) {
+  closeArrowColorPicker();
+  const update = (hex) => {
+    S.settings.bestArrowColor = hex;
+    anchor.style.background = hex;
+    refreshArrows();
+  };
+  const save = () => browserAPI.storage.local.set({ settings: S.settings });
+  const picker = buildColorPicker(S.settings.bestArrowColor || ARROW_COLOR, update, save);
+  const pop = el("div", { class: "board-cpick", role: "dialog", "aria-label": "Best-move arrow color" },
+    el("div", { class: "cpick-title" }, "Best-move arrow"), picker.el);
+  document.body.append(pop);
+  const r = anchor.getBoundingClientRect(), pr = pop.getBoundingClientRect();
+  pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - pr.width - 8)) + "px";
+  pop.style.top = Math.max(8, r.bottom + pr.height + 6 > window.innerHeight - 8
+    ? r.top - pr.height - 6 : r.bottom + 6) + "px";
+  const onDown = (e) => { if (!pop.contains(e.target) && !anchor.contains(e.target)) closeArrowColorPicker(); };
+  const onKey = (e) => {
+    if (e.key === "Escape") { e.stopPropagation(); closeArrowColorPicker(); anchor.focus(); }
+  };
+  const listenTimer = setTimeout(() => document.addEventListener("pointerdown", onDown), 0);
+  document.addEventListener("keydown", onKey);
+  _arrowPickCleanup = () => {
+    _arrowPickCleanup = null;
+    clearTimeout(listenTimer);
+    document.removeEventListener("pointerdown", onDown);
+    document.removeEventListener("keydown", onKey);
+    pop.remove();
+    save();
+  };
+}
+
 // Themed colour-picker popover for the custom board chip: pick Light/Dark squares with an in-app
 // HSV picker (matches the app's dark theme). The board updates live; the choice persists on commit.
 let _boardPickCleanup = null;
@@ -3922,6 +4012,7 @@ function resetSettingKeys(keys) {
   return browserAPI.storage.local.set({ settings: S.settings });
 }
 function resetArrowSettings() {
+  closeArrowColorPicker();
   resetSettingKeys(ARROW_SETTING_KEYS);
   refreshArrows(); renderSettings();
 }
@@ -3930,6 +4021,7 @@ function resetBackgroundSettings() {
   applyBackground(); renderSettings();
 }
 async function resetVisualSettings() {
+  closeArrowColorPicker();
   if (_accentPickCleanup) _accentPickCleanup();
   closeBoardColorPicker();
   delete S.settings.wrongSound; // remove obsolete saved choices from older versions
@@ -3972,22 +4064,16 @@ function bgControls() {
 }
 function visualSettings() {
   const boardEntries = Object.entries(BOARD_THEMES).map(([k, [lt, dk]]) => ({
-    value: k, render: (chip) => chip.append(el("span", { class: "half l", style: { background: lt } }), el("span", { class: "half r", style: { background: dk } })),
+    value: k, title: BOARD_THEME_LABEL[k] || k,
+    render: (chip) => chip.append(el("span", { class: "half l", style: { background: lt } }), el("span", { class: "half r", style: { background: dk } })),
   }));
-  // Bundled Kadagaden boards — each chip previews the real artwork (the SVG as the chip background).
-  for (const [k, b] of Object.entries(BUNDLED_BOARDS)) {
-    boardEntries.push({
-      value: k, title: b.label,
-      render: (chip) => { chip.classList.add("chip-board-art"); chip.style.backgroundImage = `url("${_url("boards-img/" + b.file)}")`; },
-    });
-  }
   // The detected chess.com board is shown as an extra chip at the front (can be selected/deselected).
   if (S.settings.ccBoardUrl || S.settings.ccBoardTheme) {
-    const [lt, dk] = CC_BOARD_COLORS[S.settings.ccBoardTheme] || BOARD_THEMES.green;
+    const { label, colors: [lt, dk] } = detectedBoardPalette();
     boardEntries.unshift({
       value: "chesscom",
       render: (chip) => {
-        chip.title = "Matched board";
+        chip.title = label;
         chip.append(el("span", { class: "half l", style: { background: lt } }), el("span", { class: "half r", style: { background: dk } }));
       },
     });
@@ -4034,10 +4120,16 @@ function visualSettings() {
       slider("Opacity", "arrowOpacity", 0.3, 1, 0.02, { onChange: refreshArrows }),
       slider("Shaft width", "arrowShaft", 0.14, 0.42, 0.01, { onChange: refreshArrows }),
       slider("Head size", "arrowHead", 0.22, 0.55, 0.01, { onChange: refreshArrows }),
-      el("div", { class: "set-row" }, setLabel("Color"),
-        el("input", { class: "set-color-input", type: "color", value: S.settings.bestArrowColor || ARROW_COLOR,
-          oninput: (e) => { S.settings.bestArrowColor = e.target.value;
-            browserAPI.storage.local.set({ settings: S.settings }); refreshArrows(); } })),
+      colorChips("Color", "bestArrowColor", [{
+        value: S.settings.bestArrowColor || ARROW_COLOR,
+        title: "Arrow color — click to pick",
+        onClick: (e) => openArrowColorPicker(e.currentTarget),
+        render: (chip) => {
+          chip.classList.add("chip-custom");
+          chip.style.background = S.settings.bestArrowColor || ARROW_COLOR;
+          chip.append(el("span", { class: "chip-edit" }, "✎"));
+        },
+      }]),
       el("button", { class: "set-reset", onclick: resetArrowSettings }, "Reset to default"),
     ),
     section("Loading",
@@ -4144,21 +4236,21 @@ function motorSettings() {
     section("Move classification",
       el("div", { class: "set-row hint" },
         el("span", { class: "set-note" }, "How move quality is graded, in pawns of evaluation lost vs the engine's best move. Changes re-label the game instantly — no re-analysis.")),
-      clsSlider("Good above", "clsGood", 0.1, 1.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsGood }),
-      clsSlider("Inaccuracy above", "clsInacc", 0.3, 2.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsInacc }),
+      clsSlider("Decent above", "clsGood", 0.1, 1.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsGood }),
+      clsSlider("Minor Misstep above", "clsInacc", 0.3, 2.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsInacc }),
       clsSlider("Blunder above", "clsBlunder", 1.5, 8, 0.1, { fmt: pawnsFmt, info: ENGINE_INFO.clsBlunder }),
       clsSlider("Clear advantage", "clsClearAdv", 1, 5, 0.1, { fmt: pawnsFmt, info: ENGINE_INFO.clsClearAdv }),
-      clsSlider("Mistake min. loss", "clsMistakeLoss", 0.5, 3, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsMistakeLoss }),
-      clsSlider("Miss tolerance", "clsMissTol", 0, 1.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsMissTol }),
+      clsSlider("Major Misstep min. loss", "clsMistakeLoss", 0.5, 3, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsMistakeLoss }),
+      clsSlider("Missed chance tolerance", "clsMissTol", 0, 1.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsMissTol }),
     ),
     section("Accuracy points",
       el("div", { class: "set-row hint" },
-        el("span", { class: "set-note" }, "The displayed accuracy is the average of these per-move scores (Best / Brilliant / Great / Book are always 100). The Elo estimate uses a separate win%-based calculation.")),
-      clsSlider("Excellent", "accExcellent", 0, 100, 1, { fmt: ptsFmt }),
-      clsSlider("Good", "accGood", 0, 100, 1, { fmt: ptsFmt }),
-      clsSlider("Inaccuracy", "accInacc", 0, 100, 1, { fmt: ptsFmt }),
-      clsSlider("Miss", "accMiss", 0, 100, 1, { fmt: ptsFmt }),
-      clsSlider("Mistake", "accMistake", 0, 100, 1, { fmt: ptsFmt }),
+        el("span", { class: "set-note" }, "These per-move scores are averaged when category-based accuracy is active (Best / Masterstroke / Superb / Theory are always 100). Win%-based accuracy instead uses the engine evaluations.")),
+      clsSlider("Near best", "accExcellent", 0, 100, 1, { fmt: ptsFmt }),
+      clsSlider("Decent", "accGood", 0, 100, 1, { fmt: ptsFmt }),
+      clsSlider("Minor Misstep", "accInacc", 0, 100, 1, { fmt: ptsFmt }),
+      clsSlider("Missed chance", "accMiss", 0, 100, 1, { fmt: ptsFmt }),
+      clsSlider("Major Misstep", "accMistake", 0, 100, 1, { fmt: ptsFmt }),
       clsSlider("Blunder", "accBlunder", 0, 100, 1, { fmt: ptsFmt }),
     ),
     section("Engine",
@@ -4184,6 +4276,7 @@ function motorSettings() {
   );
 }
 function renderSettings() {
+  closeArrowColorPicker();
   const scroll = UI.settings.scrollTop; // keep scroll position when a setting changes
   const tabs = el("div", { class: "set-tabs" },
     el("button", { class: "set-tab" + (S.settingsTab === "visual" ? " on" : ""), onclick: () => { S.settingsTab = "visual"; renderSettings(); } }, "Visual"),
@@ -4201,6 +4294,7 @@ function positionSettings() {
   UI.settings.style.right = window.innerWidth <= 520 ? "" : "24px";
 }
 function toggleSettings() {
+  closeArrowColorPicker();
   UI.settings.hidden = !UI.settings.hidden;
   if (!UI.settings.hidden) renderSettings();
 }
@@ -4209,6 +4303,13 @@ function toggleSettings() {
    The legal disclaimer and third-party asset credits live here, behind the
    info button in the top bar — kept out of the way but one click from anywhere. */
 const CREDITS = [
+  {
+    title: "Move classifier — Brilliant-Chess",
+    by: "Delo (wdeloo); adapted for Chess Review. Copyright © 2025 Delo.",
+    lic: "MIT",
+    note: "Full copyright and licence notice in THIRD_PARTY_NOTICES.md.",
+    href: "https://github.com/wdeloo/Brilliant-Chess",
+  },
   {
     title: "Chess pieces — Cburnett",
     by: "Colin M.L. Burnett (“Cburnett”), distributed by Lichess.",
@@ -4222,16 +4323,11 @@ const CREDITS = [
     href: "https://github.com/lichess-org/lila/tree/master/public/piece/merida",
   },
   {
-    title: "Chess pieces — Kaneo, 1Kbyte Gambit",
-    by: "Kadagaden — chess-pieces.",
-    lic: "CC BY 4.0",
-    href: "https://github.com/Kadagaden/chess-pieces",
-  },
-  {
     title: "Board & move sounds",
     by: "Lichess sound set (lila)",
-    lic: "AGPL-3.0",
-    href: "https://github.com/lichess-org/lila/blob/master/LICENSE",
+    lic: "Rights unverified",
+    note: "Redistribution permission is unresolved; see ATTRIBUTIONS.md.",
+    href: "https://github.com/lichess-org/lila/blob/master/COPYING.md",
   },
   {
     title: "Stockfish 19 Lite",
@@ -4285,6 +4381,7 @@ function openCredits() {
       el("div", { class: "credit-main" },
         el("div", { class: "credit-title" }, c.title),
         el("div", { class: "credit-by" }, c.by),
+        c.note ? el("div", { class: "credit-note" }, c.note) : null,
       ),
       el("span", { class: "credit-lic" }, c.lic),
     ),
@@ -4312,7 +4409,7 @@ function openCredits() {
       "All trademarks belong to their respective owners."),
     el("div", { class: "credits-list" }, contributors, ...entries),
     el("div", { class: "credits-foot" },
-      "Each asset is used under the license shown. Tap a row for the source.",
+      "Licences and unresolved permissions are shown above. Tap a row for the source.",
       el("div", { class: "credits-foot-links" },
         el("a", { href: REPO_URL + "/blob/main/LICENSE", target: "_blank", rel: "noopener noreferrer" }, "Full license (GPLv3)"),
         " · ",
@@ -4369,8 +4466,8 @@ async function setEngineSetting(key, value) {
 function applyDetectedTheme(theme) {
   if (!theme) return;
   if (theme.boardUrl || theme.boardTheme) {
-    // Match the board by COLOUR only (theme name → our own palette). The source site's board
-    // image is never hotlinked — colours aren't copyrightable, the image is.
+    // Offer a compatibility palette based on the detected theme name. No source image is
+    // hotlinked; the retained matching behavior still needs the separate rights review.
     S.settings.ccBoardTheme = theme.boardTheme || null;
     S.settings.ccBoardUrl = null;
     // Keep the user's selected board across new review windows and library games.
@@ -4390,13 +4487,10 @@ function applySettings() {
   r.style.setProperty("--accent", a.accent);
   r.style.setProperty("--accent-strong", a.strong);
   r.style.setProperty("--accent-ink", a.ink);
-  const bt =
-    BUNDLED_BOARDS[S.settings.boardTheme]
-      ? BUNDLED_BOARDS[S.settings.boardTheme].colors
-      : S.settings.boardTheme === "custom"
+  const bt = S.settings.boardTheme === "custom"
       ? customBoardColors()
       : S.settings.boardTheme === "chesscom"
-      ? (CC_BOARD_COLORS[S.settings.ccBoardTheme] || BOARD_THEMES.green)
+      ? detectedBoardPalette().colors
       : (BOARD_THEMES[S.settings.boardTheme] || BOARD_THEMES.green);
   r.style.setProperty("--sq-light", bt[0]);
   r.style.setProperty("--sq-dark", bt[1]);
@@ -4404,7 +4498,7 @@ function applySettings() {
   r.style.setProperty("--ip-font", (S.settings.insightFont ?? 13) + "px");
   r.style.setProperty("--coord-size", (S.settings.coordSize ?? 12) + "px");
   r.classList.toggle("hide-coords", S.settings.showCoords === false);
-  applyBoardArt(UI.boardWrap && UI.boardWrap.querySelector(".board"));
+  clearBoardArt(UI.boardWrap && UI.boardWrap.querySelector(".board"));
   applyBackground();
 }
 // Bundled background presets (relative to the extension's analysis page).
@@ -4468,24 +4562,12 @@ function uploadBackground() {
   document.body.append(inp);
   inp.click();
 }
-// Boards are rendered with COLOURS only (see applySettings); we never hotlink an external
-// board image. This clears any image a previous version may have applied, so existing installs
-// stop fetching the source site's board art immediately.
-// Paint the board background. A bundled Kadagaden board (boardTheme = a BUNDLED_BOARDS key) is shown
-// as the real SVG artwork with the squares transparent (.cc-board); any other theme clears the image
-// so the flat --sq-light/--sq-dark squares show through.
-function applyBoardArt(boardEl) {
+// Current boards use flat colors only. Clear image-based styling left by older versions.
+function clearBoardArt(boardEl) {
   if (!boardEl) return;
-  const b = BUNDLED_BOARDS[S.settings.boardTheme];
-  if (b) {
-    boardEl.classList.add("cc-board");
-    boardEl.style.backgroundImage = `url("${_url("boards-img/" + b.file)}")`;
-    boardEl.style.backgroundSize = "100% 100%";
-  } else {
-    boardEl.classList.remove("cc-board");
-    boardEl.style.backgroundImage = "";
-    boardEl.style.backgroundSize = "";
-  }
+  boardEl.classList.remove("cc-board");
+  boardEl.style.backgroundImage = "";
+  boardEl.style.backgroundSize = "";
 }
 
 /* ---------------- Practice your mistakes ----------------
@@ -4719,7 +4801,7 @@ function practiceAttempt(from, to) {
       }
       // Mark it as the "Best move" to confirm they found a strong move.
       toSq.classList.add("has-badge");
-      toSq.append(el("img", { class: "sq-badge", src: qIcon("best"), alt: "Best", draggable: "false" }));
+      toSq.append(makeBoardBadge("best"));
     }
     flashSquares([mv.from, mv.to], "good");
     playSanSound(mv.san);
@@ -5339,13 +5421,12 @@ async function resetLegacyZoom() {
     const [payload, store] = await Promise.all([loadJob(), browserAPI.storage.local.get(["settings", "username", "layout", "layoutMode", "layoutVersion", "library"])]);
     S.library = Array.isArray(store.library) ? store.library : [];
     S.settings = { ...DEFAULT_SETTINGS, ...(store.settings || {}) };
+    const visualAssetsMigrated = migrateVisualAssetSettings(S.settings);
     migrateEngineSettings(S.settings);
-    if (S.settings.enginePath !== store.settings?.enginePath) {
+    if (visualAssetsMigrated || S.settings.enginePath !== store.settings?.enginePath) {
       await browserAPI.storage.local.set({ settings: S.settings });
     }
     delete S.settings.wrongSound; // older selectable mistake cues were removed
-    // Removed piece styles, including Kaneo Midnight, fall back to Cburnett.
-    if (!PIECE_STYLES.includes(S.settings.pieceStyle)) S.settings.pieceStyle = "image";
     { const lm = { prikker: "dots", hop: "bounce", "bølge": "wave" }; if (lm[S.settings.loaderStyle]) S.settings.loaderStyle = lm[S.settings.loaderStyle]; } // migrate renamed loader keys
     if (S.settings.bg === "default" || S.settings.bg === "ember") S.settings.bg = "color";
     if (S.settings.coach === "old_soviet_rework") S.settings.coach = "old_soviet"; // the rework became the canonical "Old Soviet"
