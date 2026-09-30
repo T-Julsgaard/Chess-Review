@@ -1463,41 +1463,77 @@ function computePhaseRatings() {
   if (N === 0) { S.phaseRatings = { w: {}, b: {} }; S.phaseClassif = { w: {}, b: {} }; return; }
   const phaseAcc = { w: { opening: [], middlegame: [], endgame: [] }, b: { opening: [], middlegame: [], endgame: [] } };
   const phaseClassif = { w: { opening: {}, middlegame: {}, endgame: {} }, b: { opening: {}, middlegame: {}, endgame: {} } };
+  const phaseWp = { w: { opening: [], middlegame: [], endgame: [] }, b: { opening: [], middlegame: [], endgame: [] } };
+  
+  // Track phase per ply to avoid flip-flopping
+  const phaseByPly = new Array(N + 1);
+  let currentPhase = "opening";
+  for (let i = 1; i <= N; i++) {
+    const phase = getGamePhase(S.positions[i].fen, i);
+    // Smooth transitions: don't flip back to opening, only progress forward
+    if (currentPhase === "opening" && phase === "middlegame") currentPhase = "middlegame";
+    else if (currentPhase === "middlegame" && phase === "endgame") currentPhase = "endgame";
+    else if (currentPhase === "opening" && phase === "endgame") currentPhase = "endgame"; // rare but possible
+    phaseByPly[i] = currentPhase;
+  }
+  
   for (let i = 1; i <= N; i++) {
     if (S.accMove[i] == null) continue;
     const side = S.positions[i].color;
-    const phase = getGamePhase(S.positions[i].fen, i);
+    const phase = phaseByPly[i];
     phaseAcc[side][phase].push(S.accMove[i]);
+    phaseWp[side][phase].push(S.wpDrop[i] || 0);
     const cls = S.classif[i];
     if (cls) {
       phaseClassif[side][phase][cls] = (phaseClassif[side][phase][cls] || 0) + 1;
     }
   }
+  
   S.phaseRatings = { w: {}, b: {} };
   S.phaseClassif = { w: {}, b: {} };
+  
+  // Use the SAME calibration and Elo model as overall game
+  const meSide = S.meSide, opSide = S.meSide === "w" ? "b" : "w";
+  const meRating = S.players[meSide]?.rating, opRating = S.players[opSide]?.rating;
+  
   for (const side of ["w", "b"]) {
     for (const phase of ["opening", "middlegame", "endgame"]) {
-      const arr = phaseAcc[side][phase];
-      if (arr.length === 0) { S.phaseRatings[side][phase] = null; continue; }
-      const avgAcc = arr.reduce((a, b) => a + b, 0) / arr.length;
-      S.phaseRatings[side][phase] = estimateEloFromAcc(avgAcc);
+      const accArr = phaseAcc[side][phase];
+      const wpArr = phaseWp[side][phase];
+      if (accArr.length === 0) { S.phaseRatings[side][phase] = null; continue; }
+      
+      // Use same weighted aggregation as sideAccuracies() but per phase
+      const win = Math.max(2, Math.min(8, Math.floor(accArr.length / 10)));
+      const weights = accArr.map((_, idx) => {
+        const seg = wpArr.slice(Math.max(0, idx - win), idx + 1);
+        return Math.max(0.5, Math.min(12, stdev(seg)));
+      });
+      
+      const a = CALIB?.agg;
+      let phaseAccFinal;
+      if (a && a.mode === "learned" && a.learnedFeatures) phaseAccFinal = learnedAccuracy(accArr, weights, a);
+      else if (a && a.mode === "power") phaseAccFinal = powerMean(accArr, a.useVol ? weights : accArr.map(() => 1), a.p, a.floor || 0);
+      else phaseAccFinal = (weightedMean(accArr, weights) + harmonicMean(accArr)) / 2;
+      
+      // Apply SAME calibration and Elo model as overall
+      const rating = side === meSide ? meRating : opRating;
+      const calibratedAcc = calAccBias(phaseAccFinal, rating);
+      S.phaseRatings[side][phase] = estimateElo(calibratedAcc, rating);
       S.phaseClassif[side][phase] = phaseClassif[side][phase];
     }
   }
 }
+
 function getGamePhase(fen, ply) {
-  // Chess.com approach: Opening = in book, Endgame = ≤7 non-pawn pieces or ≤1 major/minor per side
+  // Chess.com approach: Opening = in book, Endgame = ≤7 non-pawn pieces
   const inBook = S.bookAt && S.bookAt[ply];
   const pieces = fen.split(" ")[0].match(/[pnbrqkPNBRQK]/g) || [];
-  const totalPieces = pieces.length;
   const nonPawns = pieces.filter(p => p.toLowerCase() !== 'p').length;
-  const whiteMajors = pieces.filter(p => /[QRBN]/.test(p)).length; // Q,R,B,N
-  const blackMajors = pieces.filter(p => /[qrbn]/.test(p)).length;
   
-  // Opening: position is in book
+  // Opening: position is in book (first ~10-15 plies typically)
   if (inBook) return "opening";
-  // Endgame: ≤7 non-pawn pieces (including kings) OR ≤1 major/minor piece per side
-  if (nonPawns <= 7 || Math.max(whiteMajors, blackMajors) <= 1) return "endgame";
+  // Endgame: ≤7 non-pawn pieces (including kings) - standard definition
+  if (nonPawns <= 7) return "endgame";
   return "middlegame";
 }
 function buildVerdict() {
@@ -3569,38 +3605,52 @@ function renderPhaseRatings() {
   const opSide = S.meSide === "w" ? "b" : "w";
   const phases = ["opening", "middlegame", "endgame"];
   
+  // Count moves per phase for both sides
+  const phaseMoves = {};
+  phases.forEach(phase => {
+    const meC = S.phaseClassif?.[S.meSide]?.[phase] || {};
+    const opC = S.phaseClassif?.[opSide]?.[phase] || {};
+    phaseMoves[phase] = Object.values(meC).reduce((a,b)=>a+b,0) + Object.values(opC).reduce((a,b)=>a+b,0);
+  });
+  
   UI.phaseRatings?.replaceChildren(el("div", { class: "panel" },
     el("div", { class: "panel-head" }, el("h3", {}, "Phase Ratings")),
     el("div", { class: "panel-body phase-body" },
-      el("div", { class: "phase-grid" },
-        phases.map((phase) => {
-          const meElo = S.phaseRatings?.[S.meSide]?.[phase];
-          const opElo = S.phaseRatings?.[opSide]?.[phase];
-          const meClassif = S.phaseClassif?.[S.meSide]?.[phase] || {};
-          const opClassif = S.phaseClassif?.[opSide]?.[phase] || {};
-          
-          return el("div", { class: "phase-card" },
-            el("div", { class: "phase-card-head" },
-              el("span", { class: "phase-label" }, phase[0].toUpperCase() + phase.slice(1)),
-              el("span", { class: "phase-moves" }, 
-                `${Object.values(meClassif).reduce((a,b)=>a+b,0) + Object.values(opClassif).reduce((a,b)=>a+b,0)} moves`
-              ),
-            ),
-            el("div", { class: "phase-card-body" },
-              el("div", { class: "phase-side" },
-                el("span", { class: "phase-side-name" }, S.players[S.meSide].name),
-                el("span", { class: "phase-side-elo" }, meElo == null ? "—" : meElo),
-                el("div", { class: "phase-side-classif" }, renderPhaseClassifBadges(meClassif)),
-              ),
-              el("div", { class: "phase-vs-divider" }, "vs"),
-              el("div", { class: "phase-side" },
-                el("span", { class: "phase-side-name" }, S.players[opSide].name),
-                el("span", { class: "phase-side-elo" }, opElo == null ? "—" : opElo),
-                el("div", { class: "phase-side-classif" }, renderPhaseClassifBadges(opClassif)),
-              ),
-            ),
-          );
-        }),
+      el("table", { class: "phase-table" },
+        el("thead", {},
+          el("tr", {},
+            el("th", {}, "Phase"),
+            el("th", {}, "Moves"),
+            el("th", { colspan: 2 }, S.players[S.meSide].name),
+            el("th", { colspan: 2 }, S.players[opSide].name),
+          ),
+          el("tr", {},
+            el("th", {}),
+            el("th", {}),
+            el("th", {}, "Elo"),
+            el("th", {}, "Moves"),
+            el("th", {}, "Elo"),
+            el("th", {}, "Moves"),
+          ),
+        ),
+        el("tbody", {},
+          phases.map((phase) => {
+            const meElo = S.phaseRatings?.[S.meSide]?.[phase];
+            const opElo = S.phaseRatings?.[opSide]?.[phase];
+            const meClassif = S.phaseClassif?.[S.meSide]?.[phase] || {};
+            const opClassif = S.phaseClassif?.[opSide]?.[phase] || {};
+            const meMoves = Object.values(meClassif).reduce((a,b)=>a+b,0);
+            const opMoves = Object.values(opClassif).reduce((a,b)=>a+b,0);
+            return el("tr", { class: "phase-row" },
+              el("td", { class: "phase-label" }, phase[0].toUpperCase() + phase.slice(1)),
+              el("td", { class: "phase-moves" }, phaseMoves[phase]),
+              el("td", { class: "phase-elo" }, meElo == null ? "—" : meElo),
+              el("td", { class: "phase-classif" }, renderPhaseClassifBadges(meClassif)),
+              el("td", { class: "phase-elo" }, opElo == null ? "—" : opElo),
+              el("td", { class: "phase-classif" }, renderPhaseClassifBadges(opClassif)),
+            );
+          }),
+        ),
       ),
     ),
   ));

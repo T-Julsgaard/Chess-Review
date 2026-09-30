@@ -598,33 +598,25 @@ button { font-family: inherit; cursor: pointer; }
 .qbreak-toggle svg { width: 18px; height: 18px; transition: transform .2s ease; }
 .qbreak-toggle.open svg { transform: rotate(180deg); }
 
-/* Phase Ratings Panel (separate from Accuracy) */
-.phase-body { padding: 8px 0; }
-.phase-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.phase-card {
-  background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px;
-  padding: 10px; display: flex; flex-direction: column; gap: 8px;
+/* Phase Ratings Panel (separate from Accuracy) — Table Layout */
+.phase-body { padding: 4px 0; }
+.phase-table { width: 100%; border-collapse: collapse; font-size: 11px; font-family: var(--font-ui); }
+.phase-table thead th {
+  text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line);
+  font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3);
 }
-.phase-card-head {
-  display: flex; justify-content: space-between; align-items: center;
-  padding-bottom: 6px; border-bottom: 1px solid var(--line-soft);
-}
-.phase-label { font-weight: 700; color: var(--ink); font-family: var(--font-ui); font-size: 12px; text-transform: capitalize; }
-.phase-moves { font-size: 10px; color: var(--ink-3); font-family: var(--font-mono); }
-.phase-card-body { display: flex; align-items: stretch; gap: 8px; }
-.phase-side { flex: 1; display: flex; flex-direction: column; gap: 4px; }
-.phase-side-name { font-size: 10.5px; font-weight: 700; color: var(--ink-2); font-family: var(--font-ui); }
-.phase-side-elo { font-family: var(--font-mono); font-size: 15px; font-weight: 800; color: var(--accent); }
-.phase-side-classif { display: flex; flex-wrap: wrap; gap: 3px; }
-.phase-vs-divider {
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; font-weight: 700; color: var(--ink-3);
-  padding: 0 6px; border-left: 1px dashed var(--line-soft); border-right: 1px dashed var(--line-soft);
-  margin: 0 4px;
-}
-
-/* Phase classification badges (compact) */
-.phase-classif-badges { display: inline-flex; align-items: center; gap: 2px; flex-wrap: wrap; }
+.phase-table thead th:first-child { width: 70px; }
+.phase-table thead th:nth-child(2) { width: 50px; text-align: center; }
+.phase-table thead th:nth-child(3), .phase-table thead th:nth-child(5) { width: 50px; text-align: center; }
+.phase-table thead th:nth-child(4), .phase-table thead th:nth-child(6) { width: 80px; text-align: center; }
+.phase-table tbody tr { border-bottom: 1px solid var(--line-soft); }
+.phase-table tbody tr:last-child { border-bottom: none; }
+.phase-table td { padding: 6px 8px; vertical-align: middle; }
+.phase-table .phase-label { font-weight: 600; color: var(--ink); font-family: var(--font-ui); }
+.phase-table .phase-moves { text-align: center; font-family: var(--font-mono); font-size: 11px; color: var(--ink-2); }
+.phase-table .phase-elo { text-align: center; font-family: var(--font-mono); font-size: 13px; font-weight: 800; color: var(--accent); }
+.phase-table .phase-classif { text-align: center; }
+.phase-classif-badges { display: inline-flex; align-items: center; gap: 2px; flex-wrap: wrap; justify-content: center; }
 .phase-qb { display: inline-flex; align-items: center; gap: 1px; }
 .phase-qb .qb.icon { width: 14px; height: 14px; }
 .phase-qb-count { font-size: 8px; font-weight: 700; color: var(--ink-3); margin-left: 1px; }
