@@ -7,21 +7,21 @@
   "move_quality": {
     "brilliant": [
       "{move}?! OUTSTANDING! THAT IS THE FINEST MOVE I HAVE SEEN SINCE BASIC! FRAME IT, SOLDIER!",
-      "BRILLIANT! THE ENGINE CONFIRMS IT! I'd salute you, recruit, but my arm is BUSY POINTING AT THE NEXT MOVE!",
-      "{move} IS A BRILLIANCY! Where was THIS soldier hiding?! AT EASE — no wait, STAY SHARP! NEVER at ease!",
+      "MASTERSTROKE! THE ENGINE CONFIRMS IT! I'd salute you, recruit, but my arm is BUSY POINTING AT THE NEXT MOVE!",
+      "{move} IS A MASTERSTROKE! Where was THIS soldier hiding?! AT EASE — no wait, STAY SHARP! NEVER at ease!",
       "OUTSTANDING MOVE, RECRUIT! {move}! That's not talent, that's TRAINING! And a little talent! MOSTLY TRAINING!",
-      "{move}!! BRILLIANT! You just earned the whole platoon five minutes of rest! THE PLATOON IS YOU! ENJOY IT!",
-      "BRILLIANT MOVE ON THE BOARD! I have NOTHING to yell about! THIS IS DEEPLY UNCOMFORTABLE FOR ME!",
-      "{move} — CERTIFIED BRILLIANT! Decorated in the field! Now drop the medal and KEEP FIGHTING!",
-      "GREAT GOOGLY — {move} IS BRILLIANT! Twenty years on this parade ground and you just made my morning, soldier. DON'T LET IT GO TO YOUR HEAD!"
+      "{move}!! MASTERSTROKE! You just earned the whole platoon five minutes of rest! THE PLATOON IS YOU! ENJOY IT!",
+      "MASTERSTROKE ON THE BOARD! I have NOTHING to yell about! THIS IS DEEPLY UNCOMFORTABLE FOR ME!",
+      "{move} — CERTIFIED MASTERSTROKE! Decorated in the field! Now drop the medal and KEEP FIGHTING!",
+      "SUPERB GOOGLY — {move} IS a masterstroke! Twenty years on this parade ground and you just made my morning, soldier. DON'T LET IT GO TO YOUR HEAD!"
     ],
     "great": [
       "{move}! THE ONLY MOVE THAT HOLDS THE LINE — AND YOU FOUND IT! THAT'S COMPOSURE UNDER FIRE!",
-      "GREAT MOVE! One path through the minefield and you walked it CLEAN! Outstanding footwork, recruit!",
+      "SUPERB MOVE! One path through the minefield and you walked it CLEAN! Outstanding footwork, recruit!",
       "{move} — the ONLY move! You held the position together with BARE HANDS and DISCIPLINE!",
       "ONE road out and you TOOK it! That's not luck, soldier — luck is for civilians!",
-      "{move}! Great move! The position said 'find it or fall' and you FOUND IT! HOO-AH!",
-      "GREAT! Narrow passage, zero room for error, FLAWLESS execution! THAT is what the drills are for!",
+      "{move}! Superb move! The position said 'find it or fall' and you FOUND IT! HOO-AH!",
+      "SUPERB! Narrow passage, zero room for error, FLAWLESS execution! THAT is what the drills are for!",
       "{move} holds EVERYTHING! That move just carried the whole company on its back! RESPECT!"
     ],
     "best": [
@@ -34,53 +34,53 @@
       "{move} — best available! Precision like that gets you through the obstacle course DRY, soldier!"
     ],
     "excellent": [
-      "{move} — EXCELLENT! Not the manual's first line, but the manual is NODDING!",
-      "EXCELLENT MOVE! Position secured! Perimeter holding! CARRY ON!",
-      "{move}! Excellent work, recruit! You improved your unit and exposed NOTHING! Textbook!",
-      "EXCELLENT! You're moving like a soldier who DID the morning drills! Because you DID THEM!",
-      "{move} is excellent! The eval didn't even FLINCH! Stability! I could WEEP! I won't!",
-      "EXCELLENT, soldier! Keep stacking moves like that and the enemy will request a TRANSFER!",
-      "{move} — excellent! Strong! Disciplined! My clipboard has NO complaints and my clipboard ALWAYS has complaints!"
+      "{move} — NEAR BEST! Not the manual's first line, but the manual is NODDING!",
+      "NEAR BEST MOVE! Position secured! Perimeter holding! CARRY ON!",
+      "{move}! Near best work, recruit! You improved your unit and exposed NOTHING! Textbook!",
+      "NEAR BEST! You're moving like a soldier who DID the morning drills! Because you DID THEM!",
+      "{move} is near best! The eval didn't even FLINCH! Stability! I could WEEP! I won't!",
+      "NEAR BEST, soldier! Keep stacking moves like that and the enemy will request a TRANSFER!",
+      "{move} — near best! Strong! Disciplined! My clipboard has NO complaints and my clipboard ALWAYS has complaints!"
     ],
     "good": [
-      "{move} — GOOD MOVE! Not heroic! DOESN'T NEED TO BE! Hold the line!",
-      "Good move, recruit! Solid fundamentals! Fundamentals are the WHOLE ARMY!",
-      "{move} is good! There was a sharper option but you kept FORMATION! Acceptable!",
-      "GOOD! The position stays secure! Security is not glamorous! NEITHER AM I! WE WIN ANYWAY!",
-      "{move}, good move! March on! Steady beats flashy SIX DAYS A WEEK!",
-      "Good move! You checked the enemy's threats first? THAT'S the habit! That habit saves LIVES! Chess lives!",
-      "{move} — good! No medals today, no casualties either! That's a fair trade, soldier!"
+      "{move} — DECENT MOVE! Not heroic! DOESN'T NEED TO BE! Hold the line!",
+      "Decent move, recruit! Solid fundamentals! Fundamentals are the WHOLE ARMY!",
+      "{move} is decent! There was a sharper option but you kept FORMATION! Acceptable!",
+      "DECENT! The position stays secure! Security is not glamorous! NEITHER AM I! WE WIN ANYWAY!",
+      "{move}, decent move! March on! Steady beats flashy SIX DAYS A WEEK!",
+      "Decent move! You checked the enemy's threats first? THAT'S the habit! That habit saves LIVES! Chess lives!",
+      "{move} — decent! No medals today, no casualties either! That's a fair trade, soldier!"
     ],
     "book": [
       "{move} — STILL BOOK! You memorized the field manual! OUTSTANDING preparation, recruit!",
-      "BOOK MOVE! Theory is the drill you ran BEFORE the battle! That's why we DRILL!",
+      "THEORY MOVE! Theory is the drill you ran BEFORE the battle! That's why we DRILL!",
       "{move} is by the book! The generals of old wrote this page! READ IT WITH RESPECT!",
       "Still in theory! Good! But know WHY the manual says it, soldier! Parrots don't pass inspection!",
-      "{move}, book move! Marching in formation with the masters! STAY IN STEP!",
-      "BOOK! The opening is on rails! When the rails end, I want a PLAN in your hands, not a QUESTION on your face!",
+      "{move}, theory move! Marching in formation with the masters! STAY IN STEP!",
+      "THEORY! The opening is on rails! When the rails end, I want a PLAN in your hands, not a QUESTION on your face!",
       "{move} — known theory! Free move! Bank the clock time! Time is AMMUNITION!"
     ],
     "inaccuracy": [
-      "{move} — THAT'S AN INACCURACY! Sloppy bunk corners, recruit! REMAKE THE BED!",
-      "Small slip! TIGHTEN UP! The enemy feeds on inaccuracies like the mess hall feeds on Tuesday meatloaf!",
+      "{move} — THAT'S A MINOR MISSTEP! Sloppy bunk corners, recruit! REMAKE THE BED!",
+      "Small slip! TIGHTEN UP! The enemy feeds on minor missteps like the mess hall feeds on Tuesday meatloaf!",
       "{move} drifted! A LITTLE! There is no 'a little' on my parade ground! Refocus!",
-      "INACCURACY! Drop and give me ten! Mental push-ups! Calculate the position TWICE before the next move!",
+      "MINOR MISSTEP! Drop and give me ten! Mental push-ups! Calculate the position TWICE before the next move!",
       "{move} was half a step out of formation! HALF a step gets a WHOLE correction! Adjust!",
       "Loose move, soldier! Loose moves become lost positions! Lost positions become LECTURES! Nobody wants my lectures!",
       "{move} — slightly off target! Recalibrate the sights! The next shot lands CENTER MASS!"
     ],
     "mistake": [
-      "{move} IS A MISTAKE! WHO authorized that move?! NOT the position! The position is FILING A COMPLAINT!",
-      "A MISTAKE, RECRUIT! You moved before you CHECKED! We check, THEN we move! IN THAT ORDER! ALWAYS!",
-      "{move} — MISTAKE! The line is breached! Do NOT stand there feeling feelings! PLUG THE GAP!",
-      "MISTAKE ON THE BOARD! My grandmother sees that threat, soldier, and my grandmother plays CHECKERS!",
+      "{move} IS A MAJOR MISSTEP! WHO authorized that move?! NOT the position! The position is FILING A COMPLAINT!",
+      "A MAJOR MISSTEP, RECRUIT! You moved before you CHECKED! We check, THEN we move! IN THAT ORDER! ALWAYS!",
+      "{move} — MAJOR MISSTEP! The line is breached! Do NOT stand there feeling feelings! PLUG THE GAP!",
+      "MAJOR MISSTEP ON THE BOARD! My grandmother sees that threat, soldier, and my grandmother plays CHECKERS!",
       "{move} hurt us! Bad move, GOOD lesson! Now show me the recovery! The recovery is the REAL test!",
-      "A MISTAKE! One mistake is a lesson! TWO is a habit! We do NOT collect habits like that in this unit!",
-      "{move} — that's a mistake, recruit! Eyes forward! The battle is NOW, the regret is for the barracks!"
+      "A MAJOR MISSTEP! One major misstep is a lesson! TWO is a habit! We do NOT collect habits like that in this unit!",
+      "{move} — that's a major misstep, recruit! Eyes forward! The battle is NOW, the regret is for the barracks!"
     ],
     "miss": [
       "{move} — YOU MISSED THE SHOT! Target was LIT UP and you walked PAST it! Eyes ON at all times!",
-      "A MISS! The winning strike was RIGHT THERE! Scan! Every! Move! Checks, captures, threats — THE DRILL EXISTS FOR A REASON!",
+      "A missed chance! The winning strike was RIGHT THERE! Scan! Every! Move! Checks, captures, threats — THE DRILL EXISTS FOR A REASON!",
       "{move} skips the kill shot! UNACCEPTABLE reconnaissance! Run the scan again and AGAIN until it's REFLEX!",
       "You missed an opportunity, soldier! Opportunities are AMMUNITION! We do not leave ammunition IN THE FIELD!",
       "{move} — the big play went UNCLAIMED! The position handed you a loaded tactic and you said NO THANK YOU?! WHAT?!",
@@ -114,7 +114,7 @@
   "non_move_states": {
     "starting_position": [
       "STARTING POSITION! Thirty-two pieces, ALL accounted for! INSPECTION PASSED! NOW EARN IT!",
-      "Fresh board, recruit! Zero mistakes on the record! KEEP THE RECORD CLEAN AS LONG AS HUMANLY POSSIBLE!",
+      "Fresh board, recruit! Zero missteps on the record! KEEP THE RECORD CLEAN AS LONG AS HUMANLY POSSIBLE!",
       "THE BATTLEFIELD IS SET! Develop! Castle! SECURE THE PERIMETER! Those are your standing orders!",
       "Game ON! Hydrate! Sit up straight! Eyes on the center! MOVE OUT!"
     ],
@@ -298,7 +298,7 @@
       "{n} errors back to back! That's not chess, that's TILT! Tilt is contraband! SURRENDER IT!",
       "{n} bad moves running! The wheels are off the transport! We fix wheels HERE and NOW, recruit!",
       "{n} in a row! STOP THE BLEEDING! Simplest sound move available! That's a DIRECT ORDER!",
-      "{n} consecutive slips! You're fighting the LAST mistake instead of the CURRENT position! The last mistake is GONE! THIS board! THIS move!"
+      "{n} consecutive slips! You're fighting the LAST misstep instead of the CURRENT position! The last misstep is GONE! THIS board! THIS move!"
     ],
     "hanging_piece": [
       "YOUR {piece} IS HANGING! UNDEFENDED ASSET IN THE OPEN FIELD! SECURE IT! SECURE IT NOW!",
@@ -345,7 +345,7 @@
       "A draw with BATTLE SCARS! Be proud of the resistance, recruit! Then find the two moments it could have been MORE! There are always two!"
     ],
     "loss": [
-      "A LOSS. Stand at ease, soldier. You lost the battle — the WAR is long. Debrief tonight: first REAL mistake, not the last one. Then we rebuild. THAT'S THE JOB.",
+      "A LOSS. Stand at ease, soldier. You lost the battle — the WAR is long. Debrief tonight: first REAL misstep, not the last one. Then we rebuild. THAT'S THE JOB.",
       "Defeat on the record. Chin UP, recruit! Units are forged in lost battles! Find the lessons, run the drills, and the next campaign starts at ZERO-DARK-THIRTY!",
       "We took the L. No excuses, no decorations — the enemy executed better TODAY. Tomorrow is a training day. The day AFTER is a reckoning!",
       "A loss, soldier. I've seen recruits quit over less and champions built on MORE. You will be the second kind. That's not encouragement. THAT'S A FORECAST."
@@ -353,9 +353,9 @@
   },
   "practice": {
     "loading_first": [
-      "PRACTICE MODE! Loading your first mistake! We do NOT hide from our errors — WE INTERROGATE THEM!",
+      "PRACTICE MODE! Loading your first misstep! We do NOT hide from our errors — WE INTERROGATE THEM!",
       "First drill incoming! Same position where it went wrong! This time it goes RIGHT!",
-      "The training ground is OPEN! Mistake number one is on its way! ATTACK IT!",
+      "The training ground is OPEN! Misstep number one is on its way! ATTACK IT!",
       "Loading rep one! You showed up to face your own game! That's already more than most! DON'T GET SENTIMENTAL! GET READY!"
     ],
     "prompt_find_better": [
@@ -372,15 +372,15 @@
       "RIGHT ANSWER, RECRUIT! See what happens when you CHECK before you move?! MIRACLES! Next!"
     ],
     "correct_final": [
-      "FINAL POSITION — SOLVED! Every mistake from that game has been HUNTED DOWN AND CORRECTED! FULL SWEEP! OUTSTANDING SESSION!",
+      "FINAL POSITION — SOLVED! Every misstep from that game has been HUNTED DOWN AND CORRECTED! FULL SWEEP! OUTSTANDING SESSION!",
       "THAT'S THE LAST ONE! All errors faced, all errors FIXED! This is what improvement looks like — SWEATY AND COMPLETE!",
-      "SESSION COMPLETE! The whole game's mistakes: NEUTRALIZED! Take thirty seconds of pride! THEN BACK TO WORK!",
+      "SESSION COMPLETE! The whole game's missteps: NEUTRALIZED! Take thirty seconds of pride! THEN BACK TO WORK!",
       "LAST DRILL CLEARED! You turned a rough game into a training victory! THAT, recruit, is how soldiers are MADE!"
     ],
     "close_try_again": [
       "CLOSE! Right sector, wrong coordinates! Adjust fire and SHOOT AGAIN!",
       "Almost! The idea was SOUND, the execution was one click off! RECALIBRATE!",
-      "NEAR MISS! Don't retreat to square one — REFINE the assault! The answer is in that sector!",
+      "NEAR MISSED CHANCE! Don't retreat to square one — REFINE the assault! The answer is in that sector!",
       "Not quite! There's a defender you didn't count! COUNT THEM ALL! Counting is FREE!",
       "Attempt {attempts}! Each one closer! Persistence is STANDARD ISSUE in this unit! AGAIN!"
     ],

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Blunder move">
+  <circle cx="50" cy="50" r="49" fill="#ee4a2f"></circle>
+  <g fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round">
+    <path d="M24 25H43L48 41 38 47 25 42Z"></path>
+    <path d="M58 24H77L75 43 59 47 52 38Z"></path>
+    <path d="M63 53 77 58 73 77H55L51 63Z"></path>
+    <path d="M25 58 39 52 47 63 40 78H23Z"></path>
+  </g>
+</svg>

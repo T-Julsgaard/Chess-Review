@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Excellent move">
+  <defs>
+    <clipPath id="c"><circle cx="50" cy="50" r="49"></circle></clipPath>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.16"></stop>
+      <stop offset="0.5" stop-color="#fff" stop-opacity="0"></stop>
+      <stop offset="1" stop-color="#000" stop-opacity="0.13"></stop>
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="50" r="49" fill="#81b64c"></circle>
+  <rect x="0" y="0" width="100" height="100" fill="url(#g)" clip-path="url(#c)"></rect>
+  <path d="M44 47 L52.5 30.5 a6.4 6.4 0 0 1 11.8 4.6 L61 47 l12.6 0 a6 6 0 0 1 5.9 7.2 l-4.2 19.5 a6.8 6.8 0 0 1 -6.6 5.3 L47 84 z" fill="#fff"></path><rect x="26" y="47" width="13" height="37" rx="4" fill="#fff"></rect>
+</svg>
