@@ -1460,21 +1460,28 @@ function computeDerived() {
 }
 function computePhaseRatings() {
   const N = S.total;
-  if (N === 0) { S.phaseRatings = { w: {}, b: {} }; return; }
+  if (N === 0) { S.phaseRatings = { w: {}, b: {} }; S.phaseClassif = { w: {}, b: {} }; return; }
   const phaseAcc = { w: { opening: [], middlegame: [], endgame: [] }, b: { opening: [], middlegame: [], endgame: [] } };
+  const phaseClassif = { w: { opening: {}, middlegame: {}, endgame: {} }, b: { opening: {}, middlegame: {}, endgame: {} } };
   for (let i = 1; i <= N; i++) {
     if (S.accMove[i] == null) continue;
     const side = S.positions[i].color;
     const phase = getGamePhase(S.positions[i].fen, i);
     phaseAcc[side][phase].push(S.accMove[i]);
+    const cls = S.classif[i];
+    if (cls) {
+      phaseClassif[side][phase][cls] = (phaseClassif[side][phase][cls] || 0) + 1;
+    }
   }
   S.phaseRatings = { w: {}, b: {} };
+  S.phaseClassif = { w: {}, b: {} };
   for (const side of ["w", "b"]) {
     for (const phase of ["opening", "middlegame", "endgame"]) {
       const arr = phaseAcc[side][phase];
       if (arr.length === 0) { S.phaseRatings[side][phase] = null; continue; }
       const avgAcc = arr.reduce((a, b) => a + b, 0) / arr.length;
       S.phaseRatings[side][phase] = estimateEloFromAcc(avgAcc);
+      S.phaseClassif[side][phase] = phaseClassif[side][phase];
     }
   }
 }
@@ -3428,6 +3435,21 @@ function jumpToCategory(side, k) {
   const ply = firstPlyForCategory(side, k);
   if (ply > 0) gotoMainline(ply);
 }
+function renderPhaseClassifBadges(classifObj) {
+  if (!classifObj || Object.keys(classifObj).length === 0) return el("span", { class: "phase-classif-empty" }, "—");
+  const order = ["brilliant", "great", "best", "excellent", "good", "inaccuracy", "mistake", "blunder", "miss", "book"];
+  return el("span", { class: "phase-classif-badges" },
+    ...order.map((k) => {
+      const count = classifObj[k];
+      if (!count) return null;
+      const cfg = QUALITY[k];
+      return el("span", { class: "phase-qb", title: `${cfg.name} ×${count}` },
+        el("img", { class: "qb icon", src: qIcon(k), alt: cfg.name, draggable: "false" }),
+        count > 1 ? el("span", { class: "phase-qb-count" }, "×" + count) : null,
+      );
+    }).filter(Boolean),
+  );
+}
 function renderStats() {
   const isExplore = S.meta?.explore === true;
   if (isExplore) {
@@ -3528,19 +3550,38 @@ function renderStats() {
       qbreak,
       el("div", { class: "phase-ratings" },
         el("div", { class: "phase-head" }, "Phase ratings"),
-        el("div", { class: "phase-grid" },
-          ["opening", "middlegame", "endgame"].map((phase) => {
-            const meElo = S.phaseRatings?.[S.meSide]?.[phase];
-            const opElo = S.phaseRatings?.[opSide]?.[phase];
-            return el("div", { class: "phase-cell" },
-              el("span", { class: "phase-label" }, phase[0].toUpperCase() + phase.slice(1)),
-              el("div", { class: "phase-pair" },
-                el("span", { class: "phase-elo" }, meElo == null ? "—" : meElo),
-                el("span", { class: "phase-vs" }, "vs"),
-                el("span", { class: "phase-elo" }, opElo == null ? "—" : opElo),
-              ),
-            );
-          }),
+        el("table", { class: "phase-table" },
+          el("thead", {},
+            el("tr", {},
+              el("th", {}, "Phase"),
+              el("th", { colspan: 2 }, S.players[S.meSide].name),
+              el("th", { colspan: 2 }, S.players[opSide].name),
+            ),
+            el("tr", {},
+              el("th", {}),
+              el("th", {}, "Elo"),
+              el("th", {}, "Moves"),
+              el("th", {}, "Elo"),
+              el("th", {}, "Moves"),
+            ),
+          ),
+          el("tbody", {},
+            ["opening", "middlegame", "endgame"].map((phase) => {
+              const meElo = S.phaseRatings?.[S.meSide]?.[phase];
+              const opElo = S.phaseRatings?.[opSide]?.[phase];
+              const meClassif = S.phaseClassif?.[S.meSide]?.[phase] || {};
+              const opClassif = S.phaseClassif?.[opSide]?.[phase] || {};
+              const meMoves = Object.values(meClassif).reduce((a, b) => a + b, 0);
+              const opMoves = Object.values(opClassif).reduce((a, b) => a + b, 0);
+              return el("tr", { class: "phase-row" },
+                el("td", { class: "phase-label" }, phase[0].toUpperCase() + phase.slice(1)),
+                el("td", { class: "phase-elo" }, meElo == null ? "—" : meElo),
+                el("td", { class: "phase-classif" }, renderPhaseClassifBadges(meClassif)),
+                el("td", { class: "phase-elo" }, opElo == null ? "—" : opElo),
+                el("td", { class: "phase-classif" }, renderPhaseClassifBadges(opClassif)),
+              );
+            }),
+          ),
         ),
       ),
     ),
