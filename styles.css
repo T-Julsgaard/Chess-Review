@@ -597,6 +597,17 @@ button { font-family: inherit; cursor: pointer; }
 .qbreak-toggle:hover { color: var(--ink); background: var(--panel-2); }
 .qbreak-toggle svg { width: 18px; height: 18px; transition: transform .2s ease; }
 .qbreak-toggle.open svg { transform: rotate(180deg); }
+
+/* phase ratings (opening/middlegame/endgame Elo) */
+.phase-ratings { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line-soft); }
+.phase-head { font-size: 11px; color: var(--ink-3); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+.phase-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.phase-cell { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.phase-label { font-size: 10.5px; color: var(--ink-2); font-weight: 600; font-family: var(--font-ui); }
+.phase-pair { display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 12.5px; font-weight: 700; }
+.phase-elo { color: var(--ink); }
+.phase-vs { color: var(--ink-3); font-size: 10px; font-weight: 400; letter-spacing: .05em; }
+
 /* explanation tooltip for each category (hover in the accuracy panel) */
 .q-tip {
   position: fixed; z-index: 60; max-width: 248px;

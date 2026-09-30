@@ -1452,7 +1452,36 @@ function computeDerived() {
     S.accElo[side] = eloAccs[side];
     S.counts[side] = counts;
   }
+  computePhaseRatings();
   buildVerdict();
+}
+function computePhaseRatings() {
+  const N = S.total;
+  if (N === 0) { S.phaseRatings = { w: {}, b: {} }; return; }
+  const phaseAcc = { w: { opening: [], middlegame: [], endgame: [] }, b: { opening: [], middlegame: [], endgame: [] } };
+  for (let i = 1; i <= N; i++) {
+    if (S.accMove[i] == null) continue;
+    const side = S.positions[i].color;
+    const phase = getGamePhase(S.positions[i].fen, i);
+    phaseAcc[side][phase].push(S.accMove[i]);
+  }
+  S.phaseRatings = { w: {}, b: {} };
+  for (const side of ["w", "b"]) {
+    for (const phase of ["opening", "middlegame", "endgame"]) {
+      const arr = phaseAcc[side][phase];
+      if (arr.length === 0) { S.phaseRatings[side][phase] = null; continue; }
+      const avgAcc = arr.reduce((a, b) => a + b, 0) / arr.length;
+      S.phaseRatings[side][phase] = estimateEloFromAcc(avgAcc);
+    }
+  }
+}
+function getGamePhase(fen, ply) {
+  const pieces = fen.split(" ")[0].match(/[pnbrqkPNBRQK]/g) || [];
+  const totalPieces = pieces.length;
+  const nonPawns = pieces.filter(p => p.toLowerCase() !== 'p').length;
+  if (ply <= 16 || (ply <= 20 && nonPawns >= 10)) return "opening";
+  if (totalPieces <= 10) return "endgame";
+  return "middlegame";
 }
 function buildVerdict() {
   const me = S.acc[S.meSide];
@@ -3487,6 +3516,23 @@ function renderStats() {
           el("span", { class: "est-rating", onmouseenter: (e) => showInfoTip(e.currentTarget, "Estimated Elo", ELO_INFO), onmouseleave: hideQTip }, S.analyzing ? "≈ ··· elo" : "≈ " + (estimateElo(opEloAcc, opRating) ?? "—") + " elo")),
       ),
       qbreak,
+      el("div", { class: "phase-ratings" },
+        el("div", { class: "phase-head" }, "Phase ratings"),
+        el("div", { class: "phase-grid" },
+          ["opening", "middlegame", "endgame"].map((phase) => {
+            const meElo = S.phaseRatings?.[S.meSide]?.[phase];
+            const opElo = S.phaseRatings?.[opSide]?.[phase];
+            return el("div", { class: "phase-cell" },
+              el("span", { class: "phase-label" }, phase[0].toUpperCase() + phase.slice(1)),
+              el("div", { class: "phase-pair" },
+                el("span", { class: "phase-elo" }, meElo == null ? "—" : meElo),
+                el("span", { class: "phase-vs" }, "vs"),
+                el("span", { class: "phase-elo" }, opElo == null ? "—" : opElo),
+              ),
+            );
+          }),
+        ),
+      ),
     ),
   ));
   statsRefs = S.analyzing ? { expanded: S.qbreakExpanded, rows } : null;
