@@ -591,15 +591,15 @@ function navFastScrub() {
   _lastNavStep = now;
   return fast;
 }
-// Pick the event for a SAN string. Priority: check/mate > castle > capture > plain move.
+// Pick the event for a SAN string. Priority: capture > check/mate > castle > plain move.
 function sanSound(san) {
   san = san || "";
+  if (/x/.test(san)) return "capture";
   if (/[+#]/.test(san)) return "check";
   if (/^[O0]-[O0]/.test(san)) return "castle";
-  if (/x/.test(san)) return "capture";
   return "move";
 }
-// Play the move sound for the position you land on (check/castle/capture/move, from its SAN).
+// Play the move sound for the position you land on (capture/check/castle/move, from its SAN).
 function playMoveSound(ply) {
   if (!S.settings.sound || ply < 1 || !S.positions[ply]) return;
   playEvent(sanSound(S.positions[ply].san));
