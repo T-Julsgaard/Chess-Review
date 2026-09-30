@@ -7,7 +7,12 @@ import { cmd } from 'web-ext';
 // Uses fresh test-only copies of the packaged extensions and isolated headless profiles.
 // The loopback reporting permission and smoke files are never added to store ZIPs.
 const root=process.cwd(), artifacts=path.join(root,'web-ext-artifacts');
-const releases=JSON.parse(await fs.readFile(path.join(artifacts,'release-sizes.json')));
+let recordPath;
+try { ({recordPath}=JSON.parse(await fs.readFile(path.join(artifacts,'latest-release.json')))); }
+catch(error) { if(error.code!=='ENOENT')throw error; }
+const releases=JSON.parse(await fs.readFile(recordPath || path.join(artifacts,'release-sizes.json')));
+const packages=recordPath ? releases.packages : releases;
+const reportDir=recordPath ? path.dirname(recordPath) : artifacts;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const reports=new Map();
 const server=http.createServer(async(req,res)=>{
@@ -19,7 +24,7 @@ await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const endpoint=`http://127.0.0.1:${server.address().port}`;
 let chromeProcess, ws, firefoxRunner;
 try {
-  for(const release of releases){
+  for(const release of packages){
     const sourceDir=await fs.mkdtemp(path.join(artifacts,`smoke-${release.browser}-`));
     await fs.cp(release.sourceDir,sourceDir,{recursive:true});
     const manifest=JSON.parse(await fs.readFile(path.join(sourceDir,'manifest.json')));
@@ -79,7 +84,7 @@ try {
     if(!reports.get(release.browser)?.ok)throw Error(JSON.stringify(reports.get(release.browser)||{error:'Browser smoke timed out',browser:release.browser}));
     if(release.browser==='chrome'){ws.close();chromeProcess.kill();chromeProcess=null;}else{await firefoxRunner.exit();firefoxRunner=null;}
   }
-  await fs.writeFile(path.join(artifacts,'browser-smoke-results.json'),JSON.stringify([...reports.values()],null,2));
+  await fs.writeFile(path.join(reportDir,'browser-smoke-results.json'),JSON.stringify([...reports.values()],null,2));
 } finally {
   ws?.close();chromeProcess?.kill();if(firefoxRunner)await firefoxRunner.exit();server.close();
 }

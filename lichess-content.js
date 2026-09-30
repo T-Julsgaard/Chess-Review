@@ -157,11 +157,11 @@ handleShareFragment();
 // Lichess is an SPA; check again shortly after in case of a late hash update.
 setTimeout(handleShareFragment, 1200);
 
-// ---- Post-game controls: inject "Review with extension" button --------------
+// ---- Post-game controls: inject "Analyze with Chess Review" button ---------
 // When a game ends, Lichess shows .rcontrols .follow-up with Rematch / New opponent / Analysis
 // board (all class "fbt", stacked). We add a matching fbt button just beneath "Analysis board"
 // that fires the same analysis flow as the toolbar icon (background's freeGameReview handler).
-const LI_REVIEW_LABEL = "Review with extension";
+const LI_REVIEW_LABEL = "Analyze with Chess Review";
 
 // Redundancy: DOM selectors live in LI as ORDERED fallback lists (current markup first → looser
 // fallbacks), so behaviour is unchanged today and a future Lichess class rename has a single place to

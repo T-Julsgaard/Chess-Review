@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Masterstroke">
+  <circle cx="50" cy="50" r="49" fill="#26c2a3"></circle>
+  <path d="M30 70C30 59 39 53 48 49L39 42 31 46 24 40 41 27 43 20 51 28C66 30 73 43 70 59L67 70Z" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"></path>
+  <circle cx="45" cy="34" r="2.5" fill="#26c2a3"></circle>
+  <path d="M54 46C60 52 60 59 54 65" fill="none" stroke="#26c2a3" stroke-width="4.5" stroke-linecap="round"></path>
+  <path d="M29 78H69" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"></path>
+  <path d="M77 19 80 26 87 29 80 32 77 39 74 32 67 29 74 26Z" fill="#fff"></path>
+</svg>
