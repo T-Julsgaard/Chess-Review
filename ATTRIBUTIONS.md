@@ -37,15 +37,10 @@ Distributed by Lichess (lila); high-quality vector SVGs.
   those noncommercial sets. Licensing reference:
   https://github.com/lichess-org/lila/blob/master/COPYING.md
 
-## Compatibility board palettes
-- **File:** `analysis.js` (`REVIEW_BOARD_PALETTES`, `SOURCE_BOARD_ALIAS`).
-- These retain the earlier platform-theme matching behavior with new display names
-  and very small RGB adjustments requested by the maintainer on 2026-09-30.
-- This is a cosmetic change, not evidence of independent design or legal clearance.
-  Source board images are not imported. The separate Kadagaden SVG boards have
-  been removed; the remaining boards use flat colors. The significance of palette
-  matching for design, branding, and contractual claims remains a review question,
-  not a finding that Chess.com owns ordinary green/white checkerboards.
+## Board colors
+- Boards use selectable flat-color palettes or custom colors. Honeywood is the default.
+- Platform-theme detection, palette matching, and the compatibility palettes were
+  removed on 2026-09-30. Historical archives and Git history may retain them.
 
 ## Country flags
 - **Files:** `flags/*.svg` (used as player avatars when a country is detected)

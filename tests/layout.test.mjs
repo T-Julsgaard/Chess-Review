@@ -66,7 +66,7 @@ test('Stockfish 18 NNUE is selected by default and listed first', t => {
   assert.equal(buttons[first+1].textContent,'Stockfish 19 Lite');
 });
 
-test('Maple is the default board theme', t => {
+test('Honeywood is the default board theme', t => {
   const a = layout(t);
   assert.equal(a.state.settings.boardTheme, 'maple');
 });

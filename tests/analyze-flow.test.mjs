@@ -39,8 +39,21 @@ test('Chess.com without a content script uses the saved username and URL', async
   await analyzeActiveTab('saved-user');
   assert.equal(s.opened.length, 1);
   assert.equal(s.payload().meta.gameId, '12345678');
-  assert.equal(s.payload().theme, null);
+  assert.equal(Object.hasOwn(s.payload(), 'theme'), false);
 });
+
+for (const url of ['https://www.chess.com/game/live/12345678', 'https://lichess.org/AAAAAAAA']) {
+  test(`source themes from stale content scripts are discarded: ${url}`, async t => {
+    const s = setup(t, url);
+    t.mock.method(chrome.tabs, 'sendMessage', async () => ({
+      ok: true, gameId: url.includes('lichess') ? 'AAAAAAAA' : '12345678',
+      theme: { boardTheme: 'green', boardUrl: 'https://example.test/board.png' },
+    }));
+    await analyzeActiveTab('saved-user');
+    assert.equal(s.opened.length, 1);
+    assert.equal(Object.hasOwn(s.payload(), 'theme'), false);
+  });
+}
 
 test('missing content script and username produces a recoverable username error', async t => {
   setup(t);
