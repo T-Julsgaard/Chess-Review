@@ -10,7 +10,6 @@ import { browserAPI } from "./browser-compat.js";
 import { lookupOpening, getLegacyBook, initOpeningsDb, getBookMovesForEco } from "./openings-db.js";
 import { generatePuzzles, puzzlesToPgn } from "./tactics-gen.js";
 import { loadCards, saveCards, addPuzzles, getDueCards, getUpcomingCards, getStats, gradeFromPractice, reviewCard } from "./srs.js";
-import { loadRepertoire, saveRepertoire, addGameToRepertoire, getOpeningTree, getRecommendations } from "./repertoire.js";
 
 /* ---------------- Opening book ----------------
  * Offline lookup table built from lichess-org/chess-openings (see data/build-openings-db.js).
@@ -1595,18 +1594,11 @@ function buildUI() {
   const libCount = el("span", { class: "count", id: "libCount" }, "0");
   const libControls = el("div", { class: "lib-controls", id: "libControls" });
   const libList = el("div", { class: "lib-list", id: "libList" });
-  const repList = el("div", { class: "lib-list", id: "repList" });
   const libRail = el("aside", { class: "library-rail", id: "libraryRail" },
-    el("div", { class: "lib-tabs" },
-      el("button", { class: "lib-tab active", "data-tab": "library", onclick: () => switchLibTab("library") }, icon("library"), el("span", { class: "lib-tab-txt" }, "Library")),
-      el("button", { class: "lib-tab", "data-tab": "repertoire", onclick: () => switchLibTab("repertoire") }, icon("book"), el("span", { class: "lib-tab-txt" }, "Repertoire")),
-    ),
+    el("div", { class: "lib-tab" }, icon("library"), el("span", { class: "lib-tab-txt" }, "Library")),
     el("div", { class: "lib-panel" },
       el("div", { class: "lib-head" }, el("h3", {}, "Your games"), libCount),
       libControls, libList),
-    el("div", { class: "lib-panel rep-panel", hidden: true },
-      el("div", { class: "lib-head" }, el("h3", {}, "Your repertoire")),
-      repList),
   );
   // Close any open library dropdown when clicking elsewhere.
   document.addEventListener("mousedown", (e) => {
@@ -1620,7 +1612,7 @@ function buildUI() {
     playerTop, playerBot, controls, coach: coachMount, evalbar: evalbarMount,
     review: reviewMount, movesBody, movesCount, movesFoot,
     graph: graphMount, stats: statsMount, engine: engineMount,
-    libRail, libControls, libList, libCount, repList,
+    libRail, libControls, libList, libCount,
   };
 
   applyLayoutMode();
@@ -5152,18 +5144,6 @@ function saveToLibrary() {
       if (dropped.length) browserAPI.storage.local.remove(dropped.map((d) => "analysis:" + d.id));
       S.library = newLib;
       renderLibrary();
-      
-      // Update repertoire with this game
-      addGameToRepertoire({
-        pgn: S.pgn,
-        classif: S.classif,
-        positions: S.positions,
-        eco: S.opening ? S.opening.eco : "",
-        opening: S.opening ? S.opening.name : "",
-        meSide: S.meSide,
-        result: myResult(),
-        myAcc: S.acc[S.meSide],
-      }, getBookMovesForEco).catch(e => console.warn("repertoire update failed", e));
     });
   } catch (e) { console.warn("library save failed", e); }
 }
@@ -5253,81 +5233,6 @@ function renderLibrary() {
     return;
   }
   UI.libList.replaceChildren(...recs.map(libCard));
-}
-
-function switchLibTab(tab) {
-  S.libTab = tab;
-  const libPanel = UI.libRail.querySelector(".lib-panel:not(.rep-panel)");
-  const repPanel = UI.libRail.querySelector(".rep-panel");
-  const libTabBtn = UI.libRail.querySelector('.lib-tab[data-tab="library"]');
-  const repTabBtn = UI.libRail.querySelector('.lib-tab[data-tab="repertoire"]');
-  if (tab === "repertoire") {
-    libPanel.hidden = true;
-    repPanel.hidden = false;
-    libTabBtn.classList.remove("active");
-    repTabBtn.classList.add("active");
-    renderRepertoire();
-  } else {
-    libPanel.hidden = false;
-    repPanel.hidden = true;
-    libTabBtn.classList.add("active");
-    repTabBtn.classList.remove("active");
-  }
-}
-async function renderRepertoire() {
-  if (!UI.repList) return;
-  const repertoire = await loadRepertoire();
-  const wTree = getOpeningTree(repertoire, "w");
-  const bTree = getOpeningTree(repertoire, "b");
-  const recommendations = getRecommendations(repertoire);
-  
-  if (!Object.keys(wTree).length && !Object.keys(bTree).length) {
-    UI.repList.replaceChildren(el("div", { class: "lib-empty" },
-      "Your repertoire will appear here as you analyze games. Play and review games to build it!"));
-    return;
-  }
-  
-  const colorTabs = ["w", "b"].map(color => 
-    el("button", { class: "rep-color-tab" + (S.repColor === color ? " active" : ""), onclick: () => { S.repColor = color; renderRepertoire(); } },
-      color === "w" ? "White" : "Black",
-      el("span", { class: "rep-count" }, Object.keys(getOpeningTree(repertoire, color)).length)
-    )
-  );
-  
-  const tree = getOpeningTree(repertoire, S.repColor || "w");
-  const treeHtml = renderOpeningTree(tree, 0);
-  
-  const recHtml = recommendations.length ? el("div", { class: "rep-recommendations" },
-    el("h4", {}, "Suggestions"),
-    el("ul", {}, ...recommendations.map(r => el("li", {},
-      el("strong", {}, r.name + " (" + r.eco + ")"),
-      el("span", {}, ` ${r.gaps} gaps · ${r.count} games · ${Math.round(r.score * 100)}%`),
-      r.topGap && el("span", { class: "rep-gap" }, "Gap: " + r.topGap)
-    )))
-  ) : null;
-  
-  UI.repList.replaceChildren(
-    el("div", { class: "rep-color-tabs" }, ...colorTabs),
-    el("div", { class: "rep-tree" }, treeHtml),
-    recHtml
-  );
-}
-function renderOpeningTree(node, depth) {
-  if (!node || typeof node !== "object" || Array.isArray(node)) return "";
-  const children = Object.entries(node).filter(([k, v]) => v && typeof v === "object" && v.children);
-  if (!children.length) return "";
-  
-  return el("ul", { class: "rep-tree-level", style: { paddingLeft: depth > 0 ? "16px" : "0" } },
-    ...children.map(([san, data]) => {
-      const isGap = data.isGap;
-      const hasChildren = Object.keys(data.children || {}).length > 0;
-      return el("li", { class: "rep-move" + (isGap ? " gap" : "") + (hasChildren ? " has-children" : "") },
-        el("span", { class: "rep-move-san" }, san),
-        data.count > 0 && el("span", { class: "rep-move-count" }, data.count),
-        hasChildren && renderOpeningTree(data.children, depth + 1)
-      );
-    })
-  );
 }
 
 /* ---------------- Navigation ---------------- */
