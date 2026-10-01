@@ -7,12 +7,11 @@ sources and licensing terms; entries marked unresolved are not claims of
 redistribution permission.
 
 ## Community contributions
-- **[neuroflowinfinix](https://github.com/neuroflowinfinix)** — proposed and implemented
-  coach/commentary layering and explicit move-category labels in
-  [PR #10](https://github.com/T-Julsgaard/Chess-Review/pull/10). These UI changes
-  were adapted here; category labels appear only when special coach replies are enabled.
-- Also recommended removing the obsolete asm.js fallback in that PR. The maintainer
-  implemented the engine cleanup separately; credit is retained for the recommendation.
+- **[aciokie](https://github.com/aciokie)** — Contributor
+- **[neuroflowinfinix](https://github.com/neuroflowinfinix)** — Contributor
+- **[Kristian Julsgaard](https://github.com/Julsgaard)** — Contributor
+- **[Arthur Guedes](https://github.com/arthurhguedes)** — Contributor
+- **[T-Julsgaard](https://github.com/T-Julsgaard)** — Maintainer
 
 ## Chess pieces (bundled SVG sets)
 Distributed by Lichess (lila); high-quality vector SVGs.
