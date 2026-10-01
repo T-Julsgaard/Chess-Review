@@ -6,6 +6,10 @@ Brilliant-move annotation is assessed separately from numerical calibration in
 [`BRILLIANT_MOVES.md`](BRILLIANT_MOVES.md). It uses board and existing evaluation
 evidence; annotations are excluded from fitted accuracy/rating inputs.
 
+[`SCORING_ROADMAP.md`](SCORING_ROADMAP.md) ranks proposed improvements to search
+evidence, category assessment and rating bias, and documents the independent
+Superb alternative-evidence gate. It schedules no calibration work.
+
 The multi-engine recent-data overnight workflow is documented in
 [`OVERNIGHT_RUN.md`](OVERNIGHT_RUN.md). It adds a tested bounded-range importer,
 exact bundled SF19 support, SQLite raw caches, a deadline supervisor, fixed
