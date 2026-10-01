@@ -1552,7 +1552,8 @@ function getPhaseGrade(calibratedAcc, side, phase) {
 }
 function getGamePhase(fen, ply) {
   // Chess.com approach: Opening = in book, Endgame = ≤7 non-pawn pieces
-  const inBook = S.bookAt && S.bookAt[ply];
+  // Defensive: S.bookAt may not be set yet if called before computeDerived()
+  const inBook = (S.bookAt && S.bookAt[ply]) || false;
   const pieces = fen.split(" ")[0].match(/[pnbrqkPNBRQK]/g) || [];
   const nonPawns = pieces.filter(p => p.toLowerCase() !== 'p').length;
   
@@ -2420,7 +2421,7 @@ function applyUserMove(from, to, animate = true) {
   stopLineWalk();
   const fen = activePos().fen;
   let c, mv;
-  try { c = new Chess(fen); mv = c.move({ from, to, promotion: "q" }); } catch { mv = null; }
+  try { c = new Chess(fen); mv = c.move({ from, to, promotion: "q" }); } catch (e) { mv = null; }
   if (!mv) { S.selectedSq = null; renderSelection(); return; }
   const node = { fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, eval: null, best: null };
   if (!S.analysisMode) {
@@ -2455,7 +2456,7 @@ function applyUserMove(from, to, animate = true) {
   // (otherwise it "jumps" back to the start square and slides forward again).
   if (animate && S.settings.moveAnim) animateMove(from, to);
   renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent();
-  requestLiveEval();
+  requestLiveEval().catch(e => console.warn("Live eval failed:", e));
 }
 // Click an engine line → play the whole PV out as a variation from the shown position.
 function playLine(pv) {
@@ -2497,7 +2498,7 @@ function playLine(pv) {
   playSanSound(v.positions[v.idx].san);
   paintBoard();
   renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent();
-  requestLiveEval();
+  requestLiveEval().catch(e => console.warn("Live eval failed:", e));
   startLineWalk();   // auto-step through the rest of the line (~2 s per move)
 }
 // Automatic walkthrough of the clicked engine line. Steps one move forward every
@@ -2876,7 +2877,7 @@ function renderControls() {
     const atEnd = v.idx >= v.positions.length - 1;
     // Same layout as the normal controls — the central green Play slot becomes a red Exit button.
     const atStart = v.idx <= 0;
-    const gotoVar = (i) => { stopLineWalk(); v.idx = Math.max(0, Math.min(v.positions.length - 1, i)); paintBoard(); renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent(); requestLiveEval(); };
+    const gotoVar = (i) => { stopLineWalk(); v.idx = Math.max(0, Math.min(v.positions.length - 1, i)); paintBoard(); renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent(); requestLiveEval().catch(e => console.warn("Live eval failed:", e)); };
     UI.controls.replaceChildren(
       el("button", { "aria-label": "Variation start", disabled: atStart, onclick: () => gotoVar(0) }, icon("first")),
       el("button", { "aria-label": "Previous move", onclick: navPrev }, icon("prev")),
@@ -4718,7 +4719,7 @@ async function setEngineSetting(key, value) {
   // In analysis mode: reset the variation's cached evals, so they're recomputed with new options.
   if (S.analysisMode && S.variation) {
     for (const p of S.variation.positions) { p.eval = null; p.best = null; }
-    requestLiveEval();
+    requestLiveEval().catch(e => console.warn("Live eval failed:", e));
   }
   // Classification always searches a single line now, and the engine panel fills extra candidate
   // lines on demand for the position you're viewing. So the line-count settings (panel "Lines",
@@ -5373,7 +5374,7 @@ function navPrev() { if (S.practice) return; stopLineWalk(); if (S.analysisMode)
 // Jump to a mainline position (exits analysis mode if active).
 function gotoMainline(ply) { if (S.practice) return; stopLineWalk(); if (S.analysisMode) exitAnalysis(); go(ply); }
 // Jump to a variation position (explore mode).
-function gotoVar(idx) { if (S.practice) return; stopLineWalk(); if (!S.variation) return; const v = S.variation; if (idx < 0 || idx >= v.positions.length) return; v.idx = idx; S.selectedSq = null; paintBoard(); playSanSound(v.positions[v.idx]?.san); renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent(); requestLiveEval(); }
+function gotoVar(idx) { if (S.practice) return; stopLineWalk(); if (!S.variation) return; const v = S.variation; if (idx < 0 || idx >= v.positions.length) return; v.idx = idx; S.selectedSq = null; paintBoard(); playSanSound(v.positions[v.idx]?.san); renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent(); requestLiveEval().catch(e => console.warn("Live eval failed:", e)); }
 function variationStep(delta) {
   const v = S.variation; if (!v) return;
   const ni = v.idx + delta;
@@ -5391,7 +5392,7 @@ function variationStep(delta) {
     else if (delta < 0) { const m = v.positions[v.idx + 1]; if (m && m.from && m.to) animateMove(m.to, m.from); }
   }
   renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent();
-  requestLiveEval();
+  requestLiveEval().catch(e => console.warn("Live eval failed:", e));
 }
 function toggleFlip() { S.flipped = !S.flipped; buildBoard(); renderPlayers(); renderEvalBar(); }
 function toggleAuto() {
@@ -5636,7 +5637,7 @@ async function applyGame(payload) {
     document.title = "Explore — Chess Review";
     computeDerived();
     renderAll();
-    requestLiveEval(); // start live engine analysis
+    requestLiveEval().catch(e => console.warn("Live eval failed:", e)); // start live engine analysis
     return;
   }
 
