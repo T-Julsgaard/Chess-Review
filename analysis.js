@@ -1461,9 +1461,6 @@ function computeDerived() {
 function computePhaseRatings() {
   const N = S.total;
   if (N === 0) { S.phaseRatings = { w: {}, b: {} }; S.phaseClassif = { w: {}, b: {} }; return; }
-  const phaseAcc = { w: { opening: [], middlegame: [], endgame: [] }, b: { opening: [], middlegame: [], endgame: [] } };
-  const phaseClassif = { w: { opening: {}, middlegame: {}, endgame: {} }, b: { opening: {}, middlegame: {}, endgame: {} } };
-  const phaseWp = { w: { opening: [], middlegame: [], endgame: [] }, b: { opening: [], middlegame: [], endgame: [] } };
   
   // Track phase per ply to avoid flip-flopping
   const phaseByPly = new Array(N + 1);
@@ -1477,12 +1474,30 @@ function computePhaseRatings() {
     phaseByPly[i] = currentPhase;
   }
   
+  // Compute win% per ply (same as sideAccuracies)
+  const wp = new Array(N + 1).fill(50);
+  for (let p = 0; p <= N; p++) wp[p] = S.evals[p] ? winPct(scoreToCp(S.evals[p])) : (p ? wp[p - 1] : 50);
+  
+  // Volatility weights per ply (same as sideAccuracies)
+  const win = Math.max(2, Math.min(8, Math.floor(N / 10)));
+  const weight = new Array(N + 1).fill(1);
+  for (let i = 1; i <= N; i++) {
+    const seg = [];
+    for (let j = Math.max(0, i - win); j <= Math.min(N, i); j++) seg.push(wp[j]);
+    weight[i] = Math.max(0.5, Math.min(12, stdev(seg)));
+  }
+  
+  // Group by phase and side
+  const phaseAcc = { w: { opening: [], middlegame: [], endgame: [] }, b: { opening: [], middlegame: [], endgame: [] } };
+  const phaseWts = { w: { opening: [], middlegame: [], endgame: [] }, b: { opening: [], middlegame: [], endgame: [] } };
+  const phaseClassif = { w: { opening: {}, middlegame: {}, endgame: {} }, b: { opening: {}, middlegame: {}, endgame: {} } };
+  
   for (let i = 1; i <= N; i++) {
     if (S.accMove[i] == null) continue;
     const side = S.positions[i].color;
     const phase = phaseByPly[i];
     phaseAcc[side][phase].push(S.accMove[i]);
-    phaseWp[side][phase].push(S.wpDrop[i] || 0);
+    phaseWts[side][phase].push(weight[i]);
     const cls = S.classif[i];
     if (cls) {
       phaseClassif[side][phase][cls] = (phaseClassif[side][phase][cls] || 0) + 1;
@@ -1499,21 +1514,15 @@ function computePhaseRatings() {
   for (const side of ["w", "b"]) {
     for (const phase of ["opening", "middlegame", "endgame"]) {
       const accArr = phaseAcc[side][phase];
-      const wpArr = phaseWp[side][phase];
+      const wtsArr = phaseWts[side][phase];
       if (accArr.length === 0) { S.phaseRatings[side][phase] = null; continue; }
       
-      // Use same weighted aggregation as sideAccuracies() but per phase
-      const win = Math.max(2, Math.min(8, Math.floor(accArr.length / 10)));
-      const weights = accArr.map((_, idx) => {
-        const seg = wpArr.slice(Math.max(0, idx - win), idx + 1);
-        return Math.max(0.5, Math.min(12, stdev(seg)));
-      });
-      
+      // Use SAME aggregation as sideAccuracies() but per phase
       const a = CALIB?.agg;
       let phaseAccFinal;
-      if (a && a.mode === "learned" && a.learnedFeatures) phaseAccFinal = learnedAccuracy(accArr, weights, a);
-      else if (a && a.mode === "power") phaseAccFinal = powerMean(accArr, a.useVol ? weights : accArr.map(() => 1), a.p, a.floor || 0);
-      else phaseAccFinal = (weightedMean(accArr, weights) + harmonicMean(accArr)) / 2;
+      if (a && a.mode === "learned" && a.learnedFeatures) phaseAccFinal = learnedAccuracy(accArr, wtsArr, a);
+      else if (a && a.mode === "power") phaseAccFinal = powerMean(accArr, a.useVol ? wtsArr : accArr.map(() => 1), a.p, a.floor || 0);
+      else phaseAccFinal = (weightedMean(accArr, wtsArr) + harmonicMean(accArr)) / 2;
       
       // Apply SAME calibration and Elo model as overall
       const rating = side === meSide ? meRating : opRating;
