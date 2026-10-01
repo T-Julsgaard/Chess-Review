@@ -1506,6 +1506,7 @@ function computePhaseRatings() {
   
   S.phaseRatings = { w: {}, b: {} };
   S.phaseClassif = { w: {}, b: {} };
+  S.phaseHasBrilliant = { w: {}, b: {} };
   
   // Use the SAME calibration and Elo model as overall game
   const meSide = S.meSide, opSide = S.meSide === "w" ? "b" : "w";
@@ -1531,12 +1532,17 @@ function computePhaseRatings() {
       S.phaseAcc = S.phaseAcc || { w: {}, b: {} };
       S.phaseAcc[side][phase] = calibratedAcc;
       S.phaseClassif[side][phase] = phaseClassif[side][phase];
+      // Track if this phase has any brilliant moves
+      S.phaseHasBrilliant[side][phase] = (phaseClassif[side][phase].brilliant || 0) > 0;
     }
   }
 }
-function getPhaseGrade(calibratedAcc) {
+function getPhaseGrade(calibratedAcc, side, phase) {
   if (calibratedAcc == null) return null;
-  if (calibratedAcc >= 95) return "brilliant";
+  // Brilliant badge ONLY if there's an actual brilliant move in this phase
+  const hasBrilliant = S.phaseHasBrilliant?.[side]?.[phase] === true;
+  const maxGrade = hasBrilliant ? "brilliant" : "great";
+  if (calibratedAcc >= 95) return hasBrilliant ? "brilliant" : "great";
   if (calibratedAcc >= 90) return "great";
   if (calibratedAcc >= 85) return "excellent";
   if (calibratedAcc >= 80) return "good";
@@ -3659,8 +3665,8 @@ function renderPhaseRatings() {
             const opElo = S.phaseRatings?.[opSide]?.[phase];
             const meAcc = S.phaseAcc?.[S.meSide]?.[phase];
             const opAcc = S.phaseAcc?.[opSide]?.[phase];
-            const meGrade = getPhaseGrade(meAcc);
-            const opGrade = getPhaseGrade(opAcc);
+            const meGrade = getPhaseGrade(meAcc, S.meSide, phase);
+            const opGrade = getPhaseGrade(opAcc, opSide, phase);
             const meMoves = Object.values(S.phaseClassif?.[S.meSide]?.[phase] || {}).reduce((a,b)=>a+b,0);
             const opMoves = Object.values(S.phaseClassif?.[opSide]?.[phase] || {}).reduce((a,b)=>a+b,0);
             return el("tr", { class: "phase-row" },
