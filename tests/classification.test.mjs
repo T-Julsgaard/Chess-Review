@@ -150,3 +150,25 @@ test('Superb evidence uses the configured loss boundary and does not change eval
   a.run('CALIB.clsWp.inacc = 5');
   a.call('computeDerived'); assert.equal(S.classif[ply],'great');
 });
+
+test('mate transitions distinguish escaping defeat, delaying a win and reversing the winner', t=>{
+  const a=app(t);
+  const cases=[[-3,3,'excellent'],[-3,-1,'excellent'],[-3,-5,'excellent'],[3,-3,'blunder'],[3,5,'good']];
+  for(const color of ['w','b'])for(const [before,after,label] of cases){
+    const white=color==='w',sign=white?1:-1;
+    const S=loadGame(a,white?'1. e4':'1. e4 e5',
+      (white?[before,after]:[before,before,after]).map(mate=>({mate:mate*sign})));
+    const ply=white?1:2;a.call('computeDerived');assert.equal(S.classif[ply],label);
+    const v=branch(a);a.call('classifyVariationMoves');assert.equal(v.positions[ply].classif,label);
+    if(before>0){S.bests[ply-1].bestmove=white?'e2e4':'e7e5';a.call('computeDerived');assert.equal(S.classif[ply],label);}
+  }
+});
+
+test('failed-punish Miss requires giving back the clear advantage',t=>{
+  const a=app(t);
+  const S=loadGame(a,'1. e4 e5 2. Nf3',[0,0,2000,800].map(cp=>({cp})));
+  a.call('computeDerived');assert.notEqual(S.classif[3],'miss');
+  loadGame(a,'1. e4 e5 2. Nf3',[0,0,500,0].map(cp=>({cp})));
+  a.call('computeDerived');assert.equal(S.classif[3],'miss');
+  const v=branch(a,1);a.call('classifyVariationMoves');assert.equal(v.positions[2].classif,'miss');
+});

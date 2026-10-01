@@ -1001,7 +1001,6 @@ function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop, state = S) 
   const losingAdvAt = (k) => { const m = state.positions[k].color; const a = _evalPawns(k - 1, m, state), b = _evalPawns(k, m, state); return a != null && b != null && a >= CA && b < CA; };
   const givingAdvAt = (k) => { const m = state.positions[k].color; const a = _evalPawns(k - 1, m, state), b = _evalPawns(k, m, state); return a != null && b != null && a >= -CA && b < -CA; };
   const keepMating = (k) => { const c = _mateFor(k, state.positions[k].color, state), p = _mateFor(k - 1, state.positions[k].color, state); return c != null && p != null && c > 0 && p > 0 && c <= p; };
-  const advanceMate = (k) => { const c = _mateFor(k, state.positions[k].color, state), p = _mateFor(k - 1, state.positions[k].color, state); return c != null && p != null && c < 0 && p < 0 && c > p; };
 
   const previousMistake = wasNotMateRel(0) && pStd(0) === "inacc" && pLoss(0) >= ML && (losingAdvAt(i - 1) || givingAdvAt(i - 1));
   const previousPreviousMistake = wasNotMateRel(1) && pStd(1) === "inacc" && pLoss(1) >= ML && (losingAdvAt(i - 2) || givingAdvAt(i - 2));
@@ -1018,18 +1017,24 @@ function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop, state = S) 
   if (!previousMiss && wasNotMateRel(0) && notMateRel && std[i] === "excellent"
     && (previousMistake || pStd(0) === "blunder") && onlyGoodReply(i, state)) return "great";
 
+  // Mate signs are relative to the mover. Reversing who wins is not delaying one's own mate;
+  // already being mated supplies no expected-result reason to reward faster defeat.
+  if (beforeMate > 0 && afterMate < 0) return "blunder";
+  if (beforeMate > 0 && afterMate > beforeMate) return "good";
+  if (beforeMate < 0 && afterMate > 0) return isTop ? "best" : "excellent";
+  if (beforeMate < 0 && afterMate < 0) return isTop ? "best" : std[i];
+
   if (isTop && _isCheckmate(i, state)) return "best";
   if (isTop) return "best";
 
   if (_isCheckmate(i, state)) return "excellent";
   if (!mate(i - 1) && mate(i) && winningNow) return "excellent";                                             // starts a mate
   if (mate(i - 1) && mate(i) && keepMating(i) && winningNow) return "excellent";                             // keeps the mate
-  if (mate(i - 1) && mate(i) && !keepMating(i) && winningNow) return "good";                                 // delays own mate
-  if (mate(i - 1) && mate(i) && advanceMate(i) && !winningNow) return "good";                                // being mated, unavoidable
 
   if (mate(i - 1) && !mate(i) && prevWinning) return "miss";                                                 // threw away a forced mate
   if (!previousMiss && notMateRel && (previousMistake || pStd(0) === "blunder")
     && (std[i] === "blunder" || std[i] === "inacc")
+    && evalFor(i) < CA
     && (loss[i] != null && pLoss(0) != null && loss[i] <= pLoss(0) + MT)) return "miss";                     // failed to punish
 
   if (notMateRel && std[i] === "inacc" && loss[i] >= ML && losingAdvAt(i)) return "mistake";                 // lost a clear advantage
