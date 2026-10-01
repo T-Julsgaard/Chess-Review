@@ -715,6 +715,9 @@ function searchHistory(positions, idx = positions.length - 1) {
 function variationSearchHistory(v, idx) {
   return searchHistory([...S.positions.slice(0, v.branchIdx + 1), ...v.positions.slice(1, idx + 1)]);
 }
+function activeSearchHistory() {
+  return S.analysisMode && S.variation ? variationSearchHistory(S.variation, S.variation.idx) : searchHistory(S.positions, S.idx);
+}
 function deriveOpening(h) {
   const eco = h.ECO || "";
   let name = h.Opening || "";
@@ -1952,17 +1955,19 @@ async function renderThreatArrow() {
   if (!S.settings.showThreat || S.analyzing || S.lineWalking || S.practice) { clear(); return; }
   const fen = activePos().fen;
   if (terminalScore(fen)) { clear(); return; }
-  let uci = S.threatCache.get(fen);
+  const history = activeSearchHistory(), historyKey = JSON.stringify(history), cacheKey = fen + historyKey;
+  let uci = S.threatCache.get(cacheKey);
   if (uci === undefined) {
     const token = ++_threatToken;
     let eng; try { eng = await getHelperEngine(); } catch { return; }
     if (token !== _threatToken) return;
     eng.stop();
-    let res; try { res = await eng.analyse(threatFen(fen), Math.min(14, S.settings.engineDepth), 1); } catch { return; }
+    const targetFen = threatFen(fen);
+    let res; try { res = await eng.analyse(targetFen, Math.min(14, S.settings.engineDepth), 1, targetFen === fen ? history : null); } catch { return; }
     if (token !== _threatToken) return;
     uci = res && res.bestmove ? res.bestmove : null;
-    S.threatCache.set(fen, uci);
-    if (activePos().fen !== fen) return;          // position changed while we searched
+    S.threatCache.set(cacheKey, uci);
+    if (activePos().fen !== fen || JSON.stringify(activeSearchHistory()) !== historyKey) return;
     svg = board.querySelector("svg.threat-arrow"); // (board may have been rebuilt)
   }
   if (!uci || uci.length < 4) { clear(); return; }
@@ -3708,11 +3713,12 @@ function fitEnginePanel() {
 }
 function renderEngine(lines, padFromCache = false) {
   const curFen = activePos().fen;
+  const historyKey = JSON.stringify(activeSearchHistory());
   const want = S.settings.engineLines;
   // The last full set of real lines we rendered, kept (with the fen they were computed for, so the
   // SAN stays correct) to fill slots that the new position hasn't searched yet — and to hold the
   // panel steady while the engine re-computes (lines === null, e.g. "Play best moves from here").
-  const cached = S._lastEngineLines?.fen === curFen ? S._lastEngineLines : null;
+  const cached = S._lastEngineLines?.fen === curFen && S._lastEngineLines?.historyKey === historyKey ? S._lastEngineLines : null;
   let body;
   if (S.analysisMode && S.liveError) {
     body = el("div", { class: "engine-empty" }, S.liveError);
@@ -3735,7 +3741,7 @@ function renderEngine(lines, padFromCache = false) {
     }
     // Only overwrite the cache with a complete fresh set, so partial (single-line) batch renders
     // don't wipe the previous second line we still want to show.
-    if (cur.length >= want) S._lastEngineLines = { lines: cur, fen: curFen };
+    if (cur.length >= want) S._lastEngineLines = { lines: cur, fen: curFen, historyKey };
     body = el("div", {},
       ...slots.map((slot) => {
         // Empty slot (a forced move with no second line, etc.) → a blank row of the same height so
