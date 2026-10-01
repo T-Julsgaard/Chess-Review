@@ -1528,11 +1528,22 @@ function computePhaseRatings() {
       const rating = side === meSide ? meRating : opRating;
       const calibratedAcc = calAccBias(phaseAccFinal, rating);
       S.phaseRatings[side][phase] = estimateElo(calibratedAcc, rating);
+      S.phaseAcc = S.phaseAcc || { w: {}, b: {} };
+      S.phaseAcc[side][phase] = calibratedAcc;
       S.phaseClassif[side][phase] = phaseClassif[side][phase];
     }
   }
 }
-
+function getPhaseGrade(calibratedAcc) {
+  if (calibratedAcc == null) return null;
+  if (calibratedAcc >= 95) return "brilliant";
+  if (calibratedAcc >= 90) return "great";
+  if (calibratedAcc >= 85) return "excellent";
+  if (calibratedAcc >= 80) return "good";
+  if (calibratedAcc >= 70) return "inacc";
+  if (calibratedAcc >= 60) return "mistake";
+  return "blunder";
+}
 function getGamePhase(fen, ply) {
   // Chess.com approach: Opening = in book, Endgame = ≤7 non-pawn pieces
   const inBook = S.bookAt && S.bookAt[ply];
@@ -3637,26 +3648,28 @@ function renderPhaseRatings() {
             el("th", {}),
             el("th", {}),
             el("th", {}, "Elo"),
-            el("th", {}, "Moves"),
+            el("th", {}, "Grade"),
             el("th", {}, "Elo"),
-            el("th", {}, "Moves"),
+            el("th", {}, "Grade"),
           ),
         ),
         el("tbody", {},
           phases.map((phase) => {
             const meElo = S.phaseRatings?.[S.meSide]?.[phase];
             const opElo = S.phaseRatings?.[opSide]?.[phase];
-            const meClassif = S.phaseClassif?.[S.meSide]?.[phase] || {};
-            const opClassif = S.phaseClassif?.[opSide]?.[phase] || {};
-            const meMoves = Object.values(meClassif).reduce((a,b)=>a+b,0);
-            const opMoves = Object.values(opClassif).reduce((a,b)=>a+b,0);
+            const meAcc = S.phaseAcc?.[S.meSide]?.[phase];
+            const opAcc = S.phaseAcc?.[opSide]?.[phase];
+            const meGrade = getPhaseGrade(meAcc);
+            const opGrade = getPhaseGrade(opAcc);
+            const meMoves = Object.values(S.phaseClassif?.[S.meSide]?.[phase] || {}).reduce((a,b)=>a+b,0);
+            const opMoves = Object.values(S.phaseClassif?.[opSide]?.[phase] || {}).reduce((a,b)=>a+b,0);
             return el("tr", { class: "phase-row" },
               el("td", { class: "phase-label" }, phase[0].toUpperCase() + phase.slice(1)),
               el("td", { class: "phase-moves" }, phaseMoves[phase]),
               el("td", { class: "phase-elo" }, meElo == null ? "—" : meElo),
-              el("td", { class: "phase-classif" }, renderPhaseClassifBadges(meClassif)),
+              el("td", { class: "phase-grade" }, meGrade ? el("img", { class: "qb icon", src: qIcon(meGrade), alt: QUALITY[meGrade].name, draggable: "false" }) : "—"),
               el("td", { class: "phase-elo" }, opElo == null ? "—" : opElo),
-              el("td", { class: "phase-classif" }, renderPhaseClassifBadges(opClassif)),
+              el("td", { class: "phase-grade" }, opGrade ? el("img", { class: "qb icon", src: qIcon(opGrade), alt: QUALITY[opGrade].name, draggable: "false" }) : "—"),
             );
           }),
         ),
