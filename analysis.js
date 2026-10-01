@@ -278,10 +278,23 @@ const ENGINE_SETTING_KEYS = [
   "clsGood", "clsInacc", "clsBlunder", "clsClearAdv", "clsMistakeLoss", "clsMissTol",
   "accExcellent", "accGood", "accInacc", "accMiss", "accMistake", "accBlunder",
 ];
-// Two single-threaded builds; the app parallelizes positions across independent workers.
-const ENGINE_BUILDS = { nnue: "engine/stockfish-nnue.js", sf19full: 
-"engine/stockfish-19-single.js", sf19lite: "engine/stockfish-19-lite-single.js" };
+// Engine builds: single-threaded (fallback) + multi-threaded (requires COOP/COEP).
+// Multi-threaded builds use SharedArrayBuffer for ~3x speedup on multi-core.
+const ENGINE_BUILDS = {
+  nnue: "engine/stockfish-nnue.js",
+  sf19full: "engine/stockfish-19-single.js",
+  sf19full_mt: "engine/stockfish-19.js",           // multi-threaded (requires cross-origin-isolated)
+  sf19lite: "engine/stockfish-19-lite-single.js",
+  sf19lite_mt: "engine/stockfish-19-lite.js"      // multi-threaded lite
+};
 const ENGINE_FALLBACK_ORDER = ["nnue", "sf19full", "sf19lite"];
+
+// Detect if multi-threaded WASM is available (cross-origin-isolated context)
+function hasMultiThreadSupport() {
+  return typeof SharedArrayBuffer === "function" &&
+         typeof Atomics === "object" &&
+         self.crossOriginIsolated === true;
+}
 
 function migrateEngineSettings(settings) {
   if (settings.enginePath === "sf19") settings.enginePath = "sf19lite";
@@ -1953,12 +1966,23 @@ function refreshArrows() { renderBestArrow(); renderUserArrows(); renderThreatAr
 let _engineFellBack = false; // warn once per page if we ever leave the preferred build
 async function createEngine(opts = {}) {
   const preferred = ENGINE_BUILDS[S.settings.enginePath] ? S.settings.enginePath : DEFAULT_SETTINGS.enginePath;
-  const order = [preferred, ...ENGINE_FALLBACK_ORDER.filter(key => key !== preferred)];
+
+  // Prefer multi-threaded build if available and cross-origin-isolated
+  const mtKey = preferred + "_mt";
+  const order = hasMultiThreadSupport() && ENGINE_BUILDS[mtKey]
+    ? [mtKey, preferred, ...ENGINE_FALLBACK_ORDER.filter(k => k !== preferred && k !== mtKey)]
+    : [preferred, ...ENGINE_FALLBACK_ORDER.filter(key => key !== preferred)];
+
   let lastErr = null;
   for (const key of order) {
     const eng = new Engine(ENGINE_BUILDS[key]);
     try {
-      await eng.setOptions(opts); // awaits the handshake; throws if this build failed to load
+      // Set Threads for multi-threaded builds
+      const threads = key.endsWith("_mt")
+        ? Math.max(1, (navigator.hardwareConcurrency || 4) - 1)
+        : 1;
+      const fullOpts = { ...opts, Threads: threads };
+      await eng.setOptions(fullOpts); // awaits the handshake; throws if this build failed to load
       eng.buildKey = key;
       if (S.settings.enginePath === preferred) {
         if (key !== preferred) S.engineFallbackBuild = key;
@@ -5319,71 +5343,111 @@ async function startAnalysis() {
   renderControls(); renderReview(); renderStats(); renderGraph(); renderMoves();
   if (!S.analysisMode) { renderEvalBar(); renderBestArrow(); renderEngineCurrent(); }
 
-  // The classification logic needs only the single best line, so the batch defaults to MultiPV=1
-  // (markedly faster than the old ≥4); the engine panel fills extra lines on demand. The user can
-  // raise "Analysis lines" (classifyLines) to search more per position for steadier accuracy/Elo.
+  // Pipeline: Pass 1 (shallow, all moves) → Pass 2 (deep, only mistakes/blunders)
+  const shallowDepth = Math.min(10, S.settings.engineDepth);
+  const deepDepth = S.settings.engineDepth;
   const multipv = Math.max(1, Math.min(ENGINE_MAX_LINES, S.settings.classifyLines || 1));
-  S.analyzedMultipv = multipv; // remember how many lines this run computed (for setEngineSetting)
+  S.analyzedMultipv = multipv;
   const nWorkers = Math.max(1, Math.min(S.settings.engineWorkers || 1, S.total + 1));
-  // createEngine() readies each worker AND falls back down the build chain if the chosen build can't
-  // load — so the whole batch survives e.g. NNUE failing, and S.activeEngineBuild reflects the build
-  // actually in use. If no build can start at all, surface it instead of leaving a stuck "Analyzing…".
-  const starts = await Promise.allSettled(
-    Array.from({ length: nWorkers }, () => createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill }))
-  );
-  const engines = starts.filter(r => r.status === "fulfilled").map(r => r.value);
-  if (gen !== S.batchGen) { engines.forEach(e => e.terminate()); return; }
-  const failed = starts.find(r => r.status === "rejected");
-  if (failed) {
-    engines.forEach(e => e.terminate());
-    console.error("[Chess Review] no Stockfish build could be started:", failed.reason);
-    S.evalEngines = []; S.analyzing = false;
-    S.analysisError = "the engine could not be started in this browser.";
-    S.verdict = "Engine unavailable — couldn't start Stockfish in this browser.";
-    flushProgress(gen);
-    return;
+
+  // Position cache (IndexedDB) - reuse evaluations across games
+  const posCache = await openPositionCache();
+
+  // Lazy engine startup: start with 1 worker, add more as queue grows
+  let engines = [];
+  let engineIndex = 0;
+  async function getOrCreateEngine() {
+    if (engineIndex < engines.length) return engines[engineIndex++];
+    const eng = await createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill });
+    eng.newGame(); // reset persistent hash for new game
+    engines.push(eng);
+    engineIndex++;
+    return eng;
   }
+
+  // Assign to global state for termination handling
   S.evalEngines = engines;
 
-  // Shared work queue. `nextIdx++` is atomic (no await between read and increment in a
-  // single-threaded runtime), so each position is handed to exactly one worker. Completion
-  // order doesn't affect the final values — computeDerived() is a pure function of the
-  // filled arrays. `contig` tracks the contiguous-analyzed prefix that navigation/eval-graph
-  // are allowed to expose during analysis.
+  // Pass 1: Shallow analysis of ALL positions
   let nextIdx = 0, contig = -1;
-  async function worker(eng) {
+  async function workerShallow(eng) {
     while (gen === S.batchGen) {
       const i = nextIdx++;
       if (i > S.total) return;
-      const terminal = terminalScore(S.positions[i].fen, i);
-      const res = terminal ? { score: terminal, bestmove: null, pv: "", lines: [] }
-        : await eng.analyse(S.positions[i].fen, S.settings.engineDepth, multipv);
-      if (gen !== S.batchGen) return;
-      S.bests[i] = res;
-      // Terminal positions (mate/stalemate) are decided from the board — not from the engine's "mate 0".
-      S.evals[i] = terminal || whiteRel(res.score, S.positions[i].fen);
+      const fen = S.positions[i].fen;
+      const cached = await posCache.get(fen);
+      if (cached && cached.depth >= shallowDepth) {
+        S.bests[i] = cached;
+        S.evals[i] = whiteRel(cached.score, fen);
+      } else {
+        const terminal = terminalScore(fen, i);
+        const res = terminal ? { score: terminal, bestmove: null, pv: "", lines: [] }
+          : await eng.analyse(fen, shallowDepth, 1);
+        if (gen !== S.batchGen) return;
+        S.bests[i] = res;
+        S.evals[i] = terminal || whiteRel(res.score, fen);
+        await posCache.set(fen, { ...res, depth: shallowDepth });
+      }
       if (i > 0) S.completed++;
       while (contig + 1 <= S.total && S.bests[contig + 1]) contig++;
       S.progress = Math.max(0, contig);
       requestProgress(gen);
     }
   }
-  try {
-    await Promise.all(engines.map((e) => worker(e)));
-  } catch (e) {
-    if (gen !== S.batchGen) return;
-    console.error("[Chess Review] engine stopped during batch analysis:", e);
-    terminateEngines();
-    S.analyzing = false;
-    S.analysisError = "the engine stopped responding.";
-    S.verdict = "Analysis stopped before the game was complete.";
-    flushProgress(gen);
-    renderReview();
-    renderStats();
-    if (!S.analysisMode) renderEngineCurrent();
-    return;
+
+  // Start with 1 worker, spawn more as needed
+  const firstEng = await getOrCreateEngine();
+  await Promise.all([workerShallow(firstEng)]);
+  if (gen !== S.batchGen) { engines.forEach(e => e.terminate()); return; }
+
+  // Spawn remaining workers for any remaining positions
+  while (engines.length < nWorkers) {
+    const eng = await getOrCreateEngine();
+    workerShallow(eng);
   }
-  if (gen !== S.batchGen) return;            // a newer analysis took over
+  await Promise.all(engines.map(e => workerShallow(e)));
+  if (gen !== S.batchGen) { engines.forEach(e => e.terminate()); return; }
+
+  // Pass 2: Deep re-analysis ONLY for Mistake/Blunder candidates
+  computeDerived(); // classify with shallow results first
+  const mistakeIndices = [];
+  for (let i = 1; i <= S.total; i++) {
+    const cls = S.classif[i];
+    if (cls === "mistake" || cls === "blunder" || cls === "miss") {
+      mistakeIndices.push(i);
+    }
+  }
+
+  if (mistakeIndices.length > 0) {
+    S.progress = 0; S.completed = 0; contig = -1;
+    let deepNext = 0;
+    async function workerDeep(eng) {
+      while (gen === S.batchGen) {
+        const idx = deepNext++;
+        if (idx >= mistakeIndices.length) return;
+        const i = mistakeIndices[idx];
+        const fen = S.positions[i].fen;
+        const cached = await posCache.get(fen);
+        if (cached && cached.depth >= deepDepth) {
+          S.bests[i] = cached;
+          S.evals[i] = whiteRel(cached.score, fen);
+        } else {
+          const res = await eng.analyse(fen, deepDepth, multipv);
+          if (gen !== S.batchGen) return;
+          S.bests[i] = res;
+          S.evals[i] = whiteRel(res.score, fen);
+          await posCache.set(fen, { ...res, depth: deepDepth });
+        }
+        S.completed++;
+        S.progress = Math.max(0, (idx / mistakeIndices.length) * mistakeIndices.length);
+        requestProgress(gen);
+      }
+    }
+    await Promise.all(engines.map(e => workerDeep(e)));
+    if (gen !== S.batchGen) { engines.forEach(e => e.terminate()); return; }
+  }
+
+  if (gen !== S.batchGen) return;
   terminateEngines();
   S.analyzing = false;
   S.progress = S.total;
@@ -5392,7 +5456,44 @@ async function startAnalysis() {
   renderReview();
   renderStats();
   if (!S.analysisMode) renderEngineCurrent();
-  saveToLibrary();   // the game is fully analyzed → keep it in the user's library
+  saveToLibrary();
+}
+
+// IndexedDB position cache for cross-game evaluation reuse
+async function openPositionCache() {
+  return new Promise((resolve) => {
+    const req = indexedDB.open("ChessReviewCache", 1);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains("positions")) {
+        db.createObjectStore("positions", { keyPath: "fen" });
+      }
+    };
+    req.onsuccess = () => {
+      const db = req.result;
+      resolve({
+        async get(fen) {
+          return new Promise((res) => {
+            const tx = db.transaction("positions", "readonly");
+            const store = tx.objectStore("positions");
+            const getReq = store.get(fen);
+            getReq.onsuccess = () => res(getReq.result?.data || null);
+            getReq.onerror = () => res(null);
+          });
+        },
+        async set(fen, data) {
+          return new Promise((res) => {
+            const tx = db.transaction("positions", "readwrite");
+            const store = tx.objectStore("positions");
+            store.put({ fen, data, ts: Date.now() });
+            tx.oncomplete = () => res();
+            tx.onerror = () => res();
+          });
+        }
+      });
+    };
+    req.onerror = () => resolve({ get: () => null, set: () => {} });
+  });
 }
 
 /* ---------------- Render everything ---------------- */

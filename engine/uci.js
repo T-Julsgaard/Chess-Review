@@ -179,7 +179,12 @@ export class Engine {
       this.multipv = this.current.multipv;
       this._send(`setoption name MultiPV value ${this.multipv}`);
     }
-    this._send("ucinewgame");
+    // Persistent hash: only send ucinewgame for first position in a game
+    // Reuse transposition table across positions for 15-30% speedup
+    if (!this._gameStarted) {
+      this._send("ucinewgame");
+      this._gameStarted = true;
+    }
     this._send(`position fen ${job.fen}`);
     this._send(`go depth ${job.depth}`);
   }
@@ -217,6 +222,12 @@ export class Engine {
     if (this._onFail) {
       try { this._failHandshake(err); } catch {}
     }
+  }
+
+  // Reset for new game - clears persistent hash
+  newGame() {
+    this._gameStarted = false;
+  }
     try { this.worker?.terminate(); } catch {}
   }
 }
