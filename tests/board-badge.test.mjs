@@ -48,7 +48,7 @@ test('changing moves and rebuilding the board dismisses the old category label',
   a.call('paintBoard');
   assert.equal(tip.getAttribute('aria-hidden'), 'true');
   pointer(a, doc.querySelector('.sq-badge'), 'pointerenter');
-  assert.equal(tip.textContent, 'Superb');
+  assert.equal(tip.textContent, 'Great');
   a.call('buildBoard');
   assert.equal(tip.classList.contains('show'), false);
 });

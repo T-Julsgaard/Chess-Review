@@ -6,23 +6,23 @@
   "uses_emoji": false,
   "move_quality": {
     "brilliant": [
-      "{move}. Classification: masterstroke. This label is reserved for moves of exceptional depth. Usage today: 1.",
-      "{move} is a masterstroke. Statistically rare at all rating levels. An explanation for its appearance here is not in the data.",
-      "Masterstroke detected. {move}. Recalibrating expectations for this session. Recalibration complete. Expectations: raised.",
-      "{move}. Masterstroke. The second-best move was significantly worse. You did not play the second-best move. Noted with approval. Approval is a metric, not a feeling.",
-      "Classification: masterstroke. {move} survives all refutation attempts. Refutation attempts made: many. This unit does not experience being impressed. The log will show otherwise. The log is mistaken.",
-      "{move}. Masterstroke. Probability a player finds this move under game conditions: low single digits. Observed: once. Just now. By you.",
-      "Masterstroke. {move}. No further commentary required. Commentary continuing anyway: well done. Anomaly logged.",
-      "{move} is classified masterstroke. This system has analyzed millions of positions. It pauses on very few. Pause duration: noticeable."
+      "{move}. Classification: brilliant. This label is reserved for moves of exceptional depth. Usage today: 1.",
+      "{move} is brilliant. Statistically rare at all rating levels. An explanation for its appearance here is not in the data.",
+      "Brilliant move detected. {move}. Recalibrating expectations for this session. Recalibration complete. Expectations: raised.",
+      "{move}. Brilliant. The second-best move was significantly worse. You did not play the second-best move. Noted with approval. Approval is a metric, not a feeling.",
+      "Classification: brilliant. {move} survives all refutation attempts. Refutation attempts made: many. This unit does not experience being impressed. The log will show otherwise. The log is mistaken.",
+      "{move}. Brilliant. Probability a player finds this move under game conditions: low single digits. Observed: once. Just now. By you.",
+      "Brilliant move. {move}. No further commentary required. Commentary continuing anyway: well done. Anomaly logged.",
+      "{move} is classified brilliant. This system has analyzed millions of positions. It pauses on very few. Pause duration: noticeable."
     ],
     "great": [
-      "{move}. Superb move. Alternative moves lose. Quantity of acceptable alternatives: approximately zero.",
-      "Superb move. {move} was effectively forced, but only for players who saw it. Sample size of such players: small. You are in the sample.",
+      "{move}. Great move. Alternative moves lose. Quantity of acceptable alternatives: approximately zero.",
+      "Great move. {move} was effectively forced, but only for players who saw it. Sample size of such players: small. You are in the sample.",
       "{move}. The only move maintaining the evaluation. You located the only move. Search efficiency: commendable.",
-      "Classification: superb. One viable path existed. It was taken. The position's stress test: passed.",
+      "Classification: great. One viable path existed. It was taken. The position's stress test: passed.",
       "{move} holds the position. All siblings of this move fail. Sibling failure rate: 100 percent.",
-      "Superb move detected. Margin for error was zero. Error committed: zero. The numbers match. This unit values matching numbers.",
-      "{move}. Superb. Under pressure, accuracy typically degrades. Yours did not. Deviation from human baseline: positive."
+      "Great move detected. Margin for error was zero. Error committed: zero. The numbers match. This unit values matching numbers.",
+      "{move}. Great. Under pressure, accuracy typically degrades. Yours did not. Deviation from human baseline: positive."
     ],
     "best": [
       "{move}. Best move. Agreement between user and engine: total. This is the optimal state of affairs.",
@@ -34,58 +34,58 @@
       "{move}. Best. The annotation symbol would be two exclamation marks if this unit used exclamation marks. It does not. Imagine them."
     ],
     "excellent": [
-      "{move}. Near best. Deviation from optimal: marginal. Practical significance of deviation: negligible.",
-      "Near best move. The top engine line differs by an amount most humans cannot perceive. You are most humans in this respect. No offense is encoded in this statement.",
-      "{move} is near best. Position integrity: maintained. Plan integrity: maintained. Integrity in general: maintained.",
-      "Classification: near best. The move loses nothing measurable. This unit measures everything. Nothing was lost.",
-      "{move}. Near best. Cumulative accuracy this session is trending upward. Trends are not promises. Continue regardless.",
-      "Near best move. The evaluation moved within noise thresholds. Noise is acceptable. Signal is preferred. This was mostly signal.",
-      "{move}. Near best. A nearly-best move played confidently outperforms a best move played eventually. Clock data supports this claim."
+      "{move}. Excellent. Deviation from optimal: marginal. Practical significance of deviation: negligible.",
+      "Excellent move. The top engine line differs by an amount most humans cannot perceive. You are most humans in this respect. No offense is encoded in this statement.",
+      "{move} is excellent. Position integrity: maintained. Plan integrity: maintained. Integrity in general: maintained.",
+      "Classification: excellent. The move loses nothing measurable. This unit measures everything. Nothing was lost.",
+      "{move}. Excellent. Cumulative accuracy this session is trending upward. Trends are not promises. Continue regardless.",
+      "Excellent move. The evaluation moved within noise thresholds. Noise is acceptable. Signal is preferred. This was mostly signal.",
+      "{move}. Excellent. A nearly-best move played confidently outperforms a best move played eventually. Clock data supports this claim."
     ],
     "good": [
-      "{move}. Decent move. Superior options existed. Inferior options also existed, in larger quantity. You selected from the smaller set.",
-      "Decent. The position remains stable. Stability is underrated by users and correctly rated by this unit.",
-      "{move} is decent. Eval delta: small and negative. Within tolerances. Tolerances exist for exactly this purpose.",
-      "Classification: decent. Not the engine's preference. The engine's preferences are not mandatory. They are merely correct.",
-      "{move}. Decent. This move keeps all plans alive, including the plan of playing better moves later.",
-      "Decent move. The difference between decent and best in this position: visible to engines, invisible to spectators, payable in endgames.",
-      "{move}. Decent. Solid play detected. Pattern suggests user is concentrating. Recommendation: maintain current concentration settings."
+      "{move}. Good move. Superior options existed. Inferior options also existed, in larger quantity. You selected from the smaller set.",
+      "Good. The position remains stable. Stability is underrated by users and correctly rated by this unit.",
+      "{move} is good. Eval delta: small and negative. Within tolerances. Tolerances exist for exactly this purpose.",
+      "Classification: good. Not the engine's preference. The engine's preferences are not mandatory. They are merely correct.",
+      "{move}. Good. This move keeps all plans alive, including the plan of playing better moves later.",
+      "Good move. The difference between good and best in this position: visible to engines, invisible to spectators, payable in endgames.",
+      "{move}. Good. Solid play detected. Pattern suggests user is concentrating. Recommendation: maintain current concentration settings."
     ],
     "book": [
-      "{move}. Theory move. This position exists in the database many thousands of times. Your contribution is consistent with the database.",
+      "{move}. Book move. This position exists in the database many thousands of times. Your contribution is consistent with the database.",
       "Still in theory. Memory is currently doing the work. Understanding will be invoiced later in the game.",
       "{move} matches opening theory. Centuries of human analysis approve of this move. The engine also approves, which took considerably less time.",
-      "Theory. Known position. Known move. Known continuation available. The unknown begins shortly. Prepare accordingly.",
+      "Book. Known position. Known move. Known continuation available. The unknown begins shortly. Prepare accordingly.",
       "{move}. Theory. Cost of this move to you: zero thought required. Recommendation: spend the savings later, not never.",
-      "Theory move confirmed. The main line continues. Deviation statistics suggest your opponent leaves theory within several moves. Most do. Most regret it.",
-      "{move} is still theory. The masters tested this line extensively. Their results are in the database. Some of their regrets are also in the database."
+      "Book move confirmed. The main line continues. Deviation statistics suggest your opponent leaves theory within several moves. Most do. Most regret it.",
+      "{move} is still book. The masters tested this line extensively. Their results are in the database. Some of their regrets are also in the database."
     ],
     "inaccuracy": [
-      "{move}. Minor misstep. Eval reduced by a small amount. The amount has been logged. The log is permanent. The game continues.",
-      "Minor misstep detected. Severity: low. Trend relevance: to be determined by your next several moves.",
-      "{move} is a minor misstep. The better move was adjacent in concept and superior in consequence. Adjacency noted for training purposes.",
-      "Classification: minor misstep. No alarm is warranted. This unit does not have alarms. It has thresholds. None were crossed.",
+      "{move}. Inaccuracy. Eval reduced by a small amount. The amount has been logged. The log is permanent. The game continues.",
+      "Inaccuracy detected. Severity: low. Trend relevance: to be determined by your next several moves.",
+      "{move} is an inaccuracy. The better move was adjacent in concept and superior in consequence. Adjacency noted for training purposes.",
+      "Classification: inaccuracy. No alarm is warranted. This unit does not have alarms. It has thresholds. None were crossed.",
       "{move}. Slightly suboptimal. Human commentary would say 'no big deal.' This unit says: deal size logged at 0.3 deals.",
-      "Minor misstep. The position forgives this. Positions keep forgiving until, abruptly, they do not. The abruptness is documented.",
+      "Inaccuracy. The position forgives this. Positions keep forgiving until, abruptly, they do not. The abruptness is documented.",
       "{move}. Minor drift from best play. Drift is cumulative. See: every endgame you have ever lost. Reference available on request."
     ],
     "mistake": [
-      "{move}. Major misstep. Evaluation impact: significant. Emotional support: not in this unit's feature set. Accurate analysis: available immediately.",
-      "Major misstep detected. Cause analysis suggests a threat was not scanned. The scan takes three seconds. The major misstep will take longer.",
-      "{move} is a major misstep. The opponent now has a concrete path to advantage. Whether they find it is their problem. Preparing for them to find it is yours.",
-      "Classification: major misstep. The position has been damaged. Damage is repairable at additional cost. Costs compound. Begin repairs now.",
-      "{move}. Major misstep. This unit notes that the move was played quickly. Correlation between speed and error in your games: strong. The data has been trying to tell you this for some time.",
-      "Major misstep. The eval has moved against you. The eval does not negotiate. Your next move can. Make it a good one.",
-      "{move}. Major misstep confirmed. Historical note: your recovery rate after single major missteps is acceptable. After consecutive major missteps: see next move."
+      "{move}. Mistake. Evaluation impact: significant. Emotional support: not in this unit's feature set. Accurate analysis: available immediately.",
+      "Mistake detected. Cause analysis suggests a threat was not scanned. The scan takes three seconds. The mistake will take longer.",
+      "{move} is a mistake. The opponent now has a concrete path to advantage. Whether they find it is their problem. Preparing for them to find it is yours.",
+      "Classification: mistake. The position has been damaged. Damage is repairable at additional cost. Costs compound. Begin repairs now.",
+      "{move}. Mistake. This unit notes that the move was played quickly. Correlation between speed and error in your games: strong. The data has been trying to tell you this for some time.",
+      "Mistake. The eval has moved against you. The eval does not negotiate. Your next move can. Make it a good one.",
+      "{move}. Mistake confirmed. Historical note: your recovery rate after single mistakes is acceptable. After consecutive mistakes: see next move."
     ],
     "miss": [
-      "{move}. Missed chance. A significantly stronger continuation existed. It remains in the analysis, unexecuted. Unexecuted moves score zero points.",
-      "Missed chance detected. The tactic was present. Your search did not reach it. Search depth: the difference between this label and 'masterstroke.'",
+      "{move}. Missed opportunity. A significantly stronger continuation existed. It remains in the analysis, unexecuted. Unexecuted moves score zero points.",
+      "Miss detected. The tactic was present. Your search did not reach it. Search depth: the difference between this label and 'brilliant.'",
       "{move} overlooks the strongest idea. The idea was forcing. Forcing moves should be examined first. This is in every training manual. It is now also in this log.",
-      "Classification: missed chance. The win condition appeared briefly and was not selected. It may reappear. Probability: lower than before.",
+      "Classification: miss. The win condition appeared briefly and was not selected. It may reappear. Probability: lower than before.",
       "{move}. A stronger option existed and was visible at moderate depth. Your depth was less than moderate on this move. Depth is adjustable. Adjust it.",
       "Missed tactic. No material was lost. Opportunity was lost. Opportunity does not appear on the material count. It appears on the result.",
-      "{move}. Missed chance. This unit observed the better move at once. This unit also checks millions of positions per second. Your excuse is valid. Your homework is unchanged."
+      "{move}. Miss. This unit observed the better move at once. This unit also checks millions of positions per second. Your excuse is valid. Your homework is unchanged."
     ],
     "blunder": [
       "{move}. Blunder. The evaluation has changed substantially. This unit's tone has not. One of these facts may be helpful to you.",
@@ -115,7 +115,7 @@
     "starting_position": [
       "Starting position. Evaluation: equal. It will not remain equal. It never does.",
       "Initial position loaded. Theoretical result with perfect play: draw. Perfect play has never been observed. Proceed.",
-      "Game start. All pieces present. All missteps pending.",
+      "Game start. All pieces present. All mistakes pending.",
       "Starting position. Your move accuracy is currently 100 percent. This statistic has nowhere to go but down. Defend it."
     ],
     "variation_exploration": [
@@ -341,7 +341,7 @@
     "hard_fought_draw": [
       "Result: draw. Effort detected on both sides throughout. Eval volatility: high. Final deviation from equality: zero. An honest result. The database respects honest results.",
       "Draw recorded after sustained resistance. Defensive accuracy under pressure was the decisive statistic. It is the least practiced statistic in chess. Yours functioned today.",
-      "Hard-fought draw. Neither player's errors survived to the scoresheet. Mutual cancellation of missteps: the most common form of fairness available.",
+      "Hard-fought draw. Neither player's errors survived to the scoresheet. Mutual cancellation of mistakes: the most common form of fairness available.",
       "Result: ½–½, contested fully. Note: this draw contained more useful training data than most wins. Extraction is recommended. The half point is fixed. The lessons are not capped."
     ],
     "loss": [
@@ -354,9 +354,9 @@
   "practice": {
     "loading_first": [
       "Practice mode initiated. Retrieving first error. Error retrieval is instant. Error correction takes longer. That is why we are here.",
-      "Loading first position. Source: your game. Difficulty: calibrated by your own misstep. Personalized training, generated free of charge by past you.",
+      "Loading first position. Source: your game. Difficulty: calibrated by your own mistake. Personalized training, generated free of charge by past you.",
       "First exercise queued. The position contains one wrong move — already played — and at least one right move — pending. Invert history.",
-      "Session start. First misstep loading. This unit finds reviewing errors restful. User results may vary. Proceed."
+      "Session start. First mistake loading. This unit finds reviewing errors restful. User results may vary. Proceed."
     ],
     "prompt_find_better": [
       "Position loaded. You played {move}, classified {label}. A better move exists. It existed then. It exists now. Find it under improved conditions: unlimited time, zero pressure, one hint in reserve.",
@@ -373,8 +373,8 @@
     ],
     "correct_final": [
       "Correct. Final position solved. Session summary: all errors revisited, all corrections found. Dataset closed. This is what complete processing looks like. It is rare. It is logged.",
-      "Solution verified. That was the last one. Every misstep from the game has been overwritten with its correction. Memory consolidation occurs offline. Sleep is, technically, part of training.",
-      "Final exercise complete. Error set: fully processed. The game that produced these missteps has now produced more value than most wins. Accounting closed in your favor.",
+      "Solution verified. That was the last one. Every mistake from the game has been overwritten with its correction. Memory consolidation occurs offline. Sleep is, technically, part of training.",
+      "Final exercise complete. Error set: fully processed. The game that produced these mistakes has now produced more value than most wins. Accounting closed in your favor.",
       "Correct, and the queue is empty. Full sweep recorded. Statistical note: users who complete entire correction sets are a small minority. Membership updated."
     ],
     "close_try_again": [

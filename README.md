@@ -15,7 +15,7 @@ rating. No account, no server, no manual PGN copying.
 
 - **One-click review** of any Chess.com or Lichess game — or paste a game URL / raw PGN.
 - **Accuracy estimates** for both players, calculated from local Stockfish analysis using the extension's scoring rules. Scores can differ from other review tools.
-- **Move classifications** from Masterstroke to Blunder, with an evaluation graph and best-move arrows.
+- **Move classifications** from Brilliant to Blunder, with an evaluation graph and best-move arrows.
 - **Estimated rating** — a rough guide to the level each player performed at in the game.
 - **Opening detection** from an offline book, named even for PGNs without headers.
 - **Explore board** from the popup, without loading a game: try legal moves, browse

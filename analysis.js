@@ -71,15 +71,15 @@ const ACCENTS = {
 // Annotation names and colors stay independent of move grades. The saved SVGs
 
 const QUALITY = {
-  brilliant: { sym: "!!", name: "Masterstroke", color: "var(--q-brilliant)", icon: "brilliant" },
-  great:     { sym: "!",  name: "Superb",    color: "var(--q-great)",     icon: "great" },
+  brilliant: { sym: "!!", name: "Brilliant", color: "var(--q-brilliant)", icon: "brilliant" },
+  great:     { sym: "!",  name: "Great",     color: "var(--q-great)",     icon: "great" },
   best:      { sym: "★",  name: "Best",      color: "var(--q-best)",      icon: "best" },
-  excellent: { sym: "✓",  name: "Near best", color: "var(--q-excellent)", icon: "excellent" },
-  good:      { sym: "✓",  name: "Decent",    color: "var(--q-good)",      icon: "good" },
-  book:      { sym: "◇",  name: "Theory",    color: "var(--q-book)",      icon: "book" },
-  inacc:     { sym: "?!", name: "Minor Misstep", color: "var(--q-inacc)", icon: "inaccuracy" },
-  mistake:   { sym: "?",  name: "Major Misstep", color: "var(--q-mistake)", icon: "mistake" },
-  miss:      { sym: "✕",  name: "Missed chance", color: "var(--q-miss)", icon: "miss" },
+  excellent: { sym: "✓",  name: "Excellent", color: "var(--q-excellent)", icon: "excellent" },
+  good:      { sym: "✓",  name: "Good",      color: "var(--q-good)",      icon: "good" },
+  book:      { sym: "◇",  name: "Book",      color: "var(--q-book)",      icon: "book" },
+  inacc:     { sym: "?!", name: "Inaccuracy",color: "var(--q-inacc)",     icon: "inaccuracy" },
+  mistake:   { sym: "?",  name: "Mistake",   color: "var(--q-mistake)",   icon: "mistake" },
+  miss:      { sym: "✕",  name: "Miss",      color: "var(--q-miss)",      icon: "miss" },
   blunder:   { sym: "??", name: "Blunder",   color: "var(--q-blunder)",   icon: "blunder" },
 };
 const QUALITY_ORDER = ["brilliant","great","best","excellent","good","book","inacc","mistake","miss","blunder"];
@@ -87,9 +87,9 @@ const QUALITY_ORDER = ["brilliant","great","best","excellent","good","book","ina
 const QBREAK_SUMMARY = ["brilliant","great","best","mistake","miss","blunder"];
 const QBREAK_FULL = ["brilliant","great","book","best","excellent","good","inacc","mistake","miss","blunder"];
 const QUALITY_LABEL = {
-  brilliant: "Masterstroke!", great: "Superb move!", best: "Best move",
-  excellent: "Near best", good: "Decent move", book: "Theory move",
-  inacc: "Minor Misstep", mistake: "Major Misstep", miss: "Missed chance", blunder: "Blunder",
+  brilliant: "Brilliant move!", great: "Great move!", best: "Best move",
+  excellent: "Excellent", good: "Good move", book: "Book move",
+  inacc: "Inaccuracy", mistake: "Mistake", miss: "Missed chance", blunder: "Blunder",
 };
 const NOTEWORTHY = new Set(["brilliant","great","inacc","mistake","miss","blunder"]);
 
@@ -103,8 +103,8 @@ const QUALITY_DESC = {
   excellent: "Not the top move, but nearly as strong (loses well under half a pawn), or a move that begins or keeps a forced mate.",
   good:      "A solid move (loses roughly half to one pawn), or one that delays an unavoidable mate.",
   book:      "A known opening move — the position is in the opening book (theory from a large game dataset).",
-  inacc:     "Minor Misstep: a move that loses about 1–4 pawns of eval.",
-  mistake:   "Major Misstep: a move that throws away a clear (≥2 pawn) advantage, or hands the opponent one.",
+  inacc:     "Inaccuracy: a move that loses about 1–4 pawns of eval.",
+  mistake:   "Mistake: a move that throws away a clear (≥2 pawn) advantage, or hands the opponent one.",
   miss:      "Missed chance: the opponent erred and you failed to punish it — or you let a forced mate slip.",
   blunder:   "Blunder: a move that loses ~4+ pawns of eval, or walks into a forced mate.",
 };
@@ -117,15 +117,15 @@ const ENGINE_INFO = {
   classifyLines: "Lines searched per position during the analysis batch. 1 is fastest and is all the move classification needs; raising it measures your move in the same search (steadier accuracy/Elo) and pre-fills the panel. Re-analyzes the game.",
   engineDepth:   "How many plies (half-moves) deep Stockfish searches each position. Higher depth gives more accurate evaluations and fewer false mistakes, but takes longer.",
   engineWorkers: "Number of Stockfish instances analysing positions in parallel. More workers finish the game faster on multi-core CPUs; the results are identical.",
-  fastAnalysis:  "Trades quality for speed: the classification pass uses fewer engine lines. ~1.3×/1.6× faster, but evals shift slightly and clean games can pick up a few false minor missteps.",
+  fastAnalysis:  "Trades quality for speed: the classification pass uses fewer engine lines. ~1.3×/1.6× faster, but evals shift slightly and clean games can pick up a few false inaccuracies.",
   enginePath:    "Stockfish 18 NNUE is the default. Stockfish 19 Lite uses a smaller evaluation network for a compact alternative. Both run locally; Lite is not the full-strength Stockfish 19 build.",
   engineSkill:   "Caps the engine's playing strength (Stockfish 'Skill Level'). Max (20) = full strength. Lower values play deliberately weaker — useful for more human-like suggestions.",
   engineHash:    "Recommended: 16 MB for most reviews (the default). Try 32–64 MB for deeper analysis if your computer has spare memory. Each parallel worker uses its own hash table, so memory use is roughly Hash × Workers.",
-  clsGood:       "A move that loses at least this much eval (in pawns) can be no better than \"Decent\". Below it, the move is \"Near best\". Lower = stricter.",
-  clsInacc:      "A move that loses at least this much eval (pawns) is flagged \"Minor Misstep\". Lower = more minor missteps.",
+  clsGood:       "A move that loses at least this much eval (in pawns) can be no better than \"Good\". Below it, the move is \"Excellent\". Lower = stricter.",
+  clsInacc:      "A move that loses at least this much eval (pawns) is flagged \"Inaccuracy\". Lower = more inaccuracies.",
   clsBlunder:    "A move that loses at least this much eval (pawns) is a \"Blunder\". Lower = more blunders.",
-  clsClearAdv:   "How many pawns counts as a \"clear advantage\". Used to decide Major Missteps (you threw away a clear advantage), Missed chances, and the context for Superb moves.",
-  clsMistakeLoss:"Minimum eval lost (pawns) for a move to qualify as a Major Misstep, and for a slip to be \"punishable\" (enabling a Superb move or Missed chance on the reply).",
+  clsClearAdv:   "How many pawns counts as a \"clear advantage\". Used to decide Mistakes (you threw away a clear advantage), Misses, and the context for Great moves.",
+  clsMistakeLoss:"Minimum eval lost (pawns) for a move to qualify as a Mistake, and for a slip to be \"punishable\" (enabling a Great move or Missed chance on the reply).",
   clsMissTol:    "How close to giving back the whole advantage still counts as a Missed chance rather than a clean punish. Higher = more missed chances.",
 };
 
@@ -952,7 +952,7 @@ function brilliantEligible(i, mover, std, wpDrop, state) {
   if (alternative.mate != null) return alternative.mate < 0;
   return Number.isFinite(alternative.cp) && alternative.cp / 100 < BRILLIANT_POLICY.clearlyWinningPawns;
 }
-// Superb means finding the only good reply, not merely replying after an error. The runner-up
+// Great means finding the only good reply, not merely replying after an error. The runner-up
 // must be worse than the Good band in the same completed root depth. With one line, this is
 // unknown; retain the ordinary category without scheduling more engine searches.
 function onlyGoodReply(i, state) {
@@ -2690,15 +2690,15 @@ function renderControls() {
 
 // Natural phrasing for the move that led to the current position, keyed by classification.
 const COMMENT_PHRASE = {
-  brilliant: (m) => `${m} is a masterstroke.`,
-  great:     (m) => `${m} is a superb move.`,
+  brilliant: (m) => `${m} is a brilliant find.`,
+  great:     (m) => `${m} is a great move.`,
   best:      (m) => `${m} is the best move.`,
-  excellent: (m) => `${m} is near best.`,
-  good:      (m) => `${m} is a decent move.`,
-  book:      (m) => `${m} follows opening theory.`,
-  inacc:     (m) => `${m} is a minor misstep.`,
-  mistake:   (m) => `${m} is a major misstep.`,
-  miss:      (m) => `${m} is a missed chance.`,
+  excellent: (m) => `${m} is excellent.`,
+  good:      (m) => `${m} is a good move.`,
+  book:      (m) => `${m} is a book move.`,
+  inacc:     (m) => `${m} is an inaccuracy.`,
+  mistake:   (m) => `${m} is a mistake.`,
+  miss:      (m) => `${m} misses a stronger chance.`,
   blunder:   (m) => `${m} is a blunder.`,
 };
 // SAN of the engine's best move in the position BEFORE ply `idx` (the alternative to what was played).
@@ -4437,21 +4437,21 @@ function motorSettings() {
     section("Move classification",
       el("div", { class: "set-row hint" },
         el("span", { class: "set-note" }, "How move quality is graded, in pawns of evaluation lost vs the engine's best move. Changes re-label the game instantly — no re-analysis.")),
-      clsSlider("Decent above", "clsGood", 0.1, 1.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsGood }),
-      clsSlider("Minor Misstep above", "clsInacc", 0.3, 2.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsInacc }),
+      clsSlider("Good above", "clsGood", 0.1, 1.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsGood }),
+      clsSlider("Inaccuracy above", "clsInacc", 0.3, 2.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsInacc }),
       clsSlider("Blunder above", "clsBlunder", 1.5, 8, 0.1, { fmt: pawnsFmt, info: ENGINE_INFO.clsBlunder }),
       clsSlider("Clear advantage", "clsClearAdv", 1, 5, 0.1, { fmt: pawnsFmt, info: ENGINE_INFO.clsClearAdv }),
-      clsSlider("Major Misstep min. loss", "clsMistakeLoss", 0.5, 3, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsMistakeLoss }),
-      clsSlider("Missed chance tolerance", "clsMissTol", 0, 1.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsMissTol }),
+      clsSlider("Mistake min. loss", "clsMistakeLoss", 0.5, 3, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsMistakeLoss }),
+      clsSlider("Miss tolerance", "clsMissTol", 0, 1.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsMissTol }),
     ),
     section("Accuracy points",
       el("div", { class: "set-row hint" },
-        el("span", { class: "set-note" }, "These per-move scores are averaged when category-based accuracy is active (Best / Masterstroke / Superb / Theory are always 100). Win%-based accuracy instead uses the engine evaluations.")),
-      clsSlider("Near best", "accExcellent", 0, 100, 1, { fmt: ptsFmt }),
-      clsSlider("Decent", "accGood", 0, 100, 1, { fmt: ptsFmt }),
-      clsSlider("Minor Misstep", "accInacc", 0, 100, 1, { fmt: ptsFmt }),
+        el("span", { class: "set-note" }, "These per-move scores are averaged when category-based accuracy is active (Best / Brilliant / Great / Book are always 100). Win%-based accuracy instead uses the engine evaluations.")),
+      clsSlider("Excellent", "accExcellent", 0, 100, 1, { fmt: ptsFmt }),
+      clsSlider("Good", "accGood", 0, 100, 1, { fmt: ptsFmt }),
+      clsSlider("Inaccuracy", "accInacc", 0, 100, 1, { fmt: ptsFmt }),
       clsSlider("Missed chance", "accMiss", 0, 100, 1, { fmt: ptsFmt }),
-      clsSlider("Major Misstep", "accMistake", 0, 100, 1, { fmt: ptsFmt }),
+      clsSlider("Mistake", "accMistake", 0, 100, 1, { fmt: ptsFmt }),
       clsSlider("Blunder", "accBlunder", 0, 100, 1, { fmt: ptsFmt }),
     ),
     section("Engine",

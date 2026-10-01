@@ -22,7 +22,7 @@ export function moveGrade(category, loss, thresholds = {}, criticalLoss = null) 
   let grade;
   if (cfg.min === cfg.max) grade = cfg.min;
   else if (category === 'great') {
-    // The gap to the runner-up is already required by the Superb classifier.
+    // The gap to the runner-up is already required by the Great classifier.
     const t = clamp(((finite(criticalLoss) ? criticalLoss : bands.inacc) - bands.inacc)
       / Math.max(1, cfg.criticalLossMax - bands.inacc), 0, 1);
     grade = cfg.min + (cfg.max - cfg.min) * t;

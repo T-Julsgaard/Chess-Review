@@ -5,7 +5,7 @@ import { JSDOM } from 'jsdom';
 import { MOVE_GRADE_CONFIG, moveGrade, gradeSvg, gradeLabel, gradeText } from '../move-grades.js';
 import { app, loadGame, branch, deferred, fakeEngine, settle } from './helpers/app.mjs';
 
-test('category ranges stay bounded and only Masterstroke can round to ten', () => {
+test('category ranges stay bounded and only Brilliant can round to ten', () => {
   for (const [category, cfg] of Object.entries(MOVE_GRADE_CONFIG)) {
     for (let loss = 0; loss <= 100; loss += .13) {
       const score = moveGrade(category, loss, {}, 100);
@@ -37,15 +37,15 @@ test('ordinary grades vary monotonically within the classifier loss bands', () =
   assert.ok(moveGrade('great', 0, {}, 45) > moveGrade('great', 0, {}, 5));
 });
 
-test('missing evidence stays pending; custom labels are escaped and Theory never gets a score', () => {
+test('missing evidence stays pending; custom labels are escaped and Book never gets a score', () => {
   for (const loss of [null, undefined, NaN, Infinity]) assert.equal(moveGrade('blunder', loss), null);
   assert.equal(gradeLabel('blunder', null, 'Blunder'), 'Blunder, score pending');
-  assert.equal(gradeLabel('book', null, 'Theory'), 'Theory');
-  const doc = new JSDOM(gradeSvg('good', 5.3, '<b>Decent</b>'), {contentType:'image/svg+xml'}).window.document;
-  assert.equal(doc.querySelector('svg').getAttribute('aria-label'), '<b>Decent</b>, score 5.3');
+  assert.equal(gradeLabel('book', null, 'Book'), 'Book');
+  const doc = new JSDOM(gradeSvg('good', 5.3, '<b>Good</b>'), {contentType:'image/svg+xml'}).window.document;
+  assert.equal(doc.querySelector('svg').getAttribute('aria-label'), '<b>Good</b>, score 5.3');
   assert.equal(doc.querySelector('b'), null);
   assert.equal(doc.querySelector('text').textContent, '5.3');
-  assert.equal(new JSDOM(gradeSvg('book', null, 'Theory'), {contentType:'image/svg+xml'}).window.document.querySelector('text'), null);
+  assert.equal(new JSDOM(gradeSvg('book', null, 'Book'), {contentType:'image/svg+xml'}).window.document.querySelector('text'), null);
 });
 
 test('numeric reference snapshots retain the exact original circles and shared renderer', () => {
@@ -56,7 +56,7 @@ test('numeric reference snapshots retain the exact original circles and shared r
     const doc = new JSDOM(saved, {contentType:'image/svg+xml'}).window.document;
     assert.equal(doc.querySelector('circle').outerHTML, original.querySelector('svg > circle').outerHTML);
     assert.equal(doc.querySelector('circle').getAttribute('fill'), cfg.color);
-    const names = {brilliant:'Masterstroke',great:'Superb',book:'Theory',best:'Best',excellent:'Near best',good:'Decent',inacc:'Minor Misstep',mistake:'Major Misstep',miss:'Missed chance',blunder:'Blunder'};
+    const names = {brilliant:'Brilliant',great:'Great',book:'Book',best:'Best',excellent:'Excellent',good:'Good',inacc:'Inaccuracy',mistake:'Mistake',miss:'Miss',blunder:'Blunder'};
     assert.equal(saved.replace(/\r\n/g, '\n'), gradeSvg(category, null, names[category], true) + '\n');
     assert.equal(doc.querySelectorAll('linearGradient,radialGradient,filter').length, 0);
   }
@@ -83,7 +83,7 @@ test('board score changes preserve the focused badge and animate only its numera
   a.state.moveGrades[1]=5.4; a.call('paintBoard');
   assert.equal(doc.querySelector('.sq-badge'), badge);
   assert.equal(doc.activeElement, badge);
-  assert.equal(badge.getAttribute('aria-label'), 'Decent, score 5.4');
+  assert.equal(badge.getAttribute('aria-label'), 'Good, score 5.4');
   assert.ok(badge.querySelector('text').classList.contains('grade-updated'));
   assert.equal(badge.querySelector('circle').classList.contains('grade-updated'), false);
   a.call('paintBoard'); assert.equal(doc.querySelector('.sq-badge'), badge);
@@ -96,7 +96,7 @@ test('move list refreshes a decimal even when its category stays unchanged', t =
   a.state.moveGrades[1]=3.6;a.call('renderMoves');
   assert.equal(doc.querySelector('.ml-move[data-ply="1"]'),cell);
   assert.equal(cell.querySelector('.qb'),badge);
-  assert.equal(badge.getAttribute('aria-label'),'Minor Misstep, score 3.6');
+  assert.equal(badge.getAttribute('aria-label'),'Inaccuracy, score 3.6');
 });
 
 test('mainline and Explore grades agree and do not depend on player rating', t => {

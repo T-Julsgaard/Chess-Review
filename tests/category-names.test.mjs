@@ -72,13 +72,13 @@ test('renaming refreshes badge labels, tooltips, and cached move commentary', t 
   a.call('showQTip', a.dom.window.document.querySelector('[data-category="brilliant"]'), 'brilliant');
   assert.equal(a.dom.window.document.querySelector('.q-tip-nm').textContent, 'Inspired');
   assert.match(a.run('_ipText'), /Inspired/);
-  assert.doesNotMatch(a.run('_ipText'), /masterstroke/i);
+  assert.doesNotMatch(a.run('_ipText'), /brilliant/i);
 });
 
 test('aliases remain plain text and do not recurse through coach names or tokens', t => {
   const a = review(t);
   a.state.settings.categoryNames = { brilliant: 'Blunder', blunder: '<b>{move}</b>' };
-  assert.equal(a.call('coachFill', 'Masterstroke! Blunder. {label}', { label: 'Blunder' }), 'Blunder! <b>{move}</b>. Blunder');
+  assert.equal(a.call('coachFill', 'Brilliant! Blunder. {label}', { label: 'Blunder' }), 'Blunder! <b>{move}</b>. Blunder');
   a.call('renderStats');
   const label = a.dom.window.document.querySelector('[data-category="blunder"] .nm');
   assert.equal(label.textContent, '<b>{move}</b>');

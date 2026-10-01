@@ -7,21 +7,21 @@
   "move_quality": {
     "brilliant": [
       "{move}?!?! ARE YOU KIDDING ME. MUSEUM. PUT IT IN A MUSEUM. 🐐",
-      "MASTERSTROKE!!! THE ENGINE IS SHOOK. I'M SHOOK. THE BOARD NEEDS A MINUTE.",
+      "BRILLIANT!!! THE ENGINE IS SHOOK. I'M SHOOK. THE BOARD NEEDS A MINUTE.",
       "{move} IS CINEMA. ABSOLUTE CINEMA. Somebody clip this FOREVER.",
       "NO WAY. NO. WAY. {move} just broke the simulation. GOAT BEHAVIOR. 🔥",
       "THE DISRESPECT of {move}!! You can't DO that to a chess position. You DID that to a chess position.",
-      "MASTERSTROKE ALERT 🚨 The group chat is getting this one. The group chat NEEDS this one.",
+      "BRILLIANT MOVE ALERT 🚨 The group chat is getting this one. The group chat NEEDS this one.",
       "{move}!!! I just woke up my neighbors. Worth it. EVERY decibel was worth it.",
-      "That's a MASTERSTROKE. Hall of Fame. First ballot. Unanimous. NEXT QUESTION."
+      "That's a BRILLIANCY. Hall of Fame. First ballot. Unanimous. NEXT QUESTION."
     ],
     "great": [
       "{move} — THE ONLY MOVE THAT WORKS AND YOU FOUND IT. CLUTCH GENE. CONFIRMED. 💯",
-      "SUPERB move!! One path through the fire and you WALKED it. Built different.",
+      "GREAT move!! One path through the fire and you WALKED it. Built different.",
       "{move}!! The position said 'find the answer or perish' and you said 'BET.'",
-      "THAT'S the superb move!! Tightrope, no net, FULL SEND. This is why we watch.",
+      "THAT'S the great move!! Tightrope, no net, FULL SEND. This is why we watch.",
       "{move} holds EVERYTHING together. Atlas move. Carrying the whole position. CARRY GANG.",
-      "SUPERB!! Needle, threaded. Clutch, certified. Doubters, silent.",
+      "GREAT!! Needle, threaded. Clutch, certified. Doubters, silent.",
       "{move} was basically the only move and you SNIFFED IT OUT. Killer instinct is REAL."
     ],
     "best": [
@@ -34,57 +34,57 @@
       "{move} — certified BEST. Stack these and the W stacks ITSELF. 💯"
     ],
     "excellent": [
-      "{move} is NEAR BEST. Not the top engine line — BETTER, it's YOURS.",
-      "NEAR BEST!! That's championship-level decision making. CHAMPIONSHIP. LEVEL.",
-      "{move} — near best move!! The position stays YOURS. Landlord behavior.",
-      "Near best!! You're not even breaking a sweat. CRUISE CONTROL at 100. 🔥",
-      "{move} is NEAR BEST. Keep this pace and they'll study this game in SCHOOLS.",
-      "NEAR BEST move. Solid. Powerful. ZERO doubt in the building.",
-      "{move}!! Near best. The eval said 'no notes.' NO NOTES!!"
+      "{move} is EXCELLENT. Not the top engine line — BETTER, it's YOURS.",
+      "EXCELLENT!! That's championship-level decision making. CHAMPIONSHIP. LEVEL.",
+      "{move} — excellent move!! The position stays YOURS. Landlord behavior.",
+      "Excellent!! You're not even breaking a sweat. CRUISE CONTROL at 100. 🔥",
+      "{move} is EXCELLENT. Keep this pace and they'll study this game in SCHOOLS.",
+      "EXCELLENT move. Solid. Powerful. ZERO doubt in the building.",
+      "{move}!! Excellent. The eval said 'no notes.' NO NOTES!!"
     ],
     "good": [
-      "{move} is DECENT. Respectable. Professional. The fundamentals are FUNDAMENTAL-ING.",
-      "Decent move!! Not the flashiest — DOESN'T MATTER. Ws are built on these.",
-      "{move} — decent. Keeping it steady. Steady is UNDERRATED. Like you. WERE. Past tense!!",
-      "DECENT move. The haters wanted a wobble. DENIED.",
-      "{move} is decent!! Brick by brick!! That's how dynasties get BUILT.",
-      "Decent!! There was a spicier option but consistency is ALSO a flex. 💯",
-      "{move}, decent move. Quiet bar. Loud résumé. We keep moving."
+      "{move} is GOOD. Respectable. Professional. The fundamentals are FUNDAMENTAL-ING.",
+      "Good move!! Not the flashiest — DOESN'T MATTER. Ws are built on these.",
+      "{move} — good. Keeping it steady. Steady is UNDERRATED. Like you. WERE. Past tense!!",
+      "GOOD move. The haters wanted a wobble. DENIED.",
+      "{move} is good!! Brick by brick!! That's how dynasties get BUILT.",
+      "Good!! There was a spicier option but consistency is ALSO a flex. 💯",
+      "{move}, good move. Quiet bar. Loud résumé. We keep moving."
     ],
     "book": [
-      "{move} — STILL THEORY. You're walking the path of LEGENDS and you belong on it.",
-      "Theory move!! Theory certified. The classics RESPECT you for this one.",
+      "{move} — STILL BOOK. You're walking the path of LEGENDS and you belong on it.",
+      "Book move!! Theory certified. The classics RESPECT you for this one.",
       "{move} is straight theory. Studying the greats to BECOME one. CULTURE. 📚 wait no emoji for books. FIRE though. 🔥",
-      "Still in theory!! You did the HOMEWORK. Prepared athletes are DANGEROUS athletes.",
+      "Still in book!! You did the HOMEWORK. Prepared athletes are DANGEROUS athletes.",
       "{move}, known theory. The GOATs played it first. You're playing it NEXT. Lineage!!",
-      "THEORY. The opening is on rails and the rails are PAID FOR.",
+      "BOOK. The opening is on rails and the rails are PAID FOR.",
       "{move} — theory says yes. The ancestors of this opening are NODDING."
     ],
     "inaccuracy": [
       "{move} is a LITTLE off. Tiny wobble. Even prime athletes miss free throws. MOVING ON.",
-      "Small minor misstep!! That's not a stumble, that's a CROWD-WORK moment. Refocus!!",
+      "Small inaccuracy!! That's not a stumble, that's a CROWD-WORK moment. Refocus!!",
       "{move} — slightly inaccurate. The eval flinched. It did NOT fall. WE do not fall.",
       "Minor slip!! The highlight reel doesn't even keep this part. NEXT.",
       "{move} drifted a touch. Champions drift. Champions CORRECT. Correct!!",
-      "A minor misstep. Barely. The comeback arc needed a LITTLE adversity anyway.",
+      "An inaccuracy. Barely. The comeback arc needed a LITTLE adversity anyway.",
       "{move} was a half-step slow. HALF-step. You've got nine more gears. USE ONE."
     ],
     "mistake": [
-      "{move} is a major misstep. PAUSE. Breathe. Legends have BAD QUARTERS. They don't have bad CAREERS.",
-      "A MAJOR MISSTEP?! Fine. FINE. This is the adversity montage. The music is building. LOCK IN.",
+      "{move} is a mistake. PAUSE. Breathe. Legends have BAD QUARTERS. They don't have bad CAREERS.",
+      "A MISTAKE?! Fine. FINE. This is the adversity montage. The music is building. LOCK IN.",
       "{move} hurt us. Real talk. But pressure makes DIAMONDS and you're already carbon-based. SCIENCE!!",
-      "Major misstep on the board. The doubters just sat up. Make them SIT BACK DOWN.",
-      "{move} — that's a major misstep. Every GOAT has a game-five moment. THIS is yours. RESPOND.",
-      "A major misstep!! You know what's undefeated? THE BOUNCE-BACK. Show me the bounce-back. 🔥",
-      "{move} was a major misstep. Down but NOT out. The greatest comebacks start EXACTLY here."
+      "Mistake on the board. The doubters just sat up. Make them SIT BACK DOWN.",
+      "{move} — that's a mistake. Every GOAT has a game-five moment. THIS is yours. RESPOND.",
+      "A mistake!! You know what's undefeated? THE BOUNCE-BACK. Show me the bounce-back. 🔥",
+      "{move} was a mistake. Down but NOT out. The greatest comebacks start EXACTLY here."
     ],
     "miss": [
       "{move} MISSED ONE. There was a HIGHLIGHT in that position and it's still there crying. GO BACK FOR IT next time.",
-      "A missed chance!! The poster dunk was RIGHT THERE. You laid it in. STILL two points but COME ON. 🚨",
+      "A miss!! The poster dunk was RIGHT THERE. You laid it in. STILL two points but COME ON. 🚨",
       "{move} walked past GREATNESS. Greatness is patient. It'll knock again. ANSWER IT.",
       "You missed the killshot!! The position offered you the MOMENT. Stay hungry for the MOMENT.",
-      "{move} — missed chance. The clip that COULD have been. Train the eyes. The eyes WIN games.",
-      "A missed chance. Okay. The legend grows anyway, but scan for tactics EVERY move. Every. Move.",
+      "{move} — missed opportunity. The clip that COULD have been. Train the eyes. The eyes WIN games.",
+      "A MISS. Okay. The legend grows anyway, but scan for tactics EVERY move. Every. Move.",
       "{move} skipped the highlight. Next time we take the SHOT. We are a TAKE-THE-SHOT program."
     ],
     "blunder": [
@@ -353,10 +353,10 @@
   },
   "practice": {
     "loading_first": [
-      "FILM SESSION!! Loading your first misstep. Champions WATCH THE TAPE. 🚨",
+      "FILM SESSION!! Loading your first mistake. Champions WATCH THE TAPE. 🚨",
       "Setting up rep ONE. We're not hiding from the L moments — we're FARMING them.",
       "First puzzle incoming!! The grind room is OPEN. Towels are FREE.",
-      "Loading the tape!! Missteps are just unclaimed HIGHLIGHTS. Go claim one."
+      "Loading the tape!! Mistakes are just unclaimed HIGHLIGHTS. Go claim one."
     ],
     "prompt_find_better": [
       "Right HERE you played {move} — graded {label}. The better play is ON THE BOARD. HUNT IT. 🔥",
@@ -372,7 +372,7 @@
       "YES!! Nailed it. The grind is GRINDING. Keep the line moving!!"
     ],
     "correct_final": [
-      "LAST ONE — SOLVED!!! Every misstep from that game just got DELETED and UPGRADED. FULL session sweep!! 🐐",
+      "LAST ONE — SOLVED!!! Every mistake from that game just got DELETED and UPGRADED. FULL session sweep!! 🐐",
       "THAT'S THE SET!! Every error, corrected. You ran the WHOLE gauntlet. Banner-worthy work.",
       "FINAL REP — DONE. You faced every L moment and flipped them ALL. That's CHAMPION homework.",
       "ALL CLEAR!! The tape is clean. The lessons are BANKED. Next game fears you ALREADY. 🔥"

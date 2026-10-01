@@ -89,7 +89,7 @@ test('original PGN IDs remain stable and distinct', t => {
   assert.equal(a.call('simpleHash',''),'45h');
 });
 
-function superbScenario(a, color = 'w') {
+function greatScenario(a, color = 'w') {
   const white = color === 'w';
   const S = loadGame(a, white ? '1. e4 e5 2. Nf3' : '1. e4 e5',
     (white ? [0,0,400,400] : [0,-400,-400]).map(cp => ({cp})));
@@ -101,10 +101,10 @@ function superbScenario(a, color = 'w') {
   return {S,ply,played,alternative};
 }
 
-test('Superb needs evidence that other replies are outside the Good band, for either side', t => {
+test('Great needs evidence that other replies are outside the Good band, for either side', t => {
   const a = app(t);
   for (const color of ['w','b']) {
-    const {S,ply} = superbScenario(a,color);
+    const {S,ply} = greatScenario(a,color);
     a.call('computeDerived'); assert.equal(S.classif[ply],'great');
     for (let start = 0; start < ply; start++) {
       const v = branch(a,start); a.call('classifyVariationMoves');
@@ -117,7 +117,7 @@ test('Superb needs evidence that other replies are outside the Good band, for ei
   }
 });
 
-test('stale, bounded, duplicated, illegal or metadata-free alternatives cannot certify Superb', t => {
+test('stale, bounded, duplicated, illegal or metadata-free alternatives cannot certify Great', t => {
   const a = app(t);
   const edits = [
     root => {root.lines[1].depth = 15;},
@@ -131,16 +131,16 @@ test('stale, bounded, duplicated, illegal or metadata-free alternatives cannot c
     root => {root.bestmove = 'b1c3';},
   ];
   for (const edit of edits) {
-    const {S,ply} = superbScenario(a); edit(S.bests[ply-1]);
+    const {S,ply} = greatScenario(a); edit(S.bests[ply-1]);
     a.call('computeDerived'); assert.notEqual(S.classif[ply],'great');
   }
-  const {S,ply} = superbScenario(a);
+  const {S,ply} = greatScenario(a);
   S.bests[ply].lines = [{multipv:1,bound:'upperbound'}];
   a.call('computeDerived'); assert.notEqual(S.classif[ply],'great');
 });
 
-test('Superb evidence uses the configured loss boundary and does not change evaluation scores', t => {
-  const a = app(t), {S,ply} = superbScenario(a);
+test('Great evidence uses the configured loss boundary and does not change evaluation scores', t => {
+  const a = app(t), {S,ply} = greatScenario(a);
   a.run('CALIB.display = "winpct"');
   a.call('computeDerived');
   const scores = JSON.stringify({acc:S.acc,elo:S.accElo,perMove:S.accMove,evals:S.evals});
