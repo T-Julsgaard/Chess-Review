@@ -22,17 +22,17 @@
   --sq-light-hl: #f4f06a;
   --sq-dark-hl:  #b9c544;
 
-  /* move quality (fixed palette across themes) */
-  --q-brilliant: #26c2a3;
-  --q-great:     #749bb8;
-  --q-best:      #81b64c;
-  --q-excellent: #81b64c;
-  --q-good:      #95b776;
-  --q-book:      #a88865;
-  --q-inacc:     #f7c531;
-  --q-mistake:   #f9a85a;
-  --q-miss:      #f5746a;
-  --q-blunder:   #ee4a2f;
+  /* move quality (fixed palette across themes) - Chess.com exact colors */
+  --q-brilliant: #3b82f6;   /* Blue */
+  --q-great:     #0ea5e9;   /* Light Blue */
+  --q-best:      #16a34a;   /* Dark Green */
+  --q-excellent: #22c55e;   /* Green */
+  --q-good:      #84cc16;   /* Light Green */
+  --q-book:      #a88865;   /* Brown */
+  --q-inacc:     #f59e0b;   /* Amber/Yellow */
+  --q-mistake:   #f97316;   /* Orange */
+  --q-miss:      #9ca3af;   /* Gray */
+  --q-blunder:   #ef4444;   /* Red */
   /* single-square marker (user's right-click) */
   --mc-marked:   #e85949;
 

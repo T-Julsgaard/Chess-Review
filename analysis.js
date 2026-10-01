@@ -83,28 +83,28 @@ const ACCENTS = {
 };
 // Display names are independent of stored classification keys and scoring rules.
 // Each classification has a color (CSS variable), a
-// short symbol (fallback) and an SVG badge icon in icons/<icon>.svg. Note that the
-// internal code "inacc" points to the "inaccuracy" icon.
+// short symbol (fallback) and an SVG badge icon in icons/<icon>.svg.
+// Chess.com-style: Brilliant(!!), Great(!), Best(★), Excellent(✓), Good(✓), Book(📖), Inaccuracy(?!), Mistake(?), Miss(✕), Blunder(??)
 const QUALITY = {
-  brilliant: { sym: "!!", name: "Masterstroke", color: "var(--q-brilliant)", icon: "brilliant" },
-  great:     { sym: "!",  name: "Superb",    color: "var(--q-great)",     icon: "great" },
+  brilliant: { sym: "!!", name: "Brilliant", color: "var(--q-brilliant)", icon: "brilliant" },
+  great:     { sym: "!",  name: "Great",     color: "var(--q-great)",     icon: "great" },
   best:      { sym: "★",  name: "Best",      color: "var(--q-best)",      icon: "best" },
-  excellent: { sym: "✓",  name: "Near best", color: "var(--q-excellent)", icon: "excellent" },
-  good:      { sym: "✓",  name: "Decent",    color: "var(--q-good)",      icon: "good" },
-  book:      { sym: "◇",  name: "Theory",    color: "var(--q-book)",      icon: "book" },
-  inacc:     { sym: "?!", name: "Minor Misstep", color: "var(--q-inacc)", icon: "inaccuracy" },
-  mistake:   { sym: "?",  name: "Major Misstep", color: "var(--q-mistake)", icon: "mistake" },
-  miss:      { sym: "✕",  name: "Missed chance", color: "var(--q-miss)", icon: "miss" },
-  blunder:   { sym: "??", name: "Blunder",   color: "var(--q-blunder)",   icon: "blunder" },
+  excellent: { sym: "✓",  name: "Excellent", color: "var(--q-excellent)", icon: "excellent" },
+  good:      { sym: "✓",  name: "Good",      color: "var(--q-good)",      icon: "good" },
+  book:      { sym: "📖", name: "Book",      color: "var(--q-book)",      icon: "book" },
+  inacc:     { sym: "?!", name: "Inaccuracy", color: "var(--q-inacc)", icon: "inaccuracy" },
+  mistake:   { sym: "?",  name: "Mistake",   color: "var(--q-mistake)", icon: "mistake" },
+  miss:      { sym: "✕",  name: "Miss",      color: "var(--q-miss)", icon: "miss" },
+  blunder:   { sym: "??", name: "Blunder",   color: "var(--q-blunder)", icon: "blunder" },
 };
 const QUALITY_ORDER = ["brilliant","great","best","excellent","good","book","inacc","mistake","miss","blunder"];
 // Accuracy breakdown: compact (default) vs. full list (expanded via the expander arrow).
 const QBREAK_SUMMARY = ["brilliant","great","best","mistake","miss","blunder"];
 const QBREAK_FULL = ["brilliant","great","book","best","excellent","good","inacc","mistake","miss","blunder"];
 const QUALITY_LABEL = {
-  brilliant: "Masterstroke!", great: "Superb move!", best: "Best move",
-  excellent: "Near best", good: "Decent move", book: "Theory move",
-  inacc: "Minor Misstep", mistake: "Major Misstep", miss: "Missed chance", blunder: "Blunder",
+  brilliant: "Brilliant!", great: "Great move!", best: "Best move",
+  excellent: "Excellent", good: "Good move", book: "Book move",
+  inacc: "Inaccuracy", mistake: "Mistake", miss: "Miss", blunder: "Blunder",
 };
 const NOTEWORTHY = new Set(["brilliant","great","inacc","mistake","miss","blunder"]);
 // Explanation for each category (shown as a tooltip in the accuracy panel). The classifier
