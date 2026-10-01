@@ -33,16 +33,25 @@ A material heuristic cannot establish human difficulty or aesthetic merit.
    gain are credited before requiring a strictly positive material cost. Thus an
    equal trade does not qualify, but a rook for a minor and pawn can qualify with
    one pawn net loss. This is an explicit design choice, not a fitted size threshold.
-2. **A real choice.** A safe piece can be left in place by another legal move,
+2. **An offer attributable to the move.** Moving the offered piece, creating a
+   legal offer or increasing its net exchange cost supplies this evidence. For an
+   unmoved piece, compare legal exchanges before and after: releasing a pin or
+   withdrawing a defender can create an offer without moving that piece. A quiet
+   move must not inherit Brilliant merely because unrelated material was already
+   hanging. Game history also allows a tempo sacrifice that ignores a newly
+   introduced opponent threat. A checking offer can qualify when accepting it is
+   a legal check evasion. Repeated checking rook offers remain eligible, including
+   defensive sacrifices that draw by stalemate if accepted.
+3. **A real choice.** A safe piece can be left in place by another legal move,
    or has a legal move that avoids its local material loss.
    For an attacked piece, a legal alternative must avoid its local material loss,
    by moving it, defending it, removing the attacker or exchanging it fairly.
    A forced sole legal move remains Best. Pure pawn offers do not qualify.
-3. **Quality and soundness.** The move must be in the current Excellent
+4. **Quality and soundness.** The move must be in the current Excellent
    expected-points-loss bucket, with existing evaluations available. Its resulting
    mover-relative score must be at least -0.5 pawn, or a winning mate. A delayed
    known mate does not qualify. A preceding opponent error is not required.
-4. **Competitive relevance.** Below +5 pawns, without a pre-existing mate score,
+5. **Competitive relevance.** Below +5 pawns, without a pre-existing mate score,
    the position passes this gate. Escaping a negative mate score is also eligible.
    At +5 or more, or with a pre-existing winning mate,
    the highest-ranked scored root alternative must fall below +5 and must not
@@ -63,17 +72,27 @@ perspective. Tests cover Black's sign convention explicitly.
 
 The opponent does not need to accept the offer in the played continuation. Engine
 evaluation of the resulting position, rather than a later opponent mistake or the
-game outcome, supplies the soundness evidence. Board evidence is cached per ply;
+game outcome, supplies the soundness evidence. Board/history evidence is cached per ply;
 evaluation-dependent eligibility is recomputed as analysis results arrive.
 
 ## Limits and cost
 
 The exchange calculation is restricted to captures on one square, with a shared
-128-position cap per candidate move. Exhaustion withholds the label. It does not
+128-position cap per candidate move. Completed local exchange results are reused
+within that budget; incomplete or exhausted results are never cached. Position
+keys retain board, turn, castling and en-passant state; move counters do not affect
+this local material calculation. Exhaustion withholds the label. It does not
 solve intermediate checks elsewhere, delayed sacrifices or compensation by a
 later combination. Newly promoted pieces and ambiguous rook relocation are not
 automatically treated as offers of existing material. Promotions may still offer
 a different existing piece after crediting the promotion gain.
+
+Quiet sacrifices that renew a persistent offer without increasing its local cost
+or creating check can be missed. Without preceding history, ignoring a fresh
+opponent threat cannot be distinguished from inheriting a persistent offer and
+is withheld. The hypothetical opponent turn used for the before-move comparison
+clears en-passant rights; it is local board evidence, not a searched counterfactual
+continuation.
 
 Existing shallow or unstable evaluations can misjudge soundness. Multiple scored
 root alternatives help with already-winning positions, but do not measure human
@@ -102,14 +121,15 @@ require a new prespecified experiment. Those changes are outside this fix.
 
 Dedicated legal-board fixtures cover sound offers without a prior error, losing
 offers, exchanges, equal trades, x-rays, pins, unavoidable losses, forced moves,
-declined offers, promotions, mate maintenance/delays, missing alternatives,
+declined and repeated offers, actual stalemate after acceptance, persistent hanging
+material, new threats, defender/pin release, promotions, mate maintenance/delays, missing alternatives,
 Black's perspective, progressive evaluation updates and numerical-score isolation.
 Classifier scores in these fixtures are synthetic inputs; they are not independent
 engine confirmation that each offer is sound.
 
-Verification passed all 166 repository tests. A board-only runtime check on 20
-existing training games (1,319 plies) took about 3.4 seconds in this environment,
-with a maximum observed candidate cost of about 120 ms. This measures execution
+Verification passed all 171 repository tests. A board/history-only runtime check on 20
+existing training games (1,319 plies) took about 3.5 seconds in this environment,
+with a maximum observed candidate cost of about 247 ms. This measures execution
 cost, not annotation precision. It performed zero engine searches, fitted no
 weights and inspected no final-test games. Board evidence is reused on subsequent
 derived-data passes.

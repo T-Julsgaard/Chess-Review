@@ -808,11 +808,16 @@ function _opp(c) { return c === "w" ? "b" : "w"; }
 // evidence, not a tactical engine: checks/intermediate moves elsewhere belong to the engine eval.
 // A side can stop exchanging only when a legal move outside this capture sequence exists.
 function exchangeGain(chess, square, budget) {
+  // Capture trees can reach the same board in different orders. Reuse only completed results;
+  // never memoize unknown/exhausted branches. Clock counters do not affect local material gain.
+  const memo = budget.memo || (budget.memo = new Map());
+  const key = chess.fen().split(" ").slice(0, 4).join(" ") + ":" + square;
+  if (memo.has(key)) return memo.get(key);
   if (++budget.nodes > budget.maxNodes) return null;
-  if (!chess.get(square) || !chess.attackers(square, chess.turn()).length) return 0;
+  if (!chess.get(square) || !chess.attackers(square, chess.turn()).length) { memo.set(key, 0); return 0; }
   const legal = chess.moves({ verbose: true });
   const captures = legal.filter(m => m.to === square && m.captured);
-  if (!captures.length) return 0;
+  if (!captures.length) { memo.set(key, 0); return 0; }
   let best = legal.length > captures.length ? 0 : -Infinity;
   for (const m of captures) {
     const reply = exchangeGain(new Chess(m.after), square, budget);
@@ -820,6 +825,7 @@ function exchangeGain(chess, square, budget) {
     const promotion = m.promotion ? SAC_VAL[m.promotion] - SAC_VAL.p : 0;
     best = Math.max(best, SAC_VAL[m.captured] + promotion - reply);
   }
+  memo.set(key, best);
   return best;
 }
 // An attacked piece is voluntary only if some legal move could avoid its material loss. This
@@ -848,6 +854,7 @@ function isSacrifice(move) {
   if (before.turn() !== move.color || after.turn() !== _opp(move.color)) return false;
   const budget = { nodes: 0, maxNodes: 128 };
   const captured = (SAC_VAL[move.captured] || 0) + (move.promotion ? SAC_VAL[move.promotion] - SAC_VAL.p : 0);
+  let priorThreats = null;
   const targets = after.board().flat().filter(p => p && p.color === move.color
     && ["n", "b", "r", "q"].includes(p.type) && after.attackers(p.square, _opp(move.color)).length);
   for (const piece of targets) {
@@ -858,7 +865,32 @@ function isSacrifice(move) {
     if (before.get(source)?.color !== piece.color || before.get(source)?.type !== piece.type) continue;
     const gain = exchangeGain(after, square, budget);
     if (gain == null) return false;
-    if (gain > captured && couldBeSaved(before, source, move.color, budget)) return true;
+    if (gain <= captured) continue;
+    if (same) {
+      // A quiet move does not sacrifice an unrelated piece that was already hanging. Compare
+      // legal capture consequences, since removing a pin/defender can create a genuine offer.
+      // The hypothetical opponent turn has no en-passant right from its own preceding move.
+      if (!priorThreats) {
+        const fields = before.fen().split(" "); fields[1] = _opp(move.color); fields[3] = "-";
+        priorThreats = new Chess(fields.join(" "));
+      }
+      const previousGain = exchangeGain(priorThreats, square, budget);
+      if (previousGain == null) return false;
+      // A new check changes the opponent's response obligation. An accepted offer must still
+      // be a legal check evasion, as established by exchangeGain after the played move.
+      if (gain - captured <= previousGain && !after.isCheck()) {
+        // Ignoring a NEW opponent threat can be a tempo sacrifice. History distinguishes that
+        // choice from inheriting an offer already present after the mover's previous turn.
+        let earlier;
+        try { if (move.prior) earlier = new Chess(move.prior); } catch {}
+        if (!earlier || earlier.turn() !== _opp(move.color)
+          || earlier.get(square)?.color !== piece.color || earlier.get(square)?.type !== piece.type) continue;
+        const earlierGain = exchangeGain(earlier, square, budget);
+        if (earlierGain == null) return false;
+        if (previousGain <= earlierGain) continue;
+      }
+    }
+    if (couldBeSaved(before, source, move.color, budget)) return true;
   }
   return false;
 }
@@ -1033,7 +1065,8 @@ function _sacAt(i, state = S) {
   if (state._sacCache[i] !== undefined) return state._sacCache[i];
   const p = state.positions[i];
   let v = false;
-  if (p) v = isSacrifice({ before: state.positions[i - 1].fen, after: p.fen, color: p.color, captured: p.captured, from: p.from, promotion: p.promotion });
+  if (p) v = isSacrifice({ before: state.positions[i - 1].fen, after: p.fen,
+    prior: state.positions[i - 2]?.fen, color: p.color, captured: p.captured, from: p.from, promotion: p.promotion });
   state._sacCache[i] = v;
   return v;
 }
