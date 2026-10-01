@@ -5744,7 +5744,11 @@ async function resetLegacyZoom() {
     if (Math.abs(z - (zs.defaultZoomFactor || 1)) > 0.005) await browserAPI.tabs.setZoom(tab.id, 0);
   } catch {}
 }
-(async function main() {
+// Skip auto-initialization in test environment
+if (typeof globalThis !== 'undefined' && (globalThis.vitest || globalThis.__vitest_browser__ || typeof process !== 'undefined' && process.env?.VITEST)) {
+  // Test environment detected - skip main()
+} else {
+  (async function main() {
   try {
     // Initialize openings database first so it's ready when loadBook() is called
     await initOpeningsDb();
@@ -5842,6 +5846,7 @@ async function resetLegacyZoom() {
     console.error(err);
   }
 })();
+}
 
 // TEST-ONLY: exposes internal functions for regression tests.
 // Do not use this namespace in production code.
@@ -5863,4 +5868,14 @@ export const __testInternals = {
   _isCheckmate,
   moveAccuracy,
   sideAccuracies,
+  // Test helpers to replace module globals for testing
+  setTestS(state) {
+    Object.assign(S, state);
+  },
+  setTestBOOK(book) {
+    BOOK = book;
+  },
+  setTestCALIB(calib) {
+    CALIB = calib;
+  },
 };
