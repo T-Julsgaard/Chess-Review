@@ -5,11 +5,11 @@
 import { browserAPI } from "../browser-compat.js";
 
 // How long to wait for the engine's "readyok" handshake before declaring the build dead.
-// If a build can't be instantiated (CSP change, missing/blocked wasm, a future browser
-// change), the worker never replies — without this cap _ready would hang forever and every
-// analysis would silently stall. On timeout the handshake REJECTS, which lets the caller
-// fall back to the next build (see createEngine() in analysis.js).
-const HANDSHAKE_TIMEOUT_MS = 10000;
+  // If a build can't be instantiated (CSP change, missing/blocked wasm, a future browser
+  // change), the worker never replies — without this cap _ready would hang forever and every
+  // analysis would silently stall. On timeout the handshake REJECTS, which lets the caller
+  // fall back to the next build (see createEngine() in analysis.js).
+const HANDSHAKE_TIMEOUT_MS = 60000;
 // A silent worker must not leave review or Explore waiting forever. Reset on engine output
 // so a deep search that is still reporting progress is allowed to continue.
 const SEARCH_SILENCE_TIMEOUT_MS = 120000;
