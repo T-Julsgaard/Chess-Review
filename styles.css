@@ -445,6 +445,12 @@ button { font-family: inherit; cursor: pointer; }
   filter: drop-shadow(0 2px 4px rgba(0,0,0,.45));
 }
 .sq-badge:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.grade-badge { display: inline-block; vertical-align: middle; flex-shrink: 0; }
+.grade-badge > svg { display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; user-select: none; }
+.grade-numeral { font-variant-numeric: tabular-nums; }
+.grade-updated { animation: grade-settle .14s ease-out; }
+@keyframes grade-settle { from { opacity: .45; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .grade-updated { animation: none; } }
 /* A name-only label lives outside the clipped board and never intercepts board input. */
 .board-badge-tip {
   position: fixed; z-index: 60; pointer-events: none;

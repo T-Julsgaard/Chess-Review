@@ -6,6 +6,7 @@
 import { Chess } from "./lib/chess.js";
 import { Engine } from "./engine/uci.js";
 import { flagCodeForCountryId, countryNameForId } from "./flags.js";
+import { MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg } from "./move-grades.js";
 import { browserAPI } from "./browser-compat.js";
 
 /* ---------------- Opening book ----------------
@@ -67,8 +68,7 @@ const ACCENTS = {
   "#c77edb": { accent: "#c77edb", strong: "#aa5fc1", ink: "#260d30" },
 };
 // Display names are independent of stored classification keys and scoring rules.
-// Each classification has a color (CSS variable), a
-// short symbol (fallback) and an SVG badge icon in icons/<icon>.svg. Note that the
+// Annotation names and colors stay independent of move grades. The saved SVGs
 
 const QUALITY = {
   brilliant: { sym: "!!", name: "Masterstroke", color: "var(--q-brilliant)", icon: "brilliant" },
@@ -131,8 +131,28 @@ const ENGINE_INFO = {
 
 const pawnsFmt = (v) => (+v).toFixed(2).replace(/\.00$/, "") + " pawns";
 const ptsFmt = (v) => v + " pts";
-// URL to a classification badge (SVG).
-const qIcon = (cls) => _url("icons/" + (QUALITY[cls]?.icon || cls) + ".svg");
+// Move-specific glyphs use the shared vector renderer; summary glyphs show an
+// illustrative midpoint and expose the full category range to assistive tools.
+function gradeBadge(cls, score, className, attrs = {}, example = false) {
+  const label = gradeLabel(cls, score, categoryName(cls), example);
+  return el("span", { class: className + " grade-badge", role: "img", "aria-label": label,
+    "data-grade": cls === "book" ? "book" : gradeText(score), ...attrs,
+    html: gradeSvg(cls, score, categoryName(cls), example).replace('role="img"', 'aria-hidden="true"'),
+  });
+}
+function activeMoveGrade() {
+  return S.analysisMode ? activePos().moveGrade : S.moveGrades[S.idx];
+}
+function updateGradeBadge(node, cls, score) {
+  const next = cls === "book" ? "book" : gradeText(score);
+  if (node.dataset.grade === next) return;
+  node.dataset.grade = next;
+  const label = gradeLabel(cls, score, categoryName(cls));
+  node.setAttribute("aria-label", label);
+  if (node.hasAttribute("title")) node.title = label;
+  node.replaceChildren(gradeBadge(cls, score, "").firstElementChild);
+  node.querySelector(".grade-numeral")?.classList.add("grade-updated");
+}
 const PIECE_STYLES = ["image","merida"];
 // Persisted "image" selects Cburnett; both remaining sets are bundled GPLv2+ SVGs.
 const PIECE_STYLE_LABEL = { image: "Cburnett", merida: "Merida" };
@@ -575,7 +595,7 @@ function playWrongSound() {
 const S = {
   pgn: "", headers: {}, meta: {},
   positions: [], clocks: [], evals: [], bests: [],
-  classif: [], accMove: [], _sacCache: [], _forcedCache: [],
+  classif: [], accMove: [], moveGrades: [], searchPreviews: [], _sacCache: [], _forcedCache: [],
   players: { w: {}, b: {} }, meSide: "w",
   
   acc: { w: null, b: null }, accElo: { w: null, b: null }, counts: { w: {}, b: {} },
@@ -1061,8 +1081,8 @@ function classifyVariationMoves() {
   const nodes = v.positions.slice(1);
   const state = {
     positions: [...S.positions.slice(0, branch + 1), ...nodes],
-    evals: [...S.evals.slice(0, branch), ...v.positions.map(p => p.eval)],
-    bests: [...S.bests.slice(0, branch), ...v.positions.map(p => p.best)],
+    evals: [...S.evals.slice(0, branch), ...v.positions.map(p => p.searchPreview ? whiteRel(p.searchPreview.score, p.fen) : p.eval)],
+    bests: [...S.bests.slice(0, branch), ...v.positions.map(p => p.searchPreview || p.best)],
     settings: S.settings, players: S.players, openingHeader: S.openingHeader,
     _sacCache: [...S._sacCache.slice(0, branch + 1), ...nodes.map(p => p._sac)],
     _forcedCache: [...S._forcedCache.slice(0, branch + 1), ...nodes.map(p => p._forced)],
@@ -1072,6 +1092,7 @@ function classifyVariationMoves() {
   nodes.forEach((p, i) => {
     const ply = branch + i + 1;
     p.classif = state.classif[ply];
+    p.moveGrade = state.moveGrades[ply];
     p._sac = state._sacCache[ply];
     p._forced = state._forcedCache[ply];
   });
@@ -1132,6 +1153,7 @@ function classifyLine(state) {
   const N = state.total;
   state.classif = new Array(N + 1).fill(null);
   state.accMove = new Array(N + 1).fill(null);
+  state.moveGrades = new Array(N + 1).fill(null);
   if (!state._sacCache || state._sacCache.length !== N + 1) { state._sacCache = new Array(N + 1).fill(undefined); state._forcedCache = new Array(N + 1).fill(undefined); }
 
   // Per-ply inputs for the ported classifier. The classifier only ever looks BACKWARDS, so one
@@ -1182,6 +1204,10 @@ function classifyLine(state) {
     const safeBook = bookAt[i] && !((_mateFor(i, state.positions[i].color, state) ?? 0) < 0)
       && wpDrop[i] != null && wpDrop[i] < (CALIB?.clsWp?.inacc ?? 5);
     state.classif[i] = classifyMove(i, state.positions[i].color, isTop[i], safeBook, sac, std, loss, wpDrop, state);
+    const root = state.bests[i - 1];
+    const top = root?.lines?.find(l => l.multipv === 1), runnerUp = root?.lines?.find(l => l.multipv === 2);
+    const criticalLoss = top && runnerUp ? Math.max(0, winPct(scoreToCp(top.score)) - winPct(scoreToCp(runnerUp.score))) : null;
+    state.moveGrades[i] = moveGrade(state.classif[i], wpDrop[i], CALIB?.clsWp, criticalLoss);
     if (state.classif[i] === "book") state.bookCount++;
   }
   // Opening name: prefer the book's clean name over the chess.com header's ECOUrl slug.
@@ -1190,6 +1216,18 @@ function classifyLine(state) {
 
 function computeDerived() {
   classifyLine(S);
+  const completedClasses = S.classif;
+  // Provisional searches affect the visible annotation only. Keep completed
+  
+  if (S.searchPreviews.some(Boolean)) {
+    const preview = { ...S,
+      evals: S.evals.map((e, i) => S.searchPreviews[i] ? whiteRel(S.searchPreviews[i].score, S.positions[i].fen) : e),
+      bests: S.bests.map((b, i) => S.searchPreviews[i] || b),
+      _sacCache: [...S._sacCache], _forcedCache: [...S._forcedCache],
+    };
+    classifyLine(preview);
+    S.classif = preview.classif; S.moveGrades = preview.moveGrades;
+  }
   const N = S.total;
   const eloAccs = sideAccuracies();   
   for (const side of ["w", "b"]) {
@@ -1198,9 +1236,8 @@ function computeDerived() {
     for (let i = 1; i <= N; i++) {
       if (S.positions[i].color !== side) continue;
       const c = S.classif[i];
-      if (!c) continue;
-      counts[c]++;
-      const a = catAcc(c);
+      if (c) counts[c]++;
+      const a = catAcc(completedClasses[i]);
       if (a != null) catScores.push(a);
     }
     
@@ -1604,10 +1641,10 @@ function renderReorgBanner() {
 }
 
 /* ---------------- Board ---------------- */
-function makeBoardBadge(cls) {
+function makeBoardBadge(cls, score = null) {
   const cfg = QUALITY[cls];
-  return el("img", {
-    class: "sq-badge", src: qIcon(cls), alt: categoryName(cls), draggable: "false", tabindex: "0",
+  return gradeBadge(cls, score, "sq-badge", {
+    tabindex: "0",
     onpointerenter: (e) => { if (e.pointerType !== "touch" && !e.buttons) showBoardBadgeTip(e.currentTarget, cls); },
     onpointerleave: hideBoardBadgeTip,
     onfocus: (e) => showBoardBadgeTip(e.currentTarget, cls),
@@ -1616,9 +1653,11 @@ function makeBoardBadge(cls) {
     onkeydown: (e) => { if (e.key === "Escape") hideBoardBadgeTip(); },
   });
 }
+let boardBadgeTipTarget = null;
 function showBoardBadgeTip(target, cls) {
   const cfg = QUALITY[cls];
   if (!cfg || !target.isConnected) return;
+  boardBadgeTipTarget = target;
   let tip = document.getElementById("boardBadgeTip");
   if (!tip) {
     tip = el("div", { id: "boardBadgeTip", class: "board-badge-tip", role: "tooltip", "aria-hidden": "true" });
@@ -1640,6 +1679,7 @@ function showBoardBadgeTip(target, cls) {
   tip.classList.add("show");
 }
 function hideBoardBadgeTip() {
+  boardBadgeTipTarget = null;
   const tip = document.getElementById("boardBadgeTip");
   if (tip) { tip.classList.remove("show"); tip.setAttribute("aria-hidden", "true"); }
 }
@@ -1675,7 +1715,6 @@ function buildBoard() {
   paintBoard();
 }
 function paintBoard() {
-  hideBoardBadgeTip();
   const pos = activePos();
   const boardEl = UI.boardWrap.querySelector(".board");
   if (boardEl) boardEl.classList.toggle("analysis", S.analysisMode);
@@ -1709,7 +1748,11 @@ function paintBoard() {
     ? `color-mix(in srgb, ${QUALITY[cls].color} 50%, transparent)`
     : null;
   for (const [name, sq] of Object.entries(sqByName)) {
-    sq.querySelectorAll(".piece, .piece-svg, .piece-img, .sq-badge").forEach((n) => n.remove());
+    const oldBadge = sq.querySelector(".sq-badge");
+    const keepBadge = oldBadge && name === pos.to && cls && oldBadge.dataset.category === cls
+      && oldBadge.dataset.move === pos.fen;
+    sq.querySelectorAll(".piece, .piece-svg, .piece-img").forEach((n) => n.remove());
+    if (oldBadge && !keepBadge) oldBadge.remove();
     const isHl = hl.has(name);
     sq.classList.toggle("hl", isHl);
     sq.classList.toggle("has-badge", name === pos.to && !!(cls && QUALITY[cls]));
@@ -1718,9 +1761,15 @@ function paintBoard() {
     const ch = occ[name];
     if (ch) sq.append(makePiece(ch.toUpperCase(), ch === ch.toUpperCase() ? "w" : "b"));
     if (name === pos.to && cls && QUALITY[cls]) {
-      sq.append(makeBoardBadge(cls));
+      if (keepBadge) updateGradeBadge(oldBadge, cls, activeMoveGrade());
+      else {
+        const badge = makeBoardBadge(cls, activeMoveGrade());
+        badge.dataset.category = cls; badge.dataset.move = pos.fen;
+        sq.append(badge);
+      }
     }
   }
+  if (!boardBadgeTipTarget?.isConnected) hideBoardBadgeTip();
   renderBestArrow();
   renderUserArrows();
   renderThreatArrow();
@@ -2319,6 +2368,7 @@ async function requestLiveEval() {
   const v = S.variation, idx = v.idx, pos = v.positions[idx];
   const valid = () => token === S.liveToken && S.analysisMode && S.variation === v
     && v.idx === idx && v.positions[idx] === pos;
+  for (const node of v.positions) node.searchPreview = null;
   S.liveError = null;
   S.liveEngine?.cancelPending();
   S.liveEngine?.stop();
@@ -2336,10 +2386,15 @@ async function requestLiveEval() {
       const node = v.positions[i];
       const terminal = variationTerminal(v, i);
       const res = terminal ? { score: terminal, bestmove: null, pv: "", lines: [] }
-        : await eng.analyse(node.fen, S.settings.engineDepth, S.settings.engineLines, variationSearchHistory(v, i));
+        : await eng.analyse(node.fen, S.settings.engineDepth, S.settings.engineLines, variationSearchHistory(v, i), preview => {
+          if (!valid()) return;
+          node.searchPreview = preview; node.searchPreviewToken = token;
+          refreshVariation();
+        });
       if (!valid()) return;
       node.eval = terminal || whiteRel(res.score, node.fen);
       node.best = res;
+      node.searchPreview = null;
       refreshVariation();
     }
   } catch (e) {
@@ -2347,6 +2402,11 @@ async function requestLiveEval() {
     S.liveError = "Stockfish stopped before this position was ready.";
     if (S.liveEngine?.dead) { S.liveEngine.terminate(); S.liveEngine = null; }
     refreshVariation();
+  } finally {
+    for (const node of v.positions) {
+      if (node.searchPreviewToken === token) node.searchPreview = null;
+    }
+    if (valid()) refreshVariation();
   }
 }
 
@@ -2359,7 +2419,7 @@ function refreshVariation() {
 
 function invalidateVariationEvals() {
   if (!S.variation) return;
-  for (const p of S.variation.positions) { p.eval = null; p.best = null; p.classif = null; }
+  for (const p of S.variation.positions) { p.eval = null; p.best = null; p.classif = null; p.moveGrade = null; p.searchPreview = null; }
 }
 
 function resetLiveEngine() {
@@ -3098,7 +3158,7 @@ function renderMoveComment() {
   const evTxt = ev ? evalText(ev) : "";
 
   const head = el("div", { class: "ip-head" });
-  if (cfg) head.append(el("img", { class: "ip-badge", src: qIcon(cls), alt: "", draggable: "false" }));
+  if (cfg) head.append(gradeBadge(cls, S.moveGrades[S.idx], "ip-badge"));
   // Special coach phrasing can omit the category, so name it beside the move.
   const sanDisplay = !S.settings.coachPlain && cfg ? `${san} ${categoryName(cls)}` : san;
   head.append(el("span", { class: "ip-move" }, sanDisplay));
@@ -3107,7 +3167,7 @@ function renderMoveComment() {
 
   // Pick the line once per (ply + coach): a fresh signature → choose + type; otherwise reuse the
   // shown text (so unrelated re-renders don't re-pick or re-animate, and a coach switch re-types).
-  const sig = "m:" + S.idx + ":" + (S.settings.coach || "");
+  const sig = "m:" + S.idx + ":" + (S.settings.coach || "") + ":" + (cls || "");
   const fresh = sig !== _ipSig;
   if (fresh) {
     let sentence = S.coach ? coachMoveSentence(S.idx) : null;
@@ -3197,7 +3257,7 @@ function showQTip(target, cls) {
   const tip = tipEl();
   tip.replaceChildren(
     el("div", { class: "q-tip-head" },
-      el("img", { class: "q-tip-ic", src: qIcon(cls), alt: "", draggable: "false" }),
+      gradeBadge(cls, null, "q-tip-ic", {}, true),
       el("span", { class: "q-tip-nm", style: { color: cfg.color } }, categoryName(cls))),
     el("div", { class: "q-tip-body" }, categoryText(QUALITY_DESC[cls] || "")),
   );
@@ -3288,7 +3348,7 @@ function categoryLabel(cls) {
         }, "↺"));
       label.replaceWith(editor); input.focus(); input.select();
     },
-  }, el("img", { class: "qsym", src: qIcon(cls), alt: "", draggable: "false" }),
+  }, gradeBadge(cls, null, "qsym", {}, true),
   el("span", { class: "nm" }, categoryName(cls)));
   return label;
 }
@@ -3306,7 +3366,7 @@ function renderStats() {
       el("div", { class: "panel-body" },
         el("div", { class: "acc-row" },
           el("div", { class: "acc-cell" },
-            cfg ? el("img", { class: "qb icon", src: qIcon(cls), alt: categoryName(cls), title: categoryName(cls), draggable: "false" }) : null,
+            cfg ? gradeBadge(cls, pos.moveGrade, "qb icon") : null,
             el("span", { class: "acc-name" }, cfg ? categoryName(cls) : "—"),
             el("span", { class: "acc-val", style: { color: "var(--accent)" } }, evTxt),
           ),
@@ -3519,15 +3579,15 @@ function moveCell(ply) {
     "data-class": cls || "", onclick: () => gotoMainline(ply) },
     el("span", { class: "pc", style: { color: pos.color === "w" ? "var(--ink)" : "var(--ink-2)" } }, glyph),
     el("span", {}, pos.san),
-    showBadge ? qBadge(cls) : null,
+    showBadge ? qBadge(cls, S.moveGrades[ply]) : null,
   );
 }
-function qBadge(k) {
+function qBadge(k, score = null) {
   const cfg = QUALITY[k]; const st = S.settings.badgeStyle;
   if (st === "dot") return el("span", { class: "qb dot", style: { background: cfg.color }, title: categoryName(k) });
   if (st === "label") return el("span", { class: "qb label", style: { background: cfg.color } }, categoryName(k));
   // "icon" → the real SVG badge
-  return el("img", { class: "qb icon", src: qIcon(k), alt: categoryName(k), title: categoryName(k), draggable: "false" });
+  return gradeBadge(k, score, "qb icon", { title: gradeLabel(k, score, categoryName(k)) });
 }
 // Move the .current highlight to the cell for S.idx and auto-scroll it into view, without
 // touching the rest of the list. Used both after a full rebuild and on a plain step.
@@ -3554,7 +3614,7 @@ function renderMoves() {
     const v = S.variation;
     const ml = S.settings.mlStyle;
     // Position identity and selected move are part of the cache key.
-    const varClassifSig = v.positions.slice(1).map(p => [p.fen, p.san, p.classif]);
+    const varClassifSig = v.positions.slice(1).map(p => [p.fen, p.san, p.classif, p.moveGrade]);
     const sig = JSON.stringify([ml, S.settings.badgeStyle, v.idx, varClassifSig]);
     if (sig === _movesSig && UI.movesBody.firstChild) { return; }
     _movesSig = sig;
@@ -3569,7 +3629,7 @@ function renderMoves() {
         const cell = el("span", { class: "ml-move" + (i === v.idx ? " current" : ""), "data-ply": i, onclick: () => gotoVar(i) },
           el("span", { class: "pc", style: { color: pos.color === "w" ? "var(--ink)" : "var(--ink-2)" } }, glyph),
           el("span", {}, pos.san),
-          showBadge ? qBadge(cls) : null,
+          showBadge ? qBadge(cls, pos.moveGrade) : null,
         );
         list.append(cell);
       }
@@ -3583,7 +3643,7 @@ function renderMoves() {
         const cell = el("span", { class: "ml-move" + (i === v.idx ? " current" : ""), "data-ply": i, onclick: () => gotoVar(i) },
           el("span", { class: "pc", style: { color: pos.color === "w" ? "var(--ink)" : "var(--ink-2)" } }, glyph),
           el("span", {}, pos.san),
-          showBadge ? qBadge(cls) : null,
+          showBadge ? qBadge(cls, pos.moveGrade) : null,
         );
         list.append(el("div", { class: "ml-pair" }, cell));
       }
@@ -3599,16 +3659,20 @@ function renderMoves() {
   // Keep move cells mounted while classifications arrive. Replacing the list during analysis
   // drops the hovered element and makes its hover state flicker; only changed badges need updates.
   const sig = ml + "|" + S.settings.badgeStyle + "|" + S.total + "|" + (S.analysisMode ? 1 : 0);
-  const classSig = S.classif.join("|");
+  const classSig = JSON.stringify([S.classif, S.moveGrades]);
   if (sig === _movesSig && UI.movesBody.firstChild) {
     if (classSig !== _movesClassSig) {
       for (const cell of UI.movesBody.querySelectorAll(".ml-move[data-ply]")) {
         const cls = S.classif[+cell.dataset.ply];
-        if (cell.dataset.class === (cls || "")) continue;
+        if (cell.dataset.class === (cls || "")) {
+          const badge = cell.querySelector(".grade-badge");
+          if (badge) updateGradeBadge(badge, cls, S.moveGrades[+cell.dataset.ply]);
+          continue;
+        }
         cell.dataset.class = cls || "";
         const old = cell.querySelector(".qb");
         if (old) old.remove();
-        if (cls && (NOTEWORTHY.has(cls) || S.settings.badgeStyle === "dot")) cell.append(qBadge(cls));
+        if (cls && (NOTEWORTHY.has(cls) || S.settings.badgeStyle === "dot")) cell.append(qBadge(cls, S.moveGrades[+cell.dataset.ply]));
       }
       _movesClassSig = classSig;
     }
@@ -4920,7 +4984,7 @@ function practiceAttempt(from, to) {
       }
       // Mark it as the "Best move" to confirm they found a strong move.
       toSq.classList.add("has-badge");
-      toSq.append(makeBoardBadge("best"));
+      toSq.append(makeBoardBadge("best", MOVE_GRADE_CONFIG.best.max));
     }
     flashSquares([mv.from, mv.to], "good");
     playSanSound(mv.san);
@@ -5234,6 +5298,7 @@ async function startAnalysis() {
   terminateEngines();
   S.evals = new Array(S.total + 1).fill(null);
   S.bests = new Array(S.total + 1).fill(null);
+  S.searchPreviews = new Array(S.total + 1).fill(null);
   S._sacCache = []; S._forcedCache = []; S._panelCache = null;
   S.progress = 0;
   S.completed = 0;
@@ -5282,9 +5347,14 @@ async function startAnalysis() {
       if (i > S.total) return;
       const terminal = terminalScore(S.positions[i].fen, i);
       const res = terminal ? { score: terminal, bestmove: null, pv: "", lines: [] }
-        : await eng.analyse(S.positions[i].fen, S.settings.engineDepth, multipv, searchHistory(S.positions, i));
+        : await eng.analyse(S.positions[i].fen, S.settings.engineDepth, multipv, searchHistory(S.positions, i), preview => {
+          if (gen !== S.batchGen) return;
+          S.searchPreviews[i] = preview;
+          requestProgress(gen);
+        });
       if (gen !== S.batchGen) return;
       S.bests[i] = res;
+      S.searchPreviews[i] = null;
       // Terminal positions (mate/stalemate) are decided from the board — not from the engine's "mate 0".
       S.evals[i] = terminal || whiteRel(res.score, S.positions[i].fen);
       if (i > 0) S.completed++;
@@ -5299,6 +5369,7 @@ async function startAnalysis() {
     if (gen !== S.batchGen) return;
     console.error("[Chess Review] engine stopped during batch analysis:", e);
     terminateEngines();
+    S.searchPreviews.fill(null);
     S.analyzing = false;
     S.analysisError = "the engine stopped responding.";
     S.verdict = "Analysis stopped before the game was complete.";
@@ -5372,6 +5443,7 @@ async function applyGame(payload) {
   S.total = S.positions.length - 1;
   S.evals = new Array(S.total + 1).fill(null);
   S.bests = new Array(S.total + 1).fill(null);
+  S.searchPreviews = new Array(S.total + 1).fill(null);
   S._sacCache = []; S._forcedCache = []; S._panelCache = null;
   S.progress = 0;
   S.completed = 0;

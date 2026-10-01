@@ -10,6 +10,25 @@ class WorkerStub {
   line(data) { this.onmessage({data}); }
 }
 
+test('search progress is throttled, exact-only and isolated from final results', async t => {
+  t.mock.timers.enable({ apis: ['Date', 'setTimeout'], now: 1000 });
+  const eng=engine(t), updates=[];
+  const pending=eng.analyse('position',12,1,null,snapshot=>{updates.push(snapshot);snapshot.score.cp=999;snapshot.lines[0].score.cp=999;});
+  await Promise.resolve();
+  eng.worker.line('info depth 3 score cp 5 pv e2e4');
+  eng.worker.line('info depth 4 score cp 8 lowerbound pv e2e4');
+  assert.equal(updates.length,0);
+  eng.worker.line('info depth 4 score cp 10 pv e2e4');
+  eng.worker.line('info depth 5 score cp 20 pv e2e4');
+  assert.equal(updates.length,1);
+  t.mock.timers.tick(121);
+  eng.worker.line('info depth 6 score cp 30 pv e2e4');
+  assert.equal(updates.length,2);
+  eng.worker.line('bestmove e2e4');const result=await pending;
+  assert.equal(result.score.cp,30);assert.equal(result.lines[0].score.cp,30);
+  eng.worker.line('info depth 7 score cp 40 pv e2e4');assert.equal(updates.length,2);
+});
+
 function engine(t,options={}) {
   const previous=globalThis.Worker;globalThis.Worker=options.Worker||WorkerStub;
   const eng=new Engine(options.path);

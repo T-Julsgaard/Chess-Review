@@ -159,6 +159,16 @@ export class Engine {
           this.current.lastScore = score;
           if (pv) this.current.lastPv = pv;
         }
+        // Only exact, useful-depth PVs feed provisional UI grades. Snapshot the
+        // lines so an observer cannot mutate the search that eventually resolves.
+        const job = this.current, now = Date.now();
+        if (job.onProgress && bound === "exact" && pv && depth >= 4 && mpv === 1
+          && (!job.progressAt || now - job.progressAt >= 120)) {
+          job.progressAt = now;
+          const lines = Object.keys(job.lines).sort((a, b) => +a - +b).map(k => ({ ...job.lines[k], score: { ...job.lines[k].score } }));
+          try { job.onProgress({ bestmove: pv.split(" ")[0], score: { ...score }, pv, lines }); }
+          catch (error) { console.error("Search progress observer failed", error); }
+        }
       }
       return;
     }
@@ -207,13 +217,15 @@ export class Engine {
    * Returns { bestmove, score:{cp|mate}, pv, lines:[{score,pv,depth,bound,multipv}] }.
    * lines are sorted best→worst (multipv 1..n), seen from the side to move.
    * Optional history = {initialFen,moves}; replay must reach fen, including its counters.
+   * Optional onProgress receives throttled provisional exact PV snapshots. It
+   * never changes the completed result returned by this promise.
    */
-  async analyse(fen, depth = 12, multipv = 1, history = null) {
+  async analyse(fen, depth = 12, multipv = 1, history = null, onProgress = null) {
     const command = positionCommand(fen, history);
     await this._ready;
     if (this.dead) throw new Error("engine is no longer running");
     return new Promise((resolve, reject) => {
-      this.queue.push({ fen, positionCommand: command, depth, multipv, resolve, reject, lastScore: null, lastPv: "", lines: {} });
+      this.queue.push({ fen, positionCommand: command, depth, multipv, resolve, reject, onProgress, lastScore: null, lastPv: "", lines: {} });
       this._pump();
     });
   }

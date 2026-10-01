@@ -55,6 +55,14 @@ try {
     for(let i=0;i<250;i++){await wait(100);saved=(await browserAPI.storage.local.get('analysis:'+id))['analysis:'+id];if(saved)break;}
     if(!saved||saved.engineBuild!==key||saved.evals.length!==7||!saved.evals.every(Boolean))throw Error('Review did not complete with '+key+': '+frame.contentDocument?.body?.innerText?.slice(-1200));
     const board=frame.contentDocument.querySelector('.board');if(!board)throw Error('Board missing');
+    const doc=frame.contentDocument;
+    doc.dispatchEvent(new KeyboardEvent('keydown',{key:'End',bubbles:true}));
+    const glyph=doc.querySelector('.sq-badge');
+    if(!glyph?.querySelector('svg > circle')||!glyph.getAttribute('aria-label'))throw Error('Vector move glyph missing');
+    const numeral=doc.querySelector('.grade-badge .grade-numeral');
+    if(!numeral||!/^\\d+(\\.\\d)?$/.test(numeral.textContent))throw Error('Numeric category glyph missing');
+    if(glyph.querySelector('text')&&!/score /.test(glyph.getAttribute('aria-label')))throw Error('Move grade accessible label missing');
+    await report({step:'numeric-glyph',key,label:glyph.getAttribute('aria-label'),reference:numeral.textContent});
     await report({step:'completed-review',key,positions:saved.evals.length,engineBuild:saved.engineBuild});
     frame.remove();
   }
