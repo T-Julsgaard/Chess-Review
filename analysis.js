@@ -133,7 +133,7 @@ const ENGINE_INFO = {
   engineDepth:   "How many plies (half-moves) deep Stockfish searches each position. Higher depth gives more accurate evaluations and fewer false mistakes, but takes longer.",
   engineWorkers: "Number of Stockfish instances analysing positions in parallel. More workers finish the game faster on multi-core CPUs; the results are identical.",
   fastAnalysis:  "Trades quality for speed: the classification pass uses fewer engine lines. ~1.3×/1.6× faster, but evals shift slightly and clean games can pick up a few false minor missteps.",
-  enginePath:    "Stockfish 18 NNUE is the default. Stockfish 19 Lite uses a smaller evaluation network for a compact alternative. Both run locally; Lite is not the full-strength Stockfish 19 build.",
+  enginePath:    "Stockfish 18 NNUE is the default. Stockfish 19 Full is the strongest build. Stockfish 19 Lite uses a smaller evaluation network for a compact alternative. Both run locally; Lite is not the full-strength Stockfish 19 build.",
   engineSkill:   "Caps the engine's playing strength (Stockfish 'Skill Level'). Max (20) = full strength. Lower values play deliberately weaker — useful for more human-like suggestions.",
   engineHash:    "Recommended: 16 MB for most reviews (the default). Try 32–64 MB for deeper analysis if your computer has spare memory. Each parallel worker uses its own hash table, so memory use is roughly Hash × Workers.",
   clsGood:       "A move that loses at least this much eval (in pawns) can be no better than \"Decent\". Below it, the move is \"Near best\". Lower = stricter.",
@@ -279,8 +279,9 @@ const ENGINE_SETTING_KEYS = [
   "accExcellent", "accGood", "accInacc", "accMiss", "accMistake", "accBlunder",
 ];
 // Two single-threaded builds; the app parallelizes positions across independent workers.
-const ENGINE_BUILDS = { nnue: "engine/stockfish-nnue.js", sf19lite: "engine/stockfish-19-lite-single.js" };
-const ENGINE_FALLBACK_ORDER = ["nnue", "sf19lite"];
+const ENGINE_BUILDS = { nnue: "engine/stockfish-nnue.js", sf19full: 
+"engine/stockfish-19-single.js", sf19lite: "engine/stockfish-19-lite-single.js" };
+const ENGINE_FALLBACK_ORDER = ["nnue", "sf19full", "sf19lite"];
 
 function migrateEngineSettings(settings) {
   if (settings.enginePath === "sf19") settings.enginePath = "sf19lite";
@@ -3763,7 +3764,7 @@ async function requestPanelLines() {
   S._panelCache = { idx: i, fen, lines: res.lines };
   renderEngineCurrent();
 }
-const ENGINE_NAME = { nnue: "Stockfish 18 NNUE", sf19lite: "Stockfish 19 Lite" };
+const ENGINE_NAME = { nnue: "Stockfish 18 NNUE", sf19full: "Stockfish 19 Full", sf19lite: "Stockfish 19 Lite" };
 // Keep all candidate lines and the action visible. Only the bottom edge moves, including
 // when narrowing a custom panel wraps its heading/button or extra lines are selected.
 function fitEnginePanel() {
@@ -4465,6 +4466,7 @@ function motorSettings() {
         setLabel("Build", ENGINE_INFO.enginePath),
         el("div", { class: "set-seg" },
           el("button", { class: S.settings.enginePath === "nnue" ? "on" : "", onclick: () => setEngineSetting("enginePath", "nnue") }, "Stockfish 18 NNUE"),
+          el("button", { class: S.settings.enginePath === "sf19full" ? "on" : "", onclick: () => setEngineSetting("enginePath", "sf19full") }, "Stockfish 19 Full"),
           el("button", { class: S.settings.enginePath === "sf19lite" ? "on" : "", onclick: () => setEngineSetting("enginePath", "sf19lite") }, "Stockfish 19 Lite"),
         ),
       ),
