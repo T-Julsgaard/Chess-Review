@@ -5550,9 +5550,11 @@ async function startAnalysis() {
   S.progress = S.total;
   S.completed = S.total;
   detectCriticalMoments();
+  computeDerived();           // recompute with full evals/bests for accurate phase ratings
   flushProgress(gen);
   renderReview();
   renderStats();
+  renderPhaseRatings();       // render phase ratings with final data
   if (!S.analysisMode) renderEngineCurrent();
   saveToLibrary();   // the game is fully analyzed → keep it in the user's library
 }
