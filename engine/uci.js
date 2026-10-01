@@ -228,6 +228,4 @@ export class Engine {
   newGame() {
     this._gameStarted = false;
   }
-    try { this.worker?.terminate(); } catch {}
-  }
 }
