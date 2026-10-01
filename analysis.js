@@ -5986,7 +5986,7 @@ if (typeof globalThis !== 'undefined' && (globalThis.vitest || globalThis.__vite
 // Do not use this namespace in production code.
 export const __testInternals = {
   classifyMove,
-  classifyVariationMove,
+  classifyVariationMove: classifyVariationMoves,
   scoreToCp,
   terminalScore,
   isSacrifice,
