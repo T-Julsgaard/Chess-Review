@@ -5419,7 +5419,8 @@ async function startAnalysis() {
   }
 
   if (mistakeIndices.length > 0) {
-    S.progress = 0; S.completed = 0; contig = -1;
+    // Continue progress from Pass 1 (don't reset to 0)
+    // Pass 1 already analyzed all S.total positions
     let deepNext = 0;
     async function workerDeep(eng) {
       while (gen === S.batchGen) {
@@ -5439,7 +5440,7 @@ async function startAnalysis() {
           await posCache.set(fen, { ...res, depth: deepDepth });
         }
         S.completed++;
-        S.progress = Math.max(0, (idx / mistakeIndices.length) * mistakeIndices.length);
+        S.progress = S.total + Math.max(0, idx + 1);
         requestProgress(gen);
       }
     }
