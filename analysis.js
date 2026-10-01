@@ -5349,7 +5349,7 @@ async function startAnalysis() {
   if (!S.analysisMode) { renderEvalBar(); renderBestArrow(); renderEngineCurrent(); }
 
   // Pipeline: Pass 1 (shallow, all moves) → Pass 2 (deep, only mistakes/blunders)
-  const shallowDepth = Math.min(10, S.settings.engineDepth);
+  const shallowDepth = Math.min(16, S.settings.engineDepth);
   const deepDepth = S.settings.engineDepth;
   const multipv = Math.max(1, Math.min(ENGINE_MAX_LINES, S.settings.classifyLines || 1));
   S.analyzedMultipv = multipv;
