@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Superb move">
+  <circle cx="50" cy="50" r="49" fill="#749bb8"></circle>
+  <path d="M43 76C25 69 21 47 30 30M57 76C75 69 79 47 70 30" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"></path>
+  <g fill="#fff">
+    <ellipse cx="28" cy="34" rx="4" ry="8" transform="rotate(-28 28 34)"></ellipse>
+    <ellipse cx="25" cy="47" rx="4" ry="8" transform="rotate(-40 25 47)"></ellipse>
+    <ellipse cx="29" cy="60" rx="4" ry="8" transform="rotate(-55 29 60)"></ellipse>
+    <ellipse cx="37" cy="70" rx="4" ry="8" transform="rotate(-65 37 70)"></ellipse>
+    <ellipse cx="72" cy="34" rx="4" ry="8" transform="rotate(28 72 34)"></ellipse>
+    <ellipse cx="75" cy="47" rx="4" ry="8" transform="rotate(40 75 47)"></ellipse>
+    <ellipse cx="71" cy="60" rx="4" ry="8" transform="rotate(55 71 60)"></ellipse>
+    <ellipse cx="63" cy="70" rx="4" ry="8" transform="rotate(65 63 70)"></ellipse>
+    <path d="M50 28 54 41 66 45 54 49 50 62 46 49 34 45 46 41Z"></path>
+  </g>
+</svg>

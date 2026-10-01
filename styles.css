@@ -16,9 +16,9 @@
   --accent-strong: #6aa14a;
   --accent-ink: #11210a;
 
-  /* board — classic green, theme-independent */
-  --sq-light: #e9edcc;
-  --sq-dark:  #6f9c54;
+  /* board — walnut fallback, overwritten by saved settings */
+  --sq-light: #f0d9b5;
+  --sq-dark:  #b58863;
   --sq-light-hl: #f4f06a;
   --sq-dark-hl:  #b9c544;
 
@@ -378,6 +378,7 @@ button { font-family: inherit; cursor: pointer; }
 
 /* board */
 .board {
+  -webkit-user-select: none; user-select: none;
   flex: 1; aspect-ratio: 1; display: grid;
   grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr);
   border-radius: 10px; overflow: hidden;
@@ -425,7 +426,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 .sq .coord {
   position: absolute; font-size: var(--coord-size, 9px); font-weight: 700; opacity: .7; z-index: 2;
-  font-family: var(--font-mono);
+  font-family: var(--font-mono); pointer-events: none;
 }
 .sq .coord.file { right: 3px; bottom: 1px; }
 .sq .coord.rank { left: 3px; top: 1px; }
@@ -437,16 +438,29 @@ button { font-family: inherit; cursor: pointer; }
 /* classification badge on the board — SVG icon in the destination square's top-right
    corner, ~42% of the square (cqmin: the square is a size container). */
 .sq-badge {
-  /* chess.com-style: ~42% of the square (was 52% — ~20% smaller), centred almost on the
+  /* ~42% of the square (was 52% — ~20% smaller), centred almost on the
      destination square's top-right corner but tugged slightly inward. The icon half is
      21cqmin × scale; the 7cqmin inset keeps the centre just inside the corner at any size. */
   position: absolute;
   width: calc(42cqmin * var(--badge-scale, 1)); height: calc(42cqmin * var(--badge-scale, 1));
   top:   calc(7cqmin - 21cqmin * var(--badge-scale, 1));
   right: calc(7cqmin - 21cqmin * var(--badge-scale, 1));
-  z-index: 4; pointer-events: none;
+  z-index: 4; pointer-events: auto; border-radius: 50%;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,.45));
 }
+.sq-badge:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+/* A name-only label lives outside the clipped board and never intercepts board input. */
+.board-badge-tip {
+  position: fixed; z-index: 60; pointer-events: none;
+  padding: 6px 10px; border-radius: 7px;
+  background: var(--panel); color: var(--ink); border: 1px solid var(--line);
+  box-shadow: 0 4px 14px rgba(0,0,0,.18);
+  font-family: var(--font-ui); font-size: 11px; font-weight: 600; line-height: 1.3;
+  white-space: nowrap; opacity: 0; visibility: hidden; transform: translateY(3px);
+  transition: opacity .12s ease-out, transform .12s cubic-bezier(.2,.8,.2,1), visibility 0s .12s;
+}
+.board-badge-tip.show { opacity: 1; visibility: visible; transform: translateY(0); transition-delay: 0s; }
+@media (prefers-reduced-motion: reduce) { .board-badge-tip { transition: none; transform: none; } }
 /* top row: nudge the icon down so it doesn't poke past the board's top edge (the badge half-height
    is 21cqmin·scale, so 22cqmin keeps the icon's top just inside the 8th-rank border) */
 .sq.top-row .sq-badge { top: calc(22cqmin - 21cqmin * var(--badge-scale, 1)); }
@@ -580,8 +594,20 @@ button { font-family: inherit; cursor: pointer; }
 /* Labels are centered as a group in the column, but share the same fixed width, so the
    icon + name line up across the rows (same start at the first letter). */
 .qbreak-row .qlabel { display: flex; align-items: center; gap: 8px; font-family: var(--font-ui);
-  justify-self: center; width: 132px; transform: translateX(16px); }
-.qbreak-row .qlabel .nm { font-weight: 600; }
+  justify-self: center; width: 132px; max-width: 100%; min-width: 0; transform: translateX(16px);
+  border: 0; padding: 0; border-radius: 5px; background: transparent; color: inherit;
+  font-size: inherit; text-align: left; cursor: pointer; }
+.qbreak-row .qlabel .nm { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qbreak-row .qlabel .qsym { flex: 0 0 22px; }
+.qbreak-row .qlabel:hover .nm { color: var(--accent); }
+.qbreak-row .qlabel:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.qbreak-row .category-name-editor { gap: 3px; transform: none; width: 100%; cursor: default; }
+/* Keep editable labels at the original 22px row height so Accuracy still fits its saved box. */
+.category-name-input { min-width: 0; width: 100%; height: 22px; flex: 1; padding: 0 5px; border: 1px solid var(--accent);
+  border-radius: 5px; background: var(--panel-2); color: var(--ink); font: inherit; outline-offset: 2px; }
+.category-name-reset { flex: 0 0 22px; padding: 0; height: 22px; border: 0; border-radius: 5px;
+  background: var(--panel-2); color: var(--ink-2); font-size: 18px; cursor: pointer; }
+.category-name-reset:hover, .category-name-reset:focus-visible { color: var(--accent); }
 .qbreak-row .ct { text-align: center; font-weight: 700; border-radius: 6px; transition: color .12s, background .12s; }
 /* a non-zero count is clickable — it jumps to that player's first move of the category */
 .qbreak-row .ct:not(.zero) { cursor: pointer; }
@@ -712,7 +738,7 @@ button { font-family: inherit; cursor: pointer; }
 
 /* ---------- ENGINE LINES ---------- */
 .engine-line {
-  display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: center;
+  display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 12px; align-items: center;
   padding: 9px 4px; border-bottom: 1px solid var(--line-soft); font-family: var(--font-mono);
 }
 .engine-line:last-child { border-bottom: 0; }
@@ -787,11 +813,13 @@ button { font-family: inherit; cursor: pointer; }
 
 /* settings popover */
 .settings-pop {
-  position: fixed; top: 64px; right: 16px; z-index: 60; width: 286px;
+  position: fixed; top: 64px; right: 24px; z-index: 60; width: 286px;
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
   box-shadow: var(--shadow); padding: 14px 16px 16px;
   display: flex; flex-direction: column; gap: 12px;
   max-height: calc(100vh - 80px); overflow-y: auto;
+  /* Keep the controls at one fixed width when a long tab starts scrolling. */
+  scrollbar-gutter: stable;
 }
 .settings-pop[hidden] { display: none; }
 
@@ -832,16 +860,22 @@ button { font-family: inherit; cursor: pointer; }
   padding-bottom: 14px; border-bottom: 1px solid var(--line-soft);
 }
 .credits-list { display: flex; flex-direction: column; gap: 6px; }
+.credits-team { padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-2); }
+.credits-team h4 { margin: 0 0 8px; font-size: 13px; color: var(--ink); }
+.credit-person { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 6px 0; text-decoration: none; }
+.credit-person:hover .credit-title { color: var(--accent); }
+.credit-person .credit-by { flex: none; margin: 0; }
 .credit-row {
-  display: flex; align-items: center; gap: 12px; text-decoration: none;
+  display: flex; align-items: flex-start; flex-wrap: wrap; gap: 8px 12px; text-decoration: none;
   padding: 10px 12px; border-radius: 10px;
   background: var(--panel-2); border: 1px solid var(--line);
   color: inherit; transition: .14s;
 }
 .credit-row:hover { border-color: color-mix(in oklab, var(--accent) 45%, var(--line)); background: var(--panel-3); }
-.credit-main { min-width: 0; flex: 1; }
+.credit-main { min-width: 0; flex: 1 1 180px; overflow-wrap: anywhere; }
 .credit-title { font-size: 13px; font-weight: 700; color: var(--ink); }
 .credit-by { font-size: 11.5px; color: var(--ink-2); line-height: 1.4; margin-top: 1px; }
+.credit-note { font-size: 11px; color: var(--ink-3); line-height: 1.45; margin-top: 5px; }
 .credit-lic {
   flex: none; font-family: var(--font-mono); font-size: 10.5px; font-weight: 700; letter-spacing: .02em;
   color: var(--accent); padding: 3px 8px; border-radius: 999px;
@@ -896,6 +930,9 @@ button { font-family: inherit; cursor: pointer; }
 .set-pieces button.on { border-color: var(--accent); color: var(--ink); background: color-mix(in oklab, var(--accent) 16%, var(--panel)); }
 
 .set-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.accent-row { flex-direction: row; align-items: center; justify-content: space-between; }
+.accent-row .set-chips { justify-content: flex-end; flex-wrap: nowrap; gap: 4px; }
+.accent-row .set-chip { width: 32px; flex: none; }
 .set-chip { width: 40px; height: 30px; border-radius: 7px; border: 2px solid transparent;
   cursor: pointer; padding: 0; overflow: hidden; position: relative; box-shadow: 0 0 0 1px var(--line); }
 .set-chip.on { border-color: var(--accent); }
@@ -978,6 +1015,11 @@ button { font-family: inherit; cursor: pointer; }
 /* panels fill their module and scroll when needed */
 .mod .panel:not(.review-mini) { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .mod .panel:not(.review-mini) .panel-body { flex: 1; min-height: 0; overflow: auto; }
+/* Engine contents keep their natural height; fitEnginePanel grows the module downward. */
+.mod[data-mod="engine"] .panel-head { flex: none; flex-wrap: wrap; }
+.mod[data-mod="engine"] .panel .engine-body { flex: none; height: auto; overflow: visible; }
+.engine-body > * { flex-shrink: 0; }
+.mod[data-mod="engine"] .engine-bestwalk { white-space: normal; }
 .mod .moves-panel .ml-scroll { max-height: none; overflow: visible; }
 .mod:not([data-mod="board"]):not([data-mod="controls"]) > .mod-inner > div { height: 100%; display: flex; flex-direction: column; min-height: 0; }
 
@@ -1066,6 +1108,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 .stage.auto.no-evalbar { --eb-w: 0px; }
 .player-strip { height: var(--strip-h); }
+.stage.canvas .player-strip { height: auto; }
 .stage.auto .mod[data-mod="evalbar"] { grid-area: eval; align-self: stretch; margin: var(--strip-h) 0; }
 .stage.auto .mod[data-mod="board"] { grid-area: board; width: var(--board); }
 .stage.auto .mod[data-mod="review"] { grid-area: review; height: var(--review-h); }
@@ -1175,7 +1218,43 @@ button { font-family: inherit; cursor: pointer; }
     grid-template-areas: "eval board" "controls controls" "review review" "moves moves" "graph graph" "acc acc" "engine engine";
   }
   .stage.auto .mod[data-mod="moves"] { height: min(420px, 60dvh); }
+  .stage.auto .player-strip .name { display: block; overflow: hidden; text-overflow: ellipsis; }
 }
+
+/* Desktop uses DEFAULT_LAYOUT from analysis.js as its single geometry source.
+   fitTabZoom selects this using the
+   unzoomed WINDOW size and scales the entire page uniformly, including type and spacing.
+   The grid above remains available on narrow windows and browsers without tab zoom APIs. */
+.stage.auto.desktop-layout {
+  position: relative; display: block; padding: 12px;
+  min-width: 1832px; min-height: 960px;
+  --coach-clear: 194px; --coach-float-h: 47px;
+}
+.stage.auto.desktop-layout .player-strip { height: auto; }
+.stage.auto.desktop-layout .mod {
+  position: absolute; margin: 0; min-height: 0; contain: none;
+}
+.stage.auto.desktop-layout .board-wrap {
+  flex: 1; min-height: 0; align-items: stretch; justify-content: center;
+}
+.stage.auto.desktop-layout .board {
+  flex: 0 1 auto; height: 100%; width: auto; aspect-ratio: 1; max-width: 100%; margin: auto;
+}
+.stage.auto.desktop-layout .side,
+.stage.auto.desktop-layout .side-cols,
+.stage.auto.desktop-layout .side-a,
+.stage.auto.desktop-layout .side-b {
+  display: contents; position: static;
+  padding: 0; contain: none; zoom: 1;
+}
+.stage.auto.desktop-layout .mod[data-mod="evalbar"] { margin: 0; }
+.stage.auto.desktop-layout .mod[data-mod="moves"],
+.stage.auto.desktop-layout .mod[data-mod="engine"] { min-height: 0; contain: none; }
+.stage.auto.desktop-layout .evalgraph svg { height: 120px; }
+.stage.auto.desktop-layout .mod[data-mod="coach"] { right: auto; margin: 0; }
+.stage.auto.desktop-layout.has-coach .insight-panel .ip-body { padding-right: var(--pad); }
+/* Match the free canvas: the evaluation stays at the right edge beside the coach. */
+.stage.auto.desktop-layout.has-coach .insight-panel .ip-head { padding-right: 0; }
 
 /* top bar and settings on small windows */
 @media (max-width: 760px) { .topbar-meta { display: none; } }
@@ -1272,7 +1351,10 @@ button { font-family: inherit; cursor: pointer; }
 .ip-opening .ip-op-txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* the body scrolls if the content (e.g. the hint button) is taller than the module, so nothing
    spills out behind the panel below it */
-.ip-body { padding: 13px var(--pad) 15px; display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; overflow-y: auto; }
+/* Keep move commentary readable when the floating coach overlaps the panel (PR #10). */
+.ip-body { position: relative; z-index: 20; padding: 13px var(--pad) 15px; display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; overflow-y: auto;
+  scrollbar-width: none; }
+.ip-body::-webkit-scrollbar { display: none; }
 /* fixed min-height so the row never shifts when the hint button or badge appears/disappears */
 .ip-head { display: flex; align-items: center; gap: 9px; min-height: 28px; }
 .ip-badge { width: 24px; height: 24px; flex: none; }
@@ -1281,7 +1363,7 @@ button { font-family: inherit; cursor: pointer; }
 .ip-eval.pos { color: var(--ink); }
 .ip-eval.neg { color: var(--q-miss); }
 /* whole insight panel uses the original mono font (matching the opening-book line) */
-.ip-move { font-family: var(--font-mono); font-weight: 800; font-size: 16px; color: var(--ink); }
+.ip-move { min-width: 0; overflow-wrap: anywhere; font-family: var(--font-mono); font-weight: 800; font-size: 16px; color: var(--ink); }
 .ip-tag { font-weight: 800; font-size: 13px; letter-spacing: .02em; margin-left: auto; }
 .ip-tag.practice {
   margin-left: 0; color: var(--accent-ink); background: var(--accent);

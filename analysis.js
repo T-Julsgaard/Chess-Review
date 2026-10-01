@@ -1,7 +1,7 @@
 // analysis.js — Chess Review analysis page (vanilla port of "Design 2.0").
 // Parses the PGN, runs Stockfish through the game and fills every panel with real
 // data: eval bar/graph, accuracy, mistake classification, engine lines (MultiPV),
-// opening (from the PGN), player/clock/result. Board + 6 piece styles + theme are selectable.
+// opening (from the PGN), player/clock/result. Board + 2 piece styles + theme are selectable.
 
 import { Chess } from "./lib/chess.js";
 import { Engine } from "./engine/uci.js";
@@ -12,7 +12,7 @@ import { generatePuzzles, puzzlesToPgn } from "./tactics-gen.js";
 import { loadCards, saveCards, addPuzzles, getDueCards, getUpcomingCards, getStats, gradeFromPractice, reviewCard } from "./srs.js";
 
 /* ---------------- Opening book ----------------
- * Offline lookup table built from lichess-org/chess-openings (see data/build-openings-db.js).
+ * Offline lookup table built from lichess-org/chess-openings (bundled in data/book.json).
  * Key = "epd" (the first 4 FEN fields: board, side, castling, en passant) → either
  * [eco, name] for a named theory position or 0 for "known, but unnamed".
  * Used for true book detection and opening naming in computeDerived(). */
@@ -23,8 +23,8 @@ function bookLookup(fen) { return BOOK ? BOOK[epdOf(fen)] : undefined; }
 async function loadBook() {
   if (BOOK) return BOOK;
   try {
-    // Use the new IndexedDB-backed openings database
-    BOOK = (await getLegacyBook()).epd || {};
+    const res = await fetch(browserAPI.runtime.getURL("data/book.json"));
+    BOOK = (await res.json()).epd || {};
   } catch {
     BOOK = {}; // book missing/unreadable → fall back to pure engine classification
   }
@@ -66,7 +66,7 @@ const GLYPH = { K: "♚", Q: "♛", R: "♜", B: "♝", N: "♞", P: "♟" };  /
 
 const BOARD_THEMES = {
   green:   ["#e9edcc", "#6f9c54"],
-  walnut:  ["#f0d9b5", "#b58863"],
+  walnut:  ["#efd8b6", "#b48764"],
   slate:   ["#dfe3e9", "#8a97a8"],
   ocean:   ["#dbe7f3", "#6f8fb4"],
   ink:     ["#b9bdc6", "#474c57"],
@@ -75,24 +75,29 @@ const BOARD_THEMES = {
   emerald: ["#e4ead4", "#46683f"],   // deep forest green
   coral:   ["#f7dfca", "#c8835a"],   // warm terracotta
 };
+// Display names are separate from persisted keys so existing board preferences keep working.
+const BOARD_THEME_LABEL = { green: "Meadow", walnut: "Hazel", slate: "Mist", ocean: "Harbor",
+  ink: "Graphite", maple: "Honeywood", emerald: "Forest", coral: "Terracotta" };
 const ACCENTS = {
   "#7fb45f": { accent: "#7fb45f", strong: "#6aa14a", ink: "#11210a" },
   "#5a8bef": { accent: "#5a8bef", strong: "#4574db", ink: "#06122e" },
   "#d9a544": { accent: "#d9a544", strong: "#c4902f", ink: "#2a1c05" },
+  "#c77edb": { accent: "#c77edb", strong: "#aa5fc1", ink: "#260d30" },
 };
-// Move classifications (standard style). Each has a color (CSS variable), a
+// Display names are independent of stored classification keys and scoring rules.
+// Each classification has a color (CSS variable), a
 // short symbol (fallback) and an SVG badge icon in icons/<icon>.svg. Note that the
 // internal code "inacc" points to the "inaccuracy" icon.
 const QUALITY = {
-  brilliant: { sym: "!!", name: "Brilliant", color: "var(--q-brilliant)", icon: "brilliant" },
-  great:     { sym: "!",  name: "Great",     color: "var(--q-great)",     icon: "great" },
+  brilliant: { sym: "!!", name: "Masterstroke", color: "var(--q-brilliant)", icon: "brilliant" },
+  great:     { sym: "!",  name: "Superb",    color: "var(--q-great)",     icon: "great" },
   best:      { sym: "★",  name: "Best",      color: "var(--q-best)",      icon: "best" },
-  excellent: { sym: "✓",  name: "Excellent", color: "var(--q-excellent)", icon: "excellent" },
-  good:      { sym: "✓",  name: "Good",      color: "var(--q-good)",      icon: "good" },
-  book:      { sym: "◇",  name: "Book",      color: "var(--q-book)",      icon: "book" },
-  inacc:     { sym: "?!", name: "Inaccuracy",color: "var(--q-inacc)",     icon: "inaccuracy" },
-  mistake:   { sym: "?",  name: "Mistake",   color: "var(--q-mistake)",   icon: "mistake" },
-  miss:      { sym: "✕",  name: "Miss",      color: "var(--q-miss)",      icon: "miss" },
+  excellent: { sym: "✓",  name: "Near best", color: "var(--q-excellent)", icon: "excellent" },
+  good:      { sym: "✓",  name: "Decent",    color: "var(--q-good)",      icon: "good" },
+  book:      { sym: "◇",  name: "Theory",    color: "var(--q-book)",      icon: "book" },
+  inacc:     { sym: "?!", name: "Minor Misstep", color: "var(--q-inacc)", icon: "inaccuracy" },
+  mistake:   { sym: "?",  name: "Major Misstep", color: "var(--q-mistake)", icon: "mistake" },
+  miss:      { sym: "✕",  name: "Missed chance", color: "var(--q-miss)", icon: "miss" },
   blunder:   { sym: "??", name: "Blunder",   color: "var(--q-blunder)",   icon: "blunder" },
 };
 const QUALITY_ORDER = ["brilliant","great","best","excellent","good","book","inacc","mistake","miss","blunder"];
@@ -100,9 +105,9 @@ const QUALITY_ORDER = ["brilliant","great","best","excellent","good","book","ina
 const QBREAK_SUMMARY = ["brilliant","great","best","mistake","miss","blunder"];
 const QBREAK_FULL = ["brilliant","great","book","best","excellent","good","inacc","mistake","miss","blunder"];
 const QUALITY_LABEL = {
-  brilliant: "Brilliant move!", great: "Great move!", best: "Best move",
-  excellent: "Excellent", good: "Good move", book: "Book move",
-  inacc: "Inaccuracy", mistake: "Mistake", miss: "Missed chance", blunder: "Blunder",
+  brilliant: "Masterstroke!", great: "Superb move!", best: "Best move",
+  excellent: "Near best", good: "Decent move", book: "Theory move",
+  inacc: "Minor Misstep", mistake: "Major Misstep", miss: "Missed chance", blunder: "Blunder",
 };
 const NOTEWORTHY = new Set(["brilliant","great","inacc","mistake","miss","blunder"]);
 // Explanation for each category (shown as a tooltip in the accuracy panel). The classifier
@@ -116,13 +121,13 @@ const QUALITY_DESC = {
   excellent: "Not the top move, but nearly as strong (loses well under half a pawn), or a move that begins or keeps a forced mate.",
   good:      "A solid move (loses roughly half to one pawn), or one that delays an unavoidable mate.",
   book:      "A known opening move — the position is in the opening book (theory from a large game dataset).",
-  inacc:     "Inaccuracy: a move that loses about 1–4 pawns of eval.",
-  mistake:   "Mistake: a move that throws away a clear (≥2 pawn) advantage, or hands the opponent one.",
+  inacc:     "Minor Misstep: a move that loses about 1–4 pawns of eval.",
+  mistake:   "Major Misstep: a move that throws away a clear (≥2 pawn) advantage, or hands the opponent one.",
   miss:      "Missed chance: the opponent erred and you failed to punish it — or you let a forced mate slip.",
   blunder:   "Blunder: a move that loses ~4+ pawns of eval, or walks into a forced mate.",
 };
 // Explanations for the accuracy and elo numbers (shown as a tooltip like the categories).
-const ACCURACY_INFO = "Accuracy (0–100) reflects how good your moves were: each move scores by its category (Best/Brilliant = 100 down to Blunder = 0) and the game accuracy is their average — close to what the major sites report. (The Elo estimate below uses a separate win%-based accuracy under the hood.) 100 = flawless.";
+const ACCURACY_INFO = "Accuracy (0–100) is an estimate calculated from local Stockfish evaluations using this extension's scoring rules. Higher scores indicate more accurate play. Scores depend on engine settings and scoring parameters and are not official platform scores.";
 const ELO_INFO = "A rough estimate of the rating you played at in this game. It anchors on your actual rating and adjusts up or down by how accurately you played this game (when no rating is known it falls back to accuracy alone). It's not an official rating — only an indication based on this single game.";
 // Explanations for the engine settings (shown on hover, same tooltip as the accuracy panel).
 const ENGINE_INFO = {
@@ -130,74 +135,85 @@ const ENGINE_INFO = {
   classifyLines: "Lines searched per position during the analysis batch. 1 is fastest and is all the move classification needs; raising it measures your move in the same search (steadier accuracy/Elo) and pre-fills the panel. Re-analyzes the game.",
   engineDepth:   "How many plies (half-moves) deep Stockfish searches each position. Higher depth gives more accurate evaluations and fewer false mistakes, but takes longer.",
   engineWorkers: "Number of Stockfish instances analysing positions in parallel. More workers finish the game faster on multi-core CPUs; the results are identical.",
-  fastAnalysis:  "Trades quality for speed: the classification pass uses fewer engine lines. ~1.3×/1.6× faster, but evals shift slightly and clean games can pick up a few false inaccuracies.",
-  enginePath:    "Which Stockfish build to run. Stockfish 19 (default) is the strongest; Stockfish 18 NNUE is lighter; Stockfish 10 (WASM) is lighter still; asm.js is a fallback for browsers without WebAssembly support.",
+  fastAnalysis:  "Trades quality for speed: the classification pass uses fewer engine lines. ~1.3×/1.6× faster, but evals shift slightly and clean games can pick up a few false minor missteps.",
+  enginePath:    "Stockfish 18 NNUE is the default. Stockfish 19 Lite uses a smaller evaluation network for a compact alternative. Both run locally; Lite is not the full-strength Stockfish 19 build.",
   engineSkill:   "Caps the engine's playing strength (Stockfish 'Skill Level'). Max (20) = full strength. Lower values play deliberately weaker — useful for more human-like suggestions.",
-  engineHash:    "Memory (MB) for the engine's transposition table — its cache of already-searched positions. More can speed up deep searches; setting it too high just wastes RAM.",
-  clsGood:       "A move that loses at least this much eval (in pawns) can be no better than \"Good\". Below it, the move is \"Excellent\". Lower = stricter.",
-  clsInacc:      "A move that loses at least this much eval (pawns) is flagged \"Inaccuracy\". Lower = more inaccuracies.",
+  engineHash:    "Recommended: 16 MB for most reviews (the default). Try 32–64 MB for deeper analysis if your computer has spare memory. Each parallel worker uses its own hash table, so memory use is roughly Hash × Workers.",
+  clsGood:       "A move that loses at least this much eval (in pawns) can be no better than \"Decent\". Below it, the move is \"Near best\". Lower = stricter.",
+  clsInacc:      "A move that loses at least this much eval (pawns) is flagged \"Minor Misstep\". Lower = more minor missteps.",
   clsBlunder:    "A move that loses at least this much eval (pawns) is a \"Blunder\". Lower = more blunders.",
-  clsClearAdv:   "How many pawns counts as a \"clear advantage\". Used to decide Mistakes (you threw away a clear advantage), Misses, and the context for Great moves.",
-  clsMistakeLoss:"Minimum eval lost (pawns) for a move to qualify as a Mistake, and for a slip to be \"punishable\" (enabling a Great/Miss on the reply).",
-  clsMissTol:    "How close to giving back the whole advantage still counts as a Miss rather than a clean punish. Higher = more Misses.",
+  clsClearAdv:   "How many pawns counts as a \"clear advantage\". Used to decide Major Missteps (you threw away a clear advantage), Missed chances, and the context for Superb moves.",
+  clsMistakeLoss:"Minimum eval lost (pawns) for a move to qualify as a Major Misstep, and for a slip to be \"punishable\" (enabling a Superb move or Missed chance on the reply).",
+  clsMissTol:    "How close to giving back the whole advantage still counts as a Missed chance rather than a clean punish. Higher = more missed chances.",
 };
 // Slider value formatters reused by the Engine-tab classification/accuracy knobs.
 const pawnsFmt = (v) => (+v).toFixed(2).replace(/\.00$/, "") + " pawns";
 const ptsFmt = (v) => v + " pts";
 // URL to a classification badge (SVG).
 const qIcon = (cls) => _url("icons/" + (QUALITY[cls]?.icon || cls) + ".svg");
-const PIECE_STYLES = ["image","merida","kaneo","kaneo_midnight","kbyte_gambit"];
-// Labels shown in the settings. "image" = bundled Cburnett (the Lichess default set, the standard
-// here), "merida" = the bundled Merida set; the kaneo/kaneo_midnight/kbyte sets are bundled Kadagaden
-// sets (CC BY 4.0) — all crisp SVG.
-const PIECE_STYLE_LABEL = { image: "Cburnett", merida: "Merida", kaneo: "Kaneo", kaneo_midnight: "Kaneo Midnight", kbyte_gambit: "1Kbyte Gambit" };
-// Color approximation of common board themes [light, dark square], used to MATCH a detected
-// board by name (colours aren't copyrightable; the source site's board image is never used).
-// Unknown themes fall back to "green".
-const CC_BOARD_COLORS = {
-  green:      ["#ebecd0", "#739552"],
-  brown:      ["#f0d9b5", "#b58863"],
-  walnut:     ["#c8a275", "#875f3c"],
-  wood:       ["#c0926a", "#7c4f31"],
-  dark_wood:  ["#c0926a", "#7c4f31"],
-  blue:       ["#dee3e6", "#8ca2ad"],
-  sky:        ["#dee3e6", "#8ca2ad"],
-  light:      ["#dad6cc", "#b0a999"],
-  glass:      ["#c2d3da", "#7a9db0"],
-  bubblegum:  ["#f9f0fb", "#e6a3c6"],
-  tournament: ["#eaeed3", "#6f9f64"],
-  newspaper:  ["#e6e6e6", "#9c9c9c"],
-  marble:     ["#e8e2d6", "#9a8d7a"],
-  icy_sea:    ["#cdd7e0", "#7d97ab"],
-  sea:        ["#cdd7e0", "#7d97ab"],
-  metal:      ["#d6d6d6", "#8e8e8e"],
-};
+const PIECE_STYLES = ["image","merida"];
+// Persisted "image" selects Cburnett; both remaining sets are bundled GPLv2+ SVGs.
+const PIECE_STYLE_LABEL = { image: "Cburnett", merida: "Merida" };
+const CATEGORY_NAME_LIMIT = 24;
+function cleanCategoryName(value) {
+  return typeof value === "string"
+    ? Array.from(value.replace(/[\u0000-\u001f\u007f]/g, " ").trim().replace(/\s+/g, " ")).slice(0, CATEGORY_NAME_LIMIT).join("")
+    : "";
+}
+function categoryName(cls) {
+  return cleanCategoryName(S.settings.categoryNames?.[cls]) || QUALITY[cls]?.name || "";
+}
+// Replace category vocabulary before filling coach tokens, so user names never become tokens.
+// A single pass also prevents one custom name from being replaced by another category's alias.
+function categoryText(text) {
+  const names = QUALITY_ORDER.filter(k => categoryName(k) !== QUALITY[k].name);
+  if (!names.length) return text;
+  const byName = new Map(names.map(k => [QUALITY[k].name.toLowerCase(), categoryName(k)]));
+  const pattern = names.map(k => QUALITY[k].name).sort((a, b) => b.length - a.length).join("|");
+  return text.replace(new RegExp("\\b(" + pattern + ")\\b", "gi"), match => byName.get(match.toLowerCase()));
+}
 // "image" = real piece images (cburnett). Filenames per piece+color (l=white, d=black).
 // Bundled high-quality SVG piece sets (from Lichess; GPLv2+). Maps a piece-style key to its folder
 // under pieces-img/<set>/<code>.svg, where <code> is e.g. wK / bN (white King, black kNight). SVG =
 // crisp at any board size.
-const BUNDLED_PIECE_SETS = { image: "cburnett", merida: "merida", kaneo: "kaneo", kaneo_midnight: "kaneo_midnight", kbyte_gambit: "kbyte_gambit" };
-// Bundled full-board artwork from Kadagaden/chess-pieces (CC BY 4.0). Each entry is a complete 8x8
-// SVG painted as the board's background (squares go transparent via .cc-board, like a detected
-// board); the [light, dark] pair drives the coordinate + last-move/selection highlight tints so
-// they read well on top of that board. Keyed by the boardTheme setting value.
-const BUNDLED_BOARDS = {
-  kada_green:   { label: "Kada Green", file: "8x8_green.svg",                colors: ["#ebecd0", "#779556"] },
-  kada_sand:    { label: "Sand",       file: "8x8_brown_sand.svg",           colors: ["#ebecd0", "#b68860"] },
-  kada_amber:   { label: "Amber",      file: "8x8_brown_yellow.svg",         colors: ["#f4eeaa", "#af7c59"] },
-  kada_clay:    { label: "Clay",       file: "8x8_pinkish_brown_yellow.svg", colors: ["#f4eeaa", "#d29b75"] },
-  kada_wood:    { label: "Wood",       file: "8x8_wood.svg",                 colors: ["#ba9d78", "#6e4e37"] },
+const BUNDLED_PIECE_SETS = { image: "cburnett", merida: "merida" };
+// Retired board preferences migrate to retained flat-color boards.
+const REMOVED_BOARD_THEMES = {
+  chesscom: "maple", // The retired source-matched option returns to Honeywood.
+  kada_green: "green", kada_sand: "walnut", kada_amber: "maple",
+  kada_clay: "coral", kada_wood: "maple",
 };
+function migrateVisualAssetSettings(settings) {
+  let changed = false;
+  if (!PIECE_STYLES.includes(settings.pieceStyle)) {
+    settings.pieceStyle = "image";
+    changed = true;
+  }
+  const replacement = REMOVED_BOARD_THEMES[settings.boardTheme];
+  if (replacement) {
+    settings.boardTheme = replacement;
+    changed = true;
+  }
+  // Remove source artwork metadata retained by older versions.
+  for (const key of ["ccPieceSet", "ccPieceUrlTemplate", "ccPieceUrlMap", "ccBoardTheme", "ccBoardUrl"]) {
+    if (Object.hasOwn(settings, key)) {
+      delete settings[key];
+      changed = true;
+    }
+  }
+  return changed;
+}
 
 const DEFAULT_SETTINGS = {
-  theme: "dark", accent: "#7fb45f", density: "compact",
+  categoryNames: {},
+  theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
   // Eval-graph look (see renderGraph), eval-BAR look (see renderEvalBar) and the Insight-panel text size (px).
   graphStyle: "area", barStyle: "gradient", insightFont: 18,
   // Board coordinate labels (the a–h / 1–8 ticks in the squares' corners): on/off + size in px.
   showCoords: true, coordSize: 12,
   // App background: "color" (a tone picked with the HSL sliders), a bundled preset (slate / olive
-  // = "Dark", a fixed near-black tone / ember), or "custom" (uploaded). bgFit is "cover" (stretched) or "tile" (repeated
+  // = "Dark", a fixed near-black tone), or "custom" (uploaded). bgFit is "cover" (stretched) or "tile" (repeated
   // at bgTile size). bgCustom holds the uploaded data URL. bgHue/Sat/Light define the "color" tone.
   // Default = a near-black neutral colour tone (HSL 0/0/11).
   bg: "color", bgFit: "tile", bgTile: "large", bgCustom: null,
@@ -206,15 +222,12 @@ const DEFAULT_SETTINGS = {
   // coachPlain toggles only the reply VOICE: false = the coach's special phrasing,
   // true = neutral "plain" commentary (the coach still appears and reacts on the board).
   coach: "old_soviet", coachPlain: true,
-  // When chess.com's board/pieces can't be detected, fall back to the green board and the
-  // bundled "Default" (image) pieces.
-  boardTheme: "chesscom", pieceStyle: "image", sound: true,
+  // Start with Honeywood (persisted as "maple") and bundled Cburnett pieces.
+  boardTheme: "maple", pieceStyle: "image", sound: true,
   // Master volume (0–100) applied to every sound the extension plays.
   soundVolume: 50,
   // Custom board colours (used when boardTheme === "custom" — the colour-picker chip, shown first).
   boardCustomLight: "#f9f9f9", boardCustomDark: "#e1a652",
-  // Practice-mode "wrong answer" effect (file under sounds/Wrong/; see WRONG_SOUNDS). Standard = "Incorrect".
-  wrongSound: "Incorrect.mp3",
   // Per-event sound mapping + knobs (see FX_SOUNDS / SOUND_EVENTS). snd = an FX_SOUNDS id or "default"
   // (the original cue); pitch in semitones; speed is a duration multiplier (1 = unchanged).
   soundFx: {
@@ -223,12 +236,8 @@ const DEFAULT_SETTINGS = {
     check:   { snd: "default", pitch: 0, speed: 1 },
     castle:  { snd: "default", pitch: 0, speed: 1 },
   },
-  // ccBoardTheme = the detected board's NAME (when opened from a chess.com/Lichess tab) → mapped to
-  // our own board colours. Pieces are never imported. We never store or fetch a source site's
-  // piece/board image. The other cc* fields are dead (kept null for back-compat with old saves).
-  ccPieceSet: null, ccPieceUrlTemplate: null, ccPieceUrlMap: null, ccBoardTheme: null, ccBoardUrl: null,
   // Best-move arrow (the engine's recommendation in the current position)
-  bestArrow: true, arrowOpacity: 0.65, arrowShaft: 0.2, arrowHead: 0.4,
+  bestArrow: true, bestArrowColor: "#85ae4a", arrowOpacity: 0.65, arrowShaft: 0.2, arrowHead: 0.4,
   // "Show the threat": a yellow arrow with the opponent's best move as if it were their turn.
   showThreat: false,
   // Move animation (sliding piece on single-step navigation). 1 = slow, 10 = fast.
@@ -240,7 +249,7 @@ const DEFAULT_SETTINGS = {
   // viewing, so changing this never re-analyzes — it just refreshes the panel.
   // Depth 16 (was 12): shallow searches give noisy evals that fabricate inaccuracies/mistakes and
   // inflate the accuracy variance vs the reference values. Deeper search is the single biggest accuracy fix.
-  engineLines: 1, engineDepth: 16, enginePath: "sf19", engineHash: 16, engineSkill: 20,
+  engineLines: 1, engineDepth: 16, enginePath: "nnue", engineHash: 16, engineSkill: 20,
   // Parallel analysis workers: independent single-threaded Stockfish instances that pull
   // positions from a shared queue. Each position is still searched identically (cold, same
   // depth/lines), so results are unchanged — only the wall-clock is parallelized. Default ≈
@@ -272,16 +281,18 @@ const ENGINE_SETTING_KEYS = [
   "clsGood", "clsInacc", "clsBlunder", "clsClearAdv", "clsMistakeLoss", "clsMissTol",
   "accExcellent", "accGood", "accInacc", "accMiss", "accMistake", "accBlunder",
 ];
-// Available Stockfish builds (all bundled). "asm" = fallback without wasm.
-const ENGINE_BUILDS = { sf19: "engine/stockfish-19-nnue.js", nnue: "engine/stockfish-nnue.js", wasm: "engine/stockfish.js", asm: "engine/stockfish.asm.js" };
-// Fixed strength order, strongest → weakest. createEngine() always tries the user's chosen build
-// first, then walks DOWN this chain so a build that can't load (e.g. NNUE one day failing) degrades
-// to the next-strongest one that does — rather than the analysis silently hanging.
-const ENGINE_FALLBACK_ORDER = ["sf19", "nnue", "wasm", "asm"];
+// Two single-threaded builds; the app parallelizes positions across independent workers.
+const ENGINE_BUILDS = { nnue: "engine/stockfish-nnue.js", sf19lite: "engine/stockfish-19-lite-single.js" };
+const ENGINE_FALLBACK_ORDER = ["nnue", "sf19lite"];
+
+function migrateEngineSettings(settings) {
+  if (settings.enginePath === "sf19") settings.enginePath = "sf19lite";
+  if (!Object.hasOwn(ENGINE_BUILDS, settings.enginePath)) settings.enginePath = DEFAULT_SETTINGS.enginePath;
+}
 // The engine panel shows up to this many candidate lines (searched on demand for the viewed position).
 const ENGINE_MAX_LINES = 4;
 // Best-move arrow color — a muted hint green.
-const ARROW_COLOR = "#85AE4A";
+const ARROW_COLOR = "#85ae4a";
 // User arrow color — yellow/orange.
 const USER_ARROW_COLOR = "#E89B3C";
 // Loading style → CSS variant. The keys are shown directly in the settings.
@@ -295,18 +306,20 @@ const LOADERS = { dots: "pulse", bounce: "bounce", spinner: "spin", wave: "wave"
 // top-right, review spanning the top of the right stack, panels retuned around them.
 // v8: the automatic responsive layout is the default; a canvas layout is only used once the user
 // reorganizes (S.layoutMode "custom"), and then starts from a snapshot of the screen. These boxes
-// remain the fallback for a module that is hidden when that snapshot is taken.
+// also define the desktop automatic layout and hidden-module snapshot fallback.
+// Geometry copied from the maintainer's saved unpacked-extension layout (September 2026).
+// Accuracy and Engine use the expanded breakdown baseline; collapse shifts Engine up.
 const LAYOUT_VERSION = 8;
 const DEFAULT_LAYOUT = {
-  board:    { x: 346,  y: 0,   w: 824, h: 936 },
-  evalbar:  { x: 290,  y: 60,  w: 32,  h: 818 },
-  controls: { x: 1194, y: 808, w: 312, h: 56  },
-  coach:    { x: 1570, y: 0,   w: 194, h: 198 },
-  review:   { x: 1200, y: 62,  w: 608, h: 138 },
-  moves:    { x: 1200, y: 220, w: 300, h: 388 },
-  accuracy: { x: 1512, y: 218, w: 296, h: 172 },
-  graph:    { x: 1200, y: 622, w: 300, h: 172 },
-  engine:   { x: 1512, y: 738, w: 296, h: 198 },
+  board:    { x: 344,  y: 0,   w: 822, h: 934 },
+  evalbar:  { x: 288,  y: 58,  w: 30,  h: 816 },
+  controls: { x: 1194, y: 812, w: 310, h: 54  },
+  coach:    { x: 1570, y: 0,   w: 192, h: 196 },
+  review:   { x: 1200, y: 60,  w: 606, h: 136 },
+  moves:    { x: 1200, y: 218, w: 300, h: 386 },
+  accuracy: { x: 1510, y: 216, w: 294, h: 506 },
+  graph:    { x: 1200, y: 620, w: 302, h: 178 },
+  engine:   { x: 1512, y: 738, w: 294, h: 176 },
 };
 const GRIP_SVG = `<svg viewBox="0 0 12 12" width="12" height="12"><path d="M11 4 4 11M11 8 8 11" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>`;
 const HANDLE_SVG = `<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><circle cx="5" cy="4" r="1.3"/><circle cx="11" cy="4" r="1.3"/><circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/><circle cx="5" cy="12" r="1.3"/><circle cx="11" cy="12" r="1.3"/></svg>`;
@@ -404,7 +417,16 @@ function shareGame(ev) {
     // PC whose stored handle doesn't match either player — the username stays the safety net, the
     // flip is the certainty. (flip = is the user Black / sitting after a board flip.)
     const meta = { ...S.meta, flip: S.flipped, myName: (S.players?.[S.meSide]?.name) || S.username || "" };
-    const data = encodeURIComponent(b64encode(JSON.stringify({ pgn: S.pgn, meta })));
+    let pgn = S.pgn;
+    if (S.meta?.explore && S.variation) {
+      const chess = new Chess(S.variation.positions[0].fen);
+      for (const p of S.variation.positions.slice(1, S.variation.idx + 1)) {
+        chess.move({ from: p.from, to: p.to, promotion: p.promotion || undefined });
+      }
+      pgn = chess.pgn();
+      delete meta.explore;
+    }
+    const data = encodeURIComponent(b64encode(JSON.stringify({ pgn, meta })));
     const carrier = ((S.meta && S.meta.url) ? S.meta.url : "https://www.chess.com/").split("#")[0];
     const url = carrier + "#gambit=" + data;
     navigator.clipboard.writeText(url)
@@ -461,14 +483,6 @@ function fxUrl(ev) {
   if (cfg.snd === "default") return _url(_eventDef(ev)[2]);
   return _url(_fxFileById(cfg.snd) || _eventDef(ev)[2]);
 }
-// Selectable "wrong answer" effects (practice mode). [filename, label]; first entry is the default.
-// Kept deliberately short — "Incorrect" is the standard cue, with "Wrong" and "No" as alternatives.
-const NO_WRONG_FILE = "No.mp3";
-const WRONG_SOUNDS = [
-  ["Incorrect.mp3", "Incorrect"],
-  ["Wrong.mp3", "Wrong"],
-  ["No.mp3", "No"],
-];
 // Master volume (0–1) for every sound the extension plays — driven by the "Volume" slider.
 function masterVol() {
   const v = S.settings.soundVolume;
@@ -580,32 +594,25 @@ function navFastScrub() {
   _lastNavStep = now;
   return fast;
 }
-// Pick the event for a SAN string. Priority: check/mate > castle > capture > plain move.
+// Pick the event for a SAN string. Priority: capture > check/mate > castle > plain move.
 function sanSound(san) {
   san = san || "";
+  if (/x/.test(san)) return "capture";
   if (/[+#]/.test(san)) return "check";
   if (/^[O0]-[O0]/.test(san)) return "castle";
-  if (/x/.test(san)) return "capture";
   return "move";
 }
-// Play the move sound for the position you land on (check/castle/capture/move, from its SAN).
+// Play the move sound for the position you land on (capture/check/castle/move, from its SAN).
 function playMoveSound(ply) {
   if (!S.settings.sound || ply < 1 || !S.positions[ply]) return;
   playEvent(sanSound(S.positions[ply].san));
 }
-// Cached "wrong answer" Audio (rebuilt when the chosen effect changes).
-let _wrongAudio = null, _wrongAudioKey = null;
-// The selected effect, falling back to the default if an old/removed choice is still stored.
-function currentWrongFile() {
-  const f = S.settings.wrongSound;
-  return WRONG_SOUNDS.some(([file]) => file === f) ? f : WRONG_SOUNDS[0][0];
-}
+// The practice mistake cue is fixed to Incorrect.
+let _wrongAudio = null;
 function playWrongSound() {
   if (!S.settings.sound) return;
-  const file = currentWrongFile();
-  if (_wrongAudioKey !== file) { _wrongAudio = new Audio(_url("sounds/Wrong/" + file)); _wrongAudioKey = file; }
-  // The "No" voice clip opens with a beat of silence — skip into it so the cue lands promptly.
-  try { _wrongAudio.volume = masterVol(); _wrongAudio.currentTime = file === NO_WRONG_FILE ? 0.08 : 0; _wrongAudio.play().catch(() => {}); } catch {}
+  if (!_wrongAudio) _wrongAudio = new Audio(_url("sounds/Wrong/Incorrect.mp3"));
+  try { _wrongAudio.volume = masterVol(); _wrongAudio.currentTime = 0; _wrongAudio.play().catch(() => {}); } catch {}
 }
 
 /* ---------------- State ---------------- */
@@ -629,10 +636,10 @@ const S = {
   evalEngines: [], autoTimer: null,
   // Re-analysis + analysis mode
   batchGen: 0, settingsTab: "visual", analyzedMultipv: null,
-  analysisMode: false, variation: null, liveEngine: null, liveToken: 0, panelToken: 0, _panelCache: null, selectedSq: null,
+  analysisMode: false, variation: null, liveEngine: null, liveEnginePromise: null, liveEngineGeneration: 0, liveError: null, liveToken: 0, panelToken: 0, _panelCache: null, selectedSq: null,
   // The build that is ACTUALLY running (set by createEngine; may differ from settings.enginePath if
   // the chosen build failed to load and we fell back). The Engine tab shows this, not the selection.
-  activeEngineBuild: null,
+  activeEngineBuild: null, engineFallbackBuild: null,
   // "Play best moves from here": auto-walk that re-analyzes each position and plays the engine's
   // best move until mate/draw or the user takes over. Token invalidates an in-flight walk.
   bestWalkToken: 0, bestWalking: false,
@@ -721,7 +728,6 @@ function buildPositions(pgn) {
   // This correctly detects threefold repetition, 50-move rule, etc.
   const pos = [];
   const replay = new Chess(startFen);
-  const epdCount = new Map();
   
   function getDrawType(chess) {
     if (chess.isCheckmate()) return "checkmate";
@@ -734,21 +740,11 @@ function buildPositions(pgn) {
   
   // Initial position
   const startDraw = getDrawType(replay);
-  const startEpd = startFen.split(" ").slice(0, 4).join(" ");
-  epdCount.set(startEpd, 1);
   pos.push({ fen: startFen, san: null, draw: startDraw });
   
   for (const mv of moves) {
-    // Play the move on the replay board
-    try {
-      replay.move({ from: mv.from, to: mv.to, promotion: mv.promotion });
-    } catch {
-      // If move fails, continue anyway
-    }
+    replay.move({ from: mv.from, to: mv.to, promotion: mv.promotion });
     const fen = mv.after;
-    const epd = fen.split(" ").slice(0, 4).join(" ");
-    const count = (epdCount.get(epd) || 0) + 1;
-    epdCount.set(epd, count);
     
     const draw = getDrawType(replay);
     pos.push({ fen, san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "", draw });
@@ -920,7 +916,9 @@ function learnedAccuracy(accs, vols, a) {
   return Math.max(0, Math.min(100, acc));
 }
 
-/* ---------------- Move classification (based on an open-source MIT-licensed classifier) ----------
+/* ---------------- Move classification (adapted from Brilliant-Chess, MIT) -----------------------
+   Copyright (c) 2025 Delo <https://github.com/wdeloo>.
+   Full upstream copyright and permission notice: THIRD_PARTY_NOTICES.md.
    The category logic (top-tier … Blunder) is derived from that approach because it is more stable
    than our old win%-drop buckets — above all it uses a real, board-based SACRIFICE test,
    so a plain trade is never mistaken for a brilliancy (our old maxOpponentWin counted gross
@@ -997,17 +995,17 @@ function isSacrifice(move) {
   return false;
 }
 // --- Eval readouts (all from our white-relative S.evals[]) ---
-function _evalPawnsWhite(k) { const e = S.evals[k]; return e ? scoreToCp(e) / 100 : null; }
-function _evalPawns(k, mover) { const p = _evalPawnsWhite(k); return p == null ? null : (mover === "w" ? p : -p); }
-function _isMateEval(k) { const e = S.evals[k]; return !!(e && e.mate != null); }
+function _evalPawnsWhite(k, state = S) { const e = state.evals[k]; return e ? scoreToCp(e) / 100 : null; }
+function _evalPawns(k, mover, state = S) { const p = _evalPawnsWhite(k, state); return p == null ? null : (mover === "w" ? p : -p); }
+function _isMateEval(k, state = S) { const e = state.evals[k]; return !!(e && e.mate != null); }
 // Mate distance from `mover`'s POV at position k (>0 = mover mating, <0 = mover being mated).
-function _mateFor(k, mover) { const e = S.evals[k]; if (!e || e.mate == null) return null; return mover === "w" ? e.mate : -e.mate; }
-function _isCheckmate(k) { try { return new Chess(S.positions[k].fen).isCheckmate(); } catch { return false; } }
+function _mateFor(k, mover, state = S) { const e = state.evals[k]; if (!e || e.mate == null) return null; return mover === "w" ? e.mate : -e.mate; }
+function _isCheckmate(k, state = S) { try { return new Chess(state.positions[k].fen).isCheckmate(); } catch { return false; } }
 // Eval loss (pawns, the mover's own POV) of the move that produced position k.
-function _moveLoss(k) {
+function _moveLoss(k, state = S) {
   if (k < 1) return null;
-  const m = S.positions[k].color;
-  const a = _evalPawns(k - 1, m), b = _evalPawns(k, m);
+  const m = state.positions[k].color;
+  const a = _evalPawns(k - 1, m, state), b = _evalPawns(k, m, state);
   return (a == null || b == null) ? null : a - b;
 }
 // Baseline bucket on the WIN%-DROP (the "expected points" model),
@@ -1025,15 +1023,15 @@ function getStandardRating(wp) {
 }
 // Per-ply move category, ported from getMoveRating(). `mover` made move i; `isTop` = it was the
 // engine's #1; `book` = the resulting position is theory; arrays sac/std/loss are indexed by ply.
-function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop) {
+function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop, state = S) {
   if (book) return "book";
   // "Forced": only one legal move in the position before — we have no separate icon, so it reads
   // as Best (you couldn't have done better).
-  if (_forcedAt(i)) return "best";   // only one legal move — you couldn't have done better
+  if (_forcedAt(i, state)) return "best";   // only one legal move — you couldn't have done better
 
   // User-tunable thresholds (Engine settings → Move classification), all in pawns of eval.
-  const CA = S.settings.clsClearAdv, ML = S.settings.clsMistakeLoss, MT = S.settings.clsMissTol;
-  const mate = _isMateEval, evalFor = (k) => _evalPawns(k, mover);
+  const CA = state.settings.clsClearAdv, ML = state.settings.clsMistakeLoss, MT = state.settings.clsMissTol;
+  const mate = (k) => _isMateEval(k, state), evalFor = (k) => _evalPawns(k, mover, state);
   const winningNow = (evalFor(i) ?? 0) > 0;
   const prevWinning = (evalFor(i - 1) ?? 0) > 0;
   const notMateRel = !mate(i) && !mate(i - 1);
@@ -1041,10 +1039,10 @@ function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop) {
   const pStd = (n) => (i - 1 - n >= 1 ? std[i - 1 - n] : null);
   const pLoss = (n) => (i - 1 - n >= 1 ? loss[i - 1 - n] : null);
   // mover-POV "lost a clear advantage" / "fell into a clear disadvantage" (CA pawns) for move k.
-  const losingAdvAt = (k) => { const m = S.positions[k].color; const a = _evalPawns(k - 1, m), b = _evalPawns(k, m); return a != null && b != null && a >= CA && b < CA; };
-  const givingAdvAt = (k) => { const m = S.positions[k].color; const a = _evalPawns(k - 1, m), b = _evalPawns(k, m); return a != null && b != null && a >= -CA && b < -CA; };
-  const keepMating = (k) => { const c = _mateFor(k, S.positions[k].color), p = _mateFor(k - 1, S.positions[k].color); return c != null && p != null && c > 0 && p > 0 && c <= p; };
-  const advanceMate = (k) => { const c = _mateFor(k, S.positions[k].color), p = _mateFor(k - 1, S.positions[k].color); return c != null && p != null && c < 0 && p < 0 && c > p; };
+  const losingAdvAt = (k) => { const m = state.positions[k].color; const a = _evalPawns(k - 1, m, state), b = _evalPawns(k, m, state); return a != null && b != null && a >= CA && b < CA; };
+  const givingAdvAt = (k) => { const m = state.positions[k].color; const a = _evalPawns(k - 1, m, state), b = _evalPawns(k, m, state); return a != null && b != null && a >= -CA && b < -CA; };
+  const keepMating = (k) => { const c = _mateFor(k, state.positions[k].color, state), p = _mateFor(k - 1, state.positions[k].color, state); return c != null && p != null && c > 0 && p > 0 && c <= p; };
+  const advanceMate = (k) => { const c = _mateFor(k, state.positions[k].color, state), p = _mateFor(k - 1, state.positions[k].color, state); return c != null && p != null && c < 0 && p < 0 && c > p; };
 
   const previousMistake = wasNotMateRel(0) && pStd(0) === "inacc" && pLoss(0) >= ML && (losingAdvAt(i - 1) || givingAdvAt(i - 1));
   const previousPreviousMistake = wasNotMateRel(1) && pStd(1) === "inacc" && pLoss(1) >= ML && (losingAdvAt(i - 2) || givingAdvAt(i - 2));
@@ -1063,10 +1061,10 @@ function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop) {
   if (!previousMiss && wasNotMateRel(0) && notMateRel && std[i] === "excellent"
     && (previousMistake || pStd(0) === "blunder")) return "great";
 
-  if (isTop && _isCheckmate(i)) return "best";
+  if (isTop && _isCheckmate(i, state)) return "best";
   if (isTop) return "best";
 
-  if (_isCheckmate(i)) return "excellent";
+  if (_isCheckmate(i, state)) return "excellent";
   if (!mate(i - 1) && mate(i) && winningNow) return "excellent";                                             // starts a mate
   if (mate(i - 1) && mate(i) && keepMating(i) && winningNow) return "excellent";                             // keeps the mate
   if (mate(i - 1) && mate(i) && !keepMating(i) && winningNow) return "good";                                 // delays own mate
@@ -1093,222 +1091,41 @@ function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop) {
   return std[i];   // plain excellent / good / inaccuracy / blunder
 }
 
-// Classification for variation moves in Explore mode.
-// Uses the same logic as classifyMove but operates on the parent position's
-// engine analysis (before the move) and current position's engine analysis (after the move).
-// vIdx: index in variation.positions (1 = first user move in variation)
-// Returns classification string (book/best/excellent/good/inacc/mistake/miss/blunder/great/brilliant)
-function classifyVariationMove(vIdx) {
-  if (!S.variation || vIdx < 1 || vIdx >= S.variation.positions.length) return null;
-  
+// Include the played game's history before the branch so Great/Miss/Brilliant
+// have exactly the same context as normal review. Never overwrite the mainline.
+function classifyVariationMoves() {
   const v = S.variation;
-  const pos = v.positions[vIdx];
-  const parentPos = v.positions[vIdx - 1];  // Always use variation's own previous position
-  const mover = pos.color;
-  
-  // Check if the resulting position is in the opening book (respecting 8-ply window)
-  // For variations, absolute ply = branchIdx + vIdx
-  const absolutePly = v.branchIdx + vIdx;
-  const bk = bookLookup(pos.fen);
-  if (absolutePly <= 8) {
-    if (Array.isArray(bk)) return "book";
-    if (bk !== undefined) return "book";
-  }
-  
-  // Check if forced move (only one legal move in parent position)
-  try {
-    const c = new Chess(parentPos.fen);
-    if (c.moves().length === 1) return "best";
-  } catch {}
-  
-  // Get engine analysis for parent position
-  const parentBest = parentPos.best;
-  const parentEval = parentPos.eval;
-  const currentEval = pos.eval;
-  
-  if (!parentBest || !parentEval || !currentEval) return null;
-  
-  // Determine if the move played matches the engine's top move in the parent position
-  const playedUci = (pos.from || "") + (pos.to || "") + (pos.promotion || "");
-  const bestUci = (parentBest.bestmove || "").slice(0, 4);
-  const isTop = !!bestUci && bestUci === playedUci.slice(0, 4);
-  
-  // Calculate eval loss from mover's perspective
-  const parentEvalMover = mover === "w" ? scoreToCp(parentEval) : -scoreToCp(parentEval);
-  const currentEvalMover = mover === "w" ? scoreToCp(currentEval) : -scoreToCp(currentEval);
-  const evalLoss = parentEvalMover - currentEvalMover;
-  
-  // Win% calculation
-  const parentWin = mover === "w" ? winPct(scoreToCp(parentEval)) : 100 - winPct(scoreToCp(parentEval));
-  const currentWin = mover === "w" ? winPct(scoreToCp(currentEval)) : 100 - winPct(scoreToCp(currentEval));
-  const wpDrop = Math.max(0, parentWin - currentWin);
-  
-  // Check for mate
-  const parentMate = parentEval.mate;
-  const currentMate = currentEval.mate;
-  const parentMateMover = parentMate != null ? (mover === "w" ? parentMate : -parentMate) : null;
-  const currentMateMover = currentMate != null ? (mover === "w" ? currentMate : -currentMate) : null;
-  const matingNow = currentMateMover != null && currentMateMover > 0;
-  const wasMating = parentMateMover != null && parentMateMover > 0;
-  
-  // Sacrifice detection using existing isSacrifice function
-  const sac = isSacrifice({ before: parentPos.fen, after: pos.fen, color: pos.color, captured: pos.captured, from: pos.from });
-  
-  // Standard rating from win% drop
-  const std = getStandardRating(wpDrop);
-  
-  // User-tunable thresholds
-  const CA = S.settings.clsClearAdv;
-  const ML = S.settings.clsMistakeLoss;
-  const MT = S.settings.clsMissTol;
-  
-  const winningNow = currentEvalMover > 0;
-  const prevWinning = parentEvalMover > 0;
-  const notMateRel = currentMateMover == null && parentMateMover == null;
-  
-  // For variations, we need to track previous move classifications AND losses in the variation
-  const prevCls = vIdx > 1 ? v.positions[vIdx - 1].classif : null;
-  const prevPrevCls = vIdx > 2 ? v.positions[vIdx - 2].classif : null;
-  const prevPrevPrevCls = vIdx > 3 ? v.positions[vIdx - 3].classif : null;
-  
-  // Calculate previous move's eval loss and std (for Miss/Great logic)
-  // Previous move: vIdx-1, its parent: vIdx-2
-  let prevEvalLoss = null;
-  let prevStd = null;
-  let prevMate = null;
-  if (vIdx > 1) {
-    const prevPos = v.positions[vIdx - 1];
-    const prevParentPos = v.positions[vIdx - 2];
-    const prevMover = prevPos.color;
-    const prevParentEval = prevParentPos.eval;
-    const prevCurrentEval = prevPos.eval;
-    if (prevParentEval && prevCurrentEval) {
-      const prevParentEvalMover = prevMover === "w" ? scoreToCp(prevParentEval) : -scoreToCp(prevParentEval);
-      const prevCurrentEvalMover = prevMover === "w" ? scoreToCp(prevCurrentEval) : -scoreToCp(prevCurrentEval);
-      prevEvalLoss = prevParentEvalMover - prevCurrentEvalMover;
-      prevStd = getStandardRating(
-        (prevMover === "w" ? winPct(scoreToCp(prevParentEval)) : 100 - winPct(scoreToCp(prevParentEval))) -
-        (prevMover === "w" ? winPct(scoreToCp(prevCurrentEval)) : 100 - winPct(scoreToCp(prevCurrentEval)))
-      );
-    }
-    // Check if previous move was mate-related
-    const prevParentMate = prevParentPos.eval?.mate;
-    const prevCurrentMate = prevPos.eval?.mate;
-    const prevParentMateMover = prevParentMate != null ? (prevMover === "w" ? prevParentMate : -prevParentMate) : null;
-    const prevCurrentMateMover = prevCurrentMate != null ? (prevMover === "w" ? prevCurrentMate : -prevCurrentMate) : null;
-    prevMate = (prevParentMateMover != null || prevCurrentMateMover != null);
-  }
-  
-  // Calculate previous-previous move's eval loss and std
-  let prevPrevEvalLoss = null;
-  let prevPrevStd = null;
-  let prevPrevMate = null;
-  if (vIdx > 2) {
-    const prevPrevPos = v.positions[vIdx - 2];
-    const prevPrevParentPos = v.positions[vIdx - 3];
-    const prevPrevMover = prevPrevPos.color;
-    const prevPrevParentEval = prevPrevParentPos.eval;
-    const prevPrevCurrentEval = prevPrevPos.eval;
-    if (prevPrevParentEval && prevPrevCurrentEval) {
-      const prevPrevParentEvalMover = prevPrevMover === "w" ? scoreToCp(prevPrevParentEval) : -scoreToCp(prevPrevParentEval);
-      const prevPrevCurrentEvalMover = prevPrevMover === "w" ? scoreToCp(prevPrevCurrentEval) : -scoreToCp(prevPrevCurrentEval);
-      prevPrevEvalLoss = prevPrevParentEvalMover - prevPrevCurrentEvalMover;
-      prevPrevStd = getStandardRating(
-        (prevPrevMover === "w" ? winPct(scoreToCp(prevPrevParentEval)) : 100 - winPct(scoreToCp(prevPrevParentEval))) -
-        (prevPrevMover === "w" ? winPct(scoreToCp(prevPrevCurrentEval)) : 100 - winPct(scoreToCp(prevPrevCurrentEval)))
-      );
-    }
-    // Check if previous-previous move was mate-related
-    const ppParentMate = prevPrevParentPos.eval?.mate;
-    const ppCurrentMate = prevPrevPos.eval?.mate;
-    const ppParentMateMover = ppParentMate != null ? (prevPrevMover === "w" ? ppParentMate : -ppParentMate) : null;
-    const ppCurrentMateMover = ppCurrentMate != null ? (prevPrevMover === "w" ? ppCurrentMate : -ppCurrentMate) : null;
-    prevPrevMate = (ppParentMateMover != null || ppCurrentMateMover != null);
-  }
-  
-  // Determine if previous move was a mistake/blunder (for Great/Miss detection)
-  // Match classifyMove: must be inacc classification AND loss >= ML AND (lost/gave clear advantage)
-  const prevParentEvalMover = vIdx > 1 ? (v.positions[vIdx - 1].color === "w" ? scoreToCp(v.positions[vIdx - 2].eval) : -scoreToCp(v.positions[vIdx - 2].eval)) : null;
-  const prevCurrentEvalMover = vIdx > 1 ? (v.positions[vIdx - 1].color === "w" ? scoreToCp(v.positions[vIdx - 1].eval) : -scoreToCp(v.positions[vIdx - 1].eval)) : null;
-  const prevLostClearAdv = prevParentEvalMover != null && prevCurrentEvalMover != null && prevParentEvalMover >= CA && prevCurrentEvalMover < CA;
-  const prevGaveClearAdv = prevParentEvalMover != null && prevCurrentEvalMover != null && prevParentEvalMover >= -CA && prevCurrentEvalMover < -CA;
-  
-  const previousMistake = !prevMate && prevStd === "inacc" && prevEvalLoss != null && prevEvalLoss >= ML && (prevLostClearAdv || prevGaveClearAdv);
-  const previousBlunder = prevCls === "blunder";
-  const previousInacc = prevCls === "inacc";
-  
-  // For previous-previous move (needed for Miss chain)
-  let prevPrevLostClearAdv = false;
-  let prevPrevGaveClearAdv = false;
-  if (vIdx > 2) {
-    const ppMover = v.positions[vIdx - 2].color;
-    const ppParentEval = v.positions[vIdx - 3].eval;
-    const ppCurrentEval = v.positions[vIdx - 2].eval;
-    const ppParentEvalMover = ppMover === "w" ? scoreToCp(ppParentEval) : -scoreToCp(ppParentEval);
-    const ppCurrentEvalMover = ppMover === "w" ? scoreToCp(ppCurrentEval) : -scoreToCp(ppCurrentEval);
-    if (ppParentEvalMover != null && ppCurrentEvalMover != null) {
-      prevPrevLostClearAdv = ppParentEvalMover >= CA && ppCurrentEvalMover < CA;
-      prevPrevGaveClearAdv = ppParentEvalMover >= -CA && ppCurrentEvalMover < -CA;
-    }
-  }
-  const prevPrevMistake = !prevPrevMate && prevPrevStd === "inacc" && prevPrevEvalLoss != null && prevPrevEvalLoss >= ML && (prevPrevLostClearAdv || prevPrevGaveClearAdv);
-  const prevPrevBlunder = prevPrevCls === "blunder";
-  const prevPrevInacc = prevPrevCls === "inacc";
-  
-  const previousMiss = prevCls === "miss";
-  const prevPrevMiss = prevPrevCls === "miss";
-  
-  // Brilliant — sound sacrifice that punishes opponent's slip
-  // Match classifyMove logic: previousBrilliant = wasNotMateRel(0) && sac[i-1] && pStd(0) === "excellent"
-  const previousBrilliant = !prevMate && prevCls === "excellent" && sac;
-  
-  // Brilliant conditions (match classifyMove)
-  if (!previousBrilliant && notMateRel && std === "excellent" && sac
-    && (prevStd === "inacc" || prevStd === "blunder"
-      || (!(prevStd === "inacc" || prevStd === "blunder") && (prevPrevStd === "inacc" || prevPrevStd === "blunder")))) return "brilliant";
-  if (sac && !wasMating && matingNow && winningNow) return "brilliant";                                   // sac that starts a mate
-  if (sac && wasMating && matingNow && currentMateMover <= parentMateMover && winningNow) return "brilliant";                   // sac that keeps the mate
-  
-  // Great — an only-good move that capitalises on the opponent's mistake/blunder
-  // Match classifyMove: not previousMiss && wasNotMateRel(0) && notMateRel && std === "excellent" && (previousMistake || pStd(0) === "blunder")
-  if (!previousMiss && !prevMate && notMateRel && std === "excellent"
-    && (previousMistake || prevStd === "blunder")) return "great";
-  
-  if (isTop && currentMateMover != null && currentMateMover > 0) return "best";
-  if (isTop) return "best";
-  
-  if (currentMateMover != null && currentMateMover > 0) return "excellent";
-  if (!wasMating && matingNow && winningNow) return "excellent";                                             // starts a mate
-  if (wasMating && matingNow && currentMateMover <= parentMateMover && winningNow) return "excellent";                             // keeps the mate
-  if (wasMating && matingNow && currentMateMover > parentMateMover && winningNow) return "good";                                 // delays own mate
-  if (wasMating && matingNow && !winningNow) return "good";                                                  // being mated, unavoidable
-  
-  if (wasMating && !matingNow && prevWinning) return "miss";                                                 // threw away a forced mate
-  // Match classifyMove Miss logic: !previousMiss && notMateRel && (previousMistake || pStd(0) === "blunder")
-  // && (std === "blunder" || std === "inacc") && (loss[i] != null && pLoss(0) != null && loss[i] <= pLoss(0) + MT)
-  if (!previousMiss && notMateRel && (previousMistake || prevStd === "blunder")
-    && (std === "blunder" || std === "inacc")
-    && (evalLoss != null && prevEvalLoss != null && evalLoss <= prevEvalLoss + MT)) return "miss";                     // failed to punish
-  
-  // Mistake/Blunder detection based on eval loss and advantage loss
-  const lostClearAdv = parentEvalMover >= CA && currentEvalMover < CA;
-  const gaveClearAdv = parentEvalMover >= -CA && currentEvalMover < -CA;
-  
-  if (notMateRel && std === "inacc" && evalLoss >= ML && lostClearAdv) return "mistake";                 // lost a clear advantage
-  if (notMateRel && std === "inacc" && evalLoss >= ML && gaveClearAdv) return "mistake";                 // handed over a clear advantage
-  if (!wasMating && matingNow && !winningNow && parentEvalMover > -CA) return "mistake";               // walked into a mate (wasn't already lost)
-  if (!wasMating && matingNow && !winningNow) return "blunder";                                              // walked into a mate
-  if (wasMating && matingNow && !winningNow && prevWinning) return "blunder";                                // threw a win straight into a mate
-  
-  // Split medium-error band
-  if (std === "inacc" && wpDrop != null) {
-    const mistWp = (typeof CALIB !== "undefined" && CALIB?.clsWp?.mistake) || 10;
-    if (wpDrop >= mistWp) return "mistake";
-  }
-  
-  return std; // plain excellent / good / inaccuracy / blunder
+  if (!v) return;
+  const branch = v.branchIdx;
+  const nodes = v.positions.slice(1);
+  const state = {
+    positions: [...S.positions.slice(0, branch + 1), ...nodes],
+    evals: [...S.evals.slice(0, branch), ...v.positions.map(p => p.eval)],
+    bests: [...S.bests.slice(0, branch), ...v.positions.map(p => p.best)],
+    settings: S.settings, players: S.players, openingHeader: S.openingHeader,
+    _sacCache: [...S._sacCache.slice(0, branch + 1), ...nodes.map(p => p._sac)],
+    _forcedCache: [...S._forcedCache.slice(0, branch + 1), ...nodes.map(p => p._forced)],
+    total: branch + nodes.length,
+  };
+  classifyLine(state);
+  nodes.forEach((p, i) => {
+    const ply = branch + i + 1;
+    p.classif = state.classif[ply];
+    p._sac = state._sacCache[ply];
+    p._forced = state._forcedCache[ply];
+  });
 }
-  
+
+function variationOpening() {
+  const v = S.variation;
+  let opening = S.meta?.explore ? null : S.openingHeader;
+  const positions = [...S.positions.slice(0, v.branchIdx), ...v.positions.slice(0, v.idx + 1)];
+  for (const pos of positions) {
+    const bk = bookLookup(pos.fen);
+    if (Array.isArray(bk) && bk[1]) opening = { eco: bk[0], name: bk[1] };
+  }
+  return opening;
+}
 
 // Displayed (category-based) per-move accuracy from the category — the basis of the shown game
 // accuracy. Best/Brilliant/Great/Book are always 100; the rest are tunable (Engine settings →
@@ -1328,19 +1145,19 @@ function catAcc(cls) {
 // Sacrifice/forced are functions of the board only (not the eval), so they're cached per ply for
 // the whole analysis — computeDerived runs many times while the batch fills in, and isSacrifice is
 // the one non-trivial cost here. Caches are reset whenever a new game's positions are built.
-function _sacAt(i) {
-  if (S._sacCache[i] !== undefined) return S._sacCache[i];
-  const p = S.positions[i];
+function _sacAt(i, state = S) {
+  if (state._sacCache[i] !== undefined) return state._sacCache[i];
+  const p = state.positions[i];
   let v = false;
-  if (p && !p.promotion) v = isSacrifice({ before: S.positions[i - 1].fen, after: p.fen, color: p.color, captured: p.captured, from: p.from });
-  S._sacCache[i] = v;
+  if (p && !p.promotion) v = isSacrifice({ before: state.positions[i - 1].fen, after: p.fen, color: p.color, captured: p.captured, from: p.from });
+  state._sacCache[i] = v;
   return v;
 }
-function _forcedAt(i) {
-  if (S._forcedCache[i] !== undefined) return S._forcedCache[i];
+function _forcedAt(i, state = S) {
+  if (state._forcedCache[i] !== undefined) return state._forcedCache[i];
   let v = false;
-  try { v = new Chess(S.positions[i - 1].fen).moves().length === 1; } catch {}
-  S._forcedCache[i] = v;
+  try { v = new Chess(state.positions[i - 1].fen).moves().length === 1; } catch {}
+  state._forcedCache[i] = v;
   return v;
 }
 // Estimated ratings are reported in steps of 50, so we quantize to the NEAREST 50 (round-to-nearest
@@ -1376,11 +1193,11 @@ function estimateElo(acc, rating) {
   return estimateEloFromAcc(acc);
 }
 
-function computeDerived() {
-  const N = S.total;
-  S.classif = new Array(N + 1).fill(null);
-  S.accMove = new Array(N + 1).fill(null);
-  if (!S._sacCache || S._sacCache.length !== N + 1) { S._sacCache = new Array(N + 1).fill(undefined); S._forcedCache = new Array(N + 1).fill(undefined); }
+function classifyLine(state) {
+  const N = state.total;
+  state.classif = new Array(N + 1).fill(null);
+  state.accMove = new Array(N + 1).fill(null);
+  if (!state._sacCache || state._sacCache.length !== N + 1) { state._sacCache = new Array(N + 1).fill(undefined); state._forcedCache = new Array(N + 1).fill(undefined); }
 
   // Per-ply inputs for the ported classifier. The classifier only ever looks BACKWARDS, so one
   // forward pass to fill std/loss/sac/isTop is enough; a second pass assigns the final category.
@@ -1393,48 +1210,54 @@ function computeDerived() {
 
   // True book detection: a move is "book" if the position it leads to is in the opening book
   // (data/book.json). Alongside, the deepest named theory position gives the opening name.
-  // Book classification is limited to the first 8 plies (absolute ply for variations).
-  S.bookCount = 0;
+  state.bookCount = 0;
   let bookOpening = null;
   for (let i = 1; i <= N; i++) {
-    const bk = bookLookup(S.positions[i].fen);
+    const bk = bookLookup(state.positions[i].fen);
     if (Array.isArray(bk)) bookOpening = { eco: bk[0], name: bk[1] };
-    // Book classification only for first 8 plies (absolute ply)
-    const absolutePly = i; // For mainline, ply = absolute ply
-    bookAt[i] = bk !== undefined && absolutePly <= 8;
+    bookAt[i] = bk !== undefined;
 
-    const mover = S.positions[i].color;
-    const bestSearch = S.bests[i - 1];
-    const before = S.evals[i - 1];
+    const mover = state.positions[i].color;
+    const bestSearch = state.bests[i - 1];
+    const before = state.evals[i - 1];
 
     // win%-based move accuracy (kept solely as the Elo estimate's input). With MultiPV=1 the played
     // move is rarely in the single line, so winAfter falls back to the after-position search —
     // i.e. the same consecutive-eval comparison the category logic uses.
     if (bestSearch && before) {
-      const playedUci = (S.positions[i].from || "") + (S.positions[i].to || "") + (S.positions[i].promotion || "");
+      const playedUci = (state.positions[i].from || "") + (state.positions[i].to || "") + (state.positions[i].promotion || "");
       const lines = bestSearch.lines || [];
       const winBefore = lines.length ? winPct(scoreToCp(lines[0].score)) : moverWin(before, mover);
       let winAfter = null;
       for (const ln of lines) { if ((ln.pv || "").split(" ")[0] === playedUci) { winAfter = winPct(scoreToCp(ln.score)); break; } }
-      if (winAfter == null && S.evals[i]) winAfter = moverWin(S.evals[i], mover);
-      if (winAfter != null) { S.accMove[i] = moveAccuracy(Math.max(0, winBefore - winAfter) * calAccMult(S.players[mover]?.rating)); wpDrop[i] = Math.max(0, winBefore - winAfter); }
-      const bestUci = (bestSearch.bestmove || "").slice(0, 4);
-      isTop[i] = !!bestUci && bestUci === playedUci.slice(0, 4);
+      if (winAfter == null && state.evals[i]) winAfter = moverWin(state.evals[i], mover);
+      if (winAfter != null) { state.accMove[i] = moveAccuracy(Math.max(0, winBefore - winAfter) * calAccMult(state.players[mover]?.rating)); wpDrop[i] = Math.max(0, winBefore - winAfter); }
+      const bestUci = bestSearch.bestmove || "";
+      isTop[i] = !!bestUci && bestUci === playedUci;
     }
 
-    loss[i] = _moveLoss(i);
+    loss[i] = _moveLoss(i, state);
     std[i] = getStandardRating(wpDrop[i]);   // bucket on win%-drop, not raw pawns
-    sac[i] = _sacAt(i);
+    sac[i] = _sacAt(i, state);
   }
   // Second pass: final category per ply (Brilliant-Chess logic). A move stays unlabelled until both
   // its own and the previous position's eval are in, so the panel fills in cleanly during analysis.
   for (let i = 1; i <= N; i++) {
-    if (bookAt[i]) { S.classif[i] = "book"; S.bookCount++; continue; }
-    if (S.evals[i] == null || S.evals[i - 1] == null) { S.classif[i] = null; continue; }
-    S.classif[i] = classifyMove(i, S.positions[i].color, isTop[i], false, sac, std, loss, wpDrop);
+    if (state.evals[i] == null || state.evals[i - 1] == null) { state.classif[i] = null; continue; }
+    // Some opening datasets include traps from the losing side. Never let theory
+    // hide a losing mate or a move the engine rates as an error.
+    const safeBook = bookAt[i] && !((_mateFor(i, state.positions[i].color, state) ?? 0) < 0)
+      && wpDrop[i] != null && wpDrop[i] < (CALIB?.clsWp?.inacc ?? 5);
+    state.classif[i] = classifyMove(i, state.positions[i].color, isTop[i], safeBook, sac, std, loss, wpDrop, state);
+    if (state.classif[i] === "book") state.bookCount++;
   }
   // Opening name: prefer the book's clean name over the chess.com header's ECOUrl slug.
-  S.opening = bookOpening || S.openingHeader;
+  state.opening = bookOpening || state.openingHeader;
+}
+
+function computeDerived() {
+  classifyLine(S);
+  const N = S.total;
   const eloAccs = sideAccuracies();   // win%-based accuracy → Elo (unchanged)
   for (const side of ["w", "b"]) {
     const counts = {}; QUALITY_ORDER.forEach((k) => (counts[k] = 0));
@@ -1600,7 +1423,7 @@ function uciLineToSan(fen, uciMoves, maxPlies = 6) {
    =================================================================== */
 function buildUI() {
   const root = document.getElementById("root");
-  root.innerHTML = "";
+  root.replaceChildren();
 
   const topbar = el("header", { class: "topbar" },
     el("div", { class: "brand" },
@@ -1690,7 +1513,7 @@ function buildUI() {
   initBoardInput();
   renderCoachAvatar();     // mount the animated coach portrait for the active personality
   renderLibrary();
-  window.addEventListener("resize", () => { growCanvas(); alignPlayers(); });
+  window.addEventListener("resize", () => { fitEnginePanel(); growCanvas(); alignPlayers(); positionSettings(); });
 }
 
 /* ---------------- Loading indicator ----------------
@@ -1744,22 +1567,44 @@ function applyLayoutMode() {
   const custom = isCustomLayout();
   UI.canvas.classList.toggle("auto", !custom);
   UI.canvas.classList.toggle("canvas", custom);
+  if (custom) UI.canvas.classList.remove("desktop-layout");
   applyLayout(); growCanvas();
 }
 function applyLayout() {
   const custom = isCustomLayout();
+  const desktop = !custom && UI.canvas.classList.contains("desktop-layout");
+  const collapse = desktop && !S.qbreakExpanded ? accuracyReflowInfo(DEFAULT_LAYOUT) : null;
   for (const mod of UI.canvas.querySelectorAll(".mod")) {
-    const b = custom && S.layout[mod.getAttribute("data-mod")];
+    const key = mod.getAttribute("data-mod");
+    const source = custom ? S.layout[key] : desktop ? DEFAULT_LAYOUT[key] : null;
+    const b = source && { ...source };
+    if (b && collapse) {
+      if (key === "accuracy") b.h = Math.max(MINH, b.h - collapse.delta);
+      if (collapse.belowKeys.includes(key)) b.y = Math.max(0, b.y - collapse.delta);
+    }
     mod.style.left = b ? b.x + "px" : ""; mod.style.top = b ? b.y + "px" : "";
     mod.style.width = b ? b.w + "px" : ""; mod.style.height = b ? b.h + "px" : "";
   }
+  fitEnginePanel();
+  requestAnimationFrame(positionSettings);
 }
 // Freeze the automatic layout into free-canvas boxes, so Reorganize starts from exactly what is on
 // screen. Hidden modules (eval bar or coach switched off) keep their default box.
 function snapshotLayout() {
   const base = UI.canvas.getBoundingClientRect();
   const out = structuredClone(DEFAULT_LAYOUT);
+  const desktop = UI.canvas.classList.contains("desktop-layout");
   for (const mod of UI.canvas.querySelectorAll(".mod")) {
+    if (desktop) {
+      // These boxes already have exact geometry, including the collapsed Accuracy panel.
+      // Measuring at browser zoom can turn 294px into 293.993px; snapping down then
+      // shrinks the panel by 2px and introduces scrollbars when Reorganize is opened.
+      out[mod.getAttribute("data-mod")] = {
+        x: parseFloat(mod.style.left), y: parseFloat(mod.style.top),
+        w: parseFloat(mod.style.width), h: parseFloat(mod.style.height),
+      };
+      continue;
+    }
     const r = mod.getBoundingClientRect();
     if (!r.width || !r.height) continue;
     // Round DOWN to the grid, so the canvas never needs more room than the screen it came from.
@@ -1768,8 +1613,7 @@ function snapshotLayout() {
   }
   return out;
 }
-// Space kept right of and below the last module on the canvas: the automatic layout's stage padding,
-// so a canvas snapshotted from it needs exactly the same room (and the same zoom).
+// Space kept right of and below layouts extending beyond the default desktop envelope.
 const CANVAS_MARGIN = 12;
 // Right and bottom edge of a module layout (px), floored at 600 so a near-empty canvas keeps a sane size.
 function layoutExtent(layout) {
@@ -1779,22 +1623,22 @@ function layoutExtent(layout) {
 }
 function growCanvas() {
   if (!isCustomLayout()) { UI.canvas.style.minHeight = ""; UI.canvas.style.minWidth = ""; return; }
-  const { maxR, maxB } = layoutExtent(S.layout);
-  UI.canvas.style.minHeight = maxB + CANVAS_MARGIN + "px";
-  UI.canvas.style.minWidth = maxR + CANVAS_MARGIN + "px";
+  const { pageW, pageH } = layoutPageSize(S.layout);
+  UI.canvas.style.minHeight = pageH - TOPBAR_H + "px";
+  UI.canvas.style.minWidth = pageW + "px";
 }
 // What collapsing the accuracy breakdown is worth on the canvas: the hidden rows' height (+ the
 // column row-gap), and every module in the same column sitting at/below the accuracy panel.
-function accuracyReflowInfo() {
+function accuracyReflowInfo(layout = S.layout) {
   const accMod = UI.canvas.querySelector('.mod[data-mod="accuracy"]');
-  const acc = S.layout.accuracy;
+  const acc = layout.accuracy;
   const row = accMod && accMod.querySelector(".qbreak-row");
   const qb = accMod && accMod.querySelector(".qbreak");
   const gap = qb ? (parseFloat(getComputedStyle(qb).rowGap) || 0) : 0;
   const rowH = row ? row.offsetHeight : 24;
   const delta = Math.round((QBREAK_FULL.length - QBREAK_SUMMARY.length) * (rowH + gap));
   const belowKeys = [];
-  for (const [k, o] of Object.entries(S.layout)) {
+  for (const [k, o] of Object.entries(layout)) {
     if (k === "accuracy") continue;
     const overlapX = o.x < acc.x + acc.w && o.x + o.w > acc.x;
     if (overlapX && o.y >= acc.y + acc.h - 1) belowKeys.push(k);
@@ -1872,6 +1716,7 @@ function makeMovable(mod, handle, grips, key) {
       const s = snapResize({ x: b.x, y: b.y, w, h }, modMinW(key));
       if (dir.includes("e")) { b.w = s.w; mod.style.width = b.w + "px"; }
       if (dir.includes("s")) { b.h = s.h; mod.style.height = b.h + "px"; }
+      if (key === "engine") fitEnginePanel();
       if (key === "board") alignPlayers();
     };
     const move = (ev) => apply(ev);
@@ -1891,17 +1736,16 @@ function makeMovable(mod, handle, grips, key) {
   grips.s.addEventListener("pointerdown", startResize("s", grips.s));
   grips.se.addEventListener("pointerdown", startResize("se", grips.se));
 }
-// Back to the automatic layout (and the browser's own zoom).
+// Back to the automatic layout and its window-dependent fit.
 function resetLayout() {
-  const wasCustom = isCustomLayout();
   S._accReflow = null;   // drop any collapse offset so the fresh layout isn't double-adjusted
   S.layout = structuredClone(DEFAULT_LAYOUT);
   S.layoutMode = "auto";
   if (S.reorganize) toggleReorganize();
   applyLayoutMode();
   saveLayout();
-  if (wasCustom) releaseTabZoom();
   requestAnimationFrame(alignPlayers);
+  return initTabZoom();
 }
 // Reorganize mode: while ON, panels can be dragged/resized (handles + grips appear); while OFF
 // they're locked and hover shows nothing. The arranged layout auto-saves and persists. Entering it
@@ -1915,7 +1759,8 @@ function toggleReorganize() {
     S.layoutMode = "custom";
     applyLayoutMode();
     saveLayout();
-    initTabZoom();
+    // The snapshot already fits at the current zoom. Refitting here would change
+    // every panel's apparent size just for unlocking its drag handles.
   }
   S.reorganize = !S.reorganize;
   UI.canvas.classList.toggle("reorganizing", S.reorganize);
@@ -1936,6 +1781,45 @@ function renderReorgBanner() {
 }
 
 /* ---------------- Board ---------------- */
+function makeBoardBadge(cls) {
+  const cfg = QUALITY[cls];
+  return el("img", {
+    class: "sq-badge", src: qIcon(cls), alt: categoryName(cls), draggable: "false", tabindex: "0",
+    onpointerenter: (e) => { if (e.pointerType !== "touch" && !e.buttons) showBoardBadgeTip(e.currentTarget, cls); },
+    onpointerleave: hideBoardBadgeTip,
+    onfocus: (e) => showBoardBadgeTip(e.currentTarget, cls),
+    onblur: hideBoardBadgeTip,
+    onpointerdown: hideBoardBadgeTip,
+    onkeydown: (e) => { if (e.key === "Escape") hideBoardBadgeTip(); },
+  });
+}
+function showBoardBadgeTip(target, cls) {
+  const cfg = QUALITY[cls];
+  if (!cfg || !target.isConnected) return;
+  let tip = document.getElementById("boardBadgeTip");
+  if (!tip) {
+    tip = el("div", { id: "boardBadgeTip", class: "board-badge-tip", role: "tooltip", "aria-hidden": "true" });
+    document.body.append(tip);
+    window.addEventListener("resize", hideBoardBadgeTip);
+    window.addEventListener("scroll", hideBoardBadgeTip, true);
+    window.addEventListener("blur", hideBoardBadgeTip);
+  }
+  tip.textContent = categoryName(cls);
+  const r = target.getBoundingClientRect();
+  // Measuring before showing also establishes the initial style for the first fade-in.
+  const w = tip.offsetWidth, h = tip.offsetHeight, gap = 8, margin = 8;
+  const left = Math.max(margin, Math.min(window.innerWidth - w - margin, r.left + r.width / 2 - w / 2));
+  const above = r.top - h - gap;
+  const top = Math.max(margin, Math.min(window.innerHeight - h - margin, above >= margin ? above : r.bottom + gap));
+  tip.style.left = left + "px";
+  tip.style.top = top + "px";
+  tip.setAttribute("aria-hidden", "false");
+  tip.classList.add("show");
+}
+function hideBoardBadgeTip() {
+  const tip = document.getElementById("boardBadgeTip");
+  if (tip) { tip.classList.remove("show"); tip.setAttribute("aria-hidden", "true"); }
+}
 function makePiece(type, side) {
   // Only the two bundled SVG sets remain (Cburnett = "image", Merida); anything else → default set.
   const setFolder = BUNDLED_PIECE_SETS[S.settings.pieceStyle] || BUNDLED_PIECE_SETS.image;
@@ -1964,10 +1848,11 @@ function buildBoard() {
   const existing = UI.boardWrap.querySelector(".board");
   if (existing) existing.replaceWith(board);
   else UI.boardWrap.append(board);
-  applyBoardArt(board);
+  clearBoardArt(board);
   paintBoard();
 }
 function paintBoard() {
+  hideBoardBadgeTip();
   const pos = activePos();
   const boardEl = UI.boardWrap.querySelector(".board");
   if (boardEl) boardEl.classList.toggle("analysis", S.analysisMode);
@@ -1995,7 +1880,7 @@ function paintBoard() {
       cls = S.classif[S.idx] || null;
     }
   }
-  // The from/to squares are tinted with the classification color (chess.com style) at 0.5 alpha;
+  // The from/to squares are tinted with the classification color at 0.5 alpha;
   // without a classification we fall back to the neutral yellow highlight.
   const tint = cls && QUALITY[cls]
     ? `color-mix(in srgb, ${QUALITY[cls].color} 50%, transparent)`
@@ -2010,7 +1895,7 @@ function paintBoard() {
     const ch = occ[name];
     if (ch) sq.append(makePiece(ch.toUpperCase(), ch === ch.toUpperCase() ? "w" : "b"));
     if (name === pos.to && cls && QUALITY[cls]) {
-      sq.append(el("img", { class: "sq-badge", src: qIcon(cls), alt: QUALITY[cls].name, draggable: "false" }));
+      sq.append(makeBoardBadge(cls));
     }
   }
   renderBestArrow();
@@ -2022,9 +1907,8 @@ function paintBoard() {
 }
 
 /* ---------------- Best-move arrow ----------------
-   Geometry engine ported from "Chess Move Arrow.html". Coordinate space: an 8×8 SVG
-   with viewBox "0 0 8 8" placed exactly over the board. Square center = (file+0.5, rank+0.5).
-   Respects S.flipped, so the arrow turns with the board. */
+   Coordinate space: an 8×8 SVG over the board. The arrow starts near the outgoing
+   edge of its origin square so its tail does not cover the piece. Respects S.flipped. */
 function arrowXY(sq) {
   const f = sq.charCodeAt(0) - 97;          // a..h -> 0..7
   const r = parseInt(sq.slice(1), 10) - 1;  // 1..8 -> 0..7
@@ -2051,6 +1935,12 @@ function arrowBuild(pts, headLen, headHalf) {
   const ux = dx / len, uy = dy / len;                  // direction of the last leg
   const base = { x: tip.x - ux * headLen, y: tip.y - uy * headLen };
   const shaft = pts.slice(0, n - 1).concat([base]);
+  // Move the tail toward the first leg's exit edge. On a straight arrow this
+  // follows the move; on a knight arrow it follows the long leg to its elbow.
+  const firstDx = pts[1].x - pts[0].x, firstDy = pts[1].y - pts[0].y;
+  const firstMax = Math.max(Math.abs(firstDx), Math.abs(firstDy)) || 1;
+  shaft[0] = { x: pts[0].x + firstDx / firstMax * 0.4,
+               y: pts[0].y + firstDy / firstMax * 0.4 };
   const nx = -uy, ny = ux;                             // perpendicular
   const head = [
     { x: base.x + nx * headHalf, y: base.y + ny * headHalf },
@@ -2091,11 +1981,25 @@ function renderBestArrow() {
     board.append(svg);
   }
   // Group opacity flattens shaft+head together BEFORE fading — no double-alpha seam.
-  svg.innerHTML =
-    `<g fill="${ARROW_COLOR}" opacity="${S.settings.arrowOpacity}">`
-    + `<polyline points="${shaft.map(arrowFmt).join(" ")}" fill="none" stroke="${ARROW_COLOR}" `
-    + `stroke-width="${S.settings.arrowShaft}" stroke-linejoin="round" stroke-linecap="butt"/>`
-    + `<polygon points="${head.map(arrowFmt).join(" ")}" stroke="none"/></g>`;
+  const arrowColor = /^#[0-9a-f]{6}$/i.test(S.settings.bestArrowColor || "")
+    ? S.settings.bestArrowColor : ARROW_COLOR;
+  svg.replaceChildren(arrowNode(shaft, head, arrowColor));
+}
+
+// Keep saved arrow settings in attributes, never interpolate them into markup.
+function arrowNode(shaft, head, color) {
+  const node = (tag, attrs) => {
+    const n = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (const [key, value] of Object.entries(attrs)) n.setAttribute(key, String(value));
+    return n;
+  };
+  const group = node("g", { fill: color, opacity: S.settings.arrowOpacity });
+  group.append(
+    node("polyline", { points: shaft.map(arrowFmt).join(" "), fill: "none", stroke: color,
+      "stroke-width": S.settings.arrowShaft, "stroke-linejoin": "round", "stroke-linecap": "butt" }),
+    node("polygon", { points: head.map(arrowFmt).join(" "), stroke: "none" }),
+  );
+  return group;
 }
 
 /* ---------------- User arrows + square marking (analysis) ----------------
@@ -2142,34 +2046,33 @@ function renderUserArrows(preview) {
   }
   const headLen = S.settings.arrowHead;
   const headHalf = headLen * 0.70;
-  svg.innerHTML = arrows.map((ar) => {
+  svg.replaceChildren(...arrows.map((ar) => {
     const a = arrowXY(ar.from), b = arrowXY(ar.to);
     const { shaft, head } = arrowBuild(arrowWaypoints(a, b), headLen, headHalf);
-    return `<g fill="${USER_ARROW_COLOR}" opacity="${S.settings.arrowOpacity}">`
-      + `<polyline points="${shaft.map(arrowFmt).join(" ")}" fill="none" stroke="${USER_ARROW_COLOR}" `
-      + `stroke-width="${S.settings.arrowShaft}" stroke-linejoin="round" stroke-linecap="butt"/>`
-      + `<polygon points="${head.map(arrowFmt).join(" ")}" stroke="none"/></g>`;
-  }).join("");
+    return arrowNode(shaft, head, USER_ARROW_COLOR);
+  }));
 }
 function refreshArrows() { renderBestArrow(); renderUserArrows(); renderThreatArrow(); }
-// Create a ready Engine, trying the user's chosen build first and then falling back DOWN the
-// strength chain (nnue → wasm → asm) if it can't load. Every build is bundled, so a fallback never
+// Create a ready Engine, trying the user's chosen build and then the other bundled build
+// if it can't load. Every build is bundled, so a fallback never
 // needs the network. The build that actually started is recorded in S.activeEngineBuild so the
 // Engine tab reflects what's really running — essential if e.g. NNUE ever stops working. `opts` are
 // the UCI options (Hash / Skill Level); applying them also awaits the handshake, which now REJECTS
 // on a dead build (timeout / worker error) instead of hanging forever.
 let _engineFellBack = false; // warn once per page if we ever leave the preferred build
 async function createEngine(opts = {}) {
-  const preferred = ENGINE_BUILDS[S.settings.enginePath] ? S.settings.enginePath : "nnue";
-  // Preferred build first, then the remaining builds in fixed strongest→weakest order (no repeats).
-  const order = [preferred, ...ENGINE_FALLBACK_ORDER.filter((k) => k !== preferred)];
+  const preferred = ENGINE_BUILDS[S.settings.enginePath] ? S.settings.enginePath : DEFAULT_SETTINGS.enginePath;
+  const order = [preferred, ...ENGINE_FALLBACK_ORDER.filter(key => key !== preferred)];
   let lastErr = null;
   for (const key of order) {
     const eng = new Engine(ENGINE_BUILDS[key]);
     try {
       await eng.setOptions(opts); // awaits the handshake; throws if this build failed to load
       eng.buildKey = key;
-      setActiveEngineBuild(key);
+      if (S.settings.enginePath === preferred) {
+        if (key !== preferred) S.engineFallbackBuild = key;
+        setActiveEngineBuild(key);
+      }
       if (key !== preferred && !_engineFellBack) {
         _engineFellBack = true;
         console.warn(`[Chess Review] engine build '${preferred}' failed to load — fell back to '${key}'. ` +
@@ -2186,17 +2089,17 @@ async function createEngine(opts = {}) {
 // Record (and surface) which build is actually running. Re-render the spots that name the engine so
 // a fallback is visible immediately, both in the live Engine panel and the settings Build row.
 function setActiveEngineBuild(key) {
-  if (S.activeEngineBuild === key) return;
+  if (S.activeEngineBuild === key && !S.engineFallbackBuild) return;
   S.activeEngineBuild = key;
   try { renderEngineCurrent(); } catch {}
   if (UI.settings && !UI.settings.hidden && S.settingsTab === "engine") { try { renderSettings(); } catch {} }
 }
 // The build name to display: what's actually running if known, else the user's selection.
 function activeEngineName() {
-  const key = S.activeEngineBuild || S.settings.enginePath;
+  const key = S.engineFallbackBuild || S.activeEngineBuild || S.settings.enginePath;
   const name = ENGINE_NAME[key] || "Stockfish";
   // Flag a fallback explicitly so it's obvious the chosen build isn't the one in use.
-  return (S.activeEngineBuild && S.activeEngineBuild !== S.settings.enginePath) ? `${name} (fallback)` : name;
+  return (S.engineFallbackBuild && S.engineFallbackBuild !== S.settings.enginePath) ? `${name} (fallback)` : name;
 }
 
 // Shared on-demand engine for the lightweight extras (threat preview + practice judging),
@@ -2253,10 +2156,7 @@ async function renderThreatArrow() {
   const a = arrowXY(uci.slice(0, 2)), b = arrowXY(uci.slice(2, 4));
   const headLen = S.settings.arrowHead, headHalf = headLen * 0.70;
   const { shaft, head } = arrowBuild(arrowWaypoints(a, b), headLen, headHalf);
-  svg.innerHTML = `<g fill="${USER_ARROW_COLOR}" opacity="${S.settings.arrowOpacity}">`
-    + `<polyline points="${shaft.map(arrowFmt).join(" ")}" fill="none" stroke="${USER_ARROW_COLOR}" `
-    + `stroke-width="${S.settings.arrowShaft}" stroke-linejoin="round" stroke-linecap="butt"/>`
-    + `<polygon points="${head.map(arrowFmt).join(" ")}" stroke="none"/></g>`;
+  svg.replaceChildren(arrowNode(shaft, head, USER_ARROW_COLOR));
 }
 // Single-square marking (red tint). Toggles on repeated right-click on the same square.
 function toggleMark(sq) {
@@ -2422,7 +2322,7 @@ function applyUserMove(from, to, animate = true) {
   let c, mv;
   try { c = new Chess(fen); mv = c.move({ from, to, promotion: "q" }); } catch { mv = null; }
   if (!mv) { S.selectedSq = null; renderSelection(); return; }
-  const node = { fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, eval: null, best: null };
+  const node = { fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "", eval: null, best: null };
   if (!S.analysisMode) {
     // On the mainline (and only if the position is analyzed): if the move matches the next
     // mainline move, just stay on the mainline.
@@ -2486,7 +2386,7 @@ function playLine(pv) {
   for (const u of ucis) {
     let mv; try { mv = c.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u.slice(4, 5) || "q" }); } catch { mv = null; }
     if (!mv) break;
-    v.positions.push({ fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, eval: null, best: null });
+    v.positions.push({ fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "", eval: null, best: null });
   }
   // Start just one move into the line (not at the end) — the rest plays out automatically.
   v.idx = Math.min(startIdx + 1, v.positions.length - 1);
@@ -2562,24 +2462,13 @@ async function playBestMoves() {
   const token = ++S.bestWalkToken;
   S.bestWalking = true;
   paintBoard(); renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent();
-  // Ensure the engine exists.
-  if (!S.liveEngine) {
-    S.liveEngine = await createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill });
-    if (token !== S.bestWalkToken) return;
-  }
   for (let n = 0; n < BEST_WALK_MAX; n++) {
     if (token !== S.bestWalkToken || !S.analysisMode || !S.variation) return;
     const v = S.variation;
     const pos = v.positions[v.idx];
-    if (terminalScore(pos.fen)) break;                 // mate / stalemate / 50-move etc.
-    // Best move for this position (analyze fresh unless we already have it).
-    if (!pos.best) {
-      S.liveEngine.stop();
-      let res; try { res = await S.liveEngine.analyse(pos.fen, S.settings.engineDepth, S.settings.engineLines); } catch { return; }
-      if (token !== S.bestWalkToken || !S.analysisMode || !S.variation) return;
-      pos.eval = terminalScore(pos.fen) || whiteRel(res.score, pos.fen);
-      pos.best = res;
-    }
+    await requestLiveEval();
+    if (token !== S.bestWalkToken || !S.analysisMode || S.variation !== v) return;
+    if (S.liveError || variationTerminal(v, v.idx) || !pos.best) break;
     renderEvalBar(); renderBestArrow(); renderEngineCurrent();
     const uci = (pos.best.bestmove || "");
     if (uci.length < 4) break;                          // no legal move → done
@@ -2589,7 +2478,7 @@ async function playBestMoves() {
     let c, mv;
     try { c = new Chess(pos.fen); mv = c.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci.slice(4, 5) || "q" }); } catch { mv = null; }
     if (!mv) break;
-    v.positions.push({ fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, eval: null, best: null });
+    v.positions.push({ fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "", eval: null, best: null });
     v.idx = v.positions.length - 1;
     playSanSound(mv.san);
     paintBoard(); renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent();
@@ -2600,76 +2489,89 @@ async function playBestMoves() {
 }
 // Live analysis of the current variation position (its own engine instance, so the batch isn't disturbed).
 async function requestLiveEval() {
+  const token = ++S.liveToken; // navigation always invalidates pending work, even on cache hits
   if (!S.analysisMode || !S.variation) return;
-  const pos = activePos();
-  // If already fully computed (eval + best + classification), just render and return
-  if (pos.best && pos.classif) { renderEvalBar(); renderBestArrow(); renderEngineCurrent(); return; }
-  const token = ++S.liveToken;
-  if (!S.liveEngine) {
-    S.liveEngine = await createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill });
-    if (token !== S.liveToken) return;
-  }
-  S.liveEngine.stop();
-  const fen = pos.fen;
-  let res;
-  try { res = await S.liveEngine.analyse(fen, S.settings.engineDepth, S.settings.engineLines); }
-  catch { return; }
-  if (token !== S.liveToken || !S.analysisMode) return;
-  pos.eval = terminalScore(fen) || whiteRel(res.score, fen);
-  pos.best = res;
-  
-  // After analyzing a position, classify the variation move that led to it (if any)
-  const vIdx = S.variation.idx;
-  if (vIdx > 0) {
-    // Ensure parent position has eval/best before classifying (fixes race on first move)
-    const parentPos = S.variation.positions[vIdx - 1];
-    if (!parentPos.eval || !parentPos.best) {
-      // Analyze parent position first
-      try {
-        S.liveEngine.stop();
-        const parentRes = await S.liveEngine.analyse(parentPos.fen, S.settings.engineDepth, S.settings.engineLines);
-        if (token !== S.liveToken || !S.analysisMode) return;
-        parentPos.eval = terminalScore(parentPos.fen) || whiteRel(parentRes.score, parentPos.fen);
-        parentPos.best = parentRes;
-      } catch { /* parent analysis failed, proceed anyway */ }
+  const v = S.variation, idx = v.idx, pos = v.positions[idx];
+  const valid = () => token === S.liveToken && S.analysisMode && S.variation === v
+    && v.idx === idx && v.positions[idx] === pos;
+  S.liveError = null;
+  S.liveEngine?.cancelPending();
+  S.liveEngine?.stop();
+  refreshVariation();
+  try {
+    // The classifier looks back up to three moves, requiring four prior positions.
+    const missing = [];
+    for (let i = idx; i >= Math.max(0, idx - 4); i--) {
+      if (!v.positions[i].best || !v.positions[i].eval) missing.push(i);
     }
-    const classification = classifyVariationMove(vIdx);
-    if (classification) {
-      pos.classif = classification;
+    if (!missing.length) return;
+    const eng = await ensureLiveEngine();
+    if (!valid()) return;
+    for (const i of missing) {
+      const node = v.positions[i];
+      const terminal = variationTerminal(v, i);
+      const res = terminal ? { score: terminal, bestmove: null, pv: "", lines: [] }
+        : await eng.analyse(node.fen, S.settings.engineDepth, S.settings.engineLines);
+      if (!valid()) return;
+      node.eval = terminal || whiteRel(res.score, node.fen);
+      node.best = res;
+      refreshVariation();
     }
+  } catch (e) {
+    if (!valid()) return;
+    S.liveError = "Stockfish stopped before this position was ready.";
+    if (S.liveEngine?.dead) { S.liveEngine.terminate(); S.liveEngine = null; }
+    refreshVariation();
   }
-  
-  // Also classify the NEXT variation move if it exists and is the current position
-  // This handles the case where the parent position was just analyzed and the next move
-  // is already on the board waiting for classification
-  const nextVIdx = vIdx + 1;
-  if (nextVIdx < S.variation.positions.length) {
-    const nextPos = S.variation.positions[nextVIdx];
-    if (nextPos && !nextPos.classif && nextPos.eval && nextPos.best) {
-      const classification = classifyVariationMove(nextVIdx);
-      if (classification) {
-        nextPos.classif = classification;
-      }
-    }
+}
+
+function refreshVariation() {
+  if (!S.analysisMode || !S.variation) return;
+  classifyVariationMoves();
+  paintBoard(); renderEvalBar(); renderMoves(); renderPlayers(); renderControls();
+  renderReview(); renderStats(); renderEngineCurrent();
+}
+
+function invalidateVariationEvals() {
+  if (!S.variation) return;
+  for (const p of S.variation.positions) { p.eval = null; p.best = null; p.classif = null; }
+}
+
+function resetLiveEngine() {
+  S.liveToken++; S.panelToken++; S.liveEngineGeneration++;
+  S.liveEngine?.terminate();
+  S.liveEngine = null; S.liveEnginePromise = null; S.liveError = null;
+}
+
+async function ensureLiveEngine() {
+  if (S.liveEngine && !S.liveEngine.dead) return S.liveEngine;
+  if (!S.liveEnginePromise) {
+    const generation = S.liveEngineGeneration;
+    const pending = createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill })
+      .then(eng => {
+        if (generation !== S.liveEngineGeneration) { eng.terminate(); throw new Error("Analysis cancelled"); }
+        S.liveEngine = eng;
+        return eng;
+      });
+    S.liveEnginePromise = pending;
+    pending.finally(() => { if (S.liveEnginePromise === pending) S.liveEnginePromise = null; }).catch(() => {});
   }
-  
-  // Update opening detection for explore mode
-  const isExplore = S.meta?.explore === true;
-  if (isExplore) {
-    const bk = bookLookup(fen);
-    if (Array.isArray(bk)) {
-      S.opening = { eco: bk[0], name: bk[1] };
-      renderReview(); // refresh opening display
-    }
-  }
-  renderEvalBar(); renderBestArrow(); renderEngineCurrent();
-  // Re-render move list and board to show classification badge
-  renderMoves(); paintBoard(); renderReview();
+  return S.liveEnginePromise;
+}
+
+function variationTerminal(v, idx) {
+  // Preserve repetition history rather than asking a fresh board about a single FEN.
+  const chess = new Chess(S.positions[0].fen);
+  const positions = [...S.positions.slice(1, v.branchIdx + 1), ...v.positions.slice(1, idx + 1)];
+  for (const p of positions) chess.move({ from: p.from, to: p.to, promotion: p.promotion || undefined });
+  if (chess.isCheckmate()) return { mate: chess.turn() === "w" ? -1 : 1 };
+  return chess.isDraw() ? { cp: 0 } : null;
 }
 // Exit analysis mode. With mainIdx: jump to that mainline position; otherwise stay put.
 // (Analysis mode is indicated/closed via the Exit button in the controls bar.)
 function exitAnalysis(mainIdx) {
   stopLineWalk();
+  if (S.meta?.explore && S.variation) { gotoVar(0); return; }
   if (!S.analysisMode) { if (mainIdx != null) go(mainIdx); return; }
   S.analysisMode = false; S.variation = null; S.selectedSq = null; S.liveToken++;
   if (mainIdx != null) { go(mainIdx); return; }
@@ -2860,12 +2762,12 @@ function renderControls() {
   if (S.practice) {
     const p = S.practice;
     const cur = Math.min(p.i + 1, p.spots.length);
-    const status = p.rolling ? "Rolling to your mistake…"
+    const status = p.rolling ? "Rolling to your misstep…"
       : p.demoing ? "Replaying your move…"
       : p.busy ? "Checking…"
       : p.solving ? "Find a stronger move" : "✓ Correct!";
     UI.controls.replaceChildren(
-      el("span", { class: "pos practice-pos" }, `Mistake ${cur}/${p.spots.length}`),
+      el("span", { class: "pos practice-pos" }, `Practice ${cur}/${p.spots.length}`),
       el("span", { class: "practice-status" }, status),
       el("button", { class: "exit-analysis", title: "Exit practice (Esc)", onclick: exitPractice }, el("span", { class: "ea-x" }, "✕"), "Exit"),
     );
@@ -2876,11 +2778,12 @@ function renderControls() {
     const atEnd = v.idx >= v.positions.length - 1;
     // Same layout as the normal controls — the central green Play slot becomes a red Exit button.
     const atStart = v.idx <= 0;
-    const gotoVar = (i) => { stopLineWalk(); v.idx = Math.max(0, Math.min(v.positions.length - 1, i)); paintBoard(); renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent(); requestLiveEval(); };
     UI.controls.replaceChildren(
       el("button", { "aria-label": "Variation start", disabled: atStart, onclick: () => gotoVar(0) }, icon("first")),
       el("button", { "aria-label": "Previous move", onclick: navPrev }, icon("prev")),
-      el("button", { class: "exit-analysis", title: "Exit analysis (Esc)", onclick: () => exitAnalysis(v.branchIdx) }, el("span", { class: "ea-x" }, "✕"), "Exit"),
+      S.meta?.explore
+        ? el("span", { class: "pos" }, "Explore")
+        : el("button", { class: "exit-analysis", title: "Exit analysis (Esc)", onclick: () => exitAnalysis(v.branchIdx) }, el("span", { class: "ea-x" }, "✕"), "Exit"),
       el("button", { "aria-label": "Next move", disabled: atEnd, onclick: navNext }, icon("next")),
       el("button", { "aria-label": "Variation end", disabled: atEnd, onclick: () => gotoVar(v.positions.length - 1) }, icon("last")),
     );
@@ -2906,15 +2809,15 @@ function renderControls() {
 
 // Natural phrasing for the move that led to the current position, keyed by classification.
 const COMMENT_PHRASE = {
-  brilliant: (m) => `${m} is a brilliant find.`,
-  great:     (m) => `${m} is a great move.`,
+  brilliant: (m) => `${m} is a masterstroke.`,
+  great:     (m) => `${m} is a superb move.`,
   best:      (m) => `${m} is the best move.`,
-  excellent: (m) => `${m} is excellent.`,
-  good:      (m) => `${m} is a good move.`,
-  book:      (m) => `${m} is a book move.`,
-  inacc:     (m) => `${m} is an inaccuracy.`,
-  mistake:   (m) => `${m} is a mistake.`,
-  miss:      (m) => `${m} misses a stronger chance.`,
+  excellent: (m) => `${m} is near best.`,
+  good:      (m) => `${m} is a decent move.`,
+  book:      (m) => `${m} follows opening theory.`,
+  inacc:     (m) => `${m} is a minor misstep.`,
+  mistake:   (m) => `${m} is a major misstep.`,
+  miss:      (m) => `${m} is a missed chance.`,
   blunder:   (m) => `${m} is a blunder.`,
 };
 // SAN of the engine's best move in the position BEFORE ply `idx` (the alternative to what was played).
@@ -2949,7 +2852,7 @@ function typeWrite(node, text) {
   step();
 }
 function openingStrip() {
-  const o = S.opening;
+  const o = (S.analysisMode && S.variation ? variationOpening() : S.opening);
   const line = o ? `${o.eco}${o.eco && o.name ? " · " : ""}${o.name}` : "Opening unknown";
   return el("div", { class: "ip-opening", title: line },
     el("span", { class: "ip-op-ic", html: ICONS.book || "" }),
@@ -3177,7 +3080,12 @@ function coachPick(arr, histKey) {
 }
 // Substitute {tokens}; leave any token we have no value for untouched (caller avoids those events).
 function coachFill(text, tok) {
-  return text.replace(/\{(\w+)\}/g, (m, k) => (tok && tok[k] != null && tok[k] !== "") ? tok[k] : m);
+  return text.split(/(\{\w+\})/g).map(part => {
+    const token = /^\{(\w+)\}$/.exec(part);
+    if (!token) return categoryText(part);
+    const k = token[1];
+    return (tok && tok[k] != null && tok[k] !== "") ? tok[k] : part;
+  }).join("");
 }
 // Grab the array for an event: top-level (weak_move_suffix / move_fallback) or nested section.key.
 function coachArr(section, key) {
@@ -3260,7 +3168,7 @@ function coachTokens(idx, extra) {
   const tok = {
     move: (S.positions[idx] && S.positions[idx].san) || "", best_move: bestSanBefore(idx) || "",
     eval: ev ? evalText(ev) : "", eco: o.eco || "", opening: o.name || "",
-    label: q ? q.name.toLowerCase() : "",
+    label: q ? categoryName(cls) : "",
     swing: (cpPrev != null && cpNow != null) ? (Math.abs(cpNow - cpPrev) / 100).toFixed(1) : "",
   };
   if (ev && ev.mate) tok.mate_n = String(Math.abs(ev.mate));
@@ -3311,7 +3219,8 @@ function renderReview() {
     _ipSig = null;
     panel.append(el("div", { class: "ip-body" },
       el("div", { class: "ip-head" }),
-      el("div", { class: "ip-text" }, `Analysis stopped early: ${S.analysisError} You can change the engine settings and try again.`),
+      el("div", { class: "ip-text" }, `Analysis stopped early: ${S.analysisError}`),
+      el("button", { class: "engine-bestwalk", onclick: () => startAnalysis() }, "Retry analysis"),
     ));
     UI.review.replaceChildren(panel);
     return;
@@ -3321,6 +3230,13 @@ function renderReview() {
 
   if (S.analysisMode && S.variation) {
     _ipSig = null;
+    if (S.liveError) {
+      panel.append(el("div", { class: "ip-body" },
+        el("div", { class: "ip-text" }, S.liveError),
+        el("button", { class: "engine-bestwalk", onclick: () => requestLiveEval() }, "Retry analysis")));
+      UI.review.replaceChildren(panel);
+      return;
+    }
     // Exploring an engine sideline is not part of the played game, so the coach stays quiet here —
     // we show a plain, neutral note instead of a coach line (the eval still updates live below).
     // Mirror a move comment's layout exactly (empty .ip-head for the same top spacing + the note in
@@ -3362,7 +3278,9 @@ function renderMoveComment() {
 
   const head = el("div", { class: "ip-head" });
   if (cfg) head.append(el("img", { class: "ip-badge", src: qIcon(cls), alt: "", draggable: "false" }));
-  head.append(el("span", { class: "ip-move" }, san));
+  // Special coach phrasing can omit the category, so name it beside the move.
+  const sanDisplay = !S.settings.coachPlain && cfg ? `${san} ${categoryName(cls)}` : san;
+  head.append(el("span", { class: "ip-move" }, sanDisplay));
   if (evTxt) head.append(el("span", { class: "ip-eval " + (evCp >= 0 ? "pos" : "neg") }, evTxt));
   body.append(head);
 
@@ -3373,7 +3291,7 @@ function renderMoveComment() {
   if (fresh) {
     let sentence = S.coach ? coachMoveSentence(S.idx) : null;
     if (sentence == null) {   // legacy generic line
-      sentence = (cfg && COMMENT_PHRASE[cls]) ? COMMENT_PHRASE[cls](san) : `${san}.`;
+      sentence = (cfg && COMMENT_PHRASE[cls]) ? categoryText(COMMENT_PHRASE[cls](san)) : `${san}.`;
     }
     _ipText = sentence; _ipSig = sig;
   }
@@ -3415,7 +3333,7 @@ function renderPracticeCoach() {
   const spot = p.spots[p.i];
   const badSan = S.positions[spot].san || "your move";
   const badCls = S.classif[spot];
-  const label = (badCls && QUALITY[badCls]) ? QUALITY[badCls].name.toLowerCase() : "weak move";
+  const label = (badCls && QUALITY[badCls]) ? categoryName(badCls) : "weak move";
   if (!p.coachTyped) {
     const tok = { move: badSan, label };
     // After a hint has been surfaced, switch to the coach's after-hint line if it has one.
@@ -3459,8 +3377,8 @@ function showQTip(target, cls) {
   tip.replaceChildren(
     el("div", { class: "q-tip-head" },
       el("img", { class: "q-tip-ic", src: qIcon(cls), alt: "", draggable: "false" }),
-      el("span", { class: "q-tip-nm", style: { color: cfg.color } }, cfg.name)),
-    el("div", { class: "q-tip-body" }, QUALITY_DESC[cls] || ""),
+      el("span", { class: "q-tip-nm", style: { color: cfg.color } }, categoryName(cls))),
+    el("div", { class: "q-tip-body" }, categoryText(QUALITY_DESC[cls] || "")),
   );
   positionTip(tip, target);
 }
@@ -3513,6 +3431,61 @@ function renderPhaseClassifBadges(classifObj) {
     }).filter(Boolean),
   );
 }
+function setCategoryName(cls, value) {
+  const name = cleanCategoryName(value);
+  const names = { ...S.settings.categoryNames };
+  if (!name || name === QUALITY[cls].name) delete names[cls];
+  else names[cls] = name;
+  S.settings.categoryNames = names;
+  browserAPI.storage.local.set({ settings: S.settings });
+  hideQTip(); hideBoardBadgeTip();
+  _movesSig = null; _ipSig = null;
+  if (S.practice) { S.practice.coachLine = null; S.practice.coachTyped = false; }
+  UI.stats.querySelectorAll("[data-category]").forEach(label => {
+    label.replaceWith(categoryLabel(label.dataset.category));
+  });
+  renderMoves(); buildBoard(); renderReview();
+}
+function categoryLabel(cls) {
+  const label = el("button", {
+    type: "button", class: "qlabel", "data-category": cls,
+    "aria-label": "Rename " + categoryName(cls), title: "Click to rename",
+    onmouseenter: e => showQTip(e.currentTarget, cls), onmouseleave: hideQTip,
+    onclick: () => {
+      hideQTip();
+      let finished = false;
+      const finish = (save, value = input.value, focus = false) => {
+        if (finished) return;
+        finished = true;
+        if (save) setCategoryName(cls, value);
+        else editor.replaceWith(categoryLabel(cls));
+        if (focus) UI.stats.querySelector('[data-category="' + cls + '"]')?.focus();
+      };
+      const input = el("input", {
+        class: "category-name-input", type: "text", maxlength: CATEGORY_NAME_LIMIT,
+        value: categoryName(cls), "aria-label": "Name for " + QUALITY[cls].name,
+        onkeydown: e => {
+          e.stopPropagation();
+          if (e.key === "Enter" || e.key === "Escape") { e.preventDefault(); finish(e.key === "Enter", input.value, true); }
+        },
+      });
+      const editor = el("div", {
+        class: "qlabel category-name-editor", "data-category": cls,
+        onfocusout: e => { if (!editor.contains(e.relatedTarget)) finish(true); },
+        onkeydown: e => { e.stopPropagation(); if (e.key === "Escape") { e.preventDefault(); finish(false, input.value, true); } },
+      }, input,
+        el("button", {
+          type: "button", class: "category-name-reset", title: "Restore default name",
+          "aria-label": "Restore " + QUALITY[cls].name,
+          onpointerdown: e => e.preventDefault(), onmousedown: e => e.preventDefault(),
+          onclick: () => finish(true, "", true),
+        }, "↺"));
+      label.replaceWith(editor); input.focus(); input.select();
+    },
+  }, el("img", { class: "qsym", src: qIcon(cls), alt: "", draggable: "false" }),
+  el("span", { class: "nm" }, categoryName(cls)));
+  return label;
+}
 function renderStats() {
   const isExplore = S.meta?.explore === true;
   if (isExplore) {
@@ -3527,8 +3500,8 @@ function renderStats() {
       el("div", { class: "panel-body" },
         el("div", { class: "acc-row" },
           el("div", { class: "acc-cell" },
-            cfg ? el("img", { class: "qb icon", src: qIcon(cls), alt: cfg.name, title: cfg.name, draggable: "false" }) : null,
-            el("span", { class: "acc-name" }, cfg ? cfg.name : "—"),
+            cfg ? el("img", { class: "qb icon", src: qIcon(cls), alt: categoryName(cls), title: categoryName(cls), draggable: "false" }) : null,
+            el("span", { class: "acc-name" }, cfg ? categoryName(cls) : "—"),
             el("span", { class: "acc-val", style: { color: "var(--accent)" } }, evTxt),
           ),
         ),
@@ -3560,7 +3533,6 @@ function renderStats() {
 
   const rows = {};
   const qrows = list.map((k) => {
-    const cfg = QUALITY[k];
     const cMe = S.counts[S.meSide][k] || 0, cOp = S.counts[opSide][k] || 0;
     const meCt = el("span", { class: "ct left " + (cMe ? "" : "zero"), onclick: () => jumpToCategory(S.meSide, k) }, cMe);
     const opCt = el("span", { class: "ct " + (cOp ? "" : "zero"), onclick: () => jumpToCategory(opSide, k) }, cOp);
@@ -3569,13 +3541,7 @@ function renderStats() {
       meCt,
       // The category explainer tooltip lives on the label only — hovering the counts (which are
       // clickable jump targets) must not trigger it.
-      el("span", {
-        class: "qlabel",
-        onmouseenter: (e) => showQTip(e.currentTarget, k),
-        onmouseleave: hideQTip,
-      },
-        el("img", { class: "qsym", src: qIcon(k), alt: "", draggable: "false" }),
-        el("span", { class: "nm" }, cfg.name)),
+      categoryLabel(k),
       opCt,
     );
   });
@@ -3614,6 +3580,7 @@ function renderStats() {
     ),
   ));
   statsRefs = S.analyzing ? { expanded: S.qbreakExpanded, rows } : null;
+  if (UI.canvas.classList.contains("desktop-layout")) applyLayout();
 }
 function renderPhaseRatings() {
   const isExplore = S.meta?.explore === true;
@@ -3818,7 +3785,7 @@ function moveCell(ply) {
   const showBadge = cls && (NOTEWORTHY.has(cls) || S.settings.badgeStyle === "dot");
   const glyph = GLYPH[pos.san && /^[KQRBN]/.test(pos.san) ? pos.san[0] : "P"];
   const isCritical = S.criticalMoments?.some((m) => m.idx === ply);
-  return el("span", { class: "ml-move" + (!S.analysisMode && ply === S.idx ? " current" : "") + (isCritical ? " critical" : ""), "data-ply": ply, onclick: () => gotoMainline(ply) },
+  return el("span", { class: "ml-move" + (!S.analysisMode && ply === S.idx ? " current" : "") + (isCritical ? " critical" : ""), "data-ply": ply, "data-class": cls || "", onclick: () => gotoMainline(ply) },
     el("span", { class: "pc", style: { color: pos.color === "w" ? "var(--ink)" : "var(--ink-2)" } }, glyph),
     el("span", {}, pos.san),
     showBadge ? qBadge(cls) : null,
@@ -3827,34 +3794,38 @@ function moveCell(ply) {
 }
 function qBadge(k) {
   const cfg = QUALITY[k]; const st = S.settings.badgeStyle;
-  if (st === "dot") return el("span", { class: "qb dot", style: { background: cfg.color }, title: cfg.name });
-  if (st === "label") return el("span", { class: "qb label", style: { background: cfg.color } }, cfg.name);
+  if (st === "dot") return el("span", { class: "qb dot", style: { background: cfg.color }, title: categoryName(k) });
+  if (st === "label") return el("span", { class: "qb label", style: { background: cfg.color } }, categoryName(k));
   // "icon" → the real SVG badge
-  return el("img", { class: "qb icon", src: qIcon(k), alt: cfg.name, title: cfg.name, draggable: "false" });
+  return el("img", { class: "qb icon", src: qIcon(k), alt: categoryName(k), title: categoryName(k), draggable: "false" });
 }
 // Move the .current highlight to the cell for S.idx and auto-scroll it into view, without
 // touching the rest of the list. Used both after a full rebuild and on a plain step.
-function highlightCurrentMove() {
+function highlightCurrentMove(forceScroll = false) {
   const prev = UI.movesBody.querySelector(".ml-move.current");
+  const previousPly = prev?.dataset.ply;
   if (prev) prev.classList.remove("current");
   // In analysis mode no mainline cell is "current" (the original render never marked one).
   const cur = S.analysisMode ? null : UI.movesBody.querySelector('.ml-move[data-ply="' + S.idx + '"]');
   if (cur) {
     cur.classList.add("current");
-    const cr = cur.getBoundingClientRect(), sr = UI.movesBody.getBoundingClientRect();
-    UI.movesBody.scrollTop += (cr.top - sr.top) - (UI.movesBody.clientHeight - cr.height - 14);
+    if (forceScroll || previousPly !== cur.dataset.ply) {
+      const cr = cur.getBoundingClientRect(), sr = UI.movesBody.getBoundingClientRect();
+      UI.movesBody.scrollTop += (cr.top - sr.top) - (UI.movesBody.clientHeight - cr.height - 14);
+    }
   }
 }
 let _movesSig = null;
+let _movesClassSig = null;
 function renderMoves() {
   const isExplore = S.meta?.explore === true;
   if (isExplore && S.variation) {
     // In explore mode, show the variation moves
     const v = S.variation;
     const ml = S.settings.mlStyle;
-    // Use variation positions' own classification (pos.classif) for signature
-    const varClassifSig = v.positions.slice(1).map(p => p.classif || "").join(",");
-    const sig = ml + "|" + S.settings.badgeStyle + "|" + v.positions.length + "|" + varClassifSig;
+    // Position identity and selected move are part of the cache key.
+    const varClassifSig = v.positions.slice(1).map(p => [p.fen, p.san, p.classif]);
+    const sig = JSON.stringify([ml, S.settings.badgeStyle, v.idx, varClassifSig]);
     if (sig === _movesSig && UI.movesBody.firstChild) { return; }
     _movesSig = sig;
     let list;
@@ -3895,13 +3866,26 @@ function renderMoves() {
   }
   const nMoves = Math.ceil(S.total / 2);
   const ml = S.settings.mlStyle;
-  // The list's CONTENT only changes with the game, the layout/badge style, or the classifications
-  // (which fill in during analysis) — NOT when you merely step to another move. Rebuilding every
-  // cell (each with a badge <img>) plus forcing a reflow on every step is what made stepping feel
-  // laggy. Cache by a signature; on a plain step just slide the .current marker (cheap).
-  const sig = ml + "|" + S.settings.badgeStyle + "|" + S.total + "|" + (S.analysisMode ? 1 : 0) + "|" + S.classif.join("");
-  if (sig === _movesSig && UI.movesBody.firstChild) { highlightCurrentMove(); return; }
+  // Keep move cells mounted while classifications arrive. Replacing the list during analysis
+  // drops the hovered element and makes its hover state flicker; only changed badges need updates.
+  const sig = ml + "|" + S.settings.badgeStyle + "|" + S.total + "|" + (S.analysisMode ? 1 : 0);
+  const classSig = S.classif.join("|");
+  if (sig === _movesSig && UI.movesBody.firstChild) {
+    if (classSig !== _movesClassSig) {
+      for (const cell of UI.movesBody.querySelectorAll(".ml-move[data-ply]")) {
+        const cls = S.classif[+cell.dataset.ply];
+        if (cell.dataset.class === (cls || "")) continue;
+        cell.dataset.class = cls || "";
+        const old = cell.querySelector(".qb");
+        if (old) old.remove();
+        if (cls && (NOTEWORTHY.has(cls) || S.settings.badgeStyle === "dot")) cell.append(qBadge(cls));
+      }
+      _movesClassSig = classSig;
+    }
+    highlightCurrentMove(); return;
+  }
   _movesSig = sig;
+  _movesClassSig = classSig;
   let list;
   if (ml === "compact") {
     list = el("div", { class: "movelist ml-compact ml-scroll" });
@@ -3917,7 +3901,7 @@ function renderMoves() {
   // Book moves are now shown in the Accuracy breakdown (expanded), no longer here in "Moves".
   UI.movesFoot.hidden = true;
   // auto-scroll to the current move
-  highlightCurrentMove();
+  highlightCurrentMove(true);
 }
 
 /* ---------------- Engine lines ---------------- */
@@ -3967,26 +3951,47 @@ async function requestPanelLines() {
   const fen = S.positions[i].fen;
   if (terminalScore(fen)) return;
   const token = ++S.panelToken;
-  if (!S.liveEngine) {
-    S.liveEngine = await createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill });
-    if (token !== S.panelToken) return;
-  }
-  S.liveEngine.stop();
-  let res; try { res = await S.liveEngine.analyse(fen, S.settings.engineDepth, want); } catch { return; }
-  if (token !== S.panelToken || S.idx !== i || S.analysisMode) return;   // navigated away → drop it
+  let res;
+  try {
+    const eng = await ensureLiveEngine();
+    if (token !== S.panelToken || S.analysisMode || activePos().fen !== fen) return;
+    eng.cancelPending(); eng.stop();
+    res = await eng.analyse(fen, S.settings.engineDepth, want);
+  } catch { return; }
+  if (token !== S.panelToken || S.idx !== i || S.analysisMode || activePos().fen !== fen) return;
   S._panelCache = { idx: i, fen, lines: res.lines };
   renderEngineCurrent();
 }
-const ENGINE_NAME = { sf19: "Stockfish 19", nnue: "Stockfish 18 NNUE", wasm: "Stockfish 10", asm: "Stockfish 10 (asm.js)" };
+const ENGINE_NAME = { nnue: "Stockfish 18 NNUE", sf19lite: "Stockfish 19 Lite" };
+// Keep all candidate lines and the action visible. Only the bottom edge moves, including
+// when narrowing a custom panel wraps its heading/button or extra lines are selected.
+function fitEnginePanel() {
+  const mod = UI.engine?.closest('.mod');
+  const head = UI.engine?.querySelector('.panel-head');
+  const body = UI.engine?.querySelector('.engine-body');
+  if (!mod || !head || !body) return;
+  const height = Math.max(DEFAULT_LAYOUT.engine.h,
+    Math.ceil((head.getBoundingClientRect().height + body.scrollHeight + 4) / GRID) * GRID);
+  mod.style.minHeight = height + "px";
+  if (isCustomLayout() && S.layout.engine) {
+    S.layout.engine.h = Math.max(S.layout.engine.h, height);
+    mod.style.height = S.layout.engine.h + "px";
+    growCanvas();
+  } else if (UI.canvas.classList.contains("desktop-layout")) {
+    mod.style.height = height + "px";
+  }
+}
 function renderEngine(lines, padFromCache = false) {
   const curFen = activePos().fen;
   const want = S.settings.engineLines;
   // The last full set of real lines we rendered, kept (with the fen they were computed for, so the
   // SAN stays correct) to fill slots that the new position hasn't searched yet — and to hold the
   // panel steady while the engine re-computes (lines === null, e.g. "Play best moves from here").
-  const cached = S._lastEngineLines;
+  const cached = S._lastEngineLines?.fen === curFen ? S._lastEngineLines : null;
   let body;
-  if (lines && !lines.length) {
+  if (S.analysisMode && S.liveError) {
+    body = el("div", { class: "engine-empty" }, S.liveError);
+  } else if (lines && !lines.length) {
     S._lastEngineLines = null; // final position: nothing worth keeping
     body = el("div", { class: "engine-empty" }, "Final position.");
   } else if (!lines && !cached) {
@@ -4035,6 +4040,7 @@ function renderEngine(lines, padFromCache = false) {
       el("span", { class: "count" }, `${activeEngineName()} · depth ${S.settings.engineDepth}`)),
     el("div", { class: "panel-body engine-body" }, body, bestWalkBtn),
   ));
+  fitEnginePanel();
 }
 
 /* ---------------- Topbar meta ---------------- */
@@ -4115,11 +4121,40 @@ function pieceGrid() {
   );
 }
 function colorChips(label, key, entries) {
-  return el("div", { class: "set-row" },
+  return el("div", { class: "set-row" + (key === "accent" ? " accent-row" : "") },
     label ? el("span", { class: "set-lbl" }, label) : null,
     el("div", { class: "set-chips" },
       ...entries.map((e) => { const chip = el("button", { class: "set-chip" + (S.settings[key] === e.value ? " on" : ""), title: e.title || e.value, onclick: e.onClick || (() => setSetting(key, e.value)) }); e.render(chip); return chip; })),
   );
+}
+let _accentPickCleanup = null;
+function openAccentColorPicker(anchor) {
+  if (_accentPickCleanup) _accentPickCleanup();
+  S.settings.accent = "custom";
+  applySettings();
+  anchor.parentElement.querySelectorAll(".set-chip").forEach((chip) => chip.classList.toggle("on", chip === anchor));
+  const picker = buildColorPicker(S.settings.accentCustom || DEFAULT_SETTINGS.accentCustom,
+    (hex) => { S.settings.accentCustom = hex; anchor.style.background = hex; applySettings(); },
+    (hex) => { S.settings.accentCustom = hex; anchor.style.background = hex;
+      browserAPI.storage.local.set({ settings: S.settings }); },
+  );
+  const pop = el("div", { class: "board-cpick" },
+    el("div", { class: "cpick-title" }, "Custom accent"), picker.el);
+  document.body.append(pop);
+  const r = anchor.getBoundingClientRect(), pr = pop.getBoundingClientRect();
+  pop.style.left = Math.max(8, Math.min(r.left, innerWidth - pr.width - 8)) + "px";
+  pop.style.top = Math.max(8, r.bottom + pr.height + 6 > innerHeight ? r.top - pr.height - 6 : r.bottom + 6) + "px";
+  const onDown = (e) => { if (!pop.contains(e.target)) close(); };
+  const onKey = (e) => { if (e.key === "Escape") close(); };
+  const close = () => {
+    document.removeEventListener("pointerdown", onDown);
+    document.removeEventListener("keydown", onKey);
+    pop.remove(); _accentPickCleanup = null;
+    browserAPI.storage.local.set({ settings: S.settings });
+  };
+  setTimeout(() => document.addEventListener("pointerdown", onDown), 0);
+  document.addEventListener("keydown", onKey);
+  _accentPickCleanup = close;
 }
 // Current custom board colours [light, dark] (with sane fallbacks).
 function customBoardColors() {
@@ -4136,6 +4171,13 @@ function hexToRgb(hex) {
 function rgbToHex(r, g, b) {
   const t = (v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0");
   return "#" + t(r) + t(g) + t(b);
+}
+function accentFromHex(hex) {
+  if (!/^#[0-9a-f]{6}$/i.test(hex || "")) hex = DEFAULT_SETTINGS.accentCustom;
+  const { r, g, b } = hexToRgb(hex);
+  const luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+  return { accent: hex, strong: rgbToHex(r * .82, g * .82, b * .82),
+    ink: luminance > .58 ? "#11111a" : "#ffffff" };
 }
 function rgbToHsv(r, g, b) {
   r /= 255; g /= 255; b /= 255;
@@ -4198,6 +4240,41 @@ function buildColorPicker(initialHex, onLive, onCommit) {
   return {
     el: el("div", { class: "cpick-pick" }, sv, hue, el("div", { class: "cpick-hexrow" }, hex)),
     setHex: (hx) => { const o = hexToHsv(hx); h = o.h; s = o.s; v = o.v; render(); },
+  };
+}
+
+// Use the same themed picker and swatch as the custom board colours.
+let _arrowPickCleanup = null;
+function closeArrowColorPicker() { if (_arrowPickCleanup) _arrowPickCleanup(); }
+function openArrowColorPicker(anchor) {
+  closeArrowColorPicker();
+  const update = (hex) => {
+    S.settings.bestArrowColor = hex;
+    anchor.style.background = hex;
+    refreshArrows();
+  };
+  const save = () => browserAPI.storage.local.set({ settings: S.settings });
+  const picker = buildColorPicker(S.settings.bestArrowColor || ARROW_COLOR, update, save);
+  const pop = el("div", { class: "board-cpick", role: "dialog", "aria-label": "Best-move arrow color" },
+    el("div", { class: "cpick-title" }, "Best-move arrow"), picker.el);
+  document.body.append(pop);
+  const r = anchor.getBoundingClientRect(), pr = pop.getBoundingClientRect();
+  pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - pr.width - 8)) + "px";
+  pop.style.top = Math.max(8, r.bottom + pr.height + 6 > window.innerHeight - 8
+    ? r.top - pr.height - 6 : r.bottom + 6) + "px";
+  const onDown = (e) => { if (!pop.contains(e.target) && !anchor.contains(e.target)) closeArrowColorPicker(); };
+  const onKey = (e) => {
+    if (e.key === "Escape") { e.stopPropagation(); closeArrowColorPicker(); anchor.focus(); }
+  };
+  const listenTimer = setTimeout(() => document.addEventListener("pointerdown", onDown), 0);
+  document.addEventListener("keydown", onKey);
+  _arrowPickCleanup = () => {
+    _arrowPickCleanup = null;
+    clearTimeout(listenTimer);
+    document.removeEventListener("pointerdown", onDown);
+    document.removeEventListener("keydown", onKey);
+    pop.remove();
+    save();
   };
 }
 
@@ -4282,7 +4359,11 @@ function engineSlider(label, key, min, max, step, opts = {}) {
         out.textContent = fmt(v);
         S.settings[key] = v;
         browserAPI.storage.local.set({ settings: S.settings });
-        if (S.liveEngine) { try { S.liveEngine.terminate(); } catch {} S.liveEngine = null; S.liveToken++; }
+        S.engineFallbackBuild = null; S.activeEngineBuild = null;
+        resetLiveEngine();
+        invalidateVariationEvals();
+        if (S.helperEngine) { try { S.helperEngine.terminate(); } catch {} S.helperEngine = null; }
+        S.threatCache.clear();
         scheduleReanalyze();
       },
     }),
@@ -4315,6 +4396,8 @@ function applyClassificationChange() {
   clearTimeout(_clsT);
   _clsT = setTimeout(() => {
     computeDerived();
+    if (S.analysisMode && S.variation) refreshVariation();
+    else paintBoard();
     renderStats(); renderMoves(); renderReview(); renderGraph();
     if (!S.analysisMode) { renderBestArrow(); renderEngineCurrent(); }
   }, 60);
@@ -4322,12 +4405,51 @@ function applyClassificationChange() {
 // Reset every Engine-tab setting to its default and re-run the analysis.
 async function resetEngineSettings() {
   for (const k of ENGINE_SETTING_KEYS) S.settings[k] = DEFAULT_SETTINGS[k];
+  S.engineFallbackBuild = null;
+  S.activeEngineBuild = null;
   await browserAPI.storage.local.set({ settings: S.settings });
-  if (S.liveEngine) { try { S.liveEngine.terminate(); } catch {} S.liveEngine = null; S.liveToken++; }
+  resetLiveEngine();
+  invalidateVariationEvals();
+  if (S.helperEngine) { try { S.helperEngine.terminate(); } catch {} S.helperEngine = null; }
+  S.threatCache.clear();
   scheduleReanalyze();
-  renderEngineCurrent();
   if (UI.settings && !UI.settings.hidden) renderSettings();
-  toast("Engine settings reset");
+}
+const ARROW_SETTING_KEYS = ["bestArrow", "showThreat", "bestArrowColor", "arrowOpacity", "arrowShaft", "arrowHead"];
+const BACKGROUND_SETTING_KEYS = ["bg", "bgFit", "bgTile", "bgCustom", "bgHue", "bgSat", "bgLight"];
+const VISUAL_SETTING_KEYS = [
+  "theme", "accent", "accentCustom", "density", "evalView", "mlStyle", "badgeStyle", "badgeScale",
+  "graphStyle", "barStyle", "insightFont", "showCoords", "coordSize", ...BACKGROUND_SETTING_KEYS,
+  "coach", "coachPlain", "boardTheme", "pieceStyle", "boardCustomLight", "boardCustomDark",
+  "sound", "soundVolume", "soundFx", ...ARROW_SETTING_KEYS,
+  "moveAnim", "animSpeed", "loaderStyle",
+];
+function resetSettingKeys(keys) {
+  for (const key of keys) S.settings[key] = structuredClone(DEFAULT_SETTINGS[key]);
+  return browserAPI.storage.local.set({ settings: S.settings });
+}
+function resetArrowSettings() {
+  closeArrowColorPicker();
+  resetSettingKeys(ARROW_SETTING_KEYS);
+  refreshArrows(); renderSettings();
+}
+function resetBackgroundSettings() {
+  resetSettingKeys(BACKGROUND_SETTING_KEYS);
+  applyBackground(); renderSettings();
+}
+async function resetVisualSettings() {
+  closeArrowColorPicker();
+  if (_accentPickCleanup) _accentPickCleanup();
+  closeBoardColorPicker();
+  delete S.settings.wrongSound; // remove obsolete saved choices from older versions
+  await resetSettingKeys(VISUAL_SETTING_KEYS);
+  S.coach = null;
+  _ipSig = null;
+  if (S.practice) S.practice.coachTyped = false;
+  resetLayout();
+  applySettings(); buildBoard(); renderEvalBar(); renderGraph(); renderMoves();
+  renderCoachAvatar(); renderReview(); renderStats(); renderControls();
+  renderSettings();
 }
 // Controls for the "Background" section: preset/custom picker, fit mode, tile size, upload button.
 function bgControls() {
@@ -4338,7 +4460,6 @@ function bgControls() {
   const entries = [
     { value: "color", render: (c) => { c.title = "Custom colour"; swatch(c, colorCss); } },
     { value: "olive", render: (c) => { c.title = "Dark"; swatch(c, "radial-gradient(120% 80% at 50% -10%, #141414, #0a0a0a 60%)"); } },
-    { value: "ember", render: (c) => { c.title = "Ember"; swatch(c, `url("${BG_PRESETS.ember}")`); } },
     { value: "slate", render: (c) => { c.title = "Slate"; swatch(c, `url("${BG_PRESETS.slate}")`); } },
   ];
   if (S.settings.bgCustom) entries.push({ value: "custom", render: (c) => { c.title = "Your image"; swatch(c, `url("${S.settings.bgCustom}")`); } });
@@ -4355,30 +4476,14 @@ function bgControls() {
       el("span", { class: "set-lbl" }, "Custom"),
       el("button", { class: "set-reset", style: { margin: 0 }, onclick: uploadBackground }, "Upload image…")),
     el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "PNG, JPEG, WebP, GIF or AVIF.")),
+    el("button", { class: "set-reset", onclick: resetBackgroundSettings }, "Reset to default"),
   ];
 }
 function visualSettings() {
   const boardEntries = Object.entries(BOARD_THEMES).map(([k, [lt, dk]]) => ({
-    value: k, render: (chip) => chip.append(el("span", { class: "half l", style: { background: lt } }), el("span", { class: "half r", style: { background: dk } })),
+    value: k, title: BOARD_THEME_LABEL[k] || k,
+    render: (chip) => chip.append(el("span", { class: "half l", style: { background: lt } }), el("span", { class: "half r", style: { background: dk } })),
   }));
-  // Bundled Kadagaden boards — each chip previews the real artwork (the SVG as the chip background).
-  for (const [k, b] of Object.entries(BUNDLED_BOARDS)) {
-    boardEntries.push({
-      value: k, title: b.label,
-      render: (chip) => { chip.classList.add("chip-board-art"); chip.style.backgroundImage = `url("${_url("boards-img/" + b.file)}")`; },
-    });
-  }
-  // The detected chess.com board is shown as an extra chip at the front (can be selected/deselected).
-  if (S.settings.ccBoardUrl || S.settings.ccBoardTheme) {
-    const [lt, dk] = CC_BOARD_COLORS[S.settings.ccBoardTheme] || BOARD_THEMES.green;
-    boardEntries.unshift({
-      value: "chesscom",
-      render: (chip) => {
-        chip.title = "Matched board";
-        chip.append(el("span", { class: "half l", style: { background: lt } }), el("span", { class: "half r", style: { background: dk } }));
-      },
-    });
-  }
   // Custom colour chip — always first. Clicking it selects custom and opens the colour picker.
   {
     const [lt, dk] = customBoardColors();
@@ -4399,6 +4504,9 @@ function visualSettings() {
   const accentEntries = Object.keys(ACCENTS).map((hex) => ({
     value: hex, render: (chip) => { chip.style.background = "transparent"; chip.append(el("span", { class: "set-accent", style: { background: hex } })); },
   }));
+  accentEntries.push({ value: "custom", title: "Custom accent — click to pick", onClick: (e) => openAccentColorPicker(e.currentTarget),
+    render: (chip) => { chip.classList.add("chip-custom"); chip.style.background = S.settings.accentCustom;
+      chip.append(el("span", { class: "chip-edit" }, "✎")); } });
   return el("div", {},
     section("Theme",
       colorChips("Accent", "accent", accentEntries),
@@ -4418,10 +4526,17 @@ function visualSettings() {
       slider("Opacity", "arrowOpacity", 0.3, 1, 0.02, { onChange: refreshArrows }),
       slider("Shaft width", "arrowShaft", 0.14, 0.42, 0.01, { onChange: refreshArrows }),
       slider("Head size", "arrowHead", 0.22, 0.55, 0.01, { onChange: refreshArrows }),
-      el("div", { class: "set-row hint" },
-        el("span", { class: "set-lbl" }, "Own arrows/moves"),
-        el("span", { class: "set-note" }, "Right-click + drag = arrow · left-click-drag a piece = analysis"),
-      ),
+      colorChips("Color", "bestArrowColor", [{
+        value: S.settings.bestArrowColor || ARROW_COLOR,
+        title: "Arrow color — click to pick",
+        onClick: (e) => openArrowColorPicker(e.currentTarget),
+        render: (chip) => {
+          chip.classList.add("chip-custom");
+          chip.style.background = S.settings.bestArrowColor || ARROW_COLOR;
+          chip.append(el("span", { class: "chip-edit" }, "✎"));
+        },
+      }]),
+      el("button", { class: "set-reset", onclick: resetArrowSettings }, "Reset to default"),
     ),
     section("Loading",
       seg("Animation", "loaderStyle", ["dots", "bounce", "spinner", "wave"]),
@@ -4436,7 +4551,7 @@ function visualSettings() {
       seg("Graph", "graphStyle", ["area", "line", "color", "minimal"]),
       el("button", { class: "set-reset reorg-toggle-btn", onclick: toggleReorganize }, S.reorganize ? "Done reorganizing" : "Reorganize panels"),
       el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Reorganize lets you drag and resize the panels, and your arrangement is saved. Reset layout goes back to the automatic layout that fits any window.")),
-      el("button", { class: "set-reset", onclick: () => { resetLayout(); toast("Layout reset"); } }, "Reset layout"),
+      el("button", { class: "set-reset", onclick: resetLayout }, "Reset layout"),
     ),
     section("Move list",
       seg("Style", "mlStyle", ["rows", "cards", "compact"]),
@@ -4470,9 +4585,9 @@ function visualSettings() {
       slider("Volume", "soundVolume", 0, 100, 1, { fmt: (v) => v + " %" }),
       el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Pick a sound for each board event, then shape it with the pitch and speed knobs. Changes preview as you make them.")),
       ...SOUND_EVENTS.map(([key, label]) => fxEventControls(key, label)),
-      wrongSoundPicker(),
-      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "The \"Wrong answer\" effect plays when you miss a move in practice mode. Pick one to preview it.")),
+      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "A missed practice move plays the Incorrect cue.")),
     ),
+    el("button", { class: "set-reset", onclick: resetVisualSettings }, "Reset to default"),
   );
 }
 // Coach personality dropdown — only personalities that have a built animated character. Uses the
@@ -4483,13 +4598,6 @@ function coachPicker() {
   const opts = COACH_LIST.filter(([id]) => COACH_RIGS[id]);
   return el("div", { class: "set-row" }, el("span", { class: "set-lbl" }, "Personality"),
     ddField(cur, opts, (v) => setCoach(v)));
-}
-// Dropdown for the practice-mode "wrong answer" effect; previews the choice on change. Uses the
-// same custom dropdown (ddField) as the coach picker, so it matches the app theme (no OS-blue select).
-function wrongSoundPicker() {
-  const cur = currentWrongFile();
-  return el("div", { class: "set-row" }, el("span", { class: "set-lbl" }, "Wrong answer"),
-    ddField(cur, WRONG_SOUNDS, (v) => { setSetting("wrongSound", v); playWrongSound(); }));
 }
 // Controls for one board event: a sound dropdown (the 9 base sounds + the original cue) plus pitch and
 // speed knobs. Everything previews on change. The dropdown re-renders the panel so its label updates;
@@ -4534,49 +4642,47 @@ function motorSettings() {
     section("Move classification",
       el("div", { class: "set-row hint" },
         el("span", { class: "set-note" }, "How move quality is graded, in pawns of evaluation lost vs the engine's best move. Changes re-label the game instantly — no re-analysis.")),
-      clsSlider("Good above", "clsGood", 0.1, 1.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsGood }),
-      clsSlider("Inaccuracy above", "clsInacc", 0.3, 2.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsInacc }),
+      clsSlider("Decent above", "clsGood", 0.1, 1.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsGood }),
+      clsSlider("Minor Misstep above", "clsInacc", 0.3, 2.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsInacc }),
       clsSlider("Blunder above", "clsBlunder", 1.5, 8, 0.1, { fmt: pawnsFmt, info: ENGINE_INFO.clsBlunder }),
       clsSlider("Clear advantage", "clsClearAdv", 1, 5, 0.1, { fmt: pawnsFmt, info: ENGINE_INFO.clsClearAdv }),
-      clsSlider("Mistake min. loss", "clsMistakeLoss", 0.5, 3, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsMistakeLoss }),
-      clsSlider("Miss tolerance", "clsMissTol", 0, 1.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsMissTol }),
+      clsSlider("Major Misstep min. loss", "clsMistakeLoss", 0.5, 3, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsMistakeLoss }),
+      clsSlider("Missed chance tolerance", "clsMissTol", 0, 1.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsMissTol }),
     ),
     section("Accuracy points",
       el("div", { class: "set-row hint" },
-        el("span", { class: "set-note" }, "The displayed accuracy is the average of these per-move scores (Best / Brilliant / Great / Book are always 100). The Elo estimate uses a separate win%-based calculation.")),
-      clsSlider("Excellent", "accExcellent", 0, 100, 1, { fmt: ptsFmt }),
-      clsSlider("Good", "accGood", 0, 100, 1, { fmt: ptsFmt }),
-      clsSlider("Inaccuracy", "accInacc", 0, 100, 1, { fmt: ptsFmt }),
-      clsSlider("Miss", "accMiss", 0, 100, 1, { fmt: ptsFmt }),
-      clsSlider("Mistake", "accMistake", 0, 100, 1, { fmt: ptsFmt }),
+        el("span", { class: "set-note" }, "These per-move scores are averaged when category-based accuracy is active (Best / Masterstroke / Superb / Theory are always 100). Win%-based accuracy instead uses the engine evaluations.")),
+      clsSlider("Near best", "accExcellent", 0, 100, 1, { fmt: ptsFmt }),
+      clsSlider("Decent", "accGood", 0, 100, 1, { fmt: ptsFmt }),
+      clsSlider("Minor Misstep", "accInacc", 0, 100, 1, { fmt: ptsFmt }),
+      clsSlider("Missed chance", "accMiss", 0, 100, 1, { fmt: ptsFmt }),
+      clsSlider("Major Misstep", "accMistake", 0, 100, 1, { fmt: ptsFmt }),
       clsSlider("Blunder", "accBlunder", 0, 100, 1, { fmt: ptsFmt }),
     ),
     section("Engine",
       el("div", { class: "set-row" },
         setLabel("Build", ENGINE_INFO.enginePath),
         el("div", { class: "set-seg" },
-          el("button", { class: S.settings.enginePath === "sf19" ? "on" : "", onclick: () => setEngineSetting("enginePath", "sf19") }, "Stockfish 19"),
           el("button", { class: S.settings.enginePath === "nnue" ? "on" : "", onclick: () => setEngineSetting("enginePath", "nnue") }, "Stockfish 18 NNUE"),
-          el("button", { class: S.settings.enginePath === "wasm" ? "on" : "", onclick: () => setEngineSetting("enginePath", "wasm") }, "Stockfish 10"),
-          el("button", { class: S.settings.enginePath === "asm" ? "on" : "", onclick: () => setEngineSetting("enginePath", "asm") }, "asm.js"),
+          el("button", { class: S.settings.enginePath === "sf19lite" ? "on" : "", onclick: () => setEngineSetting("enginePath", "sf19lite") }, "Stockfish 19 Lite"),
         ),
       ),
-      // Only shown when the chosen build couldn't load and we fell back — so it's always clear which
-      // engine is actually producing the analysis, not just which one was selected.
-      (S.activeEngineBuild && S.activeEngineBuild !== S.settings.enginePath)
+      // Keep the warning visible when any analysis worker had to use a fallback.
+      (S.engineFallbackBuild && S.engineFallbackBuild !== S.settings.enginePath)
         ? el("div", { class: "set-row hint" },
             el("span", { class: "set-note" },
-              `⚠ "${ENGINE_NAME[S.settings.enginePath] || S.settings.enginePath}" couldn't start in this browser — actually running ${ENGINE_NAME[S.activeEngineBuild] || S.activeEngineBuild}.`))
+              `⚠ At least one worker couldn't start "${ENGINE_NAME[S.settings.enginePath] || S.settings.enginePath}" and used ${ENGINE_NAME[S.engineFallbackBuild] || S.engineFallbackBuild} instead.`))
         : null,
       engineSlider("Strength (Skill)", "engineSkill", 0, 20, 1, { fmt: (v) => (v >= 20 ? "Max (20)" : String(v)), info: ENGINE_INFO.engineSkill }),
       engineSlider("Hash (MB)", "engineHash", 16, 256, 16, { fmt: (v) => v + " MB", info: ENGINE_INFO.engineHash }),
       el("div", { class: "set-row hint" },
         el("span", { class: "set-note" }, "Engine build & search options. Changes here re-analyze the game.")),
     ),
-    el("button", { class: "set-reset", onclick: resetEngineSettings }, "Reset engine defaults"),
+    el("button", { class: "set-reset", onclick: resetEngineSettings }, "Reset to default"),
   );
 }
 function renderSettings() {
+  closeArrowColorPicker();
   const scroll = UI.settings.scrollTop; // keep scroll position when a setting changes
   const tabs = el("div", { class: "set-tabs" },
     el("button", { class: "set-tab" + (S.settingsTab === "visual" ? " on" : ""), onclick: () => { S.settingsTab = "visual"; renderSettings(); } }, "Visual"),
@@ -4584,8 +4690,17 @@ function renderSettings() {
   );
   UI.settings.replaceChildren(tabs, S.settingsTab === "engine" ? motorSettings() : visualSettings());
   UI.settings.scrollTop = scroll;
+  positionSettings();
+}
+function positionSettings() {
+  if (!UI.settings || UI.settings.hidden) return;
+  // Keep the popover anchored to the right edge, beneath its toolbar button. Tying this
+  // offset to the analysis panels made it drift left on wide windows and briefly reuse
+  // stale panel geometry when the automatic/custom layout was reset.
+  UI.settings.style.right = window.innerWidth <= 520 ? "" : "24px";
 }
 function toggleSettings() {
+  closeArrowColorPicker();
   UI.settings.hidden = !UI.settings.hidden;
   if (!UI.settings.hidden) renderSettings();
 }
@@ -4594,6 +4709,13 @@ function toggleSettings() {
    The legal disclaimer and third-party asset credits live here, behind the
    info button in the top bar — kept out of the way but one click from anywhere. */
 const CREDITS = [
+  {
+    title: "Move classifier — Brilliant-Chess",
+    by: "Delo (wdeloo); adapted for Chess Review. Copyright © 2025 Delo.",
+    lic: "MIT",
+    note: "Full copyright and licence notice in THIRD_PARTY_NOTICES.md.",
+    href: "https://github.com/wdeloo/Brilliant-Chess",
+  },
   {
     title: "Chess pieces — Cburnett",
     by: "Colin M.L. Burnett (“Cburnett”), distributed by Lichess.",
@@ -4607,28 +4729,22 @@ const CREDITS = [
     href: "https://github.com/lichess-org/lila/tree/master/public/piece/merida",
   },
   {
-    title: "Chess pieces — Kaneo, Kaneo Midnight, 1Kbyte Gambit",
-    by: "Kadagaden — chess-pieces.",
-    lic: "CC BY 4.0",
-    href: "https://github.com/Kadagaden/chess-pieces",
-  },
-  {
     title: "Board & move sounds",
     by: "Lichess sound set (lila)",
-    lic: "AGPL-3.0",
+    lic: "Licensed",
     href: "https://github.com/lichess-org/lila/blob/master/LICENSE",
+  },
+  {
+    title: "Stockfish 19 Lite",
+    by: "Lite single-threaded Stockfish.js 19.0.0 by Nathan Rugg (“nmrugg”), © 2026 Chess.com, LLC; lite network by sscg13; based on the Stockfish team's engine.",
+    lic: "GPLv3",
+    href: "https://github.com/nmrugg/stockfish.js/tree/v19.0.0",
   },
   {
     title: "Stockfish 18 NNUE (default)",
     by: "NNUE build © Chess.com, LLC — distributed as JS/WASM via Nathan Rugg’s (“nmrugg”) Stockfish.js.",
     lic: "GPLv3",
-    href: "https://github.com/nmrugg/stockfish.js",
-  },
-  {
-    title: "Stockfish 10 (WASM / asm.js)",
-    by: "Fallback builds — JS/WASM port by Nathan Rugg (“nmrugg”), Stockfish.js.",
-    lic: "GPLv3",
-    href: "https://github.com/nmrugg/stockfish.js",
+    href: "https://github.com/nmrugg/stockfish.js/tree/v18.0.0",
   },
   {
     title: "Chess engine — upstream",
@@ -4637,23 +4753,40 @@ const CREDITS = [
     href: "https://github.com/official-stockfish/Stockfish",
   },
   {
-    title: "Neural network (NNUE)",
-    by: "Stockfish evaluation net by Linmiao Xu (“linrock”).",
+    title: "Neural networks (NNUE)",
+    by: "Stockfish team and network contributors; Stockfish 18's lite network by Linmiao Xu (“linrock”).",
     lic: "GPLv3",
     href: "https://tests.stockfishchess.org/nns",
   },
 ];
-const REPO_URL = "https://github.com/aciokie/Chess-Review";
+const CONTRIBUTORS = [
+  { name: "aciokie", username: "aciokie", role: "Contributor" },
+  { name: "neuroflowinfinix", username: "neuroflowinfinix", role: "Coach clarity and asm.js cleanup ideas (PR #10)" },
+  { name: "Kristian Julsgaard", username: "Julsgaard", role: "Contributor" },
+  { name: "Arthur Guedes", username: "arthurhguedes", role: "Contributor" },
+  { name: "T-Julsgaard", username: "T-Julsgaard", role: "Maintainer" },
+];
+const REPO_URL = "https://github.com/T-Julsgaard/Chess-Review";
 function openCredits() {
   document.querySelector(".credits-overlay")?.remove();
   const close = () => { overlay.remove(); document.removeEventListener("keydown", onKey); };
   const onKey = (e) => { if (e.key === "Escape") close(); };
 
-  const entries = CREDITS.map((c) =>
+  const contributors = el("section", { class: "credits-team", "aria-label": "Contributors & Maintainers" },
+    el("h4", {}, "Contributors & Maintainers"),
+    ...CONTRIBUTORS.map((person) =>
+      el("a", { class: "credit-person", href: "https://github.com/" + person.username, target: "_blank", rel: "noopener noreferrer" },
+        el("span", { class: "credit-title" }, person.name),
+        el("span", { class: "credit-by" }, person.role),
+      ),
+    ),
+  );
+  const entries = [...CREDITS].reverse().map((c) =>
     el("a", { class: "credit-row", href: c.href, target: "_blank", rel: "noopener noreferrer" },
       el("div", { class: "credit-main" },
         el("div", { class: "credit-title" }, c.title),
         el("div", { class: "credit-by" }, c.by),
+        c.note ? el("div", { class: "credit-note" }, c.note) : null,
       ),
       el("span", { class: "credit-lic" }, c.lic),
     ),
@@ -4679,9 +4812,9 @@ function openCredits() {
       "or sponsored by Chess.com or Lichess.",
       el("br"),
       "All trademarks belong to their respective owners."),
-    el("div", { class: "credits-list" }, ...entries),
+    el("div", { class: "credits-list" }, contributors, ...entries),
     el("div", { class: "credits-foot" },
-      "Each asset is used under the license shown. Tap a row for the source.",
+      "Licences and unresolved permissions are shown above. Tap a row for the source.",
       el("div", { class: "credits-foot-links" },
         el("a", { href: REPO_URL + "/blob/main/LICENSE", target: "_blank", rel: "noopener noreferrer" }, "Full license (GPLv3)"),
         " · ",
@@ -4709,15 +4842,17 @@ async function setSetting(key, value) {
 // Engine setting: save, discard the live engine (new build/options), and re-analyze.
 async function setEngineSetting(key, value) {
   S.settings[key] = value;
+  S.engineFallbackBuild = null;
+  S.activeEngineBuild = null;
   await browserAPI.storage.local.set({ settings: S.settings });
-  if (S.liveEngine) { try { S.liveEngine.terminate(); } catch {} S.liveEngine = null; S.liveToken++; }
+  resetLiveEngine();
+  invalidateVariationEvals();
   // The helper engine (threat preview / practice judging) must also be rebuilt with the new
   // build/options, and any cached threat arrows recomputed.
   if (S.helperEngine) { try { S.helperEngine.terminate(); } catch {} S.helperEngine = null; }
   S.threatCache.clear();
   // In analysis mode: reset the variation's cached evals, so they're recomputed with new options.
   if (S.analysisMode && S.variation) {
-    for (const p of S.variation.positions) { p.eval = null; p.best = null; }
     requestLiveEval();
   }
   // Classification always searches a single line now, and the engine panel fills extra candidate
@@ -4726,23 +4861,9 @@ async function setEngineSetting(key, value) {
   // refresh the panel (which kicks off an on-demand search if more lines are wanted).
   const lineKey = key === "engineLines" || key === "fastLines" || key === "fastAnalysis";
   const displayOnly = lineKey && !S.analyzing;
-  if (!displayOnly) scheduleReanalyze();
+  if (!displayOnly && !S.meta?.explore) scheduleReanalyze();
   renderEngineCurrent();
   if (UI.settings && !UI.settings.hidden) renderSettings();
-}
-// Apply a detected theme from the source tab: match the board by COLOUR using the detected theme
-// name. Pieces are never imported — they always use a bundled set (Cburnett/Merida). The user can
-// change the board afterwards (saved until the next detection).
-function applyDetectedTheme(theme) {
-  if (!theme) return;
-  if (theme.boardUrl || theme.boardTheme) {
-    // Match the board by COLOUR only (theme name → our own palette). The source site's board
-    // image is never hotlinked — colours aren't copyrightable, the image is.
-    S.settings.ccBoardTheme = theme.boardTheme || null;
-    S.settings.ccBoardUrl = null;
-    S.settings.boardTheme = "chesscom";
-  }
-  browserAPI.storage.local.set({ settings: S.settings });
 }
 function applySettings() {
   const r = document.documentElement;
@@ -4750,29 +4871,26 @@ function applySettings() {
   S.settings.theme = "dark";
   r.setAttribute("data-theme", "dark");
   r.setAttribute("data-density", S.settings.density);
-  const a = ACCENTS[S.settings.accent] || ACCENTS["#7fb45f"];
+  const a = S.settings.accent === "custom"
+    ? accentFromHex(S.settings.accentCustom)
+    : (ACCENTS[S.settings.accent] || ACCENTS["#7fb45f"]);
   r.style.setProperty("--accent", a.accent);
   r.style.setProperty("--accent-strong", a.strong);
   r.style.setProperty("--accent-ink", a.ink);
-  const bt =
-    BUNDLED_BOARDS[S.settings.boardTheme]
-      ? BUNDLED_BOARDS[S.settings.boardTheme].colors
-      : S.settings.boardTheme === "custom"
+  const bt = S.settings.boardTheme === "custom"
       ? customBoardColors()
-      : S.settings.boardTheme === "chesscom"
-      ? (CC_BOARD_COLORS[S.settings.ccBoardTheme] || BOARD_THEMES.green)
-      : (BOARD_THEMES[S.settings.boardTheme] || BOARD_THEMES.green);
+      : (BOARD_THEMES[S.settings.boardTheme] || BOARD_THEMES.maple);
   r.style.setProperty("--sq-light", bt[0]);
   r.style.setProperty("--sq-dark", bt[1]);
   r.style.setProperty("--badge-scale", S.settings.badgeScale ?? 1);
   r.style.setProperty("--ip-font", (S.settings.insightFont ?? 13) + "px");
   r.style.setProperty("--coord-size", (S.settings.coordSize ?? 12) + "px");
   r.classList.toggle("hide-coords", S.settings.showCoords === false);
-  applyBoardArt(UI.boardWrap && UI.boardWrap.querySelector(".board"));
+  clearBoardArt(UI.boardWrap && UI.boardWrap.querySelector(".board"));
   applyBackground();
 }
 // Bundled background presets (relative to the extension's analysis page).
-const BG_PRESETS = { ember: "backgrounds/bg-ember.webp", slate: "backgrounds/bg-slate.webp" };
+const BG_PRESETS = { slate: "backgrounds/bg-slate.webp" };
 const BG_TILE_PX = { small: 240, medium: 440, large: 760 };
 // Paint the chosen background on the .app shell. "color" paints an HSL tone (with a faint top
 // vignette, like the original gradient); a preset/custom image is shown stretched ("cover") or
@@ -4832,24 +4950,12 @@ function uploadBackground() {
   document.body.append(inp);
   inp.click();
 }
-// Boards are rendered with COLOURS only (see applySettings); we never hotlink an external
-// board image. This clears any image a previous version may have applied, so existing installs
-// stop fetching the source site's board art immediately.
-// Paint the board background. A bundled Kadagaden board (boardTheme = a BUNDLED_BOARDS key) is shown
-// as the real SVG artwork with the squares transparent (.cc-board); any other theme clears the image
-// so the flat --sq-light/--sq-dark squares show through.
-function applyBoardArt(boardEl) {
+// Current boards use flat colors only. Clear image-based styling left by older versions.
+function clearBoardArt(boardEl) {
   if (!boardEl) return;
-  const b = BUNDLED_BOARDS[S.settings.boardTheme];
-  if (b) {
-    boardEl.classList.add("cc-board");
-    boardEl.style.backgroundImage = `url("${_url("boards-img/" + b.file)}")`;
-    boardEl.style.backgroundSize = "100% 100%";
-  } else {
-    boardEl.classList.remove("cc-board");
-    boardEl.style.backgroundImage = "";
-    boardEl.style.backgroundSize = "";
-  }
+  boardEl.classList.remove("cc-board");
+  boardEl.style.backgroundImage = "";
+  boardEl.style.backgroundSize = "";
 }
 
 /* ---------------- Practice your mistakes ----------------
@@ -5120,7 +5226,7 @@ function practiceAttempt(from, to) {
       }
       // Mark it as the "Best move" to confirm they found a strong move.
       toSq.classList.add("has-badge");
-      toSq.append(el("img", { class: "sq-badge", src: qIcon("best"), alt: "Best", draggable: "false" }));
+      toSq.append(makeBoardBadge("best"));
     }
     flashSquares([mv.from, mv.to], "good");
     playSanSound(mv.san);
@@ -5140,24 +5246,11 @@ function practiceAttempt(from, to) {
    Every fully-analyzed game is saved to browserAPI.storage.local under "library". The sidebar
    lives off the left edge and slides in on hover; games can be sorted (recent / your accuracy /
    opponent rating) and filtered (result, time class). Clicking a game re-opens it for analysis. */
-// 64-bit FNV-1a hash for better collision resistance (vs old 32-bit djb2).
-// Returns a base36 string. Stable, deterministic, fast.
+// Preserve existing PGN-based library IDs.
 function simpleHash(str) {
-  // FNV-1a 64-bit constants
-  let hi = 0x6c62272e, lo = 0x07bb0142; // offset basis
-  for (let i = 0; i < str.length; i++) {
-    const c = str.charCodeAt(i);
-    lo ^= c;
-    hi ^= (lo >>> 31) & 0xffffffff; // carry from lo to hi
-    // Multiply by FNV prime (1099511628211 = 0x100000001b3)
-    // (hi * 0x100000001b3) + (lo * 0x100000001b3) in 64-bit
-    const hiMul = (hi * 0x100) + (lo >>> 32);
-    const loMul = (lo * 0x100000001b3) | 0;
-    hi = (hiMul * 0x100000001 + (loMul >>> 32)) | 0;
-    lo = loMul;
-  }
-  // Combine hi and lo into a base36 string
-  return ((hi >>> 0).toString(36) + (lo >>> 0).toString(36).padStart(8, "0")).slice(0, 16);
+  let h = 5381;
+  for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+  return (h >>> 0).toString(36);
 }
 // "win" / "loss" / "draw" / "" from the result, relative to the user's side.
 function myResult() {
@@ -5184,87 +5277,94 @@ function currentGameId() {
   return (S.meta && S.meta.gameId) || ("pgn:" + simpleHash(S.pgn || ""));
 }
 
-// Read the latest library from storage to avoid concurrent-write data loss.
-async function getLibrary() {
-  try {
-    const store = await browserAPI.storage.local.get("library");
-    return Array.isArray(store.library) ? store.library : [];
-  } catch {
-    return S.library || [];
-  }
+function analysisSettingsKey() {
+  return JSON.stringify([S.settings.enginePath, S.settings.engineDepth, S.settings.classifyLines,
+    S.settings.engineHash, S.settings.engineSkill]);
 }
 
-// Write library to storage and update local cache.
-async function setLibrary(lib) {
-  S.library = lib;
-  await browserAPI.storage.local.set({ library: lib });
-  renderLibrary();
+function completeAnalysis(saved, count) {
+  return !!saved && Array.isArray(saved.bests) && saved.bests.length === count
+    && saved.bests.every(Boolean) && Array.isArray(saved.evals) && saved.evals.length === count
+    && saved.evals.every(e => e && (Number.isFinite(e.cp) || Number.isFinite(e.mate)));
+}
+
+function canRestoreAnalysis(saved) {
+  return completeAnalysis(saved, S.total + 1) && saved.pgn === S.pgn
+    && (!saved.engineBuild || Object.hasOwn(ENGINE_BUILDS, saved.engineBuild))
+    && saved.settingsKey === analysisSettingsKey();
 }
 
 function saveToLibrary() {
   try {
-    if (!S.pgn) return;
+    if (!S.pgn || S.meta?.explore || S.total === 0 || S.analyzing || S.analysisError
+      || !completeAnalysis(S, S.total + 1)) return;
     const id = currentGameId();
     const opSide = S.meSide === "w" ? "b" : "w";
-    getLibrary().then((lib) => {
-      const prev = lib.find((g) => g.id === id);
-      const noMistakes = practiceSpots().length === 0;
-      const solved = noMistakes || !!(prev && prev.solved);
-      const rec = {
-        id, savedAt: Date.now(), pgn: S.pgn, meta: S.meta || {},
-        meSide: S.meSide,
-        myName: S.players[S.meSide].name, opName: S.players[opSide].name,
-        myAcc: S.acc[S.meSide], opAcc: S.acc[opSide],
-        myRating: parseInt(S.players[S.meSide].rating, 10) || null,
-        opRating: parseInt(S.players[opSide].rating, 10) || null,
-        result: myResult(), type: gameType(),
-        eco: S.opening ? S.opening.eco : "", opening: S.opening ? S.opening.name : "",
-        date: S.headers.UTCDate || S.headers.Date || "",
-        url: (S.meta && S.meta.url) || "",
-        fav: !!(prev && prev.fav), solved,
-      };
-      const newLib = lib.filter((g) => g.id !== id);
-      newLib.unshift(rec);
-      let dropped = [];
-      if (newLib.length > 300) { dropped = newLib.slice(300); newLib.length = 300; }
+    const prev = S.library.find((g) => g.id === id);
+    // "solved" = no mistakes to practice (clean game) OR practice was already completed before.
+    const noMistakes = practiceSpots().length === 0;
+    const solved = noMistakes || !!(prev && prev.solved);
+    const rec = {
+      id, savedAt: Date.now(), pgn: S.pgn, meta: S.meta || {},
+      meSide: S.meSide,
+      myName: S.players[S.meSide].name, opName: S.players[opSide].name,
+      myAcc: S.acc[S.meSide], opAcc: S.acc[opSide],
+      myRating: parseInt(S.players[S.meSide].rating, 10) || null,
+      opRating: parseInt(S.players[opSide].rating, 10) || null,
+      result: myResult(), type: gameType(),
+      eco: S.opening ? S.opening.eco : "", opening: S.opening ? S.opening.name : "",
+      date: S.headers.UTCDate || S.headers.Date || "",
+      url: (S.meta && S.meta.url) || "",
+      fav: !!(prev && prev.fav), solved,
+    };
+    const lib = S.library.filter((g) => g.id !== id);   // replace on re-analysis (no duplicates)
+    lib.unshift(rec);
+    // Cap the list; drop the analysis blobs of any games that fall off the end.
+    let dropped = [];
+    if (lib.length > 300) { dropped = lib.slice(300); lib.length = 300; }
+    S.library = lib;
+    // The heavy analysis (evals + engine lines) is stored under its own key so the library list
+    // stays light, and so re-opening a saved game can render instantly WITHOUT re-analyzing.
+    const writes = { library: lib, ["analysis:" + id]: {
+      pgn: S.pgn, settingsKey: analysisSettingsKey(), engineBuild: S.activeEngineBuild,
+      evals: S.evals, bests: S.bests, multipv: S.analyzedMultipv,
+    } };
 
-      // Generate puzzles from blunders/mistakes
-      const puzzles = generatePuzzles({
-        positions: S.positions,
-        evals: S.evals,
-        bests: S.bests,
-        classif: S.classif,
-        pgn: S.pgn,
-        meta: S.meta || {},
-      });
-
-      const writes = {
-        library: newLib,
-        ["analysis:" + id]: { evals: S.evals, bests: S.bests, multipv: S.analyzedMultipv },
-        ["puzzles:" + id]: { puzzles, generatedAt: Date.now() },
-      };
-      browserAPI.storage.local.set(writes);
-      if (dropped.length) browserAPI.storage.local.remove(dropped.map((d) => "analysis:" + d.id));
-      S.library = newLib;
-      renderLibrary();
+    // Generate puzzles from blunders/mistakes
+    const puzzles = generatePuzzles({
+      positions: S.positions,
+      evals: S.evals,
+      bests: S.bests,
+      classif: S.classif,
+      pgn: S.pgn,
+      meta: S.meta || {},
     });
+    writes["puzzles:" + id] = { puzzles, generatedAt: Date.now() };
+
+    browserAPI.storage.local.set(writes).catch(e => console.warn("library save failed", e));
+    if (dropped.length) browserAPI.storage.local.remove(dropped.map((d) => "analysis:" + d.id));
+    renderLibrary();
   } catch (e) { console.warn("library save failed", e); }
 }
 async function openLibraryGame(rec) {
-  if (rec.id === currentGameId()) return;
+  if (rec.id === currentGameId()) return;   // already open
+  // Pull the stored analysis so the re-opened game shows up already analyzed (no re-run).
   let analysis = null;
   try { const s = await browserAPI.storage.local.get("analysis:" + rec.id); analysis = s["analysis:" + rec.id] || null; } catch {}
+  // Switch in place — no page reload, no black flash. The sidebar stays open (it only closes when
+  // the mouse leaves the library area), so you can pick another game right away. Reproduce the exact
+  // perspective the game was saved with: prefer a stored flip hint, else the saved meSide — so a
+  // re-opened game is never seated the wrong way up regardless of the current stored username.
   const flip = (rec.meta && rec.meta.flip != null) ? rec.meta.flip : (rec.meSide === "b");
   applyGame({ pgn: rec.pgn, meta: { ...(rec.meta || {}), flip }, source: "library", analysis });
 }
 // Toggle a game's favorite flag and persist it.
 function toggleFav(id) {
-  getLibrary().then((lib) => {
-    const rec = lib.find((r) => r.id === id);
-    if (!rec) return;
-    rec.fav = !rec.fav;
-    setLibrary(lib);
-  });
+  const rec = S.library.find((r) => r.id === id);
+  if (!rec) return;
+  rec.fav = !rec.fav;
+  browserAPI.storage.local.set({ library: S.library });
+  renderLibrary();
 }
 // Apply the active sort + filters.
 function libRecords() {
@@ -5408,8 +5508,8 @@ document.addEventListener("keydown", (e) => {
   if (S.practice) { if (e.key === "Escape") exitPractice(); return; }
   if (e.key === "ArrowLeft") navPrev();
   else if (e.key === "ArrowRight") navNext();
-  else if (e.key === "Home") gotoMainline(0);
-  else if (e.key === "End") gotoMainline(S.total);
+  else if (e.key === "Home") { if (S.analysisMode) gotoVar(0); else gotoMainline(0); }
+  else if (e.key === "End") { if (S.analysisMode) gotoVar(S.variation.positions.length - 1); else gotoMainline(S.total); }
   else if (e.key === "Escape") { if (S.analysisMode) exitAnalysis(); }
   else if (e.key === "f" && !e.ctrlKey && !e.metaKey) toggleFlip(); // Ctrl+F must not flip the board
 });
@@ -5425,7 +5525,10 @@ document.addEventListener("keydown", (e) => {
 let _reanalyzeT = null;
 function scheduleReanalyze() {
   clearTimeout(_reanalyzeT);
-  _reanalyzeT = setTimeout(() => startAnalysis(), 400);
+  _reanalyzeT = setTimeout(() => {
+    if (S.meta?.explore) requestLiveEval();
+    else startAnalysis();
+  }, 400);
 }
 function terminateEngines() {
   if (S.evalEngines) for (const e of S.evalEngines) { try { e.terminate(); } catch {} }
@@ -5474,7 +5577,10 @@ function detectCriticalMoments() {
   S.criticalMoments = moments;
 }
 async function startAnalysis() {
+  if (S.meta?.explore) { await requestLiveEval(); return; }
   const gen = ++S.batchGen;
+  S.engineFallbackBuild = null;
+  S.activeEngineBuild = null;
   terminateEngines();
   S.evals = new Array(S.total + 1).fill(null);
   S.bests = new Array(S.total + 1).fill(null);
@@ -5498,21 +5604,22 @@ async function startAnalysis() {
   // createEngine() readies each worker AND falls back down the build chain if the chosen build can't
   // load — so the whole batch survives e.g. NNUE failing, and S.activeEngineBuild reflects the build
   // actually in use. If no build can start at all, surface it instead of leaving a stuck "Analyzing…".
-  let engines;
-  try {
-    engines = await Promise.all(
-      Array.from({ length: nWorkers }, () => createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill }))
-    );
-  } catch (e) {
-    console.error("[Chess Review] no Stockfish build could be started:", e);
+  const starts = await Promise.allSettled(
+    Array.from({ length: nWorkers }, () => createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill }))
+  );
+  const engines = starts.filter(r => r.status === "fulfilled").map(r => r.value);
+  if (gen !== S.batchGen) { engines.forEach(e => e.terminate()); return; }
+  const failed = starts.find(r => r.status === "rejected");
+  if (failed) {
+    engines.forEach(e => e.terminate());
+    console.error("[Chess Review] no Stockfish build could be started:", failed.reason);
     S.evalEngines = []; S.analyzing = false;
     S.analysisError = "the engine could not be started in this browser.";
     S.verdict = "Engine unavailable — couldn't start Stockfish in this browser.";
-    try { renderReview(); } catch {}
+    flushProgress(gen);
     return;
   }
   S.evalEngines = engines;
-  if (gen !== S.batchGen) { terminateEngines(); return; }
 
   // Shared work queue. `nextIdx++` is atomic (no await between read and increment in a
   // single-threaded runtime), so each position is handed to exactly one worker. Completion
@@ -5524,11 +5631,13 @@ async function startAnalysis() {
     while (gen === S.batchGen) {
       const i = nextIdx++;
       if (i > S.total) return;
-      const res = await eng.analyse(S.positions[i].fen, S.settings.engineDepth, multipv);
+      const terminal = terminalScore(S.positions[i].fen, i);
+      const res = terminal ? { score: terminal, bestmove: null, pv: "", lines: [] }
+        : await eng.analyse(S.positions[i].fen, S.settings.engineDepth, multipv);
       if (gen !== S.batchGen) return;
       S.bests[i] = res;
       // Terminal positions (mate/stalemate) are decided from the board — not from the engine's "mate 0".
-      S.evals[i] = terminalScore(S.positions[i].fen) || whiteRel(res.score, S.positions[i].fen);
+      S.evals[i] = terminal || whiteRel(res.score, S.positions[i].fen);
       if (i > 0) S.completed++;
       while (contig + 1 <= S.total && S.bests[contig + 1]) contig++;
       S.progress = Math.max(0, contig);
@@ -5588,8 +5697,14 @@ async function applyGame(payload) {
   const isExplore = payload.meta?.explore === true;
 
   // Tear down anything tied to the previous game.
+  clearTimeout(_reanalyzeT);
+  resetLiveEngine();
   S.batchGen++;                 // invalidate any in-flight analysis workers
+  S.engineFallbackBuild = null;
+  S.activeEngineBuild = null;
   terminateEngines();
+  if (S.helperEngine) { try { S.helperEngine.terminate(); } catch {} S.helperEngine = null; }
+  S.threatCache.clear();
   if (S.autoTimer) { clearInterval(S.autoTimer); S.autoTimer = null; }
   stopLineWalk();
   if (S.practice && S.practice.rollT) clearTimeout(S.practice.rollT);
@@ -5599,8 +5714,8 @@ async function applyGame(payload) {
   S.selectedSq = null; S.userArrows = []; S.userMarks = []; S.lineWalking = false;
   revRefs = null; statsRefs = null; _lastCommentKey = -1; _ipSig = null; S._turnPly = null;
   S._lastEngineLines = null;
+  _movesSig = null; _movesClassSig = null;
 
-  applyDetectedTheme(payload.theme);
   applySettings();
 
   S.analyzing = true;
@@ -5645,11 +5760,12 @@ async function applyGame(payload) {
   if (saved == null && !("analysis" in payload)) {
     try { const k = "analysis:" + currentGameId(); const s = await browserAPI.storage.local.get(k); saved = s[k] || null; } catch {}
   }
-  const restored = saved && Array.isArray(saved.bests) && saved.bests.length === S.total + 1 && Array.isArray(saved.evals);
+  const restored = canRestoreAnalysis(saved);
   if (restored) {
     S.evals = saved.evals;
     S.bests = saved.bests;
     S.analyzedMultipv = saved.multipv || null;
+    S.activeEngineBuild = saved.engineBuild || S.settings.enginePath;
     S.analyzing = false;
     S.progress = S.total;
     S.completed = S.total;
@@ -5665,9 +5781,8 @@ async function applyGame(payload) {
 }
 
 /* ---------------- Start ---------------- */
-// The automatic layout is responsive CSS and leaves the zoom to the browser. A custom canvas layout
-// is a FIXED-size composition under a 60 px top bar, so while one is active the page is zoomed to
-// the largest size at which the whole composition fits the WINDOW without scrolling. Not the
+// Desktop auto layout preserves the v7 composition; narrow windows use the responsive grid.
+// Desktop and custom layouts are fitted as a whole under the 60 px top bar to the WINDOW. Not the
 // monitor (screen.*): a monitor-based zoom cuts off the right column as soon as the window isn't
 // maximized, or is dragged to a smaller monitor after opening.
 //
@@ -5677,45 +5792,77 @@ async function applyGame(payload) {
 const TOPBAR_H = 60;                 // .topbar height in styles.css
 const MIN_ZOOM = 0.5, MAX_ZOOM = 2;  // below 50% the text is unreadable; above 200% it balloons
 let _zoomTabId = null;
+let _defaultZoom = 1;
 let _fittedDip = null;               // viewport size (device-independent px) the zoom was last fitted to
-function targetZoomFor(dipW, dipH) {
-  // The layout as shown (breakdown collapsed by default); expanding it later may scroll.
-  const { maxR, maxB } = layoutExtent(S.layout);
-  const pageW = maxR + CANVAS_MARGIN, pageH = TOPBAR_H + maxB + CANVAS_MARGIN;
-  // Round down to whole percents. The 0.05% tolerance keeps an exact fit (a canvas snapshotted from
-  // the automatic layout in this same window) at 100% instead of tipping it to 99%; it is well
-  // under a pixel, so it never adds a scrollbar.
-  const fit = Math.min(dipW / pageW, dipH / pageH);
-  return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Math.floor((fit + 0.0005) * 100) / 100));
+let _zoomFitQueue = Promise.resolve();
+let _zoomInit = null;
+function desktopLayoutFor(dipW, dipH) {
+  return dipW / _defaultZoom >= 1100 && dipH / _defaultZoom >= 520;
 }
-async function fitTabZoom() {
-  if (!isCustomLayout() || _zoomTabId == null) return;
+function desktopZoomFor(dipW, dipH) {
+  return fittedZoomFor(DEFAULT_LAYOUT, dipW, dipH);
+}
+function layoutPageSize(layout) {
+  const { maxR, maxB } = layoutExtent(layout);
+  const defaults = layoutExtent(DEFAULT_LAYOUT);
+  const desktopSized = maxR >= defaults.maxR && maxB >= defaults.maxB;
+  // Keep the desktop's breathing room on default-sized saved canvases too. Previously a snapshot
+  // reopened against 1818 × 1006, while Reset fitted 1832 × 1020 (91% versus 89%).
+  // Smaller arrangements (including snapshots of the narrow responsive grid) retain
+  // their own extent, so unlocking one never creates a desktop-width canvas.
+  return { pageW: Math.max(desktopSized ? 1832 : 0, maxR + CANVAS_MARGIN),
+    pageH: Math.max(desktopSized ? 1020 : 0, TOPBAR_H + maxB + CANVAS_MARGIN) };
+}
+function fittedZoomFor(layout, dipW, dipH) {
+  const { pageW, pageH } = layoutPageSize(layout);
+  return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM,
+    Math.floor(Math.min((dipW - 2) / pageW, (dipH - 2) / pageH) * 100) / 100));
+}
+function targetZoomFor(dipW, dipH) {
+  return fittedZoomFor(S.layout, dipW, dipH);
+}
+function fitTabZoom(force = false) {
+  // A reset can overlap a resize or startup. Never pair an old getZoom result
+  // with viewport dimensions already changed by another fit.
+  const next = _zoomFitQueue.catch(() => {}).then(() => performTabZoomFit(force));
+  _zoomFitQueue = next;
+  return next;
+}
+async function performTabZoomFit(force) {
+  if (_zoomTabId == null) return;
   const z = (await browserAPI.tabs.getZoom(_zoomTabId)) || 1;
-  const w = innerWidth * z, h = innerHeight * z;
+  // CSS viewport dimensions are rounded after browser zoom. Recover whole DIP pixels so
+  // reopening a 920px-high window at 90% cannot drift to 89% (1022 × .9 = 919.8).
+  const w = Math.round(innerWidth * z), h = Math.round(innerHeight * z);
   // Same device-pixel size as last time → this resize came from a zoom change (the user's Ctrl+/-,
   // our own setZoom, or another tab sharing the origin zoom), not from the window. Leave it.
-  if (_fittedDip && Math.abs(w - _fittedDip.w) < 3 && Math.abs(h - _fittedDip.h) < 3) return;
-  _fittedDip = { w, h };
-  const target = targetZoomFor(w, h);
+  if (!force && _fittedDip && Math.abs(w - _fittedDip.w) < 3 && Math.abs(h - _fittedDip.h) < 3) return;
+  const desktop = !isCustomLayout() && desktopLayoutFor(w, h);
+  UI.canvas.classList.toggle("desktop-layout", desktop);
+  applyLayout();
+  requestAnimationFrame(alignPlayers);
+  const target = isCustomLayout() ? targetZoomFor(w, h) : desktop ? desktopZoomFor(w, h) : _defaultZoom;
   // Only set it when it's off, so an unchanged window never triggers Chrome's zoom bubble.
   if (Math.abs(z - target) > 0.005) await browserAPI.tabs.setZoom(_zoomTabId, target);
+  _fittedDip = { w, h };
 }
-// Scope starts PER-ORIGIN, so a new tab opens at the zoom the last analysis tab settled on: a window
-// of the same size needs no change, and Chrome shows no zoom bubble on open. Fitting then updates
-// that remembered zoom for the next tab. Right after, the tab switches to PER-TAB, so two analysis
-// windows of different sizes (e.g. one per monitor) each keep their own fit instead of overwriting
-// each other. A browser that rejects per-tab scope just keeps the tab per-origin.
+// Isolate zoom before fitting, so two analysis windows on different monitors keep their own fit.
+// Browsers rejecting per-tab scope retain their existing scope.
 async function initTabZoom() {
   try {
     if (!browserAPI?.tabs?.getCurrent) return;
-    const tab = await browserAPI.tabs.getCurrent();
-    if (!tab || tab.id == null) return;
-    _zoomTabId = tab.id;
-    _fittedDip = null;
-    await browserAPI.tabs.setZoomSettings(tab.id, { scope: "per-origin", mode: "automatic" });
-    await fitTabZoom();
-    await browserAPI.tabs.setZoomSettings(tab.id, { scope: "per-tab", mode: "automatic" }).catch(() => {});
-  } catch { return; }
+    if (!_zoomInit) _zoomInit = (async () => {
+      const tab = await browserAPI.tabs.getCurrent();
+      if (!tab || tab.id == null) return;
+      const settings = await browserAPI.tabs.getZoomSettings(tab.id);
+      _defaultZoom = settings.defaultZoomFactor || 1;
+      // Keep a resized analysis window from changing other extension tabs' zoom.
+      await browserAPI.tabs.setZoomSettings(tab.id, { scope: "per-tab", mode: "automatic" }).catch(() => {});
+      _zoomTabId = tab.id;
+    })();
+    await _zoomInit;
+    await fitTabZoom(true);
+  } catch { _zoomInit = null; return; }
   // Refit after the window is resized, maximized or moved to a different monitor. Debounced so a
   // drag-resize zooms once when it settles, not on every frame. Registered once per page.
   if (_zoomResizeBound) return;
@@ -5727,16 +5874,6 @@ async function initTabZoom() {
   });
 }
 let _zoomResizeBound = false;
-// Leaving the custom layout: hand the zoom back to the browser, for this origin too, so the next
-// analysis tab opens at the user's own zoom.
-async function releaseTabZoom() {
-  _fittedDip = null;
-  if (_zoomTabId == null) return;
-  try {
-    await browserAPI.tabs.setZoomSettings(_zoomTabId, { scope: "per-origin", mode: "automatic" });
-    await browserAPI.tabs.setZoom(_zoomTabId, 0);   // 0 = the browser's default zoom
-  } catch {}
-}
 // Earlier versions zoomed the analysis page themselves (90–127%), and Chrome remembers that zoom for
 // the extension's origin. The automatic layout is built for the browser's own zoom, so give it back
 // once when an older install is migrated.
@@ -5756,23 +5893,22 @@ if (typeof globalThis !== 'undefined' && (globalThis.vitest || globalThis.__vite
 } else {
   (async function main() {
   try {
-    // Initialize openings database first so it's ready when loadBook() is called
-    await initOpeningsDb();
-    
     // Only the job + stored prefs are needed to build and show the UI. The opening book (~690 KB)
     // and the calibration file are only consumed once scoring/opening refinement runs, so we load
     // them in parallel and don't block the first paint on them — buildUI() can run as soon as the
     // job and settings are in, while the book is still downloading.
-    const dataReady = Promise.all([loadBook(), loadCalibration()]);
+    const dataReady = Promise.all([loadBook(), loadCalibration(), initOpeningsDb()]);
     const [payload, store] = await Promise.all([loadJob(), browserAPI.storage.local.get(["settings", "username", "layout", "layoutMode", "layoutVersion", "library"])]);
     S.library = Array.isArray(store.library) ? store.library : [];
     S.settings = { ...DEFAULT_SETTINGS, ...(store.settings || {}) };
-    // Only the two bundled SVG sets remain (Cburnett = "image", Merida). Every older or removed
-    // style — solid/billede/chesscom/flat/outline/bold/minimal and the now-dropped classic/modern —
-    // falls back to the default Cburnett set.
-    if (!PIECE_STYLES.includes(S.settings.pieceStyle)) S.settings.pieceStyle = "image";
+    const visualAssetsMigrated = migrateVisualAssetSettings(S.settings);
+    migrateEngineSettings(S.settings);
+    if (visualAssetsMigrated || S.settings.enginePath !== store.settings?.enginePath) {
+      await browserAPI.storage.local.set({ settings: S.settings });
+    }
+    delete S.settings.wrongSound; // older selectable mistake cues were removed
     { const lm = { prikker: "dots", hop: "bounce", "bølge": "wave" }; if (lm[S.settings.loaderStyle]) S.settings.loaderStyle = lm[S.settings.loaderStyle]; } // migrate renamed loader keys
-    if (S.settings.bg === "default") S.settings.bg = "color"; // the old gradient slot is now the HSL colour picker
+    if (S.settings.bg === "default" || S.settings.bg === "ember") S.settings.bg = "color";
     if (S.settings.coach === "old_soviet_rework") S.settings.coach = "old_soviet"; // the rework became the canonical "Old Soviet"
     S.settings.density = "compact"; // density picker removed — compact is the only layout now
     // New default coach is Old Soviet with plain replies — bump anyone still on the old "mentor" default
@@ -5793,13 +5929,6 @@ if (typeof globalThis !== 'undefined' && (globalThis.vitest || globalThis.__vite
       S.settings.depthBumped = true;
       browserAPI.storage.local.set({ settings: S.settings });
     }
-    // One-time switch to the strong Stockfish 18 NNUE build for anyone still on the old SF10 WASM
-    // default (asm.js users keep asm — they may lack WASM). A later deliberate choice sticks.
-    if (!S.settings.nnueDefaulted) {
-      if (S.settings.enginePath === "wasm") S.settings.enginePath = "nnue";
-      S.settings.nnueDefaulted = true;
-      browserAPI.storage.local.set({ settings: S.settings });
-    }
     // The 5-line option was removed — clamp any stored value to the new max.
     if (S.settings.engineLines > ENGINE_MAX_LINES) { S.settings.engineLines = ENGINE_MAX_LINES; browserAPI.storage.local.set({ settings: S.settings }); }
     // MultiPV 1 is the analysis-batch default (fast + tracks the reference values as well as mpv2, per
@@ -5809,13 +5938,12 @@ if (typeof globalThis !== 'undefined' && (globalThis.vitest || globalThis.__vite
       delete S.settings.mpv2Calibrated;
       browserAPI.storage.local.set({ settings: S.settings });
     }
-    applyDetectedTheme(payload.theme); // match the user's chess.com piece/board theme (if opened from a chess.com tab)
     // Use the saved layout if it matches the current version; otherwise the new default.
     const useStored = store.layoutVersion === LAYOUT_VERSION && store.layout;
     S.layout = useStored ? { ...structuredClone(DEFAULT_LAYOUT), ...store.layout } : structuredClone(DEFAULT_LAYOUT);
     S.layoutMode = useStored && store.layoutMode === "custom" ? "custom" : "auto";
     if (!useStored) saveLayout();
-    if (store.layoutVersion != null && store.layoutVersion !== LAYOUT_VERSION) resetLegacyZoom();
+    if (store.layoutVersion != null && store.layoutVersion !== LAYOUT_VERSION) await resetLegacyZoom();
     S.username = store.username || "";
 
     // Everything the first render needs must be resolved BEFORE buildUI(), so that buildUI() and
@@ -5842,8 +5970,8 @@ if (typeof globalThis !== 'undefined' && (globalThis.vitest || globalThis.__vite
     if (jobId && jobId !== "explore") {
       await browserAPI.storage.local.remove(`job:${jobId}`);
     }
-    // A custom canvas is fitted once it is laid out as shown (breakdown collapsed); not awaited.
-    if (isCustomLayout()) initTabZoom();
+    // Fit the desktop composition or custom canvas; narrow windows retain the responsive grid.
+    initTabZoom();
     requestAnimationFrame(alignPlayers); // measure the board after the first layout
   } catch (err) {
     const e = document.getElementById("error");

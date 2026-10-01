@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/T-Julsgaard/Chess-Review/security/advisories/new
+    about: Report a suspected vulnerability privately to the maintainer through GitHub.

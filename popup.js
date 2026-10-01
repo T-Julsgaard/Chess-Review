@@ -54,7 +54,7 @@ async function runCurrentAnalysis() {
       // The chess SPA may not have exposed the just-finished game yet → reload once and retry.
       try {
         setStatus("Loading the game page …");
-        await reloadActiveAndAnalyze($("username").value.trim());
+        await reloadActiveAndAnalyze($("username").value.trim(), err.tabId);
         setStatus("Opening analysis …");
         window.close();
         return;

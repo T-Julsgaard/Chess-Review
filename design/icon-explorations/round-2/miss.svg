@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Missed chance">
+  <circle cx="50" cy="50" r="49" fill="#f5746a"></circle>
+  <path d="M33 26H67C67 38 59 44 50 50 59 56 67 62 67 74H33C33 62 41 56 50 50 41 44 33 38 33 26Z" fill="none" stroke="#fff" stroke-width="6" stroke-linejoin="round"></path>
+  <path d="M39 68 50 57 61 68Z" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"></path>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Theory move">
+  <circle cx="50" cy="50" r="49" fill="#a88865"></circle>
+  <path d="M50 70V51M50 51 29 30M50 51 71 30" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path>
+  <g fill="#fff">
+    <circle cx="29" cy="30" r="8"></circle>
+    <circle cx="71" cy="30" r="8"></circle>
+    <circle cx="50" cy="51" r="7"></circle>
+    <circle cx="50" cy="72" r="8"></circle>
+  </g>
+</svg>

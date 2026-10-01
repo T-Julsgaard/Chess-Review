@@ -1,7 +1,6 @@
-// content.js — runs on chess.com pages. Kept deliberately minimal and robust:
-// reads the game ID from the current URL and responds to popup/background.
-// (Does NOT read the board/canvas itself — only the URL and optionally the
-// text move list as a fallback.)
+// content.js — runs on chess.com pages. Reads game IDs, public player information,
+// orientation for popup/background requests, with move-list text
+// as an explicit fallback. Adds extension-owned review controls to post-game UI.
 
 // Load banner: confirms the content script is actually running on this page.
 console.log("[Chess Analyzer] content script active on", location.href);
@@ -57,87 +56,6 @@ function readMoveListText() {
     }
   }
   return null;
-}
-
-// ---- Theme detection: read which piece set and board theme the user has on
-// chess.com, directly from the DOM. We store NOTHING — we just read the CDN URL
-// that chess.com already uses to show the pieces, so the analysis page can fetch
-// the same images on demand (and fall back to its own set if none is found).
-function bgUrl(elem, pseudo = null) {
-  if (!elem) return null;
-  const bg = getComputedStyle(elem, pseudo).backgroundImage;
-  const m = bg && bg.match(/url\(["']?(.*?)["']?\)/);
-  return m ? m[1] : null;
-}
-function detectChessComTheme() {
-  // We read ONLY the theme NAMES (e.g. "neo", "green") so the analysis page can match the look
-  // with its own bundled pieces and board colours. We deliberately do NOT capture or send
-  // chess.com's piece/board image URLs — that artwork is proprietary and is never fetched.
-  const out = { pieceSet: null, boardTheme: null };
-  // Pieces: each piece is an element with a background-image from
-  // .../chess-themes/pieces/<set>/<size>/<code>.png  (code = e.g. wp, bn). We keep only <set>.
-  const pieceEl = document.querySelector(".piece, [class*='piece-'], piece");
-  const pUrl = bgUrl(pieceEl);
-  if (pUrl) {
-    const m = pUrl.match(/\/pieces\/([^/]+)\/(\d+)\/([a-z]{2})\.(png|gif|svg|webp)/i);
-    if (m) out.pieceSet = m[1];
-  }
-  // Board: derive only the theme name from the board image path (never the URL itself).
-  const bUrl = findBoardImageUrl();
-  if (bUrl) out.boardTheme = boardNameFromUrl(bUrl);
-  const result = out.pieceSet || out.boardTheme ? out : null;
-  console.log("[Chess Analyzer] detected theme:", result);
-  return result;
-}
-const BOARD_RE = /chess-themes\/boards?\/|\/boards?\//i;
-const IMG_RE = /\.(png|jpe?g|svg|webp|gif)(\?|$)/i;
-function findBoardImageUrl() {
-  // 1) Most reliable: ask the browser which resources the page HAS loaded. The
-  //    board's PNG is already loaded (it's the one you could download), so we find
-  //    the URL directly — regardless of where in the DOM/CSS the image sits.
-  try {
-    for (const r of performance.getEntriesByType("resource")) {
-      if (/boards?\//i.test(r.name) && IMG_RE.test(r.name) && !/\/pieces\//i.test(r.name)) {
-        return r.name;
-      }
-    }
-  } catch {}
-  // 2) Computed background-image on candidate elements — incl. ::before/::after,
-  //    since chess.com often draws the board on a pseudo-element.
-  const sels = [
-    "wc-chess-board", "chess-board", ".board-board", "#board-board",
-    ".board-layout-chessboard", ".layout-board", ".board", "[class*='board']",
-  ];
-  for (const sel of sels) {
-    let nodes;
-    try { nodes = document.querySelectorAll(sel); } catch { continue; }
-    for (const elem of nodes) {
-      for (const pseudo of [null, "::before", "::after"]) {
-        const u = bgUrl(elem, pseudo);
-        if (u && BOARD_RE.test(u) && !/\/pieces\//i.test(u)) return u;
-      }
-    }
-  }
-  // 3) Fallback: look for a boards URL in the page's (same-origin) stylesheets.
-  for (const sheet of document.styleSheets) {
-    let rules;
-    try { rules = sheet.cssRules; } catch { continue; } // cross-origin → skip
-    if (!rules) continue;
-    for (const rule of rules) {
-      const m = (rule.cssText || "").match(/url\(["']?([^"')]*\/boards?\/[^"')]+\.(?:png|jpe?g|svg|webp|gif))["']?\)/i);
-      if (m) return m[1];
-    }
-  }
-  return null;
-}
-function boardNameFromUrl(u) {
-  if (!u) return null;
-  let m = u.match(/\/boards?\/([^/]+)\/\d+\.[a-z]+/i); // boards/<name>/200.png
-  if (m) return m[1].toLowerCase();
-  m = u.match(/\/boards?\/([^/.]+)\.[a-z]+/i);          // boards/<name>.png
-  if (m) return m[1].toLowerCase();
-  m = u.match(/\/boards?\/([^/]+)/i);
-  return m ? m[1].toLowerCase() : null;
 }
 
 // ---- Username detection: find whose perspective the board is shown from (POV).
@@ -270,10 +188,10 @@ handleShareFragment();
 // chess.com is an SPA; check again shortly after in case of a late hash update.
 setTimeout(handleShareFragment, 1200);
 
-// ---- Inject "Review with extension" buttons ----
+// ---- Inject "Analyze with Chess Review" buttons ----
 // Two spots on chess.com use the same button: (1) the game-over modal, and (2) the play-page
-// sidebar, each right beneath chess.com's green "Game Review" CTA. They share one builder; only the
-// chess.com width class and the insertion point differ. chess.com renders both with Vue (note the
+// sidebar, each right beneath chess.com's "Game Review" CTA. They share an extension-owned builder;
+// only spacing and the insertion point differ. chess.com renders both with Vue (note the
 // <!----> v-if anchors) and re-renders them while the tally/coach-speech animate, so a MutationObserver
 // re-injects if our button is ever dropped. We never "self-heal" a disabled button (that would run on
 // every animation frame and wipe the "Opening review…" cue a frame after a click).
@@ -285,15 +203,13 @@ setTimeout(handleShareFragment, 1200);
 // context but can't place the button, we warn once so a future markup change surfaces in the console.
 // Whatever happens to the DOM, the toolbar icon and Ctrl+Shift+Y still run the exact same analysis —
 // the buttons are only a convenience layer over that.
-const FREE_REVIEW_LABEL = "Review with extension";
+const FREE_REVIEW_LABEL = "Analyze with Chess Review";
 
 const CC = {
-  // Classes we put on OUR button so it matches chess.com's CTA width in each spot (styling, not
-  // lookup — kept here so every chess.com-specific string lives in one place).
-  widthClass: { modal: "game-over-primary-cta-game-over-primary-cta", sidebar: "cc-button-full" },
   // Game-over modal.
   modalContainer: [".game-over-modal-shell-buttons", "[class*='modal-shell-buttons']"],
   modalSecondaryRow: [".game-over-secondary-actions-row-component", "[class*='secondary-actions-row']"],
+  modalPrimaryCta: ['a[href*="review"]', '[class*="game-over-primary-cta"]', 'a.cc-button-component', 'button.cc-button-component'],
   modalContext: [".game-over-modal-component", "[class*='game-over-modal']"], // "is a game-over modal on screen?"
   // Play-page sidebar.
   sidebarEmphasis: [".game-review-emphasis-content", "[class*='game-review-emphasis']"],
@@ -328,24 +244,28 @@ function resetFreeReviewButton(btn, label) {
   label.textContent = FREE_REVIEW_LABEL;
 }
 
-// Build the button: green primary CTA + our logo (top-right, bordered so it stands out on the green)
-// + the "Opening review…" click cue. `widthClass` is the chess.com class that sizes it in its
-// container — the modal and the sidebar Game Review buttons use different ones.
-function buildReviewButton(widthClass, mt = 14, mb = 3) {
+// Appearance and placement-specific sizing come from the extension's content-button.css.
+// Platform class names are used only for locating insertion points, never for styling our button.
+function buildReviewButton(placement, mt = 14, mb = 3) {
   const btn = document.createElement("button");
   btn.type = "button";
-  btn.className = `cc-button-component cc-button-primary cc-button-xx-large cc-bg-primary ${widthClass} chess-analyzer-free-review`;
-  // Only top/bottom margins — NOT the `margin:Xpx 0` shorthand, which would zero the left/right
-  // margins some width classes rely on. position:relative anchors the logo in the top-right corner.
-  // Margins are passed in because the modal and the sidebar want different vertical spacing.
-  btn.style.cssText = `margin-top:${mt}px;margin-bottom:${mb}px;position:relative;`;
+  btn.className = `chess-analyzer-free-review chess-analyzer-free-review--${placement}`;
+  btn.style.setProperty("--chess-review-margin-top", `${mt}px`);
+  btn.style.setProperty("--chess-review-margin-bottom", `${mb}px`);
   // Logo is an extension file → loaded via browserAPI.runtime.getURL (listed in web_accessible_resources).
   const logoUrl = browserAPI.runtime.getURL("icons/icon.png");
-  btn.innerHTML =
-    `<img class="chess-analyzer-free-review-logo" src="${logoUrl}" alt="" ` +
-    `style="position:absolute;top:6px;right:8px;width:20px;height:20px;border:1px solid #000;border-radius:3px;"> ` +
-    `<span class="chess-analyzer-free-review-label">${FREE_REVIEW_LABEL}</span>`;
-  const label = btn.querySelector(".chess-analyzer-free-review-label");
+  const logo = document.createElement("img");
+  logo.className = "chess-analyzer-free-review-logo";
+  logo.src = logoUrl;
+  logo.alt = "";
+  const mark = document.createElement("span");
+  mark.className = "chess-analyzer-free-review-mark";
+  mark.setAttribute("aria-hidden", "true");
+  mark.append(logo);
+  const label = document.createElement("span");
+  label.className = "chess-analyzer-free-review-label";
+  label.textContent = FREE_REVIEW_LABEL;
+  btn.append(mark, label);
   let resetTimer = null;
 
   btn.addEventListener("click", () => {
@@ -377,18 +297,35 @@ function buildReviewButton(widthClass, mt = 14, mb = 3) {
 }
 
 // (1) Game-over modal: beneath "Game Review", above the New/Rematch row.
+function fitModalReviewButton(btn, buttonsContainer) {
+  const primary = firstEl(buttonsContainer, CC.modalPrimaryCta);
+  // Measure layout only; our appearance stays defined by the extension stylesheet.
+  // offsetWidth avoids measuring an entrance animation's transformed scale.
+  if (primary && primary.offsetWidth > 0) {
+    const width = `${primary.offsetWidth}px`;
+    if (btn.style.getPropertyValue("--chess-review-modal-width") !== width) {
+      btn.style.setProperty("--chess-review-modal-width", width);
+    }
+  }
+}
+
 function injectModalReviewButton(buttonsContainer) {
-  if (buttonsContainer.querySelector(".chess-analyzer-free-review")) return;
+  const existing = buttonsContainer.querySelector(".chess-analyzer-free-review");
+  if (existing) {
+    fitModalReviewButton(existing, buttonsContainer);
+    return;
+  }
   // Smaller top margin than the sidebar so our button + the New/Rematch row sit higher in the modal.
-  const btn = buildReviewButton(CC.widthClass.modal, 6, 3);
+  const btn = buildReviewButton("modal", 6, 3);
   const secondaryRow = firstEl(buttonsContainer, CC.modalSecondaryRow);
   if (secondaryRow) buttonsContainer.insertBefore(btn, secondaryRow);
   else buttonsContainer.appendChild(btn);
+  fitModalReviewButton(btn, buttonsContainer);
   console.log("[Chess Analyzer] injected review button (modal)");
 }
 
-// (2) Play-page sidebar: directly beneath chess.com's "Game Review" CTA, inside the SAME container
-// so cc-button-full gives it the identical width. The moves list above is the sidebar's flex-growing
+// (2) Play-page sidebar: beneath chess.com's "Game Review" CTA, inside its existing container.
+// Our own stylesheet fills the container width. The moves list above is the sidebar's flex-growing
 // scroll area and the sidebar is height-locked to the board, so adding this button automatically
 // shortens the moves list rather than making the sidebar taller — exactly the trade-off we want.
 function injectSidebarReviewButton(emphasisContent) {
@@ -400,7 +337,7 @@ function injectSidebarReviewButton(emphasisContent) {
   const cta = firstEl(reviewBtns, CC.sidebarCta);
   if (!cta) return;
   if (reviewBtns.querySelector(".chess-analyzer-free-review")) return;
-  const btn = buildReviewButton(CC.widthClass.sidebar);
+  const btn = buildReviewButton("sidebar");
   cta.insertAdjacentElement("afterend", btn);
   console.log("[Chess Analyzer] injected review button (sidebar)");
 }
@@ -439,6 +376,7 @@ function injectSidebarReviewButton(emphasisContent) {
   };
   const observer = new MutationObserver(tryInject);
   observer.observe(document.body, { childList: true, subtree: true });
+  window.addEventListener("resize", tryInject);
   tryInject();
 })();
 
@@ -454,13 +392,8 @@ browserAPI.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       usernames: detectUsernames(), // every readable player, best → worst archive to search
       countries: detectCountries(), // { usernameLower: countryId } scraped from the player flags
       flip: detectFlip(),         // user's board perspective from ?flip= (true=Black at bottom)
-      theme: detectChessComTheme(), // the user's chess.com piece/board theme (or null)
       moveListText: parsed ? null : null, // only filled on explicit fallback below
     });
-    return true;
-  }
-  if (msg && msg.type === "getTheme") {
-    sendResponse({ ok: true, theme: detectChessComTheme() });
     return true;
   }
   if (msg && msg.type === "getDomMoves") {

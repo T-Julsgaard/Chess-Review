@@ -1,0 +1,30 @@
+[
+  {
+    "file": "stockfish-nnue.js",
+    "version": "18.0.0",
+    "source": "https://github.com/nmrugg/stockfish.js/tree/v18.0.0",
+    "url": "https://github.com/nmrugg/stockfish.js/releases/download/v18.0.0/stockfish-18-lite-single.js",
+    "sha256": "2278005057f381491f1c9bb3e44c9f5920b3a00bef9759e33cc6582769a1f1fe"
+  },
+  {
+    "file": "stockfish-nnue.wasm",
+    "version": "18.0.0",
+    "source": "https://github.com/nmrugg/stockfish.js/tree/v18.0.0",
+    "url": "https://github.com/nmrugg/stockfish.js/releases/download/v18.0.0/stockfish-18-lite-single.wasm",
+    "sha256": "a8fbc05ec6920b56d7485826dcb02c5ffd2826bcbf751cf973046f237a9096f1"
+  },
+  {
+    "file": "stockfish-19-lite-single.js",
+    "version": "19.0.0",
+    "source": "https://github.com/nmrugg/stockfish.js/tree/v19.0.0",
+    "url": "https://github.com/nmrugg/stockfish.js/releases/download/v19.0.0/stockfish-19-lite-single.js",
+    "sha256": "d3344124ab067fb0b90ee77873bb8e9fbf5fc01bc525fe714b0f942581e889e6"
+  },
+  {
+    "file": "stockfish-19-lite-single.wasm",
+    "version": "19.0.0",
+    "source": "https://github.com/nmrugg/stockfish.js/tree/v19.0.0",
+    "url": "https://github.com/nmrugg/stockfish.js/releases/download/v19.0.0/stockfish-19-lite-single.wasm",
+    "sha256": "57ac2d72312aba346760e3f173f687a8c211208e97a87268436f7f0e10bb5387"
+  }
+]
