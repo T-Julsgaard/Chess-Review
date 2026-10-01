@@ -3113,6 +3113,11 @@ function analysisProgressText() {
   // The initial position is searched too, but is not a played ply; keep the displayed
   // denominator aligned with the game's move count.
   const done = Math.min(S.total, S.completed == null ? S.progress : S.completed);
+  // Detect Pass 2: progress > total means we're in deep re-analysis phase
+  if (S.progress > S.total) {
+    const refined = S.progress - S.total;
+    return `Refining critical mistakes … ${refined}`;
+  }
   return `Analyzing … ${done}/${S.total}`;
 }
 function renderReview() {
@@ -5408,32 +5413,35 @@ async function startAnalysis() {
   await Promise.all(engines.map(e => workerShallow(e)));
   if (gen !== S.batchGen) { engines.forEach(e => e.terminate()); return; }
 
-  // Pass 2: Deep re-analysis ONLY for Mistake/Blunder candidates
+  // Pass 2: Deep re-analysis ONLY for Blunders + Misses (critical errors only)
+  // Inaccuracies/Mistakes don't need deep re-analysis — shallow is sufficient for classification
   computeDerived(); // classify with shallow results first
-  const mistakeIndices = [];
+  const criticalIndices = [];
   for (let i = 1; i <= S.total; i++) {
     const cls = S.classif[i];
-    if (cls === "mistake" || cls === "blunder" || cls === "miss") {
-      mistakeIndices.push(i);
+    if (cls === "blunder" || cls === "miss") {
+      criticalIndices.push(i);
     }
   }
 
-  if (mistakeIndices.length > 0) {
+  if (criticalIndices.length > 0) {
     // Continue progress from Pass 1 (don't reset to 0)
     // Pass 1 already analyzed all S.total positions
     let deepNext = 0;
+    // Use MultiPV=1 for Pass 2 (single line sufficient, 3x faster)
+    const pass2Multipv = 1;
     async function workerDeep(eng) {
       while (gen === S.batchGen) {
         const idx = deepNext++;
-        if (idx >= mistakeIndices.length) return;
-        const i = mistakeIndices[idx];
+        if (idx >= criticalIndices.length) return;
+        const i = criticalIndices[idx];
         const fen = S.positions[i].fen;
         const cached = await posCache.get(fen);
         if (cached && cached.depth >= deepDepth) {
           S.bests[i] = cached;
           S.evals[i] = whiteRel(cached.score, fen);
         } else {
-          const res = await eng.analyse(fen, deepDepth, multipv);
+          const res = await eng.analyse(fen, deepDepth, pass2Multipv);
           if (gen !== S.batchGen) return;
           S.bests[i] = res;
           S.evals[i] = whiteRel(res.score, fen);
