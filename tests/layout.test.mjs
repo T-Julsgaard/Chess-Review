@@ -48,6 +48,40 @@ test('desktop fits laptop windows, then restores the responsive layout when narr
   assert.equal(a.desktop(),true); assert.equal(a.zoom(),.9);
 });
 
+// Reported display resolutions, including 16:9, 16:10, and 1470 × 956.
+// Display resolution is not the page viewport: reserve space for browser chrome.
+const REPORTED_DISPLAYS = [
+  [1920, 1080], [1366, 768], [1536, 864], [1280, 720], [2560, 1440],
+  [1536, 960], [1280, 800], [1470, 956], [1440, 900], [1600, 900],
+];
+
+for (const [width, height] of REPORTED_DISPLAYS) {
+  test(`${width} × ${height} fits automatic and saved layouts with browser chrome`, async t => {
+    for (const chromeHeight of [0, 120, 160]) {
+      for (const mode of ['auto', 'custom']) {
+        const a = layout(t, mode === 'custom' ? 1.25 : .9);
+        a.state.layoutMode = mode;
+        a.call('applyLayoutMode');
+        const viewportHeight = height - chromeHeight;
+        a.viewport(width, viewportHeight);
+        await a.call('initTabZoom');
+        const zoom = a.zoom();
+        const page = a.call('layoutPageSize', a.state.layout);
+        assert.equal(a.desktop(), mode === 'auto');
+        assert.ok(page.pageW * zoom <= width, `${mode}: horizontal overflow`);
+        assert.ok(page.pageH * zoom <= viewportHeight, `${mode}: vertical overflow`);
+        assert.ok(zoom >= .5 && zoom <= 2, `${mode}: readable zoom bounds`);
+        for (let i = 0; i < 2; i++) {
+          await a.call('initTabZoom');
+          await a.call('resetLayout');
+          assert.equal(a.zoom(), zoom, `${mode}: reopen/reset must preserve scale`);
+          assert.equal(a.desktop(), true);
+        }
+      }
+    }
+  });
+}
+
 test('custom layouts keep their own geometry and fitting', async t => {
   const a=layout(t); a.state.layoutMode='custom';
   a.state.layout={board:{x:40,y:0,w:800,h:920},moves:{x:880,y:60,w:320,h:500}};
