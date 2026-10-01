@@ -921,6 +921,33 @@ function brilliantEligible(i, mover, std, wpDrop, state) {
   if (alternative.mate != null) return alternative.mate < 0;
   return Number.isFinite(alternative.cp) && alternative.cp / 100 < BRILLIANT_POLICY.clearlyWinningPawns;
 }
+// Superb means finding the only good reply, not merely replying after an error. The runner-up
+// must be worse than the Good band in the same completed root depth. With one line, this is
+// unknown; retain the ordinary category without scheduling more engine searches.
+function onlyGoodReply(i, state) {
+  const root = state.bests[i - 1], top = root?.lines?.find(l => l.multipv === 1);
+  const next = root?.lines?.find(l => l.multipv === 2);
+  const move = state.positions[i];
+  const played = (move.from || "") + (move.to || "") + (move.promotion || "");
+  const topMove = (top?.pv || "").split(" ")[0], nextMove = (next?.pv || "").split(" ")[0];
+  if (!top || !next || top.bound !== "exact" || next.bound !== "exact"
+    || !Number.isInteger(top.depth) || top.depth <= 0 || next.depth !== top.depth
+    || topMove !== played || topMove !== root.bestmove || !nextMove || nextMove === topMove
+    || !Number.isFinite(top.score?.cp)) return false;
+  if (state.bests[i]?.lines?.some(l => l.multipv === 1 && l.bound && l.bound !== "exact")) return false;
+  const other = next.score;
+  if (!other || (other.mate != null ? !Number.isFinite(other.mate) || other.mate === 0 : !Number.isFinite(other.cp))) return false;
+  // Root PVs must identify distinct legal moves, including promotion identity.
+  try {
+    const before = new Chess(state.positions[i - 1].fen);
+    if (before.turn() !== move.color) return false;
+    const legal = before.moves({ verbose: true }).map(m => m.from + m.to + (m.promotion || ""));
+    if (!legal.includes(topMove) || !legal.includes(nextMove)) return false;
+  } catch { return false; }
+  const threshold = CALIB?.clsWp?.inacc ?? 5;
+  return Number.isFinite(threshold) && threshold > 0
+    && winPct(top.score.cp) - winPct(scoreToCp(other)) >= threshold;
+}
 // --- Eval readouts (all from our white-relative S.evals[]) ---
 function _evalPawnsWhite(k, state = S) { const e = state.evals[k]; return e ? scoreToCp(e) / 100 : null; }
 function _evalPawns(k, mover, state = S) { const p = _evalPawnsWhite(k, state); return p == null ? null : (mover === "w" ? p : -p); }
@@ -981,7 +1008,7 @@ function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop, state = S) 
 
   // Great — an only-good move that capitalises on the opponent's mistake/blunder.
   if (!previousMiss && wasNotMateRel(0) && notMateRel && std[i] === "excellent"
-    && (previousMistake || pStd(0) === "blunder")) return "great";
+    && (previousMistake || pStd(0) === "blunder") && onlyGoodReply(i, state)) return "great";
 
   if (isTop && _isCheckmate(i, state)) return "best";
   if (isTop) return "best";
