@@ -3,6 +3,22 @@
 // Supports MultiPV (multiple lines per position) for the Engine panel.
 
 import { browserAPI } from "../browser-compat.js";
+import { Chess } from "../lib/chess.js";
+
+// Validate and snapshot history before a queued search starts. Setup-FEN games use their own
+// initial board; requiring the replayed FEN to match prevents mixing a branch with its mainline.
+export function positionCommand(fen, history = null) {
+  if (!history) return `position fen ${fen}`;
+  if (!history.initialFen || !Array.isArray(history.moves)) throw new Error("Invalid search history");
+  const chess = new Chess(history.initialFen);
+  const initial = chess.fen(), moves = [...history.moves];
+  for (const uci of moves) {
+    if (typeof uci !== "string" || !/^[a-h][1-8][a-h][1-8][qrbn]?$/.test(uci)) throw new Error("Invalid history move");
+    chess.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] });
+  }
+  if (chess.fen() !== new Chess(fen).fen()) throw new Error("Search history does not reach position");
+  return `position fen ${initial}` + (moves.length ? ` moves ${moves.join(" ")}` : "");
+}
 
 // How long to wait for the engine's "readyok" handshake before declaring the build dead.
 // If a build can't be instantiated (CSP change, missing/blocked wasm, a future browser
@@ -182,7 +198,7 @@ export class Engine {
       this._send(`setoption name MultiPV value ${this.multipv}`);
     }
     this._send("ucinewgame");
-    this._send(`position fen ${job.fen}`);
+    this._send(job.positionCommand);
     this._send(`go depth ${job.depth}`);
   }
 
@@ -190,12 +206,14 @@ export class Engine {
    * Analyze one position.
    * Returns { bestmove, score:{cp|mate}, pv, lines:[{score,pv,depth,bound,multipv}] }.
    * lines are sorted best→worst (multipv 1..n), seen from the side to move.
+   * Optional history = {initialFen,moves}; replay must reach fen, including its counters.
    */
-  async analyse(fen, depth = 12, multipv = 1) {
+  async analyse(fen, depth = 12, multipv = 1, history = null) {
+    const command = positionCommand(fen, history);
     await this._ready;
     if (this.dead) throw new Error("engine is no longer running");
     return new Promise((resolve, reject) => {
-      this.queue.push({ fen, depth, multipv, resolve, reject, lastScore: null, lastPv: "", lines: {} });
+      this.queue.push({ fen, positionCommand: command, depth, multipv, resolve, reject, lastScore: null, lastPv: "", lines: {} });
       this._pump();
     });
   }

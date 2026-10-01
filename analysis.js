@@ -707,6 +707,14 @@ function buildPositions(pgn) {
   }
   return pos;
 }
+function searchHistory(positions, idx = positions.length - 1) {
+  if (!Number.isInteger(idx) || idx < 0 || idx >= positions.length) throw new Error("Invalid search position");
+  return { initialFen: positions[0].fen,
+    moves: positions.slice(1, idx + 1).map(p => p.from + p.to + (p.promotion || "")) };
+}
+function variationSearchHistory(v, idx) {
+  return searchHistory([...S.positions.slice(0, v.branchIdx + 1), ...v.positions.slice(1, idx + 1)]);
+}
 function deriveOpening(h) {
   const eco = h.ECO || "";
   let name = h.Opening || "";
@@ -2318,7 +2326,7 @@ async function requestLiveEval() {
       const node = v.positions[i];
       const terminal = variationTerminal(v, i);
       const res = terminal ? { score: terminal, bestmove: null, pv: "", lines: [] }
-        : await eng.analyse(node.fen, S.settings.engineDepth, S.settings.engineLines);
+        : await eng.analyse(node.fen, S.settings.engineDepth, S.settings.engineLines, variationSearchHistory(v, i));
       if (!valid()) return;
       node.eval = terminal || whiteRel(res.score, node.fen);
       node.best = res;
@@ -3668,7 +3676,7 @@ async function requestPanelLines() {
     const eng = await ensureLiveEngine();
     if (token !== S.panelToken || S.analysisMode || activePos().fen !== fen) return;
     eng.cancelPending(); eng.stop();
-    res = await eng.analyse(fen, S.settings.engineDepth, want);
+    res = await eng.analyse(fen, S.settings.engineDepth, want, searchHistory(S.positions, i));
   } catch { return; }
   if (token !== S.panelToken || S.idx !== i || S.analysisMode || activePos().fen !== fen) return;
   S._panelCache = { idx: i, fen, lines: res.lines };
@@ -4949,7 +4957,7 @@ function currentGameId() {
 }
 
 function analysisSettingsKey() {
-  return JSON.stringify([S.settings.enginePath, S.settings.engineDepth, S.settings.classifyLines,
+  return JSON.stringify(["history-v1", S.settings.enginePath, S.settings.engineDepth, S.settings.classifyLines,
     S.settings.engineHash, S.settings.engineSkill]);
 }
 
@@ -5263,7 +5271,7 @@ async function startAnalysis() {
       if (i > S.total) return;
       const terminal = terminalScore(S.positions[i].fen, i);
       const res = terminal ? { score: terminal, bestmove: null, pv: "", lines: [] }
-        : await eng.analyse(S.positions[i].fen, S.settings.engineDepth, multipv);
+        : await eng.analyse(S.positions[i].fen, S.settings.engineDepth, multipv, searchHistory(S.positions, i));
       if (gen !== S.batchGen) return;
       S.bests[i] = res;
       // Terminal positions (mate/stalemate) are decided from the board — not from the engine's "mate 0".

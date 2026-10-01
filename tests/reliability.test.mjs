@@ -139,3 +139,29 @@ test('Explore and incomplete analyses are never saved as finished games',t=>{
   S.meta={explore:true};a.call('saveToLibrary');assert.equal(a.writes.length,0);
   S.meta={};S.evals[1]=null;a.call('saveToLibrary');assert.equal(a.writes.length,0);
 });
+
+test('batch review sends full move prefixes and refuses FEN-only saved analyses',async t=>{
+  const a=app(t),S=loadGame(a,'1. Nf3 Nf6 2. Ng1 Ng8');quiet(a);
+  const calls=[];S.settings.engineWorkers=1;a.replace('saveToLibrary',()=>{});
+  a.replace('createEngine',async()=>fakeEngine(async(fen,depth,lines,history)=>{
+    calls.push({fen,history});return {score:{cp:0},bestmove:'g1f3',lines:[]};
+  }));
+  await a.call('startAnalysis');
+  assert.deepEqual(Array.from(calls.at(-1).history.moves),['g1f3','g8f6','f3g1','f6g8']);
+  assert.equal(calls.at(-1).history.initialFen,S.positions[0].fen);
+  const settingsKey=JSON.stringify([S.settings.enginePath,S.settings.engineDepth,S.settings.classifyLines,S.settings.engineHash,S.settings.engineSkill]);
+  assert.equal(a.call('canRestoreAnalysis',{pgn:S.pgn,settingsKey,bests:S.bests,evals:S.evals}),false);
+});
+
+test('Explore searches prepend mainline context and use the selected branch instead of future moves',async t=>{
+  const a=app(t),S=loadGame(a,'1. e4 e5 2. Nf3');quiet(a);
+  const v=branch(a,1);v.positions=a.call('buildPositions',`[SetUp "1"]\n[FEN "${S.positions[1].fen}"]\n\n1... c5`);
+  v.idx=1;v.positions.forEach(p=>{p.eval=null;p.best=null;});
+  const calls=[];S.liveEngine=fakeEngine(async(fen,depth,lines,history)=>{
+    calls.push({fen,history});return {score:{cp:0},bestmove:'g1f3',lines:[]};
+  });
+  await a.call('requestLiveEval');
+  const current=calls.find(c=>c.fen===v.positions[1].fen);
+  assert.deepEqual(Array.from(current.history.moves),['e2e4','c7c5']);
+  assert.equal(current.history.initialFen,S.positions[0].fen);
+});

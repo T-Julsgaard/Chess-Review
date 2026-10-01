@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { Engine } from '../engine/uci.js';
+import { Engine, positionCommand } from '../engine/uci.js';
+import { Chess } from '../lib/chess.js';
 
 class WorkerStub {
   commands=[];terminated=false;
@@ -85,4 +86,22 @@ test('MultiPV retains ranking, depth and score bounds without changing scalar ev
   eng.worker.line('info depth 16 multipv 2 score cp 0 pv d2d4');
   eng.worker.line('bestmove e2e4');
   assert.ok((await next).lines.every(l => l.bound === 'exact' && l.depth === 16));
+});
+
+test('history transport preserves repeated moves and snapshots queued context', async t => {
+  const eng=engine(t),chess=new Chess(),initialFen=chess.fen();
+  const moves=['g1f3','g8f6','f3g1','f6g8'];
+  for(const uci of moves)chess.move({from:uci.slice(0,2),to:uci.slice(2,4)});
+  const history={initialFen,moves},pending=eng.analyse(chess.fen(),4,1,history);
+  moves.length=0;await Promise.resolve();
+  assert.ok(eng.worker.commands.includes(`position fen ${initialFen} moves g1f3 g8f6 f3g1 f6g8`));
+  eng.worker.line('info depth 4 score cp 0 pv g1f3');eng.worker.line('bestmove g1f3');await pending;
+});
+
+test('setup-FEN history retains underpromotion and rejects a mismatched or malformed prefix',()=>{
+  const initialFen='7k/P7/8/8/8/8/8/7K w - - 0 1',chess=new Chess(initialFen);
+  chess.move({from:'a7',to:'a8',promotion:'n'});
+  assert.equal(positionCommand(chess.fen(),{initialFen,moves:['a7a8n']}),`position fen ${initialFen} moves a7a8n`);
+  assert.throws(()=>positionCommand(chess.fen(),{initialFen,moves:['a7a8q']}),/does not reach/);
+  assert.throws(()=>positionCommand(chess.fen(),{initialFen,moves:['a7a8n\ngo infinite']}),/Invalid history move/);
 });
