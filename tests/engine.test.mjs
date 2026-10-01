@@ -67,3 +67,22 @@ test('Stockfish 19 Lite fails cleanly if its startup is silent',async t=>{
   const failed=assert.rejects(eng.setOptions(),/timed out/);
   t.mock.timers.tick(10001);await failed;assert.equal(eng.dead,true);
 });
+
+test('MultiPV retains ranking, depth and score bounds without changing scalar evaluation', async t => {
+  const eng = engine(t), result = eng.analyse('position', 16, 2);
+  await Promise.resolve();
+  eng.worker.line('info depth 15 multipv 2 score cp 20 upperbound pv d2d4 d7d5');
+  eng.worker.line('info depth 16 multipv 1 score cp 600 lowerbound pv e2e4 e7e5');
+  eng.worker.line('bestmove e2e4');
+  const r = await result;
+  assert.deepEqual(r.score, { cp: 600 });
+  assert.deepEqual(r.lines, [
+    { score: { cp: 600 }, pv: 'e2e4 e7e5', depth: 16, bound: 'lowerbound', multipv: 1 },
+    { score: { cp: 20 }, pv: 'd2d4 d7d5', depth: 15, bound: 'upperbound', multipv: 2 },
+  ]);
+  const next = eng.analyse('next', 16, 2); await Promise.resolve();
+  eng.worker.line('info depth 16 multipv 1 score mate 3 pv e2e4');
+  eng.worker.line('info depth 16 multipv 2 score cp 0 pv d2d4');
+  eng.worker.line('bestmove e2e4');
+  assert.ok((await next).lines.every(l => l.bound === 'exact' && l.depth === 16));
+});

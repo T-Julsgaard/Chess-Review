@@ -136,7 +136,9 @@ export class Engine {
         const mpv = parseInt((line.match(/ multipv (\d+)/) || [])[1] || "1", 10);
         const pvMatch = line.match(/ pv (.+)$/);
         const pv = pvMatch ? pvMatch[1].trim() : "";
-        this.current.lines[mpv] = { score, pv };
+        const depth = parseInt((line.match(/ depth (\d+)/) || [])[1] || "0", 10);
+        const bound = (line.match(/\b(lowerbound|upperbound)\b/) || [])[1] || "exact";
+        this.current.lines[mpv] = { score, pv, depth, bound, multipv: mpv };
         if (mpv === 1) {
           this.current.lastScore = score;
           if (pv) this.current.lastPv = pv;
@@ -186,7 +188,7 @@ export class Engine {
 
   /**
    * Analyze one position.
-   * Returns { bestmove, score:{cp|mate}, pv, lines:[{score,pv}] }.
+   * Returns { bestmove, score:{cp|mate}, pv, lines:[{score,pv,depth,bound,multipv}] }.
    * lines are sorted best→worst (multipv 1..n), seen from the side to move.
    */
   async analyse(fen, depth = 12, multipv = 1) {

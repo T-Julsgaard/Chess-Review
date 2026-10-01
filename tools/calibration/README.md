@@ -2,6 +2,10 @@
 
 Status: offline pilot, not a production calibration. No extension behavior changes.
 
+Brilliant-move annotation is assessed separately from numerical calibration in
+[`BRILLIANT_MOVES.md`](BRILLIANT_MOVES.md). It uses board and existing evaluation
+evidence; annotations are excluded from fitted accuracy/rating inputs.
+
 The multi-engine recent-data overnight workflow is documented in
 [`OVERNIGHT_RUN.md`](OVERNIGHT_RUN.md). It adds a tested bounded-range importer,
 exact bundled SF19 support, SQLite raw caches, a deadline supervisor, fixed
