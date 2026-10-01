@@ -12,6 +12,13 @@ export function args(options) {
 }
 
 export async function json(file) { return JSON.parse(await readFile(file, 'utf8')); }
+export function provenanceSummary(manifest) {
+  if(manifest==null)return manifest;
+  const entries=Object.entries(manifest),flags=entries.filter(([key])=>key.endsWith('CalibrationUsedForTraining'));
+  if(flags.some(([,value])=>value!==false))throw Error('Unsupported scoring provenance');
+  return {...Object.fromEntries(entries.filter(([key])=>!key.endsWith('CalibrationUsedForTraining'))),
+    ...(flags.length?{independentlyDefinedScoring:true}:{})};
+}
 const saves = new Map();
 export async function save(file, value) {
   const operation = (saves.get(file) || Promise.resolve()).catch(() => {}).then(async () => {

@@ -10,10 +10,10 @@ The commands below retain the original historical smoke workflow.
 
 ## Architecture decided before implementation
 
-1. Eventually replace `analysis.js`'s calibration loader, `winPct`, `moveAccuracy`,
-   `sideAccuracies`, learned aggregation, rating corrections, `ELO_ANCHORS`, and
-   `estimateElo`. Classification needs a separate provenance review; existing
-   categories must not become experimental features or training labels.
+1. Prepare a versioned calibration artifact for integration into `analysis.js`,
+   with explicit accuracy definitions, rating target and strict engine/search
+   compatibility. Classification needs a separate provenance review; categories
+   must not become experimental features or training labels.
 2. Retain the bundled chess rules/PGN parser, engine assets, board, UI, and raw
    UCI infrastructure concept. This pipeline implements its own Node UCI client.
 3. Source: Lichess monthly rated standard exports, CC0, documented at
@@ -54,10 +54,10 @@ The commands below retain the original historical smoke workflow.
    Test monotonic loss, mate behavior, forced moves, exact build compatibility,
    repetition-aware caching, determinism, parser bounds, resumption, and leakage.
    Reanalyze development games at 4x nodes; quantify noise and score ordering.
-10. Only import `lib/chess.js` and the engine; no `analysis.js`, `data/calibration.json`,
-    historical fitting scripts, categories, or review outputs. Store provenance
+10. Only import `lib/chess.js` and the engine. Derive scoring features from raw
+    searches; exclude categories and supplied review outputs. Store provenance
     flags, code hashes, dataset hashes, engine hashes/options, seed and Node version.
-    The historical implementation and all existing user edits remain untouched.
+    Preserve immutable experiment evidence and all unrelated user edits.
 
 ## Commands (Node 24 with built-in Zstandard support)
 
@@ -111,6 +111,6 @@ band biases, length/phase/control diagnostics, and enough validation samples to
 choose a simple formula. Freeze formulas, coefficients and code BEFORE one final
 test evaluation. If results are useful, export a separate versioned JSON with
 explicit build/network/search compatibility and predictive uncertainty. Only
-then allow a diagnostic old-score comparison. SF19 transfer and native-engine
-compatibility are subsequent experiments. Never select coefficients from that
-comparison, never silently load this smoke model in the extension.
+then assess deployment compatibility. SF19 transfer and native-engine
+compatibility are subsequent experiments. Never select coefficients from
+external review scores; never silently load this smoke model in the extension.
