@@ -15,6 +15,11 @@ separate controlled comparisons and records the first bounded history probe and
 cached confirmation-policy replay. `scoring-checks.mjs` preserves its plan and
 raw outputs under a new ignored run root, with no fitted weights or final tests.
 
+The [remaining-item assessment](reports/scoring-items-2026-10-01.md) records
+implemented history and annotation fixes, mixed root-scoring evidence, training-only
+rating ablations, and the unmeasured human-label benchmark. Experimental tools
+preserve frozen calibration candidates and do not promote temporary fold fits.
+
 The multi-engine recent-data overnight workflow is documented in
 [`OVERNIGHT_RUN.md`](OVERNIGHT_RUN.md). It adds a tested bounded-range importer,
 exact bundled SF19 support, SQLite raw caches, a deadline supervisor, fixed
