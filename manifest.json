@@ -32,12 +32,6 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
   },
-  "cross_origin_embedder_policy": {
-    "value": "require-corp"
-  },
-  "cross_origin_opener_policy": {
-    "value": "same-origin"
-  },
   "background": {
     "service_worker": "background.js",
     "type": "module",
@@ -47,7 +41,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "{04a623e1-ee4d-4b46-81f7-4790bbe6a55c}",
+      "id": "{04a623e1-ee4d-4b46-81f7-4790bbe6a59c}",
       "strict_min_version": "140.0",
       "data_collection_permissions": {
         "required": [
