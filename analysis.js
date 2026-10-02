@@ -85,7 +85,7 @@ const QUALITY = {
 const QUALITY_ORDER = ["brilliant","great","best","excellent","good","book","inacc","mistake","miss","blunder"];
 
 const QBREAK_SUMMARY = ["brilliant","great","best","mistake","miss","blunder"];
-const QBREAK_FULL = ["brilliant","great","book","best","excellent","good","inacc","mistake","miss","blunder"];
+const QBREAK_FULL = ["brilliant","great","best","excellent","good","inacc","mistake","miss","blunder","book"];
 const QUALITY_LABEL = {
   brilliant: "Brilliant move!", great: "Great move!", best: "Best move",
   excellent: "Excellent", good: "Good move", book: "Book move",
