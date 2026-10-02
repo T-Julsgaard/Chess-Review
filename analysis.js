@@ -5373,6 +5373,21 @@ async function startAnalysis() {
   // Assign to global state for termination handling
   S.evalEngines = engines;
 
+  // Lichess cloud eval for opening (first 15 plies only)
+  async function getCloudEval(fen, ply) {
+    if (ply > 15) return null;
+    try {
+      const resp = await fetch(`https://lichess.org/api/cloud-eval?fen=${encodeURIComponent(fen)}&multiPv=3`);
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.pvs && data.pvs.length > 0) {
+          return { score: { cp: data.pvs[0].cp }, bestmove: data.pvs[0].moves.split(" ")[0], pv: data.pvs[0].moves, lines: data.pvs.map(p => ({ score: { cp: p.cp }, pv: p.moves })) };
+        }
+      }
+    } catch {}
+    return null;
+  }
+
   // Pass 1: Shallow analysis of ALL positions
   let nextIdx = 0, contig = -1;
   async function workerShallow(eng) {
@@ -5380,6 +5395,21 @@ async function startAnalysis() {
       const i = nextIdx++;
       if (i > S.total) return;
       const fen = S.positions[i].fen;
+      
+      // Try Lichess cloud eval for opening (first 15 plies)
+      if (i <= 15) {
+        const cloud = await getCloudEval(fen, i);
+        if (cloud) {
+          S.bests[i] = cloud;
+          S.evals[i] = whiteRel(cloud.score, fen);
+          if (i > 0) S.completed++;
+          while (contig + 1 <= S.total && S.bests[contig + 1]) contig++;
+          S.progress = Math.max(0, contig);
+          requestProgress(gen);
+          continue;
+        }
+      }
+      
       const cached = await posCache.get(fen);
       if (cached && cached.depth >= shallowDepth) {
         S.bests[i] = cached;
