@@ -322,11 +322,11 @@ const DEFAULT_LAYOUT = {
   evalbar:  { x: 288,  y: 58,  w: 30,  h: 816 },
   controls: { x: 1194, y: 812, w: 310, h: 54  },
   coach:    { x: 1570, y: 0,   w: 192, h: 196 },
-  review:   { x: 1200, y: 60,  w: 606, h: 136 },
-  moves:    { x: 1200, y: 218, w: 300, h: 386 },
+  review:   { x: 1200, y: 60,  w: 604, h: 136 },
+  moves:    { x: 1200, y: 216, w: 300, h: 390 },
   accuracy: { x: 1510, y: 216, w: 294, h: 506 },
-  graph:    { x: 1200, y: 620, w: 302, h: 178 },
-  engine:   { x: 1512, y: 738, w: 294, h: 176 },
+  graph:    { x: 1200, y: 620, w: 300, h: 178 },
+  engine:   { x: 1510, y: 736, w: 294, h: 178 },
 };
 const GRIP_SVG = `<svg viewBox="0 0 12 12" width="12" height="12"><path d="M11 4 4 11M11 8 8 11" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>`;
 const HANDLE_SVG = `<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><circle cx="5" cy="4" r="1.3"/><circle cx="11" cy="4" r="1.3"/><circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/><circle cx="5" cy="12" r="1.3"/><circle cx="11" cy="12" r="1.3"/></svg>`;

@@ -113,19 +113,23 @@ test('desktop matches the saved canvas geometry and preserves the gap when accur
   });
   a.context.getComputedStyle = () => ({ rowGap: '7px' });
   const mod = key => a.dom.window.document.querySelector(`[data-mod="${key}"]`).style;
-  const geometry = () => Object.fromEntries(['accuracy', 'engine', 'graph', 'evalbar'].map(key => {
+  const geometry = () => Object.fromEntries(['accuracy', 'engine', 'graph', 'evalbar', 'review', 'moves', 'controls'].map(key => {
     const s = mod(key); return [key, [s.left, s.top, s.width, s.height]];
   }));
   a.state.layoutMode = 'custom'; a.call('applyLayoutMode'); a.call('reflowAccuracy', false);
   const savedCanvas = geometry();
-  assert.deepEqual(savedCanvas.engine, ['1512px', '622px', '294px', '176px']);
+  assert.deepEqual(savedCanvas.engine, ['1510px', '620px', '294px', '178px']);
   assert.deepEqual(savedCanvas.accuracy, ['1510px', '216px', '294px', '390px']);
+  assert.deepEqual(savedCanvas.graph, ['1200px', '620px', '300px', '178px']);
+  assert.deepEqual(savedCanvas.review, ['1200px', '60px', '604px', '136px']);
+  assert.deepEqual(savedCanvas.moves, ['1200px', '216px', '300px', '390px']);
+  assert.deepEqual(savedCanvas.controls, ['1194px', '812px', '310px', '54px']);
   a.state.layoutMode = 'auto'; a.call('applyLayoutMode');
   a.viewport(1920, 920); await a.call('initTabZoom');
   assert.deepEqual(geometry(), savedCanvas);
   for (let i = 0; i < 3; i++) {
     a.state.qbreakExpanded = true; a.call('renderStats');
-    assert.equal(mod('accuracy').height, '506px'); assert.equal(mod('engine').top, '738px');
+    assert.equal(mod('accuracy').height, '506px'); assert.equal(mod('engine').top, '736px');
     a.state.qbreakExpanded = false; a.call('renderStats');
     assert.deepEqual(geometry(), savedCanvas);
   }
