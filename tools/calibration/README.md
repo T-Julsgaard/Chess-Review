@@ -18,6 +18,8 @@ played searches in a separate cache. It preserves the fitted coefficients.
 The [expanded latent-choice context study](LATENT_CONTEXT_RUN.md) holds prior
 bounds fixed and tests chronological heldout move prediction on the expanded
 public sample. A widest-grid fit remains an identification limitation.
+The [phase-conditioned follow-up](PHASE_CONTEXT_RUN.md) improves joint choice
+prediction but not later-choice prediction, and retains the widest latent prior.
 
 Brilliant-move annotation is assessed separately from numerical calibration in
 [`BRILLIANT_MOVES.md`](BRILLIANT_MOVES.md). It uses board and existing evaluation
