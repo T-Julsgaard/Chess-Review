@@ -7,6 +7,10 @@ bullet and rapid cohorts from preserved recent archive frames. It holds the
 quality model fixed while comparing pooled and time-control-specific rating
 context using public training folds. Settings integration remains pending.
 
+The [public repertoire studies](OPENING_REPERTOIRE.md) test opening recognition
+with exact score-message guards and a separately frozen public search-sensitivity
+scale. Both quality replay and contextual fitting are independently reproducible.
+
 Brilliant-move annotation is assessed separately from numerical calibration in
 [`BRILLIANT_MOVES.md`](BRILLIANT_MOVES.md). It uses board and existing evaluation
 evidence; annotations are excluded from fitted accuracy/rating inputs.
