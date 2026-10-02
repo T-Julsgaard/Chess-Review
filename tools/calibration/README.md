@@ -40,8 +40,9 @@ It finds occasional material sensitivity without establishing score superiority.
 
 The [bounded depth-protocol calibration study](DEPTH_CALIBRATION_RUN.md) refits
 public outcome and choice coefficients under depth16/Hash16, then freezes both
-quality and contextual models before consumed development validation. Evaluation
-is running; settings integration and production promotion remain pending.
+quality and contextual models before consumed development validation. The
+application's integrated model and bundled replay are documented in
+[the published method](PUBLIC_METHOD.md).
 
 The [same-cohort public fixed-node control](MATCHED_NODE_CONTROL.md) refits the
 20k-node protocol from archived raw data on the exact depth-study cohort.

@@ -1,6 +1,6 @@
 # Reproducible public calibration
 
-The updated calibration makes the numerical model, source evidence and fitting
+The public calibration makes the numerical model, source evidence and fitting
 procedure inspectable. All inputs needed to reconstruct the published SF18
 accuracy/context and separate SF18/SF19 moves-only rating coefficients are included
 under `public/`. Fitting and replay work offline. Node.js 24 or later is required.

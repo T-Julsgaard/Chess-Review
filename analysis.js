@@ -5722,12 +5722,6 @@ async function resetLegacyZoom() {
     }
     // The 5-line option was removed — clamp any stored value to the new max.
     if (S.settings.engineLines > ENGINE_MAX_LINES) { S.settings.engineLines = ENGINE_MAX_LINES; browserAPI.storage.local.set({ settings: S.settings }); }
-    // Migrate the retired experimental analysis-line preference.
-    if (S.settings.mpv2Calibrated) {
-      if (S.settings.classifyLines === 2) S.settings.classifyLines = 1;
-      delete S.settings.mpv2Calibrated;
-      browserAPI.storage.local.set({ settings: S.settings });
-    }
     // Use the saved layout if it matches the current version; otherwise the new default.
     const useStored = store.layoutVersion === LAYOUT_VERSION && store.layout;
     S.layout = useStored ? { ...structuredClone(DEFAULT_LAYOUT), ...store.layout } : structuredClone(DEFAULT_LAYOUT);

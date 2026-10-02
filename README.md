@@ -59,7 +59,7 @@ per worker; the Workers setting already distributes positions across multiple wo
 The redundant Stockfish 10 and asm.js engines have been removed. Their saved
 preferences migrate to 18; existing full-19 preferences migrate to 19 Lite.
 
-The updated [public calibration method](tools/calibration/PUBLIC_METHOD.md) includes
+The [public calibration method](tools/calibration/PUBLIC_METHOD.md) includes
 CC0 input snapshots, frozen engine settings, fitting code and an offline reproduction
 command. Numerical scores are independent of Brilliant and other annotations.
 In **Settings → Engine → Estimated rating**, choose **Use recorded rating** for

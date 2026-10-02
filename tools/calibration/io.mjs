@@ -14,10 +14,11 @@ export function args(options) {
 export async function json(file) { return JSON.parse(await readFile(file, 'utf8')); }
 export function provenanceSummary(manifest) {
   if(manifest==null)return manifest;
-  const entries=Object.entries(manifest),flags=entries.filter(([key])=>key.endsWith('CalibrationUsedForTraining'));
-  if(flags.some(([,value])=>value!==false))throw Error('Unsupported scoring provenance');
-  return {...Object.fromEntries(entries.filter(([key])=>!key.endsWith('CalibrationUsedForTraining'))),
-    ...(flags.length?{independentlyDefinedScoring:true}:{})};
+  if ((Object.hasOwn(manifest, 'independentlyDefinedScoring') && manifest.independentlyDefinedScoring !== true)
+      || (Object.hasOwn(manifest, 'externalReviewScoresUsed') && manifest.externalReviewScoresUsed !== false)) {
+    throw Error('Unsupported scoring provenance');
+  }
+  return structuredClone(manifest);
 }
 const saves = new Map();
 export async function save(file, value) {
