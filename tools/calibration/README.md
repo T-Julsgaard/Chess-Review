@@ -15,6 +15,10 @@ The [exact-message transport study](SEARCH_EVIDENCE.md) checks stored score/PV
 identity separately from final recommendations and adds only missing restricted
 played searches in a separate cache. It preserves the fitted coefficients.
 
+The [expanded latent-choice context study](LATENT_CONTEXT_RUN.md) holds prior
+bounds fixed and tests chronological heldout move prediction on the expanded
+public sample. A widest-grid fit remains an identification limitation.
+
 Brilliant-move annotation is assessed separately from numerical calibration in
 [`BRILLIANT_MOVES.md`](BRILLIANT_MOVES.md). It uses board and existing evaluation
 evidence; annotations are excluded from fitted accuracy/rating inputs.
