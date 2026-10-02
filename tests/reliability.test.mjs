@@ -90,6 +90,8 @@ test('progress counts out-of-order results but navigation only exposes a contigu
 
 test('cache restore requires complete data for the same game and engine settings',t=>{
   const a=app(t);const S=loadGame(a,'1. e4');
+  S.bests[0].playedScore={cp:0};
+  S.bests[0].calibration={version:a.run('CALIB.version')};
   const saved={pgn:S.pgn,settingsKey:a.call('analysisSettingsKey'),bests:S.bests,evals:S.evals};
   assert.equal(a.call('canRestoreAnalysis',saved),true);
   assert.equal(a.call('canRestoreAnalysis',{...saved,pgn:'1. d4'}),false);

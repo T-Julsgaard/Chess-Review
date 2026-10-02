@@ -1,0 +1,74 @@
+{
+  "schema": "public-calibration-release-v1",
+  "createdAt": "2026-10-02T20:45:24.707Z",
+  "files": {
+    "sf18-evidence.json.gz": {
+      "sha256": "2771b2b8a7839e4d9f2ddbff73aa6e0dfbe017f3aa3a7b052584147ee21c968b",
+      "bytes": 5838826,
+      "uncompressedSha256": "a8f4bf1d9f3c7bbe16eca1fa09d0e0dc918a907c59079a2b2fe14ea4e398e486"
+    },
+    "dataset.json.gz": {
+      "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+      "bytes": 463748,
+      "uncompressedSha256": "54b589844813490a1ebd15251e6142e2a361d6fac53d6dfe38414ded1cdf5708"
+    },
+    "sf18-rating-evidence.json.gz": {
+      "sha256": "f41178347bc9569390b744f9e6fb2206882cf2307c762de8b8f8aab35c2a1e31",
+      "bytes": 1320424,
+      "uncompressedSha256": "c4f3b5caeb78511d34ce4c9031b53ab6e00338871bad5119d488bfc0e8f365f7"
+    },
+    "sf19-rating-evidence.json.gz": {
+      "sha256": "8ac253f86fa87a945c06e86f2b7c82d4f2b7e8c96ae9b990a6efadbac9f7d721",
+      "bytes": 683399,
+      "uncompressedSha256": "cea288e5a8eeb7f2f5202b7d8fd526b7a454d9b597eaf4ee61c1e0dcaf080ecc"
+    },
+    "expected-scores.json": {
+      "sha256": "969664315be01fab6f719ce158926741c45ec59ef8e3accfe28f0dcc595b7df6",
+      "bytes": 28657,
+      "uncompressedSha256": "969664315be01fab6f719ce158926741c45ec59ef8e3accfe28f0dcc595b7df6"
+    },
+    "validation.json": {
+      "sha256": "865aa647f484f3932c42baa2bd15625bd7cdfd253f504aa6d64aba3e4eb07076",
+      "bytes": 1309,
+      "uncompressedSha256": "865aa647f484f3932c42baa2bd15625bd7cdfd253f504aa6d64aba3e4eb07076"
+    },
+    "sources.json": {
+      "sha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+      "bytes": 23408,
+      "uncompressedSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a"
+    }
+  },
+  "qualityCandidateVersion": "242d48d1bd9c88be962738f8c630581c0163d5c28c6fff392a940ccdf971c4ac",
+  "contextCandidateVersion": "f597086cd654b34ff235cbe4c223fde7d58741bbaa29752bbb4ddb4a662b80df",
+  "recipe": {
+    "seed": "public-depth16-calibration-v1",
+    "trainingGames": 100,
+    "validationGames": 25,
+    "choiceTrainingGames": 80,
+    "choiceValidationGames": 20,
+    "outcomePlies": [
+      11,
+      31,
+      51,
+      71
+    ],
+    "minimumDecisions": 10,
+    "bandQuotas": "Five equal focal-rating bands; whole games and player-disjoint roles.",
+    "contextBandwidths": [
+      200,
+      400,
+      800
+    ],
+    "contextFolds": 5
+  },
+  "definitions": {
+    "accuracy": "Arithmetic mean of 100 * exp(-beta * max(0, E(best)-E(played))) over nonforced decisions. E is a training-fitted symmetric logistic human-outcome curve; beta is fitted to all-legal-move choice likelihood with equal game weights.",
+    "context": "Recorded rating plus conventional 400/ln(10) units times the log odds of full-game quality percentile among public Gaussian rating-weighted peers.",
+    "rating": "Engine-specific standardized Huber regression on board/search features; recorded public blitz ratings are targets and are excluded from predictors."
+  },
+  "limitations": [
+    "Development validation has been used in research; no fresh final-test confirmation.",
+    "Search results are reproducible archived engine observations; reruns on different environments can vary.",
+    "Context units are a declared performance convention; cross-platform rating transfer is unvalidated."
+  ]
+}

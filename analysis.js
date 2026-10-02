@@ -1,6 +1,6 @@
 // analysis.js — Chess Review analysis page (vanilla port of "Design 2.0").
 // Parses the PGN, runs Stockfish through the game and fills every panel with real
-
+// data: eval bar/graph, accuracy, mistake classification, engine lines (MultiPV),
 // opening (from the PGN), player/clock/result. Board + 2 piece styles + theme are selectable.
 
 import { Chess } from "./lib/chess.js";
@@ -8,6 +8,9 @@ import { Engine } from "./engine/uci.js";
 import { flagCodeForCountryId, countryNameForId } from "./flags.js";
 import { BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg } from "./move-grades.js";
 import { browserAPI } from "./browser-compat.js";
+import { expectedPoints } from "./lib/public-scoring.js";
+import { calibratedReview, scoringEvidenceComplete } from "./lib/calibrated-review.js";
+import { analyseCalibratedPosition } from "./lib/calibrated-search.js";
 
 /* ---------------- Opening book ----------------
  * Offline lookup table built from lichess-org/chess-openings (bundled in data/book.json).
@@ -29,7 +32,9 @@ async function loadBook() {
   return BOOK;
 }
 
-
+/* ---------------- Public calibration ----------------
+ * Published evidence, fitting definitions and reproduction commands live in
+ * tools/calibration. Annotations are independent of numerical accuracy/rating. */
 let CALIB = null;
 async function loadCalibration() {
   if (CALIB) return CALIB;
@@ -37,12 +42,6 @@ async function loadCalibration() {
   catch { CALIB = {}; }
   return CALIB;
 }
-function calWinK() { return NaN; }
-function calMoveAcc() { return {}; }
-
-function calAccMult(rating) { return 1; }
-
-function calAccBias(acc, rating) { return null; }
 
 /* ---------------- Configuration ---------------- */
 const GLYPH = { K: "♚", Q: "♛", R: "♜", B: "♝", N: "♞", P: "♟" };  // used for the move-list piece icons
@@ -58,7 +57,7 @@ const BOARD_THEMES = {
   emerald: ["#e4ead4", "#46683f"],   // deep forest green
   coral:   ["#f7dfca", "#c8835a"],   // warm terracotta
 };
-
+// Display names are separate from persisted keys so existing board preferences keep working.
 const BOARD_THEME_LABEL = { green: "Meadow", walnut: "Hazel", slate: "Mist", ocean: "Harbor",
   ink: "Graphite", maple: "Honeywood", emerald: "Forest", coral: "Terracotta" };
 const ACCENTS = {
@@ -69,7 +68,7 @@ const ACCENTS = {
 };
 // Display names are independent of stored classification keys and scoring rules.
 // Annotation names and colors stay independent of move grades. The saved SVGs
-
+// in icons/ are category reference examples; move glyphs are rendered per ply.
 const QUALITY = {
   brilliant: { sym: "!!", name: "Brilliant", color: "var(--q-brilliant)", icon: "brilliant" },
   great:     { sym: "!",  name: "Great",     color: "var(--q-great)",     icon: "great" },
@@ -83,7 +82,7 @@ const QUALITY = {
   blunder:   { sym: "??", name: "Blunder",   color: "var(--q-blunder)",   icon: "blunder" },
 };
 const QUALITY_ORDER = ["brilliant","great","best","excellent","good","book","inacc","mistake","miss","blunder"];
-
+// Accuracy breakdown: compact (default) vs. full list (expanded via the expander arrow).
 const QBREAK_SUMMARY = ["brilliant","great","best","mistake","miss","blunder"];
 const QBREAK_FULL = ["brilliant","great","best","excellent","good","inacc","mistake","miss","blunder","book"];
 const QUALITY_LABEL = {
@@ -92,7 +91,7 @@ const QUALITY_LABEL = {
   inacc: "Inaccuracy", mistake: "Mistake", miss: "Missed chance", blunder: "Blunder",
 };
 const NOTEWORTHY = new Set(["brilliant","great","inacc","mistake","miss","blunder"]);
-
+// Explanation for each category (shown as a tooltip in the accuracy panel). The classifier
 // (computeDerived → classifyMove) works on the engine's eval in PAWNS: "loss" is how much the
 // eval drops after your move vs. the best continuation; a "sacrifice" is a real, voluntary
 // give-up of material (not a recapture/trade), detected on the board.
@@ -108,13 +107,13 @@ const QUALITY_DESC = {
   miss:      "Missed chance: the opponent erred and you failed to punish it — or you let a forced mate slip.",
   blunder:   "Blunder: a move that loses ~4+ pawns of eval, or walks into a forced mate.",
 };
-
-const ACCURACY_INFO = "Accuracy (0–100) is an estimate calculated from local Stockfish evaluations using this extension's scoring rules. Higher scores indicate more accurate play. Scores depend on engine settings and scoring parameters and are not official platform scores.";
-const ELO_INFO = "A rough estimate of the rating you played at in this game. It anchors on your actual rating and adjusts up or down by how accurately you played this game (when no rating is known it falls back to accuracy alone). It's not an official rating — only an indication based on this single game.";
-
+// Explanations for the accuracy and elo numbers (shown as a tooltip like the categories).
+const ACCURACY_INFO = "Mean retained move quality from the published public-data model. Forced moves are excluded and opening moves are included. Brilliant and other annotations do not alter numerical accuracy. Scores are estimates, not official platform scores.";
+const ELO_INFO = "Use recorded rating: SF18 performance relative to public full-game quality peers; short games are extrapolations. Moves only: estimated public blitz rating level from board and search evidence, with at least 10 nonforced decisions. These are different estimates, not official ratings. SF19 uses its separate moves-only model.";
+// Explanations for the engine settings (shown on hover, same tooltip as the accuracy panel).
 const ENGINE_INFO = {
   engineLines:   "How many candidate moves (lines) the engine panel shows for the position you're viewing. Extra lines are searched on demand — changing this doesn't re-analyze the game.",
-  classifyLines: "Lines searched per position during the analysis batch. 1 is fastest and is all the move classification needs; raising it measures your move in the same search (steadier accuracy/Elo) and pre-fills the panel. Re-analyzes the game.",
+  classifyLines: "Lines searched for annotation and candidate inspection. Calibrated SF18 numerical scores require one analysis line. Changing this re-analyzes the game.",
   engineDepth:   "How many plies (half-moves) deep Stockfish searches each position. Higher depth gives more accurate evaluations and fewer false mistakes, but takes longer.",
   engineWorkers: "Number of Stockfish instances analysing positions in parallel. More workers finish the game faster on multi-core CPUs; the results are identical.",
   fastAnalysis:  "Trades quality for speed: the classification pass uses fewer engine lines. ~1.3×/1.6× faster, but evals shift slightly and clean games can pick up a few false inaccuracies.",
@@ -128,7 +127,7 @@ const ENGINE_INFO = {
   clsMistakeLoss:"Minimum eval lost (pawns) for a move to qualify as a Mistake, and for a slip to be \"punishable\" (enabling a Great move or Missed chance on the reply).",
   clsMissTol:    "How close to giving back the whole advantage still counts as a Missed chance rather than a clean punish. Higher = more missed chances.",
 };
-
+// Slider value formatters reused by the Engine-tab classification/accuracy knobs.
 const pawnsFmt = (v) => (+v).toFixed(2).replace(/\.00$/, "") + " pawns";
 const ptsFmt = (v) => v + " pts";
 // Move-specific glyphs use the shared vector renderer; summary glyphs show an
@@ -203,7 +202,7 @@ function categoryText(text) {
 // under pieces-img/<set>/<code>.svg, where <code> is e.g. wK / bN (white King, black kNight). SVG =
 // crisp at any board size.
 const BUNDLED_PIECE_SETS = { image: "cburnett", merida: "merida" };
-
+// Retired board preferences migrate to retained flat-color boards.
 const REMOVED_BOARD_THEMES = {
   chesscom: "maple", // The retired source-matched option returns to Honeywood.
   kada_green: "green", kada_sand: "walnut", kada_amber: "maple",
@@ -271,33 +270,36 @@ const DEFAULT_SETTINGS = {
   moveAnim: true, animSpeed: 7,
   // Loading animation while the analysis runs (selectable style).
   loaderStyle: "wave",
-  
+  // Engine panel: how many candidate lines to show. The batch only searches the single best line
+  // (all the classification logic needs); extra lines are searched on demand for the position you're
+  // viewing, so changing this never re-analyzes — it just refreshes the panel.
+  // Default SF18 searches match the published depth16/Hash16 quality model.
   engineLines: 1, engineDepth: 16, enginePath: "nnue", engineHash: 16, engineSkill: 20,
   // Parallel analysis workers: independent single-threaded Stockfish instances that pull
   // positions from a shared queue. Each position is still searched identically (cold, same
   // depth/lines), so results are unchanged — only the wall-clock is parallelized. Default ≈
   // (CPU cores − 1), capped at 4.
   engineWorkers: Math.max(1, Math.min(4, ((typeof navigator !== "undefined" && navigator.hardwareConcurrency) || 4) - 1)),
-  
+  // Extra lines serve annotation and candidate inspection. Calibrated SF18 scores use one line.
   classifyLines: 1,
   // Fast analysis: kept for backwards compatibility, but now a no-op for line count — the batch
   // already searches a single line, so there are no extra lines to drop.
   fastAnalysis: false, fastLines: 3,
   // --- Move-classification thresholds (pawns of eval lost). The category logic (classifyMove /
-  
+  // getStandardRating) reads these live, so tweaking them re-labels the game WITHOUT re-analysing. ---
   clsGood: 0.4,        // eval lost ≥ this → at best "Good"
-  clsInacc: 0.8,       
+  clsInacc: 0.8,       // eval lost ≥ this → "Inaccuracy"
   clsBlunder: 4.0,     // eval lost ≥ this → "Blunder"
   clsClearAdv: 2.0,    // a "clear advantage" is this many pawns (drives Mistake / Miss / Great context)
   clsMistakeLoss: 1.2, // minimum eval lost for a move to count as a Mistake / a punishable slip
-  clsMissTol: 0.5,     
-  accExcellent: 90, accGood: 70, accInacc: 30, accMiss: 30, accMistake: 20, accBlunder: 0,
+  clsMissTol: 0.5,     // how close to giving back the whole advantage still counts as a Miss
+  ratingMode: "context",
 };
 // Keys reset by "Reset engine defaults" (everything in the Engine tab), and their default values.
 const ENGINE_SETTING_KEYS = [
   "engineDepth", "classifyLines", "engineLines", "engineWorkers", "enginePath", "engineHash", "engineSkill",
   "clsGood", "clsInacc", "clsBlunder", "clsClearAdv", "clsMistakeLoss", "clsMissTol",
-  "accExcellent", "accGood", "accInacc", "accMiss", "accMistake", "accBlunder",
+  "ratingMode",
 ];
 // Two single-threaded builds; the app parallelizes positions across independent workers.
 const ENGINE_BUILDS = { nnue: "engine/stockfish-nnue.js", sf19lite: "engine/stockfish-19-lite-single.js" };
@@ -315,7 +317,18 @@ const ARROW_COLOR = "#85ae4a";
 const USER_ARROW_COLOR = "#E89B3C";
 // Loading style → CSS variant. The keys are shown directly in the settings.
 const LOADERS = { dots: "pulse", bounce: "bounce", spinner: "spin", wave: "wave" };
-
+// Default placement of the movable modules (free canvas). Saved per user.
+// When LAYOUT_VERSION is bumped, saved layouts are reset to this default once.
+// v5: the user-arranged default (board on the left, panels stacked on the right).
+// v6: an animated coach portrait sits at the top of the right column, directly
+// above the insight ("information") panel; the rest of the right stack moved down.
+// v7: the user-tuned arrangement — controls tucked under the board, coach compact at
+// top-right, review spanning the top of the right stack, panels retuned around them.
+// v8: the automatic responsive layout is the default; a canvas layout is only used once the user
+// reorganizes (S.layoutMode "custom"), and then starts from a snapshot of the screen. These boxes
+// also define the desktop automatic layout and hidden-module snapshot fallback.
+// Geometry copied from the maintainer's saved unpacked-extension layout (October 2, 2026).
+// Accuracy and Engine use the expanded breakdown baseline; collapse shifts Engine up.
 const LAYOUT_VERSION = 8;
 const DEFAULT_LAYOUT = {
   board:    { x: 344,  y: 0,   w: 822, h: 934 },
@@ -337,8 +350,6 @@ const MINH = 56;         // minimum module height (px)
 // Per-module width floors that override MINW — the eval bar is a thin strip, so it may go narrow.
 const MOD_MINW = { evalbar: 16 };
 const modMinW = (key) => MOD_MINW[key] ?? MINW;
-
-const ELO_ANCHORS = [];
 
 const ICONS = {
   sun: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>`,
@@ -442,7 +453,9 @@ function shareGame(ev) {
 
 /* ---------------- Sound ---------------- */
 const _url = (p) => (browserAPI?.runtime?.getURL ? browserAPI.runtime.getURL(p) : p);
-
+// The 9 base effects (test bank under sounds/fx). [id, label, file]. Each board event picks one of
+// these (or the extension's original cue) and shapes it live with pitch + speed knobs — so the old
+// sped-up duplicate files are gone: one source per sound, tuned per event. See SOUND_EVENTS / fxConfig.
 const FX_SOUNDS = [
   ["01", "Sound 01", "sounds/fx/chess_sound_01.wav"],
   ["02", "Sound 02", "sounds/fx/chess_sound_02.wav"],
@@ -622,7 +635,7 @@ const S = {
   positions: [], clocks: [], evals: [], bests: [],
   classif: [], accMove: [], moveGrades: [], searchPreviews: [], _sacCache: [], _forcedCache: [],
   players: { w: {}, b: {} }, meSide: "w",
-  
+  // Both accuracy aliases use the public numerical model, independent of annotations.
   acc: { w: null, b: null }, accElo: { w: null, b: null }, counts: { w: {}, b: {} },
   bookCount: 0, opening: null, verdict: "Analyzing …",
   idx: 0, total: 0, flipped: false,
@@ -658,7 +671,7 @@ const S = {
 };
 let UI = {};
 let sqByName = {};
-
+// References to the loader/counter nodes so the panels can be updated in place during
 // the analysis — so the CSS animation doesn't restart for each analyzed move.
 let revRefs = null;
 let statsRefs = null;
@@ -839,27 +852,23 @@ function terminalScore(fen, plyIndex) {
   if (c.isDraw()) return { cp: 0 };
   return null;
 }
-function winPct(cp) { return NaN; }
-function moverWin(wr, mover) { return NaN; }
+function winPct(cp) { return Number.isFinite(cp) && CALIB?.quality?.outcome ? 100 * expectedPoints({cp}, CALIB.quality.outcome) : NaN; }
+function moverWin(wr, mover) { const wp = winPct(scoreToCp(wr)); return mover === "w" ? wp : 100 - wp; }
+function sideAccuracies() {
+  S.calibrated = calibratedReview(S.positions, S.bests, CALIB, S.players, S.settings.ratingMode || "context");
+  for (const side of ["w", "b"]) for (const move of S.calibrated[side].moves) S.accMove[move.ply] = move.quality;
+  return {w: S.calibrated.w.accuracy, b: S.calibrated.b.accuracy};
+}
 
-function moveAccuracy(d) { return null; }
-
-
-function stdev(arr) { return 0; }
-function harmonicMean(arr) { return null; }
-function weightedMean(vals, wts) { return null; }
-
-function powerMean(vals, wts, p, floor = 0) { return null; }
-
-function sideAccuracies() { return { w: null, b: null }; }
-
-const AGG_FEATURES = {};
-function learnedAccuracy(accs, vols, a) { return null; }
-
-
+/* ---------------- Move classification (adapted from Brilliant-Chess, MIT) -----------------------
+   Copyright (c) 2025 Delo <https://github.com/wdeloo>.
+   Full upstream copyright and permission notice: THIRD_PARTY_NOTICES.md.
+   The category chains use mover-relative evaluations. Brilliant is a separate, conservative
+   annotation: legal material-offer evidence plus soundness and competitive-position evidence.
+   It does not change the evaluation-based accuracy or rating inputs. */
 const SAC_VAL = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
 function _opp(c) { return c === "w" ? "b" : "w"; }
-
+// Material gain available to the side to move through captures on one square. Enumerating legal
 // moves handles pins, king safety, x-rays and promotion recaptures. This is bounded local exchange
 // evidence, not a tactical engine: checks/intermediate moves elsewhere belong to the engine eval.
 // A side can stop exchanging only when a legal move outside this capture sequence exists.
@@ -950,7 +959,7 @@ function isSacrifice(move) {
   }
   return false;
 }
-
+// Independent annotation policy, deliberately not coefficients fitted to recorded ratings.
 const BRILLIANT_POLICY = { minAfterPawns: -0.5, clearlyWinningPawns: 5 };
 function brilliantEligible(i, mover, std, wpDrop, state) {
   if (std[i] !== "excellent" || !Number.isFinite(wpDrop?.[i])) return false;
@@ -1018,9 +1027,12 @@ function _moveLoss(k, state = S) {
   const a = _evalPawns(k - 1, m, state), b = _evalPawns(k, m, state);
   return (a == null || b == null) ? null : a - b;
 }
-
+// Baseline bucket on the WIN%-DROP (the "expected points" model),
+// not raw pawns: losing 0.8 pawns at +0.2 is a real slip, but at +6 it's nothing. Thresholds are
+// in win% points (0–100); defaults mirror the standard table (≤2 excellent … >20 blunder,
+// with the add-on deriving Mistake from the clear-advantage logic). Overridable via calibration.json.
 function getStandardRating(wp) {
-  if (wp == null) return null;
+  if (!Number.isFinite(wp)) return null;
   const t = (typeof CALIB !== "undefined" && CALIB?.clsWp) || { good: 2, inacc: 5, blunder: 20 };
   let r = "excellent";
   if (wp >= t.good) r = "good";
@@ -1028,7 +1040,7 @@ function getStandardRating(wp) {
   if (wp >= t.blunder) r = "blunder";
   return r;
 }
-
+// Per-ply move category, ported from getMoveRating(). `mover` made move i; `isTop` = it was the
 // engine's #1; `book` = the resulting position is theory; arrays sac/std/loss are indexed by ply.
 function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop, state = S) {
   if (book) return "book";
@@ -1089,12 +1101,16 @@ function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop, state = S) 
   if (notMateRel && std[i] === "inacc" && loss[i] >= ML && givingAdvAt(i)) return "mistake";                 // handed over a clear advantage
   if (!mate(i - 1) && mate(i) && !winningNow && (evalFor(i - 1) ?? 0) > -CA) return "mistake";               // walked into a mate (wasn't already lost)
   if (!mate(i - 1) && mate(i) && !winningNow) return "blunder";                                              // walked into a mate
-  if (mate(i - 1) && mate(i) && !winningNow && prevWinning) return "blunder";                                
+  if (mate(i - 1) && mate(i) && !winningNow && prevWinning) return "blunder";                                // threw a win straight into a mate
+
+  // Split the medium-error band the way the expected-points model does: a 10–20% win-drop
+  // is a Mistake, 5–10% an Inaccuracy. (Done only here, at the plain-move fallback, so the relational
+  // great/miss chains above are untouched.) Threshold from calibration.json.
   if (std[i] === "inacc" && wpDrop && wpDrop[i] != null) {
     const mistWp = (typeof CALIB !== "undefined" && CALIB?.clsWp?.mistake) || 10;
     if (wpDrop[i] >= mistWp) return "mistake";
   }
-  return std[i];   
+  return std[i];   // plain excellent / good / inaccuracy / blunder
 }
 
 // Include the played game's history before the branch so Great/Miss/Brilliant
@@ -1134,19 +1150,6 @@ function variationOpening() {
   return opening;
 }
 
-
-function catAcc(cls) {
-  switch (cls) {
-    case "brilliant": case "great": case "best": case "book": return 100;
-    case "excellent": return S.settings.accExcellent;
-    case "good": return S.settings.accGood;
-    case "inacc": return S.settings.accInacc;
-    case "miss": return S.settings.accMiss;
-    case "mistake": return S.settings.accMistake;
-    case "blunder": return S.settings.accBlunder;
-    default: return null;
-  }
-}
 // Sacrifice/forced are functions of the board only (not the eval), so they're cached per ply for
 // the whole analysis — computeDerived runs many times while the batch fills in, and isSacrifice is
 // the one non-trivial cost here. Caches are reset whenever a new game's positions are built.
@@ -1166,13 +1169,16 @@ function _forcedAt(i, state = S) {
   state._forcedCache[i] = v;
   return v;
 }
-
+// Estimated ratings are reported in steps of 50, so we quantize to the NEAREST 50 (round-to-nearest
 // keeps the average bias ~0; a ceiling would add a spurious ~+26 upward bias for nothing).
 const round50 = (v) => Math.round(v / 50) * 50;
-
-function estimateEloFromAcc(acc) { return null; }
-
-function estimateElo(acc, rating) { return null; }
+// Display rounding is separate from the full-precision published models.
+function estimateElo(acc, rating, side = null) {
+  if (acc == null) return null;
+  side ||= ["w", "b"].find(color => Number(S.players[color]?.rating) === Number(rating));
+  const value = S.calibrated?.[side]?.rating;
+  return Number.isFinite(value) ? round50(Math.max(0, Math.min(5000, value))) : null;
+}
 
 function classifyLine(state) {
   const N = state.total;
@@ -1185,7 +1191,7 @@ function classifyLine(state) {
   // forward pass to fill std/loss/sac/isTop is enough; a second pass assigns the final category.
   const std = new Array(N + 1).fill(null);
   const loss = new Array(N + 1).fill(null);
-  const wpDrop = new Array(N + 1).fill(null); 
+  const wpDrop = new Array(N + 1).fill(null); // win%-drop per ply ("expected points" basis)
   const sac = new Array(N + 1).fill(false);
   const isTop = new Array(N + 1).fill(false);
   const bookAt = new Array(N + 1).fill(false);
@@ -1203,21 +1209,23 @@ function classifyLine(state) {
     const bestSearch = state.bests[i - 1];
     const before = state.evals[i - 1];
 
-    
+    // Annotation evidence uses the completed played-root score when present.
+    // Consecutive evaluations remain available for Explore annotations.
     if (bestSearch && before) {
       const playedUci = (state.positions[i].from || "") + (state.positions[i].to || "") + (state.positions[i].promotion || "");
       const lines = bestSearch.lines || [];
       const winBefore = lines.length ? winPct(scoreToCp(lines[0].score)) : moverWin(before, mover);
       let winAfter = null;
+      if (bestSearch.playedScore) winAfter = winPct(scoreToCp(bestSearch.playedScore));
       for (const ln of lines) { if ((ln.pv || "").split(" ")[0] === playedUci) { winAfter = winPct(scoreToCp(ln.score)); break; } }
       if (winAfter == null && state.evals[i]) winAfter = moverWin(state.evals[i], mover);
-      if (winAfter != null) { state.accMove[i] = moveAccuracy(Math.max(0, winBefore - winAfter) * calAccMult(state.players[mover]?.rating)); wpDrop[i] = Math.max(0, winBefore - winAfter); }
+      if (winAfter != null) wpDrop[i] = Math.max(0, winBefore - winAfter);
       const bestUci = bestSearch.bestmove || "";
       isTop[i] = !!bestUci && bestUci === playedUci;
     }
 
     loss[i] = _moveLoss(i, state);
-    std[i] = getStandardRating(wpDrop[i]);   
+    std[i] = getStandardRating(wpDrop[i]);   // bucket on win%-drop, not raw pawns
     sac[i] = _sacAt(i, state);
   }
   // Second pass: final category per ply (Brilliant-Chess logic). A move stays unlabelled until both
@@ -1243,7 +1251,7 @@ function computeDerived() {
   classifyLine(S);
   const completedClasses = S.classif;
   // Provisional searches affect the visible annotation only. Keep completed
-  
+  // evaluations, accuracy/rating inputs and saved search results untouched.
   if (S.searchPreviews.some(Boolean)) {
     const preview = { ...S,
       evals: S.evals.map((e, i) => S.searchPreviews[i] ? whiteRel(S.searchPreviews[i].score, S.positions[i].fen) : e),
@@ -1254,20 +1262,15 @@ function computeDerived() {
     S.classif = preview.classif; S.moveGrades = preview.moveGrades;
   }
   const N = S.total;
-  const eloAccs = sideAccuracies();   
+  const eloAccs = sideAccuracies();
   for (const side of ["w", "b"]) {
     const counts = {}; QUALITY_ORDER.forEach((k) => (counts[k] = 0));
-    const catScores = [];
     for (let i = 1; i <= N; i++) {
       if (S.positions[i].color !== side) continue;
       const c = S.classif[i];
       if (c) counts[c]++;
-      const a = catAcc(completedClasses[i]);
-      if (a != null) catScores.push(a);
     }
-    
-    const catAvg = catScores.length ? catScores.reduce((a, b) => a + b, 0) / catScores.length : null;
-    S.acc[side] = (CALIB?.display === "winpct") ? calAccBias(eloAccs[side], S.players[side]?.rating) : catAvg;
+    S.acc[side] = eloAccs[side];
     S.accElo[side] = eloAccs[side];
     S.counts[side] = counts;
   }
@@ -1403,7 +1406,9 @@ function buildUI() {
   window.addEventListener("resize", () => { fitEnginePanel(); growCanvas(); alignPlayers(); positionSettings(); });
 }
 
-
+/* ---------------- Loading indicator ----------------
+   Selectable animation shown in place of the accuracy/elo number while Stockfish
+   is still analyzing. The color is inherited from the parent (currentColor). */
 function loaderNode(extraClass = "", color = null) {
   const variant = LOADERS[S.settings.loaderStyle] || "pulse";
   const props = { class: "ld ld-" + variant + (extraClass ? " " + extraClass : "") };
@@ -1428,10 +1433,10 @@ function makeMod(key, ...inner) {
   return mod;
 }
 let _saveLayoutT = null;
-
-
+// Persist the EXPANDED layout baseline. While the accuracy breakdown is collapsed, S.layout holds
+// the shrunk geometry (accuracy panel shorter, modules below pulled up by `delta`). Saving that
 // as-is would let the next boot's collapse subtract `delta` a second time, so each session the
-
+// modules below Accuracy (e.g. the Engine panel) would creep upward. Adding the offset back before
 // persisting keeps the stored baseline expanded, so the boot collapse subtracts `delta` exactly once.
 function layoutForSave() {
   if (!S._accReflow) return S.layout;
@@ -1481,7 +1486,7 @@ function snapshotLayout() {
   const desktop = UI.canvas.classList.contains("desktop-layout");
   for (const mod of UI.canvas.querySelectorAll(".mod")) {
     if (desktop) {
-      
+      // These boxes already have exact geometry, including the collapsed Accuracy panel.
       // Measuring at browser zoom can turn 294px into 293.993px; snapping down then
       // shrinks the panel by 2px and introduces scrollbars when Reorganize is opened.
       out[mod.getAttribute("data-mod")] = {
@@ -1512,8 +1517,8 @@ function growCanvas() {
   UI.canvas.style.minHeight = pageH - TOPBAR_H + "px";
   UI.canvas.style.minWidth = pageW + "px";
 }
-
-
+// What collapsing the accuracy breakdown is worth on the canvas: the hidden rows' height (+ the
+// column row-gap), and every module in the same column sitting at/below the accuracy panel.
 function accuracyReflowInfo(layout = S.layout) {
   const accMod = UI.canvas.querySelector('.mod[data-mod="accuracy"]');
   const acc = layout.accuracy;
@@ -1530,7 +1535,7 @@ function accuracyReflowInfo(layout = S.layout) {
   }
   return { delta, belowKeys };
 }
-
+// Keep the Accuracy module and everything stacked below it glued together when the category list
 // expands/collapses on the custom canvas (the automatic layout reflows on its own). The saved
 // layout is sized for the EXPANDED list, so that's the baseline: collapsing SHRINKS the module by
 // the hidden rows' height and pulls every module below it up by the same amount (constant gap);
@@ -2628,7 +2633,7 @@ function playerStrip(side) {
     advText ? el("span", { class: "adv" }, advText) : null);
   // Avatar: the player's country flag when we scraped one off chess.com, otherwise the original
   // username-initial chip. (Lichess and pasted-PGN games carry no country, so they keep the chip.)
-  
+  // Hovering the flag shows the country name in the same styled tooltip the accuracy panel uses.
   const avatar = p.country
     ? el("img", { class: "avatar avatar-flag", src: _url(`flags/${p.country}.svg`), alt: p.countryName || "", draggable: "false",
         onmouseenter: p.countryName ? (e) => showLabelTip(e.currentTarget, p.countryName) : null,
@@ -2711,7 +2716,11 @@ function renderControls() {
   );
 }
 
-
+/* ---------------- Insight panel (move commentary + practice coaching) ----------------
+   Replaces the old accuracy/verdict mini. As you step through the game it narrates the
+   move you're on ("Bd4 is a mistake", "Be7 is excellent"), typed out for a live feel. The
+   opening name stays at the top, and during practice this panel becomes the coach: it tells
+   you what to do and surfaces a Hint button after a few failed tries. */
 
 // Natural phrasing for the move that led to the current position, keyed by classification.
 const COMMENT_PHRASE = {
@@ -3254,7 +3263,7 @@ function renderPracticeCoach() {
   return body;
 }
 
-
+/* ---------------- Accuracy + breakdown ---------------- */
 // Small explanation tooltip for a move category. Anchored to the row (preferably on the
 // left; otherwise on the right if there's no room), and kept within the screen.
 function tipEl() {
@@ -3308,7 +3317,7 @@ function hideQTip() {
   const tip = document.querySelector(".q-tip");
   if (tip) tip.classList.remove("show");
 }
-
+// Clicking a count in the accuracy breakdown jumps to that player's FIRST move of that category
 // (e.g. your first Blunder). A category with a 0 count finds no ply and does nothing — so clicking
 // the opponent's "0 blunders" is a harmless no-op, exactly as expected.
 function firstPlyForCategory(side, k) {
@@ -3403,9 +3412,8 @@ function renderStats() {
   }
   const opSide = S.meSide === "w" ? "b" : "w";
   const meAcc = S.acc[S.meSide], opAcc = S.acc[opSide];
-  
   const meRating = S.players[S.meSide]?.rating, opRating = S.players[opSide]?.rating;
-  const meEloAcc = calAccBias(S.accElo[S.meSide], meRating), opEloAcc = calAccBias(S.accElo[opSide], opRating);
+  const meEloAcc = S.accElo[S.meSide], opEloAcc = S.accElo[opSide];
   // Compact list by default; the expander arrow unfolds the whole list (incl. book moves).
   const list = S.qbreakExpanded ? QBREAK_FULL : QBREAK_SUMMARY;
 
@@ -3455,7 +3463,7 @@ function renderStats() {
             ? loaderNode("acc-val", "var(--accent)")
             : el("span", { class: "acc-val", style: { color: "var(--accent)" }, onmouseenter: (e) => showInfoTip(e.currentTarget, "Accuracy", ACCURACY_INFO), onmouseleave: hideQTip }, meAcc == null ? "—" : meAcc.toFixed(1)),
           el("span", { class: "acc-bar" }, el("i", { style: { width: (S.analyzing ? 0 : (meAcc || 0)) + "%", background: "var(--accent)" } })),
-          el("span", { class: "est-rating", onmouseenter: (e) => showInfoTip(e.currentTarget, "Estimated Elo", ELO_INFO), onmouseleave: hideQTip }, S.analyzing ? "≈ ··· elo" : "≈ " + (estimateElo(meEloAcc, meRating) ?? "—") + " elo")),
+          el("span", { class: "est-rating", onmouseenter: (e) => showInfoTip(e.currentTarget, "Estimated Elo", ELO_INFO), onmouseleave: hideQTip }, S.analyzing ? "≈ ··· elo" : "≈ " + (estimateElo(meEloAcc, meRating, S.meSide) ?? "—") + " elo")),
         el("span", { class: "acc-vs" }, "VS"),
         el("div", { class: "acc-cell right" },
           el("span", { class: "acc-name" }, S.players[opSide].name),
@@ -3463,7 +3471,7 @@ function renderStats() {
             ? loaderNode("acc-val", "var(--accent)")
             : el("span", { class: "acc-val", style: { color: "var(--ink-2)" }, onmouseenter: (e) => showInfoTip(e.currentTarget, "Accuracy", ACCURACY_INFO), onmouseleave: hideQTip }, opAcc == null ? "—" : opAcc.toFixed(1)),
           el("span", { class: "acc-bar" }, el("i", { style: { width: (S.analyzing ? 0 : (opAcc || 0)) + "%", background: "var(--ink-3)", marginLeft: (100 - (S.analyzing ? 100 : (opAcc || 0))) + "%" } })),
-          el("span", { class: "est-rating", onmouseenter: (e) => showInfoTip(e.currentTarget, "Estimated Elo", ELO_INFO), onmouseleave: hideQTip }, S.analyzing ? "≈ ··· elo" : "≈ " + (estimateElo(opEloAcc, opRating) ?? "—") + " elo")),
+          el("span", { class: "est-rating", onmouseenter: (e) => showInfoTip(e.currentTarget, "Estimated Elo", ELO_INFO), onmouseleave: hideQTip }, S.analyzing ? "≈ ··· elo" : "≈ " + (estimateElo(opEloAcc, opRating, opSide) ?? "—") + " elo")),
       ),
       qbreak,
     ),
@@ -3719,7 +3727,7 @@ function renderMoves() {
   UI.movesBody.replaceChildren(list);
   // The Moves header stays clean — no "Start" placeholder and no running current-move readout.
   UI.movesCount.textContent = "";
-  
+  // Book moves are now shown in the Accuracy breakdown (expanded), no longer here in "Moves".
   UI.movesFoot.hidden = true;
   // auto-scroll to the current move
   highlightCurrentMove(true);
@@ -3887,7 +3895,7 @@ function metaChips() {
 
 /* ---------------- Settings ---------------- */
 // A setting label. If `info` is given, hovering it shows the same explanation tooltip as the
-
+// accuracy panel (with a subtle dotted underline to hint it's there).
 function setLabel(label, info) {
   const props = { class: "set-lbl" + (info ? " has-info" : "") };
   if (info) {
@@ -4191,7 +4199,7 @@ function engineSlider(label, key, min, max, step, opts = {}) {
     }),
   );
 }
-
+// A live-tuning slider for the classification / accuracy knobs: saves the value and re-labels the
 // game from the already-searched evals — no engine work, so dragging gives instant feedback.
 function clsSlider(label, key, min, max, step, opts = {}) {
   const fmt = opts.fmt || ((v) => String(v));
@@ -4211,7 +4219,7 @@ function clsSlider(label, key, min, max, step, opts = {}) {
   );
 }
 let _clsT = null;
-
+// Re-run only the classification + accuracy (computeDerived) on the existing engine evals and
 // refresh everything the labels feed. Debounced so dragging a slider stays smooth.
 function applyClassificationChange() {
   if (!S.positions || !S.positions.length) return;
@@ -4474,15 +4482,12 @@ function motorSettings() {
       clsSlider("Mistake min. loss", "clsMistakeLoss", 0.5, 3, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsMistakeLoss }),
       clsSlider("Miss tolerance", "clsMissTol", 0, 1.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsMissTol }),
     ),
-    section("Accuracy points",
-      el("div", { class: "set-row hint" },
-        el("span", { class: "set-note" }, "These per-move scores are averaged when category-based accuracy is active (Best / Brilliant / Great / Book are always 100). Win%-based accuracy instead uses the engine evaluations.")),
-      clsSlider("Excellent", "accExcellent", 0, 100, 1, { fmt: ptsFmt }),
-      clsSlider("Good", "accGood", 0, 100, 1, { fmt: ptsFmt }),
-      clsSlider("Inaccuracy", "accInacc", 0, 100, 1, { fmt: ptsFmt }),
-      clsSlider("Missed chance", "accMiss", 0, 100, 1, { fmt: ptsFmt }),
-      clsSlider("Mistake", "accMistake", 0, 100, 1, { fmt: ptsFmt }),
-      clsSlider("Blunder", "accBlunder", 0, 100, 1, { fmt: ptsFmt }),
+    section("Estimated rating",
+      el("div", { class: "set-row" }, setLabel("Rating mode", ELO_INFO),
+        ddField(S.settings.ratingMode || "context", [["context", "Use recorded rating"], ["moves", "Moves only"]], value => setEngineSetting("ratingMode", value))),
+      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "SF18 can use recorded rating as context. Moves only estimates public blitz rating level. SF19 uses its separate moves-only model.")),
+      (S.settings.enginePath === "nnue" && (S.settings.engineDepth !== 16 || S.settings.engineHash !== 16 || S.settings.engineSkill !== 20 || S.settings.classifyLines !== 1))
+        ? el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Use depth 16, hash 16 MB, maximum strength and 1 analysis line for calibrated SF18 numerical scores.")) : null,
     ),
     section("Engine",
       el("div", { class: "set-row" },
@@ -4498,6 +4503,8 @@ function motorSettings() {
             el("span", { class: "set-note" },
               `⚠ At least one worker couldn't start "${ENGINE_NAME[S.settings.enginePath] || S.settings.enginePath}" and used ${ENGINE_NAME[S.engineFallbackBuild] || S.engineFallbackBuild} instead.`))
         : null,
+      S.settings.enginePath === "sf19lite" ? el("div", { class: "set-row hint" },
+        el("span", { class: "set-note" }, "SF19 reviews use fixed calibration settings at full strength. Depth and hash controls affect the live engine panel.")) : null,
       engineSlider("Strength (Skill)", "engineSkill", 0, 20, 1, { fmt: (v) => (v >= 20 ? "Max (20)" : String(v)), info: ENGINE_INFO.engineSkill }),
       engineSlider("Hash (MB)", "engineHash", 16, 256, 16, { fmt: (v) => v + " MB", info: ENGINE_INFO.engineHash }),
       el("div", { class: "set-row hint" },
@@ -5062,7 +5069,10 @@ function practiceAttempt(from, to) {
   }
 }
 
-
+/* ---------------- Library (left hover-sidebar) ----------------
+   Every fully-analyzed game is saved to browserAPI.storage.local under "library". The sidebar
+   lives off the left edge and slides in on hover; games can be sorted (recent / your accuracy /
+   opponent rating) and filtered (result, time class). Clicking a game re-opens it for analysis. */
 // Preserve existing PGN-based library IDs.
 function simpleHash(str) {
   let h = 5381;
@@ -5095,7 +5105,7 @@ function currentGameId() {
 }
 
 function analysisSettingsKey() {
-  return JSON.stringify(["history-v1", S.settings.enginePath, S.settings.engineDepth, S.settings.classifyLines,
+  return JSON.stringify(["public-scoring-v1", CALIB?.version, S.settings.ratingMode, S.settings.enginePath, S.settings.engineDepth, S.settings.classifyLines,
     S.settings.engineHash, S.settings.engineSkill]);
 }
 
@@ -5108,7 +5118,8 @@ function completeAnalysis(saved, count) {
 function canRestoreAnalysis(saved) {
   return completeAnalysis(saved, S.total + 1) && saved.pgn === S.pgn
     && (!saved.engineBuild || Object.hasOwn(ENGINE_BUILDS, saved.engineBuild))
-    && saved.settingsKey === analysisSettingsKey();
+    && saved.settingsKey === analysisSettingsKey()
+    && scoringEvidenceComplete(saved.bests, S.total, CALIB);
 }
 
 function saveToLibrary() {
@@ -5374,7 +5385,7 @@ async function startAnalysis() {
 
   // The classification logic needs only the single best line, so the batch defaults to MultiPV=1
   // (markedly faster than the old ≥4); the engine panel fills extra lines on demand. The user can
-  
+  // raise "Analysis lines" (classifyLines) to search more per position for steadier accuracy/Elo.
   const multipv = Math.max(1, Math.min(ENGINE_MAX_LINES, S.settings.classifyLines || 1));
   S.analyzedMultipv = multipv; // remember how many lines this run computed (for setEngineSetting)
   const nWorkers = Math.max(1, Math.min(S.settings.engineWorkers || 1, S.total + 1));
@@ -5410,11 +5421,15 @@ async function startAnalysis() {
       if (i > S.total) return;
       const terminal = terminalScore(S.positions[i].fen, i);
       const res = terminal ? { score: terminal, bestmove: null, pv: "", lines: [] }
-        : await eng.analyse(S.positions[i].fen, S.settings.engineDepth, multipv, searchHistory(S.positions, i), preview => {
+        : await analyseCalibratedPosition(eng, {fen: S.positions[i].fen, history: searchHistory(S.positions, i),
+          played: i < S.total ? S.positions[i + 1].from + S.positions[i + 1].to + (S.positions[i + 1].promotion || "") : null,
+          settings: S.settings, calibration: CALIB,
+          needMovesOnly: S.settings.ratingMode === "moves" || !Number(S.players.w?.rating) || !Number(S.players.b?.rating),
+          onProgress: preview => {
           if (gen !== S.batchGen) return;
           S.searchPreviews[i] = preview;
           requestProgress(gen);
-        });
+        }});
       if (gen !== S.batchGen) return;
       S.bests[i] = res;
       S.searchPreviews[i] = null;
@@ -5669,7 +5684,10 @@ async function resetLegacyZoom() {
 }
 (async function main() {
   try {
-    
+    // Only the job + stored prefs are needed to build and show the UI. The opening book (~690 KB)
+    // and the calibration file are only consumed once scoring/opening refinement runs, so we load
+    // them in parallel and don't block the first paint on them — buildUI() can run as soon as the
+    // job and settings are in, while the book is still downloading.
     const dataReady = Promise.all([loadBook(), loadCalibration()]);
     const [payload, store] = await Promise.all([loadJob(), browserAPI.storage.local.get(["settings", "username", "layout", "layoutMode", "layoutVersion", "library"])]);
     S.library = Array.isArray(store.library) ? store.library : [];
@@ -5704,7 +5722,7 @@ async function resetLegacyZoom() {
     }
     // The 5-line option was removed — clamp any stored value to the new max.
     if (S.settings.engineLines > ENGINE_MAX_LINES) { S.settings.engineLines = ENGINE_MAX_LINES; browserAPI.storage.local.set({ settings: S.settings }); }
-    
+    // Migrate the retired experimental analysis-line preference.
     if (S.settings.mpv2Calibrated) {
       if (S.settings.classifyLines === 2) S.settings.classifyLines = 1;
       delete S.settings.mpv2Calibrated;
@@ -5723,7 +5741,9 @@ async function resetLegacyZoom() {
     // page in one frame. Any await in that gap lets the empty shell paint first, and since the
     // Moves panel is the only module whose header is built in buildUI() (the rest are empty mounts
     // filled by renderAll()), that intermediate frame showed the Moves panel sitting on its own.
-    await dataReady;         
+    await dataReady;         // book + calibration (downloaded in parallel; usually already resolved)
+    // Resolve any stored analysis for this game by id (same derivation as currentGameId(), but from
+    // the payload since S isn't populated yet) so applyGame() needs no lookup await of its own.
     if (!("analysis" in payload)) {
       let saved = null;
       try {

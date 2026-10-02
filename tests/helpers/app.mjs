@@ -4,6 +4,9 @@ import { JSDOM } from 'jsdom';
 import { Chess } from '../../lib/chess.js';
 import { flagCodeForCountryId, countryNameForId } from '../../flags.js';
 import { BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg } from '../../move-grades.js';
+import {expectedPoints} from '../../lib/public-scoring.js';
+import {calibratedReview,scoringEvidenceComplete} from '../../lib/calibrated-review.js';
+import {analyseCalibratedPosition} from '../../lib/calibrated-search.js';
 
 // Execute the real application in a DOM, stubbing only browser/engine boundaries.
 // Automatic startup and imports are omitted; production needs no test exports.
@@ -29,6 +32,7 @@ export function app(t) {
     getComputedStyle: dom.window.getComputedStyle, performance, structuredClone,
     URL, TextEncoder, btoa, console, Chess, flagCodeForCountryId, countryNameForId, browserAPI,
     BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg,
+    expectedPoints, calibratedReview, scoringEvidenceComplete, analyseCalibratedPosition,
     Engine: class { constructor() { throw Error('Unexpected real engine'); } },
     fetch: async () => { throw Error('Unexpected network access'); },
     requestAnimationFrame: () => 0, cancelAnimationFrame() {},
@@ -39,7 +43,8 @@ export function app(t) {
   const run = code => vm.runInContext(code, context);
   const state = run('S');
   Object.assign(state.settings, { sound: false, moveAnim: false, coach: '', showThreat: false, engineDepth: 4 });
-  run('BOOK = {}; CALIB = { clsWp: { good: 2, inacc: 5, mistake: 10, blunder: 20 } };');
+  context.__publicCalibration = JSON.parse(fs.readFileSync(new URL('../../data/calibration.json', import.meta.url), 'utf8'));
+  run('BOOK = {}; CALIB = { ...__publicCalibration, quality: { ...__publicCalibration.quality, outcome: { slopePerPawn: 0.3 } } };');
   const replace = (name, fn) => { context.__replacement = fn; run(`${name} = __replacement`); delete context.__replacement; };
   t.after(() => { for (const id of timers) clearTimeout(id); dom.window.close(); });
   return { run, state, context, dom, store, writes, replace, call: (name, ...args) => run(name)(...args) };
@@ -74,5 +79,5 @@ export function deferred() {
 export async function settle() { for (let i = 0; i < 12; i++) await Promise.resolve(); }
 
 export function fakeEngine(analyse = async () => ({ score: { cp: 0 }, bestmove: 'e2e4', lines: [] })) {
-  return { dead: false, analyse, stop() {}, cancelPending() {}, terminate() { this.dead = true; } };
+  return { dead: false, analyse, async setOptions() {}, stop() {}, cancelPending() {}, terminate() { this.dead = true; } };
 }

@@ -128,6 +128,7 @@ export class Engine {
 
   _onLine(line) {
     if (!line || this.dead) return;
+    if (line.startsWith("id name ")) this.identity = line.slice(8);
     if (line.includes("uciok")) {
       this._send("isready");
       return;
@@ -139,6 +140,10 @@ export class Engine {
         this._onReady = null;
         this._onFail = null;
         ready();
+      }
+      if (this.current?.awaitingReady) {
+        this.current.awaitingReady = false;
+        this._beginSearch(this.current);
       }
       this._pump();
       return;
@@ -154,8 +159,10 @@ export class Engine {
         const pv = pvMatch ? pvMatch[1].trim() : "";
         const depth = parseInt((line.match(/ depth (\d+)/) || [])[1] || "0", 10);
         const bound = (line.match(/\b(lowerbound|upperbound)\b/) || [])[1] || "exact";
-        this.current.lines[mpv] = { score, pv, depth, bound, multipv: mpv };
-        if (mpv === 1) {
+        if (!this.current.requireExact || bound === "exact") {
+          this.current.lines[mpv] = { score, pv, depth, bound, multipv: mpv };
+        }
+        if (mpv === 1 && (!this.current.requireExact || bound === "exact") && (!this.current.requireExact || pv)) {
           this.current.lastScore = score;
           if (pv) this.current.lastPv = pv;
         }
@@ -180,6 +187,11 @@ export class Engine {
       const lines = Object.keys(job.lines)
         .sort((a, b) => +a - +b)
         .map((k) => job.lines[k]);
+      if (job.requireExact && (!job.lastScore || (job.searchMove && best !== job.searchMove))) {
+        job.reject(new Error("Missing exact completed scoring evidence"));
+        this._pump();
+        return;
+      }
       job.resolve({
         bestmove: best && best !== "(none)" ? best : null,
         score: job.lastScore || { cp: 0 },
@@ -191,10 +203,12 @@ export class Engine {
   }
 
   _parseScore(line) {
+    const wdl = line.match(/\bwdl (\d+) (\d+) (\d+)/);
+    const extra = wdl ? { wdl: wdl.slice(1).map(Number) } : {};
     const cp = line.match(/ score cp (-?\d+)/);
-    if (cp) return { cp: parseInt(cp[1], 10) };
+    if (cp) return { cp: parseInt(cp[1], 10), ...extra };
     const mate = line.match(/ score mate (-?\d+)/);
-    if (mate) return { mate: parseInt(mate[1], 10) };
+    if (mate) return { mate: parseInt(mate[1], 10), ...extra };
     return null;
   }
 
@@ -208,8 +222,19 @@ export class Engine {
       this._send(`setoption name MultiPV value ${this.multipv}`);
     }
     this._send("ucinewgame");
+    if (job.cold) {
+      this._send("setoption name Clear Hash");
+      job.awaitingReady = true;
+      this._send("isready");
+      return;
+    }
+    this._beginSearch(job);
+  }
+
+  _beginSearch(job) {
     this._send(job.positionCommand);
-    this._send(`go depth ${job.depth}`);
+    const budget = job.budget || { kind: "depth", value: job.depth };
+    this._send(`go ${budget.kind} ${budget.value}` + (job.searchMove ? ` searchmoves ${job.searchMove}` : ""));
   }
 
   /**
@@ -220,12 +245,19 @@ export class Engine {
    * Optional onProgress receives throttled provisional exact PV snapshots. It
    * never changes the completed result returned by this promise.
    */
-  async analyse(fen, depth = 12, multipv = 1, history = null, onProgress = null) {
+  async analyse(fen, depth = 12, multipv = 1, history = null, onProgress = null, options = {}) {
     const command = positionCommand(fen, history);
+    const { searchMove = null, budget = null, cold = false, requireExact = false } = options;
+    if (budget && (!['nodes', 'depth'].includes(budget.kind) || !Number.isSafeInteger(budget.value) || budget.value < 1)) throw Error("Invalid search budget");
+    if (searchMove) {
+      const legal = new Chess(fen).moves({ verbose: true }).map(move => move.from + move.to + (move.promotion || ""));
+      if (!legal.includes(searchMove) || multipv !== 1) throw Error("Invalid restricted search move");
+    }
     await this._ready;
     if (this.dead) throw new Error("engine is no longer running");
     return new Promise((resolve, reject) => {
-      this.queue.push({ fen, positionCommand: command, depth, multipv, resolve, reject, onProgress, lastScore: null, lastPv: "", lines: {} });
+      this.queue.push({ fen, positionCommand: command, depth, multipv, resolve, reject, onProgress,
+        searchMove, budget, cold, requireExact, lastScore: null, lastPv: "", lines: {} });
       this._pump();
     });
   }

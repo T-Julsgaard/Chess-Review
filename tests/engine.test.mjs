@@ -124,3 +124,28 @@ test('setup-FEN history retains underpromotion and rejects a mismatched or malfo
   assert.throws(()=>positionCommand(chess.fen(),{initialFen,moves:['a7a8q']}),/does not reach/);
   assert.throws(()=>positionCommand(chess.fen(),{initialFen,moves:['a7a8n\ngo infinite']}),/Invalid history move/);
 });
+
+test('cold restricted scoring waits for readyok, retains exact WDL and honors the node budget', async t => {
+  const eng = engine(t), fen = new Chess().fen();
+  const pending = eng.analyse(fen, 16, 1, {initialFen: fen, moves: []}, null,
+    {cold: true, requireExact: true, budget: {kind: 'nodes', value: 20000}, searchMove: 'e2e4'});
+  await Promise.resolve();
+  assert.ok(eng.worker.commands.includes('setoption name Clear Hash'));
+  assert.ok(!eng.worker.commands.some(command => command.startsWith('go ')));
+  eng.worker.line('readyok');
+  assert.equal(eng.worker.commands.at(-1), 'go nodes 20000 searchmoves e2e4');
+  eng.worker.line('info depth 12 score cp 20 wdl 200 600 200 pv e2e4');
+  eng.worker.line('info depth 13 score cp 999 lowerbound wdl 900 100 0 pv e2e4');
+  eng.worker.line('bestmove e2e4');
+  assert.deepEqual((await pending).score, {cp: 20, wdl: [200, 600, 200]});
+});
+
+test('scoring rejects absent exact evidence and illegal restrictions', async t => {
+  const eng = engine(t), fen = new Chess().fen();
+  await assert.rejects(eng.analyse(fen, 16, 1, null, null, {searchMove: 'a1a8'}), /Invalid restricted/);
+  const pending = eng.analyse(fen, 16, 1, null, null, {requireExact: true});
+  await Promise.resolve();
+  eng.worker.line('info depth 16 score cp 30 lowerbound pv e2e4');
+  eng.worker.line('bestmove e2e4');
+  await assert.rejects(pending, /exact completed/);
+});

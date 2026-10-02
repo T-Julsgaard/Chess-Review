@@ -233,7 +233,7 @@ test('brilliant annotations preserve evaluation-based accuracy and rating predic
   assert.equal(S.classif[1], 'excellent');
   S._sacCache[1] = true; a.call('computeDerived'); assert.equal(S.classif[1], 'brilliant');
   assert.deepEqual({ accuracy: S.acc.w, rating: rating(), moveAccuracy: S.accMove[1] }, before);
-  a.run('CALIB = { ...CALIB, display: "categories" }'); a.call('computeDerived'); assert.equal(S.acc.w, 100);
-  S._sacCache[1] = false; a.call('computeDerived'); assert.equal(S.acc.w, S.settings.accExcellent);
+  S._sacCache[1] = false; a.call('computeDerived');
+  assert.equal(S.acc.w, before.accuracy);
   assert.equal(rating(), before.rating);
 });

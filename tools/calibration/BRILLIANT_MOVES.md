@@ -2,8 +2,7 @@
 
 Brilliant is an explanation of a strong voluntary piece sacrifice. It is a move
 annotation, separate from the evaluation-based accuracy and rating models. Fixing
-this annotation does not require retraining those models or searching the
-calibration games again.
+this annotation does not require retraining the numerical models.
 
 ## Published meaning
 

@@ -53,11 +53,19 @@ badge score is intentionally fixed at 9 (9.0 with equal sizing); badge grades
 describe move categories rather than the position evaluation or game accuracy.
 Book moves appear last in the expanded Accuracy breakdown.
 Stockfish 19 Lite uses a smaller network than full Stockfish 19 and is not equivalent
-in playing strength. The existing accuracy calibration was fitted to Stockfish 18
-NNUE and has not been re-benchmarked for 19 Lite. Both builds use a single thread
+in playing strength. SF18 accuracy uses a public outcome/choice model; SF19 uses
+engine WDL quality and its own rating coefficients. Both builds use a single thread
 per worker; the Workers setting already distributes positions across multiple workers.
 The redundant Stockfish 10 and asm.js engines have been removed. Their saved
 preferences migrate to 18; existing full-19 preferences migrate to 19 Lite.
+
+The updated [public calibration method](tools/calibration/PUBLIC_METHOD.md) includes
+CC0 input snapshots, frozen engine settings, fitting code and an offline reproduction
+command. Numerical scores are independent of Brilliant and other annotations.
+In **Settings → Engine → Estimated rating**, choose **Use recorded rating** for
+SF18 game performance with rating context, or **Moves only** for an estimate of public
+blitz rating level. The moves-only model needs at least ten nonforced decisions;
+SF19 uses its separate moves-only model. Short contextual estimates are extrapolations.
 
 ## Install
 

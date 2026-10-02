@@ -1,6 +1,15 @@
-# Independent calibration experiment
+# Public calibration tools
 
-Status: offline pilot, not a production calibration. No extension behavior changes.
+The current application uses the [published calibration method](PUBLIC_METHOD.md).
+Its compressed public inputs and offline replay are included in `public/`:
+
+```powershell
+node tools/calibration/reproduce-public.mjs
+```
+
+The sections below document additional public research tools and their individual
+experimental status. Their run directories are optional and are not required by
+the published reproduction command.
 
 The [public time-control study](TIME_CONTROL_RUN.md) adds independently sampled
 bullet and rapid cohorts from preserved recent archive frames. It holds the
