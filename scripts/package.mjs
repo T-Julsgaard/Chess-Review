@@ -46,7 +46,7 @@ const snapshotDir = path.join(releaseDir, 'source');
 await mkdir(snapshotDir);
 const sourceFiles = [...files, 'manifest.json', 'package.json', 'package-lock.json',
   'STORE_LISTING.md', 'CONTRIBUTING.md', 'SECURITY.md'];
-await copyInputs(root, snapshotDir, [...sourceFiles, ...directories, 'scripts', 'tests']);
+await copyInputs(root, snapshotDir, [...sourceFiles, ...directories, 'scripts', 'tests', 'tools']);
 const sha256 = async file => createHash('sha256').update(await readFile(file)).digest('hex');
 async function fileHashes(dir, base = dir) {
   const hashes = {};
