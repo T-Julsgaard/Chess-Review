@@ -101,16 +101,15 @@ scheduled automatically by this rule.
 
 ## Integration boundary
 
-The independent calibration uses raw engine expected-result losses and move/board
-context. Brilliant labels, category counts, player identities and recorded ratings
-must not become model inputs or fit targets. The frozen SF18/SF19 coefficients,
-accuracy definitions, dataset hashes, source snapshots and final-test splits are
-unchanged by this work. No calibration run is resumed.
+The current numerical models use public outcomes, observed choices and engine
+evidence, as described in [PUBLIC_METHOD.md](PUBLIC_METHOD.md). Brilliant labels
+and category counts are excluded from accuracy and rating fitting. Recorded
+ratings supply context only in the explicitly named recorded-rating model and
+serve as training targets for the separate moves-only rating models.
 
-In the active evaluation-based display mode, annotation changes do not change
-displayed accuracy or estimated rating. The category-average fallback intentionally
-reflects its changed categories: Brilliant receives 100 points. Estimated rating
-still uses evaluation-based accuracy. Both behaviors have regression tests.
+Annotation changes do not change displayed numerical accuracy or estimated
+rating. The current scorer has no category-average accuracy fallback. Regression
+tests verify that annotation inputs remain separate from numerical scoring.
 
 Adding a Brilliant bonus to numerical accuracy, adding sacrifice-count predictors,
 or fitting rating-dependent annotation weights would change this boundary and
@@ -126,17 +125,3 @@ Black's perspective, progressive evaluation updates and numerical-score isolatio
 Classifier scores in these fixtures are synthetic inputs; they are not independent
 engine confirmation that each offer is sound.
 
-Verification passed all 171 repository tests. A board/history-only runtime check on 20
-existing training games (1,319 plies) took about 3.5 seconds in this environment,
-with a maximum observed candidate cost of about 247 ms. This measures execution
-cost, not annotation precision. It performed zero engine searches, fitted no
-weights and inspected no final-test games. Board evidence is reused on subsequent
-derived-data passes.
-
-A future annotation assessment should use separately curated positive and negative
-positions, including quiet sacrifices, defensive drawing sacrifices and mundane
-winning trades, with independently reviewed labels. Measure false positives and
-misses separately, stratify by engine/search settings, and check stability on a
-small set of disputed positions. Keep this separate from rating MAE and from the
-reserved calibration final tests. These are proposals, not additional fitting or
-engine work performed here.

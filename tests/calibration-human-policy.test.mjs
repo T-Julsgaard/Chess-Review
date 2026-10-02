@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {fitHumanOutcome,humanExpected,outcomeMetrics,fitHumanChoice,choiceStats,choiceMetrics,humanMoveQuality,humanGameAccuracy,policyVersion} from '../tools/calibration/human-policy.mjs';
-import {selectChoicePositions,studyRecipe} from '../tools/calibration/human-policy-study.mjs';
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
@@ -50,15 +49,6 @@ test('quality is bounded and monotone, excludes forced dilution, and handles ret
 test('candidate identity binds definitions, fitted parameters, engine and independent dataset',()=>{
  const a={outcome:curve,choice:{schema:'human-choice-v1',temperature:10},engineConfig:{version:18},datasetSha256:'data',selectionSha256:'ids'};
  assert.equal(policyVersion(a),policyVersion(structuredClone(a)));assert.notEqual(policyVersion(a),policyVersion({...a,selectionSha256:'changed'}));
-});
-test('position selection freezes legal alternatives and ignores final-test and review fields',()=>{
- const games=[];for(const split of ['train','validation','test'])for(let band=0;band<5;band++)games.push({id:split+band,split,band,moves:Array.from({length:8},()=>['g1f3','g8f6','f3g1','f6g8']).flat(),players:[{color:'w',rating:1000+band*300},{color:'b',rating:1100+band*300}]});
- const recipe={...studyRecipe,choiceTrainingGames:5,choiceValidationGames:5,choicesPerGame:2};
- const a=selectChoicePositions(games,recipe),b=selectChoicePositions(games.map(g=>g.split==='test'?{...g,moves:[],players:[]}:({...g,reviewAccuracy:99,reviewCategory:'brilliant'})),recipe);
- assert.deepEqual(a,b);assert.equal(a.length,20);assert.equal(a.filter(p=>p.qualityFit).length,10);
- assert.ok(a.every(p=>p.split!=='test'&&p.legalMoves.includes(p.played)&&p.history.length===p.ply-1));
- assert.deepEqual(selectChoicePositions([...games].reverse(),recipe),a);
- assert.throws(()=>selectChoicePositions([],recipe));
 });
 test('pure outcome fitting works while file permissions deny application and external-data reads',()=>{
  const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');

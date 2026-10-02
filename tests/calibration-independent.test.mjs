@@ -1,14 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, writeFile, readFile, rm } from 'node:fs/promises';
-import os from 'node:os';
-import path from 'node:path';
-import * as zlib from 'node:zlib';
 import { expected, moveQuality, summarize, assertCompatible, assertDisjoint, gameBootstrap } from '../tools/calibration/core.mjs';
-import { searchKey, readCache } from '../tools/calibration/analyze-games.mjs';
 import { Engine, engineConfig } from '../tools/calibration/engine.mjs';
 import { fit, predict } from '../tools/calibration/fit-rating.mjs';
-import { decompressArchive } from '../tools/calibration/zstd.mjs';
 
 const wdl = (wins, draws = 0) => ({ wdl: [wins, draws, 1000 - wins - draws] });
 test('WDL expected result includes half draws, rejects invalid or absent WDL', () => {
@@ -39,23 +33,6 @@ test('aggregation is deterministic, repetition-invariant, and RMS reflects catas
 test('compatibility and player splits fail closed', () => {
   assert.throws(() => assertCompatible({ engineConfig: { nodes: 100 } }, { nodes: 200 }));
   assert.throws(() => assertDisjoint([{ split: 'train', players: [{ id: 'x' }] }, { split: 'test', players: [{ id: 'x' }] }]));
-  assert.notEqual(searchKey('a', ['g1f3', 'g8f6', 'f3g1', 'f6g8']), searchKey('a', []));
-  assert.notEqual(searchKey('a', [], null), searchKey('a', [], 'e2e4'));
-});
-test('resumption repairs only torn last cache row, rejects complete corruption', async () => {
-  const dir = await mkdtemp(path.join(os.tmpdir(), 'calibration-test-')), file = path.join(dir, 'cache.jsonl');
-  try {
-    await writeFile(file, '{"key":"saved"}\n{"key":');
-    assert.equal((await readCache(file)).has('saved'), true);
-    assert.equal(await readFile(file, 'utf8'), '{"key":"saved"}\n');
-    await writeFile(file, 'broken\n'); await assert.rejects(readCache(file));
-  } finally { await rm(dir, { recursive: true }); }
-});
-test('PZstandard archive decodes every frame and rejects truncation', { skip: !zlib.zstdCompressSync }, () => {
-  const parts = ['first', 'second'].map(s => { const b = zlib.zstdCompressSync(Buffer.from(s)), h = Buffer.alloc(12);
-    h.writeUInt32LE(0x184d2a50); h.writeUInt32LE(4, 4); h.writeUInt32LE(b.length, 8); return Buffer.concat([h, b]); });
-  assert.equal(decompressArchive(Buffer.concat(parts)).toString(), 'firstsecond');
-  assert.throws(() => decompressArchive(parts[0].subarray(0, 15)));
 });
 test('rating prediction never consumes the target or known player rating', () => {
   const rows = Array.from({ length: 12 }, (_, i) => ({ meanLoss: i / 100, rmsLoss: i / 50,

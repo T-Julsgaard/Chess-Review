@@ -13,7 +13,8 @@ older records remain in their original directories. `release-sizes.json` is also
 stored in each release directory.
 
 The source snapshot contains the extension's readable code, assets, manifests,
-dependency lockfile, tests, and build scripts. It excludes Git history and local
+dependency lockfile, tests, build scripts, repository guides and current calibration
+fitting/evidence/reproduction files. It excludes Git history and local
 dependencies. Engine upstream source/build references remain in engine/README.md;
 the snapshot does not itself contain the upstream engines' complete build sources.
 Only Cburnett and Merida pieces enter the browser/source ZIPs. Kaneo, Kaneo Midnight,
@@ -64,11 +65,13 @@ do not retain the unsupported numerical-agreement claims.
 
 ## Outstanding rights review
 
-These packaging/documentation improvements do not clear the unresolved calibration,
-artwork, sound, interface, or platform-integration findings. ATTRIBUTIONS.md records
-known asset-provenance gaps. Resolve those issues before treating a generated ZIP
-as cleared for publication. Existing store version 0.1.1 still needs its actual
-uploaded package/source mapping established independently.
+Exact offline reproduction of the current numerical calibration is documented in
+tools/calibration/PUBLIC_METHOD.md. This establishes reproducibility from bundled
+evidence, not platform permission, independently validated move labels or rights
+to third-party assets. ATTRIBUTIONS.md retains known provenance gaps and historical
+removal records. Platform integration and applicable terms still need review;
+a generated ZIP is not legal clearance. Existing store version 0.1.1 still needs
+its actual uploaded package/source mapping established independently.
 
 ## Reviewer notes
 

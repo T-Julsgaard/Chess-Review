@@ -20,7 +20,7 @@ Report suspected security vulnerabilities privately as described in
 ## Set up locally
 
 1. Fork the repository and clone your fork.
-2. Install Node.js 22 or newer and npm, then run `npm ci` from the project folder.
+2. Install Node.js 24 or newer and npm, then run `npm ci` from the project folder.
 3. Create a branch for your change.
 4. In Chrome, open `chrome://extensions`, enable **Developer mode**, click
    **Load unpacked**, and select the project folder. No build step is needed.
@@ -29,6 +29,9 @@ Report suspected security vulnerabilities privately as described in
 
 For Firefox development, run `npm run start:firefox` with Firefox installed.
 The minimum Firefox version is specified in `manifest.json`.
+
+See the [repository guide](docs/REPOSITORY.md) for the purpose of each directory
+and where to keep experiments and generated files.
 
 ## Make and check your change
 

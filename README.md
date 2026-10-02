@@ -28,50 +28,54 @@ rating. No account, no server, no manual PGN copying.
 
 ## Usage
 
-1. Open a game on **Chess.com** or **Lichess**.
+1. Open a finished game on **Chess.com** or **Lichess**.
 2. Click the extension icon → **Analyze this game**, or press `Ctrl+Shift+Y`.
-3. The game opens in an analysis tab where Stockfish reviews every position.
+3. Stockfish reviews the game in an analysis tab.
 
-For older games you don't have open, paste a game URL or PGN into the popup. Your username is
-detected automatically from the board; if it can't be found, enter it once in the popup and it's
-remembered.
+You can also paste a game URL or PGN into the popup. If your username cannot be
+detected, enter it once; it is remembered locally. Chess Review is intended for
+review after play.
 
-Chess Review is intended for reviewing games after play. The standalone Explore
-board and position-only input were removed because of concerns about use for
-cheating during live games.
+Settings let you choose an engine, rating mode, board, pieces, sounds, coach and
+category-badge appearance. Badge numbers describe move categories; they are
+separate from position evaluation and game accuracy.
 
-The opening dictionary is bundled offline and has no automatic downloads.
+## Scoring and reproducibility
 
-In **Settings → Visual → Category badges**, preview six bundled number fonts,
-enable equal number sizing with one decimal (such as 9.0), and toggle hover labels
-or a subtle pulse on the active move's number. These options are off by default;
-the original font remains selected. The pulse is cosmetic, respects reduced
-motion, and never changes the score or starts an engine search. A Best move's
-badge score is intentionally fixed at 9 (9.0 with equal sizing); badge grades
-describe move categories rather than the position evaluation or game accuracy.
-Book moves appear last in the expanded Accuracy breakdown.
-Stockfish 19 Lite uses a smaller network than full Stockfish 19 and is not equivalent
-in playing strength. SF18 accuracy uses a public outcome/choice model; SF19 uses
-engine WDL quality and its own rating coefficients. Both builds use a single thread
-per worker; the Workers setting already distributes positions across multiple workers.
-The redundant Stockfish 10 and asm.js engines have been removed. Their saved
-preferences migrate to 18; existing full-19 preferences migrate to 19 Lite.
+The current SF18 numerical calibration is fitted from public **Lichess CC0 games**,
+using recorded outcomes and played moves with local Stockfish evidence. It does
+not fit against Chess.com review scores or labels. SF19 has its own moves-only
+rating model and uses engine WDL quality. Estimated ratings are rough indicators;
+cross-platform transfer and short-game extrapolation are unvalidated.
 
-The [public calibration method](tools/calibration/PUBLIC_METHOD.md) includes
-CC0 input snapshots, frozen engine settings, fitting code and an offline reproduction
-command. Numerical scores are independent of Brilliant and other annotations.
-In **Settings → Engine → Estimated rating**, choose **Use recorded rating** for
-SF18 game performance with rating context, or **Moves only** for an estimate of public
-blitz rating level. The moves-only model needs at least ten nonforced decisions;
-SF19 uses its separate moves-only model. Short contextual estimates are extrapolations.
+With Node.js 24 or later, reproduce the bundled coefficients and reference scores
+offline:
+
+```sh
+node tools/calibration/reproduce-public.mjs
+```
+
+The [public method](tools/calibration/PUBLIC_METHOD.md) explains the inputs,
+search settings, fitting and limitations. This replay verifies the archived
+evidence and calculation; it does not rerun engine searches or establish that
+each move category is correct.
+
+Move categories use declared rules separately from numerical fitting. The
+ordinary loss cutoffs (2/5/10/20 percentage points) match
+[Chess.com's published table](https://support.chess.com/en/articles/8572705-how-are-moves-classified-what-is-a-blunder-or-brilliant-etc).
+They are policy settings, not fitted coefficients. Applying them to this
+extension's own expected-points model does not reproduce Chess.com's full
+classifier. [Brilliant rules](tools/calibration/BRILLIANT_MOVES.md) explain
+special annotations and their sources.
+
+experiments. The [repository guide](docs/REPOSITORY.md) explains which files
+support the extension, development and reproduction.
 
 ## Install
 
- `Packed`
+Install from the Chrome Web Store or Firefox Add-ons using the links above.
+For a local Chrome installation:
 
-Goto: https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenkadndbdbigfam?hl=en
-
- `Unpacked`
 1. Download or clone this repository.
 2. Open `chrome://extensions` and enable **Developer mode** (top-right).
 3. Click **Load unpacked** and select the project folder.

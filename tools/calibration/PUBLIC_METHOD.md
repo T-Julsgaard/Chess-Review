@@ -66,6 +66,13 @@ are explicit annotation rules, not fitted human-label probabilities. Brilliant,
 Book and other labels never change accuracy or rating inputs. See
 [Brilliant move rules](BRILLIANT_MOVES.md) for detailed cases and limitations.
 
+The ordinary cutoff settings in `data/calibration.json` are 2/5/10/20 percentage
+points. These match [Chess.com's published expected-points table](https://support.chess.com/en/articles/8572705-how-are-moves-classified-what-is-a-blunder-or-brilliant-etc).
+They are declared category policy, not coefficients fitted by the public numerical
+calibration. The extension's expected-points calculation and additional category
+gates differ; matching cutoff values does not establish matching labels or an
+implementation of Chess.com's hidden algorithm. Current fitting evidence uses
+
 ## Two rating definitions
 
 **Use recorded rating**, the SF18 default, conditions on a player's recorded
