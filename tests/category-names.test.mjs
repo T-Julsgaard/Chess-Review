@@ -63,6 +63,7 @@ test('expanded categories are editable and renaming preserves count navigation',
 
 test('renaming refreshes badge labels, tooltips, and cached move commentary', t => {
   const a = review(t); a.state.idx = 1; a.state.classif[1] = 'brilliant';
+  a.state.settings.badgeTooltip = true;
   a.state.moveGrades[1] = 10;
   a.call('renderReview'); a.call('renderMoves');
   const input = edit(a, 'brilliant'); input.value = 'Inspired'; key(a, input, 'Enter');

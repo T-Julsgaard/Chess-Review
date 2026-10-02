@@ -17,7 +17,7 @@ const files = ['analysis.html', 'analysis.js', 'analyze-flow.js', 'background.js
   'browser-compat.js', 'chesscom.js', 'content.js', 'content-button.css', 'flags.js', 'gamecache.js',
   'lichess-content.js', 'lichess.js', 'move-grades.js', 'popup.html', 'popup.js', 'styles.css',
   'LICENSE', 'ATTRIBUTIONS.md', 'THIRD_PARTY_NOTICES.md', 'PRIVACY.md', 'README.md', 'RELEASE.md'];
-const directories = ['backgrounds', 'data', 'engine', 'flags', 'icons', 'lib', 'pieces-img', 'sounds'];
+const directories = ['backgrounds', 'data', 'engine', 'flags', 'fonts', 'icons', 'lib', 'pieces-img', 'sounds'];
 // Explicitly retain only the two selectable GPLv2+ piece sets.
 const pieceSets = ['cburnett', 'merida'];
 async function copyInputs(from, to, entries) {

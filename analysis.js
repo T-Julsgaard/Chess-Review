@@ -6,7 +6,7 @@
 import { Chess } from "./lib/chess.js";
 import { Engine } from "./engine/uci.js";
 import { flagCodeForCountryId, countryNameForId } from "./flags.js";
-import { MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg } from "./move-grades.js";
+import { BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg } from "./move-grades.js";
 import { browserAPI } from "./browser-compat.js";
 
 /* ---------------- Opening book ----------------
@@ -136,22 +136,46 @@ const ptsFmt = (v) => v + " pts";
 function gradeBadge(cls, score, className, attrs = {}, example = false) {
   const label = gradeLabel(cls, score, categoryName(cls), example);
   return el("span", { class: className + " grade-badge", role: "img", "aria-label": label,
-    "data-grade": cls === "book" ? "book" : gradeText(score), ...attrs,
-    html: gradeSvg(cls, score, categoryName(cls), example).replace('role="img"', 'aria-hidden="true"'),
+    "data-grade": cls === "book" ? "book" : gradeText(score, S.settings.badgeDecimals),
+    "data-badge-category": cls, "data-score": Number.isFinite(score) ? score : "",
+    "data-example": String(example), "data-render-key": badgeRenderKey(cls, score, example), ...attrs,
+    html: gradeSvg(cls, score, categoryName(cls), example, S.settings).replace('role="img"', 'aria-hidden="true"'),
   });
+}
+function badgeRenderKey(cls, score, example) {
+  return JSON.stringify([cls, score, example, categoryName(cls), S.settings.badgeDecimals, S.settings.badgeFont]);
 }
 function activeMoveGrade() {
   return S.analysisMode ? activePos().moveGrade : S.moveGrades[S.idx];
 }
-function updateGradeBadge(node, cls, score) {
-  const next = cls === "book" ? "book" : gradeText(score);
-  if (node.dataset.grade === next) return;
+function updateGradeBadge(node, cls, score, example = false) {
+  const key = badgeRenderKey(cls, score, example);
+  if (node.dataset.renderKey === key) return;
+  const changedScore = node.dataset.score !== (Number.isFinite(score) ? String(score) : "");
+  const next = cls === "book" ? "book" : gradeText(score, S.settings.badgeDecimals);
   node.dataset.grade = next;
-  const label = gradeLabel(cls, score, categoryName(cls));
+  node.dataset.score = Number.isFinite(score) ? score : "";
+  node.dataset.renderKey = key;
+  const label = gradeLabel(cls, score, categoryName(cls), example);
   node.setAttribute("aria-label", label);
   if (node.hasAttribute("title")) node.title = label;
-  node.replaceChildren(gradeBadge(cls, score, "").firstElementChild);
-  node.querySelector(".grade-numeral")?.classList.add("grade-updated");
+  node.replaceChildren(gradeBadge(cls, score, "", {}, example).firstElementChild);
+  if (changedScore && S.settings.badgeFlicker) node.querySelector(".grade-numeral")?.classList.add("grade-updated");
+}
+function refreshBadgeAppearance() {
+  hideBoardBadgeTip(); hideQTip();
+  for (const node of document.querySelectorAll(".grade-badge")) {
+    updateGradeBadge(node, node.dataset.badgeCategory,
+      node.dataset.score === "" ? null : Number(node.dataset.score), node.dataset.example === "true");
+    if (node.classList.contains("qb")) {
+      if (S.settings.badgeTooltip) node.title = node.getAttribute("aria-label");
+      else node.removeAttribute("title");
+    }
+  }
+  for (const node of document.querySelectorAll(".qb.dot")) {
+    if (S.settings.badgeTooltip) node.title = categoryName(node.dataset.badgeCategory);
+    else node.removeAttribute("title");
+  }
 }
 const PIECE_STYLES = ["image","merida"];
 // Persisted "image" selects Cburnett; both remaining sets are bundled GPLv2+ SVGs.
@@ -210,6 +234,7 @@ const DEFAULT_SETTINGS = {
   categoryNames: {},
   theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
+  badgeDecimals: false, badgeFont: "original", badgeFlicker: false, badgeTooltip: false,
   // Eval-graph look (see renderGraph), eval-BAR look (see renderEvalBar) and the Insight-panel text size (px).
   graphStyle: "area", barStyle: "gradient", insightFont: 18,
   // Board coordinate labels (the a–h / 1–8 ticks in the squares' corners): on/off + size in px.
@@ -1656,7 +1681,7 @@ function makeBoardBadge(cls, score = null) {
 let boardBadgeTipTarget = null;
 function showBoardBadgeTip(target, cls) {
   const cfg = QUALITY[cls];
-  if (!cfg || !target.isConnected) return;
+  if (!S.settings.badgeTooltip || !cfg || !target.isConnected) return;
   boardBadgeTipTarget = target;
   let tip = document.getElementById("boardBadgeTip");
   if (!tip) {
@@ -3316,7 +3341,7 @@ function categoryLabel(cls) {
   const label = el("button", {
     type: "button", class: "qlabel", "data-category": cls,
     "aria-label": "Rename " + categoryName(cls), title: "Click to rename",
-    onmouseenter: e => showQTip(e.currentTarget, cls), onmouseleave: hideQTip,
+    onmouseenter: e => { if (S.settings.badgeTooltip) showQTip(e.currentTarget, cls); }, onmouseleave: hideQTip,
     onclick: () => {
       hideQTip();
       let finished = false;
@@ -3584,10 +3609,12 @@ function moveCell(ply) {
 }
 function qBadge(k, score = null) {
   const cfg = QUALITY[k]; const st = S.settings.badgeStyle;
-  if (st === "dot") return el("span", { class: "qb dot", style: { background: cfg.color }, title: categoryName(k) });
+  if (st === "dot") return el("span", { class: "qb dot", "data-badge-category": k,
+    role: "img", "aria-label": categoryName(k), style: { background: cfg.color },
+    ...(S.settings.badgeTooltip ? { title: categoryName(k) } : {}) });
   if (st === "label") return el("span", { class: "qb label", style: { background: cfg.color } }, categoryName(k));
   // "icon" → the real SVG badge
-  return gradeBadge(k, score, "qb icon", { title: gradeLabel(k, score, categoryName(k)) });
+  return gradeBadge(k, score, "qb icon", S.settings.badgeTooltip ? { title: gradeLabel(k, score, categoryName(k)) } : {});
 }
 // Move the .current highlight to the cell for S.idx and auto-scroll it into view, without
 // touching the rest of the list. Used both after a full rebuild and on a plain step.
@@ -4212,8 +4239,10 @@ async function resetEngineSettings() {
 }
 const ARROW_SETTING_KEYS = ["bestArrow", "showThreat", "bestArrowColor", "arrowOpacity", "arrowShaft", "arrowHead"];
 const BACKGROUND_SETTING_KEYS = ["bg", "bgFit", "bgTile", "bgCustom", "bgHue", "bgSat", "bgLight"];
+const BADGE_SETTING_KEYS = ["badgeDecimals", "badgeFont", "badgeFlicker", "badgeTooltip"];
 const VISUAL_SETTING_KEYS = [
   "theme", "accent", "accentCustom", "density", "evalView", "mlStyle", "badgeStyle", "badgeScale",
+  ...BADGE_SETTING_KEYS,
   "graphStyle", "barStyle", "insightFont", "showCoords", "coordSize", ...BACKGROUND_SETTING_KEYS,
   "coach", "coachPlain", "boardTheme", "pieceStyle", "boardCustomLight", "boardCustomDark",
   "sound", "soundVolume", "soundFx", ...ARROW_SETTING_KEYS,
@@ -4356,6 +4385,7 @@ function visualSettings() {
         onChange: (v) => document.documentElement.style.setProperty("--badge-scale", v),
       }),
     ),
+    el("button", { class: "set-reset", onclick: () => { S.visualTab = "badges"; renderSettings(); } }, "Customize category badges →"),
     section("Coach",
       el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Who appears and narrates. Switch any time — the new coach picks up right where you are.")),
       coachPicker(),
@@ -4476,6 +4506,31 @@ function motorSettings() {
     el("button", { class: "set-reset", onclick: resetEngineSettings }, "Reset to default"),
   );
 }
+function badgeSettings() {
+  const fonts = el("div", { class: "badge-font-options", role: "group", "aria-label": "Number font" },
+    ...Object.entries(BADGE_FONTS).map(([id, font]) => el("button", {
+      class: "badge-font-option" + (S.settings.badgeFont === id ? " on" : ""),
+      "aria-pressed": String(S.settings.badgeFont === id), onclick: () => setSetting("badgeFont", id),
+    }, el("span", { class: "badge-font-name" }, font.name, el("small", {}, font.style)),
+      el("span", { class: "badge-font-sample", "aria-hidden": "true",
+        style: { fontFamily: font.family } }, "9.0 6.4"))));
+  return el("div", { class: "badge-settings" },
+    el("p", { class: "set-note" }, "Choose how move scores look across the board, move list and accuracy breakdown."),
+    el("div", { class: "badge-preview", "aria-label": "Badge preview" },
+      gradeBadge("best", 9, "badge-preview-item"), gradeBadge("good", 6.4, "badge-preview-item"),
+      gradeBadge("brilliant", 10, "badge-preview-item"), gradeBadge("blunder", 0, "badge-preview-item"),
+      gradeBadge("book", null, "badge-preview-item")),
+    toggleRow("Equal number size", "badgeDecimals"),
+    el("p", { class: "set-note" }, "Show one decimal (9.0) and use the same number size for every score, including 10.0."),
+    el("div", { class: "set-lbl" }, "Number font"), fonts,
+    el("p", { class: "set-note" }, "Six free, open-source fonts, bundled for offline use."),
+    toggleRow("Number flicker", "badgeFlicker"),
+    el("p", { class: "set-note" }, "A subtle pulse on the active move's number. Scores stay unchanged; no extra engine search. Respects reduced motion."),
+    toggleRow("Hover labels", "badgeTooltip"),
+    el("button", { class: "set-reset", onclick: async () => {
+      await resetSettingKeys(BADGE_SETTING_KEYS); applySettings(); refreshBadgeAppearance(); renderSettings();
+    } }, "Reset badges to default"));
+}
 function renderSettings() {
   closeArrowColorPicker();
   const scroll = UI.settings.scrollTop; // keep scroll position when a setting changes
@@ -4483,7 +4538,13 @@ function renderSettings() {
     el("button", { class: "set-tab" + (S.settingsTab === "visual" ? " on" : ""), onclick: () => { S.settingsTab = "visual"; renderSettings(); } }, "Visual"),
     el("button", { class: "set-tab" + (S.settingsTab === "engine" ? " on" : ""), onclick: () => { S.settingsTab = "engine"; renderSettings(); } }, "Engine"),
   );
-  UI.settings.replaceChildren(tabs, S.settingsTab === "engine" ? motorSettings() : visualSettings());
+  const visualTabs = el("div", { class: "set-tabs set-subtabs" },
+    ...[["general", "General"], ["badges", "Category badges"]].map(([id, label]) => el("button", {
+      class: "set-tab" + ((S.visualTab || "general") === id ? " on" : ""),
+      onclick: () => { S.visualTab = id; renderSettings(); },
+    }, label)));
+  UI.settings.replaceChildren(tabs, ...(S.settingsTab === "engine" ? [motorSettings()]
+    : [visualTabs, S.visualTab === "badges" ? badgeSettings() : visualSettings()]));
   UI.settings.scrollTop = scroll;
   positionSettings();
 }
@@ -4632,6 +4693,7 @@ async function setSetting(key, value) {
   if (key === "bestArrow") renderBestArrow();
   if (key === "showThreat") renderThreatArrow();
   if (key === "loaderStyle") { renderReview(); renderStats(); }
+  if (BADGE_SETTING_KEYS.includes(key)) refreshBadgeAppearance();
   if (UI.settings && !UI.settings.hidden) renderSettings();
 }
 // Engine setting: save, discard the live engine (new build/options), and re-analyze.
@@ -4678,6 +4740,7 @@ function applySettings() {
   r.style.setProperty("--sq-light", bt[0]);
   r.style.setProperty("--sq-dark", bt[1]);
   r.style.setProperty("--badge-scale", S.settings.badgeScale ?? 1);
+  r.classList.toggle("badge-flicker", S.settings.badgeFlicker === true);
   r.style.setProperty("--ip-font", (S.settings.insightFont ?? 13) + "px");
   r.style.setProperty("--coord-size", (S.settings.coordSize ?? 12) + "px");
   r.classList.toggle("hide-coords", S.settings.showCoords === false);

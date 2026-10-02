@@ -4,6 +4,7 @@ import { app, loadGame } from './helpers/app.mjs';
 
 function review(t) {
   const a = app(t);
+  a.state.settings.badgeTooltip = true;
   loadGame(a, '1. e4 e5');
   a.call('computeDerived');
   a.state.idx = 1;
@@ -84,6 +85,7 @@ test('keyboard focus shows the label; Escape and blur dismiss it', t => {
 
 test('touch and dragging do not open a hover label, and badge presses still bubble', t => {
   const a = app(t), doc = a.dom.window.document;
+  a.state.settings.badgeTooltip = true;
   const badge = a.call('makeBoardBadge', 'best');
   doc.body.append(badge);
   pointer(a, badge, 'pointerenter', { pointerType: 'touch' });

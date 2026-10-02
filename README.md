@@ -43,6 +43,15 @@ drag pieces to make legal moves. Use the move list, arrow keys, or Home/End to
 navigate. Making a different move replaces the continuation from that position.
 
 The opening dictionary is bundled offline and has no automatic downloads.
+
+In **Settings → Visual → Category badges**, preview six bundled number fonts,
+enable equal number sizing with one decimal (such as 9.0), and toggle hover labels
+or a subtle pulse on the active move's number. These options are off by default;
+the original font remains selected. The pulse is cosmetic, respects reduced
+motion, and never changes the score or starts an engine search. A Best move's
+badge score is intentionally fixed at 9 (9.0 with equal sizing); badge grades
+describe move categories rather than the position evaluation or game accuracy.
+Book moves appear last in the expanded Accuracy breakdown.
 Stockfish 19 Lite uses a smaller network than full Stockfish 19 and is not equivalent
 in playing strength. The existing accuracy calibration was fitted to Stockfish 18
 NNUE and has not been re-benchmarked for 19 Lite. Both builds use a single thread

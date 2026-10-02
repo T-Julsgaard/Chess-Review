@@ -154,3 +154,16 @@ Distributed by Lichess (lila); high-quality vector SVGs.
 
 These original assets are separate from the four Lichess move / board MP3 recordings
 listed above. Retain original recordings/design files as supporting provenance.
+## Badge number fonts
+
+The extension bundles unmodified fonts from the Google Fonts repository under
+the SIL Open Font License 1.1. They permit use and redistribution, including
+commercial use. Fonts load locally; selecting one sends no network request.
+Each font's copyright notice and full license accompany it in `fonts/`:
+
+- [Inter](https://github.com/google/fonts/tree/main/ofl/inter) — `fonts/inter-OFL.txt`
+- [Manrope](https://github.com/google/fonts/tree/main/ofl/manrope) — `fonts/manrope-OFL.txt`
+- [Sora](https://github.com/google/fonts/tree/main/ofl/sora) — `fonts/sora-OFL.txt`
+- [Space Grotesk](https://github.com/google/fonts/tree/main/ofl/spacegrotesk) — `fonts/spacegrotesk-OFL.txt`
+- [Rajdhani](https://github.com/google/fonts/tree/main/ofl/rajdhani) — `fonts/rajdhani-OFL.txt`
+- [Space Mono](https://github.com/google/fonts/tree/main/ofl/spacemono) — `fonts/spacemono-OFL.txt`

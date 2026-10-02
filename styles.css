@@ -448,9 +448,17 @@ button { font-family: inherit; cursor: pointer; }
 .grade-badge { display: inline-block; vertical-align: middle; flex-shrink: 0; }
 .grade-badge > svg { display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; user-select: none; }
 .grade-numeral { font-variant-numeric: tabular-nums; }
-.grade-updated { animation: grade-settle .14s ease-out; }
-@keyframes grade-settle { from { opacity: .45; } to { opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .grade-updated { animation: none; } }
+.badge-flicker .sq-badge .grade-numeral,
+.badge-flicker .ip-badge .grade-numeral,
+.badge-flicker .badge-preview .grade-numeral { animation: badge-think 3.2s ease-in-out infinite; }
+.badge-flicker .grade-updated { animation: grade-settle .14s ease-out; }
+@keyframes badge-think {
+  0%, 35%, 57%, 78%, 100% { opacity: 1; }
+  42%, 64% { opacity: .82; }
+  48%, 70% { opacity: .96; }
+}
+@keyframes grade-settle { from { opacity: .82; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .badge-flicker .grade-numeral { animation: none !important; } }
 /* A name-only label lives outside the clipped board and never intercepts board input. */
 .board-badge-tip {
   position: fixed; z-index: 60; pointer-events: none;
@@ -854,7 +862,7 @@ button { font-family: inherit; cursor: pointer; }
 .set-tab { flex: 1; border: 0; background: none; color: var(--ink-2); padding: 7px; border-radius: 7px;
   font-size: 12px; font-weight: 700; cursor: pointer; transition: .12s; }
 .set-tab.on { background: color-mix(in oklab, var(--accent) 22%, var(--panel)); color: var(--ink); }
-.set-tabs + div { display: flex; flex-direction: column; gap: 6px; }
+.set-tabs + div:not(.set-tabs) { display: flex; flex-direction: column; gap: 6px; }
 /* collapsible sections */
 .set-section { border-top: 1px solid var(--line-soft); }
 .set-section:first-child { border-top: 0; }
@@ -1478,3 +1486,42 @@ button { font-family: inherit; cursor: pointer; }
 .lc-status.solved { color: var(--q-best); }
 .lc-status.unsolved { color: color-mix(in oklab, var(--q-blunder) 65%, var(--ink-3)); }
 @media (prefers-reduced-motion: reduce) { .lib-panel { transition: none; } }
+
+/* Locally bundled SIL OFL number fonts; licenses are in fonts/. */
+@font-face {
+  font-family: "Badge Inter"; src: url("fonts/inter.ttf") format("truetype");
+  font-weight: 100 900; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: "Badge Manrope"; src: url("fonts/manrope.ttf") format("truetype");
+  font-weight: 200 800; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: "Badge Sora"; src: url("fonts/sora.ttf") format("truetype");
+  font-weight: 100 800; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: "Badge Space Grotesk"; src: url("fonts/spacegrotesk.ttf") format("truetype");
+  font-weight: 300 700; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: "Badge Rajdhani"; src: url("fonts/rajdhani.ttf") format("truetype");
+  font-weight: 700; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: "Badge Space Mono"; src: url("fonts/spacemono.ttf") format("truetype");
+  font-weight: 700; font-style: normal; font-display: block;
+}
+
+.set-subtabs { margin-top: -4px; }
+.badge-settings { display: flex; flex-direction: column; gap: 12px; }
+.badge-settings p { margin: 0; }
+.badge-preview { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 14px 0; }
+.badge-preview-item { width: 38px; height: 38px; }
+.badge-font-options { display: grid; gap: 6px; }
+.badge-font-option { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 9px 10px; text-align: left; background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; color: var(--ink); cursor: pointer; }
+.badge-font-option:hover, .badge-font-option.on { border-color: var(--accent); }
+.badge-font-option.on { background: color-mix(in oklab, var(--accent) 12%, var(--panel-2)); }
+.badge-font-name { font-size: 12px; font-weight: 700; }
+.badge-font-name small { display: block; font-size: 10px; font-weight: 400; color: var(--ink-3); margin-top: 3px; }
+.badge-font-sample { font-weight: 700; font-size: 22px; font-variant-numeric: tabular-nums; white-space: nowrap; }
