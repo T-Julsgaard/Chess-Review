@@ -25,6 +25,10 @@ The [opponent-conditioned public context study](OPPONENT_CONTEXT_RUN.md) tests
 public PGN opponent-rating gaps against a pooled complete-game quality baseline.
 Its training and consumed-validation differences are tiny and mixed.
 
+The [public depth-protocol probe](DEPTH_PROTOCOL_PROBE.md) measures the difference
+between the fixed-node study configuration and depth-based runtime defaults.
+It finds occasional material sensitivity without establishing score superiority.
+
 Brilliant-move annotation is assessed separately from numerical calibration in
 [`BRILLIANT_MOVES.md`](BRILLIANT_MOVES.md). It uses board and existing evaluation
 evidence; annotations are excluded from fitted accuracy/rating inputs.
