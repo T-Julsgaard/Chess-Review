@@ -29,6 +29,11 @@ The [public depth-protocol probe](DEPTH_PROTOCOL_PROBE.md) measures the differen
 between the fixed-node study configuration and depth-based runtime defaults.
 It finds occasional material sensitivity without establishing score superiority.
 
+The [bounded depth-protocol calibration study](DEPTH_CALIBRATION_RUN.md) refits
+public outcome and choice coefficients under depth16/Hash16, then freezes both
+quality and contextual models before consumed development validation. Evaluation
+is running; settings integration and production promotion remain pending.
+
 Brilliant-move annotation is assessed separately from numerical calibration in
 [`BRILLIANT_MOVES.md`](BRILLIANT_MOVES.md). It uses board and existing evaluation
 evidence; annotations are excluded from fitted accuracy/rating inputs.
