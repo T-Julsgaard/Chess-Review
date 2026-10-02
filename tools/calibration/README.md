@@ -34,6 +34,10 @@ public outcome and choice coefficients under depth16/Hash16, then freezes both
 quality and contextual models before consumed development validation. Evaluation
 is running; settings integration and production promotion remain pending.
 
+The [same-cohort public fixed-node control](MATCHED_NODE_CONTROL.md) refits the
+20k-node protocol from archived raw data on the exact depth-study cohort.
+Outcome/choice likelihoods permit a protocol contrast without cohort confounding.
+
 Brilliant-move annotation is assessed separately from numerical calibration in
 [`BRILLIANT_MOVES.md`](BRILLIANT_MOVES.md). It uses board and existing evaluation
 evidence; annotations are excluded from fitted accuracy/rating inputs.
