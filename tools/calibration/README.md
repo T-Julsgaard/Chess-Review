@@ -2,6 +2,11 @@
 
 Status: offline pilot, not a production calibration. No extension behavior changes.
 
+The [public time-control study](TIME_CONTROL_RUN.md) adds independently sampled
+bullet and rapid cohorts from preserved recent archive frames. It holds the
+quality model fixed while comparing pooled and time-control-specific rating
+context using public training folds. Settings integration remains pending.
+
 Brilliant-move annotation is assessed separately from numerical calibration in
 [`BRILLIANT_MOVES.md`](BRILLIANT_MOVES.md). It uses board and existing evaluation
 evidence; annotations are excluded from fitted accuracy/rating inputs.
@@ -94,6 +99,8 @@ node tools/calibration/report.mjs --dataset calibration-runs/smoke/dataset --run
 
 Importer also supports `--input archive.pgn[.zst] --sha256 HASH --source URL`,
 `--category blitz|rapid`, `--rating-min`, `--rating-max`, and `--seed`.
+The recent-frame importer separately supports `--category bullet|blitz|rapid` and
+`--exclude-datasets directory1,directory2` for globally disjoint new cohorts.
 Engine overrides require an exact copy of the bundled `.js/.wasm` pair via `--engine path.js`;
 native engines remain unsupported; the exact bundled SF19 Lite pair is now
 supported with independent network/build metadata and separate development fits.
