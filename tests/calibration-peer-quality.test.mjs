@@ -20,3 +20,9 @@ test('peer fitting is deterministic across input order and tied quality uses mid
  const r=rows().map(x=>({...x,quality:60})),a=fitPeerQuality(r),b=fitPeerQuality([...r].reverse());assert.deepEqual(a,b);
  const e=peerContextRating(1500,60,30,a);assert.ok(Math.abs(e.percentile-.5)<1e-12);assert.ok(Math.abs(e.deviation)<1e-9);
 });
+test('unsupported peer contexts abstain and do not count null percentiles as coverage',()=>{
+ const m={schema:'peer-quality-context-v1',bandwidth:{rating:200,logLength:.35},peers:rows().map(r=>({...r,weight:1}))};
+ const v={gameId:'unsupported',color:'w',split:'validation',rating:5000,decisions:30,quality:70};
+ const e=peerContextRating(v.rating,v.quality,v.decisions,m);assert.equal(e.adjusted,false);assert.equal(e.percentile,null);assert.equal(e.rating,5000);
+ const assessment=peerQualityMetrics([v],m);assert.equal(assessment.adjustmentCoverage,0);assert.ok(Object.values(assessment.percentileCoverage).every(x=>x===null));
+});
