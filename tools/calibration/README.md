@@ -38,6 +38,11 @@ The [same-cohort public fixed-node control](MATCHED_NODE_CONTROL.md) refits the
 20k-node protocol from archived raw data on the exact depth-study cohort.
 Outcome/choice likelihoods permit a protocol contrast without cohort confounding.
 
+The [paired public protocol assessment](PAIRED_PROTOCOL_ASSESSMENT.md) freezes
+common outcome/choice targets, equal game weighting and game-cluster uncertainty
+before depth validation completes. It distinguishes prediction loss from display
+agreement and accounts explicitly for mate versus shared-finite-cp coverage.
+
 Brilliant-move annotation is assessed separately from numerical calibration in
 [`BRILLIANT_MOVES.md`](BRILLIANT_MOVES.md). It uses board and existing evaluation
 evidence; annotations are excluded from fitted accuracy/rating inputs.
