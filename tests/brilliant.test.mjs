@@ -14,7 +14,7 @@ function offerGame(a, evals = [{ cp: 0 }, { cp: 0 }]) {
 }
 
 // Scores in these fixtures are synthetic classifier inputs, not claims that the offers are sound.
-test('a sound offer needs no preceding opponent mistake, and Explore agrees', t => {
+test('a sound offer needs no preceding opponent mistake, and variation grades agree', t => {
   const a = app(t), S = offerGame(a);
   a.call('computeDerived');
   assert.equal(S.classif[1], 'brilliant');

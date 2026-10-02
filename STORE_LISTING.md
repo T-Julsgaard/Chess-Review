@@ -15,8 +15,8 @@ move classifications, and estimated accuracy.
 Understand your games and explore better moves with Chess Review, an independent,
 open-source extension powered by Stockfish running locally in your browser.
 
-Review games from Chess.com or Lichess, paste a game URL or PGN, or open the
-Explore board to study a position.
+Review games from Chess.com or Lichess, or paste a game URL or PGN.
+Chess Review is intended for reviewing games after play.
 
 - Accuracy estimates for both players and move-by-move classifications.
 - Evaluation graphs, best-move arrows, and an estimated performance rating.
@@ -50,7 +50,7 @@ link can read its contents. The extension does not upload it to a developer serv
 
 ## Single-purpose description
 
-Review chess games and explore study positions using locally bundled Stockfish,
+Review chess games after play using locally bundled Stockfish,
 with direct public game lookups from Chess.com or Lichess.
 
 ## Maintainer notes — do not paste into the public description

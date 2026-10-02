@@ -16,7 +16,7 @@ if (startup < 0) throw Error('Application startup marker missing');
 const source = raw.slice(0, startup).replace(/^import .*;\r?\n/gm, '');
 
 export function app(t) {
-  const dom = new JSDOM('<!doctype html><div id="root"></div>', { url: 'https://extension.test/analysis.html#explore', pretendToBeVisual: true });
+  const dom = new JSDOM('<!doctype html><div id="root"></div>', { url: 'https://extension.test/analysis.html#test-game', pretendToBeVisual: true });
   const store = {}, writes = [], timers = new Set();
   const browserAPI = {
     runtime: { getURL: p => `https://extension.test/${p}` },

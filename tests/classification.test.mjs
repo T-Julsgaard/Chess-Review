@@ -64,7 +64,7 @@ test('missing evaluations do not invent a rating', t => {
   const v=branch(a);a.call('classifyVariationMoves');assert.equal(v.positions[1].classif,null);
 });
 
-test('terminal detection retains threefold history in Explore', t => {
+test('terminal detection retains threefold history in variations', t => {
   const a=app(t);const S=loadGame(a,'1. Nf3 Nf6 2. Ng1 Ng8 3. Nf3 Nf6 4. Ng1 Ng8');
   assert.equal(S.positions[8].draw,'threefold');
   const v=branch(a);assert.equal(a.call('variationTerminal',v,8).cp,0);
@@ -72,7 +72,7 @@ test('terminal detection retains threefold history in Explore', t => {
 });
 
 test('the current variation opening follows the viewed prefix', t => {
-  const a=app(t);loadGame(a,'1. e4 e5');const v=branch(a);a.state.meta={explore:true};
+  const a=app(t);loadGame(a,'1. e4 e5');const v=branch(a);
   a.context.__book={
     [a.call('epdOf',v.positions[1].fen)]:['B00','King pawn'],
     [a.call('epdOf',v.positions[2].fen)]:['C20','Open game'],

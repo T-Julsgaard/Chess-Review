@@ -19,23 +19,6 @@ function looksLikePgn(s) {
   return /\[\s*\w+\s+"[^"]*"\s*\]/.test(s) || /\b1\.\s*[A-Za-z]/.test(s);
 }
 
-// A FEN is 8 ranks of piece data + side to move; castling/en-passant/clocks are optional, so we
-// only require the first two fields to recognise one (the analysis page validates the rest).
-function looksLikeFen(s) {
-  const parts = s.trim().split(/\s+/);
-  if (parts.length < 2 || !/^[wb]$/.test(parts[1])) return false;
-  const ranks = parts[0].split("/");
-  return ranks.length === 8 && ranks.every((r) => /^[pnbrqkPNBRQK1-8]+$/.test(r));
-}
-
-// Fill in any missing trailing fields so chess.js accepts the FEN, then wrap it in a header-only
-// PGN — the analysis pipeline is PGN-based, and a no-move PGN with a [FEN] header sets the position.
-function fenToPgn(s) {
-  const [board, side = "w", castling = "-", ep = "-", half = "0", full = "1"] = s.trim().split(/\s+/);
-  const fen = `${board} ${side} ${castling} ${ep} ${half} ${full}`;
-  return `[SetUp "1"]\n[FEN "${fen}"]\n\n*`;
-}
-
 // The icon now uses a default_popup, so the popup opens on every click (pinned or in the overflow
 // menu). On a chess game page it behaves like a one-click review — auto-analyzing the current game;
 // anywhere else it shows the menu so you can paste a URL/PGN. The "Analyze this game" button re-runs
@@ -97,7 +80,7 @@ async function init() {
   } else {
     // Not a chess game page → nothing to auto-analyze; invite a paste, but leave "Manual setup"
     // collapsed by default so the popup opens clean (the user can expand it when they want it).
-    setStatus("Open a chess.com or Lichess game to review it — or use Manual setup below to paste a URL, PGN, or FEN.");
+    setStatus("Open a chess.com or Lichess game to review it — or use Manual setup below to paste a URL or PGN.");
   }
 }
 
@@ -109,36 +92,17 @@ $("saveUser").addEventListener("click", async () => {
 
 $("analyzeCurrent").addEventListener("click", runCurrentAnalysis);
 
-$("exploreMode").addEventListener("click", async () => {
-  const btn = $("exploreMode");
-  btn.disabled = true;
-  setStatus("Opening explore board …");
-  try {
-    await browserAPI.tabs.create({
-      url: browserAPI.runtime.getURL("analysis.html#explore"),
-    });
-    window.close();
-  } catch (err) {
-    setStatus(err.message, true);
-  } finally {
-    btn.disabled = false;
-  }
-});
-
 $("analyzeManual").addEventListener("click", async () => {
   const btn = $("analyzeManual");
   const raw = $("manualInput").value.trim();
   if (!raw) return setStatus("Paste a URL or PGN.", true);
   btn.disabled = true;
   try {
-    // Order matters: pasted PGN/FEN text can contain site URLs in its tags, so detect those by
+    // Order matters: pasted PGN text can contain site URLs in its tags, so detect those by
     // shape BEFORE any URL handling, or a chess.com PGN gets misrouted into an archive lookup.
     if (looksLikePgn(raw)) {
       // Full PGN (or bare movetext) → analyse directly, no username/archive needed.
       await openAnalysisTab({ pgn: raw, meta: {}, source: "pgn" });
-    } else if (looksLikeFen(raw)) {
-      // A FEN string → analyse from that position (no move history).
-      await openAnalysisTab({ pgn: fenToPgn(raw), meta: {}, source: "fen" });
     } else if (/lichess\.org/i.test(raw)) {
       // Lichess URL → fetch the PGN straight from Lichess's public API (no username needed).
       const li = parseLichessGameId(raw);

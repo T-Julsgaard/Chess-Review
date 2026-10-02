@@ -39,14 +39,6 @@ test('live startup errors are recoverable and Retry evaluates the position',asyn
   assert.ok(v.positions[1].eval);assert.ok(v.positions[1].classif);
 });
 
-test('switching settings in Explore preserves its moves and never starts a game batch',async t=>{
-  const a=app(t);const S=loadGame(a,'1. e4 e5');const v=branch(a);quiet(a);S.meta={explore:true};
-  let batches=0,live=0;a.replace('startAnalysis',()=>{batches++;});a.replace('requestLiveEval',async()=>{live++;});
-  await a.call('setEngineSetting','enginePath','nnue');
-  assert.equal(S.variation,v);assert.equal(v.positions.length,3);assert.equal(S.settings.enginePath,'nnue');
-  assert.equal(batches,0);assert.equal(live,1);assert.ok(v.positions.every(p=>p.eval===null&&p.best===null&&p.classif===null));
-});
-
 test('a failed batch never saves gaps, and Retry can complete',async t=>{
   const a=app(t);const S=loadGame(a,'1. e4 e5');quiet(a);S.settings.engineWorkers=1;
   let saved=0;a.replace('saveToLibrary',()=>{saved++;});
@@ -136,9 +128,8 @@ for (const preferred of ['nnue', 'sf19lite']) {
   });
 }
 
-test('Explore and incomplete analyses are never saved as finished games',t=>{
+test('Incomplete analyses are never saved as finished games',t=>{
   const a=app(t);const S=loadGame(a,'1. e4');quiet(a);
-  S.meta={explore:true};a.call('saveToLibrary');assert.equal(a.writes.length,0);
   S.meta={};S.evals[1]=null;a.call('saveToLibrary');assert.equal(a.writes.length,0);
 });
 
@@ -155,7 +146,7 @@ test('batch review sends full move prefixes and refuses FEN-only saved analyses'
   assert.equal(a.call('canRestoreAnalysis',{pgn:S.pgn,settingsKey,bests:S.bests,evals:S.evals}),false);
 });
 
-test('Explore searches prepend mainline context and use the selected branch instead of future moves',async t=>{
+test('Variation searches prepend mainline context and use the selected branch instead of future moves',async t=>{
   const a=app(t),S=loadGame(a,'1. e4 e5 2. Nf3');quiet(a);
   const v=branch(a,1);v.positions=a.call('buildPositions',`[SetUp "1"]\n[FEN "${S.positions[1].fen}"]\n\n1... c5`);
   v.idx=1;v.positions.forEach(p=>{p.eval=null;p.best=null;});

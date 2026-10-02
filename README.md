@@ -18,8 +18,6 @@ rating. No account, no server, no manual PGN copying.
 - **Move classifications** from Brilliant to Blunder, with an evaluation graph and best-move arrows.
 - **Estimated rating** — a rough guide to the level each player performed at in the game.
 - **Opening detection** from an offline book, named even for PGNs without headers.
-- **Explore board** from the popup, without loading a game: try legal moves, browse
-  your move list, and see evaluations, opening names, and move ratings.
 - **Rated alternatives** while reviewing a game, using the same classification rules
   as the played moves. Exploring does not change the original game or its accuracy.
 - **Stockfish 18 NNUE is the default**, with **Stockfish 19 Lite** as a compact
@@ -38,9 +36,9 @@ For older games you don't have open, paste a game URL or PGN into the popup. You
 detected automatically from the board; if it can't be found, enter it once in the popup and it's
 remembered.
 
-To explore without a game, open the popup and select **Explore board**. Click or
-drag pieces to make legal moves. Use the move list, arrow keys, or Home/End to
-navigate. Making a different move replaces the continuation from that position.
+Chess Review is intended for reviewing games after play. The standalone Explore
+board and position-only input were removed because of concerns about use for
+cheating during live games.
 
 The opening dictionary is bundled offline and has no automatic downloads.
 

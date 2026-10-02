@@ -100,7 +100,7 @@ test('move list refreshes a decimal even when its category stays unchanged', t =
   assert.equal(badge.getAttribute('aria-label'),'Inaccuracy, score 3.6');
 });
 
-test('mainline and Explore grades agree and do not depend on player rating', t => {
+test('mainline and variation grades agree and do not depend on player rating', t => {
   const a=app(t);loadGame(a,'1. e4 e5 2. Nf3',[{cp:0},{cp:-50},{cp:50},{cp:-90}]);
   a.call('computeDerived');const grades=[...a.state.moveGrades];
   a.state.players.w.rating=400;a.state.players.b.rating=2800;a.call('computeDerived');
@@ -109,7 +109,7 @@ test('mainline and Explore grades agree and do not depend on player rating', t =
   assert.deepEqual(Array.from(v.positions.slice(1),p=>p.moveGrade),grades.slice(1));
 });
 
-test('Explore shows streamed grades, then discards cancelled snapshots', async t => {
+test('variations show streamed grades, then discards cancelled snapshots', async t => {
   const a=app(t);loadGame(a,'1. e4',[{cp:0},{cp:-50}]);a.call('computeDerived');
   const v=branch(a,0);v.positions[1].eval=null;v.positions[1].best=null;
   const done=deferred();let progress;

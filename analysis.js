@@ -431,16 +431,7 @@ function shareGame(ev) {
     // PC whose stored handle doesn't match either player — the username stays the safety net, the
     // flip is the certainty. (flip = is the user Black / sitting after a board flip.)
     const meta = { ...S.meta, flip: S.flipped, myName: (S.players?.[S.meSide]?.name) || S.username || "" };
-    let pgn = S.pgn;
-    if (S.meta?.explore && S.variation) {
-      const chess = new Chess(S.variation.positions[0].fen);
-      for (const p of S.variation.positions.slice(1, S.variation.idx + 1)) {
-        chess.move({ from: p.from, to: p.to, promotion: p.promotion || undefined });
-      }
-      pgn = chess.pgn();
-      delete meta.explore;
-    }
-    const data = encodeURIComponent(b64encode(JSON.stringify({ pgn, meta })));
+    const data = encodeURIComponent(b64encode(JSON.stringify({ pgn: S.pgn, meta })));
     const carrier = ((S.meta && S.meta.url) ? S.meta.url : "https://www.chess.com/").split("#")[0];
     const url = carrier + "#gambit=" + data;
     navigator.clipboard.writeText(url)
@@ -697,16 +688,6 @@ function activeBest() {
 async function loadJob() {
   const jobId = location.hash.replace(/^#/, "");
   if (!jobId) throw new Error("No analysis job specified.");
-
-  // Explore mode: standalone Lichess-style analysis board
-  if (jobId === "explore") {
-    const startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-    return {
-      pgn: `[SetUp "1"]\n[FEN "${startFen}"]\n\n*`,
-      meta: { explore: true },
-      source: "explore",
-    };
-  }
 
   const key = `job:${jobId}`;
   const data = await browserAPI.storage.local.get(key);
@@ -1141,7 +1122,7 @@ function classifyVariationMoves() {
 
 function variationOpening() {
   const v = S.variation;
-  let opening = S.meta?.explore ? null : S.openingHeader;
+  let opening = S.openingHeader;
   const positions = [...S.positions.slice(0, v.branchIdx), ...v.positions.slice(0, v.idx + 1)];
   for (const pos of positions) {
     const bk = bookLookup(pos.fen);
@@ -1210,7 +1191,7 @@ function classifyLine(state) {
     const before = state.evals[i - 1];
 
     // Annotation evidence uses the completed played-root score when present.
-    // Consecutive evaluations remain available for Explore annotations.
+    // Consecutive evaluations remain available for variation annotations.
     if (bestSearch && before) {
       const playedUci = (state.positions[i].from || "") + (state.positions[i].to || "") + (state.positions[i].promotion || "");
       const lines = bestSearch.lines || [];
@@ -2486,7 +2467,6 @@ function variationTerminal(v, idx) {
 // (Analysis mode is indicated/closed via the Exit button in the controls bar.)
 function exitAnalysis(mainIdx) {
   stopLineWalk();
-  if (S.meta?.explore && S.variation) { gotoVar(0); return; }
   if (!S.analysisMode) { if (mainIdx != null) go(mainIdx); return; }
   S.analysisMode = false; S.variation = null; S.selectedSq = null; S.liveToken++;
   if (mainIdx != null) { go(mainIdx); return; }
@@ -2649,12 +2629,6 @@ function playerStrip(side) {
   );
 }
 function renderPlayers() {
-  const isExplore = S.meta?.explore === true;
-  if (isExplore) {
-    UI.playerTop.replaceChildren();
-    UI.playerBot.replaceChildren();
-    return;
-  }
   UI.playerTop.replaceChildren(playerStrip(S.flipped ? "w" : "b"));
   UI.playerBot.replaceChildren(playerStrip(S.flipped ? "b" : "w"));
   alignPlayers();
@@ -2696,9 +2670,7 @@ function renderControls() {
     UI.controls.replaceChildren(
       el("button", { "aria-label": "Variation start", disabled: atStart, onclick: () => gotoVar(0) }, icon("first")),
       el("button", { "aria-label": "Previous move", onclick: navPrev }, icon("prev")),
-      S.meta?.explore
-        ? el("span", { class: "pos" }, "Explore")
-        : el("button", { class: "exit-analysis", title: "Exit analysis (Esc)", onclick: () => exitAnalysis(v.branchIdx) }, el("span", { class: "ea-x" }, "✕"), "Exit"),
+      el("button", { class: "exit-analysis", title: "Exit analysis (Esc)", onclick: () => exitAnalysis(v.branchIdx) }, el("span", { class: "ea-x" }, "✕"), "Exit"),
       el("button", { "aria-label": "Next move", disabled: atEnd, onclick: navNext }, icon("next")),
       el("button", { "aria-label": "Variation end", disabled: atEnd, onclick: () => gotoVar(v.positions.length - 1) }, icon("last")),
     );
@@ -3387,29 +3359,6 @@ function categoryLabel(cls) {
   return label;
 }
 function renderStats() {
-  const isExplore = S.meta?.explore === true;
-  if (isExplore) {
-    // In explore mode, show a simple panel with current position info
-    const pos = activePos();
-    const cls = pos.classif; // Use variation position's own classification
-    const cfg = cls && QUALITY[cls];
-    const ev = activeEval();
-    const evTxt = ev ? evalText(ev) : "—";
-    UI.stats.replaceChildren(el("div", { class: "panel" },
-      el("div", { class: "panel-head" }, el("h3", {}, "Position")),
-      el("div", { class: "panel-body" },
-        el("div", { class: "acc-row" },
-          el("div", { class: "acc-cell" },
-            cfg ? gradeBadge(cls, pos.moveGrade, "qb icon") : null,
-            el("span", { class: "acc-name" }, cfg ? categoryName(cls) : "—"),
-            el("span", { class: "acc-val", style: { color: "var(--accent)" } }, evTxt),
-          ),
-        ),
-      ),
-    ));
-    statsRefs = null;
-    return;
-  }
   const opSide = S.meSide === "w" ? "b" : "w";
   const meAcc = S.acc[S.meSide], opAcc = S.acc[opSide];
   const meRating = S.players[S.meSide]?.rating, opRating = S.players[opSide]?.rating;
@@ -3482,13 +3431,6 @@ function renderStats() {
 
 /* ---------------- Eval graph ---------------- */
 function renderGraph() {
-  const isExplore = S.meta?.explore === true;
-  if (isExplore) {
-    const mod = UI.graph.closest(".mod");
-    if (mod) mod.hidden = true;
-    UI.graph.replaceChildren();
-    return;
-  }
   const show = S.settings.evalView === "both" || S.settings.evalView === "graph";
   const mod = UI.graph.closest(".mod");
   if (mod) mod.hidden = !show;   // hidden, not just emptied, so the layout closes the gap
@@ -3643,52 +3585,6 @@ function highlightCurrentMove(forceScroll = false) {
 let _movesSig = null;
 let _movesClassSig = null;
 function renderMoves() {
-  const isExplore = S.meta?.explore === true;
-  if (isExplore && S.variation) {
-    // In explore mode, show the variation moves
-    const v = S.variation;
-    const ml = S.settings.mlStyle;
-    // Position identity and selected move are part of the cache key.
-    const varClassifSig = v.positions.slice(1).map(p => [p.fen, p.san, p.classif, p.moveGrade]);
-    const sig = JSON.stringify([ml, S.settings.badgeStyle, v.idx, varClassifSig]);
-    if (sig === _movesSig && UI.movesBody.firstChild) { return; }
-    _movesSig = sig;
-    let list;
-    if (ml === "compact") {
-      list = el("div", { class: "movelist ml-compact ml-scroll" });
-      for (let i = 1; i < v.positions.length; i++) {
-        const pos = v.positions[i];
-        const cls = pos.classif; // Use variation position's own classification
-        const showBadge = cls && (NOTEWORTHY.has(cls) || S.settings.badgeStyle === "dot");
-        const glyph = GLYPH[pos.san && /^[KQRBN]/.test(pos.san) ? pos.san[0] : "P"];
-        const cell = el("span", { class: "ml-move" + (i === v.idx ? " current" : ""), "data-ply": i, onclick: () => gotoVar(i) },
-          el("span", { class: "pc", style: { color: pos.color === "w" ? "var(--ink)" : "var(--ink-2)" } }, glyph),
-          el("span", {}, pos.san),
-          showBadge ? qBadge(cls, pos.moveGrade) : null,
-        );
-        list.append(cell);
-      }
-    } else {
-      list = el("div", { class: "movelist " + (ml === "cards" ? "ml-cards" : "ml-rows") + " ml-scroll" });
-      for (let i = 1; i < v.positions.length; i++) {
-        const pos = v.positions[i];
-        const cls = pos.classif; // Use variation position's own classification
-        const showBadge = cls && (NOTEWORTHY.has(cls) || S.settings.badgeStyle === "dot");
-        const glyph = GLYPH[pos.san && /^[KQRBN]/.test(pos.san) ? pos.san[0] : "P"];
-        const cell = el("span", { class: "ml-move" + (i === v.idx ? " current" : ""), "data-ply": i, onclick: () => gotoVar(i) },
-          el("span", { class: "pc", style: { color: pos.color === "w" ? "var(--ink)" : "var(--ink-2)" } }, glyph),
-          el("span", {}, pos.san),
-          showBadge ? qBadge(cls, pos.moveGrade) : null,
-        );
-        list.append(el("div", { class: "ml-pair" }, cell));
-      }
-    }
-    UI.movesBody.style.padding = ml === "rows" ? "0" : "var(--pad)";
-    UI.movesBody.replaceChildren(list);
-    UI.movesCount.textContent = "";
-    UI.movesFoot.hidden = true;
-    return;
-  }
   const nMoves = Math.ceil(S.total / 2);
   const ml = S.settings.mlStyle;
   // Keep move cells mounted while classifications arrive. Replacing the list during analysis
@@ -3875,10 +3771,6 @@ function renderEngine(lines, padFromCache = false) {
 
 /* ---------------- Topbar meta ---------------- */
 function metaChips() {
-  const isExplore = S.meta?.explore === true;
-  if (isExplore) {
-    return [el("span", { class: "meta-chip" }, el("b", {}, "Explore"))];
-  }
   const res = S.players[S.meSide].result;
   let outcome = "Result unknown";
   if (res === "1-0") outcome = S.meSide === "w" ? "Victory" : "Loss";
@@ -4725,7 +4617,7 @@ async function setEngineSetting(key, value) {
   // refresh the panel (which kicks off an on-demand search if more lines are wanted).
   const lineKey = key === "engineLines" || key === "fastLines" || key === "fastAnalysis";
   const displayOnly = lineKey && !S.analyzing;
-  if (!displayOnly && !S.meta?.explore) scheduleReanalyze();
+  if (!displayOnly) scheduleReanalyze();
   renderEngineCurrent();
   if (UI.settings && !UI.settings.hidden) renderSettings();
 }
@@ -5124,7 +5016,7 @@ function canRestoreAnalysis(saved) {
 
 function saveToLibrary() {
   try {
-    if (!S.pgn || S.meta?.explore || S.total === 0 || S.analyzing || S.analysisError
+    if (!S.pgn || S.total === 0 || S.analyzing || S.analysisError
       || !completeAnalysis(S, S.total + 1)) return;
     const id = currentGameId();
     const opSide = S.meSide === "w" ? "b" : "w";
@@ -5288,7 +5180,7 @@ function navNext() { if (S.practice) return; stopLineWalk(); if (S.analysisMode)
 function navPrev() { if (S.practice) return; stopLineWalk(); if (S.analysisMode) variationStep(-1); else go(S.idx - 1); }
 // Jump to a mainline position (exits analysis mode if active).
 function gotoMainline(ply) { if (S.practice) return; stopLineWalk(); if (S.analysisMode) exitAnalysis(); go(ply); }
-// Jump to a variation position (explore mode).
+// Jump to a variation position while reviewing a game.
 function gotoVar(idx) { if (S.practice) return; stopLineWalk(); if (!S.variation) return; const v = S.variation; if (idx < 0 || idx >= v.positions.length) return; v.idx = idx; S.selectedSq = null; paintBoard(); playSanSound(v.positions[v.idx]?.san); renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent(); requestLiveEval(); }
 function variationStep(delta) {
   const v = S.variation; if (!v) return;
@@ -5342,8 +5234,7 @@ let _reanalyzeT = null;
 function scheduleReanalyze() {
   clearTimeout(_reanalyzeT);
   _reanalyzeT = setTimeout(() => {
-    if (S.meta?.explore) requestLiveEval();
-    else startAnalysis();
+    startAnalysis();
   }, 400);
 }
 function terminateEngines() {
@@ -5365,7 +5256,6 @@ function requestProgress(gen) {
   setTimeout(() => flushProgress(gen), Math.max(0, 140 - (Date.now() - _progLast)));
 }
 async function startAnalysis() {
-  if (S.meta?.explore) { await requestLiveEval(); return; }
   const gen = ++S.batchGen;
   S.engineFallbackBuild = null;
   S.activeEngineBuild = null;
@@ -5488,7 +5378,8 @@ function renderAll() {
    and for switching to another library game in place — no page reload, so there's no black flash
    between games; only the panels' data and the board orientation change. */
 async function applyGame(payload) {
-  const isExplore = payload.meta?.explore === true;
+  const positions = buildPositions(payload.pgn);
+  if (positions.length < 2) throw new Error("Load a game with moves to review. Standalone positions are not supported.");
 
   // Tear down anything tied to the previous game.
   clearTimeout(_reanalyzeT);
@@ -5517,7 +5408,7 @@ async function applyGame(payload) {
   S.meta = payload.meta || {};
   S.headers = parseHeaders(payload.pgn);
   S.clocks = parseClocks(payload.pgn);
-  S.positions = buildPositions(payload.pgn);
+  S.positions = positions;
   S.total = S.positions.length - 1;
   S.evals = new Array(S.total + 1).fill(null);
   S.bests = new Array(S.total + 1).fill(null);
@@ -5534,23 +5425,7 @@ async function applyGame(payload) {
   const side = flip === true ? "b" : flip === false ? "w" : meSide;
   S.meSide = side; S.flipped = side === "b"; S.idx = 0;
 
-  if (isExplore) {
-    // Explore mode: standalone analysis board with free movement
-    S.analyzing = false;
-    S.analysisMode = true;
-    S.variation = {
-      branchIdx: 0,
-      positions: [{ fen: S.positions[0].fen, san: null, eval: null, best: null }],
-      idx: 0,
-    };
-    document.title = "Explore — Chess Review";
-    computeDerived();
-    renderAll();
-    requestLiveEval(); // start live engine analysis
-    return;
-  }
-
-  // Normal game mode: restore saved analysis or start fresh
+  // Restore saved game analysis or start fresh
   let saved = payload.analysis;
   if (saved == null && !("analysis" in payload)) {
     try { const k = "analysis:" + currentGameId(); const s = await browserAPI.storage.local.get(k); saved = s[k] || null; } catch {}
@@ -5751,7 +5626,7 @@ async function resetLegacyZoom() {
     await applyGame(payload);
     // Two-phase load: now that initialization succeeded, remove the job data so it doesn't accumulate.
     const jobId = location.hash.replace(/^#/, "");
-    if (jobId && jobId !== "explore") {
+    if (jobId) {
       await browserAPI.storage.local.remove(`job:${jobId}`);
     }
     // Fit the desktop composition or custom canvas; narrow windows retain the responsive grid.

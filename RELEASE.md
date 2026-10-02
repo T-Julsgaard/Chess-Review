@@ -121,7 +121,8 @@ No test account is needed. Open the popup away from a chess site and:
 
 1. Paste `1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 *` into Manual setup and review it.
 2. Verify 18 NNUE is selected by default; switch to 19 Lite and re-analyze.
-3. Open Explore board, make a move, and verify engine output and navigation.
+3. Verify the popup offers game review only; a position-only PGN is rejected.
+   Review a game and verify alternative moves, engine output, and navigation.
 4. On a finished public Chess.com/Lichess game, launch through the popup, keyboard
    shortcut, and in-page review button. A missing content script should produce
    a username prompt or use the saved username, never a TypeError.
