@@ -11,6 +11,10 @@ The [public repertoire studies](OPENING_REPERTOIRE.md) test opening recognition
 with exact score-message guards and a separately frozen public search-sensitivity
 scale. Both quality replay and contextual fitting are independently reproducible.
 
+The [exact-message transport study](SEARCH_EVIDENCE.md) checks stored score/PV
+identity separately from final recommendations and adds only missing restricted
+played searches in a separate cache. It preserves the fitted coefficients.
+
 Brilliant-move annotation is assessed separately from numerical calibration in
 [`BRILLIANT_MOVES.md`](BRILLIANT_MOVES.md). It uses board and existing evaluation
 evidence; annotations are excluded from fitted accuracy/rating inputs.
