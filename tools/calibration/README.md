@@ -21,6 +21,10 @@ public sample. A widest-grid fit remains an identification limitation.
 The [phase-conditioned follow-up](PHASE_CONTEXT_RUN.md) improves joint choice
 prediction but not later-choice prediction, and retains the widest latent prior.
 
+The [opponent-conditioned public context study](OPPONENT_CONTEXT_RUN.md) tests
+public PGN opponent-rating gaps against a pooled complete-game quality baseline.
+Its training and consumed-validation differences are tiny and mixed.
+
 Brilliant-move annotation is assessed separately from numerical calibration in
 [`BRILLIANT_MOVES.md`](BRILLIANT_MOVES.md). It uses board and existing evaluation
 evidence; annotations are excluded from fitted accuracy/rating inputs.
