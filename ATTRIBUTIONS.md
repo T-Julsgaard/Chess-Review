@@ -147,7 +147,7 @@ Distributed by Lichess (lila); high-quality vector SVGs.
 - **License:** GNU GPL v3.0, under the project's [LICENSE](LICENSE).
 - **Files:**
 - `sounds/fx/chess_sound_01.wav` through `sounds/fx/chess_sound_09.wav`.
-- `backgrounds/bg-slate.webp` and `backgrounds/bg-ember.webp`.
+- `backgrounds/bg-slate.webp`.
 - Animated coach artwork and rigs in `data/coaches-anim/rigs/*.html` and `*.js`.
 
 These original assets are separate from the four Lichess move / board MP3 recordings
