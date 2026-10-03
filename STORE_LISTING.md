@@ -7,8 +7,7 @@ screenshots and privacy declarations with the actual version you distribute.
 
 ## Short description
 
-Review your chess games, spot mistakes, and find better moves with Stockfish
-analysis in your browser.
+Free, open-source analysis for your chess games.
 
 ## Overview
 
