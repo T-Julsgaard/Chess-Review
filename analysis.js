@@ -4577,7 +4577,7 @@ async function setEngineSetting(key, value) {
   }
   if (key === "engineDepth" && value !== 16 && S.settings.enginePath === "nnue" && S.settings.engineDepth === 16) {
     const proceed = await calibrationWarning("Change the calibrated depth?",
-      "Stockfish 18's accuracy and recorded-rating estimates are calibrated at depth 16. At another depth, those scores become unavailable. Moves-only rating estimates use a separate fixed search budget and remain available when selected. Continue with the new depth or keep depth 16.", "Keep depth 16");
+      "Our accuracy and estimated-rating calibration is built primarily around Stockfish 18 NNUE at depth 16. Other depths have less validation behind their review scores, so changing the depth may produce less reliable results. We recommend keeping depth 16 for the most consistent game reviews.", "Keep depth 16", true);
     if (!proceed) return;
   }
   S.settings[key] = value;

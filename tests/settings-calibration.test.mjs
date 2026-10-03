@@ -36,7 +36,15 @@ test('SF19 selection waits for a warning choice before saving or reanalyzing', a
 test('SF18 depth warning supports keeping calibration; SF19 depth changes need no warning', async t => {
   const a = settings(t);
   let pending = a.call('setEngineSetting', 'engineDepth', 18);
-  assert.match(a.dom.window.document.querySelector('.calibration-warning').textContent, /scores become unavailable/);
+  const dialog = a.dom.window.document.querySelector('[role="alertdialog"]');
+  assert.equal(dialog.querySelector('h3').textContent, 'Warning');
+  assert.match(dialog.textContent, /Stockfish 18 NNUE at depth 16/);
+  assert.match(dialog.textContent, /less validation/);
+  assert.match(dialog.textContent, /less reliable results/);
+  assert.doesNotMatch(dialog.textContent, /scores become unavailable|moves.only/);
+  assert.equal(dialog.querySelector('button.recommended .calibration-warning-choice-label').textContent, 'Keep depth 16');
+  assert.equal(dialog.querySelector('button.recommended small').textContent, 'Recommended');
+  assert.equal(a.state.settings.engineDepth, 16); assert.equal(a.writes.length, 0); assert.equal(a.searches(), 0);
   choice(a, 'Keep depth 16'); await pending;
   assert.equal(a.state.settings.engineDepth, 16); assert.equal(a.searches(), 0);
   pending = a.call('setEngineSetting', 'engineDepth', 18); choice(a, 'Continue'); await pending;
