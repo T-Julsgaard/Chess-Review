@@ -38,6 +38,11 @@ and where to keep experiments and generated files.
 Follow the surrounding JavaScript, HTML, and CSS style. Keep each pull request
 focused and avoid unrelated formatting or generated files.
 
+Keep temporary investigation reports, diagnostic scripts, sample exports, and
+other one-off work in `scratch/`, which is ignored by Git. Commit the resulting
+fix and lasting regression tests; promote supporting material only when it needs
+to be maintained as part of the project.
+
 Run these checks for code changes:
 
 ```sh

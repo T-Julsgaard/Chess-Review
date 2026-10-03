@@ -40,7 +40,9 @@ Many small asset files are intentional; removing them can break optional setting
 
 Keep short-lived outputs in ignored directories. `npm ci` recreates
 `node_modules/`; `npm run build` writes packages and source snapshots to
-`web-ext-artifacts/`. Use `calibration-runs/` for exploratory inputs and logs.
+`web-ext-artifacts/`. Use `scratch/` for temporary reports, one-off diagnostic
+scripts, sample exports, and other investigation files; it is ignored by Git and
+excluded from release packages. Use `calibration-runs/` for calibration inputs and logs.
 Repository metadata lives in `.git/`.
 
 Tracked files should support runtime, maintained tooling, reproduction or

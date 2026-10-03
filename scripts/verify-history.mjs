@@ -15,7 +15,7 @@ function verifyHistoryPath(name) {
   if (name.startsWith('tools/calibration/') && !maintainedTools.has(name.slice('tools/calibration/'.length))) {
     throw Error('Retired research in reachable history: ' + name);
   }
-  if (/^(?:tools\/dataset|design\/icon-explorations|backup|\.git_sf19_cloud_backup|boards-img|pieces-img\/(?:kaneo|kaneo_midnight|kbyte_gambit|johnpablok)|calibration-runs|web-ext-artifacts)\//.test(name)) {
+  if (/^(?:tools\/dataset|design\/icon-explorations|backup|\.git_sf19_cloud_backup|boards-img|pieces-img\/(?:kaneo|kaneo_midnight|kbyte_gambit|johnpablok)|calibration-runs|scratch|web-ext-artifacts)\//.test(name)) {
     throw Error('Retired or generated directory in reachable history: ' + name);
   }
   if (name === 'docs/DESIGN_HISTORY.md') throw Error('Retired documentation in reachable history: ' + name);

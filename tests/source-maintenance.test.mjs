@@ -15,6 +15,8 @@ test('older fork contributions cannot restore unsupported models or retired tool
   const modelPath = path.join(root, 'data/calibration.json');
   const analysisPath = path.join(root, 'analysis.js');
   await writeFile(modelPath, current); await writeFile(analysisPath, '');
+  await mkdir(path.join(root, 'scratch'));
+  await writeFile(path.join(root, 'scratch', 'notes.md'), 'Accuracy within ' + '9' + '5% of Chess' + '.com');
   await verifySource(root);
   await writeFile(modelPath, JSON.stringify({version: 'unsupported', display: 'winpct'}));
   await assert.rejects(verifySource(root), /model schema/);
@@ -54,6 +56,9 @@ test('history checks catch deleted commit-message claims and identical blobs und
 });
 
 test('history checks reject retired models even when the current tree is clean', () => {
+  assert.throws(() => verifyHistoryBlob('scratch/notes.md', ''), /generated directory/);
+  assert.throws(() => verifyHistoryBlob('tools/calibration/ACCURACY_DIAGNOSTICS.md', 'Archived investigation.'), /Retired research/);
+  assert.throws(() => verifyHistoryBlob('tools/calibration/diagnose-accuracy.mjs', ''), /Retired research/);
   assert.doesNotThrow(() => verifyHistoryBlob('data/calibration.json', '{}'));
   assert.throws(() => verifyHistoryBlob('data/calibration.json', '{"winK":1}'), /reachable history/);
   assert.throws(() => verifyHistoryBlob('tools/dataset/restored.mjs', ''), /reachable history/);

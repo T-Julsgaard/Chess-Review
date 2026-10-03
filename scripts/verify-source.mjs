@@ -15,7 +15,7 @@ async function files(dir, prefix = '') {
   const result = [];
   try {
     for (const entry of await readdir(dir, {withFileTypes: true})) {
-      if (['.git', 'node_modules', 'web-ext-artifacts', 'calibration-runs', '.codex', '.agents'].includes(entry.name)) continue;
+      if (['.git', 'node_modules', 'web-ext-artifacts', 'calibration-runs', 'scratch', '.codex', '.agents'].includes(entry.name)) continue;
       const name = prefix + entry.name;
       if (entry.isDirectory()) result.push(...await files(path.join(dir, entry.name), name + '/'));
       else result.push(name);
