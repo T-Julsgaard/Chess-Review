@@ -52,14 +52,15 @@ const BOARD_THEMES = {
   slate:   ["#dfe3e9", "#8a97a8"],
   ocean:   ["#dbe7f3", "#6f8fb4"],
   ink:     ["#b9bdc6", "#474c57"],
-  // Four extra professional palettes.
+  // Additional palettes.
   maple:   ["#e8cfa0", "#a4703c"],   // warm maple wood
   emerald: ["#e4ead4", "#46683f"],   // deep forest green
   coral:   ["#f7dfca", "#c8835a"],   // warm terracotta
+  lavender: ["#eae4f3", "#9580b3"], // soft purple
 };
 // Display names are separate from persisted keys so existing board preferences keep working.
 const BOARD_THEME_LABEL = { green: "Meadow", walnut: "Hazel", slate: "Mist", ocean: "Harbor",
-  ink: "Graphite", maple: "Honeywood", emerald: "Forest", coral: "Terracotta" };
+  ink: "Graphite", maple: "Honeywood", emerald: "Forest", coral: "Terracotta", lavender: "Lavender" };
 const ACCENTS = {
   "#7fb45f": { accent: "#7fb45f", strong: "#6aa14a", ink: "#11210a" },
   "#5a8bef": { accent: "#5a8bef", strong: "#4574db", ink: "#06122e" },
