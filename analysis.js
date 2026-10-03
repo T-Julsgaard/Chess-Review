@@ -636,7 +636,7 @@ const S = {
   evalEngines: [], autoTimer: null,
   // Re-analysis + analysis mode
   batchGen: 0, settingsTab: "visual", analyzedMultipv: null,
-  analysisMode: false, variation: null, liveEngine: null, liveEnginePromise: null, liveEngineGeneration: 0, liveError: null, liveToken: 0, panelToken: 0, _panelCache: null, selectedSq: null,
+  analysisMode: false, variation: null, savedVars: [], liveEngine: null, liveEnginePromise: null, liveEngineGeneration: 0, liveError: null, liveToken: 0, panelToken: 0, _panelCache: null, selectedSq: null,
   // The build that is ACTUALLY running (set by createEngine; may differ from settings.enginePath if
   // the chosen build failed to load and we fell back). The Engine tab shows this, not the selection.
   activeEngineBuild: null, engineFallbackBuild: null,
@@ -2426,8 +2426,9 @@ function refreshVariation() {
 }
 
 function invalidateVariationEvals() {
-  if (!S.variation) return;
-  for (const p of S.variation.positions) { p.eval = null; p.best = null; p.classif = null; }
+  const all = new Set(S.savedVars || []);
+  if (S.variation) all.add(S.variation);
+  for (const v of all) for (const p of v.positions) { p.eval = null; p.best = null; p.classif = null; }
 }
 
 function resetLiveEngine() {
@@ -3626,6 +3627,7 @@ function highlightCurrentMove(forceScroll = false) {
 }
 let _movesSig = null;
 let _movesClassSig = null;
+let _varSig = null;
 function renderMoves() {
   const isExplore = S.meta?.explore === true;
   if (isExplore && S.variation) {
@@ -3691,10 +3693,11 @@ function renderMoves() {
       }
       _movesClassSig = classSig;
     }
-    highlightCurrentMove(); return;
+    highlightCurrentMove(); renderVarBlocks(); return;
   }
   _movesSig = sig;
   _movesClassSig = classSig;
+  _varSig = null;                      // the list is rebuilt below, so the inline variation lines must be redrawn
   let list;
   if (ml === "compact") {
     list = el("div", { class: "movelist ml-compact ml-scroll" });
@@ -3709,8 +3712,80 @@ function renderMoves() {
   UI.movesCount.textContent = "";
   // Book moves are now shown in the Accuracy breakdown (expanded), no longer here in "Moves".
   UI.movesFoot.hidden = true;
+  renderVarBlocks();
   // auto-scroll to the current move
   highlightCurrentMove(true);
+}
+
+/* ---------------- Inline variation lines (Lichess-style) ----------------
+   Every line you explore is shown in the Moves list right under the mainline move it replaces,
+   e.g.  4…a6 5.♞g5 d6 …, with the same classification badges as the mainline. Lines are kept in
+   memory only (S.savedVars): they survive clicking back to the mainline, but are never written to
+   storage, so they are gone when you close the review or load another game. */
+function registerVariation() {
+  const v = S.variation;
+  if (!v || S.meta?.explore || v.positions.length < 2 || S.savedVars.includes(v)) return;
+  // Re-playing the same first move from the same position replaces the older line.
+  S.savedVars = S.savedVars.filter(o => !(o.branchIdx === v.branchIdx && o.positions[1]?.san === v.positions[1]?.san));
+  S.savedVars.push(v);
+}
+// Click a move inside an inline variation line: enter that line at that move.
+function openVar(v, idx) {
+  if (S.practice) return;
+  stopLineWalk();
+  if (S.variation !== v) {
+    S.variation = v; S.analysisMode = true; S.liveToken++;
+    if (S.idx !== v.branchIdx) { S.idx = v.branchIdx; renderGraph(); }   // keep S.idx on the branch point
+  }
+  gotoVar(idx);
+}
+function varMoveEl(v, j) {
+  const pos = v.positions[j];
+  const cls = pos.classif;
+  const showBadge = !!cls;   // variation lines are short, so every classified move gets its badge (Best, Good, Book… too)
+  const isPiece = pos.san && /^[KQRBN]/.test(pos.san);
+  const cur = S.analysisMode && S.variation === v && v.idx === j;
+  return el("span", { class: "vm" + (cur ? " current" : ""), "data-vply": j, onclick: (e) => { e.stopPropagation(); openVar(v, j); } },
+    isPiece ? el("span", { class: "pc", style: { color: pos.color === "w" ? "var(--ink)" : "var(--ink-2)" } }, GLYPH[pos.san[0]]) : null,
+    el("span", {}, isPiece ? pos.san.slice(1) : pos.san),
+    showBadge ? qBadge(cls) : null,
+  );
+}
+function renderVarBlocks() {
+  const root = UI.movesBody.querySelector(".movelist");
+  if (!root || S.meta?.explore) return;
+  registerVariation();
+  const vars = S.savedVars.filter(v => v.positions.length > 1).sort((a, b) => a.branchIdx - b.branchIdx);
+  const active = S.analysisMode && S.variation ? S.variation : null;
+  const sig = JSON.stringify([S.settings.mlStyle, S.settings.badgeStyle, active ? vars.indexOf(active) : -1, active ? active.idx : -1,
+    vars.map(v => [v.branchIdx, v.positions.slice(1).map(p => [p.san, p.classif || ""])])]);
+  if (sig === _varSig) return;
+  _varSig = sig;
+  root.querySelectorAll(".ml-var").forEach(n => n.remove());
+  if (!vars.length || S.total < 1) return;
+  const compact = S.settings.mlStyle === "compact";
+  const tails = new Map();
+  for (const v of vars) {
+    // Anchor: the mainline row (or, in compact style, the move pair) holding the move this line replaces.
+    const n = Math.ceil(Math.min(v.branchIdx + 1, S.total) / 2);
+    let anchor = null;
+    if (compact) {
+      const white = root.querySelector('.ml-move[data-ply="' + (n * 2 - 1) + '"]');
+      anchor = white ? (white.nextElementSibling || white) : null;
+    } else {
+      anchor = root.children[n - 1] || null;
+    }
+    if (!anchor) continue;
+    const block = el("div", { class: "ml-var" });
+    for (let j = 1; j < v.positions.length; j++) {
+      const ply = v.branchIdx + j;                       // 1-based ply of this variation move
+      const white = v.positions[j].color === "w";
+      if (white || j === 1) block.append(el("span", { class: "vn" }, Math.ceil(ply / 2) + (white ? "." : "…")));
+      block.append(varMoveEl(v, j));
+    }
+    (tails.get(anchor) || anchor).after(block);
+    tails.set(anchor, block);
+  }
 }
 
 /* ---------------- Engine lines ---------------- */
@@ -5484,7 +5559,7 @@ async function applyGame(payload) {
   if (S.practice && S.practice.rollT) clearTimeout(S.practice.rollT);
   clearDemoTimers(); removeMoveCallout();
   S.practice = null; S.practiceHint = null;
-  S.analysisMode = false; S.variation = null; S.liveToken++;
+  S.analysisMode = false; S.variation = null; S.savedVars = []; S.liveToken++;
   S.selectedSq = null; S.userArrows = []; S.userMarks = []; S.lineWalking = false;
   revRefs = null; statsRefs = null; _lastCommentKey = -1; _ipSig = null; S._turnPly = null;
   S._lastEngineLines = null;

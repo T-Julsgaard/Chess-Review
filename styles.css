@@ -691,6 +691,28 @@ button { font-family: inherit; cursor: pointer; }
 .ml-compact .ml-move:hover { background: var(--panel-2); }
 .ml-compact .ml-move.current { background: color-mix(in oklab, var(--accent) 20%, var(--panel)); }
 
+/* inline variation lines (explored lines shown under the mainline move they replace) */
+.ml-var {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 2px 3px;
+  margin: 2px 0 4px; padding: 5px 10px 6px 12px;
+  border-left: 2px solid var(--accent);
+  background: color-mix(in oklab, var(--accent) 6%, var(--panel));
+  font-family: var(--font-mono); font-size: 12.5px; font-weight: 600; line-height: 1.7;
+}
+.ml-cards .ml-var { border-radius: 8px; }
+.ml-var .vn { color: var(--ink-3); font-size: 11px; margin-right: -1px; }
+.ml-var .vm {
+  display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px;
+  border-radius: 6px; color: var(--ink); cursor: pointer; transition: .1s;
+}
+.ml-var .vm:hover { background: var(--panel-2); }
+.ml-var .vm.current {
+  background: color-mix(in oklab, var(--accent) 32%, var(--panel));
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.ml-var .vm .pc { font-size: 14px; -webkit-text-stroke: .5px currentColor; }
+.ml-var .vm .qb.icon { width: 15px; height: 15px; }
+
 /* badges inside moves */
 .qb { display: inline-grid; place-items: center; flex: none; }
 .qb.icon { width: 17px; height: 17px; display: block; filter: drop-shadow(0 1px 1px rgba(0,0,0,.3)); }
