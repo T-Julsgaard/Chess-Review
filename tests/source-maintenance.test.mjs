@@ -59,4 +59,5 @@ test('history checks reject retired models even when the current tree is clean',
   assert.throws(() => verifyHistoryBlob('tools/dataset/restored.mjs', ''), /reachable history/);
   assert.throws(() => verifyHistoryBlob('analysis.js', 'function calWinK() { return 1; }'), /scoring body/);
   assert.doesNotThrow(() => verifyHistoryBlob('analysis.js', 'function calWinK() { return NaN; }'));
+  assert.throws(() => verifyHistoryBlob('tests/helpers/app.mjs', 'CALIB = {winK: 1};'), /numerical test fixture/);
 });

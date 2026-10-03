@@ -24,6 +24,9 @@ function verifyHistoryPath(name) {
 export function verifyHistoryBlob(name, content) {
   verifyHistoryPath(name);
   verifyClaims(content, name);
+  if (name.startsWith('tests/helpers/') && /\bwinK\s*:/.test(content)) {
+    throw Error('Unsupported numerical test fixture in reachable history: ' + name);
+  }
   if (name === 'data/calibration.json') {
     const model = JSON.parse(content);
     if (Object.keys(model).length && model.schema !== 'chess-review-public-calibration-v1') {

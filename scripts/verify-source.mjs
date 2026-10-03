@@ -56,7 +56,13 @@ export async function verifySource(root) {
   for (const name of await files(root)) {
     if (!/\.(?:md|txt|json|js|mjs|cjs|html|css|yml|yaml|csv|svg)$/i.test(name)) continue;
     const file = path.join(root, name);
-    if ((await stat(file)).size <= 4 * 1024 * 1024) verifyClaims(await readFile(file, 'utf8'), name);
+    if ((await stat(file)).size <= 4 * 1024 * 1024) {
+      const content = await readFile(file, 'utf8');
+      verifyClaims(content, name);
+      if (name.startsWith('tests/helpers/') && /\bwinK\s*:/.test(content)) {
+        throw Error('Unsupported numerical test fixture: ' + name);
+      }
+    }
   }
 }
 
