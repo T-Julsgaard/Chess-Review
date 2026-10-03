@@ -3757,7 +3757,8 @@ function renderEngine(lines, padFromCache = false) {
   UI.engine.replaceChildren(el("div", { class: "panel" },
     el("div", { class: "panel-head" }, el("h3", {}, "Engine"),
       el("span", { class: "count" }, `${activeEngineName()} · depth ${S.settings.engineDepth}`)),
-    el("div", { class: "panel-body engine-body" }, body, bestWalkBtn),
+    el("div", { class: "panel-body engine-body" },
+      el("div", { class: "engine-candidates", style: { minHeight: (want * 46) + "px" } }, body), bestWalkBtn),
   ));
   fitEnginePanel();
 }

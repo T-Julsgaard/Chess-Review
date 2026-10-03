@@ -710,6 +710,7 @@ button { font-family: inherit; cursor: pointer; }
 
 /* ---------- ENGINE LINES ---------- */
 .engine-line {
+  height: 46px; box-sizing: border-box;
   display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 12px; align-items: center;
   padding: 9px 4px; border-bottom: 1px solid var(--line-soft); font-family: var(--font-mono);
 }

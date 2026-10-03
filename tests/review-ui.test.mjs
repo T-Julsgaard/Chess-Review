@@ -55,6 +55,20 @@ test('engine panel does not reuse lines from the same FEN reached through differ
   assert.match(a.dom.window.document.querySelector('.engine-body').textContent,/Analyzing/);
 });
 
+test('engine loading, ready and terminal states reserve identical candidate space above Stop', t => {
+  const a = board(t), doc = a.dom.window.document;
+  a.state.bestWalking = true;
+  for (let count = 1; count <= 4; count++) {
+    a.state.settings.engineLines = count;
+    for (const lines of [null, Array.from({length: count}, () => ({score: {cp: 12}, pv: '', depth: 16})), []]) {
+      a.state._lastEngineLines = null; a.call('renderEngine', lines);
+      const candidates = doc.querySelector('.engine-candidates');
+      assert.equal(candidates.style.minHeight, `${count * 46}px`);
+      assert.equal(candidates.nextElementSibling.textContent, '■ Stop');
+    }
+  }
+});
+
 
 test('the retired standalone URL requires a stored game job',async t=>{
   const a=app(t);a.dom.window.location.hash='#explore';
