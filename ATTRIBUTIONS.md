@@ -107,14 +107,18 @@ Distributed by Lichess (lila); high-quality vector SVGs.
 - This reference identifies the verified license text; it does not claim that the
   original adaptation was made from that exact upstream commit.
 
-## Move-category badges
+## Numeric move grades and reference SVGs
 - **Author:** T-Julsgaard, project maintainer.
 - **Files:** `icons/brilliant.svg`, `icons/great.svg`, `icons/book.svg`,
   `icons/best.svg`, `icons/excellent.svg`, `icons/good.svg`, `icons/inaccuracy.svg`,
   `icons/mistake.svg`, `icons/miss.svg`, and `icons/blunder.svg`.
 - **Source:** maintainer-created badge artwork. The maintainer confirmed authorship
   on 2026-09-30; this records that declaration, not independent verification of
-  every creation input. The redesigned symbols retain the previous circle colours.
+  every creation input.
+- **Current design:** move grades display numbers in coloured circles, rendered
+  per move by `move-grades.js`. Book moves use a book symbol without a numeric score.
+  The SVG files above are reference snapshots of this design, checked against the
+  shared renderer by `tests/move-grades.test.mjs`; they are not loaded by the review UI.
 - **License:** GNU GPL v3.0, under the project's [LICENSE](LICENSE).
 
 ## App logo / icon
