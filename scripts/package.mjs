@@ -5,8 +5,10 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { cmd } from 'web-ext';
 import './verify-engines.mjs';
+import {verifySource} from './verify-source.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
+await verifySource(root);
 const artifactsDir = path.join(root, 'web-ext-artifacts');
 const manifest = JSON.parse(await readFile(path.join(root, 'manifest.json'), 'utf8'));
 const pkg = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));

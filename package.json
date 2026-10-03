@@ -1,6 +1,6 @@
 {
   "name": "chess-review",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Chess Review — free, local game review powered by Stockfish NNUE.",
   "license": "GPL-3.0",
@@ -8,6 +8,8 @@
   "scripts": {
     "build": "node scripts/package.mjs",
     "verify:engines": "node scripts/verify-engines.mjs",
+    "verify:source": "node scripts/verify-source.mjs",
+    "verify:history": "node scripts/verify-history.mjs",
     "lint": "web-ext lint --source-dir=.",
     "start:firefox": "web-ext run --target=firefox-desktop --source-dir=.",
     "start:chrome": "web-ext run --target=chromium --source-dir=.",

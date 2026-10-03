@@ -1,11 +1,11 @@
-# Release 0.2.0
+# Release 0.2.1
 
 ## Packages and verification
 
 Run `npm ci`, `npm test`, `npm run verify:engines`, and `npm run build`.
-Each build creates a new `web-ext-artifacts/release-0.2.0-<unique>/` directory.
-It preserves `chess-review-0.2.0-chrome.zip`, `chess-review-0.2.0-firefox.zip`, and
-`chess-review-0.2.0-source.zip`, alongside staged copies. Existing packages are
+Each build creates a new `web-ext-artifacts/release-0.2.1-<unique>/` directory.
+It preserves `chess-review-0.2.1-chrome.zip`, `chess-review-0.2.1-firefox.zip`, and
+`chess-review-0.2.1-source.zip`, alongside staged copies. Existing packages are
 never overwritten. `release-record.json` records SHA-256 checksums, source-file
 hashes, the Git HEAD and working-tree status, Node version, and build time.
 `web-ext-artifacts/latest-release.json` points to the newest completed record;
@@ -19,7 +19,7 @@ dependencies. Engine upstream source/build references remain in engine/README.md
 the snapshot does not itself contain the upstream engines' complete build sources.
 Only Cburnett and Merida pieces enter the browser/source ZIPs. Kaneo, Kaneo Midnight,
 1Kbyte Gambit, and the Kadagaden SVG boards were removed from the current checkout.
-Old archives/history are preserved. Saved removed-piece choices migrate to Cburnett;
+Obsolete experiments and tooling have been retired from maintained history. Saved removed-piece choices migrate to Cburnett;
 removed SVG-board preferences migrate to similar retained flat-color boards.
 Move-category display names use Brilliant, Great, Best, Excellent, Good, Book,
 Inaccuracy, Mistake, Miss, and Blunder. Settings, coach
@@ -47,14 +47,14 @@ from the old full-19 preference to Lite. Results are saved in
 Validate the actual Firefox ZIP with:
 
 ```sh
-npx web-ext lint --source-dir=web-ext-artifacts/release-0.2.0-<unique>/chess-review-0.2.0-firefox.zip
+npx web-ext lint --source-dir=web-ext-artifacts/release-0.2.1-<unique>/chess-review-0.2.1-firefox.zip
 ```
 
 Chrome uses an MV3 module service worker. Firefox uses an MV3 module event page.
 Store packages omit the other browser's background declaration. The development
 manifest includes both so the project can be loaded directly in either browser.
 
-Before uploading, confirm 0.2.0 is greater than the latest uploaded version in both
+Before uploading, confirm 0.2.1 is greater than the latest uploaded version in both
 store dashboards. Keep the existing Chrome item and Firefox extension ID; do not
 create replacement listings. This repository does not authenticate to or publish
 to either store during build. Check that current screenshots match the two engine
@@ -70,8 +70,9 @@ tools/calibration/PUBLIC_METHOD.md. This establishes reproducibility from bundle
 evidence, not platform permission, independently validated move labels or rights
 to third-party assets. ATTRIBUTIONS.md retains known provenance gaps and historical
 removal records. Platform integration and applicable terms still need review;
-a generated ZIP is not legal clearance. Existing store version 0.1.1 still needs
-its actual uploaded package/source mapping established independently.
+a generated ZIP is not legal clearance. The Chrome store download checked on
+October 3, 2026 was version 0.2.0. Version 0.2.1 is prepared for the maintainer's
+store upload; the Firefox public listing was unavailable at that check.
 
 ## Reviewer notes
 

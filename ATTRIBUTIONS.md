@@ -116,7 +116,7 @@ Distributed by Lichess (lila); high-quality vector SVGs.
   on 2026-09-30; this records that declaration, not independent verification of
   every creation input. The redesigned symbols retain the previous circle colours.
 - **License:** GNU GPL v3.0, under the project's [LICENSE](LICENSE).
-  numeric design and earlier iterations. Superseded drawings remain in Git history;
+  numeric design and earlier iterations. Superseded drawings are retired;
   their circle geometry is retained as a small regression-test fixture.
 
 ## App logo / icon
