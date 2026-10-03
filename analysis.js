@@ -104,7 +104,7 @@ const QUALITY_DESC = {
   good:      "A small loss of estimated winning chances (2–5 percentage points), or a move that takes longer to deliver a forced mate.",
   book:      "A known opening move — the resulting position is in the bundled opening book.",
   inacc:     "A loss of about 5–10 percentage points in estimated winning chances. Context can turn a slip into a Mistake or Miss instead.",
-  mistake:   "A loss of about 10–20 percentage points in estimated winning chances, or a move that gives away a clear advantage or hands one to the opponent. The clear-advantage and minimum-loss settings affect these contextual cases.",
+  mistake:   "A loss of about 10–20 percentage points in estimated winning chances, or a move that gives away a clear advantage or hands one to the opponent.",
   miss:      "Missed chance: the opponent erred and you failed to punish it — or you let a forced mate slip.",
   blunder:   "A loss of at least 20 percentage points in estimated winning chances, or a severe forced-mate error. Special cases such as a missed opportunity can receive another label.",
 };
@@ -121,16 +121,7 @@ const ENGINE_INFO = {
   enginePath:    "Stockfish 18 NNUE is the default. Stockfish 19 Lite uses a smaller evaluation network for a compact alternative. Both run locally; Lite is not the full-strength Stockfish 19 build.",
   engineSkill:   "Caps the engine's playing strength (Stockfish 'Skill Level'). Max (20) = full strength. Lower values play deliberately weaker — useful for more human-like suggestions.",
   engineHash:    "Recommended: 16 MB for most reviews (the default). Try 32–64 MB for deeper analysis if your computer has spare memory. Each parallel worker uses its own hash table, so memory use is roughly Hash × Workers.",
-  clsGood:       "A move that loses at least this much eval (in pawns) can be no better than \"Good\". Below it, the move is \"Excellent\". Lower = stricter.",
-  clsInacc:      "A move that loses at least this much eval (pawns) is flagged \"Inaccuracy\". Lower = more inaccuracies.",
-  clsBlunder:    "A move that loses at least this much eval (pawns) is a \"Blunder\". Lower = more blunders.",
-  clsClearAdv:   "How many pawns counts as a \"clear advantage\". Used to decide Mistakes (you threw away a clear advantage), Misses, and the context for Great moves.",
-  clsMistakeLoss:"Minimum eval lost (pawns) for a move to qualify as a Mistake, and for a slip to be \"punishable\" (enabling a Great move or Missed chance on the reply).",
-  clsMissTol:    "How close to giving back the whole advantage still counts as a Missed chance rather than a clean punish. Higher = more missed chances.",
 };
-// Slider value formatters reused by the Engine-tab classification/accuracy knobs.
-const pawnsFmt = (v) => (+v).toFixed(2).replace(/\.00$/, "") + " pawns";
-const ptsFmt = (v) => v + " pts";
 // Move-specific glyphs use the shared vector renderer; summary glyphs show an
 // illustrative midpoint and expose the full category range to assistive tools.
 function gradeBadge(cls, score, className, attrs = {}, example = false) {
@@ -1066,7 +1057,7 @@ function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop, state = S) 
   // as Best (you couldn't have done better).
   if (_forcedAt(i, state)) return "best";   // only one legal move — you couldn't have done better
 
-  // User-tunable thresholds (Engine settings → Move classification), all in pawns of eval.
+  // Contextual thresholds in pawns of eval; retain saved values from earlier versions.
   const CA = state.settings.clsClearAdv, ML = state.settings.clsMistakeLoss, MT = state.settings.clsMissTol;
   const mate = (k) => _isMateEval(k, state), evalFor = (k) => _evalPawns(k, mover, state);
   const winningNow = (evalFor(i) ?? 0) > 0;
@@ -4135,39 +4126,6 @@ function engineSlider(label, key, min, max, step, opts = {}) {
     }),
   );
 }
-// A live-tuning slider for the classification / accuracy knobs: saves the value and re-labels the
-// game from the already-searched evals — no engine work, so dragging gives instant feedback.
-function clsSlider(label, key, min, max, step, opts = {}) {
-  const fmt = opts.fmt || ((v) => String(v));
-  const out = el("b", {}, fmt(+S.settings[key]));
-  return el("div", { class: "set-ctrl" },
-    el("div", { class: "set-ctrl-top" }, setLabel(label, opts.info), out),
-    el("input", {
-      type: "range", min, max, step, value: S.settings[key], disabled: opts.disabled || false,
-      oninput: (e) => {
-        const v = +e.target.value;
-        out.textContent = fmt(v);
-        S.settings[key] = v;
-        browserAPI.storage.local.set({ settings: S.settings });
-        applyClassificationChange();
-      },
-    }),
-  );
-}
-let _clsT = null;
-// Re-run only the classification + accuracy (computeDerived) on the existing engine evals and
-// refresh everything the labels feed. Debounced so dragging a slider stays smooth.
-function applyClassificationChange() {
-  if (!S.positions || !S.positions.length) return;
-  clearTimeout(_clsT);
-  _clsT = setTimeout(() => {
-    computeDerived();
-    if (S.analysisMode && S.variation) refreshVariation();
-    else paintBoard();
-    renderStats(); renderMoves(); renderReview(); renderGraph();
-    if (!S.analysisMode) { renderBestArrow(); renderEngineCurrent(); }
-  }, 60);
-}
 // Reset every Engine-tab setting to its default and re-run the analysis.
 async function resetEngineSettings() {
   for (const k of ENGINE_SETTING_KEYS) S.settings[k] = DEFAULT_SETTINGS[k];
@@ -4407,16 +4365,6 @@ function motorSettings() {
       engineSeg("Panel lines", "engineLines", [1, 2, 3, 4], null, ENGINE_INFO.engineLines),
       el("div", { class: "set-row hint" },
         el("span", { class: "set-note" }, "Additional analysis lines provide alternatives for move annotations. Calibrated SF18 numerical scores require 1 analysis line. Panel lines are searched live as you reach each move.")),
-    ),
-    section("Move classification",
-      el("div", { class: "set-row hint" },
-        el("span", { class: "set-note" }, "Controls move labels, not accuracy or estimated rating. Good, Inaccuracy and Blunder use fixed winning-chance loss bands, so their pawn cutoffs are inactive. The remaining controls adjust when a move gives away an advantage or misses an opportunity, without re-analyzing the game.")),
-      clsSlider("Good above", "clsGood", 0.1, 1.5, 0.05, { fmt: pawnsFmt, disabled: true, info: "Inactive: Good uses a fixed winning-chance loss band, rather than this pawn cutoff." }),
-      clsSlider("Inaccuracy above", "clsInacc", 0.3, 2.5, 0.05, { fmt: pawnsFmt, disabled: true, info: "Inactive: Inaccuracy uses a fixed winning-chance loss band, rather than this pawn cutoff." }),
-      clsSlider("Blunder above", "clsBlunder", 1.5, 8, 0.1, { fmt: pawnsFmt, disabled: true, info: "Inactive: Blunder uses a fixed winning-chance loss band, rather than this pawn cutoff." }),
-      clsSlider("Clear advantage", "clsClearAdv", 1, 5, 0.1, { fmt: pawnsFmt, info: ENGINE_INFO.clsClearAdv }),
-      clsSlider("Mistake min. loss", "clsMistakeLoss", 0.5, 3, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsMistakeLoss }),
-      clsSlider("Miss tolerance", "clsMissTol", 0, 1.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsMissTol }),
     ),
     section("Estimated rating",
       el("div", { class: "set-row" }, setLabel("Rating mode", ELO_INFO),

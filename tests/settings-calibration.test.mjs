@@ -70,10 +70,13 @@ test('moves-only rating is displayed independently of unavailable accuracy', t =
   assert.equal(a.call('estimateElo', null, null, 'w'), 1600);
 });
 
-test('inactive pawn cutoffs are disabled while contextual classification controls remain editable', t => {
-  const a = settings(t); a.state.settingsTab = 'engine'; a.call('renderSettings');
-  const section = [...a.dom.window.document.querySelectorAll('.set-section')].find(node => node.textContent.includes('Move classification'));
-  assert.deepEqual([...section.querySelectorAll('input')].map(input => input.disabled), [true, true, true, false, false, false]);
+test('engine settings omit classification controls and preserve existing classification preferences', t => {
+  const a = settings(t); a.state.settingsTab = 'engine';
+  Object.assign(a.state.settings, {clsClearAdv: 3, clsMistakeLoss: 1.5, clsMissTol: 0.7});
+  const before = JSON.stringify({settings: a.state.settings, classif: a.state.classif, grades: a.state.moveGrades});
+  a.call('renderSettings');
+  assert.deepEqual([...a.dom.window.document.querySelectorAll('#settings .set-sect-head')].map(node => node.textContent), ['Search', 'Estimated rating', 'Engine']);
+  assert.equal(JSON.stringify({settings: a.state.settings, classif: a.state.classif, grades: a.state.moveGrades}), before);
 });
 
 test('warning traps keyboard focus and Escape reverts without navigating the game', async t => {
