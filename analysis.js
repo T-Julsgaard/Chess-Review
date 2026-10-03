@@ -151,53 +151,7 @@ function updateGradeBadge(node, cls, score, example = false) {
   if (node.hasAttribute("title")) node.title = label;
   node.replaceChildren(gradeBadge(cls, score, "", {}, example).firstElementChild);
 }
-// Display-only ticking. Position identity remembers visits even when navigating backwards.
-const badgeVisits = new WeakSet();
-let badgeTickTimer = null, badgeTickNodes = [];
-function stopBadgeTick() {
-  clearTimeout(badgeTickTimer); badgeTickTimer = null;
-  for (const node of badgeTickNodes) {
-    const text = node.querySelector(".grade-numeral");
-    if (text) text.textContent = gradeText(Number(node.dataset.score), S.settings.badgeDecimals);
-  }
-  badgeTickNodes = [];
-}
-function prepareBadgeTick(previous, next, forward) {
-  stopBadgeTick();
-  const fresh = next && !badgeVisits.has(next);
-  if (previous) badgeVisits.add(previous);
-  if (next) badgeVisits.add(next);
-  return fresh && next !== previous && forward && S.settings.badgeFlicker
-    && !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
-    && Math.random() < 0.35;
-}
-function tickActiveBadge(enabled) {
-  const score = activeMoveGrade();
-  if (!enabled || !Number.isFinite(score)) return;
-  const nodes = document.querySelectorAll(S.analysisMode ? ".sq-badge, .ip-badge"
-    : `.sq-badge, .ip-badge, .ml-move[data-ply="${S.idx}"] .grade-badge`);
-  badgeTickNodes = [...nodes].filter(node => node.dataset.example !== "true"
-    && Number(node.dataset.score) === score && node.querySelector(".grade-numeral"));
-  if (!badgeTickNodes.length) return;
-  const position = activePos();
-  const magnitude = 1 + Math.floor(Math.random() * 5);
-  let direction = Math.random() < 0.5 ? -1 : 1;
-  if (score + direction * magnitude / 10 < 0 || score + direction * magnitude / 10 > 10) direction *= -1;
-  let remaining = magnitude;
-  const step = () => {
-    if (activePos() !== position || !S.settings.badgeFlicker || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { stopBadgeTick(); return; }
-    const value = Math.round((score + direction * remaining / 10) * 10) / 10;
-    for (const node of badgeTickNodes) {
-      const numeral = node.querySelector(".grade-numeral");
-      if (node.isConnected && Number(node.dataset.score) === score && numeral) numeral.textContent = gradeText(value, S.settings.badgeDecimals);
-    }
-    if (remaining-- > 0) badgeTickTimer = setTimeout(step, 260 + Math.floor(Math.random() * 140));
-    else stopBadgeTick();
-  };
-  step();
-}
 function refreshBadgeAppearance() {
-  stopBadgeTick();
   hideBoardBadgeTip(); hideQTip();
   for (const node of document.querySelectorAll(".grade-badge")) {
     updateGradeBadge(node, node.dataset.badgeCategory,
@@ -255,8 +209,8 @@ function migrateVisualAssetSettings(settings) {
     settings.boardTheme = replacement;
     changed = true;
   }
-  // Remove source artwork metadata retained by older versions.
-  for (const key of ["ccPieceSet", "ccPieceUrlTemplate", "ccPieceUrlMap", "ccBoardTheme", "ccBoardUrl"]) {
+  // Remove obsolete visual preferences and source artwork metadata from older versions.
+  for (const key of ["ccPieceSet", "ccPieceUrlTemplate", "ccPieceUrlMap", "ccBoardTheme", "ccBoardUrl", "badgeFlicker"]) {
     if (Object.hasOwn(settings, key)) {
       delete settings[key];
       changed = true;
@@ -269,7 +223,7 @@ const DEFAULT_SETTINGS = {
   categoryNames: {},
   theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
-  badgeDecimals: false, badgeFont: "original", badgeFlicker: false, badgeTooltip: false,
+  badgeDecimals: false, badgeFont: "original", badgeTooltip: false,
   // Eval-graph look (see renderGraph), eval-BAR look (see renderEvalBar) and the Insight-panel text size (px).
   graphStyle: "area", barStyle: "gradient", insightFont: 18,
   // Board coordinate labels (the a–h / 1–8 ticks in the squares' corners): on/off + size in px.
@@ -4141,7 +4095,7 @@ async function resetEngineSettings() {
 }
 const ARROW_SETTING_KEYS = ["bestArrow", "showThreat", "bestArrowColor", "arrowOpacity", "arrowShaft", "arrowHead"];
 const BACKGROUND_SETTING_KEYS = ["bg", "bgFit", "bgTile", "bgCustom", "bgHue", "bgSat", "bgLight"];
-const BADGE_SETTING_KEYS = ["badgeDecimals", "badgeFont", "badgeFlicker", "badgeTooltip"];
+const BADGE_SETTING_KEYS = ["badgeDecimals", "badgeFont", "badgeTooltip"];
 const VISUAL_SETTING_KEYS = [
   "theme", "accent", "accentCustom", "density", "evalView", "mlStyle", "badgeStyle", "badgeScale",
   ...BADGE_SETTING_KEYS,
@@ -4420,8 +4374,6 @@ function badgeSettings() {
     el("p", { class: "set-note" }, "Show one decimal (9.0) and use the same number size for every score, including 10.0."),
     el("div", { class: "set-lbl" }, "Number font"), fonts,
     el("p", { class: "set-note" }, "Free, open-source fonts, bundled for offline use."),
-    toggleRow("Number flicker", "badgeFlicker"),
-    el("p", { class: "set-note" }, "Occasionally lets a score tick up or down by 0.1–0.5 before settling, the first time you step forward to a move. This is a visual effect; the saved score stays unchanged. Respects reduced motion."),
     toggleRow("Hover labels", "badgeTooltip"),
     el("button", { class: "set-reset", onclick: async () => {
       await resetSettingKeys(BADGE_SETTING_KEYS); applySettings(); refreshBadgeAppearance(); renderSettings();
@@ -4670,7 +4622,6 @@ function applySettings() {
   r.style.setProperty("--sq-light", bt[0]);
   r.style.setProperty("--sq-dark", bt[1]);
   r.style.setProperty("--badge-scale", S.settings.badgeScale ?? 1);
-  r.classList.toggle("badge-flicker", S.settings.badgeFlicker === true);
   r.style.setProperty("--ip-font", (S.settings.insightFont ?? 13) + "px");
   r.style.setProperty("--coord-size", (S.settings.coordSize ?? 12) + "px");
   r.classList.toggle("hide-coords", S.settings.showCoords === false);
@@ -5180,12 +5131,10 @@ function renderLibrary() {
 /* ---------------- Navigation ---------------- */
 function go(to) {
   const prev = S.idx;
-  const previousPosition = activePos();
   // During analysis you can't go further than the move that HAS been analyzed (S.progress).
   // When the analysis is done, the whole game (S.total) is free.
   const maxPly = S.analyzing ? S.progress : S.total;
   S.idx = Math.max(0, Math.min(maxPly, to));
-  const tick = prepareBadgeTick(previousPosition, activePos(), S.idx > prev);
   // Changing moves resets the user's own arrows, square marks and piece selection. The sound must
   // match the move that actually animates: stepping FORWARD = the move just made (lands on idx);
   // stepping BACK = the move being UNDONE (the one that left `prev`). Keying both on idx made
@@ -5206,7 +5155,6 @@ function go(to) {
   renderMoves();
   renderGraph();
   renderEngineCurrent();
-  tickActiveBadge(tick);
 }
 // Navigation buttons/keys: in analysis mode we page through the variation, otherwise the mainline.
 // User-initiated navigation: stop any running engine-line walkthrough at the current spot.
@@ -5221,17 +5169,15 @@ function gotoVar(idx) {
   if (!S.variation) return;
   const v = S.variation;
   if (idx < 0 || idx >= v.positions.length) return;
-  const tick = prepareBadgeTick(activePos(), v.positions[idx], idx > v.idx);
   v.idx = idx; S.selectedSq = null;
   paintBoard(); playSanSound(v.positions[v.idx]?.san); renderEvalBar(); renderPlayers(); renderControls();
-  renderReview(); renderEngineCurrent(); tickActiveBadge(tick); requestLiveEval();
+  renderReview(); renderEngineCurrent(); requestLiveEval();
 }
 function variationStep(delta) {
   const v = S.variation; if (!v) return;
   const ni = v.idx + delta;
   if (ni <= 0) { exitAnalysis(v.branchIdx); return; }   // back before the branch → exit mode
   if (ni >= v.positions.length) return;                  // no more variation moves
-  const tick = prepareBadgeTick(activePos(), v.positions[ni], delta > 0);
   v.idx = ni;
   S.selectedSq = null;
   paintBoard();
@@ -5244,7 +5190,6 @@ function variationStep(delta) {
     else if (delta < 0) { const m = v.positions[v.idx + 1]; if (m && m.from && m.to) animateMove(m.to, m.from); }
   }
   renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent();
-  tickActiveBadge(tick);
   requestLiveEval();
 }
 function toggleFlip() { S.flipped = !S.flipped; buildBoard(); renderPlayers(); renderEvalBar(); }
@@ -5423,7 +5368,6 @@ function renderAll() {
    and for switching to another library game in place — no page reload, so there's no black flash
    between games; only the panels' data and the board orientation change. */
 async function applyGame(payload) {
-  stopBadgeTick();
   const positions = buildPositions(payload.pgn);
   if (positions.length < 2) throw new Error("Load a game with moves to review. Standalone positions are not supported.");
 

@@ -75,9 +75,8 @@ test('provisional grades change without touching completed evaluation, accuracy 
   assert.equal(a.state.moveGrades[1], old);
 });
 
-test('board score changes preserve the focused badge without the retired glow', t => {
+test('board score changes preserve the focused badge and update its numeral', t => {
   const a = app(t); loadGame(a, '1. e4'); a.call('computeDerived');
-  a.state.settings.badgeFlicker = true;
   a.state.idx=1; a.state.classif[1]='good'; a.state.moveGrades[1]=5.3;
   a.call('buildUI'); a.call('buildBoard');
   const doc=a.dom.window.document, badge=doc.querySelector('.sq-badge'); badge.focus();
@@ -85,8 +84,7 @@ test('board score changes preserve the focused badge without the retired glow', 
   assert.equal(doc.querySelector('.sq-badge'), badge);
   assert.equal(doc.activeElement, badge);
   assert.equal(badge.getAttribute('aria-label'), 'Good, score 5.4');
-  assert.equal(badge.querySelector('text').classList.contains('grade-updated'), false);
-  assert.equal(badge.querySelector('circle').classList.contains('grade-updated'), false);
+  assert.equal(badge.querySelector('text').textContent, '5.4');
   a.call('paintBoard'); assert.equal(doc.querySelector('.sq-badge'), badge);
 });
 

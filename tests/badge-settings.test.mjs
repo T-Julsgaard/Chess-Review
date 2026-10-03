@@ -42,10 +42,10 @@ test('sixteen local font choices ship with licenses and unsafe font names fall b
   assert.match(fs.readFileSync(new URL('../scripts/package.mjs', import.meta.url), 'utf8'), /'fonts'/);
 });
 
-test('hover labels and animations default off while accessible score labels remain', t => {
+test('hover labels default off while accessible score labels remain', t => {
   const a = review(t), doc = a.dom.window.document;
   assert.equal(a.state.settings.badgeFont, 'original');
-  for (const key of ['badgeTooltip', 'badgeDecimals', 'badgeFlicker']) assert.equal(a.state.settings[key], false);
+  for (const key of ['badgeTooltip', 'badgeDecimals']) assert.equal(a.state.settings[key], false);
   const badge = doc.querySelector('.sq-badge'); badge.focus();
   const event = new a.dom.window.Event('pointerenter'); Object.assign(event, { pointerType: 'mouse', buttons: 0 });
   badge.dispatchEvent(event);
@@ -53,7 +53,7 @@ test('hover labels and animations default off while accessible score labels rema
   assert.equal(doc.querySelector('.qb').hasAttribute('title'), false);
   assert.equal(badge.getAttribute('aria-label'), 'Mistake, score 2');
   a.state.moveGrades[1] = 2.4; a.call('paintBoard');
-  assert.equal(badge.querySelector('text').classList.contains('grade-updated'), false);
+  assert.equal(badge.querySelector('text').textContent, '2.4');
 });
 
 test('font and decimal settings update mounted badges and persist without changing scores', async t => {
@@ -69,8 +69,6 @@ test('font and decimal settings update mounted badges and persist without changi
     assert.match(node.querySelector('text').getAttribute('font-family'), /Badge Space Grotesk/);
   }
   assert.equal(a.store.settings.badgeFont, 'spacegrotesk'); assert.equal(a.store.settings.badgeDecimals, true);
-  await a.call('setSetting', 'badgeFlicker', true);
-  assert.equal(doc.documentElement.classList.contains('badge-flicker'), true);
   assert.equal(JSON.stringify({ grades: a.state.moveGrades, evals: a.state.evals, bests: a.state.bests, acc: a.state.acc }), before);
 });
 
@@ -95,14 +93,14 @@ test('Visual exposes Category badges with previews and an independent reset', as
   assert.equal(doc.querySelectorAll('.badge-font-option').length, Object.keys(BADGE_FONTS).length);
   assert.equal(doc.querySelectorAll('.badge-preview-item').length, 5);
   a.state.settings.badgeFont = 'sora'; a.state.settings.badgeDecimals = true;
-  a.state.settings.badgeFlicker = true; a.state.settings.badgeTooltip = true;
+  a.state.settings.badgeTooltip = true;
   a.state.settings.accent = 'custom';
   a.call('renderSettings');
   doc.querySelector('.badge-settings .set-reset').click();
   // The reset saves before applying the visual refresh.
   await Promise.resolve(); await Promise.resolve();
   assert.equal(a.state.settings.badgeFont, 'original'); assert.equal(a.state.settings.badgeDecimals, false);
-  assert.equal(a.state.settings.badgeFlicker, false); assert.equal(a.state.settings.badgeTooltip, false);
+  assert.equal(a.state.settings.badgeTooltip, false);
   assert.equal(a.state.settings.accent, 'custom');
   assert.equal(doc.querySelector('.sq-badge text').textContent, '2');
 });
@@ -123,43 +121,32 @@ test('accuracy category explainers work with hover labels off and after renaming
   assert.equal(doc.querySelector('.q-tip-nm').textContent, 'Oops');
 });
 
-test('numbers tick only on first forward visits and settle without changing stored scores', t => {
+test('obsolete number animation preferences are removed while other badge choices survive', t => {
+  const a = review(t);
+  Object.assign(a.state.settings, {badgeFlicker: true, badgeFont: 'sora', badgeDecimals: true});
+  assert.equal(a.call('migrateVisualAssetSettings', a.state.settings), true);
+  assert.equal(Object.hasOwn(a.state.settings, 'badgeFlicker'), false);
+  assert.equal(a.state.settings.badgeFont, 'sora'); assert.equal(a.state.settings.badgeDecimals, true);
+  assert.equal(a.call('migrateVisualAssetSettings', a.state.settings), false);
+  a.call('renderSettings');
+  assert.doesNotMatch(a.dom.window.document.querySelector('.badge-settings').textContent, /Number flicker|tick up or down/);
+});
+
+test('navigation immediately displays the final move score and keeps it stable', t => {
   t.mock.timers.enable({apis: ['setTimeout']});
   const a = review(t), doc = a.dom.window.document, S = a.state;
   a.replace('renderEngineCurrent', () => {});
-  S.idx = 0; S.settings.badgeFlicker = true;
-  a.run('Math.random = () => 0');
+  S.idx = 0;
   const before = JSON.stringify({grades: S.moveGrades, evals: S.evals, acc: S.acc});
   a.call('go', 1);
-  assert.equal(doc.querySelector('.sq-badge text').textContent, '1.9');
-  assert.equal(doc.querySelector('.qb text').textContent, '1.9');
+  assert.equal(doc.querySelector('.sq-badge text').textContent, '2');
+  assert.equal(doc.querySelector('.qb text').textContent, '2');
   assert.equal(doc.querySelector('.sq-badge').getAttribute('aria-label'), 'Mistake, score 2');
-  t.mock.timers.tick(260);
+  t.mock.timers.tick(2000);
   assert.equal(doc.querySelector('.sq-badge text').textContent, '2');
   a.call('go', 2); a.call('go', 1);
   assert.equal(doc.querySelector('.sq-badge text').textContent, '2');
   a.call('go', 0); a.call('go', 1);
   assert.equal(doc.querySelector('.sq-badge text').textContent, '2');
   assert.equal(JSON.stringify({grades: S.moveGrades, evals: S.evals, acc: S.acc}), before);
-});
-
-test('ticking is occasional, bounded at 0.5, cancels on navigation and respects reduced motion', t => {
-  t.mock.timers.enable({apis: ['setTimeout']});
-  const a = review(t), doc = a.dom.window.document, S = a.state;
-  a.replace('renderEngineCurrent', () => {}); S.settings.badgeFlicker = true;
-  S.idx = 0; a.run('Math.random = () => 0.99'); a.call('go', 1);
-  assert.equal(doc.querySelector('.sq-badge text').textContent, '2');
-  a.run('Math.random = () => 0.99');
-  a.call('tickActiveBadge', true);
-  assert.equal(doc.querySelector('.sq-badge text').textContent, '2.5');
-  for (let i = 0; i < 5; i++) {
-    t.mock.timers.tick(398);
-    assert.equal(doc.querySelector('.sq-badge text').textContent, String(Math.round((2.4 - i * 0.1) * 10) / 10));
-  }
-  a.call('tickActiveBadge', true); a.call('go', 0);
-  assert.equal(doc.querySelector('.qb text').textContent, '2');
-  S.idx = 0; S.classif[3] = 'mistake'; S.moveGrades[3] = 2;
-  a.dom.window.matchMedia = () => ({matches: true});
-  a.run('Math.random = () => 0'); a.call('go', 3);
-  assert.equal(doc.querySelector('.sq-badge text').textContent, '2');
 });
