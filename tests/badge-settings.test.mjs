@@ -122,3 +122,44 @@ test('accuracy category explainers work with hover labels off and after renaming
   doc.querySelector('[data-category="blunder"]').focus();
   assert.equal(doc.querySelector('.q-tip-nm').textContent, 'Oops');
 });
+
+test('numbers tick only on first forward visits and settle without changing stored scores', t => {
+  t.mock.timers.enable({apis: ['setTimeout']});
+  const a = review(t), doc = a.dom.window.document, S = a.state;
+  a.replace('renderEngineCurrent', () => {});
+  S.idx = 0; S.settings.badgeFlicker = true;
+  a.run('Math.random = () => 0');
+  const before = JSON.stringify({grades: S.moveGrades, evals: S.evals, acc: S.acc});
+  a.call('go', 1);
+  assert.equal(doc.querySelector('.sq-badge text').textContent, '1.9');
+  assert.equal(doc.querySelector('.qb text').textContent, '1.9');
+  assert.equal(doc.querySelector('.sq-badge').getAttribute('aria-label'), 'Mistake, score 2');
+  t.mock.timers.tick(260);
+  assert.equal(doc.querySelector('.sq-badge text').textContent, '2');
+  a.call('go', 2); a.call('go', 1);
+  assert.equal(doc.querySelector('.sq-badge text').textContent, '2');
+  a.call('go', 0); a.call('go', 1);
+  assert.equal(doc.querySelector('.sq-badge text').textContent, '2');
+  assert.equal(JSON.stringify({grades: S.moveGrades, evals: S.evals, acc: S.acc}), before);
+});
+
+test('ticking is occasional, bounded at 0.5, cancels on navigation and respects reduced motion', t => {
+  t.mock.timers.enable({apis: ['setTimeout']});
+  const a = review(t), doc = a.dom.window.document, S = a.state;
+  a.replace('renderEngineCurrent', () => {}); S.settings.badgeFlicker = true;
+  S.idx = 0; a.run('Math.random = () => 0.99'); a.call('go', 1);
+  assert.equal(doc.querySelector('.sq-badge text').textContent, '2');
+  a.run('Math.random = () => 0.99');
+  a.call('tickActiveBadge', true);
+  assert.equal(doc.querySelector('.sq-badge text').textContent, '2.5');
+  for (let i = 0; i < 5; i++) {
+    t.mock.timers.tick(398);
+    assert.equal(doc.querySelector('.sq-badge text').textContent, String(Math.round((2.4 - i * 0.1) * 10) / 10));
+  }
+  a.call('tickActiveBadge', true); a.call('go', 0);
+  assert.equal(doc.querySelector('.qb text').textContent, '2');
+  S.idx = 0; S.classif[3] = 'mistake'; S.moveGrades[3] = 2;
+  a.dom.window.matchMedia = () => ({matches: true});
+  a.run('Math.random = () => 0'); a.call('go', 3);
+  assert.equal(doc.querySelector('.sq-badge text').textContent, '2');
+});

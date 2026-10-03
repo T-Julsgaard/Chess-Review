@@ -151,7 +151,6 @@ function activeMoveGrade() {
 function updateGradeBadge(node, cls, score, example = false) {
   const key = badgeRenderKey(cls, score, example);
   if (node.dataset.renderKey === key) return;
-  const changedScore = node.dataset.score !== (Number.isFinite(score) ? String(score) : "");
   const next = cls === "book" ? "book" : gradeText(score, S.settings.badgeDecimals);
   node.dataset.grade = next;
   node.dataset.score = Number.isFinite(score) ? score : "";
@@ -160,9 +159,54 @@ function updateGradeBadge(node, cls, score, example = false) {
   node.setAttribute("aria-label", label);
   if (node.hasAttribute("title")) node.title = label;
   node.replaceChildren(gradeBadge(cls, score, "", {}, example).firstElementChild);
-  if (changedScore && S.settings.badgeFlicker) node.querySelector(".grade-numeral")?.classList.add("grade-updated");
+}
+// Display-only ticking. Position identity remembers visits even when navigating backwards.
+const badgeVisits = new WeakSet();
+let badgeTickTimer = null, badgeTickNodes = [];
+function stopBadgeTick() {
+  clearTimeout(badgeTickTimer); badgeTickTimer = null;
+  for (const node of badgeTickNodes) {
+    const text = node.querySelector(".grade-numeral");
+    if (text) text.textContent = gradeText(Number(node.dataset.score), S.settings.badgeDecimals);
+  }
+  badgeTickNodes = [];
+}
+function prepareBadgeTick(previous, next, forward) {
+  stopBadgeTick();
+  const fresh = next && !badgeVisits.has(next);
+  if (previous) badgeVisits.add(previous);
+  if (next) badgeVisits.add(next);
+  return fresh && next !== previous && forward && S.settings.badgeFlicker
+    && !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    && Math.random() < 0.35;
+}
+function tickActiveBadge(enabled) {
+  const score = activeMoveGrade();
+  if (!enabled || !Number.isFinite(score)) return;
+  const nodes = document.querySelectorAll(S.analysisMode ? ".sq-badge, .ip-badge"
+    : `.sq-badge, .ip-badge, .ml-move[data-ply="${S.idx}"] .grade-badge`);
+  badgeTickNodes = [...nodes].filter(node => node.dataset.example !== "true"
+    && Number(node.dataset.score) === score && node.querySelector(".grade-numeral"));
+  if (!badgeTickNodes.length) return;
+  const position = activePos();
+  const magnitude = 1 + Math.floor(Math.random() * 5);
+  let direction = Math.random() < 0.5 ? -1 : 1;
+  if (score + direction * magnitude / 10 < 0 || score + direction * magnitude / 10 > 10) direction *= -1;
+  let remaining = magnitude;
+  const step = () => {
+    if (activePos() !== position || !S.settings.badgeFlicker || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { stopBadgeTick(); return; }
+    const value = Math.round((score + direction * remaining / 10) * 10) / 10;
+    for (const node of badgeTickNodes) {
+      const numeral = node.querySelector(".grade-numeral");
+      if (node.isConnected && Number(node.dataset.score) === score && numeral) numeral.textContent = gradeText(value, S.settings.badgeDecimals);
+    }
+    if (remaining-- > 0) badgeTickTimer = setTimeout(step, 260 + Math.floor(Math.random() * 140));
+    else stopBadgeTick();
+  };
+  step();
 }
 function refreshBadgeAppearance() {
+  stopBadgeTick();
   hideBoardBadgeTip(); hideQTip();
   for (const node of document.querySelectorAll(".grade-badge")) {
     updateGradeBadge(node, node.dataset.badgeCategory,
@@ -4429,7 +4473,7 @@ function badgeSettings() {
     el("div", { class: "set-lbl" }, "Number font"), fonts,
     el("p", { class: "set-note" }, "Free, open-source fonts, bundled for offline use."),
     toggleRow("Number flicker", "badgeFlicker"),
-    el("p", { class: "set-note" }, "A subtle pulse on the active move's number. Scores stay unchanged; no extra engine search. Respects reduced motion."),
+    el("p", { class: "set-note" }, "Occasionally lets a score tick up or down by 0.1–0.5 before settling, the first time you step forward to a move. This is a visual effect; the saved score stays unchanged. Respects reduced motion."),
     toggleRow("Hover labels", "badgeTooltip"),
     el("button", { class: "set-reset", onclick: async () => {
       await resetSettingKeys(BADGE_SETTING_KEYS); applySettings(); refreshBadgeAppearance(); renderSettings();
@@ -5186,10 +5230,12 @@ function renderLibrary() {
 /* ---------------- Navigation ---------------- */
 function go(to) {
   const prev = S.idx;
+  const previousPosition = activePos();
   // During analysis you can't go further than the move that HAS been analyzed (S.progress).
   // When the analysis is done, the whole game (S.total) is free.
   const maxPly = S.analyzing ? S.progress : S.total;
   S.idx = Math.max(0, Math.min(maxPly, to));
+  const tick = prepareBadgeTick(previousPosition, activePos(), S.idx > prev);
   // Changing moves resets the user's own arrows, square marks and piece selection. The sound must
   // match the move that actually animates: stepping FORWARD = the move just made (lands on idx);
   // stepping BACK = the move being UNDONE (the one that left `prev`). Keying both on idx made
@@ -5210,6 +5256,7 @@ function go(to) {
   renderMoves();
   renderGraph();
   renderEngineCurrent();
+  tickActiveBadge(tick);
 }
 // Navigation buttons/keys: in analysis mode we page through the variation, otherwise the mainline.
 // User-initiated navigation: stop any running engine-line walkthrough at the current spot.
@@ -5218,12 +5265,23 @@ function navPrev() { if (S.practice) return; stopLineWalk(); if (S.analysisMode)
 // Jump to a mainline position (exits analysis mode if active).
 function gotoMainline(ply) { if (S.practice) return; stopLineWalk(); if (S.analysisMode) exitAnalysis(); go(ply); }
 // Jump to a variation position while reviewing a game.
-function gotoVar(idx) { if (S.practice) return; stopLineWalk(); if (!S.variation) return; const v = S.variation; if (idx < 0 || idx >= v.positions.length) return; v.idx = idx; S.selectedSq = null; paintBoard(); playSanSound(v.positions[v.idx]?.san); renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent(); requestLiveEval(); }
+function gotoVar(idx) {
+  if (S.practice) return;
+  stopLineWalk();
+  if (!S.variation) return;
+  const v = S.variation;
+  if (idx < 0 || idx >= v.positions.length) return;
+  const tick = prepareBadgeTick(activePos(), v.positions[idx], idx > v.idx);
+  v.idx = idx; S.selectedSq = null;
+  paintBoard(); playSanSound(v.positions[v.idx]?.san); renderEvalBar(); renderPlayers(); renderControls();
+  renderReview(); renderEngineCurrent(); tickActiveBadge(tick); requestLiveEval();
+}
 function variationStep(delta) {
   const v = S.variation; if (!v) return;
   const ni = v.idx + delta;
   if (ni <= 0) { exitAnalysis(v.branchIdx); return; }   // back before the branch → exit mode
   if (ni >= v.positions.length) return;                  // no more variation moves
+  const tick = prepareBadgeTick(activePos(), v.positions[ni], delta > 0);
   v.idx = ni;
   S.selectedSq = null;
   paintBoard();
@@ -5236,6 +5294,7 @@ function variationStep(delta) {
     else if (delta < 0) { const m = v.positions[v.idx + 1]; if (m && m.from && m.to) animateMove(m.to, m.from); }
   }
   renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent();
+  tickActiveBadge(tick);
   requestLiveEval();
 }
 function toggleFlip() { S.flipped = !S.flipped; buildBoard(); renderPlayers(); renderEvalBar(); }
@@ -5414,6 +5473,7 @@ function renderAll() {
    and for switching to another library game in place — no page reload, so there's no black flash
    between games; only the panels' data and the board orientation change. */
 async function applyGame(payload) {
+  stopBadgeTick();
   const positions = buildPositions(payload.pgn);
   if (positions.length < 2) throw new Error("Load a game with moves to review. Standalone positions are not supported.");
 
