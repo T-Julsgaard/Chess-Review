@@ -4640,7 +4640,7 @@ async function setSetting(key, value) {
 }
 // Engine setting: save, discard the live engine (new build/options), and re-analyze.
 let calibrationWarningPending = null;
-function calibrationWarning(title, message, revertLabel) {
+function calibrationWarning(title, message, remainLabel, recommended = false) {
   if (calibrationWarningPending) return calibrationWarningPending;
   calibrationWarningPending = new Promise(resolve => {
     const previousFocus = document.activeElement;
@@ -4648,12 +4648,15 @@ function calibrationWarning(title, message, revertLabel) {
       overlay.remove(); document.removeEventListener("keydown", onKey, true);
       calibrationWarningPending = null; previousFocus?.focus(); resolve(proceed);
     };
-    const revert = el("button", { type: "button", onclick: () => finish(false) }, revertLabel);
+    const revert = el("button", { type: "button", class: recommended ? "recommended" : "", onclick: () => finish(false) },
+      el("span", { class: "calibration-warning-choice-label" }, remainLabel),
+      recommended ? el("small", {}, "Recommended") : null);
     const proceed = el("button", { type: "button", onclick: () => finish(true) }, "Continue");
     const overlay = el("div", { class: "calibration-warning-overlay" },
       el("div", { class: "calibration-warning", role: "alertdialog", "aria-modal": "true",
-        "aria-labelledby": "calibrationWarningTitle", "aria-describedby": "calibrationWarningBody" },
-      el("h3", { id: "calibrationWarningTitle" }, title),
+        "aria-labelledby": "calibrationWarningTitle calibrationWarningContext", "aria-describedby": "calibrationWarningBody" },
+      el("h3", { id: "calibrationWarningTitle" }, "Warning"),
+      el("h4", { id: "calibrationWarningContext" }, title),
       el("p", { id: "calibrationWarningBody" }, message),
       el("div", { class: "calibration-warning-actions" }, revert, proceed)));
     const onKey = e => {
@@ -4669,7 +4672,7 @@ async function setEngineSetting(key, value) {
   if (S.settings[key] === value) return;
   if (key === "enginePath" && value === "sf19lite") {
     const proceed = await calibrationWarning("Switch to Stockfish 19 Lite?",
-      "Stockfish 18 NNUE is recommended for review scores. Stockfish 19 Lite uses a separate accuracy estimate with less calibration evidence and only supports rating estimates from moves alone. Its accuracy and rating estimates may differ from Stockfish 18's and should be treated with more caution.", "Revert to Stockfish 18");
+      "Our accuracy and estimated-rating calibration is built primarily around Stockfish 18 NNUE. Stockfish 19 Lite has less validation behind its review scores, so switching may produce less reliable results. We recommend remaining on Stockfish 18 for the most consistent game reviews.", "Remain on Stockfish 18", true);
     if (!proceed) { if (S.settings.enginePath !== "nnue") await setEngineSetting("enginePath", "nnue"); return; }
   }
   if (key === "engineDepth" && value !== 16 && S.settings.enginePath === "nnue" && S.settings.engineDepth === 16) {

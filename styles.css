@@ -1517,10 +1517,13 @@ button { font-family: inherit; cursor: pointer; }
 .badge-font-sample { font-weight: 700; font-size: 22px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .calibration-warning-overlay { position: fixed; inset: 0; z-index: 10000; background: #0008; display: flex; align-items: center; justify-content: center; padding: 20px; }
 .calibration-warning { width: min(420px, 100%); padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--ink); box-shadow: 0 12px 50px #0006; }
-.calibration-warning h3 { margin: 0 0 12px; }
+.calibration-warning h3 { margin: 0 0 8px; color: #ef6b62; font-size: 22px; text-align: center; }
+.calibration-warning h4 { margin: 0 0 16px; font-size: 15px; text-align: center; }
 .calibration-warning p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--ink-2); }
-.calibration-warning-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
-.calibration-warning-actions button { padding: 9px 12px; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--line); color: var(--ink); cursor: pointer; }
+.calibration-warning-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.calibration-warning-actions button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 54px; padding: 9px 12px; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--line); color: var(--ink); cursor: pointer; }
+.calibration-warning-actions button.recommended { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 14%, var(--panel-2)); }
+.calibration-warning-actions button.recommended small { color: var(--accent); font-size: 10.5px; font-weight: 700; }
 .calibration-warning-actions button:hover, .calibration-warning-actions button:focus-visible { border-color: var(--accent); }
 
 @font-face { font-family: "Badge Lato"; src: url("fonts/lato.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: block; }

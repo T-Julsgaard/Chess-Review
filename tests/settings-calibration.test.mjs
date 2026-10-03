@@ -12,15 +12,20 @@ function settings(t) {
   return {...a, searches: () => searches};
 }
 function choice(a, text) {
-  [...a.dom.window.document.querySelectorAll('.calibration-warning button')].find(button => button.textContent === text).click();
+  [...a.dom.window.document.querySelectorAll('.calibration-warning button')].find(button => (button.querySelector('.calibration-warning-choice-label')?.textContent || button.textContent) === text).click();
 }
 
 test('SF19 selection waits for a warning choice before saving or reanalyzing', async t => {
   const a = settings(t);
   const pending = a.call('setEngineSetting', 'enginePath', 'sf19lite');
   assert.equal(a.state.settings.enginePath, 'nnue'); assert.equal(a.writes.length, 0); assert.equal(a.searches(), 0);
-  assert.match(a.dom.window.document.querySelector('[role="alertdialog"]').textContent, /less calibration evidence/);
-  choice(a, 'Revert to Stockfish 18'); await pending;
+  const dialog = a.dom.window.document.querySelector('[role="alertdialog"]');
+  assert.equal(dialog.querySelector('h3').textContent, 'Warning');
+  assert.match(dialog.textContent, /less validation/);
+  assert.doesNotMatch(dialog.textContent, /moves alone|moves.only/);
+  assert.equal(dialog.querySelector('button.recommended .calibration-warning-choice-label').textContent, 'Remain on Stockfish 18');
+  assert.equal(dialog.querySelector('button.recommended small').textContent, 'Recommended');
+  choice(a, 'Remain on Stockfish 18'); await pending;
   assert.equal(a.state.settings.enginePath, 'nnue'); assert.equal(a.writes.length, 0);
   const accepted = a.call('setEngineSetting', 'enginePath', 'sf19lite');
   choice(a, 'Continue'); await accepted;
@@ -74,7 +79,7 @@ test('inactive pawn cutoffs are disabled while contextual classification control
 test('warning traps keyboard focus and Escape reverts without navigating the game', async t => {
   const a = settings(t), doc = a.dom.window.document;
   const pending = a.call('setEngineSetting', 'enginePath', 'sf19lite');
-  assert.equal(doc.activeElement.textContent, 'Revert to Stockfish 18');
+  assert.equal(doc.activeElement.querySelector('.calibration-warning-choice-label').textContent, 'Remain on Stockfish 18');
   doc.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'Tab', bubbles: true}));
   assert.equal(doc.activeElement.textContent, 'Continue');
   const before = a.state.idx;
