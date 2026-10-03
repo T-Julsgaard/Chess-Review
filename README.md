@@ -42,11 +42,10 @@ separate from position evaluation and game accuracy.
 
 ## Scoring and reproducibility
 
-The current SF18 numerical calibration is fitted from public **Lichess CC0 games**,
-using recorded outcomes and played moves with local Stockfish evidence. It does
-not fit against Chess.com review scores or labels. SF19 has its own moves-only
-rating model and uses engine WDL quality. Estimated ratings are rough indicators;
-cross-platform transfer and short-game extrapolation are unvalidated.
+Chess Review is open source and uses local Stockfish analysis with documented
+scoring models. The repository includes the fitting tools, public-data evidence
+and reference results needed to inspect and reproduce the bundled numerical
+models.
 
 With Node.js 24 or later, reproduce the bundled coefficients and reference scores
 offline:
@@ -55,21 +54,14 @@ offline:
 node tools/calibration/reproduce-public.mjs
 ```
 
-The [public method](tools/calibration/PUBLIC_METHOD.md) explains the inputs,
-search settings, fitting and limitations. This replay verifies the archived
-evidence and calculation; it does not rerun engine searches or establish that
-each move category is correct.
+This check replays the included evidence without rerunning engine searches. The
+[methodology](tools/calibration/PUBLIC_METHOD.md) documents the inputs,
+calculations and limitations. Estimated ratings are approximate.
 
-Move categories use declared rules separately from numerical fitting. The
-ordinary loss cutoffs (2/5/10/20 percentage points) match
-[Chess.com's published table](https://support.chess.com/en/articles/8572705-how-are-moves-classified-what-is-a-blunder-or-brilliant-etc).
-They are policy settings, not fitted coefficients. Applying them to this
-extension's own expected-points model does not reproduce Chess.com's full
-classifier. [Brilliant rules](tools/calibration/BRILLIANT_MOVES.md) explain
-special annotations and their sources.
-
-The [repository guide](docs/REPOSITORY.md) explains which files
-support the extension, development and reproduction.
+Move categories follow documented classification rules. See the
+[special annotations guide](tools/calibration/BRILLIANT_MOVES.md) for their
+definitions and sources, and the [repository guide](docs/REPOSITORY.md) for the
+supporting files.
 
 ## Install
 
