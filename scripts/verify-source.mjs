@@ -36,6 +36,7 @@ export function verifyClaims(content, name = 'text') {
 
 export function verifyDesign(name, content) {
   if (name === 'tests/fixtures/badge-circles.json') throw Error('Retired badge reference: ' + name);
+  if (name === 'styles.css' && /\.board\.cc-board\b/.test(content)) throw Error('Retired board-image styling: ' + name);
   if (name === 'content.js' && /btn\.className\s*=\s*[`"'][^\n;]*cc-button/.test(content)) {
     throw Error('Retired button styling: ' + name);
   }

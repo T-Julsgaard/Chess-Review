@@ -67,5 +67,6 @@ test('retired designs cannot return through historical files or a current source
   assert.throws(() => verifyDesign('content.js', 'btn.className = "cc-button-primary";'), /Retired button styling/);
   assert.throws(() => verifyHistoryBlob('icons/brilliant.svg', '<svg><text>!!</text></svg>'), /Unsupported badge artwork/);
   assert.throws(() => verifyHistoryBlob('icons/book.svg', '<svg><path /></svg>'), /Unsupported badge artwork/);
+  assert.throws(() => verifyHistoryBlob('styles.css', '.board.cc-board {background:transparent}'), /Retired board-image styling/);
   assert.doesNotThrow(() => verifyDesign('content.js', 'const selectors = ["a.cc-button-component"];'));
 });

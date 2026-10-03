@@ -499,7 +499,8 @@ button { font-family: inherit; cursor: pointer; }
 .controls .exit-analysis:hover { color: #fff; filter: brightness(1.07); }
 .controls .exit-analysis .ea-x { font-weight: 800; font-size: 14px; line-height: 1; }
 
-/* Legal target squares, including practice. */
+/* Legal target squares (click-to-move / drag), including practice.
+   Translucent dots mark destinations; lifted/selected squares get no halo. */
 .board .sq.light.legal { background-image: radial-gradient(circle, rgba(30,30,30,.34) 19%, transparent 20%); }
 .board .sq.dark.legal { background-image: radial-gradient(circle, rgba(20,40,20,.38) 19%, transparent 20%); }
 .board .sq.light.legal-cap { background-image: radial-gradient(circle, transparent 60%, rgba(30,30,30,.36) 61%, rgba(30,30,30,.36) 70%, transparent 71%); }
