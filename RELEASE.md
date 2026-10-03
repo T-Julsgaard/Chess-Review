@@ -1,5 +1,10 @@
 # Release 0.2.1
 
+This maintenance update improves commit descriptions and retires obsolete
+experiments, superseded tooling and discarded design work from repository history.
+Contributors using older clones should start from current `main` and port their
+reviewed changes individually, as described in CONTRIBUTING.md.
+
 ## Packages and verification
 
 Run `npm ci`, `npm test`, `npm run verify:engines`, and `npm run build`.
