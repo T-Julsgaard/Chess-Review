@@ -1,7 +1,7 @@
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
-import {maintainedTools, verifyClaims} from './verify-source.mjs';
+import {maintainedTools, verifyClaims, verifyDesign} from './verify-source.mjs';
 
 const retiredFunctions = {
   calWinK: 'return NaN;', calMoveAcc: 'return {};', calAccMult: 'return 1;', calAccBias: 'return null;',
@@ -19,11 +19,13 @@ function verifyHistoryPath(name) {
     throw Error('Retired or generated directory in reachable history: ' + name);
   }
   if (name === 'docs/DESIGN_HISTORY.md') throw Error('Retired documentation in reachable history: ' + name);
+  if (name === 'tests/fixtures/badge-circles.json') throw Error('Retired badge reference in reachable history: ' + name);
 }
 
 export function verifyHistoryBlob(name, content) {
   verifyHistoryPath(name);
   verifyClaims(content, name);
+  verifyDesign(name, content);
   if (name.startsWith('tests/helpers/') && /\bwinK\s*:/.test(content)) {
     throw Error('Unsupported numerical test fixture in reachable history: ' + name);
   }

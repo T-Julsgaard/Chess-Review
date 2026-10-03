@@ -34,6 +34,20 @@ export function verifyClaims(content, name = 'text') {
   }
 }
 
+export function verifyDesign(name, content) {
+  if (name === 'tests/fixtures/badge-circles.json') throw Error('Retired badge reference: ' + name);
+  if (name === 'content.js' && /btn\.className\s*=\s*[`"'][^\n;]*cc-button/.test(content)) {
+    throw Error('Retired button styling: ' + name);
+  }
+  if (/^icons\/(?:brilliant|great|best|excellent|good|inaccuracy|mistake|miss|blunder)\.svg$/.test(name)
+      && (!/class="grade-numeral"/.test(content) || !/role="img"/.test(content))) {
+    throw Error('Unsupported badge artwork: ' + name);
+  }
+  if (name === 'icons/book.svg' && !/role="img"[^>]*aria-label="Book"/.test(content)) {
+    throw Error('Unsupported badge artwork: ' + name);
+  }
+}
+
 export async function verifySource(root) {
   const model = JSON.parse(await readFile(path.join(root, 'data/calibration.json'), 'utf8'));
   if (model.schema !== 'chess-review-public-calibration-v1') throw Error('Unsupported numerical model schema');
@@ -59,6 +73,7 @@ export async function verifySource(root) {
     if ((await stat(file)).size <= 4 * 1024 * 1024) {
       const content = await readFile(file, 'utf8');
       verifyClaims(content, name);
+      verifyDesign(name, content);
       if (name.startsWith('tests/helpers/') && /\bwinK\s*:/.test(content)) {
         throw Error('Unsupported numerical test fixture: ' + name);
       }

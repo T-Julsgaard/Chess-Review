@@ -116,7 +116,6 @@ Distributed by Lichess (lila); high-quality vector SVGs.
   on 2026-09-30; this records that declaration, not independent verification of
   every creation input. The redesigned symbols retain the previous circle colours.
 - **License:** GNU GPL v3.0, under the project's [LICENSE](LICENSE).
-- Circle geometry is covered by `tests/fixtures/badge-circles.json`.
 
 ## App logo / icon
 - **Files:** `icons/icon16.png`, `icons/icon48.png`, `icons/icon128.png`, `icons/icon.png`

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {mkdtemp, mkdir, readFile, writeFile, rm} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import {verifySource, verifyClaims} from '../scripts/verify-source.mjs';
+import {verifySource, verifyClaims, verifyDesign} from '../scripts/verify-source.mjs';
 import {verifyHistoryBlob, verifyHistory} from '../scripts/verify-history.mjs';
 import {execFileSync} from 'node:child_process';
 
@@ -60,4 +60,12 @@ test('history checks reject retired models even when the current tree is clean',
   assert.throws(() => verifyHistoryBlob('analysis.js', 'function calWinK() { return 1; }'), /scoring body/);
   assert.doesNotThrow(() => verifyHistoryBlob('analysis.js', 'function calWinK() { return NaN; }'));
   assert.throws(() => verifyHistoryBlob('tests/helpers/app.mjs', 'CALIB = {winK: 1};'), /numerical test fixture/);
+});
+
+test('retired designs cannot return through historical files or a current source change', () => {
+  assert.throws(() => verifyHistoryBlob('tests/fixtures/badge-circles.json', '{}'), /Retired badge reference/);
+  assert.throws(() => verifyDesign('content.js', 'btn.className = "cc-button-primary";'), /Retired button styling/);
+  assert.throws(() => verifyHistoryBlob('icons/brilliant.svg', '<svg><text>!!</text></svg>'), /Unsupported badge artwork/);
+  assert.throws(() => verifyHistoryBlob('icons/book.svg', '<svg><path /></svg>'), /Unsupported badge artwork/);
+  assert.doesNotThrow(() => verifyDesign('content.js', 'const selectors = ["a.cc-button-component"];'));
 });

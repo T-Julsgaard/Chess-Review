@@ -48,13 +48,13 @@ test('missing evidence stays pending; custom labels are escaped and Book never g
   assert.equal(new JSDOM(gradeSvg('book', null, 'Book'), {contentType:'image/svg+xml'}).window.document.querySelector('text'), null);
 });
 
-test('numeric reference snapshots retain the archived circle geometry and shared renderer', () => {
-  const circles = JSON.parse(fs.readFileSync(new URL('./fixtures/badge-circles.json', import.meta.url), 'utf8'));
+test('numeric reference snapshots use accessible current artwork and the shared renderer', () => {
   for (const [category,cfg] of Object.entries(MOVE_GRADE_CONFIG)) {
     const file = category === 'inacc' ? 'inaccuracy' : category;
     const saved = fs.readFileSync(new URL(`../icons/${file}.svg`, import.meta.url), 'utf8');
     const doc = new JSDOM(saved, {contentType:'image/svg+xml'}).window.document;
-    assert.equal(doc.querySelector('circle').outerHTML, circles[file]);
+    assert.equal(doc.querySelectorAll('circle').length, 1);
+    assert.equal(doc.querySelector('svg').getAttribute('role'), 'img');
     assert.equal(doc.querySelector('circle').getAttribute('fill'), cfg.color);
     const names = {brilliant:'Brilliant',great:'Great',book:'Book',best:'Best',excellent:'Excellent',good:'Good',inacc:'Inaccuracy',mistake:'Mistake',miss:'Miss',blunder:'Blunder'};
     assert.equal(saved.replace(/\r\n/g, '\n'), gradeSvg(category, null, names[category], true) + '\n');

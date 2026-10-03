@@ -31,7 +31,7 @@ Many small asset files are intentional; removing them can break optional setting
 | `CONTRIBUTING.md`, `.github/` | Contributor guidance, issue/PR forms and dependency update configuration. |
 | `package.json`, `package-lock.json` | Commands and reproducible development dependency versions. |
 | `scripts/` | Package builds, engine verification and optional browser smoke checks. |
-| `tests/` | Regression tests for retained code and the active scoring method. `fixtures/badge-circles.json` supplies the icon geometry regression reference. |
+| `tests/` | Regression tests for retained code, current artwork and the active scoring method. |
 | `tools/calibration/` | Current fitting code, eight frozen public evidence files, offline reproduction, the reusable engine harness and independent-label evaluator. See its [guide](../tools/calibration/README.md). |
 | `.gitignore`, `.gitattributes` | Keep generated files out of Git and preserve required binary/line-ending behavior. Calibration evidence hashes depend on its exact bytes. |
 | `docs/` | Repository guide, included in source snapshots. |
