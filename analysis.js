@@ -1,4 +1,4 @@
-// analysis.js — Chess Review analysis page (vanilla port of "Design 2.0").
+// analysis.js — Chess Review analysis page.
 // Parses the PGN, runs Stockfish through the game and fills every panel with real
 // data: eval bar/graph, accuracy, mistake classification, engine lines (MultiPV),
 // opening (from the PGN), player/clock/result. Board + 2 piece styles + theme are selectable.
@@ -203,9 +203,9 @@ function categoryText(text) {
 // under pieces-img/<set>/<code>.svg, where <code> is e.g. wK / bN (white King, black kNight). SVG =
 // crisp at any board size.
 const BUNDLED_PIECE_SETS = { image: "cburnett", merida: "merida" };
-// Retired board preferences migrate to retained flat-color boards.
+// Saved board preferences migrate to supported flat-color palettes.
 const REMOVED_BOARD_THEMES = {
-  chesscom: "maple", // The retired source-matched option returns to Honeywood.
+  chesscom: "maple",
   kada_green: "green", kada_sand: "walnut", kada_amber: "maple",
   kada_clay: "coral", kada_wood: "maple",
 };
@@ -320,16 +320,8 @@ const USER_ARROW_COLOR = "#E89B3C";
 const LOADERS = { dots: "pulse", bounce: "bounce", spinner: "spin", wave: "wave" };
 // Default placement of the movable modules (free canvas). Saved per user.
 // When LAYOUT_VERSION is bumped, saved layouts are reset to this default once.
-// v5: the user-arranged default (board on the left, panels stacked on the right).
-// v6: an animated coach portrait sits at the top of the right column, directly
-// above the insight ("information") panel; the rest of the right stack moved down.
-// v7: the user-tuned arrangement — controls tucked under the board, coach compact at
-// top-right, review spanning the top of the right stack, panels retuned around them.
-// v8: the automatic responsive layout is the default; a canvas layout is only used once the user
-// reorganizes (S.layoutMode "custom"), and then starts from a snapshot of the screen. These boxes
-// also define the desktop automatic layout and hidden-module snapshot fallback.
-// Geometry copied from the maintainer's saved unpacked-extension layout (October 2, 2026).
-// Accuracy and Engine use the expanded breakdown baseline; collapse shifts Engine up.
+// Responsive placement is the default. Custom layouts start from the current screen.
+// These boxes also provide desktop placement and hidden-module fallback geometry.
 const LAYOUT_VERSION = 8;
 const DEFAULT_LAYOUT = {
   board:    { x: 344,  y: 0,   w: 822, h: 934 },
@@ -4363,7 +4355,7 @@ function motorSettings() {
       engineSlider("Workers", "engineWorkers", 1, 8, 1, { fmt: (v) => v + (v === 1 ? " (single)" : " parallel"), info: ENGINE_INFO.engineWorkers }),
       engineSeg("Panel lines", "engineLines", [1, 2, 3, 4], null, ENGINE_INFO.engineLines),
       el("div", { class: "set-row hint" },
-        el("span", { class: "set-note" }, "1 analysis line = fastest, and all the move grades need. More lines steady the accuracy/Elo and pre-fill the panel. Panel lines are searched live as you reach each move.")),
+        el("span", { class: "set-note" }, "Additional analysis lines provide alternatives for move annotations. Calibrated SF18 numerical scores require 1 analysis line. Panel lines are searched live as you reach each move.")),
     ),
     section("Move classification",
       el("div", { class: "set-row hint" },
@@ -5274,9 +5266,8 @@ async function startAnalysis() {
   renderControls(); renderReview(); renderStats(); renderGraph(); renderMoves();
   if (!S.analysisMode) { renderEvalBar(); renderBestArrow(); renderEngineCurrent(); }
 
-  // The classification logic needs only the single best line, so the batch defaults to MultiPV=1
-  // (markedly faster than the old ≥4); the engine panel fills extra lines on demand. The user can
-  // raise "Analysis lines" (classifyLines) to search more per position for steadier accuracy/Elo.
+  // Batch analysis defaults to MultiPV=1. Extra lines provide root alternatives for
+  // annotations and inspection; the engine panel fills its lines on demand.
   const multipv = Math.max(1, Math.min(ENGINE_MAX_LINES, S.settings.classifyLines || 1));
   S.analyzedMultipv = multipv; // remember how many lines this run computed (for setEngineSetting)
   const nWorkers = Math.max(1, Math.min(S.settings.engineWorkers || 1, S.total + 1));

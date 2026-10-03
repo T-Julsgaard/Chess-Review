@@ -3,14 +3,12 @@ import { readFile, writeFile, mkdir, rename } from 'node:fs/promises';
 import { parseArgs } from 'node:util';
 import path from 'node:path';
 
-
 export const hash = value => createHash('sha256').update(value).digest('hex');
 export const hashFile = async file => hash(await readFile(file));
 export function args(options) {
   return parseArgs({ options: Object.fromEntries(Object.entries(options).map(([k, v]) =>
     [k, typeof v === 'boolean' ? { type: 'boolean', default: v } : { type: 'string', ...(v == null ? {} : { default: String(v) }) }])) }).values;
 }
-
 export async function json(file) { return JSON.parse(await readFile(file, 'utf8')); }
 export function provenanceSummary(manifest) {
   if(manifest==null)return manifest;
@@ -37,6 +35,3 @@ export async function save(file, value) {
   saves.set(file, operation);
   try { await operation; } finally { if (saves.get(file) === operation) saves.delete(file); }
 }
-
-
-

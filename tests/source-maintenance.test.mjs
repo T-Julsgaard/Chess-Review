@@ -3,8 +3,9 @@ import assert from 'node:assert/strict';
 import {mkdtemp, mkdir, readFile, writeFile, rm} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import {verifySource} from '../scripts/verify-source.mjs';
-import {verifyHistoryBlob} from '../scripts/verify-history.mjs';
+import {verifySource, verifyClaims} from '../scripts/verify-source.mjs';
+import {verifyHistoryBlob, verifyHistory} from '../scripts/verify-history.mjs';
+import {execFileSync} from 'node:child_process';
 
 test('older fork contributions cannot restore unsupported models or retired tooling', async t => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'chess-review-source-'));
@@ -25,6 +26,31 @@ test('older fork contributions cannot restore unsupported models or retired tool
   await mkdir(path.join(root, 'tools/calibration'), {recursive: true});
   await writeFile(path.join(root, 'tools/calibration/obsolete-experiment.mjs'), '');
   await assert.rejects(verifySource(root), /Unmaintained calibration tool/);
+});
+
+test('agreement claims are rejected while scientific intervals remain valid', () => {
+  const percent = '9' + '5%';
+  const service = 'Chess' + '.com';
+  const claim = `Accuracy scores within ~${percent} of ${service}'s.`;
+  assert.throws(() => verifyClaims(claim), /numerical-agreement/);
+  assert.throws(() => verifyHistoryBlob('README.md', claim), /numerical-agreement/);
+  assert.doesNotThrow(() => verifyClaims(`${service} game sample: ${percent} confidence interval.`));
+});
+
+test('history checks catch deleted commit-message claims and identical blobs under retired paths', async t => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'chess-review-history-'));
+  t.after(() => rm(root, {recursive: true, force: true}));
+  const git = args => execFileSync('git', args, {cwd: root, encoding: 'utf8', windowsHide: true});
+  git(['init', '-q']); git(['config', 'user.name', 'Maintenance test']); git(['config', 'user.email', 'test@example.invalid']);
+  await writeFile(path.join(root, 'README.md'), 'Current documentation.\n');
+  git(['add', '.']); git(['commit', '-qm', 'Accuracy within ' + '9' + '5% of Chess' + '.com']);
+  git(['commit', '--allow-empty', '-qm', 'Maintain documentation']);
+  assert.throws(() => verifyHistory(['HEAD'], root), /numerical-agreement/);
+  assert.doesNotThrow(() => verifyHistory(['HEAD', '^HEAD~1'], root));
+  await mkdir(path.join(root, 'backup'));
+  await writeFile(path.join(root, 'backup', 'copied.md'), 'Current documentation.\n');
+  git(['add', '.']); git(['commit', '-qm', 'Add copied file']);
+  assert.throws(() => verifyHistory(['HEAD', '^HEAD~2'], root), /Retired or generated directory/);
 });
 
 test('history checks reject retired models even when the current tree is clean', () => {

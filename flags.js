@@ -5,17 +5,15 @@
 //   archive / history pages:  <div class="cc-country-flag-component country-2 ...">   // numeric id
 //   live game pages:          <div class="cc-country-flag-component country-us ...">  // ISO/pseudo code
 // content.js scrapes whichever token follows `country-`; these tables turn it into the basename of
-// the matching Kenney flag SVG (flags/<code>.svg). Both the id->ISO pairing and the code list come
-// from flag_map.csv (Chess.com only exposes the opaque ids on archive pages), and the maps below are
-// generated from it. Numeric tokens hit the *_ID_* tables, alpha tokens hit the *_CODE_* tables.
+// the matching Kenney flag SVG (flags/<code>.svg). The hand-compiled tables below map numeric
+// tokens through *_ID_* and alpha tokens through *_CODE_*.
 //
 // Codes are ISO 3166-1 alpha-2 as used by the Kenney pack, plus a few extras the pack ships:
 // GB_ENG / GB_SCT / GB_WLS for England / Scotland / Wales, and UN for "International".
 // Countries Chess.com supports but the pack has no art for are intentionally omitted — they
 // resolve to null and the avatar falls back to the username initial (see analysis.js).
 //
-// Flags are CC0 (Kenney.nl) — see ATTRIBUTIONS.md. To regenerate after Chess.com adds ids,
-// rebuild this table from flag_map.csv.
+// Flags are CC0 (Kenney.nl) — see ATTRIBUTIONS.md. Keep ids, codes and display names aligned.
 export const COUNTRY_ID_TO_FLAG = {
   "2": "US",
   "3": "CA",
@@ -240,7 +238,7 @@ export const COUNTRY_ID_TO_FLAG = {
 };
 
 // Display names for the hover tooltip on each flag avatar. Same ids/source as the flag map above
-// (flag_map.csv) — kept in lock-step so every flag we render also has a name to label it.
+// Keep this aligned with the flag mapping so every rendered flag has a display name.
 export const COUNTRY_ID_TO_NAME = {
   "2": "United States",
   "3": "Canada",
@@ -467,7 +465,7 @@ export const COUNTRY_ID_TO_NAME = {
 // ---- LIVE-GAME path -------------------------------------------------------------------------------
 // Archive/history pages tag nationality with the opaque numeric id (country-2). LIVE game pages use
 // the ISO/pseudo country CODE instead (country-us, country-dk, country-xe). Same source of truth
-// (flag_map.csv) keyed by that code (uppercased) so both DOM shapes resolve to the same art.
+// keyed by that code (uppercased) so both DOM shapes resolve to the same art.
 export const COUNTRY_CODE_TO_FLAG = {
   "US": "US",
   "CA": "CA",

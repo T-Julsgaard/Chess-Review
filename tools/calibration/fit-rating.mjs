@@ -1,6 +1,3 @@
-
-
-
 import { mean, correlation } from './core.mjs';
 
 export const featureNames = ['meanLoss', 'rmsLoss', 'majorLossRate', 'topRate'];
@@ -43,5 +40,3 @@ export function metrics(rows, predictions) {
     bias: mean(errors), correlation: correlation(rows.map(r => r.ratingTarget), predictions),
     predictedRange: [Math.min(...predictions), Math.max(...predictions)] };
 }
-
-
