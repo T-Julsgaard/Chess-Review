@@ -7,8 +7,8 @@ screenshots and privacy declarations with the actual version you distribute.
 
 ## Short description
 
-Independent, open-source chess game review with local Stockfish analysis,
-move classifications, and estimated accuracy.
+Review your chess games, spot mistakes, and find better moves with Stockfish
+analysis in your browser.
 
 ## Overview
 

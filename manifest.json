@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Chess Review",
   "version": "0.2.1",
-  "description": "Independent, open-source chess game review with local Stockfish analysis, move classifications, and estimated accuracy.",
+  "description": "Review your chess games, spot mistakes, and find better moves with Stockfish analysis in your browser.",
   "minimum_chrome_version": "121",
   "icons": {
     "16": "icons/icon16.png",
