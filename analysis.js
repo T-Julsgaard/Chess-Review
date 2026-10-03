@@ -4415,7 +4415,7 @@ function badgeSettings() {
     toggleRow("Equal number size", "badgeDecimals"),
     el("p", { class: "set-note" }, "Show one decimal (9.0) and use the same number size for every score, including 10.0."),
     el("div", { class: "set-lbl" }, "Number font"), fonts,
-    el("p", { class: "set-note" }, "Six free, open-source fonts, bundled for offline use."),
+    el("p", { class: "set-note" }, "Free, open-source fonts, bundled for offline use."),
     toggleRow("Number flicker", "badgeFlicker"),
     el("p", { class: "set-note" }, "A subtle pulse on the active move's number. Scores stay unchanged; no extra engine search. Respects reduced motion."),
     toggleRow("Hover labels", "badgeTooltip"),

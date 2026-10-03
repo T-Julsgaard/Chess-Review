@@ -1526,3 +1526,14 @@ button { font-family: inherit; cursor: pointer; }
 .badge-font-name { font-size: 12px; font-weight: 700; }
 .badge-font-name small { display: block; font-size: 10px; font-weight: 400; color: var(--ink-3); margin-top: 3px; }
 .badge-font-sample { font-weight: 700; font-size: 22px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+@font-face { font-family: "Badge Lato"; src: url("fonts/lato.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: block; }
+@font-face { font-family: "Badge Nunito"; src: url("fonts/nunito.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: block; }
+@font-face { font-family: "Badge Quicksand"; src: url("fonts/quicksand.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: block; }
+@font-face { font-family: "Badge Oswald"; src: url("fonts/oswald.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: block; }
+@font-face { font-family: "Badge Barlow Condensed"; src: url("fonts/barlowcondensed.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: block; }
+@font-face { font-family: "Badge Fira Sans"; src: url("fonts/firasans.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: block; }
+@font-face { font-family: "Badge Fira Mono"; src: url("fonts/firamono.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: block; }
+@font-face { font-family: "Badge Lora"; src: url("fonts/lora.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: block; }
+@font-face { font-family: "Badge Bitter"; src: url("fonts/bitter.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: block; }
+@font-face { font-family: "Badge Cabin"; src: url("fonts/cabin.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: block; }

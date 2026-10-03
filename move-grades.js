@@ -24,6 +24,16 @@ export const BADGE_FONTS = Object.freeze({
   spacegrotesk: { name: 'Space Grotesk', family: 'Badge Space Grotesk, Arial, sans-serif', style: 'Technical', file: 'spacegrotesk.ttf' },
   rajdhani: { name: 'Rajdhani', family: 'Badge Rajdhani, Arial, sans-serif', style: 'Technical condensed', file: 'rajdhani.ttf' },
   spacemono: { name: 'Space Mono', family: 'Badge Space Mono, monospace', style: 'Monospace', file: 'spacemono.ttf' },
+  lato: { name: 'Lato', family: 'Badge Lato, Arial, sans-serif', style: 'Humanist', file: 'lato.ttf' },
+  nunito: { name: 'Nunito', family: 'Badge Nunito, Arial, sans-serif', style: 'Rounded', file: 'nunito.ttf' },
+  quicksand: { name: 'Quicksand', family: 'Badge Quicksand, Arial, sans-serif', style: 'Light geometric', file: 'quicksand.ttf' },
+  oswald: { name: 'Oswald', family: 'Badge Oswald, Arial, sans-serif', style: 'Tall condensed', file: 'oswald.ttf' },
+  barlowcondensed: { name: 'Barlow Condensed', family: 'Badge Barlow Condensed, Arial, sans-serif', style: 'Narrow', file: 'barlowcondensed.ttf' },
+  firasans: { name: 'Fira Sans', family: 'Badge Fira Sans, Arial, sans-serif', style: 'Clear humanist', file: 'firasans.ttf' },
+  firamono: { name: 'Fira Mono', family: 'Badge Fira Mono, monospace', style: 'Monospace', file: 'firamono.ttf' },
+  lora: { name: 'Lora', family: 'Badge Lora, Arial, sans-serif', style: 'Classic serif', file: 'lora.ttf' },
+  bitter: { name: 'Bitter', family: 'Badge Bitter, Arial, sans-serif', style: 'Slab serif', file: 'bitter.ttf' },
+  cabin: { name: 'Cabin', family: 'Badge Cabin, Arial, sans-serif', style: 'Friendly sans', file: 'cabin.ttf' },
 });
 
 export function moveGrade(category, loss, thresholds = {}, criticalLoss = null) {

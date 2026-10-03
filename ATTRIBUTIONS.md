@@ -168,3 +168,13 @@ Each font's copyright notice and full license accompany it in `fonts/`:
 - [Space Grotesk](https://github.com/google/fonts/tree/main/ofl/spacegrotesk) — `fonts/spacegrotesk-OFL.txt`
 - [Rajdhani](https://github.com/google/fonts/tree/main/ofl/rajdhani) — `fonts/rajdhani-OFL.txt`
 - [Space Mono](https://github.com/google/fonts/tree/main/ofl/spacemono) — `fonts/spacemono-OFL.txt`
+- [Lato](https://github.com/google/fonts/tree/main/ofl/lato) — `fonts/lato-OFL.txt`
+- [Nunito](https://github.com/google/fonts/tree/main/ofl/nunito) — `fonts/nunito-OFL.txt`
+- [Quicksand](https://github.com/google/fonts/tree/main/ofl/quicksand) — `fonts/quicksand-OFL.txt`
+- [Oswald](https://github.com/google/fonts/tree/main/ofl/oswald) — `fonts/oswald-OFL.txt`
+- [Barlow Condensed](https://github.com/google/fonts/tree/main/ofl/barlowcondensed) — `fonts/barlowcondensed-OFL.txt`
+- [Fira Sans](https://github.com/google/fonts/tree/main/ofl/firasans) — `fonts/firasans-OFL.txt`
+- [Fira Mono](https://github.com/google/fonts/tree/main/ofl/firamono) — `fonts/firamono-OFL.txt`
+- [Lora](https://github.com/google/fonts/tree/main/ofl/lora) — `fonts/lora-OFL.txt`
+- [Bitter](https://github.com/google/fonts/tree/main/ofl/bitter) — `fonts/bitter-OFL.txt`
+- [Cabin](https://github.com/google/fonts/tree/main/ofl/cabin) — `fonts/cabin-OFL.txt`

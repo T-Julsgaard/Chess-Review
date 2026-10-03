@@ -28,9 +28,9 @@ test('fixed decimals use equal size for every score, including zero, ten and pen
   assert.equal(numeral(gradeSvg('book', null, 'Book', true, { badgeDecimals: true })), null);
 });
 
-test('six local font choices ship with licenses and unsafe font names fall back', () => {
+test('sixteen local font choices ship with licenses and unsafe font names fall back', () => {
   const added = Object.entries(BADGE_FONTS).filter(([, font]) => font.file);
-  assert.ok(added.length >= 6);
+  assert.ok(added.length >= 16);
   for (const [id, font] of added) {
     const data = fs.readFileSync(new URL(`../fonts/${font.file}`, import.meta.url));
     assert.equal(data.readUInt32BE(0), 0x00010000, `${id} is a TrueType font`);
@@ -90,7 +90,7 @@ test('hover setting enables labels, dismisses them immediately when disabled, an
 test('Visual exposes Category badges with previews and an independent reset', async t => {
   const a = review(t), doc = a.dom.window.document; a.call('toggleSettings');
   [...doc.querySelectorAll('.set-subtabs button')].find(b => b.textContent === 'Category badges').click();
-  assert.equal(doc.querySelectorAll('.badge-font-option').length, 7);
+  assert.equal(doc.querySelectorAll('.badge-font-option').length, Object.keys(BADGE_FONTS).length);
   assert.equal(doc.querySelectorAll('.badge-preview-item').length, 5);
   a.state.settings.badgeFont = 'sora'; a.state.settings.badgeDecimals = true;
   a.state.settings.badgeFlicker = true; a.state.settings.badgeTooltip = true;
