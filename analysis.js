@@ -109,7 +109,7 @@ const QUALITY_DESC = {
   blunder:   "Blunder: a move that loses ~4+ pawns of eval, or walks into a forced mate.",
 };
 // Explanations for the accuracy and elo numbers (shown as a tooltip like the categories).
-const ACCURACY_INFO = "Mean retained move quality from the published public-data model. Forced moves are excluded and opening moves are included. Brilliant and other annotations do not alter numerical accuracy. Scores are estimates, not official platform scores.";
+const ACCURACY_INFO = "SF18 uses the published public-data move-quality model. SF19 estimates accuracy from centipawn evaluations using a public winning-chance curve and combines ordinary and harmonic move averages to give mistakes more weight. Forced moves are excluded and opening moves are included. Annotations do not alter accuracy. Scores are estimates, not official platform scores.";
 const ELO_INFO = "Use recorded rating: SF18 performance relative to public full-game quality peers; short games are extrapolations. Moves only: estimated public blitz rating level from board and search evidence, with at least 10 nonforced decisions. These are different estimates, not official ratings. SF19 uses its separate moves-only model.";
 // Explanations for the engine settings (shown on hover, same tooltip as the accuracy panel).
 const ENGINE_INFO = {
@@ -619,7 +619,7 @@ const S = {
   positions: [], clocks: [], evals: [], bests: [],
   classif: [], accMove: [], moveGrades: [], searchPreviews: [], _sacCache: [], _forcedCache: [],
   players: { w: {}, b: {} }, meSide: "w",
-  // Both accuracy aliases use the public numerical model, independent of annotations.
+  // Both accuracy aliases use the active engine's scorer, independent of annotations.
   acc: { w: null, b: null }, accElo: { w: null, b: null }, counts: { w: {}, b: {} },
   bookCount: 0, opening: null, verdict: "Analyzing …",
   idx: 0, total: 0, flipped: false,
@@ -4990,7 +4990,7 @@ function currentGameId() {
 }
 
 function analysisSettingsKey() {
-  return JSON.stringify(["public-scoring-v1", CALIB?.version, S.settings.ratingMode, S.settings.enginePath, S.settings.engineDepth, S.settings.classifyLines,
+  return JSON.stringify(["public-scoring-v2", CALIB?.version, S.settings.ratingMode, S.settings.enginePath, S.settings.engineDepth, S.settings.classifyLines,
     S.settings.engineHash, S.settings.engineSkill]);
 }
 

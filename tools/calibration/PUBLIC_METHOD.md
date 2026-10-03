@@ -97,9 +97,17 @@ blitz rating level; cross-platform transfer is unvalidated.
 Rating searches use 20,000 nodes, Hash32, full skill, cold history and restricted
 played-root evaluations. Selecting moves-only for SF18 adds these separate
 observations; it never feeds depth16 WDL into a fixed-node regression. SF19 uses
-its own fixed-node observations and WDL arithmetic quality; no SF18 coefficients
-are assigned to SF19. Displayed ratings are rounded to 50, while model outputs
-retain full precision. Saved analyses include scoring evidence and versioned
+its own fixed-node WDL observations for rating; no SF18 coefficients
+are assigned to SF19. Its displayed accuracy is a separate estimate using the
+[Lichess public centipawn winning-chance curve](https://lichess.org/page/accuracy)
+and exponential move-accuracy transform, with the one-point search uncertainty
+bonus in its [implementation](https://github.com/lichess-org/lila/blob/master/modules/analyse/src/main/AccuracyPercent.scala).
+It averages the ordinary and harmonic means of nonforced move qualities
+to reduce dilution by easy moves. It compares best and played scores at the same
+root and does not use Lichess's volatility weights, so it does not reproduce
+official Lichess scores. This display estimate is not a fitted SF19 calibration
+or an input to either moves-only rating model. Displayed ratings are rounded to
+50, while model outputs retain full precision. Saved analyses include scoring evidence and versioned
 settings; incompatible saved observations are recomputed.
 
 ## Development results and limits
