@@ -4,26 +4,26 @@ All engine code and evaluation networks are bundled. Nothing executable is downl
 
 | Engine | Purpose | Official files | Release |
 | --- | --- | --- | --- |
-| Stockfish 18 NNUE | Default; existing accuracy calibration | `stockfish-18-lite-single.js` / `.wasm` | [18.0.0](https://github.com/nmrugg/stockfish.js/releases/tag/v18.0.0) |
+| Stockfish 18 NNUE | Default; public accuracy model | `stockfish-18-lite-single.js` / `.wasm` | [18.0.0](https://github.com/nmrugg/stockfish.js/releases/tag/v18.0.0) |
 | Stockfish 19 Lite | Optional compact alternative | `stockfish-19-lite-single.js` / `.wasm` | [19.0.0](https://github.com/nmrugg/stockfish.js/releases/tag/v19.0.0) |
 
 18's files are named `stockfish-nnue.js` / `.wasm` locally. Both pairs are byte-for-byte
 official release assets, with SHA-256 checksums and original download URLs recorded in
 [`checksums.json`](checksums.json). Run `npm run verify:engines` to verify them.
-The 18 WASM is unchanged from the previous extension release; its loader now matches
-the official release exactly. `.gitattributes` preserves the original loader bytes.
+`.gitattributes` preserves the original loader bytes.
 
 The single-threaded builds work without cross-origin isolation. The extension already
 parallelizes positions across independent workers, so additional multithreaded variants
-would duplicate engines and require a different deployment setup. Stockfish 10 and
-asm.js are removed: both supported browsers have WebAssembly, and the two remaining
+would duplicate engines and require a different deployment setup. The supported
 builds can fall back to each other if startup fails. If neither works, analysis offers Retry.
 
 Stockfish 19 Lite has a smaller network and is weaker than full Stockfish 19. No claim
-is made that it is stronger than the bundled 18 NNUE at the same depth. Accuracy has
-not been recalibrated for 19 Lite. Full-19 saved settings migrate to `sf19lite`, which
-also prevents restoring full-19 evaluations as if they came from Lite. Removed legacy
-engine settings migrate to the default 18 NNUE.
+is made that it is stronger than the bundled 18 NNUE at the same depth. SF18 uses
+the public expected-points accuracy model; SF19 uses engine WDL accuracy. Each
+build has its own moves-only rating model. See the
+[public method](../tools/calibration/PUBLIC_METHOD.md) for search settings and limits.
+Saved engine preferences migrate to supported builds and invalidate incompatible
+cached evaluations.
 
 ## Sources and licenses
 

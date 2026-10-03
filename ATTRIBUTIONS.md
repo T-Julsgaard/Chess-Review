@@ -31,7 +31,7 @@ Distributed by Lichess (lila); high-quality vector SVGs.
 - **License:** **CC0 1.0** (public domain) — https://creativecommons.org/publicdomain/zero/1.0/
 - Free for personal, educational, and commercial use. Attribution is **not required**; we credit
   **Kenney / www.kenney.nl** here voluntarily, as the pack's license suggests.
-- The Chess.com country id → flag mapping in `flags.js` was compiled by hand (`flag_map.csv`) and
+- The Chess.com country id → flag mapping in `flags.js` was compiled by hand and
   is original to this project.
 
 ## Move / board sounds
@@ -116,8 +116,7 @@ Distributed by Lichess (lila); high-quality vector SVGs.
   on 2026-09-30; this records that declaration, not independent verification of
   every creation input. The redesigned symbols retain the previous circle colours.
 - **License:** GNU GPL v3.0, under the project's [LICENSE](LICENSE).
-  numeric design and earlier iterations. Superseded drawings are retired;
-  their circle geometry is retained as a small regression-test fixture.
+- Circle geometry is covered by `tests/fixtures/badge-circles.json`.
 
 ## App logo / icon
 - **Files:** `icons/icon16.png`, `icons/icon48.png`, `icons/icon128.png`, `icons/icon.png`

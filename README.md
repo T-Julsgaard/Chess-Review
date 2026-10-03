@@ -68,7 +68,7 @@ extension's own expected-points model does not reproduce Chess.com's full
 classifier. [Brilliant rules](tools/calibration/BRILLIANT_MOVES.md) explain
 special annotations and their sources.
 
-experiments. The [repository guide](docs/REPOSITORY.md) explains which files
+The [repository guide](docs/REPOSITORY.md) explains which files
 support the extension, development and reproduction.
 
 ## Install

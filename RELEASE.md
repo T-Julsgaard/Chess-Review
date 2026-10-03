@@ -17,20 +17,9 @@ dependency lockfile, tests, build scripts, repository guides and current calibra
 fitting/evidence/reproduction files. It excludes Git history and local
 dependencies. Engine upstream source/build references remain in engine/README.md;
 the snapshot does not itself contain the upstream engines' complete build sources.
-Only Cburnett and Merida pieces enter the browser/source ZIPs. Kaneo, Kaneo Midnight,
-1Kbyte Gambit, and the Kadagaden SVG boards were removed from the current checkout.
-Obsolete experiments and tooling have been retired from maintained history. Saved removed-piece choices migrate to Cburnett;
-removed SVG-board preferences migrate to similar retained flat-color boards.
-Move-category display names use Brilliant, Great, Best, Excellent, Good, Book,
-Inaccuracy, Mistake, Miss, and Blunder. Settings, coach
-category references, and badge accessibility labels use the same terminology.
-Stored classification keys, scoring thresholds, calibration coefficients, and
-the existing attributed classifier implementation are unchanged by this rename.
-The current move-category SVGs use maintainer-created replacement symbols;
-ATTRIBUTIONS.md records their authorship and design history. The injected Chess.com
-review control uses the extension's content-button.css and its own class names,
-while retaining its existing placement and review action. Include that stylesheet
-in the source and browser packages, as enforced by the build allowlist.
+Only Cburnett and Merida pieces enter the browser/source ZIPs. Include
+`content-button.css` in the source and browser packages, as enforced by the
+build allowlist. Current asset credits are in ATTRIBUTIONS.md.
 Build from a stable working tree. A dirty build is explicitly recorded and must
 not be described as identical to its HEAD commit. Preserve the submitted source
 snapshot and checksums with the actual store-upload record; do not invent tags
@@ -63,13 +52,12 @@ STORE_LISTING.md contains prepared listing/privacy copy. It has not been submitt
 to either store. Update the published description and privacy declarations together;
 do not retain the unsupported numerical-agreement claims.
 
-## Outstanding rights review
+## Distribution review
 
 Exact offline reproduction of the current numerical calibration is documented in
 tools/calibration/PUBLIC_METHOD.md. This establishes reproducibility from bundled
 evidence, not platform permission, independently validated move labels or rights
-to third-party assets. ATTRIBUTIONS.md retains known provenance gaps and historical
-removal records. Platform integration and applicable terms still need review;
+to third-party assets. ATTRIBUTIONS.md records current asset provenance and limitations. Platform integration and applicable terms still need review;
 a generated ZIP is not legal clearance. The Chrome store download checked on
 October 3, 2026 was version 0.2.0. Version 0.2.1 is prepared for the maintainer's
 store upload; the Firefox public listing was unavailable at that check.
@@ -101,9 +89,8 @@ Both engine pairs are original release assets from Nathan Rugg's Stockfish.js:
 Exact original asset URLs and SHA-256 values are in engine/checksums.json. The 18
 pair is renamed to stockfish-nnue locally; file contents are unchanged. Networks
 are embedded in WASM. No engine compilation or minification is performed here.
-Stockfish 18 NNUE is the default; 19 Lite is optional. Full 19, Stockfish 10, and
-asm.js are no longer included. Existing full-19 preferences migrate to Lite;
-legacy preferences migrate to 18. The engine tooltips disclose the Lite tradeoff.
+Stockfish 18 NNUE is the default; 19 Lite is optional. Saved engine preferences
+migrate to supported builds. The engine tooltips disclose the Lite tradeoff.
 
 lib/chess.js is derived from `dist/esm/chess.js` in Jeff Hlywa's chess.js **1.0.0**
 official npm package:

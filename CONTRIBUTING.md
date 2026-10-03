@@ -69,8 +69,7 @@ Contributions to the project's own code use its existing [GPL-3.0 license](LICEN
 Bundled third-party assets retain their own licenses and attribution requirements.
 Reviews happen as maintainer time allows.
 
-The October 2026 repository maintenance retired obsolete experiments and tooling
-and rebuilt branch history. Start from a fresh clone of current `main`; port
+Start from current `main`; port
 reviewed changes from older clones individually instead of merging their entire
 history. The source check runs during packaging and in CI. Changes to the maintained
 model or reproduction tools must include their documented public inputs and pass

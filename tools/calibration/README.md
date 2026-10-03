@@ -1,7 +1,7 @@
 # Current calibration tools
 
 This directory contains the current public calibration, its supporting math,
-and a compact development history. It is included in source packages; the
+and offline reproduction. It is included in source packages; the
 extension loads only `data/calibration.json` and the runtime scorers in `lib/`.
 
 With **Node.js 24 or later**, run from the repository root:

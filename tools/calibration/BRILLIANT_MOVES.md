@@ -1,8 +1,7 @@
-# Brilliant moves and calibration
+# Brilliant move rules
 
 Brilliant is an explanation of a strong voluntary piece sacrifice. It is a move
-annotation, separate from the evaluation-based accuracy and rating models. Fixing
-this annotation does not require retraining the numerical models.
+annotation, separate from the evaluation-based accuracy and rating models.
 
 ## Published meaning
 
@@ -113,9 +112,9 @@ tests verify that annotation inputs remain separate from numerical scoring.
 
 Adding a Brilliant bonus to numerical accuracy, adding sacrifice-count predictors,
 or fitting rating-dependent annotation weights would change this boundary and
-require a new prespecified experiment. Those changes are outside this fix.
+require a new prespecified experiment. They are not part of the current model.
 
-## Verification and future assessment
+## Verification
 
 Dedicated legal-board fixtures cover sound offers without a prior error, losing
 offers, exchanges, equal trades, x-rays, pins, unavoidable losses, forced moves,
@@ -124,4 +123,3 @@ material, new threats, defender/pin release, promotions, mate maintenance/delays
 Black's perspective, progressive evaluation updates and numerical-score isolation.
 Classifier scores in these fixtures are synthetic inputs; they are not independent
 engine confirmation that each offer is sound.
-

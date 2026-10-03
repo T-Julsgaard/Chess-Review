@@ -72,6 +72,7 @@ They are declared category policy, not coefficients fitted by the public numeric
 calibration. The extension's expected-points calculation and additional category
 gates differ; matching cutoff values does not establish matching labels or an
 implementation of Chess.com's hidden algorithm. Current fitting evidence uses
+no Chess.com review outputs.
 
 ## Two rating definitions
 
