@@ -4528,7 +4528,7 @@ const CREDITS = [
     href: "https://github.com/lichess-org/lila/tree/master/public/piece/merida",
   },
   {
-    title: "Board & move sounds",
+    title: "Move sounds",
     by: "Lichess sound set (lila)",
     lic: "Licensed",
     href: "https://github.com/lichess-org/lila/blob/master/LICENSE",
@@ -4613,7 +4613,6 @@ function openCredits() {
       "All trademarks belong to their respective owners."),
     el("div", { class: "credits-list" }, contributors, ...entries),
     el("div", { class: "credits-foot" },
-      "Licences and unresolved permissions are shown above. Tap a row for the source.",
       el("div", { class: "credits-foot-links" },
         el("a", { href: REPO_URL + "/blob/main/LICENSE", target: "_blank", rel: "noopener noreferrer" }, "Full license (GPLv3)"),
         " · ",

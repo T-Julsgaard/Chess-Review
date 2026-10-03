@@ -34,7 +34,7 @@ Distributed by Lichess (lila); high-quality vector SVGs.
 - The Chess.com country id → flag mapping in `flags.js` was compiled by hand and
   is original to this project.
 
-## Move / board sounds
+## Move sounds
 - **Files:** `sounds/move-self.mp3`, `sounds/capture.mp3`, `sounds/Check.mp3`,
   `sounds/Castling.mp3`
 - **Source:** Lichess sound set (lila) —
