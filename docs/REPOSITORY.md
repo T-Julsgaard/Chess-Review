@@ -27,7 +27,7 @@ Many small asset files are intentional; removing them can break optional setting
 | `README.md` | Installation, usage, scoring overview and links to detailed information. |
 | `LICENSE`, `ATTRIBUTIONS.md`, `THIRD_PARTY_NOTICES.md` | Project license, third-party notices and asset provenance. |
 | `PRIVACY.md`, `SECURITY.md` | Actual data handling and how to report vulnerabilities. |
-| `RELEASE.md`, `STORE_LISTING.md` | Packaging, store review guidance and prepared listing/privacy text. These are operational documents, even though the app does not execute them. |
+| `RELEASE.md`, [marketing/STORE_LISTING.md](../marketing/STORE_LISTING.md) | Packaging, store review guidance and prepared listing/privacy text. These are operational documents, even though the app does not execute them. |
 | `CONTRIBUTING.md`, `.github/` | Contributor guidance, issue/PR forms and dependency update configuration. |
 | `package.json`, `package-lock.json` | Commands and reproducible development dependency versions. |
 | `scripts/` | Package builds, engine verification and optional browser smoke checks. |

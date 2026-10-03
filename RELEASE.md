@@ -53,8 +53,9 @@ store dashboards. Keep the existing Chrome item and Firefox extension ID; do not
 create replacement listings. This repository does not authenticate to or publish
 to either store during build. Check that current screenshots match the two engine
 choices, and use PRIVACY.md as the basis for the hosted privacy-policy URL.
-STORE_LISTING.md contains prepared listing/privacy copy. It has not been submitted
-to either store. Update the published description and privacy declarations together;
+[marketing/STORE_LISTING.md](marketing/STORE_LISTING.md) contains prepared
+listing/privacy copy. It has not been submitted to either store. Update the
+published description and privacy declarations together;
 do not retain the unsupported numerical-agreement claims.
 
 ## Distribution review
