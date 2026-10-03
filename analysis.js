@@ -100,17 +100,17 @@ const QUALITY_DESC = {
   brilliant: "A strong, sound piece sacrifice: you voluntarily offer material while keeping a satisfactory position. Ordinary trades and unnecessary sacrifices in clearly winning positions do not count.",
   great:     "An only-good move that capitalises on the opponent's mistake or blunder.",
   best:      "Exactly the engine's top move — the best possible move in the position (also shown for forced, only-legal moves).",
-  excellent: "Not the top move, but nearly as strong (loses well under half a pawn), or a move that begins or keeps a forced mate.",
-  good:      "A solid move (loses roughly half to one pawn), or one that delays an unavoidable mate.",
-  book:      "A known opening move — the position is in the opening book (theory from a large game dataset).",
-  inacc:     "Inaccuracy: a move that loses about 1–4 pawns of eval.",
-  mistake:   "Mistake: a move that throws away a clear (≥2 pawn) advantage, or hands the opponent one.",
+  excellent: "An alternative nearly as strong as the engine's top move: loses less than 2 percentage points in estimated winning chances, or begins or preserves a forced mate.",
+  good:      "A small loss of estimated winning chances (2–5 percentage points), or a move that takes longer to deliver a forced mate.",
+  book:      "A known opening move — the resulting position is in the bundled opening book.",
+  inacc:     "A loss of about 5–10 percentage points in estimated winning chances. Context can turn a slip into a Mistake or Miss instead.",
+  mistake:   "A loss of about 10–20 percentage points in estimated winning chances, or a move that gives away a clear advantage or hands one to the opponent. The clear-advantage and minimum-loss settings affect these contextual cases.",
   miss:      "Missed chance: the opponent erred and you failed to punish it — or you let a forced mate slip.",
-  blunder:   "Blunder: a move that loses ~4+ pawns of eval, or walks into a forced mate.",
+  blunder:   "A loss of at least 20 percentage points in estimated winning chances, or a severe forced-mate error. Special cases such as a missed opportunity can receive another label.",
 };
 // Explanations for the accuracy and elo numbers (shown as a tooltip like the categories).
 const ACCURACY_INFO = "SF18 uses the published public-data move-quality model. SF19 estimates accuracy from centipawn evaluations using a public winning-chance curve and combines ordinary and harmonic move averages to give mistakes more weight. Forced moves are excluded and opening moves are included. Annotations do not alter accuracy. Scores are estimates, not official platform scores.";
-const ELO_INFO = "Use recorded rating: SF18 performance relative to public full-game quality peers; short games are extrapolations. Moves only: estimated public blitz rating level from board and search evidence, with at least 10 nonforced decisions. These are different estimates, not official ratings. SF19 uses its separate moves-only model.";
+const ELO_INFO = "Use recorded rating compares this game's performance with players around the rating saved in the game. Moves only ignores that rating and estimates a blitz rating level from the moves themselves; it needs at least 10 moves with more than one legal choice. Recorded-rating comparisons are available with Stockfish 18 at the calibrated settings. Stockfish 19 Lite always uses its own moves-only model. Neither estimate changes your account rating.";
 // Explanations for the engine settings (shown on hover, same tooltip as the accuracy panel).
 const ENGINE_INFO = {
   engineLines:   "How many candidate moves (lines) the engine panel shows for the position you're viewing. Extra lines are searched on demand — changing this doesn't re-analyze the game.",
@@ -1148,7 +1148,6 @@ function _forcedAt(i, state = S) {
 const round50 = (v) => Math.round(v / 50) * 50;
 // Display rounding is separate from the full-precision published models.
 function estimateElo(acc, rating, side = null) {
-  if (acc == null) return null;
   side ||= ["w", "b"].find(color => Number(S.players[color]?.rating) === Number(rating));
   const value = S.calibrated?.[side]?.rating;
   return Number.isFinite(value) ? round50(Math.max(0, Math.min(5000, value))) : null;
@@ -3314,8 +3313,9 @@ function setCategoryName(cls, value) {
 function categoryLabel(cls) {
   const label = el("button", {
     type: "button", class: "qlabel", "data-category": cls,
-    "aria-label": "Rename " + categoryName(cls), title: "Click to rename",
-    onmouseenter: e => { if (S.settings.badgeTooltip) showQTip(e.currentTarget, cls); }, onmouseleave: hideQTip,
+    "aria-label": "Rename " + categoryName(cls),
+    onmouseenter: e => showQTip(e.currentTarget, cls), onmouseleave: hideQTip,
+    onfocus: e => showQTip(e.currentTarget, cls), onblur: hideQTip,
     onclick: () => {
       hideQTip();
       let finished = false;
@@ -4072,6 +4072,7 @@ function engineSlider(label, key, min, max, step, opts = {}) {
       oninput: (e) => {
         const v = +e.target.value;
         out.textContent = fmt(v);
+        if (key === "engineDepth") return; // preview while dragging; confirm once on release
         S.settings[key] = v;
         browserAPI.storage.local.set({ settings: S.settings });
         S.engineFallbackBuild = null; S.activeEngineBuild = null;
@@ -4080,6 +4081,11 @@ function engineSlider(label, key, min, max, step, opts = {}) {
         if (S.helperEngine) { try { S.helperEngine.terminate(); } catch {} S.helperEngine = null; }
         S.threatCache.clear();
         scheduleReanalyze();
+      },
+      onchange: async e => {
+        if (key !== "engineDepth") return;
+        await setEngineSetting(key, +e.target.value);
+        e.target.value = S.settings[key]; out.textContent = fmt(+S.settings[key]);
       },
     }),
   );
@@ -4092,7 +4098,7 @@ function clsSlider(label, key, min, max, step, opts = {}) {
   return el("div", { class: "set-ctrl" },
     el("div", { class: "set-ctrl-top" }, setLabel(label, opts.info), out),
     el("input", {
-      type: "range", min, max, step, value: S.settings[key],
+      type: "range", min, max, step, value: S.settings[key], disabled: opts.disabled || false,
       oninput: (e) => {
         const v = +e.target.value;
         out.textContent = fmt(v);
@@ -4278,7 +4284,7 @@ function visualSettings() {
         onChange: (v) => document.documentElement.style.setProperty("--badge-scale", v),
       }),
     ),
-    el("button", { class: "set-reset", onclick: () => { S.visualTab = "badges"; renderSettings(); } }, "Customize category badges →"),
+    section("Category badges", badgeSettings()),
     section("Coach",
       el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Who appears and narrates. Switch any time — the new coach picks up right where you are.")),
       coachPicker(),
@@ -4359,18 +4365,23 @@ function motorSettings() {
     ),
     section("Move classification",
       el("div", { class: "set-row hint" },
-        el("span", { class: "set-note" }, "How move quality is graded, in pawns of evaluation lost vs the engine's best move. Changes re-label the game instantly — no re-analysis.")),
-      clsSlider("Good above", "clsGood", 0.1, 1.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsGood }),
-      clsSlider("Inaccuracy above", "clsInacc", 0.3, 2.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsInacc }),
-      clsSlider("Blunder above", "clsBlunder", 1.5, 8, 0.1, { fmt: pawnsFmt, info: ENGINE_INFO.clsBlunder }),
+        el("span", { class: "set-note" }, "Controls move labels, not accuracy or estimated rating. Good, Inaccuracy and Blunder use fixed winning-chance loss bands, so their pawn cutoffs are inactive. The remaining controls adjust when a move gives away an advantage or misses an opportunity, without re-analyzing the game.")),
+      clsSlider("Good above", "clsGood", 0.1, 1.5, 0.05, { fmt: pawnsFmt, disabled: true, info: "Inactive: Good uses a fixed winning-chance loss band, rather than this pawn cutoff." }),
+      clsSlider("Inaccuracy above", "clsInacc", 0.3, 2.5, 0.05, { fmt: pawnsFmt, disabled: true, info: "Inactive: Inaccuracy uses a fixed winning-chance loss band, rather than this pawn cutoff." }),
+      clsSlider("Blunder above", "clsBlunder", 1.5, 8, 0.1, { fmt: pawnsFmt, disabled: true, info: "Inactive: Blunder uses a fixed winning-chance loss band, rather than this pawn cutoff." }),
       clsSlider("Clear advantage", "clsClearAdv", 1, 5, 0.1, { fmt: pawnsFmt, info: ENGINE_INFO.clsClearAdv }),
       clsSlider("Mistake min. loss", "clsMistakeLoss", 0.5, 3, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsMistakeLoss }),
       clsSlider("Miss tolerance", "clsMissTol", 0, 1.5, 0.05, { fmt: pawnsFmt, info: ENGINE_INFO.clsMissTol }),
     ),
     section("Estimated rating",
       el("div", { class: "set-row" }, setLabel("Rating mode", ELO_INFO),
-        ddField(S.settings.ratingMode || "context", [["context", "Use recorded rating"], ["moves", "Moves only"]], value => setEngineSetting("ratingMode", value))),
-      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "SF18 can use recorded rating as context. Moves only estimates public blitz rating level. SF19 uses its separate moves-only model.")),
+        S.settings.enginePath === "sf19lite" ? el("span", { class: "set-note" }, "Moves only")
+          : ddField(S.settings.ratingMode || "context", [["context", "Use recorded rating"], ["moves", "Moves only"]], value => setEngineSetting("ratingMode", value))),
+      el("div", { class: "set-row hint" }, el("span", { class: "set-note" },
+        S.settings.enginePath === "sf19lite"
+          ? "Stockfish 19 Lite always estimates rating from moves alone, using its own model. Your Stockfish 18 rating-mode preference is kept for when you switch back."
+          : "Use recorded rating: shows how well you played compared with players around the rating saved in this game. If no rating is saved, we use Moves only instead.")),
+      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Moves only: ignores the saved rating and estimates a blitz rating level from your move choices. Needs at least 10 moves with more than one legal choice. These estimates do not change your account rating.")),
       (S.settings.enginePath === "nnue" && (S.settings.engineDepth !== 16 || S.settings.engineHash !== 16 || S.settings.engineSkill !== 20 || S.settings.classifyLines !== 1))
         ? el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Use depth 16, hash 16 MB, maximum strength and 1 analysis line for calibrated SF18 numerical scores.")) : null,
     ),
@@ -4430,13 +4441,8 @@ function renderSettings() {
     el("button", { class: "set-tab" + (S.settingsTab === "visual" ? " on" : ""), onclick: () => { S.settingsTab = "visual"; renderSettings(); } }, "Visual"),
     el("button", { class: "set-tab" + (S.settingsTab === "engine" ? " on" : ""), onclick: () => { S.settingsTab = "engine"; renderSettings(); } }, "Engine"),
   );
-  const visualTabs = el("div", { class: "set-tabs set-subtabs" },
-    ...[["general", "General"], ["badges", "Category badges"]].map(([id, label]) => el("button", {
-      class: "set-tab" + ((S.visualTab || "general") === id ? " on" : ""),
-      onclick: () => { S.visualTab = id; renderSettings(); },
-    }, label)));
   UI.settings.replaceChildren(tabs, ...(S.settingsTab === "engine" ? [motorSettings()]
-    : [visualTabs, S.visualTab === "badges" ? badgeSettings() : visualSettings()]));
+    : [visualSettings()]));
   UI.settings.scrollTop = scroll;
   positionSettings();
 }
@@ -4589,7 +4595,44 @@ async function setSetting(key, value) {
   if (UI.settings && !UI.settings.hidden) renderSettings();
 }
 // Engine setting: save, discard the live engine (new build/options), and re-analyze.
+let calibrationWarningPending = null;
+function calibrationWarning(title, message, revertLabel) {
+  if (calibrationWarningPending) return calibrationWarningPending;
+  calibrationWarningPending = new Promise(resolve => {
+    const previousFocus = document.activeElement;
+    const finish = proceed => {
+      overlay.remove(); document.removeEventListener("keydown", onKey, true);
+      calibrationWarningPending = null; previousFocus?.focus(); resolve(proceed);
+    };
+    const revert = el("button", { type: "button", onclick: () => finish(false) }, revertLabel);
+    const proceed = el("button", { type: "button", onclick: () => finish(true) }, "Continue");
+    const overlay = el("div", { class: "calibration-warning-overlay" },
+      el("div", { class: "calibration-warning", role: "alertdialog", "aria-modal": "true",
+        "aria-labelledby": "calibrationWarningTitle", "aria-describedby": "calibrationWarningBody" },
+      el("h3", { id: "calibrationWarningTitle" }, title),
+      el("p", { id: "calibrationWarningBody" }, message),
+      el("div", { class: "calibration-warning-actions" }, revert, proceed)));
+    const onKey = e => {
+      if (e.key === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); finish(false); }
+      else if (e.key === "Tab") { e.preventDefault(); (document.activeElement === revert ? proceed : revert).focus(); }
+      else if (e.key.startsWith("Arrow") || ["Home", "End", "f"].includes(e.key)) e.stopImmediatePropagation();
+    };
+    document.body.append(overlay); document.addEventListener("keydown", onKey, true); revert.focus();
+  });
+  return calibrationWarningPending;
+}
 async function setEngineSetting(key, value) {
+  if (S.settings[key] === value) return;
+  if (key === "enginePath" && value === "sf19lite") {
+    const proceed = await calibrationWarning("Switch to Stockfish 19 Lite?",
+      "Stockfish 18 NNUE is recommended for review scores. Stockfish 19 Lite uses a separate accuracy estimate with less calibration evidence and only supports rating estimates from moves alone. Its accuracy and rating estimates may differ from Stockfish 18's and should be treated with more caution.", "Revert to Stockfish 18");
+    if (!proceed) { if (S.settings.enginePath !== "nnue") await setEngineSetting("enginePath", "nnue"); return; }
+  }
+  if (key === "engineDepth" && value !== 16 && S.settings.enginePath === "nnue" && S.settings.engineDepth === 16) {
+    const proceed = await calibrationWarning("Change the calibrated depth?",
+      "Stockfish 18's accuracy and recorded-rating estimates are calibrated at depth 16. At another depth, those scores become unavailable. Moves-only rating estimates use a separate fixed search budget and remain available when selected. Continue with the new depth or keep depth 16.", "Keep depth 16");
+    if (!proceed) return;
+  }
   S.settings[key] = value;
   S.engineFallbackBuild = null;
   S.activeEngineBuild = null;

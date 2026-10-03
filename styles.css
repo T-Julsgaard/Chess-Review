@@ -1514,7 +1514,6 @@ button { font-family: inherit; cursor: pointer; }
   font-weight: 700; font-style: normal; font-display: block;
 }
 
-.set-subtabs { margin-top: -4px; }
 .badge-settings { display: flex; flex-direction: column; gap: 12px; }
 .badge-settings p { margin: 0; }
 .badge-preview { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 14px 0; }
@@ -1537,3 +1536,11 @@ button { font-family: inherit; cursor: pointer; }
 @font-face { font-family: "Badge Lora"; src: url("fonts/lora.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: block; }
 @font-face { font-family: "Badge Bitter"; src: url("fonts/bitter.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: block; }
 @font-face { font-family: "Badge Cabin"; src: url("fonts/cabin.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: block; }
+
+.calibration-warning-overlay { position: fixed; inset: 0; z-index: 10000; background: #0008; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.calibration-warning { width: min(420px, 100%); padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--ink); box-shadow: 0 12px 50px #0006; }
+.calibration-warning h3 { margin: 0 0 12px; }
+.calibration-warning p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--ink-2); }
+.calibration-warning-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.calibration-warning-actions button { padding: 9px 12px; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--line); color: var(--ink); cursor: pointer; }
+.calibration-warning-actions button:hover, .calibration-warning-actions button:focus-visible { border-color: var(--accent); }

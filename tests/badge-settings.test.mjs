@@ -89,7 +89,9 @@ test('hover setting enables labels, dismisses them immediately when disabled, an
 
 test('Visual exposes Category badges with previews and an independent reset', async t => {
   const a = review(t), doc = a.dom.window.document; a.call('toggleSettings');
-  [...doc.querySelectorAll('.set-subtabs button')].find(b => b.textContent === 'Category badges').click();
+  assert.equal(doc.querySelector('.set-subtabs'), null);
+  [...doc.querySelectorAll('.set-sect-head')].find(b => b.textContent === 'Category badges').click();
+  assert.ok(doc.querySelector('.badge-settings').closest('.set-section').classList.contains('open'));
   assert.equal(doc.querySelectorAll('.badge-font-option').length, Object.keys(BADGE_FONTS).length);
   assert.equal(doc.querySelectorAll('.badge-preview-item').length, 5);
   a.state.settings.badgeFont = 'sora'; a.state.settings.badgeDecimals = true;
@@ -103,4 +105,20 @@ test('Visual exposes Category badges with previews and an independent reset', as
   assert.equal(a.state.settings.badgeFlicker, false); assert.equal(a.state.settings.badgeTooltip, false);
   assert.equal(a.state.settings.accent, 'custom');
   assert.equal(doc.querySelector('.sq-badge text').textContent, '2');
+});
+
+test('accuracy category explainers work with hover labels off and after renaming', t => {
+  const a = review(t), doc = a.dom.window.document;
+  for (const cls of ['brilliant', 'blunder']) {
+    const label = doc.querySelector(`[data-category="${cls}"]`);
+    assert.equal(label.hasAttribute('title'), false);
+    label.dispatchEvent(new a.dom.window.MouseEvent('mouseenter'));
+    assert.ok(doc.querySelector('.q-tip').classList.contains('show'));
+    assert.match(doc.querySelector('.q-tip-body').textContent, cls === 'brilliant' ? /sacrifice/ : /mate/);
+    label.dispatchEvent(new a.dom.window.MouseEvent('mouseleave'));
+    assert.equal(doc.querySelector('.q-tip').classList.contains('show'), false);
+  }
+  a.call('setCategoryName', 'blunder', 'Oops');
+  doc.querySelector('[data-category="blunder"]').focus();
+  assert.equal(doc.querySelector('.q-tip-nm').textContent, 'Oops');
 });
