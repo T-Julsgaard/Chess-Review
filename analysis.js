@@ -5065,7 +5065,7 @@ function practiceAttempt(from, to) {
     flashSquares([mv.from, mv.to], "good");
     playSanSound(mv.san);
     renderControls(); renderReview();
-    setTimeout(() => { if (S.practice) practiceAdvance(); }, 1300);
+    setTimeout(() => { if (S.practice === p) practiceAdvance(); }, 1300);
   } else {
     p.fails = (p.fails || 0) + 1;
     flashSquares([mv.from, mv.to], "bad");
