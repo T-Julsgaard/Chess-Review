@@ -25,10 +25,28 @@ export function positionCommand(fen, history = null) {
 // change), the worker never replies — without this cap _ready would hang forever and every
 // analysis would silently stall. On timeout the handshake REJECTS, which lets the caller
 // fall back to the next build (see createEngine() in analysis.js).
-const HANDSHAKE_TIMEOUT_MS = 10000;
+// Cold WebAssembly compilation and NNUE initialization can take longer on a
+// slow CPU, especially while other tabs are busy. Keep a finite recovery bound.
+const HANDSHAKE_TIMEOUT_MS = 60000;
 // A silent worker must not leave review or Explore waiting forever. Reset on engine output
 // so a deep search that is still reporting progress is allowed to continue.
 const SEARCH_SILENCE_TIMEOUT_MS = 120000;
+
+// Both bundled builds use SIMD. Trying the other build cannot fix a missing
+// browser/CPU capability, so report the shared requirement before loading either.
+export function engineCapabilityError(wasm = globalThis.WebAssembly) {
+  let message;
+  if (!wasm || typeof wasm.validate !== "function") {
+    message = "WebAssembly is unavailable. Use an up-to-date browser with WebAssembly enabled.";
+  } else {
+    const simd = new Uint8Array([0,97,115,109,1,0,0,0,1,5,1,96,0,1,123,3,2,1,0,10,10,1,8,0,65,0,253,15,253,98,11]);
+    try { if (wasm.validate(simd)) return null; } catch {}
+    message = "WebAssembly SIMD is unavailable in this browser or on this CPU. The bundled Stockfish engines require it. Try an up-to-date Chrome, Edge, or Firefox browser; older CPUs may remain unsupported.";
+  }
+  const error = new Error(message);
+  error.code = "ENGINE_UNSUPPORTED";
+  return error;
+}
 
 export class Engine {
   constructor(scriptPath = "engine/stockfish-nnue.js", wasmPath = scriptPath.replace(/\.js$/, ".wasm")) {
@@ -41,6 +59,13 @@ export class Engine {
     this.queue = [];
     this.current = null;
     this.multipv = 1;
+    const unsupported = engineCapabilityError();
+    if (unsupported) {
+      this.dead = true;
+      this._ready = Promise.reject(unsupported);
+      this._ready.catch(() => {});
+      return;
+    }
     // A worker whose script URL is bad throws synchronously from the constructor — treat that the
     // same as any other load failure so createEngine() can fall back instead of crashing the page.
     try {

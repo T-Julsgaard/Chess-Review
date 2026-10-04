@@ -119,7 +119,7 @@ const ENGINE_INFO = {
   engineLines:   "How many candidate moves (lines) the engine panel shows for the position you're viewing. Extra lines are searched on demand — changing this doesn't re-analyze the game.",
   classifyLines: "Lines searched for annotation and candidate inspection. Calibrated SF18 numerical scores require one analysis line. Changing this re-analyzes the game.",
   engineDepth:   "How many plies (half-moves) deep Stockfish searches each position. Higher depth gives more accurate evaluations and fewer false mistakes, but takes longer.",
-  engineWorkers: "Number of Stockfish instances analysing positions in parallel. More workers finish the game faster on multi-core CPUs; the results are identical.",
+  engineWorkers: "Requested number of Stockfish instances analysing positions in parallel. The review limits this using available CPU cores and memory to keep smaller computers responsive. Search depth and scoring settings stay the same.",
   fastAnalysis:  "Trades quality for speed: the classification pass uses fewer engine lines. ~1.3×/1.6× faster, but evals shift slightly and clean games can pick up a few false inaccuracies.",
   enginePath:    "Stockfish 18 NNUE is the default. Stockfish 19 Lite uses a smaller evaluation network for a compact alternative. Both run locally; Lite is not the full-strength Stockfish 19 build.",
   engineSkill:   "Caps the engine's playing strength (Stockfish 'Skill Level'). Max (20) = full strength. Lower values play deliberately weaker — useful for more human-like suggestions.",
@@ -225,6 +225,24 @@ function migrateVisualAssetSettings(settings) {
   return changed;
 }
 
+// CPU count alone can overcommit RAM on inexpensive PCs. deviceMemory is an
+// approximate hint and is absent in Firefox; use a conservative unknown case.
+// Budget includes engine/network overhead plus the largest scoring hash (32 MB).
+// This limits parallelism only: search settings and scoring stay unchanged.
+function engineWorkerCount(requested = 4, hash = 16, positions = Infinity,
+  hardware = typeof navigator === "undefined" ? {} : navigator) {
+  const cores = Number(hardware.hardwareConcurrency);
+  const cpuLimit = Number.isFinite(cores) && cores >= 1 ? Math.max(1, Math.floor(cores) - 1) : 2;
+  const memory = Number(hardware.deviceMemory);
+  const knownMemory = Number.isFinite(memory) && memory > 0;
+  const memoryLimit = !knownMemory ? 2 : memory <= 2 ? 1 : memory <= 4 ? 2 : 8;
+  const budgetMB = !knownMemory ? 256 : memory <= 2 ? 128 : memory <= 4 ? 256 : 768;
+  const hashMB = Number.isFinite(Number(hash)) ? Math.max(32, Math.min(256, Number(hash))) : 32;
+  const desired = Number.isFinite(Number(requested)) ? Math.max(1, Math.min(8, Math.floor(Number(requested)))) : 4;
+  return Math.max(1, Math.min(desired, cpuLimit, memoryLimit,
+    Math.floor(budgetMB / (64 + hashMB)), positions));
+}
+
 const DEFAULT_SETTINGS = {
   categoryNames: {},
   theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
@@ -274,8 +292,8 @@ const DEFAULT_SETTINGS = {
   // Parallel analysis workers: independent single-threaded Stockfish instances that pull
   // positions from a shared queue. Each position is still searched identically (cold, same
   // depth/lines), so results are unchanged — only the wall-clock is parallelized. Default ≈
-  // (CPU cores − 1), capped at 4.
-  engineWorkers: Math.max(1, Math.min(4, ((typeof navigator !== "undefined" && navigator.hardwareConcurrency) || 4) - 1)),
+  // (CPU cores − 1), capped at 4 and reduced when memory is limited or unknown.
+  engineWorkers: engineWorkerCount(),
   // Extra lines serve annotation and candidate inspection. Calibrated SF18 scores use one line.
   classifyLines: 1,
   // Fast analysis: kept for backwards compatibility, but now a no-op for line count — the batch
@@ -5434,25 +5452,36 @@ async function startAnalysis() {
   // annotations and inspection; the engine panel fills its lines on demand.
   const multipv = Math.max(1, Math.min(ENGINE_MAX_LINES, S.settings.classifyLines || 1));
   S.analyzedMultipv = multipv; // remember how many lines this run computed (for setEngineSetting)
-  const nWorkers = Math.max(1, Math.min(S.settings.engineWorkers || 1, S.total + 1));
+  const nWorkers = engineWorkerCount(S.settings.engineWorkers || 1, S.settings.engineHash, S.total + 1);
   // createEngine() readies each worker AND falls back down the build chain if the chosen build can't
   // load — so the whole batch survives e.g. NNUE failing, and S.activeEngineBuild reflects the build
   // actually in use. If no build can start at all, surface it instead of leaving a stuck "Analyzing…".
   const starts = await Promise.allSettled(
     Array.from({ length: nWorkers }, () => createEngine({ Hash: S.settings.engineHash, "Skill Level": S.settings.engineSkill }))
   );
-  const engines = starts.filter(r => r.status === "fulfilled").map(r => r.value);
+  let engines = starts.filter(r => r.status === "fulfilled").map(r => r.value);
   if (gen !== S.batchGen) { engines.forEach(e => e.terminate()); return; }
   const failed = starts.find(r => r.status === "rejected");
-  if (failed) {
-    engines.forEach(e => e.terminate());
+  if (!engines.length) {
     console.error("[Chess Review] no Stockfish build could be started:", failed.reason);
     S.evalEngines = []; S.analyzing = false;
-    S.analysisError = "the engine could not be started in this browser.";
+    S.analysisError = failed.reason?.code === "ENGINE_UNSUPPORTED"
+      ? failed.reason.message : "the engine could not be started in this browser.";
     S.verdict = "Engine unavailable — couldn't start Stockfish in this browser.";
     flushProgress(gen);
     return;
   }
+  // A failed allocation in one worker need not prevent the others reviewing
+  // the game. Keep one build throughout the review so its scoring model agrees
+  // with every position, even if individual startups took different fallbacks.
+  const build = engines[0].buildKey;
+  for (const eng of engines) if (eng.buildKey !== build) eng.terminate();
+  engines = engines.filter(eng => eng.buildKey === build);
+  if (build) {
+    S.engineFallbackBuild = build === S.settings.enginePath ? null : build;
+    setActiveEngineBuild(build);
+  }
+  if (failed) console.warn("[Chess Review] continuing with a smaller engine pool:", failed.reason);
   S.evalEngines = engines;
 
   // Shared work queue. `nextIdx++` is atomic (no await between read and increment in a

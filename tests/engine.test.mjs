@@ -85,7 +85,15 @@ test('Stockfish 19 Lite fails cleanly if its startup is silent',async t=>{
   t.mock.timers.enable({apis:['setTimeout']});
   const eng=engine(t,{path:'engine/stockfish-19-lite-single.js',noReady:true});
   const failed=assert.rejects(eng.setOptions(),/timed out/);
-  t.mock.timers.tick(10001);await failed;assert.equal(eng.dead,true);
+  t.mock.timers.tick(60001);await failed;assert.equal(eng.dead,true);
+});
+
+test('slow cold startup has time to compile before the recovery deadline',async t=>{
+  t.mock.timers.enable({apis:['setTimeout']});
+  const eng=engine(t,{noReady:true}),ready=eng.setOptions({Hash:16});
+  t.mock.timers.tick(20000);assert.equal(eng.dead,false);
+  eng.worker.line('uciok');eng.worker.line('readyok');await ready;
+  assert.ok(eng.worker.commands.includes('setoption name Hash value 16'));
 });
 
 test('MultiPV retains ranking, depth and score bounds without changing scalar evaluation', async t => {

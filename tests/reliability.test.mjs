@@ -66,11 +66,13 @@ test('a failed batch never saves gaps, and Retry can complete',async t=>{
   assert.equal(S.progress,S.total);assert.equal(S.completed,S.total);assert.ok(S.evals.every(Boolean));
 });
 
-test('partial startup failure terminates the successfully started workers',async t=>{
+test('partial startup failure finishes the review using the surviving worker',async t=>{
   const a=app(t);loadGame(a,'1. e4');quiet(a);a.state.settings.engineWorkers=2;
   const good=fakeEngine();let count=0;
   a.replace('createEngine',async()=>{if(count++===0)return good;throw Error('second failed');});
-  await a.call('startAnalysis');assert.equal(good.dead,true);assert.equal(a.state.analyzing,false);assert.ok(a.state.analysisError);
+  let saved=0;a.replace('saveToLibrary',()=>saved++);
+  await a.call('startAnalysis');assert.equal(good.dead,true);assert.equal(a.state.analyzing,false);
+  assert.equal(a.state.analysisError,null);assert.ok(a.state.evals.every(Boolean));assert.equal(saved,1);
 });
 
 test('superseded batch startup cannot overwrite or terminate the newer batch',async t=>{
