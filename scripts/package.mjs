@@ -47,7 +47,7 @@ const releaseDir = await mkdtemp(path.join(artifactsDir, `release-${manifest.ver
 const snapshotDir = path.join(releaseDir, 'source');
 await mkdir(snapshotDir);
 const sourceFiles = [...files, 'manifest.json', 'package.json', 'package-lock.json',
-  'marketing/STORE_LISTING.md', 'CONTRIBUTING.md', 'SECURITY.md'];
+  'marketing/STORE_LISTING2.md', 'CONTRIBUTING.md', 'SECURITY.md'];
 await copyInputs(root, snapshotDir, [...sourceFiles, ...directories, 'docs', 'scripts', 'tests', 'tools']);
 const sha256 = async file => createHash('sha256').update(await readFile(file)).digest('hex');
 async function fileHashes(dir, base = dir) {
