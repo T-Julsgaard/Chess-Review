@@ -1297,7 +1297,6 @@ function buildUI() {
       el("button", { class: "icon-btn", "aria-label": "Flip board", onclick: toggleFlip }, icon("flip")),
       el("button", { class: "icon-btn", "aria-label": "Share game (copy link)", onclick: shareGame }, icon("share")),
       el("button", { class: "icon-btn", "aria-label": "Credits & attributions", onclick: openCredits }, icon("info")),
-      feedbackLink("icon-btn feedback-topbar"),
       el("button", { class: "icon-btn", "aria-label": "Settings", onclick: toggleSettings }, icon("gear")),
     ),
   );
@@ -4514,12 +4513,6 @@ function openCredits() {
       el("button", { class: "icon-btn", title: "Close", onclick: close }, icon("close")),
     ),
     sourceRow,
-    feedbackLink("credits-source credits-feedback",
-      el("div", { class: "credit-main" },
-        el("div", { class: "credit-title" }, "Give feedback"),
-        el("div", { class: "credit-by" }, "Leave a review on the Chrome Web Store"),
-      ),
-    ),
     el("p", { class: "credits-disclaimer" },
       "Chess Review is an independent, unofficial tool. It is not affiliated with, endorsed by, " +
       "or sponsored by Chess.com or Lichess.",
