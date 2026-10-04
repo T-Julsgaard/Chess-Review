@@ -77,6 +77,10 @@ the new extension code.
 
 ## Limits
 
+A subsequent navigation-lag check added two rendering optimizations, with no
+engine/scoring changes. Its assessment, timing comparison and verification are
+recorded in [NAVIGATION_PERFORMANCE.md](NAVIGATION_PERFORMANCE.md).
+
 These checks cover the desktop builds and simulated update state. They do not
 exercise a store-delivered update, the oldest allowed browser versions, real
 Android devices, every custom panel arrangement, or authenticated live game-over

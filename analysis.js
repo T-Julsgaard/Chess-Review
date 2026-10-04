@@ -1309,11 +1309,15 @@ function evalText(score) {
   const v = (score.cp / 100).toFixed(1);
   return score.cp > 0 ? "+" + v : v;
 }
+const sanLineCache = new Map();
 function uciLineToSan(fen, uciMoves, maxPlies = 6) {
+  const moves = uciMoves.slice(0, maxPlies);
+  const key = JSON.stringify([fen, moves]);
+  if (sanLineCache.has(key)) return [...sanLineCache.get(key)];
   const c = new Chess(fen); const out = [];
   let fm = parseInt(fen.split(" ")[5], 10) || 1;
   let white = fen.split(" ")[1] === "w";
-  for (const u of uciMoves.slice(0, maxPlies)) {
+  for (const u of moves) {
     let mv;
     try { mv = c.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u.slice(4, 5) || undefined }); }
     catch { break; }
@@ -1322,7 +1326,11 @@ function uciLineToSan(fen, uciMoves, maxPlies = 6) {
     if (!white) fm++;
     white = !white;
   }
-  return out;
+  // Formatting is independent of engine/scoring state. Bound the cache so
+  // exploring many games cannot retain an unbounded number of variations.
+  if (sanLineCache.size >= 128) sanLineCache.delete(sanLineCache.keys().next().value);
+  sanLineCache.set(key, out);
+  return [...out];
 }
 
 /* ===================================================================
@@ -1783,7 +1791,8 @@ function makePiece(type, side) {
   // Only the two bundled SVG sets remain (Cburnett = "image", Merida); anything else → default set.
   const setFolder = BUNDLED_PIECE_SETS[S.settings.pieceStyle] || BUNDLED_PIECE_SETS.image;
   const code = (side === "w" ? "w" : "b") + type.toUpperCase(); // wK, bN …
-  return el("img", { class: "piece-img", src: _url(`pieces-img/${setFolder}/${code}.svg`), alt: "", draggable: "false" });
+  return el("img", { class: "piece-img", "data-piece": code, "data-set": setFolder,
+    src: _url(`pieces-img/${setFolder}/${code}.svg`), alt: "", draggable: "false" });
 }
 function buildBoard() {
   const files = ["a","b","c","d","e","f","g","h"];
@@ -1843,19 +1852,26 @@ function paintBoard() {
   const tint = cls && QUALITY[cls]
     ? `color-mix(in srgb, ${QUALITY[cls].color} 50%, transparent)`
     : null;
+  const set = BUNDLED_PIECE_SETS[S.settings.pieceStyle] || BUNDLED_PIECE_SETS.image;
   for (const [name, sq] of Object.entries(sqByName)) {
     const oldBadge = sq.querySelector(".sq-badge");
     const keepBadge = oldBadge && name === pos.to && cls && oldBadge.dataset.category === cls
       && oldBadge.dataset.move === pos.fen;
-    sq.querySelectorAll(".piece, .piece-svg, .piece-img").forEach((n) => n.remove());
+    const ch = occ[name];
+    const code = ch ? (ch === ch.toUpperCase() ? "w" : "b") + ch.toUpperCase() : null;
+    // Progress updates must not replace unchanged images mid-animation.
+    let keepPiece = null;
+    for (const piece of sq.querySelectorAll(".piece, .piece-svg, .piece-img")) {
+      if (!keepPiece && code && piece.dataset.piece === code && piece.dataset.set === set) keepPiece = piece;
+      else piece.remove();
+    }
     if (oldBadge && !keepBadge) oldBadge.remove();
     const isHl = hl.has(name);
     sq.classList.toggle("hl", isHl);
     sq.classList.toggle("has-badge", name === pos.to && !!(cls && QUALITY[cls]));
     if (isHl && tint) sq.style.setProperty("--hl-color", tint);
     else sq.style.removeProperty("--hl-color");
-    const ch = occ[name];
-    if (ch) sq.append(makePiece(ch.toUpperCase(), ch === ch.toUpperCase() ? "w" : "b"));
+    if (ch && !keepPiece) sq.append(makePiece(ch.toUpperCase(), ch === ch.toUpperCase() ? "w" : "b"));
     if (name === pos.to && cls && QUALITY[cls]) {
       if (keepBadge) updateGradeBadge(oldBadge, cls, activeMoveGrade());
       else {
