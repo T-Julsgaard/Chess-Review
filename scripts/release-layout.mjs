@@ -35,6 +35,19 @@ try {
   const loaded=await call('Extensions.loadUnpacked',{path:source});
   const create=async(url)=>{const {targetId}=await call('Target.createTarget',{url});const {sessionId}=await call('Target.attachToTarget',{targetId,flatten:true});return {targetId,sessionId};};
   const evaluate=async(t,expression)=>{const r=await call('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true},t.sessionId);if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;};
+  // Pass fixture data as CDP values, never interpolate it into executable code.
+  const setStorage=async(tab,items,clear=false)=>{
+    const {result,exceptionDetails}=await call('Runtime.evaluate',{expression:'globalThis'},tab.sessionId);
+    if(exceptionDetails)throw Error(JSON.stringify(exceptionDetails));
+    try {
+      const r=await call('Runtime.callFunctionOn',{
+        objectId:result.objectId,
+        functionDeclaration:'async function(items, clear) { if(clear) await this.api.storage.local.clear(); await this.api.storage.local.set(items); }',
+        arguments:[{value:items},{value:clear}],awaitPromise:true,returnByValue:true,
+      },tab.sessionId);
+      if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));
+    } finally {await call('Runtime.releaseObject',{objectId:result.objectId},tab.sessionId);}
+  };
   const waitFor=async(tab,expression,label)=>{
     for(let i=0;i<100;i++){
       if(await evaluate(tab,expression))return;
@@ -44,9 +57,13 @@ try {
   };
   const audit=await create(`chrome-extension://${loaded.id}/audit.html`);
   await waitFor(audit,"!!globalThis.api?.storage?.local",'Audit storage API');
+  const hostileFixture='"\'\\\n</script><script>globalThis.injected=true</script>\u2028\u2029';
+  await setStorage(audit,{'security:audit':hostileFixture},true);
+  assert.equal(await evaluate(audit,"api.storage.local.get('security:audit').then(s=>s['security:audit'])"),hostileFixture);
+  assert.equal(await evaluate(audit,"typeof globalThis.injected"),'undefined');
   const pgn='[White "Audit White"]\n[Black "Audit Black"]\n\n1. e4 e5 2. Nf3 Nc6 *';
   const payload={pgn,meta:{gameId:'layout-audit'},source:'pgn'};
-  await evaluate(audit,`api.storage.local.clear().then(()=>api.storage.local.set({'job:audit':${JSON.stringify(payload)}}))`);
+  await setStorage(audit,{'job:audit':payload},true);
   const review=await create(`chrome-extension://${loaded.id}/analysis.html#audit`);
   const ready=async tab=>{
     for(let i=0;i<300;i++) {
@@ -103,7 +120,7 @@ try {
   const popupSize=await evaluate(popup,"(()=>{document.querySelector('#manual').open=true;return {width:innerWidth,scroll:document.documentElement.scrollWidth,height:document.body.scrollHeight}})()");
   assert.ok(popupSize.scroll<=popupSize.width&&popupSize.height<=600,'Expanded popup overflows');
   const legacy={enginePath:'sf19',engineDepth:8,engineWorkers:1,depthBumped:true,coach:'professor',coachDefaulted:true,coachPlain:true,soundVolume:37,boardTheme:'kada_green',pieceStyle:'chesscom',badgeFont:'original',badgeDecimals:true};
-  await evaluate(audit,`api.storage.local.set({settings:${JSON.stringify(legacy)},layoutVersion:7,'job:upgrade':${JSON.stringify(payload)}})`);
+  await setStorage(audit,{settings:legacy,layoutVersion:7,'job:upgrade':payload});
   const upgraded=await create(`chrome-extension://${loaded.id}/analysis.html#upgrade`);await ready(upgraded);
   const migrated=await evaluate(upgraded,"import('./analysis.js').then(m=>({settings:m.S.settings,layoutMode:m.S.layoutMode,engine:m.S.activeEngineBuild,library:m.S.library.length}))");
   for(const [key,value] of Object.entries({enginePath:'sf19lite',boardTheme:'green',pieceStyle:'image',badgeFont:'spacemono',coach:'professor',soundVolume:37}))assert.equal(migrated.settings[key],value,`Update preference: ${key}`);
