@@ -149,3 +149,13 @@ test('scoring rejects absent exact evidence and illegal restrictions', async t =
   eng.worker.line('bestmove e2e4');
   await assert.rejects(pending, /exact completed/);
 });
+
+test('scoring cannot attach a stale exact PV score to a different completed best move', async t => {
+  const eng = engine(t), fen = new Chess().fen();
+  const pending = eng.analyse(fen, 16, 1, null, null, {requireExact: true});
+  await Promise.resolve();
+  eng.worker.line('info depth 12 score cp 30 pv e2e4');
+  eng.worker.line('info depth 13 score cp 300 lowerbound pv d2d4');
+  eng.worker.line('bestmove d2d4');
+  await assert.rejects(pending, /exact completed/);
+});

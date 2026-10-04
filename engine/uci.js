@@ -187,8 +187,13 @@ export class Engine {
       const lines = Object.keys(job.lines)
         .sort((a, b) => +a - +b)
         .map((k) => job.lines[k]);
-      if (job.requireExact && (!job.lastScore || (job.searchMove && best !== job.searchMove))) {
-        job.reject(new Error("Missing exact completed scoring evidence"));
+      if (job.requireExact && (!job.lastScore || job.lastPv.split(" ")[0] !== best
+          || (job.searchMove && best !== job.searchMove))) {
+        const error = new Error("Missing exact completed scoring evidence");
+        // A node-limited search can end on a bounded PV for a different move.
+        // Let the calibrated coordinator obtain an exact restricted observation.
+        if (!job.searchMove && job.lastScore && best && best !== "(none)") error.scoringMove = best;
+        job.reject(error);
         this._pump();
         return;
       }

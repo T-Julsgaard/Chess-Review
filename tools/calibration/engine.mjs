@@ -73,8 +73,14 @@ export class Engine {
     const score = /\bscore (cp|mate) (-?\d+)/.exec(info);
     const wdl = /\bwdl (\d+) (\d+) (\d+)/.exec(info);
     if (!score || (!wdl && score[1] !== 'mate')) throw Error('Missing WDL/score');
+    const bestmove = lines.at(-1).split(' ')[1], pv = info.split(' pv ')[1];
+    if (played && bestmove !== played) throw Error('Exact score does not describe completed move');
+    if (pv.split(' ')[0] !== bestmove) {
+      if (played) throw Error('Restricted exact PV differs');
+      return {...await this.search(moves, bestmove, budget), exactRecovery: true};
+    }
     return { score: { [score[1]]: Number(score[2]), ...(wdl ? { wdl: wdl.slice(1).map(Number) } : {}) },
-      bestmove: lines.at(-1).split(' ')[1], pv: info.split(' pv ')[1],
+      bestmove, pv,
       depth: Number(/\bdepth (\d+)/.exec(info)?.[1]), nodes: Number(/\bnodes (\d+)/.exec(info)?.[1]),
       elapsedMs: performance.now() - started, rawInfo: info,
       finalSearchInfo: lines.filter(l => /^info depth /.test(l)).at(-1) };

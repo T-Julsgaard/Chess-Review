@@ -8,7 +8,7 @@ import { Engine } from "./engine/uci.js";
 import { flagCodeForCountryId, countryNameForId } from "./flags.js";
 import { BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg } from "./move-grades.js";
 import { browserAPI } from "./browser-compat.js";
-import { expectedPoints } from "./lib/public-scoring.js";
+import { expectedPoints, SF19_OUTCOME } from "./lib/public-scoring.js";
 import { calibratedReview, scoringEvidenceComplete } from "./lib/calibrated-review.js";
 import { analyseCalibratedPosition } from "./lib/calibrated-search.js";
 
@@ -824,6 +824,45 @@ function terminalScore(fen, plyIndex) {
 }
 function winPct(cp) { return Number.isFinite(cp) && CALIB?.quality?.outcome ? 100 * expectedPoints({cp}, CALIB.quality.outcome) : NaN; }
 function moverWin(wr, mover) { const wp = winPct(scoreToCp(wr)); return mover === "w" ? wp : 100 - wp; }
+function annotationOutcome(i, state) {
+  const build = state.bests[i - 1]?.calibration?.build || state.settings.enginePath;
+  return build === "sf19lite" ? SF19_OUTCOME : CALIB?.quality?.outcome;
+}
+function annotationPoints(score, i, state) {
+  try { return 100 * expectedPoints(score, annotationOutcome(i, state)); } catch { return null; }
+}
+// Completed review decisions use best and played scores from one original root.
+// Position evaluations remain useful for streamed/variation annotations only.
+function annotationPair(i, state) {
+  const root = state.bests[i - 1], p = state.positions[i];
+  const played = p.from + p.to + (p.promotion || "");
+  const valid = score => score?.mate != null ? Number.isInteger(score.mate) && score.mate !== 0 : Number.isFinite(score?.cp);
+  if (root && Object.hasOwn(root, "playedScore")) {
+    const best = root.score, actual = root.bestmove === played ? best : root.playedScore;
+    return valid(best) && valid(actual) ? {best, played: actual, paired: true} : null;
+  }
+  if (!state.evals[i - 1] || !state.evals[i]) return null;
+  const sign = p.color === "w" ? 1 : -1;
+  const relative = score => score.mate != null ? {mate: score.mate * sign} : {cp: score.cp * sign};
+  const lines = root?.lines || [], top = lines.find(line => line.multipv === 1) || lines[0];
+  const actual = lines.find(line => (line.pv || "").split(" ")[0] === played);
+  const best = top?.score || relative(state.evals[i - 1]);
+  const after = actual?.score || relative(state.evals[i]);
+  return valid(best) && valid(after) ? {best, played: after, paired: false} : null;
+}
+function decisionScore(i, which, mover, state) {
+  const score = state.annotationEvidence?.[i]?.[which];
+  if (!score) return null;
+  const sign = state.positions[i].color === mover ? 1 : -1;
+  return score.mate != null ? {mate: score.mate * sign} : {cp: score.cp * sign};
+}
+function decisionPawns(i, which, mover, state) {
+  const score = decisionScore(i, which, mover, state);
+  return score ? scoreToCp(score) / 100 : null;
+}
+function decisionMate(i, which, mover, state) {
+  return decisionScore(i, which, mover, state)?.mate ?? null;
+}
 function sideAccuracies() {
   S.calibrated = calibratedReview(S.positions, S.bests, CALIB, S.players, S.settings.ratingMode || "context");
   for (const side of ["w", "b"]) for (const move of S.calibrated[side].moves) S.accMove[move.ply] = move.quality;
@@ -935,9 +974,9 @@ function brilliantEligible(i, mover, std, wpDrop, state) {
   if (std[i] !== "excellent" || !Number.isFinite(wpDrop?.[i])) return false;
   const root = state.bests[i - 1], topLine = root?.lines?.[0];
   const afterLine = state.bests[i]?.lines?.[0];
-  if ([topLine, afterLine].some(l => l?.bound && l.bound !== "exact")) return false;
-  const after = _evalPawns(i, mover, state), before = _evalPawns(i - 1, mover, state);
-  const mateAfter = _mateFor(i, mover, state), mateBefore = _mateFor(i - 1, mover, state);
+  if ([topLine, ...(state.annotationEvidence[i]?.paired ? [] : [afterLine])].some(l => l?.bound && l.bound !== "exact")) return false;
+  const after = decisionPawns(i, "played", mover, state), before = decisionPawns(i, "best", mover, state);
+  const mateAfter = decisionMate(i, "played", mover, state), mateBefore = decisionMate(i, "best", mover, state);
   if (!Number.isFinite(after) || !Number.isFinite(before)
     || (mateAfter != null ? mateAfter <= 0 : after < BRILLIANT_POLICY.minAfterPawns)) return false;
   // A sound offer in an undecided position does not depend on a preceding opponent error.
@@ -969,7 +1008,7 @@ function onlyGoodReply(i, state) {
     || !Number.isInteger(top.depth) || top.depth <= 0 || next.depth !== top.depth
     || topMove !== played || topMove !== root.bestmove || !nextMove || nextMove === topMove
     || !Number.isFinite(top.score?.cp)) return false;
-  if (state.bests[i]?.lines?.some(l => l.multipv === 1 && l.bound && l.bound !== "exact")) return false;
+  if (!state.annotationEvidence[i]?.paired && state.bests[i]?.lines?.some(l => l.multipv === 1 && l.bound && l.bound !== "exact")) return false;
   const other = next.score;
   if (!other || (other.mate != null ? !Number.isFinite(other.mate) || other.mate === 0 : !Number.isFinite(other.cp))) return false;
   // Root PVs must identify distinct legal moves, including promotion identity.
@@ -981,22 +1020,9 @@ function onlyGoodReply(i, state) {
   } catch { return false; }
   const threshold = CALIB?.clsWp?.inacc ?? 5;
   return Number.isFinite(threshold) && threshold > 0
-    && winPct(top.score.cp) - winPct(scoreToCp(other)) >= threshold;
+    && annotationPoints(top.score, i, state) - annotationPoints(other, i, state) >= threshold;
 }
-// --- Eval readouts (all from our white-relative S.evals[]) ---
-function _evalPawnsWhite(k, state = S) { const e = state.evals[k]; return e ? scoreToCp(e) / 100 : null; }
-function _evalPawns(k, mover, state = S) { const p = _evalPawnsWhite(k, state); return p == null ? null : (mover === "w" ? p : -p); }
-function _isMateEval(k, state = S) { const e = state.evals[k]; return !!(e && e.mate != null); }
-// Mate distance from `mover`'s POV at position k (>0 = mover mating, <0 = mover being mated).
-function _mateFor(k, mover, state = S) { const e = state.evals[k]; if (!e || e.mate == null) return null; return mover === "w" ? e.mate : -e.mate; }
 function _isCheckmate(k, state = S) { try { return new Chess(state.positions[k].fen).isCheckmate(); } catch { return false; } }
-// Eval loss (pawns, the mover's own POV) of the move that produced position k.
-function _moveLoss(k, state = S) {
-  if (k < 1) return null;
-  const m = state.positions[k].color;
-  const a = _evalPawns(k - 1, m, state), b = _evalPawns(k, m, state);
-  return (a == null || b == null) ? null : a - b;
-}
 // Baseline bucket on the WIN%-DROP (the "expected points" model),
 // not raw pawns: losing 0.8 pawns at +0.2 is a real slip, but at +6 it's nothing. Thresholds are
 // in win% points (0–100); defaults mirror the standard table (≤2 excellent … >20 blunder,
@@ -1020,17 +1046,20 @@ function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop, state = S) 
 
   // Contextual thresholds in pawns of eval; retain saved values from earlier versions.
   const CA = state.settings.clsClearAdv, ML = state.settings.clsMistakeLoss, MT = state.settings.clsMissTol;
-  const mate = (k) => _isMateEval(k, state), evalFor = (k) => _evalPawns(k, mover, state);
+  const mate = (k) => decisionMate(i, k === i ? "played" : "best", mover, state) != null;
+  const evalFor = (k) => decisionPawns(i, k === i ? "played" : "best", mover, state);
   const winningNow = (evalFor(i) ?? 0) > 0;
   const prevWinning = (evalFor(i - 1) ?? 0) > 0;
   const notMateRel = !mate(i) && !mate(i - 1);
-  const wasNotMateRel = (n) => i - 2 - n >= 0 && !mate(i - 1 - n) && !mate(i - 2 - n);
+  const wasNotMateRel = (n) => { const k = i - 1 - n; return k >= 1 && state.annotationEvidence[k]
+    && decisionMate(k, "best", state.positions[k].color, state) == null
+    && decisionMate(k, "played", state.positions[k].color, state) == null; };
   const pStd = (n) => (i - 1 - n >= 1 ? std[i - 1 - n] : null);
   const pLoss = (n) => (i - 1 - n >= 1 ? loss[i - 1 - n] : null);
   // mover-POV "lost a clear advantage" / "fell into a clear disadvantage" (CA pawns) for move k.
-  const losingAdvAt = (k) => { const m = state.positions[k].color; const a = _evalPawns(k - 1, m, state), b = _evalPawns(k, m, state); return a != null && b != null && a >= CA && b < CA; };
-  const givingAdvAt = (k) => { const m = state.positions[k].color; const a = _evalPawns(k - 1, m, state), b = _evalPawns(k, m, state); return a != null && b != null && a >= -CA && b < -CA; };
-  const keepMating = (k) => { const c = _mateFor(k, state.positions[k].color, state), p = _mateFor(k - 1, state.positions[k].color, state); return c != null && p != null && c > 0 && p > 0 && c <= p; };
+  const losingAdvAt = (k) => { const m = state.positions[k].color; const a = decisionPawns(k, "best", m, state), b = decisionPawns(k, "played", m, state); return a != null && b != null && a >= CA && b < CA; };
+  const givingAdvAt = (k) => { const m = state.positions[k].color; const a = decisionPawns(k, "best", m, state), b = decisionPawns(k, "played", m, state); return a != null && b != null && a >= -CA && b < -CA; };
+  const keepMating = (k) => { const m = state.positions[k].color, c = decisionMate(k, "played", m, state), p = decisionMate(k, "best", m, state); return c != null && p != null && c > 0 && p > 0 && c <= p; };
 
   const previousMistake = wasNotMateRel(0) && pStd(0) === "inacc" && pLoss(0) >= ML && (losingAdvAt(i - 1) || givingAdvAt(i - 1));
   const previousPreviousMistake = wasNotMateRel(1) && pStd(1) === "inacc" && pLoss(1) >= ML && (losingAdvAt(i - 2) || givingAdvAt(i - 2));
@@ -1039,7 +1068,7 @@ function classifyMove(i, mover, isTop, book, sac, std, loss, wpDrop, state = S) 
 
   // Material offer and engine quality are separate: board evidence alone cannot prove soundness.
   // Do not reward delays of a known mate or moves that merely remain best in a decided position.
-  const beforeMate = _mateFor(i - 1, mover, state), afterMate = _mateFor(i, mover, state);
+  const beforeMate = decisionMate(i, "best", mover, state), afterMate = decisionMate(i, "played", mover, state);
   const soundMate = !(beforeMate > 0) || (afterMate > 0 && keepMating(i));
   if (sac[i] && soundMate && brilliantEligible(i, mover, std, wpDrop, state)) return "brilliant";
 
@@ -1154,6 +1183,7 @@ function classifyLine(state) {
   state.classif = new Array(N + 1).fill(null);
   state.accMove = new Array(N + 1).fill(null);
   state.moveGrades = new Array(N + 1).fill(null);
+  state.annotationEvidence = new Array(N + 1).fill(null);
   if (!state._sacCache || state._sacCache.length !== N + 1) { state._sacCache = new Array(N + 1).fill(undefined); state._forcedCache = new Array(N + 1).fill(undefined); }
 
   // Per-ply inputs for the ported classifier. The classifier only ever looks BACKWARDS, so one
@@ -1176,39 +1206,31 @@ function classifyLine(state) {
 
     const mover = state.positions[i].color;
     const bestSearch = state.bests[i - 1];
-    const before = state.evals[i - 1];
 
-    // Annotation evidence uses the completed played-root score when present.
-    // Consecutive evaluations remain available for variation annotations.
-    if (bestSearch && before) {
+    const evidence = state.annotationEvidence[i] = annotationPair(i, state);
+    if (evidence) {
       const playedUci = (state.positions[i].from || "") + (state.positions[i].to || "") + (state.positions[i].promotion || "");
-      const lines = bestSearch.lines || [];
-      const winBefore = lines.length ? winPct(scoreToCp(lines[0].score)) : moverWin(before, mover);
-      let winAfter = null;
-      if (bestSearch.playedScore) winAfter = winPct(scoreToCp(bestSearch.playedScore));
-      for (const ln of lines) { if ((ln.pv || "").split(" ")[0] === playedUci) { winAfter = winPct(scoreToCp(ln.score)); break; } }
-      if (winAfter == null && state.evals[i]) winAfter = moverWin(state.evals[i], mover);
-      if (winAfter != null) wpDrop[i] = Math.max(0, winBefore - winAfter);
-      const bestUci = bestSearch.bestmove || "";
+      const winBefore = annotationPoints(evidence.best, i, state), winAfter = annotationPoints(evidence.played, i, state);
+      if (winBefore != null && winAfter != null) wpDrop[i] = Math.max(0, winBefore - winAfter);
+      const bestUci = bestSearch?.bestmove || "";
       isTop[i] = !!bestUci && bestUci === playedUci;
+      loss[i] = (scoreToCp(evidence.best) - scoreToCp(evidence.played)) / 100;
     }
-
-    loss[i] = _moveLoss(i, state);
     std[i] = getStandardRating(wpDrop[i]);   // bucket on win%-drop, not raw pawns
     sac[i] = _sacAt(i, state);
   }
   // Second pass: final category per ply (Brilliant-Chess logic). A move stays unlabelled until both
   // its own and the previous position's eval are in, so the panel fills in cleanly during analysis.
   for (let i = 1; i <= N; i++) {
-    if (state.evals[i] == null || state.evals[i - 1] == null) { state.classif[i] = null; continue; }
+    if (!state.annotationEvidence[i] || wpDrop[i] == null) { state.classif[i] = null; continue; }
     // Some opening datasets include traps from the losing side. Never let theory
     // hide a losing mate or a move the engine rates as an error.
-    const safeBook = bookAt[i] && !((_mateFor(i, state.positions[i].color, state) ?? 0) < 0)
+    const safeBook = bookAt[i] && !((decisionMate(i, "played", state.positions[i].color, state) ?? 0) < 0)
       && wpDrop[i] != null && wpDrop[i] < (CALIB?.clsWp?.inacc ?? 5);
     state.classif[i] = classifyMove(i, state.positions[i].color, isTop[i], safeBook, sac, std, loss, wpDrop, state);
     const root = state.bests[i - 1];
     const top = root?.lines?.find(l => l.multipv === 1), runnerUp = root?.lines?.find(l => l.multipv === 2);
-    const criticalLoss = top && runnerUp ? Math.max(0, winPct(scoreToCp(top.score)) - winPct(scoreToCp(runnerUp.score))) : null;
+    const criticalLoss = top && runnerUp ? Math.max(0, annotationPoints(top.score, i, state) - annotationPoints(runnerUp.score, i, state)) : null;
     state.moveGrades[i] = moveGrade(state.classif[i], wpDrop[i], CALIB?.clsWp, criticalLoss);
     if (state.classif[i] === "book") state.bookCount++;
   }
@@ -4986,7 +5008,7 @@ function currentGameId() {
 }
 
 function analysisSettingsKey() {
-  return JSON.stringify(["public-scoring-v3", CALIB?.version, CALIB?.context?.sf19?.candidateVersion, S.settings.ratingMode, S.settings.enginePath, S.settings.engineDepth, S.settings.classifyLines,
+  return JSON.stringify(["public-scoring-v4", CALIB?.version, CALIB?.context?.sf19?.candidateVersion, S.settings.ratingMode, S.settings.enginePath, S.settings.engineDepth, S.settings.classifyLines,
     S.settings.engineHash, S.settings.engineSkill]);
 }
 
