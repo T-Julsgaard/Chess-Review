@@ -130,9 +130,9 @@ try {
     await report({step:'review-reload',key});
     frame.remove();
   }
-  // Simulate the 0.2.1 update event against real browser storage and render the
+  // Simulate the 0.3.0 update event against real browser storage and render the
   // resulting defaults. Existing engine tests above also populate saved games.
-  await browserAPI.storage.local.remove('settingsResetFor021');
+  await browserAPI.storage.local.remove('settingsResetFor030');
   const resetJob={pgn:'1. e4 e5 *',meta:{gameId:'reset-smoke'},source:'pgn'};
   const library=(await browserAPI.storage.local.get('library')).library;
   library[0].fav=true;
@@ -152,7 +152,7 @@ try {
     if(['settings','layout','layoutMode','layoutVersion'].includes(key))continue;
     if(JSON.stringify(before[key])!==JSON.stringify(after[key]))throw Error('Release reset changed '+key);
   }
-  if(!after.settingsResetFor021||Object.keys(after.settings).length||after.layout!==null||after.layoutMode!=='auto')throw Error('Release reset did not clear preferences');
+  if(!after.settingsResetFor030||Object.keys(after.settings).length||after.layout!==null||after.layoutMode!=='auto')throw Error('Release reset did not clear preferences');
   const resetFrame=document.createElement('iframe');resetFrame.style='width:1680px;height:1000px';
   resetFrame.src='analysis.html#reset-smoke';document.body.append(resetFrame);
   const preferences=async()=>{
@@ -170,7 +170,7 @@ try {
   if(defaults.layoutMode!=='auto')throw Error('Reset review retained custom layout');
   await wait(400); // Let startup's saved layout settle before the customization.
   await browserAPI.storage.local.set({settings:{...defaults.settings,boardTheme:'coral',soundVolume:23}});
-  await resetSettingsForRelease({reason:'update',previousVersion:'0.2.1'});
+  await resetSettingsForRelease({reason:'update',previousVersion:'0.3.0'});
   resetFrame.src='about:blank';await wait(100);
   await browserAPI.storage.local.set({'job:reset-smoke':resetJob});
   resetFrame.src='analysis.html#reset-smoke';
@@ -180,7 +180,7 @@ try {
   // Exercise recovery when the install/update handler never completed: actual
   // review startup must reset before building its first UI, without an event.
   resetFrame.src='about:blank';await wait(100);
-  await browserAPI.storage.local.remove('settingsResetFor021');
+  await browserAPI.storage.local.remove('settingsResetFor030');
   await browserAPI.storage.local.set({'job:reset-smoke':resetJob});
   resetFrame.src='analysis.html#reset-smoke';
   const retried=await preferences();

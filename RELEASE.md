@@ -1,6 +1,10 @@
-# Release 0.2.1
+# Release 0.3.0
 
-This maintenance update improves commit descriptions and retires obsolete
+This release brings the improved review interface to existing users with a
+one-time settings reset, preserving their saved game library. It also includes
+the review reliability fixes and navigation improvements audited for 0.2.1.
+
+The preceding maintenance work improves commit descriptions and retires obsolete
 experiments, superseded tooling and discarded design work from repository history.
 Contributors using older clones should start from current `main` and port their
 reviewed changes individually, as described in CONTRIBUTING.md.
@@ -9,12 +13,12 @@ The October 4 release audit also fixes review reloads, clock-tag alignment,
 callbacks from exited practice sessions, and library overwrites between review
 tabs. The functional audit and its limits are recorded in docs/RELEASE_AUDIT.md.
 
-Updating to 0.2.1 resets all preferences and panel layouts once to the current
+Updating to 0.3.0 resets all preferences and panel layouts once to the current
 defaults, so existing users receive the new default appearance. Usernames, saved
 games, favorites, stored analyses and game caches are preserved. A separate
-completion marker prevents repeat resets. The reset is restricted to the 0.2.1
+completion marker prevents repeat resets. The reset is restricted to the 0.3.0
 extension update event; keep its release constant and marker fixed in later
-releases, including for users who skip 0.2.1. New installs only record the marker.
+releases, including for users who skip 0.3.0. New installs only record the marker.
 Review startup waits for the same reset under a shared browser lock and retries
 it if update handling was missed or its storage write failed. The marker is
 written with the reset so a late update handler cannot erase new customizations.
@@ -24,9 +28,9 @@ engine or scoring settings, without removing the saved games.
 ## Packages and verification
 
 Run `npm ci`, `npm test`, `npm run verify:engines`, and `npm run build`.
-Each build creates a new `web-ext-artifacts/release-0.2.1-<unique>/` directory.
-It preserves `chess-review-0.2.1-chrome.zip`, `chess-review-0.2.1-firefox.zip`, and
-`chess-review-0.2.1-source.zip`, alongside staged copies. Existing packages are
+Each build creates a new `web-ext-artifacts/release-0.3.0-<unique>/` directory.
+It preserves `chess-review-0.3.0-chrome.zip`, `chess-review-0.3.0-firefox.zip`, and
+`chess-review-0.3.0-source.zip`, alongside staged copies. Existing packages are
 never overwritten. `release-record.json` records SHA-256 checksums, source-file
 hashes, the Git HEAD and working-tree status, Node version, and build time.
 `web-ext-artifacts/latest-release.json` points to the newest completed record;
@@ -53,7 +57,7 @@ profiles and test-only extension copies with a loopback reporting endpoint; the
 store ZIPs are never modified. It checks a fresh default-18 review and migration
 from the old full-19 preference to Lite. Results are saved in
 `browser-smoke-results.json` in the latest release directory.
-It also simulates the one-time 0.2.1 reset against real browser storage, checks
+It also simulates the one-time 0.3.0 reset against real browser storage, checks
 that games/favorites/analyses survive, renders the default preferences, and
 reopens a review after customization to check that the reset does not repeat.
 
@@ -68,14 +72,14 @@ reviews with both engines.
 Validate the actual Firefox ZIP with:
 
 ```sh
-npx web-ext lint --source-dir=web-ext-artifacts/release-0.2.1-<unique>/chess-review-0.2.1-firefox.zip
+npx web-ext lint --source-dir=web-ext-artifacts/release-0.3.0-<unique>/chess-review-0.3.0-firefox.zip
 ```
 
 Chrome uses an MV3 module service worker. Firefox uses an MV3 module event page.
 Store packages omit the other browser's background declaration. The development
 manifest includes both so the project can be loaded directly in either browser.
 
-Before uploading, confirm 0.2.1 is greater than the latest uploaded version in both
+Before uploading, confirm 0.3.0 is greater than the latest uploaded version in both
 store dashboards. Keep the existing Chrome item and Firefox extension ID; do not
 create replacement listings. This repository does not authenticate to or publish
 to either store during build. Check that current screenshots match the two engine
@@ -92,7 +96,7 @@ tools/calibration/PUBLIC_METHOD.md. This establishes reproducibility from bundle
 evidence, not platform permission, independently validated move labels or rights
 to third-party assets. ATTRIBUTIONS.md records current asset provenance and limitations. Platform integration and applicable terms still need review;
 a generated ZIP is not legal clearance. The Chrome store download checked on
-October 3, 2026 was version 0.2.0. Version 0.2.1 is prepared for the maintainer's
+October 3, 2026 was version 0.2.0. Version 0.3.0 is prepared for the maintainer's
 store upload; the Firefox public listing was unavailable at that check.
 
 ## Reviewer notes

@@ -1,6 +1,6 @@
 {
   "name": "chess-review",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
   "description": "Chess Review — free, local game review powered by Stockfish NNUE.",
   "license": "GPL-3.0",

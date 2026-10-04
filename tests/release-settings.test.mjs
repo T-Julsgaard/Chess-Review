@@ -13,7 +13,7 @@ globalThis.chrome = {
 const { resetSettingsForRelease } = await import('../release-settings.js');
 await import('../background.js');
 
-function setup(version = '0.2.1') {
+function setup(version = '0.3.0') {
   let pending = Promise.resolve();
   Object.defineProperty(navigator, 'locks', { configurable: true, value: {
     request(name, callback) {
@@ -42,7 +42,7 @@ function setup(version = '0.2.1') {
   return { store, original, writes };
 }
 
-for (const previousVersion of ['0.1.0', '0.2.0']) {
+for (const previousVersion of ['0.1.0', '0.2.0', '0.2.1']) {
   test(`updating from ${previousVersion} resets preferences and preserves all game data`, async t => {
     const { store, original, writes } = setup();
     await installed({ reason: 'update', previousVersion });
@@ -50,7 +50,7 @@ for (const previousVersion of ['0.1.0', '0.2.0']) {
     assert.equal(store.layout, null);
     assert.equal(store.layoutMode, 'auto');
     assert.equal(store.layoutVersion, 0);
-    assert.equal(store.settingsResetFor021, true);
+    assert.equal(store.settingsResetFor030, true);
     for (const key of ['username', 'library', 'analysis:game-one', 'job:pending', 'cache:game-one']) {
       assert.deepEqual(store[key], original[key], `Preserve ${key}`);
     }
@@ -75,7 +75,7 @@ test('the same release never resets later customizations a second time', async (
   store.settings = { boardTheme: 'coral', soundVolume: 23 };
   store.layout = { board: { x: 10 } }; store.layoutMode = 'custom'; store.layoutVersion = 8;
   const customized = structuredClone(store);
-  await installed({ reason: 'update', previousVersion: '0.2.1' });
+  await installed({ reason: 'update', previousVersion: '0.3.0' });
   assert.deepEqual(store, customized);
   assert.equal(writes.length, 1);
 });
@@ -83,17 +83,17 @@ test('the same release never resets later customizations a second time', async (
 test('a fresh installation marks the release without clearing preferences or games', async () => {
   const { store, original, writes } = setup();
   await installed({ reason: 'install' });
-  assert.deepEqual(store, { ...original, settingsResetFor021: true });
-  await installed({ reason: 'update', previousVersion: '0.2.1' });
+  assert.deepEqual(store, { ...original, settingsResetFor030: true });
+  await installed({ reason: 'update', previousVersion: '0.3.0' });
   assert.equal(writes.length, 1);
 });
 
 for (const marked of [false, true]) {
   test(`future updates leave preferences intact (completion marker: ${marked})`, async () => {
-    const { store, writes } = setup('0.2.2');
-    if (marked) store.settingsResetFor021 = true;
+    const { store, writes } = setup('0.3.1');
+    if (marked) store.settingsResetFor030 = true;
     const original = structuredClone(store);
-    // Includes someone upgrading directly from 0.1, skipping 0.2.1 altogether.
+    // Includes someone upgrading directly from 0.1, skipping 0.3.0 altogether.
     await installed({ reason: 'update', previousVersion: '0.1.0' });
     assert.deepEqual(store, original);
     assert.equal(writes.length, 0);
@@ -116,7 +116,7 @@ test('a failed storage write does not record completion and can be retried', asy
   assert.deepEqual(store, original);
   chrome.storage.local.set = set;
   await resetSettingsForRelease({ reason: 'startup' });
-  assert.equal(store.settingsResetFor021, true);
+  assert.equal(store.settingsResetFor030, true);
 });
 
 test('simultaneous update and startup callers commit a single reset', async () => {
@@ -154,7 +154,7 @@ test('review startup waits for an in-progress update before loading preferences'
   assert.equal(a.state.settings.boardTheme, 'maple');
   assert.equal(a.state.username, 'saved-user');
   assert.equal(a.state.library[0].fav, true);
-  assert.equal(store.settingsResetFor021, true);
+  assert.equal(store.settingsResetFor030, true);
 });
 
 test('first review retries a missed update and late update events preserve customization', async () => {
@@ -171,6 +171,16 @@ test('startup on an empty install only marks completion and retains the username
   for (const key of ['settings', 'layout', 'layoutMode', 'layoutVersion']) delete store[key];
   const original = structuredClone(store);
   await resetSettingsForRelease({ reason: 'startup' });
-  assert.deepEqual(store, { ...original, settingsResetFor021: true });
+  assert.deepEqual(store, { ...original, settingsResetFor030: true });
+  assert.equal(writes.length, 1);
+});
+
+test('a new module context retains the completion marker after customization', async () => {
+  const { store, writes } = setup();
+  await installed({ reason: 'update', previousVersion: '0.2.0' });
+  store.settings = { boardTheme: 'coral', soundVolume: 23 };
+  const restarted = await import('../release-settings.js?restarted');
+  await restarted.resetSettingsForRelease({ reason: 'startup' });
+  assert.deepEqual(store.settings, { boardTheme: 'coral', soundVolume: 23 });
   assert.equal(writes.length, 1);
 });

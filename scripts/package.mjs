@@ -13,6 +13,10 @@ const artifactsDir = path.join(root, 'web-ext-artifacts');
 const manifest = JSON.parse(await readFile(path.join(root, 'manifest.json'), 'utf8'));
 const pkg = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
 if (manifest.version !== pkg.version) throw new Error('Package and manifest versions differ');
+const lock = JSON.parse(await readFile(path.join(root, 'package-lock.json'), 'utf8'));
+if (lock.version !== pkg.version || lock.packages[''].version !== pkg.version) {
+  throw new Error('Package lock and manifest versions differ');
+}
 
 // Explicit allowlist: development files, old ZIPs, and node_modules can never ship.
 const files = ['analysis.html', 'analysis.js', 'analyze-flow.js', 'background.js',

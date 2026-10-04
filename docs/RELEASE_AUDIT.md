@@ -77,12 +77,12 @@ the new extension code.
 
 ## Limits
 
-A subsequent 0.2.1 change adds a release-specific, one-time reset of preferences
+The subsequent 0.3.0 release adds a release-specific, one-time reset of preferences
 and panel layouts while retaining usernames, saved games, favorites and analyses.
 The legacy migration fixture above predates that change and does not invoke the
 extension update event. RELEASE.md describes the reset and its separate unit and
 Chrome/Firefox smoke checks. The fixed release guard excludes later updates,
-including installations that skip 0.2.1.
+including installations that skip 0.3.0.
 
 A subsequent navigation-lag check added two rendering optimizations, with no
 engine/scoring changes. Its assessment, timing comparison and verification are

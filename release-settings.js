@@ -1,9 +1,9 @@
 import { browserAPI } from "./browser-compat.js";
 
-// This is a one-off migration for 0.2.1. Keep both values fixed in future releases:
+// This is a one-off migration for 0.3.0. Keep both values fixed in future releases:
 // users who skip this release must not have their settings reset by a later one.
-const RESET_RELEASE = "0.2.1";
-const RESET_MARKER = "settingsResetFor021";
+const RESET_RELEASE = "0.3.0";
+const RESET_MARKER = "settingsResetFor030";
 
 export async function resetSettingsForRelease(details) {
   if (browserAPI.runtime.getManifest().version !== RESET_RELEASE) return;
