@@ -3862,7 +3862,7 @@ function setLabel(label, info) {
   }
   return el("span", props, label);
 }
-// Collapsible settings section. Open/closed is remembered per title in S.setOpen (default open).
+// Settings accordion: opening one section closes the previously expanded section.
 function section(title, ...children) {
   const kids = children.filter(Boolean);
   if (S.setOpen[title] == null) S.setOpen[title] = false; // default closed for a cleaner overview
@@ -3870,7 +3870,12 @@ function section(title, ...children) {
   const head = el("button", {
     class: "set-sect-head" + (open ? " open" : ""),
     "aria-expanded": open ? "true" : "false",
-    onclick: () => { S.setOpen[title] = !S.setOpen[title]; renderSettings(); },
+    onclick: () => {
+      const wasOpen = S.setOpen[title];
+      for (const key of Object.keys(S.setOpen)) S.setOpen[key] = false;
+      S.setOpen[title] = !wasOpen;
+      renderSettings();
+    },
   }, el("span", {}, title), icon("chevron"));
   const body = el("div", { class: "set-sect-body" }, ...kids);
   return el("div", { class: "set-section" + (open ? " open" : "") }, head, body);
@@ -3929,21 +3934,9 @@ function paintColorPickerChip(chip, colors) {
   swatch.style.background = colors[0];
   swatch.replaceChildren(...(colors.length > 1 ? [el("span", { class: "half r", style: { background: colors[1] } })] : []));
 }
-let loadingPreviewActive = false;
-function loadingTest() {
-  const preview = el("span", { class: "set-loader-preview", "aria-hidden": "true" });
-  const button = el("button", { class: "set-test", type: "button", onclick: () => {
-    loadingPreviewActive = !loadingPreviewActive;
-    paint();
-  } });
-  const paint = () => {
-    button.textContent = loadingPreviewActive ? "Stop" : "Test animation";
-    button.setAttribute("aria-pressed", String(loadingPreviewActive));
-    preview.hidden = !loadingPreviewActive;
-    preview.replaceChildren(...(loadingPreviewActive ? [loaderNode("", "var(--accent)")] : []));
-  };
-  paint();
-  return el("div", { class: "set-loader-test" }, button, preview);
+function loadingPreview() {
+  return el("div", { class: "set-loader-preview", "aria-hidden": "true" },
+    S.setOpen["Loading"] ? loaderNode("", "var(--accent)") : null);
 }
 let _accentPickCleanup = null;
 function openAccentColorPicker(anchor) {
@@ -4236,7 +4229,6 @@ function resetBackgroundSettings() {
   applyBackground(); renderSettings();
 }
 async function resetVisualSettings() {
-  loadingPreviewActive = false;
   closeArrowColorPicker();
   if (_accentPickCleanup) _accentPickCleanup();
   closeBoardColorPicker();
@@ -4331,7 +4323,7 @@ function visualSettings() {
     ),
     section("Loading",
       seg("Animation", "loaderStyle", ["wave", "dots", "bounce", "spinner"]),
-      loadingTest(),
+      loadingPreview(),
     ),
     section("Move animation",
       toggleRow("Animation", "moveAnim"),
@@ -4348,10 +4340,6 @@ function visualSettings() {
     section("Move list",
       seg("Style", "mlStyle", ["rows", "cards", "compact"]),
       seg("Badges", "badgeStyle", ["icon", "dot", "label"]),
-      slider("Badge size", "badgeScale", 0.7, 1.6, 0.05, {
-        fmt: (v) => Math.round(v * 100) + " %",
-        onChange: (v) => document.documentElement.style.setProperty("--badge-scale", v),
-      }),
     ),
     section("Category badges", badgeSettings()),
     section("Coach",
@@ -4486,6 +4474,10 @@ function badgeSettings() {
       gradeBadge("best", 9, "badge-preview-item"), gradeBadge("good", 6.4, "badge-preview-item"),
       gradeBadge("brilliant", 10, "badge-preview-item"), gradeBadge("blunder", 0, "badge-preview-item"),
       gradeBadge("book", null, "badge-preview-item")),
+    slider("Badge size", "badgeScale", 0.7, 1.6, 0.05, {
+      fmt: (v) => Math.round(v * 100) + " %",
+      onChange: (v) => document.documentElement.style.setProperty("--badge-scale", v),
+    }),
     el("div", { class: "set-lbl" }, "Number font"), fonts,
     el("p", { class: "set-note" }, "Free, open-source fonts, bundled for offline use."),
     toggleRow("Hover labels", "badgeTooltip"),
@@ -4493,10 +4485,10 @@ function badgeSettings() {
 }
 function renderSettings() {
   closeArrowColorPicker();
-  if (UI.settings.hidden || S.settingsTab !== "visual" || !S.setOpen["Loading"]) loadingPreviewActive = false;
   const scroll = UI.settings.scrollTop; // keep scroll position when a setting changes
   const fontScroll = UI.settings.querySelector(".badge-font-options")?.scrollTop;
   const focusedFont = UI.settings.contains(document.activeElement) && document.activeElement.closest(".badge-font-option")?.getAttribute("data-font");
+  const focusedSection = UI.settings.contains(document.activeElement) && document.activeElement.closest(".set-sect-head")?.querySelector("span")?.textContent;
   const tabs = el("div", { class: "set-tabs" },
     el("button", { class: "set-tab" + (S.settingsTab === "visual" ? " on" : ""), onclick: () => { S.settingsTab = "visual"; renderSettings(); } }, "Visual"),
     el("button", { class: "set-tab" + (S.settingsTab === "engine" ? " on" : ""), onclick: () => { S.settingsTab = "engine"; renderSettings(); } }, "Engine"),
@@ -4507,6 +4499,7 @@ function renderSettings() {
   const fonts = UI.settings.querySelector(".badge-font-options");
   if (fonts && fontScroll != null) fonts.scrollTop = fontScroll;
   if (focusedFont) UI.settings.querySelector(`[data-font="${focusedFont}"]`)?.focus({ preventScroll: true });
+  if (focusedSection) [...UI.settings.querySelectorAll(".set-sect-head")].find(head => head.querySelector("span")?.textContent === focusedSection)?.focus({ preventScroll: true });
   positionSettings();
 }
 function positionSettings() {
@@ -4519,7 +4512,6 @@ function positionSettings() {
 function toggleSettings() {
   closeArrowColorPicker();
   UI.settings.hidden = !UI.settings.hidden;
-  if (UI.settings.hidden) loadingPreviewActive = false;
   if (!UI.settings.hidden) renderSettings();
 }
 

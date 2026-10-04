@@ -12,37 +12,63 @@ function settings(t) {
   return { a, doc, section, open };
 }
 
-test('loading preview starts, follows the selected animation, and stops without changing the review', async t => {
+test('loading preview plays automatically and follows the selected animation without changing the review', async t => {
   const { a, section, open } = settings(t);
   const before = JSON.stringify({ evals: a.state.evals, grades: a.state.moveGrades, analyzing: a.state.analyzing, progress: a.state.progress });
-  open('Loading').querySelector('.set-test').click();
-  assert.equal(section('Loading').querySelector('.set-test').textContent, 'Stop');
+  assert.equal(section('Loading').querySelector('.set-loader-preview .ld'), null);
+  open('Loading');
+  assert.equal(section('Loading').querySelector('.set-test'), null);
   assert.ok(section('Loading').querySelector('.set-loader-preview .ld-wave'));
   section('Loading').querySelectorAll('.set-seg button')[3].click();
   await settle();
   assert.equal(a.store.settings.loaderStyle, 'spinner');
   assert.ok(section('Loading').querySelector('.set-loader-preview .ld-spin'));
-  assert.equal(section('Loading').querySelector('.set-test').getAttribute('aria-pressed'), 'true');
-  section('Loading').querySelector('.set-test').click();
-  assert.equal(section('Loading').querySelector('.set-test').textContent, 'Test animation');
-  assert.equal(section('Loading').querySelector('.set-loader-preview').hidden, true);
-  assert.equal(section('Loading').querySelector('.set-loader-preview .ld'), null);
-  assert.equal(JSON.stringify({ evals: a.state.evals, grades: a.state.moveGrades, analyzing: a.state.analyzing, progress: a.state.progress }), before);
-  assert.equal(Object.hasOwn(a.store.settings, 'loadingPreviewActive'), false);
-});
-
-test('loading preview stops when its section, settings panel, or visual tab closes', t => {
-  const { a, doc, section, open } = settings(t);
-  open('Loading').querySelector('.set-test').click();
   section('Loading').querySelector('.set-sect-head').click();
   assert.equal(section('Loading').querySelector('.set-loader-preview .ld'), null);
-  open('Loading').querySelector('.set-test').click();
-  a.call('toggleSettings'); a.call('toggleSettings');
+  assert.equal(JSON.stringify({ evals: a.state.evals, grades: a.state.moveGrades, analyzing: a.state.analyzing, progress: a.state.progress }), before);
+});
+
+test('loading preview resumes when its section becomes visible again', t => {
+  const { a, doc, section, open } = settings(t);
+  open('Loading');
+  section('Loading').querySelector('.set-sect-head').click();
   assert.equal(section('Loading').querySelector('.set-loader-preview .ld'), null);
-  section('Loading').querySelector('.set-test').click();
+  assert.ok(open('Loading').querySelector('.set-loader-preview .ld-wave'));
+  a.call('toggleSettings');
+  assert.equal(doc.getElementById('settings').hidden, true);
+  a.call('toggleSettings');
+  assert.ok(section('Loading').querySelector('.set-loader-preview .ld-wave'));
   [...doc.querySelectorAll('.set-tab')].find(b => b.textContent === 'Engine').click();
+  assert.equal(doc.querySelector('.set-loader-preview'), null);
   [...doc.querySelectorAll('.set-tab')].find(b => b.textContent === 'Visual').click();
+  assert.ok(section('Loading').querySelector('.set-loader-preview .ld-wave'));
+});
+
+test('opening a settings section collapses the previous one and keeps its header focused', t => {
+  const { doc, section, open } = settings(t);
+  open('Loading');
+  const head = section('Category badges').querySelector('.set-sect-head');
+  head.focus(); head.click();
   assert.equal(section('Loading').querySelector('.set-loader-preview .ld'), null);
+  assert.equal(section('Loading').querySelector('.set-sect-head').getAttribute('aria-expanded'), 'false');
+  assert.equal(doc.querySelectorAll('.set-section.open').length, 1);
+  assert.equal(doc.activeElement, section('Category badges').querySelector('.set-sect-head'));
+  section('Category badges').querySelector('.set-sect-head').click();
+  assert.equal(doc.querySelectorAll('.set-section.open').length, 0);
+  open('Move list'); open('Theme');
+  assert.equal(section('Move list').classList.contains('open'), false);
+  assert.equal(section('Theme').classList.contains('open'), true);
+});
+
+test('badge size lives in Category badges and saves and applies the existing scale preference', t => {
+  const { a, doc, section, open } = settings(t);
+  assert.equal(section('Move list').querySelector('input[type="range"]'), null);
+  const slider = open('Category badges').querySelector('input[type="range"]');
+  assert.equal(slider.closest('.set-ctrl').querySelector('.set-lbl').textContent, 'Badge size');
+  slider.value = '1.25'; slider.dispatchEvent(new a.dom.window.Event('input'));
+  assert.equal(a.store.settings.badgeScale, 1.25);
+  assert.equal(doc.documentElement.style.getPropertyValue('--badge-scale'), '1.25');
+  assert.equal(slider.closest('.set-ctrl').querySelector('b').textContent, '125 %');
 });
 
 test('custom accent and arrow buttons open pickers and update their framed swatches', async t => {
