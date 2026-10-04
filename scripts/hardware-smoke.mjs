@@ -32,7 +32,7 @@ try {
     const html=await fs.readFile(path.join(sourceDir,'analysis.html'),'utf8');
     await fs.writeFile(path.join(sourceDir,'analysis.html'),html.replace('<script type="module" src="analysis.js">','<script src="hardware-profile.js"></script><script type="module" src="analysis.js">'));
     await fs.writeFile(path.join(sourceDir,'hardware-profile.js'),`
-const profiles=[[1,2,1],[8,2,1],[8,4,2],[16,null,2],[16,8,4]];
+const profiles=[[1,2],[8,2],[8,4],[16,null],[16,8]];
 const profile=profiles[Number(new URLSearchParams(location.search).get('hardware'))];
 Object.defineProperties(navigator,{hardwareConcurrency:{value:profile[0]},deviceMemory:{value:profile[1]??undefined}});
 globalThis.__hardwareWorkerStarts=0;
@@ -64,9 +64,12 @@ try {
         const result=await engine.analyse('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',6);
         if(!Number.isFinite(result.score.cp)||!result.bestmove)throw Error('Real engine search failed');
       } finally {engine.terminate();}
-      for(const [index,expected] of [[0,1],[1,1],[2,2],[3,2],[4,4]]) {
-        const id='hardware-'+build+'-'+index;
-        await browserAPI.storage.local.set({settings:{enginePath:build,engineDepth:6,engineWorkers:4,engineHash:16,depthBumped:true,sound:false,coachPlain:true},
+      for(const {index,expected,requested} of [
+        {index:0,expected:1},{index:1,expected:4},{index:2,expected:4},
+        {index:3,expected:4},{index:4,expected:4},{index:0,expected:4,requested:4},
+      ]) {
+        const id='hardware-'+build+'-'+index+(requested?'-manual':'');
+        await browserAPI.storage.local.set({settings:{enginePath:build,engineDepth:6,...(requested?{engineWorkers:requested}:{}),engineHash:16,depthBumped:true,sound:false,coachPlain:true},
           ['job:'+id]:{pgn:'1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 *',meta:{gameId:id},source:'pgn'}});
         const frame=document.createElement('iframe');frame.style='width:1366px;height:768px';
         frame.src='analysis.html?hardware='+index+'#'+id;document.body.append(frame);
@@ -79,7 +82,7 @@ try {
         const workers=frame.contentWindow.__hardwareWorkerStarts;
         if(workers!==expected)throw Error(id+': expected '+expected+' workers, got '+workers);
         if(frame.contentWindow.crossOriginIsolated)throw Error('Test unexpectedly requires isolation');
-        results.push({build,profile:index,workers,positions:saved.evals.length});
+        results.push({build,profile:index,requested:requested??'default',workers,positions:saved.evals.length});
         await report({step:'completed-review',result:results.at(-1)});frame.remove();
       }
     }

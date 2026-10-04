@@ -19,8 +19,7 @@ This audit does not establish why users uninstall the extension.
 - Engine assets match the recorded upstream SHA-256 checksums. No executable
   engine or network is downloaded when a review starts.
 - Memory hints are approximate and unavailable in some browsers, including
-  Firefox. Worker limits are conservative heuristics, not a measurement of free
-  RAM or a guarantee against system-wide memory exhaustion.
+  Firefox. They do not measure free RAM and are not used to cap review workers.
 
 [Upstream build documentation](https://github.com/nmrugg/stockfish.js),
 [V8 SIMD documentation](https://v8.dev/features/simd), and
@@ -29,11 +28,20 @@ describe the relevant runtime requirements and hardware hints.
 
 ## Changes
 
-Worker defaults and saved worker requests now respect CPU and memory hints.
-Unknown-memory browsers use at most two review workers. PCs reporting 2 GB or
-less use one, and those reporting 4 GB use at most two. Larger hash settings
-also reduce the worker budget. Changing parallelism preserves search depth,
-hash preferences, and scoring settings.
+The original CPU-based defaults are preserved: logical cores minus one, at least
+one worker and at most four. If CPU information is unavailable, the original
+three-worker default is retained. Explicit selections of 1–8 workers are honored,
+limited only by the number of positions in the game. Neither RAM hints nor hash
+size reduce a user's chosen parallelism. Existing saved choices are preserved;
+there is no migration that guesses whether a choice was automatic or manual.
+
+An earlier implementation capped unknown-memory browsers at two workers and
+also reduced parallelism for RAM/hash hints. Those caps were removed following
+the speed review: hints alone do not establish that a working pool must shrink.
+Healthy worker pools retain their original concurrency. Fewer workers are used
+when an actual startup failure leaves a smaller surviving pool, or when different
+fallback builds must be separated to keep scoring consistent. Search depth,
+hash preferences, and scoring budgets are unchanged.
 
 Cold startup has a finite 60-second deadline rather than 10 seconds. A partial
 worker startup failure lets the ready workers complete the review. A pool that
@@ -41,7 +49,34 @@ started different fallback builds keeps just one build so all positions use
 the same scoring model. Unsupported WebAssembly/SIMD produces an actionable
 message rather than repeatedly trying incompatible engines.
 
-## Verification
+## Speed-preserving revision verification
+
+All 303 automated tests passed after removing the RAM/hash caps. Regression tests
+exercise the real application defaults across eight CPU/memory-hint profiles and
+check manual selections of 1, 2, 4, and 8 workers with a 256 MB hash preference.
+Healthy pools start the selected number of workers and keep search settings
+unchanged. Existing partial-startup failure and unsupported-SIMD tests also pass.
+
+Both rebuilt packages passed the updated hardware smoke tests: 24 complete
+reviews across Chrome and Firefox, both engines, five default profiles plus a
+manual-worker override. The observed default worker counts were 1, 4, 4, 4, 4
+for the five profiles in the original table below. Selecting four workers
+explicitly on the single-core profile started four workers as requested.
+The Chrome GPU/AVX/AVX2 exclusions and 128 MB per-engine memory limit still
+passed, as did the separate unsupported-SIMD check.
+
+The revised package record is
+`web-ext-artifacts/release-0.3.0-3cdhz4/release-record.json`; its results are
+`web-ext-artifacts/release-0.3.0-3cdhz4/hardware-RCqkzE/results.json`.
+These checks verify unchanged concurrency and search configuration, not a
+wall-clock benchmark or physical low-RAM/slow-CPU validation.
+
+## Original audit verification
+
+These results describe the initial conservative worker policy, before the speed
+revision above. They remain evidence of engine capability, not the current worker
+counts. The revised policy is covered by the current regression tests and the
+updated hardware smoke script.
 
 All 295 automated tests passed in this working tree, including delayed startup,
 partial worker failure, consistent fallback scoring, unsupported SIMD, and

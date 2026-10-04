@@ -16,8 +16,12 @@ const startup = raw.indexOf('(async function main()');
 if (startup < 0) throw Error('Application startup marker missing');
 const source = raw.slice(0, startup).replace(/^import .*;\r?\n/gm, '');
 
-export function app(t) {
+export function app(t, {hardware} = {}) {
   const dom = new JSDOM('<!doctype html><div id="root"></div>', { url: 'https://extension.test/analysis.html#test-game', pretendToBeVisual: true });
+  if (hardware) Object.defineProperties(dom.window.navigator, {
+    hardwareConcurrency: {configurable:true,value:hardware.hardwareConcurrency},
+    deviceMemory: {configurable:true,value:hardware.deviceMemory},
+  });
   const store = {}, writes = [], timers = new Set();
   const browserAPI = {
     runtime: { getURL: p => `https://extension.test/${p}` },

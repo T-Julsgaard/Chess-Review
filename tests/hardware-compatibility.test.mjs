@@ -6,22 +6,18 @@ import {app, loadGame, fakeEngine} from './helpers/app.mjs';
 const profiles = [
   ['single-core PC', {hardwareConcurrency:1,deviceMemory:2}, 1],
   ['dual-core PC', {hardwareConcurrency:2,deviceMemory:4}, 1],
-  ['many cores with 2 GB RAM', {hardwareConcurrency:16,deviceMemory:2}, 1],
-  ['4 GB laptop', {hardwareConcurrency:8,deviceMemory:4}, 2],
+  ['many cores with 2 GB RAM', {hardwareConcurrency:16,deviceMemory:2}, 4],
+  ['4 GB laptop', {hardwareConcurrency:8,deviceMemory:4}, 4],
   ['8 GB desktop', {hardwareConcurrency:8,deviceMemory:8}, 4],
-  ['Firefox without a memory hint', {hardwareConcurrency:16}, 2],
-  ['privacy settings hide hardware hints', {}, 2],
-  ['invalid hardware hints', {hardwareConcurrency:NaN,deviceMemory:Infinity}, 2],
+  ['Firefox without a memory hint', {hardwareConcurrency:16}, 4],
+  ['privacy settings hide hardware hints', {}, 3],
+  ['invalid hardware hints', {hardwareConcurrency:NaN,deviceMemory:Infinity}, 3],
 ];
 for (const [label, hardware, expected] of profiles) {
-  test(`${label} completes with a bounded worker pool and unchanged search settings`, async t=>{
-    const a=app(t),S=loadGame(a,'1. e4 e5 2. Nf3 Nc6');
-    Object.defineProperties(a.context.navigator, {
-      hardwareConcurrency:{configurable:true,value:hardware.hardwareConcurrency},
-      deviceMemory:{configurable:true,value:hardware.deviceMemory},
-    });
+  test(`${label} retains the original default parallelism and search settings`, async t=>{
+    const a=app(t,{hardware}),S=loadGame(a,'1. e4 e5 2. Nf3 Nc6');
     for (const name of ['paintBoard','renderEvalBar','renderMoves','renderControls','renderReview','renderStats','renderEngineCurrent','renderBestArrow','renderGraph']) a.replace(name,()=>{});
-    S.settings.engineWorkers=4;S.settings.engineHash=16;
+    assert.equal(S.settings.engineWorkers,expected);S.settings.engineHash=16;
     const settings=structuredClone(S.settings);let started=0,saved=0;
     a.replace('createEngine',async()=>{started++;return fakeEngine();});
     a.replace('saveToLibrary',()=>saved++);
@@ -29,12 +25,29 @@ for (const [label, hardware, expected] of profiles) {
     assert.equal(started,expected);assert.equal(saved,1);assert.equal(S.analysisError,null);
     assert.ok(S.evals.every(Boolean));assert.deepEqual(structuredClone(S.settings),settings);
   });
+  test(`${label} honors manual worker choices even with a large hash`,async t=>{
+    const a=app(t,{hardware}),S=loadGame(a,'1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6');
+    for(const name of ['paintBoard','renderEvalBar','renderMoves','renderControls','renderReview','renderStats','renderEngineCurrent','renderBestArrow','renderGraph'])a.replace(name,()=>{});
+    S.settings.engineHash=256;let started=0,saved=0;
+    a.replace('createEngine',async opts=>{
+      assert.equal(opts.Hash,256);started++;return fakeEngine();
+    });
+    a.replace('saveToLibrary',()=>saved++);
+    for(const requested of [1,2,4,8]) {
+      started=0;S.settings.engineWorkers=requested;
+      await a.call('startAnalysis');
+      assert.equal(started,requested);assert.equal(S.analysisError,null);assert.ok(S.evals.every(Boolean));
+      assert.equal(S.settings.engineWorkers,requested);assert.equal(S.settings.engineHash,256);
+    }
+    assert.equal(saved,4);
+  });
 }
 
-test('large saved worker/hash preferences cannot overcommit an unknown-memory PC',t=>{
+test('worker preferences are bounded only by the supported range and positions',t=>{
   const a=app(t);
-  assert.equal(a.call('engineWorkerCount',999,256,100,{hardwareConcurrency:64}),1);
-  assert.equal(a.call('engineWorkerCount',4,16,1,{hardwareConcurrency:16,deviceMemory:8}),1);
+  assert.equal(a.call('engineWorkerCount',999,100,{hardwareConcurrency:64}),8);
+  assert.equal(a.call('engineWorkerCount',4,1,{hardwareConcurrency:16,deviceMemory:8}),1);
+  assert.equal(a.call('engineWorkerCount',NaN,100,{}),3);
 });
 
 test('a pool with different startup fallbacks uses one scoring engine throughout',async t=>{
