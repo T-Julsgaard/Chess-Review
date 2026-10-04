@@ -854,7 +854,7 @@ button { font-family: inherit; cursor: pointer; }
 
 /* settings popover */
 .settings-pop {
-  position: fixed; top: 64px; right: 24px; z-index: 60; width: var(--settings-width, 286px);
+  position: fixed; top: 64px; right: 24px; z-index: 60; width: 286px;
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
   box-shadow: var(--shadow); padding: 14px 16px 16px;
   display: flex; flex-direction: column; gap: 12px;
@@ -862,7 +862,6 @@ button { font-family: inherit; cursor: pointer; }
   /* Keep the controls at one fixed width when a long tab starts scrolling. */
   scrollbar-gutter: stable;
 }
-.settings-pop:has(.set-section.open .badge-settings) { --settings-width: 380px; }
 .settings-pop[hidden] { display: none; }
 
 /* ---------- CREDITS & ATTRIBUTIONS ---------- */
@@ -1603,32 +1602,37 @@ button { font-family: inherit; cursor: pointer; }
 .badge-font-name small { display: block; font-size: 10px; font-weight: 400; color: var(--ink-3); margin-top: 3px; }
 .badge-font-sample { font-weight: 700; font-size: 22px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .badge-label-heading { padding-top: 6px; border-top: 1px solid var(--line-soft); font-size: 12px; font-weight: 600; color: var(--ink-2); }
-.badge-label-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.badge-label-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
 .badge-label-option {
   display: flex; flex-direction: column; min-width: 0; padding: 0; overflow: hidden;
   scroll-margin-top: 76px; scroll-margin-bottom: 8px;
-  border: 1px solid var(--line); border-radius: 9px; background: var(--panel-2);
+  border: 1px solid var(--line); border-radius: 7px; background: var(--panel-2);
   color: var(--ink); text-align: left; cursor: pointer; transition: border-color .15s, background .15s;
 }
 .badge-label-option:hover { border-color: color-mix(in oklab, var(--accent) 60%, var(--line)); }
 .badge-label-option.on { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 8%, var(--panel-2)); }
 .badge-label-option:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .badge-label-preview {
-  display: flex; align-items: center; justify-content: center; width: 100%; height: 68px; padding: 8px;
+  display: flex; align-items: center; justify-content: center; width: 100%; height: 38px; padding: 5px;
   background-color: color-mix(in oklab, var(--sq-light) 22%, var(--panel-2));
   background-image: conic-gradient(color-mix(in oklab, var(--sq-dark) 24%, transparent) 25%, transparent 0 50%, color-mix(in oklab, var(--sq-dark) 24%, transparent) 0 75%, transparent 0);
-  background-size: 34px 34px; border-bottom: 1px solid var(--line-soft);
+  background-size: 24px 24px; border-bottom: 1px solid var(--line-soft);
 }
 .badge-label-preview .category-label { max-width: 100%; flex-shrink: 1; }
-.badge-label-preview > img { width: 100%; max-width: 180px; height: 42px; object-fit: contain; }
-.badge-label-off { font: 400 22px/1 var(--font-ui); color: var(--ink-3); opacity: .65; }
-.badge-label-caption { display: flex; flex-direction: column; width: 100%; gap: 3px; padding: 8px 10px 10px; }
-.badge-label-title { display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 700; }
-.badge-label-check { color: var(--accent); font-size: 12px; }
-.badge-label-caption small { color: var(--ink-2); font-size: 10px; font-weight: 400; line-height: 1.4; }
-@media (max-width: 360px) {
-  .badge-label-options { grid-template-columns: 1fr; }
-}
+/* Miniature samples fit the standard settings width; board labels keep their own sizes. */
+.badge-label-preview .category-label--editorial { font-size: 11px; padding: 4px 7px; gap: 5px; }
+.badge-label-preview .category-label--editorial .category-label-mark { width: 9px; height: 1px; }
+.badge-label-preview .category-label--studio { font-size: 8px; padding: 5px 6px; gap: 5px; letter-spacing: .055em; }
+.badge-label-preview .category-label--studio .category-label-mark { height: 10px; }
+.badge-label-preview .category-label--soft { font-size: 11px; padding: 3px 7px 3px 3px; gap: 4px; }
+.badge-label-preview .category-label--soft .category-label-mark { width: 16px; height: 16px; font-size: 9px; }
+.badge-label-preview .category-label--minimal { font-size: 10px; padding: 4px 7px; gap: 4px; }
+.badge-label-preview .category-label--minimal .category-label-mark { width: 3px; height: 3px; }
+.badge-label-preview > img { width: 100%; max-width: 100px; height: 26px; object-fit: contain; }
+.badge-label-off { font: 400 17px/1 var(--font-ui); color: var(--ink-3); opacity: .65; }
+.badge-label-caption { width: 100%; padding: 5px 7px 6px; }
+.badge-label-title { display: flex; align-items: center; justify-content: space-between; font-size: 10.5px; font-weight: 700; }
+.badge-label-check { color: var(--accent); font-size: 10px; }
 .calibration-warning-overlay { position: fixed; inset: 0; z-index: 10000; background: #0008; display: flex; align-items: center; justify-content: center; padding: 20px; }
 .calibration-warning { width: min(420px, 100%); padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--ink); box-shadow: 0 12px 50px #0006; }
 .calibration-warning h3 { margin: 0 0 8px; color: #ef6b62; font-size: 22px; text-align: center; }

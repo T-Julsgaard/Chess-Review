@@ -92,7 +92,7 @@ const BADGE_LABEL_STYLES = {
   studio: { name: "Studio", description: "Crisp type · graphite" },
   soft: { name: "Soft", description: "Rounded type · gentle tint" },
   minimal: { name: "Minimal", description: "Small type · subtle accent" },
-  original: { name: "Original", description: "Illustrated lettering · pop" },
+  original: { name: "Expressive", description: "Illustrated lettering · pop" },
 };
 function badgeLabelStyle(value = S.settings.badgeTooltip) {
   // Preserve the former on/off choice when upgrading saved preferences.
@@ -4590,8 +4590,7 @@ function badgeLabelPicker() {
       el("span", { class: "badge-label-preview", "aria-hidden": "true" },
         id === "off" ? el("span", { class: "badge-label-off" }, "—") : categoryLabelArtwork("brilliant", id)),
       el("span", { class: "badge-label-caption" },
-        el("span", { class: "badge-label-title" }, option.name, el("span", { class: "badge-label-check", "aria-hidden": "true" }, selected === id ? "✓" : "")),
-        el("small", {}, option.description)));
+        el("span", { class: "badge-label-title" }, option.name, el("span", { class: "badge-label-check", "aria-hidden": "true" }, selected === id ? "✓" : ""))));
     }));
 }
 function badgeSettings() {
@@ -4608,6 +4607,8 @@ function badgeSettings() {
     el("div", { class: "badge-preview", "aria-label": "Badge preview" },
       gradeBadge("best", 9, "badge-preview-item"), gradeBadge("good", 6.4, "badge-preview-item"),
       gradeBadge("brilliant", 10, "badge-preview-item"), gradeBadge("blunder", 0, "badge-preview-item"),
+    el("div", { class: "set-lbl" }, "Number font"), fonts,
+    el("p", { class: "set-note" }, "Free, open-source fonts, bundled for offline use."),
       gradeBadge("book", null, "badge-preview-item")),
     slider("Badge size", "badgeScale", 0.7, 1.6, 0.05, {
       fmt: (v) => Math.round(v * 100) + " %",
@@ -4615,9 +4616,7 @@ function badgeSettings() {
     }),
     el("div", { class: "badge-label-heading" }, el("span", { class: "set-lbl" }, "Hover labels")),
     badgeLabelPicker(),
-    el("p", { class: "set-note" }, "The category appears above the move for two seconds. Choose a style to preview it on the board."),
-    el("div", { class: "set-lbl" }, "Number font"), fonts,
-    el("p", { class: "set-note" }, "Free, open-source fonts, bundled for offline use."));
+    el("p", { class: "set-note" }, "Show the category for two seconds after each move."));
 }
 function renderSettings() {
   closeArrowColorPicker();

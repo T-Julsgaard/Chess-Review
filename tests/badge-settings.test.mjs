@@ -103,6 +103,9 @@ test('Visual exposes Category badges with previews and hover labels off by defau
   assert.equal(options[0].getAttribute('aria-checked'), 'true');
   assert.equal(options.filter(n => n.tabIndex === 0).length, 1);
   assert.equal(doc.querySelectorAll('.badge-label-preview .category-label').length, 4);
+  assert.ok(doc.querySelector('.badge-font-options').compareDocumentPosition(doc.querySelector('.badge-label-options')) & a.dom.window.Node.DOCUMENT_POSITION_FOLLOWING);
+  assert.equal(options.at(-1).querySelector('.badge-label-title').textContent, 'Expressive');
+  assert.equal(doc.querySelector('.badge-label-caption small'), null);
 });
 
 test('old on/off label preferences migrate once and explicit style choices survive', t => {
