@@ -3,10 +3,6 @@ import vm from 'node:vm';
 import { JSDOM } from 'jsdom';
 import { Chess } from '../../lib/chess.js';
 import { flagCodeForCountryId, countryNameForId } from '../../flags.js';
-import { BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg } from '../../move-grades.js';
-import {expectedPoints} from '../../lib/public-scoring.js';
-import {calibratedReview,scoringEvidenceComplete} from '../../lib/calibrated-review.js';
-import {analyseCalibratedPosition} from '../../lib/calibrated-search.js';
 
 // Execute the real application in a DOM, stubbing only browser/engine boundaries.
 // Automatic startup and imports are omitted; production needs no test exports.
@@ -16,7 +12,7 @@ if (startup < 0) throw Error('Application startup marker missing');
 const source = raw.slice(0, startup).replace(/^import .*;\r?\n/gm, '');
 
 export function app(t) {
-  const dom = new JSDOM('<!doctype html><div id="root"></div>', { url: 'https://extension.test/analysis.html#test-game', pretendToBeVisual: true });
+  const dom = new JSDOM('<!doctype html><div id="root"></div>', { url: 'https://extension.test/analysis.html#explore', pretendToBeVisual: true });
   const store = {}, writes = [], timers = new Set();
   const browserAPI = {
     runtime: { getURL: p => `https://extension.test/${p}` },
@@ -31,8 +27,6 @@ export function app(t) {
     location: dom.window.location, Node: dom.window.Node, HTMLElement: dom.window.HTMLElement,
     getComputedStyle: dom.window.getComputedStyle, performance, structuredClone,
     URL, TextEncoder, btoa, console, Chess, flagCodeForCountryId, countryNameForId, browserAPI,
-    BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg,
-    expectedPoints, calibratedReview, scoringEvidenceComplete, analyseCalibratedPosition,
     Engine: class { constructor() { throw Error('Unexpected real engine'); } },
     fetch: async () => { throw Error('Unexpected network access'); },
     requestAnimationFrame: () => 0, cancelAnimationFrame() {},
@@ -43,8 +37,7 @@ export function app(t) {
   const run = code => vm.runInContext(code, context);
   const state = run('S');
   Object.assign(state.settings, { sound: false, moveAnim: false, coach: '', showThreat: false, engineDepth: 4 });
-  context.__publicCalibration = JSON.parse(fs.readFileSync(new URL('../../data/calibration.json', import.meta.url), 'utf8'));
-  run('BOOK = {}; CALIB = { ...__publicCalibration, quality: { ...__publicCalibration.quality, outcome: { slopePerPawn: 0.3 } } };');
+  run('BOOK = {}; CALIB = { winK: 0.003001472674915567, clsWp: { good: 2, inacc: 5, mistake: 10, blunder: 20 } };');
   const replace = (name, fn) => { context.__replacement = fn; run(`${name} = __replacement`); delete context.__replacement; };
   t.after(() => { for (const id of timers) clearTimeout(id); dom.window.close(); });
   return { run, state, context, dom, store, writes, replace, call: (name, ...args) => run(name)(...args) };
@@ -79,5 +72,5 @@ export function deferred() {
 export async function settle() { for (let i = 0; i < 12; i++) await Promise.resolve(); }
 
 export function fakeEngine(analyse = async () => ({ score: { cp: 0 }, bestmove: 'e2e4', lines: [] })) {
-  return { dead: false, analyse, async setOptions() {}, stop() {}, cancelPending() {}, terminate() { this.dead = true; } };
+  return { dead: false, analyse, stop() {}, cancelPending() {}, terminate() { this.dead = true; } };
 }

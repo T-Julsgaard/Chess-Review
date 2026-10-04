@@ -6,23 +6,23 @@
   "uses_emoji": false,
   "move_quality": {
     "brilliant": [
-      "{move} is... brilliant?? Are you sure?? It looked really risky to me. Are YOU okay? Is the position okay??",
+      "{move} is... masterstroke?? Are you sure?? It looked really risky to me. Are YOU okay? Is the position okay??",
       "The computer gave {move} the special sparkly label and I don't get it. It looked so scary. Why was it scary AND good?? Pick one!!",
-      "Brilliant move?! But... you put your piece somewhere dangerous on PURPOSE? And that's... allowed?? I'm worried about you.",
-      "{move} is brilliant, it says. Okay but did you MEAN it or did your hand slip? Because honestly it's fine either way, I just want to know.",
-      "Whoa, brilliant!! That's good, right? It sounds good. It LOOKED terrifying. My tummy hurts a little from watching it. Good job though??",
-      "The machine says {move} is one of the best moves ever. I was about to say it looked like a mistake!! We were SO close to agreeing!!",
-      "Brilliant?! I had to sit down. You did something amazing and I genuinely could not tell. Please warn me next time!!",
-      "{move}... brilliant... okay wow. I don't understand it but I'm clapping. Quietly. In case the position is still dangerous."
+      "Masterstroke?! But... you put your piece somewhere dangerous on PURPOSE? And that's... allowed?? I'm worried about you.",
+      "{move} is a masterstroke, it says. Okay but did you MEAN it or did your hand slip? Because honestly it's fine either way, I just want to know.",
+      "Whoa, masterstroke!! That's good, right? It sounds good. It LOOKED terrifying. My tummy hurts a little from watching it. Good job though??",
+      "The machine says {move} is one of the best moves ever. I was about to say it looked like a misstep!! We were SO close to agreeing!!",
+      "Masterstroke?! I had to sit down. You did something amazing and I genuinely could not tell. Please warn me next time!!",
+      "{move}... masterstroke... okay wow. I don't understand it but I'm clapping. Quietly. In case the position is still dangerous."
     ],
     "great": [
       "{move} was the ONLY move that worked?? That's horrifying!! What if you'd picked a different one?! I would have!!",
-      "A great move! Apparently every other move LOST. Why does this game DO that?? Are you okay? Do you need water?",
-      "The computer says {move} was basically the only good move. One!! Out of all of them!! This game has no chill and neither do I right now.",
-      "Great move!! I counted like twenty moves you could have made and apparently nineteen were traps?? Who DESIGNED this??",
+      "A superb move! Apparently every other move LOST. Why does this game DO that?? Are you okay? Do you need water?",
+      "The computer says {move} was basically the only decent move. One!! Out of all of them!! This game has no chill and neither do I right now.",
+      "Superb move!! I counted like twenty moves you could have made and apparently nineteen were traps?? Who DESIGNED this??",
       "{move} — the only move that holds! That's so much pressure!! I'm proud of you and also I need a snack to recover.",
       "Only move?! And you found it?! I would have moved the horse one. It's my favorite. It was apparently wrong. It's ALWAYS apparently wrong.",
-      "Great, it says! One narrow path and you took it! See, this is why I let YOU play. My paths are always the falling-down ones."
+      "Superb, it says! One narrow path and you took it! See, this is why I let YOU play. My paths are always the falling-down ones."
     ],
     "best": [
       "{move} is the best move! The computer's favorite! Okay but... how do you KNOW these things? Did you read something? Should I read something??",
@@ -34,56 +34,56 @@
       "Best move!! I cheered before I knew why. That's just how I support people."
     ],
     "excellent": [
-      "{move} is excellent! Not the BEST one, which honestly is a relief because the best ones stress me out.",
-      "Excellent! The bar didn't even move! Is... is that good? Things feel best when the bar goes WHOOSH but okay!",
-      "{move}, excellent! Nothing got taken and nobody's in danger and the computer is happy. A quiet little move. Like a nap. I respect naps.",
-      "Excellent move! I almost understood why! I'm getting closer every game. By next year I'll be dangerous!!",
-      "{move} is excellent! You keep making things SAFER and the computer keeps loving it. Wild taste, but it's consistent!",
-      "Excellent! Honestly I couldn't tell this apart from the best move. Or the good move. They all look like moving wood to me, but excellent!!",
-      "The box says excellent! I say: the slidey diagonal guy is well positioned. I have no idea if that's true. He LOOKS happy."
+      "{move} is near best! Not the BEST one, which honestly is a relief because the best ones stress me out.",
+      "Near best! The bar didn't even move! Is... is that good? Things feel best when the bar goes WHOOSH but okay!",
+      "{move}, near best! Nothing got taken and nobody's in danger and the computer is happy. A quiet little move. Like a nap. I respect naps.",
+      "Near best move! I almost understood why! I'm getting closer every game. By next year I'll be dangerous!!",
+      "{move} is near best! You keep making things SAFER and the computer keeps loving it. Wild taste, but it's consistent!",
+      "Near best! Honestly I couldn't tell this apart from the best move. Or the decent move. They all look like moving wood to me, but near best!!",
+      "The box says near best! I say: the slidey diagonal guy is well positioned. I have no idea if that's true. He LOOKS happy."
     ],
     "good": [
-      "{move} is good! Just good! I love good! Good is my favorite rating because I understand it!",
-      "A good move! The computer wanted something slightly different but the computer always wants something. Needy little box.",
-      "{move}, good! Nothing exploded! In this game that's apparently an achievement and honestly? Same.",
-      "Good move!! There was a better one but I DEFINITELY wouldn't have found it, so as far as I'm concerned you played perfectly.",
-      "Good! The position is still fine! Every move where the position stays fine is a tiny miracle. I've seen MY games.",
-      "{move} is good. Solid. Dependable. Like a sandwich. Not every move needs to be fireworks. (I do prefer the fireworks though.)",
-      "Good move! I nodded like I knew why. We're both doing great in our own ways."
+      "{move} is decent! Just decent! I love decent! Decent is my favorite rating because I understand it!",
+      "A decent move! The computer wanted something slightly different but the computer always wants something. Needy little box.",
+      "{move}, decent! Nothing exploded! In this game that's apparently an achievement and honestly? Same.",
+      "Decent move!! There was a better one but I DEFINITELY wouldn't have found it, so as far as I'm concerned you played perfectly.",
+      "Decent! The position is still fine! Every move where the position stays fine is a tiny miracle. I've seen MY games.",
+      "{move} is decent. Solid. Dependable. Like a sandwich. Not every move needs to be fireworks. (I do prefer the fireworks though.)",
+      "Decent move! I nodded like I knew why. We're both doing superb in our own ways."
     ],
     "book": [
-      "{move} is a 'book move'! There's a BOOK?! Has everyone read the book except me?? Where do you GET the book??",
-      "Still book, it says. So people memorized this part? Like, on purpose? During their free time?? Athletes are different, man.",
+      "{move} is a 'theory move'! There's a BOOK?! Has everyone read the book except me?? Where do you GET the book??",
+      "Still theory, it says. So people memorized this part? Like, on purpose? During their free time?? Athletes are different, man.",
       "{move} is in the book! So technically someone ELSE played this move first and you're doing a cover version. It's a good cover!!",
-      "Book move! Boring!! Nothing happened AGAIN! When does someone take something?? That's the good part!!",
-      "{move}, still theory. I tried to learn an opening once. I learned three moves. The third one was wrong. Anyway, nice book move!!",
-      "The book says {move}! Imagine knowing what's going to happen in advance. In MY games literally anything can occur at any time. It's a gift.",
+      "Theory move! Boring!! Nothing happened AGAIN! When does someone take something?? That's the good part!!",
+      "{move}, still theory. I tried to learn an opening once. I learned three moves. The third one was wrong. Anyway, nice theory move!!",
+      "Opening theory says {move}! Imagine knowing what's going to happen in advance. In MY games literally anything can occur at any time. It's a gift.",
       "Still in the book! Wake me up when somebody hangs a queen, that's MY chapter."
     ],
     "inaccuracy": [
-      "Ooh, {move} is an 'inaccuracy'! That means you played something the computer DIDN'T expect! Creative!! I love it!!",
-      "A little inaccuracy! Finally some personality in this game! The best moves are so samey!!",
+      "Ooh, {move} is an 'minor misstep'! That means you played something the computer DIDN'T expect! Creative!! I love it!!",
+      "A little minor misstep! Finally some personality in this game! The best moves are so samey!!",
       "{move} was slightly off, says the box. Off the BEATEN PATH maybe!! Trailblazer!!",
-      "An inaccuracy! The bar wiggled! I love when the bar wiggles. Do it again!! Wait, don't. But kind of do.",
-      "{move}, inaccuracy! You know what's accurate? Boring stuff. Rulers. Spreadsheets. You played with FLAIR.",
-      "Tiny inaccuracy! The computer is so picky. It didn't even cost anything big! Probably! I can't actually read the numbers!",
-      "Inaccuracy!! That's the gentlest of the angry words and honestly it sounds like a perfume. Inaccuracy, by Chess."
+      "A minor misstep! The bar wiggled! I love when the bar wiggles. Do it again!! Wait, don't. But kind of do.",
+      "{move}, minor misstep! You know what's accurate? Boring stuff. Rulers. Spreadsheets. You played with FLAIR.",
+      "Tiny minor misstep! The computer is so picky. It didn't even cost anything big! Probably! I can't actually read the numbers!",
+      "Minor misstep!! That's the gentlest of the angry words and honestly it sounds like a perfume. Minor misstep, by Chess."
     ],
     "mistake": [
-      "{move} is a MISTAKE! Okay!! NOW the game is getting somewhere!! Things are happening!!",
-      "A mistake!! Don't worry, this is the part of the movie where it gets good. The boring perfect part is OVER.",
-      "{move} was a mistake, says the box. I say the game was getting too predictable and you fixed that. Visionary.",
-      "Ooh, a mistake! The other side gets a chance now! That's so generous of you! Sportsmanship!!",
-      "{move} — mistake! The eval bar moved a whole bunch and I got to watch it. Thank you for that. Genuinely the highlight of my hour.",
-      "A mistake!! Welcome to MY world!! It's chaotic here but the energy is amazing!!",
-      "{move} is a mistake! Now BOTH of you have chances! It's fair now! I love fair!!"
+      "{move} is a MAJOR MISSTEP! Okay!! NOW the game is getting somewhere!! Things are happening!!",
+      "A major misstep!! Don't worry, this is the part of the movie where it gets good. The boring perfect part is OVER.",
+      "{move} was a major misstep, says the box. I say the game was getting too predictable and you fixed that. Visionary.",
+      "Ooh, a major misstep! The other side gets a chance now! That's so generous of you! Sportsmanship!!",
+      "{move} — major misstep! The eval bar moved a whole bunch and I got to watch it. Thank you for that. Genuinely the highlight of my hour.",
+      "A major misstep!! Welcome to MY world!! It's chaotic here but the energy is amazing!!",
+      "{move} is a major misstep! Now BOTH of you have chances! It's fair now! I love fair!!"
     ],
     "miss": [
       "{move} 'missed' something, apparently. There was some big complicated tactic available. Honestly? Good. Those things look exhausting.",
-      "A miss! The computer says there was something stronger. The computer ALWAYS says that. Let people enjoy things, computer!!",
+      "A missed chance! The computer says there was something stronger. The computer ALWAYS says that. Let people enjoy things, computer!!",
       "{move} skipped the fancy combination. Smart, honestly. Fancy combinations have so many steps. So many ways to trip. You kept it simple!",
       "You missed a big tactic, it says! Phew!! Those things make my head spin. Crisis avoided. For everyone. Mostly you.",
-      "A miss! The position offered you something complicated and you said no thank you. POLITE. I'm always saying chess needs more manners.",
+      "A missed chance! The position offered you something complicated and you said no thank you. POLITE. I'm always saying chess needs more manners.",
       "{move} missed something, but here's my take: if I can't see it and YOU didn't see it, maybe it didn't want to be seen. Respect its privacy.",
       "Missed the strong move! That's okay!! The strong moves are scary. The game lasts longer this way and I'm having fun!!"
     ],
@@ -114,7 +114,7 @@
   "non_move_states": {
     "starting_position": [
       "The starting position!! Everyone's lined up so neat! Enjoy it, in a few moves it's going to look like my sock drawer!",
-      "A new game!! I love this part! Nobody's made any mistakes yet! Well. Except me. I already predicted the wrong winner. To myself.",
+      "A new game!! I love this part! Nobody's made any missteps yet! Well. Except me. I already predicted the wrong winner. To myself.",
       "Starting position! Okay, quick plan: you do the moves, I do the cheering, and SOMEBODY takes a piece soon or I'm going to lose it.",
       "Everything's all set up!! Thirty-two pieces! I counted! Twice! Got different numbers but the board looks right!"
     ],
@@ -191,7 +191,7 @@
       "Pawn acquired!! Look at you collecting things! The board is your gift shop!"
     ],
     "material_lost_pawn": [
-      "They took one of your pawns! Okay sure but did you SEE the capture?? The little hop? Captures are just great content all around.",
+      "They took one of your pawns! Okay sure but did you SEE the capture?? The little hop? Captures are just superb content all around.",
       "You lost a pawn! On the bright side: the little guy gets to rest now. He was out there a long time. He did his best!",
       "A pawn down! That's fine! You have like... seven? Several! You have several!!",
       "One pawn gone! Sharing is caring! Chess is the only game where everyone claps when you DON'T share. Weird culture honestly."
@@ -260,7 +260,7 @@
       "We left the book!! No more memorized stuff! Now it's just two people guessing! MY ARENA!! Welcome!!",
       "The book is over!! Finally!! Now the moves are real and handmade! Artisanal chess!!",
       "Out of theory! The computer doesn't have a script anymore! Nobody does! It's improv night and EVERYONE'S on stage!",
-      "No more book moves! From here on out, every move is a surprise! For them! For you! Mostly for me!"
+      "No more theory moves! From here on out, every move is a surprise! For them! For you! Mostly for me!"
     ],
     "enter_middlegame": [
       "The MIDDLEGAME! That's the part where everything's out and stuff starts HAPPENING! Allegedly! I'm watching!!",
@@ -271,7 +271,7 @@
     "enter_endgame": [
       "The endgame!! Almost everyone's gone! It's so quiet! Just a few pieces and big big dreams!",
       "Endgame time! The king comes out NOW?? After hiding the whole game?? Classic management move honestly.",
-      "We're in the endgame! Every pawn is super important now, which is great because I've been rooting for them SINCE THE START.",
+      "We're in the endgame! Every pawn is super important now, which is superb because I've been rooting for them SINCE THE START.",
       "The endgame! So few pieces left! I can finally keep track of everyone! This is my favorite accessibility feature!"
     ],
     "queens_off": [
@@ -287,11 +287,11 @@
       "The game flipped!! I don't know what caused it but I respect the chaos enormously!"
     ],
     "streak_good": [
-      "{n} good moves in a row... that's great!! It's just... nothing EXCITING has happened in a while?? When's the next capture? Asking for me.",
-      "{n} accurate moves straight! The computer is so happy! The bar is so still! So... very... still... zzz— I'm awake!! Great job!!",
+      "{n} decent moves in a row... that's superb!! It's just... nothing EXCITING has happened in a while?? When's the next capture? Asking for me.",
+      "{n} accurate moves straight! The computer is so happy! The bar is so still! So... very... still... zzz— I'm awake!! Superb job!!",
       "{n} in a row! You're being SO responsible! Proud of you! Lightly bored! Mostly proud!",
-      "{n} good moves consecutively!! At this rate nothing will ever go wrong, which is honestly an experience I've never had. Describe it to me sometime!",
-      "{n} in a row, all good moves! Incredible! Unprecedented! Unrelatable! Keep going I guess!!"
+      "{n} decent moves consecutively!! At this rate nothing will ever go wrong, which is honestly an experience I've never had. Describe it to me sometime!",
+      "{n} in a row, all decent moves! Incredible! Unprecedented! Unrelatable! Keep going I guess!!"
     ],
     "streak_bad": [
       "{n} 'bad' moves in a row!! The game has been SO lively lately!! Best stretch of the whole match honestly!!",
@@ -320,7 +320,7 @@
     ],
     "endgame_rook": [
       "A rook endgame!! Just the towers and the little guys left! The towers finally get to be main characters!!",
-      "Rook endgame! Everyone says these are 'all draws' and as the official president of the Draw Fan Club: EXCELLENT news.",
+      "Rook endgame! Everyone says these are 'all draws' and as the official president of the Draw Fan Club: NEAR BEST news.",
       "Just rooks and pawns now! Simple! Clean! I can count everyone! There's like six guys! This is chess at MY difficulty level!",
       "The rook ending!! Apparently the busy rook beats the lazy rook. That's the whole rule?? Even I can remember that one. Busy tower good. Got it."
     ]
@@ -328,7 +328,7 @@
   "summary": {
     "clean_win": [
       "You WON! The whole game! Start to finish! Nothing even went wrong, which... I mean, congrats!! Personally I like a little chaos, but a win's a win!!",
-      "A clean win!! No mistakes, no drama, no nail-biting... you really just... played well the whole time?? On purpose?? Wild. Amazing. WILD.",
+      "A clean win!! No missteps, no drama, no nail-biting... you really just... played well the whole time?? On purpose?? Wild. Amazing. WILD.",
       "You won and it was never even close!! I kept waiting for the scary part and it just NEVER came! Efficient! Slightly anticlimactic! VICTORIOUS!",
       "A perfect, calm, controlled win. I'm so happy for you. Next time can we have ONE little disaster though? For me? As a treat?"
     ],
@@ -342,10 +342,10 @@
       "A DRAW!! A TIE!! Everybody gets half a point!! This is the best possible result and I will not be taking questions!!",
       "A hard-fought draw!! You BOTH won, kind of!! Nobody has to be sad!! Why isn't every game like this!!",
       "A draw, after all that fighting! Half a point each, like splitting the last cookie. Beautiful. The fairest sport moment I've ever seen.",
-      "It's a tie!! All that drama and the game just said 'you know what? both of you are great.' And honestly? The game was right!!"
+      "It's a tie!! All that drama and the game just said 'you know what? both of you are superb.' And honestly? The game was right!!"
     ],
     "loss": [
-      "You lost... BUT. Think about how happy the other person is right now!! You basically gave someone a great day!! That's community service!!",
+      "You lost... BUT. Think about how happy the other person is right now!! You basically gave someone a superb day!! That's community service!!",
       "A loss! Okay. Here's the thing though: I lose ALL the time, and look at me! Thriving! Mostly! The point is, it doesn't stick!",
       "You lost this one!! But the game had captures AND checks AND the bar went whoosh at least twice, so as far as I'm concerned, everybody ate well.",
       "A loss today. But hey — you played a whole entire chess game, start to finish, and I understood at least nine of the moves. We're both growing!!"
@@ -353,8 +353,8 @@
   },
   "practice": {
     "loading_first": [
-      "We're going BACK to the exciting moments?! The mistakes?! Best idea ever! Those were the highlights!!",
-      "Loading up your first mistake! Aw, I remember this one. Fondly! It was a great moment for the bar!",
+      "We're going BACK to the exciting moments?! The missteps?! Best idea ever! Those were the highlights!!",
+      "Loading up your first misstep! Aw, I remember this one. Fondly! It was a superb moment for the bar!",
       "Practice time! We're revisiting the chaos! Like a scrapbook, but for blunders! I'd buy that scrapbook!!",
       "Getting your first do-over ready! Apparently you're supposed to find BETTER moves this time? Counterpoint: the original moves had charm."
     ],
@@ -366,29 +366,29 @@
       "{move} happened here and got a {label}. In my heart it's a 9/10. In the engine's heart it's... whatever {label} means. Find the boring right answer!!"
     ],
     "correct_continue": [
-      "You found the right move!! That's... great!! It's so much calmer than the original. Calm is good! Probably! Next one!!",
+      "You found the right move!! That's... superb!! It's so much calmer than the original. Calm is good! Probably! Next one!!",
       "Correct!! The computer's happy! The position's safe! Nothing exciting will happen now! Hooray?? Hooray!!",
       "That's the right answer!! Look at you, fixing things! The chaos archive loses another entry. Bittersweet! Mostly sweet! NEXT!",
       "Correct!! See, you CAN do the boring right thing when they make you! I believe in you! Differently than before!"
     ],
     "correct_final": [
-      "That was the LAST one!! You fixed EVERY mistake!! The whole game is responsible now! I miss the old version a little but I'm SO proud!!",
+      "That was the LAST one!! You fixed EVERY misstep!! The whole game is responsible now! I miss the old version a little but I'm SO proud!!",
       "All done!! Every exciting moment from the game, replaced with the correct move. The engine is thrilled. I'm coping. You're improving! Everyone has feelings!!",
       "Final one solved!! You did the entire homework! Now the next game will have FEWER disasters, which means I need a new hobby, which is FINE!!",
-      "Last mistake, fixed!! Complete set!! You know what this means: next game's blunders will be BRAND NEW ones! Fresh material! The circle of chess!!"
+      "Last misstep, fixed!! Complete set!! You know what this means: next game's blunders will be BRAND NEW ones! Fresh material! The circle of chess!!"
     ],
     "close_try_again": [
       "Ooh, not quite — but honestly your attempt looked COOLER than the right answer probably does. Try again though! Apparently cool isn't the goal!",
       "Close!! You almost found the responsible move! Your instinct went for the fun one again, didn't it? I get it. I GET it. One more try!",
       "Almost!! The right move is hiding nearby. The right moves are always hiding. The wrong ones just stand right out in the open, friendly-like. Try again!!",
-      "Not that one! But listen, of all the wrong answers, that was one of them, and I thought it was great. Again!!",
+      "Not that one! But listen, of all the wrong answers, that was one of them, and I thought it was superb. Again!!",
       "Attempt {attempts}!! Still going!! I've attempted things WAY more times than that, so as far as I'm concerned you're in elite form. One more!!"
     ],
     "after_hint": [
       "A HINT!! Yes!! Hints are the best invention!! It's like the game whispering the answer! Take it take it take it!",
       "Hint received!! No shame! I would have asked for the hint BEFORE trying. This is why you're the player and I'm the moral support!",
       "There's your hint!! The game basically did the first half of the homework. Love that for us. Now finish it!!",
-      "You got a hint! Now you only have to be HALF right on your own! Those are great odds! MY kind of odds!"
+      "You got a hint! Now you only have to be HALF right on your own! Those are superb odds! MY kind of odds!"
     ],
     "streak_praise": [
       "You're solving them ALL?! One after another?! Who ARE you and also can you teach me, but slowly, and with snacks?",

@@ -1,16 +1,11 @@
-# Release 0.2.1
-
-This maintenance update improves commit descriptions and retires obsolete
-experiments, superseded tooling and discarded design work from repository history.
-Contributors using older clones should start from current `main` and port their
-reviewed changes individually, as described in CONTRIBUTING.md.
+# Release 0.2.0
 
 ## Packages and verification
 
 Run `npm ci`, `npm test`, `npm run verify:engines`, and `npm run build`.
-Each build creates a new `web-ext-artifacts/release-0.2.1-<unique>/` directory.
-It preserves `chess-review-0.2.1-chrome.zip`, `chess-review-0.2.1-firefox.zip`, and
-`chess-review-0.2.1-source.zip`, alongside staged copies. Existing packages are
+Each build creates a new `web-ext-artifacts/release-0.2.0-<unique>/` directory.
+It preserves `chess-review-0.2.0-chrome.zip`, `chess-review-0.2.0-firefox.zip`, and
+`chess-review-0.2.0-source.zip`, alongside staged copies. Existing packages are
 never overwritten. `release-record.json` records SHA-256 checksums, source-file
 hashes, the Git HEAD and working-tree status, Node version, and build time.
 `web-ext-artifacts/latest-release.json` points to the newest completed record;
@@ -18,13 +13,23 @@ older records remain in their original directories. `release-sizes.json` is also
 stored in each release directory.
 
 The source snapshot contains the extension's readable code, assets, manifests,
-dependency lockfile, tests, build scripts, repository guides and current calibration
-fitting/evidence/reproduction files. It excludes Git history and local
+dependency lockfile, tests, and build scripts. It excludes Git history and local
 dependencies. Engine upstream source/build references remain in engine/README.md;
 the snapshot does not itself contain the upstream engines' complete build sources.
-Only Cburnett and Merida pieces enter the browser/source ZIPs. Include
-`content-button.css` in the source and browser packages, as enforced by the
-build allowlist. Current asset credits are in ATTRIBUTIONS.md.
+Only Cburnett and Merida pieces enter the browser/source ZIPs. Kaneo, Kaneo Midnight,
+1Kbyte Gambit, and the Kadagaden SVG boards were removed from the current checkout.
+Old archives/history are preserved. Saved removed-piece choices migrate to Cburnett;
+removed SVG-board preferences migrate to similar retained flat-color boards.
+Move-category display names now use Masterstroke, Superb, Theory, Best, Near best,
+Decent, Minor Misstep, Major Misstep, Missed chance, and Blunder. Settings, coach
+category references, and badge accessibility labels use the same terminology.
+Stored classification keys, scoring thresholds, calibration coefficients, and
+the existing attributed classifier implementation are unchanged by this rename.
+The current move-category SVGs use maintainer-created replacement symbols;
+ATTRIBUTIONS.md records their authorship and design history. The injected Chess.com
+review control uses the extension's content-button.css and its own class names,
+while retaining its existing placement and review action. Include that stylesheet
+in the source and browser packages, as enforced by the build allowlist.
 Build from a stable working tree. A dirty build is explicitly recorded and must
 not be described as identical to its HEAD commit. Preserve the submitted source
 snapshot and checksums with the actual store-upload record; do not invent tags
@@ -41,32 +46,29 @@ from the old full-19 preference to Lite. Results are saved in
 Validate the actual Firefox ZIP with:
 
 ```sh
-npx web-ext lint --source-dir=web-ext-artifacts/release-0.2.1-<unique>/chess-review-0.2.1-firefox.zip
+npx web-ext lint --source-dir=web-ext-artifacts/release-0.2.0-<unique>/chess-review-0.2.0-firefox.zip
 ```
 
 Chrome uses an MV3 module service worker. Firefox uses an MV3 module event page.
 Store packages omit the other browser's background declaration. The development
 manifest includes both so the project can be loaded directly in either browser.
 
-Before uploading, confirm 0.2.1 is greater than the latest uploaded version in both
+Before uploading, confirm 0.2.0 is greater than the latest uploaded version in both
 store dashboards. Keep the existing Chrome item and Firefox extension ID; do not
 create replacement listings. This repository does not authenticate to or publish
 to either store during build. Check that current screenshots match the two engine
 choices, and use PRIVACY.md as the basis for the hosted privacy-policy URL.
-[marketing/STORE_LISTING2.md](marketing/STORE_LISTING2.md) contains prepared
-listing/privacy copy. It has not been submitted to either store. Update the
-published description and privacy declarations together;
+STORE_LISTING.md contains prepared listing/privacy copy. It has not been submitted
+to either store. Update the published description and privacy declarations together;
 do not retain the unsupported numerical-agreement claims.
 
-## Distribution review
+## Outstanding rights review
 
-Exact offline reproduction of the current numerical calibration is documented in
-tools/calibration/PUBLIC_METHOD.md. This establishes reproducibility from bundled
-evidence, not platform permission, independently validated move labels or rights
-to third-party assets. ATTRIBUTIONS.md records current asset provenance and limitations. Platform integration and applicable terms still need review;
-a generated ZIP is not legal clearance. The Chrome store download checked on
-October 3, 2026 was version 0.2.0. Version 0.2.1 is prepared for the maintainer's
-store upload; the Firefox public listing was unavailable at that check.
+These packaging/documentation improvements do not clear the unresolved calibration,
+artwork, sound, interface, or platform-integration findings. ATTRIBUTIONS.md records
+known asset-provenance gaps. Resolve those issues before treating a generated ZIP
+as cleared for publication. Existing store version 0.1.1 still needs its actual
+uploaded package/source mapping established independently.
 
 ## Reviewer notes
 
@@ -95,8 +97,9 @@ Both engine pairs are original release assets from Nathan Rugg's Stockfish.js:
 Exact original asset URLs and SHA-256 values are in engine/checksums.json. The 18
 pair is renamed to stockfish-nnue locally; file contents are unchanged. Networks
 are embedded in WASM. No engine compilation or minification is performed here.
-Stockfish 18 NNUE is the default; 19 Lite is optional. Saved engine preferences
-migrate to supported builds. The engine tooltips disclose the Lite tradeoff.
+Stockfish 18 NNUE is the default; 19 Lite is optional. Full 19, Stockfish 10, and
+asm.js are no longer included. Existing full-19 preferences migrate to Lite;
+legacy preferences migrate to 18. The engine tooltips disclose the Lite tradeoff.
 
 lib/chess.js is derived from `dist/esm/chess.js` in Jeff Hlywa's chess.js **1.0.0**
 official npm package:
@@ -118,8 +121,7 @@ No test account is needed. Open the popup away from a chess site and:
 
 1. Paste `1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 *` into Manual setup and review it.
 2. Verify 18 NNUE is selected by default; switch to 19 Lite and re-analyze.
-3. Verify the popup offers game review only; a position-only PGN is rejected.
-   Review a game and verify alternative moves, engine output, and navigation.
+3. Open Explore board, make a move, and verify engine output and navigation.
 4. On a finished public Chess.com/Lichess game, launch through the popup, keyboard
    shortcut, and in-page review button. A missing content script should produce
    a username prompt or use the saved username, never a TypeError.

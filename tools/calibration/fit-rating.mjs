@@ -1,3 +1,6 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { args, json, save, hash, codeIdentity } from './io.mjs';
 import { mean, correlation } from './core.mjs';
 
 export const featureNames = ['meanLoss', 'rmsLoss', 'majorLossRate', 'topRate'];
@@ -40,3 +43,30 @@ export function metrics(rows, predictions) {
     bias: mean(errors), correlation: correlation(rows.map(r => r.ratingTarget), predictions),
     predictedRange: [Math.min(...predictions), Math.max(...predictions)] };
 }
+async function main() {
+  const o = args({ run: 'calibration-runs/smoke/n20k' });
+  const features = await json(path.join(o.run, 'features.json'));
+  const rows = features.rows.filter(r => r.decisions >= 10 && featureNames.every(f => Number.isFinite(r[f])));
+  // Final test rows are never used, scored or summarized by this exploratory stage.
+  const train = rows.filter(r => r.split === 'train'), validation = rows.filter(r => r.split === 'validation');
+  if (train.length < 8 || validation.length < 4) throw Error('Insufficient training/validation samples even for exploratory fit');
+  const baseline = mean(train.map(r => r.ratingTarget));
+  const candidates = [1, 10, 100].map(lambda => {
+    const model = fit(train, lambda);
+    return { model, validation: metrics(validation, validation.map(r => predict(model, r))) };
+  });
+  candidates.sort((a, b) => a.validation.mae - b.validation.mae);
+  const selected = candidates[0];
+  await save(path.join(o.run, 'rating-exploratory.json'), {
+    status: 'exploratory only; not validated or suitable for production', target: 'recorded Lichess blitz rating level',
+    modelInputsExcludeActualRating: true, oldCalibrationUsedForTraining: false, externalReviewScoresUsed: false,
+    featuresSha256: hash(JSON.stringify(features)), binding: features.binding, trainingSamples: train.length,
+    fittingCode: await codeIdentity(),
+    finalTestEvaluated: false, baseline, baselineValidation: metrics(validation, validation.map(() => baseline)),
+    candidates, selected: selected.model,
+    validationByRatingBand: [0, 1, 2, 3].map(band => { const group = validation.filter(r => Math.min(3, Math.max(0, Math.floor((r.ratingTarget - 800) / 400))) === band);
+      return { band, ...metrics(group, group.map(r => predict(selected.model, r))) }; }),
+    uncertainty: 'Not estimable reliably from this smoke sample; no predictive interval or production artifact exported' });
+  console.log(JSON.stringify({ baselineValidation: metrics(validation, validation.map(() => baseline)), selectedValidation: selected.validation }));
+}
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();

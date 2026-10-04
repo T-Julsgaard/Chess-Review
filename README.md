@@ -15,9 +15,11 @@ rating. No account, no server, no manual PGN copying.
 
 - **One-click review** of any Chess.com or Lichess game — or paste a game URL / raw PGN.
 - **Accuracy estimates** for both players, calculated from local Stockfish analysis using the extension's scoring rules. Scores can differ from other review tools.
-- **Move classifications** from Brilliant to Blunder, with an evaluation graph and best-move arrows.
+- **Move classifications** from Masterstroke to Blunder, with an evaluation graph and best-move arrows.
 - **Estimated rating** — a rough guide to the level each player performed at in the game.
 - **Opening detection** from an offline book, named even for PGNs without headers.
+- **Explore board** from the popup, without loading a game: try legal moves, browse
+  your move list, and see evaluations, opening names, and move ratings.
 - **Rated alternatives** while reviewing a game, using the same classification rules
   as the played moves. Exploring does not change the original game or its accuracy.
 - **Stockfish 18 NNUE is the default**, with **Stockfish 19 Lite** as a compact
@@ -28,46 +30,33 @@ rating. No account, no server, no manual PGN copying.
 
 ## Usage
 
-1. Open a finished game on **Chess.com** or **Lichess**.
+1. Open a game on **Chess.com** or **Lichess**.
 2. Click the extension icon → **Analyze this game**, or press `Ctrl+Shift+Y`.
-3. Stockfish reviews the game in an analysis tab.
+3. The game opens in an analysis tab where Stockfish reviews every position.
 
-You can also paste a game URL or PGN into the popup. If your username cannot be
-detected, enter it once; it is remembered locally. Chess Review is intended for
-review after play.
+For older games you don't have open, paste a game URL or PGN into the popup. Your username is
+detected automatically from the board; if it can't be found, enter it once in the popup and it's
+remembered.
 
-Settings let you choose an engine, rating mode, board, pieces, sounds, coach and
-category-badge appearance. Badge numbers describe move categories; they are
-separate from position evaluation and game accuracy.
+To explore without a game, open the popup and select **Explore board**. Click or
+drag pieces to make legal moves. Use the move list, arrow keys, or Home/End to
+navigate. Making a different move replaces the continuation from that position.
 
-## Scoring and reproducibility
-
-Chess Review is open source and uses local Stockfish analysis with documented
-scoring models. The repository includes the fitting tools, public-data evidence
-and reference results needed to inspect and reproduce the bundled numerical
-models.
-
-With Node.js 24 or later, reproduce the bundled coefficients and reference scores
-offline:
-
-```sh
-node tools/calibration/reproduce-public.mjs
-```
-
-This check replays the included evidence without rerunning engine searches. The
-[methodology](tools/calibration/PUBLIC_METHOD.md) documents the inputs,
-calculations and limitations. Estimated ratings are approximate.
-
-Move categories follow documented classification rules. See the
-[special annotations guide](tools/calibration/BRILLIANT_MOVES.md) for their
-definitions and sources, and the [repository guide](docs/REPOSITORY.md) for the
-supporting files.
+The opening dictionary is bundled offline and has no automatic downloads.
+Stockfish 19 Lite uses a smaller network than full Stockfish 19 and is not equivalent
+in playing strength. The existing accuracy calibration was fitted to Stockfish 18
+NNUE and has not been re-benchmarked for 19 Lite. Both builds use a single thread
+per worker; the Workers setting already distributes positions across multiple workers.
+The redundant Stockfish 10 and asm.js engines have been removed. Their saved
+preferences migrate to 18; existing full-19 preferences migrate to 19 Lite.
 
 ## Install
 
-Install from the Chrome Web Store or Firefox Add-ons using the links above.
-For a local Chrome installation:
+ `Packed`
 
+Goto: https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenkadndbdbigfam?hl=en
+
+ `Unpacked`
 1. Download or clone this repository.
 2. Open `chrome://extensions` and enable **Developer mode** (top-right).
 3. Click **Load unpacked** and select the project folder.

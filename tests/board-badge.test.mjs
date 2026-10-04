@@ -4,7 +4,6 @@ import { app, loadGame } from './helpers/app.mjs';
 
 function review(t) {
   const a = app(t);
-  a.state.settings.badgeTooltip = true;
   loadGame(a, '1. e4 e5');
   a.call('computeDerived');
   a.state.idx = 1;
@@ -49,7 +48,7 @@ test('changing moves and rebuilding the board dismisses the old category label',
   a.call('paintBoard');
   assert.equal(tip.getAttribute('aria-hidden'), 'true');
   pointer(a, doc.querySelector('.sq-badge'), 'pointerenter');
-  assert.equal(tip.textContent, 'Great');
+  assert.equal(tip.textContent, 'Superb');
   a.call('buildBoard');
   assert.equal(tip.classList.contains('show'), false);
 });
@@ -85,7 +84,6 @@ test('keyboard focus shows the label; Escape and blur dismiss it', t => {
 
 test('touch and dragging do not open a hover label, and badge presses still bubble', t => {
   const a = app(t), doc = a.dom.window.document;
-  a.state.settings.badgeTooltip = true;
   const badge = a.call('makeBoardBadge', 'best');
   doc.body.append(badge);
   pointer(a, badge, 'pointerenter', { pointerType: 'touch' });

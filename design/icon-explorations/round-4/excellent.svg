@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Near best move">
+  <circle cx="50" cy="50" r="49" fill="#81b64c"></circle>
+  <path d="M63 31H57C60 24 56 20 50 20S40 24 43 31H31V43C38 40 42 44 42 50S38 60 31 57V69H43C40 62 44 58 50 58S60 62 57 69H69V57C76 60 80 56 80 50S76 40 69 43V39" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M72 24H77V29" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>

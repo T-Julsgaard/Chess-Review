@@ -2,4 +2,3 @@ node_modules/
 web-ext-artifacts/
 *.log
 calibration-runs/
-scratch/

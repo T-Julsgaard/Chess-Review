@@ -20,7 +20,7 @@ Report suspected security vulnerabilities privately as described in
 ## Set up locally
 
 1. Fork the repository and clone your fork.
-2. Install Node.js 24 or newer and npm, then run `npm ci` from the project folder.
+2. Install Node.js 22 or newer and npm, then run `npm ci` from the project folder.
 3. Create a branch for your change.
 4. In Chrome, open `chrome://extensions`, enable **Developer mode**, click
    **Load unpacked**, and select the project folder. No build step is needed.
@@ -30,24 +30,15 @@ Report suspected security vulnerabilities privately as described in
 For Firefox development, run `npm run start:firefox` with Firefox installed.
 The minimum Firefox version is specified in `manifest.json`.
 
-See the [repository guide](docs/REPOSITORY.md) for the purpose of each directory
-and where to keep experiments and generated files.
-
 ## Make and check your change
 
 Follow the surrounding JavaScript, HTML, and CSS style. Keep each pull request
 focused and avoid unrelated formatting or generated files.
 
-Keep temporary investigation reports, diagnostic scripts, sample exports, and
-other one-off work in `scratch/`, which is ignored by Git. Commit the resulting
-fix and lasting regression tests; promote supporting material only when it needs
-to be maintained as part of the project.
-
 Run these checks for code changes:
 
 ```sh
 npm test
-npm run verify:source
 npm run lint
 ```
 
@@ -73,10 +64,3 @@ need an issue first. Documentation-only changes do not need application tests.
 Contributions to the project's own code use its existing [GPL-3.0 license](LICENSE).
 Bundled third-party assets retain their own licenses and attribution requirements.
 Reviews happen as maintainer time allows.
-
-Start from current `main`; port
-reviewed changes from older clones individually instead of merging their entire
-history. The source check runs during packaging and in CI. Changes to the maintained
-model or reproduction tools must include their documented public inputs and pass
-the offline reproduction check. CI also checks reachable history, so a merge
-cannot quietly restore retired material through old parent commits.

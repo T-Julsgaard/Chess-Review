@@ -64,7 +64,7 @@ test('missing evaluations do not invent a rating', t => {
   const v=branch(a);a.call('classifyVariationMoves');assert.equal(v.positions[1].classif,null);
 });
 
-test('terminal detection retains threefold history in variations', t => {
+test('terminal detection retains threefold history in Explore', t => {
   const a=app(t);const S=loadGame(a,'1. Nf3 Nf6 2. Ng1 Ng8 3. Nf3 Nf6 4. Ng1 Ng8');
   assert.equal(S.positions[8].draw,'threefold');
   const v=branch(a);assert.equal(a.call('variationTerminal',v,8).cp,0);
@@ -72,7 +72,7 @@ test('terminal detection retains threefold history in variations', t => {
 });
 
 test('the current variation opening follows the viewed prefix', t => {
-  const a=app(t);loadGame(a,'1. e4 e5');const v=branch(a);
+  const a=app(t);loadGame(a,'1. e4 e5');const v=branch(a);a.state.meta={explore:true};
   a.context.__book={
     [a.call('epdOf',v.positions[1].fen)]:['B00','King pawn'],
     [a.call('epdOf',v.positions[2].fen)]:['C20','Open game'],
@@ -87,88 +87,4 @@ test('original PGN IDs remain stable and distinct', t => {
   assert.equal(new Set(games.map(p=>a.call('simpleHash',p))).size,3);
   // Known ID produced by the released implementation.
   assert.equal(a.call('simpleHash',''),'45h');
-});
-
-function greatScenario(a, color = 'w') {
-  const white = color === 'w';
-  const S = loadGame(a, white ? '1. e4 e5 2. Nf3' : '1. e4 e5',
-    (white ? [0,0,400,400] : [0,-400,-400]).map(cp => ({cp})));
-  const ply = white ? 3 : 2, played = white ? 'g1f3' : 'e7e5', alternative = white ? 'd2d4' : 'c7c5';
-  S.bests[ply - 1] = {bestmove:played,lines:[
-    {score:{cp:400},pv:played,depth:16,bound:'exact',multipv:1},
-    {score:{cp:0},pv:alternative,depth:16,bound:'exact',multipv:2},
-  ]};
-  return {S,ply,played,alternative};
-}
-
-test('Great needs evidence that other replies are outside the Good band, for either side', t => {
-  const a = app(t);
-  for (const color of ['w','b']) {
-    const {S,ply} = greatScenario(a,color);
-    a.call('computeDerived'); assert.equal(S.classif[ply],'great');
-    for (let start = 0; start < ply; start++) {
-      const v = branch(a,start); a.call('classifyVariationMoves');
-      assert.equal(v.positions[ply-start].classif,'great');
-    }
-    S.bests[ply-1].lines[1].score.cp = 390;
-    a.call('computeDerived'); assert.equal(S.classif[ply],'best');
-    S.bests[ply-1].lines.length = 1;
-    a.call('computeDerived'); assert.equal(S.classif[ply],'best');
-  }
-});
-
-test('stale, bounded, duplicated, illegal or metadata-free alternatives cannot certify Great', t => {
-  const a = app(t);
-  const edits = [
-    root => {root.lines[1].depth = 15;},
-    root => {root.lines[1].bound = 'upperbound';},
-    root => {root.lines[0].bound = 'lowerbound';},
-    root => {root.lines[1].pv = root.bestmove;},
-    root => {root.lines[1].pv = 'd2d5';},
-    root => {root.lines[1].multipv = 3;},
-    root => {delete root.lines[0].depth;},
-    root => {root.lines[1].score = {};},
-    root => {root.bestmove = 'b1c3';},
-  ];
-  for (const edit of edits) {
-    const {S,ply} = greatScenario(a); edit(S.bests[ply-1]);
-    a.call('computeDerived'); assert.notEqual(S.classif[ply],'great');
-  }
-  const {S,ply} = greatScenario(a);
-  S.bests[ply].lines = [{multipv:1,bound:'upperbound'}];
-  a.call('computeDerived'); assert.notEqual(S.classif[ply],'great');
-});
-
-test('Great evidence uses the configured loss boundary and does not change evaluation scores', t => {
-  const a = app(t), {S,ply} = greatScenario(a);
-  a.run('CALIB.display = "winpct"');
-  a.call('computeDerived');
-  const scores = JSON.stringify({acc:S.acc,elo:S.accElo,perMove:S.accMove,evals:S.evals});
-  a.run('CALIB.clsWp.inacc = 30');
-  a.call('computeDerived'); assert.equal(S.classif[ply],'best');
-  assert.equal(JSON.stringify({acc:S.acc,elo:S.accElo,perMove:S.accMove,evals:S.evals}),scores);
-  a.run('CALIB.clsWp.inacc = 5');
-  a.call('computeDerived'); assert.equal(S.classif[ply],'great');
-});
-
-test('mate transitions distinguish escaping defeat, delaying a win and reversing the winner', t=>{
-  const a=app(t);
-  const cases=[[-3,3,'excellent'],[-3,-1,'excellent'],[-3,-5,'excellent'],[3,-3,'blunder'],[3,5,'good']];
-  for(const color of ['w','b'])for(const [before,after,label] of cases){
-    const white=color==='w',sign=white?1:-1;
-    const S=loadGame(a,white?'1. e4':'1. e4 e5',
-      (white?[before,after]:[before,before,after]).map(mate=>({mate:mate*sign})));
-    const ply=white?1:2;a.call('computeDerived');assert.equal(S.classif[ply],label);
-    const v=branch(a);a.call('classifyVariationMoves');assert.equal(v.positions[ply].classif,label);
-    if(before>0){S.bests[ply-1].bestmove=white?'e2e4':'e7e5';a.call('computeDerived');assert.equal(S.classif[ply],label);}
-  }
-});
-
-test('failed-punish Miss requires giving back the clear advantage',t=>{
-  const a=app(t);
-  const S=loadGame(a,'1. e4 e5 2. Nf3',[0,0,2000,800].map(cp=>({cp})));
-  a.call('computeDerived');assert.notEqual(S.classif[3],'miss');
-  loadGame(a,'1. e4 e5 2. Nf3',[0,0,500,0].map(cp=>({cp})));
-  a.call('computeDerived');assert.equal(S.classif[3],'miss');
-  const v=branch(a,1);a.call('classifyVariationMoves');assert.equal(v.positions[2].classif,'miss');
 });

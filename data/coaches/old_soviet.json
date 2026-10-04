@@ -6,22 +6,22 @@
   "uses_emoji": false,
   "move_quality": {
     "brilliant": [
-      "{move}. Hm. This is brilliant move. I have seen three in my life. Now four.",
-      "Brilliant, the machine says. For once, machine and old man agree. Do not let it become a habit. The agreeing, I mean. The moves — yes, continue.",
+      "{move}. Hm. This is a masterstroke. I have seen three in my life. Now four.",
+      "Masterstroke, the machine says. For once, machine and old man agree. Do not let it become a habit. The agreeing, I mean. The moves — yes, continue.",
       "{move}... I sat forward in my chair. The chair complained. So you know this was real move.",
       "This is move my teacher Dmitri Pavlovich would have nodded at. He nodded twice in eleven years. Understand what I am telling you.",
-      "{move} is brilliant. In old training hall, we would have stopped the clocks to look at this. Even Volodya, and Volodya stopped for nothing.",
-      "A brilliancy. Good. But brilliance is dessert. Positional understanding is bread. Eat bread first, always.",
+      "{move} is a masterstroke. In old training hall, we would have stopped the clocks to look at this. Even Volodya, and Volodya stopped for nothing.",
+      "A masterstroke. Good. But brilliance is dessert. Positional understanding is bread. Eat bread first, always.",
       "{move}. So. The telephone generation produces a real move. I will say nothing more or I will become emotional, and I did not bring my second handkerchief.",
-      "Brilliant move. Write it down with pencil. Paper remembers. Telephones forget."
+      "Masterstroke. Write it down with pencil. Paper remembers. Telephones forget."
     ],
     "great": [
       "{move}. The only move that holds. You found it. This is not luck — luck does not visit positions like this one.",
-      "Great move. One path, narrow as the corridor in my old apartment block. You walked it. Acceptable.",
+      "Superb move. One path, narrow as the corridor in my old apartment block. You walked it. Acceptable.",
       "{move} — only move. In my day, finding only-moves was the entrance exam. You would have been admitted. Barely.",
       "The position demanded one answer. You gave it. This is called calculation. Many people your age believe it is an app.",
       "{move}. The single move that does not lose. I checked twice. The machine checked once. Together we are sure.",
-      "Great. The narrow road. Dmitri Pavlovich always said: the position whispers, the calculation listens. Today, you listened.",
+      "Superb. The narrow road. Dmitri Pavlovich always said: the position whispers, the calculation listens. Today, you listened.",
       "{move} holds everything. Like the old buildings. Ugly, perhaps. Standing forever."
     ],
     "best": [
@@ -34,57 +34,57 @@
       "{move} is the best move. Acceptable. From me this word is a parade. Do not expect another parade soon."
     ],
     "excellent": [
-      "{move}. Excellent, says the machine. I say: is not terrible. We mean the same thing.",
-      "Excellent move. The plan continues. A plan that continues is worth three brilliancies that do not.",
+      "{move}. Near best, says the machine. I say: is not terrible. We mean the same thing.",
+      "Near best move. The plan continues. A plan that continues is worth three masterstrokes that do not.",
       "{move} — fine move. Solid like the bread we stood in line for. The line built character. So does this move.",
-      "Excellent. You improved your piece and weakened nothing. This is chess. The rest is decoration.",
+      "Near best. You improved your piece and weakened nothing. This is chess. The rest is decoration.",
       "{move}. Good work. In old school we said: the position is a farm. Today you farmed honestly.",
-      "Excellent move. The evaluation did not move. You understand? Boring is a compliment. Boring wins tournaments.",
+      "Near best move. The evaluation did not move. You understand? Boring is a compliment. Boring wins tournaments.",
       "{move}. Hm. Acceptable plus. Yes, I invented a new grade for you. Tell no one."
     ],
     "good": [
-      "{move}. Good. Not best, but good. In life also, this is usually enough.",
-      "A good move. There was better, but you did not embarrass the position. We continue.",
+      "{move}. Decent. Not best, but decent. In life also, this is usually enough.",
+      "A decent move. There was better, but you did not embarrass the position. We continue.",
       "{move} is sound. Like old tractor. Not beautiful. Starts every morning.",
-      "Good move. You asked what opponent wants before moving? If yes — good habit. If no — lucky. Luck runs out. Habits do not.",
+      "Decent move. You asked what opponent wants before moving? If yes — decent habit. If no — lucky. Luck runs out. Habits do not.",
       "{move}. Decent chess. My generation played a thousand such moves before breakfast. Breakfast was small. The moves were not.",
-      "Good. The position remains healthy. Keep it healthy. Doctors are expensive.",
-      "{move}, good move. No drama. Drama is for the television. We did not have television. We had endgames."
+      "Decent. The position remains healthy. Keep it healthy. Doctors are expensive.",
+      "{move}, decent move. No drama. Drama is for the television. We did not have television. We had endgames."
     ],
     "book": [
       "{move}. Still theory. Good. Theory is the savings account of dead grandmasters. Spend it with respect.",
-      "Book move. We memorized these from notebooks copied by hand. You have them free, in the telephone. And still your generation plays the Bongcloud.",
-      "{move} is book. Known for fifty years. Some of those years were mine.",
+      "Theory move. We memorized these from notebooks copied by hand. You have them free, in the telephone. And still your generation plays the Bongcloud.",
+      "{move} is theory. Known for fifty years. Some of those years were mine.",
       "Theory continues. Do not just follow — understand. A parrot can repeat moves. A parrot cannot play the middlegame.",
-      "{move}, still book. The old masters walked this road in worse shoes. Honor them: know why the road turns here.",
-      "Book. In the training hall, we tested each book move ourselves before trusting it. Trust, but verify. This was chess advice first, you know.",
-      "{move} — theory. Fine. The exam begins when the book ends. Prepare now, not then."
+      "{move}, still theory. The old masters walked this road in worse shoes. Honor them: know why the road turns here.",
+      "Theory. In the training hall, we tested each theory move ourselves before trusting it. Trust, but verify. This was chess advice first, you know.",
+      "{move} — theory. Fine. The exam begins when the theory ends. Prepare now, not then."
     ],
     "inaccuracy": [
-      "{move}. Inaccuracy. Small crack in the wall. In Leningrad winters, small cracks became large problems. Fix the habit, not just the wall.",
+      "{move}. Minor misstep. Small crack in the wall. In Leningrad winters, small cracks became large problems. Fix the habit, not just the wall.",
       "Slightly inaccurate. You played the comfortable move. The position asked for the working move. Comfort is how advantages die. Slowly. Politely.",
       "{move} is loose. Not a wound. A loose button. But I have seen men lose coats over loose buttons.",
-      "An inaccuracy. The machine flinches. I do not flinch. But I noted it in the notebook. The notebook forgets nothing.",
+      "A minor misstep. The machine flinches. I do not flinch. But I noted it in the notebook. The notebook forgets nothing.",
       "{move}. Hm. A little soft. Soft moves invite hard answers. This is the oldest arithmetic in chess.",
       "Small error. Your generation calls it 'no big deal.' Three no-big-deals make one big deal. I have watched this happen for sixty years.",
       "{move} drifts. The plan was there, and you walked past it like a man late for a tram. Slow down. The tram waits for no one, but the position does."
     ],
     "mistake": [
-      "{move}. Mistake. Sit straight. Slouching never repaired a position.",
-      "A mistake. You moved fast, yes? I could hear it. Fast hands, slow understanding. Reverse this order.",
-      "{move} is a mistake. In the old school, you would now stand and explain to the room what you missed. The room is me. Begin.",
-      "Mistake. Do not look so wounded. Chess is honest work, and honest work includes honest failure. Now: what did opponent threaten? Answer first, feel later.",
+      "{move}. Major misstep. Sit straight. Slouching never repaired a position.",
+      "A major misstep. You moved fast, yes? I could hear it. Fast hands, slow understanding. Reverse this order.",
+      "{move} is a major misstep. In the old school, you would now stand and explain to the room what you missed. The room is me. Begin.",
+      "Major misstep. Do not look so wounded. Chess is honest work, and honest work includes honest failure. Now: what did opponent threaten? Answer first, feel later.",
       "{move}. This hurts the position. The good news: positions forgive faster than coaches. Show the next three moves they were wrong about you.",
-      "A real mistake. Happens. Even Tal blundered, and Tal was Tal. You are not Tal. So check your moves twice, since genius will not be saving you.",
-      "{move} concedes too much. Write it down. With pencil. The mistakes you write down once, you make twice. The ones you do not write down — twenty times."
+      "A real major misstep. Happens. Even Tal blundered, and Tal was Tal. You are not Tal. So check your moves twice, since genius will not be saving you.",
+      "{move} concedes too much. Write it down. With pencil. The major missteps you write down once, you make twice. The ones you do not write down — twenty times."
     ],
     "miss": [
       "{move}. You missed something. The chance stood there like a man holding flowers, and you walked past to catch the bus.",
-      "A miss. The tactic was on the board. Your eyes were on the telephone of your mind. Look at the BOARD. The board is undefeated.",
+      "A missed chance. The tactic was on the board. Your eyes were on the telephone of your mind. Look at the BOARD. The board is undefeated.",
       "{move} misses the strong continuation. In training hall we had a saying: the combination you do not look for does not exist. You did not look.",
-      "Missed opportunity. Hm. The position offered you a gift. Gifts must be unwrapped by force in this game. Next time, use force.",
+      "Missed chance. Hm. The position offered you a gift. Gifts must be unwrapped by force in this game. Next time, use force.",
       "{move}. There was more. There is often more. The player who assumes 'there is nothing here' retires with exactly that: nothing here.",
-      "A miss. Do not mourn. Train. Tactics fall to the player who checks every check like a customs officer.",
+      "A missed chance. Do not mourn. Train. Tactics fall to the player who checks every check like a customs officer.",
       "{move} lets the moment pass. Moments do not queue twice. This we learned standing in actual queues."
     ],
     "blunder": [
@@ -168,7 +168,7 @@
     "lead_change_equal": [
       "Equal again. Good. Now we find out who can simply play chess, without gifts.",
       "Balance returns. Equal positions are not boring. They are quiet. Quiet is where the strong players live.",
-      "Level. The next mistake writes the story. Arrange to be the reader, not the author.",
+      "Level. The next misstep writes the story. Arrange to be the reader, not the author.",
       "Even again. In equal positions, improve the worst piece and wait. Waiting is a skill. We had decades of practice.",
       "Equality. The machine shrugs. Machines shrug in numbers. Both of you: back to work."
     ],
@@ -275,7 +275,7 @@
       "We reach the endgame. Now precision is not a virtue. It is the entrance fee."
     ],
     "queens_off": [
-      "Queens are traded. Good. Now the truth of the position comes out. Queens are excellent liars.",
+      "Queens are traded. Good. Now the truth of the position comes out. Queens are near best liars.",
       "No queens. The circus leaves town. The farmers remain. I always preferred the farmers.",
       "Queens off. Your attack dreams are cancelled. Your technique appointment is confirmed. Attend it.",
       "The queens leave. Quiet position now. Quiet does not mean safe. The deepest holes are dug slowly."
@@ -288,7 +288,7 @@
     ],
     "streak_good": [
       "{n} accurate moves in a row. So. Discipline exists in your generation. I will inform the others.",
-      "{n} good moves consecutively. This is called form. Protect it: same pace, same checking, no celebrations.",
+      "{n} decent moves consecutively. This is called form. Protect it: same pace, same checking, no celebrations.",
       "A series of {n} correct decisions. Acceptable. Strong chess is a long queue of small correct decisions. You are queuing well.",
       "{n} in a row. Hm. Do not become proud. Pride is the most expensive piece on the board and it is always en prise.",
       "{n} straight. Whatever routine produces this — breakfast, posture, silence — repeat it. Champions are repetition wearing a medal."
@@ -297,7 +297,7 @@
       "{n} weak moves in a row. Stop. Sit straight. Look at the whole board like it is new. It is new. You have not seen it correctly for {n} moves.",
       "{n} errors consecutively. This is not chess anymore. This is mood. Park the mood outside, like boots in winter.",
       "A bad series — {n} moves. The old remedy: one solid, modest move. Then another. The position calms down when you do.",
-      "{n} slips in a row. You are playing the previous mistakes, not the current position. The previous mistakes are gone. The position is here. Greet it.",
+      "{n} slips in a row. You are playing the previous missteps, not the current position. The previous missteps are gone. The position is here. Greet it.",
       "{n} in a row. Tea. Breath. Material count from zero. We rebuild the evaluation like honest workers, brick by brick."
     ],
     "hanging_piece": [
@@ -345,7 +345,7 @@
       "Draw, with teeth. Good game. Study the two moments it could have been more — there are always exactly two."
     ],
     "loss": [
-      "A loss. Sit. Tea. Now listen: the loss is the best teacher you will not have to pay. Find the first mistake, not the last one. The first.",
+      "A loss. Sit. Tea. Now listen: the loss is the best teacher you will not have to pay. Find the first misstep, not the last one. The first.",
       "You lost. The board was honest with you. Be honest back: open the game tonight and look at it without excuses. Excuses are sugar. Sugar rots.",
       "Defeat. In our school, losses were homework, never tragedy. Tragedy is wasting one. Do not waste this one.",
       "A loss. Fine. I lost hundreds. They built me like bricks. You are now one brick taller. Tomorrow, we lay another — preferably a win."
@@ -353,10 +353,10 @@
   },
   "practice": {
     "loading_first": [
-      "We return to your mistakes. Sit. The first position is coming. This is the real training — everything else is stretching.",
+      "We return to your missteps. Sit. The first position is coming. This is the real training — everything else is stretching.",
       "Loading the first error. In the old hall, this exercise had a name: Monday. Welcome to Monday.",
-      "The first position prepares itself. Replaying your own mistakes — this is how players are built. Brick one is arriving.",
-      "One moment. I am choosing your first mistake. There were several candidates. Do not be flattered."
+      "The first position prepares itself. Replaying your own missteps — this is how players are built. Brick one is arriving.",
+      "One moment. I am choosing your first misstep. There were several candidates. Do not be flattered."
     ],
     "prompt_find_better": [
       "Here you played {move}. The grade was {label}. The better move exists. Find it with your eyes, not with hope.",
@@ -366,16 +366,16 @@
       "{move} — {label}. Look again. The right move was always there. Moves do not hide. Players do not look."
     ],
     "correct_continue": [
-      "Correct. You see — the move was always there. Next position. The day is young and the mistakes were many.",
+      "Correct. You see — the move was always there. Next position. The day is young and the missteps were many.",
       "Yes. That is the move. Note how it feels to find it calmly. This feeling is the whole curriculum. Next.",
       "Correct. No applause — but I made the small nod. Witnesses exist. Continue.",
       "Right. The pattern enters the hands now. Next position. Patterns travel in groups."
     ],
     "correct_final": [
-      "Correct, and that was the last one. Every mistake, revisited and repaired. This is honest work. I have no higher category.",
+      "Correct, and that was the last one. Every misstep, revisited and repaired. This is honest work. I have no higher category.",
       "The final position falls. All errors corrected. So. Today you did what most players never do once. Tomorrow, do it again.",
       "Last one — solved. The whole game, cleaned like boots before a parade. Acceptable. Very acceptable.",
-      "Finished. Each mistake faced with open eyes. In the old school this earned you the good chair. Take the good chair."
+      "Finished. Each misstep faced with open eyes. In the old school this earned you the good chair. Take the good chair."
     ],
     "close_try_again": [
       "Close. The idea is right, the order is wrong. In chess, order is everything. Ask what must happen first.",

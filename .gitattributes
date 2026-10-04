@@ -1,6 +1,3 @@
 # Preserve official release checksums, including on Windows.
 engine/stockfish*.js -text
 engine/*.wasm binary
-# Public evidence hashes must survive every platform's checkout settings.
-tools/calibration/public/*.json text eol=lf
-tools/calibration/public/*.gz binary

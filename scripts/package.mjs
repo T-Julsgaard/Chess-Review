@@ -5,10 +5,8 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { cmd } from 'web-ext';
 import './verify-engines.mjs';
-import {verifySource} from './verify-source.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-await verifySource(root);
 const artifactsDir = path.join(root, 'web-ext-artifacts');
 const manifest = JSON.parse(await readFile(path.join(root, 'manifest.json'), 'utf8'));
 const pkg = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
@@ -17,9 +15,9 @@ if (manifest.version !== pkg.version) throw new Error('Package and manifest vers
 // Explicit allowlist: development files, old ZIPs, and node_modules can never ship.
 const files = ['analysis.html', 'analysis.js', 'analyze-flow.js', 'background.js',
   'browser-compat.js', 'chesscom.js', 'content.js', 'content-button.css', 'flags.js', 'gamecache.js',
-  'lichess-content.js', 'lichess.js', 'move-grades.js', 'popup.html', 'popup.js', 'styles.css',
+  'lichess-content.js', 'lichess.js', 'popup.html', 'popup.js', 'styles.css',
   'LICENSE', 'ATTRIBUTIONS.md', 'THIRD_PARTY_NOTICES.md', 'PRIVACY.md', 'README.md', 'RELEASE.md'];
-const directories = ['backgrounds', 'data', 'engine', 'flags', 'fonts', 'icons', 'lib', 'pieces-img', 'sounds'];
+const directories = ['backgrounds', 'data', 'engine', 'flags', 'icons', 'lib', 'pieces-img', 'sounds'];
 // Explicitly retain only the two selectable GPLv2+ piece sets.
 const pieceSets = ['cburnett', 'merida'];
 async function copyInputs(from, to, entries) {
@@ -47,8 +45,8 @@ const releaseDir = await mkdtemp(path.join(artifactsDir, `release-${manifest.ver
 const snapshotDir = path.join(releaseDir, 'source');
 await mkdir(snapshotDir);
 const sourceFiles = [...files, 'manifest.json', 'package.json', 'package-lock.json',
-  'marketing/STORE_LISTING2.md', 'CONTRIBUTING.md', 'SECURITY.md'];
-await copyInputs(root, snapshotDir, [...sourceFiles, ...directories, 'docs', 'scripts', 'tests', 'tools']);
+  'STORE_LISTING.md', 'CONTRIBUTING.md', 'SECURITY.md'];
+await copyInputs(root, snapshotDir, [...sourceFiles, ...directories, 'scripts', 'tests']);
 const sha256 = async file => createHash('sha256').update(await readFile(file)).digest('hex');
 async function fileHashes(dir, base = dir) {
   const hashes = {};

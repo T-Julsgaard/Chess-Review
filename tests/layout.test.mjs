@@ -48,40 +48,6 @@ test('desktop fits laptop windows, then restores the responsive layout when narr
   assert.equal(a.desktop(),true); assert.equal(a.zoom(),.9);
 });
 
-// Reported display resolutions, including 16:9, 16:10, and 1470 × 956.
-// Display resolution is not the page viewport: reserve space for browser chrome.
-const REPORTED_DISPLAYS = [
-  [1920, 1080], [1366, 768], [1536, 864], [1280, 720], [2560, 1440],
-  [1536, 960], [1280, 800], [1470, 956], [1440, 900], [1600, 900],
-];
-
-for (const [width, height] of REPORTED_DISPLAYS) {
-  test(`${width} × ${height} fits automatic and saved layouts with browser chrome`, async t => {
-    for (const chromeHeight of [0, 120, 160]) {
-      for (const mode of ['auto', 'custom']) {
-        const a = layout(t, mode === 'custom' ? 1.25 : .9);
-        a.state.layoutMode = mode;
-        a.call('applyLayoutMode');
-        const viewportHeight = height - chromeHeight;
-        a.viewport(width, viewportHeight);
-        await a.call('initTabZoom');
-        const zoom = a.zoom();
-        const page = a.call('layoutPageSize', a.state.layout);
-        assert.equal(a.desktop(), mode === 'auto');
-        assert.ok(page.pageW * zoom <= width, `${mode}: horizontal overflow`);
-        assert.ok(page.pageH * zoom <= viewportHeight, `${mode}: vertical overflow`);
-        assert.ok(zoom >= .5 && zoom <= 2, `${mode}: readable zoom bounds`);
-        for (let i = 0; i < 2; i++) {
-          await a.call('initTabZoom');
-          await a.call('resetLayout');
-          assert.equal(a.zoom(), zoom, `${mode}: reopen/reset must preserve scale`);
-          assert.equal(a.desktop(), true);
-        }
-      }
-    }
-  });
-}
-
 test('custom layouts keep their own geometry and fitting', async t => {
   const a=layout(t); a.state.layoutMode='custom';
   a.state.layout={board:{x:40,y:0,w:800,h:920},moves:{x:880,y:60,w:320,h:500}};
@@ -113,23 +79,19 @@ test('desktop matches the saved canvas geometry and preserves the gap when accur
   });
   a.context.getComputedStyle = () => ({ rowGap: '7px' });
   const mod = key => a.dom.window.document.querySelector(`[data-mod="${key}"]`).style;
-  const geometry = () => Object.fromEntries(['accuracy', 'engine', 'graph', 'evalbar', 'review', 'moves', 'controls'].map(key => {
+  const geometry = () => Object.fromEntries(['accuracy', 'engine', 'graph', 'evalbar'].map(key => {
     const s = mod(key); return [key, [s.left, s.top, s.width, s.height]];
   }));
   a.state.layoutMode = 'custom'; a.call('applyLayoutMode'); a.call('reflowAccuracy', false);
   const savedCanvas = geometry();
-  assert.deepEqual(savedCanvas.engine, ['1510px', '620px', '294px', '178px']);
+  assert.deepEqual(savedCanvas.engine, ['1512px', '622px', '294px', '176px']);
   assert.deepEqual(savedCanvas.accuracy, ['1510px', '216px', '294px', '390px']);
-  assert.deepEqual(savedCanvas.graph, ['1200px', '620px', '300px', '178px']);
-  assert.deepEqual(savedCanvas.review, ['1200px', '60px', '604px', '136px']);
-  assert.deepEqual(savedCanvas.moves, ['1200px', '216px', '300px', '390px']);
-  assert.deepEqual(savedCanvas.controls, ['1194px', '812px', '310px', '54px']);
   a.state.layoutMode = 'auto'; a.call('applyLayoutMode');
   a.viewport(1920, 920); await a.call('initTabZoom');
   assert.deepEqual(geometry(), savedCanvas);
   for (let i = 0; i < 3; i++) {
     a.state.qbreakExpanded = true; a.call('renderStats');
-    assert.equal(mod('accuracy').height, '506px'); assert.equal(mod('engine').top, '736px');
+    assert.equal(mod('accuracy').height, '506px'); assert.equal(mod('engine').top, '738px');
     a.state.qbreakExpanded = false; a.call('renderStats');
     assert.deepEqual(geometry(), savedCanvas);
   }

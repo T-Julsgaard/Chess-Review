@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Masterstroke">
+  <circle cx="50" cy="50" r="49" fill="#26c2a3"></circle>
+  <path d="M36 25 44 33 52 20 60 33 68 25 64 46H40Z" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"></path>
+  <path d="M22 64 35 53 46 58H57C64 58 65 64 61 67L72 57C79 51 83 57 78 63L65 77C62 80 58 81 53 81H38L27 73Z" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"></path>
+  <path d="M44 66H57" fill="none" stroke="#26c2a3" stroke-width="4" stroke-linecap="round"></path>
+  <path d="M78 20 80 25 85 27 80 29 78 34 76 29 71 27 76 25Z" fill="#fff"></path>
+</svg>

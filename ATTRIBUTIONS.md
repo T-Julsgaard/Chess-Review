@@ -7,11 +7,12 @@ sources and licensing terms; entries marked unresolved are not claims of
 redistribution permission.
 
 ## Community contributions
-- **[aciokie](https://github.com/aciokie)** — Contributor
-- **[neuroflowinfinix](https://github.com/neuroflowinfinix)** — Contributor
-- **[Kristian Julsgaard](https://github.com/Julsgaard)** — Contributor
-- **[Arthur Guedes](https://github.com/arthurhguedes)** — Contributor
-- **[T-Julsgaard](https://github.com/T-Julsgaard)** — Maintainer
+- **[neuroflowinfinix](https://github.com/neuroflowinfinix)** — proposed and implemented
+  coach/commentary layering and explicit move-category labels in
+  [PR #10](https://github.com/T-Julsgaard/Chess-Review/pull/10). These UI changes
+  were adapted here; category labels appear only when special coach replies are enabled.
+- Also recommended removing the obsolete asm.js fallback in that PR. The maintainer
+  implemented the engine cleanup separately; credit is retained for the recommendation.
 
 ## Chess pieces (bundled SVG sets)
 Distributed by Lichess (lila); high-quality vector SVGs.
@@ -22,8 +23,24 @@ Distributed by Lichess (lila); high-quality vector SVGs.
 - Note: GPLv2+ permits redistribution (incl. commercial) provided the licence/source terms
   are met. Noncommercial piece sets are excluded from the current build allowlist.
 
+## Removed artwork — historical provenance record
+- On the maintainer's instruction, Kaneo, Kaneo Midnight, 1Kbyte Gambit, and the
+  five Kadagaden board SVGs were removed from the current checkout on 2026-09-30.
+  They are absent from new browser/source ZIPs and from the current settings UI.
+- **Former source:** Kadagaden, https://github.com/Kadagaden/chess-pieces;
+  received with upstream's CC BY 4.0 attribution. Underlying artwork permissions
+  were not independently established. This record does not retroactively clear them.
+- Existing release archives and Git history are preserved. Historical copies may
+  still contain these assets; current removal does not alter earlier distribution.
+- Remaining bundled pieces are Cburnett and Merida, as credited above.
+- Maestro and Maestro B/W are not included. The maintainer has chosen not to add
+  those noncommercial sets. Licensing reference:
+  https://github.com/lichess-org/lila/blob/master/COPYING.md
+
 ## Board colors
 - Boards use selectable flat-color palettes or custom colors. Honeywood is the default.
+- Platform-theme detection, palette matching, and the compatibility palettes were
+  removed on 2026-09-30. Historical archives and Git history may retain them.
 
 ## Country flags
 - **Files:** `flags/*.svg` (used as player avatars when a country is detected)
@@ -31,10 +48,10 @@ Distributed by Lichess (lila); high-quality vector SVGs.
 - **License:** **CC0 1.0** (public domain) — https://creativecommons.org/publicdomain/zero/1.0/
 - Free for personal, educational, and commercial use. Attribution is **not required**; we credit
   **Kenney / www.kenney.nl** here voluntarily, as the pack's license suggests.
-- The Chess.com country id → flag mapping in `flags.js` was compiled by hand and
+- The Chess.com country id → flag mapping in `flags.js` was compiled by hand (`flag_map.csv`) and
   is original to this project.
 
-## Move sounds
+## Move / board sounds
 - **Files:** `sounds/move-self.mp3`, `sounds/capture.mp3`, `sounds/Check.mp3`,
   `sounds/Castling.mp3`
 - **Source:** Lichess sound set (lila) —
@@ -107,19 +124,18 @@ Distributed by Lichess (lila); high-quality vector SVGs.
 - This reference identifies the verified license text; it does not claim that the
   original adaptation was made from that exact upstream commit.
 
-## Numeric move grades and reference SVGs
+## Move-category badges
 - **Author:** T-Julsgaard, project maintainer.
 - **Files:** `icons/brilliant.svg`, `icons/great.svg`, `icons/book.svg`,
   `icons/best.svg`, `icons/excellent.svg`, `icons/good.svg`, `icons/inaccuracy.svg`,
   `icons/mistake.svg`, `icons/miss.svg`, and `icons/blunder.svg`.
 - **Source:** maintainer-created badge artwork. The maintainer confirmed authorship
   on 2026-09-30; this records that declaration, not independent verification of
-  every creation input.
-- **Current design:** move grades display numbers in coloured circles, rendered
-  per move by `move-grades.js`. Book moves use a book symbol without a numeric score.
-  The SVG files above are reference snapshots of this design, checked against the
-  shared renderer by `tests/move-grades.test.mjs`; they are not loaded by the review UI.
+  every creation input. The redesigned symbols retain the previous circle colours.
 - **License:** GNU GPL v3.0, under the project's [LICENSE](LICENSE).
+- **Design record:** `design/icon-explorations/README.md`, `selection.json`, and
+  preserved design iterations identify the selected drawings. Original snapshots
+  are historical references, not the active badge set.
 
 ## App logo / icon
 - **Files:** `icons/icon16.png`, `icons/icon48.png`, `icons/icon128.png`, `icons/icon.png`
@@ -150,31 +166,8 @@ Distributed by Lichess (lila); high-quality vector SVGs.
 - **License:** GNU GPL v3.0, under the project's [LICENSE](LICENSE).
 - **Files:**
 - `sounds/fx/chess_sound_01.wav` through `sounds/fx/chess_sound_09.wav`.
-- `backgrounds/bg-slate.webp`.
+- `backgrounds/bg-slate.webp` and `backgrounds/bg-ember.webp`.
 - Animated coach artwork and rigs in `data/coaches-anim/rigs/*.html` and `*.js`.
 
 These original assets are separate from the four Lichess move / board MP3 recordings
 listed above. Retain original recordings/design files as supporting provenance.
-## Badge number fonts
-
-The extension bundles unmodified fonts from the Google Fonts repository under
-the SIL Open Font License 1.1. They permit use and redistribution, including
-commercial use. Fonts load locally; selecting one sends no network request.
-Each font's copyright notice and full license accompany it in `fonts/`:
-
-- [Inter](https://github.com/google/fonts/tree/main/ofl/inter) — `fonts/inter-OFL.txt`
-- [Manrope](https://github.com/google/fonts/tree/main/ofl/manrope) — `fonts/manrope-OFL.txt`
-- [Sora](https://github.com/google/fonts/tree/main/ofl/sora) — `fonts/sora-OFL.txt`
-- [Space Grotesk](https://github.com/google/fonts/tree/main/ofl/spacegrotesk) — `fonts/spacegrotesk-OFL.txt`
-- [Rajdhani](https://github.com/google/fonts/tree/main/ofl/rajdhani) — `fonts/rajdhani-OFL.txt`
-- [Space Mono](https://github.com/google/fonts/tree/main/ofl/spacemono) — `fonts/spacemono-OFL.txt`
-- [Lato](https://github.com/google/fonts/tree/main/ofl/lato) — `fonts/lato-OFL.txt`
-- [Nunito](https://github.com/google/fonts/tree/main/ofl/nunito) — `fonts/nunito-OFL.txt`
-- [Quicksand](https://github.com/google/fonts/tree/main/ofl/quicksand) — `fonts/quicksand-OFL.txt`
-- [Oswald](https://github.com/google/fonts/tree/main/ofl/oswald) — `fonts/oswald-OFL.txt`
-- [Barlow Condensed](https://github.com/google/fonts/tree/main/ofl/barlowcondensed) — `fonts/barlowcondensed-OFL.txt`
-- [Fira Sans](https://github.com/google/fonts/tree/main/ofl/firasans) — `fonts/firasans-OFL.txt`
-- [Fira Mono](https://github.com/google/fonts/tree/main/ofl/firamono) — `fonts/firamono-OFL.txt`
-- [Lora](https://github.com/google/fonts/tree/main/ofl/lora) — `fonts/lora-OFL.txt`
-- [Bitter](https://github.com/google/fonts/tree/main/ofl/bitter) — `fonts/bitter-OFL.txt`
-- [Cabin](https://github.com/google/fonts/tree/main/ofl/cabin) — `fonts/cabin-OFL.txt`
