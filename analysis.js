@@ -713,14 +713,18 @@ function parseHeaders(pgn) {
   return h;
 }
 function parseClocks(pgn) {
-  const out = [null]; const re = /\{\[%clk\s+([\d:.]+)\]\}/g; let m;
-  while ((m = re.exec(pgn))) {
+  const chess = new Chess(); chess.loadPgn(pgn);
+  const comments = new Map(chess.getComments().map(({ fen, comment }) => [fen, comment]));
+  // Clock tags are optional. Match comments to their actual mainline positions
+  // rather than shifting every later clock when one move has no tag.
+  return [null, ...chess.history({ verbose: true }).map(move => {
+    const m = (comments.get(move.after) || "").match(/\[%clk\s+([\d:.]+)\]/);
+    if (!m) return null;
     let t = m[1].split(".")[0];
     const p = t.split(":").map(Number);
     if (p.length === 3) t = `${p[0] * 60 + p[1]}:${String(p[2]).padStart(2, "0")}`;
-    out.push(t);
-  }
-  return out;
+    return t;
+  })];
 }
 function buildPositions(pgn) {
   const c = new Chess(); c.loadPgn(pgn);
