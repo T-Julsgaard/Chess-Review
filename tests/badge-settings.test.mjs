@@ -87,7 +87,7 @@ test('hover setting automatically shows the current move and immediately dismiss
   assert.equal(doc.querySelector('.qb').hasAttribute('title'), false);
 });
 
-test('Visual exposes Category badges with previews and an independent reset', async t => {
+test('Visual exposes Category badges with previews and hover labels off by default', t => {
   const a = review(t), doc = a.dom.window.document; a.call('toggleSettings');
   assert.equal(doc.querySelector('.set-subtabs'), null);
   [...doc.querySelectorAll('.set-sect-head')].find(b => b.textContent === 'Category badges').click();
@@ -95,17 +95,9 @@ test('Visual exposes Category badges with previews and an independent reset', as
   assert.equal(doc.querySelectorAll('.badge-font-option').length, Object.keys(BADGE_FONTS).length);
   assert.equal(doc.querySelectorAll('.badge-preview-item').length, 5);
   assert.doesNotMatch(doc.querySelector('.badge-settings').textContent, /Equal number size/);
-  a.state.settings.badgeFont = 'sora';
-  a.state.settings.badgeTooltip = true;
-  a.state.settings.accent = 'custom';
-  a.call('renderSettings');
-  doc.querySelector('.badge-settings .set-reset').click();
-  // The reset saves before applying the visual refresh.
-  await Promise.resolve(); await Promise.resolve();
+  assert.equal(doc.querySelector('.badge-settings .set-reset'), null);
   assert.equal(a.state.settings.badgeFont, 'spacemono');
   assert.equal(a.state.settings.badgeTooltip, false);
-  assert.equal(a.state.settings.accent, 'custom');
-  assert.equal(doc.querySelector('.sq-badge text').textContent, '2.0');
 });
 
 test('accuracy category explainers work with hover labels off and after renaming', t => {

@@ -236,9 +236,9 @@ const DEFAULT_SETTINGS = {
   // App background: "color" (a tone picked with the HSL sliders), a bundled preset (slate / olive
   // = "Dark", a fixed near-black tone), or "custom" (uploaded). bgFit is "cover" (stretched) or "tile" (repeated
   // at bgTile size). bgCustom holds the uploaded data URL. bgHue/Sat/Light define the "color" tone.
-  // Default = a near-black neutral colour tone (HSL 0/0/11).
+  // Default = a near-black neutral colour tone (HSL 0/0/10).
   bg: "color", bgFit: "tile", bgTile: "large", bgCustom: null,
-  bgHue: 0, bgSat: 0, bgLight: 11,
+  bgHue: 0, bgSat: 0, bgLight: 10,
   // Commentary coach (data/coaches/<id>.json) — drives the animated avatar that's shown.
   // coachPlain toggles only the reply VOICE: false = the coach's special phrasing,
   // true = neutral "plain" commentary (the coach still appears and reacts on the board).
@@ -358,6 +358,7 @@ const ICONS = {
   info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.6" r="0.4" fill="currentColor"/></svg>`,
   feedback: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/><path d="M8 10h8M8 14h5"/></svg>`,
   close: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`,
+  palette: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18h1a2 2 0 0 0 1.6-3.2 1.8 1.8 0 0 1 1.4-2.9h1a4 4 0 0 0 4-4C21 6.5 17 3 12 3Z"/><circle cx="7.5" cy="10" r=".8"/><circle cx="10" cy="6.8" r=".8"/><circle cx="14" cy="6.8" r=".8"/><circle cx="17" cy="10" r=".8"/></svg>`,
 };
 
 /* ---------------- DOM helper ---------------- */
@@ -3874,11 +3875,11 @@ function section(title, ...children) {
   const body = el("div", { class: "set-sect-body" }, ...kids);
   return el("div", { class: "set-section" + (open ? " open" : "") }, head, body);
 }
-function seg(label, key, options, info) {
+function seg(label, key, options, info, fmt = (value) => value) {
   return el("div", { class: "set-row" },
     setLabel(label, info),
     el("div", { class: "set-seg" },
-      ...options.map((o) => el("button", { class: S.settings[key] === o ? "on" : "", onclick: () => setSetting(key, o) }, o))),
+      ...options.map((o) => el("button", { class: S.settings[key] === o ? "on" : "", onclick: () => setSetting(key, o) }, fmt(o)))),
   );
 }
 // Generic slider. opts: { fmt(v)→text, onChange(v) }. Updates + saves live
@@ -3914,6 +3915,37 @@ function colorChips(label, key, entries) {
       ...entries.map((e) => { const chip = el("button", { class: "set-chip" + (S.settings[key] === e.value ? " on" : ""), title: e.title || e.value, onclick: e.onClick || (() => setSetting(key, e.value)) }); e.render(chip); return chip; })),
   );
 }
+// Custom colors use a framed swatch and a visible label instead of an edit mark over the color.
+function colorPickerChip(chip, colors) {
+  chip.classList.add("chip-custom");
+  chip.setAttribute("aria-label", chip.title);
+  chip.setAttribute("aria-haspopup", "dialog");
+  chip.append(el("span", { class: "chip-swatch", "aria-hidden": "true" }),
+    icon("palette"), el("span", {}, "Custom"));
+  paintColorPickerChip(chip, colors);
+}
+function paintColorPickerChip(chip, colors) {
+  const swatch = chip.querySelector(".chip-swatch");
+  if (!swatch) return;
+  swatch.style.background = colors[0];
+  swatch.replaceChildren(...(colors.length > 1 ? [el("span", { class: "half r", style: { background: colors[1] } })] : []));
+}
+let loadingPreviewActive = false;
+function loadingTest() {
+  const preview = el("span", { class: "set-loader-preview", "aria-hidden": "true" });
+  const button = el("button", { class: "set-test", type: "button", onclick: () => {
+    loadingPreviewActive = !loadingPreviewActive;
+    paint();
+  } });
+  const paint = () => {
+    button.textContent = loadingPreviewActive ? "Stop" : "Test animation";
+    button.setAttribute("aria-pressed", String(loadingPreviewActive));
+    preview.hidden = !loadingPreviewActive;
+    preview.replaceChildren(...(loadingPreviewActive ? [loaderNode("", "var(--accent)")] : []));
+  };
+  paint();
+  return el("div", { class: "set-loader-test" }, button, preview);
+}
 let _accentPickCleanup = null;
 function openAccentColorPicker(anchor) {
   if (_accentPickCleanup) _accentPickCleanup();
@@ -3921,16 +3953,16 @@ function openAccentColorPicker(anchor) {
   applySettings();
   anchor.parentElement.querySelectorAll(".set-chip").forEach((chip) => chip.classList.toggle("on", chip === anchor));
   const picker = buildColorPicker(S.settings.accentCustom || DEFAULT_SETTINGS.accentCustom,
-    (hex) => { S.settings.accentCustom = hex; anchor.style.background = hex; applySettings(); },
-    (hex) => { S.settings.accentCustom = hex; anchor.style.background = hex;
+    (hex) => { S.settings.accentCustom = hex; paintColorPickerChip(anchor, [hex]); applySettings(); },
+    (hex) => { S.settings.accentCustom = hex; paintColorPickerChip(anchor, [hex]);
       browserAPI.storage.local.set({ settings: S.settings }); },
   );
-  const pop = el("div", { class: "board-cpick" },
+  const pop = el("div", { class: "board-cpick", role: "dialog", "aria-label": "Custom accent color" },
     el("div", { class: "cpick-title" }, "Custom accent"), picker.el);
   document.body.append(pop);
   const r = anchor.getBoundingClientRect(), pr = pop.getBoundingClientRect();
-  pop.style.left = Math.max(8, Math.min(r.left, innerWidth - pr.width - 8)) + "px";
-  pop.style.top = Math.max(8, r.bottom + pr.height + 6 > innerHeight ? r.top - pr.height - 6 : r.bottom + 6) + "px";
+  pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - pr.width - 8)) + "px";
+  pop.style.top = Math.max(8, r.bottom + pr.height + 6 > window.innerHeight ? r.top - pr.height - 6 : r.bottom + 6) + "px";
   const onDown = (e) => { if (!pop.contains(e.target)) close(); };
   const onKey = (e) => { if (e.key === "Escape") close(); };
   const close = () => {
@@ -4037,7 +4069,7 @@ function openArrowColorPicker(anchor) {
   closeArrowColorPicker();
   const update = (hex) => {
     S.settings.bestArrowColor = hex;
-    anchor.style.background = hex;
+    paintColorPickerChip(anchor, [hex]);
     refreshArrows();
   };
   const save = () => browserAPI.storage.local.set({ settings: S.settings });
@@ -4071,11 +4103,16 @@ let _boardPickCleanup = null;
 function closeBoardColorPicker() { if (_boardPickCleanup) { _boardPickCleanup(); _boardPickCleanup = null; } }
 function openBoardColorPicker(anchor) {
   closeBoardColorPicker();
-  setSetting("boardTheme", "custom"); // select custom so these colours are shown on the board now
+  // Select custom without replacing the button that anchors the open picker.
+  S.settings.boardTheme = "custom";
+  applySettings();
+  browserAPI.storage.local.set({ settings: S.settings });
+  anchor.parentElement.querySelectorAll(".set-chip").forEach((chip) => chip.classList.toggle("on", chip === anchor));
   let target = "boardCustomLight"; // which square colour is being edited
   const swL = el("button", { class: "cpick-target on" }), swD = el("button", { class: "cpick-target" });
   const paint = () => {
     const [lt, dk] = customBoardColors();
+    paintColorPickerChip(anchor, [lt, dk]);
     swL.replaceChildren(el("span", { class: "cpick-tsw", style: { background: lt } }), el("span", {}, "Light"));
     swD.replaceChildren(el("span", { class: "cpick-tsw", style: { background: dk } }), el("span", {}, "Dark"));
   };
@@ -4091,7 +4128,7 @@ function openBoardColorPicker(anchor) {
   swL.addEventListener("click", () => setActive("boardCustomLight", swL));
   swD.addEventListener("click", () => setActive("boardCustomDark", swD));
   paint();
-  const pop = el("div", { class: "board-cpick" },
+  const pop = el("div", { class: "board-cpick", role: "dialog", "aria-label": "Custom board colors" },
     el("div", { class: "cpick-title" }, "Custom board"),
     el("div", { class: "cpick-targets" }, swL, swD),
     picker.el,
@@ -4200,6 +4237,7 @@ function resetBackgroundSettings() {
   applyBackground(); renderSettings();
 }
 async function resetVisualSettings() {
+  loadingPreviewActive = false;
   closeArrowColorPicker();
   if (_accentPickCleanup) _accentPickCleanup();
   closeBoardColorPicker();
@@ -4216,7 +4254,7 @@ async function resetVisualSettings() {
 // Controls for the "Background" section: preset/custom picker, fit mode, tile size, upload button.
 function bgControls() {
   const swatch = (c, css) => { c.style.background = css; c.style.backgroundSize = "cover"; c.style.backgroundPosition = "center"; };
-  const h = S.settings.bgHue ?? 45, s = S.settings.bgSat ?? 14, l = S.settings.bgLight ?? 7;
+  const h = S.settings.bgHue ?? DEFAULT_SETTINGS.bgHue, s = S.settings.bgSat ?? DEFAULT_SETTINGS.bgSat, l = S.settings.bgLight ?? DEFAULT_SETTINGS.bgLight;
   const colorCss = `radial-gradient(120% 80% at 50% -10%, hsl(${h} ${s}% ${Math.min(100, l + 12)}%), hsl(${h} ${s}% ${l}%) 60%)`;
   const isColor = S.settings.bg === "color";
   const entries = [
@@ -4251,24 +4289,18 @@ function visualSettings() {
     const [lt, dk] = customBoardColors();
     boardEntries.unshift({
       value: "custom",
-      title: "Custom colours — click to pick",
+      title: "Choose custom board colors",
       onClick: (e) => openBoardColorPicker(e.currentTarget),
       render: (chip) => {
-        chip.classList.add("chip-custom");
-        chip.append(
-          el("span", { class: "half l", style: { background: lt } }),
-          el("span", { class: "half r", style: { background: dk } }),
-          el("span", { class: "chip-edit" }, "✎"),
-        );
+        colorPickerChip(chip, [lt, dk]);
       },
     });
   }
   const accentEntries = Object.keys(ACCENTS).map((hex) => ({
     value: hex, render: (chip) => { chip.style.background = "transparent"; chip.append(el("span", { class: "set-accent", style: { background: hex } })); },
   }));
-  accentEntries.push({ value: "custom", title: "Custom accent — click to pick", onClick: (e) => openAccentColorPicker(e.currentTarget),
-    render: (chip) => { chip.classList.add("chip-custom"); chip.style.background = S.settings.accentCustom;
-      chip.append(el("span", { class: "chip-edit" }, "✎")); } });
+  accentEntries.unshift({ value: "custom", title: "Choose custom accent color", onClick: (e) => openAccentColorPicker(e.currentTarget),
+    render: (chip) => colorPickerChip(chip, [S.settings.accentCustom]) });
   return el("div", {},
     section("Theme",
       colorChips("Accent", "accent", accentEntries),
@@ -4285,12 +4317,10 @@ function visualSettings() {
     section("Best-move arrow",
       colorChips("Arrow color", "bestArrowColor", [{
         value: S.settings.bestArrowColor || ARROW_COLOR,
-        title: "Arrow color — click to pick",
+        title: "Choose arrow color",
         onClick: (e) => openArrowColorPicker(e.currentTarget),
         render: (chip) => {
-          chip.classList.add("chip-custom");
-          chip.style.background = S.settings.bestArrowColor || ARROW_COLOR;
-          chip.append(el("span", { class: "chip-edit" }, "✎"));
+          colorPickerChip(chip, [S.settings.bestArrowColor || ARROW_COLOR]);
         },
       }]),
       toggleRow("Show arrow", "bestArrow"),
@@ -4301,7 +4331,8 @@ function visualSettings() {
       el("button", { class: "set-reset", onclick: resetArrowSettings }, "Reset to default"),
     ),
     section("Loading",
-      seg("Animation", "loaderStyle", ["dots", "bounce", "spinner", "wave"]),
+      seg("Animation", "loaderStyle", ["wave", "dots", "bounce", "spinner"]),
+      loadingTest(),
     ),
     section("Move animation",
       toggleRow("Animation", "moveAnim"),
@@ -4309,7 +4340,7 @@ function visualSettings() {
     ),
     section("Layout",
       seg("Eval", "evalView", ["both", "bar", "graph"]),
-      seg("Bar", "barStyle", ["classic", "gradient", "mono", "accent"]),
+      seg("Bar", "barStyle", ["gradient", "classic", "mono", "accent"], null, (value) => value === "classic" ? "Solid" : value),
       seg("Graph", "graphStyle", ["area", "line", "color", "minimal"]),
       el("button", { class: "set-reset reorg-toggle-btn", onclick: toggleReorganize }, S.reorganize ? "Done reorganizing" : "Reorganize panels"),
       el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Reorganize lets you drag and resize the panels, and your arrangement is saved. Reset layout goes back to the automatic layout that fits any window.")),
@@ -4353,14 +4384,18 @@ function visualSettings() {
     el("button", { class: "set-reset", onclick: resetVisualSettings }, "Reset to default"),
   );
 }
-// Coach personality dropdown — only personalities that have a built animated character. Uses the
+// Coach dropdown — only coaches that have a built animated character. Uses the
 // library's custom dropdown (ddField) rather than a native <select> so the option hover matches the
 // app theme instead of the OS's blue highlight.
 function coachPicker() {
   const cur = S.settings.coach || "";
   const opts = COACH_LIST.filter(([id]) => COACH_RIGS[id]);
-  return el("div", { class: "set-row" }, el("span", { class: "set-lbl" }, "Personality"),
-    ddField(cur, opts, (v) => setCoach(v)));
+  const portrait = (id, label) => el("span", { class: "coach-choice" },
+    el("img", { class: "coach-thumbnail", src: browserAPI.runtime.getURL("data/coaches-anim/thumbnails/" + id + ".svg"), alt: "", width: 28, height: 32 }),
+    el("span", {}, label));
+  const dropdown = ddField(cur, opts, (v) => setCoach(v), portrait);
+  dropdown.classList.add("coach-dropdown");
+  return el("div", { class: "set-row" }, el("span", { class: "set-lbl" }, "Coach"), dropdown);
 }
 // Controls for one board event: a sound dropdown (the 9 base sounds + the original cue) plus pitch and
 // speed knobs. Everything previews on change. The dropdown re-renders the panel so its label updates;
@@ -4455,13 +4490,11 @@ function badgeSettings() {
     el("div", { class: "set-lbl" }, "Number font"), fonts,
     el("p", { class: "set-note" }, "Free, open-source fonts, bundled for offline use."),
     toggleRow("Hover labels", "badgeTooltip"),
-    el("p", { class: "set-note" }, "Show the category automatically for two seconds after each move, with a small pop animation."),
-    el("button", { class: "set-reset", onclick: async () => {
-      await resetSettingKeys(BADGE_SETTING_KEYS); applySettings(); refreshBadgeAppearance(); renderSettings();
-    } }, "Reset badges to default"));
+    el("p", { class: "set-note" }, "Show the category automatically for two seconds after each move, with a small pop animation."));
 }
 function renderSettings() {
   closeArrowColorPicker();
+  if (UI.settings.hidden || S.settingsTab !== "visual" || !S.setOpen["Loading"]) loadingPreviewActive = false;
   const scroll = UI.settings.scrollTop; // keep scroll position when a setting changes
   const fontScroll = UI.settings.querySelector(".badge-font-options")?.scrollTop;
   const focusedFont = UI.settings.contains(document.activeElement) && document.activeElement.closest(".badge-font-option")?.getAttribute("data-font");
@@ -4487,6 +4520,7 @@ function positionSettings() {
 function toggleSettings() {
   closeArrowColorPicker();
   UI.settings.hidden = !UI.settings.hidden;
+  if (UI.settings.hidden) loadingPreviewActive = false;
   if (!UI.settings.hidden) renderSettings();
 }
 
@@ -4725,7 +4759,7 @@ function applyBackground() {
   const app = document.querySelector(".app");
   if (!app) return;
   if (S.settings.bg === "color") {
-    const h = S.settings.bgHue ?? 45, s = S.settings.bgSat ?? 14, l = S.settings.bgLight ?? 7;
+    const h = S.settings.bgHue ?? DEFAULT_SETTINGS.bgHue, s = S.settings.bgSat ?? DEFAULT_SETTINGS.bgSat, l = S.settings.bgLight ?? DEFAULT_SETTINGS.bgLight;
     // base tone at the bottom, ~5% lighter toward the top edge for a subtle sense of depth
     app.style.backgroundImage = `radial-gradient(120% 80% at 50% -10%, hsl(${h} ${s}% ${Math.min(100, l + 5)}%), hsl(${h} ${s}% ${l}%) 60%)`;
     app.style.backgroundSize = app.style.backgroundRepeat = app.style.backgroundPosition = "";
@@ -5160,18 +5194,18 @@ function libRecords() {
 // [[value, label], …]. Clicking outside closes it (handled by a global listener in buildUI).
 // ddField is the standalone control (button + menu); libDropdown wraps it with an inline label for
 // the library rail, and the settings panel reuses ddField on its own so its menus match (no blue).
-function ddField(value, options, onChange) {
-  const current = (options.find(([v]) => v === value) || options[0] || ["", "—"])[1];
+function ddField(value, options, onChange, renderOption = (_value, label) => label) {
+  const [currentValue, currentLabel] = options.find(([v]) => v === value) || options[0] || ["", "—"];
   const menu = el("div", { class: "lib-dd-menu" },
     ...options.map(([v, t]) => el("button", { class: "lib-dd-opt" + (v === value ? " sel" : ""),
-      onclick: (e) => { e.stopPropagation(); onChange(v); } }, t)));
+      onclick: (e) => { e.stopPropagation(); onChange(v); } }, renderOption(v, t))));
   const field = el("div", { class: "lib-dd-field" },
     el("button", { class: "lib-dd-btn", onclick: (e) => {
       e.stopPropagation();
       const willOpen = !field.classList.contains("open");
       document.querySelectorAll(".lib-dd-field.open").forEach((d) => d.classList.remove("open"));
       field.classList.toggle("open", willOpen);
-    } }, el("span", { class: "lib-dd-cur" }, current), el("span", { class: "lib-dd-chev", html: ICONS.chevron })),
+    } }, el("span", { class: "lib-dd-cur" }, renderOption(currentValue, currentLabel)), el("span", { class: "lib-dd-chev", html: ICONS.chevron })),
     menu);
   return field;
 }
