@@ -138,6 +138,19 @@ button { font-family: inherit; cursor: pointer; }
 }
 .icon-btn:hover { color: var(--ink); border-color: color-mix(in oklab, var(--accent) 50%, var(--line)); }
 .icon-btn svg { width: 17px; height: 17px; }
+.feedback-topbar { text-decoration: none; flex-shrink: 0; }
+.feedback-floating {
+  position: fixed; right: max(18px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom)); z-index: 30;
+  display: flex; align-items: center; gap: 8px; padding: 10px 15px;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: var(--panel-2); color: var(--ink-2); box-shadow: var(--shadow);
+  font-size: 12px; font-weight: 700; text-decoration: none; transition: .15s;
+}
+.feedback-floating svg { width: 17px; height: 17px; }
+.feedback-floating:hover { color: var(--ink); border-color: var(--accent); }
+.feedback-topbar:focus-visible, .feedback-floating:focus-visible, .credits-feedback:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 3px;
+}
 
 .seg {
   display: flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden;

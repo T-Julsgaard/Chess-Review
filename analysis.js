@@ -45,6 +45,7 @@ async function loadCalibration() {
 
 /* ---------------- Configuration ---------------- */
 const GLYPH = { K: "♚", Q: "♛", R: "♜", B: "♝", N: "♞", P: "♟" };  // used for the move-list piece icons
+const FEEDBACK_URL = "https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenkadndbdbigfam";
 
 const BOARD_THEMES = {
   green:   ["#e9edcc", "#6f9c54"],
@@ -351,6 +352,7 @@ const ICONS = {
   book: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h6v16H6a2 2 0 0 0-2 2zM20 5a2 2 0 0 0-2-2h-6v16h6a2 2 0 0 1 2 2z"/></svg>`,
   library: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16M9 4v16M14 5l4 15M18.5 4.2 14 5"/></svg>`,
   info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.6" r="0.4" fill="currentColor"/></svg>`,
+  feedback: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/><path d="M8 10h8M8 14h5"/></svg>`,
   close: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`,
 };
 
@@ -377,6 +379,11 @@ function el(tag, props = {}, ...kids) {
   return n;
 }
 const icon = (name) => el("span", { style: { display: "contents" }, html: ICONS[name] || "" });
+function feedbackLink(className, ...kids) {
+  return el("a", { class: className, href: FEEDBACK_URL, target: "_blank", rel: "noopener noreferrer",
+    "aria-label": "Give feedback on the Chrome Web Store (opens in a new tab)" },
+    el("span", { "aria-hidden": "true", style: { display: "contents" } }, icon("feedback")), ...kids);
+}
 
 // UTF-8-safe base64 (for the share link)
 function b64encode(str) {
@@ -1290,6 +1297,7 @@ function buildUI() {
       el("button", { class: "icon-btn", "aria-label": "Flip board", onclick: toggleFlip }, icon("flip")),
       el("button", { class: "icon-btn", "aria-label": "Share game (copy link)", onclick: shareGame }, icon("share")),
       el("button", { class: "icon-btn", "aria-label": "Credits & attributions", onclick: openCredits }, icon("info")),
+      feedbackLink("icon-btn feedback-topbar"),
       el("button", { class: "icon-btn", "aria-label": "Settings", onclick: toggleSettings }, icon("gear")),
     ),
   );
@@ -1351,7 +1359,8 @@ function buildUI() {
     if (!e.target.closest(".lib-dd-field")) document.querySelectorAll(".lib-dd-field.open").forEach((d) => d.classList.remove("open"));
   });
 
-  root.append(el("div", { class: "app" }, topbar, canvas, settings, libRail));
+  root.append(el("div", { class: "app" }, topbar, canvas, settings, libRail,
+    feedbackLink("feedback-floating", el("span", {}, "Feedback"))));
 
   UI = {
     meta: document.getElementById("meta"), settings, canvas, boardWrap,
@@ -4506,6 +4515,12 @@ function openCredits() {
       el("button", { class: "icon-btn", title: "Close", onclick: close }, icon("close")),
     ),
     sourceRow,
+    feedbackLink("credits-source credits-feedback",
+      el("div", { class: "credit-main" },
+        el("div", { class: "credit-title" }, "Give feedback"),
+        el("div", { class: "credit-by" }, "Leave a review on the Chrome Web Store"),
+      ),
+    ),
     el("p", { class: "credits-disclaimer" },
       "Chess Review is an independent, unofficial tool. It is not affiliated with, endorsed by, " +
       "or sponsored by Chess.com or Lichess.",
