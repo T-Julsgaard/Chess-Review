@@ -67,6 +67,11 @@ are explicit annotation rules, not fitted human-label probabilities. Brilliant,
 Book and other labels never change accuracy or rating inputs. See
 [Brilliant move rules](BRILLIANT_MOVES.md) for detailed cases and limitations.
 
+Completed annotations use one original-root best/played pair throughout loss,
+mate and advantage decisions. SF19 category loss uses its own public outcome curve;
+SF18 uses its fitted curve. If the final best move differs from the retained exact
+PV, a cold restricted search obtains its score at the same budget.
+
 The ordinary cutoff settings in `data/calibration.json` are 2/5/10/20 percentage
 points. These match [Chess.com's published expected-points table](https://support.chess.com/en/articles/8572705-how-are-moves-classified-what-is-a-blunder-or-brilliant-etc).
 They are declared category policy, not coefficients fitted by the public numerical

@@ -16,7 +16,7 @@ definitions, source records and interpretation limits.
 
 | Files | Why they stay |
 | --- | --- |
-| `public/` | Eight frozen input, engine-evidence, expected-output, source and hash records needed for exact replay. |
+| `public/` | Frozen release inputs, engine evidence, expected outputs and hash records. |
 | `reproduce-public.mjs` | Refits current coefficients and checks archived scores and hashes. |
 | `human-policy.mjs`, `grouped-human-choice.mjs` | Fit expected human points and game-weighted legal-move choice. |
 | `peer-quality.mjs`, `fullgame-context.mjs` | Fit and assess the recorded-rating contextual model. |
@@ -26,6 +26,6 @@ definitions, source records and interpretation limits.
 | `category-benchmark.mjs` | Evaluates supplied independent human annotations, reporting disagreement and abstention. No validated benchmark dataset is bundled. |
 | [BRILLIANT_MOVES.md](BRILLIANT_MOVES.md) | Current special-annotation mechanics, sources and limitations. |
 
-Keep new exploratory outputs under ignored `calibration-runs/`. Promote only
-the code, evidence and documentation needed by an adopted model or an ongoing,
-clearly documented maintenance tool.
+Keep one-off investigations, audit reports and experimental scripts in ignored
+`scratch/`. Retain only tooling and evidence needed by the active model or a
+maintained calibration tool.

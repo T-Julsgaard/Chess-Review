@@ -16,7 +16,7 @@ const startup = raw.indexOf('(async function main()');
 if (startup < 0) throw Error('Application startup marker missing');
 const source = raw.slice(0, startup).replace(/^import .*;\r?\n/gm, '');
 
-export function app(t, {sourceOverride} = {}) {
+export function app(t) {
   const dom = new JSDOM('<!doctype html><div id="root"></div>', { url: 'https://extension.test/analysis.html#test-game', pretendToBeVisual: true });
   const store = {}, writes = [], timers = new Set();
   const browserAPI = {
@@ -41,7 +41,7 @@ export function app(t, {sourceOverride} = {}) {
     setTimeout(fn, ms) { const id = setTimeout(() => { timers.delete(id); fn(); }, ms); timers.add(id); return id; },
     clearTimeout(id) { clearTimeout(id); timers.delete(id); }, setInterval, clearInterval,
   });
-  vm.runInContext(sourceOverride ?? source, context, { filename: 'analysis.js' });
+  vm.runInContext(source, context, { filename: 'analysis.js' });
   const run = code => vm.runInContext(code, context);
   const state = run('S');
   Object.assign(state.settings, { sound: false, moveAnim: false, coach: '', showThreat: false, engineDepth: 4 });

@@ -60,8 +60,12 @@ A material heuristic cannot establish human difficulty or aesthetic merit.
 Root alternatives must have exact scores at the same reported depth as the top
 line, with the expected MultiPV rank and a top PV matching the final best move.
 Missing metadata, incomplete iterations and upper/lower bounds do not certify the
-already-winning exception. Explicitly bounded before/after lines also withhold
-Brilliant. The UCI client retains this metadata without changing scalar scores.
+already-winning exception. Explicitly bounded root lines also withhold Brilliant.
+For provisional annotations, bounded after-position lines withhold it too.
+Completed reviews use their exact original-root best/played pair for soundness
+and mate transitions; an independent after-position search does not replace that
+evidence. The UCI client retains bound metadata and obtains a restricted exact
+observation if its final best move differs from the retained exact PV.
 
 The -0.5/+5 policy thresholds are conservative, independently chosen annotation
 rules. They are not estimates of a published service's hidden thresholds. Root
