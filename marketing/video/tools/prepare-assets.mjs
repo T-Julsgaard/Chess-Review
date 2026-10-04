@@ -19,6 +19,7 @@ const STORE = {
 };
 
 const copies = [
+  ['marketing/video/media/chess-review-thumbnail.png', 'chess-review-thumbnail.png'],
   ['fonts/inter.ttf', 'fonts/inter.ttf'],
   ['fonts/inter-OFL.txt', 'fonts/inter-OFL.txt'],
   ['fonts/firamono.ttf', 'fonts/firamono.ttf'],

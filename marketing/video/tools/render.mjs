@@ -87,8 +87,8 @@ if ((want('video') || want('audio')) && existsSync(`${WORK}video.mp4`) && exists
 }
 
 if (want('thumbnail')) {
-  // Laid out at 1280×720 and rendered at 3×, YouTube's recommended 3840×2160.
-  remotion('still', 'src/index.ts', 'Thumbnail', `${OUT}chess-review-thumbnail.png`, '--scale=3');
+  // Preserve the supplied thumbnail exactly; never regenerate the retired design.
+  copyFileSync(`${VIDEO}media/chess-review-thumbnail.png`, `${OUT}chess-review-thumbnail.png`);
   ffmpeg('-i', `${OUT}chess-review-thumbnail.png`, '-q:v', '2', `${OUT}chess-review-thumbnail.jpg`);
 }
 

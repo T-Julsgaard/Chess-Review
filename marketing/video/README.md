@@ -20,8 +20,11 @@ extension package.
 
 `out/` and the UI captures are not in Git. Render them with the steps below.
 The selected finished video and thumbnail in `media/` are tracked in Git and
-are not overwritten by rendering. To update the README introduction, copy the
-approved render from `out/` to the corresponding file in `media/`.
+are not overwritten by rendering. To update the video, copy the selected render
+from `out/` to `media/chess-review-intro.mp4`. The supplied
+`media/chess-review-thumbnail.png` is the only thumbnail source: rendering copies
+it unchanged to `out/` and derives the JPG from that PNG. To update the thumbnail,
+replace that source PNG directly.
 
 ## README video preview
 
@@ -81,7 +84,9 @@ npm run render
   records, so they follow the UI after `npm run capture`.
 - **Sound.** Music level, ducking and effects are in `src/Soundtrack.tsx`.
   Mastering targets are in `tools/render.mjs`.
-- **Thumbnail.** `src/Thumbnail.tsx`, laid out at 1280×720 and rendered at 3×.
+- **Thumbnail.** Replace `media/chess-review-thumbnail.png` with the supplied
+  final image. `src/Thumbnail.tsx` previews that same image in Studio; the export
+  copies it unchanged and creates a JPG from it.
 - **Words.** Edit `script/narration-script.json`, generate a new take with the
   same voice and model, save it as `public/audio/narration-take.mp3` and run
   `npm run align` (Python 3.10+, numpy and faster-whisper). Then move the chunks
@@ -109,8 +114,9 @@ npm run render
   and scaled down to 2560×1440. Close-ups up to 2× zoom stay sharp, and the
   downscale smooths edges while the camera moves. Boards, badges, arrows,
   numbers and coaches inside the browser frames are the extension's own output.
-  Titles, rings, labels, the opening evaluation graph, the badge strip and the
-  thumbnail's enlarged badge are drawn by the video from the same captured data.
+  Titles, rings, labels, the opening evaluation graph and the badge strip are
+  drawn by the video from the same captured data. The thumbnail is the supplied
+  final PNG in `media/`.
 - **Voice.** ElevenLabs text to speech through the ElevenLabs connector in
   Claude, model `eleven_v4`. The first version used Justin Case, which sounded
   too much like an American advert. Six calmer voices then read the opening
