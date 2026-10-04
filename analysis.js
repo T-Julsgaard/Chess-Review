@@ -3915,13 +3915,12 @@ function colorChips(label, key, entries) {
       ...entries.map((e) => { const chip = el("button", { class: "set-chip" + (S.settings[key] === e.value ? " on" : ""), title: e.title || e.value, onclick: e.onClick || (() => setSetting(key, e.value)) }); e.render(chip); return chip; })),
   );
 }
-// Custom colors use a framed swatch and a visible label instead of an edit mark over the color.
+// Custom colors retain the preset swatch size, with a small palette icon to identify the picker.
 function colorPickerChip(chip, colors) {
   chip.classList.add("chip-custom");
   chip.setAttribute("aria-label", chip.title);
   chip.setAttribute("aria-haspopup", "dialog");
-  chip.append(el("span", { class: "chip-swatch", "aria-hidden": "true" }),
-    icon("palette"), el("span", {}, "Custom"));
+  chip.append(el("span", { class: "chip-swatch", "aria-hidden": "true" }), icon("palette"));
   paintColorPickerChip(chip, colors);
 }
 function paintColorPickerChip(chip, colors) {
