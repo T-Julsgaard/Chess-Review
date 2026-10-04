@@ -36,9 +36,9 @@ for (const [from, to] of copies) {
 }
 console.log(`Copied ${copies.length} files to ${path.relative(VIDEO, OUT)}`);
 
-// The Chess.com and Lichess pictures fill most of the 4K frame, about three times their
-// 1280×800 size. Denoised and Lanczos-scaled, their text edges stay cleaner than the
-// browser's own scaling leaves them.
+// The 4K render draws the Chess.com and Lichess pictures at about 1.5× their 1280×800 size.
+// Denoised and Lanczos-scaled 3× first, their text comes out slightly crisper than the
+// browser's own scaling of the originals.
 for (const name of ['chesscom', 'lichess']) {
   const r = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-i', path.join(OUT, `store/${name}.png`),
     '-vf', 'nlmeans=s=2.5:p=5:r=11,scale=iw*3:ih*3:flags=lanczos,unsharp=7:7:1.0:7:7:0', path.join(OUT, `store/${name}-3x.png`)]);

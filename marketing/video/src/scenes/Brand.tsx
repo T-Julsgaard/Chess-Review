@@ -3,7 +3,7 @@ import React from 'react';
 import { interpolate } from 'remotion';
 import { Browser } from '../components/Browser';
 import { Line, Mark, Mono, Ring, Shot, Wordmark, rise } from '../components/ui';
-import { camAt, fit, inside, key } from '../lib/camera';
+import { camAt, drift, fit, inside, key } from '../lib/camera';
 import { PAGE, stillLayout, stillSrc } from '../lib/captures';
 import { word } from '../lib/narration';
 import { C } from '../theme';
@@ -12,7 +12,7 @@ const clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
 const L = stillLayout('loading');
 
 
-export const BRAND = { out: 16.95 };
+export const BRAND = { out: 16.6 };
 
 export const Brand: React.FC<{ t: number }> = ({ t }) => {
   const markIn = rise(t, 9.95, 0.7);
@@ -21,11 +21,13 @@ export const Brand: React.FC<{ t: number }> = ({ t }) => {
   const page = { x: 0, y: -40, w: PAGE.w, h: PAGE.h + 40 }; // with the title bar
   // The analysis in progress: the review line counting moves, the moves and accuracy filling in.
   const right = { x: L.review.x, y: L.review.y, w: L.stats.x + L.stats.w - L.review.x, h: L.stats.y + L.stats.h - L.review.y };
+  // Rises in, leans in on the analysis panel and holds there while it fades out, so the
+  // next scene starts from a still picture.
   const cam = camAt([
     key(14.5, { ...fit(page, 50), ay: 540 + 700 }),
     key(15.25, fit(page, 50)),
-    key(16.4, inside(fit(right, 50))),
-    key(17.4, { ...inside(fit(right, 50)), k: fit(right, 50).k * 0.9, ay: 540 - 900 }),
+    key(16.55, inside(fit(right, 50))),
+    key(16.95, drift(inside(fit(right, 50)), 1.015)),
   ], t);
   const browserO = Math.min(interpolate(t, [14.5, 14.9], [0, 1], clamp), interpolate(t, [BRAND.out, BRAND.out + 0.35], [1, 0], clamp));
   const stock = word('intro', 'Stockfish');

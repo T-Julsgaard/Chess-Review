@@ -47,8 +47,8 @@ function sources(t: number): [number, string][] {
 
 export const Review: React.FC<{ t: number }> = ({ t }) => {
   const cam = camAt([
-    key(REVIEW.in, { ...OVERVIEW, k: OVERVIEW.k * 0.94, ay: OVERVIEW.ay + 90 }), key(23.35, OVERVIEW),
-    key(26.25, { ...OVERVIEW, k: OVERVIEW.k * 1.03 }), key(27.05, GRAPH), key(28.35, drift(GRAPH, 1.02)),
+    key(REVIEW.in, { ...OVERVIEW, k: OVERVIEW.k * 0.97, ay: OVERVIEW.ay + 45 }), key(23.35, OVERVIEW),
+    key(26.55, { ...OVERVIEW, k: OVERVIEW.k * 1.03 }), key(27.3, GRAPH), key(28.35, drift(GRAPH, 1.02)),
     key(29.15, MISTAKE), key(32.85, drift(MISTAKE)),
     key(33.6, ARROW), key(36.05, drift(ARROW)),
     key(36.8, IDEA), key(40.85, drift(IDEA)),
@@ -81,15 +81,16 @@ export const Review: React.FC<{ t: number }> = ({ t }) => {
         <Shot src={top} cam={cam} opacity={fade} />
       </Browser>
 
-      {/* Classification: the headline, then the ten classes from Brilliant to Blunder. */}
+      {/* Classification: the headline, then the ten classes from Brilliant to Blunder, held
+          until the camera moves to the graph. */}
       <div style={{ position: 'absolute', left: 0, right: 0, top: 84, display: 'flex', justifyContent: 'center' }}>
-        <Line t={t} start={w('classified', 'Every')} end={24.7} size={76}>
+        <Line t={t} start={w('classified', 'Every')} end={w('classified', 'from') - 0.25} size={76}>
           Every move, <span style={{ color: C.green }}>classified.</span>
         </Line>
       </div>
       <div style={{ position: 'absolute', left: 0, right: 0, top: 58, display: 'flex', justifyContent: 'center',
-        opacity: interpolate(t, [26.2, 26.5], [1, 0], clamp) }}>
-        <BadgeStrip t={t} from={w('classified', 'Brilliant') - 0.12} to={w('classified', 'Blunder')} size={66} />
+        opacity: interpolate(t, [26.6, 26.9], [1, 0], clamp) }}>
+        <BadgeStrip t={t} from={w('classified', 'from') - 0.1} to={w('classified', 'Blunder')} size={66} />
       </div>
 
       {/* The graph: the real pointer goes to the cliff and clicks. */}

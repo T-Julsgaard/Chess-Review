@@ -61,7 +61,7 @@ npm run render
 | --- | --- | --- |
 | 0:00 | The featured game replays. The evaluation graph stays level for 27 moves, then 28.Qxd4 and 28...Qxg2#. | Twenty-seven moves. A close game. Then one pawn grab… and it's mate. So what should you have played? |
 | 0:10 | Logo, then the review loading. | This is Chess Review. Free game review for Chess.com and Lichess, with Stockfish running right in your browser. |
-| 0:17 | The Analyze button on Chess.com and Lichess, from the store screenshots, then a link in the popup. | Finish a game, and click Analyze with Chess Review. Or paste a link, or a PGN. |
+| 0:17 | Chess.com and Lichess side by side with their Analyze buttons, from the store screenshots, then a link pasted into the popup. | Finish a game, and click Analyze with Chess Review. Or paste a link, or a PGN. |
 | 0:23 | The review. Badges from Brilliant to Blunder, the graph, the Mistake on move 28, the arrow to Rg1, the tried move h3 answered by Qxg2#, accuracy and estimated ratings. | Every move is classified, from Brilliant to Blunder, and the graph shows where the game turned. Move 28, queen takes d4. A mistake. The arrow shows what held. Rook to g1. Try your own idea, and it's rated too. Pawn to h3? Still mate. You also get accuracy for both players, and an estimated performance rating. |
 | 0:46 | Practice mode goes back to move 28 and the rook is dragged to g1. | Then, practice your mistakes. Chess Review takes you back to the moment… and you find the better move. |
 | 0:53 | The ten coaches, then five board and piece looks. | Choose from ten coaches, and the board and pieces you like. |
@@ -100,9 +100,9 @@ npm run render
   calm confident groove, lifts gently in the last fifteen seconds, then resolves
   on a sustained warm chord."
 - **Effects.** The extension's own move sounds from `sounds/fx/`.
-- **Mix.** The music dips 7 dB while the voice speaks. Gentle compression and a
-  limiter run at 4× sample rate bring the mix to -14 LUFS with true peaks at
-  -2 dBTP.
+- **Mix.** The music dips 7 dB while the voice speaks and stays down through
+  pauses shorter than 1.5 s. Gentle compression and a limiter run at 4× sample
+  rate bring the mix to -14 LUFS with true peaks at -2 dBTP.
 - **Captions.** `tools/captions.mjs` writes one cue per sentence from the aligned
   timings, at most two lines of 42 characters.
 
@@ -137,8 +137,9 @@ npm run render
 - The coaches are shown as named characters. The video does not call them AI or
   say they answer questions.
 - The Chess.com and Lichess shots in the one-click scene come from the 1280×800
-  store screenshots. `tools/prepare-assets.mjs` denoises them and scales them up
-  3× with ffmpeg, but they stay softer than the footage captured at 7680×4320.
+  store screenshots, shown side by side at about their own size in the 1440p
+  video. `tools/prepare-assets.mjs` denoises them and scales them up 3× with
+  ffmpeg first, which keeps their text crisp in the 4K render.
 - The narrator, CJ, is a professional voice from the ElevenLabs library, which
   means a clone of a real speaker's voice. The music is generated too.
 

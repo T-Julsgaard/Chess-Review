@@ -10,10 +10,11 @@ import { REVIEW_SOUNDS } from './scenes/Review';
 const clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
 const db = (d: number) => Math.pow(10, d / 20);
 
-// Spans where the voice speaks, with short pauses merged so the music does not pump.
+// Spans where the voice speaks. Pauses under 1.5 s are merged: in a shorter one the music only
+// jumps up for a moment and is pushed down again, which sounds like it was cut off.
 const speech = cues.reduce<[number, number][]>((acc, c) => {
   const last = acc[acc.length - 1];
-  if (last && c.start - last[1] < 0.7) last[1] = c.end;
+  if (last && c.start - last[1] < 1.5) last[1] = c.end;
   else acc.push([c.start, c.end]);
   return acc;
 }, []);
@@ -23,11 +24,12 @@ function ducking(t: number) {
   return d;
 }
 
-// The track (from MUSIC_OFFSET) is a quiet intro (−26 LUFS) until the beat lands at 23.25 s
-// in the video, then a groove at about −15 LUFS, fading out by itself from 65 s.
-const DROP = 23.25;
+// The track (from MUSIC_OFFSET) is a quiet intro (−26 LUFS) until the beat lands at 23.475 s
+// in the video (measured in 5 ms steps), then a groove at about −15 LUFS, fading out by itself
+// from 65 s. The gain drops in the last 30 ms before the beat, so the intro is not cut short.
+const DROP = 23.475;
 export function musicGain(t: number) {
-  const base = interpolate(t, [DROP - 0.1, DROP + 0.1, 63.6, 64.6], [-6, -17, -17, -13], clamp);
+  const base = interpolate(t, [DROP - 0.03, DROP, 63.6, 64.6], [-6, -17, -17, -13], clamp);
   const fadeOut = interpolate(t, [67.6, 69.0], [1, 0], clamp);
   return db(base - 7 * ducking(t)) * fadeOut;
 }
