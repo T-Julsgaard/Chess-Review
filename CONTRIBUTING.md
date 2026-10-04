@@ -30,6 +30,10 @@ Report suspected security vulnerabilities privately as described in
 For Firefox development, run `npm run start:firefox` with Firefox installed.
 The minimum Firefox version is specified in `manifest.json`.
 
+Dependency installation also applies a temporary security backport to development
+tooling. If you use `npm ci --ignore-scripts`, run `npm run patch:dependencies`
+before running tools or tests. See [SECURITY.md](SECURITY.md) for details.
+
 See the [repository guide](docs/REPOSITORY.md) for the purpose of each directory
 and where to keep experiments and generated files.
 

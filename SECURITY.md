@@ -6,6 +6,27 @@ Security fixes target the latest published release and the current `main` branch
 Older releases are not maintained separately; please update before checking
 whether a problem still occurs.
 
+## Development dependency backport
+
+`web-ext` brings in `node-forge@1.4.0` through its Android debugging dependency,
+`@devicefarmer/adbkit`. This dependency is excluded from both browser store ZIPs.
+For [CVE-2026-85393](https://github.com/advisories/GHSA-86w9-cpqp-85rv), no official
+fixed npm release was available when checked on 2026-10-05.
+
+`npm ci` and `npm install` apply `scripts/patch-node-forge.mjs` automatically.
+The temporary backport adds the nested DigestAlgorithm element-count check
+proposed in [the upstream fix](https://github.com/digitalbazaar/forge/pull/1152).
+It verifies the entire RSA source file before patching and fails on unexpected
+source or versions. Regression tests reject nested extra elements while accepting
+valid RSA signatures, including AlgorithmIdentifiers with or without NULL.
+
+If installing with `--ignore-scripts`, run `npm run patch:dependencies` before
+using development tools, then run `npm test`. The security tests fail against an
+unpatched installation. Keep the Dependabot alert open to track the official fix:
+the lockfile honestly retains version 1.4.0, so version-based scanners still report
+it despite the local backport. Once a fixed release is available, update the
+dependency and remove the override and installation patch together.
+
 ## Report a vulnerability privately
 
 Use GitHub's **[Report a vulnerability](https://github.com/T-Julsgaard/Chess-Review/security/advisories/new)**
