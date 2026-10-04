@@ -26,6 +26,8 @@ export function positionCommand(fen, history = null) {
 // analysis would silently stall. On timeout the handshake REJECTS, which lets the caller
 // fall back to the next build (see createEngine() in analysis.js).
 const HANDSHAKE_TIMEOUT_MS = 10000;
+// The full Stockfish 19 build ships a ~99 MB wasm, which needs longer to load and compile.
+const LARGE_BUILD_HANDSHAKE_TIMEOUT_MS = 60000;
 // A silent worker must not leave review or Explore waiting forever. Reset on engine output
 // so a deep search that is still reporting progress is allowed to continue.
 const SEARCH_SILENCE_TIMEOUT_MS = 120000;
@@ -120,7 +122,7 @@ export class Engine {
       this._onFail = reject;
       this._handshakeTimer = setTimeout(
         () => this._failHandshake(new Error(`engine handshake timed out (${this.scriptPath})`)),
-        HANDSHAKE_TIMEOUT_MS,
+        /stockfish-19-single\.js$/.test(this.scriptPath) ? LARGE_BUILD_HANDSHAKE_TIMEOUT_MS : HANDSHAKE_TIMEOUT_MS,
       );
       this._send("uci");
     });
