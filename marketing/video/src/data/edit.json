@@ -1,0 +1,22 @@
+{
+ "fps": 60,
+ "duration": 69,
+ "musicOffset": 2.5,
+ "chunks": {
+  "close-game": 0.8,
+  "pawn-grab": 4.0,
+  "question": 7.6,
+  "intro": 10.1,
+  "one-click": 17.1,
+  "classified": 22.9,
+  "mistake": 29.2,
+  "arrow": 33.0,
+  "own-idea": 36.3,
+  "still-mate": 38.7,
+  "accuracy": 41.3,
+  "practice": 46.1,
+  "personal": 53.6,
+  "trust": 57.6,
+  "cta": 60.8
+ }
+}

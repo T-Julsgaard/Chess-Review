@@ -1,0 +1,21 @@
+{
+  "source": "https://www.chess.com/game/live/184455438732",
+  "note": "Public Chess.com game used for the review, practice and turning-point scenes. Level for 27 moves; 28.Qxd4 allows 28...Qxg2#. The opponent is stored as \"Opponent\", without a country.",
+  "username": "Julsgaard",
+  "pgn": "[Event \"Live Chess\"]\n[Site \"Chess.com\"]\n[Date \"2026.09.27\"]\n[Round \"-\"]\n[White \"Julsgaard\"]\n[Black \"Opponent\"]\n[Result \"0-1\"]\n[CurrentPosition \"5rk1/5pp1/3p3p/p2P4/3QP3/P4P2/1Pr3qP/R2R3K w - - 0 29\"]\n[Timezone \"UTC\"]\n[ECO \"A45\"]\n[ECOUrl \"https://www.chess.com/openings/Indian-Game-2.Bf4-e6-3.e3\"]\n[UTCDate \"2026.09.27\"]\n[UTCTime \"14:04:03\"]\n[WhiteElo \"1507\"]\n[BlackElo \"1525\"]\n[TimeControl \"180+2\"]\n[Termination \"Opponent won by checkmate\"]\n[StartTime \"14:04:03\"]\n[EndDate \"2026.09.27\"]\n[EndTime \"14:10:00\"]\n[Link \"https://www.chess.com/game/live/184455438732\"]\n\n1. d4 {[%clk 0:03:01.3]} 1... Nf6 {[%clk 0:03:00.5]} 2. Bf4 {[%clk 0:03:02.1]} 2... e6 {[%clk 0:03:01.6]} 3. e3 {[%clk 0:03:03.5]} 3... d6 {[%clk 0:03:02.8]} 4. Nd2 {[%clk 0:03:02.3]} 4... b6 {[%clk 0:03:04]} 5. Be2 {[%clk 0:03:02.6]} 5... Bb7 {[%clk 0:03:05.2]} 6. Bf3 {[%clk 0:03:04.1]} 6... c6 {[%clk 0:03:00.7]} 7. c4 {[%clk 0:03:02.4]} 7... Nbd7 {[%clk 0:03:01.5]} 8. Ne2 {[%clk 0:03:02.2]} 8... Be7 {[%clk 0:03:02.4]} 9. O-O {[%clk 0:03:03]} 9... e5 {[%clk 0:02:58.4]} 10. Bg5 {[%clk 0:02:54.1]} 10... h6 {[%clk 0:02:58.6]} 11. Bxf6 {[%clk 0:02:50.8]} 11... Bxf6 {[%clk 0:02:59.7]} 12. d5 {[%clk 0:02:31.5]} 12... cxd5 {[%clk 0:02:58.4]} 13. Bxd5 {[%clk 0:02:31.9]} 13... Bxd5 {[%clk 0:02:58.9]} 14. cxd5 {[%clk 0:02:33.8]} 14... O-O {[%clk 0:02:57.3]} 15. e4 {[%clk 0:02:32]} 15... Nc5 {[%clk 0:02:54.8]} 16. a3 {[%clk 0:02:27.8]} 16... a5 {[%clk 0:02:54.2]} 17. f3 {[%clk 0:02:20.6]} 17... Bg5 {[%clk 0:02:52]} 18. Nb3 {[%clk 0:02:18.3]} 18... Rc8 {[%clk 0:02:31.3]} 19. Nc3 {[%clk 0:02:11.8]} 19... Nxb3 {[%clk 0:02:05.9]} 20. Qxb3 {[%clk 0:02:12.4]} 20... Be3+ {[%clk 0:02:04.9]} 21. Kh1 {[%clk 0:02:12.9]} 21... Bd4 {[%clk 0:01:39]} 22. Nb5 {[%clk 0:02:09.6]} 22... Qf6 {[%clk 0:01:27]} 23. Nxd4 {[%clk 0:02:06.1]} 23... exd4 {[%clk 0:01:27.7]} 24. Rfd1 {[%clk 0:02:05.7]} 24... Rb8 {[%clk 0:01:15.2]} 25. Qa4 {[%clk 0:01:41.7]} 25... Rbc8 {[%clk 0:01:07.8]} 26. Qb3 {[%clk 0:01:33]} 26... Qg5 {[%clk 0:00:59.6]} 27. Qxb6 {[%clk 0:01:10.2]} 27... Rc2 {[%clk 0:00:57.9]} 28. Qxd4 {[%clk 0:01:07.7]} 28... Qxg2# {[%clk 0:00:57.6]} 0-1\n",
+  "meta": {
+    "url": "https://www.chess.com/game/live/184455438732",
+    "gameId": "184455438732",
+    "timeClass": "blitz",
+    "endTime": 1790518200,
+    "white": {
+      "user": "Julsgaard",
+      "result": "checkmated",
+      "countryId": "DK"
+    },
+    "black": {
+      "user": "Opponent",
+      "result": "win"
+    }
+  }
+}

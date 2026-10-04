@@ -1,0 +1,36 @@
+// Copies the extension's own fonts, badges, knight, sounds and store screenshots into
+// public/shared, so the video uses exactly what ships and nothing is downloaded.
+import { copyFile, mkdir, rm } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const VIDEO = fileURLToPath(new URL('../', import.meta.url));
+const REPO = path.resolve(VIDEO, '../..');
+const OUT = path.join(VIDEO, 'public/shared');
+
+const BADGES = ['brilliant', 'great', 'best', 'excellent', 'good', 'book', 'inaccuracy', 'mistake', 'miss', 'blunder'];
+const STORE = {
+  'review.png': '1 (1).png',
+  'chesscom.png': '1 (2).png',
+  'lichess.png': '1 (3).png',
+  'accuracy.png': '1 (4).png',
+  'coaches.png': '1 (5).png',
+};
+
+const copies = [
+  ['fonts/inter.ttf', 'fonts/inter.ttf'],
+  ['fonts/inter-OFL.txt', 'fonts/inter-OFL.txt'],
+  ['fonts/firamono.ttf', 'fonts/firamono.ttf'],
+  ['fonts/firamono-OFL.txt', 'fonts/firamono-OFL.txt'],
+  ['pieces-img/cburnett/wN.svg', 'pieces/wN.svg'],
+  ...BADGES.map((b) => [`icons/${b}.svg`, `badges/${b}.svg`]),
+  ...Array.from({ length: 9 }, (_, i) => [`sounds/fx/chess_sound_0${i + 1}.wav`, `sfx/chess_sound_0${i + 1}.wav`]),
+  ...Object.entries(STORE).map(([to, from]) => [`marketing/chrome-web-store/${from}`, `store/${to}`]),
+];
+
+await rm(OUT, { recursive: true, force: true });
+for (const [from, to] of copies) {
+  await mkdir(path.dirname(path.join(OUT, to)), { recursive: true });
+  await copyFile(path.join(REPO, from), path.join(OUT, to));
+}
+console.log(`Copied ${copies.length} files to ${path.relative(VIDEO, OUT)}`);

@@ -1,0 +1,25 @@
+{
+  "name": "chess-review-intro-video",
+  "private": true,
+  "type": "module",
+  "description": "Editable production files for the Chess Review introduction video and thumbnail.",
+  "scripts": {
+    "capture": "node capture/capture-ui.mjs",
+    "align": "python tools/align_narration.py",
+    "captions": "node tools/captions.mjs",
+    "studio": "node tools/prepare-assets.mjs && remotion studio src/index.ts",
+    "render": "node tools/render.mjs",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.532",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "remotion": "4.0.532"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "playwright-core": "1.63.0",
+    "typescript": "5.9.3"
+  }
+}
