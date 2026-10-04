@@ -9,6 +9,15 @@ The October 4 release audit also fixes review reloads, clock-tag alignment,
 callbacks from exited practice sessions, and library overwrites between review
 tabs. The functional audit and its limits are recorded in docs/RELEASE_AUDIT.md.
 
+Updating to 0.2.1 resets all preferences and panel layouts once to the current
+defaults, so existing users receive the new default appearance. Usernames, saved
+games, favorites, stored analyses and game caches are preserved. A separate
+completion marker prevents repeat resets. The reset is restricted to the 0.2.1
+extension update event; keep its release constant and marker fixed in later
+releases, including for users who skip 0.2.1. New installs only record the marker.
+Stored analyses can still be recalculated when incompatible with the default
+engine or scoring settings, without removing the saved games.
+
 ## Packages and verification
 
 Run `npm ci`, `npm test`, `npm run verify:engines`, and `npm run build`.
@@ -41,6 +50,9 @@ profiles and test-only extension copies with a loopback reporting endpoint; the
 store ZIPs are never modified. It checks a fresh default-18 review and migration
 from the old full-19 preference to Lite. Results are saved in
 `browser-smoke-results.json` in the latest release directory.
+It also simulates the one-time 0.2.1 reset against real browser storage, checks
+that games/favorites/analyses survive, renders the default preferences, and
+reopens a review after customization to check that the reset does not repeat.
 
 Run `npm run test:layout` for native Chrome window fitting, square-board and
 overflow checks, 320/390-pixel responsive viewports, custom layout reload/reset,

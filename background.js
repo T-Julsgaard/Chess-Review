@@ -9,6 +9,13 @@
 
 import { analyzeActiveTab, openAnalysisTab, reloadActiveAndAnalyze } from "./analyze-flow.js";
 import { browserAPI } from "./browser-compat.js";
+import { resetSettingsForRelease } from "./release-settings.js";
+
+browserAPI.runtime.onInstalled.addListener(details =>
+  resetSettingsForRelease(details).catch(err => {
+    console.error("[Chess Review] release settings reset failed:", err);
+  })
+);
 
 // Shared game (from a share link caught by content.js) → open the analysis.
 // "Free game review" button injected into the chess.com game-over modal → same flow as the popup.

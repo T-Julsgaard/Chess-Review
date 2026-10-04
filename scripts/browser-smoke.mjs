@@ -33,7 +33,7 @@ try {
     // Iframe dimensions are CSS pixels and do not resize when their parent tab
     // zooms. Exercise the responsive fallback here; release-layout.mjs checks
     // the real tab/window zoom fit separately.
-    await fs.appendFile(path.join(sourceDir,'analysis.js'), '\nglobalThis.__smokeResponsive=()=>{_zoomTabId=null;UI.canvas.classList.remove("desktop-layout");applyLayout();};\n');
+    await fs.appendFile(path.join(sourceDir,'analysis.js'), '\nglobalThis.__smokeResponsive=()=>{_zoomTabId=null;UI.canvas.classList.remove("desktop-layout");applyLayout();};\nglobalThis.__smokePreferences=()=>({settings:structuredClone(S.settings),layoutMode:S.layoutMode});\n');
     await fs.appendFile(path.join(sourceDir,'background.js'), '\nbrowserAPI.runtime.onInstalled.addListener(() => browserAPI.tabs.create({url:browserAPI.runtime.getURL("smoke.html")}));\n');
     await fs.writeFile(path.join(sourceDir,'smoke.html'),'<!doctype html><script type="module" src="smoke-client.js"></script>');
     await fs.writeFile(path.join(sourceDir,'smoke-client.js'), `
@@ -41,6 +41,7 @@ import {browserAPI} from './browser-compat.js';
 import {Engine} from './engine/uci.js';
 import {Chess} from './lib/chess.js';
 import {calibratedReview} from './lib/calibrated-review.js';
+import {resetSettingsForRelease} from './release-settings.js';
 const report=data=>fetch(${JSON.stringify(endpoint)},{method:'POST',body:JSON.stringify({browser:${JSON.stringify(release.browser)},...data})});
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 try {
@@ -128,6 +129,49 @@ try {
     await report({step:'review-reload',key});
     frame.remove();
   }
+  // Simulate the 0.2.1 update event against real browser storage and render the
+  // resulting defaults. Existing engine tests above also populate saved games.
+  await browserAPI.storage.local.remove('settingsResetFor021');
+  const resetJob={pgn:'1. e4 e5 *',meta:{gameId:'reset-smoke'},source:'pgn'};
+  const library=(await browserAPI.storage.local.get('library')).library;
+  library[0].favorite=true;
+  await browserAPI.storage.local.set({username:'reset-user',library,
+    settings:{boardTheme:'custom',pieceStyle:'merida',coach:'professor',soundVolume:37,enginePath:'sf19lite'},
+    layout:{board:{x:20,y:30,w:400,h:400}},layoutMode:'custom',layoutVersion:8,
+    'job:reset-smoke':resetJob});
+  const before=await browserAPI.storage.local.get(null);
+  await resetSettingsForRelease({reason:'update',previousVersion:'0.2.0'});
+  const after=await browserAPI.storage.local.get(null);
+  for(const key of Object.keys(before)) {
+    if(['settings','layout','layoutMode','layoutVersion'].includes(key))continue;
+    if(JSON.stringify(before[key])!==JSON.stringify(after[key]))throw Error('Release reset changed '+key);
+  }
+  if(!after.settingsResetFor021||Object.keys(after.settings).length||after.layout!==null||after.layoutMode!=='auto')throw Error('Release reset did not clear preferences');
+  const resetFrame=document.createElement('iframe');resetFrame.style='width:1680px;height:1000px';
+  resetFrame.src='analysis.html#reset-smoke';document.body.append(resetFrame);
+  const preferences=async()=>{
+    for(let i=0;i<100;i++) {
+      await wait(100);
+      if(resetFrame.contentDocument?.querySelector('.board')&&resetFrame.contentWindow.__smokePreferences)return resetFrame.contentWindow.__smokePreferences();
+      const error=resetFrame.contentDocument?.querySelector('#error');if(error&&!error.hidden)throw Error(error.textContent);
+    }
+    throw Error('Reset review did not render');
+  };
+  const defaults=await preferences();
+  for(const [key,value] of Object.entries({boardTheme:'maple',pieceStyle:'image',coach:'old_soviet',soundVolume:50,enginePath:'nnue'})) {
+    if(defaults.settings[key]!==value)throw Error('Reset default incorrect: '+key);
+  }
+  if(defaults.layoutMode!=='auto')throw Error('Reset review retained custom layout');
+  await wait(400); // Let startup's saved layout settle before the customization.
+  await browserAPI.storage.local.set({settings:{...defaults.settings,boardTheme:'coral',soundVolume:23}});
+  await resetSettingsForRelease({reason:'update',previousVersion:'0.2.1'});
+  resetFrame.src='about:blank';await wait(100);
+  await browserAPI.storage.local.set({'job:reset-smoke':resetJob});
+  resetFrame.src='analysis.html#reset-smoke';
+  const reopened=await preferences();
+  if(reopened.settings.boardTheme!=='coral'||reopened.settings.soundVolume!==23)throw Error('Release reset repeated after customization');
+  resetFrame.remove();
+  await report({step:'one-time-release-reset',preservedUsername:true,preservedGamesAndFavorites:true,preservedAnalyses:true,defaultsRendered:true,customizationsRetained:true});
   await report({done:true,ok:true,results});
 } catch(e){await report({done:true,ok:false,error:e.stack});}
 `);
