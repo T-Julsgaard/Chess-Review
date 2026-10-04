@@ -9,6 +9,7 @@ import {fitHumanOutcome,humanExpected,humanMoveQuality,humanGameAccuracy} from '
 import {fitGroupedHumanChoice} from './grouped-human-choice.mjs';
 import {fitFullgameContext} from './fullgame-context.mjs';
 import {fitHuber} from './fit-huber.mjs';
+import {fitSf19Context} from './sf19-context.mjs';
 import {ratingFeatures,publicMoveQuality,publicGameAccuracy,contextualRating,movesOnlyRating} from '../../lib/public-scoring.js';
 
 const root = new URL('./public/', import.meta.url);
@@ -104,6 +105,7 @@ async function main() {
     if (rows.some(r => r.split !== 'train')) throw Error('Rating roles differ');
     reconstructedRatings[engine] = {model: fitHuber(rows, recipe.lambda, names, recipe.delta), inputs};
   }
+  const sf19Context = fitSf19Context(reconstructedRatings.sf19.inputs);
   // Expected outputs are opened only after all training coefficients are reconstructed.
   const expected = JSON.parse(await readFile(new URL('../../data/calibration.json', import.meta.url)));
   const scores = await publicInput('expected-scores.json', manifest);
@@ -112,6 +114,7 @@ async function main() {
     outcome: exact(replay.outcome, expected.quality.outcome), choice: exact(replay.choice, expected.quality.choice),
     context: exact(replay.context, expected.context.model), scores: exact(replay.scores, scores),
     runtimeAccuracy: replay.scores.every((r, i) => r.accuracy === replay.runtimeScores[i]),
+    sf19Context: exact(sf19Context, expected.context.sf19),
   };
   for (const engine of ['sf18', 'sf19']) {
     const {model, inputs} = reconstructedRatings[engine];
@@ -122,6 +125,7 @@ async function main() {
   checks.contextPredictions = replay.scores.every(row => Number.isFinite(contextualRating(row.ratingTarget,
     row.accuracy, row.decisions, replay.context)?.rating));
   console.log(JSON.stringify({schema: 'public-reproduction-v1', checks, publicSides: scores.length,
+    sf19ContextValidation: sf19Context.developmentValidation,
     fittingSearches: 0, networkRequests: 0, subprocesses: 0, passed: Object.values(checks).every(Boolean)}, null, 2));
   if (!Object.values(checks).every(Boolean)) throw Error('Public reproduction differs');
 }

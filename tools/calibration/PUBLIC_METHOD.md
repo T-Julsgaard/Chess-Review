@@ -2,7 +2,7 @@
 
 The public calibration makes the numerical model, source evidence and fitting
 procedure inspectable. All inputs needed to reconstruct the published SF18
-accuracy/context and separate SF18/SF19 moves-only rating coefficients are included
+accuracy/context, SF19 contextual peers and separate SF18/SF19 moves-only rating coefficients are included
 under `public/`. Fitting and replay work offline. Node.js 24 or later is required.
 
 ```powershell
@@ -17,8 +17,9 @@ node --permission --allow-fs-read=tools/calibration --allow-fs-read=lib --allow-
 
 This reconstructs training coefficients before opening expected outputs, verifies
 compressed and decoded SHA-256 hashes, and checks exact numerical equality of the
-SF18 models and 250 player-side scores. It separately reconstructs both engine's
-moves-only Huber models and verifies their search configurations. It launches no
+SF18 models and 250 player-side scores. It separately reconstructs both engines'
+moves-only Huber models, the SF19 contextual model and its baseline assessment,
+and verifies their search configurations. It launches no
 engine, subprocess or network request and needs no research run directory.
 
 ## Public sources and roles
@@ -76,13 +77,29 @@ no Chess.com review outputs.
 
 ## Two rating definitions
 
-**Use recorded rating**, the SF18 default, conditions on a player's recorded
+Both engines offer both modes; the selected preference persists across engine
+changes. If a player's recorded rating is absent, that side falls back to
+Moves only independently of the other player.
+
+**Use recorded rating**, the default for both engines, conditions on a player's recorded
 rating. Gaussian peer weights use a bandwidth selected from 200/400/800 by five
 game-disjoint training-fold CRPS. The observed full-game quality percentile adds
 `400 / ln(10) * logit(percentile)` rating units to the recorded rating. This unit
 conversion is a declared performance convention. Fewer than twenty effective
 peer sides retain the recorded rating. One to nine decisions are short-game
 extrapolations, not established playing strength.
+
+SF18 retains its existing depth16 quality distribution. SF19 has its own model
+under `context.sf19`, reconstructed by `sf19-context.mjs` from the published
+`sf19-rating-evidence.json.gz`: 750 whole training games and 1,498 player-sides.
+Its contextual quality is the arithmetic mean of
+`100 * (1 - max(0, E_WDL(best) - E_WDL(played)))` over nonforced decisions, with
+engine-top moves assigned zero loss. The reviewed game and peer games use exactly
+the same fixed-node WDL statistic. This statistic is separate from SF19's
+centipawn-based displayed accuracy; the SF18 quality distribution is never reused.
+WDL saturation can hide centipawn deterioration in already winning or lost positions.
+Standard-start history and complete, version-matched rating evidence are required
+for the contextual comparison. Unsupported histories retain the moves-only fallback.
 
 **Moves only** predicts recorded public blitz rating level without using the
 reviewed player's rating as a predictor. It retains separately fitted SF18/SF19
@@ -124,3 +141,25 @@ assessment; `public/manifest.json` declares definitions and artifact hashes.
 Repository tests also replay the actual review scorer against all published
 player-side accuracy values and verify engine restriction, cold reset, WDL,
 cache/settings migration, mate handling and annotation independence.
+
+## Measuring the rating-mode change
+
+The SF19 peer model uses the existing five game-disjoint training folds to select
+rating bandwidth. Each game's two sides stay together and have unit total weight.
+The baseline uses the same training-fold peers and weights, with no rating kernel.
+The selected model's CRPS is **2.11243352**, versus **2.21289067** for that baseline:
+**4.54% lower** distribution prediction error. CRPS measures how well the predicted
+quality distribution matches the excluded games' observed quality; lower is better.
+These values concern the WDL quality distribution, not rating prediction error,
+and are not comparable to SF18's CRPS on a different quality scale. Bandwidth
+selection consumes these folds, and the evidence was already used for moves-only
+fitting. This is development evidence, not an untouched final test, a causal
+before/after rating comparison, or validation of true playing strength.
+
+`node tools/calibration/reproduce-public.mjs` reconstructs these metrics and the
+SF19 model exactly from hash-verified evidence. The regression suite checks both
+dropdown options for both engines, persistence and engine switching, per-player
+fallback, short excerpts, forced moves, incomplete/stale evidence, standard-start
+restrictions, and production scoring across five public rating bands. It also
+replays all 250 original SF18 player-side accuracies and preserves both moves-only
+models. Saved analyses from the previous scoring version are recomputed.

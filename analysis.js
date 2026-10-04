@@ -111,7 +111,7 @@ const QUALITY_DESC = {
 };
 // Explanations for the accuracy and elo numbers (shown as a tooltip like the categories).
 const ACCURACY_INFO = "SF18 uses the published public-data move-quality model. SF19 estimates accuracy from centipawn evaluations using a public winning-chance curve and combines ordinary and harmonic move averages to give mistakes more weight. Forced moves are excluded and opening moves are included. Annotations do not alter accuracy. Scores are estimates, not official platform scores.";
-const ELO_INFO = "Use recorded rating compares this game's performance with players around the rating saved in the game. Moves only ignores that rating and estimates a blitz rating level from the moves themselves; it needs at least 10 moves with more than one legal choice. Recorded-rating comparisons are available with Stockfish 18 at the calibrated settings. Stockfish 19 Lite always uses its own moves-only model. Neither estimate changes your account rating.";
+const ELO_INFO = "Both engines support both rating modes using their own models. Use recorded rating compares this game's performance with players around the rating saved in the game. Stockfish 18 uses calibrated accuracy; Stockfish 19 uses its own expected-point losses, separately from displayed accuracy. Moves only ignores the saved rating and estimates a blitz rating level from the moves themselves; it needs at least 10 moves with more than one legal choice. Neither estimate changes your account rating.";
 // Explanations for the engine settings (shown on hover, same tooltip as the accuracy panel).
 const ENGINE_INFO = {
   engineLines:   "How many candidate moves (lines) the engine panel shows for the position you're viewing. Extra lines are searched on demand — changing this doesn't re-analyze the game.",
@@ -4331,12 +4331,11 @@ function motorSettings() {
     ),
     section("Estimated rating",
       el("div", { class: "set-row" }, setLabel("Rating mode", ELO_INFO),
-        S.settings.enginePath === "sf19lite" ? el("span", { class: "set-note" }, "Moves only")
-          : ddField(S.settings.ratingMode || "context", [["context", "Use recorded rating"], ["moves", "Moves only"]], value => setEngineSetting("ratingMode", value))),
+        ddField(S.settings.ratingMode || "context", [["context", "Use recorded rating"], ["moves", "Moves only"]], value => setEngineSetting("ratingMode", value))),
       el("div", { class: "set-row hint" }, el("span", { class: "set-note" },
-        S.settings.enginePath === "sf19lite"
-          ? "Stockfish 19 Lite always estimates rating from moves alone, using its own model. Your Stockfish 18 rating-mode preference is kept for when you switch back."
-          : "Use recorded rating: shows how well you played compared with players around the rating saved in this game. If no rating is saved, we use Moves only instead.")),
+        "Use recorded rating: shows how well you played compared with players around the rating saved in this game, using the selected engine's own model. If no rating is saved, we use Moves only instead.")),
+      S.settings.enginePath === "sf19lite" ? el("div", { class: "set-row hint" }, el("span", { class: "set-note" },
+        "Stockfish 19 compares expected-point losses with its own public peers. This rating comparison is separate from displayed accuracy.")) : null,
       el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Moves only: ignores the saved rating and estimates a blitz rating level from your move choices. Needs at least 10 moves with more than one legal choice. These estimates do not change your account rating.")),
       (S.settings.enginePath === "nnue" && (S.settings.engineDepth !== 16 || S.settings.engineHash !== 16 || S.settings.engineSkill !== 20 || S.settings.classifyLines !== 1))
         ? el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Use depth 16, hash 16 MB, maximum strength and 1 analysis line for calibrated SF18 numerical scores.")) : null,
@@ -4994,7 +4993,7 @@ function currentGameId() {
 }
 
 function analysisSettingsKey() {
-  return JSON.stringify(["public-scoring-v2", CALIB?.version, S.settings.ratingMode, S.settings.enginePath, S.settings.engineDepth, S.settings.classifyLines,
+  return JSON.stringify(["public-scoring-v3", CALIB?.version, CALIB?.context?.sf19?.candidateVersion, S.settings.ratingMode, S.settings.enginePath, S.settings.engineDepth, S.settings.classifyLines,
     S.settings.engineHash, S.settings.engineSkill]);
 }
 

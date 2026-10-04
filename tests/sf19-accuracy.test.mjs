@@ -65,7 +65,7 @@ test('saved accuracy from the old scoring version cannot restore', t => {
     calibration: {version: calibration.version, build: 'sf19lite', nodes: 20000}}));
   const saved = {pgn: S.pgn, settingsKey: a.call('analysisSettingsKey'), bests: S.bests, evals: S.evals};
   assert.equal(a.call('canRestoreAnalysis', saved), true);
-  saved.settingsKey = saved.settingsKey.replace('public-scoring-v2', 'public-scoring-v1');
+  saved.settingsKey = saved.settingsKey.replace('public-scoring-v3', 'public-scoring-v2');
   assert.equal(a.call('canRestoreAnalysis', saved), false);
 });
 

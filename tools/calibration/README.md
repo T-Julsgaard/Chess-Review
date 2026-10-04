@@ -20,6 +20,7 @@ definitions, source records and interpretation limits.
 | `reproduce-public.mjs` | Refits current coefficients and checks archived scores and hashes. |
 | `human-policy.mjs`, `grouped-human-choice.mjs` | Fit expected human points and game-weighted legal-move choice. |
 | `peer-quality.mjs`, `fullgame-context.mjs` | Fit and assess the recorded-rating contextual model. |
+| `sf19-context.mjs` | Reconstruct SF19 contextual peers from fixed-node WDL evidence and compare game-separated CRPS with an unconditional baseline. |
 | `fit-rating.mjs`, `fit-huber.mjs`, `core.mjs`, `io.mjs` | Shared mathematics, rating regression and provenance/hash helpers. |
 | `engine.mjs`, `engine-host.cjs` | Reusable local engine harness, retained for the real-engine regression test and future evidence collection. Not used by offline replay. |
 | `category-benchmark.mjs` | Evaluates supplied independent human annotations, reporting disagreement and abstention. No validated benchmark dataset is bundled. |

@@ -6,7 +6,7 @@ export const maintainedTools = new Set([
   'BRILLIANT_MOVES.md', 'PUBLIC_METHOD.md', 'README.md',
   'category-benchmark.mjs', 'core.mjs', 'engine-host.cjs', 'engine.mjs',
   'fit-huber.mjs', 'fit-rating.mjs', 'fullgame-context.mjs', 'grouped-human-choice.mjs',
-  'human-policy.mjs', 'io.mjs', 'peer-quality.mjs', 'reproduce-public.mjs',
+  'human-policy.mjs', 'io.mjs', 'peer-quality.mjs', 'reproduce-public.mjs', 'sf19-context.mjs',
   'public/dataset.json.gz', 'public/expected-scores.json', 'public/manifest.json',
   'public/sf18-evidence.json.gz', 'public/sf18-rating-evidence.json.gz',
   'public/sf19-rating-evidence.json.gz', 'public/sources.json', 'public/validation.json',
@@ -54,7 +54,8 @@ export async function verifySource(root) {
   if (model.schema !== 'chess-review-public-calibration-v1') throw Error('Unsupported numerical model schema');
   const permitted = new Set(['schema', 'version', 'source', 'quality', 'context', 'movesOnly', 'classification', 'clsWp']);
   for (const key of Object.keys(model)) if (!permitted.has(key)) throw Error('Unsupported numerical model field: ' + key);
-  if (!model.quality?.candidateVersion || !model.context?.model || !model.movesOnly?.sf18?.model || !model.movesOnly?.sf19?.model) {
+  if (!model.quality?.candidateVersion || !model.context?.model || !model.context?.sf19?.model
+      || !model.context.sf19.candidateVersion || !model.movesOnly?.sf18?.model || !model.movesOnly?.sf19?.model) {
     throw Error('Maintained public numerical models are required');
   }
   const source = await readFile(path.join(root, 'analysis.js'), 'utf8');

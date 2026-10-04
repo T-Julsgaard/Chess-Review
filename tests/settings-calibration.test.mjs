@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {app, loadGame} from './helpers/app.mjs';
+import {app, loadGame, settle} from './helpers/app.mjs';
 
 function settings(t) {
   const a = app(t); loadGame(a, '1. e4 e5');
@@ -65,12 +65,34 @@ test('depth dragging previews values and warns only on release', async t => {
   assert.equal(Number(slider.value), 16); assert.equal(a.writes.length, 0);
 });
 
-test('SF19 explains its effective mode while preserving the SF18 preference', t => {
-  const a = settings(t); a.state.settingsTab = 'engine'; a.state.settings.enginePath = 'sf19lite';
-  a.state.settings.ratingMode = 'context'; a.call('renderSettings');
-  const section = [...a.dom.window.document.querySelectorAll('.set-section')].find(node => node.textContent.includes('Estimated rating'));
-  assert.match(section.textContent, /always estimates rating from moves alone/);
-  assert.equal(section.querySelector('.dd'), null); assert.equal(a.state.settings.ratingMode, 'context');
+for (const engine of ['nnue', 'sf19lite']) {
+  test(engine + ' offers both rating modes and persists each selection', async t => {
+    const a = settings(t); a.state.settingsTab = 'engine'; a.state.settings.enginePath = engine;
+    a.run('UI.settings.hidden = false');
+    a.call('renderSettings');
+    const section = () => [...a.dom.window.document.querySelectorAll('.set-section')].find(node => node.textContent.includes('Estimated rating'));
+    assert.deepEqual([...section().querySelectorAll('.lib-dd-opt')].map(node => node.textContent), ['Use recorded rating', 'Moves only']);
+    assert.match(section().textContent, /selected engine's own model/);
+    for (const [mode, label] of [['moves', 'Moves only'], ['context', 'Use recorded rating']]) {
+      [...section().querySelectorAll('.lib-dd-opt')].find(node => node.textContent === label).click();
+      await settle();
+      assert.equal(a.state.settings.ratingMode, mode);
+      assert.equal(a.store.settings.ratingMode, mode);
+      assert.equal(section().querySelector('.lib-dd-opt.sel').textContent, label);
+    }
+    assert.equal(a.searches(), 2);
+  });
+}
+
+test('rating mode survives switching between engines', async t => {
+  const a = settings(t);
+  await a.call('setEngineSetting', 'ratingMode', 'moves');
+  const pending = a.call('setEngineSetting', 'enginePath', 'sf19lite');
+  choice(a, 'Continue'); await pending;
+  assert.equal(a.store.settings.ratingMode, 'moves');
+  await a.call('setEngineSetting', 'ratingMode', 'context');
+  await a.call('setEngineSetting', 'enginePath', 'nnue');
+  assert.equal(a.store.settings.ratingMode, 'context');
 });
 
 test('moves-only rating is displayed independently of unavailable accuracy', t => {

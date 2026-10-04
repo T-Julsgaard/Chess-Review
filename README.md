@@ -40,6 +40,12 @@ Settings let you choose an engine, rating mode, board, pieces, sounds, coach and
 category-badge appearance. Badge numbers describe move categories; they are
 separate from position evaluation and game accuracy.
 
+Both engines offer **Use recorded rating** and **Moves only**. The first compares
+your performance with public players near the rating saved in the game; the
+second ignores that rating and estimates a blitz rating level from your choices.
+Without a saved rating, the review falls back to Moves only, which needs at least
+ten nonforced decisions. Each engine uses its own models.
+
 ## Scoring and reproducibility
 
 Chess Review is open source and uses local Stockfish analysis with documented

@@ -79,8 +79,18 @@ test('SF19 uses its separate fixed-node evidence and refuses the wrong engine id
   const result = await analyseCalibratedPosition(engine, request);
   assert.equal(calls.length, 1); assert.deepEqual(calls[0].budget, {kind: 'nodes', value: 20000});
   assert.equal(result.calibration.qualityVersion, null);
+  assert.equal(result.calibration.contextVersion, calibration.context.sf19.candidateVersion);
   assert.equal(result.ratingEvidence.candidateVersion, calibration.movesOnly.sf19.candidateVersion);
   engine.identity = 'Stockfish 18'; await assert.rejects(analyseCalibratedPosition(engine, request), /identity/);
+});
+
+test('SF19 setup-FEN searches stay outside the standard-start contextual model', async () => {
+  const engine = {buildKey: 'sf19lite', identity: 'Stockfish 19 Lite', async setOptions() {},
+    async analyse() {return {bestmove: 'e2e4', score: {cp: 0, wdl: [200, 600, 200]}};}};
+  const result = await analyseCalibratedPosition(engine, {fen: new Chess().fen(),
+    history: {initialFen: '8/8/8/8/8/4k3/8/4K3 w - - 0 1', moves: []}, played: 'e2e4',
+    settings: {enginePath: 'sf19lite'}, calibration});
+  assert.equal(result.calibration.contextVersion, null);
 });
 
 test('rating settings persist and saved analyses without played-root evidence cannot restore', async t => {
