@@ -904,9 +904,6 @@ button { font-family: inherit; cursor: pointer; }
 .set-pieces button.on { border-color: var(--accent); color: var(--ink); background: color-mix(in oklab, var(--accent) 16%, var(--panel)); }
 
 .set-chips { display: flex; gap: 8px; flex-wrap: wrap; }
-.accent-row { flex-direction: row; align-items: center; justify-content: space-between; }
-.accent-row .set-chips { justify-content: flex-end; flex-wrap: nowrap; gap: 4px; }
-.accent-row .set-chip { width: 32px; flex: none; }
 .set-chip { width: 40px; height: 30px; border-radius: 7px; border: 2px solid transparent;
   cursor: pointer; padding: 0; overflow: hidden; position: relative; box-shadow: 0 0 0 1px var(--line); }
 .set-chip.on { border-color: var(--accent); }

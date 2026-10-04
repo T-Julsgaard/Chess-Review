@@ -3856,7 +3856,7 @@ function pieceGrid() {
   );
 }
 function colorChips(label, key, entries) {
-  return el("div", { class: "set-row" + (key === "accent" ? " accent-row" : "") },
+  return el("div", { class: "set-row" },
     label ? el("span", { class: "set-lbl" }, label) : null,
     el("div", { class: "set-chips" },
       ...entries.map((e) => { const chip = el("button", { class: "set-chip" + (S.settings[key] === e.value ? " on" : ""), title: e.title || e.value, onclick: e.onClick || (() => setSetting(key, e.value)) }); e.render(chip); return chip; })),
@@ -4224,19 +4224,14 @@ function visualSettings() {
     section("Board / Pieces",
       colorChips("", "boardTheme", boardEntries),
       pieceGrid(),
-      toggleRow("Coordinates", "showCoords"),
+      toggleRow("Board coordinates", "showCoords"),
       slider("Size", "coordSize", 10, 25, 1, {
         fmt: (v) => v + " px",
         onChange: (v) => document.documentElement.style.setProperty("--coord-size", v + "px"),
       }),
     ),
     section("Best-move arrow",
-      toggleRow("Show arrow", "bestArrow"),
-      toggleRow("Show the threat", "showThreat", setSetting, "Draws a yellow arrow with the opponent's best move as if it were their turn — i.e. the threat against the move you just played. Helps answer \"why was that bad / what am I missing?\""),
-      slider("Opacity", "arrowOpacity", 0.3, 1, 0.02, { onChange: refreshArrows }),
-      slider("Shaft width", "arrowShaft", 0.14, 0.42, 0.01, { onChange: refreshArrows }),
-      slider("Head size", "arrowHead", 0.22, 0.55, 0.01, { onChange: refreshArrows }),
-      colorChips("Color", "bestArrowColor", [{
+      colorChips("Arrow color", "bestArrowColor", [{
         value: S.settings.bestArrowColor || ARROW_COLOR,
         title: "Arrow color — click to pick",
         onClick: (e) => openArrowColorPicker(e.currentTarget),
@@ -4246,6 +4241,11 @@ function visualSettings() {
           chip.append(el("span", { class: "chip-edit" }, "✎"));
         },
       }]),
+      toggleRow("Show arrow", "bestArrow"),
+      toggleRow("Show the threat", "showThreat", setSetting, "Draws a yellow arrow with the opponent's best move as if it were their turn — i.e. the threat against the move you just played. Helps answer \"why was that bad / what am I missing?\""),
+      slider("Opacity", "arrowOpacity", 0.3, 1, 0.02, { onChange: refreshArrows }),
+      slider("Shaft width", "arrowShaft", 0.14, 0.42, 0.01, { onChange: refreshArrows }),
+      slider("Head size", "arrowHead", 0.22, 0.55, 0.01, { onChange: refreshArrows }),
       el("button", { class: "set-reset", onclick: resetArrowSettings }, "Reset to default"),
     ),
     section("Loading",
