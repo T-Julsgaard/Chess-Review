@@ -1,0 +1,6 @@
+# Rendered deliverables and intermediates (npm run render)
+out/
+# UI frames from the real extension (npm run capture), about 1.4 GB
+public/captures/
+# Copies of the extension's fonts, badges, sounds and store images (written by every render)
+public/shared/

@@ -1,0 +1,1024 @@
+{
+ "take": "audio/narration-take.mp3",
+ "duration": 54.64,
+ "voice": {
+  "name": "CJ - Young Swedish Male",
+  "voice_id": "9n6dGtreZHvmNb14Y1VO",
+  "model": "eleven_v4",
+  "source": "ElevenLabs text to speech, through the ElevenLabs connector",
+  "generated": "2026-10-04",
+  "take": "one full take, picked from four voices (Chris, Matt, CJ, Emma) after the first narrator sounded too much like an American advert"
+ },
+ "chunks": [
+  {
+   "id": "close-game",
+   "cues": [
+    {
+     "text": "Twenty-seven moves. A close game.",
+     "start": 0.0,
+     "end": 2.26
+    }
+   ],
+   "words": [
+    {
+     "w": "27",
+     "start": 0.0,
+     "end": 0.34
+    },
+    {
+     "w": "moves.",
+     "start": 0.34,
+     "end": 0.92
+    },
+    {
+     "w": "A",
+     "start": 1.22,
+     "end": 1.6
+    },
+    {
+     "w": "close",
+     "start": 1.6,
+     "end": 1.92
+    },
+    {
+     "w": "game.",
+     "start": 1.92,
+     "end": 2.26
+    }
+   ],
+   "in": 0.0,
+   "out": 2.585
+  },
+  {
+   "id": "pawn-grab",
+   "cues": [
+    {
+     "text": "Then one pawn grab… and it's mate.",
+     "start": 2.56,
+     "end": 5.28
+    }
+   ],
+   "words": [
+    {
+     "w": "Then,",
+     "start": 2.56,
+     "end": 3.12
+    },
+    {
+     "w": "one",
+     "start": 3.26,
+     "end": 3.62
+    },
+    {
+     "w": "pawn",
+     "start": 3.62,
+     "end": 3.92
+    },
+    {
+     "w": "grab,",
+     "start": 3.92,
+     "end": 4.16
+    },
+    {
+     "w": "and",
+     "start": 4.4,
+     "end": 4.88
+    },
+    {
+     "w": "it's",
+     "start": 4.88,
+     "end": 5.06
+    },
+    {
+     "w": "mate.",
+     "start": 5.06,
+     "end": 5.28
+    }
+   ],
+   "in": 2.585,
+   "out": 5.53
+  },
+  {
+   "id": "question",
+   "cues": [
+    {
+     "text": "So what should you have played?",
+     "start": 5.52,
+     "end": 7.16
+    }
+   ],
+   "words": [
+    {
+     "w": "So,",
+     "start": 5.52,
+     "end": 6.08
+    },
+    {
+     "w": "what",
+     "start": 6.16,
+     "end": 6.44
+    },
+    {
+     "w": "should",
+     "start": 6.44,
+     "end": 6.62
+    },
+    {
+     "w": "you",
+     "start": 6.62,
+     "end": 6.76
+    },
+    {
+     "w": "have",
+     "start": 6.76,
+     "end": 6.86
+    },
+    {
+     "w": "played?",
+     "start": 6.86,
+     "end": 7.16
+    }
+   ],
+   "in": 5.53,
+   "out": 7.495
+  },
+  {
+   "id": "intro",
+   "cues": [
+    {
+     "text": "This is Chess Review.",
+     "start": 7.48,
+     "end": 8.82
+    },
+    {
+     "text": "Free game review for Chess.com and Lichess,",
+     "start": 9.04,
+     "end": 11.68
+    },
+    {
+     "text": "with Stockfish running right in your browser.",
+     "start": 11.72,
+     "end": 13.66
+    }
+   ],
+   "words": [
+    {
+     "w": "This",
+     "start": 7.48,
+     "end": 7.96
+    },
+    {
+     "w": "is",
+     "start": 7.96,
+     "end": 8.26
+    },
+    {
+     "w": "Chess",
+     "start": 8.26,
+     "end": 8.62
+    },
+    {
+     "w": "Review,",
+     "start": 8.62,
+     "end": 8.82
+    },
+    {
+     "w": "free",
+     "start": 9.04,
+     "end": 9.42
+    },
+    {
+     "w": "game",
+     "start": 9.42,
+     "end": 9.64
+    },
+    {
+     "w": "review",
+     "start": 9.64,
+     "end": 9.88
+    },
+    {
+     "w": "for",
+     "start": 9.88,
+     "end": 10.18
+    },
+    {
+     "w": "Chess",
+     "start": 10.18,
+     "end": 10.46
+    },
+    {
+     "w": ".com",
+     "start": 10.46,
+     "end": 10.92
+    },
+    {
+     "w": "and",
+     "start": 10.92,
+     "end": 11.16
+    },
+    {
+     "w": "LeeChess,",
+     "start": 11.16,
+     "end": 11.68
+    },
+    {
+     "w": "with",
+     "start": 11.72,
+     "end": 11.94
+    },
+    {
+     "w": "Stockfish",
+     "start": 11.94,
+     "end": 12.38
+    },
+    {
+     "w": "running",
+     "start": 12.38,
+     "end": 12.68
+    },
+    {
+     "w": "right",
+     "start": 12.68,
+     "end": 13.06
+    },
+    {
+     "w": "in",
+     "start": 13.06,
+     "end": 13.22
+    },
+    {
+     "w": "your",
+     "start": 13.22,
+     "end": 13.34
+    },
+    {
+     "w": "browser.",
+     "start": 13.34,
+     "end": 13.66
+    }
+   ],
+   "in": 7.495,
+   "out": 13.96
+  },
+  {
+   "id": "one-click",
+   "cues": [
+    {
+     "text": "Finish a game, and click Analyze with Chess Review.",
+     "start": 13.98,
+     "end": 16.54
+    },
+    {
+     "text": "Or paste a link, or a PGN.",
+     "start": 16.72,
+     "end": 18.78
+    }
+   ],
+   "words": [
+    {
+     "w": "Finish",
+     "start": 13.98,
+     "end": 14.4
+    },
+    {
+     "w": "a",
+     "start": 14.4,
+     "end": 14.56
+    },
+    {
+     "w": "game",
+     "start": 14.56,
+     "end": 14.86
+    },
+    {
+     "w": "and",
+     "start": 14.86,
+     "end": 15.02
+    },
+    {
+     "w": "click",
+     "start": 15.02,
+     "end": 15.24
+    },
+    {
+     "w": "Analyze",
+     "start": 15.24,
+     "end": 15.86
+    },
+    {
+     "w": "with",
+     "start": 15.86,
+     "end": 16.04
+    },
+    {
+     "w": "Chess",
+     "start": 16.04,
+     "end": 16.34
+    },
+    {
+     "w": "Review,",
+     "start": 16.34,
+     "end": 16.54
+    },
+    {
+     "w": "or",
+     "start": 16.72,
+     "end": 17.12
+    },
+    {
+     "w": "paste",
+     "start": 17.12,
+     "end": 17.44
+    },
+    {
+     "w": "a",
+     "start": 17.44,
+     "end": 17.64
+    },
+    {
+     "w": "link,",
+     "start": 17.64,
+     "end": 17.8
+    },
+    {
+     "w": "or",
+     "start": 17.94,
+     "end": 18.24
+    },
+    {
+     "w": "a",
+     "start": 18.24,
+     "end": 18.38
+    },
+    {
+     "w": "PGN.",
+     "start": 18.38,
+     "end": 18.78
+    }
+   ],
+   "in": 13.96,
+   "out": 19.0
+  },
+  {
+   "id": "classified",
+   "cues": [
+    {
+     "text": "Every move is classified, from Brilliant to Blunder,",
+     "start": 18.98,
+     "end": 21.98
+    },
+    {
+     "text": "and the graph shows where the game turned.",
+     "start": 22.08,
+     "end": 23.92
+    }
+   ],
+   "words": [
+    {
+     "w": "Every",
+     "start": 18.98,
+     "end": 19.46
+    },
+    {
+     "w": "move",
+     "start": 19.46,
+     "end": 19.72
+    },
+    {
+     "w": "is",
+     "start": 19.72,
+     "end": 19.9
+    },
+    {
+     "w": "classified,",
+     "start": 19.9,
+     "end": 20.38
+    },
+    {
+     "w": "from",
+     "start": 20.64,
+     "end": 20.9
+    },
+    {
+     "w": "Brilliant",
+     "start": 20.9,
+     "end": 21.26
+    },
+    {
+     "w": "to",
+     "start": 21.26,
+     "end": 21.56
+    },
+    {
+     "w": "Blunder,",
+     "start": 21.56,
+     "end": 21.98
+    },
+    {
+     "w": "and",
+     "start": 22.08,
+     "end": 22.46
+    },
+    {
+     "w": "the",
+     "start": 22.46,
+     "end": 22.58
+    },
+    {
+     "w": "graph",
+     "start": 22.58,
+     "end": 22.8
+    },
+    {
+     "w": "shows",
+     "start": 22.8,
+     "end": 23.06
+    },
+    {
+     "w": "where",
+     "start": 23.06,
+     "end": 23.36
+    },
+    {
+     "w": "the",
+     "start": 23.36,
+     "end": 23.5
+    },
+    {
+     "w": "game",
+     "start": 23.5,
+     "end": 23.7
+    },
+    {
+     "w": "turned.",
+     "start": 23.7,
+     "end": 23.92
+    }
+   ],
+   "in": 19.0,
+   "out": 24.2
+  },
+  {
+   "id": "mistake",
+   "cues": [
+    {
+     "text": "Move 28, queen takes d4. A mistake.",
+     "start": 24.18,
+     "end": 27.64
+    }
+   ],
+   "words": [
+    {
+     "w": "Move",
+     "start": 24.18,
+     "end": 24.66
+    },
+    {
+     "w": "28.",
+     "start": 24.66,
+     "end": 25.12
+    },
+    {
+     "w": "Queen",
+     "start": 25.4,
+     "end": 25.84
+    },
+    {
+     "w": "takes",
+     "start": 25.84,
+     "end": 26.2
+    },
+    {
+     "w": "d4.",
+     "start": 26.2,
+     "end": 26.68
+    },
+    {
+     "w": "A",
+     "start": 26.94,
+     "end": 27.36
+    },
+    {
+     "w": "mistake.",
+     "start": 27.36,
+     "end": 27.64
+    }
+   ],
+   "in": 24.2,
+   "out": 27.89
+  },
+  {
+   "id": "arrow",
+   "cues": [
+    {
+     "text": "The arrow shows what held. Rook to g1.",
+     "start": 28.02,
+     "end": 30.68
+    }
+   ],
+   "words": [
+    {
+     "w": "The",
+     "start": 28.02,
+     "end": 28.34
+    },
+    {
+     "w": "arrow",
+     "start": 28.34,
+     "end": 28.58
+    },
+    {
+     "w": "shows",
+     "start": 28.58,
+     "end": 28.88
+    },
+    {
+     "w": "what",
+     "start": 28.88,
+     "end": 29.18
+    },
+    {
+     "w": "held.",
+     "start": 29.18,
+     "end": 29.46
+    },
+    {
+     "w": "Rook",
+     "start": 29.66,
+     "end": 30.12
+    },
+    {
+     "w": "to",
+     "start": 30.12,
+     "end": 30.26
+    },
+    {
+     "w": "g1.",
+     "start": 30.26,
+     "end": 30.68
+    }
+   ],
+   "in": 27.89,
+   "out": 30.96
+  },
+  {
+   "id": "own-idea",
+   "cues": [
+    {
+     "text": "Try your own idea, and it's rated too.",
+     "start": 30.94,
+     "end": 33.02
+    }
+   ],
+   "words": [
+    {
+     "w": "Try",
+     "start": 30.94,
+     "end": 31.38
+    },
+    {
+     "w": "your",
+     "start": 31.38,
+     "end": 31.58
+    },
+    {
+     "w": "own",
+     "start": 31.58,
+     "end": 31.76
+    },
+    {
+     "w": "idea,",
+     "start": 31.76,
+     "end": 32.04
+    },
+    {
+     "w": "and",
+     "start": 32.16,
+     "end": 32.42
+    },
+    {
+     "w": "it's",
+     "start": 32.42,
+     "end": 32.54
+    },
+    {
+     "w": "rated",
+     "start": 32.54,
+     "end": 32.76
+    },
+    {
+     "w": "too.",
+     "start": 32.76,
+     "end": 33.02
+    }
+   ],
+   "in": 30.96,
+   "out": 33.42
+  },
+  {
+   "id": "still-mate",
+   "cues": [
+    {
+     "text": "Pawn to h3? Still mate.",
+     "start": 33.42,
+     "end": 35.22
+    }
+   ],
+   "words": [
+    {
+     "w": "Pawn",
+     "start": 33.42,
+     "end": 33.74
+    },
+    {
+     "w": "to",
+     "start": 33.74,
+     "end": 33.84
+    },
+    {
+     "w": "h3?",
+     "start": 33.84,
+     "end": 34.26
+    },
+    {
+     "w": "Still",
+     "start": 34.44,
+     "end": 34.94
+    },
+    {
+     "w": "mate.",
+     "start": 34.94,
+     "end": 35.22
+    }
+   ],
+   "in": 33.42,
+   "out": 35.48
+  },
+  {
+   "id": "accuracy",
+   "cues": [
+    {
+     "text": "You also get accuracy for both players,",
+     "start": 35.46,
+     "end": 37.78
+    },
+    {
+     "text": "and an estimated performance rating.",
+     "start": 37.78,
+     "end": 39.62
+    }
+   ],
+   "words": [
+    {
+     "w": "You",
+     "start": 35.46,
+     "end": 35.9
+    },
+    {
+     "w": "also",
+     "start": 35.9,
+     "end": 36.12
+    },
+    {
+     "w": "get",
+     "start": 36.12,
+     "end": 36.34
+    },
+    {
+     "w": "accuracy",
+     "start": 36.34,
+     "end": 36.76
+    },
+    {
+     "w": "for",
+     "start": 36.76,
+     "end": 37.12
+    },
+    {
+     "w": "both",
+     "start": 37.12,
+     "end": 37.4
+    },
+    {
+     "w": "players",
+     "start": 37.4,
+     "end": 37.78
+    },
+    {
+     "w": "and",
+     "start": 37.78,
+     "end": 38.14
+    },
+    {
+     "w": "an",
+     "start": 38.14,
+     "end": 38.38
+    },
+    {
+     "w": "estimated",
+     "start": 38.38,
+     "end": 38.76
+    },
+    {
+     "w": "performance",
+     "start": 38.76,
+     "end": 39.08
+    },
+    {
+     "w": "rating.",
+     "start": 39.08,
+     "end": 39.62
+    }
+   ],
+   "in": 35.48,
+   "out": 39.84
+  },
+  {
+   "id": "practice",
+   "cues": [
+    {
+     "text": "Then, practice your mistakes.",
+     "start": 39.82,
+     "end": 41.38
+    },
+    {
+     "text": "Chess Review takes you back to the moment…",
+     "start": 41.82,
+     "end": 43.72
+    },
+    {
+     "text": "and you find the better move.",
+     "start": 43.86,
+     "end": 45.26
+    }
+   ],
+   "words": [
+    {
+     "w": "Then,",
+     "start": 39.82,
+     "end": 40.3
+    },
+    {
+     "w": "practice",
+     "start": 40.4,
+     "end": 40.86
+    },
+    {
+     "w": "your",
+     "start": 40.86,
+     "end": 41.12
+    },
+    {
+     "w": "mistakes.",
+     "start": 41.12,
+     "end": 41.38
+    },
+    {
+     "w": "Chess",
+     "start": 41.82,
+     "end": 42.24
+    },
+    {
+     "w": "Review",
+     "start": 42.24,
+     "end": 42.42
+    },
+    {
+     "w": "takes",
+     "start": 42.42,
+     "end": 42.68
+    },
+    {
+     "w": "you",
+     "start": 42.68,
+     "end": 42.92
+    },
+    {
+     "w": "back",
+     "start": 42.92,
+     "end": 43.18
+    },
+    {
+     "w": "to",
+     "start": 43.18,
+     "end": 43.32
+    },
+    {
+     "w": "the",
+     "start": 43.32,
+     "end": 43.42
+    },
+    {
+     "w": "moment,",
+     "start": 43.42,
+     "end": 43.72
+    },
+    {
+     "w": "and",
+     "start": 43.86,
+     "end": 44.18
+    },
+    {
+     "w": "you",
+     "start": 44.18,
+     "end": 44.32
+    },
+    {
+     "w": "find",
+     "start": 44.32,
+     "end": 44.62
+    },
+    {
+     "w": "the",
+     "start": 44.62,
+     "end": 44.78
+    },
+    {
+     "w": "better",
+     "start": 44.78,
+     "end": 45.0
+    },
+    {
+     "w": "move.",
+     "start": 45.0,
+     "end": 45.26
+    }
+   ],
+   "in": 39.84,
+   "out": 45.57
+  },
+  {
+   "id": "personal",
+   "cues": [
+    {
+     "text": "Choose from ten coaches,",
+     "start": 45.56,
+     "end": 46.88
+    },
+    {
+     "text": "and the board and pieces you like.",
+     "start": 46.88,
+     "end": 48.52
+    }
+   ],
+   "words": [
+    {
+     "w": "Choose",
+     "start": 45.56,
+     "end": 45.96
+    },
+    {
+     "w": "from",
+     "start": 45.96,
+     "end": 46.2
+    },
+    {
+     "w": "10",
+     "start": 46.2,
+     "end": 46.46
+    },
+    {
+     "w": "coaches",
+     "start": 46.46,
+     "end": 46.88
+    },
+    {
+     "w": "and",
+     "start": 46.88,
+     "end": 47.26
+    },
+    {
+     "w": "the",
+     "start": 47.26,
+     "end": 47.42
+    },
+    {
+     "w": "board",
+     "start": 47.42,
+     "end": 47.66
+    },
+    {
+     "w": "and",
+     "start": 47.66,
+     "end": 47.78
+    },
+    {
+     "w": "pieces",
+     "start": 47.78,
+     "end": 48.02
+    },
+    {
+     "w": "you",
+     "start": 48.02,
+     "end": 48.32
+    },
+    {
+     "w": "like.",
+     "start": 48.32,
+     "end": 48.52
+    }
+   ],
+   "in": 45.57,
+   "out": 48.72
+  },
+  {
+   "id": "trust",
+   "cues": [
+    {
+     "text": "No account. No subscription. Open source.",
+     "start": 48.7,
+     "end": 51.44
+    }
+   ],
+   "words": [
+    {
+     "w": "No",
+     "start": 48.7,
+     "end": 49.12
+    },
+    {
+     "w": "account,",
+     "start": 49.12,
+     "end": 49.38
+    },
+    {
+     "w": "no",
+     "start": 49.64,
+     "end": 49.96
+    },
+    {
+     "w": "subscription,",
+     "start": 49.96,
+     "end": 50.4
+    },
+    {
+     "w": "open",
+     "start": 50.7,
+     "end": 51.14
+    },
+    {
+     "w": "source.",
+     "start": 51.14,
+     "end": 51.44
+    }
+   ],
+   "in": 48.72,
+   "out": 51.78
+  },
+  {
+   "id": "cta",
+   "cues": [
+    {
+     "text": "Chess Review. Free on the Chrome Web Store.",
+     "start": 51.76,
+     "end": 54.22
+    }
+   ],
+   "words": [
+    {
+     "w": "Chess",
+     "start": 51.76,
+     "end": 52.28
+    },
+    {
+     "w": "Review,",
+     "start": 52.28,
+     "end": 52.44
+    },
+    {
+     "w": "free",
+     "start": 52.68,
+     "end": 53.16
+    },
+    {
+     "w": "on",
+     "start": 53.16,
+     "end": 53.38
+    },
+    {
+     "w": "the",
+     "start": 53.38,
+     "end": 53.5
+    },
+    {
+     "w": "Chrome",
+     "start": 53.5,
+     "end": 53.72
+    },
+    {
+     "w": "Web",
+     "start": 53.72,
+     "end": 53.96
+    },
+    {
+     "w": "Store.",
+     "start": 53.96,
+     "end": 54.22
+    }
+   ],
+   "in": 51.78,
+   "out": 54.64
+  }
+ ]
+}

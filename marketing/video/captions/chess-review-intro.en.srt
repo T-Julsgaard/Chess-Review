@@ -1,0 +1,96 @@
+1
+00:00:00,700 --> 00:00:03,460
+Twenty-seven moves. A close game.
+
+2
+00:00:03,875 --> 00:00:07,095
+Then one pawn grab… and it's mate.
+
+3
+00:00:07,490 --> 00:00:09,630
+So what should you have played?
+
+4
+00:00:09,985 --> 00:00:11,525
+This is Chess Review.
+
+5
+00:00:11,545 --> 00:00:14,205
+Free game review
+for Chess.com and Lichess,
+
+6
+00:00:14,225 --> 00:00:16,665
+with Stockfish running
+right in your browser.
+
+7
+00:00:17,020 --> 00:00:19,740
+Finish a game, and click
+Analyze with Chess Review.
+
+8
+00:00:19,760 --> 00:00:22,320
+Or paste a link, or a PGN.
+
+9
+00:00:23,030 --> 00:00:26,110
+Every move is classified,
+from Brilliant to Blunder,
+
+10
+00:00:26,130 --> 00:00:28,470
+and the graph shows where the game turned.
+
+11
+00:00:29,080 --> 00:00:33,010
+Move 28, queen takes d4. A mistake.
+
+12
+00:00:33,030 --> 00:00:36,160
+The arrow shows what held. Rook to g1.
+
+13
+00:00:36,180 --> 00:00:38,580
+Try your own idea, and it's rated too.
+
+14
+00:00:38,600 --> 00:00:40,900
+Pawn to h3? Still mate.
+
+15
+00:00:41,180 --> 00:00:43,480
+You also get accuracy for both players,
+
+16
+00:00:43,500 --> 00:00:45,840
+and an estimated performance rating.
+
+17
+00:00:45,980 --> 00:00:47,960
+Then, practice your mistakes.
+
+18
+00:00:47,980 --> 00:00:50,000
+Chess Review takes you back to the moment…
+
+19
+00:00:50,020 --> 00:00:51,920
+and you find the better move.
+
+20
+00:00:53,490 --> 00:00:54,790
+Choose from ten coaches,
+
+21
+00:00:54,810 --> 00:00:56,950
+and the board and pieces you like.
+
+22
+00:00:57,480 --> 00:01:00,720
+No account. No subscription. Open source.
+
+23
+00:01:00,830 --> 00:01:03,790
+Chess Review.
+Free on the Chrome Web Store.

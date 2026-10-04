@@ -28,6 +28,7 @@ Many small asset files are intentional; removing them can break optional setting
 | `LICENSE`, `ATTRIBUTIONS.md`, `THIRD_PARTY_NOTICES.md` | Project license, third-party notices and asset provenance. |
 | `PRIVACY.md`, `SECURITY.md` | Actual data handling and how to report vulnerabilities. |
 | `RELEASE.md`, [marketing/STORE_LISTING2.md](../marketing/STORE_LISTING2.md) | Packaging, store review guidance and prepared listing/privacy text. These are operational documents, even though the app does not execute them. |
+| [marketing/video/](../marketing/video/README.md) | Script, cached narration and music, captions and the Remotion project that renders the introduction video and its thumbnail. It is not part of the extension package. |
 | `CONTRIBUTING.md`, `.github/` | Contributor guidance, issue/PR forms and dependency update configuration. |
 | `package.json`, `package-lock.json` | Commands and reproducible development dependency versions. |
 | `scripts/` | Package builds, engine verification and optional browser smoke checks. `node scripts/generate-category-labels.mjs` rebuilds transparent PNG labels and SVG badge references with local Chrome and the bundled fonts. |
@@ -43,6 +44,8 @@ Keep short-lived outputs in ignored directories. `npm ci` recreates
 `web-ext-artifacts/`. Use `scratch/` for temporary reports, one-off diagnostic
 scripts, sample exports, and other investigation files; it is ignored by Git and
 excluded from release packages. Use `calibration-runs/` for calibration inputs and logs.
+The introduction video renders to `marketing/video/out/`, and its UI captures stay
+in `marketing/video/public/captures/`.
 Repository metadata lives in `.git/`.
 
 Tracked files should support runtime, maintained tooling, reproduction or
