@@ -9,6 +9,7 @@ import { flagCodeForCountryId, countryNameForId } from "./flags.js";
 import { BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg } from "./move-grades.js";
 import { CATEGORY_LABEL_FONT, categoryLabelPng } from "./lib/category-label.js";
 import { browserAPI } from "./browser-compat.js";
+import { resetSettingsForRelease } from "./release-settings.js";
 import { expectedPoints, SF19_OUTCOME } from "./lib/public-scoring.js";
 import { calibratedReview, scoringEvidenceComplete } from "./lib/calibrated-review.js";
 import { analyseCalibratedPosition } from "./lib/calibrated-search.js";
@@ -85,6 +86,19 @@ const QUALITY = {
   blunder:   { sym: "??", name: "Blunder",   color: "var(--q-blunder)",   icon: "blunder" },
 };
 const QUALITY_ORDER = ["brilliant","great","best","excellent","good","book","inacc","mistake","miss","blunder"];
+const BADGE_LABEL_STYLES = {
+  off: { name: "Off", description: "Keep the board quiet" },
+  editorial: { name: "Editorial", description: "Warm serif · fine rules" },
+  studio: { name: "Studio", description: "Crisp type · graphite" },
+  soft: { name: "Soft", description: "Rounded type · gentle tint" },
+  minimal: { name: "Minimal", description: "Small type · subtle accent" },
+  original: { name: "Original", description: "Illustrated lettering · pop" },
+};
+function badgeLabelStyle(value = S.settings.badgeTooltip) {
+  // Preserve the former on/off choice when upgrading saved preferences.
+  if (value === true) return "original";
+  return Object.hasOwn(BADGE_LABEL_STYLES, value) ? value : "off";
+}
 // Accuracy breakdown: compact (default) vs. full list (expanded via the expander arrow).
 const QBREAK_SUMMARY = ["brilliant","great","best","mistake","miss","blunder"];
 const QBREAK_FULL = ["brilliant","great","best","excellent","good","inacc","mistake","miss","blunder","book"];
@@ -154,7 +168,7 @@ function updateGradeBadge(node, cls, score, example = false) {
   node.replaceChildren(gradeBadge(cls, score, "", {}, example).firstElementChild);
 }
 function refreshBadgeAppearance() {
-  if (!S.settings.badgeTooltip) hideBoardBadgeTip();
+  if (badgeLabelStyle() === "off") hideBoardBadgeTip();
   hideQTip();
   for (const node of document.querySelectorAll(".grade-badge")) {
     updateGradeBadge(node, node.dataset.badgeCategory,
@@ -199,6 +213,11 @@ const REMOVED_BOARD_THEMES = {
 };
 function migrateVisualAssetSettings(settings) {
   let changed = false;
+  const labelStyle = badgeLabelStyle(settings.badgeTooltip);
+  if (settings.badgeTooltip !== labelStyle) {
+    settings.badgeTooltip = labelStyle;
+    changed = true;
+  }
   // Upgrade the former default once; explicit selections of other fonts survive.
   // badgeDecimals identifies legacy settings and is removed below.
   if (settings.badgeFont === "original" && Object.hasOwn(settings, "badgeDecimals")) {
@@ -228,7 +247,7 @@ const DEFAULT_SETTINGS = {
   categoryNames: {},
   theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
-  badgeFont: "spacemono", badgeTooltip: false,
+  badgeFont: "spacemono", badgeTooltip: "off",
   // Eval-graph look (see renderGraph), eval-BAR look (see renderEvalBar) and the Insight-panel text size (px).
   graphStyle: "area", barStyle: "gradient", insightFont: 18,
   // Board coordinate labels (the a–h / 1–8 ticks in the squares' corners): on/off + size in px.
@@ -5715,6 +5734,7 @@ async function resetLegacyZoom() {
 }
 (async function main() {
   try {
+    await resetSettingsForRelease({ reason: "startup" });
     // Only the job + stored prefs are needed to build and show the UI. The opening book (~690 KB)
     // and the calibration file are only consumed once scoring/opening refinement runs, so we load
     // them in parallel and don't block the first paint on them — buildUI() can run as soon as the

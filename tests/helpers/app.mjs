@@ -49,7 +49,9 @@ export function app(t) {
   run('BOOK = {}; CALIB = { ...__publicCalibration, quality: { ...__publicCalibration.quality, outcome: { slopePerPawn: 0.3 } } };');
   const replace = (name, fn) => { context.__replacement = fn; run(`${name} = __replacement`); delete context.__replacement; };
   t.after(() => { for (const id of timers) clearTimeout(id); dom.window.close(); });
-  return { run, state, context, dom, store, writes, replace, call: (name, ...args) => run(name)(...args) };
+  return { run, state, context, dom, store, writes, replace,
+    start: () => vm.runInContext(raw.slice(startup), context, { filename: 'analysis.js' }),
+    call: (name, ...args) => run(name)(...args) };
 }
 
 export function loadGame(a, pgn, evals) {

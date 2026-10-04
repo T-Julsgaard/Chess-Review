@@ -15,6 +15,9 @@ games, favorites, stored analyses and game caches are preserved. A separate
 completion marker prevents repeat resets. The reset is restricted to the 0.2.1
 extension update event; keep its release constant and marker fixed in later
 releases, including for users who skip 0.2.1. New installs only record the marker.
+Review startup waits for the same reset under a shared browser lock and retries
+it if update handling was missed or its storage write failed. The marker is
+written with the reset so a late update handler cannot erase new customizations.
 Stored analyses can still be recalculated when incompatible with the default
 engine or scoring settings, without removing the saved games.
 

@@ -35,6 +35,7 @@ try {
     // the real tab/window zoom fit separately.
     await fs.appendFile(path.join(sourceDir,'analysis.js'), '\nglobalThis.__smokeResponsive=()=>{_zoomTabId=null;UI.canvas.classList.remove("desktop-layout");applyLayout();};\nglobalThis.__smokePreferences=()=>({settings:structuredClone(S.settings),layoutMode:S.layoutMode});\n');
     await fs.appendFile(path.join(sourceDir,'background.js'), '\nbrowserAPI.runtime.onInstalled.addListener(() => browserAPI.tabs.create({url:browserAPI.runtime.getURL("smoke.html")}));\n');
+    await fs.appendFile(path.join(sourceDir,'background.js'), '\nbrowserAPI.runtime.onMessage.addListener((message,sender,reply)=>{if(message.type!=="smokeReleaseReset")return;resetSettingsForRelease({reason:"update",previousVersion:"0.2.0"}).then(()=>reply({ok:true}),error=>reply({error:error.message}));return true;});\n');
     await fs.writeFile(path.join(sourceDir,'smoke.html'),'<!doctype html><script type="module" src="smoke-client.js"></script>');
     await fs.writeFile(path.join(sourceDir,'smoke-client.js'), `
 import {browserAPI} from './browser-compat.js';
@@ -134,13 +135,18 @@ try {
   await browserAPI.storage.local.remove('settingsResetFor021');
   const resetJob={pgn:'1. e4 e5 *',meta:{gameId:'reset-smoke'},source:'pgn'};
   const library=(await browserAPI.storage.local.get('library')).library;
-  library[0].favorite=true;
+  library[0].fav=true;
   await browserAPI.storage.local.set({username:'reset-user',library,
     settings:{boardTheme:'custom',pieceStyle:'merida',coach:'professor',soundVolume:37,enginePath:'sf19lite'},
     layout:{board:{x:20,y:30,w:400,h:400}},layoutMode:'custom',layoutVersion:8,
     'job:reset-smoke':resetJob});
   const before=await browserAPI.storage.local.get(null);
-  await resetSettingsForRelease({reason:'update',previousVersion:'0.2.0'});
+  const [backgroundReset]=await Promise.all([
+    browserAPI.runtime.sendMessage({type:'smokeReleaseReset'}),
+    resetSettingsForRelease({reason:'startup'}),
+    resetSettingsForRelease({reason:'update',previousVersion:'0.2.0'}),
+  ]);
+  if(!backgroundReset.ok)throw Error('Background reset failed: '+backgroundReset.error);
   const after=await browserAPI.storage.local.get(null);
   for(const key of Object.keys(before)) {
     if(['settings','layout','layoutMode','layoutVersion'].includes(key))continue;
@@ -170,8 +176,18 @@ try {
   resetFrame.src='analysis.html#reset-smoke';
   const reopened=await preferences();
   if(reopened.settings.boardTheme!=='coral'||reopened.settings.soundVolume!==23)throw Error('Release reset repeated after customization');
+  if(!(await browserAPI.storage.local.get('library')).library.find(game=>game.id===library[0].id)?.fav)throw Error('Favorite flag lost after reopening');
+  // Exercise recovery when the install/update handler never completed: actual
+  // review startup must reset before building its first UI, without an event.
+  resetFrame.src='about:blank';await wait(100);
+  await browserAPI.storage.local.remove('settingsResetFor021');
+  await browserAPI.storage.local.set({'job:reset-smoke':resetJob});
+  resetFrame.src='analysis.html#reset-smoke';
+  const retried=await preferences();
+  if(retried.settings.boardTheme!=='maple'||retried.settings.soundVolume!==50)throw Error('Review startup failed to recover the reset');
+  if(!(await browserAPI.storage.local.get('library')).library.find(game=>game.id===library[0].id)?.fav)throw Error('Favorite flag lost after startup recovery');
   resetFrame.remove();
-  await report({step:'one-time-release-reset',preservedUsername:true,preservedGamesAndFavorites:true,preservedAnalyses:true,defaultsRendered:true,customizationsRetained:true});
+  await report({step:'one-time-release-reset',preservedUsername:true,preservedGamesAndFavorites:true,preservedAnalyses:true,defaultsRendered:true,customizationsRetained:true,backgroundAndPageCoordination:true,startupRecovery:true});
   await report({done:true,ok:true,results});
 } catch(e){await report({done:true,ok:false,error:e.stack});}
 `);
