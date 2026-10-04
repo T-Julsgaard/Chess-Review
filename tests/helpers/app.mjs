@@ -4,6 +4,7 @@ import { JSDOM } from 'jsdom';
 import { Chess } from '../../lib/chess.js';
 import { flagCodeForCountryId, countryNameForId } from '../../flags.js';
 import { BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg } from '../../move-grades.js';
+import { CATEGORY_LABEL_FONT, categoryLabelPng } from '../../lib/category-label.js';
 import {expectedPoints, SF19_OUTCOME} from '../../lib/public-scoring.js';
 import {calibratedReview,scoringEvidenceComplete} from '../../lib/calibrated-review.js';
 import {analyseCalibratedPosition} from '../../lib/calibrated-search.js';
@@ -32,6 +33,7 @@ export function app(t, {sourceOverride} = {}) {
     getComputedStyle: dom.window.getComputedStyle, performance, structuredClone,
     URL, TextEncoder, btoa, console, Chess, flagCodeForCountryId, countryNameForId, browserAPI,
     BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg,
+    CATEGORY_LABEL_FONT, categoryLabelPng,
     expectedPoints, SF19_OUTCOME, calibratedReview, scoringEvidenceComplete, analyseCalibratedPosition,
     Engine: class { constructor() { throw Error('Unexpected real engine'); } },
     fetch: async () => { throw Error('Unexpected network access'); },

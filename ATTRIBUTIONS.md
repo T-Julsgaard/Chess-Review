@@ -121,6 +121,16 @@ Distributed by Lichess (lila); high-quality vector SVGs.
   shared renderer by `tests/move-grades.test.mjs`; they are not loaded by the review UI.
 - **License:** GNU GPL v3.0, under the project's [LICENSE](LICENSE).
 
+## Transparent move labels
+- **Files:** `icons/labels/*.png` and `lib/category-label.js`.
+- **Source:** project-created typography using the bundled Space Grotesk font
+  listed below. All ten categories use the same renderer; renamed categories
+  generate transparent PNGs locally with the same lettering and category colours.
+- **Reproduction:** `node scripts/generate-category-labels.mjs` rebuilds the PNGs
+  at three times their display resolution using local Chrome and bundled fonts.
+- **License:** artwork and renderer follow the project's [GNU GPL v3.0 license](LICENSE).
+  The font retains its SIL Open Font License in `fonts/spacegrotesk-OFL.txt`.
+
 ## App logo / icon
 - **Files:** `icons/icon16.png`, `icons/icon48.png`, `icons/icon128.png`, `icons/icon.png`
 - Project logo composition incorporating Colin M.L. Burnett's ("Cburnett") white

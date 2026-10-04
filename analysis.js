@@ -7,6 +7,7 @@ import { Chess } from "./lib/chess.js";
 import { Engine } from "./engine/uci.js";
 import { flagCodeForCountryId, countryNameForId } from "./flags.js";
 import { BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg } from "./move-grades.js";
+import { CATEGORY_LABEL_FONT, categoryLabelPng } from "./lib/category-label.js";
 import { browserAPI } from "./browser-compat.js";
 import { expectedPoints, SF19_OUTCOME } from "./lib/public-scoring.js";
 import { calibratedReview, scoringEvidenceComplete } from "./lib/calibrated-review.js";
@@ -128,14 +129,14 @@ const ENGINE_INFO = {
 function gradeBadge(cls, score, className, attrs = {}, example = false) {
   const label = gradeLabel(cls, score, categoryName(cls), example);
   return el("span", { class: className + " grade-badge", role: "img", "aria-label": label,
-    "data-grade": cls === "book" ? "book" : gradeText(score, S.settings.badgeDecimals),
+    "data-grade": cls === "book" ? "book" : gradeText(score, true),
     "data-badge-category": cls, "data-score": Number.isFinite(score) ? score : "",
     "data-example": String(example), "data-render-key": badgeRenderKey(cls, score, example), ...attrs,
     html: gradeSvg(cls, score, categoryName(cls), example, S.settings).replace('role="img"', 'aria-hidden="true"'),
   });
 }
 function badgeRenderKey(cls, score, example) {
-  return JSON.stringify([cls, score, example, categoryName(cls), S.settings.badgeDecimals, S.settings.badgeFont]);
+  return JSON.stringify([cls, score, example, categoryName(cls), S.settings.badgeFont]);
 }
 function activeMoveGrade() {
   return S.analysisMode ? activePos().moveGrade : S.moveGrades[S.idx];
@@ -143,7 +144,7 @@ function activeMoveGrade() {
 function updateGradeBadge(node, cls, score, example = false) {
   const key = badgeRenderKey(cls, score, example);
   if (node.dataset.renderKey === key) return;
-  const next = cls === "book" ? "book" : gradeText(score, S.settings.badgeDecimals);
+  const next = cls === "book" ? "book" : gradeText(score, true);
   node.dataset.grade = next;
   node.dataset.score = Number.isFinite(score) ? score : "";
   node.dataset.renderKey = key;
@@ -153,18 +154,15 @@ function updateGradeBadge(node, cls, score, example = false) {
   node.replaceChildren(gradeBadge(cls, score, "", {}, example).firstElementChild);
 }
 function refreshBadgeAppearance() {
-  hideBoardBadgeTip(); hideQTip();
+  if (!S.settings.badgeTooltip) hideBoardBadgeTip();
+  hideQTip();
   for (const node of document.querySelectorAll(".grade-badge")) {
     updateGradeBadge(node, node.dataset.badgeCategory,
       node.dataset.score === "" ? null : Number(node.dataset.score), node.dataset.example === "true");
-    if (node.classList.contains("qb")) {
-      if (S.settings.badgeTooltip) node.title = node.getAttribute("aria-label");
-      else node.removeAttribute("title");
-    }
+    node.removeAttribute("title");
   }
   for (const node of document.querySelectorAll(".qb.dot")) {
-    if (S.settings.badgeTooltip) node.title = categoryName(node.dataset.badgeCategory);
-    else node.removeAttribute("title");
+    node.removeAttribute("title");
   }
 }
 const PIECE_STYLES = ["image","merida"];
@@ -201,6 +199,12 @@ const REMOVED_BOARD_THEMES = {
 };
 function migrateVisualAssetSettings(settings) {
   let changed = false;
+  // Upgrade the former default once; explicit selections of other fonts survive.
+  // badgeDecimals identifies legacy settings and is removed below.
+  if (settings.badgeFont === "original" && Object.hasOwn(settings, "badgeDecimals")) {
+    settings.badgeFont = "spacemono";
+    changed = true;
+  }
   if (!PIECE_STYLES.includes(settings.pieceStyle)) {
     settings.pieceStyle = "image";
     changed = true;
@@ -211,7 +215,7 @@ function migrateVisualAssetSettings(settings) {
     changed = true;
   }
   // Remove obsolete visual preferences and source artwork metadata from older versions.
-  for (const key of ["ccPieceSet", "ccPieceUrlTemplate", "ccPieceUrlMap", "ccBoardTheme", "ccBoardUrl", "badgeFlicker"]) {
+  for (const key of ["ccPieceSet", "ccPieceUrlTemplate", "ccPieceUrlMap", "ccBoardTheme", "ccBoardUrl", "badgeFlicker", "badgeDecimals"]) {
     if (Object.hasOwn(settings, key)) {
       delete settings[key];
       changed = true;
@@ -224,7 +228,7 @@ const DEFAULT_SETTINGS = {
   categoryNames: {},
   theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
-  badgeDecimals: false, badgeFont: "original", badgeTooltip: false,
+  badgeFont: "spacemono", badgeTooltip: false,
   // Eval-graph look (see renderGraph), eval-BAR look (see renderEvalBar) and the Insight-panel text size (px).
   graphStyle: "area", barStyle: "gradient", insightFont: 18,
   // Board coordinate labels (the a–h / 1–8 ticks in the squares' corners): on/off + size in px.
@@ -1664,46 +1668,95 @@ function renderReorgBanner() {
 
 /* ---------------- Board ---------------- */
 function makeBoardBadge(cls, score = null) {
-  const cfg = QUALITY[cls];
   return gradeBadge(cls, score, "sq-badge", {
     tabindex: "0",
-    onpointerenter: (e) => { if (e.pointerType !== "touch" && !e.buttons) showBoardBadgeTip(e.currentTarget, cls); },
-    onpointerleave: hideBoardBadgeTip,
-    onfocus: (e) => showBoardBadgeTip(e.currentTarget, cls),
-    onblur: hideBoardBadgeTip,
-    onpointerdown: hideBoardBadgeTip,
     onkeydown: (e) => { if (e.key === "Escape") hideBoardBadgeTip(); },
   });
 }
 let boardBadgeTipTarget = null;
-function showBoardBadgeTip(target, cls) {
-  const cfg = QUALITY[cls];
-  if (!S.settings.badgeTooltip || !cfg || !target.isConnected) return;
-  boardBadgeTipTarget = target;
-  let tip = document.getElementById("boardBadgeTip");
-  if (!tip) {
-    tip = el("div", { id: "boardBadgeTip", class: "board-badge-tip", role: "tooltip", "aria-hidden": "true" });
-    document.body.append(tip);
-    window.addEventListener("resize", hideBoardBadgeTip);
-    window.addEventListener("scroll", hideBoardBadgeTip, true);
-    window.addEventListener("blur", hideBoardBadgeTip);
+let boardBadgeTipTimer = null, boardBadgeTipEndTimer = null, boardBadgeTipRequest = 0;
+let boardBadgeLabelKey = null;
+const categoryLabelImages = new Map();
+function categoryLabelSource(cls) {
+  const name = categoryName(cls);
+  if (name === QUALITY[cls].name) return _url(`icons/labels/${cls}.png`);
+  const key = JSON.stringify([cls, name]);
+  if (!categoryLabelImages.has(key)) {
+    const ready = document.fonts?.load(CATEGORY_LABEL_FONT, name) || Promise.resolve();
+    categoryLabelImages.set(key, ready.then(() => categoryLabelPng(document, name, MOVE_GRADE_CONFIG[cls].color)));
+    // Bound artwork retained after repeated renames.
+    if (categoryLabelImages.size > 32) categoryLabelImages.delete(categoryLabelImages.keys().next().value);
   }
-  tip.textContent = categoryName(cls);
+  return categoryLabelImages.get(key);
+}
+function positionBoardBadgeTip() {
+  const tip = document.getElementById("boardBadgeTip"), target = boardBadgeTipTarget;
+  if (!tip || !target?.isConnected) { hideBoardBadgeTip(); return; }
   const r = target.getBoundingClientRect();
-  // Measuring before showing also establishes the initial style for the first fade-in.
-  const w = tip.offsetWidth, h = tip.offsetHeight, gap = 8, margin = 8;
+  // Leave room for the pop's 8% overshoot, including at narrow viewport edges.
+  const w = tip.offsetWidth, h = tip.offsetHeight, gap = 2, margin = 20;
   const left = Math.max(margin, Math.min(window.innerWidth - w - margin, r.left + r.width / 2 - w / 2));
   const above = r.top - h - gap;
   const top = Math.max(margin, Math.min(window.innerHeight - h - margin, above >= margin ? above : r.bottom + gap));
-  tip.style.left = left + "px";
-  tip.style.top = top + "px";
-  tip.setAttribute("aria-hidden", "false");
-  tip.classList.add("show");
+  tip.style.left = left + "px"; tip.style.top = top + "px";
+}
+function showBoardBadgeTip(target, cls) {
+  if (!S.settings.badgeTooltip || !QUALITY[cls] || !target.isConnected) return;
+  hideBoardBadgeTip();
+  const request = boardBadgeTipRequest;
+  boardBadgeTipTarget = target;
+  let tip = document.getElementById("boardBadgeTip");
+  if (!tip) {
+    tip = el("div", { id: "boardBadgeTip", class: "board-badge-tip", role: "img", "aria-hidden": "true" });
+    document.body.append(tip);
+    window.addEventListener("resize", positionBoardBadgeTip);
+    window.addEventListener("scroll", positionBoardBadgeTip, true);
+    window.addEventListener("blur", hideBoardBadgeTip);
+  }
+  tip.setAttribute("aria-label", categoryName(cls));
+  const img = el("img", { alt: "", draggable: "false", width: 280, height: 60 });
+  tip.replaceChildren(img);
+  const reveal = () => {
+    if (request !== boardBadgeTipRequest || !boardBadgeTipTarget?.isConnected || !S.settings.badgeTooltip) return;
+    positionBoardBadgeTip();
+    // Restart the entrance animation when the next move uses the same category.
+    void tip.offsetWidth;
+    tip.setAttribute("aria-hidden", "false"); tip.classList.add("show");
+    boardBadgeTipTimer = setTimeout(() => {
+      tip.classList.remove("show"); tip.classList.add("leaving");
+    }, 1800);
+    boardBadgeTipEndTimer = setTimeout(hideBoardBadgeTip, 2000);
+  };
+  img.onload = reveal;
+  img.onerror = () => { if (request === boardBadgeTipRequest) hideBoardBadgeTip(); };
+  const source = categoryLabelSource(cls);
+  if (typeof source === "string") img.src = source;
+  else source.then(src => { if (request === boardBadgeTipRequest) img.src = src; }).catch(() => {
+    if (request === boardBadgeTipRequest) hideBoardBadgeTip();
+  });
 }
 function hideBoardBadgeTip() {
+  boardBadgeTipRequest++;
+  clearTimeout(boardBadgeTipTimer); clearTimeout(boardBadgeTipEndTimer);
+  boardBadgeTipTimer = boardBadgeTipEndTimer = null;
   boardBadgeTipTarget = null;
   const tip = document.getElementById("boardBadgeTip");
-  if (tip) { tip.classList.remove("show"); tip.setAttribute("aria-hidden", "true"); }
+  if (tip) { tip.classList.remove("show", "leaving"); tip.setAttribute("aria-hidden", "true"); }
+}
+function syncBoardBadgeLabel(force = false) {
+  const badge = UI.boardWrap.querySelector(".sq-badge");
+  const cls = badge?.dataset.category;
+  const key = badge ? JSON.stringify([S.analysisMode, S.idx, S.variation?.branchIdx, S.variation?.idx,
+    badge.dataset.move, cls, categoryName(cls)]) : null;
+  if (!S.settings.badgeTooltip || !cls) { hideBoardBadgeTip(); boardBadgeLabelKey = null; return; }
+  if (!force && key === boardBadgeLabelKey) {
+    // Rebuilding or flipping the board must keep a live label attached to its badge.
+    if (boardBadgeTipTarget && boardBadgeTipTarget !== badge) boardBadgeTipTarget = badge;
+    if (boardBadgeTipTarget) positionBoardBadgeTip();
+    return;
+  }
+  boardBadgeLabelKey = key;
+  showBoardBadgeTip(badge, cls);
 }
 function makePiece(type, side) {
   // Only the two bundled SVG sets remain (Cburnett = "image", Merida); anything else → default set.
@@ -1791,7 +1844,7 @@ function paintBoard() {
       }
     }
   }
-  if (!boardBadgeTipTarget?.isConnected) hideBoardBadgeTip();
+  syncBoardBadgeLabel();
   renderBestArrow();
   renderUserArrows();
   renderThreatArrow();
@@ -3572,11 +3625,10 @@ function moveCell(ply) {
 function qBadge(k, score = null) {
   const cfg = QUALITY[k]; const st = S.settings.badgeStyle;
   if (st === "dot") return el("span", { class: "qb dot", "data-badge-category": k,
-    role: "img", "aria-label": categoryName(k), style: { background: cfg.color },
-    ...(S.settings.badgeTooltip ? { title: categoryName(k) } : {}) });
+    role: "img", "aria-label": categoryName(k), style: { background: cfg.color } });
   if (st === "label") return el("span", { class: "qb label", style: { background: cfg.color } }, categoryName(k));
   // "icon" → the real SVG badge
-  return gradeBadge(k, score, "qb icon", S.settings.badgeTooltip ? { title: gradeLabel(k, score, categoryName(k)) } : {});
+  return gradeBadge(k, score, "qb icon");
 }
 // Move the .current highlight to the cell for S.idx and auto-scroll it into view, without
 // touching the rest of the list. Used both after a full rebuild and on a plain step.
@@ -4125,7 +4177,7 @@ async function resetEngineSettings() {
 }
 const ARROW_SETTING_KEYS = ["bestArrow", "showThreat", "bestArrowColor", "arrowOpacity", "arrowShaft", "arrowHead"];
 const BACKGROUND_SETTING_KEYS = ["bg", "bgFit", "bgTile", "bgCustom", "bgHue", "bgSat", "bgLight"];
-const BADGE_SETTING_KEYS = ["badgeDecimals", "badgeFont", "badgeTooltip"];
+const BADGE_SETTING_KEYS = ["badgeFont", "badgeTooltip"];
 const VISUAL_SETTING_KEYS = [
   "theme", "accent", "accentCustom", "density", "evalView", "mlStyle", "badgeStyle", "badgeScale",
   ...BADGE_SETTING_KEYS,
@@ -4386,9 +4438,10 @@ function motorSettings() {
   );
 }
 function badgeSettings() {
-  const fonts = el("div", { class: "badge-font-options", role: "group", "aria-label": "Number font" },
+  const fonts = el("div", { class: "badge-font-options", role: "group", "aria-label": "Number font", tabindex: "0" },
     ...Object.entries(BADGE_FONTS).map(([id, font]) => el("button", {
       class: "badge-font-option" + (S.settings.badgeFont === id ? " on" : ""),
+      "data-font": id,
       "aria-pressed": String(S.settings.badgeFont === id), onclick: () => setSetting("badgeFont", id),
     }, el("span", { class: "badge-font-name" }, font.name, el("small", {}, font.style)),
       el("span", { class: "badge-font-sample", "aria-hidden": "true",
@@ -4399,11 +4452,10 @@ function badgeSettings() {
       gradeBadge("best", 9, "badge-preview-item"), gradeBadge("good", 6.4, "badge-preview-item"),
       gradeBadge("brilliant", 10, "badge-preview-item"), gradeBadge("blunder", 0, "badge-preview-item"),
       gradeBadge("book", null, "badge-preview-item")),
-    toggleRow("Equal number size", "badgeDecimals"),
-    el("p", { class: "set-note" }, "Show one decimal (9.0) and use the same number size for every score, including 10.0."),
     el("div", { class: "set-lbl" }, "Number font"), fonts,
     el("p", { class: "set-note" }, "Free, open-source fonts, bundled for offline use."),
     toggleRow("Hover labels", "badgeTooltip"),
+    el("p", { class: "set-note" }, "Show the category automatically for two seconds after each move, with a small pop animation."),
     el("button", { class: "set-reset", onclick: async () => {
       await resetSettingKeys(BADGE_SETTING_KEYS); applySettings(); refreshBadgeAppearance(); renderSettings();
     } }, "Reset badges to default"));
@@ -4411,6 +4463,8 @@ function badgeSettings() {
 function renderSettings() {
   closeArrowColorPicker();
   const scroll = UI.settings.scrollTop; // keep scroll position when a setting changes
+  const fontScroll = UI.settings.querySelector(".badge-font-options")?.scrollTop;
+  const focusedFont = UI.settings.contains(document.activeElement) && document.activeElement.closest(".badge-font-option")?.getAttribute("data-font");
   const tabs = el("div", { class: "set-tabs" },
     el("button", { class: "set-tab" + (S.settingsTab === "visual" ? " on" : ""), onclick: () => { S.settingsTab = "visual"; renderSettings(); } }, "Visual"),
     el("button", { class: "set-tab" + (S.settingsTab === "engine" ? " on" : ""), onclick: () => { S.settingsTab = "engine"; renderSettings(); } }, "Engine"),
@@ -4418,6 +4472,9 @@ function renderSettings() {
   UI.settings.replaceChildren(tabs, ...(S.settingsTab === "engine" ? [motorSettings()]
     : [visualSettings()]));
   UI.settings.scrollTop = scroll;
+  const fonts = UI.settings.querySelector(".badge-font-options");
+  if (fonts && fontScroll != null) fonts.scrollTop = fontScroll;
+  if (focusedFont) UI.settings.querySelector(`[data-font="${focusedFont}"]`)?.focus({ preventScroll: true });
   positionSettings();
 }
 function positionSettings() {
@@ -4565,6 +4622,7 @@ async function setSetting(key, value) {
   if (key === "showThreat") renderThreatArrow();
   if (key === "loaderStyle") { renderReview(); renderStats(); }
   if (BADGE_SETTING_KEYS.includes(key)) refreshBadgeAppearance();
+  if (key === "badgeTooltip") syncBoardBadgeLabel(value);
   if (UI.settings && !UI.settings.hidden) renderSettings();
 }
 // Engine setting: save, discard the live engine (new build/options), and re-analyze.

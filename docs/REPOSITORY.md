@@ -14,7 +14,7 @@ Many small asset files are intentional; removing them can break optional setting
 | `background.js`, `browser-compat.js`, `gamecache.js` | Browser integration, shared API compatibility and local game/review storage. |
 | `chesscom.js`, `lichess.js`, `content.js`, `lichess-content.js`, `content-button.css` | Fetch public games and add the review controls to supported sites. |
 | `flags.js`, `flags/` | Country mapping and player flag images, selected dynamically. |
-| `lib/` | Chess rules, numerical scoring and calibrated search/review logic. |
+| `lib/` | Chess rules, numerical scoring, calibrated search/review logic and the transparent category-label renderer. |
 | `engine/` | Two bundled Stockfish builds, the UCI client, checksums and source/license references. Large WASM files are required. |
 | `data/book.json`, `data/calibration.json` | Offline opening dictionary and the current numerical model/settings. |
 | `data/coaches/`, `data/coaches-anim/rigs/` | Coach phrase banks and animation pages/scripts. The HTML rigs are loaded by the review screen; they are not temporary previews. |
@@ -30,7 +30,7 @@ Many small asset files are intentional; removing them can break optional setting
 | `RELEASE.md`, [marketing/STORE_LISTING2.md](../marketing/STORE_LISTING2.md) | Packaging, store review guidance and prepared listing/privacy text. These are operational documents, even though the app does not execute them. |
 | `CONTRIBUTING.md`, `.github/` | Contributor guidance, issue/PR forms and dependency update configuration. |
 | `package.json`, `package-lock.json` | Commands and reproducible development dependency versions. |
-| `scripts/` | Package builds, engine verification and optional browser smoke checks. |
+| `scripts/` | Package builds, engine verification and optional browser smoke checks. `node scripts/generate-category-labels.mjs` rebuilds transparent PNG labels and SVG badge references with local Chrome and the bundled fonts. |
 | `tests/` | Regression tests for retained code, current artwork and the active scoring method. |
 | `tools/calibration/` | Current fitting code, eight frozen public evidence files, offline reproduction, the reusable engine harness and independent-label evaluator. See its [guide](../tools/calibration/README.md). |
 | `.gitignore`, `.gitattributes` | Keep generated files out of Git and preserve required binary/line-ending behavior. Calibration evidence hashes depend on its exact bytes. |

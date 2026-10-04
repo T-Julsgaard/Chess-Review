@@ -63,12 +63,14 @@ test('expanded categories are editable and renaming preserves count navigation',
 
 test('renaming refreshes badge labels, tooltips, and cached move commentary', t => {
   const a = review(t); a.state.idx = 1; a.state.classif[1] = 'brilliant';
+  a.replace('categoryLabelPng', () => 'data:image/png;base64,custom');
   a.state.settings.badgeTooltip = true;
   a.state.moveGrades[1] = 10;
   a.call('renderReview'); a.call('renderMoves');
   const input = edit(a, 'brilliant'); input.value = 'Inspired'; key(a, input, 'Enter');
   const badge = a.dom.window.document.querySelector('#movesBody .qb');
-  assert.equal(badge.getAttribute('title'), 'Inspired, score 10');
+  assert.equal(badge.getAttribute('title'), null);
+  assert.equal(badge.getAttribute('aria-label'), 'Inspired, score 10');
   assert.equal(a.call('makeBoardBadge', 'brilliant', 10).getAttribute('aria-label'), 'Inspired, score 10');
   a.call('showQTip', a.dom.window.document.querySelector('[data-category="brilliant"]'), 'brilliant');
   assert.equal(a.dom.window.document.querySelector('.q-tip-nm').textContent, 'Inspired');

@@ -460,18 +460,29 @@ button { font-family: inherit; cursor: pointer; }
 .grade-badge { display: inline-block; vertical-align: middle; flex-shrink: 0; }
 .grade-badge > svg { display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; user-select: none; }
 .grade-numeral { font-variant-numeric: tabular-nums; }
-/* A name-only label lives outside the clipped board and never intercepts board input. */
+/* Transparent PNG lettering floats above the move without intercepting input. */
 .board-badge-tip {
-  position: fixed; z-index: 60; pointer-events: none;
-  padding: 6px 10px; border-radius: 7px;
-  background: var(--panel); color: var(--ink); border: 1px solid var(--line);
-  box-shadow: 0 4px 14px rgba(0,0,0,.18);
-  font-family: var(--font-ui); font-size: 11px; font-weight: 600; line-height: 1.3;
-  white-space: nowrap; opacity: 0; visibility: hidden; transform: translateY(3px);
-  transition: opacity .12s ease-out, transform .12s cubic-bezier(.2,.8,.2,1), visibility 0s .12s;
+  position: fixed; z-index: 55; pointer-events: none;
+  width: min(280px, calc(100vw - 40px)); height: 60px;
+  opacity: 0; visibility: hidden; transform-origin: 50% 80%;
 }
-.board-badge-tip.show { opacity: 1; visibility: visible; transform: translateY(0); transition-delay: 0s; }
-@media (prefers-reduced-motion: reduce) { .board-badge-tip { transition: none; transform: none; } }
+.board-badge-tip img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.board-badge-tip.show { opacity: 1; visibility: visible; animation: category-pop-in .28s both; }
+.board-badge-tip.leaving { visibility: visible; animation: category-pop-out .2s both; }
+@keyframes category-pop-in {
+  0% { opacity: 0; transform: translateY(6px) scale(.72); }
+  65% { opacity: 1; transform: translateY(-2px) scale(1.08); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes category-pop-out {
+  0% { opacity: 1; transform: scale(1); }
+  30% { opacity: 1; transform: scale(1.04); }
+  100% { opacity: 0; transform: translateY(3px) scale(.8); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .board-badge-tip.show, .board-badge-tip.leaving { animation: none; transform: none; }
+  .board-badge-tip.leaving { opacity: 0; }
+}
 /* top row: nudge the icon down so it doesn't poke past the board's top edge (the badge half-height
    is 21cqmin·scale, so 22cqmin keeps the icon's top just inside the 8th-rank border) */
 .sq.top-row .sq-badge { top: calc(22cqmin - 21cqmin * var(--badge-scale, 1)); }
@@ -1515,9 +1526,10 @@ button { font-family: inherit; cursor: pointer; }
 
 .badge-settings { display: flex; flex-direction: column; gap: 12px; }
 .badge-settings p { margin: 0; }
-.badge-preview { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 14px 0; }
+.badge-preview { position: sticky; top: 0; z-index: 2; display: flex; flex: none; align-items: center; justify-content: space-between; gap: 6px; padding: 14px 0; background: var(--panel); border-bottom: 1px solid var(--line-soft); }
 .badge-preview-item { width: 38px; height: 38px; }
-.badge-font-options { display: grid; gap: 6px; }
+.badge-font-options { display: grid; gap: 6px; max-height: min(224px, 28vh); overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding-right: 4px; }
+.badge-font-options:focus-visible, .badge-font-option:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .badge-font-option { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 9px 10px; text-align: left; background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; color: var(--ink); cursor: pointer; }
 .badge-font-option:hover, .badge-font-option.on { border-color: var(--accent); }
 .badge-font-option.on { background: color-mix(in oklab, var(--accent) 12%, var(--panel-2)); }

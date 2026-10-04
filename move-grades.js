@@ -74,16 +74,15 @@ export function gradeLabel(category, score, name, example = false) {
   return `${name}, score ${finite(score) ? gradeText(score) : 'pending'}`;
 }
 
-// One vector renderer for every placement. Optical centring uses the numeral's
-// cap height; decimal figures are slightly narrower, without shrinking the badge.
+// One vector renderer for every placement. All grades use one decimal and the
+// same type size, including zero, ten and pending scores.
 export function gradeSvg(category, score, name, example = false, options = {}) {
   const cfg = MOVE_GRADE_CONFIG[category];
   if (!cfg) return '';
   const label = escape(gradeLabel(category, score, name, example));
-  const text = gradeText(example ? (cfg.min + cfg.max) / 2 : score, options.badgeDecimals);
-  // Fixed mode uses the same type size for every grade, including 0.0 and 10.0.
-  const size = options.badgeDecimals ? 40 : text.includes('.') ? 43 : text.length > 1 ? 53 : 62;
-  const font = Object.hasOwn(BADGE_FONTS, options.badgeFont) ? BADGE_FONTS[options.badgeFont] : BADGE_FONTS.original;
+  const text = gradeText(example ? (cfg.min + cfg.max) / 2 : score, true);
+  const size = 40;
+  const font = Object.hasOwn(BADGE_FONTS, options.badgeFont) ? BADGE_FONTS[options.badgeFont] : BADGE_FONTS.spacemono;
   const symbol = category === 'book'
     ? '<g fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M50 35C43 30 32 29 25 32V70C33 67 43 68 50 73 57 68 67 67 75 70V32C68 29 57 30 50 35Z M50 35V73"/></g>'
     : `<text class="grade-numeral" x="50" y="51" dy=".35em" text-anchor="middle" fill="#fff" font-family="${font.family}" font-size="${size}" font-weight="700" letter-spacing="-1.5">${text}</text>`;
