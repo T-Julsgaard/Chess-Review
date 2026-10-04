@@ -684,12 +684,28 @@ async function loadJob() {
   if (!jobId) throw new Error("No analysis job specified.");
 
   const key = `job:${jobId}`;
+  // The one-shot storage handoff is removed after startup. Keep the current
+  // game's lightweight payload in this tab's session so Reload still works,
+  // including after the user switches to a different library game.
+  try {
+    const session = JSON.parse(window.sessionStorage.getItem(key));
+    if (session && typeof session.pgn === "string") return session;
+  } catch { /* Unavailable or corrupt session storage: use the launch handoff. */ }
   const data = await browserAPI.storage.local.get(key);
   const payload = data[key];
   if (!payload) throw new Error("Analysis data not found (open via the popup).");
   // NOTE: Do NOT remove the job here — two-phase load: keep it until applyGame succeeds,
   // so a failed initialization (corrupt PGN, engine crash, etc.) leaves the data for a retry.
   return payload;
+}
+function rememberReviewJob() {
+  const jobId = location.hash.replace(/^#/, "");
+  if (!jobId || !S.pgn) return false;
+  try {
+    // Analysis is looked up separately using the current scoring/settings key.
+    window.sessionStorage.setItem(`job:${jobId}`, JSON.stringify({ pgn: S.pgn, meta: S.meta }));
+    return true;
+  } catch { return false; }
 }
 function parseHeaders(pgn) {
   const h = {}; const re = /\[(\w+)\s+"([^"]*)"\]/g; let m;
@@ -5549,6 +5565,7 @@ async function applyGame(payload) {
   if (!S.qbreakExpanded) reflowAccuracy(false);
   renderLibrary();
   requestAnimationFrame(alignPlayers);
+  rememberReviewJob();
   if (!restored) startAnalysis();
 }
 
@@ -5728,7 +5745,7 @@ async function resetLegacyZoom() {
     await applyGame(payload);
     // Two-phase load: now that initialization succeeded, remove the job data so it doesn't accumulate.
     const jobId = location.hash.replace(/^#/, "");
-    if (jobId) {
+    if (jobId && rememberReviewJob()) {
       await browserAPI.storage.local.remove(`job:${jobId}`);
     }
     // Fit the desktop composition or custom canvas; narrow windows retain the responsive grid.
