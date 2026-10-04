@@ -7,17 +7,13 @@ rating. No account, no server, no manual PGN copying.
 
 **Source:** https://github.com/T-Julsgaard/Chess-Review
 
-**Chrome webshop**: https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenkadndbdbigfam?hl=en
+**Chrome webshop**: https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenkadndbdbigfam
 
 **Firefox Add-ons**: https://addons.mozilla.org/en-US/firefox/addon/chess-review/
 
 ## Watch the introduction
 
 [![Watch the 69-second Chess Review introduction](marketing/video/media/chess-review-thumbnail.png)](https://t-julsgaard.github.io/Chess-Review/marketing/video/media/chess-review-intro.mp4)
-
-**[▶ Watch the introduction](https://t-julsgaard.github.io/Chess-Review/marketing/video/media/chess-review-intro.mp4)** — 69 seconds.
-[Download the MP4 (about 84 MiB)](marketing/video/media/chess-review-intro.mp4?raw=true) ·
-[English captions](marketing/video/captions/chess-review-intro.en.srt)
 
 ## Features
 
