@@ -9,6 +9,8 @@ extension package.
 
 | File | What it is |
 | --- | --- |
+| `media/chess-review-intro.mp4` | Finished introduction supplied for the repository, linked from the main README. About 84 MiB; preserved without re-encoding. |
+| `media/chess-review-thumbnail.png` | Finished thumbnail supplied for the repository, used as the main README's clickable preview. |
 | `out/chess-review-intro.mp4` | The video. 2560×1440 at 60 fps, scaled down from a 3840×2160 render. H.264 High 4:2:0 BT.709 at CRF 12 with a keyframe every half second, AAC-LC 48 kHz stereo at a 384 kb/s target, mastered to -14 LUFS and -2 dBTP. |
 | `out/chess-review-thumbnail.jpg`, `.png` | 3840×2160 thumbnail. The JPG is under YouTube's 2 MB limit for uploads from a phone. |
 | `out/chess-review-narration.wav`, `.mp3` | The voice alone, timed as in the video, -16 LUFS mono. |
@@ -17,6 +19,36 @@ extension package.
 | `public/audio/` | The chosen narration take and the music, cached so rendering never calls ElevenLabs. |
 
 `out/` and the UI captures are not in Git. Render them with the steps below.
+The selected finished video and thumbnail in `media/` are tracked in Git and
+are not overwritten by rendering. To update the README introduction, copy the
+approved render from `out/` to the corresponding file in `media/`.
+
+## README video preview
+
+The main [README](../../README.md#watch-the-introduction) displays the thumbnail
+as a link to `media/chess-review-intro.mp4?raw=true`. Both the image and video
+links are relative, so they follow the branch or fork being viewed. GitHub serves
+the video file when clicked; the browser may open it or download it.
+
+GitHub's Markdown renderer removes a hand-written `<video>` element, so a video
+committed to the repository cannot be embedded that way. An inline player can
+instead use a GitHub video attachment URL:
+
+1. Drag the MP4 into GitHub's README editor to upload it as an attachment.
+2. Copy the resulting `https://github.com/user-attachments/assets/...` URL.
+3. Put that URL on its own line in the README and retain the thumbnail/download
+   link as a fallback. Preview the README to confirm playback before committing.
+
+Uploading an attachment immediately publishes it to GitHub; the repository copy
+and clickable thumbnail need no separate upload. Nothing has been uploaded as
+part of adding this preview. GitHub currently limits video attachments to 10 MB
+on free plans or 100 MB on paid plans, so the supplied video needs a paid plan
+or a smaller export for this option. See
+[GitHub's attachment documentation](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/attaching-files).
+
+The tracked MP4 is below GitHub's 100 MiB limit for regular Git files, though
+it exceeds the 50 MiB warning threshold. It does not require Git LFS. See
+[GitHub's file size limits](https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github).
 
 ## Render
 

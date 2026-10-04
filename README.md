@@ -11,6 +11,14 @@ rating. No account, no server, no manual PGN copying.
 
 **Firefox Add-ons**: https://addons.mozilla.org/en-US/firefox/addon/chess-review/
 
+## Watch the introduction
+
+[![Watch the 69-second Chess Review introduction](marketing/video/media/chess-review-thumbnail.png)](marketing/video/media/chess-review-intro.mp4?raw=true)
+
+**[▶ Watch the introduction](marketing/video/media/chess-review-intro.mp4?raw=true)** — 69 seconds, MP4, about 84 MiB.
+Click the thumbnail to open or download the video, depending on your browser.
+[English captions](marketing/video/captions/chess-review-intro.en.srt) are also available.
+
 ## Features
 
 - **One-click review** of any Chess.com or Lichess game — or paste a game URL / raw PGN.
