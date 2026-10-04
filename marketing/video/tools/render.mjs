@@ -1,5 +1,5 @@
 // Renders the finished deliverables into out/:
-//   chess-review-intro.mp4         1080p60 H.264 with the mastered mix (−14 LUFS, −2 dBTP), to YouTube's upload spec
+//   chess-review-intro.mp4         1440p60 H.264 with the mastered mix (−14 LUFS, −2 dBTP), to YouTube's upload spec
 //   chess-review-narration.wav/.mp3 the edited voice alone, as timed in the video (−16 LUFS)
 //   chess-review-intro.en.srt/.vtt  captions
 //   chess-review-thumbnail.png/.jpg 3840×2160
@@ -49,7 +49,7 @@ function master(input, output, target, { mono = false } = {}) {
 mkdirSync(WORK, { recursive: true });
 run('node', ['tools/prepare-assets.mjs']);
 if (!existsSync(`${VIDEO}public/captures/manifest.json`) || !existsSync(`${VIDEO}public/captures/analysis.json`)) {
-  throw new Error('No UI captures. Run "npm run capture" first (about 20 minutes).');
+  throw new Error('No UI captures. Run "npm run capture" first (5 to 10 minutes).');
 }
 
 if (want('captions')) {
@@ -69,8 +69,14 @@ if (want('audio')) {
 }
 
 if (want('video')) {
-  remotion('render', 'src/index.ts', 'Intro', `${WORK}video.mp4`, '--muted', '--codec=h264', '--crf=12', '--x264-preset=slow',
-    '--gop=30', '--pixel-format=yuv420p', '--color-space=bt709', '--image-format=png');
+  // Laid out at 1920×1080, rendered at 2× and scaled down to 1440p, which smooths edges while
+  // the camera moves. The captures have 4× pixels, so close-ups up to 2× zoom stay sharp.
+  // Eight tabs keep the 8K frames within memory.
+  remotion('render', 'src/index.ts', 'Intro', `${WORK}video-2160.mp4`, '--scale=2', '--concurrency=8', '--muted', '--codec=h264',
+    '--crf=12', '--x264-preset=slow', '--gop=30', '--pixel-format=yuv420p', '--color-space=bt709', '--image-format=png');
+  ffmpeg('-i', `${WORK}video-2160.mp4`, '-vf', 'scale=2560:1440:flags=lanczos+accurate_rnd', '-c:v', 'libx264', '-preset', 'slow',
+    '-crf', '12', '-g', '30', '-pix_fmt', 'yuv420p', '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709',
+    '-color_range', 'tv', `${WORK}video.mp4`);
 }
 
 if ((want('video') || want('audio')) && existsSync(`${WORK}video.mp4`) && existsSync(`${WORK}mix-master.wav`)) {

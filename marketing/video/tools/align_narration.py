@@ -66,7 +66,8 @@ def main():
         model = WhisperModel('large-v3', device=device, compute_type='float16')
     except Exception:
         model = WhisperModel('large-v3', device='cpu', compute_type='int8')
-    segments, _ = model.transcribe(str(TAKE), language='en', word_timestamps=True, beam_size=5)
+    segments, _ = model.transcribe(str(TAKE), language='en', word_timestamps=True, beam_size=5,
+                                      condition_on_previous_text=False)  # context made it hear "Chess .com" again
     heard = [w for s in segments for w in s.words]
     heard_tokens = [(tokens(w.word) or [''])[0] for w in heard]
 

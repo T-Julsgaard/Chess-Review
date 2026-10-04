@@ -27,7 +27,7 @@ export type UiRects = { board: Rect; evalbar: Rect; review: Rect; graph: Rect; g
 export const stillLayout = (name: string) => stills[name].layout as unknown as UiRects;
 export const seqLayout = (name: string) => sequences[name].layout as unknown as UiRects;
 
-// Toolbar popup captures (3× pixels); size is in page pixels.
+// Toolbar popup captures (4× pixels); size is in page pixels.
 const popup = (manifest as unknown as { popup: Record<string, { file: string; size: [number, number] }> }).popup;
 export const popupSrc = (name: 'closed' | 'pasted') => staticFile(popup[name].file);
 export const popupSize = (name: 'closed' | 'pasted') => ({ w: popup[name].size[0], h: popup[name].size[1] });

@@ -19,13 +19,14 @@ const chunk = (id: ChunkId): Chunk => {
 // Take time -> video time for a chunk.
 const toVideo = (id: ChunkId, t: number) => edit.chunks[id] + (t - chunk(id).in);
 
-// The audio pieces to place: take in/out and video start, in seconds.
-export const voiceChunks = narration.chunks.map((c) => ({
-  id: c.id as ChunkId,
-  in: c.in,
-  out: c.out,
-  at: edit.chunks[c.id as ChunkId],
-}));
+// The audio pieces to place: take in/out and video start, in seconds. A chunk stops where the
+// next one starts, so the pause after it never plays under the next sentence.
+export const voiceChunks = narration.chunks.map((c, i) => {
+  const at = edit.chunks[c.id as ChunkId];
+  const next = narration.chunks[i + 1];
+  const room = next ? edit.chunks[next.id as ChunkId] - at : Infinity;
+  return { id: c.id as ChunkId, in: c.in, out: Math.min(c.out, c.in + room), at };
+});
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 

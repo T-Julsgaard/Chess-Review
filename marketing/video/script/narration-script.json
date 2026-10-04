@@ -1,13 +1,13 @@
 {
   "voice": {
-    "name": "Justin Case - Warm, Trustworthy, and Clear",
-    "voice_id": "DtQLDxHbTiQTpVVanTy1",
+    "name": "CJ - Young Swedish Male",
+    "voice_id": "9n6dGtreZHvmNb14Y1VO",
     "model": "eleven_v4",
     "source": "ElevenLabs text to speech, through the ElevenLabs connector",
     "generated": "2026-10-04",
-    "take": "first of two takes; chosen over the second take and over Ellis (British) for the calmer, lower read and clean word clarity"
+    "take": "one full take, picked from four voices (Chris, Matt, CJ, Emma) after the first narrator sounded too much like an American advert"
   },
-  "prompt": "[calm] Twenty-seven moves. A close game.\nThen one pawn grab… and it's mate.\n\nSo what should you have played?\n\n[warmly] This is Chess Review. Free game review for Chess dot com and Lichess, with Stockfish running right in your browser.\n\nFinish a game, and click Analyze with Chess Review. Or paste a link, or a PGN.\n\nEvery move is classified, from Brilliant to Blunder. And the graph shows where the game turned.\n\nMove twenty-eight: queen takes d4. A mistake. The arrow shows what held — rook to g1.\n\nTry your own idea, and it's rated too. Pawn to h3? Still mate.\n\nYou also get accuracy for both players, and an estimated performance rating.\n\nThen, practice your mistakes. Chess Review takes you back to the moment… and you find the better move.\n\nChoose from ten coaches, and the board and pieces you like.\n\nNo account. No subscription. Open source.\n\nChess Review. Free on the Chrome Web Store.",
+  "prompt": "[calm] Twenty-seven moves. A close game.\nThen one pawn grab… and it's mate.\n\nSo what should you have played?\n\nThis is Chess Review. Free game review for Chess dot com and Lichess, with Stockfish running right in your browser.\n\nFinish a game, and click Analyze with Chess Review. Or paste a link, or a PGN.\n\nEvery move is classified, from Brilliant to Blunder. And the graph shows where the game turned.\n\nMove twenty-eight: queen takes d4. A mistake. The arrow shows what held — rook to g1.\n\nTry your own idea, and it's rated too. Pawn to h3? Still mate.\n\nYou also get accuracy for both players, and an estimated performance rating.\n\nThen, practice your mistakes. Chess Review takes you back to the moment… and you find the better move.\n\nChoose from ten coaches, and the board and pieces you like.\n\nNo account. No subscription. Open source.\n\nChess Review. Free on the Chrome Web Store.",
   "chunks": [
     { "id": "close-game", "cues": ["Twenty-seven moves. A close game."] },
     { "id": "pawn-grab", "cues": ["Then one pawn grab… and it's mate."] },

@@ -63,7 +63,7 @@ export const OneClick: React.FC<{ t: number }> = ({ t }) => {
       <div style={{ ...storeStyle(0), opacity: (1 - back) * enter * (1 - liIn * 0.6) }}>
         <div style={{ position: 'absolute', inset: 0, transform: `translateY(${(1 - enter) * 60}px)` }}>
           <Window box={BOX} radius={22}>
-            <Shot src={staticFile('shared/store/chesscom.png')} cam={cc} page={STORE} />
+            <Shot src={staticFile('shared/store/chesscom-3x.png')} cam={cc} page={STORE} />
           </Window>
           <Ring cam={cc} rect={BUTTON_CC} t={t} start={click.start} end={19.2} radius={10} />
         </div>
@@ -72,7 +72,7 @@ export const OneClick: React.FC<{ t: number }> = ({ t }) => {
       {liIn > 0 && (
         <div style={{ ...storeStyle((1 - liIn) * 1400), opacity: 1 - back }}>
           <Window box={BOX} radius={22}>
-            <Shot src={staticFile('shared/store/lichess.png')} cam={li} page={STORE} />
+            <Shot src={staticFile('shared/store/lichess-3x.png')} cam={li} page={STORE} />
           </Window>
           <Ring cam={li} rect={BUTTON_LI} t={t} start={19.3} end={paste.start - 0.3} radius={10} />
         </div>

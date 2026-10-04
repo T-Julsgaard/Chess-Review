@@ -9,7 +9,7 @@ extension package.
 
 | File | What it is |
 | --- | --- |
-| `out/chess-review-intro.mp4` | The video. 1920×1080 at 60 fps, H.264 High 4:2:0 BT.709 at CRF 12 with a keyframe every half second, AAC-LC 48 kHz stereo at a 384 kb/s target, mastered to -14 LUFS and -2 dBTP. |
+| `out/chess-review-intro.mp4` | The video. 2560×1440 at 60 fps, scaled down from a 3840×2160 render. H.264 High 4:2:0 BT.709 at CRF 12 with a keyframe every half second, AAC-LC 48 kHz stereo at a 384 kb/s target, mastered to -14 LUFS and -2 dBTP. |
 | `out/chess-review-thumbnail.jpg`, `.png` | 3840×2160 thumbnail. The JPG is under YouTube's 2 MB limit for uploads from a phone. |
 | `out/chess-review-narration.wav`, `.mp3` | The voice alone, timed as in the video, -16 LUFS mono. |
 | `captions/chess-review-intro.en.srt`, `.vtt` | English captions, also copied to `out/`. |
@@ -30,10 +30,10 @@ npm run capture
 npm run render
 ```
 
-- `npm run capture` takes about 20 minutes. It loads the extension into headless
-  Chrome, reviews the featured game and saves frames and element positions to
-  `public/captures/`.
-- `npm run render` takes a few minutes and writes everything in `out/`. Add
+- `npm run capture` takes 5 to 10 minutes and about 1.4 GB. It loads the
+  extension into headless Chrome, reviews the featured game and saves frames and
+  element positions to `public/captures/`.
+- `npm run render` takes about 15 minutes and writes everything in `out/`. Add
   `-- --only=video` (or `captions`, `audio`, `thumbnail`) to redo one step.
 - `npm run studio` opens Remotion Studio to scrub the timeline.
 - `npm run typecheck` checks the TypeScript.
@@ -71,18 +71,22 @@ npm run render
 ## How it was made
 
 - **Footage.** The extension's store files, the same allowlist as
-  `scripts/package.mjs`, run in headless Chrome at 1920×1080 with 2× pixels.
-  Animations are captured frame by frame at 60 fps with virtual time. Boards,
-  badges, arrows, numbers and coaches inside the browser frames are the
-  extension's own output. Titles, rings, labels, the opening evaluation graph,
-  the badge strip and the thumbnail's enlarged badge are drawn by the video from
-  the same captured data.
+  `scripts/package.mjs`, run in headless Chrome at 1920×1080 with 4× pixels, so
+  a full-window capture is 7680×4320. Animations are captured frame by frame at
+  60 fps with virtual time. The video is laid out at 1920×1080, rendered at 2×
+  and scaled down to 2560×1440. Close-ups up to 2× zoom stay sharp, and the
+  downscale smooths edges while the camera moves. Boards, badges, arrows,
+  numbers and coaches inside the browser frames are the extension's own output.
+  Titles, rings, labels, the opening evaluation graph, the badge strip and the
+  thumbnail's enlarged badge are drawn by the video from the same captured data.
 - **Voice.** ElevenLabs text to speech through the ElevenLabs connector in
-  Claude, model `eleven_v4`. Four voices read the same test line with Chess.com,
-  Lichess and Stockfish in it (Justin Case, Ashton, Harper Lawson and Ellis).
-  Justin Case got two full takes and Ellis one. The first Justin Case take won
-  for its calm, low read and clear words. The prompt spells "Chess dot com" so it
-  is read correctly.
+  Claude, model `eleven_v4`. The first version used Justin Case, which sounded
+  too much like an American advert. Six calmer voices then read the opening
+  lines (Chris, Matt, Ollie, Emma, CJ and Archer). Ollie was dropped for the
+  same rising pitch as the first voice and Archer for reading 20% slower than
+  the edit allows. The other four read the full script, and CJ, a young voice
+  with a light Swedish accent, was picked. The prompt spells "Chess dot com" so
+  it is read correctly, and has no direction beyond "[calm]".
 - **Timing.** `tools/align_narration.py` transcribes the take with faster-whisper
   large-v3, matches the words to the script and cuts the take at the quietest
   point between sentences. Each chunk was transcribed again from the final mix
@@ -132,9 +136,11 @@ npm run render
   in one.
 - The coaches are shown as named characters. The video does not call them AI or
   say they answer questions.
-- The narrator, Justin Case, is a professional voice from the ElevenLabs
-  library, which means a clone of a real speaker's voice. The music is
-  generated too.
+- The Chess.com and Lichess shots in the one-click scene come from the 1280×800
+  store screenshots. `tools/prepare-assets.mjs` denoises them and scales them up
+  3× with ffmpeg, but they stay softer than the footage captured at 7680×4320.
+- The narrator, CJ, is a professional voice from the ElevenLabs library, which
+  means a clone of a real speaker's voice. The music is generated too.
 
 ## Publishing on YouTube
 
@@ -188,8 +194,9 @@ Narration and music made with ElevenLabs.
   from `fonts/` with their licences.
 - The end card shows the screenshots in
   [marketing/chrome-web-store](../chrome-web-store).
-- The narration and the music were generated with ElevenLabs on 2026-10-04.
-  Their use follows the plan of the ElevenLabs account that generated them.
+- The narration and the music were generated with ElevenLabs on 2026-10-04,
+  on a Creator plan. ElevenLabs' pricing page lists a commercial licence and
+  music commercial use for that plan.
 - Rendering uses [Remotion](https://www.remotion.dev/license), installed by
   `npm ci`. It is free for individuals and companies of up to three people.
   Larger companies need a company licence.

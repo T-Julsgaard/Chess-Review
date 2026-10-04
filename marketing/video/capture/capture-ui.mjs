@@ -1,4 +1,4 @@
-// Captures the real Chess Review UI for the intro video: 4K stills and 60 fps
+// Captures the real Chess Review UI for the intro video: 8K stills and 60 fps
 // frame-accurate sequences (see virtual-time.js), plus element positions for overlays.
 // Output goes to public/captures, which is not committed. The review is deterministic
 // (single-threaded Stockfish at fixed depth), so a re-run reproduces the same numbers.
@@ -13,7 +13,7 @@ import { installVirtualTime } from './virtual-time.js';
 
 const VIDEO = fileURLToPath(new URL('../', import.meta.url));
 const OUT = path.join(VIDEO, 'public', 'captures');
-const W = 1920, H = 1080, DSF = 2, FPS = 60;
+const W = 1920, H = 1080, DSF = 4, FPS = 60;
 const hero = JSON.parse(fs.readFileSync(new URL('./hero-game.json', import.meta.url), 'utf8'));
 // The opponent is a private player, so the video shows them as "Opponent" without a flag.
 // The moves, and so the whole analysis, are unchanged.
@@ -165,7 +165,7 @@ async function vt(method, value) {
 }
 
 // Records `frames` frames at FPS. actions[i] (functions) run just before frame i.
-async function record(name, frames, actions = {}, { quality = 92, probe } = {}) {
+async function record(name, frames, actions = {}, { quality = 95, probe } = {}) {
   const dir = path.join(OUT, name);
   fs.rmSync(dir, { recursive: true, force: true });
   fs.mkdirSync(dir, { recursive: true });
@@ -231,7 +231,7 @@ try {
     fs.rmSync(dir, { recursive: true, force: true });
     for (let p = 0; p <= 56; p++) {
       await goPly(p);
-      await grab(path.join(dir, `${String(p).padStart(4, '0')}.jpg`), { format: 'jpeg', quality: 93, clip: shot });
+      await grab(path.join(dir, `${String(p).padStart(4, '0')}.jpg`), { format: 'jpeg', quality: 95, clip: shot });
     }
     manifest.sequences['hook-replay'] = { dir: 'captures/hook-replay', frames: 57, perPly: true, clip, layout: lay };
     save();
@@ -353,18 +353,18 @@ try {
 
   // 9. The toolbar popup, with a game link pasted into Manual setup.
   if (want('popup')) {
-    await cdp.send('Emulation.setDeviceMetricsOverride', { width: 318, height: 600, deviceScaleFactor: 3, mobile: false });
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width: 318, height: 600, deviceScaleFactor: 4, mobile: false });
     await page.goto(`${base}/popup.html`);
     await sleep(800);
     const size = await page.evaluate(() => [document.documentElement.scrollWidth, document.body.scrollHeight]);
-    await cdp.send('Emulation.setDeviceMetricsOverride', { width: size[0], height: Math.ceil(size[1]), deviceScaleFactor: 3, mobile: false });
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width: size[0], height: Math.ceil(size[1]), deviceScaleFactor: 4, mobile: false });
     await sleep(300);
     await grab(path.join(OUT, 'popup.png'));
     await page.evaluate(() => { document.getElementById('manual').open = true; });
     await page.fill('#manualInput', hero.meta.url);
     await page.evaluate(() => document.activeElement.blur());
     const size2 = await page.evaluate(() => [document.documentElement.scrollWidth, document.body.scrollHeight]);
-    await cdp.send('Emulation.setDeviceMetricsOverride', { width: size2[0], height: Math.ceil(size2[1]), deviceScaleFactor: 3, mobile: false });
+    await cdp.send('Emulation.setDeviceMetricsOverride', { width: size2[0], height: Math.ceil(size2[1]), deviceScaleFactor: 4, mobile: false });
     await sleep(400);
     await grab(path.join(OUT, 'popup-pasted.png'));
     manifest.popup = { closed: { file: 'captures/popup.png', size }, pasted: { file: 'captures/popup-pasted.png', size: size2 } };

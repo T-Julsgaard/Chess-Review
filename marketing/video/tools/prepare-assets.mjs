@@ -1,5 +1,6 @@
 // Copies the extension's own fonts, badges, knight, sounds and store screenshots into
 // public/shared, so the video uses exactly what ships and nothing is downloaded.
+import { spawnSync } from 'node:child_process';
 import { copyFile, mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -34,3 +35,12 @@ for (const [from, to] of copies) {
   await copyFile(path.join(REPO, from), path.join(OUT, to));
 }
 console.log(`Copied ${copies.length} files to ${path.relative(VIDEO, OUT)}`);
+
+// The Chess.com and Lichess pictures fill most of the 4K frame, about three times their
+// 1280×800 size. Denoised and Lanczos-scaled, their text edges stay cleaner than the
+// browser's own scaling leaves them.
+for (const name of ['chesscom', 'lichess']) {
+  const r = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-i', path.join(OUT, `store/${name}.png`),
+    '-vf', 'nlmeans=s=2.5:p=5:r=11,scale=iw*3:ih*3:flags=lanczos,unsharp=7:7:1.0:7:7:0', path.join(OUT, `store/${name}-3x.png`)]);
+  if (r.status !== 0) throw new Error(`ffmpeg could not upscale ${name}.png. Is ffmpeg on PATH?`);
+}
