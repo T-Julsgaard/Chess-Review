@@ -35,7 +35,15 @@ try {
   const loaded=await call('Extensions.loadUnpacked',{path:source});
   const create=async(url)=>{const {targetId}=await call('Target.createTarget',{url});const {sessionId}=await call('Target.attachToTarget',{targetId,flatten:true});return {targetId,sessionId};};
   const evaluate=async(t,expression)=>{const r=await call('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true},t.sessionId);if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;};
-  const audit=await create(`chrome-extension://${loaded.id}/audit.html`);await sleep(300);
+  const waitFor=async(tab,expression,label)=>{
+    for(let i=0;i<100;i++){
+      if(await evaluate(tab,expression))return;
+      await sleep(100);
+    }
+    throw Error(`${label} did not become ready`);
+  };
+  const audit=await create(`chrome-extension://${loaded.id}/audit.html`);
+  await waitFor(audit,"!!globalThis.api?.storage?.local",'Audit storage API');
   const pgn='[White "Audit White"]\n[Black "Audit Black"]\n\n1. e4 e5 2. Nf3 Nc6 *';
   const payload={pgn,meta:{gameId:'layout-audit'},source:'pgn'};
   await evaluate(audit,`api.storage.local.clear().then(()=>api.storage.local.set({'job:audit':${JSON.stringify(payload)}}))`);
@@ -89,7 +97,8 @@ try {
   await capture('custom-reloaded');
   await evaluate(review,"import('./analysis.js').then(m=>m.resetLayout())");await sleep(500);
   await capture('reset-layout');
-  const popup=await create(`chrome-extension://${loaded.id}/popup.html`);await sleep(300);
+  const popup=await create(`chrome-extension://${loaded.id}/popup.html`);
+  await waitFor(popup,"!!document.querySelector('#manual')",'Popup');
   await call('Emulation.setDeviceMetricsOverride',{width:318,height:600,deviceScaleFactor:1,mobile:false},popup.sessionId);
   const popupSize=await evaluate(popup,"(()=>{document.querySelector('#manual').open=true;return {width:innerWidth,scroll:document.documentElement.scrollWidth,height:document.body.scrollHeight}})()");
   assert.ok(popupSize.scroll<=popupSize.width&&popupSize.height<=600,'Expanded popup overflows');
