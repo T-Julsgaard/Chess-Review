@@ -5,6 +5,10 @@ experiments, superseded tooling and discarded design work from repository histor
 Contributors using older clones should start from current `main` and port their
 reviewed changes individually, as described in CONTRIBUTING.md.
 
+The October 4 release audit also fixes review reloads, clock-tag alignment,
+callbacks from exited practice sessions, and library overwrites between review
+tabs. The functional audit and its limits are recorded in docs/RELEASE_AUDIT.md.
+
 ## Packages and verification
 
 Run `npm ci`, `npm test`, `npm run verify:engines`, and `npm run build`.
@@ -37,6 +41,14 @@ profiles and test-only extension copies with a loopback reporting endpoint; the
 store ZIPs are never modified. It checks a fresh default-18 review and migration
 from the old full-19 preference to Lite. Results are saved in
 `browser-smoke-results.json` in the latest release directory.
+
+Run `npm run test:layout` for native Chrome window fitting, square-board and
+overflow checks, 320/390-pixel responsive viewports, custom layout reload/reset,
+the expanded popup, legacy preference migration, and concurrent library writes.
+Screenshots and a JSON measurement report are saved in a `layout-<unique>/`
+directory alongside the audited package record. The browser smoke script also
+checks nine responsive fallback sizes in both browsers and reloads completed
+reviews with both engines.
 
 Validate the actual Firefox ZIP with:
 

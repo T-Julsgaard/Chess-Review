@@ -30,6 +30,10 @@ try {
     const manifest=JSON.parse(await fs.readFile(path.join(sourceDir,'manifest.json')));
     manifest.host_permissions.push('http://127.0.0.1/*');
     await fs.writeFile(path.join(sourceDir,'manifest.json'),JSON.stringify(manifest));
+    // Iframe dimensions are CSS pixels and do not resize when their parent tab
+    // zooms. Exercise the responsive fallback here; release-layout.mjs checks
+    // the real tab/window zoom fit separately.
+    await fs.appendFile(path.join(sourceDir,'analysis.js'), '\nglobalThis.__smokeResponsive=()=>{_zoomTabId=null;UI.canvas.classList.remove("desktop-layout");applyLayout();};\n');
     await fs.appendFile(path.join(sourceDir,'background.js'), '\nbrowserAPI.runtime.onInstalled.addListener(() => browserAPI.tabs.create({url:browserAPI.runtime.getURL("smoke.html")}));\n');
     await fs.writeFile(path.join(sourceDir,'smoke.html'),'<!doctype html><script type="module" src="smoke-client.js"></script>');
     await fs.writeFile(path.join(sourceDir,'smoke-client.js'), `
@@ -59,6 +63,7 @@ try {
     if(!saved||saved.engineBuild!==key||saved.evals.length!==23||!saved.evals.every(Boolean))throw Error('Review did not complete with '+key+': '+frame.contentDocument?.body?.innerText?.slice(-1200));
     const board=frame.contentDocument.querySelector('.board');if(!board)throw Error('Board missing');
     const doc=frame.contentDocument;
+    if(typeof frame.contentWindow.navigator.locks?.request!=='function')throw Error('Cross-tab library locks unavailable');
     doc.dispatchEvent(new KeyboardEvent('keydown',{key:'End',bubbles:true}));
     const glyph=doc.querySelector('.sq-badge');
     if(!glyph?.querySelector('svg > circle')||!glyph.getAttribute('aria-label'))throw Error('Vector move glyph missing');
@@ -98,6 +103,29 @@ try {
       }
     }
     await report({step:'rating-controls',key,labels,persistedModes:['moves','context']});
+    if(key==='nnue') {
+      frame.contentWindow.__smokeResponsive();
+      const sizes=[[1920,920],[1366,648],[1280,600],[1470,836],[1024,648],[820,648],[768,900],[390,844],[320,640]];
+      for(const [width,height] of sizes) {
+        frame.style.width=width+'px';frame.style.height=height+'px';await wait(250);
+        const rect=doc.querySelector('.board').getBoundingClientRect();
+        if(Math.abs(rect.width-rect.height)>1||doc.documentElement.scrollWidth>frame.contentWindow.innerWidth+1)
+          throw Error('Responsive layout overflow or distorted board at '+width+'x'+height);
+      }
+      frame.style.width='1680px';frame.style.height='1000px';await wait(250);
+      await report({step:'responsive-layouts',sizes});
+    }
+    const handoff=(await browserAPI.storage.local.get('job:'+id))['job:'+id];
+    if(handoff)throw Error('Completed startup left its one-shot handoff behind');
+    const previousDocument=frame.contentDocument;
+    frame.contentWindow.location.reload();
+    for(let i=0;i<100;i++) {
+      await wait(100);
+      if(frame.contentDocument!==previousDocument&&frame.contentDocument?.querySelector('.board'))break;
+    }
+    if(frame.contentDocument===previousDocument||!frame.contentDocument?.querySelector('.board')
+      ||!frame.contentDocument.querySelector('#error').hidden)throw Error('Review reload lost its game for '+key);
+    await report({step:'review-reload',key});
     frame.remove();
   }
   await report({done:true,ok:true,results});
