@@ -4603,13 +4603,13 @@ function badgeSettings() {
     el("div", { class: "badge-preview", "aria-label": "Badge preview" },
       gradeBadge("best", 9, "badge-preview-item"), gradeBadge("good", 6.4, "badge-preview-item"),
       gradeBadge("brilliant", 10, "badge-preview-item"), gradeBadge("blunder", 0, "badge-preview-item"),
-    el("div", { class: "set-lbl" }, "Number font"), fonts,
-    el("p", { class: "set-note" }, "Free, open-source fonts, bundled for offline use."),
       gradeBadge("book", null, "badge-preview-item")),
     slider("Badge size", "badgeScale", 0.7, 1.6, 0.05, {
       fmt: (v) => Math.round(v * 100) + " %",
       onChange: (v) => document.documentElement.style.setProperty("--badge-scale", v),
     }),
+    el("div", { class: "set-lbl" }, "Number font"), fonts,
+    el("p", { class: "set-note" }, "Free, open-source fonts, bundled for offline use."),
     el("div", { class: "badge-label-heading" }, el("span", { class: "set-lbl" }, "Hover labels")),
     badgeLabelPicker(),
     el("p", { class: "set-note" }, "Show the category for two seconds after each move."));
