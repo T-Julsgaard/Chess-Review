@@ -50,20 +50,26 @@ const GLYPH = { K: "♚", Q: "♛", R: "♜", B: "♝", N: "♞", P: "♟" };  /
 const FEEDBACK_URL = "https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenkadndbdbigfam";
 
 const BOARD_THEMES = {
-  green:   ["#e9edcc", "#6f9c54"],
-  walnut:  ["#efd8b6", "#b48764"],
-  slate:   ["#dfe3e9", "#8a97a8"],
-  ocean:   ["#dbe7f3", "#6f8fb4"],
-  ink:     ["#b9bdc6", "#474c57"],
-  // Additional palettes.
+  // Display order: custom colors are prepended in visualSettings, then Honeywood.
   maple:   ["#e8cfa0", "#a4703c"],   // warm maple wood
-  emerald: ["#e4ead4", "#46683f"],   // deep forest green
-  coral:   ["#f7dfca", "#c8835a"],   // warm terracotta
+  patina:  ["#f0dec6", "#487a78"],   // warm cream and aged teal
   lavender: ["#eae4f3", "#9580b3"], // soft purple
+  emerald: ["#e4ead4", "#46683f"],   // deep forest green
+  slate:   ["#dfe3e9", "#8a97a8"],
+  mulberry: ["#eadbd4", "#985e73"], // rose clay and muted berry
+  ocean:   ["#dbe7f3", "#6f8fb4"],
+  reed:    ["#dce6db", "#958448"],   // pale mint and olive ochre
+  walnut:  ["#efd8b6", "#b48764"],
+  ink:     ["#b9bdc6", "#474c57"],
+  dusk:    ["#eadfbd", "#526b8c"],   // warm ivory and evening blue
+  coral:   ["#f7dfca", "#c8835a"],   // warm terracotta
+  green:   ["#e9edcc", "#6f9c54"],
+  plum:    ["#e8dfca", "#6d5c79"],   // parchment and smoky aubergine
 };
 // Display names are separate from persisted keys so existing board preferences keep working.
 const BOARD_THEME_LABEL = { green: "Meadow", walnut: "Hazel", slate: "Mist", ocean: "Harbor",
-  ink: "Graphite", maple: "Honeywood", emerald: "Forest", coral: "Terracotta", lavender: "Lavender" };
+  ink: "Graphite", maple: "Honeywood", emerald: "Forest", coral: "Terracotta", lavender: "Lavender",
+  patina: "Patina", mulberry: "Mulberry", reed: "Reed", dusk: "Dusk", plum: "Plum" };
 const ACCENTS = {
   "#7fb45f": { accent: "#7fb45f", strong: "#6aa14a", ink: "#11210a" },
   "#5a8bef": { accent: "#5a8bef", strong: "#4574db", ink: "#06122e" },
