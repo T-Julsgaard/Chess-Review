@@ -86,19 +86,6 @@ const QUALITY = {
   blunder:   { sym: "??", name: "Blunder",   color: "var(--q-blunder)",   icon: "blunder" },
 };
 const QUALITY_ORDER = ["brilliant","great","best","excellent","good","book","inacc","mistake","miss","blunder"];
-const BADGE_LABEL_STYLES = {
-  off: { name: "Off", description: "Keep the board quiet" },
-  editorial: { name: "Editorial", description: "Warm serif · fine rules" },
-  studio: { name: "Studio", description: "Crisp type · graphite" },
-  soft: { name: "Soft", description: "Rounded type · gentle tint" },
-  minimal: { name: "Minimal", description: "Small type · subtle accent" },
-  original: { name: "Original", description: "Illustrated lettering · pop" },
-};
-function badgeLabelStyle(value = S.settings.badgeTooltip) {
-  // Preserve the former on/off choice when upgrading saved preferences.
-  if (value === true) return "original";
-  return Object.hasOwn(BADGE_LABEL_STYLES, value) ? value : "off";
-}
 // Accuracy breakdown: compact (default) vs. full list (expanded via the expander arrow).
 const QBREAK_SUMMARY = ["brilliant","great","best","mistake","miss","blunder"];
 const QBREAK_FULL = ["brilliant","great","best","excellent","good","inacc","mistake","miss","blunder","book"];
@@ -168,7 +155,7 @@ function updateGradeBadge(node, cls, score, example = false) {
   node.replaceChildren(gradeBadge(cls, score, "", {}, example).firstElementChild);
 }
 function refreshBadgeAppearance() {
-  if (badgeLabelStyle() === "off") hideBoardBadgeTip();
+  if (!S.settings.badgeTooltip) hideBoardBadgeTip();
   hideQTip();
   for (const node of document.querySelectorAll(".grade-badge")) {
     updateGradeBadge(node, node.dataset.badgeCategory,
@@ -213,11 +200,6 @@ const REMOVED_BOARD_THEMES = {
 };
 function migrateVisualAssetSettings(settings) {
   let changed = false;
-  const labelStyle = badgeLabelStyle(settings.badgeTooltip);
-  if (settings.badgeTooltip !== labelStyle) {
-    settings.badgeTooltip = labelStyle;
-    changed = true;
-  }
   // Upgrade the former default once; explicit selections of other fonts survive.
   // badgeDecimals identifies legacy settings and is removed below.
   if (settings.badgeFont === "original" && Object.hasOwn(settings, "badgeDecimals")) {
@@ -247,7 +229,7 @@ const DEFAULT_SETTINGS = {
   categoryNames: {},
   theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
-  badgeFont: "spacemono", badgeTooltip: "off",
+  badgeFont: "spacemono", badgeTooltip: false,
   // Eval-graph look (see renderGraph), eval-BAR look (see renderEvalBar) and the Insight-panel text size (px).
   graphStyle: "area", barStyle: "gradient", insightFont: 18,
   // Board coordinate labels (the a–h / 1–8 ticks in the squares' corners): on/off + size in px.
