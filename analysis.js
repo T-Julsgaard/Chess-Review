@@ -1144,10 +1144,22 @@ function classifyVariationMoves() {
   if (!v) return;
   const branch = v.branchIdx;
   const nodes = v.positions.slice(1);
+  const bests = [...S.bests.slice(0, branch), ...v.positions.map(p => p.searchPreview || p.best)];
+  const original = S.positions[branch + 1], first = nodes[0];
+  // The inherited root's paired playedScore belongs to the original game move.
+  // Keep it only when that same move is replayed, including promotion identity.
+  // Other replies use their candidate/position evaluation; copy before discarding
+  // the pair so entering a variation cannot change completed mainline evidence.
+  if (first && Object.hasOwn(bests[branch] || {}, "playedScore")
+    && (!original || first.from !== original.from || first.to !== original.to
+      || (first.promotion || "") !== (original.promotion || ""))) {
+    bests[branch] = { ...bests[branch] };
+    delete bests[branch].playedScore;
+  }
   const state = {
     positions: [...S.positions.slice(0, branch + 1), ...nodes],
     evals: [...S.evals.slice(0, branch), ...v.positions.map(p => p.searchPreview ? whiteRel(p.searchPreview.score, p.fen) : p.eval)],
-    bests: [...S.bests.slice(0, branch), ...v.positions.map(p => p.searchPreview || p.best)],
+    bests,
     settings: S.settings, players: S.players, openingHeader: S.openingHeader,
     _sacCache: [...S._sacCache.slice(0, branch + 1), ...nodes.map(p => p._sac)],
     _forcedCache: [...S._forcedCache.slice(0, branch + 1), ...nodes.map(p => p._forced)],
