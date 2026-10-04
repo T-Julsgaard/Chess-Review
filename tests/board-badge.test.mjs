@@ -5,7 +5,7 @@ import { app, loadGame, settle } from './helpers/app.mjs';
 
 function review(t) {
   const a = app(t);
-  a.state.settings.badgeTooltip = true;
+  a.state.settings.badgeTooltip = 'original';
   loadGame(a, '1. e4 e5 2. Nf3'); a.call('computeDerived');
   a.state.idx = 1; a.state.classif[1] = 'brilliant';
   a.call('buildUI'); a.call('buildBoard');
@@ -129,4 +129,48 @@ test('custom names use the same PNG renderer and late renamed artwork cannot rep
   a.state.idx = 2; a.state.classif[2] = 'great'; a.call('paintBoard'); await settle();
   assert.match(tip.querySelector('img').src, /great\.png$/);
   reveal(a); assert.equal(tip.getAttribute('aria-label'), 'Great');
+});
+
+test('all four text styles render every category immediately and retain safe custom names', t => {
+  const a = review(t), doc = a.dom.window.document;
+  for (const style of ['editorial', 'studio', 'soft', 'minimal']) {
+    a.state.settings.badgeTooltip = style;
+    for (const [cls, cfg] of Object.entries(a.run('QUALITY'))) {
+      a.state.classif[1] = cls; a.call('paintBoard');
+      const tip = doc.getElementById('boardBadgeTip');
+      assert.equal(tip.dataset.style, style);
+      assert.equal(tip.getAttribute('aria-hidden'), 'false');
+      assert.equal(tip.getAttribute('aria-label'), cfg.name);
+      assert.equal(tip.querySelector('.category-label-name').textContent, cfg.name);
+      assert.ok(tip.querySelector(`.category-label--${style}`));
+      assert.equal(tip.querySelector('img'), null);
+    }
+    a.state.classif[1] = 'brilliant';
+    a.state.settings.categoryNames.brilliant = '<b>Inspired</b>';
+    a.call('paintBoard');
+    assert.equal(doc.querySelector('#boardBadgeTip .category-label-name').textContent, '<b>Inspired</b>');
+    assert.equal(doc.querySelector('#boardBadgeTip b'), null);
+    delete a.state.settings.categoryNames.brilliant;
+  }
+});
+
+test('style switching cancels stale artwork and each text label expires without repaint restarting it', async t => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const a = review(t), doc = a.dom.window.document;
+  const stale = doc.querySelector('#boardBadgeTip img');
+  for (const style of ['editorial', 'studio', 'soft', 'minimal']) {
+    await a.call('setSetting', 'badgeTooltip', style);
+    const tip = doc.getElementById('boardBadgeTip');
+    stale.dispatchEvent(new a.dom.window.Event('load'));
+    const label = tip.firstElementChild;
+    assert.equal(tip.dataset.style, style);
+    t.mock.timers.tick(1000); a.call('paintBoard');
+    assert.equal(tip.firstElementChild, label);
+    t.mock.timers.tick(800); assert.ok(tip.classList.contains('leaving'));
+    t.mock.timers.tick(200); assert.equal(tip.getAttribute('aria-hidden'), 'true');
+    a.call('paintBoard'); assert.equal(tip.getAttribute('aria-hidden'), 'true');
+  }
+  await a.call('setSetting', 'badgeTooltip', 'off');
+  stale.dispatchEvent(new a.dom.window.Event('load'));
+  assert.equal(doc.getElementById('boardBadgeTip').getAttribute('aria-hidden'), 'true');
 });

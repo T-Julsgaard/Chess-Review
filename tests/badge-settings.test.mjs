@@ -45,7 +45,7 @@ test('sixteen local font choices ship with licenses and unsafe font names fall b
 test('hover labels default off while accessible score labels remain', t => {
   const a = review(t), doc = a.dom.window.document;
   assert.equal(a.state.settings.badgeFont, 'spacemono');
-  assert.equal(a.state.settings.badgeTooltip, false);
+  assert.equal(a.state.settings.badgeTooltip, 'off');
   assert.equal(Object.hasOwn(a.state.settings, 'badgeDecimals'), false);
   const badge = doc.querySelector('.sq-badge'); badge.focus();
   const event = new a.dom.window.Event('pointerenter'); Object.assign(event, { pointerType: 'mouse', buttons: 0 });
@@ -74,13 +74,13 @@ test('font settings update mounted badges and persist without changing scores', 
 
 test('hover setting automatically shows the current move and immediately dismisses it when disabled', async t => {
   const a = review(t), doc = a.dom.window.document, badge = doc.querySelector('.sq-badge');
-  await a.call('setSetting', 'badgeTooltip', true);
+  await a.call('setSetting', 'badgeTooltip', 'original');
   const image = doc.querySelector('#boardBadgeTip img');
   assert.match(image.src, /icons\/labels\/mistake\.png$/);
   image.dispatchEvent(new a.dom.window.Event('load'));
   assert.equal(doc.getElementById('boardBadgeTip').getAttribute('aria-hidden'), 'false');
   assert.equal(doc.querySelector('.qb').hasAttribute('title'), false);
-  await a.call('setSetting', 'badgeTooltip', false);
+  await a.call('setSetting', 'badgeTooltip', 'off');
   assert.equal(doc.getElementById('boardBadgeTip').getAttribute('aria-hidden'), 'true');
   assert.equal(doc.querySelector('.qb').hasAttribute('title'), false);
   a.state.classif[1] = 'inacc'; a.state.moveGrades[1] = 4; a.call('renderMoves');
@@ -97,7 +97,56 @@ test('Visual exposes Category badges with previews and hover labels off by defau
   assert.doesNotMatch(doc.querySelector('.badge-settings').textContent, /Equal number size/);
   assert.equal(doc.querySelector('.badge-settings .set-reset'), null);
   assert.equal(a.state.settings.badgeFont, 'spacemono');
-  assert.equal(a.state.settings.badgeTooltip, false);
+  assert.equal(a.state.settings.badgeTooltip, 'off');
+  const options = [...doc.querySelectorAll('.badge-label-option')];
+  assert.deepEqual(options.map(n => n.dataset.labelStyle), ['off', 'editorial', 'studio', 'soft', 'minimal', 'original']);
+  assert.equal(options[0].getAttribute('aria-checked'), 'true');
+  assert.equal(options.filter(n => n.tabIndex === 0).length, 1);
+  assert.equal(doc.querySelectorAll('.badge-label-preview .category-label').length, 4);
+});
+
+test('old on/off label preferences migrate once and explicit style choices survive', t => {
+  const a = review(t);
+  for (const [saved, expected] of [[true, 'original'], [false, 'off'], ['unknown', 'off']]) {
+    a.state.settings.badgeTooltip = saved;
+    assert.equal(a.call('migrateVisualAssetSettings', a.state.settings), true);
+    assert.equal(a.state.settings.badgeTooltip, expected);
+    assert.equal(a.call('migrateVisualAssetSettings', a.state.settings), false);
+  }
+  for (const style of ['editorial', 'studio', 'soft', 'minimal', 'original', 'off']) {
+    a.state.settings.badgeTooltip = style;
+    assert.equal(a.call('migrateVisualAssetSettings', a.state.settings), false);
+    assert.equal(a.state.settings.badgeTooltip, style);
+  }
+});
+
+test('style cards persist choices, preview the board and preserve scroll and keyboard focus', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  a.call('toggleSettings');
+  [...doc.querySelectorAll('.set-sect-head')].find(b => b.textContent === 'Category badges').click();
+  const before = JSON.stringify({ grades: a.state.moveGrades, evals: a.state.evals, acc: a.state.acc });
+  for (const style of ['editorial', 'studio', 'soft', 'minimal']) {
+    doc.getElementById('settings').scrollTop = 390;
+    doc.querySelector('.badge-font-options').scrollTop = 580;
+    const option = doc.querySelector(`[data-label-style="${style}"]`); option.focus(); option.click();
+    await settle();
+    assert.equal(a.store.settings.badgeTooltip, style);
+    assert.equal(doc.getElementById('boardBadgeTip').dataset.style, style);
+    assert.equal(doc.getElementById('boardBadgeTip').getAttribute('aria-hidden'), 'false');
+    assert.equal(doc.activeElement.dataset.labelStyle, style);
+    assert.equal(doc.activeElement.getAttribute('aria-checked'), 'true');
+    assert.equal(doc.getElementById('settings').scrollTop, 390);
+    assert.equal(doc.querySelector('.badge-font-options').scrollTop, 580);
+    assert.equal(doc.querySelectorAll('.badge-label-option[tabindex="0"]').length, 1);
+  }
+  doc.activeElement.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+  await settle();
+  assert.equal(doc.activeElement.dataset.labelStyle, 'original');
+  doc.activeElement.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+  await settle();
+  assert.equal(doc.activeElement.dataset.labelStyle, 'off');
+  assert.equal(doc.getElementById('boardBadgeTip').getAttribute('aria-hidden'), 'true');
+  assert.equal(JSON.stringify({ grades: a.state.moveGrades, evals: a.state.evals, acc: a.state.acc }), before);
 });
 
 test('accuracy category explainers work with hover labels off and after renaming', t => {
