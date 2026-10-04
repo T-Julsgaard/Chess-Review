@@ -1763,7 +1763,7 @@ function categoryLabelArtwork(cls, style) {
   }
   return el("span", { class: "category-label category-label--" + style,
     style: { "--label-color": QUALITY[cls].color }, "aria-hidden": "true" },
-    el("span", { class: "category-label-mark" }, style === "soft" ? QUALITY[cls].sym : ""),
+    style === "soft" ? null : el("span", { class: "category-label-mark" }),
     el("span", { class: "category-label-name" }, name));
 }
 function categoryLabelSource(cls) {

@@ -502,13 +502,8 @@ button { font-family: inherit; cursor: pointer; }
 .category-label--soft {
   font: 700 16px/1.3 "Badge Nunito", Arial, sans-serif; letter-spacing: -.015em;
   color: #303d3c; background: color-mix(in oklab, var(--label-color) 9%, #fcfdfb);
-  border: 1px solid #ffffffc9; border-radius: 999px; padding: 5px 13px 5px 6px; gap: 7px;
+  border: 1px solid #ffffffc9; border-radius: 999px; padding: 6px 13px;
   box-shadow: 0 2px 8px #10252030, 0 0 0 1px #263a3012;
-}
-.category-label--soft .category-label-mark {
-  display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px;
-  font: 700 12px/1 "Badge Space Grotesk", Arial, sans-serif;
-  color: #27332c; background: color-mix(in oklab, var(--label-color) 30%, #f6f8f2); border-radius: 50%;
 }
 .category-label--minimal {
   font: 700 13px/1.4 "Badge Manrope", Arial, sans-serif; letter-spacing: .005em;
@@ -1624,8 +1619,7 @@ button { font-family: inherit; cursor: pointer; }
 .badge-label-preview .category-label--editorial .category-label-mark { width: 9px; height: 1px; }
 .badge-label-preview .category-label--studio { font-size: 8px; padding: 5px 6px; gap: 5px; letter-spacing: .055em; }
 .badge-label-preview .category-label--studio .category-label-mark { height: 10px; }
-.badge-label-preview .category-label--soft { font-size: 11px; padding: 3px 7px 3px 3px; gap: 4px; }
-.badge-label-preview .category-label--soft .category-label-mark { width: 16px; height: 16px; font-size: 9px; }
+.badge-label-preview .category-label--soft { font-size: 11px; padding: 4px 8px; }
 .badge-label-preview .category-label--minimal { font-size: 10px; padding: 4px 7px; gap: 4px; }
 .badge-label-preview .category-label--minimal .category-label-mark { width: 3px; height: 3px; }
 .badge-label-preview > img { width: 100%; max-width: 100px; height: 26px; object-fit: contain; }

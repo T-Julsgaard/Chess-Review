@@ -143,6 +143,7 @@ test('all four text styles render every category immediately and retain safe cus
       assert.equal(tip.getAttribute('aria-label'), cfg.name);
       assert.equal(tip.querySelector('.category-label-name').textContent, cfg.name);
       assert.ok(tip.querySelector(`.category-label--${style}`));
+      if (style === 'soft') assert.equal(tip.querySelector('.category-label-mark'), null);
       assert.equal(tip.querySelector('img'), null);
     }
     a.state.classif[1] = 'brilliant';
