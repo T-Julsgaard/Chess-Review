@@ -17,13 +17,13 @@ const finite = n => typeof n === 'number' && Number.isFinite(n);
 
 // Bundled, unmodified SIL OFL fonts. Only these trusted families enter SVG markup.
 export const BADGE_FONTS = Object.freeze({
+  spacemono: { name: 'Space Mono', family: 'Badge Space Mono, monospace', style: 'Monospace', file: 'spacemono.ttf' },
   original: { name: 'Original', family: 'Arial, Helvetica, sans-serif', style: 'Classic', file: null },
   inter: { name: 'Inter', family: 'Badge Inter, Arial, sans-serif', style: 'Minimal', file: 'inter.ttf' },
   manrope: { name: 'Manrope', family: 'Badge Manrope, Arial, sans-serif', style: 'Soft geometric', file: 'manrope.ttf' },
   sora: { name: 'Sora', family: 'Badge Sora, Arial, sans-serif', style: 'Modern geometric', file: 'sora.ttf' },
   spacegrotesk: { name: 'Space Grotesk', family: 'Badge Space Grotesk, Arial, sans-serif', style: 'Technical', file: 'spacegrotesk.ttf' },
   rajdhani: { name: 'Rajdhani', family: 'Badge Rajdhani, Arial, sans-serif', style: 'Technical condensed', file: 'rajdhani.ttf' },
-  spacemono: { name: 'Space Mono', family: 'Badge Space Mono, monospace', style: 'Monospace', file: 'spacemono.ttf' },
   lato: { name: 'Lato', family: 'Badge Lato, Arial, sans-serif', style: 'Humanist', file: 'lato.ttf' },
   nunito: { name: 'Nunito', family: 'Badge Nunito, Arial, sans-serif', style: 'Rounded', file: 'nunito.ttf' },
   quicksand: { name: 'Quicksand', family: 'Badge Quicksand, Arial, sans-serif', style: 'Light geometric', file: 'quicksand.ttf' },
