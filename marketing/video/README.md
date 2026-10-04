@@ -29,9 +29,19 @@ replace that source PNG directly.
 ## README video preview
 
 The main [README](../../README.md#watch-the-introduction) displays the thumbnail
-as a link to `media/chess-review-intro.mp4?raw=true`. Both the image and video
-links are relative, so they follow the branch or fork being viewed. GitHub serves
-the video file when clicked; the browser may open it or download it.
+as a link to the
+[GitHub Pages video](https://t-julsgaard.github.io/Chess-Review/marketing/video/media/chess-review-intro.mp4).
+That URL serves the file as `video/mp4`, so browsers with H.264/AAC support open
+their video player. GitHub's raw repository URL serves it as
+`application/octet-stream` and downloads it instead; the README retains that URL
+only for the separate Download link. The thumbnail and download links remain
+relative to the repository.
+
+GitHub Pages is already configured to publish the root of `main`. The watch link
+uses that published copy; updated videos become available after pushing to
+`main` and completing the Pages build. Forks that enable their own Pages hosting
+should update the watch URL to their own site. See
+[GitHub Pages publishing sources](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
 
 GitHub's Markdown renderer removes a hand-written `<video>` element, so a video
 committed to the repository cannot be embedded that way. An inline player can

@@ -13,11 +13,11 @@ rating. No account, no server, no manual PGN copying.
 
 ## Watch the introduction
 
-[![Watch the 69-second Chess Review introduction](marketing/video/media/chess-review-thumbnail.png)](marketing/video/media/chess-review-intro.mp4?raw=true)
+[![Watch the 69-second Chess Review introduction](marketing/video/media/chess-review-thumbnail.png)](https://t-julsgaard.github.io/Chess-Review/marketing/video/media/chess-review-intro.mp4)
 
-**[▶ Watch the introduction](marketing/video/media/chess-review-intro.mp4?raw=true)** — 69 seconds, MP4, about 84 MiB.
-Click the thumbnail to open or download the video, depending on your browser.
-[English captions](marketing/video/captions/chess-review-intro.en.srt) are also available.
+**[▶ Watch the introduction](https://t-julsgaard.github.io/Chess-Review/marketing/video/media/chess-review-intro.mp4)** — 69 seconds.
+[Download the MP4 (about 84 MiB)](marketing/video/media/chess-review-intro.mp4?raw=true) ·
+[English captions](marketing/video/captions/chess-review-intro.en.srt)
 
 ## Features
 
