@@ -71,19 +71,19 @@ const ACCENTS = {
   "#c77edb": { accent: "#c77edb", strong: "#aa5fc1", ink: "#260d30" },
 };
 // Display names are independent of stored classification keys and scoring rules.
-// Annotation names and colors stay independent of move grades. The saved SVGs
-// in icons/ are category reference examples; move glyphs are rendered per ply.
+// Annotation names and colors stay independent of move grades.
+// Move glyphs are rendered per ply by the shared numerical SVG renderer.
 const QUALITY = {
-  brilliant: { sym: "!!", name: "Brilliant", color: "var(--q-brilliant)", icon: "brilliant" },
-  great:     { sym: "!",  name: "Great",     color: "var(--q-great)",     icon: "great" },
-  best:      { sym: "★",  name: "Best",      color: "var(--q-best)",      icon: "best" },
-  excellent: { sym: "✓",  name: "Excellent", color: "var(--q-excellent)", icon: "excellent" },
-  good:      { sym: "✓",  name: "Good",      color: "var(--q-good)",      icon: "good" },
-  book:      { sym: "◇",  name: "Book",      color: "var(--q-book)",      icon: "book" },
-  inacc:     { sym: "?!", name: "Inaccuracy",color: "var(--q-inacc)",     icon: "inaccuracy" },
-  mistake:   { sym: "?",  name: "Mistake",   color: "var(--q-mistake)",   icon: "mistake" },
-  miss:      { sym: "✕",  name: "Miss",      color: "var(--q-miss)",      icon: "miss" },
-  blunder:   { sym: "??", name: "Blunder",   color: "var(--q-blunder)",   icon: "blunder" },
+  brilliant: { name: "Brilliant",  color: "var(--q-brilliant)" },
+  great:     { name: "Great",      color: "var(--q-great)" },
+  best:      { name: "Best",       color: "var(--q-best)" },
+  excellent: { name: "Excellent",  color: "var(--q-excellent)" },
+  good:      { name: "Good",       color: "var(--q-good)" },
+  book:      { name: "Book",       color: "var(--q-book)" },
+  inacc:     { name: "Inaccuracy", color: "var(--q-inacc)" },
+  mistake:   { name: "Mistake",    color: "var(--q-mistake)" },
+  miss:      { name: "Miss",       color: "var(--q-miss)" },
+  blunder:   { name: "Blunder",    color: "var(--q-blunder)" },
 };
 const QUALITY_ORDER = ["brilliant","great","best","excellent","good","book","inacc","mistake","miss","blunder"];
 const BADGE_LABEL_STYLES = {
@@ -102,11 +102,6 @@ function badgeLabelStyle(value = S.settings.badgeTooltip) {
 // Accuracy breakdown: compact (default) vs. full list (expanded via the expander arrow).
 const QBREAK_SUMMARY = ["brilliant","great","best","mistake","miss","blunder"];
 const QBREAK_FULL = ["brilliant","great","best","excellent","good","inacc","mistake","miss","blunder","book"];
-const QUALITY_LABEL = {
-  brilliant: "Brilliant move!", great: "Great move!", best: "Best move",
-  excellent: "Excellent", good: "Good move", book: "Book move",
-  inacc: "Inaccuracy", mistake: "Mistake", miss: "Missed chance", blunder: "Blunder",
-};
 const NOTEWORTHY = new Set(["brilliant","great","inacc","mistake","miss","blunder"]);
 // Explanation for each category (shown as a tooltip in the accuracy panel). The classifier
 // (computeDerived → classifyMove) works on the engine's eval in PAWNS: "loss" is how much the
