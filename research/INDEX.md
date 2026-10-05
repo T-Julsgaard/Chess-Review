@@ -53,10 +53,11 @@ records. Update a row and the active experiment's resume state when work stops.
 | F015 | [Unresolved signed-log finding](findings/F015-unresolved-signed-log-choice.md) | recorded | Exact fits/vectors and independent/clean replay pass; mate-group signs differ across splits | No promotion; freeze a distinct dispersion model |
 
 | E018 | [Choice mixture](experiments/E018-choice-mixture/RESULT.md) | complete | Verified +.052790 nats exceeds practical gate, but comparator interval crosses zero; cross-fit/groups pass, budget drift worsens | Stop exact mixture; review precision/cohort/input limitations |
+| E019 | [Evidence resolution](experiments/E019-evidence-resolution/RESULT.md) | running | Exploratory paired-variation/precision and target audit; no model trial | Freeze code before diagnostics |
 | F016 | [Unresolved mixture finding](findings/F016-unresolved-choice-mixture.md) | recorded | All independent/exact/clean replay checks pass; descriptive calibration gains retain failed acceptance | Distinct question; no retuning or promotion |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E019`, `D003`, `F017`, `P001`.
+Allocate the next unused ID in each series: `E020`, `D003`, `F017`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
