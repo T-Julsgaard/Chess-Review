@@ -571,6 +571,39 @@
       "bytes": 25086,
       "sha256": "9fa39d55df53c0662457803fc3e0defd8dab6cb5d748c0dc8c991a82e8f5875b",
       "uncompressedSha256": "9fa39d55df53c0662457803fc3e0defd8dab6cb5d748c0dc8c991a82e8f5875b"
+    },
+    "research/experiments/E015-rating-choice-context/evidence/verification.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E015-rating-choice-context/evidence/results.json",
+        "research/experiments/E015-rating-choice-context/evidence/predictions.json.gz",
+        "research/experiments/E015-rating-choice-context/evidence/models.json",
+        "research/experiments/E015-rating-choice-context/evidence/freeze.json"
+      ],
+      "bytes": 25559,
+      "sha256": "44a0b75bc1d459a8632f83752cd77656eaa485f156075fb3851dcac16ea29610",
+      "uncompressedSha256": "44a0b75bc1d459a8632f83752cd77656eaa485f156075fb3851dcac16ea29610"
+    },
+    "research/experiments/E015-rating-choice-context/evidence/clean-replay.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E015-rating-choice-context/evidence/results.json",
+        "research/experiments/E015-rating-choice-context/evidence/predictions.json.gz",
+        "research/experiments/E015-rating-choice-context/evidence/models.json",
+        "research/experiments/E015-rating-choice-context/evidence/freeze.json"
+      ],
+      "bytes": 20373,
+      "sha256": "a255fc165b32502d0fbd51e59aed4e09bcf473a82e2fd2d6f7f3bcef4660bdcd",
+      "uncompressedSha256": "a255fc165b32502d0fbd51e59aed4e09bcf473a82e2fd2d6f7f3bcef4660bdcd"
+    },
+    "research/experiments/E015-rating-choice-context/evidence/clean-archive.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E015-rating-choice-context/evidence/clean-replay.json"
+      ],
+      "bytes": 878,
+      "sha256": "20003aac9bdee77414a32c8c2fa15f91ff06a3de934d1c381e2d5c20ccf40a35",
+      "uncompressedSha256": "20003aac9bdee77414a32c8c2fa15f91ff06a3de934d1c381e2d5c20ccf40a35"
     }
   }
 }

@@ -1,4 +1,4 @@
-# E015: development gain unresolved; primary gates fail
+# E015: verified unresolved rating-choice gain; primary gates fail
 
 2026-10-05. [The protocol](plan.md) fixes one monotone affine temperature model,
 global/uniform comparators, training-only fitting/folds, a 150-game development
@@ -34,7 +34,8 @@ temperature 15.464491662877617; candidate betaLow 0, delta/betaHigh
 constraint, not a forced positive intercept. Training objective comparisons
 served optimization only; no candidate validation/OOF metrics were examined.
 
-Next register/commit models and fit receipt before the one performance screen.
+Models and fit receipt were registered/committed in 6e32fdc before the one
+performance screen.
 The existing 150 development games remain exposed development evidence, not
 fresh confirmation. No new searches, human labels or reserved-target use.
 
@@ -71,6 +72,47 @@ absolute CP utilities has no resolved development gain at the practical
 threshold. It uses every legal alternative; cached evaluation cost does not
 establish a cheap extension implementation or deployed latency.
 
-Next register/commit the complete report/predictions/run, then verify exact
-refit, predictions, independent raw-score equations/KKT/gates and an external
-clean replay. No rescue refit or promotion. B000 and both human packs are fixed.
+The complete report/predictions/run were registered and committed in bdaeff5
+before verification. Exact model refit, all predictions/report and independent
+raw-score equations/KKT/gates pass. Clean replay from external archive
+bdaeff5ce6ee8b2f8c3e07195394048060a4fbe6 passes with no Git metadata, ignored
+inputs, new dependencies, network or engine searches. Archive SHA
+fed818aaa7269ea03f0795f9b37c800d7e001f42d974b0f0620d805c6ed2365a. Source representations were
+recorded before fitting; exact original checkout bytes are reconstructible.
+Twelve initial fits plus twelve deterministic refits in each verifier/replay
+are retained as reproduction, not additional candidate trials. No rescue refit
+or promotion. B000 and both human packs are fixed.
+
+## Verification and resume
+
+All eight authored checks, source verification and local links pass. All handles
+(freeze, fit, evaluate, verify, clean replay) are terminal. Independent evidence
+covers 600 choice vectors, five fold ownership checks, twelve optimality checks,
+45 budget pairs and 40,000 fixed bootstrap replicates.
+
+Development global/candidate/uniform mean NLL: 2.39040465 / 2.38925543 /
+3.42497875. Omitted-fold means: 2.44233009 / 2.41916895 / 3.31758254. All
+cross-fit groups have >=30 games. Development sparse groups: fixed-points <.1
+(11), >.9 (18), rating <1200 (18), >=2000 (23). Worst sufficiently large group
+gain is -.02184263 cross-fit and -.02794844 development, within the -.05 guard.
+Original fitting took ~1.238s and scoring ~.108s, excluding guarded provenance/
+raw-history reconstruction. No deployed all-legal collection latency measured.
+
+All small retained artifacts are registered under D002, within the 2 MiB cap:
+[freeze](evidence/freeze.json), [freeze receipt](evidence/freeze-run.json),
+[models](evidence/models.json), [fit receipt](evidence/fit-run.json),
+[result](evidence/results.json), [predictions](evidence/predictions.json.gz),
+[assessment receipt](evidence/run.json), [verification](evidence/verification.json),
+[clean replay](evidence/clean-replay.json), [archive recipe](evidence/clean-archive.json).
+
+```sh
+node --test research/experiments/E015-rating-choice-context/code/study.test.mjs research/source-replay.test.mjs
+node research/experiments/E015-rating-choice-context/code/run.mjs verify --out research/runs/E015/replay
+```
+
+Finding: [F013](../../findings/F013-unresolved-rating-choice-context.md). Stop
+this exact monotone rating-temperature recipe. Next review the relevant source
+literature and register a relative-CP choice utility comparison: a distinct
+premise about position opportunities, not another rating-temperature fit.
+No fresh confirmation, final estimated rating/adjustment or human category
+validity is established. The broad research goal remains active.

@@ -1,0 +1,14 @@
+{
+  "schema": "research-clean-archive-v1",
+  "experiment": "E015",
+  "snapshotRevision": "bdaeff5ce6ee8b2f8c3e07195394048060a4fbe6",
+  "archiveSha256": "fed818aaa7269ea03f0795f9b37c800d7e001f42d974b0f0620d805c6ed2365a",
+  "archiveCommand": "git archive --format=tar --output=<archive> bdaeff5ce6ee8b2f8c3e07195394048060a4fbe6 research analysis.js lib/chess.js lib/public-scoring.js tools/calibration package.json engine/stockfish-nnue.js engine/stockfish-nnue.wasm engine/stockfish-19-lite-single.js engine/stockfish-19-lite-single.wasm",
+  "command": "node research/clean-replay.mjs E015 bdaeff5ce6ee8b2f8c3e07195394048060a4fbe6",
+  "extractedOutsideCheckout": true,
+  "gitDirectory": false,
+  "nodeDependencies": 0,
+  "networkRequests": 0,
+  "verificationRefits": 12,
+  "sourceRepresentation": "Exact bytes and canonical LF/mixed-EOL reconstruction recorded before fitting"
+}

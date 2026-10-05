@@ -1,6 +1,6 @@
 # Research index
 
-Updated: 2026-10-05. Thirteen studies/tasks complete; root-pair joint gates fail; reviews pending.
+Updated: 2026-10-05. Fourteen studies/tasks complete; rating-choice gain unresolved; reviews pending.
 Baseline: [B000](BASELINE.md). New CP gain is development evidence, not confirmed.
 
 This is the routing and decision index. Detailed evidence lives in linked
@@ -42,10 +42,12 @@ records. Update a row and the active experiment's resume state when work stops.
 
 | F012 | [Root-pair consistency finding](findings/F012-root-pair-consistency.md) | recorded | SF19 conditional gains retain failed stability; SF18 worsens; no universal repair | Distinct contextual-choice hypothesis; no repair promotion |
 
-| E015 | [Rating-conditioned choice](experiments/E015-rating-choice-context/RESULT.md) | running | Primary failure: .001149 nats < .02, interval includes zero; complete coverage | Commit reports; exact/independent/clean verification |
+| E015 | [Rating-conditioned choice](experiments/E015-rating-choice-context/RESULT.md) | complete | Verified .001149 nats < .02, interval includes zero; sparse development groups, no resolved TV gain | Distinct relative-CP choice utility hypothesis |
+
+| F013 | [Unresolved rating-choice context](findings/F013-unresolved-rating-choice-context.md) | recorded | Train-only fits reproduce; complete independent/clean replay; no final rating claim | Stop exact monotone recipe; review relative-choice hypothesis |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E016`, `D003`, `F013`, `P001`.
+Allocate the next unused ID in each series: `E016`, `D003`, `F014`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
@@ -80,19 +82,20 @@ Only registered explicitly public, free-to-use sources and traceable derivatives
 qualify. New confirmation cohorts need complete acquisition/transform provenance;
 D001's historical limitations and exposure remain in force.
 
-Read E014's compact RESULT and F012. Numerical SF19 gains coexist with failed
-stability, while SF18's observed mean errors increase. Do not adopt a universal
-root-pair repair. Its raw-motivation diagnostic omitted published top-move
-zero-loss behavior; the tested baseline includes it. Both E005/E013 human packs
-are fixed and pending; no synthetic/engine evidence supplies perception.
+Read E015's compact RESULT and F013. Its fixed monotone rating-temperature
+recipe fails both primary development gates; stop this exact recipe. Twelve
+fits, 600 prediction vectors, independent optimality/arithmetic/gates and clean
+refit/replay verify. This proves reproduction under the stated conditions,
+not improved final ratings. Sparse development groups and search drift remain.
 
-E015 registers the rating-conditioned legal-choice likelihood study using cached
-E008 development choices. This tests whether rating context predicts peer move
-choice beyond a global choice model; it is distinct from F004's outcome-context
-interactions and F002's nonlinear moves-only rating regressions. It cannot by
-itself validate a final estimated rating or adjustment. Freeze the target,
-comparator, candidate and development gates before fitting; reserve any future
-confirmation for new registered evidence.
+Next review the relevant source literature and register a relative-CP choice
+utility comparison. The new premise concerns available alternatives rather
+than absolute outcome-probability utilities, not another rating-temperature
+refit or rescue of the failed E011 outcome curve. Freeze the comparator,
+candidate, mate/forced handling and gates before fitting. Reuse exact cached
+observations; reserve eventual confirmation for a new registered cohort.
+Both E005/E013 human packs remain fixed and pending. E014/F012 retain failed
+root-pair joint gates and the distinction from raw top-move diagnostics.
 
 For accuracy work, F006–F009 retain development gains and failed confirmation/
 stability gates. D002's 300 reserved games are consumed and keep their `test`
