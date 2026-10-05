@@ -1,0 +1,2736 @@
+{
+  "schema": "E009-search-stability-v1",
+  "summary": {
+    "games": 45,
+    "cpLoss": {
+      "mean": 0.009780721624077908,
+      "median": 0.0027842325175844174,
+      "p90": 0.022816800468007825,
+      "maximum": 0.061297464800327606
+    },
+    "wdlLoss": {
+      "mean": 0.01611111111111111,
+      "median": 0,
+      "p90": 0.0685,
+      "maximum": 0.131
+    },
+    "quality": {
+      "mean": 2.8819750240793818,
+      "median": 0.9260841984233394,
+      "p90": 8.216698984514906,
+      "maximum": 17.557718441103297
+    },
+    "withinCpTolerance": {
+      "successes": 43,
+      "n": 45,
+      "estimate": 0.9555555555555556,
+      "lower": 0.8517248923056439,
+      "upper": 0.9877258732932802,
+      "level": 0.95,
+      "method": "Wilson score; one fixed focal choice per disjoint game"
+    },
+    "withinWdlTolerance": {
+      "successes": 39,
+      "n": 45,
+      "estimate": 0.8666666666666667,
+      "lower": 0.7382269817382293,
+      "upper": 0.9374285125243192,
+      "level": 0.95,
+      "method": "Wilson score; one fixed focal choice per disjoint game"
+    },
+    "bestAlternativeOverlap": {
+      "successes": 34,
+      "n": 45,
+      "estimate": 0.7555555555555555,
+      "lower": 0.6132661994297965,
+      "upper": 0.8576452056622828,
+      "level": 0.95,
+      "method": "Wilson score; one fixed focal choice per disjoint game"
+    },
+    "sameBestSets": 27,
+    "rootBestChanges": 9,
+    "mateTransitions": 0,
+    "negativeCpResiduals": {
+      "low": 12,
+      "high": 13
+    },
+    "negativeWdlResiduals": {
+      "low": 9,
+      "high": 8
+    },
+    "gates": {
+      "cpLoss": true,
+      "wdlLoss": false,
+      "bestAlternative": false,
+      "displayedQuality": true
+    },
+    "passed": false
+  },
+  "roles": {
+    "train": {
+      "games": 30,
+      "cpLoss": {
+        "mean": 0.010243520795637928,
+        "median": 0.0027842325175844174,
+        "p90": 0.023929176752558123,
+        "maximum": 0.061297464800327606
+      },
+      "wdlLoss": {
+        "mean": 0.013133333333333332,
+        "median": 0,
+        "p90": 0.049000000000000044,
+        "maximum": 0.131
+      },
+      "quality": {
+        "mean": 3.226822576470846,
+        "median": 0.7769974602529999,
+        "p90": 9.47282766897628,
+        "maximum": 17.557718441103297
+      },
+      "withinCpTolerance": {
+        "successes": 28,
+        "n": 30,
+        "estimate": 0.9333333333333333,
+        "lower": 0.7867654163738308,
+        "upper": 0.9815229762087295,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "withinWdlTolerance": {
+        "successes": 27,
+        "n": 30,
+        "estimate": 0.9,
+        "lower": 0.7437891742081593,
+        "upper": 0.9654001112526658,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "bestAlternativeOverlap": {
+        "successes": 24,
+        "n": 30,
+        "estimate": 0.8,
+        "lower": 0.6269430358685175,
+        "upper": 0.9049489282271013,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "sameBestSets": 19,
+      "rootBestChanges": 6,
+      "mateTransitions": 0,
+      "negativeCpResiduals": {
+        "low": 8,
+        "high": 11
+      },
+      "negativeWdlResiduals": {
+        "low": 5,
+        "high": 6
+      },
+      "gates": {
+        "cpLoss": false,
+        "wdlLoss": false,
+        "bestAlternative": false,
+        "displayedQuality": true
+      },
+      "passed": false
+    },
+    "validation": {
+      "games": 15,
+      "cpLoss": {
+        "mean": 0.00885512328095787,
+        "median": 0.002158916296235089,
+        "p90": 0.019587498771419853,
+        "maximum": 0.04479700277030013
+      },
+      "wdlLoss": {
+        "mean": 0.02206666666666667,
+        "median": 0,
+        "p90": 0.0685,
+        "maximum": 0.12149999999999994
+      },
+      "quality": {
+        "mean": 2.1922799192964533,
+        "median": 0.9260841984233394,
+        "p90": 5.722362858743622,
+        "maximum": 8.216698984514906
+      },
+      "withinCpTolerance": {
+        "successes": 15,
+        "n": 15,
+        "estimate": 1,
+        "lower": 0.7961166989641515,
+        "upper": 1,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "withinWdlTolerance": {
+        "successes": 12,
+        "n": 15,
+        "estimate": 0.8,
+        "lower": 0.5481455128483065,
+        "upper": 0.9295245065301844,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "bestAlternativeOverlap": {
+        "successes": 10,
+        "n": 15,
+        "estimate": 0.6666666666666666,
+        "lower": 0.41713547738519774,
+        "upper": 0.8482367556028526,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "sameBestSets": 8,
+      "rootBestChanges": 3,
+      "mateTransitions": 0,
+      "negativeCpResiduals": {
+        "low": 4,
+        "high": 2
+      },
+      "negativeWdlResiduals": {
+        "low": 4,
+        "high": 2
+      },
+      "gates": {
+        "cpLoss": false,
+        "wdlLoss": false,
+        "bestAlternative": false,
+        "displayedQuality": true
+      },
+      "passed": false
+    }
+  },
+  "groups": [
+    {
+      "label": "fixed-points:0.1-0.9",
+      "sparse": false,
+      "games": 37,
+      "cpLoss": {
+        "mean": 0.010882363349493746,
+        "median": 0.0033428265002705126,
+        "p90": 0.023929176752558123,
+        "maximum": 0.061297464800327606
+      },
+      "wdlLoss": {
+        "mean": 0.019594594594594596,
+        "median": 0,
+        "p90": 0.07750000000000001,
+        "maximum": 0.131
+      },
+      "quality": {
+        "mean": 3.1256414984832177,
+        "median": 0.9404736156387052,
+        "p90": 8.75739547273362,
+        "maximum": 17.557718441103297
+      },
+      "withinCpTolerance": {
+        "successes": 35,
+        "n": 37,
+        "estimate": 0.9459459459459459,
+        "lower": 0.822953456491869,
+        "upper": 0.9850490231668423,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "withinWdlTolerance": {
+        "successes": 31,
+        "n": 37,
+        "estimate": 0.8378378378378378,
+        "lower": 0.6886351629906503,
+        "upper": 0.9234879276598885,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "bestAlternativeOverlap": {
+        "successes": 29,
+        "n": 37,
+        "estimate": 0.7837837837837838,
+        "lower": 0.6280485160803084,
+        "upper": 0.8861348800661442,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "sameBestSets": 23,
+      "rootBestChanges": 9,
+      "mateTransitions": 0,
+      "negativeCpResiduals": {
+        "low": 10,
+        "high": 10
+      },
+      "negativeWdlResiduals": {
+        "low": 9,
+        "high": 8
+      },
+      "gates": {
+        "cpLoss": true,
+        "wdlLoss": false,
+        "bestAlternative": false,
+        "displayedQuality": true
+      },
+      "passed": false
+    },
+    {
+      "label": "fixed-points:<0.1",
+      "sparse": true,
+      "games": 4,
+      "cpLoss": {
+        "mean": 0.0018337093090287655,
+        "median": 0,
+        "p90": 0.002158916296235089,
+        "maximum": 0.005175920939879973
+      },
+      "wdlLoss": {
+        "mean": 0,
+        "median": 0,
+        "p90": 0,
+        "maximum": 0
+      },
+      "quality": {
+        "mean": 0.556344217720973,
+        "median": 0,
+        "p90": 0.9260841984233394,
+        "maximum": 1.2992926724605525
+      },
+      "withinCpTolerance": {
+        "successes": 4,
+        "n": 4,
+        "estimate": 1,
+        "lower": 0.5101091635454027,
+        "upper": 1,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "withinWdlTolerance": {
+        "successes": 4,
+        "n": 4,
+        "estimate": 1,
+        "lower": 0.5101091635454027,
+        "upper": 1,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "bestAlternativeOverlap": {
+        "successes": 3,
+        "n": 4,
+        "estimate": 0.75,
+        "lower": 0.30064184258240184,
+        "upper": 0.9544127391902995,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "sameBestSets": 2,
+      "rootBestChanges": 0,
+      "mateTransitions": 0,
+      "negativeCpResiduals": {
+        "low": 1,
+        "high": 2
+      },
+      "negativeWdlResiduals": {
+        "low": 0,
+        "high": 0
+      },
+      "gates": {
+        "cpLoss": false,
+        "wdlLoss": false,
+        "bestAlternative": false,
+        "displayedQuality": true
+      },
+      "passed": false
+    },
+    {
+      "label": "fixed-points:>0.9",
+      "sparse": true,
+      "games": 4,
+      "cpLoss": {
+        "mean": 0.007537547979030557,
+        "median": 0,
+        "p90": 0.010636238190445235,
+        "maximum": 0.01951395372567699
+      },
+      "wdlLoss": {
+        "mean": 0,
+        "median": 0,
+        "p90": 0,
+        "maximum": 0
+      },
+      "quality": {
+        "mean": 2.9536909422023143,
+        "median": 0,
+        "p90": 4.615676768509161,
+        "maximum": 7.199087000300096
+      },
+      "withinCpTolerance": {
+        "successes": 4,
+        "n": 4,
+        "estimate": 1,
+        "lower": 0.5101091635454027,
+        "upper": 1,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "withinWdlTolerance": {
+        "successes": 4,
+        "n": 4,
+        "estimate": 1,
+        "lower": 0.5101091635454027,
+        "upper": 1,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "bestAlternativeOverlap": {
+        "successes": 2,
+        "n": 4,
+        "estimate": 0.5,
+        "lower": 0.15003898915214947,
+        "upper": 0.8499610108478506,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "sameBestSets": 2,
+      "rootBestChanges": 0,
+      "mateTransitions": 0,
+      "negativeCpResiduals": {
+        "low": 1,
+        "high": 1
+      },
+      "negativeWdlResiduals": {
+        "low": 0,
+        "high": 0
+      },
+      "gates": {
+        "cpLoss": false,
+        "wdlLoss": false,
+        "bestAlternative": false,
+        "displayedQuality": true
+      },
+      "passed": false
+    },
+    {
+      "label": "ply:21-50",
+      "sparse": false,
+      "games": 26,
+      "cpLoss": {
+        "mean": 0.00869072709147738,
+        "median": 0.0033428265002705126,
+        "p90": 0.01951395372567699,
+        "maximum": 0.061297464800327606
+      },
+      "wdlLoss": {
+        "mean": 0.010249999999999997,
+        "median": 0,
+        "p90": 0.007000000000000003,
+        "maximum": 0.131
+      },
+      "quality": {
+        "mean": 2.8260143320498985,
+        "median": 1.1616266116114105,
+        "p90": 7.199087000300096,
+        "maximum": 17.557718441103297
+      },
+      "withinCpTolerance": {
+        "successes": 25,
+        "n": 26,
+        "estimate": 0.9615384615384616,
+        "lower": 0.8110722109696524,
+        "upper": 0.9931780150064564,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "withinWdlTolerance": {
+        "successes": 24,
+        "n": 26,
+        "estimate": 0.9230769230769231,
+        "lower": 0.7585844622837095,
+        "upper": 0.9786449115277238,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "bestAlternativeOverlap": {
+        "successes": 17,
+        "n": 26,
+        "estimate": 0.6538461538461539,
+        "lower": 0.46220571188810816,
+        "upper": 0.8058776967705947,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "sameBestSets": 12,
+      "rootBestChanges": 5,
+      "mateTransitions": 0,
+      "negativeCpResiduals": {
+        "low": 7,
+        "high": 8
+      },
+      "negativeWdlResiduals": {
+        "low": 5,
+        "high": 5
+      },
+      "gates": {
+        "cpLoss": true,
+        "wdlLoss": false,
+        "bestAlternative": false,
+        "displayedQuality": true
+      },
+      "passed": false
+    },
+    {
+      "label": "ply:<=20",
+      "sparse": true,
+      "games": 8,
+      "cpLoss": {
+        "mean": 0.006174968146976469,
+        "median": 0,
+        "p90": 0.019587498771419853,
+        "maximum": 0.019726562514576496
+      },
+      "wdlLoss": {
+        "mean": 0.030375,
+        "median": 0,
+        "p90": 0.1050000000000001,
+        "maximum": 0.12149999999999994
+      },
+      "quality": {
+        "mean": 2.051302876367158,
+        "median": 0,
+        "p90": 5.722362858743622,
+        "maximum": 8.216698984514906
+      },
+      "withinCpTolerance": {
+        "successes": 8,
+        "n": 8,
+        "estimate": 1,
+        "lower": 0.6755924351161198,
+        "upper": 1,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "withinWdlTolerance": {
+        "successes": 6,
+        "n": 8,
+        "estimate": 0.75,
+        "lower": 0.40927543031016883,
+        "upper": 0.9285207872478909,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "bestAlternativeOverlap": {
+        "successes": 6,
+        "n": 8,
+        "estimate": 0.75,
+        "lower": 0.40927543031016883,
+        "upper": 0.9285207872478909,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "sameBestSets": 5,
+      "rootBestChanges": 3,
+      "mateTransitions": 0,
+      "negativeCpResiduals": {
+        "low": 3,
+        "high": 3
+      },
+      "negativeWdlResiduals": {
+        "low": 3,
+        "high": 3
+      },
+      "gates": {
+        "cpLoss": false,
+        "wdlLoss": false,
+        "bestAlternative": false,
+        "displayedQuality": true
+      },
+      "passed": false
+    },
+    {
+      "label": "ply:>50",
+      "sparse": true,
+      "games": 11,
+      "cpLoss": {
+        "mean": 0.014979438502662019,
+        "median": 0.0018441180121116507,
+        "p90": 0.04479700277030013,
+        "maximum": 0.05169887320552202
+      },
+      "wdlLoss": {
+        "mean": 0.0195909090909091,
+        "median": 0,
+        "p90": 0.0685,
+        "maximum": 0.07750000000000001
+      },
+      "quality": {
+        "mean": 3.6183709490306883,
+        "median": 0.7769974602529999,
+        "p90": 13.738511223023693,
+        "maximum": 14.656793963496582
+      },
+      "withinCpTolerance": {
+        "successes": 10,
+        "n": 11,
+        "estimate": 0.9090909090909091,
+        "lower": 0.6226415635484043,
+        "upper": 0.9837678271141151,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "withinWdlTolerance": {
+        "successes": 9,
+        "n": 11,
+        "estimate": 0.8181818181818182,
+        "lower": 0.523019438039156,
+        "upper": 0.9486323102539149,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "bestAlternativeOverlap": {
+        "successes": 11,
+        "n": 11,
+        "estimate": 1,
+        "lower": 0.7411670330319684,
+        "upper": 1,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "sameBestSets": 10,
+      "rootBestChanges": 1,
+      "mateTransitions": 0,
+      "negativeCpResiduals": {
+        "low": 2,
+        "high": 2
+      },
+      "negativeWdlResiduals": {
+        "low": 1,
+        "high": 0
+      },
+      "gates": {
+        "cpLoss": false,
+        "wdlLoss": false,
+        "bestAlternative": false,
+        "displayedQuality": true
+      },
+      "passed": false
+    },
+    {
+      "label": "rating:1200-1999",
+      "sparse": false,
+      "games": 32,
+      "cpLoss": {
+        "mean": 0.010475953922806588,
+        "median": 0.0033428265002705126,
+        "p90": 0.022816800468007825,
+        "maximum": 0.061297464800327606
+      },
+      "wdlLoss": {
+        "mean": 0.019453125,
+        "median": 0,
+        "p90": 0.0685,
+        "maximum": 0.131
+      },
+      "quality": {
+        "mean": 3.0437270827880063,
+        "median": 0.9260841984233394,
+        "p90": 8.216698984514906,
+        "maximum": 17.557718441103297
+      },
+      "withinCpTolerance": {
+        "successes": 31,
+        "n": 32,
+        "estimate": 0.96875,
+        "lower": 0.8425573617998744,
+        "upper": 0.9944621398359969,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "withinWdlTolerance": {
+        "successes": 27,
+        "n": 32,
+        "estimate": 0.84375,
+        "lower": 0.682458504024696,
+        "upper": 0.9313557971749429,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "bestAlternativeOverlap": {
+        "successes": 22,
+        "n": 32,
+        "estimate": 0.6875,
+        "lower": 0.5143332169904459,
+        "upper": 0.8204745836639026,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "sameBestSets": 18,
+      "rootBestChanges": 6,
+      "mateTransitions": 0,
+      "negativeCpResiduals": {
+        "low": 7,
+        "high": 9
+      },
+      "negativeWdlResiduals": {
+        "low": 5,
+        "high": 6
+      },
+      "gates": {
+        "cpLoss": true,
+        "wdlLoss": false,
+        "bestAlternative": false,
+        "displayedQuality": true
+      },
+      "passed": false
+    },
+    {
+      "label": "rating:<1200",
+      "sparse": true,
+      "games": 7,
+      "cpLoss": {
+        "mean": 0.006550081646437162,
+        "median": 0.005175920939879973,
+        "p90": 0.013799165263104596,
+        "maximum": 0.01951395372567699
+      },
+      "wdlLoss": {
+        "mean": 0.0018571428571428589,
+        "median": 0,
+        "p90": 0.006000000000000005,
+        "maximum": 0.007000000000000006
+      },
+      "quality": {
+        "mean": 2.34225929442247,
+        "median": 1.2992926724605525,
+        "p90": 5.642733299028492,
+        "maximum": 7.199087000300096
+      },
+      "withinCpTolerance": {
+        "successes": 7,
+        "n": 7,
+        "estimate": 1,
+        "lower": 0.6456695649333126,
+        "upper": 1,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "withinWdlTolerance": {
+        "successes": 7,
+        "n": 7,
+        "estimate": 1,
+        "lower": 0.6456695649333126,
+        "upper": 1,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "bestAlternativeOverlap": {
+        "successes": 6,
+        "n": 7,
+        "estimate": 0.8571428571428571,
+        "lower": 0.4868721707256811,
+        "upper": 0.9743203756552565,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "sameBestSets": 4,
+      "rootBestChanges": 1,
+      "mateTransitions": 0,
+      "negativeCpResiduals": {
+        "low": 3,
+        "high": 2
+      },
+      "negativeWdlResiduals": {
+        "low": 3,
+        "high": 1
+      },
+      "gates": {
+        "cpLoss": false,
+        "wdlLoss": false,
+        "bestAlternative": false,
+        "displayedQuality": true
+      },
+      "passed": false
+    },
+    {
+      "label": "rating:>=2000",
+      "sparse": true,
+      "games": 6,
+      "cpLoss": {
+        "mean": 0.009841896004772486,
+        "median": 0.0018441180121116507,
+        "p90": 0.0027842325175844174,
+        "maximum": 0.05169887320552202
+      },
+      "wdlLoss": {
+        "mean": 0.014916666666666653,
+        "median": 0.0005000000000000004,
+        "p90": 0.009499999999999953,
+        "maximum": 0.07750000000000001
+      },
+      "quality": {
+        "mean": 2.648965728899782,
+        "median": 0.2166590785105882,
+        "p90": 1.1616266116114105,
+        "maximum": 13.738511223023693
+      },
+      "withinCpTolerance": {
+        "successes": 5,
+        "n": 6,
+        "estimate": 0.8333333333333334,
+        "lower": 0.43649717781352987,
+        "upper": 0.9699466302516935,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "withinWdlTolerance": {
+        "successes": 5,
+        "n": 6,
+        "estimate": 0.8333333333333334,
+        "lower": 0.43649717781352987,
+        "upper": 0.9699466302516935,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "bestAlternativeOverlap": {
+        "successes": 6,
+        "n": 6,
+        "estimate": 1,
+        "lower": 0.6096657120978346,
+        "upper": 1,
+        "level": 0.95,
+        "method": "Wilson score; one fixed focal choice per disjoint game"
+      },
+      "sameBestSets": 5,
+      "rootBestChanges": 2,
+      "mateTransitions": 0,
+      "negativeCpResiduals": {
+        "low": 2,
+        "high": 2
+      },
+      "negativeWdlResiduals": {
+        "low": 1,
+        "high": 1
+      },
+      "gates": {
+        "cpLoss": false,
+        "wdlLoss": false,
+        "bestAlternative": false,
+        "displayedQuality": true
+      },
+      "passed": false
+    }
+  ],
+  "records": [
+    {
+      "gameId": "NZownEaj",
+      "split": "train",
+      "ply": 41,
+      "rating": 1445,
+      "fixedPoints": 0.35598925108778084,
+      "low": {
+        "cpLoss": 0.07338218465860163,
+        "quality": 72.78228491198207,
+        "wdlLoss": 0.02,
+        "cpResidual": 0.07338218465860163,
+        "wdlResidual": 0.02,
+        "best": [
+          "c7c6"
+        ],
+        "bestmove": "c7c6",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.35598925108778084
+      },
+      "high": {
+        "cpLoss": 0.13467964945892924,
+        "quality": 55.22456647087878,
+        "wdlLoss": 0.0195,
+        "cpResidual": 0.13467964945892924,
+        "wdlResidual": 0.0195,
+        "best": [
+          "c7c6"
+        ],
+        "bestmove": "c7c6",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.3551455424350717
+      },
+      "cpLossDrift": 0.061297464800327606,
+      "wdlLossDrift": 0.0005000000000000004,
+      "qualityDrift": 17.557718441103297,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "07sDmwgW",
+      "split": "train",
+      "ply": 45,
+      "rating": 1508,
+      "fixedPoints": 0.9883906884809148,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": 0.013749545659134998,
+        "wdlResidual": 0,
+        "best": [
+          "a4c4"
+        ],
+        "bestmove": "d3e4",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.9883906884809148
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": 0.002299425947486111,
+        "wdlResidual": 0,
+        "best": [
+          "d3e4"
+        ],
+        "bestmove": "d3e4",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.9867187738731744
+      },
+      "cpLossDrift": 0,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0,
+      "bestOverlap": false,
+      "sameBestSet": false,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "WWkXR9Xz",
+      "split": "train",
+      "ply": 20,
+      "rating": 1859,
+      "fixedPoints": 0.5540980866051488,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.004544065979470879,
+        "wdlResidual": -0.016000000000000014,
+        "best": [
+          "h7g6"
+        ],
+        "bestmove": "h7g6",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.5540980866051488
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.010898535985645275,
+        "wdlResidual": -0.03650000000000009,
+        "best": [
+          "h7g6"
+        ],
+        "bestmove": "h7g6",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.5522778816577142
+      },
+      "cpLossDrift": 0,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "E0nRzRyk",
+      "split": "train",
+      "ply": 59,
+      "rating": 2070,
+      "fixedPoints": 0.9212627874683679,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.006670227910446469,
+        "wdlResidual": 0,
+        "best": [
+          "g5h6"
+        ],
+        "bestmove": "c3a2",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.9212627874683679
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.002592122051626511,
+        "wdlResidual": 0,
+        "best": [
+          "g5h6"
+        ],
+        "bestmove": "c3a2",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.9131604245116784
+      },
+      "cpLossDrift": 0,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "87PZBdRd",
+      "split": "train",
+      "ply": 52,
+      "rating": 2081,
+      "fixedPoints": 0.4861957089706845,
+      "low": {
+        "cpLoss": 0.1469049612500714,
+        "quality": 52.249278860939015,
+        "wdlLoss": 0.4865,
+        "cpResidual": 0.1469049612500714,
+        "wdlResidual": 0.4865,
+        "best": [
+          "f6f5"
+        ],
+        "bestmove": "f6f5",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.4861957089706845
+      },
+      "high": {
+        "cpLoss": 0.09520608804454939,
+        "quality": 65.98779008396271,
+        "wdlLoss": 0.409,
+        "cpResidual": 0.09520608804454939,
+        "wdlResidual": 0.409,
+        "best": [
+          "f6f5"
+        ],
+        "bestmove": "f6f5",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.4751664103476071
+      },
+      "cpLossDrift": 0.05169887320552202,
+      "wdlLossDrift": 0.07750000000000001,
+      "qualityDrift": 13.738511223023693,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "aDJJOvyO",
+      "split": "train",
+      "ply": 75,
+      "rating": 2396,
+      "fixedPoints": 0.4953975299971156,
+      "low": {
+        "cpLoss": 0.013799614409309269,
+        "quality": 94.98324666601872,
+        "wdlLoss": 0.004500000000000004,
+        "cpResidual": 0.013799614409309269,
+        "wdlResidual": 0.004500000000000004,
+        "best": [
+          "d3c3"
+        ],
+        "bestmove": "d3e2",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.4953975299971156
+      },
+      "high": {
+        "cpLoss": 0.01564373242142092,
+        "quality": 94.20624920576572,
+        "wdlLoss": 0.0040000000000000036,
+        "cpResidual": 0.01564373242142092,
+        "wdlResidual": 0.0040000000000000036,
+        "best": [
+          "a2a3",
+          "d3c2",
+          "d3c3",
+          "d3d2",
+          "d3e2"
+        ],
+        "bestmove": "d3c2",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.5
+      },
+      "cpLossDrift": 0.0018441180121116507,
+      "wdlLossDrift": 0.0005000000000000004,
+      "qualityDrift": 0.7769974602529999,
+      "bestOverlap": true,
+      "sameBestSet": false,
+      "rootBestChanged": true,
+      "mateTransition": false
+    },
+    {
+      "gameId": "1ziAkAhB",
+      "split": "train",
+      "ply": 69,
+      "rating": 1478,
+      "fixedPoints": 0.3869241464463639,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.039962159651753926,
+        "wdlResidual": -0.267,
+        "best": [
+          "d2d8"
+        ],
+        "bestmove": "d2d8",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.3869241464463639
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": 0.014190458009812112,
+        "wdlResidual": 0.10450000000000001,
+        "best": [
+          "d2d8"
+        ],
+        "bestmove": "d2d8",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.41164679702450635
+      },
+      "cpLossDrift": 0,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "UhAyJbXr",
+      "split": "train",
+      "ply": 44,
+      "rating": 1478,
+      "fixedPoints": 0.9233731631034335,
+      "low": {
+        "cpLoss": 0.0026462144806495003,
+        "quality": 99.81794602299905,
+        "wdlLoss": 0,
+        "cpResidual": 0.0026462144806495003,
+        "wdlResidual": 0,
+        "best": [
+          "e5f5"
+        ],
+        "bestmove": "e5b5",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.9233731631034335
+      },
+      "high": {
+        "cpLoss": 0.013282452671094735,
+        "quality": 95.20226925448989,
+        "wdlLoss": 0,
+        "cpResidual": 0.013282452671094735,
+        "wdlResidual": 0,
+        "best": [
+          "e5a5"
+        ],
+        "bestmove": "e5b5",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.9281788606935651
+      },
+      "cpLossDrift": 0.010636238190445235,
+      "wdlLossDrift": 0,
+      "qualityDrift": 4.615676768509161,
+      "bestOverlap": false,
+      "sameBestSet": false,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "TtWBC399",
+      "split": "train",
+      "ply": 27,
+      "rating": 2125,
+      "fixedPoints": 0.48711557303526726,
+      "low": {
+        "cpLoss": 0.018372440360138187,
+        "quality": 93.06792623582517,
+        "wdlLoss": 0.016000000000000014,
+        "cpResidual": 0.018372440360138187,
+        "wdlResidual": 0.016000000000000014,
+        "best": [
+          "f4e6"
+        ],
+        "bestmove": "f4e6",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.48711557303526726
+      },
+      "high": {
+        "cpLoss": 0.01558820784255377,
+        "quality": 94.22955284743658,
+        "wdlLoss": 0.01799999999999996,
+        "cpResidual": 0.01558820784255377,
+        "wdlResidual": 0.01799999999999996,
+        "best": [
+          "f4e6"
+        ],
+        "bestmove": "f4e6",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.47700323643230064
+      },
+      "cpLossDrift": 0.0027842325175844174,
+      "wdlLossDrift": 0.0019999999999999463,
+      "qualityDrift": 1.1616266116114105,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "OypcnXEs",
+      "split": "train",
+      "ply": 61,
+      "rating": 1681,
+      "fixedPoints": 0.5,
+      "low": {
+        "cpLoss": 0.0504562746820833,
+        "quality": 80.65059372253802,
+        "wdlLoss": 0.03799999999999998,
+        "cpResidual": 0.0504562746820833,
+        "wdlResidual": 0.03799999999999998,
+        "best": [
+          "g4e4"
+        ],
+        "bestmove": "g4e4",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.5
+      },
+      "high": {
+        "cpLoss": 0.06681248549983532,
+        "quality": 74.9573345833792,
+        "wdlLoss": 0.08700000000000002,
+        "cpResidual": 0.06681248549983532,
+        "wdlResidual": 0.08700000000000002,
+        "best": [
+          "g4e4"
+        ],
+        "bestmove": "g4e4",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.5009205189599892
+      },
+      "cpLossDrift": 0.016356210817752015,
+      "wdlLossDrift": 0.049000000000000044,
+      "qualityDrift": 5.693259139158826,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "hFgCloIy",
+      "split": "train",
+      "ply": 20,
+      "rating": 2119,
+      "fixedPoints": 0.5595498132599205,
+      "low": {
+        "cpLoss": 0.002724152293416826,
+        "quality": 99.78334092148941,
+        "wdlLoss": 0.009499999999999953,
+        "cpResidual": 0.002724152293416826,
+        "wdlResidual": 0.009499999999999953,
+        "best": [
+          "f6d7"
+        ],
+        "bestmove": "f6d7",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.5595498132599205
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": 0,
+        "wdlResidual": 0,
+        "best": [
+          "f6d7"
+        ],
+        "bestmove": "d8d7",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.5586421525846197
+      },
+      "cpLossDrift": 0.002724152293416826,
+      "wdlLossDrift": 0.009499999999999953,
+      "qualityDrift": 0.2166590785105882,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": true,
+      "mateTransition": false
+    },
+    {
+      "gameId": "0uyT8KFm",
+      "split": "train",
+      "ply": 27,
+      "rating": 1323,
+      "fixedPoints": 0.8665157323943802,
+      "low": {
+        "cpLoss": 0.8665157323943802,
+        "quality": 0.20375744476085966,
+        "wdlLoss": 1,
+        "cpResidual": 0.8665157323943802,
+        "wdlResidual": 1,
+        "best": [
+          "b2b4"
+        ],
+        "bestmove": "h2h4",
+        "rootMate": null,
+        "playedMate": -1,
+        "fixedPoints": 0.8665157323943802
+      },
+      "high": {
+        "cpLoss": 0.8783905850187359,
+        "quality": 0.0842894584411118,
+        "wdlLoss": 1,
+        "cpResidual": 0.8783905850187359,
+        "wdlResidual": 1,
+        "best": [
+          "b2b4"
+        ],
+        "bestmove": "f1e2",
+        "rootMate": null,
+        "playedMate": -1,
+        "fixedPoints": 0.8783905850187359
+      },
+      "cpLossDrift": 0.011874852624355725,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0.11946798631974787,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": true,
+      "mateTransition": false
+    },
+    {
+      "gameId": "ZtaRsTxD",
+      "split": "train",
+      "ply": 34,
+      "rating": 966,
+      "fixedPoints": 0.05564449597402012,
+      "low": {
+        "cpLoss": 0.005175920939879973,
+        "quality": 98.70070732753945,
+        "wdlLoss": 0,
+        "cpResidual": 0.005175920939879973,
+        "wdlResidual": 0,
+        "best": [
+          "a8c8",
+          "d8c7"
+        ],
+        "bestmove": "d8c7",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.05564449597402012
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.003579270030092979,
+        "wdlResidual": 0,
+        "best": [
+          "d8c7",
+          "h6g5"
+        ],
+        "bestmove": "d8c7",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.046889305004047165
+      },
+      "cpLossDrift": 0.005175920939879973,
+      "wdlLossDrift": 0,
+      "qualityDrift": 1.2992926724605525,
+      "bestOverlap": true,
+      "sameBestSet": false,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "o9ANDF2f",
+      "split": "train",
+      "ply": 39,
+      "rating": 1460,
+      "fixedPoints": 0.3913003349547192,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.006156004059975018,
+        "wdlResidual": -0.0345,
+        "best": [
+          "e2c3"
+        ],
+        "bestmove": "e2c3",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.3913003349547192
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.004323722125631424,
+        "wdlResidual": -0.014499999999999999,
+        "best": [
+          "e2c3",
+          "h2g4"
+        ],
+        "bestmove": "e2c3",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.37476952142308345
+      },
+      "cpLossDrift": 0,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0,
+      "bestOverlap": true,
+      "sameBestSet": false,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "vbOIU1yl",
+      "split": "train",
+      "ply": 31,
+      "rating": 1374,
+      "fixedPoints": 0.4522786599183324,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.0027378194861993332,
+        "wdlResidual": -0.005500000000000005,
+        "best": [
+          "c3d5"
+        ],
+        "bestmove": "a1d1",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.4522786599183324
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.00823158664920759,
+        "wdlResidual": -0.012999999999999956,
+        "best": [
+          "a1d1"
+        ],
+        "bestmove": "c3d5",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.4559296988800415
+      },
+      "cpLossDrift": 0,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0,
+      "bestOverlap": false,
+      "sameBestSet": false,
+      "rootBestChanged": true,
+      "mateTransition": false
+    },
+    {
+      "gameId": "cfBoshiO",
+      "split": "train",
+      "ply": 40,
+      "rating": 1882,
+      "fixedPoints": 0.8795656272368987,
+      "low": {
+        "cpLoss": 0.014332752404719207,
+        "quality": 94.75797371351507,
+        "wdlLoss": 0,
+        "cpResidual": 0.014332752404719207,
+        "wdlResidual": 0,
+        "best": [
+          "a8f8"
+        ],
+        "bestmove": "a8f8",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.8795656272368987
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.001168495014475246,
+        "wdlResidual": 0,
+        "best": [
+          "b4c5"
+        ],
+        "bestmove": "a8f8",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.8791750393023381
+      },
+      "cpLossDrift": 0.014332752404719207,
+      "wdlLossDrift": 0,
+      "qualityDrift": 5.242026286484929,
+      "bestOverlap": false,
+      "sameBestSet": false,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "KlqlZLy3",
+      "split": "train",
+      "ply": 62,
+      "rating": 1598,
+      "fixedPoints": 0.844717576963408,
+      "low": {
+        "cpLoss": 0.2924396953056938,
+        "quality": 26.70712574138285,
+        "wdlLoss": 0.45099999999999996,
+        "cpResidual": 0.2924396953056938,
+        "wdlResidual": 0.45099999999999996,
+        "best": [
+          "d6f5"
+        ],
+        "bestmove": "d6f5",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.844717576963408
+      },
+      "high": {
+        "cpLoss": 0.30004435505270943,
+        "quality": 25.766652125744145,
+        "wdlLoss": 0.471,
+        "cpResidual": 0.30004435505270943,
+        "wdlResidual": 0.471,
+        "best": [
+          "d6f5"
+        ],
+        "bestmove": "d6f5",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.8422873339987781
+      },
+      "cpLossDrift": 0.00760465974701563,
+      "wdlLossDrift": 0.020000000000000018,
+      "qualityDrift": 0.9404736156387052,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "NoaXUASy",
+      "split": "train",
+      "ply": 64,
+      "rating": 1937,
+      "fixedPoints": 0.8353181555713568,
+      "low": {
+        "cpLoss": 0.08213344806484424,
+        "quality": 69.97995543445359,
+        "wdlLoss": 0,
+        "cpResidual": 0.08213344806484424,
+        "wdlResidual": 0,
+        "best": [
+          "c3c6"
+        ],
+        "bestmove": "c3c6",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.8353181555713568
+      },
+      "high": {
+        "cpLoss": 0.03966048908826347,
+        "quality": 84.63674939795017,
+        "wdlLoss": 0,
+        "cpResidual": 0.03966048908826347,
+        "wdlResidual": 0,
+        "best": [
+          "c3c6"
+        ],
+        "bestmove": "c3c6",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.8451999418316745
+      },
+      "cpLossDrift": 0.042472958976580766,
+      "wdlLossDrift": 0,
+      "qualityDrift": 14.656793963496582,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "lWKzzdc0",
+      "split": "train",
+      "ply": 38,
+      "rating": 1448,
+      "fixedPoints": 0.4036449683536325,
+      "low": {
+        "cpLoss": 0.022816800468007825,
+        "quality": 91.24260452726638,
+        "wdlLoss": 0.131,
+        "cpResidual": 0.022816800468007825,
+        "wdlResidual": 0.131,
+        "best": [
+          "f6d7"
+        ],
+        "bestmove": "f6d7",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.4036449683536325
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": 0,
+        "wdlResidual": 0,
+        "best": [
+          "f6d7",
+          "f6g8"
+        ],
+        "bestmove": "a7a6",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.39657487064657393
+      },
+      "cpLossDrift": 0.022816800468007825,
+      "wdlLossDrift": 0.131,
+      "qualityDrift": 8.75739547273362,
+      "bestOverlap": true,
+      "sameBestSet": false,
+      "rootBestChanged": true,
+      "mateTransition": false
+    },
+    {
+      "gameId": "NioKxUef",
+      "split": "train",
+      "ply": 28,
+      "rating": 1133,
+      "fixedPoints": 0.46050012148774266,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.010994701200444157,
+        "wdlResidual": -0.013500000000000012,
+        "best": [
+          "a8a1"
+        ],
+        "bestmove": "a8a1",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.46050012148774266
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.0064145431087184734,
+        "wdlResidual": -0.008000000000000007,
+        "best": [
+          "a8a1"
+        ],
+        "bestmove": "a8a1",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.46324561670946
+      },
+      "cpLossDrift": 0,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "g13eiJLN",
+      "split": "train",
+      "ply": 28,
+      "rating": 1151,
+      "fixedPoints": 0.5073636275599663,
+      "low": {
+        "cpLoss": 0.014727255119932725,
+        "quality": 94.59161626956619,
+        "wdlLoss": 0.006000000000000005,
+        "cpResidual": 0.014727255119932725,
+        "wdlResidual": 0.006000000000000005,
+        "best": [
+          "b7b5"
+        ],
+        "bestmove": "b7b5",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.5073636275599663
+      },
+      "high": {
+        "cpLoss": 0.02852642038303732,
+        "quality": 88.9488829705377,
+        "wdlLoss": 0.01200000000000001,
+        "cpResidual": 0.02852642038303732,
+        "wdlResidual": 0.01200000000000001,
+        "best": [
+          "b7b5"
+        ],
+        "bestmove": "b7b5",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.5184020844121936
+      },
+      "cpLossDrift": 0.013799165263104596,
+      "wdlLossDrift": 0.006000000000000005,
+      "qualityDrift": 5.642733299028492,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "v1kFlZ0q",
+      "split": "train",
+      "ply": 49,
+      "rating": 1925,
+      "fixedPoints": 0.5667962794387497,
+      "low": {
+        "cpLoss": 0.024553300492681007,
+        "quality": 90.5389573958634,
+        "wdlLoss": 0.06800000000000006,
+        "cpResidual": 0.024553300492681007,
+        "wdlResidual": 0.06800000000000006,
+        "best": [
+          "c6a8"
+        ],
+        "bestmove": "c6a8",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.5667962794387497
+      },
+      "high": {
+        "cpLoss": 0.02789612699295152,
+        "quality": 89.19929918601002,
+        "wdlLoss": 0.15900000000000003,
+        "cpResidual": 0.02789612699295152,
+        "wdlResidual": 0.15900000000000003,
+        "best": [
+          "c6a8"
+        ],
+        "bestmove": "c6a8",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.5883532029754936
+      },
+      "cpLossDrift": 0.0033428265002705126,
+      "wdlLossDrift": 0.09099999999999997,
+      "qualityDrift": 1.3396582098533827,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "k7j2HNII",
+      "split": "train",
+      "ply": 26,
+      "rating": 1787,
+      "fixedPoints": 0.8946635751884419,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.014928488274694396,
+        "wdlResidual": 0,
+        "best": [
+          "f6d7"
+        ],
+        "bestmove": "f6d7",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.8946635751884419
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.018854863329256566,
+        "wdlResidual": 0,
+        "best": [
+          "f6d7"
+        ],
+        "bestmove": "f6d7",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.8977459941661641
+      },
+      "cpLossDrift": 0,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "yKxFGFfA",
+      "split": "train",
+      "ply": 35,
+      "rating": 1387,
+      "fixedPoints": 0.36192003565750486,
+      "low": {
+        "cpLoss": 0.08005887736693101,
+        "quality": 70.63465000108705,
+        "wdlLoss": 0.0275,
+        "cpResidual": 0.08005887736693101,
+        "wdlResidual": 0.0275,
+        "best": [
+          "f2f4"
+        ],
+        "bestmove": "f2f4",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.36192003565750486
+      },
+      "high": {
+        "cpLoss": 0.07529190038751055,
+        "quality": 72.16161433291876,
+        "wdlLoss": 0.0345,
+        "cpResidual": 0.07529190038751055,
+        "wdlResidual": 0.0345,
+        "best": [
+          "f2f4"
+        ],
+        "bestmove": "f2f4",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.3661823363988792
+      },
+      "cpLossDrift": 0.0047669769794204675,
+      "wdlLossDrift": 0.007000000000000003,
+      "qualityDrift": 1.5269643318317065,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "OltFPwJq",
+      "split": "train",
+      "ply": 44,
+      "rating": 1912,
+      "fixedPoints": 0.8970679952534645,
+      "low": {
+        "cpLoss": 0.0411087211144574,
+        "quality": 84.091070127384,
+        "wdlLoss": 0,
+        "cpResidual": 0.0411087211144574,
+        "wdlResidual": 0,
+        "best": [
+          "c5e3"
+        ],
+        "bestmove": "c5e3",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.8970679952534645
+      },
+      "high": {
+        "cpLoss": 0.01717954436189928,
+        "quality": 93.56389779636028,
+        "wdlLoss": 0,
+        "cpResidual": 0.01717954436189928,
+        "wdlResidual": 0,
+        "best": [
+          "a8b8"
+        ],
+        "bestmove": "c5e3",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.8845447646163958
+      },
+      "cpLossDrift": 0.023929176752558123,
+      "wdlLossDrift": 0,
+      "qualityDrift": 9.47282766897628,
+      "bestOverlap": false,
+      "sameBestSet": false,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "GBhSl3aw",
+      "split": "train",
+      "ply": 15,
+      "rating": 1840,
+      "fixedPoints": 0.7455783621617914,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": 0.027439520452365196,
+        "wdlResidual": 0.0004999999999999449,
+        "best": [
+          "d1d8"
+        ],
+        "bestmove": "d1d8",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.7455783621617914
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.006494163172410694,
+        "wdlResidual": -0.0004999999999999449,
+        "best": [
+          "d1d8"
+        ],
+        "bestmove": "d1d8",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.7291826261225229
+      },
+      "cpLossDrift": 0,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "iyHrQ3lK",
+      "split": "train",
+      "ply": 48,
+      "rating": 1450,
+      "fixedPoints": 0.03011361794122506,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.0008723451298827539,
+        "wdlResidual": 0,
+        "best": [
+          "d8f8"
+        ],
+        "bestmove": "d8f8",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.03011361794122506
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": 0.0011607100102158062,
+        "wdlResidual": 0,
+        "best": [
+          "d8f8"
+        ],
+        "bestmove": "d8f8",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.03011361794122506
+      },
+      "cpLossDrift": 0,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "Sc600s6i",
+      "split": "train",
+      "ply": 67,
+      "rating": 1961,
+      "fixedPoints": 0.013772505539711419,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": 0.0013323934103909845,
+        "wdlResidual": 0,
+        "best": [
+          "d2e3"
+        ],
+        "bestmove": "d2e3",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.013772505539711419
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.007766360521841711,
+        "wdlResidual": 0,
+        "best": [
+          "d2e3"
+        ],
+        "bestmove": "d2e3",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.004673751607478723
+      },
+      "cpLossDrift": 0,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "zYKF5o8M",
+      "split": "train",
+      "ply": 31,
+      "rating": 1308,
+      "fixedPoints": 0.11433191756669467,
+      "low": {
+        "cpLoss": 0.025426575019360756,
+        "quality": 90.18710340909924,
+        "wdlLoss": 0,
+        "cpResidual": 0.025426575019360756,
+        "wdlResidual": 0,
+        "best": [
+          "f7d8"
+        ],
+        "bestmove": "e1d1",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.11433191756669467
+      },
+      "high": {
+        "cpLoss": 0.015578331643295529,
+        "quality": 94.23369847423065,
+        "wdlLoss": 0,
+        "cpResidual": 0.015578331643295529,
+        "wdlResidual": 0,
+        "best": [
+          "e1d1"
+        ],
+        "bestmove": "f7d8",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.10568393106735738
+      },
+      "cpLossDrift": 0.009848243376065227,
+      "wdlLossDrift": 0,
+      "qualityDrift": 4.046595065131413,
+      "bestOverlap": false,
+      "sameBestSet": false,
+      "rootBestChanged": true,
+      "mateTransition": false
+    },
+    {
+      "gameId": "yoqFko4G",
+      "split": "train",
+      "ply": 11,
+      "rating": 1911,
+      "fixedPoints": 0.5202403732122675,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": 0.00459664079084654,
+        "wdlResidual": 0.0034999999999999476,
+        "best": [
+          "d2f1",
+          "h1f1"
+        ],
+        "bestmove": "d2f1",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.5202403732122675
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.00827488827592926,
+        "wdlResidual": -0.007000000000000006,
+        "best": [
+          "d2f1"
+        ],
+        "bestmove": "d2f1",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.5128844269647328
+      },
+      "cpLossDrift": 0,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0,
+      "bestOverlap": true,
+      "sameBestSet": false,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "6ZfKnfuQ",
+      "split": "validation",
+      "ply": 35,
+      "rating": 1033,
+      "fixedPoints": 0.1577126660012219,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": 0.0033937480357625893,
+        "wdlResidual": 0,
+        "best": [
+          "a1d1",
+          "e1d1"
+        ],
+        "bestmove": "a1d1",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.1577126660012219
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": 0.0022907557246701626,
+        "wdlResidual": 0,
+        "best": [
+          "e1d1"
+        ],
+        "bestmove": "a1d1",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.14678605153511798
+      },
+      "cpLossDrift": 0,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0,
+      "bestOverlap": true,
+      "sameBestSet": false,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "755Pl4j7",
+      "split": "validation",
+      "ply": 71,
+      "rating": 1388,
+      "fixedPoints": 0.39481395242176437,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": 0,
+        "wdlResidual": 0.0015000000000000013,
+        "best": [
+          "h4f3"
+        ],
+        "bestmove": "h4f3",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.39481395242176437
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": 0.008073184822464552,
+        "wdlResidual": 0.04949999999999999,
+        "best": [
+          "h4f3"
+        ],
+        "bestmove": "h4f3",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.42418600332055545
+      },
+      "cpLossDrift": 0,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "RG2eaC19",
+      "split": "validation",
+      "ply": 17,
+      "rating": 1235,
+      "fixedPoints": 0.5704090259445697,
+      "low": {
+        "cpLoss": 0.09064939915683712,
+        "quality": 67.35360180887942,
+        "wdlLoss": 0.15549999999999997,
+        "cpResidual": 0.09064939915683712,
+        "wdlResidual": 0.15549999999999997,
+        "best": [
+          "g1e2"
+        ],
+        "bestmove": "g1e2",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.5704090259445697
+      },
+      "high": {
+        "cpLoss": 0.11037596167141361,
+        "quality": 61.631238950135796,
+        "wdlLoss": 0.26050000000000006,
+        "cpResidual": 0.11037596167141361,
+        "wdlResidual": 0.26050000000000006,
+        "best": [
+          "g1e2"
+        ],
+        "bestmove": "g1e2",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.5901355884591462
+      },
+      "cpLossDrift": 0.019726562514576496,
+      "wdlLossDrift": 0.1050000000000001,
+      "qualityDrift": 5.722362858743622,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "xlwVkAYG",
+      "split": "validation",
+      "ply": 13,
+      "rating": 1897,
+      "fixedPoints": 0.6329626589047256,
+      "low": {
+        "cpLoss": 0.006008227689135115,
+        "quality": 98.33580355900445,
+        "wdlLoss": 0.017000000000000015,
+        "cpResidual": 0.006008227689135115,
+        "wdlResidual": 0.017000000000000015,
+        "best": [
+          "b1c3"
+        ],
+        "bestmove": "d2d4",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.6329626589047256
+      },
+      "high": {
+        "cpLoss": 0.02559572646055497,
+        "quality": 90.11910457448954,
+        "wdlLoss": 0.13849999999999996,
+        "cpResidual": 0.02559572646055497,
+        "wdlResidual": 0.13849999999999996,
+        "best": [
+          "f1e1"
+        ],
+        "bestmove": "b5c6",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.6139489294360486
+      },
+      "cpLossDrift": 0.019587498771419853,
+      "wdlLossDrift": 0.12149999999999994,
+      "qualityDrift": 8.216698984514906,
+      "bestOverlap": false,
+      "sameBestSet": false,
+      "rootBestChanged": true,
+      "mateTransition": false
+    },
+    {
+      "gameId": "rdtvlp3G",
+      "split": "validation",
+      "ply": 39,
+      "rating": 1308,
+      "fixedPoints": 0.06413060406412312,
+      "low": {
+        "cpLoss": 0.011685350554308783,
+        "quality": 95.88177812448045,
+        "wdlLoss": 0,
+        "cpResidual": 0.011685350554308783,
+        "wdlResidual": 0,
+        "best": [
+          "g2g3"
+        ],
+        "bestmove": "d6e7",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.06413060406412312
+      },
+      "high": {
+        "cpLoss": 0.009526434258073695,
+        "quality": 96.80786232290379,
+        "wdlLoss": 0,
+        "cpResidual": 0.009526434258073695,
+        "wdlResidual": 0,
+        "best": [
+          "d6e7"
+        ],
+        "bestmove": "d6e7",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.059643273696334036
+      },
+      "cpLossDrift": 0.002158916296235089,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0.9260841984233394,
+      "bestOverlap": false,
+      "sameBestSet": false,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "2YtStT5N",
+      "split": "validation",
+      "ply": 63,
+      "rating": 1254,
+      "fixedPoints": 0.423286899044054,
+      "low": {
+        "cpLoss": 0.34922504871219534,
+        "quality": 20.381749403483123,
+        "wdlLoss": 0.347,
+        "cpResidual": 0.34922504871219534,
+        "wdlResidual": 0.347,
+        "best": [
+          "e2d4"
+        ],
+        "bestmove": "e2d4",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.423286899044054
+      },
+      "high": {
+        "cpLoss": 0.3940220514824955,
+        "quality": 16.385704365716357,
+        "wdlLoss": 0.4155,
+        "cpResidual": 0.3940220514824955,
+        "wdlResidual": 0.4155,
+        "best": [
+          "e2d4"
+        ],
+        "bestmove": "e2d4",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.43591797018156514
+      },
+      "cpLossDrift": 0.04479700277030013,
+      "wdlLossDrift": 0.0685,
+      "qualityDrift": 3.9960450377667662,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "uLVSnZ4r",
+      "split": "validation",
+      "ply": 45,
+      "rating": 1635,
+      "fixedPoints": 0.8307087376703215,
+      "low": {
+        "cpLoss": 0.21588746467505193,
+        "quality": 38.13033602255149,
+        "wdlLoss": 0.09750000000000003,
+        "cpResidual": 0.21588746467505193,
+        "wdlResidual": 0.09750000000000003,
+        "best": [
+          "f3g5"
+        ],
+        "bestmove": "f3g5",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.8307087376703215
+      },
+      "high": {
+        "cpLoss": 0.20254528459149856,
+        "quality": 40.54084606483613,
+        "wdlLoss": 0.09750000000000003,
+        "cpResidual": 0.20254528459149856,
+        "wdlResidual": 0.09750000000000003,
+        "best": [
+          "f3g5"
+        ],
+        "bestmove": "f3g5",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.8173665575867681
+      },
+      "cpLossDrift": 0.013342180083553368,
+      "wdlLossDrift": 0,
+      "qualityDrift": 2.410510042284642,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "jF7o7W4Y",
+      "split": "validation",
+      "ply": 24,
+      "rating": 893,
+      "fixedPoints": 0.9451244044725028,
+      "low": {
+        "cpLoss": 0.055057816556911665,
+        "quality": 79.00769145862866,
+        "wdlLoss": 0,
+        "cpResidual": 0.055057816556911665,
+        "wdlResidual": 0,
+        "best": [
+          "e7f6"
+        ],
+        "bestmove": "e7f6",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.9451244044725028
+      },
+      "high": {
+        "cpLoss": 0.035543862831234674,
+        "quality": 86.20677845892875,
+        "wdlLoss": 0,
+        "cpResidual": 0.035543862831234674,
+        "wdlResidual": 0,
+        "best": [
+          "e7f6"
+        ],
+        "bestmove": "e7f6",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.9388946215797787
+      },
+      "cpLossDrift": 0.01951395372567699,
+      "wdlLossDrift": 0,
+      "qualityDrift": 7.199087000300096,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "Rqd31FLF",
+      "split": "validation",
+      "ply": 22,
+      "rating": 1961,
+      "fixedPoints": 0.454103562397001,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": 0.01002040424182965,
+        "wdlResidual": 0.028500000000000025,
+        "best": [
+          "d6d5",
+          "f8e8"
+        ],
+        "bestmove": "c8b7",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.454103562397001
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": 0.004561439779120435,
+        "wdlResidual": 0.009000000000000008,
+        "best": [
+          "d6d5"
+        ],
+        "bestmove": "c8b7",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.4550164794045317
+      },
+      "cpLossDrift": 0,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0,
+      "bestOverlap": true,
+      "sameBestSet": false,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "w0KEuHAA",
+      "split": "validation",
+      "ply": 13,
+      "rating": 1181,
+      "fixedPoints": 0.4963179865593353,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.02024531075280883,
+        "wdlResidual": -0.017000000000000015,
+        "best": [
+          "d3e4"
+        ],
+        "bestmove": "b1a3",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.4963179865593353
+      },
+      "high": {
+        "cpLoss": 0.007361531596398574,
+        "quality": 97.74529791083185,
+        "wdlLoss": 0.007000000000000006,
+        "cpResidual": 0.007361531596398574,
+        "wdlResidual": 0.007000000000000006,
+        "best": [
+          "g1f3"
+        ],
+        "bestmove": "g1f3",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.49447710463166583
+      },
+      "cpLossDrift": 0.007361531596398574,
+      "wdlLossDrift": 0.007000000000000006,
+      "qualityDrift": 2.2547020891681484,
+      "bestOverlap": false,
+      "sameBestSet": false,
+      "rootBestChanged": true,
+      "mateTransition": false
+    },
+    {
+      "gameId": "IhHKcsVu",
+      "split": "validation",
+      "ply": 16,
+      "rating": 598,
+      "fixedPoints": 0.6532413731006851,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.016487568642103767,
+        "wdlResidual": -0.013000000000000012,
+        "best": [
+          "d4d1"
+        ],
+        "bestmove": "d4d1",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.6532413731006851
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": 0.013618111325944926,
+        "wdlResidual": 0.02949999999999997,
+        "best": [
+          "d4d1"
+        ],
+        "bestmove": "d4d1",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.6440107489122191
+      },
+      "cpLossDrift": 0,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "LYVFbYLk",
+      "split": "validation",
+      "ply": 36,
+      "rating": 2342,
+      "fixedPoints": 0.3860510705639514,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.011405268450742856,
+        "wdlResidual": -0.062499999999999986,
+        "best": [
+          "d8c8"
+        ],
+        "bestmove": "d8c8",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.3860510705639514
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.008023206196872024,
+        "wdlResidual": -0.05099999999999999,
+        "best": [
+          "d8c8"
+        ],
+        "bestmove": "d8c8",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.4071952805672289
+      },
+      "cpLossDrift": 0,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "JVNYiiqL",
+      "split": "validation",
+      "ply": 23,
+      "rating": 1589,
+      "fixedPoints": 0.5330902822991305,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.005494689111122608,
+        "wdlResidual": -0.009000000000000008,
+        "best": [
+          "f3e5"
+        ],
+        "bestmove": "h2h3",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.5330902822991305
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": -0.005488595655528616,
+        "wdlResidual": -0.01100000000000001,
+        "best": [
+          "a2a3"
+        ],
+        "bestmove": "a2a3",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.53675438329054
+      },
+      "cpLossDrift": 0,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0,
+      "bestOverlap": false,
+      "sameBestSet": false,
+      "rootBestChanged": true,
+      "mateTransition": false
+    },
+    {
+      "gameId": "zyyMQlLv",
+      "split": "validation",
+      "ply": 33,
+      "rating": 1886,
+      "fixedPoints": 0.5,
+      "low": {
+        "cpLoss": 0.060457075982542186,
+        "quality": 77.12148585235886,
+        "wdlLoss": 0.08450000000000002,
+        "cpResidual": 0.060457075982542186,
+        "wdlResidual": 0.08450000000000002,
+        "best": [
+          "f3d2"
+        ],
+        "bestmove": "e3d3",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.5
+      },
+      "high": {
+        "cpLoss": 0.06679627943874972,
+        "quality": 74.96277727411358,
+        "wdlLoss": 0.11349999999999999,
+        "cpResidual": 0.06679627943874972,
+        "wdlResidual": 0.11349999999999999,
+        "best": [
+          "e3d3"
+        ],
+        "bestmove": "e3d3",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.5
+      },
+      "cpLossDrift": 0.006339203456207532,
+      "wdlLossDrift": 0.02899999999999997,
+      "qualityDrift": 2.1587085782452817,
+      "bestOverlap": false,
+      "sameBestSet": false,
+      "rootBestChanged": false,
+      "mateTransition": false
+    },
+    {
+      "gameId": "qnqeuoba",
+      "split": "validation",
+      "ply": 74,
+      "rating": 1310,
+      "fixedPoints": 0.8432631204203119,
+      "low": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": 0.00294216492541044,
+        "wdlResidual": 0,
+        "best": [
+          "c6d5"
+        ],
+        "bestmove": "c6d6",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.8432631204203119
+      },
+      "high": {
+        "cpLoss": 0,
+        "quality": 100,
+        "wdlLoss": 0,
+        "cpResidual": 0.004456910842927653,
+        "wdlResidual": 0,
+        "best": [
+          "c6d5"
+        ],
+        "bestmove": "c6d6",
+        "rootMate": null,
+        "playedMate": null,
+        "fixedPoints": 0.8613217564210567
+      },
+      "cpLossDrift": 0,
+      "wdlLossDrift": 0,
+      "qualityDrift": 0,
+      "bestOverlap": true,
+      "sameBestSet": true,
+      "rootBestChanged": false,
+      "mateTransition": false
+    }
+  ],
+  "diagnostics": {
+    "uniqueSearches": 1600,
+    "earlierExactScores": 418,
+    "exactRecoveries": 3,
+    "selectedNodes": [
+      490,
+      80181
+    ],
+    "finalNodes": [
+      490,
+      80181
+    ]
+  },
+  "confirmation": false,
+  "promoted": false,
+  "interpretation": "Fixed45-game development operational check; higher-budget scores are not human ground truth"
+}

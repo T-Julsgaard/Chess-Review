@@ -1,0 +1,119 @@
+{
+  "schema": "research-run-v1",
+  "id": "E009-stability-assessment",
+  "date": "2026-10-05",
+  "sourceRevision": "106bc5096e461959bcd1f02edaa64926366a7074",
+  "command": "node research/experiments/E009-search-stability/code/evaluate.mjs",
+  "dataEligibility": {
+    "schema": "research-data-eligibility-v1",
+    "policyVersion": "public-data-v1",
+    "policySha256": "f087516c9483a04ddd97888191eebafa729749b3fb10aa550ae1c70adcef866a",
+    "validatorSha256": "45d3faf2c30552a159c1a363871064f9ba852f79a89856dbac26604f9e45277c",
+    "originValidatorSha256": "6537d177ad21cbe16c89471040e63d0f42ad43a69e4f189787b8dcf2624e5b21",
+    "registrySha256": "c00de91f767ec439aecbf27fd0929fd26ed3d8c3ca6a5525e996ee58989d026b",
+    "purpose": "reuse",
+    "manifestHashes": {
+      "D001": "2681803bbf2d10c28357cf4022537d99188f83447e94068b69987b2067a98d37",
+      "D002": "b2cfc7bb829db7cabec62a958ae5cd2a3199c01662846eaf4d0ab2f20f5aafe4"
+    },
+    "sourceEvidence": {
+      "lichess-standard-2026-summer": {
+        "license": "CC0-1.0",
+        "termsUrl": "https://database.lichess.org/",
+        "verifiedOn": "2026-10-05",
+        "evidenceSha256": "a227e286dce1e9e355101356507e57c4ad89ec39d65f9762f94ab76a6ffdd4ac"
+      }
+    },
+    "inputHashes": {
+      "tools/calibration/public/sources.json": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+      "tools/calibration/public/dataset.json.gz": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+      "tools/calibration/public/sf18-evidence.json.gz": "2771b2b8a7839e4d9f2ddbff73aa6e0dfbe017f3aa3a7b052584147ee21c968b",
+      "tools/calibration/public/sf18-rating-evidence.json.gz": "f41178347bc9569390b744f9e6fb2206882cf2307c762de8b8f8aab35c2a1e31",
+      "tools/calibration/public/sf19-rating-evidence.json.gz": "8ac253f86fa87a945c06e86f2b7c82d4f2b7e8c96ae9b990a6efadbac9f7d721",
+      "tools/calibration/public/expected-scores.json": "969664315be01fab6f719ce158926741c45ec59ef8e3accfe28f0dcc595b7df6",
+      "tools/calibration/public/validation.json": "865aa647f484f3932c42baa2bd15625bd7cdfd253f504aa6d64aba3e4eb07076",
+      "research/experiments/E003-sf19-archive-replay/evidence/sf19-quality.json.gz": "5cef8a6d20482a743351c8ca3a85da030fd95b3eb91a6395aeca0b8d7f7fe745",
+      "research/experiments/E001-evidence-audit/evidence/sf19-quality-archive.json": "3953a2a13f8e491e5c0dedbf40d38bb7d0d24ac4abe546278b8fb8360e1d3c2d",
+      "research/experiments/E003-sf19-archive-replay/evidence/sf19-choice-confirmation.json.gz": "5e9e1f61b48d39030e91dea0615aee4510ac9c29e3fcf3d2b7e3ad47b82efbae",
+      "research/experiments/E001-evidence-audit/evidence/sf19-choice-confirmation-archive.json": "a762d73fb732e107da84d7edae8991cc89227f3252b164d3008e64a7c1c6906b",
+      "research/experiments/E002-nonlinear-rating/evidence/results.json": "9219f67a34e1c1f6ba8252f1b5a46958b8afd7dba13b90c24d660b2370f64f18",
+      "research/experiments/E002-nonlinear-rating/evidence/predictions.json.gz": "a78f5b9f69f1a4ea21a8e17cbedb373e6b56cc432f36b9d1dbdb75d2cbebc8ac",
+      "tools/calibration/public/manifest.json": "e7d928e440f8a4b73bfa64c11e11f48320f9f3cc556c29a3bca72e1e5d15ff6a",
+      "research/experiments/E003-sf19-archive-replay/evidence/inputs.json": "e752fd0883e2db58b1121071dc59e879adcd8e982984198e58e9056f9ad84447",
+      "research/experiments/E004-practical-outcomes/evidence/results.json": "f2d89e9d9e07b45bceca955af522fca4d0ad39db100b0bece0e235403c93adea",
+      "research/experiments/E004-practical-outcomes/evidence/predictions.json.gz": "89bc0719cc00708a80d55b6c5c7a88d53d0f52e05d252eddda052b434d1c3e96",
+      "research/experiments/E005-category-review/evidence/cases.json": "b6974f3159c839f3764eed3d8da5dff406dece9bb2414c958e8484d81271c41f",
+      "research/experiments/E005-category-review/evidence/selection-key.json": "33e75aa79f26b07358d53f432535c862a85aa79a4e5f38101eff3ec8ff94b5c0",
+      "research/experiments/E005-category-review/evidence/run.json": "6e9042785eba0be3a842763f8e0b14de1590174d3ba21b1b09595ab703ffc817",
+      "research/experiments/E006-rating-uncertainty/evidence/results.json": "bf5380629014af3bf06db4324a93f347e9f858ebe27731c8a00f06146c68ea2e",
+      "research/experiments/E006-rating-uncertainty/evidence/predictions.json.gz": "10b4cd8fb5462eaa9ee6beff4ba62fc94dfe4f79f9fa5b23d69d5dfa4b97c14f",
+      "research/experiments/E006-rating-uncertainty/evidence/run.json": "c4b7ac8a82d4b6f3f165c1ce2c0191de5a00b0f3777c7b93e9edb7158056c9e8",
+      "research/datasets/D002-fresh-prefix/raw/2026-06.pgn.zst": "87e6cb6a06bed9cb0a805d625df7b9fb2cfe13330c332f761d8acfcceb8bf18b",
+      "research/datasets/D002-fresh-prefix/raw/2026-07.pgn.zst": "20a757fceb5fcb2a3a60b184032efa47b7336ebf4a6e3b1add9c1a89b56c2a1a",
+      "research/datasets/D002-fresh-prefix/raw/2026-08.pgn.zst": "f89749a19d464478a813d8f6d6ab73fff7464bbbc9194c5cf9d031289b5644c4",
+      "research/datasets/D002-fresh-prefix/sources.json": "edb7b5d3fe50f3fd1badc3cc821dbe3bb3e756448f692108cf7c6995365505cc",
+      "research/datasets/D002-fresh-prefix/exclusions.json": "110055d0be434f26ee8ed4fe0b2d039153d8d423159e0b2fc24074ce82ce04f4",
+      "research/datasets/D002-fresh-prefix/games.json.gz": "23d5008ff55aa51fd2861d4e813a1958503fbbb6908aa2115bfb31822eb536e5",
+      "research/datasets/D002-fresh-prefix/run.json": "d7cfafe1e48ce2a653d2494922d6dd4e2068d69ef1b77630d4f23af051bcc2aa",
+      "research/experiments/E007-fresh-evidence/evidence/verification.json": "d819b5dd76cb54b7daf0fffe6b7fdc36a25f03e4f32a2a33544e9f7501eea5f3",
+      "research/experiments/E007-fresh-evidence/evidence/clean-replay.json": "715e8567a6fb1bb6077647fd393dfe4d60bcc4b954355f75f33d2919b317d3ed",
+      "research/experiments/E007-fresh-evidence/evidence/metadata-fields.json": "1c09885c80d00b8f68c2afcc42bbc7cb736c4503e7bf0ca5cdb168d08302f5ac",
+      "research/experiments/E008-human-quality-curves/evidence/sf19-observations.json.gz": "d9cd050453878ebbadb330f54516b9ab71e58df4bc44ece5a7bdc79e48336ecf",
+      "research/experiments/E008-human-quality-curves/evidence/collection-run.json": "dee64873bac4e000004be8a25557315fe6669b01bfa59ab75a7b4e5fde5f7eab",
+      "research/experiments/E008-human-quality-curves/evidence/results.json": "36962320bdad9b28031686bf06569f88936393f62e0039e132aedbe6cc9796c8",
+      "research/experiments/E008-human-quality-curves/evidence/predictions.json.gz": "8d0f1164a246ccdd2fe6fd092bcdfb23aa7fc3ab0ae0960fb027af17a4abd39c",
+      "research/experiments/E008-human-quality-curves/evidence/run.json": "9bfa000b2dc438b2e2db615d99656aa0a6d0aff96bd939b45e044e5350cc40a0",
+      "research/experiments/E008-human-quality-curves/evidence/verification.json": "8ed32dbfe6c88869a2cff488730297fefb0513718faf51371c75d4d3bd300792",
+      "research/experiments/E008-human-quality-curves/evidence/clean-replay.json": "deb24ae748f4c088d2818f4f3aa46d6318ffa93a9c3df326e7b572aeb14b927c",
+      "research/experiments/E008-human-quality-curves/evidence/clean-archive.json": "7a1b5f505b528ff0aa95e546c453bd46857bbbc1ef58bf4d382300f66292214d",
+      "research/experiments/E009-search-stability/evidence/sf19-observations.json.gz": "1c0d772c3c6bd03d959fc528027a2b6a1c5feafa5f68865493902452aa8409bb",
+      "research/experiments/E009-search-stability/evidence/collection-run.json": "691b572cbf60c84fc7e7126c2de5854ac1962ce7bdebc8b415849dcb158b76eb"
+    },
+    "datasets": {
+      "D001": {
+        "gameCount": 2000,
+        "archives": [
+          "https://database.lichess.org/standard/lichess_db_standard_rated_2026-06.pgn.zst",
+          "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
+          "https://database.lichess.org/standard/lichess_db_standard_rated_2026-08.pgn.zst"
+        ],
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      },
+      "D002": {
+        "gameCount": 900,
+        "archives": [
+          "https://database.lichess.org/standard/lichess_db_standard_rated_2026-06.pgn.zst",
+          "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
+          "https://database.lichess.org/standard/lichess_db_standard_rated_2026-08.pgn.zst"
+        ],
+        "provenanceStatus": "pipeline-verified",
+        "limitations": [
+          "Archive-prefix convenience cohort; not a representative monthly/global population.",
+          "Only retained frame bytes are hashed; no whole-archive checksum is claimed.",
+          "Reserved evaluation labels were structurally parsed; no model evaluated or manual cases inspected during collection.",
+          "Provisional-rating status is absent from selected PGN tags; numeric ratings do not establish nonprovisional or stable strength."
+        ]
+      }
+    }
+  },
+  "codeSha256": {
+    "evaluate.mjs": "e5803ccf4eaa5021d6cc11a36520f4acb4aa0d45f70089c178dbea6dc99d9d18",
+    "method.mjs": "5a913754f8e7da2938f3e66ea16a4c3f4b9c80faa093629986ed3e4f8315c753"
+  },
+  "environment": {
+    "node": "v24.14.1",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "engineSearches": 0,
+  "elapsedMs": 61568.5042,
+  "outputs": {
+    "results.json": "ca372a8754192dc7d4417633bed5c5e308dd3f0518ba78138a4f904eef60bdeb"
+  },
+  "evaluationRole": "Fixed45-game development operational stability; no human-validity/confirmation claim"
+}

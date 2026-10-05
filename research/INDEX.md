@@ -27,7 +27,7 @@ records. Update a row and the active experiment's resume state when work stops.
 | D002 | [Fresh prefix cohort](datasets/D002-fresh-prefix/README.md) | registered | 900 disjoint games 450/150/300; reserved evaluation not activated | Guarded development use after protocol |
 | E008 | [Human quality curves](experiments/E008-human-quality-curves/RESULT.md) | complete | CP passes joint development screen/replay; WDL fails;23,584 cached searches | Locked fresh confirmation protocol and candidate stability |
 | F006 | [Fresh human curves](findings/F006-fresh-human-curves.md) | recorded | CP prediction gain at development maturity; no display/adoption claim | Confirm frozen CP candidate before promotion |
-| E009 | [Search stability](experiments/E009-search-stability/RESULT.md) | running | Fixed45-game20k/80k observations collected/registered | Commit complete observations, then frozen assessment |
+| E009 | [Search stability](experiments/E009-search-stability/RESULT.md) | running | CP loss/display mean pass; WDL loss and best-set overlap fail | Verify and clean replay; preserve overall failure |
 
 No promotion records yet.
 Allocate the next unused ID in each series: `E010`, `D003`, `F007`, `P001`.
@@ -67,7 +67,7 @@ D001's historical limitations and exposure remain in force.
 
 Read E008/E009 compact RESULT records first. E008's raw evidence is committed;
 CP passes its frozen development screen, numerical verification and clean replay.
-E009's fixed higher-budget sample is collected/registered; commit before assessment.
+E009's fixed higher-budget assessment fails overall; verification/clean replay next.
 Read E007's source/target limitations and open both D001/D002 for admission. Freeze later
 candidate/access rules before activating reserved evaluation; no new score is
 confirmed by the pipeline's successful reconstruction.

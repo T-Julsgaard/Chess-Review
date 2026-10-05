@@ -224,6 +224,25 @@
       "sha256": "691b572cbf60c84fc7e7126c2de5854ac1962ce7bdebc8b415849dcb158b76eb",
       "bytes": 9254,
       "uncompressedSha256": "691b572cbf60c84fc7e7126c2de5854ac1962ce7bdebc8b415849dcb158b76eb"
+    },
+    "research/experiments/E009-search-stability/evidence/results.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E009-search-stability/evidence/sf19-observations.json.gz",
+        "research/experiments/E008-human-quality-curves/evidence/sf19-observations.json.gz"
+      ],
+      "sha256": "ca372a8754192dc7d4417633bed5c5e308dd3f0518ba78138a4f904eef60bdeb",
+      "bytes": 71103,
+      "uncompressedSha256": "ca372a8754192dc7d4417633bed5c5e308dd3f0518ba78138a4f904eef60bdeb"
+    },
+    "research/experiments/E009-search-stability/evidence/run.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E009-search-stability/evidence/results.json"
+      ],
+      "sha256": "d32d8ed064a19af7b2c9e921bdc545be893fe9c279e9fbaf275e633ac237fd55",
+      "bytes": 9507,
+      "uncompressedSha256": "d32d8ed064a19af7b2c9e921bdc545be893fe9c279e9fbaf275e633ac237fd55"
     }
   }
 }
