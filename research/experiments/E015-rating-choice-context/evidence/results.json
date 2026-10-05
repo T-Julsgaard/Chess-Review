@@ -1,0 +1,270 @@
+{
+  "schema": "E015-context-choice-v1",
+  "roles": {
+    "crossfit": {
+      "games": 450,
+      "globalNll": {
+        "mean": 2.4423300859576176,
+        "median": 2.504877397962169,
+        "p90": 3.5000444208457426,
+        "maximum": 16.087240858260696
+      },
+      "candidateNll": {
+        "mean": 2.419168947441242,
+        "median": 2.4929801597313648,
+        "p90": 3.5590646413549436,
+        "maximum": 15.317260581047059
+      },
+      "uniformNll": {
+        "mean": 3.3175825407808412,
+        "median": 3.5263605246161616,
+        "p90": 3.784189633918261,
+        "maximum": 4.007333185232471
+      },
+      "groups": [
+        {
+          "label": "fixed-points:0.1-0.9",
+          "games": 362,
+          "gain": 0.02723344690764652,
+          "sparse": false,
+          "passed": true
+        },
+        {
+          "label": "fixed-points:<0.1",
+          "games": 39,
+          "gain": 0.010181910483697808,
+          "sparse": false,
+          "passed": true
+        },
+        {
+          "label": "fixed-points:>0.9",
+          "games": 49,
+          "gain": 0.0034063274068758123,
+          "sparse": false,
+          "passed": true
+        },
+        {
+          "label": "ply:21-50",
+          "games": 232,
+          "gain": 0.04397010650846675,
+          "sparse": false,
+          "passed": true
+        },
+        {
+          "label": "ply:<=20",
+          "games": 112,
+          "gain": 0.02264969608434978,
+          "sparse": false,
+          "passed": true
+        },
+        {
+          "label": "ply:>50",
+          "games": 106,
+          "gain": -0.021842625840021574,
+          "sparse": false,
+          "passed": true
+        },
+        {
+          "label": "rating:1200-1999",
+          "games": 318,
+          "gain": 0.009418133833519962,
+          "sparse": false,
+          "passed": true
+        },
+        {
+          "label": "rating:<1200",
+          "games": 70,
+          "gain": 0.07906196271699473,
+          "sparse": false,
+          "passed": true
+        },
+        {
+          "label": "rating:>=2000",
+          "games": 62,
+          "gain": 0.030535619082583815,
+          "sparse": false,
+          "passed": true
+        }
+      ]
+    },
+    "development": {
+      "games": 150,
+      "globalNll": {
+        "mean": 2.3904046509340304,
+        "median": 2.5706517287246107,
+        "p90": 3.72265057818072,
+        "maximum": 7.168568166220751
+      },
+      "candidateNll": {
+        "mean": 2.389255433942721,
+        "median": 2.522123259531453,
+        "p90": 3.7365793953396444,
+        "maximum": 8.202583915764885
+      },
+      "uniformNll": {
+        "mean": 3.4249787466006616,
+        "median": 3.5553480614894135,
+        "p90": 3.784189633918261,
+        "maximum": 4.060443010546419
+      },
+      "groups": [
+        {
+          "label": "fixed-points:0.1-0.9",
+          "games": 121,
+          "gain": -0.0011437223776138929,
+          "sparse": false,
+          "passed": true
+        },
+        {
+          "label": "fixed-points:<0.1",
+          "games": 11,
+          "gain": -0.00404605415107907,
+          "sparse": true,
+          "passed": null
+        },
+        {
+          "label": "fixed-points:>0.9",
+          "games": 18,
+          "gain": 0.019737752891651462,
+          "sparse": true,
+          "passed": null
+        },
+        {
+          "label": "ply:21-50",
+          "games": 80,
+          "gain": -0.004576170925254559,
+          "sparse": false,
+          "passed": true
+        },
+        {
+          "label": "ply:<=20",
+          "games": 32,
+          "gain": -0.02794843864939759,
+          "sparse": false,
+          "passed": true
+        },
+        {
+          "label": "ply:>50",
+          "games": 38,
+          "gain": 0.0377059541973069,
+          "sparse": false,
+          "passed": true
+        },
+        {
+          "label": "rating:1200-1999",
+          "games": 109,
+          "gain": 0.017677985294922136,
+          "sparse": false,
+          "passed": true
+        },
+        {
+          "label": "rating:<1200",
+          "games": 18,
+          "gain": -0.176212531430045,
+          "sparse": true,
+          "passed": null
+        },
+        {
+          "label": "rating:>=2000",
+          "games": 23,
+          "gain": 0.06162207466482052,
+          "sparse": true,
+          "passed": null
+        }
+      ]
+    }
+  },
+  "improvement": {
+    "estimate": 0.0011492169913105003,
+    "lower": -0.043832804921242655,
+    "upper": 0.04243666478823563,
+    "level": 0.975,
+    "iterations": 10000,
+    "seed": 20261055,
+    "unit": "game",
+    "interpretation": "Conditional development percentile interval; cross-fit models overlap"
+  },
+  "uniformImprovement": {
+    "estimate": 1.0357233126579393,
+    "lower": 0.7776264507857329,
+    "upper": 1.2875115043341832,
+    "level": 0.975,
+    "iterations": 10000,
+    "seed": 20261056,
+    "unit": "game",
+    "interpretation": "Conditional development percentile interval; cross-fit models overlap"
+  },
+  "crossFitImprovement": {
+    "estimate": 0.02316113851637594,
+    "lower": -0.02401839013344266,
+    "upper": 0.07449176662298063,
+    "level": 0.975,
+    "iterations": 10000,
+    "seed": 20261057,
+    "unit": "game",
+    "interpretation": "Conditional development percentile interval; cross-fit models overlap"
+  },
+  "stability": {
+    "games": 45,
+    "globalTv": {
+      "mean": 0.08378902394481288,
+      "median": 0.08570997474516744,
+      "p90": 0.13531451951540685,
+      "maximum": 0.2381240336136557
+    },
+    "candidateTv": {
+      "mean": 0.09061218593860668,
+      "median": 0.0863160612103377,
+      "p90": 0.16404908345073846,
+      "maximum": 0.26001381959987413
+    },
+    "pairedReduction": {
+      "estimate": -0.006823161993793789,
+      "lower": -0.014540191868963865,
+      "upper": 0.0002055435919879875,
+      "level": 0.975,
+      "iterations": 10000,
+      "seed": 20261058,
+      "unit": "game",
+      "interpretation": "Conditional development percentile interval; cross-fit models overlap"
+    },
+    "globalWithinTolerance": {
+      "successes": 28,
+      "n": 45,
+      "estimate": 0.6222222222222222,
+      "lower": 0.47629934480889535,
+      "upper": 0.7489191532786209,
+      "level": 0.95,
+      "method": "Wilson score; one fixed focal choice per disjoint game"
+    },
+    "candidateWithinTolerance": {
+      "successes": 26,
+      "n": 45,
+      "estimate": 0.5777777777777777,
+      "lower": 0.4330078870920313,
+      "upper": 0.710312975327297,
+      "level": 0.95,
+      "method": "Wilson score; one fixed focal choice per disjoint game"
+    },
+    "interpretation": "45 exposed development cases, final models including 30 training cases; operational diagnostic only, no primary gate"
+  },
+  "gates": {
+    "choicePractical": false,
+    "choiceInterval": false,
+    "uniformPractical": true,
+    "uniformInterval": true,
+    "crossFitMean": true,
+    "coverage": true,
+    "numerics": true,
+    "groups": true
+  },
+  "passed": false,
+  "sparseGroupsUnresolved": true,
+  "ratingClipped": 0,
+  "engineSearches": 0,
+  "newFits": 0,
+  "humanLabelsUsed": 0,
+  "confirmation": false,
+  "promoted": false,
+  "interpretation": "Recorded rating is peer-choice context, not an estimated rating target; exposed development evidence only"
+}

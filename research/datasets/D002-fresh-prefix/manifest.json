@@ -540,6 +540,37 @@
       "bytes": 24558,
       "sha256": "87395c7048a6c5479dd21b80bffb0a03e955a0f7c8a13fe70ce6c2e756641d24",
       "uncompressedSha256": "87395c7048a6c5479dd21b80bffb0a03e955a0f7c8a13fe70ce6c2e756641d24"
+    },
+    "research/experiments/E015-rating-choice-context/evidence/results.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E015-rating-choice-context/evidence/models.json",
+        "research/experiments/E015-rating-choice-context/evidence/freeze.json"
+      ],
+      "bytes": 7259,
+      "sha256": "7846567688b2cb1150e931686b7ea479de473ebd146ffa9a6eada7dad178e792",
+      "uncompressedSha256": "7846567688b2cb1150e931686b7ea479de473ebd146ffa9a6eada7dad178e792"
+    },
+    "research/experiments/E015-rating-choice-context/evidence/predictions.json.gz": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E015-rating-choice-context/evidence/models.json",
+        "research/experiments/E015-rating-choice-context/evidence/freeze.json"
+      ],
+      "bytes": 461324,
+      "sha256": "35b0bb7381f04284c3c9fe4b3a20c0e448abcffc93ba5e9f17b32331dc3c46a2",
+      "uncompressedSha256": "e0d8da49e3547aed041c6adec5f873e347793ee8e3c06aa593b8d2da4b2d5b0b"
+    },
+    "research/experiments/E015-rating-choice-context/evidence/run.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E015-rating-choice-context/evidence/results.json",
+        "research/experiments/E015-rating-choice-context/evidence/predictions.json.gz",
+        "research/experiments/E015-rating-choice-context/evidence/fit-run.json"
+      ],
+      "bytes": 25086,
+      "sha256": "9fa39d55df53c0662457803fc3e0defd8dab6cb5d748c0dc8c991a82e8f5875b",
+      "uncompressedSha256": "9fa39d55df53c0662457803fc3e0defd8dab6cb5d748c0dc8c991a82e8f5875b"
     }
   }
 }

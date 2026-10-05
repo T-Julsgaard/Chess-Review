@@ -42,7 +42,7 @@ records. Update a row and the active experiment's resume state when work stops.
 
 | F012 | [Root-pair consistency finding](findings/F012-root-pair-consistency.md) | recorded | SF19 conditional gains retain failed stability; SF18 worsens; no universal repair | Distinct contextual-choice hypothesis; no repair promotion |
 
-| E015 | [Rating-conditioned choice](experiments/E015-rating-choice-context/RESULT.md) | running | Twelve train-only fits converge; no performance assessment yet | Register/commit models before one development screen |
+| E015 | [Rating-conditioned choice](experiments/E015-rating-choice-context/RESULT.md) | running | Primary failure: .001149 nats < .02, interval includes zero; complete coverage | Commit reports; exact/independent/clean verification |
 
 No promotion records yet.
 Allocate the next unused ID in each series: `E016`, `D003`, `F013`, `P001`.
