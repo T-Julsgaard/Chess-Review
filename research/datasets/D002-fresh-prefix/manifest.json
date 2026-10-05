@@ -746,6 +746,37 @@
       "bytes": 28791,
       "sha256": "f2e26e0c5f458706204c79bf5e1921a82b57ddf499a7ca9f50ebb7ba72140843",
       "uncompressedSha256": "f2e26e0c5f458706204c79bf5e1921a82b57ddf499a7ca9f50ebb7ba72140843"
+    },
+    "research/experiments/E017-signed-log-choice/evidence/results.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E017-signed-log-choice/evidence/models.json",
+        "research/experiments/E017-signed-log-choice/evidence/freeze.json"
+      ],
+      "bytes": 12726,
+      "sha256": "3991a480ae82017b704bbfde7beee0eba0210d0b343c05eeadd49b6edabbed50",
+      "uncompressedSha256": "3991a480ae82017b704bbfde7beee0eba0210d0b343c05eeadd49b6edabbed50"
+    },
+    "research/experiments/E017-signed-log-choice/evidence/predictions.json.gz": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E017-signed-log-choice/evidence/models.json",
+        "research/experiments/E017-signed-log-choice/evidence/freeze.json"
+      ],
+      "bytes": 455249,
+      "sha256": "98f26028a72c1d9428d40f6265772e4940d24d59d2fc40ddcb79788f225f9201",
+      "uncompressedSha256": "e0785deebc8bf824c21768b3453c631f7e21b62655a4bb64ef663c1025a36834"
+    },
+    "research/experiments/E017-signed-log-choice/evidence/run.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E017-signed-log-choice/evidence/results.json",
+        "research/experiments/E017-signed-log-choice/evidence/predictions.json.gz",
+        "research/experiments/E017-signed-log-choice/evidence/fit-run.json"
+      ],
+      "bytes": 29355,
+      "sha256": "d92f77fb41472bf40c9f8618d6dccee17de8f0bf96d8baabb4a5b84aeea39e58",
+      "uncompressedSha256": "d92f77fb41472bf40c9f8618d6dccee17de8f0bf96d8baabb4a5b84aeea39e58"
     }
   }
 }
