@@ -381,6 +381,37 @@
       "sha256": "4fab8823a756c87c87a2a06048086593641e1bf287af994e399134bc6fe34328",
       "bytes": 12038,
       "uncompressedSha256": "4fab8823a756c87c87a2a06048086593641e1bf287af994e399134bc6fe34328"
+    },
+    "research/experiments/E011-outcome-confirmation/evidence/verification.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E011-outcome-confirmation/evidence/results.json",
+        "research/experiments/E011-outcome-confirmation/evidence/sf19-observations.json.gz",
+        "research/experiments/E011-outcome-confirmation/evidence/models.json"
+      ],
+      "sha256": "95080af3537cdc2770fbe799eac5057b713388b6ed87002bb8670c8ef94f8119",
+      "bytes": 12260,
+      "uncompressedSha256": "95080af3537cdc2770fbe799eac5057b713388b6ed87002bb8670c8ef94f8119"
+    },
+    "research/experiments/E011-outcome-confirmation/evidence/clean-replay.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E011-outcome-confirmation/evidence/results.json",
+        "research/experiments/E011-outcome-confirmation/evidence/sf19-observations.json.gz",
+        "research/experiments/E011-outcome-confirmation/evidence/models.json"
+      ],
+      "sha256": "88f0e7fa44780856dc3cb548b51cfc988a12f4e98432dac0f06786901afa13d3",
+      "bytes": 11845,
+      "uncompressedSha256": "88f0e7fa44780856dc3cb548b51cfc988a12f4e98432dac0f06786901afa13d3"
+    },
+    "research/experiments/E011-outcome-confirmation/evidence/clean-archive.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E011-outcome-confirmation/evidence/clean-replay.json"
+      ],
+      "sha256": "6d2beba437548a5c40fc455f57efcdfd92fa23fa87cba498ce1471b4525e2a3a",
+      "bytes": 679,
+      "uncompressedSha256": "6d2beba437548a5c40fc455f57efcdfd92fa23fa87cba498ce1471b4525e2a3a"
     }
   }
 }

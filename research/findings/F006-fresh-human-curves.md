@@ -57,3 +57,10 @@ before activating fresh reserved evaluation. Separately assess candidate search
 stability and the displayed scale/aggregation. A confirmation failure must be
 retained and cannot be repaired using those same labels. Only then can a promotion
 record specify an adoption scope. Matching another site's scores is no criterion.
+
+Follow-up: [F008](F008-candidate-probability-stability.md) records failed frozen
+choice-vector stability. [F009](F009-unconfirmed-outcome-curve.md) records the
+unchanged scalar curve's failed fresh confirmation and full-panel stability
+gate, with exact/independent/clean replay passing. D002's300 test games are now
+consumed. This development gain remains recorded, without a confirmed component
+or adoption proposal; a revised candidate needs fresh confirmation evidence.

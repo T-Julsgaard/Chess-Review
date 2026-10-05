@@ -1,4 +1,4 @@
-# E011: frozen confirmation fails; verification pending
+# E011: verified frozen confirmation fails
 
 2026-10-05. Frozen scalar CP outcome confirmation and20k/80k root-budget panel.
 The choice model remains unresolved after E010. This does not close the broader
@@ -51,6 +51,30 @@ candidate on the consumed reserved cohort. Unknown provisional status and
 prefix-convenience sampling remain. No SF18, displayed accuracy, causal move
 value, rating, category or instructional validity claim follows.
 
-Next: commit registered results/run and perform exact, independent and clean
-archive replay. Retain the final finding only after those checks. Both collector
-and assessment are terminal; durable raw cache remains in `research/runs/E011/`.
+## Verification and resume
+
+Results/run were committed in4e3f753 before verification. Exact replay and
+independent equations pass for11,286 predictions,300 game-unit weights, four
+10,000-resample intervals, subgroup checks and joint gates. Clean replay from
+external Git archive4e3f7532c20f9e64a254e5022f6fb4f29482dce3 also passes,
+without Git metadata, dependencies, network, ignored inputs or new searches.
+Archive SHA61d12fc976ca4e285408d577a5bba6804a3ed1883b264b763a2c216810300bc5.
+The numerical checks do not turn scientific gate failures into a pass.
+
+Evidence: [frozen curves](evidence/models.json), [raw panel](evidence/sf19-observations.json.gz),
+[collection receipt](evidence/collection-run.json), [result](evidence/results.json),
+[assessment receipt](evidence/run.json), [verification](evidence/verification.json),
+[clean replay](evidence/clean-replay.json), [archive recipe](evidence/clean-archive.json).
+All are registered in D002's manifest. Durable raw cache remains in
+`research/runs/E011/`; collector/assessment/verification/replay are terminal.
+
+```sh
+node --test research/experiments/E011-outcome-confirmation/code/method.test.mjs
+node research/experiments/E011-outcome-confirmation/code/verify.mjs --out research/runs/E011/replay
+```
+
+Completed finding: [F009](../../findings/F009-unconfirmed-outcome-curve.md).
+Do not rerun collection or retune this candidate on consumed confirmation data.
+Next: register a distinct tactical-property audit of the existing blinded
+category pack; independent human annotation remains pending. The broader
+research goal stays active, and no runtime implementation is selected.

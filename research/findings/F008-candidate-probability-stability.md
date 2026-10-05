@@ -38,3 +38,8 @@ together. A flatter CP outcome curve plus a refitted temperature is not
 automatically a more stable choice model. Isolate the unchanged scalar outcome
 curve in a separately registered fresh confirmation/budget-panel comparison;
 continue the choice/uncertainty problem separately. No bundled adoption is justified.
+
+Follow-up: [E011/F009](F009-unconfirmed-outcome-curve.md) completed the unchanged
+scalar curve's fresh confirmation and full root panel. Its joint gates fail,
+with exact/independent/clean replay passing. The300 reserved games are now
+consumed; the earlier focal-root result does not justify broader stability.
