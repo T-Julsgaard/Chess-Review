@@ -362,6 +362,25 @@
       "sha256": "78b75d6936d39463513269f5dde35d42dcafc689a9d27286be258ead7a8b17d9",
       "bytes": 13347,
       "uncompressedSha256": "78b75d6936d39463513269f5dde35d42dcafc689a9d27286be258ead7a8b17d9"
+    },
+    "research/experiments/E011-outcome-confirmation/evidence/results.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E011-outcome-confirmation/evidence/sf19-observations.json.gz",
+        "research/experiments/E011-outcome-confirmation/evidence/models.json"
+      ],
+      "sha256": "05439e519b7970053e9766a32f9e5b879f1944146ff520c94805e9f56b386f7e",
+      "bytes": 3816186,
+      "uncompressedSha256": "05439e519b7970053e9766a32f9e5b879f1944146ff520c94805e9f56b386f7e"
+    },
+    "research/experiments/E011-outcome-confirmation/evidence/run.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E011-outcome-confirmation/evidence/results.json"
+      ],
+      "sha256": "4fab8823a756c87c87a2a06048086593641e1bf287af994e399134bc6fe34328",
+      "bytes": 12038,
+      "uncompressedSha256": "4fab8823a756c87c87a2a06048086593641e1bf287af994e399134bc6fe34328"
     }
   }
 }

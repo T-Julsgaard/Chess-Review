@@ -31,7 +31,7 @@ records. Update a row and the active experiment's resume state when work stops.
 | F007 | [Search stability finding](findings/F007-search-stability.md) | recorded |45-game operational limits; independent/clean replay passes | Preserve failures; no exact-best/human validity claim |
 | E010 | [Candidate probability stability](experiments/E010-candidate-stability/RESULT.md) | complete | Verified probability-vector gate failure; focal root-point tolerance passes | Separate frozen outcome confirmation; choice stability unresolved |
 | F008 | [Candidate stability finding](findings/F008-candidate-probability-stability.md) | recorded | No distribution stability gain; exact/independent/clean replay passes | Preserve negative result; no bundled adoption |
-| E011 | [Frozen outcome confirmation](experiments/E011-outcome-confirmation/RESULT.md) | running | Complete300-game root panel,3,834 queries; zero fits/target assessments | Commit registered raw; frozen assessment and independent/clean replay |
+| E011 | [Frozen outcome confirmation](experiments/E011-outcome-confirmation/RESULT.md) | running | Frozen joint confirmation fails;300 games; no refit; reserved cohort consumed | Commit report; independent/clean replay and negative finding |
 
 No promotion records yet.
 Allocate the next unused ID in each series: `E012`, `D003`, `F009`, `P001`.
