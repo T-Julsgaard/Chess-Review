@@ -282,6 +282,26 @@
       "sha256": "450bc10c0c9e68b394c0ac9a6b23e0277a5268d0ea799bd3591320332865ae63",
       "bytes": 2231,
       "uncompressedSha256": "450bc10c0c9e68b394c0ac9a6b23e0277a5268d0ea799bd3591320332865ae63"
+    },
+    "research/experiments/E010-candidate-stability/evidence/results.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E010-candidate-stability/evidence/models.json",
+        "research/experiments/E008-human-quality-curves/evidence/sf19-observations.json.gz",
+        "research/experiments/E009-search-stability/evidence/sf19-observations.json.gz"
+      ],
+      "sha256": "1c97f3fe8b1f208f5579f09cdfd54f1f9e9ff66a6b5f7aaaf3fd2e2009da16e6",
+      "bytes": 291021,
+      "uncompressedSha256": "1c97f3fe8b1f208f5579f09cdfd54f1f9e9ff66a6b5f7aaaf3fd2e2009da16e6"
+    },
+    "research/experiments/E010-candidate-stability/evidence/run.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E010-candidate-stability/evidence/results.json"
+      ],
+      "sha256": "d5f57dd75acfc3d5e3bf7b95735382d75fc1c6ea305fcbae1fd2cc1694de9521",
+      "bytes": 10690,
+      "uncompressedSha256": "d5f57dd75acfc3d5e3bf7b95735382d75fc1c6ea305fcbae1fd2cc1694de9521"
     }
   }
 }
