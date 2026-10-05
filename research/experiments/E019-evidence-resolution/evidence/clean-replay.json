@@ -1,0 +1,280 @@
+{
+  "schema": "E019-run-v1",
+  "mode": "verify",
+  "date": "2026-10-05",
+  "sourceRevision": "8492aeaf39a6c8946c3905ea895fda23aa2734b8",
+  "command": "node research/experiments/E019-evidence-resolution/code/run.mjs verify --out research/runs/E019-clean --revision 8492aeaf39a6c8946c3905ea895fda23aa2734b8",
+  "dataEligibility": {
+    "schema": "research-data-eligibility-v1",
+    "policyVersion": "public-data-v1",
+    "policySha256": "f087516c9483a04ddd97888191eebafa729749b3fb10aa550ae1c70adcef866a",
+    "validatorSha256": "45d3faf2c30552a159c1a363871064f9ba852f79a89856dbac26604f9e45277c",
+    "originValidatorSha256": "6537d177ad21cbe16c89471040e63d0f42ad43a69e4f189787b8dcf2624e5b21",
+    "registrySha256": "c00de91f767ec439aecbf27fd0929fd26ed3d8c3ca6a5525e996ee58989d026b",
+    "purpose": "inspect",
+    "manifestHashes": {
+      "D001": "f284f54ed0144aa07cb99fcece9b044196a7f2bb0255a9612e5ff7342b2b2211",
+      "D002": "fbe2917747ad2523541e06b6e36b7d16a238a64cdb1120e9124057607b5321ad"
+    },
+    "sourceEvidence": {
+      "lichess-standard-2026-summer": {
+        "license": "CC0-1.0",
+        "termsUrl": "https://database.lichess.org/",
+        "verifiedOn": "2026-10-05",
+        "evidenceSha256": "a227e286dce1e9e355101356507e57c4ad89ec39d65f9762f94ab76a6ffdd4ac"
+      }
+    },
+    "inputHashes": {
+      "tools/calibration/public/sources.json": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+      "tools/calibration/public/dataset.json.gz": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+      "tools/calibration/public/sf18-evidence.json.gz": "2771b2b8a7839e4d9f2ddbff73aa6e0dfbe017f3aa3a7b052584147ee21c968b",
+      "tools/calibration/public/sf18-rating-evidence.json.gz": "f41178347bc9569390b744f9e6fb2206882cf2307c762de8b8f8aab35c2a1e31",
+      "tools/calibration/public/sf19-rating-evidence.json.gz": "8ac253f86fa87a945c06e86f2b7c82d4f2b7e8c96ae9b990a6efadbac9f7d721",
+      "tools/calibration/public/expected-scores.json": "969664315be01fab6f719ce158926741c45ec59ef8e3accfe28f0dcc595b7df6",
+      "tools/calibration/public/validation.json": "865aa647f484f3932c42baa2bd15625bd7cdfd253f504aa6d64aba3e4eb07076",
+      "research/experiments/E003-sf19-archive-replay/evidence/sf19-quality.json.gz": "5cef8a6d20482a743351c8ca3a85da030fd95b3eb91a6395aeca0b8d7f7fe745",
+      "research/experiments/E001-evidence-audit/evidence/sf19-quality-archive.json": "3953a2a13f8e491e5c0dedbf40d38bb7d0d24ac4abe546278b8fb8360e1d3c2d",
+      "research/experiments/E003-sf19-archive-replay/evidence/sf19-choice-confirmation.json.gz": "5e9e1f61b48d39030e91dea0615aee4510ac9c29e3fcf3d2b7e3ad47b82efbae",
+      "research/experiments/E001-evidence-audit/evidence/sf19-choice-confirmation-archive.json": "a762d73fb732e107da84d7edae8991cc89227f3252b164d3008e64a7c1c6906b",
+      "research/experiments/E002-nonlinear-rating/evidence/results.json": "9219f67a34e1c1f6ba8252f1b5a46958b8afd7dba13b90c24d660b2370f64f18",
+      "research/experiments/E002-nonlinear-rating/evidence/predictions.json.gz": "a78f5b9f69f1a4ea21a8e17cbedb373e6b56cc432f36b9d1dbdb75d2cbebc8ac",
+      "tools/calibration/public/manifest.json": "e7d928e440f8a4b73bfa64c11e11f48320f9f3cc556c29a3bca72e1e5d15ff6a",
+      "research/experiments/E003-sf19-archive-replay/evidence/inputs.json": "e752fd0883e2db58b1121071dc59e879adcd8e982984198e58e9056f9ad84447",
+      "research/experiments/E004-practical-outcomes/evidence/results.json": "f2d89e9d9e07b45bceca955af522fca4d0ad39db100b0bece0e235403c93adea",
+      "research/experiments/E004-practical-outcomes/evidence/predictions.json.gz": "89bc0719cc00708a80d55b6c5c7a88d53d0f52e05d252eddda052b434d1c3e96",
+      "research/experiments/E005-category-review/evidence/cases.json": "b6974f3159c839f3764eed3d8da5dff406dece9bb2414c958e8484d81271c41f",
+      "research/experiments/E005-category-review/evidence/selection-key.json": "33e75aa79f26b07358d53f432535c862a85aa79a4e5f38101eff3ec8ff94b5c0",
+      "research/experiments/E005-category-review/evidence/run.json": "6e9042785eba0be3a842763f8e0b14de1590174d3ba21b1b09595ab703ffc817",
+      "research/experiments/E006-rating-uncertainty/evidence/results.json": "bf5380629014af3bf06db4324a93f347e9f858ebe27731c8a00f06146c68ea2e",
+      "research/experiments/E006-rating-uncertainty/evidence/predictions.json.gz": "10b4cd8fb5462eaa9ee6beff4ba62fc94dfe4f79f9fa5b23d69d5dfa4b97c14f",
+      "research/experiments/E006-rating-uncertainty/evidence/run.json": "c4b7ac8a82d4b6f3f165c1ce2c0191de5a00b0f3777c7b93e9edb7158056c9e8",
+      "research/experiments/E012-offer-evidence/evidence/policy.json": "a7365e813d97470d55056fda3baf5b3a8311b85bcc301ecc9c88403e5314a6b4",
+      "research/experiments/E012-offer-evidence/evidence/freeze-run.json": "0287e95d96658a7b3c190ac763469b4b165441bd5d261e05a1854eeae13b7d07",
+      "research/experiments/E012-offer-evidence/evidence/sf18-observations.json.gz": "02367574df6676276243cd1f60e23e5c2ec984eb70a49df24d2188aaea6be547",
+      "research/experiments/E012-offer-evidence/evidence/collection-run.json": "555eeff8f289050ea81ea140fb722515a3d3cfdb127fdd0044b23d4386c5108a",
+      "research/experiments/E012-offer-evidence/evidence/results.json": "d31ed066a4fdcea3e81a79320c0e06f358177d84f4c3332c42ada85b49a9db0d",
+      "research/experiments/E012-offer-evidence/evidence/run.json": "134203b7f0d839b05287454db0f45211037e36a0fb6f7eeaeeddf86f7ba10b15",
+      "research/experiments/E012-offer-evidence/evidence/verification.json": "9da4fbd2ee6aa54a1eb906de1d2f18d40066fb87de71a9d2c6c4032c3991beed",
+      "research/experiments/E012-offer-evidence/evidence/clean-replay.json": "6bd00b4aebde0cac726784c81bc7299bccd1e04e3b5450af5051e8edf53e0546",
+      "research/experiments/E012-offer-evidence/evidence/clean-archive.json": "0c9cab45a3767ee9ed7d69b9d4d3e811e01242a6ef79c08617ef902186b3d5af",
+      "research/experiments/E013-net-offer-pack/evidence/policy.json": "f9f60ba511e03a1826d442504315baa9d7dd0ac16511d34008c006f0cfee5d5d",
+      "research/experiments/E013-net-offer-pack/evidence/cases.json": "d6f0c63a657901d822bdb0920895576371457f134a82c3aed35ccce04fc8c521",
+      "research/experiments/E013-net-offer-pack/evidence/selection-key.json": "32dbeb26b0e078b431156344602d2115fb4ce9e263b3ca331170d330312948ea",
+      "research/experiments/E013-net-offer-pack/evidence/build-run.json": "c36523f4429231afd19da0a5a67147eb8b3568470b8b3ec63a2f3e91798f8831",
+      "research/experiments/E013-net-offer-pack/evidence/sf18-observations.json.gz": "b7ee839acb88813dce83d16eae6dd93ee2a6d1eca8557471dae947b29ced68ea",
+      "research/experiments/E013-net-offer-pack/evidence/collection-run.json": "b077265c7ab656bc6e002ed07f567f5347dcde781f35eb386300f4835986e47c",
+      "research/experiments/E013-net-offer-pack/evidence/results.json": "7a7357cc21d012cace4782f26a407110feb14e57674e37d55da51ae239348d5a",
+      "research/experiments/E013-net-offer-pack/evidence/run.json": "43c9cd128d206e51218f2229d7a71b0c6a4b1aafdc995fcc468a9643f7273692",
+      "research/experiments/E013-net-offer-pack/evidence/verification.json": "d89a486c70dd3685c08fe078ad7e91780a4c6907deb3b40ff20e6c09cc5ca970",
+      "research/experiments/E013-net-offer-pack/evidence/clean-replay.json": "2d6932ab2d1af6e3e1a8a17a747f1bd4d4d45ac4a2eb4633594fbaef01b8112a",
+      "research/experiments/E013-net-offer-pack/evidence/clean-archive.json": "fbc50686a4b22b96f53c24b8db3b777b16ac9bde6522d4817ea4367fab399c82",
+      "research/experiments/E014-root-pair-consistency/evidence/freeze-SF18.json": "d4dab90dbc0c03d33ebab7f88728c89730e1a2e5f1165dd93a550034b2a8a110",
+      "research/experiments/E014-root-pair-consistency/evidence/freeze-run-SF18.json": "7dc93a3d18af5668871e688aaf270fcc59b32eaef0e01b103ee804743de095f1",
+      "research/experiments/E014-root-pair-consistency/evidence/results-SF18.json": "a6f2a640274b6c02e571db210b8bb46989447c62739ed95c54fc9ab742e3b56c",
+      "research/experiments/E014-root-pair-consistency/evidence/run-SF18.json": "49d8e22c8a96dfd0f535af919316e36541762454d084ec0e161e06c041bcee10",
+      "research/experiments/E014-root-pair-consistency/evidence/verification-SF18.json": "91f7a74cec294c57ea444d53e043f3e6e6ee6b8f161b12b65d7b6960826a54b6",
+      "research/experiments/E014-root-pair-consistency/evidence/source-line-endings-SF18.json": "5c073480f6cfb10450c73fb5c9dac5ff03c90bff3d415944717961a0decacbb4",
+      "research/experiments/E014-root-pair-consistency/evidence/failed-clean-replay-SF18.json": "c579eadadc1bf36894816642da325544ccb66da65977587bd73322f6e588108d",
+      "research/experiments/E014-root-pair-consistency/evidence/clean-replay-SF18.json": "172fc46b1bfc875a5c97e4d258de4d09c860482ce8df12920cfdd82eaf7f90b5",
+      "research/experiments/E014-root-pair-consistency/evidence/clean-archive-SF18.json": "61f904ac8a64af5a762974f5e7246da834843a734aa52adda4a2f7ac1bc7b124",
+      "research/datasets/D002-fresh-prefix/raw/2026-06.pgn.zst": "87e6cb6a06bed9cb0a805d625df7b9fb2cfe13330c332f761d8acfcceb8bf18b",
+      "research/datasets/D002-fresh-prefix/raw/2026-07.pgn.zst": "20a757fceb5fcb2a3a60b184032efa47b7336ebf4a6e3b1add9c1a89b56c2a1a",
+      "research/datasets/D002-fresh-prefix/raw/2026-08.pgn.zst": "f89749a19d464478a813d8f6d6ab73fff7464bbbc9194c5cf9d031289b5644c4",
+      "research/datasets/D002-fresh-prefix/sources.json": "edb7b5d3fe50f3fd1badc3cc821dbe3bb3e756448f692108cf7c6995365505cc",
+      "research/datasets/D002-fresh-prefix/exclusions.json": "110055d0be434f26ee8ed4fe0b2d039153d8d423159e0b2fc24074ce82ce04f4",
+      "research/datasets/D002-fresh-prefix/games.json.gz": "23d5008ff55aa51fd2861d4e813a1958503fbbb6908aa2115bfb31822eb536e5",
+      "research/datasets/D002-fresh-prefix/run.json": "d7cfafe1e48ce2a653d2494922d6dd4e2068d69ef1b77630d4f23af051bcc2aa",
+      "research/experiments/E007-fresh-evidence/evidence/verification.json": "d819b5dd76cb54b7daf0fffe6b7fdc36a25f03e4f32a2a33544e9f7501eea5f3",
+      "research/experiments/E007-fresh-evidence/evidence/clean-replay.json": "715e8567a6fb1bb6077647fd393dfe4d60bcc4b954355f75f33d2919b317d3ed",
+      "research/experiments/E007-fresh-evidence/evidence/metadata-fields.json": "1c09885c80d00b8f68c2afcc42bbc7cb736c4503e7bf0ca5cdb168d08302f5ac",
+      "research/experiments/E008-human-quality-curves/evidence/sf19-observations.json.gz": "d9cd050453878ebbadb330f54516b9ab71e58df4bc44ece5a7bdc79e48336ecf",
+      "research/experiments/E008-human-quality-curves/evidence/collection-run.json": "dee64873bac4e000004be8a25557315fe6669b01bfa59ab75a7b4e5fde5f7eab",
+      "research/experiments/E008-human-quality-curves/evidence/results.json": "36962320bdad9b28031686bf06569f88936393f62e0039e132aedbe6cc9796c8",
+      "research/experiments/E008-human-quality-curves/evidence/predictions.json.gz": "8d0f1164a246ccdd2fe6fd092bcdfb23aa7fc3ab0ae0960fb027af17a4abd39c",
+      "research/experiments/E008-human-quality-curves/evidence/run.json": "9bfa000b2dc438b2e2db615d99656aa0a6d0aff96bd939b45e044e5350cc40a0",
+      "research/experiments/E008-human-quality-curves/evidence/verification.json": "8ed32dbfe6c88869a2cff488730297fefb0513718faf51371c75d4d3bd300792",
+      "research/experiments/E008-human-quality-curves/evidence/clean-replay.json": "deb24ae748f4c088d2818f4f3aa46d6318ffa93a9c3df326e7b572aeb14b927c",
+      "research/experiments/E008-human-quality-curves/evidence/clean-archive.json": "7a1b5f505b528ff0aa95e546c453bd46857bbbc1ef58bf4d382300f66292214d",
+      "research/experiments/E009-search-stability/evidence/sf19-observations.json.gz": "1c0d772c3c6bd03d959fc528027a2b6a1c5feafa5f68865493902452aa8409bb",
+      "research/experiments/E009-search-stability/evidence/collection-run.json": "691b572cbf60c84fc7e7126c2de5854ac1962ce7bdebc8b415849dcb158b76eb",
+      "research/experiments/E009-search-stability/evidence/results.json": "ca372a8754192dc7d4417633bed5c5e308dd3f0518ba78138a4f904eef60bdeb",
+      "research/experiments/E009-search-stability/evidence/run.json": "d32d8ed064a19af7b2c9e921bdc545be893fe9c279e9fbaf275e633ac237fd55",
+      "research/experiments/E009-search-stability/evidence/verification.json": "d86f6ace4198d45ee89a0e18a42f91bbe5b97196e805bd3e62b2f53e8fc42f26",
+      "research/experiments/E009-search-stability/evidence/clean-replay.json": "8351dcf0a1f4a44262475a1130eaeef8a1e0354533073e8c6bc7431a3da86a85",
+      "research/experiments/E009-search-stability/evidence/clean-archive.json": "ee775ac22eefaecc6e079452253e76c5283ee12db3bf44d502af9811a515ea70",
+      "research/experiments/E010-candidate-stability/evidence/models.json": "450bc10c0c9e68b394c0ac9a6b23e0277a5268d0ea799bd3591320332865ae63",
+      "research/experiments/E010-candidate-stability/evidence/results.json": "1c97f3fe8b1f208f5579f09cdfd54f1f9e9ff66a6b5f7aaaf3fd2e2009da16e6",
+      "research/experiments/E010-candidate-stability/evidence/run.json": "d5f57dd75acfc3d5e3bf7b95735382d75fc1c6ea305fcbae1fd2cc1694de9521",
+      "research/experiments/E010-candidate-stability/evidence/verification.json": "dd463fd82e4cb46e12080b9d1bf9ae72664ab5ea24e02fb1626aa3b185cbbe15",
+      "research/experiments/E010-candidate-stability/evidence/clean-replay.json": "a3ae33a1714d612f7fadbd6ff0f1753d265f06a82c27a0499d1e309e9b30441a",
+      "research/experiments/E010-candidate-stability/evidence/clean-archive.json": "99076a7432972c93e1b1d3d4a01486705dd6829700ba185f99e7a450269509e2",
+      "research/experiments/E011-outcome-confirmation/evidence/models.json": "7f1af7d1539291e8546de2aec3014218c7df6c3e919f3d18067de0c446a4ec5c",
+      "research/experiments/E011-outcome-confirmation/evidence/sf19-observations.json.gz": "abffdf371750ba3b22da6e5d5e89a589e2d3493c34f12e98f8b006a2fc6b49a4",
+      "research/experiments/E011-outcome-confirmation/evidence/collection-run.json": "78b75d6936d39463513269f5dde35d42dcafc689a9d27286be258ead7a8b17d9",
+      "research/experiments/E011-outcome-confirmation/evidence/results.json": "05439e519b7970053e9766a32f9e5b879f1944146ff520c94805e9f56b386f7e",
+      "research/experiments/E011-outcome-confirmation/evidence/run.json": "4fab8823a756c87c87a2a06048086593641e1bf287af994e399134bc6fe34328",
+      "research/experiments/E011-outcome-confirmation/evidence/verification.json": "95080af3537cdc2770fbe799eac5057b713388b6ed87002bb8670c8ef94f8119",
+      "research/experiments/E011-outcome-confirmation/evidence/clean-replay.json": "88f0e7fa44780856dc3cb548b51cfc988a12f4e98432dac0f06786901afa13d3",
+      "research/experiments/E011-outcome-confirmation/evidence/clean-archive.json": "6d2beba437548a5c40fc455f57efcdfd92fa23fa87cba498ce1471b4525e2a3a",
+      "research/experiments/E014-root-pair-consistency/evidence/freeze-SF19.json": "e817278ac15828c355704addc87197518f03c25bb502e200658063b5c0b7e15b",
+      "research/experiments/E014-root-pair-consistency/evidence/freeze-run-SF19.json": "da63d32d4797136d707d2aeceb1e655661400f0f81cdcbe50147f0195040b487",
+      "research/experiments/E014-root-pair-consistency/evidence/results-SF19.json": "ef3c103245cadeb0ec0f1f602e5583d46a93c4cddb792c85d8ec65f4bebb9bbe",
+      "research/experiments/E014-root-pair-consistency/evidence/run-SF19.json": "ec6daa8ea87f76a831f9d44af1155720f8936959e5dcbad28e98c246a4981d5f",
+      "research/experiments/E014-root-pair-consistency/evidence/verification-SF19.json": "03d244477bf929004d07c3f4c96a6ee0c26541aa554b699224af8e08ed515bdc",
+      "research/experiments/E014-root-pair-consistency/evidence/source-line-endings-SF19.json": "807eb1afa32d38ba684c0d5dc7ace6f96f9f3e6d984aa15aef487b01d9ae78f9",
+      "research/experiments/E014-root-pair-consistency/evidence/failed-clean-replay-SF19.json": "1b2c2cab30bab630518201c4e4e5ca3b2c1a3155ea69d51bc4bec8034241c8e5",
+      "research/experiments/E014-root-pair-consistency/evidence/clean-replay-SF19.json": "172fc46b1bfc875a5c97e4d258de4d09c860482ce8df12920cfdd82eaf7f90b5",
+      "research/experiments/E014-root-pair-consistency/evidence/clean-archive-SF19.json": "648cd3f2e26b535646063135b9a07cd6cb8398fdde5f7d712a0a9bb14d12db60",
+      "research/experiments/E015-rating-choice-context/evidence/freeze.json": "53eb1e0ec9f869378fe928ef91bf56771f98fa147677a20d3e2df6a555ac0255",
+      "research/experiments/E015-rating-choice-context/evidence/freeze-run.json": "d3bb8a6493c06b8867d0df03bfc49716cf1ebf5a70af28844f6c5a6ef67e4c3d",
+      "research/experiments/E015-rating-choice-context/evidence/models.json": "2265c8517aec3bff47b6836ee048fb15a77eddd1a12badaba8dc5df98283b69a",
+      "research/experiments/E015-rating-choice-context/evidence/fit-run.json": "87395c7048a6c5479dd21b80bffb0a03e955a0f7c8a13fe70ce6c2e756641d24",
+      "research/experiments/E015-rating-choice-context/evidence/results.json": "7846567688b2cb1150e931686b7ea479de473ebd146ffa9a6eada7dad178e792",
+      "research/experiments/E015-rating-choice-context/evidence/predictions.json.gz": "35b0bb7381f04284c3c9fe4b3a20c0e448abcffc93ba5e9f17b32331dc3c46a2",
+      "research/experiments/E015-rating-choice-context/evidence/run.json": "9fa39d55df53c0662457803fc3e0defd8dab6cb5d748c0dc8c991a82e8f5875b",
+      "research/experiments/E015-rating-choice-context/evidence/verification.json": "44a0b75bc1d459a8632f83752cd77656eaa485f156075fb3851dcac16ea29610",
+      "research/experiments/E015-rating-choice-context/evidence/clean-replay.json": "a255fc165b32502d0fbd51e59aed4e09bcf473a82e2fd2d6f7f3bcef4660bdcd",
+      "research/experiments/E015-rating-choice-context/evidence/clean-archive.json": "20003aac9bdee77414a32c8c2fa15f91ff06a3de934d1c381e2d5c20ccf40a35",
+      "research/experiments/E016-relative-cp-choice/evidence/freeze.json": "1c3b9ac57624259a3c59bab4f5b641ee6d7b3f9fc4f2a3dc93114e60f526e9ba",
+      "research/experiments/E016-relative-cp-choice/evidence/freeze-run.json": "64c3f4f1b1cc90beb480faf5e850502d89e6b262772ac2632d10ffd0aada8ac1",
+      "research/experiments/E016-relative-cp-choice/evidence/models.json": "6b879766ad3e8a114823af821ca375c239131b6eb4544c209031318e95e08605",
+      "research/experiments/E016-relative-cp-choice/evidence/fit-run.json": "d3831b26ed95e93288e2cbd07c9864ad421135015e06a008d2e1e4884da406ad",
+      "research/experiments/E016-relative-cp-choice/evidence/results.json": "b191f94934a95f6345aefa9d2eeeee165d2b010ecfac5d6f7e9a78414db82fd6",
+      "research/experiments/E016-relative-cp-choice/evidence/predictions.json.gz": "67f898b4e1bbe22cb3a22b5a6e1517109bf6e2b4888e22b6d72d14b29232e9fa",
+      "research/experiments/E016-relative-cp-choice/evidence/run.json": "a25493e32ff6778329fab6744d5ba7c2f6f58cd1954ad191a2cae3709cdc5ccc",
+      "research/experiments/E016-relative-cp-choice/evidence/verification.json": "dbbe481fa6adc6c44fda0d4c6e74a406e4ddeb943dc48b5d617e3f2def6c6895",
+      "research/experiments/E016-relative-cp-choice/evidence/clean-replay.json": "e63074202ae024502922cc0329f6734a12eb1e752855da3f0a4a4aac9d977755",
+      "research/experiments/E016-relative-cp-choice/evidence/clean-archive.json": "a57da05c978554164a36c42a08654b3663b986c9201706bc31112a292b8138ba",
+      "research/experiments/E017-signed-log-choice/evidence/freeze.json": "61dbb9a27fba3d1cdc9ee4b940baf8c8e9e0ba724b1cd9d39357509d1acd4841",
+      "research/experiments/E017-signed-log-choice/evidence/freeze-run.json": "56290989d0dab8182dcf42f99d3f047fc7bccf3b725a3a28c859715c24187f4a",
+      "research/experiments/E017-signed-log-choice/evidence/models.json": "343c1dc3d44581e835b5a0ce4c45994ee3d177290544fed7ea20e65f65549e57",
+      "research/experiments/E017-signed-log-choice/evidence/fit-run.json": "f2e26e0c5f458706204c79bf5e1921a82b57ddf499a7ca9f50ebb7ba72140843",
+      "research/experiments/E017-signed-log-choice/evidence/results.json": "3991a480ae82017b704bbfde7beee0eba0210d0b343c05eeadd49b6edabbed50",
+      "research/experiments/E017-signed-log-choice/evidence/predictions.json.gz": "98f26028a72c1d9428d40f6265772e4940d24d59d2fc40ddcb79788f225f9201",
+      "research/experiments/E017-signed-log-choice/evidence/run.json": "d92f77fb41472bf40c9f8618d6dccee17de8f0bf96d8baabb4a5b84aeea39e58",
+      "research/experiments/E017-signed-log-choice/evidence/verification.json": "a302f50003a6ad3da5fffdd0cedb7f67987681ab9c6544f65022dc41183def7e",
+      "research/experiments/E017-signed-log-choice/evidence/clean-replay.json": "1a28bf2d5f00b3bca519ed4d560f10cbae17051eaa2d6ac016fdff68c1eb8cf5",
+      "research/experiments/E017-signed-log-choice/evidence/clean-archive.json": "1b32b5f1e52bd9211c069a563395fe0eeea9989c8efa56b8f5612f350b0cddf7",
+      "research/experiments/E018-choice-mixture/evidence/freeze.json": "f6bde8e77e68e52ade180ec38b1dce67fb01474f22304fdfb1b1f5750ea36179",
+      "research/experiments/E018-choice-mixture/evidence/freeze-run.json": "e98dba0583c0f2c30c5c414a7fd69103e3e824421b95aadb8aaedf494cb6e566",
+      "research/experiments/E018-choice-mixture/evidence/models.json": "89d053debca8bf09d7d2420a46bbccad232715a5dc60a651a66d9d7a409bda83",
+      "research/experiments/E018-choice-mixture/evidence/fit-run.json": "425eb5bd3f5502270ee675d2724f2d176f7cf596b8e314b6c5d05300366026ba",
+      "research/experiments/E018-choice-mixture/evidence/results.json": "f76e207828b679b6cb566a922b19faabb241d7aa9212678f2475a22b790b310e",
+      "research/experiments/E018-choice-mixture/evidence/predictions.json.gz": "81a3227774752ab0cf66557039ec8546a8c7a21845613e733d52087806b98925",
+      "research/experiments/E018-choice-mixture/evidence/run.json": "8865c62145b2fc1781808278797e86b9efe1f8957b74f2a74431d7166b0a355f",
+      "research/experiments/E018-choice-mixture/evidence/verification.json": "0619579606fea51b46aa4bd9ca06275958eb3989e41273ea7fafe6ccac1ebe2e",
+      "research/experiments/E018-choice-mixture/evidence/clean-replay.json": "00a9088e0daf0b77b51321fcf7ce4ac67dcae32977a5abec2004f9b283a50d0c",
+      "research/experiments/E018-choice-mixture/evidence/clean-archive.json": "f6eedc5c1009671b310fa7dc699de3741053eaeca0108c1cdfa0c1b79912d082",
+      "research/experiments/E019-evidence-resolution/evidence/results.json": "a6f07b4422b8a36d43aafbc045f15304c0edd3c82ed0e71a6a4eef39f0f4c81e",
+      "research/experiments/E019-evidence-resolution/evidence/run.json": "9555c4b505d81adf268a0921664eedbf5951baebeb350675ad0d8cd4c1439186"
+    },
+    "datasets": {
+      "D001": {
+        "gameCount": 2000,
+        "archives": [
+          "https://database.lichess.org/standard/lichess_db_standard_rated_2026-06.pgn.zst",
+          "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
+          "https://database.lichess.org/standard/lichess_db_standard_rated_2026-08.pgn.zst"
+        ],
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      },
+      "D002": {
+        "gameCount": 900,
+        "archives": [
+          "https://database.lichess.org/standard/lichess_db_standard_rated_2026-06.pgn.zst",
+          "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
+          "https://database.lichess.org/standard/lichess_db_standard_rated_2026-08.pgn.zst"
+        ],
+        "provenanceStatus": "pipeline-verified",
+        "limitations": [
+          "Archive-prefix convenience cohort; not a representative monthly/global population.",
+          "Only retained frame bytes are hashed; no whole-archive checksum is claimed.",
+          "Reserved evaluation labels were structurally parsed; no model evaluated or manual cases inspected during collection.",
+          "Provisional-rating status is absent from selected PGN tags; numeric ratings do not establish nonprovisional or stable strength."
+        ]
+      }
+    }
+  },
+  "parents": {
+    "research/experiments/E018-choice-mixture/evidence/predictions.json.gz": "81a3227774752ab0cf66557039ec8546a8c7a21845613e733d52087806b98925",
+    "research/experiments/E018-choice-mixture/evidence/results.json": "f76e207828b679b6cb566a922b19faabb241d7aa9212678f2475a22b790b310e",
+    "research/experiments/E018-choice-mixture/evidence/verification.json": "0619579606fea51b46aa4bd9ca06275958eb3989e41273ea7fafe6ccac1ebe2e"
+  },
+  "codeSha256": {
+    "run.mjs": "d2bed252f70522534167a50d38a4581709bc03182e64d31b4cd0e9c60f06f3fd",
+    "method.mjs": "96c3cf67e2f24ad6752ee15eb78cba339411185504eee44dc50fd29a4d8296ea",
+    "audit.mjs": "27c8665032266411207fea83b37bf52e28b8e893f5c232c6dc68d69a649133a1"
+  },
+  "sharedCodeSha256": {
+    "research/source-replay.mjs": "eb4e26c3f8a27bb3638c05bd3bea9809f12f9f5bd008b42e7a0af7543acc1348",
+    "research/data-policy.mjs": "45d3faf2c30552a159c1a363871064f9ba852f79a89856dbac26604f9e45277c",
+    "research/fresh-format.mjs": "6537d177ad21cbe16c89471040e63d0f42ad43a69e4f189787b8dcf2624e5b21",
+    "lib/chess.js": "2f346e1ba9ad3addee7a98fe23edcf98129347608de35de3d6c00c7c5e6dc27c",
+    "research/replay-hashes.mjs": "df7fe4b24c95d50b7d5954d67289ea25d0e0481083d55291be57267c94ef1921"
+  },
+  "sharedSourceRepresentation": {
+    "research/source-replay.mjs": {
+      "checkoutSha256": "eb4e26c3f8a27bb3638c05bd3bea9809f12f9f5bd008b42e7a0af7543acc1348",
+      "canonicalLfSha256": "eb4e26c3f8a27bb3638c05bd3bea9809f12f9f5bd008b42e7a0af7543acc1348",
+      "crlfLineRanges": []
+    },
+    "research/data-policy.mjs": {
+      "checkoutSha256": "45d3faf2c30552a159c1a363871064f9ba852f79a89856dbac26604f9e45277c",
+      "canonicalLfSha256": "45d3faf2c30552a159c1a363871064f9ba852f79a89856dbac26604f9e45277c",
+      "crlfLineRanges": []
+    },
+    "research/fresh-format.mjs": {
+      "checkoutSha256": "6537d177ad21cbe16c89471040e63d0f42ad43a69e4f189787b8dcf2624e5b21",
+      "canonicalLfSha256": "6537d177ad21cbe16c89471040e63d0f42ad43a69e4f189787b8dcf2624e5b21",
+      "crlfLineRanges": []
+    },
+    "lib/chess.js": {
+      "checkoutSha256": "2f346e1ba9ad3addee7a98fe23edcf98129347608de35de3d6c00c7c5e6dc27c",
+      "canonicalLfSha256": "a0b289b6530990bb49e78ccfb4ccf8ed18d9a5cb3713c44c433cbfab8725a6f6",
+      "crlfLineRanges": [
+        [
+          1,
+          1991
+        ]
+      ]
+    },
+    "research/replay-hashes.mjs": {
+      "checkoutSha256": "df7fe4b24c95d50b7d5954d67289ea25d0e0481083d55291be57267c94ef1921",
+      "canonicalLfSha256": "df7fe4b24c95d50b7d5954d67289ea25d0e0481083d55291be57267c94ef1921",
+      "crlfLineRanges": []
+    }
+  },
+  "environment": {
+    "node": "v24.14.1",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "modelFits": 0,
+  "performanceAssessments": 0,
+  "engineSearches": 0,
+  "humanLabelsUsed": 0,
+  "diagnosticMs": 5.022100000001956,
+  "elapsedMs": 21450.127200000003,
+  "passed": true,
+  "exactReport": true,
+  "independent": {
+    "passed": true,
+    "choices": 600,
+    "crossfit": 450,
+    "development": 150,
+    "varianceAlgorithms": 2,
+    "tailCounts": [
+      1,
+      5,
+      10
+    ],
+    "planningPoints": 4,
+    "previousMeansMatched": true
+  },
+  "lineEndingEquivalence": {}
+}

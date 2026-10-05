@@ -41,7 +41,7 @@ Research is available in the Git repository. The current packaging allowlist
 excludes `research/` from extension ZIPs and release source snapshots; those
 snapshots retain the active calibration instead.
 
-Seventeen studies/tasks are complete. A new 900-game cohort has fully traceable raw
+Eighteen studies/tasks are complete. A new 900-game cohort has fully traceable raw
 frames and exact clean reconstruction. A CP curve improves fresh development
 prediction; its clean replay passes, but the unchanged curve fails its frozen
 300-game confirmation gates. Smaller point gains have intervals including zero.
@@ -65,6 +65,10 @@ clears the practical point-gain threshold but fails its comparator interval
 gate. Cross-fit prediction and descriptive calibration improve, while search-
 budget vector drift worsens; all independent/exact/clean replay checks pass.
 Stop this exact mixture and review precision/cohort/input limitations before
-a distinct numerical study.
+a distinct numerical study. A subsequent independent precision/target audit
+retains strong tail variation and an explicitly hypothetical ~2,000-game
+reference for .02-nat half-width. It changes no prior gate or model claim.
+Next is a preregistered opportunity-aware game-level rating evidence/feasibility
+question, with traceable new data and cost checks before fitting.
 The index retains failed experiments and provenance/target limits.
 No new model is confirmed or promoted; current scoring is B000.

@@ -1,6 +1,6 @@
 # Research index
 
-Updated: 2026-10-05. Seventeen studies/tasks complete; mixture benefit unresolved; reviews pending.
+Updated: 2026-10-05. Eighteen studies/tasks complete; evidence-resolution audit retained; reviews pending.
 Baseline: [B000](BASELINE.md). New CP gain is development evidence, not confirmed.
 
 This is the routing and decision index. Detailed evidence lives in linked
@@ -53,11 +53,12 @@ records. Update a row and the active experiment's resume state when work stops.
 | F015 | [Unresolved signed-log finding](findings/F015-unresolved-signed-log-choice.md) | recorded | Exact fits/vectors and independent/clean replay pass; mate-group signs differ across splits | No promotion; freeze a distinct dispersion model |
 
 | E018 | [Choice mixture](experiments/E018-choice-mixture/RESULT.md) | complete | Verified +.052790 nats exceeds practical gate, but comparator interval crosses zero; cross-fit/groups pass, budget drift worsens | Stop exact mixture; review precision/cohort/input limitations |
-| E019 | [Evidence resolution](experiments/E019-evidence-resolution/RESULT.md) | running | Exploratory paired-variation/precision and target audit; no model trial | Freeze code before diagnostics |
+| E019 | [Evidence resolution](experiments/E019-evidence-resolution/RESULT.md) | complete | Exact/independent/clean paired-variation audit; .02 normal-reference precision needs ~2,000 games under assumptions | Preregister opportunity-aware game-level rating evidence/feasibility |
+| F017 | [Evidence resolution and targets](findings/F017-evidence-resolution-and-targets.md) | recorded | Precision planning is exploratory; choice likelihood does not validate display, rating or categories | Distinct rating question with target-free inputs and traceable new evidence |
 | F016 | [Unresolved mixture finding](findings/F016-unresolved-choice-mixture.md) | recorded | All independent/exact/clean replay checks pass; descriptive calibration gains retain failed acceptance | Distinct question; no retuning or promotion |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E020`, `D003`, `F017`, `P001`.
+Allocate the next unused ID in each series: `E020`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
@@ -92,7 +93,16 @@ Only registered explicitly public, free-to-use sources and traceable derivatives
 qualify. New confirmation cohorts need complete acquisition/transform provenance;
 D001's historical limitations and exposure remain in force.
 
-Read E018's compact RESULT and F016. The conditional probability mixture has
+Read E019's compact RESULT/F017 first, then E018/F016 if needed. E019's
+independent variance/tail and normal-reference planning calculations reproduce;
+it does not alter any prior scientific gate. Next preregister an opportunity-
+aware game-level moves-only rating evidence/feasibility study, including public
+source lineage, acquisition/cost smoke, sufficient decisions per game, player-
+disjoint roles, target-free predictors, baseline/median, precision and untouched
+confirmation ownership before data collection/fitting. The evidence contract
+requires distinct targets for accuracy, ratings and perceived categories.
+
+E018 background: The conditional probability mixture has
 development point gain .052790 nats but its interval includes zero; acceptance
 fails despite positive cross-fit mean and passing eligible subgroup guards.
 Descriptive Brier/top-choice calibration improve; search-budget vector drift
@@ -114,4 +124,7 @@ stability gates. D002's 300 reserved games are consumed and keep their `test`
 role; revised candidates need a fresh registered confirmation cohort. Use both
 D001/D002 for D002 admission and retain E007's source/target limitations.
 Do not retry F002/F003/F004/F005 without a changed premise. No candidate is confirmed.
-The research goal is active. The extension remains at B000.
+The research goal is paused at the user-authorized usage-monitor stop.
+Do not resume automatically. E018/E019 are verified and complete; next action
+is the E020 opportunity-aware rating evidence/feasibility protocol after the
+user explicitly resumes. The extension remains at B000.

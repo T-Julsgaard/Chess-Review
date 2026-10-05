@@ -936,6 +936,41 @@
       "bytes": 26469,
       "sha256": "9555c4b505d81adf268a0921664eedbf5951baebeb350675ad0d8cd4c1439186",
       "uncompressedSha256": "9555c4b505d81adf268a0921664eedbf5951baebeb350675ad0d8cd4c1439186"
+    },
+    "research/experiments/E019-evidence-resolution/evidence/verification.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E019-evidence-resolution/evidence/results.json",
+        "research/experiments/E019-evidence-resolution/evidence/run.json",
+        "research/experiments/E018-choice-mixture/evidence/predictions.json.gz",
+        "research/experiments/E018-choice-mixture/evidence/results.json",
+        "research/experiments/E018-choice-mixture/evidence/verification.json"
+      ],
+      "bytes": 26708,
+      "sha256": "db3f416f45c0500a727dd83524d997a9ca2e96e7b5f4fc5aea00da18f88ce56c",
+      "uncompressedSha256": "db3f416f45c0500a727dd83524d997a9ca2e96e7b5f4fc5aea00da18f88ce56c"
+    },
+    "research/experiments/E019-evidence-resolution/evidence/clean-replay.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E019-evidence-resolution/evidence/results.json",
+        "research/experiments/E019-evidence-resolution/evidence/run.json",
+        "research/experiments/E018-choice-mixture/evidence/predictions.json.gz",
+        "research/experiments/E018-choice-mixture/evidence/results.json",
+        "research/experiments/E018-choice-mixture/evidence/verification.json"
+      ],
+      "bytes": 26799,
+      "sha256": "936d5da24423cfddbe86d32e34b0b65a993ea12f327815434c66638494f2bfc1",
+      "uncompressedSha256": "936d5da24423cfddbe86d32e34b0b65a993ea12f327815434c66638494f2bfc1"
+    },
+    "research/experiments/E019-evidence-resolution/evidence/clean-archive.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E019-evidence-resolution/evidence/clean-replay.json"
+      ],
+      "bytes": 932,
+      "sha256": "361ac3431aec3df6b94f3db693ef8c04119d9c9c9d439c5136eb7db2e45203a0",
+      "uncompressedSha256": "361ac3431aec3df6b94f3db693ef8c04119d9c9c9d439c5136eb7db2e45203a0"
     }
   }
 }

@@ -78,3 +78,5 @@ and identity audit occurred. Append exposure below; renaming cannot undo it.
 | 2026-10-05 E019 activation | Retained E018 600-choice predictions, report and verification only | Plan 326ef9c fixes exploratory variation/tail and normal-reference precision calculations; no refit, model assessment, new games, searches, labels or consumed test targets. Existing E018 inference remains unchanged. |
 
 | 2026-10-05 E019 diagnostics | Existing E018 paired losses, all 450 cross-fit / 150 development choices | One fixed exploratory variance/tail and normal-reference precision grid; no model fitting or reassessment. Two independent variance algorithms and saved report means agree. No new games, searches, labels or consumed test targets. |
+
+| 2026-10-05 E019 verification | Fixed retained E018 losses and diagnostic report | Exact calculations, separate variance/tail/grid audit and external archive 8492aeaf39a6c8946c3905ea895fda23aa2734b8 reproduce for all 600 choices. No new trials, fitting, searches, labels or test targets; planning approximations do not change E018 inference. |
