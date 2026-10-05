@@ -20,7 +20,10 @@ progress only. The collector refuses an unregistered partial-run restart.
 On successful exit, register the completed observations and collection run as
 D002 derivatives, verify provenance, and commit them **before** model fitting.
 Then run the frozen evaluator, register/commit its outputs, and run verification
-and a clean offline replay. Report every failed gate and target limitation.
+and a clean offline replay. `research/clean-replay.mjs E008 <archive-commit-SHA>`
+runs the fit/independent equations from an external Git archive without `.git`,
+network, ignored caches or dependencies. Retain the archive command/hash and
+receipt. Report every failed gate and target limitation.
 If the collector fails, document the exact failure and decide an explicit,
 provenance-checked recovery; do not erase exposure or silently change searches.
 
