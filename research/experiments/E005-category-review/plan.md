@@ -64,3 +64,10 @@ unrelated hanging material is insufficient. The separate material-deficit branch
 is omitted; this ordinary-move builder does not claim to detect delayed sacrifices.
 The pack implementation uses the existing jsdom development dependency for
 synthetic workflow checks; the reviewer artifact itself is standalone and offline.
+
+Compute deviation, 2026-10-05 before any reviews: the first full build exceeded
+the one-minute estimate and was stopped before output. Public verbose move
+enumeration generated SAN/history for every legal alternative. Switch only the
+mechanics enumeration to the frozen Chess internal legal-move list (public API
+equivalence tested) and retain the same selection rule. Revised full build budget
+five minutes; no human label/model metric was inspected to make this change.

@@ -2,6 +2,7 @@ import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
+import {performance} from 'node:perf_hooks';
 import {Chess} from '../../../../lib/chess.js';
 import {openResearchData,sha256} from '../../../data-policy.mjs';
 
@@ -23,7 +24,7 @@ export function caseCandidates(games,evidence){
     const rows=byGame.get(game.id);if(!rows)continue;
     const chess=new Chess(),history=[];
     for(let i=0;i<game.moves.length;i++){
-      const row=rows.get(i+1),before=chess.fen(),legal=chess.moves().length;
+      const row=rows.get(i+1),before=chess.fen(),legal=row?chess._moves().length:0;
       if(row&&row.color!==chess.turn())throw Error('Color/ply mismatch');
       const played=chess.move(uci(game.moves[i]));if(!played)throw Error('Illegal source move');
       if(row){
@@ -32,7 +33,10 @@ export function caseCandidates(games,evidence){
         else if(chess.isGameOver())excluded.terminal++;
         else{
           if(!Number.isFinite(row.loss)||row.loss<0)throw Error('Invalid loss');
-          const offered=chess.moves({verbose:true}).some(m=>m.to===played.to&&m.captured&&values[m.captured]>values[m.piece]);
+          // Frozen mechanics' internal legal-move list avoids SAN/history work for
+          // every alternative. The public API equivalence is checked in tests.
+          const target=(8-Number(played.to[1]))*16+played.to.charCodeAt(0)-97;
+          const offered=row.loss<=.02&&chess._moves().some(m=>m.to===target&&m.captured&&values[m.captured]>values[m.piece]);
           const stratum=row.loss<=.02?(offered?'offer':'control'):row.loss>=.10?'loss':null;
           if(stratum){
             const caseId='CR-'+sha256('E005-case-v1:'+game.id+':'+(i+1)).slice(0,12);
@@ -62,6 +66,7 @@ export function htmlFor(pack,template,script){
 }
 async function main(){
   if(process.argv.length>2)throw Error('Unknown argument');
+  const started=performance.now();
   const access=await openResearchData(['D001'],{purpose:'examples'}),dataset=await access.readJson('tools/calibration/public/dataset.json.gz');
   const evidence=await access.readJson('tools/calibration/public/sf18-rating-evidence.json.gz'),selection=caseCandidates(dataset,evidence);
   const cases=blind(selection.selected),pack={schema:'E005-review-pack-v1',rubric:'v1',packId:sha256(JSON.stringify(cases)),cases};
@@ -75,7 +80,7 @@ async function main(){
   const root=fileURLToPath(new URL('../../../../',import.meta.url));
   const run={schema:'research-run-v1',id:'E005-pack-v1',date:'2026-10-05',sourceRevision:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8',windowsHide:true}).trim(),
     command:'node research/experiments/E005-category-review/code/build.mjs',environment:{node:process.version},dataEligibility:access.receipt,
-    packId:pack.packId,engineSearches:0,reviewsReceived:0,evidenceMaturity:'instrument development; no human findings',
+    packId:pack.packId,engineSearches:0,elapsedMs:performance.now()-started,reviewsReceived:0,evidenceMaturity:'instrument development; no human findings',
     codeSha256:Object.fromEntries(await Promise.all(['build.mjs','review.html','review.js'].map(async name=>[name,sha256(await readFile(new URL(name,import.meta.url)))]))),
     rubricSha256:sha256(await readFile(new URL('../rubric.md',import.meta.url))),outputs:{}};
   for(const name of ['cases.json','selection-key.json'])run.outputs['evidence/'+name]=sha256(await readFile(new URL(name,out)));

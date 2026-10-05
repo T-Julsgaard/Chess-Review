@@ -16,6 +16,7 @@ function synthetic(){
 test('deterministic enriched selection is legal, game-disjoint and blinded',()=>{
   const a=synthetic(),b=synthetic();assert.deepEqual(a,b);assert.equal(a.selected.length,24);assert.equal(new Set(a.selected.map(c=>c.gameId)).size,24);
   for(const item of a.selected){const chess=new Chess(item.before);const played=chess.move(item.san);assert.ok(played);assert.equal(chess.fen(),item.after);}
+  for(const item of a.selected.filter(c=>c.stratum==='offer')){const chess=new Chess(item.after),v={p:1,n:3,b:3,r:5,q:9,k:100};assert.ok(chess.moves({verbose:true}).some(m=>m.to===item.to&&m.captured&&v[m.captured]>v[m.piece]));}
   assert.deepEqual(Object.fromEntries(['offer','loss','control'].map(s=>[s,a.selected.filter(c=>c.stratum===s).length])),{offer:8,loss:8,control:8});
   for(const item of blind(a.selected)){assert.equal(item.loss,undefined);assert.equal(item.gameId,undefined);assert.equal(item.stratum,undefined);}
 });
