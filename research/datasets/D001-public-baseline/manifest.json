@@ -213,6 +213,36 @@
       "sha256": "6e9042785eba0be3a842763f8e0b14de1590174d3ba21b1b09595ab703ffc817",
       "bytes": 5103,
       "uncompressedSha256": "6e9042785eba0be3a842763f8e0b14de1590174d3ba21b1b09595ab703ffc817"
+    },
+    "research/experiments/E006-rating-uncertainty/evidence/results.json": {
+      "kind": "summary",
+      "parents": [
+        "tools/calibration/public/sf18-rating-evidence.json.gz",
+        "tools/calibration/public/sf19-rating-evidence.json.gz"
+      ],
+      "sha256": "bf5380629014af3bf06db4324a93f347e9f858ebe27731c8a00f06146c68ea2e",
+      "bytes": 776502,
+      "uncompressedSha256": "bf5380629014af3bf06db4324a93f347e9f858ebe27731c8a00f06146c68ea2e"
+    },
+    "research/experiments/E006-rating-uncertainty/evidence/predictions.json.gz": {
+      "kind": "summary",
+      "parents": [
+        "tools/calibration/public/sf18-rating-evidence.json.gz",
+        "tools/calibration/public/sf19-rating-evidence.json.gz"
+      ],
+      "sha256": "10b4cd8fb5462eaa9ee6beff4ba62fc94dfe4f79f9fa5b23d69d5dfa4b97c14f",
+      "bytes": 360436,
+      "uncompressedSha256": "1c1a86c1245073cc86db3ef4fc6e06fefa105f90c2af997901261296722eaeb2"
+    },
+    "research/experiments/E006-rating-uncertainty/evidence/run.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E006-rating-uncertainty/evidence/results.json",
+        "research/experiments/E006-rating-uncertainty/evidence/predictions.json.gz"
+      ],
+      "sha256": "c4b7ac8a82d4b6f3f165c1ce2c0191de5a00b0f3777c7b93e9edb7158056c9e8",
+      "bytes": 5242,
+      "uncompressedSha256": "c4b7ac8a82d4b6f3f165c1ce2c0191de5a00b0f3777c7b93e9edb7158056c9e8"
     }
   }
 }
