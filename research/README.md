@@ -41,7 +41,7 @@ Research is available in the Git repository. The current packaging allowlist
 excludes `research/` from extension ZIPs and release source snapshots; those
 snapshots retain the active calibration instead.
 
-Fourteen studies/tasks are complete. A new 900-game cohort has fully traceable raw
+Fifteen studies/tasks are complete. A new 900-game cohort has fully traceable raw
 frames and exact clean reconstruction. A CP curve improves fresh development
 prediction; its clean replay passes, but the unchanged curve fails its frozen
 300-game confirmation gates. Smaller point gains have intervals including zero.
@@ -56,6 +56,9 @@ material witnesses; human annotation remains pending. Both packs are preserved.
 The restricted-chosen-move consistency study fails joint gates: SF19 mean
 errors improve, SF18 mean errors increase, and both miss stability. Choice temperature using recorded rating has a tiny unresolved development gain and
 misses both primary gates; exact fits/predictions and independent clean replay
-verify. Relative choice utilities are the next distinct numerical hypothesis.
+verify. Linear CP choice utilities then worsen human prediction and calibration
+despite lower search-vector drift; independent/exact/clean replay verifies that
+negative result. Context-scaled utility with justified mate semantics is the next
+distinct numerical hypothesis; this exact linear recipe stops.
 The index retains failed experiments and provenance/target limits.
 No new model is confirmed or promoted; current scoring is B000.
