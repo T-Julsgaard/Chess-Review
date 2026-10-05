@@ -212,6 +212,10 @@ export async function openResearchData(ids, {purpose = 'inspect', root = repo} =
       // Recheck at use, so replacing a file after preflight cannot change the input.
       return JSON.parse(verifyArtifact(await localBytes(root, name), entries.get(name), name));
     },
+    async readFrame(name){
+      safePath(name);if(entries.get(name)?.kind!=='raw-pgn-zstd')fail('unregistered raw frame');
+      return verifyArtifact(await localBytes(root,name),entries.get(name),name);
+    },
     gameOrigin(id) {
       for (const manifest of manifests) {
         const game = records.get(manifest.normalized).find(g => g.id === id);
@@ -219,7 +223,9 @@ export async function openResearchData(ids, {purpose = 'inspect', root = repo} =
           records.get(manifest.sourceRecord).sources.find(s => s.month === game.sourceMonth).url,
           normalizedFile: manifest.normalized, sha256: inputHashes[manifest.normalized],
           sourceRecord: manifest.sourceRecord, sourceRecordSha256: inputHashes[manifest.sourceRecord],
-          provenanceStatus: manifest.provenance.status, limitations: manifest.provenance.limitations};
+          provenanceStatus: manifest.provenance.status, limitations: manifest.provenance.limitations,
+          ...(manifest.originFormat==='lichess-prefix-v1'?{rawPGN:{...game.locator,compressedFrameSha256:inputHashes[game.locator.artifact],
+            decodedFrameSha256:entries.get(game.locator.artifact).uncompressedSha256}}:{})};
       }
       fail('unregistered game: ' + id);
     },

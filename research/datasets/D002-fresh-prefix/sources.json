@@ -1,0 +1,111 @@
+{
+  "license": "CC0-1.0",
+  "licenseUrl": "https://database.lichess.org/",
+  "sources": [
+    {
+      "url": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-06.pgn.zst",
+      "month": "2026-06",
+      "license": "CC0-1.0",
+      "frames": [
+        {
+          "url": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-06.pgn.zst",
+          "artifact": "research/datasets/D002-fresh-prefix/raw/2026-06.pgn.zst",
+          "start": 12,
+          "end": 4703292,
+          "leadingMetadataHex": "502a4d180400000031c44700",
+          "bytes": 4703281,
+          "sha256": "87e6cb6a06bed9cb0a805d625df7b9fb2cfe13330c332f761d8acfcceb8bf18b",
+          "decodedSha256": "4b71bb4f1ed68707af66718496c4554223a48020310e3b3430aabd6ac10d5b37",
+          "retrievedAt": "2026-10-05T03:11:35.827Z",
+          "verification": "HTTPS206 exact prefix range; complete first frame decoded; SHA256 raw/decoded bytes",
+          "request": {
+            "range": "bytes=0-8388607",
+            "acceptEncoding": "identity"
+          },
+          "response": {
+            "status": 206,
+            "contentRange": "bytes 0-8388607/28241946492",
+            "etag": "\"6a4abce2-69359e77c\"",
+            "lastModified": "Sun, 05 Jul 2026 20:21:54 GMT"
+          },
+          "prefixSha256": "4ce4f4cb8eac2d940c34f0824a3b8243a0dfe751272d23ee17b69a51b3f306e2",
+          "prefixBytes": 8388608,
+          "extraction": {
+            "start": 12,
+            "end": 4703293
+          }
+        }
+      ]
+    },
+    {
+      "url": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
+      "month": "2026-07",
+      "license": "CC0-1.0",
+      "frames": [
+        {
+          "url": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
+          "artifact": "research/datasets/D002-fresh-prefix/raw/2026-07.pgn.zst",
+          "start": 12,
+          "end": 4688107,
+          "leadingMetadataHex": "502a4d1804000000e0884700",
+          "bytes": 4688096,
+          "sha256": "20a757fceb5fcb2a3a60b184032efa47b7336ebf4a6e3b1add9c1a89b56c2a1a",
+          "decodedSha256": "0505187f345962e55c726f8039e9fa0e70deb36710235e57a5f24e591322b1af",
+          "retrievedAt": "2026-10-05T03:11:37.167Z",
+          "verification": "HTTPS206 exact prefix range; complete first frame decoded; SHA256 raw/decoded bytes",
+          "request": {
+            "range": "bytes=0-8388607",
+            "acceptEncoding": "identity"
+          },
+          "response": {
+            "status": 206,
+            "contentRange": "bytes 0-8388607/29051046504",
+            "etag": "\"6a6e60d0-6c393ca68\"",
+            "lastModified": "Sat, 01 Aug 2026 21:10:40 GMT"
+          },
+          "prefixSha256": "78686ccd7323847a9d1640d378659b712f9eaf72e71a01c8eb46c354a464cb88",
+          "prefixBytes": 8388608,
+          "extraction": {
+            "start": 12,
+            "end": 4688108
+          }
+        }
+      ]
+    },
+    {
+      "url": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-08.pgn.zst",
+      "month": "2026-08",
+      "license": "CC0-1.0",
+      "frames": [
+        {
+          "url": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-08.pgn.zst",
+          "artifact": "research/datasets/D002-fresh-prefix/raw/2026-08.pgn.zst",
+          "start": 12,
+          "end": 4624953,
+          "leadingMetadataHex": "502a4d18040000002e924600",
+          "bytes": 4624942,
+          "sha256": "f89749a19d464478a813d8f6d6ab73fff7464bbbc9194c5cf9d031289b5644c4",
+          "decodedSha256": "a1613e80e591573d8f8cac3012b1b1ebbc57ed6c00059d48103c48046854298a",
+          "retrievedAt": "2026-10-05T03:11:38.261Z",
+          "verification": "HTTPS206 exact prefix range; complete first frame decoded; SHA256 raw/decoded bytes",
+          "request": {
+            "range": "bytes=0-8388607",
+            "acceptEncoding": "identity"
+          },
+          "response": {
+            "status": 206,
+            "contentRange": "bytes 0-8388607/30145862359",
+            "etag": "\"6aa282bd-704d55ad7\"",
+            "lastModified": "Thu, 10 Sep 2026 10:13:17 GMT"
+          },
+          "prefixSha256": "d8e9c900da9dbcd275a84e4fa08097fcca2c164ba183c04f2659929c10c8ab38",
+          "prefixBytes": 8388608,
+          "extraction": {
+            "start": 12,
+            "end": 4624954
+          }
+        }
+      ]
+    }
+  ]
+}

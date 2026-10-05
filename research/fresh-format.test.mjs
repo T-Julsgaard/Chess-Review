@@ -5,7 +5,7 @@ import {firstFrame,recordsIn,normalize,metadata,selectCohort,digest,validateFres
 
 // Authored legal sequence and headers; no observed game/player evidence.
 const line='1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8 10. d4 Nbd7 11. Nbd2 1-0';
-function pgn(i){return `[Event "Rated Blitz game"]\n[Site "https://lichess.org/${String(i).padStart(8,'0')}"]\n[White "synthetic-w-${i}"]\n[Black "synthetic-b-${i}"]\n[WhiteElo "1600"]\n[BlackElo "1650"]\n[UTCDate "2026.06.01"]\n[Result "1-0"]\n[TimeControl "180+2"]\n\n${line}\n\n`;}
+function pgn(i,month='2026-06'){return `[Event "Rated Blitz game"]\n[Site "https://lichess.org/${String(i).padStart(8,'0')}"]\n[White "synthetic-w-${i}"]\n[Black "synthetic-b-${i}"]\n[WhiteElo "1600"]\n[BlackElo "1650"]\n[UTCDate "${month.replace('-','.')}.01"]\n[Result "1-0"]\n[TimeControl "180+2"]\n\n${line}\n\n`;}
 test('bounded frame parsing separates concatenation and rejects corruption/truncation',()=>{
   const payload=Buffer.from(pgn(1)),compressed=zstdCompressSync(payload),combined=Buffer.concat([compressed,compressed]);
   const frame=firstFrame(combined);assert.deepEqual(frame.frame,compressed);assert.deepEqual(frame.decoded,payload);
@@ -25,4 +25,19 @@ test('selection uses unique players, deterministic splits and no old identities'
   assert.equal(a.games.filter(g=>g.split==='train').length,3);assert.equal(a.games.filter(g=>g.split==='validation').length,1);assert.equal(a.games.filter(g=>g.split==='test').length,2);
   assert.equal(new Set(a.games.flatMap(g=>g.players.map(p=>p.id))).size,12);
   assert.throws(()=>validateFresh({sourceRecord:'source',provenance:{exclusions:'exclude',exclusionInput:'old'}},new Map([['source',{}],['exclude',{inputSha256:'wrong'}],['old',[]]]),{old:'correct'}),/dependency/);
+});
+
+test('full fresh origin reconstruction rejects altered ratings despite a new summary',()=>{
+  const frames=['2026-06','2026-07','2026-08'].map((month,k)=>({name:'synthetic-'+month+'.zst',month,decoded:Buffer.from(Array.from({length:301},(_,i)=>pgn(k*1000+i+1,month)).join(''))}));
+  const excluded={inputSha256:'a'.repeat(64),gameIds:[],playerIds:[]},rebuilt=selectCohort(frames,excluded);
+  const records=new Map([['old',[]],['exclude',excluded],['games',rebuilt.games]]),artifacts={};
+  const sources={sources:frames.map(f=>{
+    const raw=zstdCompressSync(f.decoded),entry={kind:'raw-pgn-zstd',bytes:raw.length,sha256:digest(raw),uncompressedSha256:digest(f.decoded)};
+    records.set(f.name,f.decoded);artifacts[f.name]=entry;
+    return{month:f.month,frames:[{artifact:f.name,start:0,bytes:entry.bytes,sha256:entry.sha256,decodedSha256:entry.uncompressedSha256}]};
+  })};records.set('source',sources);
+  const manifest={sourceRecord:'source',normalized:'games',artifacts,provenance:{exclusions:'exclude',exclusionInput:'old',exclusionCounts:rebuilt.exclusions}};
+  assert.equal(validateFresh(manifest,records,{old:excluded.inputSha256}),true);
+  const altered=structuredClone(rebuilt.games);altered[0].players[0].rating++;records.set('games',altered);
+  assert.throws(()=>validateFresh(manifest,records,{old:excluded.inputSha256}),/normalization, selection or split differs/);
 });

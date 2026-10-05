@@ -52,7 +52,7 @@ The `lichess-prefix-v1` format for D002 retains complete Zstandard frames and
 decoded per-game byte locators. Its guarded admission rebuilds the exact frozen
 PGN normalization, exclusions, selection and splits. Open both D001 and D002
 because the fresh cohort's exclusion identities depend on D001's verified bytes.
-Raw frame artifacts are decoded internally and cannot be read as JSON. Current
+Raw frame artifacts use the guarded `readFrame()` decoder, not `readJson()`. Current
 origin-checker bytes are bound to the manifest and eligibility receipt; a changed
 checker requires an explicit provenance revision/reconstruction. Legacy D001
 retains its existing limitations and is not upgraded by this format.

@@ -37,6 +37,10 @@
     {
       "id": "D001",
       "manifest": "research/datasets/D001-public-baseline/manifest.json"
+    },
+    {
+      "id": "D002",
+      "manifest": "research/datasets/D002-fresh-prefix/manifest.json"
     }
   ]
 }

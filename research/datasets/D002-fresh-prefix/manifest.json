@@ -1,0 +1,103 @@
+{
+  "schema": "research-dataset-manifest-v1",
+  "id": "D002",
+  "sourceIds": [
+    "lichess-standard-2026-summer"
+  ],
+  "originFormat": "lichess-prefix-v1",
+  "sourceRecord": "research/datasets/D002-fresh-prefix/sources.json",
+  "normalized": "research/datasets/D002-fresh-prefix/games.json.gz",
+  "provenance": {
+    "status": "pipeline-verified",
+    "limitations": [
+      "Archive-prefix convenience cohort; not a representative monthly/global population.",
+      "Only retained frame bytes are hashed; no whole-archive checksum is claimed.",
+      "Reserved evaluation labels were structurally parsed; no model evaluated or manual cases inspected during collection."
+    ],
+    "replayRecipe": "node research/experiments/E007-fresh-evidence/code/verify.mjs",
+    "selectionSeed": "D002-select-v1:",
+    "splitSeed": "D002-split-v1:",
+    "formatSha256": "6537d177ad21cbe16c89471040e63d0f42ad43a69e4f189787b8dcf2624e5b21",
+    "exclusions": "research/datasets/D002-fresh-prefix/exclusions.json",
+    "exclusionInput": "tools/calibration/public/dataset.json.gz",
+    "exclusionCounts": {
+      "not-blitz": 25863,
+      "ineligible-or-illegal-moves": 34,
+      "repeated-player-game": 45,
+      "D001-overlap": 25,
+      "2026-06:complete-records": 14173,
+      "2026-07:complete-records": 14339,
+      "2026-08:complete-records": 14117
+    },
+    "dependencies": [
+      "D001"
+    ]
+  },
+  "artifacts": {
+    "research/datasets/D002-fresh-prefix/raw/2026-06.pgn.zst": {
+      "kind": "raw-pgn-zstd",
+      "parents": [
+        "research/datasets/D002-fresh-prefix/sources.json"
+      ],
+      "sha256": "87e6cb6a06bed9cb0a805d625df7b9fb2cfe13330c332f761d8acfcceb8bf18b",
+      "bytes": 4703281,
+      "uncompressedSha256": "4b71bb4f1ed68707af66718496c4554223a48020310e3b3430aabd6ac10d5b37"
+    },
+    "research/datasets/D002-fresh-prefix/raw/2026-07.pgn.zst": {
+      "kind": "raw-pgn-zstd",
+      "parents": [
+        "research/datasets/D002-fresh-prefix/sources.json"
+      ],
+      "sha256": "20a757fceb5fcb2a3a60b184032efa47b7336ebf4a6e3b1add9c1a89b56c2a1a",
+      "bytes": 4688096,
+      "uncompressedSha256": "0505187f345962e55c726f8039e9fa0e70deb36710235e57a5f24e591322b1af"
+    },
+    "research/datasets/D002-fresh-prefix/raw/2026-08.pgn.zst": {
+      "kind": "raw-pgn-zstd",
+      "parents": [
+        "research/datasets/D002-fresh-prefix/sources.json"
+      ],
+      "sha256": "f89749a19d464478a813d8f6d6ab73fff7464bbbc9194c5cf9d031289b5644c4",
+      "bytes": 4624942,
+      "uncompressedSha256": "a1613e80e591573d8f8cac3012b1b1ebbc57ed6c00059d48103c48046854298a"
+    },
+    "research/datasets/D002-fresh-prefix/sources.json": {
+      "kind": "sources",
+      "parents": [],
+      "sha256": "edb7b5d3fe50f3fd1badc3cc821dbe3bb3e756448f692108cf7c6995365505cc",
+      "bytes": 4415,
+      "uncompressedSha256": "edb7b5d3fe50f3fd1badc3cc821dbe3bb3e756448f692108cf7c6995365505cc"
+    },
+    "research/datasets/D002-fresh-prefix/exclusions.json": {
+      "kind": "summary",
+      "parents": [
+        "research/datasets/D002-fresh-prefix/sources.json"
+      ],
+      "sha256": "110055d0be434f26ee8ed4fe0b2d039153d8d423159e0b2fc24074ce82ce04f4",
+      "bytes": 73771,
+      "uncompressedSha256": "110055d0be434f26ee8ed4fe0b2d039153d8d423159e0b2fc24074ce82ce04f4"
+    },
+    "research/datasets/D002-fresh-prefix/games.json.gz": {
+      "kind": "games",
+      "parents": [
+        "research/datasets/D002-fresh-prefix/sources.json",
+        "research/datasets/D002-fresh-prefix/exclusions.json",
+        "research/datasets/D002-fresh-prefix/raw/2026-06.pgn.zst",
+        "research/datasets/D002-fresh-prefix/raw/2026-07.pgn.zst",
+        "research/datasets/D002-fresh-prefix/raw/2026-08.pgn.zst"
+      ],
+      "sha256": "23d5008ff55aa51fd2861d4e813a1958503fbbb6908aa2115bfb31822eb536e5",
+      "bytes": 228075,
+      "uncompressedSha256": "a0c999f754fa87cd65fe8a32248f7a4e48b1c887356499b244f7390426250be2"
+    },
+    "research/datasets/D002-fresh-prefix/run.json": {
+      "kind": "summary",
+      "parents": [
+        "research/datasets/D002-fresh-prefix/games.json.gz"
+      ],
+      "sha256": "d7cfafe1e48ce2a653d2494922d6dd4e2068d69ef1b77630d4f23af051bcc2aa",
+      "bytes": 7649,
+      "uncompressedSha256": "d7cfafe1e48ce2a653d2494922d6dd4e2068d69ef1b77630d4f23af051bcc2aa"
+    }
+  }
+}
