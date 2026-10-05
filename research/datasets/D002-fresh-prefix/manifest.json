@@ -12,7 +12,8 @@
     "limitations": [
       "Archive-prefix convenience cohort; not a representative monthly/global population.",
       "Only retained frame bytes are hashed; no whole-archive checksum is claimed.",
-      "Reserved evaluation labels were structurally parsed; no model evaluated or manual cases inspected during collection."
+      "Reserved evaluation labels were structurally parsed; no model evaluated or manual cases inspected during collection.",
+      "Provisional-rating status is absent from selected PGN tags; numeric ratings do not establish nonprovisional or stable strength."
     ],
     "replayRecipe": "node research/experiments/E007-fresh-evidence/code/verify.mjs",
     "selectionSeed": "D002-select-v1:",
@@ -98,6 +99,36 @@
       "sha256": "d7cfafe1e48ce2a653d2494922d6dd4e2068d69ef1b77630d4f23af051bcc2aa",
       "bytes": 7649,
       "uncompressedSha256": "d7cfafe1e48ce2a653d2494922d6dd4e2068d69ef1b77630d4f23af051bcc2aa"
+    },
+    "research/experiments/E007-fresh-evidence/evidence/verification.json": {
+      "kind": "summary",
+      "parents": [
+        "research/datasets/D002-fresh-prefix/games.json.gz",
+        "research/datasets/D002-fresh-prefix/sources.json"
+      ],
+      "sha256": "d819b5dd76cb54b7daf0fffe6b7fdc36a25f03e4f32a2a33544e9f7501eea5f3",
+      "bytes": 7598,
+      "uncompressedSha256": "d819b5dd76cb54b7daf0fffe6b7fdc36a25f03e4f32a2a33544e9f7501eea5f3"
+    },
+    "research/experiments/E007-fresh-evidence/evidence/clean-replay.json": {
+      "kind": "summary",
+      "parents": [
+        "research/datasets/D002-fresh-prefix/games.json.gz",
+        "research/datasets/D002-fresh-prefix/sources.json"
+      ],
+      "sha256": "715e8567a6fb1bb6077647fd393dfe4d60bcc4b954355f75f33d2919b317d3ed",
+      "bytes": 465,
+      "uncompressedSha256": "715e8567a6fb1bb6077647fd393dfe4d60bcc4b954355f75f33d2919b317d3ed"
+    },
+    "research/experiments/E007-fresh-evidence/evidence/metadata-fields.json": {
+      "kind": "summary",
+      "parents": [
+        "research/datasets/D002-fresh-prefix/games.json.gz",
+        "research/datasets/D002-fresh-prefix/sources.json"
+      ],
+      "sha256": "1c09885c80d00b8f68c2afcc42bbc7cb736c4503e7bf0ca5cdb168d08302f5ac",
+      "bytes": 7191,
+      "uncompressedSha256": "1c09885c80d00b8f68c2afcc42bbc7cb736c4503e7bf0ca5cdb168d08302f5ac"
     }
   }
 }

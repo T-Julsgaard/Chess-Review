@@ -1,6 +1,6 @@
 # Research index
 
-Updated: 2026-10-05. Five studies complete; blinded category reviews pending.
+Updated: 2026-10-05. Six studies/tasks complete; fresh cohort verified; human reviews pending.
 Baseline: [B000](BASELINE.md). No new improvement has been established.
 
 This is the routing and decision index. Detailed evidence lives in linked
@@ -23,8 +23,8 @@ records. Update a row and the active experiment's resume state when work stops.
 | E005 | [Blinded category workflow](experiments/E005-category-review/RESULT.md) | running | 24 legal, traceable cases; workflow checks pass; zero reviews | Review later; numerical work continues |
 | E006 | [Rating uncertainty](experiments/E006-rating-uncertainty/RESULT.md) | complete | About90% game coverage needs broad ranges; adaptive scale fails gates | Stop this scale family |
 | F005 | [Single-game rating ranges](findings/F005-single-game-rating-ranges.md) | recorded | No ±300 cases; stronger-player conditional coverage fails/unresolved | Fresh evidence and distinct hypotheses |
-| E007 | [Fresh evidence pipeline](experiments/E007-fresh-evidence/plan.md) | planned | Raw frames, exact game locators and reconstruction gates | Implement guarded acquisition/admission |
-| D002 | [Fresh prefix cohort](datasets/D002-fresh-prefix/README.md) | preparing | Not admitted; no model use | Acquire and verify under E007 |
+| E007 | [Fresh evidence pipeline](experiments/E007-fresh-evidence/RESULT.md) | complete | Exact clean reconstruction; provisional status unavailable | Distinct calibration hypothesis |
+| D002 | [Fresh prefix cohort](datasets/D002-fresh-prefix/README.md) | registered | 900 disjoint games 450/150/300; reserved evaluation not activated | Guarded development use after protocol |
 
 No promotion records yet.
 Allocate the next unused ID in each series: `E008`, `D003`, `F006`, `P001`.
@@ -62,8 +62,11 @@ Only registered explicitly public, free-to-use sources and traceable derivatives
 qualify. New confirmation cohorts need complete acquisition/transform provenance;
 D001's historical limitations and exposure remain in force.
 
-Prepare a fully traceable fresh cohort and a distinct calibration hypothesis,
-with complete raw retrieval/transform provenance before further numerical claims.
+Register a distinct human-outcome/legal-choice calibration hypothesis using
+D002's development roles, then collect/cache its engine observations. Read E007's
+source/target limitations and open both D001/D002 for admission. Freeze later
+candidate/access rules before activating reserved evaluation; no new score is
+confirmed by the pipeline's successful reconstruction.
 E005 awaits later human reviews; pending annotation does not block this work.
 Do not retry F002/F003/F004/F005 without a changed premise. No candidate is confirmed.
 The research goal is active. The extension remains at B000.

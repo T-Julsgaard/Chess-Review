@@ -1,0 +1,12 @@
+{
+  "schema": "E007-clean-replay-v1",
+  "passed": true,
+  "snapshotRevision": "51d49c0",
+  "archiveCommand": "git archive --format=tar HEAD research lib/chess.js tools/calibration/public",
+  "command": "node research/experiments/E007-fresh-evidence/code/verify.mjs",
+  "verificationSha256": "d819b5dd76cb54b7daf0fffe6b7fdc36a25f03e4f32a2a33544e9f7501eea5f3",
+  "exactVerificationMatch": true,
+  "networkRequests": 0,
+  "ignoredInputs": 0,
+  "nodeDependencies": 0
+}
