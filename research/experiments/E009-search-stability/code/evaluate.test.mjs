@@ -5,6 +5,7 @@ import {sha256} from '../../../data-policy.mjs';
 import {selection,queryKey} from '../../E008-human-quality-curves/code/queries.mjs';
 import {selectGames} from './method.mjs';
 import {evaluate} from './evaluate.mjs';
+import {audit} from './audit.mjs';
 // Authored legal history/fabricated searches, independent of player data.
 const board=new Chess();for(const san of ['e4','e5','Nf3','Nc6','Bb5','a6','Ba4','Nf6','O-O','Be7','Re1','b5','Bb3','d6','c3','O-O','h3','Nb8','d4','Nbd7'])board.move(san);
 const moves=board.history({verbose:true}).map(m=>m.from+m.to+(m.promotion||'')),all=Array.from({length:600},(_,i)=>({id:'synthetic-'+i,split:i<450?'train':'validation',moves,players:[{color:'w',rating:1500},{color:'b',rating:1500}]}));
@@ -21,6 +22,8 @@ const games=selectGames(all),basePositions=selection(games).map(p=>({...p,rootKe
   evidence={schema:'E009-search-observations-v1',complete:true,engineConfig:config,configHash,baselineConfigHash:baseHash,games,positions,searches:[...high.values()]};
 test('fixed45-game assessment reconstructs legal choices and rejects evidence swaps',()=>{
   const report=evaluate(evidence,baseline,config);assert.equal(report.records.length,45);assert.equal(report.summary.passed,true);assert.equal(report.summary.quality.maximum,0);
+  assert.equal(audit(evidence,baseline,report).decisionChecks,90);
+  const altered=structuredClone(report);altered.records[0].high.quality-=1;assert.throws(()=>audit(evidence,baseline,altered),/quality/);
   const missing=structuredClone(evidence);missing.positions[0].alternatives.pop();assert.throws(()=>evaluate(missing,baseline,config),/alternatives/);
   const changed=structuredClone(evidence);changed.positions[0].alternatives[0].baselineKey='a'.repeat(64);assert.throws(()=>evaluate(changed,baseline,config),/alternatives/);
   const invalid=structuredClone(evidence);invalid.searches[0].score.cp=21;assert.throws(()=>evaluate(invalid,baseline,config),/score/);
