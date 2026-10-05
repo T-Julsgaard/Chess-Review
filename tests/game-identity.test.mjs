@@ -34,14 +34,14 @@ function withGame(a, pgn, gameId) {
   return S;
 }
 
-test('A/G: same players, different ids stay independent across several games', t => {
+test('A/G: same players, different ids stay independent across several games', async t => {
   const a = app(t);
   withGame(a, '1. e4 e5 2. Nf3 Nc6 1-0', '111');
   const id1 = a.call('currentGameId');
-  a.call('saveToLibrary');
+  await a.call('saveToLibrary');
   withGame(a, '1. d4 d5 2. c4 e6 0-1', '222');
   const id2 = a.call('currentGameId');
-  a.call('saveToLibrary');
+  await a.call('saveToLibrary');
 
   assert.equal(id1, '111');
   assert.equal(id2, '222');
@@ -66,10 +66,10 @@ test('B: a cached 111 never answers a lookup for 222', t => {
   assert.equal(a.call('canRestoreAnalysis', a.store[key222] || null), false);
 });
 
-test('C/D: each game restores only its own cached analysis', t => {
+test('C/D: each game restores only its own cached analysis', async t => {
   const a = app(t);
-  withGame(a, '1. e4 e5 1-0', '111'); a.call('saveToLibrary');
-  withGame(a, '1. d4 d5 0-1', '222'); a.call('saveToLibrary');
+  withGame(a, '1. e4 e5 1-0', '111'); await a.call('saveToLibrary');
+  withGame(a, '1. d4 d5 0-1', '222'); await a.call('saveToLibrary');
   const s111 = a.store[analysisCacheKey('111')];
   const s222 = a.store[analysisCacheKey('222')];
 
@@ -125,12 +125,12 @@ test('F: a late search from 111 cannot overwrite 222', async t => {
   assert.ok(S.evals.every((e) => e === null));
 });
 
-test('G: many consecutive games against one opponent never collide', t => {
+test('G: many consecutive games against one opponent never collide', async t => {
   const a = app(t);
   const ids = ['9001', '9002', '9003', '9004'];
   for (const id of ids) {
     withGame(a, `1. e4 e5 ${id === '9003' ? '2. Bc4 Nf6' : '2. Nf3 Nc6'} 1-0`, id);
-    a.call('saveToLibrary');
+    await a.call('saveToLibrary');
   }
   assert.deepEqual([...a.state.library.map((r) => r.id)].sort(), [...ids].sort());
   for (const id of ids) assert.ok(a.store[analysisCacheKey(id)]);

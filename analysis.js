@@ -4917,12 +4917,8 @@ function finishPractice() {
 }
 // Mark the current game as solved in the library (after completing its practice).
 function markCurrentSolved() {
-  const rec = S.library.find((r) => r.id === currentGameId());
-  if (rec && !rec.solved) {
-    rec.solved = true;
-    browserAPI.storage.local.set({ library: S.library });
-    renderLibrary();
-  }
+  const id = currentGameId();
+  return updateLibrary((library) => library.map((rec) => rec.id === id ? { ...rec, solved: true } : rec));
 }
 // Replay roll: step from the CURRENT position to `target`, forward or backward, playing the
 // move tick each step (lightweight renders only, so it stays snappy). Calls done() on arrival.
@@ -5156,16 +5152,47 @@ function canRestoreAnalysis(saved) {
     && saved.settingsKey === analysisSettingsKey();
 }
 
+/* ---------------- Library write protection ----------------
+   Every review tab shares one browserAPI.storage.local["library"]. If each tab read-modify-writes
+   its own (possibly stale) S.library, the tab that writes last silently erases the other tab's
+   game — and its favorites/solved flags. So ALL persistent library mutations go through this one
+   helper, which holds a single Web Lock across the whole read → mutate → write, and re-reads the
+   latest persisted list inside the lock instead of trusting S.library. */
+const LIBRARY_LOCK = "chess-review-library";
+const LIBRARY_MAX = 300;                 // same cap as before: keep the newest N games
+let _libraryWriteQueue = Promise.resolve(); // fallback for environments without navigator.locks
+function updateLibrary(update, analysisWrites = {}) {
+  const commit = async () => {
+    const stored = await browserAPI.storage.local.get("library");
+    const current = Array.isArray(stored.library) ? stored.library : S.library;
+    const next = update(current);
+    // Cap the list; drop the analysis blobs of any games that fall off the end.
+    const dropped = next.slice(LIBRARY_MAX);
+    const library = next.slice(0, LIBRARY_MAX);
+    // The heavy analysis (evals + engine lines) is stored under its own key so the library list
+    // stays light, and so re-opening a saved game can render instantly WITHOUT re-analyzing.
+    await browserAPI.storage.local.set({ ...analysisWrites, library });
+    if (dropped.length) await browserAPI.storage.local.remove(dropped.map((rec) => analysisCacheKey(rec.id)));
+    S.library = library;
+    renderLibrary();
+  };
+  // One named lock serializes read/modify/write across every tab of the extension origin. The
+  // in-context promise queue mirrors that ordering where navigator.locks is unavailable (tests,
+  // older runtimes) — no delays, no polling.
+  const task = navigator.locks?.request
+    ? navigator.locks.request(LIBRARY_LOCK, commit)
+    : (_libraryWriteQueue = _libraryWriteQueue.catch(() => {}).then(commit));
+  return task.catch((error) => console.warn("library save failed", error));
+}
+
 function saveToLibrary() {
   try {
     if (!S.pgn || S.meta?.explore || S.total === 0 || S.analyzing || S.analysisError
       || !completeAnalysis(S, S.total + 1)) return;
     const id = currentGameId();
     const opSide = S.meSide === "w" ? "b" : "w";
-    const prev = S.library.find((g) => g.id === id);
     // "solved" = no mistakes to practice (clean game) OR practice was already completed before.
     const noMistakes = practiceSpots().length === 0;
-    const solved = noMistakes || !!(prev && prev.solved);
     const rec = {
       id, savedAt: Date.now(), pgn: S.pgn, meta: S.meta || {},
       meSide: S.meSide,
@@ -5177,23 +5204,16 @@ function saveToLibrary() {
       eco: S.opening ? S.opening.eco : "", opening: S.opening ? S.opening.name : "",
       date: S.headers.UTCDate || S.headers.Date || "",
       url: (S.meta && S.meta.url) || "",
-      fav: !!(prev && prev.fav), solved,
     };
-    const lib = S.library.filter((g) => g.id !== id);   // replace on re-analysis (no duplicates)
-    lib.unshift(rec);
-    // Cap the list; drop the analysis blobs of any games that fall off the end.
-    let dropped = [];
-    if (lib.length > 300) { dropped = lib.slice(300); lib.length = 300; }
-    S.library = lib;
-    // The heavy analysis (evals + engine lines) is stored under its own key so the library list
-    // stays light, and so re-opening a saved game can render instantly WITHOUT re-analyzing.
-    const writes = { library: lib, [analysisCacheKey(id)]: {
+    const writes = { [analysisCacheKey(id)]: {
       pgn: S.pgn, settingsKey: analysisSettingsKey(), engineBuild: S.activeEngineBuild,
       evals: S.evals, bests: S.bests, multipv: S.analyzedMultipv,
     } };
-    browserAPI.storage.local.set(writes).catch(e => console.warn("library save failed", e));
-    if (dropped.length) browserAPI.storage.local.remove(dropped.map((d) => analysisCacheKey(d.id)));
-    renderLibrary();
+    return updateLibrary((library) => {
+      const prev = library.find((game) => game.id === id);
+      return [{ ...rec, fav: !!prev?.fav, solved: noMistakes || !!prev?.solved },
+        ...library.filter((game) => game.id !== id)];
+    }, writes);
   } catch (e) { console.warn("library save failed", e); }
 }
 async function openLibraryGame(rec) {
@@ -5210,11 +5230,7 @@ async function openLibraryGame(rec) {
 }
 // Toggle a game's favorite flag and persist it.
 function toggleFav(id) {
-  const rec = S.library.find((r) => r.id === id);
-  if (!rec) return;
-  rec.fav = !rec.fav;
-  browserAPI.storage.local.set({ library: S.library });
-  renderLibrary();
+  return updateLibrary((library) => library.map((rec) => rec.id === id ? { ...rec, fav: !rec.fav } : rec));
 }
 // Apply the active sort + filters.
 function libRecords() {
