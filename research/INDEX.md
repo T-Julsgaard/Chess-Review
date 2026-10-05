@@ -46,7 +46,7 @@ records. Update a row and the active experiment's resume state when work stops.
 
 | F013 | [Unresolved rating-choice context](findings/F013-unresolved-rating-choice-context.md) | recorded | Train-only fits reproduce; complete independent/clean replay; no final rating claim | Stop exact monotone recipe; review relative-choice hypothesis |
 
-| E016 | [Relative CP choice](experiments/E016-relative-cp-choice/RESULT.md) | planned | Fixed linear utility versus sigmoid; plan before fitting | Commit source/cohort freeze; train-only fits |
+| E016 | [Relative CP choice](experiments/E016-relative-cp-choice/RESULT.md) | running | Fixed linear utility versus sigmoid; synthetic mechanics and guarded freeze pass | Commit source/cohort freeze; train-only fits |
 
 No promotion records yet.
 Allocate the next unused ID in each series: `E017`, `D003`, `F014`, `P001`.

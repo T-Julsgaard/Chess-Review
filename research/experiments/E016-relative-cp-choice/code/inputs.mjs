@@ -1,0 +1,7 @@
+import {loadParents as loadPreviousParents,folds,parents} from '../../E015-rating-choice-context/code/inputs.mjs';
+import {utility,rawScore} from './model.mjs';
+export {folds,parents};
+export const prefix='research/experiments/E016-relative-cp-choice/';
+export function makeFreeze(previous){const {candidate,utility:oldUtility,ratingAnchors,temperatureRange,...binding}=previous;return{...binding,schema:'E016-freeze-v1',candidate:'linear-cp-utility-v1',utilities:{global:oldUtility,candidate:{kind:'linear-cp',clipCp:10000,offset:.5,divisor:20000,mates:'sign'}},temperatureRange:[0,1000],gates:{...previous.gates,seeds:[20261065,20261066,20261067,20261068],fitGradientTolerance:1e-8},calibration:{bins:5,tie:'first-maximum',brier:'multinomial'},confirmation:false};}
+export async function loadParents(access){const original=await loadPreviousParents(access),rows=original.rows.map(r=>({...r,candidateUtilities:r.rawScores.map(rawScore).map(utility)})),byId=new Map(rows.map(r=>[r.gameId,r])),stability=original.stability.map(r=>({...r,candidateLow:byId.get(r.gameId).candidateUtilities,candidateHigh:r.rawHigh.map(rawScore).map(utility)}));return{rows,stability,freeze:makeFreeze(original.freeze),diagnostics:original.diagnostics};}
+export async function loadInputs(access){const input=await loadParents(access),freeze=await access.readJson(prefix+'evidence/freeze.json');if(JSON.stringify(freeze)!==JSON.stringify(input.freeze))throw Error('Changed source/cohort/utility/fold freeze');return{...input,freeze};}

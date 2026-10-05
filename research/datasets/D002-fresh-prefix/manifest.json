@@ -604,6 +604,26 @@
       "bytes": 878,
       "sha256": "20003aac9bdee77414a32c8c2fa15f91ff06a3de934d1c381e2d5c20ccf40a35",
       "uncompressedSha256": "20003aac9bdee77414a32c8c2fa15f91ff06a3de934d1c381e2d5c20ccf40a35"
+    },
+    "research/experiments/E016-relative-cp-choice/evidence/freeze.json": {
+      "kind": "summary",
+      "parents": [
+        "research/datasets/D002-fresh-prefix/games.json.gz",
+        "research/experiments/E008-human-quality-curves/evidence/sf19-observations.json.gz",
+        "research/experiments/E009-search-stability/evidence/sf19-observations.json.gz"
+      ],
+      "bytes": 80270,
+      "sha256": "1c3b9ac57624259a3c59bab4f5b641ee6d7b3f9fc4f2a3dc93114e60f526e9ba",
+      "uncompressedSha256": "1c3b9ac57624259a3c59bab4f5b641ee6d7b3f9fc4f2a3dc93114e60f526e9ba"
+    },
+    "research/experiments/E016-relative-cp-choice/evidence/freeze-run.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E016-relative-cp-choice/evidence/freeze.json"
+      ],
+      "bytes": 26583,
+      "sha256": "64c3f4f1b1cc90beb480faf5e850502d89e6b262772ac2632d10ffd0aada8ac1",
+      "uncompressedSha256": "64c3f4f1b1cc90beb480faf5e850502d89e6b262772ac2632d10ffd0aada8ac1"
     }
   }
 }
