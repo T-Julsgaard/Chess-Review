@@ -46,8 +46,10 @@ records. Update a row and the active experiment's resume state when work stops.
 
 | F013 | [Unresolved rating-choice context](findings/F013-unresolved-rating-choice-context.md) | recorded | Train-only fits reproduce; complete independent/clean replay; no final rating claim | Stop exact monotone recipe; review relative-choice hypothesis |
 
+| E016 | [Relative CP choice](experiments/E016-relative-cp-choice/RESULT.md) | planned | Fixed linear utility versus sigmoid; plan before fitting | Commit source/cohort freeze; train-only fits |
+
 No promotion records yet.
-Allocate the next unused ID in each series: `E016`, `D003`, `F014`, `P001`.
+Allocate the next unused ID in each series: `E017`, `D003`, `F014`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
