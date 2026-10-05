@@ -1,0 +1,169 @@
+{
+  "schema": "research-run-v1",
+  "sourceRevision": "831479a2bd857ccc3a07b446e469855a527f9f70",
+  "codeSha256": {
+    "collect.mjs": "236975c99ce90c3be64e19b6a9bb930689c38a4ad11d02aa8bb30d855f998f06",
+    "inputs.mjs": "0e22d314169718456748531917619ec511e56c42ac68fe5ae6433a788e9cd24b",
+    "selection.mjs": "4c7b4bb65d4146b5439ef90f350ca23201d9e16e00f525a249659c8bf4efe704",
+    "policy.mjs": "5016ad511233951d77cc5c03a556440e5ef2c70b73f41c4bcb667cef0d540336"
+  },
+  "sharedCodeSha256": {
+    "research/root-panel.mjs": "d91f8b7bf90aa3d5f9a7f05818e816cfdc1462a6c1a34039a25ea2447908c3e1",
+    "research/experiments/E012-offer-evidence/code/board.mjs": "8e918e77ff5cd0f606e31caaee1f47bc665900bb4dce2cd24d3b42b75650e45d",
+    "research/experiments/E012-offer-evidence/code/queries.mjs": "82886d7293918ee30a4074b294fe02975abc651b8f6831e432dd8d8af2b57de1",
+    "research/experiments/E012-offer-evidence/code/policy.mjs": "7a2a6fb263c07aaa35ae746e9907e92bf5f420eea9b6644fc625d2c3fbc9fa36"
+  },
+  "engineConfigs": {
+    "20k": {
+      "version": "Stockfish 18 (identity verified at UCI startup)",
+      "majorVersion": 18,
+      "build": "stockfish.js lite single-threaded",
+      "network": "nn-9067e33176e8.nnue",
+      "loaderSha256": "2278005057f381491f1c9bb3e44c9f5920b3a00bef9759e33cc6582769a1f1fe",
+      "wasmSha256": "a8fbc05ec6920b56d7485826dcb02c5ffd2826bcbf751cf973046f237a9096f1",
+      "budget": {
+        "kind": "nodes",
+        "value": 20000
+      },
+      "options": {
+        "Threads": 1,
+        "Hash": 32,
+        "MultiPV": 1,
+        "Skill Level": 20,
+        "UCI_LimitStrength": false,
+        "UCI_ShowWDL": true,
+        "UCI_Chess960": false
+      },
+      "reset": "ucinewgame + Clear Hash + isready before every search",
+      "tablebases": "none",
+      "perspective": "side to move at root",
+      "position": "startpos with full move history"
+    },
+    "80k": {
+      "version": "Stockfish 18 (identity verified at UCI startup)",
+      "majorVersion": 18,
+      "build": "stockfish.js lite single-threaded",
+      "network": "nn-9067e33176e8.nnue",
+      "loaderSha256": "2278005057f381491f1c9bb3e44c9f5920b3a00bef9759e33cc6582769a1f1fe",
+      "wasmSha256": "a8fbc05ec6920b56d7485826dcb02c5ffd2826bcbf751cf973046f237a9096f1",
+      "budget": {
+        "kind": "nodes",
+        "value": 80000
+      },
+      "options": {
+        "Threads": 1,
+        "Hash": 32,
+        "MultiPV": 1,
+        "Skill Level": 20,
+        "UCI_LimitStrength": false,
+        "UCI_ShowWDL": true,
+        "UCI_Chess960": false
+      },
+      "reset": "ucinewgame + Clear Hash + isready before every search",
+      "tablebases": "none",
+      "perspective": "side to move at root",
+      "position": "startpos with full move history"
+    }
+  },
+  "configHashes": {
+    "20k": "4659128c7e837baa9fb1b5131db27cdcaa064bbf09378dab6c5c1817946ce6c3",
+    "80k": "2a52934db01a52f76d41b0f1ff06bfafa792e16a84b3cf5fc27596c75bafaa20"
+  },
+  "policySha256": "9d853a0c1d7ff07b312840c50666fbd7b877e9008c768e37d1d18b8e960ea515",
+  "packId": "d0c968155f6875cf9c27f3bfe2df5570af9cc5fa12dc7ed8ef20f794d2fbf9a9",
+  "selectionHash": "c8207531e6fb038e4834f7c35450ba10eb40a133f27ec943bac39c5dde9e5a3d",
+  "dataEligibility": {
+    "schema": "research-data-eligibility-v1",
+    "policyVersion": "public-data-v1",
+    "policySha256": "f087516c9483a04ddd97888191eebafa729749b3fb10aa550ae1c70adcef866a",
+    "validatorSha256": "45d3faf2c30552a159c1a363871064f9ba852f79a89856dbac26604f9e45277c",
+    "originValidatorSha256": "6537d177ad21cbe16c89471040e63d0f42ad43a69e4f189787b8dcf2624e5b21",
+    "registrySha256": "c00de91f767ec439aecbf27fd0929fd26ed3d8c3ca6a5525e996ee58989d026b",
+    "purpose": "collect",
+    "manifestHashes": {
+      "D001": "97169b1685ad8b1ecc6e8bac2353903b21e63a68691aa84f5686be6273f3b7a8"
+    },
+    "sourceEvidence": {
+      "lichess-standard-2026-summer": {
+        "license": "CC0-1.0",
+        "termsUrl": "https://database.lichess.org/",
+        "verifiedOn": "2026-10-05",
+        "evidenceSha256": "a227e286dce1e9e355101356507e57c4ad89ec39d65f9762f94ab76a6ffdd4ac"
+      }
+    },
+    "inputHashes": {
+      "tools/calibration/public/sources.json": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+      "tools/calibration/public/dataset.json.gz": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+      "tools/calibration/public/sf18-evidence.json.gz": "2771b2b8a7839e4d9f2ddbff73aa6e0dfbe017f3aa3a7b052584147ee21c968b",
+      "tools/calibration/public/sf18-rating-evidence.json.gz": "f41178347bc9569390b744f9e6fb2206882cf2307c762de8b8f8aab35c2a1e31",
+      "tools/calibration/public/sf19-rating-evidence.json.gz": "8ac253f86fa87a945c06e86f2b7c82d4f2b7e8c96ae9b990a6efadbac9f7d721",
+      "tools/calibration/public/expected-scores.json": "969664315be01fab6f719ce158926741c45ec59ef8e3accfe28f0dcc595b7df6",
+      "tools/calibration/public/validation.json": "865aa647f484f3932c42baa2bd15625bd7cdfd253f504aa6d64aba3e4eb07076",
+      "research/experiments/E003-sf19-archive-replay/evidence/sf19-quality.json.gz": "5cef8a6d20482a743351c8ca3a85da030fd95b3eb91a6395aeca0b8d7f7fe745",
+      "research/experiments/E001-evidence-audit/evidence/sf19-quality-archive.json": "3953a2a13f8e491e5c0dedbf40d38bb7d0d24ac4abe546278b8fb8360e1d3c2d",
+      "research/experiments/E003-sf19-archive-replay/evidence/sf19-choice-confirmation.json.gz": "5e9e1f61b48d39030e91dea0615aee4510ac9c29e3fcf3d2b7e3ad47b82efbae",
+      "research/experiments/E001-evidence-audit/evidence/sf19-choice-confirmation-archive.json": "a762d73fb732e107da84d7edae8991cc89227f3252b164d3008e64a7c1c6906b",
+      "research/experiments/E002-nonlinear-rating/evidence/results.json": "9219f67a34e1c1f6ba8252f1b5a46958b8afd7dba13b90c24d660b2370f64f18",
+      "research/experiments/E002-nonlinear-rating/evidence/predictions.json.gz": "a78f5b9f69f1a4ea21a8e17cbedb373e6b56cc432f36b9d1dbdb75d2cbebc8ac",
+      "tools/calibration/public/manifest.json": "e7d928e440f8a4b73bfa64c11e11f48320f9f3cc556c29a3bca72e1e5d15ff6a",
+      "research/experiments/E003-sf19-archive-replay/evidence/inputs.json": "e752fd0883e2db58b1121071dc59e879adcd8e982984198e58e9056f9ad84447",
+      "research/experiments/E004-practical-outcomes/evidence/results.json": "f2d89e9d9e07b45bceca955af522fca4d0ad39db100b0bece0e235403c93adea",
+      "research/experiments/E004-practical-outcomes/evidence/predictions.json.gz": "89bc0719cc00708a80d55b6c5c7a88d53d0f52e05d252eddda052b434d1c3e96",
+      "research/experiments/E005-category-review/evidence/cases.json": "b6974f3159c839f3764eed3d8da5dff406dece9bb2414c958e8484d81271c41f",
+      "research/experiments/E005-category-review/evidence/selection-key.json": "33e75aa79f26b07358d53f432535c862a85aa79a4e5f38101eff3ec8ff94b5c0",
+      "research/experiments/E005-category-review/evidence/run.json": "6e9042785eba0be3a842763f8e0b14de1590174d3ba21b1b09595ab703ffc817",
+      "research/experiments/E006-rating-uncertainty/evidence/results.json": "bf5380629014af3bf06db4324a93f347e9f858ebe27731c8a00f06146c68ea2e",
+      "research/experiments/E006-rating-uncertainty/evidence/predictions.json.gz": "10b4cd8fb5462eaa9ee6beff4ba62fc94dfe4f79f9fa5b23d69d5dfa4b97c14f",
+      "research/experiments/E006-rating-uncertainty/evidence/run.json": "c4b7ac8a82d4b6f3f165c1ce2c0191de5a00b0f3777c7b93e9edb7158056c9e8",
+      "research/experiments/E012-offer-evidence/evidence/policy.json": "a7365e813d97470d55056fda3baf5b3a8311b85bcc301ecc9c88403e5314a6b4",
+      "research/experiments/E012-offer-evidence/evidence/freeze-run.json": "0287e95d96658a7b3c190ac763469b4b165441bd5d261e05a1854eeae13b7d07",
+      "research/experiments/E012-offer-evidence/evidence/sf18-observations.json.gz": "02367574df6676276243cd1f60e23e5c2ec984eb70a49df24d2188aaea6be547",
+      "research/experiments/E012-offer-evidence/evidence/collection-run.json": "555eeff8f289050ea81ea140fb722515a3d3cfdb127fdd0044b23d4386c5108a",
+      "research/experiments/E012-offer-evidence/evidence/results.json": "d31ed066a4fdcea3e81a79320c0e06f358177d84f4c3332c42ada85b49a9db0d",
+      "research/experiments/E012-offer-evidence/evidence/run.json": "134203b7f0d839b05287454db0f45211037e36a0fb6f7eeaeeddf86f7ba10b15",
+      "research/experiments/E012-offer-evidence/evidence/verification.json": "9da4fbd2ee6aa54a1eb906de1d2f18d40066fb87de71a9d2c6c4032c3991beed",
+      "research/experiments/E012-offer-evidence/evidence/clean-replay.json": "6bd00b4aebde0cac726784c81bc7299bccd1e04e3b5450af5051e8edf53e0546",
+      "research/experiments/E012-offer-evidence/evidence/clean-archive.json": "0c9cab45a3767ee9ed7d69b9d4d3e811e01242a6ef79c08617ef902186b3d5af",
+      "research/experiments/E013-net-offer-pack/evidence/policy.json": "f9f60ba511e03a1826d442504315baa9d7dd0ac16511d34008c006f0cfee5d5d",
+      "research/experiments/E013-net-offer-pack/evidence/cases.json": "d6f0c63a657901d822bdb0920895576371457f134a82c3aed35ccce04fc8c521",
+      "research/experiments/E013-net-offer-pack/evidence/selection-key.json": "32dbeb26b0e078b431156344602d2115fb4ce9e263b3ca331170d330312948ea",
+      "research/experiments/E013-net-offer-pack/evidence/build-run.json": "c36523f4429231afd19da0a5a67147eb8b3568470b8b3ec63a2f3e91798f8831"
+    },
+    "datasets": {
+      "D001": {
+        "gameCount": 2000,
+        "archives": [
+          "https://database.lichess.org/standard/lichess_db_standard_rated_2026-06.pgn.zst",
+          "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
+          "https://database.lichess.org/standard/lichess_db_standard_rated_2026-08.pgn.zst"
+        ],
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    }
+  },
+  "id": "E013-all-root-collection",
+  "date": "2026-10-05",
+  "command": "node research/experiments/E013-net-offer-pack/code/collect.mjs",
+  "environment": {
+    "node": "v24.14.1",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "startupIdentity": "Stockfish 18 Lite WASM",
+  "cases": 16,
+  "queries": 1170,
+  "requests": 1171,
+  "reused": 0,
+  "elapsedMs": 131048.67480000001,
+  "modelFits": 0,
+  "propertyAssessments": 0,
+  "humanLabelsUsed": 0,
+  "outputs": {
+    "sf18-observations.json.gz": "b7ee839acb88813dce83d16eae6dd93ee2a6d1eca8557471dae947b29ced68ea"
+  }
+}

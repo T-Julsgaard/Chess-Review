@@ -1,4 +1,4 @@
-# E013: separate blinded net-offer pack ready; prospective searches next
+# E013: complete prospective root panel; frozen screen next
 
 2026-10-05. A separate16-case prospective pack will target8 net voluntary offers
 plus8 matched nonoffers, using train-only eligible source WDL context and the
@@ -24,12 +24,16 @@ unknown; classification stopped after the cases were determined.16 distinct
 training games are bound to source/context/origin; pack/key/policy/build receipt
 are registered. HTML18,475 bytes, offline with separate E013 review/export/storage
 identity. Pack IDd0c968155f6875cf9c27f3bfe2df5570af9cc5fa12dc7ed8ef20f794d2fbf9a9.
-The original E005 pack is preserved. No new searches or property screen yet.
+The original E005 pack is preserved. Pack/policy/key committed in831479a before
+the one prospective collection:16 cases,569 legal alternatives per budget,
+1,170 distinct queries,1,171 requests,zero reuse,227,622 compressed bytes,~131s.
+Raw source/history/PV/config/budget bindings pass and complete evidence/receipt
+are registered. All resource caps pass. The collector is terminal (exit0), with
+zero fits/human labels/property assessments during collection.
 
-Next: after committing the registered pack, run
-`node research/experiments/E013-net-offer-pack/code/collect.mjs` once. Keep the
-live handle and durable `research/runs/E013/sf18/` cache; never restart on a
-timeout. Register/commit complete raw before `code/run.mjs evaluate`, then
-register report before `code/run.mjs verify` and external clean replay.
+Next: commit raw then run
+`node research/experiments/E013-net-offer-pack/code/run.mjs evaluate` once.
+Register report before `code/run.mjs verify` and external clean replay.
+Do not restart the terminal collector; durable cache is `research/runs/E013/sf18/`.
 Keep all unsupported/unstable cases and the fixed case order. Human annotation,
 broader scoring research and implementation remain pending.
