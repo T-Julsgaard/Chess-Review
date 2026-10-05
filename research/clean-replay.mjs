@@ -15,20 +15,26 @@ import {audit as auditCandidate} from './experiments/E010-candidate-stability/co
 import {loadInputs as loadOutcomeInputs} from './experiments/E011-outcome-confirmation/code/inputs.mjs';
 import {evaluate as evaluateOutcome} from './experiments/E011-outcome-confirmation/code/method.mjs';
 import {audit as auditOutcome} from './experiments/E011-outcome-confirmation/code/audit.mjs';
+import {loadInputs as loadOfferInputs} from './experiments/E012-offer-evidence/code/inputs.mjs';
+import {evaluate as evaluateOffer} from './experiments/E012-offer-evidence/code/method.mjs';
+import {audit as auditOffer} from './experiments/E012-offer-evidence/code/audit.mjs';
 
 // Run only from an externally extracted Git archive. The operator supplies its
 // exact commit and retains the archive command/hash alongside this receipt.
 const [experiment,revision,...extra]=process.argv.slice(2),root=fileURLToPath(new URL('../',import.meta.url));
-if(!['E008','E009','E010','E011'].includes(experiment)||!/^([a-f0-9]{40})$/.test(revision||'')||extra.length)throw Error('Use clean-replay.mjs E008|E009|E010|E011 <archive commit SHA>');
+if(!['E008','E009','E010','E011','E012'].includes(experiment)||!/^([a-f0-9]{40})$/.test(revision||'')||extra.length)throw Error('Use clean-replay.mjs E008|E009|E010|E011|E012 <archive commit SHA>');
 try{await stat(path.join(root,'.git'));throw Error('Clean replay requires a snapshot without .git');}catch(e){if(e.code!=='ENOENT')throw e;}
-const started=performance.now(),access=await openResearchData(['D001','D002'],{purpose:'reuse'}),
-  active={E008:'research/experiments/E008-human-quality-curves/',E009:'research/experiments/E009-search-stability/',E010:'research/experiments/E010-candidate-stability/',E011:'research/experiments/E011-outcome-confirmation/'}[experiment],run=await access.readJson(active+'evidence/run.json'),
+const started=performance.now(),access=await openResearchData(experiment==='E012'?['D001']:['D001','D002'],{purpose:'reuse'}),
+  active={E008:'research/experiments/E008-human-quality-curves/',E009:'research/experiments/E009-search-stability/',E010:'research/experiments/E010-candidate-stability/',E011:'research/experiments/E011-outcome-confirmation/',E012:'research/experiments/E012-offer-evidence/'}[experiment],run=await access.readJson(active+'evidence/run.json'),
   saved=await access.readJson(active+'evidence/results.json');
 for(const [name,expected] of Object.entries(run.codeSha256)){
   if(sha256(await readFile(path.join(root,active,'code',name)))!==expected)throw Error('Clean snapshot scoring code differs from fitted run: '+name);
 }
 let exactPredictions=null,independent;
-if(experiment==='E011'){
+if(experiment==='E012'){
+  const {prepared,policy,board,dataset}=await loadOfferInputs(access),replay=evaluateOffer(prepared,policy,board);
+  if(JSON.stringify(replay)!==JSON.stringify(saved))throw Error('Clean offer replay differs');independent=auditOffer(prepared,policy,board,saved,dataset);
+}else if(experiment==='E011'){
   const {prepared,freeze,dataset}=await loadOutcomeInputs(access),replay=evaluateOutcome(prepared,freeze);
   if(JSON.stringify(replay)!==JSON.stringify(saved))throw Error('Clean outcome replay differs');independent=auditOutcome(prepared,freeze,saved,dataset);
 }else if(experiment==='E010'){
