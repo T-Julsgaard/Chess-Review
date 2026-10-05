@@ -1,0 +1,2878 @@
+{
+  "schema": "E014-root-consistency-v1",
+  "engines": {
+    "SF18": {
+      "panels": {
+        "20k": {
+          "games": 40,
+          "baselineError": {
+            "mean": 0.005937499999999997,
+            "median": 0,
+            "p90": 0.01100000000000001,
+            "maximum": 0.10149999999999992
+          },
+          "candidateError": {
+            "mean": 0.0188,
+            "median": 0,
+            "p90": 0.0020000000000000018,
+            "maximum": 0.4485
+          },
+          "improvement": {
+            "estimate": -0.012862500000000004,
+            "lower": -0.04878750000000001,
+            "upper": 0.007137499999999994,
+            "level": 0.9875,
+            "seed": 20261051,
+            "iterations": 10000,
+            "unit": "game",
+            "interpretation": "Conditional development engine consistency; four-comparison Bonferroni percentile intervals"
+          },
+          "relativeReduction": -2.166315789473686,
+          "baselineConfusion": {
+            "falseNearBest": 0,
+            "falseNotNearBest": 0,
+            "agreement": 40
+          },
+          "candidateConfusion": {
+            "falseNearBest": 1,
+            "falseNotNearBest": 0,
+            "agreement": 39
+          },
+          "baselineNegativeResiduals": 12,
+          "candidateNegativeResiduals": 5,
+          "chosenBelowMaximum": 9,
+          "chosenShortfall": {
+            "mean": 0.0265125,
+            "median": 0,
+            "p90": 0.03849999999999998,
+            "maximum": 0.4485
+          },
+          "mateCases": 4,
+          "workload": {
+            "baselineQueries": 80,
+            "candidateQueries": 97,
+            "fullQueries": 1431,
+            "baselineRequests": 81,
+            "candidateRequests": 98,
+            "fullRequests": 1432
+          },
+          "exactScoreDiagnostics": {
+            "rootEarlier": 20,
+            "chosenEarlier": 21,
+            "rootNodes": [
+              5135,
+              20029
+            ],
+            "chosenNodes": [
+              5155,
+              20045
+            ]
+          },
+          "gates": {
+            "practical": false,
+            "interval": false,
+            "falseNearBest": true,
+            "queryWorkload": true
+          }
+        },
+        "80k": {
+          "games": 40,
+          "baselineError": {
+            "mean": 0.003675,
+            "median": 0,
+            "p90": 0.008999999999999897,
+            "maximum": 0.04949999999999999
+          },
+          "candidateError": {
+            "mean": 0.006349999999999997,
+            "median": 0,
+            "p90": 0,
+            "maximum": 0.2235
+          },
+          "improvement": {
+            "estimate": -0.002674999999999997,
+            "lower": -0.016450000000000003,
+            "upper": 0.004050000000000007,
+            "level": 0.9875,
+            "seed": 20261052,
+            "iterations": 10000,
+            "unit": "game",
+            "interpretation": "Conditional development engine consistency; four-comparison Bonferroni percentile intervals"
+          },
+          "relativeReduction": -0.7278911564625843,
+          "baselineConfusion": {
+            "falseNearBest": 0,
+            "falseNotNearBest": 0,
+            "agreement": 40
+          },
+          "candidateConfusion": {
+            "falseNearBest": 0,
+            "falseNotNearBest": 0,
+            "agreement": 40
+          },
+          "baselineNegativeResiduals": 7,
+          "candidateNegativeResiduals": 1,
+          "chosenBelowMaximum": 5,
+          "chosenShortfall": {
+            "mean": 0.006362499999999996,
+            "median": 0,
+            "p90": 0.0004999999999999449,
+            "maximum": 0.2235
+          },
+          "mateCases": 6,
+          "workload": {
+            "baselineQueries": 80,
+            "candidateQueries": 99,
+            "fullQueries": 1431,
+            "baselineRequests": 83,
+            "candidateRequests": 102,
+            "fullRequests": 1434
+          },
+          "exactScoreDiagnostics": {
+            "rootEarlier": 20,
+            "chosenEarlier": 16,
+            "rootNodes": [
+              34655,
+              80128
+            ],
+            "chosenNodes": [
+              25394,
+              80102
+            ]
+          },
+          "gates": {
+            "practical": false,
+            "interval": false,
+            "falseNearBest": true,
+            "queryWorkload": true
+          }
+        }
+      },
+      "stability": {
+        "baseline": {
+          "mean": 0.0158875,
+          "median": 0,
+          "p90": 0.07550000000000001,
+          "maximum": 0.133
+        },
+        "candidate": {
+          "mean": 0.027500000000000004,
+          "median": 0,
+          "p90": 0.06299999999999994,
+          "maximum": 0.487
+        },
+        "candidateWithinTolerance": {
+          "successes": 35,
+          "n": 40,
+          "estimate": 0.875,
+          "lower": 0.738878801611489,
+          "upper": 0.945404997490546,
+          "level": 0.95,
+          "method": "Wilson score; one fixed focal choice per disjoint game"
+        },
+        "rootBestChanges": 9
+      },
+      "gates": {
+        "coverage": true,
+        "meanDrift": false,
+        "stableFraction": false
+      },
+      "groups": [
+        {
+          "label": "E012/train",
+          "sparse": false,
+          "panels": {
+            "20k": {
+              "games": 24,
+              "baselineError": {
+                "mean": 0.009562499999999995,
+                "median": 0,
+                "p90": 0.012499999999999956,
+                "maximum": 0.10149999999999992
+              },
+              "candidateError": {
+                "mean": 0.031,
+                "median": 0,
+                "p90": 0,
+                "maximum": 0.4485
+              },
+              "improvement": null,
+              "relativeReduction": -2.241830065359479,
+              "baselineConfusion": {
+                "falseNearBest": 0,
+                "falseNotNearBest": 0,
+                "agreement": 24
+              },
+              "candidateConfusion": {
+                "falseNearBest": 1,
+                "falseNotNearBest": 0,
+                "agreement": 23
+              },
+              "baselineNegativeResiduals": 4,
+              "candidateNegativeResiduals": 3,
+              "chosenBelowMaximum": 6,
+              "chosenShortfall": {
+                "mean": 0.0423125,
+                "median": 0,
+                "p90": 0.0655,
+                "maximum": 0.4485
+              },
+              "mateCases": 4,
+              "workload": {
+                "baselineQueries": 48,
+                "candidateQueries": 63,
+                "fullQueries": 846,
+                "baselineRequests": 49,
+                "candidateRequests": 64,
+                "fullRequests": 847
+              },
+              "exactScoreDiagnostics": {
+                "rootEarlier": 12,
+                "chosenEarlier": 8,
+                "rootNodes": [
+                  5135,
+                  20029
+                ],
+                "chosenNodes": [
+                  6002,
+                  20045
+                ]
+              },
+              "gates": null
+            },
+            "80k": {
+              "games": 24,
+              "baselineError": {
+                "mean": 0.005500000000000004,
+                "median": 0,
+                "p90": 0.010000000000000009,
+                "maximum": 0.04949999999999999
+              },
+              "candidateError": {
+                "mean": 0.010208333333333331,
+                "median": 0,
+                "p90": 0,
+                "maximum": 0.2235
+              },
+              "improvement": null,
+              "relativeReduction": -0.8560606060606043,
+              "baselineConfusion": {
+                "falseNearBest": 0,
+                "falseNotNearBest": 0,
+                "agreement": 24
+              },
+              "candidateConfusion": {
+                "falseNearBest": 0,
+                "falseNotNearBest": 0,
+                "agreement": 24
+              },
+              "baselineNegativeResiduals": 3,
+              "candidateNegativeResiduals": 0,
+              "chosenBelowMaximum": 3,
+              "chosenShortfall": {
+                "mean": 0.010208333333333331,
+                "median": 0,
+                "p90": 0,
+                "maximum": 0.2235
+              },
+              "mateCases": 6,
+              "workload": {
+                "baselineQueries": 48,
+                "candidateQueries": 65,
+                "fullQueries": 846,
+                "baselineRequests": 50,
+                "candidateRequests": 67,
+                "fullRequests": 848
+              },
+              "exactScoreDiagnostics": {
+                "rootEarlier": 8,
+                "chosenEarlier": 6,
+                "rootNodes": [
+                  34655,
+                  80102
+                ],
+                "chosenNodes": [
+                  25394,
+                  80102
+                ]
+              },
+              "gates": null
+            }
+          }
+        },
+        {
+          "label": "E013/train",
+          "sparse": true,
+          "panels": {
+            "20k": {
+              "games": 16,
+              "baselineError": {
+                "mean": 0.0005000000000000004,
+                "median": 0,
+                "p90": 0,
+                "maximum": 0.006000000000000005
+              },
+              "candidateError": {
+                "mean": 0.0005000000000000004,
+                "median": 0,
+                "p90": 0,
+                "maximum": 0.006000000000000005
+              },
+              "improvement": null,
+              "relativeReduction": 0,
+              "baselineConfusion": {
+                "falseNearBest": 0,
+                "falseNotNearBest": 0,
+                "agreement": 16
+              },
+              "candidateConfusion": {
+                "falseNearBest": 0,
+                "falseNotNearBest": 0,
+                "agreement": 16
+              },
+              "baselineNegativeResiduals": 8,
+              "candidateNegativeResiduals": 2,
+              "chosenBelowMaximum": 3,
+              "chosenShortfall": {
+                "mean": 0.0028124999999999956,
+                "median": 0,
+                "p90": 0.0004999999999999449,
+                "maximum": 0.03849999999999998
+              },
+              "mateCases": 0,
+              "workload": {
+                "baselineQueries": 32,
+                "candidateQueries": 34,
+                "fullQueries": 585,
+                "baselineRequests": 32,
+                "candidateRequests": 34,
+                "fullRequests": 585
+              },
+              "exactScoreDiagnostics": {
+                "rootEarlier": 8,
+                "chosenEarlier": 13,
+                "rootNodes": [
+                  5441,
+                  20024
+                ],
+                "chosenNodes": [
+                  5155,
+                  20017
+                ]
+              },
+              "gates": null
+            },
+            "80k": {
+              "games": 16,
+              "baselineError": {
+                "mean": 0.0009374999999999939,
+                "median": 0,
+                "p90": 0,
+                "maximum": 0.008999999999999897
+              },
+              "candidateError": {
+                "mean": 0.0005624999999999936,
+                "median": 0,
+                "p90": 0,
+                "maximum": 0.008999999999999897
+              },
+              "improvement": null,
+              "relativeReduction": 0.40000000000000296,
+              "baselineConfusion": {
+                "falseNearBest": 0,
+                "falseNotNearBest": 0,
+                "agreement": 16
+              },
+              "candidateConfusion": {
+                "falseNearBest": 0,
+                "falseNotNearBest": 0,
+                "agreement": 16
+              },
+              "baselineNegativeResiduals": 4,
+              "candidateNegativeResiduals": 1,
+              "chosenBelowMaximum": 2,
+              "chosenShortfall": {
+                "mean": 0.0005937499999999901,
+                "median": 0,
+                "p90": 0,
+                "maximum": 0.008999999999999897
+              },
+              "mateCases": 0,
+              "workload": {
+                "baselineQueries": 32,
+                "candidateQueries": 34,
+                "fullQueries": 585,
+                "baselineRequests": 33,
+                "candidateRequests": 35,
+                "fullRequests": 586
+              },
+              "exactScoreDiagnostics": {
+                "rootEarlier": 12,
+                "chosenEarlier": 10,
+                "rootNodes": [
+                  35332,
+                  80128
+                ],
+                "chosenNodes": [
+                  35658,
+                  80076
+                ]
+              },
+              "gates": null
+            }
+          }
+        }
+      ],
+      "passed": false
+    }
+  },
+  "records": [
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "Eu8bn37Y",
+      "split": "train",
+      "ply": 77,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "e4c5",
+          "rootSelectedNodes": 20005,
+          "chosenSelectedNodes": 20002,
+          "rootFinalNodes": 20005,
+          "chosenFinalNodes": 20002,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": true,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 29,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 29
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "e4c5",
+          "rootSelectedNodes": 80015,
+          "chosenSelectedNodes": 80095,
+          "rootFinalNodes": 80015,
+          "chosenFinalNodes": 80095,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": true,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 29,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 29
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "ZfvqWppS",
+      "split": "train",
+      "ply": 62,
+      "budgets": {
+        "20k": {
+          "baseline": 0.007499999999999951,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0.007499999999999951,
+          "candidateError": 0,
+          "baselineResidual": 0.007499999999999951,
+          "candidateResidual": -0.22000000000000003,
+          "chosenShortfall": 0.22000000000000003,
+          "rootBestmove": "g8f8",
+          "rootSelectedNodes": 12169,
+          "chosenSelectedNodes": 17815,
+          "rootFinalNodes": 20012,
+          "chosenFinalNodes": 20002,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 28,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 28
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": -0.08599999999999997,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "b6d4",
+          "rootSelectedNodes": 80076,
+          "chosenSelectedNodes": 59023,
+          "rootFinalNodes": 80076,
+          "chosenFinalNodes": 80090,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 28,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 28
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "0zl0bbTT",
+      "split": "train",
+      "ply": 25,
+      "budgets": {
+        "20k": {
+          "baseline": 0.13349999999999995,
+          "candidate": 0.06299999999999994,
+          "reference": 0.12849999999999995,
+          "baselineError": 0.0050000000000000044,
+          "candidateError": 0.0655,
+          "baselineResidual": 0.13349999999999995,
+          "candidateResidual": 0.06299999999999994,
+          "chosenShortfall": 0.0655,
+          "rootBestmove": "c3e2",
+          "rootSelectedNodes": 11151,
+          "chosenSelectedNodes": 10153,
+          "rootFinalNodes": 20023,
+          "chosenFinalNodes": 20025,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 49,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 49
+          }
+        },
+        "80k": {
+          "baseline": 0.21750000000000003,
+          "candidate": 0.22750000000000004,
+          "reference": 0.24350000000000005,
+          "baselineError": 0.026000000000000023,
+          "candidateError": 0.016000000000000014,
+          "baselineResidual": 0.21750000000000003,
+          "candidateResidual": 0.22750000000000004,
+          "chosenShortfall": 0.016000000000000014,
+          "rootBestmove": "a2a4",
+          "rootSelectedNodes": 57184,
+          "chosenSelectedNodes": 80100,
+          "rootFinalNodes": 80024,
+          "chosenFinalNodes": 80100,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 49,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 49
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "Kl48aHnp",
+      "split": "train",
+      "ply": 78,
+      "budgets": {
+        "20k": {
+          "baseline": 0.44699999999999995,
+          "candidate": 0.4475,
+          "reference": 0.4475,
+          "baselineError": 0.000500000000000056,
+          "candidateError": 0,
+          "baselineResidual": 0.44699999999999995,
+          "candidateResidual": 0.4475,
+          "chosenShortfall": 0,
+          "rootBestmove": "e6g4",
+          "rootSelectedNodes": 14978,
+          "chosenSelectedNodes": 7991,
+          "rootFinalNodes": 20008,
+          "chosenFinalNodes": 20006,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 22,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 22
+          }
+        },
+        "80k": {
+          "baseline": 0.33299999999999996,
+          "candidate": 0.3325,
+          "reference": 0.3325,
+          "baselineError": 0.0004999999999999449,
+          "candidateError": 0,
+          "baselineResidual": 0.33299999999999996,
+          "candidateResidual": 0.3325,
+          "chosenShortfall": 0,
+          "rootBestmove": "e6g4",
+          "rootSelectedNodes": 80093,
+          "chosenSelectedNodes": 80078,
+          "rootFinalNodes": 80093,
+          "chosenFinalNodes": 80078,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": true,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 22,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 22
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "iYNg6Gap",
+      "split": "train",
+      "ply": 23,
+      "budgets": {
+        "20k": {
+          "baseline": 0.16099999999999998,
+          "candidate": 0.05950000000000005,
+          "reference": 0.05950000000000005,
+          "baselineError": 0.10149999999999992,
+          "candidateError": 0,
+          "baselineResidual": 0.16099999999999998,
+          "candidateResidual": 0.05950000000000005,
+          "chosenShortfall": 0,
+          "rootBestmove": "e4e5",
+          "rootSelectedNodes": 8540,
+          "chosenSelectedNodes": 6002,
+          "rootFinalNodes": 20019,
+          "chosenFinalNodes": 20020,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 36,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 36
+          }
+        },
+        "80k": {
+          "baseline": 0.06550000000000006,
+          "candidate": 0.05550000000000005,
+          "reference": 0.061,
+          "baselineError": 0.0045000000000000595,
+          "candidateError": 0.005499999999999949,
+          "baselineResidual": 0.06550000000000006,
+          "candidateResidual": 0.05550000000000005,
+          "chosenShortfall": 0.005499999999999949,
+          "rootBestmove": "e4e5",
+          "rootSelectedNodes": 71638,
+          "chosenSelectedNodes": 62186,
+          "rootFinalNodes": 80034,
+          "chosenFinalNodes": 80030,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 36,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 36
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "jXCnNv0P",
+      "split": "train",
+      "ply": 24,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": -0.058499999999999996,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "b7a6",
+          "rootSelectedNodes": 8239,
+          "chosenSelectedNodes": 20031,
+          "rootFinalNodes": 20038,
+          "chosenFinalNodes": 20031,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 28,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 28
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": -0.006000000000000005,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "b7a6",
+          "rootSelectedNodes": 49126,
+          "chosenSelectedNodes": 80058,
+          "rootFinalNodes": 80032,
+          "chosenFinalNodes": 80058,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 28,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 28
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "uvLQ5p88",
+      "split": "train",
+      "ply": 23,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": -0.024499999999999966,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "b5e2",
+          "rootSelectedNodes": 20008,
+          "chosenSelectedNodes": 20005,
+          "rootFinalNodes": 20008,
+          "chosenFinalNodes": 20005,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 43,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 43
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": -0.018000000000000016,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "b5e2",
+          "rootSelectedNodes": 48885,
+          "chosenSelectedNodes": 80102,
+          "rootFinalNodes": 80045,
+          "chosenFinalNodes": 80102,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 43,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 43
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "6TgXaEee",
+      "split": "train",
+      "ply": 51,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "c3d5",
+          "rootSelectedNodes": 20010,
+          "chosenSelectedNodes": 20005,
+          "rootFinalNodes": 20010,
+          "chosenFinalNodes": 20005,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": true,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 37,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 37
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "c3d5",
+          "rootSelectedNodes": 80047,
+          "chosenSelectedNodes": 80008,
+          "rootFinalNodes": 80047,
+          "chosenFinalNodes": 80008,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": true,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 37,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 37
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "JX2uKUtQ",
+      "split": "train",
+      "ply": 45,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "h4f3",
+          "rootSelectedNodes": 20027,
+          "chosenSelectedNodes": 20021,
+          "rootFinalNodes": 20027,
+          "chosenFinalNodes": 20021,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 39,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 39
+          }
+        },
+        "80k": {
+          "baseline": 0.0005,
+          "candidate": 0.0005,
+          "reference": 0.0005,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.0005,
+          "candidateResidual": 0.0005,
+          "chosenShortfall": 0,
+          "rootBestmove": "h4f3",
+          "rootSelectedNodes": 80053,
+          "chosenSelectedNodes": 80014,
+          "rootFinalNodes": 80053,
+          "chosenFinalNodes": 80014,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 39,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 39
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "2du0qQzP",
+      "split": "train",
+      "ply": 40,
+      "budgets": {
+        "20k": {
+          "baseline": 0.401,
+          "candidate": 0.2265,
+          "reference": 0.4565,
+          "baselineError": 0.055499999999999994,
+          "candidateError": 0.23,
+          "baselineResidual": 0.401,
+          "candidateResidual": 0.2265,
+          "chosenShortfall": 0.23,
+          "rootBestmove": "e7b4",
+          "rootSelectedNodes": 9290,
+          "chosenSelectedNodes": 16505,
+          "rootFinalNodes": 20019,
+          "chosenFinalNodes": 20025,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 31,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 31
+          }
+        },
+        "80k": {
+          "baseline": 0.268,
+          "candidate": 0.094,
+          "reference": 0.3175,
+          "baselineError": 0.04949999999999999,
+          "candidateError": 0.2235,
+          "baselineResidual": 0.268,
+          "candidateResidual": 0.094,
+          "chosenShortfall": 0.2235,
+          "rootBestmove": "e7b4",
+          "rootSelectedNodes": 62169,
+          "chosenSelectedNodes": 80033,
+          "rootFinalNodes": 80070,
+          "chosenFinalNodes": 80033,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 31,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 31
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "vNG1Qj8X",
+      "split": "train",
+      "ply": 24,
+      "budgets": {
+        "20k": {
+          "baseline": 0.01100000000000001,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0.01100000000000001,
+          "candidateError": 0,
+          "baselineResidual": 0.01100000000000001,
+          "candidateResidual": -0.013499999999999956,
+          "chosenShortfall": 0.013499999999999956,
+          "rootBestmove": "g6d3",
+          "rootSelectedNodes": 15070,
+          "chosenSelectedNodes": 20028,
+          "rootFinalNodes": 20024,
+          "chosenFinalNodes": 20028,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 46,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 46
+          }
+        },
+        "80k": {
+          "baseline": 0.029000000000000026,
+          "candidate": 0.029000000000000026,
+          "reference": 0.029000000000000026,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.029000000000000026,
+          "candidateResidual": 0.029000000000000026,
+          "chosenShortfall": 0,
+          "rootBestmove": "f6e4",
+          "rootSelectedNodes": 34655,
+          "chosenSelectedNodes": 34655,
+          "rootFinalNodes": 80084,
+          "chosenFinalNodes": 80084,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 46,
+            "baselineRequests": 3,
+            "candidateRequests": 4,
+            "fullRequests": 47
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "OoUlLqTP",
+      "split": "train",
+      "ply": 133,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "e6d7",
+          "rootSelectedNodes": 20012,
+          "chosenSelectedNodes": 20012,
+          "rootFinalNodes": 20012,
+          "chosenFinalNodes": 20012,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 5,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 5
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "e6f5",
+          "rootSelectedNodes": 80068,
+          "chosenSelectedNodes": 80001,
+          "rootFinalNodes": 80068,
+          "chosenFinalNodes": 80001,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": true,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 5,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 5
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "10qNq4FB",
+      "split": "train",
+      "ply": 28,
+      "budgets": {
+        "20k": {
+          "baseline": 1,
+          "candidate": 1,
+          "reference": 1,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 1,
+          "candidateResidual": 1,
+          "chosenShortfall": 0,
+          "rootBestmove": "a8a6",
+          "rootSelectedNodes": 20014,
+          "chosenSelectedNodes": 20013,
+          "rootFinalNodes": 20014,
+          "chosenFinalNodes": 20013,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 46,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 46
+          }
+        },
+        "80k": {
+          "baseline": 1,
+          "candidate": 1,
+          "reference": 1,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 1,
+          "candidateResidual": 1,
+          "chosenShortfall": 0,
+          "rootBestmove": "a8a6",
+          "rootSelectedNodes": 80062,
+          "chosenSelectedNodes": 80006,
+          "rootFinalNodes": 80062,
+          "chosenFinalNodes": 80006,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 46,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 46
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "yy6SO8bw",
+      "split": "train",
+      "ply": 10,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": -0.038000000000000034,
+          "candidateResidual": -0.038000000000000034,
+          "chosenShortfall": 0.038000000000000034,
+          "rootBestmove": "h7h6",
+          "rootSelectedNodes": 10527,
+          "chosenSelectedNodes": 10527,
+          "rootFinalNodes": 20004,
+          "chosenFinalNodes": 20004,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 35,
+            "baselineRequests": 3,
+            "candidateRequests": 4,
+            "fullRequests": 36
+          }
+        },
+        "80k": {
+          "baseline": 0.0014999999999999458,
+          "candidate": 0.006000000000000005,
+          "reference": 0.006000000000000005,
+          "baselineError": 0.0045000000000000595,
+          "candidateError": 0,
+          "baselineResidual": 0.0014999999999999458,
+          "candidateResidual": 0.006000000000000005,
+          "chosenShortfall": 0,
+          "rootBestmove": "a7a5",
+          "rootSelectedNodes": 80058,
+          "chosenSelectedNodes": 80087,
+          "rootFinalNodes": 80058,
+          "chosenFinalNodes": 80087,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 35,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 35
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "rzaKOxth",
+      "split": "train",
+      "ply": 6,
+      "budgets": {
+        "20k": {
+          "baseline": 0.011499999999999955,
+          "candidate": 0.012499999999999956,
+          "reference": 0.012499999999999956,
+          "baselineError": 0.0010000000000000009,
+          "candidateError": 0,
+          "baselineResidual": 0.011499999999999955,
+          "candidateResidual": 0.012499999999999956,
+          "chosenShortfall": 0,
+          "rootBestmove": "f8b4",
+          "rootSelectedNodes": 20029,
+          "chosenSelectedNodes": 20045,
+          "rootFinalNodes": 20029,
+          "chosenFinalNodes": 20045,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 35,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 35
+          }
+        },
+        "80k": {
+          "baseline": 0.035499999999999976,
+          "candidate": 0.03799999999999998,
+          "reference": 0.03799999999999998,
+          "baselineError": 0.0025000000000000022,
+          "candidateError": 0,
+          "baselineResidual": 0.035499999999999976,
+          "candidateResidual": 0.03799999999999998,
+          "chosenShortfall": 0,
+          "rootBestmove": "f8b4",
+          "rootSelectedNodes": 35633,
+          "chosenSelectedNodes": 51235,
+          "rootFinalNodes": 80076,
+          "chosenFinalNodes": 80070,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 35,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 35
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "T9nF5L6h",
+      "split": "train",
+      "ply": 78,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "d3c3",
+          "rootSelectedNodes": 20004,
+          "chosenSelectedNodes": 20009,
+          "rootFinalNodes": 20004,
+          "chosenFinalNodes": 20009,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 52,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 52
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "d8d7",
+          "rootSelectedNodes": 80022,
+          "chosenSelectedNodes": 80012,
+          "rootFinalNodes": 80022,
+          "chosenFinalNodes": 80012,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 52,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 52
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "3PP2yp6b",
+      "split": "train",
+      "ply": 35,
+      "budgets": {
+        "20k": {
+          "baseline": 0.4245,
+          "candidate": 0.41200000000000003,
+          "reference": 0.41200000000000003,
+          "baselineError": 0.012499999999999956,
+          "candidateError": 0,
+          "baselineResidual": 0.4245,
+          "candidateResidual": 0.41200000000000003,
+          "chosenShortfall": 0,
+          "rootBestmove": "e3d2",
+          "rootSelectedNodes": 9180,
+          "chosenSelectedNodes": 11929,
+          "rootFinalNodes": 20004,
+          "chosenFinalNodes": 20044,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 34,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 34
+          }
+        },
+        "80k": {
+          "baseline": 0.46499999999999997,
+          "candidate": 0.475,
+          "reference": 0.475,
+          "baselineError": 0.010000000000000009,
+          "candidateError": 0,
+          "baselineResidual": 0.46499999999999997,
+          "candidateResidual": 0.475,
+          "chosenShortfall": 0,
+          "rootBestmove": "e3d2",
+          "rootSelectedNodes": 52727,
+          "chosenSelectedNodes": 63586,
+          "rootFinalNodes": 80013,
+          "chosenFinalNodes": 80015,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 34,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 34
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "8SL4SzQo",
+      "split": "train",
+      "ply": 67,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "g3f4",
+          "rootSelectedNodes": 20001,
+          "chosenSelectedNodes": 20005,
+          "rootFinalNodes": 20001,
+          "chosenFinalNodes": 20005,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": true,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 29,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 29
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "g3f4",
+          "rootSelectedNodes": 80086,
+          "chosenSelectedNodes": 25394,
+          "rootFinalNodes": 80086,
+          "chosenFinalNodes": 80131,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": true,
+          "matePresent": true,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 29,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 29
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "ASiKmgPG",
+      "split": "train",
+      "ply": 37,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "d5f6",
+          "rootSelectedNodes": 20005,
+          "chosenSelectedNodes": 20044,
+          "rootFinalNodes": 20005,
+          "chosenFinalNodes": 20044,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 46,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 46
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "d5f6",
+          "rootSelectedNodes": 80033,
+          "chosenSelectedNodes": 80045,
+          "rootFinalNodes": 80033,
+          "chosenFinalNodes": 80045,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 46,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 46
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "vQ7X3vji",
+      "split": "train",
+      "ply": 32,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "f8c5",
+          "rootSelectedNodes": 5135,
+          "chosenSelectedNodes": 20012,
+          "rootFinalNodes": 20014,
+          "chosenFinalNodes": 20012,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 32,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 32
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "f8c5",
+          "rootSelectedNodes": 80029,
+          "chosenSelectedNodes": 80034,
+          "rootFinalNodes": 80029,
+          "chosenFinalNodes": 80034,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 32,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 32
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "F3TvuWZX",
+      "split": "train",
+      "ply": 37,
+      "budgets": {
+        "20k": {
+          "baseline": 0.498,
+          "candidate": 0.016000000000000014,
+          "reference": 0.4645,
+          "baselineError": 0.033499999999999974,
+          "candidateError": 0.4485,
+          "baselineResidual": 0.498,
+          "candidateResidual": 0.016000000000000014,
+          "chosenShortfall": 0.4485,
+          "rootBestmove": "a1f1",
+          "rootSelectedNodes": 13164,
+          "chosenSelectedNodes": 20015,
+          "rootFinalNodes": 20016,
+          "chosenFinalNodes": 20015,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": false,
+          "matePresent": true,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 43,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 43
+          }
+        },
+        "80k": {
+          "baseline": 0.503,
+          "candidate": 0.503,
+          "reference": 0.503,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.503,
+          "candidateResidual": 0.503,
+          "chosenShortfall": 0,
+          "rootBestmove": "d2c3",
+          "rootSelectedNodes": 80016,
+          "chosenSelectedNodes": 80016,
+          "rootFinalNodes": 80016,
+          "chosenFinalNodes": 80016,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": true,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 43,
+            "baselineRequests": 3,
+            "candidateRequests": 4,
+            "fullRequests": 44
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "SULZ4EqV",
+      "split": "train",
+      "ply": 30,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": -0.025500000000000002,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "h4g3",
+          "rootSelectedNodes": 20007,
+          "chosenSelectedNodes": 15765,
+          "rootFinalNodes": 20007,
+          "chosenFinalNodes": 20002,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 33,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 33
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.009499999999999998,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "h4g3",
+          "rootSelectedNodes": 80102,
+          "chosenSelectedNodes": 80049,
+          "rootFinalNodes": 80102,
+          "chosenFinalNodes": 80049,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 33,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 33
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "7GTeXKQp",
+      "split": "train",
+      "ply": 18,
+      "budgets": {
+        "20k": {
+          "baseline": 0.11050000000000001,
+          "candidate": 0.11200000000000002,
+          "reference": 0.11200000000000002,
+          "baselineError": 0.0015000000000000013,
+          "candidateError": 0,
+          "baselineResidual": 0.11050000000000001,
+          "candidateResidual": 0.11200000000000002,
+          "chosenShortfall": 0,
+          "rootBestmove": "g4f5",
+          "rootSelectedNodes": 12058,
+          "chosenSelectedNodes": 20028,
+          "rootFinalNodes": 20019,
+          "chosenFinalNodes": 20028,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 30,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 30
+          }
+        },
+        "80k": {
+          "baseline": 0.035,
+          "candidate": 0.0695,
+          "reference": 0.0695,
+          "baselineError": 0.0345,
+          "candidateError": 0,
+          "baselineResidual": 0.035,
+          "candidateResidual": 0.0695,
+          "chosenShortfall": 0,
+          "rootBestmove": "g4f5",
+          "rootSelectedNodes": 80042,
+          "chosenSelectedNodes": 80007,
+          "rootFinalNodes": 80042,
+          "chosenFinalNodes": 80007,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 30,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 30
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E012",
+      "gameId": "vWqMbXTw",
+      "split": "train",
+      "ply": 26,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.0004999999999999449,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "d5e3",
+          "rootSelectedNodes": 20006,
+          "chosenSelectedNodes": 20018,
+          "rootFinalNodes": 20006,
+          "chosenFinalNodes": 20018,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 38,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 38
+          }
+        },
+        "80k": {
+          "baseline": 0.0004999999999999449,
+          "candidate": 0.0004999999999999449,
+          "reference": 0.0004999999999999449,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.0004999999999999449,
+          "candidateResidual": 0.0004999999999999449,
+          "chosenShortfall": 0,
+          "rootBestmove": "d7e5",
+          "rootSelectedNodes": 80049,
+          "chosenSelectedNodes": 80059,
+          "rootFinalNodes": 80049,
+          "chosenFinalNodes": 80059,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 38,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 38
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E013",
+      "gameId": "tDHDRWhr",
+      "split": "train",
+      "ply": 57,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.10099999999999998,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "c6e7",
+          "rootSelectedNodes": 8609,
+          "chosenSelectedNodes": 6567,
+          "rootFinalNodes": 20021,
+          "chosenFinalNodes": 20025,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 46,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 46
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.15949999999999998,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "c6e7",
+          "rootSelectedNodes": 48683,
+          "chosenSelectedNodes": 64559,
+          "rootFinalNodes": 80069,
+          "chosenFinalNodes": 80062,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 46,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 46
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E013",
+      "gameId": "lknGjF3x",
+      "split": "train",
+      "ply": 26,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0.0020000000000000018,
+          "baselineError": 0.0020000000000000018,
+          "candidateError": 0.0020000000000000018,
+          "baselineResidual": -0.0044999999999999485,
+          "candidateResidual": -0.03649999999999998,
+          "chosenShortfall": 0.03849999999999998,
+          "rootBestmove": "b4d5",
+          "rootSelectedNodes": 20006,
+          "chosenSelectedNodes": 16096,
+          "rootFinalNodes": 20006,
+          "chosenFinalNodes": 20017,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 37,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 37
+          }
+        },
+        "80k": {
+          "baseline": 0.03600000000000003,
+          "candidate": 0.030000000000000027,
+          "reference": 0.030000000000000027,
+          "baselineError": 0.006000000000000005,
+          "candidateError": 0,
+          "baselineResidual": 0.03600000000000003,
+          "candidateResidual": 0.030000000000000027,
+          "chosenShortfall": 0,
+          "rootBestmove": "b4d5",
+          "rootSelectedNodes": 37912,
+          "chosenSelectedNodes": 66556,
+          "rootFinalNodes": 80059,
+          "chosenFinalNodes": 80074,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 37,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 37
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E013",
+      "gameId": "dHGW74a6",
+      "split": "train",
+      "ply": 76,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.0009999999999999454,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "g6h5",
+          "rootSelectedNodes": 20024,
+          "chosenSelectedNodes": 20001,
+          "rootFinalNodes": 20024,
+          "chosenFinalNodes": 20001,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 25,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 25
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.0005000000000000004,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "g6h5",
+          "rootSelectedNodes": 80081,
+          "chosenSelectedNodes": 80015,
+          "rootFinalNodes": 80081,
+          "chosenFinalNodes": 80015,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 25,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 25
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E013",
+      "gameId": "EPRCFdzQ",
+      "split": "train",
+      "ply": 39,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.01649999999999996,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "e3g5",
+          "rootSelectedNodes": 6260,
+          "chosenSelectedNodes": 20017,
+          "rootFinalNodes": 20025,
+          "chosenFinalNodes": 20017,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 38,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 38
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0.008999999999999897,
+          "baselineError": 0.008999999999999897,
+          "candidateError": 0.008999999999999897,
+          "baselineResidual": 0,
+          "candidateResidual": 0,
+          "chosenShortfall": 0.008999999999999897,
+          "rootBestmove": "e3g5",
+          "rootSelectedNodes": 63777,
+          "chosenSelectedNodes": 80055,
+          "rootFinalNodes": 80119,
+          "chosenFinalNodes": 80055,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 38,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 38
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E013",
+      "gameId": "Q04dFLKQ",
+      "split": "train",
+      "ply": 82,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.09299999999999997,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "c6b5",
+          "rootSelectedNodes": 14594,
+          "chosenSelectedNodes": 18599,
+          "rootFinalNodes": 20019,
+          "chosenFinalNodes": 20006,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 7,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 7
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": -0.03300000000000003,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "c6b5",
+          "rootSelectedNodes": 63493,
+          "chosenSelectedNodes": 40102,
+          "rootFinalNodes": 80054,
+          "chosenFinalNodes": 80040,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 7,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 7
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E013",
+      "gameId": "UoAme6Vk",
+      "split": "train",
+      "ply": 1,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": -0.019500000000000073,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "e2e4",
+          "rootSelectedNodes": 20015,
+          "chosenSelectedNodes": 10846,
+          "rootFinalNodes": 20015,
+          "chosenFinalNodes": 20030,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 21,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 21
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.010499999999999954,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "e2e4",
+          "rootSelectedNodes": 47416,
+          "chosenSelectedNodes": 70686,
+          "rootFinalNodes": 80085,
+          "chosenFinalNodes": 80095,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 21,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 21
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E013",
+      "gameId": "VznN5Hhe",
+      "split": "train",
+      "ply": 30,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": -0.0045000000000000595,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "e4f2",
+          "rootSelectedNodes": 18235,
+          "chosenSelectedNodes": 10619,
+          "rootFinalNodes": 20040,
+          "chosenFinalNodes": 20013,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 56,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 56
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": -0.0045000000000000595,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "e4f2",
+          "rootSelectedNodes": 41739,
+          "chosenSelectedNodes": 37851,
+          "rootFinalNodes": 80063,
+          "chosenFinalNodes": 80050,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 56,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 56
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E013",
+      "gameId": "NZta6CCP",
+      "split": "train",
+      "ply": 19,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0.006000000000000005,
+          "baselineError": 0.006000000000000005,
+          "candidateError": 0.006000000000000005,
+          "baselineResidual": 0.007499999999999951,
+          "candidateResidual": 0,
+          "chosenShortfall": 0.006000000000000005,
+          "rootBestmove": "c2c3",
+          "rootSelectedNodes": 17189,
+          "chosenSelectedNodes": 11704,
+          "rootFinalNodes": 20005,
+          "chosenFinalNodes": 20010,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 40,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 40
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "c2c3",
+          "rootSelectedNodes": 80039,
+          "chosenSelectedNodes": 80039,
+          "rootFinalNodes": 80039,
+          "chosenFinalNodes": 80039,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 40,
+            "baselineRequests": 3,
+            "candidateRequests": 3,
+            "fullRequests": 41
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E013",
+      "gameId": "cSkOnjt9",
+      "split": "train",
+      "ply": 29,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.015499999999999958,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "e2e3",
+          "rootSelectedNodes": 20010,
+          "chosenSelectedNodes": 20001,
+          "rootFinalNodes": 20010,
+          "chosenFinalNodes": 20001,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 44,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 44
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.03300000000000003,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "e2e3",
+          "rootSelectedNodes": 49794,
+          "chosenSelectedNodes": 74620,
+          "rootFinalNodes": 80076,
+          "chosenFinalNodes": 80084,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 44,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 44
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E013",
+      "gameId": "ALcv5YpS",
+      "split": "train",
+      "ply": 43,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "c2f2",
+          "rootSelectedNodes": 20011,
+          "chosenSelectedNodes": 14825,
+          "rootFinalNodes": 20011,
+          "chosenFinalNodes": 20010,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 42,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 42
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": -0.006000000000000005,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "c2f2",
+          "rootSelectedNodes": 59376,
+          "chosenSelectedNodes": 52492,
+          "rootFinalNodes": 80004,
+          "chosenFinalNodes": 80032,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 42,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 42
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E013",
+      "gameId": "RgAkRyub",
+      "split": "train",
+      "ply": 25,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": -0.11850000000000005,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "f4e5",
+          "rootSelectedNodes": 8762,
+          "chosenSelectedNodes": 9367,
+          "rootFinalNodes": 20026,
+          "chosenFinalNodes": 20022,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 46,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 46
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.09150000000000003,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "f4e5",
+          "rootSelectedNodes": 80030,
+          "chosenSelectedNodes": 80040,
+          "rootFinalNodes": 80030,
+          "chosenFinalNodes": 80040,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 46,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 46
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E013",
+      "gameId": "0SLHTgW6",
+      "split": "train",
+      "ply": 40,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": -0.07650000000000001,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "d6h2",
+          "rootSelectedNodes": 20023,
+          "chosenSelectedNodes": 14578,
+          "rootFinalNodes": 20023,
+          "chosenFinalNodes": 20023,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 43,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 43
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.00649999999999995,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "d6h2",
+          "rootSelectedNodes": 66257,
+          "chosenSelectedNodes": 49404,
+          "rootFinalNodes": 80064,
+          "chosenFinalNodes": 80016,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 43,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 43
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E013",
+      "gameId": "LJJQuCHE",
+      "split": "train",
+      "ply": 58,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": -0.0010000000000000009,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "b4a3",
+          "rootSelectedNodes": 15160,
+          "chosenSelectedNodes": 15664,
+          "rootFinalNodes": 20003,
+          "chosenFinalNodes": 20001,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 34,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 34
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.028000000000000025,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "b4a3",
+          "rootSelectedNodes": 71932,
+          "chosenSelectedNodes": 44469,
+          "rootFinalNodes": 80018,
+          "chosenFinalNodes": 80066,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 34,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 34
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E013",
+      "gameId": "7CkGl9Zu",
+      "split": "train",
+      "ply": 109,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": -0.0004999999999999449,
+          "candidateResidual": -0.0004999999999999449,
+          "chosenShortfall": 0.0004999999999999449,
+          "rootBestmove": "d5d2",
+          "rootSelectedNodes": 20011,
+          "chosenSelectedNodes": 12477,
+          "rootFinalNodes": 20011,
+          "chosenFinalNodes": 20015,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 34,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 34
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": -0.0004999999999999449,
+          "candidateResidual": -0.0004999999999999449,
+          "chosenShortfall": 0.0004999999999999449,
+          "rootBestmove": "d5a5",
+          "rootSelectedNodes": 41092,
+          "chosenSelectedNodes": 35658,
+          "rootFinalNodes": 80066,
+          "chosenFinalNodes": 80096,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 3,
+            "fullQueries": 34,
+            "baselineRequests": 2,
+            "candidateRequests": 3,
+            "fullRequests": 34
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E013",
+      "gameId": "pCnAczkD",
+      "split": "train",
+      "ply": 30,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": -0.01550000000000007,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "f6d5",
+          "rootSelectedNodes": 20015,
+          "chosenSelectedNodes": 14680,
+          "rootFinalNodes": 20015,
+          "chosenFinalNodes": 20005,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 41,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 41
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.03700000000000003,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "f6d5",
+          "rootSelectedNodes": 35332,
+          "chosenSelectedNodes": 80076,
+          "rootFinalNodes": 80010,
+          "chosenFinalNodes": 80076,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 41,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 41
+          }
+        }
+      }
+    },
+    {
+      "engine": "SF18",
+      "panel": "E013",
+      "gameId": "jcbzyUdc",
+      "split": "train",
+      "ply": 21,
+      "budgets": {
+        "20k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0.050999999999999934,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "g5e6",
+          "rootSelectedNodes": 5441,
+          "chosenSelectedNodes": 5155,
+          "rootFinalNodes": 20007,
+          "chosenFinalNodes": 20006,
+          "rootEarlierExact": true,
+          "chosenEarlierExact": true,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 31,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 31
+          }
+        },
+        "80k": {
+          "baseline": 0,
+          "candidate": 0,
+          "reference": 0,
+          "baselineError": 0,
+          "candidateError": 0,
+          "baselineResidual": 0,
+          "candidateResidual": 0,
+          "chosenShortfall": 0,
+          "rootBestmove": "g5e6",
+          "rootSelectedNodes": 80128,
+          "chosenSelectedNodes": 80039,
+          "rootFinalNodes": 80128,
+          "chosenFinalNodes": 80039,
+          "rootEarlierExact": false,
+          "chosenEarlierExact": false,
+          "matePresent": false,
+          "workload": {
+            "baselineQueries": 2,
+            "candidateQueries": 2,
+            "fullQueries": 31,
+            "baselineRequests": 2,
+            "candidateRequests": 2,
+            "fullRequests": 31
+          }
+        }
+      }
+    }
+  ],
+  "passed": false,
+  "engineSearches": 0,
+  "modelFits": 0,
+  "humanLabelsUsed": 0,
+  "confirmation": false,
+  "promoted": false,
+  "interpretation": "Operational development agreement with complete finite-search restricted alternatives; no human quality/accuracy/rating validity"
+}

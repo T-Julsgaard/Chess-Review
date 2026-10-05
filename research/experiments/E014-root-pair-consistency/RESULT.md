@@ -1,4 +1,4 @@
-# E014: registered; cached consistency comparison not evaluated
+# E014: joint consistency screen fails; SF19 partial gain
 
 2026-10-05. [The plan](plan.md) freezes one restricted-chosen-move candidate,
 four separate engine/budget comparisons, practical/paired-interval gates and
@@ -26,3 +26,67 @@ unchanged. There is no mixed-dataset origin-check bypass or raw-data duplication
 The two guarded freezes are complete, source-bound to all 40/45 fixed games,
 with zero candidate assessments. Next register and commit their exact bytes
 with candidate code before the single cached comparison.
+
+## Single frozen assessment
+
+Plan `de22e91` and code/input freeze `4a89e30` precede the one candidate
+assessment. The evaluator is terminal, exit 0. All 85 games and both requested
+budgets are covered; no fitting, searches or human labels. Separate engine
+reports retain all per-game comparisons and unchanged cohort roles.
+
+**Joint operational gates fail.** SF19 meets both numerical improvement gates
+at both budgets, but its stability gate fails. SF18 misses the numerical gates
+at both budgets, plus both mean-drift and stable-fraction guardrails. Coverage,
+false-near-best and intended query-count guards pass in all four panels.
+
+| Engine / nodes | Mean baseline error | Mean candidate error | Paired gain | 98.75% paired interval | Relative reduction |
+| --- | ---: | ---: | ---: | --- | ---: |
+| SF18 / 20k | .0059375 | .0188000 | -.0128625 | [-.0487875, .0071375] | -216.63% |
+| SF18 / 80k | .0036750 | .0063500 | -.0026750 | [-.0164500, .0040500] | -72.79% |
+| SF19 / 20k | .0111222 | .0013444 | .0097778 | [.0000333, .0297778] | 87.91% |
+| SF19 / 80k | .0101222 | .0047556 | .0053667 | [.0008000, .0143000] | 53.02% |
+
+Errors are engine-WDL expected-point loss differences against each budget's
+complete restricted alternatives, not accuracy percentage points. Paired
+10,000-replicate intervals are conditional development estimates; engines have
+different cohort selection and are not a paired cross-engine comparison.
+
+SF18 candidate low/high loss drift <= .05 holds for 35/40 (87.5%, Wilson lower
+73.8879%); SF19 for 38/45 (84.4444%, lower 71.2161%). Both miss the >=90% / >=80%
+gate. Mean drift baseline/candidate is .0158875/.0275000 for SF18 (increase
+.0116125 exceeds .01), and .0161111/.0211222 for SF19 (increase .0050111 passes).
+
+SF18 near-best agreement baseline/candidate is 40/39 at 20k and 40/40 at 80k;
+SF19 is 43/44 and 40/43. Candidate false near-best counts are 1/0 for SF18 and
+1/2 for SF19, versus baseline 0/0 and 1/4. The chosen restricted move still
+falls below the all-legal maximum in SF18 9/5 cases and SF19 7/6 cases.
+
+Intended candidate/baseline query counts total 97/80 and 99/80 for SF18, 117/90
+and 115/90 for SF19 (about 21–30% additional queries in these fixed samples).
+Including observed recovery requests gives 98/81, 102/83, 119/92 and 118/93.
+These are counterfactual counts from retained searches, not measured deployed
+latency. No actual new searches occurred. Earlier exact-score diagnostics and
+finite-search misses are retained, rather than silently replaced.
+
+## Interpretation and resume
+
+Do not adopt this as a universal root-pair repair. Preserve the narrower SF19
+consistency gain and its failed stability guard together. SF18's failure and
+both exposed development samples rule out a general grading claim. A later
+method needs a changed premise, broader fresh positions and actual cost/target
+validation, rather than cherry-picking the successful engine or subgroup.
+
+Source inspection also clarifies the motivation: E012/E013's raw root-pair
+diagnostic lacks the `top` zero-loss exception used by published move scoring.
+E014's baseline includes that exception. Thus the earlier diagnostic mismatch
+does not establish an error in published grading; even this WDL comparison is
+distinct from the published CP/human-outcome curves.
+
+Exact/independent verification and external clean replay are pending. Next
+register/commit the two complete reports before verification. B000 scoring and
+both blinded review packs remain unchanged; human reviews are pending.
+
+```sh
+node --test research/experiments/E014-root-pair-consistency/code/study.test.mjs
+node research/experiments/E014-root-pair-consistency/code/run.mjs verify --out research/runs/E014/replay
+```

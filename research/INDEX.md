@@ -38,7 +38,7 @@ records. Update a row and the active experiment's resume state when work stops.
 | E013 | [Net-offer review pack](experiments/E013-net-offer-pack/RESULT.md) | complete | Verified7/8 support, 15/16 stability;8 independent net-offer witnesses; separate blinded pack | Later human review; cached root-pair consistency study |
 | F011 | [Net-offer enrichment](findings/F011-net-offer-enrichment.md) | recorded | Improved operational targeting; deterministic/independent/clean replay; no human category claim | Preserve both packs; investigate root-score consistency |
 
-| E014 | [Root-pair consistency](experiments/E014-root-pair-consistency/RESULT.md) | planned | One restricted-chosen-move candidate; frozen 40/45 development panels | Commit guarded freeze/code before cached assessment |
+| E014 | [Root-pair consistency](experiments/E014-root-pair-consistency/RESULT.md) | running | Joint failure: SF19 numerical gains, SF18 worse means; both stability gates fail | Register/commit reports; independent and clean verification |
 
 No promotion records yet.
 Allocate the next unused ID in each series: `E015`, `D003`, `F012`, `P001`.

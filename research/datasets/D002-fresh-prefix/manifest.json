@@ -432,6 +432,25 @@
       "sha256": "da63d32d4797136d707d2aeceb1e655661400f0f81cdcbe50147f0195040b487",
       "bytes": 18210,
       "uncompressedSha256": "da63d32d4797136d707d2aeceb1e655661400f0f81cdcbe50147f0195040b487"
+    },
+    "research/experiments/E014-root-pair-consistency/evidence/results-SF19.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E014-root-pair-consistency/evidence/freeze-SF19.json"
+      ],
+      "bytes": 95721,
+      "sha256": "ef3c103245cadeb0ec0f1f602e5583d46a93c4cddb792c85d8ec65f4bebb9bbe",
+      "uncompressedSha256": "ef3c103245cadeb0ec0f1f602e5583d46a93c4cddb792c85d8ec65f4bebb9bbe"
+    },
+    "research/experiments/E014-root-pair-consistency/evidence/run-SF19.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E014-root-pair-consistency/evidence/results-SF19.json",
+        "research/experiments/E014-root-pair-consistency/evidence/freeze-SF19.json"
+      ],
+      "bytes": 18944,
+      "sha256": "ec6daa8ea87f76a831f9d44af1155720f8936959e5dcbad28e98c246a4981d5f",
+      "uncompressedSha256": "ec6daa8ea87f76a831f9d44af1155720f8936959e5dcbad28e98c246a4981d5f"
     }
   }
 }
