@@ -47,6 +47,13 @@ other one-off work in `scratch/`, which is ignored by Git. Commit the resulting
 fix and lasting regression tests; promote supporting material only when it needs
 to be maintained as part of the project.
 
+For maintained accuracy, rating and move-category research, use the separate
+[research workspace](research/README.md) and its [protocol](research/PROTOCOL.md).
+Keep experiment plans, code, reproducible evidence and all outcomes there;
+bulk runs belong in ignored `research/runs/`. Check the index before repeating
+an approach. A research candidate does not change the active methodology until
+a documented promotion is selected for implementation.
+
 Run these checks for code changes:
 
 ```sh

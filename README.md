@@ -73,6 +73,15 @@ Move categories follow documented classification rules. See the
 definitions and sources, and the [repository guide](docs/REPOSITORY.md) for the
 supporting files.
 
+## Research and future methods
+
+The separate [research workspace](research/README.md) investigates improvements
+to accuracy, estimated ratings and move categories against our own documented
+baseline. It records reproducible experiments, successful and unsuccessful
+findings, evidence limits and implementation decisions. Research candidates
+become part of the extension only through a documented promotion. See the
+[research index](research/INDEX.md) for current state and next questions.
+
 ## Install
 
 Install from the Chrome Web Store or Firefox Add-ons using the links above.

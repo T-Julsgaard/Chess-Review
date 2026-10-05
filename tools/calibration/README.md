@@ -26,6 +26,10 @@ definitions, source records and interpretation limits.
 | `category-benchmark.mjs` | Evaluates supplied independent human annotations, reporting disagreement and abstention. No validated benchmark dataset is bundled. |
 | [BRILLIANT_MOVES.md](BRILLIANT_MOVES.md) | Current special-annotation mechanics, sources and limitations. |
 
-Keep one-off investigations, audit reports and experimental scripts in ignored
-`scratch/`. Retain only tooling and evidence needed by the active model or a
-maintained calibration tool.
+Keep one-off investigations and audit reports in ignored `scratch/`. Maintained
+research for future accuracy, rating and move-category methods belongs in the
+separate [research workspace](../../research/README.md), including unsuccessful
+experiments. Keep experimental scripts and candidates there, with bulk runs in
+ignored `research/runs/`. This directory retains only tooling and evidence needed
+by the active model or a maintained calibration tool; promotion updates its
+methodology and reproduction inputs explicitly.

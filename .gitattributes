@@ -4,3 +4,8 @@ engine/*.wasm binary
 # Public evidence hashes must survive every platform's checkout settings.
 tools/calibration/public/*.json text eol=lf
 tools/calibration/public/*.gz binary
+# Retained structured research evidence is hashed after LF normalization.
+research/**/*.json text eol=lf
+research/**/*.jsonl text eol=lf
+research/**/*.csv text eol=lf
+research/**/*.tsv text eol=lf

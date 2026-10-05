@@ -1,7 +1,7 @@
 # Repository guide
 
-The checkout contains three useful kinds of files: the extension itself, tools
-that maintain or verify it, and information needed to explain and distribute it.
+The checkout contains the extension, tools that maintain or verify it,
+information needed to explain and distribute it, and a separate research workspace.
 Many small asset files are intentional; removing them can break optional settings.
 
 ## Extension files
@@ -34,6 +34,7 @@ Many small asset files are intentional; removing them can break optional setting
 | `scripts/` | Package builds, engine verification and optional browser smoke checks. `node scripts/generate-category-labels.mjs` rebuilds transparent PNG labels and SVG badge references with local Chrome and the bundled fonts. |
 | `tests/` | Regression tests for retained code, current artwork and the active scoring method. |
 | `tools/calibration/` | Current fitting code, eight frozen public evidence files, offline reproduction, the reusable engine harness and independent-label evaluator. See its [guide](../tools/calibration/README.md). |
+| [research/](../research/README.md) | Maintained experiments, dataset provenance, positive/negative findings and promotion decisions for future scoring methods. Separate from active calibration; excluded from extension ZIPs and current release source snapshots. Start with its compact [index](../research/INDEX.md). |
 | `.gitignore`, `.gitattributes` | Keep generated files out of Git and preserve required binary/line-ending behavior. Calibration evidence hashes depend on its exact bytes. |
 | `docs/` | Repository guide, included in source snapshots. |
 
@@ -43,7 +44,9 @@ Keep short-lived outputs in ignored directories. `npm ci` recreates
 `node_modules/`; `npm run build` writes packages and source snapshots to
 `web-ext-artifacts/`. Use `scratch/` for temporary reports, one-off diagnostic
 scripts, sample exports, and other investigation files; it is ignored by Git and
-excluded from release packages. Use `calibration-runs/` for calibration inputs and logs.
+excluded from release packages. Lasting scoring research belongs in `research/`,
+with bulk downloads, engine caches and intermediate outputs in ignored
+`research/runs/`. Use `calibration-runs/` for active calibration inputs and logs.
 The introduction video renders to `marketing/video/out/`, and its UI captures stay
 in `marketing/video/public/captures/`.
 Repository metadata lives in `.git/`.
