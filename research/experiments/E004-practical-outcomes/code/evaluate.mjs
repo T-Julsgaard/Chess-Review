@@ -29,7 +29,7 @@ export function observations(evidence,dataset){
   const counts=new Map();for(const row of rows)counts.set(row.gameId,(counts.get(row.gameId)||0)+1);
   return{rows:rows.map(r=>({...r,weight:1/counts.get(r.gameId)})),counts:{games:counts.size,positions:rows.length,selectedBeforeMate,mateExcluded:mates}};
 }
-function mapsFor(games){
+export function mapsFor(games){
   const maps={outer:new Map(),inner:new Map()};
   for(const component of playerComponents(games))for(const id of component){
     maps.outer.set(id,parseInt(hash('E004-outer-v1:'+component[0]).slice(0,8),16)%5);
