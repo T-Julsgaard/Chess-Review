@@ -1,6 +1,6 @@
 # Research index
 
-Updated: 2026-10-05. Evidence audit complete; numerical rating study registered.
+Updated: 2026-10-05. Evidence audit and first numerical rating study complete.
 Baseline: [B000](BASELINE.md). No new improvement has been established.
 
 This is the routing and decision index. Detailed evidence lives in linked
@@ -14,10 +14,11 @@ records. Update a row and the active experiment's resume state when work stops.
 | D001 | [Public baseline evidence](datasets/D001-public-baseline/README.md) | registered | Training/development evidence; at least fifty consumed test games | Append reuse before each evaluation |
 | E001 | [Evidence and exposure audit](experiments/E001-evidence-audit/RESULT.md) | complete | Integrity gates pass; no model evaluated | Numerical development study |
 | F001 | [Evidence and exposure finding](findings/F001-evidence-and-exposure.md) | recorded | Development use supported; confirmation requires fresh evidence | Preserve exposure history |
-| E002 | [Nonlinear rating features](experiments/E002-nonlinear-rating/plan.md) | planned | No candidate metrics inspected | Nested development comparison on D001 train |
+| E002 | [Nonlinear rating features](experiments/E002-nonlinear-rating/RESULT.md) | complete | Small development gains; practical gate fails for both engines | Stop this family; investigate richer evidence/uncertainty |
+| F002 | [Nonlinear rating finding](findings/F002-small-nonlinear-rating.md) | recorded | No promotion; numerical replay matches | Retry only with a new hypothesis |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E003`, `D002`, `F002`, `P001`.
+Allocate the next unused ID in each series: `E003`, `D002`, `F003`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
@@ -45,7 +46,7 @@ stability, latency, unavailable evidence and fallback behavior.
 
 ## Next session
 
-Run E002 using D001 train rows and the [measurement contract](MEASUREMENT.md).
-Replay archived SF19 study results separately; collect fresh confirmation data
-after selecting a candidate.
+Replay archived SF19 accuracy study results, then test uncertainty or richer
+opportunity-aware alternatives with a new registered plan. Collect fresh
+confirmation data after selecting a candidate; category human evidence is absent.
 The research goal is active. The extension remains at B000.

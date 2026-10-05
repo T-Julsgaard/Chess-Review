@@ -1,0 +1,57 @@
+{
+  "schema": "research-run-v1",
+  "id": "E002-full",
+  "date": "2026-10-05",
+  "sourceRevision": "db2f4f748a9a8080e2b84bc96ad802564d4064c3",
+  "codeSha256": "d3a15924f8489209fd59cfebc0f363ea68513a4f158de56584f04b41f5f03e37",
+  "command": "node research/experiments/E002-nonlinear-rating/code/evaluate.mjs",
+  "environment": {
+    "node": "v24.14.1",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "evaluationRole": "nested development CV on retained training rows",
+  "inputHashes": {
+    "dataset.json.gz": {
+      "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+      "bytes": 463748,
+      "uncompressedSha256": "54b589844813490a1ebd15251e6142e2a361d6fac53d6dfe38414ded1cdf5708"
+    },
+    "sf18-rating-evidence.json.gz": {
+      "sha256": "f41178347bc9569390b744f9e6fb2206882cf2307c762de8b8f8aab35c2a1e31",
+      "bytes": 1320424,
+      "uncompressedSha256": "c4f3b5caeb78511d34ce4c9031b53ab6e00338871bad5119d488bfc0e8f365f7"
+    },
+    "sf19-rating-evidence.json.gz": {
+      "sha256": "8ac253f86fa87a945c06e86f2b7c82d4f2b7e8c96ae9b990a6efadbac9f7d721",
+      "bytes": 683399,
+      "uncompressedSha256": "cea288e5a8eeb7f2f5202b7d8fd526b7a454d9b597eaf4ee61c1e0dcaf080ecc"
+    }
+  },
+  "outputs": {
+    "results.json": "9219f67a34e1c1f6ba8252f1b5a46958b8afd7dba13b90c24d660b2370f64f18",
+    "predictions.json.gz": "a78f5b9f69f1a4ea21a8e17cbedb373e6b56cc432f36b9d1dbdb75d2cbebc8ac"
+  },
+  "elapsedMs": 10965.811199999998,
+  "benchmarks": {
+    "sf18": {
+      "averageMs": 0.012782920000000014,
+      "iterations": 10000,
+      "warmup": 1000,
+      "passed": true,
+      "addedEngineSearches": 0
+    },
+    "sf19": {
+      "averageMs": 0.013845700000000034,
+      "iterations": 10000,
+      "warmup": 1000,
+      "passed": true,
+      "addedEngineSearches": 0
+    }
+  },
+  "guardrailPass": {
+    "sf18": false,
+    "sf19": false
+  },
+  "numericReplayByteIdentical": true
+}

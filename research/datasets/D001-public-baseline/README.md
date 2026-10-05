@@ -58,7 +58,7 @@ calibrated statistic. No new engine searches were performed for E001.
 | 2026-10-04 local SF19 full-curve study | 100 train / 25 validation / 25 test games | Test evaluated; archive protocol/report preserved by E001; gate failed. |
 | 2026-10-04 local SF19 choice-only study | Same train/development, different 25 test games | Test evaluated; gate failed. Both studies' outcome reports inspected during E001 registration. |
 | 2026-10-05 E001 | Full metadata/identity/hash audit; train-target binding; offline B000 replay | All files decoded. No new test prediction/target comparison. Fifty known consumed test IDs retained in audit.json. Remaining 250 have unverified historical exposure and are not certified fresh. |
-| 2026-10-05 E002 (registered) | Retained train rating sides, nested outer/inner folds | Development comparison only; no validation/test scoring. Append completion/exposure status after execution. |
+| 2026-10-05 E002 (complete) | Retained train rating sides, nested outer/inner folds | Full candidate results and subgroup diagnostics inspected; development only, no validation/test scoring. Nonlinear candidate misses practical gates. |
 
 Original source metadata saying `finalTestEvaluated: false` predates these later
 local studies; it does not override observed exposure. Keep those public files

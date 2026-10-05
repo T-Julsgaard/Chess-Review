@@ -1,0 +1,25 @@
+{
+  "schema": "E002-fold-verification-v1",
+  "passed": true,
+  "engines": {
+    "sf18": {
+      "sides": 2798,
+      "outerFolds": 5,
+      "playerOverlap": 0,
+      "trainOnlyScaling": true,
+      "predictionBindings": true
+    },
+    "sf19": {
+      "sides": 1498,
+      "outerFolds": 5,
+      "playerOverlap": 0,
+      "trainOnlyScaling": true,
+      "predictionBindings": true
+    }
+  },
+  "verifiedOutputHashes": {
+    "results.json": "9219f67a34e1c1f6ba8252f1b5a46958b8afd7dba13b90c24d660b2370f64f18",
+    "predictions.json.gz": "a78f5b9f69f1a4ea21a8e17cbedb373e6b56cc432f36b9d1dbdb75d2cbebc8ac"
+  },
+  "verifierSha256": "02494a0927ed37c824755a847d2f4155d72a6287c91b3d7919bee77fc0fe6656"
+}
