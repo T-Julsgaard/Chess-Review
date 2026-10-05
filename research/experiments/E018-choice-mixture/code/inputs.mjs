@@ -1,0 +1,6 @@
+import {loadParents as loadCached,folds,parents} from '../../E017-signed-log-choice/code/inputs.mjs';
+export {folds,parents};
+export const prefix='research/experiments/E018-choice-mixture/';
+export function makeFreeze(previous){const {candidate,utilities,...binding}=previous;return{...binding,schema:'E018-freeze-v1',candidate:'fixed-component-mixture-v1',utility:utilities.global,mixture:{factor:2,temperatureCap:1000,weights:'sharp>=0,uniform>=0,sum<=1',sequence:'global beta then conditional weights'},gates:{...previous.gates,seeds:[20261085,20261086,20261087,20261088],fitGradientTolerance:1e-9,fitBracketTolerance:1e-10,kktVertexTolerance:1e-7},confirmation:false};}
+export async function loadParents(access){const input=await loadCached(access);return{...input,rows:input.rows.map(({candidateUtilities,...r})=>r),stability:input.stability.map(({candidateLow,candidateHigh,...r})=>r),freeze:makeFreeze(input.freeze)};}
+export async function loadInputs(access){const input=await loadParents(access),freeze=await access.readJson(prefix+'evidence/freeze.json');if(JSON.stringify(freeze)!==JSON.stringify(input.freeze))throw Error('Changed source/cohort/component/weight freeze');return{...input,freeze};}

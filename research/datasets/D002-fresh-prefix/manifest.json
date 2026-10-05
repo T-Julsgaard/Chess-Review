@@ -810,6 +810,26 @@
       "bytes": 878,
       "sha256": "1b32b5f1e52bd9211c069a563395fe0eeea9989c8efa56b8f5612f350b0cddf7",
       "uncompressedSha256": "1b32b5f1e52bd9211c069a563395fe0eeea9989c8efa56b8f5612f350b0cddf7"
+    },
+    "research/experiments/E018-choice-mixture/evidence/freeze.json": {
+      "kind": "summary",
+      "parents": [
+        "research/datasets/D002-fresh-prefix/games.json.gz",
+        "research/experiments/E008-human-quality-curves/evidence/sf19-observations.json.gz",
+        "research/experiments/E009-search-stability/evidence/sf19-observations.json.gz"
+      ],
+      "bytes": 97627,
+      "sha256": "f6bde8e77e68e52ade180ec38b1dce67fb01474f22304fdfb1b1f5750ea36179",
+      "uncompressedSha256": "f6bde8e77e68e52ade180ec38b1dce67fb01474f22304fdfb1b1f5750ea36179"
+    },
+    "research/experiments/E018-choice-mixture/evidence/freeze-run.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E018-choice-mixture/evidence/freeze.json"
+      ],
+      "bytes": 30762,
+      "sha256": "e98dba0583c0f2c30c5c414a7fd69103e3e824421b95aadb8aaedf494cb6e566",
+      "uncompressedSha256": "e98dba0583c0f2c30c5c414a7fd69103e3e824421b95aadb8aaedf494cb6e566"
     }
   }
 }
