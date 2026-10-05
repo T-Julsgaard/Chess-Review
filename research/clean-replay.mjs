@@ -34,13 +34,17 @@ import {loadInputs as loadLinearInputs} from './experiments/E016-relative-cp-cho
 import {evaluate as evaluateLinear,fitModels as fitLinearModels} from './experiments/E016-relative-cp-choice/code/method.mjs';
 import {audit as auditLinear} from './experiments/E016-relative-cp-choice/code/audit.mjs';
 
+import {loadInputs as loadLogInputs} from './experiments/E017-signed-log-choice/code/inputs.mjs';
+import {evaluate as evaluateLog,fitModels as fitLogModels} from './experiments/E017-signed-log-choice/code/method.mjs';
+import {audit as auditLog} from './experiments/E017-signed-log-choice/code/audit.mjs';
+
 // Run only from an externally extracted Git archive. The operator supplies its
 // exact commit and retains the archive command/hash alongside this receipt.
 const [experiment,revision,...extra]=process.argv.slice(2),root=fileURLToPath(new URL('../',import.meta.url));
-if(!['E008','E009','E010','E011','E012','E013','E014','E015','E016'].includes(experiment)||!/^([a-f0-9]{40})$/.test(revision||'')||extra.length)throw Error('Use clean-replay.mjs E008|E009|E010|E011|E012|E013|E014|E015|E016 <archive commit SHA>');
+if(!['E008','E009','E010','E011','E012','E013','E014','E015','E016','E017'].includes(experiment)||!/^([a-f0-9]{40})$/.test(revision||'')||extra.length)throw Error('Use clean-replay.mjs E008|E009|E010|E011|E012|E013|E014|E015|E016|E017 <archive commit SHA>');
 try{await stat(path.join(root,'.git'));throw Error('Clean replay requires a snapshot without .git');}catch(e){if(e.code!=='ENOENT')throw e;}
 const started=performance.now(),access=await openResearchData(['E012','E013'].includes(experiment)?['D001']:['D001','D002'],{purpose:'reuse'}),
-  active={E008:'research/experiments/E008-human-quality-curves/',E009:'research/experiments/E009-search-stability/',E010:'research/experiments/E010-candidate-stability/',E011:'research/experiments/E011-outcome-confirmation/',E012:'research/experiments/E012-offer-evidence/',E013:'research/experiments/E013-net-offer-pack/',E014:'research/experiments/E014-root-pair-consistency/',E015:'research/experiments/E015-rating-choice-context/',E016:'research/experiments/E016-relative-cp-choice/'}[experiment],run=await access.readJson(active+'evidence/'+(experiment==='E014'?'run-SF18.json':'run.json')),
+  active={E008:'research/experiments/E008-human-quality-curves/',E009:'research/experiments/E009-search-stability/',E010:'research/experiments/E010-candidate-stability/',E011:'research/experiments/E011-outcome-confirmation/',E012:'research/experiments/E012-offer-evidence/',E013:'research/experiments/E013-net-offer-pack/',E014:'research/experiments/E014-root-pair-consistency/',E015:'research/experiments/E015-rating-choice-context/',E016:'research/experiments/E016-relative-cp-choice/',E017:'research/experiments/E017-signed-log-choice/'}[experiment],run=await access.readJson(active+'evidence/'+(experiment==='E014'?'run-SF18.json':'run.json')),
   saved=experiment==='E014'?await readRootResults(access,active):await access.readJson(active+'evidence/results.json');
 for(const [name,expected] of Object.entries(run.codeSha256)){
   if(sha256(await readFile(path.join(root,active,'code',name)))!==expected)throw Error('Clean snapshot scoring code differs from fitted run: '+name);
@@ -48,10 +52,11 @@ for(const [name,expected] of Object.entries(run.codeSha256)){
 let exactPredictions=null,independent,verificationRefits=0;
 const lineEndingEquivalence={},sourceBindings=experiment==='E014'?await access.readJson(active+'evidence/source-line-endings-SF18.json'):null;
 if(sourceBindings){const other=await access.readJson(active+'evidence/source-line-endings-SF19.json');if(sourceBindings.schema!=='research-source-line-endings-v1'||JSON.stringify(sourceBindings.files)!==JSON.stringify(other.files)||Object.keys(sourceBindings.files).some(p=>!Object.hasOwn(run.sharedCodeSha256,p)||!/^.+\.(?:mjs|js)$/.test(p)))throw Error('Changed/unrecognized source newline bindings');}
-for(const [file,expected] of Object.entries(run.sharedCodeSha256||{})){const bytes=await readFile(path.join(root,file));if(sha256(bytes)!==expected){if(['E015','E016'].includes(experiment)){lineEndingEquivalence[file]=verifySourceRepresentation(bytes,expected,run.sharedSourceRepresentation?.[file]);}else{if(!sourceBindings?.files[file])throw Error('Shared replay code differs: '+file);lineEndingEquivalence[file]=verifyArchivedSource(bytes,expected,sourceBindings.files[file]);}}}
-if(['E015','E016'].includes(experiment)){
-  const input=await (experiment==='E015'?loadRatingInputs:loadLinearInputs)(access),models=await access.readJson(active+'evidence/models.json'),fitRun=await access.readJson(active+'evidence/fit-run.json'),predictions=await access.readJson(active+'evidence/predictions.json.gz');for(const field of ['codeSha256','sharedCodeSha256','sharedSourceRepresentation'])if(JSON.stringify(fitRun[field])!==JSON.stringify(run[field]))throw Error('Rating fit/scoring source differs');
-  const refit=(experiment==='E015'?fitRatingModels:fitLinearModels)(input,input.freeze),replay=(experiment==='E015'?evaluateRating:evaluateLinear)(input,input.freeze,models);if(JSON.stringify(refit)!==JSON.stringify(models)||JSON.stringify(replay.result)!==JSON.stringify(saved)||JSON.stringify(replay.records)!==JSON.stringify(predictions))throw Error('Clean rating fit/report/prediction replay differs');verificationRefits=12;exactPredictions=true;independent=(experiment==='E015'?auditRating:auditLinear)(input,input.freeze,models,saved,predictions);
+for(const [file,expected] of Object.entries(run.sharedCodeSha256||{})){const bytes=await readFile(path.join(root,file));if(sha256(bytes)!==expected){if(['E015','E016','E017'].includes(experiment)){lineEndingEquivalence[file]=verifySourceRepresentation(bytes,expected,run.sharedSourceRepresentation?.[file]);}else{if(!sourceBindings?.files[file])throw Error('Shared replay code differs: '+file);lineEndingEquivalence[file]=verifyArchivedSource(bytes,expected,sourceBindings.files[file]);}}}
+const choiceReplay={E015:{load:loadRatingInputs,fit:fitRatingModels,evaluate:evaluateRating,audit:auditRating},E016:{load:loadLinearInputs,fit:fitLinearModels,evaluate:evaluateLinear,audit:auditLinear},E017:{load:loadLogInputs,fit:fitLogModels,evaluate:evaluateLog,audit:auditLog}}[experiment];
+if(choiceReplay){
+  const input=await choiceReplay.load(access),models=await access.readJson(active+'evidence/models.json'),fitRun=await access.readJson(active+'evidence/fit-run.json'),predictions=await access.readJson(active+'evidence/predictions.json.gz');for(const field of ['codeSha256','sharedCodeSha256','sharedSourceRepresentation'])if(JSON.stringify(fitRun[field])!==JSON.stringify(run[field]))throw Error('Rating fit/scoring source differs');
+  const refit=choiceReplay.fit(input,input.freeze),replay=choiceReplay.evaluate(input,input.freeze,models);if(JSON.stringify(refit)!==JSON.stringify(models)||JSON.stringify(replay.result)!==JSON.stringify(saved)||JSON.stringify(replay.records)!==JSON.stringify(predictions))throw Error('Clean rating fit/report/prediction replay differs');verificationRefits=12;exactPredictions=true;independent=choiceReplay.audit(input,input.freeze,models,saved,predictions);
 }else if(experiment==='E014'){
   const otherRun=await access.readJson(active+'evidence/run-SF19.json');if(JSON.stringify(otherRun.codeSha256)!==JSON.stringify(run.codeSha256)||JSON.stringify(otherRun.sharedCodeSha256)!==JSON.stringify(run.sharedCodeSha256))throw Error('Root-panel partition code differs');
   const input=await loadRootInputs(access),replay=evaluateRoot(input.rows,input.freeze);if(JSON.stringify(replay)!==JSON.stringify(saved))throw Error('Clean root consistency replay differs');independent=auditRoot(input.rows,input.freeze,saved);
@@ -80,7 +85,7 @@ if(['E015','E016'].includes(experiment)){
   }
 }
 const result={schema:'research-clean-replay-v1',experiment,passed:true,snapshotRevision:revision,exactReport:true,exactPredictions,independent,
-  ...(['E014','E015','E016'].includes(experiment)?{lineEndingEquivalence,sourceReplayCodeSha256:sha256(await readFile(new URL('source-replay.mjs',import.meta.url)))}:{}),...(['E015','E016'].includes(experiment)?{exactRefit:true,verificationRefits}:{}),
+  ...(['E014','E015','E016','E017'].includes(experiment)?{lineEndingEquivalence,sourceReplayCodeSha256:sha256(await readFile(new URL('source-replay.mjs',import.meta.url)))}:{}),...(['E015','E016','E017'].includes(experiment)?{exactRefit:true,verificationRefits}:{}),
   dataEligibility:access.receipt,codeSha256:sha256(await readFile(fileURLToPath(import.meta.url))),
   environment:{node:process.version,platform:process.platform,arch:process.arch},engineSearches:0,networkRequests:0,ignoredInputs:0,nodeDependencies:0,elapsedMs:performance.now()-started};
 const out=path.join(root,'research/runs/clean',experiment);await mkdir(out,{recursive:true});await writeFile(path.join(out,'clean-replay.json'),JSON.stringify(result,null,2)+'\n');

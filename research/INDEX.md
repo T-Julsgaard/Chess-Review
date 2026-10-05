@@ -49,7 +49,7 @@ records. Update a row and the active experiment's resume state when work stops.
 | E016 | [Relative CP choice](experiments/E016-relative-cp-choice/RESULT.md) | complete | Verified -.366494 nats development gain; primary/cross-fit/subgroup gates fail despite lower search drift | Stop exact linear recipe; distinct context scaling/mate hypothesis |
 | F014 | [Linear CP failure finding](findings/F014-linear-cp-choice-failure.md) | recorded | Independent/clean fits and predictions verify; stability gain retains worse human prediction/calibration | No promotion; preregister any distinct alternative |
 
-| E017 | [Signed-log choice](experiments/E017-signed-log-choice/RESULT.md) | planned | Fixed context scaling and mate-position harm guard; no fits yet | Source/code/cohort freeze before fitting |
+| E017 | [Signed-log choice](experiments/E017-signed-log-choice/RESULT.md) | running | Fixed context scaling/mate-position guard; synthetic mechanics pass, no fits yet | Commit source/code/cohort freeze before fitting |
 
 No promotion records yet.
 Allocate the next unused ID in each series: `E018`, `D003`, `F015`, `P001`.
