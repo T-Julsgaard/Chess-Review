@@ -521,6 +521,25 @@
       "bytes": 24232,
       "sha256": "d3bb8a6493c06b8867d0df03bfc49716cf1ebf5a70af28844f6c5a6ef67e4c3d",
       "uncompressedSha256": "d3bb8a6493c06b8867d0df03bfc49716cf1ebf5a70af28844f6c5a6ef67e4c3d"
+    },
+    "research/experiments/E015-rating-choice-context/evidence/models.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E015-rating-choice-context/evidence/freeze.json"
+      ],
+      "bytes": 8706,
+      "sha256": "2265c8517aec3bff47b6836ee048fb15a77eddd1a12badaba8dc5df98283b69a",
+      "uncompressedSha256": "2265c8517aec3bff47b6836ee048fb15a77eddd1a12badaba8dc5df98283b69a"
+    },
+    "research/experiments/E015-rating-choice-context/evidence/fit-run.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E015-rating-choice-context/evidence/models.json",
+        "research/experiments/E015-rating-choice-context/evidence/freeze.json"
+      ],
+      "bytes": 24558,
+      "sha256": "87395c7048a6c5479dd21b80bffb0a03e955a0f7c8a13fe70ce6c2e756641d24",
+      "uncompressedSha256": "87395c7048a6c5479dd21b80bffb0a03e955a0f7c8a13fe70ce6c2e756641d24"
     }
   }
 }

@@ -1,0 +1,276 @@
+{
+  "schema": "E015-fitted-models-v1",
+  "freezeSha256": "7a67c39b0ae32bf7b6ccf2a4bf889d79e655655a3c170d95bc9ba34a3ccd3dda",
+  "folds": [
+    {
+      "fold": 0,
+      "fitIdsSha256": "ed33f4d61ee1e8a65bdcd87b686f4b46492b5f4887f9346f93c0da282d6bc00f",
+      "omittedIdsSha256": "19e5cdcb8c601d596b4fcfd0f63738372530e64d1da74395431aaf80ef1744de",
+      "global": {
+        "schema": "human-choice-v1",
+        "temperature": 15.188554502700754,
+        "boundary": null,
+        "games": 360,
+        "criterion": "Mean multinomial negative log likelihood, one legal move choice per game"
+      },
+      "candidate": {
+        "schema": "E015-temperature-v1",
+        "betaLow": 1.0323916643767863,
+        "delta": 29.67470058004661,
+        "betaHigh": 30.707092244423396,
+        "anchors": [
+          100,
+          3000
+        ],
+        "coefficient": 0.368208,
+        "criterion": "Mean legal-choice multinomial NLL; recorded rating is context only"
+      },
+      "diagnostics": {
+        "games": 360,
+        "globalObjective": 2.4311830242390835,
+        "candidateObjective": 2.407446891069507,
+        "gradient": {
+          "betaLow": -9.730780995790648e-14,
+          "delta": 2.5619129213894087e-12
+        },
+        "profileDerivative": 2.5619129213894087e-12,
+        "profileCalls": 6,
+        "innerIterations": 28,
+        "outerIterations": 4,
+        "active": {
+          "betaLow": null,
+          "delta": null
+        },
+        "minDirectional": -1.7323134904041036e-10,
+        "converged": true,
+        "upperCap": false,
+        "ratingClipped": 0
+      }
+    },
+    {
+      "fold": 1,
+      "fitIdsSha256": "4da23ec292a01bb65bab0b483d7642268ddbafeae56fdfd173197ba454db5483",
+      "omittedIdsSha256": "4581c5f93a9463040061c3774c18d3d043a0d5ada6d7423c4c7c128da854333e",
+      "global": {
+        "schema": "human-choice-v1",
+        "temperature": 15.91241985807217,
+        "boundary": null,
+        "games": 360,
+        "criterion": "Mean multinomial negative log likelihood, one legal move choice per game"
+      },
+      "candidate": {
+        "schema": "E015-temperature-v1",
+        "betaLow": 0,
+        "delta": 33.82784051595135,
+        "betaHigh": 33.82784051595135,
+        "anchors": [
+          100,
+          3000
+        ],
+        "coefficient": 0.368208,
+        "criterion": "Mean legal-choice multinomial NLL; recorded rating is context only"
+      },
+      "diagnostics": {
+        "games": 360,
+        "globalObjective": 2.479106807170186,
+        "candidateObjective": 2.4447347568045927,
+        "gradient": {
+          "betaLow": 0.00032747418601297153,
+          "delta": -6.968804083178842e-12
+        },
+        "profileDerivative": -6.968804083178842e-12,
+        "profileCalls": 9,
+        "innerIterations": 15,
+        "outerIterations": 7,
+        "active": {
+          "betaLow": "lower",
+          "delta": null
+        },
+        "minDirectional": -6.733064490066157e-9,
+        "converged": true,
+        "upperCap": false,
+        "ratingClipped": 0
+      }
+    },
+    {
+      "fold": 2,
+      "fitIdsSha256": "fa1b548728bc0abf4744a396618085fabca6d70c7079691b87e97b763b63d45c",
+      "omittedIdsSha256": "33ddee9537b79bb2efc5a2efceb35ef1da785c4646392335fabad937866fb4f8",
+      "global": {
+        "schema": "human-choice-v1",
+        "temperature": 15.504697809945974,
+        "boundary": null,
+        "games": 360,
+        "criterion": "Mean multinomial negative log likelihood, one legal move choice per game"
+      },
+      "candidate": {
+        "schema": "E015-temperature-v1",
+        "betaLow": 0,
+        "delta": 33.941146735835495,
+        "betaHigh": 33.941146735835495,
+        "anchors": [
+          100,
+          3000
+        ],
+        "coefficient": 0.368208,
+        "criterion": "Mean legal-choice multinomial NLL; recorded rating is context only"
+      },
+      "diagnostics": {
+        "games": 360,
+        "globalObjective": 2.4157904465749707,
+        "candidateObjective": 2.3618115546729266,
+        "gradient": {
+          "betaLow": 0.0017104462678676114,
+          "delta": -9.84967820422739e-10
+        },
+        "profileDerivative": -9.84967820422739e-10,
+        "profileCalls": 37,
+        "innerIterations": 112,
+        "outerIterations": 35,
+        "active": {
+          "betaLow": "lower",
+          "delta": null
+        },
+        "minDirectional": -9.515368830996949e-7,
+        "converged": true,
+        "upperCap": false,
+        "ratingClipped": 0
+      }
+    },
+    {
+      "fold": 3,
+      "fitIdsSha256": "352ae41baccddbc5c26e447c36863a78d935ae4df778a8c07ee76e11ec6171f3",
+      "omittedIdsSha256": "3bcf7e52522313763cdafccc6c660d70f49af01daff9f73b5922c301a38c9a25",
+      "global": {
+        "schema": "human-choice-v1",
+        "temperature": 15.744095426997735,
+        "boundary": null,
+        "games": 360,
+        "criterion": "Mean multinomial negative log likelihood, one legal move choice per game"
+      },
+      "candidate": {
+        "schema": "E015-temperature-v1",
+        "betaLow": 2.170928329874664,
+        "delta": 28.314925694099138,
+        "betaHigh": 30.4858540239738,
+        "anchors": [
+          100,
+          3000
+        ],
+        "coefficient": 0.368208,
+        "criterion": "Mean legal-choice multinomial NLL; recorded rating is context only"
+      },
+      "diagnostics": {
+        "games": 360,
+        "globalObjective": 2.44300599209915,
+        "candidateObjective": 2.4237445742371677,
+        "gradient": {
+          "betaLow": -1.646830819860649e-16,
+          "delta": 1.0213673888130141e-11
+        },
+        "profileDerivative": 1.0213673888130141e-11,
+        "profileCalls": 6,
+        "innerIterations": 28,
+        "outerIterations": 4,
+        "active": {
+          "betaLow": null,
+          "delta": null
+        },
+        "minDirectional": -2.893637427729835e-10,
+        "converged": true,
+        "upperCap": false,
+        "ratingClipped": 0
+      }
+    },
+    {
+      "fold": 4,
+      "fitIdsSha256": "25453ebdccf5c1b492644e138207e9bbcff9c1d33db53211a6e7bc791f20ceed",
+      "omittedIdsSha256": "70d09ba876e7ac31ebbcea7930b10ce0e8f8652e8bc1c64526949932bced22ca",
+      "global": {
+        "schema": "human-choice-v1",
+        "temperature": 15.007893314071534,
+        "boundary": null,
+        "games": 360,
+        "criterion": "Mean multinomial negative log likelihood, one legal move choice per game"
+      },
+      "candidate": {
+        "schema": "E015-temperature-v1",
+        "betaLow": 2.285218750953255,
+        "delta": 26.076738784291212,
+        "betaHigh": 28.361957535244468,
+        "anchors": [
+          100,
+          3000
+        ],
+        "coefficient": 0.368208,
+        "criterion": "Mean legal-choice multinomial NLL; recorded rating is context only"
+      },
+      "diagnostics": {
+        "games": 360,
+        "globalObjective": 2.434691472218732,
+        "candidateObjective": 2.416765401328043,
+        "gradient": {
+          "betaLow": -1.0978872132404326e-16,
+          "delta": 1.2577644173086513e-12
+        },
+        "profileDerivative": 1.2577644173086513e-12,
+        "profileCalls": 6,
+        "innerIterations": 28,
+        "outerIterations": 4,
+        "active": {
+          "betaLow": null,
+          "delta": null
+        },
+        "minDirectional": -3.290793199241338e-11,
+        "converged": true,
+        "upperCap": false,
+        "ratingClipped": 0
+      }
+    }
+  ],
+  "final": {
+    "fitIdsSha256": "a29e1997650b8025964f657856aff442229c1e83cd7200558a9556811f59964f",
+    "global": {
+      "schema": "human-choice-v1",
+      "temperature": 15.464491662877617,
+      "boundary": null,
+      "games": 450,
+      "criterion": "Mean multinomial negative log likelihood, one legal move choice per game"
+    },
+    "candidate": {
+      "schema": "E015-temperature-v1",
+      "betaLow": 0,
+      "delta": 32.59543170030444,
+      "betaHigh": 32.59543170030444,
+      "anchors": [
+        100,
+        3000
+      ],
+      "coefficient": 0.368208,
+      "criterion": "Mean legal-choice multinomial NLL; recorded rating is context only"
+    },
+    "diagnostics": {
+      "games": 450,
+      "globalObjective": 2.4409127650281492,
+      "candidateObjective": 2.4116791931487835,
+      "gradient": {
+        "betaLow": 0.00009999028456606717,
+        "delta": -7.69631272292928e-16
+      },
+      "profileDerivative": -7.69631272292928e-16,
+      "profileCalls": 9,
+      "innerIterations": 16,
+      "outerIterations": 7,
+      "active": {
+        "betaLow": "lower",
+        "delta": null
+      },
+      "minDirectional": -7.445448087224855e-13,
+      "converged": true,
+      "upperCap": false,
+      "ratingClipped": 0
+    }
+  },
+  "fits": 12,
+  "performanceAssessments": 0
+}
