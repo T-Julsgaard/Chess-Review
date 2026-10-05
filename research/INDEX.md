@@ -33,7 +33,7 @@ records. Update a row and the active experiment's resume state when work stops.
 | F008 | [Candidate stability finding](findings/F008-candidate-probability-stability.md) | recorded | No distribution stability gain; exact/independent/clean replay passes | Preserve negative result; no bundled adoption |
 | E011 | [Frozen outcome confirmation](experiments/E011-outcome-confirmation/RESULT.md) | complete | Verified joint failure:20k practical gain, both fixed intervals and root stability;300 test games consumed | Distinct hypothesis; no retuning/rescue on this cohort |
 | F009 | [Unconfirmed outcome curve](findings/F009-unconfirmed-outcome-curve.md) | recorded | Small unresolved gain; predictive value vs constant; exact/independent/clean replay passes | Keep failed confirmation with development finding |
-| E012 | [Offer-evidence audit](experiments/E012-offer-evidence/RESULT.md) | running | Complete24-case/1,692-query SF18 panel; zero property looks or fits | Commit registered raw; frozen property screen and replay |
+| E012 | [Offer-evidence audit](experiments/E012-offer-evidence/RESULT.md) | running | Frozen offer screen fails:0/8 supported;21/24 stable; raw coverage complete | Commit report; exact/independent/clean replay |
 
 No promotion records yet.
 Allocate the next unused ID in each series: `E013`, `D003`, `F010`, `P001`.

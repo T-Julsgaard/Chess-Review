@@ -283,6 +283,25 @@
       "sha256": "555eeff8f289050ea81ea140fb722515a3d3cfdb127fdd0044b23d4386c5108a",
       "bytes": 8392,
       "uncompressedSha256": "555eeff8f289050ea81ea140fb722515a3d3cfdb127fdd0044b23d4386c5108a"
+    },
+    "research/experiments/E012-offer-evidence/evidence/results.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E012-offer-evidence/evidence/sf18-observations.json.gz",
+        "research/experiments/E012-offer-evidence/evidence/policy.json"
+      ],
+      "sha256": "d31ed066a4fdcea3e81a79320c0e06f358177d84f4c3332c42ada85b49a9db0d",
+      "bytes": 52567,
+      "uncompressedSha256": "d31ed066a4fdcea3e81a79320c0e06f358177d84f4c3332c42ada85b49a9db0d"
+    },
+    "research/experiments/E012-offer-evidence/evidence/run.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E012-offer-evidence/evidence/results.json"
+      ],
+      "sha256": "134203b7f0d839b05287454db0f45211037e36a0fb6f7eeaeeddf86f7ba10b15",
+      "bytes": 7073,
+      "uncompressedSha256": "134203b7f0d839b05287454db0f45211037e36a0fb6f7eeaeeddf86f7ba10b15"
     }
   }
 }
