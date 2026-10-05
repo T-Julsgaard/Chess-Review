@@ -13,6 +13,8 @@ rating. No account, no server, no manual PGN copying.
 
 ## Watch the introduction
 
+Click the image below to watch the 69-second introduction video.
+
 [![Watch the 69-second Chess Review introduction](marketing/video/media/chess-review-thumbnail.png)](https://t-julsgaard.github.io/Chess-Review/marketing/video/media/chess-review-intro.mp4)
 
 ## Features
