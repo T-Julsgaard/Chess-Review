@@ -6,6 +6,8 @@ export function lineEndingBinding(recorded,archived){
   let line=0;const ranges=[];for(const match of text.matchAll(/\r?\n/g)){line++;if(match[0]==='\r\n'){const last=ranges.at(-1);if(last&&last[1]===line-1)last[1]=line;else ranges.push([line,line]);}}
   return{checkoutSha256:sha256(recorded),archiveSha256:sha256(archived),canonicalLfSha256:sha256(lf),crlfLineRanges:ranges};
 }
+export function recordSourceRepresentation(recorded){const canonical=Buffer.from(recorded.toString('utf8').replaceAll('\r\n','\n')),binding=lineEndingBinding(recorded,canonical);return{checkoutSha256:binding.checkoutSha256,canonicalLfSha256:binding.canonicalLfSha256,crlfLineRanges:binding.crlfLineRanges};}
+export function verifySourceRepresentation(archived,expected,representation){return verifyArchivedSource(archived,expected,{...representation,archiveSha256:sha256(archived)});}
 export function verifyArchivedSource(archived,expected,binding){
   const normalized=archived.toString('utf8').replaceAll('\r\n','\n');
   if(!binding||binding.checkoutSha256!==expected||sha256(archived)!==binding.archiveSha256||sha256(normalized)!==binding.canonicalLfSha256||!Array.isArray(binding.crlfLineRanges))throw Error('Unbound source newline equivalence');
