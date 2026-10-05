@@ -1,0 +1,453 @@
+{
+  "schema": "E016-relative-choice-v1",
+  "roles": {
+    "crossfit": {
+      "games": 450,
+      "globalNll": {
+        "mean": 2.4423300859576176,
+        "median": 2.504877397962169,
+        "p90": 3.5000444208457426,
+        "maximum": 16.087240858260696
+      },
+      "candidateNll": {
+        "mean": 3.1429627777293203,
+        "median": 2.987128637791995,
+        "p90": 3.4329277991138194,
+        "maximum": 37.60810815031596
+      },
+      "uniformNll": {
+        "mean": 3.3175825407808412,
+        "median": 3.5263605246161616,
+        "p90": 3.784189633918261,
+        "maximum": 4.007333185232471
+      },
+      "groups": [
+        {
+          "label": "fixed-points:0.1-0.9",
+          "games": 362,
+          "gain": -0.5010505387002736,
+          "sparse": false,
+          "passed": false
+        },
+        {
+          "label": "fixed-points:<0.1",
+          "games": 39,
+          "gain": -1.928729754596045,
+          "sparse": false,
+          "passed": false
+        },
+        {
+          "label": "fixed-points:>0.9",
+          "games": 49,
+          "gain": -1.1976317522147164,
+          "sparse": false,
+          "passed": false
+        },
+        {
+          "label": "ply:21-50",
+          "games": 232,
+          "gain": -0.5701233792402566,
+          "sparse": false,
+          "passed": false
+        },
+        {
+          "label": "ply:<=20",
+          "games": 112,
+          "gain": -0.5948292808674794,
+          "sparse": false,
+          "passed": false
+        },
+        {
+          "label": "ply:>50",
+          "games": 106,
+          "gain": -1.0980679986449888,
+          "sparse": false,
+          "passed": false
+        },
+        {
+          "label": "rating:1200-1999",
+          "games": 318,
+          "gain": -0.932198612879862,
+          "sparse": false,
+          "passed": false
+        },
+        {
+          "label": "rating:<1200",
+          "games": 70,
+          "gain": 0.025929126497312875,
+          "sparse": false,
+          "passed": true
+        },
+        {
+          "label": "rating:>=2000",
+          "games": 62,
+          "gain": -0.33323534284325396,
+          "sparse": false,
+          "passed": false
+        }
+      ]
+    },
+    "development": {
+      "games": 150,
+      "globalNll": {
+        "mean": 2.3904046509340304,
+        "median": 2.5706517287246107,
+        "p90": 3.72265057818072,
+        "maximum": 7.168568166220751
+      },
+      "candidateNll": {
+        "mean": 2.756898199745975,
+        "median": 2.9376410222049736,
+        "p90": 3.443181696047567,
+        "maximum": 3.8875560197749666
+      },
+      "uniformNll": {
+        "mean": 3.4249787466006616,
+        "median": 3.5553480614894135,
+        "p90": 3.784189633918261,
+        "maximum": 4.060443010546419
+      },
+      "groups": [
+        {
+          "label": "fixed-points:0.1-0.9",
+          "games": 121,
+          "gain": -0.44266590488734003,
+          "sparse": false,
+          "passed": false
+        },
+        {
+          "label": "fixed-points:<0.1",
+          "games": 11,
+          "gain": 0.27770586872468966,
+          "sparse": true,
+          "passed": null
+        },
+        {
+          "label": "fixed-points:>0.9",
+          "games": 18,
+          "gain": -0.248123465910827,
+          "sparse": true,
+          "passed": null
+        },
+        {
+          "label": "ply:21-50",
+          "games": 80,
+          "gain": -0.3030620609163717,
+          "sparse": false,
+          "passed": false
+        },
+        {
+          "label": "ply:<=20",
+          "games": 32,
+          "gain": -0.6270960557752151,
+          "sparse": false,
+          "passed": false
+        },
+        {
+          "label": "ply:>50",
+          "games": 38,
+          "gain": -0.28057878062302294,
+          "sparse": false,
+          "passed": false
+        },
+        {
+          "label": "rating:1200-1999",
+          "games": 109,
+          "gain": -0.2765339331309376,
+          "sparse": false,
+          "passed": false
+        },
+        {
+          "label": "rating:<1200",
+          "games": 18,
+          "gain": -0.5415603101173122,
+          "sparse": true,
+          "passed": null
+        },
+        {
+          "label": "rating:>=2000",
+          "games": 23,
+          "gain": -0.6558151316698989,
+          "sparse": true,
+          "passed": null
+        }
+      ]
+    }
+  },
+  "calibration": {
+    "crossfit": {
+      "global": {
+        "brier": 0.8097925592490339,
+        "topChoiceCalibrationError": 0.1331125553625517,
+        "bins": [
+          {
+            "lower": 0,
+            "upper": 0.2,
+            "games": 255,
+            "predicted": 0.09610972109471294,
+            "observed": 0.22745098039215686
+          },
+          {
+            "lower": 0.2,
+            "upper": 0.4,
+            "games": 91,
+            "predicted": 0.2818700841470192,
+            "observed": 0.4065934065934066
+          },
+          {
+            "lower": 0.4,
+            "upper": 0.6,
+            "games": 44,
+            "predicted": 0.5053844204462578,
+            "observed": 0.6136363636363636
+          },
+          {
+            "lower": 0.6,
+            "upper": 0.8,
+            "games": 28,
+            "predicted": 0.6895632519133355,
+            "observed": 0.6428571428571429
+          },
+          {
+            "lower": 0.8,
+            "upper": 1,
+            "games": 32,
+            "predicted": 0.9371234342418989,
+            "observed": 0.65625
+          }
+        ]
+      },
+      "candidate": {
+        "brier": 0.8850467040795851,
+        "topChoiceCalibrationError": 0.24637079735535553,
+        "bins": [
+          {
+            "lower": 0,
+            "upper": 0.2,
+            "games": 385,
+            "predicted": 0.06922227232543036,
+            "observed": 0.3116883116883117
+          },
+          {
+            "lower": 0.2,
+            "upper": 0.4,
+            "games": 30,
+            "predicted": 0.29279473489670255,
+            "observed": 0.5666666666666667
+          },
+          {
+            "lower": 0.4,
+            "upper": 0.6,
+            "games": 20,
+            "predicted": 0.5034947617825807,
+            "observed": 0.75
+          },
+          {
+            "lower": 0.6,
+            "upper": 0.8,
+            "games": 5,
+            "predicted": 0.6745251178568525,
+            "observed": 0.6
+          },
+          {
+            "lower": 0.8,
+            "upper": 1,
+            "games": 10,
+            "predicted": 0.9998545348469099,
+            "observed": 0.6
+          }
+        ]
+      },
+      "interpretation": "Descriptive five-bin top-choice calibration and multinomial Brier; no selection gate"
+    },
+    "development": {
+      "global": {
+        "brier": 0.7970538134486325,
+        "topChoiceCalibrationError": 0.11682604968695122,
+        "bins": [
+          {
+            "lower": 0,
+            "upper": 0.2,
+            "games": 84,
+            "predicted": 0.10401905970456274,
+            "observed": 0.25
+          },
+          {
+            "lower": 0.2,
+            "upper": 0.4,
+            "games": 29,
+            "predicted": 0.2836089356875718,
+            "observed": 0.3103448275862069
+          },
+          {
+            "lower": 0.4,
+            "upper": 0.6,
+            "games": 21,
+            "predicted": 0.48804185945911654,
+            "observed": 0.6666666666666666
+          },
+          {
+            "lower": 0.6,
+            "upper": 0.8,
+            "games": 8,
+            "predicted": 0.6931127224204594,
+            "observed": 0.75
+          },
+          {
+            "lower": 0.8,
+            "upper": 1,
+            "games": 8,
+            "predicted": 0.9099935538963326,
+            "observed": 0.875
+          }
+        ]
+      },
+      "candidate": {
+        "brier": 0.8856795389021503,
+        "topChoiceCalibrationError": 0.2764264404270229,
+        "bins": [
+          {
+            "lower": 0,
+            "upper": 0.2,
+            "games": 133,
+            "predicted": 0.07134746273362892,
+            "observed": 0.3458646616541353
+          },
+          {
+            "lower": 0.2,
+            "upper": 0.4,
+            "games": 12,
+            "predicted": 0.2638807284288338,
+            "observed": 0.5
+          },
+          {
+            "lower": 0.4,
+            "upper": 0.6,
+            "games": 4,
+            "predicted": 0.4700631628711886,
+            "observed": 1
+          },
+          {
+            "lower": 0.6,
+            "upper": 0.8,
+            "games": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "lower": 0.8,
+            "upper": 1,
+            "games": 1,
+            "predicted": 0.9999999997431555,
+            "observed": 1
+          }
+        ]
+      },
+      "interpretation": "Descriptive five-bin top-choice calibration and multinomial Brier; no selection gate"
+    }
+  },
+  "scoreHandling": {
+    "low": {
+      "alternatives": 19359,
+      "cpClipped": 0,
+      "mates": 443
+    },
+    "high": {
+      "alternatives": 1555,
+      "cpClipped": 0,
+      "mates": 74
+    }
+  },
+  "improvement": {
+    "estimate": -0.3664935488119429,
+    "lower": -0.5371533647287734,
+    "upper": -0.1962145869340163,
+    "level": 0.975,
+    "iterations": 10000,
+    "seed": 20261065,
+    "unit": "game",
+    "interpretation": "Conditional development percentile interval; cross-fit models overlap"
+  },
+  "uniformImprovement": {
+    "estimate": 0.6680805468546864,
+    "lower": 0.5541485116355077,
+    "upper": 0.792108381789663,
+    "level": 0.975,
+    "iterations": 10000,
+    "seed": 20261066,
+    "unit": "game",
+    "interpretation": "Conditional development percentile interval; cross-fit models overlap"
+  },
+  "crossFitImprovement": {
+    "estimate": -0.7006326917717017,
+    "lower": -1.0824466909218857,
+    "upper": -0.3997099650692854,
+    "level": 0.975,
+    "iterations": 10000,
+    "seed": 20261067,
+    "unit": "game",
+    "interpretation": "Conditional development percentile interval; cross-fit models overlap"
+  },
+  "stability": {
+    "games": 45,
+    "globalTv": {
+      "mean": 0.08378902394481288,
+      "median": 0.08570997474516744,
+      "p90": 0.13531451951540685,
+      "maximum": 0.2381240336136557
+    },
+    "candidateTv": {
+      "mean": 0.04429447118437811,
+      "median": 0.03455757090903906,
+      "p90": 0.08686445149849552,
+      "maximum": 0.1300778046579663
+    },
+    "pairedReduction": {
+      "estimate": 0.03949455276043479,
+      "lower": 0.02011593957525959,
+      "upper": 0.057609913199397414,
+      "level": 0.975,
+      "iterations": 10000,
+      "seed": 20261068,
+      "unit": "game",
+      "interpretation": "Conditional development percentile interval; cross-fit models overlap"
+    },
+    "globalWithinTolerance": {
+      "successes": 28,
+      "n": 45,
+      "estimate": 0.6222222222222222,
+      "lower": 0.47629934480889535,
+      "upper": 0.7489191532786209,
+      "level": 0.95,
+      "method": "Wilson score; one fixed focal choice per disjoint game"
+    },
+    "candidateWithinTolerance": {
+      "successes": 41,
+      "n": 45,
+      "estimate": 0.9111111111111111,
+      "lower": 0.7926642466571064,
+      "upper": 0.9648888832736299,
+      "level": 0.95,
+      "method": "Wilson score; one fixed focal choice per disjoint game"
+    },
+    "interpretation": "45 exposed development cases, final models including 30 training cases; operational diagnostic only, no primary gate"
+  },
+  "gates": {
+    "choicePractical": false,
+    "choiceInterval": false,
+    "uniformPractical": true,
+    "uniformInterval": true,
+    "crossFitMean": false,
+    "coverage": true,
+    "numerics": true,
+    "groups": false
+  },
+  "passed": false,
+  "sparseGroupsUnresolved": true,
+  "engineSearches": 0,
+  "newFits": 0,
+  "humanLabelsUsed": 0,
+  "confirmation": false,
+  "promoted": false,
+  "interpretation": "Fixed linear CP utility predicts legal choices; no recorded-rating input, displayed accuracy or final rating claim; exposed development only"
+}
