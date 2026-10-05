@@ -9,29 +9,36 @@ import {evaluate as evaluateCurves} from './experiments/E008-human-quality-curve
 import {audit as auditCurves} from './experiments/E008-human-quality-curves/code/audit.mjs';
 import {evaluate as evaluateStability} from './experiments/E009-search-stability/code/evaluate.mjs';
 import {audit as auditStability} from './experiments/E009-search-stability/code/audit.mjs';
+import {loadInputs as loadCandidateInputs} from './experiments/E010-candidate-stability/code/inputs.mjs';
+import {evaluate as evaluateCandidate} from './experiments/E010-candidate-stability/code/method.mjs';
+import {audit as auditCandidate} from './experiments/E010-candidate-stability/code/audit.mjs';
 
 // Run only from an externally extracted Git archive. The operator supplies its
 // exact commit and retains the archive command/hash alongside this receipt.
 const [experiment,revision,...extra]=process.argv.slice(2),root=fileURLToPath(new URL('../',import.meta.url));
-if(!['E008','E009'].includes(experiment)||!/^([a-f0-9]{40})$/.test(revision||'')||extra.length)throw Error('Use clean-replay.mjs E008|E009 <archive commit SHA>');
+if(!['E008','E009','E010'].includes(experiment)||!/^([a-f0-9]{40})$/.test(revision||'')||extra.length)throw Error('Use clean-replay.mjs E008|E009|E010 <archive commit SHA>');
 try{await stat(path.join(root,'.git'));throw Error('Clean replay requires a snapshot without .git');}catch(e){if(e.code!=='ENOENT')throw e;}
 const started=performance.now(),access=await openResearchData(['D001','D002'],{purpose:'reuse'}),
-  dataset=await access.readJson('research/datasets/D002-fresh-prefix/games.json.gz'),
-  basePath='research/experiments/E008-human-quality-curves/',base=await access.readJson(basePath+'evidence/sf19-observations.json.gz'),
-  file=path.join(root,'engine/stockfish-19-lite-single.js'),prepared=prepare(base,dataset,await engineConfig(file,{kind:'nodes',value:20000})),
-  active=experiment==='E008'?basePath:'research/experiments/E009-search-stability/',run=await access.readJson(active+'evidence/run.json'),
+  active={E008:'research/experiments/E008-human-quality-curves/',E009:'research/experiments/E009-search-stability/',E010:'research/experiments/E010-candidate-stability/'}[experiment],run=await access.readJson(active+'evidence/run.json'),
   saved=await access.readJson(active+'evidence/results.json');
 for(const [name,expected] of Object.entries(run.codeSha256)){
   if(sha256(await readFile(path.join(root,active,'code',name)))!==expected)throw Error('Clean snapshot scoring code differs from fitted run: '+name);
 }
 let exactPredictions=null,independent;
-if(experiment==='E008'){
+if(experiment==='E010'){
+  const {high,low,freeze,metadata}=await loadCandidateInputs(access),replay=evaluateCandidate(high,low,freeze,metadata);
+  if(JSON.stringify(replay)!==JSON.stringify(saved))throw Error('Clean candidate replay differs');independent=auditCandidate(high,low,freeze,saved);
+}else{
+  const dataset=await access.readJson('research/datasets/D002-fresh-prefix/games.json.gz'),base=await access.readJson('research/experiments/E008-human-quality-curves/evidence/sf19-observations.json.gz'),
+    file=path.join(root,'engine/stockfish-19-lite-single.js'),prepared=prepare(base,dataset,await engineConfig(file,{kind:'nodes',value:20000}));
+  if(experiment==='E008'){
   const records=await access.readJson(active+'evidence/predictions.json.gz'),replay=evaluateCurves(prepared);
   if(JSON.stringify(replay.result)!==JSON.stringify(saved)||JSON.stringify(replay.records)!==JSON.stringify(records))throw Error('Clean curve replay differs');
   exactPredictions=true;independent=auditCurves(prepared,saved,records);
-}else{
+  }else{
   const evidence=await access.readJson(active+'evidence/sf19-observations.json.gz'),replay=evaluateStability(evidence,base,await engineConfig(file,{kind:'nodes',value:80000}));
   if(JSON.stringify(replay)!==JSON.stringify(saved))throw Error('Clean stability replay differs');independent=auditStability(evidence,base,saved);
+  }
 }
 const result={schema:'research-clean-replay-v1',experiment,passed:true,snapshotRevision:revision,exactReport:true,exactPredictions,independent,
   dataEligibility:access.receipt,codeSha256:sha256(await readFile(fileURLToPath(import.meta.url))),
