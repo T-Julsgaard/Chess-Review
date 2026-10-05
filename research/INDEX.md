@@ -35,7 +35,7 @@ records. Update a row and the active experiment's resume state when work stops.
 | F009 | [Unconfirmed outcome curve](findings/F009-unconfirmed-outcome-curve.md) | recorded | Small unresolved gain; predictive value vs constant; exact/independent/clean replay passes | Keep failed confirmation with development finding |
 | E012 | [Offer-evidence audit](experiments/E012-offer-evidence/RESULT.md) | complete | Verified screen failure:0/8 supported;21/24 stable;822 alternatives per budget | Register net-offer review selection; retain original pack |
 | F010 | [Offer-selection evidence](findings/F010-offer-selection-evidence.md) | recorded | Capture heuristic insufficient; root gaps do not change focal near-best labels; clean replay passes | Improve evidence selection; no human category claim |
-| E013 | [Net-offer review pack](experiments/E013-net-offer-pack/RESULT.md) | planned | Prospective8 net offers /8 matched controls; original E005 games excluded | Implement/test/commit code before selection and new searches |
+| E013 | [Net-offer review pack](experiments/E013-net-offer-pack/RESULT.md) | running | Tested deterministic matching, source/export/witness checks; no real scan yet | Build once; register/commit pack before searches |
 
 No promotion records yet.
 Allocate the next unused ID in each series: `E014`, `D003`, `F011`, `P001`.
@@ -73,21 +73,14 @@ Only registered explicitly public, free-to-use sources and traceable derivatives
 qualify. New confirmation cohorts need complete acquisition/transform provenance;
 D001's historical limitations and exposure remain in force.
 
-Read E008/E009 compact RESULT records first. E008's raw evidence is committed;
-CP passes its frozen development screen, numerical verification and clean replay.
-E009's fixed higher-budget assessment fails overall; numerical/clean replay passes.
-E010's frozen CP probability-vector stability fails, with independent/clean replay
-passing. E011 completed the unchanged scalar-outcome confirmation/full root-budget
-panel: its joint gates fail; exact/independent/clean replay passes. D002's300
-reserved games are consumed and keep their `test` role. Do not retune or rescue
-the candidate on them; revised candidates require fresh registered confirmation.
-E012's tactical-property audit of E005 is complete: both operational gates fail,
-with exact/independent/clean replay passing. Read F010 and improve net-voluntary-
-offer selection under a separately registered protocol/pack. Preserve E005 and
-blinding; there are still zero human reviews and no human validity claim.
-Read E007's source/target limitations and open both D001/D002 for admission. Freeze later
-candidate/access rules before activating a new confirmation cohort; no new score is
-confirmed by the pipeline's successful reconstruction.
-E005 awaits later human reviews; pending annotation does not block this work.
+Active: read E013's compact RESULT/plan and F010. Build the separate net-offer
+review pack once, register/commit its policy/cases/key before new searches, then
+assess frozen properties and replay. Preserve E005 and reviewer blinding. Human
+annotations remain pending; no synthetic or engine evidence supplies perception.
+
+For accuracy work, F006–F009 retain development gains and failed confirmation/
+stability gates. D002's300 reserved games are consumed and keep their `test`
+role; revised candidates need a fresh registered confirmation cohort. Use both
+D001/D002 for D002 admission and retain E007's source/target limitations.
 Do not retry F002/F003/F004/F005 without a changed premise. No candidate is confirmed.
 The research goal is active. The extension remains at B000.

@@ -1,0 +1,4 @@
+import {sha256} from '../../../data-policy.mjs';
+export function makePolicy(parent){return{schema:'E013-selection-policy-v1',parentPolicy:'research/experiments/E012-offer-evidence/evidence/policy.json',parentPolicySha256:sha256(JSON.stringify(parent)),boardBlockSha256:parent.boardBlockSha256,engineConfigs:parent.engineConfigs,configHashes:parent.configHashes,engineThresholds:parent.thresholds,
+  selection:{sourceLossMax:.02,playedMin:.5,playedMax:.9,pointSplit:.7,phases:[20,80],offers:8,controls:8,caseSeed:'E013-case-v1:',orderSeed:'E013-order-v1:'},gates:{offersRequired:7,stableCasesRequired:15,caseCount:16},modelFits:0,humanLabelsUsed:0};}
+export function validatePolicy(policy,parent){if(JSON.stringify(policy)!==JSON.stringify(makePolicy(parent)))throw Error('Frozen net-offer policy differs');}

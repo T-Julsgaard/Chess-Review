@@ -79,3 +79,10 @@ reconstruction, exact property replay, independent equations/completed exchange
 recurrence and external clean archive replay. State incomplete reference checks.
 No new sources, network acquisition, model-generated human judgments or silent
 overwriting. Record unsuccessful collection/checks and all negative findings.
+
+Implementation clarification before pool scanning: independent verification will
+also retain positive net-offer witnesses from completed local capture recurrence,
+attribution and a concrete legal alternative avoiding local loss. The reference
+cap is16,384 recursive calls per exchange; unresolved witnesses are reported,
+never guessed. This strengthens verification without changing selection or the
+registered operational gates, and supplies no human judgment.
