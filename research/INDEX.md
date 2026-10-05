@@ -38,8 +38,10 @@ records. Update a row and the active experiment's resume state when work stops.
 | E013 | [Net-offer review pack](experiments/E013-net-offer-pack/RESULT.md) | complete | Verified7/8 support, 15/16 stability;8 independent net-offer witnesses; separate blinded pack | Later human review; cached root-pair consistency study |
 | F011 | [Net-offer enrichment](findings/F011-net-offer-enrichment.md) | recorded | Improved operational targeting; deterministic/independent/clean replay; no human category claim | Preserve both packs; investigate root-score consistency |
 
+| E014 | [Root-pair consistency](experiments/E014-root-pair-consistency/RESULT.md) | planned | One restricted-chosen-move candidate; frozen 40/45 development panels | Commit guarded freeze/code before cached assessment |
+
 No promotion records yet.
-Allocate the next unused ID in each series: `E014`, `D003`, `F012`, `P001`.
+Allocate the next unused ID in each series: `E015`, `D003`, `F012`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
@@ -77,7 +79,7 @@ D001's historical limitations and exposure remain in force.
 Read E013's compact RESULT and F011. Its16-case pack is frozen/verified, with 7/8
 offers supported and 15/16 stable; one unstable case remains. E005 and E013 human
 annotations are pending; no synthetic/engine evidence supplies perception.
-Next register a cached root-pair consistency study, motivated by divergent
+E014 registers the cached root-pair consistency study, motivated by divergent
 root-pair versus complete-alternative near-best decisions. Reuse hash-matched
 queries and freeze the comparison before assessment; do not rewrite prior cases.
 
