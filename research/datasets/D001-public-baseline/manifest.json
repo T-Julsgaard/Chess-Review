@@ -243,6 +243,25 @@
       "sha256": "c4b7ac8a82d4b6f3f165c1ce2c0191de5a00b0f3777c7b93e9edb7158056c9e8",
       "bytes": 5242,
       "uncompressedSha256": "c4b7ac8a82d4b6f3f165c1ce2c0191de5a00b0f3777c7b93e9edb7158056c9e8"
+    },
+    "research/experiments/E012-offer-evidence/evidence/policy.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E005-category-review/evidence/cases.json",
+        "research/experiments/E005-category-review/evidence/selection-key.json"
+      ],
+      "sha256": "a7365e813d97470d55056fda3baf5b3a8311b85bcc301ecc9c88403e5314a6b4",
+      "bytes": 2370,
+      "uncompressedSha256": "a7365e813d97470d55056fda3baf5b3a8311b85bcc301ecc9c88403e5314a6b4"
+    },
+    "research/experiments/E012-offer-evidence/evidence/freeze-run.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E012-offer-evidence/evidence/policy.json"
+      ],
+      "sha256": "0287e95d96658a7b3c190ac763469b4b165441bd5d261e05a1854eeae13b7d07",
+      "bytes": 7457,
+      "uncompressedSha256": "0287e95d96658a7b3c190ac763469b4b165441bd5d261e05a1854eeae13b7d07"
     }
   }
 }
