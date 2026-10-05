@@ -147,6 +147,35 @@
       "sha256": "dee64873bac4e000004be8a25557315fe6669b01bfa59ab75a7b4e5fde5f7eab",
       "bytes": 8955,
       "uncompressedSha256": "dee64873bac4e000004be8a25557315fe6669b01bfa59ab75a7b4e5fde5f7eab"
+    },
+    "research/experiments/E008-human-quality-curves/evidence/results.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E008-human-quality-curves/evidence/sf19-observations.json.gz"
+      ],
+      "sha256": "36962320bdad9b28031686bf06569f88936393f62e0039e132aedbe6cc9796c8",
+      "bytes": 30585,
+      "uncompressedSha256": "36962320bdad9b28031686bf06569f88936393f62e0039e132aedbe6cc9796c8"
+    },
+    "research/experiments/E008-human-quality-curves/evidence/predictions.json.gz": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E008-human-quality-curves/evidence/sf19-observations.json.gz",
+        "research/experiments/E008-human-quality-curves/evidence/results.json"
+      ],
+      "sha256": "8d0f1164a246ccdd2fe6fd092bcdfb23aa7fc3ab0ae0960fb027af17a4abd39c",
+      "bytes": 490668,
+      "uncompressedSha256": "4499c32e4142762b8bb043d2015035473e6041bd9558a304b255336f3459b5b5"
+    },
+    "research/experiments/E008-human-quality-curves/evidence/run.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E008-human-quality-curves/evidence/results.json",
+        "research/experiments/E008-human-quality-curves/evidence/predictions.json.gz"
+      ],
+      "sha256": "9bfa000b2dc438b2e2db615d99656aa0a6d0aff96bd939b45e044e5350cc40a0",
+      "bytes": 8576,
+      "uncompressedSha256": "9bfa000b2dc438b2e2db615d99656aa0a6d0aff96bd939b45e044e5350cc40a0"
     }
   }
 }

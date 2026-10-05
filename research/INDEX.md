@@ -25,8 +25,8 @@ records. Update a row and the active experiment's resume state when work stops.
 | F005 | [Single-game rating ranges](findings/F005-single-game-rating-ranges.md) | recorded | No ±300 cases; stronger-player conditional coverage fails/unresolved | Fresh evidence and distinct hypotheses |
 | E007 | [Fresh evidence pipeline](experiments/E007-fresh-evidence/RESULT.md) | complete | Exact clean reconstruction; provisional status unavailable | Distinct calibration hypothesis |
 | D002 | [Fresh prefix cohort](datasets/D002-fresh-prefix/README.md) | registered | 900 disjoint games 450/150/300; reserved evaluation not activated | Guarded development use after protocol |
-| E008 | [Human quality curves](experiments/E008-human-quality-curves/RESULT.md) | running |600-game collection complete;23,584 reusable searches; no candidate metrics yet | Commit registered raw evidence, then frozen evaluation |
-| E009 | [Search stability](experiments/E009-search-stability/plan.md) | planned | Score-blind45-game20k/80k comparison; E008 cached baseline | Admit completed E008 evidence, then higher-budget collection |
+| E008 | [Human quality curves](experiments/E008-human-quality-curves/RESULT.md) | running | CP passes joint development screen; WDL fails;23,584 cached searches | Numerical verification and clean replay before finding |
+| E009 | [Search stability](experiments/E009-search-stability/RESULT.md) | running | Score-blind45-game20k/80k collection live; E008 cached baseline | Poll session91414; register complete evidence before assessment |
 
 No promotion records yet.
 Allocate the next unused ID in each series: `E010`, `D003`, `F006`, `P001`.
@@ -64,8 +64,9 @@ Only registered explicitly public, free-to-use sources and traceable derivatives
 qualify. New confirmation cohorts need complete acquisition/transform provenance;
 D001's historical limitations and exposure remain in force.
 
-Read E008's compact RESULT first; its collection is complete. Commit the
-registered raw evidence before its frozen development evaluation.
+Read E008/E009 compact RESULT records first. E008's raw evidence is committed;
+CP passes its frozen development screen, pending verification/clean replay.
+E009 is collecting a fixed higher-budget sample in live session91414.
 Read E007's source/target limitations and open both D001/D002 for admission. Freeze later
 candidate/access rules before activating reserved evaluation; no new score is
 confirmed by the pipeline's successful reconstruction.

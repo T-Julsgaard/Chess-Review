@@ -1,0 +1,1099 @@
+{
+  "schema": "E008-human-curves-v1",
+  "models": {
+    "fixed": {
+      "curve": {
+        "schema": "E008-curve-v1",
+        "kind": "cp",
+        "coefficient": 0.368208,
+        "boundary": null,
+        "fixed": true
+      },
+      "choice": {
+        "schema": "human-choice-v1",
+        "temperature": 15.464491662877624,
+        "boundary": null,
+        "games": 450,
+        "criterion": "Mean multinomial negative log likelihood, one legal move choice per game"
+      }
+    },
+    "cp": {
+      "curve": {
+        "schema": "E008-curve-v1",
+        "kind": "cp",
+        "coefficient": 0.22349935786891822,
+        "boundary": null,
+        "observations": 2744,
+        "games": 450,
+        "coordinate": "cp/100",
+        "criterion": "Weighted fractional Bernoulli negative log likelihood; each game has unit total weight"
+      },
+      "choice": {
+        "schema": "human-choice-v1",
+        "temperature": 20.939735269175777,
+        "boundary": null,
+        "games": 450,
+        "criterion": "Mean multinomial negative log likelihood, one legal move choice per game"
+      }
+    },
+    "wdl": {
+      "curve": {
+        "schema": "E008-curve-v1",
+        "kind": "wdl",
+        "coefficient": 0.16514509156690166,
+        "boundary": null,
+        "observations": 2744,
+        "games": 450,
+        "coordinate": "logit(engine expected points clamped to [0.0005,0.9995])",
+        "criterion": "Weighted fractional Bernoulli negative log likelihood; each game has unit total weight"
+      },
+      "choice": {
+        "schema": "human-choice-v1",
+        "temperature": 13.353740343925672,
+        "boundary": null,
+        "games": 450,
+        "criterion": "Mean multinomial negative log likelihood, one legal move choice per game"
+      }
+    }
+  },
+  "diagnostics": {
+    "games": 600,
+    "outcomeRoots": 3640,
+    "excludedMates": 54,
+    "choicePositions": 600,
+    "uniqueSearches": 23584,
+    "earlierExactScores": 8372,
+    "finalBoundScores": 8372,
+    "exactRecoveries": 122,
+    "selectedNodes": [
+      245,
+      20106
+    ],
+    "finalNodes": [
+      245,
+      20106
+    ]
+  },
+  "exclusions": [
+    {
+      "gameId": "JnLMtxLW",
+      "ply": 30,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "l8B9nIpe",
+      "ply": 50,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "OltFPwJq",
+      "ply": 70,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "LU1VRlcq",
+      "ply": 70,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "LU1VRlcq",
+      "ply": 71,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "H06nwi5a",
+      "ply": 71,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "hyMlsmd4",
+      "ply": 71,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "dX59R7ww",
+      "ply": 71,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "li5vE1ea",
+      "ply": 71,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "JOiiyksB",
+      "ply": 30,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "JOiiyksB",
+      "ply": 31,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "Oc4GJemE",
+      "ply": 71,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "X1JjFSb2",
+      "ply": 70,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "X1JjFSb2",
+      "ply": 71,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "Up7ckiH5",
+      "ply": 31,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "JgmnCgel",
+      "ply": 50,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "JgmnCgel",
+      "ply": 51,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "gw4mhWk7",
+      "ply": 50,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "gw4mhWk7",
+      "ply": 70,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "gw4mhWk7",
+      "ply": 71,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "JcZ7Jq6m",
+      "ply": 51,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "Io2PhOCr",
+      "ply": 70,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "Io2PhOCr",
+      "ply": 71,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "SpOkv1E1",
+      "ply": 70,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "SpOkv1E1",
+      "ply": 71,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "GhRla6HY",
+      "ply": 50,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "TGgEooxB",
+      "ply": 50,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "lWKzzdc0",
+      "ply": 71,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "HRxcS4OL",
+      "ply": 31,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "YQphdv7J",
+      "ply": 30,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "YQphdv7J",
+      "ply": 50,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "YQphdv7J",
+      "ply": 51,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "Lx5zT7YY",
+      "ply": 51,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "QTs0QimB",
+      "ply": 10,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "3BAA5TiI",
+      "ply": 51,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "U1I6Ceu7",
+      "ply": 50,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "U1I6Ceu7",
+      "ply": 51,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "C2HDoYlR",
+      "ply": 50,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "NX068zew",
+      "ply": 51,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "18WoDrIs",
+      "ply": 50,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "18WoDrIs",
+      "ply": 51,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "xr1GRzuR",
+      "ply": 51,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "8RnxAD3s",
+      "ply": 30,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "8RnxAD3s",
+      "ply": 50,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "cfBoshiO",
+      "ply": 50,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "0uyT8KFm",
+      "ply": 30,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "t14sFYll",
+      "ply": 70,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "9Xg38nnP",
+      "ply": 50,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "9Xg38nnP",
+      "ply": 51,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "8ddch4w7",
+      "ply": 30,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "8ddch4w7",
+      "ply": 31,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "d98hvUL8",
+      "ply": 30,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "d98hvUL8",
+      "ply": 31,
+      "reason": "root-mate"
+    },
+    {
+      "gameId": "5Ras0iPQ",
+      "ply": 30,
+      "reason": "root-mate"
+    }
+  ],
+  "roles": {
+    "train": {
+      "metrics": {
+        "fixed": {
+          "outcomes": {
+            "games": 450,
+            "observations": 2744,
+            "logLoss": 0.6443960090320626,
+            "brier": 0.2100359886216494
+          },
+          "choices": {
+            "games": 450,
+            "observations": 450,
+            "logLoss": 2.440912765028153,
+            "uniformLogLoss": 3.3175825407808426
+          }
+        },
+        "cp": {
+          "outcomes": {
+            "games": 450,
+            "observations": 2744,
+            "logLoss": 0.6280696926571349,
+            "brier": 0.20803830992966
+          },
+          "choices": {
+            "games": 450,
+            "observations": 450,
+            "logLoss": 2.390306083469955,
+            "uniformLogLoss": 3.3175825407808426
+          }
+        },
+        "wdl": {
+          "outcomes": {
+            "games": 450,
+            "observations": 2744,
+            "logLoss": 0.6277919272362554,
+            "brier": 0.20907266755598514
+          },
+          "choices": {
+            "games": 450,
+            "observations": 450,
+            "logLoss": 2.6668777185305363,
+            "uniformLogLoss": 3.3175825407808426
+          }
+        }
+      },
+      "rawWdlDiagnostic": {
+        "games": 450,
+        "observations": 2744,
+        "logLoss": 2.593188545122827,
+        "brier": 0.24195659603902114,
+        "probabilityClip": 1e-12,
+        "interpretation": "Engine expected points; not the fixed-CP primary comparator"
+      }
+    },
+    "validation": {
+      "metrics": {
+        "fixed": {
+          "outcomes": {
+            "games": 150,
+            "observations": 896,
+            "logLoss": 0.7051942212601745,
+            "brier": 0.23643177153702122
+          },
+          "choices": {
+            "games": 150,
+            "observations": 150,
+            "logLoss": 2.3904046509340304,
+            "uniformLogLoss": 3.4249787466006616
+          }
+        },
+        "cp": {
+          "outcomes": {
+            "games": 150,
+            "observations": 896,
+            "logLoss": 0.6657987492308242,
+            "brier": 0.22611117956692733
+          },
+          "choices": {
+            "games": 150,
+            "observations": 150,
+            "logLoss": 2.3248832071939267,
+            "uniformLogLoss": 3.4249787466006616
+          }
+        },
+        "wdl": {
+          "outcomes": {
+            "games": 150,
+            "observations": 896,
+            "logLoss": 0.6798342261513394,
+            "brier": 0.23232775343010567
+          },
+          "choices": {
+            "games": 150,
+            "observations": 150,
+            "logLoss": 2.674774286808105,
+            "uniformLogLoss": 3.4249787466006616
+          }
+        }
+      },
+      "comparisons": {
+        "cp": {
+          "outcomeImprovement": {
+            "estimate": 0.039395472029350335,
+            "lower": 0.011472143587871443,
+            "upper": 0.07039693399841854,
+            "level": 0.975,
+            "seed": 20261035,
+            "iterations": 10000,
+            "unit": "game",
+            "interpretation": "Paired development game percentile interval, conditional on the fitted training model"
+          },
+          "choiceImprovement": {
+            "estimate": 0.06552144374010467,
+            "lower": 0.022157595251550997,
+            "upper": 0.11243530155648349,
+            "level": 0.975,
+            "seed": 20261036,
+            "iterations": 10000,
+            "unit": "game",
+            "interpretation": "Paired development game percentile interval, conditional on the fitted training model"
+          },
+          "groups": [
+            {
+              "label": "fixed-points:0.1-0.9",
+              "comparator": {
+                "outcomes": {
+                  "games": 150,
+                  "observations": 792,
+                  "logLoss": 0.6991328054502002,
+                  "brier": 0.2393696290093646
+                },
+                "choices": {
+                  "games": 121,
+                  "observations": 121,
+                  "logLoss": 2.399110117573687
+                }
+              },
+              "candidate": {
+                "outcomes": {
+                  "games": 150,
+                  "observations": 792,
+                  "logLoss": 0.6759021088880907,
+                  "brier": 0.2314520973858832
+                },
+                "choices": {
+                  "games": 121,
+                  "observations": 121,
+                  "logLoss": 2.3840759618841476
+                }
+              },
+              "outcomePassed": true,
+              "choicePassed": true
+            },
+            {
+              "label": "fixed-points:<0.1",
+              "comparator": {
+                "outcomes": {
+                  "games": 36,
+                  "observations": 45,
+                  "logLoss": 0.7342023870811488,
+                  "brier": 0.22106705078459368
+                },
+                "choices": {
+                  "games": 11,
+                  "observations": 11,
+                  "logLoss": 2.711383092580722
+                }
+              },
+              "candidate": {
+                "outcomes": {
+                  "games": 36,
+                  "observations": 45,
+                  "logLoss": 0.5759879932451526,
+                  "brier": 0.18887078060250453
+                },
+                "choices": {
+                  "games": 11,
+                  "observations": 11,
+                  "logLoss": 2.282760166098608
+                }
+              },
+              "outcomePassed": true,
+              "choicePassed": null
+            },
+            {
+              "label": "fixed-points:>0.9",
+              "comparator": {
+                "outcomes": {
+                  "games": 46,
+                  "observations": 59,
+                  "logLoss": 0.7656346641724778,
+                  "brier": 0.19847063382408042
+                },
+                "choices": {
+                  "games": 18,
+                  "observations": 18,
+                  "logLoss": 2.135731077516701
+                }
+              },
+              "candidate": {
+                "outcomes": {
+                  "games": 46,
+                  "observations": 59,
+                  "logLoss": 0.5832769397596185,
+                  "brier": 0.17677534349424934
+                },
+                "choices": {
+                  "games": 18,
+                  "observations": 18,
+                  "logLoss": 1.9527182146679063
+                }
+              },
+              "outcomePassed": true,
+              "choicePassed": null
+            },
+            {
+              "label": "ply:21-50",
+              "comparator": {
+                "outcomes": {
+                  "games": 136,
+                  "observations": 369,
+                  "logLoss": 0.7033775688452428,
+                  "brier": 0.2312267097584013
+                },
+                "choices": {
+                  "games": 80,
+                  "observations": 80,
+                  "logLoss": 2.5026946821859584
+                }
+              },
+              "candidate": {
+                "outcomes": {
+                  "games": 136,
+                  "observations": 369,
+                  "logLoss": 0.6547583456489859,
+                  "brier": 0.2188782804129866
+                },
+                "choices": {
+                  "games": 80,
+                  "observations": 80,
+                  "logLoss": 2.4247686397566963
+                }
+              },
+              "outcomePassed": true,
+              "choicePassed": true
+            },
+            {
+              "label": "ply:<=20",
+              "comparator": {
+                "outcomes": {
+                  "games": 150,
+                  "observations": 300,
+                  "logLoss": 0.688146596556584,
+                  "brier": 0.23707944252274832
+                },
+                "choices": {
+                  "games": 32,
+                  "observations": 32,
+                  "logLoss": 2.291820377821471
+                }
+              },
+              "candidate": {
+                "outcomes": {
+                  "games": 150,
+                  "observations": 300,
+                  "logLoss": 0.6862616964640404,
+                  "brier": 0.23653882728304193
+                },
+                "choices": {
+                  "games": 32,
+                  "observations": 32,
+                  "logLoss": 2.319848511472302
+                }
+              },
+              "outcomePassed": true,
+              "choicePassed": true
+            },
+            {
+              "label": "ply:>50",
+              "comparator": {
+                "outcomes": {
+                  "games": 100,
+                  "observations": 227,
+                  "logLoss": 0.6709257051044426,
+                  "brier": 0.21034104106490417
+                },
+                "choices": {
+                  "games": 38,
+                  "observations": 38,
+                  "logLoss": 2.237022920393184
+                }
+              },
+              "candidate": {
+                "outcomes": {
+                  "games": 100,
+                  "observations": 227,
+                  "logLoss": 0.6032105164014293,
+                  "brier": 0.19369322317155782
+                },
+                "choices": {
+                  "games": 38,
+                  "observations": 38,
+                  "logLoss": 2.118837829774725
+                }
+              },
+              "outcomePassed": true,
+              "choicePassed": true
+            },
+            {
+              "label": "rating:1200-1999",
+              "comparator": {
+                "outcomes": {
+                  "games": 115,
+                  "observations": 639,
+                  "logLoss": 0.7031742023746743,
+                  "brier": 0.23652087572258393
+                },
+                "choices": {
+                  "games": 109,
+                  "observations": 109,
+                  "logLoss": 2.4475284724267112
+                }
+              },
+              "candidate": {
+                "outcomes": {
+                  "games": 115,
+                  "observations": 639,
+                  "logLoss": 0.6644123772097263,
+                  "brier": 0.2255891550861244
+                },
+                "choices": {
+                  "games": 109,
+                  "observations": 109,
+                  "logLoss": 2.3582466428170714
+                }
+              },
+              "outcomePassed": true,
+              "choicePassed": true
+            },
+            {
+              "label": "rating:<1200",
+              "comparator": {
+                "outcomes": {
+                  "games": 19,
+                  "observations": 100,
+                  "logLoss": 0.8678639383025445,
+                  "brier": 0.27861600056105407
+                },
+                "choices": {
+                  "games": 18,
+                  "observations": 18,
+                  "logLoss": 2.226805828059682
+                }
+              },
+              "candidate": {
+                "outcomes": {
+                  "games": 19,
+                  "observations": 100,
+                  "logLoss": 0.7533362827467961,
+                  "brier": 0.2544796690230411
+                },
+                "choices": {
+                  "games": 18,
+                  "observations": 18,
+                  "logLoss": 2.194201351414219
+                }
+              },
+              "outcomePassed": null,
+              "choicePassed": null
+            },
+            {
+              "label": "rating:>=2000",
+              "comparator": {
+                "outcomes": {
+                  "games": 26,
+                  "observations": 157,
+                  "logLoss": 0.6368735798257199,
+                  "brier": 0.21555696376744762
+                },
+                "choices": {
+                  "games": 23,
+                  "observations": 23,
+                  "logLoss": 2.2477212713269097
+                }
+              },
+              "candidate": {
+                "outcomes": {
+                  "games": 26,
+                  "observations": 157,
+                  "logLoss": 0.6357546571392123,
+                  "brier": 0.2139499365866458
+                },
+                "choices": {
+                  "games": 23,
+                  "observations": 23,
+                  "logLoss": 2.269042290720531
+                }
+              },
+              "outcomePassed": null,
+              "choicePassed": null
+            }
+          ],
+          "gates": {
+            "outcomePractical": true,
+            "outcomeInterval": true,
+            "choicePractical": true,
+            "choiceInterval": true,
+            "brier": true,
+            "coverage": true,
+            "interior": true,
+            "subgroups": true
+          },
+          "passed": true,
+          "sparseGroupsUnresolved": true
+        },
+        "wdl": {
+          "outcomeImprovement": {
+            "estimate": 0.025359995108834917,
+            "lower": -0.005235028815455574,
+            "upper": 0.06128633962385655,
+            "level": 0.975,
+            "seed": 20261037,
+            "iterations": 10000,
+            "unit": "game",
+            "interpretation": "Paired development game percentile interval, conditional on the fitted training model"
+          },
+          "choiceImprovement": {
+            "estimate": -0.2843696358740732,
+            "lower": -0.3836698858660543,
+            "upper": -0.1774824752612848,
+            "level": 0.975,
+            "seed": 20261038,
+            "iterations": 10000,
+            "unit": "game",
+            "interpretation": "Paired development game percentile interval, conditional on the fitted training model"
+          },
+          "groups": [
+            {
+              "label": "fixed-points:0.1-0.9",
+              "comparator": {
+                "outcomes": {
+                  "games": 150,
+                  "observations": 792,
+                  "logLoss": 0.6991328054502002,
+                  "brier": 0.2393696290093646
+                },
+                "choices": {
+                  "games": 121,
+                  "observations": 121,
+                  "logLoss": 2.399110117573687
+                }
+              },
+              "candidate": {
+                "outcomes": {
+                  "games": 150,
+                  "observations": 792,
+                  "logLoss": 0.6924446139923063,
+                  "brier": 0.2381726372712696
+                },
+                "choices": {
+                  "games": 121,
+                  "observations": 121,
+                  "logLoss": 2.6485562808593572
+                }
+              },
+              "outcomePassed": true,
+              "choicePassed": false
+            },
+            {
+              "label": "fixed-points:<0.1",
+              "comparator": {
+                "outcomes": {
+                  "games": 36,
+                  "observations": 45,
+                  "logLoss": 0.7342023870811488,
+                  "brier": 0.22106705078459368
+                },
+                "choices": {
+                  "games": 11,
+                  "observations": 11,
+                  "logLoss": 2.711383092580722
+                }
+              },
+              "candidate": {
+                "outcomes": {
+                  "games": 36,
+                  "observations": 45,
+                  "logLoss": 0.5820054133204317,
+                  "brier": 0.18907801622126835
+                },
+                "choices": {
+                  "games": 11,
+                  "observations": 11,
+                  "logLoss": 2.966862616702454
+                }
+              },
+              "outcomePassed": true,
+              "choicePassed": null
+            },
+            {
+              "label": "fixed-points:>0.9",
+              "comparator": {
+                "outcomes": {
+                  "games": 46,
+                  "observations": 59,
+                  "logLoss": 0.7656346641724778,
+                  "brier": 0.19847063382408042
+                },
+                "choices": {
+                  "games": 18,
+                  "observations": 18,
+                  "logLoss": 2.135731077516701
+                }
+              },
+              "candidate": {
+                "outcomes": {
+                  "games": 46,
+                  "observations": 59,
+                  "logLoss": 0.5372862229646919,
+                  "brier": 0.17076471973479315
+                },
+                "choices": {
+                  "games": 18,
+                  "observations": 18,
+                  "logLoss": 2.6725191251948015
+                }
+              },
+              "outcomePassed": true,
+              "choicePassed": null
+            },
+            {
+              "label": "ply:21-50",
+              "comparator": {
+                "outcomes": {
+                  "games": 136,
+                  "observations": 369,
+                  "logLoss": 0.7033775688452428,
+                  "brier": 0.2312267097584013
+                },
+                "choices": {
+                  "games": 80,
+                  "observations": 80,
+                  "logLoss": 2.5026946821859584
+                }
+              },
+              "candidate": {
+                "outcomes": {
+                  "games": 136,
+                  "observations": 369,
+                  "logLoss": 0.6714481601444466,
+                  "brier": 0.2269797949738372
+                },
+                "choices": {
+                  "games": 80,
+                  "observations": 80,
+                  "logLoss": 2.788464521689845
+                }
+              },
+              "outcomePassed": true,
+              "choicePassed": false
+            },
+            {
+              "label": "ply:<=20",
+              "comparator": {
+                "outcomes": {
+                  "games": 150,
+                  "observations": 300,
+                  "logLoss": 0.688146596556584,
+                  "brier": 0.23707944252274832
+                },
+                "choices": {
+                  "games": 32,
+                  "observations": 32,
+                  "logLoss": 2.291820377821471
+                }
+              },
+              "candidate": {
+                "outcomes": {
+                  "games": 150,
+                  "observations": 300,
+                  "logLoss": 0.6888001063787653,
+                  "brier": 0.23750373847337827
+                },
+                "choices": {
+                  "games": 32,
+                  "observations": 32,
+                  "logLoss": 2.5675778789537462
+                }
+              },
+              "outcomePassed": true,
+              "choicePassed": false
+            },
+            {
+              "label": "ply:>50",
+              "comparator": {
+                "outcomes": {
+                  "games": 100,
+                  "observations": 227,
+                  "logLoss": 0.6709257051044426,
+                  "brier": 0.21034104106490417
+                },
+                "choices": {
+                  "games": 38,
+                  "observations": 38,
+                  "logLoss": 2.237022920393184
+                }
+              },
+              "candidate": {
+                "outcomes": {
+                  "games": 100,
+                  "observations": 227,
+                  "logLoss": 0.629781225595751,
+                  "brier": 0.20370993687460828
+                },
+                "choices": {
+                  "games": 38,
+                  "observations": 38,
+                  "logLoss": 2.525697083144952
+                }
+              },
+              "outcomePassed": true,
+              "choicePassed": false
+            },
+            {
+              "label": "rating:1200-1999",
+              "comparator": {
+                "outcomes": {
+                  "games": 115,
+                  "observations": 639,
+                  "logLoss": 0.7031742023746743,
+                  "brier": 0.23652087572258393
+                },
+                "choices": {
+                  "games": 109,
+                  "observations": 109,
+                  "logLoss": 2.4475284724267112
+                }
+              },
+              "candidate": {
+                "outcomes": {
+                  "games": 115,
+                  "observations": 639,
+                  "logLoss": 0.6843884889066867,
+                  "brier": 0.23343896795052005
+                },
+                "choices": {
+                  "games": 109,
+                  "observations": 109,
+                  "logLoss": 2.7245276750693614
+                }
+              },
+              "outcomePassed": true,
+              "choicePassed": false
+            },
+            {
+              "label": "rating:<1200",
+              "comparator": {
+                "outcomes": {
+                  "games": 19,
+                  "observations": 100,
+                  "logLoss": 0.8678639383025445,
+                  "brier": 0.27861600056105407
+                },
+                "choices": {
+                  "games": 18,
+                  "observations": 18,
+                  "logLoss": 2.226805828059682
+                }
+              },
+              "candidate": {
+                "outcomes": {
+                  "games": 19,
+                  "observations": 100,
+                  "logLoss": 0.7340175410318396,
+                  "brier": 0.25297170477550984
+                },
+                "choices": {
+                  "games": 18,
+                  "observations": 18,
+                  "logLoss": 2.522297993465978
+                }
+              },
+              "outcomePassed": null,
+              "choicePassed": null
+            },
+            {
+              "label": "rating:>=2000",
+              "comparator": {
+                "outcomes": {
+                  "games": 26,
+                  "observations": 157,
+                  "logLoss": 0.6368735798257199,
+                  "brier": 0.21555696376744762
+                },
+                "choices": {
+                  "games": 23,
+                  "observations": 23,
+                  "logLoss": 2.2477212713269097
+                }
+              },
+              "candidate": {
+                "outcomes": {
+                  "games": 26,
+                  "observations": 157,
+                  "logLoss": 0.6443900015685942,
+                  "brier": 0.21778994898262416
+                },
+                "choices": {
+                  "games": 23,
+                  "observations": 23,
+                  "logLoss": 2.5583157633159908
+                }
+              },
+              "outcomePassed": null,
+              "choicePassed": null
+            }
+          ],
+          "gates": {
+            "outcomePractical": true,
+            "outcomeInterval": false,
+            "choicePractical": false,
+            "choiceInterval": false,
+            "brier": true,
+            "coverage": true,
+            "interior": true,
+            "subgroups": false
+          },
+          "passed": false,
+          "sparseGroupsUnresolved": true
+        }
+      },
+      "cpVsWdl": {
+        "outcomeGain": -0.014035476920515393,
+        "choiceGain": -0.34989107961417804
+      },
+      "rawWdlDiagnostic": {
+        "games": 150,
+        "observations": 896,
+        "logLoss": 3.6302079388664006,
+        "brier": 0.29104104052579377,
+        "probabilityClip": 1e-12,
+        "interpretation": "Engine expected points; not the fixed-CP primary comparator"
+      }
+    }
+  },
+  "developmentShortlist": "cp",
+  "confirmation": false,
+  "promoted": false,
+  "interpretation": "Training-only fits with a frozen development screen. No displayed accuracy, rating or category improvement is established."
+}

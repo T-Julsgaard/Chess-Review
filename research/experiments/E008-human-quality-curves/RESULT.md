@@ -1,37 +1,67 @@
-# E008: collection complete; frozen evaluation next
+# E008: CP candidate passes development screen; verification pending
 
-Updated2026-10-05. Development experiment only, SF19. Plan registered in
-`f47409d`; collector/query guards committed in `e26d865`. The extension stays B000.
+2026-10-05. State: running, numerical verification/clean replay next. The CP
+candidate passes the registered joint development gates; WDL fails. No fresh
+confirmation, displayed-accuracy validation or production promotion yet.
 
-The authored startpos pilot and two-game guarded smoke completed. Smoke:2 games,
-81 unique searches,82 engine requests,15,562 compressed bytes, zero model fits.
-This checks mechanics and cost only. The full600-game run completed from
-`e26d865` using exactly the same frozen engine configuration:23,584 unique
-searches,23,706 requests,69 compatible query reuses,1,794 seconds,4,453,580
-compressed bytes. Terminal77316 exited0. No candidate fits ran during collection.
-Reserved300 games remain excluded. No validation metrics have been inspected.
-The complete observations and collection run are registered D002 derivatives;
-the guarded provenance check passes.
+## Result
+
+450 train /150 development games, SF19 at20,000 configured nodes. Outcome
+assessment excludes54 mate roots jointly, retaining3,640 roots in600 games.
+Each game has unit outcome weight; one score-blind legal choice per game.
+All legal alternatives are retained; coverage matches every candidate.
+
+| Development metric | Fixed CP | CP refit | WDL refit |
+| --- | --- | --- | --- |
+| Outcome log loss |0.705194|0.665799|0.679834|
+| Outcome Brier |0.236432|0.226111|0.232328|
+| Legal-choice log loss |2.390405|2.324883|2.674774|
+
+CP outcome gain0.039395,97.5% paired game interval[0.011472,0.070397]; choice
+gain0.065521,[0.022158,0.112435]. Both practical/uncertainty gates, Brier,
+matched coverage, fit-interior and adequately sized subgroup guardrails pass.
+Sparse subgroups remain unresolved. CP is the sole development shortlist.
+
+WDL outcome gain0.025360,[-0.005235,0.061286] is unresolved; choice gain
+-0.284370,[-0.383670,-0.177482] is deterioration. Joint/choice/subgroup gates
+fail. Preserve this negative result; do not promote or retune on this validation.
+
+Frozen train-only parameters: CP slope0.22349935786891822 per pawn, choice
+inverse temperature20.939735269175777. Fixed-CP auxiliary temperature is
+15.464491662877624. WDL coefficient0.16514509156690166, temperature
+13.353740343925672. These are probability/choice primitives, not a new validated
+display formula, game aggregation, rating model or category rubric.
+
+## Collection and provenance
+
+Plan `f47409d`, collector `e26d865`, evaluation/checks frozen before metrics.
+Full collection terminal77316 exited0:23,584 unique searches,23,706 requests,
+69 compatible reuses,1,794 seconds,4,453,580 compressed bytes; zero fits during
+collection. Complete registered raw evidence committed in `1dc3283` before fit.
+The two-game smoke had81 searches/82 requests and passed mechanics only.
+
+8,372 searches retained an earlier exact iteration because final info had a
+bound;122 unrestricted searches used the maintained harness's exact recovery.
+Selected/final nodes range245–20,106: configured budget does not guarantee that
+every selected score consumed20,000 nodes. Raw exact/final info and flags are
+retained. No score-based exclusions or silent substitutions were made.
+
+Evidence: [observations](evidence/sf19-observations.json.gz),
+[collection receipt](evidence/collection-run.json), [results](evidence/results.json),
+[predictions](evidence/predictions.json.gz), [fit receipt](evidence/run.json).
+All are registered D002 derivatives with guarded eligibility. The D002 archive
+prefix and unknown provisional-status limits remain; reserved300 games were not
+searched, fitted or assessed. The extension remains B000.
 
 ## Resume
 
-The collector is terminal. Canonical observations and collection receipt are
-in `evidence/`; use the guarded loader. Its ignored progress/cache/header under
-`research/runs/E008/sf19/` are unregistered and must not be loaded into a model.
-Do not rerun collection or substitute those files for the complete artifact.
+Commit registered results before running `code/verify.mjs`. Then make an external
+Git archive and run `research/clean-replay.mjs E008 <archive-commit-SHA>` without
+`.git`, network, ignored inputs or installed dependencies. Retain command/hash/
+receipt. Verify exact fitted output and independent equations before a finding.
+Register/commit verification records before loading them again.
 
-Commit completed observations/registration **before** model fitting. Then run
-the frozen evaluator, register/commit its outputs, and run verification
-and a clean offline replay. `research/clean-replay.mjs E008 <archive-commit-SHA>`
-runs the fit/independent equations from an external Git archive without `.git`,
-network, ignored caches or dependencies. Retain the archive command/hash and
-receipt. Report every failed gate and target limitation.
-If the collector fails, document the exact failure and decide an explicit,
-provenance-checked recovery; do not erase exposure or silently change searches.
-
-The new code checks full query bindings, legal alternatives/PVs, raw score/
-diagnostic identity, train-only fitting, matched coverage and equal game weights.
-An independent equation implementation checks gradients, every prediction and
-metrics. These checks establish numerical integrity only. A passing development
-screen would still require fresh confirmation, search-budget stability and
-separate display/aggregation evidence. E005 human annotation remains pending.
+E009 is independently collecting a fixed45-game higher-budget diagnostic from
+this cache. A positive CP development screen needs locked fresh confirmation,
+candidate search stability and separate display/aggregation evidence before
+adoption. E005 human review remains pending and does not block numerical work.
