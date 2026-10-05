@@ -35,9 +35,10 @@ records. Update a row and the active experiment's resume state when work stops.
 | F009 | [Unconfirmed outcome curve](findings/F009-unconfirmed-outcome-curve.md) | recorded | Small unresolved gain; predictive value vs constant; exact/independent/clean replay passes | Keep failed confirmation with development finding |
 | E012 | [Offer-evidence audit](experiments/E012-offer-evidence/RESULT.md) | complete | Verified screen failure:0/8 supported;21/24 stable;822 alternatives per budget | Register net-offer review selection; retain original pack |
 | F010 | [Offer-selection evidence](findings/F010-offer-selection-evidence.md) | recorded | Capture heuristic insufficient; root gaps do not change focal near-best labels; clean replay passes | Improve evidence selection; no human category claim |
+| E013 | [Net-offer review pack](experiments/E013-net-offer-pack/RESULT.md) | planned | Prospective8 net offers /8 matched controls; original E005 games excluded | Implement/test/commit code before selection and new searches |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E013`, `D003`, `F011`, `P001`.
+Allocate the next unused ID in each series: `E014`, `D003`, `F011`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
