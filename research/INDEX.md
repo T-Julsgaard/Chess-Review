@@ -1,6 +1,6 @@
 # Research index
 
-Updated: 2026-10-05. Twelve studies/tasks complete; net-offer enrichment passes; reviews pending.
+Updated: 2026-10-05. Thirteen studies/tasks complete; root-pair joint gates fail; reviews pending.
 Baseline: [B000](BASELINE.md). New CP gain is development evidence, not confirmed.
 
 This is the routing and decision index. Detailed evidence lives in linked
@@ -38,10 +38,12 @@ records. Update a row and the active experiment's resume state when work stops.
 | E013 | [Net-offer review pack](experiments/E013-net-offer-pack/RESULT.md) | complete | Verified7/8 support, 15/16 stability;8 independent net-offer witnesses; separate blinded pack | Later human review; cached root-pair consistency study |
 | F011 | [Net-offer enrichment](findings/F011-net-offer-enrichment.md) | recorded | Improved operational targeting; deterministic/independent/clean replay; no human category claim | Preserve both packs; investigate root-score consistency |
 
-| E014 | [Root-pair consistency](experiments/E014-root-pair-consistency/RESULT.md) | running | Joint failure: SF19 numerical gains, SF18 worse means; both stability gates fail | Register/commit reports; independent and clean verification |
+| E014 | [Root-pair consistency](experiments/E014-root-pair-consistency/RESULT.md) | complete | Verified joint failure: SF19 numerical gains, SF18 worse means; both stability gates fail | Distinct rating-conditioned choice hypothesis |
+
+| F012 | [Root-pair consistency finding](findings/F012-root-pair-consistency.md) | recorded | SF19 conditional gains retain failed stability; SF18 worsens; no universal repair | Distinct contextual-choice hypothesis; no repair promotion |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E015`, `D003`, `F012`, `P001`.
+Allocate the next unused ID in each series: `E015`, `D003`, `F013`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
@@ -76,12 +78,19 @@ Only registered explicitly public, free-to-use sources and traceable derivatives
 qualify. New confirmation cohorts need complete acquisition/transform provenance;
 D001's historical limitations and exposure remain in force.
 
-Read E013's compact RESULT and F011. Its16-case pack is frozen/verified, with 7/8
-offers supported and 15/16 stable; one unstable case remains. E005 and E013 human
-annotations are pending; no synthetic/engine evidence supplies perception.
-E014 registers the cached root-pair consistency study, motivated by divergent
-root-pair versus complete-alternative near-best decisions. Reuse hash-matched
-queries and freeze the comparison before assessment; do not rewrite prior cases.
+Read E014's compact RESULT and F012. Numerical SF19 gains coexist with failed
+stability, while SF18's observed mean errors increase. Do not adopt a universal
+root-pair repair. Its raw-motivation diagnostic omitted published top-move
+zero-loss behavior; the tested baseline includes it. Both E005/E013 human packs
+are fixed and pending; no synthetic/engine evidence supplies perception.
+
+Next register a rating-conditioned legal-choice likelihood study using cached
+E008 development choices. This tests whether rating context predicts peer move
+choice beyond a global choice model; it is distinct from F004's outcome-context
+interactions and F002's nonlinear moves-only rating regressions. It cannot by
+itself validate a final estimated rating or adjustment. Freeze the target,
+comparator, candidate and development gates before fitting; reserve any future
+confirmation for new registered evidence.
 
 For accuracy work, F006–F009 retain development gains and failed confirmation/
 stability gates. D002's 300 reserved games are consumed and keep their `test`

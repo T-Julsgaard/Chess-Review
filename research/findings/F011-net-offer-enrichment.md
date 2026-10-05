@@ -62,3 +62,8 @@ bind all source/code/shared-helper/engine/policy/pack/output hashes.
 Next retain individual human exports unchanged for later assessment. Continue
 numerical work with a separately registered cached root-pair consistency study;
 do not revise scoring or treat enrichment as a human category promotion.
+
+Later [E014](../experiments/E014-root-pair-consistency/RESULT.md) clarifies that the raw root-pair diagnostic above omits the published
+`top` zero-loss exception. Its disagreement alone does not establish a published
+grading error. E014 evaluates a different restricted-chosen-move candidate with
+that exception included; the earlier frozen evidence is unchanged.

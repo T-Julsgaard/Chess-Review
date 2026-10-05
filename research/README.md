@@ -41,7 +41,7 @@ Research is available in the Git repository. The current packaging allowlist
 excludes `research/` from extension ZIPs and release source snapshots; those
 snapshots retain the active calibration instead.
 
-Twelve studies/tasks are complete. A new 900-game cohort has fully traceable raw
+Thirteen studies/tasks are complete. A new 900-game cohort has fully traceable raw
 frames and exact clean reconstruction. A CP curve improves fresh development
 prediction; its clean replay passes, but the unchanged curve fails its frozen
 300-game confirmation gates. Smaller point gains have intervals including zero.
@@ -53,6 +53,8 @@ A blinded 24-case category pack awaits later annotation. Its tactical audit
 finds the capture-offer heuristic insufficient. A separate 16-case net-offer pack
 passes prospective operational support/stability checks with independent local
 material witnesses; human annotation remains pending. Both packs are preserved.
-Root-pair consistency is the next numerical question. The index routes fresh
-calibration work and retains failed experiments and provenance/target limits.
+The restricted-chosen-move consistency study fails joint gates: SF19 mean
+errors improve, SF18 mean errors increase, and both miss stability. A distinct
+rating-conditioned choice study is next. The index routes calibration work and
+retains failed experiments and provenance/target limits.
 No new model is confirmed or promoted; current scoring is B000.

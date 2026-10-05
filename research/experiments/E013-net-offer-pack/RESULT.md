@@ -90,3 +90,8 @@ Completed enrichment finding: [F011](../../findings/F011-net-offer-enrichment.md
 Next register a cached root-pair consistency study. Human annotation, accuracy/
 rating/category validity and the broader goal remain open; no implementation or
 promotion is selected.
+
+Later [E014](../E014-root-pair-consistency/RESULT.md) clarifies that the raw root-pair diagnostic above omits the published
+`top` zero-loss exception. Its disagreement alone does not establish a published
+grading error. E014 evaluates a different restricted-chosen-move candidate with
+that exception included; the earlier frozen evidence is unchanged.

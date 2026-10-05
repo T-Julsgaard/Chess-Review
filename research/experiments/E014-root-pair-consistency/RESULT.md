@@ -91,9 +91,43 @@ receipt. A research-only replay binding records archive, checkout and canonical
 LF digests plus the exact CRLF line ranges; it reconstructs the recorded bytes
 without accepting source edits. Two authored newline/tampering tests pass.
 Scoring code, queries, reports, seeds and gates remain unchanged. Fresh external
-replay of the committed repair is pending. Both blinded packs remain fixed.
+archive bb87254869e086f4b00e74f2fc915af1b444273c passes exact and independent
+replay for all 85 games / 170 comparisons, with no Git metadata, dependencies,
+network, ignored inputs, new searches or fits. Archive SHA
+441848097d3ac181b612b2fa7ed9fdb0aac462b2e635ef3dce494d9288714da0. The three original
+checkout source byte hashes are reconstructible from their registered newline
+bindings; source text edits are rejected. Both blinded packs remain fixed.
 
 ```sh
 node --test research/experiments/E014-root-pair-consistency/code/study.test.mjs
 node research/experiments/E014-root-pair-consistency/code/run.mjs verify --out research/runs/E014/replay
 ```
+
+## Completed verification and next action
+
+All seven authored checks (five study, two source-replay) pass; source verifier
+and local-link checks pass. The scorer and verifier are terminal, as are both
+clean-replay attempts. All frozen inputs, per-engine reports, run/verification
+receipts, newline bindings, first failure and final archive receipts are
+registered under their own dataset.
+
+Evidence by engine: [SF18 freeze](evidence/freeze-SF18.json),
+[SF19 freeze](evidence/freeze-SF19.json), [SF18 report](evidence/results-SF18.json),
+[SF19 report](evidence/results-SF19.json), [SF18 run](evidence/run-SF18.json),
+[SF19 run](evidence/run-SF19.json), [SF18 verification](evidence/verification-SF18.json),
+[SF19 verification](evidence/verification-SF19.json),
+[SF18 clean replay](evidence/clean-replay-SF18.json),
+[SF19 clean replay](evidence/clean-replay-SF19.json),
+[SF18 archive recipe](evidence/clean-archive-SF18.json),
+[SF19 archive recipe](evidence/clean-archive-SF19.json),
+[SF18 original failure](evidence/failed-clean-replay-SF18.json),
+[SF19 original failure](evidence/failed-clean-replay-SF19.json),
+[SF18 newline bindings](evidence/source-line-endings-SF18.json),
+[SF19 newline bindings](evidence/source-line-endings-SF19.json).
+
+Finding: [F012](../../findings/F012-root-pair-consistency.md). Next register a
+rating-conditioned choice likelihood study on cached development choices.
+Distinct premise: peer choice prediction rather than F004 outcome interactions
+or F002 moves-only rating features. It cannot by itself validate final estimated
+rating/adjustment. Human packs remain pending, no promotion is proposed, and
+the broad research goal remains active with published scoring at B000.
