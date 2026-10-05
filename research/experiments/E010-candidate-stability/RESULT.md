@@ -1,6 +1,6 @@
-# E010: probability-vector stability fails; verification next
+# E010: verified probability-vector stability failure
 
-2026-10-05. State: running, verification/clean replay next. Operational
+2026-10-05. State: complete. Outcome: no-improvement; evidence: development. Operational
 development protocol after E008/F006 and E009's failed overall stability screen.
 No new searches or fits. Reserved300 games
 remain excluded. The extension remains B000.
@@ -24,7 +24,17 @@ is<=0.05 in45/45 for both (lower92.13%), passing that gate. Mean root drift is
 choice-vector stability. Mean played-choice loss drift0.206512 /0.185984 nats;
 candidate maximum1.388344. No refitting, case removal or revised tolerance.
 
-Next: commit registered results, run `code/verify.mjs`, then external clean
-replay. Preserve this negative result beside E008's predictive development gain.
-No choice/display/category stability or adoption is established. The scalar
-outcome curve and fitted choice model require separate future decisions.
+Registered results committed in `e870dd8` before verification. The
+[verifier](evidence/verification.json) and external archive
+[clean replay](evidence/clean-replay.json) reproduce the exact report, and
+independent equations reconstruct180 probability vectors,45 paired games,
+10,000 bootstrap resamples, Wilson bounds and all headline gates. No new searches,
+fits or network requests. [Archive command/hash](evidence/clean-archive.json)
+are retained; the full revision was obtained programmatically from Git.
+
+Reproduce `code/verify.mjs --out research/runs/E010/replay`; a clean archive runs
+`research/clean-replay.mjs E010 <verified-archive-commit-SHA>`. See
+[F008](../../findings/F008-candidate-probability-stability.md). Numerical integrity
+does not supply fresh confirmation. No choice/display/category stability or
+adoption is established. The scalar outcome curve and fitted choice model
+require separate future decisions; do not retune the rejected stability recipe.

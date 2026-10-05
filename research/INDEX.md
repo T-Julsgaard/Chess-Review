@@ -1,6 +1,6 @@
 # Research index
 
-Updated: 2026-10-05. Eight studies/tasks complete; CP development gain; human reviews pending.
+Updated: 2026-10-05. Nine studies/tasks complete; CP development gain; human reviews pending.
 Baseline: [B000](BASELINE.md). New CP gain is development evidence, not confirmed.
 
 This is the routing and decision index. Detailed evidence lives in linked
@@ -29,10 +29,11 @@ records. Update a row and the active experiment's resume state when work stops.
 | F006 | [Fresh human curves](findings/F006-fresh-human-curves.md) | recorded | CP prediction gain at development maturity; no display/adoption claim | Confirm frozen CP candidate before promotion |
 | E009 | [Search stability](experiments/E009-search-stability/RESULT.md) | complete | Verified overall failure: CP loss/display mean pass, WDL/rank fail | Distinct frozen-candidate probability stability study |
 | F007 | [Search stability finding](findings/F007-search-stability.md) | recorded |45-game operational limits; independent/clean replay passes | Preserve failures; no exact-best/human validity claim |
-| E010 | [Candidate probability stability](experiments/E010-candidate-stability/RESULT.md) | running | Probability-vector gates fail; focal root-point tolerance passes | Verify and clean replay; separate outcome/choice claims |
+| E010 | [Candidate probability stability](experiments/E010-candidate-stability/RESULT.md) | complete | Verified probability-vector gate failure; focal root-point tolerance passes | Separate frozen outcome confirmation; choice stability unresolved |
+| F008 | [Candidate stability finding](findings/F008-candidate-probability-stability.md) | recorded | No distribution stability gain; exact/independent/clean replay passes | Preserve negative result; no bundled adoption |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E011`, `D003`, `F008`, `P001`.
+Allocate the next unused ID in each series: `E011`, `D003`, `F009`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
@@ -70,9 +71,9 @@ D001's historical limitations and exposure remain in force.
 Read E008/E009 compact RESULT records first. E008's raw evidence is committed;
 CP passes its frozen development screen, numerical verification and clean replay.
 E009's fixed higher-budget assessment fails overall; numerical/clean replay passes.
-E010 is registered for frozen CP probability-vector stability using the same cache.
-Freeze/register its exact models and code before the single assessment; no new
-engine searches or reserved access. Then decide a separate fresh confirmation.
+E010's frozen CP probability-vector stability fails, with independent/clean replay
+passing. Register an unchanged scalar-outcome confirmation and broader root-budget
+panel before any reserved access; the choice model remains an unresolved track.
 Read E007's source/target limitations and open both D001/D002 for admission. Freeze later
 candidate/access rules before activating reserved evaluation; no new score is
 confirmed by the pipeline's successful reconstruction.
