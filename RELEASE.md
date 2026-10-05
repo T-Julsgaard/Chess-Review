@@ -80,8 +80,12 @@ Store packages omit the other browser's background declaration. The development
 manifest includes both so the project can be loaded directly in either browser.
 
 Before uploading, confirm 0.3.0 is greater than the latest uploaded version in both
-store dashboards. Keep the existing Chrome item and Firefox extension ID; do not
-create replacement listings. This repository does not authenticate to or publish
+store dashboards. Keep the existing Chrome item. The previous Firefox listing
+was deleted, so its retired extension ID cannot be reused. This build uses a new
+Firefox ID for submission as a new add-on; retain that ID for all future updates
+and upload those updates through the replacement listing. Firefox treats this
+as a separate installation, without automatic updates or storage migration from
+the deleted add-on. See [Mozilla's deletion documentation](https://mozilla.github.io/addons-server/topics/api/addons#delete). This repository does not authenticate to or publish
 to either store during build. Check that current screenshots match the two engine
 choices, and use PRIVACY.md as the basis for the hosted privacy-policy URL.
 [marketing/STORE_LISTING2.md](marketing/STORE_LISTING2.md) contains prepared
