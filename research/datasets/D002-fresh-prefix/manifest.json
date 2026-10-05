@@ -129,6 +129,24 @@
       "sha256": "1c09885c80d00b8f68c2afcc42bbc7cb736c4503e7bf0ca5cdb168d08302f5ac",
       "bytes": 7191,
       "uncompressedSha256": "1c09885c80d00b8f68c2afcc42bbc7cb736c4503e7bf0ca5cdb168d08302f5ac"
+    },
+    "research/experiments/E008-human-quality-curves/evidence/sf19-observations.json.gz": {
+      "kind": "game-evidence",
+      "parents": [
+        "research/datasets/D002-fresh-prefix/games.json.gz"
+      ],
+      "sha256": "d9cd050453878ebbadb330f54516b9ab71e58df4bc44ece5a7bdc79e48336ecf",
+      "bytes": 4453580,
+      "uncompressedSha256": "22be23bb22a00ef3c3afe0756033f7adfa15d9ffec56fe090b211fc7470b8880"
+    },
+    "research/experiments/E008-human-quality-curves/evidence/collection-run.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E008-human-quality-curves/evidence/sf19-observations.json.gz"
+      ],
+      "sha256": "dee64873bac4e000004be8a25557315fe6669b01bfa59ab75a7b4e5fde5f7eab",
+      "bytes": 8955,
+      "uncompressedSha256": "dee64873bac4e000004be8a25557315fe6669b01bfa59ab75a7b4e5fde5f7eab"
     }
   }
 }

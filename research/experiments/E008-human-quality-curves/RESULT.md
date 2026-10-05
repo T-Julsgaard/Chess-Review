@@ -1,25 +1,27 @@
-# E008: collection running; no candidate results yet
+# E008: collection complete; frozen evaluation next
 
 Updated2026-10-05. Development experiment only, SF19. Plan registered in
 `f47409d`; collector/query guards committed in `e26d865`. The extension stays B000.
 
 The authored startpos pilot and two-game guarded smoke completed. Smoke:2 games,
 81 unique searches,82 engine requests,15,562 compressed bytes, zero model fits.
-This checks mechanics and cost only. The full600-game run then started from
-`e26d865` using exactly the same frozen engine configuration. Reserved300 games
-remain excluded. No candidate has been fitted or validation metrics inspected.
+This checks mechanics and cost only. The full600-game run completed from
+`e26d865` using exactly the same frozen engine configuration:23,584 unique
+searches,23,706 requests,69 compatible query reuses,1,794 seconds,4,453,580
+compressed bytes. Terminal77316 exited0. No candidate fits ran during collection.
+Reserved300 games remain excluded. No validation metrics have been inspected.
+The complete observations and collection run are registered D002 derivatives;
+the guarded provenance check passes.
 
 ## Resume
 
-The full collector is live in terminal session `77316`, collector PID8428,
-engine PID32404. Poll that existing handle, not a new invocation. Its ignored
-progress/cache/header are `research/runs/E008/sf19/`; these partial artifacts
-are unregistered and must not be reused or loaded into a model. Read compact
-progress only. The collector refuses an unregistered partial-run restart.
+The collector is terminal. Canonical observations and collection receipt are
+in `evidence/`; use the guarded loader. Its ignored progress/cache/header under
+`research/runs/E008/sf19/` are unregistered and must not be loaded into a model.
+Do not rerun collection or substitute those files for the complete artifact.
 
-On successful exit, register the completed observations and collection run as
-D002 derivatives, verify provenance, and commit them **before** model fitting.
-Then run the frozen evaluator, register/commit its outputs, and run verification
+Commit completed observations/registration **before** model fitting. Then run
+the frozen evaluator, register/commit its outputs, and run verification
 and a clean offline replay. `research/clean-replay.mjs E008 <archive-commit-SHA>`
 runs the fit/independent equations from an external Git archive without `.git`,
 network, ignored caches or dependencies. Retain the archive command/hash and
