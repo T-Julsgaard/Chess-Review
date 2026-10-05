@@ -28,9 +28,10 @@ records. Update a row and the active experiment's resume state when work stops.
 | E008 | [Human quality curves](experiments/E008-human-quality-curves/RESULT.md) | complete | CP passes joint development screen/replay; WDL fails;23,584 cached searches | Locked fresh confirmation protocol and candidate stability |
 | F006 | [Fresh human curves](findings/F006-fresh-human-curves.md) | recorded | CP prediction gain at development maturity; no display/adoption claim | Confirm frozen CP candidate before promotion |
 | E009 | [Search stability](experiments/E009-search-stability/RESULT.md) | running | CP loss/display mean pass; WDL loss and best-set overlap fail | Verify and clean replay; preserve overall failure |
+| E010 | [Candidate probability stability](experiments/E010-candidate-stability/plan.md) | planned | Distinct post-E009 hypothesis; frozen E008 CP model, cached45-game vectors | Freeze/register models and code before assessment |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E010`, `D003`, `F007`, `P001`.
+Allocate the next unused ID in each series: `E011`, `D003`, `F007`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
