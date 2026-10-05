@@ -1,0 +1,26 @@
+{
+  "schema": "research-source-line-endings-v1",
+  "engine": "SF19",
+  "originalArchiveRevision": "be9d58432598db7c3dd148f222ae851321f0acd2",
+  "originalArchiveSha256": "b610f6cce1cd3e9a62abbc470064c0f9ebc0871343354d34ea620b867fe77e35",
+  "files": {
+    "tools/calibration/engine.mjs": {
+      "checkoutSha256": "1aa663a87150db86af12b10c9fc3b3d572a2ad96dea1f6cbe92c9d99a5bc45c6",
+      "archiveSha256": "bdabbbd34fd625ab9f946a3caac59a8f8275c4fe3d7ad5bb1a66d8b1cc911afe",
+      "canonicalLfSha256": "1aa663a87150db86af12b10c9fc3b3d572a2ad96dea1f6cbe92c9d99a5bc45c6",
+      "crlfLineRanges": []
+    },
+    "tools/calibration/io.mjs": {
+      "checkoutSha256": "b0411dfb063459e4652ab8785c112951f5d883e3dee4fa35b559a854d9332095",
+      "archiveSha256": "eca29a963036411d07a2db2c7df9485c5b849991555e1c6393f93ca9ba245c85",
+      "canonicalLfSha256": "b0411dfb063459e4652ab8785c112951f5d883e3dee4fa35b559a854d9332095",
+      "crlfLineRanges": []
+    },
+    "tools/calibration/human-policy.mjs": {
+      "checkoutSha256": "6669ac6cb071be0bf166e4ca6029d345814cc37b9caa12c3c21f16bdd1d8ec16",
+      "archiveSha256": "324ad1b477eaed632766c13db99ec5008b9b067f57b51ae8b06ea76cca7c7d40",
+      "canonicalLfSha256": "6669ac6cb071be0bf166e4ca6029d345814cc37b9caa12c3c21f16bdd1d8ec16",
+      "crlfLineRanges": []
+    }
+  }
+}

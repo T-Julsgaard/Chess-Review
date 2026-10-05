@@ -1,0 +1,15 @@
+{
+  "schema": "research-failed-clean-replay-v1",
+  "engine": "SF19",
+  "experiment": "E014",
+  "snapshotRevision": "be9d58432598db7c3dd148f222ae851321f0acd2",
+  "archiveSha256": "b610f6cce1cd3e9a62abbc470064c0f9ebc0871343354d34ea620b867fe77e35",
+  "passed": false,
+  "stage": "shared-source-byte-check",
+  "reason": "Recorded checkout and Git archive have different mixed CRLF/LF representation in three source files",
+  "firstMismatch": "tools/calibration/engine.mjs",
+  "assessmentStarted": false,
+  "engineSearches": 0,
+  "modelFits": 0,
+  "humanLabelsUsed": 0
+}

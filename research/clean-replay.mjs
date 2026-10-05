@@ -25,6 +25,7 @@ import {select as selectNet} from './experiments/E013-net-offer-pack/code/select
 import {loadInputs as loadRootInputs} from './experiments/E014-root-pair-consistency/code/inputs.mjs';
 import {evaluate as evaluateRoot,readResults as readRootResults} from './experiments/E014-root-pair-consistency/code/method.mjs';
 import {audit as auditRoot} from './experiments/E014-root-pair-consistency/code/audit.mjs';
+import {verifyArchivedSource} from './source-replay.mjs';
 
 // Run only from an externally extracted Git archive. The operator supplies its
 // exact commit and retains the archive command/hash alongside this receipt.
@@ -38,7 +39,9 @@ for(const [name,expected] of Object.entries(run.codeSha256)){
   if(sha256(await readFile(path.join(root,active,'code',name)))!==expected)throw Error('Clean snapshot scoring code differs from fitted run: '+name);
 }
 let exactPredictions=null,independent;
-for(const [file,expected] of Object.entries(run.sharedCodeSha256||{}))if(sha256(await readFile(path.join(root,file)))!==expected)throw Error('Shared replay code differs: '+file);
+const lineEndingEquivalence={},sourceBindings=experiment==='E014'?await access.readJson(active+'evidence/source-line-endings-SF18.json'):null;
+if(sourceBindings){const other=await access.readJson(active+'evidence/source-line-endings-SF19.json');if(sourceBindings.schema!=='research-source-line-endings-v1'||JSON.stringify(sourceBindings.files)!==JSON.stringify(other.files)||Object.keys(sourceBindings.files).some(p=>!Object.hasOwn(run.sharedCodeSha256,p)||!/^.+\.(?:mjs|js)$/.test(p)))throw Error('Changed/unrecognized source newline bindings');}
+for(const [file,expected] of Object.entries(run.sharedCodeSha256||{})){const bytes=await readFile(path.join(root,file));if(sha256(bytes)!==expected){if(!sourceBindings?.files[file])throw Error('Shared replay code differs: '+file);lineEndingEquivalence[file]=verifyArchivedSource(bytes,expected,sourceBindings.files[file]);}}
 if(experiment==='E014'){
   const otherRun=await access.readJson(active+'evidence/run-SF19.json');if(JSON.stringify(otherRun.codeSha256)!==JSON.stringify(run.codeSha256)||JSON.stringify(otherRun.sharedCodeSha256)!==JSON.stringify(run.sharedCodeSha256))throw Error('Root-panel partition code differs');
   const input=await loadRootInputs(access),replay=evaluateRoot(input.rows,input.freeze);if(JSON.stringify(replay)!==JSON.stringify(saved))throw Error('Clean root consistency replay differs');independent=auditRoot(input.rows,input.freeze,saved);
@@ -67,6 +70,7 @@ if(experiment==='E014'){
   }
 }
 const result={schema:'research-clean-replay-v1',experiment,passed:true,snapshotRevision:revision,exactReport:true,exactPredictions,independent,
+  ...(experiment==='E014'?{lineEndingEquivalence,sourceReplayCodeSha256:sha256(await readFile(new URL('source-replay.mjs',import.meta.url)))}:{}),
   dataEligibility:access.receipt,codeSha256:sha256(await readFile(fileURLToPath(import.meta.url))),
   environment:{node:process.version,platform:process.platform,arch:process.arch},engineSearches:0,networkRequests:0,ignoredInputs:0,nodeDependencies:0,elapsedMs:performance.now()-started};
 const out=path.join(root,'research/runs/clean',experiment);await mkdir(out,{recursive:true});await writeFile(path.join(out,'clean-replay.json'),JSON.stringify(result,null,2)+'\n');

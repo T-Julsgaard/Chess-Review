@@ -11,10 +11,8 @@ independently computed full-panel arithmetic/gates with forged-report rejection,
 and dataset-local partition/identity checks. The CLI syntax check caught an extra parenthesis before data access;
 corrected before any freeze or assessment. `verify:source` passes.
 
-Previous E013 work is completed and locally committed. Next register the guarded
-source-bound freeze, commit candidate code/inputs, then run one decisive cached
-comparison. Accuracy, rating and human category validity remain open; B000
-scoring is unchanged.
+Previous E013 work is completed and locally committed. Accuracy, rating and
+human category validity remain open; B000 scoring is unchanged.
 
 Before candidate evaluation, the initial unregistered combined freeze was
 replaced by dataset-local SF18/SF19 freeze/report files: the provenance checker
@@ -23,9 +21,8 @@ initial zero-assessment freeze is retained only under ignored
 `research/runs/E014/pre-partition/`. Metrics, cohort, candidate and gates are
 unchanged. There is no mixed-dataset origin-check bypass or raw-data duplication.
 
-The two guarded freezes are complete, source-bound to all 40/45 fixed games,
-with zero candidate assessments. Next register and commit their exact bytes
-with candidate code before the single cached comparison.
+The two guarded freezes were completed with zero candidate assessments and
+committed with candidate code before the single cached comparison.
 
 ## Single frozen assessment
 
@@ -82,9 +79,19 @@ E014's baseline includes that exception. Thus the earlier diagnostic mismatch
 does not establish an error in published grading; even this WDL comparison is
 distinct from the published CP/human-outcome curves.
 
-Exact/independent verification and external clean replay are pending. Next
-register/commit the two complete reports before verification. B000 scoring and
-both blinded review packs remain unchanged; human reviews are pending.
+Exact replay and independent raw-WDL/mate equations, confusions, distributions,
+paired intervals and gates pass for all 85 source-bound games / 170 budget
+comparisons. The two reports were committed before this verification.
+
+The first external archive be9d58432598db7c3dd148f222ae851321f0acd2 stopped
+at the shared source byte check, before candidate replay. Three maintained
+calibration sources have differing mixed CRLF/LF representation in checkout
+and archive, with identical text after newline normalization. Keep the failed
+receipt. A research-only replay binding records archive, checkout and canonical
+LF digests plus the exact CRLF line ranges; it reconstructs the recorded bytes
+without accepting source edits. Two authored newline/tampering tests pass.
+Scoring code, queries, reports, seeds and gates remain unchanged. Fresh external
+replay of the committed repair is pending. Both blinded packs remain fixed.
 
 ```sh
 node --test research/experiments/E014-root-pair-consistency/code/study.test.mjs
