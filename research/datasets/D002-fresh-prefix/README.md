@@ -44,3 +44,4 @@ exposure must be appended below; it cannot be undone by renaming a split.
 | --- | --- | --- |
 | 2026-10-05 E007 registration | Source metadata/terms only | No new game acquired or model evaluated yet. |
 | 2026-10-05 E007 complete | Raw retrieval, structural normalization, selection/identity/metadata audit and clean offline reconstruction | All labels parsed structurally; no engine/model evaluation, outcome summaries or manual case inspection. Reserved evaluation not activated. Provisional-status limitation retained. |
+| 2026-10-05 E008 registration | 450 train /150 development validation games | SF19 outcome/legal-choice collection and frozen two-candidate screen;300 reserved games excluded from searches/fits. Results not inspected yet. |

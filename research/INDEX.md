@@ -25,9 +25,10 @@ records. Update a row and the active experiment's resume state when work stops.
 | F005 | [Single-game rating ranges](findings/F005-single-game-rating-ranges.md) | recorded | No ±300 cases; stronger-player conditional coverage fails/unresolved | Fresh evidence and distinct hypotheses |
 | E007 | [Fresh evidence pipeline](experiments/E007-fresh-evidence/RESULT.md) | complete | Exact clean reconstruction; provisional status unavailable | Distinct calibration hypothesis |
 | D002 | [Fresh prefix cohort](datasets/D002-fresh-prefix/README.md) | registered | 900 disjoint games 450/150/300; reserved evaluation not activated | Guarded development use after protocol |
+| E008 | [Human quality curves](experiments/E008-human-quality-curves/plan.md) | planned | SF19 fixed CP versus CP-refit/WDL curves; joint outcome and choice gates | Frozen train/development collection |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E008`, `D003`, `F006`, `P001`.
+Allocate the next unused ID in each series: `E009`, `D003`, `F006`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
