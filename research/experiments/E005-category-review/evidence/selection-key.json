@@ -1,0 +1,602 @@
+{
+  "schema": "E005-private-selection-v1",
+  "packId": "67a4f44213355f7c83e7bc622c1afd3581e7c745af87567ce041d56f3eeea88d",
+  "counts": {
+    "offer": {
+      "positions": 2609,
+      "games": 1166
+    },
+    "loss": {
+      "positions": 13487,
+      "games": 1396
+    },
+    "control": {
+      "positions": 66921,
+      "games": 1400
+    }
+  },
+  "excluded": {
+    "mate": 2908,
+    "forced": 587,
+    "terminal": 41,
+    "unselected": 11714
+  },
+  "cases": [
+    {
+      "caseId": "CR-003e206c14ad",
+      "gameId": "Eu8bn37Y",
+      "ply": 77,
+      "stratum": "offer",
+      "loss": 0,
+      "offered": true,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "Eu8bn37Y",
+        "gameUrl": "https://lichess.org/Eu8bn37Y",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-00849ae14549",
+      "gameId": "ZfvqWppS",
+      "ply": 62,
+      "stratum": "offer",
+      "loss": 0.007499999999999951,
+      "offered": true,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "ZfvqWppS",
+        "gameUrl": "https://lichess.org/ZfvqWppS",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-0013fb1a2eb8",
+      "gameId": "0zl0bbTT",
+      "ply": 25,
+      "stratum": "loss",
+      "loss": 0.13349999999999995,
+      "offered": false,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "0zl0bbTT",
+        "gameUrl": "https://lichess.org/0zl0bbTT",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-08.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-00112fce584a",
+      "gameId": "Kl48aHnp",
+      "ply": 78,
+      "stratum": "loss",
+      "loss": 0.44699999999999995,
+      "offered": false,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "Kl48aHnp",
+        "gameUrl": "https://lichess.org/Kl48aHnp",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-08.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-00229ff2eeb7",
+      "gameId": "iYNg6Gap",
+      "ply": 23,
+      "stratum": "loss",
+      "loss": 0.16099999999999998,
+      "offered": false,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "iYNg6Gap",
+        "gameUrl": "https://lichess.org/iYNg6Gap",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-08.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-0006d56d7c10",
+      "gameId": "jXCnNv0P",
+      "ply": 24,
+      "stratum": "control",
+      "loss": 0,
+      "offered": false,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "jXCnNv0P",
+        "gameUrl": "https://lichess.org/jXCnNv0P",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-06.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-0000d7d4670c",
+      "gameId": "uvLQ5p88",
+      "ply": 23,
+      "stratum": "control",
+      "loss": 0,
+      "offered": false,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "uvLQ5p88",
+        "gameUrl": "https://lichess.org/uvLQ5p88",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-0044e46f0ec3",
+      "gameId": "6TgXaEee",
+      "ply": 51,
+      "stratum": "offer",
+      "loss": 0,
+      "offered": true,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "6TgXaEee",
+        "gameUrl": "https://lichess.org/6TgXaEee",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-08.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-0002619a2059",
+      "gameId": "JX2uKUtQ",
+      "ply": 45,
+      "stratum": "control",
+      "loss": 0,
+      "offered": false,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "JX2uKUtQ",
+        "gameUrl": "https://lichess.org/JX2uKUtQ",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-06.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-001f2fa1e1c9",
+      "gameId": "2du0qQzP",
+      "ply": 40,
+      "stratum": "loss",
+      "loss": 0.401,
+      "offered": false,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "2du0qQzP",
+        "gameUrl": "https://lichess.org/2du0qQzP",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-06.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-00e1f4a95f72",
+      "gameId": "vNG1Qj8X",
+      "ply": 24,
+      "stratum": "offer",
+      "loss": 0.01100000000000001,
+      "offered": true,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "vNG1Qj8X",
+        "gameUrl": "https://lichess.org/vNG1Qj8X",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-08.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-000d1c38e124",
+      "gameId": "OoUlLqTP",
+      "ply": 133,
+      "stratum": "control",
+      "loss": 0,
+      "offered": false,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "OoUlLqTP",
+        "gameUrl": "https://lichess.org/OoUlLqTP",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-06.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-001e3790f26b",
+      "gameId": "10qNq4FB",
+      "ply": 28,
+      "stratum": "loss",
+      "loss": 1,
+      "offered": false,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "10qNq4FB",
+        "gameUrl": "https://lichess.org/10qNq4FB",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-000a705062e1",
+      "gameId": "yy6SO8bw",
+      "ply": 10,
+      "stratum": "control",
+      "loss": 0,
+      "offered": false,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "yy6SO8bw",
+        "gameUrl": "https://lichess.org/yy6SO8bw",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-000556ccf5fc",
+      "gameId": "rzaKOxth",
+      "ply": 6,
+      "stratum": "control",
+      "loss": 0.011499999999999955,
+      "offered": false,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "rzaKOxth",
+        "gameUrl": "https://lichess.org/rzaKOxth",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-00074ad717d0",
+      "gameId": "T9nF5L6h",
+      "ply": 78,
+      "stratum": "control",
+      "loss": 0,
+      "offered": false,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "T9nF5L6h",
+        "gameUrl": "https://lichess.org/T9nF5L6h",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-06.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-001e2bad0c77",
+      "gameId": "3PP2yp6b",
+      "ply": 35,
+      "stratum": "loss",
+      "loss": 0.4245,
+      "offered": false,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "3PP2yp6b",
+        "gameUrl": "https://lichess.org/3PP2yp6b",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-06.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-00053e7381d2",
+      "gameId": "8SL4SzQo",
+      "ply": 67,
+      "stratum": "control",
+      "loss": 0,
+      "offered": false,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "8SL4SzQo",
+        "gameUrl": "https://lichess.org/8SL4SzQo",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-06.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-00b15964ed40",
+      "gameId": "ASiKmgPG",
+      "ply": 37,
+      "stratum": "offer",
+      "loss": 0,
+      "offered": true,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "ASiKmgPG",
+        "gameUrl": "https://lichess.org/ASiKmgPG",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-06.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-004e50b88609",
+      "gameId": "vQ7X3vji",
+      "ply": 32,
+      "stratum": "offer",
+      "loss": 0,
+      "offered": true,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "vQ7X3vji",
+        "gameUrl": "https://lichess.org/vQ7X3vji",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-08.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-00142a7a0cee",
+      "gameId": "F3TvuWZX",
+      "ply": 37,
+      "stratum": "loss",
+      "loss": 0.498,
+      "offered": false,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "F3TvuWZX",
+        "gameUrl": "https://lichess.org/F3TvuWZX",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-001f8b3cdfdf",
+      "gameId": "SULZ4EqV",
+      "ply": 30,
+      "stratum": "offer",
+      "loss": 0,
+      "offered": true,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "SULZ4EqV",
+        "gameUrl": "https://lichess.org/SULZ4EqV",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-0018a4d3b74a",
+      "gameId": "7GTeXKQp",
+      "ply": 18,
+      "stratum": "loss",
+      "loss": 0.11050000000000001,
+      "offered": false,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "7GTeXKQp",
+        "gameUrl": "https://lichess.org/7GTeXKQp",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    },
+    {
+      "caseId": "CR-00a52043ef79",
+      "gameId": "vWqMbXTw",
+      "ply": 26,
+      "stratum": "offer",
+      "loss": 0,
+      "offered": true,
+      "origin": {
+        "dataset": "D001",
+        "gameId": "vWqMbXTw",
+        "gameUrl": "https://lichess.org/vWqMbXTw",
+        "archiveUrl": "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
+        "normalizedFile": "tools/calibration/public/dataset.json.gz",
+        "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+        "sourceRecord": "tools/calibration/public/sources.json",
+        "sourceRecordSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    }
+  ]
+}
