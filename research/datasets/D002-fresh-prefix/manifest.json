@@ -624,6 +624,25 @@
       "bytes": 26583,
       "sha256": "64c3f4f1b1cc90beb480faf5e850502d89e6b262772ac2632d10ffd0aada8ac1",
       "uncompressedSha256": "64c3f4f1b1cc90beb480faf5e850502d89e6b262772ac2632d10ffd0aada8ac1"
+    },
+    "research/experiments/E016-relative-cp-choice/evidence/models.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E016-relative-cp-choice/evidence/freeze.json"
+      ],
+      "bytes": 6788,
+      "sha256": "6b879766ad3e8a114823af821ca375c239131b6eb4544c209031318e95e08605",
+      "uncompressedSha256": "6b879766ad3e8a114823af821ca375c239131b6eb4544c209031318e95e08605"
+    },
+    "research/experiments/E016-relative-cp-choice/evidence/fit-run.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E016-relative-cp-choice/evidence/models.json",
+        "research/experiments/E016-relative-cp-choice/evidence/freeze.json"
+      ],
+      "bytes": 26903,
+      "sha256": "d3831b26ed95e93288e2cbd07c9864ad421135015e06a008d2e1e4884da406ad",
+      "uncompressedSha256": "d3831b26ed95e93288e2cbd07c9864ad421135015e06a008d2e1e4884da406ad"
     }
   }
 }

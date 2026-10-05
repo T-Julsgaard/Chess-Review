@@ -1,6 +1,6 @@
 # E016: relative CP choice — working record
 
-State: running. Evidence maturity: development; no models fitted or results yet.
+State: running. Evidence maturity: development; training fitted, assessment pending.
 
 The question is whether linear CP gaps predict human legal choices better than
 the fixed sigmoid utility. Both models use the same alternatives and one fitted
@@ -13,6 +13,13 @@ independent calibration arithmetic and complete independent report reconstructio
 The guarded freeze binds 600 focal choices, five balanced training folds and 45
 budget pairs. Exact shared source representations are retained before fitting.
 
-Next: register/commit the input and code freeze, then fit on training only and
-commit models before evaluation. Zero new engine searches or human labels.
+Protocol commit: `5aa7e82`. Source/cohort freeze commit: `396566b`.
+All twelve scalar fits converge with independent objective/derivative checks;
+none reaches a numerical cap. Final training temperatures: comparator
+15.464491662877617; linear CP 52.71675871488209 (0.26358379357441045 per pawn
+inside the fixed CP bounds). Training objective is worse for the candidate;
+this is a fitting diagnostic, not the held-development assessment.
+
+Next: register/commit fitted models, then perform the single frozen assessment.
+Zero new engine searches or human labels. No consumed test targets are evaluated.
 Current scoring remains B000. Human reviews remain pending.
