@@ -1,0 +1,90 @@
+{
+  "schema": "E013-selection-policy-v1",
+  "parentPolicy": "research/experiments/E012-offer-evidence/evidence/policy.json",
+  "parentPolicySha256": "b11af208bbd622e9faf7a13214ba0e718ab44e919705842fd409586309d49661",
+  "boardBlockSha256": "d2e10319fb826b860145b48df44d9f811028a95dee368fea4d7989435d65ad9b",
+  "engineConfigs": {
+    "20k": {
+      "version": "Stockfish 18 (identity verified at UCI startup)",
+      "majorVersion": 18,
+      "build": "stockfish.js lite single-threaded",
+      "network": "nn-9067e33176e8.nnue",
+      "loaderSha256": "2278005057f381491f1c9bb3e44c9f5920b3a00bef9759e33cc6582769a1f1fe",
+      "wasmSha256": "a8fbc05ec6920b56d7485826dcb02c5ffd2826bcbf751cf973046f237a9096f1",
+      "budget": {
+        "kind": "nodes",
+        "value": 20000
+      },
+      "options": {
+        "Threads": 1,
+        "Hash": 32,
+        "MultiPV": 1,
+        "Skill Level": 20,
+        "UCI_LimitStrength": false,
+        "UCI_ShowWDL": true,
+        "UCI_Chess960": false
+      },
+      "reset": "ucinewgame + Clear Hash + isready before every search",
+      "tablebases": "none",
+      "perspective": "side to move at root",
+      "position": "startpos with full move history"
+    },
+    "80k": {
+      "version": "Stockfish 18 (identity verified at UCI startup)",
+      "majorVersion": 18,
+      "build": "stockfish.js lite single-threaded",
+      "network": "nn-9067e33176e8.nnue",
+      "loaderSha256": "2278005057f381491f1c9bb3e44c9f5920b3a00bef9759e33cc6582769a1f1fe",
+      "wasmSha256": "a8fbc05ec6920b56d7485826dcb02c5ffd2826bcbf751cf973046f237a9096f1",
+      "budget": {
+        "kind": "nodes",
+        "value": 80000
+      },
+      "options": {
+        "Threads": 1,
+        "Hash": 32,
+        "MultiPV": 1,
+        "Skill Level": 20,
+        "UCI_LimitStrength": false,
+        "UCI_ShowWDL": true,
+        "UCI_Chess960": false
+      },
+      "reset": "ucinewgame + Clear Hash + isready before every search",
+      "tablebases": "none",
+      "perspective": "side to move at root",
+      "position": "startpos with full move history"
+    }
+  },
+  "configHashes": {
+    "20k": "4659128c7e837baa9fb1b5131db27cdcaa064bbf09378dab6c5c1817946ce6c3",
+    "80k": "2a52934db01a52f76d41b0f1ff06bfafa792e16a84b3cf5fc27596c75bafaa20"
+  },
+  "engineThresholds": {
+    "nearBest": 0.02,
+    "minPlayedCp": -50,
+    "clearlyWinningCp": 500,
+    "offersRequired": 7,
+    "stableCasesRequired": 22
+  },
+  "selection": {
+    "sourceLossMax": 0.02,
+    "playedMin": 0.5,
+    "playedMax": 0.9,
+    "pointSplit": 0.7,
+    "phases": [
+      20,
+      80
+    ],
+    "offers": 8,
+    "controls": 8,
+    "caseSeed": "E013-case-v1:",
+    "orderSeed": "E013-order-v1:"
+  },
+  "gates": {
+    "offersRequired": 7,
+    "stableCasesRequired": 15,
+    "caseCount": 16
+  },
+  "modelFits": 0,
+  "humanLabelsUsed": 0
+}

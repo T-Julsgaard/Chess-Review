@@ -333,6 +333,49 @@
       "sha256": "0c9cab45a3767ee9ed7d69b9d4d3e811e01242a6ef79c08617ef902186b3d5af",
       "bytes": 671,
       "uncompressedSha256": "0c9cab45a3767ee9ed7d69b9d4d3e811e01242a6ef79c08617ef902186b3d5af"
+    },
+    "research/experiments/E013-net-offer-pack/evidence/policy.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E012-offer-evidence/evidence/policy.json"
+      ],
+      "sha256": "f9f60ba511e03a1826d442504315baa9d7dd0ac16511d34008c006f0cfee5d5d",
+      "bytes": 2813,
+      "uncompressedSha256": "f9f60ba511e03a1826d442504315baa9d7dd0ac16511d34008c006f0cfee5d5d"
+    },
+    "research/experiments/E013-net-offer-pack/evidence/cases.json": {
+      "kind": "summary",
+      "parents": [
+        "tools/calibration/public/dataset.json.gz",
+        "tools/calibration/public/sf18-rating-evidence.json.gz",
+        "research/experiments/E005-category-review/evidence/selection-key.json",
+        "research/experiments/E013-net-offer-pack/evidence/policy.json"
+      ],
+      "sha256": "d6f0c63a657901d822bdb0920895576371457f134a82c3aed35ccce04fc8c521",
+      "bytes": 15138,
+      "uncompressedSha256": "d6f0c63a657901d822bdb0920895576371457f134a82c3aed35ccce04fc8c521"
+    },
+    "research/experiments/E013-net-offer-pack/evidence/selection-key.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E013-net-offer-pack/evidence/cases.json",
+        "tools/calibration/public/sf18-rating-evidence.json.gz",
+        "research/experiments/E013-net-offer-pack/evidence/policy.json"
+      ],
+      "sha256": "32dbeb26b0e078b431156344602d2115fb4ce9e263b3ca331170d330312948ea",
+      "bytes": 66359,
+      "uncompressedSha256": "32dbeb26b0e078b431156344602d2115fb4ce9e263b3ca331170d330312948ea"
+    },
+    "research/experiments/E013-net-offer-pack/evidence/build-run.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E013-net-offer-pack/evidence/cases.json",
+        "research/experiments/E013-net-offer-pack/evidence/selection-key.json",
+        "research/experiments/E013-net-offer-pack/evidence/policy.json"
+      ],
+      "sha256": "c36523f4429231afd19da0a5a67147eb8b3568470b8b3ec63a2f3e91798f8831",
+      "bytes": 7927,
+      "uncompressedSha256": "c36523f4429231afd19da0a5a67147eb8b3568470b8b3ec63a2f3e91798f8831"
     }
   }
 }

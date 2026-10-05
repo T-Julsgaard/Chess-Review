@@ -35,7 +35,7 @@ records. Update a row and the active experiment's resume state when work stops.
 | F009 | [Unconfirmed outcome curve](findings/F009-unconfirmed-outcome-curve.md) | recorded | Small unresolved gain; predictive value vs constant; exact/independent/clean replay passes | Keep failed confirmation with development finding |
 | E012 | [Offer-evidence audit](experiments/E012-offer-evidence/RESULT.md) | complete | Verified screen failure:0/8 supported;21/24 stable;822 alternatives per budget | Register net-offer review selection; retain original pack |
 | F010 | [Offer-selection evidence](findings/F010-offer-selection-evidence.md) | recorded | Capture heuristic insufficient; root gaps do not change focal near-best labels; clean replay passes | Improve evidence selection; no human category claim |
-| E013 | [Net-offer review pack](experiments/E013-net-offer-pack/RESULT.md) | running | Tested deterministic matching, source/export/witness checks; no real scan yet | Build once; register/commit pack before searches |
+| E013 | [Net-offer review pack](experiments/E013-net-offer-pack/RESULT.md) | running | Separate16-case matched pack registered;1,011 predicate calls; no screen yet | Commit pack; collect complete SF18 root panel once |
 
 No promotion records yet.
 Allocate the next unused ID in each series: `E014`, `D003`, `F011`, `P001`.
