@@ -23,7 +23,7 @@ results do not become extension behavior automatically.
 | [INDEX.md](INDEX.md) | Compact experiment register, decisions and backlog. |
 | [BASELINE.md](BASELINE.md) | Pinned starting implementation and known evidence limits. |
 | [PROTOCOL.md](PROTOCOL.md) | Measurement, validation and promotion requirements. |
-| [MEASUREMENT.md](MEASUREMENT.md) | Output definitions, initial development gates and research sources. |
+| [MEASUREMENT.md](MEASUREMENT.md) | Output definitions, development gates and research sources. |
 | [experiments/](experiments/README.md) | One folder per experiment: plan, code, retained evidence and result. |
 | [datasets/](datasets/README.md) | Dataset provenance, split ownership and reuse records. |
 | [findings/](findings/README.md) | Durable positive, negative and inconclusive conclusions. |
@@ -38,6 +38,6 @@ Research is available in the Git repository. The current packaging allowlist
 excludes `research/` from extension ZIPs and release source snapshots; those
 snapshots retain the active calibration instead.
 
-Research starts with the measurement contract and evidence audit. The index
-records progress and evidence maturity. See the protocol for what a supported
-claim can mean; no candidate becomes production behavior automatically.
+The evidence audit is complete and numerical development studies are registered
+in the index. See the measurement contract and protocol for what a supported
+claim can mean. Research candidates require independent evidence before adoption.
