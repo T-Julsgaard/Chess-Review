@@ -1,6 +1,6 @@
 # Research index
 
-Updated: 2026-10-05. Eleven studies/tasks complete; CP/offer screens fail; human reviews pending.
+Updated: 2026-10-05. Twelve studies/tasks complete; net-offer enrichment passes; reviews pending.
 Baseline: [B000](BASELINE.md). New CP gain is development evidence, not confirmed.
 
 This is the routing and decision index. Detailed evidence lives in linked
@@ -21,7 +21,7 @@ records. Update a row and the active experiment's resume state when work stops.
 | E004 | [Practical outcome calibration](experiments/E004-practical-outcomes/RESULT.md) | complete | Both engines miss practical gate; most small gain comes from static context | Stop this interaction family |
 | F004 | [Practical context finding](findings/F004-practical-outcome-context.md) | recorded | Added phase/strength benefit unresolved; no promotion | Investigate distinct questions |
 | E005 | [Blinded category workflow](experiments/E005-category-review/RESULT.md) | running | 24 legal, traceable cases; workflow checks pass; zero reviews | Review later; numerical work continues |
-| E006 | [Rating uncertainty](experiments/E006-rating-uncertainty/RESULT.md) | complete | About90% game coverage needs broad ranges; adaptive scale fails gates | Stop this scale family |
+| E006 | [Rating uncertainty](experiments/E006-rating-uncertainty/RESULT.md) | complete | About 90% game coverage needs broad ranges; adaptive scale fails gates | Stop this scale family |
 | F005 | [Single-game rating ranges](findings/F005-single-game-rating-ranges.md) | recorded | No ±300 cases; stronger-player conditional coverage fails/unresolved | Fresh evidence and distinct hypotheses |
 | E007 | [Fresh evidence pipeline](experiments/E007-fresh-evidence/RESULT.md) | complete | Exact clean reconstruction; provisional status unavailable | Distinct calibration hypothesis |
 | D002 | [Fresh prefix cohort](datasets/D002-fresh-prefix/README.md) | registered | 900 disjoint games 450/150/300; E011 activates reserved outcome panel | Preserve role and exposure ledger |
@@ -33,12 +33,13 @@ records. Update a row and the active experiment's resume state when work stops.
 | F008 | [Candidate stability finding](findings/F008-candidate-probability-stability.md) | recorded | No distribution stability gain; exact/independent/clean replay passes | Preserve negative result; no bundled adoption |
 | E011 | [Frozen outcome confirmation](experiments/E011-outcome-confirmation/RESULT.md) | complete | Verified joint failure:20k practical gain, both fixed intervals and root stability;300 test games consumed | Distinct hypothesis; no retuning/rescue on this cohort |
 | F009 | [Unconfirmed outcome curve](findings/F009-unconfirmed-outcome-curve.md) | recorded | Small unresolved gain; predictive value vs constant; exact/independent/clean replay passes | Keep failed confirmation with development finding |
-| E012 | [Offer-evidence audit](experiments/E012-offer-evidence/RESULT.md) | complete | Verified screen failure:0/8 supported;21/24 stable;822 alternatives per budget | Register net-offer review selection; retain original pack |
+| E012 | [Offer-evidence audit](experiments/E012-offer-evidence/RESULT.md) | complete | Verified screen failure:0/8 supported; 21/24 stable; 822 alternatives per budget | Register net-offer review selection; retain original pack |
 | F010 | [Offer-selection evidence](findings/F010-offer-selection-evidence.md) | recorded | Capture heuristic insufficient; root gaps do not change focal near-best labels; clean replay passes | Improve evidence selection; no human category claim |
-| E013 | [Net-offer review pack](experiments/E013-net-offer-pack/RESULT.md) | running | Prospective operational screen passes7/8 support,15/16 stability; human review pending | Commit report; deterministic/independent/clean replay |
+| E013 | [Net-offer review pack](experiments/E013-net-offer-pack/RESULT.md) | complete | Verified7/8 support, 15/16 stability;8 independent net-offer witnesses; separate blinded pack | Later human review; cached root-pair consistency study |
+| F011 | [Net-offer enrichment](findings/F011-net-offer-enrichment.md) | recorded | Improved operational targeting; deterministic/independent/clean replay; no human category claim | Preserve both packs; investigate root-score consistency |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E014`, `D003`, `F011`, `P001`.
+Allocate the next unused ID in each series: `E014`, `D003`, `F012`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
@@ -73,13 +74,15 @@ Only registered explicitly public, free-to-use sources and traceable derivatives
 qualify. New confirmation cohorts need complete acquisition/transform provenance;
 D001's historical limitations and exposure remain in force.
 
-Active: read E013's compact RESULT/plan and F010. Build the separate net-offer
-review pack once, register/commit its policy/cases/key before new searches, then
-assess frozen properties and replay. Preserve E005 and reviewer blinding. Human
-annotations remain pending; no synthetic or engine evidence supplies perception.
+Read E013's compact RESULT and F011. Its16-case pack is frozen/verified, with 7/8
+offers supported and 15/16 stable; one unstable case remains. E005 and E013 human
+annotations are pending; no synthetic/engine evidence supplies perception.
+Next register a cached root-pair consistency study, motivated by divergent
+root-pair versus complete-alternative near-best decisions. Reuse hash-matched
+queries and freeze the comparison before assessment; do not rewrite prior cases.
 
 For accuracy work, F006–F009 retain development gains and failed confirmation/
-stability gates. D002's300 reserved games are consumed and keep their `test`
+stability gates. D002's 300 reserved games are consumed and keep their `test`
 role; revised candidates need a fresh registered confirmation cohort. Use both
 D001/D002 for D002 admission and retain E007's source/target limitations.
 Do not retry F002/F003/F004/F005 without a changed premise. No candidate is confirmed.
