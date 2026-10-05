@@ -1,4 +1,4 @@
-# E012: offer-evidence screen fails; verification next
+# E012: verified offer-evidence screen fails
 
 2026-10-05. The offer-evidence/root-counterfactual audit is registered before
 inspecting E005's actual cases/key or new searches. All24 cases are frozen;
@@ -52,7 +52,37 @@ node evidence. No population prevalence/precision estimate follows from8/8/8
 enrichment; neither the property status nor the sample stratum is a human label.
 The existing reviewer page and key remain unchanged; reviews are still pending.
 
-Next: commit report, run exact/independent verification and external clean replay.
-Keep the failed gates. Durable cache remains in `research/runs/E012/sf18/`.
-Then register improved review-case selection using net voluntary offers and
-separate soundness/stability evidence; do not silently replace reviewed packs.
+Zero focal near-best decisions differ between ordinary root-pair and complete-
+alternative loss at either budget. Extra collection exposes contradictory root
+points but does not demonstrate improved near-best categorization in this sample.
+
+## Verification and resume
+
+Report/run committed in79ff2fd precede verification. Exact replay, independent
+equations and external clean Git archive79ff2fd061e096bbfadbdb74b4f4e6c2f56f2f98
+pass:24 source/history checks,48 engine-property checks and23 completed independent
+local-exchange recurrence checks; no exhausted reference or frozen budget in
+those checks. The full board predicate is replayed from B000, not independently
+replaced. Clean replay needs no Git metadata/dependencies/network/ignored inputs
+or new searches/fits. Archive SHAd5e865fbbd1afb21c4f5fdd2150b8e872df5d0954cfb0519f80dd5add30e3bb4.
+Numerical verification does not turn failed scientific/operational gates into a
+pass. The original reviewer HTML hash is unchanged:
+9ab64efe4710596d3d35b1a904c186d88127a780fbda0b5069ef64304cc72a93.
+
+Evidence: [policy](evidence/policy.json), [freeze receipt](evidence/freeze-run.json),
+[raw queries](evidence/sf18-observations.json.gz), [collection receipt](evidence/collection-run.json),
+[result](evidence/results.json), [assessment receipt](evidence/run.json),
+[verification](evidence/verification.json), [clean replay](evidence/clean-replay.json),
+[archive recipe](evidence/clean-archive.json). All are registered in D001.
+Durable raw cache remains in `research/runs/E012/sf18/`; all handles are terminal.
+
+```sh
+node --test research/experiments/E012-offer-evidence/code/method.test.mjs
+node research/experiments/E012-offer-evidence/code/verify.mjs --out research/runs/E012/replay
+```
+
+Completed finding: [F010](../../findings/F010-offer-selection-evidence.md).
+Next register improved review-case selection using net voluntary offers and
+separate soundness/stability evidence. Freeze a new pack and retain all audit
+outcomes; do not silently replace E005. Human validity and the broader research
+tracks remain open; no runtime implementation is selected.

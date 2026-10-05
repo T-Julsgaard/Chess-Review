@@ -54,4 +54,11 @@ Next: retain exported reviews unchanged as individual, versioned annotations.
 At least two independent assessments are needed for agreement analysis. A single
 user review informs instrument development; it does not establish consensus.
 Register any comparison/adjudication separately before reading results to select
-an algorithm. Continue rating uncertainty research while reviews are pending.
+an algorithm. Continue independent numerical work while reviews are pending.
+
+Follow-up: [E012/F010](../../findings/F010-offer-selection-evidence.md) audits the
+pack's tactical properties, not human judgments. The capture-offer stratum is
+insufficient for strong-sacrifice evidence; both operational screens fail and
+numerical/clean replay passes. The page/key/cases remain unchanged. Keep the
+audit evidence closed during independent blinded review. A later net-offer pack
+must have its own identity and protocol; never overwrite this reviewed artifact.

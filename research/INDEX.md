@@ -1,6 +1,6 @@
 # Research index
 
-Updated: 2026-10-05. Ten studies/tasks complete; CP confirmation fails; human reviews pending.
+Updated: 2026-10-05. Eleven studies/tasks complete; CP/offer screens fail; human reviews pending.
 Baseline: [B000](BASELINE.md). New CP gain is development evidence, not confirmed.
 
 This is the routing and decision index. Detailed evidence lives in linked
@@ -33,10 +33,11 @@ records. Update a row and the active experiment's resume state when work stops.
 | F008 | [Candidate stability finding](findings/F008-candidate-probability-stability.md) | recorded | No distribution stability gain; exact/independent/clean replay passes | Preserve negative result; no bundled adoption |
 | E011 | [Frozen outcome confirmation](experiments/E011-outcome-confirmation/RESULT.md) | complete | Verified joint failure:20k practical gain, both fixed intervals and root stability;300 test games consumed | Distinct hypothesis; no retuning/rescue on this cohort |
 | F009 | [Unconfirmed outcome curve](findings/F009-unconfirmed-outcome-curve.md) | recorded | Small unresolved gain; predictive value vs constant; exact/independent/clean replay passes | Keep failed confirmation with development finding |
-| E012 | [Offer-evidence audit](experiments/E012-offer-evidence/RESULT.md) | running | Frozen offer screen fails:0/8 supported;21/24 stable; raw coverage complete | Commit report; exact/independent/clean replay |
+| E012 | [Offer-evidence audit](experiments/E012-offer-evidence/RESULT.md) | complete | Verified screen failure:0/8 supported;21/24 stable;822 alternatives per budget | Register net-offer review selection; retain original pack |
+| F010 | [Offer-selection evidence](findings/F010-offer-selection-evidence.md) | recorded | Capture heuristic insufficient; root gaps do not change focal near-best labels; clean replay passes | Improve evidence selection; no human category claim |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E013`, `D003`, `F010`, `P001`.
+Allocate the next unused ID in each series: `E013`, `D003`, `F011`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
@@ -79,8 +80,10 @@ passing. E011 completed the unchanged scalar-outcome confirmation/full root-budg
 panel: its joint gates fail; exact/independent/clean replay passes. D002's300
 reserved games are consumed and keep their `test` role. Do not retune or rescue
 the candidate on them; revised candidates require fresh registered confirmation.
-Next register a distinct tactical-property audit of E005's existing blinded pack,
-without exposing its key in the reviewer page or claiming human validity.
+E012's tactical-property audit of E005 is complete: both operational gates fail,
+with exact/independent/clean replay passing. Read F010 and improve net-voluntary-
+offer selection under a separately registered protocol/pack. Preserve E005 and
+blinding; there are still zero human reviews and no human validity claim.
 Read E007's source/target limitations and open both D001/D002 for admission. Freeze later
 candidate/access rules before activating a new confirmation cohort; no new score is
 confirmed by the pipeline's successful reconstruction.

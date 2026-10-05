@@ -41,7 +41,7 @@ Research is available in the Git repository. The current packaging allowlist
 excludes `research/` from extension ZIPs and release source snapshots; those
 snapshots retain the active calibration instead.
 
-Ten studies/tasks are complete. A new 900-game cohort has fully traceable raw
+Eleven studies/tasks are complete. A new 900-game cohort has fully traceable raw
 frames and exact clean reconstruction. A CP curve improves fresh development
 prediction; its clean replay passes, but the unchanged curve fails its frozen
 300-game confirmation gates. Smaller point gains have intervals including zero.
@@ -49,6 +49,8 @@ Higher-budget studies retain overall and choice-vector stability failures,
 while focal CP root points meet tolerance. Outcome and choice adoption remain
 separate; the full root-budget panel also misses its stability gate. The reserved
 cohort is consumed; revised candidates need fresh confirmation evidence.
-A blinded 24-case category pack awaits later annotation. The index routes fresh
+A blinded 24-case category pack awaits later annotation. Its tactical audit
+finds the capture-offer heuristic insufficient; net-offer selection is next.
+The original pack remains unchanged. The index routes fresh
 calibration work and retains failed experiments and provenance/target limits.
 No new model is confirmed or promoted; current scoring is B000.
