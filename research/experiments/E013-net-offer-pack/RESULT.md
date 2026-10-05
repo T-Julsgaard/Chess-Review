@@ -1,4 +1,4 @@
-# E013: complete prospective root panel; frozen screen next
+# E013: prospective enrichment screen passes; verification next
 
 2026-10-05. A separate16-case prospective pack will target8 net voluntary offers
 plus8 matched nonoffers, using train-only eligible source WDL context and the
@@ -31,9 +31,31 @@ Raw source/history/PV/config/budget bindings pass and complete evidence/receipt
 are registered. All resource caps pass. The collector is terminal (exit0), with
 zero fits/human labels/property assessments during collection.
 
-Next: commit raw then run
-`node research/experiments/E013-net-offer-pack/code/run.mjs evaluate` once.
-Register report before `code/run.mjs verify` and external clean replay.
-Do not restart the terminal collector; durable cache is `research/runs/E013/sf18/`.
-Keep all unsupported/unstable cases and the fixed case order. Human annotation,
-broader scoring research and implementation remain pending.
+Raw committed in6d14a62 precedes the one frozen property screen (terminal,exit0).
+Report/run are registered; no new fits, searches or human labels in assessment.
+
+## Frozen screen
+
+**Operational enrichment passes; human category improvement is not confirmed.**
+Seven of8 net offers satisfy the local/engine criteria at both budgets:87.5%,
+Wilson95%[52.9112%,97.7583%], meeting required>=7/8. Engine eligibility agrees
+in15/16:93.75%, interval[71.6713%,98.8881%], meeting required>=15/16. All16
+cases/all legal alternatives are covered. Net-offer statuses7 supported/0
+unsupported/1 unstable; controls0/8/0. Keep the unstable case in its fixed position.
+
+Unrestricted versus restricted-max point discrepancies>0.02 occur in2/16 at20k,
+1/16 at80k. Near-best root-pair/complete-alternative decisions differ in3/16
+and5/16 respectively; directions are retained in guarded result diagnostics.
+The all-legal maximum is still finite-search evidence, not independent truth.
+
+Compared descriptively with F010's0/8, the pack is more targeted under these
+operational properties. Different filters/case composition and board-positive
+inclusion prevent a paired causal or population precision claim. All are
+training/development examples; no fresh test role, perceived brilliance,
+educational usefulness or final classifier claim. The WDL criterion differs
+from the published SF18 human curve. E005 remains unchanged; zero human reviews.
+
+Next: commit report; verify deterministic selection, blinded payload, exact
+properties, independent equations/net-cost witnesses and external clean archive.
+All collection/assessment handles are terminal; durable cache is
+`research/runs/E013/sf18/`. No runtime implementation or promotion is selected.

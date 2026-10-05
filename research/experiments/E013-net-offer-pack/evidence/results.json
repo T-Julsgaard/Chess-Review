@@ -1,0 +1,1545 @@
+{
+  "schema": "E013-net-offer-screen-v1",
+  "diagnostics": {
+    "cases": 16,
+    "uniqueGames": 16,
+    "uniqueQueries": 1170,
+    "legalAlternatives": 569,
+    "budgets": {
+      "20k": {
+        "queries": 585,
+        "earlierExactScores": 186,
+        "exactRecoveries": 0,
+        "selectedNodes": [
+          1829,
+          20048
+        ],
+        "finalNodes": [
+          20000,
+          20063
+        ]
+      },
+      "80k": {
+        "queries": 585,
+        "earlierExactScores": 170,
+        "exactRecoveries": 1,
+        "selectedNodes": [
+          9464,
+          80158
+        ],
+        "finalNodes": [
+          80000,
+          80233
+        ]
+      }
+    }
+  },
+  "records": [
+    {
+      "caseId": "NR-000da6f6dbf6",
+      "gameId": "tDHDRWhr",
+      "split": "train",
+      "stratum": "nonoffer",
+      "localOffer": false,
+      "modes": {
+        "20k": {
+          "bestMove": "c6e7",
+          "bestScore": {
+            "cp": 77,
+            "wdl": [
+              189,
+              811,
+              0
+            ]
+          },
+          "playedScore": {
+            "cp": 77,
+            "wdl": [
+              189,
+              811,
+              0
+            ]
+          },
+          "otherMove": "b2g7",
+          "otherScore": {
+            "cp": -10,
+            "wdl": [
+              1,
+              996,
+              3
+            ]
+          },
+          "maximumPoints": 0.5945,
+          "playedPoints": 0.5945,
+          "unrestrictedPoints": 0.6955,
+          "loss": 0,
+          "rootPairLoss": 0.10099999999999998,
+          "rootPairNearBest": false,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        },
+        "80k": {
+          "bestMove": "c6e7",
+          "bestScore": {
+            "cp": 87,
+            "wdl": [
+              310,
+              690,
+              0
+            ]
+          },
+          "playedScore": {
+            "cp": 87,
+            "wdl": [
+              310,
+              690,
+              0
+            ]
+          },
+          "otherMove": "b2g7",
+          "otherScore": {
+            "cp": -26,
+            "wdl": [
+              0,
+              990,
+              10
+            ]
+          },
+          "maximumPoints": 0.655,
+          "playedPoints": 0.655,
+          "unrestrictedPoints": 0.8145,
+          "loss": 0,
+          "rootPairLoss": 0.15949999999999998,
+          "rootPairNearBest": false,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        }
+      },
+      "stable": true,
+      "status": "unsupported"
+    },
+    {
+      "caseId": "NR-106b2a7c4db3",
+      "gameId": "lknGjF3x",
+      "split": "train",
+      "stratum": "net-offer",
+      "localOffer": true,
+      "modes": {
+        "20k": {
+          "bestMove": "c7c6",
+          "bestScore": {
+            "cp": 61,
+            "wdl": [
+              141,
+              858,
+              1
+            ]
+          },
+          "playedScore": {
+            "cp": 60,
+            "wdl": [
+              137,
+              862,
+              1
+            ]
+          },
+          "otherMove": "c7c6",
+          "otherScore": {
+            "cp": 61,
+            "wdl": [
+              141,
+              858,
+              1
+            ]
+          },
+          "maximumPoints": 0.57,
+          "playedPoints": 0.568,
+          "unrestrictedPoints": 0.5635,
+          "loss": 0.0020000000000000018,
+          "rootPairLoss": 0,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        },
+        "80k": {
+          "bestMove": "b4d5",
+          "bestScore": {
+            "cp": 72,
+            "wdl": [
+              212,
+              788,
+              0
+            ]
+          },
+          "playedScore": {
+            "cp": 63,
+            "wdl": [
+              153,
+              846,
+              1
+            ]
+          },
+          "otherMove": "b4d5",
+          "otherScore": {
+            "cp": 72,
+            "wdl": [
+              212,
+              788,
+              0
+            ]
+          },
+          "maximumPoints": 0.606,
+          "playedPoints": 0.576,
+          "unrestrictedPoints": 0.612,
+          "loss": 0.030000000000000027,
+          "rootPairLoss": 0.03600000000000003,
+          "rootPairNearBest": false,
+          "rootInconsistency": false,
+          "lowLoss": false,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": false
+        }
+      },
+      "stable": false,
+      "status": "unstable"
+    },
+    {
+      "caseId": "NR-001ac31d8050",
+      "gameId": "dHGW74a6",
+      "split": "train",
+      "stratum": "nonoffer",
+      "localOffer": false,
+      "modes": {
+        "20k": {
+          "bestMove": "g6h5",
+          "bestScore": {
+            "cp": -1,
+            "wdl": [
+              1,
+              997,
+              2
+            ]
+          },
+          "playedScore": {
+            "cp": -1,
+            "wdl": [
+              1,
+              997,
+              2
+            ]
+          },
+          "otherMove": "e7f7",
+          "otherScore": {
+            "cp": -53,
+            "wdl": [
+              0,
+              955,
+              45
+            ]
+          },
+          "maximumPoints": 0.4995,
+          "playedPoints": 0.4995,
+          "unrestrictedPoints": 0.5005,
+          "loss": 0,
+          "rootPairLoss": 0.0009999999999999454,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        },
+        "80k": {
+          "bestMove": "g6h5",
+          "bestScore": {
+            "cp": -13,
+            "wdl": [
+              1,
+              996,
+              3
+            ]
+          },
+          "playedScore": {
+            "cp": -13,
+            "wdl": [
+              1,
+              996,
+              3
+            ]
+          },
+          "otherMove": "c2a3",
+          "otherScore": {
+            "cp": -41,
+            "wdl": [
+              0,
+              978,
+              22
+            ]
+          },
+          "maximumPoints": 0.499,
+          "playedPoints": 0.499,
+          "unrestrictedPoints": 0.4995,
+          "loss": 0,
+          "rootPairLoss": 0.0005000000000000004,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        }
+      },
+      "stable": true,
+      "status": "unsupported"
+    },
+    {
+      "caseId": "NR-0cd1d5ad63aa",
+      "gameId": "EPRCFdzQ",
+      "split": "train",
+      "stratum": "net-offer",
+      "localOffer": true,
+      "modes": {
+        "20k": {
+          "bestMove": "e3g5",
+          "bestScore": {
+            "cp": 71,
+            "wdl": [
+              195,
+              805,
+              0
+            ]
+          },
+          "playedScore": {
+            "cp": 71,
+            "wdl": [
+              195,
+              805,
+              0
+            ]
+          },
+          "otherMove": "c3e4",
+          "otherScore": {
+            "cp": 57,
+            "wdl": [
+              111,
+              889,
+              0
+            ]
+          },
+          "maximumPoints": 0.5975,
+          "playedPoints": 0.5975,
+          "unrestrictedPoints": 0.614,
+          "loss": 0,
+          "rootPairLoss": 0.01649999999999996,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        },
+        "80k": {
+          "bestMove": "d1c1",
+          "bestScore": {
+            "cp": 61,
+            "wdl": [
+              132,
+              868,
+              0
+            ]
+          },
+          "playedScore": {
+            "cp": 58,
+            "wdl": [
+              114,
+              886,
+              0
+            ]
+          },
+          "otherMove": "d1c1",
+          "otherScore": {
+            "cp": 61,
+            "wdl": [
+              132,
+              868,
+              0
+            ]
+          },
+          "maximumPoints": 0.566,
+          "playedPoints": 0.557,
+          "unrestrictedPoints": 0.557,
+          "loss": 0.008999999999999897,
+          "rootPairLoss": 0,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        }
+      },
+      "stable": true,
+      "status": "supported"
+    },
+    {
+      "caseId": "NR-000170b9a979",
+      "gameId": "Q04dFLKQ",
+      "split": "train",
+      "stratum": "nonoffer",
+      "localOffer": false,
+      "modes": {
+        "20k": {
+          "bestMove": "c6b5",
+          "bestScore": {
+            "cp": 64,
+            "wdl": [
+              87,
+              913,
+              0
+            ]
+          },
+          "playedScore": {
+            "cp": 64,
+            "wdl": [
+              87,
+              913,
+              0
+            ]
+          },
+          "otherMove": "c6b6",
+          "otherScore": {
+            "cp": 28,
+            "wdl": [
+              9,
+              991,
+              0
+            ]
+          },
+          "maximumPoints": 0.5435,
+          "playedPoints": 0.5435,
+          "unrestrictedPoints": 0.6365,
+          "loss": 0,
+          "rootPairLoss": 0.09299999999999997,
+          "rootPairNearBest": false,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        },
+        "80k": {
+          "bestMove": "c6b5",
+          "bestScore": {
+            "cp": 73,
+            "wdl": [
+              143,
+              857,
+              0
+            ]
+          },
+          "playedScore": {
+            "cp": 73,
+            "wdl": [
+              143,
+              857,
+              0
+            ]
+          },
+          "otherMove": "c6b6",
+          "otherScore": {
+            "cp": 18,
+            "wdl": [
+              5,
+              995,
+              0
+            ]
+          },
+          "maximumPoints": 0.5715,
+          "playedPoints": 0.5715,
+          "unrestrictedPoints": 0.5385,
+          "loss": 0,
+          "rootPairLoss": 0,
+          "rootPairNearBest": true,
+          "rootInconsistency": true,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        }
+      },
+      "stable": true,
+      "status": "unsupported"
+    },
+    {
+      "caseId": "NR-0004bed7b817",
+      "gameId": "UoAme6Vk",
+      "split": "train",
+      "stratum": "nonoffer",
+      "localOffer": false,
+      "modes": {
+        "20k": {
+          "bestMove": "e2e4",
+          "bestScore": {
+            "cp": 48,
+            "wdl": [
+              119,
+              878,
+              3
+            ]
+          },
+          "playedScore": {
+            "cp": 48,
+            "wdl": [
+              119,
+              878,
+              3
+            ]
+          },
+          "otherMove": "c2c4",
+          "otherScore": {
+            "cp": 24,
+            "wdl": [
+              51,
+              940,
+              9
+            ]
+          },
+          "maximumPoints": 0.558,
+          "playedPoints": 0.558,
+          "unrestrictedPoints": 0.5385,
+          "loss": 0,
+          "rootPairLoss": 0,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        },
+        "80k": {
+          "bestMove": "e2e4",
+          "bestScore": {
+            "cp": 33,
+            "wdl": [
+              72,
+              922,
+              6
+            ]
+          },
+          "playedScore": {
+            "cp": 33,
+            "wdl": [
+              72,
+              922,
+              6
+            ]
+          },
+          "otherMove": "g1f3",
+          "otherScore": {
+            "cp": 24,
+            "wdl": [
+              51,
+              940,
+              9
+            ]
+          },
+          "maximumPoints": 0.533,
+          "playedPoints": 0.533,
+          "unrestrictedPoints": 0.5435,
+          "loss": 0,
+          "rootPairLoss": 0.010499999999999954,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        }
+      },
+      "stable": true,
+      "status": "unsupported"
+    },
+    {
+      "caseId": "NR-0eebe2df3fb0",
+      "gameId": "VznN5Hhe",
+      "split": "train",
+      "stratum": "net-offer",
+      "localOffer": true,
+      "modes": {
+        "20k": {
+          "bestMove": "e4f2",
+          "bestScore": {
+            "cp": 21,
+            "wdl": [
+              33,
+              962,
+              5
+            ]
+          },
+          "playedScore": {
+            "cp": 21,
+            "wdl": [
+              33,
+              962,
+              5
+            ]
+          },
+          "otherMove": "f7f6",
+          "otherScore": {
+            "cp": -20,
+            "wdl": [
+              6,
+              962,
+              32
+            ]
+          },
+          "maximumPoints": 0.514,
+          "playedPoints": 0.514,
+          "unrestrictedPoints": 0.5095,
+          "loss": 0,
+          "rootPairLoss": 0,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        },
+        "80k": {
+          "bestMove": "e4f2",
+          "bestScore": {
+            "cp": 15,
+            "wdl": [
+              25,
+              968,
+              7
+            ]
+          },
+          "playedScore": {
+            "cp": 15,
+            "wdl": [
+              25,
+              968,
+              7
+            ]
+          },
+          "otherMove": "d8b6",
+          "otherScore": {
+            "cp": -18,
+            "wdl": [
+              6,
+              966,
+              28
+            ]
+          },
+          "maximumPoints": 0.509,
+          "playedPoints": 0.509,
+          "unrestrictedPoints": 0.5045,
+          "loss": 0,
+          "rootPairLoss": 0,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        }
+      },
+      "stable": true,
+      "status": "supported"
+    },
+    {
+      "caseId": "NR-0a0f377d0f3b",
+      "gameId": "NZta6CCP",
+      "split": "train",
+      "stratum": "net-offer",
+      "localOffer": true,
+      "modes": {
+        "20k": {
+          "bestMove": "g1e2",
+          "bestScore": {
+            "cp": 6,
+            "wdl": [
+              14,
+              978,
+              8
+            ]
+          },
+          "playedScore": {
+            "cp": -6,
+            "wdl": [
+              8,
+              978,
+              14
+            ]
+          },
+          "otherMove": "g1e2",
+          "otherScore": {
+            "cp": 6,
+            "wdl": [
+              14,
+              978,
+              8
+            ]
+          },
+          "maximumPoints": 0.503,
+          "playedPoints": 0.497,
+          "unrestrictedPoints": 0.5045,
+          "loss": 0.006000000000000005,
+          "rootPairLoss": 0.007499999999999951,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        },
+        "80k": {
+          "bestMove": "c2c3",
+          "bestScore": {
+            "cp": 9,
+            "wdl": [
+              16,
+              977,
+              7
+            ]
+          },
+          "playedScore": {
+            "cp": 9,
+            "wdl": [
+              16,
+              977,
+              7
+            ]
+          },
+          "otherMove": "d1d2",
+          "otherScore": {
+            "cp": 6,
+            "wdl": [
+              14,
+              978,
+              8
+            ]
+          },
+          "maximumPoints": 0.5045,
+          "playedPoints": 0.5045,
+          "unrestrictedPoints": 0.5045,
+          "loss": 0,
+          "rootPairLoss": 0,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        }
+      },
+      "stable": true,
+      "status": "supported"
+    },
+    {
+      "caseId": "NR-000751de0e75",
+      "gameId": "cSkOnjt9",
+      "split": "train",
+      "stratum": "nonoffer",
+      "localOffer": false,
+      "modes": {
+        "20k": {
+          "bestMove": "e2e3",
+          "bestScore": {
+            "cp": 80,
+            "wdl": [
+              262,
+              738,
+              0
+            ]
+          },
+          "playedScore": {
+            "cp": 80,
+            "wdl": [
+              262,
+              738,
+              0
+            ]
+          },
+          "otherMove": "d1d2",
+          "otherScore": {
+            "cp": -252,
+            "wdl": [
+              0,
+              0,
+              1000
+            ]
+          },
+          "maximumPoints": 0.631,
+          "playedPoints": 0.631,
+          "unrestrictedPoints": 0.6465,
+          "loss": 0,
+          "rootPairLoss": 0.015499999999999958,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        },
+        "80k": {
+          "bestMove": "e2e3",
+          "bestScore": {
+            "cp": 86,
+            "wdl": [
+              327,
+              673,
+              0
+            ]
+          },
+          "playedScore": {
+            "cp": 86,
+            "wdl": [
+              327,
+              673,
+              0
+            ]
+          },
+          "otherMove": "d1g1",
+          "otherScore": {
+            "cp": -262,
+            "wdl": [
+              0,
+              0,
+              1000
+            ]
+          },
+          "maximumPoints": 0.6635,
+          "playedPoints": 0.6635,
+          "unrestrictedPoints": 0.6965,
+          "loss": 0,
+          "rootPairLoss": 0.03300000000000003,
+          "rootPairNearBest": false,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        }
+      },
+      "stable": true,
+      "status": "unsupported"
+    },
+    {
+      "caseId": "NR-07e0c03eee14",
+      "gameId": "ALcv5YpS",
+      "split": "train",
+      "stratum": "net-offer",
+      "localOffer": true,
+      "modes": {
+        "20k": {
+          "bestMove": "c2f2",
+          "bestScore": {
+            "cp": 41,
+            "wdl": [
+              36,
+              964,
+              0
+            ]
+          },
+          "playedScore": {
+            "cp": 41,
+            "wdl": [
+              36,
+              964,
+              0
+            ]
+          },
+          "otherMove": "c2d3",
+          "otherScore": {
+            "cp": 36,
+            "wdl": [
+              28,
+              971,
+              1
+            ]
+          },
+          "maximumPoints": 0.518,
+          "playedPoints": 0.518,
+          "unrestrictedPoints": 0.518,
+          "loss": 0,
+          "rootPairLoss": 0,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        },
+        "80k": {
+          "bestMove": "c2f2",
+          "bestScore": {
+            "cp": 46,
+            "wdl": [
+              48,
+              952,
+              0
+            ]
+          },
+          "playedScore": {
+            "cp": 46,
+            "wdl": [
+              48,
+              952,
+              0
+            ]
+          },
+          "otherMove": "c2d3",
+          "otherScore": {
+            "cp": 39,
+            "wdl": [
+              32,
+              968,
+              0
+            ]
+          },
+          "maximumPoints": 0.524,
+          "playedPoints": 0.524,
+          "unrestrictedPoints": 0.518,
+          "loss": 0,
+          "rootPairLoss": 0,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        }
+      },
+      "stable": true,
+      "status": "supported"
+    },
+    {
+      "caseId": "NR-00b4827f913a",
+      "gameId": "RgAkRyub",
+      "split": "train",
+      "stratum": "nonoffer",
+      "localOffer": false,
+      "modes": {
+        "20k": {
+          "bestMove": "f4e5",
+          "bestScore": {
+            "cp": 115,
+            "wdl": [
+              653,
+              347,
+              0
+            ]
+          },
+          "playedScore": {
+            "cp": 115,
+            "wdl": [
+              653,
+              347,
+              0
+            ]
+          },
+          "otherMove": "f3e5",
+          "otherScore": {
+            "cp": 65,
+            "wdl": [
+              187,
+              812,
+              1
+            ]
+          },
+          "maximumPoints": 0.8265,
+          "playedPoints": 0.8265,
+          "unrestrictedPoints": 0.708,
+          "loss": 0,
+          "rootPairLoss": 0,
+          "rootPairNearBest": true,
+          "rootInconsistency": true,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        },
+        "80k": {
+          "bestMove": "f4e5",
+          "bestScore": {
+            "cp": 93,
+            "wdl": [
+              427,
+              573,
+              0
+            ]
+          },
+          "playedScore": {
+            "cp": 93,
+            "wdl": [
+              427,
+              573,
+              0
+            ]
+          },
+          "otherMove": "f3e5",
+          "otherScore": {
+            "cp": 72,
+            "wdl": [
+              234,
+              765,
+              1
+            ]
+          },
+          "maximumPoints": 0.7135,
+          "playedPoints": 0.7135,
+          "unrestrictedPoints": 0.805,
+          "loss": 0,
+          "rootPairLoss": 0.09150000000000003,
+          "rootPairNearBest": false,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        }
+      },
+      "stable": true,
+      "status": "unsupported"
+    },
+    {
+      "caseId": "NR-071fb8fcfdde",
+      "gameId": "0SLHTgW6",
+      "split": "train",
+      "stratum": "net-offer",
+      "localOffer": true,
+      "modes": {
+        "20k": {
+          "bestMove": "d6h2",
+          "bestScore": {
+            "cp": 123,
+            "wdl": [
+              789,
+              211,
+              0
+            ]
+          },
+          "playedScore": {
+            "cp": 123,
+            "wdl": [
+              789,
+              211,
+              0
+            ]
+          },
+          "otherMove": "h8e8",
+          "otherScore": {
+            "cp": -5,
+            "wdl": [
+              3,
+              992,
+              5
+            ]
+          },
+          "maximumPoints": 0.8945,
+          "playedPoints": 0.8945,
+          "unrestrictedPoints": 0.818,
+          "loss": 0,
+          "rootPairLoss": 0,
+          "rootPairNearBest": true,
+          "rootInconsistency": true,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        },
+        "80k": {
+          "bestMove": "d6h2",
+          "bestScore": {
+            "cp": 125,
+            "wdl": [
+              808,
+              192,
+              0
+            ]
+          },
+          "playedScore": {
+            "cp": 125,
+            "wdl": [
+              808,
+              192,
+              0
+            ]
+          },
+          "otherMove": "h8e8",
+          "otherScore": {
+            "cp": -19,
+            "wdl": [
+              1,
+              989,
+              10
+            ]
+          },
+          "maximumPoints": 0.904,
+          "playedPoints": 0.904,
+          "unrestrictedPoints": 0.9105,
+          "loss": 0,
+          "rootPairLoss": 0.00649999999999995,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        }
+      },
+      "stable": true,
+      "status": "supported"
+    },
+    {
+      "caseId": "NR-03e1279246a1",
+      "gameId": "LJJQuCHE",
+      "split": "train",
+      "stratum": "net-offer",
+      "localOffer": true,
+      "modes": {
+        "20k": {
+          "bestMove": "b4a3",
+          "bestScore": {
+            "cp": 14,
+            "wdl": [
+              4,
+              995,
+              1
+            ]
+          },
+          "playedScore": {
+            "cp": 14,
+            "wdl": [
+              4,
+              995,
+              1
+            ]
+          },
+          "otherMove": "b8b6",
+          "otherScore": {
+            "cp": -61,
+            "wdl": [
+              0,
+              928,
+              72
+            ]
+          },
+          "maximumPoints": 0.5015,
+          "playedPoints": 0.5015,
+          "unrestrictedPoints": 0.5005,
+          "loss": 0,
+          "rootPairLoss": 0,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        },
+        "80k": {
+          "bestMove": "b4a3",
+          "bestScore": {
+            "cp": 31,
+            "wdl": [
+              12,
+              988,
+              0
+            ]
+          },
+          "playedScore": {
+            "cp": 31,
+            "wdl": [
+              12,
+              988,
+              0
+            ]
+          },
+          "otherMove": "b8b6",
+          "otherScore": {
+            "cp": -81,
+            "wdl": [
+              0,
+              770,
+              230
+            ]
+          },
+          "maximumPoints": 0.506,
+          "playedPoints": 0.506,
+          "unrestrictedPoints": 0.534,
+          "loss": 0,
+          "rootPairLoss": 0.028000000000000025,
+          "rootPairNearBest": false,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        }
+      },
+      "stable": true,
+      "status": "supported"
+    },
+    {
+      "caseId": "NR-07f5ce0986c3",
+      "gameId": "7CkGl9Zu",
+      "split": "train",
+      "stratum": "net-offer",
+      "localOffer": true,
+      "modes": {
+        "20k": {
+          "bestMove": "d5d6",
+          "bestScore": {
+            "cp": 8,
+            "wdl": [
+              2,
+              997,
+              1
+            ]
+          },
+          "playedScore": {
+            "cp": 8,
+            "wdl": [
+              2,
+              997,
+              1
+            ]
+          },
+          "otherMove": "d5a5",
+          "otherScore": {
+            "cp": 1,
+            "wdl": [
+              1,
+              998,
+              1
+            ]
+          },
+          "maximumPoints": 0.5005,
+          "playedPoints": 0.5005,
+          "unrestrictedPoints": 0.5,
+          "loss": 0,
+          "rootPairLoss": 0,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        },
+        "80k": {
+          "bestMove": "d5d3",
+          "bestScore": {
+            "cp": 2,
+            "wdl": [
+              1,
+              998,
+              1
+            ]
+          },
+          "playedScore": {
+            "cp": 2,
+            "wdl": [
+              2,
+              997,
+              1
+            ]
+          },
+          "otherMove": "d5d3",
+          "otherScore": {
+            "cp": 2,
+            "wdl": [
+              1,
+              998,
+              1
+            ]
+          },
+          "maximumPoints": 0.5005,
+          "playedPoints": 0.5005,
+          "unrestrictedPoints": 0.5,
+          "loss": 0,
+          "rootPairLoss": 0,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        }
+      },
+      "stable": true,
+      "status": "supported"
+    },
+    {
+      "caseId": "NR-0018b0a522e5",
+      "gameId": "pCnAczkD",
+      "split": "train",
+      "stratum": "nonoffer",
+      "localOffer": false,
+      "modes": {
+        "20k": {
+          "bestMove": "f6d5",
+          "bestScore": {
+            "cp": 78,
+            "wdl": [
+              231,
+              769,
+              0
+            ]
+          },
+          "playedScore": {
+            "cp": 78,
+            "wdl": [
+              231,
+              769,
+              0
+            ]
+          },
+          "otherMove": "a5d5",
+          "otherScore": {
+            "cp": 68,
+            "wdl": [
+              149,
+              851,
+              0
+            ]
+          },
+          "maximumPoints": 0.6155,
+          "playedPoints": 0.6155,
+          "unrestrictedPoints": 0.6,
+          "loss": 0,
+          "rootPairLoss": 0,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        },
+        "80k": {
+          "bestMove": "f6d5",
+          "bestScore": {
+            "cp": 100,
+            "wdl": [
+              500,
+              500,
+              0
+            ]
+          },
+          "playedScore": {
+            "cp": 100,
+            "wdl": [
+              500,
+              500,
+              0
+            ]
+          },
+          "otherMove": "a5d5",
+          "otherScore": {
+            "cp": 83,
+            "wdl": [
+              279,
+              721,
+              0
+            ]
+          },
+          "maximumPoints": 0.75,
+          "playedPoints": 0.75,
+          "unrestrictedPoints": 0.787,
+          "loss": 0,
+          "rootPairLoss": 0.03700000000000003,
+          "rootPairNearBest": false,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        }
+      },
+      "stable": true,
+      "status": "unsupported"
+    },
+    {
+      "caseId": "NR-003af74c3825",
+      "gameId": "jcbzyUdc",
+      "split": "train",
+      "stratum": "nonoffer",
+      "localOffer": false,
+      "modes": {
+        "20k": {
+          "bestMove": "g5e6",
+          "bestScore": {
+            "cp": 57,
+            "wdl": [
+              121,
+              878,
+              1
+            ]
+          },
+          "playedScore": {
+            "cp": 57,
+            "wdl": [
+              121,
+              878,
+              1
+            ]
+          },
+          "otherMove": "d3d4",
+          "otherScore": {
+            "cp": -155,
+            "wdl": [
+              0,
+              73,
+              927
+            ]
+          },
+          "maximumPoints": 0.56,
+          "playedPoints": 0.56,
+          "unrestrictedPoints": 0.611,
+          "loss": 0,
+          "rootPairLoss": 0.050999999999999934,
+          "rootPairNearBest": false,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        },
+        "80k": {
+          "bestMove": "g5e6",
+          "bestScore": {
+            "cp": 50,
+            "wdl": [
+              88,
+              911,
+              1
+            ]
+          },
+          "playedScore": {
+            "cp": 50,
+            "wdl": [
+              88,
+              911,
+              1
+            ]
+          },
+          "otherMove": "c2c3",
+          "otherScore": {
+            "cp": -169,
+            "wdl": [
+              0,
+              39,
+              961
+            ]
+          },
+          "maximumPoints": 0.5435,
+          "playedPoints": 0.5435,
+          "unrestrictedPoints": 0.5435,
+          "loss": 0,
+          "rootPairLoss": 0,
+          "rootPairNearBest": true,
+          "rootInconsistency": false,
+          "lowLoss": true,
+          "sound": true,
+          "competitive": true,
+          "mateMaintained": true,
+          "eligible": true
+        }
+      },
+      "stable": true,
+      "status": "unsupported"
+    }
+  ],
+  "summary": {
+    "offerSupport": {
+      "successes": 7,
+      "n": 8,
+      "estimate": 0.875,
+      "lower": 0.5291118177871464,
+      "upper": 0.9775825085499433,
+      "level": 0.95,
+      "method": "Wilson score; one fixed focal choice per disjoint game"
+    },
+    "engineDecisionStability": {
+      "successes": 15,
+      "n": 16,
+      "estimate": 0.9375,
+      "lower": 0.7167126242970107,
+      "upper": 0.9888806552353576,
+      "level": 0.95,
+      "method": "Wilson score; one fixed focal choice per disjoint game"
+    },
+    "statuses": {
+      "net-offer": {
+        "supported": 7,
+        "unsupported": 0,
+        "unstable": 1
+      },
+      "nonoffer": {
+        "supported": 0,
+        "unsupported": 8,
+        "unstable": 0
+      }
+    },
+    "rootInconsistencies": {
+      "20k": 2,
+      "80k": 1
+    },
+    "rootPairDecisionDifferences": {
+      "20k": 3,
+      "80k": 5
+    }
+  },
+  "gates": {
+    "complete": true,
+    "offerEvidence": true,
+    "engineDecisionStability": true
+  },
+  "passed": true,
+  "humanReviews": 0,
+  "categoryImprovementConfirmed": false,
+  "promoted": false,
+  "interpretation": "Prospective matched review enrichment operational screen; selection differs from E012, no paired causal or human category claim"
+}
