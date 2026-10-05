@@ -23,3 +23,7 @@ sizes as verified. No promotion is justified by this inventory alone.
 What changes this conclusion: a documented earlier exposure record changes the
 consumption ledger; a reproducible integrity failure changes input eligibility;
 new independently assessed data can support claims beyond development.
+
+2026-10-05 update: [E003](../experiments/E003-sf19-archive-replay/RESULT.md)
+subsequently reproduced both archived models and reports from retained raw
+observations. The original inventory and test-exposure conclusion remain intact.

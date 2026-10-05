@@ -1,0 +1,43 @@
+{
+  "schema": "research-run-v1",
+  "id": "E003-retrospective-replay",
+  "date": "2026-10-05",
+  "sourceRevision": "8b433c9b3926b078a22d784cab6d7c0fdb8e70d6",
+  "command": "node research/experiments/E003-sf19-archive-replay/code/replay.mjs",
+  "environment": {
+    "node": "v24.14.1",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "evaluationRole": "retrospective replay of consumed development/test evidence",
+  "seed": 18019,
+  "bootstrapIterations": 2000,
+  "engineSearches": 0,
+  "inputs": {
+    "schema": "E003-archive-inputs-v1",
+    "legacySourceFile": "scratch/accuracy-verification/tools/calibration/sf19-quality.mjs",
+    "legacySourceSha256": "104ac29324dcfba846b15ce606314ae1c64214e907efe59f7594940f87781a3f",
+    "archives": {
+      "sf19-quality": {
+        "file": "sf19-quality.json.gz",
+        "sha256": "5cef8a6d20482a743351c8ca3a85da030fd95b3eb91a6395aeca0b8d7f7fe745",
+        "bytes": 515106
+      },
+      "sf19-choice-confirmation": {
+        "file": "sf19-choice-confirmation.json.gz",
+        "sha256": "5e9e1f61b48d39030e91dea0615aee4510ac9c29e3fcf3d2b7e3ad47b82efbae",
+        "bytes": 512264
+      }
+    }
+  },
+  "codeSha256": {
+    "replay.mjs": "4a1bb8b489d8c9e366aecb7b47522b832893c570dc6172abcf66cf1718cf41d6",
+    "study.mjs": "0f05a432040e5cd479c3ac286b2dc5b4b29527d7f4fbe2c3a4602247f2abc510"
+  },
+  "outputs": {
+    "replay.json": "23e825f3d2d4ec7bde22823247ac52ba0d9535fa936146b15e29bbc131c8af81"
+  },
+  "numericReplayByteIdentical": true,
+  "cleanReplayWithoutIgnoredInputs": true,
+  "cohortMatchesD001": true
+}

@@ -1,0 +1,356 @@
+{
+  "schema": "E003-retrospective-replay-v1",
+  "passed": true,
+  "records": {
+    "sf19-quality": {
+      "modelMatches": true,
+      "reportMatches": true,
+      "model": {
+        "schema": "engine-quality-v1",
+        "candidateVersion": "0096ee4d2f0e7850d22080efa6127dc087f517fcfd9fa743543954c0f88c4cb6",
+        "outcome": {
+          "schema": "human-outcome-v1",
+          "slopePerPawn": 0.13989269918921732,
+          "boundary": null,
+          "observations": 299,
+          "games": 100,
+          "criterion": "Weighted fractional Bernoulli negative log likelihood; each game has unit total weight"
+        },
+        "choice": {
+          "schema": "human-choice-v1",
+          "temperature": 37.4939681585912,
+          "boundary": null,
+          "games": 80,
+          "observations": 80,
+          "criterion": "Game-weighted multinomial negative log likelihood across all preselected choices",
+          "sampling": {
+            "schema": "grouped-human-choice-v1",
+            "observations": "All four preselected public choices per game; no ranking by scores or review labels.",
+            "weighting": "Each game contributes unit total weight, divided equally between its selected positions.",
+            "fitting": "Positive inverse temperature minimizes weighted multinomial negative log likelihood on training games only."
+          }
+        },
+        "engineConfig": {
+          "version": "Stockfish 19 (identity verified at UCI startup)",
+          "majorVersion": 19,
+          "build": "stockfish.js lite single-threaded",
+          "network": "nn-61e7af4bb97d.nnue",
+          "loaderSha256": "d3344124ab067fb0b90ee77873bb8e9fbf5fc01bc525fe714b0f942581e889e6",
+          "wasmSha256": "57ac2d72312aba346760e3f173f687a8c211208e97a87268436f7f0e10bb5387",
+          "budget": {
+            "kind": "nodes",
+            "value": 20000
+          },
+          "options": {
+            "Threads": 1,
+            "Hash": 32,
+            "MultiPV": 1,
+            "Skill Level": 20,
+            "UCI_LimitStrength": false,
+            "UCI_ShowWDL": true,
+            "UCI_Chess960": false
+          },
+          "reset": "ucinewgame + Clear Hash + isready before every search",
+          "tablebases": "none",
+          "perspective": "side to move at root",
+          "position": "startpos with full move history"
+        },
+        "aggregation": "Arithmetic mean of fitted move qualities over nonforced decisions.",
+        "protocol": {
+          "schema": "sf19-quality-study-v1",
+          "seed": "sf19-quality-2026-10-04-v1",
+          "outcomePlies": [
+            11,
+            31,
+            51,
+            71
+          ],
+          "trainingGames": 100,
+          "developmentGames": 25,
+          "testGames": 25,
+          "trainingChoices": 80,
+          "developmentChoices": 20,
+          "testChoices": 25,
+          "selection": "Existing SF18 training/development cohort; one hash-selected archived legal choice per game. Five test games per rating band, ordered by frozen dataset order; one hash-selected nonforced test choice after ply 10.",
+          "acceptance": "Test outcome log loss and Brier loss must both beat the old SF19 curve; test legal-choice log loss must beat normalized old move qualities and uniform choice. Paired game bootstrap upper bounds for both log-loss differences must be below zero.",
+          "limits": "Human outcome/choice prediction validates those targets, not a unique display percentage or agreement with human category labels. Existing development games were consumed before this study. Test split roles are frozen; this assessment consumes the selected test games."
+        }
+      },
+      "report": {
+        "development": {
+          "split": "validation",
+          "outcome": {
+            "candidate": {
+              "games": 25,
+              "observations": 81,
+              "logLoss": 0.6417691563868407,
+              "brier": 0.2251892918748044
+            },
+            "baseline": {
+              "games": 25,
+              "observations": 81,
+              "logLoss": 0.6525830600098911,
+              "brier": 0.22519130328600825
+            }
+          },
+          "choice": {
+            "games": 20,
+            "observations": 20,
+            "logLoss": 1.820817932550452,
+            "uniformLogLoss": 3.4602962198129665,
+            "baselineLogLoss": 2.6918665892894427
+          },
+          "pairedDifference": {
+            "outcome": {
+              "estimate": -0.010813903623050307,
+              "lower": -0.10542706000468986,
+              "upper": 0.061115058233498845,
+              "iterations": 2000,
+              "seed": 18019,
+              "unit": "game (both player sides resampled together)",
+              "interpretation": "exploratory percentile interval; small stratified sample"
+            },
+            "choice": {
+              "estimate": -0.8710486567389907,
+              "lower": -1.2075031368617917,
+              "upper": -0.5392155788318307,
+              "iterations": 2000,
+              "seed": 18019,
+              "unit": "game (both player sides resampled together)",
+              "interpretation": "exploratory percentile interval; small stratified sample"
+            }
+          },
+          "passed": false
+        },
+        "test": {
+          "split": "test",
+          "outcome": {
+            "candidate": {
+              "games": 25,
+              "observations": 84,
+              "logLoss": 0.6474639840883392,
+              "brier": 0.20804488869714594
+            },
+            "baseline": {
+              "games": 25,
+              "observations": 84,
+              "logLoss": 0.6748654283090729,
+              "brier": 0.21229317001509146
+            }
+          },
+          "choice": {
+            "games": 25,
+            "observations": 25,
+            "logLoss": 2.5857518770243644,
+            "uniformLogLoss": 3.3113691679303296,
+            "baselineLogLoss": 2.9382012221902336
+          },
+          "pairedDifference": {
+            "outcome": {
+              "estimate": -0.027401444220733453,
+              "lower": -0.14504602331680008,
+              "upper": 0.05767350481154628,
+              "iterations": 2000,
+              "seed": 18019,
+              "unit": "game (both player sides resampled together)",
+              "interpretation": "exploratory percentile interval; small stratified sample"
+            },
+            "choice": {
+              "estimate": -0.3524493451658688,
+              "lower": -0.6206648441373943,
+              "upper": -0.050200204704674324,
+              "iterations": 2000,
+              "seed": 18019,
+              "unit": "game (both player sides resampled together)",
+              "interpretation": "exploratory percentile interval; small stratified sample"
+            }
+          },
+          "passed": false
+        }
+      },
+      "sourceSha256": "5cef8a6d20482a743351c8ca3a85da030fd95b3eb91a6395aeca0b8d7f7fe745",
+      "expectedSnapshotSha256": "3953a2a13f8e491e5c0dedbf40d38bb7d0d24ac4abe546278b8fb8360e1d3c2d",
+      "counts": {
+        "games": 150,
+        "positions": 125,
+        "searches": 4677,
+        "trainingChoices": 80
+      },
+      "note": "Retrospective numerical reproduction; original reports previously inspected; no new confirmation"
+    },
+    "sf19-choice-confirmation": {
+      "modelMatches": true,
+      "reportMatches": true,
+      "model": {
+        "schema": "engine-quality-v1",
+        "candidateVersion": "8c7e18512426e527519523558019001a2138a0e2c18dfe111eef8cfff43276a3",
+        "outcome": {
+          "schema": "human-outcome-v1",
+          "slopePerPawn": 0.368208,
+          "source": "Retained public Lichess centipawn curve; not an SF19-fitted human outcome curve."
+        },
+        "choice": {
+          "schema": "human-choice-v1",
+          "temperature": 17.31631627755427,
+          "boundary": null,
+          "games": 80,
+          "observations": 80,
+          "criterion": "Game-weighted multinomial negative log likelihood across all preselected choices",
+          "sampling": {
+            "schema": "grouped-human-choice-v1",
+            "observations": "All four preselected public choices per game; no ranking by scores or review labels.",
+            "weighting": "Each game contributes unit total weight, divided equally between its selected positions.",
+            "fitting": "Positive inverse temperature minimizes weighted multinomial negative log likelihood on training games only."
+          }
+        },
+        "engineConfig": {
+          "version": "Stockfish 19 (identity verified at UCI startup)",
+          "majorVersion": 19,
+          "build": "stockfish.js lite single-threaded",
+          "network": "nn-61e7af4bb97d.nnue",
+          "loaderSha256": "d3344124ab067fb0b90ee77873bb8e9fbf5fc01bc525fe714b0f942581e889e6",
+          "wasmSha256": "57ac2d72312aba346760e3f173f687a8c211208e97a87268436f7f0e10bb5387",
+          "budget": {
+            "kind": "nodes",
+            "value": 20000
+          },
+          "options": {
+            "Threads": 1,
+            "Hash": 32,
+            "MultiPV": 1,
+            "Skill Level": 20,
+            "UCI_LimitStrength": false,
+            "UCI_ShowWDL": true,
+            "UCI_Chess960": false
+          },
+          "reset": "ucinewgame + Clear Hash + isready before every search",
+          "tablebases": "none",
+          "perspective": "side to move at root",
+          "position": "startpos with full move history"
+        },
+        "aggregation": "Arithmetic mean of fitted move qualities over nonforced decisions.",
+        "protocol": {
+          "schema": "sf19-choice-confirmation-v1",
+          "seed": "sf19-quality-2026-10-04-v1",
+          "outcomePlies": [
+            11,
+            31,
+            51,
+            71
+          ],
+          "trainingGames": 100,
+          "developmentGames": 25,
+          "testGames": 25,
+          "trainingChoices": 80,
+          "developmentChoices": 20,
+          "testChoices": 25,
+          "selection": "Existing SF18 training/development cohort; one hash-selected archived legal choice per game. Five test games per rating band, ordered by frozen dataset order; one hash-selected nonforced test choice after ply 10. Confirmation uses the next five test games per band, excluding the first study holdout.",
+          "acceptance": "Outcome curve is unchanged. Choice log loss must beat normalized old move qualities and uniform legal choice; the upper paired game-bootstrap difference must be below zero.",
+          "limits": "Human outcome/choice prediction validates those targets, not a unique display percentage or agreement with human category labels. Existing development games were consumed before this study. Test split roles are frozen; this assessment consumes the selected test games. This second holdout confirms a narrower training-fitted choice model after the full-curve candidate failed its first gate.",
+          "modelKind": "choice-only"
+        }
+      },
+      "report": {
+        "development": {
+          "split": "validation",
+          "outcome": {
+            "candidate": {
+              "games": 25,
+              "observations": 81,
+              "logLoss": 0.6525830600098911,
+              "brier": 0.22519130328600825
+            },
+            "baseline": {
+              "games": 25,
+              "observations": 81,
+              "logLoss": 0.6525830600098911,
+              "brier": 0.22519130328600825
+            }
+          },
+          "choice": {
+            "games": 20,
+            "observations": 20,
+            "logLoss": 1.9009190966260934,
+            "uniformLogLoss": 3.4602962198129665,
+            "baselineLogLoss": 2.6918665892894427
+          },
+          "pairedDifference": {
+            "outcome": {
+              "estimate": 0,
+              "lower": 0,
+              "upper": 0,
+              "iterations": 2000,
+              "seed": 18019,
+              "unit": "game (both player sides resampled together)",
+              "interpretation": "exploratory percentile interval; small stratified sample"
+            },
+            "choice": {
+              "estimate": -0.790947492663349,
+              "lower": -1.0667926008033426,
+              "upper": -0.5058201292091223,
+              "iterations": 2000,
+              "seed": 18019,
+              "unit": "game (both player sides resampled together)",
+              "interpretation": "exploratory percentile interval; small stratified sample"
+            }
+          },
+          "passed": true
+        },
+        "test": {
+          "split": "test",
+          "outcome": {
+            "candidate": {
+              "games": 25,
+              "observations": 72,
+              "logLoss": 0.7234648905140839,
+              "brier": 0.24362564813857734
+            },
+            "baseline": {
+              "games": 25,
+              "observations": 72,
+              "logLoss": 0.7234648905140839,
+              "brier": 0.24362564813857734
+            }
+          },
+          "choice": {
+            "games": 25,
+            "observations": 25,
+            "logLoss": 2.808278195279954,
+            "uniformLogLoss": 3.3647350071619404,
+            "baselineLogLoss": 2.867358139370989
+          },
+          "pairedDifference": {
+            "outcome": {
+              "estimate": 0,
+              "lower": 0,
+              "upper": 0,
+              "iterations": 2000,
+              "seed": 18019,
+              "unit": "game (both player sides resampled together)",
+              "interpretation": "exploratory percentile interval; small stratified sample"
+            },
+            "choice": {
+              "estimate": -0.05907994409103384,
+              "lower": -0.5002425755713904,
+              "upper": 0.4723236472062209,
+              "iterations": 2000,
+              "seed": 18019,
+              "unit": "game (both player sides resampled together)",
+              "interpretation": "exploratory percentile interval; small stratified sample"
+            }
+          },
+          "passed": false
+        }
+      },
+      "sourceSha256": "5e9e1f61b48d39030e91dea0615aee4510ac9c29e3fcf3d2b7e3ad47b82efbae",
+      "expectedSnapshotSha256": "a762d73fb732e107da84d7edae8991cc89227f3252b164d3008e64a7c1c6906b",
+      "counts": {
+        "games": 150,
+        "positions": 125,
+        "searches": 4652,
+        "trainingChoices": 80
+      },
+      "note": "Retrospective numerical reproduction; original reports previously inspected; no new confirmation"
+    }
+  }
+}
