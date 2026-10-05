@@ -1,5 +1,20 @@
 # Research protocol
 
+## Verify eligibility and provenance before use
+
+Follow [DATA_POLICY.md](DATA_POLICY.md) before starting/resuming a research goal
+or collecting, inspecting or using game data. Every source must be explicitly
+public and free to use under documented compatible terms. Missing or ambiguous
+permission prohibits all uses, including derivatives and cached models. Run the
+preflight and use the guarded loader; retain its eligibility receipt per run.
+
+Trace every game to its source and every result to hash-bound inputs, acquisition
+records, transformations, selection/split decisions and exact method revisions.
+Retain independent replay evidence and state any unverifiable historical steps.
+Source eligibility and byte integrity do not prove scientific validity or confer
+permission to inspect locked labels. Confirmation still requires the controls
+below; no result is universally proven by a successful preflight.
+
 ## Define the claim first
 
 Each experiment names one question, the target population, the baseline and

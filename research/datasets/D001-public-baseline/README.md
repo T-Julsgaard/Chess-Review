@@ -1,5 +1,17 @@
 # D001: retained public baseline evidence
 
+Eligibility registered 2026-10-05 under [public-data-v1](../../DATA_POLICY.md).
+[manifest.json](manifest.json) binds the source records, normalized games, retained
+engine observations and historical derivatives to exact bytes and parent inputs.
+The approved-source registry retains verified publisher CC0 evidence for the
+three recorded standard game exports. Preflight checks game ID/URL/month and
+derivative bindings. It does not independently prove per-game archive-frame
+membership or reconstruct the original acquisition/selection pipeline. These
+limitations remain explicit; this evidence cannot provide new confirmation.
+
+Check eligibility: `npm run research:preflight -- D001 --purpose inspect`.
+Trace one game: `npm run research:preflight -- D001 --game qw9OwOT5`.
+
 Registered 2026-10-05. Frozen data and normalization are retained at B000 revision
 `becc0629688ef8814c247f94fa449dc3e4247faf` in `tools/calibration/public/`.
 Use those files by reference; do not overwrite them or copy them into a new role.

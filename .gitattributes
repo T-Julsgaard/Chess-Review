@@ -9,3 +9,6 @@ research/**/*.json text eol=lf
 research/**/*.jsonl text eol=lf
 research/**/*.csv text eol=lf
 research/**/*.tsv text eol=lf
+# Publisher evidence and policy receipts must survive checkout line endings.
+research/datasets/evidence/*.md text eol=lf
+research/DATA_POLICY.md text eol=lf

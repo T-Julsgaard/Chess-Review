@@ -1,0 +1,42 @@
+{
+  "schema": "research-approved-sources-v1",
+  "policyVersion": "public-data-v1",
+  "sources": [
+    {
+      "id": "lichess-standard-2026-summer",
+      "publisher": "Lichess",
+      "status": "approved",
+      "public": true,
+      "freeToUse": true,
+      "license": "CC0-1.0",
+      "termsUrl": "https://database.lichess.org/",
+      "verifiedOn": "2026-10-05",
+      "allowedPurposes": [
+        "collect",
+        "inspect",
+        "analyze",
+        "train",
+        "tune",
+        "validate",
+        "test",
+        "examples",
+        "reuse"
+      ],
+      "evidence": {
+        "path": "research/datasets/evidence/lichess-terms-2026-10-05.md",
+        "sha256": "a227e286dce1e9e355101356507e57c4ad89ec39d65f9762f94ab76a6ffdd4ac"
+      },
+      "exports": [
+        "https://database.lichess.org/standard/lichess_db_standard_rated_2026-06.pgn.zst",
+        "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
+        "https://database.lichess.org/standard/lichess_db_standard_rated_2026-08.pgn.zst"
+      ]
+    }
+  ],
+  "datasets": [
+    {
+      "id": "D001",
+      "manifest": "research/datasets/D001-public-baseline/manifest.json"
+    }
+  ]
+}

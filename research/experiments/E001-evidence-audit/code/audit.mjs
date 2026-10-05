@@ -5,6 +5,7 @@ import path from 'node:path';
 import {hash} from '../../../../tools/calibration/io.mjs';
 import {ratingFeatures} from '../../../../lib/public-scoring.js';
 import {Chess} from '../../../../lib/chess.js';
+import {openResearchData} from '../../../data-policy.mjs';
 
 const repo = fileURLToPath(new URL('../../../../', import.meta.url));
 const publicDir = path.join(repo, 'tools/calibration/public');
@@ -40,14 +41,15 @@ async function bytesRecord(file) {
 }
 
 export async function audit() {
-  const manifest = JSON.parse(await readFile(path.join(publicDir, 'manifest.json'), 'utf8'));
+  const data = await openResearchData(['D001'], {purpose: 'analyze'});
+  const manifest = await data.readJson('tools/calibration/public/manifest.json');
   const inputs = {}, inputHashes = {}, errors = [];
   for (const [name, expected] of Object.entries(manifest.files)) {
     const bytes = await readFile(path.join(publicDir, name));
     const decoded = name.endsWith('.gz') ? gunzipSync(bytes) : bytes;
     inputHashes[name] = {sha256: hash(bytes), uncompressedSha256: hash(decoded), bytes: bytes.length};
     if (hash(bytes) !== expected.sha256 || hash(decoded) !== expected.uncompressedSha256 || bytes.length !== expected.bytes) errors.push('Hash/size differs: ' + name);
-    inputs[name] = JSON.parse(decoded);
+    inputs[name] = await data.readJson('tools/calibration/public/' + name);
   }
   if (errors.length) throw Error(errors.join('\n'));
   const dataset = inputs['dataset.json.gz'], games = new Map(dataset.map(g => [g.id, g]));
@@ -106,32 +108,14 @@ export async function audit() {
   }
   const archived = [];
   for (const study of ['sf19-quality', 'sf19-choice-confirmation']) {
-    const dir = path.join(repo, 'calibration-runs', study);
-    try {
-      const plan = JSON.parse(await readFile(path.join(dir, 'plan.json'), 'utf8'));
-      const model = JSON.parse(await readFile(path.join(dir, 'model.json'), 'utf8'));
-      const report = JSON.parse(await readFile(path.join(dir, 'report.json'), 'utf8'));
-      const sourceFiles = {};
-      for (const name of ['plan.json', 'model.json', 'report.json', 'evidence.json.gz']) sourceFiles[name] = await bytesRecord(path.join(dir, name));
-      const unknownGames = plan.games.filter(g => !games.has(g.id)).map(g => g.id);
-      const consumedTestIds = sorted(plan.games.filter(g => g.split === 'test').map(g => g.id));
-      archived.push({study, protocol: plan.protocol, sourceFiles, datasetSha256: plan.datasetSha256,
-        selectionSha256: plan.selectionSha256, engineConfig: plan.engineConfig,
-        games: plan.games.map(g => ({id: g.id, split: g.split})), consumedTestIds, unknownGames,
-        candidateVersion: model.candidateVersion, model, report,
-        status: 'Retrospective archive; reports inspected; numerical replay not yet independently checked'});
-    } catch (error) {
-      if (error.code !== 'ENOENT') throw error;
-      // A clean clone can reproduce the exposure inventory from retained metadata.
-      // This does not stand in for a numerical replay of the old raw evidence.
-      const retained = fileURLToPath(new URL('../evidence/' + study + '-archive.json', import.meta.url));
-      try {archived.push(JSON.parse(await readFile(retained, 'utf8')));}
-      catch (missing) {if (missing.code !== 'ENOENT') throw missing;}
-    }
+    // Ignored local studies are not registered inputs. Use only retained,
+    // hash-bound snapshots; a new local study must be registered before use.
+    archived.push(await data.readJson('research/experiments/E001-evidence-audit/evidence/' + study + '-archive.json'));
   }
   const allConsumed = new Set(archived.flatMap(a => a.consumedTestIds));
   const output = {
     schema: 'research-evidence-audit-v1', dataset: 'D001', inputHashes,
+    dataEligibility: data.receipt,
     baselineFiles: Object.fromEntries(await Promise.all(['data/calibration.json', 'lib/public-scoring.js', 'tools/calibration/PUBLIC_METHOD.md'].map(async file => [file, await bytesRecord(path.join(repo, file))]))),
     normalized: {games: dataset.length, uniqueGames: games.size, players: new Set(dataset.flatMap(g => g.players.map(p => p.id))).size,
       roles: countBy(dataset, g => g.split), categories: countBy(dataset, g => g.category), months: countBy(dataset, g => g.sourceMonth),

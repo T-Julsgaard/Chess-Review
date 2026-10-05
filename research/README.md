@@ -13,9 +13,11 @@ results do not become extension behavior automatically.
 ## Start here
 
 1. Read [INDEX.md](INDEX.md) for current state, prior findings and the next task.
-2. Read [BASELINE.md](BASELINE.md) when comparing with the extension.
-3. Read [PROTOCOL.md](PROTOCOL.md) before designing or assessing an experiment.
-4. Open only the relevant experiment, dataset or finding after that.
+2. Follow [DATA_POLICY.md](DATA_POLICY.md) and run the data eligibility preflight
+   before starting/resuming a goal or using any games or derived data.
+3. Read [BASELINE.md](BASELINE.md) when comparing with the extension.
+4. Read [PROTOCOL.md](PROTOCOL.md) before designing or assessing an experiment.
+5. Open only the relevant experiment, dataset or finding after that.
 
 | Location | Purpose |
 | --- | --- |
@@ -23,6 +25,7 @@ results do not become extension behavior automatically.
 | [INDEX.md](INDEX.md) | Compact experiment register, decisions and backlog. |
 | [BASELINE.md](BASELINE.md) | Pinned starting implementation and known evidence limits. |
 | [PROTOCOL.md](PROTOCOL.md) | Measurement, validation and promotion requirements. |
+| [DATA_POLICY.md](DATA_POLICY.md) | Mandatory public-data eligibility, verifiable lineage and run checks. |
 | [MEASUREMENT.md](MEASUREMENT.md) | Output definitions, development gates and research sources. |
 | [experiments/](experiments/README.md) | One folder per experiment: plan, code, retained evidence and result. |
 | [datasets/](datasets/README.md) | Dataset provenance, split ownership and reuse records. |

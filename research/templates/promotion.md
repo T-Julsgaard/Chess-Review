@@ -3,6 +3,7 @@
 - Date, decision state, maintainer and rationale:
 - Findings and exact confirmed claims supporting adoption:
 - Baseline/candidate revisions, dataset/test exposure and clean replay links:
+- Data eligibility receipts, complete input/method lineage and provenance limits:
 - Paired practical improvement, uncertainty and all guardrail outcomes:
 - Selected algorithm/parameters/components and excluded experiment components:
 - Exact runtime/model/methodology/reproduction files to change:

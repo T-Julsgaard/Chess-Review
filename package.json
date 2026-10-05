@@ -12,6 +12,8 @@
     "verify:engines": "node scripts/verify-engines.mjs",
     "verify:source": "node scripts/verify-source.mjs",
     "verify:history": "node scripts/verify-history.mjs",
+    "research:preflight": "node research/preflight.mjs",
+    "test:research": "node --test research/*.test.mjs research/experiments/*/code/*.test.mjs",
     "lint": "web-ext lint --source-dir=.",
     "start:firefox": "web-ext run --target=firefox-desktop --source-dir=.",
     "start:chrome": "web-ext run --target=chromium --source-dir=.",

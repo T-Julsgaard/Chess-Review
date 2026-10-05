@@ -5,7 +5,7 @@ import path from 'node:path';
 import {performance} from 'node:perf_hooks';
 import {execFileSync} from 'node:child_process';
 import {hash} from '../../../../tools/calibration/io.mjs';
-import {publicInput} from '../../../../tools/calibration/reproduce-public.mjs';
+import {openResearchData} from '../../../data-policy.mjs';
 import {fitHuber} from '../../../../tools/calibration/fit-huber.mjs';
 import {predict} from '../../../../tools/calibration/fit-rating.mjs';
 import {ratingFeatures} from '../../../../lib/public-scoring.js';
@@ -170,11 +170,12 @@ async function evaluateEngine(engine, evidence, dataset, smoke) {
 async function main(){
   const smoke=process.argv.includes('--smoke');
   if(process.argv.slice(2).some(arg=>arg!=='--smoke'))throw Error('Unknown argument');
-  const manifest=JSON.parse(await readFile(path.join(root,'tools/calibration/public/manifest.json'),'utf8'));
-  const dataset=await publicInput('dataset.json.gz',manifest),reports={},predictions={},benchmarks={};
+  const data=await openResearchData(['D001'],{purpose:'train'});
+  const manifest=await data.readJson('tools/calibration/public/manifest.json');
+  const dataset=await data.readJson('tools/calibration/public/dataset.json.gz'),reports={},predictions={},benchmarks={};
   const started=performance.now();
   for(const engine of ['sf18','sf19']){
-    const evidence=await publicInput(engine+'-rating-evidence.json.gz',manifest);
+    const evidence=await data.readJson('tools/calibration/public/'+engine+'-rating-evidence.json.gz');
     const result=await evaluateEngine(engine,evidence,dataset,smoke);
     reports[engine]=result.report;predictions[engine]=result.records;benchmarks[engine]=result.benchmark;
   }
@@ -187,6 +188,7 @@ async function main(){
   const revision=execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8',windowsHide:true}).trim();
   const codeSha256=hash(await readFile(fileURLToPath(import.meta.url)));
   await writeFile(path.join(out,'run.json'),JSON.stringify({schema:'research-run-v1',id:'E002-'+(smoke?'smoke':'full'),date:'2026-10-05',sourceRevision:revision,codeSha256,
+    dataEligibility:data.receipt,
     command:'node research/experiments/E002-nonlinear-rating/code/evaluate.mjs'+(smoke?' --smoke':''),
     environment:{node:process.version,platform:process.platform,arch:process.arch},evaluationRole:'nested development CV on retained training rows',
     inputHashes:Object.fromEntries(['dataset.json.gz','sf18-rating-evidence.json.gz','sf19-rating-evidence.json.gz'].map(name=>[name,manifest.files[name]])),

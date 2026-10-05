@@ -6,6 +6,16 @@ preferences still apply.
 - Start with `README.md` and `INDEX.md`. Read the protocol on the first research
   task; thereafter open the active record and only relevant supporting files.
   Do not read all past experiments, bulk evidence or generated logs by default.
+- Before starting/resuming a research goal or using game data, follow
+  `DATA_POLICY.md` and run `npm run research:preflight -- <dataset IDs> --purpose
+  <use>`. Only explicitly public, free-to-use, registered sources with documented
+  permission qualify. Missing/ambiguous permission or untraceable provenance
+  strictly prohibits every use, including training, inspection, evaluation,
+  examples and derived caches/models. Never bypass the gate or substitute data.
+  Source metadata/terms may be read to establish eligibility. Require the shared
+  guarded loader in every entry point; keep its receipt in each run. Reverify
+  terms before new acquisitions and origins before changed inputs. Keep game and
+  bulk provenance records out of model context; report compact checks only.
 - Before running work, check the index and dataset reuse records for the same
   question, search configuration and inputs. Reuse hash-matched observations;
   never substitute a different engine, budget or history silently.

@@ -21,4 +21,6 @@ jobs:
       - run: npm run verify:source
       - run: npm run verify:history
       - run: npm test
+      - run: npm run test:research
+      - run: npm run research:preflight -- D001 --purpose inspect
       - run: node tools/calibration/reproduce-public.mjs

@@ -49,6 +49,13 @@ stability, latency, unavailable evidence and fallback behavior.
 
 ## Next session
 
+Before any research goal starts/resumes or game data is used, follow
+[DATA_POLICY.md](DATA_POLICY.md) and run
+`npm run research:preflight -- D001 --purpose inspect` (use actual dataset IDs).
+Only registered explicitly public, free-to-use sources and traceable derivatives
+qualify. New confirmation cohorts need complete acquisition/transform provenance;
+D001's historical limitations and exposure remain in force.
+
 Run E004's broader practical-outcome calibration, preserving its distinct target
 from displayed accuracy/rating. Rating uncertainty remains queued. Prepare an
 independent category rubric/pack, then collect and lock a fresh numerical cohort

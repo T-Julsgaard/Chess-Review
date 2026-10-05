@@ -1,0 +1,188 @@
+{
+  "schema": "research-dataset-manifest-v1",
+  "id": "D001",
+  "registeredOn": "2026-10-05",
+  "sourceIds": [
+    "lichess-standard-2026-summer"
+  ],
+  "originFormat": "lichess-month-v1",
+  "sourceRecord": "tools/calibration/public/sources.json",
+  "normalized": "tools/calibration/public/dataset.json.gz",
+  "provenance": {
+    "status": "legacy-partial",
+    "replayRecipe": "Retrieve retained inputs at Git revision eb864b4 and verify every artifact hash in this manifest; see README.md and E001-E003 plans for numerical replay commands.",
+    "limitations": [
+      "Original selection/normalization pipeline is not reconstructed.",
+      "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+      "Existing development/test exposure prevents new confirmation claims."
+    ]
+  },
+  "artifacts": {
+    "tools/calibration/public/sources.json": {
+      "kind": "sources",
+      "parents": [],
+      "sha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+      "bytes": 23408,
+      "uncompressedSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a"
+    },
+    "tools/calibration/public/dataset.json.gz": {
+      "kind": "games",
+      "parents": [
+        "tools/calibration/public/sources.json"
+      ],
+      "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+      "bytes": 463748,
+      "uncompressedSha256": "54b589844813490a1ebd15251e6142e2a361d6fac53d6dfe38414ded1cdf5708"
+    },
+    "tools/calibration/public/sf18-evidence.json.gz": {
+      "kind": "game-evidence",
+      "parents": [
+        "tools/calibration/public/dataset.json.gz"
+      ],
+      "sha256": "2771b2b8a7839e4d9f2ddbff73aa6e0dfbe017f3aa3a7b052584147ee21c968b",
+      "bytes": 5838826,
+      "uncompressedSha256": "a8f4bf1d9f3c7bbe16eca1fa09d0e0dc918a907c59079a2b2fe14ea4e398e486"
+    },
+    "tools/calibration/public/sf18-rating-evidence.json.gz": {
+      "kind": "rating-evidence",
+      "parents": [
+        "tools/calibration/public/dataset.json.gz"
+      ],
+      "sha256": "f41178347bc9569390b744f9e6fb2206882cf2307c762de8b8f8aab35c2a1e31",
+      "bytes": 1320424,
+      "uncompressedSha256": "c4f3b5caeb78511d34ce4c9031b53ab6e00338871bad5119d488bfc0e8f365f7"
+    },
+    "tools/calibration/public/sf19-rating-evidence.json.gz": {
+      "kind": "rating-evidence",
+      "parents": [
+        "tools/calibration/public/dataset.json.gz"
+      ],
+      "sha256": "8ac253f86fa87a945c06e86f2b7c82d4f2b7e8c96ae9b990a6efadbac9f7d721",
+      "bytes": 683399,
+      "uncompressedSha256": "cea288e5a8eeb7f2f5202b7d8fd526b7a454d9b597eaf4ee61c1e0dcaf080ecc"
+    },
+    "tools/calibration/public/expected-scores.json": {
+      "kind": "summary",
+      "parents": [
+        "tools/calibration/public/sf18-evidence.json.gz",
+        "tools/calibration/public/sf18-rating-evidence.json.gz",
+        "tools/calibration/public/sf19-rating-evidence.json.gz"
+      ],
+      "sha256": "969664315be01fab6f719ce158926741c45ec59ef8e3accfe28f0dcc595b7df6",
+      "bytes": 28657,
+      "uncompressedSha256": "969664315be01fab6f719ce158926741c45ec59ef8e3accfe28f0dcc595b7df6"
+    },
+    "tools/calibration/public/validation.json": {
+      "kind": "summary",
+      "parents": [
+        "tools/calibration/public/sf18-evidence.json.gz",
+        "tools/calibration/public/sf18-rating-evidence.json.gz",
+        "tools/calibration/public/sf19-rating-evidence.json.gz"
+      ],
+      "sha256": "865aa647f484f3932c42baa2bd15625bd7cdfd253f504aa6d64aba3e4eb07076",
+      "bytes": 1309,
+      "uncompressedSha256": "865aa647f484f3932c42baa2bd15625bd7cdfd253f504aa6d64aba3e4eb07076"
+    },
+    "research/experiments/E003-sf19-archive-replay/evidence/sf19-quality.json.gz": {
+      "kind": "game-evidence",
+      "parents": [
+        "tools/calibration/public/dataset.json.gz"
+      ],
+      "sha256": "5cef8a6d20482a743351c8ca3a85da030fd95b3eb91a6395aeca0b8d7f7fe745",
+      "bytes": 515106,
+      "uncompressedSha256": "86e68880e708fb289395a3033ce915122d5463eb354e23484347bbbec7b35852"
+    },
+    "research/experiments/E001-evidence-audit/evidence/sf19-quality-archive.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E003-sf19-archive-replay/evidence/sf19-quality.json.gz"
+      ],
+      "sha256": "3953a2a13f8e491e5c0dedbf40d38bb7d0d24ac4abe546278b8fb8360e1d3c2d",
+      "bytes": 18520,
+      "uncompressedSha256": "3953a2a13f8e491e5c0dedbf40d38bb7d0d24ac4abe546278b8fb8360e1d3c2d"
+    },
+    "research/experiments/E003-sf19-archive-replay/evidence/sf19-choice-confirmation.json.gz": {
+      "kind": "game-evidence",
+      "parents": [
+        "tools/calibration/public/dataset.json.gz"
+      ],
+      "sha256": "5e9e1f61b48d39030e91dea0615aee4510ac9c29e3fcf3d2b7e3ad47b82efbae",
+      "bytes": 512264,
+      "uncompressedSha256": "486066d849723197882cfcb933c55248f5f6856e85e44674f567aa7921a7ea77"
+    },
+    "research/experiments/E001-evidence-audit/evidence/sf19-choice-confirmation-archive.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E003-sf19-archive-replay/evidence/sf19-choice-confirmation.json.gz"
+      ],
+      "sha256": "a762d73fb732e107da84d7edae8991cc89227f3252b164d3008e64a7c1c6906b",
+      "bytes": 18681,
+      "uncompressedSha256": "a762d73fb732e107da84d7edae8991cc89227f3252b164d3008e64a7c1c6906b"
+    },
+    "research/experiments/E002-nonlinear-rating/evidence/results.json": {
+      "kind": "summary",
+      "parents": [
+        "tools/calibration/public/sf18-rating-evidence.json.gz",
+        "tools/calibration/public/sf19-rating-evidence.json.gz"
+      ],
+      "sha256": "9219f67a34e1c1f6ba8252f1b5a46958b8afd7dba13b90c24d660b2370f64f18",
+      "bytes": 108817,
+      "uncompressedSha256": "9219f67a34e1c1f6ba8252f1b5a46958b8afd7dba13b90c24d660b2370f64f18"
+    },
+    "research/experiments/E002-nonlinear-rating/evidence/predictions.json.gz": {
+      "kind": "summary",
+      "parents": [
+        "tools/calibration/public/sf18-rating-evidence.json.gz",
+        "tools/calibration/public/sf19-rating-evidence.json.gz"
+      ],
+      "sha256": "a78f5b9f69f1a4ea21a8e17cbedb373e6b56cc432f36b9d1dbdb75d2cbebc8ac",
+      "bytes": 231804,
+      "uncompressedSha256": "170dd318ea5b291bfcfae3cd31ca47a4dfe75c3fd0186079332e21f8cc4f3eec"
+    },
+    "tools/calibration/public/manifest.json": {
+      "kind": "summary",
+      "parents": [
+        "tools/calibration/public/sources.json",
+        "tools/calibration/public/dataset.json.gz",
+        "tools/calibration/public/sf18-evidence.json.gz",
+        "tools/calibration/public/sf18-rating-evidence.json.gz",
+        "tools/calibration/public/sf19-rating-evidence.json.gz",
+        "tools/calibration/public/expected-scores.json",
+        "tools/calibration/public/validation.json"
+      ],
+      "sha256": "e7d928e440f8a4b73bfa64c11e11f48320f9f3cc556c29a3bca72e1e5d15ff6a",
+      "bytes": 3362,
+      "uncompressedSha256": "e7d928e440f8a4b73bfa64c11e11f48320f9f3cc556c29a3bca72e1e5d15ff6a"
+    },
+    "research/experiments/E003-sf19-archive-replay/evidence/inputs.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E003-sf19-archive-replay/evidence/sf19-quality.json.gz",
+        "research/experiments/E003-sf19-archive-replay/evidence/sf19-choice-confirmation.json.gz"
+      ],
+      "sha256": "e752fd0883e2db58b1121071dc59e879adcd8e982984198e58e9056f9ad84447",
+      "bytes": 613,
+      "uncompressedSha256": "e752fd0883e2db58b1121071dc59e879adcd8e982984198e58e9056f9ad84447"
+    },
+    "research/experiments/E004-practical-outcomes/evidence/results.json": {
+      "kind": "summary",
+      "parents": [
+        "tools/calibration/public/sf18-rating-evidence.json.gz",
+        "tools/calibration/public/sf19-rating-evidence.json.gz"
+      ],
+      "sha256": "f2d89e9d9e07b45bceca955af522fca4d0ad39db100b0bece0e235403c93adea",
+      "bytes": 79363,
+      "uncompressedSha256": "f2d89e9d9e07b45bceca955af522fca4d0ad39db100b0bece0e235403c93adea"
+    },
+    "research/experiments/E004-practical-outcomes/evidence/predictions.json.gz": {
+      "kind": "summary",
+      "parents": [
+        "tools/calibration/public/sf18-rating-evidence.json.gz",
+        "tools/calibration/public/sf19-rating-evidence.json.gz"
+      ],
+      "sha256": "89bc0719cc00708a80d55b6c5c7a88d53d0f52e05d252eddda052b434d1c3e96",
+      "bytes": 569113,
+      "uncompressedSha256": "a8669704f9390a2c078edac87660bdaa384683f7213bc3ae829309ca79d504bc"
+    }
+  }
+}

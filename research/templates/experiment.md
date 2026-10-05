@@ -12,6 +12,8 @@ result section into `RESULT.md` when starting work; remove these instructions.
 - Pinned baseline revision, engine/mode and simple comparator:
 - Candidate algorithm, parameters, tuning space and ablations:
 - Dataset IDs/hashes, prior use, eligibility and exclusion policy:
+- Data-policy revision, approved exports/permission evidence and preflight purpose:
+- Per-game source lineage, acquisition/transform recipe and unverified steps:
 - Split/cluster unit, leakage checks, locked-test access and exposure policy:
 - Primary metric/direction and numerical practical-improvement threshold:
 - Uncertainty procedure, acceptance rule and sample-size rationale:
@@ -27,6 +29,7 @@ result section into `RESULT.md` when starting work; remove these instructions.
 - State, outcome and evidence maturity:
 - Plan revision, evaluation code revision, run IDs/dates/environment:
 - Dataset/split/config/input/output hashes and retained evidence links:
+- Eligibility receipt, source/derivative lineage and independent replay evidence:
 - Exact commands and clean replay result:
 
 | Metric / guardrail | Units / eligible N | Baseline | Candidate | Paired effect + interval | Planned gate | Result |

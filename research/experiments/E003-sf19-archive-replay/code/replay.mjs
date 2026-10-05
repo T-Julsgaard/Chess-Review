@@ -1,37 +1,44 @@
-import {readFile,writeFile} from 'node:fs/promises';
-import {gunzipSync} from 'node:zlib';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {hash} from '../../../../tools/calibration/io.mjs';
 import {fitQualityStudy,assessQualityStudy} from './study.mjs';
+import {openResearchData} from '../../../data-policy.mjs';
 
 const evidenceDir=new URL('../evidence/',import.meta.url);
-const inputs=JSON.parse(await readFile(new URL('inputs.json',evidenceDir)));
+const root=fileURLToPath(new URL('../../../../',import.meta.url)),args=process.argv.slice(2);
+if(args.length && (args.length!==2 || args[0]!=='--out' || !args[1]))throw Error('Usage: replay.mjs [--out research/runs/<run>/]');
+const out=args.length?path.resolve(root,args[1]):fileURLToPath(evidenceDir);
+const relative=path.relative(path.join(root,'research/runs'),out);
+if(args.length && (relative.startsWith('..')||path.isAbsolute(relative)))throw Error('Replay output must stay under research/runs');
+const data=await openResearchData(['D001'],{purpose:'reuse'});
+const inputs=await data.readJson('research/experiments/E003-sf19-archive-replay/evidence/inputs.json');
 const records={};
 for(const [study,entry]of Object.entries(inputs.archives)){
   const bytes=await readFile(new URL(entry.file,evidenceDir));
   if(hash(bytes)!==entry.sha256||bytes.length!==entry.bytes)throw Error('Archive input hash differs');
-  const evidence=JSON.parse(gunzipSync(bytes));
+  const evidence=await data.readJson('research/experiments/E003-sf19-archive-replay/evidence/'+entry.file);
   const model=fitQualityStudy(evidence);
   const report={development:assessQualityStudy(evidence,model,'validation'),test:assessQualityStudy(evidence,model,'test')};
   // Archived expected coefficients/reports are opened only after training-only refit.
-  const expectedBytes=await readFile(new URL('../../E001-evidence-audit/evidence/'+study+'-archive.json',import.meta.url));
-  const expected=JSON.parse(expectedBytes);
+  const expectedPath='research/experiments/E001-evidence-audit/evidence/'+study+'-archive.json';
+  const expected=await data.readJson(expectedPath);
   const modelMatches=JSON.stringify(model)===JSON.stringify(expected.model),reportMatches=JSON.stringify(report)===JSON.stringify(expected.report);
   if(!modelMatches||!reportMatches)throw Error('Archived numerical outputs differ: '+study);
-  records[study]={modelMatches,reportMatches,model,report,sourceSha256:entry.sha256,expectedSnapshotSha256:hash(expectedBytes),
+  records[study]={modelMatches,reportMatches,model,report,sourceSha256:entry.sha256,expectedSnapshotSha256:data.receipt.inputHashes[expectedPath],
     counts:{games:evidence.games.length,positions:evidence.positions.length,searches:evidence.searches.length,
       trainingChoices:evidence.positions.filter(p=>p.split==='train').length},
     note:'Retrospective numerical reproduction; original reports previously inspected; no new confirmation'};
 }
 const output=JSON.stringify({schema:'E003-retrospective-replay-v1',passed:true,records},null,2)+'\n';
-await writeFile(new URL('replay.json',evidenceDir),output);
-const root=fileURLToPath(new URL('../../../../',import.meta.url));
+await mkdir(out,{recursive:true});
+await writeFile(path.join(out,'replay.json'),output);
 let sourceRevision=null;
 try{sourceRevision=execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8',windowsHide:true}).trim();}catch{/* Independent source copy need not have Git. */}
-await writeFile(new URL('run.json',evidenceDir),JSON.stringify({schema:'research-run-v1',id:'E003-retrospective-replay',date:'2026-10-05',sourceRevision,
-  command:'node research/experiments/E003-sf19-archive-replay/code/replay.mjs',environment:{node:process.version,platform:process.platform,arch:process.arch},
+await writeFile(path.join(out,'run.json'),JSON.stringify({schema:'research-run-v1',id:'E003-retrospective-replay',date:'2026-10-05',sourceRevision,
+  dataEligibility:data.receipt,
+  command:'node research/experiments/E003-sf19-archive-replay/code/replay.mjs'+(args.length?' --out '+args[1]:''),environment:{node:process.version,platform:process.platform,arch:process.arch},
   evaluationRole:'retrospective replay of consumed development/test evidence',seed:18019,bootstrapIterations:2000,engineSearches:0,
   inputs,codeSha256:{'replay.mjs':hash(await readFile(fileURLToPath(import.meta.url))),'study.mjs':hash(await readFile(new URL('study.mjs',import.meta.url)))},
   outputs:{'replay.json':hash(output)}},null,2)+'\n');
