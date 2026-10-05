@@ -1,6 +1,6 @@
 # Research index
 
-Updated: 2026-10-05. Setup complete; research has not started.
+Updated: 2026-10-05. Research started; evidence audit is registered.
 Baseline: [B000](BASELINE.md). No new improvement has been established.
 
 This is the routing and decision index. Detailed evidence lives in linked
@@ -11,9 +11,10 @@ records. Update a row and the active experiment's resume state when work stops.
 | ID | Question / record | State | Outcome / evidence | Next action |
 | --- | --- | --- | --- | --- |
 | B000 | [Starting extension baseline](BASELINE.md) | Inventoried | Existing development evidence; no fresh confirmation | Reproduce before first comparison |
+| E001 | [Evidence and exposure audit](experiments/E001-evidence-audit/plan.md) | planned | No new model evaluated | Audit D001 and prior local test exposure |
 
-No experiment, dataset, finding or promotion records have been created yet.
-Allocate the next unused ID in each series: `E001`, `D001`, `F001`, `P001`.
+No completed experiment, dataset, finding or promotion records yet.
+Allocate the next unused ID in each series: `E002`, `D001`, `F001`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
@@ -41,7 +42,6 @@ stability, latency, unavailable evidence and fallback behavior.
 
 ## Next session
 
-Start the measurement/dataset plan using [the experiment template](templates/experiment.md).
-Reproduce B000, inventory available evidence and its prior use, and choose the
-first tractable hypothesis. Do not call existing development data a fresh test.
-The user will initiate the research goal separately.
+Run E001, register D001 and preserve discovered prior test exposure. Use the
+[measurement contract](MEASUREMENT.md) to select numerical development experiments.
+The research goal is active. The extension remains at B000.
