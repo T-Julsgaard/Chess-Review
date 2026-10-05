@@ -26,9 +26,10 @@ records. Update a row and the active experiment's resume state when work stops.
 | E007 | [Fresh evidence pipeline](experiments/E007-fresh-evidence/RESULT.md) | complete | Exact clean reconstruction; provisional status unavailable | Distinct calibration hypothesis |
 | D002 | [Fresh prefix cohort](datasets/D002-fresh-prefix/README.md) | registered | 900 disjoint games 450/150/300; reserved evaluation not activated | Guarded development use after protocol |
 | E008 | [Human quality curves](experiments/E008-human-quality-curves/RESULT.md) | running | SF19 smoke passed;600-game collection live; no candidate fits or metrics yet | Poll existing session; register complete evidence before fit |
+| E009 | [Search stability](experiments/E009-search-stability/plan.md) | planned | Score-blind45-game20k/80k comparison; E008 cached baseline | Admit completed E008 evidence, then higher-budget collection |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E009`, `D003`, `F006`, `P001`.
+Allocate the next unused ID in each series: `E010`, `D003`, `F006`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
