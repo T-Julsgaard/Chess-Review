@@ -10,6 +10,7 @@ test('bounded frame parsing separates concatenation and rejects corruption/trunc
   const payload=Buffer.from(pgn(1)),compressed=zstdCompressSync(payload),combined=Buffer.concat([compressed,compressed]);
   const frame=firstFrame(combined);assert.deepEqual(frame.frame,compressed);assert.deepEqual(frame.decoded,payload);
   assert.equal(firstFrame(compressed.subarray(0,compressed.length-1)),null);
+  const skip=Buffer.from('502a4d180400000001020304','hex'),prefixed=firstFrame(Buffer.concat([skip,compressed]));assert.equal(prefixed.start,12);assert.deepEqual(prefixed.frame,compressed);assert.equal(firstFrame(skip.subarray(0,11)),null);
   const bad=Buffer.from(compressed);bad[4]|=8;assert.throws(()=>firstFrame(bad),/Reserved/);
   assert.throws(()=>firstFrame(Buffer.from('random wrong format')),/magic/);
 });

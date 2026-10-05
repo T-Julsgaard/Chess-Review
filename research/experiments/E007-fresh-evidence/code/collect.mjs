@@ -27,10 +27,10 @@ async function main(){
     const name=base+'raw/'+month+'.pgn.zst';await writeFile(new URL(name,new URL('../../../../',import.meta.url)),frame.frame);
     outputs[name]={kind:'raw-pgn-zstd',parents:[base+'sources.json'],sha256:sha256(frame.frame),bytes:frame.frame.length,uncompressedSha256:sha256(frame.decoded)};
     frames.push({name,month,decoded:frame.decoded});receipts.push(source.receipt);
-    sources.sources.push({url,month,license:'CC0-1.0',frames:[{url,artifact:name,start:0,end:frame.frame.length-1,bytes:frame.frame.length,sha256:sha256(frame.frame),decodedSha256:sha256(frame.decoded),retrievedAt,
+    sources.sources.push({url,month,license:'CC0-1.0',frames:[{url,artifact:name,start:frame.start,end:frame.end-1,leadingMetadataHex:prefix.subarray(0,frame.start).toString('hex'),bytes:frame.frame.length,sha256:sha256(frame.frame),decodedSha256:sha256(frame.decoded),retrievedAt,
       verification:'HTTPS206 exact prefix range; complete first frame decoded; SHA256 raw/decoded bytes',
       request:{range:'bytes=0-'+(limit-1),acceptEncoding:'identity'},response:{status:response.status,contentRange:range,etag:response.headers.get('etag'),lastModified:response.headers.get('last-modified')},
-      prefixSha256:sha256(prefix),prefixBytes:prefix.length,extraction:{start:0,end:frame.frame.length}}]});
+      prefixSha256:sha256(prefix),prefixBytes:prefix.length,extraction:{start:frame.start,end:frame.end}}]});
     console.log(month+' complete frame retained: '+frame.frame.length+' compressed bytes');
   }
   if(frames.reduce((s,f)=>s+outputs[f.name].bytes,0)>20*1024*1024)throw Error('Raw storage budget exceeded');

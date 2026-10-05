@@ -66,3 +66,14 @@ clean offline reconstruction and retain exact equality/hashes. If acquisition or
 sample-size assumptions fail, document the failure and amend before collecting
 additional bytes; do not quietly broaden sampling. Later register a distinct
 calibration hypothesis and its development/locked-confirmation access rules.
+
+Format amendment2026-10-05, before any normalization/model metrics: the first
+request returned a valid skippable metadata frame at the archive start, which
+the initial parser did not support. It stopped after8 MiB without output. A
+32-byte header probe identified12 leading metadata bytes. Support official
+skippable headers and retain their exact hex/offset while storing the first
+standard frame. No game-selection rule changes. Revised total network budget
+32 MiB plus the32-byte diagnostic (including the failed request); raw storage
+budget remains20 MiB. Default sandbox denied the first network connection before
+bytes arrived; the authorized elevated run reached the publisher and exposed
+the format issue. These failures are retained in the result record.

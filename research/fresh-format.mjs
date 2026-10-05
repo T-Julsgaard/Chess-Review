@@ -5,11 +5,16 @@ import {Chess} from '../lib/chess.js';
 export const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
 const order=(a,b)=>a<b?-1:a>b?1:0;
 export function firstFrame(bytes){
-  if(bytes.length<5)return null;
-  if(bytes.readUInt32LE(0)!==0xfd2fb528)throw Error('Unsupported Zstandard magic');
-  const descriptor=bytes[4],single=Boolean(descriptor&32),fcs=descriptor>>>6;
+  let start=0;
+  for(;;){
+    if(start+5>bytes.length)return null;
+    const magic=bytes.readUInt32LE(start);
+    if(magic>=0x184d2a50&&magic<=0x184d2a5f){if(start+8>bytes.length)return null;start+=8+bytes.readUInt32LE(start+4);continue;}
+    if(magic!==0xfd2fb528)throw Error('Unsupported Zstandard magic');break;
+  }
+  const descriptor=bytes[start+4],single=Boolean(descriptor&32),fcs=descriptor>>>6;
   if(descriptor&8)throw Error('Reserved Zstandard descriptor');
-  let pos=5+(single?0:1)+[0,1,2,4][descriptor&3]+(fcs===0?(single?1:0):[0,2,4,8][fcs]);
+  let pos=start+5+(single?0:1)+[0,1,2,4][descriptor&3]+(fcs===0?(single?1:0):[0,2,4,8][fcs]);
   if(pos>bytes.length)return null;
   for(;;){
     if(pos+3>bytes.length)return null;
@@ -18,8 +23,8 @@ export function firstFrame(bytes){
     pos+=3+(type===1?1:size);if(pos>bytes.length)return null;
     if(last){pos+=(descriptor&4)?4:0;if(pos>bytes.length)return null;break;}
   }
-  const frame=bytes.subarray(0,pos),decoded=zstdDecompressSync(frame,{maxOutputLength:64*1024*1024});
-  return{frame,decoded};
+  const frame=bytes.subarray(start,pos),decoded=zstdDecompressSync(frame,{maxOutputLength:64*1024*1024});
+  return{frame,decoded,start,end:pos};
 }
 export function recordsIn(decoded){
   const marker=Buffer.from('[Event "'),starts=[];let pos=0;
@@ -97,7 +102,7 @@ export function validateFresh(manifest,records,hashes){
   const frames=[];
   for(const source of sources.sources)for(const frame of source.frames){
     const decoded=records.get(frame.artifact),entry=manifest.artifacts[frame.artifact];
-    if(!Buffer.isBuffer(decoded)||entry?.kind!=='raw-pgn-zstd'||frame.start!==0||frame.bytes!==entry.bytes||frame.sha256!==entry.sha256||frame.decodedSha256!==entry.uncompressedSha256)throw Error('Unbound raw frame');
+    if(!Buffer.isBuffer(decoded)||entry?.kind!=='raw-pgn-zstd'||frame.start!==Buffer.from(frame.leadingMetadataHex||'','hex').length||frame.start+frame.bytes>8*1024*1024||frame.bytes!==entry.bytes||frame.sha256!==entry.sha256||frame.decodedSha256!==entry.uncompressedSha256)throw Error('Unbound raw frame');
     frames.push({name:frame.artifact,month:source.month,decoded});
   }
   const rebuilt=selectCohort(frames,excluded),games=records.get(manifest.normalized);
