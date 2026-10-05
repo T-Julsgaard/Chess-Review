@@ -23,9 +23,11 @@ records. Update a row and the active experiment's resume state when work stops.
 | E005 | [Blinded category workflow](experiments/E005-category-review/RESULT.md) | running | 24 legal, traceable cases; workflow checks pass; zero reviews | Review later; numerical work continues |
 | E006 | [Rating uncertainty](experiments/E006-rating-uncertainty/RESULT.md) | complete | About90% game coverage needs broad ranges; adaptive scale fails gates | Stop this scale family |
 | F005 | [Single-game rating ranges](findings/F005-single-game-rating-ranges.md) | recorded | No ±300 cases; stronger-player conditional coverage fails/unresolved | Fresh evidence and distinct hypotheses |
+| E007 | [Fresh evidence pipeline](experiments/E007-fresh-evidence/plan.md) | planned | Raw frames, exact game locators and reconstruction gates | Implement guarded acquisition/admission |
+| D002 | [Fresh prefix cohort](datasets/D002-fresh-prefix/README.md) | preparing | Not admitted; no model use | Acquire and verify under E007 |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E007`, `D002`, `F006`, `P001`.
+Allocate the next unused ID in each series: `E008`, `D003`, `F006`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
