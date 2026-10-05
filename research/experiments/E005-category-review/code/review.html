@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chess Review research · blinded review</title>
+<style>
+:root{color-scheme:light;font:16px/1.5 system-ui;color:#1a2835;background:#f4f6f8}body{margin:0}main{max-width:1080px;margin:auto;padding:24px}h1{font-size:26px;margin:0}h2{font-size:20px}p{max-width:78ch}button,select,input,textarea{font:inherit;border:1px solid #8194a5;border-radius:6px;padding:8px;background:white;color:inherit}button{cursor:pointer}button:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #1680aa}button.active{background:#164764;color:white}.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:16px 0}.layout{display:grid;grid-template-columns:minmax(300px,440px) 1fr;gap:32px}#board{display:grid;grid-template-columns:repeat(8,1fr);aspect-ratio:1;border:2px solid #263a47}.square{display:flex;justify-content:center;align-items:center;position:relative;font-size:clamp(26px,4vw,46px);line-height:1;aspect-ratio:1}.light{background:#e6ead9}.dark{background:#7b9b86}.square.focal{box-shadow:inset 0 0 0 4px #e0ae32}.whitepiece{color:#fff;text-shadow:1px 0 #172a35,-1px 0 #172a35,0 1px #172a35,0 -1px #172a35}.blackpiece{color:#172a35}.coordinate{position:absolute;bottom:2px;left:3px;font:10px system-ui;color:#233746}label{display:block;font-weight:600;margin:12px 0 4px}select,input,textarea{box-sizing:border-box;width:100%}textarea{min-height:110px}details{border:1px solid #bdc8d0;border-radius:8px;padding:12px;margin:16px 0}summary{cursor:pointer;font-weight:600}.subtle{font-size:14px;color:#415669}#status{min-height:24px;color:#164764}.history{max-height:120px;overflow:auto;font-family:monospace;font-size:14px}#fen{overflow-wrap:anywhere}button:disabled{opacity:.45;cursor:default}@media(max-width:760px){main{padding:16px}.layout{grid-template-columns:1fr}.square{font-size:clamp(28px,7vw,48px)}}
+</style>
+<main>
+<h1>Blinded move review</h1>
+<p>24 independent cases. Work at your own pace and export partial reviews. Assess the shown move using your own analysis. “Unresolved” is a useful answer. No engine labels or later game outcomes are shown.</p>
+<details><summary>Rubric and review instructions</summary>
+<p><strong>Consequence:</strong> sound/equivalent preserves prospects; small concession is modest avoidable worsening; clear mistake is a meaningful tactical or lasting disadvantage; major mistake is likely to change the practical result. Explain a better alternative for mistake judgments. A bad position alone does not imply a bad move.</p>
+<p><strong>Exceptional idea:</strong> ordinary, notable idea, brilliant candidate, or unresolved. A brilliant candidate needs a concrete non-obvious, sound-looking idea worth teaching. Material offers, routine recaptures, forced moves and flashy unsound tactics are insufficient. Explain compensation or the unique resource. Human perception does not establish tactical soundness.</p>
+<p>Choose confidence and instructional usefulness separately. State ambiguity or missing context. Review independently before opening the selection key or discussing cases. One reviewer supplies individual evidence; this pack does not certify extension labels.</p>
+</details>
+<div class="toolbar"><button id="previous">Previous</button><select id="case" aria-label="Choose case" style="width:auto"></select><button id="next">Next</button><span id="progress"></span></div>
+<div class="layout"><section><h2 id="heading"></h2>
+<div class="toolbar"><button id="before">Before move</button><button id="after">After move</button><button id="flip">Flip board</button></div>
+<div id="board" role="img" aria-label="Chess position"></div>
+<p id="turn" class="subtle"></p><details><summary>Preceding moves and FEN</summary><div id="history" class="history"></div><p id="fen" class="subtle"></p></details>
+</section><section aria-label="Your assessment"><label for="reviewer">Reviewer name or pseudonym</label><input id="reviewer" autocomplete="off" placeholder="Your identifier">
+<label for="consequence">Decision consequence</label><select id="consequence"><option value="">Choose or leave pending</option><option value="sound">Sound / equivalent</option><option value="small">Small concession</option><option value="mistake">Clear mistake</option><option value="major">Major mistake</option><option value="unresolved">Unresolved</option></select>
+<label for="exceptional">Exceptional-move perception</label><select id="exceptional"><option value="">Choose or leave pending</option><option value="ordinary">Ordinary</option><option value="notable">Notable idea</option><option value="brilliant">Brilliant candidate</option><option value="unresolved">Unresolved</option></select>
+<label for="confidence">Confidence</label><select id="confidence"><option value="">Choose</option><option>low</option><option>medium</option><option>high</option></select>
+<label for="usefulness">Instructional usefulness</label><select id="usefulness"><option value="">Choose</option><option>low</option><option>medium</option><option>high</option></select>
+<label for="reason">Reason, idea, alternative or ambiguity</label><textarea id="reason" placeholder="Describe the concrete consequence or idea; a short line is helpful."></textarea>
+<p id="status" role="status" aria-live="polite"></p><button id="export">Export reviews as JSON</button>
+<p class="subtle">Progress is saved in this browser when local storage is available. Export a file as your durable copy. It contains only your reviews and the blinded case identifiers.</p>
+</section></div></main>
+<!--PACK-->
+<!--APP-->
+</html>

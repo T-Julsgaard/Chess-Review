@@ -57,3 +57,10 @@ export mechanics; they supply no human validity evidence. No runtime edits.
 
 Next: implement and validate the pack; then await later reviews while numerical
 research continues. Review timing does not block independent research.
+
+Implementation clarification, 2026-10-05 before selection: the offer heuristic
+requires a legal capture of the just-moved piece by a lower-value piece. Existing
+unrelated hanging material is insufficient. The separate material-deficit branch
+is omitted; this ordinary-move builder does not claim to detect delayed sacrifices.
+The pack implementation uses the existing jsdom development dependency for
+synthetic workflow checks; the reviewer artifact itself is standalone and offline.
