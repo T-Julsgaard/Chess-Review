@@ -4,7 +4,7 @@ import {mkdtemp, mkdir, readFile, writeFile, rm, realpath} from 'node:fs/promise
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {gzipSync} from 'node:zlib';
-import {openResearchData, sha256, validateRegistry, validateManifest, verifyArtifact} from './data-policy.mjs';
+import {openResearchData, openResearchSource, sha256, validateRegistry, validateManifest, verifyArtifact} from './data-policy.mjs';
 
 // Authored synthetic records exercise mechanics only; no real games or labels.
 async function fixture(t) {
@@ -132,4 +132,13 @@ test('changed bytes and changes after preflight cannot enter the guarded loader'
   const entry = {bytes: bytes.length, sha256: sha256(bytes), uncompressedSha256: sha256(decoded)};
   assert.deepEqual(verifyArtifact(bytes, entry, 'fixture.json.gz'), decoded);
   assert.throws(() => verifyArtifact(bytes, {...entry, uncompressedSha256: '0'.repeat(64)}, 'fixture.json.gz'), /decoded hash differs/);
+});
+
+test('acquisition bootstrap requires exact exports and permission before requesting data',async t=>{
+  const f=await fixture(t);f.registry.sources[0].allowedPurposes.push('collect');await f.flush();
+  const approved=f.registry.sources[0].exports[0];
+  assert.equal((await openResearchSource(approved,{root:f.root})).sourceId,'synthetic-source');
+  await assert.rejects(openResearchSource('https://data.example/unapproved.pgn.zst',{root:f.root}),/unregistered exact export/);
+  await f.save(f.registry.sources[0].evidence.path,'Changed synthetic terms');
+  await assert.rejects(openResearchSource(approved,{root:f.root}),/permission evidence hash differs/);
 });

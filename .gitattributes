@@ -17,3 +17,4 @@ research/**/*.mjs text eol=lf
 research/**/*.js text eol=lf
 research/**/*.html text eol=lf
 research/**/*.md text eol=lf
+research/**/*.zst binary

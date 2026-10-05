@@ -1,13 +1,14 @@
 import {readFile, realpath} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
+import {validateFresh,firstFrame} from './fresh-format.mjs';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 
 const repo = fileURLToPath(new URL('../', import.meta.url));
 const registryPath = 'research/datasets/approved-sources.json';
 const purposes = new Set(['collect', 'inspect', 'analyze', 'train', 'tune', 'validate', 'test', 'examples', 'reuse']);
-const kinds = new Set(['sources', 'games', 'game-evidence', 'rating-evidence', 'summary']);
+const kinds = new Set(['sources', 'games', 'game-evidence', 'rating-evidence', 'summary', 'raw-pgn-zstd']);
 export const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const fail = message => { throw Error('Research data prohibited: ' + message); };
 const digest = value => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
@@ -63,9 +64,14 @@ export function validateManifest(manifest, registry) {
       || !nonempty(manifest.sourceIds) || new Set(manifest.sourceIds).size !== manifest.sourceIds.length) fail('invalid dataset manifest');
   for (const id of manifest.sourceIds) if (!registry.sources.some(s => s.id === id)) fail('unknown contributing source: ' + id);
   // Additional formats must supply an explicit origin checker before admission.
-  if (manifest.originFormat !== 'lichess-month-v1') fail('unsupported origin format');
-  if (!manifest.provenance || manifest.provenance.status !== 'legacy-partial' || manifest.id !== 'D001'
-      || !nonempty(manifest.provenance.limitations) || !manifest.provenance.replayRecipe) fail('unsupported/missing provenance record');
+  if (!['lichess-month-v1','lichess-prefix-v1'].includes(manifest.originFormat)) fail('unsupported origin format');
+  const fresh=manifest.originFormat==='lichess-prefix-v1';
+  if (!manifest.provenance || !nonempty(manifest.provenance.limitations) || !manifest.provenance.replayRecipe) fail('missing provenance record');
+  if (!fresh&&(manifest.provenance.status!=='legacy-partial'||manifest.id!=='D001')) fail('unsupported legacy provenance');
+  if (fresh&&(manifest.provenance.status!=='pipeline-verified'||manifest.id!=='D002'
+      ||manifest.provenance.selectionSeed!=='D002-select-v1:'||manifest.provenance.splitSeed!=='D002-split-v1:'
+      ||!manifest.provenance.exclusions||manifest.provenance.exclusionInput!=='tools/calibration/public/dataset.json.gz'
+      ||!digest(manifest.provenance.formatSha256))) fail('unsupported fresh provenance');
   if (!manifest.artifacts || !Object.keys(manifest.artifacts).length) fail('empty artifact inventory');
   for (const [name, entry] of Object.entries(manifest.artifacts)) {
     safePath(name);
@@ -73,6 +79,7 @@ export function validateManifest(manifest, registry) {
         || !kinds.has(entry.kind) || !Array.isArray(entry.parents)) fail('invalid artifact record: ' + name);
     if (entry.kind !== 'sources' && !entry.parents.length) fail('missing derivative lineage: ' + name);
     if (entry.kind === 'sources' && (entry.parents.length || name !== manifest.sourceRecord)) fail('unrecognized source record or lineage root');
+    if(entry.kind==='raw-pgn-zstd'&&(!fresh||!name.endsWith('.zst')||entry.parents.length!==1||entry.parents[0]!==manifest.sourceRecord))fail('unbound raw frame artifact');
   }
   if (manifest.artifacts[manifest.normalized]?.kind !== 'games' || manifest.artifacts[manifest.sourceRecord]?.kind !== 'sources') fail('missing game/source records');
   const done = new Set(), visiting = new Set();
@@ -88,12 +95,16 @@ export function validateManifest(manifest, registry) {
 
 export function verifyArtifact(bytes, entry, name) {
   if (bytes.length !== entry.bytes || sha256(bytes) !== entry.sha256) fail('file hash/size differs: ' + name);
-  const decoded = name.endsWith('.gz') ? gunzipSync(bytes) : bytes;
+  let decoded;
+  if(entry.kind==='raw-pgn-zstd'){
+    if(bytes.length>8*1024*1024)fail('raw prefix frame exceeds budget');
+    const frame=firstFrame(bytes);if(!frame||frame.frame.length!==bytes.length)fail('raw frame incomplete or has appended bytes');decoded=frame.decoded;
+  }else decoded=name.endsWith('.gz') ? gunzipSync(bytes) : bytes;
   if (sha256(decoded) !== entry.uncompressedSha256) fail('decoded hash differs: ' + name);
   return decoded;
 }
 
-export function verifyOrigins(manifest, registry, records) {
+export function verifyOrigins(manifest, registry, records, hashes={}) {
   const sources = records.get(manifest.sourceRecord), games = records.get(manifest.normalized);
   const approved = registry.sources.filter(s => manifest.sourceIds.includes(s.id));
   const urls = new Set(approved.flatMap(s => s.exports));
@@ -118,6 +129,9 @@ export function verifyOrigins(manifest, registry, records) {
         || game.source !== 'https://lichess.org/' + game.id || !months.has(game.sourceMonth)
         || game.date?.slice(0, 7).replace('.', '-') !== game.sourceMonth || !nonempty(game.moves)) fail('unknown/invalid game origin');
     byId.set(game.id, game);
+  }
+  if(manifest.originFormat==='lichess-prefix-v1'){
+    try{validateFresh(manifest,records,hashes);}catch(e){fail(e.message);}
   }
   for (const [name, entry] of Object.entries(manifest.artifacts)) {
     const data = records.get(name);
@@ -161,6 +175,7 @@ export async function openResearchData(ids, {purpose = 'inspect', root = repo} =
     const bytes = await localBytes(root, dataset.manifest), manifest = JSON.parse(bytes);
     if (manifest.id !== id) fail('dataset identity differs');
     validateManifest(manifest, registry); manifests.push(manifest); manifestHashes[id] = sha256(bytes);
+    if(manifest.originFormat==='lichess-prefix-v1'&&manifest.provenance.formatSha256!==sha256(await readFile(new URL('fresh-format.mjs',import.meta.url))))fail('fresh origin checker revision differs');
     for (const sourceId of manifest.sourceIds) sources.set(sourceId, registry.sources.find(s => s.id === sourceId));
   }
   // Verify publisher evidence before reading any registered game artifact.
@@ -170,26 +185,30 @@ export async function openResearchData(ids, {purpose = 'inspect', root = repo} =
     sourceEvidence[source.id] = {license: source.license, termsUrl: source.termsUrl, verifiedOn: source.verifiedOn, evidenceSha256: sha256(bytes)};
   }
   const records = new Map(), entries = new Map(), inputHashes = {}, datasets = {};
+  // D002 explicitly depends on D001's registered exclusion identities.
+  manifests.sort((a,b)=>a.id.localeCompare(b.id));
   for (const manifest of manifests) {
     const current = new Map();
     for (const [name, entry] of Object.entries(manifest.artifacts)) {
       if (entries.has(name) && JSON.stringify(entries.get(name)) !== JSON.stringify(entry)) fail('conflicting artifact registrations');
       const bytes = await localBytes(root, name), decoded = verifyArtifact(bytes, entry, name);
-      current.set(name, JSON.parse(decoded)); entries.set(name, entry); inputHashes[name] = entry.sha256;
+      current.set(name, entry.kind==='raw-pgn-zstd'?decoded:JSON.parse(decoded)); entries.set(name, entry); inputHashes[name] = entry.sha256;
     }
-    const origins = verifyOrigins(manifest, registry, current);
+    const origins = verifyOrigins(manifest, registry, new Map([...records,...current]),inputHashes);
     datasets[manifest.id] = {...origins, provenanceStatus: manifest.provenance.status, limitations: manifest.provenance.limitations};
     for (const [name, data] of current) records.set(name, data);
   }
   const receipt = {schema: 'research-data-eligibility-v1', policyVersion: registry.policyVersion,
     policySha256: sha256(await localBytes(root, 'research/DATA_POLICY.md')),
     validatorSha256: sha256(await readFile(fileURLToPath(import.meta.url))),
+    originValidatorSha256:sha256(await readFile(new URL('fresh-format.mjs',import.meta.url))),
     registrySha256: sha256(registryBytes), purpose, manifestHashes, sourceEvidence, inputHashes, datasets};
   return {
     receipt,
     async readJson(name) {
       safePath(name);
       if (!records.has(name)) fail('unregistered input: ' + name);
+      if(entries.get(name).kind==='raw-pgn-zstd')fail('raw frame is not JSON');
       // Recheck at use, so replacing a file after preflight cannot change the input.
       return JSON.parse(verifyArtifact(await localBytes(root, name), entries.get(name), name));
     },
@@ -205,4 +224,14 @@ export async function openResearchData(ids, {purpose = 'inspect', root = repo} =
       fail('unregistered game: ' + id);
     },
   };
+}
+
+// Acquisition bootstrap: the exact approved export and publisher evidence must
+// qualify before any new bytes are requested. It cannot admit unfinished data.
+export async function openResearchSource(url,{purpose='collect',root=repo}={}){
+  const bytes=await localBytes(root,registryPath),registry=JSON.parse(bytes);validateRegistry(registry,purpose);
+  const source=registry.sources.find(s=>s.exports.includes(url));if(!source)fail('unregistered exact export');
+  const evidence=await localBytes(root,source.evidence.path);if(sha256(evidence)!==source.evidence.sha256)fail('permission evidence hash differs');
+  return{sourceId:source.id,url,receipt:{schema:'research-source-eligibility-v1',purpose,registrySha256:sha256(bytes),sourceId:source.id,
+    license:source.license,termsUrl:source.termsUrl,verifiedOn:source.verifiedOn,evidenceSha256:sha256(evidence)}};
 }

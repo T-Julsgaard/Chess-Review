@@ -42,6 +42,21 @@ Generated results used in later work must be registered as derivatives with
 their hashes and parent artifacts before being loaded again. Commit updated
 records before decisive evaluation. CI checks the retained registry and inputs.
 
+New acquisition uses `openResearchSource()` to verify an exact registered export,
+purpose and hash-bound publisher terms before the first request. This bootstrap
+permits only the registered acquisition/normalization pipeline while hashes are
+being established; it does not admit unfinished datasets for model use. Retain
+source receipts and enforce exact HTTPS responses, ranges and bounded byte sizes.
+
+The `lichess-prefix-v1` format for D002 retains complete Zstandard frames and
+decoded per-game byte locators. Its guarded admission rebuilds the exact frozen
+PGN normalization, exclusions, selection and splits. Open both D001 and D002
+because the fresh cohort's exclusion identities depend on D001's verified bytes.
+Raw frame artifacts are decoded internally and cannot be read as JSON. Current
+origin-checker bytes are bound to the manifest and eligibility receipt; a changed
+checker requires an explicit provenance revision/reconstruction. Legacy D001
+retains its existing limitations and is not upgraded by this format.
+
 For checks that should preserve historical run records, the retained verifier
 and replay accept separate output directories:
 
