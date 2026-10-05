@@ -18,9 +18,10 @@ records. Update a row and the active experiment's resume state when work stops.
 | F002 | [Nonlinear rating finding](findings/F002-small-nonlinear-rating.md) | recorded | No promotion; numerical replay matches | Retry only with a new hypothesis |
 | E003 | [SF19 archive replay](experiments/E003-sf19-archive-replay/RESULT.md) | complete | Exact old models/reports reproduce; both original joint gates failed | New hypothesis and richer evidence |
 | F003 | [Small-cohort SF19 finding](findings/F003-sf19-small-cohort.md) | recorded | Narrow choice gain; joint outcome and later choice gates unresolved | No promotion of these recipes |
+| E004 | [Practical outcome calibration](experiments/E004-practical-outcomes/plan.md) | planned | New monotone phase/strength hypothesis on broader fixed-node outcomes | Nested development comparison |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E004`, `D002`, `F004`, `P001`.
+Allocate the next unused ID in each series: `E005`, `D002`, `F004`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
@@ -48,9 +49,8 @@ stability, latency, unavailable evidence and fallback behavior.
 
 ## Next session
 
-Next register E004 for rating uncertainty or richer opportunity-aware evidence,
-using observed E002 dispersion for sample-size planning. Accuracy needs a new
-outcome/choice hypothesis beyond the already tested small-cohort recipe; collect
-and lock a new cohort before decisive confirmation. Category rubric and independent
-human evidence remain outstanding. Do not retry F002/F003 without a changed premise.
+Run E004's broader practical-outcome calibration, preserving its distinct target
+from displayed accuracy/rating. Rating uncertainty remains queued. Prepare an
+independent category rubric/pack, then collect and lock a fresh numerical cohort
+for shortlisted candidates. Do not retry F002/F003 without a changed premise.
 The research goal is active. The extension remains at B000.
