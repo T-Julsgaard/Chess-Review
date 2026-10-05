@@ -1,0 +1,53 @@
+{
+  "schema": "E011-curve-freeze-v1",
+  "curves": {
+    "fixed": {
+      "schema": "E008-curve-v1",
+      "kind": "cp",
+      "coefficient": 0.368208,
+      "boundary": null,
+      "fixed": true
+    },
+    "cp": {
+      "schema": "E008-curve-v1",
+      "kind": "cp",
+      "coefficient": 0.22349935786891822,
+      "boundary": null,
+      "observations": 2744,
+      "games": 450,
+      "coordinate": "cp/100",
+      "criterion": "Weighted fractional Bernoulli negative log likelihood; each game has unit total weight"
+    }
+  },
+  "curvesSha256": "8d3ed05dece6845e8d22ce2a3aa839dc72969e6fb506b974342e6841a30e4c9f",
+  "primaryConfig": {
+    "version": "Stockfish 19 (identity verified at UCI startup)",
+    "majorVersion": 19,
+    "build": "stockfish.js lite single-threaded",
+    "network": "nn-61e7af4bb97d.nnue",
+    "loaderSha256": "d3344124ab067fb0b90ee77873bb8e9fbf5fc01bc525fe714b0f942581e889e6",
+    "wasmSha256": "57ac2d72312aba346760e3f173f687a8c211208e97a87268436f7f0e10bb5387",
+    "budget": {
+      "kind": "nodes",
+      "value": 20000
+    },
+    "options": {
+      "Threads": 1,
+      "Hash": 32,
+      "MultiPV": 1,
+      "Skill Level": 20,
+      "UCI_LimitStrength": false,
+      "UCI_ShowWDL": true,
+      "UCI_Chess960": false
+    },
+    "reset": "ucinewgame + Clear Hash + isready before every search",
+    "tablebases": "none",
+    "perspective": "side to move at root",
+    "position": "startpos with full move history"
+  },
+  "primaryConfigHash": "fdb09212ed137b44394201739fadaf5a422827a98a182ed45820b89e959486c5",
+  "source": "research/experiments/E010-candidate-stability/evidence/models.json",
+  "sourceModelsSha256": "22c02c4d19548d657e0937a6b8cc79ef664a657ce60cf4810160a28877bf4df4",
+  "modelFits": 0,
+  "choiceModelIncluded": false
+}

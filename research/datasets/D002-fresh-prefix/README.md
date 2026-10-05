@@ -8,7 +8,8 @@ game/player overlap. No new source or license is assumed.
 
 Archive-prefix sampling is a restricted convenience population. Eligibility,
 complete raw-to-normalized lineage and fresh scientific confirmation are separate
-requirements. No fit, improvement claim or promotion has been made on this data.
+requirements. E008 fitted development curves; F006 records its limited gain.
+No promotion has been made on this data.
 Numeric recorded ratings are retained, but provisional status is unavailable;
 do not describe this as established strength or a nonprovisional-only cohort.
 
@@ -32,11 +33,12 @@ Use `readJson()` for normalized/structured records and `readFrame()` for raw
 decoded frames after opening the guard. The frozen pipeline is rebuilt on
 admission; arbitrary file copies cannot establish eligible origins.
 
-The 300 reserved games are not an activated confirmation set. A later candidate
-protocol must freeze scope, methods, sample access, metrics and selection before
-evaluation. Structural parsing/identity audit is recorded; model target metrics
-and manual reserved cases remain uninspected under this program. Any later
-exposure must be appended below; it cannot be undone by renaming a split.
+E011 activates the 300 reserved games for one frozen scalar CP outcome-curve
+confirmation and a paired20k/80k root-search panel. Its committed protocol,
+code and curve freeze precede searches. No choice model is included. Their
+`test` role remains; after the assessment this cohort cannot provide fresh
+confirmation for revised candidates. Before activation only structural parsing
+and identity audit occurred. Append exposure below; renaming cannot undo it.
 
 ## Exposure ledger
 
@@ -47,3 +49,5 @@ exposure must be appended below; it cannot be undone by renaming a split.
 | 2026-10-05 E008 registration | 450 train /150 development validation games | SF19 outcome/legal-choice collection and frozen two-candidate screen;300 reserved games excluded from searches/fits. Results not inspected yet. |
 | 2026-10-05 E008 development evaluation | 450 train fits /150 development metrics and shortlist | Fixed two-candidate screen: CP passes, WDL fails; development consumed.300 reserved games still excluded. No confirmation/adoption. |
 | 2026-10-05 E009 collection |30 train /15 development games, score-blind hash selection | Reuse E00820k cache, collect80k operational stability reference; no human truth or additional candidate tuning. Reserved300 excluded. |
+| 2026-10-05 E010 cached assessment | Same45 development games; exact E008/E009 queries | No new searches/fits or reserved access. Frozen CP choice-vector stability fails; focal root tolerance passes. |
+| 2026-10-05 E011 activation |300 reserved `test` games, predeclared outcome roots at20k/80k | Plan52c0507 and codea7a7cad committed before activation; curve-only model is registered in manifest before collection. No refit, choice queries, interim target metrics or promotion. Complete raw evidence must be registered and committed before a single frozen assessment. |
