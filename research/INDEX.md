@@ -21,9 +21,10 @@ records. Update a row and the active experiment's resume state when work stops.
 | E004 | [Practical outcome calibration](experiments/E004-practical-outcomes/RESULT.md) | complete | Both engines miss practical gate; most small gain comes from static context | Stop this interaction family |
 | F004 | [Practical context finding](findings/F004-practical-outcome-context.md) | recorded | Added phase/strength benefit unresolved; no promotion | Investigate distinct questions |
 | E005 | [Blinded category workflow](experiments/E005-category-review/RESULT.md) | running | 24 legal, traceable cases; workflow checks pass; zero reviews | Review later; numerical work continues |
+| E006 | [Rating uncertainty](experiments/E006-rating-uncertainty/plan.md) | planned | Fixed point recipe; adaptive versus constant game-calibrated intervals | Fit/calibration/evaluation separation |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E006`, `D002`, `F005`, `P001`.
+Allocate the next unused ID in each series: `E007`, `D002`, `F005`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
