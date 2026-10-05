@@ -1,0 +1,17 @@
+{
+  "schema": "E003-archive-inputs-v1",
+  "legacySourceFile": "scratch/accuracy-verification/tools/calibration/sf19-quality.mjs",
+  "legacySourceSha256": "104ac29324dcfba846b15ce606314ae1c64214e907efe59f7594940f87781a3f",
+  "archives": {
+    "sf19-quality": {
+      "file": "sf19-quality.json.gz",
+      "sha256": "5cef8a6d20482a743351c8ca3a85da030fd95b3eb91a6395aeca0b8d7f7fe745",
+      "bytes": 515106
+    },
+    "sf19-choice-confirmation": {
+      "file": "sf19-choice-confirmation.json.gz",
+      "sha256": "5e9e1f61b48d39030e91dea0615aee4510ac9c29e3fcf3d2b7e3ad47b82efbae",
+      "bytes": 512264
+    }
+  }
+}
