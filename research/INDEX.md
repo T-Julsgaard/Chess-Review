@@ -1,6 +1,6 @@
 # Research index
 
-Updated: 2026-10-05. Four studies complete; blinded category pack ready.
+Updated: 2026-10-05. Five studies complete; blinded category reviews pending.
 Baseline: [B000](BASELINE.md). No new improvement has been established.
 
 This is the routing and decision index. Detailed evidence lives in linked
@@ -21,10 +21,11 @@ records. Update a row and the active experiment's resume state when work stops.
 | E004 | [Practical outcome calibration](experiments/E004-practical-outcomes/RESULT.md) | complete | Both engines miss practical gate; most small gain comes from static context | Stop this interaction family |
 | F004 | [Practical context finding](findings/F004-practical-outcome-context.md) | recorded | Added phase/strength benefit unresolved; no promotion | Investigate distinct questions |
 | E005 | [Blinded category workflow](experiments/E005-category-review/RESULT.md) | running | 24 legal, traceable cases; workflow checks pass; zero reviews | Review later; numerical work continues |
-| E006 | [Rating uncertainty](experiments/E006-rating-uncertainty/plan.md) | planned | Fixed point recipe; adaptive versus constant game-calibrated intervals | Fit/calibration/evaluation separation |
+| E006 | [Rating uncertainty](experiments/E006-rating-uncertainty/RESULT.md) | complete | About90% game coverage needs broad ranges; adaptive scale fails gates | Stop this scale family |
+| F005 | [Single-game rating ranges](findings/F005-single-game-rating-ranges.md) | recorded | No ±300 cases; stronger-player conditional coverage fails/unresolved | Fresh evidence and distinct hypotheses |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E007`, `D002`, `F005`, `P001`.
+Allocate the next unused ID in each series: `E007`, `D002`, `F006`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
@@ -59,8 +60,8 @@ Only registered explicitly public, free-to-use sources and traceable derivatives
 qualify. New confirmation cohorts need complete acquisition/transform provenance;
 D001's historical limitations and exposure remain in force.
 
-Register rating uncertainty as the next numerical question. The E005 pack awaits
-later human reviews; pending annotation does not block numerical work. Collect
-and lock a fresh cohort only for a defensible shortlisted numerical candidate.
-Do not retry F002/F003/F004 without a changed premise. No candidate is confirmed.
+Prepare a fully traceable fresh cohort and a distinct calibration hypothesis,
+with complete raw retrieval/transform provenance before further numerical claims.
+E005 awaits later human reviews; pending annotation does not block this work.
+Do not retry F002/F003/F004/F005 without a changed premise. No candidate is confirmed.
 The research goal is active. The extension remains at B000.

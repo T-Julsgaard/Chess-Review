@@ -74,7 +74,7 @@ calibrated statistic. No new engine searches were performed for E001.
 | 2026-10-05 E003 (complete) | Two prior SF19 outcome/choice cohorts, including known consumed fifty test games | Exact refitted models and reports reproduce; no new independent confirmation or test selection. Raw archives now retained. |
 | 2026-10-05 E004 (complete) | Train-only fixed-node root WDL plus normalized game outcomes/context | Full nested development results inspected; both engines miss practical gate. Ratings are legitimate outcome context, not moves-only predictors. No validation/test scoring. |
 | 2026-10-05 E005 (pack ready) | SF18 train context and normalized move histories | 24 game-disjoint enriched cases selected; full training candidate pool scanned for mechanics/loss strata. Blinded human annotations pending; no validation/test use or population-frequency claim. |
-| 2026-10-05 E006 (registered) | Retained train rating rows, separate fit/calibration/outer folds | Compare moves-only interval methods; no validation/test use. Calibration units are game maxima, not independent sides. |
+| 2026-10-05 E006 (complete) | Retained train rating rows, separate fit/calibration/outer folds | Full interval comparison and subgroup results inspected; adaptation fails gates and narrow ranges absent. No validation/test use. Calibration units are game maxima, not independent sides. |
 
 Original source metadata saying `finalTestEvaluated: false` predates these later
 local studies; it does not override observed exposure. Keep those public files

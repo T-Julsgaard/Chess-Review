@@ -41,7 +41,7 @@ Research is available in the Git repository. The current packaging allowlist
 excludes `research/` from extension ZIPs and release source snapshots; those
 snapshots retain the active calibration instead.
 
-Four studies are complete, including a practical-outcome comparison that missed
-its improvement gates. A blinded 24-case category review pack is ready for later
-annotation. The index routes ongoing work and retains unsuccessful findings.
+Five studies are complete, including outcome and rating-uncertainty comparisons
+that missed improvement gates. A blinded 24-case category review pack awaits
+later annotation. The index routes fresh-evidence work and retains failures.
 No new model is confirmed or promoted; current scoring is B000.

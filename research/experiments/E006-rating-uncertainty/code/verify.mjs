@@ -21,7 +21,7 @@ for(const engine of ['sf18','sf19']){
   const maps=foldMaps(dataset.filter(g=>ids.has(g.id))),byKey=new Map(rows.map(r=>[r.gameId+':'+r.color,r])),seen=new Set();
   for(const fold of report.reports[engine].folds){
     const parts=partition(rows,maps,fold.fold),fitIds=[...new Set(parts.fit.map(r=>r.gameId))].sort(),calIds=[...new Set(parts.calibration.map(r=>r.gameId))].sort(),testIds=[...new Set(parts.test.map(r=>r.gameId))].sort();
-    compare(fitIds,fold.fitGames,'Fit IDs');compare(calIds,fold.calibrationGames,'Calibration IDs');compare(testIds,fold.testGames,'Test IDs');
+    compare(fitIds,fold.fitGames.slice().sort(),'Fit IDs');compare(calIds,fold.calibrationGames.slice().sort(),'Calibration IDs');compare(testIds,fold.testGames.slice().sort(),'Test IDs');
     compareModel(fitPoint(parts.fit,engine),fold.point,'Refitted point');
     const scored=[];
     for(const inner of fold.scale.innerModels){
