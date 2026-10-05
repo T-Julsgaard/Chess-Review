@@ -25,7 +25,7 @@ records. Update a row and the active experiment's resume state when work stops.
 | F005 | [Single-game rating ranges](findings/F005-single-game-rating-ranges.md) | recorded | No ±300 cases; stronger-player conditional coverage fails/unresolved | Fresh evidence and distinct hypotheses |
 | E007 | [Fresh evidence pipeline](experiments/E007-fresh-evidence/RESULT.md) | complete | Exact clean reconstruction; provisional status unavailable | Distinct calibration hypothesis |
 | D002 | [Fresh prefix cohort](datasets/D002-fresh-prefix/README.md) | registered | 900 disjoint games 450/150/300; reserved evaluation not activated | Guarded development use after protocol |
-| E008 | [Human quality curves](experiments/E008-human-quality-curves/plan.md) | planned | SF19 fixed CP versus CP-refit/WDL curves; joint outcome and choice gates | Frozen train/development collection |
+| E008 | [Human quality curves](experiments/E008-human-quality-curves/RESULT.md) | running | SF19 smoke passed;600-game collection live; no candidate fits or metrics yet | Poll existing session; register complete evidence before fit |
 
 No promotion records yet.
 Allocate the next unused ID in each series: `E009`, `D003`, `F006`, `P001`.
@@ -63,9 +63,9 @@ Only registered explicitly public, free-to-use sources and traceable derivatives
 qualify. New confirmation cohorts need complete acquisition/transform provenance;
 D001's historical limitations and exposure remain in force.
 
-Register a distinct human-outcome/legal-choice calibration hypothesis using
-D002's development roles, then collect/cache its engine observations. Read E007's
-source/target limitations and open both D001/D002 for admission. Freeze later
+Resume E008's existing collection session and read its compact RESULT first.
+Register/commit completed evidence before its frozen development evaluation.
+Read E007's source/target limitations and open both D001/D002 for admission. Freeze later
 candidate/access rules before activating reserved evaluation; no new score is
 confirmed by the pipeline's successful reconstruction.
 E005 awaits later human reviews; pending annotation does not block this work.
