@@ -1,6 +1,6 @@
 # Research index
 
-Updated: 2026-10-05. Fifteen studies/tasks complete; linear CP choice fails; reviews pending.
+Updated: 2026-10-05. Sixteen studies/tasks complete; signed-log benefit unresolved; reviews pending.
 Baseline: [B000](BASELINE.md). New CP gain is development evidence, not confirmed.
 
 This is the routing and decision index. Detailed evidence lives in linked
@@ -49,10 +49,11 @@ records. Update a row and the active experiment's resume state when work stops.
 | E016 | [Relative CP choice](experiments/E016-relative-cp-choice/RESULT.md) | complete | Verified -.366494 nats development gain; primary/cross-fit/subgroup gates fail despite lower search drift | Stop exact linear recipe; distinct context scaling/mate hypothesis |
 | F014 | [Linear CP failure finding](findings/F014-linear-cp-choice-failure.md) | recorded | Independent/clean fits and predictions verify; stability gain retains worse human prediction/calibration | No promotion; preregister any distinct alternative |
 
-| E017 | [Signed-log choice](experiments/E017-signed-log-choice/RESULT.md) | running | .012107 nats < .02; interval includes zero; cross-fit/subgroup guards fail | Independent/exact/clean verification; retain inconclusive benefit |
+| E017 | [Signed-log choice](experiments/E017-signed-log-choice/RESULT.md) | complete | Verified .012107 nats < .02; interval includes zero; cross-fit/subgroup guards fail | Stop exact curve; distinct probability-mixture hypothesis |
+| F015 | [Unresolved signed-log finding](findings/F015-unresolved-signed-log-choice.md) | recorded | Exact fits/vectors and independent/clean replay pass; mate-group signs differ across splits | No promotion; freeze a distinct dispersion model |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E018`, `D003`, `F015`, `P001`.
+Allocate the next unused ID in each series: `E018`, `D003`, `F016`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
@@ -87,25 +88,26 @@ Only registered explicitly public, free-to-use sources and traceable derivatives
 qualify. New confirmation cohorts need complete acquisition/transform provenance;
 D001's historical limitations and exposure remain in force.
 
-Read E015's compact RESULT and F013. Its fixed monotone rating-temperature
-recipe fails both primary development gates; stop this exact recipe. Twelve
-fits, 600 prediction vectors, independent optimality/arithmetic/gates and clean
-refit/replay verify. This proves reproduction under the stated conditions,
-not improved final ratings. Sparse development groups and search drift remain.
+Read E017's compact RESULT and F015. Its signed-log recipe has a small positive
+development gain .012107 nats, below .02, with interval including zero; cross-fit
+mean and five cross-fit subgroup guards fail. Any-mate groups have opposite
+signs across splits; development's 20 cases are sparse. No resolved stability
+or calibration improvement. Exact twelve-fit and full independent/clean replay
+verify; stop this exact recipe. E015's rating-temperature recipe also remains
+unresolved and is stopped; none establishes an improved final rating.
 
-E016/F014 completes the relative linear CP utility screen: development gain
+E016/F014 retains the relative linear CP utility screen: development gain
 -.366494 nats with interval wholly below zero; cross-fit/subgroup guards and
 descriptive calibration also fail. Search-vector drift improves, showing why
 operational stability is insufficient. Exact twelve-fit and full independent/
 clean replay pass. Stop this exact recipe, including its fixed mate semantics.
-Next register a signed-log CP utility comparison, with fixed bounds/normalization,
-explicit mate handling and gates before fitting. Keeping sign-only mates would
-isolate the CP transformation while preserving that limitation. Both existing
-models already use all alternatives; relative
-softmax centering alone is neutral. A different utility mapping needs a new
-plan/source freeze before fitting, not another rating-temperature refit or
-rescue of the failed E011 outcome curve. Reuse hash-matched observations and
-reserve eventual confirmation for a new registered cohort.
+Next register a distinct probability-mixture comparison: the global comparator,
+a fixed sharper distribution and uniform choices, with convex train-only weights.
+Freeze component definitions, training sequence, weight constraints and gates
+before fitting. It tests variable dispersion, not another CP-curve/rating-
+temperature refit or rescue of E011. Both utility models already use complete
+alternatives; centering alone is neutral. Reuse hash-matched observations,
+preserve exposed development ownership and reserve confirmation for fresh D003.
 Both E005/E013 human packs remain fixed and pending. E014/F012 retain failed
 root-pair joint gates and the distinction from raw top-move diagnostics.
 
