@@ -32,6 +32,18 @@ Both colors stay in one split, and player identities are disjoint across roles.
 Only training observations fit coefficients. Development validation is consumed;
 it does not provide untouched final-test confirmation.
 
+The original 2,000-game dataset also has an exact archive-to-game reconstruction,
+including every game's raw PGN locator and pinned sampling/parser dependencies.
+From a repository checkout, run
+`node research/datasets/D001-public-baseline/reconstruct.mjs --download`, then
+the calibration replay above. The reconstruction checks all 60 recorded fragment
+hashes and the complete normalization, selection and splits. Downloads total
+about 282 MB and are cached for offline replay; no npm packages or historical
+Git objects are needed. See [D001 reconstruction](../../research/datasets/D001-public-baseline/README.md).
+This extra provenance check is in the Git research workspace, which is excluded
+from release source snapshots. It does not regenerate the engine observations
+or change data exposure or scientific-validity limits.
+
 The depth model uses 100 training and 25 validation whole games, balanced across
 five focal-rating bands. Both players have at least ten nonforced decisions.
 Eighty training and twenty validation games contribute four fixed legal choices

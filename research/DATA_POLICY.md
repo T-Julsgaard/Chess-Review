@@ -54,8 +54,10 @@ PGN normalization, exclusions, selection and splits. Open both D001 and D002
 because the fresh cohort's exclusion identities depend on D001's verified bytes.
 Raw frame artifacts use the guarded `readFrame()` decoder, not `readJson()`. Current
 origin-checker bytes are bound to the manifest and eligibility receipt; a changed
-checker requires an explicit provenance revision/reconstruction. Legacy D001
-retains its existing limitations and is not upgraded by this format.
+checker requires an explicit provenance revision/reconstruction. D001 has a
+separate historical-frame reconstruction record and per-game locator inventory.
+Offline admission checks their bindings and pinned method/dependencies; explicit
+`D001-public-baseline/reconstruct.mjs` replay rechecks all original raw fragments.
 
 For checks that should preserve historical run records, the retained verifier
 and replay accept separate output directories:
@@ -105,12 +107,16 @@ it does not prove honest metadata, representative sampling or a useful model.
 Evidence must make each claimed step independently checkable. Do not describe
 an undocumented step as reproduced or a development result as confirmed.
 
-D001 is retained legacy evidence. Its game IDs/URLs/months, export range records
-and all retained input bytes are traceable. The original selection/normalization
-pipeline, per-game frame membership and whole-archive checksums are not verified.
-Its manifest preserves these limitations. It is eligible for development/audit/
-retrospective replay, but cannot serve as new scientific confirmation. New data
-must supply the stronger acquisition and transformation chain above.
+D001's original selection/normalization and every selected game's raw-frame
+membership now have an exact retained reconstruction. Its manifest pins the
+method/dependencies, input hashes, report and locators. Full replay retrieves
+hash-matched fragments from the recorded ranges or uses the verified local cache;
+preflight does not download or replay those bulk fragments automatically.
+Whole-archive checksums and regenerated engine observations are not claimed.
+Existing sampling, rating-metadata and development/test-exposure limits remain:
+the reconstruction cannot make D001 new scientific confirmation. Frozen origin
+summaries are preserved for historical pack replay;
+`gameOrigin(id, {current: true})` exposes updated provenance and its raw locator.
 
 Experiment plans still require predeclared claims, metrics, thresholds, splitting,
 leakage controls, uncertainty, stopping rules and evaluation access. Confirmation

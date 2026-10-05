@@ -11,7 +11,7 @@ records. Update a row and the active experiment's resume state when work stops.
 | ID | Question / record | State | Outcome / evidence | Next action |
 | --- | --- | --- | --- | --- |
 | B000 | [Starting extension baseline](BASELINE.md) | Reproduced | Offline replay passes; no fresh confirmation | Use frozen recipe as comparator |
-| D001 | [Public baseline evidence](datasets/D001-public-baseline/README.md) | registered | Training/development evidence; at least fifty consumed test games | Append reuse before each evaluation |
+| D001 | [Public baseline evidence](datasets/D001-public-baseline/README.md) | reconstruction verified | Exact original-fragment-to-game rebuild and raw locators; at least fifty consumed test games | Preserve exposure; replay reconstruction when checking raw origins |
 | E001 | [Evidence and exposure audit](experiments/E001-evidence-audit/RESULT.md) | complete | Integrity gates pass; no model evaluated | Numerical development study |
 | F001 | [Evidence and exposure finding](findings/F001-evidence-and-exposure.md) | recorded | Development use supported; confirmation requires fresh evidence | Preserve exposure history |
 | E002 | [Nonlinear rating features](experiments/E002-nonlinear-rating/RESULT.md) | complete | Small development gains; practical gate fails for both engines | Stop this family; investigate richer evidence/uncertainty |
@@ -91,7 +91,8 @@ Before any research goal starts/resumes or game data is used, follow
 `npm run research:preflight -- D001 --purpose inspect` (use actual dataset IDs).
 Only registered explicitly public, free-to-use sources and traceable derivatives
 qualify. New confirmation cohorts need complete acquisition/transform provenance;
-D001's historical limitations and exposure remain in force.
+D001's original dataset reconstruction is verified; its sampling, rating-metadata
+and exposure limitations remain in force.
 
 Read E019's compact RESULT/F017 first, then E018/F016 if needed. E019's
 independent variance/tail and normal-reference planning calculations reproduce;

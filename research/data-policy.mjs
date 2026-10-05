@@ -2,6 +2,7 @@ import {readFile, realpath} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
 import {validateFresh,firstFrame} from './fresh-format.mjs';
+import {validateReconstruction, pinnedFiles, codeHash} from './d001-format.mjs';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 
@@ -67,7 +68,17 @@ export function validateManifest(manifest, registry) {
   if (!['lichess-month-v1','lichess-prefix-v1'].includes(manifest.originFormat)) fail('unsupported origin format');
   const fresh=manifest.originFormat==='lichess-prefix-v1';
   if (!manifest.provenance || !nonempty(manifest.provenance.limitations) || !manifest.provenance.replayRecipe) fail('missing provenance record');
-  if (!fresh&&(manifest.provenance.status!=='legacy-partial'||manifest.id!=='D001')) fail('unsupported legacy provenance');
+  const reconstructed = manifest.provenance.status === 'reconstruction-verified';
+  if (!fresh&&(!['legacy-partial','reconstruction-verified'].includes(manifest.provenance.status)||manifest.id!=='D001')) fail('unsupported legacy provenance');
+  if (reconstructed) {
+    const p = manifest.provenance.reconstruction, historical = manifest.provenance.historicalOrigin;
+    if (!p?.record || !p.locators || !p.codeSha256
+        || JSON.stringify(Object.keys(p.codeSha256)) !== JSON.stringify(pinnedFiles)
+        || Object.values(p.codeSha256).some(h => !digest(h))
+        || historical?.status !== 'legacy-partial' || !nonempty(historical.limitations))
+      fail('missing D001 reconstruction provenance');
+    safePath(p.record); safePath(p.locators);
+  }
   if (fresh&&(manifest.provenance.status!=='pipeline-verified'||manifest.id!=='D002'
       ||manifest.provenance.selectionSeed!=='D002-select-v1:'||manifest.provenance.splitSeed!=='D002-split-v1:'
       ||!manifest.provenance.exclusions||manifest.provenance.exclusionInput!=='tools/calibration/public/dataset.json.gz'
@@ -82,6 +93,9 @@ export function validateManifest(manifest, registry) {
     if(entry.kind==='raw-pgn-zstd'&&(!fresh||!name.endsWith('.zst')||entry.parents.length!==1||entry.parents[0]!==manifest.sourceRecord))fail('unbound raw frame artifact');
   }
   if (manifest.artifacts[manifest.normalized]?.kind !== 'games' || manifest.artifacts[manifest.sourceRecord]?.kind !== 'sources') fail('missing game/source records');
+  if (reconstructed && [manifest.provenance.reconstruction.record, manifest.provenance.reconstruction.locators]
+      .some(n => manifest.artifacts[n]?.kind !== 'summary' || !manifest.artifacts[n].parents.includes(manifest.normalized)))
+    fail('unregistered D001 reconstruction evidence');
   const done = new Set(), visiting = new Set();
   const visit = name => {
     if (done.has(name)) return;
@@ -132,6 +146,9 @@ export function verifyOrigins(manifest, registry, records, hashes={}) {
   }
   if(manifest.originFormat==='lichess-prefix-v1'){
     try{validateFresh(manifest,records,hashes);}catch(e){fail(e.message);}
+  }
+  if(manifest.provenance.status==='reconstruction-verified'){
+    try{validateReconstruction(manifest,records,hashes);}catch(e){fail(e.message);}
   }
   for (const [name, entry] of Object.entries(manifest.artifacts)) {
     const data = records.get(name);
@@ -184,6 +201,10 @@ export async function openResearchData(ids, {purpose = 'inspect', root = repo} =
     if (sha256(bytes) !== source.evidence.sha256) fail('permission evidence hash differs: ' + source.id);
     sourceEvidence[source.id] = {license: source.license, termsUrl: source.termsUrl, verifiedOn: source.verifiedOn, evidenceSha256: sha256(bytes)};
   }
+  for (const manifest of manifests) if (manifest.provenance.reconstruction) {
+    for (const [name, expected] of Object.entries(manifest.provenance.reconstruction.codeSha256))
+      if (codeHash(await localBytes(root, name)) !== expected) fail('D001 reconstruction dependency differs: ' + name);
+  }
   const records = new Map(), entries = new Map(), inputHashes = {}, datasets = {};
   // D002 explicitly depends on D001's registered exclusion identities.
   manifests.sort((a,b)=>a.id.localeCompare(b.id));
@@ -216,14 +237,24 @@ export async function openResearchData(ids, {purpose = 'inspect', root = repo} =
       safePath(name);if(entries.get(name)?.kind!=='raw-pgn-zstd')fail('unregistered raw frame');
       return verifyArtifact(await localBytes(root,name),entries.get(name),name);
     },
-    gameOrigin(id) {
+    gameOrigin(id, {current = false} = {}) {
       for (const manifest of manifests) {
         const game = records.get(manifest.normalized).find(g => g.id === id);
+        // Existing blinded packs bind the original origin envelope byte-for-byte.
+        // Current provenance is in the receipt and available explicitly for tracing.
+        const provenance = !current && manifest.provenance.historicalOrigin || manifest.provenance;
+        let rawPGN;
+        if (game && current && manifest.provenance.reconstruction) {
+          const p = manifest.provenance.reconstruction, locator = records.get(p.locators).entries.find(l => l.gameId === id);
+          const frame = records.get(p.record).result.frames.find(f => f.month === locator.month && f.frame === locator.frame);
+          rawPGN = {...locator, compressedFrameSha256: frame.compressedSha256, decodedFrameSha256: frame.decodedSha256};
+        }
         if (game) return {dataset: manifest.id, gameId: id, gameUrl: game.source, archiveUrl:
           records.get(manifest.sourceRecord).sources.find(s => s.month === game.sourceMonth).url,
           normalizedFile: manifest.normalized, sha256: inputHashes[manifest.normalized],
           sourceRecord: manifest.sourceRecord, sourceRecordSha256: inputHashes[manifest.sourceRecord],
-          provenanceStatus: manifest.provenance.status, limitations: manifest.provenance.limitations,
+          provenanceStatus: provenance.status, limitations: provenance.limitations,
+          ...(rawPGN ? {rawPGN} : {}),
           ...(manifest.originFormat==='lichess-prefix-v1'?{rawPGN:{...game.locator,compressedFrameSha256:inputHashes[game.locator.artifact],
             decodedFrameSha256:entries.get(game.locator.artifact).uncompressedSha256}}:{})};
       }

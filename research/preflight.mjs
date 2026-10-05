@@ -9,7 +9,7 @@ for (let i = 0; i < args.length; i++) {
   else throw Error('Usage: node research/preflight.mjs D001 [D002 ...] [--purpose inspect] [--game GAME_ID]');
 }
 const data = await openResearchData(ids, {purpose});
-console.log(JSON.stringify(game ? data.gameOrigin(game) : {
+console.log(JSON.stringify(game ? data.gameOrigin(game, {current: true}) : {
   passed: true, policyVersion: data.receipt.policyVersion, purpose, registrySha256: data.receipt.registrySha256,
   datasets: Object.fromEntries(Object.entries(data.receipt.datasets).map(([id, d]) => [id, {
     games: d.gameCount, provenanceStatus: d.provenanceStatus, limitations: d.limitations,

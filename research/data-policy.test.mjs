@@ -5,6 +5,7 @@ import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {gzipSync} from 'node:zlib';
 import {openResearchData, openResearchSource, sha256, validateRegistry, validateManifest, verifyArtifact} from './data-policy.mjs';
+import {pinnedFiles} from './d001-format.mjs';
 
 // Authored synthetic records exercise mechanics only; no real games or labels.
 async function fixture(t) {
@@ -141,4 +142,19 @@ test('acquisition bootstrap requires exact exports and permission before request
   await assert.rejects(openResearchSource('https://data.example/unapproved.pgn.zst',{root:f.root}),/unregistered exact export/);
   await f.save(f.registry.sources[0].evidence.path,'Changed synthetic terms');
   await assert.rejects(openResearchSource(approved,{root:f.root}),/permission evidence hash differs/);
+});
+
+test('D001 reconstructed provenance cannot admit changed method dependencies', async t => {
+  const f = await fixture(t), historicalOrigin = {status: f.manifest.provenance.status, limitations: f.manifest.provenance.limitations};
+  const codeSha256 = {};
+  for (const n of pinnedFiles) {
+    const bytes = 'Authored synthetic pinned code\n'; await f.save(n, bytes); codeSha256[n] = sha256(bytes);
+  }
+  await f.add('inputs/reconstruction.json', {synthetic: true}, 'summary', [f.manifest.normalized]);
+  await f.add('inputs/locators.json', {synthetic: true}, 'summary', [f.manifest.normalized]);
+  Object.assign(f.manifest.provenance, {status: 'reconstruction-verified', historicalOrigin,
+    reconstruction: {record: 'inputs/reconstruction.json', locators: 'inputs/locators.json', codeSha256}});
+  await f.flush();
+  await f.save(pinnedFiles[0], 'Changed synthetic method\n');
+  await assert.rejects(f.open(), /reconstruction dependency differs/);
 });
