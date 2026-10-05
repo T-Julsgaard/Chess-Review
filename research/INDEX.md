@@ -42,8 +42,10 @@ records. Update a row and the active experiment's resume state when work stops.
 
 | F012 | [Root-pair consistency finding](findings/F012-root-pair-consistency.md) | recorded | SF19 conditional gains retain failed stability; SF18 worsens; no universal repair | Distinct contextual-choice hypothesis; no repair promotion |
 
+| E015 | [Rating-conditioned choice](experiments/E015-rating-choice-context/RESULT.md) | planned | Fixed monotone temperature; cached 450 train / 150 development; no fit yet | Commit source-bound freeze/code before twelve fits |
+
 No promotion records yet.
-Allocate the next unused ID in each series: `E015`, `D003`, `F013`, `P001`.
+Allocate the next unused ID in each series: `E016`, `D003`, `F013`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
@@ -84,7 +86,7 @@ root-pair repair. Its raw-motivation diagnostic omitted published top-move
 zero-loss behavior; the tested baseline includes it. Both E005/E013 human packs
 are fixed and pending; no synthetic/engine evidence supplies perception.
 
-Next register a rating-conditioned legal-choice likelihood study using cached
+E015 registers the rating-conditioned legal-choice likelihood study using cached
 E008 development choices. This tests whether rating context predicts peer move
 choice beyond a global choice model; it is distinct from F004's outcome-context
 interactions and F002's nonlinear moves-only rating regressions. It cannot by
