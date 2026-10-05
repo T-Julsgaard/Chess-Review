@@ -52,8 +52,10 @@ records. Update a row and the active experiment's resume state when work stops.
 | E017 | [Signed-log choice](experiments/E017-signed-log-choice/RESULT.md) | complete | Verified .012107 nats < .02; interval includes zero; cross-fit/subgroup guards fail | Stop exact curve; distinct probability-mixture hypothesis |
 | F015 | [Unresolved signed-log finding](findings/F015-unresolved-signed-log-choice.md) | recorded | Exact fits/vectors and independent/clean replay pass; mate-group signs differ across splits | No promotion; freeze a distinct dispersion model |
 
+| E018 | [Choice mixture](experiments/E018-choice-mixture/RESULT.md) | planned | Fixed regular/sharper/uniform components; convex train-only weight fit | Source/cohort/code freeze before fitting |
+
 No promotion records yet.
-Allocate the next unused ID in each series: `E018`, `D003`, `F016`, `P001`.
+Allocate the next unused ID in each series: `E019`, `D003`, `F016`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
