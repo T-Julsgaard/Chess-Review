@@ -1,6 +1,7 @@
-# E009: overall stability screen fails; verification next
+# E009: verified overall stability failure; limited CP loss stability
 
-2026-10-05. State: running, verification/clean replay next. Plan/method tests
+2026-10-05. State: complete. Outcome: no-improvement; evidence: development.
+Plan/method tests
 committed before any real-game higher-budget search or E008 candidate fit.
 The extension is B000. This is operational development evidence, not human truth.
 
@@ -42,8 +43,24 @@ The80k observations retain418 earlier exact iterations and3 exact recoveries;
 selected/final nodes range490–80,181. A configured budget is not a guaranteed
 minimum for the selected score. No score-based dropping or build substitution.
 
-Raw evidence was registered/committed in `106bc50` before `code/evaluate.mjs`.
-The results and receipt are now registered; commit before `code/verify.mjs` and
-an external `research/clean-replay.mjs E009 <archive-commit-SHA>` run. Preserve
-every drift and failed gate. Numerical replay/independent reconstruction is
-still pending. No adequate overall stability or quality improvement is established.
+Raw evidence was registered/committed in `106bc50` before `code/evaluate.mjs`;
+results were registered/committed in `0b233a4` before verification. The
+[verifier](evidence/verification.json) exactly reproduces the report and
+independently reconstructs90 paired decision values, sets, drift/tolerance
+counts and Wilson bounds. The external archive
+[clean replay](evidence/clean-replay.json) also passes, with zero new searches,
+network, ignored inputs or installed dependencies. Retained
+[archive recipe/hash](evidence/clean-archive.json) records an initial incorrect
+caller-supplied full revision as invalid provenance metadata; the complete
+replay was repeated with verified `0b233a4d85231e3e583f8d6c841c42a4fc3dbf7d`.
+The invalid attempt was never used to support this result.
+
+Reproduce `code/verify.mjs` with optional `--out research/runs/E009/replay`.
+For a clean replay, extract the retained archive recipe externally, obtain its
+full revision with `git rev-parse`, and run `research/clean-replay.mjs E009
+<verified-archive-commit-SHA>` from the snapshot root. Scientific confirmation
+is separate from numerical integrity. See [F007](../../findings/F007-search-stability.md).
+
+No adequate overall stability or human quality improvement is established.
+E010 separately tests frozen CP-model probability-vector stability using these
+same observations; it cannot erase this failed rank/WDL result. No extension edit.

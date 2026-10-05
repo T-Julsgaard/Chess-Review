@@ -41,9 +41,11 @@ Research is available in the Git repository. The current packaging allowlist
 excludes `research/` from extension ZIPs and release source snapshots; those
 snapshots retain the active calibration instead.
 
-Seven studies/tasks are complete. A new 900-game cohort has fully traceable raw
+Eight studies/tasks are complete. A new 900-game cohort has fully traceable raw
 frames and exact clean reconstruction. A CP curve improves fresh development
 prediction; its clean replay passes, but scientific confirmation is pending.
+The higher-budget study retains an overall stability failure and limited CP
+loss stability; the next cached study tests the candidate's probability vectors.
 A blinded 24-case category pack awaits later annotation. The index routes fresh
 calibration work and retains failed experiments and provenance/target limits.
 No new model is confirmed or promoted; current scoring is B000.

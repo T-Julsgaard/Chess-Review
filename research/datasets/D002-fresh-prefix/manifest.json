@@ -243,6 +243,35 @@
       "sha256": "d32d8ed064a19af7b2c9e921bdc545be893fe9c279e9fbaf275e633ac237fd55",
       "bytes": 9507,
       "uncompressedSha256": "d32d8ed064a19af7b2c9e921bdc545be893fe9c279e9fbaf275e633ac237fd55"
+    },
+    "research/experiments/E009-search-stability/evidence/verification.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E009-search-stability/evidence/results.json",
+        "research/experiments/E009-search-stability/evidence/sf19-observations.json.gz"
+      ],
+      "sha256": "d86f6ace4198d45ee89a0e18a42f91bbe5b97196e805bd3e62b2f53e8fc42f26",
+      "bytes": 9865,
+      "uncompressedSha256": "d86f6ace4198d45ee89a0e18a42f91bbe5b97196e805bd3e62b2f53e8fc42f26"
+    },
+    "research/experiments/E009-search-stability/evidence/clean-replay.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E009-search-stability/evidence/results.json",
+        "research/experiments/E009-search-stability/evidence/sf19-observations.json.gz"
+      ],
+      "sha256": "8351dcf0a1f4a44262475a1130eaeef8a1e0354533073e8c6bc7431a3da86a85",
+      "bytes": 9724,
+      "uncompressedSha256": "8351dcf0a1f4a44262475a1130eaeef8a1e0354533073e8c6bc7431a3da86a85"
+    },
+    "research/experiments/E009-search-stability/evidence/clean-archive.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E009-search-stability/evidence/clean-replay.json"
+      ],
+      "sha256": "ee775ac22eefaecc6e079452253e76c5283ee12db3bf44d502af9811a515ea70",
+      "bytes": 1265,
+      "uncompressedSha256": "ee775ac22eefaecc6e079452253e76c5283ee12db3bf44d502af9811a515ea70"
     }
   }
 }

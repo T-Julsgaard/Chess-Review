@@ -1,0 +1,27 @@
+{
+  "schema": "research-clean-archive-v1",
+  "experiment": "E009",
+  "snapshotRevision": "0b233a4d85231e3e583f8d6c841c42a4fc3dbf7d",
+  "archiveSha256": "d7d5ec90716e4f42dc217073337d623c353a581b293bb2c57cf7b3896796cc81",
+  "archiveCommand": "git archive --format=tar --output=<archive> 0b233a4 research lib/chess.js lib/public-scoring.js tools/calibration package.json engine/stockfish-19-lite-single.js engine/stockfish-19-lite-single.wasm",
+  "command": "node research/clean-replay.mjs E009 0b233a4d85231e3e583f8d6c841c42a4fc3dbf7d",
+  "extractedOutsideCheckout": true,
+  "gitDirectory": false,
+  "nodeDependencies": 0,
+  "networkRequests": 0,
+  "attempts": [
+    {
+      "providedRevision": "0b233a4a7885ee0e46c9cb1fda907ef955149c9d",
+      "valid": false,
+      "reason": "Incorrect caller-supplied full revision; numeric replay matched but provenance metadata invalid; never used as valid evidence",
+      "receiptSha256": "63d016fbd731115f94dc6d413a6759dfacda21f031eb35c6a4297f347594a7e0",
+      "engineSearches": 0
+    },
+    {
+      "providedRevision": "0b233a4d85231e3e583f8d6c841c42a4fc3dbf7d",
+      "valid": true,
+      "action": "Repeated clean replay with verified Git archive commit; canonical receipt retained",
+      "engineSearches": 0
+    }
+  ]
+}
