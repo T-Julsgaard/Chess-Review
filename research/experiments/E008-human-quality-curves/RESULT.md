@@ -1,6 +1,6 @@
-# E008: CP candidate passes development screen; verification pending
+# E008: verified CP development gain; WDL candidate fails
 
-2026-10-05. State: running, numerical verification/clean replay next. The CP
+2026-10-05. State: complete. Outcome: improved, evidence level: development. The CP
 candidate passes the registered joint development gates; WDL fails. No fresh
 confirmation, displayed-accuracy validation or production promotion yet.
 
@@ -21,6 +21,10 @@ CP outcome gain0.039395,97.5% paired game interval[0.011472,0.070397]; choice
 gain0.065521,[0.022158,0.112435]. Both practical/uncertainty gates, Brier,
 matched coverage, fit-interior and adequately sized subgroup guardrails pass.
 Sparse subgroups remain unresolved. CP is the sole development shortlist.
+
+In particular, rating<1200 has19 outcome /18 choice games; rating>=2000 has
+26/23, both below30. Extreme-point choice groups have11/18 games. Their
+conditional behavior is unresolved, even though the overall screen passes.
 
 WDL outcome gain0.025360,[-0.005235,0.061286] is unresolved; choice gain
 -0.284370,[-0.383670,-0.177482] is deterioration. Joint/choice/subgroup gates
@@ -53,13 +57,20 @@ All are registered D002 derivatives with guarded eligibility. The D002 archive
 prefix and unknown provisional-status limits remain; reserved300 games were not
 searched, fitted or assessed. The extension remains B000.
 
-## Resume
+## Verification and next action
 
-Commit registered results before running `code/verify.mjs`. Then make an external
-Git archive and run `research/clean-replay.mjs E008 <archive-commit-SHA>` without
-`.git`, network, ignored inputs or installed dependencies. Retain command/hash/
-receipt. Verify exact fitted output and independent equations before a finding.
-Register/commit verification records before loading them again.
+[Verification](evidence/verification.json) reproduces exact reports/predictions
+and independently checks fit stationarity,10,920 outcome predictions,1,800
+choices and equal-game metrics. No new engine searches. The
+[clean replay](evidence/clean-replay.json) from external archive `4858da5` passes
+the same checks, without `.git`, network, ignored inputs or dependencies;
+[archive recipe/hash](evidence/clean-archive.json) is retained. Numerical
+verification is separate from scientific confirmation. See [F006](../../findings/F006-fresh-human-curves.md).
+
+Reproduce `code/verify.mjs` with optional `--out research/runs/E008/replay`.
+For clean replay, extract the recorded archive recipe externally and run
+`research/clean-replay.mjs E008 <archive-commit-SHA>` from its root.
+Do not rerun collection or fit a revised candidate on these validation results.
 
 E009 is independently collecting a fixed45-game higher-budget diagnostic from
 this cache. A positive CP development screen needs locked fresh confirmation,

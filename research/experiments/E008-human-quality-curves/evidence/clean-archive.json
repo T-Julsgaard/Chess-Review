@@ -1,0 +1,12 @@
+{
+  "schema": "research-clean-archive-v1",
+  "experiment": "E008",
+  "snapshotRevision": "4858da5c7e1656c5accd6c0d5b9c246047310b68",
+  "archiveSha256": "5ec6954556a169610a5c67bdc66809b6b87e5026b66b7b0cc7b90fff10efbebd",
+  "archiveCommand": "git archive --format=tar --output=<archive> 4858da5 research lib/chess.js lib/public-scoring.js tools/calibration package.json engine/stockfish-19-lite-single.js engine/stockfish-19-lite-single.wasm",
+  "command": "node research/clean-replay.mjs E008 4858da5c7e1656c5accd6c0d5b9c246047310b68",
+  "extractedOutsideCheckout": true,
+  "gitDirectory": false,
+  "nodeDependencies": 0,
+  "networkRequests": 0
+}

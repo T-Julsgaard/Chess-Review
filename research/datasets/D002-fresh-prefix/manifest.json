@@ -176,6 +176,54 @@
       "sha256": "9bfa000b2dc438b2e2db615d99656aa0a6d0aff96bd939b45e044e5350cc40a0",
       "bytes": 8576,
       "uncompressedSha256": "9bfa000b2dc438b2e2db615d99656aa0a6d0aff96bd939b45e044e5350cc40a0"
+    },
+    "research/experiments/E008-human-quality-curves/evidence/verification.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E008-human-quality-curves/evidence/results.json",
+        "research/experiments/E008-human-quality-curves/evidence/predictions.json.gz"
+      ],
+      "sha256": "8ed32dbfe6c88869a2cff488730297fefb0513718faf51371c75d4d3bd300792",
+      "bytes": 9419,
+      "uncompressedSha256": "8ed32dbfe6c88869a2cff488730297fefb0513718faf51371c75d4d3bd300792"
+    },
+    "research/experiments/E008-human-quality-curves/evidence/clean-replay.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E008-human-quality-curves/evidence/results.json",
+        "research/experiments/E008-human-quality-curves/evidence/predictions.json.gz"
+      ],
+      "sha256": "deb24ae748f4c088d2818f4f3aa46d6318ffa93a9c3df326e7b572aeb14b927c",
+      "bytes": 9070,
+      "uncompressedSha256": "deb24ae748f4c088d2818f4f3aa46d6318ffa93a9c3df326e7b572aeb14b927c"
+    },
+    "research/experiments/E008-human-quality-curves/evidence/clean-archive.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E008-human-quality-curves/evidence/clean-replay.json"
+      ],
+      "sha256": "7a1b5f505b528ff0aa95e546c453bd46857bbbc1ef58bf4d382300f66292214d",
+      "bytes": 646,
+      "uncompressedSha256": "7a1b5f505b528ff0aa95e546c453bd46857bbbc1ef58bf4d382300f66292214d"
+    },
+    "research/experiments/E009-search-stability/evidence/sf19-observations.json.gz": {
+      "kind": "game-evidence",
+      "parents": [
+        "research/datasets/D002-fresh-prefix/games.json.gz",
+        "research/experiments/E008-human-quality-curves/evidence/sf19-observations.json.gz"
+      ],
+      "sha256": "1c0d772c3c6bd03d959fc528027a2b6a1c5feafa5f68865493902452aa8409bb",
+      "bytes": 376368,
+      "uncompressedSha256": "e893a6f64e0a9afcf3e30f9c263e585d9a77d4c61de7759c6d0223f527bdd1ce"
+    },
+    "research/experiments/E009-search-stability/evidence/collection-run.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E009-search-stability/evidence/sf19-observations.json.gz"
+      ],
+      "sha256": "691b572cbf60c84fc7e7126c2de5854ac1962ce7bdebc8b415849dcb158b76eb",
+      "bytes": 9254,
+      "uncompressedSha256": "691b572cbf60c84fc7e7126c2de5854ac1962ce7bdebc8b415849dcb158b76eb"
     }
   }
 }
