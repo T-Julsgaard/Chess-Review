@@ -16,6 +16,7 @@ const dataset=await access.readJson('tools/calibration/public/dataset.json.gz'),
 for(const engine of ['sf18','sf19']){
   const evidence=await access.readJson('tools/calibration/public/'+engine+'-rating-evidence.json.gz');
   const {rows}=observations(evidence,dataset),ids=new Set(rows.map(r=>r.gameId)),maps=mapsFor(dataset.filter(g=>ids.has(g.id)));
+  const trainingCounts=new Map(Array.from({length:5},(_,fold)=>[fold,new Set(rows.filter(r=>maps.outer.get(r.gameId)!==fold).map(r=>r.gameId)).size]));
   const key=r=>r.gameId+':'+r.color+':'+r.ply,byKey=new Map(rows.map(r=>[key(r),r])),seen=new Set();
   if(records[engine].length!==rows.length)throw Error('Coverage count differs');
   for(const saved of records[engine]){
@@ -25,7 +26,7 @@ for(const engine of ['sf18','sf19']){
     for(const name of Object.keys(source))if(saved[name]!==source[name])throw Error('Input binding differs: '+name);
     const fold=report.reports[engine].folds.find(f=>f.fold===saved.fold);
     for(const [family,model]of Object.entries(fold.models)){
-      const trainingGames=new Set(rows.filter(r=>maps.outer.get(r.gameId)!==saved.fold).map(r=>r.gameId)).size;
+      const trainingGames=trainingCounts.get(saved.fold);
       if(!model.converged||model.trainingGames!==trainingGames||model.coefficients.slice(0,model.positiveSlopeCoordinates).some(b=>b<0))throw Error('Invalid fit diagnostics');
       if(Math.abs(predict(model,source)-saved[family])>1e-12)throw Error('Prediction differs');
     }

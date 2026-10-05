@@ -1,0 +1,94 @@
+{
+  "schema": "research-run-v1",
+  "id": "E004-full",
+  "date": "2026-10-05",
+  "sourceRevision": "1adbe50186a1b353e1589680a3efcc49fa42b2d9",
+  "dataEligibility": {
+    "schema": "research-data-eligibility-v1",
+    "policyVersion": "public-data-v1",
+    "policySha256": "87809b474a534fa4c817d6a75af89c5c3f88e63c6fb80eb6c4f3c9be311fb559",
+    "validatorSha256": "524acbf992e13b2d9bc5aec55a4bd41544b67c076909e22d1410e8fe085ba45c",
+    "registrySha256": "ab9c6a9eaad794a92f789922d0929b9f3483adbd06e087fe36264941d18fc8d7",
+    "purpose": "train",
+    "manifestHashes": {
+      "D001": "ff4e21ad5a39ed8b69e58060916995ef92f11ffbe6cefee1524875d85a3aaabb"
+    },
+    "sourceEvidence": {
+      "lichess-standard-2026-summer": {
+        "license": "CC0-1.0",
+        "termsUrl": "https://database.lichess.org/",
+        "verifiedOn": "2026-10-05",
+        "evidenceSha256": "a227e286dce1e9e355101356507e57c4ad89ec39d65f9762f94ab76a6ffdd4ac"
+      }
+    },
+    "inputHashes": {
+      "tools/calibration/public/sources.json": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+      "tools/calibration/public/dataset.json.gz": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+      "tools/calibration/public/sf18-evidence.json.gz": "2771b2b8a7839e4d9f2ddbff73aa6e0dfbe017f3aa3a7b052584147ee21c968b",
+      "tools/calibration/public/sf18-rating-evidence.json.gz": "f41178347bc9569390b744f9e6fb2206882cf2307c762de8b8f8aab35c2a1e31",
+      "tools/calibration/public/sf19-rating-evidence.json.gz": "8ac253f86fa87a945c06e86f2b7c82d4f2b7e8c96ae9b990a6efadbac9f7d721",
+      "tools/calibration/public/expected-scores.json": "969664315be01fab6f719ce158926741c45ec59ef8e3accfe28f0dcc595b7df6",
+      "tools/calibration/public/validation.json": "865aa647f484f3932c42baa2bd15625bd7cdfd253f504aa6d64aba3e4eb07076",
+      "research/experiments/E003-sf19-archive-replay/evidence/sf19-quality.json.gz": "5cef8a6d20482a743351c8ca3a85da030fd95b3eb91a6395aeca0b8d7f7fe745",
+      "research/experiments/E001-evidence-audit/evidence/sf19-quality-archive.json": "3953a2a13f8e491e5c0dedbf40d38bb7d0d24ac4abe546278b8fb8360e1d3c2d",
+      "research/experiments/E003-sf19-archive-replay/evidence/sf19-choice-confirmation.json.gz": "5e9e1f61b48d39030e91dea0615aee4510ac9c29e3fcf3d2b7e3ad47b82efbae",
+      "research/experiments/E001-evidence-audit/evidence/sf19-choice-confirmation-archive.json": "a762d73fb732e107da84d7edae8991cc89227f3252b164d3008e64a7c1c6906b",
+      "research/experiments/E002-nonlinear-rating/evidence/results.json": "9219f67a34e1c1f6ba8252f1b5a46958b8afd7dba13b90c24d660b2370f64f18",
+      "research/experiments/E002-nonlinear-rating/evidence/predictions.json.gz": "a78f5b9f69f1a4ea21a8e17cbedb373e6b56cc432f36b9d1dbdb75d2cbebc8ac",
+      "tools/calibration/public/manifest.json": "e7d928e440f8a4b73bfa64c11e11f48320f9f3cc556c29a3bca72e1e5d15ff6a",
+      "research/experiments/E003-sf19-archive-replay/evidence/inputs.json": "e752fd0883e2db58b1121071dc59e879adcd8e982984198e58e9056f9ad84447",
+      "research/experiments/E004-practical-outcomes/evidence/results.json": "f2d89e9d9e07b45bceca955af522fca4d0ad39db100b0bece0e235403c93adea",
+      "research/experiments/E004-practical-outcomes/evidence/predictions.json.gz": "89bc0719cc00708a80d55b6c5c7a88d53d0f52e05d252eddda052b434d1c3e96"
+    },
+    "datasets": {
+      "D001": {
+        "gameCount": 2000,
+        "archives": [
+          "https://database.lichess.org/standard/lichess_db_standard_rated_2026-06.pgn.zst",
+          "https://database.lichess.org/standard/lichess_db_standard_rated_2026-07.pgn.zst",
+          "https://database.lichess.org/standard/lichess_db_standard_rated_2026-08.pgn.zst"
+        ],
+        "provenanceStatus": "legacy-partial",
+        "limitations": [
+          "Original selection/normalization pipeline is not reconstructed.",
+          "Per-game membership in retrieved archive frames and whole-archive checksums are not independently verified.",
+          "Existing development/test exposure prevents new confirmation claims."
+        ]
+      }
+    }
+  },
+  "command": "node research/experiments/E004-practical-outcomes/code/evaluate.mjs",
+  "environment": {
+    "node": "v24.14.1",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "codeSha256": {
+    "evaluate.mjs": "9315d1bb11d6fded751de62518dd68d30c0ce79152420aff5577803fd4411547",
+    "model.mjs": "932b37d7f84539e42531c44e134ffec5da1fd14d57dcc8a68200932a5d15bf65"
+  },
+  "inputs": {
+    "dataset.json.gz": {
+      "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+      "bytes": 463748,
+      "uncompressedSha256": "54b589844813490a1ebd15251e6142e2a361d6fac53d6dfe38414ded1cdf5708"
+    },
+    "sf18-rating-evidence.json.gz": {
+      "sha256": "f41178347bc9569390b744f9e6fb2206882cf2307c762de8b8f8aab35c2a1e31",
+      "bytes": 1320424,
+      "uncompressedSha256": "c4f3b5caeb78511d34ce4c9031b53ab6e00338871bad5119d488bfc0e8f365f7"
+    },
+    "sf19-rating-evidence.json.gz": {
+      "sha256": "8ac253f86fa87a945c06e86f2b7c82d4f2b7e8c96ae9b990a6efadbac9f7d721",
+      "bytes": 683399,
+      "uncompressedSha256": "cea288e5a8eeb7f2f5202b7d8fd526b7a454d9b597eaf4ee61c1e0dcaf080ecc"
+    }
+  },
+  "outputs": {
+    "results.json": "f2d89e9d9e07b45bceca955af522fca4d0ad39db100b0bece0e235403c93adea",
+    "predictions.json.gz": "89bc0719cc00708a80d55b6c5c7a88d53d0f52e05d252eddda052b434d1c3e96"
+  },
+  "elapsedMs": 17428.0088,
+  "engineSearches": 0,
+  "evaluationRole": "nested development outcome CV; recorded ratings are contextual predictors; no validation/test scoring"
+}

@@ -1,0 +1,2665 @@
+{
+  "schema": "E004-outcome-development-v1",
+  "smoke": false,
+  "plies": [
+    10,
+    11,
+    30,
+    31,
+    50,
+    51,
+    70,
+    71
+  ],
+  "lambdas": [
+    0.1,
+    1,
+    10
+  ],
+  "reports": {
+    "sf18": {
+      "engineConfig": {
+        "version": "Stockfish 18 (identity verified at UCI startup)",
+        "majorVersion": 18,
+        "build": "stockfish.js lite single-threaded",
+        "network": "nn-9067e33176e8.nnue",
+        "loaderSha256": "2278005057f381491f1c9bb3e44c9f5920b3a00bef9759e33cc6582769a1f1fe",
+        "wasmSha256": "a8fbc05ec6920b56d7485826dcb02c5ffd2826bcbf751cf973046f237a9096f1",
+        "budget": {
+          "kind": "nodes",
+          "value": 20000
+        },
+        "options": {
+          "Threads": 1,
+          "Hash": 32,
+          "MultiPV": 1,
+          "Skill Level": 20,
+          "UCI_LimitStrength": false,
+          "UCI_ShowWDL": true,
+          "UCI_Chess960": false
+        },
+        "reset": "ucinewgame + Clear Hash + isready before every search",
+        "tablebases": "none",
+        "perspective": "side to move at root",
+        "position": "startpos with full move history"
+      },
+      "counts": {
+        "games": 1400,
+        "positions": 8437,
+        "selectedBeforeMate": 8592,
+        "mateExcluded": 155
+      },
+      "folds": [
+        {
+          "fold": 0,
+          "trainingGames": 1136,
+          "testGames": 264,
+          "models": {
+            "scalar": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "scalar",
+              "lambda": 10,
+              "coefficients": [
+                0.15523547616538133
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 4,
+              "converged": true,
+              "maximumProjectedGradient": 2.122859610125224e-11,
+              "objective": 726.5394865081163,
+              "trainingGames": 1136
+            },
+            "static": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "static",
+              "lambda": 0.1,
+              "coefficients": [
+                0.15372034750374883,
+                0.9181062388414748,
+                -0.10513528727490382
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 5,
+              "converged": true,
+              "maximumProjectedGradient": 9.921300577497266e-9,
+              "objective": 718.3056972986304,
+              "trainingGames": 1136
+            },
+            "phaseSkill": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "phaseSkill",
+              "lambda": 1,
+              "coefficients": [
+                0.07842069515102584,
+                0.20658437663768958,
+                0.14246473581580968,
+                0.2418505952831911,
+                0.8583601011599442,
+                -0.10065274441775907
+              ],
+              "positiveSlopeCoordinates": 4,
+              "sweeps": 39,
+              "converged": true,
+              "maximumProjectedGradient": 8.084991801601005e-8,
+              "objective": 716.9556026375893,
+              "trainingGames": 1136
+            }
+          },
+          "tuning": {
+            "scalar": {
+              "lambda": 10,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6399954015172612
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6399950436677165
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6399919860363896
+                }
+              ]
+            },
+            "static": {
+              "lambda": 0.1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6334888582088015
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6335072879596746
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6347119411608997
+                }
+              ]
+            },
+            "phaseSkill": {
+              "lambda": 1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6323829932595115
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6323766575394979
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6334802037561001
+                }
+              ]
+            }
+          },
+          "metrics": {
+            "raw": {
+              "games": 264,
+              "positions": 1549,
+              "logLoss": 2.4717652373699135,
+              "brier": 0.2641075433216101,
+              "bias": 0.03664169372294387
+            },
+            "scalar": {
+              "games": 264,
+              "positions": 1549,
+              "logLoss": 0.6508646411571665,
+              "brier": 0.21938737562877256,
+              "bias": 0.01535636284168654
+            },
+            "static": {
+              "games": 264,
+              "positions": 1549,
+              "logLoss": 0.645533345381104,
+              "brier": 0.21732794507886258,
+              "bias": 0.015097670226396524
+            },
+            "phaseSkill": {
+              "games": 264,
+              "positions": 1549,
+              "logLoss": 0.6445198072048994,
+              "brier": 0.2169793592034957,
+              "bias": 0.014550992711984187
+            }
+          }
+        },
+        {
+          "fold": 1,
+          "trainingGames": 1116,
+          "testGames": 284,
+          "models": {
+            "scalar": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "scalar",
+              "lambda": 10,
+              "coefficients": [
+                0.1567048818956709
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 4,
+              "converged": true,
+              "maximumProjectedGradient": 1.684033672168827e-11,
+              "objective": 713.5285670684632,
+              "trainingGames": 1116
+            },
+            "static": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "static",
+              "lambda": 1,
+              "coefficients": [
+                0.15350649503324762,
+                1.0561438060081094,
+                -0.0802163685329844
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 5,
+              "converged": true,
+              "maximumProjectedGradient": 2.584413011957031e-8,
+              "objective": 703.1385596094452,
+              "trainingGames": 1116
+            },
+            "phaseSkill": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "phaseSkill",
+              "lambda": 1,
+              "coefficients": [
+                0.0976796102165679,
+                0.18722129382697544,
+                0.138808990770038,
+                0.23501060766063844,
+                1.0486826145492594,
+                -0.07616199096050902
+              ],
+              "positiveSlopeCoordinates": 4,
+              "sweeps": 34,
+              "converged": true,
+              "maximumProjectedGradient": 8.127059736858416e-8,
+              "objective": 702.0178266323783,
+              "trainingGames": 1116
+            }
+          },
+          "tuning": {
+            "scalar": {
+              "lambda": 10,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6397667028674053
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6397665445221207
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6397654999558984
+                }
+              ]
+            },
+            "static": {
+              "lambda": 1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6328233985968309
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6326616548868829
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6338461205712502
+                }
+              ]
+            },
+            "phaseSkill": {
+              "lambda": 1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6328386598185249
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6325883644914666
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6334382148628525
+                }
+              ]
+            }
+          },
+          "metrics": {
+            "raw": {
+              "games": 284,
+              "positions": 1752,
+              "logLoss": 2.700182000744995,
+              "brier": 0.2595324151691408,
+              "bias": 0.03903812667672719
+            },
+            "scalar": {
+              "games": 284,
+              "positions": 1752,
+              "logLoss": 0.6509448197644363,
+              "brier": 0.21726435217640122,
+              "bias": 0.016528938465520292
+            },
+            "static": {
+              "games": 284,
+              "positions": 1752,
+              "logLoss": 0.6553142241606773,
+              "brier": 0.2185477082602267,
+              "bias": 0.016408095691359068
+            },
+            "phaseSkill": {
+              "games": 284,
+              "positions": 1752,
+              "logLoss": 0.6523129343436451,
+              "brier": 0.21755577555872335,
+              "bias": 0.01614026322200769
+            }
+          }
+        },
+        {
+          "fold": 2,
+          "trainingGames": 1109,
+          "testGames": 291,
+          "models": {
+            "scalar": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "scalar",
+              "lambda": 10,
+              "coefficients": [
+                0.14495583638516316
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 4,
+              "converged": true,
+              "maximumProjectedGradient": 6.718323858360807e-11,
+              "objective": 716.3141448855039,
+              "trainingGames": 1109
+            },
+            "static": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "static",
+              "lambda": 1,
+              "coefficients": [
+                0.14183030282274078,
+                0.9015008704398437,
+                -0.046917498879302445
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 5,
+              "converged": true,
+              "maximumProjectedGradient": 2.756460267883619e-9,
+              "objective": 709.0663828687948,
+              "trainingGames": 1109
+            },
+            "phaseSkill": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "phaseSkill",
+              "lambda": 1,
+              "coefficients": [
+                0.10214482052745777,
+                0.04135855372754452,
+                0.1312315756236015,
+                0.2928918797368201,
+                0.9008605571197368,
+                -0.03912559123077681
+              ],
+              "positiveSlopeCoordinates": 4,
+              "sweeps": 46,
+              "converged": true,
+              "maximumProjectedGradient": 7.980631355035328e-8,
+              "objective": 707.0968126039726,
+              "trainingGames": 1109
+            }
+          },
+          "tuning": {
+            "scalar": {
+              "lambda": 10,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6464109243984635
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6464105555624345
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6464073327391661
+                }
+              ]
+            },
+            "static": {
+              "lambda": 1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6412393223465929
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6411159958677409
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.641927686212853
+                }
+              ]
+            },
+            "phaseSkill": {
+              "lambda": 1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6399492304413982
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6397949096171056
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6404962964521735
+                }
+              ]
+            }
+          },
+          "metrics": {
+            "raw": {
+              "games": 291,
+              "positions": 1790,
+              "logLoss": 2.169261160789178,
+              "brier": 0.2303478748823851,
+              "bias": 0.03505109433807899
+            },
+            "scalar": {
+              "games": 291,
+              "positions": 1790,
+              "logLoss": 0.6260264839489837,
+              "brier": 0.20445590206004605,
+              "bias": 0.014456426612540655
+            },
+            "static": {
+              "games": 291,
+              "positions": 1790,
+              "logLoss": 0.619015416568935,
+              "brier": 0.20197223309297943,
+              "bias": 0.014011110952370499
+            },
+            "phaseSkill": {
+              "games": 291,
+              "positions": 1790,
+              "logLoss": 0.6199363321811945,
+              "brier": 0.20240725458716463,
+              "bias": 0.012998944323568797
+            }
+          }
+        },
+        {
+          "fold": 3,
+          "trainingGames": 1124,
+          "testGames": 276,
+          "models": {
+            "scalar": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "scalar",
+              "lambda": 10,
+              "coefficients": [
+                0.149878372200074
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 4,
+              "converged": true,
+              "maximumProjectedGradient": 3.869936977635659e-11,
+              "objective": 722.7292509572325,
+              "trainingGames": 1124
+            },
+            "static": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "static",
+              "lambda": 1,
+              "coefficients": [
+                0.1483747142488823,
+                0.7421004910857616,
+                -0.08754844073043837
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 5,
+              "converged": true,
+              "maximumProjectedGradient": 1.2642961307915429e-8,
+              "objective": 716.5700049958696,
+              "trainingGames": 1124
+            },
+            "phaseSkill": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "phaseSkill",
+              "lambda": 1,
+              "coefficients": [
+                0.08616355860083114,
+                0.13350071559526716,
+                0.13470999064637545,
+                0.2708525002808832,
+                0.7384096976654504,
+                -0.07986068496362762
+              ],
+              "positiveSlopeCoordinates": 4,
+              "sweeps": 39,
+              "converged": true,
+              "maximumProjectedGradient": 7.876020695862883e-8,
+              "objective": 714.7377202972789,
+              "trainingGames": 1124
+            }
+          },
+          "tuning": {
+            "scalar": {
+              "lambda": 10,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6444950789114912
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6444939739887817
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6444834772920794
+                }
+              ]
+            },
+            "static": {
+              "lambda": 1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6403746960804735
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.640339685761458
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6410120960110851
+                }
+              ]
+            },
+            "phaseSkill": {
+              "lambda": 1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6394150960664098
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6393227784976058
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.639709585513768
+                }
+              ]
+            }
+          },
+          "metrics": {
+            "raw": {
+              "games": 276,
+              "positions": 1669,
+              "logLoss": 2.4025554827953535,
+              "brier": 0.25180106506426986,
+              "bias": 0.030285813492063652
+            },
+            "scalar": {
+              "games": 276,
+              "positions": 1669,
+              "logLoss": 0.6363397276119891,
+              "brier": 0.21758152425610014,
+              "bias": 0.010930072096373597
+            },
+            "static": {
+              "games": 276,
+              "positions": 1669,
+              "logLoss": 0.6253759398772993,
+              "brier": 0.21295327120843052,
+              "bias": 0.011007993377632022
+            },
+            "phaseSkill": {
+              "games": 276,
+              "positions": 1669,
+              "logLoss": 0.6246167217334414,
+              "brier": 0.21271779232468366,
+              "bias": 0.010021936915734275
+            }
+          }
+        },
+        {
+          "fold": 4,
+          "trainingGames": 1115,
+          "testGames": 285,
+          "models": {
+            "scalar": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "scalar",
+              "lambda": 10,
+              "coefficients": [
+                0.1541988937799886
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 4,
+              "converged": true,
+              "maximumProjectedGradient": 2.2288536736228414e-11,
+              "objective": 714.1836281585074,
+              "trainingGames": 1115
+            },
+            "static": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "static",
+              "lambda": 1,
+              "coefficients": [
+                0.15148080329440833,
+                0.8183691981129441,
+                -0.053842431661083066
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 5,
+              "converged": true,
+              "maximumProjectedGradient": 2.899755941095918e-9,
+              "objective": 707.8490972378003,
+              "trainingGames": 1115
+            },
+            "phaseSkill": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "phaseSkill",
+              "lambda": 1,
+              "coefficients": [
+                0.07998544094336199,
+                0.20667711396510177,
+                0.12005518608499298,
+                0.2614743513078079,
+                0.8198351062176934,
+                -0.050249065294284176
+              ],
+              "positiveSlopeCoordinates": 4,
+              "sweeps": 34,
+              "converged": true,
+              "maximumProjectedGradient": 8.807539595313918e-8,
+              "objective": 705.7223927922338,
+              "trainingGames": 1115
+            }
+          },
+          "tuning": {
+            "scalar": {
+              "lambda": 10,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6415989063617
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6415982003409368
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6415917048344016
+                }
+              ]
+            },
+            "static": {
+              "lambda": 1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6380767876341755
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6379051084686592
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6383511861360913
+                }
+              ]
+            },
+            "phaseSkill": {
+              "lambda": 1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6367050780286083
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6364971189140082
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6368175338711694
+                }
+              ]
+            }
+          },
+          "metrics": {
+            "raw": {
+              "games": 285,
+              "positions": 1677,
+              "logLoss": 2.623324050397567,
+              "brier": 0.2568606243535936,
+              "bias": 0.034561994569757844
+            },
+            "scalar": {
+              "games": 285,
+              "positions": 1677,
+              "logLoss": 0.6462121204004028,
+              "brier": 0.22215802421336353,
+              "bias": 0.013178855904836825
+            },
+            "static": {
+              "games": 285,
+              "positions": 1677,
+              "logLoss": 0.6358517312739516,
+              "brier": 0.21770287475033637,
+              "bias": 0.01288354716220359
+            },
+            "phaseSkill": {
+              "games": 285,
+              "positions": 1677,
+              "logLoss": 0.6365664082194931,
+              "brier": 0.21783024409783483,
+              "bias": 0.012639227727743124
+            }
+          }
+        }
+      ],
+      "metrics": {
+        "raw": {
+          "games": 1400,
+          "positions": 8437,
+          "logLoss": 2.4724324116297316,
+          "brier": 0.25226085773873014,
+          "bias": 0.035120826105441455
+        },
+        "scalar": {
+          "games": 1400,
+          "positions": 8437,
+          "logLoss": 0.6419075143162448,
+          "brier": 0.21606110591360453,
+          "bias": 0.01409128020724249
+        },
+        "static": {
+          "games": 1400,
+          "positions": 8437,
+          "logLoss": 0.6360607370592805,
+          "brier": 0.21359747759581946,
+          "bias": 0.013880667511934577
+        },
+        "phaseSkill": {
+          "games": 1400,
+          "positions": 8437,
+          "logLoss": 0.6354480119009874,
+          "brier": 0.2134004517305375,
+          "bias": 0.013268731514515384
+        }
+      },
+      "comparisons": {
+        "scalar": {
+          "estimate": 0.00645950241526384,
+          "lower": 0.0003388193510756206,
+          "upper": 0.01271956027859426,
+          "level": 0.975,
+          "iterations": 10000,
+          "seed": 20261015,
+          "unit": "game; all selected positions and colors together",
+          "interpretation": "Development percentile interval; positive favors phase/strength candidate"
+        },
+        "static": {
+          "estimate": 0.000612725158294898,
+          "lower": -0.0016720544970529117,
+          "upper": 0.002818132180072675,
+          "level": 0.975,
+          "iterations": 10000,
+          "seed": 20261016,
+          "unit": "game; all selected positions and colors together",
+          "interpretation": "Development percentile interval; positive favors phase/strength candidate"
+        },
+        "raw": {
+          "estimate": 1.8369843997287971,
+          "lower": 1.58665496137006,
+          "upper": 2.090913982134966,
+          "level": 0.975,
+          "iterations": 10000,
+          "seed": 20261017,
+          "unit": "game; all selected positions and colors together",
+          "interpretation": "Development percentile interval; positive favors phase/strength candidate"
+        }
+      },
+      "subgroups": [
+        {
+          "label": "color:b",
+          "scalar": {
+            "games": 1398,
+            "positions": 4244,
+            "logLoss": 0.6432821433911076,
+            "brier": 0.2167283788999911,
+            "bias": -0.003041005122980843
+          },
+          "candidate": {
+            "games": 1398,
+            "positions": 4244,
+            "logLoss": 0.637667187467236,
+            "brier": 0.2144362219707741,
+            "bias": 0.01285423928131726
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "color:w",
+          "scalar": {
+            "games": 1400,
+            "positions": 4193,
+            "logLoss": 0.6405153907065709,
+            "brier": 0.21538534072325632,
+            "bias": 0.031441603528908256
+          },
+          "candidate": {
+            "games": 1400,
+            "positions": 4193,
+            "logLoss": 0.633200593483699,
+            "brier": 0.21235149952081037,
+            "bias": 0.013688498878979728
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "mean-rating:1200-1999",
+          "scalar": {
+            "games": 643,
+            "positions": 3889,
+            "logLoss": 0.6385460793974281,
+            "brier": 0.21435099313126832,
+            "bias": 0.014970373180123281
+          },
+          "candidate": {
+            "games": 643,
+            "positions": 3889,
+            "logLoss": 0.6329456761869204,
+            "brier": 0.21217031017143734,
+            "bias": 0.014410303048230268
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "mean-rating:<1200",
+          "scalar": {
+            "games": 379,
+            "positions": 2029,
+            "logLoss": 0.646882814297479,
+            "brier": 0.22140800463754404,
+            "bias": 0.016641522085211767
+          },
+          "candidate": {
+            "games": 379,
+            "positions": 2029,
+            "logLoss": 0.6427962733199685,
+            "brier": 0.21983660375156597,
+            "bias": 0.013157462105594304
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "mean-rating:>=2000",
+          "scalar": {
+            "games": 378,
+            "positions": 2519,
+            "logLoss": 0.6426370486017606,
+            "brier": 0.21360906332809873,
+            "bias": 0.010038903346627858
+          },
+          "candidate": {
+            "games": 378,
+            "positions": 2519,
+            "logLoss": 0.632336929325227,
+            "brier": 0.20903981523989637,
+            "bias": 0.01143841566743266
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "ply:10",
+          "scalar": {
+            "games": 1400,
+            "positions": 2797,
+            "logLoss": 0.6901899541120357,
+            "brier": 0.24191184629565377,
+            "bias": 0.008501093494027933
+          },
+          "candidate": {
+            "games": 1400,
+            "positions": 2797,
+            "logLoss": 0.6825643625514126,
+            "brier": 0.23860285135913745,
+            "bias": 0.006155990562552084
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "ply:30",
+          "scalar": {
+            "games": 1308,
+            "positions": 2597,
+            "logLoss": 0.6409887421023366,
+            "brier": 0.21682122703682044,
+            "bias": 0.020455001653926722
+          },
+          "candidate": {
+            "games": 1308,
+            "positions": 2597,
+            "logLoss": 0.6362630536327691,
+            "brier": 0.21474601984247668,
+            "bias": 0.019279701838418598
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "ply:50",
+          "scalar": {
+            "games": 975,
+            "positions": 1914,
+            "logLoss": 0.5858950055457156,
+            "brier": 0.1869404913389604,
+            "bias": 0.015544838989863863
+          },
+          "candidate": {
+            "games": 975,
+            "positions": 1914,
+            "logLoss": 0.5801663585299658,
+            "brier": 0.1849573776614937,
+            "bias": 0.016354287332448057
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "ply:70",
+          "scalar": {
+            "games": 580,
+            "positions": 1129,
+            "logLoss": 0.5687675813370493,
+            "brier": 0.17132053101616737,
+            "bias": 0.012718259192283062
+          },
+          "candidate": {
+            "games": 580,
+            "positions": 1129,
+            "logLoss": 0.5599298137586316,
+            "brier": 0.16799687431102697,
+            "bias": 0.01565221640038995
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "wdl:0.1-0.9",
+          "scalar": {
+            "games": 1334,
+            "positions": 4630,
+            "logLoss": 0.6919598516218252,
+            "brier": 0.23888718620600718,
+            "bias": 0.011844238570671127
+          },
+          "candidate": {
+            "games": 1334,
+            "positions": 4630,
+            "logLoss": 0.6854527811591482,
+            "brier": 0.23600532353948858,
+            "bias": 0.011449011046269284
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "wdl:<0.1",
+          "scalar": {
+            "games": 1004,
+            "positions": 1670,
+            "logLoss": 0.5553990110560999,
+            "brier": 0.17665120715622631,
+            "bias": 0.021086059089595204
+          },
+          "candidate": {
+            "games": 1004,
+            "positions": 1670,
+            "logLoss": 0.5501578574399482,
+            "brier": 0.17495572695782471,
+            "bias": 0.018583987351034108
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "wdl:>0.9",
+          "scalar": {
+            "games": 1152,
+            "positions": 2137,
+            "logLoss": 0.5918493694843959,
+            "brier": 0.19320033405897863,
+            "bias": 0.013954039649314588
+          },
+          "candidate": {
+            "games": 1152,
+            "positions": 2137,
+            "logLoss": 0.5845666303608767,
+            "brier": 0.19031418136198064,
+            "bias": 0.013425334187268387
+          },
+          "sufficient": true,
+          "passed": true
+        }
+      ],
+      "calibration": {
+        "raw": [
+          {
+            "bin": 0,
+            "positions": 1670,
+            "weight": 262.2761904761886,
+            "predicted": 0.008021701042158462,
+            "observed": 0.24657985039398816
+          },
+          {
+            "bin": 1,
+            "positions": 146,
+            "weight": 24.239285714285728,
+            "predicted": 0.14784151073129995,
+            "observed": 0.4286380826089089
+          },
+          {
+            "bin": 2,
+            "positions": 157,
+            "weight": 27.195238095238107,
+            "predicted": 0.252171686219576,
+            "observed": 0.45252582735072633
+          },
+          {
+            "bin": 3,
+            "positions": 249,
+            "weight": 45.0642857142857,
+            "predicted": 0.3580054947957946,
+            "observed": 0.44217255772177316
+          },
+          {
+            "bin": 4,
+            "positions": 1505,
+            "weight": 253.5845238095222,
+            "predicted": 0.47082972006140944,
+            "observed": 0.4657224274802753
+          },
+          {
+            "bin": 5,
+            "positions": 1838,
+            "weight": 317.159523809524,
+            "predicted": 0.5322548139362042,
+            "observed": 0.5141978274414998
+          },
+          {
+            "bin": 6,
+            "positions": 342,
+            "weight": 62.85238095238087,
+            "predicted": 0.6413880123494214,
+            "observed": 0.49821956208803797
+          },
+          {
+            "bin": 7,
+            "positions": 198,
+            "weight": 34.45714285714286,
+            "predicted": 0.7458894762299614,
+            "observed": 0.5223362354892205
+          },
+          {
+            "bin": 8,
+            "positions": 194,
+            "weight": 30.858333333333356,
+            "predicted": 0.8486767871609884,
+            "observed": 0.5391767292928508
+          },
+          {
+            "bin": 9,
+            "positions": 2138,
+            "weight": 342.3130952380962,
+            "predicted": 0.9907795442768543,
+            "observed": 0.7146844124183093
+          }
+        ],
+        "scalar": [
+          {
+            "bin": 0,
+            "positions": 0,
+            "weight": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": 1,
+            "positions": 0,
+            "weight": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": 2,
+            "positions": 1351,
+            "weight": 209.75357142857035,
+            "predicted": 0.24236350825161965,
+            "observed": 0.2233970702581838
+          },
+          {
+            "bin": 3,
+            "positions": 252,
+            "weight": 41.29404761904761,
+            "predicted": 0.3575426879318083,
+            "observed": 0.35245192723498714
+          },
+          {
+            "bin": 4,
+            "positions": 2124,
+            "weight": 361.3119047619064,
+            "predicted": 0.4836769196539072,
+            "observed": 0.45385203392399087
+          },
+          {
+            "bin": 5,
+            "positions": 2680,
+            "weight": 464.4952380952424,
+            "predicted": 0.5175329535271517,
+            "observed": 0.5211212375953339
+          },
+          {
+            "bin": 6,
+            "positions": 351,
+            "weight": 59.12380952380944,
+            "predicted": 0.6448321442269316,
+            "observed": 0.5904377416237123
+          },
+          {
+            "bin": 7,
+            "positions": 1679,
+            "weight": 264.02142857142695,
+            "predicted": 0.757233426863582,
+            "observed": 0.7450603756910075
+          },
+          {
+            "bin": 8,
+            "positions": 0,
+            "weight": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": 9,
+            "positions": 0,
+            "weight": 0,
+            "predicted": null,
+            "observed": null
+          }
+        ],
+        "static": [
+          {
+            "bin": 0,
+            "positions": 19,
+            "weight": 3.2916666666666665,
+            "predicted": 0.0591768190037729,
+            "observed": 0.0759493670886076
+          },
+          {
+            "bin": 1,
+            "positions": 137,
+            "weight": 22.189285714285724,
+            "predicted": 0.17066866909709075,
+            "observed": 0.2058050324588228
+          },
+          {
+            "bin": 2,
+            "positions": 1178,
+            "weight": 182.67976190476128,
+            "predicted": 0.24555511056140292,
+            "observed": 0.2234556959550613
+          },
+          {
+            "bin": 3,
+            "positions": 382,
+            "weight": 63.078571428571365,
+            "predicted": 0.35130273995489175,
+            "observed": 0.30434454384176984
+          },
+          {
+            "bin": 4,
+            "positions": 2176,
+            "weight": 373.0238095238112,
+            "predicted": 0.46729384338174607,
+            "observed": 0.4720894236292813
+          },
+          {
+            "bin": 5,
+            "positions": 2414,
+            "weight": 414.03809523809866,
+            "predicted": 0.5348456797192329,
+            "observed": 0.50649957445829
+          },
+          {
+            "bin": 6,
+            "positions": 480,
+            "weight": 80.33214285714287,
+            "predicted": 0.6487315712512562,
+            "observed": 0.6708605640273264
+          },
+          {
+            "bin": 7,
+            "positions": 1468,
+            "weight": 231.46309523809384,
+            "predicted": 0.7535006165012292,
+            "observed": 0.7369399626598945
+          },
+          {
+            "bin": 8,
+            "positions": 161,
+            "weight": 25.861904761904764,
+            "predicted": 0.8290452569905205,
+            "observed": 0.7799208248941263
+          },
+          {
+            "bin": 9,
+            "positions": 22,
+            "weight": 4.041666666666666,
+            "predicted": 0.936946617080764,
+            "observed": 0.9381443298969073
+          }
+        ],
+        "phaseSkill": [
+          {
+            "bin": 0,
+            "positions": 31,
+            "weight": 4.892857142857143,
+            "predicted": 0.06684277591973073,
+            "observed": 0.12773722627737225
+          },
+          {
+            "bin": 1,
+            "positions": 320,
+            "weight": 44.91904761904758,
+            "predicted": 0.17069505552628528,
+            "observed": 0.15910897911586996
+          },
+          {
+            "bin": 2,
+            "positions": 932,
+            "weight": 145.7416666666667,
+            "predicted": 0.24871103352067342,
+            "observed": 0.2273837432508598
+          },
+          {
+            "bin": 3,
+            "positions": 421,
+            "weight": 71.86666666666662,
+            "predicted": 0.347038302453416,
+            "observed": 0.33086237741850016
+          },
+          {
+            "bin": 4,
+            "positions": 2188,
+            "weight": 377.20000000000186,
+            "predicted": 0.4676820946640652,
+            "observed": 0.46106334898752394
+          },
+          {
+            "bin": 5,
+            "positions": 2432,
+            "weight": 418.8047619047655,
+            "predicted": 0.5341265213863268,
+            "observed": 0.5154578221469187
+          },
+          {
+            "bin": 6,
+            "positions": 536,
+            "weight": 95.91071428571445,
+            "predicted": 0.6521566959118185,
+            "observed": 0.6502761745174684
+          },
+          {
+            "bin": 7,
+            "positions": 1164,
+            "weight": 182.31071428571386,
+            "predicted": 0.7503734475096199,
+            "observed": 0.7396223088526297
+          },
+          {
+            "bin": 8,
+            "positions": 374,
+            "weight": 52.049999999999955,
+            "predicted": 0.8291206269421454,
+            "observed": 0.7988884314532734
+          },
+          {
+            "bin": 9,
+            "positions": 39,
+            "weight": 6.30357142857143,
+            "predicted": 0.929218713427177,
+            "observed": 0.9206798866855522
+          }
+        ]
+      },
+      "gates": {
+        "practical": false,
+        "uncertainty": true,
+        "brier": true,
+        "identicalCoverage": true,
+        "subgroups": true,
+        "monotone": true
+      },
+      "passed": false,
+      "evidence": "development only"
+    },
+    "sf19": {
+      "engineConfig": {
+        "version": "Stockfish 19 (identity verified at UCI startup)",
+        "majorVersion": 19,
+        "build": "stockfish.js lite single-threaded",
+        "network": "nn-61e7af4bb97d.nnue",
+        "loaderSha256": "d3344124ab067fb0b90ee77873bb8e9fbf5fc01bc525fe714b0f942581e889e6",
+        "wasmSha256": "57ac2d72312aba346760e3f173f687a8c211208e97a87268436f7f0e10bb5387",
+        "budget": {
+          "kind": "nodes",
+          "value": 20000
+        },
+        "options": {
+          "Threads": 1,
+          "Hash": 32,
+          "MultiPV": 1,
+          "Skill Level": 20,
+          "UCI_LimitStrength": false,
+          "UCI_ShowWDL": true,
+          "UCI_Chess960": false
+        },
+        "reset": "ucinewgame + Clear Hash + isready before every search",
+        "tablebases": "none",
+        "perspective": "side to move at root",
+        "position": "startpos with full move history"
+      },
+      "counts": {
+        "games": 750,
+        "positions": 4525,
+        "selectedBeforeMate": 4597,
+        "mateExcluded": 72
+      },
+      "folds": [
+        {
+          "fold": 0,
+          "trainingGames": 604,
+          "testGames": 146,
+          "models": {
+            "scalar": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "scalar",
+              "lambda": 10,
+              "coefficients": [
+                0.1477976130156085
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 4,
+              "converged": true,
+              "maximumProjectedGradient": 6.662150981730582e-11,
+              "objective": 386.6547900176126,
+              "trainingGames": 604
+            },
+            "static": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "static",
+              "lambda": 1,
+              "coefficients": [
+                0.14641693965283764,
+                0.810100579786924,
+                -0.14805271280577056
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 5,
+              "converged": true,
+              "maximumProjectedGradient": 6.892270357548014e-9,
+              "objective": 381.7802047745566,
+              "trainingGames": 604
+            },
+            "phaseSkill": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "phaseSkill",
+              "lambda": 1,
+              "coefficients": [
+                0.03904452756337829,
+                0.1542673134008728,
+                0.20584329961719797,
+                0.2102052835716696,
+                0.815102651902224,
+                -0.14214716112969938
+              ],
+              "positiveSlopeCoordinates": 4,
+              "sweeps": 42,
+              "converged": true,
+              "maximumProjectedGradient": 7.820009081810094e-8,
+              "objective": 380.4094329277657,
+              "trainingGames": 604
+            }
+          },
+          "tuning": {
+            "scalar": {
+              "lambda": 10,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6410164219812554
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6410146606230513
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6409987644084083
+                }
+              ]
+            },
+            "static": {
+              "lambda": 1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.634592803961855
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6344628083417553
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6360552549822286
+                }
+              ]
+            },
+            "phaseSkill": {
+              "lambda": 1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6338250215306136
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6335984913353899
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.634741578356738
+                }
+              ]
+            }
+          },
+          "metrics": {
+            "raw": {
+              "games": 146,
+              "positions": 883,
+              "logLoss": 2.931571878566059,
+              "brier": 0.2760111306771845,
+              "bias": 0.03750446428571414
+            },
+            "scalar": {
+              "games": 146,
+              "positions": 883,
+              "logLoss": 0.6510816031310485,
+              "brier": 0.21963676769057908,
+              "bias": 0.016955715994631484
+            },
+            "static": {
+              "games": 146,
+              "positions": 883,
+              "logLoss": 0.6375461900241781,
+              "brier": 0.21358803513567542,
+              "bias": 0.01684341797394134
+            },
+            "phaseSkill": {
+              "games": 146,
+              "positions": 883,
+              "logLoss": 0.6332370908317397,
+              "brier": 0.2120879617092402,
+              "bias": 0.015178552914971884
+            }
+          }
+        },
+        {
+          "fold": 1,
+          "trainingGames": 599,
+          "testGames": 151,
+          "models": {
+            "scalar": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "scalar",
+              "lambda": 10,
+              "coefficients": [
+                0.1501016657639257
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 4,
+              "converged": true,
+              "maximumProjectedGradient": 5.169297433065734e-11,
+              "objective": 382.43108260404176,
+              "trainingGames": 599
+            },
+            "static": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "static",
+              "lambda": 1,
+              "coefficients": [
+                0.1479351098292374,
+                0.8770965843031087,
+                -0.1302244020129262
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 5,
+              "converged": true,
+              "maximumProjectedGradient": 4.083702100368667e-9,
+              "objective": 377.31665166824826,
+              "trainingGames": 599
+            },
+            "phaseSkill": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "phaseSkill",
+              "lambda": 1,
+              "coefficients": [
+                0.04416984222998027,
+                0.13973079370517685,
+                0.206225944764899,
+                0.2233861098764533,
+                0.8738370711580501,
+                -0.12031225308361455
+              ],
+              "positiveSlopeCoordinates": 4,
+              "sweeps": 40,
+              "converged": true,
+              "maximumProjectedGradient": 8.233962615071735e-8,
+              "objective": 375.9228182599129,
+              "trainingGames": 599
+            }
+          },
+          "tuning": {
+            "scalar": {
+              "lambda": 10,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6394026925975542
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6394016792710757
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6393931875535275
+                }
+              ]
+            },
+            "static": {
+              "lambda": 1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6337064137951041
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6335799808625253
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6353853104329913
+                }
+              ]
+            },
+            "phaseSkill": {
+              "lambda": 1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6328244809704333
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6325302032675845
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6337318136363609
+                }
+              ]
+            }
+          },
+          "metrics": {
+            "raw": {
+              "games": 151,
+              "positions": 936,
+              "logLoss": 2.9458917898002484,
+              "brier": 0.2747935438662885,
+              "bias": 0.04159791075370547
+            },
+            "scalar": {
+              "games": 151,
+              "positions": 936,
+              "logLoss": 0.6577314966546487,
+              "brier": 0.2245340854284131,
+              "bias": 0.017209505170589716
+            },
+            "static": {
+              "games": 151,
+              "positions": 936,
+              "logLoss": 0.64621498731991,
+              "brier": 0.21921401399256413,
+              "bias": 0.01731320284742844
+            },
+            "phaseSkill": {
+              "games": 151,
+              "positions": 936,
+              "logLoss": 0.6421429437345969,
+              "brier": 0.217603985648731,
+              "bias": 0.015993925388628528
+            }
+          }
+        },
+        {
+          "fold": 2,
+          "trainingGames": 609,
+          "testGames": 141,
+          "models": {
+            "scalar": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "scalar",
+              "lambda": 10,
+              "coefficients": [
+                0.13326359764013168
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 4,
+              "converged": true,
+              "maximumProjectedGradient": 2.4407744362394653e-10,
+              "objective": 395.2718942089839,
+              "trainingGames": 609
+            },
+            "static": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "static",
+              "lambda": 1,
+              "coefficients": [
+                0.13243640801191142,
+                0.8651255826589146,
+                -0.1761916113480927
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 5,
+              "converged": true,
+              "maximumProjectedGradient": 2.545456742275934e-8,
+              "objective": 389.7049223420765,
+              "trainingGames": 609
+            },
+            "phaseSkill": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "phaseSkill",
+              "lambda": 1,
+              "coefficients": [
+                0.01191424453802206,
+                0.11043877619834641,
+                0.19840850929492912,
+                0.2339947672116834,
+                0.8698816647511519,
+                -0.16459843951600447
+              ],
+              "positiveSlopeCoordinates": 4,
+              "sweeps": 45,
+              "converged": true,
+              "maximumProjectedGradient": 9.208158800889757e-8,
+              "objective": 387.5219990344261,
+              "trainingGames": 609
+            }
+          },
+          "tuning": {
+            "scalar": {
+              "lambda": 10,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6503986558818138
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6503972390932824
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.650384338405046
+                }
+              ]
+            },
+            "static": {
+              "lambda": 1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6433136888993606
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6431229321306126
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6445123554942491
+                }
+              ]
+            },
+            "phaseSkill": {
+              "lambda": 1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6406321055385873
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6403970173676307
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6415942077398556
+                }
+              ]
+            }
+          },
+          "metrics": {
+            "raw": {
+              "games": 141,
+              "positions": 880,
+              "logLoss": 2.3323455989817616,
+              "brier": 0.20866482814927362,
+              "bias": 0.04319353259034108
+            },
+            "scalar": {
+              "games": 141,
+              "positions": 880,
+              "logLoss": 0.6142464232952258,
+              "brier": 0.1929248504759547,
+              "bias": 0.016764782355681067
+            },
+            "static": {
+              "games": 141,
+              "positions": 880,
+              "logLoss": 0.6050132161507724,
+              "brier": 0.1898108294817566,
+              "bias": 0.01674097736771723
+            },
+            "phaseSkill": {
+              "games": 141,
+              "positions": 880,
+              "logLoss": 0.6061205996879737,
+              "brier": 0.19066352019661997,
+              "bias": 0.014569976317613979
+            }
+          }
+        },
+        {
+          "fold": 3,
+          "trainingGames": 594,
+          "testGames": 156,
+          "models": {
+            "scalar": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "scalar",
+              "lambda": 10,
+              "coefficients": [
+                0.14245392967114473
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 4,
+              "converged": true,
+              "maximumProjectedGradient": 1.0727967991657999e-10,
+              "objective": 382.27852644207,
+              "trainingGames": 594
+            },
+            "static": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "static",
+              "lambda": 0.1,
+              "coefficients": [
+                0.14235851007740402,
+                0.8922893905212677,
+                -0.1879387660590831
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 5,
+              "converged": true,
+              "maximumProjectedGradient": 3.506740338729537e-8,
+              "objective": 376.4447635422547,
+              "trainingGames": 594
+            },
+            "phaseSkill": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "phaseSkill",
+              "lambda": 0.1,
+              "coefficients": [
+                0.08383556516512577,
+                0.031048375119722874,
+                0.13670606585946388,
+                0.32892598125384465,
+                0.8815229784700443,
+                -0.17411411086327838
+              ],
+              "positiveSlopeCoordinates": 4,
+              "sweeps": 47,
+              "converged": true,
+              "maximumProjectedGradient": 8.459137231707355e-8,
+              "objective": 374.60147868267904,
+              "trainingGames": 594
+            }
+          },
+          "tuning": {
+            "scalar": {
+              "lambda": 10,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6444713015223015
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6444694878343478
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6444529841938317
+                }
+              ]
+            },
+            "static": {
+              "lambda": 0.1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6356284494115992
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6357131606467648
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6376565784351239
+                }
+              ]
+            },
+            "phaseSkill": {
+              "lambda": 0.1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6338802709947802
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6339304602891157
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.635717521263591
+                }
+              ]
+            }
+          },
+          "metrics": {
+            "raw": {
+              "games": 156,
+              "positions": 912,
+              "logLoss": 2.7324984899211326,
+              "brier": 0.2589790140987491,
+              "bias": 0.03345425061050066
+            },
+            "scalar": {
+              "games": 156,
+              "positions": 912,
+              "logLoss": 0.6372830258703175,
+              "brier": 0.21548107854307458,
+              "bias": 0.013998939982827615
+            },
+            "static": {
+              "games": 156,
+              "positions": 912,
+              "logLoss": 0.6285132862941688,
+              "brier": 0.2119102960857978,
+              "bias": 0.01441386617919249
+            },
+            "phaseSkill": {
+              "games": 156,
+              "positions": 912,
+              "logLoss": 0.6275497215360522,
+              "brier": 0.21144618200996657,
+              "bias": 0.011917961472083956
+            }
+          }
+        },
+        {
+          "fold": 4,
+          "trainingGames": 594,
+          "testGames": 156,
+          "models": {
+            "scalar": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "scalar",
+              "lambda": 10,
+              "coefficients": [
+                0.14653783848995863
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 4,
+              "converged": true,
+              "maximumProjectedGradient": 7.489739926275742e-11,
+              "objective": 379.99888863174226,
+              "trainingGames": 594
+            },
+            "static": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "static",
+              "lambda": 1,
+              "coefficients": [
+                0.14297349617948948,
+                1.1256720725649003,
+                -0.13320418468500259
+              ],
+              "positiveSlopeCoordinates": 1,
+              "sweeps": 5,
+              "converged": true,
+              "maximumProjectedGradient": 1.0344222300091095e-8,
+              "objective": 373.29268392192625,
+              "trainingGames": 594
+            },
+            "phaseSkill": {
+              "schema": "practical-wdl-outcome-v1",
+              "family": "phaseSkill",
+              "lambda": 1,
+              "coefficients": [
+                0.06974178323660482,
+                0.08881274659826073,
+                0.12554494463231666,
+                0.32280064071258074,
+                1.13472281862117,
+                -0.12267243344395448
+              ],
+              "positiveSlopeCoordinates": 4,
+              "sweeps": 44,
+              "converged": true,
+              "maximumProjectedGradient": 8.31124787668032e-8,
+              "objective": 371.2765357836706,
+              "trainingGames": 594
+            }
+          },
+          "tuning": {
+            "scalar": {
+              "lambda": 10,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6415942296136542
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6415922252033339
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6415738694202123
+                }
+              ]
+            },
+            "static": {
+              "lambda": 1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.63198985576161
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6318316475106528
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6350562536161346
+                }
+              ]
+            },
+            "phaseSkill": {
+              "lambda": 1,
+              "candidates": [
+                {
+                  "lambda": 0.1,
+                  "logLoss": 0.6297492337466346
+                },
+                {
+                  "lambda": 1,
+                  "logLoss": 0.6295422983652095
+                },
+                {
+                  "lambda": 10,
+                  "logLoss": 0.6325987290798814
+                }
+              ]
+            }
+          },
+          "metrics": {
+            "raw": {
+              "games": 156,
+              "positions": 914,
+              "logLoss": 2.809391977057002,
+              "brier": 0.26193150491071415,
+              "bias": 0.031098634004884003
+            },
+            "scalar": {
+              "games": 156,
+              "positions": 914,
+              "logLoss": 0.6519316515336724,
+              "brier": 0.22368886634920468,
+              "bias": 0.010676108917254625
+            },
+            "static": {
+              "games": 156,
+              "positions": 914,
+              "logLoss": 0.6521855473517397,
+              "brier": 0.22344169168451078,
+              "bias": 0.010309694863711364
+            },
+            "phaseSkill": {
+              "games": 156,
+              "positions": 914,
+              "logLoss": 0.6529648629576329,
+              "brier": 0.22318320120563576,
+              "bias": 0.009793382973522162
+            }
+          }
+        }
+      ],
+      "metrics": {
+        "raw": {
+          "games": 750,
+          "positions": 4525,
+          "logLoss": 2.754979729114093,
+          "brier": 0.25663364258293947,
+          "bias": 0.0372232992063497
+        },
+        "scalar": {
+          "games": 750,
+          "positions": 4525,
+          "logLoss": 0.6428021405488509,
+          "brier": 0.21557937373709257,
+          "bias": 0.015049749008718943
+        },
+        "static": {
+          "games": 750,
+          "positions": 4525,
+          "logLoss": 0.6343414511398162,
+          "brier": 0.21195120838904508,
+          "bias": 0.015054381314264476
+        },
+        "phaseSkill": {
+          "games": 750,
+          "positions": 4525,
+          "logLoss": 0.6328526393365107,
+          "brier": 0.2113450458291559,
+          "bias": 0.013429983804756098
+        }
+      },
+      "comparisons": {
+        "scalar": {
+          "estimate": 0.009949501212342383,
+          "lower": -0.00044360822865282667,
+          "upper": 0.020143721002275433,
+          "level": 0.975,
+          "iterations": 10000,
+          "seed": 20261016,
+          "unit": "game; all selected positions and colors together",
+          "interpretation": "Development percentile interval; positive favors phase/strength candidate"
+        },
+        "static": {
+          "estimate": 0.001488811803306032,
+          "lower": -0.002344252532600614,
+          "upper": 0.005381239718641693,
+          "level": 0.975,
+          "iterations": 10000,
+          "seed": 20261017,
+          "unit": "game; all selected positions and colors together",
+          "interpretation": "Development percentile interval; positive favors phase/strength candidate"
+        },
+        "raw": {
+          "estimate": 2.1221270897775093,
+          "lower": 1.7504105164986359,
+          "upper": 2.5168750653652285,
+          "level": 0.975,
+          "iterations": 10000,
+          "seed": 20261018,
+          "unit": "game; all selected positions and colors together",
+          "interpretation": "Development percentile interval; positive favors phase/strength candidate"
+        }
+      },
+      "subgroups": [
+        {
+          "label": "color:b",
+          "scalar": {
+            "games": 748,
+            "positions": 2277,
+            "logLoss": 0.6417204417839916,
+            "brier": 0.21510839376452984,
+            "bias": -0.020157517547616882
+          },
+          "candidate": {
+            "games": 748,
+            "positions": 2277,
+            "logLoss": 0.6336924850511182,
+            "brier": 0.21175399110100362,
+            "bias": 0.013468834177481905
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "color:w",
+          "scalar": {
+            "games": 750,
+            "positions": 2248,
+            "logLoss": 0.6438967590383438,
+            "brier": 0.21605597905726723,
+            "bias": 0.05067752837737108
+          },
+          "candidate": {
+            "games": 750,
+            "positions": 2248,
+            "logLoss": 0.6320027625709679,
+            "brier": 0.21093121614725766,
+            "bias": 0.013390669406244908
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "mean-rating:1200-1999",
+          "scalar": {
+            "games": 330,
+            "positions": 2007,
+            "logLoss": 0.6407898057237674,
+            "brier": 0.21439654021254664,
+            "bias": 0.014997262183267522
+          },
+          "candidate": {
+            "games": 330,
+            "positions": 2007,
+            "logLoss": 0.6324590257662304,
+            "brier": 0.2117583363093881,
+            "bias": 0.013781322861204317
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "mean-rating:<1200",
+          "scalar": {
+            "games": 213,
+            "positions": 1146,
+            "logLoss": 0.6440324917087998,
+            "brier": 0.22036500643494883,
+            "bias": 0.020225326187041887
+          },
+          "candidate": {
+            "games": 213,
+            "positions": 1146,
+            "logLoss": 0.6343188145990403,
+            "brier": 0.21588661098005407,
+            "bias": 0.015276618825826517
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "mean-rating:>=2000",
+          "scalar": {
+            "games": 207,
+            "positions": 1372,
+            "logLoss": 0.6447441970474279,
+            "brier": 0.2125407036813335,
+            "bias": 0.009807829749859756
+          },
+          "candidate": {
+            "games": 207,
+            "positions": 1372,
+            "logLoss": 0.6319714661349103,
+            "brier": 0.20601297222712855,
+            "bias": 0.010969717388736588
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "ply:10",
+          "scalar": {
+            "games": 750,
+            "positions": 1497,
+            "logLoss": 0.6971517042597274,
+            "brier": 0.24457948218060468,
+            "bias": 0.008596298204161036
+          },
+          "candidate": {
+            "games": 750,
+            "positions": 1497,
+            "logLoss": 0.6853319841898997,
+            "brier": 0.23940557735357904,
+            "bias": 0.003587288821065601
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "ply:30",
+          "scalar": {
+            "games": 700,
+            "positions": 1390,
+            "logLoss": 0.6407602398895895,
+            "brier": 0.21603701533318576,
+            "bias": 0.02225975652781779
+          },
+          "candidate": {
+            "games": 700,
+            "positions": 1390,
+            "logLoss": 0.6304778933110659,
+            "brier": 0.2115669704013635,
+            "bias": 0.02046437013246242
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "ply:50",
+          "scalar": {
+            "games": 532,
+            "positions": 1034,
+            "logLoss": 0.5863711477972384,
+            "brier": 0.18631307879418976,
+            "bias": 0.016971438490742886
+          },
+          "candidate": {
+            "games": 532,
+            "positions": 1034,
+            "logLoss": 0.5796055619011673,
+            "brier": 0.18383312452256337,
+            "bias": 0.019390983304519552
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "ply:70",
+          "scalar": {
+            "games": 310,
+            "positions": 604,
+            "logLoss": 0.552630706808714,
+            "brier": 0.1610053607387178,
+            "bias": 0.01342082661428159
+          },
+          "candidate": {
+            "games": 310,
+            "positions": 604,
+            "logLoss": 0.5446124806940533,
+            "brier": 0.15765202644667417,
+            "bias": 0.017350424248268433
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "wdl:0.1-0.9",
+          "scalar": {
+            "games": 704,
+            "positions": 2355,
+            "logLoss": 0.6926021674429468,
+            "brier": 0.2380617768548696,
+            "bias": 0.012944308186927891
+          },
+          "candidate": {
+            "games": 704,
+            "positions": 2355,
+            "logLoss": 0.6854302575988659,
+            "brier": 0.23475468246498643,
+            "bias": 0.012361163139197412
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "wdl:<0.1",
+          "scalar": {
+            "games": 547,
+            "positions": 950,
+            "logLoss": 0.5630339766567806,
+            "brier": 0.17979129577094907,
+            "bias": 0.01405194049131827
+          },
+          "candidate": {
+            "games": 547,
+            "positions": 950,
+            "logLoss": 0.5521549237230795,
+            "brier": 0.17559229562234116,
+            "bias": 0.010509110811785157
+          },
+          "sufficient": true,
+          "passed": true
+        },
+        {
+          "label": "wdl:>0.9",
+          "scalar": {
+            "games": 625,
+            "positions": 1220,
+            "logLoss": 0.5992656216085133,
+            "brier": 0.19575495540308413,
+            "bias": 0.02020787385013765
+          },
+          "candidate": {
+            "games": 625,
+            "positions": 1220,
+            "logLoss": 0.5842161810909712,
+            "brier": 0.18955575650223508,
+            "bias": 0.017881238563618666
+          },
+          "sufficient": true,
+          "passed": true
+        }
+      ],
+      "calibration": {
+        "raw": [
+          {
+            "bin": 0,
+            "positions": 950,
+            "weight": 147.90714285714296,
+            "predicted": 0.006751376346163125,
+            "observed": 0.26011332721623925
+          },
+          {
+            "bin": 1,
+            "positions": 64,
+            "weight": 11.001190476190477,
+            "predicted": 0.15307591169786816,
+            "observed": 0.48566172492154525
+          },
+          {
+            "bin": 2,
+            "positions": 59,
+            "weight": 10.13452380952381,
+            "predicted": 0.254246681545871,
+            "observed": 0.39880183249148365
+          },
+          {
+            "bin": 3,
+            "positions": 119,
+            "weight": 21.136904761904766,
+            "predicted": 0.35488442692199373,
+            "observed": 0.49346662911855793
+          },
+          {
+            "bin": 4,
+            "positions": 846,
+            "weight": 144.44285714285732,
+            "predicted": 0.4731865089176798,
+            "observed": 0.4444540599347233
+          },
+          {
+            "bin": 5,
+            "positions": 922,
+            "weight": 160.73809523809513,
+            "predicted": 0.5282005628795728,
+            "observed": 0.5139683009924463
+          },
+          {
+            "bin": 6,
+            "positions": 158,
+            "weight": 28.522619047619056,
+            "predicted": 0.6389526065361655,
+            "observed": 0.6001293877039939
+          },
+          {
+            "bin": 7,
+            "positions": 107,
+            "weight": 18.419047619047618,
+            "predicted": 0.7479093523784905,
+            "observed": 0.4988689245087901
+          },
+          {
+            "bin": 8,
+            "positions": 79,
+            "weight": 12.604761904761903,
+            "predicted": 0.8452984038534194,
+            "observed": 0.46373252738949766
+          },
+          {
+            "bin": 9,
+            "positions": 1221,
+            "weight": 195.0928571428564,
+            "predicted": 0.9927463143313939,
+            "observed": 0.7031267162157255
+          }
+        ],
+        "scalar": [
+          {
+            "bin": 0,
+            "positions": 0,
+            "weight": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": 1,
+            "positions": 0,
+            "weight": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": 2,
+            "positions": 777,
+            "weight": 119.49166666666706,
+            "predicted": 0.2520875622705108,
+            "observed": 0.22933458200910534
+          },
+          {
+            "bin": 3,
+            "positions": 129,
+            "weight": 21.65595238095239,
+            "predicted": 0.35311924444334913,
+            "observed": 0.3643285141003792
+          },
+          {
+            "bin": 4,
+            "positions": 1132,
+            "weight": 193.47499999999926,
+            "predicted": 0.48609000126597507,
+            "observed": 0.4506642300284916
+          },
+          {
+            "bin": 5,
+            "positions": 1324,
+            "weight": 230.56785714285584,
+            "predicted": 0.5159540723556166,
+            "observed": 0.5226536966186011
+          },
+          {
+            "bin": 6,
+            "positions": 188,
+            "weight": 30.989285714285735,
+            "predicted": 0.6447643336747488,
+            "observed": 0.5686873343321419
+          },
+          {
+            "bin": 7,
+            "positions": 975,
+            "weight": 153.82023809523812,
+            "predicted": 0.7473303458334583,
+            "observed": 0.7398904101107532
+          },
+          {
+            "bin": 8,
+            "positions": 0,
+            "weight": 0,
+            "predicted": null,
+            "observed": null
+          },
+          {
+            "bin": 9,
+            "positions": 0,
+            "weight": 0,
+            "predicted": null,
+            "observed": null
+          }
+        ],
+        "static": [
+          {
+            "bin": 0,
+            "positions": 17,
+            "weight": 2.5357142857142856,
+            "predicted": 0.05737039805388167,
+            "observed": 0.14788732394366197
+          },
+          {
+            "bin": 1,
+            "positions": 83,
+            "weight": 13.091666666666661,
+            "predicted": 0.173005001816634,
+            "observed": 0.1584977721196691
+          },
+          {
+            "bin": 2,
+            "positions": 608,
+            "weight": 94.87261904761918,
+            "predicted": 0.2503156316917511,
+            "observed": 0.23724166488901124
+          },
+          {
+            "bin": 3,
+            "positions": 295,
+            "weight": 46.880952380952316,
+            "predicted": 0.34999496096958765,
+            "observed": 0.3027425088877605
+          },
+          {
+            "bin": 4,
+            "positions": 1071,
+            "weight": 185.64285714285646,
+            "predicted": 0.46112989085420114,
+            "observed": 0.4538989354880098
+          },
+          {
+            "bin": 5,
+            "positions": 1193,
+            "weight": 205.2904761904754,
+            "predicted": 0.5399263986379468,
+            "observed": 0.5221144255526466
+          },
+          {
+            "bin": 6,
+            "positions": 380,
+            "weight": 62.26309523809516,
+            "predicted": 0.6513728593761843,
+            "observed": 0.6339744937955303
+          },
+          {
+            "bin": 7,
+            "positions": 760,
+            "weight": 121.09880952380996,
+            "predicted": 0.7489374763000243,
+            "observed": 0.7405552333297271
+          },
+          {
+            "bin": 8,
+            "positions": 98,
+            "weight": 15.02023809523809,
+            "predicted": 0.8225336490694227,
+            "observed": 0.7819608464769755
+          },
+          {
+            "bin": 9,
+            "positions": 20,
+            "weight": 3.3035714285714284,
+            "predicted": 0.9373445546037076,
+            "observed": 0.8864864864864864
+          }
+        ],
+        "phaseSkill": [
+          {
+            "bin": 0,
+            "positions": 25,
+            "weight": 3.5595238095238093,
+            "predicted": 0.06447020904554199,
+            "observed": 0.10535117056856189
+          },
+          {
+            "bin": 1,
+            "positions": 215,
+            "weight": 29.135714285714293,
+            "predicted": 0.16698766184703734,
+            "observed": 0.15373457546784336
+          },
+          {
+            "bin": 2,
+            "positions": 432,
+            "weight": 67.94047619047615,
+            "predicted": 0.24828512736597746,
+            "observed": 0.2263360785000876
+          },
+          {
+            "bin": 3,
+            "positions": 317,
+            "weight": 53.54404761904757,
+            "predicted": 0.35100480318444316,
+            "observed": 0.3250105609533763
+          },
+          {
+            "bin": 4,
+            "positions": 1104,
+            "weight": 192.58809523809447,
+            "predicted": 0.4621024252165522,
+            "observed": 0.45541928863723685
+          },
+          {
+            "bin": 5,
+            "positions": 1224,
+            "weight": 211.72380952380848,
+            "predicted": 0.540474869568196,
+            "observed": 0.524737416220597
+          },
+          {
+            "bin": 6,
+            "positions": 393,
+            "weight": 68.96309523809519,
+            "predicted": 0.6502605397744842,
+            "observed": 0.6310483522933249
+          },
+          {
+            "bin": 7,
+            "positions": 530,
+            "weight": 83.47023809523812,
+            "predicted": 0.749549607428702,
+            "observed": 0.7398702132211353
+          },
+          {
+            "bin": 8,
+            "positions": 255,
+            "weight": 34.49761904761907,
+            "predicted": 0.8302904504204286,
+            "observed": 0.8299399544482021
+          },
+          {
+            "bin": 9,
+            "positions": 30,
+            "weight": 4.5773809523809526,
+            "predicted": 0.9311287486641528,
+            "observed": 0.8907672301690507
+          }
+        ]
+      },
+      "gates": {
+        "practical": false,
+        "uncertainty": false,
+        "brier": true,
+        "identicalCoverage": true,
+        "subgroups": true,
+        "monotone": true
+      },
+      "passed": false,
+      "evidence": "development only"
+    }
+  }
+}
