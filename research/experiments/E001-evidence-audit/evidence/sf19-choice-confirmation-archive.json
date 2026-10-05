@@ -1,0 +1,861 @@
+{
+  "study": "sf19-choice-confirmation",
+  "protocol": {
+    "schema": "sf19-choice-confirmation-v1",
+    "seed": "sf19-quality-2026-10-04-v1",
+    "outcomePlies": [
+      11,
+      31,
+      51,
+      71
+    ],
+    "trainingGames": 100,
+    "developmentGames": 25,
+    "testGames": 25,
+    "trainingChoices": 80,
+    "developmentChoices": 20,
+    "testChoices": 25,
+    "selection": "Existing SF18 training/development cohort; one hash-selected archived legal choice per game. Five test games per rating band, ordered by frozen dataset order; one hash-selected nonforced test choice after ply 10. Confirmation uses the next five test games per band, excluding the first study holdout.",
+    "acceptance": "Outcome curve is unchanged. Choice log loss must beat normalized old move qualities and uniform legal choice; the upper paired game-bootstrap difference must be below zero.",
+    "limits": "Human outcome/choice prediction validates those targets, not a unique display percentage or agreement with human category labels. Existing development games were consumed before this study. Test split roles are frozen; this assessment consumes the selected test games. This second holdout confirms a narrower training-fitted choice model after the full-curve candidate failed its first gate.",
+    "modelKind": "choice-only"
+  },
+  "sourceFiles": {
+    "plan.json": {
+      "sha256": "3178fafaeffee79d2c3ef55c91e260dca6599c4732fa1490ebd362e7aa18aebf",
+      "bytes": 213827
+    },
+    "model.json": {
+      "sha256": "d636f27ee27ee97acf1fc0a121a3df71088868a1b82b33f66dcb330fc8df5bc7",
+      "bytes": 3179
+    },
+    "report.json": {
+      "sha256": "9567e026c3ffe5a9e40d18ad78d8bc3f9e7427beb07128980745df0c482836dc",
+      "bytes": 2508
+    },
+    "evidence.json.gz": {
+      "sha256": "5e9e1f61b48d39030e91dea0615aee4510ac9c29e3fcf3d2b7e3ad47b82efbae",
+      "bytes": 512264
+    }
+  },
+  "datasetSha256": "dfde368d4c5bb190c2966a8e180fccc99b9ab53bbb24ca8252653e4d6258f226",
+  "selectionSha256": "0c8f69d6e796285656765715f2391ce6dab9ccb79bed583b49e22c17b7e0eeae",
+  "engineConfig": {
+    "version": "Stockfish 19 (identity verified at UCI startup)",
+    "majorVersion": 19,
+    "build": "stockfish.js lite single-threaded",
+    "network": "nn-61e7af4bb97d.nnue",
+    "loaderSha256": "d3344124ab067fb0b90ee77873bb8e9fbf5fc01bc525fe714b0f942581e889e6",
+    "wasmSha256": "57ac2d72312aba346760e3f173f687a8c211208e97a87268436f7f0e10bb5387",
+    "budget": {
+      "kind": "nodes",
+      "value": 20000
+    },
+    "options": {
+      "Threads": 1,
+      "Hash": 32,
+      "MultiPV": 1,
+      "Skill Level": 20,
+      "UCI_LimitStrength": false,
+      "UCI_ShowWDL": true,
+      "UCI_Chess960": false
+    },
+    "reset": "ucinewgame + Clear Hash + isready before every search",
+    "tablebases": "none",
+    "perspective": "side to move at root",
+    "position": "startpos with full move history"
+  },
+  "games": [
+    {
+      "id": "fhP7zxBp",
+      "split": "train"
+    },
+    {
+      "id": "NJfc7uOL",
+      "split": "train"
+    },
+    {
+      "id": "iAnLDG2g",
+      "split": "train"
+    },
+    {
+      "id": "LAnzm7zw",
+      "split": "train"
+    },
+    {
+      "id": "2YIVomfH",
+      "split": "train"
+    },
+    {
+      "id": "DRLrwk1i",
+      "split": "train"
+    },
+    {
+      "id": "CraoA3LY",
+      "split": "train"
+    },
+    {
+      "id": "edqllH9r",
+      "split": "train"
+    },
+    {
+      "id": "Xl3H2AFo",
+      "split": "train"
+    },
+    {
+      "id": "UWiKRSdj",
+      "split": "train"
+    },
+    {
+      "id": "OIYprEB0",
+      "split": "train"
+    },
+    {
+      "id": "Uaibaw0h",
+      "split": "train"
+    },
+    {
+      "id": "AIiRRDn5",
+      "split": "train"
+    },
+    {
+      "id": "f8f2aWoN",
+      "split": "train"
+    },
+    {
+      "id": "f055AYMt",
+      "split": "train"
+    },
+    {
+      "id": "Of6kTpuR",
+      "split": "train"
+    },
+    {
+      "id": "C64zjJQY",
+      "split": "train"
+    },
+    {
+      "id": "J9wONt3g",
+      "split": "train"
+    },
+    {
+      "id": "628zFxKc",
+      "split": "train"
+    },
+    {
+      "id": "23lLmOpC",
+      "split": "train"
+    },
+    {
+      "id": "oaHc5IFh",
+      "split": "train"
+    },
+    {
+      "id": "c2NG13Pk",
+      "split": "train"
+    },
+    {
+      "id": "fcEVWCtI",
+      "split": "train"
+    },
+    {
+      "id": "0zl0bbTT",
+      "split": "train"
+    },
+    {
+      "id": "ngeuVXJ0",
+      "split": "train"
+    },
+    {
+      "id": "quTcTZaQ",
+      "split": "train"
+    },
+    {
+      "id": "JtEbkyyP",
+      "split": "train"
+    },
+    {
+      "id": "v0dD9ZzN",
+      "split": "train"
+    },
+    {
+      "id": "50l6Yw10",
+      "split": "train"
+    },
+    {
+      "id": "jMtwXOlO",
+      "split": "train"
+    },
+    {
+      "id": "CdZxLwhI",
+      "split": "train"
+    },
+    {
+      "id": "zabTGRIT",
+      "split": "train"
+    },
+    {
+      "id": "erFAEpQ6",
+      "split": "train"
+    },
+    {
+      "id": "RR5a8fdp",
+      "split": "train"
+    },
+    {
+      "id": "jdlVPn2u",
+      "split": "train"
+    },
+    {
+      "id": "4JNpr2qp",
+      "split": "train"
+    },
+    {
+      "id": "Id76bBSb",
+      "split": "train"
+    },
+    {
+      "id": "2pWVrMXj",
+      "split": "train"
+    },
+    {
+      "id": "fBMppqyV",
+      "split": "train"
+    },
+    {
+      "id": "KbR9bKDF",
+      "split": "train"
+    },
+    {
+      "id": "GlIsh4xL",
+      "split": "train"
+    },
+    {
+      "id": "mUlHpS7o",
+      "split": "train"
+    },
+    {
+      "id": "TxN9ECYz",
+      "split": "train"
+    },
+    {
+      "id": "I5lnLg23",
+      "split": "train"
+    },
+    {
+      "id": "nhuWmN0z",
+      "split": "train"
+    },
+    {
+      "id": "0hLOgdYt",
+      "split": "train"
+    },
+    {
+      "id": "wsia8zsS",
+      "split": "train"
+    },
+    {
+      "id": "J4aQHBAg",
+      "split": "train"
+    },
+    {
+      "id": "uV8otBm3",
+      "split": "train"
+    },
+    {
+      "id": "gC3QBuH0",
+      "split": "train"
+    },
+    {
+      "id": "qkJRS9xf",
+      "split": "train"
+    },
+    {
+      "id": "VEiUylEy",
+      "split": "train"
+    },
+    {
+      "id": "rjlQsyJD",
+      "split": "train"
+    },
+    {
+      "id": "uftT2MW7",
+      "split": "train"
+    },
+    {
+      "id": "1habIH0p",
+      "split": "train"
+    },
+    {
+      "id": "nwoD7NsA",
+      "split": "train"
+    },
+    {
+      "id": "kgXLo3Sb",
+      "split": "train"
+    },
+    {
+      "id": "3MnOcC7o",
+      "split": "train"
+    },
+    {
+      "id": "Y8mlMfk2",
+      "split": "train"
+    },
+    {
+      "id": "A96B1g9X",
+      "split": "train"
+    },
+    {
+      "id": "xgRzHOuk",
+      "split": "train"
+    },
+    {
+      "id": "siBdLdeo",
+      "split": "train"
+    },
+    {
+      "id": "IX4AUgiR",
+      "split": "train"
+    },
+    {
+      "id": "QXvINXxu",
+      "split": "train"
+    },
+    {
+      "id": "RKzI3YO2",
+      "split": "train"
+    },
+    {
+      "id": "4G3czeJs",
+      "split": "train"
+    },
+    {
+      "id": "862xoDXG",
+      "split": "train"
+    },
+    {
+      "id": "rw7xNdB2",
+      "split": "train"
+    },
+    {
+      "id": "C8XnNoEz",
+      "split": "train"
+    },
+    {
+      "id": "mWzz3wfx",
+      "split": "train"
+    },
+    {
+      "id": "kmzxvCOC",
+      "split": "train"
+    },
+    {
+      "id": "puUmiWfY",
+      "split": "train"
+    },
+    {
+      "id": "xjHHFOvt",
+      "split": "train"
+    },
+    {
+      "id": "Nz5VsJhK",
+      "split": "train"
+    },
+    {
+      "id": "ZrD83iZ1",
+      "split": "train"
+    },
+    {
+      "id": "ul89scH5",
+      "split": "train"
+    },
+    {
+      "id": "HDNXN3AD",
+      "split": "train"
+    },
+    {
+      "id": "ycYIbD8Q",
+      "split": "train"
+    },
+    {
+      "id": "3SJnhs4H",
+      "split": "train"
+    },
+    {
+      "id": "oGHwxHXQ",
+      "split": "train"
+    },
+    {
+      "id": "YxKwv3Hi",
+      "split": "train"
+    },
+    {
+      "id": "iOd0fnlR",
+      "split": "train"
+    },
+    {
+      "id": "UGLjf02M",
+      "split": "train"
+    },
+    {
+      "id": "5seNpKgX",
+      "split": "train"
+    },
+    {
+      "id": "G9T1RlKJ",
+      "split": "train"
+    },
+    {
+      "id": "pClcRlGo",
+      "split": "train"
+    },
+    {
+      "id": "cSBVHdqu",
+      "split": "train"
+    },
+    {
+      "id": "h2D9Fugi",
+      "split": "train"
+    },
+    {
+      "id": "E8YUlTwR",
+      "split": "train"
+    },
+    {
+      "id": "0e3EKO99",
+      "split": "train"
+    },
+    {
+      "id": "aPmLJdis",
+      "split": "train"
+    },
+    {
+      "id": "s2LHQHZc",
+      "split": "train"
+    },
+    {
+      "id": "ymsktO3J",
+      "split": "train"
+    },
+    {
+      "id": "JsXDOU0O",
+      "split": "train"
+    },
+    {
+      "id": "ywHWNPGL",
+      "split": "train"
+    },
+    {
+      "id": "qiFgO76w",
+      "split": "train"
+    },
+    {
+      "id": "jXyCZlSk",
+      "split": "train"
+    },
+    {
+      "id": "R2p1MzQ6",
+      "split": "train"
+    },
+    {
+      "id": "OG6OXTzT",
+      "split": "train"
+    },
+    {
+      "id": "wG3OdWba",
+      "split": "train"
+    },
+    {
+      "id": "4zzOZcWz",
+      "split": "validation"
+    },
+    {
+      "id": "VX7iARNW",
+      "split": "validation"
+    },
+    {
+      "id": "gTWjzQMn",
+      "split": "validation"
+    },
+    {
+      "id": "caTUNtOk",
+      "split": "validation"
+    },
+    {
+      "id": "T3MY9hbz",
+      "split": "validation"
+    },
+    {
+      "id": "JpbBxN1b",
+      "split": "validation"
+    },
+    {
+      "id": "bhFZ4wyi",
+      "split": "validation"
+    },
+    {
+      "id": "LHqrLsXi",
+      "split": "validation"
+    },
+    {
+      "id": "2emIPg2g",
+      "split": "validation"
+    },
+    {
+      "id": "uN4rBFYJ",
+      "split": "validation"
+    },
+    {
+      "id": "Hjk7N6NY",
+      "split": "validation"
+    },
+    {
+      "id": "rK1vVPeu",
+      "split": "validation"
+    },
+    {
+      "id": "F0knBeU8",
+      "split": "validation"
+    },
+    {
+      "id": "iJ9BNsMO",
+      "split": "validation"
+    },
+    {
+      "id": "HZNocx7D",
+      "split": "validation"
+    },
+    {
+      "id": "RzCIo7YR",
+      "split": "validation"
+    },
+    {
+      "id": "BSL2Flg9",
+      "split": "validation"
+    },
+    {
+      "id": "JusCXlMm",
+      "split": "validation"
+    },
+    {
+      "id": "pcIpKlZ8",
+      "split": "validation"
+    },
+    {
+      "id": "wcAXW10N",
+      "split": "validation"
+    },
+    {
+      "id": "yYssZm4n",
+      "split": "validation"
+    },
+    {
+      "id": "8dIuU4aX",
+      "split": "validation"
+    },
+    {
+      "id": "udiPscIc",
+      "split": "validation"
+    },
+    {
+      "id": "6rKBUoFW",
+      "split": "validation"
+    },
+    {
+      "id": "rALG5jvN",
+      "split": "validation"
+    },
+    {
+      "id": "9onF3nfO",
+      "split": "test"
+    },
+    {
+      "id": "GRatGSHa",
+      "split": "test"
+    },
+    {
+      "id": "VI6VghKh",
+      "split": "test"
+    },
+    {
+      "id": "zX4c9GZN",
+      "split": "test"
+    },
+    {
+      "id": "ytGoqMK0",
+      "split": "test"
+    },
+    {
+      "id": "bbQ2ujvu",
+      "split": "test"
+    },
+    {
+      "id": "U9SRFsUd",
+      "split": "test"
+    },
+    {
+      "id": "DI5HddPH",
+      "split": "test"
+    },
+    {
+      "id": "wv6AwzNf",
+      "split": "test"
+    },
+    {
+      "id": "M9d9WHf5",
+      "split": "test"
+    },
+    {
+      "id": "saqlG7cF",
+      "split": "test"
+    },
+    {
+      "id": "wUgLvGBB",
+      "split": "test"
+    },
+    {
+      "id": "t8Y5CCMz",
+      "split": "test"
+    },
+    {
+      "id": "Mx3KPQ7z",
+      "split": "test"
+    },
+    {
+      "id": "CkvyovWE",
+      "split": "test"
+    },
+    {
+      "id": "mwHnCdLq",
+      "split": "test"
+    },
+    {
+      "id": "HyqM1DeP",
+      "split": "test"
+    },
+    {
+      "id": "j4c1pyPe",
+      "split": "test"
+    },
+    {
+      "id": "UwI9kQQw",
+      "split": "test"
+    },
+    {
+      "id": "EEYWPLZs",
+      "split": "test"
+    },
+    {
+      "id": "L6dowU3Q",
+      "split": "test"
+    },
+    {
+      "id": "s6t6FuBx",
+      "split": "test"
+    },
+    {
+      "id": "qgLeeAST",
+      "split": "test"
+    },
+    {
+      "id": "VXWEhtTV",
+      "split": "test"
+    },
+    {
+      "id": "3GeCq9zh",
+      "split": "test"
+    }
+  ],
+  "consumedTestIds": [
+    "3GeCq9zh",
+    "9onF3nfO",
+    "CkvyovWE",
+    "DI5HddPH",
+    "EEYWPLZs",
+    "GRatGSHa",
+    "HyqM1DeP",
+    "L6dowU3Q",
+    "M9d9WHf5",
+    "Mx3KPQ7z",
+    "U9SRFsUd",
+    "UwI9kQQw",
+    "VI6VghKh",
+    "VXWEhtTV",
+    "bbQ2ujvu",
+    "j4c1pyPe",
+    "mwHnCdLq",
+    "qgLeeAST",
+    "s6t6FuBx",
+    "saqlG7cF",
+    "t8Y5CCMz",
+    "wUgLvGBB",
+    "wv6AwzNf",
+    "ytGoqMK0",
+    "zX4c9GZN"
+  ],
+  "unknownGames": [],
+  "candidateVersion": "8c7e18512426e527519523558019001a2138a0e2c18dfe111eef8cfff43276a3",
+  "model": {
+    "schema": "engine-quality-v1",
+    "candidateVersion": "8c7e18512426e527519523558019001a2138a0e2c18dfe111eef8cfff43276a3",
+    "outcome": {
+      "schema": "human-outcome-v1",
+      "slopePerPawn": 0.368208,
+      "source": "Retained public Lichess centipawn curve; not an SF19-fitted human outcome curve."
+    },
+    "choice": {
+      "schema": "human-choice-v1",
+      "temperature": 17.31631627755427,
+      "boundary": null,
+      "games": 80,
+      "observations": 80,
+      "criterion": "Game-weighted multinomial negative log likelihood across all preselected choices",
+      "sampling": {
+        "schema": "grouped-human-choice-v1",
+        "observations": "All four preselected public choices per game; no ranking by scores or review labels.",
+        "weighting": "Each game contributes unit total weight, divided equally between its selected positions.",
+        "fitting": "Positive inverse temperature minimizes weighted multinomial negative log likelihood on training games only."
+      }
+    },
+    "engineConfig": {
+      "version": "Stockfish 19 (identity verified at UCI startup)",
+      "majorVersion": 19,
+      "build": "stockfish.js lite single-threaded",
+      "network": "nn-61e7af4bb97d.nnue",
+      "loaderSha256": "d3344124ab067fb0b90ee77873bb8e9fbf5fc01bc525fe714b0f942581e889e6",
+      "wasmSha256": "57ac2d72312aba346760e3f173f687a8c211208e97a87268436f7f0e10bb5387",
+      "budget": {
+        "kind": "nodes",
+        "value": 20000
+      },
+      "options": {
+        "Threads": 1,
+        "Hash": 32,
+        "MultiPV": 1,
+        "Skill Level": 20,
+        "UCI_LimitStrength": false,
+        "UCI_ShowWDL": true,
+        "UCI_Chess960": false
+      },
+      "reset": "ucinewgame + Clear Hash + isready before every search",
+      "tablebases": "none",
+      "perspective": "side to move at root",
+      "position": "startpos with full move history"
+    },
+    "aggregation": "Arithmetic mean of fitted move qualities over nonforced decisions.",
+    "protocol": {
+      "schema": "sf19-choice-confirmation-v1",
+      "seed": "sf19-quality-2026-10-04-v1",
+      "outcomePlies": [
+        11,
+        31,
+        51,
+        71
+      ],
+      "trainingGames": 100,
+      "developmentGames": 25,
+      "testGames": 25,
+      "trainingChoices": 80,
+      "developmentChoices": 20,
+      "testChoices": 25,
+      "selection": "Existing SF18 training/development cohort; one hash-selected archived legal choice per game. Five test games per rating band, ordered by frozen dataset order; one hash-selected nonforced test choice after ply 10. Confirmation uses the next five test games per band, excluding the first study holdout.",
+      "acceptance": "Outcome curve is unchanged. Choice log loss must beat normalized old move qualities and uniform legal choice; the upper paired game-bootstrap difference must be below zero.",
+      "limits": "Human outcome/choice prediction validates those targets, not a unique display percentage or agreement with human category labels. Existing development games were consumed before this study. Test split roles are frozen; this assessment consumes the selected test games. This second holdout confirms a narrower training-fitted choice model after the full-curve candidate failed its first gate.",
+      "modelKind": "choice-only"
+    }
+  },
+  "report": {
+    "development": {
+      "split": "validation",
+      "outcome": {
+        "candidate": {
+          "games": 25,
+          "observations": 81,
+          "logLoss": 0.6525830600098911,
+          "brier": 0.22519130328600825
+        },
+        "baseline": {
+          "games": 25,
+          "observations": 81,
+          "logLoss": 0.6525830600098911,
+          "brier": 0.22519130328600825
+        }
+      },
+      "choice": {
+        "games": 20,
+        "observations": 20,
+        "logLoss": 1.9009190966260934,
+        "uniformLogLoss": 3.4602962198129665,
+        "baselineLogLoss": 2.6918665892894427
+      },
+      "pairedDifference": {
+        "outcome": {
+          "estimate": 0,
+          "lower": 0,
+          "upper": 0,
+          "iterations": 2000,
+          "seed": 18019,
+          "unit": "game (both player sides resampled together)",
+          "interpretation": "exploratory percentile interval; small stratified sample"
+        },
+        "choice": {
+          "estimate": -0.790947492663349,
+          "lower": -1.0667926008033426,
+          "upper": -0.5058201292091223,
+          "iterations": 2000,
+          "seed": 18019,
+          "unit": "game (both player sides resampled together)",
+          "interpretation": "exploratory percentile interval; small stratified sample"
+        }
+      },
+      "passed": true
+    },
+    "test": {
+      "split": "test",
+      "outcome": {
+        "candidate": {
+          "games": 25,
+          "observations": 72,
+          "logLoss": 0.7234648905140839,
+          "brier": 0.24362564813857734
+        },
+        "baseline": {
+          "games": 25,
+          "observations": 72,
+          "logLoss": 0.7234648905140839,
+          "brier": 0.24362564813857734
+        }
+      },
+      "choice": {
+        "games": 25,
+        "observations": 25,
+        "logLoss": 2.808278195279954,
+        "uniformLogLoss": 3.3647350071619404,
+        "baselineLogLoss": 2.867358139370989
+      },
+      "pairedDifference": {
+        "outcome": {
+          "estimate": 0,
+          "lower": 0,
+          "upper": 0,
+          "iterations": 2000,
+          "seed": 18019,
+          "unit": "game (both player sides resampled together)",
+          "interpretation": "exploratory percentile interval; small stratified sample"
+        },
+        "choice": {
+          "estimate": -0.05907994409103384,
+          "lower": -0.5002425755713904,
+          "upper": 0.4723236472062209,
+          "iterations": 2000,
+          "seed": 18019,
+          "unit": "game (both player sides resampled together)",
+          "interpretation": "exploratory percentile interval; small stratified sample"
+        }
+      },
+      "passed": false
+    }
+  },
+  "status": "Retrospective archive; reports inspected; numerical replay not yet independently checked"
+}

@@ -1,0 +1,30 @@
+{
+  "schema": "research-run-v1",
+  "id": "E001-2026-10-05-audit",
+  "date": "2026-10-05",
+  "sourceRevision": "c24edc78188ea57bd2cdee73bc094792a4f53b6e",
+  "planRevision": "133ae7c",
+  "environment": {
+    "node": "v24.14.1",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "evaluationRole": "metadata audit and retrospective exposure inventory; baseline reproduction",
+  "commands": [
+    "node research/experiments/E001-evidence-audit/code/audit.mjs",
+    "node tools/calibration/reproduce-public.mjs"
+  ],
+  "seed": null,
+  "engineSearches": 0,
+  "codeSha256": "3ff3b1e282622129fce8271ed06a5e39064e795d64d72619da904086bcd81e05",
+  "outputs": {
+    "audit.json": "7811c5b444dee2d671338d4a6e39621b341fcd0b132cd8369392023eb2641ba9",
+    "baseline-replay.json": "cc964d50bbd08e5ebf3aa8a85463c25795d8edc83729a0a19e3129bd9dd931fc",
+    "sf19-quality-archive.json": "3953a2a13f8e491e5c0dedbf40d38bb7d0d24ac4abe546278b8fb8360e1d3c2d",
+    "sf19-choice-confirmation-archive.json": "a762d73fb732e107da84d7edae8991cc89227f3252b164d3008e64a7c1c6906b"
+  },
+  "auditReplayByteIdentical": true,
+  "inputHashes": "audit.json#inputHashes",
+  "engineConfigurations": "audit.json#rating",
+  "cleanReplayWithoutIgnoredArchives": true
+}

@@ -1,0 +1,59 @@
+{
+  "schema": "public-reproduction-v1",
+  "checks": {
+    "outcome": true,
+    "choice": true,
+    "context": true,
+    "scores": true,
+    "runtimeAccuracy": true,
+    "sf19Context": true,
+    "sf18Rating": true,
+    "sf18Protocol": true,
+    "sf18Predictions": true,
+    "sf19Rating": true,
+    "sf19Protocol": true,
+    "sf19Predictions": true,
+    "contextPredictions": true
+  },
+  "publicSides": 250,
+  "sf19ContextValidation": {
+    "games": 750,
+    "sides": 1498,
+    "folds": 5,
+    "crps": 2.112433520760696,
+    "baselineCrps": 2.21289067267762,
+    "improvementFraction": 0.04539634657837377,
+    "baselineFolds": [
+      {
+        "fold": 0,
+        "crps": 2.0227708462044705,
+        "games": 159
+      },
+      {
+        "fold": 1,
+        "crps": 2.288849364807958,
+        "games": 157
+      },
+      {
+        "fold": 2,
+        "crps": 2.105006695071229,
+        "games": 138
+      },
+      {
+        "fold": 3,
+        "crps": 2.445468487858286,
+        "games": 156
+      },
+      {
+        "fold": 4,
+        "crps": 2.190814869008091,
+        "games": 140
+      }
+    ],
+    "limitations": "Game-disjoint training-fold assessment also selects bandwidth. Existing rating-training evidence is reused; no untouched final test or true-rating validation."
+  },
+  "fittingSearches": 0,
+  "networkRequests": 0,
+  "subprocesses": 0,
+  "passed": true
+}

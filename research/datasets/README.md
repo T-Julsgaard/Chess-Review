@@ -24,4 +24,4 @@ Keep bulk raw inputs in `research/runs/`; retain compact manifests and necessary
 evidence. Use LF-normalized structured text before hashing. Do not claim fresh
 confirmation simply because an existing dataset has been renamed or resplit.
 
-No new datasets have been registered yet.
+Registered: [D001 public baseline evidence](D001-public-baseline/README.md).

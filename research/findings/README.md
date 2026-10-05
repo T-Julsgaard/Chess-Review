@@ -9,4 +9,4 @@ prevent repeated dead ends. Update the index with outcome and evidence maturity.
 When later evidence changes a conclusion, append a dated revision and link the
 superseding finding. Preserve the original result and the reason for the change.
 
-No new findings have been established yet.
+Recorded: [F001 evidence and test exposure](F001-evidence-and-exposure.md).

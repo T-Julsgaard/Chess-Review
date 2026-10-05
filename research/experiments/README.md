@@ -9,4 +9,4 @@ models stay here. Bulk artifacts go in ignored `../runs/<id>/<run-id>/` and must
 have a retained manifest and retrieval/rebuild recipe. Register each experiment
 in [INDEX.md](../INDEX.md), including negative, inconclusive and invalid outcomes.
 
-No experiments have run yet.
+See [the index](../INDEX.md) for registered and completed experiments.

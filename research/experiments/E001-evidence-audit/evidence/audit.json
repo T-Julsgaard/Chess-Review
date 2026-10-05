@@ -1,0 +1,266 @@
+{
+  "schema": "research-evidence-audit-v1",
+  "dataset": "D001",
+  "inputHashes": {
+    "sf18-evidence.json.gz": {
+      "sha256": "2771b2b8a7839e4d9f2ddbff73aa6e0dfbe017f3aa3a7b052584147ee21c968b",
+      "uncompressedSha256": "a8f4bf1d9f3c7bbe16eca1fa09d0e0dc918a907c59079a2b2fe14ea4e398e486",
+      "bytes": 5838826
+    },
+    "dataset.json.gz": {
+      "sha256": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+      "uncompressedSha256": "54b589844813490a1ebd15251e6142e2a361d6fac53d6dfe38414ded1cdf5708",
+      "bytes": 463748
+    },
+    "sf18-rating-evidence.json.gz": {
+      "sha256": "f41178347bc9569390b744f9e6fb2206882cf2307c762de8b8f8aab35c2a1e31",
+      "uncompressedSha256": "c4f3b5caeb78511d34ce4c9031b53ab6e00338871bad5119d488bfc0e8f365f7",
+      "bytes": 1320424
+    },
+    "sf19-rating-evidence.json.gz": {
+      "sha256": "8ac253f86fa87a945c06e86f2b7c82d4f2b7e8c96ae9b990a6efadbac9f7d721",
+      "uncompressedSha256": "cea288e5a8eeb7f2f5202b7d8fd526b7a454d9b597eaf4ee61c1e0dcaf080ecc",
+      "bytes": 683399
+    },
+    "expected-scores.json": {
+      "sha256": "969664315be01fab6f719ce158926741c45ec59ef8e3accfe28f0dcc595b7df6",
+      "uncompressedSha256": "969664315be01fab6f719ce158926741c45ec59ef8e3accfe28f0dcc595b7df6",
+      "bytes": 28657
+    },
+    "validation.json": {
+      "sha256": "865aa647f484f3932c42baa2bd15625bd7cdfd253f504aa6d64aba3e4eb07076",
+      "uncompressedSha256": "865aa647f484f3932c42baa2bd15625bd7cdfd253f504aa6d64aba3e4eb07076",
+      "bytes": 1309
+    },
+    "sources.json": {
+      "sha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+      "uncompressedSha256": "13e7e502f8dc39ddfb917d3966ae3d483238597b2fd2de38591a581e8365033a",
+      "bytes": 23408
+    }
+  },
+  "baselineFiles": {
+    "data/calibration.json": {
+      "sha256": "22366593977f4f910c060050ec2c6757b74c002924f8bc33cb8ee78792b55781",
+      "bytes": 419004
+    },
+    "lib/public-scoring.js": {
+      "sha256": "de158d2fd2708b9f37b1692508eed10db57fc12f41c33d101a6da772b0b42c54",
+      "bytes": 7236
+    },
+    "tools/calibration/PUBLIC_METHOD.md": {
+      "sha256": "7695a0e09a4c39a403baa76ac4b70fb280d898a986039b6a592d0e1b2d498a27",
+      "bytes": 10885
+    }
+  },
+  "normalized": {
+    "games": 2000,
+    "uniqueGames": 2000,
+    "players": 4000,
+    "roles": {
+      "train": 1400,
+      "validation": 300,
+      "test": 300
+    },
+    "categories": {
+      "blitz": 2000
+    },
+    "months": {
+      "2026-08": 670,
+      "2026-06": 675,
+      "2026-07": 655
+    },
+    "playersCrossingRoles": 0
+  },
+  "depth": {
+    "games": 125,
+    "roles": {
+      "train": 100,
+      "validation": 25
+    },
+    "positions": 400,
+    "searches": 26697,
+    "configHash": "a0b30bac4d4c2130e457dc6b5cbdd9e86845540646c4ff135721ee874a4b1d9b"
+  },
+  "rating": {
+    "sf18": {
+      "games": 1400,
+      "sides": 2798,
+      "missingSides": [
+        {
+          "gameId": "HsowT6Qd",
+          "color": "b",
+          "decisions": 9,
+          "reason": "Below maintained ten-decision rating threshold"
+        },
+        {
+          "gameId": "4eLPtn5c",
+          "color": "b",
+          "decisions": 8,
+          "reason": "Below maintained ten-decision rating threshold"
+        }
+      ],
+      "decisions": 97396,
+      "negativeResidualsBelowMinus002": 1172,
+      "invalidRecords": 0,
+      "engineConfig": {
+        "version": "Stockfish 18 (identity verified at UCI startup)",
+        "majorVersion": 18,
+        "build": "stockfish.js lite single-threaded",
+        "network": "nn-9067e33176e8.nnue",
+        "loaderSha256": "2278005057f381491f1c9bb3e44c9f5920b3a00bef9759e33cc6582769a1f1fe",
+        "wasmSha256": "a8fbc05ec6920b56d7485826dcb02c5ffd2826bcbf751cf973046f237a9096f1",
+        "budget": {
+          "kind": "nodes",
+          "value": 20000
+        },
+        "options": {
+          "Threads": 1,
+          "Hash": 32,
+          "MultiPV": 1,
+          "Skill Level": 20,
+          "UCI_LimitStrength": false,
+          "UCI_ShowWDL": true,
+          "UCI_Chess960": false
+        },
+        "reset": "ucinewgame + Clear Hash + isready before every search",
+        "tablebases": "none",
+        "perspective": "side to move at root",
+        "position": "startpos with full move history"
+      },
+      "componentCount": 1400,
+      "largestComponentGames": 1,
+      "componentSizes": {
+        "1": 1400
+      },
+      "playersCrossingExistingGameFolds": 0,
+      "datasetRoleCounts": {
+        "train": 1400
+      }
+    },
+    "sf19": {
+      "games": 750,
+      "sides": 1498,
+      "missingSides": [
+        {
+          "gameId": "HsowT6Qd",
+          "color": "b",
+          "decisions": 9,
+          "reason": "Below maintained ten-decision rating threshold"
+        },
+        {
+          "gameId": "4eLPtn5c",
+          "color": "b",
+          "decisions": 8,
+          "reason": "Below maintained ten-decision rating threshold"
+        }
+      ],
+      "decisions": 51765,
+      "negativeResidualsBelowMinus002": 585,
+      "invalidRecords": 0,
+      "engineConfig": {
+        "version": "Stockfish 19 (identity verified at UCI startup)",
+        "majorVersion": 19,
+        "build": "stockfish.js lite single-threaded",
+        "network": "nn-61e7af4bb97d.nnue",
+        "loaderSha256": "d3344124ab067fb0b90ee77873bb8e9fbf5fc01bc525fe714b0f942581e889e6",
+        "wasmSha256": "57ac2d72312aba346760e3f173f687a8c211208e97a87268436f7f0e10bb5387",
+        "budget": {
+          "kind": "nodes",
+          "value": 20000
+        },
+        "options": {
+          "Threads": 1,
+          "Hash": 32,
+          "MultiPV": 1,
+          "Skill Level": 20,
+          "UCI_LimitStrength": false,
+          "UCI_ShowWDL": true,
+          "UCI_Chess960": false
+        },
+        "reset": "ucinewgame + Clear Hash + isready before every search",
+        "tablebases": "none",
+        "perspective": "side to move at root",
+        "position": "startpos with full move history"
+      },
+      "componentCount": 750,
+      "largestComponentGames": 1,
+      "componentSizes": {
+        "1": 750
+      },
+      "playersCrossingExistingGameFolds": 0,
+      "datasetRoleCounts": {
+        "train": 750
+      }
+    }
+  },
+  "priorExposure": {
+    "localStudies": [
+      {
+        "study": "sf19-quality",
+        "testGames": 25,
+        "unknownGames": 0
+      },
+      {
+        "study": "sf19-choice-confirmation",
+        "testGames": 25,
+        "unknownGames": 0
+      }
+    ],
+    "knownConsumedTestGames": 50,
+    "consumedTestIds": [
+      "3GeCq9zh",
+      "5n1UF5cg",
+      "6BLnoiys",
+      "7K3pZGB2",
+      "9onF3nfO",
+      "BTCMWtaa",
+      "CMAQWWtQ",
+      "CkvyovWE",
+      "DI5HddPH",
+      "EEYWPLZs",
+      "FdRoaBcp",
+      "FltoIXMH",
+      "GRatGSHa",
+      "Gn9OkAlf",
+      "HBjQ4SBI",
+      "HyqM1DeP",
+      "Ik6NX3iy",
+      "L6dowU3Q",
+      "M7CoxZFt",
+      "M9d9WHf5",
+      "MgCjIbAT",
+      "Mx3KPQ7z",
+      "OIh7H7r6",
+      "Ri47RJiD",
+      "SdT0K8fw",
+      "U9SRFsUd",
+      "UwI9kQQw",
+      "VI6VghKh",
+      "VXWEhtTV",
+      "WU1V4YdW",
+      "XIfQTazI",
+      "bbQ2ujvu",
+      "fxzqBTnq",
+      "j4c1pyPe",
+      "mwHnCdLq",
+      "qawVKrmj",
+      "qgLeeAST",
+      "qs9YKi9O",
+      "qyKKQ3BH",
+      "s6t6FuBx",
+      "sP1i0uKa",
+      "saqlG7cF",
+      "t8Y5CCMz",
+      "uOLCNW6n",
+      "uW77isN0",
+      "vqgd7w8N",
+      "wUgLvGBB",
+      "wv6AwzNf",
+      "ytGoqMK0",
+      "zX4c9GZN"
+    ],
+    "remainingTestStatus": "Unknown earlier exposure; metadata inspected. Not certified fresh."
+  },
+  "errors": [],
+  "passed": true
+}
