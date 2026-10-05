@@ -22,21 +22,27 @@ import {loadInputs as loadNetInputs} from './experiments/E013-net-offer-pack/cod
 import {evaluate as evaluateNet} from './experiments/E013-net-offer-pack/code/method.mjs';
 import {audit as auditNet} from './experiments/E013-net-offer-pack/code/audit.mjs';
 import {select as selectNet} from './experiments/E013-net-offer-pack/code/selection.mjs';
+import {loadInputs as loadRootInputs} from './experiments/E014-root-pair-consistency/code/inputs.mjs';
+import {evaluate as evaluateRoot,readResults as readRootResults} from './experiments/E014-root-pair-consistency/code/method.mjs';
+import {audit as auditRoot} from './experiments/E014-root-pair-consistency/code/audit.mjs';
 
 // Run only from an externally extracted Git archive. The operator supplies its
 // exact commit and retains the archive command/hash alongside this receipt.
 const [experiment,revision,...extra]=process.argv.slice(2),root=fileURLToPath(new URL('../',import.meta.url));
-if(!['E008','E009','E010','E011','E012','E013'].includes(experiment)||!/^([a-f0-9]{40})$/.test(revision||'')||extra.length)throw Error('Use clean-replay.mjs E008|E009|E010|E011|E012|E013 <archive commit SHA>');
+if(!['E008','E009','E010','E011','E012','E013','E014'].includes(experiment)||!/^([a-f0-9]{40})$/.test(revision||'')||extra.length)throw Error('Use clean-replay.mjs E008|E009|E010|E011|E012|E013|E014 <archive commit SHA>');
 try{await stat(path.join(root,'.git'));throw Error('Clean replay requires a snapshot without .git');}catch(e){if(e.code!=='ENOENT')throw e;}
 const started=performance.now(),access=await openResearchData(['E012','E013'].includes(experiment)?['D001']:['D001','D002'],{purpose:'reuse'}),
-  active={E008:'research/experiments/E008-human-quality-curves/',E009:'research/experiments/E009-search-stability/',E010:'research/experiments/E010-candidate-stability/',E011:'research/experiments/E011-outcome-confirmation/',E012:'research/experiments/E012-offer-evidence/',E013:'research/experiments/E013-net-offer-pack/'}[experiment],run=await access.readJson(active+'evidence/run.json'),
-  saved=await access.readJson(active+'evidence/results.json');
+  active={E008:'research/experiments/E008-human-quality-curves/',E009:'research/experiments/E009-search-stability/',E010:'research/experiments/E010-candidate-stability/',E011:'research/experiments/E011-outcome-confirmation/',E012:'research/experiments/E012-offer-evidence/',E013:'research/experiments/E013-net-offer-pack/',E014:'research/experiments/E014-root-pair-consistency/'}[experiment],run=await access.readJson(active+'evidence/'+(experiment==='E014'?'run-SF18.json':'run.json')),
+  saved=experiment==='E014'?await readRootResults(access,active):await access.readJson(active+'evidence/results.json');
 for(const [name,expected] of Object.entries(run.codeSha256)){
   if(sha256(await readFile(path.join(root,active,'code',name)))!==expected)throw Error('Clean snapshot scoring code differs from fitted run: '+name);
 }
 let exactPredictions=null,independent;
 for(const [file,expected] of Object.entries(run.sharedCodeSha256||{}))if(sha256(await readFile(path.join(root,file)))!==expected)throw Error('Shared replay code differs: '+file);
-if(experiment==='E013'){
+if(experiment==='E014'){
+  const otherRun=await access.readJson(active+'evidence/run-SF19.json');if(JSON.stringify(otherRun.codeSha256)!==JSON.stringify(run.codeSha256)||JSON.stringify(otherRun.sharedCodeSha256)!==JSON.stringify(run.sharedCodeSha256))throw Error('Root-panel partition code differs');
+  const input=await loadRootInputs(access),replay=evaluateRoot(input.rows,input.freeze);if(JSON.stringify(replay)!==JSON.stringify(saved))throw Error('Clean root consistency replay differs');independent=auditRoot(input.rows,input.freeze,saved);
+}else if(experiment==='E013'){
   const input=await loadNetInputs(access),replay=evaluateNet(input.prepared,input.policy,input.board),selected=selectNet(input.dataset,input.context,input.excluded,input.board);
   if(JSON.stringify(replay)!==JSON.stringify(saved)||!selected.complete||JSON.stringify(selected.selected)!==JSON.stringify(input.selected)||JSON.stringify(selected.diagnostics)!==JSON.stringify(input.key.diagnostics))throw Error('Clean net-offer/selection replay differs');independent=auditNet(input.prepared,input.policy,input.board,saved,input.dataset);
 }else if(experiment==='E012'){

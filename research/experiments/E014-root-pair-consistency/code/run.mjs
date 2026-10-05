@@ -1,0 +1,25 @@
+import {readFile,writeFile,mkdir,stat} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import {execFileSync} from 'node:child_process';
+import path from 'node:path';
+import {openResearchData,sha256} from '../../../data-policy.mjs';
+import {loadParents,loadInputs,prefix,partitionFreeze} from './inputs.mjs';
+import {evaluate,partitionResult,readResults} from './method.mjs';
+import {audit} from './audit.mjs';
+export async function hashes(root){const local=['run.mjs','method.mjs','audit.mjs','inputs.mjs'],codeSha256=Object.fromEntries(await Promise.all(local.map(async n=>[n,sha256(await readFile(path.join(root,prefix,'code',n)))]))),sharedCodeSha256={},visited=new Set();
+  async function walk(p){if(visited.has(p))return;visited.add(p);const source=await readFile(path.join(root,p),'utf8');if(!p.startsWith(prefix))sharedCodeSha256[p]=sha256(source);
+    for(const m of source.matchAll(/(?:from\s+|import\s*)['"]([^'"]+)['"]/g)){if(!m[1].startsWith('.'))continue;const next=path.posix.normalize(path.posix.join(path.posix.dirname(p),m[1]));if(!next.endsWith('.js')&&!next.endsWith('.mjs'))continue;await walk(next);}}
+  for(const n of local)await walk(prefix+'code/'+n);sharedCodeSha256['analysis.js']=sha256(await readFile(path.join(root,'analysis.js')));sharedCodeSha256['research/fresh-format.mjs']=sha256(await readFile(path.join(root,'research/fresh-format.mjs')));return{codeSha256,sharedCodeSha256};}
+async function main(){
+  const [mode,...args]=process.argv.slice(2);if(!['freeze','evaluate','verify'].includes(mode)||args.length&&!(args.length===2&&args[0]==='--out'&&args[1]))throw Error('Use run.mjs freeze|evaluate|verify [--out research/directory]');
+  const root=fileURLToPath(new URL('../../../../',import.meta.url)),out=args.length?path.resolve(root,args[1]):fileURLToPath(new URL('../evidence/',import.meta.url));if(!out.startsWith(path.join(root,'research')+path.sep))throw Error('Output must stay in research');
+  const started=performance.now(),access=await openResearchData(['D001','D002'],{purpose:mode==='evaluate'?'analyze':'reuse'}),input=mode==='freeze'?await loadParents(access):await loadInputs(access),deps=await hashes(root),receipt={schema:'research-run-v1',id:'E014-'+mode,date:'2026-10-05',sourceRevision:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8',windowsHide:true}).trim(),command:'node '+prefix+'code/run.mjs '+mode+(args.length?' --out '+args[1]:''),dataEligibility:access.receipt,
+    environment:{node:process.version,platform:process.platform,arch:process.arch},...deps,freezeSha256:sha256(JSON.stringify(input.freeze)),engineSearches:0,modelFits:0,humanLabelsUsed:0};
+  await mkdir(out,{recursive:true});const write=async(name,value)=>{const b=JSON.stringify(value,null,2)+'\n';if(Buffer.byteLength(b)>1048576)throw Error('Retained file exceeds report cap');await writeFile(path.join(out,name),b);return sha256(b);};
+  async function fresh(file){try{await stat(path.join(out,file));throw Error('Refusing to overwrite canonical output: '+file);}catch(e){if(e.code!=='ENOENT')throw e;}}
+  if(mode==='freeze'){for(const e of ['SF18','SF19'])await fresh('freeze-'+e+'.json');for(const e of ['SF18','SF19']){const name='freeze-'+e+'.json',h=await write(name,partitionFreeze(input.freeze,e));await write('freeze-run-'+e+'.json',{...receipt,engine:e,elapsedMs:performance.now()-started,propertyAssessments:0,outputs:{[name]:h}});}console.log(JSON.stringify({frozen:true,SF18:40,SF19:45,sourceBound:true,propertyAssessments:0}));return;}
+  const scoringStart=performance.now(),replay=evaluate(input.rows,input.freeze);if(performance.now()-scoringStart>120000)throw Error('Scoring time cap exceeded');
+  if(mode==='evaluate'){for(const e of ['SF18','SF19'])await fresh('results-'+e+'.json');for(const e of ['SF18','SF19']){const name='results-'+e+'.json',h=await write(name,partitionResult(replay,e));await write('run-'+e+'.json',{...receipt,engine:e,elapsedMs:performance.now()-started,scoringMs:performance.now()-scoringStart,outputs:{[name]:h},evaluationRole:'Exposed development engine consistency; no reserved targets/outcomes/ratings or human labels'});}console.log(JSON.stringify({passed:replay.passed,engines:replay.engines},null,2));}
+  else{const saved=await readResults(access,prefix);for(const e of ['SF18','SF19']){const run=await access.readJson(prefix+'evidence/run-'+e+'.json');if(JSON.stringify(partitionResult(replay,e))!==JSON.stringify(await access.readJson(prefix+'evidence/results-'+e+'.json'))||JSON.stringify(run.codeSha256)!==JSON.stringify(deps.codeSha256)||JSON.stringify(run.sharedCodeSha256)!==JSON.stringify(deps.sharedCodeSha256))throw Error('Exact/code replay mismatch');}const independent=audit(input.rows,input.freeze,saved);for(const e of ['SF18','SF19'])await write('verification-'+e+'.json',{...receipt,schema:'E014-verification-v1',engine:e,passed:true,exactReport:true,independent,elapsedMs:performance.now()-started});console.log(JSON.stringify({passed:true,exactReport:true,independent,elapsedMs:performance.now()-started},null,2));}
+}
+if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url))await main();

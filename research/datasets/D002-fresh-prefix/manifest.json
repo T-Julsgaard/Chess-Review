@@ -412,6 +412,26 @@
       "sha256": "6d2beba437548a5c40fc455f57efcdfd92fa23fa87cba498ce1471b4525e2a3a",
       "bytes": 679,
       "uncompressedSha256": "6d2beba437548a5c40fc455f57efcdfd92fa23fa87cba498ce1471b4525e2a3a"
+    },
+    "research/experiments/E014-root-pair-consistency/evidence/freeze-SF19.json": {
+      "kind": "summary",
+      "parents": [
+        "research/datasets/D002-fresh-prefix/games.json.gz",
+        "research/experiments/E008-human-quality-curves/evidence/sf19-observations.json.gz",
+        "research/experiments/E009-search-stability/evidence/sf19-observations.json.gz"
+      ],
+      "sha256": "e817278ac15828c355704addc87197518f03c25bb502e200658063b5c0b7e15b",
+      "bytes": 6617,
+      "uncompressedSha256": "e817278ac15828c355704addc87197518f03c25bb502e200658063b5c0b7e15b"
+    },
+    "research/experiments/E014-root-pair-consistency/evidence/freeze-run-SF19.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E014-root-pair-consistency/evidence/freeze-SF19.json"
+      ],
+      "sha256": "da63d32d4797136d707d2aeceb1e655661400f0f81cdcbe50147f0195040b487",
+      "bytes": 18210,
+      "uncompressedSha256": "da63d32d4797136d707d2aeceb1e655661400f0f81cdcbe50147f0195040b487"
     }
   }
 }

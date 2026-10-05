@@ -1,0 +1,313 @@
+{
+  "schema": "E014-freeze-v1",
+  "candidate": "restrict-final-chosen-move-v1",
+  "pointMapping": "engine-WDL-with-mate-boundaries",
+  "budgets": [
+    "20k",
+    "80k"
+  ],
+  "cohorts": {
+    "SF19": [
+      {
+        "gameId": "NZownEaj",
+        "split": "train",
+        "ply": 41,
+        "panel": "E009"
+      },
+      {
+        "gameId": "07sDmwgW",
+        "split": "train",
+        "ply": 45,
+        "panel": "E009"
+      },
+      {
+        "gameId": "WWkXR9Xz",
+        "split": "train",
+        "ply": 20,
+        "panel": "E009"
+      },
+      {
+        "gameId": "E0nRzRyk",
+        "split": "train",
+        "ply": 59,
+        "panel": "E009"
+      },
+      {
+        "gameId": "87PZBdRd",
+        "split": "train",
+        "ply": 52,
+        "panel": "E009"
+      },
+      {
+        "gameId": "aDJJOvyO",
+        "split": "train",
+        "ply": 75,
+        "panel": "E009"
+      },
+      {
+        "gameId": "1ziAkAhB",
+        "split": "train",
+        "ply": 69,
+        "panel": "E009"
+      },
+      {
+        "gameId": "UhAyJbXr",
+        "split": "train",
+        "ply": 44,
+        "panel": "E009"
+      },
+      {
+        "gameId": "TtWBC399",
+        "split": "train",
+        "ply": 27,
+        "panel": "E009"
+      },
+      {
+        "gameId": "OypcnXEs",
+        "split": "train",
+        "ply": 61,
+        "panel": "E009"
+      },
+      {
+        "gameId": "hFgCloIy",
+        "split": "train",
+        "ply": 20,
+        "panel": "E009"
+      },
+      {
+        "gameId": "0uyT8KFm",
+        "split": "train",
+        "ply": 27,
+        "panel": "E009"
+      },
+      {
+        "gameId": "ZtaRsTxD",
+        "split": "train",
+        "ply": 34,
+        "panel": "E009"
+      },
+      {
+        "gameId": "o9ANDF2f",
+        "split": "train",
+        "ply": 39,
+        "panel": "E009"
+      },
+      {
+        "gameId": "vbOIU1yl",
+        "split": "train",
+        "ply": 31,
+        "panel": "E009"
+      },
+      {
+        "gameId": "cfBoshiO",
+        "split": "train",
+        "ply": 40,
+        "panel": "E009"
+      },
+      {
+        "gameId": "KlqlZLy3",
+        "split": "train",
+        "ply": 62,
+        "panel": "E009"
+      },
+      {
+        "gameId": "NoaXUASy",
+        "split": "train",
+        "ply": 64,
+        "panel": "E009"
+      },
+      {
+        "gameId": "lWKzzdc0",
+        "split": "train",
+        "ply": 38,
+        "panel": "E009"
+      },
+      {
+        "gameId": "NioKxUef",
+        "split": "train",
+        "ply": 28,
+        "panel": "E009"
+      },
+      {
+        "gameId": "g13eiJLN",
+        "split": "train",
+        "ply": 28,
+        "panel": "E009"
+      },
+      {
+        "gameId": "v1kFlZ0q",
+        "split": "train",
+        "ply": 49,
+        "panel": "E009"
+      },
+      {
+        "gameId": "k7j2HNII",
+        "split": "train",
+        "ply": 26,
+        "panel": "E009"
+      },
+      {
+        "gameId": "yKxFGFfA",
+        "split": "train",
+        "ply": 35,
+        "panel": "E009"
+      },
+      {
+        "gameId": "OltFPwJq",
+        "split": "train",
+        "ply": 44,
+        "panel": "E009"
+      },
+      {
+        "gameId": "GBhSl3aw",
+        "split": "train",
+        "ply": 15,
+        "panel": "E009"
+      },
+      {
+        "gameId": "iyHrQ3lK",
+        "split": "train",
+        "ply": 48,
+        "panel": "E009"
+      },
+      {
+        "gameId": "Sc600s6i",
+        "split": "train",
+        "ply": 67,
+        "panel": "E009"
+      },
+      {
+        "gameId": "zYKF5o8M",
+        "split": "train",
+        "ply": 31,
+        "panel": "E009"
+      },
+      {
+        "gameId": "yoqFko4G",
+        "split": "train",
+        "ply": 11,
+        "panel": "E009"
+      },
+      {
+        "gameId": "6ZfKnfuQ",
+        "split": "validation",
+        "ply": 35,
+        "panel": "E009"
+      },
+      {
+        "gameId": "755Pl4j7",
+        "split": "validation",
+        "ply": 71,
+        "panel": "E009"
+      },
+      {
+        "gameId": "RG2eaC19",
+        "split": "validation",
+        "ply": 17,
+        "panel": "E009"
+      },
+      {
+        "gameId": "xlwVkAYG",
+        "split": "validation",
+        "ply": 13,
+        "panel": "E009"
+      },
+      {
+        "gameId": "rdtvlp3G",
+        "split": "validation",
+        "ply": 39,
+        "panel": "E009"
+      },
+      {
+        "gameId": "2YtStT5N",
+        "split": "validation",
+        "ply": 63,
+        "panel": "E009"
+      },
+      {
+        "gameId": "uLVSnZ4r",
+        "split": "validation",
+        "ply": 45,
+        "panel": "E009"
+      },
+      {
+        "gameId": "jF7o7W4Y",
+        "split": "validation",
+        "ply": 24,
+        "panel": "E009"
+      },
+      {
+        "gameId": "Rqd31FLF",
+        "split": "validation",
+        "ply": 22,
+        "panel": "E009"
+      },
+      {
+        "gameId": "w0KEuHAA",
+        "split": "validation",
+        "ply": 13,
+        "panel": "E009"
+      },
+      {
+        "gameId": "IhHKcsVu",
+        "split": "validation",
+        "ply": 16,
+        "panel": "E009"
+      },
+      {
+        "gameId": "LYVFbYLk",
+        "split": "validation",
+        "ply": 36,
+        "panel": "E009"
+      },
+      {
+        "gameId": "JVNYiiqL",
+        "split": "validation",
+        "ply": 23,
+        "panel": "E009"
+      },
+      {
+        "gameId": "zyyMQlLv",
+        "split": "validation",
+        "ply": 33,
+        "panel": "E009"
+      },
+      {
+        "gameId": "qnqeuoba",
+        "split": "validation",
+        "ply": 74,
+        "panel": "E009"
+      }
+    ]
+  },
+  "inputSha256": {
+    "research/datasets/D002-fresh-prefix/games.json.gz": "23d5008ff55aa51fd2861d4e813a1958503fbbb6908aa2115bfb31822eb536e5",
+    "research/experiments/E008-human-quality-curves/evidence/sf19-observations.json.gz": "d9cd050453878ebbadb330f54516b9ab71e58df4bc44ece5a7bdc79e48336ecf",
+    "research/experiments/E009-search-stability/evidence/sf19-observations.json.gz": "1c0d772c3c6bd03d959fc528027a2b6a1c5feafa5f68865493902452aa8409bb"
+  },
+  "gates": {
+    "minimumRelativeReduction": 0.25,
+    "intervalLevel": 0.9875,
+    "bootstrapIterations": 10000,
+    "seeds": [
+      20261051,
+      20261052,
+      20261053,
+      20261054
+    ],
+    "nearBestThreshold": 0.02,
+    "maxFalseNearBestIncrease": 0.025,
+    "maxMeanDriftIncrease": 0.01,
+    "driftTolerance": 0.05,
+    "minStableFraction": 0.9,
+    "minWilsonLower": 0.8,
+    "maxQueries": 3
+  },
+  "engineConfigHashes": {
+    "SF19": {
+      "20k": "fdb09212ed137b44394201739fadaf5a422827a98a182ed45820b89e959486c5",
+      "80k": "f7eb408d8f178bff37aa65fe3c017a7947d9114d208d6fc536f9b1247bbe7ea2"
+    }
+  },
+  "confirmation": false
+}

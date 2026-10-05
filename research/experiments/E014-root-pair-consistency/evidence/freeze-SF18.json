@@ -1,0 +1,290 @@
+{
+  "schema": "E014-freeze-v1",
+  "candidate": "restrict-final-chosen-move-v1",
+  "pointMapping": "engine-WDL-with-mate-boundaries",
+  "budgets": [
+    "20k",
+    "80k"
+  ],
+  "cohorts": {
+    "SF18": [
+      {
+        "gameId": "Eu8bn37Y",
+        "split": "train",
+        "ply": 77,
+        "panel": "E012"
+      },
+      {
+        "gameId": "ZfvqWppS",
+        "split": "train",
+        "ply": 62,
+        "panel": "E012"
+      },
+      {
+        "gameId": "0zl0bbTT",
+        "split": "train",
+        "ply": 25,
+        "panel": "E012"
+      },
+      {
+        "gameId": "Kl48aHnp",
+        "split": "train",
+        "ply": 78,
+        "panel": "E012"
+      },
+      {
+        "gameId": "iYNg6Gap",
+        "split": "train",
+        "ply": 23,
+        "panel": "E012"
+      },
+      {
+        "gameId": "jXCnNv0P",
+        "split": "train",
+        "ply": 24,
+        "panel": "E012"
+      },
+      {
+        "gameId": "uvLQ5p88",
+        "split": "train",
+        "ply": 23,
+        "panel": "E012"
+      },
+      {
+        "gameId": "6TgXaEee",
+        "split": "train",
+        "ply": 51,
+        "panel": "E012"
+      },
+      {
+        "gameId": "JX2uKUtQ",
+        "split": "train",
+        "ply": 45,
+        "panel": "E012"
+      },
+      {
+        "gameId": "2du0qQzP",
+        "split": "train",
+        "ply": 40,
+        "panel": "E012"
+      },
+      {
+        "gameId": "vNG1Qj8X",
+        "split": "train",
+        "ply": 24,
+        "panel": "E012"
+      },
+      {
+        "gameId": "OoUlLqTP",
+        "split": "train",
+        "ply": 133,
+        "panel": "E012"
+      },
+      {
+        "gameId": "10qNq4FB",
+        "split": "train",
+        "ply": 28,
+        "panel": "E012"
+      },
+      {
+        "gameId": "yy6SO8bw",
+        "split": "train",
+        "ply": 10,
+        "panel": "E012"
+      },
+      {
+        "gameId": "rzaKOxth",
+        "split": "train",
+        "ply": 6,
+        "panel": "E012"
+      },
+      {
+        "gameId": "T9nF5L6h",
+        "split": "train",
+        "ply": 78,
+        "panel": "E012"
+      },
+      {
+        "gameId": "3PP2yp6b",
+        "split": "train",
+        "ply": 35,
+        "panel": "E012"
+      },
+      {
+        "gameId": "8SL4SzQo",
+        "split": "train",
+        "ply": 67,
+        "panel": "E012"
+      },
+      {
+        "gameId": "ASiKmgPG",
+        "split": "train",
+        "ply": 37,
+        "panel": "E012"
+      },
+      {
+        "gameId": "vQ7X3vji",
+        "split": "train",
+        "ply": 32,
+        "panel": "E012"
+      },
+      {
+        "gameId": "F3TvuWZX",
+        "split": "train",
+        "ply": 37,
+        "panel": "E012"
+      },
+      {
+        "gameId": "SULZ4EqV",
+        "split": "train",
+        "ply": 30,
+        "panel": "E012"
+      },
+      {
+        "gameId": "7GTeXKQp",
+        "split": "train",
+        "ply": 18,
+        "panel": "E012"
+      },
+      {
+        "gameId": "vWqMbXTw",
+        "split": "train",
+        "ply": 26,
+        "panel": "E012"
+      },
+      {
+        "gameId": "tDHDRWhr",
+        "split": "train",
+        "ply": 57,
+        "panel": "E013"
+      },
+      {
+        "gameId": "lknGjF3x",
+        "split": "train",
+        "ply": 26,
+        "panel": "E013"
+      },
+      {
+        "gameId": "dHGW74a6",
+        "split": "train",
+        "ply": 76,
+        "panel": "E013"
+      },
+      {
+        "gameId": "EPRCFdzQ",
+        "split": "train",
+        "ply": 39,
+        "panel": "E013"
+      },
+      {
+        "gameId": "Q04dFLKQ",
+        "split": "train",
+        "ply": 82,
+        "panel": "E013"
+      },
+      {
+        "gameId": "UoAme6Vk",
+        "split": "train",
+        "ply": 1,
+        "panel": "E013"
+      },
+      {
+        "gameId": "VznN5Hhe",
+        "split": "train",
+        "ply": 30,
+        "panel": "E013"
+      },
+      {
+        "gameId": "NZta6CCP",
+        "split": "train",
+        "ply": 19,
+        "panel": "E013"
+      },
+      {
+        "gameId": "cSkOnjt9",
+        "split": "train",
+        "ply": 29,
+        "panel": "E013"
+      },
+      {
+        "gameId": "ALcv5YpS",
+        "split": "train",
+        "ply": 43,
+        "panel": "E013"
+      },
+      {
+        "gameId": "RgAkRyub",
+        "split": "train",
+        "ply": 25,
+        "panel": "E013"
+      },
+      {
+        "gameId": "0SLHTgW6",
+        "split": "train",
+        "ply": 40,
+        "panel": "E013"
+      },
+      {
+        "gameId": "LJJQuCHE",
+        "split": "train",
+        "ply": 58,
+        "panel": "E013"
+      },
+      {
+        "gameId": "7CkGl9Zu",
+        "split": "train",
+        "ply": 109,
+        "panel": "E013"
+      },
+      {
+        "gameId": "pCnAczkD",
+        "split": "train",
+        "ply": 30,
+        "panel": "E013"
+      },
+      {
+        "gameId": "jcbzyUdc",
+        "split": "train",
+        "ply": 21,
+        "panel": "E013"
+      }
+    ]
+  },
+  "inputSha256": {
+    "tools/calibration/public/dataset.json.gz": "802f4fa8819408df565de0b3a0316ee24b5a302fa92291cba788a8ad5e9ac15f",
+    "tools/calibration/public/sf18-rating-evidence.json.gz": "f41178347bc9569390b744f9e6fb2206882cf2307c762de8b8f8aab35c2a1e31",
+    "research/experiments/E005-category-review/evidence/cases.json": "b6974f3159c839f3764eed3d8da5dff406dece9bb2414c958e8484d81271c41f",
+    "research/experiments/E005-category-review/evidence/selection-key.json": "33e75aa79f26b07358d53f432535c862a85aa79a4e5f38101eff3ec8ff94b5c0",
+    "research/experiments/E012-offer-evidence/evidence/policy.json": "a7365e813d97470d55056fda3baf5b3a8311b85bcc301ecc9c88403e5314a6b4",
+    "research/experiments/E012-offer-evidence/evidence/sf18-observations.json.gz": "02367574df6676276243cd1f60e23e5c2ec984eb70a49df24d2188aaea6be547",
+    "research/experiments/E013-net-offer-pack/evidence/policy.json": "f9f60ba511e03a1826d442504315baa9d7dd0ac16511d34008c006f0cfee5d5d",
+    "research/experiments/E013-net-offer-pack/evidence/sf18-observations.json.gz": "b7ee839acb88813dce83d16eae6dd93ee2a6d1eca8557471dae947b29ced68ea",
+    "research/experiments/E013-net-offer-pack/evidence/cases.json": "d6f0c63a657901d822bdb0920895576371457f134a82c3aed35ccce04fc8c521",
+    "research/experiments/E013-net-offer-pack/evidence/selection-key.json": "32dbeb26b0e078b431156344602d2115fb4ce9e263b3ca331170d330312948ea"
+  },
+  "gates": {
+    "minimumRelativeReduction": 0.25,
+    "intervalLevel": 0.9875,
+    "bootstrapIterations": 10000,
+    "seeds": [
+      20261051,
+      20261052,
+      20261053,
+      20261054
+    ],
+    "nearBestThreshold": 0.02,
+    "maxFalseNearBestIncrease": 0.025,
+    "maxMeanDriftIncrease": 0.01,
+    "driftTolerance": 0.05,
+    "minStableFraction": 0.9,
+    "minWilsonLower": 0.8,
+    "maxQueries": 3
+  },
+  "engineConfigHashes": {
+    "SF18": {
+      "20k": "4659128c7e837baa9fb1b5131db27cdcaa064bbf09378dab6c5c1817946ce6c3",
+      "80k": "2a52934db01a52f76d41b0f1ff06bfafa792e16a84b3cf5fc27596c75bafaa20"
+    }
+  },
+  "confirmation": false
+}
