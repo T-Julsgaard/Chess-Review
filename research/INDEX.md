@@ -33,9 +33,10 @@ records. Update a row and the active experiment's resume state when work stops.
 | F008 | [Candidate stability finding](findings/F008-candidate-probability-stability.md) | recorded | No distribution stability gain; exact/independent/clean replay passes | Preserve negative result; no bundled adoption |
 | E011 | [Frozen outcome confirmation](experiments/E011-outcome-confirmation/RESULT.md) | complete | Verified joint failure:20k practical gain, both fixed intervals and root stability;300 test games consumed | Distinct hypothesis; no retuning/rescue on this cohort |
 | F009 | [Unconfirmed outcome curve](findings/F009-unconfirmed-outcome-curve.md) | recorded | Small unresolved gain; predictive value vs constant; exact/independent/clean replay passes | Keep failed confirmation with development finding |
+| E012 | [Offer-evidence audit](experiments/E012-offer-evidence/RESULT.md) | planned | All24 existing blinded cases; SF18 all-legal roots20k/80k; no human target | Implement/test/commit before searches; preserve blinding |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E012`, `D003`, `F010`, `P001`.
+Allocate the next unused ID in each series: `E013`, `D003`, `F010`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
