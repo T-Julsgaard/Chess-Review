@@ -24,7 +24,7 @@ export function drift(game,position,low,high){
   return{gameId:game.id,split:game.split,ply:position.ply,rating:player.rating,fixedPoints:low.fixedPoints,low,high,
     cpLossDrift:Math.abs(low.cpLoss-high.cpLoss),wdlLossDrift:Math.abs(low.wdlLoss-high.wdlLoss),qualityDrift:Math.abs(low.quality-high.quality),
     bestOverlap:low.best.some(m=>high.best.includes(m)),sameBestSet:JSON.stringify(low.best)===JSON.stringify(high.best),
-    rootBestChanged:low.bestmove!==high.bestmove,mateTransition:low.rootMate!==high.rootMate||low.playedMate!==high.playedMate};
+    rootBestChanged:low.bestmove!==high.bestmove,mateTransition:Math.sign(low.rootMate||0)!==Math.sign(high.rootMate||0)||Math.sign(low.playedMate||0)!==Math.sign(high.playedMate||0)};
 }
 export function summary(rows){
   if(!rows.length)return null;
