@@ -262,6 +262,27 @@
       "sha256": "0287e95d96658a7b3c190ac763469b4b165441bd5d261e05a1854eeae13b7d07",
       "bytes": 7457,
       "uncompressedSha256": "0287e95d96658a7b3c190ac763469b4b165441bd5d261e05a1854eeae13b7d07"
+    },
+    "research/experiments/E012-offer-evidence/evidence/sf18-observations.json.gz": {
+      "kind": "game-evidence",
+      "parents": [
+        "tools/calibration/public/dataset.json.gz",
+        "research/experiments/E005-category-review/evidence/cases.json",
+        "research/experiments/E005-category-review/evidence/selection-key.json",
+        "research/experiments/E012-offer-evidence/evidence/policy.json"
+      ],
+      "sha256": "02367574df6676276243cd1f60e23e5c2ec984eb70a49df24d2188aaea6be547",
+      "bytes": 319092,
+      "uncompressedSha256": "0979b909b92a2f757b70c12b7a68d8d17e650bff4efda61b8475d6fd4a252c40"
+    },
+    "research/experiments/E012-offer-evidence/evidence/collection-run.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E012-offer-evidence/evidence/sf18-observations.json.gz"
+      ],
+      "sha256": "555eeff8f289050ea81ea140fb722515a3d3cfdb127fdd0044b23d4386c5108a",
+      "bytes": 8392,
+      "uncompressedSha256": "555eeff8f289050ea81ea140fb722515a3d3cfdb127fdd0044b23d4386c5108a"
     }
   }
 }
