@@ -4,6 +4,7 @@ import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {hash} from '../../../../tools/calibration/io.mjs';
 import {ratingFeatures} from '../../../../lib/public-scoring.js';
+import {Chess} from '../../../../lib/chess.js';
 
 const repo = fileURLToPath(new URL('../../../../', import.meta.url));
 const publicDir = path.join(repo, 'tools/calibration/public');
@@ -83,7 +84,19 @@ export async function audit() {
     if (invalid) errors.push('Invalid move/feature records: ' + name + ':' + invalid);
     const selectedGames = dataset.filter(g => selected.has(g.id));
     const components = playerComponents(selectedGames);
-    const missingSides = selectedGames.flatMap(g => g.players.filter(p => !rowKeys.has(g.id + ':' + p.color)).map(p => ({gameId: g.id, color: p.color, reason: 'Not retained; requires eligibility audit before model comparison'})));
+    const missingSides = [];
+    for (const game of selectedGames) {
+      const missing = game.players.filter(p => !rowKeys.has(game.id + ':' + p.color));
+      if (!missing.length) continue;
+      const chess = new Chess(), decisions = {w:0, b:0};
+      for (const move of game.moves) {
+        if (chess.moves().length > 1) decisions[chess.turn()]++;
+        chess.move({from:move.slice(0,2), to:move.slice(2,4), promotion:move[4]});
+      }
+      missingSides.push(...missing.map(p => ({gameId:game.id, color:p.color, decisions:decisions[p.color],
+        reason:decisions[p.color] < 10 ? 'Below maintained ten-decision rating threshold' : 'Unexplained exclusion'})));
+      if (missing.some(p => decisions[p.color] >= 10)) errors.push('Unexplained missing rating side: ' + name);
+    }
     const foldOf = g => parseInt(hash('fullgame-context-fold-v1:' + g.id).slice(0, 8), 16) % 5;
     engines[name] = {games: selected.size, sides: rowKeys.size, missingSides, decisions, negativeResidualsBelowMinus002: negativeResiduals,
       invalidRecords: invalid, engineConfig: evidence.engineConfig, componentCount: components.length,
