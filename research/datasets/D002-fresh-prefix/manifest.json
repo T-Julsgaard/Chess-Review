@@ -880,6 +880,39 @@
       "bytes": 31642,
       "sha256": "8865c62145b2fc1781808278797e86b9efe1f8957b74f2a74431d7166b0a355f",
       "uncompressedSha256": "8865c62145b2fc1781808278797e86b9efe1f8957b74f2a74431d7166b0a355f"
+    },
+    "research/experiments/E018-choice-mixture/evidence/verification.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E018-choice-mixture/evidence/results.json",
+        "research/experiments/E018-choice-mixture/evidence/predictions.json.gz",
+        "research/experiments/E018-choice-mixture/evidence/models.json",
+        "research/experiments/E018-choice-mixture/evidence/freeze.json"
+      ],
+      "bytes": 32033,
+      "sha256": "0619579606fea51b46aa4bd9ca06275958eb3989e41273ea7fafe6ccac1ebe2e",
+      "uncompressedSha256": "0619579606fea51b46aa4bd9ca06275958eb3989e41273ea7fafe6ccac1ebe2e"
+    },
+    "research/experiments/E018-choice-mixture/evidence/clean-replay.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E018-choice-mixture/evidence/results.json",
+        "research/experiments/E018-choice-mixture/evidence/predictions.json.gz",
+        "research/experiments/E018-choice-mixture/evidence/models.json",
+        "research/experiments/E018-choice-mixture/evidence/freeze.json"
+      ],
+      "bytes": 24724,
+      "sha256": "00a9088e0daf0b77b51321fcf7ce4ac67dcae32977a5abec2004f9b283a50d0c",
+      "uncompressedSha256": "00a9088e0daf0b77b51321fcf7ce4ac67dcae32977a5abec2004f9b283a50d0c"
+    },
+    "research/experiments/E018-choice-mixture/evidence/clean-archive.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E018-choice-mixture/evidence/clean-replay.json"
+      ],
+      "bytes": 878,
+      "sha256": "f6eedc5c1009671b310fa7dc699de3741053eaeca0108c1cdfa0c1b79912d082",
+      "uncompressedSha256": "f6eedc5c1009671b310fa7dc699de3741053eaeca0108c1cdfa0c1b79912d082"
     }
   }
 }

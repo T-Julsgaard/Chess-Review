@@ -41,7 +41,7 @@ Research is available in the Git repository. The current packaging allowlist
 excludes `research/` from extension ZIPs and release source snapshots; those
 snapshots retain the active calibration instead.
 
-Sixteen studies/tasks are complete. A new 900-game cohort has fully traceable raw
+Seventeen studies/tasks are complete. A new 900-game cohort has fully traceable raw
 frames and exact clean reconstruction. A CP curve improves fresh development
 prediction; its clean replay passes, but the unchanged curve fails its frozen
 300-game confirmation gates. Smaller point gains have intervals including zero.
@@ -60,7 +60,11 @@ verify. Linear CP choice utilities then worsen human prediction and calibration
 despite lower search-vector drift; independent/exact/clean replay verifies that
 negative result. Signed-log context scaling then has a small unresolved point
 gain, failing primary, cross-fit and subgroup guards; full independent/exact/
-clean replay passes. Both exact utility recipes stop. A distinct fixed-component
-probability mixture is the next numerical hypothesis.
+clean replay passes. Both exact utility recipes stop. The subsequent fixed-component choice mixture
+clears the practical point-gain threshold but fails its comparator interval
+gate. Cross-fit prediction and descriptive calibration improve, while search-
+budget vector drift worsens; all independent/exact/clean replay checks pass.
+Stop this exact mixture and review precision/cohort/input limitations before
+a distinct numerical study.
 The index retains failed experiments and provenance/target limits.
 No new model is confirmed or promoted; current scoring is B000.

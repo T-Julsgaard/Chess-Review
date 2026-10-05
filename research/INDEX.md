@@ -1,6 +1,6 @@
 # Research index
 
-Updated: 2026-10-05. Sixteen studies/tasks complete; signed-log benefit unresolved; reviews pending.
+Updated: 2026-10-05. Seventeen studies/tasks complete; mixture benefit unresolved; reviews pending.
 Baseline: [B000](BASELINE.md). New CP gain is development evidence, not confirmed.
 
 This is the routing and decision index. Detailed evidence lives in linked
@@ -52,10 +52,11 @@ records. Update a row and the active experiment's resume state when work stops.
 | E017 | [Signed-log choice](experiments/E017-signed-log-choice/RESULT.md) | complete | Verified .012107 nats < .02; interval includes zero; cross-fit/subgroup guards fail | Stop exact curve; distinct probability-mixture hypothesis |
 | F015 | [Unresolved signed-log finding](findings/F015-unresolved-signed-log-choice.md) | recorded | Exact fits/vectors and independent/clean replay pass; mate-group signs differ across splits | No promotion; freeze a distinct dispersion model |
 
-| E018 | [Choice mixture](experiments/E018-choice-mixture/RESULT.md) | running | Fixed regular/sharper/uniform components; synthetic convex-fit checks pass | Commit source/cohort/code freeze before fitting |
+| E018 | [Choice mixture](experiments/E018-choice-mixture/RESULT.md) | complete | Verified +.052790 nats exceeds practical gate, but comparator interval crosses zero; cross-fit/groups pass, budget drift worsens | Stop exact mixture; review precision/cohort/input limitations |
+| F016 | [Unresolved mixture finding](findings/F016-unresolved-choice-mixture.md) | recorded | All independent/exact/clean replay checks pass; descriptive calibration gains retain failed acceptance | Distinct question; no retuning or promotion |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E019`, `D003`, `F016`, `P001`.
+Allocate the next unused ID in each series: `E019`, `D003`, `F017`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
@@ -90,26 +91,20 @@ Only registered explicitly public, free-to-use sources and traceable derivatives
 qualify. New confirmation cohorts need complete acquisition/transform provenance;
 D001's historical limitations and exposure remain in force.
 
-Read E017's compact RESULT and F015. Its signed-log recipe has a small positive
-development gain .012107 nats, below .02, with interval including zero; cross-fit
-mean and five cross-fit subgroup guards fail. Any-mate groups have opposite
-signs across splits; development's 20 cases are sparse. No resolved stability
-or calibration improvement. Exact twelve-fit and full independent/clean replay
-verify; stop this exact recipe. E015's rating-temperature recipe also remains
-unresolved and is stopped; none establishes an improved final rating.
-
-E016/F014 retains the relative linear CP utility screen: development gain
--.366494 nats with interval wholly below zero; cross-fit/subgroup guards and
-descriptive calibration also fail. Search-vector drift improves, showing why
-operational stability is insufficient. Exact twelve-fit and full independent/
-clean replay pass. Stop this exact recipe, including its fixed mate semantics.
-Next register a distinct probability-mixture comparison: the global comparator,
-a fixed sharper distribution and uniform choices, with convex train-only weights.
-Freeze component definitions, training sequence, weight constraints and gates
-before fitting. It tests variable dispersion, not another CP-curve/rating-
-temperature refit or rescue of E011. Both utility models already use complete
-alternatives; centering alone is neutral. Reuse hash-matched observations,
-preserve exposed development ownership and reserve confirmation for fresh D003.
+Read E018's compact RESULT and F016. The conditional probability mixture has
+development point gain .052790 nats but its interval includes zero; acceptance
+fails despite positive cross-fit mean and passing eligible subgroup guards.
+Descriptive Brier/top-choice calibration improve; search-budget vector drift
+worsens with an interval below zero for reduction. Five development groups
+remain sparse. All twelve refits, 600 vectors, 45 pairs and independent/clean
+replay verify. Stop this exact recipe; no rescue fitting or more performance
+looks. Review precision, cohort and input limitations before registering a
+distinct question that informs accuracy or estimated ratings. Do not continue
+utility/temperature sweeps simply because cached scoring is cheap.
+E015–E017 also retain unresolved or negative utility/context results and stop
+their exact recipes. None establishes improved final rating or human accuracy.
+Fresh registered evidence is required for eventual confirmation of a candidate
+that passes development gates. Preserve prior exposures and D002 test ownership.
 Both E005/E013 human packs remain fixed and pending. E014/F012 retain failed
 root-pair joint gates and the distinction from raw top-move diagnostics.
 
