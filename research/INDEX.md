@@ -16,9 +16,10 @@ records. Update a row and the active experiment's resume state when work stops.
 | F001 | [Evidence and exposure finding](findings/F001-evidence-and-exposure.md) | recorded | Development use supported; confirmation requires fresh evidence | Preserve exposure history |
 | E002 | [Nonlinear rating features](experiments/E002-nonlinear-rating/RESULT.md) | complete | Small development gains; practical gate fails for both engines | Stop this family; investigate richer evidence/uncertainty |
 | F002 | [Nonlinear rating finding](findings/F002-small-nonlinear-rating.md) | recorded | No promotion; numerical replay matches | Retry only with a new hypothesis |
+| E003 | [SF19 archive replay](experiments/E003-sf19-archive-replay/plan.md) | planned | Original test reports already inspected | Verify old models/metrics before citing failures |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E003`, `D002`, `F003`, `P001`.
+Allocate the next unused ID in each series: `E004`, `D002`, `F003`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
