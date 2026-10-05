@@ -72,7 +72,8 @@ calibrated statistic. No new engine searches were performed for E001.
 | 2026-10-05 E001 | Full metadata/identity/hash audit; train-target binding; offline B000 replay | All files decoded. No new test prediction/target comparison. Fifty known consumed test IDs retained in audit.json. Remaining 250 have unverified historical exposure and are not certified fresh. |
 | 2026-10-05 E002 (complete) | Retained train rating sides, nested outer/inner folds | Full candidate results and subgroup diagnostics inspected; development only, no validation/test scoring. Nonlinear candidate misses practical gates. |
 | 2026-10-05 E003 (complete) | Two prior SF19 outcome/choice cohorts, including known consumed fifty test games | Exact refitted models and reports reproduce; no new independent confirmation or test selection. Raw archives now retained. |
-| 2026-10-05 E004 (registered) | Train-only fixed-node root WDL plus normalized game outcomes/context | Nested development outcome comparison; no validation/test scoring. Ratings are context inputs for outcome prediction, not moves-only predictors. |
+| 2026-10-05 E004 (complete) | Train-only fixed-node root WDL plus normalized game outcomes/context | Full nested development results inspected; both engines miss practical gate. Ratings are legitimate outcome context, not moves-only predictors. No validation/test scoring. |
+| 2026-10-05 E005 (pack ready) | SF18 train context and normalized move histories | 24 game-disjoint enriched cases selected; full training candidate pool scanned for mechanics/loss strata. Blinded human annotations pending; no validation/test use or population-frequency claim. |
 
 Original source metadata saying `finalTestEvaluated: false` predates these later
 local studies; it does not override observed exposure. Keep those public files

@@ -52,11 +52,11 @@ replay may change elapsed time, revision and eligibility receipt as policy recor
 evolve; numerical files must match. D001's legacy provenance and exposure prevent
 new confirmation claims.
 
-Policy integration note: the guarded data policy and registry were present in
-the working tree during the first evaluation, alongside another ongoing change.
-Their exact hashes are retained in the receipt; their installation commit was
-not yet available. This is a reproducibility limitation until those separate
-changes are committed. No policy bypass or additional dataset was used.
+Policy integration: the first evaluation used the hash-bound guarded policy
+while its separate installation change was in progress. After that change was
+committed as `3170d07`, a complete additional replay and verification passed
+from committed source with the same numerical hashes. No policy bypass or
+additional dataset was used.
 
 Next: stop this exact interaction family. Investigate uncertainty for rating
 estimates and independently assess category constructs. A narrower calibration

@@ -41,6 +41,7 @@ Research is available in the Git repository. The current packaging allowlist
 excludes `research/` from extension ZIPs and release source snapshots; those
 snapshots retain the active calibration instead.
 
-The evidence audit, first rating experiment and earlier SF19 study replay are
-complete. The index records results, unsuccessful approaches and the next
-research question. No new model is confirmed or promoted; current scoring is B000.
+Four studies are complete, including a practical-outcome comparison that missed
+its improvement gates. A blinded 24-case category review pack is ready for later
+annotation. The index routes ongoing work and retains unsuccessful findings.
+No new model is confirmed or promoted; current scoring is B000.

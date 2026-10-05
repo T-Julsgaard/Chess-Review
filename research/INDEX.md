@@ -1,6 +1,6 @@
 # Research index
 
-Updated: 2026-10-05. Audit, rating development screen and SF19 archive replay complete.
+Updated: 2026-10-05. Four studies complete; blinded category pack ready.
 Baseline: [B000](BASELINE.md). No new improvement has been established.
 
 This is the routing and decision index. Detailed evidence lives in linked
@@ -18,10 +18,12 @@ records. Update a row and the active experiment's resume state when work stops.
 | F002 | [Nonlinear rating finding](findings/F002-small-nonlinear-rating.md) | recorded | No promotion; numerical replay matches | Retry only with a new hypothesis |
 | E003 | [SF19 archive replay](experiments/E003-sf19-archive-replay/RESULT.md) | complete | Exact old models/reports reproduce; both original joint gates failed | New hypothesis and richer evidence |
 | F003 | [Small-cohort SF19 finding](findings/F003-sf19-small-cohort.md) | recorded | Narrow choice gain; joint outcome and later choice gates unresolved | No promotion of these recipes |
-| E004 | [Practical outcome calibration](experiments/E004-practical-outcomes/plan.md) | planned | New monotone phase/strength hypothesis on broader fixed-node outcomes | Nested development comparison |
+| E004 | [Practical outcome calibration](experiments/E004-practical-outcomes/RESULT.md) | complete | Both engines miss practical gate; most small gain comes from static context | Stop this interaction family |
+| F004 | [Practical context finding](findings/F004-practical-outcome-context.md) | recorded | Added phase/strength benefit unresolved; no promotion | Investigate distinct questions |
+| E005 | [Blinded category workflow](experiments/E005-category-review/RESULT.md) | running | 24 legal, traceable cases; workflow checks pass; zero reviews | Review later; numerical work continues |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E005`, `D002`, `F004`, `P001`.
+Allocate the next unused ID in each series: `E006`, `D002`, `F005`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
@@ -56,8 +58,8 @@ Only registered explicitly public, free-to-use sources and traceable derivatives
 qualify. New confirmation cohorts need complete acquisition/transform provenance;
 D001's historical limitations and exposure remain in force.
 
-Run E004's broader practical-outcome calibration, preserving its distinct target
-from displayed accuracy/rating. Rating uncertainty remains queued. Prepare an
-independent category rubric/pack, then collect and lock a fresh numerical cohort
-for shortlisted candidates. Do not retry F002/F003 without a changed premise.
+Register rating uncertainty as the next numerical question. The E005 pack awaits
+later human reviews; pending annotation does not block numerical work. Collect
+and lock a fresh cohort only for a defensible shortlisted numerical candidate.
+Do not retry F002/F003/F004 without a changed premise. No candidate is confirmed.
 The research goal is active. The extension remains at B000.
