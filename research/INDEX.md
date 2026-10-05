@@ -29,7 +29,7 @@ records. Update a row and the active experiment's resume state when work stops.
 | F006 | [Fresh human curves](findings/F006-fresh-human-curves.md) | recorded | CP prediction gain at development maturity; no display/adoption claim | Confirm frozen CP candidate before promotion |
 | E009 | [Search stability](experiments/E009-search-stability/RESULT.md) | complete | Verified overall failure: CP loss/display mean pass, WDL/rank fail | Distinct frozen-candidate probability stability study |
 | F007 | [Search stability finding](findings/F007-search-stability.md) | recorded |45-game operational limits; independent/clean replay passes | Preserve failures; no exact-best/human validity claim |
-| E010 | [Candidate probability stability](experiments/E010-candidate-stability/plan.md) | planned | Distinct post-E009 hypothesis; frozen E008 CP model, cached45-game vectors | Freeze/register models and code before assessment |
+| E010 | [Candidate probability stability](experiments/E010-candidate-stability/RESULT.md) | running | Models/code frozen; synthetic checks pass; no real sensitivity metrics | Commit registered models, then cached45-game assessment |
 
 No promotion records yet.
 Allocate the next unused ID in each series: `E011`, `D003`, `F008`, `P001`.

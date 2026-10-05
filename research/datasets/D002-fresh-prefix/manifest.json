@@ -272,6 +272,16 @@
       "sha256": "ee775ac22eefaecc6e079452253e76c5283ee12db3bf44d502af9811a515ea70",
       "bytes": 1265,
       "uncompressedSha256": "ee775ac22eefaecc6e079452253e76c5283ee12db3bf44d502af9811a515ea70"
+    },
+    "research/experiments/E010-candidate-stability/evidence/models.json": {
+      "kind": "summary",
+      "parents": [
+        "research/experiments/E008-human-quality-curves/evidence/results.json",
+        "research/experiments/E008-human-quality-curves/evidence/collection-run.json"
+      ],
+      "sha256": "450bc10c0c9e68b394c0ac9a6b23e0277a5268d0ea799bd3591320332865ae63",
+      "bytes": 2231,
+      "uncompressedSha256": "450bc10c0c9e68b394c0ac9a6b23e0277a5268d0ea799bd3591320332865ae63"
     }
   }
 }
