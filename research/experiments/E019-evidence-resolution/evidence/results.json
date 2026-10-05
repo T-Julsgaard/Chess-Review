@@ -1,0 +1,84 @@
+{
+  "schema": "E019-resolution-v1",
+  "roles": {
+    "crossfit": {
+      "games": 450,
+      "mean": 0.1718793235218467,
+      "sampleSd": 0.9187912314725606,
+      "hypotheticalIndependentSe": 0.043312234017932424,
+      "positive": 292,
+      "negative": 157,
+      "zero": 1,
+      "maxAbsoluteDifference": 9.866733158863214,
+      "largestCenteredSquares": [
+        {
+          "cases": 1,
+          "fraction": 0.2479719212909009
+        },
+        {
+          "cases": 5,
+          "fraction": 0.7220941422366751
+        },
+        {
+          "cases": 10,
+          "fraction": 0.8084210202794679
+        }
+      ]
+    },
+    "development": {
+      "games": 150,
+      "mean": 0.05279012676825757,
+      "sampleSd": 0.4005908427212586,
+      "hypotheticalIndependentSe": 0.03270810534328641,
+      "positive": 97,
+      "negative": 52,
+      "zero": 1,
+      "maxAbsoluteDifference": 1.2338240314409687,
+      "largestCenteredSquares": [
+        {
+          "cases": 1,
+          "fraction": 0.0692322345571944
+        },
+        {
+          "cases": 5,
+          "fraction": 0.2534818520554242
+        },
+        {
+          "cases": 10,
+          "fraction": 0.3865598586099807
+        }
+      ]
+    }
+  },
+  "developmentNormalReference": {
+    "z": 2.241402727604947,
+    "level": 0.975,
+    "halfWidth": 0.0733120365312321,
+    "precisionGrid": [
+      {
+        "halfWidth": 0.01,
+        "hypotheticalGames": 8062
+      },
+      {
+        "halfWidth": 0.02,
+        "hypotheticalGames": 2016
+      },
+      {
+        "halfWidth": 0.05,
+        "hypotheticalGames": 323
+      },
+      {
+        "halfWidth": 0.1,
+        "hypotheticalGames": 81
+      }
+    ]
+  },
+  "exploratory": true,
+  "modelFits": 0,
+  "performanceAssessments": 0,
+  "engineSearches": 0,
+  "humanLabelsUsed": 0,
+  "confirmation": false,
+  "promoted": false,
+  "interpretation": "Descriptive paired variation; normal independent frozen-model planning approximation only, not achieved coverage, observed power or a revised E018 inference"
+}

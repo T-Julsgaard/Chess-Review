@@ -76,3 +76,5 @@ and identity audit occurred. Append exposure below; renaming cannot undo it.
 | 2026-10-05 E018 verification | Exact refits/reports/vectors, independent mixture/optimality equations and external archive | Twelve fits, 600 vectors, 45 pairs and 40,000 bootstrap replicates verify in checkout and archive fce42257a13bff5e60d29d82d9ccccf7e4b3d9f9. Acceptance remains failed; stop this exact recipe. Verification refits reproduce fixed models, not new trials. No new searches, human labels or consumed test targets. |
 
 | 2026-10-05 E019 activation | Retained E018 600-choice predictions, report and verification only | Plan 326ef9c fixes exploratory variation/tail and normal-reference precision calculations; no refit, model assessment, new games, searches, labels or consumed test targets. Existing E018 inference remains unchanged. |
+
+| 2026-10-05 E019 diagnostics | Existing E018 paired losses, all 450 cross-fit / 150 development choices | One fixed exploratory variance/tail and normal-reference precision grid; no model fitting or reassessment. Two independent variance algorithms and saved report means agree. No new games, searches, labels or consumed test targets. |
