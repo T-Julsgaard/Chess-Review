@@ -77,3 +77,12 @@ standard frame. No game-selection rule changes. Revised total network budget
 budget remains20 MiB. Default sandbox denied the first network connection before
 bytes arrived; the authorized elevated run reached the publisher and exposed
 the format issue. These failures are retained in the result record.
+
+Metadata limitation recorded2026-10-05 during structural verification, before
+any candidate evaluation: the900 selected PGNs provide numeric Elo and rating
+differences but no explicit provisional-status field. Numeric/unknown-string
+filtering was performed; the planned exclusion of all provisional ratings cannot
+be verified from this export. Do not claim a nonprovisional-only cohort. D002's
+domain is recorded numeric ratings, with provisional status unknown. Future
+candidate protocols must acknowledge this limitation or obtain separately
+eligible evidence before making claims that require established ratings.
