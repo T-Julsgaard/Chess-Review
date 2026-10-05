@@ -61,6 +61,25 @@ test('ongoing engine output extends the search timeout',async t=>{
   eng.worker.line('bestmove e2e4');assert.equal((await result).score.cp,12);
 });
 
+test('a supplied move history is replayed so Stockfish sees repetitions',async t=>{
+  const eng=engine(t);
+  const result=eng.analyse('somefen',4,1,{initialFen:'startfen',moves:['e2e4','e7e5']});
+  await Promise.resolve();
+  assert.ok(eng.worker.commands.includes('position fen startfen moves e2e4 e7e5'));
+  assert.ok(!eng.worker.commands.includes('position fen somefen'));
+  eng.worker.line('info depth 4 score cp 10 pv g1f3');eng.worker.line('bestmove g1f3');
+  assert.equal((await result).score.cp,10);
+});
+
+test('without a history the bare FEN is searched (unchanged behaviour)',async t=>{
+  const eng=engine(t);
+  const result=eng.analyse('barefen',4,1);
+  await Promise.resolve();
+  assert.ok(eng.worker.commands.includes('position fen barefen'));
+  eng.worker.line('info depth 4 score cp 5 pv e2e4');eng.worker.line('bestmove e2e4');
+  assert.equal((await result).score.cp,5);
+});
+
 test('Stockfish 19 Lite fails cleanly if its startup is silent',async t=>{
   t.mock.timers.enable({apis:['setTimeout']});
   const eng=engine(t,{path:'engine/stockfish-19-lite-single.js',noReady:true});

@@ -180,7 +180,14 @@ export class Engine {
       this._send(`setoption name MultiPV value ${this.multipv}`);
     }
     this._send("ucinewgame");
-    this._send(`position fen ${job.fen}`);
+    // Replaying the moves (not just the FEN) lets Stockfish see repetitions and the 50-move clock,
+    // so a position is judged in the context it was reached in. Without a history we fall back to
+    // the bare FEN (unchanged behaviour for callers that don't pass one).
+    if (job.history && job.history.initialFen && job.history.moves && job.history.moves.length) {
+      this._send(`position fen ${job.history.initialFen} moves ${job.history.moves.join(" ")}`);
+    } else {
+      this._send(`position fen ${job.fen}`);
+    }
     this._send(`go depth ${job.depth}`);
   }
 
@@ -188,12 +195,14 @@ export class Engine {
    * Analyze one position.
    * Returns { bestmove, score:{cp|mate}, pv, lines:[{score,pv}] }.
    * lines are sorted best→worst (multipv 1..n), seen from the side to move.
+   * `history` ({ initialFen, moves }) reproduces the game to this position so Stockfish detects
+   * repetitions; pass it whenever the caller knows the moves, omit it for a bare FEN search.
    */
-  async analyse(fen, depth = 12, multipv = 1) {
+  async analyse(fen, depth = 12, multipv = 1, history = null) {
     await this._ready;
     if (this.dead) throw new Error("engine is no longer running");
     return new Promise((resolve, reject) => {
-      this.queue.push({ fen, depth, multipv, resolve, reject, lastScore: null, lastPv: "", lines: {} });
+      this.queue.push({ fen, depth, multipv, history, resolve, reject, lastScore: null, lastPv: "", lines: {} });
       this._pump();
     });
   }

@@ -4,6 +4,10 @@
 import { findGameById, gameMeta, parseFlip, parseGameId } from "./chesscom.js";
 import { parseLichessGameId, parseLichessFlip, fetchGamePgn as fetchLichessPgn } from "./lichess.js";
 import { browserAPI } from "./browser-compat.js";
+import { canonicalGameId } from "./gameid.js";
+
+// Dev-only diagnostics; set globalThis.CHESS_REVIEW_DEBUG = true to see game-identity resolution.
+function dbg(...args) { if (globalThis.CHESS_REVIEW_DEBUG === true) console.log("[Chess Review]", ...args); }
 
 /** Save the analysis payload and open analysis.html in a new tab. */
 export async function openAnalysisTab(payload) {
@@ -92,8 +96,15 @@ async function analyzeTab(tab, username) {
   // where tab.url may lag behind history.pushState), then fall back to the tab URL. The content script
   // reads location.pathname at message time, so it always reflects the current page even during SPA
   // transitions. The tab URL is kept as fallback for cases where the content script isn't injected yet.
-  const gameId = (info && info.gameId) || parseGameId(tab.url)?.id || null;
-  if (!gameId) {
+  const fromPage = (info && info.gameId) || null;
+  const fromUrl = parseGameId(tab.url)?.id || null;
+  const gameId = canonicalGameId({ gameId: fromPage || fromUrl });
+  if (fromPage && fromUrl && fromPage !== fromUrl) {
+    // The content script and the (possibly lagging) tab URL disagree — the SPA is mid-navigation.
+    // The live page wins; log it so a persistent mismatch is visible during development.
+    console.warn("[Chess Review] chess.com game id mismatch (page vs tab.URL):", { page: fromPage, tabUrl: fromUrl });
+  }
+  if (!fromPage && !fromUrl) {
     // Surface a diagnostic when the page clearly IS a game page but no id parsed — that means the URL
     // scheme changed and GAME_ID_RE (chesscom.js + content.js) needs widening.
     if (/\/(?:game|analysis)\b/.test(tab.url || "")) {
@@ -162,10 +173,13 @@ async function analyzeTab(tab, username) {
   // back to whatever the content script reported. Null = no hint → the analysis page uses the
   // username match (defaults to White at the bottom).
   const flip = parseFlip(tab.url) ?? (info && info.flip != null ? info.flip : null);
-  const meta = { ...gameMeta(game), flip };
+  // Pin meta.gameId to the canonical id we resolved and looked the game up with — never let a
+  // weaker derivation (e.g. a game.url that failed to parse) silently override it.
+  const meta = { ...gameMeta(game), gameId, flip };
   // Country flags: the API knows WHO is white/black; the page knows each player's country id. Match
   // them by username so the right flag lands on the right side (analysis.js resolves id → flag art).
   attachCountries(meta, info && info.countries);
+  dbg("detected game", { gameId, site: "chesscom", players: [meta.white?.user, meta.black?.user] });
   await openAnalysisTab({ pgn: game.pgn, meta, source: "active-tab" });
 }
 
@@ -191,13 +205,14 @@ function attachCountries(meta, countries) {
  */
 async function analyzeLichessTab(info, tabUrl) {
   const fromUrl = parseLichessGameId(tabUrl);
-  const gameId = (info && info.gameId) || (fromUrl && fromUrl.id) || null;
-  if (!gameId) {
+  const rawId = (info && info.gameId) || (fromUrl && fromUrl.id) || null;
+  if (!rawId) {
     // No game id in the URL or on the page → let the popup take over (paste a URL/PGN).
     const e = new Error("No Lichess game found here. Open a game page, or paste its URL/PGN.");
     e.code = "NO_GAME";
     throw e;
   }
+  const gameId = canonicalGameId({ gameId: rawId });
   let pgn = null;
   try {
     pgn = await fetchLichessPgn(gameId);
@@ -212,6 +227,7 @@ async function analyzeLichessTab(info, tabUrl) {
   // opponent at the bottom. Take the board orientation the content script read (chessground's
   // orientation-black/-white), falling back to a /black|/white segment in the URL.
   const flip = (info && info.flip != null) ? info.flip : parseLichessFlip(tabUrl);
+  dbg("detected game", { gameId, site: "lichess" });
   await openAnalysisTab({
     pgn,
     meta: { url: `https://lichess.org/${gameId}`, gameId, flip },

@@ -7,6 +7,15 @@ import { Chess } from "./lib/chess.js";
 import { Engine } from "./engine/uci.js";
 import { flagCodeForCountryId, countryNameForId } from "./flags.js";
 import { browserAPI } from "./browser-compat.js";
+import { canonicalGameId, analysisCacheKey } from "./gameid.js";
+
+// Development-only diagnostics for game identity / cache routing. Silent in production; enable by
+// opening the page with ?debug (analysis.html?debug#<job>) or setting globalThis.CHESS_REVIEW_DEBUG.
+const DEBUG = (() => {
+  try { return /[?&#]debug\b/.test(location.href) || globalThis.CHESS_REVIEW_DEBUG === true; }
+  catch { return false; }
+})();
+function dbg(...args) { if (DEBUG) console.log("[Chess Review]", ...args); }
 
 /* ---------------- Opening book ----------------
  * Offline lookup table built from lichess-org/chess-openings (bundled in data/book.json).
@@ -750,6 +759,16 @@ function buildPositions(pgn) {
     pos.push({ fen, san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "", draw });
   }
   return pos;
+}
+// UCI move history from the game's start (or its [FEN] setup) to ply `idx`. Stockfish needs the
+// moves — not just the resulting FEN — to see repetitions and the 50-move clock, so a position is
+// evaluated in the context it was actually reached in. Also used to key the search cache so a board
+// reached through one line is never served a result computed for a different line/game.
+function searchHistory(positions, idx = positions.length - 1) {
+  return {
+    initialFen: positions[0].fen,
+    moves: positions.slice(1, idx + 1).map((p) => p.from + p.to + (p.promotion || "")),
+  };
 }
 function deriveOpening(h) {
   const eco = h.ECO || "";
@@ -5093,12 +5112,6 @@ function practiceAttempt(from, to) {
    Every fully-analyzed game is saved to browserAPI.storage.local under "library". The sidebar
    lives off the left edge and slides in on hover; games can be sorted (recent / your accuracy /
    opponent rating) and filtered (result, time class). Clicking a game re-opens it for analysis. */
-// Preserve existing PGN-based library IDs.
-function simpleHash(str) {
-  let h = 5381;
-  for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
-  return (h >>> 0).toString(36);
-}
 // "win" / "loss" / "draw" / "" from the result, relative to the user's side.
 function myResult() {
   const res = S.players[S.meSide].result;
@@ -5120,8 +5133,10 @@ function gameType() {
   }
   return "";
 }
+// The identity of the game currently open. Derived through the shared canonical helper so every
+// game-scoped cache agrees on the key; two different games can never share an id.
 function currentGameId() {
-  return (S.meta && S.meta.gameId) || ("pgn:" + simpleHash(S.pgn || ""));
+  return canonicalGameId({ gameId: S.meta && S.meta.gameId, pgn: S.pgn });
 }
 
 function analysisSettingsKey() {
@@ -5172,12 +5187,12 @@ function saveToLibrary() {
     S.library = lib;
     // The heavy analysis (evals + engine lines) is stored under its own key so the library list
     // stays light, and so re-opening a saved game can render instantly WITHOUT re-analyzing.
-    const writes = { library: lib, ["analysis:" + id]: {
+    const writes = { library: lib, [analysisCacheKey(id)]: {
       pgn: S.pgn, settingsKey: analysisSettingsKey(), engineBuild: S.activeEngineBuild,
       evals: S.evals, bests: S.bests, multipv: S.analyzedMultipv,
     } };
     browserAPI.storage.local.set(writes).catch(e => console.warn("library save failed", e));
-    if (dropped.length) browserAPI.storage.local.remove(dropped.map((d) => "analysis:" + d.id));
+    if (dropped.length) browserAPI.storage.local.remove(dropped.map((d) => analysisCacheKey(d.id)));
     renderLibrary();
   } catch (e) { console.warn("library save failed", e); }
 }
@@ -5185,7 +5200,7 @@ async function openLibraryGame(rec) {
   if (rec.id === currentGameId()) return;   // already open
   // Pull the stored analysis so the re-opened game shows up already analyzed (no re-run).
   let analysis = null;
-  try { const s = await browserAPI.storage.local.get("analysis:" + rec.id); analysis = s["analysis:" + rec.id] || null; } catch {}
+  try { const s = await browserAPI.storage.local.get(analysisCacheKey(rec.id)); analysis = s[analysisCacheKey(rec.id)] || null; } catch {}
   // Switch in place — no page reload, no black flash. The sidebar stays open (it only closes when
   // the mouse leaves the library area), so you can pick another game right away. Reproduce the exact
   // perspective the game was saved with: prefer a stored flip hint, else the saved meSide — so a
@@ -5386,6 +5401,11 @@ function requestProgress(gen) {
 async function startAnalysis() {
   if (S.meta?.explore) { await requestLiveEval(); return; }
   const gen = ++S.batchGen;
+  // The identity this batch belongs to. Every result is validated against it before it can touch
+  // current-game state, so a late Game 1 search can never be written into Game 2.
+  const batchGameId = currentGameId();
+  S.batchGameId = batchGameId;
+  dbg("analysis started for", batchGameId);
   S.engineFallbackBuild = null;
   S.activeEngineBuild = null;
   terminateEngines();
@@ -5432,25 +5452,31 @@ async function startAnalysis() {
   // order doesn't affect the final values — computeDerived() is a pure function of the
   // filled arrays. `contig` tracks the contiguous-analyzed prefix that navigation/eval-graph
   // are allowed to expose during analysis.
-  // Position cache (IndexedDB): reuses an evaluation ONLY if it came from the same engine build, the
-  // same depth and MultiPV=1 — so results are identical to a fresh search (cache is quality-neutral).
+  // Position cache (IndexedDB): a search result is a pure function of the engine build, the depth,
+  // the exact position AND the move history that reached it (Stockfish sees repetitions and the
+  // 50-move clock through the moves). Keying on all four means a board reached through one line is
+  // never served a result computed for a different line — while identical lines still share work.
   let posCache = null;
   if (multipv === 1) { try { posCache = await openPositionCache(); } catch { posCache = null; } }
-  const cacheKey = (fen) => `${S.settings.enginePath}|d${S.settings.engineDepth}|${fen}`;
+  const cacheKey = (i) => {
+    const hist = searchHistory(S.positions, i);
+    return `${S.activeEngineBuild || S.settings.enginePath}|d${S.settings.engineDepth}|${S.positions[i].fen}|${hist.moves.join("")}`;
+  };
   let nextIdx = 0, contig = -1;
+  const stillCurrent = () => gen === S.batchGen && currentGameId() === batchGameId;
   async function worker(eng) {
-    while (gen === S.batchGen) {
+    while (stillCurrent()) {
       const i = nextIdx++;
       if (i > S.total) return;
       const terminal = terminalScore(S.positions[i].fen, i);
       let res = terminal ? { score: terminal, bestmove: null, pv: "", lines: [] } : null;
-      if (!res && posCache) { try { res = await posCache.get(cacheKey(S.positions[i].fen)); } catch { res = null; } }
+      if (!res && posCache) { try { res = await posCache.get(cacheKey(i)); } catch { res = null; } }
       if (!res) {
-        res = await eng.analyse(S.positions[i].fen, S.settings.engineDepth, multipv);
-        if (gen !== S.batchGen) return;
-        if (posCache) { try { await posCache.set(cacheKey(S.positions[i].fen), res); } catch {} }
+        res = await eng.analyse(S.positions[i].fen, S.settings.engineDepth, multipv, searchHistory(S.positions, i));
+        if (!stillCurrent()) return;
+        if (posCache) { try { await posCache.set(cacheKey(i), res); } catch {} }
       }
-      if (gen !== S.batchGen) return;
+      if (!stillCurrent()) return;
       S.bests[i] = res;
       // Terminal positions (mate/stalemate) are decided from the board — not from the engine's "mate 0".
       S.evals[i] = terminal || whiteRel(res.score, S.positions[i].fen);
@@ -5475,7 +5501,7 @@ async function startAnalysis() {
     if (!S.analysisMode) renderEngineCurrent();
     return;
   }
-  if (gen !== S.batchGen) return;            // a newer analysis took over
+  if (!stillCurrent()) return;            // a newer analysis (or a different game) took over
   terminateEngines();
   S.analyzing = false;
   S.progress = S.total;
@@ -5484,6 +5510,7 @@ async function startAnalysis() {
   renderReview();
   renderStats();
   if (!S.analysisMode) renderEngineCurrent();
+  dbg("analysis completed for", batchGameId);
   saveToLibrary();   // the game is fully analyzed → keep it in the user's library
 }
 
@@ -5607,7 +5634,7 @@ async function applyGame(payload) {
   // Normal game mode: restore saved analysis or start fresh
   let saved = payload.analysis;
   if (saved == null && !("analysis" in payload)) {
-    try { const k = "analysis:" + currentGameId(); const s = await browserAPI.storage.local.get(k); saved = s[k] || null; } catch {}
+    try { const k = analysisCacheKey(currentGameId()); const s = await browserAPI.storage.local.get(k); saved = s[k] || null; } catch {}
   }
   const restored = canRestoreAnalysis(saved);
   if (restored) {
@@ -5802,7 +5829,9 @@ async function resetLegacyZoom() {
     if (!("analysis" in payload)) {
       let saved = null;
       try {
-        const k = "analysis:" + ((payload.meta && payload.meta.gameId) || ("pgn:" + simpleHash(payload.pgn || "")));
+        const id = canonicalGameId({ gameId: payload.meta && payload.meta.gameId, pgn: payload.pgn });
+        const k = analysisCacheKey(id);
+        dbg("cache lookup", { gameId: id, key: k });
         const s = await browserAPI.storage.local.get(k);
         saved = s[k] || null;
       } catch {}
