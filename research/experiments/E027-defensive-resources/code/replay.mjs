@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';
+import {Chess} from '../../../../lib/chess.js';
+const values={p:1,n:3,b:3,r:5,q:9,k:0},code=m=>m.from+m.to+(m.promotion||''),other=c=>c==='w'?'b':'w';
+const pieces=c=>c.board().flat().filter(Boolean),king=(c,color)=>pieces(c).find(p=>p.type==='k'&&p.color===color).square;
+const material=(c,color)=>pieces(c).reduce((n,p)=>n+(p.color===color?1:-1)*values[p.type],0),victim=m=>m.isEnPassant()?m.to[0]+m.from[1]:m.to;
+function turn(c,color){const f=c.fen().split(' ');if(f[1]!==color){f[1]=color;f[3]='-';}return new Chess(f.join(' '));}
+const stepSet=(c,color)=>turn(c,color).moves({verbose:true}).filter(m=>m.piece==='k'&&!m.captured).map(m=>m.to).sort();
+function scanMates(c,color){const rows=[];for(const m of c.moves({verbose:true})){c.move(m);if(c.isCheckmate())rows.push({move:code(m),piece:m.piece,to:m.to,king:king(c,other(color)),checking:c.attackers(king(c,other(color)),color),after:c.fen()});c.undo();}return rows;}
+function between(a,b){const dx=b.charCodeAt(0)-a.charCodeAt(0),dy=+b[1]- +a[1];assert.ok(dx||dy);assert.ok(!dx||!dy||Math.abs(dx)===Math.abs(dy));const result=[];let x=a.charCodeAt(0)+Math.sign(dx),y=+a[1]+Math.sign(dy);while(String.fromCharCode(x)+y!==b){result.push(String.fromCharCode(x)+y);x+=Math.sign(dx);y+=Math.sign(dy);}return result;}
+export const defenseIds=new Set(['saving-piece','defending-piece','defensive-pawn-move','eliminating-attacker','active-defense','luft','escape-square','line-interposition','king-escape','blocking-file','blocking-diagonal','closing-line']);
+export function replay(fixture,event){
+ const before=new Chess(fixture.fen),after=new Chess(fixture.history?.fen||fixture.fen);if(fixture.history)for(const m of fixture.history.moves)after.move(m);const played=after.move(fixture.move),color=played.color,enemy=other(color),e=event.evidence;let replies=0,leaves=0;
+ assert.ok(defenseIds.has(event.id));
+ if(event.id==='king-escape'){assert.ok(before.isCheck());assert.equal(played.piece,'k');assert.equal(e.from,played.from);assert.equal(e.to,played.to);assert.ok(!after.isAttacked(e.to,enemy));return{replies,leaves};}
+ if(['line-interposition','blocking-file','blocking-diagonal','closing-line'].includes(event.id)){
+  const target=before.get(e.target.square);assert.ok(target?.color===color);assert.equal(target.type,e.target.type);assert.ok(e.target.square!==played.from&&after.get(e.target.square)?.color===color);const attacker=before.get(e.attacker);assert.ok(attacker?.color===enemy&&['b','r','q'].includes(attacker.type));assert.equal(attacker.type,e.attackerType);assert.ok(before.attackers(e.target.square,enemy).includes(e.attacker));assert.ok(!after.attackers(e.target.square,enemy).includes(e.attacker));assert.equal(e.blocker,played.to);const line=between(e.attacker,e.target.square);assert.deepEqual(e.line,line);assert.ok(line.includes(played.to));
+  if(event.id==='line-interposition'){assert.equal(target.type,'k');assert.ok(before.isCheck());assert.ok(!after.isAttacked(e.target.square,enemy));}
+  if(event.id==='blocking-file')assert.equal(e.attacker[0],e.target.square[0]);if(event.id==='blocking-diagonal')assert.equal(Math.abs(e.attacker.charCodeAt(0)-e.target.square.charCodeAt(0)),Math.abs(+e.attacker[1]- +e.target.square[1]));return{replies,leaves};
+ }
+ assert.ok(!before.isCheck()&&!after.isGameOver());
+ if(['escape-square','luft'].includes(event.id)){
+  assert.equal(played.piece,'p');assert.ok(!played.captured&&!after.isCheck());assert.equal(e.pawnMove,code(played));assert.equal(e.king,king(after,color));assert.equal(e.king,king(before,color));assert.equal(e.king[1],color==='w'?'1':'8');assert.equal(e.square,played.from);assert.deepEqual(e.oldSteps,stepSet(before,color));assert.deepEqual(e.newSteps,stepSet(after,color));assert.ok(!e.oldSteps.includes(e.square)&&e.newSteps.includes(e.square));
+  if(event.id==='luft'){const old=turn(before,enemy);assert.equal(e.beforeOpponentFen,old.fen());assert.deepEqual(e.oldMates,scanMates(old,enemy));assert.deepEqual(e.newMates,scanMates(after,enemy));assert.equal(e.newMates.length,0);const rank=color==='w'?'1':'8',backRank=e.oldMates.filter(m=>['r','q'].includes(m.piece)&&m.to[1]===rank&&m.king[1]===rank&&m.checking.includes(m.to));assert.deepEqual(e.backRank,backRank);assert.ok(backRank.length);replies=old.moves().length+after.moves().length;}
+  return{replies,leaves};
+ }
+ assert.equal(e.hypotheticalOpponentTurn,true);const old=turn(before,enemy),t=e.threat,d=e.defense;assert.equal(t.baselineFen,old.fen());assert.equal(t.initialBalance,material(old,enemy));assert.ok(['n','b','r','q'].includes(e.piece));assert.equal(before.get(e.original)?.color,color);assert.equal(before.get(e.original)?.type,e.piece);assert.equal(e.target,e.original===played.from?played.to:e.original);assert.equal(after.get(e.target)?.type,e.piece);assert.equal(after.get(e.target)?.color,color);
+ const capture=old.moves({verbose:true}).find(m=>code(m)===t.capture);assert.ok(capture&&capture.captured===e.piece&&victim(capture)===e.original);old.move(capture);assert.ok(!old.isDraw());const responses=old.moves({verbose:true});assert.deepEqual(t.responses.map(r=>r.reply).sort(),responses.map(code).sort());let minimum=material(old,enemy)-t.initialBalance;
+ for(const r of responses){old.move(r);const gain=material(old,enemy)-t.initialBalance;assert.ok(!old.isCheckmate()&&!old.isDraw()&&gain>0);assert.equal(t.responses.find(w=>w.reply===code(r)).gain,gain);minimum=Math.min(minimum,gain);old.undo();leaves++;}assert.ok(minimum>0);assert.equal(t.minimumGain,minimum);
+ assert.equal(d.target,e.target);assert.equal(d.baselineFen,after.fen());assert.equal(d.initialBalance,material(after,enemy));const captures=after.moves({verbose:true}).filter(m=>m.captured&&victim(m)===e.target);assert.deepEqual(d.witnesses.map(w=>w.capture).sort(),captures.map(code).sort());
+ for(const m of captures){const w=d.witnesses.find(w=>w.capture===code(m));after.move(m);assert.ok(!after.isGameOver());const r=after.moves({verbose:true}).find(r=>code(r)===w.reply);assert.ok(r);after.move(r);const gain=material(after,enemy)-d.initialBalance;assert.ok(gain<=0);assert.equal(w.gain,gain);after.undo();after.undo();leaves++;}replies=1+captures.length;
+ if(event.id==='saving-piece')assert.equal(played.from,e.original);if(event.id==='defending-piece')assert.notEqual(played.from,e.original);if(event.id==='defensive-pawn-move')assert.equal(played.piece,'p');if(event.id==='eliminating-attacker')assert.ok(played.captured&&victim(played)===capture.from);if(event.id==='active-defense')assert.ok(played.captured||after.isCheck());
+ return{replies,leaves};
+}

@@ -60,3 +60,13 @@ Estimate <=30 seconds, <=3 MB evidence. Log exposed implementation amendments.
 Keep coach goal active, numerical research paused, no extension integration or
 push. Monitor actual 300-minute usage. Near 10% remaining checkpoint/commit,
 disable cutoff heartbeat and execute the authorized normal shutdown without /f.
+
+Implementation notes, 2026-10-07: existing frozen interposition events are kept;
+new named-line witnesses use `line-interposition` to avoid mixing evidence schemas.
+Specific E026 relative/cross-pin and defender-removal labels outrank general
+defense labels while mate/draw/warnings retain priority, with selected-label
+regressions. Initial rook examples protected by their adjacent king correctly
+failed the old profitable-threat gate; a distinct unprotected-king arrangement
+supplies positive cases and the original is retained as a negative. A rook on
+the escape file was blocked by the advanced pawn and did not invalidate the
+new king step; the attacked-square negative uses an unblocked bishop diagonal.
