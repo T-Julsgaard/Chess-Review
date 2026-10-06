@@ -62,3 +62,21 @@ duplicated. Targeted tests and source integrity before local commits. Log fixes.
 Live allowance monitor continues. At 10% remaining in the 300-minute window,
 checkpoint/commit, disable heartbeat, normal `shutdown.exe /s /t 0` without `/f`.
 No extension integration, pushes or numerical goal restart.
+
+## Exposed amendments
+
+First pass: 73/77 tests passed. The old central queen already checked the
+nonmoving king; move that king to h7 for the negative. The unsupported-knight
+negative started in a dead K+N/K position; retain a pawn so a legal move can be
+explained. These are fixture corrections, not gate changes. Promotion captures
+validate history but do not emit trade labels: promotion changes nominal value
+outside the two captured pieces. Add that negative, a capture of another piece
+instead of recapturing, and an en-passant history exchange positive. Reflected
+history is replayed to derive its counters because changing starting color can
+change the fullmove number after an odd number of plies.
+During exposed development, also admit exact terminal mating-army labels:
+king+rook, king+queen, king+two bishops, bishop+knight versus a lone king, only
+when the played move is actual mate with no other material. Queen-and-rook mate
+additionally requires the checking queen be geometrically supported by the rook.
+Add an inert-rook negative so mere material presence cannot imply teamwork.
+General queen-versus-pawn classification also covers less advanced pawns.
