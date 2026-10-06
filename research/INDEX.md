@@ -1,6 +1,6 @@
 # Research index
 
-Updated: 2026-10-05. Eighteen studies/tasks complete; evidence-resolution audit retained; reviews pending.
+Updated: 2026-10-06. Coach-concept mechanics research added; numerical goal remains paused.
 Baseline: [B000](BASELINE.md). New CP gain is development evidence, not confirmed.
 
 This is the routing and decision index. Detailed evidence lives in linked
@@ -57,8 +57,10 @@ records. Update a row and the active experiment's resume state when work stops.
 | F017 | [Evidence resolution and targets](findings/F017-evidence-resolution-and-targets.md) | recorded | Precision planning is exploratory; choice likelihood does not validate display, rating or categories | Distinct rating question with target-free inputs and traceable new evidence |
 | F016 | [Unresolved mixture finding](findings/F016-unresolved-choice-mixture.md) | recorded | All independent/exact/clean replay checks pass; descriptive calibration gains retain failed acceptance | Distinct question; no retuning or promotion |
 
+| E020 | [Evidence-backed coach concepts](experiments/E020-coach-concepts/RESULT.md) | planned | Synthetic-only legal-move certificates; vocabulary retained; no extension integration | Implement and verify bounded mechanics prototype |
+
 No promotion records yet.
-Allocate the next unused ID in each series: `E020`, `D003`, `F018`, `P001`.
+Allocate the next unused ID in each series: `E021`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
@@ -127,5 +129,5 @@ D001/D002 for D002 admission and retain E007's source/target limitations.
 Do not retry F002/F003/F004/F005 without a changed premise. No candidate is confirmed.
 The research goal is paused at the user-authorized usage-monitor stop.
 Do not resume automatically. E018/E019 are verified and complete; next action
-is the E020 opportunity-aware rating evidence/feasibility protocol after the
+is the next unused experiment's opportunity-aware rating evidence/feasibility protocol after the
 user explicitly resumes. The extension remains at B000.

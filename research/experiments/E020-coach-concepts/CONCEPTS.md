@@ -1,0 +1,1132 @@
+1. Board, rules, and fundamental concepts
+- Board coordinates — files (a–h), ranks (1–8), and square names.
+- Piece movement — legal movement of kings, queens, rooks, bishops, knights, and pawns.
+- Capture — removing an enemy piece by occupying its square.
+- Check — an attack on the enemy king.
+- Checkmate — a check from which there is no legal escape.
+- Stalemate — a player has no legal move but is not in check.
+- Draw by repetition — the same position occurs three times under the required conditions.
+- Fifty-move rule — a draw may be claimed after the required number of moves without a pawn move or capture.
+- Insufficient mating material — neither side can possibly checkmate.
+- Castling — special king-rook move for king safety and rook development.
+- Kingside castling — castling with the h-rook.
+- Queenside castling — castling with the a-rook.
+- En passant — special pawn capture after an opposing pawn advances two squares.
+- Promotion — converting a pawn reaching the last rank into another piece.
+- Underpromotion — promoting to a rook, bishop, or knight instead of a queen.
+- Legal move — a move that does not leave your king in check.
+- Illegal move — a move forbidden by the rules.
+- Touch-move rule — tournament rule requiring a touched piece to be moved when legally possible.
+- Checkmate versus resignation — distinction between the formal end of a game and voluntary concession.
+- Material — the pieces and pawns possessed by each player.
+- Tempo — one unit of time represented by a move.
+- Initiative — the ability to make threats that force the opponent to respond.
+- Space — control of territory restricting the opponent.
+- Development — bringing pieces from their starting squares into useful positions.
+- King safety — how vulnerable a king is to attack.
+- Piece activity — how many useful things a piece can do.
+- Mobility — number and quality of squares available to a piece.
+- Coordination — how effectively pieces work together.
+- Harmony — the overall cooperation of the pieces.
+- Material balance — comparison of both sides' material.
+- Material imbalance — positions involving different combinations of pieces, such as rook versus bishop and knight.
+2. Piece values and exchanges
+- Relative piece value — approximate values such as pawn 1, knight 3, bishop 3, rook 5, queen 9.
+- Absolute versus relative value — a piece's textbook value versus its actual usefulness in a position.
+- Exchange — trading one piece for another.
+- The exchange — specifically the material difference between a rook and a minor piece.
+- Winning the exchange — obtaining a rook for a bishop or knight.
+- Exchange sacrifice — deliberately giving a rook for a minor piece.
+- Quality of pieces — evaluating pieces by activity rather than nominal value.
+- Good trade — an exchange that improves your position.
+- Bad trade — an exchange that benefits the opponent.
+- Equal trade — exchanging pieces of roughly equal value.
+- Unequal trade — exchanging pieces of differing nominal values.
+- Piece simplification — reducing the number of pieces.
+- Mass exchanges — several exchanges occurring in succession.
+- Trading when ahead — simplifying material when possessing a material advantage.
+- Keeping pieces when behind — maintaining complications to preserve winning chances.
+- Queen trade — often reduces attacking possibilities and king danger.
+- Minor-piece trade — exchanging bishops and/or knights.
+- Rook trade — exchanging major pieces, often affecting endgame transitions.
+- Favorable transformation — trading into a position that is easier or better than the current one.
+3. Tactical concepts
+- Tactic — a forcing sequence producing a concrete advantage.
+- Combination — a tactical sequence involving several coordinated ideas.
+- Fork — one piece attacks two or more targets simultaneously.
+- Knight fork — a fork delivered by a knight.
+- Pawn fork — a pawn attacks two pieces simultaneously.
+- Royal fork — a fork attacking king and queen.
+- Double attack — one move creates attacks against multiple targets.
+- Triple attack — one move attacks three targets.
+- Pin — a piece cannot or should not move because something more valuable is behind it.
+- Absolute pin — the pinned piece legally cannot move because the king would be exposed.
+- Relative pin — the pinned piece can legally move but doing so loses material.
+- Cross-pin — a piece is pinned in more than one direction or interacts with multiple pins.
+- Skewer — a valuable piece is attacked and, after moving, exposes another piece.
+- Absolute skewer — usually a king is attacked first.
+- Discovered attack — moving one piece reveals an attack by another.
+- Discovered check — a discovered attack against the king.
+- Double check — two pieces simultaneously give check.
+- X-ray attack — a piece attacks through another piece.
+- X-ray defense — a long-range piece indirectly protects something through an intervening piece.
+- Deflection — forcing a defender away from an important duty.
+- Decoy — attracting an enemy piece to a vulnerable square.
+- Attraction — forcing a piece, commonly the king, onto a specific square.
+- Distraction — making a defending piece abandon its task.
+- Removal of the defender — eliminating a piece protecting an important target.
+- Overloading — a piece has too many defensive responsibilities.
+- Interference — inserting a piece between an enemy piece and its target.
+- Clearance — moving a piece away to free a square, file, rank, or diagonal.
+- Line clearance — opening a line for a rook, bishop, or queen.
+- Square clearance — vacating a square another piece needs.
+- Blocking — placing a piece so an opposing piece's line is obstructed.
+- Interposition — blocking a check or line attack.
+- Trapping a piece — restricting a piece until it cannot escape.
+- Trapped queen — restricting the queen until it is lost.
+- Domination — controlling all or nearly all useful squares of an enemy piece.
+- Desperado — a doomed piece causes maximum damage before being captured.
+- Zwischenzug — an intermediate move played before the apparently obvious continuation.
+- Intermediate check — a zwischenzug delivered with check.
+- ** zwischenmatt / intermediate mate** — an unexpected mating move inserted into a tactical sequence.
+- Sacrifice — intentionally giving material for another advantage.
+- Temporary sacrifice — material is regained soon afterward.
+- Permanent sacrifice — material is not immediately recovered.
+- Positional sacrifice — material given for long-term positional compensation.
+- Clearance sacrifice — material sacrificed to clear a line or square.
+- Deflection sacrifice — material sacrificed to lure away a defender.
+- Destroying the pawn shield — sacrificing to expose the enemy king.
+- Greek Gift sacrifice — Bxh7+ or Bxh2+ attacking motif.
+- Rook sacrifice on h7/h2 — attacking sacrifice against the castled king.
+- Rook sacrifice on g7/g2 — another common king-opening motif.
+- Exchange sacrifice on c3/c6 — thematic sacrifice in numerous Sicilian-type structures.
+- Queen sacrifice — sacrificing the queen for mate or substantial compensation.
+- Smothered mate combination — restricting the king with its own pieces before mating with a knight.
+- Back-rank tactic — exploiting a king trapped behind its own pawns.
+- Loose piece — an undefended piece.
+- Hanging piece — a piece that can be captured profitably.
+- Loose pieces drop off — principle that undefended pieces frequently create tactical opportunities.
+- Counting attackers and defenders — determining whether a capture sequence works.
+- Removing protection — attacking a piece after its defender disappears.
+- En prise — a piece that can be captured.
+- Tactical vulnerability — a structural or piece-placement feature enabling tactics.
+- Alignment — pieces positioned on the same file, rank, or diagonal, creating tactical opportunities.
+- King-piece alignment — particularly relevant for pins and skewers.
+- Queen-king alignment — often allows discovered attacks or skewers.
+- Rook-queen alignment — potential skewer or x-ray motif.
+4. Calculation and visualization
+- Candidate moves — plausible moves worth calculating.
+- Forcing moves — checks, captures, and threats.
+- Checks-captures-threats method — systematic tactical search procedure.
+- Calculation tree — branching sequence of possible variations.
+- Principal variation — the line considered best for both sides.
+- Visualization — mentally seeing future positions.
+- Board vision — accurately perceiving relationships between pieces.
+- Tactical vision — recognizing tactical opportunities.
+- Pattern recognition — identifying familiar structures and motifs.
+- Move ordering — calculating forcing moves in the most efficient sequence.
+- Calculation depth — number of moves examined ahead.
+- Calculation breadth — number of candidate variations considered.
+- Quiet move — a non-forcing move within a tactical sequence.
+- Only move — a move necessary to maintain the position.
+- Forced move — a move essentially compelled by threats.
+- Forcing sequence — a sequence in which the opponent has few reasonable responses.
+- Critical position — a position where a major decision is required.
+- Critical moment — a point where the nature of the game may change substantially.
+- Stopping point — knowing when a calculated line has reached a sufficiently stable evaluation.
+- Final-position evaluation — judging the position at the end of a variation.
+- Blunder check — checking whether a proposed move allows an immediate tactical refutation.
+- Opponent's best response — calculating against the strongest defense rather than hoped-for moves.
+- Backward calculation — reasoning from a desired tactical outcome toward the moves needed to create it.
+- Elimination method — rejecting inferior candidates until the best remains.
+- Comparison of candidates — evaluating several plausible moves against each other.
+5. Opening principles
+- Control the center — influence central squares such as e4, d4, e5, and d5.
+- Develop minor pieces — activate knights and bishops early.
+- Castle early — usually secure the king before launching operations.
+- Connect the rooks — clear the back rank so the rooks defend one another.
+- Avoid unnecessary pawn moves — prevent loss of development time.
+- Avoid repeated piece moves — unless tactically or strategically justified.
+- Do not bring the queen out too early — an exposed queen can become a target.
+- Opening tempo — time used to improve development.
+- Development advantage — having more active developed pieces.
+- Lead in development — temporary time advantage that may support an attack.
+- Opening initiative — early pressure forcing the opponent to react.
+- Opening theory — established analysis of opening variations.
+- Main line — heavily studied theoretical continuation.
+- Sideline — less common opening continuation.
+- Novelty — a new move in a theoretically known position.
+- Preparation — studying likely opening positions before a game.
+- Move order — sequence used to reach a particular position.
+- Transposition — reaching the same position through a different move order.
+- Opening repertoire — set of openings a player regularly uses.
+- Repertoire depth — how thoroughly opening variations are known.
+- Opening trap — tactical pitfall occurring early in the game.
+- Gambit — offering material, commonly a pawn, for compensation.
+- Accepted gambit — opponent takes the offered material.
+- Declined gambit — opponent refuses the offered material.
+- Countergambit — responding to a gambit with another material offer.
+- Open game — typically 1.e4 e5 structures with freer piece activity.
+- Semi-open game — 1.e4 followed by a Black response other than ...e5.
+- Closed game — often 1.d4 d5 structures with blocked centers.
+- Semi-closed game — commonly 1.d4 followed by a Black response other than ...d5.
+- Hypermodern opening — allows the opponent some central occupation before attacking it.
+- Classical opening — tends toward direct central occupation with pawns.
+- Opening equalization — Black successfully neutralizes White's first-move advantage.
+- Opening advantage — a favorable position obtained from the opening.
+6. The center
+- Pawn center — central pawns occupying important squares.
+- Piece center — central control primarily through pieces.
+- Classical center — pawns directly occupying central squares.
+- Hypermodern center — central influence from a distance.
+- Open center — few or no central pawns blocking files and diagonals.
+- Closed center — locked central pawn chains.
+- Fixed center — central pawns cannot easily advance or capture.
+- Mobile center — central pawns can advance and gain space.
+- Dynamic center — central tension can rapidly change.
+- Fluid center — central pawn structure is unresolved.
+- Pawn tension — opposing pawns can capture one another.
+- Maintaining tension — delaying pawn exchanges.
+- Releasing tension — resolving the pawn confrontation.
+- Central break — pawn move challenging the opponent's center.
+- Undermining the center — attacking the base or support of central pawns.
+- Overextended center — central pawns have advanced farther than they can safely support.
+- Center collapse — central pawn structure becomes tactically or strategically unsustainable.
+7. Pawn structure
+- Pawn structure — overall arrangement of pawns.
+- Pawn skeleton — another term for the basic pawn structure.
+- Pawn chain — diagonally connected pawns.
+- Base of the pawn chain — rear pawn supporting the rest of the chain.
+- Head of the pawn chain — most advanced pawn in the chain.
+- Pawn island — group of connected pawns separated from other pawns.
+- Pawn majority — more pawns than the opponent on one section of the board.
+- Queenside majority — pawn numerical superiority on the queenside.
+- Kingside majority — pawn numerical superiority on the kingside.
+- Minority attack — advancing a smaller pawn group against a larger opposing pawn group.
+- Passed pawn — pawn with no opposing pawn able to stop it on adjacent files.
+- Protected passed pawn — passed pawn defended by another pawn.
+- Connected passed pawns — neighboring passed pawns protecting each other.
+- Outside passed pawn — passed pawn far from the main action.
+- Distant passed pawn — passed pawn capable of distracting the enemy king.
+- Candidate passed pawn — pawn likely to become passed.
+- Backward pawn — pawn unable to advance safely and lacking neighboring pawn support.
+- Isolated pawn — pawn with no friendly pawn on neighboring files.
+- Isolated queen's pawn / IQP — isolated pawn on the d-file, usually d4 or d5.
+- Hanging pawns — adjacent pawns, typically on c- and d-files, without neighboring support.
+- Doubled pawns — two friendly pawns on the same file.
+- Tripled pawns — three friendly pawns on the same file.
+- Pawn weakness — pawn that is difficult to defend.
+- Weak square — square that cannot conveniently be protected by a pawn.
+- Pawn hole — permanently weak square created by pawn movement.
+- Pawn lever — pawn advance that attacks an opposing pawn.
+- Pawn break — pawn move designed to alter the structure.
+- Breakthrough — pawn sequence creating a passed pawn or penetration.
+- Pawn storm — coordinated pawn advance, usually toward the enemy king.
+- Pawn race — both sides rush pawns toward promotion.
+- Pawn wedge — advanced pawn restricting the enemy position.
+- Cramping pawn — pawn that seriously limits enemy pieces.
+- Pawn duo — neighboring pawns side by side.
+- Pawn phalanx — multiple pawns advancing side by side.
+- Ram — two opposing pawns directly blocking each other.
+- Pawn fixation — forcing an enemy pawn to remain on a vulnerable square.
+- Pawn target — pawn that can be attacked repeatedly.
+- Pawn shield — pawns protecting the king.
+- Pawn cover — structure shielding the king from attacks.
+- Pawn sacrifice — pawn intentionally given for activity, development, or structure.
+- Structural weakness — long-term defect in the pawn formation.
+- Structural advantage — healthier or more useful pawn arrangement.
+- Color-complex weakness — weaknesses concentrated on squares of one color.
+- Dark-square weakness — vulnerability on dark squares.
+- Light-square weakness — vulnerability on light squares.
+8. Common pawn structures
+- Carlsbad structure
+- Isolated queen's pawn structure
+- Hanging-pawn structure
+- Maroczy Bind
+- Hedgehog structure
+- Stonewall structure
+- French pawn chain
+- Caro-Kann structure
+- Slav structure
+- Queen's Gambit structure
+- Benoni structure
+- Benko structure
+- King's Indian structure
+- Grünfeld center
+- Sicilian Scheveningen structure
+- Najdorf structure
+- Dragon structure
+- Closed Sicilian structure
+- Botvinnik structure
+- Panov structure
+- Symmetrical pawn structure
+- Four-versus-three kingside structure
+- Three-versus-two queenside majority
+- Opposite-wing pawn majorities
+- Locked pawn chains
+- Open-file pawn structure
+9. Squares, files, ranks, and diagonals
+- Open file — file containing no pawns.
+- Semi-open file — file where one player has no pawn.
+- Closed file — file blocked by pawns.
+- Open rank — rank available for horizontal rook or queen activity.
+- Open diagonal — diagonal unobstructed for bishop or queen.
+- Long diagonal — a1–h8 or h1–a8 diagonal.
+- Weak square — square difficult for one player to defend.
+- Strong square — useful square that is difficult for the opponent to challenge.
+- Outpost — secure square, usually for a knight, that cannot be attacked by enemy pawns.
+- Advanced outpost — outpost deep in enemy territory.
+- Entry square — square allowing penetration into the opponent's position.
+- Penetration square — strategically valuable invading square.
+- Key square — strategically or tactically decisive square.
+- Critical square — square important to the evaluation of the position.
+- Blockade square — ideal square from which a passed pawn can be restrained.
+- Corresponding squares — endgame squares whose occupation determines king maneuvering.
+10. Positional chess
+- Positional advantage — long-term advantage not based on immediate tactics.
+- Static advantage — durable feature unlikely to disappear quickly.
+- Dynamic advantage — temporary advantage based on activity or initiative.
+- Compensation — benefits received in return for a disadvantage such as sacrificed material.
+- Long-term compensation — strategic advantages that persist.
+- Temporary compensation — advantages that must be exploited quickly.
+- Improving the worst-placed piece — classic positional principle.
+- Restriction — limiting the opponent's pieces and pawn breaks.
+- Prophylaxis — preventing the opponent's intended plan.
+- Preventive move — move designed primarily to stop an enemy idea.
+- Accumulation of advantages — gradually collecting small positional benefits.
+- Two weaknesses principle — creating a second target to overload the defense.
+- Multiple weaknesses — attacking several weaknesses across the board.
+- Space advantage — controlling more territory.
+- Space disadvantage — having restricted maneuvering room.
+- Cramped position — pieces lack useful squares.
+- Piece improvement — relocating a piece to a more useful square.
+- Piece optimization — placing pieces on squares maximizing their potential.
+- Maneuvering — repositioning pieces without immediate tactical action.
+- Regrouping — reorganizing pieces for a new objective.
+- Re-routing — transferring a piece through several squares to a better post.
+- Transformation of advantages — converting one advantage into another.
+- Conversion — turning an advantage into a win.
+- Consolidation — stabilizing the position after winning material or gaining an advantage.
+- Strategic trade — exchange based on positional considerations.
+- Good piece versus bad piece — comparing effectiveness rather than nominal value.
+- Domination — restricting an enemy piece or the entire position.
+- Bind — structure that severely restricts pawn breaks and piece activity.
+- Restriction before attack — reducing counterplay before beginning an offensive.
+- Multi-purpose move — move achieving several strategic objectives.
+11. Bishops
+- Bishop pair — owning both bishops.
+- Two bishops advantage — bishops can become especially powerful in open positions.
+- Good bishop — bishop whose own pawns do not seriously restrict it.
+- Bad bishop — bishop restricted by its own pawns.
+- Active bishop — bishop with useful targets and diagonals.
+- Passive bishop — bishop with limited activity.
+- Outside the pawn chain — placing the bishop beyond its own restrictive pawns.
+- Fianchetto — developing a bishop to b2, g2, b7, or g7.
+- Long-diagonal bishop — bishop controlling a major diagonal.
+- Bishop sacrifice — often used to expose a king.
+- Opposite-colored bishops — each player retains a bishop on different-colored squares.
+- Same-colored bishops — both bishops operate on the same color complex.
+- Bishop versus knight — strategic comparison based on structure and position.
+- Bishop in open position — bishops generally benefit from fewer pawns and open lines.
+- Bishop behind pawn chain — potentially restricted piece requiring liberation.
+12. Knights
+- Knight outpost
+- Centralized knight
+- Rim knight
+- Knight maneuver
+- Knight fork
+- Knight blockade
+- Knight versus bishop
+- Good knight
+- Bad knight
+- Octopus knight — deeply placed knight controlling many important squares.
+- Knight on the sixth rank
+- Knight on the fifth rank
+- Knight domination
+- Knight blockade of passed pawn
+- Knight rerouting
+- Knight tour
+- Knight on a protected outpost
+- Knight versus pawns on both wings — often less effective than a bishop.
+- Knight in closed position — often strong because blocked pawn structures reduce bishop mobility.
+13. Rooks
+- Rook on an open file
+- Rook on a semi-open file
+- Rook penetration
+- Rook on the seventh rank
+- Rook on the second rank
+- Two rooks on the seventh
+- Doubling rooks
+- Tripling on a file — usually rooks plus queen.
+- Connected rooks
+- Rook lift — transferring a rook horizontally, often through the third or fourth rank.
+- Rook swing — moving a rook laterally toward the attack.
+- Rook behind a passed pawn
+- Rook activity
+- Active rook principle — particularly important in rook endings.
+- Cutting off the king
+- Rook checking distance
+- Rook versus minor piece
+- Exchange sacrifice
+- Rook invasion
+- Rook blockade
+14. Queens
+- Queen activity
+- Queen centralization
+- Queen invasion
+- Queen infiltration
+- Queen check
+- Perpetual check
+- Queen battery
+- Queen-bishop battery
+- Queen-rook battery
+- Queen sacrifice
+- Queen trade
+- Queen versus two rooks
+- Queen versus rook and minor piece
+- Queen and knight attack
+- Queen and bishop attack
+- Exposed queen
+- Queen harassment
+- Queen trap
+- Early queen development
+- Queen domination of weak squares
+15. King concepts
+- King safety
+- Castled king
+- Uncastled king
+- Exposed king
+- Central king
+- King in the center
+- King activation
+- King centralization
+- Active king in the endgame
+- King opposition
+- Distant opposition
+- Diagonal opposition
+- Corresponding squares
+- King penetration
+- King blockade
+- King escorting a passed pawn
+- King cut-off
+- King hunt
+- Mating net
+- King shelter
+- Pawn shield
+- Air / luft — escape square preventing back-rank mate.
+- King walk — king travels unusually far, sometimes during an attack or defense.
+16. Attacking concepts
+- Attack
+- Direct attack
+- Kingside attack
+- Queenside attack
+- Central attack
+- Attack on the king
+- Attack on a weakness
+- Attack on a pawn
+- Attack on a piece
+- Attack with opposite-side castling
+- Pawn storm
+- Piece storm
+- Opening lines
+- Opening diagonals
+- Destroying the pawn shield
+- Sacrificial attack
+- Mating attack
+- Attack with material deficit
+- Attack with development advantage
+- Local superiority — concentrating more attacking forces in one area.
+- Overwhelming defenders
+- Bringing reinforcements
+- Switching the attack
+- Attack on both wings
+- Creating threats
+- Threat multiplication
+- Forcing weaknesses
+- Dark-square attack
+- Light-square attack
+- Attack against f7/f2
+- Attack against h7/h2
+- Attack against g7/g2
+- Battery
+- Line opening
+- File opening
+- Diagonal opening
+- Sacrifice for open lines
+- Mating net
+- King hunt
+- No escape squares
+- Restricting the king
+17. Defensive concepts
+- Defense
+- Active defense
+- Passive defense
+- Counterattack
+- Counterplay
+- Counterthreat
+- Trading attackers
+- Trading queens
+- Returning material
+- Giving back the exchange
+- Creating luft
+- Closing lines
+- Blocking files
+- Blocking diagonals
+- King evacuation
+- King escape
+- Defensive sacrifice
+- Eliminating attacking pieces
+- Overprotection
+- Reinforcing a weakness
+- Simplification
+- Fortress
+- Perpetual check
+- Perpetual attack
+- Stalemate defense
+- Resource
+- Only defense
+- Defensive tactical shot
+- Counter-sacrifice
+- Liquidation into an endgame
+- Neutralizing the initiative
+- Returning sacrificed material to end the attack
+18. Checkmating patterns
+- Back-rank mate
+- Ladder mate
+- Rook roller mate
+- Queen-and-rook mate
+- Smothered mate
+- Anastasia's mate
+- Arabian mate
+- Boden's mate
+- Epaulette mate
+- Opera mate
+- Damiano's mate
+- Lolli mate
+- Greco mate
+- Blackburne's mate
+- Morphy's mate
+- Legal's mate
+- Hook mate
+- Corner mate
+- Box mate
+- Kill box
+- Dovetail mate
+- Swallow's-tail mate
+- Double-bishop mate
+- Bishop-and-rook mating pattern
+- Queen-and-knight mating pattern
+- Queen-and-bishop mating pattern
+- Rook-and-knight mating pattern
+- Pawn-supported mate
+- Discovered mate
+- Double-check mate
+- Promotion mate
+- Underpromotion mate
+- Mating net
+- Forced mate
+- Mate in one
+- Mate in two
+- Mate in three
+- King-and-queen mate
+- King-and-rook mate
+- King and two bishops mate
+- Bishop-and-knight mate
+19. Strategic planning
+- Plan formation
+- Short-term plan
+- Long-term plan
+- Strategic objective
+- Target selection
+- Weakness identification
+- Piece improvement
+- Pawn break preparation
+- Minority attack
+- Majority advance
+- Kingside expansion
+- Queenside expansion
+- Central expansion
+- Restriction
+- Blockade
+- Prophylaxis
+- Creating an outpost
+- Occupying an open file
+- Creating a passed pawn
+- Activating the king
+- Improving pawn structure
+- Exchanging a bad piece
+- Exchanging the opponent's good piece
+- Changing the pawn structure
+- Fixing weaknesses
+- Inducing weaknesses
+- Creating a second weakness
+- Switching wings
+- Preparing a favorable endgame
+- Preventing counterplay
+20. Evaluation of a position
+- Material
+- King safety
+- Piece activity
+- Development
+- Space
+- Pawn structure
+- Center control
+- Initiative
+- Mobility
+- Coordination
+- Weak squares
+- Outposts
+- Open files
+- Open diagonals
+- Passed pawns
+- Pawn majorities
+- Minor-piece quality
+- Bishop pair
+- King activity
+- Tactical opportunities
+- Potential pawn breaks
+- Opponent's counterplay
+- Static evaluation
+- Dynamic evaluation
+- Equal position
+- Slight advantage
+- Clear advantage
+- Winning position
+- Losing position
+- Unclear position
+- Complicated position
+- Sharp position
+- Quiet position
+- Balanced position
+- Imbalanced position
+21. Initiative and dynamics
+- Initiative
+- Momentum
+- Tempo
+- Development lead
+- Forcing play
+- Dynamic compensation
+- Activity compensation
+- Time versus material
+- Space versus material
+- King safety versus material
+- Initiative versus material
+- Sacrificial initiative
+- Maintaining pressure
+- Losing the initiative
+- Seizing the initiative
+- Counter-initiative
+- Forcing the opponent onto the defensive
+- Dynamic equilibrium
+- Temporary advantage
+- Permanent advantage
+22. Endgame fundamentals
+- Endgame transition
+- King activation
+- Centralizing the king
+- Passed pawn creation
+- Passed pawn promotion
+- Outside passed pawn
+- Distant passed pawn
+- Opposition
+- Distant opposition
+- Key squares
+- Corresponding squares
+- Triangulation
+- Zugzwang
+- Mutual zugzwang
+- Reserve tempo
+- Tempo move
+- Breakthrough
+- Pawn race
+- Counting tempi
+- Rule of the square
+- Shouldering
+- Outflanking
+- King penetration
+- Fortress
+- Stalemate resource
+- Underpromotion
+- Domination
+- Converting an extra pawn
+- Liquidation
+- Endgame simplification
+- Active defense
+23. Pawn endings
+- King and pawn versus king
+- Key-square theory
+- Opposition
+- Distant opposition
+- Diagonal opposition
+- Outflanking
+- Shouldering
+- Rule of the square
+- Pawn breakthrough
+- Protected passed pawn
+- Outside passed pawn
+- Candidate passed pawn
+- Connected passers
+- Pawn race
+- Promotion race
+- Queen with check
+- Reserve tempo
+- Spare pawn move
+- Triangulation
+- Zugzwang
+- Corresponding squares
+- Trebuchet
+- Réti maneuver
+- Self-blocking pawns
+- Pawn majority
+- Fixing pawns
+- Creating entry squares
+24. Rook endings
+- Rook behind the passed pawn
+- Active rook
+- Cutting off the enemy king
+- Checking from behind
+- Checking from the side
+- Side checks
+- Long-side defense
+- Short-side defense
+- Lucena position
+- Building a bridge
+- Philidor position
+- Vancura defense
+- Rook and pawn versus rook
+- Rook versus connected pawns
+- Rook versus passed pawns
+- Rook activity versus pawn material
+- Seventh-rank rook
+- Rook penetration
+- King-rook coordination
+- Rook sacrifice for a pawn
+- Rook endgame pawn races
+- Four versus three
+- Three versus two
+- Outside passed pawn in rook endings
+- Checking distance
+- Rook trade into pawn ending
+25. Bishop endings
+- Bishop and pawn versus bishop
+- Opposite-colored bishop ending
+- Same-colored bishop ending
+- Good bishop
+- Bad bishop
+- Outside passed pawn
+- Wrong-colored bishop
+- Wrong rook pawn
+- Bishop sacrifice for pawns
+- Diagonal control
+- King penetration
+- Bishop domination
+- Bishop versus pawns on both wings
+26. Knight endings
+- Knight and pawn versus knight
+- Knight blockade
+- Knight outpost
+- Knight domination
+- Knight fork in endgames
+- Knight maneuvering
+- Knight versus outside passed pawn
+- Knight versus connected pawns
+- King-knight coordination
+- Knight inability to lose a tempo easily
+- Knight distance from action
+27. Bishop versus knight endings
+- Bishop versus knight
+- Open position favors bishop
+- Closed position favors knight
+- Pawns on both wings favor bishop
+- Fixed pawns can favor knight
+- Good bishop versus bad knight
+- Good knight versus bad bishop
+- Creating an outpost
+- Fixing pawns on bishop's color
+- Restricting the knight
+- Knight blockade
+- Bishop's long-range advantage
+28. Queen endings
+- Queen activity
+- Perpetual check
+- King exposure
+- Queen centralization
+- Passed-pawn checks
+- Queen behind passed pawn
+- Queen-versus-pawn endings
+- Queen race
+- Cross-check
+- Checking distance
+- King shelter
+- Queen trade
+- Promotion tactics
+- Perpetual-check fortress
+29. Advanced endgames
+- Queen versus rook
+- Queen versus minor piece
+- Rook versus bishop
+- Rook versus knight
+- Rook and bishop versus rook
+- Rook and knight versus rook
+- Queen versus rook and pawn
+- Queen versus advanced pawn
+- Two bishops versus knight
+- Bishop and knight checkmate
+- Fortress construction
+- Tablebase position
+- Tablebase win
+- Tablebase draw
+- Distance to mate
+- Distance to zeroing move
+30. Tempo and move-order concepts
+- Tempo
+- Gain of tempo
+- Loss of tempo
+- Developing with tempo
+- Attacking with tempo
+- Tempo on the queen
+- Useful tempo
+- Wasted tempo
+- Reserve tempo
+- Move-order trick
+- Transposition
+- Waiting move
+- Passing move
+- Triangulation
+- Zugzwang
+- Mutual zugzwang
+- Move-order finesse
+- Forcing move order
+31. Prophylaxis and prevention
+- Prophylaxis
+- Opponent's idea
+- Preventing a pawn break
+- Preventing castling
+- Preventing development
+- Stopping an outpost
+- Removing counterplay
+- Creating escape squares
+- Preventing a tactical motif
+- Restricting a piece
+- Preventing penetration
+- Defensive pawn move
+- Overprotection
+- Restraining a passed pawn
+- Neutralizing a strong piece
+- Preventive king move
+- Preventive rook move
+- Preventive queen move
+32. Decision-making concepts
+- Candidate move selection
+- Calculation
+- Evaluation
+- Comparison
+- Planning
+- Pattern recognition
+- Intuition
+- Positional judgment
+- Tactical awareness
+- Risk assessment
+- Practical chances
+- Objective evaluation
+- Subjective difficulty
+- Complexity
+- Uncertainty
+- Critical decision
+- Commitment
+- Irreversible move
+- Pawn move irreversibility
+- Exchange decision
+- When to simplify
+- When to complicate
+- When to attack
+- When to defend
+- When to sacrifice
+- When to change the structure
+33. Practical chess concepts
+- Time management
+- Clock awareness
+- Time trouble
+- Zeitnot
+- Increment
+- Delay
+- Thinking on the opponent's time
+- Blunder checking
+- Practical move
+- Safe move
+- Complicated move
+- Forcing move
+- Playing for two results — aiming to win while minimizing losing chances.
+- Playing for a draw
+- Playing for a win
+- Creating practical problems
+- Complexity management
+- Risk management
+- Psychological pressure
+- Opening preparation
+- Opponent preparation
+- Post-game analysis
+- Self-analysis
+- Engine analysis
+- Game annotation
+- Error classification
+- Pattern training
+- Tactical training
+- Calculation training
+- Endgame training
+- Opening study
+- Model games
+- Guess-the-move training
+34. Common mistakes
+- Blunder
+- Mistake
+- Inaccuracy
+- Hanging a piece
+- Missing a tactic
+- Missing mate
+- Ignoring the opponent's threat
+- Premature attack
+- Premature pawn break
+- Unnecessary pawn move
+- Weakening king safety
+- Moving the same piece repeatedly in the opening
+- Early queen development
+- Neglecting development
+- Greed
+- Pawn grabbing
+- Automatic recapture
+- Automatic exchange
+- Bad simplification
+- Trading an active piece
+- Creating unnecessary weaknesses
+- Passive defense
+- Overextension
+- Overconfidence
+- Playing too quickly
+- Using too much time
+- Tunnel vision
+- Hope chess — playing moves based on an opponent missing something.
+- Stopping calculation too early
+- Failing to calculate the opponent's best defense
+- Misjudging an endgame
+- Entering a lost pawn ending
+- Ignoring counterplay
+35. Strategic imbalances
+A major way of understanding chess is to compare the imbalances between the two sides:
+- Material imbalance
+- Bishop versus knight
+- Bishop pair versus other minor pieces
+- Rook versus two minor pieces
+- Queen versus two rooks
+- Queen versus rook and minor piece
+- Pawn-structure imbalance
+- Space imbalance
+- Development imbalance
+- King-safety imbalance
+- Initiative imbalance
+- Activity imbalance
+- Weak-square imbalance
+- Passed-pawn imbalance
+- Pawn-majority imbalance
+- Color-complex imbalance
+- Good-piece/bad-piece imbalance
+- Static versus dynamic advantage
+36. Deeper strategic concepts
+- Principle of two weaknesses
+- Overprotection
+- Blockade
+- Restriction
+- Prophylaxis
+- Centralization
+- Maximal piece activity
+- Transformation of advantages
+- Accumulation of small advantages
+- Strategic exchange sacrifice
+- Positional pawn sacrifice
+- Dynamic compensation
+- Permanent weakness
+- Temporary weakness
+- Static weakness
+- Weakness creation
+- Fixation
+- Provocation
+- Inducing pawn moves
+- Changing the character of the position
+- Good version versus bad version of a structure
+- Favorable minor-piece imbalance
+- Improving before attacking
+- Restricting before breaking through
+- Creating multiple fronts
+- Switching the point of attack
+- Maximum tension
+- Keeping flexibility
+- Commitment
+- Irreversibility
+- Pawn structure determines plans
+37. Advanced tactical concepts
+- Geometric tactics
+- Line tactics
+- Alignment tactics
+- Overworked defender
+- Underprotected piece
+- Self-pin
+- Cross-pin
+- Cross-check
+- Double attack with discovered attack
+- Clearance combination
+- Interference combination
+- Deflection combination
+- Attraction combination
+- Decoy combination
+- Blocking combination
+- Trapping combination
+- Desperado combination
+- Promotion tactic
+- Underpromotion tactic
+- Stalemate tactic
+- Perpetual-check tactic
+- Fortress tactic
+- Tactical liquidation
+- Intermediate sacrifice
+- Intermediate check
+- Intermediate capture
+- Quiet tactical move
+- Tactical retreat
+- Counter-combination
+- Defensive combination
+38. Chess terminology for position types
+- Open position
+- Closed position
+- Semi-open position
+- Sharp position
+- Tactical position
+- Positional position
+- Quiet position
+- Dynamic position
+- Static position
+- Balanced position
+- Unbalanced position
+- Symmetrical position
+- Asymmetrical position
+- Cramped position
+- Spacious position
+- Blocked position
+- Fluid position
+- Complicated position
+- Simplified position
+- Winning position
+- Lost position
+- Drawn position
+- Unclear position
+- Fortress position
+- Zugzwang position
+- Critical position
+39. Chess notation and analysis language
+- Algebraic notation
+- Descriptive notation
+- SAN — Standard Algebraic Notation
+- PGN — Portable Game Notation
+- FEN — Forsyth-Edwards Notation
+- Move number
+- Variation
+- Main line
+- Side variation
+- Annotation
+- ! — good move
+- !! — brilliant/excellent move
+- ? — mistake
+- ?? — blunder
+- !? — interesting move
+- ?! — dubious move
+- += — White slightly better
+- =+ — Black slightly better
+- ± — White clearly better
+- ∓ — Black clearly better
+- = — equal
+- ∞ — unclear/compensation
+- Mating evaluation
+- Centipawn evaluation
+- Engine evaluation
+- Depth
+- Principal variation
+40. Computer-chess concepts
+- Chess engine
+- Evaluation function
+- Centipawn
+- Search depth
+- Nodes
+- Nodes per second
+- Principal variation
+- Engine line
+- Multi-PV
+- Opening book
+- Endgame tablebase
+- Syzygy tablebases
+- Mate search
+- Engine tactical analysis
+- Engine positional evaluation
+- Human versus engine move
+- Top engine move
+- Evaluation swing
+- Blunder according to engine
+- Accuracy
+- Computer-assisted preparation
+41. Competitive and rating concepts
+- Classical chess
+- Rapid chess
+- Blitz chess
+- Bullet chess
+- Armageddon
+- Time control
+- Increment
+- Delay
+- Rated game
+- Unrated game
+- Rating
+- Elo rating
+- Rating performance
+- Performance rating
+- Tournament
+- Round robin
+- Swiss system
+- Knockout
+- Match
+- Tiebreak
+- Tournament standings
+- Title norms
+- Candidate Master
+- FIDE Master
+- International Master
+- Grandmaster
+42. Higher-level ideas that tie everything together
+At stronger levels, many individual concepts merge into broader questions:
+- What does the opponent want?
+- What changed after the last move?
+- Are there checks, captures, or threats?
+- Which pieces are undefended?
+- Which pieces are badly placed?
+- What is my worst piece?
+- What is my opponent's best piece?
+- Where are the weak squares?
+- Where are the pawn breaks?
+- Who benefits from exchanges?
+- Who benefits from an open position?
+- Who benefits from a closed position?
+- Whose king is weaker?
+- Who has more space?
+- Who has the initiative?
+- What are the long-term weaknesses?
+- What are the temporary advantages?
+- Can a temporary advantage be converted before it disappears?
+- Can one advantage be transformed into another?
+- Can counterplay be eliminated before trying to win?
+- Can a second weakness be created?
+- What is the correct moment to change the pawn structure?
+- What is the correct moment to simplify?
+- What is the correct moment to sacrifice?
+- What is the opponent's strongest defensive resource?
+- What would I play if it were the opponent's turn?
+- What is the position asking for?
+This gives you well over 500 individual chess ideas, motifs, structures, principles, and technical concepts when the subcategories are counted separately.
+A useful way to organize the whole subject is:
+Rules → tactics → calculation → openings → pawn structures → positional play → strategy → attack/defense → piece play → endgames → practical play → advanced evaluation.
