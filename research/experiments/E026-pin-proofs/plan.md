@@ -62,3 +62,13 @@ not establish real-game precision or educational benefit.
 Live usage cutoff stays active: 10% remaining in 300-minute window means
 checkpoint/commit, disable heartbeat, normal authorized shutdown without `/f`.
 No extension integration, push or numerical goal restart.
+
+Implementation notes, 2026-10-07: supplied verified move history is replayed
+inside E026 certificates so known repetition draws also reject new finite
+claims. FEN-only inputs cannot establish earlier repetitions; inherited E020–E025
+events retain their frozen history limitations. The proof budget may be lowered
+for controls, never raised above 50,000. Initial authored removal without a
+surviving pawn correctly failed through insufficient-material draw; it is
+retained as a negative case, with a distinct pawn-containing positive. A rook
+blocker case correctly failed through an off-line countercheck and is retained
+as a negative rather than weakening the conditional gate.

@@ -1,0 +1,21 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {openResearchData} from '../../../data-policy.mjs';
+import {explainMove,offLineMoves} from './proofs.mjs';
+import {replay} from './replay.mjs';
+import {Chess} from '../../../../lib/chess.js';
+await openResearchData(['D001'],{purpose:'test'});
+const {fixtures,reflect}=await import('./fixtures.mjs');
+const ids=new Set(['relative-pin','cross-pin','certified-removal']);
+for(const fixture of fixtures.flatMap(f=>[f,reflect(f)]))test(fixture.id,()=>{
+ const result=explainMove(fixture),events=result.events.map(e=>e.id);
+ for(const id of fixture.expected)assert.ok(events.includes(id),`${fixture.id}: missing ${id}`);
+ for(const id of fixture.absent)assert.ok(!events.includes(id),`${fixture.id}: unexpected ${id}`);
+ for(const event of result.events.filter(e=>ids.has(e.id)))replay(fixture,event);
+ assert.ok(!result.comment||result.comment.split(/\s+/).length<=24);
+});
+test('shared exhaustion removes all new finite events',()=>{const f=fixtures[0],r=explainMove({...f,maxProofNodes:0});assert.ok(r.proofBudget.exhausted);assert.ok(!r.events.some(e=>ids.has(e.id)));assert.ok(r.events.some(e=>e.id==='x-ray-attack'));});
+test('capturing the pinner is excluded from conditional off-line reply set',()=>{const f=fixtures[11],c=new Chess(f.fen);c.move(f.move);assert.ok(c.moves({verbose:true}).some(m=>m.from==='d5'&&m.to==='d1'));assert.ok(!offLineMoves(c,{slider:'d1',line:['d2','d3','d4','d5','d6','d7'],target:{square:'d8'},blocker:{square:'d5'}}).some(m=>m.to==='d1'));});
+test('proof budget cannot be raised or made unbounded',()=>{for(const limit of [-1,50001,Infinity,NaN,0.5])assert.throws(()=>explainMove({...fixtures[0],maxProofNodes:limit}),/maxProofNodes/);});
+test('counterreply coverage and arithmetic cannot be altered',()=>{const f=fixtures[0],event=explainMove(f).events.find(e=>e.id==='relative-pin');for(const mutate of [r=>r.pop(),r=>r.push(r[0]),r=>r[0].gain++]){const changed=structuredClone(event),row=changed.evidence.proof.witnesses.find(w=>w.responses.length);assert.ok(row);mutate(row.responses);assert.throws(()=>replay(f,changed));}});
+test('certificates reject altered or incomplete witnesses',()=>{for(const f of [fixtures[0],fixtures[5],fixtures[7]]){const event=explainMove(f).events.find(e=>ids.has(e.id));assert.ok(event);for(const mutate of [e=>e.evidence.proof.witnesses.pop(),e=>e.evidence.proof.witnesses.push(e.evidence.proof.witnesses[0]),e=>e.evidence.proof.initialBalance++,e=>e.evidence.proof.baselineFen=f.fen,e=>e.evidence.target.square='h1',e=>e.evidence.proof.minimumGain++]){const changed=structuredClone(event);mutate(changed);assert.throws(()=>replay(f,changed));}}});
