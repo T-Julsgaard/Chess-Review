@@ -1,6 +1,6 @@
 # Research index
 
-Updated: 2026-10-06. Coach-concept mechanics research added; numerical goal remains paused.
+Updated: 2026-10-07. Unattended coach expansion active; numerical goal remains paused.
 Baseline: [B000](BASELINE.md). New CP gain is development evidence, not confirmed.
 
 This is the routing and decision index. Detailed evidence lives in linked
@@ -60,7 +60,9 @@ records. Update a row and the active experiment's resume state when work stops.
 | E020 | [Evidence-backed coach concepts](experiments/E020-coach-concepts/RESULT.md) | complete | 74 mechanics tests; 68 synthetic cases; eight fork certificates; exact clean replay; 1,085-entry tracker; human utility unresolved | Plan independent explanation precision/usefulness assessment before integration |
 
 No promotion records yet.
-Allocate the next unused ID in each series: `E021`, `D003`, `F018`, `P001`.
+| E021 | [Short structural coach concepts](experiments/E021-structural-concepts/RESULT.md) | planned | Objective structural vocabulary; short comments; unattended usage cutoff | Implement and verify authored feature fixtures |
+
+Allocate the next unused ID in each series: `E022`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
