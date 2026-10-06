@@ -46,11 +46,13 @@ verifies bounded mechanics on synthetic positions, with an exhaustive concept
 tracker and browsable demo. Human usefulness and real-game precision remain
 unresolved; there is no extension integration. The numerical goal stays paused.
 
-The latest [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
-adds short pawn, file, battery, blockade and piece-placement comments. Its
-[cumulative tracker](experiments/E021-structural-concepts/evidence/concept-status.md)
+The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
+adds short pawn, file, battery, blockade and piece-placement comments. The latest
+[E022 move and tactics prototype](experiments/E022-move-tactics/RESULT.md) adds
+capture effects, check evasions, discovered attacks and finite skewer witnesses.
+Its [cumulative tracker](experiments/E022-move-tactics/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E021-structural-concepts/evidence/demo.html) is runnable
+list; its [demo](experiments/E022-move-tactics/evidence/demo.html) is runnable
 without the extension. Further coach research is active under the authorized
 five-hour usage cutoff.
 

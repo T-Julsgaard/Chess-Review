@@ -62,7 +62,7 @@ records. Update a row and the active experiment's resume state when work stops.
 No promotion records yet.
 | E021 | [Short structural coach concepts](experiments/E021-structural-concepts/RESULT.md) | complete | 206 cumulative tests; 190 synthetic cases; 68 verified names plus partial scopes; 17-word longest comment; exact repeat/clean replay | Continue E022 concrete move facts and bounded tactical motifs; usage cutoff active |
 
-| E022 | [Concrete move facts and bounded tactics](experiments/E022-move-tactics/RESULT.md) | planned | Short factual move effects, finite skewer/capture witnesses and narrow mate patterns | Implement guarded fixtures and independent replay |
+| E022 | [Concrete move facts and bounded tactics](experiments/E022-move-tactics/RESULT.md) | complete | 286 cumulative tests; 268 synthetic cases; 78 verified names; 80 certificate event replays; exact repeat/clean source and outputs | Continue E023 certified fork types and line motifs; usage cutoff active |
 
 Allocate the next unused ID in each series: `E023`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
