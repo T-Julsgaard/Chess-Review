@@ -101,4 +101,26 @@ needed for the authorized cutoff; sandbox approval review still applies.
 
 ## Amendments
 
-None at registration. Append dated development corrections with exposure state.
+2026-10-07, before any structural fixture evaluation: also admit exact placement
+facts for fianchetto squares b2/g2/b7/g7, bishops on a1–h8/h1–a8, knights on
+central d4/e4/d5/e5 or board edges, knights on relative fifth/sixth ranks, direct
+knight/rook blockade of an enemy passed pawn's next forward square, central
+king placement and unobstructed king opposition geometry. Direct opposition
+means rank/file distance two; distant means even distance at least four;
+diagonal means two squares in both coordinates. These identify geometry only,
+never who wins the opposition or whether a piece is good. Primary/negative
+gates and short-comment limit apply unchanged; no outcomes inspected.
+During exposed development, add direct count/placement subsets: three-or-more
+contiguous same-rank pawns as a phalanx; two-or-more central pawns as a pawn
+center; opposite-wing strict majorities and the 3:2/4:3 count cases. Initial
+fixture smoke exposed one illegal knight move in a negative rim case; replace
+it with legal rim-to-rim h2–f1 and record both-color failure, not a gate change.
+Legal en-passant vulnerability is explicitly excluded from the passed-pawn
+shortcut, and connected-passer wording makes no promise of safe advancement.
+Further exposed development: a negative bishop-ending fixture accidentally
+blocked its intended bishop move with a rook; move that rook to g2, preserving
+the negative gate (a remaining rook prevents bishop-ending classification).
+For branching pawn chains, terminal graph nodes need not be the most advanced
+pawns. Retain terminals in evidence but define heads as the component's most
+advanced rank, matching the supplied vocabulary. Add an unequal-branch test.
+These fixes were made before retained decisive evidence; no held-out claim.
