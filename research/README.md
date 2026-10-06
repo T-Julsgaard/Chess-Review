@@ -48,11 +48,12 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E022 move and tactics prototype](experiments/E022-move-tactics/RESULT.md) adds
-capture effects, check evasions, discovered attacks and finite skewer witnesses.
-Its [cumulative tracker](experiments/E022-move-tactics/evidence/concept-status.md)
+[E023 tactical expansion](experiments/E023-broad-tactics/RESULT.md) adds all-piece
+finite forks, discovered double attacks, capture/mate warnings and explicit
+x-ray geometry on top of E022 capture effects and skewer witnesses.
+Its [cumulative tracker](experiments/E023-broad-tactics/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E022-move-tactics/evidence/demo.html) is runnable
+list; its [demo](experiments/E023-broad-tactics/evidence/demo.html) is runnable
 without the extension. Further coach research is active under the authorized
 five-hour usage cutoff.
 

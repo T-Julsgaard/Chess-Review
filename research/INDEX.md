@@ -64,7 +64,7 @@ No promotion records yet.
 
 | E022 | [Concrete move facts and bounded tactics](experiments/E022-move-tactics/RESULT.md) | complete | 286 cumulative tests; 268 synthetic cases; 78 verified names; 80 certificate event replays; exact repeat/clean source and outputs | Continue E023 certified fork types and line motifs; usage cutoff active |
 
-| E023 | [Broader finite tactics and line motifs](experiments/E023-broad-tactics/RESULT.md) | planned | All-piece forks, discovered double attacks, hanging-capture witnesses and explicit line geometry | Implement negative controls and independent finite replay |
+| E023 | [Broader finite tactics and line motifs](experiments/E023-broad-tactics/RESULT.md) | complete | 342 cumulative tests; 318 synthetic cases; 82 verified names; 160 finite certificate event replays; exact repeat/clean outputs | Continue E024 endgame/material and placement facts; usage cutoff active |
 
 Allocate the next unused ID in each series: `E024`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
