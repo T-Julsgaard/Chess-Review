@@ -110,5 +110,16 @@ from human validation and adoption. No production promotion in this task.
 
 ## Amendments
 
-None at registration. Later amendments must state date, inspected evidence and
-effect on interpretation without rewriting this original protocol.
+2026-10-06, development implementation: all authored fixtures and outputs were
+exposed during debugging. Corrected a synthetic warning's target square and
+non-moving king placement; added pawns to separate a positive queen-fork
+example from the dead-position negative case. Split pawn-fork examples by
+whether the king has an escape from the immediate countermate. Retained the
+mate/draw cases as negative fixtures, and added defended equal-value targets
+and pinner relocation. These are test-design corrections/coverage extensions,
+not altered gates, independent labels or confirmation. Adapted castling checks
+to the bundled chess.js API (it has no combined `isCastle()` method).
+Final development review also added explicit FEN castling/EP/counter consistency
+checks and negative tests: the bundled FEN validator alone does not establish
+the starting king/rook or the last double pawn move. This only tightens invalid
+input refusal; it does not establish historical reachability or change gates.
