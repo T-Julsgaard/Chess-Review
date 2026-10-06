@@ -1,0 +1,30 @@
+import {setup} from '../../E021-structural-concepts/code/fixtures.mjs';
+export {reflect} from '../../E020-coach-concepts/code/fixtures.mjs';
+const f=(id,extra,move,expected=[],absent=[],options={})=>({id,fen:setup(extra),move,expected,absent,note:id.replaceAll('-',' '),...options});
+export const fixtures=[
+ f('queen-checking-fork',{h8:null,g6:'k',e5:'Q',b5:'n',g4:'P'},'e5h5',['broad-fork']),
+ f('rook-checking-fork',{h8:null,g7:'k',c6:'R',b6:'n',f5:'P',a7:null},'c6g6',['broad-fork']),
+ f('bishop-checking-fork',{a1:null,h4:'K',h8:null,g6:'k',g4:'B',f3:'r'},'g4h5',['broad-fork']),
+ f('king-forks-pawns',{a1:null,d3:'K',d4:'p',f4:'p'},'d3e4',['broad-fork']),
+ f('pawn-forks-king-pawn',{a1:null,f5:'K',h8:null,d7:'k',e5:'P',f7:'p',h7:'R',a7:null},'e5e6',['broad-fork']),
+ f('triple-knight-pawn-targets',{h8:null,e8:'k',f5:'N',c8:'r',f7:'p',a7:null},'f5d6',['fork','triple-attack']),
+ f('capturable-queen-fork',{d1:'Q',d7:'r',g4:'r'},'d1d4',[],['broad-fork']),
+ f('protected-knight-targets',{c3:'N',d5:'b',b5:'b',c6:'p',e6:'p'},'c3d5',[],['broad-fork']),
+ f('old-queen-pair',{h8:null,h7:'k',d4:'Q',b4:'n',d7:'b'},'d4d5',[],['broad-fork']),
+ f('discovered-double-threat',{h8:null,e7:'k',c1:'R',c3:'N',c7:'q'},'c3d5',['discovered-double-attack']),
+ f('xray-rook-attack',{e1:'R',d4:'n',d8:'q'},'e1d1',['x-ray-attack']),
+ f('xray-bishop-attack',{c1:'B',d4:'n',f6:'q'},'c1b2',['x-ray-attack']),
+ f('xray-rook-defense',{e1:'R',d4:'p',d8:'N'},'e1d1',['x-ray-defense']),
+ f('xray-two-blockers',{e1:'R',d4:'n',d6:'p',d8:'q'},'e1d1',['x-ray-attack']),
+ f('old-xray',{d1:'R',d4:'n',d8:'q'},'d1d2',[],['x-ray-attack']),
+ f('interference-line',{a1:null,a2:'K',c1:'R',c8:'r',e4:'B'},'e4c2',['interference']),
+ f('no-interference-blocked-line',{a1:null,a2:'K',c1:'R',c8:'r',c4:'p',e4:'B'},'e4c2',[],['interference']),
+ f('hanging-bishop-warning',{a1:null,d1:'K',c1:'B',b7:'r'},'c1b2',['hanging-piece']),
+ f('defended-capture-no-profit',{c1:'R',b7:'r',a1:null,a2:'K'},'c1b1',[],['hanging-piece']),
+ f('old-hanging-piece',{a1:null,d1:'K',h8:null,h7:'k',b2:'B',b7:'r'},'h2h3',[],['hanging-piece']),
+ f('en-passant-hanging-warning',{c2:'P',d4:'p'},'c2c4',['hanging-piece']),
+ f('budget-fork-abstention',{h8:null,g6:'k',e5:'Q',b5:'n',g4:'P'},'e5h5',[],['broad-fork','hanging-piece'],{maxBroadNodes:1}),
+ f('mate-capture-warning',{},'d5c6',['hanging-piece','allows-mate'],[],{fen:'3r3k/7p/2r5/3P4/8/8/PPP5/1K1B4 w - - 0 1'}),
+ f('bishop-royal-fork',{h8:null,d8:'k',d6:'q',f8:'B',d1:'R',f6:'P'},'f8e7',['broad-fork']),
+ f('capturable-bishop-royal-fork',{h8:null,d8:'k',d6:'q',f8:'B',d1:'R'},'f8e7',[],['broad-fork']),
+];
