@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "codeRevision": "7d7dffd77f339888422225193dc766e4af8b8e18",
+  "repeatOutputHashesMatch": true,
+  "cleanOutputHashesMatch": true,
+  "cleanInputHashesMatch": true,
+  "cleanWorkingTreeWasEmpty": true,
+  "tests": {
+    "passed": 74,
+    "failed": 0,
+    "cleanPassed": 74
+  },
+  "demoFilters": {
+    "all": 34,
+    "comment": 20,
+    "abstain": 11,
+    "invalid": 3
+  },
+  "sourceCheckPassed": true,
+  "outputHashes": {
+    "results.json": "846b1e47961a5301f4c4fd964eb11c0b8d40e8f51566e1f34905d384a2d2caff",
+    "demo.html": "d8afee197cad016dd168bf376b9ce230851b80986077cefa7d64d245eb0c0af2",
+    "concept-status.md": "b98b10ddb999527605f66f110263a023b18312ec7d6f9654aa57275a5cc2392e"
+  },
+  "evidenceBytes": {
+    "concept-status.md": 62340,
+    "demo.html": 472849,
+    "results.json": 93088,
+    "run.json": 12263
+  },
+  "limits": "Shared chess.js rules library; synthetic development fixtures; no independent engine or human validation."
+}

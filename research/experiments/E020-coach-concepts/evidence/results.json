@@ -1,0 +1,3268 @@
+{
+  "schema": "E020-synthetic-mechanics-v1",
+  "source": "authored synthetic fixtures; no real games",
+  "fixtures": 68,
+  "accepted": 40,
+  "abstained": 22,
+  "invalid": 6,
+  "replays": [
+    {
+      "fixture": "royal-knight",
+      "kind": "fork",
+      "defenderReplies": 4,
+      "counterreplyLeaves": 28,
+      "minimumGain": 6
+    },
+    {
+      "fixture": "royal-knight-black",
+      "kind": "fork",
+      "defenderReplies": 4,
+      "counterreplyLeaves": 28,
+      "minimumGain": 6
+    },
+    {
+      "fixture": "pawn-fork",
+      "kind": "fork",
+      "defenderReplies": 24,
+      "counterreplyLeaves": 393,
+      "minimumGain": 2
+    },
+    {
+      "fixture": "pawn-fork-black",
+      "kind": "fork",
+      "defenderReplies": 24,
+      "counterreplyLeaves": 384,
+      "minimumGain": 2
+    },
+    {
+      "fixture": "fork-warning",
+      "kind": "allows-fork",
+      "defenderReplies": 4,
+      "counterreplyLeaves": 28,
+      "minimumGain": 9
+    },
+    {
+      "fixture": "fork-warning-black",
+      "kind": "allows-fork",
+      "defenderReplies": 4,
+      "counterreplyLeaves": 28,
+      "minimumGain": 9
+    },
+    {
+      "fixture": "fork-avoidance",
+      "kind": "avoids-fork",
+      "defenderReplies": 4,
+      "counterreplyLeaves": 28,
+      "minimumGain": 9
+    },
+    {
+      "fixture": "fork-avoidance-black",
+      "kind": "avoids-fork",
+      "defenderReplies": 4,
+      "counterreplyLeaves": 28,
+      "minimumGain": 9
+    }
+  ],
+  "results": [
+    {
+      "fixture": {
+        "id": "defended-equal-targets",
+        "fen": "7k/1p3p2/2b1b3/8/8/5N2/P7/K7 w - - 0 1",
+        "move": "f3d4",
+        "expected": [],
+        "absent": [
+          "fork"
+        ],
+        "note": "Two bishops attacked, but pawn recaptures erase the nominal material gain."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "7k/1p3p2/2b1b3/8/8/5N2/P7/K7 w - - 0 1",
+        "after": "7k/1p3p2/2b1b3/8/3N4/8/P7/K7 b - - 1 1",
+        "move": "f3d4",
+        "san": "Nd4",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 70,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "defended-equal-targets-black",
+        "fen": "k7/p7/5n2/8/8/2B1B3/1P3P2/7K b - - 0 1",
+        "move": "f6d5",
+        "expected": [],
+        "absent": [
+          "fork"
+        ],
+        "note": "Two bishops attacked, but pawn recaptures erase the nominal material gain."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "k7/p7/5n2/8/8/2B1B3/1P3P2/7K b - - 0 1",
+        "after": "k7/p7/8/3n4/8/2B1B3/1P3P2/7K w - - 1 2",
+        "move": "f6d5",
+        "san": "Nd5",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 46,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "royal-knight",
+        "fen": "4k3/5q1p/8/5N2/8/8/P7/K7 w - - 0 1",
+        "move": "f5d6",
+        "expected": [
+          "fork",
+          "check"
+        ],
+        "absent": [
+          "allows-fork"
+        ],
+        "note": "Checking royal fork; every reply has a material witness."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "4k3/5q1p/8/5N2/8/8/P7/K7 w - - 0 1",
+        "after": "4k3/5q1p/3N4/8/8/8/P7/K7 b - - 1 1",
+        "move": "f5d6",
+        "san": "Nd6+",
+        "events": [
+          {
+            "id": "fork",
+            "text": "Your knight on d6 forks the king on e8 and the queen on f7. Every legal reply still allows a capture of one of these targets.",
+            "evidence": {
+              "piece": "n",
+              "attacker": "d6",
+              "targets": [
+                {
+                  "square": "e8",
+                  "type": "k",
+                  "color": "b"
+                },
+                {
+                  "square": "f7",
+                  "type": "q",
+                  "color": "b"
+                }
+              ],
+              "royal": true,
+              "proof": {
+                "horizonPliesAfterFork": 3,
+                "materialValues": {
+                  "p": 1,
+                  "n": 3,
+                  "b": 3,
+                  "r": 5,
+                  "q": 9,
+                  "k": 0
+                },
+                "minimumGain": 6,
+                "witnesses": [
+                  {
+                    "reply": "e8f8",
+                    "capture": "d6f7",
+                    "target": "f7",
+                    "worstReply": "f8f7",
+                    "worstGain": 6,
+                    "responses": 7
+                  },
+                  {
+                    "reply": "e8e7",
+                    "capture": "d6f7",
+                    "target": "f7",
+                    "worstReply": "e7f7",
+                    "worstGain": 6,
+                    "responses": 8
+                  },
+                  {
+                    "reply": "e8d7",
+                    "capture": "d6f7",
+                    "target": "f7",
+                    "worstReply": null,
+                    "worstGain": 9,
+                    "responses": 8
+                  },
+                  {
+                    "reply": "e8d8",
+                    "capture": "d6f7",
+                    "target": "f7",
+                    "worstReply": null,
+                    "worstGain": 9,
+                    "responses": 5
+                  }
+                ]
+              }
+            },
+            "qualityClaim": false
+          },
+          {
+            "id": "check",
+            "text": "You give check to the king on e8.",
+            "evidence": {
+              "king": "e8",
+              "attackers": [
+                "d6"
+              ]
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Your knight on d6 forks the king on e8 and the queen on f7. Every legal reply still allows a capture of one of these targets.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 50,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "royal-knight-black",
+        "fen": "k7/p7/8/8/5n2/8/5Q1P/4K3 b - - 0 1",
+        "move": "f4d3",
+        "expected": [
+          "fork",
+          "check"
+        ],
+        "absent": [
+          "allows-fork"
+        ],
+        "note": "Checking royal fork; every reply has a material witness."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "k7/p7/8/8/5n2/8/5Q1P/4K3 b - - 0 1",
+        "after": "k7/p7/8/8/8/3n4/5Q1P/4K3 w - - 1 2",
+        "move": "f4d3",
+        "san": "Nd3+",
+        "events": [
+          {
+            "id": "fork",
+            "text": "Your knight on d3 forks the queen on f2 and the king on e1. Every legal reply still allows a capture of one of these targets.",
+            "evidence": {
+              "piece": "n",
+              "attacker": "d3",
+              "targets": [
+                {
+                  "square": "f2",
+                  "type": "q",
+                  "color": "w"
+                },
+                {
+                  "square": "e1",
+                  "type": "k",
+                  "color": "w"
+                }
+              ],
+              "royal": true,
+              "proof": {
+                "horizonPliesAfterFork": 3,
+                "materialValues": {
+                  "p": 1,
+                  "n": 3,
+                  "b": 3,
+                  "r": 5,
+                  "q": 9,
+                  "k": 0
+                },
+                "minimumGain": 6,
+                "witnesses": [
+                  {
+                    "reply": "e1d2",
+                    "capture": "d3f2",
+                    "target": "f2",
+                    "worstReply": null,
+                    "worstGain": 9,
+                    "responses": 8
+                  },
+                  {
+                    "reply": "e1e2",
+                    "capture": "d3f2",
+                    "target": "f2",
+                    "worstReply": "e2f2",
+                    "worstGain": 6,
+                    "responses": 8
+                  },
+                  {
+                    "reply": "e1f1",
+                    "capture": "d3f2",
+                    "target": "f2",
+                    "worstReply": "f1f2",
+                    "worstGain": 6,
+                    "responses": 7
+                  },
+                  {
+                    "reply": "e1d1",
+                    "capture": "d3f2",
+                    "target": "f2",
+                    "worstReply": null,
+                    "worstGain": 9,
+                    "responses": 5
+                  }
+                ]
+              }
+            },
+            "qualityClaim": false
+          },
+          {
+            "id": "check",
+            "text": "You give check to the king on e1.",
+            "evidence": {
+              "king": "e1",
+              "attackers": [
+                "d3"
+              ]
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Your knight on d3 forks the queen on f2 and the king on e1. Every legal reply still allows a capture of one of these targets.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 50,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "capturable-forker",
+        "fen": "3rk3/5q2/8/5N2/8/8/8/K7 w - - 0 1",
+        "move": "f5d6",
+        "expected": [
+          "check"
+        ],
+        "absent": [
+          "fork"
+        ],
+        "note": "The rook can capture the forking knight."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "3rk3/5q2/8/5N2/8/8/8/K7 w - - 0 1",
+        "after": "3rk3/5q2/3N4/8/8/8/8/K7 b - - 1 1",
+        "move": "f5d6",
+        "san": "Nd6+",
+        "events": [
+          {
+            "id": "check",
+            "text": "You give check to the king on e8.",
+            "evidence": {
+              "king": "e8",
+              "attackers": [
+                "d6"
+              ]
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "You give check to the king on e8.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 7,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "capturable-forker-black",
+        "fen": "k7/8/8/8/5n2/8/5Q2/3RK3 b - - 0 1",
+        "move": "f4d3",
+        "expected": [
+          "check"
+        ],
+        "absent": [
+          "fork"
+        ],
+        "note": "The rook can capture the forking knight."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "k7/8/8/8/5n2/8/5Q2/3RK3 b - - 0 1",
+        "after": "k7/8/8/8/8/3n4/5Q2/3RK3 w - - 1 2",
+        "move": "f4d3",
+        "san": "Nd3+",
+        "events": [
+          {
+            "id": "check",
+            "text": "You give check to the king on e1.",
+            "evidence": {
+              "king": "e1",
+              "attackers": [
+                "d3"
+              ]
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "You give check to the king on e1.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 7,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "pawn-fork",
+        "fen": "7k/7p/2r1r3/8/3P4/8/1PP5/1K1B4 w - - 0 1",
+        "move": "d4d5",
+        "expected": [
+          "fork"
+        ],
+        "absent": [
+          "check"
+        ],
+        "note": "Non-checking pawn fork of two rooks; king has an escape square."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "7k/7p/2r1r3/8/3P4/8/1PP5/1K1B4 w - - 0 1",
+        "after": "7k/7p/2r1r3/3P4/8/8/1PP5/1K1B4 b - - 0 1",
+        "move": "d4d5",
+        "san": "d5",
+        "events": [
+          {
+            "id": "fork",
+            "text": "Your pawn on d5 forks the rook on c6 and the rook on e6. Every legal reply still allows a capture of one of these targets.",
+            "evidence": {
+              "piece": "p",
+              "attacker": "d5",
+              "targets": [
+                {
+                  "square": "c6",
+                  "type": "r",
+                  "color": "b"
+                },
+                {
+                  "square": "e6",
+                  "type": "r",
+                  "color": "b"
+                }
+              ],
+              "royal": false,
+              "proof": {
+                "horizonPliesAfterFork": 3,
+                "materialValues": {
+                  "p": 1,
+                  "n": 3,
+                  "b": 3,
+                  "r": 5,
+                  "q": 9,
+                  "k": 0
+                },
+                "minimumGain": 2,
+                "witnesses": [
+                  {
+                    "reply": "h8g7",
+                    "capture": "d5c6",
+                    "target": "c6",
+                    "worstReply": "e6c6",
+                    "worstGain": 4,
+                    "responses": 21
+                  },
+                  {
+                    "reply": "h8g8",
+                    "capture": "d5c6",
+                    "target": "c6",
+                    "worstReply": "e6c6",
+                    "worstGain": 4,
+                    "responses": 18
+                  },
+                  {
+                    "reply": "h7h6",
+                    "capture": "d5c6",
+                    "target": "c6",
+                    "worstReply": "e6c6",
+                    "worstGain": 4,
+                    "responses": 15
+                  },
+                  {
+                    "reply": "h7h5",
+                    "capture": "d5c6",
+                    "target": "c6",
+                    "worstReply": "e6c6",
+                    "worstGain": 4,
+                    "responses": 16
+                  },
+                  {
+                    "reply": "c6c7",
+                    "capture": "d5e6",
+                    "target": "e6",
+                    "worstReply": "c7c2",
+                    "worstGain": 4,
+                    "responses": 16
+                  },
+                  {
+                    "reply": "c6c8",
+                    "capture": "d5e6",
+                    "target": "e6",
+                    "worstReply": "c8c2",
+                    "worstGain": 4,
+                    "responses": 16
+                  },
+                  {
+                    "reply": "c6d6",
+                    "capture": "d5e6",
+                    "target": "e6",
+                    "worstReply": "d6d1",
+                    "worstGain": 2,
+                    "responses": 15
+                  },
+                  {
+                    "reply": "c6c5",
+                    "capture": "d5e6",
+                    "target": "e6",
+                    "worstReply": "c5c2",
+                    "worstGain": 4,
+                    "responses": 17
+                  },
+                  {
+                    "reply": "c6c4",
+                    "capture": "d5e6",
+                    "target": "e6",
+                    "worstReply": "c4c2",
+                    "worstGain": 4,
+                    "responses": 17
+                  },
+                  {
+                    "reply": "c6c3",
+                    "capture": "d5e6",
+                    "target": "e6",
+                    "worstReply": "c3c2",
+                    "worstGain": 4,
+                    "responses": 17
+                  },
+                  {
+                    "reply": "c6c2",
+                    "capture": "d5e6",
+                    "target": "e6",
+                    "worstReply": "c2b2",
+                    "worstGain": 3,
+                    "responses": 17
+                  },
+                  {
+                    "reply": "c6b6",
+                    "capture": "d5e6",
+                    "target": "e6",
+                    "worstReply": "b6e6",
+                    "worstGain": 4,
+                    "responses": 14
+                  },
+                  {
+                    "reply": "c6a6",
+                    "capture": "d5e6",
+                    "target": "e6",
+                    "worstReply": "a6e6",
+                    "worstGain": 4,
+                    "responses": 15
+                  },
+                  {
+                    "reply": "e6e7",
+                    "capture": "d5c6",
+                    "target": "c6",
+                    "worstReply": null,
+                    "worstGain": 5,
+                    "responses": 17
+                  },
+                  {
+                    "reply": "e6e8",
+                    "capture": "d5c6",
+                    "target": "c6",
+                    "worstReply": null,
+                    "worstGain": 5,
+                    "responses": 17
+                  },
+                  {
+                    "reply": "e6f6",
+                    "capture": "d5c6",
+                    "target": "c6",
+                    "worstReply": "f6c6",
+                    "worstGain": 4,
+                    "responses": 16
+                  },
+                  {
+                    "reply": "e6g6",
+                    "capture": "d5c6",
+                    "target": "c6",
+                    "worstReply": "g6c6",
+                    "worstGain": 4,
+                    "responses": 16
+                  },
+                  {
+                    "reply": "e6h6",
+                    "capture": "d5c6",
+                    "target": "c6",
+                    "worstReply": "h6c6",
+                    "worstGain": 4,
+                    "responses": 12
+                  },
+                  {
+                    "reply": "e6e5",
+                    "capture": "d5c6",
+                    "target": "c6",
+                    "worstReply": null,
+                    "worstGain": 5,
+                    "responses": 18
+                  },
+                  {
+                    "reply": "e6e4",
+                    "capture": "d5c6",
+                    "target": "c6",
+                    "worstReply": null,
+                    "worstGain": 5,
+                    "responses": 18
+                  },
+                  {
+                    "reply": "e6e3",
+                    "capture": "d5c6",
+                    "target": "c6",
+                    "worstReply": null,
+                    "worstGain": 5,
+                    "responses": 18
+                  },
+                  {
+                    "reply": "e6e2",
+                    "capture": "d5c6",
+                    "target": "c6",
+                    "worstReply": "e2c2",
+                    "worstGain": 4,
+                    "responses": 16
+                  },
+                  {
+                    "reply": "e6e1",
+                    "capture": "d5c6",
+                    "target": "c6",
+                    "worstReply": "e1d1",
+                    "worstGain": 2,
+                    "responses": 15
+                  },
+                  {
+                    "reply": "e6d6",
+                    "capture": "d5c6",
+                    "target": "c6",
+                    "worstReply": "d6d1",
+                    "worstGain": 2,
+                    "responses": 16
+                  }
+                ]
+              }
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Your pawn on d5 forks the rook on c6 and the rook on e6. Every legal reply still allows a capture of one of these targets.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 584,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "pawn-fork-black",
+        "fen": "1k1b4/1pp5/8/3p4/8/2R1R3/7P/7K b - - 0 1",
+        "move": "d5d4",
+        "expected": [
+          "fork"
+        ],
+        "absent": [
+          "check"
+        ],
+        "note": "Non-checking pawn fork of two rooks; king has an escape square."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "1k1b4/1pp5/8/3p4/8/2R1R3/7P/7K b - - 0 1",
+        "after": "1k1b4/1pp5/8/8/3p4/2R1R3/7P/7K w - - 0 2",
+        "move": "d5d4",
+        "san": "d4",
+        "events": [
+          {
+            "id": "fork",
+            "text": "Your pawn on d4 forks the rook on c3 and the rook on e3. Every legal reply still allows a capture of one of these targets.",
+            "evidence": {
+              "piece": "p",
+              "attacker": "d4",
+              "targets": [
+                {
+                  "square": "c3",
+                  "type": "r",
+                  "color": "w"
+                },
+                {
+                  "square": "e3",
+                  "type": "r",
+                  "color": "w"
+                }
+              ],
+              "royal": false,
+              "proof": {
+                "horizonPliesAfterFork": 3,
+                "materialValues": {
+                  "p": 1,
+                  "n": 3,
+                  "b": 3,
+                  "r": 5,
+                  "q": 9,
+                  "k": 0
+                },
+                "minimumGain": 2,
+                "witnesses": [
+                  {
+                    "reply": "c3c4",
+                    "capture": "d4e3",
+                    "target": "e3",
+                    "worstReply": "c4c7",
+                    "worstGain": 4,
+                    "responses": 17
+                  },
+                  {
+                    "reply": "c3c5",
+                    "capture": "d4e3",
+                    "target": "e3",
+                    "worstReply": "c5c7",
+                    "worstGain": 4,
+                    "responses": 17
+                  },
+                  {
+                    "reply": "c3c6",
+                    "capture": "d4e3",
+                    "target": "e3",
+                    "worstReply": "c6c7",
+                    "worstGain": 4,
+                    "responses": 17
+                  },
+                  {
+                    "reply": "c3c7",
+                    "capture": "d4e3",
+                    "target": "e3",
+                    "worstReply": "c7b7",
+                    "worstGain": 3,
+                    "responses": 17
+                  },
+                  {
+                    "reply": "c3d3",
+                    "capture": "d4e3",
+                    "target": "e3",
+                    "worstReply": "d3d8",
+                    "worstGain": 2,
+                    "responses": 15
+                  },
+                  {
+                    "reply": "c3c2",
+                    "capture": "d4e3",
+                    "target": "e3",
+                    "worstReply": "c2c7",
+                    "worstGain": 4,
+                    "responses": 16
+                  },
+                  {
+                    "reply": "c3c1",
+                    "capture": "d4e3",
+                    "target": "e3",
+                    "worstReply": "c1c7",
+                    "worstGain": 4,
+                    "responses": 16
+                  },
+                  {
+                    "reply": "c3b3",
+                    "capture": "d4e3",
+                    "target": "e3",
+                    "worstReply": "b3b7",
+                    "worstGain": 4,
+                    "responses": 14
+                  },
+                  {
+                    "reply": "c3a3",
+                    "capture": "d4e3",
+                    "target": "e3",
+                    "worstReply": "a3e3",
+                    "worstGain": 4,
+                    "responses": 15
+                  },
+                  {
+                    "reply": "e3e4",
+                    "capture": "d4c3",
+                    "target": "c3",
+                    "worstReply": null,
+                    "worstGain": 5,
+                    "responses": 18
+                  },
+                  {
+                    "reply": "e3e5",
+                    "capture": "d4c3",
+                    "target": "c3",
+                    "worstReply": null,
+                    "worstGain": 5,
+                    "responses": 18
+                  },
+                  {
+                    "reply": "e3e6",
+                    "capture": "d4c3",
+                    "target": "c3",
+                    "worstReply": null,
+                    "worstGain": 5,
+                    "responses": 18
+                  },
+                  {
+                    "reply": "e3e7",
+                    "capture": "d4c3",
+                    "target": "c3",
+                    "worstReply": "e7c7",
+                    "worstGain": 4,
+                    "responses": 16
+                  },
+                  {
+                    "reply": "e3e8",
+                    "capture": "d4c3",
+                    "target": "c3",
+                    "worstReply": "e8d8",
+                    "worstGain": 2,
+                    "responses": 15
+                  },
+                  {
+                    "reply": "e3f3",
+                    "capture": "d4c3",
+                    "target": "c3",
+                    "worstReply": "f3c3",
+                    "worstGain": 4,
+                    "responses": 16
+                  },
+                  {
+                    "reply": "e3g3",
+                    "capture": "d4c3",
+                    "target": "c3",
+                    "worstReply": "g3c3",
+                    "worstGain": 4,
+                    "responses": 16
+                  },
+                  {
+                    "reply": "e3h3",
+                    "capture": "d4c3",
+                    "target": "c3",
+                    "worstReply": "h3c3",
+                    "worstGain": 4,
+                    "responses": 12
+                  },
+                  {
+                    "reply": "e3e2",
+                    "capture": "d4c3",
+                    "target": "c3",
+                    "worstReply": null,
+                    "worstGain": 5,
+                    "responses": 17
+                  },
+                  {
+                    "reply": "e3e1",
+                    "capture": "d4c3",
+                    "target": "c3",
+                    "worstReply": null,
+                    "worstGain": 5,
+                    "responses": 17
+                  },
+                  {
+                    "reply": "e3d3",
+                    "capture": "d4c3",
+                    "target": "c3",
+                    "worstReply": "d3d8",
+                    "worstGain": 2,
+                    "responses": 16
+                  },
+                  {
+                    "reply": "h2h3",
+                    "capture": "d4e3",
+                    "target": "e3",
+                    "worstReply": "c3c7",
+                    "worstGain": 4,
+                    "responses": 14
+                  },
+                  {
+                    "reply": "h2h4",
+                    "capture": "d4e3",
+                    "target": "e3",
+                    "worstReply": "c3c7",
+                    "worstGain": 4,
+                    "responses": 14
+                  },
+                  {
+                    "reply": "h1g2",
+                    "capture": "d4e3",
+                    "target": "e3",
+                    "worstReply": "c3c7",
+                    "worstGain": 4,
+                    "responses": 18
+                  },
+                  {
+                    "reply": "h1g1",
+                    "capture": "d4e3",
+                    "target": "e3",
+                    "worstReply": "c3c7",
+                    "worstGain": 4,
+                    "responses": 15
+                  }
+                ]
+              }
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Your pawn on d4 forks the rook on c3 and the rook on e3. Every legal reply still allows a capture of one of these targets.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 584,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "fork-countermate",
+        "fen": "7k/7p/2r1r3/8/3P4/8/PPP5/1K1B4 w - - 0 1",
+        "move": "d4d5",
+        "expected": [],
+        "absent": [
+          "fork"
+        ],
+        "note": "Material capture allows immediate Rxd1 mate; reject the apparent fork."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "7k/7p/2r1r3/8/3P4/8/PPP5/1K1B4 w - - 0 1",
+        "after": "7k/7p/2r1r3/3P4/8/8/PPP5/1K1B4 b - - 0 1",
+        "move": "d4d5",
+        "san": "d5",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 240,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "fork-countermate-black",
+        "fen": "1k1b4/ppp5/8/3p4/8/2R1R3/7P/7K b - - 0 1",
+        "move": "d5d4",
+        "expected": [],
+        "absent": [
+          "fork"
+        ],
+        "note": "Material capture allows immediate Rxd1 mate; reject the apparent fork."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "1k1b4/ppp5/8/3p4/8/2R1R3/7P/7K b - - 0 1",
+        "after": "1k1b4/ppp5/8/8/3p4/2R1R3/7P/7K w - - 0 2",
+        "move": "d5d4",
+        "san": "d4",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 129,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "fork-draw",
+        "fen": "4k3/5q2/8/5N2/8/8/8/K7 w - - 0 1",
+        "move": "f5d6",
+        "expected": [
+          "check"
+        ],
+        "absent": [
+          "fork"
+        ],
+        "note": "Capturing queen and recapturing knight leaves a dead position; no material-success claim."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "4k3/5q2/8/5N2/8/8/8/K7 w - - 0 1",
+        "after": "4k3/5q2/3N4/8/8/8/8/K7 b - - 1 1",
+        "move": "f5d6",
+        "san": "Nd6+",
+        "events": [
+          {
+            "id": "check",
+            "text": "You give check to the king on e8.",
+            "evidence": {
+              "king": "e8",
+              "attackers": [
+                "d6"
+              ]
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "You give check to the king on e8.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 9,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "fork-draw-black",
+        "fen": "k7/8/8/8/5n2/8/5Q2/4K3 b - - 0 1",
+        "move": "f4d3",
+        "expected": [
+          "check"
+        ],
+        "absent": [
+          "fork"
+        ],
+        "note": "Capturing queen and recapturing knight leaves a dead position; no material-success claim."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "k7/8/8/8/5n2/8/5Q2/4K3 b - - 0 1",
+        "after": "k7/8/8/8/8/3n4/5Q2/4K3 w - - 1 2",
+        "move": "f4d3",
+        "san": "Nd3+",
+        "events": [
+          {
+            "id": "check",
+            "text": "You give check to the king on e1.",
+            "evidence": {
+              "king": "e1",
+              "attackers": [
+                "d3"
+              ]
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "You give check to the king on e1.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 9,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "pawn-fork-capturable",
+        "fen": "7k/8/2r1b3/8/3P4/8/8/K7 w - - 0 1",
+        "move": "d4d5",
+        "expected": [],
+        "absent": [
+          "fork"
+        ],
+        "note": "The attacked bishop can take the pawn."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "7k/8/2r1b3/8/3P4/8/8/K7 w - - 0 1",
+        "after": "7k/8/2r1b3/3P4/8/8/8/K7 b - - 0 1",
+        "move": "d4d5",
+        "san": "d5",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 285,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "pawn-fork-capturable-black",
+        "fen": "k7/8/8/3p4/8/2R1B3/8/7K b - - 0 1",
+        "move": "d5d4",
+        "expected": [],
+        "absent": [
+          "fork"
+        ],
+        "note": "The attacked bishop can take the pawn."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "k7/8/8/3p4/8/2R1B3/8/7K b - - 0 1",
+        "after": "k7/8/8/8/3p4/2R1B3/8/7K w - - 0 2",
+        "move": "d5d4",
+        "san": "d4",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 109,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "pinned-pawn-fork",
+        "fen": "3r3k/8/2r1r3/8/3P4/8/8/3K4 w - - 0 1",
+        "move": "d4d5",
+        "expected": [],
+        "absent": [
+          "fork"
+        ],
+        "note": "Pawn geometrically forks but cannot legally capture off its pin."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "3r3k/8/2r1r3/8/3P4/8/8/3K4 w - - 0 1",
+        "after": "3r3k/8/2r1r3/3P4/8/8/8/3K4 b - - 0 1",
+        "move": "d4d5",
+        "san": "d5",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 206,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "pinned-pawn-fork-black",
+        "fen": "3k4/8/8/3p4/8/2R1R3/8/3R3K b - - 0 1",
+        "move": "d5d4",
+        "expected": [],
+        "absent": [
+          "fork"
+        ],
+        "note": "Pawn geometrically forks but cannot legally capture off its pin."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "3k4/8/8/3p4/8/2R1R3/8/3R3K b - - 0 1",
+        "after": "3k4/8/8/8/3p4/2R1R3/8/3R3K w - - 0 2",
+        "move": "d5d4",
+        "san": "d4",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 37,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "already-forking",
+        "fen": "4k3/5q2/8/8/3N4/8/8/K7 w - - 0 1",
+        "move": "d4b5",
+        "expected": [],
+        "absent": [
+          "fork"
+        ],
+        "note": "Single-target attack is not a fork."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "4k3/5q2/8/8/3N4/8/8/K7 w - - 0 1",
+        "after": "4k3/5q2/8/1N6/8/8/8/K7 b - - 1 1",
+        "move": "d4b5",
+        "san": "Nb5",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 27,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "already-forking-black",
+        "fen": "k7/8/8/3n4/8/8/5Q2/4K3 b - - 0 1",
+        "move": "d5b4",
+        "expected": [],
+        "absent": [
+          "fork"
+        ],
+        "note": "Single-target attack is not a fork."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "k7/8/8/3n4/8/8/5Q2/4K3 b - - 0 1",
+        "after": "k7/8/8/8/1n6/8/5Q2/4K3 w - - 1 2",
+        "move": "d5b4",
+        "san": "Nb4",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 27,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "existing-pawn-fork",
+        "fen": "7k/8/2r1r3/3P4/8/8/8/K7 w - - 0 1",
+        "move": "a1b1",
+        "expected": [],
+        "absent": [
+          "fork"
+        ],
+        "note": "An unrelated move must not claim an existing fork."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "7k/8/2r1r3/3P4/8/8/8/K7 w - - 0 1",
+        "after": "7k/8/2r1r3/3P4/8/8/8/1K6 b - - 1 1",
+        "move": "a1b1",
+        "san": "Kb1",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 25,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "existing-pawn-fork-black",
+        "fen": "k7/8/8/8/3p4/2R1R3/8/7K b - - 0 1",
+        "move": "a8b8",
+        "expected": [],
+        "absent": [
+          "fork"
+        ],
+        "note": "An unrelated move must not claim an existing fork."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "k7/8/8/8/3p4/2R1R3/8/7K b - - 0 1",
+        "after": "1k6/8/8/8/3p4/2R1R3/8/7K w - - 1 2",
+        "move": "a8b8",
+        "san": "Kb8",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 25,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "absolute-pin",
+        "fen": "4k3/4n3/8/8/8/8/8/K2R4 w - - 0 1",
+        "move": "d1e1",
+        "expected": [
+          "absolute-pin"
+        ],
+        "absent": [
+          "check"
+        ],
+        "note": "A new rook pin of a knight to its king."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "4k3/4n3/8/8/8/8/8/K2R4 w - - 0 1",
+        "after": "4k3/4n3/8/8/8/8/8/K3R3 b - - 1 1",
+        "move": "d1e1",
+        "san": "Re1",
+        "events": [
+          {
+            "id": "absolute-pin",
+            "text": "Your piece on e1 pins the knight on e7 to the king on e8. It cannot move off that line without exposing its king.",
+            "evidence": {
+              "slider": "e1",
+              "blocker": "e7",
+              "piece": "n",
+              "king": "e8",
+              "line": [
+                "e2",
+                "e3",
+                "e4",
+                "e5",
+                "e6",
+                "e7"
+              ]
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Your piece on e1 pins the knight on e7 to the king on e8. It cannot move off that line without exposing its king.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 5,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "absolute-pin-black",
+        "fen": "k2r4/8/8/8/8/8/4N3/4K3 b - - 0 1",
+        "move": "d8e8",
+        "expected": [
+          "absolute-pin"
+        ],
+        "absent": [
+          "check"
+        ],
+        "note": "A new rook pin of a knight to its king."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "k2r4/8/8/8/8/8/4N3/4K3 b - - 0 1",
+        "after": "k3r3/8/8/8/8/8/4N3/4K3 w - - 1 2",
+        "move": "d8e8",
+        "san": "Re8",
+        "events": [
+          {
+            "id": "absolute-pin",
+            "text": "Your piece on e8 pins the knight on e2 to the king on e1. It cannot move off that line without exposing its king.",
+            "evidence": {
+              "slider": "e8",
+              "blocker": "e2",
+              "piece": "n",
+              "king": "e1",
+              "line": [
+                "e7",
+                "e6",
+                "e5",
+                "e4",
+                "e3",
+                "e2"
+              ]
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Your piece on e8 pins the knight on e2 to the king on e1. It cannot move off that line without exposing its king.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 5,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "pin-line-movement",
+        "fen": "4k3/4r3/8/8/8/8/8/K2R4 w - - 0 1",
+        "move": "d1e1",
+        "expected": [
+          "absolute-pin"
+        ],
+        "absent": [],
+        "note": "Pinned rook can move along the pin line, including taking the pinner."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "4k3/4r3/8/8/8/8/8/K2R4 w - - 0 1",
+        "after": "4k3/4r3/8/8/8/8/8/K3R3 b - - 1 1",
+        "move": "d1e1",
+        "san": "Re1",
+        "events": [
+          {
+            "id": "absolute-pin",
+            "text": "Your piece on e1 pins the rook on e7 to the king on e8. It cannot move off that line without exposing its king.",
+            "evidence": {
+              "slider": "e1",
+              "blocker": "e7",
+              "piece": "r",
+              "king": "e8",
+              "line": [
+                "e2",
+                "e3",
+                "e4",
+                "e5",
+                "e6",
+                "e7"
+              ]
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Your piece on e1 pins the rook on e7 to the king on e8. It cannot move off that line without exposing its king.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 11,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "pin-line-movement-black",
+        "fen": "k2r4/8/8/8/8/8/4R3/4K3 b - - 0 1",
+        "move": "d8e8",
+        "expected": [
+          "absolute-pin"
+        ],
+        "absent": [],
+        "note": "Pinned rook can move along the pin line, including taking the pinner."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "k2r4/8/8/8/8/8/4R3/4K3 b - - 0 1",
+        "after": "k3r3/8/8/8/8/8/4R3/4K3 w - - 1 2",
+        "move": "d8e8",
+        "san": "Re8",
+        "events": [
+          {
+            "id": "absolute-pin",
+            "text": "Your piece on e8 pins the rook on e2 to the king on e1. It cannot move off that line without exposing its king.",
+            "evidence": {
+              "slider": "e8",
+              "blocker": "e2",
+              "piece": "r",
+              "king": "e1",
+              "line": [
+                "e7",
+                "e6",
+                "e5",
+                "e4",
+                "e3",
+                "e2"
+              ]
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Your piece on e8 pins the rook on e2 to the king on e1. It cannot move off that line without exposing its king.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 11,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "two-blockers",
+        "fen": "4k3/4n3/4b3/8/8/8/8/K2R4 w - - 0 1",
+        "move": "d1e1",
+        "expected": [],
+        "absent": [
+          "absolute-pin"
+        ],
+        "note": "Two blockers do not form a direct absolute pin."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "4k3/4n3/4b3/8/8/8/8/K2R4 w - - 0 1",
+        "after": "4k3/4n3/4b3/8/8/8/8/K3R3 b - - 1 1",
+        "move": "d1e1",
+        "san": "Re1",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 22,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "two-blockers-black",
+        "fen": "k2r4/8/8/8/8/4B3/4N3/4K3 b - - 0 1",
+        "move": "d8e8",
+        "expected": [],
+        "absent": [
+          "absolute-pin"
+        ],
+        "note": "Two blockers do not form a direct absolute pin."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "k2r4/8/8/8/8/4B3/4N3/4K3 b - - 0 1",
+        "after": "k3r3/8/8/8/8/4B3/4N3/4K3 w - - 1 2",
+        "move": "d8e8",
+        "san": "Re8",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 22,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "relative-pin-deferred",
+        "fen": "7k/4q3/4n3/8/8/8/8/K2R4 w - - 0 1",
+        "move": "d1e1",
+        "expected": [],
+        "absent": [
+          "absolute-pin"
+        ],
+        "note": "Queen behind blocker is not an absolute pin."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "7k/4q3/4n3/8/8/8/8/K2R4 w - - 0 1",
+        "after": "7k/4q3/4n3/8/8/8/8/K3R3 b - - 1 1",
+        "move": "d1e1",
+        "san": "Re1",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 29,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "relative-pin-deferred-black",
+        "fen": "k2r4/8/8/8/8/4N3/4Q3/7K b - - 0 1",
+        "move": "d8e8",
+        "expected": [],
+        "absent": [
+          "absolute-pin"
+        ],
+        "note": "Queen behind blocker is not an absolute pin."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "k2r4/8/8/8/8/4N3/4Q3/7K b - - 0 1",
+        "after": "k3r3/8/8/8/8/4N3/4Q3/7K w - - 1 2",
+        "move": "d8e8",
+        "san": "Re8",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 29,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "existing-pin",
+        "fen": "4k3/4n3/8/8/8/8/8/K3R3 w - - 0 1",
+        "move": "a1b1",
+        "expected": [],
+        "absent": [
+          "absolute-pin"
+        ],
+        "note": "Existing motif is not attributed to an unrelated move."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "4k3/4n3/8/8/8/8/8/K3R3 w - - 0 1",
+        "after": "4k3/4n3/8/8/8/8/8/1K2R3 b - - 1 1",
+        "move": "a1b1",
+        "san": "Kb1",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 5,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "existing-pin-black",
+        "fen": "k3r3/8/8/8/8/8/4N3/4K3 b - - 0 1",
+        "move": "a8b8",
+        "expected": [],
+        "absent": [
+          "absolute-pin"
+        ],
+        "note": "Existing motif is not attributed to an unrelated move."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "k3r3/8/8/8/8/8/4N3/4K3 b - - 0 1",
+        "after": "1k2r3/8/8/8/8/8/4N3/4K3 w - - 1 2",
+        "move": "a8b8",
+        "san": "Kb8",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 5,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "existing-pin-relocation",
+        "fen": "4k3/4n3/8/8/8/8/8/K3R3 w - - 0 1",
+        "move": "e1e2",
+        "expected": [],
+        "absent": [
+          "absolute-pin"
+        ],
+        "note": "Moving the same pinner along the line does not create a new pin."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "4k3/4n3/8/8/8/8/8/K3R3 w - - 0 1",
+        "after": "4k3/4n3/8/8/8/8/4R3/K7 b - - 1 1",
+        "move": "e1e2",
+        "san": "Re2",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 5,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "existing-pin-relocation-black",
+        "fen": "k3r3/8/8/8/8/8/4N3/4K3 b - - 0 1",
+        "move": "e8e7",
+        "expected": [],
+        "absent": [
+          "absolute-pin"
+        ],
+        "note": "Moving the same pinner along the line does not create a new pin."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "k3r3/8/8/8/8/8/4N3/4K3 b - - 0 1",
+        "after": "k7/4r3/8/8/8/8/4N3/4K3 w - - 1 2",
+        "move": "e8e7",
+        "san": "Re7",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 5,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "discovered-check",
+        "fen": "4k3/8/8/8/8/8/4B3/K3R3 w - - 0 1",
+        "move": "e2f3",
+        "expected": [
+          "discovered-check"
+        ],
+        "absent": [
+          "double-check"
+        ],
+        "note": "Bishop clears the rook file."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "4k3/8/8/8/8/8/4B3/K3R3 w - - 0 1",
+        "after": "4k3/8/8/8/8/5B2/8/K3R3 b - - 1 1",
+        "move": "e2f3",
+        "san": "Bf3+",
+        "events": [
+          {
+            "id": "discovered-check",
+            "text": "Moving from e2 opens a check from e1 against the king on e8.",
+            "evidence": {
+              "king": "e8",
+              "revealed": [
+                "e1"
+              ],
+              "vacated": "e2"
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Moving from e2 opens a check from e1 against the king on e8.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 5,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "discovered-check-black",
+        "fen": "k3r3/4b3/8/8/8/8/8/4K3 b - - 0 1",
+        "move": "e7f6",
+        "expected": [
+          "discovered-check"
+        ],
+        "absent": [
+          "double-check"
+        ],
+        "note": "Bishop clears the rook file."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "k3r3/4b3/8/8/8/8/8/4K3 b - - 0 1",
+        "after": "k3r3/8/5b2/8/8/8/8/4K3 w - - 1 2",
+        "move": "e7f6",
+        "san": "Bf6+",
+        "events": [
+          {
+            "id": "discovered-check",
+            "text": "Moving from e7 opens a check from e8 against the king on e1.",
+            "evidence": {
+              "king": "e1",
+              "revealed": [
+                "e8"
+              ],
+              "vacated": "e7"
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Moving from e7 opens a check from e8 against the king on e1.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 5,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "double-check",
+        "fen": "4k3/8/8/8/8/8/4B3/K3R3 w - - 0 1",
+        "move": "e2b5",
+        "expected": [
+          "double-check",
+          "discovered-check"
+        ],
+        "absent": [],
+        "note": "Both bishop and rook give check."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "4k3/8/8/8/8/8/4B3/K3R3 w - - 0 1",
+        "after": "4k3/8/8/1B6/8/8/8/K3R3 b - - 1 1",
+        "move": "e2b5",
+        "san": "Bb5+",
+        "events": [
+          {
+            "id": "double-check",
+            "text": "Double check: both pieces on b5 and e1 attack the king on e8. Only a king move can answer it.",
+            "evidence": {
+              "king": "e8",
+              "attackers": [
+                "b5",
+                "e1"
+              ]
+            },
+            "qualityClaim": false
+          },
+          {
+            "id": "discovered-check",
+            "text": "Moving from e2 opens a check from e1 against the king on e8.",
+            "evidence": {
+              "king": "e8",
+              "revealed": [
+                "e1"
+              ],
+              "vacated": "e2"
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Double check: both pieces on b5 and e1 attack the king on e8. Only a king move can answer it.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 4,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "double-check-black",
+        "fen": "k3r3/4b3/8/8/8/8/8/4K3 b - - 0 1",
+        "move": "e7b4",
+        "expected": [
+          "double-check",
+          "discovered-check"
+        ],
+        "absent": [],
+        "note": "Both bishop and rook give check."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "k3r3/4b3/8/8/8/8/8/4K3 b - - 0 1",
+        "after": "k3r3/8/8/8/1b6/8/8/4K3 w - - 1 2",
+        "move": "e7b4",
+        "san": "Bb4+",
+        "events": [
+          {
+            "id": "double-check",
+            "text": "Double check: both pieces on e8 and b4 attack the king on e1. Only a king move can answer it.",
+            "evidence": {
+              "king": "e1",
+              "attackers": [
+                "e8",
+                "b4"
+              ]
+            },
+            "qualityClaim": false
+          },
+          {
+            "id": "discovered-check",
+            "text": "Moving from e7 opens a check from e8 against the king on e1.",
+            "evidence": {
+              "king": "e1",
+              "revealed": [
+                "e8"
+              ],
+              "vacated": "e7"
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Double check: both pieces on e8 and b4 attack the king on e1. Only a king move can answer it.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 4,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "direct-check",
+        "fen": "4k3/8/8/8/8/8/8/K2R4 w - - 0 1",
+        "move": "d1e1",
+        "expected": [
+          "check"
+        ],
+        "absent": [
+          "discovered-check"
+        ],
+        "note": "Moved rook check is not discovered."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "4k3/8/8/8/8/8/8/K2R4 w - - 0 1",
+        "after": "4k3/8/8/8/8/8/8/K3R3 b - - 1 1",
+        "move": "d1e1",
+        "san": "Re1+",
+        "events": [
+          {
+            "id": "check",
+            "text": "You give check to the king on e8.",
+            "evidence": {
+              "king": "e8",
+              "attackers": [
+                "e1"
+              ]
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "You give check to the king on e8.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 5,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "direct-check-black",
+        "fen": "k2r4/8/8/8/8/8/8/4K3 b - - 0 1",
+        "move": "d8e8",
+        "expected": [
+          "check"
+        ],
+        "absent": [
+          "discovered-check"
+        ],
+        "note": "Moved rook check is not discovered."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "k2r4/8/8/8/8/8/8/4K3 b - - 0 1",
+        "after": "k3r3/8/8/8/8/8/8/4K3 w - - 1 2",
+        "move": "d8e8",
+        "san": "Re8+",
+        "events": [
+          {
+            "id": "check",
+            "text": "You give check to the king on e1.",
+            "evidence": {
+              "king": "e1",
+              "attackers": [
+                "e8"
+              ]
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "You give check to the king on e1.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 5,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "mate",
+        "fen": "7k/8/5KQ1/8/8/8/8/8 w - - 0 1",
+        "move": "g6g7",
+        "expected": [
+          "checkmate"
+        ],
+        "absent": [
+          "check",
+          "fork"
+        ],
+        "note": "Terminal mate outranks lesser facts."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "7k/8/5KQ1/8/8/8/8/8 w - - 0 1",
+        "after": "7k/6Q1/5K2/8/8/8/8/8 b - - 1 1",
+        "move": "g6g7",
+        "san": "Qg7#",
+        "events": [
+          {
+            "id": "checkmate",
+            "text": "Checkmate. The king is in check and has no legal escape.",
+            "evidence": {
+              "king": "h8"
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Checkmate. The king is in check and has no legal escape.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 0,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "mate-black",
+        "fen": "8/8/8/8/8/5kq1/8/7K b - - 0 1",
+        "move": "g3g2",
+        "expected": [
+          "checkmate"
+        ],
+        "absent": [
+          "check",
+          "fork"
+        ],
+        "note": "Terminal mate outranks lesser facts."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "8/8/8/8/8/5kq1/8/7K b - - 0 1",
+        "after": "8/8/8/8/8/5k2/6q1/7K w - - 1 2",
+        "move": "g3g2",
+        "san": "Qg2#",
+        "events": [
+          {
+            "id": "checkmate",
+            "text": "Checkmate. The king is in check and has no legal escape.",
+            "evidence": {
+              "king": "h1"
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Checkmate. The king is in check and has no legal escape.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 0,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "stalemate",
+        "fen": "7k/5K2/8/6Q1/8/8/8/8 w - - 0 1",
+        "move": "g5g6",
+        "expected": [
+          "stalemate"
+        ],
+        "absent": [
+          "checkmate",
+          "fork"
+        ],
+        "note": "No legal move without check."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "7k/5K2/8/6Q1/8/8/8/8 w - - 0 1",
+        "after": "7k/5K2/6Q1/8/8/8/8/8 b - - 1 1",
+        "move": "g5g6",
+        "san": "Qg6",
+        "events": [
+          {
+            "id": "stalemate",
+            "text": "Stalemate. The opponent has no legal move, and their king is not in check.",
+            "evidence": {
+              "king": "h8"
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Stalemate. The opponent has no legal move, and their king is not in check.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 0,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "stalemate-black",
+        "fen": "8/8/8/8/6q1/8/5k2/7K b - - 0 1",
+        "move": "g4g3",
+        "expected": [
+          "stalemate"
+        ],
+        "absent": [
+          "checkmate",
+          "fork"
+        ],
+        "note": "No legal move without check."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "8/8/8/8/6q1/8/5k2/7K b - - 0 1",
+        "after": "8/8/8/8/8/6q1/5k2/7K w - - 1 2",
+        "move": "g4g3",
+        "san": "Qg3",
+        "events": [
+          {
+            "id": "stalemate",
+            "text": "Stalemate. The opponent has no legal move, and their king is not in check.",
+            "evidence": {
+              "king": "h1"
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Stalemate. The opponent has no legal move, and their king is not in check.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 0,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "castle-kingside",
+        "fen": "4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1",
+        "move": "e1g1",
+        "expected": [
+          "castling"
+        ],
+        "absent": [
+          "discovered-check"
+        ],
+        "note": "Only rule fact; no claim about king safety."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1",
+        "after": "4k3/8/8/8/8/8/8/R4RK1 b - - 1 1",
+        "move": "e1g1",
+        "san": "O-O",
+        "events": [
+          {
+            "id": "castling",
+            "text": "You castled kingside.",
+            "evidence": {
+              "wing": "kingside"
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "You castled kingside.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 4,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "castle-kingside-black",
+        "fen": "r3k2r/8/8/8/8/8/8/4K3 b kq - 0 1",
+        "move": "e8g8",
+        "expected": [
+          "castling"
+        ],
+        "absent": [
+          "discovered-check"
+        ],
+        "note": "Only rule fact; no claim about king safety."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "r3k2r/8/8/8/8/8/8/4K3 b kq - 0 1",
+        "after": "r4rk1/8/8/8/8/8/8/4K3 w - - 1 2",
+        "move": "e8g8",
+        "san": "O-O",
+        "events": [
+          {
+            "id": "castling",
+            "text": "You castled kingside.",
+            "evidence": {
+              "wing": "kingside"
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "You castled kingside.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 4,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "castle-queenside",
+        "fen": "4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1",
+        "move": "e1c1",
+        "expected": [
+          "castling"
+        ],
+        "absent": [],
+        "note": "Queenside rule fact."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1",
+        "after": "4k3/8/8/8/8/8/8/2KR3R b - - 1 1",
+        "move": "e1c1",
+        "san": "O-O-O",
+        "events": [
+          {
+            "id": "castling",
+            "text": "You castled queenside.",
+            "evidence": {
+              "wing": "queenside"
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "You castled queenside.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 4,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "castle-queenside-black",
+        "fen": "r3k2r/8/8/8/8/8/8/4K3 b kq - 0 1",
+        "move": "e8c8",
+        "expected": [
+          "castling"
+        ],
+        "absent": [],
+        "note": "Queenside rule fact."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "r3k2r/8/8/8/8/8/8/4K3 b kq - 0 1",
+        "after": "2kr3r/8/8/8/8/8/8/4K3 w - - 1 2",
+        "move": "e8c8",
+        "san": "O-O-O",
+        "events": [
+          {
+            "id": "castling",
+            "text": "You castled queenside.",
+            "evidence": {
+              "wing": "queenside"
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "You castled queenside.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 4,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "castle-rook-check",
+        "fen": "5k2/8/8/8/8/8/8/4K2R w K - 0 1",
+        "move": "e1g1",
+        "expected": [
+          "castling",
+          "check"
+        ],
+        "absent": [
+          "discovered-check"
+        ],
+        "note": "Castling rook moved; do not call its check discovered."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "5k2/8/8/8/8/8/8/4K2R w K - 0 1",
+        "after": "5k2/8/8/8/8/8/8/5RK1 b - - 1 1",
+        "move": "e1g1",
+        "san": "O-O+",
+        "events": [
+          {
+            "id": "castling",
+            "text": "You castled kingside.",
+            "evidence": {
+              "wing": "kingside"
+            },
+            "qualityClaim": false
+          },
+          {
+            "id": "check",
+            "text": "You give check to the king on f8.",
+            "evidence": {
+              "king": "f8",
+              "attackers": [
+                "f1"
+              ]
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "You castled kingside.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 5,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "castle-rook-check-black",
+        "fen": "4k2r/8/8/8/8/8/8/5K2 b k - 0 1",
+        "move": "e8g8",
+        "expected": [
+          "castling",
+          "check"
+        ],
+        "absent": [
+          "discovered-check"
+        ],
+        "note": "Castling rook moved; do not call its check discovered."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "4k2r/8/8/8/8/8/8/5K2 b k - 0 1",
+        "after": "5rk1/8/8/8/8/8/8/5K2 w - - 1 2",
+        "move": "e8g8",
+        "san": "O-O+",
+        "events": [
+          {
+            "id": "castling",
+            "text": "You castled kingside.",
+            "evidence": {
+              "wing": "kingside"
+            },
+            "qualityClaim": false
+          },
+          {
+            "id": "check",
+            "text": "You give check to the king on f1.",
+            "evidence": {
+              "king": "f1",
+              "attackers": [
+                "f8"
+              ]
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "You castled kingside.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 5,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "en-passant",
+        "fen": "7k/8/8/3pP3/8/8/8/K7 w - d6 0 1",
+        "move": "e5d6",
+        "expected": [
+          "en-passant"
+        ],
+        "absent": [],
+        "note": "Captured pawn is on d5, not d6."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "7k/8/8/3pP3/8/8/8/K7 w - d6 0 1",
+        "after": "7k/8/3P4/8/8/8/8/K7 b - - 0 1",
+        "move": "e5d6",
+        "san": "exd6",
+        "events": [
+          {
+            "id": "en-passant",
+            "text": "Your pawn on d6 captured en passant.",
+            "evidence": {
+              "from": "e5",
+              "to": "d6",
+              "capturedSquare": "d5"
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Your pawn on d6 captured en passant.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 4,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "en-passant-black",
+        "fen": "k7/8/8/8/3Pp3/8/8/7K b - d3 0 1",
+        "move": "e4d3",
+        "expected": [
+          "en-passant"
+        ],
+        "absent": [],
+        "note": "Captured pawn is on d5, not d6."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "k7/8/8/8/3Pp3/8/8/7K b - d3 0 1",
+        "after": "k7/8/8/8/8/3p4/8/7K w - - 0 2",
+        "move": "e4d3",
+        "san": "exd3",
+        "events": [
+          {
+            "id": "en-passant",
+            "text": "Your pawn on d3 captured en passant.",
+            "evidence": {
+              "from": "e4",
+              "to": "d3",
+              "capturedSquare": "d4"
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Your pawn on d3 captured en passant.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 4,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "en-passant-discovery",
+        "fen": "8/8/8/R2pP2k/8/8/8/K7 w - d6 0 1",
+        "move": "e5d6",
+        "expected": [
+          "en-passant",
+          "discovered-check"
+        ],
+        "absent": [],
+        "note": "En passant removes both blockers of the rook check."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "8/8/8/R2pP2k/8/8/8/K7 w - d6 0 1",
+        "after": "8/8/3P4/R6k/8/8/8/K7 b - - 0 1",
+        "move": "e5d6",
+        "san": "exd6+",
+        "events": [
+          {
+            "id": "en-passant",
+            "text": "Your pawn on d6 captured en passant.",
+            "evidence": {
+              "from": "e5",
+              "to": "d6",
+              "capturedSquare": "d5"
+            },
+            "qualityClaim": false
+          },
+          {
+            "id": "discovered-check",
+            "text": "Moving from e5 opens a check from a5 against the king on h5.",
+            "evidence": {
+              "king": "h5",
+              "revealed": [
+                "a5"
+              ],
+              "vacated": "e5"
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Your pawn on d6 captured en passant.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 5,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "en-passant-discovery-black",
+        "fen": "k7/8/8/8/r2Pp2K/8/8/8 b - d3 0 1",
+        "move": "e4d3",
+        "expected": [
+          "en-passant",
+          "discovered-check"
+        ],
+        "absent": [],
+        "note": "En passant removes both blockers of the rook check."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "k7/8/8/8/r2Pp2K/8/8/8 b - d3 0 1",
+        "after": "k7/8/8/8/r6K/3p4/8/8 w - - 0 2",
+        "move": "e4d3",
+        "san": "exd3+",
+        "events": [
+          {
+            "id": "en-passant",
+            "text": "Your pawn on d3 captured en passant.",
+            "evidence": {
+              "from": "e4",
+              "to": "d3",
+              "capturedSquare": "d4"
+            },
+            "qualityClaim": false
+          },
+          {
+            "id": "discovered-check",
+            "text": "Moving from e4 opens a check from a4 against the king on h4.",
+            "evidence": {
+              "king": "h4",
+              "revealed": [
+                "a4"
+              ],
+              "vacated": "e4"
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Your pawn on d3 captured en passant.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 5,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "promotion",
+        "fen": "7k/P7/8/8/8/8/8/7K w - - 0 1",
+        "move": "a7a8q",
+        "expected": [
+          "promotion",
+          "check"
+        ],
+        "absent": [],
+        "note": "Queen promotion, no qualitative assessment."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "7k/P7/8/8/8/8/8/7K w - - 0 1",
+        "after": "Q6k/8/8/8/8/8/8/7K b - - 0 1",
+        "move": "a7a8q",
+        "san": "a8=Q+",
+        "events": [
+          {
+            "id": "promotion",
+            "text": "You promoted the pawn on a8 to a queen.",
+            "evidence": {
+              "piece": "q",
+              "underpromotion": false
+            },
+            "qualityClaim": false
+          },
+          {
+            "id": "check",
+            "text": "You give check to the king on h8.",
+            "evidence": {
+              "king": "h8",
+              "attackers": [
+                "a8"
+              ]
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "You promoted the pawn on a8 to a queen.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 3,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "promotion-black",
+        "fen": "7k/8/8/8/8/8/p7/7K b - - 0 1",
+        "move": "a2a1q",
+        "expected": [
+          "promotion",
+          "check"
+        ],
+        "absent": [],
+        "note": "Queen promotion, no qualitative assessment."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "7k/8/8/8/8/8/p7/7K b - - 0 1",
+        "after": "7k/8/8/8/8/8/8/q6K w - - 0 2",
+        "move": "a2a1q",
+        "san": "a1=Q+",
+        "events": [
+          {
+            "id": "promotion",
+            "text": "You promoted the pawn on a1 to a queen.",
+            "evidence": {
+              "piece": "q",
+              "underpromotion": false
+            },
+            "qualityClaim": false
+          },
+          {
+            "id": "check",
+            "text": "You give check to the king on h1.",
+            "evidence": {
+              "king": "h1",
+              "attackers": [
+                "a1"
+              ]
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "You promoted the pawn on a1 to a queen.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 3,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "underpromotion",
+        "fen": "8/P6k/8/8/8/8/8/7K w - - 0 1",
+        "move": "a7a8n",
+        "expected": [
+          "promotion"
+        ],
+        "absent": [
+          "fork"
+        ],
+        "note": "Knight underpromotion; no claim it is best."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "8/P6k/8/8/8/8/8/7K w - - 0 1",
+        "after": "N7/7k/8/8/8/8/8/7K b - - 0 1",
+        "move": "a7a8n",
+        "san": "a8=N",
+        "events": [
+          {
+            "id": "promotion",
+            "text": "You underpromoted the pawn on a8 to a knight.",
+            "evidence": {
+              "piece": "n",
+              "underpromotion": true
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "You underpromoted the pawn on a8 to a knight.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 0,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "underpromotion-black",
+        "fen": "7k/8/8/8/8/8/p6K/8 b - - 0 1",
+        "move": "a2a1n",
+        "expected": [
+          "promotion"
+        ],
+        "absent": [
+          "fork"
+        ],
+        "note": "Knight underpromotion; no claim it is best."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "7k/8/8/8/8/8/p6K/8 b - - 0 1",
+        "after": "7k/8/8/8/8/8/7K/n7 w - - 0 2",
+        "move": "a2a1n",
+        "san": "a1=N",
+        "events": [
+          {
+            "id": "promotion",
+            "text": "You underpromoted the pawn on a1 to a knight.",
+            "evidence": {
+              "piece": "n",
+              "underpromotion": true
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "You underpromoted the pawn on a1 to a knight.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 0,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "allows-fork",
+        "fen": "7k/8/8/8/5n2/8/5Q2/K7 w - - 0 1",
+        "move": "a1e1",
+        "invalid": true,
+        "note": "King cannot jump to e1; illegal inputs fail."
+      },
+      "error": "Illegal move; explanation refused."
+    },
+    {
+      "fixture": {
+        "id": "allows-fork-black",
+        "fen": "k7/5q2/8/5N2/8/8/8/7K b - - 0 1",
+        "move": "a8e8",
+        "invalid": true,
+        "note": "King cannot jump to e1; illegal inputs fail."
+      },
+      "error": "Illegal move; explanation refused."
+    },
+    {
+      "fixture": {
+        "id": "fork-warning",
+        "fen": "6k1/7p/8/8/5n2/8/P4Q2/4K3 w - - 0 1",
+        "move": "f2b2",
+        "expected": [
+          "allows-fork"
+        ],
+        "absent": [
+          "fork"
+        ],
+        "note": "Black Nd3+ forks king e1 and queen b2."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "6k1/7p/8/8/5n2/8/P4Q2/4K3 w - - 0 1",
+        "after": "6k1/7p/8/8/5n2/8/PQ6/4K3 b - - 1 1",
+        "move": "f2b2",
+        "san": "Qb2",
+        "events": [
+          {
+            "id": "allows-fork",
+            "text": "Watch out: Nd3+ lets the opponent fork your queen on b2 and your king on e1.",
+            "evidence": {
+              "threat": {
+                "move": "f4d3",
+                "san": "Nd3+",
+                "piece": "n",
+                "attacker": "d3",
+                "targets": [
+                  {
+                    "square": "b2",
+                    "type": "q",
+                    "color": "w"
+                  },
+                  {
+                    "square": "e1",
+                    "type": "k",
+                    "color": "w"
+                  }
+                ],
+                "royal": true,
+                "proof": {
+                  "horizonPliesAfterFork": 3,
+                  "materialValues": {
+                    "p": 1,
+                    "n": 3,
+                    "b": 3,
+                    "r": 5,
+                    "q": 9,
+                    "k": 0
+                  },
+                  "minimumGain": 9,
+                  "witnesses": [
+                    {
+                      "reply": "e1d2",
+                      "capture": "d3b2",
+                      "target": "b2",
+                      "worstReply": null,
+                      "worstGain": 9,
+                      "responses": 8
+                    },
+                    {
+                      "reply": "e1e2",
+                      "capture": "d3b2",
+                      "target": "b2",
+                      "worstReply": null,
+                      "worstGain": 9,
+                      "responses": 8
+                    },
+                    {
+                      "reply": "e1f1",
+                      "capture": "d3b2",
+                      "target": "b2",
+                      "worstReply": null,
+                      "worstGain": 9,
+                      "responses": 7
+                    },
+                    {
+                      "reply": "e1d1",
+                      "capture": "d3b2",
+                      "target": "b2",
+                      "worstReply": null,
+                      "worstGain": 9,
+                      "responses": 5
+                    }
+                  ]
+                }
+              },
+              "supportedReplies": [
+                "f4d3"
+              ]
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Watch out: Nd3+ lets the opponent fork your queen on b2 and your king on e1.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 58,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "fork-warning-black",
+        "fen": "4k3/p4q2/8/5N2/8/8/7P/6K1 b - - 0 1",
+        "move": "f7b7",
+        "expected": [
+          "allows-fork"
+        ],
+        "absent": [
+          "fork"
+        ],
+        "note": "Black Nd3+ forks king e1 and queen b2."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "4k3/p4q2/8/5N2/8/8/7P/6K1 b - - 0 1",
+        "after": "4k3/pq6/8/5N2/8/8/7P/6K1 w - - 1 2",
+        "move": "f7b7",
+        "san": "Qb7",
+        "events": [
+          {
+            "id": "allows-fork",
+            "text": "Watch out: Nd6+ lets the opponent fork your king on e8 and your queen on b7.",
+            "evidence": {
+              "threat": {
+                "move": "f5d6",
+                "san": "Nd6+",
+                "piece": "n",
+                "attacker": "d6",
+                "targets": [
+                  {
+                    "square": "e8",
+                    "type": "k",
+                    "color": "b"
+                  },
+                  {
+                    "square": "b7",
+                    "type": "q",
+                    "color": "b"
+                  }
+                ],
+                "royal": true,
+                "proof": {
+                  "horizonPliesAfterFork": 3,
+                  "materialValues": {
+                    "p": 1,
+                    "n": 3,
+                    "b": 3,
+                    "r": 5,
+                    "q": 9,
+                    "k": 0
+                  },
+                  "minimumGain": 9,
+                  "witnesses": [
+                    {
+                      "reply": "e8f8",
+                      "capture": "d6b7",
+                      "target": "b7",
+                      "worstReply": null,
+                      "worstGain": 9,
+                      "responses": 7
+                    },
+                    {
+                      "reply": "e8e7",
+                      "capture": "d6b7",
+                      "target": "b7",
+                      "worstReply": null,
+                      "worstGain": 9,
+                      "responses": 8
+                    },
+                    {
+                      "reply": "e8d7",
+                      "capture": "d6b7",
+                      "target": "b7",
+                      "worstReply": null,
+                      "worstGain": 9,
+                      "responses": 8
+                    },
+                    {
+                      "reply": "e8d8",
+                      "capture": "d6b7",
+                      "target": "b7",
+                      "worstReply": null,
+                      "worstGain": 9,
+                      "responses": 5
+                    }
+                  ]
+                }
+              },
+              "supportedReplies": [
+                "f5d6"
+              ]
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Watch out: Nd6+ lets the opponent fork your king on e8 and your queen on b7.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 58,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "fork-avoidance",
+        "fen": "6k1/7p/8/8/5n2/8/P4Q2/4K3 w - - 0 1",
+        "move": "f2e2",
+        "alternative": "f2b2",
+        "expected": [
+          "avoids-fork"
+        ],
+        "absent": [
+          "allows-fork"
+        ],
+        "note": "Concrete comparison to the legal queen move allowing Nd3+."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "6k1/7p/8/8/5n2/8/P4Q2/4K3 w - - 0 1",
+        "after": "6k1/7p/8/8/5n2/8/P3Q3/4K3 b - - 1 1",
+        "move": "f2e2",
+        "san": "Qe2",
+        "events": [
+          {
+            "id": "avoids-fork",
+            "text": "Your move prevents the fork with Nd3+ that Qb2 would allow.",
+            "evidence": {
+              "alternative": "f2b2",
+              "threat": {
+                "move": "f4d3",
+                "san": "Nd3+",
+                "piece": "n",
+                "attacker": "d3",
+                "targets": [
+                  {
+                    "square": "b2",
+                    "type": "q",
+                    "color": "w"
+                  },
+                  {
+                    "square": "e1",
+                    "type": "k",
+                    "color": "w"
+                  }
+                ],
+                "royal": true,
+                "proof": {
+                  "horizonPliesAfterFork": 3,
+                  "materialValues": {
+                    "p": 1,
+                    "n": 3,
+                    "b": 3,
+                    "r": 5,
+                    "q": 9,
+                    "k": 0
+                  },
+                  "minimumGain": 9,
+                  "witnesses": [
+                    {
+                      "reply": "e1d2",
+                      "capture": "d3b2",
+                      "target": "b2",
+                      "worstReply": null,
+                      "worstGain": 9,
+                      "responses": 8
+                    },
+                    {
+                      "reply": "e1e2",
+                      "capture": "d3b2",
+                      "target": "b2",
+                      "worstReply": null,
+                      "worstGain": 9,
+                      "responses": 8
+                    },
+                    {
+                      "reply": "e1f1",
+                      "capture": "d3b2",
+                      "target": "b2",
+                      "worstReply": null,
+                      "worstGain": 9,
+                      "responses": 7
+                    },
+                    {
+                      "reply": "e1d1",
+                      "capture": "d3b2",
+                      "target": "b2",
+                      "worstReply": null,
+                      "worstGain": 9,
+                      "responses": 5
+                    }
+                  ]
+                }
+              },
+              "scope": "this specific fork; bounded knight/pawn scan"
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Your move prevents the fork with Nd3+ that Qb2 would allow.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 74,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "fork-avoidance-black",
+        "fen": "4k3/p4q2/8/5N2/8/8/7P/6K1 b - - 0 1",
+        "move": "f7e7",
+        "alternative": "f7b7",
+        "expected": [
+          "avoids-fork"
+        ],
+        "absent": [
+          "allows-fork"
+        ],
+        "note": "Concrete comparison to the legal queen move allowing Nd3+."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "4k3/p4q2/8/5N2/8/8/7P/6K1 b - - 0 1",
+        "after": "4k3/p3q3/8/5N2/8/8/7P/6K1 w - - 1 2",
+        "move": "f7e7",
+        "san": "Qe7",
+        "events": [
+          {
+            "id": "avoids-fork",
+            "text": "Your move prevents the fork with Nd6+ that Qb7 would allow.",
+            "evidence": {
+              "alternative": "f7b7",
+              "threat": {
+                "move": "f5d6",
+                "san": "Nd6+",
+                "piece": "n",
+                "attacker": "d6",
+                "targets": [
+                  {
+                    "square": "e8",
+                    "type": "k",
+                    "color": "b"
+                  },
+                  {
+                    "square": "b7",
+                    "type": "q",
+                    "color": "b"
+                  }
+                ],
+                "royal": true,
+                "proof": {
+                  "horizonPliesAfterFork": 3,
+                  "materialValues": {
+                    "p": 1,
+                    "n": 3,
+                    "b": 3,
+                    "r": 5,
+                    "q": 9,
+                    "k": 0
+                  },
+                  "minimumGain": 9,
+                  "witnesses": [
+                    {
+                      "reply": "e8f8",
+                      "capture": "d6b7",
+                      "target": "b7",
+                      "worstReply": null,
+                      "worstGain": 9,
+                      "responses": 7
+                    },
+                    {
+                      "reply": "e8e7",
+                      "capture": "d6b7",
+                      "target": "b7",
+                      "worstReply": null,
+                      "worstGain": 9,
+                      "responses": 8
+                    },
+                    {
+                      "reply": "e8d7",
+                      "capture": "d6b7",
+                      "target": "b7",
+                      "worstReply": null,
+                      "worstGain": 9,
+                      "responses": 8
+                    },
+                    {
+                      "reply": "e8d8",
+                      "capture": "d6b7",
+                      "target": "b7",
+                      "worstReply": null,
+                      "worstGain": 9,
+                      "responses": 5
+                    }
+                  ]
+                }
+              },
+              "scope": "this specific fork; bounded knight/pawn scan"
+            },
+            "qualityClaim": false
+          }
+        ],
+        "comment": "Your move prevents the fork with Nd6+ that Qb7 would allow.",
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 74,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "ordinary-move",
+        "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        "move": "e2e4",
+        "expected": [],
+        "absent": [
+          "fork",
+          "avoids-fork",
+          "absolute-pin"
+        ],
+        "note": "Unsupported positional advice stays silent."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        "after": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+        "move": "e2e4",
+        "san": "e4",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 21,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "ordinary-move-black",
+        "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1",
+        "move": "e7e5",
+        "expected": [],
+        "absent": [
+          "fork",
+          "avoids-fork",
+          "absolute-pin"
+        ],
+        "note": "Unsupported positional advice stays silent."
+      },
+      "result": {
+        "schema": "coach-concepts-v1",
+        "before": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1",
+        "after": "rnbqkbnr/pppp1ppp/8/4p3/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 2",
+        "move": "e7e5",
+        "san": "e5",
+        "events": [],
+        "comment": null,
+        "diagnostics": {
+          "tactics": "complete",
+          "replyScan": "complete",
+          "nodes": 21,
+          "maxNodes": 50000
+        }
+      }
+    },
+    {
+      "fixture": {
+        "id": "missing-ep-right",
+        "fen": "7k/8/8/3pP3/8/8/8/K7 w - - 0 1",
+        "move": "e5d6",
+        "invalid": true,
+        "note": "En passant requires the recorded right."
+      },
+      "error": "Illegal move; explanation refused."
+    },
+    {
+      "fixture": {
+        "id": "missing-ep-right-black",
+        "fen": "k7/8/8/8/3Pp3/8/8/7K b - - 0 1",
+        "move": "e4d3",
+        "invalid": true,
+        "note": "En passant requires the recorded right."
+      },
+      "error": "Illegal move; explanation refused."
+    },
+    {
+      "fixture": {
+        "id": "illegal-pinned-move",
+        "fen": "3r3k/8/8/8/3N4/8/8/3K4 w - - 0 1",
+        "move": "d4f5",
+        "invalid": true,
+        "note": "Pinned knight cannot expose its king."
+      },
+      "error": "Illegal move; explanation refused."
+    },
+    {
+      "fixture": {
+        "id": "illegal-pinned-move-black",
+        "fen": "3k4/8/8/3n4/8/8/8/3R3K b - - 0 1",
+        "move": "d5f4",
+        "invalid": true,
+        "note": "Pinned knight cannot expose its king."
+      },
+      "error": "Illegal move; explanation refused."
+    }
+  ]
+}

@@ -41,7 +41,12 @@ Research is available in the Git repository. The current packaging allowlist
 excludes `research/` from extension ZIPs and release source snapshots; those
 snapshots retain the active calibration instead.
 
-Eighteen studies/tasks are complete. A new 900-game cohort has fully traceable raw
+Nineteen studies/tasks are complete. The separate [E020 coach-concept prototype](experiments/E020-coach-concepts/RESULT.md)
+verifies bounded mechanics on synthetic positions, with an exhaustive concept
+tracker and browsable demo. Human usefulness and real-game precision remain
+unresolved; there is no extension integration. The numerical goal stays paused.
+
+A new 900-game cohort has fully traceable raw
 frames and exact clean reconstruction. A CP curve improves fresh development
 prediction; its clean replay passes, but the unchanged curve fails its frozen
 300-game confirmation gates. Smaller point gains have intervals including zero.

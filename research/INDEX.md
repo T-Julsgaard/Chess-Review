@@ -57,7 +57,7 @@ records. Update a row and the active experiment's resume state when work stops.
 | F017 | [Evidence resolution and targets](findings/F017-evidence-resolution-and-targets.md) | recorded | Precision planning is exploratory; choice likelihood does not validate display, rating or categories | Distinct rating question with target-free inputs and traceable new evidence |
 | F016 | [Unresolved mixture finding](findings/F016-unresolved-choice-mixture.md) | recorded | All independent/exact/clean replay checks pass; descriptive calibration gains retain failed acceptance | Distinct question; no retuning or promotion |
 
-| E020 | [Evidence-backed coach concepts](experiments/E020-coach-concepts/RESULT.md) | planned | Synthetic-only legal-move certificates; vocabulary retained; no extension integration | Implement and verify bounded mechanics prototype |
+| E020 | [Evidence-backed coach concepts](experiments/E020-coach-concepts/RESULT.md) | complete | 74 mechanics tests; 68 synthetic cases; eight fork certificates; exact clean replay; 1,085-entry tracker; human utility unresolved | Plan independent explanation precision/usefulness assessment before integration |
 
 No promotion records yet.
 Allocate the next unused ID in each series: `E021`, `D003`, `F018`, `P001`.
