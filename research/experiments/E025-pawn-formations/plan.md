@@ -67,3 +67,18 @@ Synthetic mechanics do not establish human usefulness or real-game precision.
 Live 300-minute allowance cutoff continues: at 10% remaining checkpoint/commit,
 disable heartbeat and normal authorized `shutdown.exe /s /t 0` without `/f`.
 No extension integration, pushes or numerical goal restart.
+
+## Amendments before first fixture evaluation
+
+Code inspection found later wrappers flattened earlier selection priorities,
+allowing generic checkmate to hide verified mate-pattern text. Consolidate
+cumulative selection in an importable E025 module. Add selected-text regressions
+for specific mate patterns, royal/triple forks, outposts and tactical-warning
+priority. Royal-fork wording names king/queen targets without changing evidence
+or finite proof. This changes selected text, not tactical acceptance gates.
+Geometric defender-removal comments explicitly say "geometry" and remain
+partial in tracking: support attack counts can include pinned defenders, so
+legal protection and finite target gain need a later proof. Generic profitable
+capture text takes lower priority than supported specific formation/motif text;
+the underlying capture certificate remains unchanged. First 62-test fixture
+pass has zero failures.

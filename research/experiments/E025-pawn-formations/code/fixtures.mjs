@@ -1,0 +1,33 @@
+import {setup} from '../../E021-structural-concepts/code/fixtures.mjs';
+export {reflect} from '../../E024-transitions/code/fixtures.mjs';
+const f=(id,extra,move,expected=[],absent=[],options={})=>({id,fen:setup({a7:null,h2:null,...extra}),move,expected,absent,note:id.replaceAll('-',' '),...options});
+export const fixtures=[
+ f('hanging-pair',{c3:'P',d4:'P',c7:'p',d7:'p'},'c3c4',['hanging-pawns']),
+ f('supported-pair-not-hanging',{b2:'P',c3:'P',d4:'P',c7:'p',d7:'p'},'c3c4',[],['hanging-pawns']),
+ f('doubled-pair-not-hanging',{c2:'P',c3:'P',d4:'P',c7:'p',d7:'p'},'c3c4',[],['hanging-pawns']),
+ f('rear-pair-not-hanging',{c2:'P',d3:'P',c7:'p',d7:'p'},'c2c3',[],['hanging-pawns']),
+ f('central-pawn-lever',{c2:'P',b3:'P',d5:'p'},'c2c4',['pawn-lever','central-break']),
+ f('wing-pawn-lever',{g2:'P',f3:'P',h5:'p'},'g2g4',['pawn-lever'],['central-break']),
+ f('pinned-pawn-lever',{a1:null,c1:'K',c2:'P',c8:'r',d5:'p'},'c2c4',[],['pawn-lever','central-break']),
+ f('undermine-central-chain',{b4:'P',a4:'P',c6:'p',d5:'p'},'b4b5',['pawn-lever','undermining-center']),
+ f('remove-pawn-defender',{b5:'P',c6:'p',d5:'p',d1:'R'},'b5c6',['removal-defender']),
+ f('another-defender-remains',{b5:'P',c6:'p',d5:'p',e6:'p',d1:'R'},'b5c6',['removal-defender']),
+ f('remove-bishop-defender',{c1:'Q',c4:'b',e6:'r'},'c1c4',['removal-defender']),
+ f('blocked-target-no-removal-motif',{c1:'Q',c4:'b',e6:'r',d5:'N'},'c1c4',[],['removal-defender']),
+ f('locked-central-chains',{c2:'P',d4:'P',e5:'P',c4:'p',d5:'p',e6:'p'},'c2c3',['locked-pawn-chains','closed-center']),
+ f('fixed-center-created',{d3:'P',e5:'P',d5:'p',e6:'p'},'d3d4',['locked-pawn-chains','closed-center','fixed-center']),
+ f('incomplete-lock',{c2:'P',d4:'P',e5:'P',c4:'p',d5:'p'},'c2c3',[],['locked-pawn-chains','closed-center']),
+ f('central-tension-not-fixed',{d3:'P',e4:'P',d5:'p',e5:'p'},'d3d4',[],['fixed-center','locked-pawn-chains']),
+ f('open-center-created',{d5:'P',c6:'n'},'d5c6',['open-center']),
+ f('extra-e-pawn-not-open',{d5:'P',c6:'n',e7:'p'},'d5c6',[],['open-center']),
+ f('pawn-cover-change',{a1:null,g1:'K',f2:'P',g2:'P',h2:'P',f7:'p',g7:'p',h7:'p'},'f2f3',['pawn-cover']),
+ f('capture-king-cover',{h8:null,g8:'k',f7:'p',g7:'p',h7:'p',d5:'B'},'d5f7',['pawn-cover-capture']),
+ f('cover-away-from-home',{a1:null,g2:'K',f3:'P',g3:'P',h3:'P'},'f3f4',[],['pawn-cover']),
+ f('symmetric-pawns-restored',{c2:'P',e4:'P',c7:'p',e7:'p'},'e7e5',['symmetric-pawns'],[],{fen:'7k/2p1p3/8/8/4P3/8/2P5/K7 b - - 0 1'}),
+ f('pawn-symmetry-broken',{c2:'P',e2:'P',c7:'p',e7:'p'},'c2c3',['asymmetric-pawns']),
+ f('too-few-pawns-for-symmetry',{c3:'P',c7:'p'},'c7c6',[],['symmetric-pawns'],{fen:'7k/2p5/8/8/8/2P5/8/K7 b - - 0 1'}),
+ f('bishop-pawn-color-count',{f1:'B',c2:'P',g2:'P',g7:'p'},'g2g3',['bishop-pawn-color']),
+ f('bishop-behind-new-chain',{c1:'B',d2:'P',e2:'P',d7:'p',e7:'p'},'e2e3',['bishop-behind-chain']),
+ f('non-chain-bishop-blocker',{c1:'B',d2:'P',e4:'P',d7:'p',e7:'p'},'e4e5',[],['bishop-behind-chain']),
+ f('stable-pawn-structure',{d4:'P',e5:'P',d5:'p',e6:'p',b1:'N'},'b1c3',[],['locked-pawn-chains','closed-center','fixed-center']),
+];
