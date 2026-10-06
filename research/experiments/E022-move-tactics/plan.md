@@ -65,3 +65,24 @@ remains inconclusive until independent player/real-game assessment.
 Continue under the active 10%-remaining five-hour monitor. Check allowance each
 batch; at usedPercent>=90 in the 300-minute window checkpoint/commit, disable
 heartbeat, then normal `shutdown.exe /s /t 0` without `/f`. No pushes.
+
+## Exposed development amendments
+
+Initial 76-case test pass failed 23 tests, including reflected copies and a
+dependent tampering test. Reasons: three bishops initially checked the nonmoving
+king; one bishop move was not diagonal; a nominally undefended target still had
+a defender; a knight did not attack the intended target; two draw fixtures
+started in already-terminal positions; the purported only move was illegal;
+and an unprotected skewer attacker could be captured by the king. Correct these
+authored setups, retaining the capturable attacker as a negative. Move the
+interposition defender far enough to admit a legal blocking reply. Gates remain
+unchanged. Add explicit immediate countermate and defender fifty-move draw cases.
+All expected new event multisets are exposed development annotations, reviewed
+after smoke output; they verify regression, not independent precision.
+Capture simplification requires the actual non-pawn count to fall, so promotion
+captures do not falsely claim one fewer piece. En-passant checker capture uses
+the removed pawn's square. Terminal played mate selects its pattern rather
+than performing a redundant finite material search.
+Combined demo smoke exposed the frozen renderer's assumption that every
+attacker event has a fork target array. Add an E022 display adapter for singular
+discovered/skewer targets; canonical results keep their original schema.

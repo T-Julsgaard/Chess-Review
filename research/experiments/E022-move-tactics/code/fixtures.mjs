@@ -1,0 +1,62 @@
+import {setup} from '../../E021-structural-concepts/code/fixtures.mjs';
+export {reflect} from '../../E020-coach-concepts/code/fixtures.mjs';
+const f=(id,extra,move,expected=[],absent=[],options={})=>({id,fen:setup(extra),move,expected,absent,note:id.replaceAll('-',' '),...options});
+export const fixtures=[
+ f('pawn-capture',{c4:'P',d5:'p'},'c4d5',['capture','profitable-capture']),
+ f('piece-capture',{c3:'N',d5:'b'},'c3d5',['capture','piece-simplification','profitable-capture']),
+ f('winning-exchange',{c3:'B',d4:'r'},'c3d4',['capture','winning-exchange']),
+ f('recaptured-exchange',{c3:'B',d4:'r',e5:'p'},'c3d4',['capture','winning-exchange']),
+ f('losing-queen-capture',{d2:'Q',d4:'r',e5:'p'},'d2d4',['capture'],['profitable-capture','winning-exchange']),
+ f('equal-recapture',{c3:'N',d5:'b',e6:'p'},'c3d5',['capture'],['profitable-capture']),
+ f('discovered-rook-attack',{h8:null,h7:'k',c1:'R',c3:'B',c7:'q'},'c3d4',['discovered-attack']),
+ f('discovered-bishop-attack',{b1:'B',d3:'N',g6:'r'},'d3f4',['discovered-attack']),
+ f('blocked-discovery',{h8:null,h7:'k',c1:'R',c3:'B',c5:'P',c7:'q'},'c3d4',[],['discovered-attack']),
+ f('old-rook-attack',{c1:'R',d3:'B',c7:'q'},'d3e4',[],['discovered-attack']),
+ f('pinned-discovered-slider',{h8:null,h7:'k',a1:null,b1:'K',c1:'R',c3:'B',c7:'q',h1:'r'},'c3d4',[],['discovered-attack']),
+ f('remove-geometric-defender',{c1:'Q',c4:'b',e6:'r'},'c1c4',['loose-piece']),
+ f('new-en-prise',{b3:'N',e6:'r'},'b3c5',['en-prise']),
+ f('new-capture-warning',{c1:'B',b7:'r'},'c1b2',['allows-capture']),
+ f('interpose-rook',{a1:null,e1:'K',e8:'r',d2:'R'},'d2e2',['interposition']),
+ f('capture-checker',{a1:null,e1:'K',e8:'r',b5:'B'},'b5e8',['capture-checker']),
+ f('king-escape',{a1:null,e1:'K',e8:'r'},'e1d1',['king-check-evasion']),
+ f('ep-captures-checker',{a1:null,e4:'K',e5:'P',d5:'p'},'e5d6',['capture-checker'],[],{fen:'7k/p7/8/3pP3/4K3/8/7P/8 w - d6 0 2'}),
+ f('absolute-rook-skewer',{h8:null,g7:'k',a7:null,g8:'q',a6:'R',f5:'P'},'a6g6',['absolute-skewer']),
+ f('absolute-bishop-skewer',{h8:null,g4:'k',h5:'q',b3:'B'},'b3d1',['absolute-skewer']),
+ f('capturable-skewer',{h8:null,g7:'k',a7:null,g8:'q',g5:'r',a6:'R'},'a6g6',[],['absolute-skewer']),
+ f('skewer-wrong-target',{h8:null,g7:'k',a7:null,g8:'N',a6:'R',f5:'P'},'a6g6',[],['absolute-skewer']),
+ f('skewer-interpose',{h8:null,g7:'k',a7:null,g8:'q',f6:'r',a3:'R'},'a3g3',[],['absolute-skewer']),
+ f('nonchecking-alignment',{h8:null,f7:'k',a7:null,g8:'q',a6:'R'},'a6g6',[],['absolute-skewer']),
+ f('back-rank-mate',{a7:null,h2:null,h8:null,g8:'k',f7:'p',g7:'p',h7:'p',a1:null,b1:'K',a2:'R'},'a2a8',['back-rank-mate']),
+ f('smothered-mate',{a7:null,h8:'k',g8:'r',g7:'p',h7:'p',e5:'N'},'e5f7',['smothered-mate']),
+ f('knight-check-not-mate',{a7:null,h8:'k',g7:'p',h7:'p',e5:'N'},'e5f7',[],['smothered-mate']),
+ f('back-rank-check-with-flight',{a7:null,h2:null,h8:null,g8:'k',f7:'p',h7:'p',a1:null,b1:'K',a2:'R'},'a2a8',[],['back-rank-mate']),
+ f('insufficient-bishop',{a7:null,h2:null,c1:'B',d2:'r'},'c1d2',['insufficient-material']),
+ f('insufficient-knight',{a7:null,h2:null,c1:'N',d3:'r'},'c1d3',['insufficient-material']),
+ f('rook-not-insufficient',{a7:null,h2:null,c1:'R'},'c1c2',[],['insufficient-material']),
+ f('fifty-move-threshold',{c1:'N'},'c1d3',['fifty-move-threshold'],[],{fen:'7k/p7/8/8/8/8/7P/K1N5 w - - 99 50'}),
+ f('pawn-resets-counter',{},'h2h3',[],['fifty-move-threshold'],{fen:'7k/p7/8/8/8/8/7P/K7 w - - 99 50'}),
+ f('only-legal-escape',{},'a1a2',['only-legal-move'],[],{fen:'1r5k/8/8/8/8/2q5/8/K7 w - - 0 1'}),
+ f('multiple-legal-escapes',{a1:null,e1:'K',e8:'r'},'e1d1',[],['only-legal-move']),
+ f('promotion-capture-no-simplification',{a7:'P',b8:'r'},'a7b8q',['capture'],['piece-simplification']),
+ f('budget-abstention',{h8:null,g7:'k',a7:null,g8:'q',a6:'R',f5:'P'},'a6g6',[],['absolute-skewer','profitable-capture'],{maxTacticNodes:1}),
+ f('capture-countermate',{},'d5c6',['capture','allows-capture'],['profitable-capture'],{fen:'3r3k/7p/2r5/3P4/8/8/PPP5/1K1B4 w - - 0 1'}),
+ f('skewer-defender-draw',{},'a6g6',[],['absolute-skewer'],{fen:'6q1/6k1/R7/5P2/8/8/7P/K7 w - - 98 50'}),
+];
+// Exposed development expectations, reviewed as move effects; duplicate IDs
+// represent separate target squares. These are not held-out annotations.
+const exact=[
+ 'capture|profitable-capture','capture|piece-simplification|profitable-capture',
+ 'capture|en-prise|piece-simplification|profitable-capture|winning-exchange',
+ 'allows-capture|capture|en-prise|en-prise|piece-simplification|profitable-capture|winning-exchange',
+ 'allows-capture|capture|en-prise|en-prise|piece-simplification','allows-capture|capture|loose-piece|piece-simplification',
+ 'allows-capture|discovered-attack|en-prise|en-prise','discovered-attack|en-prise','','','allows-capture|en-prise',
+ 'capture|en-prise|loose-piece|piece-simplification|profitable-capture','en-prise','allows-capture',
+ 'allows-capture|en-prise|interposition','capture|capture-checker|piece-simplification|profitable-capture|winning-exchange',
+ 'king-check-evasion','capture|capture-checker|profitable-capture','absolute-skewer','absolute-skewer',
+ 'allows-capture|allows-capture|en-prise','','','allows-capture|allows-capture|en-prise',
+ 'back-rank-mate','smothered-mate','','','capture|insufficient-material|piece-simplification',
+ 'capture|insufficient-material|piece-simplification','','fifty-move-threshold','','king-check-evasion|only-legal-move',
+ 'king-check-evasion','capture|profitable-capture','','allows-capture|capture|piece-simplification','',
+];
+fixtures.forEach((f,i)=>{f.expectedNew=exact[i]?exact[i].split('|'):[];});
+export const newIds=new Set(exact.flatMap(s=>s?s.split('|'):[]));
