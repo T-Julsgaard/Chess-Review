@@ -70,7 +70,9 @@ No promotion records yet.
 
 | E025 | [Pawn formations and attack-line changes](experiments/E025-pawn-formations/RESULT.md) | complete | 499 cumulative tests; 464 synthetic cases; 125 verified names; specific mate/royal/triple/outpost selection retained; exact clean replay | Continue E026 finite defender-removal and relative/cross-pin proofs; usage cutoff active |
 
-Allocate the next unused ID in each series: `E026`, `D003`, `F018`, `P001`.
+| E026 | [Relative/cross-pin and defender-removal proofs](experiments/E026-pin-proofs/RESULT.md) | planned | Conditional queen-pin and all-defense target-capture witnesses with post-move baseline | Implement independent replay and negative controls |
+
+Allocate the next unused ID in each series: `E027`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
