@@ -68,7 +68,9 @@ No promotion records yet.
 
 | E024 | [Material transitions and placement vocabulary](experiments/E024-transitions/RESULT.md) | complete | 437 cumulative tests; 408 synthetic cases; 116 verified names; verified recapture history; exact repeat/clean replay | Continue E025 pawn formations and attack-line changes; usage cutoff active |
 
-Allocate the next unused ID in each series: `E025`, `D003`, `F018`, `P001`.
+| E025 | [Pawn formations and attack-line changes](experiments/E025-pawn-formations/RESULT.md) | planned | Hanging-pawn geometry, levers, locked centers, pawn cover and color facts | Implement scoped synthetic controls and retained evidence |
+
+Allocate the next unused ID in each series: `E026`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
