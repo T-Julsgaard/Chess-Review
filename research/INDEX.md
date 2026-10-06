@@ -66,7 +66,9 @@ No promotion records yet.
 
 | E023 | [Broader finite tactics and line motifs](experiments/E023-broad-tactics/RESULT.md) | complete | 342 cumulative tests; 318 synthetic cases; 82 verified names; 160 finite certificate event replays; exact repeat/clean outputs | Continue E024 endgame/material and placement facts; usage cutoff active |
 
-Allocate the next unused ID in each series: `E024`, `D003`, `F018`, `P001`.
+| E024 | [Material transitions and placement vocabulary](experiments/E024-transitions/RESULT.md) | planned | Exact ending classes, verified optional recapture history and geometric placement subsets | Implement synthetic controls and reproducible evidence |
+
+Allocate the next unused ID in each series: `E025`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
