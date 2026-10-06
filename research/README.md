@@ -46,6 +46,14 @@ verifies bounded mechanics on synthetic positions, with an exhaustive concept
 tracker and browsable demo. Human usefulness and real-game precision remain
 unresolved; there is no extension integration. The numerical goal stays paused.
 
+The latest [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
+adds short pawn, file, battery, blockade and piece-placement comments. Its
+[cumulative tracker](experiments/E021-structural-concepts/evidence/concept-status.md)
+records verified mechanics and partial interpretations against the original
+list; its [demo](experiments/E021-structural-concepts/evidence/demo.html) is runnable
+without the extension. Further coach research is active under the authorized
+five-hour usage cutoff.
+
 A new 900-game cohort has fully traceable raw
 frames and exact clean reconstruction. A CP curve improves fresh development
 prediction; its clean replay passes, but the unchanged curve fails its frozen
