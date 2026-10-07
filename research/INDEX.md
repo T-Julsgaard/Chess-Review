@@ -77,7 +77,7 @@ No promotion records yet.
 
 | E030 | [Mating sacrifice explanations](experiments/E030-mating-sacrifices/RESULT.md) | complete | 812 cumulative tests; 750 synthetic cases; sound material offers, exchange and clearance sacrifices; exact repeat/clean replay | E031 broaden verifiable short concepts; cutoff active |
 
-| E031 | [Verified intermediate moves](experiments/E031-intermediate-moves/RESULT.md) | planned | Verified recapture-delay context and finite all-defense recapture witnesses; actual intermediate mate | Implement authored controls and independent replay |
+| E031 | [Verified intermediate moves](experiments/E031-intermediate-moves/RESULT.md) | complete | 839 cumulative tests; 772 synthetic cases; 176 verified names; history-grounded recapture delays and intermediate mate; exact repeat/clean replay | E032 history-grounded draw facts; cutoff active |
 
 Allocate the next unused ID in each series: `E032`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.

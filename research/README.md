@@ -48,12 +48,12 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E030 mating-sacrifice expansion](experiments/E030-mating-sacrifices/RESULT.md)
-adds queen, rook, minor-piece and pawn offers, exchange sacrifices and clearance
-lines with all-defense mate proofs to E029's forced and missed-mate comments.
-Its [cumulative tracker](experiments/E030-mating-sacrifices/evidence/concept-status.md)
+[E031 intermediate-move expansion](experiments/E031-intermediate-moves/RESULT.md)
+adds history-grounded intermediate checks, captures and actual mate instead of
+recapturing, with complete finite recapture proofs, to earlier mating sacrifices.
+Its [cumulative tracker](experiments/E031-intermediate-moves/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E030-mating-sacrifices/evidence/demo.html) is runnable
+list; its [demo](experiments/E031-intermediate-moves/evidence/demo.html) is runnable
 without the extension. Further coach research is active under the authorized
 five-hour usage cutoff.
 

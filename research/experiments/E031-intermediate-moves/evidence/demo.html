@@ -1,0 +1,1669 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Coach concepts research demo</title><style>
+  :root{font:16px/1.5 system-ui;color:#e5eaf3;background:#101720}body{margin:0 auto;max-width:1120px;padding:36px 24px}h1{font-size:34px;margin:0}h2{font-size:19px;text-transform:capitalize;margin:0}h3{font-size:13px;color:#a2aec2;margin:0 0 8px}p{color:#bbc6d7}header{display:flex;justify-content:space-between;gap:16px}header span{color:#83e1bc}button{font:inherit;background:#253347;color:#e5eaf3;border:1px solid #44546a;border-radius:8px;padding:8px 14px;margin:8px 5px 8px 0;cursor:pointer}button[aria-pressed=true]{background:#1b6d56}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:24px}article{background:#182331;border:1px solid #354255;border-radius:14px;padding:22px}article[hidden]{display:none}.positions{display:grid;grid-template-columns:1fr 1fr;gap:14px}.board{display:grid;grid-template-columns:repeat(8,1fr);aspect-ratio:1;border:1px solid #627087}.square{position:relative;display:flex;align-items:center;justify-content:center;aspect-ratio:1}.light{background:#d1d5ce}.dark{background:#778c80}.marked{background:#c4aa54}.piece{font-size:clamp(17px,2.5vw,30px);line-height:1}.white{color:#fff;text-shadow:0 1px 2px #000,1px 0 #333,-1px 0 #333}.black{color:#17221e}.square small{position:absolute;bottom:0;left:2px;font-size:8px;color:#29372f}.comment{padding:14px;background:#0e1924;border-left:3px solid #6dc9a6;color:#effaf7}summary{cursor:pointer;color:#9fdccb}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.5 monospace;color:#b7c8db}footer{margin-top:30px;color:#98a7ba}@media(max-width:740px){.grid{grid-template-columns:1fr}body{padding:24px 14px}.piece{font-size:clamp(20px,5vw,34px)}}
+  .positions{grid-template-columns:repeat(2,minmax(0,1fr))}@media(max-width:420px){.positions{grid-template-columns:1fr}.piece{font-size:clamp(20px,7vw,34px)}}
+  </style><h1>Coach concepts · verified intermediate moves</h1><p>History-grounded intermediate checks and captures retain recapture through every legal defense. Budget exhaustion makes no new claims. Authored positions; no extension integration.</p><p>Forks need a capture witness against every legal reply, with positive nominal material after immediate counterreplies. This finite check does not establish the best move or a winning position. Praise and strategic advice await broader validation.</p><p><a href="../../E024-transitions/evidence/demo.html">Earlier endgame and trade examples</a> · <a href="../../E023-broad-tactics/evidence/demo.html">Tactical and structural examples</a> · Inherited cases are checked and fingerprinted in results.json.</p><nav aria-label="Filter examples"><button data-filter="all" aria-pressed="true">All examples</button><button data-filter="comment" aria-pressed="false">Supported comments</button><button data-filter="abstain" aria-pressed="false">Abstentions</button><button data-filter="invalid" aria-pressed="false">Invalid moves</button></nav><main class="grid"><article data-kind="comment"><header><h2>checking before recapture</h2><span>Re8+</span></header><p>checking before recapture</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 7k/8/8/8/r7/1P6/8/4R2K w - - 0 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black">♚</span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black"></span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black">♜</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece white">♖</span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After Re8+</h3><div class="board" role="img" aria-label="Chess position: 4R2k/8/8/8/r7/1P6/8/7K b - - 1 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece white">♖</span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black">♚</span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black"></span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black">♜</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">Intermediate check: every legal reply still lets you recapture the rook.</p><details><summary>Inspect concepts and evidence · 2 defender replies</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v12&quot;,
+  &quot;before&quot;: &quot;7k/8/8/8/r7/1P6/8/4R2K w - - 0 2&quot;,
+  &quot;after&quot;: &quot;4R2k/8/8/8/r7/1P6/8/7K b - - 1 2&quot;,
+  &quot;move&quot;: &quot;e1e8&quot;,
+  &quot;san&quot;: &quot;Re8+&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;check&quot;,
+      &quot;text&quot;: &quot;Check: your move attacks the king on h8.&quot;,
+      &quot;evidence&quot;: {
+        &quot;king&quot;: &quot;h8&quot;,
+        &quot;attackers&quot;: [
+          &quot;e8&quot;
+        ]
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;intermediate-check&quot;,
+      &quot;text&quot;: &quot;Intermediate check: every legal reply still lets you recapture the rook.&quot;,
+      &quot;evidence&quot;: {
+        &quot;history&quot;: {
+          &quot;start&quot;: &quot;r6k/8/8/8/N7/1P6/8/4R2K b - - 0 1&quot;,
+          &quot;moves&quot;: [
+            &quot;a8a4&quot;
+          ]
+        },
+        &quot;prior&quot;: {
+          &quot;move&quot;: &quot;a8a4&quot;,
+          &quot;piece&quot;: &quot;r&quot;,
+          &quot;captured&quot;: &quot;n&quot;,
+          &quot;square&quot;: &quot;a4&quot;
+        },
+        &quot;directRecaptures&quot;: [
+          &quot;b3a4&quot;
+        ],
+        &quot;played&quot;: &quot;e1e8&quot;,
+        &quot;proof&quot;: {
+          &quot;baselineFen&quot;: &quot;4R2k/8/8/8/r7/1P6/8/7K b - - 1 2&quot;,
+          &quot;color&quot;: &quot;w&quot;,
+          &quot;initialBalance&quot;: 1,
+          &quot;horizonPliesAfterMove&quot;: 3,
+          &quot;witnesses&quot;: [
+            {
+              &quot;reply&quot;: &quot;h8h7&quot;,
+              &quot;target&quot;: {
+                &quot;square&quot;: &quot;a4&quot;,
+                &quot;type&quot;: &quot;r&quot;
+              },
+              &quot;recapture&quot;: &quot;b3a4&quot;,
+              &quot;terminalMate&quot;: false,
+              &quot;worstGain&quot;: 5,
+              &quot;responses&quot;: [
+                {
+                  &quot;move&quot;: &quot;h7h6&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;h7g6&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;h7g7&quot;,
+                  &quot;gain&quot;: 5
+                }
+              ]
+            },
+            {
+              &quot;reply&quot;: &quot;h8g7&quot;,
+              &quot;target&quot;: {
+                &quot;square&quot;: &quot;a4&quot;,
+                &quot;type&quot;: &quot;r&quot;
+              },
+              &quot;recapture&quot;: &quot;b3a4&quot;,
+              &quot;terminalMate&quot;: false,
+              &quot;worstGain&quot;: 5,
+              &quot;responses&quot;: [
+                {
+                  &quot;move&quot;: &quot;g7h7&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g7h6&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g7g6&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g7f6&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g7f7&quot;,
+                  &quot;gain&quot;: 5
+                }
+              ]
+            }
+          ]
+        }
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Intermediate check: every legal reply still lets you recapture the rook.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 3,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 4
+    },
+    &quot;history&quot;: {
+      &quot;verified&quot;: true,
+      &quot;plies&quot;: 1
+    }
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;intermediateAnalysis&quot;: {
+    &quot;maxIntermediateNodes&quot;: 50000,
+    &quot;nodes&quot;: 15,
+    &quot;status&quot;: &quot;proved&quot;
+  }
+}</pre></details></article><article data-kind="comment"><header><h2>capture with check</h2><span>Rxe8+</span></header><p>capture with check</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 4b2k/8/8/8/r7/1P6/8/4R2K w - - 0 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black">♝</span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black">♚</span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black"></span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black">♜</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece white">♖</span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After Rxe8+</h3><div class="board" role="img" aria-label="Chess position: 4R2k/8/8/8/r7/1P6/8/7K b - - 0 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece white">♖</span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black">♚</span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black"></span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light marked" title="a4"><span class="piece black">♜</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light marked" title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">Intermediate check: every legal reply still lets you recapture the rook.</p><details><summary>Inspect concepts and evidence · 6 defender replies</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v12&quot;,
+  &quot;before&quot;: &quot;4b2k/8/8/8/r7/1P6/8/4R2K w - - 0 2&quot;,
+  &quot;after&quot;: &quot;4R2k/8/8/8/r7/1P6/8/7K b - - 0 2&quot;,
+  &quot;move&quot;: &quot;e1e8&quot;,
+  &quot;san&quot;: &quot;Rxe8+&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;check&quot;,
+      &quot;text&quot;: &quot;Check: your move attacks the king on h8.&quot;,
+      &quot;evidence&quot;: {
+        &quot;king&quot;: &quot;h8&quot;,
+        &quot;attackers&quot;: [
+          &quot;e8&quot;
+        ]
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;material-balance&quot;,
+      &quot;evidence&quot;: {
+        &quot;own&quot;: 6,
+        &quot;enemy&quot;: 5,
+        &quot;delta&quot;: 1,
+        &quot;values&quot;: {
+          &quot;p&quot;: 1,
+          &quot;n&quot;: 3,
+          &quot;b&quot;: 3,
+          &quot;r&quot;: 5,
+          &quot;q&quot;: 9,
+          &quot;k&quot;: 0
+        }
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;Nominal material balance: 1 pawn-value point ahead.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;capture&quot;,
+      &quot;text&quot;: &quot;You capture the bishop on e8.&quot;,
+      &quot;evidence&quot;: {
+        &quot;from&quot;: &quot;e1&quot;,
+        &quot;to&quot;: &quot;e8&quot;,
+        &quot;captured&quot;: &quot;b&quot;,
+        &quot;enPassant&quot;: false
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;piece-simplification&quot;,
+      &quot;text&quot;: &quot;One fewer non-pawn piece remains after this capture.&quot;,
+      &quot;evidence&quot;: {
+        &quot;before&quot;: 3,
+        &quot;after&quot;: 2
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;loose-piece&quot;,
+      &quot;text&quot;: &quot;Loose rook on a4: no friendly piece geometrically defends it.&quot;,
+      &quot;evidence&quot;: {
+        &quot;target&quot;: {
+          &quot;square&quot;: &quot;a4&quot;,
+          &quot;type&quot;: &quot;r&quot;,
+          &quot;color&quot;: &quot;b&quot;
+        },
+        &quot;defenders&quot;: [],
+        &quot;oldDefenders&quot;: [
+          &quot;e8&quot;
+        ]
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;profitable-capture&quot;,
+      &quot;text&quot;: &quot;Your capture gains material through every immediate reply; minimum nominal gain 3.&quot;,
+      &quot;evidence&quot;: {
+        &quot;capture&quot;: &quot;e1e8&quot;,
+        &quot;proof&quot;: {
+          &quot;horizonPliesAfterCapture&quot;: 1,
+          &quot;materialValues&quot;: {
+            &quot;p&quot;: 1,
+            &quot;n&quot;: 3,
+            &quot;b&quot;: 3,
+            &quot;r&quot;: 5,
+            &quot;q&quot;: 9,
+            &quot;k&quot;: 0
+          },
+          &quot;minimumGain&quot;: 3,
+          &quot;witnesses&quot;: [
+            {
+              &quot;reply&quot;: &quot;h8h7&quot;,
+              &quot;gain&quot;: 3
+            },
+            {
+              &quot;reply&quot;: &quot;h8g7&quot;,
+              &quot;gain&quot;: 3
+            }
+          ]
+        }
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;ending-rook-pawn-rook&quot;,
+      &quot;text&quot;: &quot;Rook and pawn versus rook: these are the exact remaining non-king armies.&quot;,
+      &quot;evidence&quot;: {
+        &quot;id&quot;: &quot;rook-pawn-rook&quot;,
+        &quot;label&quot;: &quot;Rook and pawn versus rook&quot;,
+        &quot;color&quot;: &quot;w&quot;,
+        &quot;white&quot;: &quot;pr&quot;,
+        &quot;black&quot;: &quot;r&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;ending-r-ending&quot;,
+      &quot;text&quot;: &quot;Rook ending: only kings, rooks and optional pawns remain.&quot;,
+      &quot;evidence&quot;: {
+        &quot;id&quot;: &quot;r-ending&quot;,
+        &quot;label&quot;: &quot;Rook ending&quot;,
+        &quot;color&quot;: null,
+        &quot;white&quot;: &quot;pr&quot;,
+        &quot;black&quot;: &quot;r&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;endgame-transition&quot;,
+      &quot;text&quot;: &quot;Endgame transition: rook and pawn versus rook now describes the remaining material.&quot;,
+      &quot;evidence&quot;: {
+        &quot;before&quot;: &quot;4b2k/8/8/8/r7/1P6/8/4R2K w - - 0 2&quot;,
+        &quot;after&quot;: &quot;4R2k/8/8/8/r7/1P6/8/7K b - - 0 2&quot;,
+        &quot;ending&quot;: {
+          &quot;id&quot;: &quot;rook-pawn-rook&quot;,
+          &quot;label&quot;: &quot;Rook and pawn versus rook&quot;,
+          &quot;color&quot;: &quot;w&quot;,
+          &quot;white&quot;: &quot;pr&quot;,
+          &quot;black&quot;: &quot;r&quot;
+        }
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;removal-defender&quot;,
+      &quot;text&quot;: &quot;Defender-removal geometry: e8 supported rook a4’s square. Other defenders may remain.&quot;,
+      &quot;evidence&quot;: {
+        &quot;removed&quot;: &quot;e8&quot;,
+        &quot;target&quot;: {
+          &quot;square&quot;: &quot;a4&quot;,
+          &quot;type&quot;: &quot;r&quot;,
+          &quot;color&quot;: &quot;b&quot;
+        },
+        &quot;oldDefenders&quot;: [
+          &quot;e8&quot;
+        ],
+        &quot;remainingDefenders&quot;: [],
+        &quot;capture&quot;: &quot;b3a4&quot;,
+        &quot;hypotheticalTurn&quot;: &quot;w&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;certified-removal&quot;,
+      &quot;text&quot;: &quot;You remove a defender of rook a4; every reply permits its capture with immediate net material gain.&quot;,
+      &quot;evidence&quot;: {
+        &quot;removed&quot;: &quot;e8&quot;,
+        &quot;target&quot;: {
+          &quot;square&quot;: &quot;a4&quot;,
+          &quot;type&quot;: &quot;r&quot;,
+          &quot;color&quot;: &quot;b&quot;
+        },
+        &quot;oldDefenders&quot;: [
+          &quot;e8&quot;
+        ],
+        &quot;remainingDefenders&quot;: [],
+        &quot;capture&quot;: &quot;b3a4&quot;,
+        &quot;hypotheticalTurn&quot;: &quot;w&quot;,
+        &quot;attackers&quot;: [
+          {
+            &quot;square&quot;: &quot;b3&quot;,
+            &quot;type&quot;: &quot;p&quot;,
+            &quot;color&quot;: &quot;w&quot;
+          }
+        ],
+        &quot;proof&quot;: {
+          &quot;baseline&quot;: &quot;afterMove&quot;,
+          &quot;baselineFen&quot;: &quot;4R2k/8/8/8/r7/1P6/8/7K b - - 0 2&quot;,
+          &quot;initialBalance&quot;: 1,
+          &quot;horizonPliesAfterMove&quot;: 3,
+          &quot;minimumGain&quot;: 5,
+          &quot;witnesses&quot;: [
+            {
+              &quot;reply&quot;: &quot;h8h7&quot;,
+              &quot;capture&quot;: &quot;b3a4&quot;,
+              &quot;target&quot;: &quot;a4&quot;,
+              &quot;worstGain&quot;: 5,
+              &quot;responses&quot;: [
+                {
+                  &quot;reply&quot;: &quot;h7h6&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;reply&quot;: &quot;h7g6&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;reply&quot;: &quot;h7g7&quot;,
+                  &quot;gain&quot;: 5
+                }
+              ]
+            },
+            {
+              &quot;reply&quot;: &quot;h8g7&quot;,
+              &quot;capture&quot;: &quot;b3a4&quot;,
+              &quot;target&quot;: &quot;a4&quot;,
+              &quot;worstGain&quot;: 5,
+              &quot;responses&quot;: [
+                {
+                  &quot;reply&quot;: &quot;g7h7&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;reply&quot;: &quot;g7h6&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;reply&quot;: &quot;g7g6&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;reply&quot;: &quot;g7f6&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;reply&quot;: &quot;g7f7&quot;,
+                  &quot;gain&quot;: 5
+                }
+              ]
+            }
+          ]
+        },
+        &quot;attacker&quot;: &quot;b3&quot;,
+        &quot;targets&quot;: [
+          {
+            &quot;square&quot;: &quot;a4&quot;,
+            &quot;type&quot;: &quot;r&quot;,
+            &quot;color&quot;: &quot;b&quot;
+          }
+        ]
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;intermediate-check&quot;,
+      &quot;text&quot;: &quot;Intermediate check: every legal reply still lets you recapture the rook.&quot;,
+      &quot;evidence&quot;: {
+        &quot;history&quot;: {
+          &quot;start&quot;: &quot;r3b2k/8/8/8/N7/1P6/8/4R2K b - - 0 1&quot;,
+          &quot;moves&quot;: [
+            &quot;a8a4&quot;
+          ]
+        },
+        &quot;prior&quot;: {
+          &quot;move&quot;: &quot;a8a4&quot;,
+          &quot;piece&quot;: &quot;r&quot;,
+          &quot;captured&quot;: &quot;n&quot;,
+          &quot;square&quot;: &quot;a4&quot;
+        },
+        &quot;directRecaptures&quot;: [
+          &quot;b3a4&quot;
+        ],
+        &quot;played&quot;: &quot;e1e8&quot;,
+        &quot;proof&quot;: {
+          &quot;baselineFen&quot;: &quot;4R2k/8/8/8/r7/1P6/8/7K b - - 0 2&quot;,
+          &quot;color&quot;: &quot;w&quot;,
+          &quot;initialBalance&quot;: 1,
+          &quot;horizonPliesAfterMove&quot;: 3,
+          &quot;witnesses&quot;: [
+            {
+              &quot;reply&quot;: &quot;h8h7&quot;,
+              &quot;target&quot;: {
+                &quot;square&quot;: &quot;a4&quot;,
+                &quot;type&quot;: &quot;r&quot;
+              },
+              &quot;recapture&quot;: &quot;b3a4&quot;,
+              &quot;terminalMate&quot;: false,
+              &quot;worstGain&quot;: 5,
+              &quot;responses&quot;: [
+                {
+                  &quot;move&quot;: &quot;h7h6&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;h7g6&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;h7g7&quot;,
+                  &quot;gain&quot;: 5
+                }
+              ]
+            },
+            {
+              &quot;reply&quot;: &quot;h8g7&quot;,
+              &quot;target&quot;: {
+                &quot;square&quot;: &quot;a4&quot;,
+                &quot;type&quot;: &quot;r&quot;
+              },
+              &quot;recapture&quot;: &quot;b3a4&quot;,
+              &quot;terminalMate&quot;: false,
+              &quot;worstGain&quot;: 5,
+              &quot;responses&quot;: [
+                {
+                  &quot;move&quot;: &quot;g7h7&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g7h6&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g7g6&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g7f6&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g7f7&quot;,
+                  &quot;gain&quot;: 5
+                }
+              ]
+            }
+          ]
+        }
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Intermediate check: every legal reply still lets you recapture the rook.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 3,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 3
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 4
+    },
+    &quot;history&quot;: {
+      &quot;verified&quot;: true,
+      &quot;plies&quot;: 1
+    }
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 12,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;intermediateAnalysis&quot;: {
+    &quot;maxIntermediateNodes&quot;: 50000,
+    &quot;nodes&quot;: 15,
+    &quot;status&quot;: &quot;proved&quot;
+  }
+}</pre></details></article><article data-kind="comment"><header><h2>mate instead of recapture</h2><span>Qh7#</span></header><p>mate instead of recapture</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 7k/5Q2/6K1/8/r7/1P6/8/8 w - - 0 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black">♚</span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece white">♕</span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black"></span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece white">♔</span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black">♜</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece black"></span><small>h1</small></div></div></div><div><h3>After Qh7#</h3><div class="board" role="img" aria-label="Chess position: 7k/7Q/6K1/8/r7/1P6/8/8 b - - 1 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark marked" title="h8"><span class="piece black">♚</span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light marked" title="h7"><span class="piece white">♕</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece white">♔</span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black">♜</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece black"></span><small>h1</small></div></div></div></div><p class="comment">Intermediate mate: you deliver checkmate instead of recapturing.</p><details><summary>Inspect concepts and evidence</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v12&quot;,
+  &quot;before&quot;: &quot;7k/5Q2/6K1/8/r7/1P6/8/8 w - - 0 2&quot;,
+  &quot;after&quot;: &quot;7k/7Q/6K1/8/r7/1P6/8/8 b - - 1 2&quot;,
+  &quot;move&quot;: &quot;f7h7&quot;,
+  &quot;san&quot;: &quot;Qh7#&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;checkmate&quot;,
+      &quot;text&quot;: &quot;Checkmate: the king is attacked with no legal escape.&quot;,
+      &quot;evidence&quot;: {
+        &quot;king&quot;: &quot;h8&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;queen-check&quot;,
+      &quot;text&quot;: &quot;Queen check: your queen on h7 attacks the king.&quot;,
+      &quot;evidence&quot;: {
+        &quot;square&quot;: &quot;h7&quot;,
+        &quot;promotion&quot;: null
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;mate-in-one&quot;,
+      &quot;text&quot;: &quot;You found mate in one; the opponent has no legal reply.&quot;,
+      &quot;evidence&quot;: {
+        &quot;after&quot;: &quot;7k/7Q/6K1/8/r7/1P6/8/8 b - - 1 2&quot;,
+        &quot;king&quot;: &quot;h8&quot;,
+        &quot;color&quot;: &quot;w&quot;,
+        &quot;checkers&quot;: [
+          &quot;h7&quot;
+        ],
+        &quot;move&quot;: &quot;f7h7&quot;,
+        &quot;attacker&quot;: &quot;h7&quot;,
+        &quot;targets&quot;: [
+          {
+            &quot;square&quot;: &quot;h8&quot;
+          }
+        ]
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;intermediate-mate&quot;,
+      &quot;text&quot;: &quot;Intermediate mate: you deliver checkmate instead of recapturing.&quot;,
+      &quot;evidence&quot;: {
+        &quot;history&quot;: {
+          &quot;start&quot;: &quot;r6k/5Q2/6K1/8/N7/1P6/8/8 b - - 0 1&quot;,
+          &quot;moves&quot;: [
+            &quot;a8a4&quot;
+          ]
+        },
+        &quot;prior&quot;: {
+          &quot;move&quot;: &quot;a8a4&quot;,
+          &quot;piece&quot;: &quot;r&quot;,
+          &quot;captured&quot;: &quot;n&quot;,
+          &quot;square&quot;: &quot;a4&quot;
+        },
+        &quot;directRecaptures&quot;: [
+          &quot;b3a4&quot;
+        ],
+        &quot;played&quot;: &quot;f7h7&quot;,
+        &quot;afterFen&quot;: &quot;7k/7Q/6K1/8/r7/1P6/8/8 b - - 1 2&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Intermediate mate: you deliver checkmate instead of recapturing.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 0,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;terminal&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;history&quot;: {
+      &quot;verified&quot;: true,
+      &quot;plies&quot;: 1
+    }
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;intermediateAnalysis&quot;: {
+    &quot;maxIntermediateNodes&quot;: 50000,
+    &quot;nodes&quot;: 0,
+    &quot;status&quot;: &quot;not-required&quot;
+  }
+}</pre></details></article><article data-kind="comment"><header><h2>ordinary recapture</h2><span>bxa4</span></header><p>ordinary recapture</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 7k/8/8/8/r7/1P6/8/4R2K w - - 0 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black">♚</span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black"></span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black">♜</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece white">♖</span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After bxa4</h3><div class="board" role="img" aria-label="Chess position: 7k/8/8/8/P7/8/8/4R2K b - - 0 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black">♚</span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black"></span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece white">♙</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece white">♖</span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">The exchange: this trade swaps a rook and a minor piece.</p><details><summary>Inspect concepts and evidence · 3 defender replies</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v9&quot;,
+  &quot;before&quot;: &quot;7k/8/8/8/r7/1P6/8/4R2K w - - 0 2&quot;,
+  &quot;after&quot;: &quot;7k/8/8/8/P7/8/8/4R2K b - - 0 2&quot;,
+  &quot;move&quot;: &quot;b3a4&quot;,
+  &quot;san&quot;: &quot;bxa4&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;passed-pawn-advance&quot;,
+      &quot;evidence&quot;: {
+        &quot;from&quot;: &quot;b3&quot;,
+        &quot;to&quot;: &quot;a4&quot;
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;Your passed pawn advances from b3 to a4.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;file-opening&quot;,
+      &quot;evidence&quot;: {
+        &quot;file&quot;: &quot;b&quot;
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;The b-file is now open: no pawns remain on it.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;material-balance&quot;,
+      &quot;evidence&quot;: {
+        &quot;own&quot;: 6,
+        &quot;enemy&quot;: 0,
+        &quot;delta&quot;: 6,
+        &quot;values&quot;: {
+          &quot;p&quot;: 1,
+          &quot;n&quot;: 3,
+          &quot;b&quot;: 3,
+          &quot;r&quot;: 5,
+          &quot;q&quot;: 9,
+          &quot;k&quot;: 0
+        }
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;Nominal material balance: 6 pawn-value points ahead.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;capture&quot;,
+      &quot;text&quot;: &quot;You capture the rook on a4.&quot;,
+      &quot;evidence&quot;: {
+        &quot;from&quot;: &quot;b3&quot;,
+        &quot;to&quot;: &quot;a4&quot;,
+        &quot;captured&quot;: &quot;r&quot;,
+        &quot;enPassant&quot;: false
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;piece-simplification&quot;,
+      &quot;text&quot;: &quot;One fewer non-pawn piece remains after this capture.&quot;,
+      &quot;evidence&quot;: {
+        &quot;before&quot;: 2,
+        &quot;after&quot;: 1
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;profitable-capture&quot;,
+      &quot;text&quot;: &quot;Your capture gains material through every immediate reply; minimum nominal gain 5.&quot;,
+      &quot;evidence&quot;: {
+        &quot;capture&quot;: &quot;b3a4&quot;,
+        &quot;proof&quot;: {
+          &quot;horizonPliesAfterCapture&quot;: 1,
+          &quot;materialValues&quot;: {
+            &quot;p&quot;: 1,
+            &quot;n&quot;: 3,
+            &quot;b&quot;: 3,
+            &quot;r&quot;: 5,
+            &quot;q&quot;: 9,
+            &quot;k&quot;: 0
+          },
+          &quot;minimumGain&quot;: 5,
+          &quot;witnesses&quot;: [
+            {
+              &quot;reply&quot;: &quot;h8h7&quot;,
+              &quot;gain&quot;: 5
+            },
+            {
+              &quot;reply&quot;: &quot;h8g7&quot;,
+              &quot;gain&quot;: 5
+            },
+            {
+              &quot;reply&quot;: &quot;h8g8&quot;,
+              &quot;gain&quot;: 5
+            }
+          ]
+        }
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;exchange&quot;,
+      &quot;text&quot;: &quot;Exchange: you recapture on a4, trading 3 for 5 nominal points.&quot;,
+      &quot;evidence&quot;: {
+        &quot;last&quot;: &quot;a8a4&quot;,
+        &quot;recapture&quot;: &quot;b3a4&quot;,
+        &quot;lost&quot;: &quot;n&quot;,
+        &quot;gained&quot;: &quot;r&quot;,
+        &quot;lostValue&quot;: 3,
+        &quot;gainedValue&quot;: 5,
+        &quot;nominalDelta&quot;: 2,
+        &quot;beforePair&quot;: &quot;r6k/8/8/8/N7/1P6/8/4R2K b - - 0 1&quot;,
+        &quot;afterPair&quot;: &quot;7k/8/8/8/P7/8/8/4R2K b - - 0 2&quot;,
+        &quot;balanceBefore&quot;: 4,
+        &quot;balanceAfter&quot;: 6,
+        &quot;history&quot;: {
+          &quot;fen&quot;: &quot;r6k/8/8/8/N7/1P6/8/4R2K b - - 0 1&quot;,
+          &quot;moves&quot;: [
+            &quot;a8a4&quot;
+          ]
+        }
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;unequal-trade&quot;,
+      &quot;text&quot;: &quot;Unequal trade by nominal values: 3 for 5. Position quality needs separate analysis.&quot;,
+      &quot;evidence&quot;: {
+        &quot;last&quot;: &quot;a8a4&quot;,
+        &quot;recapture&quot;: &quot;b3a4&quot;,
+        &quot;lost&quot;: &quot;n&quot;,
+        &quot;gained&quot;: &quot;r&quot;,
+        &quot;lostValue&quot;: 3,
+        &quot;gainedValue&quot;: 5,
+        &quot;nominalDelta&quot;: 2,
+        &quot;beforePair&quot;: &quot;r6k/8/8/8/N7/1P6/8/4R2K b - - 0 1&quot;,
+        &quot;afterPair&quot;: &quot;7k/8/8/8/P7/8/8/4R2K b - - 0 2&quot;,
+        &quot;balanceBefore&quot;: 4,
+        &quot;balanceAfter&quot;: 6,
+        &quot;history&quot;: {
+          &quot;fen&quot;: &quot;r6k/8/8/8/N7/1P6/8/4R2K b - - 0 1&quot;,
+          &quot;moves&quot;: [
+            &quot;a8a4&quot;
+          ]
+        }
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;exchange-difference&quot;,
+      &quot;text&quot;: &quot;The exchange: this trade swaps a rook and a minor piece.&quot;,
+      &quot;evidence&quot;: {
+        &quot;last&quot;: &quot;a8a4&quot;,
+        &quot;recapture&quot;: &quot;b3a4&quot;,
+        &quot;lost&quot;: &quot;n&quot;,
+        &quot;gained&quot;: &quot;r&quot;,
+        &quot;lostValue&quot;: 3,
+        &quot;gainedValue&quot;: 5,
+        &quot;nominalDelta&quot;: 2,
+        &quot;beforePair&quot;: &quot;r6k/8/8/8/N7/1P6/8/4R2K b - - 0 1&quot;,
+        &quot;afterPair&quot;: &quot;7k/8/8/8/P7/8/8/4R2K b - - 0 2&quot;,
+        &quot;balanceBefore&quot;: 4,
+        &quot;balanceAfter&quot;: 6,
+        &quot;history&quot;: {
+          &quot;fen&quot;: &quot;r6k/8/8/8/N7/1P6/8/4R2K b - - 0 1&quot;,
+          &quot;moves&quot;: [
+            &quot;a8a4&quot;
+          ]
+        }
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;The exchange: this trade swaps a rook and a minor piece.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 4,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 4
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 5
+    },
+    &quot;history&quot;: {
+      &quot;verified&quot;: true,
+      &quot;plies&quot;: 1
+    }
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  }
+}</pre></details></article><article data-kind="comment"><header><h2>refutable check</h2><span>Re8+</span></header><p>refutable check</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 7k/5b2/8/8/r7/1P6/8/4R2K w - - 0 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black">♚</span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black">♝</span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black"></span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black">♜</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece white">♖</span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After Re8+</h3><div class="board" role="img" aria-label="Chess position: 4R2k/5b2/8/8/r7/1P6/8/7K b - - 1 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece white">♖</span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black">♚</span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black">♝</span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black"></span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black">♜</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">Check: your move attacks the king on h8.</p><details><summary>Inspect concepts and evidence</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v12&quot;,
+  &quot;before&quot;: &quot;7k/5b2/8/8/r7/1P6/8/4R2K w - - 0 2&quot;,
+  &quot;after&quot;: &quot;4R2k/5b2/8/8/r7/1P6/8/7K b - - 1 2&quot;,
+  &quot;move&quot;: &quot;e1e8&quot;,
+  &quot;san&quot;: &quot;Re8+&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;check&quot;,
+      &quot;text&quot;: &quot;Check: your move attacks the king on h8.&quot;,
+      &quot;evidence&quot;: {
+        &quot;king&quot;: &quot;h8&quot;,
+        &quot;attackers&quot;: [
+          &quot;e8&quot;
+        ]
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;allows-capture&quot;,
+      &quot;text&quot;: &quot;Watch out: Bxe8 legally captures your rook on e8.&quot;,
+      &quot;evidence&quot;: {
+        &quot;capture&quot;: &quot;f7e8&quot;,
+        &quot;target&quot;: &quot;e8&quot;,
+        &quot;piece&quot;: &quot;r&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Check: your move attacks the king on h8.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 5,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 10
+    },
+    &quot;history&quot;: {
+      &quot;verified&quot;: true,
+      &quot;plies&quot;: 1
+    }
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;intermediateAnalysis&quot;: {
+    &quot;maxIntermediateNodes&quot;: 50000,
+    &quot;nodes&quot;: 5,
+    &quot;status&quot;: &quot;refuted&quot;
+  }
+}</pre></details></article><article data-kind="comment"><header><h2>moved capturer</h2><span>Be4+</span></header><p>moved capturer</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/r7/1P1P1B2/8/7K w - - 0 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black">♜</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece white">♙</span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece white">♗</span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After Be4+</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/r3B3/1P1P4/8/7K b - - 1 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black">♜</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece white">♗</span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece white">♙</span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">Intermediate check: every legal reply still lets you recapture the rook.</p><details><summary>Inspect concepts and evidence · 5 defender replies</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v12&quot;,
+  &quot;before&quot;: &quot;8/7k/8/8/r7/1P1P1B2/8/7K w - - 0 2&quot;,
+  &quot;after&quot;: &quot;8/7k/8/8/r3B3/1P1P4/8/7K b - - 1 2&quot;,
+  &quot;move&quot;: &quot;f3e4&quot;,
+  &quot;san&quot;: &quot;Be4+&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;check&quot;,
+      &quot;text&quot;: &quot;Check: your move attacks the king on h7.&quot;,
+      &quot;evidence&quot;: {
+        &quot;king&quot;: &quot;h7&quot;,
+        &quot;attackers&quot;: [
+          &quot;e4&quot;
+        ]
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;allows-capture&quot;,
+      &quot;text&quot;: &quot;Watch out: Rxe4 legally captures your bishop on e4.&quot;,
+      &quot;evidence&quot;: {
+        &quot;capture&quot;: &quot;a4e4&quot;,
+        &quot;target&quot;: &quot;e4&quot;,
+        &quot;piece&quot;: &quot;b&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;intermediate-check&quot;,
+      &quot;text&quot;: &quot;Intermediate check: every legal reply still lets you recapture the rook.&quot;,
+      &quot;evidence&quot;: {
+        &quot;history&quot;: {
+          &quot;start&quot;: &quot;r7/7k/8/8/N7/1P1P1B2/8/7K b - - 0 1&quot;,
+          &quot;moves&quot;: [
+            &quot;a8a4&quot;
+          ]
+        },
+        &quot;prior&quot;: {
+          &quot;move&quot;: &quot;a8a4&quot;,
+          &quot;piece&quot;: &quot;r&quot;,
+          &quot;captured&quot;: &quot;n&quot;,
+          &quot;square&quot;: &quot;a4&quot;
+        },
+        &quot;directRecaptures&quot;: [
+          &quot;b3a4&quot;
+        ],
+        &quot;played&quot;: &quot;f3e4&quot;,
+        &quot;proof&quot;: {
+          &quot;baselineFen&quot;: &quot;8/7k/8/8/r3B3/1P1P4/8/7K b - - 1 2&quot;,
+          &quot;color&quot;: &quot;w&quot;,
+          &quot;initialBalance&quot;: 0,
+          &quot;horizonPliesAfterMove&quot;: 3,
+          &quot;witnesses&quot;: [
+            {
+              &quot;reply&quot;: &quot;h7g8&quot;,
+              &quot;target&quot;: {
+                &quot;square&quot;: &quot;a4&quot;,
+                &quot;type&quot;: &quot;r&quot;
+              },
+              &quot;recapture&quot;: &quot;b3a4&quot;,
+              &quot;terminalMate&quot;: false,
+              &quot;worstGain&quot;: 5,
+              &quot;responses&quot;: [
+                {
+                  &quot;move&quot;: &quot;g8h8&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g8g7&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g8f7&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g8f8&quot;,
+                  &quot;gain&quot;: 5
+                }
+              ]
+            },
+            {
+              &quot;reply&quot;: &quot;h7h8&quot;,
+              &quot;target&quot;: {
+                &quot;square&quot;: &quot;a4&quot;,
+                &quot;type&quot;: &quot;r&quot;
+              },
+              &quot;recapture&quot;: &quot;b3a4&quot;,
+              &quot;terminalMate&quot;: false,
+              &quot;worstGain&quot;: 5,
+              &quot;responses&quot;: [
+                {
+                  &quot;move&quot;: &quot;h8g7&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;h8g8&quot;,
+                  &quot;gain&quot;: 5
+                }
+              ]
+            },
+            {
+              &quot;reply&quot;: &quot;h7h6&quot;,
+              &quot;target&quot;: {
+                &quot;square&quot;: &quot;a4&quot;,
+                &quot;type&quot;: &quot;r&quot;
+              },
+              &quot;recapture&quot;: &quot;b3a4&quot;,
+              &quot;terminalMate&quot;: false,
+              &quot;worstGain&quot;: 5,
+              &quot;responses&quot;: [
+                {
+                  &quot;move&quot;: &quot;h6g7&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;h6h5&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;h6g5&quot;,
+                  &quot;gain&quot;: 5
+                }
+              ]
+            },
+            {
+              &quot;reply&quot;: &quot;h7g7&quot;,
+              &quot;target&quot;: {
+                &quot;square&quot;: &quot;a4&quot;,
+                &quot;type&quot;: &quot;r&quot;
+              },
+              &quot;recapture&quot;: &quot;b3a4&quot;,
+              &quot;terminalMate&quot;: false,
+              &quot;worstGain&quot;: 5,
+              &quot;responses&quot;: [
+                {
+                  &quot;move&quot;: &quot;g7f8&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g7g8&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g7h8&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g7h6&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g7f6&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g7f7&quot;,
+                  &quot;gain&quot;: 5
+                }
+              ]
+            },
+            {
+              &quot;reply&quot;: &quot;a4e4&quot;,
+              &quot;target&quot;: {
+                &quot;square&quot;: &quot;e4&quot;,
+                &quot;type&quot;: &quot;r&quot;
+              },
+              &quot;recapture&quot;: &quot;d3e4&quot;,
+              &quot;terminalMate&quot;: false,
+              &quot;worstGain&quot;: 2,
+              &quot;responses&quot;: [
+                {
+                  &quot;move&quot;: &quot;h7g8&quot;,
+                  &quot;gain&quot;: 2
+                },
+                {
+                  &quot;move&quot;: &quot;h7h8&quot;,
+                  &quot;gain&quot;: 2
+                },
+                {
+                  &quot;move&quot;: &quot;h7h6&quot;,
+                  &quot;gain&quot;: 2
+                },
+                {
+                  &quot;move&quot;: &quot;h7g6&quot;,
+                  &quot;gain&quot;: 2
+                },
+                {
+                  &quot;move&quot;: &quot;h7g7&quot;,
+                  &quot;gain&quot;: 2
+                }
+              ]
+            }
+          ]
+        }
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Intermediate check: every legal reply still lets you recapture the rook.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 6,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 12
+    },
+    &quot;history&quot;: {
+      &quot;verified&quot;: true,
+      &quot;plies&quot;: 1
+    }
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;intermediateAnalysis&quot;: {
+    &quot;maxIntermediateNodes&quot;: 50000,
+    &quot;nodes&quot;: 36,
+    &quot;status&quot;: &quot;proved&quot;
+  }
+}</pre></details></article><article data-kind="comment"><header><h2>capture before recapture</h2><span>Nxg5</span></header><p>capture before recapture</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 8/6k1/8/6p1/3r4/4PN2/1B6/7K w - - 0 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black">♚</span><small>g7</small></div><div class="square light " title="h7"><span class="piece black"></span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black">♟</span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black">♜</span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece white">♙</span><small>e3</small></div><div class="square light " title="f3"><span class="piece white">♘</span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece white">♗</span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After Nxg5</h3><div class="board" role="img" aria-label="Chess position: 8/6k1/8/6N1/3r4/4P3/1B6/7K b - - 0 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black">♚</span><small>g7</small></div><div class="square light " title="h7"><span class="piece black"></span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece white">♘</span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black">♜</span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece white">♙</span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece white">♗</span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">Intermediate capture: every legal reply still lets you recapture the rook.</p><details><summary>Inspect concepts and evidence · 12 defender replies</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v12&quot;,
+  &quot;before&quot;: &quot;8/6k1/8/6p1/3r4/4PN2/1B6/7K w - - 0 2&quot;,
+  &quot;after&quot;: &quot;8/6k1/8/6N1/3r4/4P3/1B6/7K b - - 0 2&quot;,
+  &quot;move&quot;: &quot;f3g5&quot;,
+  &quot;san&quot;: &quot;Nxg5&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;pawn-majority&quot;,
+      &quot;evidence&quot;: {
+        &quot;wing&quot;: &quot;kingside&quot;,
+        &quot;files&quot;: &quot;efgh&quot;,
+        &quot;own&quot;: 1,
+        &quot;enemy&quot;: 0
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;Kingside pawn majority: 1 pawns against 0.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;file-opening&quot;,
+      &quot;evidence&quot;: {
+        &quot;file&quot;: &quot;g&quot;
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;The g-file is now open: no pawns remain on it.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;advanced-knight&quot;,
+      &quot;evidence&quot;: {
+        &quot;square&quot;: &quot;g5&quot;,
+        &quot;relativeRank&quot;: 5
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;Your knight on g5 reaches your fifth rank.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;material-balance&quot;,
+      &quot;evidence&quot;: {
+        &quot;own&quot;: 7,
+        &quot;enemy&quot;: 5,
+        &quot;delta&quot;: 2,
+        &quot;values&quot;: {
+          &quot;p&quot;: 1,
+          &quot;n&quot;: 3,
+          &quot;b&quot;: 3,
+          &quot;r&quot;: 5,
+          &quot;q&quot;: 9,
+          &quot;k&quot;: 0
+        }
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;Nominal material balance: 2 pawn-value points ahead.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;capture&quot;,
+      &quot;text&quot;: &quot;You capture the pawn on g5.&quot;,
+      &quot;evidence&quot;: {
+        &quot;from&quot;: &quot;f3&quot;,
+        &quot;to&quot;: &quot;g5&quot;,
+        &quot;captured&quot;: &quot;p&quot;,
+        &quot;enPassant&quot;: false
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;profitable-capture&quot;,
+      &quot;text&quot;: &quot;Your capture gains material through every immediate reply; minimum nominal gain 1.&quot;,
+      &quot;evidence&quot;: {
+        &quot;capture&quot;: &quot;f3g5&quot;,
+        &quot;proof&quot;: {
+          &quot;horizonPliesAfterCapture&quot;: 1,
+          &quot;materialValues&quot;: {
+            &quot;p&quot;: 1,
+            &quot;n&quot;: 3,
+            &quot;b&quot;: 3,
+            &quot;r&quot;: 5,
+            &quot;q&quot;: 9,
+            &quot;k&quot;: 0
+          },
+          &quot;minimumGain&quot;: 1,
+          &quot;witnesses&quot;: [
+            {
+              &quot;reply&quot;: &quot;g7f8&quot;,
+              &quot;gain&quot;: 1
+            },
+            {
+              &quot;reply&quot;: &quot;g7g8&quot;,
+              &quot;gain&quot;: 1
+            },
+            {
+              &quot;reply&quot;: &quot;g7h8&quot;,
+              &quot;gain&quot;: 1
+            },
+            {
+              &quot;reply&quot;: &quot;g7h6&quot;,
+              &quot;gain&quot;: 1
+            },
+            {
+              &quot;reply&quot;: &quot;g7g6&quot;,
+              &quot;gain&quot;: 1
+            },
+            {
+              &quot;reply&quot;: &quot;g7f6&quot;,
+              &quot;gain&quot;: 1
+            }
+          ]
+        }
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;intermediate-capture&quot;,
+      &quot;text&quot;: &quot;Intermediate capture: every legal reply still lets you recapture the rook.&quot;,
+      &quot;evidence&quot;: {
+        &quot;history&quot;: {
+          &quot;start&quot;: &quot;3r4/6k1/8/6p1/3N4/4PN2/1B6/7K b - - 0 1&quot;,
+          &quot;moves&quot;: [
+            &quot;d8d4&quot;
+          ]
+        },
+        &quot;prior&quot;: {
+          &quot;move&quot;: &quot;d8d4&quot;,
+          &quot;piece&quot;: &quot;r&quot;,
+          &quot;captured&quot;: &quot;n&quot;,
+          &quot;square&quot;: &quot;d4&quot;
+        },
+        &quot;directRecaptures&quot;: [
+          &quot;e3d4&quot;,
+          &quot;f3d4&quot;,
+          &quot;b2d4&quot;
+        ],
+        &quot;played&quot;: &quot;f3g5&quot;,
+        &quot;proof&quot;: {
+          &quot;baselineFen&quot;: &quot;8/6k1/8/6N1/3r4/4P3/1B6/7K b - - 0 2&quot;,
+          &quot;color&quot;: &quot;w&quot;,
+          &quot;initialBalance&quot;: 2,
+          &quot;horizonPliesAfterMove&quot;: 3,
+          &quot;witnesses&quot;: [
+            {
+              &quot;reply&quot;: &quot;g7f8&quot;,
+              &quot;target&quot;: {
+                &quot;square&quot;: &quot;d4&quot;,
+                &quot;type&quot;: &quot;r&quot;
+              },
+              &quot;recapture&quot;: &quot;e3d4&quot;,
+              &quot;terminalMate&quot;: false,
+              &quot;worstGain&quot;: 5,
+              &quot;responses&quot;: [
+                {
+                  &quot;move&quot;: &quot;f8g8&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;f8g7&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;f8e7&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;f8e8&quot;,
+                  &quot;gain&quot;: 5
+                }
+              ]
+            },
+            {
+              &quot;reply&quot;: &quot;g7g8&quot;,
+              &quot;target&quot;: {
+                &quot;square&quot;: &quot;d4&quot;,
+                &quot;type&quot;: &quot;r&quot;
+              },
+              &quot;recapture&quot;: &quot;e3d4&quot;,
+              &quot;terminalMate&quot;: false,
+              &quot;worstGain&quot;: 5,
+              &quot;responses&quot;: [
+                {
+                  &quot;move&quot;: &quot;g8h8&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g8g7&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g8f8&quot;,
+                  &quot;gain&quot;: 5
+                }
+              ]
+            },
+            {
+              &quot;reply&quot;: &quot;g7h8&quot;,
+              &quot;target&quot;: {
+                &quot;square&quot;: &quot;d4&quot;,
+                &quot;type&quot;: &quot;r&quot;
+              },
+              &quot;recapture&quot;: &quot;e3d4&quot;,
+              &quot;terminalMate&quot;: false,
+              &quot;worstGain&quot;: 5,
+              &quot;responses&quot;: [
+                {
+                  &quot;move&quot;: &quot;h8g7&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;h8g8&quot;,
+                  &quot;gain&quot;: 5
+                }
+              ]
+            },
+            {
+              &quot;reply&quot;: &quot;g7h6&quot;,
+              &quot;target&quot;: {
+                &quot;square&quot;: &quot;d4&quot;,
+                &quot;type&quot;: &quot;r&quot;
+              },
+              &quot;recapture&quot;: &quot;e3d4&quot;,
+              &quot;terminalMate&quot;: false,
+              &quot;worstGain&quot;: 2,
+              &quot;responses&quot;: [
+                {
+                  &quot;move&quot;: &quot;h6g7&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;h6h5&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;h6g5&quot;,
+                  &quot;gain&quot;: 2
+                },
+                {
+                  &quot;move&quot;: &quot;h6g6&quot;,
+                  &quot;gain&quot;: 5
+                }
+              ]
+            },
+            {
+              &quot;reply&quot;: &quot;g7g6&quot;,
+              &quot;target&quot;: {
+                &quot;square&quot;: &quot;d4&quot;,
+                &quot;type&quot;: &quot;r&quot;
+              },
+              &quot;recapture&quot;: &quot;e3d4&quot;,
+              &quot;terminalMate&quot;: false,
+              &quot;worstGain&quot;: 2,
+              &quot;responses&quot;: [
+                {
+                  &quot;move&quot;: &quot;g6g7&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g6h6&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g6h5&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g6g5&quot;,
+                  &quot;gain&quot;: 2
+                },
+                {
+                  &quot;move&quot;: &quot;g6f5&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;g6f6&quot;,
+                  &quot;gain&quot;: 5
+                }
+              ]
+            },
+            {
+              &quot;reply&quot;: &quot;g7f6&quot;,
+              &quot;target&quot;: {
+                &quot;square&quot;: &quot;d4&quot;,
+                &quot;type&quot;: &quot;r&quot;
+              },
+              &quot;recapture&quot;: &quot;e3d4&quot;,
+              &quot;terminalMate&quot;: false,
+              &quot;worstGain&quot;: 2,
+              &quot;responses&quot;: [
+                {
+                  &quot;move&quot;: &quot;f6e7&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;f6g7&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;f6g6&quot;,
+                  &quot;gain&quot;: 5
+                },
+                {
+                  &quot;move&quot;: &quot;f6g5&quot;,
+                  &quot;gain&quot;: 2
+                },
+                {
+                  &quot;move&quot;: &quot;f6f5&quot;,
+                  &quot;gain&quot;: 5
+                }
+              ]
+            }
+          ]
+        }
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Intermediate capture: every legal reply still lets you recapture the rook.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 7,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 7
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 8
+    },
+    &quot;history&quot;: {
+      &quot;verified&quot;: true,
+      &quot;plies&quot;: 1
+    }
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;intermediateAnalysis&quot;: {
+    &quot;maxIntermediateNodes&quot;: 50000,
+    &quot;nodes&quot;: 43,
+    &quot;status&quot;: &quot;proved&quot;
+  }
+}</pre></details></article><article data-kind="comment"><header><h2>exhausted</h2><span>Re8+</span></header><p>exhausted</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 7k/8/8/8/r7/1P6/8/4R2K w - - 0 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black">♚</span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black"></span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black">♜</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece white">♖</span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After Re8+</h3><div class="board" role="img" aria-label="Chess position: 4R2k/8/8/8/r7/1P6/8/7K b - - 1 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece white">♖</span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black">♚</span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black"></span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black">♜</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">Check: your move attacks the king on h8.</p><details><summary>Inspect concepts and evidence</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v12&quot;,
+  &quot;before&quot;: &quot;7k/8/8/8/r7/1P6/8/4R2K w - - 0 2&quot;,
+  &quot;after&quot;: &quot;4R2k/8/8/8/r7/1P6/8/7K b - - 1 2&quot;,
+  &quot;move&quot;: &quot;e1e8&quot;,
+  &quot;san&quot;: &quot;Re8+&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;check&quot;,
+      &quot;text&quot;: &quot;Check: your move attacks the king on h8.&quot;,
+      &quot;evidence&quot;: {
+        &quot;king&quot;: &quot;h8&quot;,
+        &quot;attackers&quot;: [
+          &quot;e8&quot;
+        ]
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Check: your move attacks the king on h8.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 3,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 4
+    },
+    &quot;history&quot;: {
+      &quot;verified&quot;: true,
+      &quot;plies&quot;: 1
+    }
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;intermediateAnalysis&quot;: {
+    &quot;maxIntermediateNodes&quot;: 0,
+    &quot;nodes&quot;: 1,
+    &quot;status&quot;: &quot;exhausted&quot;
+  }
+}</pre></details></article><article data-kind="comment"><header><h2>no direct recapture</h2><span>Re8+</span></header><p>no direct recapture</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 7k/8/8/8/r7/8/8/4R2K w - - 0 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black">♚</span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black"></span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black">♜</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece white">♖</span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After Re8+</h3><div class="board" role="img" aria-label="Chess position: 4R2k/8/8/8/r7/8/8/7K b - - 1 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece white">♖</span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black">♚</span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black"></span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black">♜</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">Check: your move attacks the king on h8.</p><details><summary>Inspect concepts and evidence</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v9&quot;,
+  &quot;before&quot;: &quot;7k/8/8/8/r7/8/8/4R2K w - - 0 2&quot;,
+  &quot;after&quot;: &quot;4R2k/8/8/8/r7/8/8/7K b - - 1 2&quot;,
+  &quot;move&quot;: &quot;e1e8&quot;,
+  &quot;san&quot;: &quot;Re8+&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;check&quot;,
+      &quot;text&quot;: &quot;Check: your move attacks the king on h8.&quot;,
+      &quot;evidence&quot;: {
+        &quot;king&quot;: &quot;h8&quot;,
+        &quot;attackers&quot;: [
+          &quot;e8&quot;
+        ]
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Check: your move attacks the king on h8.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 3,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 4
+    },
+    &quot;history&quot;: {
+      &quot;verified&quot;: true,
+      &quot;plies&quot;: 1
+    }
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  }
+}</pre></details></article><article data-kind="comment"><header><h2>countermate after recapture</h2><span>Re8+</span></header><p>countermate after recapture</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 7k/2b5/8/8/r6q/1P6/6PP/4R1NK w - - 0 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black">♚</span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black">♝</span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black"></span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black">♜</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black">♛</span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece white">♙</span><small>g2</small></div><div class="square dark " title="h2"><span class="piece white">♙</span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece white">♖</span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece white">♘</span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After Re8+</h3><div class="board" role="img" aria-label="Chess position: 4R2k/2b5/8/8/r6q/1P6/6PP/6NK b - - 1 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece white">♖</span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black">♚</span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black">♝</span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black"></span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black">♜</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black">♛</span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece white">♙</span><small>g2</small></div><div class="square dark " title="h2"><span class="piece white">♙</span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece white">♘</span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">Check: your move attacks the king on h8.</p><details><summary>Inspect concepts and evidence</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v12&quot;,
+  &quot;before&quot;: &quot;7k/2b5/8/8/r6q/1P6/6PP/4R1NK w - - 0 2&quot;,
+  &quot;after&quot;: &quot;4R2k/2b5/8/8/r6q/1P6/6PP/6NK b - - 1 2&quot;,
+  &quot;move&quot;: &quot;e1e8&quot;,
+  &quot;san&quot;: &quot;Re8+&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;check&quot;,
+      &quot;text&quot;: &quot;Check: your move attacks the king on h8.&quot;,
+      &quot;evidence&quot;: {
+        &quot;king&quot;: &quot;h8&quot;,
+        &quot;attackers&quot;: [
+          &quot;e8&quot;
+        ]
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Check: your move attacks the king on h8.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 3,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 4
+    },
+    &quot;history&quot;: {
+      &quot;verified&quot;: true,
+      &quot;plies&quot;: 1
+    }
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 3,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;intermediateAnalysis&quot;: {
+    &quot;maxIntermediateNodes&quot;: 50000,
+    &quot;nodes&quot;: 24,
+    &quot;status&quot;: &quot;refuted&quot;
+  }
+}</pre></details></article><article data-kind="comment"><header><h2>draw after recapture</h2><span>Be2+</span></header><p>draw after recapture</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 8/8/8/7k/n7/1K6/8/5B2 w - - 0 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black"></span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black">♚</span><small>h5</small></div><div class="square light " title="a4"><span class="piece black">♞</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♔</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece white">♗</span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece black"></span><small>h1</small></div></div></div><div><h3>After Be2+</h3><div class="board" role="img" aria-label="Chess position: 8/8/8/7k/n7/1K6/4B3/8 b - - 1 2"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black"></span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black">♚</span><small>h5</small></div><div class="square light " title="a4"><span class="piece black">♞</span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♔</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece white">♗</span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece black"></span><small>h1</small></div></div></div></div><p class="comment">Check: your move attacks the king on h5.</p><details><summary>Inspect concepts and evidence</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v12&quot;,
+  &quot;before&quot;: &quot;8/8/8/7k/n7/1K6/8/5B2 w - - 0 2&quot;,
+  &quot;after&quot;: &quot;8/8/8/7k/n7/1K6/4B3/8 b - - 1 2&quot;,
+  &quot;move&quot;: &quot;f1e2&quot;,
+  &quot;san&quot;: &quot;Be2+&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;check&quot;,
+      &quot;text&quot;: &quot;Check: your move attacks the king on h5.&quot;,
+      &quot;evidence&quot;: {
+        &quot;king&quot;: &quot;h5&quot;,
+        &quot;attackers&quot;: [
+          &quot;e2&quot;
+        ]
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Check: your move attacks the king on h5.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 5,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 6
+    },
+    &quot;history&quot;: {
+      &quot;verified&quot;: true,
+      &quot;plies&quot;: 1
+    }
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;intermediateAnalysis&quot;: {
+    &quot;maxIntermediateNodes&quot;: 50000,
+    &quot;nodes&quot;: 3,
+    &quot;status&quot;: &quot;refuted&quot;
+  }
+}</pre></details></article></main><footer>Color-reflected versions are also verified in results.json. Expand evidence to inspect every defender reply and capture witness.</footer><script>document.querySelectorAll('button[data-filter]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('button[data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));document.querySelectorAll('article').forEach(card=>card.hidden=button.dataset.filter!=='all'&&card.dataset.kind!==button.dataset.filter)}));</script></html>
