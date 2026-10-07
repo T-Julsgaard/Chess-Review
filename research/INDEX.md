@@ -103,8 +103,9 @@ No promotion records yet.
 | E051 | [All-reply interference combinations](experiments/E051-interference-combinations/RESULT.md) | complete | 1,775 cumulative tests; 1,610 synthetic cases; 265 verified names; before-proven defensive duties, all-reply material gains and counterfactual recaptures; exact repeat/clean and saved-proof replay | E052 investigate desperado captures with threatened units, legal escape comparisons and finite material witnesses; cutoff cancelled |
 | E052 | [Finite desperado capture comparisons](experiments/E052-desperado-captures/RESULT.md) | complete | 1,839 cumulative tests; 1,668 synthetic cases; 267 verified names; all-quiet-alternative unit losses and all-acceptance conditional capture benefits; exact repeat/clean and saved-proof replay | E053 investigate cross-checks with before-check rays, actual interposition and countercheck; cutoff cancelled |
 | E053 | [Legal cross-check mechanisms](experiments/E053-cross-checks/RESULT.md) | complete | 1,946 cumulative tests; 1,768 synthetic cases; 268 verified names; direct/discovered/double counterchecks, checker captures, king discoveries, promotions/EP and complete evasions; exact repeat/clean and saved-proof replay | E054 investigate attraction, decoy and blocking combinations with all-defense mate and causal-role proofs; cutoff cancelled |
+| E054 | [Causal mating combination labels](experiments/E054-causal-mating-combinations/RESULT.md) | complete | 2,033 cumulative tests; 1,848 synthetic cases; 271 verified names; attraction, decoy and escape-blocking labels require all-defense mate and exact causal-role references; exact repeat/clean and saved-proof replay | E055 investigate history-confirmed intermediate sacrifices with available recaptures and full mating proofs; cutoff cancelled |
 
-Allocate the next unused ID in each series: `E054`, `D003`, `F018`, `P001`.
+Allocate the next unused ID in each series: `E055`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.

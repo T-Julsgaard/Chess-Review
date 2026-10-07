@@ -48,12 +48,12 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E053 cross-checks](experiments/E053-cross-checks/RESULT.md)
-adds short legal countercheck comments with explicit block, capture or king
-discovery mechanisms and complete evasions. Coverage reaches 268 verified names.
-Its [cumulative tracker](experiments/E053-cross-checks/evidence/concept-status.md)
+[E054 causal mating combinations](experiments/E054-causal-mating-combinations/RESULT.md)
+adds short attraction, decoy and flight-blocking comments requiring complete
+mate and causal-role proofs. Coverage reaches 271 verified names.
+Its [cumulative tracker](experiments/E054-causal-mating-combinations/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E053-cross-checks/evidence/demo.html) is runnable
+list; its [demo](experiments/E054-causal-mating-combinations/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 
