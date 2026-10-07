@@ -48,12 +48,12 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E041 unique mate defenses](experiments/E041-unique-mate-defense/RESULT.md)
-adds short only-move explanations backed by complete immediate-mate safety
-and a mating refutation of every legal alternative, following quiet mating nets.
-Its [cumulative tracker](experiments/E041-unique-mate-defense/evidence/concept-status.md)
+[E042 defensive counterattacks](experiments/E042-defensive-counterattacks/RESULT.md)
+adds checking defenses and conditional sacrifice offers backed by unique
+immediate-mate safety, all-alternative refutations and accepted-loss witnesses.
+Its [cumulative tracker](experiments/E042-defensive-counterattacks/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E041-unique-mate-defense/evidence/demo.html) is runnable
+list; its [demo](experiments/E042-defensive-counterattacks/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 
