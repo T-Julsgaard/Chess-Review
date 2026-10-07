@@ -72,7 +72,7 @@ No promotion records yet.
 
 | E026 | [Relative/cross-pin and defender-removal proofs](experiments/E026-pin-proofs/RESULT.md) | complete | 536 cumulative tests; 496 synthetic cases; 129 verified names; conditional pin/all-defense removal proofs; exact clean replay | E027 proven tactical escapes and short threat-response labels; usage cutoff active |
 | E027 | [Short defensive resources](experiments/E027-defensive-resources/RESULT.md) | complete | 582 cumulative tests; 536 synthetic cases; 140 verified names; finite immediate defense and luft; exact repeat/clean replay | E028 named mating patterns with legal witnesses and narrow sourced definitions; cutoff active |
-| E028 | [Named mating-pattern explanations](experiments/E028-mating-patterns/RESULT.md) | planned | Actual legal checkmate plus narrow sourced geometry and explicit piece roles | Implement independent replay and authored near misses |
+| E028 | [Named mating-pattern explanations](experiments/E028-mating-patterns/RESULT.md) | complete | 749 cumulative tests; 700 synthetic cases; 161 verified names; nine named templates and legal role/action mates; exact repeat/clean replay | E029 bounded mate-in-two/three and missed-mate witnesses with explicit budgets; cutoff active |
 
 Allocate the next unused ID in each series: `E029`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.

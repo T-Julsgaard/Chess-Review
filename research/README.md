@@ -48,12 +48,12 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E027 defensive resource expansion](experiments/E027-defensive-resources/RESULT.md)
-adds short proven piece defenses, line blocks, king escapes and back-rank luft
-on top of E026's conditional pin and defender-removal proofs.
-Its [cumulative tracker](experiments/E027-defensive-resources/evidence/concept-status.md)
+[E028 mating-pattern expansion](experiments/E028-mating-patterns/RESULT.md)
+adds short named mating patterns and checker/helper/action roles to E027's
+proven piece defenses, line blocks, king escapes and back-rank luft.
+Its [cumulative tracker](experiments/E028-mating-patterns/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E027-defensive-resources/evidence/demo.html) is runnable
+list; its [demo](experiments/E028-mating-patterns/evidence/demo.html) is runnable
 without the extension. Further coach research is active under the authorized
 five-hour usage cutoff.
 
