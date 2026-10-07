@@ -48,12 +48,12 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E049 overloaded defenders](experiments/E049-overloaded-defenders/RESULT.md)
-adds conditional overload/deflection comments with two legal defensive duties
-and material gain surviving every immediate reply. Coverage reaches 261 verified names.
-Its [cumulative tracker](experiments/E049-overloaded-defenders/evidence/concept-status.md)
+[E050 square clearance and material recovery](experiments/E050-square-clearance-and-recovery/RESULT.md)
+adds all-defense mate on the vacated square and conditional temporary-sacrifice
+recovery through every immediate reply. Coverage reaches 264 verified names.
+Its [cumulative tracker](experiments/E050-square-clearance-and-recovery/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E049-overloaded-defenders/evidence/demo.html) is runnable
+list; its [demo](experiments/E050-square-clearance-and-recovery/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 
