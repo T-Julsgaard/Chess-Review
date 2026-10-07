@@ -19,3 +19,8 @@ sequence, FEN, puzzle or evaluation imported into fixtures.
 
 All evaluated boards are authored synthetic fixtures. Named labels state the
 observed terminal pattern only. King placement does not assert actual castling.
+
+The [dedicated strict Lolli definition](https://www.chessworld.net/lollis-mate.asp)
+explicitly names the queen's g7/g2/b7/b2 landing squares and both f6/h6 pawn
+support forms. The preregistered addendum includes both protecting pawn files
+and their horizontal mirrors, without broader pawn-cage/sequence claims.

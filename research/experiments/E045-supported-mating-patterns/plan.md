@@ -49,3 +49,14 @@ queen's route; use g6 bishop support instead. The initial central queen pattern
 left f7/h7 open and was not mate; explicit enemy pawn blockers make the intended
 central-mate negative true. All 60 exposed tests now pass; none of the detector
 gates were weakened. These corrections are fixture design, not confirmation.
+The originally refuted h7-pawn blocker is additionally retained as an explicit
+negative fixture in both colors and file mirrors. This adds four tests/cases
+(64 new tests). The earlier cumulative pilot began before this extra fixture;
+its output is superseded, and rerun after the revised fixture inputs stabilize.
+
+Scope addendum before decisive evaluation: the dedicated ChessWorld Lolli page
+explicitly describes both f6 and h6 advanced pawn support for Qg7#, including
+file-mirrored queenside endings. Add the equally verifiable h6/a6 supporting
+pawn variant and authored g8/h8 endings in both colors/file mirrors (eight more
+cases/tests, 72 new tests). Existing gates stay intact; terminal support is
+proved directly. Repeat targeted and cumulative verification after this change.
