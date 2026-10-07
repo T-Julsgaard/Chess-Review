@@ -70,13 +70,13 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E069 checking invasions](experiments/E069-checking-invasions/RESULT.md)
-adds separate rook and queen checking-invasion comments with verified rank
-entry, direct check rays and every full-history legal reply. Coverage reaches 297 verified
+[E070 pawn-supported knight outposts](experiments/E070-knight-outposts/RESULT.md)
+adds outpost and advanced-outpost comments with legal pawn support and complete
+pre-promotion enemy pawn-route proofs. Coverage reaches 300 verified
 names.
-Its [cumulative tracker](experiments/E069-checking-invasions/evidence/concept-status.md)
+Its [cumulative tracker](experiments/E070-knight-outposts/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E069-checking-invasions/evidence/demo.html) is runnable
+list; its [demo](experiments/E070-knight-outposts/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 
