@@ -1,0 +1,30 @@
+import {Chess} from '../../../../lib/chess.js';import {setup} from '../../E021-structural-concepts/code/fixtures.mjs';export {reflect} from '../../E024-transitions/code/fixtures.mjs';
+function build(id,side,options={},positive=true){const k=side==='k',castle=k?'e8g8':'e8c8',first=options.first||(k?'g4g5':'a4a5'),idle=options.idle||(k?'a7a6':'h7h6'),move=options.move||(k?'h4h5':'b4b5'),extra={h8:null,e8:'k',h2:null,...(k?{h8:'r',g4:'P',h4:'P'}:{a8:'r',a4:'P',b4:'P',h7:'p'}),...options.extra};if(options.noCastle){extra.e8=null;extra[k?'g8':'c8']='k';extra[k?'h8':'a8']=null;extra[k?'f8':'d8']='r';}const start=setup(extra).replace(' w - ',` ${options.turn||(options.noCastle?'w':'b')} ${options.noCastle?'-':side} `),moves=options.moves||(options.noCastle?[first,idle]:[castle,first,idle]),c=new Chess(start);for(const m of moves)c.move(m);return{id:id+(k?'':'-queenside'),fen:c.fen(),...(!options.missingHistory?{history:{fen:start,moves}}:{}),move,pawnStormTags:true,expected:positive?['pawn-storm']:[],absent:positive?[]:['pawn-storm'],note:'Authored standard '+(k?'kingside':'queenside')+' storm counterpart',...options.profile,...(options.invalid?{invalid:true}:{})};}
+const pair=(id,config=()=>({}),positive=true)=>['k','q'].map(side=>build(id,side,config(side),positive));
+export const fixtures=[
+ ...pair('connected-advances'),
+ ...pair('double-advances',s=>s==='k'?{extra:{g4:null,h4:null,g2:'P',h2:'P'},first:'g2g4',move:'h2h4'}:{extra:{a4:null,b4:null,a2:'P',b2:'P'},first:'a2a4',move:'b2b4'}),
+ ...pair('staggered-connection',s=>s==='k'?{extra:{g4:null,g5:'P'},first:'g5g6'}:{extra:{a4:null,a5:'P'},first:'a5a6'}),
+ ...pair('capture-advances',s=>s==='k'?{extra:{f4:'P',g5:'n',h4:null,h5:'p'},first:'f4g5',move:'g4h5'}:{extra:{c4:'P',b5:'n',a4:null,a5:'p'},first:'c4b5',move:'b4a5'}),
+ ...pair('same-pawn-repeated',s=>s==='k'?{extra:{g4:null,h4:null,g3:'P',h5:'P'},first:'g3g4',move:'g4g5'}:{extra:{a4:null,b4:null,a3:'P',b5:'P'},first:'a3a4',move:'a4a5'},false),
+ ...pair('too-early',s=>s==='k'?{extra:{g4:null,h4:null,g2:'P',h2:'P'},first:'g2g3',move:'h2h3'}:{extra:{a4:null,b4:null,a2:'P',b2:'P'},first:'a2a3',move:'b2b3'},false),
+ ...pair('wrong-flank',s=>s==='k'?{extra:{a2:'P'},move:'a2a4'}:{extra:{h2:'P'},move:'h2h4'},false),
+ ...pair('separated-files',s=>s==='k'?{extra:{g4:null,f4:'P'},first:'f4f5'}:{extra:{b4:null,c4:'P'},first:'c4c5',move:'a4a5'},false),
+ ...pair('separated-ranks',s=>s==='k'?{extra:{g4:null,h4:null,g2:'P',h5:'P'},first:'g2g4',move:'h5h6'}:{extra:{a4:null,b4:null,a2:'P',b5:'P'},first:'a2a4',move:'b5b6'},false),
+ ...pair('missing-history',()=>({missingHistory:true}),false),
+ ...pair('history-without-castle',()=>({noCastle:true}),false),
+ ...pair('advance-before-castle',s=>({turn:'w',moves:s==='k'?['g4g5','e8g8']:['a4a5','e8c8']}),false),
+ ...pair('king-moved',s=>({idle:s==='k'?'g8h8':'c8b8'}),false),
+ ...pair('prior-pawn-captured',s=>s==='k'?{extra:{h5:'r'},idle:'h5g5'}:{extra:{a1:null,h1:'K',b5:'r'},idle:'b5a5'},false),
+ ...pair('prior-move-not-pawn',s=>s==='k'?{extra:{g4:null,g5:'P',b1:'N'},first:'b1c3'}:{extra:{a4:null,a5:'P',b1:'N'},first:'b1c3'},false),
+ ...pair('actual-not-pawn',()=>({extra:{b1:'N'},move:'b1c3'}),false),
+ ...pair('actual-pawn-can-be-taken',s=>({extra:s==='k'?{g6:'b'}:{c6:'b'}})),
+ ...pair('terminal-reply',s=>s==='k'?{extra:{a2:'P',b2:'P',f3:'q'}}:{extra:{a1:null,h1:'K',g2:'P',h2:'P',c3:'q'}}),
+ ...pair('ep-right-history',s=>s==='k'?{turn:'w',extra:{g4:null,h4:'p',g2:'P',f4:'P'},moves:['g2g4','e8g8','g4g5','a7a6'],move:'f4f5'}:{turn:'w',extra:{b4:null,a4:'p',b2:'P',c4:'P'},moves:['b2b4','e8c8','b4b5','h7h6'],move:'c4c5'}),
+ ...pair('actual-ep-capture',s=>s==='k'?{extra:{g4:null,h4:null,g2:'P',f2:'P',e4:'p'},first:'g2g4',move:'f2f4'}:{extra:{a4:null,b4:null,a2:'P',b2:'P',c4:'p'},first:'a2a4',move:'b2b4'}),
+ ...pair('actual-promotion',s=>s==='k'?{extra:{g4:null,h4:null,g6:'P',h6:'P'},moves:['e8g8','h6h7','g8h8','g6g7','h8g7'],move:'h7h8q'}:{extra:{a4:null,b4:null,a7:null,a6:'P',b6:'P'},moves:['e8c8','a6a7','c8d7','b6b7','d7c6'],move:'a7a8q'},false),
+ ...pair('actual-mate',s=>s==='k'?{extra:{a1:null,h6:'K',d8:'N',g4:null,h4:null,g6:'P',f6:'P',h7:'p'},first:'g6g7',idle:'f8e8',move:'f6f7'}:{extra:{a1:null,a6:'K',b5:'N',f8:'N',a4:null,b4:null,c6:'P',d6:'P'},first:'c6c7',idle:'d8e8',move:'d6d7'},false),
+ ...pair('illegal-actual',s=>({move:s==='k'?'h4h6':'b4b6',invalid:true}),false),
+ ...pair('disabled',()=>({profile:{pawnStormTags:false}}),false),
+ ...pair('zero-budget',()=>({profile:{maxPawnStormNodes:0}}),false),
+];
