@@ -2,6 +2,7 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import {Chess} from '../../../../lib/chess.js';import {openResearchData} from '../../../data-policy.mjs';
 import {explainMove,crossIds} from './cross.mjs';import {replay} from './replay.mjs';
 import {explainMove as parent} from '../../E052-desperado-captures/code/desperado.mjs';
+import {renderDemo} from './display.mjs';
 await openResearchData(['D001'],{purpose:'test'});const {fixtures,reflect}=await import('./fixtures.mjs');
 for(const f of fixtures.flatMap(f=>[f,reflect(f)]))test(f.id,()=>{
  if(f.invalid){assert.throws(()=>explainMove(f),/Illegal move/);return;}
@@ -50,4 +51,11 @@ test('live full history replays; mismatched counters, terminal roots and illegal
  assert.throws(()=>replay({...f,fen:f.fen.replace(' 1 2',' 2 2')},e));
  const dead=fixture('no-before-check'),c=new Chess(dead.fen);c.remove('a7');assert.throws(()=>explainMove({...dead,fen:c.fen()}),/terminal/);
  assert.throws(()=>explainMove(fixture('illegal-double-check-block')),/Illegal move/);
+});
+test('compact demo preserves teaching comments and board data while linking canonical certificates',()=>{
+ const f=fixture('knight-block'),result=explainMove(f),untouched=structuredClone(result);
+ const html=renderDemo([{fixture:f,result}]);assert.deepEqual(result,untouched);
+ assert.ok(html.includes(result.comment));assert.ok(html.includes('href="results.json"'));
+ assert.ok(html.includes('class="square'));assert.ok(html.includes('legalEnemyEvasions'));
+ assert.ok(!html.includes('initialBalance'));assert.ok(!html.includes('beforeCheckers'));
 });

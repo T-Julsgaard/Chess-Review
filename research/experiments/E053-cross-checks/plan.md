@@ -71,3 +71,12 @@ mate. Explicit mate takes precedence (US Chess 13A); ordinary checking moves
 at that boundary remain excluded. Detector and independent replay use the
 same rule separately. The exposed 96-case pilot predates this four-case
 addition; final targeted/cumulative checks and decisive runs use 100 new cases.
+
+Initial decisive runs at c7f1c28 matched and saved replay passed, but the
+retention gate failed: 3,090,979 bytes exceeded the preregistered 3 MB limit.
+Most duplication was complete certificates serialized again in demo cards.
+A local display adapter retains all teaching comments, boards and summary
+highlights, links canonical results.json, and omits duplicate bulk evidence.
+Full results/certificates remain unchanged. Test the display contract and
+rerun source/cumulative and main/repeat/clean checks at a new source revision;
+the original matched runs remain exposed development observations.
