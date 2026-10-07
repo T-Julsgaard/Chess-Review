@@ -75,7 +75,7 @@ No promotion records yet.
 | E028 | [Named mating-pattern explanations](experiments/E028-mating-patterns/RESULT.md) | complete | 749 cumulative tests; 700 synthetic cases; 161 verified names; nine named templates and legal role/action mates; exact repeat/clean replay | E029 bounded mate-in-two/three and missed-mate witnesses with explicit budgets; cutoff active |
 | E029 | [Bounded forced-mate comments](experiments/E029-forced-mates/RESULT.md) | complete | 785 cumulative tests; 728 synthetic cases; 165 verified names; opt-in mate-in-two/three and shorter missed-mate proofs; exact repeat/clean replay | E030 broaden verifiable short concepts; cutoff active |
 
-| E030 | [Mating sacrifice explanations](experiments/E030-mating-sacrifices/RESULT.md) | planned | Offered material with bounded all-defense mate proof; exact legal acceptance sets and clearance rays | Implement authored positives and independent replay |
+| E030 | [Mating sacrifice explanations](experiments/E030-mating-sacrifices/RESULT.md) | complete | 812 cumulative tests; 750 synthetic cases; sound material offers, exchange and clearance sacrifices; exact repeat/clean replay | E031 broaden verifiable short concepts; cutoff active |
 
 Allocate the next unused ID in each series: `E031`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
