@@ -48,12 +48,12 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E045 supported mating patterns](experiments/E045-supported-mating-patterns/RESULT.md)
-adds Damiano, Lolli and Hook terminal-mate comments with exact pawn support,
-knight-to-rook protection and escape-square witnesses.
-Its [cumulative tracker](experiments/E045-supported-mating-patterns/evidence/concept-status.md)
+[E046 coordinated mating patterns](experiments/E046-coordinated-mating-patterns/RESULT.md)
+adds Greco, Blackburne and Kill box terminal-mate comments with distinct
+bishop/knight duties and exact queen-to-rook box support.
+Its [cumulative tracker](experiments/E046-coordinated-mating-patterns/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E045-supported-mating-patterns/evidence/demo.html) is runnable
+list; its [demo](experiments/E046-coordinated-mating-patterns/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 

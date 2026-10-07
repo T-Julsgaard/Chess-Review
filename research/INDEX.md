@@ -95,8 +95,9 @@ No promotion records yet.
 | E043 | [Mating decoys and deflections](experiments/E043-mating-decoys/RESULT.md) | complete | 1,169 cumulative tests; 1,050 synthetic cases; 240 verified names; legal prior duties, attracted-king mates and geometric escape blockers; exact repeat/clean and saved-role replay | E044 investigate named mating combinations and coordinate offers; cutoff cancelled |
 | E044 | [Named mating combinations and coordinate offers](experiments/E044-named-mating-combinations/RESULT.md) | complete | 1,202 cumulative tests; 1,078 synthetic cases; 247 verified names; all-defense named mate witnesses and actual enemy castling history; exact repeat/clean and saved-proof replay | E045 investigate pawn-supported named mating patterns; cutoff cancelled |
 | E045 | [Supported named mating patterns](experiments/E045-supported-mating-patterns/RESULT.md) | complete | 1,274 cumulative tests; 1,146 synthetic cases; 250 verified names; exact queen/pawn and pawn/knight/rook roles; exact repeat/clean, saved-proof and negative replay | E046 investigate Greco, Blackburne and Kill box mating patterns; cutoff cancelled |
+| E046 | [Coordinated named mating patterns](experiments/E046-coordinated-mating-patterns/RESULT.md) | complete | 1,351 cumulative tests; 1,218 synthetic cases; 253 verified names; distinct Greco/Blackburne helper flights and exact Kill box geometry; exact repeat/clean, saved-proof and negative replay | E047 investigate Legal's mate with played history and terminal king-location concepts; cutoff cancelled |
 
-Allocate the next unused ID in each series: `E046`, `D003`, `F018`, `P001`.
+Allocate the next unused ID in each series: `E047`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
