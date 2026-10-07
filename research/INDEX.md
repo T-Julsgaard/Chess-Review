@@ -107,7 +107,9 @@ No promotion records yet.
 
 | E055 | [History-confirmed intermediate sacrifices](experiments/E055-intermediate-sacrifices/RESULT.md) | complete | 2,114 cumulative tests; 1,924 synthetic cases; 272 verified names; legal recapture alternatives, full capture history and all-defense mating offer; exact repeat/clean and saved-proof replay | E056 investigate blockade squares, knight and king blockades with exact legal enemy moves; cutoff cancelled |
 
-Allocate the next unused ID in each series: `E056`, `D003`, `F018`, `P001`.
+| E056 | [Pawn blockade squares and pieces](experiments/E056-pawn-blockades/RESULT.md) | complete | 2,233 cumulative tests; 2,036 synthetic cases; 276 verified names; actual moved nonpawn blocker, complete legal enemy replies, pawn captures/removal and terminal exclusions; exact repeat/clean and saved-proof replay | E057 investigate rear/side rook checks and checking distance with exact legal evasions; cutoff cancelled |
+
+Allocate the next unused ID in each series: `E057`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
