@@ -56,3 +56,16 @@ hashes, output hashes and metrics. Independent saved JSON replay, unchanged
 inherited fingerprints, original 1085 IDs unchanged, full new evidence <3 MB.
 Expected ~100 seconds each full run, overlap three runs. Synthetic mechanics
 only: real-game precision and human benefit remain unmeasured.
+
+Exposed smoke: the first multi-defender setup already attacked the nonmoving
+king and was refused; the king was relocated. A black promotion pawn was first
+authored on the wrong rank and corrected. The king-recapture test initially
+ended immediately by insufficient material; extra authored pawn material keeps
+that branch live. The pin-explanation gate now explicitly requires the king
+not already in check after the opponent capture, distinguishing a newly exposed
+king from an unrelated existing checking line. Independent replay checks the
+same requirement. A slider hidden behind its own ray blocker is not itself a
+direct defender before that blocker moves; its negative therefore requires no
+x-ray label, rather than incorrectly expecting a direct-pin label. Final tests
+retain all these legal/terminal distinctions. A PowerShell adapter command was
+refused at parsing; the task-owned Node adapter generated the runner instead.
