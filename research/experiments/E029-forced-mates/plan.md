@@ -60,3 +60,20 @@ the authored batch. Amend exposed costs/failures instead of hiding them.
 Coach goal/cutoff active; numerical research paused. Near 10% remaining in the
 actual 300-minute window checkpoint/commit, disable cutoff heartbeat and
 perform authorized normal shutdown without /f. No integration or pushes.
+
+## Exposed implementation notes
+
+An initial missed-two candidate Nd8-c6 actually retained mate in two through
+queen back-rank clearance. It correctly withheld the missed-mate label and is
+retained as an equivalent-fast-mate negative. A proposed mate-already-played
+setup illegally checked the nonmoving king; Qf7-h7 supplies a legal positive.
+The mate-in-three proof branches, so its comment states the all-defense claim
+instead of presenting a single continuation as forced. Unique lines include
+SAN and actual black-move ellipses; a shared final mating move is named only
+when every legal defense permits that same move and notation.
+
+The frozen demo assumes material-proof reply arrays. A display-only adapter
+supplies first-defense tree branches to its counter; canonical mate certificates
+retain their full tree schema. No frozen implementation is modified. The
+cumulative development tests passed before this extra negative was added;
+the amended batch is rerun before source commit and retained evaluation.
