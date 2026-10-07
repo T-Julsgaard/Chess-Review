@@ -49,3 +49,20 @@ exact ordered frozen E053 full-result hashes and unchanged original-list hash.
 Use compact E053 demo cards linked to full certificates. Full retained evidence
 below3MB; estimate ~170 seconds per full run, overlap three. Synthetic mechanics
 only; real-game precision/human learning value unmeasured.
+
+## Exposed smoke observations
+
+Reused queen/rook seeds have both defensive-duty deflection and self-blocking
+roles, while the bishop seed has two actual king-attraction mates. Adding an
+authored white Ne7 keeps the deflection mate but guards the g8 flight even if
+the accepted rook is removed, so the self-blocking labels correctly disappear.
+With Rd8, adding black Ne7 permits two legal acceptances (Rxg8 and Nxg8), both
+self-blocking and mating. With Rf8, Nxg8 instead permits Nf7+ Rxf7 and refutes
+the all-defense mate, despite Rxg8 still allowing the named line.
+
+A quiet mating pawn offer has legal declined defenses, but no matching named
+causal role. An authored Rh4 additionally permits declining with Rh6+ after
+f2f4; every own legal reply is nonmating, so the foundation and names fail.
+These are explicit positive/negative mechanics, not weakened gates or copied
+external examples. Same-row references keep full parent certificates readable
+once in results.json, with compact demo summaries inherited from E053.
