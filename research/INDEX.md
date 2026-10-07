@@ -117,7 +117,9 @@ No promotion records yet.
 
 | E060 | [Pawn breaks with legal next-turn witnesses](experiments/E060-pawn-breaks/RESULT.md) | complete | 2,663 cumulative tests; 2,440 synthetic cases; 285 verified names; complete legal replies and next-turn capture/advance sets, EP release and escape, pins/checks/capture refutations; exact repeat/clean; mechanics pass, planned 3MB storage target fails at 3.39MB | E061 investigate closed files with exact pawn occupancy and legal file access; prospectively budget display/evidence cost; continue isolated; cutoff cancelled |
 
-Allocate the next unused ID in each series: `E061`, `D003`, `F018`, `P001`.
+| E061 | [Closed files and actual slider access](experiments/E061-closed-files/RESULT.md) | complete | 2,822 cumulative tests; 2,592 synthetic cases; 286 verified names; complete pawn lists, both rays, every reply and legal file moves, pins/checks/captures/promotions/EP expiry; exact repeat/clean; mechanics pass, planned 4MB storage target fails at 4.11MB | E062 investigate pawn-space restriction of enemy king destinations with causal legal witnesses; budget complete overhead/display; continue isolated; cutoff cancelled |
+
+Allocate the next unused ID in each series: `E062`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
