@@ -48,12 +48,12 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E043 mating decoys](experiments/E043-mating-decoys/RESULT.md)
-adds conditional deflection, decoy and king-attraction explanations backed by
-all-defense mate, legal defender duties and exact mating continuations.
-Its [cumulative tracker](experiments/E043-mating-decoys/evidence/concept-status.md)
+[E044 named mating combinations](experiments/E044-named-mating-combinations/RESULT.md)
+adds smothered/back-rank combinations and coordinate rook/exchange offers
+backed by all-defense mate, exact mating patterns and actual castling history.
+Its [cumulative tracker](experiments/E044-named-mating-combinations/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E043-mating-decoys/evidence/demo.html) is runnable
+list; its [demo](experiments/E044-named-mating-combinations/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 

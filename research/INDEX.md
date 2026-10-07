@@ -94,7 +94,9 @@ No promotion records yet.
 | E042 | [Defensive counterattacks and sacrifice offers](experiments/E042-defensive-counterattacks/RESULT.md) | complete | 1,144 cumulative tests; 1,030 synthetic cases; 235 verified names; checking unique defenses and accepted-loss counterreply witnesses; exact repeat/clean, saved-proof and inherited-hash replay | E043 investigate conditional decoy/deflection; cutoff cancelled |
 | E043 | [Mating decoys and deflections](experiments/E043-mating-decoys/RESULT.md) | complete | 1,169 cumulative tests; 1,050 synthetic cases; 240 verified names; legal prior duties, attracted-king mates and geometric escape blockers; exact repeat/clean and saved-role replay | E044 investigate named mating combinations and coordinate offers; cutoff cancelled |
 
-Allocate the next unused ID in each series: `E044`, `D003`, `F018`, `P001`.
+| E044 | [Named mating combinations and coordinate offers](experiments/E044-named-mating-combinations/RESULT.md) | complete | 1,202 cumulative tests; 1,078 synthetic cases; 247 verified names; all-defense named mate witnesses and actual enemy castling history; exact repeat/clean and saved-proof replay | E045 investigate pawn-supported named mating patterns; cutoff cancelled |
+
+Allocate the next unused ID in each series: `E045`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
