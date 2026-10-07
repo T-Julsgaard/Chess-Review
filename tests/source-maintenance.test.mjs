@@ -39,6 +39,32 @@ test('agreement claims are rejected while scientific intervals remain valid', ()
   assert.doesNotThrow(() => verifyClaims(`${service} game sample: ${percent} confidence interval.`));
 });
 
+test('source scanning skips local research runs but still checks retained research and other runs folders', async t => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'chess-review-runs-'));
+  t.after(() => rm(root, {recursive: true, force: true}));
+  await mkdir(path.join(root, 'data'));
+  await writeFile(path.join(root, 'data/calibration.json'), await readFile(new URL('../data/calibration.json', import.meta.url)));
+  await writeFile(path.join(root, 'analysis.js'), '');
+  const claim = 'Accuracy within ' + '9' + '5% of Chess' + '.com';
+  const localClone = path.join(root, 'research/runs/E001/clean');
+  await mkdir(localClone, {recursive: true});
+  await writeFile(path.join(localClone, 'README.md'), claim);
+  await verifySource(root);
+  const retained = path.join(root, 'research/experiments/E001/evidence');
+  await mkdir(retained, {recursive: true});
+  await writeFile(path.join(retained, 'notes.md'), claim);
+  await assert.rejects(verifySource(root), /numerical-agreement/);
+  await writeFile(path.join(retained, 'notes.md'), 'Retained evidence.');
+  await mkdir(path.join(root, 'docs/runs'), {recursive: true});
+  await writeFile(path.join(root, 'docs/runs/notes.md'), claim);
+  await assert.rejects(verifySource(root), /numerical-agreement/);
+  await writeFile(path.join(root, 'docs/runs/notes.md'), 'Maintained notes.');
+  const git = args => execFileSync('git', args, {cwd: root, encoding: 'utf8', windowsHide: true});
+  git(['init', '-q']); git(['add', '--', 'research/runs']);
+  await assert.rejects(verifySource(root), /research runs must not be tracked/);
+  assert.throws(() => verifyHistoryBlob('research/runs/E001/notes.md', ''), /Generated research runs/);
+});
+
 test('history checks catch deleted commit-message claims and identical blobs under retired paths', async t => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'chess-review-history-'));
   t.after(() => rm(root, {recursive: true, force: true}));

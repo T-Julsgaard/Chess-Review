@@ -1,6 +1,7 @@
 import {readFile, readdir, stat} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {execFileSync} from 'node:child_process';
 
 export const maintainedTools = new Set([
   'BRILLIANT_MOVES.md', 'PUBLIC_METHOD.md', 'README.md',
@@ -11,13 +12,14 @@ export const maintainedTools = new Set([
   'public/sf18-evidence.json.gz', 'public/sf18-rating-evidence.json.gz',
   'public/sf19-rating-evidence.json.gz', 'public/sources.json', 'public/validation.json',
 ]);
-async function files(dir, prefix = '') {
+async function files(dir, prefix = '', excludeResearchRuns = false) {
   const result = [];
   try {
     for (const entry of await readdir(dir, {withFileTypes: true})) {
       if (['.git', 'node_modules', 'web-ext-artifacts', 'calibration-runs', 'scratch', '.codex', '.agents'].includes(entry.name)) continue;
       const name = prefix + entry.name;
-      if (entry.isDirectory()) result.push(...await files(path.join(dir, entry.name), name + '/'));
+      if (excludeResearchRuns && name === 'research/runs' && entry.isDirectory()) continue;
+      if (entry.isDirectory()) result.push(...await files(path.join(dir, entry.name), name + '/', excludeResearchRuns));
       else result.push(name);
     }
   } catch (error) { if (error.code !== 'ENOENT') throw error; }
@@ -50,6 +52,17 @@ export function verifyDesign(name, content) {
 }
 
 export async function verifySource(root) {
+  // Local run artifacts are not maintained source. Reject tracked files there
+  // rather than allowing a committed source file to hide from this check.
+  let hasGit = false;
+  try { await stat(path.join(root, '.git')); hasGit = true; }
+  catch (error) { if (error.code !== 'ENOENT') throw error; }
+  if (hasGit) {
+    const trackedRuns = execFileSync('git', ['ls-files', '--', 'research/runs'], {
+      cwd: root, encoding: 'utf8', windowsHide: true,
+    }).trim();
+    if (trackedRuns) throw Error('Generated research runs must not be tracked: ' + trackedRuns);
+  }
   const model = JSON.parse(await readFile(path.join(root, 'data/calibration.json'), 'utf8'));
   if (model.schema !== 'chess-review-public-calibration-v1') throw Error('Unsupported numerical model schema');
   const permitted = new Set(['schema', 'version', 'source', 'quality', 'context', 'movesOnly', 'classification', 'clsWp']);
@@ -69,7 +82,7 @@ export async function verifySource(root) {
     'pieces-img/kaneo', 'pieces-img/kaneo_midnight', 'pieces-img/kbyte_gambit', 'pieces-img/johnpablok']) {
     if ((await files(path.join(root, directory))).length) throw Error('Retired directory: ' + directory);
   }
-  for (const name of await files(root)) {
+  for (const name of await files(root, '', true)) {
     if (!/\.(?:md|txt|json|js|mjs|cjs|html|css|yml|yaml|csv|svg)$/i.test(name)) continue;
     const file = path.join(root, name);
     if ((await stat(file)).size <= 4 * 1024 * 1024) {
