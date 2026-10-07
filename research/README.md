@@ -48,12 +48,12 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E026 tactical proof expansion](experiments/E026-pin-proofs/RESULT.md)
-adds conditional relative/cross-pins and certified defender removal on top of
-E025's scoped pawn formations and specific comment selection.
-Its [cumulative tracker](experiments/E026-pin-proofs/evidence/concept-status.md)
+[E027 defensive resource expansion](experiments/E027-defensive-resources/RESULT.md)
+adds short proven piece defenses, line blocks, king escapes and back-rank luft
+on top of E026's conditional pin and defender-removal proofs.
+Its [cumulative tracker](experiments/E027-defensive-resources/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E026-pin-proofs/evidence/demo.html) is runnable
+list; its [demo](experiments/E027-defensive-resources/evidence/demo.html) is runnable
 without the extension. Further coach research is active under the authorized
 five-hour usage cutoff.
 
