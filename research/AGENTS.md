@@ -8,6 +8,12 @@ preferences still apply.
   or create another working clone unless the user explicitly requests it.
   Clean verification checkouts remain allowed for required reproducibility;
   they must not become additional development branches.
+- Reuse one existing clean verification checkout instead of making a copy per
+  experiment. Before moving it to the frozen source revision, verify its tracked
+  and non-ignored state is clean, it has no unique work to lose, and no run is
+  using it. Use detached HEAD for verification; preserve retained outputs and
+  provenance. Never reset or delete an active or dirty checkout. Verify exact
+  source/input hashes and use a distinct output directory for each reproduction.
 - Import completed research from the isolated checkout into the shared
   repository's existing `codex/coach-concept-research` branch using a local,
   fast-forward-only fetch. Never create `codex/coach-concepts-e###-evidence`
@@ -62,6 +68,18 @@ preferences still apply.
 - Use targeted checks for research code and `npm run verify:source` for retained
   changes. If active scoring is later changed, run the full relevant regression
   and reproduction checks described in `CONTRIBUTING.md` and the promotion record.
+- During development, use `npm run research:coach-tests -- E###` for the active
+  study and explicitly include any affected dependent studies. Before freezing
+  source, run `npm run research:coach-tests` for the full cumulative coach suite,
+  source verification and diff checks. Focused tests never replace final gates.
+  Keep independent saved-proof replay, inherited-result checks and the required
+  main/repeat/initially clean runs with exact source/input/output hashes. Do not
+  skip them using cached success or weaken an already registered plan.
+- Use `npm run research:status` for progress counts instead of hand-counting.
+  Study runners already generate trackers, demos and hash manifests; reuse those
+  outputs and their existing acceptance checks rather than creating parallel
+  summaries. Related concepts may share a prospectively registered study and
+  common proof machinery, with separate positive/negative gates for each claim.
 - Finish by committing coherent completed changes and reporting the evidence
   status, local commit and next action. Do not launch a goal, push, or publish
   research merely because the scaffold or an experiment is ready.
