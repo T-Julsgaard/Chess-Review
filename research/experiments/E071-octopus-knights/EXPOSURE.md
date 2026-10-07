@@ -21,3 +21,9 @@ No pruning or priority/gate relaxation.
 Final focused 116 passed in 19.9s. Full cumulative 4,160 coach tests passed
 in 118.2s; maintained source verification and diff checks passed. Freeze
 follows; exact reproduction and saved-proof gates remain mandatory.
+
+Initial 53425ae full main/repeat/clean runs matched and own saved proofs replayed,
+but selected-comment audit failed: full-history terminal repetition still selected
+an inherited royal fork. All initial full artifacts and manifests retained under
+initial-evidence, including audit.json. AMENDMENT prospectively strengthens fallback
+selection and budget behavior before final source/evaluation. No gate relaxation.

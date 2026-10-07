@@ -1,0 +1,32 @@
+{
+  "source": "53425aeb018be22e89350bf1704d0c0c01a7ed99",
+  "reproductionsMatched": true,
+  "octopusProofReplayPassed": true,
+  "selectedFallbackSoundnessPassed": false,
+  "rows": [
+    {
+      "fixture": "terminal-defense-repetition",
+      "comment": "Royal knight fork on d6: king c8 and queen c4. Every defense permits a capture with immediate material gain.",
+      "refuted": "queen-gain-refuted",
+      "terminalDefense": "c8b8"
+    },
+    {
+      "fixture": "terminal-defense-repetition-black",
+      "comment": "Royal knight fork on d3: king c1 and queen c5. Every defense permits a capture with immediate material gain.",
+      "refuted": "queen-gain-refuted",
+      "terminalDefense": "c1b1"
+    },
+    {
+      "fixture": "terminal-defense-repetition-mirror",
+      "comment": "Royal knight fork on e6: king f8 and queen f4. Every defense permits a capture with immediate material gain.",
+      "refuted": "queen-gain-refuted",
+      "terminalDefense": "f8g8"
+    },
+    {
+      "fixture": "terminal-defense-repetition-mirror-black",
+      "comment": "Royal knight fork on e3: king f1 and queen f5. Every defense permits a capture with immediate material gain.",
+      "refuted": "queen-gain-refuted",
+      "terminalDefense": "f1g1"
+    }
+  ]
+}
