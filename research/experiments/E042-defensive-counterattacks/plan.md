@@ -30,3 +30,8 @@ saved JSON proof replay, guarded D001 receipts. No registered games, extension,
 rating edits or push. Expected ~75 seconds per ~1,030-case run; retain lossless
 compact JSON under 3 MB. Keep comments <=24 words. Counterattack and Defensive
 sacrifice retain exact subsets; extend already verified Active defense scope.
+
+Exposed smoke addendum: adding a rook to recapture the knight's acceptor also
+creates another safe Rf3 defense, so preserve that case as a prerequisite
+refutation. An authored bishop recapture case preserves unique Ne3+ and directly
+tests rejection of recoverable material offers. No gate is relaxed.
