@@ -105,7 +105,9 @@ No promotion records yet.
 | E053 | [Legal cross-check mechanisms](experiments/E053-cross-checks/RESULT.md) | complete | 1,946 cumulative tests; 1,768 synthetic cases; 268 verified names; direct/discovered/double counterchecks, checker captures, king discoveries, promotions/EP and complete evasions; exact repeat/clean and saved-proof replay | E054 investigate attraction, decoy and blocking combinations with all-defense mate and causal-role proofs; cutoff cancelled |
 | E054 | [Causal mating combination labels](experiments/E054-causal-mating-combinations/RESULT.md) | complete | 2,033 cumulative tests; 1,848 synthetic cases; 271 verified names; attraction, decoy and escape-blocking labels require all-defense mate and exact causal-role references; exact repeat/clean and saved-proof replay | E055 investigate history-confirmed intermediate sacrifices with available recaptures and full mating proofs; cutoff cancelled |
 
-Allocate the next unused ID in each series: `E055`, `D003`, `F018`, `P001`.
+| E055 | [History-confirmed intermediate sacrifices](experiments/E055-intermediate-sacrifices/RESULT.md) | complete | 2,114 cumulative tests; 1,924 synthetic cases; 272 verified names; legal recapture alternatives, full capture history and all-defense mating offer; exact repeat/clean and saved-proof replay | E056 investigate blockade squares, knight and king blockades with exact legal enemy moves; cutoff cancelled |
+
+Allocate the next unused ID in each series: `E056`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
