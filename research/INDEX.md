@@ -85,8 +85,9 @@ No promotion records yet.
 
 | E034 | [Bishop diagonals and pawn-color patterns](experiments/E034-bishop-patterns/RESULT.md) | complete | 930 cumulative tests; 850 synthetic cases; 200 verified names; prepared flank, clear lines and pawn-color patterns; exact repeat/clean replay | E035 broaden verifiable short concepts; cutoff active |
 | E035 | [Opening development history](experiments/E035-opening-development/RESULT.md) | complete | 960 cumulative tests; 878 synthetic cases; 206 verified names; original-piece development, checking tempo and repeat/queen count facts; exact repeat/clean replay | E036 broaden verifiable short concepts; cutoff active |
+| E036 | [Passer context and promotion tactics](experiments/E036-passer-context/RESULT.md) | complete | 989 cumulative tests; 904 synthetic cases; 211 verified names; outside passer/king escort geometry and all-reply safe promotion certificates; exact repeat/clean replay | E037 broaden verifiable short concepts; cutoff active |
 
-Allocate the next unused ID in each series: `E035`, `D003`, `F018`, `P001`.
+Allocate the next unused ID in each series: `E037`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.

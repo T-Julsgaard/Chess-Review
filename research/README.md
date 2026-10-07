@@ -48,12 +48,12 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E035 opening-development expansion](experiments/E035-opening-development/RESULT.md)
-adds verified first minor development, checking tempo, repeated piece moves
-and early queen count facts to earlier bishop, mobility and tactical explanations.
-Its [cumulative tracker](experiments/E035-opening-development/evidence/concept-status.md)
+[E036 passed-pawn expansion](experiments/E036-passer-context/RESULT.md)
+adds outside passer separation, new king escorts and all-reply safe promotion
+certificates to earlier development, bishop, mobility and tactical explanations.
+Its [cumulative tracker](experiments/E036-passer-context/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E035-opening-development/evidence/demo.html) is runnable
+list; its [demo](experiments/E036-passer-context/evidence/demo.html) is runnable
 without the extension. Further coach research is active under the authorized
 five-hour usage cutoff.
 
