@@ -49,3 +49,15 @@ Definition metadata only; no source games/positions/diagrams imported.
 Coach expansion and actual five-hour cutoff active; near 10% remaining
 checkpoint/commit, disable heartbeat and authorized normal shutdown without /f.
 Numerical research paused; no extension integration or push.
+
+## Exposed development notes
+
+The first domination positive left only bishop versus bare king after capture,
+so the draw guard correctly rejected it. A remaining pawn provides the positive;
+the original is retained as a draw negative. The first checking-move exclusion
+tried to move a queen through its own king; a legal diagonal checking move
+replaces it. Mobility comparison is disabled when the mover initially is in
+check, since swapping turns there would create an invalid hypothetical board.
+An explicit evasion control retains this distinction. A pinned knight supplies
+an exact zero-destination restriction without a profitable full trap. A queen
+capture followed by actual counter-mate explicitly refutes a tempting trap.
