@@ -70,13 +70,13 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E072 named pawn formations](experiments/E072-named-pawn-formations/RESULT.md)
-adds Stonewall support and Maroczy exchange/control comments backed by legal
-countercaptures and recorded original-pawn identities. Coverage reaches 303 verified
+[E073 Carlsbad and Hedgehog structures](experiments/E073-carlsbad-hedgehog/RESULT.md)
+adds Carlsbad support/majority and Hedgehog square-control comments backed by
+complete legal countercaptures and reply inventories. Coverage reaches 305 verified
 names.
-Its [cumulative tracker](experiments/E072-named-pawn-formations/evidence/concept-status.md)
+Its [cumulative tracker](experiments/E073-carlsbad-hedgehog/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E072-named-pawn-formations/evidence/demo.html) is runnable
+list; its [demo](experiments/E073-carlsbad-hedgehog/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 
