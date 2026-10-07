@@ -119,7 +119,9 @@ No promotion records yet.
 
 | E061 | [Closed files and actual slider access](experiments/E061-closed-files/RESULT.md) | complete | 2,822 cumulative tests; 2,592 synthetic cases; 286 verified names; complete pawn lists, both rays, every reply and legal file moves, pins/checks/captures/promotions/EP expiry; exact repeat/clean; mechanics pass, planned 4MB storage target fails at 4.11MB | E062 investigate pawn-space restriction of enemy king destinations with causal legal witnesses; budget complete overhead/display; continue isolated; cutoff cancelled |
 
-Allocate the next unused ID in each series: `E062`, `D003`, `F018`, `P001`.
+| E062 | [Causal pawn space and king destinations](experiments/E062-pawn-space/RESULT.md) | complete | 2,939 cumulative tests; 2,700 synthetic cases; 287 verified names; complete before/actual/removed-pawn legal king sets, denied territory, every reply including captures/terminal, EP and castling; exact repeat/clean; full proofs3.58MB within5MB | E063 investigate distinct pawn advances toward a history-verified castled king's flank; no successful-attack inference; continue isolated; cutoff cancelled |
+
+Allocate the next unused ID in each series: `E063`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
