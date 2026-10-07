@@ -1,0 +1,110 @@
+{
+  "roots": 1542,
+  "eligible": 294,
+  "found": [
+    {
+      "fen": "7k/4N2p/5K2/8/8/4Q3/P7/8 w - - 0 1",
+      "move": "a2a3",
+      "king": "f6",
+      "queen": "e3",
+      "helper": {
+        "e7": "N"
+      },
+      "enemy": {
+        "h7": "p"
+      },
+      "replies": 2
+    },
+    {
+      "fen": "7k/4N2p/5K2/8/8/4Q3/P7/8 w - - 0 1",
+      "move": "a2a4",
+      "king": "f6",
+      "queen": "e3",
+      "helper": {
+        "e7": "N"
+      },
+      "enemy": {
+        "h7": "p"
+      },
+      "replies": 2
+    },
+    {
+      "fen": "7k/4N2p/5K2/8/7Q/8/P7/8 w - - 0 1",
+      "move": "a2a3",
+      "king": "f6",
+      "queen": "h4",
+      "helper": {
+        "e7": "N"
+      },
+      "enemy": {
+        "h7": "p"
+      },
+      "replies": 2
+    },
+    {
+      "fen": "7k/4N2p/5K2/8/7Q/8/P7/8 w - - 0 1",
+      "move": "a2a4",
+      "king": "f6",
+      "queen": "h4",
+      "helper": {
+        "e7": "N"
+      },
+      "enemy": {
+        "h7": "p"
+      },
+      "replies": 2
+    },
+    {
+      "fen": "7k/7p/4BK2/8/8/4Q3/P7/8 w - - 0 1",
+      "move": "a2a3",
+      "king": "f6",
+      "queen": "e3",
+      "helper": {
+        "e6": "B"
+      },
+      "enemy": {
+        "h7": "p"
+      },
+      "replies": 2
+    },
+    {
+      "fen": "7k/7p/4BK2/8/8/4Q3/P7/8 w - - 0 1",
+      "move": "a2a4",
+      "king": "f6",
+      "queen": "e3",
+      "helper": {
+        "e6": "B"
+      },
+      "enemy": {
+        "h7": "p"
+      },
+      "replies": 2
+    },
+    {
+      "fen": "7k/7p/4BK2/8/8/7Q/P7/8 w - - 0 1",
+      "move": "a2a3",
+      "king": "f6",
+      "queen": "h3",
+      "helper": {
+        "e6": "B"
+      },
+      "enemy": {
+        "h7": "p"
+      },
+      "replies": 2
+    },
+    {
+      "fen": "7k/7p/4BK2/8/8/7Q/P7/8 w - - 0 1",
+      "move": "a2a4",
+      "king": "f6",
+      "queen": "h3",
+      "helper": {
+        "e6": "B"
+      },
+      "enemy": {
+        "h7": "p"
+      },
+      "replies": 2
+    }
+  ]
+}

@@ -30,3 +30,7 @@ reproductions are NOT complete. Existing tracker remains E066 unchanged.
 Next broaden authored material/king contexts under the same frozen contract,
 then add positive/negative per-claim gates; if still empty, retain inconclusive
 result rather than claiming either concept verified.
+
+Broader blocker/helper pilot:1,542 legal roots,294 eligible, eight pawn waiting candidates found (four board patterns with single/double step). Enemy h7 pawn has both legal h5/h6 replies; Qh6# or Qxh6# mates after each, while own immediate mate before is absent. Separate actual/pass/removed-pawn full proofs independently replay for reserve; nonpawn Na2b4/Ba2b3 qualify only as waiting. Added paired/color positives and legal-defense negatives. Expanded target110:109 pass, one SAN assertion mistakenly calls capture mate Qh6#; correct to Qxh6# after h6. No detector or priority change; preserve the failed test.
+
+Corrected focused110/110 passes; full cumulative E020–E0673,579 tests passes in88.4s. Maintained source/diff passes. Earlier incomplete notes above describe prior exposure boundaries, superseded by independent positive actual/pass/removed-pawn replay and separate selection/tamper gates now passing. Prototype detector gates/priority unchanged. Preserve pilot summaries/code and all negative outcomes. Freeze source/exposure before main/repeat/initially clean full runs; exact revision and all files fixed until all three terminal.
