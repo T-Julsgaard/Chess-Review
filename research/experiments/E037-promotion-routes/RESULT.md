@@ -34,7 +34,11 @@ original occurrences, 89 partial and 757 unimplemented occurrences.
 [Main](evidence/run.json), [repeat](evidence/repeat-run.json) and
 [initially clean local checkout](evidence/clean-run.json) match every normalized
 input and deterministic output hash at source revision `c8f1866`. Main/clean
-took about 50/52 seconds; retained evidence is under 3 MB. Metadata includes
+took about 50/52 seconds in the initial runs. The first pretty-printed retention
+exceeded the 3 MB gate; the initial evidence commit mistakenly preceded handling
+that failed gate. The runner now writes losslessly compact JSON. Replacement
+main/repeat/clean evidence and measured retention must pass before closing this
+correction. Metadata includes
 exact source revision, command, config, environment and guarded D001 receipt.
 No registered game is analyzed. Pilot: research/runs/E037/development.
 
