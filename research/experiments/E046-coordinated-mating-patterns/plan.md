@@ -44,3 +44,11 @@ D001 test receipt in every entry point; no registered game analyzed. Estimate
 ~100 seconds per ~1,200-case run, three overlapping runs, compact retention
 <3 MB. Original 1,085 occurrences retained. This verifies synthetic mechanics,
 not real-game precision or human benefit. No extension/rating edits or push.
+
+Exposed smoke note: independent replay initially expected empty get() to return
+null, but the maintained library returns undefined. Use a falsy emptiness test
+which still rejects every occupied square. The first alternative pawn-helper
+Blackburne negative put g6 pawn on the f5–h7 bishop route, so the legal-move
+guard refused it. Replace with a different authored corner mate supported by
+king/pawn and two bishops without a knight. All 77 exposed tests pass; detector
+role or terminal gates unchanged. No source position imported.
