@@ -48,13 +48,13 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E064 blocked positions](experiments/E064-blocked-position/RESULT.md)
-adds short comments for newly completed central pawn walls with complete legal
-pawn mobility sets now and after every enemy reply. Coverage reaches 289 verified
+[E065 king triangulation](experiments/E065-king-triangulation/RESULT.md)
+adds short comments for recorded king triangles restoring placement and changing
+the turn, with full history and every reply retained. Coverage reaches 290 verified
 names.
-Its [cumulative tracker](experiments/E064-blocked-position/evidence/concept-status.md)
+Its [cumulative tracker](experiments/E065-king-triangulation/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E064-blocked-position/evidence/demo.html) is runnable
+list; its [demo](experiments/E065-king-triangulation/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 
