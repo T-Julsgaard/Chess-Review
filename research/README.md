@@ -70,13 +70,13 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E073 Carlsbad and Hedgehog structures](experiments/E073-carlsbad-hedgehog/RESULT.md)
-adds Carlsbad support/majority and Hedgehog square-control comments backed by
-complete legal countercaptures and reply inventories. Coverage reaches 305 verified
+[E074 French chains and Scheveningen control](experiments/E074-french-scheveningen/RESULT.md)
+adds French support/ram and Scheveningen exchange/control comments backed by
+complete legal countercaptures and reply inventories. Coverage reaches 307 verified
 names.
-Its [cumulative tracker](experiments/E073-carlsbad-hedgehog/evidence/concept-status.md)
+Its [cumulative tracker](experiments/E074-french-scheveningen/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E073-carlsbad-hedgehog/evidence/demo.html) is runnable
+list; its [demo](experiments/E074-french-scheveningen/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 
