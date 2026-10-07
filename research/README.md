@@ -22,6 +22,7 @@ results do not become extension behavior automatically.
 | Location | Purpose |
 | --- | --- |
 | [AGENTS.md](AGENTS.md) | Scoped instructions for efficient, resumable research. |
+| [concepts/](concepts/README.md) | Conservative duplicate-row cleanup and proposed coach-concept order; not an active schedule or replacement evidence tracker. |
 | [INDEX.md](INDEX.md) | Compact experiment register, decisions and backlog. |
 | [BASELINE.md](BASELINE.md) | Pinned starting implementation and known evidence limits. |
 | [PROTOCOL.md](PROTOCOL.md) | Measurement, validation and promotion requirements. |
