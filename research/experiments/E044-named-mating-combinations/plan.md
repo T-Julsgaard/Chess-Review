@@ -39,3 +39,10 @@ input/output hashes, saved JSON replay, unchanged inherited result hashes,
 guarded D001 receipt. No registered game/source diagrams imported; no extension,
 rating edits or push. Expected ~80 seconds per ~1,080-case run; three overlapping
 runs, lossless compact retention <3 MB. Original list preserved.
+
+Exposed smoke note: the first authored g-file history accidentally used the
+illegal knight move e4–e6; the legal history guard refused evaluation. Correct
+the starting square to d4 and use d4–e6. The resulting three coordinate offers
+pass inherited full mate-in-two proof. Add opposing-side-only castling and a
+multiple-defense pawn offer with no complementary named role as refutations.
+No gate is relaxed or inferred from the corrected fixture placement.
