@@ -84,6 +84,7 @@ No promotion records yet.
 | E033 | [Mobility and trapped-piece proofs](experiments/E033-mobility-traps/RESULT.md) | complete | 905 cumulative tests; 828 synthetic cases; 190 verified names; conditional domination and full all-defense traps; exact repeat/clean replay | E034 broaden verifiable short concepts; cutoff active |
 
 | E034 | [Bishop diagonals and pawn-color patterns](experiments/E034-bishop-patterns/RESULT.md) | complete | 930 cumulative tests; 850 synthetic cases; 200 verified names; prepared flank, clear lines and pawn-color patterns; exact repeat/clean replay | E035 broaden verifiable short concepts; cutoff active |
+| E035 | [Opening development history](experiments/E035-opening-development/RESULT.md) | complete | 960 cumulative tests; 878 synthetic cases; 206 verified names; original-piece development, checking tempo and repeat/queen count facts; exact repeat/clean replay | E036 broaden verifiable short concepts; cutoff active |
 
 Allocate the next unused ID in each series: `E035`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
