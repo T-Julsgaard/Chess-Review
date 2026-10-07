@@ -64,3 +64,10 @@ are refused moves, never attributed an explanation.
 Meaningful negative evidence includes legal Re8xe4 capturing the cross-checking
 knight: the neutral term is a verified legal mechanism, not a claim that every
 cross-check is sound as a strategy. Existing stronger warnings retain priority.
+
+Before source commit, add a clock-boundary mating fixture starting at 99
+halfmoves. chess.js reports both isDraw() and isCheckmate() after this quiet
+mate. Explicit mate takes precedence (US Chess 13A); ordinary checking moves
+at that boundary remain excluded. Detector and independent replay use the
+same rule separately. The exposed 96-case pilot predates this four-case
+addition; final targeted/cumulative checks and decisive runs use 100 new cases.
