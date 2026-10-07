@@ -71,13 +71,13 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E074 French chains and Scheveningen control](experiments/E074-french-scheveningen/RESULT.md)
-adds French support/ram and Scheveningen exchange/control comments backed by
-complete legal countercaptures and reply inventories. Coverage reaches 307 verified
+[E075 board and material foundations](experiments/E075-board-material/RESULT.md)
+adds optional board, legal-input and nominal-material comments backed by
+complete legal sets, input-state proofs and exact inventories. Coverage reaches 312 verified
 names.
-Its [cumulative tracker](experiments/E074-french-scheveningen/evidence/concept-status.md)
+Its [cumulative tracker](experiments/E075-board-material/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E074-french-scheveningen/evidence/demo.html) is runnable
+list; its [demo](experiments/E075-board-material/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 
