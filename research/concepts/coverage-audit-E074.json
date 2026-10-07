@@ -1,0 +1,8301 @@
+{
+  "schema": "coach-queue-audit-v1",
+  "experiment": "E074",
+  "hashes": {
+    "catalog": "e537ba4fff39501016db6dc015bab1d757d269b5ecafef633cdff4a3eb494477",
+    "original": "a7b06b6f9530b8c894471f32eeaea49c8ef340deb40e215e7f065967016a1bdd",
+    "tracker": "d929648b87055ff1e8c51754e23966bd4706ec88a45f85d3feaf99e6e18576e1"
+  },
+  "summary": {
+    "originalOccurrences": 1085,
+    "duplicateGroups": 54,
+    "redundantRows": 66,
+    "allVerifiedGroups": 20,
+    "allPendingGroups": 34,
+    "mixedScopeGroups": 0,
+    "outstandingRows": 690,
+    "outstandingOccurrences": 729,
+    "supportRows": 124
+  },
+  "duplicates": [
+    {
+      "id": "C0321",
+      "name": "Knight outpost",
+      "occurrences": [
+        {
+          "id": "C0321",
+          "category": "12. Knights",
+          "text": "Knight outpost",
+          "name": "Knight outpost",
+          "status": "partial",
+          "scope": "Partial: new pawn-supported knight on c–f relative ranks 4–6; no enemy pawn ahead on neighboring files; future exchanges/permanence deferred."
+        },
+        {
+          "id": "C0701",
+          "category": "26. Knight endings",
+          "text": "Knight outpost",
+          "name": "Knight outpost",
+          "status": "partial",
+          "scope": "Partial: new pawn-supported knight on c–f relative ranks 4–6; no enemy pawn ahead on neighboring files; future exchanges/permanence deferred."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0326",
+      "name": "Knight blockade",
+      "occurrences": [
+        {
+          "id": "C0326",
+          "category": "12. Knights",
+          "text": "Knight blockade",
+          "name": "Knight blockade",
+          "status": "verified",
+          "scope": "Mechanics verified: actual moved knight occupies the square immediately ahead of an unchanged enemy pawn; complete legal enemy replies show no straight advance; pawn captures and blocker removals retained; no permanent/best-move claim."
+        },
+        {
+          "id": "C0700",
+          "category": "26. Knight endings",
+          "text": "Knight blockade",
+          "name": "Knight blockade",
+          "status": "verified",
+          "scope": "Mechanics verified: actual moved knight occupies the square immediately ahead of an unchanged enemy pawn; complete legal enemy replies show no straight advance; pawn captures and blocker removals retained; no permanent/best-move claim."
+        },
+        {
+          "id": "C0720",
+          "category": "27. Bishop versus knight endings",
+          "text": "Knight blockade",
+          "name": "Knight blockade",
+          "status": "verified",
+          "scope": "Mechanics verified: actual moved knight occupies the square immediately ahead of an unchanged enemy pawn; complete legal enemy replies show no straight advance; pawn captures and blocker removals retained; no permanent/best-move claim."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0333",
+      "name": "Knight domination",
+      "occurrences": [
+        {
+          "id": "C0333",
+          "category": "12. Knights",
+          "text": "Knight domination",
+          "name": "Knight domination",
+          "status": "verified",
+          "scope": "Mechanics verified: every legal move by the named unit permits tracked capture with positive gain through every immediate counterreply; other defenses not promised."
+        },
+        {
+          "id": "C0702",
+          "category": "26. Knight endings",
+          "text": "Knight domination",
+          "name": "Knight domination",
+          "status": "verified",
+          "scope": "Mechanics verified: every legal move by the named unit permits tracked capture with positive gain through every immediate counterreply; other defenses not promised."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0342",
+      "name": "Rook penetration",
+      "occurrences": [
+        {
+          "id": "C0342",
+          "category": "13. Rooks",
+          "text": "Rook penetration",
+          "name": "Rook penetration",
+          "status": "verified",
+          "scope": "Mechanics verified: checking subset: actual rook enters enemy back two ranks from own half along its file and directly checks horizontally; all full-history replies retained; no safety/advantage claim."
+        },
+        {
+          "id": "C0677",
+          "category": "24. Rook endings",
+          "text": "Rook penetration",
+          "name": "Rook penetration",
+          "status": "verified",
+          "scope": "Mechanics verified: checking subset: actual rook enters enemy back two ranks from own half along its file and directly checks horizontally; all full-history replies retained; no safety/advantage claim."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0360",
+      "name": "Queen activity",
+      "occurrences": [
+        {
+          "id": "C0360",
+          "category": "14. Queens",
+          "text": "Queen activity",
+          "name": "Queen activity",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0722",
+          "category": "28. Queen endings",
+          "text": "Queen activity",
+          "name": "Queen activity",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0361",
+      "name": "Queen centralization",
+      "occurrences": [
+        {
+          "id": "C0361",
+          "category": "14. Queens",
+          "text": "Queen centralization",
+          "name": "Queen centralization",
+          "status": "partial",
+          "scope": "Partial: queen arrives on d4/e4/d5/e5; safety/usefulness not inferred."
+        },
+        {
+          "id": "C0725",
+          "category": "28. Queen endings",
+          "text": "Queen centralization",
+          "name": "Queen centralization",
+          "status": "partial",
+          "scope": "Partial: queen arrives on d4/e4/d5/e5; safety/usefulness not inferred."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0365",
+      "name": "Perpetual check",
+      "occurrences": [
+        {
+          "id": "C0365",
+          "category": "14. Queens",
+          "text": "Perpetual check",
+          "name": "Perpetual check",
+          "status": "partial",
+          "scope": "Partial: verified repetition facts are available; an observed cycle does not establish an all-defense perpetual-check strategy."
+        },
+        {
+          "id": "C0466",
+          "category": "17. Defensive concepts",
+          "text": "Perpetual check",
+          "name": "Perpetual check",
+          "status": "partial",
+          "scope": "Partial: verified repetition facts are available; an observed cycle does not establish an all-defense perpetual-check strategy."
+        },
+        {
+          "id": "C0723",
+          "category": "28. Queen endings",
+          "text": "Perpetual check",
+          "name": "Perpetual check",
+          "status": "partial",
+          "scope": "Partial: verified repetition facts are available; an observed cycle does not establish an all-defense perpetual-check strategy."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0370",
+      "name": "Queen trade",
+      "occurrences": [
+        {
+          "id": "C0370",
+          "category": "14. Queens",
+          "text": "Queen trade",
+          "name": "Queen trade",
+          "status": "verified",
+          "scope": "Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded."
+        },
+        {
+          "id": "C0733",
+          "category": "28. Queen endings",
+          "text": "Queen trade",
+          "name": "Queen trade",
+          "status": "verified",
+          "scope": "Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0371",
+      "name": "Queen versus two rooks",
+      "occurrences": [
+        {
+          "id": "C0371",
+          "category": "14. Queens",
+          "text": "Queen versus two rooks",
+          "name": "Queen versus two rooks",
+          "status": "partial",
+          "scope": "Partial: exact non-pawn army combinations only; strategic comparison deferred."
+        },
+        {
+          "id": "C0884",
+          "category": "35. Strategic imbalances",
+          "text": "Queen versus two rooks",
+          "name": "Queen versus two rooks",
+          "status": "partial",
+          "scope": "Partial: exact non-pawn army combinations only; strategic comparison deferred."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0372",
+      "name": "Queen versus rook and minor piece",
+      "occurrences": [
+        {
+          "id": "C0372",
+          "category": "14. Queens",
+          "text": "Queen versus rook and minor piece",
+          "name": "Queen versus rook and minor piece",
+          "status": "partial",
+          "scope": "Partial: exact non-pawn army combinations only; strategic comparison deferred."
+        },
+        {
+          "id": "C0885",
+          "category": "35. Strategic imbalances",
+          "text": "Queen versus rook and minor piece",
+          "name": "Queen versus rook and minor piece",
+          "status": "partial",
+          "scope": "Partial: exact non-pawn army combinations only; strategic comparison deferred."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0378",
+      "name": "Early queen development",
+      "occurrences": [
+        {
+          "id": "C0378",
+          "category": "14. Queens",
+          "text": "Early queen development",
+          "name": "Early queen development",
+          "status": "verified",
+          "scope": "Mechanics verified: first original queen move in first eight own turns with fewer than two surviving developed minors; count fact, not criticism."
+        },
+        {
+          "id": "C0859",
+          "category": "34. Common mistakes",
+          "text": "Early queen development",
+          "name": "Early queen development",
+          "status": "verified",
+          "scope": "Mechanics verified: first original queen move in first eight own turns with fewer than two surviving developed minors; count fact, not criticism."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0380",
+      "name": "King safety",
+      "occurrences": [
+        {
+          "id": "C0380",
+          "category": "15. King concepts",
+          "text": "King safety",
+          "name": "King safety",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0548",
+          "category": "20. Evaluation of a position",
+          "text": "King safety",
+          "name": "King safety",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0386",
+      "name": "King activation",
+      "occurrences": [
+        {
+          "id": "C0386",
+          "category": "15. King concepts",
+          "text": "King activation",
+          "name": "King activation",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0603",
+          "category": "22. Endgame fundamentals",
+          "text": "King activation",
+          "name": "King activation",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0390",
+      "name": "Distant opposition",
+      "occurrences": [
+        {
+          "id": "C0390",
+          "category": "15. King concepts",
+          "text": "Distant opposition",
+          "name": "Distant opposition",
+          "status": "verified",
+          "scope": "Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry."
+        },
+        {
+          "id": "C0610",
+          "category": "22. Endgame fundamentals",
+          "text": "Distant opposition",
+          "name": "Distant opposition",
+          "status": "verified",
+          "scope": "Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry."
+        },
+        {
+          "id": "C0636",
+          "category": "23. Pawn endings",
+          "text": "Distant opposition",
+          "name": "Distant opposition",
+          "status": "verified",
+          "scope": "Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0391",
+      "name": "Diagonal opposition",
+      "occurrences": [
+        {
+          "id": "C0391",
+          "category": "15. King concepts",
+          "text": "Diagonal opposition",
+          "name": "Diagonal opposition",
+          "status": "verified",
+          "scope": "Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry."
+        },
+        {
+          "id": "C0637",
+          "category": "23. Pawn endings",
+          "text": "Diagonal opposition",
+          "name": "Diagonal opposition",
+          "status": "verified",
+          "scope": "Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0392",
+      "name": "Corresponding squares",
+      "occurrences": [
+        {
+          "id": "C0392",
+          "category": "15. King concepts",
+          "text": "Corresponding squares",
+          "name": "Corresponding squares",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0612",
+          "category": "22. Endgame fundamentals",
+          "text": "Corresponding squares",
+          "name": "Corresponding squares",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0653",
+          "category": "23. Pawn endings",
+          "text": "Corresponding squares",
+          "name": "Corresponding squares",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0393",
+      "name": "King penetration",
+      "occurrences": [
+        {
+          "id": "C0393",
+          "category": "15. King concepts",
+          "text": "King penetration",
+          "name": "King penetration",
+          "status": "verified",
+          "scope": "Mechanics verified: same before/after promotion benefit plus actual king advance deeper into relative rank at least five."
+        },
+        {
+          "id": "C0624",
+          "category": "22. Endgame fundamentals",
+          "text": "King penetration",
+          "name": "King penetration",
+          "status": "verified",
+          "scope": "Mechanics verified: same before/after promotion benefit plus actual king advance deeper into relative rank at least five."
+        },
+        {
+          "id": "C0696",
+          "category": "25. Bishop endings",
+          "text": "King penetration",
+          "name": "King penetration",
+          "status": "verified",
+          "scope": "Mechanics verified: same before/after promotion benefit plus actual king advance deeper into relative rank at least five."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0397",
+      "name": "King hunt",
+      "occurrences": [
+        {
+          "id": "C0397",
+          "category": "15. King concepts",
+          "text": "King hunt",
+          "name": "King hunt",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0441",
+          "category": "16. Attacking concepts",
+          "text": "King hunt",
+          "name": "King hunt",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0398",
+      "name": "Mating net",
+      "occurrences": [
+        {
+          "id": "C0398",
+          "category": "15. King concepts",
+          "text": "Mating net",
+          "name": "Mating net",
+          "status": "verified",
+          "scope": "Mechanics verified: nonchecking, noncapturing actual move; every legal reply permits checkmate on the next own move, independently replayed; no newly-created/only-best claim."
+        },
+        {
+          "id": "C0440",
+          "category": "16. Attacking concepts",
+          "text": "Mating net",
+          "name": "Mating net",
+          "status": "verified",
+          "scope": "Mechanics verified: nonchecking, noncapturing actual move; every legal reply permits checkmate on the next own move, independently replayed; no newly-created/only-best claim."
+        },
+        {
+          "id": "C0508",
+          "category": "18. Checkmating patterns",
+          "text": "Mating net",
+          "name": "Mating net",
+          "status": "verified",
+          "scope": "Mechanics verified: nonchecking, noncapturing actual move; every legal reply permits checkmate on the next own move, independently replayed; no newly-created/only-best claim."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0399",
+      "name": "King shelter",
+      "occurrences": [
+        {
+          "id": "C0399",
+          "category": "15. King concepts",
+          "text": "King shelter",
+          "name": "King shelter",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0732",
+          "category": "28. Queen endings",
+          "text": "King shelter",
+          "name": "King shelter",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0445",
+      "name": "Active defense",
+      "occurrences": [
+        {
+          "id": "C0445",
+          "category": "17. Defensive concepts",
+          "text": "Active defense",
+          "name": "Active defense",
+          "status": "verified",
+          "scope": "Mechanics verified: earlier finite target-defense with capture/check, or checking unique immediate-mate defense; exact certificates, no enduring initiative claim."
+        },
+        {
+          "id": "C0632",
+          "category": "22. Endgame fundamentals",
+          "text": "Active defense",
+          "name": "Active defense",
+          "status": "verified",
+          "scope": "Mechanics verified: earlier finite target-defense with capture/check, or checking unique immediate-mate defense; exact certificates, no enduring initiative claim."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0446",
+      "name": "Passive defense",
+      "occurrences": [
+        {
+          "id": "C0446",
+          "category": "17. Defensive concepts",
+          "text": "Passive defense",
+          "name": "Passive defense",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0868",
+          "category": "34. Common mistakes",
+          "text": "Passive defense",
+          "name": "Passive defense",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0462",
+      "name": "Overprotection",
+      "occurrences": [
+        {
+          "id": "C0462",
+          "category": "17. Defensive concepts",
+          "text": "Overprotection",
+          "name": "Overprotection",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0782",
+          "category": "31. Prophylaxis and prevention",
+          "text": "Overprotection",
+          "name": "Overprotection",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0899",
+          "category": "36. Deeper strategic concepts",
+          "text": "Overprotection",
+          "name": "Overprotection",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0465",
+      "name": "Fortress",
+      "occurrences": [
+        {
+          "id": "C0465",
+          "category": "17. Defensive concepts",
+          "text": "Fortress",
+          "name": "Fortress",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0625",
+          "category": "22. Endgame fundamentals",
+          "text": "Fortress",
+          "name": "Fortress",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0530",
+      "name": "Restriction",
+      "occurrences": [
+        {
+          "id": "C0530",
+          "category": "19. Strategic planning",
+          "text": "Restriction",
+          "name": "Restriction",
+          "status": "verified",
+          "scope": "Mechanics verified: static legal destination count drops by at least two to at most two; explicit hypothetical before-opponent turn, no quality or future-position claim."
+        },
+        {
+          "id": "C0901",
+          "category": "36. Deeper strategic concepts",
+          "text": "Restriction",
+          "name": "Restriction",
+          "status": "verified",
+          "scope": "Mechanics verified: static legal destination count drops by at least two to at most two; explicit hypothetical before-opponent turn, no quality or future-position claim."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0531",
+      "name": "Blockade",
+      "occurrences": [
+        {
+          "id": "C0531",
+          "category": "19. Strategic planning",
+          "text": "Blockade",
+          "name": "Blockade",
+          "status": "verified",
+          "scope": "Mechanics verified: actual moved nonpawn piece occupies the square immediately ahead of an unchanged enemy pawn; complete legal enemy replies show no straight advance; pawn captures and blocker removals retained; no permanent/best-move claim."
+        },
+        {
+          "id": "C0900",
+          "category": "36. Deeper strategic concepts",
+          "text": "Blockade",
+          "name": "Blockade",
+          "status": "verified",
+          "scope": "Mechanics verified: actual moved nonpawn piece occupies the square immediately ahead of an unchanged enemy pawn; complete legal enemy replies show no straight advance; pawn captures and blocker removals retained; no permanent/best-move claim."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0532",
+      "name": "Prophylaxis",
+      "occurrences": [
+        {
+          "id": "C0532",
+          "category": "19. Strategic planning",
+          "text": "Prophylaxis",
+          "name": "Prophylaxis",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0770",
+          "category": "31. Prophylaxis and prevention",
+          "text": "Prophylaxis",
+          "name": "Prophylaxis",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0902",
+          "category": "36. Deeper strategic concepts",
+          "text": "Prophylaxis",
+          "name": "Prophylaxis",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0533",
+      "name": "Creating an outpost",
+      "occurrences": [
+        {
+          "id": "C0533",
+          "category": "19. Strategic planning",
+          "text": "Creating an outpost",
+          "name": "Creating an outpost",
+          "status": "partial",
+          "scope": "Partial: new pawn-supported knight on c–f relative ranks 4–6; no enemy pawn ahead on neighboring files; future exchanges/permanence deferred."
+        },
+        {
+          "id": "C0717",
+          "category": "27. Bishop versus knight endings",
+          "text": "Creating an outpost",
+          "name": "Creating an outpost",
+          "status": "partial",
+          "scope": "Partial: new pawn-supported knight on c–f relative ranks 4–6; no enemy pawn ahead on neighboring files; future exchanges/permanence deferred."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0554",
+      "name": "Initiative",
+      "occurrences": [
+        {
+          "id": "C0554",
+          "category": "20. Evaluation of a position",
+          "text": "Initiative",
+          "name": "Initiative",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0582",
+          "category": "21. Initiative and dynamics",
+          "text": "Initiative",
+          "name": "Initiative",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0574",
+      "name": "Winning position",
+      "occurrences": [
+        {
+          "id": "C0574",
+          "category": "20. Evaluation of a position",
+          "text": "Winning position",
+          "name": "Winning position",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0978",
+          "category": "38. Chess terminology for position types",
+          "text": "Winning position",
+          "name": "Winning position",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0576",
+      "name": "Unclear position",
+      "occurrences": [
+        {
+          "id": "C0576",
+          "category": "20. Evaluation of a position",
+          "text": "Unclear position",
+          "name": "Unclear position",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0981",
+          "category": "38. Chess terminology for position types",
+          "text": "Unclear position",
+          "name": "Unclear position",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0577",
+      "name": "Complicated position",
+      "occurrences": [
+        {
+          "id": "C0577",
+          "category": "20. Evaluation of a position",
+          "text": "Complicated position",
+          "name": "Complicated position",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0976",
+          "category": "38. Chess terminology for position types",
+          "text": "Complicated position",
+          "name": "Complicated position",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0578",
+      "name": "Sharp position",
+      "occurrences": [
+        {
+          "id": "C0578",
+          "category": "20. Evaluation of a position",
+          "text": "Sharp position",
+          "name": "Sharp position",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0962",
+          "category": "38. Chess terminology for position types",
+          "text": "Sharp position",
+          "name": "Sharp position",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0579",
+      "name": "Quiet position",
+      "occurrences": [
+        {
+          "id": "C0579",
+          "category": "20. Evaluation of a position",
+          "text": "Quiet position",
+          "name": "Quiet position",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0965",
+          "category": "38. Chess terminology for position types",
+          "text": "Quiet position",
+          "name": "Quiet position",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0580",
+      "name": "Balanced position",
+      "occurrences": [
+        {
+          "id": "C0580",
+          "category": "20. Evaluation of a position",
+          "text": "Balanced position",
+          "name": "Balanced position",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0968",
+          "category": "38. Chess terminology for position types",
+          "text": "Balanced position",
+          "name": "Balanced position",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0584",
+      "name": "Tempo",
+      "occurrences": [
+        {
+          "id": "C0584",
+          "category": "21. Initiative and dynamics",
+          "text": "Tempo",
+          "name": "Tempo",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0752",
+          "category": "30. Tempo and move-order concepts",
+          "text": "Tempo",
+          "name": "Tempo",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0587",
+      "name": "Dynamic compensation",
+      "occurrences": [
+        {
+          "id": "C0587",
+          "category": "21. Initiative and dynamics",
+          "text": "Dynamic compensation",
+          "name": "Dynamic compensation",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0909",
+          "category": "36. Deeper strategic concepts",
+          "text": "Dynamic compensation",
+          "name": "Dynamic compensation",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0607",
+      "name": "Outside passed pawn",
+      "occurrences": [
+        {
+          "id": "C0607",
+          "category": "22. Endgame fundamentals",
+          "text": "Outside passed pawn",
+          "name": "Outside passed pawn",
+          "status": "verified",
+          "scope": "Mechanics verified: actual flank passer advance with every other pawn at least three files away, at least two other pawns including both colors; no king diversion or win claim."
+        },
+        {
+          "id": "C0643",
+          "category": "23. Pawn endings",
+          "text": "Outside passed pawn",
+          "name": "Outside passed pawn",
+          "status": "verified",
+          "scope": "Mechanics verified: actual flank passer advance with every other pawn at least three files away, at least two other pawns including both colors; no king diversion or win claim."
+        },
+        {
+          "id": "C0691",
+          "category": "25. Bishop endings",
+          "text": "Outside passed pawn",
+          "name": "Outside passed pawn",
+          "status": "verified",
+          "scope": "Mechanics verified: actual flank passer advance with every other pawn at least three files away, at least two other pawns including both colors; no king diversion or win claim."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0609",
+      "name": "Opposition",
+      "occurrences": [
+        {
+          "id": "C0609",
+          "category": "22. Endgame fundamentals",
+          "text": "Opposition",
+          "name": "Opposition",
+          "status": "verified",
+          "scope": "Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry."
+        },
+        {
+          "id": "C0635",
+          "category": "23. Pawn endings",
+          "text": "Opposition",
+          "name": "Opposition",
+          "status": "verified",
+          "scope": "Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0613",
+      "name": "Triangulation",
+      "occurrences": [
+        {
+          "id": "C0613",
+          "category": "22. Endgame fundamentals",
+          "text": "Triangulation",
+          "name": "Triangulation",
+          "status": "verified",
+          "scope": "Mechanics verified: recorded king triangle against two reversible moves of one enemy unit restores full piece placement and rights/EP, changing the turn; full legal history, counters and every reply retained; no forcing, opposition gain, zugzwang or winning-tempo claim."
+        },
+        {
+          "id": "C0651",
+          "category": "23. Pawn endings",
+          "text": "Triangulation",
+          "name": "Triangulation",
+          "status": "verified",
+          "scope": "Mechanics verified: recorded king triangle against two reversible moves of one enemy unit restores full piece placement and rights/EP, changing the turn; full legal history, counters and every reply retained; no forcing, opposition gain, zugzwang or winning-tempo claim."
+        },
+        {
+          "id": "C0765",
+          "category": "30. Tempo and move-order concepts",
+          "text": "Triangulation",
+          "name": "Triangulation",
+          "status": "verified",
+          "scope": "Mechanics verified: recorded king triangle against two reversible moves of one enemy unit restores full piece placement and rights/EP, changing the turn; full legal history, counters and every reply retained; no forcing, opposition gain, zugzwang or winning-tempo claim."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0614",
+      "name": "Zugzwang",
+      "occurrences": [
+        {
+          "id": "C0614",
+          "category": "22. Endgame fundamentals",
+          "text": "Zugzwang",
+          "name": "Zugzwang",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0652",
+          "category": "23. Pawn endings",
+          "text": "Zugzwang",
+          "name": "Zugzwang",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0766",
+          "category": "30. Tempo and move-order concepts",
+          "text": "Zugzwang",
+          "name": "Zugzwang",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0615",
+      "name": "Mutual zugzwang",
+      "occurrences": [
+        {
+          "id": "C0615",
+          "category": "22. Endgame fundamentals",
+          "text": "Mutual zugzwang",
+          "name": "Mutual zugzwang",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0767",
+          "category": "30. Tempo and move-order concepts",
+          "text": "Mutual zugzwang",
+          "name": "Mutual zugzwang",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0616",
+      "name": "Reserve tempo",
+      "occurrences": [
+        {
+          "id": "C0616",
+          "category": "22. Endgame fundamentals",
+          "text": "Reserve tempo",
+          "name": "Reserve tempo",
+          "status": "verified",
+          "scope": "Mechanics verified: used straight pawn waiting step satisfies waiting contract and separate legal live removed-pawn frames retain all-reply next-move mate; no future tempo inventory or general opposition claim."
+        },
+        {
+          "id": "C0649",
+          "category": "23. Pawn endings",
+          "text": "Reserve tempo",
+          "name": "Reserve tempo",
+          "status": "verified",
+          "scope": "Mechanics verified: used straight pawn waiting step satisfies waiting contract and separate legal live removed-pawn frames retain all-reply next-move mate; no future tempo inventory or general opposition claim."
+        },
+        {
+          "id": "C0760",
+          "category": "30. Tempo and move-order concepts",
+          "text": "Reserve tempo",
+          "name": "Reserve tempo",
+          "status": "verified",
+          "scope": "Mechanics verified: used straight pawn waiting step satisfies waiting contract and separate legal live removed-pawn frames retain all-reply next-move mate; no future tempo inventory or general opposition claim."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0619",
+      "name": "Pawn race",
+      "occurrences": [
+        {
+          "id": "C0619",
+          "category": "22. Endgame fundamentals",
+          "text": "Pawn race",
+          "name": "Pawn race",
+          "status": "verified",
+          "scope": "Mechanics verified: pure king-and-one-advanced-passed-pawn per side; full legal all-defense bounded route proves own pawn queens first using straight advances, with all post-promotion replies retained; no automatic win or queen-safety claim."
+        },
+        {
+          "id": "C0646",
+          "category": "23. Pawn endings",
+          "text": "Pawn race",
+          "name": "Pawn race",
+          "status": "verified",
+          "scope": "Mechanics verified: pure king-and-one-advanced-passed-pawn per side; full legal all-defense bounded route proves own pawn queens first using straight advances, with all post-promotion replies retained; no automatic win or queen-safety claim."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0621",
+      "name": "Rule of the square",
+      "occurrences": [
+        {
+          "id": "C0621",
+          "category": "22. Endgame fundamentals",
+          "text": "Rule of the square",
+          "name": "Rule of the square",
+          "status": "verified",
+          "scope": "Mechanics verified: bare K+P versus K, enemy king outside conservative tempo-adjusted promotion-square distance gate, plus independently verified all-response safe promotion route; no formula-only or inside-square judgment."
+        },
+        {
+          "id": "C0640",
+          "category": "23. Pawn endings",
+          "text": "Rule of the square",
+          "name": "Rule of the square",
+          "status": "verified",
+          "scope": "Mechanics verified: bare K+P versus K, enemy king outside conservative tempo-adjusted promotion-square distance gate, plus independently verified all-response safe promotion route; no formula-only or inside-square judgment."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0622",
+      "name": "Shouldering",
+      "occurrences": [
+        {
+          "id": "C0622",
+          "category": "22. Endgame fundamentals",
+          "text": "Shouldering",
+          "name": "Shouldering",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0639",
+          "category": "23. Pawn endings",
+          "text": "Shouldering",
+          "name": "Shouldering",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0623",
+      "name": "Outflanking",
+      "occurrences": [
+        {
+          "id": "C0623",
+          "category": "22. Endgame fundamentals",
+          "text": "Outflanking",
+          "name": "Outflanking",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0638",
+          "category": "23. Pawn endings",
+          "text": "Outflanking",
+          "name": "Outflanking",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0684",
+      "name": "Checking distance",
+      "occurrences": [
+        {
+          "id": "C0684",
+          "category": "24. Rook endings",
+          "text": "Checking distance",
+          "name": "Checking distance",
+          "status": "verified",
+          "scope": "Mechanics verified: at least three clear squares between actual checking rook and king, EVERY immediate legal evasion leaves checker uncaptured; exact separation only, no long-term safety/draw claim."
+        },
+        {
+          "id": "C0731",
+          "category": "28. Queen endings",
+          "text": "Checking distance",
+          "name": "Checking distance",
+          "status": "verified",
+          "scope": "Mechanics verified: at least three clear squares between actual checking rook and king, EVERY immediate legal evasion leaves checker uncaptured; exact separation only, no long-term safety/draw claim."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0710",
+      "name": "Bishop versus knight",
+      "occurrences": [
+        {
+          "id": "C0710",
+          "category": "27. Bishop versus knight endings",
+          "text": "Bishop versus knight",
+          "name": "Bishop versus knight",
+          "status": "partial",
+          "scope": "Partial: exact non-pawn army combinations only; strategic comparison deferred."
+        },
+        {
+          "id": "C0881",
+          "category": "35. Strategic imbalances",
+          "text": "Bishop versus knight",
+          "name": "Bishop versus knight",
+          "status": "partial",
+          "scope": "Partial: exact non-pawn army combinations only; strategic comparison deferred."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0730",
+      "name": "Cross-check",
+      "occurrences": [
+        {
+          "id": "C0730",
+          "category": "28. Queen endings",
+          "text": "Cross-check",
+          "name": "Cross-check",
+          "status": "verified",
+          "scope": "Mechanics verified: legal checking answer to a check; exact original/counterchecker sets, typed blocking rays or checker capture (including EP) or king discovery; direct/discovered/double counterchecks and promotions; ALL legal enemy evasions replayed; neutral factual wording, no advantage claim."
+        },
+        {
+          "id": "C0936",
+          "category": "37. Advanced tactical concepts",
+          "text": "Cross-check",
+          "name": "Cross-check",
+          "status": "verified",
+          "scope": "Mechanics verified: legal checking answer to a check; exact original/counterchecker sets, typed blocking rays or checker capture (including EP) or king discovery; direct/discovered/double counterchecks and promotions; ALL legal enemy evasions replayed; neutral factual wording, no advantage claim."
+        }
+      ],
+      "disposition": "all-verified"
+    },
+    {
+      "id": "C0804",
+      "name": "Commitment",
+      "occurrences": [
+        {
+          "id": "C0804",
+          "category": "32. Decision-making concepts",
+          "text": "Commitment",
+          "name": "Commitment",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C0926",
+          "category": "36. Deeper strategic concepts",
+          "text": "Commitment",
+          "name": "Commitment",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0818",
+      "name": "Increment",
+      "occurrences": [
+        {
+          "id": "C0818",
+          "category": "33. Practical chess concepts",
+          "text": "Increment",
+          "name": "Increment",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C1039",
+          "category": "41. Competitive and rating concepts",
+          "text": "Increment",
+          "name": "Increment",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C0819",
+      "name": "Delay",
+      "occurrences": [
+        {
+          "id": "C0819",
+          "category": "33. Practical chess concepts",
+          "text": "Delay",
+          "name": "Delay",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C1040",
+          "category": "41. Competitive and rating concepts",
+          "text": "Delay",
+          "name": "Delay",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    },
+    {
+      "id": "C1011",
+      "name": "Principal variation",
+      "occurrences": [
+        {
+          "id": "C1011",
+          "category": "39. Chess notation and analysis language",
+          "text": "Principal variation",
+          "name": "Principal variation",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        },
+        {
+          "id": "C1018",
+          "category": "40. Computer-chess concepts",
+          "text": "Principal variation",
+          "name": "Principal variation",
+          "status": "unimplemented",
+          "scope": "Not implemented."
+        }
+      ],
+      "disposition": "all-pending"
+    }
+  ],
+  "queue": [
+    {
+      "rank": 1,
+      "phase": 1,
+      "id": "C0001",
+      "name": "Board coordinates",
+      "pendingIds": [
+        "C0001"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 2,
+      "phase": 1,
+      "id": "C0002",
+      "name": "Piece movement",
+      "pendingIds": [
+        "C0002"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 3,
+      "phase": 1,
+      "id": "C0016",
+      "name": "Legal move",
+      "pendingIds": [
+        "C0016"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 4,
+      "phase": 1,
+      "id": "C0017",
+      "name": "Illegal move",
+      "pendingIds": [
+        "C0017"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 5,
+      "phase": 1,
+      "id": "C0020",
+      "name": "Material",
+      "pendingIds": [
+        "C0020"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 6,
+      "phase": 1,
+      "id": "C0030",
+      "name": "Material balance",
+      "pendingIds": [
+        "C0030"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 7,
+      "phase": 1,
+      "id": "C0031",
+      "name": "Material imbalance",
+      "pendingIds": [
+        "C0031"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 8,
+      "phase": 1,
+      "id": "C0547",
+      "name": "Material",
+      "pendingIds": [
+        "C0547"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 9,
+      "phase": 1,
+      "id": "C0552",
+      "name": "Pawn structure",
+      "pendingIds": [
+        "C0552"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 10,
+      "phase": 1,
+      "id": "C0880",
+      "name": "Material imbalance",
+      "pendingIds": [
+        "C0880"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 11,
+      "phase": 1,
+      "id": "C0882",
+      "name": "Bishop pair versus other minor pieces",
+      "pendingIds": [
+        "C0882"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 12,
+      "phase": 1,
+      "id": "C0883",
+      "name": "Rook versus two minor pieces",
+      "pendingIds": [
+        "C0883"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 13,
+      "phase": 1,
+      "id": "C0893",
+      "name": "Passed-pawn imbalance",
+      "pendingIds": [
+        "C0893"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 14,
+      "phase": 1,
+      "id": "C0894",
+      "name": "Pawn-majority imbalance",
+      "pendingIds": [
+        "C0894"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 15,
+      "phase": 1,
+      "id": "C0189",
+      "name": "Pawn structure",
+      "pendingIds": [
+        "C0189"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 16,
+      "phase": 1,
+      "id": "C0190",
+      "name": "Pawn skeleton",
+      "pendingIds": [
+        "C0190"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 17,
+      "phase": 1,
+      "id": "C0201",
+      "name": "Connected passed pawns",
+      "pendingIds": [
+        "C0201"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 18,
+      "phase": 1,
+      "id": "C0219",
+      "name": "Pawn wedge",
+      "pendingIds": [
+        "C0219"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 19,
+      "phase": 1,
+      "id": "C0226",
+      "name": "Pawn shield",
+      "pendingIds": [
+        "C0226"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 20,
+      "phase": 1,
+      "id": "C0259",
+      "name": "Open-file pawn structure",
+      "pendingIds": [
+        "C0259"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 21,
+      "phase": 1,
+      "id": "C0263",
+      "name": "Open rank",
+      "pendingIds": [
+        "C0263"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 22,
+      "phase": 1,
+      "id": "C0312",
+      "name": "Outside the pawn chain",
+      "pendingIds": [
+        "C0312"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 23,
+      "phase": 1,
+      "id": "C0320",
+      "name": "Bishop behind pawn chain",
+      "pendingIds": [
+        "C0320"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 24,
+      "phase": 1,
+      "id": "C0366",
+      "name": "Queen battery",
+      "pendingIds": [
+        "C0366"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 25,
+      "phase": 1,
+      "id": "C0384",
+      "name": "Central king",
+      "pendingIds": [
+        "C0384"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 26,
+      "phase": 1,
+      "id": "C0385",
+      "name": "King in the center",
+      "pendingIds": [
+        "C0385"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 27,
+      "phase": 1,
+      "id": "C0400",
+      "name": "Pawn shield",
+      "pendingIds": [
+        "C0400"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 28,
+      "phase": 1,
+      "id": "C0404",
+      "name": "Direct attack",
+      "pendingIds": [
+        "C0404"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 29,
+      "phase": 1,
+      "id": "C0410",
+      "name": "Attack on a pawn",
+      "pendingIds": [
+        "C0410"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 30,
+      "phase": 1,
+      "id": "C0411",
+      "name": "Attack on a piece",
+      "pendingIds": [
+        "C0411"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 31,
+      "phase": 1,
+      "id": "C0435",
+      "name": "Battery",
+      "pendingIds": [
+        "C0435"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 32,
+      "phase": 1,
+      "id": "C0645",
+      "name": "Connected passers",
+      "pendingIds": [
+        "C0645"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 33,
+      "phase": 1,
+      "id": "C0665",
+      "name": "Side checks",
+      "pendingIds": [
+        "C0665"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 34,
+      "phase": 1,
+      "id": "C0681",
+      "name": "Four versus three",
+      "pendingIds": [
+        "C0681"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 35,
+      "phase": 1,
+      "id": "C0682",
+      "name": "Three versus two",
+      "pendingIds": [
+        "C0682"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 36,
+      "phase": 1,
+      "id": "C0970",
+      "name": "Symmetrical position",
+      "pendingIds": [
+        "C0970"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 37,
+      "phase": 1,
+      "id": "C0971",
+      "name": "Asymmetrical position",
+      "pendingIds": [
+        "C0971"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 38,
+      "phase": 2,
+      "id": "C0057",
+      "name": "Double attack",
+      "pendingIds": [
+        "C0057"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 39,
+      "phase": 2,
+      "id": "C0068",
+      "name": "X-ray attack",
+      "pendingIds": [
+        "C0068"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 40,
+      "phase": 2,
+      "id": "C0077",
+      "name": "Clearance",
+      "pendingIds": [
+        "C0077"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 41,
+      "phase": 2,
+      "id": "C0078",
+      "name": "Line clearance",
+      "pendingIds": [
+        "C0078"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 42,
+      "phase": 2,
+      "id": "C0110",
+      "name": "Alignment",
+      "pendingIds": [
+        "C0110"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 43,
+      "phase": 2,
+      "id": "C0111",
+      "name": "King-piece alignment",
+      "pendingIds": [
+        "C0111"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 44,
+      "phase": 2,
+      "id": "C0112",
+      "name": "Queen-king alignment",
+      "pendingIds": [
+        "C0112"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 45,
+      "phase": 2,
+      "id": "C0113",
+      "name": "Rook-queen alignment",
+      "pendingIds": [
+        "C0113"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 46,
+      "phase": 2,
+      "id": "C0126",
+      "name": "Quiet move",
+      "pendingIds": [
+        "C0126"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 47,
+      "phase": 2,
+      "id": "C0405",
+      "name": "Kingside attack",
+      "pendingIds": [
+        "C0405"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 48,
+      "phase": 2,
+      "id": "C0406",
+      "name": "Queenside attack",
+      "pendingIds": [
+        "C0406"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 49,
+      "phase": 2,
+      "id": "C0407",
+      "name": "Central attack",
+      "pendingIds": [
+        "C0407"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 50,
+      "phase": 2,
+      "id": "C0408",
+      "name": "Attack on the king",
+      "pendingIds": [
+        "C0408"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 51,
+      "phase": 2,
+      "id": "C0412",
+      "name": "Attack with opposite-side castling",
+      "pendingIds": [
+        "C0412"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 52,
+      "phase": 2,
+      "id": "C0415",
+      "name": "Opening lines",
+      "pendingIds": [
+        "C0415"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 53,
+      "phase": 2,
+      "id": "C0417",
+      "name": "Destroying the pawn shield",
+      "pendingIds": [
+        "C0417"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 54,
+      "phase": 2,
+      "id": "C0430",
+      "name": "Dark-square attack",
+      "pendingIds": [
+        "C0430"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 55,
+      "phase": 2,
+      "id": "C0431",
+      "name": "Light-square attack",
+      "pendingIds": [
+        "C0431"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 56,
+      "phase": 2,
+      "id": "C0432",
+      "name": "Attack against f7/f2",
+      "pendingIds": [
+        "C0432"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 57,
+      "phase": 2,
+      "id": "C0433",
+      "name": "Attack against h7/h2",
+      "pendingIds": [
+        "C0433"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 58,
+      "phase": 2,
+      "id": "C0434",
+      "name": "Attack against g7/g2",
+      "pendingIds": [
+        "C0434"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 59,
+      "phase": 2,
+      "id": "C0436",
+      "name": "Line opening",
+      "pendingIds": [
+        "C0436"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 60,
+      "phase": 2,
+      "id": "C0437",
+      "name": "File opening",
+      "pendingIds": [
+        "C0437"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 61,
+      "phase": 2,
+      "id": "C0442",
+      "name": "No escape squares",
+      "pendingIds": [
+        "C0442"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 62,
+      "phase": 2,
+      "id": "C0443",
+      "name": "Restricting the king",
+      "pendingIds": [
+        "C0443"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 63,
+      "phase": 2,
+      "id": "C0450",
+      "name": "Trading attackers",
+      "pendingIds": [
+        "C0450"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 64,
+      "phase": 2,
+      "id": "C0451",
+      "name": "Trading queens",
+      "pendingIds": [
+        "C0451"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 65,
+      "phase": 2,
+      "id": "C0452",
+      "name": "Returning material",
+      "pendingIds": [
+        "C0452"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 66,
+      "phase": 2,
+      "id": "C0453",
+      "name": "Giving back the exchange",
+      "pendingIds": [
+        "C0453"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 67,
+      "phase": 2,
+      "id": "C0464",
+      "name": "Simplification",
+      "pendingIds": [
+        "C0464"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 68,
+      "phase": 2,
+      "id": "C0473",
+      "name": "Liquidation into an endgame",
+      "pendingIds": [
+        "C0473"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 69,
+      "phase": 2,
+      "id": "C0933",
+      "name": "Underprotected piece",
+      "pendingIds": [
+        "C0933"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 70,
+      "phase": 2,
+      "id": "C0934",
+      "name": "Self-pin",
+      "pendingIds": [
+        "C0934"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 71,
+      "phase": 2,
+      "id": "C0172",
+      "name": "Pawn center",
+      "pendingIds": [
+        "C0172"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 72,
+      "phase": 2,
+      "id": "C0173",
+      "name": "Piece center",
+      "pendingIds": [
+        "C0173"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 73,
+      "phase": 2,
+      "id": "C0174",
+      "name": "Classical center",
+      "pendingIds": [
+        "C0174"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 74,
+      "phase": 2,
+      "id": "C0175",
+      "name": "Hypermodern center",
+      "pendingIds": [
+        "C0175"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 75,
+      "phase": 2,
+      "id": "C0176",
+      "name": "Open center",
+      "pendingIds": [
+        "C0176"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 76,
+      "phase": 2,
+      "id": "C0178",
+      "name": "Fixed center",
+      "pendingIds": [
+        "C0178"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 77,
+      "phase": 2,
+      "id": "C0183",
+      "name": "Maintaining tension",
+      "pendingIds": [
+        "C0183"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 78,
+      "phase": 2,
+      "id": "C0526",
+      "name": "Majority advance",
+      "pendingIds": [
+        "C0526"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 79,
+      "phase": 2,
+      "id": "C0527",
+      "name": "Kingside expansion",
+      "pendingIds": [
+        "C0527"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 80,
+      "phase": 2,
+      "id": "C0528",
+      "name": "Queenside expansion",
+      "pendingIds": [
+        "C0528"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 81,
+      "phase": 2,
+      "id": "C0529",
+      "name": "Central expansion",
+      "pendingIds": [
+        "C0529"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 82,
+      "phase": 2,
+      "id": "C0540",
+      "name": "Changing the pawn structure",
+      "pendingIds": [
+        "C0540"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 83,
+      "phase": 2,
+      "id": "C0753",
+      "name": "Gain of tempo",
+      "pendingIds": [
+        "C0753"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 84,
+      "phase": 2,
+      "id": "C0754",
+      "name": "Loss of tempo",
+      "pendingIds": [
+        "C0754"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 85,
+      "phase": 2,
+      "id": "C0756",
+      "name": "Attacking with tempo",
+      "pendingIds": [
+        "C0756"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 86,
+      "phase": 2,
+      "id": "C0757",
+      "name": "Tempo on the queen",
+      "pendingIds": [
+        "C0757"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 87,
+      "phase": 2,
+      "id": "C0777",
+      "name": "Creating escape squares",
+      "pendingIds": [
+        "C0777"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 88,
+      "phase": 2,
+      "id": "C0036",
+      "name": "Winning the exchange",
+      "pendingIds": [
+        "C0036"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 89,
+      "phase": 2,
+      "id": "C0213",
+      "name": "Pawn hole",
+      "pendingIds": [
+        "C0213"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 90,
+      "phase": 2,
+      "id": "C0266",
+      "name": "Weak square",
+      "pendingIds": [
+        "C0266"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 91,
+      "phase": 2,
+      "id": "C0267",
+      "name": "Strong square",
+      "pendingIds": [
+        "C0267"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 92,
+      "phase": 2,
+      "id": "C0337",
+      "name": "Knight on a protected outpost",
+      "pendingIds": [
+        "C0337"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 93,
+      "phase": 2,
+      "id": "C0349",
+      "name": "Rook lift",
+      "pendingIds": [
+        "C0349"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 94,
+      "phase": 2,
+      "id": "C0361",
+      "name": "Queen centralization",
+      "pendingIds": [
+        "C0361",
+        "C0725"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 95,
+      "phase": 2,
+      "id": "C0382",
+      "name": "Uncastled king",
+      "pendingIds": [
+        "C0382"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 96,
+      "phase": 2,
+      "id": "C0553",
+      "name": "Center control",
+      "pendingIds": [
+        "C0553"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 97,
+      "phase": 2,
+      "id": "C0602",
+      "name": "Endgame transition",
+      "pendingIds": [
+        "C0602"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 98,
+      "phase": 2,
+      "id": "C0604",
+      "name": "Centralizing the king",
+      "pendingIds": [
+        "C0604"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 99,
+      "phase": 2,
+      "id": "C0630",
+      "name": "Liquidation",
+      "pendingIds": [
+        "C0630"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 100,
+      "phase": 2,
+      "id": "C0631",
+      "name": "Endgame simplification",
+      "pendingIds": [
+        "C0631"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 101,
+      "phase": 2,
+      "id": "C0648",
+      "name": "Queen with check",
+      "pendingIds": [
+        "C0648"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 102,
+      "phase": 2,
+      "id": "C0650",
+      "name": "Spare pawn move",
+      "pendingIds": [
+        "C0650"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 103,
+      "phase": 2,
+      "id": "C0806",
+      "name": "Pawn move irreversibility",
+      "pendingIds": [
+        "C0806"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 104,
+      "phase": 2,
+      "id": "C0850",
+      "name": "Hanging a piece",
+      "pendingIds": [
+        "C0850"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 105,
+      "phase": 2,
+      "id": "C0888",
+      "name": "Development imbalance",
+      "pendingIds": [
+        "C0888"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 106,
+      "phase": 2,
+      "id": "C0927",
+      "name": "Irreversibility",
+      "pendingIds": [
+        "C0927"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 107,
+      "phase": 2,
+      "id": "C0977",
+      "name": "Simplified position",
+      "pendingIds": [
+        "C0977"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 108,
+      "phase": 3,
+      "id": "C0139",
+      "name": "Control the center",
+      "pendingIds": [
+        "C0139"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 109,
+      "phase": 3,
+      "id": "C0141",
+      "name": "Castle early",
+      "pendingIds": [
+        "C0141"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 110,
+      "phase": 3,
+      "id": "C0143",
+      "name": "Avoid unnecessary pawn moves",
+      "pendingIds": [
+        "C0143"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 111,
+      "phase": 3,
+      "id": "C0144",
+      "name": "Avoid repeated piece moves",
+      "pendingIds": [
+        "C0144"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 112,
+      "phase": 3,
+      "id": "C0145",
+      "name": "Do not bring the queen out too early",
+      "pendingIds": [
+        "C0145"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 113,
+      "phase": 3,
+      "id": "C0147",
+      "name": "Development advantage",
+      "pendingIds": [
+        "C0147"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 114,
+      "phase": 3,
+      "id": "C0148",
+      "name": "Lead in development",
+      "pendingIds": [
+        "C0148"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 115,
+      "phase": 3,
+      "id": "C0155",
+      "name": "Move order",
+      "pendingIds": [
+        "C0155"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 116,
+      "phase": 3,
+      "id": "C0156",
+      "name": "Transposition",
+      "pendingIds": [
+        "C0156"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 117,
+      "phase": 3,
+      "id": "C0160",
+      "name": "Gambit",
+      "pendingIds": [
+        "C0160"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 118,
+      "phase": 3,
+      "id": "C0161",
+      "name": "Accepted gambit",
+      "pendingIds": [
+        "C0161"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 119,
+      "phase": 3,
+      "id": "C0162",
+      "name": "Declined gambit",
+      "pendingIds": [
+        "C0162"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 120,
+      "phase": 3,
+      "id": "C0163",
+      "name": "Countergambit",
+      "pendingIds": [
+        "C0163"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 121,
+      "phase": 3,
+      "id": "C0164",
+      "name": "Open game",
+      "pendingIds": [
+        "C0164"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 122,
+      "phase": 3,
+      "id": "C0165",
+      "name": "Semi-open game",
+      "pendingIds": [
+        "C0165"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 123,
+      "phase": 3,
+      "id": "C0166",
+      "name": "Closed game",
+      "pendingIds": [
+        "C0166"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 124,
+      "phase": 3,
+      "id": "C0167",
+      "name": "Semi-closed game",
+      "pendingIds": [
+        "C0167"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 125,
+      "phase": 3,
+      "id": "C0168",
+      "name": "Hypermodern opening",
+      "pendingIds": [
+        "C0168"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 126,
+      "phase": 3,
+      "id": "C0169",
+      "name": "Classical opening",
+      "pendingIds": [
+        "C0169"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 127,
+      "phase": 3,
+      "id": "C0179",
+      "name": "Mobile center",
+      "pendingIds": [
+        "C0179"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 128,
+      "phase": 3,
+      "id": "C0181",
+      "name": "Fluid center",
+      "pendingIds": [
+        "C0181"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 129,
+      "phase": 3,
+      "id": "C0204",
+      "name": "Candidate passed pawn",
+      "pendingIds": [
+        "C0204"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 130,
+      "phase": 3,
+      "id": "C0205",
+      "name": "Backward pawn",
+      "pendingIds": [
+        "C0205"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 131,
+      "phase": 3,
+      "id": "C0211",
+      "name": "Pawn weakness",
+      "pendingIds": [
+        "C0211"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 132,
+      "phase": 3,
+      "id": "C0212",
+      "name": "Weak square",
+      "pendingIds": [
+        "C0212"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 133,
+      "phase": 3,
+      "id": "C0220",
+      "name": "Cramping pawn",
+      "pendingIds": [
+        "C0220"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 134,
+      "phase": 3,
+      "id": "C0225",
+      "name": "Pawn target",
+      "pendingIds": [
+        "C0225"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 135,
+      "phase": 3,
+      "id": "C0227",
+      "name": "Pawn cover",
+      "pendingIds": [
+        "C0227"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 136,
+      "phase": 3,
+      "id": "C0229",
+      "name": "Structural weakness",
+      "pendingIds": [
+        "C0229"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 137,
+      "phase": 3,
+      "id": "C0231",
+      "name": "Color-complex weakness",
+      "pendingIds": [
+        "C0231"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 138,
+      "phase": 3,
+      "id": "C0232",
+      "name": "Dark-square weakness",
+      "pendingIds": [
+        "C0232"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 139,
+      "phase": 3,
+      "id": "C0233",
+      "name": "Light-square weakness",
+      "pendingIds": [
+        "C0233"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 140,
+      "phase": 3,
+      "id": "C0241",
+      "name": "Caro-Kann structure",
+      "pendingIds": [
+        "C0241"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 141,
+      "phase": 3,
+      "id": "C0242",
+      "name": "Slav structure",
+      "pendingIds": [
+        "C0242"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 142,
+      "phase": 3,
+      "id": "C0243",
+      "name": "Queen's Gambit structure",
+      "pendingIds": [
+        "C0243"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 143,
+      "phase": 3,
+      "id": "C0244",
+      "name": "Benoni structure",
+      "pendingIds": [
+        "C0244"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 144,
+      "phase": 3,
+      "id": "C0245",
+      "name": "Benko structure",
+      "pendingIds": [
+        "C0245"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 145,
+      "phase": 3,
+      "id": "C0246",
+      "name": "King's Indian structure",
+      "pendingIds": [
+        "C0246"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 146,
+      "phase": 3,
+      "id": "C0247",
+      "name": "Grünfeld center",
+      "pendingIds": [
+        "C0247"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 147,
+      "phase": 3,
+      "id": "C0249",
+      "name": "Najdorf structure",
+      "pendingIds": [
+        "C0249"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 148,
+      "phase": 3,
+      "id": "C0250",
+      "name": "Dragon structure",
+      "pendingIds": [
+        "C0250"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 149,
+      "phase": 3,
+      "id": "C0251",
+      "name": "Closed Sicilian structure",
+      "pendingIds": [
+        "C0251"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 150,
+      "phase": 3,
+      "id": "C0252",
+      "name": "Botvinnik structure",
+      "pendingIds": [
+        "C0252"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 151,
+      "phase": 3,
+      "id": "C0253",
+      "name": "Panov structure",
+      "pendingIds": [
+        "C0253"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 152,
+      "phase": 3,
+      "id": "C0324",
+      "name": "Knight maneuver",
+      "pendingIds": [
+        "C0324"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 153,
+      "phase": 3,
+      "id": "C0335",
+      "name": "Knight rerouting",
+      "pendingIds": [
+        "C0335"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 154,
+      "phase": 3,
+      "id": "C0336",
+      "name": "Knight tour",
+      "pendingIds": [
+        "C0336"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 155,
+      "phase": 3,
+      "id": "C0363",
+      "name": "Queen infiltration",
+      "pendingIds": [
+        "C0363"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 156,
+      "phase": 3,
+      "id": "C0376",
+      "name": "Queen harassment",
+      "pendingIds": [
+        "C0376"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 157,
+      "phase": 3,
+      "id": "C0402",
+      "name": "King walk",
+      "pendingIds": [
+        "C0402"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 158,
+      "phase": 3,
+      "id": "C0414",
+      "name": "Piece storm",
+      "pendingIds": [
+        "C0414"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 159,
+      "phase": 3,
+      "id": "C0422",
+      "name": "Local superiority",
+      "pendingIds": [
+        "C0422"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 160,
+      "phase": 3,
+      "id": "C0424",
+      "name": "Bringing reinforcements",
+      "pendingIds": [
+        "C0424"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 161,
+      "phase": 3,
+      "id": "C0425",
+      "name": "Switching the attack",
+      "pendingIds": [
+        "C0425"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 162,
+      "phase": 3,
+      "id": "C0426",
+      "name": "Attack on both wings",
+      "pendingIds": [
+        "C0426"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 163,
+      "phase": 3,
+      "id": "C0467",
+      "name": "Perpetual attack",
+      "pendingIds": [
+        "C0467"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 164,
+      "phase": 3,
+      "id": "C0524",
+      "name": "Pawn break preparation",
+      "pendingIds": [
+        "C0524"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 165,
+      "phase": 3,
+      "id": "C0544",
+      "name": "Switching wings",
+      "pendingIds": [
+        "C0544"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 166,
+      "phase": 3,
+      "id": "C0585",
+      "name": "Development lead",
+      "pendingIds": [
+        "C0585"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 167,
+      "phase": 3,
+      "id": "C0644",
+      "name": "Candidate passed pawn",
+      "pendingIds": [
+        "C0644"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 168,
+      "phase": 3,
+      "id": "C0658",
+      "name": "Fixing pawns",
+      "pendingIds": [
+        "C0658"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 169,
+      "phase": 3,
+      "id": "C0659",
+      "name": "Creating entry squares",
+      "pendingIds": [
+        "C0659"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 170,
+      "phase": 3,
+      "id": "C0704",
+      "name": "Knight maneuvering",
+      "pendingIds": [
+        "C0704"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 171,
+      "phase": 3,
+      "id": "C0709",
+      "name": "Knight distance from action",
+      "pendingIds": [
+        "C0709"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 172,
+      "phase": 3,
+      "id": "C0718",
+      "name": "Fixing pawns on bishop's color",
+      "pendingIds": [
+        "C0718"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 173,
+      "phase": 3,
+      "id": "C0761",
+      "name": "Move-order trick",
+      "pendingIds": [
+        "C0761"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 174,
+      "phase": 3,
+      "id": "C0762",
+      "name": "Transposition",
+      "pendingIds": [
+        "C0762"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 175,
+      "phase": 3,
+      "id": "C0773",
+      "name": "Preventing castling",
+      "pendingIds": [
+        "C0773"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 176,
+      "phase": 3,
+      "id": "C0775",
+      "name": "Stopping an outpost",
+      "pendingIds": [
+        "C0775"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 177,
+      "phase": 3,
+      "id": "C0856",
+      "name": "Unnecessary pawn move",
+      "pendingIds": [
+        "C0856"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 178,
+      "phase": 3,
+      "id": "C0862",
+      "name": "Pawn grabbing",
+      "pendingIds": [
+        "C0862"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 179,
+      "phase": 3,
+      "id": "C0869",
+      "name": "Overextension",
+      "pendingIds": [
+        "C0869"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 180,
+      "phase": 3,
+      "id": "C0886",
+      "name": "Pawn-structure imbalance",
+      "pendingIds": [
+        "C0886"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 181,
+      "phase": 3,
+      "id": "C0910",
+      "name": "Permanent weakness",
+      "pendingIds": [
+        "C0910"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 182,
+      "phase": 3,
+      "id": "C0911",
+      "name": "Temporary weakness",
+      "pendingIds": [
+        "C0911"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 183,
+      "phase": 3,
+      "id": "C0912",
+      "name": "Static weakness",
+      "pendingIds": [
+        "C0912"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 184,
+      "phase": 3,
+      "id": "C0914",
+      "name": "Fixation",
+      "pendingIds": [
+        "C0914"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 185,
+      "phase": 3,
+      "id": "C0916",
+      "name": "Inducing pawn moves",
+      "pendingIds": [
+        "C0916"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 186,
+      "phase": 3,
+      "id": "C0959",
+      "name": "Open position",
+      "pendingIds": [
+        "C0959"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 187,
+      "phase": 3,
+      "id": "C0960",
+      "name": "Closed position",
+      "pendingIds": [
+        "C0960"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 188,
+      "phase": 3,
+      "id": "C0961",
+      "name": "Semi-open position",
+      "pendingIds": [
+        "C0961"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 189,
+      "phase": 3,
+      "id": "C0975",
+      "name": "Fluid position",
+      "pendingIds": [
+        "C0975"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 190,
+      "phase": 4,
+      "id": "C0059",
+      "name": "Pin",
+      "pendingIds": [
+        "C0059"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 191,
+      "phase": 4,
+      "id": "C0063",
+      "name": "Skewer",
+      "pendingIds": [
+        "C0063"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 192,
+      "phase": 4,
+      "id": "C0091",
+      "name": "Permanent sacrifice",
+      "pendingIds": [
+        "C0091"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 193,
+      "phase": 4,
+      "id": "C0095",
+      "name": "Destroying the pawn shield",
+      "pendingIds": [
+        "C0095"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 194,
+      "phase": 4,
+      "id": "C0096",
+      "name": "Greek Gift sacrifice",
+      "pendingIds": [
+        "C0096"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 195,
+      "phase": 4,
+      "id": "C0104",
+      "name": "Hanging piece",
+      "pendingIds": [
+        "C0104"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 196,
+      "phase": 4,
+      "id": "C0105",
+      "name": "Loose pieces drop off",
+      "pendingIds": [
+        "C0105"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 197,
+      "phase": 4,
+      "id": "C0109",
+      "name": "Tactical vulnerability",
+      "pendingIds": [
+        "C0109"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 198,
+      "phase": 4,
+      "id": "C0129",
+      "name": "Forcing sequence",
+      "pendingIds": [
+        "C0129"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 199,
+      "phase": 4,
+      "id": "C0159",
+      "name": "Opening trap",
+      "pendingIds": [
+        "C0159"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 200,
+      "phase": 4,
+      "id": "C0216",
+      "name": "Breakthrough",
+      "pendingIds": [
+        "C0216"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 201,
+      "phase": 4,
+      "id": "C0270",
+      "name": "Entry square",
+      "pendingIds": [
+        "C0270"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 202,
+      "phase": 4,
+      "id": "C0271",
+      "name": "Penetration square",
+      "pendingIds": [
+        "C0271"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 203,
+      "phase": 4,
+      "id": "C0272",
+      "name": "Key square",
+      "pendingIds": [
+        "C0272"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 204,
+      "phase": 4,
+      "id": "C0273",
+      "name": "Critical square",
+      "pendingIds": [
+        "C0273"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 205,
+      "phase": 4,
+      "id": "C0275",
+      "name": "Corresponding squares",
+      "pendingIds": [
+        "C0275"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 206,
+      "phase": 4,
+      "id": "C0354",
+      "name": "Cutting off the king",
+      "pendingIds": [
+        "C0354"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 207,
+      "phase": 4,
+      "id": "C0392",
+      "name": "Corresponding squares",
+      "pendingIds": [
+        "C0392",
+        "C0612",
+        "C0653"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 208,
+      "phase": 4,
+      "id": "C0396",
+      "name": "King cut-off",
+      "pendingIds": [
+        "C0396"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 209,
+      "phase": 4,
+      "id": "C0458",
+      "name": "King evacuation",
+      "pendingIds": [
+        "C0458"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 210,
+      "phase": 4,
+      "id": "C0465",
+      "name": "Fortress",
+      "pendingIds": [
+        "C0465",
+        "C0625"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 211,
+      "phase": 4,
+      "id": "C0469",
+      "name": "Resource",
+      "pendingIds": [
+        "C0469"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 212,
+      "phase": 4,
+      "id": "C0470",
+      "name": "Only defense",
+      "pendingIds": [
+        "C0470"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 213,
+      "phase": 4,
+      "id": "C0471",
+      "name": "Defensive tactical shot",
+      "pendingIds": [
+        "C0471"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 214,
+      "phase": 4,
+      "id": "C0472",
+      "name": "Counter-sacrifice",
+      "pendingIds": [
+        "C0472"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 215,
+      "phase": 4,
+      "id": "C0611",
+      "name": "Key squares",
+      "pendingIds": [
+        "C0611"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 216,
+      "phase": 4,
+      "id": "C0614",
+      "name": "Zugzwang",
+      "pendingIds": [
+        "C0614",
+        "C0652",
+        "C0766"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 217,
+      "phase": 4,
+      "id": "C0615",
+      "name": "Mutual zugzwang",
+      "pendingIds": [
+        "C0615",
+        "C0767"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 218,
+      "phase": 4,
+      "id": "C0617",
+      "name": "Tempo move",
+      "pendingIds": [
+        "C0617"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 219,
+      "phase": 4,
+      "id": "C0618",
+      "name": "Breakthrough",
+      "pendingIds": [
+        "C0618"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 220,
+      "phase": 4,
+      "id": "C0620",
+      "name": "Counting tempi",
+      "pendingIds": [
+        "C0620"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 221,
+      "phase": 4,
+      "id": "C0629",
+      "name": "Converting an extra pawn",
+      "pendingIds": [
+        "C0629"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 222,
+      "phase": 4,
+      "id": "C0634",
+      "name": "Key-square theory",
+      "pendingIds": [
+        "C0634"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 223,
+      "phase": 4,
+      "id": "C0641",
+      "name": "Pawn breakthrough",
+      "pendingIds": [
+        "C0641"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 224,
+      "phase": 4,
+      "id": "C0647",
+      "name": "Promotion race",
+      "pendingIds": [
+        "C0647"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 225,
+      "phase": 4,
+      "id": "C0654",
+      "name": "Trebuchet",
+      "pendingIds": [
+        "C0654"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 226,
+      "phase": 4,
+      "id": "C0655",
+      "name": "Réti maneuver",
+      "pendingIds": [
+        "C0655"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 227,
+      "phase": 4,
+      "id": "C0662",
+      "name": "Cutting off the enemy king",
+      "pendingIds": [
+        "C0662"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 228,
+      "phase": 4,
+      "id": "C0666",
+      "name": "Long-side defense",
+      "pendingIds": [
+        "C0666"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 229,
+      "phase": 4,
+      "id": "C0667",
+      "name": "Short-side defense",
+      "pendingIds": [
+        "C0667"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 230,
+      "phase": 4,
+      "id": "C0668",
+      "name": "Lucena position",
+      "pendingIds": [
+        "C0668"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 231,
+      "phase": 4,
+      "id": "C0669",
+      "name": "Building a bridge",
+      "pendingIds": [
+        "C0669"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 232,
+      "phase": 4,
+      "id": "C0670",
+      "name": "Philidor position",
+      "pendingIds": [
+        "C0670"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 233,
+      "phase": 4,
+      "id": "C0671",
+      "name": "Vancura defense",
+      "pendingIds": [
+        "C0671"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 234,
+      "phase": 4,
+      "id": "C0679",
+      "name": "Rook sacrifice for a pawn",
+      "pendingIds": [
+        "C0679"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 235,
+      "phase": 4,
+      "id": "C0680",
+      "name": "Rook endgame pawn races",
+      "pendingIds": [
+        "C0680"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 236,
+      "phase": 4,
+      "id": "C0683",
+      "name": "Outside passed pawn in rook endings",
+      "pendingIds": [
+        "C0683"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 237,
+      "phase": 4,
+      "id": "C0694",
+      "name": "Bishop sacrifice for pawns",
+      "pendingIds": [
+        "C0694"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 238,
+      "phase": 4,
+      "id": "C0703",
+      "name": "Knight fork in endgames",
+      "pendingIds": [
+        "C0703"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 239,
+      "phase": 4,
+      "id": "C0705",
+      "name": "Knight versus outside passed pawn",
+      "pendingIds": [
+        "C0705"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 240,
+      "phase": 4,
+      "id": "C0708",
+      "name": "Knight inability to lose a tempo easily",
+      "pendingIds": [
+        "C0708"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 241,
+      "phase": 4,
+      "id": "C0726",
+      "name": "Passed-pawn checks",
+      "pendingIds": [
+        "C0726"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 242,
+      "phase": 4,
+      "id": "C0729",
+      "name": "Queen race",
+      "pendingIds": [
+        "C0729"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 243,
+      "phase": 4,
+      "id": "C0735",
+      "name": "Perpetual-check fortress",
+      "pendingIds": [
+        "C0735"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 244,
+      "phase": 4,
+      "id": "C0738",
+      "name": "Rook versus bishop",
+      "pendingIds": [
+        "C0738"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 245,
+      "phase": 4,
+      "id": "C0739",
+      "name": "Rook versus knight",
+      "pendingIds": [
+        "C0739"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 246,
+      "phase": 4,
+      "id": "C0746",
+      "name": "Fortress construction",
+      "pendingIds": [
+        "C0746"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 247,
+      "phase": 4,
+      "id": "C0747",
+      "name": "Tablebase position",
+      "pendingIds": [
+        "C0747"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 248,
+      "phase": 4,
+      "id": "C0748",
+      "name": "Tablebase win",
+      "pendingIds": [
+        "C0748"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 249,
+      "phase": 4,
+      "id": "C0749",
+      "name": "Tablebase draw",
+      "pendingIds": [
+        "C0749"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 250,
+      "phase": 4,
+      "id": "C0750",
+      "name": "Distance to mate",
+      "pendingIds": [
+        "C0750"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 251,
+      "phase": 4,
+      "id": "C0751",
+      "name": "Distance to zeroing move",
+      "pendingIds": [
+        "C0751"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 252,
+      "phase": 4,
+      "id": "C0764",
+      "name": "Passing move",
+      "pendingIds": [
+        "C0764"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 253,
+      "phase": 4,
+      "id": "C0769",
+      "name": "Forcing move order",
+      "pendingIds": [
+        "C0769"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 254,
+      "phase": 4,
+      "id": "C0772",
+      "name": "Preventing a pawn break",
+      "pendingIds": [
+        "C0772"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 255,
+      "phase": 4,
+      "id": "C0774",
+      "name": "Preventing development",
+      "pendingIds": [
+        "C0774"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 256,
+      "phase": 4,
+      "id": "C0778",
+      "name": "Preventing a tactical motif",
+      "pendingIds": [
+        "C0778"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 257,
+      "phase": 4,
+      "id": "C0780",
+      "name": "Preventing penetration",
+      "pendingIds": [
+        "C0780"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 258,
+      "phase": 4,
+      "id": "C0783",
+      "name": "Restraining a passed pawn",
+      "pendingIds": [
+        "C0783"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 259,
+      "phase": 4,
+      "id": "C0851",
+      "name": "Missing a tactic",
+      "pendingIds": [
+        "C0851"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 260,
+      "phase": 4,
+      "id": "C0853",
+      "name": "Ignoring the opponent's threat",
+      "pendingIds": [
+        "C0853"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 261,
+      "phase": 4,
+      "id": "C0878",
+      "name": "Entering a lost pawn ending",
+      "pendingIds": [
+        "C0878"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 262,
+      "phase": 4,
+      "id": "C0929",
+      "name": "Geometric tactics",
+      "pendingIds": [
+        "C0929"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 263,
+      "phase": 4,
+      "id": "C0930",
+      "name": "Line tactics",
+      "pendingIds": [
+        "C0930"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 264,
+      "phase": 4,
+      "id": "C0931",
+      "name": "Alignment tactics",
+      "pendingIds": [
+        "C0931"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 265,
+      "phase": 4,
+      "id": "C0944",
+      "name": "Trapping combination",
+      "pendingIds": [
+        "C0944"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 266,
+      "phase": 4,
+      "id": "C0949",
+      "name": "Perpetual-check tactic",
+      "pendingIds": [
+        "C0949"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 267,
+      "phase": 4,
+      "id": "C0950",
+      "name": "Fortress tactic",
+      "pendingIds": [
+        "C0950"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 268,
+      "phase": 4,
+      "id": "C0951",
+      "name": "Tactical liquidation",
+      "pendingIds": [
+        "C0951"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 269,
+      "phase": 4,
+      "id": "C0956",
+      "name": "Tactical retreat",
+      "pendingIds": [
+        "C0956"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 270,
+      "phase": 4,
+      "id": "C0957",
+      "name": "Counter-combination",
+      "pendingIds": [
+        "C0957"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 271,
+      "phase": 4,
+      "id": "C0958",
+      "name": "Defensive combination",
+      "pendingIds": [
+        "C0958"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 272,
+      "phase": 4,
+      "id": "C0982",
+      "name": "Fortress position",
+      "pendingIds": [
+        "C0982"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 273,
+      "phase": 4,
+      "id": "C0983",
+      "name": "Zugzwang position",
+      "pendingIds": [
+        "C0983"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 274,
+      "phase": 5,
+      "id": "C0021",
+      "name": "Tempo",
+      "pendingIds": [
+        "C0021"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 275,
+      "phase": 5,
+      "id": "C0022",
+      "name": "Initiative",
+      "pendingIds": [
+        "C0022"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 276,
+      "phase": 5,
+      "id": "C0025",
+      "name": "King safety",
+      "pendingIds": [
+        "C0025"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 277,
+      "phase": 5,
+      "id": "C0026",
+      "name": "Piece activity",
+      "pendingIds": [
+        "C0026"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 278,
+      "phase": 5,
+      "id": "C0028",
+      "name": "Coordination",
+      "pendingIds": [
+        "C0028"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 279,
+      "phase": 5,
+      "id": "C0029",
+      "name": "Harmony",
+      "pendingIds": [
+        "C0029"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 280,
+      "phase": 5,
+      "id": "C0032",
+      "name": "Relative piece value",
+      "pendingIds": [
+        "C0032"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 281,
+      "phase": 5,
+      "id": "C0033",
+      "name": "Absolute versus relative value",
+      "pendingIds": [
+        "C0033"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 282,
+      "phase": 5,
+      "id": "C0038",
+      "name": "Quality of pieces",
+      "pendingIds": [
+        "C0038"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 283,
+      "phase": 5,
+      "id": "C0039",
+      "name": "Good trade",
+      "pendingIds": [
+        "C0039"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 284,
+      "phase": 5,
+      "id": "C0040",
+      "name": "Bad trade",
+      "pendingIds": [
+        "C0040"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 285,
+      "phase": 5,
+      "id": "C0044",
+      "name": "Mass exchanges",
+      "pendingIds": [
+        "C0044"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 286,
+      "phase": 5,
+      "id": "C0045",
+      "name": "Trading when ahead",
+      "pendingIds": [
+        "C0045"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 287,
+      "phase": 5,
+      "id": "C0046",
+      "name": "Keeping pieces when behind",
+      "pendingIds": [
+        "C0046"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 288,
+      "phase": 5,
+      "id": "C0050",
+      "name": "Favorable transformation",
+      "pendingIds": [
+        "C0050"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 289,
+      "phase": 5,
+      "id": "C0092",
+      "name": "Positional sacrifice",
+      "pendingIds": [
+        "C0092"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 290,
+      "phase": 5,
+      "id": "C0114",
+      "name": "Candidate moves",
+      "pendingIds": [
+        "C0114"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 291,
+      "phase": 5,
+      "id": "C0116",
+      "name": "Checks-captures-threats method",
+      "pendingIds": [
+        "C0116"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 292,
+      "phase": 5,
+      "id": "C0117",
+      "name": "Calculation tree",
+      "pendingIds": [
+        "C0117"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 293,
+      "phase": 5,
+      "id": "C0118",
+      "name": "Principal variation",
+      "pendingIds": [
+        "C0118"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 294,
+      "phase": 5,
+      "id": "C0123",
+      "name": "Move ordering",
+      "pendingIds": [
+        "C0123"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 295,
+      "phase": 5,
+      "id": "C0124",
+      "name": "Calculation depth",
+      "pendingIds": [
+        "C0124"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 296,
+      "phase": 5,
+      "id": "C0125",
+      "name": "Calculation breadth",
+      "pendingIds": [
+        "C0125"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 297,
+      "phase": 5,
+      "id": "C0130",
+      "name": "Critical position",
+      "pendingIds": [
+        "C0130"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 298,
+      "phase": 5,
+      "id": "C0131",
+      "name": "Critical moment",
+      "pendingIds": [
+        "C0131"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 299,
+      "phase": 5,
+      "id": "C0132",
+      "name": "Stopping point",
+      "pendingIds": [
+        "C0132"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 300,
+      "phase": 5,
+      "id": "C0133",
+      "name": "Final-position evaluation",
+      "pendingIds": [
+        "C0133"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 301,
+      "phase": 5,
+      "id": "C0134",
+      "name": "Blunder check",
+      "pendingIds": [
+        "C0134"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 302,
+      "phase": 5,
+      "id": "C0135",
+      "name": "Opponent's best response",
+      "pendingIds": [
+        "C0135"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 303,
+      "phase": 5,
+      "id": "C0136",
+      "name": "Backward calculation",
+      "pendingIds": [
+        "C0136"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 304,
+      "phase": 5,
+      "id": "C0137",
+      "name": "Elimination method",
+      "pendingIds": [
+        "C0137"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 305,
+      "phase": 5,
+      "id": "C0138",
+      "name": "Comparison of candidates",
+      "pendingIds": [
+        "C0138"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 306,
+      "phase": 5,
+      "id": "C0149",
+      "name": "Opening initiative",
+      "pendingIds": [
+        "C0149"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 307,
+      "phase": 5,
+      "id": "C0170",
+      "name": "Opening equalization",
+      "pendingIds": [
+        "C0170"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 308,
+      "phase": 5,
+      "id": "C0171",
+      "name": "Opening advantage",
+      "pendingIds": [
+        "C0171"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 309,
+      "phase": 5,
+      "id": "C0180",
+      "name": "Dynamic center",
+      "pendingIds": [
+        "C0180"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 310,
+      "phase": 5,
+      "id": "C0187",
+      "name": "Overextended center",
+      "pendingIds": [
+        "C0187"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 311,
+      "phase": 5,
+      "id": "C0188",
+      "name": "Center collapse",
+      "pendingIds": [
+        "C0188"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 312,
+      "phase": 5,
+      "id": "C0198",
+      "name": "Minority attack",
+      "pendingIds": [
+        "C0198"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 313,
+      "phase": 5,
+      "id": "C0230",
+      "name": "Structural advantage",
+      "pendingIds": [
+        "C0230"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 314,
+      "phase": 5,
+      "id": "C0276",
+      "name": "Positional advantage",
+      "pendingIds": [
+        "C0276"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 315,
+      "phase": 5,
+      "id": "C0277",
+      "name": "Static advantage",
+      "pendingIds": [
+        "C0277"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 316,
+      "phase": 5,
+      "id": "C0278",
+      "name": "Dynamic advantage",
+      "pendingIds": [
+        "C0278"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 317,
+      "phase": 5,
+      "id": "C0279",
+      "name": "Compensation",
+      "pendingIds": [
+        "C0279"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 318,
+      "phase": 5,
+      "id": "C0280",
+      "name": "Long-term compensation",
+      "pendingIds": [
+        "C0280"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 319,
+      "phase": 5,
+      "id": "C0281",
+      "name": "Temporary compensation",
+      "pendingIds": [
+        "C0281"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 320,
+      "phase": 5,
+      "id": "C0282",
+      "name": "Improving the worst-placed piece",
+      "pendingIds": [
+        "C0282"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 321,
+      "phase": 5,
+      "id": "C0284",
+      "name": "Prophylaxis",
+      "pendingIds": [
+        "C0284"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 322,
+      "phase": 5,
+      "id": "C0285",
+      "name": "Preventive move",
+      "pendingIds": [
+        "C0285"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 323,
+      "phase": 5,
+      "id": "C0286",
+      "name": "Accumulation of advantages",
+      "pendingIds": [
+        "C0286"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 324,
+      "phase": 5,
+      "id": "C0287",
+      "name": "Two weaknesses principle",
+      "pendingIds": [
+        "C0287"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 325,
+      "phase": 5,
+      "id": "C0288",
+      "name": "Multiple weaknesses",
+      "pendingIds": [
+        "C0288"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 326,
+      "phase": 5,
+      "id": "C0289",
+      "name": "Space advantage",
+      "pendingIds": [
+        "C0289"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 327,
+      "phase": 5,
+      "id": "C0290",
+      "name": "Space disadvantage",
+      "pendingIds": [
+        "C0290"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 328,
+      "phase": 5,
+      "id": "C0291",
+      "name": "Cramped position",
+      "pendingIds": [
+        "C0291"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 329,
+      "phase": 5,
+      "id": "C0292",
+      "name": "Piece improvement",
+      "pendingIds": [
+        "C0292"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 330,
+      "phase": 5,
+      "id": "C0293",
+      "name": "Piece optimization",
+      "pendingIds": [
+        "C0293"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 331,
+      "phase": 5,
+      "id": "C0294",
+      "name": "Maneuvering",
+      "pendingIds": [
+        "C0294"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 332,
+      "phase": 5,
+      "id": "C0295",
+      "name": "Regrouping",
+      "pendingIds": [
+        "C0295"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 333,
+      "phase": 5,
+      "id": "C0296",
+      "name": "Re-routing",
+      "pendingIds": [
+        "C0296"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 334,
+      "phase": 5,
+      "id": "C0297",
+      "name": "Transformation of advantages",
+      "pendingIds": [
+        "C0297"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 335,
+      "phase": 5,
+      "id": "C0298",
+      "name": "Conversion",
+      "pendingIds": [
+        "C0298"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 336,
+      "phase": 5,
+      "id": "C0299",
+      "name": "Consolidation",
+      "pendingIds": [
+        "C0299"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 337,
+      "phase": 5,
+      "id": "C0300",
+      "name": "Strategic trade",
+      "pendingIds": [
+        "C0300"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 338,
+      "phase": 5,
+      "id": "C0301",
+      "name": "Good piece versus bad piece",
+      "pendingIds": [
+        "C0301"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 339,
+      "phase": 5,
+      "id": "C0303",
+      "name": "Bind",
+      "pendingIds": [
+        "C0303"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 340,
+      "phase": 5,
+      "id": "C0304",
+      "name": "Restriction before attack",
+      "pendingIds": [
+        "C0304"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 341,
+      "phase": 5,
+      "id": "C0305",
+      "name": "Multi-purpose move",
+      "pendingIds": [
+        "C0305"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 342,
+      "phase": 5,
+      "id": "C0307",
+      "name": "Two bishops advantage",
+      "pendingIds": [
+        "C0307"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 343,
+      "phase": 5,
+      "id": "C0310",
+      "name": "Active bishop",
+      "pendingIds": [
+        "C0310"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 344,
+      "phase": 5,
+      "id": "C0311",
+      "name": "Passive bishop",
+      "pendingIds": [
+        "C0311"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 345,
+      "phase": 5,
+      "id": "C0318",
+      "name": "Bishop versus knight",
+      "pendingIds": [
+        "C0318"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 346,
+      "phase": 5,
+      "id": "C0319",
+      "name": "Bishop in open position",
+      "pendingIds": [
+        "C0319"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 347,
+      "phase": 5,
+      "id": "C0321",
+      "name": "Knight outpost",
+      "pendingIds": [
+        "C0321",
+        "C0701"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 348,
+      "phase": 5,
+      "id": "C0327",
+      "name": "Knight versus bishop",
+      "pendingIds": [
+        "C0327"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 349,
+      "phase": 5,
+      "id": "C0328",
+      "name": "Good knight",
+      "pendingIds": [
+        "C0328"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 350,
+      "phase": 5,
+      "id": "C0329",
+      "name": "Bad knight",
+      "pendingIds": [
+        "C0329"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 351,
+      "phase": 5,
+      "id": "C0338",
+      "name": "Knight versus pawns on both wings",
+      "pendingIds": [
+        "C0338"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 352,
+      "phase": 5,
+      "id": "C0339",
+      "name": "Knight in closed position",
+      "pendingIds": [
+        "C0339"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 353,
+      "phase": 5,
+      "id": "C0352",
+      "name": "Rook activity",
+      "pendingIds": [
+        "C0352"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 354,
+      "phase": 5,
+      "id": "C0353",
+      "name": "Active rook principle",
+      "pendingIds": [
+        "C0353"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 355,
+      "phase": 5,
+      "id": "C0356",
+      "name": "Rook versus minor piece",
+      "pendingIds": [
+        "C0356"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 356,
+      "phase": 5,
+      "id": "C0360",
+      "name": "Queen activity",
+      "pendingIds": [
+        "C0360",
+        "C0722"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 357,
+      "phase": 5,
+      "id": "C0365",
+      "name": "Perpetual check",
+      "pendingIds": [
+        "C0365",
+        "C0466",
+        "C0723"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 358,
+      "phase": 5,
+      "id": "C0371",
+      "name": "Queen versus two rooks",
+      "pendingIds": [
+        "C0371",
+        "C0884"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 359,
+      "phase": 5,
+      "id": "C0372",
+      "name": "Queen versus rook and minor piece",
+      "pendingIds": [
+        "C0372",
+        "C0885"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 360,
+      "phase": 5,
+      "id": "C0373",
+      "name": "Queen and knight attack",
+      "pendingIds": [
+        "C0373"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 361,
+      "phase": 5,
+      "id": "C0374",
+      "name": "Queen and bishop attack",
+      "pendingIds": [
+        "C0374"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 362,
+      "phase": 5,
+      "id": "C0375",
+      "name": "Exposed queen",
+      "pendingIds": [
+        "C0375"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 363,
+      "phase": 5,
+      "id": "C0379",
+      "name": "Queen domination of weak squares",
+      "pendingIds": [
+        "C0379"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 364,
+      "phase": 5,
+      "id": "C0380",
+      "name": "King safety",
+      "pendingIds": [
+        "C0380",
+        "C0548"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 365,
+      "phase": 5,
+      "id": "C0383",
+      "name": "Exposed king",
+      "pendingIds": [
+        "C0383"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 366,
+      "phase": 5,
+      "id": "C0386",
+      "name": "King activation",
+      "pendingIds": [
+        "C0386",
+        "C0603"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 367,
+      "phase": 5,
+      "id": "C0397",
+      "name": "King hunt",
+      "pendingIds": [
+        "C0397",
+        "C0441"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 368,
+      "phase": 5,
+      "id": "C0399",
+      "name": "King shelter",
+      "pendingIds": [
+        "C0399",
+        "C0732"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 369,
+      "phase": 5,
+      "id": "C0403",
+      "name": "Attack",
+      "pendingIds": [
+        "C0403"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 370,
+      "phase": 5,
+      "id": "C0409",
+      "name": "Attack on a weakness",
+      "pendingIds": [
+        "C0409"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 371,
+      "phase": 5,
+      "id": "C0418",
+      "name": "Sacrificial attack",
+      "pendingIds": [
+        "C0418"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 372,
+      "phase": 5,
+      "id": "C0420",
+      "name": "Attack with material deficit",
+      "pendingIds": [
+        "C0420"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 373,
+      "phase": 5,
+      "id": "C0421",
+      "name": "Attack with development advantage",
+      "pendingIds": [
+        "C0421"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 374,
+      "phase": 5,
+      "id": "C0423",
+      "name": "Overwhelming defenders",
+      "pendingIds": [
+        "C0423"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 375,
+      "phase": 5,
+      "id": "C0427",
+      "name": "Creating threats",
+      "pendingIds": [
+        "C0427"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 376,
+      "phase": 5,
+      "id": "C0428",
+      "name": "Threat multiplication",
+      "pendingIds": [
+        "C0428"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 377,
+      "phase": 5,
+      "id": "C0429",
+      "name": "Forcing weaknesses",
+      "pendingIds": [
+        "C0429"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 378,
+      "phase": 5,
+      "id": "C0446",
+      "name": "Passive defense",
+      "pendingIds": [
+        "C0446",
+        "C0868"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 379,
+      "phase": 5,
+      "id": "C0448",
+      "name": "Counterplay",
+      "pendingIds": [
+        "C0448"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 380,
+      "phase": 5,
+      "id": "C0449",
+      "name": "Counterthreat",
+      "pendingIds": [
+        "C0449"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 381,
+      "phase": 5,
+      "id": "C0462",
+      "name": "Overprotection",
+      "pendingIds": [
+        "C0462",
+        "C0782",
+        "C0899"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 382,
+      "phase": 5,
+      "id": "C0463",
+      "name": "Reinforcing a weakness",
+      "pendingIds": [
+        "C0463"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 383,
+      "phase": 5,
+      "id": "C0474",
+      "name": "Neutralizing the initiative",
+      "pendingIds": [
+        "C0474"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 384,
+      "phase": 5,
+      "id": "C0475",
+      "name": "Returning sacrificed material to end the attack",
+      "pendingIds": [
+        "C0475"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 385,
+      "phase": 5,
+      "id": "C0517",
+      "name": "Plan formation",
+      "pendingIds": [
+        "C0517"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 386,
+      "phase": 5,
+      "id": "C0518",
+      "name": "Short-term plan",
+      "pendingIds": [
+        "C0518"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 387,
+      "phase": 5,
+      "id": "C0519",
+      "name": "Long-term plan",
+      "pendingIds": [
+        "C0519"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 388,
+      "phase": 5,
+      "id": "C0520",
+      "name": "Strategic objective",
+      "pendingIds": [
+        "C0520"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 389,
+      "phase": 5,
+      "id": "C0521",
+      "name": "Target selection",
+      "pendingIds": [
+        "C0521"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 390,
+      "phase": 5,
+      "id": "C0522",
+      "name": "Weakness identification",
+      "pendingIds": [
+        "C0522"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 391,
+      "phase": 5,
+      "id": "C0523",
+      "name": "Piece improvement",
+      "pendingIds": [
+        "C0523"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 392,
+      "phase": 5,
+      "id": "C0525",
+      "name": "Minority attack",
+      "pendingIds": [
+        "C0525"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 393,
+      "phase": 5,
+      "id": "C0532",
+      "name": "Prophylaxis",
+      "pendingIds": [
+        "C0532",
+        "C0770",
+        "C0902"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 394,
+      "phase": 5,
+      "id": "C0533",
+      "name": "Creating an outpost",
+      "pendingIds": [
+        "C0533",
+        "C0717"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 395,
+      "phase": 5,
+      "id": "C0537",
+      "name": "Improving pawn structure",
+      "pendingIds": [
+        "C0537"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 396,
+      "phase": 5,
+      "id": "C0538",
+      "name": "Exchanging a bad piece",
+      "pendingIds": [
+        "C0538"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 397,
+      "phase": 5,
+      "id": "C0539",
+      "name": "Exchanging the opponent's good piece",
+      "pendingIds": [
+        "C0539"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 398,
+      "phase": 5,
+      "id": "C0541",
+      "name": "Fixing weaknesses",
+      "pendingIds": [
+        "C0541"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 399,
+      "phase": 5,
+      "id": "C0542",
+      "name": "Inducing weaknesses",
+      "pendingIds": [
+        "C0542"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 400,
+      "phase": 5,
+      "id": "C0543",
+      "name": "Creating a second weakness",
+      "pendingIds": [
+        "C0543"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 401,
+      "phase": 5,
+      "id": "C0545",
+      "name": "Preparing a favorable endgame",
+      "pendingIds": [
+        "C0545"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 402,
+      "phase": 5,
+      "id": "C0546",
+      "name": "Preventing counterplay",
+      "pendingIds": [
+        "C0546"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 403,
+      "phase": 5,
+      "id": "C0549",
+      "name": "Piece activity",
+      "pendingIds": [
+        "C0549"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 404,
+      "phase": 5,
+      "id": "C0554",
+      "name": "Initiative",
+      "pendingIds": [
+        "C0554",
+        "C0582"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 405,
+      "phase": 5,
+      "id": "C0556",
+      "name": "Coordination",
+      "pendingIds": [
+        "C0556"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 406,
+      "phase": 5,
+      "id": "C0557",
+      "name": "Weak squares",
+      "pendingIds": [
+        "C0557"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 407,
+      "phase": 5,
+      "id": "C0563",
+      "name": "Minor-piece quality",
+      "pendingIds": [
+        "C0563"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 408,
+      "phase": 5,
+      "id": "C0566",
+      "name": "Tactical opportunities",
+      "pendingIds": [
+        "C0566"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 409,
+      "phase": 5,
+      "id": "C0567",
+      "name": "Potential pawn breaks",
+      "pendingIds": [
+        "C0567"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 410,
+      "phase": 5,
+      "id": "C0568",
+      "name": "Opponent's counterplay",
+      "pendingIds": [
+        "C0568"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 411,
+      "phase": 5,
+      "id": "C0569",
+      "name": "Static evaluation",
+      "pendingIds": [
+        "C0569"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 412,
+      "phase": 5,
+      "id": "C0570",
+      "name": "Dynamic evaluation",
+      "pendingIds": [
+        "C0570"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 413,
+      "phase": 5,
+      "id": "C0571",
+      "name": "Equal position",
+      "pendingIds": [
+        "C0571"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 414,
+      "phase": 5,
+      "id": "C0572",
+      "name": "Slight advantage",
+      "pendingIds": [
+        "C0572"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 415,
+      "phase": 5,
+      "id": "C0573",
+      "name": "Clear advantage",
+      "pendingIds": [
+        "C0573"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 416,
+      "phase": 5,
+      "id": "C0574",
+      "name": "Winning position",
+      "pendingIds": [
+        "C0574",
+        "C0978"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 417,
+      "phase": 5,
+      "id": "C0575",
+      "name": "Losing position",
+      "pendingIds": [
+        "C0575"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 418,
+      "phase": 5,
+      "id": "C0576",
+      "name": "Unclear position",
+      "pendingIds": [
+        "C0576",
+        "C0981"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 419,
+      "phase": 5,
+      "id": "C0577",
+      "name": "Complicated position",
+      "pendingIds": [
+        "C0577",
+        "C0976"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 420,
+      "phase": 5,
+      "id": "C0578",
+      "name": "Sharp position",
+      "pendingIds": [
+        "C0578",
+        "C0962"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 421,
+      "phase": 5,
+      "id": "C0579",
+      "name": "Quiet position",
+      "pendingIds": [
+        "C0579",
+        "C0965"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 422,
+      "phase": 5,
+      "id": "C0580",
+      "name": "Balanced position",
+      "pendingIds": [
+        "C0580",
+        "C0968"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 423,
+      "phase": 5,
+      "id": "C0581",
+      "name": "Imbalanced position",
+      "pendingIds": [
+        "C0581"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 424,
+      "phase": 5,
+      "id": "C0583",
+      "name": "Momentum",
+      "pendingIds": [
+        "C0583"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 425,
+      "phase": 5,
+      "id": "C0584",
+      "name": "Tempo",
+      "pendingIds": [
+        "C0584",
+        "C0752"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 426,
+      "phase": 5,
+      "id": "C0586",
+      "name": "Forcing play",
+      "pendingIds": [
+        "C0586"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 427,
+      "phase": 5,
+      "id": "C0587",
+      "name": "Dynamic compensation",
+      "pendingIds": [
+        "C0587",
+        "C0909"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 428,
+      "phase": 5,
+      "id": "C0588",
+      "name": "Activity compensation",
+      "pendingIds": [
+        "C0588"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 429,
+      "phase": 5,
+      "id": "C0589",
+      "name": "Time versus material",
+      "pendingIds": [
+        "C0589"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 430,
+      "phase": 5,
+      "id": "C0590",
+      "name": "Space versus material",
+      "pendingIds": [
+        "C0590"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 431,
+      "phase": 5,
+      "id": "C0591",
+      "name": "King safety versus material",
+      "pendingIds": [
+        "C0591"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 432,
+      "phase": 5,
+      "id": "C0592",
+      "name": "Initiative versus material",
+      "pendingIds": [
+        "C0592"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 433,
+      "phase": 5,
+      "id": "C0593",
+      "name": "Sacrificial initiative",
+      "pendingIds": [
+        "C0593"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 434,
+      "phase": 5,
+      "id": "C0594",
+      "name": "Maintaining pressure",
+      "pendingIds": [
+        "C0594"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 435,
+      "phase": 5,
+      "id": "C0595",
+      "name": "Losing the initiative",
+      "pendingIds": [
+        "C0595"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 436,
+      "phase": 5,
+      "id": "C0596",
+      "name": "Seizing the initiative",
+      "pendingIds": [
+        "C0596"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 437,
+      "phase": 5,
+      "id": "C0597",
+      "name": "Counter-initiative",
+      "pendingIds": [
+        "C0597"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 438,
+      "phase": 5,
+      "id": "C0598",
+      "name": "Forcing the opponent onto the defensive",
+      "pendingIds": [
+        "C0598"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 439,
+      "phase": 5,
+      "id": "C0599",
+      "name": "Dynamic equilibrium",
+      "pendingIds": [
+        "C0599"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 440,
+      "phase": 5,
+      "id": "C0600",
+      "name": "Temporary advantage",
+      "pendingIds": [
+        "C0600"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 441,
+      "phase": 5,
+      "id": "C0601",
+      "name": "Permanent advantage",
+      "pendingIds": [
+        "C0601"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 442,
+      "phase": 5,
+      "id": "C0622",
+      "name": "Shouldering",
+      "pendingIds": [
+        "C0622",
+        "C0639"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 443,
+      "phase": 5,
+      "id": "C0623",
+      "name": "Outflanking",
+      "pendingIds": [
+        "C0623",
+        "C0638"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 444,
+      "phase": 5,
+      "id": "C0661",
+      "name": "Active rook",
+      "pendingIds": [
+        "C0661"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 445,
+      "phase": 5,
+      "id": "C0675",
+      "name": "Rook activity versus pawn material",
+      "pendingIds": [
+        "C0675"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 446,
+      "phase": 5,
+      "id": "C0678",
+      "name": "King-rook coordination",
+      "pendingIds": [
+        "C0678"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 447,
+      "phase": 5,
+      "id": "C0698",
+      "name": "Bishop versus pawns on both wings",
+      "pendingIds": [
+        "C0698"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 448,
+      "phase": 5,
+      "id": "C0707",
+      "name": "King-knight coordination",
+      "pendingIds": [
+        "C0707"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 449,
+      "phase": 5,
+      "id": "C0710",
+      "name": "Bishop versus knight",
+      "pendingIds": [
+        "C0710",
+        "C0881"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 450,
+      "phase": 5,
+      "id": "C0711",
+      "name": "Open position favors bishop",
+      "pendingIds": [
+        "C0711"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 451,
+      "phase": 5,
+      "id": "C0712",
+      "name": "Closed position favors knight",
+      "pendingIds": [
+        "C0712"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 452,
+      "phase": 5,
+      "id": "C0713",
+      "name": "Pawns on both wings favor bishop",
+      "pendingIds": [
+        "C0713"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 453,
+      "phase": 5,
+      "id": "C0714",
+      "name": "Fixed pawns can favor knight",
+      "pendingIds": [
+        "C0714"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 454,
+      "phase": 5,
+      "id": "C0715",
+      "name": "Good bishop versus bad knight",
+      "pendingIds": [
+        "C0715"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 455,
+      "phase": 5,
+      "id": "C0716",
+      "name": "Good knight versus bad bishop",
+      "pendingIds": [
+        "C0716"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 456,
+      "phase": 5,
+      "id": "C0721",
+      "name": "Bishop's long-range advantage",
+      "pendingIds": [
+        "C0721"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 457,
+      "phase": 5,
+      "id": "C0724",
+      "name": "King exposure",
+      "pendingIds": [
+        "C0724"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 458,
+      "phase": 5,
+      "id": "C0758",
+      "name": "Useful tempo",
+      "pendingIds": [
+        "C0758"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 459,
+      "phase": 5,
+      "id": "C0759",
+      "name": "Wasted tempo",
+      "pendingIds": [
+        "C0759"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 460,
+      "phase": 5,
+      "id": "C0768",
+      "name": "Move-order finesse",
+      "pendingIds": [
+        "C0768"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 461,
+      "phase": 5,
+      "id": "C0771",
+      "name": "Opponent's idea",
+      "pendingIds": [
+        "C0771"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 462,
+      "phase": 5,
+      "id": "C0776",
+      "name": "Removing counterplay",
+      "pendingIds": [
+        "C0776"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 463,
+      "phase": 5,
+      "id": "C0784",
+      "name": "Neutralizing a strong piece",
+      "pendingIds": [
+        "C0784"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 464,
+      "phase": 5,
+      "id": "C0785",
+      "name": "Preventive king move",
+      "pendingIds": [
+        "C0785"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 465,
+      "phase": 5,
+      "id": "C0786",
+      "name": "Preventive rook move",
+      "pendingIds": [
+        "C0786"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 466,
+      "phase": 5,
+      "id": "C0787",
+      "name": "Preventive queen move",
+      "pendingIds": [
+        "C0787"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 467,
+      "phase": 5,
+      "id": "C0788",
+      "name": "Candidate move selection",
+      "pendingIds": [
+        "C0788"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 468,
+      "phase": 5,
+      "id": "C0797",
+      "name": "Risk assessment",
+      "pendingIds": [
+        "C0797"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 469,
+      "phase": 5,
+      "id": "C0798",
+      "name": "Practical chances",
+      "pendingIds": [
+        "C0798"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 470,
+      "phase": 5,
+      "id": "C0799",
+      "name": "Objective evaluation",
+      "pendingIds": [
+        "C0799"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 471,
+      "phase": 5,
+      "id": "C0800",
+      "name": "Subjective difficulty",
+      "pendingIds": [
+        "C0800"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 472,
+      "phase": 5,
+      "id": "C0801",
+      "name": "Complexity",
+      "pendingIds": [
+        "C0801"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 473,
+      "phase": 5,
+      "id": "C0802",
+      "name": "Uncertainty",
+      "pendingIds": [
+        "C0802"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 474,
+      "phase": 5,
+      "id": "C0803",
+      "name": "Critical decision",
+      "pendingIds": [
+        "C0803"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 475,
+      "phase": 5,
+      "id": "C0804",
+      "name": "Commitment",
+      "pendingIds": [
+        "C0804",
+        "C0926"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 476,
+      "phase": 5,
+      "id": "C0807",
+      "name": "Exchange decision",
+      "pendingIds": [
+        "C0807"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 477,
+      "phase": 5,
+      "id": "C0808",
+      "name": "When to simplify",
+      "pendingIds": [
+        "C0808"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 478,
+      "phase": 5,
+      "id": "C0809",
+      "name": "When to complicate",
+      "pendingIds": [
+        "C0809"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 479,
+      "phase": 5,
+      "id": "C0810",
+      "name": "When to attack",
+      "pendingIds": [
+        "C0810"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 480,
+      "phase": 5,
+      "id": "C0811",
+      "name": "When to defend",
+      "pendingIds": [
+        "C0811"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 481,
+      "phase": 5,
+      "id": "C0812",
+      "name": "When to sacrifice",
+      "pendingIds": [
+        "C0812"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 482,
+      "phase": 5,
+      "id": "C0813",
+      "name": "When to change the structure",
+      "pendingIds": [
+        "C0813"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 483,
+      "phase": 5,
+      "id": "C0821",
+      "name": "Blunder checking",
+      "pendingIds": [
+        "C0821"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 484,
+      "phase": 5,
+      "id": "C0822",
+      "name": "Practical move",
+      "pendingIds": [
+        "C0822"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 485,
+      "phase": 5,
+      "id": "C0823",
+      "name": "Safe move",
+      "pendingIds": [
+        "C0823"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 486,
+      "phase": 5,
+      "id": "C0824",
+      "name": "Complicated move",
+      "pendingIds": [
+        "C0824"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 487,
+      "phase": 5,
+      "id": "C0826",
+      "name": "Playing for two results",
+      "pendingIds": [
+        "C0826"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 488,
+      "phase": 5,
+      "id": "C0827",
+      "name": "Playing for a draw",
+      "pendingIds": [
+        "C0827"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 489,
+      "phase": 5,
+      "id": "C0828",
+      "name": "Playing for a win",
+      "pendingIds": [
+        "C0828"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 490,
+      "phase": 5,
+      "id": "C0829",
+      "name": "Creating practical problems",
+      "pendingIds": [
+        "C0829"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 491,
+      "phase": 5,
+      "id": "C0830",
+      "name": "Complexity management",
+      "pendingIds": [
+        "C0830"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 492,
+      "phase": 5,
+      "id": "C0831",
+      "name": "Risk management",
+      "pendingIds": [
+        "C0831"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 493,
+      "phase": 5,
+      "id": "C0854",
+      "name": "Premature attack",
+      "pendingIds": [
+        "C0854"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 494,
+      "phase": 5,
+      "id": "C0855",
+      "name": "Premature pawn break",
+      "pendingIds": [
+        "C0855"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 495,
+      "phase": 5,
+      "id": "C0857",
+      "name": "Weakening king safety",
+      "pendingIds": [
+        "C0857"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 496,
+      "phase": 5,
+      "id": "C0860",
+      "name": "Neglecting development",
+      "pendingIds": [
+        "C0860"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 497,
+      "phase": 5,
+      "id": "C0861",
+      "name": "Greed",
+      "pendingIds": [
+        "C0861"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 498,
+      "phase": 5,
+      "id": "C0863",
+      "name": "Automatic recapture",
+      "pendingIds": [
+        "C0863"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 499,
+      "phase": 5,
+      "id": "C0864",
+      "name": "Automatic exchange",
+      "pendingIds": [
+        "C0864"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 500,
+      "phase": 5,
+      "id": "C0865",
+      "name": "Bad simplification",
+      "pendingIds": [
+        "C0865"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 501,
+      "phase": 5,
+      "id": "C0866",
+      "name": "Trading an active piece",
+      "pendingIds": [
+        "C0866"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 502,
+      "phase": 5,
+      "id": "C0867",
+      "name": "Creating unnecessary weaknesses",
+      "pendingIds": [
+        "C0867"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 503,
+      "phase": 5,
+      "id": "C0877",
+      "name": "Misjudging an endgame",
+      "pendingIds": [
+        "C0877"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 504,
+      "phase": 5,
+      "id": "C0879",
+      "name": "Ignoring counterplay",
+      "pendingIds": [
+        "C0879"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 505,
+      "phase": 5,
+      "id": "C0887",
+      "name": "Space imbalance",
+      "pendingIds": [
+        "C0887"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 506,
+      "phase": 5,
+      "id": "C0889",
+      "name": "King-safety imbalance",
+      "pendingIds": [
+        "C0889"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 507,
+      "phase": 5,
+      "id": "C0890",
+      "name": "Initiative imbalance",
+      "pendingIds": [
+        "C0890"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 508,
+      "phase": 5,
+      "id": "C0891",
+      "name": "Activity imbalance",
+      "pendingIds": [
+        "C0891"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 509,
+      "phase": 5,
+      "id": "C0892",
+      "name": "Weak-square imbalance",
+      "pendingIds": [
+        "C0892"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 510,
+      "phase": 5,
+      "id": "C0895",
+      "name": "Color-complex imbalance",
+      "pendingIds": [
+        "C0895"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 511,
+      "phase": 5,
+      "id": "C0896",
+      "name": "Good-piece/bad-piece imbalance",
+      "pendingIds": [
+        "C0896"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 512,
+      "phase": 5,
+      "id": "C0897",
+      "name": "Static versus dynamic advantage",
+      "pendingIds": [
+        "C0897"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 513,
+      "phase": 5,
+      "id": "C0898",
+      "name": "Principle of two weaknesses",
+      "pendingIds": [
+        "C0898"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 514,
+      "phase": 5,
+      "id": "C0904",
+      "name": "Maximal piece activity",
+      "pendingIds": [
+        "C0904"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 515,
+      "phase": 5,
+      "id": "C0905",
+      "name": "Transformation of advantages",
+      "pendingIds": [
+        "C0905"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 516,
+      "phase": 5,
+      "id": "C0906",
+      "name": "Accumulation of small advantages",
+      "pendingIds": [
+        "C0906"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 517,
+      "phase": 5,
+      "id": "C0907",
+      "name": "Strategic exchange sacrifice",
+      "pendingIds": [
+        "C0907"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 518,
+      "phase": 5,
+      "id": "C0908",
+      "name": "Positional pawn sacrifice",
+      "pendingIds": [
+        "C0908"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 519,
+      "phase": 5,
+      "id": "C0913",
+      "name": "Weakness creation",
+      "pendingIds": [
+        "C0913"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 520,
+      "phase": 5,
+      "id": "C0915",
+      "name": "Provocation",
+      "pendingIds": [
+        "C0915"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 521,
+      "phase": 5,
+      "id": "C0917",
+      "name": "Changing the character of the position",
+      "pendingIds": [
+        "C0917"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 522,
+      "phase": 5,
+      "id": "C0918",
+      "name": "Good version versus bad version of a structure",
+      "pendingIds": [
+        "C0918"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 523,
+      "phase": 5,
+      "id": "C0919",
+      "name": "Favorable minor-piece imbalance",
+      "pendingIds": [
+        "C0919"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 524,
+      "phase": 5,
+      "id": "C0920",
+      "name": "Improving before attacking",
+      "pendingIds": [
+        "C0920"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 525,
+      "phase": 5,
+      "id": "C0921",
+      "name": "Restricting before breaking through",
+      "pendingIds": [
+        "C0921"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 526,
+      "phase": 5,
+      "id": "C0922",
+      "name": "Creating multiple fronts",
+      "pendingIds": [
+        "C0922"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 527,
+      "phase": 5,
+      "id": "C0923",
+      "name": "Switching the point of attack",
+      "pendingIds": [
+        "C0923"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 528,
+      "phase": 5,
+      "id": "C0924",
+      "name": "Maximum tension",
+      "pendingIds": [
+        "C0924"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 529,
+      "phase": 5,
+      "id": "C0925",
+      "name": "Keeping flexibility",
+      "pendingIds": [
+        "C0925"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 530,
+      "phase": 5,
+      "id": "C0928",
+      "name": "Pawn structure determines plans",
+      "pendingIds": [
+        "C0928"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 531,
+      "phase": 5,
+      "id": "C0963",
+      "name": "Tactical position",
+      "pendingIds": [
+        "C0963"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 532,
+      "phase": 5,
+      "id": "C0964",
+      "name": "Positional position",
+      "pendingIds": [
+        "C0964"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 533,
+      "phase": 5,
+      "id": "C0966",
+      "name": "Dynamic position",
+      "pendingIds": [
+        "C0966"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 534,
+      "phase": 5,
+      "id": "C0967",
+      "name": "Static position",
+      "pendingIds": [
+        "C0967"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 535,
+      "phase": 5,
+      "id": "C0969",
+      "name": "Unbalanced position",
+      "pendingIds": [
+        "C0969"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 536,
+      "phase": 5,
+      "id": "C0972",
+      "name": "Cramped position",
+      "pendingIds": [
+        "C0972"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 537,
+      "phase": 5,
+      "id": "C0973",
+      "name": "Spacious position",
+      "pendingIds": [
+        "C0973"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 538,
+      "phase": 5,
+      "id": "C0979",
+      "name": "Lost position",
+      "pendingIds": [
+        "C0979"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 539,
+      "phase": 5,
+      "id": "C0984",
+      "name": "Critical position",
+      "pendingIds": [
+        "C0984"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 540,
+      "phase": 5,
+      "id": "C1059",
+      "name": "What does the opponent want?",
+      "pendingIds": [
+        "C1059"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 541,
+      "phase": 5,
+      "id": "C1060",
+      "name": "What changed after the last move?",
+      "pendingIds": [
+        "C1060"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 542,
+      "phase": 5,
+      "id": "C1061",
+      "name": "Are there checks, captures, or threats?",
+      "pendingIds": [
+        "C1061"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 543,
+      "phase": 5,
+      "id": "C1062",
+      "name": "Which pieces are undefended?",
+      "pendingIds": [
+        "C1062"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 544,
+      "phase": 5,
+      "id": "C1063",
+      "name": "Which pieces are badly placed?",
+      "pendingIds": [
+        "C1063"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 545,
+      "phase": 5,
+      "id": "C1064",
+      "name": "What is my worst piece?",
+      "pendingIds": [
+        "C1064"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 546,
+      "phase": 5,
+      "id": "C1065",
+      "name": "What is my opponent's best piece?",
+      "pendingIds": [
+        "C1065"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 547,
+      "phase": 5,
+      "id": "C1066",
+      "name": "Where are the weak squares?",
+      "pendingIds": [
+        "C1066"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 548,
+      "phase": 5,
+      "id": "C1067",
+      "name": "Where are the pawn breaks?",
+      "pendingIds": [
+        "C1067"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 549,
+      "phase": 5,
+      "id": "C1068",
+      "name": "Who benefits from exchanges?",
+      "pendingIds": [
+        "C1068"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 550,
+      "phase": 5,
+      "id": "C1069",
+      "name": "Who benefits from an open position?",
+      "pendingIds": [
+        "C1069"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 551,
+      "phase": 5,
+      "id": "C1070",
+      "name": "Who benefits from a closed position?",
+      "pendingIds": [
+        "C1070"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 552,
+      "phase": 5,
+      "id": "C1071",
+      "name": "Whose king is weaker?",
+      "pendingIds": [
+        "C1071"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 553,
+      "phase": 5,
+      "id": "C1072",
+      "name": "Who has more space?",
+      "pendingIds": [
+        "C1072"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 554,
+      "phase": 5,
+      "id": "C1073",
+      "name": "Who has the initiative?",
+      "pendingIds": [
+        "C1073"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 555,
+      "phase": 5,
+      "id": "C1074",
+      "name": "What are the long-term weaknesses?",
+      "pendingIds": [
+        "C1074"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 556,
+      "phase": 5,
+      "id": "C1075",
+      "name": "What are the temporary advantages?",
+      "pendingIds": [
+        "C1075"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 557,
+      "phase": 5,
+      "id": "C1076",
+      "name": "Can a temporary advantage be converted before it disappears?",
+      "pendingIds": [
+        "C1076"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 558,
+      "phase": 5,
+      "id": "C1077",
+      "name": "Can one advantage be transformed into another?",
+      "pendingIds": [
+        "C1077"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 559,
+      "phase": 5,
+      "id": "C1078",
+      "name": "Can counterplay be eliminated before trying to win?",
+      "pendingIds": [
+        "C1078"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 560,
+      "phase": 5,
+      "id": "C1079",
+      "name": "Can a second weakness be created?",
+      "pendingIds": [
+        "C1079"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 561,
+      "phase": 5,
+      "id": "C1080",
+      "name": "What is the correct moment to change the pawn structure?",
+      "pendingIds": [
+        "C1080"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 562,
+      "phase": 5,
+      "id": "C1081",
+      "name": "What is the correct moment to simplify?",
+      "pendingIds": [
+        "C1081"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 563,
+      "phase": 5,
+      "id": "C1082",
+      "name": "What is the correct moment to sacrifice?",
+      "pendingIds": [
+        "C1082"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 564,
+      "phase": 5,
+      "id": "C1083",
+      "name": "What is the opponent's strongest defensive resource?",
+      "pendingIds": [
+        "C1083"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 565,
+      "phase": 5,
+      "id": "C1084",
+      "name": "What would I play if it were the opponent's turn?",
+      "pendingIds": [
+        "C1084"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 566,
+      "phase": 5,
+      "id": "C1085",
+      "name": "What is the position asking for?",
+      "pendingIds": [
+        "C1085"
+      ],
+      "supportOnly": false
+    },
+    {
+      "rank": 567,
+      "phase": 6,
+      "id": "C0018",
+      "name": "Touch-move rule",
+      "pendingIds": [
+        "C0018"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 568,
+      "phase": 6,
+      "id": "C0019",
+      "name": "Checkmate versus resignation",
+      "pendingIds": [
+        "C0019"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 569,
+      "phase": 6,
+      "id": "C0119",
+      "name": "Visualization",
+      "pendingIds": [
+        "C0119"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 570,
+      "phase": 6,
+      "id": "C0120",
+      "name": "Board vision",
+      "pendingIds": [
+        "C0120"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 571,
+      "phase": 6,
+      "id": "C0121",
+      "name": "Tactical vision",
+      "pendingIds": [
+        "C0121"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 572,
+      "phase": 6,
+      "id": "C0122",
+      "name": "Pattern recognition",
+      "pendingIds": [
+        "C0122"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 573,
+      "phase": 6,
+      "id": "C0150",
+      "name": "Opening theory",
+      "pendingIds": [
+        "C0150"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 574,
+      "phase": 6,
+      "id": "C0151",
+      "name": "Main line",
+      "pendingIds": [
+        "C0151"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 575,
+      "phase": 6,
+      "id": "C0152",
+      "name": "Sideline",
+      "pendingIds": [
+        "C0152"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 576,
+      "phase": 6,
+      "id": "C0153",
+      "name": "Novelty",
+      "pendingIds": [
+        "C0153"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 577,
+      "phase": 6,
+      "id": "C0154",
+      "name": "Preparation",
+      "pendingIds": [
+        "C0154"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 578,
+      "phase": 6,
+      "id": "C0157",
+      "name": "Opening repertoire",
+      "pendingIds": [
+        "C0157"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 579,
+      "phase": 6,
+      "id": "C0158",
+      "name": "Repertoire depth",
+      "pendingIds": [
+        "C0158"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 580,
+      "phase": 6,
+      "id": "C0789",
+      "name": "Calculation",
+      "pendingIds": [
+        "C0789"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 581,
+      "phase": 6,
+      "id": "C0790",
+      "name": "Evaluation",
+      "pendingIds": [
+        "C0790"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 582,
+      "phase": 6,
+      "id": "C0791",
+      "name": "Comparison",
+      "pendingIds": [
+        "C0791"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 583,
+      "phase": 6,
+      "id": "C0792",
+      "name": "Planning",
+      "pendingIds": [
+        "C0792"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 584,
+      "phase": 6,
+      "id": "C0793",
+      "name": "Pattern recognition",
+      "pendingIds": [
+        "C0793"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 585,
+      "phase": 6,
+      "id": "C0794",
+      "name": "Intuition",
+      "pendingIds": [
+        "C0794"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 586,
+      "phase": 6,
+      "id": "C0795",
+      "name": "Positional judgment",
+      "pendingIds": [
+        "C0795"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 587,
+      "phase": 6,
+      "id": "C0796",
+      "name": "Tactical awareness",
+      "pendingIds": [
+        "C0796"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 588,
+      "phase": 6,
+      "id": "C0814",
+      "name": "Time management",
+      "pendingIds": [
+        "C0814"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 589,
+      "phase": 6,
+      "id": "C0815",
+      "name": "Clock awareness",
+      "pendingIds": [
+        "C0815"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 590,
+      "phase": 6,
+      "id": "C0816",
+      "name": "Time trouble",
+      "pendingIds": [
+        "C0816"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 591,
+      "phase": 6,
+      "id": "C0817",
+      "name": "Zeitnot",
+      "pendingIds": [
+        "C0817"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 592,
+      "phase": 6,
+      "id": "C0818",
+      "name": "Increment",
+      "pendingIds": [
+        "C0818",
+        "C1039"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 593,
+      "phase": 6,
+      "id": "C0819",
+      "name": "Delay",
+      "pendingIds": [
+        "C0819",
+        "C1040"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 594,
+      "phase": 6,
+      "id": "C0820",
+      "name": "Thinking on the opponent's time",
+      "pendingIds": [
+        "C0820"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 595,
+      "phase": 6,
+      "id": "C0832",
+      "name": "Psychological pressure",
+      "pendingIds": [
+        "C0832"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 596,
+      "phase": 6,
+      "id": "C0833",
+      "name": "Opening preparation",
+      "pendingIds": [
+        "C0833"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 597,
+      "phase": 6,
+      "id": "C0834",
+      "name": "Opponent preparation",
+      "pendingIds": [
+        "C0834"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 598,
+      "phase": 6,
+      "id": "C0835",
+      "name": "Post-game analysis",
+      "pendingIds": [
+        "C0835"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 599,
+      "phase": 6,
+      "id": "C0836",
+      "name": "Self-analysis",
+      "pendingIds": [
+        "C0836"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 600,
+      "phase": 6,
+      "id": "C0837",
+      "name": "Engine analysis",
+      "pendingIds": [
+        "C0837"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 601,
+      "phase": 6,
+      "id": "C0838",
+      "name": "Game annotation",
+      "pendingIds": [
+        "C0838"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 602,
+      "phase": 6,
+      "id": "C0839",
+      "name": "Error classification",
+      "pendingIds": [
+        "C0839"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 603,
+      "phase": 6,
+      "id": "C0840",
+      "name": "Pattern training",
+      "pendingIds": [
+        "C0840"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 604,
+      "phase": 6,
+      "id": "C0841",
+      "name": "Tactical training",
+      "pendingIds": [
+        "C0841"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 605,
+      "phase": 6,
+      "id": "C0842",
+      "name": "Calculation training",
+      "pendingIds": [
+        "C0842"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 606,
+      "phase": 6,
+      "id": "C0843",
+      "name": "Endgame training",
+      "pendingIds": [
+        "C0843"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 607,
+      "phase": 6,
+      "id": "C0844",
+      "name": "Opening study",
+      "pendingIds": [
+        "C0844"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 608,
+      "phase": 6,
+      "id": "C0845",
+      "name": "Model games",
+      "pendingIds": [
+        "C0845"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 609,
+      "phase": 6,
+      "id": "C0846",
+      "name": "Guess-the-move training",
+      "pendingIds": [
+        "C0846"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 610,
+      "phase": 6,
+      "id": "C0847",
+      "name": "Blunder",
+      "pendingIds": [
+        "C0847"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 611,
+      "phase": 6,
+      "id": "C0848",
+      "name": "Mistake",
+      "pendingIds": [
+        "C0848"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 612,
+      "phase": 6,
+      "id": "C0849",
+      "name": "Inaccuracy",
+      "pendingIds": [
+        "C0849"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 613,
+      "phase": 6,
+      "id": "C0870",
+      "name": "Overconfidence",
+      "pendingIds": [
+        "C0870"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 614,
+      "phase": 6,
+      "id": "C0871",
+      "name": "Playing too quickly",
+      "pendingIds": [
+        "C0871"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 615,
+      "phase": 6,
+      "id": "C0872",
+      "name": "Using too much time",
+      "pendingIds": [
+        "C0872"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 616,
+      "phase": 6,
+      "id": "C0873",
+      "name": "Tunnel vision",
+      "pendingIds": [
+        "C0873"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 617,
+      "phase": 6,
+      "id": "C0874",
+      "name": "Hope chess",
+      "pendingIds": [
+        "C0874"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 618,
+      "phase": 6,
+      "id": "C0875",
+      "name": "Stopping calculation too early",
+      "pendingIds": [
+        "C0875"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 619,
+      "phase": 6,
+      "id": "C0876",
+      "name": "Failing to calculate the opponent's best defense",
+      "pendingIds": [
+        "C0876"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 620,
+      "phase": 6,
+      "id": "C0985",
+      "name": "Algebraic notation",
+      "pendingIds": [
+        "C0985"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 621,
+      "phase": 6,
+      "id": "C0986",
+      "name": "Descriptive notation",
+      "pendingIds": [
+        "C0986"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 622,
+      "phase": 6,
+      "id": "C0987",
+      "name": "SAN",
+      "pendingIds": [
+        "C0987"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 623,
+      "phase": 6,
+      "id": "C0988",
+      "name": "PGN",
+      "pendingIds": [
+        "C0988"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 624,
+      "phase": 6,
+      "id": "C0989",
+      "name": "FEN",
+      "pendingIds": [
+        "C0989"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 625,
+      "phase": 6,
+      "id": "C0990",
+      "name": "Move number",
+      "pendingIds": [
+        "C0990"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 626,
+      "phase": 6,
+      "id": "C0991",
+      "name": "Variation",
+      "pendingIds": [
+        "C0991"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 627,
+      "phase": 6,
+      "id": "C0992",
+      "name": "Main line",
+      "pendingIds": [
+        "C0992"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 628,
+      "phase": 6,
+      "id": "C0993",
+      "name": "Side variation",
+      "pendingIds": [
+        "C0993"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 629,
+      "phase": 6,
+      "id": "C0994",
+      "name": "Annotation",
+      "pendingIds": [
+        "C0994"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 630,
+      "phase": 6,
+      "id": "C0995",
+      "name": "!",
+      "pendingIds": [
+        "C0995"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 631,
+      "phase": 6,
+      "id": "C0996",
+      "name": "!!",
+      "pendingIds": [
+        "C0996"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 632,
+      "phase": 6,
+      "id": "C0997",
+      "name": "?",
+      "pendingIds": [
+        "C0997"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 633,
+      "phase": 6,
+      "id": "C0998",
+      "name": "??",
+      "pendingIds": [
+        "C0998"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 634,
+      "phase": 6,
+      "id": "C0999",
+      "name": "!?",
+      "pendingIds": [
+        "C0999"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 635,
+      "phase": 6,
+      "id": "C1000",
+      "name": "?!",
+      "pendingIds": [
+        "C1000"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 636,
+      "phase": 6,
+      "id": "C1001",
+      "name": "+=",
+      "pendingIds": [
+        "C1001"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 637,
+      "phase": 6,
+      "id": "C1002",
+      "name": "=+",
+      "pendingIds": [
+        "C1002"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 638,
+      "phase": 6,
+      "id": "C1003",
+      "name": "±",
+      "pendingIds": [
+        "C1003"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 639,
+      "phase": 6,
+      "id": "C1004",
+      "name": "∓",
+      "pendingIds": [
+        "C1004"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 640,
+      "phase": 6,
+      "id": "C1005",
+      "name": "=",
+      "pendingIds": [
+        "C1005"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 641,
+      "phase": 6,
+      "id": "C1006",
+      "name": "∞",
+      "pendingIds": [
+        "C1006"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 642,
+      "phase": 6,
+      "id": "C1007",
+      "name": "Mating evaluation",
+      "pendingIds": [
+        "C1007"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 643,
+      "phase": 6,
+      "id": "C1008",
+      "name": "Centipawn evaluation",
+      "pendingIds": [
+        "C1008"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 644,
+      "phase": 6,
+      "id": "C1009",
+      "name": "Engine evaluation",
+      "pendingIds": [
+        "C1009"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 645,
+      "phase": 6,
+      "id": "C1010",
+      "name": "Depth",
+      "pendingIds": [
+        "C1010"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 646,
+      "phase": 6,
+      "id": "C1011",
+      "name": "Principal variation",
+      "pendingIds": [
+        "C1011",
+        "C1018"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 647,
+      "phase": 6,
+      "id": "C1012",
+      "name": "Chess engine",
+      "pendingIds": [
+        "C1012"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 648,
+      "phase": 6,
+      "id": "C1013",
+      "name": "Evaluation function",
+      "pendingIds": [
+        "C1013"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 649,
+      "phase": 6,
+      "id": "C1014",
+      "name": "Centipawn",
+      "pendingIds": [
+        "C1014"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 650,
+      "phase": 6,
+      "id": "C1015",
+      "name": "Search depth",
+      "pendingIds": [
+        "C1015"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 651,
+      "phase": 6,
+      "id": "C1016",
+      "name": "Nodes",
+      "pendingIds": [
+        "C1016"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 652,
+      "phase": 6,
+      "id": "C1017",
+      "name": "Nodes per second",
+      "pendingIds": [
+        "C1017"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 653,
+      "phase": 6,
+      "id": "C1019",
+      "name": "Engine line",
+      "pendingIds": [
+        "C1019"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 654,
+      "phase": 6,
+      "id": "C1020",
+      "name": "Multi-PV",
+      "pendingIds": [
+        "C1020"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 655,
+      "phase": 6,
+      "id": "C1021",
+      "name": "Opening book",
+      "pendingIds": [
+        "C1021"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 656,
+      "phase": 6,
+      "id": "C1022",
+      "name": "Endgame tablebase",
+      "pendingIds": [
+        "C1022"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 657,
+      "phase": 6,
+      "id": "C1023",
+      "name": "Syzygy tablebases",
+      "pendingIds": [
+        "C1023"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 658,
+      "phase": 6,
+      "id": "C1024",
+      "name": "Mate search",
+      "pendingIds": [
+        "C1024"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 659,
+      "phase": 6,
+      "id": "C1025",
+      "name": "Engine tactical analysis",
+      "pendingIds": [
+        "C1025"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 660,
+      "phase": 6,
+      "id": "C1026",
+      "name": "Engine positional evaluation",
+      "pendingIds": [
+        "C1026"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 661,
+      "phase": 6,
+      "id": "C1027",
+      "name": "Human versus engine move",
+      "pendingIds": [
+        "C1027"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 662,
+      "phase": 6,
+      "id": "C1028",
+      "name": "Top engine move",
+      "pendingIds": [
+        "C1028"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 663,
+      "phase": 6,
+      "id": "C1029",
+      "name": "Evaluation swing",
+      "pendingIds": [
+        "C1029"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 664,
+      "phase": 6,
+      "id": "C1030",
+      "name": "Blunder according to engine",
+      "pendingIds": [
+        "C1030"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 665,
+      "phase": 6,
+      "id": "C1031",
+      "name": "Accuracy",
+      "pendingIds": [
+        "C1031"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 666,
+      "phase": 6,
+      "id": "C1032",
+      "name": "Computer-assisted preparation",
+      "pendingIds": [
+        "C1032"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 667,
+      "phase": 6,
+      "id": "C1033",
+      "name": "Classical chess",
+      "pendingIds": [
+        "C1033"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 668,
+      "phase": 6,
+      "id": "C1034",
+      "name": "Rapid chess",
+      "pendingIds": [
+        "C1034"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 669,
+      "phase": 6,
+      "id": "C1035",
+      "name": "Blitz chess",
+      "pendingIds": [
+        "C1035"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 670,
+      "phase": 6,
+      "id": "C1036",
+      "name": "Bullet chess",
+      "pendingIds": [
+        "C1036"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 671,
+      "phase": 6,
+      "id": "C1037",
+      "name": "Armageddon",
+      "pendingIds": [
+        "C1037"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 672,
+      "phase": 6,
+      "id": "C1038",
+      "name": "Time control",
+      "pendingIds": [
+        "C1038"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 673,
+      "phase": 6,
+      "id": "C1041",
+      "name": "Rated game",
+      "pendingIds": [
+        "C1041"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 674,
+      "phase": 6,
+      "id": "C1042",
+      "name": "Unrated game",
+      "pendingIds": [
+        "C1042"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 675,
+      "phase": 6,
+      "id": "C1043",
+      "name": "Rating",
+      "pendingIds": [
+        "C1043"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 676,
+      "phase": 6,
+      "id": "C1044",
+      "name": "Elo rating",
+      "pendingIds": [
+        "C1044"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 677,
+      "phase": 6,
+      "id": "C1045",
+      "name": "Rating performance",
+      "pendingIds": [
+        "C1045"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 678,
+      "phase": 6,
+      "id": "C1046",
+      "name": "Performance rating",
+      "pendingIds": [
+        "C1046"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 679,
+      "phase": 6,
+      "id": "C1047",
+      "name": "Tournament",
+      "pendingIds": [
+        "C1047"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 680,
+      "phase": 6,
+      "id": "C1048",
+      "name": "Round robin",
+      "pendingIds": [
+        "C1048"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 681,
+      "phase": 6,
+      "id": "C1049",
+      "name": "Swiss system",
+      "pendingIds": [
+        "C1049"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 682,
+      "phase": 6,
+      "id": "C1050",
+      "name": "Knockout",
+      "pendingIds": [
+        "C1050"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 683,
+      "phase": 6,
+      "id": "C1051",
+      "name": "Match",
+      "pendingIds": [
+        "C1051"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 684,
+      "phase": 6,
+      "id": "C1052",
+      "name": "Tiebreak",
+      "pendingIds": [
+        "C1052"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 685,
+      "phase": 6,
+      "id": "C1053",
+      "name": "Tournament standings",
+      "pendingIds": [
+        "C1053"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 686,
+      "phase": 6,
+      "id": "C1054",
+      "name": "Title norms",
+      "pendingIds": [
+        "C1054"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 687,
+      "phase": 6,
+      "id": "C1055",
+      "name": "Candidate Master",
+      "pendingIds": [
+        "C1055"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 688,
+      "phase": 6,
+      "id": "C1056",
+      "name": "FIDE Master",
+      "pendingIds": [
+        "C1056"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 689,
+      "phase": 6,
+      "id": "C1057",
+      "name": "International Master",
+      "pendingIds": [
+        "C1057"
+      ],
+      "supportOnly": true
+    },
+    {
+      "rank": 690,
+      "phase": 6,
+      "id": "C1058",
+      "name": "Grandmaster",
+      "pendingIds": [
+        "C1058"
+      ],
+      "supportOnly": true
+    }
+  ]
+}
