@@ -44,3 +44,16 @@ hashes. Record exposed failures; no human or real-game precision claim.
 Coach expansion and live five-hour cutoff active; at about 10% remaining
 checkpoint/commit, disable heartbeat and authorized normal shutdown without /f.
 Numerical research paused; no extension integration or push.
+
+## Exposed development notes
+
+An initial bare-kings fixture tried to capture a lone knight from an already
+dead position, and a same-color-bishop fixture also started dead; inherited
+terminal guards correctly refused both. Capturing a last pawn reaches bare
+kings legally, and removing a pawn reaches the same-color-bishop subset.
+A bishop near-miss initially checked the moving king along its diagonal, so
+its proposed move was illegal; a different opposite-color square supplies a
+legal control. A rights-loss setup accidentally checked the nonmoving king
+with its rook; moving that king to e8 makes the legal rights witness explicit.
+The authored quiet walk uses a deterministic seed solely for synthetic move
+choice, rejecting repeated/terminal positions; all 100 plies are retained.
