@@ -102,8 +102,9 @@ No promotion records yet.
 | E050 | [Square clearance and temporary recovery](experiments/E050-square-clearance-and-recovery/RESULT.md) | complete | 1,702 cumulative tests; 1,542 synthetic cases; 264 verified names; all-defense mate on vacated square and all-acceptance immediate material recovery; exact repeat/clean and saved-proof replay | E051 investigate tactical interference with legal defender-response and material/mate witnesses; cutoff cancelled |
 | E051 | [All-reply interference combinations](experiments/E051-interference-combinations/RESULT.md) | complete | 1,775 cumulative tests; 1,610 synthetic cases; 265 verified names; before-proven defensive duties, all-reply material gains and counterfactual recaptures; exact repeat/clean and saved-proof replay | E052 investigate desperado captures with threatened units, legal escape comparisons and finite material witnesses; cutoff cancelled |
 | E052 | [Finite desperado capture comparisons](experiments/E052-desperado-captures/RESULT.md) | complete | 1,839 cumulative tests; 1,668 synthetic cases; 267 verified names; all-quiet-alternative unit losses and all-acceptance conditional capture benefits; exact repeat/clean and saved-proof replay | E053 investigate cross-checks with before-check rays, actual interposition and countercheck; cutoff cancelled |
+| E053 | [Legal cross-check mechanisms](experiments/E053-cross-checks/RESULT.md) | complete | 1,946 cumulative tests; 1,768 synthetic cases; 268 verified names; direct/discovered/double counterchecks, checker captures, king discoveries, promotions/EP and complete evasions; exact repeat/clean and saved-proof replay | E054 investigate attraction, decoy and blocking combinations with all-defense mate and causal-role proofs; cutoff cancelled |
 
-Allocate the next unused ID in each series: `E053`, `D003`, `F018`, `P001`.
+Allocate the next unused ID in each series: `E054`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
