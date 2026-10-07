@@ -48,13 +48,13 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E056 pawn blockades](experiments/E056-pawn-blockades/RESULT.md)
-adds short knight, king and other piece blockade comments, requiring an occupied
-pawn-forward square and every legal enemy reply. Coverage reaches 276 verified
+[E057 rook checking direction and distance](experiments/E057-rook-checking-distance/RESULT.md)
+adds short rear/side check comments and measured separation with no immediate
+legal checker capture, retaining every legal evasion. Coverage reaches 280 verified
 names.
-Its [cumulative tracker](experiments/E056-pawn-blockades/evidence/concept-status.md)
+Its [cumulative tracker](experiments/E057-rook-checking-distance/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E056-pawn-blockades/evidence/demo.html) is runnable
+list; its [demo](experiments/E057-rook-checking-distance/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 

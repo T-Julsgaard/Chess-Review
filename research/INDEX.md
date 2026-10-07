@@ -109,7 +109,9 @@ No promotion records yet.
 
 | E056 | [Pawn blockade squares and pieces](experiments/E056-pawn-blockades/RESULT.md) | complete | 2,233 cumulative tests; 2,036 synthetic cases; 276 verified names; actual moved nonpawn blocker, complete legal enemy replies, pawn captures/removal and terminal exclusions; exact repeat/clean and saved-proof replay | E057 investigate rear/side rook checks and checking distance with exact legal evasions; cutoff cancelled |
 
-Allocate the next unused ID in each series: `E057`, `D003`, `F018`, `P001`.
+| E057 | [Rook checking direction and immediate distance](experiments/E057-rook-checking-distance/RESULT.md) | complete | 2,336 cumulative tests; 2,132 synthetic cases; 280 verified names; rear/side direct rays, advanced passer context, complete evasions and no-capture distance evidence; selected-comment correction, exact repeat/clean and saved-proof replay | E058 investigate wrong-colored bishop and rook pawn with promotion-square and legal-corner evidence; cutoff cancelled |
+
+Allocate the next unused ID in each series: `E058`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
