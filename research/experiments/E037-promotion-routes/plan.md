@@ -39,3 +39,20 @@ Record exact revision, receipt, config/environment and evidence under 3 MB.
 This protocol is a resume point, not proof of coverage. Continue actual
 five-hour usage monitoring. At around 10% remaining preserve completed work,
 disable heartbeat and perform the user's authorized normal PC shutdown.
+
+## Resumption addendum, 2026-10-07
+
+The user revoked the usage cutoff and shutdown instructions and requested
+continued concept work. The shutdown automation was deleted. Earlier cutoff
+notes above are historical, not active instructions.
+
+Use an explicit research profile `promotionDepth` (0 disables route search;
+1–6 bounds remaining own pushes). Default zero preserves inherited behavior.
+Share `maxRouteNodes` 0–50,000 across candidates and drop all new route/square
+claims on any exhaustion. Positive trees retain own choices and all enemy
+branches; no negative-tree retention or FEN transposition cache. Emit geometric
+rule-of-square only for bare K+P versus K after a proven route, with enemy king
+Chebyshev distance to the promotion square greater than remaining single pushes
+plus one for its first reply. This conservative tempo margin excludes initial
+double-step ambiguity; pawns on their starting rank cannot get that label.
+Checking and immediate-promotion facts keep their existing higher priority.
