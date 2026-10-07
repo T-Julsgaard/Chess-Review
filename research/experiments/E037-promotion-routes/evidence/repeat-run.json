@@ -1,9 +1,9 @@
 {
   "schema": "research-synthetic-run-v1",
   "experiment": "E037",
-  "date": "2026-10-07T08:45:01.438Z",
-  "codeRevision": "c8f18665df4d118d9b9d59c0638bc2f60668486d",
-  "workingTreeStatus": "M research/INDEX.md\n M research/README.md\n M research/experiments/E037-promotion-routes/RESULT.md\n?? research/experiments/E037-promotion-routes/evidence/",
+  "date": "2026-10-07T08:51:05.629Z",
+  "codeRevision": "f51798242d6853b9d4c2ca8cce01204f9b4a22d8",
+  "workingTreeStatus": "M research/experiments/E037-promotion-routes/evidence/results.json\n M research/experiments/E037-promotion-routes/evidence/run.json\n?? research/experiments/E038-underpromotion-stalemate/",
   "command": "node research/experiments/E037-promotion-routes/code/run.mjs --out research/runs/E037/repeat",
   "evaluationRole": "exposed synthetic development mechanics; not independent explanation precision",
   "environment": {
@@ -147,7 +147,7 @@
     "research/experiments/E037-promotion-routes/code/fixtures.mjs": "ef518db9ce37f29f0b88874d286bde94157f1bc3849fbcb07de28a88779ec094",
     "research/experiments/E037-promotion-routes/code/routes.test.mjs": "dca8fa1c54d5798ba853a314f387cbc0214d34a7cc3e917e760c3854b7e80aab",
     "research/experiments/E037-promotion-routes/code/status.mjs": "4212391fcfef59cb50685703a4945a9ab5110af24697c92f588ba265fab2d35b",
-    "research/experiments/E037-promotion-routes/code/run.mjs": "921fd36408a542e4f8888ca62c2f9da0edcbda1b384d19e2ae9650a41f9a5335",
+    "research/experiments/E037-promotion-routes/code/run.mjs": "e1a45ad62b94bcb1fe38ba18adf3a31a3afa3afb8e50a15125eace7cc1257a6c",
     "research/experiments/E036-passer-context/code/passers.mjs": "5930d3aa75f26077c67f82aa87e24e7359d597d716202b9dd747106b6f89a72a",
     "research/experiments/E036-passer-context/code/replay.mjs": "2240f8c7a146a15c0b659c0012a54a6986285feb32e972f250dd8fcdd8667f93",
     "research/experiments/E036-passer-context/code/fixtures.mjs": "f101a67916e8a9855e8d80dd62f6ac37bb69571a136d176285b980a2cbbd8604",
@@ -219,11 +219,11 @@
     "research/experiments/E020-coach-concepts/CONCEPTS.md": "a7b06b6f9530b8c894471f32eeaea49c8ef340deb40e215e7f065967016a1bdd"
   },
   "outputHashes": {
-    "results.json": "ab76b14f585d43d289452175d53ceb40a0f795c8656402c4851e3dd813e8f440",
+    "results.json": "737e7ab53a58900c58df92a8bc614427bdc4a1bfe3c8b4bd0b6bb5ceb8b62ef6",
     "demo.html": "3484055dd4947895801f1c5fe3941ebf777e8484305f956284c5929ccf69d1d3",
     "concept-status.md": "88b2f5cebca082d7b31d734f1f97cf2bfa000efd9e92e5ca9f9a1d7f80cf730a"
   },
-  "elapsedMs": 46942.089,
+  "elapsedMs": 46170.0672,
   "metrics": {
     "fixtures": 928,
     "newFixtureCases": 24,

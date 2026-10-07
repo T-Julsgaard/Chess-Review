@@ -33,12 +33,14 @@ original occurrences, 89 partial and 757 unimplemented occurrences.
 [results](evidence/results.json) retain exact route trees and safety leaves.
 [Main](evidence/run.json), [repeat](evidence/repeat-run.json) and
 [initially clean local checkout](evidence/clean-run.json) match every normalized
-input and deterministic output hash at source revision `c8f1866`. Main/clean
-took about 50/52 seconds in the initial runs. The first pretty-printed retention
+input and deterministic output hash at corrected source revision `f517982`.
+Main/repeat/clean took about 48/46/47 seconds. The first pretty-printed retention
 exceeded the 3 MB gate; the initial evidence commit mistakenly preceded handling
 that failed gate. The runner now writes losslessly compact JSON. Replacement
-main/repeat/clean evidence and measured retention must pass before closing this
-correction. Metadata includes
+main/repeat/clean evidence passes every hash comparison, and retained evidence
+is 2,837,011 bytes. Parsed JSON is identical to the first retained report; demo
+and tracker hashes are unchanged. This closes the retention correction.
+Metadata includes
 exact source revision, command, config, environment and guarded D001 receipt.
 No registered game is analyzed. Pilot: research/runs/E037/development.
 
