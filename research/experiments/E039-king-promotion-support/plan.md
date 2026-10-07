@@ -35,3 +35,16 @@ routes. Cumulative E020–E039 tests, source verification, exact source commit,
 main/repeat/initially clean clone, normalized input/output hash matching and
 guarded D001 receipt. No registered game is analyzed; retain <3 MB lossless
 compact evidence and comments <=24 words. No extension, rating work or push.
+
+## Exposed pilot/retention addendum
+
+The first central king move did not secure promotion; preserve it as a negative
+case. A separate authored king move into the center unblocks the pawn, giving
+a positive contrast. No geometry-only benefit gate is relaxed.
+
+To retain all large paired proofs within the byte cap, allow a deterministic
+gzip JSON certificate pack. Results reference each exact before/after proof
+by key; display details stay compact. Verify lossless roundtrip, independent
+raw proof replay, unique reference keys and compressed/uncompressed hashes in
+run metadata. Exact repeat/clean comparison includes the pack bytes. No proof
+leaf is dropped; decompression/replay is documented in RESULT.md.
