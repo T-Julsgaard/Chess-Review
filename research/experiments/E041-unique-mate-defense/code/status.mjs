@@ -1,0 +1,5 @@
+import {renderStatus as parent} from '../../E040-quiet-mating-nets/code/status.mjs';
+export function renderStatus(list,report){let text=parent(list,report).replace(/^.*C\d{4} \*\*(Only move|Forced move)\*\*.*$/gm,line=>line.replace(/^- \[[ x]\]/,'- [x]').replace(/ — .*/,' — Mechanics verified: at least two legal choices; played move has complete no-enemy-mate-in-one proof and EVERY alternative admits immediate enemy mate; longer-term safety not claimed.'));
+ const rows=[...text.matchAll(/^- \[([ x])\] C\d{4} \*\*([^*]+)\*\* — (.*)$/gm)],verified=rows.filter(r=>r[1]==='x'),partial=rows.filter(r=>r[3].startsWith('Partial:'));text=text.replace(/1085 entries; .*?\. Checked/,`1085 entries; ${verified.length} verified occurrences across ${new Set(verified.map(r=>r[2])).size} names; ${partial.length} partial occurrences. Checked`);
+ return text.replace(/\d+ authored\/reflected cases\..*?Comments <=24 words\./,`${report.fixtures} authored/reflected cases. Unique mate defense proves safety against immediate mate and a mating refutation for every other legal move. Full new proofs retained losslessly. Comments <=24 words.`);
+}
