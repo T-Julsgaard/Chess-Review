@@ -92,8 +92,9 @@ No promotion records yet.
 | E040 | [Quiet mating nets](experiments/E040-quiet-mating-nets/RESULT.md) | complete | 1,097 cumulative tests; 992 synthetic cases; 231 verified names; every legal defense admits next-move mate; exact repeat/clean replay and lossless pack audit | E041 examine unique immediate-mate defenses; cutoff cancelled |
 | E041 | [Unique immediate-mate defenses](experiments/E041-unique-mate-defense/RESULT.md) | complete | 1,118 cumulative tests; 1,010 synthetic cases; 233 verified names; complete actual safety and all-alternative mating refutations; exact repeat/clean and saved-proof replay | E042 broaden concrete defensive concepts; cutoff cancelled |
 | E042 | [Defensive counterattacks and sacrifice offers](experiments/E042-defensive-counterattacks/RESULT.md) | complete | 1,144 cumulative tests; 1,030 synthetic cases; 235 verified names; checking unique defenses and accepted-loss counterreply witnesses; exact repeat/clean, saved-proof and inherited-hash replay | E043 investigate conditional decoy/deflection; cutoff cancelled |
+| E043 | [Mating decoys and deflections](experiments/E043-mating-decoys/RESULT.md) | complete | 1,169 cumulative tests; 1,050 synthetic cases; 240 verified names; legal prior duties, attracted-king mates and geometric escape blockers; exact repeat/clean and saved-role replay | E044 investigate named mating combinations and coordinate offers; cutoff cancelled |
 
-Allocate the next unused ID in each series: `E043`, `D003`, `F018`, `P001`.
+Allocate the next unused ID in each series: `E044`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.

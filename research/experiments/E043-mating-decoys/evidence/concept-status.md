@@ -1,0 +1,1097 @@
+# Cumulative coach concept tracker
+
+Updated: 2026-10-07. [Original list](../../E020-coach-concepts/CONCEPTS.md) is unchanged, including all repeated occurrence IDs.
+
+1085 entries; 275 verified occurrences across 240 names; 79 partial occurrences. Checked means stated synthetic mechanics, not real-game precision, human benefit or extension readiness.
+
+[Plan](../plan.md) · [Result](../RESULT.md) · [Demo](demo.html) · [Evidence](results.json)
+
+1050 authored/reflected cases. Conditional mating decoys retain prior defender duties, king-attraction moves or explicit artificial removed-blocker king escapes, with complete all-defense mate proof. Full proofs in results.json. Comments <=24 words.
+
+## Per-entry status
+
+- [ ] C0001 **Board coordinates** — Not implemented.
+- [ ] C0002 **Piece movement** — Not implemented.
+- [x] C0003 **Capture** — Mechanics verified: actual removed piece and square, including en passant.
+- [x] C0004 **Check** — Mechanics verified: check; factual king attack only.
+- [x] C0005 **Checkmate** — Mechanics verified: checkmate; played move ends in mate.
+- [x] C0006 **Stalemate** — Mechanics verified: stalemate; played move ends in stalemate.
+- [x] C0007 **Draw by repetition** — Mechanics verified: verified legal history reaches three equal position keys including turn, castling rights and legal en passant; reports claim opportunity, not awarded draw.
+- [x] C0008 **Fifty-move rule** — Mechanics verified: verified history covers 100 consecutive plies without pawn move/capture and consistent counters; FEN-only thresholds remain partial facts and cannot trigger this claim label.
+- [x] C0009 **Insufficient mating material** — Mechanics verified: chess.js insufficient-material classification after legal move.
+- [x] C0010 **Castling** — Mechanics verified: castling; factual move, no safety judgment.
+- [x] C0011 **Kingside castling** — Mechanics verified: castling; kingside.
+- [x] C0012 **Queenside castling** — Mechanics verified: castling; queenside.
+- [x] C0013 **En passant** — Mechanics verified: en-passant; right, removed pawn and discovered-check case.
+- [x] C0014 **Promotion** — Mechanics verified: promotion; factual piece change.
+- [x] C0015 **Underpromotion** — Mechanics verified: promotion; non-queen piece change, no optimality claim.
+- [ ] C0016 **Legal move** — Not implemented.
+- [ ] C0017 **Illegal move** — Not implemented.
+- [ ] C0018 **Touch-move rule** — Not implemented.
+- [ ] C0019 **Checkmate versus resignation** — Not implemented.
+- [ ] C0020 **Material** — Not implemented.
+- [ ] C0021 **Tempo** — Not implemented.
+- [ ] C0022 **Initiative** — Not implemented.
+- [ ] C0023 **Space** — Not implemented.
+- [x] C0024 **Development** — Mechanics verified: first surviving original minor home departure off back rank during first ten own turns; verified initial-position history.
+- [ ] C0025 **King safety** — Not implemented.
+- [ ] C0026 **Piece activity** — Not implemented.
+- [x] C0027 **Mobility** — Mechanics verified: static legal destination count drops by at least two to at most two; explicit hypothetical before-opponent turn, no quality or future-position claim.
+- [ ] C0028 **Coordination** — Not implemented.
+- [ ] C0029 **Harmony** — Not implemented.
+- [ ] C0030 **Material balance** — Partial: nominal 1/3/3/5/9 arithmetic and listed exact army subsets; positional value deferred.
+- [ ] C0031 **Material imbalance** — Partial: nominal 1/3/3/5/9 arithmetic and listed exact army subsets; positional value deferred.
+- [ ] C0032 **Relative piece value** — Not implemented.
+- [ ] C0033 **Absolute versus relative value** — Not implemented.
+- [x] C0034 **Exchange** — Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded.
+- [x] C0035 **The exchange** — Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded.
+- [ ] C0036 **Winning the exchange** — Partial: played minor-for-rook capture retains positive nominal gain through every immediate reply only.
+- [x] C0037 **Exchange sacrifice** — Mechanics verified: rook captures a minor and is legally offered at a nominal loss of two points, with all-defense forced-mate proof.
+- [ ] C0038 **Quality of pieces** — Not implemented.
+- [ ] C0039 **Good trade** — Not implemented.
+- [ ] C0040 **Bad trade** — Not implemented.
+- [x] C0041 **Equal trade** — Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded.
+- [x] C0042 **Unequal trade** — Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded.
+- [x] C0043 **Piece simplification** — Mechanics verified: non-pawn piece count decreases by one; no quality judgment.
+- [ ] C0044 **Mass exchanges** — Not implemented.
+- [ ] C0045 **Trading when ahead** — Not implemented.
+- [ ] C0046 **Keeping pieces when behind** — Not implemented.
+- [x] C0047 **Queen trade** — Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded.
+- [x] C0048 **Minor-piece trade** — Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded.
+- [x] C0049 **Rook trade** — Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded.
+- [ ] C0050 **Favorable transformation** — Not implemented.
+- [ ] C0051 **Tactic** — Not implemented.
+- [ ] C0052 **Combination** — Not implemented.
+- [x] C0053 **Fork** — Mechanics verified: new all-piece target pairs, including pawns; every defense has a positive finite capture witness.
+- [x] C0054 **Knight fork** — Mechanics verified: fork; new knight fork with exhaustive finite material witnesses.
+- [x] C0055 **Pawn fork** — Mechanics verified: fork; new pawn fork with exhaustive finite material witnesses.
+- [x] C0056 **Royal fork** — Mechanics verified: king-and-queen target pair by any piece with a positive finite witness; king never captured.
+- [ ] C0057 **Double attack** — Partial: certified moved-piece forks and discovered two-attacker target threats only.
+- [x] C0058 **Triple attack** — Mechanics verified: three or more moved-piece targets with one finite capture witness per defense; not all targets won.
+- [ ] C0059 **Pin** — Partial: absolute king pins and certified queen-relative/cross pins verified; other non-king pin targets unverified.
+- [x] C0060 **Absolute pin** — Mechanics verified: absolute-pin; new single-blocker slider-to-king alignment.
+- [x] C0061 **Relative pin** — Mechanics verified: new queen alignment; every legal blocker move off that line permits queen capture with positive immediate net material versus the post-move position; other defenses remain.
+- [x] C0062 **Cross-pin** — Mechanics verified: mixed king/queen pin on distinct slider lines; nonempty legal off-queen-line reply set passes the relative-pin proof; other cross-pin forms excluded.
+- [ ] C0063 **Skewer** — Partial: certified absolute king-first subset only.
+- [x] C0064 **Absolute skewer** — Mechanics verified: king-first moved-slider skewer; every defense allows target capture with positive immediate net material.
+- [x] C0065 **Discovered attack** — Mechanics verified: stationary slider’s newly opened attack with legal same-side capture witness; opponent can respond.
+- [x] C0066 **Discovered check** — Mechanics verified: discovered-check; includes en passant, excludes moving castling rook.
+- [x] C0067 **Double check** — Mechanics verified: double-check; two king attackers, terminal mate takes priority.
+- [ ] C0068 **X-ray attack** — Partial: new slider/blocker/enemy-target alignment only; blocker prevents direct attack.
+- [ ] C0069 **X-ray defense** — Partial: new slider/blocker/friendly-target alignment only; blocker prevents direct defense.
+- [x] C0070 **Deflection** — Mechanics verified: positive all-defense mate sacrifice; accepting enemy unit abandons a before-proven legal capture of the same eventual mating unit; acceptance/mate explicit.
+- [x] C0071 **Decoy** — Mechanics verified: all-defense mate offer; accepted non-king unit blocks a geometrically verified king escape, or accepted king enables a before-legal nonmating move to mate; conditional line.
+- [x] C0072 **Attraction** — Mechanics verified: king-specific all-defense mating offer: accepting king changes square and same before-legal nonmating move actually mates; conditional acceptance.
+- [x] C0073 **Distraction** — Mechanics verified: same legal defender-duty deflection certificate; no psychological intent inferred.
+- [x] C0074 **Removal of the defender** — Mechanics verified: captured geometric defender; every legal reply permits original target capture with positive immediate net material versus the post-capture position; later play unproven.
+- [ ] C0075 **Overloading** — Not implemented.
+- [x] C0076 **Interference** — Mechanics verified: played piece removes a specific enemy slider’s previously clear attack line to a friendly piece; geometry only.
+- [ ] C0077 **Clearance** — Partial: discovered attacks and certified mating clearance sacrifices verified; broader quiet uses/intent unverified.
+- [ ] C0078 **Line clearance** — Partial: discovered attacks and certified mating clearance sacrifices verified; broader quiet uses/intent unverified.
+- [ ] C0079 **Square clearance** — Not implemented.
+- [x] C0080 **Blocking** — Mechanics verified: played move interrupts a previously clear enemy slider attack line; no wider safety or evaluation claim.
+- [x] C0081 **Interposition** — Mechanics verified: legal check evasion blocks a specified checking slider between attacker and king.
+- [x] C0082 **Trapping a piece** — Mechanics verified: currently attacked N/B/R/Q has complete all-defense tracked capture proof and positive gain through every immediate counterreply; nonchecking finite subset.
+- [x] C0083 **Trapped queen** — Mechanics verified: currently attacked N/B/R/Q has complete all-defense tracked capture proof and positive gain through every immediate counterreply; nonchecking finite subset.
+- [x] C0084 **Domination** — Mechanics verified: every legal move by the named unit permits tracked capture with positive gain through every immediate counterreply; other defenses not promised.
+- [ ] C0085 **Desperado** — Not implemented.
+- [x] C0086 **Zwischenzug** — Mechanics verified: verified previous capture and legal recapture; played intermediate check/capture retains recapture through all legal replies and immediate counters, or actually mates.
+- [x] C0087 **Intermediate check** — Mechanics verified: actual check delays a verified available recapture; every legal reply permits tracked recapture with finite positive gain or actual mate.
+- [x] C0088 **zwischenmatt / intermediate mate** — Mechanics verified: verified previous capture has legal recapture alternative, but actual played move legally checkmates instead.
+- [x] C0089 **Sacrifice** — Mechanics verified: actual material offer retains all-defense mate within two/three moves, including every legal acceptance and decline; no necessity or intention inferred.
+- [ ] C0090 **Temporary sacrifice** — Not implemented.
+- [ ] C0091 **Permanent sacrifice** — Not implemented.
+- [ ] C0092 **Positional sacrifice** — Not implemented.
+- [x] C0093 **Clearance sacrifice** — Mechanics verified: material offer vacates the sole blocker on a stationary slider-to-king ray, opening check and retaining bounded mate through every defense.
+- [x] C0094 **Deflection sacrifice** — Mechanics verified: same positive nominal-offer/all-defense mate and before-duty/after-mate deflection proof.
+- [ ] C0095 **Destroying the pawn shield** — Partial: capture removes one geometric cover pawn; sacrifice intent or complete destruction not inferred.
+- [ ] C0096 **Greek Gift sacrifice** — Not implemented.
+- [ ] C0097 **Rook sacrifice on h7/h2** — Not implemented.
+- [ ] C0098 **Rook sacrifice on g7/g2** — Not implemented.
+- [ ] C0099 **Exchange sacrifice on c3/c6** — Not implemented.
+- [x] C0100 **Queen sacrifice** — Mechanics verified: legally capturable moved queen costs more than the played capture, while every defense retains bounded forced mate.
+- [ ] C0101 **Smothered mate combination** — Partial: actual final knight mate with every adjacent king square occupied by own pieces; combination history unknown.
+- [ ] C0102 **Back-rank tactic** — Partial: terminal back-rank mate only.
+- [x] C0103 **Loose piece** — Mechanics verified: new absence of geometric defenders; pinned defenders still counted.
+- [ ] C0104 **Hanging piece** — Partial: newly available opponent capture survives every immediate response with positive nominal gain; long-term profit unresolved.
+- [ ] C0105 **Loose pieces drop off** — Not implemented.
+- [ ] C0106 **Counting attackers and defenders** — Not implemented.
+- [x] C0107 **Removing protection** — Mechanics verified: same finite all-defense target-capture proof; no claim all protection disappears.
+- [x] C0108 **En prise** — Mechanics verified: legal same-side capture if target remains available next turn; no profit claim.
+- [ ] C0109 **Tactical vulnerability** — Not implemented.
+- [ ] C0110 **Alignment** — Partial: new x-ray and battery geometry subsets; tactical value not implied.
+- [ ] C0111 **King-piece alignment** — Partial: absolute pins/skewers and descriptive x-rays only.
+- [ ] C0112 **Queen-king alignment** — Partial: certified king-first queen-target skewers and x-ray geometry subsets.
+- [ ] C0113 **Rook-queen alignment** — Partial: descriptive x-ray alignment; no general relative-skewer proof.
+- [ ] C0114 **Candidate moves** — Not implemented.
+- [x] C0115 **Forcing moves** — Mechanics verified: nonchecking, noncapturing actual move; every legal reply permits checkmate on the next own move, independently replayed; no newly-created/only-best claim.
+- [ ] C0116 **Checks-captures-threats method** — Not implemented.
+- [ ] C0117 **Calculation tree** — Partial: bounded mate tree/profile and verified continuation are implemented in research evidence; generic calculation/variation coaching label remains outside this candidate.
+- [ ] C0118 **Principal variation** — Not implemented.
+- [ ] C0119 **Visualization** — Not implemented.
+- [ ] C0120 **Board vision** — Not implemented.
+- [ ] C0121 **Tactical vision** — Not implemented.
+- [ ] C0122 **Pattern recognition** — Not implemented.
+- [ ] C0123 **Move ordering** — Not implemented.
+- [ ] C0124 **Calculation depth** — Partial: bounded mate tree/profile and verified continuation are implemented in research evidence; generic calculation/variation coaching label remains outside this candidate.
+- [ ] C0125 **Calculation breadth** — Not implemented.
+- [ ] C0126 **Quiet move** — Partial: a quiet tactical mate threat has no check or capture, but the original non-forcing characterization is not established.
+- [x] C0127 **Only move** — Mechanics verified: at least two legal choices; played move has complete no-enemy-mate-in-one proof and EVERY alternative admits immediate enemy mate; longer-term safety not claimed.
+- [x] C0128 **Forced move** — Mechanics verified: at least two legal choices; played move has complete no-enemy-mate-in-one proof and EVERY alternative admits immediate enemy mate; longer-term safety not claimed.
+- [ ] C0129 **Forcing sequence** — Not implemented.
+- [ ] C0130 **Critical position** — Not implemented.
+- [ ] C0131 **Critical moment** — Not implemented.
+- [ ] C0132 **Stopping point** — Not implemented.
+- [ ] C0133 **Final-position evaluation** — Not implemented.
+- [ ] C0134 **Blunder check** — Not implemented.
+- [ ] C0135 **Opponent's best response** — Not implemented.
+- [ ] C0136 **Backward calculation** — Not implemented.
+- [ ] C0137 **Elimination method** — Not implemented.
+- [ ] C0138 **Comparison of candidates** — Not implemented.
+- [ ] C0139 **Control the center** — Partial: new pawn attacks on d4/e4/d5/e5 only.
+- [x] C0140 **Develop minor pieces** — Mechanics verified: same first-development history gate, with all four surviving minors off back rank explicitly recognized.
+- [ ] C0141 **Castle early** — Not implemented.
+- [x] C0142 **Connect the rooks** — Mechanics verified: unobstructed same-rank/file rook alignment; geometric support only.
+- [ ] C0143 **Avoid unnecessary pawn moves** — Not implemented.
+- [ ] C0144 **Avoid repeated piece moves** — Partial: actual repeated minor move and unmoved count explained; necessity/avoidance recommendation not established.
+- [ ] C0145 **Do not bring the queen out too early** — Partial: actual first early queen move and minor count explained; harm/avoidance recommendation not established.
+- [x] C0146 **Opening tempo** — Mechanics verified: checking first-development subset only; no net time advantage.
+- [ ] C0147 **Development advantage** — Not implemented.
+- [ ] C0148 **Lead in development** — Not implemented.
+- [ ] C0149 **Opening initiative** — Not implemented.
+- [ ] C0150 **Opening theory** — Not implemented.
+- [ ] C0151 **Main line** — Not implemented.
+- [ ] C0152 **Sideline** — Not implemented.
+- [ ] C0153 **Novelty** — Not implemented.
+- [ ] C0154 **Preparation** — Not implemented.
+- [ ] C0155 **Move order** — Not implemented.
+- [ ] C0156 **Transposition** — Not implemented.
+- [ ] C0157 **Opening repertoire** — Not implemented.
+- [ ] C0158 **Repertoire depth** — Not implemented.
+- [ ] C0159 **Opening trap** — Not implemented.
+- [ ] C0160 **Gambit** — Not implemented.
+- [ ] C0161 **Accepted gambit** — Not implemented.
+- [ ] C0162 **Declined gambit** — Not implemented.
+- [ ] C0163 **Countergambit** — Not implemented.
+- [ ] C0164 **Open game** — Not implemented.
+- [ ] C0165 **Semi-open game** — Not implemented.
+- [ ] C0166 **Closed game** — Not implemented.
+- [ ] C0167 **Semi-closed game** — Not implemented.
+- [ ] C0168 **Hypermodern opening** — Not implemented.
+- [ ] C0169 **Classical opening** — Not implemented.
+- [ ] C0170 **Opening equalization** — Not implemented.
+- [ ] C0171 **Opening advantage** — Not implemented.
+- [ ] C0172 **Pawn center** — Partial: at least two pawns occupy d4/e4/d5/e5; formation facts only.
+- [ ] C0173 **Piece center** — Not implemented.
+- [ ] C0174 **Classical center** — Partial: at least two pawns occupy d4/e4/d5/e5; formation facts only.
+- [ ] C0175 **Hypermodern center** — Not implemented.
+- [ ] C0176 **Open center** — Partial: d/e files become pawn-free; broader central activity not established.
+- [x] C0177 **Closed center** — Mechanics verified: matched locked chains with at least two mover pawns on central squares; no plan claim.
+- [ ] C0178 **Fixed center** — Partial: central pawn straight advances blocked and no geometric captures now; future transformation/ease not established.
+- [ ] C0179 **Mobile center** — Not implemented.
+- [ ] C0180 **Dynamic center** — Not implemented.
+- [ ] C0181 **Fluid center** — Not implemented.
+- [x] C0182 **Pawn tension** — Mechanics verified: opposing pawn attacks; resolving capture.
+- [ ] C0183 **Maintaining tension** — Not implemented.
+- [x] C0184 **Releasing tension** — Mechanics verified: opposing pawn attacks; resolving capture.
+- [x] C0185 **Central break** — Mechanics verified: new legal pawn-lever target occupies d4/e4/d5/e5; plan or advantage not inferred.
+- [x] C0186 **Undermining the center** — Mechanics verified: new legal pawn attack on base of enemy chain containing a central pawn; collapse not implied.
+- [ ] C0187 **Overextended center** — Not implemented.
+- [ ] C0188 **Center collapse** — Not implemented.
+- [ ] C0189 **Pawn structure** — Not implemented.
+- [ ] C0190 **Pawn skeleton** — Not implemented.
+- [x] C0191 **Pawn chain** — Mechanics verified: directed pawn-support component; rear bases and most advanced heads.
+- [x] C0192 **Base of the pawn chain** — Mechanics verified: directed pawn-support component; rear bases and most advanced heads.
+- [x] C0193 **Head of the pawn chain** — Mechanics verified: directed pawn-support component; rear bases and most advanced heads.
+- [x] C0194 **Pawn island** — Mechanics verified: contiguous occupied-file groups.
+- [x] C0195 **Pawn majority** — Mechanics verified: counts on fixed a–d/e–h wings; no plan or advantage claim.
+- [x] C0196 **Queenside majority** — Mechanics verified: counts on fixed a–d/e–h wings; no plan or advantage claim.
+- [x] C0197 **Kingside majority** — Mechanics verified: counts on fixed a–d/e–h wings; no plan or advantage claim.
+- [ ] C0198 **Minority attack** — Not implemented.
+- [x] C0199 **Passed pawn** — Mechanics verified: passed-pawn geometry, including legal en-passant exception; creation or advance.
+- [x] C0200 **Protected passed pawn** — Mechanics verified: passer attacked by a friendly pawn; legal recapture or safe advance not promised.
+- [ ] C0201 **Connected passed pawns** — Partial: adjacent-file passers at most one rank apart; reciprocal protection in supplied wording not established.
+- [x] C0202 **Outside passed pawn** — Mechanics verified: actual flank passer advance with every other pawn at least three files away, at least two other pawns including both colors; no king diversion or win claim.
+- [x] C0203 **Distant passed pawn** — Mechanics verified: actual flank passer advance with every other pawn at least three files away, at least two other pawns including both colors; no king diversion or win claim.
+- [ ] C0204 **Candidate passed pawn** — Not implemented.
+- [ ] C0205 **Backward pawn** — Not implemented.
+- [x] C0206 **Isolated pawn** — Mechanics verified: no friendly pawn on either neighboring file; IQP restricted to d-file.
+- [x] C0207 **Isolated queen's pawn / IQP** — Mechanics verified: no friendly pawn on either neighboring file; IQP restricted to d-file.
+- [x] C0208 **Hanging pawns** — Mechanics verified: new same-rank c/d pair at relative fourth/fifth rank, no other c/d or b/e pawns; no weakness claim.
+- [x] C0209 **Doubled pawns** — Mechanics verified: same-file friendly pawn counts.
+- [x] C0210 **Tripled pawns** — Mechanics verified: same-file friendly pawn counts.
+- [ ] C0211 **Pawn weakness** — Not implemented.
+- [ ] C0212 **Weak square** — Not implemented.
+- [ ] C0213 **Pawn hole** — Not implemented.
+- [x] C0214 **Pawn lever** — Mechanics verified: new pawn attack with a legal hypothetical same-side capture; opponent can respond.
+- [ ] C0215 **Pawn break** — Not implemented.
+- [ ] C0216 **Breakthrough** — Not implemented.
+- [ ] C0217 **Pawn storm** — Not implemented.
+- [ ] C0218 **Pawn race** — Not implemented.
+- [ ] C0219 **Pawn wedge** — Not implemented.
+- [ ] C0220 **Cramping pawn** — Not implemented.
+- [x] C0221 **Pawn duo** — Mechanics verified: adjacent same-rank pawns; phalanx requires at least three.
+- [x] C0222 **Pawn phalanx** — Mechanics verified: adjacent same-rank pawns; phalanx requires at least three.
+- [x] C0223 **Ram** — Mechanics verified: opposing pawns block straight advancement.
+- [ ] C0224 **Pawn fixation** — Not implemented.
+- [ ] C0225 **Pawn target** — Not implemented.
+- [ ] C0226 **Pawn shield** — Partial: pawn squares within two forward ranks on three files around c/e/g home-rank king; safety not measured.
+- [ ] C0227 **Pawn cover** — Partial: pawn squares within two forward ranks on three files around c/e/g home-rank king; safety not measured.
+- [x] C0228 **Pawn sacrifice** — Mechanics verified: actual moved pawn may be legally captured, including en passant, yet every defense retains bounded forced mate; activity-for-mate subset.
+- [ ] C0229 **Structural weakness** — Not implemented.
+- [ ] C0230 **Structural advantage** — Not implemented.
+- [ ] C0231 **Color-complex weakness** — Not implemented.
+- [ ] C0232 **Dark-square weakness** — Not implemented.
+- [ ] C0233 **Light-square weakness** — Not implemented.
+- [ ] C0234 **Carlsbad structure** — Not implemented.
+- [x] C0235 **Isolated queen's pawn structure** — Mechanics verified: no friendly pawn on either neighboring file; IQP restricted to d-file.
+- [x] C0236 **Hanging-pawn structure** — Mechanics verified: new same-rank c/d pair at relative fourth/fifth rank, no other c/d or b/e pawns; no weakness claim.
+- [ ] C0237 **Maroczy Bind** — Not implemented.
+- [ ] C0238 **Hedgehog structure** — Not implemented.
+- [ ] C0239 **Stonewall structure** — Not implemented.
+- [ ] C0240 **French pawn chain** — Not implemented.
+- [ ] C0241 **Caro-Kann structure** — Not implemented.
+- [ ] C0242 **Slav structure** — Not implemented.
+- [ ] C0243 **Queen's Gambit structure** — Not implemented.
+- [ ] C0244 **Benoni structure** — Not implemented.
+- [ ] C0245 **Benko structure** — Not implemented.
+- [ ] C0246 **King's Indian structure** — Not implemented.
+- [ ] C0247 **Grünfeld center** — Not implemented.
+- [ ] C0248 **Sicilian Scheveningen structure** — Not implemented.
+- [ ] C0249 **Najdorf structure** — Not implemented.
+- [ ] C0250 **Dragon structure** — Not implemented.
+- [ ] C0251 **Closed Sicilian structure** — Not implemented.
+- [ ] C0252 **Botvinnik structure** — Not implemented.
+- [ ] C0253 **Panov structure** — Not implemented.
+- [x] C0254 **Symmetrical pawn structure** — Mechanics verified: exact same-file rank-reflection of at least two pawns each; full position/evaluation symmetry not implied.
+- [x] C0255 **Four-versus-three kingside structure** — Mechanics verified: counts on fixed a–d/e–h wings; no plan or advantage claim.
+- [x] C0256 **Three-versus-two queenside majority** — Mechanics verified: counts on fixed a–d/e–h wings; no plan or advantage claim.
+- [x] C0257 **Opposite-wing pawn majorities** — Mechanics verified: counts on fixed a–d/e–h wings; no plan or advantage claim.
+- [x] C0258 **Locked pawn chains** — Mechanics verified: two matched support components whose members all ram opposing pawns.
+- [ ] C0259 **Open-file pawn structure** — Not implemented.
+- [x] C0260 **Open file** — Mechanics verified: pawn-free file geometry and new rook/queen occupation.
+- [x] C0261 **Semi-open file** — Mechanics verified: pawn-free file geometry and new rook/queen occupation.
+- [ ] C0262 **Closed file** — Not implemented.
+- [ ] C0263 **Open rank** — Not implemented.
+- [x] C0264 **Open diagonal** — Mechanics verified: new full edge-to-edge bishop line of length at least five has no other piece; length eight identifies a long diagonal; geometric control only.
+- [x] C0265 **Long diagonal** — Mechanics verified: new full edge-to-edge bishop line of length at least five has no other piece; length eight identifies a long diagonal; geometric control only.
+- [ ] C0266 **Weak square** — Not implemented.
+- [ ] C0267 **Strong square** — Not implemented.
+- [ ] C0268 **Outpost** — Not implemented.
+- [ ] C0269 **Advanced outpost** — Not implemented.
+- [ ] C0270 **Entry square** — Not implemented.
+- [ ] C0271 **Penetration square** — Not implemented.
+- [ ] C0272 **Key square** — Not implemented.
+- [ ] C0273 **Critical square** — Not implemented.
+- [ ] C0274 **Blockade square** — Not implemented.
+- [ ] C0275 **Corresponding squares** — Not implemented.
+- [ ] C0276 **Positional advantage** — Not implemented.
+- [ ] C0277 **Static advantage** — Not implemented.
+- [ ] C0278 **Dynamic advantage** — Not implemented.
+- [ ] C0279 **Compensation** — Not implemented.
+- [ ] C0280 **Long-term compensation** — Not implemented.
+- [ ] C0281 **Temporary compensation** — Not implemented.
+- [ ] C0282 **Improving the worst-placed piece** — Not implemented.
+- [x] C0283 **Restriction** — Mechanics verified: static legal destination count drops by at least two to at most two; explicit hypothetical before-opponent turn, no quality or future-position claim.
+- [ ] C0284 **Prophylaxis** — Not implemented.
+- [ ] C0285 **Preventive move** — Not implemented.
+- [ ] C0286 **Accumulation of advantages** — Not implemented.
+- [ ] C0287 **Two weaknesses principle** — Not implemented.
+- [ ] C0288 **Multiple weaknesses** — Not implemented.
+- [ ] C0289 **Space advantage** — Not implemented.
+- [ ] C0290 **Space disadvantage** — Not implemented.
+- [ ] C0291 **Cramped position** — Not implemented.
+- [ ] C0292 **Piece improvement** — Not implemented.
+- [ ] C0293 **Piece optimization** — Not implemented.
+- [ ] C0294 **Maneuvering** — Not implemented.
+- [ ] C0295 **Regrouping** — Not implemented.
+- [ ] C0296 **Re-routing** — Not implemented.
+- [ ] C0297 **Transformation of advantages** — Not implemented.
+- [ ] C0298 **Conversion** — Not implemented.
+- [ ] C0299 **Consolidation** — Not implemented.
+- [ ] C0300 **Strategic trade** — Not implemented.
+- [ ] C0301 **Good piece versus bad piece** — Not implemented.
+- [x] C0302 **Domination** — Mechanics verified: every legal move by the named unit permits tracked capture with positive gain through every immediate counterreply; other defenses not promised.
+- [ ] C0303 **Bind** — Not implemented.
+- [ ] C0304 **Restriction before attack** — Partial: finite mobility/trap witnesses are implemented; separate preparatory history or larger combination intent remains unresolved.
+- [ ] C0305 **Multi-purpose move** — Not implemented.
+- [x] C0306 **Bishop pair** — Mechanics verified: both square-color complexes represented; excludes two same-color promoted bishops.
+- [ ] C0307 **Two bishops advantage** — Not implemented.
+- [x] C0308 **Good bishop** — Mechanics verified: new good-bishop pattern has at least two own pawns, all opposite the bishop square color; pawn relation only, not overall strategic value.
+- [x] C0309 **Bad bishop** — Mechanics verified: new bad-bishop pattern has at least two fixed central same-color own pawns, a direct forward blocker and at most four geometric controlled squares; not overall strategic value.
+- [ ] C0310 **Active bishop** — Not implemented.
+- [ ] C0311 **Passive bishop** — Not implemented.
+- [ ] C0312 **Outside the pawn chain** — Not implemented.
+- [x] C0313 **Fianchetto** — Mechanics verified: new prepared formation requires actual home-to-b2/g2/b7/g7 bishop move and advanced own flank pawn; no first-ever development or suitability claim.
+- [x] C0314 **Long-diagonal bishop** — Mechanics verified: new full edge-to-edge bishop line of length at least five has no other piece; length eight identifies a long diagonal; geometric control only.
+- [x] C0315 **Bishop sacrifice** — Mechanics verified: legally capturable moved bishop retains bounded all-defense mate; tested clearance-check subset, not all bishop sacrifices.
+- [x] C0316 **Opposite-colored bishops** — Mechanics verified: one bishop per side, only kings/pawns/bishops remain; square-color classification.
+- [x] C0317 **Same-colored bishops** — Mechanics verified: one bishop per side, only kings/pawns/bishops remain; square-color classification.
+- [ ] C0318 **Bishop versus knight** — Partial: exact non-pawn army combinations only; strategic comparison deferred.
+- [ ] C0319 **Bishop in open position** — Not implemented.
+- [ ] C0320 **Bishop behind pawn chain** — Partial: friendly chain pawn directly blocks bishop’s forward diagonal; passivity/liberation not assessed.
+- [ ] C0321 **Knight outpost** — Partial: new pawn-supported knight on c–f relative ranks 4–6; no enemy pawn ahead on neighboring files; future exchanges/permanence deferred.
+- [x] C0322 **Centralized knight** — Mechanics verified: knight arrives on d4/e4/d5/e5.
+- [x] C0323 **Rim knight** — Mechanics verified: new knight placement on board edge, inherited E021 mechanics.
+- [ ] C0324 **Knight maneuver** — Not implemented.
+- [x] C0325 **Knight fork** — Mechanics verified: fork; new knight fork with exhaustive finite material witnesses.
+- [ ] C0326 **Knight blockade** — Not implemented.
+- [ ] C0327 **Knight versus bishop** — Partial: exact non-pawn army combinations only; strategic comparison deferred.
+- [ ] C0328 **Good knight** — Not implemented.
+- [ ] C0329 **Bad knight** — Not implemented.
+- [ ] C0330 **Octopus knight** — Not implemented.
+- [x] C0331 **Knight on the sixth rank** — Mechanics verified: new relative-rank knight placement, inherited E021 mechanics.
+- [x] C0332 **Knight on the fifth rank** — Mechanics verified: new relative-rank knight placement, inherited E021 mechanics.
+- [x] C0333 **Knight domination** — Mechanics verified: every legal move by the named unit permits tracked capture with positive gain through every immediate counterreply; other defenses not promised.
+- [x] C0334 **Knight blockade of passed pawn** — Mechanics verified: piece occupies enemy passer’s next forward square; no permanent restraint claim.
+- [ ] C0335 **Knight rerouting** — Not implemented.
+- [ ] C0336 **Knight tour** — Not implemented.
+- [ ] C0337 **Knight on a protected outpost** — Partial: new pawn-supported knight on c–f relative ranks 4–6; no enemy pawn ahead on neighboring files; future exchanges/permanence deferred.
+- [ ] C0338 **Knight versus pawns on both wings** — Not implemented.
+- [ ] C0339 **Knight in closed position** — Not implemented.
+- [x] C0340 **Rook on an open file** — Mechanics verified: pawn-free file geometry and new rook/queen occupation.
+- [x] C0341 **Rook on a semi-open file** — Mechanics verified: pawn-free file geometry and new rook/queen occupation.
+- [ ] C0342 **Rook penetration** — Not implemented.
+- [x] C0343 **Rook on the seventh rank** — Mechanics verified: relative seventh rank (White 7, Black 2); new placement.
+- [x] C0344 **Rook on the second rank** — Mechanics verified: relative seventh rank (White 7, Black 2); new placement.
+- [x] C0345 **Two rooks on the seventh** — Mechanics verified: relative seventh rank (White 7, Black 2); new placement.
+- [x] C0346 **Doubling rooks** — Mechanics verified: unobstructed same-rank/file rook alignment; geometric support only.
+- [x] C0347 **Tripling on a file** — Mechanics verified: two rooks and queen on one file without other intervening pieces.
+- [x] C0348 **Connected rooks** — Mechanics verified: unobstructed same-rank/file rook alignment; geometric support only.
+- [ ] C0349 **Rook lift** — Partial: arrival or horizontal movement on relative third/fourth rank; attack intent not inferred.
+- [ ] C0350 **Rook swing** — Not implemented.
+- [x] C0351 **Rook behind a passed pawn** — Mechanics verified: unobstructed rook behind own or enemy passer; no best-placement claim.
+- [ ] C0352 **Rook activity** — Not implemented.
+- [ ] C0353 **Active rook principle** — Not implemented.
+- [ ] C0354 **Cutting off the king** — Not implemented.
+- [ ] C0355 **Rook checking distance** — Not implemented.
+- [ ] C0356 **Rook versus minor piece** — Partial: exact non-pawn army combinations only; strategic comparison deferred.
+- [x] C0357 **Exchange sacrifice** — Mechanics verified: rook captures a minor and is legally offered at a nominal loss of two points, with all-defense forced-mate proof.
+- [ ] C0358 **Rook invasion** — Not implemented.
+- [x] C0359 **Rook blockade** — Mechanics verified: piece occupies enemy passer’s next forward square; no permanent restraint claim.
+- [ ] C0360 **Queen activity** — Not implemented.
+- [ ] C0361 **Queen centralization** — Partial: queen arrives on d4/e4/d5/e5; safety/usefulness not inferred.
+- [ ] C0362 **Queen invasion** — Not implemented.
+- [ ] C0363 **Queen infiltration** — Not implemented.
+- [x] C0364 **Queen check** — Mechanics verified: moved/promoted queen is an actual checker.
+- [ ] C0365 **Perpetual check** — Partial: verified repetition facts are available; an observed cycle does not establish an all-defense perpetual-check strategy.
+- [ ] C0366 **Queen battery** — Partial: queen–rook and queen–bishop types only.
+- [x] C0367 **Queen-bishop battery** — Mechanics verified: unobstructed queen–rook orthogonal or queen–bishop diagonal alignment.
+- [x] C0368 **Queen-rook battery** — Mechanics verified: unobstructed queen–rook orthogonal or queen–bishop diagonal alignment.
+- [x] C0369 **Queen sacrifice** — Mechanics verified: legally capturable moved queen costs more than the played capture, while every defense retains bounded forced mate.
+- [x] C0370 **Queen trade** — Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded.
+- [ ] C0371 **Queen versus two rooks** — Partial: exact non-pawn army combinations only; strategic comparison deferred.
+- [ ] C0372 **Queen versus rook and minor piece** — Partial: exact non-pawn army combinations only; strategic comparison deferred.
+- [ ] C0373 **Queen and knight attack** — Not implemented.
+- [ ] C0374 **Queen and bishop attack** — Not implemented.
+- [ ] C0375 **Exposed queen** — Not implemented.
+- [ ] C0376 **Queen harassment** — Not implemented.
+- [x] C0377 **Queen trap** — Mechanics verified: currently attacked N/B/R/Q has complete all-defense tracked capture proof and positive gain through every immediate counterreply; nonchecking finite subset.
+- [x] C0378 **Early queen development** — Mechanics verified: first original queen move in first eight own turns with fewer than two surviving developed minors; count fact, not criticism.
+- [ ] C0379 **Queen domination of weak squares** — Not implemented.
+- [ ] C0380 **King safety** — Not implemented.
+- [x] C0381 **Castled king** — Mechanics verified: actual castling event from inherited E020 legal-move fixtures; no inferred prior history.
+- [ ] C0382 **Uncastled king** — Not implemented.
+- [ ] C0383 **Exposed king** — Not implemented.
+- [ ] C0384 **Central king** — Partial: king arrives on d4/e4/d5/e5; safety and benefit not established.
+- [ ] C0385 **King in the center** — Not implemented.
+- [ ] C0386 **King activation** — Not implemented.
+- [x] C0387 **King centralization** — Mechanics verified: same before/after promotion benefit plus new king arrival on d4/e4/d5/e5; king subset only, no geometry-only quality judgment.
+- [x] C0388 **Active king in the endgame** — Mechanics verified: bare K+P versus K: actual king move changes pawn-only safe-queen goal from independently refuted before to proven after; bound covers every remaining push.
+- [x] C0389 **King opposition** — Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry.
+- [x] C0390 **Distant opposition** — Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry.
+- [x] C0391 **Diagonal opposition** — Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry.
+- [ ] C0392 **Corresponding squares** — Not implemented.
+- [x] C0393 **King penetration** — Mechanics verified: same before/after promotion benefit plus actual king advance deeper into relative rank at least five.
+- [ ] C0394 **King blockade** — Not implemented.
+- [x] C0395 **King escorting a passed pawn** — Mechanics verified: actual king move newly adjacent to own passer; current protection only, not promotion guarantee.
+- [ ] C0396 **King cut-off** — Not implemented.
+- [ ] C0397 **King hunt** — Not implemented.
+- [x] C0398 **Mating net** — Mechanics verified: nonchecking, noncapturing actual move; every legal reply permits checkmate on the next own move, independently replayed; no newly-created/only-best claim.
+- [ ] C0399 **King shelter** — Not implemented.
+- [ ] C0400 **Pawn shield** — Partial: pawn squares within two forward ranks on three files around c/e/g home-rank king; safety not measured.
+- [x] C0401 **Air / luft** — Mechanics verified: noncapturing pawn move opens legal adjacent king step, with old hypothetical back-rank mate witness and no actual opponent mate in one afterward.
+- [ ] C0402 **King walk** — Not implemented.
+- [ ] C0403 **Attack** — Not implemented.
+- [ ] C0404 **Direct attack** — Not implemented.
+- [ ] C0405 **Kingside attack** — Not implemented.
+- [ ] C0406 **Queenside attack** — Not implemented.
+- [ ] C0407 **Central attack** — Not implemented.
+- [ ] C0408 **Attack on the king** — Not implemented.
+- [ ] C0409 **Attack on a weakness** — Not implemented.
+- [ ] C0410 **Attack on a pawn** — Not implemented.
+- [ ] C0411 **Attack on a piece** — Not implemented.
+- [ ] C0412 **Attack with opposite-side castling** — Not implemented.
+- [ ] C0413 **Pawn storm** — Not implemented.
+- [ ] C0414 **Piece storm** — Not implemented.
+- [ ] C0415 **Opening lines** — Not implemented.
+- [x] C0416 **Opening diagonals** — Mechanics verified: actual move removes/vacates prior blocker from a stationary bishop line, leaving the entire length-at-least-five diagonal clear.
+- [ ] C0417 **Destroying the pawn shield** — Partial: capture removes one geometric cover pawn; sacrifice intent or complete destruction not inferred.
+- [ ] C0418 **Sacrificial attack** — Not implemented.
+- [x] C0419 **Mating attack** — Mechanics verified: nonchecking, noncapturing actual move; every legal reply permits checkmate on the next own move, independently replayed; no newly-created/only-best claim.
+- [ ] C0420 **Attack with material deficit** — Not implemented.
+- [ ] C0421 **Attack with development advantage** — Not implemented.
+- [ ] C0422 **Local superiority** — Not implemented.
+- [ ] C0423 **Overwhelming defenders** — Not implemented.
+- [ ] C0424 **Bringing reinforcements** — Not implemented.
+- [ ] C0425 **Switching the attack** — Not implemented.
+- [ ] C0426 **Attack on both wings** — Not implemented.
+- [ ] C0427 **Creating threats** — Not implemented.
+- [ ] C0428 **Threat multiplication** — Not implemented.
+- [ ] C0429 **Forcing weaknesses** — Not implemented.
+- [ ] C0430 **Dark-square attack** — Not implemented.
+- [ ] C0431 **Light-square attack** — Not implemented.
+- [ ] C0432 **Attack against f7/f2** — Not implemented.
+- [ ] C0433 **Attack against h7/h2** — Not implemented.
+- [ ] C0434 **Attack against g7/g2** — Not implemented.
+- [ ] C0435 **Battery** — Partial: queen–rook and queen–bishop types only.
+- [ ] C0436 **Line opening** — Not implemented.
+- [ ] C0437 **File opening** — Not implemented.
+- [x] C0438 **Diagonal opening** — Mechanics verified: actual move removes/vacates prior blocker from a stationary bishop line, leaving the entire length-at-least-five diagonal clear.
+- [x] C0439 **Sacrifice for open lines** — Mechanics verified: same finite clearance-sacrifice subset: new checking ray, actual legal material acceptance and all-defense forced mate.
+- [x] C0440 **Mating net** — Mechanics verified: nonchecking, noncapturing actual move; every legal reply permits checkmate on the next own move, independently replayed; no newly-created/only-best claim.
+- [ ] C0441 **King hunt** — Not implemented.
+- [ ] C0442 **No escape squares** — Not implemented.
+- [ ] C0443 **Restricting the king** — Not implemented.
+- [x] C0444 **Defense** — Mechanics verified: one N/B/R/Q had a hypothetical immediate profitable-capture threat; every actual capture after the move permits a reply with no net nominal loss; other targets and later play excluded.
+- [x] C0445 **Active defense** — Mechanics verified: earlier finite target-defense with capture/check, or checking unique immediate-mate defense; exact certificates, no enduring initiative claim.
+- [ ] C0446 **Passive defense** — Not implemented.
+- [x] C0447 **Counterattack** — Mechanics verified: actual check plus complete unique immediate-mate defense; no exclusive causal/longer-term initiative claim.
+- [ ] C0448 **Counterplay** — Not implemented.
+- [ ] C0449 **Counterthreat** — Not implemented.
+- [ ] C0450 **Trading attackers** — Not implemented.
+- [ ] C0451 **Trading queens** — Not implemented.
+- [ ] C0452 **Returning material** — Not implemented.
+- [ ] C0453 **Giving back the exchange** — Not implemented.
+- [x] C0454 **Creating luft** — Mechanics verified: noncapturing pawn move opens legal adjacent king step, with old hypothetical back-rank mate witness and no actual opponent mate in one afterward.
+- [x] C0455 **Closing lines** — Mechanics verified: played move interrupts a previously clear enemy slider attack line; no wider safety or evaluation claim.
+- [x] C0456 **Blocking files** — Mechanics verified: played move blocks an actual clear enemy slider file attack on surviving own piece/king; geometry only.
+- [x] C0457 **Blocking diagonals** — Mechanics verified: played move blocks an actual clear enemy slider diagonal attack on surviving own piece/king; geometry only.
+- [ ] C0458 **King evacuation** — Not implemented.
+- [x] C0459 **King escape** — Mechanics verified: actual king move legally evades check; no longer-term safety claim.
+- [x] C0460 **Defensive sacrifice** — Mechanics verified: checking unique immediate-mate defense offers actual unit to a legal capture with negative nominal gain through EVERY immediate counterreply; acceptance conditional, longer-term compensation unproved.
+- [x] C0461 **Eliminating attacking pieces** — Mechanics verified: played capture removes the original attacker of the certified old profitable-capture threat and passes actual target-defense proof.
+- [ ] C0462 **Overprotection** — Not implemented.
+- [ ] C0463 **Reinforcing a weakness** — Not implemented.
+- [ ] C0464 **Simplification** — Not implemented.
+- [ ] C0465 **Fortress** — Not implemented.
+- [ ] C0466 **Perpetual check** — Partial: verified repetition facts are available; an observed cycle does not establish an all-defense perpetual-check strategy.
+- [ ] C0467 **Perpetual attack** — Not implemented.
+- [x] C0468 **Stalemate defense** — Mechanics verified: actual moved non-pawn/non-king piece has a named legal enemy capture that immediately stalemates the mover; conditional resource only, not forced draw or loss assessment.
+- [ ] C0469 **Resource** — Not implemented.
+- [ ] C0470 **Only defense** — Not implemented.
+- [ ] C0471 **Defensive tactical shot** — Not implemented.
+- [ ] C0472 **Counter-sacrifice** — Not implemented.
+- [ ] C0473 **Liquidation into an endgame** — Not implemented.
+- [ ] C0474 **Neutralizing the initiative** — Not implemented.
+- [ ] C0475 **Returning sacrificed material to end the attack** — Not implemented.
+- [x] C0476 **Back-rank mate** — Mechanics verified: actual rook/queen rank mate with own pawns occupying all forward king neighbors.
+- [x] C0477 **Ladder mate** — Mechanics verified: actual edge rook mate; a second rook on inner parallel line controls all vacant inward neighboring flights; sequence not inferred.
+- [x] C0478 **Rook roller mate** — Mechanics verified: actual edge rook mate; a second rook on inner parallel line controls all vacant inward neighboring flights; sequence not inferred.
+- [x] C0479 **Queen-and-rook mate** — Mechanics verified: actual mate with checker and named distinct helper protecting adjacent checker or controlling uncovered vacant flight; opposite-color bishops for B/B.
+- [x] C0480 **Smothered mate** — Mechanics verified: actual knight mate with every adjacent king square occupied by own pieces.
+- [x] C0481 **Anastasia's mate** — Mechanics verified: actual edge-file/rank rook or queen mate; knight controls both inward diagonal flights and own king-side blocker closes inward step.
+- [x] C0482 **Arabian mate** — Mechanics verified: actual corner checkmate by adjacent rook; same knight protects rook and controls vacant flight outside rook coverage.
+- [x] C0483 **Boden's mate** — Mechanics verified: actual edge bishop mate with opposite-color bishop controlling two uncovered vacant flights and two king-side self-blockers.
+- [x] C0484 **Epaulette mate** — Mechanics verified: actual edge queen mate from two squares inward with both parallel shoulders occupied by king-side pieces.
+- [x] C0485 **Opera mate** — Mechanics verified: actual edge mate by adjacent parallel rook, supported bishop sealing inward flight, two opposite-side self-blockers.
+- [ ] C0486 **Damiano's mate** — Not implemented.
+- [ ] C0487 **Lolli mate** — Not implemented.
+- [ ] C0488 **Greco mate** — Not implemented.
+- [ ] C0489 **Blackburne's mate** — Not implemented.
+- [x] C0490 **Morphy's mate** — Mechanics verified: actual corner bishop mate; rook cuts an empty orthogonal flight and own king-side piece blocks other orthogonal flight.
+- [ ] C0491 **Legal's mate** — Not implemented.
+- [ ] C0492 **Hook mate** — Not implemented.
+- [ ] C0493 **Corner mate** — Not implemented.
+- [ ] C0494 **Box mate** — Not implemented.
+- [ ] C0495 **Kill box** — Not implemented.
+- [x] C0496 **Dovetail mate** — Mechanics verified: protected diagonal-adjacent queen; exactly two on-board uncovered flights are self-blocked, with actual mate.
+- [x] C0497 **Swallow's-tail mate** — Mechanics verified: protected orthogonal-adjacent queen; two on-board rear-diagonal uncovered flights are self-blocked, with actual mate.
+- [x] C0498 **Double-bishop mate** — Mechanics verified: actual mate with checker and named distinct helper protecting adjacent checker or controlling uncovered vacant flight; opposite-color bishops for B/B.
+- [x] C0499 **Bishop-and-rook mating pattern** — Mechanics verified: actual mate with checker and named distinct helper protecting adjacent checker or controlling uncovered vacant flight; opposite-color bishops for B/B.
+- [x] C0500 **Queen-and-knight mating pattern** — Mechanics verified: actual mate with checker and named distinct helper protecting adjacent checker or controlling uncovered vacant flight; opposite-color bishops for B/B.
+- [x] C0501 **Queen-and-bishop mating pattern** — Mechanics verified: actual mate with checker and named distinct helper protecting adjacent checker or controlling uncovered vacant flight; opposite-color bishops for B/B.
+- [x] C0502 **Rook-and-knight mating pattern** — Mechanics verified: actual mate with checker and named distinct helper protecting adjacent checker or controlling uncovered vacant flight; opposite-color bishops for B/B.
+- [x] C0503 **Pawn-supported mate** — Mechanics verified: actual mate with pawn geometrically protecting adjacent checking piece.
+- [x] C0504 **Discovered mate** — Mechanics verified: played legal move newly exposes a stationary original checking piece and actually checkmates.
+- [x] C0505 **Double-check mate** — Mechanics verified: actual checkmate with at least two distinct checking pieces.
+- [x] C0506 **Promotion mate** — Mechanics verified: played legal promotion actually checkmates; mere promotion is insufficient.
+- [x] C0507 **Underpromotion mate** — Mechanics verified: played legal rook, bishop or knight promotion actually checkmates; necessity not inferred.
+- [x] C0508 **Mating net** — Mechanics verified: nonchecking, noncapturing actual move; every legal reply permits checkmate on the next own move, independently replayed; no newly-created/only-best claim.
+- [x] C0509 **Forced mate** — Mechanics verified: played move has an independently replayed legal all-defense mate within two/three attacker moves; shorter horizon checked, bounded profile required.
+- [x] C0510 **Mate in one** — Mechanics verified: the played legal move is an actual mate with zero legal opponent replies; no longer sequence inferred.
+- [x] C0511 **Mate in two** — Mechanics verified: actual played move plus every defender reply permits immediate mating move; no mate in one was played.
+- [x] C0512 **Mate in three** — Mechanics verified: all-defense legal tree reaches opponent checkmate within three attacker moves; complete mate-in-two failure tree establishes no shorter guarantee.
+- [x] C0513 **King-and-queen mate** — Mechanics verified: actual played checkmate against lone king with exactly the stated mating army.
+- [x] C0514 **King-and-rook mate** — Mechanics verified: actual played checkmate against lone king with exactly the stated mating army.
+- [x] C0515 **King and two bishops mate** — Mechanics verified: actual played checkmate against lone king with exactly the stated mating army.
+- [x] C0516 **Bishop-and-knight mate** — Mechanics verified: actual played checkmate against lone king with exactly the stated mating army.
+- [ ] C0517 **Plan formation** — Not implemented.
+- [ ] C0518 **Short-term plan** — Not implemented.
+- [ ] C0519 **Long-term plan** — Not implemented.
+- [ ] C0520 **Strategic objective** — Not implemented.
+- [ ] C0521 **Target selection** — Not implemented.
+- [ ] C0522 **Weakness identification** — Not implemented.
+- [ ] C0523 **Piece improvement** — Not implemented.
+- [ ] C0524 **Pawn break preparation** — Not implemented.
+- [ ] C0525 **Minority attack** — Not implemented.
+- [ ] C0526 **Majority advance** — Not implemented.
+- [ ] C0527 **Kingside expansion** — Not implemented.
+- [ ] C0528 **Queenside expansion** — Not implemented.
+- [ ] C0529 **Central expansion** — Not implemented.
+- [x] C0530 **Restriction** — Mechanics verified: static legal destination count drops by at least two to at most two; explicit hypothetical before-opponent turn, no quality or future-position claim.
+- [ ] C0531 **Blockade** — Not implemented.
+- [ ] C0532 **Prophylaxis** — Not implemented.
+- [ ] C0533 **Creating an outpost** — Partial: new pawn-supported knight on c–f relative ranks 4–6; no enemy pawn ahead on neighboring files; future exchanges/permanence deferred.
+- [x] C0534 **Occupying an open file** — Mechanics verified: pawn-free file geometry and new rook/queen occupation.
+- [x] C0535 **Creating a passed pawn** — Mechanics verified: passed-pawn geometry, including legal en-passant exception; creation or advance.
+- [x] C0536 **Activating the king** — Mechanics verified: bare K+P versus K: actual king move changes pawn-only safe-queen goal from independently refuted before to proven after; bound covers every remaining push.
+- [ ] C0537 **Improving pawn structure** — Not implemented.
+- [ ] C0538 **Exchanging a bad piece** — Not implemented.
+- [ ] C0539 **Exchanging the opponent's good piece** — Not implemented.
+- [ ] C0540 **Changing the pawn structure** — Not implemented.
+- [ ] C0541 **Fixing weaknesses** — Not implemented.
+- [ ] C0542 **Inducing weaknesses** — Not implemented.
+- [ ] C0543 **Creating a second weakness** — Not implemented.
+- [ ] C0544 **Switching wings** — Not implemented.
+- [ ] C0545 **Preparing a favorable endgame** — Not implemented.
+- [ ] C0546 **Preventing counterplay** — Not implemented.
+- [ ] C0547 **Material** — Not implemented.
+- [ ] C0548 **King safety** — Not implemented.
+- [ ] C0549 **Piece activity** — Not implemented.
+- [x] C0550 **Development** — Mechanics verified: first surviving original minor home departure off back rank during first ten own turns; verified initial-position history.
+- [ ] C0551 **Space** — Not implemented.
+- [ ] C0552 **Pawn structure** — Not implemented.
+- [ ] C0553 **Center control** — Not implemented.
+- [ ] C0554 **Initiative** — Not implemented.
+- [x] C0555 **Mobility** — Mechanics verified: static legal destination count drops by at least two to at most two; explicit hypothetical before-opponent turn, no quality or future-position claim.
+- [ ] C0556 **Coordination** — Not implemented.
+- [ ] C0557 **Weak squares** — Not implemented.
+- [ ] C0558 **Outposts** — Not implemented.
+- [x] C0559 **Open files** — Mechanics verified: pawn-free file geometry and new rook/queen occupation.
+- [x] C0560 **Open diagonals** — Mechanics verified: new full edge-to-edge bishop line of length at least five has no other piece; length eight identifies a long diagonal; geometric control only.
+- [x] C0561 **Passed pawns** — Mechanics verified: passed-pawn geometry, including legal en-passant exception; creation or advance.
+- [x] C0562 **Pawn majorities** — Mechanics verified: counts on fixed a–d/e–h wings; no plan or advantage claim.
+- [ ] C0563 **Minor-piece quality** — Not implemented.
+- [x] C0564 **Bishop pair** — Mechanics verified: both square-color complexes represented; excludes two same-color promoted bishops.
+- [x] C0565 **King activity** — Mechanics verified: bare K+P versus K: actual king move changes pawn-only safe-queen goal from independently refuted before to proven after; bound covers every remaining push.
+- [ ] C0566 **Tactical opportunities** — Not implemented.
+- [ ] C0567 **Potential pawn breaks** — Not implemented.
+- [ ] C0568 **Opponent's counterplay** — Not implemented.
+- [ ] C0569 **Static evaluation** — Not implemented.
+- [ ] C0570 **Dynamic evaluation** — Not implemented.
+- [ ] C0571 **Equal position** — Not implemented.
+- [ ] C0572 **Slight advantage** — Not implemented.
+- [ ] C0573 **Clear advantage** — Not implemented.
+- [ ] C0574 **Winning position** — Not implemented.
+- [ ] C0575 **Losing position** — Not implemented.
+- [ ] C0576 **Unclear position** — Not implemented.
+- [ ] C0577 **Complicated position** — Not implemented.
+- [ ] C0578 **Sharp position** — Not implemented.
+- [ ] C0579 **Quiet position** — Not implemented.
+- [ ] C0580 **Balanced position** — Not implemented.
+- [ ] C0581 **Imbalanced position** — Not implemented.
+- [ ] C0582 **Initiative** — Not implemented.
+- [ ] C0583 **Momentum** — Not implemented.
+- [ ] C0584 **Tempo** — Not implemented.
+- [ ] C0585 **Development lead** — Not implemented.
+- [ ] C0586 **Forcing play** — Not implemented.
+- [ ] C0587 **Dynamic compensation** — Not implemented.
+- [ ] C0588 **Activity compensation** — Not implemented.
+- [ ] C0589 **Time versus material** — Not implemented.
+- [ ] C0590 **Space versus material** — Not implemented.
+- [ ] C0591 **King safety versus material** — Not implemented.
+- [ ] C0592 **Initiative versus material** — Not implemented.
+- [ ] C0593 **Sacrificial initiative** — Not implemented.
+- [ ] C0594 **Maintaining pressure** — Not implemented.
+- [ ] C0595 **Losing the initiative** — Not implemented.
+- [ ] C0596 **Seizing the initiative** — Not implemented.
+- [ ] C0597 **Counter-initiative** — Not implemented.
+- [ ] C0598 **Forcing the opponent onto the defensive** — Not implemented.
+- [ ] C0599 **Dynamic equilibrium** — Not implemented.
+- [ ] C0600 **Temporary advantage** — Not implemented.
+- [ ] C0601 **Permanent advantage** — Not implemented.
+- [ ] C0602 **Endgame transition** — Partial: capture changes to an enumerated pure ending class; count-based subset, not strategic desirability.
+- [ ] C0603 **King activation** — Not implemented.
+- [ ] C0604 **Centralizing the king** — Partial: king arrives on d4/e4/d5/e5; safety and benefit not established.
+- [x] C0605 **Passed pawn creation** — Mechanics verified: passed-pawn geometry, including legal en-passant exception; creation or advance.
+- [x] C0606 **Passed pawn promotion** — Mechanics verified: promotion of a previously identified passer.
+- [x] C0607 **Outside passed pawn** — Mechanics verified: actual flank passer advance with every other pawn at least three files away, at least two other pawns including both colors; no king diversion or win claim.
+- [x] C0608 **Distant passed pawn** — Mechanics verified: actual flank passer advance with every other pawn at least three files away, at least two other pawns including both colors; no king diversion or win claim.
+- [x] C0609 **Opposition** — Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry.
+- [x] C0610 **Distant opposition** — Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry.
+- [ ] C0611 **Key squares** — Not implemented.
+- [ ] C0612 **Corresponding squares** — Not implemented.
+- [ ] C0613 **Triangulation** — Not implemented.
+- [ ] C0614 **Zugzwang** — Not implemented.
+- [ ] C0615 **Mutual zugzwang** — Not implemented.
+- [ ] C0616 **Reserve tempo** — Not implemented.
+- [ ] C0617 **Tempo move** — Not implemented.
+- [ ] C0618 **Breakthrough** — Not implemented.
+- [ ] C0619 **Pawn race** — Not implemented.
+- [ ] C0620 **Counting tempi** — Not implemented.
+- [x] C0621 **Rule of the square** — Mechanics verified: bare K+P versus K, enemy king outside conservative tempo-adjusted promotion-square distance gate, plus independently verified all-response safe promotion route; no formula-only or inside-square judgment.
+- [ ] C0622 **Shouldering** — Not implemented.
+- [ ] C0623 **Outflanking** — Not implemented.
+- [x] C0624 **King penetration** — Mechanics verified: same before/after promotion benefit plus actual king advance deeper into relative rank at least five.
+- [ ] C0625 **Fortress** — Not implemented.
+- [x] C0626 **Stalemate resource** — Mechanics verified: actual moved non-pawn/non-king piece has a named legal enemy capture that immediately stalemates the mover; conditional resource only, not forced draw or loss assessment.
+- [x] C0627 **Underpromotion** — Mechanics verified: promotion; non-queen piece change, no optimality claim.
+- [x] C0628 **Domination** — Mechanics verified: every legal move by the named unit permits tracked capture with positive gain through every immediate counterreply; other defenses not promised.
+- [ ] C0629 **Converting an extra pawn** — Not implemented.
+- [ ] C0630 **Liquidation** — Not implemented.
+- [ ] C0631 **Endgame simplification** — Partial: capture changes to an enumerated pure ending class; count-based subset, not strategic desirability.
+- [x] C0632 **Active defense** — Mechanics verified: earlier finite target-defense with capture/check, or checking unique immediate-mate defense; exact certificates, no enduring initiative claim.
+- [x] C0633 **King and pawn versus king** — Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim.
+- [ ] C0634 **Key-square theory** — Not implemented.
+- [x] C0635 **Opposition** — Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry.
+- [x] C0636 **Distant opposition** — Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry.
+- [x] C0637 **Diagonal opposition** — Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry.
+- [ ] C0638 **Outflanking** — Not implemented.
+- [ ] C0639 **Shouldering** — Not implemented.
+- [x] C0640 **Rule of the square** — Mechanics verified: bare K+P versus K, enemy king outside conservative tempo-adjusted promotion-square distance gate, plus independently verified all-response safe promotion route; no formula-only or inside-square judgment.
+- [ ] C0641 **Pawn breakthrough** — Not implemented.
+- [x] C0642 **Protected passed pawn** — Mechanics verified: passer attacked by a friendly pawn; legal recapture or safe advance not promised.
+- [x] C0643 **Outside passed pawn** — Mechanics verified: actual flank passer advance with every other pawn at least three files away, at least two other pawns including both colors; no king diversion or win claim.
+- [ ] C0644 **Candidate passed pawn** — Not implemented.
+- [ ] C0645 **Connected passers** — Partial: adjacent-file passers at most one rank apart; safety and reciprocal protection not established.
+- [ ] C0646 **Pawn race** — Not implemented.
+- [ ] C0647 **Promotion race** — Not implemented.
+- [ ] C0648 **Queen with check** — Partial: passed-pawn queen promotion giving actual check; race strategy deferred.
+- [ ] C0649 **Reserve tempo** — Not implemented.
+- [ ] C0650 **Spare pawn move** — Not implemented.
+- [ ] C0651 **Triangulation** — Not implemented.
+- [ ] C0652 **Zugzwang** — Not implemented.
+- [ ] C0653 **Corresponding squares** — Not implemented.
+- [ ] C0654 **Trebuchet** — Not implemented.
+- [ ] C0655 **Réti maneuver** — Not implemented.
+- [ ] C0656 **Self-blocking pawns** — Not implemented.
+- [x] C0657 **Pawn majority** — Mechanics verified: counts on fixed a–d/e–h wings; no plan or advantage claim.
+- [ ] C0658 **Fixing pawns** — Not implemented.
+- [ ] C0659 **Creating entry squares** — Not implemented.
+- [x] C0660 **Rook behind the passed pawn** — Mechanics verified: unobstructed rook behind own or enemy passer; no best-placement claim.
+- [ ] C0661 **Active rook** — Not implemented.
+- [ ] C0662 **Cutting off the enemy king** — Not implemented.
+- [ ] C0663 **Checking from behind** — Not implemented.
+- [ ] C0664 **Checking from the side** — Not implemented.
+- [ ] C0665 **Side checks** — Not implemented.
+- [ ] C0666 **Long-side defense** — Not implemented.
+- [ ] C0667 **Short-side defense** — Not implemented.
+- [ ] C0668 **Lucena position** — Not implemented.
+- [ ] C0669 **Building a bridge** — Not implemented.
+- [ ] C0670 **Philidor position** — Not implemented.
+- [ ] C0671 **Vancura defense** — Not implemented.
+- [x] C0672 **Rook and pawn versus rook** — Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim.
+- [x] C0673 **Rook versus connected pawns** — Mechanics verified: exact pure army and connected/passed pawn geometry; no outcome claim.
+- [x] C0674 **Rook versus passed pawns** — Mechanics verified: exact pure army and connected/passed pawn geometry; no outcome claim.
+- [ ] C0675 **Rook activity versus pawn material** — Not implemented.
+- [x] C0676 **Seventh-rank rook** — Mechanics verified: relative seventh rank (White 7, Black 2); new placement.
+- [ ] C0677 **Rook penetration** — Not implemented.
+- [ ] C0678 **King-rook coordination** — Not implemented.
+- [ ] C0679 **Rook sacrifice for a pawn** — Not implemented.
+- [ ] C0680 **Rook endgame pawn races** — Not implemented.
+- [ ] C0681 **Four versus three** — Not implemented.
+- [ ] C0682 **Three versus two** — Not implemented.
+- [ ] C0683 **Outside passed pawn in rook endings** — Not implemented.
+- [ ] C0684 **Checking distance** — Not implemented.
+- [x] C0685 **Rook trade into pawn ending** — Mechanics verified: verified rook-for-rook recapture leaves only kings and pawns.
+- [x] C0686 **Bishop and pawn versus bishop** — Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim.
+- [x] C0687 **Opposite-colored bishop ending** — Mechanics verified: one bishop per side, only kings/pawns/bishops remain; square-color classification.
+- [x] C0688 **Same-colored bishop ending** — Mechanics verified: one bishop per side, only kings/pawns/bishops remain; square-color classification.
+- [x] C0689 **Good bishop** — Mechanics verified: new good-bishop pattern has at least two own pawns, all opposite the bishop square color; pawn relation only, not overall strategic value.
+- [x] C0690 **Bad bishop** — Mechanics verified: new bad-bishop pattern has at least two fixed central same-color own pawns, a direct forward blocker and at most four geometric controlled squares; not overall strategic value.
+- [x] C0691 **Outside passed pawn** — Mechanics verified: actual flank passer advance with every other pawn at least three files away, at least two other pawns including both colors; no king diversion or win claim.
+- [ ] C0692 **Wrong-colored bishop** — Not implemented.
+- [ ] C0693 **Wrong rook pawn** — Not implemented.
+- [ ] C0694 **Bishop sacrifice for pawns** — Not implemented.
+- [x] C0695 **Diagonal control** — Mechanics verified: new full edge-to-edge bishop line of length at least five has no other piece; length eight identifies a long diagonal; geometric control only.
+- [x] C0696 **King penetration** — Mechanics verified: same before/after promotion benefit plus actual king advance deeper into relative rank at least five.
+- [x] C0697 **Bishop domination** — Mechanics verified: every legal move by the named unit permits tracked capture with positive gain through every immediate counterreply; other defenses not promised.
+- [ ] C0698 **Bishop versus pawns on both wings** — Not implemented.
+- [x] C0699 **Knight and pawn versus knight** — Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim.
+- [ ] C0700 **Knight blockade** — Not implemented.
+- [ ] C0701 **Knight outpost** — Partial: new pawn-supported knight on c–f relative ranks 4–6; no enemy pawn ahead on neighboring files; future exchanges/permanence deferred.
+- [x] C0702 **Knight domination** — Mechanics verified: every legal move by the named unit permits tracked capture with positive gain through every immediate counterreply; other defenses not promised.
+- [ ] C0703 **Knight fork in endgames** — Not implemented.
+- [ ] C0704 **Knight maneuvering** — Not implemented.
+- [ ] C0705 **Knight versus outside passed pawn** — Not implemented.
+- [x] C0706 **Knight versus connected pawns** — Mechanics verified: exact pure army and connected/passed pawn geometry; no outcome claim.
+- [ ] C0707 **King-knight coordination** — Not implemented.
+- [ ] C0708 **Knight inability to lose a tempo easily** — Not implemented.
+- [ ] C0709 **Knight distance from action** — Not implemented.
+- [ ] C0710 **Bishop versus knight** — Partial: exact non-pawn army combinations only; strategic comparison deferred.
+- [ ] C0711 **Open position favors bishop** — Not implemented.
+- [ ] C0712 **Closed position favors knight** — Not implemented.
+- [ ] C0713 **Pawns on both wings favor bishop** — Not implemented.
+- [ ] C0714 **Fixed pawns can favor knight** — Not implemented.
+- [ ] C0715 **Good bishop versus bad knight** — Not implemented.
+- [ ] C0716 **Good knight versus bad bishop** — Not implemented.
+- [ ] C0717 **Creating an outpost** — Partial: new pawn-supported knight on c–f relative ranks 4–6; no enemy pawn ahead on neighboring files; future exchanges/permanence deferred.
+- [ ] C0718 **Fixing pawns on bishop's color** — Not implemented.
+- [x] C0719 **Restricting the knight** — Mechanics verified: static legal destination count drops by at least two to at most two; explicit hypothetical before-opponent turn, no quality or future-position claim.
+- [ ] C0720 **Knight blockade** — Not implemented.
+- [ ] C0721 **Bishop's long-range advantage** — Not implemented.
+- [ ] C0722 **Queen activity** — Not implemented.
+- [ ] C0723 **Perpetual check** — Partial: verified repetition facts are available; an observed cycle does not establish an all-defense perpetual-check strategy.
+- [ ] C0724 **King exposure** — Not implemented.
+- [ ] C0725 **Queen centralization** — Partial: queen arrives on d4/e4/d5/e5; safety/usefulness not inferred.
+- [ ] C0726 **Passed-pawn checks** — Partial: passed pawn advance/promotion itself gives check; broader tactical plans deferred.
+- [x] C0727 **Queen behind passed pawn** — Mechanics verified: new same-file unobstructed queen behind own/enemy passer.
+- [x] C0728 **Queen-versus-pawn endings** — Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim.
+- [ ] C0729 **Queen race** — Not implemented.
+- [ ] C0730 **Cross-check** — Not implemented.
+- [ ] C0731 **Checking distance** — Not implemented.
+- [ ] C0732 **King shelter** — Not implemented.
+- [x] C0733 **Queen trade** — Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded.
+- [x] C0734 **Promotion tactics** — Mechanics verified: immediate E036 or opt-in multi-push E037 route: all defender replies retain queen promotion and every immediate response preserves queen and positive nominal gain, or actual mate; bounded horizon only.
+- [ ] C0735 **Perpetual-check fortress** — Not implemented.
+- [x] C0736 **Queen versus rook** — Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim.
+- [x] C0737 **Queen versus minor piece** — Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim.
+- [ ] C0738 **Rook versus bishop** — Partial: exact non-pawn army combinations only; strategic comparison deferred.
+- [ ] C0739 **Rook versus knight** — Partial: exact non-pawn army combinations only; strategic comparison deferred.
+- [x] C0740 **Rook and bishop versus rook** — Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim.
+- [x] C0741 **Rook and knight versus rook** — Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim.
+- [x] C0742 **Queen versus rook and pawn** — Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim.
+- [x] C0743 **Queen versus advanced pawn** — Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim.
+- [x] C0744 **Two bishops versus knight** — Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim.
+- [x] C0745 **Bishop and knight checkmate** — Mechanics verified: actual played checkmate against lone king with exactly the stated mating army.
+- [ ] C0746 **Fortress construction** — Not implemented.
+- [ ] C0747 **Tablebase position** — Not implemented.
+- [ ] C0748 **Tablebase win** — Not implemented.
+- [ ] C0749 **Tablebase draw** — Not implemented.
+- [ ] C0750 **Distance to mate** — Not implemented.
+- [ ] C0751 **Distance to zeroing move** — Not implemented.
+- [ ] C0752 **Tempo** — Not implemented.
+- [ ] C0753 **Gain of tempo** — Not implemented.
+- [ ] C0754 **Loss of tempo** — Not implemented.
+- [x] C0755 **Developing with tempo** — Mechanics verified: first minor development also gives legal check; mandatory response only, no net tempo gain.
+- [ ] C0756 **Attacking with tempo** — Not implemented.
+- [ ] C0757 **Tempo on the queen** — Not implemented.
+- [ ] C0758 **Useful tempo** — Not implemented.
+- [ ] C0759 **Wasted tempo** — Not implemented.
+- [ ] C0760 **Reserve tempo** — Not implemented.
+- [ ] C0761 **Move-order trick** — Not implemented.
+- [ ] C0762 **Transposition** — Not implemented.
+- [ ] C0763 **Waiting move** — Not implemented.
+- [ ] C0764 **Passing move** — Not implemented.
+- [ ] C0765 **Triangulation** — Not implemented.
+- [ ] C0766 **Zugzwang** — Not implemented.
+- [ ] C0767 **Mutual zugzwang** — Not implemented.
+- [ ] C0768 **Move-order finesse** — Not implemented.
+- [ ] C0769 **Forcing move order** — Not implemented.
+- [ ] C0770 **Prophylaxis** — Not implemented.
+- [ ] C0771 **Opponent's idea** — Not implemented.
+- [ ] C0772 **Preventing a pawn break** — Not implemented.
+- [ ] C0773 **Preventing castling** — Not implemented.
+- [ ] C0774 **Preventing development** — Not implemented.
+- [ ] C0775 **Stopping an outpost** — Not implemented.
+- [ ] C0776 **Removing counterplay** — Not implemented.
+- [ ] C0777 **Creating escape squares** — Partial: vacated pawn square becomes legal adjacent home-rank king step; generic mate prevention or durable safety not established.
+- [ ] C0778 **Preventing a tactical motif** — Partial: subset verified: a specific certified fork prevented versus a supplied legal alternative.
+- [x] C0779 **Restricting a piece** — Mechanics verified: static legal destination count drops by at least two to at most two; explicit hypothetical before-opponent turn, no quality or future-position claim.
+- [ ] C0780 **Preventing penetration** — Not implemented.
+- [x] C0781 **Defensive pawn move** — Mechanics verified: actual pawn move passes finite target-defense proof for a surviving non-pawn piece.
+- [ ] C0782 **Overprotection** — Not implemented.
+- [ ] C0783 **Restraining a passed pawn** — Not implemented.
+- [ ] C0784 **Neutralizing a strong piece** — Not implemented.
+- [ ] C0785 **Preventive king move** — Not implemented.
+- [ ] C0786 **Preventive rook move** — Not implemented.
+- [ ] C0787 **Preventive queen move** — Not implemented.
+- [ ] C0788 **Candidate move selection** — Not implemented.
+- [ ] C0789 **Calculation** — Not implemented.
+- [ ] C0790 **Evaluation** — Not implemented.
+- [ ] C0791 **Comparison** — Not implemented.
+- [ ] C0792 **Planning** — Not implemented.
+- [ ] C0793 **Pattern recognition** — Not implemented.
+- [ ] C0794 **Intuition** — Not implemented.
+- [ ] C0795 **Positional judgment** — Not implemented.
+- [ ] C0796 **Tactical awareness** — Not implemented.
+- [ ] C0797 **Risk assessment** — Not implemented.
+- [ ] C0798 **Practical chances** — Not implemented.
+- [ ] C0799 **Objective evaluation** — Not implemented.
+- [ ] C0800 **Subjective difficulty** — Not implemented.
+- [ ] C0801 **Complexity** — Not implemented.
+- [ ] C0802 **Uncertainty** — Not implemented.
+- [ ] C0803 **Critical decision** — Not implemented.
+- [ ] C0804 **Commitment** — Not implemented.
+- [x] C0805 **Irreversible move** — Mechanics verified: actual pawn move, capture or castling-right loss with before/after witnesses; no quality judgment.
+- [ ] C0806 **Pawn move irreversibility** — Not implemented.
+- [ ] C0807 **Exchange decision** — Not implemented.
+- [ ] C0808 **When to simplify** — Not implemented.
+- [ ] C0809 **When to complicate** — Not implemented.
+- [ ] C0810 **When to attack** — Not implemented.
+- [ ] C0811 **When to defend** — Not implemented.
+- [ ] C0812 **When to sacrifice** — Partial: bounded mate certificates verify some sound offers; general timing, necessity and positional criteria remain unresolved.
+- [ ] C0813 **When to change the structure** — Not implemented.
+- [ ] C0814 **Time management** — Not implemented.
+- [ ] C0815 **Clock awareness** — Not implemented.
+- [ ] C0816 **Time trouble** — Not implemented.
+- [ ] C0817 **Zeitnot** — Not implemented.
+- [ ] C0818 **Increment** — Not implemented.
+- [ ] C0819 **Delay** — Not implemented.
+- [ ] C0820 **Thinking on the opponent's time** — Not implemented.
+- [ ] C0821 **Blunder checking** — Not implemented.
+- [ ] C0822 **Practical move** — Not implemented.
+- [ ] C0823 **Safe move** — Not implemented.
+- [ ] C0824 **Complicated move** — Not implemented.
+- [x] C0825 **Forcing move** — Mechanics verified: nonchecking, noncapturing actual move; every legal reply permits checkmate on the next own move, independently replayed; no newly-created/only-best claim.
+- [ ] C0826 **Playing for two results** — Not implemented.
+- [ ] C0827 **Playing for a draw** — Not implemented.
+- [ ] C0828 **Playing for a win** — Not implemented.
+- [ ] C0829 **Creating practical problems** — Not implemented.
+- [ ] C0830 **Complexity management** — Not implemented.
+- [ ] C0831 **Risk management** — Not implemented.
+- [ ] C0832 **Psychological pressure** — Not implemented.
+- [ ] C0833 **Opening preparation** — Not implemented.
+- [ ] C0834 **Opponent preparation** — Not implemented.
+- [ ] C0835 **Post-game analysis** — Not implemented.
+- [ ] C0836 **Self-analysis** — Not implemented.
+- [ ] C0837 **Engine analysis** — Not implemented.
+- [ ] C0838 **Game annotation** — Not implemented.
+- [ ] C0839 **Error classification** — Not implemented.
+- [ ] C0840 **Pattern training** — Not implemented.
+- [ ] C0841 **Tactical training** — Not implemented.
+- [ ] C0842 **Calculation training** — Not implemented.
+- [ ] C0843 **Endgame training** — Not implemented.
+- [ ] C0844 **Opening study** — Not implemented.
+- [ ] C0845 **Model games** — Not implemented.
+- [ ] C0846 **Guess-the-move training** — Not implemented.
+- [ ] C0847 **Blunder** — Not implemented.
+- [ ] C0848 **Mistake** — Not implemented.
+- [ ] C0849 **Inaccuracy** — Not implemented.
+- [ ] C0850 **Hanging a piece** — Not implemented.
+- [ ] C0851 **Missing a tactic** — Not implemented.
+- [x] C0852 **Missing mate** — Mechanics verified: shorter legal alternative has positive mate proof and played move has complete failure counterstrategy at same bound; no claim all later mating chances lost.
+- [ ] C0853 **Ignoring the opponent's threat** — Not implemented.
+- [ ] C0854 **Premature attack** — Not implemented.
+- [ ] C0855 **Premature pawn break** — Not implemented.
+- [ ] C0856 **Unnecessary pawn move** — Not implemented.
+- [ ] C0857 **Weakening king safety** — Not implemented.
+- [x] C0858 **Moving the same piece repeatedly in the opening** — Mechanics verified: original surviving minor moves again in first ten turns while another original minor remains unmoved; no bad-move inference.
+- [x] C0859 **Early queen development** — Mechanics verified: first original queen move in first eight own turns with fewer than two surviving developed minors; count fact, not criticism.
+- [ ] C0860 **Neglecting development** — Not implemented.
+- [ ] C0861 **Greed** — Not implemented.
+- [ ] C0862 **Pawn grabbing** — Not implemented.
+- [ ] C0863 **Automatic recapture** — Partial: legal direct recapture options are retained as context; necessity, automatic choice and criticism of human decisions not inferred.
+- [ ] C0864 **Automatic exchange** — Not implemented.
+- [ ] C0865 **Bad simplification** — Not implemented.
+- [ ] C0866 **Trading an active piece** — Not implemented.
+- [ ] C0867 **Creating unnecessary weaknesses** — Not implemented.
+- [ ] C0868 **Passive defense** — Not implemented.
+- [ ] C0869 **Overextension** — Not implemented.
+- [ ] C0870 **Overconfidence** — Not implemented.
+- [ ] C0871 **Playing too quickly** — Not implemented.
+- [ ] C0872 **Using too much time** — Not implemented.
+- [ ] C0873 **Tunnel vision** — Not implemented.
+- [ ] C0874 **Hope chess** — Not implemented.
+- [ ] C0875 **Stopping calculation too early** — Not implemented.
+- [ ] C0876 **Failing to calculate the opponent's best defense** — Not implemented.
+- [ ] C0877 **Misjudging an endgame** — Not implemented.
+- [ ] C0878 **Entering a lost pawn ending** — Not implemented.
+- [ ] C0879 **Ignoring counterplay** — Not implemented.
+- [ ] C0880 **Material imbalance** — Partial: nominal 1/3/3/5/9 arithmetic and listed exact army subsets; positional value deferred.
+- [ ] C0881 **Bishop versus knight** — Partial: exact non-pawn army combinations only; strategic comparison deferred.
+- [ ] C0882 **Bishop pair versus other minor pieces** — Not implemented.
+- [ ] C0883 **Rook versus two minor pieces** — Partial: exact non-pawn army combinations only; strategic comparison deferred.
+- [ ] C0884 **Queen versus two rooks** — Partial: exact non-pawn army combinations only; strategic comparison deferred.
+- [ ] C0885 **Queen versus rook and minor piece** — Partial: exact non-pawn army combinations only; strategic comparison deferred.
+- [ ] C0886 **Pawn-structure imbalance** — Not implemented.
+- [ ] C0887 **Space imbalance** — Not implemented.
+- [ ] C0888 **Development imbalance** — Not implemented.
+- [ ] C0889 **King-safety imbalance** — Not implemented.
+- [ ] C0890 **Initiative imbalance** — Not implemented.
+- [ ] C0891 **Activity imbalance** — Not implemented.
+- [ ] C0892 **Weak-square imbalance** — Not implemented.
+- [ ] C0893 **Passed-pawn imbalance** — Not implemented.
+- [ ] C0894 **Pawn-majority imbalance** — Not implemented.
+- [ ] C0895 **Color-complex imbalance** — Not implemented.
+- [ ] C0896 **Good-piece/bad-piece imbalance** — Not implemented.
+- [ ] C0897 **Static versus dynamic advantage** — Not implemented.
+- [ ] C0898 **Principle of two weaknesses** — Not implemented.
+- [ ] C0899 **Overprotection** — Not implemented.
+- [ ] C0900 **Blockade** — Not implemented.
+- [x] C0901 **Restriction** — Mechanics verified: static legal destination count drops by at least two to at most two; explicit hypothetical before-opponent turn, no quality or future-position claim.
+- [ ] C0902 **Prophylaxis** — Not implemented.
+- [x] C0903 **Centralization** — Mechanics verified: same before/after promotion benefit plus new king arrival on d4/e4/d5/e5; king subset only, no geometry-only quality judgment.
+- [ ] C0904 **Maximal piece activity** — Not implemented.
+- [ ] C0905 **Transformation of advantages** — Not implemented.
+- [ ] C0906 **Accumulation of small advantages** — Not implemented.
+- [ ] C0907 **Strategic exchange sacrifice** — Not implemented.
+- [ ] C0908 **Positional pawn sacrifice** — Not implemented.
+- [ ] C0909 **Dynamic compensation** — Not implemented.
+- [ ] C0910 **Permanent weakness** — Not implemented.
+- [ ] C0911 **Temporary weakness** — Not implemented.
+- [ ] C0912 **Static weakness** — Not implemented.
+- [ ] C0913 **Weakness creation** — Not implemented.
+- [ ] C0914 **Fixation** — Not implemented.
+- [ ] C0915 **Provocation** — Not implemented.
+- [ ] C0916 **Inducing pawn moves** — Not implemented.
+- [ ] C0917 **Changing the character of the position** — Not implemented.
+- [ ] C0918 **Good version versus bad version of a structure** — Not implemented.
+- [ ] C0919 **Favorable minor-piece imbalance** — Not implemented.
+- [ ] C0920 **Improving before attacking** — Not implemented.
+- [ ] C0921 **Restricting before breaking through** — Partial: finite mobility/trap witnesses are implemented; separate preparatory history or larger combination intent remains unresolved.
+- [ ] C0922 **Creating multiple fronts** — Not implemented.
+- [ ] C0923 **Switching the point of attack** — Not implemented.
+- [ ] C0924 **Maximum tension** — Not implemented.
+- [ ] C0925 **Keeping flexibility** — Not implemented.
+- [ ] C0926 **Commitment** — Not implemented.
+- [ ] C0927 **Irreversibility** — Not implemented.
+- [ ] C0928 **Pawn structure determines plans** — Not implemented.
+- [ ] C0929 **Geometric tactics** — Not implemented.
+- [ ] C0930 **Line tactics** — Not implemented.
+- [ ] C0931 **Alignment tactics** — Not implemented.
+- [ ] C0932 **Overworked defender** — Not implemented.
+- [ ] C0933 **Underprotected piece** — Not implemented.
+- [ ] C0934 **Self-pin** — Not implemented.
+- [x] C0935 **Cross-pin** — Mechanics verified: mixed king/queen pin on distinct slider lines; nonempty legal off-queen-line reply set passes the relative-pin proof; other cross-pin forms excluded.
+- [ ] C0936 **Cross-check** — Not implemented.
+- [x] C0937 **Double attack with discovered attack** — Mechanics verified: new moved-piece and stationary revealed-slider attacks on distinct targets with finite capture witnesses.
+- [ ] C0938 **Clearance combination** — Not implemented.
+- [ ] C0939 **Interference combination** — Not implemented.
+- [ ] C0940 **Deflection combination** — Not implemented.
+- [ ] C0941 **Attraction combination** — Not implemented.
+- [ ] C0942 **Decoy combination** — Not implemented.
+- [ ] C0943 **Blocking combination** — Not implemented.
+- [ ] C0944 **Trapping combination** — Partial: finite mobility/trap witnesses are implemented; separate preparatory history or larger combination intent remains unresolved.
+- [ ] C0945 **Desperado combination** — Not implemented.
+- [x] C0946 **Promotion tactic** — Mechanics verified: immediate E036 or opt-in multi-push E037 route: all defender replies retain queen promotion and every immediate response preserves queen and positive nominal gain, or actual mate; bounded horizon only.
+- [x] C0947 **Underpromotion tactic** — Mechanics verified: played non-queen promotion remains nonterminal or actually mates while same-square queen promotion stalemates; avoids that draw only, no general necessity or forced win.
+- [x] C0948 **Stalemate tactic** — Mechanics verified: actual moved non-pawn/non-king piece has a named legal enemy capture that immediately stalemates the mover; conditional resource only, not forced draw or loss assessment.
+- [ ] C0949 **Perpetual-check tactic** — Partial: repetition claim is verified from history; forced perpetual-check strategy remains unimplemented.
+- [ ] C0950 **Fortress tactic** — Not implemented.
+- [ ] C0951 **Tactical liquidation** — Not implemented.
+- [ ] C0952 **Intermediate sacrifice** — Not implemented.
+- [x] C0953 **Intermediate check** — Mechanics verified: actual check delays a verified available recapture; every legal reply permits tracked recapture with finite positive gain or actual mate.
+- [x] C0954 **Intermediate capture** — Mechanics verified: capture of a different unit delays verified recapture; every legal reply permits tracked recapture with finite positive gain or actual mate.
+- [x] C0955 **Quiet tactical move** — Mechanics verified: nonchecking, noncapturing actual move; every legal reply permits checkmate on the next own move, independently replayed; no newly-created/only-best claim.
+- [ ] C0956 **Tactical retreat** — Not implemented.
+- [ ] C0957 **Counter-combination** — Not implemented.
+- [ ] C0958 **Defensive combination** — Not implemented.
+- [ ] C0959 **Open position** — Not implemented.
+- [ ] C0960 **Closed position** — Not implemented.
+- [ ] C0961 **Semi-open position** — Not implemented.
+- [ ] C0962 **Sharp position** — Not implemented.
+- [ ] C0963 **Tactical position** — Not implemented.
+- [ ] C0964 **Positional position** — Not implemented.
+- [ ] C0965 **Quiet position** — Not implemented.
+- [ ] C0966 **Dynamic position** — Not implemented.
+- [ ] C0967 **Static position** — Not implemented.
+- [ ] C0968 **Balanced position** — Not implemented.
+- [ ] C0969 **Unbalanced position** — Not implemented.
+- [ ] C0970 **Symmetrical position** — Not implemented.
+- [ ] C0971 **Asymmetrical position** — Not implemented.
+- [ ] C0972 **Cramped position** — Not implemented.
+- [ ] C0973 **Spacious position** — Not implemented.
+- [ ] C0974 **Blocked position** — Not implemented.
+- [ ] C0975 **Fluid position** — Not implemented.
+- [ ] C0976 **Complicated position** — Not implemented.
+- [ ] C0977 **Simplified position** — Not implemented.
+- [ ] C0978 **Winning position** — Not implemented.
+- [ ] C0979 **Lost position** — Not implemented.
+- [x] C0980 **Drawn position** — Mechanics verified: actual legal stalemate or conservative dead material: bare kings, lone minor, or only same-square-color bishops; no general drawn evaluation.
+- [ ] C0981 **Unclear position** — Not implemented.
+- [ ] C0982 **Fortress position** — Not implemented.
+- [ ] C0983 **Zugzwang position** — Not implemented.
+- [ ] C0984 **Critical position** — Not implemented.
+- [ ] C0985 **Algebraic notation** — Not implemented.
+- [ ] C0986 **Descriptive notation** — Not implemented.
+- [ ] C0987 **SAN** — Not implemented.
+- [ ] C0988 **PGN** — Not implemented.
+- [ ] C0989 **FEN** — Not implemented.
+- [ ] C0990 **Move number** — Not implemented.
+- [ ] C0991 **Variation** — Partial: bounded mate tree/profile and verified continuation are implemented in research evidence; generic calculation/variation coaching label remains outside this candidate.
+- [ ] C0992 **Main line** — Not implemented.
+- [ ] C0993 **Side variation** — Not implemented.
+- [ ] C0994 **Annotation** — Not implemented.
+- [ ] C0995 **!** — Not implemented.
+- [ ] C0996 **!!** — Not implemented.
+- [ ] C0997 **?** — Not implemented.
+- [ ] C0998 **??** — Not implemented.
+- [ ] C0999 **!?** — Not implemented.
+- [ ] C1000 **?!** — Not implemented.
+- [ ] C1001 **+=** — Not implemented.
+- [ ] C1002 **=+** — Not implemented.
+- [ ] C1003 **±** — Not implemented.
+- [ ] C1004 **∓** — Not implemented.
+- [ ] C1005 **=** — Not implemented.
+- [ ] C1006 **∞** — Not implemented.
+- [ ] C1007 **Mating evaluation** — Not implemented.
+- [ ] C1008 **Centipawn evaluation** — Not implemented.
+- [ ] C1009 **Engine evaluation** — Not implemented.
+- [ ] C1010 **Depth** — Not implemented.
+- [ ] C1011 **Principal variation** — Not implemented.
+- [ ] C1012 **Chess engine** — Not implemented.
+- [ ] C1013 **Evaluation function** — Not implemented.
+- [ ] C1014 **Centipawn** — Not implemented.
+- [ ] C1015 **Search depth** — Partial: bounded mate tree/profile and verified continuation are implemented in research evidence; generic calculation/variation coaching label remains outside this candidate.
+- [ ] C1016 **Nodes** — Not implemented.
+- [ ] C1017 **Nodes per second** — Not implemented.
+- [ ] C1018 **Principal variation** — Not implemented.
+- [ ] C1019 **Engine line** — Not implemented.
+- [ ] C1020 **Multi-PV** — Not implemented.
+- [ ] C1021 **Opening book** — Not implemented.
+- [ ] C1022 **Endgame tablebase** — Not implemented.
+- [ ] C1023 **Syzygy tablebases** — Not implemented.
+- [ ] C1024 **Mate search** — Partial: bounded mate tree/profile and verified continuation are implemented in research evidence; generic calculation/variation coaching label remains outside this candidate.
+- [ ] C1025 **Engine tactical analysis** — Not implemented.
+- [ ] C1026 **Engine positional evaluation** — Not implemented.
+- [ ] C1027 **Human versus engine move** — Not implemented.
+- [ ] C1028 **Top engine move** — Not implemented.
+- [ ] C1029 **Evaluation swing** — Not implemented.
+- [ ] C1030 **Blunder according to engine** — Not implemented.
+- [ ] C1031 **Accuracy** — Not implemented.
+- [ ] C1032 **Computer-assisted preparation** — Not implemented.
+- [ ] C1033 **Classical chess** — Not implemented.
+- [ ] C1034 **Rapid chess** — Not implemented.
+- [ ] C1035 **Blitz chess** — Not implemented.
+- [ ] C1036 **Bullet chess** — Not implemented.
+- [ ] C1037 **Armageddon** — Not implemented.
+- [ ] C1038 **Time control** — Not implemented.
+- [ ] C1039 **Increment** — Not implemented.
+- [ ] C1040 **Delay** — Not implemented.
+- [ ] C1041 **Rated game** — Not implemented.
+- [ ] C1042 **Unrated game** — Not implemented.
+- [ ] C1043 **Rating** — Not implemented.
+- [ ] C1044 **Elo rating** — Not implemented.
+- [ ] C1045 **Rating performance** — Not implemented.
+- [ ] C1046 **Performance rating** — Not implemented.
+- [ ] C1047 **Tournament** — Not implemented.
+- [ ] C1048 **Round robin** — Not implemented.
+- [ ] C1049 **Swiss system** — Not implemented.
+- [ ] C1050 **Knockout** — Not implemented.
+- [ ] C1051 **Match** — Not implemented.
+- [ ] C1052 **Tiebreak** — Not implemented.
+- [ ] C1053 **Tournament standings** — Not implemented.
+- [ ] C1054 **Title norms** — Not implemented.
+- [ ] C1055 **Candidate Master** — Not implemented.
+- [ ] C1056 **FIDE Master** — Not implemented.
+- [ ] C1057 **International Master** — Not implemented.
+- [ ] C1058 **Grandmaster** — Not implemented.
+- [ ] C1059 **What does the opponent want?** — Not implemented.
+- [ ] C1060 **What changed after the last move?** — Not implemented.
+- [ ] C1061 **Are there checks, captures, or threats?** — Not implemented.
+- [ ] C1062 **Which pieces are undefended?** — Not implemented.
+- [ ] C1063 **Which pieces are badly placed?** — Not implemented.
+- [ ] C1064 **What is my worst piece?** — Not implemented.
+- [ ] C1065 **What is my opponent's best piece?** — Not implemented.
+- [ ] C1066 **Where are the weak squares?** — Not implemented.
+- [ ] C1067 **Where are the pawn breaks?** — Not implemented.
+- [ ] C1068 **Who benefits from exchanges?** — Not implemented.
+- [ ] C1069 **Who benefits from an open position?** — Not implemented.
+- [ ] C1070 **Who benefits from a closed position?** — Not implemented.
+- [ ] C1071 **Whose king is weaker?** — Not implemented.
+- [ ] C1072 **Who has more space?** — Not implemented.
+- [ ] C1073 **Who has the initiative?** — Not implemented.
+- [ ] C1074 **What are the long-term weaknesses?** — Not implemented.
+- [ ] C1075 **What are the temporary advantages?** — Not implemented.
+- [ ] C1076 **Can a temporary advantage be converted before it disappears?** — Not implemented.
+- [ ] C1077 **Can one advantage be transformed into another?** — Not implemented.
+- [ ] C1078 **Can counterplay be eliminated before trying to win?** — Not implemented.
+- [ ] C1079 **Can a second weakness be created?** — Not implemented.
+- [ ] C1080 **What is the correct moment to change the pawn structure?** — Not implemented.
+- [ ] C1081 **What is the correct moment to simplify?** — Not implemented.
+- [ ] C1082 **What is the correct moment to sacrifice?** — Partial: bounded mate certificates verify some sound offers; general timing, necessity and positional criteria remain unresolved.
+- [ ] C1083 **What is the opponent's strongest defensive resource?** — Not implemented.
+- [ ] C1084 **What would I play if it were the opponent's turn?** — Not implemented.
+- [ ] C1085 **What is the position asking for?** — Not implemented.
