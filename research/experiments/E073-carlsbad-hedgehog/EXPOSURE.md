@@ -21,3 +21,7 @@ legal history is checked without inventing post-completion repetition claims.
 
 Focused/full cumulative/source/diff and frozen exact main/repeat/clean gates
 pending. Keep protocol, proof sets and prospective20MB storage budget fixed.
+
+After the preregistered arithmetic amendment, focused210 tests passed7.3s and
+full cumulative4,546 tests passed109.6s. Maintained source and diff checks passed.
+No source/target/capture was removed. Decisive frozen reproductions pending.
