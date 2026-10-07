@@ -59,3 +59,26 @@ outputs and metrics. Saved JSON independent replay, unchanged inherited full
 fingerprints and original-list hash. Full new proofs <3 MB; estimated ~160
 seconds per full run, overlap three. Synthetic mechanics only; real-game
 precision/human benefit unmeasured. No new engine or registered game analysis.
+
+## Exposed smoke and authoring corrections
+
+The proposed safe-knight negative initially removed Rc8, but Rb6 could still
+legally capture Nb8 after the quiet move. That was a genuine positive under the
+unchanged protocol. The retained negative replaces Rb6 with Bb7: Nb4 now has no
+legal enemy unit capture. The initial dead-position negative used two bishops
+on the same square color and was already terminal before the actual move; the
+strict inherited guard refused it. The retained case uses mutually attacking
+knights, with the actual capture producing K+N versus K. No guard was weakened.
+
+A separate actual-response draw was added before decisive evaluation:
+Qa8xb8 Rc8xb8 Ka7xb8 reaches insufficient material when Nd7 is absent. Original
+quiet Ka7a6 still admits Rb8xa8 mate, so this tests the actual-response terminal
+guard independently of the quiet-loss gate. The development pilot launched
+before that extra negative is exposed/stale and cannot be final evidence.
+Final pilot and cumulative checks must use the complete updated fixtures.
+
+Castling uses explicit orthodox K rights. File reflection is omitted for this
+one case because an e-file king reflected to the d-file is not orthodox
+castling; rank/color reflection remains valid. Tests replay the relocation to
+f1 and verify the threatened rook has no immediate legal capture there.
+Replay also verifies the exact short comment text against certified values.
