@@ -1,6 +1,8 @@
 # E028 result and resume state
 
-State: planned, 2026-10-07. Next: implement named and role-based mate labels,
-independent terminal/geometry replay and authored near misses. Definition metadata
-in SOURCES.md; no sourced game positions or extension changes. Coach expansion
-and usage cutoff active; numerical research paused.
+State: implementation validated, 2026-10-07; retained repeat/clean evidence
+pending. Nine named mating templates, six role-based piece pairs and actual
+promotion/discovery/double-check/one-move mate facts pass independent replay.
+749 cumulative tests and source checks pass. Next: retain the guarded run and
+verify exact repeat/clean hashes. No sourced game inputs or extension changes;
+coach expansion/cutoff active and numerical research paused.

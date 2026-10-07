@@ -69,3 +69,13 @@ hashes. Estimate <=30 seconds and <=3 MB retained evidence. Record exposed chang
 Coach goal and 300-minute usage cutoff remain active; numerical research paused.
 Near 10% remaining checkpoint/commit, disable heartbeat and execute authorized
 normal shutdown without /f. No integration or pushing.
+
+Implementation notes, 2026-10-07: pawn-free rotated authored seeds additionally
+exercise every named template on different board edges; pawn directions are
+never rotated. Initial queen-role examples already checked the non-moving king
+or crossed their own support pawn, so legal input guards rejected them before
+concept detection. Distinct legal queen paths supply the valid positives.
+Independent coordinate replay treats signed zero as numerical zero, avoiding
+JavaScript strict-assertion failures without changing any chess gate. Double-check
+and underpromotion names get deterministic priority over more generic action
+labels. Frozen parent code/evidence remain unchanged.
