@@ -48,13 +48,13 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E063 pawn storms](experiments/E063-pawn-storm/RESULT.md)
-adds short comments for connected pawn advances after a recorded enemy castle
-with full history and every reply retained. Coverage reaches 288 verified
+[E064 blocked positions](experiments/E064-blocked-position/RESULT.md)
+adds short comments for newly completed central pawn walls with complete legal
+pawn mobility sets now and after every enemy reply. Coverage reaches 289 verified
 names.
-Its [cumulative tracker](experiments/E063-pawn-storm/evidence/concept-status.md)
+Its [cumulative tracker](experiments/E064-blocked-position/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E063-pawn-storm/evidence/demo.html) is runnable
+list; its [demo](experiments/E064-blocked-position/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 
