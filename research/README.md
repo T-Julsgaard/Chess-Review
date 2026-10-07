@@ -41,6 +41,28 @@ Research is available in the Git repository. The current packaging allowlist
 excludes `research/` from extension ZIPs and release source snapshots; those
 snapshots retain the active calibration instead.
 
+## Workflow commands
+
+- `npm run research:status` reports the latest completed coach study, checking
+  tracker counts and occurrence IDs against the original list. Add `-- --json`
+  for machine-readable metadata. It does not read games or evaluate a candidate.
+- `npm run research:coach-tests -- E065` runs focused development tests; supply
+  multiple experiment IDs when dependent studies are affected. Run the dataset
+  eligibility preflight required by the study first; guarded tests still enforce
+  their own access policy.
+- `npm run research:coach-tests` runs every available coach study's test files
+  from E020 onward. This is the final cumulative coach regression, not a
+  replacement for numerical research tests in `npm run test:research`.
+
+Final independent proof replay and exact main/repeat/clean reproduction remain
+required by each plan. Reuse the existing development and clean verification
+checkouts under the safeguards in [AGENTS.md](AGENTS.md); do not accumulate new
+branches or working clones. Source verification excludes local `research/runs/`
+outputs and copies, checks maintained research/evidence, and rejects tracking
+generated run files. Extension linting also excludes that local run folder and
+the already ignored `scratch/` and `calibration-runs/` working artifacts.
+Reachable-history checks reject those generated paths.
+
 Nineteen studies/tasks are complete. The separate [E020 coach-concept prototype](experiments/E020-coach-concepts/RESULT.md)
 verifies bounded mechanics on synthetic positions, with an exhaustive concept
 tracker and browsable demo. Human usefulness and real-game precision remain

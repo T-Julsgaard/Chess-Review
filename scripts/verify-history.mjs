@@ -12,6 +12,7 @@ const retiredFunctions = {
 };
 
 function verifyHistoryPath(name) {
+  if (name.startsWith('research/runs/')) throw Error('Generated research runs in reachable history: ' + name);
   if (name.startsWith('tools/calibration/') && !maintainedTools.has(name.slice('tools/calibration/'.length))) {
     throw Error('Retired research in reachable history: ' + name);
   }
