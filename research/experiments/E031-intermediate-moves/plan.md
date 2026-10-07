@@ -41,3 +41,13 @@ Definition metadata only; no source games, diagrams or positions imported.
 Coach expansion/live five-hour cutoff active. Near 10% remaining checkpoint and
 commit, disable heartbeat then authorized normal shutdown without /f. Numerical
 research remains paused; no push. Next unused E032 can study history draw facts.
+
+## Exposed development notes
+
+The initial refutable-check proposal did not give check at all. The retained
+negative instead permits Bf7xe8, removing the checking rook so the subsequent
+recapture has no positive net gain. Separate controls refuse recapture followed
+by enemy mate and a recapture leaving insufficient mating material. A moved
+capturer Ra4xe4 is tracked to e4 and recaptured by Pd3xe4. A nonchecking
+intermediate capture has a pinned original capturer and preserves recapture
+against all replies; no subjective surprise or opponent intention is inferred.
