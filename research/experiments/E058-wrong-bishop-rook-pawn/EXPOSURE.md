@@ -21,3 +21,13 @@ corner-access and distant-defender examples, preserving promotion priority.
 Final target passes110 tests (104 cases plus six proof/selection/guard groups);
 cumulative E020–E058 passes2,446 tests. Maintained source and diff checks pass
 before source commit. No new draw theorem or strategy claim is evaluated.
+
+Initial clean run at904d3d9 succeeds. Original main/repeat complete mechanics
+but fail before writing evidence because the shared checkout switches to
+66a4256 on another branch during execution, removing tracked research inputs.
+Do not restore or reset that checkout. Existing task-owned clean clone retains
+904d3d9 and empty status; create local codex/coach-concepts-e058-evidence there,
+run replacement main/repeat there, and compare against the completed initially
+clean run. All three successful runs match exact revision, normalized inputs,
+physical outputs and metrics. Keep interrupted runs distinct from evidence.
+Record results in that isolated checkout; preserve the shared branch untouched.

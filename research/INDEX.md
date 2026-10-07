@@ -111,7 +111,9 @@ No promotion records yet.
 
 | E057 | [Rook checking direction and immediate distance](experiments/E057-rook-checking-distance/RESULT.md) | complete | 2,336 cumulative tests; 2,132 synthetic cases; 280 verified names; rear/side direct rays, advanced passer context, complete evasions and no-capture distance evidence; selected-comment correction, exact repeat/clean and saved-proof replay | E058 investigate wrong-colored bishop and rook pawn with promotion-square and legal-corner evidence; cutoff cancelled |
 
-Allocate the next unused ID in each series: `E058`, `D003`, `F018`, `P001`.
+| E058 | [Wrong bishop and rook-pawn promotion corner](experiments/E058-wrong-bishop-rook-pawn/RESULT.md) | complete | 2,446 cumulative tests; 2,236 synthetic cases; 282 verified names; exact pure material/colors, complete replies and legal corner access/occupation; replacement main/repeat in isolated clone match completed clean run | E059 investigate self-blocking pawns and blocked pawn positions; continue isolated while shared checkout is on another branch; cutoff cancelled |
+
+Allocate the next unused ID in each series: `E059`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
