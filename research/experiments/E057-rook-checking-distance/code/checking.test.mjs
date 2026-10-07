@@ -4,6 +4,13 @@ await openResearchData(['D001'],{purpose:'test'});const {fixtures,reflect}=await
 const ids=new Set(['rear-rook-check','side-rook-check','rook-checking-distance']);
 for(const f of fixtures.flatMap(f=>[f,reflect(f)]))test(f.id,()=>{if(f.invalid){assert.throws(()=>explainMove(f),/Illegal move/);return;}const r=explainMove(f);for(const id of f.expected)assert.ok(r.events.some(e=>e.id===id),`${f.id}: missing ${id}`);for(const id of f.absent)assert.ok(!r.events.some(e=>e.id===id),`${f.id}: unexpected ${id}`);for(const e of r.events.filter(e=>ids.has(e.id)))replay(f,e);assert.ok(!r.comment||r.comment.split(/\s+/).length<=24);});
 const fixture=name=>fixtures.find(f=>f.id===name),event=(r,id='rook-checking-distance')=>r.events.find(e=>e.id===id);
+test('verified checking explanations replace lift geometry while urgent capture warnings remain selected',()=>{
+ for(const name of ['rear-three-clear-squares','side-three-clear-squares','side-from-right'])assert.ok(explainMove(fixture(name)).comment.startsWith('Checking distance:'));
+ assert.ok(explainMove(fixture('rear-short-distance')).comment.startsWith('Rook check from behind:'));
+ assert.ok(explainMove(fixture('side-short-distance')).comment.startsWith('Rook check from the side:'));
+ const pawn=fixture('side-pawn-captures-checker');assert.ok(explainMove(pawn).comment.startsWith('Watch out:'));assert.equal(explainMove(pawn).comment,parent(pawn).comment);
+ const rook=explainMove(fixture('side-rook-captures-checker'));assert.ok(!event(rook));assert.ok(event(rook,'side-rook-check').evidence.checkerCaptures.includes('a8a3'));
+});
 test('distance boundary counts empty intervening squares rather than coordinate separation',()=>{
  for(const name of ['rear-three-clear-squares','side-three-clear-squares','side-from-right']){const e=event(explainMove(fixture(name)));assert.equal(e.evidence.clearSquares,3);assert.equal(e.evidence.ray.length,3);assert.equal(e.evidence.checkerCaptures.length,0);}
  for(const name of ['rear-short-distance','side-short-distance']){const r=explainMove(fixture(name));assert.ok(!event(r));const e=r.events.find(e=>ids.has(e.id));assert.equal(e.evidence.clearSquares,name.startsWith('rear')?2:1);}

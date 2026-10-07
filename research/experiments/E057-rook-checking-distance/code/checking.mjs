@@ -2,7 +2,7 @@ import {Chess} from '../../../../lib/chess.js';
 import {explainMove as parent,priority as prior} from '../../E056-pawn-blockades/code/blockade.mjs';
 const code=m=>m.from+m.to+(m.promotion||''),file=s=>s.charCodeAt(0),rank=s=>+s[1];
 function record(c,uci){const before=c.fen(),m=c.move(uci);return{move:code(m),san:m.san,from:m.from,to:m.to,piece:m.piece,color:m.color,captured:m.captured||null,promotion:m.promotion||null,before,after:c.fen()};}
-export const priority=e=>e.id==='rook-checking-distance'?75.5:e.id==='side-rook-check'?75.4:e.id==='rear-rook-check'?75.3:prior(e);
+export const priority=e=>e.id==='rook-checking-distance'?76.5:e.id==='side-rook-check'?76.4:e.id==='rear-rook-check'?76.3:prior(e);
 export function explainMove(input){
  const enabled=input.rookCheckTags??false,limit=input.maxRookCheckNodes??50000;
  if(typeof enabled!=='boolean')throw Error('rookCheckTags must be boolean');
