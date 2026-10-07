@@ -43,3 +43,24 @@ Main/repeat/initially clean clone exact source, normalized inputs, deterministic
 outputs/metrics; saved independent JSON replay and frozen ordered E052 hashes.
 Full new certificates below 3 MB. Estimate ~150 seconds per full run; three
 overlap. Synthetic mechanics only; real-game precision/human utility unmeasured.
+
+## Exposed smoke corrections
+
+The first checker-capture fixture placed the enemy king off the resulting
+bishop ray, so it was an ordinary evasion rather than a cross-check. Moving
+the king to b8 made Ba7 a checking capture, but K+B versus K then triggered the
+strict draw refusal. Retaining an authored black h7 pawn gives the intended
+live checking-capture example. Removing the checking rook from the initial
+negative left an already dead K+N versus K root; a black a7 pawn retains a live
+ordinary-check negative. No legality or terminal guard was weakened.
+
+The frozen E047 file mirror discards en-passant rights. Mirrored e5xd6 EP was
+therefore illegal. A local E053 wrapper reflects the EP file explicitly;
+frozen mirrors/runtimes remain unchanged. Rank/color reflection already
+preserves the valid rights. Full-history checking-rook cases and illegal
+double-check interpositions were added before decisive evaluation. The latter
+are refused moves, never attributed an explanation.
+
+Meaningful negative evidence includes legal Re8xe4 capturing the cross-checking
+knight: the neutral term is a verified legal mechanism, not a claim that every
+cross-check is sound as a strategy. Existing stronger warnings retain priority.
