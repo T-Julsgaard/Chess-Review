@@ -101,8 +101,9 @@ No promotion records yet.
 | E049 | [Conditional overloaded defenders](experiments/E049-overloaded-defenders/RESULT.md) | complete | 1,595 cumulative tests; 1,442 synthetic cases; 261 verified names; two legal recapture duties and conditional positive material through all immediate replies; exact repeat/clean and saved-proof replay | E050 investigate square clearance and temporary tactical sacrifices with legal vacancy/recapture witnesses; cutoff cancelled |
 | E050 | [Square clearance and temporary recovery](experiments/E050-square-clearance-and-recovery/RESULT.md) | complete | 1,702 cumulative tests; 1,542 synthetic cases; 264 verified names; all-defense mate on vacated square and all-acceptance immediate material recovery; exact repeat/clean and saved-proof replay | E051 investigate tactical interference with legal defender-response and material/mate witnesses; cutoff cancelled |
 | E051 | [All-reply interference combinations](experiments/E051-interference-combinations/RESULT.md) | complete | 1,775 cumulative tests; 1,610 synthetic cases; 265 verified names; before-proven defensive duties, all-reply material gains and counterfactual recaptures; exact repeat/clean and saved-proof replay | E052 investigate desperado captures with threatened units, legal escape comparisons and finite material witnesses; cutoff cancelled |
+| E052 | [Finite desperado capture comparisons](experiments/E052-desperado-captures/RESULT.md) | complete | 1,839 cumulative tests; 1,668 synthetic cases; 267 verified names; all-quiet-alternative unit losses and all-acceptance conditional capture benefits; exact repeat/clean and saved-proof replay | E053 investigate cross-checks with before-check rays, actual interposition and countercheck; cutoff cancelled |
 
-Allocate the next unused ID in each series: `E052`, `D003`, `F018`, `P001`.
+Allocate the next unused ID in each series: `E053`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.

@@ -48,12 +48,12 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E051 interference combinations](experiments/E051-interference-combinations/RESULT.md)
-adds all-reply material interference with before-proven defensive duties and
-counterfactual legal recaptures. Coverage reaches 265 verified names.
-Its [cumulative tracker](experiments/E051-interference-combinations/evidence/concept-status.md)
+[E052 desperado captures](experiments/E052-desperado-captures/RESULT.md)
+adds finite material comparisons against every legal quiet alternative and
+conditional recapture proofs. Coverage reaches 267 verified names.
+Its [cumulative tracker](experiments/E052-desperado-captures/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E051-interference-combinations/evidence/demo.html) is runnable
+list; its [demo](experiments/E052-desperado-captures/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 
