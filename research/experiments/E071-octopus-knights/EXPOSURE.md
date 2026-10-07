@@ -27,3 +27,15 @@ but selected-comment audit failed: full-history terminal repetition still select
 an inherited royal fork. All initial full artifacts and manifests retained under
 initial-evidence, including audit.json. AMENDMENT prospectively strengthens fallback
 selection and budget behavior before final source/evaluation. No gate relaxation.
+
+Corrective guard retains all actual history/replies and suppresses false
+force-capture fallback even with zero own/outpost budgets. Explicit independent
+guard replay and tamper rejection added. Final focused 118 tests pass; repeat
+all final gates and exact reproductions under AMENDMENT. Initial proof corpus
+6.37MB retained; combined initial/final storage estimate ~13MB within unchanged
+20MB. New reproductions use repeat-final and clean-final distinct directories.
+
+Corrected final focused 118 passed in 22.5s; cumulative 4,162 tests passed
+(exit 0), maintained source and diff checks passed. Freeze corrected source
+before three entirely new reproductions; initial unsuccessful selected-comment
+source and artifacts remain retained without overwrite.
