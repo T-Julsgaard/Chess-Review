@@ -70,13 +70,13 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E071 tactical octopus knights](experiments/E071-octopus-knights/RESULT.md)
-adds octopus-knight comments backed by complete queen-gain trees and a history
-guard suppressing false capture promises after terminal replies. Coverage reaches 301 verified
+[E072 named pawn formations](experiments/E072-named-pawn-formations/RESULT.md)
+adds Stonewall support and Maroczy exchange/control comments backed by legal
+countercaptures and recorded original-pawn identities. Coverage reaches 303 verified
 names.
-Its [cumulative tracker](experiments/E071-octopus-knights/evidence/concept-status.md)
+Its [cumulative tracker](experiments/E072-named-pawn-formations/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E071-octopus-knights/evidence/demo.html) is runnable
+list; its [demo](experiments/E072-named-pawn-formations/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 
