@@ -48,3 +48,10 @@ saved JSON replay of positives/negatives, unchanged inherited fingerprints.
 Expected ~100 seconds per ~1,300-case run, three overlapping runs, lossless
 retention <3 MB. Original 1,085 occurrences preserved. Synthetic mechanics only;
 real-game precision/human benefit unmeasured. No extension/rating changes/push.
+
+Exposed smoke: an extra closing brace initially prevented module loading;
+corrected before evaluating fixtures. All 85 exposed tests pass. Authoring
+uses a deliberately different pin route (bishop b5, knight c4, queen e2 and
+bishop h5), not a source opening/game move sequence. File/color mirrors replay
+this full history. Source terminology prompted specific knight-finishing Corner
+and exact king/rook Box profiles before preregistration, not generic geography.
