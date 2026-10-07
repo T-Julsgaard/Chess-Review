@@ -64,3 +64,9 @@ relocated the second target and attacker so the root is legal while the
 acceptance genuinely checks and prevents the follow-up capture. Added explicit
 legal refutation, terminal same-color bishop draw and zero-net-gain cases.
 Proof gates are unchanged. All smoke failures and corrections precede main.
+
+Additional exposed correction: a black pawn authored on a6 cannot capture a
+unit on b7. That supposed zero-gain refutation was actually a valid positive
+and correctly received the label. Replaced the pawn with an authored knight
+a5 whose legal ...Nxb7 gives exactly zero net gain; explicit replay verifies
+this response. Do not count an imagined recapture as a negative witness.
