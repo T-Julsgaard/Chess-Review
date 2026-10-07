@@ -3,6 +3,24 @@
 These instructions apply to `research/`. Repository-wide commit and no-push
 preferences still apply.
 
+- Keep research on one existing branch and reuse the existing isolated research
+  checkout. Do not create per-experiment branches, switch the shared checkout,
+  or create another working clone unless the user explicitly requests it.
+  Clean verification checkouts remain allowed for required reproducibility;
+  they must not become additional development branches.
+- Import completed research from the isolated checkout into the shared
+  repository's existing `codex/coach-concept-research` branch using a local,
+  fast-forward-only fetch. Never create `codex/coach-concepts-e###-evidence`
+  branches to transfer results. Keep unfinished work in the isolated checkout.
+- After required checks and the result commit, fast-forward completed research
+  into local `main` only when the shared checkout is already on `main`, its
+  tracked and non-ignored working files are clean, and no operation is in
+  progress. If histories diverge, stop integration and report the reason;
+  never force, reset, or switch branches to make it work. Include all changes
+  from local `main` in the isolated research history at a safe boundary before
+  integration, preserving uncommitted work and frozen evidence revisions.
+  Report the branch and whether local `main` includes the completed study.
+  These local integrations do not authorize any push.
 - Start with `README.md` and `INDEX.md`. Read the protocol on the first research
   task; thereafter open the active record and only relevant supporting files.
   Do not read all past experiments, bulk evidence or generated logs by default.
