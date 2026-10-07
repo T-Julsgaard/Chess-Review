@@ -55,3 +55,16 @@ saved JSON positives and negatives, unchanged inherited full fingerprints.
 Retain full new proofs <3 MB; estimated ~140 seconds per run, overlap three.
 Synthetic mechanics only; real-game explanation precision and learning benefit
 remain unmeasured.
+
+Exposed smoke: a queen on d4 already checked the nonmoving h8 king; relocate
+that king for queen-offer cases. The first bishop-draw negative also allowed
+a different capture recovering material without a draw; changed the offered
+square/accepting bishop so all apparent restoration captures genuinely draw
+or fail. In the rook-refutation negative the recovery bishop initially could
+not legally move because it exposed its own king; relocate the own king to
+exercise the intended legal enemy recapture instead. A defense capturing the
+square-clearance helper refutes that mate claim, but the same setup genuinely
+has a different conditional temporary-sacrifice recovery. Retain that positive
+tag while suppressing square clearance; do not conflate independent concepts.
+All corrections precede main; proof gates unchanged. Add a two-acceptor case
+and prove both capture branches, retaining an omitted-branch tamper refusal.
