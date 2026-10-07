@@ -79,7 +79,9 @@ No promotion records yet.
 
 | E031 | [Verified intermediate moves](experiments/E031-intermediate-moves/RESULT.md) | complete | 839 cumulative tests; 772 synthetic cases; 176 verified names; history-grounded recapture delays and intermediate mate; exact repeat/clean replay | E032 history-grounded draw facts; cutoff active |
 
-Allocate the next unused ID in each series: `E032`, `D003`, `F018`, `P001`.
+| E032 | [History-grounded draw facts](experiments/E032-draw-history/RESULT.md) | planned | Exact repetition keys and claim wording; verified quiet suffix and irreversible changes | Implement independent rule witnesses and controls |
+
+Allocate the next unused ID in each series: `E033`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
