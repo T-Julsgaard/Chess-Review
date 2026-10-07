@@ -48,12 +48,12 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E037 promotion-route expansion](experiments/E037-promotion-routes/RESULT.md)
-adds multi-push all-response promotion routes and conservative rule-of-square
-comments to earlier passer, development, bishop and tactical explanations.
-Its [cumulative tracker](experiments/E037-promotion-routes/evidence/concept-status.md)
+[E038 underpromotion/stalemate expansion](experiments/E038-underpromotion-stalemate/RESULT.md)
+adds underpromotions avoiding queen stalemate and named conditional stalemate
+resources to earlier promotion routes, passer, development and tactical explanations.
+Its [cumulative tracker](experiments/E038-underpromotion-stalemate/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E037-promotion-routes/evidence/demo.html) is runnable
+list; its [demo](experiments/E038-underpromotion-stalemate/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 
