@@ -77,7 +77,9 @@ No promotion records yet.
 
 | E030 | [Mating sacrifice explanations](experiments/E030-mating-sacrifices/RESULT.md) | complete | 812 cumulative tests; 750 synthetic cases; sound material offers, exchange and clearance sacrifices; exact repeat/clean replay | E031 broaden verifiable short concepts; cutoff active |
 
-Allocate the next unused ID in each series: `E031`, `D003`, `F018`, `P001`.
+| E031 | [Verified intermediate moves](experiments/E031-intermediate-moves/RESULT.md) | planned | Verified recapture-delay context and finite all-defense recapture witnesses; actual intermediate mate | Implement authored controls and independent replay |
+
+Allocate the next unused ID in each series: `E032`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
