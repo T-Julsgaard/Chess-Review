@@ -89,8 +89,9 @@ No promotion records yet.
 | E037 | [Verified promotion routes](experiments/E037-promotion-routes/RESULT.md) | complete | 1,020 cumulative tests; 928 synthetic cases; 212 verified names; all-response route/safety trees and conservative square rule; exact repeat/clean replay | E038 broaden verified original-list concepts; usage cutoff cancelled |
 | E038 | [Underpromotion and stalemate resources](experiments/E038-underpromotion-stalemate/RESULT.md) | complete | 1,043 cumulative tests; 948 synthetic cases; 216 verified names; alternate-queen stalemate and named conditional capture witnesses; exact repeat/clean replay | E039 broaden verified original-list concepts; cutoff cancelled |
 | E039 | [King support and opposition](experiments/E039-king-promotion-support/RESULT.md) | complete | 1,070 cumulative tests; 968 synthetic cases; 226 verified names; paired promotion success/refutation proofs; exact repeat/clean replay and lossless pack audit | E040 broaden verified original-list concepts; cutoff cancelled |
+| E040 | [Quiet mating nets](experiments/E040-quiet-mating-nets/RESULT.md) | complete | 1,097 cumulative tests; 992 synthetic cases; 231 verified names; every legal defense admits next-move mate; exact repeat/clean replay and lossless pack audit | E041 examine unique immediate-mate defenses; cutoff cancelled |
 
-Allocate the next unused ID in each series: `E040`, `D003`, `F018`, `P001`.
+Allocate the next unused ID in each series: `E041`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
