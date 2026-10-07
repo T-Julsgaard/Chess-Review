@@ -1,6 +1,6 @@
 # Research index
 
-Updated: 2026-10-07. Unattended coach expansion active; numerical goal remains paused.
+Updated: 2026-10-08. Coach expansion follows the approved [easier-first queue](concepts/ACTIVE-QUEUE.md); numerical goal remains paused.
 Baseline: [B000](BASELINE.md). New CP gain is development evidence, not confirmed.
 
 This is the routing and decision index. Detailed evidence lives in linked
@@ -215,4 +215,4 @@ user explicitly resumes. The extension remains at B000.
 
 | E073 | [Carlsbad and Hedgehog structures](experiments/E073-carlsbad-hedgehog/RESULT.md) | complete | 4,546 cumulative tests; 4,232 cases; 305 verified names; 20 Carlsbad/22 Hedgehog certificates; legal support/majority and complete six-target control; failed eight-edge arithmetic retained and prospectively corrected to seven; all 4,028 inherited fingerprints unchanged; exact repeat/clean and saved replay; 5.52MB within 20MB | E074 French pawn chain/Scheveningen naming with current support, ram/control and context gates; no inferred opening or successful attack/break |
 
-| E074 | [French-type chains and Scheveningen control](experiments/E074-french-scheveningen/RESULT.md) | complete | 4,741 cumulative tests; 4,420 cases; 307 verified names; 28 French/20 Scheveningen certificates; legal support, ram move sets and original-pawn exchange/control; all 4,232 inherited fingerprints unchanged; exact repeat/clean and independent saved replay; 5.69MB within 20MB | E075 Benoni/Botvinnik structures with primary naming, bounded support/control and required exchange provenance; no inferred opening or successful attack |
+| E074 | [French-type chains and Scheveningen control](experiments/E074-french-scheveningen/RESULT.md) | complete | 4,741 cumulative tests; 4,420 cases; 307 verified names; 28 French/20 Scheveningen certificates; legal support, ram move sets and original-pawn exchange/control; all 4,232 inherited fingerprints unchanged; exact repeat/clean and independent saved replay; 5.69MB within 20MB | Next unused study: approved objective board/nominal-material batch and exact-duplicate coverage audit; follow concepts/ACTIVE-QUEUE.md, preserve final gates; Benoni/Botvinnik deferred to structure phase |

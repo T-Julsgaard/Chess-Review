@@ -80,6 +80,12 @@ preferences still apply.
   outputs and their existing acceptance checks rather than creating parallel
   summaries. Related concepts may share a prospectively registered study and
   common proof machinery, with separate positive/negative gates for each claim.
+- For coach expansion, follow the user-approved scheduling and support routing
+  in `concepts/ACTIVE-QUEUE.md`. Use the fixed easier-to-harder ranks filtered
+  against current canonical status, batch compatible claims, preserve duplicate
+  occurrence scopes and keep support work separate from verified detectors.
+  Record prerequisite-driven deviations before implementation; keep all final
+  scientific gates and the complete teaching catalog.
 - Finish by committing coherent completed changes and reporting the evidence
   status, local commit and next action. Do not launch a goal, push, or publish
   research merely because the scaffold or an experiment is ready.

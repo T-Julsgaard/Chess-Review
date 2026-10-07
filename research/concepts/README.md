@@ -1,5 +1,9 @@
 # Coach concept catalog and scheduling review
 
+The user approved the ordering and support-routing recommendations on
+2026-10-08. [ACTIVE-QUEUE.md](ACTIVE-QUEUE.md) is the current scheduling policy;
+the catalog and review documents below remain the unchanged E074 snapshot.
+
 2026-10-08 review, frozen at E074. This is vocabulary/progress metadata only: no games were loaded, no empirical experiment ran, no extension behavior changed and the paused research goal was not resumed. The active experiment schedule and original trackers are untouched.
 
 | Item | Count |
