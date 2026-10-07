@@ -54,3 +54,14 @@ hashes, deterministic output hashes and metrics. Separate saved JSON positive/
 negative replay, unchanged inherited fingerprints and original-list hash.
 Retain full new certificates <3 MB. Estimate ~140 seconds per full run, overlap
 three runs. Synthetic mechanics; real-game precision/human benefit unmeasured.
+
+Exposed smoke: a relocated king accidentally blocked the intended discovered
+check in the diagonal queen case. Keep the original off-ray king and shield
+it from the queen's initial file attack with an authored pawn. An intended
+target-escape negative had a rook pinned to its king by the capturing rook,
+so the alleged escaping reply was illegal and the position genuinely positive.
+Use an off-file queen attacker with a protected capture square to exercise a
+legal ...Rg7 interposition/target escape. An initial terminal queen-interposer
+setup already checked the nonmoving king; replace it with a legal knight
+interposition and additional king-flight coverage that actually mates.
+All 73 exposed tests pass after fixture corrections; proof gates unchanged.
