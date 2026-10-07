@@ -28,3 +28,10 @@ clean checkout runs, independent retained-pack read-back, input/output hashes,
 guarded D001 receipts. No registered game analyzed. Retain lossless evidence
 under 3 MB. Reuse E039 runner and deterministic gzip retention; estimate three
 968+ case runs at about 75 seconds each, largely overlapping, <3 MB retained.
+
+Exposed pilot addendum: the first positive case has a sole legal reply, despite
+its initial many-defenses name. Preserve it with an accurate name and add an
+authored opposing knight with multiple legal defenses. Require a positive
+test asserting multiple replies and a non-king defense; no proof gate changes.
+The first pilot also caught a demo adapter dereference for compressed proof
+references; the display fix and smoke test preserve the canonical certificates.
