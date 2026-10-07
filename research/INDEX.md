@@ -98,8 +98,9 @@ No promotion records yet.
 | E046 | [Coordinated named mating patterns](experiments/E046-coordinated-mating-patterns/RESULT.md) | complete | 1,351 cumulative tests; 1,218 synthetic cases; 253 verified names; distinct Greco/Blackburne helper flights and exact Kill box geometry; exact repeat/clean, saved-proof and negative replay | E047 investigate Legal's mate with played history and terminal king-location concepts; cutoff cancelled |
 | E047 | [Played history and basic mates](experiments/E047-history-and-basic-mates/RESULT.md) | complete | 1,436 cumulative tests; 1,298 synthetic cases; 256 verified names; actual Legal pin/queen-capture history and exact Corner/Box roles; exact repeat/clean, saved-proof and negative replay | E048 investigate legal attacker/defender counts and pinned-piece exclusions; cutoff cancelled |
 | E048 | [Legal capture counts and x-ray defense](experiments/E048-legal-defense-counts/RESULT.md) | complete | 1,522 cumulative tests; 1,374 synthetic cases; 258 verified names; exact legal capture/recapture sets, pinned exclusions and conditional four-move x-ray witnesses; exact repeat/clean and saved-proof replay | E049 investigate overloading with distinct targets and legal defender-response witnesses; cutoff cancelled |
+| E049 | [Conditional overloaded defenders](experiments/E049-overloaded-defenders/RESULT.md) | complete | 1,595 cumulative tests; 1,442 synthetic cases; 261 verified names; two legal recapture duties and conditional positive material through all immediate replies; exact repeat/clean and saved-proof replay | E050 investigate square clearance and temporary tactical sacrifices with legal vacancy/recapture witnesses; cutoff cancelled |
 
-Allocate the next unused ID in each series: `E049`, `D003`, `F018`, `P001`.
+Allocate the next unused ID in each series: `E050`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.

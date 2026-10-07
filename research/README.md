@@ -48,12 +48,12 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E048 legal defense counts](experiments/E048-legal-defense-counts/RESULT.md)
-adds distinct-piece legal capture counts, branch-specific recaptures, pinned
-defender explanations and conditional x-ray defense. Coverage reaches 258 verified names.
-Its [cumulative tracker](experiments/E048-legal-defense-counts/evidence/concept-status.md)
+[E049 overloaded defenders](experiments/E049-overloaded-defenders/RESULT.md)
+adds conditional overload/deflection comments with two legal defensive duties
+and material gain surviving every immediate reply. Coverage reaches 261 verified names.
+Its [cumulative tracker](experiments/E049-overloaded-defenders/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E048-legal-defense-counts/evidence/demo.html) is runnable
+list; its [demo](experiments/E049-overloaded-defenders/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 
