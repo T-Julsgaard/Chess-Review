@@ -192,3 +192,5 @@ The research goal is paused at the user-authorized usage-monitor stop.
 Do not resume automatically. E018/E019 are verified and complete; next action
 is the next unused experiment's opportunity-aware rating evidence/feasibility protocol after the
 user explicitly resumes. The extension remains at B000.
+
+| E063 | [History-confirmed connected pawn storms](experiments/E063-pawn-storm/RESULT.md) | complete | 3,047 cumulative tests; 2,800 synthetic cases; 288 verified names; legal castle/advance history, distinct connected pawns, every reply including pawn captures/terminal/EP; exact repeat/clean; full proofs3.38MB within5MB | E064 investigate actual newly completed pawn walls with full legal pawn mobility and all-reply next-turn witnesses; continue isolated; cutoff cancelled |
