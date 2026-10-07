@@ -55,3 +55,12 @@ exact revision, normalized inputs, deterministic outputs and metrics. Separate
 saved-JSON replay; all inherited full-result hashes unchanged; full new evidence
 <3 MB. ~120 seconds per full run, three concurrent runs. Synthetic mechanics
 only; real-game precision/human benefit unmeasured.
+
+Exposed smoke: an initially mislabeled pin setup instead directly checked the
+nonmoving king and was refused. Replaced it with a real pinned defender whose
+legal duty fails; that negative receives no overload label. An intended
+acceptance-check negative initially put its own king under a knight attack;
+relocated the second target and attacker so the root is legal while the
+acceptance genuinely checks and prevents the follow-up capture. Added explicit
+legal refutation, terminal same-color bishop draw and zero-net-gain cases.
+Proof gates are unchanged. All smoke failures and corrections precede main.
