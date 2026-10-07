@@ -28,6 +28,7 @@
     "web-ext": "^10.7.0"
   },
   "overrides": {
-    "node-forge": "1.4.0"
+    "node-forge": "1.4.0",
+    "shell-quote": "^1.12.0"
   }
 }

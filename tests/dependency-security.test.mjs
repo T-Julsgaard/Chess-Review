@@ -7,6 +7,28 @@ import forge from 'node-forge';
 import {patchRsaSource} from '../scripts/patch-node-forge.mjs';
 
 const require = createRequire(import.meta.url);
+const fxRequire = createRequire(require.resolve('fx-runner'));
+const {quote, parse} = fxRequire('shell-quote');
+const {SourceMapConsumer} = require('source-map-js');
+
+test('Firefox runner quoting rejects line terminators after a comment token', () => {
+  for (const terminator of ['\n', '\r', '\u2028', '\u2029']) {
+    assert.throws(() => quote(['echo', 'ok', {comment: 'x'}, `a${terminator}id;#`]), TypeError);
+    assert.throws(() => quote(parse('echo http://example.com/#frag').concat(`a${terminator}id;#`)), TypeError);
+  }
+  assert.deepEqual(parse(quote(['firefox', '--profile', 'path with spaces'])),
+    ['firefox', '--profile', 'path with spaces']);
+});
+
+test('indexed source maps reject excessive section offsets and preserve valid maps', () => {
+  const map = {version: 3, sources: ['input.js'], names: [], mappings: 'AAAA'};
+  const indexed = line => ({version: 3, sections: [{offset: {line, column: 0}, map}]});
+  assert.throws(() => new SourceMapConsumer(indexed(1e12)), /Section offset line must not exceed/);
+  const consumer = new SourceMapConsumer(indexed(1));
+  assert.deepEqual(consumer.originalPositionFor({line: 2, column: 1}),
+    {source: 'input.js', line: 1, column: 0, name: null});
+});
+
 const {privateKey: pem} = generateKeyPairSync('rsa', {
   modulusLength: 1024, publicExponent: 3,
   privateKeyEncoding: {type: 'pkcs1', format: 'pem'},

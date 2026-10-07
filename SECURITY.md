@@ -6,12 +6,30 @@ Security fixes target the latest published release and the current `main` branch
 Older releases are not maintained separately; please update before checking
 whether a problem still occurs.
 
-## Development dependency backport
+## Development dependency alerts
+
+All three packages below are transitive development dependencies of `web-ext`
+and are excluded from the browser store ZIPs. Checked on 2026-10-08:
+
+- Dependabot #10, [shell-quote command injection](https://github.com/advisories/GHSA-pqg4-j6r4-53mv):
+  upgraded from 1.10.0 to 1.12.0 (fixed in 1.11.0). An npm override is needed
+  because `fx-runner@1.6.0` pins 1.10.0. Remove the override once its dependency
+  accepts a fixed version.
+- Dependabot #9, [source-map-js denial of service](https://github.com/advisories/GHSA-68fv-2mgg-jv7q):
+  upgraded from 1.2.1 to the patched 1.2.2 within `css-tree`'s existing range.
+- Dependabot #8, `node-forge`: the temporary backport below remains necessary.
+
+`tests/dependency-security.test.mjs` checks rejection of the shell-quote attack
+inputs and excessive indexed source-map offsets, alongside valid input behavior.
+After the updates, `npm audit` reports no critical vulnerabilities and only the
+known node-forge advisory (also counted against `adbkit` and `web-ext`).
+
+### node-forge backport
 
 `web-ext` brings in `node-forge@1.4.0` through its Android debugging dependency,
 `@devicefarmer/adbkit`. This dependency is excluded from both browser store ZIPs.
 For [CVE-2026-85393](https://github.com/advisories/GHSA-86w9-cpqp-85rv), no official
-fixed npm release was available when checked on 2026-10-05.
+fixed npm release was available when checked on 2026-10-08.
 
 `npm ci` and `npm install` apply `scripts/patch-node-forge.mjs` automatically.
 The temporary backport adds the nested DigestAlgorithm element-count check
