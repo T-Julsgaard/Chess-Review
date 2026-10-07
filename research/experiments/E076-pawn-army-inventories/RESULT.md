@@ -58,3 +58,21 @@ Working prototype committed only on existing isolated research branch. Shared
 main stays at completed E075; import only completed research under AGENTS clean
 fast-forward safeguards. No extension, push, numerical work, usage cutoff,
 shutdown, replacement goal/automation or agents. Broader goal remains active.
+
+## Saved-run source checkpoint
+
+The cumulative runner, occurrence-specific status renderer and proof-linked
+preview are now implemented. Development runner passed 4,680 cases in 196.4s;
+all 4,554 ordered E075 full-result fingerprints unchanged. Final focused check
+passed 132 tests in 4.2s; final cumulative 5,038 tests passed in 86.8s; maintained
+source and diff checks passed after all runner/display/status edits. Preview
+semantic audit distinguishes budget exhaustion from terminal roots and refuses
+fabricated played boards for rejected/unavailable/root-terminal inputs.
+Status audit preserves all 1,077 outside-batch occurrence rows byte for byte.
+Candidate tracker has 314 names/363 verified occurrences/81 partial/722 remaining;
+this is not canonical acceptance yet. Only C0189/C0190 advance; six broader
+scopes remain partial. Original list/protocol/amendment and all source inputs are
+hashed by the runner. Independent saved-output verifier prepared.
+
+Next: freeze this tested source, then exact main/repeat/initially clean reused
+checkout runs and independent saved replay. No decisive outputs accepted yet.
