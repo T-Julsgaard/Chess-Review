@@ -48,12 +48,12 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E032 draw-history expansion](experiments/E032-draw-history/RESULT.md)
-adds precise repetition/fifty-move claim comments, actual drawn-position reasons
-and irreversible changes to earlier intermediate moves and mating sacrifices.
-Its [cumulative tracker](experiments/E032-draw-history/evidence/concept-status.md)
+[E033 mobility/trap expansion](experiments/E033-mobility-traps/RESULT.md)
+adds exact mobility reductions, conditional domination and complete all-defense
+piece traps to earlier draw-history, intermediate-move and mating explanations.
+Its [cumulative tracker](experiments/E033-mobility-traps/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E032-draw-history/evidence/demo.html) is runnable
+list; its [demo](experiments/E033-mobility-traps/evidence/demo.html) is runnable
 without the extension. Further coach research is active under the authorized
 five-hour usage cutoff.
 

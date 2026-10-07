@@ -81,7 +81,7 @@ No promotion records yet.
 
 | E032 | [History-grounded draw facts](experiments/E032-draw-history/RESULT.md) | complete | 875 cumulative tests; 804 synthetic cases; 180 verified names; exact repetition, quiet suffix, actual draw and irreversible witnesses; exact repeat/clean replay | E033 broaden verifiable mobility/trap concepts; cutoff active |
 
-| E033 | [Mobility and trapped-piece proofs](experiments/E033-mobility-traps/RESULT.md) | planned | Legal destination reductions; conditional domination versus full all-defense traps | Implement tracked-target capture certificates and controls |
+| E033 | [Mobility and trapped-piece proofs](experiments/E033-mobility-traps/RESULT.md) | complete | 905 cumulative tests; 828 synthetic cases; 190 verified names; conditional domination and full all-defense traps; exact repeat/clean replay | E034 broaden verifiable short concepts; cutoff active |
 
 Allocate the next unused ID in each series: `E034`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
