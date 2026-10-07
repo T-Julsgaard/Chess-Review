@@ -1,0 +1,14 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {openResearchData} from '../../../data-policy.mjs';
+import {explainMove} from './sacrifices.mjs';
+import {replay,sacrificeIds} from './replay.mjs';
+import {explainMove as parent} from '../../E029-forced-mates/code/mates.mjs';
+await openResearchData(['D001'],{purpose:'test'});
+const {fixtures,reflect}=await import('./fixtures.mjs');
+for(const f of fixtures.flatMap(f=>[f,reflect(f)]))test(f.id,()=>{const r=explainMove(f),ids=r.events.map(e=>e.id);for(const id of f.expected)assert.ok(ids.includes(id),`${f.id}: missing ${id}`);for(const id of f.absent)assert.ok(!ids.includes(id),`${f.id}: unexpected ${id}`);for(const e of r.events.filter(e=>sacrificeIds.has(e.id)))replay(f,e);assert.ok(!r.comment||r.comment.split(/\s+/).length<=24);});
+test('disabled, exhausted and no offer preserve parent exactly',()=>{for(const id of ['disabled','exhausted','equal-queen-trade','no-legal-acceptance','queen-no-helper']){const f=fixtures.find(f=>f.id===id);assert.deepEqual(explainMove(f),parent(f));}});
+test('acceptance set, offered value, type and positive branch reject tampering',()=>{const f=fixtures.find(f=>f.id==='queen-offer'),e=explainMove(f).events.find(e=>e.id==='mating-sacrifice');for(const mutate of [p=>p.acceptances=[],p=>p.acceptances.push(p.acceptances[0]),p=>p.acceptances[0].capturer='p',p=>p.offered.type='n',p=>p.offered.square='a1',p=>p.nominalLoss=0,p=>p.proof.tree.branches[0].child.win=false]){const changed=structuredClone(e);mutate(changed.evidence);assert.throws(()=>replay(f,changed));}});
+test('exchange requires actual minor surrendered to rook',()=>{const f=fixtures.find(f=>f.id==='rook-offer'),e=structuredClone(explainMove(f).events.find(e=>e.id==='mating-sacrifice'));e.id='exchange-sacrifice';assert.throws(()=>replay(f,e));});
+test('clearance ray rejects invented king, slider, square and line',()=>{const f=fixtures.find(f=>f.id==='clearance-knight'),e=explainMove(f).events.find(e=>e.id==='clearance-sacrifice');for(const mutate of [p=>p.rays=[],p=>p.rays[0].king='a8',p=>p.rays[0].slider='e1',p=>p.rays[0].vacated='a1',p=>p.rays[0].line.pop()]){const changed=structuredClone(e);mutate(changed.evidence);assert.throws(()=>replay(f,changed));}});
+test('pawn acceptance uses en passant captured square and permits declining replies',()=>{const f=fixtures.find(f=>f.id==='pawn-en-passant-offer'),e=explainMove(f).events.find(e=>e.id==='mating-sacrifice');assert.deepEqual(e.evidence.acceptances,[{move:'e4f3',capturer:'p',square:'f4'}]);assert.ok(e.evidence.proof.tree.branches.length>e.evidence.acceptances.length);assert.ok(e.evidence.proof.tree.branches.some(b=>b.move==='e4e3'));});

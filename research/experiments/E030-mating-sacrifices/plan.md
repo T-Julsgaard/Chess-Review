@@ -49,3 +49,14 @@ definitions only; no source diagrams or game positions imported.
 Coach expansion and live five-hour cutoff remain active. Near 10% remaining,
 checkpoint/commit, disable heartbeat then authorized normal shutdown without /f.
 Numerical research remains paused; no push.
+
+## Exposed development notes
+
+The first rook offer let the king escape through g7; an explicit knight guards
+that flight in the positive. A proposed clearance continuation was blocked by
+its own e6 knight; moving that guard to f7 retains its d8 coverage and clears
+the rook's path. A bishop setup used invalid back-rank pawns; legal minor-piece
+self-blockers replace them. A proposed extra acceptance bishop blocked the
+played queen's path and was rejected; it is not presented as an evaluated
+positive. The en-passant pawn offer supplies accepting and declining branches.
+All these positions are authored development controls, not sampled games.
