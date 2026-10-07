@@ -48,13 +48,13 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E059 pawn restraint](experiments/E059-pawn-restraint/RESULT.md)
-adds short own-pawn blocker comments and independently verified fixation through
-the next own turn after every legal reply. Coverage reaches 284 verified
+[E060 pawn breaks](experiments/E060-pawn-breaks/RESULT.md)
+adds short ram challenge, capture release and escape comments with exhaustive
+legal next-turn witnesses. Coverage reaches 285 verified
 names.
-Its [cumulative tracker](experiments/E059-pawn-restraint/evidence/concept-status.md)
+Its [cumulative tracker](experiments/E060-pawn-breaks/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E059-pawn-restraint/evidence/demo.html) is runnable
+list; its [demo](experiments/E060-pawn-breaks/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 

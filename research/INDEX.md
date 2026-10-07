@@ -115,7 +115,9 @@ No promotion records yet.
 
 | E059 | [Own-pawn blockers and next-turn fixation](experiments/E059-pawn-restraint/RESULT.md) | complete | 2,544 cumulative tests; 2,328 synthetic cases; 284 verified names; complete legal replies and tracked pawn moves, capture and terminal refutations; exact repeat/clean and saved-proof replay | E060 investigate pawn breaks removing an actual ram and all-reply legal next-turn advances; continue isolated; cutoff cancelled |
 
-Allocate the next unused ID in each series: `E060`, `D003`, `F018`, `P001`.
+| E060 | [Pawn breaks with legal next-turn witnesses](experiments/E060-pawn-breaks/RESULT.md) | complete | 2,663 cumulative tests; 2,440 synthetic cases; 285 verified names; complete legal replies and next-turn capture/advance sets, EP release and escape, pins/checks/capture refutations; exact repeat/clean; mechanics pass, planned 3MB storage target fails at 3.39MB | E061 investigate closed files with exact pawn occupancy and legal file access; prospectively budget display/evidence cost; continue isolated; cutoff cancelled |
+
+Allocate the next unused ID in each series: `E061`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
