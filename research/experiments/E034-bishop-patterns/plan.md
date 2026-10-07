@@ -40,3 +40,15 @@ only; no source games, positions or diagrams imported. All fixtures authored.
 Coach expansion/live cutoff active; near 10% remaining checkpoint/commit,
 disable heartbeat then authorized normal shutdown without /f. Numerical
 research paused; no extension integration or push.
+
+## Exposed development notes
+
+The bad-bishop gate additionally requires at most four geometrically controlled
+squares, avoiding the sourced bad-bishop name for a bishop with a wide unobstructed
+other diagonal. Scope includes the first occupied square on each ray, consistent
+with geometric attack, not legal capture. Independent replay derives that set
+from attacker queries. The first unprepared-flank negative started at bishop
+versus bare king and was rejected by terminal guards; an unrelated pawn supplies
+a legal nonterminal control. Specific pawn-color patterns take priority over
+generic open lines, while newly opened lines/prepared fianchettos and tactics
+retain higher priority. No source example is used as a fixture.
