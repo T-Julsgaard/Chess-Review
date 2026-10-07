@@ -12,3 +12,23 @@ These are exposed pilot fixtures, not decisive or independent precision data.
 The first pilot does not cover every registered gate. Separate fixtures for
 all remaining colors, captures, terminal/history behavior, exact army comparison
 and overlapping tactical warnings remain required before source freeze.
+
+Registered-case pilot: four failures. The intended dead-position capture began
+with K versus K+N, already an insufficient-material terminal root, so both colors
+correctly returned unavailable. Retain that observation; add own Nb3 so the
+initial two-minor position is live and Ka1xa2 leaves K+N versus K. The intended
+Qg6g5 stalemate left h7 available; use Qg6f5, controlling h7 while Kf7 controls
+g7/g8. A tamper test selected the first parent event instead of the new movement
+certificate; select the explicit piece-movement ID. All legality/terminal and
+priority gates remain unchanged. These corrections change authored probes,
+not registered claim definitions.
+
+The next selected-comment audit failed: the initial foundation priority 100.8
+overrode check (75) and the parent rook-lift annotation (76) on c3g3. That violated
+the registered low-priority descriptor requirement. Lower all accepted foundation
+priorities to 4.3–4.8, below even the parent's nominal material annotation (5).
+Keep the rejected-input refusal separate: no actual move exists there. Test
+selected output against the parent for check, mate and stalemate overlaps, and
+retain the check event without assuming it outranks another parent insight.
+This is an implementation correction to the original precedence gate, not a
+gate relaxation. Inventory wording also avoids singular/plural count errors.

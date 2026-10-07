@@ -84,7 +84,7 @@ export function replay(input, event) {
       'piece-movement': movement,
       'board-coordinates': `${to.square} is file ${to.file}, rank ${to.rank}; your move starts on ${from.square}.`,
       'legal-input': `Legal move: ${input.move} leaves your king out of check.`,
-      'material-inventory': `Material inventory: you have ${counts.own.p} pawns and ${men('own')} nonking pieces; your opponent has ${counts.enemy.p} pawns and ${men('enemy')} nonking pieces.`,
+      'material-inventory': `Material inventory: pawns/nonking pieces are ${counts.own.p}/${men('own')} for you and ${counts.enemy.p}/${men('enemy')} for your opponent.`,
       'nominal-balance': `Nominal material: you have ${expected.after.own} points versus ${expected.after.enemy}; the difference is ${expected.after.balance}.`,
     });
     if (expected.after.unequalArmies) texts['material-imbalance'] = `Material imbalance: your piece counts differ from your opponent's; nominal totals are ${expected.after.own} versus ${expected.after.enemy}.`;
@@ -93,5 +93,44 @@ export function replay(input, event) {
   assert.ok(Object.hasOwn(texts, event.id));
   assert.equal(event.text, texts[event.id]);
   assert.ok(event.text.split(/\s+/).length <= 24);
-  return {kind: event.id, accepted, legalMoves: legalMoves.length, inventoryEntries: expected.before.pieces.length + (expected.after?.pieces.length || 0)};
+  return {kind: event.id, accepted, legalMoves: legalMoves.length, inventoryEntries: expected.before.pieces.length + (expected.after?.pieces.length || 0),replies:0,leaves:0};
+}
+
+export function replayResult(input, result) {
+  assert.equal(input.foundationTags, true);
+  const chess = new Chess(input.history?.fen || input.fen);
+  for (const value of input.history?.moves || []) {
+    assert.ok(!chess.isGameOver()); chess.move(value);
+  }
+  assert.equal(chess.fen(), new Chess(input.fen).fen());
+  const limit = input.maxFoundationNodes ?? 50000;
+  const ids = ['piece-movement','board-coordinates','legal-input','illegal-input','material-inventory','nominal-balance','material-imbalance'];
+  const events = result.events.filter(event => ids.includes(event.id));
+  if (chess.isGameOver()) {
+    assert.deepEqual(result.foundationAnalysis, {status:'unavailable',limit,nodes:0,reason:'terminal-root'});
+    assert.deepEqual(result.events, []); assert.equal(result.comment, null);
+    return {state:'unavailable',certificates:0};
+  }
+  const accepted = chess.moves({verbose:true}).some(move => key(move) === input.move);
+  let expectedIds = ['illegal-input'], needed = 3;
+  if (accepted) {
+    const actor = chess.turn(); chess.move(input.move);
+    expectedIds = ['piece-movement','board-coordinates','legal-input','material-inventory','nominal-balance'];
+    if (inventory(chess.fen(), actor).unequalArmies) expectedIds.push('material-imbalance');
+    needed = 3 + expectedIds.length;
+  }
+  if (limit < needed) {
+    assert.deepEqual(result.foundationAnalysis, {status:'exhausted',limit,nodes:limit+1,accepted});
+    assert.deepEqual(events, []);
+    if (!accepted) { assert.deepEqual(result.events, []); assert.equal(result.comment, null); }
+    return {state:'exhausted',certificates:0};
+  }
+  assert.deepEqual(result.foundationAnalysis, {status:accepted?'accepted':'rejected',limit,nodes:needed,accepted});
+  assert.deepEqual(events.map(event=>event.id), expectedIds);
+  for (const event of events) replay(input,event);
+  if (!accepted) {
+    assert.equal(result.after, undefined);
+    assert.equal(result.comment, events[0].text);
+  } else assert.equal(result.after, chess.fen());
+  return {state:accepted?'accepted':'rejected',certificates:events.length};
 }

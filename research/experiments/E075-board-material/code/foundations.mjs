@@ -20,9 +20,9 @@ function moveRecord(chess, value) {
     captured: move.captured || null, promotion: move.promotion || null, flags: move.flags,
     san: move.san, before, after: chess.fen()};
 }
-export const priority = event => ({'nominal-balance': 100.8, 'material-imbalance': 100.7,
-  'piece-movement': 100.6, 'material-inventory': 100.5, 'legal-input': 100.4,
-  'board-coordinates': 100.3, 'illegal-input': 1000}[event.id] ?? previousPriority(event));
+export const priority = event => ({'nominal-balance': 4.8, 'material-imbalance': 4.7,
+  'piece-movement': 4.6, 'material-inventory': 4.5, 'legal-input': 4.4,
+  'board-coordinates': 4.3, 'illegal-input': 1000}[event.id] ?? previousPriority(event));
 
 export function explainMove(input) {
   const enabled = input.foundationTags ?? false;
@@ -84,7 +84,7 @@ export function explainAttempt(input) {
       add('board-coordinates', `${to.square} is file ${to.file}, rank ${to.rank}; your move starts on ${from.square}.`);
       add('legal-input', `Legal move: ${input.move} leaves your king out of check.`);
       const nonPawns = side => ['n', 'b', 'r', 'q'].reduce((sum, type) => sum + evidence.after.counts[side][type], 0);
-      add('material-inventory', `Material inventory: you have ${evidence.after.counts.own.p} pawns and ${nonPawns('own')} nonking pieces; your opponent has ${evidence.after.counts.enemy.p} pawns and ${nonPawns('enemy')} nonking pieces.`);
+      add('material-inventory', `Material inventory: pawns/nonking pieces are ${evidence.after.counts.own.p}/${nonPawns('own')} for you and ${evidence.after.counts.enemy.p}/${nonPawns('enemy')} for your opponent.`);
       add('nominal-balance', `Nominal material: you have ${evidence.after.own} points versus ${evidence.after.enemy}; the difference is ${evidence.after.balance}.`);
       if (evidence.after.unequalArmies) add('material-imbalance', `Material imbalance: your piece counts differ from your opponent's; nominal totals are ${evidence.after.own} versus ${evidence.after.enemy}.`);
     }
