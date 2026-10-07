@@ -1,0 +1,1053 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Coach concepts research demo</title><style>
+  :root{font:16px/1.5 system-ui;color:#e5eaf3;background:#101720}body{margin:0 auto;max-width:1120px;padding:36px 24px}h1{font-size:34px;margin:0}h2{font-size:19px;text-transform:capitalize;margin:0}h3{font-size:13px;color:#a2aec2;margin:0 0 8px}p{color:#bbc6d7}header{display:flex;justify-content:space-between;gap:16px}header span{color:#83e1bc}button{font:inherit;background:#253347;color:#e5eaf3;border:1px solid #44546a;border-radius:8px;padding:8px 14px;margin:8px 5px 8px 0;cursor:pointer}button[aria-pressed=true]{background:#1b6d56}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:24px}article{background:#182331;border:1px solid #354255;border-radius:14px;padding:22px}article[hidden]{display:none}.positions{display:grid;grid-template-columns:1fr 1fr;gap:14px}.board{display:grid;grid-template-columns:repeat(8,1fr);aspect-ratio:1;border:1px solid #627087}.square{position:relative;display:flex;align-items:center;justify-content:center;aspect-ratio:1}.light{background:#d1d5ce}.dark{background:#778c80}.marked{background:#c4aa54}.piece{font-size:clamp(17px,2.5vw,30px);line-height:1}.white{color:#fff;text-shadow:0 1px 2px #000,1px 0 #333,-1px 0 #333}.black{color:#17221e}.square small{position:absolute;bottom:0;left:2px;font-size:8px;color:#29372f}.comment{padding:14px;background:#0e1924;border-left:3px solid #6dc9a6;color:#effaf7}summary{cursor:pointer;color:#9fdccb}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.5 monospace;color:#b7c8db}footer{margin-top:30px;color:#98a7ba}@media(max-width:740px){.grid{grid-template-columns:1fr}body{padding:24px 14px}.piece{font-size:clamp(20px,5vw,34px)}}
+  .positions{grid-template-columns:repeat(2,minmax(0,1fr))}@media(max-width:420px){.positions{grid-template-columns:1fr}.piece{font-size:clamp(20px,7vw,34px)}}
+  </style><h1>Coach concepts · bishop patterns and open diagonals</h1><p>Prepared fianchetto, full clear diagonals and pawn-color bishop patterns retain exact geometric witnesses. Budget exhaustion makes no new claims. Authored positions; no extension integration.</p><p>Forks need a capture witness against every legal reply, with positive nominal material after immediate counterreplies. This finite check does not establish the best move or a winning position. Praise and strategic advice await broader validation.</p><p><a href="../../E024-transitions/evidence/demo.html">Earlier endgame and trade examples</a> · <a href="../../E023-broad-tactics/evidence/demo.html">Tactical and structural examples</a> · Inherited cases are checked and fingerprinted in results.json.</p><nav aria-label="Filter examples"><button data-filter="all" aria-pressed="true">All examples</button><button data-filter="comment" aria-pressed="false">Supported comments</button><button data-filter="abstain" aria-pressed="false">Abstentions</button><button data-filter="invalid" aria-pressed="false">Invalid moves</button></nav><main class="grid"><article data-kind="comment"><header><h2>queenside fianchetto</h2><span>Bb2</span></header><p>queenside fianchetto</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/8/1P6/8/2B4K w - - 0 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece white">♗</span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After Bb2</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/8/1P6/1B6/7K b - - 1 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece white">♗</span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">Fianchetto formation: bishop b2 sits behind your advanced b-pawn.</p><details><summary>Inspect concepts and evidence</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v15&quot;,
+  &quot;before&quot;: &quot;8/7k/8/8/8/1P6/8/2B4K w - - 0 1&quot;,
+  &quot;after&quot;: &quot;8/7k/8/8/8/1P6/1B6/7K b - - 1 1&quot;,
+  &quot;move&quot;: &quot;c1b2&quot;,
+  &quot;san&quot;: &quot;Bb2&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;fianchetto&quot;,
+      &quot;evidence&quot;: {
+        &quot;square&quot;: &quot;b2&quot;
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;Fianchetto bishop on b2.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;long-diagonal-bishop&quot;,
+      &quot;evidence&quot;: {
+        &quot;square&quot;: &quot;b2&quot;,
+        &quot;diagonal&quot;: &quot;a1-h8&quot;
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;Long-diagonal bishop: b2 lies on a1-h8.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;prepared-fianchetto&quot;,
+      &quot;text&quot;: &quot;Fianchetto formation: bishop b2 sits behind your advanced b-pawn.&quot;,
+      &quot;evidence&quot;: {
+        &quot;bishop&quot;: &quot;b2&quot;,
+        &quot;home&quot;: &quot;c1&quot;,
+        &quot;pawn&quot;: &quot;b3&quot;,
+        &quot;wing&quot;: &quot;queenside&quot;,
+        &quot;played&quot;: &quot;c1b2&quot;,
+        &quot;afterFen&quot;: &quot;8/7k/8/8/8/1P6/1B6/7K b - - 1 1&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;open-bishop-diagonal&quot;,
+      &quot;text&quot;: &quot;Open long diagonal: bishop b2 controls a1–h8.&quot;,
+      &quot;evidence&quot;: {
+        &quot;bishop&quot;: &quot;b2&quot;,
+        &quot;line&quot;: [
+          &quot;a1&quot;,
+          &quot;b2&quot;,
+          &quot;c3&quot;,
+          &quot;d4&quot;,
+          &quot;e5&quot;,
+          &quot;f6&quot;,
+          &quot;g7&quot;,
+          &quot;h8&quot;
+        ],
+        &quot;controlled&quot;: [
+          &quot;a1&quot;,
+          &quot;c3&quot;,
+          &quot;d4&quot;,
+          &quot;e5&quot;,
+          &quot;f6&quot;,
+          &quot;g7&quot;,
+          &quot;h8&quot;
+        ],
+        &quot;long&quot;: true,
+        &quot;played&quot;: &quot;c1b2&quot;,
+        &quot;afterFen&quot;: &quot;8/7k/8/8/8/1P6/1B6/7K b - - 1 1&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Fianchetto formation: bishop b2 sits behind your advanced b-pawn.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 4,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 5
+    },
+    &quot;history&quot;: null
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;trapAnalysis&quot;: {
+    &quot;maxTrapNodes&quot;: 50000,
+    &quot;nodes&quot;: 0,
+    &quot;status&quot;: &quot;complete&quot;
+  }
+}</pre></details></article><article data-kind="comment"><header><h2>kingside fianchetto</h2><span>Bg2</span></header><p>kingside fianchetto</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/8/6P1/8/5B1K w - - 0 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece white">♙</span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece white">♗</span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After Bg2</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/8/6P1/6B1/7K b - - 1 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece white">♙</span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece white">♗</span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">Fianchetto formation: bishop g2 sits behind your advanced g-pawn.</p><details><summary>Inspect concepts and evidence</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v15&quot;,
+  &quot;before&quot;: &quot;8/7k/8/8/8/6P1/8/5B1K w - - 0 1&quot;,
+  &quot;after&quot;: &quot;8/7k/8/8/8/6P1/6B1/7K b - - 1 1&quot;,
+  &quot;move&quot;: &quot;f1g2&quot;,
+  &quot;san&quot;: &quot;Bg2&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;fianchetto&quot;,
+      &quot;evidence&quot;: {
+        &quot;square&quot;: &quot;g2&quot;
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;Fianchetto bishop on g2.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;long-diagonal-bishop&quot;,
+      &quot;evidence&quot;: {
+        &quot;square&quot;: &quot;g2&quot;,
+        &quot;diagonal&quot;: &quot;h1-a8&quot;
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;Long-diagonal bishop: g2 lies on h1-a8.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;prepared-fianchetto&quot;,
+      &quot;text&quot;: &quot;Fianchetto formation: bishop g2 sits behind your advanced g-pawn.&quot;,
+      &quot;evidence&quot;: {
+        &quot;bishop&quot;: &quot;g2&quot;,
+        &quot;home&quot;: &quot;f1&quot;,
+        &quot;pawn&quot;: &quot;g3&quot;,
+        &quot;wing&quot;: &quot;kingside&quot;,
+        &quot;played&quot;: &quot;f1g2&quot;,
+        &quot;afterFen&quot;: &quot;8/7k/8/8/8/6P1/6B1/7K b - - 1 1&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Fianchetto formation: bishop g2 sits behind your advanced g-pawn.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 6,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 7
+    },
+    &quot;history&quot;: null
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;trapAnalysis&quot;: {
+    &quot;maxTrapNodes&quot;: 50000,
+    &quot;nodes&quot;: 0,
+    &quot;status&quot;: &quot;complete&quot;
+  }
+}</pre></details></article><article data-kind="comment"><header><h2>double fianchetto</h2><span>Bb2</span></header><p>double fianchetto</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/8/1P4P1/6B1/2B4K w - - 0 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece white">♙</span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece white">♗</span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece white">♗</span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After Bb2</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/8/1P4P1/1B4B1/7K b - - 1 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece white">♙</span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece white">♗</span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece white">♗</span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">Double fianchetto: both bishops sit behind advanced flank pawns.</p><details><summary>Inspect concepts and evidence</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v15&quot;,
+  &quot;before&quot;: &quot;8/7k/8/8/8/1P4P1/6B1/2B4K w - - 0 1&quot;,
+  &quot;after&quot;: &quot;8/7k/8/8/8/1P4P1/1B4B1/7K b - - 1 1&quot;,
+  &quot;move&quot;: &quot;c1b2&quot;,
+  &quot;san&quot;: &quot;Bb2&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;fianchetto&quot;,
+      &quot;evidence&quot;: {
+        &quot;square&quot;: &quot;b2&quot;
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;Fianchetto bishop on b2.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;long-diagonal-bishop&quot;,
+      &quot;evidence&quot;: {
+        &quot;square&quot;: &quot;b2&quot;,
+        &quot;diagonal&quot;: &quot;a1-h8&quot;
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;Long-diagonal bishop: b2 lies on a1-h8.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;prepared-fianchetto&quot;,
+      &quot;text&quot;: &quot;Fianchetto formation: bishop b2 sits behind your advanced b-pawn.&quot;,
+      &quot;evidence&quot;: {
+        &quot;bishop&quot;: &quot;b2&quot;,
+        &quot;home&quot;: &quot;c1&quot;,
+        &quot;pawn&quot;: &quot;b3&quot;,
+        &quot;wing&quot;: &quot;queenside&quot;,
+        &quot;played&quot;: &quot;c1b2&quot;,
+        &quot;afterFen&quot;: &quot;8/7k/8/8/8/1P4P1/1B4B1/7K b - - 1 1&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;double-fianchetto&quot;,
+      &quot;text&quot;: &quot;Double fianchetto: both bishops sit behind advanced flank pawns.&quot;,
+      &quot;evidence&quot;: {
+        &quot;bishops&quot;: [
+          {
+            &quot;bishop&quot;: &quot;b2&quot;,
+            &quot;pawn&quot;: &quot;b3&quot;,
+            &quot;wing&quot;: &quot;queenside&quot;
+          },
+          {
+            &quot;bishop&quot;: &quot;g2&quot;,
+            &quot;pawn&quot;: &quot;g3&quot;,
+            &quot;wing&quot;: &quot;kingside&quot;
+          }
+        ],
+        &quot;played&quot;: &quot;c1b2&quot;,
+        &quot;afterFen&quot;: &quot;8/7k/8/8/8/1P4P1/1B4B1/7K b - - 1 1&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;open-bishop-diagonal&quot;,
+      &quot;text&quot;: &quot;Open long diagonal: bishop b2 controls a1–h8.&quot;,
+      &quot;evidence&quot;: {
+        &quot;bishop&quot;: &quot;b2&quot;,
+        &quot;line&quot;: [
+          &quot;a1&quot;,
+          &quot;b2&quot;,
+          &quot;c3&quot;,
+          &quot;d4&quot;,
+          &quot;e5&quot;,
+          &quot;f6&quot;,
+          &quot;g7&quot;,
+          &quot;h8&quot;
+        ],
+        &quot;controlled&quot;: [
+          &quot;a1&quot;,
+          &quot;c3&quot;,
+          &quot;d4&quot;,
+          &quot;e5&quot;,
+          &quot;f6&quot;,
+          &quot;g7&quot;,
+          &quot;h8&quot;
+        ],
+        &quot;long&quot;: true,
+        &quot;played&quot;: &quot;c1b2&quot;,
+        &quot;afterFen&quot;: &quot;8/7k/8/8/8/1P4P1/1B4B1/7K b - - 1 1&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Double fianchetto: both bishops sit behind advanced flank pawns.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 4,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 5
+    },
+    &quot;history&quot;: null
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;trapAnalysis&quot;: {
+    &quot;maxTrapNodes&quot;: 50000,
+    &quot;nodes&quot;: 0,
+    &quot;status&quot;: &quot;complete&quot;
+  }
+}</pre></details></article><article data-kind="comment"><header><h2>pawn opens long diagonal</h2><span>c4</span></header><p>pawn opens long diagonal</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/8/2P5/1B6/7K w - - 0 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece white">♙</span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece white">♗</span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After c4</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/2P5/8/1B6/7K b - - 0 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece white">♙</span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece white">♗</span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">Your move opens bishop b2’s a1–h8 diagonal.</p><details><summary>Inspect concepts and evidence</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v15&quot;,
+  &quot;before&quot;: &quot;8/7k/8/8/8/2P5/1B6/7K w - - 0 1&quot;,
+  &quot;after&quot;: &quot;8/7k/8/8/2P5/8/1B6/7K b - - 0 1&quot;,
+  &quot;move&quot;: &quot;c3c4&quot;,
+  &quot;san&quot;: &quot;c4&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;passed-pawn-advance&quot;,
+      &quot;evidence&quot;: {
+        &quot;from&quot;: &quot;c3&quot;,
+        &quot;to&quot;: &quot;c4&quot;
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;Your passed pawn advances from c3 to c4.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;central-pawn-control&quot;,
+      &quot;evidence&quot;: {
+        &quot;pawn&quot;: &quot;c4&quot;,
+        &quot;squares&quot;: [
+          &quot;d5&quot;
+        ]
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;Center control: your pawn on c4 attacks d5.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;bishop-pawn-color&quot;,
+      &quot;text&quot;: &quot;Your bishop on b2 shares dark squares with 0 of your pawns.&quot;,
+      &quot;evidence&quot;: {
+        &quot;bishop&quot;: &quot;b2&quot;,
+        &quot;colorComplex&quot;: &quot;dark&quot;,
+        &quot;pawns&quot;: [],
+        &quot;previous&quot;: [
+          &quot;c3&quot;
+        ]
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;irreversible-move&quot;,
+      &quot;text&quot;: &quot;Irreversible pawn move: it resets the fifty-move count.&quot;,
+      &quot;evidence&quot;: {
+        &quot;played&quot;: &quot;c3c4&quot;,
+        &quot;piece&quot;: &quot;p&quot;,
+        &quot;captured&quot;: null,
+        &quot;beforeFen&quot;: &quot;8/7k/8/8/8/2P5/1B6/7K w - - 0 1&quot;,
+        &quot;afterFen&quot;: &quot;8/7k/8/8/2P5/8/1B6/7K b - - 0 1&quot;,
+        &quot;reasons&quot;: [
+          &quot;pawn-move&quot;
+        ],
+        &quot;oldRights&quot;: &quot;-&quot;,
+        &quot;newRights&quot;: &quot;-&quot;,
+        &quot;lostRights&quot;: [],
+        &quot;halfmoveCount&quot;: 0
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;open-bishop-diagonal&quot;,
+      &quot;text&quot;: &quot;Open long diagonal: bishop b2 controls a1–h8.&quot;,
+      &quot;evidence&quot;: {
+        &quot;bishop&quot;: &quot;b2&quot;,
+        &quot;line&quot;: [
+          &quot;a1&quot;,
+          &quot;b2&quot;,
+          &quot;c3&quot;,
+          &quot;d4&quot;,
+          &quot;e5&quot;,
+          &quot;f6&quot;,
+          &quot;g7&quot;,
+          &quot;h8&quot;
+        ],
+        &quot;controlled&quot;: [
+          &quot;a1&quot;,
+          &quot;c3&quot;,
+          &quot;d4&quot;,
+          &quot;e5&quot;,
+          &quot;f6&quot;,
+          &quot;g7&quot;,
+          &quot;h8&quot;
+        ],
+        &quot;long&quot;: true,
+        &quot;played&quot;: &quot;c3c4&quot;,
+        &quot;afterFen&quot;: &quot;8/7k/8/8/2P5/8/1B6/7K b - - 0 1&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;opened-bishop-diagonal&quot;,
+      &quot;text&quot;: &quot;Your move opens bishop b2’s a1–h8 diagonal.&quot;,
+      &quot;evidence&quot;: {
+        &quot;bishop&quot;: &quot;b2&quot;,
+        &quot;line&quot;: [
+          &quot;a1&quot;,
+          &quot;b2&quot;,
+          &quot;c3&quot;,
+          &quot;d4&quot;,
+          &quot;e5&quot;,
+          &quot;f6&quot;,
+          &quot;g7&quot;,
+          &quot;h8&quot;
+        ],
+        &quot;controlled&quot;: [
+          &quot;a1&quot;,
+          &quot;c3&quot;,
+          &quot;d4&quot;,
+          &quot;e5&quot;,
+          &quot;f6&quot;,
+          &quot;g7&quot;,
+          &quot;h8&quot;
+        ],
+        &quot;long&quot;: true,
+        &quot;played&quot;: &quot;c3c4&quot;,
+        &quot;beforeFen&quot;: &quot;8/7k/8/8/8/2P5/1B6/7K w - - 0 1&quot;,
+        &quot;blockers&quot;: [
+          &quot;c3&quot;
+        ],
+        &quot;afterFen&quot;: &quot;8/7k/8/8/2P5/8/1B6/7K b - - 0 1&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Your move opens bishop b2’s a1–h8 diagonal.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 4,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 5
+    },
+    &quot;history&quot;: null
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;trapAnalysis&quot;: {
+    &quot;maxTrapNodes&quot;: 50000,
+    &quot;nodes&quot;: 0,
+    &quot;status&quot;: &quot;complete&quot;
+  }
+}</pre></details></article><article data-kind="comment"><header><h2>long diagonal still blocked</h2><span>c4</span></header><p>long diagonal still blocked</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 8/7k/5p2/8/8/2P5/1B6/7K w - - 0 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black">♟</span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece white">♙</span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece white">♗</span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After c4</h3><div class="board" role="img" aria-label="Chess position: 8/7k/5p2/8/2P5/8/1B6/7K b - - 0 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark marked" title="f6"><span class="piece black">♟</span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece white">♙</span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark marked" title="b2"><span class="piece white">♗</span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">Discovered attack: moving from c3 opens b2’s attack on the pawn at f6.</p><details><summary>Inspect concepts and evidence</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v14&quot;,
+  &quot;before&quot;: &quot;8/7k/5p2/8/8/2P5/1B6/7K w - - 0 1&quot;,
+  &quot;after&quot;: &quot;8/7k/5p2/8/2P5/8/1B6/7K b - - 0 1&quot;,
+  &quot;move&quot;: &quot;c3c4&quot;,
+  &quot;san&quot;: &quot;c4&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;passed-pawn-advance&quot;,
+      &quot;evidence&quot;: {
+        &quot;from&quot;: &quot;c3&quot;,
+        &quot;to&quot;: &quot;c4&quot;
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;Your passed pawn advances from c3 to c4.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;central-pawn-control&quot;,
+      &quot;evidence&quot;: {
+        &quot;pawn&quot;: &quot;c4&quot;,
+        &quot;squares&quot;: [
+          &quot;d5&quot;
+        ]
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;Center control: your pawn on c4 attacks d5.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;discovered-attack&quot;,
+      &quot;text&quot;: &quot;Discovered attack: moving from c3 opens b2’s attack on the pawn at f6.&quot;,
+      &quot;evidence&quot;: {
+        &quot;vacated&quot;: &quot;c3&quot;,
+        &quot;attacker&quot;: &quot;b2&quot;,
+        &quot;target&quot;: {
+          &quot;square&quot;: &quot;f6&quot;,
+          &quot;type&quot;: &quot;p&quot;,
+          &quot;color&quot;: &quot;b&quot;
+        },
+        &quot;legalCapture&quot;: &quot;b2f6&quot;,
+        &quot;line&quot;: [
+          &quot;c3&quot;,
+          &quot;d4&quot;,
+          &quot;e5&quot;
+        ],
+        &quot;targets&quot;: [
+          {
+            &quot;square&quot;: &quot;f6&quot;,
+            &quot;type&quot;: &quot;p&quot;,
+            &quot;color&quot;: &quot;b&quot;
+          }
+        ]
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;en-prise&quot;,
+      &quot;text&quot;: &quot;The pawn on f6 is en prise: Bxf6 is a legal capture if available next turn.&quot;,
+      &quot;evidence&quot;: {
+        &quot;target&quot;: {
+          &quot;square&quot;: &quot;f6&quot;,
+          &quot;type&quot;: &quot;p&quot;,
+          &quot;color&quot;: &quot;b&quot;
+        },
+        &quot;capture&quot;: &quot;b2f6&quot;,
+        &quot;hypotheticalTurn&quot;: &quot;w&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;bishop-pawn-color&quot;,
+      &quot;text&quot;: &quot;Your bishop on b2 shares dark squares with 0 of your pawns.&quot;,
+      &quot;evidence&quot;: {
+        &quot;bishop&quot;: &quot;b2&quot;,
+        &quot;colorComplex&quot;: &quot;dark&quot;,
+        &quot;pawns&quot;: [],
+        &quot;previous&quot;: [
+          &quot;c3&quot;
+        ]
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;irreversible-move&quot;,
+      &quot;text&quot;: &quot;Irreversible pawn move: it resets the fifty-move count.&quot;,
+      &quot;evidence&quot;: {
+        &quot;played&quot;: &quot;c3c4&quot;,
+        &quot;piece&quot;: &quot;p&quot;,
+        &quot;captured&quot;: null,
+        &quot;beforeFen&quot;: &quot;8/7k/5p2/8/8/2P5/1B6/7K w - - 0 1&quot;,
+        &quot;afterFen&quot;: &quot;8/7k/5p2/8/2P5/8/1B6/7K b - - 0 1&quot;,
+        &quot;reasons&quot;: [
+          &quot;pawn-move&quot;
+        ],
+        &quot;oldRights&quot;: &quot;-&quot;,
+        &quot;newRights&quot;: &quot;-&quot;,
+        &quot;lostRights&quot;: [],
+        &quot;halfmoveCount&quot;: 0
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Discovered attack: moving from c3 opens b2’s attack on the pawn at f6.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 7,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 8
+    },
+    &quot;history&quot;: null
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;trapAnalysis&quot;: {
+    &quot;maxTrapNodes&quot;: 50000,
+    &quot;nodes&quot;: 0,
+    &quot;status&quot;: &quot;complete&quot;
+  }
+}</pre></details></article><article data-kind="comment"><header><h2>bad bishop fixed pawns</h2><span>Bd2</span></header><p>bad bishop fixed pawns</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/2p1p3/2P1P3/8/2B4K w - - 0 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black">♟</span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black">♟</span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece white">♙</span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece white">♙</span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece white">♗</span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After Bd2</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/2p1p3/2P1P3/3B4/7K b - - 1 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black">♟</span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black">♟</span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece white">♙</span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece white">♙</span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece white">♗</span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">Bad-bishop pattern: fixed own pawns block bishop d2’s scope.</p><details><summary>Inspect concepts and evidence</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v15&quot;,
+  &quot;before&quot;: &quot;8/7k/8/8/2p1p3/2P1P3/8/2B4K w - - 0 1&quot;,
+  &quot;after&quot;: &quot;8/7k/8/8/2p1p3/2P1P3/3B4/7K b - - 1 1&quot;,
+  &quot;move&quot;: &quot;c1d2&quot;,
+  &quot;san&quot;: &quot;Bd2&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;bishop-color-pattern&quot;,
+      &quot;text&quot;: &quot;Bad-bishop pattern: fixed own pawns block bishop d2’s scope.&quot;,
+      &quot;evidence&quot;: {
+        &quot;bishop&quot;: &quot;d2&quot;,
+        &quot;played&quot;: &quot;c1d2&quot;,
+        &quot;pattern&quot;: {
+          &quot;kind&quot;: &quot;bad&quot;,
+          &quot;pawns&quot;: [
+            &quot;c3&quot;,
+            &quot;e3&quot;
+          ],
+          &quot;fixed&quot;: [
+            {
+              &quot;square&quot;: &quot;c3&quot;,
+              &quot;blocker&quot;: &quot;c4&quot;
+            },
+            {
+              &quot;square&quot;: &quot;e3&quot;,
+              &quot;blocker&quot;: &quot;e4&quot;
+            }
+          ],
+          &quot;blockers&quot;: [
+            &quot;c3&quot;,
+            &quot;e3&quot;
+          ],
+          &quot;controlled&quot;: [
+            &quot;c1&quot;,
+            &quot;c3&quot;,
+            &quot;e1&quot;,
+            &quot;e3&quot;
+          ],
+          &quot;colorComplex&quot;: 0
+        },
+        &quot;afterFen&quot;: &quot;8/7k/8/8/2p1p3/2P1P3/3B4/7K b - - 1 1&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Bad-bishop pattern: fixed own pawns block bishop d2’s scope.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 6,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 7
+    },
+    &quot;history&quot;: null
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;trapAnalysis&quot;: {
+    &quot;maxTrapNodes&quot;: 50000,
+    &quot;nodes&quot;: 0,
+    &quot;status&quot;: &quot;complete&quot;
+  }
+}</pre></details></article><article data-kind="comment"><header><h2>good bishop opposite pawns</h2><span>Be2</span></header><p>good bishop opposite pawns</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/8/2P1P3/8/5B1K w - - 0 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece white">♙</span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece white">♙</span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece white">♗</span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After Be2</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/8/2P1P3/4B3/7K b - - 1 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece white">♙</span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece white">♙</span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece white">♗</span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">Good-bishop pattern: your own pawns occupy the opposite color to bishop e2.</p><details><summary>Inspect concepts and evidence</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v15&quot;,
+  &quot;before&quot;: &quot;8/7k/8/8/8/2P1P3/8/5B1K w - - 0 1&quot;,
+  &quot;after&quot;: &quot;8/7k/8/8/8/2P1P3/4B3/7K b - - 1 1&quot;,
+  &quot;move&quot;: &quot;f1e2&quot;,
+  &quot;san&quot;: &quot;Be2&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;open-bishop-diagonal&quot;,
+      &quot;text&quot;: &quot;Open diagonal: bishop e2 controls d1–h5.&quot;,
+      &quot;evidence&quot;: {
+        &quot;bishop&quot;: &quot;e2&quot;,
+        &quot;line&quot;: [
+          &quot;d1&quot;,
+          &quot;e2&quot;,
+          &quot;f3&quot;,
+          &quot;g4&quot;,
+          &quot;h5&quot;
+        ],
+        &quot;controlled&quot;: [
+          &quot;d1&quot;,
+          &quot;f3&quot;,
+          &quot;g4&quot;,
+          &quot;h5&quot;
+        ],
+        &quot;long&quot;: false,
+        &quot;played&quot;: &quot;f1e2&quot;,
+        &quot;afterFen&quot;: &quot;8/7k/8/8/8/2P1P3/4B3/7K b - - 1 1&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;open-bishop-diagonal&quot;,
+      &quot;text&quot;: &quot;Open diagonal: bishop e2 controls a6–f1.&quot;,
+      &quot;evidence&quot;: {
+        &quot;bishop&quot;: &quot;e2&quot;,
+        &quot;line&quot;: [
+          &quot;a6&quot;,
+          &quot;b5&quot;,
+          &quot;c4&quot;,
+          &quot;d3&quot;,
+          &quot;e2&quot;,
+          &quot;f1&quot;
+        ],
+        &quot;controlled&quot;: [
+          &quot;a6&quot;,
+          &quot;b5&quot;,
+          &quot;c4&quot;,
+          &quot;d3&quot;,
+          &quot;f1&quot;
+        ],
+        &quot;long&quot;: false,
+        &quot;played&quot;: &quot;f1e2&quot;,
+        &quot;afterFen&quot;: &quot;8/7k/8/8/8/2P1P3/4B3/7K b - - 1 1&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;bishop-color-pattern&quot;,
+      &quot;text&quot;: &quot;Good-bishop pattern: your own pawns occupy the opposite color to bishop e2.&quot;,
+      &quot;evidence&quot;: {
+        &quot;bishop&quot;: &quot;e2&quot;,
+        &quot;played&quot;: &quot;f1e2&quot;,
+        &quot;pattern&quot;: {
+          &quot;kind&quot;: &quot;good&quot;,
+          &quot;pawns&quot;: [
+            &quot;c3&quot;,
+            &quot;e3&quot;
+          ],
+          &quot;colorComplex&quot;: 1
+        },
+        &quot;afterFen&quot;: &quot;8/7k/8/8/8/2P1P3/4B3/7K b - - 1 1&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Good-bishop pattern: your own pawns occupy the opposite color to bishop e2.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 6,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 7
+    },
+    &quot;history&quot;: null
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;trapAnalysis&quot;: {
+    &quot;maxTrapNodes&quot;: 50000,
+    &quot;nodes&quot;: 0,
+    &quot;status&quot;: &quot;complete&quot;
+  }
+}</pre></details></article><article data-kind="comment"><header><h2>mixed pawn colors</h2><span>Be2</span></header><p>mixed pawn colors</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/4P3/2P5/8/5B1K w - - 0 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece white">♙</span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece white">♙</span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece white">♗</span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After Be2</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/4P3/2P5/4B3/7K b - - 1 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece white">♙</span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece white">♙</span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece white">♗</span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">Open diagonal: bishop e2 controls d1–h5.</p><details><summary>Inspect concepts and evidence</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v15&quot;,
+  &quot;before&quot;: &quot;8/7k/8/8/4P3/2P5/8/5B1K w - - 0 1&quot;,
+  &quot;after&quot;: &quot;8/7k/8/8/4P3/2P5/4B3/7K b - - 1 1&quot;,
+  &quot;move&quot;: &quot;f1e2&quot;,
+  &quot;san&quot;: &quot;Be2&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;open-bishop-diagonal&quot;,
+      &quot;text&quot;: &quot;Open diagonal: bishop e2 controls d1–h5.&quot;,
+      &quot;evidence&quot;: {
+        &quot;bishop&quot;: &quot;e2&quot;,
+        &quot;line&quot;: [
+          &quot;d1&quot;,
+          &quot;e2&quot;,
+          &quot;f3&quot;,
+          &quot;g4&quot;,
+          &quot;h5&quot;
+        ],
+        &quot;controlled&quot;: [
+          &quot;d1&quot;,
+          &quot;f3&quot;,
+          &quot;g4&quot;,
+          &quot;h5&quot;
+        ],
+        &quot;long&quot;: false,
+        &quot;played&quot;: &quot;f1e2&quot;,
+        &quot;afterFen&quot;: &quot;8/7k/8/8/4P3/2P5/4B3/7K b - - 1 1&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    },
+    {
+      &quot;id&quot;: &quot;open-bishop-diagonal&quot;,
+      &quot;text&quot;: &quot;Open diagonal: bishop e2 controls a6–f1.&quot;,
+      &quot;evidence&quot;: {
+        &quot;bishop&quot;: &quot;e2&quot;,
+        &quot;line&quot;: [
+          &quot;a6&quot;,
+          &quot;b5&quot;,
+          &quot;c4&quot;,
+          &quot;d3&quot;,
+          &quot;e2&quot;,
+          &quot;f1&quot;
+        ],
+        &quot;controlled&quot;: [
+          &quot;a6&quot;,
+          &quot;b5&quot;,
+          &quot;c4&quot;,
+          &quot;d3&quot;,
+          &quot;f1&quot;
+        ],
+        &quot;long&quot;: false,
+        &quot;played&quot;: &quot;f1e2&quot;,
+        &quot;afterFen&quot;: &quot;8/7k/8/8/4P3/2P5/4B3/7K b - - 1 1&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Open diagonal: bishop e2 controls d1–h5.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 6,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 7
+    },
+    &quot;history&quot;: null
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;trapAnalysis&quot;: {
+    &quot;maxTrapNodes&quot;: 50000,
+    &quot;nodes&quot;: 0,
+    &quot;status&quot;: &quot;complete&quot;
+  }
+}</pre></details></article><article data-kind="abstain"><header><h2>mobile same color pawns</h2><span>Bd2</span></header><p>mobile same color pawns</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/8/2P1P3/8/2B4K w - - 0 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece white">♙</span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece white">♙</span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece white">♗</span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After Bd2</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/8/2P1P3/3B4/7K b - - 1 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece white">♙</span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece white">♙</span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece white">♗</span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">No supported concept comment for this move.</p><details><summary>Inspect concepts and evidence</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v14&quot;,
+  &quot;before&quot;: &quot;8/7k/8/8/8/2P1P3/8/2B4K w - - 0 1&quot;,
+  &quot;after&quot;: &quot;8/7k/8/8/8/2P1P3/3B4/7K b - - 1 1&quot;,
+  &quot;move&quot;: &quot;c1d2&quot;,
+  &quot;san&quot;: &quot;Bd2&quot;,
+  &quot;events&quot;: [],
+  &quot;comment&quot;: null,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 6,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 7
+    },
+    &quot;history&quot;: null
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;trapAnalysis&quot;: {
+    &quot;maxTrapNodes&quot;: 50000,
+    &quot;nodes&quot;: 0,
+    &quot;status&quot;: &quot;complete&quot;
+  }
+}</pre></details></article><article data-kind="comment"><header><h2>unprepared flank</h2><span>Bb2</span></header><p>unprepared flank</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/8/8/5P2/2B4K w - - 0 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece white">♙</span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece white">♗</span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After Bb2</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/8/8/1B3P2/7K b - - 1 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece black"></span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece white">♗</span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece white">♙</span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">Open long diagonal: bishop b2 controls a1–h8.</p><details><summary>Inspect concepts and evidence</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v15&quot;,
+  &quot;before&quot;: &quot;8/7k/8/8/8/8/5P2/2B4K w - - 0 1&quot;,
+  &quot;after&quot;: &quot;8/7k/8/8/8/8/1B3P2/7K b - - 1 1&quot;,
+  &quot;move&quot;: &quot;c1b2&quot;,
+  &quot;san&quot;: &quot;Bb2&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;fianchetto&quot;,
+      &quot;evidence&quot;: {
+        &quot;square&quot;: &quot;b2&quot;
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;Fianchetto bishop on b2.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;long-diagonal-bishop&quot;,
+      &quot;evidence&quot;: {
+        &quot;square&quot;: &quot;b2&quot;,
+        &quot;diagonal&quot;: &quot;a1-h8&quot;
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;Long-diagonal bishop: b2 lies on a1-h8.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;open-bishop-diagonal&quot;,
+      &quot;text&quot;: &quot;Open long diagonal: bishop b2 controls a1–h8.&quot;,
+      &quot;evidence&quot;: {
+        &quot;bishop&quot;: &quot;b2&quot;,
+        &quot;line&quot;: [
+          &quot;a1&quot;,
+          &quot;b2&quot;,
+          &quot;c3&quot;,
+          &quot;d4&quot;,
+          &quot;e5&quot;,
+          &quot;f6&quot;,
+          &quot;g7&quot;,
+          &quot;h8&quot;
+        ],
+        &quot;controlled&quot;: [
+          &quot;a1&quot;,
+          &quot;c3&quot;,
+          &quot;d4&quot;,
+          &quot;e5&quot;,
+          &quot;f6&quot;,
+          &quot;g7&quot;,
+          &quot;h8&quot;
+        ],
+        &quot;long&quot;: true,
+        &quot;played&quot;: &quot;c1b2&quot;,
+        &quot;afterFen&quot;: &quot;8/7k/8/8/8/8/1B3P2/7K b - - 1 1&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Open long diagonal: bishop b2 controls a1–h8.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 4,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 5
+    },
+    &quot;history&quot;: null
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;trapAnalysis&quot;: {
+    &quot;maxTrapNodes&quot;: 50000,
+    &quot;nodes&quot;: 0,
+    &quot;status&quot;: &quot;complete&quot;
+  }
+}</pre></details></article><article data-kind="comment"><header><h2>flank from another square</h2><span>Bb2</span></header><p>flank from another square</p><div class="positions"><div><h3>Before</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/3B4/1P6/8/7K w - - 0 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece white">♗</span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece black"></span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div><div><h3>After Bb2</h3><div class="board" role="img" aria-label="Chess position: 8/7k/8/8/8/1P6/1B6/7K b - - 1 1"><div class="square light " title="a8"><span class="piece black"></span><small>a8</small></div><div class="square dark " title="b8"><span class="piece black"></span><small>b8</small></div><div class="square light " title="c8"><span class="piece black"></span><small>c8</small></div><div class="square dark " title="d8"><span class="piece black"></span><small>d8</small></div><div class="square light " title="e8"><span class="piece black"></span><small>e8</small></div><div class="square dark " title="f8"><span class="piece black"></span><small>f8</small></div><div class="square light " title="g8"><span class="piece black"></span><small>g8</small></div><div class="square dark " title="h8"><span class="piece black"></span><small>h8</small></div><div class="square dark " title="a7"><span class="piece black"></span><small>a7</small></div><div class="square light " title="b7"><span class="piece black"></span><small>b7</small></div><div class="square dark " title="c7"><span class="piece black"></span><small>c7</small></div><div class="square light " title="d7"><span class="piece black"></span><small>d7</small></div><div class="square dark " title="e7"><span class="piece black"></span><small>e7</small></div><div class="square light " title="f7"><span class="piece black"></span><small>f7</small></div><div class="square dark " title="g7"><span class="piece black"></span><small>g7</small></div><div class="square light " title="h7"><span class="piece black">♚</span><small>h7</small></div><div class="square light " title="a6"><span class="piece black"></span><small>a6</small></div><div class="square dark " title="b6"><span class="piece black"></span><small>b6</small></div><div class="square light " title="c6"><span class="piece black"></span><small>c6</small></div><div class="square dark " title="d6"><span class="piece black"></span><small>d6</small></div><div class="square light " title="e6"><span class="piece black"></span><small>e6</small></div><div class="square dark " title="f6"><span class="piece black"></span><small>f6</small></div><div class="square light " title="g6"><span class="piece black"></span><small>g6</small></div><div class="square dark " title="h6"><span class="piece black"></span><small>h6</small></div><div class="square dark " title="a5"><span class="piece black"></span><small>a5</small></div><div class="square light " title="b5"><span class="piece black"></span><small>b5</small></div><div class="square dark " title="c5"><span class="piece black"></span><small>c5</small></div><div class="square light " title="d5"><span class="piece black"></span><small>d5</small></div><div class="square dark " title="e5"><span class="piece black"></span><small>e5</small></div><div class="square light " title="f5"><span class="piece black"></span><small>f5</small></div><div class="square dark " title="g5"><span class="piece black"></span><small>g5</small></div><div class="square light " title="h5"><span class="piece black"></span><small>h5</small></div><div class="square light " title="a4"><span class="piece black"></span><small>a4</small></div><div class="square dark " title="b4"><span class="piece black"></span><small>b4</small></div><div class="square light " title="c4"><span class="piece black"></span><small>c4</small></div><div class="square dark " title="d4"><span class="piece black"></span><small>d4</small></div><div class="square light " title="e4"><span class="piece black"></span><small>e4</small></div><div class="square dark " title="f4"><span class="piece black"></span><small>f4</small></div><div class="square light " title="g4"><span class="piece black"></span><small>g4</small></div><div class="square dark " title="h4"><span class="piece black"></span><small>h4</small></div><div class="square dark " title="a3"><span class="piece black"></span><small>a3</small></div><div class="square light " title="b3"><span class="piece white">♙</span><small>b3</small></div><div class="square dark " title="c3"><span class="piece black"></span><small>c3</small></div><div class="square light " title="d3"><span class="piece black"></span><small>d3</small></div><div class="square dark " title="e3"><span class="piece black"></span><small>e3</small></div><div class="square light " title="f3"><span class="piece black"></span><small>f3</small></div><div class="square dark " title="g3"><span class="piece black"></span><small>g3</small></div><div class="square light " title="h3"><span class="piece black"></span><small>h3</small></div><div class="square light " title="a2"><span class="piece black"></span><small>a2</small></div><div class="square dark " title="b2"><span class="piece white">♗</span><small>b2</small></div><div class="square light " title="c2"><span class="piece black"></span><small>c2</small></div><div class="square dark " title="d2"><span class="piece black"></span><small>d2</small></div><div class="square light " title="e2"><span class="piece black"></span><small>e2</small></div><div class="square dark " title="f2"><span class="piece black"></span><small>f2</small></div><div class="square light " title="g2"><span class="piece black"></span><small>g2</small></div><div class="square dark " title="h2"><span class="piece black"></span><small>h2</small></div><div class="square dark " title="a1"><span class="piece black"></span><small>a1</small></div><div class="square light " title="b1"><span class="piece black"></span><small>b1</small></div><div class="square dark " title="c1"><span class="piece black"></span><small>c1</small></div><div class="square light " title="d1"><span class="piece black"></span><small>d1</small></div><div class="square dark " title="e1"><span class="piece black"></span><small>e1</small></div><div class="square light " title="f1"><span class="piece black"></span><small>f1</small></div><div class="square dark " title="g1"><span class="piece black"></span><small>g1</small></div><div class="square light " title="h1"><span class="piece white">♔</span><small>h1</small></div></div></div></div><p class="comment">Open long diagonal: bishop b2 controls a1–h8.</p><details><summary>Inspect concepts and evidence</summary><pre>{
+  &quot;schema&quot;: &quot;coach-concepts-v15&quot;,
+  &quot;before&quot;: &quot;8/7k/8/8/3B4/1P6/8/7K w - - 0 1&quot;,
+  &quot;after&quot;: &quot;8/7k/8/8/8/1P6/1B6/7K b - - 1 1&quot;,
+  &quot;move&quot;: &quot;d4b2&quot;,
+  &quot;san&quot;: &quot;Bb2&quot;,
+  &quot;events&quot;: [
+    {
+      &quot;id&quot;: &quot;fianchetto&quot;,
+      &quot;evidence&quot;: {
+        &quot;square&quot;: &quot;b2&quot;
+      },
+      &quot;qualityClaim&quot;: false,
+      &quot;text&quot;: &quot;Fianchetto bishop on b2.&quot;
+    },
+    {
+      &quot;id&quot;: &quot;open-bishop-diagonal&quot;,
+      &quot;text&quot;: &quot;Open long diagonal: bishop b2 controls a1–h8.&quot;,
+      &quot;evidence&quot;: {
+        &quot;bishop&quot;: &quot;b2&quot;,
+        &quot;line&quot;: [
+          &quot;a1&quot;,
+          &quot;b2&quot;,
+          &quot;c3&quot;,
+          &quot;d4&quot;,
+          &quot;e5&quot;,
+          &quot;f6&quot;,
+          &quot;g7&quot;,
+          &quot;h8&quot;
+        ],
+        &quot;controlled&quot;: [
+          &quot;a1&quot;,
+          &quot;c3&quot;,
+          &quot;d4&quot;,
+          &quot;e5&quot;,
+          &quot;f6&quot;,
+          &quot;g7&quot;,
+          &quot;h8&quot;
+        ],
+        &quot;long&quot;: true,
+        &quot;played&quot;: &quot;d4b2&quot;,
+        &quot;afterFen&quot;: &quot;8/7k/8/8/8/1P6/1B6/7K b - - 1 1&quot;
+      },
+      &quot;qualityClaim&quot;: false
+    }
+  ],
+  &quot;comment&quot;: &quot;Open long diagonal: bishop b2 controls a1–h8.&quot;,
+  &quot;diagnostics&quot;: {
+    &quot;tactics&quot;: &quot;complete&quot;,
+    &quot;replyScan&quot;: &quot;complete&quot;,
+    &quot;nodes&quot;: 4,
+    &quot;maxNodes&quot;: 50000,
+    &quot;moveTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 0
+    },
+    &quot;broadTactics&quot;: {
+      &quot;status&quot;: &quot;complete&quot;,
+      &quot;nodes&quot;: 5
+    },
+    &quot;history&quot;: null
+  },
+  &quot;proofBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;defenseBudget&quot;: {
+    &quot;nodes&quot;: 0,
+    &quot;limit&quot;: 50000,
+    &quot;exhausted&quot;: false
+  },
+  &quot;trapAnalysis&quot;: {
+    &quot;maxTrapNodes&quot;: 50000,
+    &quot;nodes&quot;: 0,
+    &quot;status&quot;: &quot;complete&quot;
+  }
+}</pre></details></article></main><footer>Color-reflected versions are also verified in results.json. Expand evidence to inspect every defender reply and capture witness.</footer><script>document.querySelectorAll('button[data-filter]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('button[data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));document.querySelectorAll('article').forEach(card=>card.hidden=button.dataset.filter!=='all'&&card.dataset.kind!==button.dataset.filter)}));</script></html>
