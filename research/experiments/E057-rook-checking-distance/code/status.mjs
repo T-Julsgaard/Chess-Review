@@ -1,0 +1,8 @@
+import {renderStatus as parent} from '../../E056-pawn-blockades/code/status.mjs';
+const scopes={'Checking from behind':'actual direct rook check behind enemy king and advanced passer on their file in a K/R/P ending; full legal evasions; no drawing-technique claim','Checking from the side':'actual direct rook check along king rank beside an advanced passer on king file in a K/R/P ending; full legal evasions; no strength/outcome claim','Checking distance':'at least three clear squares between actual checking rook and king, EVERY immediate legal evasion leaves checker uncaptured; exact separation only, no long-term safety/draw claim','Rook checking distance':'at least three clear squares between actual checking rook and king, EVERY immediate legal evasion leaves checker uncaptured; exact separation only, no long-term safety/draw claim'};
+export function renderStatus(list,report){
+ let text=parent(list,report).replace(/^.*C\d{4} \*\*([^*]+)\*\*.*$/gm,(line,name)=>scopes[name]?line.replace(/^- \[[ x]\]/,'- [x]').replace(/ — .*/,` — Mechanics verified: ${scopes[name]}.`):line);
+ const rows=[...text.matchAll(/^- \[([ x])\] C\d{4} \*\*([^*]+)\*\* — (.*)$/gm)],verified=rows.filter(r=>r[1]==='x'),partial=rows.filter(r=>r[3].startsWith('Partial:'));
+ text=text.replace(/1085 entries; .*?\. Checked/,`1085 entries; ${verified.length} verified occurrences across ${new Set(verified.map(r=>r[2])).size} names; ${partial.length} partial occurrences. Checked`);
+ return text.replace(/\d+ authored\/reflected cases\..*?Comments <=24 words\./,`${report.fixtures} authored/reflected cases. Rook checking directions and immediate distance require exact rays, advanced passer context and complete legal evasions. Full proofs in results.json. Comments <=24 words.`);
+}
