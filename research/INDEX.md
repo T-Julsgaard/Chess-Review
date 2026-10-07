@@ -113,7 +113,9 @@ No promotion records yet.
 
 | E058 | [Wrong bishop and rook-pawn promotion corner](experiments/E058-wrong-bishop-rook-pawn/RESULT.md) | complete | 2,446 cumulative tests; 2,236 synthetic cases; 282 verified names; exact pure material/colors, complete replies and legal corner access/occupation; replacement main/repeat in isolated clone match completed clean run | E059 investigate self-blocking pawns and blocked pawn positions; continue isolated while shared checkout is on another branch; cutoff cancelled |
 
-Allocate the next unused ID in each series: `E059`, `D003`, `F018`, `P001`.
+| E059 | [Own-pawn blockers and next-turn fixation](experiments/E059-pawn-restraint/RESULT.md) | complete | 2,544 cumulative tests; 2,328 synthetic cases; 284 verified names; complete legal replies and tracked pawn moves, capture and terminal refutations; exact repeat/clean and saved-proof replay | E060 investigate pawn breaks removing an actual ram and all-reply legal next-turn advances; continue isolated; cutoff cancelled |
+
+Allocate the next unused ID in each series: `E060`, `D003`, `F018`, `P001`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.
