@@ -70,13 +70,13 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E067 waiting tempi](experiments/E067-waiting-tempi/RESULT.md)
-adds short waiting and used-reserve comments with actual/pass/removed-pawn
-all-defense mating proofs and no prior immediate mate. Coverage reaches 293 verified
+[E068 checking rook swings](experiments/E068-rook-swings/RESULT.md)
+adds short checking rook-swing comments with recorded legal lift history,
+direct check rays and every legal enemy reply. Coverage reaches 294 verified
 names.
-Its [cumulative tracker](experiments/E067-waiting-tempi/evidence/concept-status.md)
+Its [cumulative tracker](experiments/E068-rook-swings/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E067-waiting-tempi/evidence/demo.html) is runnable
+list; its [demo](experiments/E068-rook-swings/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 
