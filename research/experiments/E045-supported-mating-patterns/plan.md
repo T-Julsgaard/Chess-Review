@@ -39,3 +39,13 @@ inherited full-result hashes. Retain guarded D001 receipt. Expected ~80 seconds
 per ~1,120-case run, three overlapping runs; compact full evidence <3 MB.
 Success establishes authored mechanics only, not real-game precision, human
 benefit or readiness for extension integration. Local commits only.
+
+Exposed smoke note: initial corner queen starts already checked the non-moving
+king and were refused by legal-position validation. Move the authored queen
+start to b7. The initial Hook blocker h7 pawn could legally capture the rook
+on g6, refuting mate; replace it with an authored h7 knight that blocks h7
+without that capture. The initial bishop-helper negative put a bishop on the
+queen's route; use g6 bishop support instead. The initial central queen pattern
+left f7/h7 open and was not mate; explicit enemy pawn blockers make the intended
+central-mate negative true. All 60 exposed tests now pass; none of the detector
+gates were weakened. These corrections are fixture design, not confirmation.
