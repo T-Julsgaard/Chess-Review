@@ -1,28 +1,50 @@
-# E037 resume state: promotion routes
+# E037 result: verified promotion routes and rule of the square
 
-Planned only. No candidate implementation, evaluated fixtures, retained run,
-new verified concepts or learning-benefit claim exists for E037.
+Research-only checkpoint. The user revoked the usage cutoff and PC shutdown
+instruction on 2026-10-07; its automation was deleted. Continue concept work
+without that cutoff. No extension integration or push.
 
-E036 is the last completed source/evidence checkpoint: 211 verified concept
-names, 989 passing cumulative tests, 904 synthetic cases and matching main,
-repeat and clean-checkout evidence. Its result and tracker remain authoritative.
-The original supplied list remains unchanged in E020/CONCEPTS.md.
+The opt-in promotionDepth profile searches 1–6 remaining own pawn pushes,
+preserving every legal defender response and supplied history. Every successful
+route ends in queen promotion that either checkmates or survives all immediate
+responses with positive nominal material gain over the position after the
+actual move. It does not promise a whole-game win. Profile zero preserves the
+inherited behavior. A shared 50,000-node ceiling drops all new route claims on
+exhaustion, including an earlier complete candidate.
 
-Next concrete action: verify primary definitions and author route/refutation
-fixtures for the registered [protocol](plan.md), then implement independent
-all-response promotion search and certificate replay. Preserve short comments,
-research-only scope, local commits and all existing dataset/history guards.
-Do not resume the separately paused numerical-rating work or push changes.
+The rule-of-square label requires bare K+P versus K, a conservative
+promotion-square king-distance/tempo gate and an independently verified route.
+It does not classify all inside-square cases or use distance alone. Starting
+rank double-step ambiguity is excluded from this label; legal route search
+still supports the first double push. King-supported promotion can be proved
+without receiving the square label. Promotion races remain deferred.
 
-Usage cutoff reached on 2026-10-07 at 01:50 UTC: the actual Codex primary
-300-minute window reports 90% used / 10% remaining (reset timestamp 1791346534).
-Research stopped before E037 implementation. All E036 source/evidence is
-committed; E037 protocol/resume state is committed as `71a732f`.
+Validation: 31 new tests and 1,020 cumulative tests pass, plus source verification
+and diff checks. Tests include both colors, legal double push, blocked/caught
+routes, promoted-queen capture, stalemate, short/zero/exhausted budgets, later
+candidate exhaustion, history matching/restoration and tampered proof trees.
+Main evaluates 928 authored/reflected cases: 896 with facts, 26 abstentions,
+six invalid moves refused. Comments remain at most 19 words. Independent replay
+checks 1,455 event certificates, 72 mate queries, 4,119 reply/history edges and
+8,222 response/terminal/fact leaves. Coverage is 212 verified names across 239
+original occurrences, 89 partial and 757 unimplemented occurrences.
 
-The usage heartbeat `monitor-five-hour-usage-and-shut-down-at-8` was updated
-to PAUSED and its stored status verified before shutdown. After this cutoff
-record is committed, issue the explicitly authorized normal Windows command
-`shutdown.exe /s /t 0` without `/f`. This saved record does not itself establish
-that shutdown completed. Re-read actual account usage before resuming later;
-do not infer a fresh allowance from reboot or elapsed time. Monitoring must
-be deliberately re-enabled for further unattended research.
+[Demo](evidence/demo.html), [tracker](evidence/concept-status.md) and
+[results](evidence/results.json) retain exact route trees and safety leaves.
+[Main](evidence/run.json), [repeat](evidence/repeat-run.json) and
+[initially clean local checkout](evidence/clean-run.json) match every normalized
+input and deterministic output hash at source revision `c8f1866`. Main/clean
+took about 50/52 seconds; retained evidence is under 3 MB. Metadata includes
+exact source revision, command, config, environment and guarded D001 receipt.
+No registered game is analyzed. Pilot: research/runs/E037/development.
+
+Plan addendum documents the explicit profile and conservative square gate
+before implementation; exposed controls added stalemate, later-candidate
+exhaustion and supplied-history restoration. These are synthetic mechanics,
+not real-game explanation precision or measured human improvement. A full
+promotion-race comparison still needs both sides' legal routes and checking
+promotions. No race coverage is claimed.
+
+Next: E038 broaden further independently verifiable original-list concepts,
+including promotion-race feasibility, underpromotion tactics or positional
+transitions with exact witnesses. Keep research-only scope and local commits.

@@ -48,14 +48,14 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E036 passed-pawn expansion](experiments/E036-passer-context/RESULT.md)
-adds outside passer separation, new king escorts and all-reply safe promotion
-certificates to earlier development, bishop, mobility and tactical explanations.
-Its [cumulative tracker](experiments/E036-passer-context/evidence/concept-status.md)
+[E037 promotion-route expansion](experiments/E037-promotion-routes/RESULT.md)
+adds multi-push all-response promotion routes and conservative rule-of-square
+comments to earlier passer, development, bishop and tactical explanations.
+Its [cumulative tracker](experiments/E037-promotion-routes/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E036-passer-context/evidence/demo.html) is runnable
-without the extension. Further coach research is active under the authorized
-five-hour usage cutoff.
+list; its [demo](experiments/E037-promotion-routes/evidence/demo.html) is runnable
+without the extension. Further coach research continues. The user cancelled the
+usage cutoff and PC shutdown; the shutdown automation was deleted.
 
 A new 900-game cohort has fully traceable raw
 frames and exact clean reconstruction. A CP curve improves fresh development
