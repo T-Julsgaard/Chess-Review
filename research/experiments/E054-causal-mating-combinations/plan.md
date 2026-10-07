@@ -66,3 +66,9 @@ f2f4; every own legal reply is nonmating, so the foundation and names fail.
 These are explicit positive/negative mechanics, not weakened gates or copied
 external examples. Same-row references keep full parent certificates readable
 once in results.json, with compact demo summaries inherited from E053.
+
+Before source commit, add capturing offers: the authored exchange-offer seed
+costs rook5 minus captured bishop3, and a black g7 pawn added to the bishop
+attraction seed gives bishop3 minus pawn1. Both require the unchanged all-defense
+mate/causal-role gates. The 72-case pilot predates these eight reflected cases;
+final targeted/cumulative and decisive evaluations use 80 new cases.
