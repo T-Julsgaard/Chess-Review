@@ -53,3 +53,26 @@ proof. Exact source move ordering and work units remain fixed; inventories,
 cover and rays use separately derived enumerations. All 22 focused tests pass
 in 6.9s, including 21 deliberate witness/proof/wording/selection forgeries.
 No test failure occurred in this addition; all earlier failed roots retained.
+
+Expanded history/terminal/refusal collection failed ten assertions (110 tests,
+10.8s): castling root's Rh1 already checked nonmoving Kh8; an authored Bh4 ray
+did not pin Pf2 to Kg1; three borrowed parser/illegal guard roots lacked exact
+expected-error metadata. Both color reflections retained. Guarded full original
+fixture/results saved at research/runs/E080/development/guards-original.json,
+with D001 receipt and exact fixture source hash. Disabled entries in that compact
+probe were a display projection omission (no new analysis when disabled), not
+additional test failures; disabled exact-parent checks already passed.
+
+Retain checked-enemy castling root as explicit error, add legal castling with
+Ka8; retain unpinned f2f3 root as no-new-fact, add genuine Be3 pin. Borrowed
+malformed-FEN/UCI/illegal fixtures now require their exact established error
+reason instead of absent metadata. No detector, scientific acceptance, source
+ordering or budget change; no failed position removed. Full actual history,
+zero/short/new strict options, nonpawn/king/capture/promotion/two-square outside
+cover, outside home file/rank, pinned-slider and noncausal bishop mate gates
+are included; corrected terminal outcome remains pending.
+Corrected collection passes all 114 focused tests in 11.1s. Both literal failed
+roots and both corrections remain in the input set; all previous guard states
+and independent proof/tamper gates pass without detector changes. A guarded
+110-case saved development pilot is prepared; final cumulative acceptance and
+exact reproductions remain required.

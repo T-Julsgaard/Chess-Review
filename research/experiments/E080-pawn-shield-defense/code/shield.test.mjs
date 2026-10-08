@@ -7,8 +7,19 @@ const {explainMove} = await import('./shield.mjs');
 const {explainMove: parent} = await import('../../E079-central-king-support/code/center.mjs');
 const {replayQuery} = await import('../../E029-forced-mates/code/replay.mjs');
 const {turnBoard} = await import('../../E027-defensive-resources/code/defense.mjs');
-const {candidate, rookOriginal, candidates, reflect} = await import('./fixtures.mjs');
+const {candidate, rookOriginal, candidates, extraFixtures, reflect} = await import('./fixtures.mjs');
 const {replayResult} = await import('./replay.mjs');
+for (const f of extraFixtures.flatMap(f => [f, reflect(f)])) test(f.id + ': history, refusal or applicability gate', () => {
+  if (f.inputError) {
+    assert.throws(() => explainMove(f), error => error.message.includes(f.expectedError));
+  } else {
+    const result = explainMove(f), checked = replayResult(f, result);
+    assert.equal(checked.state, f.expectedStatus);
+    if (!['proven', 'disabled'].includes(checked.state)) {
+      assert.ok(!result.events.some(e => e.id === 'pawn-shield-defense'));
+    }
+  }
+});
 
 // Authored prospective development hypothesis. No acceptance or tracker change.
 for (const f of candidates.flatMap(f => [f, reflect(f)])) test(f.id + ': complete source proofs for retained development hypothesis', () => {

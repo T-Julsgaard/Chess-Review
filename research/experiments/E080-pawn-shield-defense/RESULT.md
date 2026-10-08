@@ -47,8 +47,20 @@ blocker/snapshot/history/proof/node/status/quality/priority/text/selection
 mutations. Disabled, exact/one-less and zero budgets replay independently.
 No new detector change, failure, acceptance or tracker advancement.
 
-Next: broader guarded history/terminal/refusal fixtures and saved pilot, then
-registered cumulative/exact final gates. Shared reconciliation policy
+Expanded history/terminal/refusal collection initially failed ten assertions
+in 10.8s due to two authored geometry assumptions and three missing borrowed
+error expectations, both colors. Guarded complete original results retained
+under research/runs/E080/development/guards-original.json; exact failed roots
+remain alongside corrected castling/pin roots. Corrected collection passes
+all 114 focused tests in 11.1s. Full valid history, strict/refusal/capture/
+castling/promotion/nonpawn/king/two-square outside-cover, home-file/rank,
+pinned-slider/pawn, noncausal bishop and inherited terminal/foundation guards
+are now checked with independent wrapper replay. No detector/gate changes.
+Prepared guarded 110-case saved development pilot, before costly cumulative
+collection; estimated 15s/under 1MB, with source/input hashes and full results.
+
+Next: run saved pilot; build cumulative runner/tracker/demo and finish remaining
+registered coverage before cumulative/exact final gates. Shared reconciliation policy
 c43b471 incorporated at clean boundary via 22b9abe; source/diff and unchanged
 261-input/three-output E079 manifest audit pass. Ordinary local divergence
 will now be reconciled safely under that explicit approval before integration.
