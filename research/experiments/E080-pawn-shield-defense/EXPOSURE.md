@@ -76,3 +76,8 @@ roots and both corrections remain in the input set; all previous guard states
 and independent proof/tamper gates pass without detector changes. A guarded
 110-case saved development pilot is prepared; final cumulative acceptance and
 exact reproductions remain required.
+Guarded saved 110-case pilot at bca51b0 passed in 6.314s; separately saved JSON
+replay and all 267 input hashes pass. Twelve proven/32 no-new-fact/two disabled/
+four exhausted/12 not-applicable/ten not-live and 38 exact errors; 324 proof
+replies/leaves. Full artifact 665,381 bytes at research/runs/E080/pilot/results.json;
+recorded exact hash in RESULT. No failure, pruning or storage-only complexity.

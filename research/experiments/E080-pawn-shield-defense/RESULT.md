@@ -58,8 +58,19 @@ pinned-slider/pawn, noncausal bishop and inherited terminal/foundation guards
 are now checked with independent wrapper replay. No detector/gate changes.
 Prepared guarded 110-case saved development pilot, before costly cumulative
 collection; estimated 15s/under 1MB, with source/input hashes and full results.
+Pilot at bca51b0 passed in 6.314s: 110 cases, 12 proven, 32 no-new-fact,
+two disabled, four exhausted, 12 not-applicable, ten not-live and 38 input
+errors. All 12 certificates and 324 replies/leaves independently replay from
+saved JSON; all 267 normalized-text/raw-binary input hashes pass. Physical
+artifact 665,381 bytes, SHA-256
+68125d105ee47a188eb1a057fb83e9b803471787ce20194cc2a00865d2af677a,
+under research/runs/E080/pilot/results.json. No size-only optimization needed;
+actual cheap cost/size are below soft estimates. Role remains exposed development,
+not canonical acceptance. Remaining named gates include explicit checking-move,
+extra distant pawn/higher-warning selection and rehashed storage forgery checks,
+plus cumulative runner/tracker/demo and all registered exact final checks.
 
-Next: run saved pilot; build cumulative runner/tracker/demo and finish remaining
+Next: build cumulative runner/tracker/demo and finish remaining
 registered coverage before cumulative/exact final gates. Shared reconciliation policy
 c43b471 incorporated at clean boundary via 22b9abe; source/diff and unchanged
 261-input/three-output E079 manifest audit pass. Ordinary local divergence
