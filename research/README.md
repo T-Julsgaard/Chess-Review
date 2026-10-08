@@ -71,13 +71,13 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E076 pawn and paired-army inventories](experiments/E076-pawn-army-inventories/RESULT.md)
-adds optional exact pawn maps, whole paired armies and changed passer/flank counts
-backed by complete inventories and independent legal-EP replay. Coverage reaches 314 verified
-names; broader strength assessments remain partial.
-Its [cumulative tracker](experiments/E076-pawn-army-inventories/evidence/concept-status.md)
+[E077 connected passers and open lines](experiments/E077-connected-passers-open-lines/RESULT.md)
+adds complete connected-passer, pawn-free file and legal horizontal rank proofs,
+including all seven root rank destinations. Coverage reaches 317 verified
+names; reciprocal protection and broader strategic assessments remain partial.
+Its [cumulative tracker](experiments/E077-connected-passers-open-lines/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E076-pawn-army-inventories/evidence/demo.html) is runnable
+list; its [demo](experiments/E077-connected-passers-open-lines/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 
