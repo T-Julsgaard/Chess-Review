@@ -5,6 +5,7 @@ import {readFile, writeFile, mkdir} from 'node:fs/promises';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
+import {gzipSync} from 'node:zlib';
 import os from 'node:os';
 import {openResearchData, sha256} from '../../data-policy.mjs';
 
@@ -107,7 +108,9 @@ export async function runStudy(study, argv = process.argv.slice(2)) {
     source: 'authored synthetic fixtures; no real games', cases: rows.length, counts, failures, rows};
   const json = JSON.stringify(results) + '\n';
   await mkdir(out, {recursive: true});
-  await writeFile(path.join(out, 'results.json'), json);
+  // Simple deterministic lossless compression (gzip level 9, no timestamp): gunzip restores results.json exactly.
+  const packed = gzipSync(Buffer.from(json), {level: 9});
+  await writeFile(path.join(out, 'results.json.gz'), packed);
   const inputHashes = {};
   for (const name of study.inputs) inputHashes[name] = await normalized(name);
   const run = {schema: 'research-synthetic-run-v1', experiment: study.id, date: new Date().toISOString(),
@@ -117,8 +120,8 @@ export async function runStudy(study, argv = process.argv.slice(2)) {
     config: {flagKey: study.flagKey, limitKey: study.limitKey, seed: null, engine: null},
     environment: {node: process.version, platform: process.platform + '-' + process.arch, os: os.release()},
     eligibilityReceipt: data.receipt,
-    inputHashes, outputHashes: {'results.json': sha256(Buffer.from(json))},
-    metrics: {cases: rows.length, failures: failures.length, counts, bytes: Buffer.byteLength(json)},
+    inputHashes, outputHashes: {'results.json.gz': sha256(packed)}, uncompressedSha256: {'results.json': sha256(Buffer.from(json))},
+    metrics: {cases: rows.length, failures: failures.length, counts, bytes: packed.length, uncompressedBytes: Buffer.byteLength(json)},
     elapsedMs: performance.now() - started};
   await writeFile(path.join(out, 'run.json'), JSON.stringify(run, null, 2) + '\n');
   console.log(JSON.stringify({passed: failures.length === 0, failures, ...run.metrics, out,
