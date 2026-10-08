@@ -21,12 +21,31 @@ preferences still apply.
 - After required checks and the result commit, fast-forward completed research
   into local `main` only when the shared checkout is already on `main`, its
   tracked and non-ignored working files are clean, and no operation is in
-  progress. If histories diverge, stop integration and report the reason;
-  never force, reset, or switch branches to make it work. Include all changes
-  from local `main` in the isolated research history at a safe boundary before
-  integration, preserving uncommitted work and frozen evidence revisions.
+  progress. Ordinary divergence is expected when other tasks commit to `main`;
+  it is not by itself a reason to leave completed studies unintegrated. The user
+  authorizes the safe local reconciliation procedure below. Never force, reset,
+  switch the shared branch, automatically stash work, or rewrite frozen evidence.
   Report the branch and whether local `main` includes the completed study.
   These local integrations do not authorize any push.
+- Before preregistering the next study and again immediately before importing
+  completed results, check both repositories' status, HEADs, ancestry and active
+  Git operations. At a clean boundary with no running process depending on the
+  mutable development checkout, fetch current shared local `main` into the
+  existing isolated repository. If it is ahead, fast-forward the existing
+  development branch; if histories diverge, merge the fetched `main` into that
+  same development branch with a normal local merge commit. Preserve both
+  histories and all completed evidence. Resolve only conflicts whose intended
+  result is established by the retained changes and instructions; ask about
+  ambiguous intent or conflicts in frozen evidence instead of guessing.
+- Verify any reconciliation with source verification, diff checks and relevant
+  checks for files whose behavior changed. Instruction-only merges do not require
+  re-running unchanged experiments. After completion, locally fast-forward-fetch
+  the reconciled development history into the existing shared research branch,
+  then fast-forward clean shared `main`. Recheck status and ancestry immediately
+  before each mutation; if `main` advanced meanwhile, reconcile again at the
+  next safe boundary. Never move shared refs to unfinished study commits.
+  For dirty/active checkouts, defer synchronization and state that specific
+  blocker; do not discard work or abandon reconciliation merely due to divergence.
 - Start with `README.md` and `INDEX.md`. Read the protocol on the first research
   task; thereafter open the active record and only relevant supporting files.
   Do not read all past experiments, bulk evidence or generated logs by default.
