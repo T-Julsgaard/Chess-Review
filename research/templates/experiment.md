@@ -22,6 +22,8 @@ result section into `RESULT.md` when starting work; remove these instructions.
 - Reproduction command from repo root, dependencies, seeds and tolerance:
 - Engine hashes/options/budget/reset/history and evidence/cache key:
 - Estimated compute/storage budget and cheap smoke check:
+- Soft evidence-size target, practical lossless minimization, actual byte sizes
+  and overrun rationale; any genuine hard external storage limit and consequence:
 - Dated amendments, when made, what evidence was already inspected:
 
 ## Result (copy to RESULT.md)
