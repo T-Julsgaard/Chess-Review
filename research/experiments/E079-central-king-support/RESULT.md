@@ -32,6 +32,13 @@ Authoritative research:status after acceptance: 321 verified names, 370 verified
 occurrences of 1,085, 78 partial, 637 unimplemented, 715 remaining (34.1%);
 60 completed coach studies. Next: filter the approved queue and preregister a
 bounded pawn-shield defensive-benefit study, preserving broader safety scopes.
+Completed evidence commit 1d7ee20 remains on the existing isolated development
+branch codex/coach-concepts-e058-evidence. Shared clean main a018c6b includes
+84a5d49 marketing tiles and a018c6b language-statistics attributes beyond E078;
+neither history is an ancestor of the other after local fetch. Per research
+AGENTS divergence rule, stop automatic integration: no merge, force, reset or
+branch switch; shared main and codex/coach-concept-research retain E078. This
+does not invalidate frozen E079 proofs or block further isolated research.
 Earlier development snapshots below are retained history, superseded by this
 acceptance record; failures remain in EXPOSURE.md and local development outputs.
 
