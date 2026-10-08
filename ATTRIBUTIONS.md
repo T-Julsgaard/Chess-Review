@@ -11,6 +11,7 @@ redistribution permission.
 - **[neuroflowinfinix](https://github.com/neuroflowinfinix)** — Contributor
 - **[Kristian Julsgaard](https://github.com/Julsgaard)** — Contributor
 - **[Arthur Guedes](https://github.com/arthurhguedes)** — Contributor
+- **[Thomas Murray](https://github.com/MurrayThomas)** — Contributor
 - **[T-Julsgaard](https://github.com/T-Julsgaard)** — Maintainer
 
 ## Chess pieces (bundled SVG sets)
