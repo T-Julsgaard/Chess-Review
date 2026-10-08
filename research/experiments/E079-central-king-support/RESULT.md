@@ -17,9 +17,10 @@ checks passed. Covers both colors, central-file mirrors, inherited support
 negatives, missing explicit support, disabled exact parent, zero/exact/one-less
 wrapper limits, malformed options and forged witness/source proof/teaching text.
 A separate guarded saved descriptive probe independently replayed four
-within-center/already-safe cases. Actual c4d4 with pawn c3 proves contribution:
+near-center-entry/already-safe cases (historical within-center IDs). Actual
+c4d4 with pawn c3 proves an entry contribution:
 King in the center: d4 secures a safe queening route for pawn c3.
-Black reflection likewise proves; already-safe routes stay no-new-fact.
+Black reflection likewise proves entry; already-safe routes stay no-new-fact.
 Observation retained locally at research/runs/E079/development/within-center.json.
 Explicit expected states added from these retained observations; no failed case
 removed or gate loosened. No candidate test failure occurred. Source inspection
@@ -32,7 +33,7 @@ safety interpretation must not be discharged by geometry or immediate legality.
 No canonical tracker advancement or final acceptance. E078 remains canonical:
 320 names/369 verified entries, 78 partial/638 unimplemented, 716 remaining.
 
-Expanded 65-root/130-case collection and saved runner/status/preview implemented.
+Expanded 69-root/138-case collection and saved runner/status/preview implemented.
 Corrected targeted 82 boundary/refusal tests, all-fixture geometry, independent
 1,083-row preservation and preview semantic audits pass. Candidate tracker adds
 only C0385; C0384 remains partial. Canonical E078 is unchanged. Initial expanded
@@ -42,9 +43,26 @@ copied unavailable expectation and illegal pawn fixture. Every original failed
 root and terminal outcome is retained in EXPOSURE.md; no acceptance predicate
 weakened. Prospective runtime/strict-input AMENDMENT preserves original PLAN.
 
-Next: fresh full cumulative source/diff and saved pilot on corrected source,
-then frozen exact main/repeat/initially clean reproduction and independent saved
-replay. Preserve all 5,052 ordered E078 full fingerprints and original list.
+Earlier corrected-source full suite passed in 362.6s and saved 5,182-case pilot
+passed in 569.079s at 05a145a. Ordered inheritance audit then found two altered
+illegal-move error fingerprints from applying this study's new reflector to
+legacy batches. Frozen E078 reflector now applies to every inherited fixture;
+new reflector only applies to own fixture objects. Targeted exact error-hash
+check passes; complete fresh 5,052-row audit remains required. Original pilot
+outputs retained in research/runs/E079/pilot. No acceptance gate relaxed.
+
+Coverage audit corrected historical c4/f4 entry cases misnamed within-center,
+retaining original IDs/roots with accurate preview names. Same source predicate
+independently proves genuine d4e4/d5e5 and Black reflections; separate guarded
+saved probe retained at research/runs/E079/development/genuine-within-center.json.
+All eight new true core-to-core cases pass focused tests, asserting both from/to
+inside d4/e4/d5/e5 and frozen central-arrival attribute false. Include all four
+directions via file/color reflection. Definition unchanged; C0384 stays partial.
+Source verification/diff pass after corrections; no final source freeze yet.
+
+Next: fresh final full cumulative suite/source/diff and 5,190-case expanded
+saved pilot, then frozen exact main/repeat/initially clean reproduction and
+independent saved replay. Preserve all 5,052 ordered E078 full fingerprints and original list.
 Existing isolated branch and detached verification checkout only; unfinished
 prototype stays isolated. Broad goal active; numerical research paused; usage
 cutoff/shutdown/automation cancelled. No extension, agents or push.

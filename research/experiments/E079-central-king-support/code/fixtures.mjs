@@ -32,3 +32,6 @@ for(const [id,enemy]of [['rook',{a8:'k',d8:'r'}],['bishop',{a8:'k',g7:'b'}],['kn
 fixtures.push({...positive,id:'bad-boolean-null',kingCenterTags:null,inputError:true,expectedStatus:undefined,expectedError:'boolean'});fixtures.push({...positive,id:'bad-wrapper-limit-null',maxKingCenterNodes:null,inputError:true,expectedStatus:undefined,expectedError:'integer'});
 
 const illegalPush=fixtures.find(f=>f.id==='nonking-pawn-move');fixtures.push({...illegalPush,id:'nonking-pawn-original-illegal',inputError:true,expectedStatus:undefined,expectedError:'Illegal move'});illegalPush.fen=setup({a1:null,h8:null,h2:null,a7:null,d4:'K',c3:'P',a1:'k'});illegalPush.move='c3c4';
+
+for(const id of ['within-center','within-file-mirror'])fixtures.find(f=>f.id===id).displayName='Entering the center';
+for(const [id,army,move,depth]of [['genuine-within-low',{d4:'K',d3:'P',a1:'k'},'d4e4',5],['genuine-within-high',{d5:'K',d4:'P',a1:'k'},'d5e5',4],['genuine-within-low-mirror',{e4:'K',e3:'P',h1:'k'},'e4d4',5],['genuine-within-high-mirror',{e5:'K',e4:'P',h1:'k'},'e5d5',4]])fixtures.push({id,fen:setup({a1:null,h8:null,h2:null,a7:null,...army}),move,kingSupportDepth:depth,kingCenterTags:true,expected:['king-promotion-support'],expectedStatus:'proven',withinCenter:true,displayName:'Moving within the center'});

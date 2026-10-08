@@ -13,3 +13,10 @@ No new opening definition, data acquisition or global king-safety rule.
 Original list, approved fixed queue and original occurrence contexts retained.
 C0384 enduring safety remains partial. C0385 candidate bounded central-king
 contribution requires full promotion benefit, never a geometry-only label.
+
+Geometric attack semantics also agree with the official [FIDE Laws of Chess,
+Articles 3.1.3 and 3.9.1](https://handbook.fide.com/chapter/e012023), indexed official
+text checked 2026-10-08: constrained/pinned pieces can still attack squares for
+king-check purposes. The authored pinned-bishop illegal-center-entry fixture
+tests that distinction. Definition reference only; no external game, position,
+diagram or example imported.

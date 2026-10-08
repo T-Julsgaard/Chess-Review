@@ -67,3 +67,24 @@ Malformed/mismatched histories remain literal and are never executed by reflecto
 Cheap all-fixture geometry audit passed: 65 roots/130 cases, 64 direct legal-move
 cases excluding intended refusals/foundation cases. This does not replace final
 scientific tests or saved replay.
+
+Corrected-source full suite passed in 362.6s, maintained source/diff passed; saved
+pilot completed at source 05a145a in 569.079s with 5,182 cases/14 new witnesses.
+Original pilot outputs remain in research/runs/E079/pilot. Ordered inheritance
+audit then failed on two ordinary-illegal-black fingerprints: the new literal
+error reflector had been applied to all prior fixture batches, replacing frozen
+prior identical-error reflection with a different illegal move/error string.
+Use frozen E078 reflector for every inherited batch and new reflector only for
+this study's own fixture objects. No exact-hash requirement relaxed and no prior
+result mutated; fresh ordered audit still required. Coach predicate unchanged.
+
+Coverage audit found historical within-center/within-file-mirror fixtures begin
+at c4/f4 outside registered core. Retain IDs/root/move with accurate entry display
+name. Earlier RESULT within-center wording corrected: these were entries, not
+core-to-core moves. Do not widen center definition. Separate guarded saved probe
+independently proves genuine d4e4/d5e5 and Black reflections under identical source
+proof, retained at research/runs/E079/development/genuine-within-center.json. Add
+all four actual core-to-core directions with true file/color reflection, source
+predicate unchanged; explicitly assert both from/to are core and frozen source
+central-arrival attribute false. Rerun final full suite and expanded saved pilot.
+No failed root removed or acceptance gate weakened.
