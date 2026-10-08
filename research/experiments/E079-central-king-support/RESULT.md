@@ -85,7 +85,10 @@ EXPOSURE.md; full E039 proofs restored from verified gzip archive, whose raw
 binary input hash is tracked separately from normalized text. Classifier API,
 search budgets, all logical metrics and inherited fingerprints stay unchanged.
 
-Next: final full cumulative suite/source/diff after storage change, source freeze,
+Final post-storage full cumulative suite passed in 557.4 seconds; maintained
+source verification and diff checks passed. No acceptance gate changed.
+
+Next: source freeze,
 exact main/repeat/initially clean runs and independent saved decoded proof replay. Preserve all 5,052 ordered E078 full fingerprints and original list.
 Existing isolated branch and detached verification checkout only; unfinished
 prototype stays isolated. Broad goal active; numerical research paused; usage
