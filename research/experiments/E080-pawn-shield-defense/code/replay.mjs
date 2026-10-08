@@ -133,7 +133,7 @@ export function replayResult(f, result) {
                           piece: mating.piece, color: mating.color, captured: mating.captured, cells,
                           beforeBlockers: [], afterBlockers: [{square: move.to, type: 'p', color: actor}]}};
                       events = [...base.events, {id: 'pawn-shield-defense',
-                        text: `Pawn shield: ${move.to} blocks ...${mating.san}, with no immediate mate remaining.`,
+                        text: `Pawn shield: ${move.to} blocks ${enemy === 'b' ? '...' : ''}${mating.san}, with no immediate mate remaining.`,
                         qualityClaim: false, evidence: {witness, beforeProof, afterProof}}];
                     }
                   }

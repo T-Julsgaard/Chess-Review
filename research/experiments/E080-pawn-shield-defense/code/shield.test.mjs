@@ -48,6 +48,7 @@ for (const f of candidates.flatMap(f => [f, reflect(f)])) test(f.id + ': complet
     assert.ok(a.witness.blockedCapture.cells.includes(a.witness.played.to));
     assert.equal(result.events.at(-1).qualityClaim, false);
     assert.ok(result.events.at(-1).text.split(/\s+/).length <= 24);
+    assert.equal(result.events.at(-1).text.includes('...'), enemy === 'b', 'ellipsis identifies a Black threat only');
   } else {
     if (a.afterProof) assert.equal(replayQuery(root, a.afterProof).win, true);
     assert.equal(a.witness, null);

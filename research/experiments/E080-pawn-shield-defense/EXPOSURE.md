@@ -91,3 +91,18 @@ or source search/budget/predicate change. Cumulative runner reuses exact E079
 reflection routing and storage; expose expanded 116-case core pilot next, with
 distinct output directory and complete source/input provenance. Canonical
 tracker remains E079 until all unchanged registered final gates pass.
+
+Expanded c205d01 116-case pilot passed in 7.536s; full cumulative suite 534.9s;
+cumulative 5,306-case development collection 770.597s. Saved independent audit
+passes all 5,190 inherited fingerprints, original-list hash, 1,083 outside rows,
+all physical input/output hashes and 16 complete shield proofs. Evidence
+4,751,354 bytes below soft target; no size-only optimization needed.
+
+Manual notation audit then found an unconditional Black ellipsis on White
+threats in Black-player examples. Preserve all old observations; correct only
+emitter/replayer threat prefix from actual opponent color and add explicit
+both-color notation gate. No scientific predicate, tree, ordering, budget or
+metric altered. Final full suite and corrected cheap pilot remain required;
+no source freeze or accepted advancement yet, three cold exact runs unchanged.
+Corrected focused collection passes all 122 tests in 14.1s, including explicit
+White-threat/no-ellipsis and Black-threat/ellipsis assertions. Source/diff pass.

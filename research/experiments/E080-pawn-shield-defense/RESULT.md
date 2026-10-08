@@ -87,8 +87,30 @@ No new size-only encoding complexity or hard byte cap. Expected expanded core
 Before costly collection, run the expanded guarded saved pilot to a distinct
 output directory preserving the 110-case pilot.
 
-Next: expanded cheap pilot, full cumulative suite/source/diff and cumulative
-development saved run; then freeze and exact main/repeat/clean plus saved replay.
+Expanded 116-case pilot at c205d01 passed in 7.536s/832,992 bytes, 16 proven,
+34 no-new-fact, two disabled, four exhausted, 12 not-applicable, ten not-live,
+38 errors, 444 replies/leaves; old 110-case output preserved. Full cumulative
+suite passed in 534.9s with source/diff pass. Cumulative development collection
+passed in 770.597s: 5,306 cases, 4,810 accepted/238 abstained/258 invalid,
+9,101 certificates/294 query proofs, 76,595 replies/252,256 leaves, max selected
+21 words. Independent saved replay/physical hashes, all 5,190 inherited full
+fingerprints, original-list hash and all 1,083 outside rows pass; complete
+four-file development evidence 4,751,354 bytes, below soft 8MB target.
+
+After these audits, manual notation review found unconditional Black-move
+ellipsis on White threats in Black-player examples. Correct emitter and
+independent text reconstruction to prepend ellipsis only for an actual Black
+opponent, and add a both-color notation assertion. No detector predicate,
+search ordering, tree, budget, metric or scope change. Keep c205d01 full output
+at research/runs/E080/cumulative-pilot as exposed pre-correction observation.
+Final full tests and distinct corrected cheap pilot required before freeze;
+Corrected focused 122 tests pass in 14.1s; maintained source/diff checks pass.
+three fresh exact cumulative runs and saved replay remain mandatory. Avoid a
+size/format-only repeat of the old development collection: only notation changes,
+all complete proofs retained, fresh mandatory cold evaluations will verify them.
+
+Next: final full suite/source/diff and corrected cheap saved pilot, freeze and
+exact main/repeat/initially clean cumulative runs plus independent saved replay.
 Shared reconciliation policy
 c43b471 incorporated at clean boundary via 22b9abe; source/diff and unchanged
 261-input/three-output E079 manifest audit pass. Ordinary local divergence

@@ -88,7 +88,7 @@ export function explainMove(input) {
         piece: mating.piece, color: mating.color, captured: mating.captured,
         cells, beforeBlockers: [], afterBlockers: [{square: move.to, type: 'p', color: actor}]}};
     status = 'proven';
-    const text = `Pawn shield: ${move.to} blocks ...${mating.san}, with no immediate mate remaining.`;
+    const text = `Pawn shield: ${move.to} blocks ${enemy === 'b' ? '...' : ''}${mating.san}, with no immediate mate remaining.`;
     if (text.split(/\s+/).length > 24) throw Error('Comment exceeds 24 words');
     events = [...base.events, {id: 'pawn-shield-defense', text, qualityClaim: false,
       evidence: {witness, beforeProof, afterProof}}];
