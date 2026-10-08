@@ -64,3 +64,52 @@ Final full cumulative coach regression passes in615.0s with maintained-source
 and diff checks. Source ready to freeze;144 new cases plus5312 inherited
 produce5456 cumulative cases. Three fresh exact runs and independent saved
 replay remain required before acceptance. No canonical advancement yet.
+
+## Accepted mechanics — 2026-10-09
+
+Frozen9166ebadbc13776d955548a19e13a4962dc2ff3a main/repeat/initially clean
+detached runs pass in1079.816/1073.801/1076.171s, within soft900-1100s estimate.
+Exact284 input hashes, three physical output hashes, configuration/environment/
+receipt/metrics match. Saved independent replay proves50 direct-contact witnesses
+from144 new cases;36 expected errors; states50proven/28no-new-fact/4disabled/
+4exhausted/12not-applicable/10not-live. All5312 ordered inherited fingerprints,
+original-list hash and1082 outside rows unchanged. All six attacker families and
+pawn/N/B/R/Q targets have both-color positives; full promotion capture choices,
+pins/blockers/history/category/priority and rehashed-storage gates retained.
+Cumulative5456 cases,4912 with facts/250abstentions/294invalid;9303 replayed
+event certificates,294 queries,76755 defender replies/252384 leaves. New
+contact events add zero defender-search replies/leaves, not invented gain proofs.
+Longest selected comment21words. OnlyC0404/C0410/C0411 advance; broad Attack,
+king attack, forced gain, quality, strategic initiative and usefulness unresolved.
+
+Initial saved-audit comparison failed because explicitundefined flag properties
+are omitted by JSON, while its in-memory fixture comparison retained them.
+Correct comparison to the exact JSON representation; source flags/defaults,
+fixtures, evidence and independentreplay unchanged. No failed scientific case
+removed, no predicate/budget/gate weakening or costly run repetition. Complete
+saved audit then passes. Original helper failure is recorded here; frozen EXPOSURE remains unchanged.
+
+Complete six-file canonical evidence5195333bytes below soft8MB target. Existing
+sha256-json-king-support-dag-v2 plus retained independent E079 decoder reconstructs
+full report JSON; small direct-contact witnesses remain complete inline. All
+failed original queen roots and44/130/144case development outputs retained.
+Rebuild at frozenSHA with code/run.mjs defaultcanonical and --out
+research/runs/E081/repeat; run --out research/runs/E081/clean from initially clean
+detached checkout. Retained code/verify.mjs takes frozenSHA and absolute clean-run
+directory; code/audit.mjs independently checks physicalhashes, all inherited
+results, contact semantics and occurrence rows. Verification entrypoints retained
+aftercollection; source independentreplay itself is among284 frozen inputs.
+Saved JSON omitsundefined properties; explicitnull values remain strict errors.
+
+New scheduling policy4a49a1f verified on sharedmain while runslive. E081 finished
+all development gates before its sole final cumulative suite615.0s; no redundant
+full regression planned. Documentation-only reconciliation will not trigger
+unchanged experiment reruns. No source/HEAD/input mutation occurred during the
+three live decisive runs. Next: local evidence commit, safe sharedmain merge
+and completed-only FF integration; preregister pending rook-ending queue batch.
+Goal remainsactive; no extension/push/agents/numerical/cutoff/shutdown revival.
+
+Post-collection documentation initially appended the audit note to frozen
+EXPOSURE, which the physical input check correctly rejected. Restored that
+input byte-for-byte (normalized text) and keep the new audit note only here.
+No evidence rerun or source behavior change is required.

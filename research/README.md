@@ -71,14 +71,14 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E080 pawn-shield defense](experiments/E080-pawn-shield-defense/RESULT.md)
+[E081 direct pawn and piece attacks](experiments/E081-direct-attacks/RESULT.md)
 names cover-pawn advances that block a complete prior hypothetical mating
 capture and leave no opponent mate in one. Coverage reaches 322 verified names;
 enduring king safety, bishop liberation, reciprocal protection and broader
 strategic assessments remain partial.
-Its [cumulative tracker](experiments/E080-pawn-shield-defense/evidence/concept-status.md)
+Its [cumulative tracker](experiments/E081-direct-attacks/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E080-pawn-shield-defense/evidence/demo.html) is runnable
+list; its [demo](experiments/E081-direct-attacks/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 
