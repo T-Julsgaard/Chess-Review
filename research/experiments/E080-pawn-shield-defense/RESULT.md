@@ -36,8 +36,19 @@ Every failed root and observed continuation stays in EXPOSURE/fixtures; no
 detector change or acceptance weakening. Neither occurrence advances without
 full independent wrapper replay and the remaining registered final gates.
 
-Next: independent scalar wrapper replay/tamper gates and broader guarded
-synthetic pilot; retain unmet coverage/failures. Shared reconciliation policy
+Independent wrapper replay now implemented without importing new detector,
+cover/ray predicates or the source solver. It separately derives square
+inventories, three-file/two-rank cover, scalar interior rays and the complete
+finite one-ply truth table in frozen source ordering; frozen E029 replayQuery
+also semantically checks every supplied tree. Reconstructed parent/events/text,
+history, status and exact atomic work units must match. All 22 focused tests
+pass in 6.9s, including 21 forged inventory/cover/king/pawn/legal-move/ray/
+blocker/snapshot/history/proof/node/status/quality/priority/text/selection
+mutations. Disabled, exact/one-less and zero budgets replay independently.
+No new detector change, failure, acceptance or tracker advancement.
+
+Next: broader guarded history/terminal/refusal fixtures and saved pilot, then
+registered cumulative/exact final gates. Shared reconciliation policy
 c43b471 incorporated at clean boundary via 22b9abe; source/diff and unchanged
 261-input/three-output E079 manifest audit pass. Ordinary local divergence
 will now be reconciled safely under that explicit approval before integration.

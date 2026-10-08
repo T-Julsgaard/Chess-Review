@@ -45,3 +45,11 @@ Thus the registered home files/two slider families have candidate coverage, but
 full independent wrapper verification and final gates still remain unmet.
 Corrected focused collection passed all 21 tests in 3.8s; maintained source and
 diff checks pass. Original PLAN unchanged, no gate weakened or case removed.
+
+Independent scalar wrapper verifier added without new detector/source-solver
+imports. It builds the finite one-ply table directly with legal move/history
+transitions, and separately calls frozen E029 replayQuery for each supplied
+proof. Exact source move ordering and work units remain fixed; inventories,
+cover and rays use separately derived enumerations. All 22 focused tests pass
+in 6.9s, including 21 deliberate witness/proof/wording/selection forgeries.
+No test failure occurred in this addition; all earlier failed roots retained.
