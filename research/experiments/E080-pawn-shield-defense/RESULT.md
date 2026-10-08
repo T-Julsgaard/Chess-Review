@@ -1,5 +1,53 @@
 # E080 registered pawn-shield defense research
 
+## Accepted mechanics — 2026-10-08
+
+All registered final gates pass. Frozen source fe78fcf871cc485fb6078fc78a2d3e3addcdda31
+produces exactly matching main/repeat/initially clean detached outputs in
+815.425/821.223/822.197s. All 272 input hashes, three physical output hashes,
+5,190 ordered inherited full fingerprints, original-list hash and 1,083
+unrelated tracker rows pass. Complete independent saved replay verifies all
+16 new shield certificates, 444 replies/leaves and 38 expected input errors.
+New core: 122 cases, 16 proven/40 no-new-fact/2 disabled/4 exhausted/
+12 not-applicable/10 not-live. Cumulative: 5,312 cases, 4,816 accepted/
+238 abstained/258 invalid, 9,113 certificates, 294 query proofs,
+76,635 replies/252,262 leaves; longest selected comment 21 words.
+
+Only C0226/C0400 advance for the registered bounded pawn-shield protection
+effect; broader C0227 cover and C0384 enduring safety remain partial. Q/R
+positive mechanics cover both colors and every c/e/g home king file; bishop
+and literal file-mirror inability remain retained negatives. Examples:
+“Pawn shield: g3 blocks ...Qxg2#, with no immediate mate remaining.”
+“Pawn shield: g6 blocks Qxg7#, with no immediate mate remaining.”
+Higher material/mate warnings remain selected. This is exposed synthetic
+mechanics, with no real-game precision, human usefulness, best-move or
+lasting safety claim, and no extension integration.
+
+Complete six-file canonical evidence: 4,906,654 bytes, below the soft 8MB
+planning target; no size-only encoding optimization. Existing lossless
+sha256-json-king-support-dag-v2 decoder reconstructs the complete report;
+small new shield proofs remain inline. All previous failed roots and outputs
+remain in EXPOSURE, fixtures and the distinct development directories below.
+
+Rebuild from frozen source using code/run.mjs (default canonical output),
+--out research/runs/E080/repeat, and --out research/runs/E080/clean from a
+clean detached checkout. Retained code/verify.mjs accepts the frozen SHA and
+absolute clean-run directory, independently checks all three physical reports,
+then invokes code/audit.mjs for saved semantics/inheritance/tracker checks.
+These verification entry points were retained after collection; the independently
+replaying code/replay.mjs itself is among the 272 frozen inputs. Date, command,
+elapsed time and generated-output working-tree entries may differ; exact source,
+inputs, outputs, configuration, environment, receipt and metrics must match.
+Initial detached cleanliness is verified; every other status may contain only
+the newly generated canonical evidence directory.
+
+Next: commit accepted evidence, safely fast-forward it into existing shared
+research branch and clean local main; then preregister the next queue batch
+C0404 Direct attack/C0410 Attack on a pawn/C0411 Attack on a piece. Goal
+continues; numerical work, usage cutoff and PC shutdown remain cancelled/paused.
+
+## Retained development exposure
+
 2026-10-08. PLAN preregistered before code or fixture evaluation. Reuse exact
 E079 parent and frozen E027 hypothetical-turn/E029 mate-query semantics. Require
 a cover pawn's causal obstruction of a complete prior hypothetical mating
