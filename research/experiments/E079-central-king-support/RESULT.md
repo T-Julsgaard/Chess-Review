@@ -60,9 +60,33 @@ inside d4/e4/d5/e5 and frozen central-arrival attribute false. Include all four
 directions via file/color reflection. Definition unchanged; C0384 stays partial.
 Source verification/diff pass after corrections; no final source freeze yet.
 
-Next: fresh final full cumulative suite/source/diff and 5,190-case expanded
-saved pilot, then frozen exact main/repeat/initially clean reproduction and
-independent saved replay. Preserve all 5,052 ordered E078 full fingerprints and original list.
+Expanded 5,190-case pilot passed in 837.531s at source 2f2062e; final pre-codec
+full suite passed in 586.3s, maintained source/diff passed. All 5,052 ordered
+inherited fingerprints now match. New states: 22 proven, 30 no-new-fact, ten
+not-live, six exhausted, 12 not-applicable, two unavailable; 54 input errors and
+two disabled-parent cases. Eight genuine core-to-core cases are included.
+Logical cumulative evidence has 8,989 certificates/288 query proofs, 75,967
+defender replies/251,664 leaves; maximum selected comment length 21 words.
+
+Plain results.json is 26,521,412 bytes above the unchanged 20MB canonical cap.
+Retain it under research/runs/E079/pilot-expanded. Prospectively registered
+lossless content-addressed node storage implemented, with separate independent
+decoder and byte-identical full-tree JSON roundtrip. Complete 138-case/5,052
+inherited report becomes 6,111,692 bytes/10,550 nodes without removing any branch,
+history, case or semantic field. Guarded storage smoke verifies all 243 unchanged
+classification/source modules against 2f2062e input hashes and saved output hash;
+receipt/output at research/runs/E079/codec-smoke. This reuses observations only
+for formatting smoke and does not replace cold exact reproductions.
+
+Three codec tests pass: full real archived proof roundtrip/replay, corrupted or
+missing/unused/malformed pool rejection, and correctly rehashed semantic forgery
+rejected by frozen proof replay. Initial archived-stub setup failure retained in
+EXPOSURE.md; full E039 proofs restored from verified gzip archive, whose raw
+binary input hash is tracked separately from normalized text. Classifier API,
+search budgets, all logical metrics and inherited fingerprints stay unchanged.
+
+Next: final full cumulative suite/source/diff after storage change, source freeze,
+exact main/repeat/initially clean runs and independent saved decoded proof replay. Preserve all 5,052 ordered E078 full fingerprints and original list.
 Existing isolated branch and detached verification checkout only; unfinished
 prototype stays isolated. Broad goal active; numerical research paused; usage
 cutoff/shutdown/automation cancelled. No extension, agents or push.

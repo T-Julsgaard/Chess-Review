@@ -88,3 +88,19 @@ all four actual core-to-core directions with true file/color reflection, source
 predicate unchanged; explicitly assert both from/to are core and frozen source
 central-arrival attribute false. Rerun final full suite and expanded saved pilot.
 No failed root removed or acceptance gate weakened.
+
+Expanded final pre-codec full suite passed in 586.3s; expanded plaintext pilot
+finished in 837.531s with 5,190 cases/22 witnesses, source 2f2062e. All 5,052
+ordered inherited hashes now match. Results JSON 26,521,412 bytes violates
+canonical cap; keep development output and add prospectively registered lossless
+storage, not prune any case/branch. Full byte-for-byte sharing feasibility passes:
+6,111,691 packed JSON bytes/10,550 nodes.
+
+First codec test setup retained failure: E039 results hold before/after certificate
+references, with full proofs in frozen certificates.json.gz; replaying reference
+stubs fails missing rootFen. Restore full archived proofs after verifying both
+compressed/uncompressed SHA-256, then perform codec roundtrip and semantic
+forgery tests on those real trees. This does not change any classifier or replay
+acceptance; original test failure retained. Binary source archive must be hashed
+raw, text inputs remain CRLF-normalized. Final source/cumulative tests and exact
+reproductions still required after storage change.

@@ -20,3 +20,11 @@ text checked 2026-10-08: constrained/pinned pieces can still attack squares for
 king-check purposes. The authored pinned-bishop illegal-center-entry fixture
 tests that distinction. Definition reference only; no external game, position,
 diagram or example imported.
+
+Canonical storage interns complete support-proof JSON nodes by content hash.
+Separate saved.mjs verifies the version/digests/references/reachability and
+expands complete original trees; pool.mjs never interprets FEN or changes search.
+Byte-identical roundtrip required. Independent frozen proof replayers still
+check every reply/leaf in its own actual history, including rehashed semantic
+forgeries. Codec tests reuse the guarded immutable E039 synthetic evidence,
+whose full artifact hash is included in this study's input manifest.
