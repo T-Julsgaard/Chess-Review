@@ -87,3 +87,10 @@ fixtures.push(f('combined-profiles',{d1:'Q',a4:'R'},'a4d4',['slider-battery-proo
 for(const [id,queen]of [['root-mate','b2'],['root-stalemate','c2']]){const pieces={h2:null,a7:null,h8:null,c3:'k',[queen]:'q'};fixtures.push(f(id,pieces,'a1a2',[],ids,{inputError:true,expectedError:'Illegal move'}));fixtures.push(f('foundation-'+id,pieces,'a1a2',[],ids,{foundationTags:true,expectedStatus:'not-applicable'}));}
 
 fixtures.push(f('two-new-batteries',{d1:'R',a4:'R',e3:'Q',h8:null,g8:'k'},'e3d4',['slider-battery-proof']));
+
+const mirrorBase={a1:null,h8:null,h1:'K',a8:'k',h2:null,a7:null,a2:'P',h7:'p'};
+fixtures.push(f('outside-chain-reversed-file',{...mirrorBase,e2:'B',f3:'P',e4:'P'},'e2b5',['outside-chain-proof']));
+fixtures.push(f('outside-capture-reversed-file',{...mirrorBase,e2:'B',f3:'P',e4:'P',b5:'n'},'e2b5',['outside-chain-proof']));
+fixtures.push(f('outside-branch-reversed-file',{...mirrorBase,e2:'B',f3:'P',e4:'P',f5:'P',d5:'P'},'e2a6',['outside-chain-proof']));
+fixtures.push(f('behind-chain-reversed-file',{...mirrorBase,d3:'B',f3:'P',e4:'P'},'d3e2',['behind-chain-proof']));
+fixtures.push(f('quiet-qq-display',{d1:'Q',e3:'Q',f2:'P'},'e3f3',['slider-battery-proof']));

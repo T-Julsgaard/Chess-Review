@@ -53,15 +53,23 @@ mechanics/display evidence, not independent real-game precision or teaching
 usefulness. General contextual selection remains unresolved. No external games
 or diagrams acquired; D001 preflight passed with 54 registered artifacts.
 
-No decisive source freeze, cumulative saved runner, status renderer, canonical
-preview or main/repeat/clean reproductions yet. No canonical tracker advanced.
+Saved runner, status renderer and preview implemented. Expanded final focused
+198 tests passed in 9.6s; cumulative 5,422 passed in 103.8s; source/diff
+checks passed. Full saved development pilot: 5,052 cases (192 new), 88 new
+certificates (14 outside-chain, six behind-chain, 68 batteries); 86 proven,
+56 no-new-fact, ten not-live, two exhausted, 12 not-applicable, 24 input
+errors and two disabled-parent cases. All 4,860 ordered E077 fingerprints
+unchanged. Pilot elapsed 280.084s. Added reversed-file blocker coverage and
+retained descriptive Q–Q selection fixture. Independent occurrence audit
+preserves all 1,081 outside rows; C0320 remains partial. Display distinguishes
+terminal input from actual played terminal positions and budget exhaustion.
+Source ready for freeze; decisive main/repeat/clean reproductions pending. No canonical tracker advanced.
 E077 remains canonical: 317 names/366 verified occurrences, 80 partial,
 639 unimplemented, 719 remaining. Shared clean main includes E077 only; unfinished
 E078 stays on existing isolated research branch.
 
-Next: add saved-evidence runner/status/preview, retain independent saved proofs,
-then final source/diff/full gates and exact main/repeat/initially clean reused
-checkout runs. Preserve all 4,860 ordered E077 fingerprints and original-list
+Next: freeze tested source and run exact main/repeat/initially clean reused
+checkout runs, then independently replay saved proofs. Preserve all 4,860 ordered E077 fingerprints and original-list
 hash. Canonical budget 20MB. C0312/C0366/C0435 are candidates only after all gates;
 C0320 must remain partial. Goal active; no extension, push, agents, numerical
 resumption, usage monitoring/cutoff, shutdown or automation revival.
