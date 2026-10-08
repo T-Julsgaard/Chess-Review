@@ -6,9 +6,11 @@ review — accuracy scores, move-by-move classifications, an evaluation graph, a
 rating. No account, no server, no manual PGN copying.
 
 The right-hand Settings panel includes an optional **Concepts** tab after Visual
-and Engine. The review's **Coach** tab beside Engine uses those same findings,
+and Engine. A separate **Concepts** panel to the right of Accuracy and Engine
+uses those same findings,
 ordered by likely relevance and phrased from your playing side. It follows the
-selected move, includes every match, and separates insights with space. Expand
+selected move, includes every match, and separates insights with space. Its top
+aligns with the coach commentary panel; its bottom aligns with Engine. Expand
 an insight's evidence to inspect the original explanation and exact scope.
 Accuracy and the existing move commentary retain their scoring and behavior.
 

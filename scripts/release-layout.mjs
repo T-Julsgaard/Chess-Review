@@ -11,7 +11,7 @@ const record=JSON.parse(await fs.readFile(recordPath));
 const out=await fs.mkdtemp(path.join(path.dirname(recordPath),'layout-'));
 const source=await fs.mkdtemp(path.join(artifacts,'layout-chrome-'));
 await fs.cp(record.packages.find(p=>p.browser==='chrome').sourceDir,source,{recursive:true});
-await fs.appendFile(path.join(source,'analysis.js'),'\nexport {S, resetLayout, toggleReorganize, updateLibrary, go, applyGame, _conceptSession, selectedConceptInput};\n');
+await fs.appendFile(path.join(source,'analysis.js'),'\nexport {S, resetLayout, toggleReorganize, updateLibrary, go, applyGame, _conceptSession, selectedConceptInput, renderEngine, renderEngineCurrent, renderStats};\n');
 await fs.writeFile(path.join(source,'audit.html'),'<!doctype html><script type="module" src="audit.js"></script>');
 await fs.writeFile(path.join(source,'audit.js'),"import {browserAPI} from './browser-compat.js'; window.api=browserAPI;");
 const profile=await fs.mkdtemp(path.join(artifacts,'layout-profile-'));
@@ -132,11 +132,22 @@ try {
   await waitFor(review,"document.querySelector('.concepts-findings')?.textContent.includes('Development')",'Selected concept redraw');
   assert.match(await evaluate(review,"document.querySelector('.concepts-findings').textContent"),/Development/);
   await capture('concepts-wide');
-  await evaluate(review,"document.querySelector('[aria-label=\"Settings\"]').click(); document.querySelector('#position-tab-coach').click()");
+  await evaluate(review,"document.querySelector('[aria-label=\"Settings\"]').click()");
+  const assertConceptAlignment=async()=>{
+    const b=await evaluate(review,"(()=>{const rect=key=>document.querySelector('[data-mod=\"'+key+'\"]').getBoundingClientRect();const r=rect('review'),e=rect('engine'),c=rect('concepts');return {top:c.top-r.top,bottom:c.bottom-e.bottom,gap:c.left-e.right}})()");
+    assert.ok(Math.abs(b.top)<1&&Math.abs(b.bottom)<1&&b.gap>0,'Concepts must align with the commentary top and Engine bottom: '+JSON.stringify(b));
+  };
+  await assertConceptAlignment();
   const selectedFindingCount=await evaluate(review,"(async()=>{const m=await import('./analysis.js'), {conceptKey}=await import('./lib/concepts/session.js');return m._conceptSession.entries.get(conceptKey(m.selectedConceptInput())).findings.length})()");
   assert.equal(await evaluate(review,"document.querySelectorAll('.coach-insight').length"),selectedFindingCount);
   assert.match(await evaluate(review,"document.querySelector('.coach-position').textContent"),/Playing White.*Your Nf3/);
   await capture('coach-wide');
+  await evaluate(review,"import('./analysis.js').then(m=>{m.S.settings.engineLines=4;m.renderEngine(null)})");
+  await assertConceptAlignment(); await capture('concepts-engine-four-lines');
+  await evaluate(review,"import('./analysis.js').then(m=>{m.S.settings.engineLines=2;m.S.qbreakExpanded=true;m.renderStats();m.renderEngineCurrent()})");
+  await assertConceptAlignment(); await capture('concepts-accuracy-expanded');
+  await evaluate(review,"import('./analysis.js').then(m=>{m.S.qbreakExpanded=false;m.renderStats()})");
+  await assertConceptAlignment();
   await evaluate(review,"import('./analysis.js').then(m=>{m.S.meSide='b';m.go(2);m.go(3)})");
   assert.match(await evaluate(review,"document.querySelector('.coach-position').textContent"),/Playing Black.*Opponent’s Nf3/);
   await capture('coach-black');
@@ -152,7 +163,7 @@ try {
   await evaluate(review,"import('./analysis.js').then(m=>{m.go(0)})");
   assert.equal(await evaluate(review,"document.querySelectorAll('.coach-insight').length"),0);
   await evaluate(review,"import('./analysis.js').then(m=>{m.S.meSide='w';m.go(3)})");
-  await evaluate(review,"document.querySelector('#position-tab-engine').click(); document.querySelector('[aria-label=\"Settings\"]').click()");
+  await evaluate(review,"document.querySelector('[aria-label=\"Settings\"]').click()");
   for(const width of [390,320]) {
     await call('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(400);
     const bounds=await evaluate(review,"(()=>{const r=document.querySelector('#settings').getBoundingClientRect();return {left:r.left,right:r.right,width:innerWidth,scroll:document.documentElement.scrollWidth}})()");

@@ -70,7 +70,7 @@ tracker and browsable demo. Human usefulness and real-game precision remain
 unresolved. [P001](promotions/P001-concepts-tab.md) integrates the E080 verified
 scopes in an optional Concepts tab; the numerical goal stays paused.
 [P002](promotions/P002-position-coach.md) presents every supported finding in a
-move-following Coach tab with player perspective and stable relevance ordering.
+move-following Concepts panel with player perspective and stable relevance ordering.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest

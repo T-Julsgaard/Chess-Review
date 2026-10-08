@@ -14,6 +14,6 @@ for an opt-in findings panel. Coaching effectiveness remains unverified; scoring
 and existing coach comments are unchanged.
 
 [P002: Player-aware position coach](P002-position-coach.md) presents those findings
-in a move-following Coach tab with stable relevance ordering and both-side wording.
+in a standalone Concepts panel with stable relevance ordering and both-side wording.
 Every match and its exact scope remains inspectable; ordering is a presentation
 heuristic, with no new benefit or effectiveness claim.

@@ -363,6 +363,7 @@ const DEFAULT_LAYOUT = {
   accuracy: { x: 1510, y: 216, w: 294, h: 506 },
   graph:    { x: 1200, y: 620, w: 300, h: 178 },
   engine:   { x: 1510, y: 736, w: 294, h: 178 },
+  concepts: { x: 1820, y: 60,  w: 294, h: 854 },
 };
 const GRIP_SVG = `<svg viewBox="0 0 12 12" width="12" height="12"><path d="M11 4 4 11M11 8 8 11" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>`;
 const HANDLE_SVG = `<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><circle cx="5" cy="4" r="1.3"/><circle cx="11" cy="4" r="1.3"/><circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/><circle cx="5" cy="12" r="1.3"/><circle cx="11" cy="12" r="1.3"/></svg>`;
@@ -1425,6 +1426,7 @@ function buildUI() {
   const graphMount = el("div", { id: "graphMount" });
   const statsMount = el("div", { id: "statsMount" });
   const engineMount = el("div", { id: "engineMount" });
+  const conceptsMount = el("div", { id: "conceptsMount" });
 
   // The stage holds every module. In the automatic layout the side wrappers group the panels into
   // columns (styles.css picks wide / medium / narrow by window size); in the custom layout they are
@@ -1440,6 +1442,7 @@ function buildUI() {
       ),
       makeMod("coach", coachMount),
     ),
+    makeMod("concepts", conceptsMount),
   );
 
   const settings = el("div", { class: "settings-pop", id: "settings", hidden: true });
@@ -1468,7 +1471,7 @@ function buildUI() {
     meta: document.getElementById("meta"), settings, canvas, boardWrap,
     playerTop, playerBot, controls, coach: coachMount, evalbar: evalbarMount,
     review: reviewMount, movesBody, movesCount, movesFoot,
-    graph: graphMount, stats: statsMount, engine: engineMount,
+    graph: graphMount, stats: statsMount, engine: engineMount, concepts: conceptsMount,
     libRail, libControls, libList, libCount,
   };
 
@@ -1476,6 +1479,11 @@ function buildUI() {
   initBoardInput();
   renderCoachAvatar();     // mount the animated coach portrait for the active personality
   renderLibrary();
+  if (typeof ResizeObserver !== "undefined") {
+    const alignment = new ResizeObserver(() => alignConceptPanel());
+    alignment.observe(UI.engine.closest(".mod"));
+    alignment.observe(UI.review.closest(".mod"));
+  }
   window.addEventListener("resize", () => { fitEnginePanel(); growCanvas(); alignPlayers(); positionSettings(); });
 }
 
@@ -1517,6 +1525,7 @@ function layoutForSave() {
   const out = structuredClone(S.layout);
   if (out.accuracy) out.accuracy.h += delta;
   for (const k of belowKeys) if (out[k]) out[k].y += delta;
+  if (S._accReflow.conceptsResized && out.concepts) out.concepts.h += delta;
   return out;
 }
 function saveLayout() {
@@ -1537,6 +1546,7 @@ function applyLayout() {
   const custom = isCustomLayout();
   const desktop = !custom && UI.canvas.classList.contains("desktop-layout");
   const collapse = desktop && !S.qbreakExpanded ? accuracyReflowInfo(DEFAULT_LAYOUT) : null;
+  UI.canvas.style.setProperty("--desktop-width", layoutPageSize(DEFAULT_LAYOUT).pageW + "px");
   for (const mod of UI.canvas.querySelectorAll(".mod")) {
     const key = mod.getAttribute("data-mod");
     const source = custom ? S.layout[key] : desktop ? DEFAULT_LAYOUT[key] : null;
@@ -1606,7 +1616,10 @@ function accuracyReflowInfo(layout = S.layout) {
     const overlapX = o.x < acc.x + acc.w && o.x + o.w > acc.x;
     if (overlapX && o.y >= acc.y + acc.h - 1) belowKeys.push(k);
   }
-  return { delta, belowKeys };
+  const concepts = layout.concepts, review = layout.review, engine = layout.engine;
+  const conceptsResized = !!(concepts && review && engine && concepts.x >= engine.x + engine.w
+    && Math.abs(concepts.y - review.y) < 1 && Math.abs(concepts.y + concepts.h - engine.y - engine.h) < 1);
+  return { delta, belowKeys, conceptsResized };
 }
 // Keep the Accuracy module and everything stacked below it glued together when the category list
 // expands/collapses on the custom canvas (the automatic layout reflows on its own). The saved
@@ -1617,15 +1630,17 @@ function reflowAccuracy(expanded) {
   if (!UI.canvas || !isCustomLayout()) return;
   const acc = S.layout.accuracy; if (!acc) return;
   if (!expanded && !S._accReflow) {
-    const { delta, belowKeys } = accuracyReflowInfo();
+    const { delta, belowKeys, conceptsResized } = accuracyReflowInfo();
     acc.h = Math.max(MINH, acc.h - delta);
     for (const k of belowKeys) S.layout[k].y = Math.max(0, S.layout[k].y - delta);
-    S._accReflow = { delta, belowKeys };
+    if (conceptsResized) S.layout.concepts.h = Math.max(MINH, S.layout.concepts.h - delta);
+    S._accReflow = { delta, belowKeys, conceptsResized };
   } else if (expanded && S._accReflow) {
     // Expand: restore the panel's height and push the same modules back down.
     const { delta, belowKeys } = S._accReflow;
     acc.h += delta;
     for (const k of belowKeys) if (S.layout[k]) S.layout[k].y += delta;
+    if (S._accReflow.conceptsResized && S.layout.concepts) S.layout.concepts.h += delta;
     S._accReflow = null;
   }
   applyLayout(); growCanvas();
@@ -3266,7 +3281,7 @@ function renderReview() {
   refreshConcepts();
   // Cached/completed inputs do not emit a worker update on navigation.
   if (UI.settings && !UI.settings.hidden && S.settingsTab === "concepts") renderSettings();
-  if (_reviewTab === "coach") renderCoachPanel();
+  renderCoachPanel();
   // In-place progress text during analysis (so the loader animation doesn't restart each move).
   if (S.analyzing && revRefs) { revRefs.head.textContent = analysisProgressText(); return; }
 
@@ -3809,38 +3824,41 @@ function renderMoves() {
 }
 
 /* ---------------- Engine lines ---------------- */
-let _reviewTab = "engine", _coachPositionKey = null;
-function reviewPanelTabs() {
-  return el("div", {class: "review-panel-tabs", role: "tablist", "aria-label": "Position analysis"},
-    ...["engine", "coach"].map(tab => el("button", {
-      class: "review-panel-tab" + (_reviewTab === tab ? " on" : ""), role: "tab",
-      id: "position-tab-" + tab, "aria-selected": String(_reviewTab === tab),
-      "aria-controls": "position-panel", tabindex: _reviewTab === tab ? "0" : "-1",
-      onclick: () => { _reviewTab = tab; refreshConcepts(); renderEngineCurrent(); document.getElementById("position-tab-" + tab)?.focus({preventScroll: true}); },
-      onkeydown: event => {
-        if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
-          event.preventDefault(); event.stopPropagation(); _reviewTab = event.key === "Home" ? "engine" : event.key === "End" ? "coach" : tab === "engine" ? "coach" : "engine";
-          renderEngineCurrent(); document.getElementById("position-tab-" + _reviewTab)?.focus({preventScroll: true});
-        }
-      },
-    }, tab === "engine" ? "Engine" : "Coach")));
+let _coachPositionKey = null;
+
+function alignConceptPanel() {
+  const mod = UI.concepts?.closest(".mod"), review = UI.review?.closest(".mod"), engine = UI.engine?.closest(".mod");
+  if (!mod || !review || !engine || isCustomLayout()) return;
+  if (UI.canvas.classList.contains("desktop-layout")) {
+    const top = parseFloat(review.style.top), bottom = parseFloat(engine.style.top) + parseFloat(engine.style.height);
+    mod.style.top = top + "px";
+    mod.style.left = parseFloat(engine.style.left) + parseFloat(engine.style.width) + 16 + "px";
+    mod.style.height = Math.max(MINH, bottom - top) + "px";
+  } else if (window.innerWidth >= 1500 && window.innerHeight >= 600) {
+    const r = review.getBoundingClientRect(), e = engine.getBoundingClientRect();
+    const scale = r.height / review.offsetHeight || 1;
+    mod.style.height = Math.max(MINH, (e.bottom - r.top) / scale) + "px";
+  } else mod.style.height = "";
 }
 
 function renderCoachPanel() {
-  if (!UI.engine || _reviewTab !== "coach") return;
-  const input = selectedConceptInput(), key = input ? conceptKey(input) : S.practice ? "practice" : "start";
+  if (!UI.concepts) return;
+  const mount = UI.concepts;
+  const selected = activePos(), hasMove = !S.practice && !!selected.from && !!selected.to;
+  const input = S.settings.conceptsEnabled === true ? selectedConceptInput() : null;
+  const key = input ? conceptKey(input) : S.practice ? "practice" : hasMove ? selected.fen : "start";
   const signature = JSON.stringify([key, S.meSide, S.settings.conceptsEnabled]);
-  const same = signature === _coachPositionKey, oldBody = UI.engine.querySelector(".coach-insights-body");
+  const same = signature === _coachPositionKey, oldBody = mount.querySelector(".coach-insights-body");
   const scroll = same ? oldBody?.scrollTop || 0 : 0;
-  const open = new Set(same ? [...UI.engine.querySelectorAll("details[open]")].map(d => d.dataset.insight) : []);
-  const focused = UI.engine.contains(document.activeElement) ? document.activeElement.id : null;
+  const open = new Set(same ? [...mount.querySelectorAll("details[open]")].map(d => d.dataset.insight) : []);
+  const focused = mount.contains(document.activeElement) ? document.activeElement.id : null;
   _coachPositionKey = signature;
-  const selected = activePos(), mover = input ? input.fen.split(" ")[1] : null;
+  const mover = hasMove ? selected.color : null;
   const entry = input && _conceptSession?.entries.get(key);
-  const body = el("div", {class: "panel-body coach-insights-body", id: "position-panel", role: "tabpanel", "aria-labelledby": "position-tab-coach"});
+  const body = el("div", {class: "panel-body coach-insights-body", "aria-labelledby": "conceptsHeading"});
   body.append(el("p", {class: "coach-position", "aria-live": "polite"},
-    `${S.meSide === "w" ? "Playing White" : "Playing Black"} · ${input ? (S.analysisMode ? "Variation · " : "") + (mover === S.meSide ? "Your " : "Opponent’s ") + (selected.san || input.move) : S.practice ? "Practice" : "Starting position"}`));
-  if (input && !S.analysisMode && S.classif[S.idx]) {
+    `${S.meSide === "w" ? "Playing White" : "Playing Black"} · ${hasMove ? (S.analysisMode ? "Variation · " : "") + (mover === S.meSide ? "Your " : "Opponent’s ") + selected.san : S.practice ? "Practice" : "Starting position"}`));
+  if (hasMove && !S.analysisMode && S.classif[S.idx]) {
     body.append(el("p", {class: "coach-move-quality"}, `Move assessment: ${categoryName(S.classif[S.idx])}`));
   }
   if (S.practice) body.append(el("p", {}, "Use the practice coach above. Position insights return when practice ends."));
@@ -3867,27 +3885,23 @@ function renderCoachPanel() {
     if (diagnostics.length) body.append(el("p", {class: "coach-status"}, "Some searches or inputs were unavailable. Showing supported findings; details are in Settings → Concepts."));
     body.append(el("p", {class: "coach-status"}, `${insights.length} insights · All matches shown, ordered by likely relevance. Structure observations alone do not establish an advantage.`));
   }
-  UI.engine.replaceChildren(el("div", {class: "panel coach-insights-panel"},
-    el("div", {class: "panel-head"}, reviewPanelTabs()), body));
+  mount.replaceChildren(el("div", {class: "panel coach-insights-panel"},
+    el("div", {class: "panel-head"}, el("h3", {id: "conceptsHeading"}, "Concepts")), body));
   body.scrollTop = scroll;
   if (focused) document.getElementById(focused)?.focus({preventScroll: true});
-  // Keep the existing panel footprint; the complete list scrolls inside it.
-  const mod = UI.engine.closest(".mod");
-  if (mod) mod.style.minHeight = DEFAULT_LAYOUT.engine.h + "px";
-  fitEnginePanel();
+  alignConceptPanel();
 }
 
 // While solving a practice position, the engine lines would give the answer away → hide them.
 function renderEnginePractice() {
   UI.engine.replaceChildren(el("div", { class: "panel" },
-    el("div", { class: "panel-head" }, reviewPanelTabs(), el("span", { class: "count" }, "Practice")),
-    el("div", { class: "panel-body engine-body", id: "position-panel", role: "tabpanel", "aria-labelledby": "position-tab-engine" },
+    el("div", { class: "panel-head" }, el("h3", {}, "Engine"), el("span", { class: "count" }, "Practice")),
+    el("div", { class: "panel-body engine-body" },
       el("div", { class: "engine-empty" }, "Find a stronger move — engine lines are hidden until you solve it.")),
   ));
 }
 // Choose the source of the engine lines for the shown position and draw the panel.
 function renderEngineCurrent() {
-  if (_reviewTab === "coach") { renderCoachPanel(); return; }
   // Hide the engine lines for the whole practice flow, not just the solve: while rolling/skipping to
   // the next mistake (or replaying the demo) the lines would briefly flash the answer for the upcoming
   // position. They only reappear once practice is fully finished/exited.
@@ -3940,15 +3954,6 @@ const ENGINE_NAME = { nnue: "Stockfish 18 NNUE", sf19lite: "Stockfish 19 Lite" }
 // when narrowing a custom panel wraps its heading/button or extra lines are selected.
 function fitEnginePanel() {
   const mod = UI.engine?.closest('.mod');
-  if (mod && _reviewTab === "coach") {
-    // Use spare space below a collapsed Accuracy panel without extending past
-    // the board. Custom layouts keep the user's chosen box and scroll inside it.
-    if (UI.canvas.classList.contains("desktop-layout")) {
-      mod.style.height = Math.max(DEFAULT_LAYOUT.engine.h, Math.min(420,
-        DEFAULT_LAYOUT.board.y + DEFAULT_LAYOUT.board.h - parseFloat(mod.style.top || "0") - 20)) + "px";
-    }
-    return;
-  }
   const head = UI.engine?.querySelector('.panel-head');
   const body = UI.engine?.querySelector('.engine-body');
   if (!mod || !head || !body) return;
@@ -3962,9 +3967,9 @@ function fitEnginePanel() {
   } else if (UI.canvas.classList.contains("desktop-layout")) {
     mod.style.height = height + "px";
   }
+  alignConceptPanel();
 }
 function renderEngine(lines, padFromCache = false) {
-  if (_reviewTab === "coach") { renderCoachPanel(); return; }
   const curFen = activePos().fen;
   const historyKey = JSON.stringify(activeSearchHistory());
   const want = S.settings.engineLines;
@@ -4020,9 +4025,9 @@ function renderEngine(lines, padFromCache = false) {
     onclick: () => { if (S.bestWalking) { stopBestWalk(); renderControls(); renderEngineCurrent(); } else playBestMoves(); },
   }, S.bestWalking ? "■ Stop" : "▶ Play best moves from here");
   UI.engine.replaceChildren(el("div", { class: "panel" },
-    el("div", { class: "panel-head" }, reviewPanelTabs(),
+    el("div", { class: "panel-head" }, el("h3", {}, "Engine"),
       el("span", { class: "count" }, `${activeEngineName()} · depth ${S.settings.engineDepth}`)),
-    el("div", { class: "panel-body engine-body", id: "position-panel", role: "tabpanel", "aria-labelledby": "position-tab-engine" },
+    el("div", { class: "panel-body engine-body" },
       el("div", { class: "engine-candidates", style: { minHeight: (want * 46) + "px" } }, body), bestWalkBtn),
   ));
   fitEnginePanel();
@@ -4765,7 +4770,7 @@ function refreshConcepts() {
     _conceptRenderTimer = setTimeout(() => {
       _conceptRenderTimer = null;
       if (UI.settings && !UI.settings.hidden && S.settingsTab === "concepts") renderSettings();
-      if (_reviewTab === "coach") renderCoachPanel();
+      renderCoachPanel();
     }, 100);
   }});
   if (_conceptPositions !== S.positions || _conceptEnabled !== enabled) {

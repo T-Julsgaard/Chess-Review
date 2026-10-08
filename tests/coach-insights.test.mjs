@@ -55,12 +55,17 @@ test('accepted overload retains actual defender ownership without copying search
 
 test('Coach follows the selected move, discards stale messages, keeps all matches and shares analysis', t => {
   const a = app(t), S = loadGame(a, '1. e4 e5 2. Nf3');
-  a.call('computeDerived'); a.call('buildUI'); a.call('renderEngineCurrent');
+  a.call('computeDerived'); a.call('buildUI'); a.call('renderEngineCurrent'); a.call('renderReview');
   const document = a.dom.window.document;
-  assert.equal(document.querySelector('#position-tab-engine').getAttribute('aria-selected'), 'true');
-  document.querySelector('#position-tab-coach').click();
+  assert.ok(document.querySelector('#engineMount .engine-body'));
+  assert.equal(document.querySelector('#position-tab-coach'), null);
+  assert.equal(document.querySelector('[data-mod="concepts"] h3').textContent, 'Concepts');
   assert.ok(document.querySelector('#coachEnable'));
   assert.equal(a.run('_conceptSession'), null);
+  const selectedInput = a.run('selectedConceptInput');
+  a.replace('selectedConceptInput', () => {throw Error('Disabled panel must not build analysis history');});
+  a.call('renderCoachPanel');
+  a.replace('selectedConceptInput', selectedInput);
   let workers = 0, terminated = 0;
   const session = new ConceptSession({worker: () => {workers++; return {postMessage() {}, terminate() {terminated++;}};}});
   t.after(() => session.stop());
@@ -103,7 +108,6 @@ test('Coach follows the selected move, discards stale messages, keeps all matche
   S.practice = null; S.analysisMode = false; S.variation = null;
   a.call('setConceptEnabled', false); a.call('renderCoachPanel');
   assert.ok(terminated); assert.equal(session.enabled, false);
-  document.querySelector('#position-tab-engine').click();
   assert.ok(document.querySelector('.engine-body'));
   assert.equal(JSON.stringify([S.evals, S.classif, S.moveGrades]), scores);
 });

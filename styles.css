@@ -1063,10 +1063,6 @@ button { font-family: inherit; cursor: pointer; }
 .mod[data-mod="engine"] .panel .engine-body { flex: none; height: auto; overflow: visible; }
 .engine-body > * { flex-shrink: 0; }
 .mod[data-mod="engine"] .engine-bestwalk { white-space: normal; }
-.review-panel-tabs { display: flex; gap: 12px; align-items: center; }
-.review-panel-tab { padding: 3px 0; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--ink-2); font: inherit; font-weight: 600; cursor: pointer; }
-.review-panel-tab.on { color: var(--ink); border-bottom-color: var(--accent); }
-.review-panel-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .coach-insights-body { padding: 10px 12px; overflow-wrap: anywhere; }
 .coach-insights-body p { margin: 0 0 8px; }
 .coach-position { font-weight: 600; }
@@ -1079,7 +1075,7 @@ button { font-family: inherit; cursor: pointer; }
 .coach-insight details { font-size: 11px; color: var(--ink-2); }
 .coach-insight summary { cursor: pointer; }
 .coach-insight details p { margin: 6px 0; }
-.stage.auto:not(.desktop-layout) .mod[data-mod="engine"]:has(.coach-insights-panel) { height: 420px; min-height: 320px; max-height: 420px; }
+.stage.auto:not(.desktop-layout) .mod[data-mod="concepts"] { height: 420px; min-height: 320px; }
 .mod .moves-panel .ml-scroll { max-height: none; overflow: visible; }
 .mod:not([data-mod="board"]):not([data-mod="controls"]) > .mod-inner > div { height: 100%; display: flex; flex-direction: column; min-height: 0; }
 
@@ -1177,6 +1173,7 @@ button { font-family: inherit; cursor: pointer; }
 .stage.auto .mod[data-mod="controls"] { grid-area: controls; }
 .stage.auto .mod[data-mod="accuracy"] { grid-area: acc; }
 .stage.auto .mod[data-mod="engine"] { grid-area: engine; }
+.stage.auto .mod[data-mod="concepts"] { grid-area: concepts; }
 .stage.auto .evalgraph svg { height: clamp(64px, 11vh, 120px); }
 /* The coach portrait sits in the insight panel's top-right corner. The opening and move rows stop
    short of it, and a float beside the first lines of commentary keeps the text clear of it; the
@@ -1200,7 +1197,7 @@ button { font-family: inherit; cursor: pointer; }
        (89px into the insight panel) */
     --coach-float-h: max(0px, calc(99px - var(--side-top)));
     grid-template-columns: var(--eb-w) var(--board) var(--side-w);
-    grid-template-areas: "eval board side";
+    grid-template-areas: "eval board side" "concepts concepts concepts";
   }
   /* The side column is exactly as tall as the board block (contain: size keeps the long move list
      from stretching the row) and starts level with the board, under the top player strip, so the
@@ -1223,6 +1220,16 @@ button { font-family: inherit; cursor: pointer; }
   .stage.auto .mod[data-mod="engine"] { flex: 1 1 0; min-height: 140px; }
   /* at the top of the side column, so the head leans up into the strip beside the board */
   .stage.auto .mod[data-mod="coach"] { position: absolute; top: 0; right: 16px; width: 184px; height: 188px; }
+}
+/* A separate right-hand concepts column when the unzoomed grid has room. */
+@media (min-width: 1500px) and (min-height: 600px) {
+  .stage.auto:not(.desktop-layout) {
+    --concepts-w: 294px;
+    --board-wmax: calc(100vw - var(--sb) - var(--pad-l) - var(--gap) - var(--eb-w) - var(--side-w) - var(--concepts-w) - 3 * var(--gap));
+    grid-template-columns: var(--eb-w) var(--board) var(--side-w) var(--concepts-w);
+    grid-template-areas: "eval board side concepts";
+  }
+  .stage.auto:not(.desktop-layout) .mod[data-mod="concepts"] { margin-top: var(--side-top); }
 }
 /* short but wide windows (laptops): the side column starts with the top strip, for more room, and
    the coach then covers the insight panel's whole right side */
@@ -1249,7 +1256,8 @@ button { font-family: inherit; cursor: pointer; }
       "eval  board moves"
       "eval  board controls"
       "graph graph graph"
-      "acc   acc   engine";
+      "acc   acc   engine"
+      "concepts concepts concepts";
   }
   /* the move list fills whatever the board leaves, without its length stretching the row */
   .stage.auto .mod[data-mod="moves"] { align-self: stretch; contain: size; min-height: 120px; }
@@ -1275,7 +1283,7 @@ button { font-family: inherit; cursor: pointer; }
     --board: min(var(--board-wmax), max(var(--board-min), var(--board-hmax)));
     --review-h: 190px;
     grid-template-columns: var(--eb-w) var(--board);
-    grid-template-areas: "eval board" "controls controls" "review review" "moves moves" "graph graph" "acc acc" "engine engine";
+    grid-template-areas: "eval board" "controls controls" "review review" "moves moves" "graph graph" "acc acc" "engine engine" "concepts concepts";
   }
   .stage.auto .mod[data-mod="moves"] { height: min(420px, 60dvh); }
   .stage.auto .player-strip .name { display: block; overflow: hidden; text-overflow: ellipsis; }
@@ -1287,7 +1295,7 @@ button { font-family: inherit; cursor: pointer; }
    The grid above remains available on narrow windows and browsers without tab zoom APIs. */
 .stage.auto.desktop-layout {
   position: relative; display: block; padding: 12px;
-  min-width: 1832px; min-height: 960px;
+  min-width: var(--desktop-width, 2126px); min-height: 960px;
   --coach-clear: 194px; --coach-float-h: 47px;
 }
 .stage.auto.desktop-layout .player-strip { height: auto; }

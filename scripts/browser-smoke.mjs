@@ -94,7 +94,7 @@ try {
       for(let i=0;i<1000&&frame.contentWindow.__smokeConcepts().metrics.processed!==22;i++)await wait(100);
       const concepts=frame.contentWindow.__smokeConcepts();
       if(concepts.metrics.processed!==22||!concepts.metrics.found||concepts.metrics.errors.length){await report({step:'concept-diagnostics',metrics:concepts.metrics});throw Error('Concept worker failed: '+JSON.stringify(concepts));}
-        doc.querySelector('#position-tab-coach').click();
+        if(!doc.querySelector('#conceptsMount .coach-insights-panel')||!doc.querySelector('#engineMount .engine-body'))throw Error('Concepts and Engine must have independent panels');
         frame.contentWindow.__smokeCoachGo(3);await wait(150);
         const coachCount=doc.querySelectorAll('.coach-insight').length;
         if(coachCount!==frame.contentWindow.__smokeConcepts().selectedFindings||!coachCount)throw Error('Coach omitted matched findings');
@@ -105,8 +105,7 @@ try {
         if(doc.querySelector('.coach-position').textContent===positionBefore)throw Error('Coach retained previous move');
         frame.contentWindow.__smokeCoachGo(0);await wait(150);
         if(doc.querySelectorAll('.coach-insight').length)throw Error('Coach retained results at start');
-        doc.querySelector('#position-tab-engine').click();
-        if(!doc.querySelector('.engine-body'))throw Error('Engine tab did not return');
+        if(!doc.querySelector('#engineMount .engine-body'))throw Error('Engine panel was replaced');
         doc.querySelector('#conceptsEnabled').click();
         if(frame.contentWindow.__smokeConcepts().worker)throw Error('Disabled concept worker remained active');
         await report({step:'coach',key,allMatches:coachCount,moveReplacement:true});

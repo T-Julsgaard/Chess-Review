@@ -8,10 +8,16 @@
   remains E080: 372 verified occurrences / 322 names, 320 eligible routed names.
   No additional concept, scope, benefit or scientific verification is promoted.
 - Selected implementation: `lib/coach-insights.js` is a pure presentation policy;
-  `analysis.js` provides Engine/Coach tabs in the existing Engine panel beside
-  Accuracy. The existing panel footprint and custom layout are retained; when
-  desktop Accuracy is collapsed the Coach can use spare space below it, capped
-  at 420px and the board's bottom edge. Longer lists scroll inside the panel.
+  `analysis.js` provides a standalone Concepts panel to the right of Accuracy
+  and Engine, following the user's placement correction and image. Its top aligns
+  with the existing coach commentary panel and its bottom with the actual Engine
+  bottom, including Accuracy expansion/collapse and Engine content-height changes.
+  Existing module positions remain; the fitted desktop envelope gains one 294px
+  column with a 16px gap. Layout version stays unchanged; old saved layouts acquire
+  only the new default module. Reorganize preserves the visible boxes, and an
+  aligned Concepts column tracks Accuracy reflow without double-applying saved
+  offsets. Manually arranged custom boxes remain independent. Narrow views stack
+  a 420px Concepts panel below Engine. Longer lists scroll inside the panel.
   `styles.css` spaces successive insights with padding, separators and 12px gaps.
 - Message structure: selected move, playing side and existing move assessment;
   then every matched concept name, perspective, explanation and expandable
@@ -43,16 +49,16 @@
   remain semantically unchanged; no search budgets, scoring, grades, existing
   coach phrase banks, avatar narration or saved game schemas change. The memory
   cache profile becomes E080-P002-v1 for the richer summary shape.
-- Cost/reuse: Coach and Concepts share the same optional worker, cache and
-  checkbox. Coach has an enable action when analysis is off. Opening the tab does
-  not enable work automatically. Disabled analysis still skips the worker and
-  history-building cost. Worker results refresh only the current visible Coach
-  and/or Concepts view. Errors/exhaustion display a compact abstention notice;
+- Cost/reuse: the standalone Concepts panel and Settings inspector share the same
+  optional worker, cache and checkbox. The panel has an enable action when analysis
+  is off. Its presence does not enable work automatically. Disabled analysis skips
+  the worker and history-building cost. Worker results refresh the current panel
+  and visible Settings inspector. Errors/exhaustion show a compact abstention notice;
   existing Concepts game-wide diagnostics retain their detailed reports.
 - Exposure: new UI/policy fixtures are authored synthetic; no new real-game
   acquisition, fitting or effectiveness evaluation. Existing guarded regression
   audit uses D001 preflight, public-data-v1, reconstruction verified.
-- Verification: all 322 production regression tests pass, including all-match
+- Initial implementation verification: all 322 production regression tests pass, including all-match
   stable ordering, two-side wording/grammar, conditional overload ownership from
   an actual accepted proof, stale completion/navigation, variation/practice/start
   states, scroll/evidence preservation, disable/shared-worker behavior and unchanged
@@ -70,7 +76,17 @@
   browser processes 22 moves / 254 findings with zero errors or unavailable inputs;
   22 bounded mate-budget abstentions remain explicit. Measured concept-analysis work
   totals 35.80s Chrome / 52.05s Firefox on this host; presentation adds no search.
-- Rollback: remove the Engine/Coach switch and presentation module, revert compact
+- Placement correction verification: all 322 production tests, 30 Chrome layout
+  cases, packaged Chrome/Firefox smoke checks, source verification, local builds
+  and whitespace checks pass. Firefox package lint has zero errors and the same
+  existing innerHTML warning. Desktop and scrolled 320px screenshots were inspected
+  against the supplied image. New browser assertions require the panel's top to match commentary,
+  its bottom to match Engine, and its left edge to sit beyond Engine's right edge;
+  repeat with four engine lines and expanded/collapsed Accuracy. The independent
+  Engine panel, all-match messages, disabled history cost and custom layout fitting
+  retain regression coverage. No detector, scope, ranking or wording is changed
+  by the placement correction.
+- Rollback: remove the standalone Concepts module and presentation module, revert compact
   ownership metadata/profile version; P001 remains independently usable. No
   scoring/calibration rollback or persisted analysis migration is necessary.
 - Implementation commit: the local commit introducing this record.
