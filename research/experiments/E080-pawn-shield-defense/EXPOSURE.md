@@ -81,3 +81,13 @@ replay and all 267 input hashes pass. Twelve proven/32 no-new-fact/two disabled/
 four exhausted/12 not-applicable/ten not-live and 38 exact errors; 324 proof
 replies/leaves. Full artifact 665,381 bytes at research/runs/E080/pilot/results.json;
 recorded exact hash in RESULT. No failure, pruning or storage-only complexity.
+
+Remaining checking-move/distant-pawn/higher-warning selection and rehashed
+storage-forgery gates pass; focused 121 tests in 11.1s, then candidate tracker/
+preview audit brings total 122 tests, all pass in 12.8s. All 1,083 outside rows
+unchanged; broader cover/enduring safety remain partial. Higher missed-mate
+warning stays selected despite a valid shield event, both colors. No failure
+or source search/budget/predicate change. Cumulative runner reuses exact E079
+reflection routing and storage; expose expanded 116-case core pilot next, with
+distinct output directory and complete source/input provenance. Canonical
+tracker remains E079 until all unchanged registered final gates pass.

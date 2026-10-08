@@ -70,8 +70,26 @@ not canonical acceptance. Remaining named gates include explicit checking-move,
 extra distant pawn/higher-warning selection and rehashed storage forgery checks,
 plus cumulative runner/tracker/demo and all registered exact final checks.
 
-Next: build cumulative runner/tracker/demo and finish remaining
-registered coverage before cumulative/exact final gates. Shared reconciliation policy
+Remaining named checking-move/distant-pawn/higher-warning/rehashed-forgery gates
+now pass: 121 focused tests in 11.1s, then 122 tests in 12.8s including tracker
+and preview audit. Higher missed-mate warning remains selected despite a valid
+shield witness, both colors. Candidate tracker changes only C0226/C0400; all
+1,083 outside rows unchanged, C0227 cover/C0384 enduring safety remain partial.
+Candidate counts 322 names/372 verified occurrences, 76 partial/637 unimplemented,
+713 remaining; canonical E079 remains unchanged until final acceptance.
+
+Cumulative runner/status/preview prepared from exact E079 harness. Three-layer
+reflection preserves E080 own/E079 own/older E078 routes separately, and every
+5,190 ordered inherited full fingerprint remains a required gate. Reuse complete
+lossless E079 storage/decoder; new small shield proofs remain complete inline.
+No new size-only encoding complexity or hard byte cap. Expected expanded core
+116 cases and cumulative 5,306; all source/input vectors and original list retained.
+Before costly collection, run the expanded guarded saved pilot to a distinct
+output directory preserving the 110-case pilot.
+
+Next: expanded cheap pilot, full cumulative suite/source/diff and cumulative
+development saved run; then freeze and exact main/repeat/clean plus saved replay.
+Shared reconciliation policy
 c43b471 incorporated at clean boundary via 22b9abe; source/diff and unchanged
 261-input/three-output E079 manifest audit pass. Ordinary local divergence
 will now be reconciled safely under that explicit approval before integration.

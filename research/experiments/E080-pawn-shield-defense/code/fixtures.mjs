@@ -4,7 +4,7 @@ import {fixtures as previousFixtures} from '../../E079-central-king-support/code
 export {reflect} from '../../E079-central-king-support/code/fixtures.mjs';
 export const candidate = {id: 'queen-file-cover', fen: setup({a1: null, a7: null,
   g1: 'K', f2: 'P', g2: 'P', h2: 'P', h8: 'k', g4: 'q', f3: 'b'}),
-  move: 'g2g3', pawnShieldTags: true, scanReplies: false};
+  move: 'g2g3', pawnShieldTags: true, scanReplies: false, expectedStatus: 'proven'};
 export const rookOriginal = {...candidate, id: 'rook-original-negative',
   fen: setup({a1: null, a7: null, g1: 'K', g2: 'P', h2: 'P', h8: 'k',
     g4: 'r', f3: 'b', b5: 'b', f2: 'n'})};
@@ -82,4 +82,8 @@ for (const id of ['foundation-rejected', 'foundation-exhausted', 'foundation-ter
       : ['dead-promotion', 'repetition-root', 'actual-dead-capture', 'actual-mate', 'actual-stalemate'].includes(id)
         ? 'not-live' : 'no-new-fact'});
 }
+add('checking-pawn-move', {fen: basic({h8: null, e4: 'k', g1: 'K', f2: 'P', g2: 'P', h2: 'P', g4: 'q', h3: 'b'}), move: 'f2f3'});
+add('extra-distant-pawn', {fen: basic({g1: 'K', f2: 'P', g2: 'P', h2: 'P', a2: 'P', g4: 'q', f3: 'b'})}, 'proven');
+add('prior-warning-selection', {fen: basic({g1: 'K', f2: 'P', g2: 'P', h2: 'P', a7: 'Q', f7: 'R', g4: 'q', f3: 'b'}),
+  mateDepth: 2, parentSelectedId: 'missed-mate'}, 'proven');
 fixtures.push(...extraFixtures);

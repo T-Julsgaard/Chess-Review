@@ -32,7 +32,11 @@ for (const fixture of fixtures.flatMap(f => [f, reflect(f)])) {
 const report = {role: 'exposed guarded development pilot; not canonical acceptance', codeRevision,
   eligibilityReceipt: data.receipt, inputHashes, rows, states, ...counts,
   elapsedMs: Math.round(performance.now() - started)};
-const json = JSON.stringify(report, null, 2) + '\n', out = 'research/runs/E080/pilot';
+const args = process.argv.slice(2);
+if (args.length && (args.length !== 2 || args[0] !== '--out' || !args[1].startsWith('research/runs/E080/'))) {
+  throw Error('Use --out research/runs/E080/<development-folder>');
+}
+const json = JSON.stringify(report, null, 2) + '\n', out = args[1] || 'research/runs/E080/pilot';
 await mkdir(out, {recursive: true}); await writeFile(out + '/results.json', json);
 console.log(JSON.stringify({passed: true, role: report.role, codeRevision, cases: rows.length,
   states, ...counts, bytes: Buffer.byteLength(json), hash: sha256(json), elapsedMs: report.elapsedMs, out}, null, 2));

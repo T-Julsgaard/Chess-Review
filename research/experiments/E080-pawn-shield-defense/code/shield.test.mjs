@@ -9,12 +9,26 @@ const {replayQuery} = await import('../../E029-forced-mates/code/replay.mjs');
 const {turnBoard} = await import('../../E027-defensive-resources/code/defense.mjs');
 const {candidate, rookOriginal, candidates, extraFixtures, reflect} = await import('./fixtures.mjs');
 const {replayResult} = await import('./replay.mjs');
+const {packReport} = await import('../../E079-central-king-support/code/pool.mjs');
+const {unpackReport} = await import('../../E079-central-king-support/code/saved.mjs');
+const {createHash} = await import('node:crypto');
+const {readFile} = await import('node:fs/promises');
+const {renderStatus} = await import('./status.mjs');
+const {renderStatus: parentStatus} = await import('../../E079-central-king-support/code/status.mjs');
+const {parseTracker} = await import('../../../workflow.mjs');
+const {renderDemo} = await import('./display.mjs');
 for (const f of extraFixtures.flatMap(f => [f, reflect(f)])) test(f.id + ': history, refusal or applicability gate', () => {
   if (f.inputError) {
     assert.throws(() => explainMove(f), error => error.message.includes(f.expectedError));
   } else {
     const result = explainMove(f), checked = replayResult(f, result);
     assert.equal(checked.state, f.expectedStatus);
+    if (f.parentSelectedId) {
+      const inherited = parent(f), selected = inherited.events.find(e => e.text === inherited.comment);
+      assert.equal(selected.id, f.parentSelectedId);
+      assert.equal(result.comment, inherited.comment);
+      assert.ok(result.events.some(e => e.id === 'pawn-shield-defense'));
+    }
     if (!['proven', 'disabled'].includes(checked.state)) {
       assert.ok(!result.events.some(e => e.id === 'pawn-shield-defense'));
     }
@@ -117,4 +131,42 @@ test('independent wrapper replay rejects forged inventories, causality, proofs a
     const forged = structuredClone(complete); alter(forged);
     assert.throws(() => replayResult(candidate, forged));
   }
+});
+test('valid storage and recomputed physical hash cannot authenticate a forged mate-refusal tree', () => {
+  const report = {results: [{fixture: candidate, result: explainMove(candidate)}]};
+  const stored = packReport(report), original = JSON.stringify(stored);
+  assert.equal(JSON.stringify(unpackReport(stored)), JSON.stringify(report));
+  const forged = structuredClone(report);
+  forged.results[0].result.pawnShieldAnalysis.afterProof.tree.branches[0].child.win = true;
+  const alteredStorage = packReport(forged), altered = JSON.stringify(alteredStorage);
+  const hash = value => createHash('sha256').update(value).digest('hex');
+  assert.notEqual(hash(altered), hash(original));
+  const verifiedPhysicalHash = hash(altered);
+  assert.equal(hash(altered), verifiedPhysicalHash);
+  const decoded = unpackReport(JSON.parse(altered));
+  assert.throws(() => replayResult(decoded.results[0].fixture, decoded.results[0].result));
+});
+test('candidate tracker changes only the two registered scopes; preview distinguishes refusal and played terminal', async () => {
+  const list = await readFile('research/experiments/E020-coach-concepts/CONCEPTS.md', 'utf8');
+  const report = {fixtures: 5306}, before = parentStatus(list, report), after = renderStatus(list, report);
+  const rows = text => new Map([...text.matchAll(/^- .* (C\d{4}) \*\*.*$/gm)].map(r => [r[1], r[0]]));
+  const oldRows = rows(before), newRows = rows(after);
+  let unchanged = 0;
+  for (const [id, row] of oldRows) if (!['C0226', 'C0400'].includes(id)) {
+    assert.equal(newRows.get(id), row); unchanged++;
+  }
+  assert.equal(unchanged, 1083);
+  assert.ok(newRows.get('C0227').includes('Partial:'));
+  assert.ok(newRows.get('C0384').includes('Partial:'));
+  const status = parseTracker(after, list);
+  assert.equal(status.verifiedConcepts, 322); assert.equal(status.verifiedEntries, 372);
+  assert.equal(status.partialEntries, 76); assert.equal(status.remainingEntries, 713);
+  const zero = {...candidate, id: 'preview-zero', maxPawnShieldNodes: 0};
+  const html = renderDemo([{fixture: zero, result: explainMove(zero)}]);
+  assert.ok(html.includes('Played position')); assert.ok(html.includes('exhausted'));
+  assert.ok(!html.includes('The input position is terminal'));
+  const terminal = extraFixtures.find(f => f.id === 'guard-actual-mate');
+  const played = renderDemo([{fixture: terminal, result: explainMove(terminal)}]);
+  assert.ok(played.includes('Played position')); assert.ok(played.includes('not-live'));
+  assert.ok(!played.includes('The input position is terminal'));
 });
