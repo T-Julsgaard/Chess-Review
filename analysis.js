@@ -14,6 +14,7 @@ import { expectedPoints, SF19_OUTCOME } from "./lib/public-scoring.js";
 import { calibratedReview, scoringEvidenceComplete } from "./lib/calibrated-review.js";
 import { analyseCalibratedPosition } from "./lib/calibrated-search.js";
 import { ConceptSession, conceptKey } from "./lib/concepts/session.js";
+import { coachInsights } from "./lib/coach-insights.js";
 
 /* ---------------- Opening book ----------------
  * Offline lookup table built from lichess-org/chess-openings (bundled in data/book.json).
@@ -3263,6 +3264,9 @@ function analysisProgressText() {
 }
 function renderReview() {
   refreshConcepts();
+  // Cached/completed inputs do not emit a worker update on navigation.
+  if (UI.settings && !UI.settings.hidden && S.settingsTab === "concepts") renderSettings();
+  if (_reviewTab === "coach") renderCoachPanel();
   // In-place progress text during analysis (so the loader animation doesn't restart each move).
   if (S.analyzing && revRefs) { revRefs.head.textContent = analysisProgressText(); return; }
 
@@ -3805,16 +3809,85 @@ function renderMoves() {
 }
 
 /* ---------------- Engine lines ---------------- */
+let _reviewTab = "engine", _coachPositionKey = null;
+function reviewPanelTabs() {
+  return el("div", {class: "review-panel-tabs", role: "tablist", "aria-label": "Position analysis"},
+    ...["engine", "coach"].map(tab => el("button", {
+      class: "review-panel-tab" + (_reviewTab === tab ? " on" : ""), role: "tab",
+      id: "position-tab-" + tab, "aria-selected": String(_reviewTab === tab),
+      "aria-controls": "position-panel", tabindex: _reviewTab === tab ? "0" : "-1",
+      onclick: () => { _reviewTab = tab; refreshConcepts(); renderEngineCurrent(); document.getElementById("position-tab-" + tab)?.focus({preventScroll: true}); },
+      onkeydown: event => {
+        if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
+          event.preventDefault(); event.stopPropagation(); _reviewTab = event.key === "Home" ? "engine" : event.key === "End" ? "coach" : tab === "engine" ? "coach" : "engine";
+          renderEngineCurrent(); document.getElementById("position-tab-" + _reviewTab)?.focus({preventScroll: true});
+        }
+      },
+    }, tab === "engine" ? "Engine" : "Coach")));
+}
+
+function renderCoachPanel() {
+  if (!UI.engine || _reviewTab !== "coach") return;
+  const input = selectedConceptInput(), key = input ? conceptKey(input) : S.practice ? "practice" : "start";
+  const signature = JSON.stringify([key, S.meSide, S.settings.conceptsEnabled]);
+  const same = signature === _coachPositionKey, oldBody = UI.engine.querySelector(".coach-insights-body");
+  const scroll = same ? oldBody?.scrollTop || 0 : 0;
+  const open = new Set(same ? [...UI.engine.querySelectorAll("details[open]")].map(d => d.dataset.insight) : []);
+  const focused = UI.engine.contains(document.activeElement) ? document.activeElement.id : null;
+  _coachPositionKey = signature;
+  const selected = activePos(), mover = input ? input.fen.split(" ")[1] : null;
+  const entry = input && _conceptSession?.entries.get(key);
+  const body = el("div", {class: "panel-body coach-insights-body", id: "position-panel", role: "tabpanel", "aria-labelledby": "position-tab-coach"});
+  body.append(el("p", {class: "coach-position", "aria-live": "polite"},
+    `${S.meSide === "w" ? "Playing White" : "Playing Black"} · ${input ? (S.analysisMode ? "Variation · " : "") + (mover === S.meSide ? "Your " : "Opponent’s ") + (selected.san || input.move) : S.practice ? "Practice" : "Starting position"}`));
+  if (input && !S.analysisMode && S.classif[S.idx]) {
+    body.append(el("p", {class: "coach-move-quality"}, `Move assessment: ${categoryName(S.classif[S.idx])}`));
+  }
+  if (S.practice) body.append(el("p", {}, "Use the practice coach above. Position insights return when practice ends."));
+  else if (!S.settings.conceptsEnabled) body.append(
+    el("p", {}, "Enable position insights to see the coach’s explanations for each move."),
+    el("button", {class: "engine-bestwalk", id: "coachEnable", onclick: () => setConceptEnabled(true)}, "Enable position insights"));
+  else if (!input) body.append(el("p", {}, "Select a move to see what changed and what the resulting position contains."));
+  else {
+    const insights = coachInsights(entry?.findings || [], {mover, player: S.meSide});
+    if (!entry || entry.status !== "complete") body.append(el("p", {class: "coach-status"}, insights.length ? "Observations ready; checking further continuations…" : "Checking this position…"));
+    if (entry?.status === "complete" && !insights.length) body.append(el("p", {}, "No supported insight within the available inputs and search limits."));
+    const list = el("ol", {class: "coach-insights-list"});
+    for (const finding of insights) {
+      const id = JSON.stringify([finding.event, finding.name, finding.sourceText]);
+      const details = el("details", {"data-insight": id, open: open.has(id)}, el("summary", {}, "Evidence and scope"),
+        el("p", {}, finding.kind), el("p", {}, "Detector explanation: " + finding.sourceText),
+        ...finding.scopes.map(scope => el("p", {}, scope.occurrence + ": " + scope.scope)));
+      list.append(el("li", {class: "coach-insight", "data-concept": finding.name},
+        el("strong", {}, finding.name), el("span", {class: "coach-perspective"}, finding.perspective),
+        el("p", {}, finding.text), details));
+    }
+    body.append(list);
+    const diagnostics = [...(entry?.errors || []), ...(entry?.unavailable || []), ...(entry?.issues || [])];
+    if (diagnostics.length) body.append(el("p", {class: "coach-status"}, "Some searches or inputs were unavailable. Showing supported findings; details are in Settings → Concepts."));
+    body.append(el("p", {class: "coach-status"}, `${insights.length} insights · All matches shown, ordered by likely relevance. Structure observations alone do not establish an advantage.`));
+  }
+  UI.engine.replaceChildren(el("div", {class: "panel coach-insights-panel"},
+    el("div", {class: "panel-head"}, reviewPanelTabs()), body));
+  body.scrollTop = scroll;
+  if (focused) document.getElementById(focused)?.focus({preventScroll: true});
+  // Keep the existing panel footprint; the complete list scrolls inside it.
+  const mod = UI.engine.closest(".mod");
+  if (mod) mod.style.minHeight = DEFAULT_LAYOUT.engine.h + "px";
+  fitEnginePanel();
+}
+
 // While solving a practice position, the engine lines would give the answer away → hide them.
 function renderEnginePractice() {
   UI.engine.replaceChildren(el("div", { class: "panel" },
-    el("div", { class: "panel-head" }, el("h3", {}, "Engine"), el("span", { class: "count" }, "Practice")),
-    el("div", { class: "panel-body engine-body" },
+    el("div", { class: "panel-head" }, reviewPanelTabs(), el("span", { class: "count" }, "Practice")),
+    el("div", { class: "panel-body engine-body", id: "position-panel", role: "tabpanel", "aria-labelledby": "position-tab-engine" },
       el("div", { class: "engine-empty" }, "Find a stronger move — engine lines are hidden until you solve it.")),
   ));
 }
 // Choose the source of the engine lines for the shown position and draw the panel.
 function renderEngineCurrent() {
+  if (_reviewTab === "coach") { renderCoachPanel(); return; }
   // Hide the engine lines for the whole practice flow, not just the solve: while rolling/skipping to
   // the next mistake (or replaying the demo) the lines would briefly flash the answer for the upcoming
   // position. They only reappear once practice is fully finished/exited.
@@ -3867,6 +3940,15 @@ const ENGINE_NAME = { nnue: "Stockfish 18 NNUE", sf19lite: "Stockfish 19 Lite" }
 // when narrowing a custom panel wraps its heading/button or extra lines are selected.
 function fitEnginePanel() {
   const mod = UI.engine?.closest('.mod');
+  if (mod && _reviewTab === "coach") {
+    // Use spare space below a collapsed Accuracy panel without extending past
+    // the board. Custom layouts keep the user's chosen box and scroll inside it.
+    if (UI.canvas.classList.contains("desktop-layout")) {
+      mod.style.height = Math.max(DEFAULT_LAYOUT.engine.h, Math.min(420,
+        DEFAULT_LAYOUT.board.y + DEFAULT_LAYOUT.board.h - parseFloat(mod.style.top || "0") - 20)) + "px";
+    }
+    return;
+  }
   const head = UI.engine?.querySelector('.panel-head');
   const body = UI.engine?.querySelector('.engine-body');
   if (!mod || !head || !body) return;
@@ -3882,6 +3964,7 @@ function fitEnginePanel() {
   }
 }
 function renderEngine(lines, padFromCache = false) {
+  if (_reviewTab === "coach") { renderCoachPanel(); return; }
   const curFen = activePos().fen;
   const historyKey = JSON.stringify(activeSearchHistory());
   const want = S.settings.engineLines;
@@ -3937,9 +4020,9 @@ function renderEngine(lines, padFromCache = false) {
     onclick: () => { if (S.bestWalking) { stopBestWalk(); renderControls(); renderEngineCurrent(); } else playBestMoves(); },
   }, S.bestWalking ? "■ Stop" : "▶ Play best moves from here");
   UI.engine.replaceChildren(el("div", { class: "panel" },
-    el("div", { class: "panel-head" }, el("h3", {}, "Engine"),
+    el("div", { class: "panel-head" }, reviewPanelTabs(),
       el("span", { class: "count" }, `${activeEngineName()} · depth ${S.settings.engineDepth}`)),
-    el("div", { class: "panel-body engine-body" },
+    el("div", { class: "panel-body engine-body", id: "position-panel", role: "tabpanel", "aria-labelledby": "position-tab-engine" },
       el("div", { class: "engine-candidates", style: { minHeight: (want * 46) + "px" } }, body), bestWalkBtn),
   ));
   fitEnginePanel();
@@ -4682,6 +4765,7 @@ function refreshConcepts() {
     _conceptRenderTimer = setTimeout(() => {
       _conceptRenderTimer = null;
       if (UI.settings && !UI.settings.hidden && S.settingsTab === "concepts") renderSettings();
+      if (_reviewTab === "coach") renderCoachPanel();
     }, 100);
   }});
   if (_conceptPositions !== S.positions || _conceptEnabled !== enabled) {
@@ -4694,14 +4778,17 @@ function refreshConcepts() {
   }
   if (enabled) { const selected = selectedConceptInput(); if (selected) _conceptSession.include(selected, true); }
 }
+function setConceptEnabled(enabled) {
+  S.settings.conceptsEnabled = enabled;
+  browserAPI.storage.local.set({settings: S.settings});
+  refreshConcepts();
+}
 function conceptSettings() {
   const enabled = S.settings.conceptsEnabled === true;
   const checkbox = el("input", {type: "checkbox", id: "conceptsEnabled", checked: enabled, onchange: event => {
-    S.settings.conceptsEnabled = event.target.checked;
-    browserAPI.storage.local.set({settings: S.settings});
     // Let checkbox/label activation finish before the scheduled panel refresh.
     // Replacing this input during change can make a native label activate it twice.
-    refreshConcepts();
+    setConceptEnabled(event.target.checked);
   }});
   const panel = el("div", {class: "concepts-panel"},
     el("label", {class: "concepts-toggle"}, checkbox, "Enable concept analysis"),

@@ -11,7 +11,7 @@ const record=JSON.parse(await fs.readFile(recordPath));
 const out=await fs.mkdtemp(path.join(path.dirname(recordPath),'layout-'));
 const source=await fs.mkdtemp(path.join(artifacts,'layout-chrome-'));
 await fs.cp(record.packages.find(p=>p.browser==='chrome').sourceDir,source,{recursive:true});
-await fs.appendFile(path.join(source,'analysis.js'),'\nexport {S, resetLayout, toggleReorganize, updateLibrary, go, applyGame, _conceptSession};\n');
+await fs.appendFile(path.join(source,'analysis.js'),'\nexport {S, resetLayout, toggleReorganize, updateLibrary, go, applyGame, _conceptSession, selectedConceptInput};\n');
 await fs.writeFile(path.join(source,'audit.html'),'<!doctype html><script type="module" src="audit.js"></script>');
 await fs.writeFile(path.join(source,'audit.js'),"import {browserAPI} from './browser-compat.js'; window.api=browserAPI;");
 const profile=await fs.mkdtemp(path.join(artifacts,'layout-profile-'));
@@ -129,8 +129,30 @@ try {
   assert.equal(conceptMetrics.total,4);assert.ok(conceptMetrics.found>0);assert.deepEqual(conceptMetrics.errors,[]);
   assert.equal(await evaluate(review,"import('./analysis.js').then(m=>JSON.stringify([m.S.evals,m.S.classif]))"),scoreBefore);
   await evaluate(review,"import('./analysis.js').then(m=>m.go(3))");await sleep(150);
+  await waitFor(review,"document.querySelector('.concepts-findings')?.textContent.includes('Development')",'Selected concept redraw');
   assert.match(await evaluate(review,"document.querySelector('.concepts-findings').textContent"),/Development/);
   await capture('concepts-wide');
+  await evaluate(review,"document.querySelector('[aria-label=\"Settings\"]').click(); document.querySelector('#position-tab-coach').click()");
+  const selectedFindingCount=await evaluate(review,"(async()=>{const m=await import('./analysis.js'), {conceptKey}=await import('./lib/concepts/session.js');return m._conceptSession.entries.get(conceptKey(m.selectedConceptInput())).findings.length})()");
+  assert.equal(await evaluate(review,"document.querySelectorAll('.coach-insight').length"),selectedFindingCount);
+  assert.match(await evaluate(review,"document.querySelector('.coach-position').textContent"),/Playing White.*Your Nf3/);
+  await capture('coach-wide');
+  await evaluate(review,"import('./analysis.js').then(m=>{m.S.meSide='b';m.go(2);m.go(3)})");
+  assert.match(await evaluate(review,"document.querySelector('.coach-position').textContent"),/Playing Black.*Opponent’s Nf3/);
+  await capture('coach-black');
+  for(const width of [390,320]) {
+    await call('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(500);
+    await evaluate(review,"document.querySelector('.coach-insights-panel').scrollIntoView({block:'center'})");
+    const coachBox=await evaluate(review,"(()=>{const panel=document.querySelector('.coach-insights-panel'),mod=panel.closest('.mod'),body=panel.querySelector('.coach-insights-body');return {panel:panel.getBoundingClientRect().height,module:mod.getBoundingClientRect().height,body:body.clientHeight,scrolls:body.scrollHeight>body.clientHeight}})()");
+    assert.ok(coachBox.panel<=coachBox.module+1&&coachBox.body>100&&coachBox.scrolls,`Coach ${width}: list must scroll inside its box`);
+    await capture(`coach-${width}`);
+  }
+  await call('Emulation.clearDeviceMetricsOverride',{},review.sessionId);
+  await evaluate(review,"window.scrollTo(0,0)");
+  await evaluate(review,"import('./analysis.js').then(m=>{m.go(0)})");
+  assert.equal(await evaluate(review,"document.querySelectorAll('.coach-insight').length"),0);
+  await evaluate(review,"import('./analysis.js').then(m=>{m.S.meSide='w';m.go(3)})");
+  await evaluate(review,"document.querySelector('#position-tab-engine').click(); document.querySelector('[aria-label=\"Settings\"]').click()");
   for(const width of [390,320]) {
     await call('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(400);
     const bounds=await evaluate(review,"(()=>{const r=document.querySelector('#settings').getBoundingClientRect();return {left:r.left,right:r.right,width:innerWidth,scroll:document.documentElement.scrollWidth}})()");

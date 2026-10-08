@@ -6,7 +6,14 @@ review — accuracy scores, move-by-move classifications, an evaluation graph, a
 rating. No account, no server, no manual PGN copying.
 
 The right-hand Settings panel includes an optional **Concepts** tab after Visual
-and Engine. Check **Enable concept analysis** to list supported findings for the
+and Engine. The review's **Coach** tab beside Engine uses those same findings,
+ordered by likely relevance and phrased from your playing side. It follows the
+selected move, includes every match, and separates insights with space. Expand
+an insight's evidence to inspect the original explanation and exact scope.
+Accuracy and the existing move commentary retain their scoring and behavior.
+
+The Settings Concepts panel remains the raw inspection and game-debug view.
+Check **Enable concept analysis** to list supported findings for the
 selected move, with exact verified scopes and game-wide debug metrics. It defaults
 off and stops its worker immediately when disabled. Findings use completed E080
 research's bounded mechanics; broader strategic benefits and coaching usefulness

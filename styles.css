@@ -1063,6 +1063,23 @@ button { font-family: inherit; cursor: pointer; }
 .mod[data-mod="engine"] .panel .engine-body { flex: none; height: auto; overflow: visible; }
 .engine-body > * { flex-shrink: 0; }
 .mod[data-mod="engine"] .engine-bestwalk { white-space: normal; }
+.review-panel-tabs { display: flex; gap: 12px; align-items: center; }
+.review-panel-tab { padding: 3px 0; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--ink-2); font: inherit; font-weight: 600; cursor: pointer; }
+.review-panel-tab.on { color: var(--ink); border-bottom-color: var(--accent); }
+.review-panel-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.coach-insights-body { padding: 10px 12px; overflow-wrap: anywhere; }
+.coach-insights-body p { margin: 0 0 8px; }
+.coach-position { font-weight: 600; }
+.coach-move-quality, .coach-status, .coach-perspective { color: var(--ink-2); font-size: 12px; line-height: 1.5; }
+.coach-insights-list { list-style: none; padding: 0; margin: 12px 0; }
+.coach-insight { padding: 12px 0; border-top: 1px solid var(--line); line-height: 1.55; }
+.coach-insight + .coach-insight { margin-top: 12px; }
+.coach-insight > strong, .coach-perspective { display: block; }
+.coach-perspective { margin: 3px 0 7px; }
+.coach-insight details { font-size: 11px; color: var(--ink-2); }
+.coach-insight summary { cursor: pointer; }
+.coach-insight details p { margin: 6px 0; }
+.stage.auto:not(.desktop-layout) .mod[data-mod="engine"]:has(.coach-insights-panel) { height: 420px; min-height: 320px; max-height: 420px; }
 .mod .moves-panel .ml-scroll { max-height: none; overflow: visible; }
 .mod:not([data-mod="board"]):not([data-mod="controls"]) > .mod-inner > div { height: 100%; display: flex; flex-direction: column; min-height: 0; }
 

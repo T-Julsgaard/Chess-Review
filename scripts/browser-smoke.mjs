@@ -36,7 +36,7 @@ try {
     // zooms. Exercise the responsive fallback here; release-layout.mjs checks
     // the real tab/window zoom fit separately.
     await fs.appendFile(path.join(sourceDir,'analysis.js'), '\nglobalThis.__smokeResponsive=()=>{_zoomTabId=null;UI.canvas.classList.remove("desktop-layout");applyLayout();};\nglobalThis.__smokePreferences=()=>({settings:structuredClone(S.settings),layoutMode:S.layoutMode});\n');
-    await fs.appendFile(path.join(sourceDir,'analysis.js'), '\nglobalThis.__smokeConcepts=()=>({enabled:S.settings.conceptsEnabled,worker:!!_conceptSession?.worker,metrics:_conceptSession?.metrics()});\n');
+    await fs.appendFile(path.join(sourceDir,'analysis.js'), '\nglobalThis.__smokeConcepts=()=>({enabled:S.settings.conceptsEnabled,worker:!!_conceptSession?.worker,metrics:_conceptSession?.metrics(),selectedFindings:_conceptSession?.entries.get(conceptKey(selectedConceptInput()))?.findings.length});\nglobalThis.__smokeCoachGo=idx=>go(idx);\n');
     await fs.appendFile(path.join(sourceDir,'background.js'), '\nbrowserAPI.runtime.onInstalled.addListener(() => browserAPI.tabs.create({url:browserAPI.runtime.getURL("smoke.html")}));\n');
     await fs.appendFile(path.join(sourceDir,'background.js'), '\nbrowserAPI.runtime.onMessage.addListener((message,sender,reply)=>{if(message.type!=="smokeReleaseReset")return;resetSettingsForRelease({reason:"update",previousVersion:"0.2.0"}).then(()=>reply({ok:true}),error=>reply({error:error.message}));return true;});\n');
     await fs.writeFile(path.join(sourceDir,'smoke.html'),'<!doctype html><script type="module" src="smoke-client.js"></script>');
@@ -94,8 +94,22 @@ try {
       for(let i=0;i<1000&&frame.contentWindow.__smokeConcepts().metrics.processed!==22;i++)await wait(100);
       const concepts=frame.contentWindow.__smokeConcepts();
       if(concepts.metrics.processed!==22||!concepts.metrics.found||concepts.metrics.errors.length){await report({step:'concept-diagnostics',metrics:concepts.metrics});throw Error('Concept worker failed: '+JSON.stringify(concepts));}
-      doc.querySelector('#conceptsEnabled').click();
-      if(frame.contentWindow.__smokeConcepts().worker)throw Error('Disabled concept worker remained active');
+        doc.querySelector('#position-tab-coach').click();
+        frame.contentWindow.__smokeCoachGo(3);await wait(150);
+        const coachCount=doc.querySelectorAll('.coach-insight').length;
+        if(coachCount!==frame.contentWindow.__smokeConcepts().selectedFindings||!coachCount)throw Error('Coach omitted matched findings');
+        const coachPanel=doc.querySelector('.coach-insights-panel'),coachBox=coachPanel.closest('.mod'),coachBody=coachPanel.querySelector('.coach-insights-body');
+        if(coachPanel.getBoundingClientRect().height>coachBox.getBoundingClientRect().height+1||coachBody.clientHeight<100)throw Error('Coach contents escape their panel');
+        const positionBefore=doc.querySelector('.coach-position').textContent;
+        frame.contentWindow.__smokeCoachGo(4);await wait(150);
+        if(doc.querySelector('.coach-position').textContent===positionBefore)throw Error('Coach retained previous move');
+        frame.contentWindow.__smokeCoachGo(0);await wait(150);
+        if(doc.querySelectorAll('.coach-insight').length)throw Error('Coach retained results at start');
+        doc.querySelector('#position-tab-engine').click();
+        if(!doc.querySelector('.engine-body'))throw Error('Engine tab did not return');
+        doc.querySelector('#conceptsEnabled').click();
+        if(frame.contentWindow.__smokeConcepts().worker)throw Error('Disabled concept worker remained active');
+        await report({step:'coach',key,allMatches:coachCount,moveReplacement:true});
       await report({step:'concepts',key,metrics:concepts.metrics});
       // The panel rebuilds; reacquire its current buttons.
       [...doc.querySelectorAll('.set-tab')].find(tab=>tab.textContent==='Engine').click();
