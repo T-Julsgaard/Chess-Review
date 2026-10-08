@@ -9,7 +9,7 @@ const {replayResult} = await import('./replay.mjs');
 const base = 'research/experiments/E081-direct-attacks';
 const prior = JSON.parse(await readFile('research/experiments/E080-pawn-shield-defense/evidence/run.json', 'utf8'));
 const inputs = [...new Set([...Object.keys(prior.inputHashes), base + '/PLAN.md',
-  ...['attacks.mjs', 'replay.mjs', 'fixtures.mjs', 'attacks.test.mjs', 'pilot.mjs'].map(f => base + '/code/' + f)])];
+  ...['attacks.mjs', 'replay.mjs', 'fixtures.mjs', 'attacks.test.mjs', 'pilot.mjs', 'status.mjs', 'display.mjs'].map(f => base + '/code/' + f)])];
 const inputHashes = {};
 for (const file of inputs) inputHashes[file] = sha256(file.endsWith('.gz') ? await readFile(file)
   : (await readFile(file, 'utf8')).replaceAll('\r\n', '\n'));
@@ -31,7 +31,11 @@ const report = {role: 'exposed synthetic development pilot, not canonical accept
   workingTreeStatus: execFileSync('git', ['status', '--porcelain'], {encoding: 'utf8'}).trim(),
   eligibilityReceipt: data.receipt, inputHashes, rows, states, errors, certificates,
   elapsedMs: Math.round(performance.now() - started)};
-const out = 'research/runs/E081/pilot';
+const args = process.argv.slice(2);
+if (args.length && (args.length !== 2 || args[0] !== '--out' || !args[1].startsWith('research/runs/E081/'))) {
+  throw Error('Use --out research/runs/E081/<development-folder>');
+}
+const out = args[1] || 'research/runs/E081/pilot';
 const json = JSON.stringify(report, null, 2) + '\n';
 await mkdir(out, {recursive: true}); await writeFile(out + '/results.json', json);
 console.log(JSON.stringify({passed: true, cases: rows.length, states, errors, certificates,

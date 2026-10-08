@@ -14,3 +14,14 @@ registered gates unchanged. All failed roots retained rather than removed.
 
 Next: rerun expanded focused collection, then remaining registered fixtures,
 full independent tamper gates, saved core pilot and cumulative final gates.
+
+Expanded capture/promotion/EP/castling/multiple-target/history/terminal/refusal/
+higher-warning gates pass132 checks in7.3s. Full forged witness/rehashed-storage
+and candidate tracker/preview gates pass135 in8.4s;130-case saved pilot4.846s.
+Long ray/vertical, bishop/queen blockers, pawn noncapture and king defended-target
+gates bring149 focused checks in9.2s,144-case saved pilot6.040s. All50 witnesses,
+36 expected errors and280 exact input hashes independently replay from saved
+JSON. No new scientific failure; original invalid queen roots retained.
+Runner construction initially stopped on a title-string assertion before any
+runner file or evidence was written. Corrected exact existing title mapping;
+source syntax/maintained-source/diff pass. No detector, search or gate change.
