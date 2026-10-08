@@ -39,6 +39,13 @@ neither history is an ancestor of the other after local fetch. Per research
 AGENTS divergence rule, stop automatic integration: no merge, force, reset or
 branch switch; shared main and codex/coach-concept-research retain E078. This
 does not invalidate frozen E079 proofs or block further isolated research.
+At the subsequent clean boundary, trusted user-approved instruction explicitly
+authorized incorporating current main, including the practical soft-storage
+policy 4d126a5. Merge 38862b3 preserves both histories and all unrelated images,
+attributes and policy edits. Post-merge physical audit still matches all 261
+frozen E079 inputs and three outputs. The previous integration stop is resolved;
+completed evidence can now be transferred by fast-forward only. E079's original
+hard storage outcome and lossless reduction remain intact; no policy-only rerun.
 Earlier development snapshots below are retained history, superseded by this
 acceptance record; failures remain in EXPOSURE.md and local development outputs.
 
