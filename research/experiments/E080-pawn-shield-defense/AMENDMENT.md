@@ -25,3 +25,10 @@ distant-pawn, higher-warning and rehashed-storage-forgery gates are prospective
 completion of named PLAN requirements, not relaxed gates. Expanded focused
 121 tests pass in 11.1s. Still require final full cumulative/source/diff before
 source freeze, three exact fresh runs and independent saved replay.
+
+Before evaluating literal a/h file mirrors, add mirrors of the three authored
+rook home-file candidates, both colors. Mirrored kings occupy b/d/f, outside
+the unchanged registered c/e/g predicate: require no-new-fact, not forced
+positive coverage. Preserve every previous root. This completes the explicit
+file-reflected-route check without changing the detector or broadening its
+claim. Expected core 122 cases; final full regression remains mandatory.

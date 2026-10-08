@@ -115,3 +115,24 @@ Shared reconciliation policy
 c43b471 incorporated at clean boundary via 22b9abe; source/diff and unchanged
 261-input/three-output E079 manifest audit pass. Ordinary local divergence
 will now be reconciled safely under that explicit approval before integration.
+
+Corrected notation full suite passed in 492.7s with source/diff pass. Its
+116-case saved pilot passed in 17.677s/832,957 bytes at 44fbb60 (concurrent
+regression), hash 97b1247b4719543dfaa762e1d77925eea9e2e4eec561cb24ed8f27537eaebce1.
+Literal whole-board file mirrors added prospectively under AMENDMENT; all
+six mirror cases abstain because their b/d/f king files are outside the
+unchanged c/e/g claim. All previous cases retained. Focused 128 tests pass
+in 11.4s; expanded 122-case pilot passes in 7.189s/868,297 bytes, hash
+730d1b2e1a952fea67bab2db122a1487f076082d8efa7e91d459808867b88fac.
+Pilot is a dirty-source development observation at base 44fbb60 with exact
+input hashes, not acceptance. States 16 proven/40 no-new-fact/2 disabled/
+4 exhausted/12 not-applicable/10 not-live, 38 errors, 444 replies/leaves.
+Next: final full suite for these added fixtures, freeze, then three fresh
+5,312-case cumulative runs and exact independent saved replay.
+
+Final full cumulative coach regression passed in 456.3s, with maintained
+source and diff checks passing. Source is ready to freeze: detector, independent
+replayer, complete 122-case core, candidate tracker and preview. No source/input
+changes are permitted during the three required fresh cumulative runs. Estimated
+900–1,100s per run and around 8MB remain soft planning targets. Acceptance and
+canonical advancement remain pending exact three-run equality and saved replay.

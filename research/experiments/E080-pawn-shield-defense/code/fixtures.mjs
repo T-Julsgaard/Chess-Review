@@ -87,3 +87,17 @@ add('extra-distant-pawn', {fen: basic({g1: 'K', f2: 'P', g2: 'P', h2: 'P', a2: '
 add('prior-warning-selection', {fen: basic({g1: 'K', f2: 'P', g2: 'P', h2: 'P', a7: 'Q', f7: 'R', g4: 'q', f3: 'b'}),
   mateDepth: 2, parentSelectedId: 'missed-mate'}, 'proven');
 fixtures.push(...extraFixtures);
+// Literal whole-board file mirrors retain the registered home-file refusal.
+for (const original of candidates.filter(f => f.id === 'rook-file-cover' || /^rook-home-[ce]$/.test(f.id))) {
+  const source = new Chess(original.fen), mirrored = new Chess();
+  mirrored.clear();
+  const mirror = square => String.fromCharCode(201 - square.charCodeAt(0)) + square[1];
+  for (const rank of source.board()) for (const piece of rank) if (piece) {
+    mirrored.put({type: piece.type, color: piece.color}, mirror(piece.square));
+  }
+  const suffix = original.fen.split(' ').slice(1).join(' ');
+  fixtures.push({...original, id: original.id + '-file-mirror',
+    fen: mirrored.fen().split(' ')[0] + ' ' + suffix,
+    move: mirror(original.move.slice(0, 2)) + mirror(original.move.slice(2, 4)),
+    expectedStatus: 'no-new-fact'});
+}
