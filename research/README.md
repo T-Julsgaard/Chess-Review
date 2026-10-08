@@ -56,7 +56,14 @@ snapshots retain the active calibration instead.
   replacement for numerical research tests in `npm run test:research`.
 
 Final independent proof replay and exact main/repeat/clean reproduction remain
-required by each plan. Reuse the existing development and clean verification
+required by each plan. Complete the registered development cases, replay tests,
+cheap saved pilot and candidate runner/tracker/demo with focused checks first.
+Run the full cumulative regression at the source-freeze boundary, not after
+each edit or routine commit/resume. Repeat it only if later changes or an
+unresolved failure/integration concern invalidate the earlier check, recording
+the reason in `RESULT.md`. Documentation-only changes do not require another
+unchanged regression; exact reproduction input hashes still have to match.
+Reuse the existing development and clean verification
 checkouts under the safeguards in [AGENTS.md](AGENTS.md); do not accumulate new
 branches or working clones. Source verification excludes local `research/runs/`
 outputs and copies, checks maintained research/evidence, and rejects tracking

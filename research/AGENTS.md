@@ -97,9 +97,19 @@ preferences still apply.
   changes. If active scoring is later changed, run the full relevant regression
   and reproduction checks described in `CONTRIBUTING.md` and the promotion record.
 - During development, use `npm run research:coach-tests -- E###` for the active
-  study and explicitly include any affected dependent studies. Before freezing
-  source, run `npm run research:coach-tests` for the full cumulative coach suite,
-  source verification and diff checks. Focused tests never replace final gates.
+  study and explicitly include any affected dependent studies. Finish the
+  registered fixture matrix, independent replay/tamper tests, cheap saved pilot
+  and candidate runner/tracker/demo before launching the full cumulative suite;
+  check development corrections with focused tests and affected dependencies.
+  Do not run the full suite or collect all inherited cases after each small edit,
+  at routine commits/resumes, or while known acceptance work remains unfinished.
+  Before freezing source, run `npm run research:coach-tests` for the full
+  cumulative coach suite, source verification and diff checks. Focused tests
+  never replace final gates.
+  Repeat a passed full suite only when subsequent behavior/test/input changes,
+  a failure or an unresolved integration concern invalidate that check; record
+  the reason in `RESULT.md` before starting it. Documentation-only edits do not
+  invalidate an unchanged regression, but exact run input hashes must still match.
   Keep independent saved-proof replay, inherited-result checks and the required
   main/repeat/initially clean runs with exact source/input/output hashes. Do not
   skip them using cached success or weaken an already registered plan.
