@@ -5,8 +5,8 @@ export {priority};
 const inventory=c=>c.board().flat().filter(Boolean).map(({square,type,color})=>({square,type,color})).sort((a,b)=>a.square.localeCompare(b.square));
 const ownKing=(pieces,actor)=>pieces.find(p=>p.type==='k'&&p.color===actor).square;
 export function explainMove(input){
- const enabled=input.kingCenterTags??false;if(typeof enabled!=='boolean')throw Error('kingCenterTags must be boolean');if(!enabled)return parent(input);
- const limit=input.maxKingCenterNodes??50000;if(!Number.isSafeInteger(limit)||limit<0||limit>50000)throw Error('maxKingCenterNodes must be integer 0..50000');
+ const enabled=input.kingCenterTags===undefined?false:input.kingCenterTags;if(typeof enabled!=='boolean')throw Error('kingCenterTags must be boolean');if(!enabled)return parent(input);
+ const limit=input.maxKingCenterNodes===undefined?50000:input.maxKingCenterNodes;if(!Number.isSafeInteger(limit)||limit<0||limit>50000)throw Error('maxKingCenterNodes must be integer 0..50000');
  const base=parent(input);let nodes=0,status='no-new-fact',witness=null,events=base.events;
  const finish=()=>({...base,schema:'coach-concepts-v60',events,comment:[...events].sort((a,b)=>priority(b)-priority(a))[0]?.text||null,kingCenterAnalysis:{limit,nodes,status,witness}});
  if(base.foundationAnalysis&&base.foundationAnalysis.status!=='accepted'){status='not-applicable';return finish();}

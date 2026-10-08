@@ -1,5 +1,34 @@
-import {fixtures as prior} from '../../E039-king-promotion-support/code/fixtures.mjs';import {setup} from '../../E021-structural-concepts/code/fixtures.mjs';export {reflect} from '../../E024-transitions/code/fixtures.mjs';
+import {Chess} from '../../../../lib/chess.js';import {fixtures as placementFixtures} from '../../E078-bishop-chains-batteries/code/fixtures.mjs';import {fixtures as prior} from '../../E039-king-promotion-support/code/fixtures.mjs';import {setup} from '../../E021-structural-concepts/code/fixtures.mjs';import {reflect as validReflect} from '../../E078-bishop-chains-batteries/code/fixtures.mjs';import {reflect as rawReflect} from '../../E020-coach-concepts/code/fixtures.mjs';
+export function reflect(f){if(f.inputError){try{new Chess(f.fen);}catch{return validReflect(f);}if(!/^[a-h][1-8][a-h][1-8][qrbn]?$/.test(f.move))return validReflect(f);const r=rawReflect(f);if(f.history&&typeof f.history.fen==='string'&&Array.isArray(f.history.moves)){const h=rawReflect({...f,fen:f.history.fen});r.history={fen:h.fen,moves:f.history.moves.map(m=>m[0]+(9- +m[1])+m[2]+(9- +m[3])+(m[4]||''))};}return{...r,expectedError:f.reflectedError||f.expectedError};}return validReflect(f);}
+
 export const fixtures=prior.map(f=>({...f,id:'support-'+f.id,kingCenterTags:true,expectedStatus:f.id==='centralization-unblocks-route'?'proven':'no-new-fact'}));
 fixtures.push({id:'file-mirror-center',fen:setup({a1:null,h8:null,a7:null,h2:null,f5:'K',f4:'P',h1:'k'}),move:'f5e5',kingSupportDepth:4,kingCenterTags:true,expectedStatus:'proven'});
 const positive=fixtures.find(f=>f.expectedStatus==='proven');for(const [id,settings,status] of [['disabled',{kingCenterTags:false},'disabled'],['unavailable',{kingSupportDepth:0},'unavailable'],['zero-wrapper',{maxKingCenterNodes:0},'exhausted'],['exact-wrapper',{maxKingCenterNodes:8},'proven'],['short-wrapper',{maxKingCenterNodes:7},'exhausted']])fixtures.push({...positive,...settings,id,expectedStatus:status});
 for(const [id,extra,move] of [['within-center',{c4:'K',c3:'P',a1:'k'},'c4d4'],['center-already-safe',{c4:'K',a6:'P',h8:'k'},'c4d4']])fixtures.push({id,fen:setup({a1:null,h8:null,a7:null,h2:null,...extra}),move,kingSupportDepth:5,kingCenterTags:true,expectedStatus:id==='within-center'?'proven':'no-new-fact'});
+
+fixtures.push({id:'within-file-mirror',fen:setup({a1:null,h8:null,a7:null,h2:null,f4:'K',f3:'P',h1:'k'}),move:'f4e4',kingSupportDepth:5,kingCenterTags:true,expectedStatus:'proven'});
+const historyMoves=['c5b5','a1b1','b5c5','b1a1'],historyBoard=new Chess(positive.fen);for(const move of historyMoves)historyBoard.move(move);
+fixtures.push({...positive,id:'valid-support-history',fen:historyBoard.fen(),history:{fen:positive.fen,moves:historyMoves},expectedStatus:'proven'});
+fixtures.push({...positive,id:'history-exact-wrapper',fen:historyBoard.fen(),history:{fen:positive.fen,moves:historyMoves},maxKingCenterNodes:12,expectedStatus:'proven'});
+fixtures.push({...positive,id:'history-short-wrapper',fen:historyBoard.fen(),history:{fen:positive.fen,moves:historyMoves},maxKingCenterNodes:11,expectedStatus:'exhausted'});
+fixtures.push({...positive,id:'history-mismatch',history:{fen:positive.fen,moves:['c5b5']},inputError:true,expectedError:'final FEN'});
+fixtures.push({...positive,id:'history-invalid-move',history:{fen:positive.fen,moves:['c5c7']},inputError:true,expectedError:'illegal move'});
+fixtures.push({...positive,id:'history-malformed',history:null,inputError:true,expectedError:'Invalid history'});
+for(const id of ['foundation-rejected','foundation-exhausted','foundation-terminal-root','dead-promotion','valid-history','repetition-root','clock-root','foundation-clock-root','history-mismatch','malformed-fen','malformed-uci','ordinary-illegal','default-dead-root','actual-dead-capture','root-mate','root-stalemate','foundation-root-mate','foundation-root-stalemate']){const old=placementFixtures.find(f=>f.id===id);if(!old)throw Error('Missing source '+id);const {placementTags,expected,absent,expectedStatus,...rest}=old;fixtures.push({...rest,id:'guard-'+id,expected:[],absent:[],kingCenterTags:true,kingSupportDepth:1,expectedStatus:old.inputError?undefined:old.foundationTags?'not-applicable':['dead-promotion','actual-dead-capture','repetition-root'].includes(id)?'not-live':'no-new-fact'});}
+const basic=(id,extra,move,options={})=>({id,fen:setup({a1:null,h8:null,a7:null,h2:null,...extra}),move,kingCenterTags:true,kingSupportDepth:1,expectedStatus:'no-new-fact',...options});
+fixtures.push(basic('king-captures-extra-pawn',{c4:'K',c3:'P',a1:'k',d4:'p'},'c4d4'));
+fixtures.push(basic('nonking-pawn-move',{c4:'K',c3:'P',a1:'k'},'c3c5'));
+fixtures.push(basic('nonking-piece-move',{c4:'K',c3:'P',a1:'k',h2:'R'},'h2h3'));
+fixtures.push(basic('castling-no-support',{e1:'K',h1:'R',h2:'P',a8:'k'},'e1g1',{fen:setup({a1:null,h8:null,a7:null,e1:'K',h1:'R',a8:'k'},'w','K')}));
+for(const [id,fields]of [['bad-boolean',{kingCenterTags:1}],['bad-limit-negative',{maxKingCenterNodes:-1}],['bad-limit-fraction',{maxKingCenterNodes:0.5}],['bad-limit-large',{maxKingCenterNodes:50001}],['bad-support-depth',{kingSupportDepth:7}],['bad-support-budget',{maxKingSupportNodes:-1}]])fixtures.push({...positive,...fields,id,inputError:true,expectedStatus:undefined});
+
+const mismatch=fixtures.find(f=>f.id==='history-mismatch'),oldReflection=validReflect({...mismatch,inputError:false});fixtures.push({...oldReflection,id:'original-mismatched-history-reflection',inputError:true,expectedStatus:undefined,expectedError:'Illegal move',reflectedError:'final FEN'});
+const noRights=fixtures.find(f=>f.id==='castling-no-support');fixtures.push({...noRights,id:'castling-without-rights',inputError:true,expectedStatus:undefined,expectedError:'Illegal move'});noRights.fen=noRights.fen.replace(' w - - ',' w K - ');
+
+const unavailable=fixtures.find(f=>f.id==='unavailable');unavailable.expected=[];unavailable.absent=['king-promotion-support'];
+for(const id of ['actual-mate','actual-stalemate']){const old=placementFixtures.find(f=>f.id===id),{placementTags,expected,absent,...rest}=old;fixtures.push({...rest,id:'guard-'+id,expected:[],absent:[],kingCenterTags:true,kingSupportDepth:1,expectedStatus:'not-live'});}
+for(const [id,enemy]of [['rook',{a8:'k',d8:'r'}],['bishop',{a8:'k',g7:'b'}],['knight',{a8:'k',f5:'n'}],['pawn',{a8:'k',e5:'p'}],['pinned-bishop',{b2:'k',e5:'b',g7:'B'}]])fixtures.push(basic('king-enters-attacked-center-'+id,{c4:'K',c3:'P',...enemy},'c4d4',{inputError:true,expectedStatus:undefined,expectedError:'Illegal move'}));
+
+fixtures.push({...positive,id:'bad-boolean-null',kingCenterTags:null,inputError:true,expectedStatus:undefined,expectedError:'boolean'});fixtures.push({...positive,id:'bad-wrapper-limit-null',maxKingCenterNodes:null,inputError:true,expectedStatus:undefined,expectedError:'integer'});
+
+const illegalPush=fixtures.find(f=>f.id==='nonking-pawn-move');fixtures.push({...illegalPush,id:'nonking-pawn-original-illegal',inputError:true,expectedStatus:undefined,expectedError:'Illegal move'});illegalPush.fen=setup({a1:null,h8:null,h2:null,a7:null,d4:'K',c3:'P',a1:'k'});illegalPush.move='c3c4';
