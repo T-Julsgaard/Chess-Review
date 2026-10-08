@@ -18,3 +18,5 @@ research/**/*.js text eol=lf
 research/**/*.html text eol=lf
 research/**/*.md text eol=lf
 research/**/*.zst binary
+# Keep research in the repository without counting it as application code on GitHub.
+research/** linguist-documentation

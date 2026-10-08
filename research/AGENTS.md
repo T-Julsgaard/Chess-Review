@@ -65,6 +65,15 @@ preferences still apply.
   Run a cheap smoke/sample check before a costly collection; estimate and record
   the full run's compute/storage cost. Cache raw engine observations separately
   from candidate scoring so compatible candidates can reuse searches.
+- Minimize retained evidence size where practical, but use soft storage targets
+  by default, not scientific acceptance gates. Prefer simple lossless compression,
+  compatible proof sharing and avoiding redundant copies; do not spend excessive
+  development or compute time solely to meet a byte target. Keep all required
+  cases, branches, histories, failures, provenance and independent replay.
+  Record justified overruns, actual sizes and the storage/retrieval recipe; an
+  overrun alone does not invalidate a scientific result. Follow PROTOCOL.md for
+  dated changes to existing registered caps; never rewrite frozen outcomes or
+  silently weaken engine/search budgets, runtime correctness or final gates.
 - Use targeted checks for research code and `npm run verify:source` for retained
   changes. If active scoring is later changed, run the full relevant regression
   and reproduction checks described in `CONTRIBUTING.md` and the promotion record.

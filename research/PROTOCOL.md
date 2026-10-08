@@ -90,6 +90,43 @@ Document collection/search cost and cache keys. Maintain only one canonical
 result record per experiment. Record unsuccessful approaches, numerical/search
 failures and missing data as evidence rather than discarding them.
 
+### Evidence storage targets
+
+User-approved policy, 2026-10-08: minimize retained evidence size as much as
+practical, while weighing saved bytes against development time, compute cost
+and representation complexity. Storage estimates are soft planning targets by
+default. Exceeding an evidence byte target alone is not scientific failure and
+must not block an otherwise valid result merely to satisfy an arbitrary cap.
+
+Prefer straightforward lossless compression, deterministic sharing of identical
+proofs and avoiding redundant copies. Preserve every required case, proof branch,
+history, semantic field, failure and provenance record. A compact representation
+must reconstruct the required evidence exactly and remain independently
+replayable; checksums alone do not establish semantic validity. Keep the decoder,
+format/version, hashes and retrieval/rebuild instructions with the canonical
+record. Retain large evidence through the immutable, accessible recipe above
+when repository storage is impractical; an ignored local file alone is inadequate.
+
+Record estimated and actual byte sizes, significant optimization cost and why an
+overrun or a chosen representation is justified. Stop size-only optimization
+when further savings require disproportionate time, compute or complexity;
+document that choice and continue the scientific work. Avoid duplicate canonical
+reports, while preserving required reproduction manifests and exposed failures.
+
+Explicit external storage or deployment limits may remain hard engineering
+constraints when a plan names the actual limit and its consequence. Keep these
+separate from scientific acceptance. This policy does not relax engine/search
+budgets, numerical gates, data eligibility, completeness or registered final
+reproducibility checks.
+
+For an ongoing study with an already registered hard evidence cap, add a dated
+amendment before the next evaluation affected by the change. Cite this user
+authorization, preserve the original cap, disclose already inspected evidence
+and separately report the original storage outcome and revised policy. Never
+rewrite a frozen plan, erase a historical failed gate, or rerun an otherwise
+completed study solely to reclassify its storage result. Completed E079 evidence
+and its successful lossless storage remain unchanged.
+
 ## Conclusions and promotion
 
 Use `improved`, `no-improvement`, `inconclusive` or `invalid` as the outcome.
