@@ -1,4 +1,41 @@
-# E079 working central-king support prototype
+# E079 central-king support evidence
+
+2026-10-08. Complete research-only mechanics study. Frozen source
+98523f67924e515cda124d9d15b015824b7a41e3; original preregistration and prospective
+AMENDMENT retained. Final post-storage full cumulative suite passed in 557.4s;
+source and diff checks passed before freeze. Three cold main/repeat/initially
+clean detached runs passed in 842.436/840.806/838.890s with exact source/input,
+physical output and metric equality. Independent saved decoding and proof replay
+passed: 22 center witnesses, 40,372 source replies and 164,744 proof leaves.
+All 5,052 ordered inherited full fingerprints and original-list hash unchanged;
+all 1,083 unrelated occurrence rows byte-identical. Preview and physical manifest
+audits pass (261 inputs, three outputs). Six canonical evidence files total
+6,872,588 bytes, within the unchanged 20MB cap; complete lossless proof pool has
+10,550 nodes. Saved result trees reconstruct byte-identically before replay.
+
+C0385 King in the center is verified for actual legal noncapturing king moves
+ending on d4/e4/d5/e5 in bare K+P versus K, including genuine core-to-core moves,
+when the complete same pawn-only safe-queening goal is refuted before and proven
+after. C0384 Central king remains partial: enduring safety and wider material are
+unestablished. Comments name the proven effect in 13 words, for example:
+King in the center: e4 secures a safe queening route for pawn d3.
+
+There are 5,190 cumulative cases: 138 new, 5,052 inherited; 4,740 accepted,
+230 abstained, 220 invalid. New gates include 22 proven, 30 no-new-fact,
+ten not-live, six exhausted, 12 not-applicable, two unavailable, 54 input errors
+and two exact disabled-parent cases. Cumulative proof metrics: 8,989 certificates,
+288 query proofs, 75,967 defender replies, 251,664 leaves; maximum selected
+comment length 21 words. Human usefulness and independent real-game precision
+remain unmeasured. No extension integration, push, usage cutoff or shutdown.
+
+Authoritative research:status after acceptance: 321 verified names, 370 verified
+occurrences of 1,085, 78 partial, 637 unimplemented, 715 remaining (34.1%);
+60 completed coach studies. Next: filter the approved queue and preregister a
+bounded pawn-shield defensive-benefit study, preserving broader safety scopes.
+Earlier development snapshots below are retained history, superseded by this
+acceptance record; failures remain in EXPOSURE.md and local development outputs.
+
+## Retained development history
 
 2026-10-08. Prospective PLAN retained. Research-only opt-in kingCenterTags
 wrapper on exact E078 parent reuses E039/E037 complete before-refutation and
