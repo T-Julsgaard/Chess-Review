@@ -8,6 +8,8 @@ import { CATEGORY_LABEL_FONT, categoryLabelPng } from '../../lib/category-label.
 import {expectedPoints, SF19_OUTCOME} from '../../lib/public-scoring.js';
 import {calibratedReview,scoringEvidenceComplete} from '../../lib/calibrated-review.js';
 import {analyseCalibratedPosition} from '../../lib/calibrated-search.js';
+import {ConceptSession, conceptKey} from '../../lib/concepts/session.js';
+import {coachInsights} from '../../lib/coach-insights.js';
 
 // Execute the real application in a DOM, stubbing only browser/engine boundaries.
 // Automatic startup and imports are omitted; production needs no test exports.
@@ -39,6 +41,7 @@ export function app(t, {hardware} = {}) {
     BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg,
     CATEGORY_LABEL_FONT, categoryLabelPng,
     expectedPoints, SF19_OUTCOME, calibratedReview, scoringEvidenceComplete, analyseCalibratedPosition,
+    ConceptSession, conceptKey, coachInsights,
     Engine: class { constructor() { throw Error('Unexpected real engine'); } },
     fetch: async () => { throw Error('Unexpected network access'); },
     requestAnimationFrame: () => 0, cancelAnimationFrame() {},

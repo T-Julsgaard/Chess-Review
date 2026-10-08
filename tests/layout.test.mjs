@@ -40,7 +40,8 @@ test('desktop fits laptop windows, then restores the responsive layout when narr
   for (const [w,h] of [[1366,648], [1536,744], [1280,600], [2560,1320]]) {
     a.viewport(w,h); await a.call('fitTabZoom');
     assert.equal(a.desktop(), true);
-    assert.ok(1832 * a.zoom() <= w && 1020 * a.zoom() <= h);
+    const page = a.call('layoutPageSize', a.run('DEFAULT_LAYOUT'));
+    assert.ok(page.pageW * a.zoom() <= w && page.pageH * a.zoom() <= h);
   }
   a.viewport(768,900); await a.call('fitTabZoom');
   assert.equal(a.desktop(), false); assert.equal(a.zoom(),1);
@@ -195,7 +196,7 @@ test('saved desktop layouts reopen at the reset scale across typical screen size
   for (const [w, h, initial, expected] of [
     [1280, 600, 1.25, .58], [1366, 648, .91, .63], [1536, 744, 1, .72],
     [1920, 916, .91, .89], [1920, 920, .89, .90],
-    [2560, 1320, 1.25, 1.29], [3840, 2040, 2, 1.99],
+    [2560, 1320, 1.25, 1.20], [3840, 2040, 2, 1.80],
   ]) {
     const a = layout(t, initial);
     a.state.layoutMode = 'custom'; a.call('applyLayoutMode');

@@ -13,6 +13,8 @@ import { resetSettingsForRelease } from "./release-settings.js";
 import { expectedPoints, SF19_OUTCOME } from "./lib/public-scoring.js";
 import { calibratedReview, scoringEvidenceComplete } from "./lib/calibrated-review.js";
 import { analyseCalibratedPosition } from "./lib/calibrated-search.js";
+import { ConceptSession, conceptKey } from "./lib/concepts/session.js";
+import { coachInsights } from "./lib/coach-insights.js";
 
 /* ---------------- Opening book ----------------
  * Offline lookup table built from lichess-org/chess-openings (bundled in data/book.json).
@@ -258,6 +260,7 @@ function engineWorkerCount(requested = null, positions = Infinity,
 }
 
 const DEFAULT_SETTINGS = {
+  conceptsEnabled: false,
   categoryNames: {},
   theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
@@ -360,6 +363,7 @@ const DEFAULT_LAYOUT = {
   accuracy: { x: 1510, y: 216, w: 294, h: 506 },
   graph:    { x: 1200, y: 620, w: 300, h: 178 },
   engine:   { x: 1510, y: 736, w: 294, h: 178 },
+  concepts: { x: 1820, y: 60,  w: 294, h: 854 },
 };
 const GRIP_SVG = `<svg viewBox="0 0 12 12" width="12" height="12"><path d="M11 4 4 11M11 8 8 11" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>`;
 const HANDLE_SVG = `<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><circle cx="5" cy="4" r="1.3"/><circle cx="11" cy="4" r="1.3"/><circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/><circle cx="5" cy="12" r="1.3"/><circle cx="11" cy="12" r="1.3"/></svg>`;
@@ -1422,6 +1426,7 @@ function buildUI() {
   const graphMount = el("div", { id: "graphMount" });
   const statsMount = el("div", { id: "statsMount" });
   const engineMount = el("div", { id: "engineMount" });
+  const conceptsMount = el("div", { id: "conceptsMount" });
 
   // The stage holds every module. In the automatic layout the side wrappers group the panels into
   // columns (styles.css picks wide / medium / narrow by window size); in the custom layout they are
@@ -1437,6 +1442,7 @@ function buildUI() {
       ),
       makeMod("coach", coachMount),
     ),
+    makeMod("concepts", conceptsMount),
   );
 
   const settings = el("div", { class: "settings-pop", id: "settings", hidden: true });
@@ -1465,7 +1471,7 @@ function buildUI() {
     meta: document.getElementById("meta"), settings, canvas, boardWrap,
     playerTop, playerBot, controls, coach: coachMount, evalbar: evalbarMount,
     review: reviewMount, movesBody, movesCount, movesFoot,
-    graph: graphMount, stats: statsMount, engine: engineMount,
+    graph: graphMount, stats: statsMount, engine: engineMount, concepts: conceptsMount,
     libRail, libControls, libList, libCount,
   };
 
@@ -1473,6 +1479,11 @@ function buildUI() {
   initBoardInput();
   renderCoachAvatar();     // mount the animated coach portrait for the active personality
   renderLibrary();
+  if (typeof ResizeObserver !== "undefined") {
+    const alignment = new ResizeObserver(() => alignConceptPanel());
+    alignment.observe(UI.engine.closest(".mod"));
+    alignment.observe(UI.review.closest(".mod"));
+  }
   window.addEventListener("resize", () => { fitEnginePanel(); growCanvas(); alignPlayers(); positionSettings(); });
 }
 
@@ -1514,6 +1525,7 @@ function layoutForSave() {
   const out = structuredClone(S.layout);
   if (out.accuracy) out.accuracy.h += delta;
   for (const k of belowKeys) if (out[k]) out[k].y += delta;
+  if (S._accReflow.conceptsResized && out.concepts) out.concepts.h += delta;
   return out;
 }
 function saveLayout() {
@@ -1534,6 +1546,7 @@ function applyLayout() {
   const custom = isCustomLayout();
   const desktop = !custom && UI.canvas.classList.contains("desktop-layout");
   const collapse = desktop && !S.qbreakExpanded ? accuracyReflowInfo(DEFAULT_LAYOUT) : null;
+  UI.canvas.style.setProperty("--desktop-width", layoutPageSize(DEFAULT_LAYOUT).pageW + "px");
   for (const mod of UI.canvas.querySelectorAll(".mod")) {
     const key = mod.getAttribute("data-mod");
     const source = custom ? S.layout[key] : desktop ? DEFAULT_LAYOUT[key] : null;
@@ -1603,7 +1616,10 @@ function accuracyReflowInfo(layout = S.layout) {
     const overlapX = o.x < acc.x + acc.w && o.x + o.w > acc.x;
     if (overlapX && o.y >= acc.y + acc.h - 1) belowKeys.push(k);
   }
-  return { delta, belowKeys };
+  const concepts = layout.concepts, review = layout.review, engine = layout.engine;
+  const conceptsResized = !!(concepts && review && engine && concepts.x >= engine.x + engine.w
+    && Math.abs(concepts.y - review.y) < 1 && Math.abs(concepts.y + concepts.h - engine.y - engine.h) < 1);
+  return { delta, belowKeys, conceptsResized };
 }
 // Keep the Accuracy module and everything stacked below it glued together when the category list
 // expands/collapses on the custom canvas (the automatic layout reflows on its own). The saved
@@ -1614,15 +1630,17 @@ function reflowAccuracy(expanded) {
   if (!UI.canvas || !isCustomLayout()) return;
   const acc = S.layout.accuracy; if (!acc) return;
   if (!expanded && !S._accReflow) {
-    const { delta, belowKeys } = accuracyReflowInfo();
+    const { delta, belowKeys, conceptsResized } = accuracyReflowInfo();
     acc.h = Math.max(MINH, acc.h - delta);
     for (const k of belowKeys) S.layout[k].y = Math.max(0, S.layout[k].y - delta);
-    S._accReflow = { delta, belowKeys };
+    if (conceptsResized) S.layout.concepts.h = Math.max(MINH, S.layout.concepts.h - delta);
+    S._accReflow = { delta, belowKeys, conceptsResized };
   } else if (expanded && S._accReflow) {
     // Expand: restore the panel's height and push the same modules back down.
     const { delta, belowKeys } = S._accReflow;
     acc.h += delta;
     for (const k of belowKeys) if (S.layout[k]) S.layout[k].y += delta;
+    if (S._accReflow.conceptsResized && S.layout.concepts) S.layout.concepts.h += delta;
     S._accReflow = null;
   }
   applyLayout(); growCanvas();
@@ -3260,6 +3278,10 @@ function analysisProgressText() {
   return `Analyzing … ${done}/${S.total}`;
 }
 function renderReview() {
+  refreshConcepts();
+  // Cached/completed inputs do not emit a worker update on navigation.
+  if (UI.settings && !UI.settings.hidden && S.settingsTab === "concepts") renderSettings();
+  renderCoachPanel();
   // In-place progress text during analysis (so the loader animation doesn't restart each move).
   if (S.analyzing && revRefs) { revRefs.head.textContent = analysisProgressText(); return; }
 
@@ -3802,6 +3824,74 @@ function renderMoves() {
 }
 
 /* ---------------- Engine lines ---------------- */
+let _coachPositionKey = null;
+
+function alignConceptPanel() {
+  const mod = UI.concepts?.closest(".mod"), review = UI.review?.closest(".mod"), engine = UI.engine?.closest(".mod");
+  if (!mod || !review || !engine || isCustomLayout()) return;
+  if (UI.canvas.classList.contains("desktop-layout")) {
+    const top = parseFloat(review.style.top), bottom = parseFloat(engine.style.top) + parseFloat(engine.style.height);
+    mod.style.top = top + "px";
+    mod.style.left = parseFloat(engine.style.left) + parseFloat(engine.style.width) + 16 + "px";
+    mod.style.height = Math.max(MINH, bottom - top) + "px";
+  } else if (window.innerWidth >= 1500 && window.innerHeight >= 600) {
+    const r = review.getBoundingClientRect(), e = engine.getBoundingClientRect();
+    const scale = r.height / review.offsetHeight || 1;
+    mod.style.height = Math.max(MINH, (e.bottom - r.top) / scale) + "px";
+  } else mod.style.height = "";
+}
+
+function renderCoachPanel() {
+  if (!UI.concepts) return;
+  const mount = UI.concepts;
+  const selected = activePos(), hasMove = !S.practice && !!selected.from && !!selected.to;
+  const input = S.settings.conceptsEnabled === true ? selectedConceptInput() : null;
+  const key = input ? conceptKey(input) : S.practice ? "practice" : hasMove ? selected.fen : "start";
+  const signature = JSON.stringify([key, S.meSide, S.settings.conceptsEnabled]);
+  const same = signature === _coachPositionKey, oldBody = mount.querySelector(".coach-insights-body");
+  const scroll = same ? oldBody?.scrollTop || 0 : 0;
+  const open = new Set(same ? [...mount.querySelectorAll("details[open]")].map(d => d.dataset.insight) : []);
+  const focused = mount.contains(document.activeElement) ? document.activeElement.id : null;
+  _coachPositionKey = signature;
+  const mover = hasMove ? selected.color : null;
+  const entry = input && _conceptSession?.entries.get(key);
+  const body = el("div", {class: "panel-body coach-insights-body", "aria-labelledby": "conceptsHeading"});
+  body.append(el("p", {class: "coach-position", "aria-live": "polite"},
+    `${S.meSide === "w" ? "Playing White" : "Playing Black"} · ${hasMove ? (S.analysisMode ? "Variation · " : "") + (mover === S.meSide ? "Your " : "Opponent’s ") + selected.san : S.practice ? "Practice" : "Starting position"}`));
+  if (hasMove && !S.analysisMode && S.classif[S.idx]) {
+    body.append(el("p", {class: "coach-move-quality"}, `Move assessment: ${categoryName(S.classif[S.idx])}`));
+  }
+  if (S.practice) body.append(el("p", {}, "Use the practice coach above. Position insights return when practice ends."));
+  else if (!S.settings.conceptsEnabled) body.append(
+    el("p", {}, "Enable position insights to see the coach’s explanations for each move."),
+    el("button", {class: "engine-bestwalk", id: "coachEnable", onclick: () => setConceptEnabled(true)}, "Enable position insights"));
+  else if (!input) body.append(el("p", {}, "Select a move to see what changed and what the resulting position contains."));
+  else {
+    const insights = coachInsights(entry?.findings || [], {mover, player: S.meSide});
+    if (!entry || entry.status !== "complete") body.append(el("p", {class: "coach-status"}, insights.length ? "Observations ready; checking further continuations…" : "Checking this position…"));
+    if (entry?.status === "complete" && !insights.length) body.append(el("p", {}, "No supported insight within the available inputs and search limits."));
+    const list = el("ol", {class: "coach-insights-list"});
+    for (const finding of insights) {
+      const id = JSON.stringify([finding.event, finding.name, finding.sourceText]);
+      const details = el("details", {"data-insight": id, open: open.has(id)}, el("summary", {}, "Evidence and scope"),
+        el("p", {}, finding.kind), el("p", {}, "Detector explanation: " + finding.sourceText),
+        ...finding.scopes.map(scope => el("p", {}, scope.occurrence + ": " + scope.scope)));
+      list.append(el("li", {class: "coach-insight", "data-concept": finding.name},
+        el("strong", {}, finding.name), el("span", {class: "coach-perspective"}, finding.perspective),
+        el("p", {}, finding.text), details));
+    }
+    body.append(list);
+    const diagnostics = [...(entry?.errors || []), ...(entry?.unavailable || []), ...(entry?.issues || [])];
+    if (diagnostics.length) body.append(el("p", {class: "coach-status"}, "Some searches or inputs were unavailable. Showing supported findings; details are in Settings → Concepts."));
+    body.append(el("p", {class: "coach-status"}, `${insights.length} insights · All matches shown, ordered by likely relevance. Structure observations alone do not establish an advantage.`));
+  }
+  mount.replaceChildren(el("div", {class: "panel coach-insights-panel"},
+    el("div", {class: "panel-head"}, el("h3", {id: "conceptsHeading"}, "Concepts")), body));
+  body.scrollTop = scroll;
+  if (focused) document.getElementById(focused)?.focus({preventScroll: true});
+  alignConceptPanel();
+}
+
 // While solving a practice position, the engine lines would give the answer away → hide them.
 function renderEnginePractice() {
   UI.engine.replaceChildren(el("div", { class: "panel" },
@@ -3877,6 +3967,7 @@ function fitEnginePanel() {
   } else if (UI.canvas.classList.contains("desktop-layout")) {
     mod.style.height = height + "px";
   }
+  alignConceptPanel();
 }
 function renderEngine(lines, padFromCache = false) {
   const curFen = activePos().fen;
@@ -4621,11 +4712,15 @@ function renderSettings() {
   const focusedFont = UI.settings.contains(document.activeElement) && document.activeElement.closest(".badge-font-option")?.getAttribute("data-font");
   const focusedLabelStyle = UI.settings.contains(document.activeElement) && document.activeElement.closest(".badge-label-option")?.getAttribute("data-label-style");
   const focusedSection = UI.settings.contains(document.activeElement) && document.activeElement.closest(".set-sect-head")?.querySelector("span")?.textContent;
+  const openConceptDetails = new Set([...UI.settings.querySelectorAll(".concepts-panel details[open]")].map(node => node.dataset.conceptDetail));
+  const focusedConceptToggle = UI.settings.contains(document.activeElement) && document.activeElement.id === "conceptsEnabled";
   const tabs = el("div", { class: "set-tabs" },
     el("button", { class: "set-tab" + (S.settingsTab === "visual" ? " on" : ""), onclick: () => { S.settingsTab = "visual"; renderSettings(); } }, "Visual"),
     el("button", { class: "set-tab" + (S.settingsTab === "engine" ? " on" : ""), onclick: () => { S.settingsTab = "engine"; renderSettings(); } }, "Engine"),
+    el("button", { class: "set-tab" + (S.settingsTab === "concepts" ? " on" : ""), onclick: () => { S.settingsTab = "concepts"; refreshConcepts(); renderSettings(); } }, "Concepts"),
   );
-  UI.settings.replaceChildren(tabs, ...(S.settingsTab === "engine" ? [motorSettings()]
+  UI.settings.classList.toggle("concepts-open", S.settingsTab === "concepts");
+  UI.settings.replaceChildren(tabs, ...(S.settingsTab === "concepts" ? [conceptSettings()] : S.settingsTab === "engine" ? [motorSettings()]
     : [visualSettings()]));
   UI.settings.scrollTop = scroll;
   const fonts = UI.settings.querySelector(".badge-font-options");
@@ -4633,6 +4728,8 @@ function renderSettings() {
   if (focusedFont) UI.settings.querySelector(`[data-font="${focusedFont}"]`)?.focus({ preventScroll: true });
   if (focusedLabelStyle) UI.settings.querySelector(`[data-label-style="${focusedLabelStyle}"]`)?.focus({ preventScroll: true });
   if (focusedSection) [...UI.settings.querySelectorAll(".set-sect-head")].find(head => head.querySelector("span")?.textContent === focusedSection)?.focus({ preventScroll: true });
+  for (const detail of UI.settings.querySelectorAll(".concepts-panel details")) detail.open = openConceptDetails.has(detail.dataset.conceptDetail);
+  if (focusedConceptToggle) UI.settings.querySelector("#conceptsEnabled")?.focus({preventScroll: true});
   positionSettings();
 }
 function positionSettings() {
@@ -4646,6 +4743,95 @@ function toggleSettings() {
   closeArrowColorPicker();
   UI.settings.hidden = !UI.settings.hidden;
   if (!UI.settings.hidden) renderSettings();
+}
+
+/* ---------------- Optional, isolated concept analysis ---------------- */
+let _conceptSession = null, _conceptPositions = null, _conceptEnabled = false, _conceptRenderTimer = null;
+let _conceptGameKeys = [];
+function conceptMoveInput(positions, ply) {
+  if (ply < 1 || !positions[ply]?.from || !positions[ply]?.to) return null;
+  const history = searchHistory(positions, ply - 1), move = positions[ply];
+  return {fen: positions[ply - 1].fen, move: move.from + move.to + (move.promotion || ""),
+    history: {fen: history.initialFen, moves: history.moves}};
+}
+function selectedConceptInput() {
+  if (S.practice) return null;
+  if (S.analysisMode && S.variation) {
+    const v = S.variation, positions = [...S.positions.slice(0, v.branchIdx + 1), ...v.positions.slice(1, v.idx + 1)];
+    return conceptMoveInput(positions, positions.length - 1);
+  }
+  return conceptMoveInput(S.positions, S.idx);
+}
+function refreshConcepts() {
+  const enabled = S.settings.conceptsEnabled === true;
+  if (!enabled && !_conceptSession) return;
+  if (!_conceptSession) _conceptSession = new ConceptSession({setTimer: (fn, ms) => setTimeout(fn, ms), clearTimer: id => clearTimeout(id), changed: () => {
+    if (_conceptRenderTimer) return;
+    _conceptRenderTimer = setTimeout(() => {
+      _conceptRenderTimer = null;
+      if (UI.settings && !UI.settings.hidden && S.settingsTab === "concepts") renderSettings();
+      renderCoachPanel();
+    }, 100);
+  }});
+  if (_conceptPositions !== S.positions || _conceptEnabled !== enabled) {
+    const changedGame = _conceptPositions !== S.positions;
+    _conceptPositions = S.positions; _conceptEnabled = enabled;
+    // No history building or worker creation while the checkbox is off.
+    const inputs = enabled ? S.positions.slice(1).map((_p, i) => conceptMoveInput(S.positions, i + 1)).filter(Boolean) : [];
+    if (enabled || changedGame) _conceptGameKeys = inputs.map(conceptKey);
+    _conceptSession.configure(inputs, enabled);
+  }
+  if (enabled) { const selected = selectedConceptInput(); if (selected) _conceptSession.include(selected, true); }
+}
+function setConceptEnabled(enabled) {
+  S.settings.conceptsEnabled = enabled;
+  browserAPI.storage.local.set({settings: S.settings});
+  refreshConcepts();
+}
+function conceptSettings() {
+  const enabled = S.settings.conceptsEnabled === true;
+  const checkbox = el("input", {type: "checkbox", id: "conceptsEnabled", checked: enabled, onchange: event => {
+    // Let checkbox/label activation finish before the scheduled panel refresh.
+    // Replacing this input during change can make a native label activate it twice.
+    setConceptEnabled(event.target.checked);
+  }});
+  const panel = el("div", {class: "concepts-panel"},
+    el("label", {class: "concepts-toggle"}, checkbox, "Enable concept analysis"),
+    el("p", {class: "concepts-note"}, "E080 verified mechanics. Observations and bounded proofs; broader strategic benefits are unproven."));
+  if (!enabled) {
+    panel.append(el("p", {}, "Disabled — concept analysis is stopped. Enable to process this game."));
+  }
+  const input = selectedConceptInput(), entry = input && _conceptSession?.entries.get(conceptKey(input));
+  if (enabled) panel.append(el("h3", {}, "Selected move"));
+  if (!enabled) { /* Keep debug metrics visible while the analysis is stopped. */ }
+  else if (!input) panel.append(el("p", {}, S.practice ? "Practice inputs unavailable for concept analysis." : "Select a played move. The initial position has no played-move context."));
+  else if (!entry || entry.status !== "complete" && !entry.findings.length) panel.append(el("p", {}, "Concept analysis pending…"));
+  else {
+    if (entry.status !== "complete") panel.append(el("p", {class: "concepts-note"}, "Observations ready; bounded proof searches are running…"));
+    if (!entry.findings.length) panel.append(el("p", {}, "No supported finding within the available inputs and budgets."));
+    const list = el("ul", {class: "concepts-findings"});
+    for (const finding of entry.findings) list.append(el("li", {},
+      el("strong", {}, finding.name), el("p", {}, finding.text),
+      el("span", {class: "concepts-kind"}, finding.kind),
+      el("details", {"data-concept-detail": JSON.stringify([finding.event, finding.name, finding.text])}, el("summary", {}, "Verified scope"), ...finding.scopes.map(scope => el("p", {}, scope.occurrence + ": " + scope.scope)))));
+    panel.append(list);
+  }
+  const metrics = _conceptSession?.metrics(_conceptGameKeys) || {timeMs: 0, processed: 0, total: 0, found: 0, reused: 0, errors: [], unavailable: [], issues: []};
+  panel.append(el("h3", {}, "Game debug metrics"),
+    el("p", {id: "conceptMetrics"}, `Total concept-analysis time: ${(metrics.timeMs / 1000).toFixed(2)} s · Positions processed: ${metrics.processed}/${metrics.total} · Concepts found: ${metrics.found} · Reused positions: ${metrics.reused}`),
+    el("p", {class: "concepts-note"}, "Time sums per-position concept work, including reused work. Counts include every finding at each move. Variations are shown above and excluded from game totals."));
+  const atPlies = field => _conceptGameKeys.flatMap((key, index) => (_conceptSession?.entries.get(key)?.[field] || []).map(message => `Ply ${index + 1}: ${message}`));
+  const reports = [["Errors", atPlies("errors")], ["Unavailable inputs", atPlies("unavailable")], ["Exhausted budgets", atPlies("issues")]];
+  for (const [label, messages] of reports) {
+    const unique = [...new Set(messages)];
+    const detail = el("details", {"data-concept-detail": "debug:" + label}, el("summary", {}, `${label}: ${messages.length}`));
+    for (const message of unique) detail.append(el("p", {}, message));
+    panel.append(detail);
+  }
+  if (enabled && entry && !_conceptGameKeys.includes(conceptKey(input))) {
+    for (const message of [...entry.errors, ...entry.unavailable, ...entry.issues]) panel.append(el("p", {}, "Selected variation: " + message));
+  }
+  return panel;
 }
 
 /* ---------------- Credits & attributions ----------------
@@ -4707,6 +4893,7 @@ const CONTRIBUTORS = [
   { name: "neuroflowinfinix", username: "neuroflowinfinix", role: "Contributor" },
   { name: "Kristian Julsgaard", username: "Julsgaard", role: "Contributor" },
   { name: "Arthur Guedes", username: "arthurhguedes", role: "Contributor" },
+  { name: "Thomas Murray", username: "MurrayThomas", role: "Contributor" },
   { name: "T-Julsgaard", username: "T-Julsgaard", role: "Maintainer" },
 ];
 const REPO_URL = "https://github.com/T-Julsgaard/Chess-Review";
