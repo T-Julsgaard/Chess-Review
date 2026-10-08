@@ -67,7 +67,8 @@ Reachable-history checks reject those generated paths.
 Nineteen studies/tasks are complete. The separate [E020 coach-concept prototype](experiments/E020-coach-concepts/RESULT.md)
 verifies bounded mechanics on synthetic positions, with an exhaustive concept
 tracker and browsable demo. Human usefulness and real-game precision remain
-unresolved; there is no extension integration. The numerical goal stays paused.
+unresolved. [P001](promotions/P001-concepts-tab.md) integrates the E080 verified
+scopes in an optional Concepts tab; the numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest

@@ -858,6 +858,15 @@ button { font-family: inherit; cursor: pointer; }
   scrollbar-gutter: stable;
 }
 .settings-pop[hidden] { display: none; }
+.settings-pop.concepts-open { width: min(420px, calc(100vw - 48px)); }
+.concepts-panel { display: grid; gap: 12px; overflow-wrap: anywhere; }
+.concepts-panel h3, .concepts-panel p { margin: 0; }
+.concepts-toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.concepts-note, .concepts-kind { color: var(--muted); font-size: 12px; }
+.concepts-findings { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.concepts-findings li { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 5px; }
+.concepts-panel summary { cursor: pointer; font-size: 12px; }
+.concepts-panel details p { font-size: 12px; margin-top: 6px; }
 
 /* ---------- CREDITS & ATTRIBUTIONS ---------- */
 .credits-overlay {

@@ -1,0 +1,2186 @@
+{
+  "study": "E080",
+  "hashNormalization": "utf8-lf",
+  "trackerPath": "research/experiments/E080-pawn-shield-defense/evidence/concept-status.md",
+  "trackerSha256": "65820789717e96aa37f31c05933e17db4cfb9b6ab510dbde9eabaab9ff6ed579",
+  "entry": "E080-shield.mjs",
+  "sources": {
+    "research/experiments/E080-pawn-shield-defense/code/shield.mjs": {
+      "file": "E080-shield.mjs",
+      "sha256": "5c257c223124f6c254f6a245cf510e0f5063fc0eed63e509b59979e1792b3ecd",
+      "promotedSha256": "c78edef567aec03b2faaafba79e44718fb1547c0e63c38287504352c9f31183c"
+    },
+    "research/experiments/E020-coach-concepts/code/concepts.mjs": {
+      "file": "E020-concepts.mjs",
+      "sha256": "b6e917d81c675175f840b19233ebcac61591ac163e5277fa6a1f12a3b9aaa692",
+      "promotedSha256": "f83b3fe4e0ac15f91e49df81126e9bc70c2bba59ca21af1a58a434272c96ae2c"
+    },
+    "research/experiments/E024-transitions/code/transitions.mjs": {
+      "file": "E024-transitions.mjs",
+      "sha256": "14c933ccf39ca66e89803d04701defb311f02bc4519001369878d1c66f9fb437",
+      "promotedSha256": "f5a7d3ed9113593b4311d093b9668e61825676b99836be25b4203aaaee21b8ba"
+    },
+    "research/experiments/E023-broad-tactics/code/tactics.mjs": {
+      "file": "E023-tactics.mjs",
+      "sha256": "a00d789ffb538ed5a274257c82420716716e04ddfe84e970d115aee1cee01a74",
+      "promotedSha256": "d71e66149183c90b6aa9565b02a4abedf88aba73a2ec58b028c4e42abb4c1114"
+    },
+    "research/experiments/E022-move-tactics/code/tactics.mjs": {
+      "file": "E022-tactics.mjs",
+      "sha256": "04ea550a22503c1f3aa13cb822dcb67fcca130bb86102faa171ca588359592d4",
+      "promotedSha256": "81a6ac3d664c3ed1c78919ce6ec1a6285ee30cb464f8a95dd699218f64302ca7"
+    },
+    "research/experiments/E021-structural-concepts/code/explain.mjs": {
+      "file": "E021-explain.mjs",
+      "sha256": "b2578320f9d6a81c2a803789126ea0104ce720890361c953cd1b2811e3811be6",
+      "promotedSha256": "7c5dfc513504e41828ead58eaff2ebcb77c0496a3d7993d0d23d7e7cc0140f2b"
+    },
+    "research/experiments/E021-structural-concepts/code/features.mjs": {
+      "file": "E021-features.mjs",
+      "sha256": "88ae24e21f310e53aa26263a26b13c990c34e86cbe56df128ed80585e966df66",
+      "promotedSha256": "88ae24e21f310e53aa26263a26b13c990c34e86cbe56df128ed80585e966df66"
+    },
+    "research/experiments/E027-defensive-resources/code/defense.mjs": {
+      "file": "E027-defense.mjs",
+      "sha256": "43e8d09fe3928793cdea30d00b33fb6538640a1b7903ee12f18c9e074195eeab",
+      "promotedSha256": "7d137258840a01e95403cb3352f17af5496fb44d14c6207b0dd233766f50c6af"
+    },
+    "research/experiments/E026-pin-proofs/code/proofs.mjs": {
+      "file": "E026-proofs.mjs",
+      "sha256": "4e2962a201f90858d7f0d5255d9d718e30449fdae51db2868c4c40e3bc5dade8",
+      "promotedSha256": "07b28f3c6a315a2f75e5c7674b1957057a47f40800eeec60b0f30d3051a5b0a8"
+    },
+    "research/experiments/E025-pawn-formations/code/formations.mjs": {
+      "file": "E025-formations.mjs",
+      "sha256": "e1d52eddcd92da7229213fa99e3bfd3bc6ebe1bcb5a4492aacee0c6bdd0a81cf",
+      "promotedSha256": "d9825e7b5dc508d669beefe2b39d4e9315c38fbd5c3cbffa98aaf2517f6093ca"
+    },
+    "research/experiments/E025-pawn-formations/code/selection.mjs": {
+      "file": "E025-selection.mjs",
+      "sha256": "189e73c5fc6a7f2083cb70644baf1d980f86f32cac281a21a829ccd88c7e70fc",
+      "promotedSha256": "189e73c5fc6a7f2083cb70644baf1d980f86f32cac281a21a829ccd88c7e70fc"
+    },
+    "research/experiments/E029-forced-mates/code/mates.mjs": {
+      "file": "E029-mates.mjs",
+      "sha256": "dabf4dac0f0e6cc54eb26783b4ade335a0b37d61ca851e9ded1448a825092228",
+      "promotedSha256": "f207cee78c367e0c972d1c938a611f59631b31c6bd34fe589dcd005d35c665b7"
+    },
+    "research/experiments/E028-mating-patterns/code/patterns.mjs": {
+      "file": "E028-patterns.mjs",
+      "sha256": "5655557ef51dcda0688c98b3518408cbe6b509b0e255637257c4f0ea9c1e552e",
+      "promotedSha256": "d2c16de108da795eec80f029561e8d1fd24c79c16e344d783070c5e7ac9c24b1"
+    },
+    "research/experiments/E079-central-king-support/code/center.mjs": {
+      "file": "E079-center.mjs",
+      "sha256": "3e467c608ffbc3c6f963b0a10cbe720fb275ceada56b3b9d3b60ea7ca0cad163",
+      "promotedSha256": "7d98114d9696b07fe87a0507b99f37008c3a4de7c0cfd86d1a4c222d9f4d0ab9"
+    },
+    "research/experiments/E078-bishop-chains-batteries/code/placements.mjs": {
+      "file": "E078-placements.mjs",
+      "sha256": "5285f4ccb910d7933b80088722bd566ac4cb64eca845aa89ba49a7b8305e6230",
+      "promotedSha256": "ec87a99f7da575c78b7f85fcb869008c94f8552ba4e958273600e522f29be28b"
+    },
+    "research/experiments/E077-connected-passers-open-lines/code/lines.mjs": {
+      "file": "E077-lines.mjs",
+      "sha256": "16a5284d3d69c7fe0155aabc33fa266abed3ef1a17174e9e4d73c560b0444a73",
+      "promotedSha256": "a25d28551de9d3961aecffa47f9fbf8672763f68d4127a8257180f63d2c7b301"
+    },
+    "research/experiments/E076-pawn-army-inventories/code/inventories.mjs": {
+      "file": "E076-inventories.mjs",
+      "sha256": "3b2c53e6af7f14904c06f1a992f55955b188236defb45d9e56bcbdc763ecb9c3",
+      "promotedSha256": "0188cf4650d55adc627956af11e022b0b0afaec6bf3485a513b58b0a9b9e5a37"
+    },
+    "research/experiments/E075-board-material/code/foundations.mjs": {
+      "file": "E075-foundations.mjs",
+      "sha256": "9cd1b52656c3e45d5d31e82ca54a4d82f7639f1cfe232a67f0753d35191266a9",
+      "promotedSha256": "4c323897909c375b917243360b5112409a15feb12b6978a1af4fcf05e90df463"
+    },
+    "research/experiments/E074-french-scheveningen/code/centers.mjs": {
+      "file": "E074-centers.mjs",
+      "sha256": "731f129fe00ee2c2e2c904060b2a9c8820085100c9cdbc733d539ed370402529",
+      "promotedSha256": "5e216a608c17564ea979aebca212b28f97da01c1ed5b5051fb27f129700f54bc"
+    },
+    "research/experiments/E073-carlsbad-hedgehog/code/structures.mjs": {
+      "file": "E073-structures.mjs",
+      "sha256": "6ca84c3821e87983c0169219d19f19efe5f883f7a47f1aa2b0b3c3d84b9b5ff4",
+      "promotedSha256": "a800013c2527c5d05adc97c542b5317c9bfe00a61f4698413193f333804a1aa6"
+    },
+    "research/experiments/E072-named-pawn-formations/code/formations.mjs": {
+      "file": "E072-formations.mjs",
+      "sha256": "409bf1fae779fd7a3e379df12218f600cee06eda09b272b914d717e6bf319b33",
+      "promotedSha256": "277651374ce335f8b334aaa0f4146b2bbd5c55240f27e7a5f2141ca864a10623"
+    },
+    "research/experiments/E071-octopus-knights/code/octopus.mjs": {
+      "file": "E071-octopus.mjs",
+      "sha256": "5ce3bf8858db7609288cec4042669159d92569080b8a952e57488197d5d606e6",
+      "promotedSha256": "98c5abe58693b8fff28779e7815483e0014c08bfd11544b7a53ca00d71d28676"
+    },
+    "research/experiments/E070-knight-outposts/code/outpost.mjs": {
+      "file": "E070-outpost.mjs",
+      "sha256": "cb442c24920a8f68e10d6ec59c92fdd65a7ec5af5b1e63bd47f811cc5fe6d893",
+      "promotedSha256": "453433927ac43f59a00611230ac843e0a44c4eeaf610b0dd2b890481a997ce6d"
+    },
+    "research/experiments/E069-checking-invasions/code/invasion.mjs": {
+      "file": "E069-invasion.mjs",
+      "sha256": "68eaadce6899762553427cfabbb3265b65297d8e26a011a31676f8414919fe2c",
+      "promotedSha256": "d64c1b0baa24e9eb7bd7131240947b55ed1095e1a53ea181f8774d4b22238dde"
+    },
+    "research/experiments/E068-rook-swings/code/swing.mjs": {
+      "file": "E068-swing.mjs",
+      "sha256": "00d75a52c811498245d1f392004e1405fe3ad51604e460c85a313939103dbe38",
+      "promotedSha256": "01c197c12d5841d7a7b45870a109d6e2877397b04f4f505dd9a88596f2ad3691"
+    },
+    "research/experiments/E067-waiting-tempi/code/tempi.mjs": {
+      "file": "E067-tempi.mjs",
+      "sha256": "5a8f4130fecb46d786def90abe6e7a89016e0613e57fd9668b5873586eacb6c6",
+      "promotedSha256": "f33fad647bd6119882ec69130053dae9422f3ffb8d3bfaabf04f88db8bac4d34"
+    },
+    "research/experiments/E066-pawn-races/code/race.mjs": {
+      "file": "E066-race.mjs",
+      "sha256": "91e8ba79a8f304af5d66a7132b2aa2f1595be0d60b3f54dc19f5f87e76413385",
+      "promotedSha256": "ae398be5b3cf335fc59bde0e5cd03af112ded40ab7060c3d04660ab3c38cb6ef"
+    },
+    "research/experiments/E065-king-triangulation/code/triangle.mjs": {
+      "file": "E065-triangle.mjs",
+      "sha256": "e1dde61de5728c988ba02fc4e97aa829960cde4e02adcc9a64f6a65c80421884",
+      "promotedSha256": "35afcc6977c2c5c273ec97968e7174926bbb5a6d2c5f662ae8bedc9a390398e5"
+    },
+    "research/experiments/E064-blocked-position/code/blocked.mjs": {
+      "file": "E064-blocked.mjs",
+      "sha256": "28c77338b70bde8c98fa9a18ecc6dbe7c04b6b5ca4d9ce626bf5c24bc97b3abe",
+      "promotedSha256": "3e57c340e2f07d689f0bd4c7097a25981fc6bc85df8d24cc9d0f30f446500873"
+    },
+    "research/experiments/E063-pawn-storm/code/storm.mjs": {
+      "file": "E063-storm.mjs",
+      "sha256": "6450445edb5244e4158637cd5756bd3c4f56a9b8cd1c438dad3482e7abcd1592",
+      "promotedSha256": "cba7824054cd18a1439509d32637f79dabe79dd9246939823d4efb1814da2062"
+    },
+    "research/experiments/E062-pawn-space/code/space.mjs": {
+      "file": "E062-space.mjs",
+      "sha256": "baeba263cbe7db29102ca4a80175651d0b9ec777e9fd949b6e64d00602221447",
+      "promotedSha256": "ddc4049617fc659725889b01102780b1cfae0bc2e1be7185795aae2816743aa1"
+    },
+    "research/experiments/E061-closed-files/code/files.mjs": {
+      "file": "E061-files.mjs",
+      "sha256": "186ca69020de609bc20d0f67b55a933700554276eac6c7fd944ab4e711a9b4e5",
+      "promotedSha256": "793bbe35b3044a8db032654d4dc9bca70b147aa08a4448159b1172c13caac940"
+    },
+    "research/experiments/E060-pawn-breaks/code/breaks.mjs": {
+      "file": "E060-breaks.mjs",
+      "sha256": "51ec80f7e3afdfd27721f6fb997b4ba09136deb394788dc68db4ecd5793c07f1",
+      "promotedSha256": "c6c310028c1f3932aaa882a24865fca0db5fa9d0cf24a602cb9cb4fdc424d754"
+    },
+    "research/experiments/E059-pawn-restraint/code/restraint.mjs": {
+      "file": "E059-restraint.mjs",
+      "sha256": "927ffe03dd600c22ed630ba72b9c84df2411a39dec8962ab1298a4a43887834b",
+      "promotedSha256": "46470a9a013f1feefb5ff9821c36715e264b1f30d85507742746d1e3edb32ffc"
+    },
+    "research/experiments/E058-wrong-bishop-rook-pawn/code/corner.mjs": {
+      "file": "E058-corner.mjs",
+      "sha256": "cda9a445fa30a33f727f9c787596c8953c0212f723715d1746ac547a5047f470",
+      "promotedSha256": "850c0367d0f24d1bcf2f14cf14a2b11910c400ae66a6977202523a191003e575"
+    },
+    "research/experiments/E057-rook-checking-distance/code/checking.mjs": {
+      "file": "E057-checking.mjs",
+      "sha256": "1b516114d92a31e6681ff74c80f611a2181f67ef650c7c241b9a22074e945e82",
+      "promotedSha256": "66d3a70bc758fef0935d90679fe7e097b080dedc0846baceb671ca53b95ed3f8"
+    },
+    "research/experiments/E056-pawn-blockades/code/blockade.mjs": {
+      "file": "E056-blockade.mjs",
+      "sha256": "511e094cef873ec03644e0761dd0125dff014dc0a38ddf77eb58471fde2ea40d",
+      "promotedSha256": "2aca770e3f72d1032fd13015a065535fdcd6d277d7e79ee9bae419740f190ef3"
+    },
+    "research/experiments/E055-intermediate-sacrifices/code/timed.mjs": {
+      "file": "E055-timed.mjs",
+      "sha256": "cc9b630543033802be7add85475ce60cbeae89f88b7fa635b40752adf28287f8",
+      "promotedSha256": "0558112286665e9a3cf26dc86602fe4a17af6210e5178e6076e12318a87372ff"
+    },
+    "research/experiments/E054-causal-mating-combinations/code/named.mjs": {
+      "file": "E054-named.mjs",
+      "sha256": "97d01fb8fa2d958f02a7b0e34b9d7cbafc650f0eafc6b1f1038942664c672d98",
+      "promotedSha256": "080b936e9b39a2e638be86dbd7983d15c42e6c27713fd407ad46e7ea57d87a36"
+    },
+    "research/experiments/E053-cross-checks/code/cross.mjs": {
+      "file": "E053-cross.mjs",
+      "sha256": "06c94560fc59bc81fdb58346032b54732ee393a331afad5438d7976b19db2501",
+      "promotedSha256": "197a3d3b2a89cef42221651e8186d156e1e1c57d0e66273387c10f0e0e892b3b"
+    },
+    "research/experiments/E052-desperado-captures/code/desperado.mjs": {
+      "file": "E052-desperado.mjs",
+      "sha256": "c7bf41aba7e77f6a9e402a5dfc0246994090019b10541c1459cf7eb8470278dd",
+      "promotedSha256": "8e31b15d37d0226a9875c56cdc11c8d9c75100da83126fd5827e5e595a2becbd"
+    },
+    "research/experiments/E051-interference-combinations/code/interference.mjs": {
+      "file": "E051-interference.mjs",
+      "sha256": "07bebfa3f8a13b751a157633f3d910234b24b812273971c8bb93e2306db4a8ad",
+      "promotedSha256": "f847897e8b4991e7da1be8ca1880e138341aed136083af28522fd15783702a40"
+    },
+    "research/experiments/E050-square-clearance-and-recovery/code/clearance.mjs": {
+      "file": "E050-clearance.mjs",
+      "sha256": "d504e2d590f06d5f9cfe732d340331a04aacae3304a14b72a7cb69d46798e470",
+      "promotedSha256": "6a9583852288f11455010165f7e6b18335c349e51d100bab36120e02b339b49f"
+    },
+    "research/experiments/E049-overloaded-defenders/code/overload.mjs": {
+      "file": "E049-overload.mjs",
+      "sha256": "8ef2ebeb37b880e66ed2ada7dba96e5b55b72c32bc72955560cc9d8a0edfc58f",
+      "promotedSha256": "2e8c22a40613fda009034ad69eff9838a1ae7b865ba7367f22ab133ae0e4d206"
+    },
+    "research/experiments/E048-legal-defense-counts/code/counts.mjs": {
+      "file": "E048-counts.mjs",
+      "sha256": "f17d204825943895c546721b5a6a53b51b4660dd876dc8b7acff60420c04c3c1",
+      "promotedSha256": "b6954e9200dafc4d0b90f181de562b8e8009ab9c0d15fd37845e682d8dd1b356"
+    },
+    "research/experiments/E047-history-and-basic-mates/code/history.mjs": {
+      "file": "E047-history.mjs",
+      "sha256": "ba16d5392b6411dcae99fadef948b59ef435e1212835d3ea7eeffc82c2356575",
+      "promotedSha256": "f3626a09a39ad5b12d93a03eac0c018898e43bc5c83736b2a55e2c996364171a"
+    },
+    "research/experiments/E046-coordinated-mating-patterns/code/nets.mjs": {
+      "file": "E046-nets.mjs",
+      "sha256": "82f16b71dfa6a1d3f3df7bba9693009325d62afa42dabeb7475a12370bee136f",
+      "promotedSha256": "e813a64ac30ea411b690e799340990fb8a305ff55708a2fa267763e326bdc272"
+    },
+    "research/experiments/E045-supported-mating-patterns/code/supported.mjs": {
+      "file": "E045-supported.mjs",
+      "sha256": "b79f637aad02173a7bbce114378c7be2a861a909a5fa57642542d104db219a05",
+      "promotedSha256": "875201fe55089d8d8f9cab85cffee321c50bb3f769f7345401bc8ad7aa230e7e"
+    },
+    "research/experiments/E044-named-mating-combinations/code/combinations.mjs": {
+      "file": "E044-combinations.mjs",
+      "sha256": "91cb6eb6f6d4d19976c8cc4e8f60c7b45c7288585fa842dafadcca0a81fabca5",
+      "promotedSha256": "4216c93204a2a0be7d0ab9374f0f487ee5fed6b52ca1d30cfe33a145a35a5bfc"
+    },
+    "research/experiments/E043-mating-decoys/code/decoys.mjs": {
+      "file": "E043-decoys.mjs",
+      "sha256": "eb2a70aa9d3bd109538db4a52cf5dd6c089523a78b13d83a818a5a903ab6d177",
+      "promotedSha256": "55a368551995a3b7fcc8aca6666ab895284bfacf3923ba1a75d1e49f97d9883d"
+    },
+    "research/experiments/E042-defensive-counterattacks/code/counter.mjs": {
+      "file": "E042-counter.mjs",
+      "sha256": "f033909430f9694fd082923729caa184cc1e0906c192a82e31bd30e7163dc98e",
+      "promotedSha256": "76b3ebeb104b25f22f131f64f3887d8d13e3850d33621fac6fbd331e2b5173df"
+    },
+    "research/experiments/E041-unique-mate-defense/code/defense.mjs": {
+      "file": "E041-defense.mjs",
+      "sha256": "a80276c0c3b082da845ab006396f6049a11549f54f07eba6328febe8a77b9d31",
+      "promotedSha256": "ce577d201ae4e3ae7f99732a77b0795b23617649bdbb49b4ce562346d18e6ab4"
+    },
+    "research/experiments/E040-quiet-mating-nets/code/nets.mjs": {
+      "file": "E040-nets.mjs",
+      "sha256": "e3b7f79d1d8530c8ff1ee0d9dd12b7006584da769e235a6bec78649ad0e4cbc5",
+      "promotedSha256": "f715c1605036003ae467f6903f37a973095e064f4246f2053a04f953744cea13"
+    },
+    "research/experiments/E039-king-promotion-support/code/support.mjs": {
+      "file": "E039-support.mjs",
+      "sha256": "dff2346e970ab8f1f66038acec398e72d14597e1762216c654d07fc56717669b",
+      "promotedSha256": "26fe8c261cf976ed6a07157b7e598e218069a7eca38ac032b2bad9573ce986f2"
+    },
+    "research/experiments/E037-promotion-routes/code/routes.mjs": {
+      "file": "E037-routes.mjs",
+      "sha256": "aaa17c22f8275bc4e73695dbc5a671334e835f8a7c244317c26bbe8842eed343",
+      "promotedSha256": "686e035114b5f2aea97922e2c65b2be996a384ea827f59399566e05d9632a822"
+    },
+    "research/experiments/E036-passer-context/code/passers.mjs": {
+      "file": "E036-passers.mjs",
+      "sha256": "5930d3aa75f26077c67f82aa87e24e7359d597d716202b9dd747106b6f89a72a",
+      "promotedSha256": "d3a1c6d4bda33e212ce1036601970b06ff5c4c6c40f4fd196be3ffa9a7a6f607"
+    },
+    "research/experiments/E035-opening-development/code/opening.mjs": {
+      "file": "E035-opening.mjs",
+      "sha256": "2401040f3d2c85f58d0d96968911459b6a71ae726a1f79be7e143a03a4ed2b08",
+      "promotedSha256": "ccf9b7c6be7790ffbf7dd5b06d94a328b2ab91c94be69fe14dbec343f7fb836b"
+    },
+    "research/experiments/E034-bishop-patterns/code/bishops.mjs": {
+      "file": "E034-bishops.mjs",
+      "sha256": "c3e647d4464e94063085d6943e9672c5c749b13cdbce1622899c78af62db1764",
+      "promotedSha256": "e0a7f2034221861edc0a755bbc194568b3cc1404ef838609e5bb2ee3cc807665"
+    },
+    "research/experiments/E033-mobility-traps/code/traps.mjs": {
+      "file": "E033-traps.mjs",
+      "sha256": "de29e49c614ad22e2d5fdc08995a37fb074e025766391de51d40785fb991a872",
+      "promotedSha256": "26b9a7f6c4cc856459d9bd0b66c584e36b97c68be8703fd1394b836cb44d2dbe"
+    },
+    "research/experiments/E032-draw-history/code/draws.mjs": {
+      "file": "E032-draws.mjs",
+      "sha256": "29a7fee649b44a611ba1705707c64a3a7b386bb27f0de35dad157342fb5961cf",
+      "promotedSha256": "00038f62548bbb107e897d2e2ebbe612c3840d123ca61c148aaf7ad7fea93667"
+    },
+    "research/experiments/E031-intermediate-moves/code/intermediate.mjs": {
+      "file": "E031-intermediate.mjs",
+      "sha256": "a0e6fa2d206e864ea120b488c85b5753df9defe70463b6d37b03a9402f567e4a",
+      "promotedSha256": "86315f4ed527cd0a19022fc85844359e8c2c1917e5b42ea50671df584d7e3ef6"
+    },
+    "research/experiments/E030-mating-sacrifices/code/sacrifices.mjs": {
+      "file": "E030-sacrifices.mjs",
+      "sha256": "4a16a83f2c7cd0ad452670be45e5441f890aec375221f193875cc2da47e9b88f",
+      "promotedSha256": "85e448786e6d1a99ec0f3ee3bb98924ddae9e43841435362d38715a38a6bf17c"
+    },
+    "research/experiments/E038-underpromotion-stalemate/code/resources.mjs": {
+      "file": "E038-resources.mjs",
+      "sha256": "02520b66830e922b96eeb61519b31e5b528e6b4021e7231d82bd7ab6ef6891e3",
+      "promotedSha256": "1afd06738482ea09490110141d2b819a433d28b623fef4b8bcb90f22758ca8f0"
+    }
+  },
+  "verified": [
+    {
+      "occurrence": "C0001",
+      "name": "Board coordinates",
+      "scope": "Mechanics verified: absolute origin/destination square, file and rank of a validated attempted move; both colors and board edges."
+    },
+    {
+      "occurrence": "C0002",
+      "name": "Piece movement",
+      "scope": "Mechanics verified: actual legal movement of all six piece types with complete legal-set membership, capture, castling, en passant and every promotion choice; no move-quality claim."
+    },
+    {
+      "occurrence": "C0003",
+      "name": "Capture",
+      "scope": "Mechanics verified: actual removed piece and square, including en passant."
+    },
+    {
+      "occurrence": "C0004",
+      "name": "Check",
+      "scope": "Mechanics verified: check; factual king attack only."
+    },
+    {
+      "occurrence": "C0005",
+      "name": "Checkmate",
+      "scope": "Mechanics verified: checkmate; played move ends in mate."
+    },
+    {
+      "occurrence": "C0006",
+      "name": "Stalemate",
+      "scope": "Mechanics verified: stalemate; played move ends in stalemate."
+    },
+    {
+      "occurrence": "C0007",
+      "name": "Draw by repetition",
+      "scope": "Mechanics verified: verified legal history reaches three equal position keys including turn, castling rights and legal en passant; reports claim opportunity, not awarded draw."
+    },
+    {
+      "occurrence": "C0008",
+      "name": "Fifty-move rule",
+      "scope": "Mechanics verified: verified history covers 100 consecutive plies without pawn move/capture and consistent counters; FEN-only thresholds remain partial facts and cannot trigger this claim label."
+    },
+    {
+      "occurrence": "C0009",
+      "name": "Insufficient mating material",
+      "scope": "Mechanics verified: chess.js insufficient-material classification after legal move."
+    },
+    {
+      "occurrence": "C0010",
+      "name": "Castling",
+      "scope": "Mechanics verified: castling; factual move, no safety judgment."
+    },
+    {
+      "occurrence": "C0011",
+      "name": "Kingside castling",
+      "scope": "Mechanics verified: castling; kingside."
+    },
+    {
+      "occurrence": "C0012",
+      "name": "Queenside castling",
+      "scope": "Mechanics verified: castling; queenside."
+    },
+    {
+      "occurrence": "C0013",
+      "name": "En passant",
+      "scope": "Mechanics verified: en-passant; right, removed pawn and discovered-check case."
+    },
+    {
+      "occurrence": "C0014",
+      "name": "Promotion",
+      "scope": "Mechanics verified: promotion; factual piece change."
+    },
+    {
+      "occurrence": "C0015",
+      "name": "Underpromotion",
+      "scope": "Mechanics verified: promotion; non-queen piece change, no optimality claim."
+    },
+    {
+      "occurrence": "C0016",
+      "name": "Legal move",
+      "scope": "Mechanics verified: live-root strict-UCI membership in complete legal move set, validated history and safe actor king after actual move; terminal roots unavailable."
+    },
+    {
+      "occurrence": "C0017",
+      "name": "Illegal move",
+      "scope": "Mechanics verified: explicit research attempted-input path refuses nonmember UCI moves, retains complete legal alternatives, no fabricated played position or inferred reason; malformed/invalid-root inputs are errors."
+    },
+    {
+      "occurrence": "C0020",
+      "name": "Material",
+      "scope": "Mechanics verified: complete square/type/color piece and pawn inventories and per-type counts before/after actual moves, captures, EP, castling and promotions; kings included in inventory."
+    },
+    {
+      "occurrence": "C0023",
+      "name": "Space",
+      "scope": "Mechanics verified: actual new pawn attack squares in enemy half remove immediate enemy king destinations; complete legal before/after/removed-pawn causal sets and every actual reply; no general advantage or permanent restriction claim."
+    },
+    {
+      "occurrence": "C0024",
+      "name": "Development",
+      "scope": "Mechanics verified: first surviving original minor home departure off back rank during first ten own turns; verified initial-position history."
+    },
+    {
+      "occurrence": "C0027",
+      "name": "Mobility",
+      "scope": "Mechanics verified: static legal destination count drops by at least two to at most two; explicit hypothetical before-opponent turn, no quality or future-position claim."
+    },
+    {
+      "occurrence": "C0034",
+      "name": "Exchange",
+      "scope": "Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded."
+    },
+    {
+      "occurrence": "C0035",
+      "name": "The exchange",
+      "scope": "Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded."
+    },
+    {
+      "occurrence": "C0037",
+      "name": "Exchange sacrifice",
+      "scope": "Mechanics verified: rook captures a minor and is legally offered at a nominal loss of two points, with all-defense forced-mate proof."
+    },
+    {
+      "occurrence": "C0041",
+      "name": "Equal trade",
+      "scope": "Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded."
+    },
+    {
+      "occurrence": "C0042",
+      "name": "Unequal trade",
+      "scope": "Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded."
+    },
+    {
+      "occurrence": "C0043",
+      "name": "Piece simplification",
+      "scope": "Mechanics verified: non-pawn piece count decreases by one; no quality judgment."
+    },
+    {
+      "occurrence": "C0047",
+      "name": "Queen trade",
+      "scope": "Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded."
+    },
+    {
+      "occurrence": "C0048",
+      "name": "Minor-piece trade",
+      "scope": "Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded."
+    },
+    {
+      "occurrence": "C0049",
+      "name": "Rook trade",
+      "scope": "Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded."
+    },
+    {
+      "occurrence": "C0051",
+      "name": "Tactic",
+      "scope": "Mechanics verified: positive all-defense material-offer mating sequence with named final pattern or independently certified decoy/clearance idea."
+    },
+    {
+      "occurrence": "C0052",
+      "name": "Combination",
+      "scope": "Mechanics verified: same certified material offer plus complementary named-mate/decoy/clearance idea; full all-defense mate."
+    },
+    {
+      "occurrence": "C0053",
+      "name": "Fork",
+      "scope": "Mechanics verified: new all-piece target pairs, including pawns; every defense has a positive finite capture witness."
+    },
+    {
+      "occurrence": "C0054",
+      "name": "Knight fork",
+      "scope": "Mechanics verified: fork; new knight fork with exhaustive finite material witnesses."
+    },
+    {
+      "occurrence": "C0055",
+      "name": "Pawn fork",
+      "scope": "Mechanics verified: fork; new pawn fork with exhaustive finite material witnesses."
+    },
+    {
+      "occurrence": "C0056",
+      "name": "Royal fork",
+      "scope": "Mechanics verified: king-and-queen target pair by any piece with a positive finite witness; king never captured."
+    },
+    {
+      "occurrence": "C0058",
+      "name": "Triple attack",
+      "scope": "Mechanics verified: three or more moved-piece targets with one finite capture witness per defense; not all targets won."
+    },
+    {
+      "occurrence": "C0060",
+      "name": "Absolute pin",
+      "scope": "Mechanics verified: absolute-pin; new single-blocker slider-to-king alignment."
+    },
+    {
+      "occurrence": "C0061",
+      "name": "Relative pin",
+      "scope": "Mechanics verified: new queen alignment; every legal blocker move off that line permits queen capture with positive immediate net material versus the post-move position; other defenses remain."
+    },
+    {
+      "occurrence": "C0062",
+      "name": "Cross-pin",
+      "scope": "Mechanics verified: mixed king/queen pin on distinct slider lines; nonempty legal off-queen-line reply set passes the relative-pin proof; other cross-pin forms excluded."
+    },
+    {
+      "occurrence": "C0064",
+      "name": "Absolute skewer",
+      "scope": "Mechanics verified: king-first moved-slider skewer; every defense allows target capture with positive immediate net material."
+    },
+    {
+      "occurrence": "C0065",
+      "name": "Discovered attack",
+      "scope": "Mechanics verified: stationary slider’s newly opened attack with legal same-side capture witness; opponent can respond."
+    },
+    {
+      "occurrence": "C0066",
+      "name": "Discovered check",
+      "scope": "Mechanics verified: discovered-check; includes en passant, excludes moving castling rook."
+    },
+    {
+      "occurrence": "C0067",
+      "name": "Double check",
+      "scope": "Mechanics verified: double-check; two king attackers, terminal mate takes priority."
+    },
+    {
+      "occurrence": "C0069",
+      "name": "X-ray defense",
+      "scope": "Mechanics verified: actual conditional capture/blocker-recapture/opponent-recapture/slider-recapture sequence through exactly one own ray blocker; all four moves legal, no forced acceptance or favorable trade claim."
+    },
+    {
+      "occurrence": "C0070",
+      "name": "Deflection",
+      "scope": "Mechanics verified: positive all-defense mate sacrifice; accepting enemy unit abandons a before-proven legal capture of the same eventual mating unit; acceptance/mate explicit."
+    },
+    {
+      "occurrence": "C0071",
+      "name": "Decoy",
+      "scope": "Mechanics verified: all-defense mate offer; accepted non-king unit blocks a geometrically verified king escape, or accepted king enables a before-legal nonmating move to mate; conditional line."
+    },
+    {
+      "occurrence": "C0072",
+      "name": "Attraction",
+      "scope": "Mechanics verified: king-specific all-defense mating offer: accepting king changes square and same before-legal nonmating move actually mates; conditional acceptance."
+    },
+    {
+      "occurrence": "C0073",
+      "name": "Distraction",
+      "scope": "Mechanics verified: same legal defender-duty deflection certificate; no psychological intent inferred."
+    },
+    {
+      "occurrence": "C0074",
+      "name": "Removal of the defender",
+      "scope": "Mechanics verified: captured geometric defender; every legal reply permits original target capture with positive immediate net material versus the post-capture position; later play unproven."
+    },
+    {
+      "occurrence": "C0075",
+      "name": "Overloading",
+      "scope": "Mechanics verified: conditional enemy N/B/R/Q recapture abandons another target after two before-proven legal recapture duties; same own attacker captures that target with positive before-move nominal gain through EVERY immediate enemy reply; all defender acceptances checked, no forced acceptance/long-term gain claim."
+    },
+    {
+      "occurrence": "C0076",
+      "name": "Interference",
+      "scope": "Mechanics verified: frozen enemy-slider attack-line interruption geometry; additionally enemy slider had a legally proven before-duty recapture; actual move interposes on its clear ray; EVERY enemy reply allows the original target capture with positive before-move nominal gain through EVERY next enemy response; removing only the blocker restores a legal counterfactual defender recapture."
+    },
+    {
+      "occurrence": "C0079",
+      "name": "Square clearance",
+      "scope": "Mechanics verified: actual move vacates own occupied square; EVERY legal enemy reply permits a different original own unit to legally checkmate on that same square; no uniqueness/intent claim."
+    },
+    {
+      "occurrence": "C0080",
+      "name": "Blocking",
+      "scope": "Mechanics verified: played move interrupts a previously clear enemy slider attack line; no wider safety or evaluation claim."
+    },
+    {
+      "occurrence": "C0081",
+      "name": "Interposition",
+      "scope": "Mechanics verified: legal check evasion blocks a specified checking slider between attacker and king."
+    },
+    {
+      "occurrence": "C0082",
+      "name": "Trapping a piece",
+      "scope": "Mechanics verified: currently attacked N/B/R/Q has complete all-defense tracked capture proof and positive gain through every immediate counterreply; nonchecking finite subset."
+    },
+    {
+      "occurrence": "C0083",
+      "name": "Trapped queen",
+      "scope": "Mechanics verified: currently attacked N/B/R/Q has complete all-defense tracked capture proof and positive gain through every immediate counterreply; nonchecking finite subset."
+    },
+    {
+      "occurrence": "C0084",
+      "name": "Domination",
+      "scope": "Mechanics verified: every legal move by the named unit permits tracked capture with positive gain through every immediate counterreply; other defenses not promised."
+    },
+    {
+      "occurrence": "C0085",
+      "name": "Desperado",
+      "scope": "Mechanics verified: geometrically threatened N/B/R/Q takes its maximum available nominal capture; EVERY legal quiet alternative admits a legal unit-loss capture through ALL own responses (or enemy mate); EVERY actual unit recapture retains the conditional captured-value benefit through ALL own responses; finite three-ply comparison, no best-move or lasting-gain claim."
+    },
+    {
+      "occurrence": "C0086",
+      "name": "Zwischenzug",
+      "scope": "Mechanics verified: verified previous capture and legal recapture; played intermediate check/capture retains recapture through all legal replies and immediate counters, or actually mates."
+    },
+    {
+      "occurrence": "C0087",
+      "name": "Intermediate check",
+      "scope": "Mechanics verified: actual check delays a verified available recapture; every legal reply permits tracked recapture with finite positive gain or actual mate."
+    },
+    {
+      "occurrence": "C0088",
+      "name": "zwischenmatt / intermediate mate",
+      "scope": "Mechanics verified: verified previous capture has legal recapture alternative, but actual played move legally checkmates instead."
+    },
+    {
+      "occurrence": "C0089",
+      "name": "Sacrifice",
+      "scope": "Mechanics verified: actual material offer retains all-defense mate within two/three moves, including every legal acceptance and decline; no necessity or intention inferred."
+    },
+    {
+      "occurrence": "C0090",
+      "name": "Temporary sacrifice",
+      "scope": "Mechanics verified: every legal capture of a positive nominal offer creates actual material loss; an own capture restores the before-move balance through EVERY immediate enemy reply; acceptance conditional, finite horizon only."
+    },
+    {
+      "occurrence": "C0093",
+      "name": "Clearance sacrifice",
+      "scope": "Mechanics verified: material offer vacates the sole blocker on a stationary slider-to-king ray, opening check and retaining bounded mate through every defense."
+    },
+    {
+      "occurrence": "C0094",
+      "name": "Deflection sacrifice",
+      "scope": "Mechanics verified: same positive nominal-offer/all-defense mate and before-duty/after-mate deflection proof."
+    },
+    {
+      "occurrence": "C0097",
+      "name": "Rook sacrifice on h7/h2",
+      "scope": "Mechanics verified: checking rook offer on relative h7, verified opponent kingside castle history and current g/h home-rank king, complete bounded all-defense mate."
+    },
+    {
+      "occurrence": "C0098",
+      "name": "Rook sacrifice on g7/g2",
+      "scope": "Mechanics verified: same checking/actual kingside-castle/current home-rank king and all-defense mate gates on relative g7."
+    },
+    {
+      "occurrence": "C0099",
+      "name": "Exchange sacrifice on c3/c6",
+      "scope": "Mechanics verified: actual rook-for-minor offer on relative c3 and complete bounded mate; no Sicilian/opening or generic strategic judgment."
+    },
+    {
+      "occurrence": "C0100",
+      "name": "Queen sacrifice",
+      "scope": "Mechanics verified: legally capturable moved queen costs more than the played capture, while every defense retains bounded forced mate."
+    },
+    {
+      "occurrence": "C0101",
+      "name": "Smothered mate combination",
+      "scope": "Mechanics verified: EVERY legal reply admits actual sole-knight mate with every valid adjacent king square occupied by its own units."
+    },
+    {
+      "occurrence": "C0102",
+      "name": "Back-rank tactic",
+      "scope": "Mechanics verified: EVERY legal reply admits actual rook/queen home-rank mate behind at least two adjacent own pawns."
+    },
+    {
+      "occurrence": "C0103",
+      "name": "Loose piece",
+      "scope": "Mechanics verified: new absence of geometric defenders; pinned defenders still counted."
+    },
+    {
+      "occurrence": "C0106",
+      "name": "Counting attackers and defenders",
+      "scope": "Mechanics verified: complete distinct-piece legal capture counts and branch-specific immediate legal recapture sets, including en passant landing squares and promotion alternatives counted once; no safety/profit claim."
+    },
+    {
+      "occurrence": "C0107",
+      "name": "Removing protection",
+      "scope": "Mechanics verified: same finite all-defense target-capture proof; no claim all protection disappears."
+    },
+    {
+      "occurrence": "C0108",
+      "name": "En prise",
+      "scope": "Mechanics verified: legal same-side capture if target remains available next turn; no profit claim."
+    },
+    {
+      "occurrence": "C0115",
+      "name": "Forcing moves",
+      "scope": "Mechanics verified: nonchecking, noncapturing actual move; every legal reply permits checkmate on the next own move, independently replayed; no newly-created/only-best claim."
+    },
+    {
+      "occurrence": "C0127",
+      "name": "Only move",
+      "scope": "Mechanics verified: at least two legal choices; played move has complete no-enemy-mate-in-one proof and EVERY alternative admits immediate enemy mate; longer-term safety not claimed."
+    },
+    {
+      "occurrence": "C0128",
+      "name": "Forced move",
+      "scope": "Mechanics verified: at least two legal choices; played move has complete no-enemy-mate-in-one proof and EVERY alternative admits immediate enemy mate; longer-term safety not claimed."
+    },
+    {
+      "occurrence": "C0140",
+      "name": "Develop minor pieces",
+      "scope": "Mechanics verified: same first-development history gate, with all four surviving minors off back rank explicitly recognized."
+    },
+    {
+      "occurrence": "C0142",
+      "name": "Connect the rooks",
+      "scope": "Mechanics verified: unobstructed same-rank/file rook alignment; geometric support only."
+    },
+    {
+      "occurrence": "C0146",
+      "name": "Opening tempo",
+      "scope": "Mechanics verified: checking first-development subset only; no net time advantage."
+    },
+    {
+      "occurrence": "C0177",
+      "name": "Closed center",
+      "scope": "Mechanics verified: matched locked chains with at least two mover pawns on central squares; no plan claim."
+    },
+    {
+      "occurrence": "C0182",
+      "name": "Pawn tension",
+      "scope": "Mechanics verified: opposing pawn attacks; resolving capture."
+    },
+    {
+      "occurrence": "C0184",
+      "name": "Releasing tension",
+      "scope": "Mechanics verified: opposing pawn attacks; resolving capture."
+    },
+    {
+      "occurrence": "C0185",
+      "name": "Central break",
+      "scope": "Mechanics verified: new legal pawn-lever target occupies d4/e4/d5/e5; plan or advantage not inferred."
+    },
+    {
+      "occurrence": "C0186",
+      "name": "Undermining the center",
+      "scope": "Mechanics verified: new legal pawn attack on base of enemy chain containing a central pawn; collapse not implied."
+    },
+    {
+      "occurrence": "C0189",
+      "name": "Pawn structure",
+      "scope": "Mechanics verified: exact overall own/enemy pawn-square arrangement with full file/rank maps before/after a live legal move changing the pawn map; no weakness or opening identity inferred."
+    },
+    {
+      "occurrence": "C0190",
+      "name": "Pawn skeleton",
+      "scope": "Mechanics verified: pawn skeleton represented by complete own/enemy pawn-square/file/rank maps, including pawn capture, EP, promotion and empty maps; no strategic strength inference."
+    },
+    {
+      "occurrence": "C0191",
+      "name": "Pawn chain",
+      "scope": "Mechanics verified: directed pawn-support component; rear bases and most advanced heads."
+    },
+    {
+      "occurrence": "C0192",
+      "name": "Base of the pawn chain",
+      "scope": "Mechanics verified: directed pawn-support component; rear bases and most advanced heads."
+    },
+    {
+      "occurrence": "C0193",
+      "name": "Head of the pawn chain",
+      "scope": "Mechanics verified: directed pawn-support component; rear bases and most advanced heads."
+    },
+    {
+      "occurrence": "C0194",
+      "name": "Pawn island",
+      "scope": "Mechanics verified: contiguous occupied-file groups."
+    },
+    {
+      "occurrence": "C0195",
+      "name": "Pawn majority",
+      "scope": "Mechanics verified: counts on fixed a–d/e–h wings; no plan or advantage claim."
+    },
+    {
+      "occurrence": "C0196",
+      "name": "Queenside majority",
+      "scope": "Mechanics verified: counts on fixed a–d/e–h wings; no plan or advantage claim."
+    },
+    {
+      "occurrence": "C0197",
+      "name": "Kingside majority",
+      "scope": "Mechanics verified: counts on fixed a–d/e–h wings; no plan or advantage claim."
+    },
+    {
+      "occurrence": "C0199",
+      "name": "Passed pawn",
+      "scope": "Mechanics verified: passed-pawn geometry, including legal en-passant exception; creation or advance."
+    },
+    {
+      "occurrence": "C0200",
+      "name": "Protected passed pawn",
+      "scope": "Mechanics verified: passer attacked by a friendly pawn; legal recapture or safe advance not promised."
+    },
+    {
+      "occurrence": "C0202",
+      "name": "Outside passed pawn",
+      "scope": "Mechanics verified: actual flank passer advance with every other pawn at least three files away, at least two other pawns including both colors; no king diversion or win claim."
+    },
+    {
+      "occurrence": "C0203",
+      "name": "Distant passed pawn",
+      "scope": "Mechanics verified: actual flank passer advance with every other pawn at least three files away, at least two other pawns including both colors; no king diversion or win claim."
+    },
+    {
+      "occurrence": "C0206",
+      "name": "Isolated pawn",
+      "scope": "Mechanics verified: no friendly pawn on either neighboring file; IQP restricted to d-file."
+    },
+    {
+      "occurrence": "C0207",
+      "name": "Isolated queen's pawn / IQP",
+      "scope": "Mechanics verified: no friendly pawn on either neighboring file; IQP restricted to d-file."
+    },
+    {
+      "occurrence": "C0208",
+      "name": "Hanging pawns",
+      "scope": "Mechanics verified: new same-rank c/d pair at relative fourth/fifth rank, no other c/d or b/e pawns; no weakness claim."
+    },
+    {
+      "occurrence": "C0209",
+      "name": "Doubled pawns",
+      "scope": "Mechanics verified: same-file friendly pawn counts."
+    },
+    {
+      "occurrence": "C0210",
+      "name": "Tripled pawns",
+      "scope": "Mechanics verified: same-file friendly pawn counts."
+    },
+    {
+      "occurrence": "C0214",
+      "name": "Pawn lever",
+      "scope": "Mechanics verified: new pawn attack with a legal hypothetical same-side capture; opponent can respond."
+    },
+    {
+      "occurrence": "C0215",
+      "name": "Pawn break",
+      "scope": "Mechanics verified: actual new pawn challenge to an enemy ram with every reply vacating blocker or permitting its legal capture; actual capture release/escape requires straight advance after every reply; complete legal history and move subsets, no advantage/permanence claim."
+    },
+    {
+      "occurrence": "C0217",
+      "name": "Pawn storm",
+      "scope": "Mechanics verified: distinct adjacent advanced pawns progress on consecutive own turns after a history-verified enemy castle, on its unchanged king flank; full history, identities and every reply retained; no intent, safety or successful-attack claim."
+    },
+    {
+      "occurrence": "C0218",
+      "name": "Pawn race",
+      "scope": "Mechanics verified: pure king-and-one-advanced-passed-pawn per side; full legal all-defense bounded route proves own pawn queens first using straight advances, with all post-promotion replies retained; no automatic win or queen-safety claim."
+    },
+    {
+      "occurrence": "C0221",
+      "name": "Pawn duo",
+      "scope": "Mechanics verified: adjacent same-rank pawns; phalanx requires at least three."
+    },
+    {
+      "occurrence": "C0222",
+      "name": "Pawn phalanx",
+      "scope": "Mechanics verified: adjacent same-rank pawns; phalanx requires at least three."
+    },
+    {
+      "occurrence": "C0223",
+      "name": "Ram",
+      "scope": "Mechanics verified: opposing pawns block straight advancement."
+    },
+    {
+      "occurrence": "C0224",
+      "name": "Pawn fixation",
+      "scope": "Mechanics verified: actual pawn advance/capture creates enemy pawn ram; EVERY legal enemy reply remains live, preserves both ram pawns and leaves ZERO legal tracked pawn moves next own turn; bounded fixation only."
+    },
+    {
+      "occurrence": "C0226",
+      "name": "Pawn shield",
+      "scope": "Mechanics verified: actual legal noncapturing nonpromoting cover-pawn advance with unchanged c/e/g home-rank king; complete hypothetical opponent-turn prior mating capture, directly pawn-blocked Q/R/B capture ray, and exhaustive absence of actual opponent mate in one; complete inventories/cover/legal moves/ray/history and independently replayed one-ply proofs; no actual pass, quality, enduring safety or whole-game win claim."
+    },
+    {
+      "occurrence": "C0228",
+      "name": "Pawn sacrifice",
+      "scope": "Mechanics verified: actual moved pawn may be legally captured, including en passant, yet every defense retains bounded forced mate; activity-for-mate subset."
+    },
+    {
+      "occurrence": "C0234",
+      "name": "Carlsbad structure",
+      "scope": "Mechanics verified: new current fixed d4/e3 against c6/d5 core with exactly one pawn on each stated file, legal own/enemy support, queenside own2/enemy3 and kingside own4/enemy3; no opening or historical pawn-origin inference, strategic success or permanent weakness."
+    },
+    {
+      "occurrence": "C0235",
+      "name": "Isolated queen's pawn structure",
+      "scope": "Mechanics verified: no friendly pawn on either neighboring file; IQP restricted to d-file."
+    },
+    {
+      "occurrence": "C0236",
+      "name": "Hanging-pawn structure",
+      "scope": "Mechanics verified: new same-rank c/d pair at relative fourth/fifth rank, no other c/d or b/e pawns; no weakness claim."
+    },
+    {
+      "occurrence": "C0237",
+      "name": "Maroczy Bind",
+      "scope": "Mechanics verified: newly completed fixed c4/e4 (explicit reversed c5/e5 for black), recorded original d-start/c-start pawn exchange and immediate nonpawn recapture, both legal common-target pawn captures, no own d-file/enemy c-file pawn; no FEN-only provenance or strategic restriction inference."
+    },
+    {
+      "occurrence": "C0238",
+      "name": "Hedgehog structure",
+      "scope": "Mechanics verified: new a6/b6/d6/e6 core (explicit reversed own a3/b3/d3/e3), opposing c4/e4 context, missing own c-file/enemy d-file pawn, all six empty forward targets with every named legal pawn-control edge and extra captures; current control only, no successful breaks/counterplay inference."
+    },
+    {
+      "occurrence": "C0239",
+      "name": "Stonewall structure",
+      "scope": "Mechanics verified: newly completed fixed c3/d4/e3/f4 formation (color reverse c6/d5/e6/f5), all three named pawn-support links certified by legal countercaptures; full-history responses include lost pawns and terminals; no strength/permanence inference."
+    },
+    {
+      "occurrence": "C0240",
+      "name": "French pawn chain",
+      "scope": "Mechanics verified: French-type current advanced/base actor chains on fixed d/e files, both legal support links, two opposing pawn rams and complete named-pawn legal move sets with no forward push; explicit reversed roles; no opening or permanent closure inference."
+    },
+    {
+      "occurrence": "C0248",
+      "name": "Sicilian Scheveningen structure",
+      "scope": "Mechanics verified: new compact d6/e6 center (explicit reversed d3/e3), opposing e4/e5 context, recorded original own c-start/enemy d-start exchange and immediate nonpawn recapture, no own c-file/enemy d-file pawn; all four empty forward targets with complete legal captures; no safe center or strategic strength inference."
+    },
+    {
+      "occurrence": "C0254",
+      "name": "Symmetrical pawn structure",
+      "scope": "Mechanics verified: exact same-file rank-reflection of at least two pawns each; full position/evaluation symmetry not implied."
+    },
+    {
+      "occurrence": "C0255",
+      "name": "Four-versus-three kingside structure",
+      "scope": "Mechanics verified: counts on fixed a–d/e–h wings; no plan or advantage claim."
+    },
+    {
+      "occurrence": "C0256",
+      "name": "Three-versus-two queenside majority",
+      "scope": "Mechanics verified: counts on fixed a–d/e–h wings; no plan or advantage claim."
+    },
+    {
+      "occurrence": "C0257",
+      "name": "Opposite-wing pawn majorities",
+      "scope": "Mechanics verified: counts on fixed a–d/e–h wings; no plan or advantage claim."
+    },
+    {
+      "occurrence": "C0258",
+      "name": "Locked pawn chains",
+      "scope": "Mechanics verified: two matched support components whose members all ram opposing pawns."
+    },
+    {
+      "occurrence": "C0259",
+      "name": "Open-file pawn structure",
+      "scope": "Mechanics verified: actual legal capture, pawn file transfer, EP or promotion changes a formerly pawn-occupied file to pawn-free for both colors; complete before/after eight-file maps and all remaining nonpawn blockers; no unobstructed ray or activity advantage inferred."
+    },
+    {
+      "occurrence": "C0260",
+      "name": "Open file",
+      "scope": "Mechanics verified: pawn-free file geometry and new rook/queen occupation."
+    },
+    {
+      "occurrence": "C0261",
+      "name": "Semi-open file",
+      "scope": "Mechanics verified: pawn-free file geometry and new rook/queen occupation."
+    },
+    {
+      "occurrence": "C0262",
+      "name": "Closed file",
+      "scope": "Mechanics verified: actual moved rook/queen on file with pawns of BOTH colors, complete pawn lists and vertical rays; every legal enemy reply and tracked slider legal file move retained; no advantage, permanence or closed-position claim."
+    },
+    {
+      "occurrence": "C0263",
+      "name": "Open rank",
+      "scope": "Mechanics verified: actual rook/queen horizontal activity on otherwise empty rank; all seven root destinations legal with complete full move records and rank cells; no future reply/persistence/advantage inference."
+    },
+    {
+      "occurrence": "C0264",
+      "name": "Open diagonal",
+      "scope": "Mechanics verified: new full edge-to-edge bishop line of length at least five has no other piece; length eight identifies a long diagonal; geometric control only."
+    },
+    {
+      "occurrence": "C0265",
+      "name": "Long diagonal",
+      "scope": "Mechanics verified: new full edge-to-edge bishop line of length at least five has no other piece; length eight identifies a long diagonal; geometric control only."
+    },
+    {
+      "occurrence": "C0268",
+      "name": "Outpost",
+      "scope": "Mechanics verified: pawn-supported knight on relative rank 4–6; complete occupancy-independent forward/capture-file DAGs prove no current enemy pawn can reach an attacking square before promotion; legal support counterframe and every legal reply retained; no safety against other/promoted pieces."
+    },
+    {
+      "occurrence": "C0269",
+      "name": "Advanced outpost",
+      "scope": "Mechanics verified: the outpost proof plus relative rank six; no general best-square or positional-strength claim."
+    },
+    {
+      "occurrence": "C0274",
+      "name": "Blockade square",
+      "scope": "Mechanics verified: actual moved nonpawn piece occupies the square immediately ahead of an unchanged enemy pawn; complete legal enemy replies show no straight advance; pawn captures and blocker removals retained; no permanent/best-move claim."
+    },
+    {
+      "occurrence": "C0283",
+      "name": "Restriction",
+      "scope": "Mechanics verified: static legal destination count drops by at least two to at most two; explicit hypothetical before-opponent turn, no quality or future-position claim."
+    },
+    {
+      "occurrence": "C0302",
+      "name": "Domination",
+      "scope": "Mechanics verified: every legal move by the named unit permits tracked capture with positive gain through every immediate counterreply; other defenses not promised."
+    },
+    {
+      "occurrence": "C0306",
+      "name": "Bishop pair",
+      "scope": "Mechanics verified: both square-color complexes represented; excludes two same-color promoted bishops."
+    },
+    {
+      "occurrence": "C0308",
+      "name": "Good bishop",
+      "scope": "Mechanics verified: new good-bishop pattern has at least two own pawns, all opposite the bishop square color; pawn relation only, not overall strategic value."
+    },
+    {
+      "occurrence": "C0309",
+      "name": "Bad bishop",
+      "scope": "Mechanics verified: new bad-bishop pattern has at least two fixed central same-color own pawns, a direct forward blocker and at most four geometric controlled squares; not overall strategic value."
+    },
+    {
+      "occurrence": "C0312",
+      "name": "Outside the pawn chain",
+      "scope": "Mechanics verified: actual bishop moves beyond every member of an unchanged full own pawn-support component that previously blocked a forward diagonal while behind all members; complete before/after four rays and no chain member on any after ray; literal witnessed escape only, no activity or persistence advantage."
+    },
+    {
+      "occurrence": "C0313",
+      "name": "Fianchetto",
+      "scope": "Mechanics verified: new prepared formation requires actual home-to-b2/g2/b7/g7 bishop move and advanced own flank pawn; no first-ever development or suitability claim."
+    },
+    {
+      "occurrence": "C0314",
+      "name": "Long-diagonal bishop",
+      "scope": "Mechanics verified: new full edge-to-edge bishop line of length at least five has no other piece; length eight identifies a long diagonal; geometric control only."
+    },
+    {
+      "occurrence": "C0315",
+      "name": "Bishop sacrifice",
+      "scope": "Mechanics verified: legally capturable moved bishop retains bounded all-defense mate; tested clearance-check subset, not all bishop sacrifices."
+    },
+    {
+      "occurrence": "C0316",
+      "name": "Opposite-colored bishops",
+      "scope": "Mechanics verified: one bishop per side, only kings/pawns/bishops remain; square-color classification."
+    },
+    {
+      "occurrence": "C0317",
+      "name": "Same-colored bishops",
+      "scope": "Mechanics verified: one bishop per side, only kings/pawns/bishops remain; square-color classification."
+    },
+    {
+      "occurrence": "C0322",
+      "name": "Centralized knight",
+      "scope": "Mechanics verified: knight arrives on d4/e4/d5/e5."
+    },
+    {
+      "occurrence": "C0323",
+      "name": "Rim knight",
+      "scope": "Mechanics verified: new knight placement on board edge, inherited E021 mechanics."
+    },
+    {
+      "occurrence": "C0325",
+      "name": "Knight fork",
+      "scope": "Mechanics verified: fork; new knight fork with exhaustive finite material witnesses."
+    },
+    {
+      "occurrence": "C0326",
+      "name": "Knight blockade",
+      "scope": "Mechanics verified: actual moved knight occupies the square immediately ahead of an unchanged enemy pawn; complete legal enemy replies show no straight advance; pawn captures and blocker removals retained; no permanent/best-move claim."
+    },
+    {
+      "occurrence": "C0330",
+      "name": "Octopus knight",
+      "scope": "Mechanics verified: explicit tactical subset: central sixth-rank advanced outpost controls eight squares and checks king plus queen; every full-history defense permits same-knight original-queen capture with positive material gain through all immediate counterresponses, never draw/countermate; no general strength or longer-term win claim."
+    },
+    {
+      "occurrence": "C0331",
+      "name": "Knight on the sixth rank",
+      "scope": "Mechanics verified: new relative-rank knight placement, inherited E021 mechanics."
+    },
+    {
+      "occurrence": "C0332",
+      "name": "Knight on the fifth rank",
+      "scope": "Mechanics verified: new relative-rank knight placement, inherited E021 mechanics."
+    },
+    {
+      "occurrence": "C0333",
+      "name": "Knight domination",
+      "scope": "Mechanics verified: every legal move by the named unit permits tracked capture with positive gain through every immediate counterreply; other defenses not promised."
+    },
+    {
+      "occurrence": "C0334",
+      "name": "Knight blockade of passed pawn",
+      "scope": "Mechanics verified: piece occupies enemy passer’s next forward square; no permanent restraint claim."
+    },
+    {
+      "occurrence": "C0340",
+      "name": "Rook on an open file",
+      "scope": "Mechanics verified: pawn-free file geometry and new rook/queen occupation."
+    },
+    {
+      "occurrence": "C0341",
+      "name": "Rook on a semi-open file",
+      "scope": "Mechanics verified: pawn-free file geometry and new rook/queen occupation."
+    },
+    {
+      "occurrence": "C0342",
+      "name": "Rook penetration",
+      "scope": "Mechanics verified: checking subset: actual rook enters enemy back two ranks from own half along its file and directly checks horizontally; all full-history replies retained; no safety/advantage claim."
+    },
+    {
+      "occurrence": "C0343",
+      "name": "Rook on the seventh rank",
+      "scope": "Mechanics verified: relative seventh rank (White 7, Black 2); new placement."
+    },
+    {
+      "occurrence": "C0344",
+      "name": "Rook on the second rank",
+      "scope": "Mechanics verified: relative seventh rank (White 7, Black 2); new placement."
+    },
+    {
+      "occurrence": "C0345",
+      "name": "Two rooks on the seventh",
+      "scope": "Mechanics verified: relative seventh rank (White 7, Black 2); new placement."
+    },
+    {
+      "occurrence": "C0346",
+      "name": "Doubling rooks",
+      "scope": "Mechanics verified: unobstructed same-rank/file rook alignment; geometric support only."
+    },
+    {
+      "occurrence": "C0347",
+      "name": "Tripling on a file",
+      "scope": "Mechanics verified: two rooks and queen on one file without other intervening pieces."
+    },
+    {
+      "occurrence": "C0348",
+      "name": "Connected rooks",
+      "scope": "Mechanics verified: unobstructed same-rank/file rook alignment; geometric support only."
+    },
+    {
+      "occurrence": "C0350",
+      "name": "Rook swing",
+      "scope": "Mechanics verified: full legal history records the same rook lifting from home ranks to rank 3/4, then transferring sideways at least two files with direct king-file check; all legal responses retained; no safety or winning attack claim."
+    },
+    {
+      "occurrence": "C0351",
+      "name": "Rook behind a passed pawn",
+      "scope": "Mechanics verified: unobstructed rook behind own or enemy passer; no best-placement claim."
+    },
+    {
+      "occurrence": "C0355",
+      "name": "Rook checking distance",
+      "scope": "Mechanics verified: at least three clear squares between actual checking rook and king, EVERY immediate legal evasion leaves checker uncaptured; exact separation only, no long-term safety/draw claim."
+    },
+    {
+      "occurrence": "C0357",
+      "name": "Exchange sacrifice",
+      "scope": "Mechanics verified: rook captures a minor and is legally offered at a nominal loss of two points, with all-defense forced-mate proof."
+    },
+    {
+      "occurrence": "C0358",
+      "name": "Rook invasion",
+      "scope": "Mechanics verified: same checking-entry subset as rook penetration; complete legal responses retain captures and terminals; no intent or winning attack claim."
+    },
+    {
+      "occurrence": "C0359",
+      "name": "Rook blockade",
+      "scope": "Mechanics verified: piece occupies enemy passer’s next forward square; no permanent restraint claim."
+    },
+    {
+      "occurrence": "C0362",
+      "name": "Queen invasion",
+      "scope": "Mechanics verified: checking subset: actual queen enters enemy back two ranks from own half along its file and directly checks horizontally; all full-history responses retained; no safe/winning invasion claim."
+    },
+    {
+      "occurrence": "C0364",
+      "name": "Queen check",
+      "scope": "Mechanics verified: moved/promoted queen is an actual checker."
+    },
+    {
+      "occurrence": "C0366",
+      "name": "Queen battery",
+      "scope": "Mechanics verified: new maximal compatible same-color slider group containing a queen: all Q–R/Q–B/Q–Q orthogonal/diagonal families, promoted extra queens/bishops and larger groups; full line/members/gaps/boundary blockers and identity-mapped newness; no joint profitable attack inferred."
+    },
+    {
+      "occurrence": "C0367",
+      "name": "Queen-bishop battery",
+      "scope": "Mechanics verified: unobstructed queen–rook orthogonal or queen–bishop diagonal alignment."
+    },
+    {
+      "occurrence": "C0368",
+      "name": "Queen-rook battery",
+      "scope": "Mechanics verified: unobstructed queen–rook orthogonal or queen–bishop diagonal alignment."
+    },
+    {
+      "occurrence": "C0369",
+      "name": "Queen sacrifice",
+      "scope": "Mechanics verified: legally capturable moved queen costs more than the played capture, while every defense retains bounded forced mate."
+    },
+    {
+      "occurrence": "C0370",
+      "name": "Queen trade",
+      "scope": "Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded."
+    },
+    {
+      "occurrence": "C0377",
+      "name": "Queen trap",
+      "scope": "Mechanics verified: currently attacked N/B/R/Q has complete all-defense tracked capture proof and positive gain through every immediate counterreply; nonchecking finite subset."
+    },
+    {
+      "occurrence": "C0378",
+      "name": "Early queen development",
+      "scope": "Mechanics verified: first original queen move in first eight own turns with fewer than two surviving developed minors; count fact, not criticism."
+    },
+    {
+      "occurrence": "C0381",
+      "name": "Castled king",
+      "scope": "Mechanics verified: actual castling event from inherited E020 legal-move fixtures; no inferred prior history."
+    },
+    {
+      "occurrence": "C0385",
+      "name": "King in the center",
+      "scope": "Mechanics verified: actual legal noncapturing king move ends on d4/e4/d5/e5 in bare K+P versus K; same complete pawn-only safe-queen goal independently refuted before and proven after against every defender reply and immediate promotion response; depth covers all remaining pushes; full history/boards/legal moves/king attackers and source certificate pointer; within-center moves allowed, no global safety or whole-game win claim."
+    },
+    {
+      "occurrence": "C0387",
+      "name": "King centralization",
+      "scope": "Mechanics verified: same before/after promotion benefit plus new king arrival on d4/e4/d5/e5; king subset only, no geometry-only quality judgment."
+    },
+    {
+      "occurrence": "C0388",
+      "name": "Active king in the endgame",
+      "scope": "Mechanics verified: bare K+P versus K: actual king move changes pawn-only safe-queen goal from independently refuted before to proven after; bound covers every remaining push."
+    },
+    {
+      "occurrence": "C0389",
+      "name": "King opposition",
+      "scope": "Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry."
+    },
+    {
+      "occurrence": "C0390",
+      "name": "Distant opposition",
+      "scope": "Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry."
+    },
+    {
+      "occurrence": "C0391",
+      "name": "Diagonal opposition",
+      "scope": "Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry."
+    },
+    {
+      "occurrence": "C0393",
+      "name": "King penetration",
+      "scope": "Mechanics verified: same before/after promotion benefit plus actual king advance deeper into relative rank at least five."
+    },
+    {
+      "occurrence": "C0394",
+      "name": "King blockade",
+      "scope": "Mechanics verified: actual moved king occupies the square immediately ahead of an unchanged enemy pawn; complete legal enemy replies show no straight advance; pawn captures and blocker removals retained; no permanent/best-move claim."
+    },
+    {
+      "occurrence": "C0395",
+      "name": "King escorting a passed pawn",
+      "scope": "Mechanics verified: actual king move newly adjacent to own passer; current protection only, not promotion guarantee."
+    },
+    {
+      "occurrence": "C0398",
+      "name": "Mating net",
+      "scope": "Mechanics verified: nonchecking, noncapturing actual move; every legal reply permits checkmate on the next own move, independently replayed; no newly-created/only-best claim."
+    },
+    {
+      "occurrence": "C0400",
+      "name": "Pawn shield",
+      "scope": "Mechanics verified: actual legal noncapturing nonpromoting cover-pawn advance with unchanged c/e/g home-rank king; complete hypothetical opponent-turn prior mating capture, directly pawn-blocked Q/R/B capture ray, and exhaustive absence of actual opponent mate in one; complete inventories/cover/legal moves/ray/history and independently replayed one-ply proofs; no actual pass, quality, enduring safety or whole-game win claim."
+    },
+    {
+      "occurrence": "C0401",
+      "name": "Air / luft",
+      "scope": "Mechanics verified: noncapturing pawn move opens legal adjacent king step, with old hypothetical back-rank mate witness and no actual opponent mate in one afterward."
+    },
+    {
+      "occurrence": "C0413",
+      "name": "Pawn storm",
+      "scope": "Mechanics verified: distinct adjacent advanced pawns progress on consecutive own turns after a history-verified enemy castle, on its unchanged king flank; full history, identities and every reply retained; no intent, safety or successful-attack claim."
+    },
+    {
+      "occurrence": "C0416",
+      "name": "Opening diagonals",
+      "scope": "Mechanics verified: actual move removes/vacates prior blocker from a stationary bishop line, leaving the entire length-at-least-five diagonal clear."
+    },
+    {
+      "occurrence": "C0419",
+      "name": "Mating attack",
+      "scope": "Mechanics verified: nonchecking, noncapturing actual move; every legal reply permits checkmate on the next own move, independently replayed; no newly-created/only-best claim."
+    },
+    {
+      "occurrence": "C0435",
+      "name": "Battery",
+      "scope": "Mechanics verified: new maximal orthogonal R/Q or diagonal B/Q battery, all Q–R/Q–B/Q–Q/R–R/B–B families and larger groups; middle sliders retained, exact compatible gaps/bounds, promotion/merge/split/EP transitions and mapped-existing negatives; no move-quality or joint threat claim."
+    },
+    {
+      "occurrence": "C0438",
+      "name": "Diagonal opening",
+      "scope": "Mechanics verified: actual move removes/vacates prior blocker from a stationary bishop line, leaving the entire length-at-least-five diagonal clear."
+    },
+    {
+      "occurrence": "C0439",
+      "name": "Sacrifice for open lines",
+      "scope": "Mechanics verified: same finite clearance-sacrifice subset: new checking ray, actual legal material acceptance and all-defense forced mate."
+    },
+    {
+      "occurrence": "C0440",
+      "name": "Mating net",
+      "scope": "Mechanics verified: nonchecking, noncapturing actual move; every legal reply permits checkmate on the next own move, independently replayed; no newly-created/only-best claim."
+    },
+    {
+      "occurrence": "C0444",
+      "name": "Defense",
+      "scope": "Mechanics verified: one N/B/R/Q had a hypothetical immediate profitable-capture threat; every actual capture after the move permits a reply with no net nominal loss; other targets and later play excluded."
+    },
+    {
+      "occurrence": "C0445",
+      "name": "Active defense",
+      "scope": "Mechanics verified: earlier finite target-defense with capture/check, or checking unique immediate-mate defense; exact certificates, no enduring initiative claim."
+    },
+    {
+      "occurrence": "C0447",
+      "name": "Counterattack",
+      "scope": "Mechanics verified: actual check plus complete unique immediate-mate defense; no exclusive causal/longer-term initiative claim."
+    },
+    {
+      "occurrence": "C0454",
+      "name": "Creating luft",
+      "scope": "Mechanics verified: noncapturing pawn move opens legal adjacent king step, with old hypothetical back-rank mate witness and no actual opponent mate in one afterward."
+    },
+    {
+      "occurrence": "C0455",
+      "name": "Closing lines",
+      "scope": "Mechanics verified: played move interrupts a previously clear enemy slider attack line; no wider safety or evaluation claim."
+    },
+    {
+      "occurrence": "C0456",
+      "name": "Blocking files",
+      "scope": "Mechanics verified: played move blocks an actual clear enemy slider file attack on surviving own piece/king; geometry only."
+    },
+    {
+      "occurrence": "C0457",
+      "name": "Blocking diagonals",
+      "scope": "Mechanics verified: played move blocks an actual clear enemy slider diagonal attack on surviving own piece/king; geometry only."
+    },
+    {
+      "occurrence": "C0459",
+      "name": "King escape",
+      "scope": "Mechanics verified: actual king move legally evades check; no longer-term safety claim."
+    },
+    {
+      "occurrence": "C0460",
+      "name": "Defensive sacrifice",
+      "scope": "Mechanics verified: checking unique immediate-mate defense offers actual unit to a legal capture with negative nominal gain through EVERY immediate counterreply; acceptance conditional, longer-term compensation unproved."
+    },
+    {
+      "occurrence": "C0461",
+      "name": "Eliminating attacking pieces",
+      "scope": "Mechanics verified: played capture removes the original attacker of the certified old profitable-capture threat and passes actual target-defense proof."
+    },
+    {
+      "occurrence": "C0468",
+      "name": "Stalemate defense",
+      "scope": "Mechanics verified: actual moved non-pawn/non-king piece has a named legal enemy capture that immediately stalemates the mover; conditional resource only, not forced draw or loss assessment."
+    },
+    {
+      "occurrence": "C0476",
+      "name": "Back-rank mate",
+      "scope": "Mechanics verified: actual rook/queen rank mate with own pawns occupying all forward king neighbors."
+    },
+    {
+      "occurrence": "C0477",
+      "name": "Ladder mate",
+      "scope": "Mechanics verified: actual edge rook mate; a second rook on inner parallel line controls all vacant inward neighboring flights; sequence not inferred."
+    },
+    {
+      "occurrence": "C0478",
+      "name": "Rook roller mate",
+      "scope": "Mechanics verified: actual edge rook mate; a second rook on inner parallel line controls all vacant inward neighboring flights; sequence not inferred."
+    },
+    {
+      "occurrence": "C0479",
+      "name": "Queen-and-rook mate",
+      "scope": "Mechanics verified: actual mate with checker and named distinct helper protecting adjacent checker or controlling uncovered vacant flight; opposite-color bishops for B/B."
+    },
+    {
+      "occurrence": "C0480",
+      "name": "Smothered mate",
+      "scope": "Mechanics verified: actual knight mate with every adjacent king square occupied by own pieces."
+    },
+    {
+      "occurrence": "C0481",
+      "name": "Anastasia's mate",
+      "scope": "Mechanics verified: actual edge-file/rank rook or queen mate; knight controls both inward diagonal flights and own king-side blocker closes inward step."
+    },
+    {
+      "occurrence": "C0482",
+      "name": "Arabian mate",
+      "scope": "Mechanics verified: actual corner checkmate by adjacent rook; same knight protects rook and controls vacant flight outside rook coverage."
+    },
+    {
+      "occurrence": "C0483",
+      "name": "Boden's mate",
+      "scope": "Mechanics verified: actual edge bishop mate with opposite-color bishop controlling two uncovered vacant flights and two king-side self-blockers."
+    },
+    {
+      "occurrence": "C0484",
+      "name": "Epaulette mate",
+      "scope": "Mechanics verified: actual edge queen mate from two squares inward with both parallel shoulders occupied by king-side pieces."
+    },
+    {
+      "occurrence": "C0485",
+      "name": "Opera mate",
+      "scope": "Mechanics verified: actual edge mate by adjacent parallel rook, supported bishop sealing inward flight, two opposite-side self-blockers."
+    },
+    {
+      "occurrence": "C0486",
+      "name": "Damiano's mate",
+      "scope": "Mechanics verified: actual sole-queen mate on relative h7 protected by own g6 pawn, enemy king g8/h8; horizontal mirrored files also checked; pawn terminal pattern only."
+    },
+    {
+      "occurrence": "C0487",
+      "name": "Lolli mate",
+      "scope": "Mechanics verified: actual sole-queen mate on relative g7 protected by own f6/h6 pawn, enemy king g8/h8; horizontal mirrored files also checked; no actual castling claim."
+    },
+    {
+      "occurrence": "C0488",
+      "name": "Greco mate",
+      "scope": "Mechanics verified: actual corner-file rook/queen mate; bishop seals vacant same-edge-rank flight outside checker coverage and enemy pawn blocks inward diagonal neighbor."
+    },
+    {
+      "occurrence": "C0489",
+      "name": "Blackburne's mate",
+      "scope": "Mechanics verified: actual edge bishop mate with opposite-color bishop and knight each controlling a distinct vacant flight outside both other helpers; knight protects adjacent checker."
+    },
+    {
+      "occurrence": "C0490",
+      "name": "Morphy's mate",
+      "scope": "Mechanics verified: actual corner bishop mate; rook cuts an empty orthogonal flight and own king-side piece blocks other orthogonal flight."
+    },
+    {
+      "occurrence": "C0491",
+      "name": "Legal's mate",
+      "scope": "Mechanics verified: actual classical or file-mirrored knight/two-knight/bishop mating net after recent legally replayed knight departure from bishop-to-queen relative pin, same bishop queen capture, bishop check and king reply; no all-defense offer claim."
+    },
+    {
+      "occurrence": "C0492",
+      "name": "Hook mate",
+      "scope": "Mechanics verified: actual adjacent rook mate outside a corner; pawn protects knight, knight protects rook and seals a vacant flight outside rook coverage, adjacent enemy unit blocks escape."
+    },
+    {
+      "occurrence": "C0493",
+      "name": "Corner mate",
+      "scope": "Mechanics verified: actual knight mate to corner king with rook/queen controlling both vacant inward-file neighbors and an enemy pawn blocking the other orthogonal neighbor."
+    },
+    {
+      "occurrence": "C0494",
+      "name": "Box mate",
+      "scope": "Mechanics verified: actual exact king+rook versus lone king terminal edge mate; own king seals every vacant flight outside rook coverage; no preceding shrinking-box method claim."
+    },
+    {
+      "occurrence": "C0495",
+      "name": "Kill box",
+      "scope": "Mechanics verified: actual edge contact rook mate; queen two diagonal squares away protects rook across an empty midpoint, king lies inside 3-by-3 rectangle, queen seals every vacant flight outside rook coverage."
+    },
+    {
+      "occurrence": "C0496",
+      "name": "Dovetail mate",
+      "scope": "Mechanics verified: protected diagonal-adjacent queen; exactly two on-board uncovered flights are self-blocked, with actual mate."
+    },
+    {
+      "occurrence": "C0497",
+      "name": "Swallow's-tail mate",
+      "scope": "Mechanics verified: protected orthogonal-adjacent queen; two on-board rear-diagonal uncovered flights are self-blocked, with actual mate."
+    },
+    {
+      "occurrence": "C0498",
+      "name": "Double-bishop mate",
+      "scope": "Mechanics verified: actual mate with checker and named distinct helper protecting adjacent checker or controlling uncovered vacant flight; opposite-color bishops for B/B."
+    },
+    {
+      "occurrence": "C0499",
+      "name": "Bishop-and-rook mating pattern",
+      "scope": "Mechanics verified: actual mate with checker and named distinct helper protecting adjacent checker or controlling uncovered vacant flight; opposite-color bishops for B/B."
+    },
+    {
+      "occurrence": "C0500",
+      "name": "Queen-and-knight mating pattern",
+      "scope": "Mechanics verified: actual mate with checker and named distinct helper protecting adjacent checker or controlling uncovered vacant flight; opposite-color bishops for B/B."
+    },
+    {
+      "occurrence": "C0501",
+      "name": "Queen-and-bishop mating pattern",
+      "scope": "Mechanics verified: actual mate with checker and named distinct helper protecting adjacent checker or controlling uncovered vacant flight; opposite-color bishops for B/B."
+    },
+    {
+      "occurrence": "C0502",
+      "name": "Rook-and-knight mating pattern",
+      "scope": "Mechanics verified: actual mate with checker and named distinct helper protecting adjacent checker or controlling uncovered vacant flight; opposite-color bishops for B/B."
+    },
+    {
+      "occurrence": "C0503",
+      "name": "Pawn-supported mate",
+      "scope": "Mechanics verified: actual mate with pawn geometrically protecting adjacent checking piece."
+    },
+    {
+      "occurrence": "C0504",
+      "name": "Discovered mate",
+      "scope": "Mechanics verified: played legal move newly exposes a stationary original checking piece and actually checkmates."
+    },
+    {
+      "occurrence": "C0505",
+      "name": "Double-check mate",
+      "scope": "Mechanics verified: actual checkmate with at least two distinct checking pieces."
+    },
+    {
+      "occurrence": "C0506",
+      "name": "Promotion mate",
+      "scope": "Mechanics verified: played legal promotion actually checkmates; mere promotion is insufficient."
+    },
+    {
+      "occurrence": "C0507",
+      "name": "Underpromotion mate",
+      "scope": "Mechanics verified: played legal rook, bishop or knight promotion actually checkmates; necessity not inferred."
+    },
+    {
+      "occurrence": "C0508",
+      "name": "Mating net",
+      "scope": "Mechanics verified: nonchecking, noncapturing actual move; every legal reply permits checkmate on the next own move, independently replayed; no newly-created/only-best claim."
+    },
+    {
+      "occurrence": "C0509",
+      "name": "Forced mate",
+      "scope": "Mechanics verified: played move has an independently replayed legal all-defense mate within two/three attacker moves; shorter horizon checked, bounded profile required."
+    },
+    {
+      "occurrence": "C0510",
+      "name": "Mate in one",
+      "scope": "Mechanics verified: the played legal move is an actual mate with zero legal opponent replies; no longer sequence inferred."
+    },
+    {
+      "occurrence": "C0511",
+      "name": "Mate in two",
+      "scope": "Mechanics verified: actual played move plus every defender reply permits immediate mating move; no mate in one was played."
+    },
+    {
+      "occurrence": "C0512",
+      "name": "Mate in three",
+      "scope": "Mechanics verified: all-defense legal tree reaches opponent checkmate within three attacker moves; complete mate-in-two failure tree establishes no shorter guarantee."
+    },
+    {
+      "occurrence": "C0513",
+      "name": "King-and-queen mate",
+      "scope": "Mechanics verified: actual played checkmate against lone king with exactly the stated mating army."
+    },
+    {
+      "occurrence": "C0514",
+      "name": "King-and-rook mate",
+      "scope": "Mechanics verified: actual played checkmate against lone king with exactly the stated mating army."
+    },
+    {
+      "occurrence": "C0515",
+      "name": "King and two bishops mate",
+      "scope": "Mechanics verified: actual played checkmate against lone king with exactly the stated mating army."
+    },
+    {
+      "occurrence": "C0516",
+      "name": "Bishop-and-knight mate",
+      "scope": "Mechanics verified: actual played checkmate against lone king with exactly the stated mating army."
+    },
+    {
+      "occurrence": "C0530",
+      "name": "Restriction",
+      "scope": "Mechanics verified: static legal destination count drops by at least two to at most two; explicit hypothetical before-opponent turn, no quality or future-position claim."
+    },
+    {
+      "occurrence": "C0531",
+      "name": "Blockade",
+      "scope": "Mechanics verified: actual moved nonpawn piece occupies the square immediately ahead of an unchanged enemy pawn; complete legal enemy replies show no straight advance; pawn captures and blocker removals retained; no permanent/best-move claim."
+    },
+    {
+      "occurrence": "C0534",
+      "name": "Occupying an open file",
+      "scope": "Mechanics verified: pawn-free file geometry and new rook/queen occupation."
+    },
+    {
+      "occurrence": "C0535",
+      "name": "Creating a passed pawn",
+      "scope": "Mechanics verified: passed-pawn geometry, including legal en-passant exception; creation or advance."
+    },
+    {
+      "occurrence": "C0536",
+      "name": "Activating the king",
+      "scope": "Mechanics verified: bare K+P versus K: actual king move changes pawn-only safe-queen goal from independently refuted before to proven after; bound covers every remaining push."
+    },
+    {
+      "occurrence": "C0550",
+      "name": "Development",
+      "scope": "Mechanics verified: first surviving original minor home departure off back rank during first ten own turns; verified initial-position history."
+    },
+    {
+      "occurrence": "C0551",
+      "name": "Space",
+      "scope": "Mechanics verified: actual new pawn attack squares in enemy half remove immediate enemy king destinations; complete legal before/after/removed-pawn causal sets and every actual reply; no general advantage or permanent restriction claim."
+    },
+    {
+      "occurrence": "C0555",
+      "name": "Mobility",
+      "scope": "Mechanics verified: static legal destination count drops by at least two to at most two; explicit hypothetical before-opponent turn, no quality or future-position claim."
+    },
+    {
+      "occurrence": "C0558",
+      "name": "Outposts",
+      "scope": "Mechanics verified: same conservative pawn-supported knight subset as Outpost, including future file shifts and legal pawn support; no permanent piece safety/strength claim."
+    },
+    {
+      "occurrence": "C0559",
+      "name": "Open files",
+      "scope": "Mechanics verified: pawn-free file geometry and new rook/queen occupation."
+    },
+    {
+      "occurrence": "C0560",
+      "name": "Open diagonals",
+      "scope": "Mechanics verified: new full edge-to-edge bishop line of length at least five has no other piece; length eight identifies a long diagonal; geometric control only."
+    },
+    {
+      "occurrence": "C0561",
+      "name": "Passed pawns",
+      "scope": "Mechanics verified: passed-pawn geometry, including legal en-passant exception; creation or advance."
+    },
+    {
+      "occurrence": "C0562",
+      "name": "Pawn majorities",
+      "scope": "Mechanics verified: counts on fixed a–d/e–h wings; no plan or advantage claim."
+    },
+    {
+      "occurrence": "C0564",
+      "name": "Bishop pair",
+      "scope": "Mechanics verified: both square-color complexes represented; excludes two same-color promoted bishops."
+    },
+    {
+      "occurrence": "C0565",
+      "name": "King activity",
+      "scope": "Mechanics verified: bare K+P versus K: actual king move changes pawn-only safe-queen goal from independently refuted before to proven after; bound covers every remaining push."
+    },
+    {
+      "occurrence": "C0605",
+      "name": "Passed pawn creation",
+      "scope": "Mechanics verified: passed-pawn geometry, including legal en-passant exception; creation or advance."
+    },
+    {
+      "occurrence": "C0606",
+      "name": "Passed pawn promotion",
+      "scope": "Mechanics verified: promotion of a previously identified passer."
+    },
+    {
+      "occurrence": "C0607",
+      "name": "Outside passed pawn",
+      "scope": "Mechanics verified: actual flank passer advance with every other pawn at least three files away, at least two other pawns including both colors; no king diversion or win claim."
+    },
+    {
+      "occurrence": "C0608",
+      "name": "Distant passed pawn",
+      "scope": "Mechanics verified: actual flank passer advance with every other pawn at least three files away, at least two other pawns including both colors; no king diversion or win claim."
+    },
+    {
+      "occurrence": "C0609",
+      "name": "Opposition",
+      "scope": "Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry."
+    },
+    {
+      "occurrence": "C0610",
+      "name": "Distant opposition",
+      "scope": "Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry."
+    },
+    {
+      "occurrence": "C0613",
+      "name": "Triangulation",
+      "scope": "Mechanics verified: recorded king triangle against two reversible moves of one enemy unit restores full piece placement and rights/EP, changing the turn; full legal history, counters and every reply retained; no forcing, opposition gain, zugzwang or winning-tempo claim."
+    },
+    {
+      "occurrence": "C0616",
+      "name": "Reserve tempo",
+      "scope": "Mechanics verified: used straight pawn waiting step satisfies waiting contract and separate legal live removed-pawn frames retain all-reply next-move mate; no future tempo inventory or general opposition claim."
+    },
+    {
+      "occurrence": "C0619",
+      "name": "Pawn race",
+      "scope": "Mechanics verified: pure king-and-one-advanced-passed-pawn per side; full legal all-defense bounded route proves own pawn queens first using straight advances, with all post-promotion replies retained; no automatic win or queen-safety claim."
+    },
+    {
+      "occurrence": "C0621",
+      "name": "Rule of the square",
+      "scope": "Mechanics verified: bare K+P versus K, enemy king outside conservative tempo-adjusted promotion-square distance gate, plus independently verified all-response safe promotion route; no formula-only or inside-square judgment."
+    },
+    {
+      "occurrence": "C0624",
+      "name": "King penetration",
+      "scope": "Mechanics verified: same before/after promotion benefit plus actual king advance deeper into relative rank at least five."
+    },
+    {
+      "occurrence": "C0626",
+      "name": "Stalemate resource",
+      "scope": "Mechanics verified: actual moved non-pawn/non-king piece has a named legal enemy capture that immediately stalemates the mover; conditional resource only, not forced draw or loss assessment."
+    },
+    {
+      "occurrence": "C0627",
+      "name": "Underpromotion",
+      "scope": "Mechanics verified: promotion; non-queen piece change, no optimality claim."
+    },
+    {
+      "occurrence": "C0628",
+      "name": "Domination",
+      "scope": "Mechanics verified: every legal move by the named unit permits tracked capture with positive gain through every immediate counterreply; other defenses not promised."
+    },
+    {
+      "occurrence": "C0632",
+      "name": "Active defense",
+      "scope": "Mechanics verified: earlier finite target-defense with capture/check, or checking unique immediate-mate defense; exact certificates, no enduring initiative claim."
+    },
+    {
+      "occurrence": "C0633",
+      "name": "King and pawn versus king",
+      "scope": "Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim."
+    },
+    {
+      "occurrence": "C0635",
+      "name": "Opposition",
+      "scope": "Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry."
+    },
+    {
+      "occurrence": "C0636",
+      "name": "Distant opposition",
+      "scope": "Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry."
+    },
+    {
+      "occurrence": "C0637",
+      "name": "Diagonal opposition",
+      "scope": "Mechanics verified: same proven king-move promotion effect with exact vacant even-separation king alignment and opponent to move; direct/distant/diagonal gated separately; not universal win from geometry."
+    },
+    {
+      "occurrence": "C0640",
+      "name": "Rule of the square",
+      "scope": "Mechanics verified: bare K+P versus K, enemy king outside conservative tempo-adjusted promotion-square distance gate, plus independently verified all-response safe promotion route; no formula-only or inside-square judgment."
+    },
+    {
+      "occurrence": "C0642",
+      "name": "Protected passed pawn",
+      "scope": "Mechanics verified: passer attacked by a friendly pawn; legal recapture or safe advance not promised."
+    },
+    {
+      "occurrence": "C0643",
+      "name": "Outside passed pawn",
+      "scope": "Mechanics verified: actual flank passer advance with every other pawn at least three files away, at least two other pawns including both colors; no king diversion or win claim."
+    },
+    {
+      "occurrence": "C0645",
+      "name": "Connected passers",
+      "scope": "Mechanics verified: actual nonpromoting pawn move creates or advances adjacent-file passers at most one rank apart in a live pure-pawn ending with pawns of both colors; complete front-blocker/legal-EP classification and zero/one-way geometric support; no winning, mutual-protection or legal-recapture claim."
+    },
+    {
+      "occurrence": "C0646",
+      "name": "Pawn race",
+      "scope": "Mechanics verified: pure king-and-one-advanced-passed-pawn per side; full legal all-defense bounded route proves own pawn queens first using straight advances, with all post-promotion replies retained; no automatic win or queen-safety claim."
+    },
+    {
+      "occurrence": "C0649",
+      "name": "Reserve tempo",
+      "scope": "Mechanics verified: used straight pawn waiting step satisfies waiting contract and separate legal live removed-pawn frames retain all-reply next-move mate; no future tempo inventory or general opposition claim."
+    },
+    {
+      "occurrence": "C0651",
+      "name": "Triangulation",
+      "scope": "Mechanics verified: recorded king triangle against two reversible moves of one enemy unit restores full piece placement and rights/EP, changing the turn; full legal history, counters and every reply retained; no forcing, opposition gain, zugzwang or winning-tempo claim."
+    },
+    {
+      "occurrence": "C0656",
+      "name": "Self-blocking pawns",
+      "scope": "Mechanics verified: actual move lands own unit immediately ahead of unchanged own pawn; current straight advance blocked; every enemy reply and next legal pawn move retained, no permanent/weakness claim."
+    },
+    {
+      "occurrence": "C0657",
+      "name": "Pawn majority",
+      "scope": "Mechanics verified: counts on fixed a–d/e–h wings; no plan or advantage claim."
+    },
+    {
+      "occurrence": "C0660",
+      "name": "Rook behind the passed pawn",
+      "scope": "Mechanics verified: unobstructed rook behind own or enemy passer; no best-placement claim."
+    },
+    {
+      "occurrence": "C0663",
+      "name": "Checking from behind",
+      "scope": "Mechanics verified: actual direct rook check behind enemy king and advanced passer on their file in a K/R/P ending; full legal evasions; no drawing-technique claim."
+    },
+    {
+      "occurrence": "C0664",
+      "name": "Checking from the side",
+      "scope": "Mechanics verified: actual direct rook check along king rank beside an advanced passer on king file in a K/R/P ending; full legal evasions; no strength/outcome claim."
+    },
+    {
+      "occurrence": "C0672",
+      "name": "Rook and pawn versus rook",
+      "scope": "Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim."
+    },
+    {
+      "occurrence": "C0673",
+      "name": "Rook versus connected pawns",
+      "scope": "Mechanics verified: exact pure army and connected/passed pawn geometry; no outcome claim."
+    },
+    {
+      "occurrence": "C0674",
+      "name": "Rook versus passed pawns",
+      "scope": "Mechanics verified: exact pure army and connected/passed pawn geometry; no outcome claim."
+    },
+    {
+      "occurrence": "C0676",
+      "name": "Seventh-rank rook",
+      "scope": "Mechanics verified: relative seventh rank (White 7, Black 2); new placement."
+    },
+    {
+      "occurrence": "C0677",
+      "name": "Rook penetration",
+      "scope": "Mechanics verified: checking subset: actual rook enters enemy back two ranks from own half along its file and directly checks horizontally; all full-history replies retained; no safety/advantage claim."
+    },
+    {
+      "occurrence": "C0684",
+      "name": "Checking distance",
+      "scope": "Mechanics verified: at least three clear squares between actual checking rook and king, EVERY immediate legal evasion leaves checker uncaptured; exact separation only, no long-term safety/draw claim."
+    },
+    {
+      "occurrence": "C0685",
+      "name": "Rook trade into pawn ending",
+      "scope": "Mechanics verified: verified rook-for-rook recapture leaves only kings and pawns."
+    },
+    {
+      "occurrence": "C0686",
+      "name": "Bishop and pawn versus bishop",
+      "scope": "Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim."
+    },
+    {
+      "occurrence": "C0687",
+      "name": "Opposite-colored bishop ending",
+      "scope": "Mechanics verified: one bishop per side, only kings/pawns/bishops remain; square-color classification."
+    },
+    {
+      "occurrence": "C0688",
+      "name": "Same-colored bishop ending",
+      "scope": "Mechanics verified: one bishop per side, only kings/pawns/bishops remain; square-color classification."
+    },
+    {
+      "occurrence": "C0689",
+      "name": "Good bishop",
+      "scope": "Mechanics verified: new good-bishop pattern has at least two own pawns, all opposite the bishop square color; pawn relation only, not overall strategic value."
+    },
+    {
+      "occurrence": "C0690",
+      "name": "Bad bishop",
+      "scope": "Mechanics verified: new bad-bishop pattern has at least two fixed central same-color own pawns, a direct forward blocker and at most four geometric controlled squares; not overall strategic value."
+    },
+    {
+      "occurrence": "C0691",
+      "name": "Outside passed pawn",
+      "scope": "Mechanics verified: actual flank passer advance with every other pawn at least three files away, at least two other pawns including both colors; no king diversion or win claim."
+    },
+    {
+      "occurrence": "C0692",
+      "name": "Wrong-colored bishop",
+      "scope": "Mechanics verified: pure K+B+one a/h pawn vs bare K; bishop color differs from promotion corner; cannot control that corner; all legal next moves replayed, no draw/outcome claim."
+    },
+    {
+      "occurrence": "C0693",
+      "name": "Wrong rook pawn",
+      "scope": "Mechanics verified: pure K+B+one a/h pawn vs bare K; opposite-colored promotion corner; defending king occupies it or has a certified legal immediate move there; complete responses, conditional access only, no draw claim."
+    },
+    {
+      "occurrence": "C0695",
+      "name": "Diagonal control",
+      "scope": "Mechanics verified: new full edge-to-edge bishop line of length at least five has no other piece; length eight identifies a long diagonal; geometric control only."
+    },
+    {
+      "occurrence": "C0696",
+      "name": "King penetration",
+      "scope": "Mechanics verified: same before/after promotion benefit plus actual king advance deeper into relative rank at least five."
+    },
+    {
+      "occurrence": "C0697",
+      "name": "Bishop domination",
+      "scope": "Mechanics verified: every legal move by the named unit permits tracked capture with positive gain through every immediate counterreply; other defenses not promised."
+    },
+    {
+      "occurrence": "C0699",
+      "name": "Knight and pawn versus knight",
+      "scope": "Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim."
+    },
+    {
+      "occurrence": "C0700",
+      "name": "Knight blockade",
+      "scope": "Mechanics verified: actual moved knight occupies the square immediately ahead of an unchanged enemy pawn; complete legal enemy replies show no straight advance; pawn captures and blocker removals retained; no permanent/best-move claim."
+    },
+    {
+      "occurrence": "C0702",
+      "name": "Knight domination",
+      "scope": "Mechanics verified: every legal move by the named unit permits tracked capture with positive gain through every immediate counterreply; other defenses not promised."
+    },
+    {
+      "occurrence": "C0706",
+      "name": "Knight versus connected pawns",
+      "scope": "Mechanics verified: exact pure army and connected/passed pawn geometry; no outcome claim."
+    },
+    {
+      "occurrence": "C0719",
+      "name": "Restricting the knight",
+      "scope": "Mechanics verified: static legal destination count drops by at least two to at most two; explicit hypothetical before-opponent turn, no quality or future-position claim."
+    },
+    {
+      "occurrence": "C0720",
+      "name": "Knight blockade",
+      "scope": "Mechanics verified: actual moved knight occupies the square immediately ahead of an unchanged enemy pawn; complete legal enemy replies show no straight advance; pawn captures and blocker removals retained; no permanent/best-move claim."
+    },
+    {
+      "occurrence": "C0727",
+      "name": "Queen behind passed pawn",
+      "scope": "Mechanics verified: new same-file unobstructed queen behind own/enemy passer."
+    },
+    {
+      "occurrence": "C0728",
+      "name": "Queen-versus-pawn endings",
+      "scope": "Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim."
+    },
+    {
+      "occurrence": "C0730",
+      "name": "Cross-check",
+      "scope": "Mechanics verified: legal checking answer to a check; exact original/counterchecker sets, typed blocking rays or checker capture (including EP) or king discovery; direct/discovered/double counterchecks and promotions; ALL legal enemy evasions replayed; neutral factual wording, no advantage claim."
+    },
+    {
+      "occurrence": "C0731",
+      "name": "Checking distance",
+      "scope": "Mechanics verified: at least three clear squares between actual checking rook and king, EVERY immediate legal evasion leaves checker uncaptured; exact separation only, no long-term safety/draw claim."
+    },
+    {
+      "occurrence": "C0733",
+      "name": "Queen trade",
+      "scope": "Mechanics verified: verified legal immediate recapture history; fixed captured-piece nominal values only; promotions excluded."
+    },
+    {
+      "occurrence": "C0734",
+      "name": "Promotion tactics",
+      "scope": "Mechanics verified: immediate E036 or opt-in multi-push E037 route: all defender replies retain queen promotion and every immediate response preserves queen and positive nominal gain, or actual mate; bounded horizon only."
+    },
+    {
+      "occurrence": "C0736",
+      "name": "Queen versus rook",
+      "scope": "Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim."
+    },
+    {
+      "occurrence": "C0737",
+      "name": "Queen versus minor piece",
+      "scope": "Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim."
+    },
+    {
+      "occurrence": "C0740",
+      "name": "Rook and bishop versus rook",
+      "scope": "Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim."
+    },
+    {
+      "occurrence": "C0741",
+      "name": "Rook and knight versus rook",
+      "scope": "Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim."
+    },
+    {
+      "occurrence": "C0742",
+      "name": "Queen versus rook and pawn",
+      "scope": "Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim."
+    },
+    {
+      "occurrence": "C0743",
+      "name": "Queen versus advanced pawn",
+      "scope": "Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim."
+    },
+    {
+      "occurrence": "C0744",
+      "name": "Two bishops versus knight",
+      "scope": "Mechanics verified: exact pure remaining material counts; no win/draw or strategic-value claim."
+    },
+    {
+      "occurrence": "C0745",
+      "name": "Bishop and knight checkmate",
+      "scope": "Mechanics verified: actual played checkmate against lone king with exactly the stated mating army."
+    },
+    {
+      "occurrence": "C0755",
+      "name": "Developing with tempo",
+      "scope": "Mechanics verified: first minor development also gives legal check; mandatory response only, no net tempo gain."
+    },
+    {
+      "occurrence": "C0760",
+      "name": "Reserve tempo",
+      "scope": "Mechanics verified: used straight pawn waiting step satisfies waiting contract and separate legal live removed-pawn frames retain all-reply next-move mate; no future tempo inventory or general opposition claim."
+    },
+    {
+      "occurrence": "C0763",
+      "name": "Waiting move",
+      "scope": "Mechanics verified: actual quiet move preserves an already existing all-reply next-move mate proven on legal hypothetical pass; no immediate mate originally available; full causal frames and trees; no intent/best-play/zugzwang claim."
+    },
+    {
+      "occurrence": "C0765",
+      "name": "Triangulation",
+      "scope": "Mechanics verified: recorded king triangle against two reversible moves of one enemy unit restores full piece placement and rights/EP, changing the turn; full legal history, counters and every reply retained; no forcing, opposition gain, zugzwang or winning-tempo claim."
+    },
+    {
+      "occurrence": "C0779",
+      "name": "Restricting a piece",
+      "scope": "Mechanics verified: static legal destination count drops by at least two to at most two; explicit hypothetical before-opponent turn, no quality or future-position claim."
+    },
+    {
+      "occurrence": "C0781",
+      "name": "Defensive pawn move",
+      "scope": "Mechanics verified: actual pawn move passes finite target-defense proof for a surviving non-pawn piece."
+    },
+    {
+      "occurrence": "C0805",
+      "name": "Irreversible move",
+      "scope": "Mechanics verified: actual pawn move, capture or castling-right loss with before/after witnesses; no quality judgment."
+    },
+    {
+      "occurrence": "C0825",
+      "name": "Forcing move",
+      "scope": "Mechanics verified: nonchecking, noncapturing actual move; every legal reply permits checkmate on the next own move, independently replayed; no newly-created/only-best claim."
+    },
+    {
+      "occurrence": "C0852",
+      "name": "Missing mate",
+      "scope": "Mechanics verified: shorter legal alternative has positive mate proof and played move has complete failure counterstrategy at same bound; no claim all later mating chances lost."
+    },
+    {
+      "occurrence": "C0858",
+      "name": "Moving the same piece repeatedly in the opening",
+      "scope": "Mechanics verified: original surviving minor moves again in first ten turns while another original minor remains unmoved; no bad-move inference."
+    },
+    {
+      "occurrence": "C0859",
+      "name": "Early queen development",
+      "scope": "Mechanics verified: first original queen move in first eight own turns with fewer than two surviving developed minors; count fact, not criticism."
+    },
+    {
+      "occurrence": "C0900",
+      "name": "Blockade",
+      "scope": "Mechanics verified: actual moved nonpawn piece occupies the square immediately ahead of an unchanged enemy pawn; complete legal enemy replies show no straight advance; pawn captures and blocker removals retained; no permanent/best-move claim."
+    },
+    {
+      "occurrence": "C0901",
+      "name": "Restriction",
+      "scope": "Mechanics verified: static legal destination count drops by at least two to at most two; explicit hypothetical before-opponent turn, no quality or future-position claim."
+    },
+    {
+      "occurrence": "C0903",
+      "name": "Centralization",
+      "scope": "Mechanics verified: same before/after promotion benefit plus new king arrival on d4/e4/d5/e5; king subset only, no geometry-only quality judgment."
+    },
+    {
+      "occurrence": "C0932",
+      "name": "Overworked defender",
+      "scope": "Mechanics verified: conditional enemy N/B/R/Q recapture abandons another target after two before-proven legal recapture duties; same own attacker captures that target with positive before-move nominal gain through EVERY immediate enemy reply; all defender acceptances checked, no forced acceptance/long-term gain claim."
+    },
+    {
+      "occurrence": "C0935",
+      "name": "Cross-pin",
+      "scope": "Mechanics verified: mixed king/queen pin on distinct slider lines; nonempty legal off-queen-line reply set passes the relative-pin proof; other cross-pin forms excluded."
+    },
+    {
+      "occurrence": "C0936",
+      "name": "Cross-check",
+      "scope": "Mechanics verified: legal checking answer to a check; exact original/counterchecker sets, typed blocking rays or checker capture (including EP) or king discovery; direct/discovered/double counterchecks and promotions; ALL legal enemy evasions replayed; neutral factual wording, no advantage claim."
+    },
+    {
+      "occurrence": "C0937",
+      "name": "Double attack with discovered attack",
+      "scope": "Mechanics verified: new moved-piece and stationary revealed-slider attacks on distinct targets with finite capture witnesses."
+    },
+    {
+      "occurrence": "C0938",
+      "name": "Clearance combination",
+      "scope": "Mechanics verified: same all-defense vacated-square mate sequence, complete legal reply/mating witnesses."
+    },
+    {
+      "occurrence": "C0939",
+      "name": "Interference combination",
+      "scope": "Mechanics verified: enemy slider had a legally proven before-duty recapture; actual move interposes on its clear ray; EVERY enemy reply allows the original target capture with positive before-move nominal gain through EVERY next enemy response; removing only the blocker restores a legal counterfactual defender recapture."
+    },
+    {
+      "occurrence": "C0940",
+      "name": "Deflection combination",
+      "scope": "Mechanics verified: conditional enemy N/B/R/Q recapture abandons another target after two before-proven legal recapture duties; same own attacker captures that target with positive before-move nominal gain through EVERY immediate enemy reply; all defender acceptances checked, no forced acceptance/long-term gain claim."
+    },
+    {
+      "occurrence": "C0941",
+      "name": "Attraction combination",
+      "scope": "Mechanics verified: positive nominal mating offer; EVERY legal defense permits mate next move; legal king acceptance changes its square and the SAME before-legal nonmating move becomes actual mate; conditional acceptance, no best-move/intent claim."
+    },
+    {
+      "occurrence": "C0942",
+      "name": "Decoy combination",
+      "scope": "Mechanics verified: positive all-defense mating offer plus independently replayed king attraction or nonking self-blocking; mere defender-duty deflection insufficient; same-row full mate and complete causal-role certificate required."
+    },
+    {
+      "occurrence": "C0943",
+      "name": "Blocking combination",
+      "scope": "Mechanics verified: positive all-defense mating offer; accepted nonking unit blocks an adjacent king flight; actual mate is legal and removing ONLY that capturer restores a legal escape onto its square; explicit artificial counterfactual, conditional acceptance."
+    },
+    {
+      "occurrence": "C0945",
+      "name": "Desperado combination",
+      "scope": "Mechanics verified: geometrically threatened N/B/R/Q takes its maximum available nominal capture; EVERY legal quiet alternative admits a legal unit-loss capture through ALL own responses (or enemy mate); EVERY actual unit recapture retains the conditional captured-value benefit through ALL own responses; finite three-ply comparison, no best-move or lasting-gain claim."
+    },
+    {
+      "occurrence": "C0946",
+      "name": "Promotion tactic",
+      "scope": "Mechanics verified: immediate E036 or opt-in multi-push E037 route: all defender replies retain queen promotion and every immediate response preserves queen and positive nominal gain, or actual mate; bounded horizon only."
+    },
+    {
+      "occurrence": "C0947",
+      "name": "Underpromotion tactic",
+      "scope": "Mechanics verified: played non-queen promotion remains nonterminal or actually mates while same-square queen promotion stalemates; avoids that draw only, no general necessity or forced win."
+    },
+    {
+      "occurrence": "C0948",
+      "name": "Stalemate tactic",
+      "scope": "Mechanics verified: actual moved non-pawn/non-king piece has a named legal enemy capture that immediately stalemates the mover; conditional resource only, not forced draw or loss assessment."
+    },
+    {
+      "occurrence": "C0952",
+      "name": "Intermediate sacrifice",
+      "scope": "Mechanics verified: full history ends in enemy capture; every legal original recapture enumerated; different positive-cost offer forces mate in 2 or 3 via full same-row all-defense proof; no original mate in one; no eventual-recapture/best-move claim."
+    },
+    {
+      "occurrence": "C0953",
+      "name": "Intermediate check",
+      "scope": "Mechanics verified: actual check delays a verified available recapture; every legal reply permits tracked recapture with finite positive gain or actual mate."
+    },
+    {
+      "occurrence": "C0954",
+      "name": "Intermediate capture",
+      "scope": "Mechanics verified: capture of a different unit delays verified recapture; every legal reply permits tracked recapture with finite positive gain or actual mate."
+    },
+    {
+      "occurrence": "C0955",
+      "name": "Quiet tactical move",
+      "scope": "Mechanics verified: nonchecking, noncapturing actual move; every legal reply permits checkmate on the next own move, independently replayed; no newly-created/only-best claim."
+    },
+    {
+      "occurrence": "C0974",
+      "name": "Blocked position",
+      "scope": "Mechanics verified: actual pawn advance completes a matched contiguous central pawn wall; neither side has a legal pawn move now, and all pawns/wall survive every live enemy reply with zero own pawn moves; full legal sets retained; no permanent blockage, fortress or advantage claim."
+    },
+    {
+      "occurrence": "C0980",
+      "name": "Drawn position",
+      "scope": "Mechanics verified: actual legal stalemate or conservative dead material: bare kings, lone minor, or only same-square-color bishops; no general drawn evaluation."
+    }
+  ]
+}

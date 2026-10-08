@@ -59,7 +59,7 @@ records. Update a row and the active experiment's resume state when work stops.
 
 | E020 | [Evidence-backed coach concepts](experiments/E020-coach-concepts/RESULT.md) | complete | 74 mechanics tests; 68 synthetic cases; eight fork certificates; exact clean replay; 1,085-entry tracker; human utility unresolved | Plan independent explanation precision/usefulness assessment before integration |
 
-No promotion records yet.
+| P001 | [Optional Concepts tab](promotions/P001-concepts-tab.md) | implemented | E080 exact verified scopes, opt-in worker and inspectable findings; scoring unchanged | Assess real-game precision/usefulness separately |
 | E021 | [Short structural coach concepts](experiments/E021-structural-concepts/RESULT.md) | complete | 206 cumulative tests; 190 synthetic cases; 68 verified names plus partial scopes; 17-word longest comment; exact repeat/clean replay | Continue E022 concrete move facts and bounded tactical motifs; usage cutoff active |
 
 | E022 | [Concrete move facts and bounded tactics](experiments/E022-move-tactics/RESULT.md) | complete | 286 cumulative tests; 268 synthetic cases; 78 verified names; 80 certificate event replays; exact repeat/clean source and outputs | Continue E023 certified fork types and line motifs; usage cutoff active |
@@ -121,7 +121,7 @@ No promotion records yet.
 
 | E062 | [Causal pawn space and king destinations](experiments/E062-pawn-space/RESULT.md) | complete | 2,939 cumulative tests; 2,700 synthetic cases; 287 verified names; complete before/actual/removed-pawn legal king sets, denied territory, every reply including captures/terminal, EP and castling; exact repeat/clean; full proofs3.58MB within5MB | E063 investigate distinct pawn advances toward a history-verified castled king's flank; no successful-attack inference; continue isolated; cutoff cancelled |
 
-Allocate the next unused ID in each series: `E063`, `D003`, `F018`, `P001`.
+Allocate the next unused ID in each series: `E063`, `D003`, `F018`, `P002`.
 Use relative links here; append rows rather than reusing IDs.
 
 Experiment states: `planned`, `running`, `complete`, `blocked`.

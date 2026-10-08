@@ -13,6 +13,7 @@ import { resetSettingsForRelease } from "./release-settings.js";
 import { expectedPoints, SF19_OUTCOME } from "./lib/public-scoring.js";
 import { calibratedReview, scoringEvidenceComplete } from "./lib/calibrated-review.js";
 import { analyseCalibratedPosition } from "./lib/calibrated-search.js";
+import { ConceptSession, conceptKey } from "./lib/concepts/session.js";
 
 /* ---------------- Opening book ----------------
  * Offline lookup table built from lichess-org/chess-openings (bundled in data/book.json).
@@ -258,6 +259,7 @@ function engineWorkerCount(requested = null, positions = Infinity,
 }
 
 const DEFAULT_SETTINGS = {
+  conceptsEnabled: false,
   categoryNames: {},
   theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
@@ -3260,6 +3262,7 @@ function analysisProgressText() {
   return `Analyzing … ${done}/${S.total}`;
 }
 function renderReview() {
+  refreshConcepts();
   // In-place progress text during analysis (so the loader animation doesn't restart each move).
   if (S.analyzing && revRefs) { revRefs.head.textContent = analysisProgressText(); return; }
 
@@ -4621,11 +4624,15 @@ function renderSettings() {
   const focusedFont = UI.settings.contains(document.activeElement) && document.activeElement.closest(".badge-font-option")?.getAttribute("data-font");
   const focusedLabelStyle = UI.settings.contains(document.activeElement) && document.activeElement.closest(".badge-label-option")?.getAttribute("data-label-style");
   const focusedSection = UI.settings.contains(document.activeElement) && document.activeElement.closest(".set-sect-head")?.querySelector("span")?.textContent;
+  const openConceptDetails = new Set([...UI.settings.querySelectorAll(".concepts-panel details[open]")].map(node => node.dataset.conceptDetail));
+  const focusedConceptToggle = UI.settings.contains(document.activeElement) && document.activeElement.id === "conceptsEnabled";
   const tabs = el("div", { class: "set-tabs" },
     el("button", { class: "set-tab" + (S.settingsTab === "visual" ? " on" : ""), onclick: () => { S.settingsTab = "visual"; renderSettings(); } }, "Visual"),
     el("button", { class: "set-tab" + (S.settingsTab === "engine" ? " on" : ""), onclick: () => { S.settingsTab = "engine"; renderSettings(); } }, "Engine"),
+    el("button", { class: "set-tab" + (S.settingsTab === "concepts" ? " on" : ""), onclick: () => { S.settingsTab = "concepts"; refreshConcepts(); renderSettings(); } }, "Concepts"),
   );
-  UI.settings.replaceChildren(tabs, ...(S.settingsTab === "engine" ? [motorSettings()]
+  UI.settings.classList.toggle("concepts-open", S.settingsTab === "concepts");
+  UI.settings.replaceChildren(tabs, ...(S.settingsTab === "concepts" ? [conceptSettings()] : S.settingsTab === "engine" ? [motorSettings()]
     : [visualSettings()]));
   UI.settings.scrollTop = scroll;
   const fonts = UI.settings.querySelector(".badge-font-options");
@@ -4633,6 +4640,8 @@ function renderSettings() {
   if (focusedFont) UI.settings.querySelector(`[data-font="${focusedFont}"]`)?.focus({ preventScroll: true });
   if (focusedLabelStyle) UI.settings.querySelector(`[data-label-style="${focusedLabelStyle}"]`)?.focus({ preventScroll: true });
   if (focusedSection) [...UI.settings.querySelectorAll(".set-sect-head")].find(head => head.querySelector("span")?.textContent === focusedSection)?.focus({ preventScroll: true });
+  for (const detail of UI.settings.querySelectorAll(".concepts-panel details")) detail.open = openConceptDetails.has(detail.dataset.conceptDetail);
+  if (focusedConceptToggle) UI.settings.querySelector("#conceptsEnabled")?.focus({preventScroll: true});
   positionSettings();
 }
 function positionSettings() {
@@ -4646,6 +4655,91 @@ function toggleSettings() {
   closeArrowColorPicker();
   UI.settings.hidden = !UI.settings.hidden;
   if (!UI.settings.hidden) renderSettings();
+}
+
+/* ---------------- Optional, isolated concept analysis ---------------- */
+let _conceptSession = null, _conceptPositions = null, _conceptEnabled = false, _conceptRenderTimer = null;
+let _conceptGameKeys = [];
+function conceptMoveInput(positions, ply) {
+  if (ply < 1 || !positions[ply]?.from || !positions[ply]?.to) return null;
+  const history = searchHistory(positions, ply - 1), move = positions[ply];
+  return {fen: positions[ply - 1].fen, move: move.from + move.to + (move.promotion || ""),
+    history: {fen: history.initialFen, moves: history.moves}};
+}
+function selectedConceptInput() {
+  if (S.practice) return null;
+  if (S.analysisMode && S.variation) {
+    const v = S.variation, positions = [...S.positions.slice(0, v.branchIdx + 1), ...v.positions.slice(1, v.idx + 1)];
+    return conceptMoveInput(positions, positions.length - 1);
+  }
+  return conceptMoveInput(S.positions, S.idx);
+}
+function refreshConcepts() {
+  const enabled = S.settings.conceptsEnabled === true;
+  if (!enabled && !_conceptSession) return;
+  if (!_conceptSession) _conceptSession = new ConceptSession({setTimer: (fn, ms) => setTimeout(fn, ms), clearTimer: id => clearTimeout(id), changed: () => {
+    if (_conceptRenderTimer) return;
+    _conceptRenderTimer = setTimeout(() => {
+      _conceptRenderTimer = null;
+      if (UI.settings && !UI.settings.hidden && S.settingsTab === "concepts") renderSettings();
+    }, 100);
+  }});
+  if (_conceptPositions !== S.positions || _conceptEnabled !== enabled) {
+    const changedGame = _conceptPositions !== S.positions;
+    _conceptPositions = S.positions; _conceptEnabled = enabled;
+    // No history building or worker creation while the checkbox is off.
+    const inputs = enabled ? S.positions.slice(1).map((_p, i) => conceptMoveInput(S.positions, i + 1)).filter(Boolean) : [];
+    if (enabled || changedGame) _conceptGameKeys = inputs.map(conceptKey);
+    _conceptSession.configure(inputs, enabled);
+  }
+  if (enabled) { const selected = selectedConceptInput(); if (selected) _conceptSession.include(selected, true); }
+}
+function conceptSettings() {
+  const enabled = S.settings.conceptsEnabled === true;
+  const checkbox = el("input", {type: "checkbox", id: "conceptsEnabled", checked: enabled, onchange: event => {
+    S.settings.conceptsEnabled = event.target.checked;
+    browserAPI.storage.local.set({settings: S.settings});
+    // Let checkbox/label activation finish before the scheduled panel refresh.
+    // Replacing this input during change can make a native label activate it twice.
+    refreshConcepts();
+  }});
+  const panel = el("div", {class: "concepts-panel"},
+    el("label", {class: "concepts-toggle"}, checkbox, "Enable concept analysis"),
+    el("p", {class: "concepts-note"}, "E080 verified mechanics. Observations and bounded proofs; broader strategic benefits are unproven."));
+  if (!enabled) {
+    panel.append(el("p", {}, "Disabled — concept analysis is stopped. Enable to process this game."));
+  }
+  const input = selectedConceptInput(), entry = input && _conceptSession?.entries.get(conceptKey(input));
+  if (enabled) panel.append(el("h3", {}, "Selected move"));
+  if (!enabled) { /* Keep debug metrics visible while the analysis is stopped. */ }
+  else if (!input) panel.append(el("p", {}, S.practice ? "Practice inputs unavailable for concept analysis." : "Select a played move. The initial position has no played-move context."));
+  else if (!entry || entry.status !== "complete" && !entry.findings.length) panel.append(el("p", {}, "Concept analysis pending…"));
+  else {
+    if (entry.status !== "complete") panel.append(el("p", {class: "concepts-note"}, "Observations ready; bounded proof searches are running…"));
+    if (!entry.findings.length) panel.append(el("p", {}, "No supported finding within the available inputs and budgets."));
+    const list = el("ul", {class: "concepts-findings"});
+    for (const finding of entry.findings) list.append(el("li", {},
+      el("strong", {}, finding.name), el("p", {}, finding.text),
+      el("span", {class: "concepts-kind"}, finding.kind),
+      el("details", {"data-concept-detail": JSON.stringify([finding.event, finding.name, finding.text])}, el("summary", {}, "Verified scope"), ...finding.scopes.map(scope => el("p", {}, scope.occurrence + ": " + scope.scope)))));
+    panel.append(list);
+  }
+  const metrics = _conceptSession?.metrics(_conceptGameKeys) || {timeMs: 0, processed: 0, total: 0, found: 0, reused: 0, errors: [], unavailable: [], issues: []};
+  panel.append(el("h3", {}, "Game debug metrics"),
+    el("p", {id: "conceptMetrics"}, `Total concept-analysis time: ${(metrics.timeMs / 1000).toFixed(2)} s · Positions processed: ${metrics.processed}/${metrics.total} · Concepts found: ${metrics.found} · Reused positions: ${metrics.reused}`),
+    el("p", {class: "concepts-note"}, "Time sums per-position concept work, including reused work. Counts include every finding at each move. Variations are shown above and excluded from game totals."));
+  const atPlies = field => _conceptGameKeys.flatMap((key, index) => (_conceptSession?.entries.get(key)?.[field] || []).map(message => `Ply ${index + 1}: ${message}`));
+  const reports = [["Errors", atPlies("errors")], ["Unavailable inputs", atPlies("unavailable")], ["Exhausted budgets", atPlies("issues")]];
+  for (const [label, messages] of reports) {
+    const unique = [...new Set(messages)];
+    const detail = el("details", {"data-concept-detail": "debug:" + label}, el("summary", {}, `${label}: ${messages.length}`));
+    for (const message of unique) detail.append(el("p", {}, message));
+    panel.append(detail);
+  }
+  if (enabled && entry && !_conceptGameKeys.includes(conceptKey(input))) {
+    for (const message of [...entry.errors, ...entry.unavailable, ...entry.issues]) panel.append(el("p", {}, "Selected variation: " + message));
+  }
+  return panel;
 }
 
 /* ---------------- Credits & attributions ----------------

@@ -5,6 +5,13 @@ locally in your browser. One click turns any **Chess.com** or **Lichess** game i
 review — accuracy scores, move-by-move classifications, an evaluation graph, and an estimated
 rating. No account, no server, no manual PGN copying.
 
+The right-hand Settings panel includes an optional **Concepts** tab after Visual
+and Engine. Check **Enable concept analysis** to list supported findings for the
+selected move, with exact verified scopes and game-wide debug metrics. It defaults
+off and stops its worker immediately when disabled. Findings use completed E080
+research's bounded mechanics; broader strategic benefits and coaching usefulness
+remain unproven. Existing scores and coach comments are unchanged.
+
 **Source:** https://github.com/T-Julsgaard/Chess-Review
 
 **Chrome webshop**: https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenkadndbdbigfam
