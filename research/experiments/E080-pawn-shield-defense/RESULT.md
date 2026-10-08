@@ -26,8 +26,15 @@ New tests add exact/one-less atomic budget and cover-without-threat/obstruction
 negative gates; all five focused tests pass in 1.9s, maintained source/diff
 checks pass. EXPOSURE retains the observed roots/results; no failure occurred.
 Current
-positive coverage is queen on g-file/home-g king only, both colors; c/e king
-files and a second slider family remain unmet, so neither occurrence advances.
+initial positive coverage was queen on home-g king only, both colors. Expanded
+queen translations exposed alternative remaining mates, retained as negatives.
+The original rook hypothesis also remains a before/after-mate negative; corrected
+rook candidates prove the effect on all c/e/g home files and another bishop
+support ray. Ten positive/eight retained negative fixture cases now have frozen
+source proofs, and all 21 focused tests pass in 3.8s. Source/diff checks pass.
+Every failed root and observed continuation stays in EXPOSURE/fixtures; no
+detector change or acceptance weakening. Neither occurrence advances without
+full independent wrapper replay and the remaining registered final gates.
 
 Next: independent scalar wrapper replay/tamper gates and broader guarded
 synthetic pilot; retain unmet coverage/failures. Shared reconciliation policy

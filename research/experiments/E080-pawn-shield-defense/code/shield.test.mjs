@@ -3,26 +3,38 @@ await openResearchData(['D001'], {purpose: 'test'});
 const {default: test} = await import('node:test');
 const {default: assert} = await import('node:assert/strict');
 const {Chess} = await import('../../../../lib/chess.js');
-const {setup} = await import('../../E021-structural-concepts/code/fixtures.mjs');
 const {explainMove} = await import('./shield.mjs');
 const {explainMove: parent} = await import('../../E079-central-king-support/code/center.mjs');
 const {replayQuery} = await import('../../E029-forced-mates/code/replay.mjs');
 const {turnBoard} = await import('../../E027-defensive-resources/code/defense.mjs');
-const {reflect} = await import('../../E079-central-king-support/code/fixtures.mjs');
+const {candidate, rookOriginal, candidates, reflect} = await import('./fixtures.mjs');
 
 // Authored prospective development hypothesis. No acceptance or tracker change.
-const candidate = {id: 'queen-file-cover', fen: setup({a1: null, a7: null, h2: 'P',
-  g1: 'K', f2: 'P', g2: 'P', h8: 'k', g4: 'q', f3: 'b'}),
-  move: 'g2g3', pawnShieldTags: true, scanReplies: false};
-for (const f of [candidate, reflect(candidate)]) test(f.id + ': complete source proofs for development hypothesis', () => {
+for (const f of candidates.flatMap(f => [f, reflect(f)])) test(f.id + ': complete source proofs for retained development hypothesis', () => {
   const result = explainMove(f), a = result.pawnShieldAnalysis;
-  assert.equal(a.status, 'proven');
+  assert.equal(a.status, f.expectedStatus || 'proven');
   const root = new Chess(f.fen), enemy = root.turn() === 'w' ? 'b' : 'w';
   assert.equal(replayQuery(turnBoard(root, enemy), a.beforeProof).win, true);
-  root.move(f.move); assert.equal(replayQuery(root, a.afterProof).win, false);
-  assert.ok(a.witness.blockedCapture.cells.includes(a.witness.played.to));
-  assert.equal(result.events.at(-1).qualityClaim, false);
-  assert.ok(result.events.at(-1).text.split(/\s+/).length <= 24);
+  root.move(f.move);
+  if (a.status === 'proven') {
+    assert.equal(replayQuery(root, a.afterProof).win, false);
+    assert.ok(a.witness.blockedCapture.cells.includes(a.witness.played.to));
+    assert.equal(result.events.at(-1).qualityClaim, false);
+    assert.ok(result.events.at(-1).text.split(/\s+/).length <= 24);
+  } else {
+    if (a.afterProof) assert.equal(replayQuery(root, a.afterProof).win, true);
+    assert.equal(a.witness, null);
+    assert.ok(!result.events.some(e => e.id === 'pawn-shield-defense'));
+  }
+});
+for (const f of [rookOriginal, reflect(rookOriginal)]) test(f.id + ': retained failed hypothesis with another mate', () => {
+  const result = explainMove(f), a = result.pawnShieldAnalysis;
+  assert.equal(a.status, 'no-new-fact');
+  assert.equal(a.beforeProof.tree.win, true);
+  assert.equal(a.afterProof.tree.win, true);
+  const root = new Chess(f.fen); root.move(f.move);
+  assert.equal(replayQuery(root, a.afterProof).win, true);
+  assert.ok(!result.events.some(e => e.id === 'pawn-shield-defense'));
 });
 test('disabled exact parent, strict flags and atomic wrapper budget', () => {
   const f = {...candidate, pawnShieldTags: false};
