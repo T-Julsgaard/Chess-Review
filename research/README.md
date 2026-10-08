@@ -71,13 +71,13 @@ unresolved; there is no extension integration. The numerical goal stays paused.
 
 The [E021 structural expansion](experiments/E021-structural-concepts/RESULT.md)
 adds short pawn, file, battery, blockade and piece-placement comments. The latest
-[E077 connected passers and open lines](experiments/E077-connected-passers-open-lines/RESULT.md)
-adds complete connected-passer, pawn-free file and legal horizontal rank proofs,
-including all seven root rank destinations. Coverage reaches 317 verified
-names; reciprocal protection and broader strategic assessments remain partial.
-Its [cumulative tracker](experiments/E077-connected-passers-open-lines/evidence/concept-status.md)
+[E078 bishop chains and complete slider batteries](experiments/E078-bishop-chains-batteries/RESULT.md)
+adds witnessed bishop escapes and complete Q–R/Q–B/Q–Q/R–R/B–B battery proofs.
+Coverage reaches 320 verified names; bishop liberation, reciprocal protection
+and broader strategic assessments remain partial.
+Its [cumulative tracker](experiments/E078-bishop-chains-batteries/evidence/concept-status.md)
 records verified mechanics and partial interpretations against the original
-list; its [demo](experiments/E077-connected-passers-open-lines/evidence/demo.html) is runnable
+list; its [demo](experiments/E078-bishop-chains-batteries/evidence/demo.html) is runnable
 without the extension. Further coach research continues. The user cancelled the
 usage cutoff and PC shutdown; the shutdown automation was deleted.
 

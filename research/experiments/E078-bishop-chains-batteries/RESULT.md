@@ -1,75 +1,65 @@
-# E078 working prototype and resume state
+# E078 bishop-chain and complete battery evidence
 
-2026-10-08. Approved ranks 22–24 plus compatible C0435 registered. Original
-PLAN and prospective source/work-unit AMENDMENT retained. C0320 liberation/
-recommendation and all earlier positional/wedge/shield/reciprocal dependencies
-remain partial or pending; no cheap shape replaces them.
+2026-10-08. Complete research-only mechanics study. Frozen source
+87ef831a69dd616e6fbc75c772f512284bb05afc; preregistration 52e0d17 and prospective
+AMENDMENT retained. No extension integration. Synthetic evidence does not
+establish real-game precision, teaching usefulness or a universal strategic rule.
 
-Working opt-in placementTags, exact-disabled E077 parent, shared atomic integer
-budget and independent complete state/event replay implemented. Root/history
-and actual after must be live and legal. Explicit foundation rejected/unavailable/
-exhausted input returns not-applicable with no new facts. Priorities <=4.0;
-qualityClaim false, comments <=24 words, all inherited events/selection retained.
+Actual bishop escape beyond an unchanged full restrictive own pawn chain is
+verified (C0312). New maximal batteries cover Q–R, Q–B, Q–Q, R–R and B–B,
+including promoted extra sliders and groups larger than two (C0366/C0435).
+All complete support components, four bishop rays, maximal board lines, members,
+empty gaps and boundary blockers are saved. Compatible middle sliders remain
+members. Identity-mapped existing groups do not become newly created facts.
+C0320 newly behind-chain blocker mechanics work, but the required liberation,
+passivity and better-alternative interpretation remains partial. Prior strategic,
+shield, wedge and reciprocal-protection dependencies remain unresolved.
 
-Bishop escape requires unchanged full own support component, root behind every
-member with a first-forward-diagonal chain blocker, then actual bishop reaches
-beyond every member with no chain member on any of its four diagonals. Newly
-behind placement retains exact blockers and full rays, without advice to free
-that bishop. E021 graph extraction reused with full branches/bases/heads/
-terminals/edges; independent replay rebuilds it by separate scalar traversal.
+Opt-in placementTags has exact disabled E077 behavior, atomic integer budget,
+history-aware live legal root/after gating, no quality claim and priority <=4.0.
+Independent replay rebuilds full graphs/rays/groups without detector imports.
+Short comments name the witnessed fact, for example: “Queen battery: your queens
+at d1/f3 align on the d1–h5 diagonal.” No profitable joint threat is inferred.
+The preview distinguishes terminal inputs/refusals from actual played terminal
+positions and budget exhaustion; a witnessed after board remains visible.
 
-Maximal battery groups cover orthogonal R/Q and diagonal B/Q, all five adjacent
-families Q–R/Q–B/Q–Q/R–R/B–B. Every old-family edge agrees with frozen E021
-extraction. Compatible middle sliders stay in triples/larger groups; noncompatible
-or enemy pieces terminate groups. Complete line cells/gaps/bounds/members and
-identity-mapped newness retained. Independent replay enumerates full board lines
-by scalar equations and derives group partitions without detector imports.
-Queen subset flag avoids duplicate comment events. No joint threat/profit or
-activity advantage is inferred, and aligned same-color bishops are not called
-an opposite-square-color bishop pair.
+Final focused 198 tests passed in 9.6s; cumulative 5,422 in 103.8s; maintained
+source and diff checks passed before source freeze. Earlier prototype checks
+(188 focused/5,412 cumulative) and development corrections are retained in
+EXPOSURE.md. Four reflected pilot failures were already-existing placements:
+behind-branched root was already behind and falling B–B root already aligned.
+Both original roots remain negatives; new positive roots added without loosening
+any gate. Added reversed-file blockers and selected descriptive Q–Q fixture.
+No focused/cumulative implementation failure occurred.
 
-Focused 188 tests passed in 9.8s. Initial cumulative 5,410 tests
-passed in 97.6s, then added a two-new-batteries case and atomic multi-event budget
-check. Final cumulative 5412 tests passed in 96.2s; maintained source
-and diff checks passed. Independent guarded development pilot: 182 cases,
-76 proven, 56 no-new-fact, ten not-live, two exhausted, 12 not-applicable,
-24 input errors and two exact disabled-parent. Replayed 78 new certificates:
-eight outside-chain, four behind-chain and 66 batteries. Covers both colors,
-all families/orientations, triples/four-member/queen-front-middle-rear groups,
-merge/split, promotions/capture promotions of all four types, EP removing two
-blockers, two simultaneously formed batteries, full graph/ray/boundary negatives,
-valid/invalid history, mate/stalemate/dead/repetition/clock, malformed inputs,
-zero/exact/one-less budgets, parent warnings/combined profiles and forged fields.
+Main/repeat/initially clean detached reproductions all passed: 5,052 cases,
+192 new and 4,860 inherited; elapsed 274.952/274.731/274.409 seconds. Exact
+code revision, normalized source/input hashes, physical output hashes and metrics
+match; clean run initially has empty working-tree status. Independent saved
+replay verifies 88 new certificates: 14 outside-chain, six behind-chain and
+68 batteries, retaining 32 chain edges and 158 battery members. New states:
+86 proven, 56 no-new-fact, ten not-live, two exhausted, 12 not-applicable;
+24 input errors and two disabled-parent cases. Complete inherited output has
+8,921 certificates/288 query proofs, 27,657 defender replies/54,524 counterreply
+leaves. Max selected comment length 21 words, below 24-word gate.
 
-Four reflected pilot failures retained in EXPOSURE.md: behind-branched root was
-already behind; falling B–B root was already aligned. Preserve both original
-roots as negatives and add genuinely new positives; no newness/legality/gates
-loosened, no failures pruned. No focused or cumulative source failures occurred.
+Coverage includes both colors, all orientations/families, queens in all group
+positions, triples/four-member groups, merge/split, promotion/capture promotion,
+EP unblocking, two simultaneous batteries, complete graph/ray/group negatives,
+histories, terminal root/after positions, foundation refusal, invalid inputs,
+zero/exact/one-less budgets, parent selection and forged proof fields. All
+4,860 ordered E077 full fingerprints and original-list hash are unchanged.
+All 1,081 occurrences outside this four-row batch are byte-identical.
 
-Guarded descriptive display probe independently replayed and saved locally at
-research/runs/E078/development/selected-qq.json. Selected comment: Queen battery:
-your queens at d1/f3 align on the d1–h5 diagonal. This is exposed synthetic
-mechanics/display evidence, not independent real-game precision or teaching
-usefulness. General contextual selection remains unresolved. No external games
-or diagrams acquired; D001 preflight passed with 54 registered artifacts.
+Canonical evidence: evidence/results.json, demo.html, concept-status.md,
+run.json, repeat-run.json and clean-run.json; 5,272,778 bytes within 20MB.
+Repeated outputs retained under research/runs/E078/repeat and reused detached
+research/runs/E064/clean/research/runs/E078/clean. D001 guarded preflight passed
+with 54 registered artifacts; no external games acquired. Canonical status is
+reported by npm run research:status after this completed index record.
 
-Saved runner, status renderer and preview implemented. Expanded final focused
-198 tests passed in 9.6s; cumulative 5,422 passed in 103.8s; source/diff
-checks passed. Full saved development pilot: 5,052 cases (192 new), 88 new
-certificates (14 outside-chain, six behind-chain, 68 batteries); 86 proven,
-56 no-new-fact, ten not-live, two exhausted, 12 not-applicable, 24 input
-errors and two disabled-parent cases. All 4,860 ordered E077 fingerprints
-unchanged. Pilot elapsed 280.084s. Added reversed-file blocker coverage and
-retained descriptive Q–Q selection fixture. Independent occurrence audit
-preserves all 1,081 outside rows; C0320 remains partial. Display distinguishes
-terminal input from actual played terminal positions and budget exhaustion.
-Source ready for freeze; decisive main/repeat/clean reproductions pending. No canonical tracker advanced.
-E077 remains canonical: 317 names/366 verified occurrences, 80 partial,
-639 unimplemented, 719 remaining. Shared clean main includes E077 only; unfinished
-E078 stays on existing isolated research branch.
-
-Next: freeze tested source and run exact main/repeat/initially clean reused
-checkout runs, then independently replay saved proofs. Preserve all 4,860 ordered E077 fingerprints and original-list
-hash. Canonical budget 20MB. C0312/C0366/C0435 are candidates only after all gates;
-C0320 must remain partial. Goal active; no extension, push, agents, numerical
-resumption, usage monitoring/cutoff, shutdown or automation revival.
+Next: filter approved queue and preregister central-king scopes at ranks 25–26,
+reusing meaningful promotion-effect proofs where applicable; geometric placement
+alone cannot discharge safety/benefit. Keep rank-27 shield safety prerequisite.
+Broader coach goal remains active. Numerical research stays paused; usage cutoff,
+PC shutdown and automation remain cancelled. No push or agents.
