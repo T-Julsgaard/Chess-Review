@@ -127,12 +127,6 @@ with browser-specific manifests and no development dependencies or tests. Each b
 has its own release directory, source snapshot, and SHA-256 package checksums.
 See [RELEASE.md](RELEASE.md) for store reviewer notes and validation commands.
 
-## Contributors
-
-Developed and maintained by [T-Julsgaard](https://github.com/T-Julsgaard), with
-AI-assisted contributions from OpenAI Codex to code, research, tests, and documentation.
-See [CONTRIBUTING.md](CONTRIBUTING.md) to contribute to the project.
-
 ## License & attributions
 
 Chess Review's own code is licensed under the **GNU General Public License v3.0** (see
