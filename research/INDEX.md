@@ -267,4 +267,4 @@ user explicitly resumes. The extension remains at B000.
 
 | E108 | [Exchange and sacrifice choices](experiments/E108-exchange-sacrifice-choices/RESULT.md) | prototype | 8 bounded original scopes; 48 focused plus mate/parent checks; 28-case guarded pilot and independent replay; 117 source hashes; recapture mate/draw and H+2 timing, accepted unchanged | Causal structure/activity and comparative ending value; combined validation deferred |
 
-| E109 | [Causal piece conversion](experiments/E109-causal-piece-conversion/RESULT.md) | registered | Full conversion policies with isolated activity/minor-type/material/distance controls registered | Implement focused controls and independent replay |
+| E109 | [Causal piece conversion](experiments/E109-causal-piece-conversion/RESULT.md) | prototype | 15 bounded original scopes; 55 focused plus conversion/parent checks; 34-case guarded pilot and independent replay; 113 source hashes; isolated activity, minor replacement, richer captures and defender history, accepted unchanged | Coordinated pieces/structures/endgame comparisons; combined validation deferred |
