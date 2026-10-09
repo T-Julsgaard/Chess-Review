@@ -19,7 +19,7 @@ function summary(pieces) {
 }
 const record = m => ({uci: uci(m), san: m.san, from: m.from, to: m.to, piece: m.piece, color: m.color,
   captured: m.captured || null, promotion: m.promotion || null, flags: m.flags});
-export const priority = e => ({'side-check-proof': 76.4, 'rook-four-three': 30.2, 'rook-three-two': 30.2}[e.id] ?? inherited(e));
+export const priority = e => ({'side-check-proof': 100.4, 'rook-four-three': 100.2, 'rook-three-two': 100.2}[e.id] ?? inherited(e));
 export function explainMove(input) {
   const enabled = input.rookEndingTags === undefined ? false : input.rookEndingTags;
   if (typeof enabled !== 'boolean') throw Error('rookEndingTags must be boolean');

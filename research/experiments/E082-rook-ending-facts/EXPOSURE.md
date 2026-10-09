@@ -31,3 +31,46 @@ Corrected89focused tests pass10.8s; source/diff pass. Guarded86case pilot6.681s,
 independently replay. FrozenFRIEND-01 bytes/inputs and22original positive proofs
 also independently replay. No acceptance or tracker advancement. Complete new
 pilot saved under research/runs/E082/pilot; original borrowed errorfixtures kept.
+
+Expanded matrix initially fails two reflected expectations in 15.2 seconds:
+b1b8 is a legal rook history move, so the rejection is final-FEN mismatch,
+not illegal move. Original root/id retained with retainedMislabel; separate
+b1c4 diagonal rook move added for genuine illegal-history coverage. No detector
+or acceptance changes. Expanded pawn-capture/EP/promotion/count/rank matrix then
+passes 225 focused checks in 18.2 seconds, and broad tamper/storage checks pass
+228 focused checks in 22.4 seconds.
+
+Priority observation prospectively registered in AMENDMENT commit 4f5a295 before
+changing only new priorities. Follow-up focused run fails two assertions in
+22.5 seconds: original last-minor material root also hangs its rook on the a-file,
+so its higher hanging-piece warning must remain selected. Use retained split-wing
+root with blocked enemy rook file for the explicit benign count-label selection;
+retain original unsafe root unchanged. Terminal-root preview used the inherited
+strict illegal-move guard instead of the already retained foundation-unavailable
+guard; use the latter for terminal display, keep both original guards. These
+correct expected behavior without weakening selection or legality.
+
+Corrected selection/tracker/preview run passes 229 focused checks in 22.1 seconds.
+Benign split-wing material selects the exact count label, actual side+material
+selects the side check, and the capturable variant retains hanging-piece. Authored
+rank 1/2/8 and static exact/one-less core budgets are then added prospectively to
+the final matrix; independently observed complete work is side20, material9,
+side+material20 and reused E057 side18. No cumulative collection has run yet.
+
+Final rank/budget matrix passes 251 focused checks in 23.3 seconds. Expanded
+244-position pilot14.307s/2974586bytes, then final pilot14.570s/2974995bytes,
+128proven/134certificates/48expectederrors; candidate runner pilots20.583s and
+19.718s retain all core proofs, 256evasions and unchanged1082outside rows.
+All saved pilot/runner results independently replay and input/output bytes
+authenticate. Earlier runner/pilot/audit versions have exact hash-bound snapshots
+under research/runs/E082/expanded-pilot and runner-pilot, plus pre-promotion
+fixture/test snapshots for both final pilots. Added core-only runner mode and
+audit sources are development changes, never inherited decisive collections.
+
+The promotion-interposition edge case fails two reflected assertions in24.6s:
+the pawn has EIGHT legal promotion defenses, four blocking promotions on b1 and
+four capture-promotions taking the checking rook on a1. The complete witness and
+independent enumeration already retained all eight; the test expected only four.
+Keep both original positions/IDs and assert both full four-choice groups,
+capture flags and all resulting live states. No detector/predicate/budget change.
+Next final focused check and fresh complete saved pilots precede full regression.

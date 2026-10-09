@@ -10,7 +10,9 @@ const base = 'research/experiments/E082-rook-ending-facts';
 const prior = JSON.parse(await readFile('research/experiments/E081-direct-attacks/evidence/run.json', 'utf8'));
 const borrowed = JSON.parse(await readFile('research/experiments/FRIEND-01-four-versus-three/evidence/run.json', 'utf8'));
 const inputs = [...new Set([...Object.keys(prior.inputHashes), ...Object.keys(borrowed.inputHashes), 'research/experiments/FRIEND-01-four-versus-three/evidence/run.json', 'research/experiments/FRIEND-01-four-versus-three/evidence/results.json.gz', base + '/PLAN.md',
-  ...['endings.mjs', 'replay.mjs', 'fixtures.mjs', 'endings.test.mjs', 'pilot.mjs'].map(f => base + '/code/' + f)])];
+  ...['AMENDMENT.md', 'EXPOSURE.md', 'SOURCES.md'].map(f => base + '/' + f),
+  ...['endings.mjs', 'replay.mjs', 'fixtures.mjs', 'endings.test.mjs', 'pilot.mjs', 'run.mjs', 'status.mjs', 'display.mjs',
+    'audit.mjs', 'pilot-audit.mjs', 'verify.mjs'].map(f => base + '/code/' + f)])];
 const inputHashes = {};
 for (const file of inputs) inputHashes[file] = sha256(file.endsWith('.gz') ? await readFile(file)
   : (await readFile(file, 'utf8')).replaceAll('\r\n', '\n'));
@@ -24,6 +26,7 @@ for (const fixture of fixtures.flatMap(f => [f, reflect(f)])) {
   const result = explainMove(fixture), replay = replayResult(fixture, result);
   assert.equal(replay.state, fixture.expectedStatus, fixture.id);
   for (const id of fixture.expected) assert.ok(result.events.some(e => e.id === id));
+  for (const id of fixture.absent || []) assert.equal(result.events.some(e => e.id === id), false);
   states[replay.state] = (states[replay.state] || 0) + 1; certificates += replay.certificates;
   rows.push({fixture, result, replay});
 }

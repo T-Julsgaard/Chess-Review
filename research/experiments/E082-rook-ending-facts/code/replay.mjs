@@ -102,7 +102,7 @@ export function replayResult(f, result) {
       }
     }
   } catch (error) { if (error.message !== 'independent-quota') throw error; status = 'exhausted'; witness = null; events = base.events; }
-  const rank = e => ({'side-check-proof': 76.4, 'rook-four-three': 30.2, 'rook-three-two': 30.2}[e.id] ?? prior(e));
+  const rank = e => ({'side-check-proof': 100.4, 'rook-four-three': 100.2, 'rook-three-two': 100.2}[e.id] ?? prior(e));
   assert.deepEqual(result, {...base, schema: 'coach-concepts-v63', events,
     comment: events === base.events ? base.comment : [...events].sort((a, b) => rank(b) - rank(a))[0]?.text || null,
     rookEndingAnalysis: {limit, nodes, status, witness}});
