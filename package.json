@@ -14,6 +14,8 @@
     "verify:history": "node scripts/verify-history.mjs",
     "research:preflight": "node research/preflight.mjs",
     "research:status": "node research/workflow.mjs status",
+    "research:build-status": "node research/build-workflow.mjs status",
+    "research:backlog": "node research/build-workflow.mjs backlog",
     "research:coach-tests": "node research/workflow.mjs test",
     "test:research": "node --test research/*.test.mjs research/experiments/*/code/*.test.mjs",
     "lint": "web-ext lint --source-dir=. --ignore-files=research/runs/** scratch/** calibration-runs/**",

@@ -129,6 +129,20 @@ and its successful lossless storage remain unchanged.
 
 ## Conclusions and promotion
 
+### Coach build-stage scheduling amendment, 2026-10-09
+
+The user explicitly authorized generating remaining coach code before later
+combined cross-checking. Follow [concepts/BUILD-FIRST.md](concepts/BUILD-FIRST.md):
+use provisional compatible batches, focused checks and hash-bound evidence
+reuse, then freeze and validate the combined implementation. Per-study full
+historical collections are not a prerequisite for further prototype development.
+Record this scheduling change prospectively, including already inspected
+evidence and each deferred gate; preserve old plans and completed outcomes.
+Code-ready does not mean accepted, verified or confirmed. Combined behavior,
+independent semantic replay and fresh reproduction of changed work remain
+acceptance requirements. This amendment does not alter numerical confirmation,
+data eligibility or production promotion requirements.
+
 Use `improved`, `no-improvement`, `inconclusive` or `invalid` as the outcome.
 Failure to resolve a small effect is inconclusive, not proof of equivalence.
 Use these separate evidence levels:

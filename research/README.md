@@ -50,19 +50,26 @@ snapshots retain the active calibration instead.
 - `npm run research:coach-tests -- E065` runs focused development tests; supply
   multiple experiment IDs when dependent studies are affected. Run the dataset
   eligibility preflight required by the study first; guarded tests still enforce
-  their own access policy.
+  their own access policy. Temporary contributor IDs such as `FRIEND-01` are
+  supported too, and their tests participate in the later full coach suite.
 - `npm run research:coach-tests` runs every available coach study's test files
   from E020 onward. This is the final cumulative coach regression, not a
   replacement for numerical research tests in `npm run test:research`.
+- `npm run research:build-status` reports provisional code coverage separately
+  from accepted mechanics and detects changed/missing build dependencies.
+- `npm run research:backlog` groups remaining claims in approved queue order,
+  distinguishing provisional implementations from code still to build. Both
+  commands accept `-- --json` and load metadata/source bytes only, not games.
 
-Final independent proof replay and exact main/repeat/clean reproduction remain
-required by each plan. Complete the registered development cases, replay tests,
-cheap saved pilot and candidate runner/tracker/demo with focused checks first.
-Run the full cumulative regression at the source-freeze boundary, not after
-each edit or routine commit/resume. Repeat it only if later changes or an
-unresolved failure/integration concern invalidate the earlier check, recording
-the reason in `RESULT.md`. Documentation-only changes do not require another
-unchanged regression; exact reproduction input hashes still have to match.
+The user approved [implementation first, combined validation later](concepts/BUILD-FIRST.md)
+on 2026-10-09. Generate remaining research code in larger compatible batches,
+using focused positive/negative checks, affected dependencies and cheap pilots.
+Code-ready batches are provisional; their full regression, exhaustive semantic
+cross-checks and exact reproductions move to the later combined source freeze.
+Reuse unchanged hash-bound observations while checking integration behavior.
+Preserve original plans and record dated amendments for unfinished studies;
+already-running frozen reproductions retain their fixed inputs and outputs.
+Accepted evidence and tracker counts remain separate from build coverage.
 Reuse the existing development and clean verification
 checkouts under the safeguards in [AGENTS.md](AGENTS.md); do not accumulate new
 branches or working clones. Source verification excludes local `research/runs/`
