@@ -23,7 +23,3 @@ await writeFile(out+'/run.json',JSON.stringify({schema:'E094-focused-retention-v
  scope:'provisional authored synthetic history-bound formations and legal break resources pilot; full combined validation deferred'},null,2)+'\n');
 console.log(JSON.stringify({passed:true,cases:rows.length,errors:rows.filter(r=>r.error).length,witnesses:rows.filter(r=>r.result?.openingStructureAnalysis.witness).length,
  bytes:Buffer.byteLength(text),compressedBytes:packed.length,sha256:sha256(text),compressedSha256:sha256(packed),out}));
-
-
-
-

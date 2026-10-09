@@ -21,7 +21,3 @@ const record={schema:'coach-build-v1',experiment:'E094',stage:'code-ready',claim
  'exact main/repeat/initially clean reproductions at combined freeze','original-occurrence scope audit','real-game precision and usefulness']};
 await writeFile(directory+'/build.json',JSON.stringify(record,null,2)+'\n');
 console.log(JSON.stringify({claims:record.claims.length,sourceInputs:Object.keys(hashes).length}));
-
-
-
-

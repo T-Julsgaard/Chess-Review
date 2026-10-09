@@ -1,6 +1,6 @@
 {
   "schema": "E094-focused-retention-v1",
-  "sourceRevision": "b6f125148d8129909928230af7d9e0b235537fa9",
+  "sourceRevision": "16aba2edf90b2f3a53b8cf9f83a8c220f147a6ae",
   "inputHashes": {
     "lib/chess.js": "a0b289b6530990bb49e78ccfb4ccf8ed18d9a5cb3713c44c433cbfab8725a6f6",
     "package.json": "2e41edb6006876e10c1c02bd95e70a220323fbbd39cfadc4431e57cf7cacd38d",
@@ -85,26 +85,26 @@
     "research/experiments/E091-forced-material-sequences/code/sequences.mjs": "34824bba59ea1f22b5d11f31dc456d4b0d04992cd2c4b04f47f94725843affb6",
     "research/experiments/E092-pawn-vulnerabilities-transformations/code/structures.mjs": "7700dbd825864d1c4cd5ef6da8427b68775ad3f49068a64109fae532158fec57",
     "research/experiments/E093-forcing-draw-resources/code/draws.mjs": "66d116c3733a5da4210065136cf206d4417cc9511f50bd661effd631bdf89f20",
-    "research/experiments/E094-history-pawn-formations-breaks/EXPOSURE.md": "328dc481b4ccbf661be252acf23e980243c53fb4c47c3cadbcef4c3d8bc83067",
+    "research/experiments/E094-history-pawn-formations-breaks/EXPOSURE.md": "5701097d38aea2615c61ad0116a5b29930bdaaa513fb73245274358c36d8fb63",
     "research/experiments/E094-history-pawn-formations-breaks/PLAN.md": "4ead760218bb957ec2b6a0c3ee39b05e457742e6bd1ecbb5cb79244facaa4aa1",
     "research/experiments/E094-history-pawn-formations-breaks/SOURCES.md": "a9d07f8151f9dc82c841f9d2a7a3bb647ddb52da31c09fc2b6f8333a25011654",
     "research/experiments/E094-history-pawn-formations-breaks/code/check-witness.mjs": "8e237147cdd846b6fa5efb3f8438e07e80cf3e0534d7e0f506e41eec819797af",
     "research/experiments/E094-history-pawn-formations-breaks/code/fixtures.mjs": "7b59d2eca1ac1e313699a219e3788771dbaadf3e5c1d6d9169f8b163171d8c81",
     "research/experiments/E094-history-pawn-formations-breaks/code/formations.mjs": "05735f794a998b546e5e3bbe3fe0c5b40dd4de2b75e610ebaf0316541445e749",
     "research/experiments/E094-history-pawn-formations-breaks/code/formations.test.mjs": "ea30d0cb89731c5406e3b0b348a6e88c5b26b834e933b40a3f9cab5fcfb96333",
-    "research/experiments/E094-history-pawn-formations-breaks/code/pilot.mjs": "e62fb7e383dc07f29ff0ac46a49bebd87f3cd1ef08f20ac72394f3638882b9c2",
-    "research/experiments/E094-history-pawn-formations-breaks/code/record-build.mjs": "68ac3246ce04093f62866fa9628c4e2b2cada75bf20851cdc942b846233d58e9",
+    "research/experiments/E094-history-pawn-formations-breaks/code/pilot.mjs": "362e6ba66ba3c7eef2e880bfbeadcc2ef499189dd019700517fa0635da97087e",
+    "research/experiments/E094-history-pawn-formations-breaks/code/record-build.mjs": "83f3b996d39b8c3f56f75342cdd411a4bdb6a74ec814eee9c0bba4873abdbb36",
     "research/experiments/FRIEND-03-pawn-wedge/code/wedge.mjs": "eaf41c80a1b89b9e6c145dc16f6501096b72bde8a9851eb8b086d4910e6f8b40",
     "research/experiments/FRIEND-shared/lib.mjs": "db5f0b05bfb833a7c37565fe5b9d066de9ef6a7132d561e5dfa1ca6bfb9038d5",
     "research/fresh-format.mjs": "6537d177ad21cbe16c89471040e63d0f42ad43a69e4f189787b8dcf2624e5b21",
     "tools/calibration/core.mjs": "c9f38c42f4937fcfdcb3bd44fdaf1d4eea6323c69533a24ca16779cfc4178ace"
   },
   "outputHashes": {
-    "results.json.gz": "ea19f258b8709641981684d5daf65895aa974b1276abb5a32791cde90552f0cf"
+    "results.json.gz": "88df98b46fee43505e4f2313f290ac70364ea311cec4e65d8158cbe5b029d4ba"
   },
-  "uncompressedSha256": "44cbc8d326dd6bb5e2925d1b29b3f4de01f79a57ee74cd2f1b24ebf406b6f331",
-  "uncompressedBytes": 1468047,
-  "compressedBytes": 86769,
+  "uncompressedSha256": "b538dc30429191d3d14ed9a23f798ea09b9328ad97ffc81ad2335b9e66db1b1b",
+  "uncompressedBytes": 1468139,
+  "compressedBytes": 86770,
   "cases": 20,
   "scope": "provisional authored synthetic history-bound formations and legal break resources pilot; full combined validation deferred"
 }

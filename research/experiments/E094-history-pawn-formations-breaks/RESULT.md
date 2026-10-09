@@ -39,14 +39,14 @@ replaced with legal checking move and separate mate. EXPOSURE.md records repairs
 saved fixture FEN/move/history, original identities/exchanges, complete legal
 root/advance/contact inventories, all conditional material counters and causal
 remove-only-mover frames. JSON fixture equality respects omitted undefined fields.
-Retained evidence/results.json.gz86,769bytes SHA256
- ea19f258b8709641981684d5daf65895aa974b1276abb5a32791cde90552f0cf.
-Plain JSON1,468,047bytes SHA256
- 44cbc8d326dd6bb5e2925d1b29b3f4de01f79a57ee74cd2f1b24ebf406b6f331.
-run.json binds preregistration b6f1251 and96 normalized literal source inputs.
+Retained evidence/results.json.gz86,770bytes SHA256
+ 88df98b46fee43505e4f2313f290ac70364ea311cec4e65d8158cbe5b029d4ba.
+Plain JSON1,468,139bytes SHA256
+ b538dc30429191d3d14ed9a23f798ea09b9328ad97ffc81ad2335b9e66db1b1b.
+run.json binds implementation revision16aba2e (preregistration b6f1251) and96 normalized literal source inputs.
 Current hashes and compression/plain hashes independently checked. No actual
 game contents, engine evaluations or historical evidence regeneration used.
-Source verification and git diff checks pass. All evidence remains provisional.
+Source verification passes. Staged diff caught utility trailing blank lines; repaired and rebound source/evidence, then staged diff passes. All evidence remains provisional.
 
 Deferred: combined cumulative regression, complete saved semantic/absence replay,
 interaction/priority/history/budget matrix, exact main/repeat/initially-clean
