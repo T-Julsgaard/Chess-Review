@@ -33,3 +33,14 @@ cheap guarded synthetic pilot with lossless gzip if large, affected E087 and
 E022 tests, source/diff. Deferred complete semantic replay/interactions/cumulative
 regression and exact changed-work three reproductions on combined freeze;
 real-game precision/usefulness and broad original scopes unverified.
+
+## Prospective strengthening amendment2026-10-09
+
+After inspected focused/pilot observations, require positive net nominal gain
+relative to the post-played threat root, not just the local pre-capture child.
+An opponent can otherwise win material elsewhere before losing its queen.
+Reuse E022 local proof but shift every gain by the enemy-reply material offset;
+if global minimum<=0 refute. Retain pre-amendment pilot/source under ignored
+research/runs/E088/pre-net-gain. No accepted/frozen evidence rewritten. This
+strengthens the gate before code-ready registration and requires fresh focused
+checks/pilot. Original declarations/exposures remain above.
