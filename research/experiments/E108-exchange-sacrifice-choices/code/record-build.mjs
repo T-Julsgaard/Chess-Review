@@ -1,0 +1,21 @@
+// Research source dependency fingerprints; never reads game or evidence contents.
+import {readFile,writeFile,readdir} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import path from 'node:path';
+const directory='research/experiments/E108-exchange-sacrifice-choices';
+const claims={"C0807":"Actual recorded immediate enemy capture establishes exact legal recaptures; actual own mate versus recapture terminal draw/enemy mate, or actual drawn/losing recapture versus legal nonrecapture own mate. Positive complete outcomes at identical finite horizon; general exchange decision unresolved.","C1068":"Same history/identity-bound exchange comparison demonstrates concrete mate-versus-draw/opposing-mate beneficiary. No unbounded evaluation or broad strategic beneficiary inference.","C0587":"Full actual mate versus every defense, plus selected legal moved-unit acceptance with positive root-relative nominal loss after acceptance and through EVERY immediate actor counterreply. Complete nonmaterial compensation despite unrecovered immediate loss; general dynamic/positional compensation unresolved.","C0909":"Same full mate and complete positive net-loss acceptance/reply ledger for deeper strategic dynamic-compensation occurrence; no long-term/general compensation claim.","C0812":"Same positive compensation plus legal quiet root delay fails own-mate even at H+2 further plies, granting one extra reply/actor opportunity. Timing available H0..3 only; global correct/unique moment unresolved.","C1082":"Same full mate versus complete delayed H+2 counterpolicy with unrecovered net material offer; concrete bounded timing comparison, broader necessity and optimal timing unresolved.","C0589":"Same actual H-ply mating compensation for unrecovered material and failed H+2 legal quiet delay demonstrate finite time/material choice, not abstract tempo prices or merely exhausted shorter horizon.","C0592":"Actual net-loss mating compensation additionally actual move checks and every actor choice in entire full mate tree checks, covering every legal evasion. Concrete checking initiative versus material; nonchecking/global initiative unresolved."};const seeds=[directory+'/PLAN.md',directory+'/EXPOSURE.md','package.json','research/AGENTS.md',
+ 'research/concepts/BUILD-FIRST.md',... (await readdir(directory+'/code')).filter(f=>f.endsWith('.mjs')).map(f=>directory+'/code/'+f)];
+const hashes={},visit=async name=>{
+ name=name.replaceAll('\\','/');if(hashes[name])return;
+ if(name.startsWith('../')||/^(research\/(datasets|runs)\/)|\/evidence\//.test(name))throw Error('Not source metadata:'+name);
+ const text=(await readFile(name,'utf8')).replaceAll('\r\n','\n');hashes[name]=createHash('sha256').update(text).digest('hex');
+ if(/\.(mjs|js)$/.test(name))for(const match of text.matchAll(/(?:from\s*|import\s*\(\s*|import\s*)['"](\.[^'"]+)['"]/g))
+  await visit(path.posix.normalize(path.posix.join(path.posix.dirname(name),match[1])));
+};
+for(const seed of seeds)await visit(seed);
+const record={schema:'coach-build-v1',experiment:'E108',stage:'code-ready',claims:Object.entries(claims).map(([id,scope])=>({id,scope})),
+ inputHashes:Object.fromEntries(Object.entries(hashes).sort()),focusedChecks:["npm run research:coach-tests -- E108","npm run research:coach-tests -- E029","node --test '--test-name-pattern=disabled exact parent|strict controls|history mismatch' research/experiments/E107-causal-material-mating-value/code/value.test.mjs","node research/experiments/E108-exchange-sacrifice-choices/code/pilot.mjs --out research/runs/E108/recorded-runtime","node research/experiments/E108-exchange-sacrifice-choices/code/replay-saved.mjs research/runs/E108/recorded-runtime","npm run verify:source","git diff --check"],
+ deferredChecks:['combined cumulative regression','combined independent complete saved semantic replay','interaction/priority/history/budget matrix',
+ 'exact main/repeat/initially clean reproductions at combined freeze','original-occurrence scope audit','real-game precision and usefulness']};
+await writeFile(directory+'/build.json',JSON.stringify(record,null,2)+'\n');
+console.log(JSON.stringify({claims:record.claims.length,sourceInputs:Object.keys(hashes).length}));

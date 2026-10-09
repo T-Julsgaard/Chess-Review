@@ -265,4 +265,4 @@ user explicitly resumes. The extension remains at B000.
 
 | E107 | [Causal material value in mating policies](experiments/E107-causal-material-mating-value/RESULT.md) | prototype | 9 bounded original scopes; 37 focused plus E029/E106 checks; 22-case guarded pilot and independent replay; 111 source hashes, causal equal-value frames and castling-rights guard, accepted unchanged | Exchange decisions and broader activity/material policies; combined validation deferred |
 
-| E108 | [Exchange and sacrifice choices](experiments/E108-exchange-sacrifice-choices/RESULT.md) | registered | Complete contrasting recapture outcomes and net-loss mating timing registered | Implement focused policies and independent replay |
+| E108 | [Exchange and sacrifice choices](experiments/E108-exchange-sacrifice-choices/RESULT.md) | prototype | 8 bounded original scopes; 48 focused plus mate/parent checks; 28-case guarded pilot and independent replay; 117 source hashes; recapture mate/draw and H+2 timing, accepted unchanged | Causal structure/activity and comparative ending value; combined validation deferred |
