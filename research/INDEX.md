@@ -269,4 +269,4 @@ user explicitly resumes. The extension remains at B000.
 
 | E109 | [Causal piece conversion](experiments/E109-causal-piece-conversion/RESULT.md) | prototype | 15 bounded original scopes; 55 focused plus conversion/parent checks; 34-case guarded pilot and independent replay; 113 source hashes; isolated activity, minor replacement, richer captures and defender history, accepted unchanged | Coordinated pieces/structures/endgame comparisons; combined validation deferred |
 
-| E110 | [Joint mating coordination](experiments/E110-joint-mating-coordination/RESULT.md) | registered | Joint necessity, king placement, bishop-pair substitutions and actual opposing minor armies registered | Implement complete mate comparisons and independent replay |
+| E110 | [Joint mating coordination](experiments/E110-joint-mating-coordination/RESULT.md) | prototype | 10 bounded original scopes; 74 focused plus mate/parent checks; 52-case guarded pilot and independent replay; 114 source hashes; joint necessity, restored king and equal-value bishop substitutions, accepted unchanged | Coordinated structures and bounded endgame comparisons; combined validation deferred |
