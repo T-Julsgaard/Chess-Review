@@ -1,0 +1,21 @@
+import {legalPosition,uci} from '../../E020-coach-concepts/code/concepts.mjs';import {validateHistory} from '../../E024-transitions/code/transitions.mjs';import {conversionQuery} from './policy.mjs';import {explainMove as parent,priority as inherited} from '../../E105-connected-pawn-conversion/code/conversion.mjs';
+const men=c=>c.board().flat().filter(Boolean),nonp=c=>men(c).filter(p=>!['p','k'].includes(p.type));
+export const priority=e=>e.evidence?.experiment==='E106'?161:inherited(e);
+export function explainMove(input){
+ const enabled=input.endingConversionTags===undefined?false:input.endingConversionTags;if(typeof enabled!=='boolean')throw Error('endingConversionTags must be boolean');if(!enabled)return parent(input);
+ const H=input.endingConversionPlies===undefined?4:input.endingConversionPlies,limit=input.maxEndingConversionNodes===undefined?50000:input.maxEndingConversionNodes;if(!Number.isSafeInteger(H)||H<0||H>6)throw Error('endingConversionPlies must be integer0..6');if(!Number.isSafeInteger(limit)||limit<0||limit>50000)throw Error('maxEndingConversionNodes must be integer0..50000');
+ const base=parent(input);let nodes=0,status='no-new-fact',witness=null,events=base.events;const budget={tick(){if(++nodes>limit)throw Error('ending-conversion-budget');}},done=()=>({...base,schema:'coach-concepts-E106-prototype',events,comment:events===base.events?base.comment:[...events].sort((a,b)=>priority(b)-priority(a))[0]?.text||null,endingConversionAnalysis:{plies:H,limit,nodes,status,witness}});
+ if(base.error||base.foundationAnalysis&&base.foundationAnalysis.status!=='accepted'){status='not-applicable';return done();}
+ try{
+  budget.tick();const h=validateHistory(input),c=legalPosition(h?.start||input.fen);for(const code of h?.moves||[]){budget.tick();c.move(code);}if(c.isGameOver()){status='not-live';return done();}
+  const before=c.fen(),actor=c.turn(),old=men(c),oldNon=nonp(c),pawns=old.filter(p=>p.type==='p'&&p.color===actor);if(pawns.length!==1||old.length>6){status='not-applicable';return done();}const pawn=pawns[0].square,rootMoves=c.moves({verbose:true}).map(uci).sort(),m=c.move(input.move),after=c.fen();if(after!==base.after)throw Error('Parent ending differs');
+  const transition=m.captured&&oldNon.length===1&&nonp(c).length===0&&!m.promotion,rookMinor=m.piece==='r'&&['b','n'].includes(m.captured)&&old.length===5&&oldNon.length===2&&oldNon.some(p=>p.type==='r'&&p.color===actor)&&oldNon.some(p=>p.type===m.captured&&p.color!==actor);
+  if((!transition&&!rookMinor)||c.isGameOver()){status='not-applicable';return done();}
+  const tracked=m.from===pawn?m.to:pawn,actual=conversionQuery(c,actor,tracked,H,budget,before);witness={experiment:'E106',before,after,actor,history:h?{fen:h.start,moves:h.moves}:null,played:uci(m),pawn,tracked,transition:!!transition,rookMinor:!!rookMinor,minor:rookMinor?m.captured:null,rootMoves,actual,alternatives:[]};if(!actual.win)return done();
+  c.undo();for(const code of rootMoves.filter(code=>code!==uci(m))){budget.tick();const alternative=c.move(code);let proof;try{proof=conversionQuery(c,actor,alternative.from===pawn?alternative.to:pawn,H,budget,before);}finally{c.undo();}witness.alternatives.push({move:code,proof});if(!proof.win)break;}c.move(input.move);
+  const extra=[],add=(id,text)=>{if(text.split(/\s+/).length>24)throw Error('Comment exceeds24words');extra.push({id,text,qualityClaim:false,evidence:{experiment:'E106',before,after,detail:{query:'actual'}}});};
+  if(transition){add('pawn-ending-conversion-transition',`Endgame transition: ${m.san} removes the last piece and permits mate or a surviving promoted queen within ${H} plies against every legal defense.`);if(witness.alternatives.some(a=>!a.proof.win))add('conversion-backed-simplification',`Simplification: ${m.san} permits mate or a surviving queen within ${H} plies; a recorded legal alternative fails that same bounded goal.`);}
+  if(rookMinor)add('rook-'+(m.captured==='b'?'bishop':'knight')+'-conversion',`Rook versus ${m.captured==='b'?'bishop':'knight'}: ${m.san} removes the minor piece and permits mate or a surviving queen within ${H} plies against every defense.`);
+  events=[...base.events,...extra];status='proven';
+ }catch(e){if(e.message!=='ending-conversion-budget')throw e;events=base.events;witness=null;status='exhausted';}return done();
+}
