@@ -1,0 +1,12 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {openResearchData} from '../../../data-policy.mjs';await openResearchData(['D001'],{purpose:'test'});
+import {explainMove} from './center.mjs';import {explainMove as parent} from '../../E089-causal-pawn-breakthrough/code/breakthrough.mjs';
+import {bothColors} from './fixtures.mjs';import {checkWitness} from './check-witness.mjs';
+const input=f=>({fen:f.fen,move:f.move,history:f.history,scanReplies:false,centerTags:true});
+for(const f of bothColors)test(f.id,()=>{const i=input(f),r=explainMove(i),p=parent({...i,centerTags:false}),extra=r.events.slice(p.events.length);assert.deepEqual(r.events.slice(0,p.events.length),p.events);
+ for(const id of f.expected)assert.ok(extra.some(e=>e.id===id),id);for(const id of f.absent||[])assert.ok(!extra.some(e=>e.id===id),id);if(!f.expected.length)assert.equal(extra.length,0);
+ if(r.centerAnalysis.witness)assert.equal(checkWitness(r.centerAnalysis.witness,r),true);assert.deepEqual(explainMove({...i,centerTags:false}),p);assert.deepEqual(explainMove({...i,centerTags:undefined}),p);});
+test('strict controls and missing history',()=>{const i=input(bothColors[0]);for(const centerTags of [null,1,'true',{},[]])assert.throws(()=>explainMove({...i,centerTags}),/boolean/);for(const maxCenterNodes of [null,-1,50001,1.5,NaN,'1'])assert.throws(()=>explainMove({...i,maxCenterNodes}),/integer/);assert.ok(!explainMove({...i,history:undefined}).events.some(e=>e.id.startsWith('recorded-')));assert.throws(()=>explainMove({...i,history:{fen:i.fen,moves:['a1a8']}}),/history/);});
+test('atomic budgets',()=>{const i=input(bothColors[9]),full=explainMove(i),p=parent({...i,centerTags:false});for(const maxCenterNodes of [0,1,2,full.centerAnalysis.nodes-1]){const r=explainMove({...i,maxCenterNodes});assert.equal(r.centerAnalysis.status,'exhausted');assert.deepEqual(r.events,p.events);assert.equal(r.centerAnalysis.witness,null);}});
+test('witness tampering rejected',()=>{for(const f of bothColors){const r=explainMove(input(f)),w=r.centerAnalysis.witness;if(!w)continue;for(const mutate of [w=>w.fresh.moves.pop(),w=>w.fresh.pawnFreeDE=!w.fresh.pawnFreeDE,w=>w.played.to='a1']){const bad=structuredClone(w);mutate(bad);assert.throws(()=>checkWitness(bad,r));}}});
+test('actual terminal move guarded',()=>{const r=explainMove({fen:'7k/8/5KQ1/8/8/8/8/8 w - - 0 1',move:'g6g7',centerTags:true,scanReplies:false});assert.equal(r.centerAnalysis.status,'not-live');assert.equal(r.centerAnalysis.witness,null);});
