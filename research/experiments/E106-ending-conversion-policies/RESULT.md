@@ -52,3 +52,37 @@ policies, or compatible pending material/exchange scopes; inspect current tracke
 and prerequisites before preregistration. Keep all1085original entries in scope.
 Latest primary93%used/7%remaining,secondary92%used. Full objective incomplete.
 At about95%primary usage, stop, commit resume state and authorized PC shutdown.
+
+## Usage cutoff and exact resume state
+
+2026-10-09 primary300-minute window94%used/6%remaining, near authorized
+about5% cutoff; secondary92%used. Stop new development now and preserve completed
+work before explicitly authorized PC shutdown. Full goal remains incomplete;
+conditional user stop will pause it rather than claim completion.
+
+Completed E106 result2d8725f, prereg2788d54. Evidence fully retained and independently
+replayed16cases/111inputs after copying. All task-run handles terminal; no live
+frozen run or unfinished source. E082 runs already finished/retained, no repeats.
+Existing isolated path C:/Users/thoma/Documents/Git/Chess-Review/research/runs/E020/clean
+branch codex/coach-concepts-e058-evidence. Shared main and existing transfer branch
+codex/coach-concept-research will receive this completed result and cutoff commit
+only after clean-state/operations/ancestry recheck. No push, switch, reset, stash
+or new checkout. Final checkout HEAD is cutoff-documentation commit following
+2d8725f; inspect actual git state when resuming instead of assuming this record.
+
+Resume: read research/AGENTS.md, BUILD-FIRST.md, ACTIVE-QUEUE.md, INDEX.md and
+this RESULT; current status/build-status/backlog; dataset preflight. Reuse same
+checkout/branch and local-main reconciliation. Next unused study E107: select
+coherent outstanding material/exchange or technical-ending scopes from actual
+backlog, reuse combined OR-goal and unchanged eligible evidence where compatible.
+Do not count finite failure as unbounded loss. Strengthen later combined checks
+for mixed mate/queen response branches and pawn-loss-to-mate paths. No new E107
+registration or evaluation. Accepted378; provisional212/27ready/0stale; total590
+54.4%;495withoutcandidate,707stillpending acceptance,668workingitems.
+
+Combined frozen validation remains deferred until implementable catalog batches
+and explicit unavailable-prerequisite records are ready. Preserve all1085original
+scopes; full regression, independent semantic replay, interaction/absence/priority/
+terminal/history/budget checks and exact changed main/repeat/initially-clean
+reproductions, reusing unchanged eligible evidence. No extension/numerical edits.
+Shutdown command after saving/committing: shutdown.exe /s /t 0, without /f.
