@@ -271,4 +271,4 @@ user explicitly resumes. The extension remains at B000.
 
 | E110 | [Joint mating coordination](experiments/E110-joint-mating-coordination/RESULT.md) | prototype | 10 bounded original scopes; 74 focused plus mate/parent checks; 52-case guarded pilot and independent replay; 114 source hashes; joint necessity, restored king and equal-value bishop substitutions, accepted unchanged | Coordinated structures and bounded endgame comparisons; combined validation deferred |
 
-| E111 | [Pawn-chain mating constraints](experiments/E111-pawn-chain-mating-constraints/RESULT.md) | registered | Causal defender bishop obstruction and local color mating vulnerability registered; six pending scopes | Implement complete actual/opened/bishop-removal mate proofs |
+| E111 | [Pawn-chain mating constraints](experiments/E111-pawn-chain-mating-constraints/RESULT.md) | prototype | Six bounded original scopes; 75 focused plus pawn/mate/parent checks; 48-case guarded pilot and independent replay; 115 source hashes; full component opening isolates bishop defense, accepted unchanged | Further piece/pawn constraints and history-backed tactics; combined validation deferred |
