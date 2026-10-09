@@ -1,5 +1,13 @@
 # E082 rook-ending facts
 
+State: complete. All original scientific acceptance gates pass at frozen source
+2859af1c33dc359237119f936778514764356190. C0665 Side checks, C0681 Four versus
+three and C0682 Three versus two advance only for the explicit factual scopes in
+PLAN/AMENDMENT and the accepted tracker. Research-only synthetic mechanics;
+strategic outcomes, real-game precision and player usefulness remain unverified.
+
+## Retained preregistration and development record
+
 2026-10-09. PLAN registered before new implementation or fixture evaluation.
 Queue ranks33-35 C0665/C0681/C0682 share actual K/R/P inventories with separate
 side-check/fullcountpair gates. Reuse frozen E057/FRIEND-01 evidence whereexact
@@ -83,3 +91,56 @@ that check; no repeat full suite is justified. Freeze the complete source now,
 then collect main/repeat/initially clean detached runs with distinct outputs.
 The unregistered next-study draft (research/runs/E083-plan-draft.md) was prepared
 without new fixture evaluation or implementation and does not alter E082 inputs.
+
+## Accepted frozen evidence
+
+Three fresh main/repeat/initially clean detached runs each pass 5702 cases:
+246 new and all 5456 inherited. Source revision, 309 exact physical input hashes,
+three output hashes, metrics, environment, config and eligibility receipts match.
+Elapsed milliseconds: 1129495 / 1123799 / 1126552. Detached run starts clean and
+records an empty working-tree status. No source/HEAD/frozen input changes occurred
+during collection; all three processes are terminal before subsequent commits.
+
+Independent saved replay passes all new rows: 130 proven, 136 certificates,
+278 legal evasions, 4 disabled, 12 exhausted, 28 no-new-fact, 12 not-live,
+12 not-applicable and 48 expected input errors. Every inherited ordered complete
+result fingerprint and the original teaching-list hash match E081. Exactly 1082
+outside occurrence rows remain unchanged. Only C0665/C0681/C0682 advance.
+
+Canonical counts from npm run research:status -- --json: 328 verified names,
+378/1085 verified occurrences (34.8%), 76 partial, 631 unimplemented, 707 remaining
+and 63 completed coach studies. These are accepted mechanics, not build counts.
+
+Whole collection: 5102 accepted, 258 abstained, 342 invalid, 9667 event certificates,
+294 query proofs, 77881 defender replies and 252942 counterreply leaves. Longest
+selected comment is 21 words; new facts carry qualityClaim false. Urgent existing
+warnings retain priority, including capturable checking rooks. Reused E057 side
+events remain original parent events, with no duplicated new label.
+
+Output SHA-256 values:
+
+- results.json: 6c5f82b0847d3ef2d73b36d64acd43eaaf9f02ef8c0ec2ffb59a281da02d01fd
+- demo.html: f379bbfe98d2ff8e9bfb9a90a8cee9ad8b635d375157361e9c99b9c78c6e7ad0
+- concept-status.md: dc6897e8bf47c113c6265a94ac7bbbad5d6e4d8bafad820f9dfa08f0ce6b600a
+
+Complete six-file canonical evidence is 6,839,757 bytes, below the soft 8 MB target.
+Existing E079 lossless codec retains all proof branches; new complete inventories/
+evasions remain inline. The frozen original FRIEND-01 manifest/compressed bytes,
+full input vector and 22 independent positive proofs remain intact. All authored
+failures and development outputs/changed-input snapshots are preserved.
+
+Reproduce at the frozen source with code/run.mjs default canonical output and
+--out research/runs/E082/repeat, then from an initially clean detached checkout
+with --out research/runs/E082/clean. code/verify.mjs takes frozen SHA and absolute
+clean-output folder; code/audit.mjs checks complete saved semantics, inherited
+fingerprints and trackers. Audit frozen inputs from the reused verification
+checkout if newer policy documentation has since changed in development.
+
+Shared main is clean at 4fff60a with the newly approved build-first workflow.
+After the local acceptance commit, reconcile that policy at this safe boundary,
+validate its affected tooling, then fast-forward only completed E082 into the
+existing local research/main refs. No repeated unchanged full suite or duplicate
+collections. Continue subsequent compatible code-ready batches provisionally,
+with focused checks and explicit deferred combined gates; accepted coverage and
+build availability remain separate. No extension promotion, push, usage cutoff
+or shutdown. The complete remaining teaching catalog stays in scope.
