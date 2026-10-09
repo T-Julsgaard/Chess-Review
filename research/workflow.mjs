@@ -53,16 +53,18 @@ export async function latestCoachStatus(workspace = root) {
 }
 
 export async function coachTestFiles(workspace = root, requested = []) {
-  if (requested.some(id => !/^E\d{3}$/.test(id) || Number(id.slice(1)) < 20)) throw Error('Use coach experiment IDs such as E065');
+  if (requested.some(id => !(/^FRIEND-\d{2}$/.test(id) || /^E\d{3}$/.test(id) && Number(id.slice(1)) >= 20)))
+    throw Error('Use coach experiment IDs such as E065 or FRIEND-01');
   const experiments = path.join(workspace, 'research/experiments');
-  const folders = (await readdir(experiments, {withFileTypes: true})).filter(entry => entry.isDirectory() && /^E\d{3}-/.test(entry.name)
-    && Number(entry.name.slice(1, 4)) >= 20).sort((a, b) => a.name.localeCompare(b.name));
+  const folders = (await readdir(experiments, {withFileTypes: true})).filter(entry => entry.isDirectory()
+    && (/^FRIEND-\d{2}-/.test(entry.name) || /^E\d{3}-/.test(entry.name)
+      && Number(entry.name.slice(1, 4)) >= 20)).sort((a, b) => a.name.localeCompare(b.name));
   for (const id of requested) {
     if (folders.filter(entry => entry.name.startsWith(id + '-')).length !== 1) throw Error('Missing or ambiguous experiment: ' + id);
   }
   const files = [];
   for (const folder of folders) {
-    const id = folder.name.slice(0, 4);
+    const id = /^(E\d{3}|FRIEND-\d{2})-/.exec(folder.name)[1];
     if (requested.length && !requested.includes(id)) continue;
     const code = path.join(experiments, folder.name, 'code');
     let entries;

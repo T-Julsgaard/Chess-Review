@@ -3,6 +3,13 @@
 These instructions apply to `research/`. Repository-wide commit and no-push
 preferences still apply.
 
+User-approved coach workflow, 2026-10-09: follow
+`concepts/BUILD-FIRST.md`. Build remaining code in compatible provisional batches
+with focused checks; defer full cumulative acceptance to combined validation.
+This supersedes per-study freeze/reproduction prerequisites below for coach build
+work only. Preserve accepted evidence and document changes to registered studies
+with dated amendments. Numerical research and production promotion are unchanged.
+
 - Keep research on one existing branch and reuse the existing isolated research
   checkout. Do not create per-experiment branches, switch the shared checkout,
   or create another working clone unless the user explicitly requests it.
@@ -97,23 +104,29 @@ preferences still apply.
   changes. If active scoring is later changed, run the full relevant regression
   and reproduction checks described in `CONTRIBUTING.md` and the promotion record.
 - During development, use `npm run research:coach-tests -- E###` for the active
-  study and explicitly include any affected dependent studies. Finish the
-  registered fixture matrix, independent replay/tamper tests, cheap saved pilot
-  and candidate runner/tracker/demo before launching the full cumulative suite;
-  check development corrections with focused tests and affected dependencies.
+  study and explicitly include any affected dependent studies. In the coach
+  build stage, use representative positive/negative checks and cheap pilots;
+  record provisional scope, source dependencies and deferred gates in each
+  batch's build.json and RESULT.md. Continue to the next compatible batch without
+  constructing full inherited evidence or running cumulative acceptance first.
   Do not run the full suite or collect all inherited cases after each small edit,
   at routine commits/resumes, or while known acceptance work remains unfinished.
-  Before freezing source, run `npm run research:coach-tests` for the full
-  cumulative coach suite, source verification and diff checks. Focused tests
-  never replace final gates.
+  At the later combined-validation source freeze, run the full cumulative coach
+  suite, source verification and diff checks. Focused tests never establish
+  final acceptance or replace the deferred combined cross-checks.
   Repeat a passed full suite only when subsequent behavior/test/input changes,
   a failure or an unresolved integration concern invalidate that check; record
   the reason in `RESULT.md` before starting it. Documentation-only edits do not
   invalidate an unchanged regression, but exact run input hashes must still match.
-  Keep independent saved-proof replay, inherited-result checks and the required
-  main/repeat/initially clean runs with exact source/input/output hashes. Do not
-  skip them using cached success or weaken an already registered plan.
+  Keep independent saved-proof replay, inherited-result checks and exact
+  main/repeat/initially clean reproduction at that combined boundary. Reuse
+  unchanged hash-bound observations under BUILD-FIRST.md; do not substitute a
+  cached success for semantic replay. Amend unfinished registered plans openly
+  when moving their gate timing; never rewrite historical results.
 - Use `npm run research:status` for progress counts instead of hand-counting.
+  Use `npm run research:build-status` for separate provisional code coverage and
+  `npm run research:backlog` for remaining grouped claims; never add prototype
+  counts to the accepted tracker or mark INDEX.md prototypes `complete`.
   Study runners already generate trackers, demos and hash manifests; reuse those
   outputs and their existing acceptance checks rather than creating parallel
   summaries. Related concepts may share a prospectively registered study and

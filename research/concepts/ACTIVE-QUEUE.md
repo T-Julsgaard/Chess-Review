@@ -6,6 +6,14 @@ backlog suggestions. It supersedes the previous suggestion to immediately
 research Benoni/Botvinnik after E074. Existing registered studies, frozen
 evidence and original occurrence IDs are preserved.
 
+Update approved 2026-10-09: [BUILD-FIRST.md](BUILD-FIRST.md) now governs coach
+execution. Generate remaining code in larger compatible provisional batches;
+perform full cumulative cross-checks later on a frozen combined implementation.
+The easier-to-harder ranks remain the baseline within families, with common
+useful coaching coverage prioritized and prerequisite deviations recorded.
+Every original idea stays in scope. Prototype code never advances accepted
+mechanics counts. This update supersedes per-study final-gate timing below.
+
 ## Next work and fixed ordering
 
 Use [ORDER.md](ORDER.md) and the `proposedWork.rank` values in
@@ -53,9 +61,11 @@ acceptance. Do not inflate completion by counting tooltips as proven insights.
 
 Register separate claims and positive/negative acceptance gates within each
 coherent batch. Preserve all registered final cumulative tests, independent
-saved-proof replay and exact main/repeat/initially clean reproductions. Focused
-development checks and compatible hash-bound observation reuse may save time;
-they do not replace final gates. Synthetic mechanics remain distinct from
+saved-proof replay and exact main/repeat/initially clean reproductions as later
+combined acceptance work. Amend unfinished plans openly when deferring gates;
+reuse eligible unchanged evidence instead of recollecting the full history per
+prototype. Focused development checks do not establish final acceptance.
+Synthetic mechanics remain distinct from
 real-game precision and teaching usefulness. No speedup percentage is established.
 
 Follow research/AGENTS.md, including eligibility preflight before goal resumption

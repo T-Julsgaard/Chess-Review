@@ -34,8 +34,10 @@ test('status reports completed evidence rather than a newer draft; test selectio
   await put('research/experiments/E020-coach-concepts/code/old.test.mjs');
   await put('research/experiments/E021-draft/code/new.test.mjs');
   await put('research/experiments/E019-numerical/code/numeric.test.mjs');
+  await put('research/experiments/FRIEND-01-candidate/code/friend.test.mjs');
   assert.equal((await latestCoachStatus(root)).experiment, 'E020');
-  assert.equal((await coachTestFiles(root)).length, 2);
+  assert.equal((await coachTestFiles(root)).length, 3);
+  assert.deepEqual(await coachTestFiles(root, ['FRIEND-01']), [path.join(root, 'research/experiments/FRIEND-01-candidate/code/friend.test.mjs')]);
   assert.deepEqual(await coachTestFiles(root, ['E021']), [path.join(root, 'research/experiments/E021-draft/code/new.test.mjs')]);
   await assert.rejects(coachTestFiles(root, ['E022']), /Missing/);
   await assert.rejects(coachTestFiles(root, ['../E020']), /experiment IDs/);
