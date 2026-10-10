@@ -1,0 +1,4 @@
+import {Chess} from '../../../../lib/chess.js';
+import {boardFen,reflect} from '../../FRIEND-shared/lib.mjs';
+const root={g6:'K',f7:'Q',h8:'k'},make=(id,extra={},more={})=>{const start=boardFen({...root,...extra}),moves=['f7f6','h8g8'],c=new Chess(start);for(const m of moves)c.move(m);return{id,fen:c.fen(),history:{fen:start,moves},move:'f6g7',conversionTags:true,scanReplies:false,expected:['recorded-certified-advantage-conversion'],...more};},base=make('recorded-nine-point-conversion');
+export const fixtures=[base,make('cooperative-mate-refuted-earlier',{d7:'n'},{expected:[]}),make('equal-material-mating-route',{a8:'q'},{expected:[]}),{...base,id:'winning-policy-not-yet-converted',move:'f6e6',expected:[]},{...base,id:'short-horizon',conversionPlies:1,expected:[]},{...base,id:'missing-history',history:undefined,expected:[]},{...base,id:'zero-budget',maxConversionNodes:0,expected:[]}].flatMap(f=>[f,reflect(f)]);
