@@ -58,3 +58,15 @@ Queue deviation: sustained rook defenses/perpetual strategies/full outcomes need
 stronger endgame-policy or tablebase provenance; tiny E138 scores cannot supply
 those guarantees. This batch addresses remaining finite tactical claims in queue
 order without substituting static geometry for quantified consequences.
+
+## Development observation, 2026-10-10
+
+First fixture import failed because the reused reflection helper expects a whole
+fixture rather than a FEN string; corrected that call before any query ran.
+The first guarded positive query passes455ticks. Actual defensive pawn capture
+is a7xb6, not the initially hypothesized b7xb6 (a pawn cannot capture forward).
+Original hypothesis retained above. The second control also fails on Bb8-e5,
+besides removal of the attacking knight. No query/objective/budget changes.
+After inspecting this result, add an explicit authored countermate negative and
+threefold-eligible helper check for development coverage; neither is fresh
+confirmation. Comment wording explicitly states the three-ply material horizon.
