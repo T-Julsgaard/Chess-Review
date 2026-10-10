@@ -1,0 +1,17 @@
+import {legalPosition,uci,VALUES} from '../../E020-coach-concepts/code/concepts.mjs';
+import {validateHistory} from '../../E024-transitions/code/transitions.mjs';
+export const balance=(c,a)=>c.board().flat().filter(Boolean).reduce((n,p)=>n+VALUES[p.type]*(p.color===a?1:-1),0);
+export const victim=m=>m.captured?(m.isEnPassant()?m.to[0]+m.from[1]:m.to):null;
+export const flags=c=>({mate:c.isCheckmate(),stalemate:c.isStalemate(),insufficient:c.isInsufficientMaterial(),fifty:c.isDrawByFiftyMoves(),threefold:c.isThreefoldRepetition()});
+export const describe=m=>({move:uci(m),san:m.san,from:m.from,to:m.to,piece:m.piece,captured:m.captured||null,promotion:m.promotion||null,enPassant:m.isEnPassant(),victim:victim(m)});
+const sorted=c=>c.moves({verbose:true}).sort((a,b)=>uci(a).localeCompare(uci(b))),quiet=m=>m.piece!=='p'&&!m.captured&&!m.promotion;
+export function collectPanel(input,limit){
+  let nodes=0;const tick=()=>{if(++nodes>limit)throw Error('advantage-resource-budget');};tick();const h=validateHistory(input);if(!h)throw Error('Full history required');const c=legalPosition(h.start);for(const m of h.moves){tick();c.move(m);}if(c.isGameOver())throw Error('History-terminal root');const actor=c.turn();tick();const baseline=balance(c,actor);tick();const legal=sorted(c),actual=legal.find(m=>uci(m)===input.move),alternative=input.advantageAlternative===undefined?null:input.advantageAlternative;if(alternative!==null&&(typeof alternative!=='string'||alternative===input.move||!legal.some(m=>uci(m)===alternative&&m.from===actual.from&&quiet(m))))throw Error('advantageAlternative must be distinct legal quiet same-source move');const choices=legal.filter(m=>uci(m)===input.move||uci(m)===alternative),p={schema:'E150-complete-resource-panel-v1',before:c.fen(),history:input.history,actor,baseline,legal:legal.map(describe),variants:[],claimContexts:[],nodes:0},seen=new Set();
+  const record=path=>{if(c.isDrawByFiftyMoves()||c.isThreefoldRepetition()){const key=path.join('/')+'|'+c.fen();if(!seen.has(key)){seen.add(key);p.claimContexts.push(key);}}},state=()=>({fen:c.fen(),balance:balance(c,actor),flags:flags(c)}),inventory=()=>Object.values(flags(c)).some(Boolean)?[]:sorted(c);
+  for(const m of choices){tick();c.move(uci(m));try{record([uci(m)]);tick();const row={...describe(m),state:state(),checking:c.isCheck(),targets:c.board().flat().filter(t=>t&&t.color!==actor&&!['p','k'].includes(t.type)&&c.attackers(t.square,actor).includes(m.to)).map(t=>t.square).sort(),legal:[],branches:[]};tick();const replies=inventory();row.legal=replies.map(describe);
+    for(const r of replies){tick();c.move(uci(r));try{record([uci(m),uci(r)]);tick();const branch={...describe(r),state:state(),legal:[],attempts:[]};tick();const options=inventory();branch.legal=options.map(describe);const eligible=options.filter(a=>baseline>=3&&quiet(a)||a.from===m.to&&a.captured);
+      for(const a of eligible){tick();c.move(uci(a));try{record([uci(m),uci(r),uci(a)]);tick();const attempt={...describe(a),state:state(),legal:[],counters:[]};tick();const counters=inventory();attempt.legal=counters.map(describe);for(const b of counters){tick();c.move(uci(b));try{record([uci(m),uci(r),uci(a),uci(b)]);attempt.counters.push({move:uci(b),san:b.san,...state()});}finally{c.undo();}}branch.attempts.push(attempt);}finally{c.undo();}}row.branches.push(branch);
+    }finally{c.undo();}}p.variants.push(row);
+  }finally{c.undo();}}
+  p.nodes=nodes;return p;
+}
