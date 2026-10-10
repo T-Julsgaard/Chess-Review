@@ -1,0 +1,25 @@
+
+> chess-review@0.3.0 research:coach-tests
+> node research/workflow.mjs test E175
+
+Focused development checks: E175 (1 test files).
+Focused checks do not replace the final full regression or independent proof/reproducibility checks.
+....................
+........X...........
+....................
+...........
+
+Failed tests:
+
+✖ equivalent FEN spelling retains canonical historical endpoint (129.4869ms)
+  Error: Parent exchange-quality endpoint differs
+      at explainMove (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/research/experiments/E175-recorded-quality-exchanges/code/exchanges.mjs:8:513)
+      at TestContext.<anonymous> (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/research/experiments/E175-recorded-quality-exchanges/code/exchanges.test.mjs:15:143)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7)
+
+Focused checks failed in 12.7 seconds.

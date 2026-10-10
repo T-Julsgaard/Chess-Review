@@ -1,0 +1,1 @@
+Initial smoke exited1: Error: Illegal move: c4f7 from parent inputMove. Added Black Be6 blocks the c4–f7 ray. First three complete panels were checkpointed and remain reusable. No fourth raw panel was collected.

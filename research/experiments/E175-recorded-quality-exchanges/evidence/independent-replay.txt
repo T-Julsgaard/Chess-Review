@@ -1,0 +1,1 @@
+{"cases":20,"witnesses":8,"positives":6,"uniquePanels":8,"sourceHashes":767,"extraWitnesses":4,"independentReplay":"passed"}
