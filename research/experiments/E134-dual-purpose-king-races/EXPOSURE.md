@@ -10,3 +10,9 @@ No E134 decisive evaluation, acquired game contents or holdout labels inspected.
 
 Pre-evaluation logic audit clarified that fulfilled stopping resource A remains
 fulfilled when the capture yields bare kings. No solver or E134 fixture has run.
+
+Later fixed-budget smoke returned no combined H10 policy on the original board,
+10727ticks/4.4seconds. Its tree was omitted by the initial wrapper and must be
+retained/replayed next. Added Kf5/Pc6 versus Kb5/Pc3, Ke4 H4 hypothesis after
+this exposure, prospectively before evaluating that new board. Both remain
+required pilot cases; no claim of fresh confirmation or original-case success.

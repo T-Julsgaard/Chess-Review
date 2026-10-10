@@ -75,3 +75,17 @@ losing one's own pawn would be contradicted. The terminal exclusion above applie
 when A has not been fulfilled and to the live queen resource B; a terminal draw
 by itself is not an alternative resource. No goal, search budget or outcome
 threshold was selected from observed results. Preserve original wording openly.
+
+## Development exposure and additional fixture, 2026-10-10
+
+Fixed50000-node H10 first smoke on original authored Kh8/Pc6 versus Ka6/Ph5,
+Kg7 returned no combined policy after10727ticks/4.4seconds. Preserve this failed
+hypothesis; it is not proof of a lost game or absence of an unbounded Réti idea.
+Initial wrapper omitted the failed tree, so retain it on the next diagnostic
+evaluation and require independent saved replay. No query budget, goal or
+geometry gate changes. Add independently authored Kf5/Pc6 versus Kb5/Pc3, Ke4,
+H4 as a new prospective resource-policy hypothesis: ...Kxc6 should force the
+stopping resource, ...c2 should permit c7/c8Q without immediate queen capture.
+Keep BOTH positions in the pilot; do not replace the original failed case or
+declare broad maneuver coverage. Additional fixture selected after the disclosed
+failure; its status is exploratory build evidence, not independent confirmation.
