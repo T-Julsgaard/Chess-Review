@@ -1,0 +1,17 @@
+import {legalPosition,uci} from '../../E020-coach-concepts/code/concepts.mjs';
+import {validateHistory} from '../../E024-transitions/code/transitions.mjs';
+const square=/^[a-h][1-8]$/,code=/^[a-h][1-8][a-h][1-8][qrbn]?$/;
+export function controls(input){
+ if(input.queenPlacementMode!==undefined&&!['exposure','control'].includes(input.queenPlacementMode))throw Error('queenPlacementMode must be exposure or control');
+ for(const k of ['queenPlacementAlternative','queenAttack'])if(input[k]!==undefined&&(typeof input[k]!=='string'||!code.test(input[k])))throw Error(k+' must be UCI');
+ if(input.queenEntries!==undefined&&(!Array.isArray(input.queenEntries)||input.queenEntries.length!==2||input.queenEntries.some(v=>typeof v!=='string'||!code.test(v))||new Set(input.queenEntries).size!==2))throw Error('queenEntries must be two distinct UCI moves');
+ if(input.queenPlacementPanels!==undefined&&(!input.queenPlacementPanels||typeof input.queenPlacementPanels!=='object'||Array.isArray(input.queenPlacementPanels)||Object.keys(input.queenPlacementPanels).sort().join(',')!=='actual,alternative'||Object.values(input.queenPlacementPanels).some(p=>!p||typeof p!=='object')))throw Error('Expected actual/alternative queenPlacementPanels');
+}
+export function context(input,limit){let work=0;const tick=()=>{if(++work>limit)throw Error('queen-placement-budget');};tick();const h=validateHistory(input);if(!h)return{status:'history-prerequisite',work};for(const k of ['queenPlacementMode','queenPlacementAlternative',input.queenPlacementMode==='exposure'?'queenAttack':'queenEntries'])if(input[k]===undefined)return{status:k+'-prerequisite',work};tick();const c=legalPosition(h.start);for(const m of h.moves){tick();c.move(m);}tick();const actor=c.turn(),legal=c.moves({verbose:true}),a=legal.find(m=>uci(m)===input.move),alt=legal.find(m=>uci(m)===input.queenPlacementAlternative);
+ if(c.isGameOver())return{status:'not-live',work};if(!a||a.piece!=='q'||a.captured||a.promotion)return{status:'quiet-queen-prerequisite',work};c.move(uci(a));const checking=c.isCheck();c.undo();if(checking)return{status:'quiet-queen-prerequisite',work};
+ if(!alt||uci(alt)===uci(a)||alt.from!==a.from||alt.piece!=='q'||alt.captured||alt.promotion)throw Error('Alternative must be distinct legal quiet same-queen move');c.move(uci(alt));const altCheck=c.isCheck();c.undo();if(altCheck)throw Error('Alternative must be nonchecking');
+ const replies=input.queenPlacementMode==='exposure'?[input.queenAttack]:input.queenEntries;
+ if(input.queenPlacementMode==='control'&&(replies[0].slice(0,2)!==replies[1].slice(0,2)||replies.some(m=>!square.test(m.slice(2,4)))))throw Error('Entries must be same knight');
+ for(const placement of [input.move,input.queenPlacementAlternative]){c.move(placement);if(c.isGameOver())throw Error('Placement must remain live');const options=c.moves({verbose:true});for(const r of replies){const m=options.find(m=>uci(m)===r);if(!m||m.captured||m.promotion||!(input.queenPlacementMode==='exposure'?'nb':'n').includes(m.piece))throw Error('Declared enemy move must be legal quiet minor/knight');c.move(r);const check=c.isCheck();c.undo();if(check)throw Error('Declared enemy move must be nonchecking');}c.undo();}
+ return{status:'ready',work,actor,queen:a.from,mode:input.queenPlacementMode,history:input.history,before:c.fen(),actual:input.move,alternative:input.queenPlacementAlternative,replies};
+}

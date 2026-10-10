@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {gzipSync} from 'node:zlib';
+import {execFileSync} from 'node:child_process';
+import os from 'node:os';
+import {createHash} from 'node:crypto';
+import {openResearchData} from '../../../data-policy.mjs';
+import {fixtures} from './fixtures.mjs';
+import {explainMove} from './queen.mjs';
+import {explainMove as parent} from '../../E161-queen-activity-objectives/code/queen.mjs';
+import {checkWitness} from './check-witness.mjs';
+import {savedPanels,key,dir} from './saved.mjs';
+const data=await openResearchData(['D001'],{purpose:'test'}),saved=await savedPanels(),build=JSON.parse(await readFile(dir+'/build.json','utf8')),rows=[];let reused=0,fresh=0;for(const input of fixtures){const found=saved.cache.get(key(input)),result=explainMove({...input,...(found?{queenPlacementPanels:found.panels}:{})});assert.deepEqual(result.events.filter(e=>e.evidence?.experiment==='E162').map(e=>e.id),input.expected,input.id);if(result.queenPlacementAnalysis.witness){checkWitness(input,result);if(found)reused++;else fresh++;saved.cache.set(key(input),{input,panels:result.queenPlacementAnalysis.witness.panels});}const disabled=explainMove({...input,queenPlacementTags:false}),inherited=parent(input);assert.deepEqual(disabled,inherited);rows.push({input,result,inherited});}const source=JSON.stringify({sourceHashes:saved.hashes,rows:[...saved.cache.values()]}),bytes=gzipSync(source,{level:9}),output=gzipSync(JSON.stringify({rows}),{level:9});await mkdir(dir+'/evidence',{recursive:true});await writeFile(dir+'/evidence/observations.json.gz',bytes);await writeFile(dir+'/evidence/results.json.gz',output);const hash=b=>createHash('sha256').update(b).digest('hex');await writeFile(dir+'/evidence/run.json',JSON.stringify({experiment:'E162',preregistration:'159e2e7',revision:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),argv:process.argv,node:process.version,platform:process.platform,arch:process.arch,os:os.release(),engine:null,seed:null,datasetReceipt:data.receipt,sourceHashes:build.inputHashes,outputs:{observations:hash(bytes),results:hash(output)},cases:rows.length,witnesses:rows.filter(r=>r.result.queenPlacementAnalysis.witness).length,positives:rows.filter(r=>r.input.expected.length).length,reusedComparisons:reused,freshComparisons:fresh},null,2)+'\n');console.log(JSON.stringify({cases:rows.length,reused,fresh,bytes:bytes.length+output.length}));
