@@ -12,3 +12,8 @@ original branching Qg5+ full31candidate comparison succeeds3473ticks but no actu
 PV withinH2. Retain this failed hypothesis; registered corrected Qc7 same-board
 example before its evaluation. H0 panel preserves mating alternatives without
 fabricating an actual line. Changes affect fixtures only, not goals/search gates.
+
+Corrected Qc7 succeeds3498ticks with2complete defender replies/ties; first50focused
+checks fail only2 original Qg5-g7 mirrored input cases due own king blockade.
+Register Qg5-d8# endpoint before evaluating new fixture; keep original illegal
+cases. Reused E029 four-ply helper passes1464ticks; no long/cumulative searches.

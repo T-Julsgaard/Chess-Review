@@ -79,3 +79,10 @@ White Kf6 blocks the proposed Qg5-d8 diagonal. Keep that failed PV hypothesis.
 Before evaluating a corrected branch example, add same Kf6/Qc5 versus Kg8 with
 actual Qc7 H2: ...Kf8/...Kh8 should allow distinct Qd8#/Qg7#. Keep both colors,
 all earlier cases/gates/budgets, pilot18cases. No selected failure is removed.
+
+First50focused checks had2 reflected failures: authored actual Qg5-g7 is illegal
+because own Kg6 blocks the file. Retain both as exact input-refusal controls.
+Prospectively add legal actual Qg5-d8# on the same core for distance0/PV endpoint,
+before evaluating that fixture. Expand small pilot to20cases; no detector/checker,
+search, budget or goal changes. Other focused checks passed, including full legal
+history and direct E029 reused four-ply PV helper (1464ticks, two own stages).
