@@ -81,3 +81,21 @@ evidence soft target, honest overrun if necessary. Full cumulative/exhaustive
 occurrence/absence/priority/history/budget audits and changed main/repeat/initially
 clean reproductions deferred to combined freeze. Real-game precision/usefulness
 unmeasured. Accepted tracker, numerical work and production unchanged.
+
+## 2026-10-10 development amendment
+
+Initial focused run: 54 pass, one fixture-construction failure in70.8seconds.
+The threefold test played a White king move immediately after an already-played
+White move, while Black was to move. Preserve original test and full output in
+evidence/initial-king.test.mjs.txt and initial-focused-checks.txt. Correct only
+the fixture to two legal full cycles from the original root; same threefold gate.
+Detector, independent checker, pilot inputs, raw panels and outputs unchanged.
+Rerun the corrected test first, then the focused file once to establish the final
+test result. Refresh final build fingerprints separately from the already-run
+pilot source bindings; retain the original collection/execution bindings.
+
+The first correction also failed its single targeted check: returning to f1 is
+illegal because Bc4 attacks f1. Preserve second-king.test.mjs.txt and the targeted
+error record. Use the live position AFTER Kg1 as start, Black to move: ...Kg8,
+Kh1, ...Kh8, Kg1 twice, then supplied actual ...Kg8. This tests the same root
+threefold abstention with fully legal history, without traversing attacked f1.

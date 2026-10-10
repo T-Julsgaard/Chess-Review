@@ -1,0 +1,24 @@
+
+> chess-review@0.3.0 research:coach-tests
+> node research/workflow.mjs test E164
+
+Focused development checks: E164 (1 test files).
+Focused checks do not replace the final full regression or independent proof/reproducibility checks.
+....................
+............X.......
+...............
+
+Failed tests:
+
+✖ threefold true-history root withholds (0.5874ms)
+  Error: Invalid move: g1h1
+      at Chess.move (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/lib/chess.js:1129:23)
+      at TestContext.<anonymous> (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/research/experiments/E164-king-hunt-shelter/code/king.test.mjs:27:236)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7)
+
+Focused checks failed in 70.8 seconds.
