@@ -65,3 +65,13 @@ Focused tests, source/diff, compressed proofs and complete source closure.
 Deferred combined regression/exhaustive interactions/original-occurrence audit,
 exact main/repeat/initially clean reproductions, real-game precision/usefulness
 and full outcomes. Accepted E082/numerical/production unchanged.
+
+## Pre-evaluation consistency clarification, 2026-10-10
+
+No E134 solver or evaluation has run. Resource A is fulfilled on elimination of
+the enemy tracked unit even if that capture leaves bare kings/insufficient draw.
+Test A BEFORE terminal exclusion. Otherwise the stated ability to pursue A after
+losing one's own pawn would be contradicted. The terminal exclusion above applies
+when A has not been fulfilled and to the live queen resource B; a terminal draw
+by itself is not an alternative resource. No goal, search budget or outcome
+threshold was selected from observed results. Preserve original wording openly.
