@@ -9,3 +9,7 @@ or evaluated. Authored core and history in PLAN chosen before solver/evaluation.
 Search snippets also referenced endgame teaching books/PDFs/forums; not acquired
 or used as game data. No prior E135 observations. Pilot mechanics exploratory,
 not independent real-game confirmation. C0668/C0669 broader outcome scopes open.
+
+Initial42focused/18pilot pass disclosed in dated PLAN amendment. Before observing
+it, register the near defending king (...Kxc7) refutation with unchanged H4 and
+50000node cap, both colors. Original pilot output retained, new final20 run.

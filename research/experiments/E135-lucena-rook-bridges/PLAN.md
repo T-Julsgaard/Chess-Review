@@ -53,3 +53,13 @@ Deferred combined cumulative regression, exhaustive interactions/priority/absenc
 history/budget/original-occurrence audit, exact main/repeat/initially clean
 reproductions, real-game precision/usefulness and general winning conversion.
 Accepted tracker, numerical research and production unchanged.
+
+## Prospective additional refutation control, 2026-10-10
+
+Initial42 focused checks and18case pilot passed (4 positives,2 exhaustions).
+Before evaluating it, add authored Kc5/Pc7/Re4 versus Kd7/Rc1, Rc4 H4:
+the bridge geometry should pass but ...Kxc7 should refute promotion. This tests
+policy necessity beyond a zero-ply limit. Retain both colors, increase small pilot
+to20cases, same budgets/goals. Keep original18case run at runs/E135/final and
+new evaluation at runs/E135/final20. Additional negative is development-selected,
+not a fresh confirmation set; no original failed observation is removed.
