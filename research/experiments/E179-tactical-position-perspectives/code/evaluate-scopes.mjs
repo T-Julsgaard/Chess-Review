@@ -1,0 +1,2 @@
+import {explainMove} from '../../E169-passive-defense-counterplay/code/defense.mjs';import {validateIds,validateView} from './scopes.mjs';import {inspectScopes} from './inspect-scopes.mjs';
+export function evaluateScopes(ids,input,view){validateIds(ids);validateView(view);const routed={...input,defenseComparisonTags:true},result=explainMove(routed);return{result,decisions:inspectScopes(ids,routed,result,view)};}
