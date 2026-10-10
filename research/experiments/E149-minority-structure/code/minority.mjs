@@ -1,0 +1,15 @@
+import {validateHistory} from '../../E024-transitions/code/transitions.mjs';
+import {collectPanel} from './panel.mjs';
+import {verifyPanel} from './verify-panel.mjs';
+import {derive} from './derive.mjs';
+import {explainMove as parent,priority as inherited} from '../../E148-causal-center-instability/code/center.mjs';
+export const priority=e=>e.evidence?.experiment==='E149'?187.8:inherited(e);
+export function explainMove(input){
+  const enabled=input.minorityStructureTags===undefined?false:input.minorityStructureTags;if(typeof enabled!=='boolean')throw Error('minorityStructureTags must be boolean');if(!enabled)return parent(input);const limit=input.maxMinorityStructureNodes===undefined?50000:input.maxMinorityStructureNodes;if(!Number.isSafeInteger(limit)||limit<0||limit>50000)throw Error('maxMinorityStructureNodes must be integer0..50000');const base=parent(input);let nodes=0,witness=null,events=base.events,status='history-prerequisite';const done=()=>({...base,schema:'coach-concepts-E149-prototype',events,comment:events===base.events?base.comment:[...events].sort((a,b)=>priority(b)-priority(a))[0]?.text||null,minorityStructureAnalysis:{limit,nodes,status,witness}});if(base.error||base.foundationAnalysis&&base.foundationAnalysis.status!=='accepted'){status='not-applicable';return done();}
+  try{if(!limit)throw Error('minority-structure-budget');nodes=1;const h=validateHistory(input);if(!h)return done();if(limit<6+h.moves.length)throw Error('minority-structure-budget');const p=input.minorityStructurePanel===undefined?collectPanel(input,limit-3):input.minorityStructurePanel;if(!p||typeof p!=='object')throw Error('Expected structure panel');if(3+p.nodes>limit)throw Error('minority-structure-budget');nodes=3+verifyPanel(input,p).nodes;witness=derive(input,p);if(witness.after!==base.after)throw Error('Parent structure endpoint differs');if(p.claimContexts.length){status='claim-rule-prerequisite';return done();}const extra=[],add=(id,text)=>{if(text.split(/\s+/).length>24)throw Error('Comment exceeds24words');extra.push({id,text,qualityClaim:false,evidence:{experiment:'E149',before:witness.before,after:witness.after,detail:{source:'minorityStructureAnalysis.witness'}}});};
+    if(witness.lever)add('minority-pawn-lever',`Minority attack: ${witness.san} advances the smaller wing pawn group into new legal pawn contact. This identifies a lever, without judging its quality.`);
+    if(witness.health)add('bounded-structural-exploitation',`Structural exploitation: your pawns have fewer isolated pawns and no more doubled files; this isolated-pawn capture retains ${witness.health.minimumGain} nominal point through every immediate reply.`);
+    if(witness.recorded)add('recorded-minority-attack',`Recorded minority attack: the smaller pawn group exchanged, creating this isolated target; its capture retains ${witness.recorded.minimumGain} nominal point through every immediate reply.`);
+    if(extra.length){events=[...base.events,...extra];status='proven';}else status='compared';
+  }catch(e){if(e.message!=='minority-structure-budget')throw e;nodes=limit+1;events=base.events;witness=null;status='exhausted';}return done();
+}

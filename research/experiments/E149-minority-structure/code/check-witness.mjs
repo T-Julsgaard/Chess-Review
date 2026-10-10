@@ -1,0 +1,26 @@
+import assert from 'node:assert/strict';
+import {Chess} from '../../../../lib/chess.js';
+import {verifyPanel,independentStructure} from './verify-panel.mjs';
+const code=m=>m.from+m.to+(m.promotion||''),removed=m=>m.captured?(m.isEnPassant()?m.to[0]+m.from[1]:m.to):null,enemy=c=>c==='w'?'b':'w';
+// Separate claim reconstruction: no candidate, collector or derivation imports.
+export function checkWitness(w,result,input){
+  verifyPanel(input,w.panel);const p=w.panel,c=new Chess(input.history.fen),records=[];for(const m of input.history.moves){const before=c.fen(),move=c.move(m);records.push({before,move,after:c.fen()});}const actor=c.turn(),opponent=enemy(actor),before=c.fen(),move=c.moves({verbose:true}).find(m=>code(m)===input.move),row=p.variants.find(v=>v.move===input.move);c.move(input.move);const expected={experiment:'E149',panel:p,before,after:c.fen(),actor,played:input.move,san:move.san,lever:null,health:null,recorded:null};
+  function contact(board,m,options){
+    if(m.piece!=='p'||m.captured||m.promotion||m.from[0]!==m.to[0]||(+m.to[1]-+m.from[1])*(m.color==='w'?1:-1)<=0)return null;
+    const files=m.from[0]<='d'?'abcd':'efgh',s=independentStructure(board),own=s[m.color].pawns.filter(q=>files.includes(q[0])),opposing=s[enemy(m.color)].pawns.filter(q=>files.includes(q[0])),oldContact=board.attackers(m.from,enemy(m.color)).filter(q=>board.get(q)?.type==='p').sort(),captures=options.filter(o=>o.piece==='p'&&o.captured==='p'&&o.victim===m.to&&files.includes(o.from[0])).map(o=>({move:o.move,san:o.san,from:o.from,to:o.to,enPassant:o.enPassant,victim:o.victim}));
+    return own.length>0&&own.length<opposing.length&&oldContact.length===0&&captures.length>0?{files,own,enemy:opposing,oldContact,captures}:null;
+  }
+  if(row&&!p.claimContexts.length){
+    expected.lever=contact(new Chess(before),move,row.pawnCaptures);const ledger=row.captureLedger;let gain=null;if(ledger&&ledger.afterGain>0&&!Object.values(ledger.afterFlags).some(Boolean)&&ledger.replies.length>0&&ledger.replies.every(r=>r.gain>0&&!Object.values(r.flags).some(Boolean)))gain=Math.min(ledger.afterGain,...ledger.replies.map(r=>r.gain));const s=independentStructure(new Chess(before)),target=removed(move);
+    if(move.captured==='p'&&s[opponent].isolated.includes(target)&&s[actor].isolated.length<s[opponent].isolated.length&&s[actor].doubled.length<=s[opponent].doubled.length&&gain!==null)expected.health={target,own:s[actor],enemy:s[opponent],minimumGain:gain};
+    if(records.length>=4&&move.captured==='p'&&gain!==null){const four=records.slice(-4),a=four[0].move,b=four[1].move,d=four[2].move,e=four[3].move,initialBoard=new Chess(four[0].before),afterFirst=new Chess(four[0].after),options=afterFirst.moves({verbose:true}).map(m=>({move:code(m),san:m.san,from:m.from,to:m.to,piece:m.piece,captured:m.captured||null,enPassant:m.isEnPassant(),victim:removed(m)})),lever=contact(initialBoard,a,options),initial=independentStructure(initialBoard),exchange=independentStructure(new Chess(four[2].after));
+      if(lever&&a.color===actor&&b.piece==='p'&&b.captured==='p'&&removed(b)===a.to&&!b.promotion&&d.piece==='p'&&d.captured==='p'&&removed(d)===b.to&&!d.promotion&&d.from!==a.from&&lever.files.includes(d.from[0])&&lever.files.includes(d.to[0])&&e.piece!=='p'&&!e.captured&&!e.promotion&&(target[0]<='d'?'abcd':'efgh')===lever.files&&!initial[opponent].isolated.includes(target)&&initial[opponent].pawns.includes(target)&&exchange[opponent].isolated.includes(target)&&s[opponent].isolated.includes(target))expected.recorded={prefix:{fen:input.history.fen,moves:input.history.moves.slice(0,-4)},sequence:four.map(r=>({before:r.before,move:code(r.move),after:r.after})),lever,initialStructure:initial,exchangeStructure:exchange,target,minimumGain:gain};
+    }
+  }
+  assert.deepEqual(w,expected);assert.equal(result.before,before);assert.equal(result.after,expected.after);const analysis=result.minorityStructureAnalysis;assert.deepEqual(analysis.witness,w);assert.equal(analysis.limit,input.maxMinorityStructureNodes??50000);assert.equal(analysis.nodes,3+p.nodes);const events=[];
+  const add=(id,text)=>events.push({id,text,qualityClaim:false,evidence:{experiment:'E149',before,after:expected.after,detail:{source:'minorityStructureAnalysis.witness'}}});
+  if(expected.lever)add('minority-pawn-lever',`Minority attack: ${move.san} advances the smaller wing pawn group into new legal pawn contact. This identifies a lever, without judging its quality.`);
+  if(expected.health)add('bounded-structural-exploitation',`Structural exploitation: your pawns have fewer isolated pawns and no more doubled files; this isolated-pawn capture retains ${expected.health.minimumGain} nominal point through every immediate reply.`);
+  if(expected.recorded)add('recorded-minority-attack',`Recorded minority attack: the smaller pawn group exchanged, creating this isolated target; its capture retains ${expected.recorded.minimumGain} nominal point through every immediate reply.`);
+  assert.deepEqual(result.events.filter(e=>e.evidence?.experiment==='E149'),events);assert.equal(analysis.status,p.claimContexts.length?'claim-rule-prerequisite':events.length?'proven':'compared');for(const e of events)assert.ok(e.text.split(/\s+/).length<=24);return true;
+}

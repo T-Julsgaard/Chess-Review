@@ -1,0 +1,15 @@
+import {Chess} from '../../../../lib/chess.js';
+import {validateHistory} from '../../E024-transitions/code/transitions.mjs';
+import {structure,wing,victim} from './panel.mjs';
+import {minimum} from '../../E148-causal-center-instability/code/derive.mjs';
+const other=c=>c==='w'?'b':'w';
+function lever(c,m,replies){
+  if(m.piece!=='p'||m.captured||m.promotion||m.from[0]!==m.to[0]||(+m.to[1]-+m.from[1])*(m.color==='w'?1:-1)<=0)return null;const s=structure(c),files=wing(m.from),own=s[m.color].pawns.filter(q=>files.includes(q[0])),enemy=s[other(m.color)].pawns.filter(q=>files.includes(q[0])),oldContact=c.attackers(m.from,other(m.color)).filter(q=>c.get(q)?.type==='p').sort(),captures=replies.filter(r=>r.piece==='p'&&r.captured==='p'&&r.victim===m.to&&files.includes(r.from[0]));if(!own.length||own.length>=enemy.length||oldContact.length||!captures.length)return null;return{files,own,enemy,oldContact,captures:captures.map(r=>({move:r.move,san:r.san,from:r.from,to:r.to,enPassant:r.enPassant,victim:r.victim}))};
+}
+export function derive(input,p){
+  const c=new Chess(p.before),actor=p.actor,enemy=other(actor),m=c.moves({verbose:true}).find(m=>m.from+m.to+(m.promotion||'')===input.move),row=p.variants.find(r=>r.move===input.move),w={experiment:'E149',panel:p,before:p.before,after:null,actor,played:input.move,san:m.san,lever:null,health:null,recorded:null};c.move(input.move);w.after=c.fen();if(!row||p.claimContexts.length)return w;
+  w.lever=lever(new Chess(p.before),m,row.pawnCaptures);const gain=minimum(row.captureLedger),s=p.beforeStructure;
+  if(m.captured==='p'&&s[enemy].isolated.includes(victim(m))&&s[actor].isolated.length<s[enemy].isolated.length&&s[actor].doubled.length<=s[enemy].doubled.length&&gain!==null)w.health={target:victim(m),own:s[actor],enemy:s[enemy],minimumGain:gain};
+  const h=validateHistory(input);if(!h||h.records.length<4||m.captured!=='p'||gain===null)return w;const records=h.records.slice(-4),[a,b,d,e]=records.map(r=>r.move),start=new Chess(records[0].before),afterA=new Chess(records[0].after),reply=afterA.moves({verbose:true}).map(r=>({move:r.from+r.to+(r.promotion||''),san:r.san,from:r.from,to:r.to,piece:r.piece,captured:r.captured||null,enPassant:r.isEnPassant(),victim:victim(r)})),first=lever(start,a,reply),initial=structure(start),exchange=structure(new Chess(records[2].after)),target=victim(m);
+  if(first&&a.color===actor&&b.piece==='p'&&b.captured==='p'&&victim(b)===a.to&&!b.promotion&&d.piece==='p'&&d.captured==='p'&&victim(d)===b.to&&!d.promotion&&d.from!==a.from&&first.files.includes(d.from[0])&&first.files.includes(d.to[0])&&e.piece!=='p'&&!e.captured&&!e.promotion&&wing(target)===first.files&&!initial[enemy].isolated.includes(target)&&initial[enemy].pawns.includes(target)&&exchange[enemy].isolated.includes(target)&&s[enemy].isolated.includes(target))w.recorded={prefix:{fen:h.start,moves:h.moves.slice(0,-4)},sequence:records.map(r=>({before:r.before,move:r.move.from+r.move.to+(r.move.promotion||''),after:r.after})),lever:first,initialStructure:initial,exchangeStructure:exchange,target,minimumGain:gain};return w;
+}
