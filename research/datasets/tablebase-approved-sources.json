@@ -1,0 +1,46 @@
+{
+  "schema": "tablebase-approved-sources-v1",
+  "policyVersion": "tablebase-data-v1",
+  "dataset": "T001",
+  "originFormat": "syzygy-kqk-v1",
+  "manifest": "research/datasets/T001-syzygy-kqk/manifest.json",
+  "source": {
+    "id": "syzygy-generated-kqk",
+    "publisher": "Ronald de Man (generator); Lichess (host)",
+    "status": "approved",
+    "public": true,
+    "freeToUse": true,
+    "grant": "Syzygy-generator-redistribution-permission",
+    "verifiedOn": "2026-10-10",
+    "allowedPurposes": [
+      "collect",
+      "inspect",
+      "test",
+      "analyze",
+      "reuse",
+      "examples"
+    ],
+    "permissionEvidence": {
+      "path": "research/datasets/evidence/syzygy-kqk-permission-2026-10-10.md",
+      "sha256": "97d3c5b7e937ed190050735e3410c06d90b997a3d7358f2f5d85de153485a67a"
+    },
+    "checksumEvidence": {
+      "path": "research/datasets/evidence/syzygy-kqk-checksums-2026-10-10.json",
+      "sha256": "a2cc24cd4b2295bf8f776f11af0c1030b018b077356a8d18c9bca65ea68ed6ea"
+    },
+    "exports": [
+      {
+        "name": "KQvK.rtbw",
+        "url": "https://tablebase.lichess.ovh/tables/standard/3-4-5-wdl/KQvK.rtbw",
+        "bytes": 272,
+        "sha256": "517667dff787162dbb1ed9d5d6484d30ee854e686ee0675c08d99ecf045d2d50"
+      },
+      {
+        "name": "KQvK.rtbz",
+        "url": "https://tablebase.lichess.ovh/tables/standard/3-4-5-dtz/KQvK.rtbz",
+        "bytes": 5392,
+        "sha256": "71ea9444fa5bd42897d781a0c356975ea6f23e0f65a4254e470897031c161c8c"
+      }
+    ]
+  }
+}

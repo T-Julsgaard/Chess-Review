@@ -1,0 +1,3 @@
+# Preserve the exact upstream bytes checked by the probe dependency lock.
+chess/*.py -text
+COPYING -text

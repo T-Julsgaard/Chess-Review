@@ -1,0 +1,2 @@
+import {setup} from '../../E021-structural-concepts/code/fixtures.mjs';
+export const fixtures=[{id:'authored-queen-root',fen:setup({a7:null,h2:null,d1:'Q'}),move:'d1d2',expected:['admitted-tablebase-panel','zero-counter-tablebase-win','reported-tablebase-dtz']},{id:'authored-capturable-queen-root',fen:setup({a7:null,h2:null,h7:'Q'}).replace(' w ',' b '),move:'h8h7',expected:['admitted-tablebase-panel','zero-counter-tablebase-draw','reported-tablebase-dtz']}].map(f=>({...f,history:{fen:f.fen,moves:[]},admittedTablebaseTags:true,scanReplies:false}));

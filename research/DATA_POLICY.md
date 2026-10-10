@@ -2,6 +2,15 @@
 
 Policy version: `public-data-v1`, adopted 2026-10-05.
 
+Computed-tablebase addendum, 2026-10-10: [TABLEBASE_DATA_POLICY.md](TABLEBASE_DATA_POLICY.md)
+defines a separate, explicitly registered namespace for generated endgame tables.
+This is a policy revision for those non-game artifacts only. Their permission,
+exact exports and origin format must pass `openResearchTablebases()`; a game-data
+receipt cannot admit them. Existing `public-data-v1` game registry/validator,
+origins and archived receipt meanings remain unchanged. Requirements below for
+game-derived data continue unchanged. The old document fingerprint remains part
+of historical evidence; do not rewrite archived receipts to hide this addendum.
+
 ## Mandatory eligibility rule
 
 Research may collect, inspect or use real games and game-derived data only from
