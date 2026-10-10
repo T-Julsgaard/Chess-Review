@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {isDeepStrictEqual} from 'node:util';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {gzipSync} from 'node:zlib';
+import {execFileSync} from 'node:child_process';
+import os from 'node:os';
+import {createHash} from 'node:crypto';
+import {openResearchData} from '../../../data-policy.mjs';
+import {fixtures} from './fixtures.mjs';
+import {explainMove} from './attack-context.mjs';
+import {explainMove as parent} from '../../E165-comparative-sacrificial-attack/code/attack.mjs';
+import {checkWitness} from './check-witness.mjs';
+import {savedPanels,key,dir} from './saved.mjs';
+const data=await openResearchData(['D001'],{purpose:'test'}),saved=await savedPanels(),build=JSON.parse(await readFile(dir+'/build.json','utf8')),rows=[],used=new Map();let reused=0,fresh=0;for(const input of fixtures){const found=saved.get(input),result=explainMove({...input,...(found?{[input.attackContextMode==='development'?'developmentAttackPanel':'capacityPanel']:found.raw}:{})});assert.deepEqual(result.events.filter(e=>e.evidence?.experiment==='E166').map(e=>e.id),input.expected,input.id);if(result.attackContextAnalysis.witness){checkWitness(input,result);if(found)reused++;else fresh++;saved.store(input,result.attackContextAnalysis.witness.raw);used.set(key(input),{input,raw:result.attackContextAnalysis.witness.raw});}const inherited=parent(input);assert.ok(isDeepStrictEqual(explainMove({...input,attackContextTags:false}),inherited));rows.push({input,result,inherited});}const observations=gzipSync(JSON.stringify({sourceHashes:saved.hashes,rows:[...used.values()]}),{level:9}),results=gzipSync(JSON.stringify({rows}),{level:9});await mkdir(dir+'/evidence',{recursive:true});await writeFile(dir+'/evidence/observations.json.gz',observations);await writeFile(dir+'/evidence/results.json.gz',results);const hash=b=>createHash('sha256').update(b).digest('hex');await writeFile(dir+'/evidence/run.json',JSON.stringify({experiment:'E166',preregistration:'f67ab73',revision:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),argv:process.argv,node:process.version,platform:process.platform,arch:process.arch,os:os.release(),engine:null,seed:null,datasetReceipt:data.receipt,sourceHashes:build.inputHashes,outputs:{observations:hash(observations),results:hash(results)},cases:rows.length,witnesses:rows.filter(r=>r.result.attackContextAnalysis.witness).length,positives:rows.filter(r=>r.input.expected.length).length,reused,fresh},null,2)+'\n');console.log(JSON.stringify({cases:rows.length,reused,fresh,bytes:observations.length+results.length}));

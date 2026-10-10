@@ -1,0 +1,9 @@
+Command: node research/experiments/E166-development-defender-capacity/code/smoke.mjs
+Exit 1, Node.js v24.20.0, before any query.
+Error: Invalid move: f4e5
+at Chess.move (lib/chess.js:1129:23)
+at make (code/fixtures.mjs:4:266)
+at code/fixtures.mjs:4:318
+at ModuleJob.run (node:internal/modules/esm/module_job:561:25)
+at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+Original fixture source: initial-fixtures.mjs.txt.

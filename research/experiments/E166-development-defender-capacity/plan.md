@@ -80,3 +80,14 @@ compressed evidence soft target with justified overruns. No new real games,
 engine/tablebase, human review or untouched confirmation. Full cumulative/
 exhaustive occurrence/absence/priority/history/budget tests and changed main/
 repeat/initially clean reproductions deferred to combined source freeze.
+
+## 2026-10-10 legal-history amendment before queries
+
+First smoke failed during fixture construction: f4-e5 is not a knight move.
+No chess query or development/defender outcome evaluated. Preserve original
+fixtures and error in evidence/. Replace only the prospective matched histories:
+actual e4/e5 Nf3/d6 Bc4/Bg4 Nc3/a6 a3/g6 Nxe5/Bxd1;
+alternative e4/e5 Nf3/d6 Be2/Bg4 Bc4/a6 a3/g6 Nxe5/Bxd1.
+The bishop's two-step route replaces the knight development tempo. Both roots
+now share Pa3/Pa6, all other placements and material, except Nc3 versus Nb1.
+Same Bxf7+ and unchanged finite-mate/development comparison gates; no relaxation.

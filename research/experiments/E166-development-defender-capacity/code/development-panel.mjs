@@ -1,0 +1,4 @@
+import {legalPosition,uci} from '../../E020-coach-concepts/code/concepts.mjs';
+import {tracedQuery} from '../../E144-causal-piece-coordination/code/query.mjs';
+import {describe,flags} from '../../E153-second-target-defense/code/panel.mjs';
+export function collectPanel(ctx,H,limit){let nodes=0;const tick=()=>{if(++nodes>limit)throw Error('attack-context-budget');};tick();const p={schema:'E166-paired-development-attack-v1',plies:H,variants:[],nodes:0};for(const f of [ctx.actual,ctx.alternative]){tick();const input=f.input,c=legalPosition(input.history.fen);for(const m of input.history.moves){tick();c.move(m);}const before=c.fen(),actor=c.turn();tick();const played=c.move(input.move),after=c.fen(),legal=c.moves({verbose:true}).sort((a,b)=>uci(a).localeCompare(uci(b))).map(describe),query=tracedQuery(c,actor,H,tick);p.variants.push({input,before,after,actor,played:describe(played),flags:flags(c),legal,query});}tick();p.nodes=nodes;return p;}
