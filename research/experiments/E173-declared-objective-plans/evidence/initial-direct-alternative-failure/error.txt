@@ -1,0 +1,1 @@
+Initial smoke exited 1 in context: Plan requires distinct quiet same-unit first moves. Direct-entry alternative a1b1 lands on own Kb1. First two cases passed (nodes 51 and 39), but the initial runner saved only after the loop, so their complete raw panels were not persisted. No full raw observations available for those two searches.

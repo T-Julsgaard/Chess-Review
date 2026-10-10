@@ -1,0 +1,8 @@
+import assert from 'node:assert/strict';import {isDeepStrictEqual} from 'node:util';import {verifyPanel} from './verify-panel.mjs';
+export function checkWitness(i,r){
+  const a=r.planAnalysis,w=a.witness,p=w.panel,H=i.planPlies===undefined?3:i.planPlies,checked=verifyPanel(i,H,p),[actual,alt]=p.variants,claim=checked.claim;
+  const objective=!claim&&actual.query.tree.win,short=objective&&!actual.state.goal,formed=short&&!alt.query.tree.win,before=p.root.fen,after=actual.state.fen;
+  assert.ok(isDeepStrictEqual(w,{experiment:'E173',before,after,panel:p,work:3,claim,objective,short,formed}));assert.equal(a.nodes,3+i.history.moves.length+checked.nodes+3);assert.equal(a.limit,i.maxPlanNodes===undefined?50000:i.maxPlanNodes);assert.equal(a.plies,H);assert.equal(a.status,objective?'proven':claim?'claim-rule-prerequisite':'compared');assert.equal(r.before,before);assert.equal(r.after,after);
+  const texts={'declared-rook-entry-objective':"Declared objective: the original rook can reach the seventh rank within the stated bound against every defense.",'complete-short-objective-plan':"Short plan: this first move leaves a complete policy for the original rook's seventh-rank entry after every reply.",'comparative-objective-plan-formed':"Establishing the declared route: this move permits the complete short policy; the supplied quiet alternative does not."},ids=[...(objective?['declared-rook-entry-objective']:[]),...(short?['complete-short-objective-plan']:[]),...(formed?['comparative-objective-plan-formed']:[])];
+  assert.ok(isDeepStrictEqual(r.events.filter(e=>e.evidence?.experiment==='E173'),ids.map(id=>({id,text:texts[id],qualityClaim:false,evidence:{experiment:'E173',before,after,detail:{source:'planAnalysis.witness'}}}))));return true;
+}

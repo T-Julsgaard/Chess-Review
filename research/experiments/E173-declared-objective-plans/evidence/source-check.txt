@@ -1,0 +1,5 @@
+
+> chess-review@0.3.0 verify:source
+> node scripts/verify-source.mjs
+
+Maintained source and numerical model verified.
