@@ -1,0 +1,10 @@
+
+> chess-review@0.3.0 research:coach-tests
+> node research/workflow.mjs test E181
+
+Focused development checks: E181 (1 test files).
+Focused checks do not replace the final full regression or independent proof/reproducibility checks.
+....................
+...............
+
+Focused checks passed in 177.2 seconds.

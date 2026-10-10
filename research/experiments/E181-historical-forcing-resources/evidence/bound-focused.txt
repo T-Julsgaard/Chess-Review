@@ -1,0 +1,28 @@
+✔ conversion history resource and distinct live/terminal gates 0 (454.0284ms)
+✔ conversion history resource and distinct live/terminal gates 1 (274.2771ms)
+✔ conversion history resource and distinct live/terminal gates 2 (246.6643ms)
+✔ conversion history resource and distinct live/terminal gates 3 (222.9447ms)
+✔ conversion history resource and distinct live/terminal gates 4 (270.1814ms)
+✔ conversion history resource and distinct live/terminal gates 5 (302.7769ms)
+✔ conversion history resource and distinct live/terminal gates 6 (749.1809ms)
+✔ conversion history resource and distinct live/terminal gates 7 (726.6182ms)
+✔ source snapshots unchanged by explicit evaluator (40.2298ms)
+✔ inspector missing current continuation abstains instead of assuming loss (32.5352ms)
+✔ fresh/cached exact, one-short and zero budgets agree atomically (1681.0909ms)
+✔ genuine irreversible history prefix and selected source start (944.679ms)
+✔ independent changed decision rejects bound (363.5063ms)
+✔ independent changed decision rejects frame (331.6433ms)
+✔ independent changed decision rejects history (331.6534ms)
+✔ independent changed decision rejects terminal (311.8122ms)
+✔ independent changed decision rejects defenses (469.3219ms)
+✔ independent changed decision rejects ledger (211.7483ms)
+✔ independent changed decision rejects nodes (235.1575ms)
+✔ longer earlier policy remains covered when actual mate finishes sooner (10366.7079ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 31428.2984

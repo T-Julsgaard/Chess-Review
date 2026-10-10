@@ -1,0 +1,1 @@
+{"cases":24,"decisions":72,"available":{"C0583":8,"C0594":4,"C0598":6},"newMateQueries":0,"newRawTrees":2,"bytes":46663}

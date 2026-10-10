@@ -1,0 +1,41 @@
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {Chess} from '../../../../lib/chess.js';
+import {checkWitness as checkConversion} from '../../E155-recorded-advantage-conversion/code/check-witness.mjs';
+import {checkWitness as checkHunt} from '../../E164-king-hunt-shelter/code/check-witness.mjs';
+import {verifyTree} from '../../E146-retrograde-calculation/code/verify-tree.mjs';
+import {scopes,ids} from './scopes.mjs';
+// Independent history, recursive winning policies, frame/bound and scope gates.
+const cache=new Set(),code=m=>m.from+m.to+(m.promotion||'');
+function solve(g,actor){const values=Array(g.tree.length);function visit(id){const n=g.tree[id];for(const e of n.edges)visit(e.child);let win=false,rank=null;if(n.kind==='mate'&&n.outcome===actor){win=true;rank=0;}if(n.kind==='branch'){if(n.turn===actor){for(const e of n.edges){const v=values[e.child];if(v.win){win=true;rank=rank===null?v.rank+1:Math.min(rank,v.rank+1);}}}else{win=true;let longest=0;for(const e of n.edges){const v=values[e.child];if(!v.win)win=false;else longest=Math.max(longest,v.rank);}if(win)rank=longest+1;}}values[id]={win,rank};}visit(0);const policy=[];function route(id){if(!values[id].win)return;const n=g.tree[id],moves=[];for(const e of n.edges)if(n.turn!==actor||values[e.child].win)moves.push(e);policy.push({node:id,rank:values[id].rank,moves:moves.map(e=>e.move)});for(const e of moves)route(e.child);}route(0);return{values,policy};}
+function bound(t){if(t.kind==='mate')return 0;if(t.kind==='choice')return 1+bound(t.child);assert.equal(t.kind,'all');let longest=0;for(const b of t.branches)longest=Math.max(longest,bound(b.child));return longest+1;}
+export function checkHistory(source,input,result,options,output,raw){
+ assert.ok(['conversion','hunt'].includes(source));assert.ok(options&&typeof options==='object'&&!Array.isArray(options));assert.ok(Object.keys(options).every(k=>['continuation','maxMomentumNodes'].includes(k)));const limit=options.maxMomentumNodes===undefined?50000:options.maxMomentumNodes;assert.ok(Number.isSafeInteger(limit)&&limit>=0&&limit<=50000);
+ const flag=source==='conversion'?'conversionTags':'kingChaseTags',capKey=source==='conversion'?'maxConversionNodes':'maxKingChaseNodes',hKey=source==='conversion'?'conversionPlies':'kingChasePlies',cap=input[capKey]===undefined?50000:input[capKey],H=input[hKey]===undefined?(source==='hunt'&&input.kingChaseMode==='shelter'?3:2):input[hKey];assert.equal(input[flag],true);assert.ok(Number.isSafeInteger(cap)&&cap>=0&&cap<=50000);assert.ok(Number.isSafeInteger(H)&&H>=0&&H<=(source==='conversion'?4:3));if(source==='conversion'){const start=input.conversionStartPly===undefined?0:input.conversionStartPly;assert.ok(Number.isSafeInteger(start)&&start>=0&&start<=1000);}else assert.ok(['hunt','shelter'].includes(input.kingChaseMode)&&options.continuation===undefined);
+ let nodes=1,status,continuation=null,values=null,policy=[],want;
+ const finish=(s,proofs={})=>{const statuses=typeof s==='string'?Object.fromEntries(ids.map(id=>[id,s])):s;want=ids.map(id=>({id,...scopes[id],available:statuses[id]==='available',status:statuses[id],proof:statuses[id]==='available'?proofs[id]:null}));assert.deepEqual(output,{analysis:{source,limit,nodes,status,continuation,values,policy},decisions:want});};
+ const absent=s=>{status=s;finish(s);},exhaust=()=>{nodes=limit+1;continuation=null;values=null;policy=[];absent('exhausted');};
+ if(limit===0){exhaust();return;}if(input.history===undefined){absent('history-prerequisite');return;}
+ const c=new Chess(input.history.fen),records=[];for(const move of input.history.moves){assert.equal(c.isGameOver(),false);const before=c.fen(),m=c.move(move);records.push({before,after:c.fen(),move:code(m),san:m.san,turn:m.color});}assert.equal(c.fen(),new Chess(input.fen).fen());assert.equal(c.isGameOver(),false);const before=c.fen(),actor=c.turn(),played=c.move(input.move),after=c.fen(),current={before,after,move:code(played),san:played.san,turn:played.color},live=!c.isGameOver(),checking=c.isCheck();
+ const key=source==='conversion'?'conversionAnalysis':'kingChaseAnalysis',a=result?.[key];if(!a){absent('source-unavailable');return;}
+ assert.ok(Number.isSafeInteger(a.nodes)&&a.nodes>=0&&a.nodes<=cap+1&&(!a.witness||a.nodes<=cap));nodes=2+a.nodes+input.history.moves.length+1;if(nodes>limit){exhaust();return;}const w=a.witness;if(!w){absent('source-unavailable');return;}
+ const fingerprint=createHash('sha256').update(JSON.stringify(structuredClone([source,input,result]))).digest('hex');if(!cache.has(fingerprint)){source==='conversion'?checkConversion(w,result,input):checkHunt(input,result);cache.add(fingerprint);}
+ if(source==='hunt'&&input.kingChaseMode!=='hunt'){absent('historical-mode-prerequisite');return;}
+ let historical=false,historicalChecks=false,positive=c.isCheckmate()&&c.turn()!==actor,rank=positive?0:null,defenses=[],span,firstBefore,firstAfter,earlierContinuationPlies,certificate='actual-checkmate',claims=false;
+ if(source==='conversion'){
+  claims=w.graph.claimNodes.length>0;const start=input.conversionStartPly===undefined?0:input.conversionStartPly,old=solve(w.graph,actor),recorded=[...records.slice(start),current];span=recorded.map(r=>r.move);firstBefore=recorded[0].before;firstAfter=recorded[0].after;earlierContinuationPlies=w.graph.plies;
+  const own=recorded.filter(r=>r.turn===actor);historicalChecks=own.length>=2;for(const r of own)if(!/[+#]/.test(r.san))historicalChecks=false;
+  historical=old.values[0].win;let id=0;for(const r of records.slice(start+1)){const n=w.graph.tree[id],edge=n.edges.find(e=>e.move===r.move);if(!edge||!old.values[id].win){historical=false;break;}id=edge.child;if(!old.values[id].win)historical=false;}if(w.graph.tree[id].fen!==before)historical=false;
+  if(claims){absent('claim-rule-prerequisite');return;}
+  if(options.continuation!==undefined||live&&checking){
+   const g=options.continuation===undefined?(raw||output.analysis.continuation):options.continuation;if(!g){absent('continuation-prerequisite');return;}
+   verifyTree({...input,retrogradeCalculationPlies:2},g);const cost=nodes+g.nodes+g.tree.length;if(cost>limit){exhaust();return;}nodes=cost;continuation=g;({values,policy}=solve(g,actor));if(g.claimNodes.length){absent('claim-rule-prerequisite');return;}positive=values[0].win;rank=values[0].rank;defenses=g.tree[0].edges.map(e=>e.move);certificate='continuation.tree[0]';
+  }
+ }else{
+  const H=input.kingChasePlies===undefined?2:input.kingChasePlies,p=new Chess(input.history.fen);for(const r of records.slice(0,-2))p.move(r.move);firstBefore=p.fen();const first=p.move(records.at(-2).move);firstAfter=p.fen();const legal=p.moves({verbose:true}).map(code).sort();historicalChecks=p.isCheck()&&checking;claims=!!w.panel.claimContext||p.isDrawByFiftyMoves()||p.isThreefoldRepetition();p.move(records.at(-1).move);historical=legal.length===1&&legal[0]===records.at(-1).move&&p.fen()===before;span=[code(first),records.at(-1).move,input.move];earlierContinuationPlies=H+2;
+  if(claims){absent('claim-rule-prerequisite');return;}const row=w.panel.rows.find(r=>r.move===input.move);positive=row.actor.tree.win;rank=positive?bound(row.actor.tree):null;defenses=row.actor.tree.kind==='all'?row.actor.tree.branches.map(b=>b.move):[];certificate='panel.rows['+input.move+'].actor';
+ }
+ const historyProof={source,actor,firstBefore,firstAfter,firstMove:span[0],recordedSpan:span,earlierContinuationPlies,extendedTotalPlies:span.length+(rank??0),current:{frame:'after-actual',fen:after,winner:actor,plies:rank,certificate},branching:source==='conversion'?'complete-earlier-policy':'unique-prior-defense'},defenseProof={source,frame:'after-actual',fen:after,actor,played:input.move,plies:rank,certificate,defenses};
+ const statuses={};for(const id of ids){if(id==='C0598')statuses[id]=!live?'terminal-prerequisite':!checking?'checking-prerequisite':positive?'available':'bounded-unresolved';else if(id==='C0594'&&!live)statuses[id]='terminal-prerequisite';else statuses[id]=!historicalChecks?'historical-check-prerequisite':!historical?'historical-policy-prerequisite':!positive?'current-policy-unresolved':'available';}
+ status=Object.values(statuses).includes('available')?'available':'compared';finish(statuses,{C0583:historyProof,C0594:{...historyProof,defenses},C0598:defenseProof});
+}
