@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {isDeepStrictEqual} from 'node:util';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {gzipSync} from 'node:zlib';
+import {execFileSync} from 'node:child_process';
+import os from 'node:os';
+import {createHash} from 'node:crypto';
+import {openResearchData} from '../../../data-policy.mjs';
+import {fixtures} from './fixtures.mjs';
+import {explainMove} from './attack.mjs';
+import {explainMove as parent} from '../../E164-king-hunt-shelter/code/king.mjs';
+import {checkWitness} from './check-witness.mjs';
+import {savedPanels,key,dir} from './saved.mjs';
+const data=await openResearchData(['D001'],{purpose:'test'}),saved=await savedPanels(),build=JSON.parse(await readFile(dir+'/build.json','utf8')),rows=[],used=new Map();let reused=0,fresh=0;for(const input of fixtures){const found=saved.cache.get(key(input)),result=explainMove({...input,...(found?{attackPolicyPanel:found.panel}:{})});assert.deepEqual(result.events.filter(e=>e.evidence?.experiment==='E165').map(e=>e.id),input.expected,input.id);if(result.attackPolicyAnalysis.witness){checkWitness(input,result);if(found)reused++;else fresh++;const row={input,panel:result.attackPolicyAnalysis.witness.panel};saved.cache.set(key(input),row);used.set(key(input),row);}const inherited=parent(input);assert.ok(isDeepStrictEqual(explainMove({...input,attackPolicyTags:false}),inherited));rows.push({input,result,inherited});}const observations=gzipSync(JSON.stringify({sourceHashes:saved.hashes,rows:[...used.values()]}),{level:9}),results=gzipSync(JSON.stringify({rows}),{level:9});await mkdir(dir+'/evidence',{recursive:true});await writeFile(dir+'/evidence/observations.json.gz',observations);await writeFile(dir+'/evidence/results.json.gz',results);const hash=b=>createHash('sha256').update(b).digest('hex');await writeFile(dir+'/evidence/run.json',JSON.stringify({experiment:'E165',preregistration:'08af4b8',revision:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),argv:process.argv,node:process.version,platform:process.platform,arch:process.arch,os:os.release(),engine:null,seed:null,datasetReceipt:data.receipt,sourceHashes:build.inputHashes,outputs:{observations:hash(observations),results:hash(results)},cases:rows.length,witnesses:rows.filter(r=>r.result.attackPolicyAnalysis.witness).length,positives:rows.filter(r=>r.input.expected.length).length,reused,fresh},null,2)+'\n');console.log(JSON.stringify({cases:rows.length,reused,fresh,bytes:observations.length+results.length}));
