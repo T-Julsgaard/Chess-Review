@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "cases": 16,
+  "decisions": 64,
+  "rawPanels": 4,
+  "retainedFailureArtifacts": 6,
+  "collectionBindings": 20,
+  "sourceBindings": 922,
+  "pilotSha256": "e331a4dafad066e5da16a7bca0197efe4b5b723e540256b6460b6eb1e1e884ca",
+  "panelSha256": "8280304e899042d580b26993867fd83e4c37d838dcbc9fb9091fccea5fcb77c3",
+  "limitations": "Shares legal Chess, old E106 independent proof checker and old ordinary-data helper. Imports no E184 runtime/context/collector/admission. Synthetic development, not full original definitions or human validity."
+}

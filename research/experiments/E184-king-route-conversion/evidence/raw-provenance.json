@@ -1,0 +1,37 @@
+{
+  "experiment": "E184",
+  "rootAmendment": "e313fa1",
+  "command": "node research/experiments/E184-king-route-conversion/code/smoke.mjs",
+  "sourceState": "Actual working source, not pristine HEAD; corrected collector source snapshot reconstructed exactly from retained traced six-file snapshot plus only registered fixture and output filename edits. Frozen recursive imports unchanged. Final stricter controls/admission replays saved queries without recollection.",
+  "sourceHashes": {
+    "lib/chess.js": "a0b289b6530990bb49e78ccfb4ccf8ed18d9a5cb3713c44c433cbfab8725a6f6",
+    "research/d001-format.mjs": "5dffe4a50655536950d2bb8c475fef31f493cfb9b47cfcaad808b0fb087ea24d",
+    "research/data-policy.mjs": "595ea82720f6699405b19e0f64fdc793597ace0b9e5b9096b482b9781c3d7225",
+    "research/experiments/E020-coach-concepts/code/concepts.mjs": "b6e917d81c675175f840b19233ebcac61591ac163e5277fa6a1f12a3b9aaa692",
+    "research/experiments/E021-structural-concepts/code/explain.mjs": "b2578320f9d6a81c2a803789126ea0104ce720890361c953cd1b2811e3811be6",
+    "research/experiments/E021-structural-concepts/code/features.mjs": "88ae24e21f310e53aa26263a26b13c990c34e86cbe56df128ed80585e966df66",
+    "research/experiments/E022-move-tactics/code/tactics.mjs": "04ea550a22503c1f3aa13cb822dcb67fcca130bb86102faa171ca588359592d4",
+    "research/experiments/E023-broad-tactics/code/tactics.mjs": "a00d789ffb538ed5a274257c82420716716e04ddfe84e970d115aee1cee01a74",
+    "research/experiments/E024-transitions/code/transitions.mjs": "14c933ccf39ca66e89803d04701defb311f02bc4519001369878d1c66f9fb437",
+    "research/experiments/E106-ending-conversion-policies/code/check-policy.mjs": "1f0055773d1dc51801c7baf30bda41335cac2df04e416a35992bb851bc2e29d1",
+    "research/experiments/E183-recorded-initiative-turnover/code/plain.mjs": "55383721408cb03afe75a35b5680c2c6c97650d20675c5a95053cce340ebea14",
+    "research/experiments/E184-king-route-conversion/code/admit-proof.mjs": "605222a79232693e7dd9e08b2c8789220dd59a4788bec3bd23cb0e6eedecbe60",
+    "research/experiments/E184-king-route-conversion/code/context.mjs": "56a2d8bd1c03505653812c926e95891c2eb925eaa77582b23313643a8210063b",
+    "research/experiments/E184-king-route-conversion/code/fixtures.mjs": "b4bf5cdcd407f116b99d2b752020dc55d419341cc8a4224d611d943776fc1743",
+    "research/experiments/E184-king-route-conversion/code/routes.mjs": "192dee0cd6e780da22051428ef429b2928c2d2b76cab71ebffaef697efd94d2b",
+    "research/experiments/E184-king-route-conversion/code/smoke.mjs": "a1e75e842276d2b7b41a0e3718805ffb6c2fa7abc30740a31578ee4f21ce911b",
+    "research/experiments/E184-king-route-conversion/code/trace-policy.mjs": "fb68e199280a6248233dd2d5e8cc320db2e3419194f372a5f771f6443600b3b1",
+    "research/experiments/FRIEND-shared/lib.mjs": "db5f0b05bfb833a7c37565fe5b9d066de9ef6a7132d561e5dfa1ca6bfb9038d5",
+    "research/fresh-format.mjs": "6537d177ad21cbe16c89471040e63d0f42ad43a69e4f189787b8dcf2624e5b21",
+    "tools/calibration/core.mjs": "c9f38c42f4937fcfdcb3bd44fdaf1d4eea6323c69533a24ca16779cfc4178ace"
+  },
+  "artifacts": {
+    "initial-smoke.json.gz": "1b81ffd2ad3b6078c7c2ae47c062a1f0cd140d659ef44003ea6d993f529bdc11",
+    "traced-smoke.json.gz": "18d4b16cad3861ea5008fc26b750d813470ee217260ff18943bb105ece5d530d",
+    "corrected-smoke.json.gz": "8280304e899042d580b26993867fd83e4c37d838dcbc9fb9091fccea5fcb77c3",
+    "initial-source.json.gz": "4013b3def18d10e23e227a35b4e59eafe607c2932dc3b117931ba88e7f9ec28b",
+    "traced-source.json.gz": "8a3c3aa5f8c3964ebbeda1818ec935bf62e8011c23c2d08c3d5dbdfb3edd86db",
+    "corrected-collection-source.json.gz": "7ca8df599b38945f6f69bfe15ef1db72d03f51e8c56275bf974e8aaa1130e3f0"
+  },
+  "reuse": "Older compact E106 policies lack attempted-prefix search trace; changed authored roots do not match E184 earlier observations. Four corrected panels collected once, no further H6 collection."
+}

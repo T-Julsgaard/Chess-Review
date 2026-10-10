@@ -6,7 +6,7 @@ export function admitProof(q,c,actor,pawn,H,baseline){
  assert.equal(q.actor,actor);assert.equal(q.pawn,pawn);assert.equal(q.plies,H);assert.equal(q.baselineFen,baseline);
  checkConversion(q,c);let cost=0,claims=false;
  function visit(n,left){
-  cost++;claims||=c.isThreefoldRepetition()||c.isDrawByFiftyMoves();
+  cost++;assert.equal(n.fen,c.fen());claims||=c.isThreefoldRepetition()||c.isDrawByFiftyMoves();
   for(const r of n.probe?.responses||[]){cost++;c.move(r.move);try{claims||=c.isThreefoldRepetition()||c.isDrawByFiftyMoves();}finally{c.undo();}}
   let edges=n.branches||[];
   if(n.child){
@@ -17,7 +17,7 @@ export function admitProof(q,c,actor,pawn,H,baseline){
   }else assert.equal(n.tried,undefined);
   for(const e of edges){cost++;c.move(e.move);try{
    if(n.tried?.includes(e)){
-    if(e.child.square===null){assert.ok(c.isInsufficientMaterial());assert.equal(e.child.kind,'draw');assert.equal(e.child.win,false);}
+    if(e.child.square===null){assert.ok(c.isInsufficientMaterial());assert.deepEqual(e.child,{fen:c.fen(),kind:'draw',win:false,square:null});}
     else checkConversion({...q,rootFen:c.fen(),pawn:e.child.square,plies:left-1,win:e.child.win,tree:e.child},c);
    }
    visit(e.child,left-1);

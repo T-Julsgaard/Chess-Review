@@ -7,7 +7,7 @@ const object=(x,keys)=>x&&typeof x==='object'&&!Array.isArray(x)&&Object.keys(x)
 export function controls(input,options){
  plain([input,options]);
  if(!object(options,['enabled','alternative','plies','maxNodes','proofs']))throw Error('Invalid king-route options');
- const enabled=options.enabled??false,H=options.plies??4,limit=options.maxNodes??50000;
+ const enabled=options.enabled===undefined?false:options.enabled,H=options.plies===undefined?4:options.plies,limit=options.maxNodes===undefined?50000:options.maxNodes;
  if(typeof enabled!=='boolean'||!Number.isSafeInteger(H)||H<0||H>6||!Number.isSafeInteger(limit)||limit<0||limit>50000)throw Error('Invalid king-route controls');
  if(options.alternative!==undefined&&!code(options.alternative))throw Error('Expected alternative UCI');
  if(options.proofs!==undefined&&(!object(options.proofs,['actual','alternative'])||!options.proofs.actual||!options.proofs.alternative))throw Error('Expected paired proofs');
