@@ -1,0 +1,24 @@
+import {checkWitness} from '../../E143-forcing-tempo-initiative/code/check-witness.mjs';
+import {explainMove} from '../../E143-forcing-tempo-initiative/code/tempo.mjs';
+import {validateHistory} from '../../E024-transitions/code/transitions.mjs';
+import {validateIds,decisions} from './scopes.mjs';
+export function evaluateForcing(ids,input){validateIds(ids,'forcing');const result=explainMove({...input,forcingTempoTags:true});return {result,decisions:inspectForcing(ids,{...input,forcingTempoTags:true},result)};}
+export function inspectForcing(ids,input,result){
+  validateIds(ids,'forcing');
+  if(input.forcingTempoTags!==true)throw Error('Explicit enabled E143 input required');
+  const limit=input.maxForcingTempoNodes===undefined?50000:input.maxForcingTempoNodes,H=input.forcingTempoPlies===undefined?2:input.forcingTempoPlies;
+  if(!Number.isSafeInteger(limit)||limit<0||limit>50000||!Number.isSafeInteger(H)||H<0||H>2)throw Error('Invalid E143 controls');
+  if(!validateHistory(input))return decisions(ids,'history-prerequisite');
+  const w=result?.forcingTempoAnalysis?.witness;if(!w)return decisions(ids,'source-unavailable');
+  checkWitness(w,result,input);
+  if(w.panel.claimContext)return decisions(ids,'claim-rule-prerequisite');
+  const own=[],enemy=[],unresolved=[];
+  for(const r of w.panel.rows){const q=r.actor.tree.win?own:r.opponent.tree.win?enemy:unresolved;q.push(r.move);}
+  const sharp=own.length>0&&enemy.length>0,forcing=w.defenses.length>0,tempo=forcing&&w.quietLosses.length>0;
+  return ids.flatMap(id=>{
+    const root=['C0578','C0962'].includes(id),yes=root?sharp:id==='C0586'?forcing:tempo;
+    const proof=root?{source:'E143',frame:'before-actual',fen:w.before,actor:w.actor,choicePlies:H+1,queryPlies:H,own,enemy,unresolved,certificates:w.panel.rows.filter(r=>r.actor.tree.win||r.opponent.tree.win).map(r=>({move:r.move,fen:r.after,winner:r.actor.tree.win?w.actor:w.actor==='w'?'b':'w',query:r.actor.tree.win?'actor':'opponent'}))}
+      :{source:'E143',frame:'after-actual',fen:w.after,actor:w.actor,played:w.played,plies:H,defenses:w.defenses,quietLosses:id==='C0586'?[]:w.quietLosses};
+    return decisions([id],yes?'available':'bounded-unresolved',proof);
+  });
+}

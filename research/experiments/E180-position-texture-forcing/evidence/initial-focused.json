@@ -1,0 +1,11 @@
+{
+  "command": "npm run research:coach-tests -- E180",
+  "passed": 33,
+  "seconds": 143.7,
+  "sourceHashes": {
+    "forcing.mjs": "c88f2810758bb05db4cf3844dd0c98d71cef1dfee7c6709dad2d6103f0343ae6",
+    "check-decisions.mjs": "5836ccd5da084505341fa3d297663cfbc6835dd3a7f6fe49b671284cd269b54f",
+    "scopes.test.mjs": "0dc3ee197d5a4e07c3a59cd1d558f6606b24e6736775bc8ded7fa661dfb1f8f8"
+  },
+  "note": "No gate failed. Repeated unchanged source semantic admission dominated focused checks; exact-content memoization follows."
+}

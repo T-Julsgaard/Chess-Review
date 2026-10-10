@@ -1,0 +1,43 @@
+✔ strict supported IDs and typed controls (15.8862ms)
+✔ quiet positive and negative legal continuations 0 (173.8443ms)
+✔ quiet positive and negative legal continuations 1 (73.6245ms)
+✔ quiet positive and negative legal continuations 2 (197.9401ms)
+✔ quiet positive and negative legal continuations 4 (109.7081ms)
+✔ quiet positive and negative legal continuations 6 (97.3173ms)
+✔ quiet positive and negative legal continuations 8 (2.2576ms)
+✔ quiet positive and negative legal continuations 10 (1.2516ms)
+✔ quiet positive and negative legal continuations 12 (1.4834ms)
+✔ quiet positive and negative legal continuations 14 (0.6337ms)
+✔ quiet positive and negative legal continuations 16 (0.5302ms)
+✔ fresh and cached exact/one-short budgets agree atomically (296.5901ms)
+✔ genuine prefix and matching FEN counters admitted, mismatches reject (98.2258ms)
+✖ current checked frame cannot be quiet (3.2094ms)
+✔ altered full quiet source rejects edge (14.8377ms)
+✔ altered full quiet source rejects san (10.2847ms)
+✔ altered full quiet source rejects fen (3.0943ms)
+✔ altered full quiet source rejects claim (41.1284ms)
+✔ altered full quiet source rejects horizon (1.7572ms)
+✔ independent quiet decision and noise mutations reject (685.8011ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 19
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10866.52
+
+✖ failing tests:
+
+test at research\experiments\E180-position-texture-forcing\code\scopes.test.mjs:40:1
+✖ current checked frame cannot be quiet (3.2094ms)
+  Error: Invalid move: a2a8
+      at Chess.move (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/lib/chess.js:1129:23)
+      at evaluateQuiet (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/research/experiments/E180-position-texture-forcing/code/quiet.mjs:15:205)
+      at TestContext.<anonymous> (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/research/experiments/E180-position-texture-forcing/code/scopes.test.mjs:40:140)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7)

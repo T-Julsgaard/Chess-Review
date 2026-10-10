@@ -1,0 +1,28 @@
+✔ strict supported IDs and typed controls (15.7151ms)
+✔ quiet positive and negative legal continuations 0 (243.8636ms)
+✔ quiet positive and negative legal continuations 1 (64.405ms)
+✔ quiet positive and negative legal continuations 2 (306.4587ms)
+✔ quiet positive and negative legal continuations 4 (237.5932ms)
+✔ quiet positive and negative legal continuations 6 (112.5058ms)
+✔ quiet positive and negative legal continuations 8 (2.2901ms)
+✔ quiet positive and negative legal continuations 10 (2.1392ms)
+✔ quiet positive and negative legal continuations 12 (1.6122ms)
+✔ quiet positive and negative legal continuations 14 (0.8862ms)
+✔ quiet positive and negative legal continuations 16 (0.6907ms)
+✔ fresh and cached exact/one-short budgets agree atomically (290.642ms)
+✔ genuine prefix and matching FEN counters admitted, mismatches reject (140.4299ms)
+✔ current checked frame cannot be quiet (177.9132ms)
+✔ altered full quiet source rejects edge (7.4883ms)
+✔ altered full quiet source rejects san (2.9633ms)
+✔ altered full quiet source rejects fen (1.6035ms)
+✔ altered full quiet source rejects claim (24.8004ms)
+✔ altered full quiet source rejects horizon (1.1887ms)
+✔ independent quiet decision and noise mutations reject (584.7339ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10956.5498

@@ -1,0 +1,44 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {Chess} from '../../../../lib/chess.js';
+import {openResearchData} from '../../../data-policy.mjs';
+import {forcingArchive} from './archive.mjs';
+import {quietArchive,graphFor} from './saved.mjs';
+import {quietFixtures} from './fixtures.mjs';
+import {forcingIds} from './scopes.mjs';
+import {evaluateForcing,inspectForcing} from './forcing.mjs';
+import {evaluateQuiet} from './quiet.mjs';
+import {checkForcing,checkQuiet} from './check-decisions.mjs';
+await openResearchData(['D001'],{purpose:'test'});const old=await forcingArchive(),raw=await quietArchive();
+const row=old.rows[0],input=row.fixture,get=(d,id)=>d.find(x=>x.id===id),quiet=(i)=>{const f=quietFixtures[i];return{f,g:graphFor(f,raw.rows)};};
+test('strict supported IDs and typed controls',()=>{
+  for(const ids of [null,[],['C0578','C0578'],['toString'],['__proto__'],['C0579'],[{}]]){assert.throws(()=>inspectForcing(ids,input,row.result));assert.throws(()=>evaluateForcing(ids,input));}
+  for(const extra of [{forcingTempoTags:false},{forcingTempoTags:null},{forcingTempoPlies:null},{forcingTempoPlies:3},{maxForcingTempoNodes:null},{maxForcingTempoNodes:-1},{maxForcingTempoNodes:50001},{history:null}])assert.throws(()=>inspectForcing(forcingIds,{...input,...extra},row.result));
+  for(const extra of [{quietPlies:null},{quietPlies:'2'},{quietPlies:3},{maxQuietNodes:null},{maxQuietNodes:-1},{maxQuietNodes:50001},{history:null}])assert.throws(()=>evaluateQuiet({...quietFixtures[0],...extra}));
+});
+test('saved source routing preserves exact E143 result and caller',()=>{const before=JSON.stringify(row),r=evaluateForcing(forcingIds,{...input,forcingTempoPanel:row.result.forcingTempoAnalysis.witness.panel});assert.deepEqual(r.result,row.result);checkForcing(input,r.result,r.decisions);assert.equal(JSON.stringify(row),before);});
+for(const n of [0,1,2,3,10,11])test('root choices, frames, forcing and quiet-counterattack independence '+n,()=>{
+  const r=old.rows[n],d=inspectForcing(forcingIds,r.fixture,r.result);checkForcing(r.fixture,r.result,d);
+  if(n<4){assert.equal(get(d,'C0578').available,true);assert.equal(get(d,'C0578').proof.fen,r.result.before);assert.equal(get(d,'C0578').proof.choicePlies,3);}
+  assert.equal(get(d,'C0586').available,n<2||n>=10);assert.equal(get(d,'C0584').available,n<2);
+  if(n>=10){assert.equal(r.result.events.some(e=>e.evidence?.experiment==='E143'),false);assert.equal(get(d,'C0586').available,true);}
+  assert.equal(get(d,'C0578').available,get(d,'C0962').available);assert.notEqual(get(d,'C0578').context,get(d,'C0962').context);assert.notEqual(get(d,'C0584').context,get(d,'C0752').context);
+});
+for(const i of [0,1,2,4,6,8,10,12,14,16])test('quiet positive and negative legal continuations '+i,()=>{
+  const {f,g}=quiet(i),before=JSON.stringify(f),r=evaluateQuiet({...f,...(g?{quietPanel:g}:{})});checkQuiet(f,r,g);assert.equal(JSON.stringify(f),before);
+  assert.equal(r.status,i<2?'available':i===8?'terminal-prerequisite':i===10?'claim-rule-prerequisite':i===12?'horizon-prerequisite':i===14?'history-prerequisite':i===16?'exhausted':'noisy-continuation');
+  if(i===2){assert.ok(r.noisy.length);assert.ok(r.noisy.every(e=>e.parent!==0));}
+  if(i<2){assert.equal(r.decisions[0].proof.fen,g.after);assert.notEqual(g.before,g.after);assert.notEqual(r.decisions[0].context,r.decisions[1].context);}
+});
+test('fresh and cached exact/one-short budgets agree atomically',()=>{
+  const {f,g}=quiet(0),a=evaluateQuiet({...f,quietPanel:g}),cap=a.nodes;
+  for(const maxQuietNodes of [0,1,2,cap-1,cap]){const input={...f,maxQuietNodes},fresh=evaluateQuiet(input),saved=evaluateQuiet({...input,quietPanel:g});assert.deepEqual(fresh,saved);checkQuiet(input,fresh,g);if(maxQuietNodes<cap){assert.equal(fresh.graph,null);assert.ok(fresh.decisions.every(d=>!d.available));}}
+});
+test('genuine prefix and matching FEN counters admitted, mismatches reject',()=>{
+  const f=quietFixtures[0],c=new Chess(f.fen);c.move('b1c1');c.move('h7h6');const prefix={...f,fen:c.fen(),history:{fen:f.fen,moves:['b1c1','h7h6']},move:'c1b1'},r=evaluateQuiet(prefix);assert.equal(r.status,'available');checkQuiet(prefix,r,r.graph);assert.throws(()=>evaluateQuiet({...prefix,fen:f.fen}));
+});
+test('current checked frame cannot be quiet',()=>{const fen='7k/7p/8/8/8/P7/R7/1K6 w - - 0 1',f={fen,history:{fen,moves:[]},move:'a2a8'},r=evaluateQuiet(f);assert.equal(r.status,'checked-frame-prerequisite');assert.ok(r.decisions.every(d=>!d.available));checkQuiet(f,r,r.graph);});
+for(const [name,edit]of Object.entries({edge:g=>g.tree[0].edges.pop(),san:g=>g.tree[0].edges[0].san='x',fen:g=>g.tree[0].fen=g.before,claim:g=>g.claimNodes.push(0),horizon:g=>g.plies=1}))test('altered full quiet source rejects '+name,()=>{const {f,g}=quiet(0),copy=structuredClone(g);edit(copy);assert.throws(()=>evaluateQuiet({...f,quietPanel:copy}));});
+for(const [name,edit]of Object.entries({inventory:p=>p.rows.pop(),actor:p=>p.actor='b',trace:p=>p.rows[0].actor.searchTrace.pop()}))test('altered E143 source rejects '+name,()=>{const r=structuredClone(row.result);edit(r.forcingTempoAnalysis.witness.panel);assert.throws(()=>inspectForcing(forcingIds,input,r));});
+for(const [name,edit]of Object.entries({frame:d=>d[0].proof.fen='bad',bound:d=>d[0].proof.queryPlies++,partition:d=>d[0].proof.enemy=[],availability:d=>d[0].available=false}))test('independent forcing decision rejects '+name,()=>{const d=inspectForcing(forcingIds,input,row.result);edit(d);assert.throws(()=>checkForcing(input,row.result,d));});
+test('independent quiet decision and noise mutations reject',()=>{const {f,g}=quiet(2),a=evaluateQuiet({...f,quietPanel:g});for(const edit of [r=>r.noisy=[],r=>r.status='available',r=>r.decisions[0].context='bad',r=>r.nodes--]){const r=structuredClone(a);edit(r);assert.throws(()=>checkQuiet(f,r,g));}});

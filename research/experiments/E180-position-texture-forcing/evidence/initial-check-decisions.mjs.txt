@@ -1,0 +1,53 @@
+import assert from 'node:assert/strict';
+import {Chess} from '../../../../lib/chess.js';
+import {checkWitness} from '../../E143-forcing-tempo-initiative/code/check-witness.mjs';
+import {verifyTree} from '../../E146-retrograde-calculation/code/verify-tree.mjs';
+import {scopes,forcingIds,quietIds} from './scopes.mjs';
+// Independent selectors and legal-move classification. No new runtime imports.
+function expected(id,status,proof){return{id,context:scopes[id].context,scope:scopes[id].scope,available:status==='available',status,proof:status==='available'?proof:null};}
+export function checkForcing(input,result,output){
+  assert.equal(input.forcingTempoTags,true);const H=input.forcingTempoPlies===undefined?2:input.forcingTempoPlies,limit=input.maxForcingTempoNodes===undefined?50000:input.maxForcingTempoNodes;
+  assert.ok(Number.isSafeInteger(H)&&H>=0&&H<=2);assert.ok(Number.isSafeInteger(limit)&&limit>=0&&limit<=50000);
+  if(input.history===undefined){assert.deepEqual(output,forcingIds.map(id=>expected(id,'history-prerequisite')));return;}
+  const w=result.forcingTempoAnalysis.witness;
+  if(!w){assert.deepEqual(output,forcingIds.map(id=>expected(id,'source-unavailable')));return;}
+  checkWitness(w,result,input);
+  if(w.panel.claimContext){assert.deepEqual(output,forcingIds.map(id=>expected(id,'claim-rule-prerequisite')));return;}
+  const partitions=[[],[],[]],certificates=[];
+  for(const r of w.panel.rows){
+    const winner=r.actor.tree.win?w.actor:r.opponent.tree.win?(w.actor==='w'?'b':'w'):null;
+    partitions[winner===null?2:winner===w.actor?0:1].push(r.move);
+    if(winner)certificates.push({move:r.move,fen:r.after,winner,query:winner===w.actor?'actor':'opponent'});
+  }
+  const actual=w.panel.rows.find(r=>r.move===w.played),tree=actual.actor.tree;
+  const force=actual.check&&!actual.mate&&!actual.capture&&!actual.promotion&&tree.win&&tree.kind==='all'&&tree.branches.length>0&&tree.branches.every(b=>b.child.kind==='choice'&&b.child.child.kind==='mate'&&b.child.child.win);
+  const alternatives=w.panel.rows.filter(r=>r.piece===actual.piece&&r.from===actual.from&&!r.capture&&!r.promotion&&!r.check&&r.opponent.tree.win).map(r=>r.move);
+  const want=forcingIds.map(id=>{
+    if(['C0578','C0962'].includes(id))return expected(id,partitions[0].length&&partitions[1].length?'available':'bounded-unresolved',{source:'E143',frame:'before-actual',fen:w.before,actor:w.actor,choicePlies:H+1,queryPlies:H,own:partitions[0],enemy:partitions[1],unresolved:partitions[2],certificates});
+    return expected(id,force&&(id==='C0586'||alternatives.length)?'available':'bounded-unresolved',{source:'E143',frame:'after-actual',fen:w.after,actor:w.actor,played:w.played,plies:H,defenses:w.defenses,quietLosses:id==='C0586'?[]:alternatives});
+  });assert.deepEqual(output,want);
+}
+export function checkQuiet(input,result,raw){
+  const H=input.quietPlies===undefined?2:input.quietPlies,limit=input.maxQuietNodes===undefined?50000:input.maxQuietNodes;
+  assert.ok(Number.isSafeInteger(H)&&H>=0&&H<=2);assert.ok(Number.isSafeInteger(limit)&&limit>=0&&limit<=50000);
+  let status,nodes,graph=null,noisy=[],terminal=[];
+  if(limit===0){status='exhausted';nodes=1;}
+  else if(input.history===undefined){status='history-prerequisite';nodes=1;}
+  else if(limit===1){status='exhausted';nodes=2;}
+  else if(H!==2){status='horizon-prerequisite';nodes=2;}
+  else{
+    assert.ok(raw);verifyTree({...input,retrogradeCalculationPlies:H},raw);
+    const fullCost=2+raw.nodes+raw.tree.length+raw.tree.reduce((n,r)=>n+r.edges.length,0);
+    if(limit<fullCost){status='exhausted';nodes=limit+1;}
+    else{
+      graph=raw;nodes=fullCost;
+      for(const n of raw.tree){
+        if(n.kind==='claim'||n.kind==='draw'||n.kind==='mate')terminal.push({node:n.id,kind:n.kind});
+        for(const e of n.edges){const c=new Chess(n.fen),m=c.move(e.move);const reason=m.promotion?'promotion':m.captured?'capture':c.isCheck()?'check':null;if(reason)noisy.push({parent:n.id,move:e.move,san:e.san,child:e.child,reason});}
+      }
+      status=raw.claimNodes.length?'claim-rule-prerequisite':terminal.length?'terminal-prerequisite':noisy.length?'noisy-continuation':'available';
+    }
+  }
+  const proof=graph?{source:'E146',frame:'after-actual',fen:graph.after,actor:graph.actor,plies:H,frontier:'unresolved beyond declared horizon',nodes:graph.tree.length}:null;
+  assert.deepEqual(result,{schema:'E180-quiet-v1',limit,plies:H,nodes,status,graph,noisy,terminal,decisions:quietIds.map(id=>expected(id,status,proof))});
+}
