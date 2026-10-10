@@ -41,3 +41,22 @@ One archive-copy helper initially formed evidence/evidence for the build copy
 and exited ENOENT after preserving source/pilot/run/replay. Corrected the literal
 destination and retained lossless initial run/replay/build copies. This path-only
 harness issue changed no observation, hypothesis, source behavior or gate.
+
+During final audit, normalize the independent mutation test's archived result
+to the stronger schema and FIRST admit that valid baseline before applying each
+mutation. Otherwise its missing new observed-comparison field could reject even
+without the intended mutation. The affected check passes with explicit valid
+baseline admission; retain all query data and redo only source-bound derivation/
+replay, not collection. This strengthens test evidence, not a chess gate change.
+
+Before final readiness, make the retained bishop role an explicit admission
+requirement too: the knight replacement's complete failed policy must select a
+quiet king entry into an originally EMPTY square directly controlled by the
+actual bishop; the legal B frame excludes that move. The context must relocate
+an ENEMY pawn onto that exact entry square, excluding the same king move for
+both contextual types. Retain king move, bishop square and pawn origin identity.
+This prevents an unrelated new promotion-protecting pawn from satisfying the
+bishop label merely by equalizing the context values. It is bounded role
+reconstruction under setup/semantic admission, not a new search or cost change.
+The initial/final row comparison additionally permits this derived role field;
+all raw query goals, policies, frames and work must remain identical.
