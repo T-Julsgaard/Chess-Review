@@ -65,3 +65,8 @@ All original scopes remain in catalog. Accepted/numerical/production unchanged.
 Deferred combined cumulative regression, exhaustive interaction/absence/priority/
 history/budget/original-occurrence audit, exact main/repeat/initially clean
 reproductions, real-game precision/usefulness and nonmating strategic extension.
+
+Additional prospective branching control before any E137 evaluation: White Kf6/
+Qc5 versus Kg8, actual Qg5+ H2. Hypothesis ...Kf8/...Kh7/...Kh8 all permit a mate
+next; retain all replies/ties. Include with the original core, Qf5, actual Qg7#,
+H0 core, neutral H0, zero and clock99 for16cases total across both colors.
