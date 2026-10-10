@@ -1,0 +1,16 @@
+Retained smoke failure summary, 2026-10-10 (not a new execution log).
+
+Initial execution:
+node research/experiments/E168-forced-pawn-weakness/code/smoke.mjs
+Exit 1. AssertionError: forced-g-pawn-capture-isolates-f6
+Actual own event IDs: []
+Expected: ['forced-new-isolated-pawn-exploitation']
+Complete observations and original derivation: initial-query-field-failure/.
+Query tree was positive; initial code read nonexistent query.win.
+
+After query field correction, same command exited 1 with the same assertion.
+Actual capture policy succeeded, but quiet Qf4 also allowed winning target
+captures on every target-retaining reply. Complete observations and fixture/
+derivation source: failed-quiet-hypothesis/. Registered escape gate unchanged.
+
+Revised quiet Qb5 smoke exited 0. See final smoke.json.gz and dated amendment.
