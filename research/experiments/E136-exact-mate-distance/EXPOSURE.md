@@ -12,3 +12,8 @@ https://chessprogramming.org/Score for ply-based mate-distance interpretation.
 Search also returned incidental teaching/forum/book snippets; no game contents,
 diagrams, positions or example routes imported or evaluated. No external source
 games used. Authored mechanics are exploratory, not real-game confirmation.
+
+First observed smoke disclosed: original Kxa1 throws Illegal move:a2a1 (pawn
+attack); original Qf7 yields terminal-without-mate,3ticks, stalemate. Dated PLAN
+amendment preserves both failures and preregisters the corrected Kxa3 exchange and
+Qe6 distance2 hypotheses before evaluating them. No source-derived boards used.

@@ -59,3 +59,20 @@ Deferred combined cumulative regression, exhaustive interaction/absence/priority
 history/budget/original-occurrence audit, exact main/repeat/initially clean
 reproductions, real-game precision/usefulness and broader outcomes/tablebases.
 Accepted tracker, numerical research and production unchanged.
+
+## Disclosed hypotheses and prospective corrections, 2026-10-10
+
+First smoke: authored Ka2/Pa3 versus Kc2/Pb2/Ra1, Kxa1 is illegal: Pb2 attacks
+a1. Original Qe7-f7 with Kf6 versus Kh8 is stalemate, not distance2. Retain both
+failed hypotheses, both colors, as input-error/terminal-negative pilot controls.
+No solver, horizon, outcome or exactness gate changes.
+
+Before evaluating corrected boards, register White Ka2/Pa4 versus Black Kc3/Pb2/
+Ra3, Kxa3 H3. Legal prior history hypothesis starts White Ka2/Pa4/Ra3 versus
+Black Kc3/Pb2/Rb3, Black ...Rxa3+. After Kxa3, ...b1Q a5 Qb3# should force
+mate in3plies, with shorter refutations. Keep no-history counterpart. New distance2
+hypothesis uses same Kf6/Qe7 versus Kh8 but actual Qe6; ...Kh7 should allow Qg7#.
+Use that new board at clock99 for claim-semantic control; actual quiet move reaches
+100. Original Qf7 remains negative. Mirrored one-ply history needs initial fullmove
+counter2, since reflected White move does not increment it; save exact canonical
+root/full clocks rather than silently accepting a history mismatch. Pilot<=20cases.
