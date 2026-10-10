@@ -4,16 +4,24 @@
   "decisions": 96,
   "positives": {
     "C0711": 2,
-    "C0712": 2,
-    "C0714": 2
+    "C0712": 0,
+    "C0714": 0
   },
   "rawPanels": 12,
-  "sourceBindings": 954,
+  "sourceBindings": 955,
   "panelHashes": {
     "smoke.json.gz": "dee3afb0903b2de9f809b00c4fe04859771fba63a41f162c69aaef21b7af99ea",
     "knight-smoke.json.gz": "0299ff7e8e490a97f38e8a487907b00646e1afebb6ca007a2c351ddae3a38279",
     "control-smoke.json.gz": "3b73bbbe43a7a232d55cc2259dac29312b0668cdc62c725260d34f015015cfb2"
   },
-  "pilotSha256": "01206931d165b98696517d4f8c28f98d13443bc20baa0cfe2e63b76c7a3b9171",
-  "limits": "Result checker imports no E186 runtime/context or search collector. Shares legal Chess, neutral E186 general traced-policy checker adapted from independent E106, and ordinary-data helper. Exposed authored synthetic development; no broad causal openness/good-bad or human validity."
+  "pilotSha256": "22952d3c6726f054324bf23783af62c558c11bcd2e157476a29584187cdc0b91",
+  "initialArchives": {
+    "initial-semantic-build.json.gz": "c73f759271b370094082103310c5c1f944baf13ee1cd33dd317d2ef387bd49dc",
+    "initial-semantic-pilot.json.gz": "01206931d165b98696517d4f8c28f98d13443bc20baa0cfe2e63b76c7a3b9171",
+    "initial-semantic-run.json.gz": "d50561ea07107c6612c4a114225b3b1f3bc83db6c9be18c345400c12f4f93b16",
+    "initial-semantic-replay.json.gz": "ef8928f2a4190004fe49827bb905ba641e715303dc447be47de011cb0f813471",
+    "initial-semantic-source.json.gz": "d9d99c59754b1fcb83de3be5383d4abeaa9fc0b29c847ded67414b17e6182670"
+  },
+  "semanticCorrection": "Only stronger label/status admission, observed-comparison and explicit bishop-role fields change. All32 inputs/options/raw queries/frames/goals/costs match archived initial rows; no searches recollected. Initial passing outputs/source remain bound to05d3ff0.",
+  "limits": "Result checker imports no E186 runtime/context or search collector. Shares legal Chess, neutral general traced-policy checker and ordinary-data helper. C0712/C0714 withheld pending genuine fixed-pawn causal evidence; no generic openness/quality or human validity."
 }
