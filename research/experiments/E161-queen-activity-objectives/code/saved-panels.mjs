@@ -1,0 +1,8 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {gunzipSync} from 'node:zlib';
+import {openResearchData,sha256} from '../../../data-policy.mjs';
+import {normalized} from '../../E138-bounded-engine-panels/code/source-bindings.mjs';
+export const key=f=>({fen:f.fen,history:f.history,move:f.move,target:f.queenObjectiveTarget,alternative:f.queenAlternative});
+export async function savedPanels(guarded){const data=guarded??await openResearchData(['D001'],{purpose:'test'}),saved=JSON.parse(gunzipSync(await readFile('research/experiments/E161-queen-activity-objectives/evidence/observations.json.gz')));assert.equal(saved.schema,'E161-saved-queen-panels-v1');assert.deepEqual(saved.eligibilityReceipt,data.receipt);for(const [p,h]of Object.entries(saved.sourceHashes))assert.equal(sha256(normalized(p,await readFile(p))),h,'Changed collection source '+p);return saved;}
+export function withSavedPanels(f,saved){if(!f.history||f.maxQueenActivityNodes===0)return f;const row=saved.rows.find(r=>JSON.stringify(r.key)===JSON.stringify(key(f)));assert.ok(row,'Missing queen comparison '+f.id);return{...f,queenActivityPanels:row.panels};}
