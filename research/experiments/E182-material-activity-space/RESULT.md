@@ -1,66 +1,106 @@
-# E182 — implementation checkpoint
+# E182 — material concessions, forcing activity and causal pawn space
 
-2026-10-10. Registered at 0c9c53a, parent completed prototype E1818963bad.
-In development; NOT code-ready, accepted, or production behavior.
+2026-10-10. **Prototype, not accepted evidence.** Preregistered0c9c53a,
+parent E1818963bad. Development checkpoints66504b6 and246d2a4. Authorized
+current main, research-only local commits/no push. Original scopes C0588,
+C0590 and C0593; full strategic definitions remain open.
 
-Implemented evaluateSpace/inspectSpace research APIs and complete material-space
-panel collection/admission. The quiet actual pawn advance is compared with a
-distinct legal same-pawn nonpromoting alternative, including capture. Panels
-retain signed root/variant material, legal enemy unit moves and all immediate
-actor replies, flags, history, territory and claim contexts. The E152 causal
-derivation remains unchanged; independent new panel admission reconstructs the
-legal inventories and material. C0590 requires a material gain foregone and
-witnessed loss of enemy unit-safe destinations caused by the advanced pawn.
-This does not prove overall superiority or lasting strategic compensation.
+Explicit inspectOffer admits an enabled, history-safe E165 result through its
+full independent source verifier. It walks the actual complete actor mate policy
+and requires every selected attacking continuation to check. It reconstructs
+all legal enemy acceptances capturing the actually offered moved unit and every
+immediate legal actor reply, with FEN/terminal flags, signed material, captures,
+promotions and en-passant victims. C0593 requires a nominal concession under
+that checking policy. C0588 additionally requires positive unrecovered loss
+through EVERY immediate reply on at least one acceptance and a failed own mate
+for the declared quiet same-unit alternative at the SAME finite bound. This is
+bounded mating compensation, not generally superior activity or timing. The
+stronger E108 H+2 quiet delay is not claimed. E108's omitted-history snapshots
+remain their original evidence, with no manufactured history projection.
 
-Nine focused tests pass (node --test
-research/experiments/E182-material-activity-space/code/space.test.mjs), about
-1.64 seconds overall on the final run. Both colors, fresh/saved exact and
-one-short budgets, altered material/omitted reply rejection, no added territory,
-no affected unit, no material gain, one affected unit, prerequisites, strict caps
-and genuine en-passant victim/material history are represented. Source
-verification and diff checks pass. D001 test preflight passes, 54 artifacts,
-registry c00de91f767ec439aecbf27fd0929fd26ed3d8c3ca6a5525e996ee58989d026b.
-These are synthetic development checks, not independent real-game evidence.
+Explicit evaluateSpace/inspectSpace compare a quiet nonpromoting pawn advance
+with a distinct legal same-pawn nonpromoting alternative, including capture.
+The new complete panel schema retains root and after-choice signed balances,
+full enemy B/N/R/Q identities and legal options, all actor counterreplies,
+survival, history, flags, pawn-controlled middle-band cells and claim contexts.
+The frozen E152 causal derivation is reused after independent new admission.
+C0590 requires material gain foregone, added pawn-controlled cells with none
+lost, unchanged enemy unit identities and no unit-safe-count improvement, plus
+lost safe destinations with legal live capture by the actually advanced pawn.
+Space control alone cannot supply the claim. No overall quality, winning,
+lasting space, global compensation or human-intent assertion is made.
 
-Development tests deliberately collect small fresh panels to exercise collection
-and exact-budget behavior, including the quiet negative control. They are not
-the registered main pilot. The main pilot must use the registered explicit
-projection of eligible E152 quiet panels; no archived pilot collection has yet
-been performed or declared reused. No old evidence or production code changed.
+Strict source flags/horizons/caps, options, history, UCI and supplied panel
+validation. Space budget3setup+raw.nodes, fresh/saved exact and one-short agree;
+exhaustion discards panel/proof/positive. inspectSpace never collects. Audit
+fixed null supplied panel accidentally falling through null-coalescing into
+collection; it now rejects explicitly, with focused coverage. No production
+code, event priorities, numerical scoring or earlier source results changed.
 
-Second checkpoint, 2026-10-10: inspectOffer now independently admits the complete
-E165 source witness, walks its certified policy to require checks on every
-selected attacking continuation, and reconstructs every legal acceptance of the
-offered moved unit plus every immediate actor reply. Signed material includes
-captures, promotions and en-passant victims. C0593 requires an actual nominal
-concession and the checking mate policy; C0588 additionally requires unrecovered
-loss through all immediate replies on an acceptance and the failed same-bound
-quiet comparison. The E165 result is unchanged.
+Development checks and evidence:
 
-Five focused offer tests pass in26.98seconds, dominated by frozen full-source
-admission: both colors of the original queen offer, checking mate without
-acceptance, missing helper/short bound, changed source and strict controls.
-Original and reflected authored recovery controls each collected one new full
-E143 H2 panel,5411nodes, after exact E143/E165 cache lookup found no match.
-Raw panels checkpointed before source derivation; saved result files retain the
-guarded receipt and recursive source bindings. Both produce C0593true/C0588false:
-queen concession9, immediate promotion/capture recovery13, minimum net loss-4.
-Independent check-offer imports no E182 runtime/collector/derive and reconstructs
-the policy/checks, acceptance inventory, complete replies, material and claims.
-replay-recovery passes both saved controls, exact source bindings, raw/source
-panel equality, receipts and artifact hashes. Frozen E165 source checker and
-Chess remain shared dependencies. No engine, acquired games or full suite.
+- Initial checkpoints passed9space tests in1.64seconds and5offer tests in26.98
+  seconds. Final focused E182 run passes17tests in60.0seconds, including new
+  independent decision/endpoint/material/vector mutations, full source and
+  omitted legal-reply mutations, strict/prerequisite controls, immutability,
+  both colors, no space/no material/no affected unit, one affected unit and
+  genuine en-passant victim/material history. Frozen full-source semantic
+  admission dominates the offer checks. No cumulative suite or inherited
+  historical matrix ran.
+- Two original/reflected recoverable promotion controls collected new E143 H2
+  full panels,5411nodes each, after exact E143/E165 cache lookup found no match.
+  Raw checkpoints precede E165 result derivation. Queen concession9, immediate
+  rook capture plus promotion recovery13, minimum net loss-4: C0593true and
+  C0588false. Independent saved recovery replay passes. No later collection
+  regenerated either panel.
+- Ten space panels checkpointed individually: eight fresh capture-comparison
+  panels cost191..229ticks, and two exact E152 quiet controls explicitly
+  projected. Old independent admission first verifies each original quiet panel;
+  projection preserves every profile/control/history/FEN/node and only changes
+  schema and adds reconstructed balances. Saved replay separately strips those
+  additions and requires exact old-panel equality, original locator/hash,
+  receipt, source closure and original E152 output-manifest agreement. Small
+  focused fresh/cache tests also deliberately exercise collection; they are
+  separate from main-pilot reuse.
+- Guarded main pilot30cases/44decisions: twelve registered original E165 cases,
+  two recovery controls (two offer claims each), and sixteen authored space
+  controls. Positives C0588=2,C0593=4,C0590=4. These are exposed synthetic scoped
+  outcomes, not independent sample precision or whole-definition coverage.
+- First saved replay failed on standard JSON transport: live negative fixtures
+  had explicit history:undefined whereas JSON omits that optional field.
+  Retain initial-results.json.gz, initial-run.json.gz, initial-replay-source.mjs.gz
+  and development-failure.json. Checker now compares the exact JSON-transported
+  expected fixture. Full old/new manifest audit verifies ONLY this checker file
+  changed; all30input/source/decision rows and raw observations are identical.
+  run.json records the explicit binding refresh and initial hashes. No chess
+  claim, gate, source runtime or collection changed to repair this failure.
+- Final independent saved replay passes all44decisions, exact originals/new raw
+  panels, source/input/config/history/result hashes, eligibility receipts and
+  878normalized recursive source bindings including the full E181 build. New
+  checkers import no new runtime/collector/context/derive. Frozen E165 full
+  source verifier, independent legal-panel verification and shared Chess remain
+  limitations. Byte integrity alone is not used as semantic validation.
 
-Evidence files recovery-raw-w/b.json.gz and recovery-result-w/b.json.gz decode
-as standard JSON; recovery-replay.json binds those four artifacts and checker
-closure. This is a development checkpoint, not the registered30case main pilot.
-No ready build or accepted-coverage change is claimed. The earlier space
-checkpoint and its nine focused tests remain unchanged. Source/diff checks pass.
+D001 test preflight passes54artifacts; registry
+c00de91f767ec439aecbf27fd0929fd26ed3d8c3ca6a5525e996ee58989d026b.
+Gzip artifacts decode as standard JSON (initial-replay-source as UTF-8 module).
+Retained evidence844732bytes exceeds the500KB SOFT target: full new/source
+proofs, explicit reused origins, recursive hash manifests, independent replay
+and the original failed run are preserved. Straightforward lossless compression
+already applies to bulk observations/results; further size-only deduplication
+would add work without improving the chess claim. No acquired games, engine,
+tablebase, human review or untouched confirmation.
 
-Next: implement independent space decision replay, exact E152 projection and
-guarded checkpointed saved pilot/provenance. Complete the registered fixture and
-mutation coverage before creating build.json or marking this batch code-ready.
-Full combined regression, exhaustive scope audits, and changed main/repeat/clean
-reproductions remain deferred under BUILD-FIRST. The complete catalog remains
-in scope; accepted E082 and provisional coverage counts are unchanged.
+Source verification and diff checks pass. Accepted E082 remains378/1085(34.8%),
+328names,63accepted studies. Separate build449pending entries with candidates,
+102ready/0stale batches;827/1085accepted-or-candidate(76.2%),258without code.
+Combined cumulative regression, exhaustive occurrence/absence/priority/history/
+budget audits and changed main/repeat/initially clean reproductions remain
+DEFERRED. Broad strategic definitions and real-game precision/usefulness remain
+unfinished. Full catalog remains in scope; goal remains active.
+
+Next: audit genuine historical transitions for C0595 losing initiative, C0596
+seizing initiative and C0597 counter-initiative against existing positive
+opposing resource proofs. Failed short search alone cannot establish a lost
+resource. Record exact history/frame/counterfactual prerequisites before new
+collection; retain equilibrium and temporary/permanent advantage prerequisites.

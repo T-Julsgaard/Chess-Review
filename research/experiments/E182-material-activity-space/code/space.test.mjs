@@ -4,6 +4,7 @@ import {Chess} from '../../../../lib/chess.js';
 import {boardFen,reflect} from '../../FRIEND-shared/lib.mjs';
 import {openResearchData} from '../../../data-policy.mjs';
 import {evaluateSpace,inspectSpace} from './space.mjs';
+import {checkSpace} from './check-space.mjs';
 await openResearchData(['D001'],{purpose:'test'});
 const fen=boardFen({a1:'K',a4:'P',b4:'P',e2:'P',h4:'P',h8:'k',a8:'r',e8:'r',c7:'n',g7:'n',a6:'p',b5:'p',e6:'p',h5:'p',d3:'p'});
 const base={fen,history:{fen,moves:[]},move:'e2e4',materialAlternative:'e2d3'};
@@ -23,6 +24,16 @@ for(const [color,input] of [['white',base],['black',black]]){
     assert.deepEqual(evaluateSpace({...input,maxMaterialSpaceNodes:result.nodes}),{...result,limit:result.nodes});
     const exhausted=inspectSpace({...supplied,maxMaterialSpaceNodes:result.nodes-1});
     assert.equal(exhausted.status,'exhausted');assert.equal(exhausted.witness,null);assert.equal(exhausted.available,false);
+    assert.equal(checkSpace(supplied,result),true);
+    assert.equal(checkSpace({...supplied,maxMaterialSpaceNodes:result.nodes-1},exhausted),true);
+  });
+  test(`${color}: independent decision/frame/vector/material mutation rejection`,()=>{
+    const supplied={...input,materialSpacePanel:result.witness.panel};
+    for(const edit of [r=>{r.available=false;},r=>{r.witness.after=r.witness.before;},r=>{r.witness.room.vector[0].actual++;},r=>{r.witness.material.foregone++;}]){
+      const altered=structuredClone(result);edit(altered);assert.throws(()=>checkSpace(supplied,altered));
+    }
+    assert.throws(()=>inspectSpace({...input,materialSpacePanel:null}));
+    assert.throws(()=>evaluateSpace({...input,materialAlternative:'bogus'}));
   });
   test(`${color}: altered material and omitted legal counterreply rejected`,()=>{
     const panel=structuredClone(result.witness.panel);panel.balance++;

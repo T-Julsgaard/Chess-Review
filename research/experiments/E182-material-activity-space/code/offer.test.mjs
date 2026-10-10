@@ -4,6 +4,7 @@ import {readFile} from 'node:fs/promises';
 import {gunzipSync} from 'node:zlib';
 import {openResearchData} from '../../../data-policy.mjs';
 import {inspectOffer} from './offer.mjs';
+import {checkOffer} from './check-offer.mjs';
 await openResearchData(['D001'],{purpose:'test'});
 const {rows}=JSON.parse(gunzipSync(await readFile('research/experiments/E165-comparative-sacrificial-attack/evidence/results.json.gz')));
 for(const index of [4,5])test(`saved queen offer ${index}: unrecovered concession and checking policy`,()=>{
@@ -27,4 +28,12 @@ test('missing witness, strict source controls and changed source cannot supply a
   const changed=structuredClone(result);changed.attackPolicyAnalysis.witness.context.offerBalance++;
   assert.throws(()=>inspectOffer(input,changed));
   assert.throws(()=>inspectOffer(input,result,{unknown:true}));
+});
+test('independent offer checker rejects changed recovery ledger and claim',()=>{
+  const {input,result}=rows[4],decision=inspectOffer(input,result);
+  assert.equal(checkOffer(input,result,decision),true);
+  const changed=structuredClone(decision);changed.witness.acceptances[0].minimumUnrecoveredLoss=0;
+  assert.throws(()=>checkOffer(input,result,changed));
+  const claim=structuredClone(decision);claim.claims.C0588=false;
+  assert.throws(()=>checkOffer(input,result,claim));
 });

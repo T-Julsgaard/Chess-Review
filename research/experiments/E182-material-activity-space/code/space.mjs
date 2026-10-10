@@ -6,7 +6,8 @@ import {verifyPanel} from './verify-space-panel.mjs';
 function controls(input) {
   const limit=input.maxMaterialSpaceNodes===undefined?50000:input.maxMaterialSpaceNodes;
   if(!Number.isSafeInteger(limit)||limit<0||limit>50000)throw Error('maxMaterialSpaceNodes must be integer0..50000');
-  if(input.materialAlternative!==undefined&&typeof input.materialAlternative!=='string')throw Error('materialAlternative must be UCI string');
+  if(input.materialAlternative!==undefined&&(typeof input.materialAlternative!=='string'||!/^[a-h][1-8][a-h][1-8][qrbn]?$/.test(input.materialAlternative)))throw Error('materialAlternative must be UCI string');
+  if(input.materialSpacePanel!==undefined&&(!input.materialSpacePanel||typeof input.materialSpacePanel!=='object'||Array.isArray(input.materialSpacePanel)))throw Error('Expected material space panel');
   return limit;
 }
 function run(input,collect) {
@@ -16,7 +17,7 @@ function run(input,collect) {
   if(!collect&&input.materialSpacePanel===undefined)return {...answer,status:'panel-prerequisite'};
   try {
     if(limit<3)throw Error('material-space-budget');
-    const panel=input.materialSpacePanel??collectPanel(input,limit-3);
+    const panel=input.materialSpacePanel===undefined?collectPanel(input,limit-3):input.materialSpacePanel;
     if(!panel||typeof panel!=='object')throw Error('Expected material space panel');
     if(!Number.isSafeInteger(panel.nodes)||panel.nodes<0)throw Error('Invalid panel node count');
     if(panel.nodes+3>limit)throw Error('material-space-budget');

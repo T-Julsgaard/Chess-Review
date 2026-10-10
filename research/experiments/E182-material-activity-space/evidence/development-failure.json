@@ -1,0 +1,13 @@
+{
+  "stage": "independent saved replay",
+  "status": "failed",
+  "reason": "deepStrictEqual compared JSON-decoded missing-history input with live fixture containing history:undefined; JSON omits undefined object fields.",
+  "location": "code/replay-saved.mjs fixture admission",
+  "chessOutputChanged": false,
+  "retained": [
+    "initial-results.json.gz",
+    "initial-run.json.gz",
+    "initial-replay-source.mjs.gz"
+  ],
+  "next": "Compare live expected fixture after standard JSON serialization; independently replay all saved decisions without recollecting."
+}
