@@ -1,0 +1,9 @@
+{
+  "stage": "cache assembly before further collection",
+  "reason": "Full receipt equality refused historical policy document fingerprint",
+  "historicalPolicySha256": "9e6e2e256958657981c680d3678a07ebf28f94c99c809652453004cf161204b6",
+  "currentPolicySha256": "b9f78bc7e345dc2d5fea681b16f801d85c808ae2173cf8b44ece30ba99e2298f",
+  "otherReceiptFieldsEqual": true,
+  "newPanelsCollectedBeforeRefusal": 0,
+  "historicalReceiptsRewritten": false
+}

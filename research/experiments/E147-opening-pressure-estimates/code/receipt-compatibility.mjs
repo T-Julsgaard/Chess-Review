@@ -1,0 +1,9 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {execFileSync} from 'node:child_process';
+import {sha256} from '../../../data-policy.mjs';
+export async function receiptCompatibility(report,current){
+  assert.match(report.revision,/^[a-f0-9]{40}$/);const path='research/DATA_POLICY.md',raw=execFileSync('git',['show',report.revision+':'+path]),lf=raw.toString('utf8').replaceAll('\r\n','\n'),variants=[['LF',lf],['CRLF',lf.replaceAll('\n','\r\n')]],matched=variants.find(([,bytes])=>sha256(bytes)===report.eligibilityReceipt.policySha256);assert.ok(matched,'Historical policy bytes do not match receipt');assert.deepEqual({...report.eligibilityReceipt,policySha256:current.policySha256},current);
+  const addendum='Computed-tablebase addendum, 2026-10-10: [TABLEBASE_DATA_POLICY.md](TABLEBASE_DATA_POLICY.md)\ndefines a separate, explicitly registered namespace for generated endgame tables.\nThis is a policy revision for those non-game artifacts only. Their permission,\nexact exports and origin format must pass `openResearchTablebases()`; a game-data\nreceipt cannot admit them. Existing `public-data-v1` game registry/validator,\norigins and archived receipt meanings remain unchanged. Requirements below for\ngame-derived data continue unchanged. The old document fingerprint remains part\nof historical evidence; do not rewrite archived receipts to hide this addendum.\n\n';
+  const now=(await readFile(path,'utf8')).replaceAll('\r\n','\n'),removed=now.replace(addendum,'');assert.notEqual(removed,now);assert.equal(removed,lf,'Historical game policy changed beyond tablebase-only addendum');return{revision:report.revision,path,gitBlobSha256:sha256(raw),historicalReceiptPolicySha256:report.eligibilityReceipt.policySha256,checkoutEncoding:matched[0],currentPolicySha256:current.policySha256};
+}

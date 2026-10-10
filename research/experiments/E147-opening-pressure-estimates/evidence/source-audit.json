@@ -1,0 +1,11 @@
+{
+  "schema": "E147-supplementary-source-audit-v1",
+  "reason": "Initial pilot retention refused missing vendor/dependency hashes; dynamic engine-host launch was absent from static collection closure",
+  "path": "tools/calibration/engine-host.cjs",
+  "sourceSha256": "1c1c1e635cc1ff43fdff8a1be921292500f79d8bbe1cff5e039934e37837b326",
+  "revision": "ea6f06f1dccd903458e920df8af0b4c4763f2e88",
+  "observationsSha256": "de96c6a62165067090ee1beb082f55299ec40c599bd34b58d398f27991cc91b2",
+  "method": "unchanged committed host bytes at collection revision; supplementary audit, not contemporaneous snapshot",
+  "observationsChanged": false,
+  "queriesRepeated": 0
+}
