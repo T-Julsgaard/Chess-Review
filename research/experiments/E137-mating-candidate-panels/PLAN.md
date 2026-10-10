@@ -70,3 +70,12 @@ Additional prospective branching control before any E137 evaluation: White Kf6/
 Qc5 versus Kg8, actual Qg5+ H2. Hypothesis ...Kf8/...Kh7/...Kh8 all permit a mate
 next; retain all replies/ties. Include with the original core, Qf5, actual Qg7#,
 H0 core, neutral H0, zero and clock99 for16cases total across both colors.
+
+Development smoke: core Qe7 full25candidate panel succeeds862ticks, actual PV
+...Kg8 Qd8# (one equally short mate, not the originally suggested Qe8#). H0 keeps
+comparison/filter while actual lacks a within-bound PV. Proposed Qg5+ branching
+core has full31candidate comparison but actual is not certified withinH2,3473ticks;
+White Kf6 blocks the proposed Qg5-d8 diagonal. Keep that failed PV hypothesis.
+Before evaluating a corrected branch example, add same Kf6/Qc5 versus Kg8 with
+actual Qc7 H2: ...Kf8/...Kh8 should allow distinct Qd8#/Qg7#. Keep both colors,
+all earlier cases/gates/budgets, pilot18cases. No selected failure is removed.
