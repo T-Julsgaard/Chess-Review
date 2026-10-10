@@ -17,3 +17,9 @@ First observed smoke disclosed: original Kxa1 throws Illegal move:a2a1 (pawn
 attack); original Qf7 yields terminal-without-mate,3ticks, stalemate. Dated PLAN
 amendment preserves both failures and preregisters the corrected Kxa3 exchange and
 Qe6 distance2 hypotheses before evaluating them. No source-derived boards used.
+
+Second smoke: corrected exchange exact3plies197ticks both colors; Qe6 unresolved
+within3plies377ticks; claim-clock refuses exactness, actual Qg7# exact0. Retain
+Qe6 failure. Prospective third distance2 core from previously exposed authored E029
+quiet-forced-two mechanics, with additional pieces removed, registered before its
+evaluation. All observations exploratory; no threshold/goal/search gate changed.

@@ -76,3 +76,12 @@ Use that new board at clock99 for claim-semantic control; actual quiet move reac
 100. Original Qf7 remains negative. Mirrored one-ply history needs initial fullmove
 counter2, since reflected White move does not increment it; save exact canonical
 root/full clocks rather than silently accepting a history mismatch. Pilot<=20cases.
+
+Corrected Kxa3 exchange succeeds at exact3plies197ticks in both colors; clock
+control correctly requires claim-rule support; actual Qg7# returns distance0.
+Qe6 does NOT force mate within3plies377ticks: proposed Qg7 from e6 is not a legal
+queen move. Retain this second failed distance2 hypothesis as unresolved, not draw.
+Before further evaluation, add K g6/Qg5 versus Kh8, actual Qe7 H3: this reuses
+the authored E029 quiet-forced-two core (without its additional pieces), and should
+allow ...Kg8 Qe8#. It is development-exposed mechanics, not fresh confirmation.
+Keep all earlier failures, same solver/gates/budgets, pilot<=22cases.
