@@ -1,0 +1,8 @@
+import {mkdir,writeFile} from 'node:fs/promises';
+import {gzipSync} from 'node:zlib';
+import {execFileSync} from 'node:child_process';
+import {openResearchData} from '../../../data-policy.mjs';
+import {bindings} from '../../E138-bounded-engine-panels/code/source-bindings.mjs';
+const data=await openResearchData(['D001'],{purpose:'test'}),{fixtures}=await import('./fixtures.mjs'),{explainMove}=await import('./effectiveness.mjs'),{checkWitness}=await import('./check-witness.mjs'),rows=[];
+for(const f of [fixtures[0],fixtures[2],fixtures[4]]){let result=null,error=null;try{result=explainMove(f);if(result.pieceObjectiveAnalysis.witness)checkWitness(result.pieceObjectiveAnalysis.witness,result,f);}catch(e){error=e.stack;}const actual=result?.events.filter(e=>e.evidence?.experiment==='E156').map(e=>e.id),passed=error===null&&JSON.stringify(actual)===JSON.stringify(f.expected);rows.push({fixture:f,result,error,passed});}
+const report={schema:'E156-smoke-v1',revision:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),eligibilityReceipt:data.receipt,sourceHashes:await bindings(['research/experiments/E156-piece-objective-effectiveness/code/smoke.mjs']),rows},out='research/runs/E156/smoke';await mkdir(out,{recursive:true});await writeFile(out+'/results.json.gz',gzipSync(Buffer.from(JSON.stringify(report)+'\n'),{level:9}));console.log(JSON.stringify({passed:rows.every(r=>r.passed),rows:rows.map(r=>({id:r.fixture.id,passed:r.passed,error:r.error,nodes:r.result?.pieceObjectiveAnalysis.nodes,policies:r.result?.pieceObjectiveAnalysis.witness?.policies.map(p=>({square:p.square,passed:p.passed,refutations:p.refutations}))}))}));if(rows.some(r=>!r.passed))process.exitCode=1;
