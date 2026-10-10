@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "cases": 14,
+  "shoulderDecisions": 28,
+  "sourceDecisions": 56,
+  "newRawPanels": 2,
+  "reusedControlPanels": 4,
+  "sourceBindings": 933,
+  "collectionBindings": 22,
+  "pilotSha256": "2279f0766bf6be407889eabb8f48cf28d119445d0a237c639a86e7ca72ff46e6",
+  "panelHashes": {
+    "fresh": "4605dceb621f7d61606e11c8f95c09b5a21dd262d2e06c0898f9f57ad837ed07",
+    "old": "8280304e899042d580b26993867fd83e4c37d838dcbc9fb9091fccea5fcb77c3"
+  },
+  "limitations": "Unchanged E184 independent checker, shared legal Chess, frozen E106 independent checker and ordinary-data helper. Synthetic development; no production or broad optimal-endgame/human validity claim."
+}
