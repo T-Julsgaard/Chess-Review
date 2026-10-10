@@ -1,0 +1,9 @@
+import assert from 'node:assert/strict';import {readFile} from 'node:fs/promises';import {gunzipSync} from 'node:zlib';import {openResearchData,sha256} from '../../../data-policy.mjs';import {bindings} from '../../E138-bounded-engine-panels/code/source-bindings.mjs';import {savedCertificates} from '../../E144-causal-piece-coordination/code/saved-certificates.mjs';import {fixtures,prefixControl} from './fixtures.mjs';
+export const dir='research/experiments/E177-queen-exchange-ending',key=i=>JSON.stringify([i.fen,i.history,i.move,i.endingAlternative,i.endingMatePlies===undefined?2:i.endingMatePlies]);
+export async function savedPanels(){
+  const data=await openResearchData(['D001'],{purpose:'test'}),hashes=await bindings([dir+'/code/panel.mjs',dir+'/code/context.mjs']),old=await savedCertificates(),sourceObservation='research/experiments/E144-causal-piece-coordination/evidence/observations.json.gz',matching=old.rows.filter(r=>[...fixtures,prefixControl].some(i=>r.key.fen===i.fen&&JSON.stringify(r.key.history)===JSON.stringify(i.history)&&r.key.plies===(i.endingMatePlies??2)&&[i.move,i.endingAlternative].includes(r.key.move)));
+  assert.equal(matching.length,0,'Existing matching query must be reused before collection');
+  const audit={sourceObservation,sourceObservationSha256:sha256(await readFile(sourceObservation)),checked:old.rows.length,matched:matching.length},cache=new Map();
+  for(const name of ['smoke','observations']){let raw;try{raw=JSON.parse(gunzipSync(await readFile(dir+'/evidence/'+name+'.json.gz')));}catch(e){if(e.code==='ENOENT')continue;throw e;}assert.deepEqual(raw.datasetReceipt,data.receipt);assert.deepEqual(raw.sourceHashes,hashes);assert.deepEqual(raw.queryReuseAudit,audit);for(const r of raw.rows){const p=r.panel||r.result?.endingPreparationAnalysis?.witness?.panel;if(p)cache.set(key(r.input),p);}}
+  return{hashes,audit,get:i=>cache.get(key(i)),store:(i,p)=>cache.set(key(i),p)};
+}

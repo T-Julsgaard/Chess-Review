@@ -1,0 +1,27 @@
+
+> chess-review@0.3.0 research:coach-tests
+> node research/workflow.mjs test E177
+
+Focused development checks: E177 (1 test files).
+Focused checks do not replace the final full regression or independent proof/reproducibility checks.
+....................
+.........X..........
+....................
+
+
+Failed tests:
+
+✖ history reaching already terminal root abstains (4.6692ms)
+  Error: Cannot explain a move from a terminal position
+      at explainMove (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/research/experiments/E020-coach-concepts/code/concepts.mjs:171:34)
+      at explainMove (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/research/experiments/E021-structural-concepts/code/explain.mjs:72:19)
+      at explainMove (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/research/experiments/E022-move-tactics/code/tactics.mjs:98:14)
+      at explainMove (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/research/experiments/E023-broad-tactics/code/tactics.mjs:91:18)
+      at explainMove (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/research/experiments/E024-transitions/code/transitions.mjs:95:44)
+      at explainMove (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/research/experiments/E025-pawn-formations/code/formations.mjs:82:13)
+      at explainMove (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/research/experiments/E026-pin-proofs/code/proofs.mjs:30:13)
+      at explainMove (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/research/experiments/E027-defensive-resources/code/defense.mjs:33:13)
+      at explainMove (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/research/experiments/E028-mating-patterns/code/patterns.mjs:58:47)
+      at explainMove (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/research/experiments/E029-forced-mates/code/mates.mjs:31:13)
+
+Focused checks failed in 23.6 seconds.
