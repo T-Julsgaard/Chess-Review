@@ -1,0 +1,8 @@
+import {writeFile,mkdir} from 'node:fs/promises';
+import {gzipSync} from 'node:zlib';
+import {execFileSync} from 'node:child_process';
+import {openResearchData} from '../../../data-policy.mjs';
+import {bindings} from '../../E138-bounded-engine-panels/code/source-bindings.mjs';
+import {fixtures} from './fixtures.mjs';
+import {explainMove} from './routes.mjs';
+const data=await openResearchData(['D001'],{purpose:'test'}),dir='research/experiments/E154-piece-route-objectives',report={schema:'E154-smoke-v1',revision:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),sourceHashes:await bindings([dir+'/code/smoke.mjs']),eligibilityReceipt:data.receipt,rows:[]};await mkdir('research/runs/E154/smoke',{recursive:true});for(const f of [fixtures[0],fixtures[2],fixtures[4]]){const start=performance.now();let result=null,error=null;try{result=explainMove(f);}catch(e){error=e.message;}const elapsedMs=Math.round(performance.now()-start);report.rows.push({fixture:f,result,error,elapsedMs});await writeFile('research/runs/E154/smoke/results.json.gz',gzipSync(Buffer.from(JSON.stringify(report)+'\n'),{level:9}));console.log(JSON.stringify({id:f.id,elapsedMs,error,observed:result?.events.filter(e=>e.evidence?.experiment==='E154').map(e=>e.id),status:result?.routeAnalysis.status,nodes:result?.routeAnalysis.nodes,ranking:result?.routeAnalysis.witness?.ranking.map(r=>({move:r.move,valid:r.valid,score:r.score})),prior:result?.routeAnalysis.witness?.priorCounts?.map(u=>({square:u.square,safe:u.safeCount})),current:result?.routeAnalysis.witness?.rootCounts?.map(u=>({square:u.square,safe:u.safeCount})),regroup:result?.routeAnalysis.witness?.regroup?.refutations}));}
