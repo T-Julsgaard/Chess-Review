@@ -1,0 +1,7 @@
+export const texts={'finite-initiative-neutralized-by-return':"Neutralizing the initiative: this return refutes the opponent's complete mating policy within the declared bound; the quiet alternative permits forced mate.",'recorded-sacrifice-gain-returned':"Returning material: accepting this offer gives back part of the recorded gain and escapes the mating bound; the quiet alternative loses."};
+export function derive(p,limit){
+  let work=0,claim=false;const tick=()=>{if(++work>limit)throw Error('material-return-budget');},live=s=>!Object.values(s.flags).some(Boolean),visit=s=>{claim||=s.flags.fifty||s.flags.threefold;};tick();visit(p.root);
+  const summaries=p.variants.map(v=>{tick();visit(v.state);claim||=v.query.searchClaim;return{move:v.played.move,enemyMate:v.query.tree.win,returnedCaptures:v.acceptances.map(a=>{tick();visit(a.state);claim||=a.query.searchClaim;return{move:a.played.move,loss:p.root.balance-a.state.balance,remainingGain:a.state.balance-p.certificate.anchorBalance,safe:live(a.state)&&!a.query.tree.win};})};});
+  const [actual,alternative]=summaries,captures=actual.returnedCaptures,neutralized=!claim&&p.config.plies===3&&p.variants.every(v=>live(v.state))&&!actual.enemyMate&&alternative.enemyMate&&captures.length>0&&captures.every(c=>c.safe&&c.loss>=1),returned=neutralized&&captures.every(c=>c.loss<=p.certificate.rootGain&&c.remainingGain>=0);
+  return{experiment:'E172',before:p.root.fen,after:p.variants[0].state.fen,panel:p,work,claim,summaries,neutralized,returned};
+}
