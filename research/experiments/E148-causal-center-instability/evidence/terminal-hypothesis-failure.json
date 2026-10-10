@@ -1,0 +1,767 @@
+{
+  "schema": "E148-terminal-hypothesis-failure-v1",
+  "revision": "907d18485fbfa5c1edee58b06673408b14f29eb3",
+  "fixture": {
+    "id": "recorded-support-chain-collapse",
+    "fen": "8/7k/4B3/3p4/8/8/8/K7 w - - 1 2",
+    "history": {
+      "fen": "7k/8/4p3/3p4/6B1/8/8/K7 w - - 0 1",
+      "moves": [
+        "g4e6",
+        "h8h7"
+      ]
+    },
+    "move": "e6d5",
+    "centerInstabilityTags": true,
+    "scanReplies": false,
+    "expected": [
+      "recorded-center-collapse"
+    ]
+  },
+  "expected": [
+    "recorded-center-collapse"
+  ],
+  "observed": [],
+  "reason": "Actual capture ends K+B versus K: insufficient-material draw, no material certificate",
+  "sourceHashes": {
+    "lib/chess.js": "a0b289b6530990bb49e78ccfb4ccf8ed18d9a5cb3713c44c433cbfab8725a6f6",
+    "research/d001-format.mjs": "5dffe4a50655536950d2bb8c475fef31f493cfb9b47cfcaad808b0fb087ea24d",
+    "research/data-policy.mjs": "595ea82720f6699405b19e0f64fdc793597ace0b9e5b9096b482b9781c3d7225",
+    "research/experiments/E020-coach-concepts/code/concepts.mjs": "b6e917d81c675175f840b19233ebcac61591ac163e5277fa6a1f12a3b9aaa692",
+    "research/experiments/E021-structural-concepts/code/explain.mjs": "b2578320f9d6a81c2a803789126ea0104ce720890361c953cd1b2811e3811be6",
+    "research/experiments/E021-structural-concepts/code/features.mjs": "88ae24e21f310e53aa26263a26b13c990c34e86cbe56df128ed80585e966df66",
+    "research/experiments/E022-move-tactics/code/tactics.mjs": "04ea550a22503c1f3aa13cb822dcb67fcca130bb86102faa171ca588359592d4",
+    "research/experiments/E023-broad-tactics/code/tactics.mjs": "a00d789ffb538ed5a274257c82420716716e04ddfe84e970d115aee1cee01a74",
+    "research/experiments/E024-transitions/code/transitions.mjs": "14c933ccf39ca66e89803d04701defb311f02bc4519001369878d1c66f9fb437",
+    "research/experiments/E148-causal-center-instability/code/fixtures.mjs": "b3f34b0684e85237769fb2ec0d9ba9478e0db9313937b760d0b5e9bbc64f112f",
+    "research/experiments/E148-causal-center-instability/code/panel.mjs": "ae462c7ab358babbe313fa09c47988e32ebb31d80b19ecac7e7cd4c656196143",
+    "research/experiments/FRIEND-shared/lib.mjs": "db5f0b05bfb833a7c37565fe5b9d066de9ef6a7132d561e5dfa1ca6bfb9038d5",
+    "research/fresh-format.mjs": "6537d177ad21cbe16c89471040e63d0f42ad43a69e4f189787b8dcf2624e5b21",
+    "tools/calibration/core.mjs": "c9f38c42f4937fcfdcb3bd44fdaf1d4eea6323c69533a24ca16779cfc4178ace"
+  },
+  "fixtureSource": "import {Chess} from '../../../../lib/chess.js';\nimport {boardFen,reflect} from '../../FRIEND-shared/lib.mjs';\nconst fen=boardFen({a1:'K',d4:'P',e3:'P',h8:'k',e5:'p',e6:'p'}),base={id:'advance-beyond-support',fen,history:{fen,moves:[]},move:'d4d5',centerInstabilityTags:true,scanReplies:false,expected:['dynamic-center-options','central-pawn-overextension']},start=boardFen({a1:'K',g4:'B',h8:'k',d5:'p',e6:'p'}),moves=['g4e6','h8h7'],c=new Chess(start);for(const m of moves)c.move(m);const defended=boardFen({a1:'K',c4:'P',d4:'P',e3:'P',h8:'k',e5:'p',e6:'p'});\nexport const fixtures=[base,{...base,id:'same-pawn-capture-alternative',move:'d4e5',expected:['dynamic-center-options']},{...base,id:'recorded-support-chain-collapse',fen:c.fen(),history:{fen:start,moves},move:'e6d5',expected:['recorded-center-collapse']},{...base,id:'advance-retains-pawn-support',fen:defended,history:{fen:defended,moves:[]},expected:['dynamic-center-options']},{...base,id:'missing-history',history:undefined,expected:[]},{...base,id:'zero-budget',maxCenterInstabilityNodes:0,expected:[]}].flatMap(f=>[f,reflect(f)]).map(f=>{if(f.history?.moves.length){const c=new Chess(f.history.fen);for(const m of f.history.moves)c.move(m);return{...f,fen:c.fen()};}return f;});\n",
+  "panel": {
+    "schema": "E148-complete-center-panel-v1",
+    "before": "8/7k/4B3/3p4/8/8/8/K7 w - - 1 2",
+    "history": {
+      "fen": "7k/8/4p3/3p4/6B1/8/8/K7 w - - 0 1",
+      "moves": [
+        "g4e6",
+        "h8h7"
+      ]
+    },
+    "actor": "w",
+    "from": "e6",
+    "sourceSupport": [],
+    "beforeCenter": [
+      {
+        "square": "d5",
+        "color": "b",
+        "support": []
+      }
+    ],
+    "legal": [
+      {
+        "move": "a1a2",
+        "san": "Ka2",
+        "from": "a1",
+        "to": "a2",
+        "piece": "k",
+        "captured": null,
+        "promotion": null,
+        "enPassant": false,
+        "victim": null
+      },
+      {
+        "move": "a1b1",
+        "san": "Kb1",
+        "from": "a1",
+        "to": "b1",
+        "piece": "k",
+        "captured": null,
+        "promotion": null,
+        "enPassant": false,
+        "victim": null
+      },
+      {
+        "move": "a1b2",
+        "san": "Kb2",
+        "from": "a1",
+        "to": "b2",
+        "piece": "k",
+        "captured": null,
+        "promotion": null,
+        "enPassant": false,
+        "victim": null
+      },
+      {
+        "move": "e6c8",
+        "san": "Bc8",
+        "from": "e6",
+        "to": "c8",
+        "piece": "b",
+        "captured": null,
+        "promotion": null,
+        "enPassant": false,
+        "victim": null
+      },
+      {
+        "move": "e6d5",
+        "san": "Bxd5",
+        "from": "e6",
+        "to": "d5",
+        "piece": "b",
+        "captured": "p",
+        "promotion": null,
+        "enPassant": false,
+        "victim": "d5"
+      },
+      {
+        "move": "e6d7",
+        "san": "Bd7",
+        "from": "e6",
+        "to": "d7",
+        "piece": "b",
+        "captured": null,
+        "promotion": null,
+        "enPassant": false,
+        "victim": null
+      },
+      {
+        "move": "e6f5",
+        "san": "Bf5+",
+        "from": "e6",
+        "to": "f5",
+        "piece": "b",
+        "captured": null,
+        "promotion": null,
+        "enPassant": false,
+        "victim": null
+      },
+      {
+        "move": "e6f7",
+        "san": "Bf7",
+        "from": "e6",
+        "to": "f7",
+        "piece": "b",
+        "captured": null,
+        "promotion": null,
+        "enPassant": false,
+        "victim": null
+      },
+      {
+        "move": "e6g4",
+        "san": "Bg4",
+        "from": "e6",
+        "to": "g4",
+        "piece": "b",
+        "captured": null,
+        "promotion": null,
+        "enPassant": false,
+        "victim": null
+      },
+      {
+        "move": "e6g8",
+        "san": "Bg8+",
+        "from": "e6",
+        "to": "g8",
+        "piece": "b",
+        "captured": null,
+        "promotion": null,
+        "enPassant": false,
+        "victim": null
+      },
+      {
+        "move": "e6h3",
+        "san": "Bh3",
+        "from": "e6",
+        "to": "h3",
+        "piece": "b",
+        "captured": null,
+        "promotion": null,
+        "enPassant": false,
+        "victim": null
+      }
+    ],
+    "variants": [
+      {
+        "move": "e6d5",
+        "san": "Bxd5",
+        "from": "e6",
+        "to": "d5",
+        "piece": "b",
+        "captured": "p",
+        "promotion": null,
+        "enPassant": false,
+        "victim": "d5",
+        "after": "8/7k/8/3B4/8/8/8/K7 b - - 0 2",
+        "flags": {
+          "mate": false,
+          "stalemate": false,
+          "insufficient": true,
+          "fifty": false,
+          "threefold": false
+        },
+        "center": [],
+        "movedSupport": [],
+        "legal": [
+          {
+            "move": "h7g6",
+            "san": "Kg6",
+            "from": "h7",
+            "to": "g6",
+            "piece": "k",
+            "captured": null,
+            "promotion": null,
+            "enPassant": false,
+            "victim": null
+          },
+          {
+            "move": "h7g7",
+            "san": "Kg7",
+            "from": "h7",
+            "to": "g7",
+            "piece": "k",
+            "captured": null,
+            "promotion": null,
+            "enPassant": false,
+            "victim": null
+          },
+          {
+            "move": "h7h6",
+            "san": "Kh6",
+            "from": "h7",
+            "to": "h6",
+            "piece": "k",
+            "captured": null,
+            "promotion": null,
+            "enPassant": false,
+            "victim": null
+          },
+          {
+            "move": "h7h8",
+            "san": "Kh8",
+            "from": "h7",
+            "to": "h8",
+            "piece": "k",
+            "captured": null,
+            "promotion": null,
+            "enPassant": false,
+            "victim": null
+          }
+        ],
+        "captureLedger": {
+          "winner": "w",
+          "baseline": 2,
+          "afterGain": 1,
+          "afterFlags": {
+            "mate": false,
+            "stalemate": false,
+            "insufficient": true,
+            "fifty": false,
+            "threefold": false
+          },
+          "replies": [
+            {
+              "move": "h7g6",
+              "san": "Kg6",
+              "fen": "8/8/6k1/3B4/8/8/8/K7 w - - 1 3",
+              "gain": 1,
+              "flags": {
+                "mate": false,
+                "stalemate": false,
+                "insufficient": true,
+                "fifty": false,
+                "threefold": false
+              }
+            },
+            {
+              "move": "h7g7",
+              "san": "Kg7",
+              "fen": "8/6k1/8/3B4/8/8/8/K7 w - - 1 3",
+              "gain": 1,
+              "flags": {
+                "mate": false,
+                "stalemate": false,
+                "insufficient": true,
+                "fifty": false,
+                "threefold": false
+              }
+            },
+            {
+              "move": "h7h6",
+              "san": "Kh6",
+              "fen": "8/8/7k/3B4/8/8/8/K7 w - - 1 3",
+              "gain": 1,
+              "flags": {
+                "mate": false,
+                "stalemate": false,
+                "insufficient": true,
+                "fifty": false,
+                "threefold": false
+              }
+            },
+            {
+              "move": "h7h8",
+              "san": "Kh8",
+              "fen": "7k/8/8/3B4/8/8/8/K7 w - - 1 3",
+              "gain": 1,
+              "flags": {
+                "mate": false,
+                "stalemate": false,
+                "insufficient": true,
+                "fifty": false,
+                "threefold": false
+              }
+            }
+          ]
+        },
+        "enemyCaptures": []
+      }
+    ],
+    "claimContexts": [],
+    "nodes": 13
+  },
+  "result": {
+    "schema": "coach-concepts-E148-prototype",
+    "before": "8/7k/4B3/3p4/8/8/8/K7 w - - 1 2",
+    "after": "8/7k/8/3B4/8/8/8/K7 b - - 0 2",
+    "move": "e6d5",
+    "san": "Bxd5",
+    "events": [
+      {
+        "id": "file-opening",
+        "evidence": {
+          "file": "d"
+        },
+        "qualityClaim": false,
+        "text": "The d-file is now open: no pawns remain on it."
+      },
+      {
+        "id": "long-diagonal-bishop",
+        "evidence": {
+          "square": "d5",
+          "diagonal": "h1-a8"
+        },
+        "qualityClaim": false,
+        "text": "Long-diagonal bishop: d5 lies on h1-a8."
+      },
+      {
+        "id": "material-balance",
+        "evidence": {
+          "own": 3,
+          "enemy": 0,
+          "delta": 3,
+          "values": {
+            "p": 1,
+            "n": 3,
+            "b": 3,
+            "r": 5,
+            "q": 9,
+            "k": 0
+          }
+        },
+        "qualityClaim": false,
+        "text": "Nominal material balance: 3 pawn-value points ahead."
+      },
+      {
+        "id": "capture",
+        "text": "You capture the pawn on d5.",
+        "evidence": {
+          "from": "e6",
+          "to": "d5",
+          "captured": "p",
+          "enPassant": false
+        },
+        "qualityClaim": false
+      },
+      {
+        "id": "insufficient-material",
+        "text": "Insufficient mating material: this position is drawn.",
+        "evidence": {
+          "fen": "8/7k/8/3B4/8/8/8/K7 b - - 0 2"
+        },
+        "qualityClaim": false
+      },
+      {
+        "id": "open-center",
+        "text": "Open center: neither the d-file nor the e-file contains a pawn.",
+        "evidence": {
+          "files": "de",
+          "remaining": []
+        },
+        "qualityClaim": false
+      },
+      {
+        "id": "draw-position",
+        "text": "Drawn position: a lone bishop or knight cannot mate a bare king.",
+        "evidence": {
+          "afterFen": "8/7k/8/3B4/8/8/8/K7 b - - 0 2",
+          "reason": "lone-minor",
+          "pieces": [
+            {
+              "square": "d5",
+              "type": "b",
+              "color": "w"
+            }
+          ]
+        },
+        "qualityClaim": false
+      },
+      {
+        "id": "irreversible-move",
+        "text": "Irreversible capture: it resets the fifty-move count.",
+        "evidence": {
+          "played": "e6d5",
+          "piece": "b",
+          "captured": "p",
+          "beforeFen": "8/7k/4B3/3p4/8/8/8/K7 w - - 1 2",
+          "afterFen": "8/7k/8/3B4/8/8/8/K7 b - - 0 2",
+          "reasons": [
+            "capture"
+          ],
+          "oldRights": "-",
+          "newRights": "-",
+          "lostRights": [],
+          "halfmoveCount": 0
+        },
+        "qualityClaim": false
+      }
+    ],
+    "comment": "Drawn position: a lone bishop or knight cannot mate a bare king.",
+    "diagnostics": {
+      "tactics": "complete",
+      "replyScan": "disabled",
+      "nodes": 0,
+      "maxNodes": 50000,
+      "moveTactics": {
+        "status": "complete",
+        "nodes": 0
+      },
+      "broadTactics": {
+        "status": "terminal",
+        "nodes": 0
+      },
+      "history": {
+        "verified": true,
+        "plies": 2
+      }
+    },
+    "proofBudget": {
+      "nodes": 0,
+      "limit": 50000,
+      "exhausted": false
+    },
+    "defenseBudget": {
+      "nodes": 0,
+      "limit": 50000,
+      "exhausted": false
+    },
+    "centerInstabilityAnalysis": {
+      "limit": 50000,
+      "nodes": 16,
+      "status": "compared",
+      "witness": {
+        "experiment": "E148",
+        "panel": {
+          "schema": "E148-complete-center-panel-v1",
+          "before": "8/7k/4B3/3p4/8/8/8/K7 w - - 1 2",
+          "history": {
+            "fen": "7k/8/4p3/3p4/6B1/8/8/K7 w - - 0 1",
+            "moves": [
+              "g4e6",
+              "h8h7"
+            ]
+          },
+          "actor": "w",
+          "from": "e6",
+          "sourceSupport": [],
+          "beforeCenter": [
+            {
+              "square": "d5",
+              "color": "b",
+              "support": []
+            }
+          ],
+          "legal": [
+            {
+              "move": "a1a2",
+              "san": "Ka2",
+              "from": "a1",
+              "to": "a2",
+              "piece": "k",
+              "captured": null,
+              "promotion": null,
+              "enPassant": false,
+              "victim": null
+            },
+            {
+              "move": "a1b1",
+              "san": "Kb1",
+              "from": "a1",
+              "to": "b1",
+              "piece": "k",
+              "captured": null,
+              "promotion": null,
+              "enPassant": false,
+              "victim": null
+            },
+            {
+              "move": "a1b2",
+              "san": "Kb2",
+              "from": "a1",
+              "to": "b2",
+              "piece": "k",
+              "captured": null,
+              "promotion": null,
+              "enPassant": false,
+              "victim": null
+            },
+            {
+              "move": "e6c8",
+              "san": "Bc8",
+              "from": "e6",
+              "to": "c8",
+              "piece": "b",
+              "captured": null,
+              "promotion": null,
+              "enPassant": false,
+              "victim": null
+            },
+            {
+              "move": "e6d5",
+              "san": "Bxd5",
+              "from": "e6",
+              "to": "d5",
+              "piece": "b",
+              "captured": "p",
+              "promotion": null,
+              "enPassant": false,
+              "victim": "d5"
+            },
+            {
+              "move": "e6d7",
+              "san": "Bd7",
+              "from": "e6",
+              "to": "d7",
+              "piece": "b",
+              "captured": null,
+              "promotion": null,
+              "enPassant": false,
+              "victim": null
+            },
+            {
+              "move": "e6f5",
+              "san": "Bf5+",
+              "from": "e6",
+              "to": "f5",
+              "piece": "b",
+              "captured": null,
+              "promotion": null,
+              "enPassant": false,
+              "victim": null
+            },
+            {
+              "move": "e6f7",
+              "san": "Bf7",
+              "from": "e6",
+              "to": "f7",
+              "piece": "b",
+              "captured": null,
+              "promotion": null,
+              "enPassant": false,
+              "victim": null
+            },
+            {
+              "move": "e6g4",
+              "san": "Bg4",
+              "from": "e6",
+              "to": "g4",
+              "piece": "b",
+              "captured": null,
+              "promotion": null,
+              "enPassant": false,
+              "victim": null
+            },
+            {
+              "move": "e6g8",
+              "san": "Bg8+",
+              "from": "e6",
+              "to": "g8",
+              "piece": "b",
+              "captured": null,
+              "promotion": null,
+              "enPassant": false,
+              "victim": null
+            },
+            {
+              "move": "e6h3",
+              "san": "Bh3",
+              "from": "e6",
+              "to": "h3",
+              "piece": "b",
+              "captured": null,
+              "promotion": null,
+              "enPassant": false,
+              "victim": null
+            }
+          ],
+          "variants": [
+            {
+              "move": "e6d5",
+              "san": "Bxd5",
+              "from": "e6",
+              "to": "d5",
+              "piece": "b",
+              "captured": "p",
+              "promotion": null,
+              "enPassant": false,
+              "victim": "d5",
+              "after": "8/7k/8/3B4/8/8/8/K7 b - - 0 2",
+              "flags": {
+                "mate": false,
+                "stalemate": false,
+                "insufficient": true,
+                "fifty": false,
+                "threefold": false
+              },
+              "center": [],
+              "movedSupport": [],
+              "legal": [
+                {
+                  "move": "h7g6",
+                  "san": "Kg6",
+                  "from": "h7",
+                  "to": "g6",
+                  "piece": "k",
+                  "captured": null,
+                  "promotion": null,
+                  "enPassant": false,
+                  "victim": null
+                },
+                {
+                  "move": "h7g7",
+                  "san": "Kg7",
+                  "from": "h7",
+                  "to": "g7",
+                  "piece": "k",
+                  "captured": null,
+                  "promotion": null,
+                  "enPassant": false,
+                  "victim": null
+                },
+                {
+                  "move": "h7h6",
+                  "san": "Kh6",
+                  "from": "h7",
+                  "to": "h6",
+                  "piece": "k",
+                  "captured": null,
+                  "promotion": null,
+                  "enPassant": false,
+                  "victim": null
+                },
+                {
+                  "move": "h7h8",
+                  "san": "Kh8",
+                  "from": "h7",
+                  "to": "h8",
+                  "piece": "k",
+                  "captured": null,
+                  "promotion": null,
+                  "enPassant": false,
+                  "victim": null
+                }
+              ],
+              "captureLedger": {
+                "winner": "w",
+                "baseline": 2,
+                "afterGain": 1,
+                "afterFlags": {
+                  "mate": false,
+                  "stalemate": false,
+                  "insufficient": true,
+                  "fifty": false,
+                  "threefold": false
+                },
+                "replies": [
+                  {
+                    "move": "h7g6",
+                    "san": "Kg6",
+                    "fen": "8/8/6k1/3B4/8/8/8/K7 w - - 1 3",
+                    "gain": 1,
+                    "flags": {
+                      "mate": false,
+                      "stalemate": false,
+                      "insufficient": true,
+                      "fifty": false,
+                      "threefold": false
+                    }
+                  },
+                  {
+                    "move": "h7g7",
+                    "san": "Kg7",
+                    "fen": "8/6k1/8/3B4/8/8/8/K7 w - - 1 3",
+                    "gain": 1,
+                    "flags": {
+                      "mate": false,
+                      "stalemate": false,
+                      "insufficient": true,
+                      "fifty": false,
+                      "threefold": false
+                    }
+                  },
+                  {
+                    "move": "h7h6",
+                    "san": "Kh6",
+                    "fen": "8/8/7k/3B4/8/8/8/K7 w - - 1 3",
+                    "gain": 1,
+                    "flags": {
+                      "mate": false,
+                      "stalemate": false,
+                      "insufficient": true,
+                      "fifty": false,
+                      "threefold": false
+                    }
+                  },
+                  {
+                    "move": "h7h8",
+                    "san": "Kh8",
+                    "fen": "7k/8/8/3B4/8/8/8/K7 w - - 1 3",
+                    "gain": 1,
+                    "flags": {
+                      "mate": false,
+                      "stalemate": false,
+                      "insufficient": true,
+                      "fifty": false,
+                      "threefold": false
+                    }
+                  }
+                ]
+              },
+              "enemyCaptures": []
+            }
+          ],
+          "claimContexts": [],
+          "nodes": 13
+        },
+        "before": "8/7k/4B3/3p4/8/8/8/K7 w - - 1 2",
+        "after": "8/7k/8/3B4/8/8/8/K7 b - - 0 2",
+        "actor": "w",
+        "played": "e6d5",
+        "san": "Bxd5",
+        "summaries": [
+          {
+            "move": "e6d5",
+            "san": "Bxd5",
+            "profitableCaptures": [],
+            "ownCaptureMinimum": null
+          }
+        ],
+        "dynamicComparison": null,
+        "overextension": null,
+        "collapse": null
+      }
+    }
+  }
+}
