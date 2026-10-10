@@ -1,0 +1,9 @@
+{
+  "stage": "fifty-claim focused source harness",
+  "error": "Cannot explain a move from a terminal position",
+  "reason": "Frozen source correctly rejects the recorded fifty-claim root; harness originally expected a returned source result.",
+  "collectorHash": "88fdf3db99bed8ab270217400bcbdfd7a8359b7e904ef94b7fd91b25c609c826",
+  "rawHash": "fa6ca2176eb6d6c9dbb224f4722375b51b518bed035cd0c6003ec29c95a39565",
+  "chessClaimChanged": false,
+  "next": "Record expected source rejection and assert no source certificate/turnover positive; reuse unchanged first two raw contexts."
+}
