@@ -1,9 +1,9 @@
-# E160 — bounded outpost holding and exchange policy, in progress
+# E160 — bounded outpost holding and exchange policy
 
-2026-10-10. Preregistered cb5f852; parent E159 a6d4b7e. Current main authorized,
-research-only/local commits/no push. Callable default-disabled prototype exists,
-but focused checks have NOT passed and no build.json has been generated. Neither
-C0321 nor C0701 counts as code-ready/accepted. Full catalog goal remains active.
+2026-10-10. Preregistered cb5f852; parent E159 a6d4b7e, initial in-progress
+retention d1d1279. Current main authorized, research-only/local commits/no push.
+Code-ready provisional C0321/C0701 scopes, not accepted research. Full catalog
+goal remains active; neither broad occurrence is declared complete.
 
 Adds complete actual-history policy after E070 initial pawn-route/legal-support
 admission. For every enemy reply, retain all legal own moves and every eligible
@@ -53,19 +53,68 @@ bytes/20,956,005plain,216 collection source hashes; smoke and initial failure al
 retained. All positions authored synthetic, D001-test receipt guards throughout;
 no acquired games/engine/tablebase. Complete combined evidence size not finalized.
 
-Focused test module, guarded pilot, independent saved replay and build metadata
-generator written. Pilot/replay/build generator have not run. Focused workflow
-failed before named tests due Node allocation failure; repeated small isolated
-attempts confirmed memory failure rather than a reported assertion. See
-FOCUSED-FAILURE.md for exact commands, elapsed times and diagnostics. No claim
-that these checks passed. No cumulative suite or exact reproduction run attempted.
+Initial focused attempts failed with Node allocation errors before a named test
+completed; FOCUSED-FAILURE.md preserves exact commands/diagnostics. Subsequent
+isolation found malformed caller panel {} triggered huge deep-equality failure
+formatting. A bounded streaming loader alone reduced memory but did not fix that
+diagnostic. The original parsed-all-panels loader remains unchanged because it
+is in the original collector source closure; new consumers use a separate loader.
+Source-only comparison migration replaces two assert.deepEqual full-tree calls
+with assert.ok(isDeepStrictEqual(...)) and compact messages. Deep comparison and
+acceptance predicates remain unchanged, not relaxed. Both original verifier
+sources/hashes are retained in comparison-source-snapshots.json; bounded loader
+mechanically reconstructs exactly those edits, rejecting any other source change.
+Current build/pilot fingerprints bind new bytes; original collection hashes stay
+intact. Independent current semantic replay is still mandatory. See dated
+MEMORY-AMENDMENT.md; no fixture, policy, history, budget or branch changed here.
 
-Next concrete action: change saved-evidence loading to process one comparison
-at a time, retaining every branch/hash/receipt and reusing collected panels.
-Avoid repeating the same whole-file attempt before that change. Then finish
-focused/representative-parent checks, small pilot, independent saved replay,
-source/diff verification and code-ready record. Full cumulative/exhaustive scope/
-priority/history/budget audits and exact main/repeat/initially clean reproductions
-remain deferred to combined freeze. Broad permanence/strategic value and real-
-game precision/human usefulness remain unresolved; production/numerical/accepted
-tracker unchanged. No E160 completion credit while this work remains unfinished.
+Bounded loader streams one complete retained comparison at a time into ignored
+gzip cache shards bound to original observations SHA256 and per-shard hashes.
+On admission it checks key, original initial certificate, cost and compressed
+bytes. Entry points share their already opened D001 guard context rather than
+reopening the same registered inputs. Pilot writes rows incrementally; saved
+replay streams result/smoke rows and hashes, never rebuilding the whole corpus
+in memory. Original observations/smoke/failure artifacts unchanged. All12 panels
+reused in this finishing step, no new chess searches or recollection.
+
+49 focused checks pass28.8seconds, plus2 representative E159 parent checks.
+Includes both colors, default-disabled/strict controls, fresh/cache and exact/
+one-short atomic budgets, original support and actual pawn exchange, material
+profit insufficient when recapture pawn is lost, delayed piece challenge, lost
+support, distinct knight-ending occurrence, empty pawn graphs, failed initial
+support/future pawn routes, quiet/check/capture gates, four-ply true prefix charged
++8 across initial proof/tree, fifty-move abstention,20 independent tree/policy
+mutations and caller/event metadata admission. Compact malformed rejection alone
+passes in0.17seconds; no long cumulative or exact reproduction run attempted.
+
+Guarded16case pilot passes:6 positives,12 complete witnesses, two each missing
+history and zero cap. Independent saved replay checks all12 full raw trees and
+E070 initial certificates, original source/migration admission, every response/
+counterreply, policies, parent snapshots, receipts, commands/environment and515
+normalized source/dependency hashes. All six corrected smoke results exactly
+match current pilot fingerprints and independently replay. Canonical pilot copies
+byte-identical to replayed run; replay also passes at canonical evidence path:
+node research/experiments/E160-outpost-holding-policy/code/replay-saved.mjs
+Source verification/diff checks pass. Full E159 parent build and recursive static/
+dynamic behavioral dependency closure retained; text LF-normalized, binary exact.
+
+Evidence bytes: observations452,677, smoke232,562, results487,669(21,301,099plain),
+failure85,855, run.json73,890, source snapshots7,650; total1,340,303. Compressed
+artifacts1,258,763 exceed500KB soft target by758,763bytes. Complete raw response/
+counterreply inventories, initial failed hypothesis, original smoke and current
+result preserved losslessly. This is justified proof storage, not a reason to
+prune branches, relax material/retention gates or spend more time optimizing size.
+
+Accepted E082 unchanged:378/1085(34.8%),328 names,63 accepted studies. Build383
+provisional entries,80 ready/0 stale batches;761 accepted-or-candidate(70.1%),
+324 without ready code. Production, numerical work, accepted tracker and shared
+policy unchanged. Full cumulative/exhaustive occurrence/absence/priority/history/
+budget integration and exact main/repeat/initially clean reproductions remain
+deferred to combined freeze. Broad permanence/strategic value and real-game
+precision/human usefulness remain unresolved; full catalog remains in scope.
+
+Next compatible approved rank is C0360/C0722 queen activity, followed by C0371/
+C0884 queen versus two rooks and C0372/C0885 queen versus rook/minor. Audit existing
+objective/alternative policies for genuine reuse and preserve distinct queen-ending
+scopes; do not infer activity or relative strength from nominal material/mobility
+alone. Earlier explicit prerequisite work remains in backlog, not deleted.

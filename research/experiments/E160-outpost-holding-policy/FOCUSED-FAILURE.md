@@ -35,3 +35,11 @@ comparison at a time with hashes/receipts and complete semantic replay preserved
 Reuse the exact existing observations; do not recollect or lower response depth,
 budgets, branches, material/support criteria or acceptance gates. Keep focused
 checks small; avoid repeating whole-file attempts until the loader changes.
+
+Resolution later2026-10-10: separate bounded loader succeeds; strict isolation
+then traced remaining failure to formatting the huge deep-equality error for
+malformed panel {}. Exact deep comparisons retained with compact messages and
+archived original sources/mechanically checked migration. Strict case now passes
+0.17seconds, complete49-check focused suite passes28.8seconds. MEMORY-AMENDMENT.md
+and RESULT.md record current source bindings, successful pilot and semantic replay.
+Original failed attempts above remain failures; no retroactive passed status.
