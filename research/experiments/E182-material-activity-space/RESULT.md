@@ -29,9 +29,36 @@ the registered main pilot. The main pilot must use the registered explicit
 projection of eligible E152 quiet panels; no archived pilot collection has yet
 been performed or declared reused. No old evidence or production code changed.
 
-Next: implement inspectOffer and its independently checked material recovery /
-all-checking mating-policy gates, including the recoverable promotion control.
-Then implement independent space decision replay, exact E152 projection and
+Second checkpoint, 2026-10-10: inspectOffer now independently admits the complete
+E165 source witness, walks its certified policy to require checks on every
+selected attacking continuation, and reconstructs every legal acceptance of the
+offered moved unit plus every immediate actor reply. Signed material includes
+captures, promotions and en-passant victims. C0593 requires an actual nominal
+concession and the checking mate policy; C0588 additionally requires unrecovered
+loss through all immediate replies on an acceptance and the failed same-bound
+quiet comparison. The E165 result is unchanged.
+
+Five focused offer tests pass in26.98seconds, dominated by frozen full-source
+admission: both colors of the original queen offer, checking mate without
+acceptance, missing helper/short bound, changed source and strict controls.
+Original and reflected authored recovery controls each collected one new full
+E143 H2 panel,5411nodes, after exact E143/E165 cache lookup found no match.
+Raw panels checkpointed before source derivation; saved result files retain the
+guarded receipt and recursive source bindings. Both produce C0593true/C0588false:
+queen concession9, immediate promotion/capture recovery13, minimum net loss-4.
+Independent check-offer imports no E182 runtime/collector/derive and reconstructs
+the policy/checks, acceptance inventory, complete replies, material and claims.
+replay-recovery passes both saved controls, exact source bindings, raw/source
+panel equality, receipts and artifact hashes. Frozen E165 source checker and
+Chess remain shared dependencies. No engine, acquired games or full suite.
+
+Evidence files recovery-raw-w/b.json.gz and recovery-result-w/b.json.gz decode
+as standard JSON; recovery-replay.json binds those four artifacts and checker
+closure. This is a development checkpoint, not the registered30case main pilot.
+No ready build or accepted-coverage change is claimed. The earlier space
+checkpoint and its nine focused tests remain unchanged. Source/diff checks pass.
+
+Next: implement independent space decision replay, exact E152 projection and
 guarded checkpointed saved pilot/provenance. Complete the registered fixture and
 mutation coverage before creating build.json or marking this batch code-ready.
 Full combined regression, exhaustive scope audits, and changed main/repeat/clean
