@@ -1,4 +1,4 @@
-import {conversionQuery} from '../../E106-ending-conversion-policies/code/policy.mjs';
+import {tracedConversionQuery as conversionQuery} from './trace-policy.mjs';
 import {admitProof} from './admit-proof.mjs';
 import {controls,context,route,distance,ids} from './context.mjs';
 function run(input,options,collect){
