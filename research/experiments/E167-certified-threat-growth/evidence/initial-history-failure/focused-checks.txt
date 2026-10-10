@@ -1,0 +1,70 @@
+✔ certified-prior-threat-plus-h6 (385.6486ms)
+✔ certified-prior-threat-plus-h6-black (359.0339ms)
+✔ certified-prior-threat-plus-f6 (0.1944ms)
+✔ certified-prior-threat-plus-f6-black (0.1374ms)
+✔ independent-extra-defender (0.256ms)
+✔ independent-extra-defender-black (0.1714ms)
+✔ reversed-quiet-placement (0.2191ms)
+✔ reversed-quiet-placement-black (0.1503ms)
+✔ geometric-old-pressure-is-not-certified-threat (99.0612ms)
+✔ geometric-old-pressure-is-not-certified-threat-black (101.8598ms)
+✔ missing-history (0.1593ms)
+✔ missing-history-black (0.1014ms)
+✔ missing-targets (0.0555ms)
+✔ missing-targets-black (0.0505ms)
+✔ zero-budget (0.0494ms)
+✔ zero-budget-black (0.0478ms)
+✔ disabled exactly parent (130.905ms)
+✔ strict controls (59.4297ms)
+✔ missing inputs abstain (46.3313ms)
+✔ certified prior capture retains signed gain through all root counters (0.1738ms)
+✔ new threat participates and both targets have complete exclusive refutations (0.1211ms)
+✔ legacy-positive separating case fails certified prior threat (0.0928ms)
+✔ same root and paired target panels reused when actual choices reverse (1.6164ms)
+✔ fresh and cached complete panels agree (940.0896ms)
+✔ exact one-short and zero caps atomically preserve parent (1433.1177ms)
+✔ genuine prefix charged in both raw contracts (898.374ms)
+✔ visited fifty claim suppresses entire new finding (260.2559ms)
+✖ true threefold root abstains (77.2402ms)
+✔ root mate capture closes with empty counter inventory (3.3637ms)
+✔ root en-passant victim is preserved (9.1791ms)
+✔ comments quality and priority (0.3441ms)
+✔ independent rejection: schema (11.5673ms)
+✔ independent rejection: history (9.5544ms)
+✔ independent rejection: root inventory (6.8207ms)
+✔ independent rejection: capture victim (9.9098ms)
+✔ independent rejection: capture balance (7.7606ms)
+✔ independent rejection: counter omitted (10.0049ms)
+✔ independent rejection: counter balance (6.6272ms)
+✔ independent rejection: terminal flag (8.649ms)
+✔ independent rejection: node ledger (6.4563ms)
+✔ independent rejection: summary gain (270.0552ms)
+✔ independent rejection: prior threat (263.0974ms)
+✔ independent rejection: new resource (264.2815ms)
+✔ independent rejection: exclusive choices (260.8016ms)
+✔ independent rejection: creation label (258.7669ms)
+✔ independent rejection: legacy policy (358.5934ms)
+✔ runtime rejects altered root and target panels (688.2508ms)
+ℹ tests 47
+ℹ suites 0
+ℹ pass 46
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10254.7159
+
+✖ failing tests:
+
+test at research\experiments\E167-certified-threat-growth\code\threats.test.mjs:29:1
+✖ true threefold root abstains (77.2402ms)
+  Error: History-terminal root
+      at collectPanel (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/research/experiments/E153-second-target-defense/code/panel.mjs:7:299)
+      at explainMove (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/research/experiments/E167-certified-threat-growth/code/threats.mjs:10:2167)
+      at TestContext.<anonymous> (file:///C:/Users/thoma/Documents/GitHub/Chess-Review/research/experiments/E167-certified-threat-growth/code/threats.test.mjs:29:189)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:969:18)
+      at Test.postRun (node:internal/test_runner/test:1537:19)
+      at Test.run (node:internal/test_runner/test:1462:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:969:7)

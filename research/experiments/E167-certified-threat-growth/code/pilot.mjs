@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {isDeepStrictEqual} from 'node:util';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {gzipSync} from 'node:zlib';
+import {execFileSync} from 'node:child_process';
+import os from 'node:os';
+import {createHash} from 'node:crypto';
+import {openResearchData} from '../../../data-policy.mjs';
+import {fixtures} from './fixtures.mjs';
+import {explainMove} from './threats.mjs';
+import {explainMove as parent} from '../../E166-development-defender-capacity/code/attack-context.mjs';
+import {checkWitness} from './check-witness.mjs';
+import {savedPanels,key,dir} from './saved.mjs';
+const data=await openResearchData(['D001'],{purpose:'test'}),saved=await savedPanels(),build=JSON.parse(await readFile(dir+'/build.json','utf8')),rows=[],used=new Map();let reused=0,fresh=0,targetReused=0;for(const input of fixtures){const found=saved.get(input),result=explainMove({...input,...(found.target?{threatGrowthPanel:found.target}:{}),...(found.root?{threatRootPanel:found.root}:{})});assert.deepEqual(result.events.filter(e=>e.evidence?.experiment==='E167').map(e=>e.id),input.expected,input.id);const w=result.threatGrowthAnalysis.witness;if(w){checkWitness(input,result);if(found.target&&found.root)reused++;else fresh++;if(found.target)targetReused++;saved.store(input,w);used.set(key(input),{input,rootPanel:w.rootPanel,targetPanel:w.component.weaknessAnalysis.witness.panel});}const inherited=parent(input);assert.ok(isDeepStrictEqual(explainMove({...input,threatGrowthTags:false}),inherited));rows.push({input,result,inherited});}const observations=gzipSync(JSON.stringify({sourceHashes:saved.hashes,rows:[...used.values()]}),{level:9}),results=gzipSync(JSON.stringify({rows}),{level:9});await mkdir(dir+'/evidence',{recursive:true});await writeFile(dir+'/evidence/observations.json.gz',observations);await writeFile(dir+'/evidence/results.json.gz',results);const hash=b=>createHash('sha256').update(b).digest('hex');await writeFile(dir+'/evidence/run.json',JSON.stringify({experiment:'E167',preregistration:'09d3dd3',revision:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),argv:process.argv,node:process.version,platform:process.platform,arch:process.arch,os:os.release(),engine:null,seed:null,datasetReceipt:data.receipt,sourceHashes:build.inputHashes,outputs:{observations:hash(observations),results:hash(results)},cases:rows.length,witnesses:rows.filter(r=>r.result.threatGrowthAnalysis.witness).length,positives:rows.filter(r=>r.input.expected.length).length,reused,fresh,targetReused},null,2)+'\n');console.log(JSON.stringify({cases:rows.length,reused,fresh,targetReused,bytes:observations.length+results.length}));
