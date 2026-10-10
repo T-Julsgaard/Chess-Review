@@ -1,0 +1,15 @@
+{
+  "source": "defense",
+  "color": "w",
+  "stage": "registered earlier alternative legality",
+  "error": "Invalid move: h5h1",
+  "reason": "White Nh3 blocks the queen h5-h1 file.",
+  "collected": false,
+  "sourceInputs": "initial-fixtures.mjs.gz",
+  "entrypoint": "initial-smoke-root.mjs.gz",
+  "unchangedTempoResults": [
+    "initial-tempo-w-result.json.gz",
+    "initial-tempo-b-result.json.gz"
+  ],
+  "next": "Preregister removal of White Nh3 from the authored defense root, preserve original fixed horizons/caps and all claims."
+}
