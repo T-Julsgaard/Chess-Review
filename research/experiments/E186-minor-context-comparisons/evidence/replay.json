@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "cases": 32,
+  "decisions": 96,
+  "positives": {
+    "C0711": 2,
+    "C0712": 2,
+    "C0714": 2
+  },
+  "rawPanels": 12,
+  "sourceBindings": 954,
+  "panelHashes": {
+    "smoke.json.gz": "dee3afb0903b2de9f809b00c4fe04859771fba63a41f162c69aaef21b7af99ea",
+    "knight-smoke.json.gz": "0299ff7e8e490a97f38e8a487907b00646e1afebb6ca007a2c351ddae3a38279",
+    "control-smoke.json.gz": "3b73bbbe43a7a232d55cc2259dac29312b0668cdc62c725260d34f015015cfb2"
+  },
+  "pilotSha256": "01206931d165b98696517d4f8c28f98d13443bc20baa0cfe2e63b76c7a3b9171",
+  "limits": "Result checker imports no E186 runtime/context or search collector. Shares legal Chess, neutral E186 general traced-policy checker adapted from independent E106, and ordinary-data helper. Exposed authored synthetic development; no broad causal openness/good-bad or human validity."
+}

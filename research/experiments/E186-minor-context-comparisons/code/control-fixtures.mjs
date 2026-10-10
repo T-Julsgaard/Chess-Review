@@ -1,0 +1,6 @@
+import {roots as bishop} from './fixtures.mjs';import {roots as knight} from './knight-fixtures.mjs';import {legalPosition} from '../../E020-coach-concepts/code/concepts.mjs';import {reflect,flip} from '../../FRIEND-shared/lib.mjs';
+const b=structuredClone(bishop[0]),n=structuredClone(knight[0]);
+const bp=structuredClone(b),np=structuredClone(n);bp.id='bishop-persistent';bp.options.contextMoves=[{from:'a2',to:'d3'},{from:'h2',to:'e3'},{from:'a7',to:'d4'},{from:'h7',to:'e4'}];np.id='knight-persistent';np.options.contextMoves=[{from:'d3',to:'a2'},{from:'e3',to:'h2'},{from:'d4',to:'a7'},{from:'e4',to:'b7'}];
+function king(r,from,to,id){const x=structuredClone(r),c=legalPosition(x.input.fen);c.remove(from);c.put({type:'k',color:'w'},to);x.id=id;x.input.fen=c.fen();x.input.history={fen:c.fen(),moves:[]};return x;}
+const whites=[bp,np,king(b,'a6','b7','bishop-redundant'),king(n,'h1','h7','knight-redundant')];
+export const roots=whites.flatMap(r=>{const b=reflect({id:r.id,...r.input}),c=legalPosition(b.history.fen);for(const m of b.history.moves)c.move(m);return[r,{id:b.id,input:{fen:c.fen(),move:b.move,history:b.history},options:{...r.options,pawn:flip(r.options.pawn),contextMoves:r.options.contextMoves.map(m=>({from:flip(m.from),to:flip(m.to)}))}}];});
