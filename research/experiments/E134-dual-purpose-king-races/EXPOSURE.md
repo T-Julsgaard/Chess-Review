@@ -16,3 +16,7 @@ Later fixed-budget smoke returned no combined H10 policy on the original board,
 retained/replayed next. Added Kf5/Pc6 versus Kb5/Pc3, Ke4 H4 hypothesis after
 this exposure, prospectively before evaluating that new board. Both remain
 required pilot cases; no claim of fresh confirmation or original-case success.
+
+Second board Ke4 H4 also failed,223ticks/0.3seconds, independently replayed.
+Added enemy Pd3 instead of Pc3 as prospectively declared third H4 hypothesis;
+keep the same-file queen-recapture failure and original H10 failure in pilot.

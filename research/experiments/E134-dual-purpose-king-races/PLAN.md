@@ -89,3 +89,12 @@ stopping resource, ...c2 should permit c7/c8Q without immediate queen capture.
 Keep BOTH positions in the pilot; do not replace the original failed case or
 declare broad maneuver coverage. Additional fixture selected after the disclosed
 failure; its status is exploratory build evidence, not independent confirmation.
+
+Additional H4 smoke on Kf5/Pc6 versus Kb5/Pc3, Ke4 failed combined policy in
+223ticks/0.3seconds including independent replay. Its same-file promotion race
+can allow the enemy promoted queen to capture the own queen immediately. Keep
+that board as a required negative. Before any further evaluation, add Pd3 in
+place of Pc3 as another authored H4 hypothesis: this removes that immediate
+queen-to-queen file capture while keeping the same complete dual-goal gates.
+All three original/new boards remain in the <=12case pilot, both colors. No
+goal/budget/geometry weakening or broad maneuver success inferred from variants.
