@@ -26,3 +26,14 @@ raw panel; subsequent runs reuse it. Max50000 source/overall cap stays fixed.
 No other new source collection is needed. True threefold traversal, longer
 nonempty prefixes and full historical interactions remain deferred combined
 checks; fifty claim does not establish those checks.
+
+Before corrected focused collection: first control FAILS (compared instead of
+claim-rule-prerequisite). Fixture49 counted halfmoves as full moves: threshold
+is100 halfmoves, not50. Retain initial collector and exact error in evidence.
+The harness asserted before persistence, so its original raw proof is unavailable;
+do not claim it retained or replayed. No positive claim resulted. Do not recollect
+the unchanged mistaken context merely to replace missing original evidence.
+Correct authored clock to99, prospectively authorizing one additional tiny panel
+(two fresh contexts total rather than one). Source horizon/cap/claim gates stay
+unchanged. Persist full corrected raw/result/source/receipt BEFORE assertions,
+so any further failure remains reviewable. No claim gate weakened.

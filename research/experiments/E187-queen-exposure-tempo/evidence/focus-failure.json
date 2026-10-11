@@ -1,0 +1,9 @@
+{
+  "status": "failed",
+  "actual": "compared",
+  "expected": "claim-rule-prerequisite",
+  "reason": "Fixture used49 halfmoves; fifty-move threshold is100 halfmoves. Expected next quiet move to reach threshold incorrectly.",
+  "source": "initial-focus-collector.mjs.gz",
+  "rawRetained": false,
+  "retentionError": "Assertion preceded persistence. Original search result unavailable; do not claim raw reuse or recreate it as original."
+}
