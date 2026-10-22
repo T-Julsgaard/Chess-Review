@@ -27,7 +27,7 @@
     "test:learning-browser": "node scripts/learning-browser.mjs --working-tree"
   },
   "devDependencies": {
-    "jsdom": "^26.1.0",
+    "jsdom": "^30.1.3",
     "web-ext": "^10.7.0"
   },
   "overrides": {
