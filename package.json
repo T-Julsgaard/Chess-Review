@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "jsdom": "^26.1.0",
-    "web-ext": "^10.7.0"
+    "web-ext": "^10.8.0"
   },
   "overrides": {
     "node-forge": "1.4.0",
