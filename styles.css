@@ -524,6 +524,14 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* Review and learning behave as app surfaces without accidental text highlighting. */
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* Preserve normal editing, selection and copying inside text entry fields. */
+input, textarea, [contenteditable=""], [contenteditable="true"], [contenteditable="plaintext-only"] {
+  -webkit-user-select: text;
+  user-select: text;
 }
 .app {
   min-height: 100vh;
