@@ -3342,9 +3342,9 @@ function openingStrip() {
    {tokens}. Anything the bank can't supply falls back to the legacy generic line, so a missing or
    malformed file never breaks the panel. */
 const COACH_LIST = [
-  ["mentor", "Ralph"], ["wise_grandma", "Wise Grandma"],
+  ["old_soviet", "Old Soviet"], ["mentor", "Ralph"], ["wise_grandma", "Wise Grandma"],
   ["life_coach", "Julie"], ["charmer", "Charmer"], ["hype_beast", "Hype Beast"],
-  ["streamer", "Streamer"], ["sportscaster", "Sportscaster"], ["old_soviet", "Old Soviet"],
+  ["streamer", "Streamer"], ["sportscaster", "Sportscaster"],
   ["drill_sergeant", "Drill Sergeant"], ["hustler", "Hustler"], ["kid_prodigy", "Kid Prodigy"],
   ["professor", "Professor"], ["analyst", "Analyst"], ["noob", "Noob"],
   ["drunk_uncle", "Drunk Uncle"], ["conspiracy_theorist", "Conspiracy Theorist"],
