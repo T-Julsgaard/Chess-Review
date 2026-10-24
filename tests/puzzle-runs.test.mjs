@@ -82,6 +82,27 @@ test('Knockout has no timer and ends immediately on its first wrong move with it
   await w.navigate('puzzles');assert.equal(w.root.querySelector('[data-focus=knockout]').closest('.puzzle-mode').querySelector('.puzzle-mode-record strong').textContent,'2');
 });
 
+for(const mode of ['timeAttack','knockout'])for(const page of ['openings','concepts'])test(`${mode} navigation to ${page} ends and saves the run`,async t=>{
+  const {w,data}=await setup(t);await w.startPuzzleRun(mode);await solve(w);
+  const run=w.run,button=w.root.querySelector(`[data-focus=${page}]`);
+  assert.equal(button.disabled,false);button.click();
+  for(let i=0;i<60;i++)await Promise.resolve();
+  assert.equal(w.page,page);assert.equal(w.run,null);assert.equal(w.activity,null);
+  assert.equal(w.result,null);assert.equal(w.busy,false);assert.equal(run.clock?.runningAt??null,null);
+  assert.equal(data['learning:v1'].challenges.at(-1).solved,1);
+  assert.equal(data['learning:v1'].bests[mode],1);assert.ok(w.root.querySelector('.learn-library'));
+});
+
+for(const mode of ['timeAttack','knockout'])test(`${mode} navigation cancels a pending opponent reply`,async t=>{
+  const {w}=await setup(t,{puzzles:[{...line,rating:400},...fixtures.map(p=>({...p,rating:3000}))]});
+  await w.startPuzzleRun(mode);
+  const move=w.submitPuzzle(line.solution[0]);assert.equal(w.opponentPlaying,true);
+  assert.equal(w.root.querySelector('[data-focus=openings]').disabled,false);
+  await w.navigate('openings');await move;
+  assert.equal(w.page,'openings');assert.equal(w.run,null);assert.equal(w.activity,null);
+  assert.equal(w.pendingOpponent,null);assert.equal(w.busy,false);assert.equal(w.opponentPlaying,false);
+});
+
 for(const mode of ['timeAttack','knockout'])test(`${mode} result badges only select a read-only board and preserve the results controls`,async t=>{
   const {w,dom,data}=await setup(t,{puzzles:[{...line,rating:400},...fixtures.map(p=>({...p,rating:3000}))]});
   await w.startRatedPuzzles();await w.navigate('puzzles');
