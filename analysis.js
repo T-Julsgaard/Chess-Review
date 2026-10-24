@@ -6140,6 +6140,11 @@ document.addEventListener("keydown", (e) => {
   if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
   // During practice the only shortcut is Escape to exit; nav keys are disabled.
   if (S.practice) { if (e.key === "Escape") exitPractice(); return; }
+  if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) {
+    e.preventDefault();
+    // Navigation takes focus away from the last clicked control (e.g. Feedback).
+    document.activeElement?.blur();
+  }
   if (e.key === "ArrowLeft") navPrev();
   else if (e.key === "ArrowRight") navNext();
   else if (e.key === "Home") { if (S.analysisMode) gotoVar(0); else gotoMainline(0); }

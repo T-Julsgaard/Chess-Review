@@ -2,6 +2,16 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {app,loadGame,settle} from './helpers/app.mjs';
 function review(t,pgn='1. e4 e5'){const a=app(t);loadGame(a,pgn);a.call('computeDerived');a.call('buildUI');a.call('renderAll');a.replace('requestLiveEval',()=>{});return a;}
+test('review navigation clears leftover Feedback focus after returning from its tab',t=>{
+  const a=review(t),doc=a.dom.window.document,feedback=doc.querySelector('.feedback-floating');
+  for(const [key,idx] of [['ArrowRight',1],['ArrowLeft',0],['End',2],['Home',0]]){
+    feedback.focus();assert.equal(doc.activeElement,feedback);
+    const event=new a.dom.window.KeyboardEvent('keydown',{key,bubbles:true,cancelable:true});
+    feedback.dispatchEvent(event);
+    assert.equal(a.state.idx,idx);assert.equal(doc.activeElement,doc.body);assert.equal(event.defaultPrevented,true);
+  }
+});
+
 test('review has no typed move field and Tab does not traverse review sections',async t=>{
   const a=review(t),doc=a.dom.window.document;
   assert.equal(doc.querySelector('.review-move-entry'),null);
