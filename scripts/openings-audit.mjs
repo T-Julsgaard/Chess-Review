@@ -17,6 +17,13 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     assert.deepEqual(await run("[...document.querySelectorAll('.learn-library-row h3')].map(n=>n.textContent)"),OPENINGS.map(o=>o.title));
     const libraryScreenshot=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false},review.sessionId);
     await fs.writeFile(path.join(out,`opening-library-${width}.png`),Buffer.from(libraryScreenshot.data,'base64'));
+    const libraryScroll=()=>run("(()=>{const w=document.querySelector('.learning-workspace'),m=w.querySelector('.learn-main');return {root:w.scrollTop,main:m.scrollTop};})()");
+    await run("document.querySelector('.learning-workspace').scrollTop=600;document.querySelector('.learn-main').scrollTop=600");
+    const scrolled=await libraryScroll();
+    assert.ok(scrolled.root>0||scrolled.main>0,'Library must actually scroll at '+width);
+    await run("import('./analysis.js').then(m=>m.learningWorkspace.startOpening('french'))");
+    await run("import('./analysis.js').then(m=>m.learningWorkspace.navigate('openings'))");
+    assert.deepEqual(await libraryScroll(),scrolled,'Opening return restores library scroll at '+width);
     await run("import('./analysis.js').then(m=>m.learningWorkspace.navigate('puzzles'))");
     const board=await run(rect('.board'));
     for(const color of ['w','b']) {

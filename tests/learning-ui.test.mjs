@@ -139,6 +139,36 @@ test('openings pair moves in a scorecard with two side controls, keyboard naviga
   await w.navigate('openings');const search=w.root.querySelector('input');search.focus();key('ArrowRight');assert.equal(w.activity,null);
 });
 
+test('opening library round trips preserve scroll and search until leaving the section or Learn',async t=>{
+  const standalone=(await workspace(t)).w;
+  const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
+  await a.call('openLearning');const embedded=a.run('learningWorkspace');t.after(()=>embedded.close());
+  for (const w of [standalone,embedded]) {
+    await w.navigate('openings');w.filters.search='defen';w.render();
+    const scroll={root:280,shell:45,main:620};
+    const setScroll=()=>{w.root.scrollTop=scroll.root;if(w.shell)w.shell.scrollTop=scroll.shell;w.root.querySelector('.learn-main').scrollTop=scroll.main;};
+    for (const id of ['sicilian','french']) {
+      setScroll();const titles=[...w.root.querySelectorAll('.learn-library-row h3')].map(n=>n.textContent);
+      await w.startOpening(id);assert.equal(w.activity.kind,'opening');assert.equal(w.root.scrollTop,0);
+      w.stepOpening(2);
+      await w.navigate('openings');
+      assert.equal(w.activity,null);assert.equal(w.filters.search,'defen');
+      assert.deepEqual([...w.root.querySelectorAll('.learn-library-row h3')].map(n=>n.textContent),titles);
+      assert.equal(w.root.scrollTop,scroll.root);assert.equal(w.root.querySelector('.learn-main').scrollTop,scroll.main);
+      if(w.shell)assert.equal(w.shell.scrollTop,scroll.shell);
+    }
+    for (const section of ['puzzles','concepts']) {
+      setScroll();await w.startOpening('italian');await w.navigate(section);
+      assert.equal(w.activity,null);assert.equal(w.openingLibraryState,null);
+      await w.navigate('openings');assert.equal(w.root.querySelector('.learn-main').scrollTop,0);assert.equal(w.filters.search,'');
+    }
+    setScroll();await w.startOpening('italian');await w.close();assert.equal(w.openingLibraryState,null);
+  }
+  await a.call('openLearning');const reopened=a.run('learningWorkspace');t.after(()=>reopened.close());
+  assert.equal(reopened.page,'puzzles');assert.equal(reopened.activity,null);
+  await reopened.navigate('openings');assert.equal(reopened.root.querySelector('.learn-main').scrollTop,0);
+});
+
 test('opening highlights follow backward moves in either orientation and reset on starting positions and variation changes',async t=>{
   const {w,dom}=await workspace(t);
   const highlighted=()=>[...w.root.querySelectorAll('.last-move')].map(n=>n.dataset.square).sort();
