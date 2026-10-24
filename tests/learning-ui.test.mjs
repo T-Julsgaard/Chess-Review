@@ -82,6 +82,21 @@ test('the statistics footer returns directly to review',async t=>{
   assert.equal(w.closed,true);
 });
 
+test('the navigation indicator stays still within Puzzles and animates between destination tabs',async t=>{
+  const {w}=await workspace(t);
+  for(const [index,button] of [...w.nav.querySelectorAll('button')].entries()){
+    for(const [key,value] of Object.entries({offsetLeft:index*100,offsetTop:0,offsetWidth:90,offsetHeight:40}))Object.defineProperty(button,key,{value});
+  }
+  w.navIndicator.getBoundingClientRect=()=>({left:parseFloat(w.navIndicator.style.left)||0,top:0,width:90,height:40});
+  let animations=0;w.navIndicator.animate=()=>{animations++;return {cancel(){}};};
+  w.syncNavigation();assert.equal(animations,0);
+  w.showPuzzleStatistics(true);w.render();w.showPuzzleStatistics(false);w.render();
+  assert.equal(animations,0);assert.equal(w.navPage,'puzzles');
+  await w.navigate('openings');assert.equal(animations,1);
+  await w.navigate('puzzles');assert.equal(animations,2);
+  w.showPuzzleStatistics(true);w.showPuzzleStatistics(false);assert.equal(animations,2);
+});
+
 test('Escape closes Settings before leaving puzzle statistics on the embedded learning board',async t=>{
   const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
   await a.call('openLearning');const w=a.run('learningWorkspace'),doc=a.dom.window.document;
