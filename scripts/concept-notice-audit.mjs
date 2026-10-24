@@ -24,7 +24,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await pointer(0,0);await open();const initial=await geometry();
     assert.ok(Math.abs((initial.card.left+initial.card.right)/2-initial.width/2)<2,'Dialog must be centered horizontally: '+JSON.stringify(initial));
     assert.ok(Math.abs((initial.card.top+initial.card.bottom)/2-initial.height/2)<2,'Dialog must be centered vertically: '+JSON.stringify(initial));
-    assert.ok(initial.reject.left-initial.accept.right>=32,'Initial buttons need a generous gap');
+    assert.ok(initial.accept.left-initial.reject.right>=32,'Fair enough sits to the right with a generous gap');
     assert.ok(initial.card.left>=15&&initial.card.right<=initial.width-15&&initial.card.top>=15&&initial.card.bottom<=initial.height-15,'Dialog must fit the viewport: '+JSON.stringify(initial));
     assert.ok(initial.card.width<=460&&initial.card.height<400,'Keep the dialog compact');
     assert.equal(await run("getComputedStyle(document.querySelector('.learn-notice-card')).userSelect"),'none');
@@ -33,6 +33,10 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await call('Input.dispatchMouseEvent',{type:'mouseReleased',x:4,y:4,button:'left',clickCount:1},review.sessionId);
     await key('Escape');assert.equal(await run("!!document.querySelector('.learn-notice-overlay')"),true);
     await shot('concept-notice-'+width);
+    // Enter above Fair enough, then move down to it without waking the runner.
+    await pointer((initial.accept.left+initial.accept.right)/2,initial.accept.top-60);
+    await pointer((initial.accept.left+initial.accept.right)/2,(initial.accept.top+initial.accept.bottom)/2);
+    assert.equal(await run("Number(document.querySelector('.learn-notice-reject').dataset.dodges||0)"),0,'Approaching Fair enough should not trigger the first dodge');
     // A rapid press must dodge rather than win before the queued frame runs.
     const pressX=(initial.reject.left+initial.reject.right)/2,pressY=(initial.reject.top+initial.reject.bottom)/2;
     await call('Input.dispatchMouseEvent',{type:'mousePressed',x:pressX,y:pressY,button:'left',clickCount:1},review.sessionId);

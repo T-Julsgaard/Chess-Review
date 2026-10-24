@@ -79,11 +79,16 @@ test('the evasive button reacts before hover, respects a catch window, resets on
   const flush=()=>{for(const [id,fn] of frames){frames.delete(id);fn();}};
   const dispose=evasiveNoticeButton({arena,button,safeButton,view});
   move(155,315);assert.equal(frames.size,0,'Approaching Fair enough never starts the game');
-  move(340,220);assert.equal(frames.size,1,'React almost 100 pixels before the pointer reaches the button');move(421,220);assert.equal(frames.size,1);flush();
+  move(340,220);assert.equal(frames.size,0,'Crossing toward the dismiss button should not start a chase');
+  move(421,220);assert.equal(frames.size,1,'The first dodge requires a close approach');
+  move(155,315);assert.equal(frames.size,0,'Moving toward Fair enough cancels a queued dodge');
+  move(421,220);assert.equal(frames.size,1);flush();
   assert.equal(button.dataset.dodges,'1');assert.ok(Math.hypot(parseFloat(button.style.left)-338,parseFloat(button.style.top))>=60);
   const escaped=button.getBoundingClientRect();
   assert.ok(Math.hypot(Math.max(escaped.left-421,0,421-escaped.right),Math.max(escaped.top-220,0,220-escaped.bottom))>=64,'Choose a destination away from the latest pointer position');
-  const now=button.getBoundingClientRect();move(now.left,now.top);flush();assert.equal(button.dataset.dodges,'1','A brief reaction window permits a real catch');
+  const now=button.getBoundingClientRect();
+  const near={x:now.left<270?now.right+70:now.left-70,y:now.top+20};
+  move(near.x,near.y);flush();assert.equal(button.dataset.dodges,'1','A brief reaction window permits a real catch');
   assert.equal(timers.size,1);clock=120;for(const [id,fn] of timers){timers.delete(id);fn();}flush();
   assert.equal(button.dataset.dodges,'2','A pointer that stays close triggers another escape after the catch window');
   view.dispatchEvent(new view.Event('resize'));assert.equal(button.style.left,'');assert.equal(button.style.top,'');

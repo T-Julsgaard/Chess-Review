@@ -187,8 +187,8 @@
 .learn-notice-card p { color: var(--ink-2); font-size: 17px; line-height: 1.7; margin: 0 auto; max-width: 380px; text-wrap: pretty; }
 .learn-notice-actions { position: relative; height: 44px; margin-top: 24px; }
 .learn-notice-actions .learn-button { position: absolute; bottom: 0; white-space: nowrap; touch-action: manipulation; }
-.learn-notice-accept { left: 0; z-index: 1; }
-.learn-notice-reject { right: 0; will-change: transform; }
+.learn-notice-accept { right: 0; z-index: 1; }
+.learn-notice-reject { left: 0; will-change: transform; }
 @media (max-width: 400px) { .learn-notice-actions .learn-button { padding-inline: 12px; font-size: 13px; } }
 .learn-rules { border-top: 1px solid var(--line); padding-top: 18px; }
 .learn-storage-error { padding: 16px; margin: 0 0 24px; border: 1px solid var(--q-mistake); border-radius: 10px; }
