@@ -354,6 +354,60 @@ test('puzzle types and two handles on one Elo track filter the full adaptive ses
   await w.navigate('puzzles');w.root.querySelector('[data-focus="theme-all"]').click();assert.equal(w.puzzleThemes.size,0);
 });
 
+test('rating drags move smoothly, coalesce filtering and retain the captured thumb',async t=>{
+  const {w,dom}=await workspace(t),view=dom.window;
+  const track=w.root.querySelector('.learn-dual-range'),handles=[...track.querySelectorAll('input')];
+  const [min,max]=handles.map(n=>Number(n.value)),x=rating=>110+(rating-min)/(max-min)*400;
+  track.getBoundingClientRect=()=>({left:100,width:420});
+  const frames=new Map();let frameId=0,updates=0,captured=null;
+  view.requestAnimationFrame=fn=>{frames.set(++frameId,fn);return frameId;};
+  view.cancelAnimationFrame=id=>frames.delete(id);
+  const frame=()=>{const callbacks=[...frames.values()];frames.clear();callbacks.forEach(fn=>fn());};
+  const select=w.updatePuzzleSelection.bind(w);w.updatePuzzleSelection=()=>{updates++;select();};
+  track.setPointerCapture=id=>{captured=id;};track.hasPointerCapture=id=>captured===id;
+  track.releasePointerCapture=()=>{captured=null;};
+  // MouseEvent does not expose pointerId in jsdom; give these events a real pointer identity.
+  const send=(node,type,clientX,id=7)=>{const event=new view.MouseEvent(type,{bubbles:true,cancelable:true,button:0,clientX});Object.defineProperty(event,'pointerId',{value:id});node.dispatchEvent(event);return event;};
+  assert.equal(send(handles[0],'pointerdown',x(min)+6).defaultPrevented,true);
+  assert.equal(captured,7);assert.equal(view.document.activeElement,handles[0]);
+  assert.equal(track.classList.contains('is-dragging'),true);assert.equal(handles[0].step,'any');
+  assert.equal(Number(handles[0].value),min,'grabbing the edge must not jump the thumb');
+  send(view,'pointermove',x(min+100)+6);send(view,'pointermove',x(min+200)+6);
+  assert.equal(frames.size,1);assert.equal(updates,0);frame();
+  assert.deepEqual(w.puzzleRange,[min+200,max]);assert.equal(updates,1);
+  send(view,'pointermove',x(min+210)+6);frame();
+  assert.ok(Math.abs(Number(handles[0].value)-(min+210))<.001,'thumb moves between the 50-point selections');
+  assert.equal(updates,1,'the same rounded rating must not rescan the library');
+  assert.equal(handles[0].getAttribute('aria-valuetext'),min+200+' rating');
+  send(view,'pointerup',x(max+100)+6,8);assert.equal(captured,7,'other pointers cannot end the drag');
+  send(view,'pointermove',x(max+100)+6);send(view,'pointerup',x(max+100)+6);
+  assert.equal(frames.size,0);assert.deepEqual(w.puzzleRange,[max-50,max]);
+  assert.equal(Number(handles[0].value),max-50);assert.equal(handles[0].step,'50');
+  assert.equal(captured,null);assert.equal(w.cancelRangeInput,null);assert.equal(track.classList.contains('is-dragging'),false);
+  assert.equal(w.root.querySelector('[data-focus="solve-puzzle"]').disabled,!w.filteredPuzzles().length);
+  const finished=[...w.puzzleRange];send(view,'pointermove',x(min));frame();assert.deepEqual(w.puzzleRange,finished);
+});
+
+test('rating track drags clean up on cancellation, capture loss, blur, render and close',async t=>{
+  const {w,dom}=await workspace(t),view=dom.window;
+  const frames=new Map();let frameId=0;
+  view.requestAnimationFrame=fn=>{frames.set(++frameId,fn);return frameId;};view.cancelAnimationFrame=id=>frames.delete(id);
+  const send=(node,type,x)=>{const e=new view.MouseEvent(type,{bubbles:true,cancelable:true,button:0,clientX:x});Object.defineProperty(e,'pointerId',{value:1});node.dispatchEvent(e);};
+  for(const end of ['pointercancel','lostpointercapture','blur','render','close']){
+    w.puzzleRange=null;w.render();
+    const track=w.root.querySelector('.learn-dual-range'),inputs=[...track.querySelectorAll('input')];
+    track.getBoundingClientRect=()=>({left:0,width:420});
+    send(track,'pointerdown',310);assert.equal(view.document.activeElement,inputs[1],'the rail chooses the nearest handle');
+    send(view,'pointermove',260);assert.equal(frames.size,1);
+    if(end==='render')w.render();else if(end==='close')await w.close();
+    else if(end==='blur')view.dispatchEvent(new view.Event('blur'));
+    else send(end==='lostpointercapture'?track:view,end,260);
+    assert.equal(frames.size,0,end);assert.equal(w.cancelRangeInput,null,end);
+    assert.equal(track.classList.contains('is-dragging'),false,end);assert.ok(inputs.every(input=>input.step==='50'),end);
+    const finished=[...w.puzzleRange];send(view,'pointermove',100);assert.deepEqual(w.puzzleRange,finished,end);
+  }
+});
+
 test('concept and opening libraries use readable rows without progress labels',async t=>{
   const {w}=await workspace(t);
   for(const page of ['concepts','openings']){

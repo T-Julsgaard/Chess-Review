@@ -397,8 +397,8 @@
 .learn-elo-range { position: relative; }
 .learn-range-value { display: block; color: var(--ink-2); font-size: 13px; font-variant-numeric: tabular-nums; margin: 2px 0 8px; }
 .learn-dual-range { position: relative; height: 36px; margin: 4px 10px 12px; touch-action: none; cursor: pointer; }
-.learn-range-rail { position: absolute; left: 0; right: 0; top: 16px; height: 4px; border-radius: 4px; background: linear-gradient(to right,var(--line) 0% var(--range-low),var(--accent) var(--range-low) var(--range-high),var(--line) var(--range-high) 100%); }
-.learning-workspace .learn-dual-range input { appearance: none; -webkit-appearance: none; position: absolute; inset: 0; width: 100%; min-width: 0; height: 36px; min-height: 0; padding: 0; margin: 0; border: 0; background: transparent; pointer-events: none; }
+.learn-range-rail { position: absolute; left: 10px; right: 10px; top: 16px; height: 4px; border-radius: 4px; background: linear-gradient(to right,var(--line) 0% var(--range-low),var(--accent) var(--range-low) var(--range-high),var(--line) var(--range-high) 100%); }
+.learning-workspace .learn-dual-range input { appearance: none; -webkit-appearance: none; position: absolute; inset: 0; width: 100%; min-width: 0; height: 36px; min-height: 0; padding: 0; margin: 0; border: 0; background: transparent; pointer-events: none; touch-action: none; }
 .learn-dual-range input:focus-visible { outline: none; }
 .learn-dual-range input::-webkit-slider-runnable-track { height: 4px; background: transparent; border: 0; }
 .learn-dual-range input::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 20px; height: 20px; margin-top: -8px; border: 3px solid var(--panel); border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 1px var(--accent); pointer-events: auto; cursor: grab; }
@@ -406,7 +406,9 @@
 .learn-dual-range input::-moz-range-thumb { width: 14px; height: 14px; border: 3px solid var(--panel); border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 1px var(--accent); pointer-events: auto; cursor: grab; }
 .learn-dual-range input:focus-visible::-webkit-slider-thumb { outline: 3px solid var(--accent); outline-offset: 3px; }
 .learn-dual-range input:focus-visible::-moz-range-thumb { outline: 3px solid var(--accent); outline-offset: 3px; }
-.learn-dual-range input:active::-webkit-slider-thumb { cursor: grabbing; }
+.learn-dual-range.is-dragging { cursor: grabbing; }
+.learn-dual-range.is-dragging input::-webkit-slider-thumb { cursor: grabbing; }
+.learn-dual-range.is-dragging input::-moz-range-thumb { cursor: grabbing; }
 .puzzle-session { display: grid; grid-template-columns: minmax(0,1fr) auto; column-gap: 16px; align-items: center; }
 .puzzle-session > :not(.puzzle-session-navigation):not(.puzzle-practice-heading) { grid-column: 1 / -1; }
 .puzzle-session > .puzzle-session-navigation { grid-column: 2; grid-row: 1; }
