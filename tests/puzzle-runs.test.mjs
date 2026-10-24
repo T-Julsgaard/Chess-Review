@@ -103,8 +103,9 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} navigation cancels a p
   assert.equal(w.pendingOpponent,null);assert.equal(w.busy,false);assert.equal(w.opponentPlaying,false);
 });
 
-for(const mode of ['timeAttack','knockout'])test(`${mode} result badges only select a read-only board and preserve the results controls`,async t=>{
+for(const mode of ['timeAttack','knockout'])test(`${mode} result badges select playable puzzles and preserve the results controls and saved progress`,async t=>{
   const {w,dom,data}=await setup(t,{puzzles:[{...line,rating:400},...fixtures.map(p=>({...p,rating:3000}))]});
+  t.mock.method(w,'waitForPuzzleReply',async()=>true);
   await w.startRatedPuzzles();await w.navigate('puzzles');
   await w.startPuzzleRun(mode);await solve(w);await wrong(w);
   if(w.run)await w.finishChallenge('Ended early');
@@ -124,20 +125,33 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} result badges only sel
   assert.equal(w.root.querySelector('.learn-results h2').textContent,heading);
   assert.equal(w.root.querySelectorAll('.puzzle-run-history button').length,2);
   assert.equal(w.root.querySelectorAll('.puzzle-run-history [aria-current=true]').length,1);
-  assert.doesNotMatch(w.root.textContent,/Puzzle replay|Close puzzle|Hint|Skip|White to move|Black to move/);
+  assert.doesNotMatch(w.root.textContent,/Puzzle replay|Close puzzle|Hint|Skip/);
+  assert.equal(w.root.querySelector('.puzzle-practice-status').textContent,line.fen.split(' ')[1]==='w'?'White to move':'Black to move');
   assert.deepEqual(controls(),originalControls);
-  assert.equal(w.root.querySelector('.puzzle-practice-actions, .puzzle-practice-status, .puzzle-run-meta'),null);
+  assert.equal(w.root.querySelector('.puzzle-practice-actions, .puzzle-run-meta'),null);
   await w.replayRunPuzzle(result.results[1].id);assert.equal(w.activity.id,result.results[1].id);
   await w.replayRunPuzzle(result.results[0].id);assert.equal(w.activity.id,result.results[0].id);
   assert.equal(w.root.querySelector('.puzzle-rating-region, .puzzle-rating-toggle, #learn-clock'),null);
   const fen=w.currentFen();
+  await wrong(w);assert.equal(w.currentFen(),fen);assert.equal(w.activity.mistakes,1);
+  assert.equal(w.root.querySelector('.puzzle-practice-status').textContent,'Wrong move');
+  assert.ok(w.root.querySelector('.puzzle-result-badge[data-result=incorrect]'));
   for(const square of current(w).solution[0].match(/.{2}/g).slice(0,2))w.root.querySelector(`[data-square=${square}]`).click();
-  await wrong(w);await w.submitMove(current(w).solution[0]);await w.hintPuzzle();await w.revealPuzzle();await w.skipPuzzle();
+  for(let i=0;i<60;i++)await Promise.resolve();
+  assert.equal(w.activity.step,2);assert.notEqual(w.currentFen(),fen);
+  assert.equal(w.lastMove,line.solution[1]);assert.deepEqual(controls(),originalControls);
+  while(!w.attemptRecorded)await w.submitMove(current(w).solution[w.activity.step]);
+  const solved=w.currentFen();assert.equal(w.feedback.status,'completed');assert.equal(w.busy,false);
+  assert.equal(w.root.querySelector('.puzzle-practice-status').textContent,'Puzzle completed');
+  assert.ok(w.root.querySelector('.puzzle-result-badge[data-result=correct]'));
+  await w.submitMove(line.solution[0]);await w.hintPuzzle();await w.revealPuzzle();await w.skipPuzzle();
   w.startPuzzleAnalysis();
-  assert.equal(w.currentFen(),fen);assert.equal(w.activity.step,0);assert.equal(w.activity.assisted,false);
+  assert.equal(w.currentFen(),solved);assert.equal(w.activity.assisted,false);assert.equal(w.puzzleThinkingAt,null);
   assert.equal(w.puzzleAnalysis,null);assert.deepEqual(controls(),originalControls);
   assert.deepEqual(data['learning:v1'],saved);assert.deepEqual(w.store.value,saved);
   w.returnToRunResults();assert.equal(w.result,result);assert.equal(w.activity,null);
+  await w.replayRunPuzzle(result.results[0].id);
+  assert.equal(w.currentFen(),fen);assert.equal(w.activity.step,0);assert.equal(w.attemptRecorded,false);
   await w.replayRunPuzzle(result.results[1].id);
   assert.deepEqual(data['learning:v1'],saved);
   w.root.querySelector('[data-focus=run-again]').click();

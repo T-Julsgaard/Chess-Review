@@ -37,8 +37,14 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace.busy)",'Replay ready');
     assert.equal(await run("document.querySelector('.puzzle-run-results h2').textContent"),'Run complete');await grid();
     assert.equal(await run("document.querySelectorAll('.puzzle-run-history [aria-current=true]').length"),1);
-    assert.equal(await run("document.querySelector('.puzzle-run-results').textContent"),resultText);
-    assert.equal(await run("!!document.querySelector('.puzzle-practice-actions, .puzzle-practice-status, .puzzle-run-meta, [data-focus=replay-back], .puzzle-analyse')"),false);
+    assert.equal(await run("(()=>{const r=document.querySelector('.puzzle-run-results').cloneNode(true);r.querySelector('.puzzle-practice-status')?.remove();return r.textContent;})()"),resultText);
+    assert.equal(await run("!!document.querySelector('.puzzle-practice-actions, .puzzle-run-meta, [data-focus=replay-back], .puzzle-analyse')"),false);
+    assert.match(await run("document.querySelector('.puzzle-practice-status').textContent"),/White to move|Black to move/);
+    const saved=await run("import('./analysis.js').then(m=>JSON.stringify(m.learningWorkspace.store.value))");
+    await run("import('./analysis.js').then(async m=>{const w=m.learningWorkspace,p=w.puzzleById(w.activity.id);while(!w.attemptRecorded)await w.submitMove(p.solution[w.activity.step]);})");
+    assert.equal(await run("import('./analysis.js').then(m=>m.learningWorkspace.feedback.status)"),'completed');
+    assert.equal(await run("import('./analysis.js').then(m=>JSON.stringify(m.learningWorkspace.store.value))"),saved);
+    assert.equal(await run("(()=>{const r=document.querySelector('.puzzle-run-results').cloneNode(true);r.querySelector('.puzzle-practice-status')?.remove();return r.textContent;})()"),resultText);
     const shot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);await fs.writeFile(path.join(out,`${mode}-replay-320.png`),Buffer.from(shot.data,'base64'));
     await run("import('./analysis.js').then(m=>m.learningWorkspace.returnToRunResults())");
   }

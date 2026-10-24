@@ -98,7 +98,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await capture(mode+'-replay');
     await run("import('./analysis.js').then(async m=>{const w=m.learningWorkspace,p=w.puzzles.find(p=>p.id===w.activity.id);while(!w.attemptRecorded)await w.submitPuzzle(p.solution[w.activity.step]);})");
     assert.equal(await run("import('./analysis.js').then(m=>JSON.stringify(m.learningWorkspace.store.value)===replaySaved)"),true,'Replay must preserve saved progress');
-    await run("document.querySelector('[data-focus=replay-back]').click()");
+    await run("import('./analysis.js').then(m=>m.learningWorkspace.returnToRunResults())");
     assert.equal(await run("document.activeElement.dataset.focus"),'replay-1');
     await run("import('./analysis.js').then(m=>m.learningWorkspace.navigate('puzzles'))");
   }

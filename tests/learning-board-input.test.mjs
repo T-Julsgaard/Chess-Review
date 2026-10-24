@@ -58,6 +58,27 @@ test('learning immediately lifts pieces, shares review drag tracking, and restor
   down('g1');await w.close();assert.equal(doc.querySelector('.drag-piece'),null);
 });
 
+for(const mode of ['timeAttack','knockout'])test(`${mode} result replays accept embedded board clicks and drags without changing the result controls`,async t=>{
+  const {a,w,doc,board,down,up,event}=await setup(t);
+  t.mock.method(w,'waitForPuzzleReply',async()=>true);
+  await w.navigate('puzzles');await w.startPuzzleRun(mode);await w.submitPuzzle('d2d4');
+  if(w.run)await w.finishChallenge('Ended early');
+  const result=w.result,saved=JSON.stringify(w.store.value);
+  const controls=()=>[...doc.querySelectorAll('.puzzle-run-results button')].map(n=>n.textContent);
+  const originalControls=controls();await w.replayRunPuzzle(result.results[0].id);
+  assert.equal(doc.querySelector('.board'),board);
+  assert.equal(doc.querySelector('.puzzle-turn-cue').textContent,'White to move');
+  down('e2');up('e2');down('e4');up('e4');await settle();
+  assert.equal(w.activity.step,2);assert.equal(new Chess(w.currentFen()).get('e5').color,'b');
+  down('g1');a.dom.window.dispatchEvent(event('pointermove','f3'));up('f3');await settle();
+  assert.equal(w.activity.step,4);assert.equal(doc.querySelector('.drag-piece'),null);
+  down('f1');a.dom.window.dispatchEvent(event('pointermove','c4'));up('c4');await settle();
+  assert.equal(w.feedback.status,'completed');assert.equal(w.attemptRecorded,true);
+  assert.deepEqual(controls(),originalControls);assert.equal(JSON.stringify(w.store.value),saved);
+  assert.equal(w.runReplay,result);assert.equal(doc.querySelector('.puzzle-practice-actions, .puzzle-analyse, .puzzle-rating-region'),null);
+  assert.equal(a.state.analysisMode,false);
+});
+
 test('the learning library board supports independent moves, arrows, marks and piece pickup',async t=>{
   const {a,w,doc,board,down,up,event}=await setup(t);await w.navigate('puzzles');
   const reviewFen=a.call('activePos').fen,reviewPositions=a.state.positions,progress=JSON.stringify(w.store.value);
