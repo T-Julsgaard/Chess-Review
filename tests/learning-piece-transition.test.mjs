@@ -93,6 +93,55 @@ for(const mode of ['timeAttack','knockout'])for(const showResults of [false,true
   assert.equal(board.classList.contains('puzzle-arranging'),false);
 });
 
+async function replayWorkspace(t,mode) {
+  const workspace=await returningWorkspace(t,mode),{w}=workspace;
+  w.puzzles.push({id:'replay-transition',fen:start,solution:['e2e4'],rating:3000,themes:[]});
+  w.run.results=w.puzzles.map((p,i)=>({id:p.id,number:i+1,correct:true,rating:p.rating}));
+  w.run.solved=2;
+  await w.finishChallenge('Ended early');
+  return workspace;
+}
+
+for(const mode of ['timeAttack','knockout'])test(`${mode} result selections assemble pieces and cancel unfinished assemblies when switching or closing`,async t=>{
+  const {w,board,pending}=await replayWorkspace(t,mode);
+  const result=w.result,saved=structuredClone(w.store.value);
+  const checkAssembly=from=>{
+    const routes=pieceRoutes(from.fen,w.currentFen(),{fromFlipped:from.flipped,toFlipped:w.flipped});
+    assert.ok(board.classList.contains('puzzle-arranging'));
+    assert.equal(board.querySelectorAll('.puzzle-piece-transition').length,1);
+    assert.equal(board.querySelectorAll('.puzzle-transition-piece').length,routes.length);
+    assert.equal(w.root.querySelectorAll('.puzzle-run-history [aria-current=true]').length,1);
+    assert.equal(w.runReplay,result);assert.equal(w.activity.replay,true);assert.equal(w.busy,false);
+    assert.deepEqual(w.store.value,saved);
+  };
+  const from={...w.displayedBoard},first=w.replayRunPuzzle('replay-transition');
+  checkAssembly(from);assert.equal(w.flipped,false);
+  assert.ok(pending.some(p=>p.options.delay>0));
+  pending.forEach(p=>p.resolve());await first;
+  assert.equal(board.querySelector('.puzzle-piece-transition'),null);
+
+  const secondFrom={...w.displayedBoard},second=w.replayRunPuzzle('return-transition');
+  checkAssembly(secondFrom);assert.equal(w.flipped,true);
+  const cancelled=board.querySelector('.puzzle-piece-transition'),thirdFrom={...w.displayedBoard};
+  const third=w.replayRunPuzzle('replay-transition');
+  checkAssembly(thirdFrom);assert.equal(cancelled.isConnected,false);
+  await second;
+  assert.equal(typeof w.cancelPieceTransition,'function');
+  await w.close();await third;
+  assert.equal(w.cancelPieceTransition,null);
+  assert.equal(board.querySelector('.puzzle-piece-transition'),null);
+  assert.equal(board.classList.contains('puzzle-arranging'),false);
+});
+
+for(const mode of ['timeAttack','knockout'])for(const reduced of [false,true])test(`${mode} result selections respect ${reduced?'system reduced motion':'disabled move animations'}`,async t=>{
+  const {a,w,board,pending}=await replayWorkspace(t,mode);
+  if(reduced)a.dom.window.matchMedia=()=>({matches:true});else a.state.settings.moveAnim=false;
+  await w.replayRunPuzzle('replay-transition');
+  await w.replayRunPuzzle('return-transition');
+  assert.equal(pending.length,0);assert.equal(board.querySelector('.puzzle-piece-transition'),null);
+  assert.equal(w.currentFen(),w.puzzleById('return-transition').fen);
+});
+
 for(const reduced of [false,true])test(`returning from a puzzle respects ${reduced?'system reduced motion':'disabled move animations'}`,async t=>{
   const {a,w,board,pending}=await returningWorkspace(t);
   if(reduced)a.dom.window.matchMedia=()=>({matches:true});else a.state.settings.moveAnim=false;
