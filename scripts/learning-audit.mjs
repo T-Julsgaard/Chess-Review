@@ -46,7 +46,9 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await run("import('./analysis.js').then(m=>{m.go(2);m.toggleFlip();})");
   const before=await run("import('./analysis.js').then(m=>({idx:m.S.idx,flipped:m.S.flipped,pgn:m.S.pgn,evals:JSON.stringify(m.S.evals)}))");
   await run("window.auditBoard=document.querySelector('.board');window.auditFrames=[];window.auditSampling=true;function sample(){const r=auditBoard.getBoundingClientRect();auditFrames.push({x:r.x,y:r.y,width:r.width,height:r.height});if(auditSampling)requestAnimationFrame(sample);}requestAnimationFrame(sample);");
-  await run("document.querySelector('.learn-entry-button').click()");
+  assert.equal(await run("document.querySelector('.learn-entry-button').textContent"),'Solve Puzzles');
+  assert.equal(await run("document.querySelector('#learningToggle').textContent"),'Learn with Chess review');
+  await run("document.querySelector('#learningToggle').click()");
   await waitFor(review,"!!document.querySelector('.puzzle-arranging')",'Review pieces gliding into a fresh board');
   await waitFor(review,"import('./analysis.js').then(m=>m.learningWorkspace?.ready&&!m.learningWorkspace.transitioning)",'Learning expansion');
   await run('auditSampling=false');
@@ -104,7 +106,9 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   assert.ok(await run("!!document.querySelector('.learn-stat-empty')"));
   await capture('statistics-empty');
   await showStatistics();await capture('statistics-desktop');
-  assert.equal(await run("document.querySelector('[data-focus=review]').textContent"),'← Back to review');
+  assert.equal(await run("document.querySelector('#learningToggle').textContent"),'Return to Game review');
+  assert.equal(await run("document.querySelector('.learn-footer, [data-focus=review]')"),null);
+  assert.equal(await run("(()=>{const main=document.querySelector('.learn-main').getBoundingClientRect(),shell=document.querySelector('.learn-shell').getBoundingClientRect();return Math.abs(main.bottom-shell.bottom)<1})()"),true,'Scrollable content uses the former footer space');
   assert.equal(await run("document.querySelector('[data-focus=puzzle-statistics]').textContent"),'Back to puzzle overview');
   await run("document.querySelector('[data-focus=puzzle-statistics]').click()");
   assert.equal(await run("document.activeElement.dataset.focus"),'puzzle-statistics');
@@ -233,7 +237,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await checkRatingCollapse('Puzzle practice');
   await run("import('./analysis.js').then(m=>{window.savedPuzzle={id:m.learningWorkspace.activity.id,step:m.learningWorkspace.activity.step};document.querySelector('[data-focus=puzzle-overview]').click();})");
   await waitFor(review,"!!document.querySelector('[data-focus=solve-puzzle]')",'Back to puzzle library');
-  assert.equal(await run("document.querySelector('.learn-header [data-focus=review]').textContent"),'← Back to review');
+  assert.equal(await run("document.querySelector('#learningToggle').textContent"),'Return to Game review');
   await run("document.querySelector('[data-focus=solve-puzzle]').click()");
   await waitFor(review,"import('./analysis.js').then(m=>m.learningWorkspace.activity?.kind==='puzzle'&&!m.learningWorkspace.busy)",'Resume from puzzle library');
   assert.equal(await run("Promise.all([import('./analysis.js'),savedPuzzle]).then(([m,saved])=>m.learningWorkspace.activity.id===saved.id&&m.learningWorkspace.activity.step===saved.step)"),true);

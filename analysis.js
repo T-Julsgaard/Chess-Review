@@ -1521,6 +1521,7 @@ function buildUI() {
     ),
     el("div", { class: "topbar-meta", id: "meta" }),
     el("div", { class: "topbar-right" },
+      el("button", { type:"button", id:"learningToggle", class:"icon-btn learning-toggle", onclick:toggleLearning }, "Learn with Chess review"),
       // aria-label (not title) → keeps the buttons labelled for screen readers without the native
       // hover tooltip the user found unnecessary.
       el("button", { class: "icon-btn", "data-game-action":"", "aria-label": "Flip board", onclick: toggleFlip }, icon("flip")),
@@ -1552,7 +1553,7 @@ function buildUI() {
   const statsMount = el("div", { id: "statsMount" });
   const engineMount = el("div", { id: "engineMount" });
   const learnMount = el("div", { class: "learn-entry" },
-    el("button", { class: "learn-entry-button", onclick: openLearning }, icon("book"), "Learn with Chess Review"));
+    el("button", { class: "learn-entry-button", onclick: openLearning }, icon("book"), "Solve Puzzles"));
 
   // The stage holds every module. In the automatic layout the side wrappers group the panels into
   // columns (styles.css picks wide / medium / narrow by window size); in the custom layout they are
@@ -1625,6 +1626,14 @@ function buildUI() {
 let learningWorkspace = null;
 let openingLearning = false;
 let deferredPracticeAdvance = false;
+function toggleLearning() {
+  if (learningWorkspace) return learningWorkspace.close();
+  return openLearning();
+}
+function syncLearningToggle() {
+  const button=document.getElementById("learningToggle");
+  if(button)button.textContent=learningWorkspace?"Return to Game review":"Learn with Chess review";
+}
 async function openLearning() {
   if (learningWorkspace || openingLearning) return;
   openingLearning = true;
@@ -1653,7 +1662,7 @@ async function openLearning() {
   learningWorkspace = new LearningWorkspace({document, storage:browserAPI.storage.local, makePiece, url:_url,
     settings:()=>S.settings, flipped:S.flipped, book:()=>BOOK || {}, onPuzzleWrong:playWrongSound, onPuzzleMove:playSanSound, onOpeningMove:playSanSound, onFreeMove:playSanSound, onPuzzleSuccess:playPuzzleSuccess,
     createAnalysisEngine:()=>createEngine({Hash:S.settings.engineHash, "Skill Level":S.settings.engineSkill}),
-    returnLabel:wasBlank?"← Back to Chess Review":undefined,
+    navigationButton:document.getElementById("learningToggle"),
     embedded:wasBlank?null:{stage:UI.canvas, boardWrap:UI.boardWrap, fen:sourceFen, startDrag,
       restoreBoard:()=>{
         paintBoard({restoring:true});
@@ -1663,6 +1672,7 @@ async function openLearning() {
       drawBestArrow:(from,to,flipped)=>learningArrow(from,to,flipped,/^#[0-9a-f]{6}$/i.test(S.settings.bestArrowColor || "")?S.settings.bestArrowColor:ARROW_COLOR)},
     onClose:()=>{
       learningWorkspace = null;
+      syncLearningToggle();
       if(wasBlank){UI.home?.querySelector("button")?.focus();return;}
       S.idx=snapshot.idx; S.flipped=snapshot.flipped; S.selectedSq=snapshot.selectedSq;
       if(!S.practice){paintBoard();}
@@ -1676,6 +1686,7 @@ async function openLearning() {
       if(snapshot.bestWalking)playBestMoves();
       else if(snapshot.lineWalking)startLineWalk();
     }});
+  syncLearningToggle();
   await learningWorkspace.open();
 }
 

@@ -58,9 +58,17 @@ test('learning opens without a review board and returns to the blank workspace',
   const a=blank(t);await a.start();const entry=a.dom.window.document.querySelector('.workspace-home-action');entry.focus();
   await a.call('openLearning');const w=a.run('learningWorkspace');
   assert.equal(w.ready,true);assert.equal(w.embedded,null);assert.equal(a.state.blank,true);assert.equal(a.state.analyzing,false);
-  assert.ok(w.root.querySelector('.learn-theme-list'));assert.match(w.root.querySelector('[data-focus=review]').textContent,/Back to Chess Review/);
+  assert.ok(w.root.querySelector('.learn-theme-list'));assert.equal(w.root.querySelector('[data-focus=review]'),null);
+  const toggle=a.dom.window.document.querySelector('#learningToggle');
+  assert.equal(toggle.textContent,'Return to Game review');assert.notEqual(toggle.closest('.app').inert,true);
+  assert.equal(entry.closest('.workspace-home').inert,true);
+  assert.ok(w.root.classList.contains('learning-with-topbar'));
+  let keyReached=false;toggle.addEventListener('keydown',()=>{keyReached=true;},{once:true});
+  toggle.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'Enter',bubbles:true}));
+  assert.equal(keyReached,true,'learning must allow keyboard activation of the top-bar button');
   await w.navigate('openings');assert.equal(w.page,'openings');assert.match(w.root.textContent,/Italian Game/);
-  await w.close();assert.equal(a.run('learningWorkspace'),null);assert.equal(a.dom.window.document.activeElement,entry);
+  toggle.click();await w.close();assert.equal(a.run('learningWorkspace'),null);assert.equal(a.dom.window.document.activeElement,entry);
+  assert.equal(toggle.textContent,'Learn with Chess review');assert.equal(entry.closest('.workspace-home').inert,false);
   assert.equal(a.dom.window.document.querySelector('#canvas').hidden,true);
 });
 

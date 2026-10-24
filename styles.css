@@ -604,6 +604,11 @@ button { font-family: inherit; cursor: pointer; }
 }
 .icon-btn:hover { color: var(--ink); border-color: color-mix(in oklab, var(--accent) 50%, var(--line)); }
 .icon-btn svg { width: 17px; height: 17px; }
+.learning-toggle { width: auto; min-width: 0; padding: 0 12px; font: inherit; font-size: 12px; line-height: 1.25; }
+.learning-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.learning-with-topbar { top: 60px; }
+@media (min-width: 761px) and (max-width: 1100px) { .topbar-meta { gap: 8px; margin-left: 0; } .meta-chip { font-size: 11px; gap: 4px; } }
+@media (max-width: 520px) { .learning-toggle { max-width: 112px; padding-inline: 6px; } }
 .feedback-floating {
   position: fixed; right: max(18px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom)); z-index: 30;
   display: flex; align-items: center; gap: 8px; padding: 10px 15px;

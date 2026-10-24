@@ -41,9 +41,10 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await run(blank,"document.querySelector('.workspace-home-action').click()");
   await waitFor(blank,"!!document.querySelector('.learning-workspace .learn-theme-list')",'Learning without a game');
   assert.equal(await run(blank,"import('./analysis.js').then(m=>!m.S.analyzing&&m.S.blank)"),true);
-  assert.match(await run(blank,"document.querySelector('[data-focus=review]').textContent"),/Back to Chess Review/);
+  assert.equal(await run(blank,"document.querySelector('#learningToggle').textContent"),'Return to Game review');
+  assert.equal(await run(blank,"document.querySelector('.learn-footer, [data-focus=review]')"),null);
   await shot(blank,'blank-learning');
-  await run(blank,"document.querySelector('[data-focus=review]').click()");
+  await run(blank,"document.querySelector('#learningToggle').click()");
   await waitFor(blank,"!document.querySelector('.learning-workspace')",'Return to blank workspace');
   assert.equal(await run(blank,"document.activeElement===document.querySelector('.workspace-home-action')"),true);
   assert.equal(await run(review,"import('./browser-compat.js').then(async({browserAPI:api})=>JSON.stringify(await api.storage.local.get(['username','learning:v1','library']))===JSON.stringify(blankBaseline))"),true);

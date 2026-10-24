@@ -150,7 +150,7 @@ try {
       clickLearning('Mixed practice');await waitLearning(()=>doc.querySelector('.learn-move-input'),'Puzzle');
       if(doc.querySelector('.learn-board .annotated')||doc.querySelector('.learn-copy').textContent.includes('Why the solution works'))throw Error('Puzzle leaked solution');
       clickLearning('Reveal solution');await waitLearning(()=>doc.querySelector('.learn-feedback.revealed'),'Solution reveal');
-      clickLearning('← Back to review');await waitLearning(()=>!doc.querySelector('.learning-workspace'),'Return to review');
+      doc.querySelector('#learningToggle').click();await waitLearning(()=>!doc.querySelector('.learning-workspace'),'Return to review');
       if(JSON.stringify(frame.contentWindow.__smokeLearningReview())!==reviewBefore)throw Error('Learning changed the review state');
       const learning=(await browserAPI.storage.local.get('learning:v1'))['learning:v1'];
       if(!learning?.lessons.fork.exercises[0]?.passed||!Object.values(learning.puzzles).some(p=>p.assisted>0))throw Error('Learning progress not persisted');
