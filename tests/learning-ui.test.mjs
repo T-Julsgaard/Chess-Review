@@ -169,6 +169,29 @@ test('opening library round trips preserve scroll and search until leaving the s
   await reopened.navigate('openings');assert.equal(reopened.root.querySelector('.learn-main').scrollTop,0);
 });
 
+test('Study keeps the library scroll stable while saving, then shows the opening at the top',async t=>{
+  const standalone=(await workspace(t)).w;
+  const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
+  await a.call('openLearning');const embedded=a.run('learningWorkspace');t.after(()=>embedded.close());
+  for (const w of [standalone,embedded]) {
+    await w.navigate('openings');w.root.scrollTop=280;w.root.querySelector('.learn-main').scrollTop=620;
+    const library=w.root.querySelector('.learn-library');
+    let release;const gate=new Promise(resolve=>{release=resolve;});
+    const set=w.store.storage.set;
+    const saving=t.mock.method(w.store.storage,'set',async values=>{await gate;return set.call(w.store.storage,values);});
+    const starting=w.startOpening('french');
+    try {
+      await settle();
+      assert.equal(w.root.querySelector('.learn-library'),library);
+      assert.equal(w.root.scrollTop,280);assert.equal(w.root.querySelector('.learn-main').scrollTop,620);
+    } finally {release();await starting;saving.mock.restore();}
+    assert.ok(w.root.querySelector('.learn-opening-view'));assert.equal(w.root.querySelector('.learn-library'),null);
+    assert.equal(w.root.scrollTop,0);
+    if(w.embedded)assert.equal(w.root.querySelector('.learn-main').scrollTop,0);
+    await w.navigate('openings');assert.equal(w.root.scrollTop,280);assert.equal(w.root.querySelector('.learn-main').scrollTop,620);
+  }
+});
+
 test('opening highlights follow backward moves in either orientation and reset on starting positions and variation changes',async t=>{
   const {w,dom}=await workspace(t);
   const highlighted=()=>[...w.root.querySelectorAll('.last-move')].map(n=>n.dataset.square).sort();

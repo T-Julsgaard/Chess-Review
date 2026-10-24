@@ -21,7 +21,23 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await run("document.querySelector('.learning-workspace').scrollTop=600;document.querySelector('.learn-main').scrollTop=600");
     const scrolled=await libraryScroll();
     assert.ok(scrolled.root>0||scrolled.main>0,'Library must actually scroll at '+width);
-    await run("import('./analysis.js').then(m=>m.learningWorkspace.startOpening('french'))");
+    const entryFrames=await run(`import('./analysis.js').then(async m=>{
+      const w=m.learningWorkspace,persist=w.persist;
+      let release,saving;const gate=new Promise(resolve=>{release=resolve;});
+      w.persist=change=>(saving=gate.then(()=>persist.call(w,change)));
+      const frames=[];
+      try {
+        w.root.querySelector('.learn-library-row:last-child > button').click();
+        for(let i=0;i<3;i++) {
+          await new Promise(requestAnimationFrame);
+          frames.push({library:!!w.root.querySelector('.learn-library'),root:w.root.scrollTop,main:w.root.querySelector('.learn-main').scrollTop});
+        }
+      } finally {release();await saving;w.persist=persist;}
+      return frames;
+    })`);
+    assert.ok(entryFrames.every(frame=>frame.library&&frame.root===scrolled.root&&frame.main===scrolled.main),
+      'Study must keep the library at its saved position until the opening is ready: '+JSON.stringify({width,scrolled,entryFrames}));
+    await waitFor(review,"!!document.querySelector('.learn-opening-view')",'Opening study view');
     await run("import('./analysis.js').then(m=>m.learningWorkspace.navigate('openings'))");
     assert.deepEqual(await libraryScroll(),scrolled,'Opening return restores library scroll at '+width);
     await run("import('./analysis.js').then(m=>m.learningWorkspace.navigate('puzzles'))");
