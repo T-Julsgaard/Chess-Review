@@ -610,6 +610,15 @@ body {
   -webkit-user-select: none;
   user-select: none;
 }
+/* Keep the first layout measurable without exposing the unfinished panels. */
+body[data-starting] #root { visibility: hidden; }
+#startup { position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center; background: var(--bg); }
+.startup-mark { display: grid; grid-template-columns: repeat(2, 9px); gap: 3px; }
+.startup-mark i { width: 9px; height: 9px; border-radius: 2px; background: var(--accent); opacity: .3; animation: startup-pulse .65s ease-in-out infinite alternate; }
+.startup-mark i:nth-child(2), .startup-mark i:nth-child(3) { animation-delay: -.325s; }
+@keyframes startup-pulse { to { opacity: .9; } }
+@media (prefers-reduced-motion: reduce) { .startup-mark i { animation: none; opacity: .65; } }
+
 /* Preserve normal editing, selection and copying inside text entry fields. */
 input, textarea, [contenteditable=""], [contenteditable="true"], [contenteditable="plaintext-only"] {
   -webkit-user-select: text;

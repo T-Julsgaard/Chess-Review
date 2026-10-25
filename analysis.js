@@ -6708,6 +6708,24 @@ async function initTabZoom() {
   // A reset also restores 100% after deliberate manual browser zoom.
   _zoomInit=null;
 }
+function dismissStartup() {
+  document.body.removeAttribute("data-starting");
+  const root = document.getElementById("root");
+  root.removeAttribute("inert");
+  root.removeAttribute("aria-busy");
+  document.getElementById("startup")?.remove();
+}
+async function showReadyWorkspace() {
+  if (!document.body.hasAttribute("data-starting")) return;
+  // Decode the actual saved piece set, including a flipped board, before revealing it.
+  // A missing image must not leave the workspace stuck behind the startup screen.
+  await Promise.all([...document.querySelectorAll("#boardWrap .piece-img")].map(img => img.decode?.().catch(() => {})));
+  await new Promise(resolve => requestAnimationFrame(() => {
+    alignPlayers();
+    dismissStartup();
+    resolve();
+  }));
+}
 (async function main() {
   try {
     if(screenPreview){
@@ -6716,10 +6734,7 @@ async function initTabZoom() {
       await screenPreview.configure(await platformAPI.storage.local.get(screenPreview.viewport?null:["settings","layout","layoutMode","layoutVersion"]),snapshot);
     }
     else await resetSettingsForRelease({ reason: "startup" });
-    // Only the job + stored prefs are needed to build and show the UI. The opening book (~690 KB)
-    // and the calibration file are only consumed once scoring/opening refinement runs, so we load
-    // them in parallel and don't block the first paint on them — buildUI() can run as soon as the
-    // job and settings are in, while the book is still downloading.
+    // Load review data alongside the job and preferences while the startup mark is visible.
     const dataReady = blankLaunch&&!location.hash&&!screenPreview ? Promise.resolve()
       : Promise.all([loadBook(), loadCalibration().catch(error => {console.warn(error);return null;})]);
     const [payload, store] = await Promise.all([loadJob(), browserAPI.storage.local.get(["settings", "username", "layout", "layoutMode", "layoutVersion", "library"])]);
@@ -6771,11 +6786,8 @@ async function initTabZoom() {
 
     S.username = store.username || "";
 
-    // Everything the first render needs must be resolved BEFORE buildUI(), so that buildUI() and
-    // applyGame() run back-to-back with no await between them — i.e. the browser paints the whole
-    // page in one frame. Any await in that gap lets the empty shell paint first, and since the
-    // Moves panel is the only module whose header is built in buildUI() (the rest are empty mounts
-    // filled by renderAll()), that intermediate frame showed the Moves panel sitting on its own.
+    // Resolve review data before mounting. The startup screen also covers async work inside
+    // applyGame(), such as remembering the player's identity, so the empty shell never paints.
     await dataReady;         // book + calibration (downloaded in parallel; usually already resolved)
     if(blankLaunch&&!location.hash&&payload.source!=="blank"&&!screenPreview)
       await Promise.all([loadBook(),loadCalibration().catch(error=>{console.warn(error);return null;})]);
@@ -6794,14 +6806,14 @@ async function initTabZoom() {
     buildUI();               // built once; switching games re-uses it (no full page reload)
     if(S.blank)showBlankWorkspace();
     else await applyGame(payload);
+    // Fit and reveal the board as soon as it can paint; engine analysis continues normally.
+    await initTabZoom();
+    await showReadyWorkspace();
     // Two-phase load: now that initialization succeeded, remove the job data so it doesn't accumulate.
     const jobId = location.hash.replace(/^#/, "");
     if (jobId && rememberReviewJob()) {
       await browserAPI.storage.local.remove(`job:${jobId}`);
     }
-    // Fit the desktop composition or custom canvas; narrow windows retain the responsive grid.
-    initTabZoom();
-    requestAnimationFrame(alignPlayers); // measure the board after the first layout
     if (!screenPreview) learningAnnouncement = mountLearningAnnouncement({document, storage:browserAPI.storage.local,
       motion:()=>S.settings.moveAnim!==false});
     if(screenPreview?.viewport){
@@ -6815,6 +6827,8 @@ async function initTabZoom() {
         close:async()=>{const tab=await platformAPI.tabs.getCurrent();if(tab?.id!=null)await platformAPI.tabs.remove(tab.id);}});
     }
   } catch (err) {
+    document.getElementById("root").hidden = true;
+    dismissStartup();
     const e = document.getElementById("error");
     e.hidden = false;
     e.textContent = "Error: " + err.message;
