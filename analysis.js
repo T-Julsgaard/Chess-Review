@@ -1562,7 +1562,8 @@ function buildUI() {
   const statsMount = el("div", { id: "statsMount" });
   const engineMount = el("div", { id: "engineMount" });
   const learnMount = el("div", { class: "learn-entry" },
-    el("button", { class: "learn-entry-button", onclick: openLearning }, icon("book"), "Solve Puzzles"));
+    el("button", { class: "learn-entry-button", "data-motion": S.settings.moveAnim===false?"off":"on", onclick: openLearning },
+      icon("book"), el("span", {class:"learn-entry-label"}, "Solve Puzzles")));
 
   // The stage holds every module. In the automatic layout the side wrappers group the panels into
   // columns (styles.css picks wide / medium / narrow by window size); in the custom layout they are
@@ -5450,6 +5451,8 @@ function applySettings() {
   r.style.setProperty("--coord-size", (S.settings.coordSize ?? 12) + "px");
   r.classList.toggle("hide-coords", S.settings.showCoords === false);
   clearBoardArt(UI.boardWrap && UI.boardWrap.querySelector(".board"));
+  const learnEntry=document.querySelector(".learn-entry-button");
+  if(learnEntry)learnEntry.dataset.motion=S.settings.moveAnim===false?"off":"on";
   applyBackground();
   learningWorkspace?.refreshSettings();
 }
