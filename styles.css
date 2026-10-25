@@ -812,14 +812,13 @@ button { font-family: inherit; cursor: pointer; }
   max-height: calc(100dvh - 100px); overflow-y: auto; box-sizing: border-box;
   padding: 23px; border: 1px solid color-mix(in oklab,var(--accent) 55%,var(--line)); border-radius: 18px;
   background: radial-gradient(ellipse at 100% 0%,color-mix(in oklab,var(--accent) 13%,transparent),transparent 70%),var(--panel);
-  color: var(--ink); box-shadow: 0 18px 60px #0005,0 0 0 5px color-mix(in oklab,var(--accent) 7%,transparent);
+  color: var(--ink); text-align: center; box-shadow: 0 18px 60px #0005,0 0 0 5px color-mix(in oklab,var(--accent) 7%,transparent);
   animation: learning-announcement-enter .45s cubic-bezier(.16,1,.3,1) both;
 }
 .learning-announcement-eyebrow { display: block; margin-bottom: 13px; color: var(--accent); font-size: 10px; font-weight: 750; letter-spacing: .09em; text-transform: uppercase; }
-.learning-announcement h2 { margin: 0 0 12px; font-size: 23px; font-weight: 750; line-height: 1.15; letter-spacing: -.6px; }
-.learning-announcement p { margin: 0 0 12px; color: var(--ink-2); font-size: 13px; line-height: 1.65; }
-.learning-announcement .learning-announcement-directions { margin-bottom: 20px; font-size: 12px; }
-.learning-announcement-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.learning-announcement h2 { margin: 0 0 12px; font-size: 23px; font-weight: 750; line-height: 1.15; letter-spacing: -.6px; white-space: nowrap; }
+.learning-announcement p { margin: 0 0 20px; color: var(--ink-2); font-size: 13px; line-height: 1.65; }
+.learning-announcement-actions { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
 .learning-announcement-actions button { min-height: 36px; padding: 8px 11px; border: 0; border-radius: 8px; font: inherit; font-size: 11px; font-weight: 650; }
 .learning-announcement-dismiss { background: var(--accent); color: var(--accent-ink); }
 .learning-announcement-dismiss:hover { background: var(--accent-strong); }
@@ -828,12 +827,14 @@ button { font-family: inherit; cursor: pointer; }
 .learning-announcement-actions button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 .learning-announcement-arrows { position: fixed; inset: 0; z-index: 84; width: 100%; height: 100%; overflow: visible; pointer-events: none; color: var(--accent); }
 .learning-announcement-arrow { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-dasharray: 7 7; animation: learning-announcement-flow 1.8s linear infinite; }
+.learning-announcement-traveller { fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 .learning-announcement-target { outline: 2px solid var(--accent); outline-offset: 4px; box-shadow: 0 0 0 7px color-mix(in oklab,var(--accent) 12%,transparent); }
 @keyframes learning-announcement-enter { from { opacity: 0; translate: 0 -8px; } to { opacity: 1; translate: 0 0; } }
 @keyframes learning-announcement-flow { to { stroke-dashoffset: -28; } }
 .learning-announcement[data-motion="off"], .learning-announcement-arrows[data-motion="off"] .learning-announcement-arrow { animation: none; }
+.learning-announcement-arrows[data-motion="off"] .learning-announcement-traveller { display: none; }
 @media (max-width: 520px) { .learning-announcement { right: 12px; padding: 20px; } }
-@media (prefers-reduced-motion: reduce) { .learning-announcement, .learning-announcement-arrow { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .learning-announcement, .learning-announcement-arrow { animation: none; } .learning-announcement-traveller { display: none; } }
 .learning-with-topbar { top: 60px; }
 @media (min-width: 761px) and (max-width: 1100px) { .topbar-meta { gap: 8px; margin-left: 0; } .meta-chip { font-size: 11px; gap: 4px; } }
 @media (max-width: 520px) { .learning-toggle { max-width: 112px; padding-inline: 6px; } }
