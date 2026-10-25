@@ -1528,7 +1528,9 @@ function buildUI() {
     ),
     el("div", { class: "topbar-meta", id: "meta" }),
     el("div", { class: "topbar-right" },
-      el("button", { type:"button", id:"learningToggle", class:"icon-btn learning-toggle", onclick:toggleLearning }, "Learn with Chess review"),
+      el("button", { type:"button", id:"learningToggle", class:"icon-btn learning-toggle", onclick:toggleLearning },
+        el("span", {class:"learning-toggle-icon", "aria-hidden":"true"}, icon("book")),
+        el("span", {class:"learning-toggle-label"}, "Learn with Chess review")),
       // aria-label (not title) → keeps the buttons labelled for screen readers without the native
       // hover tooltip the user found unnecessary.
       el("button", { class: "icon-btn", "data-game-action":"", "aria-label": "Flip board", onclick: toggleFlip }, icon("flip")),
@@ -1639,7 +1641,13 @@ function toggleLearning() {
 }
 function syncLearningToggle() {
   const button=document.getElementById("learningToggle");
-  if(button)button.textContent=learningWorkspace?"Return to Game review":"Learn with Chess review";
+  if(!button)return;
+  const learning=!!learningWorkspace&&!learningWorkspace.closing, mode=learning?"learning":"review";
+  button.dataset.motion=S.settings.moveAnim===false?"off":"on";
+  if(button.dataset.mode===mode)return;
+  button.querySelector(".learning-toggle-label").textContent=learning?"Return to Game review":"Learn with Chess review";
+  button.querySelector(".learning-toggle-icon").replaceChildren(icon(learning?"prev":"book"));
+  button.dataset.mode=mode;
 }
 async function openLearning() {
   if (learningWorkspace || openingLearning) return;
@@ -1677,6 +1685,7 @@ async function openLearning() {
       },
       drawArrow:(from,to,flipped)=>learningArrow(from,to,flipped,USER_ARROW_COLOR),
       drawBestArrow:(from,to,flipped)=>learningArrow(from,to,flipped,/^#[0-9a-f]{6}$/i.test(S.settings.bestArrowColor || "")?S.settings.bestArrowColor:ARROW_COLOR)},
+    onClosing:syncLearningToggle,
     onClose:()=>{
       learningWorkspace = null;
       syncLearningToggle();
@@ -5442,6 +5451,8 @@ function applySettings() {
   learningWorkspace?.refreshSettings();
 }
 // Bundled background presets (relative to the extension's analysis page).
+  const learningToggle=document.getElementById("learningToggle");
+  if(learningToggle)learningToggle.dataset.motion=S.settings.moveAnim===false?"off":"on";
 const BG_PRESETS = { slate: "backgrounds/bg-slate.webp" };
 const BG_TILE_PX = { small: 240, medium: 440, large: 760 };
 // Paint the chosen background on the .app shell. "color" paints an HSL tone (with a faint top
