@@ -915,7 +915,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 .sq.sel::before, .sq.puzzle-hint-square::before, .sq.last-move::before { content: ''; position: absolute; inset: 0; z-index: 0; background: rgba(255,230,88,.52); pointer-events: none; }
 /* the user's single-square marker (red, translucent) — sits behind the piece */
-.sq.marked::after {
+.sq.marked::after, .sq.premove::after {
   content: ""; position: absolute; inset: 0; z-index: 0;
   background: color-mix(in srgb, var(--mc-marked) 45%, transparent);
 }

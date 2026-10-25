@@ -182,7 +182,7 @@ test('learning promotion requires an explicit choice and Escape cancels without 
   await w.close();assert.ok(board);
 });
 
-test('a picked-up solver piece survives the opponent introduction and reply without accepting early drops',async t=>{
+test('a picked-up solver piece survives the opponent introduction and reply after cancelling a premove',async t=>{
   const {a,w,doc,board,down,up,event}=await setup(t);
   const before=new Chess();before.move('e4');const after=new Chess(before.fen());after.move('d5');
   const puzzle={id:'pickup-intro',fen:after.fen(),setup:{fen:before.fen(),move:'d7d5'},solution:['e4d5','d8d5','b1c3'],rating:1200,themes:[],theme:'fork',source:{url:'https://lichess.org/training'}};
@@ -195,6 +195,7 @@ test('a picked-up solver piece survives the opponent introduction and reply with
   assert.ok(board.querySelector('[data-square=d5].legal-cap'),'The capture marker uses the settled opponent position during the introduction');
   a.dom.window.dispatchEvent(event('pointermove','d5'));up('d5');
   assert.equal(w.activity.step,0);assert.equal(w.store.value.puzzleRating.played,0);assert.equal(doc.querySelector('.drag-piece'),null);
+  assert.equal(board.querySelector('[data-square=d5] img').dataset.piece,'wP');assert.ok(board.querySelector('[data-square=d5].premove'));
   down('e4');const ghost=doc.querySelector('.drag-piece');advance();await settle();
   assert.equal(doc.querySelector('.drag-piece'),ghost);assert.equal(board.querySelector('[data-square=e4] img').style.visibility,'hidden');
   finishSlide();await opening;assert.equal(doc.querySelector('.drag-piece'),ghost);
@@ -245,6 +246,81 @@ function quickPuzzle(solution=['e4d5','d8d5','b1c3']) {
   return {id:'quick-reply',fen:after.fen(),setup:{fen:before.fen(),move:'d7d5'},solution,rating:450,themes:[]};
 }
 
+test('practice premoves preview captures and execute once after introductions and replies',async t=>{
+  const {a,w,doc,board,down,up,event}=await setup(t);w.puzzles=[quickPuzzle()];
+  a.state.settings.moveAnim=true;controlledReplies(t,w);
+  const starting=w.startPuzzleSelection(w.puzzles);await drain();const fen=w.currentFen();
+  down('e4');a.dom.window.dispatchEvent(event('pointermove','d5'));up('d5');up('d5');
+  assert.equal(w.currentFen(),fen);assert.equal(w.activity.step,0);assert.equal(w.store.value.puzzleRating.played,0);
+  assert.equal(board.querySelector('[data-square=e4] img'),null);
+  assert.equal(board.querySelector('[data-square=d5] img').dataset.piece,'wP');
+  assert.deepEqual([...board.querySelectorAll('.premove')].map(n=>n.dataset.square).sort(),['d5','e4']);
+  w.render();assert.ok(board.querySelector('[data-square=d5].premove'));
+  w.releaseReply(true);await starting;await drain();assert.equal(w.activity.step,1);
+  down('b1');up('b1');down('c3');up('c3');
+  assert.equal(board.querySelector('[data-square=c3] img').dataset.piece,'wN');
+  assert.equal(w.activity.step,1);assert.equal(w.busy,true);
+  w.releaseReply(true);await drain();
+  assert.equal(w.feedback.status,'completed');assert.equal(w.activity.step,3);
+  assert.equal(w.store.value.puzzleRating.played,1);assert.equal(w.premove,null);
+  assert.equal(board.querySelector('.premove'),null);assert.equal(doc.querySelector('.drag-piece'),null);
+});
+
+for(const cancel of ['right-click','Escape','replacement'])test(`practice premoves support ${cancel} cancellation`,async t=>{
+  const {a,w,board,down,up,event}=await setup(t);controlledReplies(t,w);
+  const playing=w.submitPuzzle('e2e4');await drain();
+  down('g1');a.dom.window.dispatchEvent(event('pointermove','h3'));up('h3');
+  assert.ok(board.querySelector('[data-square=h3].premove'));
+  if(cancel==='right-click'){down('h3',2);up('h3',2);}
+  if(cancel==='Escape')a.dom.window.document.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
+  if(cancel==='replacement'){
+    down('g1');up('g1');down('f3');up('f3');
+    assert.equal(board.querySelector('[data-square=h3] img'),null);
+    assert.ok(board.querySelector('[data-square=f3].premove'));
+  } else {
+    assert.equal(w.premove,null);assert.equal(board.querySelector('.premove'),null);
+    assert.equal(board.querySelector('[data-square=g1] img').dataset.piece,'wN');
+  }
+  w.releaseReply(true);await playing;await drain();
+  assert.equal(w.activity.mistakes,0);assert.equal(w.closed,false);
+  assert.equal(w.activity.step,cancel==='replacement'?3:2);
+  if(w.releaseReply)w.releaseReply(true);await drain();
+});
+
+test('a wrong premove is validated once on the solver turn',async t=>{
+  const {a,w,board,down,up,event}=await setup(t);controlledReplies(t,w);
+  const playing=w.submitPuzzle('e2e4');await drain();
+  down('g1');a.dom.window.dispatchEvent(event('pointermove','h3'));up('h3');up('h3');
+  assert.equal(w.activity.mistakes,0);w.releaseReply(true);await playing;await drain();
+  assert.equal(w.activity.mistakes,1);assert.equal(w.activity.step,2);assert.equal(w.feedback.status,'incorrect');
+  assert.equal(board.querySelector('[data-square=g1] img').dataset.piece,'wN');assert.equal(board.querySelector('.premove'),null);
+});
+
+for(const ending of ['close','navigation','deadline'])test(`queued premoves are discarded on ${ending}`,async t=>{
+  const {a,w,doc,down,up,event}=await setup(t);w.puzzles=[quickPuzzle(['e4d5'])];
+  a.state.settings.moveAnim=true;controlledReplies(t,w);
+  const starting=w.startPuzzleRun('knockout');await drain();const run=w.run;
+  down('e4');a.dom.window.dispatchEvent(event('pointermove','d5'));up('d5');assert.ok(w.premove);
+  if(ending==='close')await w.close();
+  else if(ending==='navigation')await w.navigate('openings');
+  else await w.finishChallenge('Time is up');
+  await starting;await drain();
+  assert.equal(run.correctMoves,0);assert.equal(run.solved,0);assert.equal(w.premove,null);
+  assert.equal(w.pendingOpponent,null);assert.equal(doc.querySelector('.premove, .drag-piece'),null);
+});
+
+test('a premoved underpromotion retains its choice while waiting for the reply',async t=>{
+  const {a,w,doc,board,down,up,event}=await setup(t),before=new Chess('7k/P7/8/8/8/8/8/7K b - - 0 1'),after=new Chess(before.fen());after.move('Kh7');
+  w.puzzles=[{id:'premove-promotion',fen:after.fen(),setup:{fen:before.fen(),move:'h8h7'},solution:['a7a8n'],rating:450,themes:[]}];
+  a.state.settings.moveAnim=true;controlledReplies(t,w);
+  const starting=w.startPuzzleSelection(w.puzzles);await drain();
+  down('a7');a.dom.window.dispatchEvent(event('pointermove','a8'));up('a8');
+  doc.querySelector('[aria-label="Promote to knight"]').click();await drain();
+  assert.equal(w.activity.step,0);assert.equal(board.querySelector('[data-square=a8].premove img').dataset.piece,'wN');
+  w.releaseReply(true);await starting;await drain();assert.equal(w.feedback.status,'completed');
+  assert.equal(board.querySelector('[data-square=a8] img').dataset.piece,'wN');assert.equal(w.premove,null);
+});
+
 test('Time attack accepts early capture and continuation drops exactly once',async t=>{
   const {a,w,doc,board,down,up,event}=await setup(t);w.puzzles=[quickPuzzle()];
   a.state.settings.moveAnim=true;controlledReplies(t,w);
@@ -257,17 +333,19 @@ test('Time attack accepts early capture and continuation drops exactly once',asy
   a.dom.window.dispatchEvent(event('pointermove','c3'));up('c3');up('c3');await drain();
   assert.equal(w.result.solved,1);assert.equal(running.correctMoves,2);assert.equal(w.result.results.length,1);
   assert.equal(w.store.value.puzzleRating.played,0);assert.equal(doc.querySelector('.drag-piece'),null);
-  assert.equal(w.pendingOpponent,null);assert.equal(w.earlyPuzzleMove,null);
+  assert.equal(w.pendingOpponent,null);assert.equal(w.premove,null);
 });
 
-test('Knockout shows capture markers during the reply but keeps early drops blocked',async t=>{
-  const {a,w,board,down,up,event}=await setup(t);w.puzzles=[quickPuzzle()];
+test('Knockout queues early capture drops until the opponent reply finishes',async t=>{
+  const {a,w,board,down,up,event}=await setup(t);w.puzzles=[quickPuzzle(['e4d5'])];
   a.state.settings.moveAnim=true;controlledReplies(t,w);
   const starting=w.startPuzzleRun('knockout');await drain();
   down('e4');assert.ok(board.querySelector('[data-square=d5].legal-cap'));
   a.dom.window.dispatchEvent(event('pointermove','d5'));up('d5');await drain();
   assert.equal(w.activity.step,0);assert.equal(w.run.correctMoves,0);assert.equal(w.pendingOpponent.fastForward,false);
-  w.releaseReply(true);await starting;assert.equal(w.busy,false);
+  assert.equal(board.querySelector('[data-square=d5] img').dataset.piece,'wP');
+  assert.deepEqual([...board.querySelectorAll('.premove')].map(n=>n.dataset.square).sort(),['d5','e4']);
+  w.releaseReply(true);await starting;await drain();assert.equal(w.result.solved,1);assert.equal(w.premove,null);
 });
 
 test('an early Time attack drop finishes the active slide at its destination',async t=>{
@@ -291,9 +369,9 @@ test('early Time attack promotion waits for an explicit piece choice',async t=>{
   w.puzzles=[{id:'early-promotion',fen:after.fen(),setup:{fen:before.fen(),move:'h8h7'},solution:['a7a8n'],rating:450,themes:[]}];
   a.state.settings.moveAnim=true;controlledReplies(t,w);
   const starting=w.startPuzzleRun('timeAttack');await drain();const running=w.run;
-  down('a7');a.dom.window.dispatchEvent(event('pointermove','a8'));up('a8');await starting;await drain();
+  down('a7');a.dom.window.dispatchEvent(event('pointermove','a8'));up('a8');await drain();
   assert.equal(w.activity.step,0);assert.equal(doc.querySelectorAll('.promotion-options button').length,4);
-  doc.querySelector('[aria-label="Promote to knight"]').click();await drain();
+  doc.querySelector('[aria-label="Promote to knight"]').click();await starting;await drain();
   assert.equal(w.result.solved,1);assert.equal(running.correctMoves,1);
 });
 
