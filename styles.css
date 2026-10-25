@@ -303,7 +303,22 @@
 .learning-workspace .learn-puzzle-start h2 { font-size: 32px; margin: 0; }
 .learning-workspace .learn-puzzle-start > .primary { min-width: 200px; padding: 14px 24px; }
 .learn-puzzle-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; }
-.learn-statistics-button { background: transparent; border-color: transparent; color: var(--ink-2); padding: 8px 10px; font-size: 13px; font-weight: 500; }
+.learn-statistics-button {
+  background: color-mix(in oklab,var(--accent) 5%,var(--panel));
+  border-color: color-mix(in oklab,var(--ink-2) 55%,var(--line));
+  color: var(--ink); padding: 8px 10px; font-size: 13px; font-weight: 500;
+  box-shadow: 0 1px 2px #00000014;
+  transition: background .18s,border-color .18s,box-shadow .18s;
+}
+.learn-statistics-button:hover:not(:disabled) { background: color-mix(in oklab,var(--accent) 12%,var(--panel)); border-color: var(--accent); box-shadow: 0 3px 8px #0000001a; }
+.learn-statistics-button:active:not(:disabled) { background: color-mix(in oklab,var(--accent) 17%,var(--panel)); box-shadow: inset 0 1px 3px #0000001a; }
+@media (prefers-reduced-motion: no-preference) {
+  .learning-workspace:not([data-motion="off"]) .learn-statistics-button { transition: background .18s,border-color .18s,box-shadow .18s,transform .18s; }
+  .learning-workspace:not([data-motion="off"]) .learn-statistics-button:hover:not(:disabled) { transform: translateY(-1px); }
+  .learning-workspace:not([data-motion="off"]) .learn-statistics-button:active:not(:disabled) { transform: translateY(0); }
+}
+.learning-workspace[data-motion="off"] .learn-statistics-button { transition: none; }
+@media (prefers-reduced-motion: reduce) { .learn-statistics-button { transition: none; } }
 .learn-puzzle-statistics { padding-top: 8px; }
 .learning-workspace .learn-puzzle-statistics h2 { margin: 0 0 8px; font-size: 30px; outline: none; }
 .learn-stat-overview { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin: 22px 0 28px; padding: 0; }
@@ -638,7 +653,7 @@ button { font-family: inherit; cursor: pointer; }
 .learning-toggle[data-mode="review"] .learning-toggle-icon { animation: learning-toggle-book .46s both; }
 .learning-toggle[data-mode="learning"]::after { animation: learning-toggle-shine-out .46s both; }
 .learning-toggle[data-mode="review"]::after { animation: learning-toggle-shine-back .46s both; }
-.learning-toggle:hover { transform: translateY(-2px); box-shadow: 0 4px 14px color-mix(in oklab, var(--accent) 14%, transparent); }
+.learning-toggle:hover { box-shadow: 0 4px 14px color-mix(in oklab, var(--accent) 14%, transparent); }
 .learning-toggle:active { transform: translateY(1px) scale(.97); }
 @keyframes learning-toggle-out {
   0% { transform: scale(.96); }
