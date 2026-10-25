@@ -57,6 +57,28 @@ test('correct practice captures also clear legal capture rings',t=>{
   assert.ok(a.run('sqByName.d5').querySelector('.puzzle-result-badge[data-result=correct]'));
 });
 
+test('repeated incorrect attempts replay the full board shake and red flashes alongside the badge',t=>{
+  t.mock.timers.enable({apis:['setTimeout']});
+  const a=practice(t),board=a.dom.window.document.querySelector('.board');
+  const from=a.run('sqByName.d2'),to=a.run('sqByName.d4');
+  a.call('practiceAttempt','d2','d4');
+  assert.ok(board.classList.contains('buzz'));
+  assert.ok(from.classList.contains('flash-bad'));assert.ok(to.classList.contains('flash-bad'));
+  assert.ok(from.querySelector('.puzzle-result-badge[data-result=incorrect]'));
+  t.mock.timers.tick(300);a.call('practiceAttempt','d2','d4');
+  t.mock.timers.tick(120);
+  assert.ok(board.classList.contains('buzz'),'the previous attempt must not cut the new shake short');
+  t.mock.timers.tick(260);
+  assert.ok(from.classList.contains('flash-bad'));assert.ok(to.classList.contains('flash-bad'));
+  t.mock.timers.tick(40);assert.equal(board.classList.contains('buzz'),false);
+  t.mock.timers.tick(260);
+  assert.equal(from.classList.contains('flash-bad'),false);assert.equal(to.classList.contains('flash-bad'),false);
+  assert.ok(from.querySelector('.puzzle-result-badge[data-result=incorrect]'));
+  assert.ok(from.querySelector('.piece-img[data-piece=wP]'));
+  assert.equal(a.state.practice.fails,2);assert.equal(a.state.practice.solving,true);
+  t.mock.timers.tick(1320);assert.equal(board.querySelector('.puzzle-result-badge'),null);
+});
+
 test('the first wrong practice move offers one working Hint button inside the coach message',t=>{
   const a=practice(t),doc=a.dom.window.document;
   a.call('renderReview');

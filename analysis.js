@@ -5727,23 +5727,36 @@ function practiceAdvance() {
   practiceRoll(p.spots[p.i] - 1, practiceEnterSolve);   // roll from where we are to the next mistake
 }
 // Flash the from/to squares green (good) or red (bad) as quick feedback.
+const practiceFlashTimers = new WeakMap();
 function flashSquares(names, kind) {
   const cls = kind === "good" ? "flash-good" : "flash-bad";
-  for (const n of names) {
-    const sq = sqByName[n]; if (!sq) continue;
+  const squares = names.map(n => sqByName[n]).filter(Boolean);
+  for (const sq of squares) {
+    clearTimeout(practiceFlashTimers.get(sq));
+    sq.classList.remove("flash-good", "flash-bad");
+  }
+  // Repeated attempts on the same squares must replay the fade from its start.
+  if (squares.length) void squares[0].offsetWidth;
+  for (const sq of squares) {
     sq.classList.add(cls);
-    setTimeout(() => sq.classList.remove(cls), 680);
+    practiceFlashTimers.set(sq, setTimeout(() => {
+      sq.classList.remove(cls); practiceFlashTimers.delete(sq);
+    }, 680));
   }
 }
 // Short "buzz" on the board to make a rejected move feel like a wrong answer (instead of the
 // piece just silently snapping back). The class is removed once the keyframes finish.
+const practiceBuzzTimers = new WeakMap();
 function buzzBoard() {
   const board = UI.boardWrap && UI.boardWrap.querySelector(".board");
   if (!board) return;
+  clearTimeout(practiceBuzzTimers.get(board));
   board.classList.remove("buzz");
   void board.offsetWidth;             // restart the animation if it's still mid-buzz
   board.classList.add("buzz");
-  setTimeout(() => board.classList.remove("buzz"), 420);
+  practiceBuzzTimers.set(board, setTimeout(() => {
+    board.classList.remove("buzz"); practiceBuzzTimers.delete(board);
+  }, 420));
 }
 // Reveal the answer for the current practice spot: light up the engine's best move (the piece
 // it starts from + its target square) with the analytical highlight.
@@ -5821,10 +5834,10 @@ async function practiceAttempt(from, to, promotion = "q") {
       if (S.practice === p && p.resultBadge === result) clearPracticeResult();
     }, 2000);
     p.fails = (p.fails || 0) + 1;
+    S.selectedSq = null; paintBoard(); renderControls(); renderReview();
     flashSquares([mv.from, mv.to], "bad");
     buzzBoard();
     playWrongSound();
-    S.selectedSq = null; paintBoard(); renderControls(); renderReview();
   }
 }
 
