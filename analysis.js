@@ -17,6 +17,7 @@ import { expectedPoints, SF19_OUTCOME } from "./lib/public-scoring.js";
 import { calibratedReview, scoringEvidenceComplete } from "./lib/calibrated-review.js";
 import { analyseCalibratedPosition } from "./lib/calibrated-search.js";
 import { loadLearningWorkspace, presentationFor } from "./lib/learning-loader.js";
+import { mountLearningAnnouncement } from "./lib/learning-announcement.js";
 import { panelScale, panelGroupBounds, scalePanelGroup, movePanelGroup } from "./lib/panel-layout.js";
 import { createScreenPreviewContext, loadScreenPreviewController } from "./lib/screen-previews.js";
 import { rememberAnalyzedGame, historyGame } from "./lib/player-history.js";
@@ -1517,6 +1518,7 @@ function uciLineToSan(fen, uciMoves, maxPlies = 6) {
    UI skeleton
    =================================================================== */
 function buildUI() {
+  learningAnnouncement?.dispose();
   UI.boardObserver?.disconnect();
   const root = document.getElementById("root");
   root.replaceChildren();
@@ -1634,6 +1636,7 @@ function buildUI() {
 }
 
 let learningWorkspace = null;
+let learningAnnouncement = null;
 let openingLearning = false;
 let deferredPracticeAdvance = false;
 function openPuzzles(event) {
@@ -1658,6 +1661,7 @@ function syncLearningToggle() {
 }
 async function openLearning() {
   if (learningWorkspace || openingLearning) return;
+  learningAnnouncement?.close();
   openingLearning = true;
   const positions = S.positions;
   let LearningWorkspace;
@@ -6732,6 +6736,8 @@ async function resetLegacyZoom() {
     // Fit the desktop composition or custom canvas; narrow windows retain the responsive grid.
     initTabZoom();
     requestAnimationFrame(alignPlayers); // measure the board after the first layout
+    if (!screenPreview) learningAnnouncement = mountLearningAnnouncement({document, storage:browserAPI.storage.local,
+      motion:()=>S.settings.moveAnim!==false});
     if(screenPreview?.viewport){
       if(!S.blank&&Number.isInteger(screenPreview.idx))go(screenPreview.idx);
       document.body.dataset.previewReady="true";
