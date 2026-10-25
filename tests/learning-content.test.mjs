@@ -116,11 +116,11 @@ test('all opening variations have legal annotated moves and reuse named position
   assert.equal(new Set(OPENINGS.map(o=>o.id)).size,OPENINGS.length);
   assert.equal(new Set(OPENINGS.map(o=>o.title)).size,OPENINGS.length);
   const lines=OPENINGS.flatMap(o=>o.lines);
-  assert.equal(lines.length,72);
+  assert.equal(lines.length,220);
   assert.equal(new Set(lines.map(line=>line.moves.join(' '))).size,lines.length);
   const bookNames={
     italian:/Italian Game/,ruy:/Ruy Lopez/,scotch:/Scotch Game/,'queens-gambit':/Queen's Gambit/,
-    slav:/Slav Defense/,london:/London System/,sicilian:/Sicilian Defense/,french:/French Defense/,
+    slav:/Slav Defense/,london:/London System|Rapport-Jobava System/,sicilian:/Sicilian Defense/,french:/French Defense/,
     caro:/Caro-Kann Defense/,'kings-indian':/King's Indian Defense/,nimzo:/Nimzo-Indian Defense/,english:/English Opening/,
     vienna:/Vienna Game/,'kings-gambit':/King's Gambit/,'four-knights':/Four Knights Game/,petrov:/Petrov's Defense/,
     philidor:/Philidor Defense/,ponziani:/Ponziani Opening/,'danish-gambit':/Danish Gambit/,scandinavian:/Scandinavian Defense/,
@@ -132,7 +132,7 @@ test('all opening variations have legal annotated moves and reuse named position
   for(const o of OPENINGS){
     assert.ok(o.plans&&o.structure&&o.mistakes&&o.tactic&&o.source);
     assert.ok(o.level>=1&&o.level<=3);
-    assert.ok(o.lines.length>=2);assert.deepEqual(o.colors,['w','b']);
+    assert.ok(o.lines.length>=6,o.id+' needs broad variation coverage');assert.deepEqual(o.colors,['w','b']);
     assert.equal(new Set(o.lines.map(line=>line.name)).size,o.lines.length);
     for(const line of o.lines){
       const label=o.id+':'+line.name;
@@ -144,8 +144,22 @@ test('all opening variations have legal annotated moves and reuse named position
       const names=positions.map(fen=>book[positionKey(fen)]).filter(Array.isArray);
       assert.ok(bookNames[o.id]&&names.some(entry=>bookNames[o.id].test(entry[1])),label);
       for(const fen of positions)legalPosition(fen);
+      const replay=new Chess();
+      for(const san of line.moves)assert.equal(replay.move(san).san,san,label+' uses canonical notation');
     }
   }
+});
+test('expanded opening courses cover distinct branches beyond the two saved introductory lines',()=>{
+  for(const o of OPENINGS){
+    const endings=new Set(o.lines.slice(0,2).map(line=>positionKey(linePositions(line).positions.at(-1))));
+    for(const line of o.lines.slice(2)){
+      const end=positionKey(linePositions(line).positions.at(-1));
+      assert.ok(!endings.has(end),o.id+':'+line.name+' must teach a different position');
+      endings.add(end);
+      assert.ok(line.moves.length>=12,o.id+':'+line.name+' needs a developed teaching position');
+    }
+  }
+  for(const id of ['ruy','sicilian'])assert.equal(OPENINGS.find(o=>o.id===id).lines.length,8);
 });
 test('opening perspectives match the usual repertoire side while both sides remain available',()=>{
   const black=['slav','sicilian','french','caro','kings-indian','nimzo','petrov','philidor','scandinavian','pirc','modern','alekhine','semi-slav','tarrasch','chigorin','queens-indian','grunfeld','benoni','benko','dutch'];

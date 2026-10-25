@@ -17,7 +17,8 @@ Settings available alongside learning, with reserved space on desktop windows.
 the surrounding panels transition into learning.
 The learning workspace includes 23 concept lessons with 47
 exercises, 50,000 offline puzzles, Time attack and Knockout modes, and 36 opening courses
-with 24 annotated lines. Lessons use move, square-selection and position-reading
+with 220 annotated lines: at least six variations per opening, and eight each for
+the Ruy Lopez and Sicilian Defense. Lessons use move, square-selection and position-reading
 exercises. Opening practice supports both colors and automatic opponent replies.
 Progress and bookmarks stay in your browser, and **Back to review** restores your
 game position and orientation. The [learning objective and progress tracker](docs/LEARN_WITH_CHESS_REVIEW.md)

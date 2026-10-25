@@ -61,13 +61,19 @@ not establish permission to bundle a site's collection.
 ## Lessons and opening courses
 
 The explanations, common mistakes, plans, annotations and composed teaching
-positions in `lib/learning/content.js` are original project content under the
+positions in `lib/learning/content.js` and `lib/learning/opening-variations.js` are original project content under the
 repository's GPL-3.0 license. Standard opening sequences are legally replayed
 and matched against the existing offline `data/book.json` from
 [lichess-org/chess-openings](https://github.com/lichess-org/chess-openings), CC0.
 Every variation has one annotation per move. Courses teach plans for both colors;
 the offline book supplies names and position recognition, not instructional text.
-The opening library contains 36 courses, 72 variations and 836 annotated half-moves.
+The opening library contains 36 courses, 220 variations and 3,216 annotated half-moves.
+Every course has at least six variations; the Ruy Lopez and Sicilian Defense each
+have eight. The alternatives cover central exchanges, gambits, quieter setups
+and characteristic pawn structures, with continuations illustrating plans rather
+than claiming forced or engine-ranked best play. Shared move prefixes reuse the
+introductory annotations, and every new continuation has original move notes.
+The original two variations retain their indexes and moves for saved study positions.
 All variations are legally replayed and checked for their course’s named book
 positions, unique course IDs and nonempty move annotations by
 `tests/learning-content.test.mjs`.
