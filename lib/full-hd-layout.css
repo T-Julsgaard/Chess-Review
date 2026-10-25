@@ -138,6 +138,7 @@ html:has(.full-hd-reference), body:has(.full-hd-reference) {height:100%;overflow
 .stage.full-hd-reference .mod[data-mod="engine"] .engine-line {height:46px;padding:9px 4px;}
 .stage.full-hd-reference .mod[data-mod="engine"] .engine-bestwalk {margin-top:10px;padding:9px 12px;min-height:0;font-size:12.5px;line-height:1.4;}
 .app:has(.full-hd-reference) {--topbar-h:52.2px;}
+.app:has(.full-hd-reference) .settings-pop {width:256px;padding-inline:14px;}
 .app:has(.full-hd-reference) .topbar {gap:15.66px;padding:0 20.88px;}
 .app:has(.full-hd-reference) .brand {gap:9.57px;}
 .app:has(.full-hd-reference) .brand-mark {width:26.1px;height:26.1px;border-radius:6.96px;font-size:15.66px;}
