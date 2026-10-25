@@ -4118,10 +4118,12 @@ function renderGraph() {
   const pts = [];
   for (let p = 0; p <= S.total; p++) { if (!S.evals[p]) break; pts.push({ ply: p, cp: scoreToCp(S.evals[p]) }); }
   const graphKey = JSON.stringify([S.total,S.settings.graphStyle || "area",pts,S.classif]);
+  const markerVisible = S.idx > 0 && S.idx < S.total;
   const retained = UI.graphRefs;
   if (retained?.key === graphKey && retained.marker.isConnected) {
     const x = String(toX(Math.min(S.idx,maxPly)));
     if (retained.marker.getAttribute("x1") !== x) { retained.marker.setAttribute("x1",x); retained.marker.setAttribute("x2",x); }
+    retained.marker.style.display = markerVisible ? "" : "none";
     return;
   }
   let line = "", fill = "";
@@ -4132,7 +4134,7 @@ function renderGraph() {
   const dots = pts.filter((s) => ["blunder", "mistake", "miss", "brilliant", "great"].includes(S.classif[s.ply]));
   const markerX = toX(Math.min(S.idx, maxPly));
   const midLine = `<line x1="0" y1="${mid}" x2="${W}" y2="${mid}" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 3"/>`;
-  const marker = `<line class="eval-position" x1="${markerX}" y1="0" x2="${markerX}" y2="${H}" stroke="var(--accent)" stroke-width="1.5" opacity="0.7"/>`;
+  const marker = `<line class="eval-position" x1="${markerX}" y1="0" x2="${markerX}" y2="${H}" stroke="var(--accent)" stroke-width="1.5" opacity="0.7" style="display:${markerVisible ? "" : "none"}"/>`;
   const style = S.settings.graphStyle || "area";
   // Classification dots are drawn on every style except the bare "minimal" one.
   const dotsSvg = style === "minimal" ? "" : dots.map((s) =>

@@ -26,6 +26,24 @@ test('every graph style retains its hover targets and changes geometry when evid
   S.settings.evalView='bar';a.call('renderGraph');assert.equal(doc.querySelector('#graphMount svg'),null);
   S.settings.evalView='both';a.call('renderGraph');assert.ok(doc.querySelector('#graphMount svg'));
 });
+
+test('every graph style hides the position marker at both game endpoints, including after redraws',t=>{
+  const a=review(t),S=a.state,doc=a.dom.window.document;
+  for(const style of ['area','line','minimal','color']){
+    S.settings.graphStyle=style;S.idx=0;a.call('renderGraph');
+    const svg=doc.querySelector('#graphMount svg'),marker=svg.querySelector('.eval-position');
+    assert.equal(marker.style.display,'none');
+    for(const ply of [1,S.total,2,0]){
+      a.call('go',ply);
+      assert.equal(doc.querySelector('#graphMount svg'),svg);
+      assert.equal(marker.style.display,ply===0||ply===S.total?'none':'');
+    }
+    S.idx=S.total;S.evals[1]={cp:(S.evals[1]?.cp||0)+100};a.call('renderGraph');
+    assert.equal(doc.querySelector('.eval-position').style.display,'none');
+  }
+  loadGame(a,'1. e4');a.call('computeDerived');
+  for(const ply of [0,1]){a.call('go',ply);assert.equal(doc.querySelector('.eval-position').style.display,'none');}
+});
 test('unchanged engine panels stay mounted and returning from practice restores the real lines',t=>{
   const a=review(t),doc=a.dom.window.document,lines=[{score:{cp:30},pv:'e2e4',depth:16}];
   a.call('renderEngine',lines);const panel=doc.querySelector('#engineMount .panel');a.call('renderEngine',lines);
