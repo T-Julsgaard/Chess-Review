@@ -10,7 +10,7 @@ import {app,loadGame} from './helpers/app.mjs';
 const before=new Chess();before.move('e4');const after=new Chess(before.fen());after.move('d5');
 const puzzle={id:'ready',fen:after.fen(),setup:{fen:before.fen(),move:'d7d5'},solution:['e4d5','d8d5','b1c3'],rating:450,themes:[]};
 const settle=async()=>{for(let i=0;i<80;i++)await Promise.resolve();};
-async function setup(t,{motion=true,reduced=false,style='pulse'}={}) {
+async function setup(t,{motion=true,reduced=false,style}={}) {
   const dom=new JSDOM('<div id="root"><div class="app"></div></div>',{url:'https://extension.test'}),data={},sounds=[],timers=new Map();
   dom.window.matchMedia=()=>({matches:reduced});
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[puzzle]})}));
@@ -30,15 +30,15 @@ async function setup(t,{motion=true,reduced=false,style='pulse'}={}) {
   return {w,dom,data,sounds,timers,advance,settings};
 }
 
-for(const options of [{motion:true},{motion:false},{motion:true,reduced:true},...['rings','flip','still'].map(style=>({motion:true,style}))])test(`Time attack gives three seconds to prepare with motion ${JSON.stringify(options)}`,async t=>{
+for(const options of [{motion:true},{motion:false},{motion:true,reduced:true},...['pulse','rings','still'].map(style=>({motion:true,style}))])test(`Time attack gives three seconds to prepare with motion ${JSON.stringify(options)}`,async t=>{
   const {w,sounds,advance}=await setup(t,options),moves=[];
   w.onPuzzleMove=san=>moves.push(san);
   const starting=w.startPuzzleRun('timeAttack');await settle();
   const run=w.run;let now=0;run.clock.now=()=>now;
   const overlay=w.root.querySelector('.puzzle-run-start');
   assert.ok(overlay);assert.equal(overlay.parentElement.classList.contains('learn-board'),true);
-  assert.equal(overlay.dataset.motion,options.motion&&!options.reduced&&options.style!=='still'?'on':'off');
-  assert.equal(overlay.dataset.style,options.style||'pulse');
+  assert.equal(overlay.dataset.motion,options.motion&&!options.reduced?'on':'off');
+  assert.equal(overlay.dataset.style,'flip','Flip also replaces saved animation choices');
   assert.equal(overlay.querySelector('.puzzle-run-start-title').textContent,'Get ready');
   assert.equal(overlay.querySelector('.puzzle-run-start-copy'),null);
   assert.equal(w.currentFen(),puzzle.setup.fen,'The opponent waits for the countdown');
@@ -94,7 +94,7 @@ test('Play again gets a fresh countdown and Knockout starts directly',async t=>{
 });
 
 test('flip panels carry the old and new digits and settle on a complete Go',async t=>{
-  const {w,advance}=await setup(t,{style:'flip'});
+  const {w,advance}=await setup(t);
   const starting=w.startPuzzleRun('timeAttack');await settle();
   const overlay=w.runStartOverlay;
   for(const [previous,next] of [['3','2'],['2','1']]){
@@ -113,7 +113,7 @@ test('embedded board redraws keep the countdown connected through Go',async t=>{
   const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[puzzle]})}));
   await a.call('openLearning');const w=a.run('learningWorkspace'),board=w.boardElement;
-  const overlay=runStartOverlay(w.h,{style:'flip'});w.runStartOverlay=overlay;board.append(overlay);
+  const overlay=runStartOverlay(w.h);w.runStartOverlay=overlay;board.append(overlay);
   const observer=new a.dom.window.MutationObserver(()=>{});observer.observe(board,{childList:true});
   for(const label of ['3','2','1','Go!']){
     updateRunStartStep(overlay,label);w.render();
@@ -126,7 +126,7 @@ test('embedded board redraws keep the countdown connected through Go',async t=>{
 test('the ending brings the board into view when narrow-screen results are below it',async t=>{
   const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[puzzle]})}));
-  await a.call('openLearning');const w=a.run('learningWorkspace');a.state.settings.puzzleEndAnimation='flip';
+  await a.call('openLearning');const w=a.run('learningWorkspace');
   w.result={mode:'knockout',solved:7,reason:'Out of lives'};
   w.root.classList.add('learn-stacked');w.root.style.setProperty('--learn-panel-y','400px');w.root.scrollTop=400;
   w.showPuzzleRunEnd();assert.equal(w.root.scrollTop,0);
@@ -134,23 +134,21 @@ test('the ending brings the board into view when narrow-screen results are below
   await w.close();
 });
 
-for(const mode of ['timeAttack','knockout'])for(const style of ['classic','ribbon','spotlight','flip','still'])test(`${mode} uses the ${style} ending and refreshes its motion setting`,async t=>{
+for(const mode of ['timeAttack','knockout'])for(const style of [undefined,'classic','ribbon','spotlight','still'])test(`${mode} uses Flip with saved style ${style} and refreshes its motion setting`,async t=>{
   const {w,settings,advance,timers}=await setup(t);
   settings.puzzleEndAnimation=style;
   const starting=w.startPuzzleRun(mode);await settle();
   if(mode==='timeAttack')for(let i=0;i<3;i++)await advance(1000);
-  await starting;if(style==='flip')w.run.solved=12;await w.finishChallenge('Out of lives');
+  await starting;w.run.solved=12;await w.finishChallenge('Out of lives');
   const overlay=w.root.querySelector('.puzzle-run-end');
-  assert.equal(overlay.dataset.style,style);assert.equal(overlay.dataset.motion,style==='still'?'off':'on');
+  assert.equal(overlay.dataset.style,'flip');assert.equal(overlay.dataset.motion,'on');
   assert.equal(overlay.querySelector('.puzzle-run-end-title').textContent,'Puzzles solved');
   assert.equal(overlay.querySelector('.puzzle-run-end-reason'),null);
   assert.equal(overlay.querySelector('.puzzle-end-score-caption'),null);
-  if(style==='flip'){
-    assert.equal(overlay.querySelector('.puzzle-end-score').getAttribute('aria-label'),'12 puzzles solved');
-    assert.equal(overlay.querySelector('.puzzle-flip-in').dataset.value,'12');
-    assert.equal(overlay.querySelector('.puzzle-flip-out').dataset.value,'—');
-    assert.ok(overlay.querySelector('.puzzle-run-end-best'));
-  }
+  assert.equal(overlay.querySelector('.puzzle-end-score').getAttribute('aria-label'),'12 puzzles solved');
+  assert.equal(overlay.querySelector('.puzzle-flip-in').dataset.value,'12');
+  assert.equal(overlay.querySelector('.puzzle-flip-out').dataset.value,'—');
+  assert.ok(overlay.querySelector('.puzzle-run-end-best'));
   settings.moveAnim=false;w.refreshSettings();assert.equal(overlay.dataset.motion,'off');
   assert.equal(timers.size,0,'The final screen has no expiry timer');
   w.render();assert.equal(w.root.querySelector('.puzzle-run-end'),overlay);

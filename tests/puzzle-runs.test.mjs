@@ -181,7 +181,8 @@ for(const mode of ['timeAttack','knockout'])for(const previousBest of [0,10])tes
   assert.ok(overlay);assert.equal(overlay.dataset.motion,'off');
   assert.equal(overlay.querySelector('.puzzle-run-end-title').textContent,'Puzzles solved');
   assert.equal(overlay.querySelector('.puzzle-run-end-reason'),null);
-  assert.equal(overlay.querySelector('.puzzle-end-score-static').textContent,String(w.result.solved));
+  assert.equal(overlay.dataset.style,'flip');
+  assert.equal(overlay.querySelector('.puzzle-flip-in').dataset.value,String(w.result.solved));
   assert.equal(!!overlay.querySelector('.puzzle-run-end-best'),!previousBest);
   w.render();assert.equal(w.root.querySelector('.puzzle-run-end'),overlay,'The final screen survives results redraws');
   await w.replayRunPuzzle(w.result.results[0].id);
@@ -192,7 +193,7 @@ for(const mode of ['timeAttack','knockout'])for(const previousBest of [0,10])tes
 test('the board ending cue clears immediately on replay, restart, navigation and close',async t=>{
   const {w}=await setup(t);
   await w.startPuzzleRun('knockout');await solve(w);await w.finishChallenge('All puzzles completed');
-  assert.ok(w.root.querySelector('.puzzle-run-end-icon[data-complete=true]'));
+  assert.equal(w.root.querySelector('.puzzle-run-end').dataset.style,'flip');
   await w.replayRunPuzzle(w.result.results[0].id);
   assert.equal(w.root.querySelector('.puzzle-run-end'),null);assert.equal(w.cancelRunEnd,null);
   w.returnToRunResults();await w.startPuzzleRun('knockout');await wrong(w);

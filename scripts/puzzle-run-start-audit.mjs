@@ -34,7 +34,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       const w=m.learningWorkspace,e=document.querySelector('.puzzle-run-start'),b=e.parentElement.getBoundingClientRect(),r=e.getBoundingClientRect(),c=e.querySelector('.puzzle-run-start-card').getBoundingClientRect();
       return {clock:w.clockText(),started:w.run.clock.started,busy:w.busy,thinking:w.puzzleThinkingAt!=null,motion:e.dataset.motion,
         waiting:w.currentFen()===readyBefore&&!w.opponentPlaying&&!readyMoves.length,cursor:getComputedStyle(e).cursor,
-        animation:getComputedStyle(e.querySelector('strong')).animationName,
+        animation:getComputedStyle(e.querySelector('.puzzle-flip-in')).animationName,
         fits:Math.abs(r.left-b.left)<2&&Math.abs(r.right-b.right)<2&&Math.abs(r.top-b.top)<2&&Math.abs(r.bottom-b.bottom)<2,
         contained:c.left>=r.left&&c.right<=r.right&&c.top>=r.top&&c.bottom<=r.bottom};
     })`);

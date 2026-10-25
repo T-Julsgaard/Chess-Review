@@ -10,7 +10,6 @@ import { BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, grade
 import { puzzleResultBadge } from "./lib/puzzle-badge.js";
 import { matedKingSquare, mateMark } from "./lib/mate-mark.js";
 import { moveAnimationDuration, MOVE_ANIMATION_EASING } from "./lib/move-animation.js";
-import { RUN_START_STYLES, RUN_END_STYLES, runAnimationStyle, runStartOverlay, runEndOverlay } from "./lib/learning/run-animations.js";
 import { CATEGORY_LABEL_FONT, categoryLabelPng } from "./lib/category-label.js";
 import { browserAPI as platformAPI } from "./browser-compat.js";
 import { resetSettingsForRelease } from "./release-settings.js";
@@ -345,7 +344,6 @@ const DEFAULT_SETTINGS = {
   // Move animation (sliding piece on single-step navigation). 1 = slow, 10 = fast.
   moveAnim: true, animSpeed: 7,
   learningTransition: "morph3",
-  puzzleStartAnimation: "pulse", puzzleEndAnimation: "classic",
   // Loading animation while the analysis runs (selectable style).
   loaderStyle: "wave",
   // Engine panel: how many candidate lines to show. The batch only searches the single best line
@@ -5164,22 +5162,6 @@ function badgeSettings() {
     badgeLabelPicker(),
     el("p", { class: "set-note" }, "Show the category for two seconds after each move."));
 }
-function puzzleAnimationControl(kind) {
-  const start=kind==="start",key=start?"puzzleStartAnimation":"puzzleEndAnimation",style=runAnimationStyle(S.settings,kind);
-  const choices=start?RUN_START_STYLES:RUN_END_STYLES;
-  return el("div",{class:"puzzle-animation-control","data-kind":kind},
-    el("div",{class:"set-row"},setLabel("Animation"),el("div",{class:"set-seg"},...choices.map(([id,label])=>
-      el("button",{type:"button","data-setting":key,"data-value":id,"aria-pressed":String(style===id),class:style===id?"on":"",onclick:()=>setSetting(key,id)},label)))),
-    el("div",{class:"puzzle-animation-preview","aria-hidden":"true","data-motion":S.settings.moveAnim===false?"off":"on"},
-      (start?runStartOverlay:runEndOverlay)(el,{style,motion:S.settings.moveAnim!==false,preview:true})),
-    el("p",{class:"set-note"},start?"A three-second countdown before the first opponent move in Time attack.":"Shown when a Time attack or Knockout run ends."));
-}
-function puzzleSettings() {
-  return el("div",{},section("Time attack start",puzzleAnimationControl("start")),section("Game over",puzzleAnimationControl("end")),
-    el("button",{class:"set-reset",onclick:async()=>{
-      await resetSettingKeys(["puzzleStartAnimation","puzzleEndAnimation"]);applySettings();renderSettings();
-    }},"Reset to default"));
-}
 function renderSettings() {
   closeArrowColorPicker();
   const scroll = UI.settings.scrollTop; // keep scroll position when a setting changes
@@ -5196,10 +5178,8 @@ function renderSettings() {
   const tabs = el("div", { class: "set-tabs" },
     el("button", { class: "set-tab" + (S.settingsTab === "visual" ? " on" : ""), onclick: () => { S.settingsTab = "visual"; renderSettings(); } }, "Visual"),
     el("button", { class: "set-tab" + (S.settingsTab === "engine" ? " on" : ""), onclick: () => { S.settingsTab = "engine"; renderSettings(); } }, "Engine"),
-    el("button", { class: "set-tab" + (S.settingsTab === "puzzles" ? " on" : ""), onclick: () => { S.settingsTab = "puzzles"; renderSettings(); } }, "Puzzles"),
   );
-  UI.settings.replaceChildren(tabs, ...(S.settingsTab === "engine" ? [motorSettings()]
-    : S.settingsTab === "puzzles" ? [puzzleSettings()] : [visualSettings()]));
+  UI.settings.replaceChildren(tabs, S.settingsTab === "engine" ? motorSettings() : visualSettings());
   UI.settings.scrollTop = scroll;
   const fonts = UI.settings.querySelector(".badge-font-options");
   if (fonts && fontScroll != null) fonts.scrollTop = fontScroll;

@@ -83,7 +83,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await waitFor(review,"!document.querySelector('.puzzle-run-end')",'Board ending animation cleared');
     await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]},review.sessionId);
     await run("import('./analysis.js').then(m=>m.learningWorkspace.showPuzzleRunEnd())");
-    assert.equal(await run("(()=>{const e=document.querySelector('.puzzle-run-end');return e.dataset.motion==='off'&&getComputedStyle(e).animationName==='none'&&getComputedStyle(e.querySelector('.puzzle-run-end-icon')).animationName==='none';})()"),true);
+    assert.equal(await run("(()=>{const e=document.querySelector('.puzzle-run-end');return e.dataset.motion==='off'&&getComputedStyle(e).animationName==='none'&&getComputedStyle(e.querySelector('.puzzle-flip-in')).animationName==='none';})()"),true);
     await run("import('./analysis.js').then(m=>m.learningWorkspace.cancelRunEnd())");
     await call('Emulation.setEmulatedMedia',{features:[]},review.sessionId);
     await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=false;})");
