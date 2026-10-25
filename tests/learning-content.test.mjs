@@ -147,6 +147,14 @@ test('all opening variations have legal annotated moves and reuse named position
     }
   }
 });
+test('opening perspectives match the usual repertoire side while both sides remain available',()=>{
+  const black=['slav','sicilian','french','caro','kings-indian','nimzo','petrov','philidor','scandinavian','pirc','modern','alekhine','semi-slav','tarrasch','chigorin','queens-indian','grunfeld','benoni','benko','dutch'];
+  const white=['italian','ruy','scotch','queens-gambit','london','english','vienna','kings-gambit','four-knights','ponziani','danish-gambit','trompowsky','colle','catalan','reti','bird'];
+  assert.deepEqual(OPENINGS.filter(o=>o.defaultColor==='b').map(o=>o.id),black);
+  assert.deepEqual(OPENINGS.filter(o=>o.defaultColor==='w').map(o=>o.id),white);
+  for(const o of OPENINGS)assert.deepEqual(o.colors,['w','b']);
+});
+
 test('instructional tactical examples distinguish an uncovered attack from a safe gain and replay the Italian king hunt legally',()=>{
   const discovery=LESSONS.find(l=>l.id==='discovery').exercises[0],c=new Chess(discovery.fen);
   playUci(c,'c3d4');assert.equal(c.move('Qxc1+').captured,'r');

@@ -510,6 +510,49 @@ test('expanded opening library supports search, family and level filters, both c
   assert.equal(w.root.querySelector('.learn-opening-progress').textContent,'14 of 14 moves');
 });
 
+test('opening library defaults to each opening side and lets either perspective override it',async t=>{
+  const {w}=await workspace(t);
+  for(const opening of OPENINGS){
+    await w.navigate('openings');
+    assert.equal(w.filters.color,'Opening side');
+    assert.equal(w.root.querySelector('[data-focus="color"]').getAttribute('aria-label'),'View as');
+    const row=[...w.root.querySelectorAll('.learn-library-row')].find(row=>row.querySelector('h3').textContent===opening.title);
+    assert.ok(row.textContent.includes((opening.defaultColor==='b'?'Black':'White')+' opening'));
+    row.querySelector('button').click();await settle();
+    assert.equal(w.activity.color,opening.defaultColor,opening.id);
+    assert.equal(w.flipped,opening.defaultColor==='b',opening.id);
+    assert.equal(w.activity.ply,0);
+    assert.equal(w.currentFen().split(' ')[1],'w','White still moves first');
+  }
+  for(const [view,id,color] of [['White','sicilian','w'],['Black','london','b']]){
+    await w.navigate('openings');
+    w.root.querySelector('[data-focus="color"]').click();
+    [...w.dropdown.field.querySelectorAll('[role="option"]')].find(option=>option.textContent===view).click();
+    assert.equal(w.root.querySelectorAll('.learn-library-row').length,OPENINGS.length);
+    const row=[...w.root.querySelectorAll('.learn-library-row')].find(row=>row.querySelector('h3').textContent===OPENINGS.find(o=>o.id===id).title);
+    row.querySelector('button').click();await settle();
+    assert.equal(w.activity.color,color);assert.equal(w.flipped,color==='b');
+    w.root.querySelector('[data-focus="opening-variation"]').click();
+    w.dropdown.field.querySelectorAll('[role="option"]')[1].click();w.stepOpening(3);await settle();
+    const resume=structuredClone(w.store.value.resume);
+    await w.navigate('openings');await w.resume(resume);
+    assert.deepEqual(w.activity,resume);assert.equal(w.flipped,color==='b');
+  }
+});
+
+test('opening direct entry uses the opening side and retains saved explicit perspectives',async t=>{
+  const {w}=await workspace(t);
+  for(const [id,color] of [['sicilian','b'],['french','b'],['london','w']]){
+    await w.startOpening(id);assert.equal(w.activity.color,color);assert.equal(w.flipped,color==='b');
+  }
+  for(const color of ['w','b']){
+    await w.resume({kind:'opening',id:'french',line:1,ply:3,color});
+    assert.equal(w.flipped,color==='b');assert.equal(w.activity.ply,3);assert.equal(w.activity.line,1);
+  }
+  await w.startOpening('sicilian',{color:'Both'});assert.equal(w.activity.color,'b');
+  w.stepOpening(1);assert.equal(w.lastMove,'e2e4');w.stepOpening(2);assert.equal(w.lastMove,'c7c5');
+});
+
 test('themed library dropdowns filter content and dismiss without leaving learning',async t=>{
   const {w,dom}=await workspace(t),doc=dom.window.document;
   for(const [page,key,value] of [['concepts','category',CATEGORIES[0]],['openings','family',OPENINGS[0].family]]){

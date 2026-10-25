@@ -9,6 +9,20 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const press=async(key,value)=>{for(const type of ['keyDown','keyUp'])await call('Input.dispatchKeyEvent',{type,key,code:key,windowsVirtualKeyCode:value,nativeVirtualKeyCode:value},review.sessionId);};
   await run("document.querySelector('.learn-entry-button').click()");
   await waitFor(review,"import('./analysis.js').then(m=>m.learningWorkspace?.ready&&!m.learningWorkspace.transitioning)",'Learning workspace');
+  // Exercise library entry, not just startOpening with an explicit perspective.
+  const defaults=await run(`import('./analysis.js').then(async m=>{
+    const {OPENINGS}=await import('./lib/learning/content.js'),w=m.learningWorkspace,results=[];
+    for(const o of OPENINGS){
+      await w.navigate('openings');
+      const row=[...w.root.querySelectorAll('.learn-library-row')].find(row=>row.querySelector('h3').textContent===o.title);
+      row.querySelector('button').click();
+      for(let i=0;i<100&&!w.root.querySelector('.learn-opening-view');i++)await new Promise(requestAnimationFrame);
+      results.push({id:w.activity.id,color:w.activity.color,flipped:w.flipped,ply:w.activity.ply});
+    }
+    await w.navigate('openings');return results;
+  })`);
+  assert.deepEqual(defaults,OPENINGS.map(o=>({id:o.id,color:o.defaultColor,flipped:o.defaultColor==='b',ply:0})));
+  assert.equal(await run("document.querySelector('[data-focus=color]').getAttribute('aria-label')"),'View as');
   const rect=selector=>`(()=>{const r=document.querySelector('${selector}').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,right:r.right};})()`;
   for(const [width,height] of [[1920,1080],[1366,768],[960,768],[390,844],[320,640]]) {
     await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);
