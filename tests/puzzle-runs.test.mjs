@@ -179,8 +179,9 @@ for(const mode of ['timeAttack','knockout'])for(const previousBest of [0,10])tes
   assert.equal(w.root.querySelector('.puzzle-run-results [role=timer]'),null);
   const overlay=w.root.querySelector('.learn-board > .puzzle-run-end[role=status]');
   assert.ok(overlay);assert.equal(overlay.dataset.motion,'off');
-  assert.equal(overlay.querySelector('.puzzle-run-end-title').textContent,'Run over');
-  assert.equal(overlay.querySelector('.puzzle-run-end-reason').textContent,reason);
+  assert.equal(overlay.querySelector('.puzzle-run-end-title').textContent,'Puzzles solved');
+  assert.equal(overlay.querySelector('.puzzle-run-end-reason'),null);
+  assert.equal(overlay.querySelector('.puzzle-end-score-static').textContent,String(w.result.solved));
   assert.equal(!!overlay.querySelector('.puzzle-run-end-best'),!previousBest);
   w.render();assert.equal(w.root.querySelector('.puzzle-run-end'),overlay,'The final screen survives results redraws');
   await w.replayRunPuzzle(w.result.results[0].id);

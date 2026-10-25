@@ -48,10 +48,11 @@ export async function auditLearning(context) {
         const held=+getComputedStyle(e).opacity,observer=new MutationObserver(()=>{});observer.observe(e.parentElement,{childList:true});
         w.render();w.render();const stable=e.getAnimations().includes(animation),detached=observer.takeRecords().some(r=>[...r.removedNodes].includes(e));observer.disconnect();
         animation.currentTime=550;const faded=+getComputedStyle(e).opacity;animation.currentTime=100;
-        return {held,faded,stable,detached,leafAnimation:getComputedStyle(e.querySelector('.puzzle-flip-in')).animationName,background:getComputedStyle(e).backgroundColor};
+        return {held,faded,stable,detached,leafAnimation:getComputedStyle(e.querySelector('.puzzle-flip-in')).animationName,background:getComputedStyle(e).backgroundColor,goColor:getComputedStyle(e.querySelector('.puzzle-flip')).color};
       })`);
       assert.equal(transition.held,1);assert.ok(transition.faded<.3);assert.equal(transition.stable,true);assert.equal(transition.detached,false);
       assert.equal(transition.leafAnimation,'none');assert.match(transition.background,/, 0\.6\)$/);
+      assert.equal(transition.goColor,'rgb(255, 255, 255)');
       await capture('puzzle-flip-go');
     }
     await run('animationStarting');
@@ -62,8 +63,9 @@ export async function auditLearning(context) {
     for(const mode of ['timeAttack','knockout'])for(const style of ['classic','ribbon','spotlight','flip','still']){
       await run(`import('./analysis.js').then(m=>{m.S.settings.puzzleEndAnimation='${style}';const w=m.learningWorkspace;w.result.mode='${mode}';w.showPuzzleRunEnd();})`);
       await sleep(250);
-      const state=await run(`(()=>{const e=document.querySelector('.learn-board > .puzzle-run-end');return {style:e.dataset.style,animation:getComputedStyle(e).animationName,card:getComputedStyle(e.firstChild).animationName};})()`);
+      const state=await run(`(()=>{const e=document.querySelector('.learn-board > .puzzle-run-end'),score=e.querySelector(e.dataset.style==='flip'?'.puzzle-flip':'.puzzle-end-score-static');return {style:e.dataset.style,animation:getComputedStyle(e).animationName,card:getComputedStyle(e.firstChild).animationName,title:e.querySelector('.puzzle-run-end-title').textContent,reason:!!e.querySelector('.puzzle-run-end-reason'),caption:!!e.querySelector('.puzzle-end-score-caption'),scoreColor:getComputedStyle(score).color};})()`);
       assert.equal(state.style,style);assert.equal(state.animation==='none',reduced||style==='still');assert.equal(state.card==='none',reduced||style==='still');
+      assert.equal(state.title,'Puzzles solved');assert.equal(state.reason,false);assert.equal(state.caption,false);assert.equal(state.scoreColor,'rgb(255, 255, 255)');
       if(style==='flip'){
         const score=await run(`(()=>{const e=document.querySelector('.learn-board > .puzzle-run-end'),s=e.querySelector('.puzzle-end-score');return {value:s.getAttribute('aria-label'),display:getComputedStyle(s).display,leaf:getComputedStyle(s.querySelector('.puzzle-flip-in')).animationName};})()`);
         assert.equal(score.value,'0 puzzles solved');assert.equal(score.display,'block');assert.equal(score.leaf==='none',reduced);

@@ -411,7 +411,7 @@
 .puzzle-run-end-icon { display: block; font: 72px/1 Georgia,serif; color: #fff; transform-origin: 50% 85%; animation: puzzle-run-end-king .7s .15s cubic-bezier(.4,0,.6,1) both; }
 .puzzle-run-end-icon[data-complete] { color: #a7e5a0; animation-name: puzzle-run-end-arrive; }
 .puzzle-run-end-title { font-size: clamp(24px,4vw,42px); line-height: 1.15; letter-spacing: -.5px; }
-.puzzle-run-end-reason { font-size: clamp(13px,2vw,17px); line-height: 1.4; color: #e1e6ed; }
+.puzzle-end-score-static { color: #fff; font-size: clamp(32px,6vw,56px); line-height: 1; font-variant-numeric: tabular-nums; }
 .puzzle-run-end-best { margin-top: 4px; padding: 6px 12px; border: 1px solid #a7e5a066; border-radius: 99px; background: #a7e5a01a; color: #b8efb2; font-size: 13px; font-weight: 600; }
 @keyframes puzzle-run-end-veil { from { opacity: 0; } to { opacity: 1; } }
 @keyframes puzzle-run-end-arrive { from { opacity: 0; transform: translateY(14px) scale(.94); } to { opacity: 1; transform: translateY(0) scale(1); } }
@@ -455,7 +455,7 @@
 .puzzle-run-start[data-step="2"] .puzzle-flip-out { animation-name: puzzle-flip-out-b; }
 .puzzle-run-start[data-step="2"] .puzzle-flip-in { animation-name: puzzle-flip-in-b; }
 .puzzle-run-start[data-step="Go!"] .puzzle-flip-out, .puzzle-run-start[data-step="Go!"] .puzzle-flip-in { animation: none; }
-.puzzle-run-start[data-step="Go!"] .puzzle-flip { color: #c7f6bd; }
+.puzzle-run-start[data-step="Go!"] :is(.puzzle-run-start-count,.puzzle-flip) { color: #fff; }
 .puzzle-flip::before, .puzzle-flip::after { content: ""; position: absolute; top: calc(50% - 5px); width: 4px; height: 10px; z-index: 4; border-radius: 2px; background: #0c141d; box-shadow: 0 1px 1px #ffffff24; }
 .puzzle-flip::before { left: 5px; }
 .puzzle-flip::after { right: 5px; }
@@ -468,13 +468,10 @@
 /* Flip ends the run on the same hinged counter used by the countdown. */
 .puzzle-run-end[data-style="flip"] { inset: -1px; border-radius: 0; background: #10151b99; }
 .puzzle-run-end[data-style="flip"] .puzzle-run-end-card { gap: 10px; animation-duration: .35s; }
-.puzzle-run-end[data-style="flip"] .puzzle-run-end-icon { display: none; }
+.puzzle-run-end[data-style="flip"] :is(.puzzle-run-end-icon,.puzzle-end-score-static) { display: none; }
 .puzzle-end-score { display: none; position: relative; width: 2.8em; height: 1.7em; margin-top: 4px; font-size: clamp(40px,8vw,76px); line-height: 1; font-variant-numeric: tabular-nums; }
-.puzzle-run-end[data-style="flip"] :is(.puzzle-end-score,.puzzle-end-score-caption) { display: block; }
-.puzzle-run-end[data-style="flip"] .puzzle-flip { color: #c7f6bd; }
+.puzzle-run-end[data-style="flip"] .puzzle-end-score { display: block; }
 .puzzle-run-end[data-style="flip"] .puzzle-flip-out, .puzzle-run-end[data-style="flip"] .puzzle-flip-in { animation-delay: .18s; }
-.puzzle-end-score-caption { display: none; color: #d3dae4; font-size: clamp(12px,1.6vw,15px); }
-.puzzle-run-end[data-style="flip"] .puzzle-run-end-reason { margin-top: 2px; animation: puzzle-end-details .3s .65s ease both; }
 .puzzle-run-end[data-style="flip"] .puzzle-run-end-best { animation: puzzle-end-details .3s .85s ease both; }
 @keyframes puzzle-end-details { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 /* End alternatives: a sliding ribbon and a soft spotlight. */
@@ -491,12 +488,12 @@
 .puzzle-animation-control[data-kind="end"] .set-seg button { flex: 1 1 30%; border: 1px solid var(--line); border-radius: 8px; padding: 7px 6px; }
 .puzzle-animation-preview { position: relative; height: 210px; margin: 12px 0; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: #10151b; }
 .puzzle-animation-preview .puzzle-run-start-title, .puzzle-animation-preview .puzzle-run-end-title { font-size: 24px; }
-.puzzle-animation-preview .puzzle-run-start-copy, .puzzle-animation-preview .puzzle-run-end-reason { font-size: 13px; }
+.puzzle-animation-preview .puzzle-run-start-copy { font-size: 13px; }
 .puzzle-animation-preview .puzzle-count-display { margin-top: 2px; font-size: 42px; }
 .puzzle-animation-preview .puzzle-run-end-icon { font-size: 48px; }
 .puzzle-animation-preview .puzzle-end-score { font-size: 40px; }
 .puzzle-animation-preview .puzzle-run-end[data-style="flip"] .puzzle-run-end-card { gap: 6px; }
-.puzzle-animation-preview .puzzle-end-score-caption { font-size: 12px; }
+.puzzle-animation-preview .puzzle-end-score-static { font-size: 32px; }
 .puzzle-animation-preview .puzzle-run-end[data-style="flip"] .puzzle-flip-out { animation: puzzle-end-preview-out 2.8s cubic-bezier(.4,0,.6,1) infinite; }
 .puzzle-animation-preview .puzzle-run-end[data-style="flip"] .puzzle-flip-in { animation: puzzle-end-preview-in 2.8s cubic-bezier(.2,.7,.3,1) infinite; }
 @keyframes puzzle-end-preview-out { 0%,6% { transform: rotateX(0); } 18%,100% { transform: rotateX(-90deg); } }

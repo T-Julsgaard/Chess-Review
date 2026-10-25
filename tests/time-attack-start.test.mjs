@@ -141,7 +141,9 @@ for(const mode of ['timeAttack','knockout'])for(const style of ['classic','ribbo
   await starting;if(style==='flip')w.run.solved=12;await w.finishChallenge('Out of lives');
   const overlay=w.root.querySelector('.puzzle-run-end');
   assert.equal(overlay.dataset.style,style);assert.equal(overlay.dataset.motion,style==='still'?'off':'on');
-  assert.equal(overlay.querySelector('.puzzle-run-end-reason').textContent,'Out of lives');
+  assert.equal(overlay.querySelector('.puzzle-run-end-title').textContent,'Puzzles solved');
+  assert.equal(overlay.querySelector('.puzzle-run-end-reason'),null);
+  assert.equal(overlay.querySelector('.puzzle-end-score-caption'),null);
   if(style==='flip'){
     assert.equal(overlay.querySelector('.puzzle-end-score').getAttribute('aria-label'),'12 puzzles solved');
     assert.equal(overlay.querySelector('.puzzle-flip-in').dataset.value,'12');
