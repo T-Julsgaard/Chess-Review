@@ -57,12 +57,18 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   assert.equal(await run(blank,"import('./analysis.js').then(m=>!m.S.analyzing&&m.S.blank)"),true);
   assert.equal(await run(blank,"document.querySelector('#learningToggle').textContent"),'Return to Game review');
   assert.equal(await run(blank,"document.querySelector('.learn-footer, [data-focus=review]')"),null);
+  assert.equal(await run(blank,"!!document.querySelector('.learning-embedded .learn-board-dock .learn-board')"),true);
+  assert.equal(await run(blank,"document.querySelectorAll('.learn-board .piece-img').length"),32);
   await shot(blank,'blank-learning');
   await run(blank,"document.querySelector('#learningToggle').click()");
   await waitFor(blank,"!document.querySelector('.learning-workspace')",'Return to blank workspace');
   assert.equal(await run(blank,"document.activeElement===document.querySelector('#learningToggle')"),true);
   assert.equal(await run(blank,"document.querySelectorAll('.board .piece-img').length"),32);
   assert.equal(await run(review,"import('./browser-compat.js').then(async({browserAPI:api})=>JSON.stringify(await api.storage.local.get(['username','learning:v1','library']))===JSON.stringify(blankBaseline))"),true);
+  await run(blank,"document.querySelector('.learn-entry-button').click()");
+  await waitFor(blank,"!!document.querySelector('.learning-embedded .learn-board-dock .learn-board')",'Solve puzzles with the normal board');
+  await run(blank,"document.querySelector('#learningToggle').click()");
+  await waitFor(blank,"!document.querySelector('.learning-workspace')",'Return from Solve puzzles');
   console.log('Blank startup, zero engine/data work, narrow layouts and learning round-trip passed.');
 
   await run(blank,"document.querySelector('.lib-tab').click();document.querySelector('.lc-open').click()");
@@ -82,7 +88,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   previous=new Set((await targets()).map(t=>t.targetId));
   await run(paste,"document.querySelector('#manual').open=true;document.querySelector('#manualInput').value='1. e4 e5 2. Nf3 Nc6';document.querySelector('#analyzeManual').click()");
   const pasted=await newTarget(previous,/analysis.html#/);await waitFor(pasted,"!!document.querySelector('.board')&&import('./analysis.js').then(m=>!m.S.analyzing&&m.S.total===4)",'Pasted game');
-  const preview=await tab(base+'/popup.html?screen-preview=popup');await waitFor(preview,"document.body.dataset.previewReady==='true'",'Popup preview');
+  const preview=await tab(base+'/popup.html?screen-preview=popup');await waitFor(preview,"document.body?.dataset.previewReady==='true'",'Popup preview');
   previous=new Set((await targets()).map(t=>t.targetId));await run(preview,"document.querySelector('#openWorkspace').click()");await sleep(100);
   assert.equal((await targets()).filter(target=>target.type==='page').every(target=>previous.has(target.targetId)),true);assert.match(await run(preview,"document.querySelector('#status').textContent"),/Preview actions are disabled/);
   const homePreview=await tab(base+'/analysis.html?screen-preview=workspace-blank');

@@ -69,11 +69,11 @@ test('a piece can return from the boundary and drop on a legal square',async t=>
   assert.equal(doc.querySelector('.drag-piece'),null);assert.equal(new Chess(a.call('activePos').fen).get('e4')?.type,'p');
 });
 
-test('a standalone puzzle pickup follows a repainted board and clears its selection on outside release',async t=>{
+test('a puzzle pickup from blank review survives repainting the shared board and clears on outside release',async t=>{
   const {w,doc,board,down,pointer,view}=await setup(t,'standalone puzzle');
   down();const ghost=doc.querySelector('.drag-piece');
   w.render({preservePickup:true});const replacement=doc.querySelector('.learn-board');
-  assert.notEqual(replacement,board);assert.equal(doc.querySelector('.drag-piece'),ghost);
+  assert.equal(replacement,board);assert.equal(doc.querySelector('.drag-piece'),ghost);
   replacement.getBoundingClientRect=()=>({left:30,top:80,width:320,height:320});
   const original=replacement.querySelector('[data-square=e2] img');assert.equal(original.style.visibility,'hidden');
   pointer(view,'pointermove',10000,10000);
