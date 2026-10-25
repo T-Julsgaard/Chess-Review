@@ -18,6 +18,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       if(n===0)await shot(`expanded-accuracy-${width}x${height}`);
     }
     for(const entry of ['#learningToggle','.learn-entry-button']){
+      const reviewRight=await run("Math.max(...[...document.querySelectorAll('.mod[data-mod=accuracy] > .mod-inner,.mod[data-mod=engine] > .mod-inner,.mod[data-mod=learn] > .mod-inner')].map(n=>n.getBoundingClientRect().right))");
       await run(`window.samples=[];window.sampleActive=true;
         window.sampleScene=()=>{const rect=n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height};};
           const board=document.querySelector('.board');
@@ -41,12 +42,15 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       const margins=await run("(()=>{const board=document.querySelector('.learning-embedded .board').getBoundingClientRect(),header=document.querySelector('.topbar').getBoundingClientRect(),panel=document.querySelector('.learn-shell').getBoundingClientRect();return {above:board.top-header.bottom,below:innerHeight-board.bottom,boardY:board.y,panelY:panel.y,boardHeight:board.height,panelHeight:panel.height};})()");
       assert.ok(Math.abs(margins.above-margins.below)<1,'Learning margins should balance '+JSON.stringify(margins));
       assert.ok(Math.abs(margins.boardY-margins.panelY)<1&&Math.abs(margins.boardHeight-margins.panelHeight)<1,'Board and learning UI should stay aligned');
+      assert.ok(Math.abs(await run("document.querySelector('.learn-shell').getBoundingClientRect().right")-reviewRight)<1,'Learning panel should reach the review column right edge');
+      assert.ok(Math.abs(await run("document.querySelector('.learn-nav').getBoundingClientRect().right")-reviewRight)<1,'Visible learning tabs should reach the review column right edge');
       for(const frame of frames)for(const key of ['x','y','w','h'])assert.ok(frame.board[key]>=Math.min(start[key],end[key])-1&&frame.board[key]<=Math.max(start[key],end[key])+1,'Board overshoot on entry '+JSON.stringify({key,frame,start,end}));
       await shot(`learning-entered-${height}`);
       if(entry==='#learningToggle'){
         await run("import('./analysis.js').then(m=>{const w=m.learningWorkspace,p={id:'centered-layout',fen:'7k/5Q2/6K1/8/8/8/8/8 w - - 0 1',solution:['f7f8'],rating:1200,themes:['mateIn1']};w.puzzles=[p];return w.startPuzzleSelection([p]);})");
         const puzzle=await run("(()=>{const b=document.querySelector('.learning-embedded .board').getBoundingClientRect(),p=document.querySelector('.learn-shell').getBoundingClientRect(),t=document.querySelector('.topbar').getBoundingClientRect().bottom;return {above:b.top-t,below:innerHeight-b.bottom,panelY:p.y,boardY:b.y};})()");
         assert.ok(Math.abs(puzzle.above-puzzle.below)<1&&Math.abs(puzzle.panelY-puzzle.boardY)<1,'Puzzle activity should retain balanced alignment');
+        assert.ok(Math.abs(await run("document.querySelector('.learn-shell').getBoundingClientRect().right")-reviewRight)<1,'Active puzzle should retain the review column right edge');
         await shot(`puzzle-centered-${height}`);
       }
       await run("samples=[];sampleActive=true;sampleLoop();document.querySelector('#learningToggle').click()");
