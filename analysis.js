@@ -3804,7 +3804,7 @@ function renderMoveComment() {
   const head = el("div", { class: "ip-head" });
   if (cfg) head.append(gradeBadge(cls, S.moveGrades[S.idx], "ip-badge"));
   // Special coach phrasing can omit the category, so name it beside the move.
-  const sanDisplay = !S.settings.coachPlain && cfg ? `${san} ${categoryName(cls)}` : san;
+  const sanDisplay = S.settings.coach && !S.settings.coachPlain && cfg ? `${san} ${categoryName(cls)}` : san;
   head.append(el("span", { class: "ip-move" }, sanDisplay));
   if (evTxt) head.append(el("span", { class: "ip-eval " + (evCp >= 0 ? "pos" : "neg") }, evTxt));
   body.append(head);
@@ -4976,15 +4976,15 @@ function visualSettings() {
     ),
     section("Category badges", badgeSettings()),
     section("Coach",
-      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Who appears and narrates. Switch any time — the new coach picks up right where you are.")),
+      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Who appears and narrates. Choose No coach to remove the character and keep plain move commentary. Switch any time.")),
       coachPicker(),
-      el("div", { class: "set-row" },
+      S.settings.coach ? el("div", { class: "set-row" },
         setLabel("Special replies", "On = the coach narrates in their own voice. Off = neutral, plain commentary (the coach still appears and reacts on the board)."),
         el("div", { class: "set-seg" },
           el("button", { class: !S.settings.coachPlain ? "on" : "", onclick: () => setCoachPlain(false) }, "On"),
           el("button", { class: S.settings.coachPlain ? "on" : "", onclick: () => setCoachPlain(true) }, "Off"),
         ),
-      ),
+      ) : null,
     ),
     section("Background", ...bgControls()),
     section("Insights",
@@ -5010,9 +5010,9 @@ function visualSettings() {
 // app theme instead of the OS's blue highlight.
 function coachPicker() {
   const cur = S.settings.coach || "";
-  const opts = COACH_LIST.filter(([id]) => COACH_RIGS[id]);
+  const opts = [["", "No coach"], ...COACH_LIST.filter(([id]) => COACH_RIGS[id])];
   const portrait = (id, label) => el("span", { class: "coach-choice" },
-    el("img", { class: "coach-thumbnail", src: browserAPI.runtime.getURL("data/coaches-anim/thumbnails/" + id + ".svg"), alt: "", width: 28, height: 32 }),
+    id ? el("img", { class: "coach-thumbnail", src: browserAPI.runtime.getURL("data/coaches-anim/thumbnails/" + id + ".svg"), alt: "", width: 28, height: 32 }) : null,
     el("span", {}, label));
   const dropdown = ddField(cur, opts, (v) => setCoach(v), portrait);
   dropdown.classList.add("coach-dropdown");
