@@ -410,7 +410,7 @@
 @keyframes puzzle-run-end-king { 0%,20% { transform: rotate(0); } 75% { transform: rotate(-64deg); } 100% { transform: rotate(-55deg); } }
 .puzzle-run-end[data-motion="off"], .puzzle-run-end[data-motion="off"] * { animation: none; }
 @media (prefers-reduced-motion: reduce) { .puzzle-run-end, .puzzle-run-end * { animation: none; } }
-.puzzle-run-start { position: absolute; inset: 0; z-index: 12; display: grid; place-items: center; padding: 16px; box-sizing: border-box; border-radius: inherit; background: #10151be8; color: #fff; cursor: wait; animation: puzzle-run-start-arrive .25s ease both; }
+.puzzle-run-start { position: absolute; inset: 0; z-index: 12; display: grid; place-items: center; padding: 16px; box-sizing: border-box; border-radius: inherit; background: #10151be8; color: #fff; cursor: default; animation: puzzle-run-start-arrive .25s ease both; }
 .puzzle-run-start-card { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
 .puzzle-run-start-title { font-size: clamp(24px,4vw,42px); line-height: 1.15; font-weight: 700; letter-spacing: -.5px; }
 .puzzle-run-start-copy { color: #d3dae4; font-size: clamp(13px,2vw,17px); }

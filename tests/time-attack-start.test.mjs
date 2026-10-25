@@ -28,24 +28,28 @@ async function setup(t,{motion=true,reduced=false}={}) {
 }
 
 for(const options of [{motion:true},{motion:false},{motion:true,reduced:true}])test(`Time attack gives three seconds to prepare with motion ${JSON.stringify(options)}`,async t=>{
-  const {w,sounds,advance}=await setup(t,options);
+  const {w,sounds,advance}=await setup(t,options),moves=[];
+  w.onPuzzleMove=san=>moves.push(san);
   const starting=w.startPuzzleRun('timeAttack');await settle();
   const run=w.run;let now=0;run.clock.now=()=>now;
   const overlay=w.root.querySelector('.puzzle-run-start');
   assert.ok(overlay);assert.equal(overlay.parentElement.classList.contains('learn-board'),true);
   assert.equal(overlay.dataset.motion,options.motion&&!options.reduced?'on':'off');
   assert.equal(overlay.querySelector('.puzzle-run-start-title').textContent,'Time attack');
-  assert.equal(w.currentFen(),puzzle.fen,'The opening move prepares during the countdown');
+  assert.equal(w.currentFen(),puzzle.setup.fen,'The opponent waits for the countdown');
   assert.equal(w.busy,true);assert.equal(run.clock.started,false);assert.equal(w.puzzleThinkingAt==null,true);
   for(const step of [3,2,1]){
     assert.equal(overlay.querySelector('strong').textContent,String(step));
     assert.equal(w.puzzleRunStarting(),true);assert.equal(w.clockText(),'3:00');
+    assert.equal(w.currentFen(),puzzle.setup.fen);assert.equal(w.opponentPlaying,false);
+    assert.deepEqual(moves,[],'No opening move or sound before Go');
     await w.submitPuzzle('e4d5');await w.queuePuzzlePremove('e4d5');
     assert.equal(run.correctMoves,0);assert.equal(w.premove==null,true);
     w.render();assert.equal(w.root.querySelector('.puzzle-run-start'),overlay,'Renders preserve the live countdown');
     now+=1000;await advance(1000);
   }
   await starting;
+  assert.equal(w.currentFen(),puzzle.fen);assert.deepEqual(moves,['d5']);
   assert.equal(overlay.querySelector('strong').textContent,'Go!');
   assert.deepEqual(sounds,['3','2','1','Go!']);
   assert.equal(w.puzzleRunStarting(),false);assert.equal(w.busy,false);
