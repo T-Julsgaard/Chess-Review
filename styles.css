@@ -395,7 +395,7 @@
 .run-dashboard span { font-size: 11px; }
 @media (max-width: 420px) { .run-dashboard > div { padding-inline: 14px; } .run-dashboard strong { font-size: 27px; } }
 .puzzle-run-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 18px 0 12px; color: var(--ink-2); font-size: 13px; }
-.learning-workspace .puzzle-run-history { display: grid; grid-template-columns: repeat(auto-fill,minmax(56px,1fr)); align-content: start; gap: 8px; list-style: none; max-height: 156px; overflow-y: auto; margin: 16px 0; padding: 0; }
+.learning-workspace .puzzle-run-history { display: grid; grid-template-columns: repeat(auto-fill,minmax(56px,1fr)); align-content: start; gap: 8px; list-style: none; max-height: 304px; overflow-y: auto; margin: 16px 0; padding: 0; }
 .learning-workspace .puzzle-run-history li { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 0; min-height: 44px; margin: 0; padding: 7px 6px; box-sizing: border-box; border: 1px solid color-mix(in srgb,var(--accent) 30%,transparent); border-radius: 8px; background: color-mix(in srgb,var(--accent) 9%,transparent); color: var(--accent); font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .learning-workspace .puzzle-run-history li.missed { color: #f35a66; border-color: #f35a664d; background: #f35a6612; }
 .puzzle-run-history li > span:first-child { font-size: 17px; }
