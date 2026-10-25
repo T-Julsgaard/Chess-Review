@@ -1247,6 +1247,10 @@ button { font-family: inherit; cursor: pointer; }
   display: grid; place-items: center; transition: .14s;
 }
 .controls button:hover { color: var(--ink); border-color: color-mix(in oklab, var(--accent) 45%, var(--line)); }
+.controls button[aria-label]:is(:active, :focus):not(:disabled) {
+  outline: 2px solid color-mix(in oklab, var(--accent) 35%, transparent); outline-offset: 2px;
+}
+.controls button[aria-label]:focus-visible:not(:disabled) { outline-color: var(--accent); }
 .controls button[disabled] { opacity: .35; pointer-events: none; }
 .controls button.play {
   background: linear-gradient(160deg, var(--accent), var(--accent-strong));
