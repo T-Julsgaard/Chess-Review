@@ -8,6 +8,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     m.S.settings.moveAnim=false;await m.openLearning();
     const w=m.learningWorkspace,{Chess}=await import('./lib/chess.js');
     const before=new Chess();before.move('e4');const after=new Chess(before.fen());after.move('d5');
+    window.readyBefore=before.fen();window.readyMoves=[];w.onPuzzleMove=san=>readyMoves.push(san);
     w.puzzles=[{id:'ready-audit',fen:after.fen(),setup:{fen:before.fen(),move:'d7d5'},solution:['e4d5','d8d5','b1c3'],rating:450,themes:[]}];
     window.startCues=[];
     const {createRunStartSound}=await import('./lib/learning/run-start-sound.js');
@@ -24,7 +25,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await run(`import('./analysis.js').then(async m=>{
       await m.learningWorkspace.navigate('puzzles');m.S.settings.moveAnim=${motion};m.S.settings.sound=true;m.S.settings.soundVolume=15;
       m.learningWorkspace.refreshSettings();
-      window.startCues=[];window.readyStarted=performance.now();
+      window.startCues=[];window.readyMoves=[];window.readyStarted=performance.now();
       void m.learningWorkspace.startPuzzleRun('timeAttack');
     })`);
     await waitFor(review,"!!document.querySelector('.puzzle-run-start[data-step=\"3\"]')",'Countdown');
@@ -32,11 +33,13 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     const state=await run(`import('./analysis.js').then(m=>{
       const w=m.learningWorkspace,e=document.querySelector('.puzzle-run-start'),b=e.parentElement.getBoundingClientRect(),r=e.getBoundingClientRect(),c=e.querySelector('.puzzle-run-start-card').getBoundingClientRect();
       return {clock:w.clockText(),started:w.run.clock.started,busy:w.busy,thinking:w.puzzleThinkingAt!=null,motion:e.dataset.motion,
+        waiting:w.currentFen()===readyBefore&&!w.opponentPlaying&&!readyMoves.length,cursor:getComputedStyle(e).cursor,
         animation:getComputedStyle(e.querySelector('strong')).animationName,
         fits:Math.abs(r.left-b.left)<2&&Math.abs(r.right-b.right)<2&&Math.abs(r.top-b.top)<2&&Math.abs(r.bottom-b.bottom)<2,
         contained:c.left>=r.left&&c.right<=r.right&&c.top>=r.top&&c.bottom<=r.bottom};
     })`);
     assert.equal(state.clock,'3:00');assert.equal(state.started,false);assert.equal(state.busy,true);assert.equal(state.thinking,false);
+    assert.equal(state.waiting,true);assert.equal(state.cursor,'default');
     assert.equal(state.motion,motion&&!reduced?'on':'off');assert.equal(state.animation==='none',!motion||reduced);
     assert.equal(state.fits,true);assert.equal(state.contained,true);
     const point=async square=>run(`(()=>{const r=document.querySelector('[data-square=${square}]').getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2};})()`);

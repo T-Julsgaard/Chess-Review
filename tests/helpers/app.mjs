@@ -16,6 +16,7 @@ import {createScreenPreviewContext,loadScreenPreviewController} from '../../lib/
 import {puzzleResultBadge} from '../../lib/puzzle-badge.js';
 import {matedKingSquare,mateMark} from '../../lib/mate-mark.js';
 import {moveAnimationDuration, MOVE_ANIMATION_EASING} from '../../lib/move-animation.js';
+import {RUN_START_STYLES,RUN_END_STYLES,runAnimationStyle,runStartOverlay,runEndOverlay} from '../../lib/learning/run-animations.js';
 import {rememberAnalyzedGame,historyGame} from '../../lib/player-history.js';
 
 // Execute the real application in a DOM, stubbing only browser/engine boundaries.
@@ -51,6 +52,7 @@ export function app(t, {hardware,url='https://extension.test/analysis.html#test-
     rememberAnalyzedGame,historyGame,
     BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg, puzzleResultBadge, matedKingSquare, mateMark,
     moveAnimationDuration, MOVE_ANIMATION_EASING,
+    RUN_START_STYLES,RUN_END_STYLES,runAnimationStyle,runStartOverlay,runEndOverlay,
     CATEGORY_LABEL_FONT, categoryLabelPng,
     expectedPoints, SF19_OUTCOME, calibratedReview, scoringEvidenceComplete, analyseCalibratedPosition,
     Engine: class { constructor() { throw Error('Unexpected real engine'); } },

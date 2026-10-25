@@ -8,12 +8,13 @@ import {createRunStartSound} from '../lib/learning/run-start-sound.js';
 const before=new Chess();before.move('e4');const after=new Chess(before.fen());after.move('d5');
 const puzzle={id:'ready',fen:after.fen(),setup:{fen:before.fen(),move:'d7d5'},solution:['e4d5','d8d5','b1c3'],rating:450,themes:[]};
 const settle=async()=>{for(let i=0;i<80;i++)await Promise.resolve();};
-async function setup(t,{motion=true,reduced=false}={}) {
+async function setup(t,{motion=true,reduced=false,style='pulse'}={}) {
   const dom=new JSDOM('<div id="root"><div class="app"></div></div>',{url:'https://extension.test'}),data={},sounds=[],timers=new Map();
   dom.window.matchMedia=()=>({matches:reduced});
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[puzzle]})}));
   const storage={async get(key){return {[key]:structuredClone(data[key])};},async set(values){Object.assign(data,structuredClone(values));}};
-  const w=new LearningWorkspace({document:dom.window.document,storage,settings:()=>({moveAnim:motion}),makePiece:()=>dom.window.document.createElement('span')});
+  const settings={moveAnim:motion,puzzleStartAnimation:style};
+  const w=new LearningWorkspace({document:dom.window.document,storage,settings:()=>settings,makePiece:()=>dom.window.document.createElement('span')});
   w.runStartSound={prime(){},play:step=>sounds.push(step),stop(){},close(){}};
   t.mock.method(w,'waitForPuzzleReply',async()=>true);
   let id=0;
@@ -24,17 +25,18 @@ async function setup(t,{motion=true,reduced=false}={}) {
     assert.ok(timer,`Expected a ${delay}ms countdown timer`);timers.delete(id);timer.fn();await settle();
   };
   t.after(async()=>{await w.close();dom.window.close();});await w.open();
-  return {w,dom,data,sounds,timers,advance};
+  return {w,dom,data,sounds,timers,advance,settings};
 }
 
-for(const options of [{motion:true},{motion:false},{motion:true,reduced:true}])test(`Time attack gives three seconds to prepare with motion ${JSON.stringify(options)}`,async t=>{
+for(const options of [{motion:true},{motion:false},{motion:true,reduced:true},...['rings','flip','still'].map(style=>({motion:true,style}))])test(`Time attack gives three seconds to prepare with motion ${JSON.stringify(options)}`,async t=>{
   const {w,sounds,advance}=await setup(t,options),moves=[];
   w.onPuzzleMove=san=>moves.push(san);
   const starting=w.startPuzzleRun('timeAttack');await settle();
   const run=w.run;let now=0;run.clock.now=()=>now;
   const overlay=w.root.querySelector('.puzzle-run-start');
   assert.ok(overlay);assert.equal(overlay.parentElement.classList.contains('learn-board'),true);
-  assert.equal(overlay.dataset.motion,options.motion&&!options.reduced?'on':'off');
+  assert.equal(overlay.dataset.motion,options.motion&&!options.reduced&&options.style!=='still'?'on':'off');
+  assert.equal(overlay.dataset.style,options.style||'pulse');
   assert.equal(overlay.querySelector('.puzzle-run-start-title').textContent,'Time attack');
   assert.equal(w.currentFen(),puzzle.setup.fen,'The opponent waits for the countdown');
   assert.equal(w.busy,true);assert.equal(run.clock.started,false);assert.equal(w.puzzleThinkingAt==null,true);
@@ -86,6 +88,19 @@ test('Play again gets a fresh countdown and Knockout starts directly',async t=>{
   await w.startPuzzleRun('knockout');
   assert.equal(w.root.querySelector('.puzzle-run-start'),null);assert.equal(w.busy,false);
   assert.equal(sounds.length,8);
+});
+
+for(const mode of ['timeAttack','knockout'])for(const style of ['classic','ribbon','spotlight','still'])test(`${mode} uses the ${style} ending and refreshes its motion setting`,async t=>{
+  const {w,settings,advance}=await setup(t);
+  settings.puzzleEndAnimation=style;
+  const starting=w.startPuzzleRun(mode);await settle();
+  if(mode==='timeAttack')for(let i=0;i<3;i++)await advance(1000);
+  await starting;await w.finishChallenge('Out of lives');
+  const overlay=w.root.querySelector('.puzzle-run-end');
+  assert.equal(overlay.dataset.style,style);assert.equal(overlay.dataset.motion,style==='still'?'off':'on');
+  assert.equal(overlay.querySelector('.puzzle-run-end-reason').textContent,'Out of lives');
+  settings.moveAnim=false;w.refreshSettings();assert.equal(overlay.dataset.motion,'off');
+  await advance(2800);assert.equal(overlay.isConnected,false);
 });
 
 function audioFixture() {
