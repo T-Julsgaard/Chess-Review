@@ -5832,7 +5832,7 @@ async function practiceAttempt(from, to, promotion = "q") {
     const result = p.resultBadge = {solvePos, square:mv.from, status:"incorrect"};
     setTimeout(() => {
       if (S.practice === p && p.resultBadge === result) clearPracticeResult();
-    }, 2000);
+    }, 1000);
     p.fails = (p.fails || 0) + 1;
     S.selectedSq = null; paintBoard(); renderControls(); renderReview();
     flashSquares([mv.from, mv.to], "bad");

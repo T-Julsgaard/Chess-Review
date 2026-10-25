@@ -81,16 +81,16 @@ test('review practice clears an incorrect badge on pickup and keeps it cleared a
   assert.equal(a.state.practice.fails,1);assert.equal(a.state.practice.solving,true);
 });
 
-test('review practice expires incorrect badges after two seconds and restarts the delay on another mistake',async t=>{
+test('review practice expires incorrect badges after one second and restarts the delay on another mistake',async t=>{
   t.mock.timers.enable({apis:['setTimeout']});
   const a=review(t);a.state.practice={spots:[1],i:0,solving:true,busy:false};a.state.idx=0;a.call('paintBoard');
   const board=a.dom.window.document.querySelector('.board');
   await a.call('practiceAttempt','d2','d4');
-  t.mock.timers.tick(1500);a.call('paintBoard');badge(board,'incorrect');
+  t.mock.timers.tick(750);a.call('paintBoard');badge(board,'incorrect');
   await a.call('practiceAttempt','g1','f3');
-  t.mock.timers.tick(500);badge(board,'incorrect');
+  t.mock.timers.tick(250);badge(board,'incorrect');
   assert.ok(a.run('sqByName.g1').querySelector('.puzzle-result-badge'));
-  t.mock.timers.tick(1499);badge(board,'incorrect');
+  t.mock.timers.tick(749);badge(board,'incorrect');
   t.mock.timers.tick(1);
   assert.equal(a.state.practice.resultBadge,null);
   assert.equal(board.querySelector('.puzzle-result-badge'),null);
@@ -103,16 +103,16 @@ test('an expired incorrect attempt does not clear the correct badge or a new pra
   t.mock.timers.enable({apis:['setTimeout']});
   const a=review(t);a.state.practice={spots:[1],i:0,solving:true,busy:false};a.state.idx=0;a.call('paintBoard');
   const board=a.dom.window.document.querySelector('.board');
-  await a.call('practiceAttempt','d2','d4');t.mock.timers.tick(1500);
+  await a.call('practiceAttempt','d2','d4');t.mock.timers.tick(750);
   await a.call('practiceAttempt','e2','e4');
-  t.mock.timers.tick(500);badge(board,'correct');
+  t.mock.timers.tick(250);badge(board,'correct');
   assert.ok(a.run('sqByName.e4').querySelector('.puzzle-result-badge'));
   a.call('exitPractice');
   a.state.practice={spots:[1],i:0,solving:true,busy:false};a.state.idx=0;a.call('paintBoard');
-  await a.call('practiceAttempt','d2','d4');t.mock.timers.tick(1000);
+  await a.call('practiceAttempt','d2','d4');t.mock.timers.tick(500);
   a.call('exitPractice');
   a.state.practice={spots:[1],i:0,solving:true,busy:false};a.state.idx=0;a.call('paintBoard');
-  await a.call('practiceAttempt','g1','f3');t.mock.timers.tick(1000);
+  await a.call('practiceAttempt','g1','f3');t.mock.timers.tick(500);
   badge(board,'incorrect');
   assert.ok(a.run('sqByName.g1').querySelector('.puzzle-result-badge'));
 });
@@ -126,7 +126,7 @@ test('practice badge expiry clears the saved review square while learning owns t
   const learningBadge=board.querySelector('.puzzle-result-badge').cloneNode(true);
   learningSquare.classList.add('has-badge');learningSquare.append(learningBadge);
   board.replaceChildren(learningSquare);
-  t.mock.timers.tick(2000);
+  t.mock.timers.tick(1000);
   assert.equal(a.state.practice.resultBadge,null);
   assert.equal(learningBadge.parentElement,learningSquare);
   assert.ok(learningSquare.classList.contains('has-badge'));

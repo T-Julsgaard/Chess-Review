@@ -76,7 +76,7 @@ test('repeated incorrect attempts replay the full board shake and red flashes al
   assert.ok(from.querySelector('.puzzle-result-badge[data-result=incorrect]'));
   assert.ok(from.querySelector('.piece-img[data-piece=wP]'));
   assert.equal(a.state.practice.fails,2);assert.equal(a.state.practice.solving,true);
-  t.mock.timers.tick(1320);assert.equal(board.querySelector('.puzzle-result-badge'),null);
+  t.mock.timers.tick(320);assert.equal(board.querySelector('.puzzle-result-badge'),null);
 });
 
 test('the first wrong practice move offers one working Hint button inside the coach message',t=>{
