@@ -156,6 +156,8 @@ for(const mode of ['timeAttack','knockout'])for(const previousBest of [0,10])tes
   await w.finishChallenge(reason);
   assert.equal(w.root.querySelector('.puzzle-practice-heading h2').textContent,title);
   assert.equal(w.root.querySelector('.puzzle-run-stats > div > span').textContent,'Solved');
+  assert.ok(w.root.querySelector('.puzzle-run-results .run-dashboard'));
+  assert.equal(w.root.querySelector('.puzzle-run-results [role=timer]'),null);
   const overlay=w.root.querySelector('.learn-board > .puzzle-run-end[role=status]');
   assert.ok(overlay);assert.equal(overlay.dataset.motion,'off');
   assert.equal(overlay.querySelector('.puzzle-run-end-title').textContent,'Run over');

@@ -44,6 +44,16 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
     await run("import('./analysis.js').then(m=>{m.learningWorkspace.run.bestEligible=false;m.learningWorkspace.render();})");
     assert.equal(await run("!!document.querySelector('.run-record')"),false);
     await capture(`${mode}-custom`);
+    await run(`import('./analysis.js').then(m=>m.learningWorkspace.finishChallenge('${mode==='timeAttack'?'Time is up':'Out of lives'}'))`);
+    assert.equal(await run("!!document.querySelector('.puzzle-run-results .run-dashboard')"),true);
+    assert.equal(await run("!!document.querySelector('.run-record, [role=timer]')"),false);
+    await capture(`${mode}-results-custom`);
+    await run("import('./analysis.js').then(m=>{m.learningWorkspace.result.bestEligible=true;m.learningWorkspace.render();})");
+    for(const [width,height] of [[1920,1080],[390,844],[320,740]]) {
+      await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(150);
+      assert.equal(await run("(()=>{const card=document.querySelector('.puzzle-run-results .run-dashboard');return card.scrollWidth<=card.clientWidth+1&&card.children.length===2&&!!card.querySelector('.run-record');})()"),true);
+      await capture(`${mode}-results-${width}`);
+    }
   }
   console.log('Run dashboard checks passed in both themes at 1920, 1280, 390 and 320 pixels. Screenshots: '+out);
 }
