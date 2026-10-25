@@ -110,6 +110,7 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} result badges select p
   await w.startPuzzleRun(mode);await solve(w);await wrong(w);
   if(w.run)await w.finishChallenge('Ended early');
   const result=w.result,saved=structuredClone(data['learning:v1']),heading=w.root.querySelector('.learn-results h2').textContent;
+  const finalTurn=w.root.querySelector('.puzzle-turn-cue').textContent;
   assert.equal(w.root.querySelector('.learn-results .learn-eyebrow'),null);
   assert.ok(w.root.querySelector('.puzzle-run-results.puzzle-session .puzzle-practice-heading'));
   assert.doesNotMatch(w.root.textContent,/Each check is a solved puzzle|Back to puzzles/);
@@ -150,6 +151,7 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} result badges select p
   assert.equal(w.puzzleAnalysis,null);assert.deepEqual(controls(),originalControls);
   assert.deepEqual(data['learning:v1'],saved);assert.deepEqual(w.store.value,saved);
   w.returnToRunResults();assert.equal(w.result,result);assert.equal(w.activity,null);
+  assert.equal(w.root.querySelector('.puzzle-turn-cue').textContent,finalTurn);
   await w.replayRunPuzzle(result.results[0].id);
   assert.equal(w.currentFen(),fen);assert.equal(w.activity.step,0);assert.equal(w.attemptRecorded,false);
   await w.replayRunPuzzle(result.results[1].id);
@@ -176,12 +178,14 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} keeps the final puzzle
   const {w,dom}=await setup(t,{puzzles:[{...line,rating:400},...fixtures.map(p=>({...p,rating:3000}))]});
   await w.startPuzzleRun(mode);
   if(mode==='timeAttack'){await wrong(w);await wrong(w);}
+  const turn=current(w).fen.split(' ')[1]==='w'?'White to move':'Black to move';
   await w.submitPuzzle(current(w).solution[0]);
   const fen=w.currentFen(),flipped=w.flipped;
   const squares=()=>[...w.root.querySelectorAll('.learn-square')].map(n=>n.getAttribute('aria-label'));
   const position=squares();await wrong(w);
   assert.equal(w.run,null);assert.equal(w.activity,null);assert.equal(w.result.reason,'Out of lives');
   assert.equal(w.currentFen(),fen);assert.equal(w.flipped,flipped);assert.deepEqual(squares(),position);
+  assert.equal(w.root.querySelector('.puzzle-turn-cue').textContent,turn);
   const badge=()=>w.root.querySelector('.puzzle-result-badge[data-result=incorrect]');
   assert.ok(badge());const square=badge().closest('[data-square]').dataset.square;
   const saved=structuredClone(w.store.value);
@@ -192,6 +196,7 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} keeps the final puzzle
   w.flipBoard();assert.equal(w.flipped,!flipped);assert.ok(badge());assert.equal(w.currentFen(),fen);
   await w.replayRunPuzzle(w.result.results[0].id);assert.equal(badge(),null);
   w.returnToRunResults();assert.equal(w.currentFen(),fen);assert.ok(badge());
+  assert.equal(w.root.querySelector('.puzzle-turn-cue').textContent,turn);
   assert.equal(badge().closest('[data-square]').dataset.square,square);
   await w.navigate('puzzles');assert.equal(badge(),null);assert.equal(w.currentFen(),w.homePosition.fen());
 });
@@ -199,12 +204,14 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} keeps the final puzzle
 test('Time attack keeps its unfinished puzzle position when the clock expires',async t=>{
   const {w}=await setup(t,{puzzles:[{...line,rating:400},...fixtures.map(p=>({...p,rating:3000}))]});
   await w.startPuzzleRun('timeAttack');clearInterval(w.ticker);
+  const turn=w.root.querySelector('.puzzle-turn-cue').textContent;
   await w.submitPuzzle(line.solution[0]);
   const fen=w.currentFen(),flipped=w.flipped;
   w.run.clock.remainingMs=0;w.run.clock.runningAt=null;
   await w.submitPuzzle(line.solution[w.activity.step]);
   assert.equal(w.result.reason,'Time is up');assert.equal(w.result.solved,0);assert.equal(w.result.results.length,0);
   assert.equal(w.currentFen(),fen);assert.equal(w.flipped,flipped);
+  assert.equal(w.root.querySelector('.puzzle-turn-cue').textContent,turn);
   assert.equal(w.root.querySelectorAll('.learn-square').length,64);
   assert.equal(w.root.querySelector('.puzzle-result-badge'),null);
 });
