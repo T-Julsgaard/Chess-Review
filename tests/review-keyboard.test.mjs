@@ -51,6 +51,23 @@ test('library toggle, game buttons, favorite focus and Escape form one keyboard 
   assert.equal(a.store.library[0].fav,true);assert.equal(doc.activeElement.classList.contains('lc-fav'),true);assert.equal(a.state.pgn,'1. e4 e5');assert.equal(panel.inert,false);
   doc.activeElement.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}));assert.equal(panel.inert,true);assert.equal(doc.activeElement,toggle);
 });
+
+test('leaving the library collapses it after opening a game even while its card has focus',async t=>{
+  const a=review(t),doc=a.dom.window.document;
+  const rec={id:'saved',pgn:'1. d4 d5',meta:{gameId:'saved'},opName:'Opponent'};
+  a.state.library=[rec];a.call('renderLibrary');a.replace('startAnalysis',()=>{});
+  const rail=doc.querySelector('.library-rail'),panel=doc.querySelector('.lib-panel'),toggle=doc.querySelector('.lib-tab');
+  rail.dispatchEvent(new a.dom.window.MouseEvent('mouseenter'));
+  const open=doc.querySelector('.lc-open');open.focus();open.click();await settle();
+  assert.equal(a.state.pgn,rec.pgn);assert.equal(doc.activeElement,open);
+  assert.equal(a.state.libraryOpen,true);assert.equal(panel.inert,false);
+  rail.dispatchEvent(new a.dom.window.MouseEvent('mouseleave'));
+  assert.equal(a.state.libraryOpen,false);assert.equal(rail.classList.contains('open'),false);
+  assert.equal(panel.inert,true);assert.equal(toggle.getAttribute('aria-expanded'),'false');
+  a.call('renderLibrary');await settle();assert.equal(a.state.libraryOpen,false);
+  rail.dispatchEvent(new a.dom.window.MouseEvent('mouseenter'));
+  assert.equal(a.state.libraryOpen,true);assert.equal(panel.inert,false);
+});
 test('settings toggle updates retain control identity and Credits owns keyboard focus',async t=>{
   const a=review(t),doc=a.dom.window.document;await a.call('toggleSettings');[...doc.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Sound').click();
   const on=doc.querySelector('[data-setting="sound"][data-value="true"]');on.focus();on.click();await a.run('_settingsWriteQueue');await settle();assert.equal(doc.activeElement.dataset.setting,'sound');assert.equal(doc.activeElement.dataset.value,'true');

@@ -1596,7 +1596,7 @@ function buildUI() {
       libControls, libList),
   );
   libRail.addEventListener("mouseenter", () => setLibraryOpen(true));
-  libRail.addEventListener("mouseleave", () => {if(!libRail.contains(document.activeElement))setLibraryOpen(false);});
+  libRail.addEventListener("mouseleave", () => setLibraryOpen(false));
   // Rerendering a focused card briefly blurs it before restoring its replacement.
   libRail.addEventListener("focusout", () => {Promise.resolve().then(()=>{
     if(!libRail.contains(document.activeElement)&&!libRail.matches(":hover"))setLibraryOpen(false);
