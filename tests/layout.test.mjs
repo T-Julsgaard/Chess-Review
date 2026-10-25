@@ -2,14 +2,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { app, loadGame, settle } from './helpers/app.mjs';
 
-function layout(t, initialZoom = 1, defaultZoom = 1) {
+function layout(t, initialZoom = 1, defaultZoom = 1, effectiveZoom = z => z) {
   const a = app(t); loadGame(a, '1. e4 e5');
   a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
   let zoom = initialZoom, size;
   const syncViewport = () => {
     if (!size) return;
-    a.context.innerWidth = Math.round(size.w / zoom);
-    a.context.innerHeight = Math.round(size.h / zoom);
+    a.context.innerWidth = Math.round(size.w / effectiveZoom(zoom));
+    a.context.innerHeight = Math.round(size.h / effectiveZoom(zoom));
+    a.context.devicePixelRatio = effectiveZoom(zoom);
   };
   const changes = [];
   a.context.browserAPI.tabs = {
@@ -33,6 +34,22 @@ test('Full HD retains the original scale without drifting on reopen or a zoom re
   a.viewport(1920, 920); await a.call('fitTabZoom');
   await a.call('initTabZoom');
   assert.deepEqual(a.changes, [.87]);
+});
+
+test('Firefox zoom quantization does not refit the same viewport in a 1% loop', async t => {
+  const a = layout(t, 1, 1, z => 60 / Math.round(60 / z));
+  a.viewport(1100, 635);
+  await a.call('initTabZoom');
+  assert.equal(a.zoom(), .59);
+  for (let i = 0; i < 6; i++) await a.call('fitTabZoom');
+  for (let i = 0; i < 3; i++) await a.call('initTabZoom');
+  await a.call('resetLayout');
+  assert.equal(a.zoom(), .59);
+  assert.deepEqual(a.changes, [.59]);
+  a.viewport(1200, 700);
+  await a.call('fitTabZoom');
+  assert.equal(a.zoom(), .65);
+  assert.deepEqual(a.changes, [.59, .65]);
 });
 
 test('desktop fits laptop windows, then restores the responsive layout when narrowed', async t => {

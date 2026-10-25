@@ -6540,7 +6540,8 @@ const TOPBAR_H = 60;                 // .topbar height in styles.css
 const MIN_ZOOM = 0.5, MAX_ZOOM = 2;  // below 50% the text is unreadable; above 200% it balloons
 let _zoomTabId = null;
 let _defaultZoom = 1;
-let _fittedDip = null;               // viewport size (device-independent px) the zoom was last fitted to
+let _fittedViewport = null;          // rendered viewport size, stable across browser zoom changes
+let _fittedDip = null;               // size used for fitting, recovered before the last zoom change
 let _zoomFitQueue = Promise.resolve();
 let _zoomInit = null;
 function desktopLayoutFor(dipW, dipH) {
@@ -6578,12 +6579,17 @@ function fitTabZoom(force = false) {
 async function performTabZoomFit(force) {
   if (_zoomTabId == null) return;
   const z = (await browserAPI.tabs.getZoom(_zoomTabId)) || 1;
+  // Firefox getZoom reports the request; devicePixelRatio tracks its quantized rendered scale.
+  const renderedScale = screenPreview?.viewport ? z : devicePixelRatio;
+  const viewport = { w: Math.round(innerWidth * renderedScale), h: Math.round(innerHeight * renderedScale) };
   // CSS viewport dimensions are rounded after browser zoom. Recover whole DIP pixels so
   // reopening a 920px-high window at 90% cannot drift to 89% (1022 × .9 = 919.8).
-  const w = Math.round(innerWidth * z), h = Math.round(innerHeight * z);
-  // Same device-pixel size as last time → this resize came from a zoom change (the user's Ctrl+/-,
-  // our own setZoom, or another tab sharing the origin zoom), not from the window. Leave it.
-  if (!force && _fittedDip && Math.abs(w - _fittedDip.w) < 3 && Math.abs(h - _fittedDip.h) < 3) return;
+  const measuredDip = { w: Math.round(innerWidth * z), h: Math.round(innerHeight * z) };
+  // Same rendered viewport size as last time → this resize came from a zoom change (the user's Ctrl+/-,
+  // our own setZoom, or another tab sharing the origin zoom), not from the window.
+  const sameViewport = _fittedViewport && Math.abs(viewport.w - _fittedViewport.w) < 3 && Math.abs(viewport.h - _fittedViewport.h) < 3;
+  if (!force && sameViewport) return;
+  const { w, h } = sameViewport ? _fittedDip : measuredDip;
   const desktop = !isCustomLayout() && desktopLayoutFor(w, h);
   UI.canvas.classList.toggle("desktop-layout", desktop);
   applyLayout();
@@ -6591,6 +6597,7 @@ async function performTabZoomFit(force) {
   const target = isCustomLayout() ? targetZoomFor(w, h) : desktop ? desktopZoomFor(w, h) : _defaultZoom;
   // Only set it when it's off, so an unchanged window never triggers Chrome's zoom bubble.
   if (Math.abs(z - target) > 0.005) await browserAPI.tabs.setZoom(_zoomTabId, target);
+  _fittedViewport = viewport;
   _fittedDip = { w, h };
 }
 // Isolate zoom before fitting, so two analysis windows on different monitors keep their own fit.
