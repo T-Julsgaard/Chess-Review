@@ -42,7 +42,7 @@ test('puzzle statistics show saved patterns, preserve settings and resume, and r
   assert.equal(w.root.querySelector('.learn-stat-untried'),null);
   assert.equal(w.root.querySelectorAll('.learn-stat-track').length,Object.keys(THEME_NAMES).length);
   assert.ok([...w.root.querySelectorAll('.learn-stat-track > span')].every(n=>n.style.width==='0%'));
-  assert.equal(button().textContent,'Back to puzzle overview');
+  assert.equal(button().textContent,'Return to puzzle overview');
   assert.equal(w.root.querySelector('[data-focus="review"]').textContent,'← Back to review');
   assert.equal(doc.activeElement.id,'learn-statistics-title');
   assert.equal(w.root.querySelector('.learn-nav [aria-current]').textContent,'Puzzles');
@@ -287,11 +287,11 @@ test('the upper puzzle overview link preserves the attempt and the footer return
   assert.equal(back(),null);
   await w.startPuzzleSelection([p],null,{adaptive:true});await w.submitPuzzle(p.solution[0]);
   const step=w.activity.step,elo=w.store.value.puzzleRating.elo;
-  assert.equal(back().textContent,'Back to puzzle overview');assert.ok(w.root.querySelector('.puzzle-session-navigation').contains(back()));
+  assert.equal(back().textContent,'Return to puzzle overview');assert.ok(w.root.querySelector('.puzzle-session-navigation').contains(back()));
   assert.equal(w.root.querySelector('.learn-header [data-focus="review"]').textContent,'← Back to review');
   back().click();await settle();assert.equal(w.closed,false);assert.equal(w.activity,null);assert.equal(w.page,'puzzles');assert.equal(back(),null);
   assert.equal(w.store.value.puzzleResume.step,step);assert.equal(w.store.value.puzzleRating.elo,elo);
-  await w.startRatedPuzzles();assert.equal(w.activity.id,p.id);assert.equal(w.activity.step,0);assert.equal(w.currentFen(),p.fen);assert.equal(w.lastMove,p.setup.move);assert.equal(back().textContent,'Back to puzzle overview');
+  await w.startRatedPuzzles();assert.equal(w.activity.id,p.id);assert.equal(w.activity.step,0);assert.equal(w.currentFen(),p.fen);assert.equal(w.lastMove,p.setup.move);assert.equal(back().textContent,'Return to puzzle overview');
   back().click();await settle();w.root.querySelector('[data-focus="review"]').click();await settle();assert.equal(w.closed,true);assert.equal(w.root.isConnected,false);
 });
 

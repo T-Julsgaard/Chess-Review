@@ -90,7 +90,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await call('Emulation.clearDeviceMetricsOverride',{},review.sessionId);
     await run("import('./analysis.js').then(m=>m.learningWorkspace.finishChallenge('Ended early'))");
     await capture(mode+'-results');
-    assert.equal(await run("document.querySelector('[data-focus=puzzle-overview]').textContent"),'Back to puzzle overview');
+    assert.equal(await run("document.querySelector('[data-focus=puzzle-overview]').textContent"),'Return to puzzle overview');
     assert.equal(await run("document.querySelector('.puzzle-run-results').textContent.includes('Each check is a solved puzzle')"),false);
     await run("import('./analysis.js').then(m=>{window.replaySaved=JSON.stringify(m.learningWorkspace.store.value);window.replayId=m.learningWorkspace.result.results[0].id;document.querySelector('.puzzle-run-history button').click();})");
     await waitFor(review,"import('./analysis.js').then(m=>m.learningWorkspace.activity?.replay&&!m.learningWorkspace.busy)",'Run puzzle replay');
@@ -109,7 +109,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   assert.equal(await run("document.querySelector('#learningToggle').textContent"),'Return to Game review');
   assert.equal(await run("document.querySelector('.learn-footer, [data-focus=review]')"),null);
   assert.equal(await run("(()=>{const main=document.querySelector('.learn-main').getBoundingClientRect(),shell=document.querySelector('.learn-shell').getBoundingClientRect();return Math.abs(main.bottom-shell.bottom)<1})()"),true,'Scrollable content uses the former footer space');
-  assert.equal(await run("document.querySelector('[data-focus=puzzle-statistics]').textContent"),'Back to puzzle overview');
+  assert.equal(await run("document.querySelector('[data-focus=puzzle-statistics]').textContent"),'Return to puzzle overview');
   await run("document.querySelector('[data-focus=puzzle-statistics]').click()");
   assert.equal(await run("document.activeElement.dataset.focus"),'puzzle-statistics');
   await run("import('./analysis.js').then(m=>m.learningWorkspace.navigate('puzzles'))");
@@ -208,7 +208,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   assert.equal(await run("import('./analysis.js').then(m=>{const w=m.learningWorkspace,status=document.querySelector('.puzzle-practice-status');return status.textContent===(w.currentFen().split(' ')[1]==='w'?'White to move':'Black to move')&&getComputedStyle(status).position!=='absolute';})"),true,'Ready puzzles must show which side moves in the feedback area');
   const puzzleActions=await run("[...document.querySelectorAll('.puzzle-practice-actions button')].map(n=>{const s=getComputedStyle(n);return {color:s.color,background:s.backgroundColor,border:s.borderColor}})");
   assert.deepEqual(puzzleActions[0],puzzleActions[1],'Hint and Skip must share neutral styling');
-  assert.equal(await run("document.querySelector('[data-focus=puzzle-overview]').textContent"),'Back to puzzle overview');
+  assert.equal(await run("document.querySelector('[data-focus=puzzle-overview]').textContent"),'Return to puzzle overview');
   assert.equal(await run("!!document.querySelector('.puzzle-practice-heading button:not(.puzzle-rating-toggle), .puzzle-back')"),false);
   const checkRatingCollapse=async label=>{
     for(const enabled of [false,true]){

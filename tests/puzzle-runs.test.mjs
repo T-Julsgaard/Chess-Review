@@ -156,7 +156,7 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} result badges select p
   assert.equal(w.root.querySelector('.learn-results .learn-eyebrow'),null);
   assert.ok(w.root.querySelector('.puzzle-run-results.puzzle-session .puzzle-practice-heading'));
   assert.doesNotMatch(w.root.textContent,/Each check is a solved puzzle|Back to puzzles/);
-  assert.equal(w.root.querySelector('[data-focus=puzzle-overview]').textContent,'Back to puzzle overview');
+  assert.equal(w.root.querySelector('[data-focus=puzzle-overview]').textContent,'Return to puzzle overview');
   const controls=()=>[...w.root.querySelectorAll('.puzzle-run-results button:not(.learn-square)')].map(n=>n.textContent);
   const originalControls=controls();
   const badges=w.root.querySelectorAll('.puzzle-run-history button');

@@ -6,6 +6,50 @@ import assert from 'node:assert/strict';
 export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const run=expression=>evaluate(review,expression);
   await run("import('./analysis.js').then(async m=>{m.S.settings.moveAnim=false;await m.openLearning();})");
+  // Navigation shares its top/right anchor across the overview and every mode.
+  const navigation=()=>run(`(()=>{
+    const button=document.querySelector('[data-focus=puzzle-overview], [data-focus=puzzle-statistics]'),
+      rect=button.getBoundingClientRect(),main=document.querySelector('.learn-main').getBoundingClientRect(),
+      title=document.querySelector('.learn-main h2').getBoundingClientRect();
+    return {top:rect.top-main.top,right:main.right-rect.right,height:rect.height,
+      viewportTop:rect.top,viewportRight:rect.right,stacked:document.querySelector('.learning-workspace').classList.contains('learn-stacked'),
+      overlap:rect.left<title.right&&rect.right>title.left&&rect.top<title.bottom&&rect.bottom>title.top,
+      overflow:document.querySelector('.learn-main').scrollWidth>document.querySelector('.learn-main').clientWidth+1,
+      label:button.textContent};
+  })()`);
+  const capture=async name=>{
+    await run("import('./analysis.js').then(m=>m.learningWorkspace.scrollToTop())");
+    const shot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
+    await fs.writeFile(path.join(out,name+'.png'),Buffer.from(shot.data,'base64'));
+  };
+  for(const [width,height] of [[1920,1080],[1280,800],[390,844],[320,640]]) {
+    await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(1000);
+    await run("import('./analysis.js').then(m=>m.learningWorkspace.navigate('puzzles'))");
+    const overview=await navigation();
+    assert.equal(overview.overlap,false);assert.equal(overview.overflow,false);
+    await capture(`navigation-overview-${width}`);
+    const aligned=async name=>{
+      await sleep(100);
+      const current=await navigation();
+      assert.equal(current.label,'Return to puzzle overview');
+      assert.ok(Math.abs(current.top-overview.top)<1&&Math.abs(current.right-overview.right)<1&&Math.abs(current.height-overview.height)<1,
+        `${name} navigation must align with overview at ${width}px: ${JSON.stringify({overview,current})}`);
+      assert.equal(current.stacked,overview.stacked);
+      assert.ok(Math.abs(current.viewportRight-overview.viewportRight)<1,`${name} navigation must keep its screen position horizontally`);
+      if(!overview.stacked)assert.ok(Math.abs(current.viewportTop-overview.viewportTop)<1,`${name} navigation must keep its screen position vertically`);
+      assert.equal(current.overlap,false);assert.equal(current.overflow,false);
+      await capture(`navigation-${name}-${width}`);
+    };
+    await run("import('./analysis.js').then(m=>m.learningWorkspace.showPuzzleStatistics(true))");await aligned('statistics');
+    await run("import('./analysis.js').then(m=>m.learningWorkspace.navigate('puzzles'))");
+    await run("import('./analysis.js').then(m=>m.learningWorkspace.startRatedPuzzles())");await aligned('practice');
+    await run("import('./analysis.js').then(m=>m.learningWorkspace.navigate('puzzles'))");
+    for(const mode of ['timeAttack','knockout']) {
+      await run(`import('./analysis.js').then(m=>m.learningWorkspace.startPuzzleRun('${mode}'))`);await aligned(mode);
+      await run("import('./analysis.js').then(m=>m.learningWorkspace.finishChallenge('Ended early'))");await aligned(mode+'-results');
+      await run("import('./analysis.js').then(m=>m.learningWorkspace.navigate('puzzles'))");
+    }
+  }
   const grid=async()=>{
     const boxes=await run("(()=>{const list=document.querySelector('.puzzle-run-history'),r=list.getBoundingClientRect();return [...list.children].map(n=>{const b=n.getBoundingClientRect();return {left:b.left,top:b.top,width:b.width,height:b.height,right:b.right,listRight:r.right};});})()");
     assert.equal(boxes.length,26);
@@ -27,8 +71,8 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await run("import('./analysis.js').then(m=>m.learningWorkspace.finishChallenge('Out of lives'))");
     for(const [width,height] of [[1920,1080],[390,844],[320,640]]) {
       await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(300);await grid();
-      const header=await run("(()=>{const h=document.querySelector('.puzzle-run-results h2'),b=document.querySelector('[data-focus=puzzle-overview]'),a=h.getBoundingClientRect(),c=b.getBoundingClientRect();return {title:h.textContent,center:a.top+a.height/2-c.top-c.height/2,eyebrow:!!document.querySelector('.puzzle-run-results .learn-eyebrow')};})()");
-      assert.equal(header.title,mode==='timeAttack'?'Time attack':'Knockout');assert.equal(header.eyebrow,false);assert.ok(Math.abs(header.center)<2,'Result heading must align with the overview button');
+      const header=await run("(()=>{const h=document.querySelector('.puzzle-run-results h2'),b=document.querySelector('[data-focus=puzzle-overview]'),a=h.getBoundingClientRect(),c=b.getBoundingClientRect();return {title:h.textContent,center:a.top+a.height/2-c.top-c.height/2,below:a.top>=c.bottom+11,eyebrow:!!document.querySelector('.puzzle-run-results .learn-eyebrow')};})()");
+      assert.equal(header.title,mode==='timeAttack'?'Time attack':'Knockout');assert.equal(header.eyebrow,false);assert.ok(Math.abs(header.center)<2||header.below,'Result heading must align with the overview button or sit below it in a narrow panel');
       await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=true;m.learningWorkspace.showPuzzleRunEnd();})");await sleep(450);
       const ending=await run("(()=>{const e=document.querySelector('.puzzle-run-end'),b=e.parentElement.getBoundingClientRect(),r=e.getBoundingClientRect();return {title:e.querySelector('strong').textContent,reason:e.querySelector('.puzzle-run-end-reason').textContent,motion:e.dataset.motion,animation:getComputedStyle(e).animationName,fits:Math.abs(r.left-b.left)<2&&Math.abs(r.right-b.right)<2&&Math.abs(r.top-b.top)<2&&Math.abs(r.bottom-b.bottom)<2};})()");
       assert.deepEqual(ending,{title:'Run over',reason:'Out of lives',motion:'on',animation:'puzzle-run-end-veil',fits:true});
