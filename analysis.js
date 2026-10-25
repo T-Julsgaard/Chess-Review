@@ -4258,7 +4258,13 @@ function highlightCurrentMove(forceScroll = false) {
     cur.classList.add("current");
     if (forceScroll || previousPly !== cur.dataset.ply) {
       const cr = cur.getBoundingClientRect(), sr = UI.movesBody.getBoundingClientRect();
-      UI.movesBody.scrollTop += (cr.top - sr.top) - (UI.movesBody.clientHeight - cr.height - 14);
+      // Rectangles are screen pixels, while scrollTop/clientHeight are unscaled
+      // layout pixels. Convert before scrolling the scaled Full HD panel.
+      const scale=UI.movesBody.offsetHeight?sr.height/UI.movesBody.offsetHeight:1;
+      const top=sr.top+UI.movesBody.clientTop*scale,bottom=top+UI.movesBody.clientHeight*scale;
+      const padding=8*scale;
+      if(cr.bottom>bottom-padding)UI.movesBody.scrollTop+=(cr.bottom-bottom+padding)/scale;
+      else if(cr.top<top+padding)UI.movesBody.scrollTop+=(cr.top-top-padding)/scale;
     }
   }
 }

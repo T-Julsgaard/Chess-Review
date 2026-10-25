@@ -12,6 +12,16 @@ revision `8516f684` at 87% and the prototype at 100% in separate test extensions
 It compares panel and content dimensions in physical pixels, saves paired
 screenshots, and checks that Reorganize, Reset, and reload preserve the result.
 
+The Full HD review viewport clips panels that expand below the window instead
+of adding page scrolling. Individual panel bodies still scroll. The move-list
+highlight converts screen distances back to layout pixels when following a
+move, and updates without a color transition during rapid navigation.
+
+Learning fades use the individual `translate` property so panel content scales
+remain intact. Board return motion converts translations through the review's
+scaled ancestor. `--review-interactions` records entry/return frames and checks
+interruption, reduced motion, expanded viewport bounds, and rapid move following.
+
 Review startup and Reset layout restore 100% browser zoom. Window resizing uses
 the actual CSS viewport and never changes browser zoom. A manual zoom choice
 made after startup remains available for accessibility.

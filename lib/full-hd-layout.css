@@ -13,6 +13,8 @@
    Panel bodies retain their own scrolling and learning has its own viewport. */
 .app:has(.full-hd-reference) > .review-viewport {height:calc(100dvh - 52.2px);overflow:clip;}
 html:has(.full-hd-reference), body:has(.full-hd-reference) {height:100%;overflow:hidden;}
+.stage.full-hd-reference #movesBody {scroll-behavior:auto;}
+.stage.full-hd-reference .ml-move {transition:none;}
 .stage.auto.full-hd-reference .side,
 .stage.auto.full-hd-reference .side-cols,
 .stage.auto.full-hd-reference .side-a,
