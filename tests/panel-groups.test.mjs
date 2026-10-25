@@ -72,7 +72,8 @@ test('cancelled or blurred group gestures restore geometry and reset returns to 
   a.event(grip,'pointerdown',0,0);a.event(a.dom.window,'pointermove',100,100);await a.call('resetLayout');
   assert.equal(a.state.layoutMode,'auto');assert.equal(a.state.reorganize,false);assert.equal(a.doc.querySelector('.reorg-banner'),null);
   assert.equal(JSON.stringify(a.state.layout),a.run('JSON.stringify(DEFAULT_LAYOUT)'));
-  assert.equal(a.mod('moves').querySelector('.mod-inner').style.transform,'');
+  const automatic=a.call('snapshotLayout');
+  assert.equal(a.mod('moves').querySelector('.mod-inner').style.transform,`scale(${automatic.moves.scale})`);
 });
 
 test('completed panel scale is persisted and can be restored without drift',async t=>{

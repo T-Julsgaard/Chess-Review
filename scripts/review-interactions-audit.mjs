@@ -8,7 +8,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const resize=async(width,height)=>{await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(120);};
   await run("document.querySelector('.learning-announcement-disable')?.click()");
   await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=true;m.S.settings.sound=false;})");
-  for(const [width,height]of [[1920,1080],[1920,920]]){
+  for(const [width,height]of [[1920,1080],[1920,920],[3840,2160],[3440,1280],[2560,1280],[1536,704],[1366,608],[1280,600]]){
     await resize(width,height);
     const initial=await run("({w:document.documentElement.clientWidth,h:document.documentElement.clientHeight})");
     for(let n=0;n<4;n++){
@@ -58,7 +58,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       const returning=await run('sampleActive=false;samples');
       const from=returning[0].board,to=returning.at(-1).board;
       for(const frame of returning)for(const key of ['x','y','w','h'])assert.ok(frame.board[key]>=Math.min(from[key],to[key])-1&&frame.board[key]<=Math.max(from[key],to[key])+1,'Board overshoot on return '+key);
-      for(const key of ['x','y','w','h'])assert.ok(Math.abs(to[key]-start[key])<1,'Review geometry changed '+key);
+      for(const key of ['x','y','w','h'])assert.ok(Math.abs(to[key]-start[key])<1,'Review geometry changed '+JSON.stringify({width,height,entry,key,to,start}));
       evidence.push({width,height,entry,frames,returning});
     }
   }
@@ -88,7 +88,9 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       evals:positions.map(()=>({cp:0})),bests:positions.map(()=>null),classif:positions.map(()=>null),moveGrades:[],_panelNeedsLive:false});
     m.go(0);
   })`);
-  for(const style of ['rows','cards','compact']){
+  for(const [width,height]of [[1920,920],[3840,2160],[2560,1280],[1366,608],[820,1180],[390,844]]){
+   await resize(width,height);
+   for(const style of ['rows','cards','compact']){
     await run(`import('./analysis.js').then(m=>{m.S.settings.mlStyle='${style}';m.go(0);})`);
     const misses=await run(`import('./analysis.js').then(m=>{
       const body=document.querySelector('#movesBody'),misses=[];
@@ -103,6 +105,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     assert.deepEqual(misses,[],style+': current move must remain visible on every navigation step');
     await run("import('./analysis.js').then(m=>m.go(m.S.total))");await shot(`last-move-${style}`);
   }
+  }
   await fs.writeFile(path.join(out,'review-interactions.json'),JSON.stringify({passed:true,evidence},null,2));
-  console.log('Full HD entry/return frames, expanded viewport clipping and 1,200 rapid navigation steps passed. Evidence: '+out);
+  console.log('Reference entry/return frames, expanded viewport clipping and 7,200 rapid navigation steps passed. Evidence: '+out);
 }

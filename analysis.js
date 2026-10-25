@@ -1837,6 +1837,9 @@ function applyLayout() {
   UI.canvas.classList.remove("desktop-layout");
   const reference=fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,S.qbreakExpanded);
   UI.canvas.classList.toggle('full-hd-reference',!!reference);
+  UI.canvas.classList.toggle('reference-components',!isCustomLayout()||!!reference);
+  UI.canvas.style.setProperty('--reference-factor',reference?reference.review.scale/(DEFAULT_LAYOUT.review.scale*.87):1);
+  UI.canvas.closest('.app').style.setProperty('--reference-chrome-scale',reference?Math.max(1,reference.review.scale/(DEFAULT_LAYOUT.review.scale*.87)):1);
   const boxes=isCustomLayout()?S.layout:reference;
   for (const mod of UI.canvas.querySelectorAll(".mod")) applyPanelBox(mod,boxes?.[mod.dataset.mod]);
   fitEnginePanel();
