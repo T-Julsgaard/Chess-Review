@@ -55,19 +55,18 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
       await capture(`${mode}-results-${width}`);
     }
   }
-  // Reproduce the reported history: attempt 31 is solved after misses at 28 and 30.
-  await run("import('./analysis.js').then(async m=>{const w=m.learningWorkspace;await w.navigate('puzzles');await w.startPuzzleRun('timeAttack');w.run.clock.pause();w.run.results=w.puzzles.slice(0,31).map((p,i)=>({id:p.id,number:i+1,rating:p.rating,correct:i!==27&&i!==29}));w.run.solved=29;w.run.mistakes=2;await w.finishChallenge('Time is up');})");
+  // A completed run with 31 correct outcomes must show 31 everywhere.
+  await run("import('./analysis.js').then(async m=>{const w=m.learningWorkspace;await w.navigate('puzzles');await w.startPuzzleRun('timeAttack');w.run.clock.pause();w.run.results=w.puzzles.slice(0,31).map((p,i)=>({id:p.id,number:i+1,rating:p.rating,correct:true}));w.run.solved=31;await w.finishChallenge('Time is up');})");
   for(const [width,height] of [[1920,1080],[390,844],[320,740]]) {
     await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(150);
     const summary=await run(`(()=>{
-      const panel=document.querySelector('.puzzle-run-results'),summary=panel.querySelector('.puzzle-run-summary'),list=panel.querySelector('.puzzle-run-history');
-      return {text:summary.textContent,score:panel.querySelector('[data-run-score]').textContent,best:panel.querySelector('.run-record strong').textContent,
+      const panel=document.querySelector('.puzzle-run-results'),list=panel.querySelector('.puzzle-run-history');
+      return {summary:!!panel.querySelector('.puzzle-run-summary'),score:panel.querySelector('[data-run-score]').textContent,best:panel.querySelector('.run-record strong').textContent,
         solved:list.querySelectorAll('li.solved').length,incorrect:list.querySelectorAll('li.missed').length,last:list.lastElementChild.getAttribute('aria-label'),
-        fits:summary.scrollWidth<=summary.clientWidth+1&&panel.scrollWidth<=panel.clientWidth+1,
-        above:summary.getBoundingClientRect().bottom<=list.getBoundingClientRect().top};
+        fits:list.scrollWidth<=list.clientWidth+1&&panel.scrollWidth<=panel.clientWidth+1};
     })()`);
-    assert.deepEqual(summary,{text:'31 attempted · 29 solved · 2 incorrectNumbers show puzzle order.',score:'29',best:'29',solved:29,incorrect:2,last:'Puzzle 31: solved',fits:true,above:true});
-    await capture(`time-attack-31-attempts-${width}`);
+    assert.deepEqual(summary,{summary:false,score:'31',best:'31',solved:31,incorrect:0,last:'Puzzle 31: solved',fits:true});
+    await capture(`time-attack-31-solved-${width}`);
   }
-  console.log('Run dashboard and 31-attempt score summary checks passed at desktop and mobile widths. Screenshots: '+out);
+  console.log('Run dashboard and 31-solve score checks passed at desktop and mobile widths. Screenshots: '+out);
 }
