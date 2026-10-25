@@ -21,6 +21,33 @@ test('illegal practice input remains uncounted and does not lock the board',t=>{
   assert.equal(a.state.practice.fails||0,0);assert.equal(a.state.practice.solving,true);assert.equal(a.state.practice.busy,false);
 });
 
+test('the first wrong practice move offers one working Hint button inside the coach message',t=>{
+  const a=practice(t),doc=a.dom.window.document;
+  a.call('renderReview');
+  assert.equal(doc.querySelector('.practice-coach .ip-hint-btn'),null);
+  a.call('practiceAttempt','e2','e5');
+  assert.equal(doc.querySelector('.practice-coach .ip-hint-btn'),null);
+  a.call('practiceAttempt','d2','d4');
+  const coach=doc.querySelector('.practice-coach');
+  assert.equal(coach.querySelector('.ip-text').textContent,'Click to get a Hint');
+  assert.equal(coach.querySelector('.ip-head button'),null);
+  assert.equal(coach.querySelectorAll('.ip-hint-btn').length,1);
+  coach.querySelector('.ip-text button').click();
+  assert.equal(a.state.practice.hinted,true);
+  assert.equal(a.run('sqByName.e2').classList.contains('hint-from'),true);
+  assert.equal(doc.querySelectorAll('.sq.hint-from').length,1);
+  assert.ok(doc.querySelector('.practice-coach .ip-text .ip-hint-btn.on'));
+  a.call('practiceAttempt','g1','f3');
+  assert.equal(doc.querySelectorAll('.practice-coach .ip-hint-btn').length,1);
+  a.call('practiceAttempt','e2','e4');
+  assert.equal(doc.querySelector('.practice-coach .ip-hint-btn'),null);
+  a.call('practiceEnterSolve');
+  assert.equal(a.state.practice.fails,0);
+  assert.equal(a.state.practice.hinted,false);
+  assert.equal(doc.querySelector('.practice-coach .ip-hint-btn'),null);
+  assert.equal(doc.querySelector('.sq.hint-from'),null);
+});
+
 test('an alternative checkmate is rejected unless it is the stored answer',t=>{
   const a=app(t);loadGame(a,'[SetUp "1"]\n[FEN "7k/5Q2/6K1/8/8/8/8/8 w - - 0 1"]\n\n1. Qg7#');
   a.state.bests[0]={bestmove:'f7g7',score:{mate:1},lines:[{score:{mate:1},pv:'f7g7'}]};

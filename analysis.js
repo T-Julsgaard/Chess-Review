@@ -761,7 +761,7 @@ const S = {
   coach: null, _turnPly: null,
   // Mistake-practice session (null when inactive). "Show the threat" helper engine + cache.
   practice: null, helperEngine: null, helperEnginePromise: null, helperEngineGeneration: 0, threatCache: new Map(),
-  // Practice hint squares (the engine's best move) — shown after 3 failed attempts.
+  // Practice hint squares (the engine's best move) — available after the first failed attempt.
   practiceHint: null,
   // Library (left hover-sidebar): the saved games + the active sort/filter selection.
   library: [], libSort: "history", libResult: "all", libType: "all",
@@ -3815,16 +3815,12 @@ function renderMoveComment() {
   if (fresh) { coachReactPly(S.idx); typeWrite(txt, _ipText); } else txt.textContent = _ipText;
   return body;
 }
-// Practice coaching: what to do, attempt count, and a Hint button after 3 failed tries.
+// Practice coaching: what to do, with an inline Hint button after the first failed try.
 function renderPracticeCoach() {
   const p = S.practice;
   const body = el("div", { class: "ip-body practice-coach" });
-  // Hint becomes available after 3 failed tries and lives in the top-right of the header — so the
-  // panel's layout (and height) never shifts as you try (no attempt counter, no extra button row).
-  const showHint = p.solving && (p.fails >= 3 || p.hinted);
   body.append(el("div", { class: "ip-head" },
-    el("span", { class: "ip-tag practice" }, "Practice"),
-    showHint ? el("button", { class: "ip-hint-btn ip-hint-top" + (S.practiceHint ? " on" : ""), title: "Highlight the piece to move", onclick: showPracticeHint }, "Hint") : null));
+    el("span", { class: "ip-tag practice" }, "Practice")));
 
   // Coach phrase (or null) → otherwise the built-in default for each practice state.
   const cl = (key, tok) => S.coach ? coachLine("practice", key, tok) : null;
@@ -3841,6 +3837,11 @@ function renderPracticeCoach() {
     body.append(el("div", { class: "ip-text ip-good" },
       last ? (cl("correct_final", {}) || "✓ Correct — last one. Well done!")
            : (cl("correct_continue", {}) || "✓ Correct! Moving on…")));
+    return body;
+  }
+  if (p.solving && (p.fails >= 1 || p.hinted)) {
+    body.append(el("div", { class: "ip-text" }, "Click to get a ",
+      el("button", { class: "ip-hint-btn ip-hint-inline" + (S.practiceHint ? " on" : ""), title: "Highlight the piece to move", onclick: showPracticeHint }, "Hint")));
     return body;
   }
   // Demo replay OR solving — the SAME message, picked + typed once when we land on the spot so the

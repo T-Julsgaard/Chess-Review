@@ -2052,9 +2052,9 @@ button { font-family: inherit; cursor: pointer; }
   transition: border-color .14s, background .14s;
 }
 .ip-hint-btn:hover { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 20%, var(--panel-2)); }
-/* hint button docked in the top-right of the practice header (replaces the old mistake counter) */
-.ip-hint-top { margin-left: auto; margin-top: 0; padding: 4px 11px; font-size: 12px; }
-.ip-hint-top.on { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 22%, var(--panel-2)); color: var(--accent); }
+/* Keep the hint button compact and aligned with the coach's invitation. */
+.ip-hint-inline { margin-top: 0; padding: 4px 11px; font-size: 12px; vertical-align: middle; }
+.ip-hint-inline.on { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 22%, var(--panel-2)); color: var(--accent); }
 
 /* practice hint: light up just the square of the piece to move — same red as a right-click mark */
 .sq.hint-from::after {
