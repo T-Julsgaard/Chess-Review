@@ -16,6 +16,7 @@ if (process.argv.includes('--working-tree')) {
   for (const file of files) await fs.copyFile(path.join(root,file),path.join(source,file));
   // Keep the workspace and its progress/input dependencies from the same revision.
   await fs.cp(path.join(root,'lib'),path.join(source,'lib'),{recursive:true});
+  await fs.cp(path.join(root,'icons'),path.join(source,'icons'),{recursive:true});
 }
 await fs.appendFile(path.join(source,'analysis.js'),'\nexport {S, learningWorkspace, openLearning, go, toggleFlip, applyLayoutMode, applyUserMove, paintBoard, exitAnalysis};\n');
 if(process.argv.includes('--viewport-preview'))await fs.appendFile(path.join(source,'analysis.js'),'\nglobalThis.__viewportAudit={S,openLearning,workspace:()=>learningWorkspace,fit:()=>_fittedDip};\n');

@@ -130,8 +130,7 @@
 .learn-board-caption strong { font-size: 14px; color: var(--ink-2); }
 .learn-board { position: relative; display: grid; grid-template-columns: repeat(8,1fr); aspect-ratio: 1; width: 100%; border-radius: 8px; overflow: hidden; box-shadow: 0 12px 36px #0003; }
 .learn-square { border: 0; border-radius: 0; min-width: 0; width: 100%; aspect-ratio: 1; padding: 0; position: relative; display: grid; place-items: center; }
-.learn-square.light { background: var(--sq-light); }
-.learn-square.dark { background: var(--sq-dark); }
+.learn-square { background: transparent; }
 .learn-square.selected { box-shadow: inset 0 0 0 5px var(--accent); }
 .learn-square.annotated::after { content: ''; position: absolute; inset: 3px; border: 3px solid #edb44f; border-radius: 3px; pointer-events: none; }
 .learn-square .piece-img { width: 88%; height: 88%; object-fit: contain; position: static; z-index: 1; pointer-events: auto; user-select: none; animation: learn-piece .16s ease-out; }
@@ -1108,11 +1107,16 @@ button { font-family: inherit; cursor: pointer; }
   -webkit-user-select: none; user-select: none;
   flex: 1; aspect-ratio: 1; display: grid;
   grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr);
-  /* Paint one surface so fractional sizing/scaling cannot open seams between squares. */
-  background: conic-gradient(from 90deg, var(--sq-light) 25%, var(--sq-dark) 0 50%, var(--sq-light) 0 75%, var(--sq-dark) 0) 0 0 / 25% 25%;
   border-radius: 10px; overflow: hidden;
   box-shadow: 0 0 0 1px var(--line), 0 26px 50px -30px rgba(0,0,0,.6);
   position: relative;
+}
+/* One opaque base and a full-board mask avoid both square and repeated-tile seams. */
+.board, .learn-board { background: var(--sq-light); }
+.board::before, .learn-board::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: var(--sq-dark);
+  mask: url('icons/board-squares.svg') center / 100% 100% no-repeat;
 }
 /* best-move arrow: SVG overlay placed exactly over the 8×8 grid — above pieces,
    square markers AND the classification badge (has-badge=7), so the arrow is never hidden */
