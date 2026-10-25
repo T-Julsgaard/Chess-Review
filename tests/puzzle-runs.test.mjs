@@ -353,6 +353,46 @@ for(const elapsed of [179999,180000])test(`Time attack ${elapsed<180000?'accepts
   assert.equal(w.result.solved,elapsed<180000?1:0);
 });
 
+for(const elapsed of [179999,180000])test(`Time attack reconciles 31 attempts with two mistakes when the last answer arrives at ${elapsed}ms`,async t=>{
+  const puzzles=Array.from({length:32},(_,i)=>({...mate,id:'score-'+i,rating:450+i*40}));
+  const {w,data}=await setup(t,{puzzles});
+  await w.startPuzzleRun('timeAttack');clearInterval(w.ticker);
+  let now=0;w.run.clock=new ChallengeClock(180,()=>now);w.run.clock.ready();
+  for(let number=1;number<=30;number++) {
+    if(number===28||number===30)await wrong(w);else await solve(w);
+  }
+  const summary=()=>w.root.querySelector('.puzzle-run-summary');
+  assert.match(summary().textContent,/30 attempted · 28 solved · 2 incorrect/);
+  assert.match(summary().textContent,/Numbers show puzzle order\./);
+  assert.equal(w.root.querySelector('[data-run-score]').textContent,'28');
+  const finalId=w.activity.id;
+  now=elapsed;
+  // Expiry during the accepted solve's record write must keep its point and tile.
+  const set=w.store.storage.set.bind(w.store.storage);
+  t.mock.method(w.store.storage,'set',async values=>{now=180001;await set(values);});
+  await solve(w);
+  const accepted=elapsed<180000,score=accepted?29:28,attempts=accepted?31:30;
+  assert.equal(w.result.reason,'Time is up');
+  assert.equal(w.result.solved,score);assert.equal(w.result.best,score);
+  assert.equal(w.result.results.length,attempts);
+  assert.equal(w.result.results.filter(r=>r.correct).length,score);
+  assert.deepEqual(w.result.results.filter(r=>!r.correct).map(r=>r.number),[28,30]);
+  assert.equal(w.result.results.some(r=>r.id===finalId&&r.correct),accepted);
+  assert.equal(w.root.querySelector('[data-run-score]').textContent,String(score));
+  assert.equal(w.root.querySelector('.run-record strong').textContent,String(score));
+  assert.equal(w.root.querySelectorAll('.puzzle-run-history li.solved').length,score);
+  assert.equal(w.root.querySelectorAll('.puzzle-run-history li.missed').length,2);
+  assert.match(summary().textContent,new RegExp(`${attempts} attempted · ${score} solved · 2 incorrect`));
+  assert.equal(w.root.querySelector('.puzzle-run-history').getAttribute('aria-describedby'),summary().id);
+  assert.equal(data['learning:v1'].bests.timeAttack,score);
+  assert.equal(data['learning:v1'].challenges.at(-1).solved,score);
+  assert.deepEqual(data['learning:v1'].challenges.at(-1).results,w.result.results);
+  await w.store.load();assert.equal(w.store.value.bests.timeAttack,score);
+  await w.replayRunPuzzle(w.result.results.at(-1).id);
+  assert.match(summary().textContent,new RegExp(`${attempts} attempted · ${score} solved · 2 incorrect`));
+  assert.equal(w.root.querySelector('[data-run-score]').textContent,String(score));
+});
+
 test('timer keeps running during replies and expiry cancels pending work without counting a partial solve',async t=>{
   const {w}=await setup(t,{puzzles:[{...line,rating:400},...fixtures.map(p=>({...p,rating:3000}))]});
   await w.startPuzzleRun('timeAttack');clearInterval(w.ticker);

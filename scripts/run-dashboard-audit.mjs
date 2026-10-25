@@ -55,5 +55,19 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
       await capture(`${mode}-results-${width}`);
     }
   }
-  console.log('Run dashboard checks passed in both themes at 1920, 1280, 390 and 320 pixels. Screenshots: '+out);
+  // Reproduce the reported history: attempt 31 is solved after misses at 28 and 30.
+  await run("import('./analysis.js').then(async m=>{const w=m.learningWorkspace;await w.navigate('puzzles');await w.startPuzzleRun('timeAttack');w.run.clock.pause();w.run.results=w.puzzles.slice(0,31).map((p,i)=>({id:p.id,number:i+1,rating:p.rating,correct:i!==27&&i!==29}));w.run.solved=29;w.run.mistakes=2;await w.finishChallenge('Time is up');})");
+  for(const [width,height] of [[1920,1080],[390,844],[320,740]]) {
+    await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(150);
+    const summary=await run(`(()=>{
+      const panel=document.querySelector('.puzzle-run-results'),summary=panel.querySelector('.puzzle-run-summary'),list=panel.querySelector('.puzzle-run-history');
+      return {text:summary.textContent,score:panel.querySelector('[data-run-score]').textContent,best:panel.querySelector('.run-record strong').textContent,
+        solved:list.querySelectorAll('li.solved').length,incorrect:list.querySelectorAll('li.missed').length,last:list.lastElementChild.getAttribute('aria-label'),
+        fits:summary.scrollWidth<=summary.clientWidth+1&&panel.scrollWidth<=panel.clientWidth+1,
+        above:summary.getBoundingClientRect().bottom<=list.getBoundingClientRect().top};
+    })()`);
+    assert.deepEqual(summary,{text:'31 attempted · 29 solved · 2 incorrectNumbers show puzzle order.',score:'29',best:'29',solved:29,incorrect:2,last:'Puzzle 31: solved',fits:true,above:true});
+    await capture(`time-attack-31-attempts-${width}`);
+  }
+  console.log('Run dashboard and 31-attempt score summary checks passed at desktop and mobile widths. Screenshots: '+out);
 }
