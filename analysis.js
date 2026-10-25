@@ -5619,8 +5619,10 @@ function removeMoveCallout() {
 }
 function clearPracticeResult() {
   if (!S.practice?.resultBadge) return;
+  const square = sqByName[S.practice.resultBadge.square];
   S.practice.resultBadge = null;
-  UI.boardWrap.querySelectorAll('.puzzle-result-badge').forEach(n => {n.parentElement.classList.remove('has-badge');n.remove();});
+  square?.classList.remove('has-badge');
+  square?.querySelectorAll('.puzzle-result-badge').forEach(n => n.remove());
 }
 function exitPractice() {
   if (!S.practice) return;
@@ -5811,7 +5813,10 @@ async function practiceAttempt(from, to, promotion = "q") {
     renderControls(); renderReview();
     setTimeout(() => { if (S.practice === p) practiceAdvance(); }, 1300);
   } else {
-    p.resultBadge = {solvePos, square:mv.from, status:"incorrect"};
+    const result = p.resultBadge = {solvePos, square:mv.from, status:"incorrect"};
+    setTimeout(() => {
+      if (S.practice === p && p.resultBadge === result) clearPracticeResult();
+    }, 2000);
     p.fails = (p.fails || 0) + 1;
     flashSquares([mv.from, mv.to], "bad");
     buzzBoard();

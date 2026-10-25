@@ -1210,7 +1210,8 @@ button { font-family: inherit; cursor: pointer; }
 }
 /* Exit-analysis button: sits in the central Play slot, styled like the green Play button but
    red, so it reads as the clear way out of analysis mode. */
-.controls .exit-analysis {
+.controls .exit-analysis,
+.stage.full-hd-reference .controls .exit-analysis {
   min-width: 64px; padding: 0 12px; gap: 6px;
   display: inline-flex; align-items: center; justify-content: center;
   font-weight: 700; font-size: 13px; white-space: nowrap; border: 0; color: #fff;
