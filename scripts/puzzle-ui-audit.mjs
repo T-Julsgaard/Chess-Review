@@ -16,6 +16,44 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await run("import('./analysis.js').then(m=>{m.S.layoutMode='auto';m.applyLayoutMode();})");
   await run(`import('./analysis.js').then(async m=>{
     m.S.settings.moveAnim=true;await m.openLearning();const w=m.learningWorkspace;
+    const {Chess}=await import('./lib/chess.js'),position=new Chess(),before=position.fen();position.move('e4');
+    w.puzzles=[{id:'startup-audit',fen:position.fen(),setup:{fen:before,move:'e2e4'},solution:['e7e5','g1f3','b8c6'],rating:1200,themes:[]}];
+    window.uiArrange=w.arrangePuzzlePieces.bind(w);
+  })`);
+  for(const mode of ['practice','timeAttack','knockout'])for(const leaveEarly of [false,true]) {
+    await run(`import('./analysis.js').then(async m=>{const w=m.learningWorkspace;
+      await w.navigate('puzzles');
+      w.arrangePuzzlePieces=()=>new Promise(resolve=>{window.uiReleaseIntro=resolve;w.cancelPieceTransition=resolve;});
+      window.uiStarting=${mode==='practice'?'w.startRatedPuzzles()':`w.startPuzzleRun('${mode}')`};
+    })`);
+    await waitFor(review,"!!window.uiReleaseIntro&&!!document.querySelector('[data-focus=puzzle-overview]')",'Puzzle introduction');
+    const target=await run(`(()=>{window.uiOverview=document.querySelector('[data-focus=puzzle-overview]');
+      const r=uiOverview.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
+    await call('Input.dispatchMouseEvent',{type:'mouseMoved',...target},review.sessionId);await sleep(250);
+    assert.equal(await run("import('./analysis.js').then(m=>m.learningWorkspace.puzzleIntroducing&&m.learningWorkspace.busy&&!uiOverview.disabled&&uiOverview.matches(':hover'))"),true,mode+': return is available immediately');
+    if(leaveEarly) {
+      await call('Input.dispatchMouseEvent',{type:'mousePressed',...target,button:'left',clickCount:1},review.sessionId);
+      await call('Input.dispatchMouseEvent',{type:'mouseReleased',...target,button:'left',clickCount:1},review.sessionId);
+      await waitFor(review,"!!document.querySelector('.puzzle-mode-grid')",'Immediate return to overview');
+      await run('uiStarting');
+      assert.equal(await run("import('./analysis.js').then(m=>!m.learningWorkspace.activity&&!m.learningWorkspace.run&&!m.learningWorkspace.busy&&!m.learningWorkspace.puzzleIntroducing)"),true);
+    } else {
+      const frames=await run(`(async()=>{
+        const sample=()=>({same:document.querySelector('[data-focus=puzzle-overview]')===uiOverview,
+          hover:uiOverview.matches(':hover'),disabled:uiOverview.disabled,
+          background:getComputedStyle(uiOverview).backgroundColor,opacity:getComputedStyle(uiOverview).opacity});
+        const frames=[sample()],started=performance.now();uiReleaseIntro();
+        await new Promise(resolve=>{function tick(){frames.push(sample());
+          if(performance.now()-started<900)requestAnimationFrame(tick);else resolve();}requestAnimationFrame(tick);});
+        await uiStarting;return frames;
+      })()`);
+      const unstable=frames.filter(frame=>!frame.same||!frame.hover||frame.disabled||frame.background!==frames[0].background||frame.opacity!=='1');
+      assert.equal(unstable.length,0,mode+': hover appearance must stay stable through startup '+JSON.stringify(unstable.slice(0,3)));
+    }
+    await run("import('./analysis.js').then(m=>{m.learningWorkspace.arrangePuzzlePieces=uiArrange;window.uiReleaseIntro=null;})");
+  }
+  await run(`import('./analysis.js').then(async m=>{
+    const w=m.learningWorkspace;await w.navigate('puzzles');
     const {Chess}=await import('./lib/chess.js');
     w.puzzles=[{id:'ui-audit',fen:new Chess().fen(),solution:['e2e4','e7e5','g1f3'],rating:1200,themes:[]}];
     await w.startPuzzleSelection(w.puzzles);

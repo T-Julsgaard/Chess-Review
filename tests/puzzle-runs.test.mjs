@@ -23,6 +23,53 @@ const current=w=>w.puzzles.find(p=>p.id===w.activity.id);
 const solve=async w=>{const id=w.activity.id;while(w.activity?.id===id)await w.submitPuzzle(current(w).solution[w.activity.step]);};
 const wrong=async w=>{const p=current(w),c=new Chess(w.currentFen());await w.submitPuzzle(c.moves({verbose:true}).find(m=>m.lan!==p.solution[w.activity.step]&&!new Chess(m.after).isCheckmate()).lan);};
 
+for(const mode of ['practice','timeAttack','knockout'])for(const phase of ['arrangement','opponent setup']) {
+  test(`${mode} can return immediately during ${phase} without a late startup restoring the puzzle`,async t=>{
+    const {w,data}=await setup(t,{puzzles:[mate]});
+    assert.ok(mate.setup);
+    w.settings=()=>({moveAnim:true});
+    let release,cancelled=false;
+    const pending=new Promise(resolve=>{release=resolve;});
+    t.after(release);
+    if(phase==='arrangement')t.mock.method(w,'arrangePuzzlePieces',()=>{
+      w.cancelPieceTransition=()=>{cancelled=true;};return pending;
+    });
+    else {
+      t.mock.method(w,'arrangePuzzlePieces',async()=>{});
+      t.mock.method(w,'waitForPuzzleReply',()=>{w.releaseReply=()=>{cancelled=true;};return pending;});
+    }
+    const starting=mode==='practice'?w.startRatedPuzzles():w.startPuzzleRun(mode);
+    for(let i=0;i<100&&!(phase==='arrangement'?w.cancelPieceTransition:w.releaseReply);i++)await Promise.resolve();
+    assert.equal(w.puzzleIntroducing,true);assert.equal(w.busy,true);
+    const button=w.root.querySelector('[data-focus=puzzle-overview]');
+    assert.equal(button.disabled,false);
+    w.render();assert.equal(w.root.querySelector('[data-focus=puzzle-overview]'),button);
+    button.click();
+    for(let i=0;i<100&&w.root.querySelector('[data-focus=puzzle-overview]');i++)await Promise.resolve();
+    assert.equal(cancelled,true);assert.equal(w.activity,null);assert.equal(w.run,null);
+    assert.equal(w.puzzleIntroducing,false);assert.equal(w.busy,false);assert.equal(w.page,'puzzles');
+    assert.ok(w.root.querySelector('.puzzle-mode-grid'));
+    const saved=structuredClone(data['learning:v1']);
+    release(true);await starting;
+    assert.equal(w.activity,null);assert.equal(w.pendingOpponent==null,true);assert.equal(w.puzzleThinkingAt==null,true);
+    assert.equal(w.feedback,null);assert.equal(w.run,null);assert.equal(w.busy,false);
+    assert.deepEqual(data['learning:v1'],saved);
+    assert.equal(saved.challenges.length,mode==='practice'?0:1);
+    assert.deepEqual(saved.puzzles,{});
+  });
+}
+
+test('the overview button survives startup renders while answer validation still locks it',async t=>{
+  const {w}=await setup(t,{puzzles:[line]});
+  await w.startRatedPuzzles();
+  const button=w.root.querySelector('[data-focus=puzzle-overview]');
+  await w.preparePuzzle(line);assert.equal(w.root.querySelector('[data-focus=puzzle-overview]'),button);
+  w.busy=true;w.render();assert.equal(button.disabled,true);
+  button.click();assert.ok(w.activity);
+  w.busy=false;w.render();assert.equal(button.disabled,false);
+  assert.equal(w.root.querySelector('[data-focus=puzzle-overview]'),button);
+});
+
 test('three aligned mode buttons show independent records and disable empty selections',async t=>{
   const {w}=await setup(t);
   await w.persist(p=>{p.bests.timeAttack=12;p.bests.knockout=7;p.puzzles.old={clean:1};});w.puzzleRange=[9000,9100];w.render();
