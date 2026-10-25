@@ -111,7 +111,8 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} result selections asse
     assert.equal(board.querySelectorAll('.puzzle-piece-transition').length,1);
     assert.equal(board.querySelectorAll('.puzzle-transition-piece').length,routes.length);
     assert.equal(w.root.querySelectorAll('.puzzle-run-history [aria-current=true]').length,1);
-    assert.equal(w.runReplay,result);assert.equal(w.activity.replay,true);assert.equal(w.busy,false);
+    assert.equal(w.runReplay,result);assert.equal(w.activity.replay,true);assert.equal(w.busy,true);
+    assert.equal(w.root.querySelector('.puzzle-run-replay').disabled,false);
     assert.deepEqual(w.store.value,saved);
   };
   const from={...w.displayedBoard},first=w.replayRunPuzzle('replay-transition');
