@@ -9,6 +9,10 @@
   --gap:12px;--pad:12px;--row-h:28px;--radius:10px;--fs-body:13px;--engine-line-h:46px;
   --coach-clear:194px;--coach-float-h:47px;
 }
+/* Expanded panels may extend below the composition; keep the page itself fixed.
+   Panel bodies retain their own scrolling and learning has its own viewport. */
+.app:has(.full-hd-reference) > .review-viewport {height:calc(100dvh - 52.2px);overflow:clip;}
+html:has(.full-hd-reference), body:has(.full-hd-reference) {height:100%;overflow:hidden;}
 .stage.auto.full-hd-reference .side,
 .stage.auto.full-hd-reference .side-cols,
 .stage.auto.full-hd-reference .side-a,
