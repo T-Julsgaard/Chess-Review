@@ -311,9 +311,9 @@ const DEFAULT_SETTINGS = {
   // App background: "color" (a tone picked with the HSL sliders), a bundled preset (slate / olive
   // = "Dark", a fixed near-black tone), or "custom" (uploaded). bgFit is "cover" (stretched) or "tile" (repeated
   // at bgTile size). bgCustom holds the uploaded data URL. bgHue/Sat/Light define the "color" tone.
-  // Default = a near-black neutral colour tone (HSL 0/0/10).
+  // Default = a near-black neutral colour tone (HSL 0/0/8).
   bg: "color", bgFit: "tile", bgTile: "large", bgCustom: null,
-  bgHue: 0, bgSat: 0, bgLight: 10,
+  bgHue: 0, bgSat: 0, bgLight: 8,
   // Commentary coach (data/coaches/<id>.json) — drives the animated avatar that's shown.
   // coachPlain toggles only the reply VOICE: false = the coach's special phrasing,
   // true = neutral "plain" commentary (the coach still appears and reacts on the board).
