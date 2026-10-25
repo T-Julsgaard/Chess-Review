@@ -17,6 +17,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
       insightTop:insight?.getBoundingClientRect().top,
       headingHeight:heading.getBoundingClientRect().height,headingLine:parseFloat(getComputedStyle(heading).lineHeight),
       headingSize:parseFloat(getComputedStyle(heading).fontSize),copySize:parseFloat(getComputedStyle(card.querySelector('p')).fontSize),
+      developerSize:parseFloat(getComputedStyle(card.querySelector('.learning-announcement-eyebrow')).fontSize),
       centered:getComputedStyle(card).textAlign==='center'&&getComputedStyle(card.querySelector('.learning-announcement-actions')).justifyContent==='center',
       arrows:[...document.querySelectorAll('.learning-announcement-arrow')].filter(p=>getComputedStyle(p).display!=='none').length};
   })()`);
@@ -47,6 +48,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     assert.equal(g.overflow, false, JSON.stringify(g));
     assert.ok(g.headingHeight <= g.headingLine + 1, 'The title stays on one line: ' + JSON.stringify(g));
     assert.equal(g.headingSize, 25); assert.equal(g.copySize, 14);
+    assert.equal(g.developerSize, 14);
     assert.equal(g.centered, true, 'Copy and actions should be centered');
     if (width >= 1366) assert.ok(Math.abs(g.top - g.insightTop) < 1, 'Align the note with Insights: ' + JSON.stringify(g));
     assert.equal(g.targets.length, 2);
@@ -56,10 +58,13 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     assert.equal(g.arrows, visible.length, JSON.stringify(g));
     if (visible.length === 2) await checkLowerPointer();
     if (width === 1920) {
-      assert.equal(await run("[...document.querySelectorAll('.learning-announcement-arrow')].every(p=>!/[CQ]/.test(p.getAttribute('d')))"), true, 'Pointers use straight line segments');
+      assert.equal(await run("(()=>{const d=document.querySelectorAll('.learning-announcement-arrow')[1].getAttribute('d');return (d.match(/C/g)||[]).length===1&&!/[HQV]/.test(d);})()"), true, 'The lower pointer uses a single smooth curve');
       assert.equal(await run("document.querySelector('.learning-announcement').textContent.includes('Jump in with')||document.querySelector('.learning-announcement p').textContent.startsWith('Hi!')"), false);
       assert.equal(await run("!!document.querySelector('.learning-announcement-traveller, .learning-announcement-arrows animateMotion, .learning-announcement-arrows animate')"), false);
-      assert.equal(await run("document.querySelector('.learning-announcement-arrows').getAnimations({subtree:true}).length"), 0, 'Pointers remain static');
+      assert.equal(await run("document.querySelector('.learning-announcement p').textContent.includes('50,000 puzzles')"), true);
+      const dashOffsets = () => run("[...document.querySelectorAll('.learning-announcement-arrow')].map(p=>getComputedStyle(p).strokeDashoffset)");
+      const before = await dashOffsets(); await sleep(200); const after = await dashOffsets();
+      after.forEach((offset,index) => assert.notEqual(offset,before[index], 'The dash pattern flows toward both buttons'));
     }
     await screenshot('learning-announcement-' + width);
     if (visible.length < 2) {
