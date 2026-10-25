@@ -1037,6 +1037,8 @@ button { font-family: inherit; cursor: pointer; }
   -webkit-user-select: none; user-select: none;
   flex: 1; aspect-ratio: 1; display: grid;
   grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr);
+  /* Paint one surface so fractional sizing/scaling cannot open seams between squares. */
+  background: conic-gradient(from 90deg, var(--sq-light) 25%, var(--sq-dark) 0 50%, var(--sq-light) 0 75%, var(--sq-dark) 0) 0 0 / 25% 25%;
   border-radius: 10px; overflow: hidden;
   box-shadow: 0 0 0 1px var(--line), 0 26px 50px -30px rgba(0,0,0,.6);
   position: relative;
@@ -1064,8 +1066,6 @@ button { font-family: inherit; cursor: pointer; }
 /* the square with the sliding piece is raised above the others during the animation */
 .sq.anim-top { z-index: 6; }
 .sq.anim-top .piece, .sq.anim-top .piece-svg, .sq.anim-top .piece-img { will-change: transform; }
-.sq.light { background: var(--sq-light); }
-.sq.dark  { background: var(--sq-dark); }
 /* move highlight: translucent overlay, independent of board theme.
    --hl-color is set per square to the classification color; otherwise neutral yellow. */
 .sq.hl::before {
