@@ -5505,11 +5505,11 @@ function applySettings() {
   const learnEntry=document.querySelector(".learn-entry-button");
   if(learnEntry)learnEntry.dataset.motion=S.settings.moveAnim===false?"off":"on";
   applyBackground();
+  const learningToggle=document.getElementById("learningToggle");
+  if(learningToggle)learningToggle.dataset.motion=S.settings.moveAnim===false?"off":"on";
   learningWorkspace?.refreshSettings();
 }
 // Bundled background presets (relative to the extension's analysis page).
-  const learningToggle=document.getElementById("learningToggle");
-  if(learningToggle)learningToggle.dataset.motion=S.settings.moveAnim===false?"off":"on";
 const BG_PRESETS = { slate: "backgrounds/bg-slate.webp" };
 const BG_TILE_PX = { small: 240, medium: 440, large: 760 };
 // Paint the chosen background on the .app shell. "color" paints an HSL tone (with a faint top
