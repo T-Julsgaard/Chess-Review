@@ -3445,9 +3445,9 @@ async function setCoachPlain(plain) {
 
 /* ---------------- Animated coach avatar ----------------
    The lifelike portraits live as self-contained rig HTML files (one per personality) that expose a
-   uniform postMessage API. They use inline scripts, so they're declared as sandboxed pages in the
-   manifest and embedded via <iframe> here; we drive them purely with postMessage (emotion/look/
-   talk/gestures/prop). Personalities without a built rig (or "Off") simply hide the module. */
+   uniform postMessage API. They load as extension pages in an <iframe>; animation commands use
+   postMessage (emotion/look/talk/gestures/prop). The parent also hit-tests the painted SVG so pressing
+   the character reacts without blocking the transparent space. Unbuilt rigs and "Off" hide the module. */
 const COACH_RIG_DIR = "data/coaches-anim/rigs/";
 const COACH_RIGS = {
   mentor: "animated_mentor_rig.html",
@@ -3499,9 +3499,48 @@ function clearCoachPointer() {
   if (_coachPointerActive) coachSend({ coachCmd: "pointer", value: null });
   _coachPointerActive = false;
 }
+function coachHitTest(x, y) {
+  if (!_coachReady || !_coachFrame || S.reorganize) return false;
+  const rect = _coachFrame.getBoundingClientRect();
+  if (!rect.width || !rect.height || x < rect.left || x >= rect.right || y < rect.top || y >= rect.bottom) return false;
+  try {
+    // Probe the stacking order without letting the otherwise transparent iframe capture input.
+    const previous = _coachFrame.style.pointerEvents;
+    try {
+      _coachFrame.style.pointerEvents = "auto";
+      if (document.elementFromPoint(x, y) !== _coachFrame) return false;
+    } finally { _coachFrame.style.pointerEvents = previous; }
+    // Use the rig's painted SVG shapes; its empty background must still pass clicks through.
+    const target = _coachFrame.contentDocument?.elementFromPoint(
+      (x - rect.left) * _coachFrame.clientWidth / rect.width,
+      (y - rect.top) * _coachFrame.clientHeight / rect.height);
+    return !!target?.closest("#figure");
+  } catch { return false; }
+}
 function bindCoachPointer() {
   if (_coachPointerBound) return;
   _coachPointerBound = true;
+  let pressedPointer = null, suppressClick = false;
+  const consume = ev => { ev.preventDefault(); ev.stopImmediatePropagation(); };
+  document.addEventListener("pointerdown", ev => {
+    if (ev.button !== 0 || ev.isPrimary === false) return;
+    pressedPointer = null; suppressClick = false;
+    if (!coachHitTest(ev.clientX, ev.clientY)) return;
+    pressedPointer = ev.pointerId; suppressClick = true;
+    consume(ev);
+    coachSend({ coachCmd: "shake" });
+  }, true);
+  document.addEventListener("pointerup", ev => {
+    if (pressedPointer === null || ev.pointerId !== pressedPointer) return;
+    pressedPointer = null; consume(ev);
+  }, true);
+  document.addEventListener("click", ev => {
+    if (!suppressClick) return;
+    suppressClick = false; consume(ev);
+  }, true);
+  const cancelPress = () => { pressedPointer = null; suppressClick = false; };
+  document.addEventListener("pointercancel", cancelPress);
+  window.addEventListener("blur", cancelPress);
   document.addEventListener("pointermove", ev => {
     if (ev.pointerType === "touch" || !_coachReady || document.hidden) return;
     _coachPointerPoint = { x: ev.clientX, y: ev.clientY };

@@ -180,3 +180,46 @@ test('nearby cursor tracking is coalesced, scaled and cleared on leave or coach 
   a.state.settings.coach = ''; a.call('renderCoachAvatar');
   move(600, 300); assert.equal(paints.size, 0);
 });
+
+test('pressing the painted coach shakes once and consumes the click; empty space and reorganizing pass through', t => {
+  const a = app(t), ui = coachUI(a); animationClock(a); loadGame(a, '1. e4 e5');
+  const {frame, messages} = mountedCoach(a, ui);
+  frame.getBoundingClientRect = () => ({left:400, top:100, right:550, bottom:300, width:150, height:200});
+  Object.defineProperties(frame, {clientWidth:{value:300},clientHeight:{value:400}});
+  let covered = false;
+  a.dom.window.document.elementFromPoint = () => covered ? ui.canvas : frame;
+  const figure = a.dom.window.document.createElement('div'); figure.id = 'figure';
+  const path = a.dom.window.document.createElement('span'); figure.append(path);
+  const hits = [], child = {elementFromPoint(x, y) { hits.push([x,y]); return x > 80 && x < 220 ? path : null; }};
+  Object.defineProperty(frame, 'contentDocument', {value:child});
+  let beneath = 0;
+  for (const name of ['pointerdown','pointerup','click']) a.dom.window.document.addEventListener(name, () => beneath++);
+  const event = (name, x, button = 0) => {
+    const ev = new a.dom.window.MouseEvent(name, {clientX:x,clientY:160,button,bubbles:true,cancelable:true});
+    Object.defineProperty(ev, 'pointerId', {value:1});
+    a.dom.window.document.dispatchEvent(ev); return ev;
+  };
+  assert.equal(event('pointerdown', 475).defaultPrevented, true);
+  assert.deepEqual(hits.at(-1), [150,120], 'hit testing accounts for portrait scale');
+  assert.equal(event('pointerup', 475).defaultPrevented, true);
+  assert.equal(event('click', 475).defaultPrevented, true);
+  assert.equal(beneath, 0, 'pressing the coach cannot activate a control behind him');
+  assert.equal(messages.filter(m => m.coachCmd === 'shake').length, 1);
+  assert.equal(frame.style.pointerEvents, '', 'hit testing restores click-through behavior');
+  event('pointerdown', 405); event('pointerup', 405); event('click', 405);
+  assert.equal(beneath, 3, 'transparent parts of the portrait preserve underlying controls');
+  a.state.reorganize = true;
+  event('pointerdown', 475); event('pointerup', 475); event('click', 475);
+  assert.equal(beneath, 6, 'layout editing keeps its normal drag interaction');
+  a.state.reorganize = false;
+  event('pointerdown', 475, 2);
+  assert.equal(messages.filter(m => m.coachCmd === 'shake').length, 1, 'right clicks do not shake');
+  event('pointerdown', 475); event('pointercancel', 475); event('click', 405);
+  assert.equal(beneath, 8, 'cancelled touches cannot swallow a later unrelated click');
+  covered = true;
+  const shakes = messages.filter(m => m.coachCmd === 'shake').length;
+  event('pointerdown', 475); event('pointerup', 475); event('click', 475);
+  assert.equal(beneath, 11, 'a settings panel over the coach receives normal input');
+  assert.equal(messages.filter(m => m.coachCmd === 'shake').length, shakes);
+  assert.equal(frame.style.pointerEvents, '');
+});
