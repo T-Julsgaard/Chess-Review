@@ -3697,6 +3697,8 @@ function startCoachIdle() {
   const tick = () => {
     _coachIdleT = setTimeout(() => {
       if (_coachReady && !document.hidden && !_coachPointerActive && performance.now() > _coachGlanceUntil && !_coachTalking) {
+        // His longer vignettes own the head, face and tea until a review reaction interrupts.
+        if (_coachId === "old_soviet") { coachSend({ coachCmd: "ambient" }); tick(); return; }
         coachSend({ coachCmd: "look", value: dirs[Math.floor(Math.random() * dirs.length)] });
         const r = Math.random();
         if (r < 0.10) coachSend({ coachCmd: "nod" });

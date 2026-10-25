@@ -7,7 +7,7 @@ for(const file of fs.readdirSync(new URL('../data/coaches-anim/rigs/',import.met
   test(file+': settled face avoids repeated writes and still responds to emotion and speech',()=>{
     let queue=[],now=0,writes=0;const nodes=new Map(),window={addEventListener(){}};
     const node=id=>{if(!nodes.has(id)){const attrs=new Map();nodes.set(id,{attrs,addEventListener(){},setAttribute(k,v){writes++;attrs.set(k,v);},getAttribute:k=>attrs.has(k)?attrs.get(k):null,removeAttribute:k=>attrs.delete(k),classList:{toggle(){},add(){},remove(){}}});}return nodes.get(id);};
-    const context=vm.createContext({document:{getElementById:node,querySelectorAll:()=>[]},window,
+    const context=vm.createContext({document:{getElementById:node,querySelectorAll:()=>[],addEventListener(){}},window,
       performance:{now:()=>now},requestAnimationFrame:fn=>queue.push(fn),setTimeout(){},clearTimeout(){},setInterval(){},clearInterval(){},console,Math});
     vm.runInContext(fs.readFileSync(new URL('../data/coaches-anim/rigs/'+file,import.meta.url),'utf8'),context);
     const frames=n=>{for(let i=0;i<n;i++){now+=1000/60;const current=queue;queue=[];current.forEach(fn=>fn(now));}};

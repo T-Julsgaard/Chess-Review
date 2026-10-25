@@ -143,6 +143,15 @@ test('a prop gesture finishes before the same prop can be raised again', t => {
   assert.equal(messages.filter(m => m.coachCmd === 'raise').length, 3);
 });
 
+test('Soviet idle ticks delegate to the rig so longer rare animations can finish', t => {
+  const a = app(t), ui = coachUI(a), advance = animationClock(a);
+  loadGame(a, '1. e4 e5');
+  const {messages} = mountedCoach(a, ui);
+  advance(2000); messages.length = 0; advance(20000);
+  assert.ok(messages.some(m => m.coachCmd === 'ambient'));
+  assert.equal(messages.some(m => ['look', 'nod', 'shrug', 'raise', 'eyeRoll'].includes(m.coachCmd)), false);
+});
+
 test('nearby cursor tracking is coalesced, scaled and cleared on leave or coach changes', t => {
   const a = app(t), ui = coachUI(a); animationClock(a);
   loadGame(a, '1. e4 e5');
