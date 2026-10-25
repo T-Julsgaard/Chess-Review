@@ -130,38 +130,20 @@ test('Knockout has no timer and ends immediately on its first wrong move with it
   await w.navigate('puzzles');assert.equal(w.root.querySelector('[data-focus=knockout]').closest('.puzzle-mode').querySelector('.puzzle-mode-record strong').textContent,'2');
 });
 
-test('run dashboard tracks the record target, lost lives and a new personal best as puzzles resolve',async t=>{
-  const {w}=await setup(t);
-  await w.persist(p=>{p.bests.timeAttack=2;});await w.startPuzzleRun('timeAttack');
-  const target=()=>w.root.querySelector('.run-target-copy').textContent;
-  assert.equal(target(),'3 more to a new record');
-  await solve(w);assert.equal(target(),'2 more to a new record');
-  await wrong(w);
-  assert.equal(target(),'2 more to a new record');
-  assert.equal(w.root.querySelector('.run-vitality').getAttribute('aria-label'),'2 of 3 lives remaining');
-  assert.equal(w.root.querySelectorAll('.run-vitality [data-lost=true]').length,1);
-  await solve(w);assert.equal(target(),'1 more to a new record');
-  await solve(w);assert.equal(target(),'New personal best!');
-  assert.equal(w.root.querySelector('.run-record strong').textContent,'3');
-  assert.equal(w.root.querySelector('.run-target-track > span').style.width,'100%');
-});
-
-test('countdown ring and urgency follow the active clock through re-renders without replacing the score',async t=>{
+test('the compact countdown keeps its low-time cue through re-renders without replacing the score',async t=>{
   const {w}=await setup(t);await w.startPuzzleRun('timeAttack');w.run.clock.pause();
   w.run.clock.remainingMs=90000;w.updateClock();
   const score=w.root.querySelector('[data-run-score]');
-  assert.equal(w.root.querySelector('.run-dashboard').style.getPropertyValue('--run-time'),'50%');
-  assert.equal(w.root.querySelector('.run-dashboard').dataset.urgency,'normal');
+  assert.equal(w.root.querySelector('#learn-clock').classList.contains('running-low'),false);
   w.run.clock.remainingMs=29000;w.updateClock();
   assert.equal(w.root.querySelector('[data-run-score]'),score);
   assert.equal(w.root.querySelector('#learn-clock').textContent,'0:29');
-  assert.equal(w.root.querySelector('.run-dashboard').dataset.urgency,'low');
-  assert.equal(w.root.querySelector('.run-countdown .run-metric-label').textContent,'Last 30 seconds');
+  assert.equal(w.root.querySelector('#learn-clock').classList.contains('running-low'),true);
   w.render();
-  assert.equal(w.root.querySelector('.run-dashboard').dataset.urgency,'low');
+  assert.equal(w.root.querySelector('#learn-clock').classList.contains('running-low'),true);
   assert.equal(w.root.querySelector('#learn-clock').textContent,'0:29');
   w.run.clock.remainingMs=0;w.updateClock();
-  assert.equal(w.root.querySelector('.run-dashboard').style.getPropertyValue('--run-time'),'0%');
+  assert.equal(w.root.querySelector('#learn-clock').textContent,'0:00');
 });
 
 for(const mode of ['timeAttack','knockout'])for(const previousBest of [0,10])test(`${mode} keeps its labels and announces the ending on the board ${previousBest?'without':'with'} a personal best`,async t=>{
@@ -170,11 +152,6 @@ for(const mode of ['timeAttack','knockout'])for(const previousBest of [0,10])tes
   await w.startPuzzleRun(mode);
   const title=w.root.querySelector('.puzzle-practice-heading h2').textContent;
   await solve(w);
-  let dismiss;
-  t.mock.method(dom.window,'setTimeout',(fn,delay,...args)=>{
-    if(delay===2800){dismiss=fn;return 0;}
-    return setTimeout(fn,delay,...args);
-  });
   const reason=mode==='timeAttack'?'Time is up':'Out of lives';
   await w.finishChallenge(reason);
   assert.equal(w.root.querySelector('.puzzle-practice-heading h2').textContent,title);
@@ -184,8 +161,7 @@ for(const mode of ['timeAttack','knockout'])for(const previousBest of [0,10])tes
   assert.equal(overlay.querySelector('.puzzle-run-end-title').textContent,'Run over');
   assert.equal(overlay.querySelector('.puzzle-run-end-reason').textContent,reason);
   assert.equal(!!overlay.querySelector('.puzzle-run-end-best'),!previousBest);
-  dismiss();assert.equal(overlay.isConnected,false);assert.equal(w.cancelRunEnd,null);
-  w.render();assert.equal(w.root.querySelector('.puzzle-run-end'),null);
+  w.render();assert.equal(w.root.querySelector('.puzzle-run-end'),overlay,'The final screen survives results redraws');
   await w.replayRunPuzzle(w.result.results[0].id);
   assert.equal(w.root.querySelector('.puzzle-run-end'),null);
   assert.equal(w.root.querySelector('.puzzle-practice-heading h2').textContent,title);
