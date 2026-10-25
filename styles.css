@@ -391,7 +391,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 7px;
   width: 100%;
   min-width: 0;
@@ -409,15 +409,14 @@
   isolation: isolate;
 }
 .learning-workspace .puzzle-mode-button:hover { background: var(--mode-stock); }
-.mode-ticket-label { position: absolute; top: 12px; left: 12px; right: 12px; font-size: 8px; font-weight: 750; letter-spacing: 1.2px; line-height: 1.3; }
-.puzzle-mode-art { align-self: center; width: 108px; max-width: 100%; height: 82px; margin-top: 13px; overflow: visible; }
+.mode-ticket-label { font-size: 8px; font-weight: 750; letter-spacing: 1.2px; line-height: 1.3; }
+.puzzle-mode-art { align-self: center; width: 108px; max-width: 100%; height: 82px; min-height: 0; overflow: visible; }
 .puzzle-mode-name { display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 750; letter-spacing: -.35px; line-height: 1.25; }
-.puzzle-mode-info { display: flex; flex: 1; flex-direction: column; text-align: center; position: relative; padding: 0 12px 10px; border-top: 1px dashed color-mix(in srgb,var(--mode-stock) 35%,var(--line)); }
+.puzzle-mode-info { display: flex; flex: 1; flex-direction: column; text-align: center; position: relative; padding: 10px 12px; border-top: 1px dashed color-mix(in srgb,var(--mode-stock) 35%,var(--line)); }
 .puzzle-mode-info::before,.puzzle-mode-info::after { content: ''; position: absolute; top: -4px; width: 7px; height: 7px; background: var(--bg); border: 1px solid var(--line); border-radius: 50%; }
 .puzzle-mode-info::before { left: -5px; }
 .puzzle-mode-info::after { right: -5px; }
-.puzzle-mode-description { margin: 10px 0; color: var(--ink-2); font-size: 11px; line-height: 1.5; }
-.puzzle-mode-record { display: flex; align-items: center; margin-top: auto; border-top: 1px solid var(--line); color: var(--ink-2); line-height: 1.4; flex-direction: row; justify-content: space-between; gap: 6px; padding: 8px 0 0; font-size: 10px; text-align: left; }
+.puzzle-mode-record { display: flex; align-items: center; margin-top: auto; color: var(--ink-2); line-height: 1.4; flex-direction: row; justify-content: space-between; gap: 6px; font-size: 10px; text-align: left; }
 .puzzle-mode-record strong { color: var(--ink); font-size: 22px; font-weight: 650; font-variant-numeric: tabular-nums; line-height: 1; }
 .mode-piece,.mode-timer,.mode-crown,.mode-speed-lines { transform-box: fill-box; transform-origin: center; transition: transform .35s cubic-bezier(.2,.8,.2,1); }
 .puzzle-mode:has(.puzzle-mode-button:focus-visible) { outline: 2px solid var(--ink); outline-offset: 4px; }
@@ -433,10 +432,9 @@
 @media (max-width: 420px) {
   .puzzle-mode-grid { gap: 7px; }
   .learning-workspace .puzzle-mode-button { padding: 10px 8px 12px; height: 148px; min-height: 148px; }
-  .mode-ticket-label { left: 8px; right: 8px; font-size: 7px; letter-spacing: .6px; }
+  .mode-ticket-label { font-size: 7px; letter-spacing: .6px; }
   .puzzle-mode-name { min-height: 30px; font-size: 12px; }
   .puzzle-mode-info { padding-inline: 8px; }
-  .puzzle-mode-description { font-size: 10px; }
   .puzzle-mode-record { flex-direction: column-reverse; gap: 5px; text-align: center; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -490,7 +488,7 @@
 .puzzle-count-display { display: grid; place-items: center; margin-top: 12px; }
 .puzzle-run-start-count { display: grid; place-items: center; width: 100%; height: 100%; box-sizing: border-box; visibility: hidden; color: #fff; font-size: inherit; }
 .puzzle-run-start[data-step="Go!"] { pointer-events: none; animation: puzzle-run-start-go .6s ease-in both; }
-.puzzle-run-start .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.puzzle-run-start .sr-only,.puzzle-mode-info .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @keyframes puzzle-run-start-arrive { from { opacity: 0; } to { opacity: 1; } }
 @keyframes puzzle-run-start-go { 0%,33% { opacity: 1; } 100% { opacity: 0; } }
 .puzzle-run-start[data-motion="off"], .puzzle-run-start[data-motion="off"] *, .learning-workspace[data-motion="off"] .puzzle-run-start, .learning-workspace[data-motion="off"] .puzzle-run-start * { animation: none !important; }
