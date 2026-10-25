@@ -6,7 +6,14 @@ import { app, loadGame, settle } from './helpers/app.mjs';
 const exportedLayout = JSON.parse(fs.readFileSync(new URL('./fixtures/default-panel-layout.json', import.meta.url), 'utf8'));
 
 function layout(t, initialZoom = 1, defaultZoom = 1) {
-  const a = app(t); loadGame(a, '1. e4 e5');
+  const a = app(t);
+  // Model the CSS row metrics that determine Accuracy's collapsed footprint.
+  Object.defineProperty(a.dom.window.HTMLElement.prototype, 'offsetHeight', {
+    configurable: true, get() { return this.classList.contains('qbreak-row') ? 22 : 0; },
+  });
+  const getStyle = a.context.getComputedStyle;
+  a.context.getComputedStyle = node => node.classList.contains('qbreak') ? { rowGap: '7px' } : getStyle(node);
+  loadGame(a, '1. e4 e5');
   a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
   let zoom = initialZoom, size;
   const syncViewport = () => {
@@ -32,10 +39,23 @@ function layout(t, initialZoom = 1, defaultZoom = 1) {
 test('Full HD fits the default panels without drifting on reopen or a zoom resize event', async t => {
   const a = layout(t); a.viewport(1920, 920);
   await a.call('initTabZoom');
-  assert.equal(a.zoom(), .85); assert.equal(a.desktop(), true);
+  assert.equal(a.zoom(), .87); assert.equal(a.desktop(), true);
   a.viewport(1920, 920); await a.call('fitTabZoom');
   await a.call('initTabZoom');
-  assert.deepEqual(a.changes, [.85]);
+  assert.deepEqual(a.changes, [.87]);
+});
+
+test('Reset restores the exported 87% composition from the reported 85% viewport', async t => {
+  const a = layout(t, .85);
+  a.viewport(1919, 919); // 2258 × 1081 CSS pixels at the reported 85% browser zoom.
+  await a.call('initTabZoom');
+  assert.equal(a.zoom(), .87);
+  assert.equal(a.context.innerWidth, exportedLayout.viewport.width);
+  assert.equal(a.context.innerHeight, exportedLayout.viewport.height);
+  a.call('toggleReorganize');
+  await a.call('resetLayout');
+  assert.equal(a.zoom(), .87);
+  assert.deepEqual(a.changes, [.87]);
 });
 
 test('desktop fits laptop windows, then restores the responsive layout when narrowed', async t => {
@@ -43,13 +63,13 @@ test('desktop fits laptop windows, then restores the responsive layout when narr
   for (const [w,h] of [[1366,648], [1536,744], [1280,600], [2560,1320]]) {
     a.viewport(w,h); await a.call('fitTabZoom');
     assert.equal(a.desktop(), true);
-    const page = a.call('layoutPageSize', a.run('DEFAULT_LAYOUT'));
+    const page = a.call('layoutPageSize', a.call('collapsedAccuracyLayout', a.run('DEFAULT_LAYOUT')));
     assert.ok(page.pageW * a.zoom() <= w && page.pageH * a.zoom() <= h);
   }
   a.viewport(768,900); await a.call('fitTabZoom');
   assert.equal(a.desktop(), false); assert.equal(a.zoom(),1);
   a.viewport(1920,920); await a.call('fitTabZoom');
-  assert.equal(a.desktop(),true); assert.equal(a.zoom(),.85);
+  assert.equal(a.desktop(),true); assert.equal(a.zoom(),.87);
 });
 
 // Reported display resolutions, including 16:9, 16:10, and 1470 × 956.
@@ -66,11 +86,12 @@ for (const [width, height] of REPORTED_DISPLAYS) {
         const a = layout(t, mode === 'custom' ? 1.25 : .9);
         a.state.layoutMode = mode;
         a.call('applyLayoutMode');
+        if (mode === 'custom') a.call('reflowAccuracy', false);
         const viewportHeight = height - chromeHeight;
         a.viewport(width, viewportHeight);
         await a.call('initTabZoom');
         const zoom = a.zoom();
-        const page = a.call('layoutPageSize', a.state.layout);
+        const page = a.call('layoutPageSize', mode === 'auto' ? a.call('collapsedAccuracyLayout', a.state.layout) : a.state.layout);
         assert.equal(a.desktop(), mode === 'auto');
         assert.ok(page.pageW * zoom <= width, `${mode}: horizontal overflow`);
         assert.ok(page.pageH * zoom <= viewportHeight, `${mode}: vertical overflow`);
@@ -175,14 +196,14 @@ test('Reorganize preserves exact desktop boxes and zoom through repeated resets'
     const before = geometry();
     a.call('toggleReorganize'); await settle();
     assert.deepEqual(geometry(), before);
-    assert.equal(a.zoom(), .85);
+    assert.equal(a.zoom(), .87);
     assert.deepEqual(structuredClone(a.call('layoutForSave')), defaults);
     a.call('resetLayout'); await settle();
     assert.deepEqual(geometry(), before);
-    assert.equal(a.zoom(), .85);
+    assert.equal(a.zoom(), .87);
     assert.equal(a.state.reorganize, false);
   }
-  assert.deepEqual(a.changes, [.85]);
+  assert.deepEqual(a.changes, [.87]);
 });
 
 test('settings stays right-aligned through visual and layout resets', async t => {
@@ -205,12 +226,12 @@ test('settings stays right-aligned through visual and layout resets', async t =>
 
 test('saved desktop layouts reopen at the reset scale across typical screen sizes', async t => {
   for (const [w, h, initial, expected] of [
-    [1280, 600, 1.25, .55], [1366, 648, .91, .60], [1536, 744, 1, .69],
-    [1920, 916, .91, .85], [1920, 920, .89, .85],
-    [2560, 1320, 1.25, 1.23], [3840, 2040, 2, 1.90],
+    [1280, 600, 1.25, .56], [1366, 648, .91, .61], [1536, 744, 1, .70],
+    [1920, 916, .91, .86], [1920, 920, .89, .87],
+    [2560, 1320, 1.25, 1.25], [3840, 2040, 2, 1.93],
   ]) {
     const a = layout(t, initial);
-    a.state.layoutMode = 'custom'; a.call('applyLayoutMode');
+    a.state.layoutMode = 'custom'; a.call('applyLayoutMode'); a.call('reflowAccuracy', false);
     a.viewport(w, h); await a.call('initTabZoom');
     assert.equal(a.zoom(), expected, `${w} × ${h} saved layout`);
     for (let i = 0; i < 3; i++) {
@@ -234,11 +255,30 @@ test('reset refits automatic layout after manual zoom and concurrent initializat
     await settle(); await setZoom(...args); active--;
   };
   await Promise.all([a.call('initTabZoom'), a.call('initTabZoom'), a.call('fitTabZoom')]);
-  assert.equal(scopes, 1); assert.deepEqual(a.changes, [.85]);
+  assert.equal(scopes, 1); assert.deepEqual(a.changes, [.86]);
   await tabs.setZoom(7, .91);
   await a.call('fitTabZoom'); assert.equal(a.zoom(), .91);
   await a.call('resetLayout');
-  assert.equal(a.zoom(), .85); assert.equal(scopes, 1);
+  assert.equal(a.zoom(), .86); assert.equal(scopes, 1);
+});
+
+test('Reset starts saving defaults immediately and completes only after storage confirms them', async t => {
+  const a = layout(t); a.viewport(1920, 920); await a.call('initTabZoom');
+  a.state.layoutMode = 'custom';
+  a.state.layout.board.x += 100;
+  a.call('saveLayout'); // A pending drag save must not overwrite the reset later.
+  let requested, confirm;
+  const saved = new Promise(resolve => { confirm = resolve; });
+  a.context.browserAPI.storage.local.set = values => { requested = structuredClone(values); return saved; };
+  let completed = false;
+  const reset = a.call('resetLayout').then(() => { completed = true; });
+  assert.deepEqual(requested.layout, exportedLayout.layout, 'Reload must not race a debounced save');
+  assert.equal(requested.layoutMode, 'auto');
+  assert.equal(requested.layoutVersion, a.run('LAYOUT_VERSION'));
+  await settle();
+  assert.equal(completed, false, 'Reset must wait for durable storage');
+  confirm(); await reset;
+  assert.equal(completed, true);
 });
 
 test('failed zoom writes can be retried at the same window size', async t => {
@@ -248,7 +288,7 @@ test('failed zoom writes can be retried at the same window size', async t => {
   await a.call('initTabZoom');
   tabs.setZoom = setZoom;
   await a.call('fitTabZoom');
-  assert.equal(a.zoom(), .85);
+  assert.equal(a.zoom(), .86);
 });
 
 test('narrow windows use the browser default zoom, even with a nonstandard default', async t => {
@@ -256,7 +296,7 @@ test('narrow windows use the browser default zoom, even with a nonstandard defau
   await a.call('initTabZoom');
   assert.equal(a.desktop(), false); assert.equal(a.zoom(), 1.25);
   a.viewport(1920, 916); await a.call('fitTabZoom');
-  assert.equal(a.desktop(), true); assert.equal(a.zoom(), .85);
+  assert.equal(a.desktop(), true); assert.equal(a.zoom(), .86);
 });
 
 test('small custom canvases retain their own bounds instead of inheriting desktop width', async t => {

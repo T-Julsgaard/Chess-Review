@@ -1761,9 +1761,11 @@ function layoutForSave() {
   for (const k of belowKeys) if (out[k]) out[k].y += delta;
   return out;
 }
-function saveLayout() {
+function saveLayout(immediate = false) {
   clearTimeout(_saveLayoutT);
-  _saveLayoutT = setTimeout(() => browserAPI.storage.local.set({ layout: layoutForSave(), layoutMode: S.layoutMode, layoutVersion: LAYOUT_VERSION }), 250);
+  const persist = () => browserAPI.storage.local.set({ layout: layoutForSave(), layoutMode: S.layoutMode, layoutVersion: LAYOUT_VERSION });
+  if (immediate) return persist();
+  _saveLayoutT = setTimeout(persist, 250);
 }
 // "auto" = the responsive layout in styles.css, which fits any window. "custom" = the free canvas the
 // user arranged in Reorganize mode, placed from S.layout and zoomed to fit the window.
@@ -1829,17 +1831,11 @@ function applyLayout() {
   UI.canvas.classList.add("no-concepts");
   const custom = isCustomLayout();
   const desktop = !custom && UI.canvas.classList.contains("desktop-layout");
-  const collapse = desktop && !S.qbreakExpanded ? accuracyReflowInfo(DEFAULT_LAYOUT) : null;
+  const boxes = custom ? S.layout : desktop ? (S.qbreakExpanded ? DEFAULT_LAYOUT : collapsedAccuracyLayout(DEFAULT_LAYOUT)) : null;
   UI.canvas.style.setProperty("--desktop-width", layoutPageSize(DEFAULT_LAYOUT).pageW + "px");
   for (const mod of UI.canvas.querySelectorAll(".mod")) {
     const key = mod.getAttribute("data-mod");
-    const source = custom ? S.layout[key] : desktop ? DEFAULT_LAYOUT[key] : null;
-    const b = source && { ...source };
-    if (b && collapse) {
-      if (key === "accuracy") b.h = Math.max(MINH, b.h - collapse.delta);
-      if (collapse.belowKeys.includes(key)) b.y = Math.max(0, b.y - collapse.delta);
-    }
-    applyPanelBox(mod,b);
+    applyPanelBox(mod, boxes?.[key]);
   }
   fitEnginePanel();
   requestAnimationFrame(positionSettings);
@@ -1901,6 +1897,13 @@ function accuracyReflowInfo(layout = S.layout) {
     if (overlapX && o.y >= acc.y + acc.h - 1) belowKeys.push(k);
   }
   return { delta, belowKeys };
+}
+function collapsedAccuracyLayout(layout) {
+  if (!layout.accuracy) return layout;
+  const out = structuredClone(layout), { delta, belowKeys } = accuracyReflowInfo(layout);
+  out.accuracy.h = Math.max(MINH * panelScale(out.accuracy), out.accuracy.h - delta);
+  for (const key of belowKeys) out[key].y = Math.max(0, out[key].y - delta);
+  return out;
 }
 // Keep the Accuracy module and everything stacked below it glued together when the category list
 // expands/collapses on the custom canvas (the automatic layout reflows on its own). The saved
@@ -1980,16 +1983,17 @@ function makeMovable(mod, handle, grips, key) {
   for(const dir of ['e','s','se'])grips[dir].addEventListener('pointerdown',begin(dir,grips[dir]));
 }
 // Back to the automatic layout and its window-dependent fit.
-function resetLayout() {
+async function resetLayout() {
   cancelPanelGesture?.();
   S._accReflow = null;   // drop any collapse offset so the fresh layout isn't double-adjusted
   S.layout = structuredClone(DEFAULT_LAYOUT);
   S.layoutMode = "auto";
   if (S.reorganize) toggleReorganize();
   applyLayoutMode();
-  saveLayout();
+  // Reset is a committed action: a reload must not cancel a pending debounce.
+  const saved = saveLayout(true);
   requestAnimationFrame(alignPlayers);
-  return initTabZoom();
+  await Promise.all([saved, initTabZoom()]);
 }
 // Reorganize mode: while ON, panels can be dragged/resized (handles + grips appear); while OFF
 // they're locked and hover shows nothing. The arranged layout auto-saves and persists. Entering it
@@ -4888,7 +4892,7 @@ async function resetVisualSettings() {
   S.coach = null;
   _ipSig = null;
   if (S.practice) S.practice.coachTyped = false;
-  resetLayout();
+  await resetLayout();
   applySettings(); buildBoard(); renderEvalBar(); renderGraph(); renderMoves();
   renderCoachAvatar(); renderReview(); renderStats(); renderControls();
   renderSettings();
@@ -6564,18 +6568,19 @@ function desktopLayoutFor(dipW, dipH) {
   return dipW / _defaultZoom >= 1100 && dipH / _defaultZoom >= 520;
 }
 function desktopZoomFor(dipW, dipH) {
-  return fittedZoomFor(DEFAULT_LAYOUT, dipW, dipH);
+  // The export was arranged with Accuracy collapsed. Fitting its hidden rows
+  // shrinks the whole page, turning the intended 87% into 85% on Full HD.
+  return fittedZoomFor(collapsedAccuracyLayout(DEFAULT_LAYOUT), dipW, dipH);
 }
 function layoutPageSize(layout) {
   const { maxR, maxB } = layoutExtent(layout);
-  const defaults = layoutExtent(DEFAULT_LAYOUT);
-  const desktopSized = maxR >= defaults.maxR && maxB >= defaults.maxB;
-  // Keep the desktop's breathing room on default-sized saved canvases too. Previously a snapshot
-  // reopened against 1818 × 1006, while Reset fitted 1832 × 1020 (91% versus 89%).
-  // Smaller arrangements (including snapshots of the narrow responsive grid) retain
-  // their own extent, so unlocking one never creates a desktop-width canvas.
+  const defaults = layoutExtent(collapsedAccuracyLayout(DEFAULT_LAYOUT));
+  const desktopSized = maxR >= defaults.maxR - .02 && maxB >= defaults.maxB - .02;
+  // Preserve the exported desktop's breathing room (1056px viewport, including
+  // the 2px fit allowance) on reset and saved canvases. Allow CSS rounding when
+  // recognizing a desktop snapshot; smaller arrangements keep their own bounds.
   return { pageW: Math.max(desktopSized ? 1832 : 0, maxR + CANVAS_MARGIN),
-    pageH: Math.max(desktopSized ? 1020 : 0, TOPBAR_H + maxB + CANVAS_MARGIN) };
+    pageH: Math.max(desktopSized ? 1054 : 0, TOPBAR_H + maxB + CANVAS_MARGIN) };
 }
 function fittedZoomFor(layout, dipW, dipH) {
   const { pageW, pageH } = layoutPageSize(layout);
@@ -6583,7 +6588,7 @@ function fittedZoomFor(layout, dipW, dipH) {
     Math.floor(Math.min((dipW - 2) / pageW, (dipH - 2) / pageH) * 100) / 100));
 }
 function targetZoomFor(dipW, dipH) {
-  return fittedZoomFor(S.layout, dipW, dipH);
+  return fittedZoomFor(S.qbreakExpanded ? collapsedAccuracyLayout(S.layout) : S.layout, dipW, dipH);
 }
 function fitTabZoom(force = false) {
   // A reset can overlap a resize or startup. Never pair an old getZoom result

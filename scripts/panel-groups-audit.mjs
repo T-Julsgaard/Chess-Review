@@ -5,12 +5,22 @@ import assert from 'node:assert/strict';
 export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const run=expression=>evaluate(review,expression),near=(a,b)=>assert.ok(Math.abs(a-b)<1,`${a} must match ${b}`);
   const expected=JSON.parse(await fs.readFile(new URL('../tests/fixtures/default-panel-layout.json',import.meta.url),'utf8'));
-  const defaults=await run("import('./analysis.js').then(m=>({layout:m.S.layout,boxes:Object.fromEntries([...document.querySelectorAll('.mod')].map(n=>[n.dataset.mod,{x:parseFloat(n.style.left),y:parseFloat(n.style.top),w:parseFloat(n.style.width),h:parseFloat(n.style.height),transform:n.querySelector('.mod-inner').style.transform}]))}))");
-  assert.deepEqual(defaults.layout,expected.layout);
-  for(const [key,box] of Object.entries(expected.displayedLayout)){
-    for(const prop of ['x','y','w','h'])near(defaults.boxes[key][prop],box[prop]);
-    assert.ok(Math.abs(parseFloat(defaults.boxes[key].transform.slice(6))-box.scale)<1e-5);
-  }
+  // Reproduce the reported 2258 × 1081 CSS viewport at 85%: 1919 × 919 DIP.
+  const initial=await run('(async()=>({outerW:outerWidth,outerH:outerHeight,w:innerWidth,h:innerHeight,zoom:await chrome.tabs.getZoom()}))()');
+  const {windowId}=await call('Browser.getWindowForTarget',{targetId:review.targetId});
+  await call('Browser.setWindowBounds',{windowId,bounds:{width:initial.outerW+1919-Math.round(initial.w*initial.zoom),height:initial.outerH+919-Math.round(initial.h*initial.zoom)}});
+  await waitFor(review,"chrome.tabs.getZoom().then(z=>Math.abs(z-.87)<.005)",'Original exported zoom');
+  const checkDefaults=async()=>{
+    const defaults=await run("import('./analysis.js').then(async m=>({mode:m.S.layoutMode,layout:m.S.layout,zoom:await chrome.tabs.getZoom(),boxes:Object.fromEntries([...document.querySelectorAll('.mod')].map(n=>[n.dataset.mod,{x:parseFloat(n.style.left),y:parseFloat(n.style.top),w:parseFloat(n.style.width),h:parseFloat(n.style.height),transform:n.querySelector('.mod-inner').style.transform}]))}))");
+    assert.equal(defaults.mode,'auto');
+    assert.equal(defaults.zoom,.87);
+    assert.deepEqual(defaults.layout,expected.layout);
+    for(const [key,box] of Object.entries(expected.displayedLayout)){
+      for(const prop of ['x','y','w','h'])near(defaults.boxes[key][prop],box[prop]);
+      assert.ok(Math.abs(parseFloat(defaults.boxes[key].transform.slice(6))-box.scale)<1e-5);
+    }
+  };
+  await checkDefaults();
   const defaultShot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
   await fs.writeFile(path.join(out,'default-panels.png'),Buffer.from(defaultShot.data,'base64'));
   const rect=selector=>run(`(()=>{const r=document.querySelector('${selector}').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};})()`);
@@ -50,5 +60,11 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   for(const key of start.keys)for(const value of ['x','y','w','h','scale'])near(changed[key][value],moved[key][value]);
   const transform=await run("document.querySelector('[data-mod=moves] .mod-inner').style.transform");
   assert.ok(Math.abs(parseFloat(transform.slice(6))-changed.moves.scale)<1e-5);
-  console.log('Real group move/scale, unchanged board, scaled content, JSON download and reload checks passed. Artifacts: '+out);
+  const reset=await run("(async()=>{document.querySelector('[aria-label=Settings]').click();[...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Layout').click();[...document.querySelectorAll('.set-reset')].find(n=>n.textContent==='Reset layout').click();return chrome.storage.local.get(['layout','layoutMode']);})()");
+  assert.equal(reset.layoutMode,'auto');
+  assert.deepEqual(reset.layout,expected.layout);
+  await call('Page.reload',{},review.sessionId);
+  await waitFor(review,"!!document.querySelector('.board')&&import('./analysis.js').then(m=>!m.S.analyzing)",'Reloaded default layout');
+  await checkDefaults();
+  console.log('Default placements, real group move/scale, JSON export, saved reload, Reset layout and reset reload checks passed. Artifacts: '+out);
 }
