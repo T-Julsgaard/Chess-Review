@@ -9,6 +9,7 @@ async function setup(t) {
   const original=globalThis.fetch;globalThis.fetch=async()=>({ok:true,json:async()=>({schema:1,puzzles:[{}]})});
   t.after(()=>{globalThis.fetch=original;});
   await a.call('openLearning');const w=a.run('learningWorkspace'),doc=a.dom.window.document;
+  t.mock.method(w,'showPuzzleRunStart',async()=>true); // Exercise input after the ready countdown.
   const puzzle={id:'board-input',fen:new Chess().fen(),solution:['e2e4','e7e5','g1f3','b8c6','f1c4'],rating:1200,themes:[]};
   w.puzzles=[puzzle];await w.startPuzzleSelection([puzzle]);
   const board=doc.querySelector('.board');board.getBoundingClientRect=()=>({left:0,top:0,width:800,height:800});

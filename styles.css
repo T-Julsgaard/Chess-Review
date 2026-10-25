@@ -410,6 +410,21 @@
 @keyframes puzzle-run-end-king { 0%,20% { transform: rotate(0); } 75% { transform: rotate(-64deg); } 100% { transform: rotate(-55deg); } }
 .puzzle-run-end[data-motion="off"], .puzzle-run-end[data-motion="off"] * { animation: none; }
 @media (prefers-reduced-motion: reduce) { .puzzle-run-end, .puzzle-run-end * { animation: none; } }
+.puzzle-run-start { position: absolute; inset: 0; z-index: 12; display: grid; place-items: center; padding: 16px; box-sizing: border-box; border-radius: inherit; background: #10151be8; color: #fff; cursor: wait; animation: puzzle-run-start-arrive .25s ease both; }
+.puzzle-run-start-card { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.puzzle-run-start-title { font-size: clamp(24px,4vw,42px); line-height: 1.15; font-weight: 700; letter-spacing: -.5px; }
+.puzzle-run-start-copy { color: #d3dae4; font-size: clamp(13px,2vw,17px); }
+.puzzle-run-start-count { display: grid; place-items: center; width: 1.65em; height: 1.65em; margin-top: 12px; border: 2px solid #a7e5a066; border-radius: 50%; background: #a7e5a00d; color: #b8efb2; font-size: clamp(40px,8vw,76px); line-height: 1; font-variant-numeric: tabular-nums; }
+.puzzle-run-start[data-step="3"] .puzzle-run-start-count, .puzzle-run-start[data-step="2"] .puzzle-run-start-count, .puzzle-run-start[data-step="1"] .puzzle-run-start-count { animation: puzzle-run-start-beat-a 1s ease-out both; }
+.puzzle-run-start[data-step="2"] .puzzle-run-start-count { animation-name: puzzle-run-start-beat-b; }
+.puzzle-run-start[data-step="Go!"] { pointer-events: none; animation: puzzle-run-start-go .3s ease-in both; }
+.puzzle-run-start .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@keyframes puzzle-run-start-arrive { from { opacity: 0; } to { opacity: 1; } }
+@keyframes puzzle-run-start-beat-a { from { transform: scale(1.12); border-color: #b8efb2; } to { transform: scale(1); border-color: #a7e5a066; } }
+@keyframes puzzle-run-start-beat-b { from { transform: scale(1.12); border-color: #b8efb2; } to { transform: scale(1); border-color: #a7e5a066; } }
+@keyframes puzzle-run-start-go { from { opacity: 1; } to { opacity: 0; } }
+.puzzle-run-start[data-motion="off"], .puzzle-run-start[data-motion="off"] *, .learning-workspace[data-motion="off"] .puzzle-run-start, .learning-workspace[data-motion="off"] .puzzle-run-start * { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .puzzle-run-start, .puzzle-run-start * { animation: none !important; } }
 .learning-workspace .puzzle-run-results > [data-focus="run-again"] { justify-self: start; width: auto; padding-inline: 24px; }
 @media (max-width: 420px) {
   .puzzle-mode-grid { gap: 6px; }

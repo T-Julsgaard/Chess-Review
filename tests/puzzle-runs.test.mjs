@@ -16,6 +16,7 @@ async function setup(t,{puzzles=fixtures,initial={}}={}) {
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles})}));
   const storage={async get(key){return {[key]:structuredClone(data[key])};},async set(values){if(state.fail)throw Error('Unavailable');Object.assign(data,structuredClone(values));}};
   const w=new LearningWorkspace({document:dom.window.document,storage,settings:()=>({moveAnim:false}),makePiece:()=>dom.window.document.createElement('span')});
+  t.mock.method(w,'showPuzzleRunStart',async()=>true); // Countdown timing has dedicated coverage.
   t.after(async()=>{state.fail=false;await w.close();dom.window.close();});await w.open();
   return {w,dom,data,state};
 }
