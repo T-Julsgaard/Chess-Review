@@ -33,13 +33,14 @@ async function setup(t,mode='practice',p=puzzle) {
 for(const mode of ['practice','timeAttack','knockout','challenge'])test(`${mode} arrows review the opening capture and each accepted ply without changing the solve`,async t=>{
   const {w,data,sounds,key}=await setup(t,mode),run=w.run;
   const saved=structuredClone(data['learning:v1']),activity=structuredClone(w.activity),thinking=w.puzzleThinkingAt;
+  const cue=w.root.querySelector('.puzzle-turn-cue');
   w.root.querySelector('[data-square=d5]').focus();
   assert.equal(key('ArrowLeft').defaultPrevented,true);
   assert.equal(w.currentFen(),before.fen());
   assert.equal(w.root.querySelector('[data-square=d5] img').dataset.piece,'wP');
   assert.equal(w.root.querySelector('[data-square=d8] img').dataset.piece,'bQ');
   assert.equal(w.root.querySelector('.last-move, .puzzle-result-badge, .puzzle-hint-arrow'),null);
-  assert.match(w.root.querySelector('.puzzle-practice-status').textContent,/Earlier position/);
+  assert.equal(w.root.querySelector('.puzzle-turn-cue'),cue);assert.equal(cue.textContent,'White to move');
   assert.equal(w.doc.activeElement,w.root);
   assert.deepEqual(w.activity,activity);assert.deepEqual(data['learning:v1'],saved);
   assert.equal(w.puzzleThinkingAt,thinking);assert.equal(w.run,run);
@@ -50,18 +51,21 @@ for(const mode of ['practice','timeAttack','knockout','challenge'])test(`${mode}
   key('ArrowUp');key('ArrowDown');assert.equal(w.currentFen(),before.fen());
   key('ArrowRight');assert.equal(w.currentFen(),puzzle.fen);assert.equal(w.puzzleHistoryIndex,null);
   assert.equal(w.root.querySelector('[data-square=d5] img').dataset.piece,'bQ');
-  assert.deepEqual(sounds,['Qxd5']);
+  assert.deepEqual(sounds,['Qxd5','Qxd5','Qxd5']);
 
   await w.submitPuzzle('b1c3');
   assert.equal(w.activity.step,2);
   const latest=w.currentFen(),progress=structuredClone(w.store.value),moves=[...w.puzzleMoves],last=w.lastMove;
   const afterPlayer=new Chess(puzzle.fen);afterPlayer.move('Nc3');
+  sounds.length=0;
   key('ArrowLeft');assert.equal(w.currentFen(),afterPlayer.fen());
   assert.equal(w.root.querySelector('[data-square=c3]').classList.contains('last-move'),true);
   key('ArrowLeft');assert.equal(w.currentFen(),puzzle.fen);
   key('Home');assert.equal(w.currentFen(),before.fen());
   key('End');assert.equal(w.currentFen(),latest);
   key('ArrowRight');assert.equal(w.currentFen(),latest);
+  assert.deepEqual(sounds,['Qa5','Nc3','Qxd5','Qa5']);
+  assert.equal(w.root.querySelector('.puzzle-turn-cue'),cue);assert.equal(cue.textContent,'White to move');
   assert.deepEqual(w.store.value,progress);assert.deepEqual(w.puzzleMoves,moves);
   assert.equal(w.lastMove,last);assert.equal(w.activity.step,2);
   assert.equal(w.run?.correctMoves,mode==='practice'?undefined:1);
@@ -86,6 +90,15 @@ test('history keys respect inputs, settings, modifier keys and an open dropdown'
   const settings=w.doc.createElement('div');settings.id='settings';const button=w.doc.createElement('button');settings.append(button);w.root.append(settings);button.focus();
   assert.equal(key('ArrowLeft').defaultPrevented,false);assert.equal(w.currentFen(),puzzle.fen);
   w.root.focus();w.dropdown={};key('ArrowLeft');assert.equal(w.currentFen(),puzzle.fen);w.dropdown=null;
+});
+
+for(const mode of ['practice','timeAttack','knockout','challenge'])test(`${mode} keeps the Black solver cue while viewing the opponent opening move`,async t=>{
+  const c=new Chess(),fen=c.fen();c.move('e4');
+  const p={...puzzle,fen:c.fen(),setup:{fen,move:'e2e4'},solution:['e7e5','g1f3','b8c6']};
+  const {w,key}=await setup(t,mode,p),cue=w.root.querySelector('.puzzle-turn-cue');
+  key('ArrowLeft');assert.equal(w.currentFen(),fen);
+  assert.equal(w.root.querySelector('.puzzle-turn-cue'),cue);assert.equal(cue.textContent,'Black to move');
+  key('ArrowRight');assert.equal(w.root.querySelector('.puzzle-turn-cue'),cue);assert.equal(cue.textContent,'Black to move');
 });
 
 test('pending opponent replies finish before history navigation, and a new puzzle resets history',async t=>{
@@ -147,20 +160,27 @@ for(const [name,fen,move,answer] of [
 ])test(`opening ${name} restores the exact position and all pieces when stepping back`,async t=>{
   const c=new Chess(fen);c.move({from:move.slice(0,2),to:move.slice(2,4),promotion:move[4]});
   const p={...puzzle,setup:{fen,move},fen:c.fen(),solution:[answer]};
-  const {w,key}=await setup(t,'practice',p);
+  const {w,key,sounds}=await setup(t,'practice',p);
   key('ArrowLeft');assert.equal(w.currentFen(),fen);
   key('ArrowRight');assert.equal(w.currentFen(),p.fen);
+  assert.deepEqual(sounds,[c.history()[0],c.history()[0],c.history()[0]]);
 });
 
 test('embedded puzzle history updates the shared board without changing game review',async t=>{
   const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
+  const sounds=[];a.state.settings.sound=true;a.replace('playEvent',event=>sounds.push(event));
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[puzzle]})}));
   await a.call('openLearning');const w=a.run('learningWorkspace');t.after(()=>w.close());
   await w.startPuzzleSelection([puzzle]);
+  sounds.length=0;
   const board=w.boardElement,positions=JSON.stringify(a.state.positions),idx=a.state.idx;
   board.querySelector('[data-square=d5]').focus();
   a.dom.window.document.activeElement.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'ArrowLeft',bubbles:true,cancelable:true}));
   assert.equal(w.currentFen(),before.fen());assert.equal(board.querySelector('[data-square=d5] img').dataset.piece,'wP');
   assert.equal(w.boardElement,board);assert.equal(a.state.idx,idx);assert.equal(JSON.stringify(a.state.positions),positions);
   assert.equal(a.dom.window.document.activeElement,w.root);assert.equal(a.state.analysisMode,false);
+  assert.deepEqual(sounds,['capture']);
+  w.stepPuzzleHistory(1);assert.deepEqual(sounds,['capture','capture']);
+  a.state.settings.sound=false;
+  w.stepPuzzleHistory(0);w.stepPuzzleHistory(1);assert.deepEqual(sounds,['capture','capture']);
 });
