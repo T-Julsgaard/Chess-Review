@@ -1682,7 +1682,7 @@ async function openLearning() {
   UI.settings.hidden = true;
   hideBoardBadgeTip();
   learningWorkspace = new LearningWorkspace({document, storage:browserAPI.storage.local, makePiece, url:_url,
-    settings:()=>S.settings, flipped:S.flipped, book:()=>BOOK || {}, onPuzzleWrong:playWrongSound, onPuzzleMove:playSanSound, onOpeningMove:playSanSound, onFreeMove:playSanSound, onPuzzleSuccess:playPuzzleSuccess,
+    settings:()=>S.settings, flipped:S.flipped, book:()=>BOOK || {}, startDrag, onPuzzleWrong:playWrongSound, onPuzzleMove:playSanSound, onOpeningMove:playSanSound, onFreeMove:playSanSound, onPuzzleSuccess:playPuzzleSuccess,
     createAnalysisEngine:()=>createEngine({Hash:S.settings.engineHash, "Skill Level":S.settings.engineSkill}),
     navigationButton:document.getElementById("learningToggle"),
     embedded:wasBlank?null:{stage:UI.canvas, boardWrap:UI.boardWrap, fen:sourceFen, startDrag,
@@ -2690,7 +2690,7 @@ function startDrag(e, from, input = null) {
   const squareAt = input?.squareAt || squareFromEvent;
   const deselect = () => {if(input)input.deselect();else {S.selectedSq=null;renderSelection();}};
   _cancelBoardDrag?.();
-  const board = UI.boardWrap.querySelector(".board");
+  let board = input?.board || UI.boardWrap.querySelector(".board");
   if (!board) return;
   const cell = board.getBoundingClientRect().width / 8;
   let orig = squares[from] && squares[from].querySelector(".piece, .piece-svg, .piece-img");
@@ -2698,7 +2698,12 @@ function startDrag(e, from, input = null) {
   if (orig) ghost.append(orig.cloneNode(true));
   ghost.style.width = ghost.style.height = cell + "px";
   document.body.append(ghost);
-  const place = (ev) => { ghost.style.left = ev.clientX + "px"; ghost.style.top = ev.clientY + "px"; };
+  const place = (ev) => {
+    const r = board.getBoundingClientRect();
+    // The ghost is centered here: stop at the edge with at most half the piece outside.
+    ghost.style.left = Math.max(r.left, Math.min(r.left + r.width, ev.clientX)) + "px";
+    ghost.style.top = Math.max(r.top, Math.min(r.top + r.height, ev.clientY)) + "px";
+  };
   place(e);
   if (orig) orig.style.visibility = "hidden";
   let moved = false, lastHover = null, done = false;
@@ -2732,6 +2737,7 @@ function startDrag(e, from, input = null) {
     squares = next;
     orig = squares[from]?.querySelector('.piece, .piece-svg, .piece-img');
     if (!orig || orig.dataset.piece !== ghost.firstElementChild?.dataset.piece) {cancel();return;}
+    board = orig.closest('.board, .learn-board') || board;
     orig.style.visibility = 'hidden';
     if (lastHover) setHover(lastHover);
   };
