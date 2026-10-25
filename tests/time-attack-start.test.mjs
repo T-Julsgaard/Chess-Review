@@ -4,6 +4,8 @@ import {JSDOM} from 'jsdom';
 import {Chess} from '../lib/chess.js';
 import {LearningWorkspace} from '../lib/learning/workspace.js';
 import {createRunStartSound} from '../lib/learning/run-start-sound.js';
+import {runStartOverlay,updateRunStartStep} from '../lib/learning/run-animations.js';
+import {app,loadGame} from './helpers/app.mjs';
 
 const before=new Chess();before.move('e4');const after=new Chess(before.fen());after.move('d5');
 const puzzle={id:'ready',fen:after.fen(),setup:{fen:before.fen(),move:'d7d5'},solution:['e4d5','d8d5','b1c3'],rating:450,themes:[]};
@@ -57,7 +59,7 @@ for(const options of [{motion:true},{motion:false},{motion:true,reduced:true},..
   assert.equal(w.puzzleRunStarting(),false);assert.equal(w.busy,false);
   assert.equal(run.clock.started,true);assert.equal(run.clock.remaining(),180000);
   assert.notEqual(w.puzzleThinkingAt,null);
-  await advance(300);assert.equal(overlay.isConnected,false);assert.equal(w.cancelRunStart,null);
+  await advance(600);assert.equal(overlay.isConnected,false);assert.equal(w.cancelRunStart,null);
   await w.submitPuzzle('e4d5');assert.equal(run.correctMoves,1);
   assert.equal(w.root.querySelector('.puzzle-run-start'),null,'Later moves do not repeat the introduction');
 });
@@ -82,12 +84,42 @@ test('Play again gets a fresh countdown and Knockout starts directly',async t=>{
     const starting=w.startPuzzleRun('timeAttack',{again:!!attempt});await settle();
     assert.equal(w.root.querySelector('.puzzle-run-start strong').textContent,'3');
     for(let i=0;i<3;i++)await advance(1000);
-    await starting;await advance(300);await w.finishChallenge('Time is up');
+    await starting;await advance(600);await w.finishChallenge('Time is up');
   }
   assert.deepEqual(sounds,['3','2','1','Go!','3','2','1','Go!']);
   await w.startPuzzleRun('knockout');
   assert.equal(w.root.querySelector('.puzzle-run-start'),null);assert.equal(w.busy,false);
   assert.equal(sounds.length,8);
+});
+
+test('flip panels carry the old and new digits and settle on a complete Go',async t=>{
+  const {w,advance}=await setup(t,{style:'flip'});
+  const starting=w.startPuzzleRun('timeAttack');await settle();
+  const overlay=w.runStartOverlay;
+  for(const [previous,next] of [['3','2'],['2','1']]){
+    await advance(1000);
+    assert.equal(overlay.querySelector('.puzzle-flip-top').dataset.value,next);
+    assert.equal(overlay.querySelector('.puzzle-flip-in').dataset.value,next);
+    assert.equal(overlay.querySelector('.puzzle-flip-out').dataset.value,previous);
+    assert.equal(overlay.querySelector('.puzzle-flip-bottom').dataset.value,previous);
+  }
+  await advance(1000);await starting;
+  assert.ok([...overlay.querySelectorAll('.puzzle-flip > span')].every(part=>part.dataset.value==='Go!'));
+  await advance(600);assert.equal(overlay.isConnected,false);
+});
+
+test('embedded board redraws keep the countdown connected through Go',async t=>{
+  const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
+  t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[puzzle]})}));
+  await a.call('openLearning');const w=a.run('learningWorkspace'),board=w.boardElement;
+  const overlay=runStartOverlay(w.h,{style:'flip'});w.runStartOverlay=overlay;board.append(overlay);
+  const observer=new a.dom.window.MutationObserver(()=>{});observer.observe(board,{childList:true});
+  for(const label of ['3','2','1','Go!']){
+    updateRunStartStep(overlay,label);w.render();
+    assert.equal(overlay.parentElement,board);
+    assert.equal(observer.takeRecords().some(record=>[...record.removedNodes,...record.addedNodes].includes(overlay)),false,'The overlay must never be detached or moved');
+  }
+  observer.disconnect();w.runStartOverlay=null;overlay.remove();await w.close();
 });
 
 for(const mode of ['timeAttack','knockout'])for(const style of ['classic','ribbon','spotlight','still'])test(`${mode} uses the ${style} ending and refreshes its motion setting`,async t=>{

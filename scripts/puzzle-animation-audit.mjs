@@ -35,7 +35,25 @@ export async function auditLearning(context) {
     await sleep(300);
     assert.equal(await run(`document.querySelector('.learn-board > .puzzle-run-start').dataset.style`),style);
     assert.equal(await run(`import('./analysis.js').then(m=>m.learningWorkspace.currentFen()===readyBefore)`),true);
+    const coverage=await run(`(()=>{const e=document.querySelector('.learn-board > .puzzle-run-start'),b=e.parentElement.getBoundingClientRect(),r=e.getBoundingClientRect();return {covers:r.left<=b.left&&r.right>=b.right&&r.top<=b.top&&r.bottom>=b.bottom,rounded:getComputedStyle(e).borderRadius};})()`);
+    assert.equal(coverage.covers,true);assert.equal(coverage.rounded,'0px','Only the board clips the veil, avoiding a second rounded edge');
     await capture(`puzzle-start-${style}`);
+    if(style==='flip'){
+      await waitFor(review,`document.querySelector('.learn-board > .puzzle-run-start')?.dataset.step==='2'`,'Second flip');
+      await sleep(150);await capture('puzzle-flip-turning');
+      await waitFor(review,`document.querySelector('.learn-board > .puzzle-run-start')?.dataset.step==='Go!'`,'Flip Go');
+      const transition=await run(`import('./analysis.js').then(m=>{
+        const w=m.learningWorkspace,e=w.runStartOverlay,animation=e.getAnimations().find(a=>a.animationName==='puzzle-run-start-go');
+        animation.pause();animation.currentTime=100;
+        const held=+getComputedStyle(e).opacity,observer=new MutationObserver(()=>{});observer.observe(e.parentElement,{childList:true});
+        w.render();w.render();const stable=e.getAnimations().includes(animation),detached=observer.takeRecords().some(r=>[...r.removedNodes].includes(e));observer.disconnect();
+        animation.currentTime=550;const faded=+getComputedStyle(e).opacity;animation.currentTime=100;
+        return {held,faded,stable,detached,leafAnimation:getComputedStyle(e.querySelector('.puzzle-flip-in')).animationName,background:getComputedStyle(e).backgroundColor};
+      })`);
+      assert.equal(transition.held,1);assert.ok(transition.faded<.3);assert.equal(transition.stable,true);assert.equal(transition.detached,false);
+      assert.equal(transition.leafAnimation,'none');assert.match(transition.background,/, 0\.6\)$/);
+      await capture('puzzle-flip-go');
+    }
     await run('animationStarting');
     await run(`import('./analysis.js').then(m=>m.learningWorkspace.finishChallenge('Time is up'))`);
   }
@@ -54,5 +72,5 @@ export async function auditLearning(context) {
     assert.equal(await run(`getComputedStyle(document.querySelector('.puzzle-animation-preview .puzzle-run-start-count'),'::before').animationName==='none'`),reduced);
     await run(`document.querySelector('[aria-label=Settings]').click()`);
   }
-  console.log(JSON.stringify({ok:true,out,checks:['countdown move and cursor gating','all animation previews at desktop and phone sizes','all live countdown styles','ending styles for both modes','reduced motion including rings']},null,2));
+  console.log(JSON.stringify({ok:true,out,checks:['countdown move and cursor gating','all animation previews at desktop and phone sizes','all live countdown styles','hinged flip and uninterrupted Go fade','lighter veil with complete board coverage','ending styles for both modes','reduced motion including rings']},null,2));
 }
