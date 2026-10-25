@@ -131,7 +131,7 @@ test('openings pair moves in a scorecard with two side controls, keyboard naviga
   assert.equal(w.activity.practice,undefined);assert.equal(w.activity.ply,0);assert.equal(w.flipped,true);
   const back=w.root.querySelector('[data-focus=opening-library]');
   assert.ok(back.classList.contains('learn-statistics-button'));assert.ok(back.closest('.puzzle-session-navigation'));
-  assert.equal(back.textContent,'Opening library');
+  assert.equal(back.textContent,'Return to opening library');
   assert.equal(w.root.querySelector('.learn-copy, .learn-opening-notes, .learn-move-input, [data-focus="practice-color"]'),null);
   assert.equal(w.root.querySelectorAll('.learn-opening-controls button').length,2);
   assert.ok(w.root.querySelector('.learn-opening-toolbar .learn-opening-controls'));
