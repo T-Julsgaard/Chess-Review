@@ -85,20 +85,39 @@ test('three aligned mode buttons show independent records and disable empty sele
   assert.equal(w.run.mode,'timeAttack');assert.ok(w.activity);
 });
 
-test('difficulty stays easy for eight puzzles then climbs without repeats in the real library',()=>{
+test('each mode has a steady rating curve without the ninth-puzzle jump',()=>{
+  const numbers=[1,8,9,10,20,35,65,103,150];
+  assert.deepEqual(numbers.map(n=>runPuzzleRating(n-1,'timeAttack')),[450,730,770,810,1210,1810,3000,3000,3000]);
+  assert.deepEqual(numbers.map(n=>runPuzzleRating(n-1,'knockout')),[450,625,650,675,925,1300,2050,3000,3000]);
+  assert.equal(runPuzzleRating(8),770);
+});
+
+for(const mode of ['timeAttack','knockout'])test(`${mode} stays easy for eight puzzles then climbs without repeats in the real library`,()=>{
   for(const random of [()=>0,()=>.5,()=>.999]){
     const results=[];
     for(let i=0;i<35;i++){
-      const p=pickRunPuzzle(library,results,random);
+      const p=pickRunPuzzle(library,results,mode,random);
       assert.ok(!results.some(r=>r.id===p.id));
       if(i<8)assert.ok(p.rating<=800);
       if(i)assert.ok(p.rating>=results.at(-1).rating||!library.some(q=>q.rating>=results.at(-1).rating&&!results.some(r=>r.id===q.id)));
       results.push({id:p.id,rating:p.rating});
     }
-    assert.ok(results[20].rating>1700);assert.ok(results[34].rating>2900);
+    assert.ok(Math.abs(results[20].rating-runPuzzleRating(20,mode))<=100);
+    assert.ok(Math.abs(results[34].rating-runPuzzleRating(34,mode))<=100);
   }
-  assert.equal(runPuzzleRating(7),730);assert.equal(runPuzzleRating(8),850);
-  assert.equal(pickRunPuzzle([mate],[{id:mate.id,rating:mate.rating}]),null);
+  assert.equal(pickRunPuzzle([mate],[{id:mate.id,rating:mate.rating}],mode),null);
+});
+
+for(const mode of ['timeAttack','knockout'])test(`${mode} uses its own curve when advancing an active run`,async t=>{
+  const puzzles=Array.from({length:521},(_,i)=>({...mate,id:'curve-'+i,rating:400+i*5}));
+  const {w}=await setup(t,{puzzles});
+  t.mock.method(Math,'random',()=>.5);
+  await w.startPuzzleRun(mode);
+  assert.equal(current(w).rating,450);
+  for(let i=0;i<19;i++)await solve(w);
+  assert.equal(w.run.solved,19);
+  const expected=mode==='timeAttack'?1210:925;
+  assert.ok(Math.abs(current(w).rating-expected)<=50,`Puzzle 20: expected near ${expected}, got ${current(w).rating}`);
 });
 
 test('Time attack starts at three minutes, advances on success or failure, and ends on third mistake',async t=>{
