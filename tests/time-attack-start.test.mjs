@@ -39,7 +39,8 @@ for(const options of [{motion:true},{motion:false},{motion:true,reduced:true},..
   assert.ok(overlay);assert.equal(overlay.parentElement.classList.contains('learn-board'),true);
   assert.equal(overlay.dataset.motion,options.motion&&!options.reduced&&options.style!=='still'?'on':'off');
   assert.equal(overlay.dataset.style,options.style||'pulse');
-  assert.equal(overlay.querySelector('.puzzle-run-start-title').textContent,'Time attack');
+  assert.equal(overlay.querySelector('.puzzle-run-start-title').textContent,'Get ready');
+  assert.equal(overlay.querySelector('.puzzle-run-start-copy'),null);
   assert.equal(w.currentFen(),puzzle.setup.fen,'The opponent waits for the countdown');
   assert.equal(w.busy,true);assert.equal(run.clock.started,false);assert.equal(w.puzzleThinkingAt==null,true);
   for(const step of [3,2,1]){

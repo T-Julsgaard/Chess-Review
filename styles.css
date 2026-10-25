@@ -422,7 +422,6 @@
 .board:has(> .puzzle-run-start, > .puzzle-run-end[data-style="flip"]) { box-shadow: 0 26px 50px -30px #0009; }
 .puzzle-run-start-card { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
 .puzzle-run-start-title { font-size: clamp(24px,4vw,42px); line-height: 1.15; font-weight: 700; letter-spacing: -.5px; }
-.puzzle-run-start-copy { color: #d3dae4; font-size: clamp(13px,2vw,17px); }
 .puzzle-count-display { position: relative; display: grid; place-items: center; margin-top: 12px; font-size: clamp(40px,8vw,76px); line-height: 1; font-variant-numeric: tabular-nums; }
 .puzzle-run-start-count { display: grid; place-items: center; width: 1.65em; height: 1.65em; border: 2px solid #a7e5a066; border-radius: 50%; background: #a7e5a00d; color: #b8efb2; font-size: inherit; }
 .puzzle-run-start[data-step="3"] .puzzle-run-start-count, .puzzle-run-start[data-step="2"] .puzzle-run-start-count, .puzzle-run-start[data-step="1"] .puzzle-run-start-count { animation: puzzle-run-start-beat-a 1s ease-out both; }
@@ -488,7 +487,6 @@
 .puzzle-animation-control[data-kind="end"] .set-seg button { flex: 1 1 30%; border: 1px solid var(--line); border-radius: 8px; padding: 7px 6px; }
 .puzzle-animation-preview { position: relative; height: 210px; margin: 12px 0; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: #10151b; }
 .puzzle-animation-preview .puzzle-run-start-title, .puzzle-animation-preview .puzzle-run-end-title { font-size: 24px; }
-.puzzle-animation-preview .puzzle-run-start-copy { font-size: 13px; }
 .puzzle-animation-preview .puzzle-count-display { margin-top: 2px; font-size: 42px; }
 .puzzle-animation-preview .puzzle-run-end-icon { font-size: 48px; }
 .puzzle-animation-preview .puzzle-end-score { font-size: 40px; }
