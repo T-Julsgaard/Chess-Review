@@ -28,14 +28,25 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     for(const [width,height] of [[1920,1080],[390,844],[320,640]]) {
       await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(300);await grid();
       const header=await run("(()=>{const h=document.querySelector('.puzzle-run-results h2'),b=document.querySelector('[data-focus=puzzle-overview]'),a=h.getBoundingClientRect(),c=b.getBoundingClientRect();return {title:h.textContent,center:a.top+a.height/2-c.top-c.height/2,eyebrow:!!document.querySelector('.puzzle-run-results .learn-eyebrow')};})()");
-      assert.equal(header.title,'Run complete');assert.equal(header.eyebrow,false);assert.ok(Math.abs(header.center)<2,'Result heading must align with the overview button');
+      assert.equal(header.title,mode==='timeAttack'?'Time attack':'Knockout');assert.equal(header.eyebrow,false);assert.ok(Math.abs(header.center)<2,'Result heading must align with the overview button');
+      await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=true;m.learningWorkspace.showPuzzleRunEnd();})");await sleep(450);
+      const ending=await run("(()=>{const e=document.querySelector('.puzzle-run-end'),b=e.parentElement.getBoundingClientRect(),r=e.getBoundingClientRect();return {title:e.querySelector('strong').textContent,reason:e.querySelector('.puzzle-run-end-reason').textContent,motion:e.dataset.motion,animation:getComputedStyle(e).animationName,fits:Math.abs(r.left-b.left)<2&&Math.abs(r.right-b.right)<2&&Math.abs(r.top-b.top)<2&&Math.abs(r.bottom-b.bottom)<2};})()");
+      assert.deepEqual(ending,{title:'Run over',reason:'Out of lives',motion:'on',animation:'puzzle-run-end-veil',fits:true});
+      assert.equal(await run("document.querySelector('.puzzle-run-stats > div > span').textContent"),'Solved');
       assert.equal(await run("(()=>{const b=document.querySelector('[data-focus=run-again]');return b.getBoundingClientRect().width<180;})()"),true);
       const shot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);await fs.writeFile(path.join(out,`${mode}-results-${width}.png`),Buffer.from(shot.data,'base64'));
     }
-    const resultText=await run("document.querySelector('.puzzle-run-results').textContent");
+    await waitFor(review,"!document.querySelector('.puzzle-run-end')",'Board ending animation cleared');
+    await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]},review.sessionId);
+    await run("import('./analysis.js').then(m=>m.learningWorkspace.showPuzzleRunEnd())");
+    assert.equal(await run("(()=>{const e=document.querySelector('.puzzle-run-end');return e.dataset.motion==='off'&&getComputedStyle(e).animationName==='none'&&getComputedStyle(e.querySelector('.puzzle-run-end-icon')).animationName==='none';})()"),true);
+    await run("import('./analysis.js').then(m=>m.learningWorkspace.cancelRunEnd())");
+    await call('Emulation.setEmulatedMedia',{features:[]},review.sessionId);
+    await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=false;})");
+    const resultText=await run("(()=>{const r=document.querySelector('.puzzle-run-results').cloneNode(true);r.querySelector('.puzzle-practice-status')?.remove();return r.textContent;})()");
     await run("import('./analysis.js').then(m=>m.learningWorkspace.replayRunPuzzle(m.learningWorkspace.result.results[0].id))");
     await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace.busy)",'Replay ready');
-    assert.equal(await run("document.querySelector('.puzzle-run-results h2').textContent"),'Run complete');await grid();
+    assert.equal(await run("document.querySelector('.puzzle-run-results h2').textContent"),mode==='timeAttack'?'Time attack':'Knockout');await grid();
     assert.equal(await run("document.querySelectorAll('.puzzle-run-history [aria-current=true]').length"),1);
     assert.equal(await run("(()=>{const r=document.querySelector('.puzzle-run-results').cloneNode(true);r.querySelector('.puzzle-practice-status')?.remove();return r.textContent;})()"),resultText);
     assert.equal(await run("!!document.querySelector('.puzzle-practice-actions, .puzzle-run-meta, [data-focus=replay-back], .puzzle-analyse')"),false);

@@ -32,6 +32,7 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} results retain the emb
   const expected=position();await w.submitPuzzle('g1h3');
   assert.equal(w.run,null);assert.equal(w.currentFen(),fen);assert.equal(w.flipped,flipped);
   assert.equal(doc.querySelector('.board'),board);assert.deepEqual(position(),expected);
+  assert.equal(board.querySelector('.puzzle-run-end-reason').textContent,'Out of lives');
   assert.ok(board.querySelector('[data-square=g1] .puzzle-result-badge[data-result=incorrect]'));
   assert.ok(board.querySelector('[data-square=g1].puzzle-wrong'));
   assert.ok(board.querySelector('[data-square=h3].puzzle-wrong'));
@@ -39,6 +40,7 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} results retain the emb
   assert.equal(doc.querySelector('.drag-piece'),null);assert.equal(w.selected,null);assert.equal(w.currentFen(),fen);
   assert.ok(board.querySelector('.puzzle-result-badge[data-result=incorrect]'));
   w.render();assert.deepEqual(position(),expected);assert.ok(board.querySelector('.puzzle-result-badge'));
+  assert.equal(board.querySelector('.puzzle-run-end'),null);
   assert.equal(a.state.analysisMode,false);
 });
 

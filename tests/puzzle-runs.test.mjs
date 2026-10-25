@@ -82,6 +82,48 @@ test('Knockout has no timer and ends immediately on its first wrong move with it
   await w.navigate('puzzles');assert.equal(w.root.querySelector('[data-focus=knockout]').closest('.puzzle-mode').querySelector('.puzzle-mode-record strong').textContent,'2');
 });
 
+for(const mode of ['timeAttack','knockout'])for(const previousBest of [0,10])test(`${mode} keeps its labels and announces the ending on the board ${previousBest?'without':'with'} a personal best`,async t=>{
+  const {w,dom}=await setup(t);
+  await w.persist(p=>{p.bests[mode]=previousBest;});
+  await w.startPuzzleRun(mode);
+  const title=w.root.querySelector('.puzzle-practice-heading h2').textContent;
+  await solve(w);
+  let dismiss;
+  t.mock.method(dom.window,'setTimeout',(fn,delay,...args)=>{
+    if(delay===2800){dismiss=fn;return 0;}
+    return setTimeout(fn,delay,...args);
+  });
+  const reason=mode==='timeAttack'?'Time is up':'Out of lives';
+  await w.finishChallenge(reason);
+  assert.equal(w.root.querySelector('.puzzle-practice-heading h2').textContent,title);
+  assert.equal(w.root.querySelector('.puzzle-run-stats > div > span').textContent,'Solved');
+  const overlay=w.root.querySelector('.learn-board > .puzzle-run-end[role=status]');
+  assert.ok(overlay);assert.equal(overlay.dataset.motion,'off');
+  assert.equal(overlay.querySelector('.puzzle-run-end-title').textContent,'Run over');
+  assert.equal(overlay.querySelector('.puzzle-run-end-reason').textContent,reason);
+  assert.equal(!!overlay.querySelector('.puzzle-run-end-best'),!previousBest);
+  dismiss();assert.equal(overlay.isConnected,false);assert.equal(w.cancelRunEnd,null);
+  w.render();assert.equal(w.root.querySelector('.puzzle-run-end'),null);
+  await w.replayRunPuzzle(w.result.results[0].id);
+  assert.equal(w.root.querySelector('.puzzle-run-end'),null);
+  assert.equal(w.root.querySelector('.puzzle-practice-heading h2').textContent,title);
+});
+
+test('the board ending cue clears immediately on replay, restart, navigation and close',async t=>{
+  const {w}=await setup(t);
+  await w.startPuzzleRun('knockout');await solve(w);await w.finishChallenge('All puzzles completed');
+  assert.ok(w.root.querySelector('.puzzle-run-end-icon[data-complete=true]'));
+  await w.replayRunPuzzle(w.result.results[0].id);
+  assert.equal(w.root.querySelector('.puzzle-run-end'),null);assert.equal(w.cancelRunEnd,null);
+  w.returnToRunResults();await w.startPuzzleRun('knockout');await wrong(w);
+  assert.ok(w.root.querySelector('.puzzle-run-end'));
+  await w.startPuzzleRun('knockout');assert.equal(w.root.querySelector('.puzzle-run-end'),null);
+  await wrong(w);await w.navigate('puzzles');
+  assert.equal(w.root.querySelector('.puzzle-run-end'),null);assert.equal(w.cancelRunEnd,null);
+  await w.startPuzzleRun('knockout');await wrong(w);await w.close();
+  assert.equal(w.cancelRunEnd,null);
+});
+
 for(const mode of ['timeAttack','knockout'])for(const page of ['openings','concepts'])test(`${mode} navigation to ${page} ends and saves the run`,async t=>{
   const {w,data}=await setup(t);await w.startPuzzleRun(mode);await solve(w);
   const run=w.run,button=w.root.querySelector(`[data-focus=${page}]`);
@@ -287,7 +329,7 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} warns on entry with se
   await w.finishChallenge('Ended early');
   assert.equal(w.result.solved,3);assert.equal(w.result.personalBest,false);assert.equal(w.result.best,1);
   assert.equal(data['learning:v1'].bests[mode],1);assert.equal(data['learning:v1'].challenges.at(-1).bestEligible,false);
-  assert.equal(w.root.querySelector('.learn-results h2').textContent,'Run complete');
+  assert.equal(w.root.querySelector('.learn-results h2').textContent,mode==='timeAttack'?'Time attack':'Knockout');
   assert.ok(!w.root.querySelector('.learn-results').textContent.includes('Personal best'));
   await w.navigate('puzzles');
   await w.startPuzzleRun(mode);assert.equal(w.root.querySelector('.puzzle-run-notice-card'),null);
