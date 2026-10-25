@@ -62,9 +62,12 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
       assert.equal(await run("document.querySelector('.learning-announcement').textContent.includes('Jump in with')||document.querySelector('.learning-announcement p').textContent.startsWith('Hi!')"), false);
       assert.equal(await run("!!document.querySelector('.learning-announcement-traveller, .learning-announcement-arrows animateMotion, .learning-announcement-arrows animate')"), false);
       assert.equal(await run("document.querySelector('.learning-announcement p').textContent.includes('50,000 puzzles')"), true);
-      const dashOffsets = () => run("[...document.querySelectorAll('.learning-announcement-arrow')].map(p=>getComputedStyle(p).strokeDashoffset)");
-      const before = await dashOffsets(); await sleep(200); const after = await dashOffsets();
-      after.forEach((offset,index) => assert.notEqual(offset,before[index], 'The dash pattern flows toward both buttons'));
+      const dashSamples = await run(`([...document.querySelectorAll('.learning-announcement-arrow')].map(p=>{
+        const animation=p.getAnimations()[0];if(!animation)return null;
+        animation.pause();animation.currentTime=0;const before=getComputedStyle(p).strokeDashoffset;
+        animation.currentTime=600;const after=getComputedStyle(p).strokeDashoffset;animation.play();return {before,after};
+      }))`);
+      dashSamples.forEach(sample => assert.ok(sample&&sample.before!==sample.after, 'The dash pattern flows toward both buttons'));
     }
     await screenshot('learning-announcement-' + width);
     if (visible.length < 2) {
@@ -97,5 +100,27 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await call('Page.reload', {}, review.sessionId); await sleep(1200);
   await waitFor(review, "!!document.querySelector('#learningToggle')", 'Reloaded workspace');
   assert.equal(await run("!!document.querySelector('.learning-announcement')"), false, 'Reload must not repeat the notice');
-  console.log('First-open announcement, arrows, responsive layout, reduced motion, permanent opt-out and reload passed. Screenshots: ' + out);
+  const freshNotice = async () => {
+    // Reset only this disposable audit profile to exercise another dismissal.
+    await run("chrome.storage.local.remove(['learningAnnouncement:puzzles:seen','learningAnnouncement:puzzles:disabled']).then(()=>{localStorage.removeItem('learningAnnouncement:puzzles:seen');localStorage.removeItem('learningAnnouncement:puzzles:disabled');})");
+    await call('Page.reload', {}, review.sessionId);
+    await waitFor(review, "!!document.querySelector('.learning-announcement')", 'Fresh dismissal check');
+    await sleep(500);
+  };
+  await call('Emulation.setEmulatedMedia', {features:[{name:'prefers-reduced-motion',value:'no-preference'}]}, review.sessionId);
+  await freshNotice();
+  const popping = await run(`(() => {
+    const button=document.querySelector('.learning-announcement-dismiss');button.focus();button.click();button.click();
+    const card=document.querySelector('.learning-announcement');
+    return {present:!!card,inert:card?.inert,animated:card?.getAnimations().some(a=>a.playState==='running'),focus:document.activeElement.id};
+  })()`);
+  assert.deepEqual(popping, {present:true,inert:true,animated:true,focus:'learningToggle'});
+  await waitFor(review, "!document.querySelector('.learning-announcement, .learning-announcement-arrows, .learning-announcement-target')", 'Pop dismissal cleanup');
+  await call('Page.reload', {}, review.sessionId); await sleep(1000);
+  await waitFor(review, "!!document.querySelector('#learningToggle')", 'Reload after pop');
+  assert.equal(await run("!!document.querySelector('.learning-announcement')"), false, 'Pop dismissal must not show again');
+  await call('Emulation.setEmulatedMedia', {features:[{name:'prefers-reduced-motion',value:'reduce'}]}, review.sessionId);
+  await freshNotice();
+  assert.equal(await run("document.querySelector('.learning-announcement-dismiss').click();!!document.querySelector('.learning-announcement, .learning-announcement-arrows, .learning-announcement-target')"), false, 'Reduced motion dismisses immediately');
+  console.log('First-open announcement, arrows, responsive layout, pop dismissal, reduced motion, permanent opt-out and reload passed. Screenshots: ' + out);
 }
