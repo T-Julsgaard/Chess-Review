@@ -55,7 +55,7 @@ async function returningWorkspace(t,mode) {
   a.state.settings.moveAnim=true;
   a.dom.window.HTMLElement.prototype.animate=function(frames,options){
     let resolve;const animation={finished:new Promise(r=>{resolve=r;}),cancel(){resolve();}};
-    if(this.classList.contains('puzzle-transition-piece'))pending.push({frames,options,resolve});else resolve();
+    if(this.classList.contains('puzzle-transition-piece')&&!w.closing)pending.push({frames,options,resolve});else resolve();
     return animation;
   };
   return {a,w,board,from,pending};

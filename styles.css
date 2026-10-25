@@ -293,6 +293,7 @@
 .learning-embedded .learn-footer { flex: none; min-height: 0; margin: 0; padding: 12px 0 0; border: 0; background: transparent; }
 .learn-transition-surface { will-change: transform, opacity; pointer-events: none !important; }
 .learn-swoop-anchor { position: relative; z-index: 40 !important; will-change: transform; }
+.learn-swoop-anchor .board { z-index: 1; }
 .learning-workspace .learn-library { display: flex; flex-direction: column; margin: 12px 0 28px; }
 .learn-library-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--line); }
 .learn-library-row:first-child { border-top: 1px solid var(--line); }
@@ -584,7 +585,7 @@
 .learn-board[data-puzzle-board] .piece-img { animation: none; }
 .learn-square.puzzle-reply-target { z-index: 5; }
 .learn-board.puzzle-arranging { position: relative; }
-.learn-board.puzzle-arranging > .sq .piece-img { visibility: hidden; }
+.puzzle-arranging > .sq .piece-img { visibility: hidden; }
 .puzzle-piece-transition { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 8; border-radius: inherit; }
 .puzzle-transition-piece { position: absolute; width: 12.5%; height: 12.5%; display: grid; place-items: center; }
 .puzzle-transition-piece .piece-img { width: 94%; height: 94%; animation: none; pointer-events: none; }
