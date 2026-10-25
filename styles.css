@@ -313,7 +313,7 @@
 .learn-statistics-button {
   background: color-mix(in oklab,var(--accent) 5%,var(--panel));
   border-color: color-mix(in oklab,var(--ink-2) 55%,var(--line));
-  color: var(--ink); padding: 8px 10px; font-size: 13px; font-weight: 500;
+  color: var(--ink); min-height: 36px; padding: 6px 9px; font-size: 12px; font-weight: 500;
   box-shadow: 0 1px 2px #00000014;
   transition: background .18s,border-color .18s,box-shadow .18s;
 }
