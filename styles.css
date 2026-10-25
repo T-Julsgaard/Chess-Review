@@ -49,7 +49,6 @@
 .learn-entry-button { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: 10px; background: var(--panel-2); color: var(--ink); font-weight: 700; font-size: 13px; }
 .learn-entry-button:hover { background: color-mix(in srgb, var(--accent) 15%, var(--panel)); }
 .learn-entry-button svg { width: 20px; height: 20px; }
-.learn-entry-button:is(:hover,:focus-visible) { box-shadow: 0 4px 14px color-mix(in oklab, var(--accent) 14%, transparent); }
 .learn-entry-button.is-activating { animation: learning-toggle-out .46s; }
 .learn-entry-button.is-activating svg { animation: learning-toggle-book .46s both; }
 .learn-entry-button.is-activating .learn-entry-label { animation: learning-toggle-label-back .3s cubic-bezier(.16, 1, .3, 1); }
