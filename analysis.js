@@ -3459,6 +3459,15 @@ let _coachId = null;           // which rig is currently mounted
 let _coachIdleT = null, _coachGlanceT = null, _coachIdleStarted = false;
 let _coachGlanceUntil = 0;     // suppress idle look-around until this timestamp (board glance in progress)
 let _coachTalking = false;
+const COACH_SETTLE_MS = 250, COACH_REACTION_HOLD_MS = 1200;
+let _coachReactionT = null, _coachReactAt = -Infinity, _coachEmotion = null;
+
+function resetCoachAnimation() {
+  for (const timer of [_coachReactionT, _coachIdleT, _coachGlanceT, _coachSpecialT, _coachCupT]) clearTimeout(timer);
+  _coachReactionT = _coachIdleT = _coachGlanceT = _coachSpecialT = _coachCupT = null;
+  _coachIdleStarted = false; _coachGlanceUntil = 0; _coachCupUp = false;
+  _coachTalking = false; _coachReactAt = -Infinity; _coachEmotion = null;
+}
 
 function coachSend(cmd) {
   if (_coachFrame && _coachReady && _coachFrame.contentWindow) {
@@ -3473,6 +3482,7 @@ function renderCoachAvatar() {
   const mod = UI.coach.closest(".mod");
   UI.canvas.classList.toggle("has-coach", !!rig);   // the insight text leaves room for the portrait
   if (!rig) {                                   // "Off" or no rig built yet → hide the module entirely
+    resetCoachAnimation();
     _coachFrame = null; _coachReady = false; _coachId = null;
     UI.coach.replaceChildren();
     if (mod) mod.hidden = true;
@@ -3480,17 +3490,19 @@ function renderCoachAvatar() {
   }
   if (mod) mod.hidden = false;
   if (id === _coachId && _coachFrame) return;   // same coach already mounted → keep it (no fl/reset)
+  resetCoachAnimation();
   _coachId = id; _coachReady = false;
   const frame = el("iframe", {
     class: "coach-frame", title: "Coach", scrolling: "no",
     src: browserAPI.runtime.getURL(COACH_RIG_DIR + rig),
   });
   frame.addEventListener("load", () => {
+    if (_coachFrame !== frame) return;   // a removed portrait may finish loading after a switch
     _coachReady = true;
     frame.classList.add("ready");   // fade the portrait in now that its document has loaded
 
-    _coachCupUp = false; clearTimeout(_coachCupT);   // fresh rig → its cup is down; keep our flag in sync
     coachSend({ coachCmd: "look", value: "center" });
+    coachSend({ coachCmd: "talk", value: _coachTalking });
     coachReactPly(S.idx);          // react to wherever we currently are in the game
     startCoachIdle();
   });
@@ -3532,24 +3544,39 @@ function coachSpecial() {
   if (_coachId === "old_soviet") { coachSipCup(); return; }
   const sp = COACH_SPECIAL[_coachId];
   if (!sp) { coachSend({ coachCmd: "nod" }); return; }   // ambient-special coaches → small nod
-  clearTimeout(_coachSpecialT);
+  if (_coachSpecialT) return;   // let an existing prop gesture finish before starting another
   if (sp.journal) {
     coachSend({ coachCmd: "openJournal", value: true });
-    _coachSpecialT = setTimeout(() => coachSend({ coachCmd: "openJournal", value: false }), 2600);
+    _coachSpecialT = setTimeout(() => { _coachSpecialT = null; coachSend({ coachCmd: "openJournal", value: false }); }, 2600);
   } else if (sp.toggle) {
     coachSend({ coachCmd: "raise" });
-    _coachSpecialT = setTimeout(() => coachSend({ coachCmd: "raise" }), 2400);
+    _coachSpecialT = setTimeout(() => { _coachSpecialT = null; coachSend({ coachCmd: "raise" }); }, 2400);
   } else {
     coachSend({ coachCmd: sp.cmd });
   }
 }
-// React to landing on a ply: wear the move's expression, glance down-left at the board, and use the
-// coach's gestures + signature ability so all of the rig's abilities get exercised over a game.
+// Wait for navigation to settle and hold each reaction long enough to read naturally.
+// Replace pending moves instead of replaying the expressions of skipped positions.
 function coachReactPly(idx) {
   if (!_coachReady) return;
+  clearTimeout(_coachReactionT);
+  const now = performance.now();
+  const delay = Math.max(COACH_SETTLE_MS, _coachReactAt + COACH_REACTION_HOLD_MS - now);
+  _coachGlanceUntil = now + delay + 1700;
+  _coachReactionT = setTimeout(() => {
+    _coachReactionT = null;
+    if (!_coachReady || S.idx !== idx) return;
+    _coachReactAt = performance.now();
+    coachApplyReaction(idx);
+  }, delay);
+}
+function coachApplyReaction(idx) {
   const cls = idx > 0 ? S.classif[idx] : null;
   const emo = idx === 0 ? "neutral" : (COACH_QUALITY_EMOTION[cls] || "neutral");
-  coachSend({ coachCmd: "emotion", value: emo });
+  if (emo !== _coachEmotion) {
+    _coachEmotion = emo;
+    coachSend({ coachCmd: "emotion", value: emo });
+  }
   // glance down-and-to-the-left at the board, then return to centre
   coachSend({ coachCmd: "look", value: "downleft" });
   _coachGlanceUntil = performance.now() + 1700;
