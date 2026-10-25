@@ -38,8 +38,17 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
         for(const key of ['x','y','w','h'])assert.ok(Math.abs(player.rect[key]-frames[0].players[i].rect[key])<1,'Player label moves while fading '+key);
       }
       const start=frames[0].board,end=frames.at(-1).board;
+      const margins=await run("(()=>{const board=document.querySelector('.learning-embedded .board').getBoundingClientRect(),header=document.querySelector('.topbar').getBoundingClientRect(),panel=document.querySelector('.learn-shell').getBoundingClientRect();return {above:board.top-header.bottom,below:innerHeight-board.bottom,boardY:board.y,panelY:panel.y,boardHeight:board.height,panelHeight:panel.height};})()");
+      assert.ok(Math.abs(margins.above-margins.below)<1,'Learning margins should balance '+JSON.stringify(margins));
+      assert.ok(Math.abs(margins.boardY-margins.panelY)<1&&Math.abs(margins.boardHeight-margins.panelHeight)<1,'Board and learning UI should stay aligned');
       for(const frame of frames)for(const key of ['x','y','w','h'])assert.ok(frame.board[key]>=Math.min(start[key],end[key])-1&&frame.board[key]<=Math.max(start[key],end[key])+1,'Board overshoot on entry '+JSON.stringify({key,frame,start,end}));
       await shot(`learning-entered-${height}`);
+      if(entry==='#learningToggle'){
+        await run("import('./analysis.js').then(m=>{const w=m.learningWorkspace,p={id:'centered-layout',fen:'7k/5Q2/6K1/8/8/8/8/8 w - - 0 1',solution:['f7f8'],rating:1200,themes:['mateIn1']};w.puzzles=[p];return w.startPuzzleSelection([p]);})");
+        const puzzle=await run("(()=>{const b=document.querySelector('.learning-embedded .board').getBoundingClientRect(),p=document.querySelector('.learn-shell').getBoundingClientRect(),t=document.querySelector('.topbar').getBoundingClientRect().bottom;return {above:b.top-t,below:innerHeight-b.bottom,panelY:p.y,boardY:b.y};})()");
+        assert.ok(Math.abs(puzzle.above-puzzle.below)<1&&Math.abs(puzzle.panelY-puzzle.boardY)<1,'Puzzle activity should retain balanced alignment');
+        await shot(`puzzle-centered-${height}`);
+      }
       await run("samples=[];sampleActive=true;sampleLoop();document.querySelector('#learningToggle').click()");
       await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace)",'Review restored');
       const returning=await run('sampleActive=false;samples');

@@ -21,6 +21,9 @@ Learning fades use the individual `translate` property so panel content scales
 remain intact. Board return motion converts translations through the review's
 scaled ancestor. `--review-interactions` records entry/return frames and checks
 interruption, reduced motion, expanded viewport bounds, and rapid move following.
+The Full HD learning board and side UI share equal space above and below in the
+viewport beneath the header. Centering changes their vertical position while
+preserving the board size, right edge, and straight entry/return animation.
 
 Review startup and Reset layout restore 100% browser zoom. Window resizing uses
 the actual CSS viewport and never changes browser zoom. A manual zoom choice
