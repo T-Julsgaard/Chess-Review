@@ -12,6 +12,7 @@ import {LearningWorkspace} from '../../lib/learning/workspace.js';
 import {mountLearningAnnouncement} from '../../lib/learning-announcement.js';
 import {presentationFor} from '../../lib/learning/presentations.js';
 import {panelScale,panelGroupBounds,scalePanelGroup,movePanelGroup} from '../../lib/panel-layout.js';
+import {fullHdReferenceLayout} from '../../lib/full-hd-layout.js';
 import {createScreenPreviewContext,loadScreenPreviewController} from '../../lib/screen-previews.js';
 import {puzzleResultBadge} from '../../lib/puzzle-badge.js';
 import {matedKingSquare,mateMark} from '../../lib/mate-mark.js';
@@ -43,7 +44,7 @@ export function app(t, {hardware,url='https://extension.test/analysis.html#test-
   const context = vm.createContext({
     window: dom.window, document: dom.window.document, navigator: dom.window.navigator, LearningWorkspace,
     loadLearningWorkspace:async () => ({LearningWorkspace}), presentationFor, mountLearningAnnouncement,
-    panelScale,panelGroupBounds,scalePanelGroup,movePanelGroup,
+    panelScale,panelGroupBounds,scalePanelGroup,movePanelGroup,fullHdReferenceLayout,
     location: dom.window.location, Node: dom.window.Node, HTMLElement: dom.window.HTMLElement,
     getComputedStyle: dom.window.getComputedStyle, performance, structuredClone,
     URL, TextEncoder, btoa, console, Chess, flagCodeForCountryId, countryNameForId, browserAPI,platformAPI:browserAPI,

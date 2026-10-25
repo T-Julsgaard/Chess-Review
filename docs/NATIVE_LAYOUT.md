@@ -1,5 +1,17 @@
 # Layout at 100% browser zoom
 
+The current Full HD review pass restores the approved pre-redesign composition
+at 100% browser zoom. It converts the original coordinates and content scales
+together, with scoped component styles, rather than stretching the panel grid.
+It applies to 1800–2000px wide, 880–1100px high viewports, covering the 1920 × 1080
+screen with browser chrome. Other sizes retain the responsive layout below while
+the Full HD appearance is reviewed.
+
+`node scripts/learning-browser.mjs --working-tree --full-hd-reference` renders
+revision `8516f684` at 87% and the prototype at 100% in separate test extensions.
+It compares panel and content dimensions in physical pixels, saves paired
+screenshots, and checks that Reorganize, Reset, and reload preserve the result.
+
 Review startup and Reset layout restore 100% browser zoom. Window resizing uses
 the actual CSS viewport and never changes browser zoom. A manual zoom choice
 made after startup remains available for accessibility.

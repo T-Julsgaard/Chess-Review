@@ -19,6 +19,7 @@ import { analyseCalibratedPosition } from "./lib/calibrated-search.js";
 import { loadLearningWorkspace, presentationFor } from "./lib/learning-loader.js";
 import { mountLearningAnnouncement } from "./lib/learning-announcement.js";
 import { panelScale, panelGroupBounds, scalePanelGroup, movePanelGroup } from "./lib/panel-layout.js";
+import { fullHdReferenceLayout } from "./lib/full-hd-layout.js";
 import { createScreenPreviewContext, loadScreenPreviewController } from "./lib/screen-previews.js";
 import { rememberAnalyzedGame, historyGame } from "./lib/player-history.js";
 
@@ -1814,7 +1815,7 @@ function applyPanelBox(mod,b) {
   inner.style.transform=scale===1?"":"scale("+scale+")";inner.style.transformOrigin=scale===1?"":"top left";
 }
 function panelContentScale(key) {
-  return isCustomLayout() ? panelScale(S.layout[key]) : 1;
+  return isCustomLayout() ? panelScale(S.layout[key]) : panelScale(fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,S.qbreakExpanded)?.[key]);
 }
 function applyLayoutMode() {
   const custom = isCustomLayout();
@@ -1826,7 +1827,10 @@ function applyLayoutMode() {
 function applyLayout() {
   UI.canvas.classList.add("no-concepts");
   UI.canvas.classList.remove("desktop-layout");
-  for (const mod of UI.canvas.querySelectorAll(".mod")) applyPanelBox(mod,isCustomLayout()?S.layout[mod.dataset.mod]:null);
+  const reference=fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,S.qbreakExpanded);
+  UI.canvas.classList.toggle('full-hd-reference',!!reference);
+  const boxes=isCustomLayout()?S.layout:reference;
+  for (const mod of UI.canvas.querySelectorAll(".mod")) applyPanelBox(mod,boxes?.[mod.dataset.mod]);
   fitEnginePanel();
   requestAnimationFrame(positionSettings);
 }
@@ -1835,7 +1839,9 @@ function applyLayout() {
 function snapshotLayout() {
   const base = UI.canvas.parentElement.getBoundingClientRect();
   const out = structuredClone(DEFAULT_LAYOUT);
+  const reference=fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,S.qbreakExpanded);
   for (const mod of UI.canvas.querySelectorAll(".mod")) {
+    if(reference&&!isCustomLayout()) {out[mod.dataset.mod]={...reference[mod.dataset.mod]};continue;}
     const r = mod.getBoundingClientRect();
     if (!r.width || !r.height) continue;
     // Preserve the rendered geometry when unlocking panels; grid snapping applies
@@ -4093,6 +4099,7 @@ function renderStats() {
     ),
   ));
   statsRefs = S.analyzing ? { expanded: S.qbreakExpanded, rows } : null;
+  if(UI.canvas.classList.contains("full-hd-reference"))applyLayout();
 }
 
 /* ---------------- Eval graph ---------------- */
