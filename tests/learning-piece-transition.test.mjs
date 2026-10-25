@@ -161,3 +161,73 @@ test('starting another puzzle cancels the return assembly without cancelling the
   assert.equal(board.querySelector('.puzzle-piece-transition'),null);
   assert.equal(w.cancelPieceTransition,null);assert.equal(w.busy,false);
 });
+
+async function openingWorkspace(t) {
+  const setup=await returningWorkspace(t),{w,pending}=setup;
+  await w.navigate('openings');
+  w.homePosition=new Chess(sparse);w.render();pending.length=0;
+  return setup;
+}
+const settle=async()=>{for(let i=0;i<40;i++)await Promise.resolve();};
+
+for(const [id,color,ply] of [['italian','w',0],['sicilian','b',0],['french','b',6]])test(`opening ${id} assembles the displayed pieces into its ${ply?'resumed':'starting'} position`,async t=>{
+  const {w,board,pending}=await openingWorkspace(t),from={...w.displayedBoard};
+  const starting=w.startOpening(id,{ply});await settle();
+  const routes=pieceRoutes(from.fen,w.currentFen(),{fromFlipped:from.flipped,toFlipped:color==='b'});
+  assert.equal(w.activity.ply,ply);assert.equal(w.flipped,color==='b');
+  assert.ok(board.classList.contains('puzzle-arranging'));
+  assert.equal(board.querySelectorAll('.puzzle-transition-piece').length,routes.length);
+  assert.ok(pending.length>0);assert.ok(routes.some(r=>r.kind==='enter'));
+  pending.forEach(p=>p.resolve());await starting;
+  assert.equal(board.querySelector('.puzzle-piece-transition'),null);
+  assert.equal(board.querySelectorAll('.sq img').length,32);
+});
+
+test('changing opening variations assembles pieces back to the starting position',async t=>{
+  const {w,board,pending}=await openingWorkspace(t);
+  const starting=w.startOpening('italian');await settle();pending.forEach(p=>p.resolve());await starting;
+  w.stepOpening(8);pending.length=0;
+  w.root.querySelector('[data-focus="opening-variation"]').click();
+  w.dropdown.field.querySelectorAll('[role="option"]')[1].click();
+  assert.equal(w.activity.line,1);assert.equal(w.activity.ply,0);
+  assert.ok(board.classList.contains('puzzle-arranging'));assert.ok(pending.length>0);
+  pending.forEach(p=>p.resolve());await settle();
+  assert.equal(board.querySelector('.puzzle-piece-transition'),null);
+});
+
+test('opening assemblies cancel when stepping, switching openings or closing',async t=>{
+  const {w,board}=await openingWorkspace(t);
+  const first=w.startOpening('italian');await settle();
+  const cancelled=board.querySelector('.puzzle-piece-transition');assert.ok(cancelled);
+  const second=w.startOpening('sicilian');await settle();await first;
+  assert.equal(cancelled.isConnected,false);assert.equal(w.activity.id,'sicilian');
+  assert.equal(board.querySelectorAll('.puzzle-piece-transition').length,1);
+  w.stepOpening(1);await second;
+  assert.equal(board.querySelector('.puzzle-piece-transition'),null);assert.equal(w.activity.ply,1);
+  const third=w.startOpening('french');await settle();
+  assert.ok(board.classList.contains('puzzle-arranging'));
+  await w.close();await third;
+  assert.equal(board.querySelector('.puzzle-piece-transition'),null);assert.equal(w.cancelPieceTransition,null);
+});
+
+for(const setting of ['disabled','reduced','unchanged'])test(`opening entry skips assembly when motion is ${setting}`,async t=>{
+  const {a,w,board,pending}=await openingWorkspace(t);
+  if(setting==='disabled')a.state.settings.moveAnim=false;
+  else if(setting==='reduced')a.dom.window.matchMedia=()=>({matches:true});
+  else {w.homePosition=new Chess();w.homeBoardFlipped=false;w.render();}
+  await w.startOpening('italian');
+  assert.equal(pending.length,0);assert.equal(board.querySelector('.puzzle-piece-transition'),null);
+  assert.equal(w.currentFen(),start);
+});
+
+test('leaving the library while an opening saves does not render or assemble the stale opening',async t=>{
+  const {w,board,pending}=await openingWorkspace(t);
+  const persist=w.persist;let release;
+  w.persist=change=>new Promise(resolve=>{release=async()=>resolve(await persist.call(w,change));});
+  const starting=w.startOpening('french');await settle();
+  assert.ok(w.root.querySelector('.learn-library'));
+  await w.navigate('concepts');release();await starting;
+  assert.equal(w.page,'concepts');assert.equal(w.activity,null);
+  assert.equal(pending.length,0);assert.equal(board.querySelector('.puzzle-piece-transition'),null);
+  w.persist=persist;
+});

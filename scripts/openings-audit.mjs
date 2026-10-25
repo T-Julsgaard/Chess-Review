@@ -31,6 +31,27 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     assert.deepEqual(await run("[...document.querySelectorAll('.learn-library-row h3')].map(n=>n.textContent)"),OPENINGS.map(o=>o.title));
     const libraryScreenshot=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false},review.sessionId);
     await fs.writeFile(path.join(out,`opening-library-${width}.png`),Buffer.from(libraryScreenshot.data,'base64'));
+    await run(`import('./analysis.js').then(async m=>{
+      const {Chess}=await import('./lib/chess.js'),w=m.learningWorkspace;
+      w.homePosition=new Chess('7k/8/8/8/8/8/8/K7 w - - 0 1');w.render();
+      [...w.root.querySelectorAll('.learn-library-row')].find(row=>row.querySelector('h3').textContent==='Sicilian Defense').querySelector('button').click();
+    })`);
+    await waitFor(review,"!!document.querySelector('.board.puzzle-arranging .puzzle-piece-transition')",'Opening piece assembly');
+    assert.equal(await run("document.querySelectorAll('.puzzle-transition-piece').length"),32);
+    const assemblyScreenshot=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false},review.sessionId);
+    await fs.writeFile(path.join(out,`opening-assembly-${width}.png`),Buffer.from(assemblyScreenshot.data,'base64'));
+    await waitFor(review,"!document.querySelector('.puzzle-piece-transition')",'Opening assembly completion');
+    assert.equal(await run("document.querySelectorAll('.board .sq img').length"),32);
+    assert.equal(await run("import('./analysis.js').then(m=>m.learningWorkspace.flipped)"),true);
+    await run(`import('./analysis.js').then(m=>{
+      const w=m.learningWorkspace;w.stepOpening(6);
+      w.root.querySelector('[data-focus="opening-variation"]').click();
+      w.dropdown.field.querySelectorAll('[role="option"]')[1].click();
+    })`);
+    await waitFor(review,"!!document.querySelector('.puzzle-piece-transition')",'Opening variation assembly');
+    await waitFor(review,"!document.querySelector('.puzzle-piece-transition')",'Opening variation assembly completion');
+    await run("import('./analysis.js').then(m=>m.learningWorkspace.navigate('openings'))");
+    await waitFor(review,"!document.querySelector('.puzzle-piece-transition')",'Opening library return assembly');
     const libraryScroll=()=>run("(()=>{const w=document.querySelector('.learning-workspace'),m=w.querySelector('.learn-main');return {root:w.scrollTop,main:m.scrollTop};})()");
     await run("document.querySelector('.learning-workspace').scrollTop=600;document.querySelector('.learn-main').scrollTop=600");
     const scrolled=await libraryScroll();
