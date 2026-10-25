@@ -485,7 +485,7 @@ test('concept and opening libraries use readable rows without progress labels',a
   assert.equal(w.root.querySelector('.learn-bookmark'),null);assert.doesNotMatch(w.root.textContent,/★|☆|Saved/);
 });
 
-test('expanded opening library supports search, family and level filters, both colors and saved variation positions',async t=>{
+test('expanded opening library supports search, family and level filters, board flips and saved variation positions',async t=>{
   const {w,data}=await workspace(t);await w.navigate('openings');
   const titles=()=>[...w.root.querySelectorAll('.learn-library-row h3')].map(n=>n.textContent);
   assert.deepEqual(titles(),OPENINGS.map(o=>o.title));
@@ -494,8 +494,9 @@ test('expanded opening library supports search, family and level filters, both c
   assert.deepEqual(titles(),['Scandinavian Defense']);
   w.filters.search='';w.filters.family='Indian defenses';w.filters.difficulty='Advanced';w.render();
   assert.deepEqual(titles(),['King’s Indian Defense','Nimzo–Indian Defense','Grünfeld Defense','Modern Benoni','Benko Gambit']);
-  w.filters.family='All';w.filters.difficulty='All';w.filters.search='Bird';w.filters.color='Black';w.render();
+  w.filters.family='All';w.filters.difficulty='All';w.filters.search='Bird';w.render();
   w.root.querySelector('.learn-library-row button').click();await settle();
+  assert.equal(w.activity.color,'w');w.flipBoard();await settle();
   assert.equal(w.activity.id,'bird');assert.equal(w.activity.color,'b');assert.equal(w.flipped,true);
   w.root.querySelector('[data-focus="opening-variation"]').click();
   w.dropdown.field.querySelectorAll('[role="option"]')[1].click();
@@ -510,12 +511,11 @@ test('expanded opening library supports search, family and level filters, both c
   assert.equal(w.root.querySelector('.learn-opening-progress').textContent,'14 of 14 moves');
 });
 
-test('opening library defaults to each opening side and lets either perspective override it',async t=>{
+test('opening library defaults to each opening side without a redundant perspective selector',async t=>{
   const {w}=await workspace(t);
   for(const opening of OPENINGS){
     await w.navigate('openings');
-    assert.equal(w.filters.color,'Opening side');
-    assert.equal(w.root.querySelector('[data-focus="color"]').getAttribute('aria-label'),'View as');
+    assert.equal(w.root.querySelector('[data-focus="color"]'),null);
     const row=[...w.root.querySelectorAll('.learn-library-row')].find(row=>row.querySelector('h3').textContent===opening.title);
     assert.ok(row.textContent.includes((opening.defaultColor==='b'?'Black':'White')+' opening'));
     row.querySelector('button').click();await settle();
@@ -524,16 +524,27 @@ test('opening library defaults to each opening side and lets either perspective 
     assert.equal(w.activity.ply,0);
     assert.equal(w.currentFen().split(' ')[1],'w','White still moves first');
   }
-  for(const [view,id,color] of [['White','sicilian','w'],['Black','london','b']]){
+});
+
+test('the in-opening flip control preserves perspective through moves, variations and resume',async t=>{
+  const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
+  await a.call('openLearning');const w=a.run('learningWorkspace');t.after(()=>w.close());
+  const reviewFlipped=a.state.flipped;
+  for(const [id,color] of [['sicilian','w'],['london','b']]){
     await w.navigate('openings');
-    w.root.querySelector('[data-focus="color"]').click();
-    [...w.dropdown.field.querySelectorAll('[role="option"]')].find(option=>option.textContent===view).click();
     assert.equal(w.root.querySelectorAll('.learn-library-row').length,OPENINGS.length);
     const row=[...w.root.querySelectorAll('.learn-library-row')].find(row=>row.querySelector('h3').textContent===OPENINGS.find(o=>o.id===id).title);
     row.querySelector('button').click();await settle();
+    const fen=w.currentFen();
+    assert.equal(w.activity.color,color==='b'?'w':'b');
+    w.doc.querySelector('[aria-label="Flip board"]').click();await settle();
     assert.equal(w.activity.color,color);assert.equal(w.flipped,color==='b');
+    assert.equal(w.store.value.resume.color,color);assert.equal(w.currentFen(),fen);
+    assert.equal(a.state.flipped,reviewFlipped);
+    w.stepOpening(2);assert.equal(w.flipped,color==='b');
     w.root.querySelector('[data-focus="opening-variation"]').click();
     w.dropdown.field.querySelectorAll('[role="option"]')[1].click();w.stepOpening(3);await settle();
+    assert.equal(w.flipped,color==='b');
     const resume=structuredClone(w.store.value.resume);
     await w.navigate('openings');await w.resume(resume);
     assert.deepEqual(w.activity,resume);assert.equal(w.flipped,color==='b');

@@ -22,7 +22,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await w.navigate('openings');return results;
   })`);
   assert.deepEqual(defaults,OPENINGS.map(o=>({id:o.id,color:o.defaultColor,flipped:o.defaultColor==='b',ply:0})));
-  assert.equal(await run("document.querySelector('[data-focus=color]').getAttribute('aria-label')"),'View as');
+  assert.equal(await run("!!document.querySelector('[data-focus=color]')"),false);
   const rect=selector=>`(()=>{const r=document.querySelector('${selector}').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,right:r.right};})()`;
   for(const [width,height] of [[1920,1080],[1366,768],[960,768],[390,844],[320,640]]) {
     await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);
@@ -50,6 +50,15 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     })`);
     await waitFor(review,"!!document.querySelector('.puzzle-piece-transition')",'Opening variation assembly');
     await waitFor(review,"!document.querySelector('.puzzle-piece-transition')",'Opening variation assembly completion');
+    const flipped=await run(`import('./analysis.js').then(async m=>{
+      const w=m.learningWorkspace;document.querySelector('[aria-label="Flip board"]').click();
+      w.root.querySelector('[data-focus="opening-variation"]').click();
+      w.dropdown.field.querySelectorAll('[role="option"]')[0].click();
+      w.stepOpening(3);await w.store.queue;
+      const resume={...w.store.value.resume};await w.navigate('openings');await w.resume(resume);
+      return {color:w.activity.color,flipped:w.flipped,ply:w.activity.ply};
+    })`);
+    assert.deepEqual(flipped,{color:'w',flipped:false,ply:3});
     await run("import('./analysis.js').then(m=>m.learningWorkspace.navigate('openings'))");
     await waitFor(review,"!document.querySelector('.puzzle-piece-transition')",'Opening library return assembly');
     const libraryScroll=()=>run("(()=>{const w=document.querySelector('.learning-workspace'),m=w.querySelector('.learn-main');return {root:w.scrollTop,main:m.scrollTop};})()");
