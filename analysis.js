@@ -3465,10 +3465,13 @@ let _coachId = null;           // which rig is currently mounted
 let _coachIdleT = null, _coachGlanceT = null, _coachIdleStarted = false;
 let _coachGlanceUntil = 0;     // suppress idle look-around until this timestamp (board glance in progress)
 let _coachTalking = false;
+let _coachPointerActive = false, _coachPointerRAF = null, _coachPointerPoint = null;
+let _coachPointerBound = false;
 const COACH_SETTLE_MS = 250, COACH_REACTION_HOLD_MS = 1200;
 let _coachReactionT = null, _coachReactAt = -Infinity, _coachEmotion = null;
 
 function resetCoachAnimation() {
+  clearCoachPointer();
   for (const timer of [_coachReactionT, _coachIdleT, _coachGlanceT, _coachSpecialT, _coachCupT]) clearTimeout(timer);
   _coachReactionT = _coachIdleT = _coachGlanceT = _coachSpecialT = _coachCupT = null;
   _coachIdleStarted = false; _coachGlanceUntil = 0; _coachCupUp = false;
@@ -3479,6 +3482,39 @@ function coachSend(cmd) {
   if (_coachFrame && _coachReady && _coachFrame.contentWindow) {
     try { _coachFrame.contentWindow.postMessage(cmd, "*"); } catch {}
   }
+}
+// The portrait lets clicks pass through, so observe the pointer in the parent document.
+// Coalesce movement into one message per paint, using the current scaled frame bounds.
+function clearCoachPointer() {
+  if (_coachPointerRAF !== null) cancelAnimationFrame(_coachPointerRAF);
+  _coachPointerRAF = null; _coachPointerPoint = null;
+  if (_coachPointerActive) coachSend({ coachCmd: "pointer", value: null });
+  _coachPointerActive = false;
+}
+function bindCoachPointer() {
+  if (_coachPointerBound) return;
+  _coachPointerBound = true;
+  document.addEventListener("pointermove", ev => {
+    if (ev.pointerType === "touch" || !_coachReady || document.hidden) return;
+    _coachPointerPoint = { x: ev.clientX, y: ev.clientY };
+    if (_coachPointerRAF !== null) return;
+    _coachPointerRAF = requestAnimationFrame(() => {
+      _coachPointerRAF = null;
+      if (!_coachFrame || !_coachReady || !_coachPointerPoint) return;
+      const rect = _coachFrame.getBoundingClientRect(), p = _coachPointerPoint;
+      const dx = Math.max(rect.left - p.x, 0, p.x - rect.right);
+      const dy = Math.max(rect.top - p.y, 0, p.y - rect.bottom);
+      if (!rect.width || !rect.height || Math.hypot(dx, dy) > 100) { clearCoachPointer(); return; }
+      _coachPointerActive = true;
+      coachSend({ coachCmd: "pointer", value: { x: (p.x - rect.left) / rect.width, y: (p.y - rect.top) / rect.height } });
+    });
+  }, { passive: true });
+  document.addEventListener("pointerleave", clearCoachPointer);
+  document.addEventListener("pointercancel", clearCoachPointer);
+  document.addEventListener("scroll", clearCoachPointer, { capture: true, passive: true });
+  document.addEventListener("visibilitychange", clearCoachPointer);
+  window.addEventListener("blur", clearCoachPointer);
+  window.addEventListener("resize", clearCoachPointer);
 }
 // (Re)mount the iframe for the active personality. Reuses the frame if the coach hasn't changed.
 function renderCoachAvatar() {
@@ -3495,6 +3531,7 @@ function renderCoachAvatar() {
     return;
   }
   if (mod) mod.hidden = false;
+  bindCoachPointer();
   if (id === _coachId && _coachFrame) return;   // same coach already mounted → keep it (no fl/reset)
   resetCoachAnimation();
   _coachId = id; _coachReady = false;
@@ -3609,7 +3646,7 @@ function startCoachIdle() {
   const dirs = ["left", "right", "up", "upleft", "upright", "downright", "center", "center"];
   const tick = () => {
     _coachIdleT = setTimeout(() => {
-      if (_coachReady && !document.hidden && performance.now() > _coachGlanceUntil && !_coachTalking) {
+      if (_coachReady && !document.hidden && !_coachPointerActive && performance.now() > _coachGlanceUntil && !_coachTalking) {
         coachSend({ coachCmd: "look", value: dirs[Math.floor(Math.random() * dirs.length)] });
         const r = Math.random();
         if (r < 0.10) coachSend({ coachCmd: "nod" });

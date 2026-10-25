@@ -142,3 +142,41 @@ test('a prop gesture finishes before the same prop can be raised again', t => {
   a.call('coachSpecial');
   assert.equal(messages.filter(m => m.coachCmd === 'raise').length, 3);
 });
+
+test('nearby cursor tracking is coalesced, scaled and cleared on leave or coach changes', t => {
+  const a = app(t), ui = coachUI(a); animationClock(a);
+  loadGame(a, '1. e4 e5');
+  let next = 0; const paints = new Map();
+  a.context.requestAnimationFrame = fn => { const id = ++next; paints.set(id, fn); return id; };
+  a.context.cancelAnimationFrame = id => paints.delete(id);
+  const paint = () => { const pending = [...paints.values()]; paints.clear(); pending.forEach(fn => fn()); };
+  const move = (x, y, type = 'mouse') => {
+    const event = new a.dom.window.MouseEvent('pointermove', {clientX:x, clientY:y});
+    Object.defineProperty(event, 'pointerType', {value:type});
+    a.dom.window.document.dispatchEvent(event);
+  };
+  const {frame, messages} = mountedCoach(a, ui);
+  frame.getBoundingClientRect = () => ({left:500, top:200, right:700, bottom:500, width:200, height:300});
+  const pointerMessages = () => messages.filter(m => m.coachCmd === 'pointer');
+  move(50, 50); paint(); assert.equal(pointerMessages().length, 0);
+  move(550, 230); move(650, 260);
+  assert.equal(paints.size, 1); paint();
+  assert.deepEqual(JSON.parse(JSON.stringify(pointerMessages().at(-1).value)), {x:0.75,y:0.2});
+  move(750, 350); paint();
+  assert.equal(pointerMessages().at(-1).value.x, 1.25, 'vicinity extends beyond the portrait');
+  move(850, 350); paint(); assert.equal(pointerMessages().at(-1).value, null);
+  move(600, 300, 'touch'); paint(); assert.equal(a.run('_coachPointerActive'), false);
+  move(600, 300); paint();
+  a.dom.window.dispatchEvent(new a.dom.window.Event('blur'));
+  assert.equal(pointerMessages().at(-1).value, null);
+  move(600, 300); paint();
+  a.dom.window.document.dispatchEvent(new a.dom.window.Event('pointerleave'));
+  assert.equal(a.run('_coachPointerActive'), false);
+  move(600, 300); paint(); move(620, 300);
+  const replacement = mountedCoach(a, ui, 'mentor');
+  assert.equal(paints.size, 0, 'switching cancels pending pointer messages');
+  assert.equal(pointerMessages().at(-1).value, null);
+  assert.equal(replacement.messages.some(m => m.coachCmd === 'pointer'), false);
+  a.state.settings.coach = ''; a.call('renderCoachAvatar');
+  move(600, 300); assert.equal(paints.size, 0);
+});

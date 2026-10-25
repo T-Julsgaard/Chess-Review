@@ -65,7 +65,8 @@
   if(whistling){var rb=8.0;eff={bLY:tgt.bLY,bRY:tgt.bRY,bLR:tgt.bLR,bRR:tgt.bRR,sqL:tgt.sqL,sqR:tgt.sqR,mc:584,mt:584-rb*1.35,mb:584+rb*1.35,mw:rb};}
   for(i=0;i<k.length;i++){cur[k[i]]=lerp(cur[k[i]],eff[k[i]],.16);}
   if(roll)roll(performance.now());
-  gx=lerp(gx,tgx,roll?0.5:0.18);gy=lerp(gy,tgy,roll?0.5:0.18);
+  var gaze=window.coachPointerGaze;
+  gx=lerp(gx,gaze?gaze.x*GX:tgx,gaze?0.18:roll?0.5:0.18);gy=lerp(gy,gaze?gaze.y*GY:tgy,gaze?0.18:roll?0.5:0.18);
   if(eyeL)attr(eyeL,'transform','translate('+gx.toFixed(2)+' '+gy.toFixed(2)+')');
   if(eyeR)attr(eyeR,'transform','translate('+gx.toFixed(2)+' '+gy.toFixed(2)+')');
   var sL=Math.max(cur.sqL,blink), sR=Math.max(cur.sqR,blink);
