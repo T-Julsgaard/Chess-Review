@@ -59,6 +59,7 @@ test(`${source} returns assemble into the saved ${flipped?'black':'white'} revie
     {transform:'translate(0,0)'},
   ]));
   assert.ok(motions.some(m=>m.node===board),'Board return and piece assembly run together');
+  assert.equal(w.root.isConnected,false,'The outgoing puzzle UI must be removed when its fade ends, even while pieces are still assembling');
   assert.equal(a.state.idx,target.idx);assert.equal(a.state.flipped,target.flipped);
   let done=false;closing.then(()=>{done=true;});await settle();assert.equal(done,false);
   pending.forEach(p=>p.resolve());await closing;
