@@ -122,15 +122,32 @@ test('embedded board redraws keep the countdown connected through Go',async t=>{
   observer.disconnect();w.runStartOverlay=null;overlay.remove();await w.close();
 });
 
-for(const mode of ['timeAttack','knockout'])for(const style of ['classic','ribbon','spotlight','still'])test(`${mode} uses the ${style} ending and refreshes its motion setting`,async t=>{
+test('the ending brings the board into view when narrow-screen results are below it',async t=>{
+  const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
+  t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[puzzle]})}));
+  await a.call('openLearning');const w=a.run('learningWorkspace');a.state.settings.puzzleEndAnimation='flip';
+  w.result={mode:'knockout',solved:7,reason:'Out of lives'};
+  w.root.classList.add('learn-stacked');w.root.style.setProperty('--learn-panel-y','400px');w.root.scrollTop=400;
+  w.showPuzzleRunEnd();assert.equal(w.root.scrollTop,0);
+  assert.equal(w.boardElement.querySelector('.puzzle-end-score').getAttribute('aria-label'),'7 puzzles solved');
+  await w.close();
+});
+
+for(const mode of ['timeAttack','knockout'])for(const style of ['classic','ribbon','spotlight','flip','still'])test(`${mode} uses the ${style} ending and refreshes its motion setting`,async t=>{
   const {w,settings,advance}=await setup(t);
   settings.puzzleEndAnimation=style;
   const starting=w.startPuzzleRun(mode);await settle();
   if(mode==='timeAttack')for(let i=0;i<3;i++)await advance(1000);
-  await starting;await w.finishChallenge('Out of lives');
+  await starting;if(style==='flip')w.run.solved=12;await w.finishChallenge('Out of lives');
   const overlay=w.root.querySelector('.puzzle-run-end');
   assert.equal(overlay.dataset.style,style);assert.equal(overlay.dataset.motion,style==='still'?'off':'on');
   assert.equal(overlay.querySelector('.puzzle-run-end-reason').textContent,'Out of lives');
+  if(style==='flip'){
+    assert.equal(overlay.querySelector('.puzzle-end-score').getAttribute('aria-label'),'12 puzzles solved');
+    assert.equal(overlay.querySelector('.puzzle-flip-in').dataset.value,'12');
+    assert.equal(overlay.querySelector('.puzzle-flip-out').dataset.value,'—');
+    assert.ok(overlay.querySelector('.puzzle-run-end-best'));
+  }
   settings.moveAnim=false;w.refreshSettings();assert.equal(overlay.dataset.motion,'off');
   await advance(2800);assert.equal(overlay.isConnected,false);
 });

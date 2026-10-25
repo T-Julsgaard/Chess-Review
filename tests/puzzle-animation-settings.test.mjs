@@ -19,7 +19,7 @@ test('Puzzles settings persist independent animation choices, preview them, and 
     assert.equal(doc.querySelector(`[data-setting=puzzleStartAnimation][data-value=${style}]`).getAttribute('aria-pressed'),'true');
   }
   open('Game over');
-  for(const style of ['ribbon','spotlight','still']){
+  for(const style of ['ribbon','spotlight','flip','still']){
     doc.querySelector(`[data-setting=puzzleEndAnimation][data-value=${style}]`).click();await settle();
     assert.equal(a.store.settings.puzzleEndAnimation,style);
     assert.equal(doc.querySelector('.puzzle-animation-preview .puzzle-run-end').dataset.style,style);

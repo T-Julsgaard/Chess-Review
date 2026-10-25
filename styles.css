@@ -465,7 +465,7 @@
 .puzzle-run-end[data-motion="off"], .puzzle-run-end[data-motion="off"] * { animation: none !important; }
 @media (prefers-reduced-motion: reduce) { .puzzle-run-end, .puzzle-run-end * { animation: none !important; } }
 .puzzle-run-start { position: absolute; inset: -1px; z-index: 12; display: grid; place-items: center; padding: 16px; box-sizing: border-box; border-radius: 0; background: #10151b99; color: #fff; cursor: default; animation: puzzle-run-start-arrive .25s ease both; }
-.board:has(> .puzzle-run-start) { box-shadow: 0 26px 50px -30px #0009; }
+.board:has(> .puzzle-run-start, > .puzzle-run-end[data-style="flip"]) { box-shadow: 0 26px 50px -30px #0009; }
 .puzzle-run-start-card { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
 .puzzle-run-start-title { font-size: clamp(24px,4vw,42px); line-height: 1.15; font-weight: 700; letter-spacing: -.5px; }
 .puzzle-run-start-copy { color: #d3dae4; font-size: clamp(13px,2vw,17px); }
@@ -489,7 +489,7 @@
 .puzzle-run-start[data-style="rings"][data-step="2"] .puzzle-run-start-count::before, .puzzle-run-start[data-style="rings"][data-step="2"] .puzzle-run-start-count::after { animation-name: puzzle-count-ring-b; }
 .puzzle-flip { display: none; }
 .puzzle-run-start[data-style="flip"] .puzzle-run-start-count { width: 2.1em; height: 1.7em; border: 0; visibility: hidden; animation: none; }
-.puzzle-run-start[data-style="flip"] .puzzle-flip { display: block; position: absolute; inset: 0; perspective: 600px; color: #fff; font-weight: 750; filter: drop-shadow(0 10px 18px #0005); }
+:is(.puzzle-run-start,.puzzle-run-end)[data-style="flip"] .puzzle-flip { display: block; position: absolute; inset: 0; perspective: 600px; color: #fff; font-weight: 750; filter: drop-shadow(0 10px 18px #0005); }
 .puzzle-flip > span { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; backface-visibility: hidden; border: 1px solid #ffffff24; box-sizing: border-box; }
 .puzzle-flip > span::after { content: attr(data-value); position: absolute; left: 0; right: 0; height: 200%; display: grid; place-items: center; text-shadow: 0 2px 2px #0004; }
 .puzzle-flip-top, .puzzle-flip-out { top: 0; border-radius: 14px 14px 0 0; transform-origin: center bottom; background: linear-gradient(#354150,#242e3a); border-bottom-color: #080d13 !important; }
@@ -511,6 +511,18 @@
 @keyframes puzzle-flip-out-b { 0% { transform: rotateX(0); } 48%,100% { transform: rotateX(-90deg); } }
 @keyframes puzzle-flip-in { 0%,48% { transform: rotateX(90deg); } 84% { transform: rotateX(-4deg); } 100% { transform: rotateX(0); } }
 @keyframes puzzle-flip-in-b { 0%,48% { transform: rotateX(90deg); } 84% { transform: rotateX(-4deg); } 100% { transform: rotateX(0); } }
+/* Flip ends the run on the same hinged counter used by the countdown. */
+.puzzle-run-end[data-style="flip"] { inset: -1px; border-radius: 0; background: #10151b99; }
+.puzzle-run-end[data-style="flip"] .puzzle-run-end-card { gap: 10px; animation-duration: .35s; }
+.puzzle-run-end[data-style="flip"] .puzzle-run-end-icon { display: none; }
+.puzzle-end-score { display: none; position: relative; width: 2.8em; height: 1.7em; margin-top: 4px; font-size: clamp(40px,8vw,76px); line-height: 1; font-variant-numeric: tabular-nums; }
+.puzzle-run-end[data-style="flip"] :is(.puzzle-end-score,.puzzle-end-score-caption) { display: block; }
+.puzzle-run-end[data-style="flip"] .puzzle-flip { color: #c7f6bd; }
+.puzzle-run-end[data-style="flip"] .puzzle-flip-out, .puzzle-run-end[data-style="flip"] .puzzle-flip-in { animation-delay: .18s; }
+.puzzle-end-score-caption { display: none; color: #d3dae4; font-size: clamp(12px,1.6vw,15px); }
+.puzzle-run-end[data-style="flip"] .puzzle-run-end-reason { margin-top: 2px; animation: puzzle-end-details .3s .65s ease both; }
+.puzzle-run-end[data-style="flip"] .puzzle-run-end-best { animation: puzzle-end-details .3s .85s ease both; }
+@keyframes puzzle-end-details { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 /* End alternatives: a sliding ribbon and a soft spotlight. */
 .puzzle-run-end[data-style="ribbon"] { padding-inline: 0; background: #10151b80; overflow: hidden; }
 .puzzle-run-end[data-style="ribbon"] .puzzle-run-end-card { box-sizing: border-box; width: 100%; padding: 22px 16px; border-block: 1px solid #b8efb25c; background: linear-gradient(100deg,#1b332e,#18222d); box-shadow: 0 12px 36px #0005; animation: puzzle-end-ribbon .55s cubic-bezier(.2,.8,.2,1) both; }
@@ -521,11 +533,20 @@
 @keyframes puzzle-end-ribbon { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes puzzle-end-focus { from { transform: scale(.8); opacity: 0; filter: blur(6px); } to { transform: scale(1); opacity: 1; filter: blur(0); } }
 .puzzle-animation-control > .set-row { flex-direction: column; align-items: stretch; gap: 8px; }
+.puzzle-animation-control[data-kind="end"] .set-seg { flex-wrap: wrap; gap: 4px; border: 0; overflow: visible; }
+.puzzle-animation-control[data-kind="end"] .set-seg button { flex: 1 1 30%; border: 1px solid var(--line); border-radius: 8px; padding: 7px 6px; }
 .puzzle-animation-preview { position: relative; height: 210px; margin: 12px 0; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: #10151b; }
 .puzzle-animation-preview .puzzle-run-start-title, .puzzle-animation-preview .puzzle-run-end-title { font-size: 24px; }
 .puzzle-animation-preview .puzzle-run-start-copy, .puzzle-animation-preview .puzzle-run-end-reason { font-size: 13px; }
 .puzzle-animation-preview .puzzle-count-display { margin-top: 2px; font-size: 42px; }
 .puzzle-animation-preview .puzzle-run-end-icon { font-size: 48px; }
+.puzzle-animation-preview .puzzle-end-score { font-size: 40px; }
+.puzzle-animation-preview .puzzle-run-end[data-style="flip"] .puzzle-run-end-card { gap: 6px; }
+.puzzle-animation-preview .puzzle-end-score-caption { font-size: 12px; }
+.puzzle-animation-preview .puzzle-run-end[data-style="flip"] .puzzle-flip-out { animation: puzzle-end-preview-out 2.8s cubic-bezier(.4,0,.6,1) infinite; }
+.puzzle-animation-preview .puzzle-run-end[data-style="flip"] .puzzle-flip-in { animation: puzzle-end-preview-in 2.8s cubic-bezier(.2,.7,.3,1) infinite; }
+@keyframes puzzle-end-preview-out { 0%,6% { transform: rotateX(0); } 18%,100% { transform: rotateX(-90deg); } }
+@keyframes puzzle-end-preview-in { 0%,18% { transform: rotateX(90deg); } 30%,100% { transform: rotateX(0); } }
 .puzzle-animation-preview .puzzle-run-start-count, .puzzle-animation-preview .puzzle-run-start-count::before, .puzzle-animation-preview .puzzle-run-start-count::after { animation-iteration-count: infinite; }
 .puzzle-animation-preview .puzzle-flip-out, .puzzle-animation-preview .puzzle-flip-in { animation-duration: 1.6s; animation-iteration-count: infinite; }
 .puzzle-animation-preview .puzzle-run-end { animation-iteration-count: infinite; }

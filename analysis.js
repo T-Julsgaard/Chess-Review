@@ -5167,7 +5167,7 @@ function badgeSettings() {
 function puzzleAnimationControl(kind) {
   const start=kind==="start",key=start?"puzzleStartAnimation":"puzzleEndAnimation",style=runAnimationStyle(S.settings,kind);
   const choices=start?RUN_START_STYLES:RUN_END_STYLES;
-  return el("div",{class:"puzzle-animation-control"},
+  return el("div",{class:"puzzle-animation-control","data-kind":kind},
     el("div",{class:"set-row"},setLabel("Animation"),el("div",{class:"set-seg"},...choices.map(([id,label])=>
       el("button",{type:"button","data-setting":key,"data-value":id,"aria-pressed":String(style===id),class:style===id?"on":"",onclick:()=>setSetting(key,id)},label)))),
     el("div",{class:"puzzle-animation-preview","aria-hidden":"true","data-motion":S.settings.moveAnim===false?"off":"on"},
