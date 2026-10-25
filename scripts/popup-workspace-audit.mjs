@@ -15,11 +15,21 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   assert.equal(await run(popup,'document.documentElement.scrollWidth<=document.documentElement.clientWidth'),true);
   await shot(popup,'popup-default');
   // Use real pointer events and inspect the in-flight liquid shape.
+  assert.equal(await run(popup,"getComputedStyle(document.querySelector('.fluid-indicator')).visibility"),'hidden');
+  const first=await run(popup,"(()=>{const r=document.querySelector('#analyzeCurrent').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()");
+  await call('Input.dispatchMouseEvent',{type:'mouseMoved',...first},popup.sessionId);
+  assert.equal(await run(popup,"document.querySelector('#analyzeCurrent').dataset.highlighted"),'true');
   const point=await run(popup,"(()=>{const r=document.querySelector('#openWorkspace').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()");
   await call('Input.dispatchMouseEvent',{type:'mouseMoved',...point},popup.sessionId);await sleep(50);
   assert.equal(await run(popup,"document.querySelector('#openWorkspace').dataset.highlighted"),'true');
   assert.equal(await run(popup,"document.querySelector('.fluid-indicator').getAnimations().some(a=>a.playState==='running')"),true);
   await sleep(300);await shot(popup,'popup-open-highlight');
+  await call('Input.dispatchMouseEvent',{type:'mouseMoved',...first},popup.sessionId);await sleep(50);
+  assert.equal(await run(popup,"document.querySelector('#analyzeCurrent').dataset.highlighted"),'true');
+  assert.equal(await run(popup,"document.querySelector('.fluid-indicator').getAnimations().some(a=>a.playState==='running')"),true);
+  await call('Input.dispatchMouseEvent',{type:'mouseMoved',x:2,y:2},popup.sessionId);
+  assert.equal(await run(popup,"getComputedStyle(document.querySelector('.fluid-indicator')).visibility"),'hidden');
+  assert.equal(await run(popup,"document.querySelectorAll('[data-highlighted=true]').length"),0);
   await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]},popup.sessionId);
   await run(popup,"document.querySelector('#analyzeCurrent').focus()");
   assert.equal(await run(popup,"document.querySelector('.fluid-indicator').getAnimations().length"),0);
