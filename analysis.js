@@ -1697,7 +1697,7 @@ async function openLearning() {
       learningWorkspace = null;
       syncLearningToggle();
       alignPlayers();
-      if(wasBlank){UI.home?.querySelector("button")?.focus();return;}
+      if(wasBlank){document.getElementById("learningToggle")?.focus();return;}
       S.idx=snapshot.idx; S.flipped=snapshot.flipped; S.selectedSq=snapshot.selectedSq;
       if(!S.practice){paintBoard();}
       renderControls();
@@ -2621,7 +2621,7 @@ function initBoardInput() {
   // Never let the browser start its own image/element drag on the board (the stray ghost image).
   wrap.addEventListener("dragstart", (e) => {if (!learningWorkspace?.embedded) e.preventDefault();});
   wrap.addEventListener("pointerdown", (e) => {
-    if (learningWorkspace) return;
+    if (learningWorkspace || S.blank) return;
     if (e.button === 2) { rightPointerDown(e); return; }
     if (e.button !== 0) return;
     // During practice the board only accepts moves while you're actively solving (not while it's
@@ -2778,6 +2778,7 @@ function playSanSound(san) {
 // Make a user move from the shown position. Starts/extends a variation (analysis mode),
 // unless the move on the mainline is simply the next mainline move.
 function applyUserMove(from, to, animate = true, promotion = null) {
+  if(S.blank)return;
   if (S.practice && (!S.practice.solving || S.practice.busy)) return;
   if (promotion == null && new Chess(activePos().fen).moves({verbose:true}).some(move=>move.from===from&&move.to===to&&move.promotion)) {
     requestPromotion(from,to,animate);return;
@@ -3312,9 +3313,12 @@ function renderControls() {
   // The forward buttons are blocked when at the analysis front (only during analysis).
   const maxPly = S.analyzing ? S.progress : S.total;
   const atEnd = S.idx >= maxPly;
+  refs.first.disabled = S.blank;
+  refs.previous.disabled = S.blank;
   if (refs.next.disabled !== atEnd) refs.next.disabled = atEnd;
   if (refs.last.disabled !== atEnd) refs.last.disabled = atEnd;
   const playing = !!S.autoTimer;
+  refs.center.disabled = S.blank;
   const label = playing ? "Pause" : "Play";
   if (refs.center.getAttribute("aria-label") !== label) {
     refs.center.setAttribute("aria-label", label);
@@ -3722,6 +3726,11 @@ function analysisProgressText() {
   return `Analyzing … ${done}/${S.total}`;
 }
 function renderReview() {
+  if(S.blank){
+    UI.review.replaceChildren(el("div",{class:"panel insight-panel"},
+      el("div",{class:"ip-body"},el("div",{class:"ip-text"},"No game loaded."))));
+    return;
+  }
   // In-place progress text during analysis (so the loader animation doesn't restart each move).
   if (S.analyzing && revRefs) { revRefs.head.textContent = analysisProgressText(); return; }
 
@@ -4039,7 +4048,7 @@ function renderStats() {
     // The button is always rendered (disabled while analyzing or already practicing) so the
     // header height never changes between states.
     el("div", { class: "panel-head acc-head" }, el("h3", {}, "Accuracy"),
-      el("button", { class: "practice-btn", disabled: S.analyzing || !!S.practice, title: "Replay the game and re-solve every mistake you made", onclick: startPractice }, "Practice your mistakes")),
+      el("button", { class: "practice-btn", disabled: S.blank || S.analyzing || !!S.practice, title: "Replay the game and re-solve every mistake you made", onclick: startPractice }, "Practice your mistakes")),
     el("div", { class: "panel-body" },
       el("div", { class: "acc-row" },
         el("div", { class: "acc-cell" },
@@ -4289,7 +4298,13 @@ function renderEnginePractice() {
 }
 // Choose the source of the engine lines for the shown position and draw the panel.
 function renderEngineCurrent() {
-  if(S.blank)return;
+  if(S.blank){
+    UI.engine.replaceChildren(el("div",{class:"panel"},
+      el("div",{class:"panel-head"},el("h3",{},"Engine")),
+      el("div",{class:"panel-body engine-body"},el("div",{class:"engine-empty"},"No game loaded."))));
+    fitEnginePanel();
+    return;
+  }
   // Hide the engine lines for the whole practice flow, not just the solve: while rolling/skipping to
   // the next mistake (or replaying the demo) the lines would briefly flash the answer for the upcoming
   // position. They only reappear once practice is fully finished/exited.
@@ -6398,8 +6413,7 @@ async function startAnalysis({preserveCompleted = false} = {}) {
 
 /* ---------------- Render everything ---------------- */
 function renderAll() {
-  if(S.blank)return;
-  UI.meta.replaceChildren(...metaChips());
+  UI.meta.replaceChildren(...(S.blank?[]:metaChips()));
   buildBoard();
   renderEvalBar();
   renderPlayers();
@@ -6413,30 +6427,18 @@ function renderAll() {
 
 /* A blank launch has no game or engine work; learning and saved games stay available. */
 function setBlankWorkspace(blank) {
-  S.blank=blank;UI.canvas.hidden=blank;
-  if(UI.home)UI.home.hidden=!blank;
-  document.querySelector('.app')?.classList.toggle('blank-workspace',blank);
+  S.blank=blank;
   for(const button of document.querySelectorAll('[data-game-action]'))button.hidden=blank;
 }
 function showBlankWorkspace() {
   S.analyzing=false;S.pgn="";S.total=0;S.idx=0;
   S.positions=[{fen:new Chess().fen()}];
   S.evals=[null];S.bests=[null];S.meta={};S.headers={};
+  S.players={w:{name:"White"},b:{name:"Black"}};
   document.title="Chess Review";
   applySettings();
-  const action=(label,description,symbol,onclick)=>el("button",{type:"button",class:"workspace-home-action",onclick},
-    icon(symbol),el("span",{class:"workspace-home-copy"},el("strong",{},label),el("small",{},description)),el("span",{"aria-hidden":"true"},"→"));
-  UI.home=el("main",{class:"workspace-home","aria-labelledby":"workspaceHomeTitle"},
-    el("div",{class:"workspace-home-art","aria-hidden":"true"},el("img",{src:_url("pieces-img/cburnett/wN.svg"),alt:""})),
-    el("h1",{id:"workspaceHomeTitle"},"Welcome to Chess Review"),
-    el("p",{class:"workspace-home-intro"},"Choose a puzzle, study an opening, or revisit a saved game."),
-    el("div",{class:"workspace-home-actions"},
-      action("Learn with Chess Review","Puzzles, openings and concepts","book",openLearning),
-      action("Open game library","Your saved reviews","library",()=>{
-        setLibraryOpen(true);(UI.libList.querySelector('.lc-open')||UI.libControls.querySelector('button'))?.focus();
-      })),
-    el("p",{class:"workspace-home-note"},"To review a new game, use the extension on Chess.com or Lichess, or paste a URL or PGN in Manual setup."));
-  UI.canvas.before(UI.home);setBlankWorkspace(true);
+  setBlankWorkspace(true);
+  renderAll();
 }
 
 /* ---------------- Load / switch a game ----------------
@@ -6603,7 +6605,6 @@ async function performTabZoomFit(force) {
 // Isolate zoom before fitting, so two analysis windows on different monitors keep their own fit.
 // Browsers rejecting per-tab scope retain their existing scope.
 async function initTabZoom() {
-  if(S.blank)return;
   try {
     if (!browserAPI?.tabs?.getCurrent) return;
     if (!_zoomInit) _zoomInit = (async () => {

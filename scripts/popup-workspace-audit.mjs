@@ -32,13 +32,17 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
 
   let previous=new Set((await targets()).map(t=>t.targetId));await run(popup,"document.querySelector('#openWorkspace').click()");
   const blank=await newTarget(previous,/analysis.html\?workspace=blank/);
-  await waitFor(blank,"!!document.querySelector('.workspace-home')",'Blank workspace');
-  assert.equal(await run(blank,"getComputedStyle(document.querySelector('#canvas')).display"),'none');
+  await waitFor(blank,"!!document.querySelector('.board')",'Blank review board');
+  assert.notEqual(await run(blank,"getComputedStyle(document.querySelector('#canvas')).display"),'none');
+  assert.equal(await run(blank,"document.querySelector('.workspace-home')"),null);
+  assert.equal(await run(blank,"document.querySelectorAll('.board .piece-img').length"),32);
+  assert.equal(await run(blank,"document.querySelectorAll('.ml-move').length"),0);
+  assert.equal(await run(blank,"import('./analysis.js').then(m=>m.S.positions[0].fen==='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')"),true);
   assert.equal(await run(blank,"import('./analysis.js').then(m=>m.S.blank&&!m.S.analyzing&&m.S.pgn===''&&m.S.evalEngines.length===0)"),true);
   assert.equal(await run(blank,"performance.getEntriesByType('resource').some(r=>['/data/book.json','/data/calibration.json','.wasm','.nnue'].some(part=>r.name.includes(part)))"),false);
-  for(const width of [1280,390,320]){await resize(blank,width,900);await shot(blank,'blank-'+width);assert.equal(await run(blank,'document.documentElement.scrollWidth<=innerWidth'),true);}
+  for(const width of [1280,390,320]){await resize(blank,width,900);await sleep(600);await shot(blank,'blank-'+width);assert.equal(await run(blank,'document.documentElement.scrollWidth<=innerWidth'),true,`Blank review overflows at ${width}px`);}
   await resize(blank,1280,900);
-  await run(blank,"document.querySelector('.workspace-home-action').click()");
+  await run(blank,"document.querySelector('#learningToggle').click()");
   await waitFor(blank,"!!document.querySelector('.learning-workspace .learn-theme-list')",'Learning without a game');
   assert.equal(await run(blank,"import('./analysis.js').then(m=>!m.S.analyzing&&m.S.blank)"),true);
   assert.equal(await run(blank,"document.querySelector('#learningToggle').textContent"),'Return to Game review');
@@ -46,11 +50,12 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await shot(blank,'blank-learning');
   await run(blank,"document.querySelector('#learningToggle').click()");
   await waitFor(blank,"!document.querySelector('.learning-workspace')",'Return to blank workspace');
-  assert.equal(await run(blank,"document.activeElement===document.querySelector('.workspace-home-action')"),true);
+  assert.equal(await run(blank,"document.activeElement===document.querySelector('#learningToggle')"),true);
+  assert.equal(await run(blank,"document.querySelectorAll('.board .piece-img').length"),32);
   assert.equal(await run(review,"import('./browser-compat.js').then(async({browserAPI:api})=>JSON.stringify(await api.storage.local.get(['username','learning:v1','library']))===JSON.stringify(blankBaseline))"),true);
   console.log('Blank startup, zero engine/data work, narrow layouts and learning round-trip passed.');
 
-  await run(blank,"document.querySelectorAll('.workspace-home-action')[1].click();document.querySelector('.lc-open').click()");
+  await run(blank,"document.querySelector('.lib-tab').click();document.querySelector('.lc-open').click()");
   await waitFor(blank,"import('./analysis.js').then(m=>!m.S.blank&&!m.S.analyzing&&m.S.pgn==='1. d4 d5')",'Saved game from blank');
   assert.notEqual(await run(blank,"getComputedStyle(document.querySelector('#canvas')).display"),'none');
   const beforeReload=await run(blank,'performance.timeOrigin');
@@ -59,7 +64,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await waitFor(blank,"!!document.querySelector('.board')&&import('./analysis.js').then(m=>!m.S.blank&&!m.S.analyzing&&m.S.pgn==='1. d4 d5')",'Reload saved game');
   const secondPopup=await tab(base+'/popup.html');await waitFor(secondPopup,"!!document.querySelector('#status')?.textContent",'Second popup');
   previous=new Set((await targets()).map(t=>t.targetId));await run(secondPopup,"document.querySelector('#openWorkspace').click()");
-  const secondBlank=await newTarget(previous,/analysis.html\?workspace=blank/);await waitFor(secondBlank,"!!document.querySelector('.workspace-home')",'Independent blank tab');
+  const secondBlank=await newTarget(previous,/analysis.html\?workspace=blank/);await waitFor(secondBlank,"!!document.querySelector('.board')",'Independent blank tab');
   assert.equal(await run(secondBlank,"import('./analysis.js').then(m=>m.S.blank&&m.S.pgn==='')"),true);
   console.log('Saved-game review, reload recovery and independent blank tabs passed.');
 
@@ -73,6 +78,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const homePreview=await tab(base+'/analysis.html?screen-preview=workspace-blank');
   await waitFor(homePreview,"document.body?.dataset.previewReady==='true'",'Blank screen preview');
   assert.equal(await run(homePreview,"document.querySelector('[aria-label=\"Screen preview\"]').value"),'workspace-blank');
-  assert.equal(await run(homePreview,"getComputedStyle(document.querySelector('#canvas')).display"),'none');
+  assert.notEqual(await run(homePreview,"getComputedStyle(document.querySelector('#canvas')).display"),'none');
+  assert.equal(await run(homePreview,"document.querySelectorAll('.board .piece-img').length"),32);
   console.log('Pasted-game import, preview launch guard and blank screen preview passed. Screenshots: '+out);
 }

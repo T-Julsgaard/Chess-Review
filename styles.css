@@ -2392,22 +2392,4 @@ button { font-family: inherit; cursor: pointer; }
 
 .learning-workspace .puzzle-run-results .puzzle-practice-heading h2 { font-size: clamp(20px,1.4vw,24px); }
 
-/* No-game entry, using the same panels and accent as the review. */
-.workspace-home { width:min(620px,100%); margin:auto; padding:clamp(32px,7vh,80px) 28px 72px; text-align:center; }
-.workspace-home-art { display:grid; place-items:center; width:88px; height:88px; margin:0 auto 28px; border:1px solid color-mix(in srgb,var(--accent) 38%,var(--line)); border-radius:26px; background:color-mix(in srgb,var(--accent) 14%,var(--panel)); box-shadow:0 16px 48px #00000020; }
-.workspace-home-art img { width:62px; height:62px; }
-.workspace-home h1 { font-size:clamp(26px,4vw,36px); letter-spacing:-.8px; line-height:1.15; margin:0 0 14px; }
-.workspace-home-intro { margin:0 auto 30px; max-width:390px; color:var(--ink-2); font-size:16px; line-height:1.6; }
-.workspace-home-actions { display:grid; gap:12px; }
-.workspace-home-action { display:flex; align-items:center; gap:16px; padding:20px; min-height:86px; border:1px solid var(--line); border-radius:14px; background:var(--panel); color:var(--ink); text-align:left; transition:background .2s,border-color .2s; }
-.workspace-home-action:hover { border-color:var(--accent); background:color-mix(in srgb,var(--accent) 12%,var(--panel)); }
-.workspace-home-action:focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
-.workspace-home-action svg { width:26px; height:26px; color:var(--accent); flex:none; }
-.workspace-home-copy { flex:1; min-width:0; }
-.workspace-home-action strong,.workspace-home-action small { display:block; }
-.workspace-home-action strong { font-size:16px; }.workspace-home-action small { margin-top:6px; font-size:13px; color:var(--ink-2); }
-.workspace-home-note { color:var(--ink-3); font-size:12px; line-height:1.7; margin:24px auto 0; max-width:440px; }
-.blank-workspace { min-height:100vh; }.blank-workspace .feedback-floating { z-index:100; }
-@media(prefers-reduced-motion:reduce) { .workspace-home-action { transition:none; } }
-
-.workspace-home[hidden], .stage[hidden], [data-game-action][hidden] { display:none!important; }
+.stage[hidden], [data-game-action][hidden] { display:none!important; }
