@@ -36,6 +36,26 @@ test('board expands uniformly on a straight path with no upward arc or overshoot
   ]);
 });
 
+test('return animation converts screen movement through a scaled review ancestor',()=>{
+  assert.deepEqual(boardExpansionFrames({x:80,y:130,width:600},{x:100,y:150,width:500},.8),[
+    {transform:'translate(-25px, -25px) scale(1.2)'},
+    {transform:'translate(0px, 0px) scale(1)'},
+  ]);
+});
+
+test('panel fades preserve existing content transforms in both directions',async t=>{
+  const {dom,doc,source,board,target,animations}=scene(t);
+  source.style.transform='scale(0.8847)';target.style.transform='scale(0.9038)';
+  const controller=new dom.window.AbortController();
+  const pending=centeredMorph(doc,capturePanels([source]),[target],{board,fromBoard:board.getBoundingClientRect(),signal:controller.signal});
+  for(const animation of animations.filter(a=>a.target===source||a.target===target)){
+    assert.ok(animation.frames.every(frame=>!('transform'in frame)));
+    assert.ok(animation.frames.every(frame=>'translate'in frame));
+  }
+  controller.abort();await pending;
+  assert.equal(source.style.transform,'scale(0.8847)');assert.equal(target.style.transform,'scale(0.9038)');
+});
+
 test('Morph 3 clears outgoing text before revealing its single live destination and cancels cleanly',async t=>{
   const {dom,doc,source,board,target,animations}=scene(t);
   const controller=new dom.window.AbortController();
