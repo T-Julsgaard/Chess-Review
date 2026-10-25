@@ -1689,6 +1689,7 @@ async function openLearning() {
     onClose:()=>{
       learningWorkspace = null;
       syncLearningToggle();
+      alignPlayers();
       if(wasBlank){UI.home?.querySelector("button")?.focus();return;}
       S.idx=snapshot.idx; S.flipped=snapshot.flipped; S.selectedSq=snapshot.selectedSq;
       if(!S.practice){paintBoard();}
@@ -3233,6 +3234,8 @@ function renderPlayers() {
 // Align the player strip with the board's actual left edge (the board can be
 // centered in its module, so we measure instead of guessing a fixed offset).
 function alignPlayers() {
+  // The learning board has its own geometry; keep the saved review labels still.
+  if (learningWorkspace?.embedded) return;
   const board = UI.boardWrap && UI.boardWrap.querySelector(".board");
   const top = UI.playerTop && UI.playerTop.querySelector(".player-strip");
   if (!board || !top) return;

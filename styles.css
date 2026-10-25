@@ -201,7 +201,7 @@
 /* The review's board remains anchored while the surrounding surfaces reassemble. */
 .stage.learning-active { position: relative; }
 .learning-active > .mod, .learning-active > .side .mod { visibility: hidden; }
-.has-learning .library-rail, .has-learning > .feedback-floating { visibility: hidden; }
+.has-learning > .feedback-floating { visibility: hidden; }
 .learn-board-placeholder { width: 100%; aspect-ratio: 1; flex: 1; }
 .learning-workspace.learning-embedded { position: absolute; inset: 0; z-index: 30; overflow: visible; background: transparent; animation: none; pointer-events: none; }
 .learning-embedded .learn-board-dock { position: absolute; left: var(--learn-board-x); top: var(--learn-board-y); width: var(--learn-board-size); pointer-events: auto; }
@@ -583,18 +583,14 @@ button { font-family: inherit; cursor: pointer; }
 
 .topbar-meta { display: flex; align-items: center; gap: 18px; margin-left: 6px; }
 .has-learning .topbar-meta { pointer-events: none; animation: meta-swoop-up .28s ease-out both; }
-.topbar-meta.meta-return { animation: meta-drop-in 1.05s both; transform-origin: 50% 0; }
+.topbar-meta.meta-return { animation: meta-slide-down .28s ease-out both; }
 @keyframes meta-swoop-up {
   0% { transform: translateY(0); }
   100% { transform: translateY(-60px); visibility: hidden; }
 }
-@keyframes meta-drop-in {
-  0% { transform: translateY(-160px) rotate(-9deg); opacity: 0; animation-timing-function: cubic-bezier(.55,.05,1,.6); }
-  48% { transform: translateY(5px) rotate(3deg) scaleY(.9); opacity: 1; animation-timing-function: ease-out; }
-  68% { transform: translateY(-14px) rotate(-2deg) scaleY(1.04); animation-timing-function: ease-in; }
-  82% { transform: translateY(2px) rotate(1deg); animation-timing-function: ease-out; }
-  92% { transform: translateY(-4px) rotate(-.5deg); }
-  100% { transform: translateY(0) rotate(0); opacity: 1; }
+@keyframes meta-slide-down {
+  from { transform: translateY(-60px); }
+  to { transform: translateY(0); }
 }
 .topbar-meta[data-motion="off"] { animation: none; }
 .has-learning .topbar-meta[data-motion="off"] { visibility: hidden; }
@@ -2068,7 +2064,16 @@ button { font-family: inherit; cursor: pointer; }
   position: fixed; left: 0; top: 60px; bottom: 0; z-index: 25;
   width: 13px;                      /* the thin "move to the left" trigger strip */
   display: flex; align-items: center;
+  transform: translateX(0); visibility: visible;
+  transition: transform .28s ease-out, visibility 0s;
 }
+.library-rail.open { --learning-library-offset: -280px; }
+.has-learning .library-rail {
+  transform: translateX(var(--learning-library-offset, -40px)); visibility: hidden; pointer-events: none;
+  transition: transform .28s ease-out, visibility 0s .28s;
+}
+.library-rail[data-motion="off"] { transition: none; }
+@media (prefers-reduced-motion: reduce) { .library-rail { transition: none !important; } }
 .lib-tab {
   position: absolute; left: 0; top: 50%; transform: translateY(-50%);
   display: flex; flex-direction: column; align-items: center; gap: 7px;

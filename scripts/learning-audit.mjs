@@ -159,8 +159,13 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await run("(()=>{const low=document.querySelector('[aria-label=Minimum]'),high=document.querySelector('[aria-label=Maximum]');low.value=1000;low.dispatchEvent(new Event('input',{bubbles:true}));high.value=2400;high.dispatchEvent(new Event('input',{bubbles:true}));window.auditSlider=low;window.auditShell=document.querySelector('.learn-shell');auditShell.scrollTop=120;window.sliderFrames=[];window.sampleSliders=true;function sample(){if(auditSlider.isConnected){sliderFrames.push({same:document.querySelector('[aria-label=Minimum]')===auditSlider,count:document.querySelectorAll('[aria-label=Minimum]').length,appearance:getComputedStyle(auditSlider).appearance,context:!!auditSlider.closest('.learning-workspace'),value:auditSlider.value,scroll:auditShell.scrollTop});}if(sampleSliders)requestAnimationFrame(sample);}requestAnimationFrame(sample);})()");
   await run("import('./analysis.js').then(m=>{void m.learningWorkspace.close();})");
   await sleep(60);
-  const drop=await run("(()=>{const n=document.querySelector('.topbar-meta'),a=n.getAnimations().find(a=>a.animationName==='meta-drop-in');if(!a)return null;a.pause();a.currentTime=0;const start=n.getBoundingClientRect().bottom;a.currentTime=504;const landing=n.getBoundingClientRect().top;a.currentTime=714;const bounce=n.getBoundingClientRect().top;a.currentTime=1050;const end=n.getBoundingClientRect().top;return {start,landing,bounce,end,hidden:n.hasAttribute('aria-hidden')};})()");
-  assert.ok(drop&&drop.start<0&&drop.landing>drop.end&&drop.bounce<drop.end&&!drop.hidden,'Review metadata must fall from above the viewport and bounce on landing');
+  const slide=await run("(()=>{const n=document.querySelector('.topbar-meta'),a=n.getAnimations().find(a=>a.animationName==='meta-slide-down');if(!a)return null;a.pause();const frames=[0,70,140,210,280].map(time=>{a.currentTime=time;const m=new DOMMatrix(getComputedStyle(n).transform);return {x:m.m41,y:m.m42,scaleX:m.m11,scaleY:m.m22,skewX:m.m12,skewY:m.m21};});a.finish();return {frames,hidden:n.hasAttribute('aria-hidden')};})()");
+  assert.ok(slide&&!slide.hidden,'Review metadata must slide back into view');
+  for(const [i,frame] of slide.frames.entries()){
+    assert.equal(frame.x,0);assert.equal(frame.scaleX,1);assert.equal(frame.scaleY,1);assert.equal(frame.skewX,0);assert.equal(frame.skewY,0);
+    assert.ok(frame.y>=-60&&frame.y<=0,'Metadata must stay on its straight return path');
+    if(i)assert.ok(frame.y>=slide.frames[i-1].y,'Metadata must return without bouncing');
+  }
   assert.equal(await run("document.getAnimations().some(a=>a.effect?.target===auditShell)"),true,'Return should animate the live shell');
   const returning=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
   await fs.writeFile(path.join(out,'return-live-controls.png'),Buffer.from(returning.data,'base64'));
