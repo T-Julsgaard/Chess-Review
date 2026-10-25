@@ -5,7 +5,7 @@ import {app,loadGame} from './helpers/app.mjs';
 
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-8,`${a} must equal ${b}`);
 function setup(t) {
-  const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
+  const a=app(t);Object.defineProperties(a.dom.window,{innerWidth:{value:2206,configurable:true},innerHeight:{value:1100,configurable:true}});loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
   a.state.layoutMode='custom';a.call('applyLayoutMode');a.call('toggleReorganize');
   const doc=a.dom.window.document,mod=key=>doc.querySelector(`[data-mod=${key}]`);
   const event=(target,type,x,y,id=1)=>{const e=new a.dom.window.MouseEvent(type,{bubbles:true,clientX:x,clientY:y,button:0});Object.defineProperty(e,'pointerId',{value:id});target.dispatchEvent(e);};

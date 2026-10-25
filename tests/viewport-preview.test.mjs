@@ -10,7 +10,7 @@ test('fit scales large screens without changing dimensions and actual size stays
   assert.equal(previewScale(3840,2160,1968,1128,'1'),1);
 });
 
-test('presets, custom sizes, rotation and app zoom resize the same live iframe',t=>{
+test('presets, custom sizes, rotation keep native dimensions and resize the same live iframe',t=>{
   const dom=new JSDOM(fs.readFileSync(new URL('../screen-preview.html',import.meta.url),'utf8'),{url:'https://extension.test/screen-preview.html'});
   t.after(()=>dom.window.close());
   const doc=dom.window.document,$=id=>doc.getElementById(id),stage=$('preview-stage');
@@ -28,7 +28,7 @@ test('presets, custom sizes, rotation and app zoom resize the same live iframe',
   change('screen-width','0');assert.equal(frame.style.width,'900px');
   change('screen-width','900');
   frame.dispatchEvent(new dom.window.CustomEvent('preview-zoom',{detail:0.75}));
-  assert.equal(frame.style.width,'1200px');assert.equal(frame.dataset.previewZoom,'0.75');
+  assert.equal(frame.style.width,'900px');assert.equal(frame.style.height,'700px');assert.equal(frame.dataset.previewZoom,undefined);
   assert.match($('screen-readout').textContent,/900 × 700/);
   assert.equal(frame.src,source);assert.equal($('preview-app'),frame);
 });

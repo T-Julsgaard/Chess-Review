@@ -63,7 +63,7 @@ test('engine loading, ready and terminal states reserve identical candidate spac
     for (const lines of [null, Array.from({length: count}, () => ({score: {cp: 12}, pv: '', depth: 16})), []]) {
       a.state._lastEngineLines = null; a.call('renderEngine', lines);
       const candidates = doc.querySelector('.engine-candidates');
-      assert.equal(candidates.style.minHeight, `${count * 46}px`);
+      assert.equal(candidates.style.minHeight, `calc(${count} * var(--engine-line-h, 46px))`);
       assert.equal(candidates.nextElementSibling.textContent, '■ Stop');
     }
   }

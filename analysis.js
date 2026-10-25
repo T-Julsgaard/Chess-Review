@@ -24,14 +24,8 @@ import { rememberAnalyzedGame, historyGame } from "./lib/player-history.js";
 
 const screenPreview = createScreenPreviewContext(location);
 const blankLaunch = new window.URLSearchParams(location.search).get("workspace") === "blank";
-// A framed preview fits only its own viewport. Browser tab zoom would also resize
-// the surrounding controls, so the host provides equivalent frame dimensions.
-const browserAPI = screenPreview ? {...platformAPI,storage:{...platformAPI.storage,local:screenPreview.storage},
-  tabs:screenPreview.viewport?{...platformAPI.tabs,
-    getZoom:async()=>Number(window.frameElement?.dataset.previewZoom)||1,
-    getZoomSettings:async()=>({defaultZoomFactor:1}),setZoomSettings:async()=>{},
-    setZoom:async(_id,zoom)=>window.frameElement?.dispatchEvent(new window.CustomEvent('preview-zoom',{detail:zoom})),
-  }:platformAPI.tabs} : platformAPI;
+// Previews use isolated storage and their actual iframe viewport at 100%.
+const browserAPI = screenPreview ? {...platformAPI,storage:{...platformAPI.storage,local:screenPreview.storage}} : platformAPI;
 
 /* ---------------- Opening book ----------------
  * Offline lookup table built from lichess-org/chess-openings (bundled in data/book.json).
@@ -306,7 +300,7 @@ const DEFAULT_SETTINGS = {
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
   badgeFont: "spacemono", badgeTooltip: "off",
   // Eval-graph look (see renderGraph), eval-BAR look (see renderEvalBar) and the Insight-panel text size (px).
-  graphStyle: "area", barStyle: "gradient", insightFont: 18,
+  graphStyle: "area", barStyle: "gradient", insightFont: 16, nativeSizingVersion: 1,
   // Board coordinate labels (the a–h / 1–8 ticks in the squares' corners): on/off + size in px.
   showCoords: true, coordSize: 12,
   // App background: "color" (a tone picked with the HSL sliders), a bundled preset (slate / olive
@@ -396,7 +390,8 @@ const LOADERS = { dots: "pulse", bounce: "bounce", spinner: "spin", wave: "wave"
 // Default placement of the movable modules (free canvas). Saved per user.
 // When LAYOUT_VERSION is bumped, saved layouts are reset to this default once.
 // Responsive placement is the default. Custom layouts start from the current screen.
-// These boxes also provide desktop placement and hidden-module fallback geometry.
+// These boxes preserve saved canvas coordinates and hidden-module fallback geometry.
+// Automatic placement uses the responsive CSS grid at 100% browser zoom.
 const LAYOUT_VERSION = 9;
 // Exported panel placements, with the expanded Accuracy baseline and content scales.
 const DEFAULT_LAYOUT = {
@@ -1612,7 +1607,7 @@ function buildUI() {
   });
 
   const saveStatus = el("div", {class:"review-save-status", hidden:true, "aria-live":"polite"});
-  root.append(el("div", { class: "app" }, topbar, canvas, settings, libRail, saveStatus,
+  root.append(el("div", { class: "app" }, topbar, el("div", {class:"review-viewport"}, canvas), settings, libRail, saveStatus,
     feedbackLink("feedback-floating", el("span", {}, "Feedback"))));
 
   UI = {
@@ -1748,6 +1743,7 @@ function makeMod(key, ...inner) {
   return mod;
 }
 let _saveLayoutT = null;
+let canvasScale = 1;
 // Persist the EXPANDED layout baseline. While the accuracy breakdown is collapsed, S.layout holds
 // the shrunk geometry (accuracy panel shorter, modules below pulled up by `delta`). Saving that
 // as-is would let the next boot's collapse subtract `delta` a second time, so each session the
@@ -1818,7 +1814,7 @@ function applyPanelBox(mod,b) {
   inner.style.transform=scale===1?"":"scale("+scale+")";inner.style.transformOrigin=scale===1?"":"top left";
 }
 function panelContentScale(key) {
-  return isCustomLayout() ? panelScale(S.layout[key]) : UI.canvas.classList.contains("desktop-layout") ? panelScale(DEFAULT_LAYOUT[key]) : 1;
+  return isCustomLayout() ? panelScale(S.layout[key]) : 1;
 }
 function applyLayoutMode() {
   const custom = isCustomLayout();
@@ -1829,40 +1825,22 @@ function applyLayoutMode() {
 }
 function applyLayout() {
   UI.canvas.classList.add("no-concepts");
-  const custom = isCustomLayout();
-  const desktop = !custom && UI.canvas.classList.contains("desktop-layout");
-  const boxes = custom ? S.layout : desktop ? (S.qbreakExpanded ? DEFAULT_LAYOUT : collapsedAccuracyLayout(DEFAULT_LAYOUT)) : null;
-  UI.canvas.style.setProperty("--desktop-width", layoutPageSize(DEFAULT_LAYOUT).pageW + "px");
-  for (const mod of UI.canvas.querySelectorAll(".mod")) {
-    const key = mod.getAttribute("data-mod");
-    applyPanelBox(mod, boxes?.[key]);
-  }
+  UI.canvas.classList.remove("desktop-layout");
+  for (const mod of UI.canvas.querySelectorAll(".mod")) applyPanelBox(mod,isCustomLayout()?S.layout[mod.dataset.mod]:null);
   fitEnginePanel();
   requestAnimationFrame(positionSettings);
 }
 // Freeze the automatic layout into free-canvas boxes, so Reorganize starts from exactly what is on
 // screen. Hidden modules (eval bar or coach switched off) keep their default box.
 function snapshotLayout() {
-  const base = UI.canvas.getBoundingClientRect();
+  const base = UI.canvas.parentElement.getBoundingClientRect();
   const out = structuredClone(DEFAULT_LAYOUT);
-  const desktop = UI.canvas.classList.contains("desktop-layout");
   for (const mod of UI.canvas.querySelectorAll(".mod")) {
-    if (desktop) {
-      // These boxes already have exact geometry, including the collapsed Accuracy panel.
-      // Measuring at browser zoom can turn 294px into 293.993px; snapping down then
-      // shrinks the panel by 2px and introduces scrollbars when Reorganize is opened.
-      out[mod.getAttribute("data-mod")] = {
-        x: parseFloat(mod.style.left), y: parseFloat(mod.style.top),
-        w: parseFloat(mod.style.width), h: parseFloat(mod.style.height),
-        scale: panelScale(DEFAULT_LAYOUT[mod.getAttribute("data-mod")]),
-      };
-      continue;
-    }
     const r = mod.getBoundingClientRect();
     if (!r.width || !r.height) continue;
-    // Round DOWN to the grid, so the canvas never needs more room than the screen it came from.
-    const down = (v) => Math.floor(v / GRID) * GRID;
-    out[mod.getAttribute("data-mod")] = { x: down(r.left - base.left), y: down(r.top - base.top), w: down(r.width), h: down(r.height) };
+    // Preserve the rendered geometry when unlocking panels; grid snapping applies
+    // only to an actual user drag, not to the responsive layout snapshot.
+    out[mod.getAttribute("data-mod")] = { x:r.left-base.left, y:r.top-base.top, w:r.width, h:r.height };
   }
   return out;
 }
@@ -1875,10 +1853,21 @@ function layoutExtent(layout) {
   return { maxR, maxB };
 }
 function growCanvas() {
-  if (!isCustomLayout()) { UI.canvas.style.minHeight = ""; UI.canvas.style.minWidth = ""; return; }
-  const { pageW, pageH } = layoutPageSize(S.layout);
-  UI.canvas.style.minHeight = pageH - TOPBAR_H + "px";
-  UI.canvas.style.minWidth = pageW + "px";
+  const viewport=UI.canvas.parentElement;
+  if (!isCustomLayout()) {
+    canvasScale=1;
+    for(const key of ['minHeight','minWidth','width','height','transform','transformOrigin','marginLeft'])UI.canvas.style[key]="";
+    viewport.style.height="";viewport.classList.remove('custom-viewport');
+    return;
+  }
+  const {pageW,pageH}=layoutPageSize(S.layout),height=pageH-TOPBAR_H;
+  const width=window.innerWidth||innerWidth,availableHeight=(window.innerHeight||innerHeight)-TOPBAR_H;
+  canvasScale=Math.min(1,width/pageW,Math.max(1,availableHeight)/height);
+  UI.canvas.style.minWidth=UI.canvas.style.width=pageW+'px';
+  UI.canvas.style.minHeight=UI.canvas.style.height=height+'px';
+  UI.canvas.style.transform='scale('+canvasScale+')';UI.canvas.style.transformOrigin='top left';
+  UI.canvas.style.marginLeft='0px';
+  viewport.style.height=height*canvasScale+'px';viewport.classList.add('custom-viewport');
 }
 // What collapsing the accuracy breakdown is worth on the canvas: the hidden rows' height (+ the
 // column row-gap), and modules below it in the same column. Playback controls stay anchored.
@@ -1897,13 +1886,6 @@ function accuracyReflowInfo(layout = S.layout) {
     if (overlapX && o.y >= acc.y + acc.h - 1) belowKeys.push(k);
   }
   return { delta, belowKeys };
-}
-function collapsedAccuracyLayout(layout) {
-  if (!layout.accuracy) return layout;
-  const out = structuredClone(layout), { delta, belowKeys } = accuracyReflowInfo(layout);
-  out.accuracy.h = Math.max(MINH * panelScale(out.accuracy), out.accuracy.h - delta);
-  for (const key of belowKeys) out[key].y = Math.max(0, out[key].y - delta);
-  return out;
 }
 // Keep the Accuracy module and everything stacked below it glued together when the category list
 // expands/collapses on the custom canvas (the automatic layout reflows on its own). The saved
@@ -1944,13 +1926,13 @@ function makeMovable(mod, handle, grips, key) {
     if(e.ctrlKey||e.metaKey||e.shiftKey){togglePanelSelection(key);return;}
     if(!selectedPanels.has(key))selectPanels([key]);
     const keys=selectedPanelKeys(),group=keys.length>1,start=structuredClone(S.layout),reflow=S._accReflow&&structuredClone(S._accReflow);
-    const bounds=panelGroupBounds(start,keys),box=start[key],sx=e.clientX,sy=e.clientY;
+    const bounds=panelGroupBounds(start,keys),box=start[key],sx=e.clientX,sy=e.clientY,gestureScale=canvasScale;
     if(!bounds||!box)return;
     clearTimeout(_saveLayoutT);
     for(const name of keys)UI.canvas.querySelector('[data-mod="'+name+'"]').classList.add(kind==='move'?'dragging':'resizing');
     try{target.setPointerCapture(e.pointerId);}catch{}
     const apply=ev=>{
-      const dx=ev.clientX-sx,dy=ev.clientY-sy;
+      const dx=(ev.clientX-sx)/gestureScale,dy=(ev.clientY-sy)/gestureScale;
       if(kind==='move')S.layout=movePanelGroup(start,keys,snapGrid(dx),snapGrid(dy));
       else if(group){
         const rx=box.x+box.w-bounds.x,ry=box.y+box.h-bounds.y;
@@ -3266,7 +3248,7 @@ function alignPlayers() {
   const board = UI.boardWrap && UI.boardWrap.querySelector(".board");
   const top = UI.playerTop && UI.playerTop.querySelector(".player-strip");
   if (!board || !top) return;
-  const scale=panelContentScale('board');
+  const scale=panelContentScale('board')*canvasScale;
   const off = Math.max(4, Math.round((board.getBoundingClientRect().left - UI.boardWrap.getBoundingClientRect().left)/scale));
   top.style.paddingLeft = off + "px";
   const bot = UI.playerBot.querySelector(".player-strip");
@@ -4084,7 +4066,6 @@ function renderStats() {
     ),
   ));
   statsRefs = S.analyzing ? { expanded: S.qbreakExpanded, rows } : null;
-  if (UI.canvas.classList.contains("desktop-layout")) applyLayout();
 }
 
 /* ---------------- Eval graph ---------------- */
@@ -4400,24 +4381,16 @@ async function requestPanelLines() {
   return entry.promise;
 }
 const ENGINE_NAME = { nnue: "Stockfish 18 NNUE", sf19lite: "Stockfish 19 Lite" };
-// Keep all candidate lines and the action visible. Only the bottom edge moves, including
-// when narrowing a custom panel wraps its heading/button or extra lines are selected.
+// Keep Engine in its allotted panel. Candidate lines scroll instead of pushing
+// playback or learning controls outside the viewport when more lines are shown.
 function fitEnginePanel() {
-  const mod = UI.engine?.closest('.mod');
-  const head = UI.engine?.querySelector('.panel-head');
-  const body = UI.engine?.querySelector('.engine-body');
-  if (!mod || !head || !body) return;
-  const scale=panelContentScale('engine');
-  const height = Math.max(DEFAULT_LAYOUT.engine.h/panelScale(DEFAULT_LAYOUT.engine),
-    Math.ceil(((head.offsetHeight||head.getBoundingClientRect().height/scale) + body.scrollHeight + 4) / GRID) * GRID)*scale;
-  mod.style.minHeight = height + "px";
-  if (isCustomLayout() && S.layout.engine) {
-    S.layout.engine.h = Math.max(S.layout.engine.h, height);
-    applyPanelBox(mod,S.layout.engine);
-    growCanvas();
-  } else if (UI.canvas.classList.contains("desktop-layout")) {
-    mod.style.height = height + "px";
-  }
+  const mod=UI.engine?.closest('.mod');if(!mod)return;
+  if(!isCustomLayout()){mod.style.minHeight="";return;}
+  if(!S.layout.engine){mod.style.minHeight="";return;}
+  const height=120*panelScale(S.layout.engine);
+  mod.style.minHeight=height+'px';
+  S.layout.engine.h=Math.max(S.layout.engine.h,height);
+  applyPanelBox(mod,S.layout.engine);growCanvas();
 }
 function renderEngine(lines, padFromCache = false) {
   const curFen = activePos().fen;
@@ -4483,7 +4456,7 @@ function renderEngine(lines, padFromCache = false) {
     el("div", { class: "panel-head" }, el("h3", {}, "Engine"),
       el("span", { class: "count" }, `${activeEngineName()} · depth ${S.settings.engineDepth}`)),
     el("div", { class: "panel-body engine-body" },
-      el("div", { class: "engine-candidates", style: { minHeight: (want * 46) + "px" } }, body), bestWalkBtn),
+      el("div", { class: "engine-candidates", style: { minHeight: `calc(${want} * var(--engine-line-h, 46px))` } }, body), bestWalkBtn),
   ));
   UI.engineRenderKey = renderKey; UI.engineRenderNode = UI.engine.firstChild;
   fitEnginePanel();
@@ -6549,112 +6522,42 @@ async function applyGame(payload) {
 }
 
 /* ---------------- Start ---------------- */
-// Desktop auto layout preserves the v7 composition; narrow windows use the responsive grid.
-// Desktop and custom layouts are fitted as a whole under the 60 px top bar to the WINDOW. Not the
-// monitor (screen.*): a monitor-based zoom cuts off the right column as soon as the window isn't
-// maximized, or is dragged to a smaller monitor after opening.
-//
-// The viewport is measured in device-independent pixels (innerWidth × current zoom), since
-// innerWidth alone shrinks and grows with the zoom we are about to set. We use real Chrome zoom (not
-// CSS zoom, which would throw off the pointer-coordinate maths the panel dragging relies on).
-const TOPBAR_H = 60;                 // .topbar height in styles.css
-const MIN_ZOOM = 0.5, MAX_ZOOM = 2;  // below 50% the text is unreadable; above 200% it balloons
-let _zoomTabId = null;
-let _defaultZoom = 1;
-let _fittedDip = null;               // viewport size (device-independent px) the zoom was last fitted to
-let _zoomFitQueue = Promise.resolve();
+// Layout follows the CSS viewport. Browser zoom is normalized once on open/reset;
+// resizing never changes it, and manual zoom remains an accessibility choice.
+const TOPBAR_H = 52;
+let _fittedDip = null;
 let _zoomInit = null;
-function desktopLayoutFor(dipW, dipH) {
-  return dipW / _defaultZoom >= 1100 && dipH / _defaultZoom >= 520;
-}
-function desktopZoomFor(dipW, dipH) {
-  // The export was arranged with Accuracy collapsed. Fitting its hidden rows
-  // shrinks the whole page, turning the intended 87% into 85% on Full HD.
-  return fittedZoomFor(collapsedAccuracyLayout(DEFAULT_LAYOUT), dipW, dipH);
-}
-function layoutPageSize(layout) {
-  const { maxR, maxB } = layoutExtent(layout);
-  const defaults = layoutExtent(collapsedAccuracyLayout(DEFAULT_LAYOUT));
-  const desktopSized = maxR >= defaults.maxR - .02 && maxB >= defaults.maxB - .02;
-  // Preserve the exported desktop's breathing room (1056px viewport, including
-  // the 2px fit allowance) on reset and saved canvases. Allow CSS rounding when
-  // recognizing a desktop snapshot; smaller arrangements keep their own bounds.
-  return { pageW: Math.max(desktopSized ? 1832 : 0, maxR + CANVAS_MARGIN),
-    pageH: Math.max(desktopSized ? 1054 : 0, TOPBAR_H + maxB + CANVAS_MARGIN) };
-}
-function fittedZoomFor(layout, dipW, dipH) {
-  const { pageW, pageH } = layoutPageSize(layout);
-  return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM,
-    Math.floor(Math.min((dipW - 2) / pageW, (dipH - 2) / pageH) * 100) / 100));
-}
-function targetZoomFor(dipW, dipH) {
-  return fittedZoomFor(S.qbreakExpanded ? collapsedAccuracyLayout(S.layout) : S.layout, dipW, dipH);
-}
-function fitTabZoom(force = false) {
-  // A reset can overlap a resize or startup. Never pair an old getZoom result
-  // with viewport dimensions already changed by another fit.
-  const next = _zoomFitQueue.catch(() => {}).then(() => performTabZoomFit(force));
-  _zoomFitQueue = next;
-  return next;
-}
-async function performTabZoomFit(force) {
-  if (_zoomTabId == null) return;
-  const z = (await browserAPI.tabs.getZoom(_zoomTabId)) || 1;
-  // CSS viewport dimensions are rounded after browser zoom. Recover whole DIP pixels so
-  // reopening a 920px-high window at 90% cannot drift to 89% (1022 × .9 = 919.8).
-  const w = Math.round(innerWidth * z), h = Math.round(innerHeight * z);
-  // Same device-pixel size as last time → this resize came from a zoom change (the user's Ctrl+/-,
-  // our own setZoom, or another tab sharing the origin zoom), not from the window. Leave it.
-  if (!force && _fittedDip && Math.abs(w - _fittedDip.w) < 3 && Math.abs(h - _fittedDip.h) < 3) return;
-  const desktop = !isCustomLayout() && desktopLayoutFor(w, h);
-  UI.canvas.classList.toggle("desktop-layout", desktop);
-  applyLayout();
-  requestAnimationFrame(alignPlayers);
-  const target = isCustomLayout() ? targetZoomFor(w, h) : desktop ? desktopZoomFor(w, h) : _defaultZoom;
-  // Only set it when it's off, so an unchanged window never triggers Chrome's zoom bubble.
-  if (Math.abs(z - target) > 0.005) await browserAPI.tabs.setZoom(_zoomTabId, target);
-  _fittedDip = { w, h };
-}
-// Isolate zoom before fitting, so two analysis windows on different monitors keep their own fit.
-// Browsers rejecting per-tab scope retain their existing scope.
-async function initTabZoom() {
-  try {
-    if (!browserAPI?.tabs?.getCurrent) return;
-    if (!_zoomInit) _zoomInit = (async () => {
-      const tab = await browserAPI.tabs.getCurrent();
-      if (!tab || tab.id == null) return;
-      const settings = await browserAPI.tabs.getZoomSettings(tab.id);
-      _defaultZoom = settings.defaultZoomFactor || 1;
-      // Keep a resized analysis window from changing other extension tabs' zoom.
-      await browserAPI.tabs.setZoomSettings(tab.id, { scope: "per-tab", mode: "automatic" }).catch(() => {});
-      _zoomTabId = tab.id;
-    })();
-    await _zoomInit;
-    await fitTabZoom(true);
-  } catch { _zoomInit = null; return; }
-  // Refit after the window is resized, maximized or moved to a different monitor. Debounced so a
-  // drag-resize zooms once when it settles, not on every frame. Registered once per page.
-  if (_zoomResizeBound) return;
-  _zoomResizeBound = true;
-  let t = null;
-  window.addEventListener("resize", () => {
-    clearTimeout(t);
-    t = setTimeout(() => fitTabZoom().catch(() => {}), 200);
-  });
-}
 let _zoomResizeBound = false;
-// Earlier versions zoomed the analysis page themselves (90–127%), and Chrome remembers that zoom for
-// the extension's origin. The automatic layout is built for the browser's own zoom, so give it back
-// once when an older install is migrated.
-async function resetLegacyZoom() {
-  try {
-    if (!browserAPI?.tabs?.getCurrent) return;
-    const tab = await browserAPI.tabs.getCurrent();
-    if (!tab || tab.id == null) return;
-    await browserAPI.tabs.setZoomSettings(tab.id, { scope: "per-origin", mode: "automatic" });
-    const [z, zs] = await Promise.all([browserAPI.tabs.getZoom(tab.id), browserAPI.tabs.getZoomSettings(tab.id)]);
-    if (Math.abs(z - (zs.defaultZoomFactor || 1)) > 0.005) await browserAPI.tabs.setZoom(tab.id, 0);
-  } catch {}
+function layoutPageSize(layout) {
+  const {maxR,maxB}=layoutExtent(layout);
+  return {pageW:maxR+CANVAS_MARGIN,pageH:TOPBAR_H+maxB+CANVAS_MARGIN};
+}
+function fitViewport() {
+  if(!UI.canvas)return;
+  _fittedDip={w:window.innerWidth,h:window.innerHeight};
+  applyLayout();growCanvas();requestAnimationFrame(alignPlayers);
+}
+async function initTabZoom() {
+  if(!_zoomInit)_zoomInit=(async()=>{
+    try {
+      const tabs=browserAPI?.tabs;
+      // Iframes always render their requested CSS size and never change the host tab.
+      if(!screenPreview&&tabs?.getCurrent){
+        const tab=await tabs.getCurrent();
+        if(tab?.id!=null){
+          await tabs.setZoomSettings(tab.id,{scope:"per-tab",mode:"automatic"}).catch(()=>{});
+          if(Math.abs((await tabs.getZoom(tab.id))-1)>.005)await tabs.setZoom(tab.id,1);
+        }
+      }
+    } finally {fitViewport();}
+  })().catch(()=>{_zoomInit=null;fitViewport();});
+  await _zoomInit;
+  if(!_zoomResizeBound){
+    _zoomResizeBound=true;
+    window.addEventListener('resize',fitViewport);
+  }
+  // A reset also restores 100% after deliberate manual browser zoom.
+  _zoomInit=null;
 }
 (async function main() {
   try {
@@ -6674,6 +6577,10 @@ async function resetLegacyZoom() {
     S.library = Array.isArray(store.library) ? store.library : [];
     S.settings = { ...DEFAULT_SETTINGS, ...(store.settings || {}) };
     const loadedSettings = structuredClone(S.settings);
+    if (!store.settings?.nativeSizingVersion) {
+      if (S.settings.insightFont === 18) S.settings.insightFont = 16;
+      S.settings.nativeSizingVersion = 1;
+    }
     S.settings.learningTransition = presentationFor(store.settings || {});
     for (const key of ["showConcepts", "conceptsEnabled", "conceptGroups", "disabledConcepts", "conceptsView", "conceptsDefaultedOff"]) delete S.settings[key];
     migrateVisualAssetSettings(S.settings);
@@ -6702,6 +6609,7 @@ async function resetLegacyZoom() {
     // The 5-line option was removed — clamp any stored value to the new max.
     if (S.settings.engineLines > ENGINE_MAX_LINES) S.settings.engineLines = ENGINE_MAX_LINES;
     const migration = {};
+    if (!store.settings?.nativeSizingVersion) migration.nativeSizingVersion = 1;
     for (const key of new Set([...Object.keys(loadedSettings), ...Object.keys(S.settings)])) {
       if (JSON.stringify(loadedSettings[key]) !== JSON.stringify(S.settings[key])) migration[key] = S.settings[key];
     }
@@ -6711,7 +6619,7 @@ async function resetLegacyZoom() {
     S.layout = useStored ? { ...structuredClone(DEFAULT_LAYOUT), ...store.layout } : structuredClone(DEFAULT_LAYOUT);
     S.layoutMode = useStored && store.layoutMode === "custom" ? "custom" : "auto";
     if (!useStored) saveLayout();
-    if (!screenPreview && store.layoutVersion != null && store.layoutVersion !== LAYOUT_VERSION) await resetLegacyZoom();
+
     S.username = store.username || "";
 
     // Everything the first render needs must be resolved BEFORE buildUI(), so that buildUI() and

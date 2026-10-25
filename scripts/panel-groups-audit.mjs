@@ -4,21 +4,14 @@ import assert from 'node:assert/strict';
 
 export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const run=expression=>evaluate(review,expression),near=(a,b)=>assert.ok(Math.abs(a-b)<1,`${a} must match ${b}`);
-  const expected=JSON.parse(await fs.readFile(new URL('../tests/fixtures/default-panel-layout.json',import.meta.url),'utf8'));
-  // Reproduce the reported 2258 × 1081 CSS viewport at 85%: 1919 × 919 DIP.
-  const initial=await run('(async()=>({outerW:outerWidth,outerH:outerHeight,w:innerWidth,h:innerHeight,zoom:await chrome.tabs.getZoom()}))()');
-  const {windowId}=await call('Browser.getWindowForTarget',{targetId:review.targetId});
-  await call('Browser.setWindowBounds',{windowId,bounds:{width:initial.outerW+1919-Math.round(initial.w*initial.zoom),height:initial.outerH+919-Math.round(initial.h*initial.zoom)}});
-  await waitFor(review,"chrome.tabs.getZoom().then(z=>Math.abs(z-.87)<.005)",'Original exported zoom');
+  await call('Emulation.setDeviceMetricsOverride',{width:1919,height:919,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(150);
+  const nativeBoxes=()=>run("Object.fromEntries([...document.querySelectorAll('.stage .mod')].map(n=>{const r=n.getBoundingClientRect();return [n.dataset.mod,{x:r.x,y:r.y,w:r.width,h:r.height}]}))");
+  const defaults=await nativeBoxes();
+  const expectedLayout=await run("import('./analysis.js').then(m=>structuredClone(m.S.layout))");
   const checkDefaults=async()=>{
-    const defaults=await run("import('./analysis.js').then(async m=>({mode:m.S.layoutMode,layout:m.S.layout,zoom:await chrome.tabs.getZoom(),boxes:Object.fromEntries([...document.querySelectorAll('.mod')].map(n=>[n.dataset.mod,{x:parseFloat(n.style.left),y:parseFloat(n.style.top),w:parseFloat(n.style.width),h:parseFloat(n.style.height),transform:n.querySelector('.mod-inner').style.transform}]))}))");
-    assert.equal(defaults.mode,'auto');
-    assert.equal(defaults.zoom,.87);
-    assert.deepEqual(defaults.layout,expected.layout);
-    for(const [key,box] of Object.entries(expected.displayedLayout)){
-      for(const prop of ['x','y','w','h'])near(defaults.boxes[key][prop],box[prop]);
-      assert.ok(Math.abs(parseFloat(defaults.boxes[key].transform.slice(6))-box.scale)<1e-5);
-    }
+    assert.equal(await run("chrome.tabs.getZoom()"),1);
+    assert.equal(await run("import('./analysis.js').then(m=>m.S.layoutMode)"),'auto');
+    const boxes=await nativeBoxes();for(const key of Object.keys(defaults))for(const prop of ['x','y','w','h'])near(boxes[key][prop],defaults[key][prop]);
   };
   await checkDefaults();
   const defaultShot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
@@ -62,7 +55,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   assert.ok(Math.abs(parseFloat(transform.slice(6))-changed.moves.scale)<1e-5);
   const reset=await run("(async()=>{document.querySelector('[aria-label=Settings]').click();[...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Layout').click();[...document.querySelectorAll('.set-reset')].find(n=>n.textContent==='Reset layout').click();return chrome.storage.local.get(['layout','layoutMode']);})()");
   assert.equal(reset.layoutMode,'auto');
-  assert.deepEqual(reset.layout,expected.layout);
+  assert.deepEqual(reset.layout,expectedLayout);
   await call('Page.reload',{},review.sessionId);
   await waitFor(review,"!!document.querySelector('.board')&&import('./analysis.js').then(m=>!m.S.analyzing)",'Reloaded default layout');
   await checkDefaults();

@@ -38,7 +38,7 @@ try {
     // Iframe dimensions are CSS pixels and do not resize when their parent tab
     // zooms. Exercise the responsive fallback here; release-layout.mjs checks
     // the real tab/window zoom fit separately.
-    await fs.appendFile(path.join(sourceDir,'analysis.js'), '\nglobalThis.__smokeResponsive=()=>{_zoomTabId=null;UI.canvas.classList.remove("desktop-layout");applyLayout();};\nglobalThis.__smokePreferences=()=>({settings:structuredClone(S.settings),layoutMode:S.layoutMode});\n');
+    await fs.appendFile(path.join(sourceDir,'analysis.js'), '\nglobalThis.__smokeResponsive=()=>{fitViewport();};\nglobalThis.__smokePreferences=()=>({settings:structuredClone(S.settings),layoutMode:S.layoutMode});\n');
     await fs.appendFile(path.join(sourceDir,'analysis.js'), '\nglobalThis.__smokeLearningReview=()=>({idx:S.idx,flipped:S.flipped,fen:activePos().fen,classif:[...S.classif]});\n');
     await fs.appendFile(path.join(sourceDir,'background.js'), '\nbrowserAPI.runtime.onInstalled.addListener(() => browserAPI.tabs.create({url:browserAPI.runtime.getURL("smoke.html")}));\n');
     await fs.appendFile(path.join(sourceDir,'background.js'), '\nbrowserAPI.runtime.onMessage.addListener((message,sender,reply)=>{if(message.type!=="smokeReleaseReset")return;resetSettingsForRelease({reason:"update",previousVersion:"0.2.0"}).then(()=>reply({ok:true}),error=>reply({error:error.message}));return true;});\n');

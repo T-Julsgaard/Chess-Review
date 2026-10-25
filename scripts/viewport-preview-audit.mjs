@@ -34,7 +34,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       throw Error(error.message+': '+JSON.stringify(await inside("({fit:w.__viewportAudit.fit(),width:w.innerWidth,height:w.innerHeight,zoom:w.frameElement.dataset.previewZoom})")));
     });
     await sleep(650);
-    const state=await run("(()=>{const f=document.querySelector('iframe'),w=f.contentWindow;return {width:f.offsetWidth*Number(f.dataset.previewZoom),height:f.offsetHeight*Number(f.dataset.previewZoom),same:w===originalFrame&&w.document===originalDoc,outerZoom:devicePixelRatio,error:w.document.querySelector('#error').textContent,scroll:w.document.documentElement.scrollWidth,innerWidth:w.innerWidth}})()");
+    const state=await run("(()=>{const f=document.querySelector('iframe'),w=f.contentWindow;return {width:f.offsetWidth,height:f.offsetHeight,same:w===originalFrame&&w.document===originalDoc,outerZoom:devicePixelRatio,error:w.document.querySelector('#error').textContent,scroll:w.document.documentElement.scrollWidth,innerWidth:w.innerWidth}})()");
     assert.ok(Math.abs(state.width-width)<2,`${group}: width`);assert.ok(Math.abs(state.height-height)<2,`${group}: height`);
     assert.equal(state.same,true,'Size changes preserve the live document');assert.equal(state.error,'');
     const shot=await call('Page.captureScreenshot',{format:'png'},sessionId);await fs.writeFile(path.join(out,`screen-size-${group.toLowerCase()}-${index}.png`),Buffer.from(shot.data,'base64'));

@@ -1,119 +1,106 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { app, loadGame, settle } from './helpers/app.mjs';
+import {app,loadGame,settle} from './helpers/app.mjs';
+const exportedLayout=JSON.parse(fs.readFileSync(new URL('./fixtures/default-panel-layout.json',import.meta.url),'utf8'));
 
-const exportedLayout = JSON.parse(fs.readFileSync(new URL('./fixtures/default-panel-layout.json', import.meta.url), 'utf8'));
-
-function layout(t, initialZoom = 1, defaultZoom = 1) {
-  const a = app(t);
-  // Model the CSS row metrics that determine Accuracy's collapsed footprint.
-  Object.defineProperty(a.dom.window.HTMLElement.prototype, 'offsetHeight', {
-    configurable: true, get() { return this.classList.contains('qbreak-row') ? 22 : 0; },
-  });
-  const getStyle = a.context.getComputedStyle;
-  a.context.getComputedStyle = node => node.classList.contains('qbreak') ? { rowGap: '7px' } : getStyle(node);
-  loadGame(a, '1. e4 e5');
-  a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
-  let zoom = initialZoom, size;
-  const syncViewport = () => {
-    if (!size) return;
-    a.context.innerWidth = Math.round(size.w / zoom);
-    a.context.innerHeight = Math.round(size.h / zoom);
-  };
-  const changes = [];
-  a.context.browserAPI.tabs = {
-    getCurrent: async () => ({ id: 7 }),
-    getZoomSettings: async () => ({ defaultZoomFactor: defaultZoom }),
-    setZoomSettings: async () => {},
-    getZoom: async () => zoom,
-    setZoom: async (id, value) => { assert.equal(id, 7); changes.push(value); zoom = value; syncViewport(); },
-  };
-  const viewport = (w, h) => {
-    size = {w, h}; syncViewport();
-  };
-  return { ...a, viewport, changes, zoom: () => zoom,
-    desktop: () => a.dom.window.document.querySelector('.stage').classList.contains('desktop-layout') };
+function layout(t,initialZoom=1) {
+  const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
+  let zoom=initialZoom,width=1920,height=920;
+  const viewport=(w,h)=>{width=w;height=h;sync();};
+  const sync=()=>{for(const [key,value]of [['innerWidth',Math.round(width/zoom)],['innerHeight',Math.round(height/zoom)]]){Object.defineProperty(a.dom.window,key,{value,configurable:true});a.context[key]=value;}};
+  sync();const changes=[];
+  a.context.browserAPI.tabs={getCurrent:async()=>({id:7}),setZoomSettings:async()=>{},getZoom:async()=>zoom,
+    setZoom:async(id,value)=>{assert.equal(id,7);changes.push(value);zoom=value;sync();}};
+  return {...a,viewport,changes,zoom:()=>zoom};
 }
 
-test('Full HD fits the default panels without drifting on reopen or a zoom resize event', async t => {
-  const a = layout(t); a.viewport(1920, 920);
-  await a.call('initTabZoom');
-  assert.equal(a.zoom(), .87); assert.equal(a.desktop(), true);
-  a.viewport(1920, 920); await a.call('fitTabZoom');
-  await a.call('initTabZoom');
-  assert.deepEqual(a.changes, [.87]);
-});
-
-test('Reset restores the exported 87% composition from the reported 85% viewport', async t => {
-  const a = layout(t, .85);
-  a.viewport(1919, 919); // 2258 × 1081 CSS pixels at the reported 85% browser zoom.
-  await a.call('initTabZoom');
-  assert.equal(a.zoom(), .87);
-  assert.equal(a.context.innerWidth, exportedLayout.viewport.width);
-  assert.equal(a.context.innerHeight, exportedLayout.viewport.height);
-  a.call('toggleReorganize');
-  await a.call('resetLayout');
-  assert.equal(a.zoom(), .87);
-  assert.deepEqual(a.changes, [.87]);
-});
-
-test('desktop fits laptop windows, then restores the responsive layout when narrowed', async t => {
-  const a = layout(t); a.viewport(1920, 920); await a.call('initTabZoom');
-  for (const [w,h] of [[1366,648], [1536,744], [1280,600], [2560,1320]]) {
-    a.viewport(w,h); await a.call('fitTabZoom');
-    assert.equal(a.desktop(), true);
-    const page = a.call('layoutPageSize', a.call('collapsedAccuracyLayout', a.run('DEFAULT_LAYOUT')));
-    assert.ok(page.pageW * a.zoom() <= w && page.pageH * a.zoom() <= h);
-  }
-  a.viewport(768,900); await a.call('fitTabZoom');
-  assert.equal(a.desktop(), false); assert.equal(a.zoom(),1);
-  a.viewport(1920,920); await a.call('fitTabZoom');
-  assert.equal(a.desktop(),true); assert.equal(a.zoom(),.87);
-});
-
-// Reported display resolutions, including 16:9, 16:10, and 1470 × 956.
-// Display resolution is not the page viewport: reserve space for browser chrome.
-const REPORTED_DISPLAYS = [
-  [1920, 1080], [1366, 768], [1536, 864], [1280, 720], [2560, 1440],
-  [1536, 960], [1280, 800], [1470, 956], [1440, 900], [1600, 900],
-];
-
-for (const [width, height] of REPORTED_DISPLAYS) {
-  test(`${width} × ${height} fits automatic and saved layouts with browser chrome`, async t => {
-    for (const chromeHeight of [0, 120, 160]) {
-      for (const mode of ['auto', 'custom']) {
-        const a = layout(t, mode === 'custom' ? 1.25 : .9);
-        a.state.layoutMode = mode;
-        a.call('applyLayoutMode');
-        if (mode === 'custom') a.call('reflowAccuracy', false);
-        const viewportHeight = height - chromeHeight;
-        a.viewport(width, viewportHeight);
-        await a.call('initTabZoom');
-        const zoom = a.zoom();
-        const page = a.call('layoutPageSize', mode === 'auto' ? a.call('collapsedAccuracyLayout', a.state.layout) : a.state.layout);
-        assert.equal(a.desktop(), mode === 'auto');
-        assert.ok(page.pageW * zoom <= width, `${mode}: horizontal overflow`);
-        assert.ok(page.pageH * zoom <= viewportHeight, `${mode}: vertical overflow`);
-        assert.ok(zoom >= .5 && zoom <= 2, `${mode}: readable zoom bounds`);
-        for (let i = 0; i < 2; i++) {
-          await a.call('initTabZoom');
-          await a.call('resetLayout');
-          assert.equal(a.zoom(), zoom, `${mode}: reopen/reset must preserve scale`);
-          assert.equal(a.desktop(), true);
-        }
-      }
+for(const [width,height]of [[1920,1080],[1366,768],[1536,864],[1280,720],[2560,1440],[1536,960],[1280,800],[1470,956],[1440,900],[1600,900],[3840,2160],[3440,1440],[820,1180],[390,844],[320,568]]) {
+  test(width+' × '+height+' uses 100% browser zoom through open, resize and reset',async t=>{
+    const a=layout(t,.87);
+    for(const chromeHeight of [0,120,160]){
+      a.viewport(width,height-chromeHeight);await a.call('initTabZoom');
+      assert.equal(a.zoom(),1);assert.deepEqual(structuredClone(a.run('_fittedDip')),{w:width,h:height-chromeHeight});
+      assert.equal(a.dom.window.document.querySelector('.stage').style.transform,'');
+      a.call('fitViewport');await a.call('resetLayout');assert.equal(a.zoom(),1);
     }
+    assert.deepEqual(a.changes,[1]);
   });
 }
 
-test('custom layouts keep their own geometry and fitting', async t => {
-  const a=layout(t); a.state.layoutMode='custom';
-  a.state.layout={board:{x:40,y:0,w:800,h:920},moves:{x:880,y:60,w:320,h:500}};
-  const before=structuredClone(a.state.layout);
-  a.call('applyLayoutMode'); a.viewport(1280,720); await a.call('initTabZoom');
-  assert.equal(a.desktop(),false); assert.deepEqual(a.state.layout,before);
-  assert.equal(a.zoom(),a.call('targetZoomFor',1280,720));
+test('simultaneous startup shares zoom normalization and resizing respects manual zoom',async t=>{
+  const a=layout(t,.85);let scopes=0;
+  a.context.browserAPI.tabs.setZoomSettings=async()=>{scopes++;await settle();};
+  await Promise.all([a.call('initTabZoom'),a.call('initTabZoom'),a.call('initTabZoom')]);
+  assert.equal(scopes,1);assert.deepEqual(a.changes,[1]);
+  await a.context.browserAPI.tabs.setZoom(7,1.25);
+  a.viewport(1280,800);a.dom.window.dispatchEvent(new a.dom.window.Event('resize'));
+  assert.equal(a.zoom(),1.25,'Window resize must preserve an accessibility zoom choice');
+  await a.call('resetLayout');assert.equal(a.zoom(),1);
+});
+
+test('missing or failed tab zoom APIs do not prevent responsive layout or later retries',async t=>{
+  const a=layout(t,.87),tabs=a.context.browserAPI.tabs;
+  const setZoom=tabs.setZoom;tabs.setZoom=async()=>{throw Error('Temporary error');};
+  await a.call('initTabZoom');assert.equal(a.dom.window.document.querySelector('.stage').style.minWidth,'');
+  tabs.setZoom=setZoom;await a.call('initTabZoom');assert.equal(a.zoom(),1);
+  a.context.browserAPI.tabs=undefined;a.viewport(390,844);await a.call('initTabZoom');
+  assert.deepEqual(structuredClone(a.run('_fittedDip')),{w:390,h:844});
+});
+
+test('custom geometry fits inside its own canvas while browser zoom remains 100%',async t=>{
+  const a=layout(t,.61);a.state.layoutMode='custom';const before=structuredClone(a.state.layout);
+  for(const [width,height]of [[1920,920],[1366,648],[1280,560],[768,900],[390,844]]){
+    a.viewport(width,height);a.call('applyLayoutMode');await a.call('initTabZoom');
+    const size=a.call('layoutPageSize',a.state.layout),scale=a.run('canvasScale');
+    assert.equal(a.zoom(),1);assert.ok(size.pageW*scale<=width);assert.ok((size.pageH-52)*scale<=height-52);
+    assert.deepEqual(a.state.layout,before,'Fitting must never rewrite saved panel data');
+  }
+  await a.call('resetLayout');
+  assert.equal(a.dom.window.document.querySelector('.stage').style.transform,'');
+  assert.equal(a.dom.window.document.querySelector('.review-viewport').style.height,'');
+});
+
+test('custom drag converts screen deltas into canvas coordinates at the fitted scale',async t=>{
+  const a=layout(t);a.viewport(1280,720);a.state.layoutMode='custom';a.call('applyLayoutMode');a.call('toggleReorganize');
+  const scale=a.run('canvasScale'),start=a.state.layout.moves.x;
+  const handle=a.dom.window.document.querySelector('[data-mod=moves] .mod-handle');
+  const event=(target,type,x)=>{const e=new a.dom.window.MouseEvent(type,{bubbles:true,clientX:x,clientY:0,button:0});Object.defineProperty(e,'pointerId',{value:1});target.dispatchEvent(e);};
+  event(handle,'pointerdown',0);event(a.dom.window,'pointermove',100*scale);event(a.dom.window,'pointerup',100*scale);
+  assert.ok(Math.abs(a.state.layout.moves.x-start-100)<1e-8);
+});
+
+test('small saved canvases keep their own bounds and do not upscale',async t=>{
+  const a=layout(t);a.state.layoutMode='custom';a.state.layout={board:{x:36,y:0,w:640,h:760}};
+  a.viewport(1920,1080);a.call('applyLayoutMode');await a.call('initTabZoom');
+  assert.equal(a.run('canvasScale'),1);assert.equal(a.dom.window.document.querySelector('.stage').style.width,'688px');
+});
+
+test('native Engine uses scrolling, and custom Engine respects its content scale and resize floor',async t=>{
+  const a=layout(t);await a.call('initTabZoom');const mod=a.dom.window.document.querySelector('[data-mod=engine]');
+  Object.defineProperty(mod.querySelector('.engine-body'),'scrollHeight',{configurable:true,value:1000});
+  a.call('fitEnginePanel');assert.equal(mod.style.minHeight,'');assert.equal(mod.style.height,'');
+  a.state.layoutMode='custom';a.state.layout.engine.h=20;a.call('applyLayoutMode');
+  assert.equal(a.state.layout.engine.h,120*a.state.layout.engine.scale);
+});
+
+test('settings remains right aligned through visual and layout resets',async t=>{
+  const a=layout(t);a.viewport(1920,920);a.call('toggleSettings');
+  const settings=a.dom.window.document.getElementById('settings');assert.equal(settings.style.right,'24px');
+  await a.call('resetVisualSettings');await a.call('resetLayout');assert.equal(settings.style.right,'24px');
+  a.viewport(390,844);a.dom.window.dispatchEvent(new a.dom.window.Event('resize'));assert.equal(settings.style.right,'');
+});
+
+test('native commentary sizing migrates the old default once and preserves later choices',async t=>{
+  const a=app(t,{url:'https://extension.test/analysis.html?workspace=blank'});
+  a.replace('resetSettingsForRelease',async()=>{});
+  a.store.settings={insightFont:18,depthBumped:true,coachPlain:true};
+  await a.start();
+  assert.equal(a.state.settings.insightFont,16);
+  assert.equal(a.store.settings.nativeSizingVersion,1);
+  a.store.settings.insightFont=18;
+  await a.start();
+  assert.equal(a.state.settings.insightFont,18,'A deliberate later font choice must survive reopening');
 });
 
 test('Stockfish 18 NNUE is selected by default and listed first', t => {
@@ -128,138 +115,6 @@ test('Stockfish 18 NNUE is selected by default and listed first', t => {
 test('Honeywood is the default board theme', t => {
   const a = layout(t);
   assert.equal(a.state.settings.boardTheme, 'maple');
-});
-
-test('desktop matches the saved canvas geometry and preserves the gap when accuracy collapses', async t => {
-  const a = layout(t);
-  // Model the rendered category rows; jsdom has no layout engine.
-  Object.defineProperty(a.dom.window.HTMLElement.prototype, 'offsetHeight', {
-    configurable: true, get() { return this.classList.contains('qbreak-row') ? 22 : 0; },
-  });
-  a.context.getComputedStyle = () => ({ rowGap: '7px' });
-  const mod = key => a.dom.window.document.querySelector(`[data-mod="${key}"]`).style;
-  const geometry = () => Object.fromEntries(['accuracy', 'engine', 'graph', 'evalbar', 'review', 'moves', 'controls'].map(key => {
-    const s = mod(key); return [key, [s.left, s.top, s.width, s.height]];
-  }));
-  a.state.layoutMode = 'custom'; a.call('applyLayoutMode'); a.call('reflowAccuracy', false);
-  const savedCanvas = geometry();
-  assert.deepEqual(structuredClone(a.call('layoutForSave')), exportedLayout.layout);
-  const matchesExport = () => {
-    for (const key of Object.keys(savedCanvas)) {
-      const box = exportedLayout.displayedLayout[key];
-      for (const [i, prop] of ['x', 'y', 'w', 'h'].entries()) {
-        assert.ok(Math.abs(parseFloat(geometry()[key][i]) - box[prop]) < 1e-8, `${key}.${prop}`);
-      }
-      assert.equal(a.dom.window.document.querySelector(`[data-mod="${key}"] .mod-inner`).style.transform, `scale(${box.scale})`);
-    }
-  };
-  matchesExport();
-  a.state.layoutMode = 'auto'; a.call('applyLayoutMode');
-  a.viewport(1920, 920); await a.call('initTabZoom');
-  assert.deepEqual(geometry(), savedCanvas);
-  matchesExport();
-  for (let i = 0; i < 3; i++) {
-    a.state.qbreakExpanded = true; a.call('renderStats');
-    assert.equal(mod('accuracy').height, exportedLayout.layout.accuracy.h + 'px');
-    assert.equal(mod('engine').top, exportedLayout.layout.engine.y + 'px');
-    assert.equal(mod('controls').top, exportedLayout.layout.controls.y + 'px');
-    a.state.qbreakExpanded = false; a.call('renderStats');
-    assert.deepEqual(geometry(), savedCanvas);
-  }
-  a.viewport(768, 900); await a.call('fitTabZoom');
-  assert.equal(mod('engine').top, ''); assert.equal(mod('accuracy').height, '');
-  a.viewport(1920, 920); await a.call('fitTabZoom');
-  assert.deepEqual(geometry(), savedCanvas);
-});
-
-test('Reorganize preserves exact desktop boxes and zoom through repeated resets', async t => {
-  const a = layout(t);
-  Object.defineProperty(a.dom.window.HTMLElement.prototype, 'offsetHeight', {
-    configurable: true, get() { return this.classList.contains('qbreak-row') ? 22 : 0; },
-  });
-  a.context.getComputedStyle = () => ({ rowGap: '7px' });
-  const stage = a.dom.window.document.querySelector('.stage');
-  stage.getBoundingClientRect = () => ({ left: 0, top: 60 });
-  const mods = [...stage.querySelectorAll('.mod')];
-  // Real browser zoom rounds rendered boxes slightly below their CSS dimensions.
-  for (const mod of mods) mod.getBoundingClientRect = () => ({
-    left: parseFloat(mod.style.left) - .007,
-    top: 60 + parseFloat(mod.style.top) - .007,
-    width: parseFloat(mod.style.width) - .007,
-    height: parseFloat(mod.style.height) - .007,
-  });
-  const geometry = () => mods.map(m => [m.style.left, m.style.top, m.style.width, m.style.height]);
-  a.viewport(1920, 920); await a.call('initTabZoom'); a.viewport(1920, 920);
-  const defaults = structuredClone(a.state.layout);
-  for (const expanded of [false, true, false]) {
-    a.state.qbreakExpanded = expanded; a.call('renderStats');
-    const before = geometry();
-    a.call('toggleReorganize'); await settle();
-    assert.deepEqual(geometry(), before);
-    assert.equal(a.zoom(), .87);
-    assert.deepEqual(structuredClone(a.call('layoutForSave')), defaults);
-    a.call('resetLayout'); await settle();
-    assert.deepEqual(geometry(), before);
-    assert.equal(a.zoom(), .87);
-    assert.equal(a.state.reorganize, false);
-  }
-  assert.deepEqual(a.changes, [.87]);
-});
-
-test('settings stays right-aligned through visual and layout resets', async t => {
-  const a = layout(t);
-  const settings = a.dom.window.document.getElementById('settings');
-  a.dom.window.innerWidth = 2200;
-  a.call('toggleSettings');
-  assert.equal(settings.style.right, '24px');
-  await a.call('resetVisualSettings');
-  assert.equal(settings.style.right, '24px');
-  a.call('resetLayout');
-  assert.equal(settings.style.right, '24px');
-  a.dom.window.innerWidth = 1920;
-  a.dom.window.dispatchEvent(new a.dom.window.Event('resize'));
-  assert.equal(settings.style.right, '24px');
-  a.dom.window.innerWidth = 500;
-  a.dom.window.dispatchEvent(new a.dom.window.Event('resize'));
-  assert.equal(settings.style.right, '');
-});
-
-test('saved desktop layouts reopen at the reset scale across typical screen sizes', async t => {
-  for (const [w, h, initial, expected] of [
-    [1280, 600, 1.25, .56], [1366, 648, .91, .61], [1536, 744, 1, .70],
-    [1920, 916, .91, .86], [1920, 920, .89, .87],
-    [2560, 1320, 1.25, 1.25], [3840, 2040, 2, 1.93],
-  ]) {
-    const a = layout(t, initial);
-    a.state.layoutMode = 'custom'; a.call('applyLayoutMode'); a.call('reflowAccuracy', false);
-    a.viewport(w, h); await a.call('initTabZoom');
-    assert.equal(a.zoom(), expected, `${w} × ${h} saved layout`);
-    for (let i = 0; i < 3; i++) {
-      await a.call('initTabZoom');
-      await a.call('resetLayout');
-      assert.equal(a.zoom(), expected, `${w} × ${h} reopen/reset ${i}`);
-      assert.equal(a.desktop(), true);
-    }
-    assert.deepEqual(a.changes, initial === expected ? [] : [expected]);
-  }
-});
-
-test('reset refits automatic layout after manual zoom and concurrent initialization', async t => {
-  const a = layout(t, .91); a.viewport(1920, 916);
-  let scopes = 0, active = 0;
-  const tabs = a.context.browserAPI.tabs;
-  const setZoom = tabs.setZoom;
-  tabs.setZoomSettings = async () => { scopes++; };
-  tabs.setZoom = async (...args) => {
-    assert.equal(active++, 0, 'zoom writes must not overlap');
-    await settle(); await setZoom(...args); active--;
-  };
-  await Promise.all([a.call('initTabZoom'), a.call('initTabZoom'), a.call('fitTabZoom')]);
-  assert.equal(scopes, 1); assert.deepEqual(a.changes, [.86]);
-  await tabs.setZoom(7, .91);
-  await a.call('fitTabZoom'); assert.equal(a.zoom(), .91);
-  await a.call('resetLayout');
-  assert.equal(a.zoom(), .86); assert.equal(scopes, 1);
 });
 
 test('Reset starts saving defaults immediately and completes only after storage confirms them', async t => {
@@ -279,56 +134,4 @@ test('Reset starts saving defaults immediately and completes only after storage 
   assert.equal(completed, false, 'Reset must wait for durable storage');
   confirm(); await reset;
   assert.equal(completed, true);
-});
-
-test('failed zoom writes can be retried at the same window size', async t => {
-  const a = layout(t); a.viewport(1920, 916);
-  const tabs = a.context.browserAPI.tabs, setZoom = tabs.setZoom;
-  tabs.setZoom = async () => { throw Error('Temporary tab error'); };
-  await a.call('initTabZoom');
-  tabs.setZoom = setZoom;
-  await a.call('fitTabZoom');
-  assert.equal(a.zoom(), .86);
-});
-
-test('narrow windows use the browser default zoom, even with a nonstandard default', async t => {
-  const a = layout(t, .89, 1.25); a.viewport(1000, 800);
-  await a.call('initTabZoom');
-  assert.equal(a.desktop(), false); assert.equal(a.zoom(), 1.25);
-  a.viewport(1920, 916); await a.call('fitTabZoom');
-  assert.equal(a.desktop(), true); assert.equal(a.zoom(), .86);
-});
-
-test('small custom canvases retain their own bounds instead of inheriting desktop width', async t => {
-  const a = layout(t);
-  a.state.layoutMode = 'custom';
-  a.state.layout = { board: { x: 36, y: 0, w: 640, h: 760 } };
-  a.call('applyLayoutMode'); a.viewport(768, 900);
-  await a.call('initTabZoom');
-  const stage = a.dom.window.document.querySelector('.stage');
-  assert.equal(stage.style.minWidth, '688px');
-  assert.equal(stage.style.minHeight, '772px');
-  assert.equal(a.zoom(), 1.07);
-});
-
-test('Engine grows downward for its contents and cannot be resized below them', async t => {
-  const a = layout(t); a.viewport(1920, 916); await a.call('initTabZoom');
-  const mod = a.dom.window.document.querySelector('[data-mod="engine"]');
-  const head = mod.querySelector('.panel-head'), body = mod.querySelector('.engine-body');
-  head.getBoundingClientRect = () => ({ height: 40.5 });
-  Object.defineProperty(body, 'scrollHeight', { configurable: true, value: 250 });
-  const scale = exportedLayout.layout.engine.scale;
-  const height = Math.ceil((40.5 / scale + 250 + 4) / 2) * 2 * scale;
-  const top = mod.style.top;
-  a.call('fitEnginePanel');
-  assert.equal(mod.style.height, height + 'px'); assert.equal(mod.style.top, top);
-  a.call('toggleReorganize');
-  assert.equal(a.state.layout.engine.h, height);
-  const grip = mod.querySelector('.mod-resize.s');
-  const event = (type, y) => new a.dom.window.MouseEvent(type, { clientY: y, bubbles: true });
-  grip.dispatchEvent(event('pointerdown', 300));
-  grip.dispatchEvent(event('pointermove', 0));
-  grip.dispatchEvent(event('pointerup', 0));
-  assert.equal(a.state.layout.engine.h, height);
-  assert.equal(mod.style.height, height + 'px'); assert.equal(mod.style.top, top);
 });

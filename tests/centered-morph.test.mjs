@@ -6,7 +6,7 @@ import {capturePanels} from '../lib/learning/morph.js';
 import {app, loadGame} from './helpers/app.mjs';
 import {LearningWorkspace} from '../lib/learning/workspace.js';
 
-test('learning reserves Settings without moving and bounds the square board at all window sizes',()=>{
+test('learning adapts its Settings gutter without moving and bounds the square board at all window sizes',()=>{
   for(const width of [320,390,600,760,960,1280,1440,1920,2560]){
     const board={x:80,y:140,width:Math.min(width-48,700)};
     const closed=fullSizeLearningLayout({width,height:1080,board,settingsOpen:false});
@@ -14,7 +14,7 @@ test('learning reserves Settings without moving and bounds the square board at a
     assert.deepEqual(open,closed);const p=open;
     assert.ok(p.boardX>=0&&p.boardX+p.boardSize<=width);
     assert.ok(p.panelX>=0&&p.panelX+p.panelWidth<=width);
-    if(width>=760)assert.ok(p.panelX+p.panelWidth<=width-334);
+    if(width>=1600)assert.ok(p.panelX+p.panelWidth<=width-334);
     if(p.stacked)assert.ok(p.panelY>p.boardY+p.boardSize);
     else {
       assert.ok(p.panelX>=p.boardX+p.boardSize+24);
@@ -22,11 +22,11 @@ test('learning reserves Settings without moving and bounds the square board at a
     }
   }
   const board={x:92,y:142,width:700};const p=fullSizeLearningLayout({width:1920,height:1080,board});
-  assert.ok(p.boardSize>board.width);assert.ok(p.boardX<board.x);assert.equal(p.boardY+60,board.y);
+  assert.ok(p.boardSize>board.width);assert.ok(p.boardX<board.x);assert.equal(p.boardY+52,board.y);
   assert.equal(p.boardX+p.boardSize,board.x+board.width);
   assert.ok(board.x-p.boardX>32&&board.x-p.boardX<=80);assert.equal(p.panelX,board.x+board.width+32);
   const tight=fullSizeLearningLayout({width:1366,height:1080,board:{x:350,y:70,width:800}});
-  assert.equal(tight.boardX+tight.boardSize,1150);assert.equal(tight.boardY+60,70);
+  assert.ok(tight.boardX+tight.boardSize<=1366-24-24-340);assert.equal(tight.stacked,false);assert.equal(tight.boardY+52,70);
 });
 
 test('board expands uniformly on a straight path with no upward arc or overshoot',()=>{

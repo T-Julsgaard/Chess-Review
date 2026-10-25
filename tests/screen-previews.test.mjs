@@ -56,13 +56,10 @@ test('viewport startup uses the current game without mounting a scenario toolbar
   assert.equal(a.writes.length,0);assert.deepEqual(a.store,original);
 });
 
-test('viewport zoom uses its frame without changing browser tab zoom',async t=>{
-  const a=app(t,{url:'https://extension.test/analysis.html?viewport-preview=1'}),frame=a.dom.window.document.createElement('iframe');
-  Object.defineProperty(a.dom.window,'frameElement',{value:frame});frame.dataset.previewZoom='0.75';
-  let requested;frame.addEventListener('preview-zoom',event=>{requested=event.detail;});
-  assert.equal(await a.run('browserAPI.tabs.getZoom(1)'),0.75);
-  await a.run('browserAPI.tabs.setZoom(1,0.9)');assert.equal(requested,0.9);
-  assert.equal(frame.dataset.previewZoom,'0.75','Only the host applies the new zoom');
+test('viewport previews never expose tab zoom APIs to the host',async t=>{
+  const a=app(t,{url:'https://extension.test/analysis.html?viewport-preview=1'});let changes=0;
+  a.context.platformAPI.tabs={getCurrent:async()=>({id:1}),setZoomSettings:async()=>{},getZoom:async()=>.87,setZoom:async()=>{changes++;}};
+  loadGame(a,'1. e4 e5');a.call('buildUI');await a.call('initTabZoom');assert.equal(changes,0);
 });
 
 test('preview startup reads display preferences but never migrates or saves real account data',async t=>{
