@@ -41,7 +41,7 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} results retain the emb
   assert.equal(doc.querySelector('.drag-piece'),null);assert.equal(w.selected,null);assert.equal(w.currentFen(),fen);
   assert.ok(board.querySelector('.puzzle-result-badge[data-result=incorrect]'));
   w.render();assert.deepEqual(position(),expected);assert.ok(board.querySelector('.puzzle-result-badge'));
-  assert.equal(board.querySelector('.puzzle-run-end'),null);
+  assert.ok(board.querySelector('.puzzle-run-end'),'Results redraws keep the final screen visible');
   assert.equal(a.state.analysisMode,false);
 });
 

@@ -134,7 +134,7 @@ test('the ending brings the board into view when narrow-screen results are below
 });
 
 for(const mode of ['timeAttack','knockout'])for(const style of ['classic','ribbon','spotlight','flip','still'])test(`${mode} uses the ${style} ending and refreshes its motion setting`,async t=>{
-  const {w,settings,advance}=await setup(t);
+  const {w,settings,advance,timers}=await setup(t);
   settings.puzzleEndAnimation=style;
   const starting=w.startPuzzleRun(mode);await settle();
   if(mode==='timeAttack')for(let i=0;i<3;i++)await advance(1000);
@@ -149,7 +149,9 @@ for(const mode of ['timeAttack','knockout'])for(const style of ['classic','ribbo
     assert.ok(overlay.querySelector('.puzzle-run-end-best'));
   }
   settings.moveAnim=false;w.refreshSettings();assert.equal(overlay.dataset.motion,'off');
-  await advance(2800);assert.equal(overlay.isConnected,false);
+  assert.equal(timers.size,0,'The final screen has no expiry timer');
+  w.render();assert.equal(w.root.querySelector('.puzzle-run-end'),overlay);
+  await w.navigate('puzzles');assert.equal(overlay.isConnected,false);
 });
 
 function audioFixture() {

@@ -86,5 +86,18 @@ export async function auditLearning(context) {
     const fits=await run(`(()=>{const e=document.querySelector('.learn-board > .puzzle-run-end'),b=e.getBoundingClientRect(),c=e.firstChild.getBoundingClientRect(),top=document.querySelector('.topbar').getBoundingClientRect().bottom;return c.left>=b.left&&c.right<=b.right&&c.top>=b.top&&c.bottom<=b.bottom&&c.top>=top-1&&c.bottom<=innerHeight;})()`);
     assert.equal(fits,true,`Flip result with a record fits at ${width}`);await capture(`puzzle-end-flip-record-${width}`);
   }
-  console.log(JSON.stringify({ok:true,out,checks:['countdown move and cursor gating','all animation previews at desktop and phone sizes','all live countdown styles','hinged flip and uninterrupted Go fade','lighter veil with complete board coverage','ending styles for both modes','reduced motion including rings']},null,2));
+  for(const mode of ['timeAttack','knockout']){
+    await run(`import('./analysis.js').then(m=>{
+      const w=m.learningWorkspace;w.result.mode='${mode}';w.result.results=[{id:w.puzzles[0].id,number:1,correct:true}];
+      w.render();w.showPuzzleRunEnd();window.persistentEnding=w.runEndOverlay;
+    })`);
+    await sleep(3300);
+    assert.equal(await run(`import('./analysis.js').then(m=>{const w=m.learningWorkspace;w.render();return w.runEndOverlay===persistentEnding&&persistentEnding.isConnected&&getComputedStyle(persistentEnding).opacity==='1';})`),true,`${mode} ending stays visible beyond the old timer and through redraws`);
+    await run(`document.querySelector('[data-focus=replay-1]').click()`);
+    await waitFor(review,`import('./analysis.js').then(m=>m.learningWorkspace.activity?.replay&&!m.learningWorkspace.runEndOverlay)`,'Puzzle selection clears the ending');
+    await run(`import('./analysis.js').then(m=>{const w=m.learningWorkspace;w.returnToRunResults();w.showPuzzleRunEnd();document.querySelector('[data-focus=run-again]').click();})`);
+    await waitFor(review,`import('./analysis.js').then(m=>m.learningWorkspace.run?.mode==='${mode}'&&!m.learningWorkspace.runEndOverlay&&!m.learningWorkspace.busy)`,'Play again clears the ending');
+    await run(`import('./analysis.js').then(m=>m.learningWorkspace.finishChallenge('Out of lives'))`);
+  }
+  console.log(JSON.stringify({ok:true,out,checks:['countdown move and cursor gating','all animation previews at desktop and phone sizes','all live countdown styles','hinged flip and uninterrupted Go fade','lighter veil with complete board coverage','ending styles for both modes','reduced motion including rings','persistent endings and puzzle/restart dismissal']},null,2));
 }
