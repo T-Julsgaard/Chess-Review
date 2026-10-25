@@ -388,11 +388,10 @@
 .puzzle-run-stats #learn-clock.running-low { color: #f35a66; }
 /* Quiet depth and clear hierarchy for active puzzle runs. */
 .puzzle-run-stats.run-dashboard { gap: 0; padding: 20px 0; border: 1px solid var(--line); border-radius: 12px; background: linear-gradient(135deg,color-mix(in oklab,var(--accent) 3%,var(--panel)),var(--panel)); box-shadow: 0 2px 8px #00000008; }
-.run-dashboard > div { flex: 1; min-width: 0; padding: 0 20px; gap: 6px; }
+.run-dashboard > div { flex: 1; min-width: 0; padding: 0 20px; gap: 6px; align-items: center; text-align: center; }
 .run-dashboard > div + div { border-left: 1px solid var(--line); }
 .run-dashboard strong { font-size: 30px; line-height: 1.15; letter-spacing: -.7px; }
 .run-dashboard .run-score strong { font-weight: 750; }
-.run-dashboard .run-countdown { align-items: flex-end; }
 .run-dashboard span { font-size: 11px; }
 @media (max-width: 420px) { .run-dashboard > div { padding-inline: 14px; } .run-dashboard strong { font-size: 27px; } }
 .puzzle-run-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 18px 0 12px; color: var(--ink-2); font-size: 13px; }
