@@ -316,11 +316,6 @@
 }
 .learn-statistics-button:hover:not(:disabled) { background: color-mix(in oklab,var(--accent) 12%,var(--panel)); border-color: var(--accent); box-shadow: 0 3px 8px #0000001a; }
 .learn-statistics-button:active:not(:disabled) { background: color-mix(in oklab,var(--accent) 17%,var(--panel)); box-shadow: inset 0 1px 3px #0000001a; }
-@media (prefers-reduced-motion: no-preference) {
-  .learning-workspace:not([data-motion="off"]) .learn-statistics-button { transition: background .18s,border-color .18s,box-shadow .18s,transform .18s; }
-  .learning-workspace:not([data-motion="off"]) .learn-statistics-button:hover:not(:disabled) { transform: translateY(-1px); }
-  .learning-workspace:not([data-motion="off"]) .learn-statistics-button:active:not(:disabled) { transform: translateY(0); }
-}
 .learning-workspace[data-motion="off"] .learn-statistics-button { transition: none; }
 @media (prefers-reduced-motion: reduce) { .learn-statistics-button { transition: none; } }
 .learn-puzzle-statistics { padding-top: 8px; }
@@ -357,11 +352,10 @@
   position: relative; display: flex; flex: none; flex-direction: column; align-items: center; gap: 7px;
   min-width: 44px; min-height: 44px; padding: 4px 0; border: 0; border-radius: 6px;
   background: transparent; box-shadow: none;
-  color: var(--ink-2); transition: color .25s,transform .2s;
+  color: var(--ink-2); transition: color .25s;
 }
 .learning-workspace .puzzle-rating-toggle[aria-checked="true"] { color: color-mix(in oklab,#7fb45f 80%,var(--ink)); }
 .learning-workspace .puzzle-rating-toggle:hover:not(:disabled) { background: transparent; color: var(--ink); }
-.learning-workspace .puzzle-rating-toggle:active:not(:disabled) { transform: scale(.96); }
 .learning-workspace .puzzle-rating-toggle:disabled { opacity: 1; cursor: default; }
 .puzzle-rating-label { font-size: 12px; font-weight: 650; line-height: 1; letter-spacing: .2px; }
 .puzzle-rating-track { position: relative; display: block; width: 44px; height: 23px; border-radius: 20px; background: color-mix(in oklab,var(--ink-3) 22%,var(--panel)); box-shadow: inset 0 1px 3px #0003,inset 0 0 0 1px color-mix(in oklab,var(--ink-3) 20%,transparent); transition: background .32s,box-shadow .32s; }
