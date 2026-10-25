@@ -88,12 +88,16 @@ choose a group. Drag a handle to move the group or a corner to scale its spacing
 contents and dimensions together. **Export layout** downloads a JSON proposal
 that can be shared for a future default arrangement.
 
-### Screen previews
+### Screen sizes
 
-Open Visual settings → Debug → Browse screen previews to inspect sample review,
-learning, dialog and popup states. Use the selector or Alt + Left/Right to switch
-views; collapse the controls for an unobstructed view. Each preview uses private
-in-memory progress and settings, so experiments do not change your saved data.
+Open **Settings → Visual → Screen sizes → Open screen-size preview** to use the
+app at desktop, laptop, tablet and phone viewport sizes. The preview starts with
+your current game and settings. Choose a resolution, enter custom dimensions or
+rotate the viewport without losing your place. **Fit to window** shows the whole
+viewport; **100%** lets you inspect it at actual size with scrolling. Dimensions
+are browser viewport pixels, and phone/tablet presets test layout rather than
+device hardware or touch input. Progress and settings changes stay in the preview
+tab and do not change your saved data.
 
 
 Both engines offer **Use recorded rating** and **Moves only**. The first compares

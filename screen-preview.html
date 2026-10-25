@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Screen sizes — Chess Review</title>
+    <link rel="icon" href="icons/icon48.png">
+    <link rel="stylesheet" href="lib/viewport-preview.css">
+  </head>
+  <body>
+    <header>
+      <div class="preview-heading"><div><strong>Screen sizes</strong><span>Chess Review</span></div><button id="close-preview" type="button">Close preview</button></div>
+      <nav id="device-tabs" aria-label="Screen type"></nav>
+      <div class="preview-controls">
+        <label class="preset-label">Screen <select id="screen-preset"></select></label>
+        <label>Width <input id="screen-width" type="number" min="240" max="7680" step="1" inputmode="numeric"></label>
+        <span aria-hidden="true">×</span>
+        <label>Height <input id="screen-height" type="number" min="240" max="7680" step="1" inputmode="numeric"></label>
+        <button id="rotate-screen" type="button" title="Swap width and height">Rotate</button>
+        <label>View <select id="preview-scale"><option value="fit">Fit to window</option><option value="1">100%</option></select></label>
+        <output id="screen-readout" aria-live="polite"></output>
+      </div>
+      <p>Use the app below. Switching sizes keeps your place. Dimensions are browser viewport pixels; previews of tablets and phones show layout only. Changes stay in this tab.</p>
+    </header>
+    <main id="preview-stage" aria-label="Interactive screen preview">
+      <div id="preview-surface"><iframe id="preview-app" title="Chess Review at the selected screen size"></iframe></div>
+    </main>
+    <script type="module" src="lib/viewport-preview.js"></script>
+  </body>
+</html>

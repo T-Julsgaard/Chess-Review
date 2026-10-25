@@ -23,7 +23,14 @@ import { rememberAnalyzedGame, historyGame } from "./lib/player-history.js";
 
 const screenPreview = createScreenPreviewContext(location);
 const blankLaunch = new window.URLSearchParams(location.search).get("workspace") === "blank";
-const browserAPI = screenPreview ? {...platformAPI,storage:{...platformAPI.storage,local:screenPreview.storage}} : platformAPI;
+// A framed preview fits only its own viewport. Browser tab zoom would also resize
+// the surrounding controls, so the host provides equivalent frame dimensions.
+const browserAPI = screenPreview ? {...platformAPI,storage:{...platformAPI.storage,local:screenPreview.storage},
+  tabs:screenPreview.viewport?{...platformAPI.tabs,
+    getZoom:async()=>Number(window.frameElement?.dataset.previewZoom)||1,
+    getZoomSettings:async()=>({defaultZoomFactor:1}),setZoomSettings:async()=>{},
+    setZoom:async(_id,zoom)=>window.frameElement?.dispatchEvent(new window.CustomEvent('preview-zoom',{detail:zoom})),
+  }:platformAPI.tabs} : platformAPI;
 
 /* ---------------- Opening book ----------------
  * Offline lookup table built from lichess-org/chess-openings (bundled in data/book.json).
@@ -4932,9 +4939,9 @@ function visualSettings() {
       el("button", { class: "set-reset", onclick: exportPanelLayout }, "Export panel layout"),
       el("button", { class: "set-reset", onclick: resetLayout }, "Reset layout"),
     ),
-    section("Debug",
-      el("button", {class:"set-reset","data-debug":"screen-previews",onclick:()=>browserAPI.tabs.create({url:_url("analysis.html")+"?screen-preview=review"})}, "Browse screen previews"),
-      el("div", {class:"set-row hint"},el("span",{class:"set-note"},"Inspect sample review, learning, popup and dialog screens in a separate tab. Preview changes are not saved.")),
+    section("Screen sizes",
+      el("button", {class:"set-reset","data-debug":"screen-previews",onclick:openScreenSizePreview}, "Open screen-size preview"),
+      el("div", {class:"set-row hint"},el("span",{class:"set-note"},"Use the app at desktop, laptop, tablet and phone sizes in a separate tab. Switch resolutions or enter your own dimensions. Preview changes are not saved.")),
     ),
     section("Move list",
       seg("Style", "mlStyle", ["rows", "cards", "compact"]),
@@ -5900,6 +5907,25 @@ function persistReviewSnapshot(snapshot) {
   pending.finally(() => { _savingReviewSnapshots.delete(snapshot); renderReviewSaveStatus(); });
   return pending;
 }
+function openScreenSizePreview() {
+  if(screenPreview?.viewport){window.parent.focus();return;}
+  const job=S.blank?{source:"blank",analysis:null}:{pgn:S.pgn,meta:S.meta||{},source:"pgn"};
+  if(!S.blank&&!S.analyzing&&!S.analysisError&&completeAnalysis(S,S.total+1))job.analysis={
+    pgn:S.pgn,settingsKey:analysisSettingsKey(),engineBuild:S.activeEngineBuild,
+    panelNeedsLive:!!S._panelNeedsLive,evals:S.evals,bests:S.bests,multipv:S.analyzedMultipv,
+  };
+  // window.open copies this tab's session storage synchronously. The preview
+  // receives a snapshot without writing a handoff into persistent account data.
+  const key="screen-size-preview",previous=window.sessionStorage.getItem(key);
+  try {
+    window.sessionStorage.setItem(key,JSON.stringify({job,idx:S.idx,preferences:{settings:S.settings,
+      layout:layoutForSave(),layoutMode:S.layoutMode,layoutVersion:LAYOUT_VERSION}}));
+    const opened=window.open(_url("screen-preview.html"),"_blank");
+    if(!opened)return browserAPI.tabs.create({url:_url("screen-preview.html")});
+  } finally {
+    if(previous==null)window.sessionStorage.removeItem(key);else window.sessionStorage.setItem(key,previous);
+  }
+}
 function saveToLibrary() {
   try {
     if (!S.pgn || S.total === 0 || S.analyzing || S.analysisError
@@ -6588,7 +6614,11 @@ async function resetLegacyZoom() {
 }
 (async function main() {
   try {
-    if(screenPreview)await screenPreview.configure(await platformAPI.storage.local.get(["settings","layout","layoutMode","layoutVersion"]));
+    if(screenPreview){
+      let snapshot=null;
+      if(screenPreview.viewport)try{snapshot=JSON.parse(window.sessionStorage.getItem("screen-size-preview"));}catch{}
+      await screenPreview.configure(await platformAPI.storage.local.get(screenPreview.viewport?null:["settings","layout","layoutMode","layoutVersion"]),snapshot);
+    }
     else await resetSettingsForRelease({ reason: "startup" });
     // Only the job + stored prefs are needed to build and show the UI. The opening book (~690 KB)
     // and the calibration file are only consumed once scoring/opening refinement runs, so we load
@@ -6659,7 +6689,7 @@ async function resetLegacyZoom() {
       } catch {}
       payload.analysis = saved;
     }
-    S.blank=payload.source==="blank"&&((blankLaunch&&!location.hash)||screenPreview?.id==="workspace-blank");
+    S.blank=payload.source==="blank"&&((blankLaunch&&!location.hash)||screenPreview?.id==="workspace-blank"||screenPreview?.viewport===true);
     buildUI();               // built once; switching games re-uses it (no full page reload)
     if(S.blank)showBlankWorkspace();
     else await applyGame(payload);
@@ -6671,7 +6701,10 @@ async function resetLegacyZoom() {
     // Fit the desktop composition or custom canvas; narrow windows retain the responsive grid.
     initTabZoom();
     requestAnimationFrame(alignPlayers); // measure the board after the first layout
-    if(screenPreview){
+    if(screenPreview?.viewport){
+      if(!S.blank&&Number.isInteger(screenPreview.idx))go(screenPreview.idx);
+      document.body.dataset.previewReady="true";
+    }else if(screenPreview){
       const {mountScreenPreview}=await loadScreenPreviewController();
       await mountScreenPreview({context:screenPreview,document,state:S,openLearning,workspace:()=>learningWorkspace,
         renderAll,renderSettings,toggleSettings,toggleReorganize,openCredits,go,applyUserMove,startPractice,

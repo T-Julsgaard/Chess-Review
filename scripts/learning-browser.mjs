@@ -18,6 +18,7 @@ if (process.argv.includes('--working-tree')) {
   await fs.cp(path.join(root,'lib'),path.join(source,'lib'),{recursive:true});
 }
 await fs.appendFile(path.join(source,'analysis.js'),'\nexport {S, learningWorkspace, openLearning, go, toggleFlip, applyLayoutMode, applyUserMove, paintBoard, exitAnalysis};\n');
+if(process.argv.includes('--viewport-preview'))await fs.appendFile(path.join(source,'analysis.js'),'\nglobalThis.__viewportAudit={S,openLearning,workspace:()=>learningWorkspace,fit:()=>_fittedDip};\n');
 await fs.writeFile(path.join(source,'audit.html'),'<!doctype html><script type="module" src="audit.js"></script>');
 await fs.writeFile(path.join(source,'audit.js'),"import {browserAPI} from './browser-compat.js'; window.api=browserAPI;");
 const profile=await fs.mkdtemp(path.join(artifacts,'learning-profile-'));
@@ -45,6 +46,6 @@ try {
   const {windowId}=await call('Browser.getWindowForTarget',{targetId:review.targetId});
   await call('Browser.setWindowBounds',{windowId,bounds:{width:1920,height:1080}});await sleep(400);
   const {auditLearning}=await import(process.argv.includes('--puzzle-slider')?'./puzzle-slider-audit.mjs':process.argv.includes('--puzzle-ui')?'./puzzle-ui-audit.mjs':process.argv.includes('--openings')?'./openings-audit.mjs':process.argv.includes('--concept-notice')?'./concept-notice-audit.mjs':process.argv.includes('--run-notice')?'./puzzle-run-notice-audit.mjs':process.argv.includes('--run-layout')?'./puzzle-run-layout-audit.mjs':process.argv.includes('--puzzle-speed')?'./puzzle-speed-audit.mjs':process.argv.includes('--statistics')?'./puzzle-statistics-audit.mjs':process.argv.includes('--panel-groups')?'./panel-groups-audit.mjs':process.argv.includes('--screen-previews')?'./screen-previews-audit.mjs':process.argv.includes('--popup-workspace')?'./popup-workspace-audit.mjs':'./learning-audit.mjs');
-  const runAudit=process.argv.includes('--navigation')?(await import('./learning-navigation-audit.mjs')).auditLearning:auditLearning;
+  const runAudit=process.argv.includes('--viewport-preview')?(await import('./viewport-preview-audit.mjs')).auditLearning:process.argv.includes('--navigation')?(await import('./learning-navigation-audit.mjs')).auditLearning:auditLearning;
   await runAudit({review,call,evaluate,waitFor,sleep,out});
 } finally {clearInterval(keepAlive);ws?.close();chrome.kill();}

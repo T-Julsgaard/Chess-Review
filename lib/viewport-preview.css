@@ -1,0 +1,16 @@
+@font-face{font-family:Inter;src:url('../fonts/inter.ttf') format('truetype');font-display:swap}
+:root{color-scheme:dark;font-family:Inter,system-ui,sans-serif;color:#e8e9ed;background:#111318}
+*{box-sizing:border-box}
+body{height:100vh;height:100dvh;margin:0;display:flex;flex-direction:column;overflow:hidden}
+header{flex:none;padding:18px 24px 12px;background:#1a1d24;border-bottom:1px solid #343945;box-shadow:0 4px 20px #0003;z-index:1}
+.preview-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}
+.preview-heading>div{display:flex;align-items:baseline;gap:12px}.preview-heading strong{font-size:19px;font-weight:650;letter-spacing:-.4px}.preview-heading span{color:#9299a9;font-size:12px}
+button,select,input{font:inherit;font-size:12px;color:inherit;background:#242934;border:1px solid #414958;border-radius:7px;min-height:34px}
+button{padding:7px 13px;cursor:pointer}button:hover{background:#303847;border-color:#68758a}button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid #a1cc7b;outline-offset:3px}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}nav button{background:transparent;border-color:transparent;color:#a6adbb}nav button[aria-pressed=true]{color:#d5edc1;background:#7fb45f20;border-color:#7fb45f70}
+.preview-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.preview-controls label{display:flex;align-items:center;gap:8px;color:#a6adbb;font-size:12px}select{padding:6px 28px 6px 10px;max-width:100%}input{width:78px;padding:6px 8px}output{margin-left:auto;font:12px ui-monospace,monospace;color:#c4d7b7;white-space:nowrap}
+header p{font-size:11px;line-height:1.5;color:#9299a9;margin:12px 0 0}
+main{flex:1;min-height:0;overflow:auto;background-color:#111318;background-image:radial-gradient(#303640 1px,transparent 1px);background-size:16px 16px;padding:24px;overscroll-behavior:contain}
+#preview-surface{position:relative;margin:0 auto;flex:none;background:#1b1e25;box-shadow:0 0 0 1px #48515f,0 10px 40px #0008}
+iframe{display:block;position:absolute;left:0;top:0;transform-origin:top left;border:0;background:#1b1e25}
+@media(max-width:700px){header{padding:12px}.preview-heading{margin-bottom:10px}.preview-heading span{display:none}.preview-controls{gap:8px}output{width:100%;margin-left:0}header p{max-height:3em;overflow:auto}.preset-label{width:100%}}
