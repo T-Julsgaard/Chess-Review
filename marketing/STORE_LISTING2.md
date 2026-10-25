@@ -51,20 +51,3 @@ link can read its contents. The extension does not upload it to a developer serv
 
 Review chess games after play using locally bundled Stockfish,
 with direct public game lookups from Chess.com or Lichess.
-
-## Maintainer notes — do not paste into the public description
-
-Check the actual store privacy form against PRIVACY.md, including game-related
-website content, usernames, browsing/game identifiers, local storage, clipboard
-sharing, and direct platform requests. Do not equate absence of a developer
-backend with absence of all data processing or transmission. The developer's
-dashboard declarations and currently published wording require a separate update;
-this repository does not submit them. Copy alone does not update dashboard choices.
-
-Privacy policy URL: https://github.com/T-Julsgaard/Chess-Review/blob/main/PRIVACY.md
-Use this URL only after the revised policy is available there, or update the policy
-at the existing hosted URL. A local edit does not update either public location.
-
-No Android-support claim is included because device testing remains outstanding.
-The copy does not claim numerical agreement with another platform, absence of all
-network requests, or a technical guarantee that unfinished platform games are blocked.
