@@ -318,19 +318,20 @@ const DEFAULT_SETTINGS = {
   boardTheme: "maple", pieceStyle: "image", sound: true,
   // Master volume (0–100) applied to every sound the extension plays.
   soundVolume: 50,
-  puzzleSuccessSound: "warm-marimba",
+  puzzleSuccessSound: "soft-retro",
   puzzleIncorrectSound: "default",
   // Custom board colours (used when boardTheme === "custom" — the colour-picker chip, shown first).
   boardCustomLight: "#f9f9f9", boardCustomDark: "#e1a652",
   // Per-event sound mapping + knobs (see FX_SOUNDS / SOUND_EVENTS). snd = an FX_SOUNDS id or "default"
-  // (the original cue); pitch in semitones; speed is a duration multiplier (1 = unchanged).
+  // (the original cue); pitch in semitones; speed is a duration multiplier (1 = unchanged), volume 0–100.
   soundFx: {
-    move:    { snd: "default", pitch: 0, speed: 1 },
-    capture: { snd: "default", pitch: 0, speed: 1 },
-    check:   { snd: "default", pitch: 0, speed: 1 },
-    castle:  { snd: "default", pitch: 0, speed: 1 },
-    puzzleSuccess: { pitch: 0, speed: 1 },
-    puzzleIncorrect: { pitch: 0, speed: 1 },
+    move:    { snd: "default", pitch: 0, speed: 1, volume: 100 },
+    capture: { snd: "default", pitch: 0, speed: 1, volume: 100 },
+    check:   { snd: "default", pitch: 0, speed: 1, volume: 100 },
+    castle:  { snd: "default", pitch: 0, speed: 1, volume: 100 },
+    puzzleSuccess: { pitch: 0, speed: 1, volume: 100 },
+    puzzleIncorrect: { pitch: 0, speed: 1, volume: 100 },
+    runStart: { volume: 100 },
   },
   // Best-move arrow (the engine's recommendation in the current position)
   bestArrow: true, bestArrowColor: "#85ae4a", arrowOpacity: 0.65, arrowShaft: 0.2, arrowHead: 0.4,
@@ -531,11 +532,17 @@ const FX_SOUNDS = [
   ["09", "Sound 09", "sounds/fx/chess_sound_09.wav"],
 ];
 const PUZZLE_SUCCESS_SOUNDS = [
+  ["soft-retro", "Soft Retro", "sounds/success/04-soft-retro.wav", .25],
   ["warm-marimba", "Warm Marimba", "sounds/success/01-warm-marimba.wav"],
   ["crystal-chime", "Crystal Chime", "sounds/success/02-crystal-chime.wav"],
   ["gentle-piano", "Gentle Piano", "sounds/success/03-gentle-piano.wav"],
-  ["soft-retro", "Soft Retro", "sounds/success/04-soft-retro.wav", .25],
   ["airy-bloom", "Airy Bloom", "sounds/success/05-airy-bloom.wav"],
+];
+const PUZZLE_INCORRECT_SOUNDS = [
+  ["default", "Try Again", "sounds/Wrong/Incorrect.mp3"],
+  ["soft-descent", "Soft Descent", "sounds/Wrong/soft-descent.wav"],
+  ["retro-wobble", "Retro Wobble", "sounds/Wrong/retro-wobble.wav"],
+  ["wooden-knock", "Wooden Knock", "sounds/Wrong/wooden-knock.wav"],
 ];
 function puzzleSuccessChoice() {
   const id = S.settings.puzzleSuccessSound;
@@ -551,7 +558,7 @@ const SOUND_EVENTS = [
 ];
 const _fxFileById = (id) => (FX_SOUNDS.find(([x]) => x === id) || [])[2] || null;
 const _eventDef = (ev) => SOUND_EVENTS.find(([k]) => k === ev) || SOUND_EVENTS[0];
-// Per-event config { snd, pitch, speed }, with safe fallbacks for old/missing stored settings.
+// Per-event config { snd, pitch, speed, volume }, with safe fallbacks for old/missing stored settings.
 function fxConfig(ev) {
   const c = (S.settings.soundFx && S.settings.soundFx[ev]) || {};
   let snd = c.snd === "default" || _fxFileById(c.snd) ? c.snd : "default";
@@ -559,9 +566,10 @@ function fxConfig(ev) {
   if (ev === "puzzleIncorrect") {
     const id = S.settings.puzzleIncorrectSound;
     // Preserve On/Off choices saved by the earlier toggle.
-    snd = id === false || id === "none" ? "none" : _fxFileById(id) ? id : "default";
+    snd = id === false || id === "none" ? "none" : PUZZLE_INCORRECT_SOUNDS.some(([key]) => key === id) ? id : "default";
   }
-  return { snd, pitch: Number.isFinite(+c.pitch) ? +c.pitch : 0, speed: +c.speed > 0 ? +c.speed : 1 };
+  const volume = c.volume == null || !Number.isFinite(+c.volume) ? 100 : Math.max(0, Math.min(100, +c.volume));
+  return { snd, pitch: Number.isFinite(+c.pitch) ? +c.pitch : 0, speed: +c.speed > 0 ? +c.speed : 1, volume };
 }
 function setFx(ev, field, val) {
   if (field === "snd" && (ev === "puzzleSuccess" || ev === "puzzleIncorrect")) {
@@ -573,7 +581,7 @@ function setFx(ev, field, val) {
   // shared DEFAULT_SETTINGS object (settings are loaded with a shallow spread).
   const fx = { ...(S.settings.soundFx || {}) };
   fx[ev] = { ...fxConfig(ev), [field]: val };
-  if (ev === "puzzleSuccess" || ev === "puzzleIncorrect") delete fx[ev].snd;
+  if (ev === "puzzleSuccess" || ev === "puzzleIncorrect" || ev === "runStart") delete fx[ev].snd;
   S.settings.soundFx = fx;
   return writeSettings({ soundFx: { [ev]: { [field]: val } } });
 }
@@ -582,7 +590,7 @@ function fxUrl(ev) {
   const cfg = fxConfig(ev);
   if (cfg.snd === "none") return null;
   if (ev === "puzzleSuccess") return _url(puzzleSuccessChoice()[2]);
-  if (ev === "puzzleIncorrect") return _url(_fxFileById(cfg.snd) || "sounds/Wrong/Incorrect.mp3");
+  if (ev === "puzzleIncorrect") return _url(PUZZLE_INCORRECT_SOUNDS.find(([id]) => id === cfg.snd)[2]);
   if (cfg.snd === "default") return _url(_eventDef(ev)[2]);
   return _url(_fxFileById(cfg.snd) || _eventDef(ev)[2]);
 }
@@ -671,7 +679,7 @@ function triggerFx(ev) {
   const url = fxUrl(ev);
   if (!url) return;
   const volume = ev === "puzzleSuccess" ? puzzleSuccessChoice()?.[3] ?? 1 : 1;
-  triggerAudio(url, cfg.pitch, cfg.speed, volume);
+  triggerAudio(url, cfg.pitch, cfg.speed, volume * cfg.volume / 100);
 }
 function triggerAudio(url, pitch = 0, speed = 1, volume = 1) {
   const ctx = audioCtx();
@@ -5075,11 +5083,13 @@ function visualSettings() {
     ),
     section("Sound",
       toggleRow("Sound effects", "sound"),
-      slider("Volume", "soundVolume", 0, 100, 1, { fmt: (v) => v + " %" }),
-      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Pick a sound for each event, then shape it with the pitch and speed knobs. Changes preview as you make them.")),
+      slider("Master volume", "soundVolume", 0, 100, 1, { fmt: (v) => v + " %" }),
+      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Pick a sound for each event, then adjust its volume, pitch and speed. Each volume is relative to the master volume. Changes preview as you make them.")),
       fxEventControls("puzzleSuccess", "Puzzle success"),
       fxEventControls("puzzleIncorrect", "Incorrect puzzle"),
       ...SOUND_EVENTS.map(([key, label]) => fxEventControls(key, label)),
+      el("div", { class: "set-fx", "data-sound-event": "runStart" },
+        fxSlider("runStart", "volume", "Puzzle countdown volume", 0, 100, 1, (v) => v + " %")),
     ),
     el("button", { class: "set-reset", onclick: resetVisualSettings }, "Reset to default"),
   );
@@ -5097,14 +5107,14 @@ function coachPicker() {
   dropdown.classList.add("coach-dropdown");
   return el("div", { class: "set-row" }, el("span", { class: "set-lbl" }, "Coach"), dropdown);
 }
-// Controls for one event: a sound dropdown plus pitch and speed knobs.
+// Controls for one event: a sound dropdown plus volume, pitch and speed knobs.
 // Everything previews on change. The dropdown re-renders the panel so its label updates;
 // the sliders save + preview live without a rebuild (so the drag isn't interrupted).
 function fxEventControls(ev, label) {
   const cfg = fxConfig(ev);
   let opts = [["default", "Lichess"], ...FX_SOUNDS.map(([id, l]) => [id, l])];
   if (ev === "puzzleSuccess") opts = [...PUZZLE_SUCCESS_SOUNDS.map(([id, label]) => [id, label]), ["none", "Off"]];
-  else if (ev === "puzzleIncorrect") {opts[0] = ["default", "Incorrect"];opts.push(["none", "Off"]);}
+  else if (ev === "puzzleIncorrect") opts = [...PUZZLE_INCORRECT_SOUNDS.map(([id, label]) => [id, label]), ["none", "Off"]];
   const cls = ev === "puzzleSuccess" ? " set-puzzle-success" : ev === "puzzleIncorrect" ? " set-puzzle-incorrect" : "";
   return el("div", { class: "set-fx" + cls, "data-sound-event": ev },
     el("div", { class: "set-row" }, el("span", { class: "set-lbl" }, label),
@@ -5113,6 +5123,7 @@ function fxEventControls(ev, label) {
         triggerFx(ev);
         if (UI.settings && !UI.settings.hidden) renderSettings();
       })),
+    fxSlider(ev, "volume", "Volume", 0, 100, 1, (v) => v + " %"),
     fxSlider(ev, "pitch", "Pitch", -12, 12, 1, (v) => (v > 0 ? "+" : "") + v + " st"),
     fxSlider(ev, "speed", "Speed", 0.5, 2, 0.05, (v) => (+v).toFixed(2) + "×"),
   );
@@ -5121,12 +5132,13 @@ function fxEventControls(ev, label) {
 // drag survives); previewing on change (release) keeps the cue from machine-gunning while dragging.
 function fxSlider(ev, field, label, min, max, step, fmt) {
   const out = el("b", {}, fmt(fxConfig(ev)[field]));
+  const eventLabel = {puzzleSuccess: "Puzzle success", puzzleIncorrect: "Incorrect puzzle", runStart: "Puzzle countdown"}[ev] || _eventDef(ev)[1];
   return el("div", { class: "set-ctrl set-fx-knob" },
     el("div", { class: "set-ctrl-top" }, el("span", { class: "set-lbl" }, label), out),
     el("input", {
-      type: "range", min, max, step, value: fxConfig(ev)[field],
+      type: "range", min, max, step, value: fxConfig(ev)[field], "aria-label": eventLabel + " " + field,
       oninput: (e) => { const v = +e.target.value; out.textContent = fmt(v); setFx(ev, field, v); },
-      onchange: () => triggerFx(ev),
+      onchange: () => { if (ev !== "runStart") triggerFx(ev); },
     }),
   );
 }

@@ -182,3 +182,16 @@ test('muted or unavailable audio never prevents the intro',()=>{
   const unavailable=createRunStartSound({},()=>({sound:true}));
   assert.doesNotThrow(()=>{unavailable.prime();unavailable.play('Go!');unavailable.close();});
 });
+
+test('countdown volume multiplies master volume, clamps invalid levels and can mute just the countdown',()=>{
+  const {sound,settings,notes}=audioFixture();
+  settings.soundFx={runStart:{volume:40}};
+  sound.play('3');assert.equal(notes.at(-1).volume,.5*.4*.18);
+  sound.play('Go!');assert.equal(notes.at(-1).volume,.5*.4*.13);
+  settings.soundFx.runStart.volume=0;sound.play('2');assert.equal(notes.length,3);
+  for(const value of [null,undefined,'broken',Infinity,200]){
+    settings.soundFx.runStart.volume=value;sound.play('1');assert.equal(notes.at(-1).volume,.09);
+  }
+  settings.soundFx.runStart.volume=-20;const count=notes.length;sound.play('1');assert.equal(notes.length,count);
+  sound.close();
+});
