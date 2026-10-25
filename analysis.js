@@ -1562,7 +1562,7 @@ function buildUI() {
   const statsMount = el("div", { id: "statsMount" });
   const engineMount = el("div", { id: "engineMount" });
   const learnMount = el("div", { class: "learn-entry" },
-    el("button", { class: "learn-entry-button", "data-motion": S.settings.moveAnim===false?"off":"on", onclick: openLearning },
+    el("button", { class: "learn-entry-button", "data-motion": S.settings.moveAnim===false?"off":"on", onclick: openPuzzles },
       icon("book"), el("span", {class:"learn-entry-label"}, "Solve Puzzles")));
 
   // The stage holds every module. In the automatic layout the side wrappers group the panels into
@@ -1636,6 +1636,12 @@ function buildUI() {
 let learningWorkspace = null;
 let openingLearning = false;
 let deferredPracticeAdvance = false;
+function openPuzzles(event) {
+  const button=event.currentTarget;
+  button.classList.add("is-activating");
+  setTimeout(()=>button.classList.remove("is-activating"),460);
+  return openLearning();
+}
 function toggleLearning() {
   if (learningWorkspace) return learningWorkspace.close();
   return openLearning();

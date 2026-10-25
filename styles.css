@@ -50,9 +50,10 @@
 .learn-entry-button:hover { background: color-mix(in srgb, var(--accent) 15%, var(--panel)); }
 .learn-entry-button svg { width: 20px; height: 20px; }
 .learn-entry-button:is(:hover,:focus-visible) { box-shadow: 0 4px 14px color-mix(in oklab, var(--accent) 14%, transparent); }
-.learn-entry-button:is(:hover,:focus-visible) svg { animation: learning-toggle-book .46s both; }
-.learn-entry-button:is(:hover,:focus-visible) .learn-entry-label { animation: learning-toggle-label-back .3s cubic-bezier(.16, 1, .3, 1); }
-.learn-entry-button:is(:hover,:focus-visible)::after { animation: learning-toggle-shine-back .46s both; }
+.learn-entry-button.is-activating { animation: learning-toggle-out .46s; }
+.learn-entry-button.is-activating svg { animation: learning-toggle-book .46s both; }
+.learn-entry-button.is-activating .learn-entry-label { animation: learning-toggle-label-back .3s cubic-bezier(.16, 1, .3, 1); }
+.learn-entry-button.is-activating::after { animation: learning-toggle-shine-back .46s both; }
 .learning-workspace { position: fixed; inset: 0; z-index: 2000; overflow-y: auto; background: var(--bg); color: var(--ink); animation: learn-enter .22s ease-out; }
 .learn-header { min-height: 76px; display: flex; gap: 16px; align-items: center; justify-content: space-between; padding: 16px clamp(16px,4vw,64px); border-bottom: 1px solid var(--line); background: var(--panel); }
 .learn-brand { display: flex; gap: 12px; align-items: center; font-size: clamp(16px,2vw,22px); font-weight: 750; letter-spacing: -.4px; }
