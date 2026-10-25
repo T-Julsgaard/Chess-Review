@@ -4968,7 +4968,7 @@ function visualSettings() {
     ),
     section("Screen sizes",
       el("button", {class:"set-reset","data-debug":"screen-previews",onclick:openScreenSizePreview}, "Open screen-size preview"),
-      el("div", {class:"set-row hint"},el("span",{class:"set-note"},"Use the app at desktop, laptop, tablet and phone sizes in a separate tab. Switch resolutions or enter your own dimensions. Preview changes are not saved.")),
+      el("div", {class:"set-row hint"},el("span",{class:"set-note"},"Try your current review at desktop, laptop, tablet and phone sizes. Open full screen and hide the controls for an immersive preview. Switch resolutions without losing your place. Preview changes are not saved.")),
     ),
     section("Move list",
       seg("Style", "mlStyle", ["rows", "cards", "compact"]),

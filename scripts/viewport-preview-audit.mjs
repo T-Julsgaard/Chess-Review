@@ -21,6 +21,22 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const game=await inside("({pgn:w.__viewportAudit.S.pgn,idx:w.__viewportAudit.S.idx})");
   assert.equal(game.pgn,'1. e4 e5 2. Nf3 Nc6 *');assert.equal(game.idx,2);
   await run("window.originalFrame=document.querySelector('iframe').contentWindow;window.originalDoc=originalFrame.document");
+  const measureStage="(()=>{const r=document.querySelector('#preview-stage').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,viewportWidth:innerWidth,viewportHeight:innerHeight}})()";
+  const stage=await run(measureStage);
+  assert.deepEqual(stage,{x:0,y:0,width:stage.viewportWidth,height:stage.viewportHeight,viewportWidth:stage.viewportWidth,viewportHeight:stage.viewportHeight},'Review uses the entire available viewport');
+  assert.equal(await run("document.querySelector('#preview-settings').hidden"),true);
+  await run("document.querySelector('#toggle-settings').click()");
+  assert.deepEqual(await run(measureStage),stage,'Screen setup overlays the review without shrinking it');
+  let shot=await call('Page.captureScreenshot',{format:'png'},sessionId);await fs.writeFile(path.join(out,'screen-size-setup.png'),Buffer.from(shot.data,'base64'));
+  await run("document.querySelector('#close-settings').click()");
+  await call('Runtime.evaluate',{expression:"document.querySelector('#fullscreen-preview').click()",userGesture:true},sessionId);
+  await waitFor(tab,"document.fullscreenElement===document.documentElement&&document.querySelector('#preview-toolbar').hidden",'Immersive full screen');
+  assert.equal(await run("document.querySelector('#show-controls').hidden"),false);
+  shot=await call('Page.captureScreenshot',{format:'png'},sessionId);await fs.writeFile(path.join(out,'screen-size-fullscreen.png'),Buffer.from(shot.data,'base64'));
+  await run("document.querySelector('#show-controls').click()");
+  assert.equal(await run("document.querySelector('#fullscreen-preview').textContent"),'Exit full screen');
+  await run("document.exitFullscreen()");
+  await waitFor(tab,"!document.fullscreenElement",'Exit full screen');
   const base=await evaluate(review,'location.origin');
   const auditTarget=await call('Target.createTarget',{url:base+'/audit.html'});
   const auditSession=await call('Target.attachToTarget',{targetId:auditTarget.targetId,flatten:true}),audit={sessionId:auditSession.sessionId};
@@ -37,10 +53,16 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     const state=await run("(()=>{const f=document.querySelector('iframe'),w=f.contentWindow;return {width:f.offsetWidth,height:f.offsetHeight,same:w===originalFrame&&w.document===originalDoc,outerZoom:devicePixelRatio,error:w.document.querySelector('#error').textContent,scroll:w.document.documentElement.scrollWidth,innerWidth:w.innerWidth}})()");
     assert.ok(Math.abs(state.width-width)<2,`${group}: width`);assert.ok(Math.abs(state.height-height)<2,`${group}: height`);
     assert.equal(state.same,true,'Size changes preserve the live document');assert.equal(state.error,'');
+    const fit=await run("(()=>{const s=document.querySelector('#preview-stage');return {width:s.clientWidth,height:s.clientHeight,scrollWidth:s.scrollWidth,scrollHeight:s.scrollHeight}})()");
+    assert.ok(fit.scrollWidth<=fit.width+1&&fit.scrollHeight<=fit.height+1,`${group}: fitted review fills the stage without outer scrolling`);
+    assert.equal(await run("(()=>{const s=document.querySelector('#preview-stage'),r=document.querySelector('#preview-surface').getBoundingClientRect();return Math.abs(r.width-s.clientWidth)<1||Math.abs(r.height-s.clientHeight)<1})()"),true,`${group}: fitted review uses all available width or height`);
     const shot=await call('Page.captureScreenshot',{format:'png'},sessionId);await fs.writeFile(path.join(out,`screen-size-${group.toLowerCase()}-${index}.png`),Buffer.from(shot.data,'base64'));
     assert.ok(state.scroll<=state.innerWidth+1,`${group}: horizontal overflow ${JSON.stringify(state)}; screenshot: ${out}`);
     checked++;
   }
+  await run("document.querySelector('#preview-scale').value='1';document.querySelector('#preview-scale').dispatchEvent(new Event('change'))");
+  assert.equal(await run("document.querySelector('iframe').style.transform"),'scale(1)');
+  await run("document.querySelector('#preview-scale').value='fit';document.querySelector('#preview-scale').dispatchEvent(new Event('change'))");
   await run("document.querySelector('iframe').contentWindow.document.querySelector('[aria-label=Settings]').click()");
   await sleep(200);
   assert.equal(await inside("!w.document.querySelector('#settings').hidden"),true);
@@ -50,6 +72,11 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   assert.equal(await inside("w.__viewportAudit.workspace().ready"),true);
   await run("[...document.querySelectorAll('#device-tabs button')].find(b=>b.textContent==='Laptop').click()");await sleep(650);
   assert.equal(await run("document.querySelector('iframe').contentWindow===originalFrame"),true);
+  await call('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false},sessionId);
+  await run("document.querySelector('#toggle-settings').click()");await sleep(250);
+  assert.equal(await run("['preview-settings','preview-toolbar'].every(id=>{const n=document.getElementById(id),r=n.getBoundingClientRect();return r.x>=0&&r.right<=innerWidth&&r.y>=0&&r.bottom<=innerHeight&&n.scrollWidth<=n.clientWidth+1})"),true,'Screen controls remain usable in a narrow window');
+  shot=await call('Page.captureScreenshot',{format:'png'},sessionId);await fs.writeFile(path.join(out,'screen-size-narrow-setup.png'),Buffer.from(shot.data,'base64'));
+  await call('Emulation.clearDeviceMetricsOverride',{},sessionId);
   assert.equal(await evaluate(audit,'api.storage.local.get(null).then(JSON.stringify)'),baseline,'Preview leaves real account data unchanged');
-  console.log(`Passed ${checked} viewport sizes, current-game handoff, persistent iframe, settings rotation, learning navigation and isolated storage. Screenshots: ${out}`);
+  console.log(`Passed full-viewport layout, setup overlay, native fullscreen, ${checked} viewport sizes, current-game handoff, persistent iframe, settings rotation, learning navigation and isolated storage. Screenshots: ${out}`);
 }
