@@ -4,6 +4,15 @@ import assert from 'node:assert/strict';
 
 export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const run=expression=>evaluate(review,expression),near=(a,b)=>assert.ok(Math.abs(a-b)<1,`${a} must match ${b}`);
+  const expected=JSON.parse(await fs.readFile(new URL('../tests/fixtures/default-panel-layout.json',import.meta.url),'utf8'));
+  const defaults=await run("import('./analysis.js').then(m=>({layout:m.S.layout,boxes:Object.fromEntries([...document.querySelectorAll('.mod')].map(n=>[n.dataset.mod,{x:parseFloat(n.style.left),y:parseFloat(n.style.top),w:parseFloat(n.style.width),h:parseFloat(n.style.height),transform:n.querySelector('.mod-inner').style.transform}]))}))");
+  assert.deepEqual(defaults.layout,expected.layout);
+  for(const [key,box] of Object.entries(expected.displayedLayout)){
+    for(const prop of ['x','y','w','h'])near(defaults.boxes[key][prop],box[prop]);
+    assert.ok(Math.abs(parseFloat(defaults.boxes[key].transform.slice(6))-box.scale)<1e-5);
+  }
+  const defaultShot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
+  await fs.writeFile(path.join(out,'default-panels.png'),Buffer.from(defaultShot.data,'base64'));
   const rect=selector=>run(`(()=>{const r=document.querySelector('${selector}').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};})()`);
   const board=await rect('.board');
   await run("document.querySelector('[aria-label=Settings]').click();[...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Layout').click();document.querySelector('.reorg-toggle-btn').click()");
@@ -22,7 +31,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   };
   await drag(x,y,dx,dy);await sleep(100);
   let changed=await run("import('./analysis.js').then(m=>structuredClone(m.S.layout))");
-  for(const key of start.keys){near(changed[key].w,start.layout[key].w*.8);near(changed[key].h,start.layout[key].h*.8);assert.ok(Math.abs(changed[key].scale-.8)<.001);}
+  for(const key of start.keys){near(changed[key].w,start.layout[key].w*.8);near(changed[key].h,start.layout[key].h*.8);assert.ok(Math.abs(changed[key].scale-(start.layout[key].scale||1)*.8)<.001);}
   const smallLabel=await rect('.moves-panel .panel-head h3');near(smallLabel.height,label.height*.8);
   const sameBoard=await rect('.board');for(const key of ['x','y','width','height'])near(sameBoard[key],board[key]);
   const handle=await rect('[data-mod=review] .mod-handle');await drag(handle.x+10,handle.y+10,-40,30);await sleep(100);
@@ -39,6 +48,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await waitFor(review,"!!document.querySelector('.board')&&import('./analysis.js').then(m=>!m.S.analyzing)",'Reloaded scaled layout');
   changed=await run("import('./analysis.js').then(m=>structuredClone(m.S.layout))");
   for(const key of start.keys)for(const value of ['x','y','w','h','scale'])near(changed[key][value],moved[key][value]);
-  assert.equal(await run("document.querySelector('[data-mod=moves] .mod-inner').style.transform"),'scale(0.8)');
+  const transform=await run("document.querySelector('[data-mod=moves] .mod-inner').style.transform");
+  assert.ok(Math.abs(parseFloat(transform.slice(6))-changed.moves.scale)<1e-5);
   console.log('Real group move/scale, unchanged board, scaled content, JSON download and reload checks passed. Artifacts: '+out);
 }

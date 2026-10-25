@@ -39,8 +39,8 @@ test('selected panels move and resize together while content retains its origina
   a.event(grip,'pointerdown',0,0);a.event(a.dom.window,'pointermove',dx,dy);a.event(a.dom.window,'pointerup',dx,dy);
   for(const key of ['moves','graph']){
     near(a.state.layout[key].w,start[key].w*.5);near(a.state.layout[key].h,start[key].h*.5);
-    assert.equal(a.mod(key).querySelector('.mod-inner').style.transform,'scale(0.5)');
-    assert.equal(parseFloat(a.mod(key).querySelector('.mod-inner').style.width),start[key].w);
+    assert.equal(a.mod(key).querySelector('.mod-inner').style.transform,`scale(${panelScale(start[key])*.5})`);
+    near(parseFloat(a.mod(key).querySelector('.mod-inner').style.width),start[key].w/panelScale(start[key]));
   }
   assert.deepEqual(a.state.layout.board,before.board);
 });
@@ -57,7 +57,7 @@ test('right-panel scaling preserves the collapsed Accuracy baseline and engine c
   const exported=structuredClone(a.call('panelLayoutExport'));
   near(exported.layout.accuracy.h,exported.displayedLayout.accuracy.h+delta*.75);
   assert.equal(exported.schema,'chess-review-layout-v1');assert.equal(exported.layoutMode,'custom');
-  assert.equal(exported.layout.engine.scale,.75);assert.ok(!('pgn' in exported));
+  near(exported.layout.engine.scale,panelScale(before.engine)*.75);assert.ok(!('pgn' in exported));
   assert.equal(a.run('JSON.stringify(DEFAULT_LAYOUT)'),defaults);
 });
 
@@ -77,9 +77,10 @@ test('cancelled or blurred group gestures restore geometry and reset returns to 
 
 test('completed panel scale is persisted and can be restored without drift',async t=>{
   const a=setup(t);a.select('moves');a.select('graph');const before=structuredClone(a.state.layout),grip=a.mod('graph').querySelector('.mod-resize.e');
-  a.event(grip,'pointerdown',0,0);a.event(a.dom.window,'pointermove',60,0);a.event(a.dom.window,'pointerup',60,0);
+  const dx=before.graph.w*.2;
+  a.event(grip,'pointerdown',0,0);a.event(a.dom.window,'pointermove',dx,0);a.event(a.dom.window,'pointerup',dx,0);
   await new Promise(resolve=>setTimeout(resolve,300));
-  const saved=structuredClone(a.store.layout);assert.equal(saved.moves.scale,1.2);near(saved.graph.w,before.graph.w*1.2);
-  a.state.layout=saved;a.call('applyLayoutMode');assert.equal(a.mod('moves').querySelector('.mod-inner').style.transform,'scale(1.2)');
+  const saved=structuredClone(a.store.layout);near(saved.moves.scale,panelScale(before.moves)*1.2);near(saved.graph.w,before.graph.w*1.2);
+  a.state.layout=saved;a.call('applyLayoutMode');assert.equal(a.mod('moves').querySelector('.mod-inner').style.transform,`scale(${saved.moves.scale})`);
   assert.equal(a.state.layout.moves.w,saved.moves.w);
 });

@@ -397,18 +397,19 @@ const LOADERS = { dots: "pulse", bounce: "bounce", spinner: "spin", wave: "wave"
 // When LAYOUT_VERSION is bumped, saved layouts are reset to this default once.
 // Responsive placement is the default. Custom layouts start from the current screen.
 // These boxes also provide desktop placement and hidden-module fallback geometry.
-const LAYOUT_VERSION = 8;
+const LAYOUT_VERSION = 9;
+// Exported panel placements, with the expanded Accuracy baseline and content scales.
 const DEFAULT_LAYOUT = {
-  board:    { x: 344,  y: 0,   w: 822, h: 934 },
-  evalbar:  { x: 288,  y: 58,  w: 30,  h: 816 },
-  controls: { x: 1194, y: 841, w: 310, h: 54  },
-  coach:    { x: 1570, y: 0,   w: 192, h: 196 },
-  review:   { x: 1200, y: 60,  w: 604, h: 136 },
-  moves:    { x: 1200, y: 216, w: 300, h: 419 },
-  accuracy: { x: 1510, y: 216, w: 294, h: 506 },
-  graph:    { x: 1200, y: 649, w: 300, h: 178 },
-  engine:   { x: 1510, y: 736, w: 294, h: 178 },
-  learn:    { x: 1510, y: 928, w: 294, h: 54 },
+  board: { x: 350.1796861323378, y: 0, w: 853.9946785853867, h: 970.3540508500623, scale: 1.038922966648889 },
+  evalbar: { x: 292, y: 60.25753206563556, w: 31.16768899946667, h: 847.7611407854935, scale: 1.038922966648889 },
+  controls: { x: 1223.2642077838934, y: 855.2197936272515, w: 315.2415410516622, h: 54.913042634805684, scale: 1.0169081969408462 },
+  coach: { x: 1609.5369298642804, y: 0, w: 195.24637381264242, h: 199.3140066004058, scale: 1.0169081969408462 },
+  review: { x: 1231.3232769808528, y: 61.01449181645075, w: 618.607924839354, h: 137.03340107200881, scale: 1.0169081969408462 },
+  moves: { x: 1229.3656569655382, y: 219.65217053922274, w: 305.07245908225383, h: 426.0845345182144, scale: 1.0169081969408462 },
+  accuracy: { x: 1550.480058063144, y: 219.65217053922274, w: 298.9710099006087, h: 514.5555476520681, scale: 1.0169081969408462 },
+  graph: { x: 1229.3656569655382, y: 659.9734198146091, w: 305.07245908225383, h: 181.0096590554706, scale: 1.0169081969408462 },
+  engine: { x: 1550.480058063144, y: 748.4444329484627, w: 298.9710099006087, h: 181.00965905547062, scale: 1.0169081969408462 },
+  learn: { x: 1550.480058063144, y: 943.6908067611051, w: 298.9710099006087, h: 54.913042634805684, scale: 1.0169081969408462 },
 };
 const GRIP_SVG = `<svg viewBox="0 0 12 12" width="12" height="12"><path d="M11 4 4 11M11 8 8 11" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>`;
 const HANDLE_SVG = `<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><circle cx="5" cy="4" r="1.3"/><circle cx="11" cy="4" r="1.3"/><circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/><circle cx="5" cy="12" r="1.3"/><circle cx="11" cy="12" r="1.3"/></svg>`;
@@ -1814,6 +1815,9 @@ function applyPanelBox(mod,b) {
   inner.style.width=scale===1?"":b.w/scale+"px";inner.style.height=scale===1?"":b.h/scale+"px";
   inner.style.transform=scale===1?"":"scale("+scale+")";inner.style.transformOrigin=scale===1?"":"top left";
 }
+function panelContentScale(key) {
+  return isCustomLayout() ? panelScale(S.layout[key]) : UI.canvas.classList.contains("desktop-layout") ? panelScale(DEFAULT_LAYOUT[key]) : 1;
+}
 function applyLayoutMode() {
   const custom = isCustomLayout();
   UI.canvas.classList.toggle("auto", !custom);
@@ -1854,6 +1858,7 @@ function snapshotLayout() {
       out[mod.getAttribute("data-mod")] = {
         x: parseFloat(mod.style.left), y: parseFloat(mod.style.top),
         w: parseFloat(mod.style.width), h: parseFloat(mod.style.height),
+        scale: panelScale(DEFAULT_LAYOUT[mod.getAttribute("data-mod")]),
       };
       continue;
     }
@@ -3257,7 +3262,7 @@ function alignPlayers() {
   const board = UI.boardWrap && UI.boardWrap.querySelector(".board");
   const top = UI.playerTop && UI.playerTop.querySelector(".player-strip");
   if (!board || !top) return;
-  const scale=isCustomLayout()?panelScale(S.layout.board):1;
+  const scale=panelContentScale('board');
   const off = Math.max(4, Math.round((board.getBoundingClientRect().left - UI.boardWrap.getBoundingClientRect().left)/scale));
   top.style.paddingLeft = off + "px";
   const bot = UI.playerBot.querySelector(".player-strip");
@@ -4398,8 +4403,8 @@ function fitEnginePanel() {
   const head = UI.engine?.querySelector('.panel-head');
   const body = UI.engine?.querySelector('.engine-body');
   if (!mod || !head || !body) return;
-  const scale=isCustomLayout()?panelScale(S.layout.engine):1;
-  const height = Math.max(DEFAULT_LAYOUT.engine.h,
+  const scale=panelContentScale('engine');
+  const height = Math.max(DEFAULT_LAYOUT.engine.h/panelScale(DEFAULT_LAYOUT.engine),
     Math.ceil(((head.offsetHeight||head.getBoundingClientRect().height/scale) + body.scrollHeight + 4) / GRID) * GRID)*scale;
   mod.style.minHeight = height + "px";
   if (isCustomLayout() && S.layout.engine) {

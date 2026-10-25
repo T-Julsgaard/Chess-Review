@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { app, loadGame, settle } from './helpers/app.mjs';
+
+const exportedLayout = JSON.parse(fs.readFileSync(new URL('./fixtures/default-panel-layout.json', import.meta.url), 'utf8'));
 
 function layout(t, initialZoom = 1, defaultZoom = 1) {
   const a = app(t); loadGame(a, '1. e4 e5');
@@ -26,13 +29,13 @@ function layout(t, initialZoom = 1, defaultZoom = 1) {
     desktop: () => a.dom.window.document.querySelector('.stage').classList.contains('desktop-layout') };
 }
 
-test('Full HD retains the original scale without drifting on reopen or a zoom resize event', async t => {
+test('Full HD fits the default panels without drifting on reopen or a zoom resize event', async t => {
   const a = layout(t); a.viewport(1920, 920);
   await a.call('initTabZoom');
-  assert.equal(a.zoom(), .87); assert.equal(a.desktop(), true);
+  assert.equal(a.zoom(), .85); assert.equal(a.desktop(), true);
   a.viewport(1920, 920); await a.call('fitTabZoom');
   await a.call('initTabZoom');
-  assert.deepEqual(a.changes, [.87]);
+  assert.deepEqual(a.changes, [.85]);
 });
 
 test('desktop fits laptop windows, then restores the responsive layout when narrowed', async t => {
@@ -46,7 +49,7 @@ test('desktop fits laptop windows, then restores the responsive layout when narr
   a.viewport(768,900); await a.call('fitTabZoom');
   assert.equal(a.desktop(), false); assert.equal(a.zoom(),1);
   a.viewport(1920,920); await a.call('fitTabZoom');
-  assert.equal(a.desktop(),true); assert.equal(a.zoom(),.87);
+  assert.equal(a.desktop(),true); assert.equal(a.zoom(),.85);
 });
 
 // Reported display resolutions, including 16:9, 16:10, and 1470 × 956.
@@ -119,19 +122,26 @@ test('desktop matches the saved canvas geometry and preserves the gap when accur
   }));
   a.state.layoutMode = 'custom'; a.call('applyLayoutMode'); a.call('reflowAccuracy', false);
   const savedCanvas = geometry();
-  assert.deepEqual(savedCanvas.engine, ['1510px', '649px', '294px', '178px']);
-  assert.deepEqual(savedCanvas.accuracy, ['1510px', '216px', '294px', '419px']);
-  assert.deepEqual(savedCanvas.graph, ['1200px', '649px', '300px', '178px']);
-  assert.deepEqual(savedCanvas.review, ['1200px', '60px', '604px', '136px']);
-  assert.deepEqual(savedCanvas.moves, ['1200px', '216px', '300px', '419px']);
-  assert.deepEqual(savedCanvas.controls, ['1194px', '841px', '310px', '54px']);
+  assert.deepEqual(structuredClone(a.call('layoutForSave')), exportedLayout.layout);
+  const matchesExport = () => {
+    for (const key of Object.keys(savedCanvas)) {
+      const box = exportedLayout.displayedLayout[key];
+      for (const [i, prop] of ['x', 'y', 'w', 'h'].entries()) {
+        assert.ok(Math.abs(parseFloat(geometry()[key][i]) - box[prop]) < 1e-8, `${key}.${prop}`);
+      }
+      assert.equal(a.dom.window.document.querySelector(`[data-mod="${key}"] .mod-inner`).style.transform, `scale(${box.scale})`);
+    }
+  };
+  matchesExport();
   a.state.layoutMode = 'auto'; a.call('applyLayoutMode');
   a.viewport(1920, 920); await a.call('initTabZoom');
   assert.deepEqual(geometry(), savedCanvas);
+  matchesExport();
   for (let i = 0; i < 3; i++) {
     a.state.qbreakExpanded = true; a.call('renderStats');
-    assert.equal(mod('accuracy').height, '506px'); assert.equal(mod('engine').top, '736px');
-    assert.equal(mod('controls').top, '841px');
+    assert.equal(mod('accuracy').height, exportedLayout.layout.accuracy.h + 'px');
+    assert.equal(mod('engine').top, exportedLayout.layout.engine.y + 'px');
+    assert.equal(mod('controls').top, exportedLayout.layout.controls.y + 'px');
     a.state.qbreakExpanded = false; a.call('renderStats');
     assert.deepEqual(geometry(), savedCanvas);
   }
@@ -165,14 +175,14 @@ test('Reorganize preserves exact desktop boxes and zoom through repeated resets'
     const before = geometry();
     a.call('toggleReorganize'); await settle();
     assert.deepEqual(geometry(), before);
-    assert.equal(a.zoom(), .87);
+    assert.equal(a.zoom(), .85);
     assert.deepEqual(structuredClone(a.call('layoutForSave')), defaults);
     a.call('resetLayout'); await settle();
     assert.deepEqual(geometry(), before);
-    assert.equal(a.zoom(), .87);
+    assert.equal(a.zoom(), .85);
     assert.equal(a.state.reorganize, false);
   }
-  assert.deepEqual(a.changes, [.87]);
+  assert.deepEqual(a.changes, [.85]);
 });
 
 test('settings stays right-aligned through visual and layout resets', async t => {
@@ -195,9 +205,9 @@ test('settings stays right-aligned through visual and layout resets', async t =>
 
 test('saved desktop layouts reopen at the reset scale across typical screen sizes', async t => {
   for (const [w, h, initial, expected] of [
-    [1280, 600, 1.25, .56], [1366, 648, .91, .61], [1536, 744, 1, .70],
-    [1920, 916, .91, .86], [1920, 920, .89, .87],
-    [2560, 1320, 1.25, 1.25], [3840, 2040, 2, 1.93],
+    [1280, 600, 1.25, .55], [1366, 648, .91, .60], [1536, 744, 1, .69],
+    [1920, 916, .91, .85], [1920, 920, .89, .85],
+    [2560, 1320, 1.25, 1.23], [3840, 2040, 2, 1.90],
   ]) {
     const a = layout(t, initial);
     a.state.layoutMode = 'custom'; a.call('applyLayoutMode');
@@ -224,11 +234,11 @@ test('reset refits automatic layout after manual zoom and concurrent initializat
     await settle(); await setZoom(...args); active--;
   };
   await Promise.all([a.call('initTabZoom'), a.call('initTabZoom'), a.call('fitTabZoom')]);
-  assert.equal(scopes, 1); assert.deepEqual(a.changes, [.86]);
+  assert.equal(scopes, 1); assert.deepEqual(a.changes, [.85]);
   await tabs.setZoom(7, .91);
   await a.call('fitTabZoom'); assert.equal(a.zoom(), .91);
   await a.call('resetLayout');
-  assert.equal(a.zoom(), .86); assert.equal(scopes, 1);
+  assert.equal(a.zoom(), .85); assert.equal(scopes, 1);
 });
 
 test('failed zoom writes can be retried at the same window size', async t => {
@@ -238,7 +248,7 @@ test('failed zoom writes can be retried at the same window size', async t => {
   await a.call('initTabZoom');
   tabs.setZoom = setZoom;
   await a.call('fitTabZoom');
-  assert.equal(a.zoom(), .86);
+  assert.equal(a.zoom(), .85);
 });
 
 test('narrow windows use the browser default zoom, even with a nonstandard default', async t => {
@@ -246,7 +256,7 @@ test('narrow windows use the browser default zoom, even with a nonstandard defau
   await a.call('initTabZoom');
   assert.equal(a.desktop(), false); assert.equal(a.zoom(), 1.25);
   a.viewport(1920, 916); await a.call('fitTabZoom');
-  assert.equal(a.desktop(), true); assert.equal(a.zoom(), .86);
+  assert.equal(a.desktop(), true); assert.equal(a.zoom(), .85);
 });
 
 test('small custom canvases retain their own bounds instead of inheriting desktop width', async t => {
@@ -267,16 +277,18 @@ test('Engine grows downward for its contents and cannot be resized below them', 
   const head = mod.querySelector('.panel-head'), body = mod.querySelector('.engine-body');
   head.getBoundingClientRect = () => ({ height: 40.5 });
   Object.defineProperty(body, 'scrollHeight', { configurable: true, value: 250 });
+  const scale = exportedLayout.layout.engine.scale;
+  const height = Math.ceil((40.5 / scale + 250 + 4) / 2) * 2 * scale;
   const top = mod.style.top;
   a.call('fitEnginePanel');
-  assert.equal(mod.style.height, '296px'); assert.equal(mod.style.top, top);
+  assert.equal(mod.style.height, height + 'px'); assert.equal(mod.style.top, top);
   a.call('toggleReorganize');
-  assert.equal(a.state.layout.engine.h, 296);
+  assert.equal(a.state.layout.engine.h, height);
   const grip = mod.querySelector('.mod-resize.s');
   const event = (type, y) => new a.dom.window.MouseEvent(type, { clientY: y, bubbles: true });
   grip.dispatchEvent(event('pointerdown', 300));
   grip.dispatchEvent(event('pointermove', 0));
   grip.dispatchEvent(event('pointerup', 0));
-  assert.equal(a.state.layout.engine.h, 296);
-  assert.equal(mod.style.height, '296px'); assert.equal(mod.style.top, top);
+  assert.equal(a.state.layout.engine.h, height);
+  assert.equal(mod.style.height, height + 'px'); assert.equal(mod.style.top, top);
 });
