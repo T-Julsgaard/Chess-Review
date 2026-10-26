@@ -47,7 +47,20 @@
 .accuracy-pages .acc-phase-row strong:last-child { color: var(--ink); }
 
 /* Full height has no header/footer nodes, leaving all panel space for moves. */
-.moves-panel[data-design="full"] { overflow: hidden; }
-.mod .moves-panel[data-design="full"] > #movesBody { flex: 1 1 auto; min-height: 0; border-radius: inherit; }
+.moves-panel:is([data-design="full"], [data-design="zoomed"]) { overflow: hidden; }
+.mod .moves-panel:is([data-design="full"], [data-design="zoomed"]) > #movesBody { flex: 1 1 auto; min-height: 0; border-radius: inherit; }
 .moves-panel[data-design="original"] > .moves-head,
 .moves-panel[data-design="original"] > .moves-foot { flex: none; }
+
+/* Enlarge only the list contents, keeping the surrounding panel geometry intact. */
+.moves-panel[data-design="zoomed"] .ml-pair { grid-template-columns: 40px minmax(0,1fr) minmax(0,1fr); }
+.moves-panel[data-design="zoomed"] .ml-move {
+  min-width: 0; min-height: 48px; height: auto; box-sizing: border-box;
+  padding: 10px; gap: 8px; flex-wrap: wrap; font-size: 18px; line-height: 1.4;
+}
+.moves-panel[data-design="zoomed"] .ml-move > span:not(.pc):not(.qb) { overflow-wrap: anywhere; }
+.moves-panel[data-design="zoomed"] .ml-num { font-size: 15px; }
+.moves-panel[data-design="zoomed"] .ml-move .pc { font-size: 22px; }
+.moves-panel[data-design="zoomed"] .qb.icon { width: 22px; height: 22px; }
+.moves-panel[data-design="zoomed"] .qb.dot { width: 11px; height: 11px; }
+.moves-panel[data-design="zoomed"] .qb.label { font-size: 11px; }

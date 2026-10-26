@@ -4609,6 +4609,7 @@ function updateMovesDesign() {
     panel.append(el('div', {class: 'moves-foot', 'aria-hidden': 'true'}));
   }
   UI.movesBody.scrollTop = scroll;
+  highlightCurrentMove(true);
 }
 function renderMoves() {
   updateMovesDesign();

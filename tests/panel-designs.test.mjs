@@ -15,7 +15,7 @@ test('Visual > Tabs exposes independent Accuracy and Move list design choices', 
   const section = () => [...doc.querySelectorAll('.set-section')].find(node => node.querySelector('.set-sect-head').textContent === 'Tabs');
   section().querySelector('.set-sect-head').click();
   assert.deepEqual([...section().querySelectorAll('[data-setting="accuracyDesign"]')].map(node => node.textContent), ['Original', 'Page tabs', 'Dials']);
-  assert.deepEqual([...section().querySelectorAll('[data-setting="movesDesign"]')].map(node => node.textContent), ['Original', 'Full height']);
+  assert.deepEqual([...section().querySelectorAll('[data-setting="movesDesign"]')].map(node => node.textContent), ['Original', 'Full height', 'Zoomed in']);
   const option = section().querySelector('[data-setting="accuracyDesign"][data-value="original"]');
   option.focus(); option.click(); await settle(); await a.run('_settingsWriteQueue');
   assert.equal(a.store.settings.accuracyDesign, 'original');
@@ -82,6 +82,34 @@ test('switching designs during analysis rebuilds the correct counters and keeps 
     assert.equal(doc.querySelector('[data-category="blunder"]').closest('.qbreak-row').querySelector('.ct.left').textContent, '4');
     a.state.counts.w.blunder = 1;
   }
+});
+
+test('Zoomed in keeps move cells mounted and the selected move visible when rows grow', async t => {
+  const a = review(t), doc = a.dom.window.document, S = a.state;
+  S.idx = 6;
+  a.call('highlightCurrentMove');
+  const body = doc.querySelector('#movesBody'), list = body.firstChild, cell = body.querySelector('[data-ply="6"]');
+  const before = JSON.stringify({positions: S.positions, bests: S.bests, evals: S.evals, idx: S.idx, layout: S.layout});
+  Object.defineProperties(body, {offsetHeight: {value: 100}, clientHeight: {value: 100}, clientTop: {value: 0}});
+  body.getBoundingClientRect = () => ({top: 0, bottom: 100, height: 100});
+  cell.getBoundingClientRect = () => ({top: 100 - body.scrollTop, bottom: 148 - body.scrollTop});
+  a.replace('scheduleReanalyze', () => { throw Error('Design changes must not reanalyze'); });
+  await a.call('setSetting', 'movesDesign', 'zoomed');
+  assert.equal(a.store.settings.movesDesign, 'zoomed');
+  assert.equal(doc.querySelector('.moves-panel').dataset.design, 'zoomed');
+  assert.equal(doc.querySelector('.moves-head,.moves-foot'), null);
+  assert.equal(body.firstChild, list);
+  assert.equal(body.querySelector('.current'), cell);
+  assert.equal(body.scrollTop, 56);
+  assert.equal(JSON.stringify({positions: S.positions, bests: S.bests, evals: S.evals, idx: S.idx, layout: S.layout}), before);
+});
+
+test('saved Zoomed in choice is restored on startup', async t => {
+  const a = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
+  a.replace('resetSettingsForRelease', async () => {});
+  a.store.settings = {movesDesign: 'zoomed'};
+  await a.start();
+  assert.equal(a.dom.window.document.querySelector('.moves-panel').dataset.design, 'zoomed');
 });
 
 test('saved choices survive startup and Visual reset restores the latest designs', async t => {

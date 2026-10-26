@@ -54,20 +54,28 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     assert.ok(full.height >= oldHeight + 40, JSON.stringify({width, height, oldHeight, full}));
     assert.equal(await boxes(), geometry); assert.equal(await numericState(), before);
     if (width === 1920) await shot('moves-design-full', '.moves-panel');
-    evidence.push({width, height, oldHeight, fullHeight: full.height});
+    const normal = await run("(()=>{const c=document.querySelector('.ml-move');return {font:parseFloat(getComputedStyle(c).fontSize),row:c.getBoundingClientRect().height}})()");
+    await choose('movesDesign', 'zoomed', '.moves-panel'); await close();
+    const zoomed = await run("(()=>{const p=document.querySelector('.moves-panel'),b=p.querySelector('#movesBody'),c=b.querySelector('.ml-move');return {font:parseFloat(getComputedStyle(c).fontSize),row:c.getBoundingClientRect().height,height:b.clientHeight,horizontal:b.scrollWidth-b.clientWidth,page:document.documentElement.scrollWidth-innerWidth,footer:!!p.querySelector('.moves-head,.moves-foot')}})()");
+    assert.ok(zoomed.font > normal.font && zoomed.row > normal.row, JSON.stringify({width, height, normal, zoomed}));
+    assert.equal(zoomed.height, full.height); assert.equal(zoomed.footer, false);
+    assert.ok(zoomed.horizontal <= 1 && zoomed.page <= 1, JSON.stringify({width, height, zoomed}));
+    assert.equal(await boxes(), geometry); assert.equal(await numericState(), before);
+    await shot(`moves-design-zoomed-${width}`, '.moves-panel');
+    evidence.push({width, height, oldHeight, fullHeight: full.height, normal, zoomed});
   }
   await resize(1920, 1080); await open();
   await shot('visual-tabs-settings', '#settings');
   await choose('accuracyDesign', 'original', '.accuracy-panel');
-  await choose('movesDesign', 'original', '.moves-panel');
+  await choose('movesDesign', 'zoomed', '.moves-panel');
   await call('Page.reload', {}, review.sessionId);
-  await waitFor(review, "document.querySelector('.accuracy-original')&&document.querySelector('.moves-head')&&import('./analysis.js').then(m=>!m.S.analyzing)", 'Saved original designs');
+  await waitFor(review, "document.querySelector('.accuracy-original')&&document.querySelector('.moves-panel[data-design=zoomed]')&&import('./analysis.js').then(m=>!m.S.analyzing)", 'Saved panel designs');
   await choose('accuracyDesign', 'dials', '.accuracy-panel');
-  await choose('movesDesign', 'full', '.moves-panel'); await close();
+  await close();
   await run('document.activeElement?.blur()');
   await call('Input.dispatchKeyEvent', {type: 'keyDown', key: 'End', code: 'End'}, review.sessionId);
   const bottom = await run("import('./analysis.js').then(m=>{const b=document.querySelector('#movesBody').getBoundingClientRect(),r=document.querySelector('.ml-move[data-ply=\"'+m.S.total+'\"]').getBoundingClientRect();return {idx:m.S.idx,total:m.S.total,visible:r.bottom<=b.bottom+1&&r.top>=b.top-1}})");
   assert.equal(bottom.idx, bottom.total); assert.equal(bottom.visible, true);
   await fs.writeFile(path.join(out, 'tab-designs.json'), JSON.stringify({passed: true, evidence}, null, 2));
-  console.log('Saved panel variants, fixed geometry, unchanged scoring and full-height moves passed at five viewport sizes. Screenshots: ' + out);
+  console.log('Saved panel variants, fixed geometry, unchanged scoring and zoomed move navigation passed at five viewport sizes. Screenshots: ' + out);
 }
