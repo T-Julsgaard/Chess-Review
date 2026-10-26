@@ -5,6 +5,7 @@ The choices are local visual preferences and survive reopening the extension.
 
 | Panel | Designs | Default |
 | --- | --- | --- |
+| Engine | Original, Focus | Original |
 | Evaluation bar | Original, Balance | Balance |
 | Accuracy | Original, Page tabs, Dials, Reveal | Reveal |
 | Move list | Original, Full height | Full height |
@@ -29,6 +30,15 @@ Original Move list restores its title header and empty footer strip. Full height
 omits both nodes so the scrollable moves body reaches the panel bottom. It keeps
 the same move cells mounted when switching; the separate rows/cards/compact and
 badge preferences apply to either design.
+
+Focus Engine highlights the recommended move, separates its continuation, and
+keeps a White-relative score beside each candidate. Click a candidate to explore
+its variation. The inline **Lines** buttons show one to four candidates using the
+existing on-demand search; **Auto-play** lets the engine play its best moves and
+can be stopped at any time. The footer explains score signs and shows the engine
+and configured search depth. Candidate lines scroll independently of the fixed
+header and playback footer on desktop. Practice hides all answers and disables
+the controls. Original remains the default and is always available.
 
 Changing designs does not change the game, selected move, annotations, numerical
 accuracy, Elo estimate, engine settings, analysis cache key or panel arrangement.

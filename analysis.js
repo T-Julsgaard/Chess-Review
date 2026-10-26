@@ -4716,8 +4716,41 @@ function renderMoves() {
 }
 
 /* ---------------- Engine lines ---------------- */
+// Focus keeps the controls in place while only the candidate list scrolls.
+function focusedEnginePanel(content, {locked = false, playable = false} = {}) {
+  const side = !S.blank && activePos().fen.split(' ')[1] === 'b' ? 'Black' : 'White';
+  const lines = el('div', {class: 'engine-focus-lines', role: 'group', 'aria-label': 'Number of engine lines'},
+    el('span', {}, 'Lines'), ...[1, 2, 3, 4].map(count => el('button', {
+      type: 'button', 'aria-label': `Show ${count} engine ${count === 1 ? 'line' : 'lines'}`,
+      'aria-pressed': String(S.settings.engineLines === count), disabled: locked,
+      onclick: async () => {
+        await setEngineSetting('engineLines', count);
+        UI.engine.querySelector(`[aria-label="Show ${count} engine ${count === 1 ? 'line' : 'lines'}"]`)?.focus();
+      },
+    }, String(count))));
+  const panel = el('div', {class: 'panel engine-focus', 'data-design': 'focus', 'aria-label': 'Engine'},
+    el('div', {class: 'engine-focus-head'},
+      el('div', {class: 'engine-focus-title'}, el('h3', {}, 'Engine'),
+        el('span', {class: 'engine-focus-turn'}, S.blank ? 'Position analysis' : locked ? 'Practice' : `${side} to move`)), lines),
+    el('div', {class: 'panel-body engine-body'}, content),
+    el('div', {class: 'engine-focus-foot'},
+      el('span', {class: 'engine-focus-source', title: `${activeEngineName()} · search depth ${S.settings.engineDepth}. Scores favor White (+) or Black (−).`},
+        el('span', {}, 'White + / Black −'), el('span', {}, `${activeEngineName().replace('Stockfish ', 'SF ')} · depth ${S.settings.engineDepth}`)),
+      el('button', {type: 'button', class: 'engine-focus-play' + (S.bestWalking ? ' on' : ''),
+        disabled: locked || !playable && !S.bestWalking,
+        title: 'Let the engine play its best moves from this position. You can stop at any time.',
+        'aria-label': S.bestWalking ? 'Stop playing best moves' : 'Play best moves from this position',
+        onclick: () => { if (S.bestWalking) { stopBestWalk(); renderControls(); renderEngineCurrent(); } else playBestMoves(); },
+      }, S.bestWalking ? '■ Stop' : '▶ Auto-play')));
+  UI.engine.replaceChildren(panel);
+  fitEnginePanel();
+}
 // While solving a practice position, the engine lines would give the answer away → hide them.
 function renderEnginePractice() {
+  if (panelDesign('engine', S.settings) === 'focus') {
+    focusedEnginePanel(el('div', {class: 'engine-empty', role: 'status'}, 'Find the best move — engine lines are hidden until you solve it.'), {locked: true});
+    return;
+  }
   UI.engine.replaceChildren(el("div", { class: "panel" },
     el("div", { class: "panel-head" }, el("h3", {}, "Engine"), el("span", { class: "count" }, "Practice")),
     el("div", { class: "panel-body engine-body" },
@@ -4728,6 +4761,10 @@ function renderEnginePractice() {
 // Choose the source of the engine lines for the shown position and draw the panel.
 function renderEngineCurrent() {
   if(S.blank){
+    if (panelDesign('engine', S.settings) === 'focus') {
+      focusedEnginePanel(el('div', {class: 'engine-empty'}, 'Load a game to explore the best moves.'));
+      return;
+    }
     UI.engine.replaceChildren(el("div",{class:"panel"},
       el("div",{class:"panel-head"},el("h3",{},"Engine")),
       el("div",{class:"panel-body engine-body"},el("div",{class:"engine-empty"},"No game loaded."))));
@@ -4828,6 +4865,7 @@ function fitEnginePanel() {
   applyPanelBox(mod,S.layout.engine);growCanvas();
 }
 function renderEngine(lines, padFromCache = false) {
+  const design = panelDesign('engine', S.settings), focus = design === 'focus';
   const curFen = activePos().fen;
   const historyKey = JSON.stringify(activeSearchHistory());
   const configKey = JSON.stringify([S.settings.enginePath, S.activeEngineBuild, S.engineFallbackBuild,
@@ -4837,7 +4875,7 @@ function renderEngine(lines, padFromCache = false) {
   // SAN stays correct) to fill slots that the new position hasn't searched yet — and to hold the
   // panel steady while the engine re-computes (lines === null, e.g. "Play best moves from here").
   const cached = S._lastEngineLines?.fen === curFen && S._lastEngineLines?.historyKey === historyKey && S._lastEngineLines?.configKey === configKey ? S._lastEngineLines : null;
-  const renderKey = JSON.stringify([curFen,historyKey,configKey,want,S.analysisMode,S.liveError,S.bestWalking,
+  const renderKey = JSON.stringify([design,curFen,historyKey,configKey,want,S.analysisMode,S.liveError,S.bestWalking,
     padFromCache,lines,(!lines || padFromCache) && cached?.lines]);
   if (UI.engineRenderKey === renderKey && UI.engineRenderNode === UI.engine.firstChild) return;
   let body;
@@ -4864,14 +4902,32 @@ function renderEngine(lines, padFromCache = false) {
     // don't wipe the previous second line we still want to show.
     if (cur.length >= want) S._lastEngineLines = { lines: cur, fen: curFen, historyKey, configKey };
     body = el("div", {},
-      ...slots.map((slot) => {
+      ...slots.map((slot, index) => {
         // Empty slot (a forced move with no second line, etc.) → a blank row of the same height so
         // the panel keeps the size of `want` lines and never resizes between moves.
-        if (!slot) return el("div", { class: "engine-line" }, el("span", { class: "ev" }, " "), el("span", { class: "moves" }, " "));
+        if (!slot) return focus ? el('div', {class: 'engine-focus-pending', role: 'status'},
+          el('span', {}, String(index + 1).padStart(2, '0')), el('span', {}, padFromCache ? 'Finding another move…' : 'No other candidate'))
+          : el("div", { class: "engine-line" }, el("span", { class: "ev" }, " "), el("span", { class: "moves" }, " "));
         const { l, fen } = slot;
         const wr = whiteRel(l.score, fen); const cp = scoreToCp(wr);
         const evTxt = wr.mate != null ? evalText(wr) : (cp >= 0 ? "+" : "") + (cp / 100).toFixed(2);
         const toks = uciLineToSan(fen, (l.pv || "").split(/\s+/).filter(Boolean), 6);
+        if (focus) {
+          const move = toks[0]?.replace(/^\d+\.\s*/, '') || '—';
+          const continuation = toks.slice(1).join(' ');
+          const evaluation = wr.mate != null ? `${cp >= 0 ? 'White' : 'Black'} can force mate in ${Math.abs(wr.mate)}`
+            : cp === 0 ? 'Equal position' : `${cp > 0 ? 'White' : 'Black'} has an advantage of ${Math.abs(cp / 100).toFixed(2)} pawns`;
+          return el('button', {type: 'button', class: 'engine-focus-candidate' + (index === 0 ? ' recommended' : ''),
+            title: 'Explore this variation on the board',
+            'aria-label': `${index === 0 ? 'Best move' : 'Alternative ' + (index + 1)}: ${toks.join(' ')}. ${evaluation}. Explore variation.`,
+            onclick: () => playLine(l.pv)},
+            el('span', {class: 'engine-focus-rank', 'aria-hidden': 'true'}, String(index + 1).padStart(2, '0')),
+            el('span', {class: 'engine-focus-variation'},
+              el('span', {class: 'engine-focus-move'}, el('strong', {}, move), index === 0 ? el('span', {class: 'engine-focus-best'}, 'Best move') : null),
+              el('span', {class: 'engine-focus-continuation'}, continuation || 'Explore move')),
+            el('span', {class: 'engine-focus-eval ' + (cp >= 0 ? 'pos' : 'neg'), title: evaluation}, evTxt),
+            el('span', {class: 'engine-focus-arrow', 'aria-hidden': 'true'}, '›'));
+        }
         // Click a line → play the whole line out as a variation (analysis mode).
         return el("button", { type:"button", class: "engine-line clickable", tabindex:"-1", "aria-label":"Play variation " + toks.join(" ") + ", evaluation " + evTxt, onclick: () => playLine(l.pv) },
           el("span", { class: "ev " + (cp >= 0 ? "pos" : "neg") }, evTxt),
@@ -4879,6 +4935,13 @@ function renderEngine(lines, padFromCache = false) {
         );
       }),
     );
+  }
+  if (focus) {
+    focusedEnginePanel(el('div', {class: 'engine-candidates'}, body), {
+      playable: !S.liveError && lines?.length !== 0 && !!(lines?.some(line => line.pv?.trim()) || cached?.lines.some(line => line.pv?.trim())),
+    });
+    UI.engineRenderKey = renderKey; UI.engineRenderNode = UI.engine.firstChild;
+    return;
   }
   // "Play best moves from here": re-analyzes each position and plays the engine's actual best
   // move until mate/draw (or until the user takes over). Not a fixed line — so the moves are
@@ -5303,7 +5366,7 @@ async function resetVisualSettings() {
   if (S.practice) S.practice.coachTyped = false;
   await resetLayout();
   applySettings(); buildBoard(); renderEvalBar(); renderGraph(); renderMoves();
-  renderCoachAvatar(); renderReview(); renderStats(); renderControls();
+  renderCoachAvatar(); renderReview(); renderStats(); renderControls(); renderEngineCurrent();
   renderSettings();
 }
 // Controls for the "Background" section: preset/custom picker, fit mode, tile size, upload button.
@@ -5801,6 +5864,7 @@ async function setSetting(key, value) {
   applySettings();
   if (key === 'accuracyDesign') { statsRefs = null; hideQTip(); renderStats(); }
   if (key === 'movesDesign') updateMovesDesign();
+  if (key === 'engineDesign') renderEngineCurrent();
   if (key === 'moveAnim' && S.settings.moveAnim === false) overviewReveal.stop();
   if (key === "pieceStyle") buildBoard();
   if (key === "mlStyle" || key === "badgeStyle") renderMoves();
@@ -6671,7 +6735,7 @@ function toggleAuto() {
 }
 document.addEventListener("keydown", (e) => {
   if (learningWorkspace || S.blank) return;
-  if (e.key === "Tab" && !e.target?.closest?.('#settings,.accuracy-panel,[role="dialog"],[role="alertdialog"]')) {
+  if (e.key === "Tab" && !e.target?.closest?.('#settings,.accuracy-panel,.engine-focus,[role="dialog"],[role="alertdialog"]')) {
     e.preventDefault(); return;
   }
   if (UI.settings?.contains(e.target) || UI.libRail?.contains(e.target)) return;
