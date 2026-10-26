@@ -1,0 +1,53 @@
+/* Original designs are scoped so future iterations can share live review data. */
+.stage .accuracy-panel.accuracy-original .acc-head { padding: 10.2px 12px; }
+.stage .accuracy-panel.accuracy-original .acc-head h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .1em; }
+.accuracy-original .acc-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 14px; }
+.accuracy-original .acc-cell { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.accuracy-original .acc-cell.right { align-items: flex-end; }
+.accuracy-original .acc-cell .ld.acc-val { align-self: center; }
+.accuracy-original .acc-name { font-size: 12px; }
+.stage .accuracy-panel.accuracy-original .acc-val { position: static; transform: none; color: inherit; font-size: 30px; letter-spacing: 0; }
+.accuracy-original .acc-bar { display: block; height: 5px; border-radius: 4px; background: var(--panel-3); overflow: hidden; width: 100%; }
+.accuracy-original .acc-bar i { display: block; height: 100%; border-radius: 4px; }
+.accuracy-original .acc-vs { font-size: 11px; color: var(--ink-3); font-weight: 700; letter-spacing: .1em; }
+.stage .accuracy-panel.accuracy-original .qbreak { margin-top: 14px; gap: 7px; }
+.stage .accuracy-panel.accuracy-original .qbreak-row { grid-template-columns: 30px minmax(0,1fr) 30px; gap: 10px; min-height: 22px; font-size: 12.5px; }
+.stage .accuracy-panel.accuracy-original .qbreak-row .qlabel { width: 132px; transform: translateX(16px); padding: 0; font-size: 12.5px; }
+.stage .accuracy-panel.accuracy-original .qbreak-row .qsym { width: 22px; height: 22px; flex-basis: 22px; }
+.stage .accuracy-panel.accuracy-original .qbreak-row .ct { font-size: 12.5px; min-height: 0; padding: 0; }
+.accuracy-original .qbreak-row .ct.left { text-align: right; }
+.accuracy-original .qbreak-toggle { margin-top: 4px; width: 100%; display: grid; place-items: center;
+  background: none; border: 0; cursor: pointer; color: var(--ink-3); padding: 5px 0; border-radius: 8px; }
+.accuracy-original .qbreak-toggle:hover { color: var(--ink); background: var(--panel-2); }
+.accuracy-original .qbreak-toggle svg { width: 18px; height: 18px; }
+.accuracy-original .qbreak-toggle.open svg { transform: rotate(180deg); }
+.stage .accuracy-panel.accuracy-original .qbreak-row .category-name-editor { transform: none; width: 100%; }
+.accuracy-original .category-name-input, .accuracy-original .category-name-reset { height: 22px; }
+
+/* The first paged iteration: comparison rows and three named page buttons. */
+.stage .accuracy-panel.accuracy-pages .acc-head { padding: 12px 14px 8px; }
+.stage .accuracy-panel.accuracy-pages .acc-head h3 { font-size: 16px; letter-spacing: 0; text-transform: none; }
+.accuracy-pages .acc-page-count { margin-left: auto; color: var(--ink-3); font: 12px var(--font-mono); }
+.accuracy-pages .acc-tabs { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 3px; padding: 4px; margin: 0 12px 2px;
+  flex: none; border: 1px solid var(--line-soft); border-radius: 10px; background: var(--panel-2); }
+.accuracy-pages .acc-tabs button { border: 0; border-radius: 7px; background: transparent; padding: 9px 2px; min-width: 0;
+  color: var(--ink-2); font: 600 13px var(--font-ui); white-space: nowrap; cursor: pointer; }
+.accuracy-pages .acc-tabs button:hover { background: var(--panel-3); }
+.accuracy-pages .acc-tabs [aria-selected="true"] { color: var(--accent-ink); background: var(--accent); }
+.stage .accuracy-panel.accuracy-pages .acc-val { position: static; transform: none; font-size: 40px; color: inherit; }
+.accuracy-pages .acc-unit { font-size: 17px; }
+.accuracy-pages .acc-elo { color: inherit; }
+.accuracy-pages .acc-phases { display: block; min-height: 0; margin-top: 13px; padding: 0; border: 0; }
+.accuracy-pages .acc-phases h4 { font-size: 15px; font-weight: 650; margin: 0 0 8px; text-align: center; }
+.accuracy-pages .acc-phase-row { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center;
+  gap: 6px; min-height: 38px; border-bottom: 1px solid var(--line-soft); text-align: center; }
+.accuracy-pages .acc-phase-row span { font-size: 14px; color: var(--ink-2); }
+.accuracy-pages .acc-phase-row strong { font: 700 17px var(--font-mono); letter-spacing: -.5px; }
+.accuracy-pages .acc-phase-row strong:first-child { color: var(--accent); }
+.accuracy-pages .acc-phase-row strong:last-child { color: var(--ink); }
+
+/* Full height has no header/footer nodes, leaving all panel space for moves. */
+.moves-panel[data-design="full"] { overflow: hidden; }
+.mod .moves-panel[data-design="full"] > #movesBody { flex: 1 1 auto; min-height: 0; border-radius: inherit; }
+.moves-panel[data-design="original"] > .moves-head,
+.moves-panel[data-design="original"] > .moves-foot { flex: none; }

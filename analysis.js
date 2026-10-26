@@ -16,6 +16,7 @@ import { resetSettingsForRelease } from "./release-settings.js";
 import { expectedPoints, SF19_OUTCOME } from "./lib/public-scoring.js";
 import { calibratedReview, scoringEvidenceComplete } from "./lib/calibrated-review.js";
 import { gameStatistics, GAME_PHASES } from "./lib/game-statistics.js";
+import { PANEL_DESIGNS, panelDesign, normalizePanelDesigns } from "./lib/panel-designs.js";
 import { analyseCalibratedPosition } from "./lib/calibrated-search.js";
 import { loadLearningWorkspace, presentationFor } from "./lib/learning-loader.js";
 import { mountLearningAnnouncement } from "./lib/learning-announcement.js";
@@ -144,6 +145,7 @@ function badgeLabelStyle(value = S.settings.badgeTooltip) {
 }
 // The move-quality page keeps the complete category list, with Book last.
 const QBREAK_FULL = ["brilliant","great","best","excellent","good","inacc","mistake","miss","blunder","book"];
+const QBREAK_SUMMARY = ["brilliant","great","best","inacc","mistake","miss","blunder"];
 const ACCURACY_PAGES = ['Overview', 'Move quality', 'Advanced'];
 const NOTEWORTHY = new Set(["brilliant","great","inacc","mistake","miss","blunder"]);
 // Explanation for each category (shown as a tooltip in the accuracy panel). The classifier
@@ -295,6 +297,7 @@ function engineWorkerCount(requested = null, positions = Infinity,
 }
 
 const DEFAULT_SETTINGS = {
+  ...Object.fromEntries(PANEL_DESIGNS.map(design => [design.setting, design.default])),
   categoryNames: {},
   theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
@@ -746,7 +749,7 @@ const S = {
   // `progress` is the contiguous prefix that is safe to navigate to while a batch is
   // still running. `completed` is the total number of game plies already returned by
   // any worker. They differ when parallel workers finish out of order.
-  analyzing: true, progress: 0, completed: 0, analysisError: null, userArrows: [], userMarks: [], qbreakExpanded: false, accuracyPage: 0,
+  analyzing: true, progress: 0, completed: 0, analysisError: null, userArrows: [], userMarks: [], qbreakExpanded: false, accuracyPage: 0, originalAccuracyExpanded: false,
   // Collapsible settings sections: open/closed state, keyed by section title.
   setOpen: {},
   settings: { ...DEFAULT_SETTINGS },
@@ -1555,9 +1558,8 @@ function buildUI() {
 
   // The move list starts directly with moves; keep its name accessible.
   const movesBody = el("div", { class: "panel-body", id: "movesBody" });
-  const movesFoot = el("div", { class: "moves-foot", id: "movesFoot", hidden: true });
   const movesPanel = el("div", { class: "panel moves-panel", "aria-label": "Moves" },
-    movesBody, movesFoot,
+    movesBody,
   );
 
   const coachMount = el("div", { id: "coachMount", class: "coach-mount" });
@@ -1620,7 +1622,7 @@ function buildUI() {
   UI = {
     meta: document.getElementById("meta"), settings, canvas, boardWrap,
     playerTop, playerBot, controls, coach: coachMount, evalbar: evalbarMount,
-    review: reviewMount, movesBody, movesFoot,
+    review: reviewMount, movesBody,
     graph: graphMount, stats: statsMount, engine: engineMount,
     libRail, libControls, libList, libCount, libPanel:libRail.querySelector(".lib-panel"), saveStatus,
   };
@@ -4106,9 +4108,14 @@ function setCategoryName(cls, value) {
   renderMoves(); buildBoard(); renderReview();
 }
 function categoryLabel(cls) {
+  const explain = panelDesign('accuracy', S.settings) === 'original';
   const label = el("button", {
     type: "button", class: "qlabel", "data-category": cls,
     "aria-label": "Rename " + categoryName(cls),
+    onmouseenter: explain ? e => showQTip(e.currentTarget, cls) : undefined,
+    onmouseleave: explain ? hideQTip : undefined,
+    onfocus: explain ? e => showQTip(e.currentTarget, cls) : undefined,
+    onblur: explain ? hideQTip : undefined,
     onclick: () => {
       hideQTip();
       let finished = false;
@@ -4168,10 +4175,13 @@ function accuracyDial(value, busy) {
     el('span', {class: 'acc-dial-label'}, 'Accuracy'));
 }
 function renderStats() {
+  const design = panelDesign('accuracy', S.settings);
+  if (design === 'original') return renderOriginalStats();
+  if (design === 'pages') return renderPagedStats();
   const sides = [S.meSide, S.meSide === "w" ? "b" : "w"];
   const page = S.accuracyPage || 0, busy = S.analyzing && !S.blank;
   // Keep the analysis animation and keyboard focus intact while results arrive.
-  if (busy && statsRefs?.page === page) {
+  if (busy && statsRefs?.design === design && statsRefs.page === page) {
     for (const [k, row] of Object.entries(statsRefs.rows)) sides.forEach((side, i) => {
       const count = S.counts[side][k] || 0;
       row[i].textContent = count;
@@ -4252,10 +4262,168 @@ function renderStats() {
     el('div', {class: 'acc-pager-center'}, el('span', {class: 'acc-page-name', 'aria-hidden': 'true'}, ACCURACY_PAGES[page]), tabs),
     el('button', {type: 'button', class: 'acc-page-next', 'aria-label': 'Next accuracy page: ' + ACCURACY_PAGES[(page + 1) % 3],
       onclick: () => setAccuracyPage(page + 1, '.acc-page-next')}, icon('chevron')));
-  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel', 'aria-label': 'Accuracy'},
+  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials', 'data-design': design, 'aria-label': 'Accuracy'},
     el('div', {class: 'panel-body acc-page' + (page === 0 ? ' acc-page-overview' : ''), id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
       'aria-labelledby': 'accuracy-tab-' + page}, players, content), pager));
-  statsRefs = busy ? {page, rows} : null;
+  statsRefs = busy ? {design, page, rows} : null;
+  if (UI.canvas.classList.contains('full-hd-reference')) applyLayout();
+}
+
+function renderOriginalStats() {
+  const opSide = S.meSide === "w" ? "b" : "w";
+  const meAcc = S.acc[S.meSide], opAcc = S.acc[opSide];
+  const meRating = S.players[S.meSide]?.rating, opRating = S.players[opSide]?.rating;
+  const meEloAcc = S.accElo[S.meSide], opEloAcc = S.accElo[opSide];
+  // Compact list by default; the expander arrow unfolds the whole list (incl. book moves).
+  const list = S.originalAccuracyExpanded ? QBREAK_FULL : QBREAK_SUMMARY;
+
+  // In-place counter update during analysis (so the loader animation doesn't restart).
+  if (S.analyzing && statsRefs?.design === 'original' && statsRefs.expanded === S.originalAccuracyExpanded) {
+    for (const k of list) {
+      const r = statsRefs.rows[k]; if (!r) continue;
+      const cMe = S.counts[S.meSide][k] || 0, cOp = S.counts[opSide][k] || 0;
+      r.me.textContent = cMe; r.me.classList.toggle("zero", !cMe);
+      r.op.textContent = cOp; r.op.classList.toggle("zero", !cOp);
+    }
+    return;
+  }
+
+  const rows = {};
+  const qrows = list.map((k) => {
+    const cMe = S.counts[S.meSide][k] || 0, cOp = S.counts[opSide][k] || 0;
+    const meCt = el("span", { class: "ct left " + (cMe ? "" : "zero"), onclick: () => jumpToCategory(S.meSide, k) }, cMe);
+    const opCt = el("span", { class: "ct " + (cOp ? "" : "zero"), onclick: () => jumpToCategory(opSide, k) }, cOp);
+    rows[k] = { me: meCt, op: opCt };
+    return el("div", { class: "qbreak-row" },
+      meCt,
+      // The category explainer tooltip lives on the label only — hovering the counts (which are
+      // clickable jump targets) must not trigger it.
+      categoryLabel(k),
+      opCt,
+    );
+  });
+  const expander = el("button", {
+    class: "qbreak-toggle" + (S.originalAccuracyExpanded ? " open" : ""),
+    title: S.originalAccuracyExpanded ? "Show fewer categories" : "Show all categories",
+    "aria-expanded": S.originalAccuracyExpanded ? "true" : "false",
+    onclick: () => { S.originalAccuracyExpanded = !S.originalAccuracyExpanded; renderStats(); },
+  }, icon("chevron"));
+  const qbreak = el("div", { class: "qbreak" }, ...qrows, expander);
+
+  UI.stats.replaceChildren(el("div", { class: "panel accuracy-panel accuracy-original", "data-design": "original", "aria-label": "Accuracy" },
+    // The button is always rendered (disabled while analyzing or already practicing) so the
+    // header height never changes between states.
+    el("div", { class: "panel-head acc-head" }, el("h3", {}, "Accuracy"),
+      el("button", { class: "practice-btn", disabled: S.blank || S.analyzing || !!S.practice, title: "Replay the game and re-solve every mistake you made", onclick: startPractice }, "Practice your mistakes")),
+    el("div", { class: "panel-body" },
+      el("div", { class: "acc-row" },
+        el("div", { class: "acc-cell" },
+          el("span", { class: "acc-name" }, S.players[S.meSide].name),
+          S.analyzing
+            ? loaderNode("acc-val", "var(--accent)")
+            : el("span", { class: "acc-val", style: { color: "var(--accent)" }, onmouseenter: (e) => showInfoTip(e.currentTarget, "Accuracy", ACCURACY_INFO), onmouseleave: hideQTip }, meAcc == null ? "—" : meAcc.toFixed(1)),
+          el("span", { class: "acc-bar" }, el("i", { style: { width: (S.analyzing ? 0 : (meAcc || 0)) + "%", background: "var(--accent)" } })),
+          el("span", { class: "est-rating", onmouseenter: (e) => showInfoTip(e.currentTarget, "Estimated Elo", ELO_INFO), onmouseleave: hideQTip }, S.analyzing ? "≈ ··· elo" : "≈ " + (estimateElo(meEloAcc, meRating, S.meSide) ?? "—") + " elo")),
+        el("span", { class: "acc-vs" }, "VS"),
+        el("div", { class: "acc-cell right" },
+          el("span", { class: "acc-name" }, S.players[opSide].name),
+          S.analyzing
+            ? loaderNode("acc-val", "var(--accent)")
+            : el("span", { class: "acc-val", style: { color: "var(--ink-2)" }, onmouseenter: (e) => showInfoTip(e.currentTarget, "Accuracy", ACCURACY_INFO), onmouseleave: hideQTip }, opAcc == null ? "—" : opAcc.toFixed(1)),
+          el("span", { class: "acc-bar" }, el("i", { style: { width: (S.analyzing ? 0 : (opAcc || 0)) + "%", background: "var(--ink-3)", marginLeft: (100 - (S.analyzing ? 100 : (opAcc || 0))) + "%" } })),
+          el("span", { class: "est-rating", onmouseenter: (e) => showInfoTip(e.currentTarget, "Estimated Elo", ELO_INFO), onmouseleave: hideQTip }, S.analyzing ? "≈ ··· elo" : "≈ " + (estimateElo(opEloAcc, opRating, opSide) ?? "—") + " elo")),
+      ),
+      qbreak,
+    ),
+  ));
+  statsRefs = S.analyzing ? { design: 'original', expanded: S.originalAccuracyExpanded, rows } : null;
+  if(UI.canvas.classList.contains("full-hd-reference"))applyLayout();
+}
+
+function renderPagedStats() {
+  const sides = [S.meSide, S.meSide === "w" ? "b" : "w"];
+  const page = S.accuracyPage || 0, busy = S.analyzing && !S.blank;
+  // Keep the analysis animation and keyboard focus intact while results arrive.
+  if (busy && statsRefs?.design === 'pages' && statsRefs.page === page) {
+    for (const [k, row] of Object.entries(statsRefs.rows)) sides.forEach((side, i) => {
+      const count = S.counts[side][k] || 0;
+      row[i].textContent = count;
+      row[i].disabled = !count;
+      row[i].classList.toggle('zero', !count);
+      row[i].setAttribute('aria-label', S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Jump to first move.');
+    });
+    return;
+  }
+  const pair = (className, values) => el('div', {class: className}, ...values);
+  const number = value => value == null ? '—' : value.toFixed(1) + '%';
+  const pending = value => busy ? '···' : value;
+  const comparison = (label, values, note = null, className = '') => el('div', {class: 'acc-comparison ' + className},
+    el('div', {class: 'acc-metric-label'}, label), pair('acc-metric-values', values),
+    note ? el('p', {class: 'acc-note'}, note) : null);
+  const players = pair('acc-players', sides.map(side => el('div', {class: 'acc-player'},
+    el('span', {class: 'acc-side ' + side, 'aria-label': side === 'w' ? 'White' : 'Black'}),
+    el('span', {class: 'acc-name'}, S.players[side].name))));
+  const rows = {};
+  let content;
+  if (page === 0) {
+    content = el('div', {class: 'acc-overview'},
+      comparison('Game accuracy', sides.map(side => busy ? loaderNode('acc-val', 'var(--accent)')
+        : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side].toFixed(1),
+          S.acc[side] == null ? null : el('span', {class: 'acc-unit'}, '%'))), null, 'acc-overall'),
+      comparison('Estimated Elo', sides.map(side => el('strong', {class: 'acc-elo'}, pending(
+        estimateElo(S.accElo[side], S.players[side]?.rating, side) == null ? '—'
+          : '≈ ' + estimateElo(S.accElo[side], S.players[side]?.rating, side))))),
+      el('div', {class: 'acc-phases'}, el('h4', {}, 'Accuracy by phase'),
+        ...GAME_PHASES.map((phase, i) => el('div', {class: 'acc-phase-row'},
+          el('strong', {}, pending(number(S.gameStats?.[sides[0]]?.phases[phase].accuracy))),
+          el('span', {}, ['Opening', 'Middlegame', 'Endgame'][i]),
+          el('strong', {}, pending(number(S.gameStats?.[sides[1]]?.phases[phase].accuracy))))),
+        el('p', {class: 'acc-note'}, S.blank ? 'Load a game to see its accuracy.'
+          : busy ? 'Scores appear when analysis finishes.' : '— Phase not reached or no scored decisions.')));
+  } else if (page === 1) {
+    content = el('div', {class: 'acc-quality'},
+      el('div', {class: 'qbreak'}, ...QBREAK_FULL.map(k => {
+        const counts = sides.map((side, i) => {
+          const count = S.counts[side][k] || 0;
+          return el('button', {type: 'button', class: 'ct ' + (i === 0 ? 'left ' : '') + (count ? '' : 'zero'),
+            disabled: !count, 'aria-label': S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Jump to first move.',
+            onclick: () => jumpToCategory(side, k)}, count);
+        });
+        rows[k] = counts;
+        return el('div', {class: 'qbreak-row'}, counts[0], categoryLabel(k), counts[1]);
+      })), el('p', {class: 'acc-note'}, 'Select a count to revisit the first move.'));
+  } else {
+    const stats = sides.map(side => S.gameStats?.[side]);
+    content = el('div', {class: 'acc-advanced'},
+      comparison('Average centipawn loss', stats.map(stat => el('strong', {class: 'acc-stat-value',
+        'aria-label': busy ? 'Analyzing' : (stat?.averageCpLoss == null ? 'Unavailable' : stat.averageCpLoss.toFixed(1) + ' centipawns, from ' + stat.cpMoves + ' moves')},
+        pending(stat?.averageCpLoss == null ? '—' : stat.averageCpLoss.toFixed(1)))), 'Lower is better · 100 cp = 1 pawn'),
+      comparison('Engine top-move match', stats.map(stat => el('strong', {class: 'acc-stat-value'}, pending(number(stat?.topMatch))))),
+      comparison('Largest evaluation loss', stats.map((stat, i) => {
+        const loss = busy ? null : stat?.largestLoss, position = loss && S.positions[loss.ply];
+        return el('button', {type: 'button', class: 'acc-loss', disabled: !loss || loss.loss === 0,
+          'aria-label': S.players[sides[i]].name + ': ' + (loss ? loss.loss + ' centipawns lost on ' + position.san + '. Jump to move.' : 'No scored loss'),
+          onclick: () => gotoMainline(loss.ply)},
+          el('strong', {class: 'acc-stat-value'}, pending(loss ? Math.round(loss.loss) + ' cp' : '—')),
+          loss && loss.loss > 0 ? el('span', {}, Math.ceil(loss.ply / 2) + (position.color === 'w' ? '. ' : '… ') + position.san + ' ↗') : null);
+      })),
+      el('p', {class: 'acc-note acc-evidence'}, busy ? 'Stats appear when analysis finishes.'
+        : 'Forced moves excluded. Centipawn stats omit mate scores.'));
+  }
+  const tabs = el('div', {class: 'acc-tabs', role: 'tablist', 'aria-label': 'Accuracy pages',
+    onkeydown: e => {
+      const next = {ArrowRight: page + 1, ArrowLeft: page - 1, Home: 0, End: 2}[e.key];
+      if (next == null) return;
+      e.preventDefault(); e.stopPropagation(); setAccuracyPage(next, true);
+    }}, ...ACCURACY_PAGES.map((name, i) => el('button', {type: 'button', role: 'tab', id: 'accuracy-tab-' + i,
+      'aria-selected': String(page === i), 'aria-controls': 'accuracy-page', tabindex: page === i ? 0 : -1,
+      onclick: () => setAccuracyPage(i, true)}, name)));
+  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-pages', 'data-design': 'pages', 'aria-label': 'Accuracy'},
+    el('div', {class: 'panel-head acc-head'}, el('h3', {}, 'Accuracy'), el('span', {class: 'acc-page-count'}, (page + 1) + ' / 3')),
+    tabs,
+    el('div', {class: 'panel-body acc-page', id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
+      'aria-labelledby': 'accuracy-tab-' + page}, players, content)));
+  statsRefs = busy ? {design: 'pages', page, rows} : null;
   if (UI.canvas.classList.contains('full-hd-reference')) applyLayout();
 }
 
@@ -4429,7 +4597,21 @@ function highlightCurrentMove(forceScroll = false) {
 }
 let _movesSig = null;
 let _movesClassSig = null;
+function updateMovesDesign() {
+  const panel = UI.movesBody.closest('.moves-panel'), design = panelDesign('moves', S.settings);
+  if (panel.dataset.design === design) return;
+  const scroll = UI.movesBody.scrollTop;
+  panel.querySelector('.moves-head')?.remove();
+  panel.querySelector('.moves-foot')?.remove();
+  panel.dataset.design = design;
+  if (design === 'original') {
+    panel.prepend(el('div', {class: 'panel-head moves-head'}, el('h3', {}, 'Moves')));
+    panel.append(el('div', {class: 'moves-foot', 'aria-hidden': 'true'}));
+  }
+  UI.movesBody.scrollTop = scroll;
+}
 function renderMoves() {
+  updateMovesDesign();
   const ml = S.settings.mlStyle;
   // Keep move cells mounted while classifications arrive. Replacing the list during analysis
   // drops the hovered element and makes its hover state flicker; only changed badges need updates.
@@ -4471,8 +4653,6 @@ function renderMoves() {
   }
   UI.movesBody.style.padding = ml === "rows" ? "0" : "var(--pad)";
   UI.movesBody.replaceChildren(list);
-  // Book counts live on the move-quality page, separate from the move list.
-  UI.movesFoot.hidden = true;
   // auto-scroll to the current move
   highlightCurrentMove(true);
 }
@@ -5033,6 +5213,7 @@ const ARROW_SETTING_KEYS = ["bestArrow", "showThreat", "bestArrowColor", "arrowO
 const BACKGROUND_SETTING_KEYS = ["bg", "bgFit", "bgTile", "bgCustom", "bgHue", "bgSat", "bgLight"];
 const BADGE_SETTING_KEYS = ["badgeFont", "badgeTooltip"];
 const VISUAL_SETTING_KEYS = [
+  ...PANEL_DESIGNS.map(design => design.setting),
   "theme", "accent", "accentCustom", "density", "evalView", "mlStyle", "badgeStyle", "badgeScale",
   ...BADGE_SETTING_KEYS,
   "graphStyle", "barStyle", "insightFont", "showCoords", "coordSize", ...BACKGROUND_SETTING_KEYS,
@@ -5118,6 +5299,10 @@ function visualSettings() {
   accentEntries.unshift({ value: "custom", title: "Choose custom accent color", onClick: (e) => openAccentColorPicker(e.currentTarget),
     render: (chip) => colorPickerChip(chip, [S.settings.accentCustom]) });
   return el("div", {},
+    section("Tabs",
+      ...PANEL_DESIGNS.map(design => seg(design.label, design.setting, design.versions.map(version => version.id), null,
+        value => design.versions.find(version => version.id === value).label)),
+    ),
     section("Theme",
       colorChips("Accent", "accent", accentEntries),
     ),
@@ -5550,10 +5735,14 @@ function writeSettings(patch, replaceKeys = []) {
   return pending;
 }
 async function setSetting(key, value) {
+  const design = PANEL_DESIGNS.find(item => item.setting === key);
+  if (design) value = panelDesign(design.panel, {[key]: value});
   if (key === "badgeTooltip") value = badgeLabelStyle(value);
   S.settings[key] = value;
   await writeSettings({ [key]: value });
   applySettings();
+  if (key === 'accuracyDesign') { statsRefs = null; hideQTip(); renderStats(); }
+  if (key === 'movesDesign') updateMovesDesign();
   if (key === "pieceStyle") buildBoard();
   if (key === "mlStyle" || key === "badgeStyle") renderMoves();
   if (key === "evalView" || key === "graphStyle" || key === "barStyle") { renderEvalBar(); renderGraph(); }
@@ -6842,6 +7031,7 @@ async function showReadyWorkspace() {
     S.settings.learningTransition = presentationFor(store.settings || {});
     for (const key of ["showConcepts", "conceptsEnabled", "conceptGroups", "disabledConcepts", "conceptsView", "conceptsDefaultedOff"]) delete S.settings[key];
     migrateVisualAssetSettings(S.settings);
+    normalizePanelDesigns(S.settings);
     migrateEngineSettings(S.settings);
     delete S.settings.wrongSound; // older selectable mistake cues were removed
     { const lm = { prikker: "dots", hop: "bounce", "bølge": "wave" }; if (lm[S.settings.loaderStyle]) S.settings.loaderStyle = lm[S.settings.loaderStyle]; } // migrate renamed loader keys

@@ -1,5 +1,10 @@
 # Accuracy panel
 
+**Settings → Visual → Tabs** selects the panel design. Accuracy offers Original,
+Page tabs and Dials; Dials is the default described below. The original summary
+and first paged iteration remain available for comparison. See
+[panel design choices](TAB_DESIGNS.md) for saved settings and future iterations.
+
 The panel has three pages with fixed, shared dimensions. Overview is the initial
 page; selecting a page never resizes a panel or moves playback controls. Desktop
 uses the original **compact** Accuracy height, including the original 87px
