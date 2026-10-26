@@ -27,7 +27,7 @@ test('Tabs exposes Evaluation designs, saves them and preserves all analysis', a
 });
 
 for (const design of ['timeline','bars','minimal']) {
-  test(`${design} retains chart and keyboard focus while updating score, position and mate explanation`, async t => {
+  test(`${design} retains chart and keyboard focus while updating score and accessible position descriptions`, async t => {
     const a = review(t), doc = a.dom.window.document;
     await a.call('setSetting','graphDesign',design);
     const chart = doc.querySelector('#graphMount [role=slider]'), svg = chart.querySelector('svg');
@@ -40,7 +40,8 @@ for (const design of ['timeline','bars','minimal']) {
       assert.equal(a.state.idx,ply);
       if (design !== 'minimal') {
         assert.equal(doc.querySelector('.evaluation-score').textContent,text);
-        assert.equal(doc.querySelector('.evaluation-verdict').textContent,label);
+        assert.equal(doc.querySelector('.evaluation-panel').textContent,text, 'Only the score is visible alongside the chart');
+        assert.equal(doc.querySelector('.evaluation-header,.evaluation-footer,.evaluation-axis, .evaluation-panel button'),null);
       }
       assert.match(chart.getAttribute('aria-valuetext'), new RegExp(ply === 0 ? 'Equal position' : label.startsWith('White') ? 'White' : 'Black'));
       assert.equal(chart.getAttribute('aria-valuenow'),String(ply));
@@ -74,15 +75,14 @@ for (const design of ['timeline','bars','minimal']) {
   });
 }
 
-test('Move bars steps through evaluated positions and keeps scores oriented toward White on board flips', async t => {
+test('Move bars keeps scores oriented toward White on board flips', async t => {
   const a = review(t), doc = a.dom.window.document;
   await a.call('setSetting','graphDesign','bars');
   assert.equal(doc.querySelectorAll('.evaluation-column').length,5);
-  assert.equal(doc.querySelector('[aria-label="Previous evaluated move"]').disabled,true);
-  doc.querySelector('[aria-label="Next evaluated move"]').click(); assert.equal(a.state.idx,1);
+  a.call('go',1);
   a.state.flipped = true; a.call('renderGraph');
   assert.equal(doc.querySelector('.evaluation-score').textContent,'+0.6');
-  doc.querySelector('[aria-label="Previous evaluated move"]').click(); assert.equal(a.state.idx,0);
+  assert.equal(doc.querySelector('.evaluation-panel').textContent,'+0.6');
 });
 
 test('Minimal shows only black and white fields, with hover on the boundary and no labels or colored annotations', async t => {
@@ -131,5 +131,6 @@ test('empty and missing evaluations have honest states; saved designs restore af
   const b = app(t,{url:'https://extension.test/analysis.html?workspace=blank'});
   b.replace('resetSettingsForRelease',async () => {}); b.store.settings={graphDesign:'bars'}; await b.start();
   assert.equal(b.dom.window.document.querySelector('.evaluation-panel').dataset.design,'bars');
-  assert.equal(b.dom.window.document.querySelector('.evaluation-verdict').textContent,'Load a game');
+  assert.match(b.dom.window.document.querySelector('.evaluation-empty').textContent,/Load a game/);
+  assert.equal(b.dom.window.document.querySelector('.evaluation-score').textContent,'—');
 });

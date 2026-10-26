@@ -33,6 +33,10 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       if (design==='minimal') {
         assert.ok(fit.height<=96,JSON.stringify(fit));
         assert.equal(await run("document.querySelector('.evaluation-minimal').textContent"),'');
+      } else {
+        const readout = await run("(()=>{const p=document.querySelector('.evaluation-panel'),s=p.querySelector('.evaluation-score'),r=p.getBoundingClientRect(),q=s.getBoundingClientRect(),scale=r.width/p.offsetWidth;return {text:p.textContent,score:s.textContent,top:(q.top-r.top)/scale,right:(r.right-q.right)/scale}})()");
+        assert.equal(readout.text,readout.score,'Only evaluation data should be visible');
+        assert.ok(readout.top>=0&&readout.top<=8&&readout.right>=0&&readout.right<=8,JSON.stringify({width,height,design,readout}));
       }
       await shot(`evaluation-${design}-${width}`,'#graphMount .panel');
       if (width===1920) await shot('evaluation-'+design+'-desktop');

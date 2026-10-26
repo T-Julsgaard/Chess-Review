@@ -4712,16 +4712,12 @@ function updateGraphReadout(refs) {
   if (refs.readout) {
     refs.readout.textContent = e == null ? '—' : e.mate != null ? 'M' + Math.abs(e.mate) : rounded === '0.0' ? '0.0' : evalText(e);
     refs.readout.dataset.side = cp == null || rounded === '0.0' && e.mate == null ? 'equal' : cp > 0 ? 'white' : 'black';
-    refs.verdict.textContent = label;
-    refs.move.textContent = S.blank ? 'Game overview' : graphPositionText(S.idx);
   }
   const description = e == null ? label : e.mate != null ? `${side} has mate in ${Math.abs(e.mate)}`
     : rounded === '0.0' ? label : `${side} is ahead by ${rounded} pawns`;
   refs.chart.setAttribute('aria-valuenow', Math.min(S.idx, refs.lastPly));
   refs.chart.setAttribute('aria-valuetext', `${graphPositionText(S.idx)}. ${description}. Positive scores favor White; negative scores favor Black.`);
   refs.chart.setAttribute('aria-disabled', String(!!S.practice || refs.lastPly === 0));
-  if (refs.previous) refs.previous.disabled = S.practice || S.idx <= 0;
-  if (refs.next) refs.next.disabled = S.practice || S.idx >= refs.lastPly;
 }
 function renderGraph() {
   const restoreFocus = document.activeElement === UI.graphRefs?.chart;
@@ -4888,21 +4884,12 @@ function renderGraph() {
       if (restoreFocus) chart.focus({preventScroll: true});
       return;
     }
-    const move = el('span', {class: 'evaluation-move'}), verdict = el('span', {class: 'evaluation-verdict'});
     const readout = el('strong', {class: 'evaluation-score', title: 'Positive favors White; negative favors Black. M means mate.'});
-    const step = (label, delta) => el('button', {type: 'button', 'aria-label': label, onclick: () => gotoMainline(Math.max(0,Math.min(lastPly,S.idx + delta)))}, delta < 0 ? '‹' : '›');
-    const previous = design === 'bars' ? step('Previous evaluated move', -1) : null;
-    const next = design === 'bars' ? step('Next evaluated move', 1) : null;
-    const footer = design === 'timeline'
-      ? el('div', {class: 'evaluation-footer'}, el('span', {}, 'Start'), el('span', {class: 'evaluation-hint'}, 'Click to explore'), el('span', {}, 'Move ' + Math.ceil(S.total / 2)))
-      : el('div', {class: 'evaluation-footer'}, el('span', {}, 'One bar per position'), el('div', {class: 'evaluation-steps'}, previous, next));
     UI.graph.replaceChildren(el('div', {class: 'panel eval-side evaluation-panel evaluation-' + design, 'data-design': design, 'aria-label': 'Evaluation'},
-      el('div', {class: 'evaluation-header'}, el('div', {class: 'evaluation-heading'}, el('h3', {}, 'Evaluation'), move),
-        el('div', {class: 'evaluation-current'}, readout, verdict)),
-      el('div', {class: 'evaluation-plot'},
-        el('div', {class: 'evaluation-axis', 'aria-hidden': 'true'}, el('span', {title: 'White advantage'}, 'W +'), el('span', {}, '0'), el('span', {title: 'Black advantage'}, 'B −')), chart,
-        !pts.length ? el('span', {class: 'evaluation-empty'}, S.blank ? 'Load a game to see its evaluation' : 'Waiting for analysis…') : null), footer));
-    UI.graphRefs = {key:graphKey, marker:chart.querySelector('.eval-position'), readout, verdict, move, chart, previous, next, lastPly};
+      readout,
+      el('div', {class: 'evaluation-plot'}, chart,
+        !pts.length ? el('span', {class: 'evaluation-empty'}, S.blank ? 'Load a game to see its evaluation' : 'Waiting for analysis…') : null)));
+    UI.graphRefs = {key:graphKey, marker:chart.querySelector('.eval-position'), readout, chart, lastPly};
     updateGraphReadout(UI.graphRefs);
     if (restoreFocus) chart.focus({preventScroll: true});
     return;
