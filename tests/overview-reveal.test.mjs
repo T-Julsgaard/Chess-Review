@@ -67,6 +67,18 @@ test('stopping or removing the panel restores exact values and cancels pending w
   assert.equal(f.panel.innerHTML, before); assert.equal(f.frames.size, 0);
 });
 
+test('live-review totals animate without restarting completed phase scores and bars', t => {
+  const f = fixture(t);
+  f.reveal.mount(f.panel, {...f, includePhases: false});
+  assert.equal(f.panel.querySelector('.acc-val .acc-reveal-ink').textContent, '0.0%');
+  assert.equal(f.panel.querySelector('.acc-phase-values > strong').textContent, '100.0%');
+  assert.equal(f.panel.querySelector('.acc-phase-bars i').style.width, '94.5%');
+  f.frames.tick(0); f.frames.tick(300);
+  assert.equal(f.panel.querySelector('.acc-phase-values > strong .acc-reveal-slot'), null);
+  assert.equal(f.panel.querySelector('.acc-phase-bars i').style.width, '94.5%');
+  f.reveal.stop();
+});
+
 test('disabled motion and a live reduced-motion change show completed stats immediately', t => {
   const f = fixture(t), before = f.panel.innerHTML;
   f.reveal.mount(f.panel, {...f, enabled: false}); assert.equal(f.panel.innerHTML, before); assert.equal(f.frames.size, 0);
@@ -98,7 +110,7 @@ test('rerenders preserve a running overview and page changes do not replay it or
   for (const selector of ['.acc-dial-label', '.acc-elo-label', '.acc-phase-values > span', '.acc-navigation button']) {
     assert.equal(panel.querySelector(selector + ' .acc-reveal-slot'), null);
   }
-  assert.equal(panel.querySelector('.acc-navigation [aria-selected="true"]').textContent, 'Overview');
+  assert.equal(panel.querySelector('.acc-navigation [aria-selected="true"]').textContent, 'Accuracy');
   a.call('renderStats'); assert.equal(a.dom.window.document.querySelector('.accuracy-reveal'), panel);
   frames.tick(0); frames.tick(1200);
   a.call('setAccuracyPage', 1); a.call('setAccuracyPage', 0);

@@ -26,6 +26,16 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await waitFor(review, "chrome.storage.local.get('settings').then(r=>r.settings.accuracyDesign==='phases-modern')", 'Saved Modern report');
   await shot('phase-modern-settings', true);
   await run("document.querySelector('[aria-label=Settings]').click()");
+  const navigation = await run(`(()=>{
+    const rail=document.querySelector('.acc-navigation'),names=document.querySelector('.acc-players');
+    const surface=rail.querySelector('.acc-nav-current');
+    return {above:rail.getBoundingClientRect().bottom<=names.getBoundingClientRect().top,
+      labels:[...rail.querySelectorAll('button')].map(button=>button.textContent),
+      shadow:getComputedStyle(surface).boxShadow,light:getComputedStyle(surface,'::after').content};
+  })()`);
+  assert.equal(navigation.above,true);
+  assert.deepEqual(navigation.labels,['Accuracy','Quality','Advanced']);
+  assert.equal(navigation.shadow,'none'); assert.equal(navigation.light,'none');
   const before = await snapshot(), evidence = [];
   for (const [width, height] of [[1920,1080],[1920,919],[1366,768],[1280,600],[1100,480],[820,900],[390,844],[320,640]]) {
     await resize(width, height);
@@ -81,6 +91,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await call('Page.reload', {}, review.sessionId);
   await waitFor(review, "document.querySelector('.accuracy-phase-modern')&&import('./analysis.js').then(m=>!m.S.analyzing)", 'Saved report after reload');
   await waitFor(review, "!document.querySelector('#startup')&&!document.querySelector('[data-revealing]')", 'Reload reveal completed');
+  assert.equal(await run("import('./analysis.js').then(m=>m.S.restoredAnalysis)"),true);
   await run(`import('./analysis.js').then(m=>{
     m.S.settings.moveAnim=false;
     window.originalPhaseStats=structuredClone(m.S.gameStats);window.originalPhaseAcc={...m.S.acc};window.originalPhaseCalibration=structuredClone(m.S.calibrated);

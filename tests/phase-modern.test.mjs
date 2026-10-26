@@ -41,7 +41,8 @@ test('one retained liquid rail replaces both old controls across all shared page
       assert.equal(rail.querySelector('[aria-selected="true"]').id, 'accuracy-tab-' + next);
       assert.equal(doc.querySelector('.acc-page-corner,.acc-page-prev,.acc-page-next,.acc-pager-steps,.acc-tabs'), null);
       assert.equal(rail.querySelectorAll('button').length, 3);
-      assert.equal(doc.querySelector('.accuracy-panel').lastElementChild, rail);
+      assert.equal(rail.nextElementSibling, doc.querySelector('.acc-page'));
+      assert.ok(rail.compareDocumentPosition(doc.querySelector('.acc-players')) & a.dom.window.Node.DOCUMENT_POSITION_FOLLOWING);
     }
     for (const [key, next] of [['ArrowLeft', 2], ['Home', 0], ['End', 2]]) {
       rail.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key, bubbles: true}));

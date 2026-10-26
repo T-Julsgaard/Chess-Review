@@ -11,7 +11,7 @@ function review(t) {
 
 test('Accuracy opens on overview, with phase scores and Elo and no practice or explanation controls', t => {
   const a = review(t), panel = a.dom.window.document.querySelector('.accuracy-panel');
-  assert.equal(panel.querySelector('[aria-selected="true"]').getAttribute('aria-label'), 'Overview');
+  assert.equal(panel.querySelector('[aria-selected="true"]').getAttribute('aria-label'), 'Accuracy');
   assert.equal(panel.querySelectorAll('.acc-phase-row').length, 3);
   assert.match(panel.textContent, /Estimated rating/);
   assert.equal(a.state.qbreakExpanded, false);
@@ -75,7 +75,7 @@ test('advanced loss links navigate using the mainline and retain the selected pa
 test('named page buttons jump directly and preserve focus through result updates', t => {
   const a = review(t), doc = a.dom.window.document;
   const rail = doc.querySelector('.acc-navigation');
-  assert.deepEqual([...rail.querySelectorAll('button')].map(button => button.textContent), ['Overview', 'Quality', 'Advanced']);
+  assert.deepEqual([...rail.querySelectorAll('button')].map(button => button.textContent), ['Accuracy', 'Quality', 'Advanced']);
   for (const page of [2, 0, 1]) {
     doc.querySelector('#accuracy-tab-' + page).click();
     assert.equal(a.state.accuracyPage, page);

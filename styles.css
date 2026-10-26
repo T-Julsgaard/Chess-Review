@@ -1466,7 +1466,7 @@ button { font-family: inherit; cursor: pointer; }
 .acc-phase-track:last-child i { margin-left: auto; background: var(--ink-2); opacity: .7; }
 /* A quiet liquid surface: one selected destination, one passing wake. */
 .acc-navigation { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(3,minmax(0,1fr));
-  flex: none; gap: 0; margin: 0 8px 4px; padding: 4px; min-height: 36px; border: 1px solid var(--line-soft);
+  flex: none; gap: 0; margin: 4px 8px 0; padding: 4px; min-height: 36px; border: 1px solid var(--line-soft);
   border-radius: 13px; background: color-mix(in srgb,var(--panel-2) 72%,var(--panel)); }
 .acc-navigation button { position: relative; z-index: 1; display: grid; place-items: center; min-width: 0; min-height: 28px;
   padding: 6px 2px; border: 0; border-radius: 9px; background: transparent; color: var(--ink-3);
@@ -1478,10 +1478,7 @@ button { font-family: inherit; cursor: pointer; }
 .acc-nav-current,.acc-nav-wake { position: absolute; z-index: 0; pointer-events: none; top: 4px; bottom: 4px; left: 0;
   border-radius: 10px; transform-origin: left center; visibility: hidden; }
 .acc-navigation[data-ready="true"] :is(.acc-nav-current,.acc-nav-wake) { visibility: visible; }
-.acc-nav-current { background: linear-gradient(165deg,color-mix(in srgb,var(--accent) 23%,var(--panel)),color-mix(in srgb,var(--accent) 11%,var(--panel)));
-  box-shadow: inset 0 1px 0 color-mix(in srgb,var(--accent) 28%,transparent),inset 0 -1px 0 color-mix(in srgb,var(--accent) 12%,transparent),0 2px 5px #0000000a; }
-.acc-nav-current::after { content: ''; position: absolute; inset: auto 16% 0; height: 1px;
-  background: linear-gradient(90deg,transparent,color-mix(in srgb,var(--accent) 65%,transparent),transparent); }
+.acc-nav-current { background: color-mix(in srgb,var(--accent) 14%,var(--panel)); }
 .acc-nav-wake { background: var(--accent); opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .acc-navigation button { transition: none; } }
 .acc-comparison { text-align: center; padding: 10px 0 12px; border-bottom: 1px solid var(--line-soft); }

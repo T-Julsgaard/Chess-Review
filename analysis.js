@@ -150,7 +150,7 @@ function badgeLabelStyle(value = S.settings.badgeTooltip) {
 // The move-quality page keeps the complete category list, with Book last.
 const QBREAK_FULL = ["brilliant","great","best","excellent","good","inacc","mistake","miss","blunder","book"];
 const QBREAK_SUMMARY = ["brilliant","great","best","inacc","mistake","miss","blunder"];
-const ACCURACY_PAGES = ['Overview', 'Move quality', 'Advanced'];
+const ACCURACY_PAGES = ['Accuracy', 'Move quality', 'Advanced'];
 const NOTEWORTHY = new Set(["brilliant","great","inacc","mistake","miss","blunder"]);
 // Explanation for each category (shown as a tooltip in the accuracy panel). The classifier
 // (computeDerived → classifyMove) works on the engine's eval in PAWNS: "loss" is how much the
@@ -756,6 +756,7 @@ const S = {
   // still running. `completed` is the total number of game plies already returned by
   // any worker. They differ when parallel workers finish out of order.
   analyzing: true, progress: 0, completed: 0, analysisError: null, userArrows: [], userMarks: [], qbreakExpanded: false, accuracyPage: 0, originalAccuracyExpanded: false,
+  restoredAnalysis: false, progressiveAccuracy: false,
   // Collapsible settings sections: open/closed state, keyed by section title.
   setOpen: {},
   settings: { ...DEFAULT_SETTINGS },
@@ -4396,6 +4397,36 @@ function renderMoveQuality(sides, rows) {
   if (distribution) updateQualityDistribution(content, sides);
   return content;
 }
+// Wait for completed evidence on both sides and keep later phases behind earlier
+// ones, even when pool workers finish positions out of order.
+function accuracyPhasePending(phase, busy) {
+  return busy && GAME_PHASES.slice(0, GAME_PHASES.indexOf(phase) + 1).some(key =>
+    ['w', 'b'].some(side => !S.gameStats?.[side]?.phases[key]?.complete));
+}
+function renderAccuracyPhases(sides, busy, bars = true) {
+  return el('div', {class: 'acc-phases', 'aria-label': 'Accuracy by game phase'},
+    bars ? null : el('h4', {}, 'Accuracy by phase'),
+    ...GAME_PHASES.map((phase, i) => {
+      const pending = accuracyPhasePending(phase, busy);
+      const values = sides.map(side => S.gameStats?.[side]?.phases[phase]?.accuracy);
+      const scores = values.map(value => el('strong', {}, pending ? '···' : value == null ? '—' : value.toFixed(1)));
+      const label = el('span', {}, ['Opening', 'Middlegame', 'Endgame'][i]);
+      return el('div', {class: 'acc-phase-row', 'data-phase': phase},
+        ...(bars ? [el('div', {class: 'acc-phase-values'}, scores[0], label, scores[1]),
+          el('div', {class: 'acc-phase-bars'}, ...values.map(value =>
+            el('span', {class: 'acc-phase-track', 'aria-hidden': 'true'},
+              el('i', {style: {width: (pending || value == null ? 0 : value) + '%'}}))))]
+          : [scores[0], label, scores[1]]));
+    }));
+}
+function updateAccuracyPhases(sides, busy, design) {
+  const key = JSON.stringify(['w', 'b'].map(side => S.gameStats?.[side]?.phases));
+  if (statsRefs.phasesKey === key) return;
+  statsRefs.phasesKey = key;
+  const current = UI.stats.querySelector('.acc-phases,.phase-report');
+  if (current) current.replaceWith(design.startsWith('phases')
+    ? renderPhaseReport(sides, busy, design === 'phases2') : renderAccuracyPhases(sides, busy, design !== 'pages'));
+}
 function renderStats() {
   const design = panelDesign('accuracy', S.settings);
   const phaseReport2 = design === 'phases2';
@@ -4413,6 +4444,7 @@ function renderStats() {
   const page = S.accuracyPage || 0, busy = S.analyzing && !S.blank;
   // Keep the analysis animation and keyboard focus intact while results arrive.
   if (busy && statsRefs?.design === design && statsRefs.page === page) {
+    if (page === 0) updateAccuracyPhases(sides, busy, design);
     for (const [k, row] of Object.entries(statsRefs.rows)) sides.forEach((side, i) => {
       const count = S.counts[side][k] || 0;
       row[i].textContent = count;
@@ -4448,16 +4480,7 @@ function renderStats() {
           el('div', {class: 'acc-estimate'}, el('strong', {class: 'acc-elo'}, pending(rating == null ? '—' : '≈ ' + rating)),
             el('span', {class: 'acc-elo-label'}, reveal ? 'Estimated rating' : 'Estimated Elo')));
       })),
-      el('div', {class: 'acc-phases', 'aria-label': 'Accuracy by game phase'},
-        ...GAME_PHASES.map((phase, i) => {
-          const values = sides.map(side => S.gameStats?.[side]?.phases[phase].accuracy);
-          const score = value => value == null ? '—' : value.toFixed(1);
-          return el('div', {class: 'acc-phase-row'},
-            el('div', {class: 'acc-phase-values'}, el('strong', {}, pending(score(values[0]))),
-              el('span', {}, ['Opening', 'Middlegame', 'Endgame'][i]), el('strong', {}, pending(score(values[1])))),
-            pair('acc-phase-bars', values.map(value => el('span', {class: 'acc-phase-track', 'aria-hidden': 'true'},
-              el('i', {style: {width: (busy || value == null ? 0 : value) + '%'}})))));
-        })));
+      renderAccuracyPhases(sides, busy));
   } else if (page === 1) {
     content = renderMoveQuality(sides, rows);
   } else {
@@ -4477,13 +4500,16 @@ function renderStats() {
       })));
   }
   UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials accuracy-book' + (reveal ? ' accuracy-reveal' : '') + (phaseReport ? ' accuracy-phase-report' : '') + (phaseReport2 && page === 0 ? ' accuracy-phase-report-2' : '') + (phaseModern ? ' accuracy-phase-modern' : ''), 'data-design': design, 'aria-label': 'Accuracy'},
+    accuracyPager(),
     el('div', {class: 'panel-body acc-page' + (page === 0 ? ' acc-page-overview' : ''), id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
-      'aria-labelledby': 'accuracy-tab-' + page}, players, content), accuracyPager()));
+      'aria-labelledby': 'accuracy-tab-' + page}, players, content)));
   statsRefs = busy ? {design, page, rows} : null;
   if (UI.canvas.classList.contains('full-hd-reference')) applyLayout();
   accuracyNavigation?.sync(page);
-  if (reveal && page === 0 && !busy && !S.blank && Object.values(S.acc).some(Number.isFinite)) {
-    overviewReveal.mount(UI.stats.firstChild, {game: S.positions, key: revealKey, enabled: animate});
+  // Saved reviews open with their full results. Live reviews have already shown
+  // their phases, so finishing must not count those scores up from zero again.
+  if (reveal && page === 0 && !busy && !S.blank && !S.restoredAnalysis && Object.values(S.acc).some(Number.isFinite)) {
+    overviewReveal.mount(UI.stats.firstChild, {game: S.positions, key: revealKey, enabled: animate, includePhases: !S.progressiveAccuracy});
   }
 }
 
@@ -4493,21 +4519,7 @@ function renderPhaseOverview2(sides, busy) {
       el('span', {class: 'phase-summary-label phase2-label'}, 'Accuracy'),
       ...sides.map(side => busy ? loaderNode('acc-val', 'var(--accent)')
         : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side] >= 100 ? '100' : S.acc[side].toFixed(1)))),
-    el('div', {class: 'phase-report phase2-report', 'aria-label': 'Accuracy by game phase'},
-      ...GAME_PHASES.map((phase, index) => {
-        const name = ['Opening', 'Middlegame', 'Endgame'][index];
-        return el('div', {class: 'phase-report-row phase2-row', 'data-phase': phase},
-          el('span', {class: 'phase-report-name'}, name),
-          ...sides.map(side => {
-            const stats = S.gameStats?.[side]?.phases[phase], value = stats?.accuracy;
-            const band = busy ? null : phasePerformance(value);
-            return el('div', {class: 'phase-report-cell' + (band ? '' : ' unavailable'), 'data-phase-category': band?.category || '',
-              style: {'--phase-color': band ? QUALITY[band.category].color : 'var(--ink-3)'},
-              'aria-label': S.players[side].name + ', ' + name + ': ' + (busy ? 'analyzing' : value == null ? 'not scored'
-                : value.toFixed(1) + ' accuracy, ' + categoryName(band.category) + ', ' + stats.decisions + ' scored decisions')},
-              el('strong', {class: 'phase-report-score'}, busy ? '···' : value == null ? '—' : value.toFixed(1)));
-          }));
-      })),
+    renderPhaseReport(sides, busy, true),
     el('div', {class: 'phase-rating phase2-rating'},
       el('span', {class: 'acc-elo-label phase2-label'}, 'Estimated rating'),
       ...sides.map(side => {
@@ -4516,27 +4528,31 @@ function renderPhaseOverview2(sides, busy) {
       })));
 }
 
+function renderPhaseReport(sides, busy, compact = false) {
+  return el('div', {class: 'phase-report' + (compact ? ' phase2-report' : ''), 'aria-label': 'Accuracy by game phase'}, ...GAME_PHASES.map((phase, index) => {
+    const pending = accuracyPhasePending(phase, busy);
+    const name = ['Opening', 'Middlegame', 'Endgame'][index];
+    const cells = sides.map(side => {
+      const stats = S.gameStats?.[side]?.phases[phase], value = stats?.accuracy;
+      const band = pending ? null : phasePerformance(value), label = band ? categoryName(band.category) : pending ? 'Analyzing' : 'Not scored';
+      return el('div', {class: 'phase-report-cell' + (band ? '' : ' unavailable'), 'data-phase-category': band?.category || '',
+        style: {'--phase-color': band ? QUALITY[band.category].color : 'var(--ink-3)'},
+        'aria-label': S.players[side].name + ', ' + name + ': ' + (pending ? 'analyzing' : value == null ? 'not scored' : value.toFixed(1) + ' accuracy, ' + label + ', ' + stats.decisions + ' scored decisions')},
+        el('strong', {class: 'phase-report-score'}, pending ? '···' : value == null ? '—' : value.toFixed(1)));
+    });
+    return el('div', {class: 'phase-report-row' + (compact ? ' phase2-row' : ''), 'data-phase': phase},
+      el(compact ? 'span' : 'div', {class: 'phase-report-name'}, name),
+      ...(compact ? cells : [el('div', {class: 'phase-report-cells'}, ...cells)]));
+  }));
+}
 function renderPhaseOverview(sides, busy, modern = false) {
-  const score = value => busy ? '···' : value == null ? '—' : value.toFixed(1);
   return el('div', {class: 'phase-overview'},
     el('div', {class: 'phase-summary'},
       el('span', {class: 'phase-summary-label'}, 'Accuracy'),
       el('div', {class: 'phase-overall-values'}, ...sides.map(side => modern ? accuracyDial(S.acc[side], busy)
         : busy ? loaderNode('acc-val', 'var(--accent)')
         : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side] >= 100 ? '100' : S.acc[side].toFixed(1))))),
-    el('div', {class: 'phase-report', 'aria-label': 'Accuracy by game phase'}, ...GAME_PHASES.map((phase, index) => {
-      const name = ['Opening', 'Middlegame', 'Endgame'][index];
-      return el('div', {class: 'phase-report-row', 'data-phase': phase},
-        el('div', {class: 'phase-report-name'}, name),
-        el('div', {class: 'phase-report-cells'}, ...sides.map(side => {
-          const stats = S.gameStats?.[side]?.phases[phase], value = stats?.accuracy;
-          const band = busy ? null : phasePerformance(value), label = band ? categoryName(band.category) : busy ? 'Analyzing' : 'Not scored';
-          return el('div', {class: 'phase-report-cell' + (band ? '' : ' unavailable'), 'data-phase-category': band?.category || '',
-            style: {'--phase-color': band ? QUALITY[band.category].color : 'var(--ink-3)'},
-            'aria-label': S.players[side].name + ', ' + name + ': ' + (busy ? 'analyzing' : value == null ? 'not scored' : value.toFixed(1) + ' accuracy, ' + label + ', ' + stats.decisions + ' scored decisions')},
-            el('strong', {class: 'phase-report-score'}, score(value)));
-        })));
-    })),
+    renderPhaseReport(sides, busy),
     el('div', {class: 'phase-rating'},
       el('span', {class: 'acc-elo-label'}, 'Estimated rating'),
       el('div', {class: 'phase-rating-values'}, ...sides.map(side => {
@@ -4621,6 +4637,7 @@ function renderPagedStats() {
   const page = S.accuracyPage || 0, busy = S.analyzing && !S.blank;
   // Keep the analysis animation and keyboard focus intact while results arrive.
   if (busy && statsRefs?.design === 'pages' && statsRefs.page === page) {
+    if (page === 0) updateAccuracyPhases(sides, busy, 'pages');
     for (const [k, row] of Object.entries(statsRefs.rows)) sides.forEach((side, i) => {
       const count = S.counts[side][k] || 0;
       row[i].textContent = count;
@@ -4649,13 +4666,9 @@ function renderPagedStats() {
       comparison('Estimated Elo', sides.map(side => el('strong', {class: 'acc-elo'}, pending(
         estimateElo(S.accElo[side], S.players[side]?.rating, side) == null ? '—'
           : '≈ ' + estimateElo(S.accElo[side], S.players[side]?.rating, side))))),
-      el('div', {class: 'acc-phases'}, el('h4', {}, 'Accuracy by phase'),
-        ...GAME_PHASES.map((phase, i) => el('div', {class: 'acc-phase-row'},
-          el('strong', {}, pending(S.gameStats?.[sides[0]]?.phases[phase].accuracy?.toFixed(1) ?? '—')),
-          el('span', {}, ['Opening', 'Middlegame', 'Endgame'][i]),
-          el('strong', {}, pending(S.gameStats?.[sides[1]]?.phases[phase].accuracy?.toFixed(1) ?? '—')))),
-        el('p', {class: 'acc-note'}, S.blank ? 'Load a game to see its accuracy.'
-          : busy ? 'Scores appear when analysis finishes.' : '— Phase not reached or no scored decisions.')));
+      renderAccuracyPhases(sides, busy, false),
+      el('p', {class: 'acc-note'}, S.blank ? 'Load a game to see its accuracy.'
+        : busy ? 'Phase scores appear as analysis progresses.' : '— Phase not reached or no scored decisions.'));
   } else if (page === 1) {
     content = renderMoveQuality(sides, rows);
   } else {
@@ -4678,8 +4691,9 @@ function renderPagedStats() {
   }
   UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-pages accuracy-book', 'data-design': 'pages', 'aria-label': 'Accuracy'},
     el('div', {class: 'panel-head acc-head'}, el('h3', {}, 'Accuracy'), el('span', {class: 'acc-page-count'}, (page + 1) + ' / 3')),
+    accuracyPager(),
     el('div', {class: 'panel-body acc-page', id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
-      'aria-labelledby': 'accuracy-tab-' + page}, players, content), accuracyPager()));
+      'aria-labelledby': 'accuracy-tab-' + page}, players, content)));
   statsRefs = busy ? {design: 'pages', page, rows} : null;
   if (UI.canvas.classList.contains('full-hd-reference')) applyLayout();
   accuracyNavigation?.sync(page);
@@ -7126,6 +7140,7 @@ function requestProgress(gen) {
 }
 async function startAnalysis({preserveCompleted = false} = {}) {
   if(S.blank)return;
+  S.progressiveAccuracy = true;
   if (S.practice) exitPractice();
   S._lastEngineLines = null;
   panelLineCache.clear(); S._panelRequest = null; S.panelToken++;
@@ -7366,6 +7381,8 @@ async function applyGame(payload) {
     try { const k = "analysis:" + currentGameId(); const s = await browserAPI.storage.local.get(k); saved = s[k] || null; } catch {}
   }
   const restored = canRestoreAnalysis(saved);
+  S.restoredAnalysis = restored;
+  S.progressiveAccuracy = false;
   S._panelNeedsLive = false;
   if (restored) {
     const oldSettings = JSON.parse(saved.settingsKey), currentSettings = JSON.parse(analysisSettingsKey());
