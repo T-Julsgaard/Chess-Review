@@ -12,14 +12,19 @@ The choices are local visual preferences and survive reopening the extension.
   including its panel content scales. Accuracy uses Phase report (the first
   version), Move list uses Zoom +20%, Engine uses Minimal, and the remaining
   tabs use Original.
+- **Custom** is selected automatically after moving or resizing panels or changing
+  a tab design. Selecting Custom directly keeps the current arrangement and designs.
 
 Choosing a setup applies its arrangement and tab designs. Individual tabs and
-panel positions can still be customized. **Reset layout** restores the selected
-setup's arrangement and keeps individual tab choices. Visual's **Reset to
-default** also restores that setup's tab designs. The selected setup and custom
-edits survive reopening. Existing users keep their settings and saved arrangement
-until they choose a setup; without a selection, Reset layout uses the automatic
-arrangement. Setups keep the current game, scores, engine settings and other
+panel positions can still be customized. **Reset layout** restores the starting
+setup's arrangement and keeps individual tab choices; Custom stays selected if
+those designs differ from the starting setup. Visual's **Reset to default** also
+restores that setup's tab designs and selects it again. The starting setup and
+custom edits survive reopening. Existing edited setups are labeled Custom while
+keeping their saved settings and arrangement. Without a starting selection,
+Reset layout uses the automatic arrangement. Opening Reorganize, cancelled drags,
+window resizing and unrelated preferences do not select Custom.
+Setups keep the current game, scores, engine settings and other
 visual preferences.
 
 | Panel | Designs | Default |

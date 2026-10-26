@@ -304,7 +304,7 @@ const DEFAULT_SETTINGS = {
   ...Object.fromEntries(PANEL_DESIGNS.map(design => [design.setting, design.default])),
   categoryNames: {},
   layoutGridSize: 16,
-  uiSetup: "", // Existing arrangements stay intact until a setup is selected.
+  uiSetup: "custom", uiSetupBase: "", // Custom retains its starting preset for resets.
   theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
   badgeFont: "spacemono", badgeTooltip: "off",
@@ -1993,6 +1993,7 @@ function makeMovable(mod, handle, grips, key) {
       if(cancelled){S.layout=start;S._accReflow=reflow;applyLayout();growCanvas();}
       else if(ev)apply(ev);
       for(const name of keys)UI.canvas.querySelector('[data-mod="'+name+'"]').classList.remove('dragging','resizing');
+      if(!cancelled&&JSON.stringify(S.layout)!==JSON.stringify(start))writeSettings(customUiSetupPatch());
       saveLayout();if(keys.includes('board'))alignPlayers();
     };
     const up=ev=>finish(false,ev),cancel=ev=>finish(true,ev),blur=()=>finish(true);
@@ -2002,11 +2003,29 @@ function makeMovable(mod, handle, grips, key) {
   handle.addEventListener('pointerdown',begin('move',handle));
   for(const dir of ['e','s','se'])grips[dir].addEventListener('pointerdown',begin(dir,grips[dir]));
 }
+function baseUiSetup() {
+  return UI_SETUPS[S.settings.uiSetup]?.designs ? S.settings.uiSetup
+    : UI_SETUPS[S.settings.uiSetupBase]?.designs ? S.settings.uiSetupBase : '';
+}
+function customUiSetupPatch() {
+  const patch = {uiSetup:'custom', uiSetupBase:baseUiSetup()};
+  Object.assign(S.settings,patch);
+  return patch;
+}
+function setupDesignsMatch() {
+  const setup = UI_SETUPS[baseUiSetup()];
+  return !!setup && Object.entries(setup.designs).every(([key,value])=>S.settings[key]===value);
+}
 function setupLayout() {
-  return structuredClone(S.settings.uiSetup === 'modern' ? MODERN_LAYOUT : DEFAULT_LAYOUT);
+  return structuredClone(baseUiSetup() === 'modern' ? MODERN_LAYOUT : DEFAULT_LAYOUT);
 }
 function setupLayoutMode() {
-  return UI_SETUPS[S.settings.uiSetup]?.layoutMode || 'auto';
+  return UI_SETUPS[baseUiSetup()]?.layoutMode || 'auto';
+}
+function setupLayoutMatches(layout,mode) {
+  const baseline=setupLayout();
+  return mode===setupLayoutMode()&&Object.keys(layout).every(key=>key in baseline)&&Object.entries(baseline).every(([key,box])=>
+    ['x','y','w','h','scale'].every(prop=>Math.abs((layout[key]?.[prop]??(prop==='scale'?1:NaN))-(box[prop]??1))<1e-6));
 }
 // Restore the selected setup's starting arrangement and window-dependent fit.
 async function resetLayout() {
@@ -2018,9 +2037,13 @@ async function resetLayout() {
   if (!accuracyLayoutExpanded()) reflowAccuracy(false);
   applyLayoutMode();
   // Reset is a committed action: a reload must not cancel a pending debounce.
+  const uiSetup = setupDesignsMatch() ? baseUiSetup() : 'custom';
+  const savedSettings = S.settings.uiSetup === uiSetup ? Promise.resolve() : writeSettings({uiSetup,uiSetupBase:baseUiSetup()});
+  S.settings.uiSetup = uiSetup;
   const saved = saveLayout(true);
   requestAnimationFrame(alignPlayers);
-  await Promise.all([saved, initTabZoom()]);
+  await Promise.all([saved, savedSettings, initTabZoom()]);
+  if (UI.settings && !UI.settings.hidden) renderSettings();
 }
 // Reorganize mode: while ON, panels can be dragged/resized (handles + grips appear); while OFF
 // they're locked and hover shows nothing. The arranged layout auto-saves and persists. Entering it
@@ -4099,7 +4122,7 @@ function renderMoveComment() {
   // Special coach phrasing can omit the category, so name it beside the move.
   const sanDisplay = S.settings.coach && !S.settings.coachPlain && cfg ? `${san} ${categoryName(cls)}` : san;
   head.append(el("span", { class: "ip-move" }, sanDisplay));
-  if (evTxt && S.settings.uiSetup !== 'modern') head.append(el("span", { class: "ip-eval " + (evCp >= 0 ? "pos" : "neg") }, evTxt));
+  if (evTxt && baseUiSetup() !== 'modern') head.append(el("span", { class: "ip-eval " + (evCp >= 0 ? "pos" : "neg") }, evTxt));
   body.append(head);
 
   // Pick the line once per (ply + coach): a fresh signature → choose + type; otherwise reuse the
@@ -5749,7 +5772,7 @@ async function resetVisualSettings() {
   closeBoardColorPicker();
   delete S.settings.wrongSound; // remove obsolete saved choices from older versions
   await resetSettingKeys(VISUAL_SETTING_KEYS);
-  const setup = UI_SETUPS[S.settings.uiSetup];
+  const setup = UI_SETUPS[baseUiSetup()];
   if (setup) {
     Object.assign(S.settings, setup.designs);
     await writeSettings(setup.designs);
@@ -5814,7 +5837,7 @@ function visualSettings() {
     render: (chip) => colorPickerChip(chip, [S.settings.accentCustom]) });
   return el("div", {},
     section("Premade UI setups",
-      el("div", {class:"set-row hint"}, el("span", {class:"set-note"}, "Choose a panel arrangement and tab designs. You can customize them afterward. Reset layout restores the selected setup's arrangement.")),
+      el("div", {class:"set-row hint"}, el("span", {class:"set-note"}, "Choose a panel arrangement and tab designs. Moving or resizing panels or changing tab designs selects Custom automatically. Reset layout restores your starting setup's arrangement.")),
       seg("Setup", "uiSetup", Object.keys(UI_SETUPS), null, value => UI_SETUPS[value].label),
       el("div", {class:"set-row hint"}, el("span", {class:"set-note"}, "Old: original tabs and automatic layout. Modern: Phase report 1, Move list Zoom +20%, Minimal Engine, and the modern panel layout.")),
     ),
@@ -6259,8 +6282,9 @@ async function setSetting(key, value) {
   const design = PANEL_DESIGNS.find(item => item.setting === key);
   if (design) value = panelDesign(design.panel, {[key]: value});
   if (key === "badgeTooltip") value = badgeLabelStyle(value);
+  const setupPatch = design && S.settings[key] !== value ? customUiSetupPatch() : {};
   S.settings[key] = value;
-  await writeSettings({ [key]: value });
+  await writeSettings({ [key]: value, ...setupPatch });
   applySettings();
   if (design?.panel.startsWith('accuracy')) { statsRefs = null; hideQTip(); renderStats(); if(key==='accuracyDesign')reflowAccuracy(accuracyLayoutExpanded()); }
   if (key === 'movesDesign') updateMovesDesign();
@@ -6279,8 +6303,13 @@ async function setSetting(key, value) {
 async function applyUiSetup(value) {
   const setup = UI_SETUPS[value];
   if (!setup) return;
+  if (value === 'custom') {
+    await writeSettings(customUiSetupPatch());
+    if (UI.settings && !UI.settings.hidden) renderSettings();
+    return;
+  }
   cancelPanelGesture?.();
-  const patch = {uiSetup:value, ...setup.designs, evalView:'both', ...(value === 'modern' ? {modernEngineVersion:1,modernMovesVersion:1} : {})};
+  const patch = {uiSetup:value, uiSetupBase:value, ...setup.designs, evalView:'both', ...(value === 'modern' ? {modernEngineVersion:1,modernMovesVersion:1} : {})};
   Object.assign(S.settings, patch);
   S.originalAccuracyExpanded = false; S.qbreakExpanded = false; S.accuracyPage = 0;
   statsRefs = null; hideQTip(); overviewReveal.stop();
@@ -7615,6 +7644,13 @@ async function showReadyWorkspace() {
     }
     // The 5-line option was removed — clamp any stored value to the new max.
     if (S.settings.engineLines > ENGINE_MAX_LINES) S.settings.engineLines = ENGINE_MAX_LINES;
+    // Existing edited presets become Custom without changing their designs or saved boxes.
+    const savedLayout = store.layoutVersion === LAYOUT_VERSION && store.layout;
+    const trackedSetup = store.settings?.uiSetupBase === S.settings.uiSetup;
+    if (!UI_SETUPS[S.settings.uiSetup] || (S.settings.uiSetup !== 'custom' &&
+      (!setupDesignsMatch() || !trackedSetup && savedLayout && !setupLayoutMatches(savedLayout,store.layoutMode)))) {
+      customUiSetupPatch();
+    }
     const migration = {};
     if (!store.settings?.nativeSizingVersion) migration.nativeSizingVersion = 1;
     for (const key of new Set([...Object.keys(loadedSettings), ...Object.keys(S.settings)])) {
