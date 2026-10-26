@@ -385,7 +385,7 @@
   transition: transform .25s ease, box-shadow .25s ease;
 }
 :is(.puzzle-mode,.puzzle-run-start,.puzzle-run-end)[data-mode="timeAttack"] { --mode-stock: #edc278; }
-:is(.puzzle-mode,.puzzle-run-end)[data-mode="knockout"] { --mode-stock: #eaa18e; }
+:is(.puzzle-mode,.puzzle-run-start,.puzzle-run-end)[data-mode="knockout"] { --mode-stock: #eaa18e; }
 .learning-workspace .puzzle-mode-button {
   position: relative;
   display: flex;

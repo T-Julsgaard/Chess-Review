@@ -5164,7 +5164,7 @@ function visualSettings() {
       fxEventControls("puzzleIncorrect", "Incorrect puzzle"),
       ...SOUND_EVENTS.map(([key, label]) => fxEventControls(key, label)),
       el("div", { class: "set-fx", "data-sound-event": "runStart" },
-        fxSlider("runStart", "volume", "Puzzle countdown volume", 0, 100, 1, (v) => v + " %")),
+        fxSlider("runStart", "volume", "Puzzle intro volume", 0, 100, 1, (v) => v + " %")),
     ),
     el("button", { class: "set-reset", onclick: resetVisualSettings }, "Reset to default"),
   );
@@ -5207,7 +5207,7 @@ function fxEventControls(ev, label) {
 // drag survives); previewing on change (release) keeps the cue from machine-gunning while dragging.
 function fxSlider(ev, field, label, min, max, step, fmt) {
   const out = el("b", {}, fmt(fxConfig(ev)[field]));
-  const eventLabel = {puzzleSuccess: "Puzzle success", puzzleIncorrect: "Incorrect puzzle", runStart: "Puzzle countdown"}[ev] || _eventDef(ev)[1];
+  const eventLabel = {puzzleSuccess: "Puzzle success", puzzleIncorrect: "Incorrect puzzle", runStart: "Puzzle intro"}[ev] || _eventDef(ev)[1];
   return el("div", { class: "set-ctrl set-fx-knob" },
     el("div", { class: "set-ctrl-top" }, el("span", { class: "set-lbl" }, label), out),
     el("input", {
