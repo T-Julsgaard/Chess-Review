@@ -4485,27 +4485,54 @@ function renderPagedStats() {
 }
 
 /* ---------------- Eval graph ---------------- */
+function graphPositionText(ply) {
+  if (!ply) return 'Starting position';
+  return `${Math.ceil(ply / 2)}${ply % 2 ? '.' : '…'} ${S.positions[ply]?.san || ''}`.trim();
+}
+function updateGraphReadout(refs) {
+  if (!refs.readout) return;
+  const e = S.evals[S.idx], cp = e == null ? null : scoreToCp(e);
+  const rounded = cp == null ? null : Math.abs(cp / 100).toFixed(1);
+  const side = cp > 0 ? 'White' : 'Black';
+  const label = e == null ? (S.blank ? 'Load a game' : 'Calculating…')
+    : e.mate != null ? `${side} mates` : rounded === '0.0' ? 'Equal position' : `${side} ahead`;
+  refs.readout.textContent = e == null ? '—' : e.mate != null ? 'M' + Math.abs(e.mate) : rounded === '0.0' ? '0.0' : evalText(e);
+  refs.readout.dataset.side = cp == null || rounded === '0.0' && e.mate == null ? 'equal' : cp > 0 ? 'white' : 'black';
+  refs.verdict.textContent = label;
+  refs.move.textContent = S.blank ? 'Game overview' : graphPositionText(S.idx);
+  const description = e == null ? label : e.mate != null ? `${side} has mate in ${Math.abs(e.mate)}`
+    : rounded === '0.0' ? label : `${side} is ahead by ${rounded} pawns`;
+  refs.chart.setAttribute('aria-valuenow', Math.min(S.idx, refs.lastPly));
+  refs.chart.setAttribute('aria-valuetext', `${graphPositionText(S.idx)}. ${description}. Positive scores favor White; negative scores favor Black.`);
+  refs.chart.setAttribute('aria-disabled', String(!!S.practice || refs.lastPly === 0));
+  if (refs.previous) refs.previous.disabled = S.practice || S.idx <= 0;
+  if (refs.next) refs.next.disabled = S.practice || S.idx >= refs.lastPly;
+}
 function renderGraph() {
+  const restoreFocus = document.activeElement === UI.graphRefs?.chart;
   const show = S.settings.evalView === "both" || S.settings.evalView === "graph";
   const mod = UI.graph.closest(".mod");
   if (mod) mod.hidden = !show;   // hidden, not just emptied, so the layout closes the gap
   if (!show) { UI.graph.replaceChildren(); UI.graphRefs = null; return; }
+  const design = panelDesign('graph', S.settings), modern = design !== 'original';
   const W = 384, H = 120, mid = H / 2;
   const maxPly = Math.max(1, S.total);
-  const toX = (p) => (p / maxPly) * W;
+  const toX = (p) => design === 'bars' ? ((p + .5) / (maxPly + 1)) * W : (p / maxPly) * W;
+  const fromFraction = fraction => Math.round(design === 'bars' ? fraction * (maxPly + 1) - .5 : fraction * maxPly);
   const toY = (cp) => { const c = Math.max(-500, Math.min(500, cp)); return mid - (c / 500) * (mid - 8); };
   // The "color" style flips the y-axis (White advantage pushes the boundary DOWN); the hover marker
   // re-uses whichever mapping the active style draws with, so the dot rides the visible curve.
   const toYc = (cp) => { const c = Math.max(-500, Math.min(500, cp)); return mid + (c / 500) * (mid - 8); };
   const pts = [];
   for (let p = 0; p <= S.total; p++) { if (!S.evals[p]) break; pts.push({ ply: p, cp: scoreToCp(S.evals[p]) }); }
-  const graphKey = JSON.stringify([S.total,S.settings.graphStyle || "area",pts,S.classif]);
-  const markerVisible = S.idx > 0 && S.idx < S.total;
+  const graphKey = JSON.stringify([design,S.total,S.settings.graphStyle || "area",pts,S.classif,S.blank]);
+  const markerVisible = modern ? pts.length > 0 && S.idx < pts.length : S.idx > 0 && S.idx < S.total;
   const retained = UI.graphRefs;
   if (retained?.key === graphKey && retained.marker.isConnected) {
     const x = String(toX(Math.min(S.idx,maxPly)));
     if (retained.marker.getAttribute("x1") !== x) { retained.marker.setAttribute("x1",x); retained.marker.setAttribute("x2",x); }
     retained.marker.style.display = markerVisible ? "" : "none";
+    updateGraphReadout(retained);
     return;
   }
   let line = "", fill = "";
@@ -4559,20 +4586,36 @@ function renderGraph() {
       + dotsSvg + marker;
   }
   // Hover marker: a vertical guide + a dot that rides the curve, both hidden until the mouse enters.
-  const hoverY = style === "color" ? toYc : toY;
+  if (modern) {
+    const guides = `<line x1="0" y1="${mid}" x2="${W}" y2="${mid}" class="evaluation-zero"/>`;
+    if (design === 'timeline') {
+      inner = guides + (fill ? `<path d="${fill}" class="evaluation-area"/>` : '')
+        + (line ? `<path d="${line}" class="evaluation-curve" vector-effect="non-scaling-stroke"/>` : '')
+        + dotsSvg + marker;
+    } else {
+      // Keep every analyzed position: a bar represents its evaluation, not a score change.
+      const unit = W / (maxPly + 1), width = Math.max(.25, unit * .72);
+      inner = pts.map(p => {
+        const y = toY(p.cp), height = Math.max(.8, Math.abs(y - mid));
+        return `<rect class="evaluation-column ${p.cp >= 0 ? 'white' : 'black'}" x="${p.ply * unit + (unit - width) / 2}" y="${p.cp >= 0 ? mid - height : mid}" width="${width}" height="${height}" rx="${Math.min(1.5,width/3)}"/>`;
+      }).join('') + guides + marker;
+    }
+  }
+  const hoverY = !modern && style === "color" ? toYc : toY;
   const hover = `<g class="eval-hover" style="display:none"><line class="eval-hover-line" x1="0" y1="0" x2="0" y2="${H}" vector-effect="non-scaling-stroke"/><circle class="eval-hover-dot" cx="0" cy="0" r="4.7"/></g>`;
   const svg = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${inner}${hover}</svg>`;
   // Map a pointer event to the nearest plotted ply (0..last ply that has an eval).
   const plyFromEvent = (e) => {
     const r = e.currentTarget.getBoundingClientRect();
     if (!r.width || !pts.length) return null;
-    return Math.max(0, Math.min(pts.length - 1, Math.round(((e.clientX - r.left) / r.width) * maxPly)));
+    return Math.max(0, Math.min(pts.length - 1, fromFraction((e.clientX - r.left) / r.width)));
   };
   // Click anywhere on the graph → jump straight to that move (instant, no stepping through).
   const jumpFromEvent = (e) => {
     const r = e.currentTarget.getBoundingClientRect();
     if (!r.width) return;
-    const ply = Math.max(0, Math.min(S.total, Math.round(((e.clientX - r.left) / r.width) * S.total)));
+    const ply = Math.max(0, Math.min(modern ? pts.length - 1 : S.total, fromFraction((e.clientX - r.left) / r.width)));
+    if (modern && !pts.length) return;
     gotoMainline(ply);
   };
   // Move the hover marker to the pointed ply and float its eval value above the dot.
@@ -4600,7 +4643,41 @@ function renderGraph() {
     t.style.top = (r.top + (y / H) * r.height - 10) + "px";
     t.classList.add("show");
   };
-  UI.graph.replaceChildren(el("div", { class: "panel eval-side" },
+  hideHover();
+  if (modern) {
+    const lastPly = Math.max(0, pts.length - 1);
+    const onkey = e => {
+      if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key)) return;
+      e.preventDefault(); e.stopPropagation();
+      if (S.practice || !pts.length) return;
+      const target = e.key === 'Home' ? 0 : e.key === 'End' ? lastPly
+        : S.idx + (['ArrowLeft','ArrowDown'].includes(e.key) ? -1 : 1);
+      gotoMainline(Math.max(0, Math.min(lastPly, target)));
+    };
+    const chart = el('div', {class: 'evalgraph clickable-graph', html: svg, role: 'slider', tabindex: 0,
+      'aria-label': 'Game evaluation. Use arrow keys to explore moves.', 'aria-valuemin': 0, 'aria-valuemax': lastPly,
+      title: 'Click a move to explore · Arrow keys to step · Scores favor White (+) or Black (−)',
+      onclick: jumpFromEvent, onmousemove: hoverMove, onmouseleave: hideHover, onblur: hideHover, onkeydown: onkey});
+    const move = el('span', {class: 'evaluation-move'}), verdict = el('span', {class: 'evaluation-verdict'});
+    const readout = el('strong', {class: 'evaluation-score', title: 'Positive favors White; negative favors Black. M means mate.'});
+    const step = (label, delta) => el('button', {type: 'button', 'aria-label': label, onclick: () => gotoMainline(Math.max(0,Math.min(lastPly,S.idx + delta)))}, delta < 0 ? '‹' : '›');
+    const previous = design === 'bars' ? step('Previous evaluated move', -1) : null;
+    const next = design === 'bars' ? step('Next evaluated move', 1) : null;
+    const footer = design === 'timeline'
+      ? el('div', {class: 'evaluation-footer'}, el('span', {}, 'Start'), el('span', {class: 'evaluation-hint'}, 'Click to explore'), el('span', {}, 'Move ' + Math.ceil(S.total / 2)))
+      : el('div', {class: 'evaluation-footer'}, el('span', {}, 'One bar per position'), el('div', {class: 'evaluation-steps'}, previous, next));
+    UI.graph.replaceChildren(el('div', {class: 'panel eval-side evaluation-panel evaluation-' + design, 'data-design': design, 'aria-label': 'Evaluation'},
+      el('div', {class: 'evaluation-header'}, el('div', {class: 'evaluation-heading'}, el('h3', {}, 'Evaluation'), move),
+        el('div', {class: 'evaluation-current'}, readout, verdict)),
+      el('div', {class: 'evaluation-plot'},
+        el('div', {class: 'evaluation-axis', 'aria-hidden': 'true'}, el('span', {title: 'White advantage'}, 'W +'), el('span', {}, '0'), el('span', {title: 'Black advantage'}, 'B −')), chart,
+        !pts.length ? el('span', {class: 'evaluation-empty'}, S.blank ? 'Load a game to see its evaluation' : 'Waiting for analysis…') : null), footer));
+    UI.graphRefs = {key:graphKey, marker:chart.querySelector('.eval-position'), readout, verdict, move, chart, previous, next, lastPly};
+    updateGraphReadout(UI.graphRefs);
+    if (restoreFocus) chart.focus({preventScroll: true});
+    return;
+  }
+  UI.graph.replaceChildren(el("div", { class: "panel eval-side", 'data-design': design },
     el("div", { class: "panel-head" }, el("h3", {}, "Evaluation")),
     el("div", { class: "panel-body", style: { paddingTop: "8px", paddingBottom: "8px" } },
       el("div", { class: "evalgraph clickable-graph", title: "Click to jump to a move", html: svg, onclick: jumpFromEvent, onmousemove: hoverMove, onmouseleave: hideHover })),
@@ -5868,7 +5945,7 @@ async function setSetting(key, value) {
   if (key === 'moveAnim' && S.settings.moveAnim === false) overviewReveal.stop();
   if (key === "pieceStyle") buildBoard();
   if (key === "mlStyle" || key === "badgeStyle") renderMoves();
-  if (key === "evalView" || key === "graphStyle" || key === "barStyle" || key === "evalbarDesign" || key === "moveAnim") { renderEvalBar(); renderGraph(); }
+  if (key === "evalView" || key === "graphStyle" || key === "barStyle" || key === "evalbarDesign" || key === "graphDesign" || key === "moveAnim") { renderEvalBar(); renderGraph(); }
   if (key === "bestArrow") renderBestArrow();
   if (key === "showThreat") renderThreatArrow();
   if (key === "loaderStyle") { renderReview(); renderStats(); }

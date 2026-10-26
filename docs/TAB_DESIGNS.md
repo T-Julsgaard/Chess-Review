@@ -7,6 +7,7 @@ The choices are local visual preferences and survive reopening the extension.
 | --- | --- | --- |
 | Engine | Original, Focus | Original |
 | Evaluation bar | Original, Balance | Balance |
+| Evaluation | Original, Timeline, Move bars | Timeline |
 | Accuracy | Original, Page tabs, Dials, Reveal | Reveal |
 | Move list | Original, Full height, Zoomed in, Zoom +20% | Full height |
 
@@ -59,6 +60,21 @@ color styles and panel dimensions apply to both versions.
 
 Run `node scripts/learning-browser.mjs --working-tree --evaluation-bar` to check
 score fit, mates, flips and saved choices at four viewport sizes with screenshots.
+
+Timeline Evaluation shows a continuous curve around a labeled equal-position
+line. Its header pairs the selected move with its score and a plain-language
+White/Black advantage label. Move bars gives every analyzed position its own
+column: light above zero for White, gray below zero for Black. Its compact
+previous/next buttons step through evaluated positions. Both designs support
+click-to-jump, hover scores and keyboard navigation (arrows, Home, End), preserve
+focus and chart nodes while navigating, and stop at the analyzed prefix. Empty
+and pending positions show explicit waiting states. Scores use White's
+perspective regardless of board orientation; M means mate. Original retains the
+earlier graph styles. Designs share engine results and do not change analysis.
+
+Run `node scripts/learning-browser.mjs --working-tree --evaluation-panel` for
+screenshots and checks of both designs at five sizes, keyboard/pointer navigation
+and saved choices after reload.
 
 ## Adding another iteration
 

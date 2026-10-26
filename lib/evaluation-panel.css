@@ -1,0 +1,55 @@
+/* Two compact, responsive views of the same White-relative evaluation history. */
+.stage .evaluation-panel {
+  display: flex; flex-direction: column; height: 100%; min-height: 0;
+  padding: 12px 13px 7px; gap: 8px; overflow: hidden; container: evaluation / inline-size;
+}
+.evaluation-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex: none; }
+.evaluation-heading, .evaluation-current { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.evaluation-current { align-items: flex-end; flex: none; }
+.evaluation-heading h3 { margin: 0; color: var(--ink); font: 650 13px/1.2 var(--font-ui); }
+.evaluation-move, .evaluation-verdict { font: 11px/1.2 var(--font-ui); color: var(--ink-3); white-space: nowrap; }
+.evaluation-move { overflow: hidden; text-overflow: ellipsis; }
+.evaluation-score { font: 650 21px/1 var(--font-mono); letter-spacing: -.7px; font-variant-numeric: tabular-nums; color: var(--ink); }
+.evaluation-verdict { color: var(--ink-2); }
+.evaluation-plot { display: flex; position: relative; flex: 1 1 60px; min-height: 35px; gap: 7px; }
+.evaluation-axis { display: flex; flex: 0 0 23px; flex-direction: column; justify-content: space-between; padding: 3px 0;
+  font: 9px/1 var(--font-mono); color: var(--ink-3); }
+.evaluation-panel .evalgraph { flex: 1; min-width: 0; min-height: 0; border-radius: 4px; }
+.stage .evaluation-panel .evalgraph svg { width: 100%; height: 100%; min-height: 0; overflow: visible; }
+.evaluation-panel .evalgraph:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.evaluation-zero { stroke: var(--line); stroke-width: 1; stroke-dasharray: 3 4; }
+.evaluation-area { fill: color-mix(in oklab,var(--accent) 12%,transparent); }
+.evaluation-curve { fill: none; stroke: var(--accent); stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
+.evaluation-column.white { fill: #e2dfd5; }
+.evaluation-column.black { fill: #77766d; }
+.evaluation-bars .evaluation-score { padding: 5px 7px; border-radius: 5px; font-size: 16px; letter-spacing: -.3px; background: var(--panel-3); }
+.evaluation-bars .evaluation-score[data-side="white"] { background: #e2dfd5; color: #252629; }
+.evaluation-bars .evaluation-score[data-side="black"] { background: #3b3c3e; color: #f0ede5; }
+.evaluation-bars .evaluation-header { gap: 6px; }
+.evaluation-bars .evaluation-current { flex-direction: row; align-items: center; gap: 7px; }
+.evaluation-bars .evaluation-verdict { max-width: 44px; white-space: normal; font-size: 10px; line-height: 1.3; }
+.evaluation-footer { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex: none;
+  min-height: 18px; color: var(--ink-3); font: 10px/1.2 var(--font-ui); }
+.evaluation-hint { font-size: 9px; opacity: .85; }
+.evaluation-steps { display: flex; gap: 4px; }
+.evaluation-steps button { display: grid; place-items: center; min-width: 24px; height: 22px; padding: 0;
+  border: 1px solid var(--line-soft); border-radius: 5px; background: var(--panel-2); color: var(--ink-2); font: 18px/1 var(--font-ui); cursor: pointer; }
+.evaluation-steps button:hover:enabled { color: var(--ink); border-color: var(--accent); }
+.evaluation-steps button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.evaluation-steps button:disabled { opacity: .3; cursor: default; }
+.evaluation-empty { position: absolute; inset: 0 0 0 30px; display: grid; place-items: center;
+  pointer-events: none; font-size: 11px; color: var(--ink-3); text-align: center; }
+@container evaluation (max-width: 215px) {
+  .evaluation-hint { display: none; }
+  .evaluation-heading h3 { font-size: 12px; }
+  .evaluation-verdict { font-size: 10px; }
+  .evaluation-score { font-size: 18px; }
+}
+@media (max-height: 650px) and (min-width: 1100px) {
+  .stage.full-hd-reference .evaluation-panel { padding: 7px 10px 5px; gap: 4px; }
+  .stage.full-hd-reference .evaluation-panel .evaluation-plot { min-height: 20px; }
+  .stage.full-hd-reference .evaluation-panel .evaluation-score { font-size: 17px; }
+  .stage.full-hd-reference .evaluation-panel .evaluation-move,
+  .stage.full-hd-reference .evaluation-panel .evaluation-verdict { font-size: 10px; }
+  .stage.full-hd-reference .evaluation-panel .evaluation-steps button { height: 18px; }
+}

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {app,loadGame,settle} from './helpers/app.mjs';
 
-function review(t){const a=app(t);loadGame(a,'1. e4 d5 2. exd5 Qxd5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');return a;}
+function review(t){const a=app(t);a.state.settings.graphDesign='original';loadGame(a,'1. e4 d5 2. exd5 Qxd5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');return a;}
 test('navigation retains graph/player nodes and updates turns, clocks and captured material',t=>{
   const a=review(t),S=a.state,doc=a.dom.window.document;S.clocks=['','9:59','9:58','9:55','9:54'];S.headers.TimeControl='600';a.call('renderPlayers');
   const top=doc.querySelector('#playerTop .player-strip'),bottom=doc.querySelector('#playerBot .player-strip'),name=bottom.querySelector('.name');
