@@ -5089,7 +5089,19 @@ function focusedEnginePanel(content, {locked = false, playable = false} = {}) {
       el('span', {class: 'count', title: locked ? 'Engine lines are hidden during practice' : name + ' · target search depth ' + S.settings.engineDepth},
         locked ? 'Practice' : minimal ? 'Depth ' + S.settings.engineDepth : name + ' · depth ' + S.settings.engineDepth),
       minimal ? play : null),
-    el('div', {class: 'panel-body engine-body'}, content),
+    el('div', {class: 'panel-body engine-body'}, content,
+      minimal && S.settings.engineLines < ENGINE_MAX_LINES ? el('button', {
+        type: 'button', class: 'engine-minimal-add', disabled: locked || !playable,
+        'aria-label': 'Add another engine line',
+        onclick: async e => {
+          e.currentTarget.disabled = true;
+          await setEngineSetting('engineLines', Math.min(ENGINE_MAX_LINES, S.settings.engineLines + 1));
+          const target = UI.engine.querySelector('.engine-minimal-add')
+            || [...UI.engine.querySelectorAll('.engine-focus-candidate')].at(-1)
+            || UI.engine.querySelector('.engine-focus-play');
+          target?.focus({preventScroll: true});
+        },
+      }, '+ Add line') : null),
     minimal ? null : el('div', {class: 'engine-focus-foot'}, play));
   UI.engine.replaceChildren(panel);
   fitEnginePanel();

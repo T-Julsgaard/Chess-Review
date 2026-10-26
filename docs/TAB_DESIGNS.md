@@ -121,8 +121,11 @@ Saved Focus selections use this revised layout. Original remains the default.
 
 Minimal is the Modern setup's Engine design. A slim header holds depth and the
 play/stop control; single-line variations show plain scores and an emphasized
-first move. Up to four candidates fit the preset's existing height without a
-scrollbar. Hover or focus a row for its continuation and score explanation, or
+first move. The default single line sits at the top, with **+ Add line** directly
+below it. Each press requests one more candidate and saves the panel-line count;
+the button disappears at four lines. All rows and the add control fit the
+preset's existing height without a scrollbar. Hover or focus a row for its
+continuation and score explanation, or
 activate it to explore the variation. The full engine name is in the depth
 tooltip. Existing Modern setups using the former Original default upgrade once;
 later individual design choices are retained. Select Minimal independently under

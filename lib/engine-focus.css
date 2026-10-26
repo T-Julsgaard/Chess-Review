@@ -56,7 +56,7 @@
   .engine-focus-play { font-size:11px; }
 }
 
-/* Modern's shallow Engine panel: one slim toolbar and up to four single rows. */
+/* Top-aligned candidates with a quiet, inline action to request another line. */
 .stage .mod[data-mod="engine"] .engine-minimal .engine-focus-head {
   height:30px; box-sizing:border-box; padding:3px 8px; gap:8px;
 }
@@ -71,8 +71,15 @@
 .stage .mod[data-mod="engine"] .engine-minimal .engine-focus-play:hover { background:var(--panel-2); color:var(--ink); }
 .stage .mod[data-mod="engine"] .engine-minimal .engine-focus-play.on { color:var(--q-blunder); }
 .stage .mod[data-mod="engine"] .engine-minimal .engine-body {
-  height:auto; padding:4px 8px; justify-content:center; overflow:hidden;
+  height:auto; padding:4px 8px; justify-content:flex-start; gap:4px; overflow:hidden;
 }
+.engine-minimal-add {
+  display:flex; align-items:center; justify-content:center; flex:none;
+  width:100%; height:18px; min-height:18px; box-sizing:border-box; padding:1px 4px;
+  border:0; border-radius:4px; background:transparent; color:var(--ink-3);
+  font:500 10px/14px var(--font-ui); cursor:pointer;
+}
+.engine-minimal-add:hover { background:var(--panel-2); color:var(--ink); }
 .engine-minimal .engine-focus-candidate {
   grid-template-columns:44px minmax(0,1fr); gap:8px;
   height:22px; min-height:22px; padding:0; border:0; border-radius:4px;
