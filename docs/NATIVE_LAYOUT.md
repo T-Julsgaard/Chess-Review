@@ -44,6 +44,10 @@ the choice. Moving snaps the panel or selection's outer origin to the grid;
 resizing a single panel snaps its right and bottom edges. Group scaling retains
 the selected panels' proportions and internal spacing. Changing grid spacing
 preserves the existing arrangement, and Done hides the grid.
+The compact Layout toolbar can be dragged by its grip or moved with arrow keys
+when the grip is focused (Shift moves ten pixels). The minus button minimizes it
+to a small bar with an expand button and Done. Moving or minimizing the toolbar
+preserves the panel arrangement; resizing the window keeps its controls in view.
 
 Review startup and Reset restore 100% browser zoom. Resizing never changes browser
 zoom; a later manual zoom remains available. Display scaling is represented by

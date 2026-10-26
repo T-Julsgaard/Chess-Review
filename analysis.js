@@ -2029,24 +2029,86 @@ function toggleReorganize() {
   syncPanelSelection();
   if (UI.settings && !UI.settings.hidden) renderSettings();   // refresh the button label if open
 }
+let reorgToolbarPosition = null, reorgToolbarMinimized = false, cleanupReorgToolbar = null;
+function positionReorgToolbar(banner, x, y) {
+  const rect=banner.getBoundingClientRect(),margin=8;
+  const left=Math.max(margin,Math.min(x,window.innerWidth-rect.width-margin));
+  const top=Math.max(margin,Math.min(y,window.innerHeight-rect.height-margin));
+  reorgToolbarPosition={x:left,y:top};
+  Object.assign(banner.style,{left:left+'px',top:top+'px',bottom:'auto',transform:'none'});
+}
+function makeReorgToolbarMovable(banner) {
+  const handle=banner.querySelector('.reorg-drag');
+  let cancelDrag=null;
+  handle.addEventListener('pointerdown',e=>{
+    if(e.button!==0)return;
+    e.preventDefault();e.stopPropagation();cancelDrag?.();
+    const rect=banner.getBoundingClientRect(),previous=reorgToolbarPosition&&{...reorgToolbarPosition};
+    try{handle.setPointerCapture(e.pointerId);}catch{}
+    banner.classList.add('toolbar-dragging');
+    const move=ev=>{
+      if(ev.pointerId!==e.pointerId)return;
+      positionReorgToolbar(banner,rect.left+ev.clientX-e.clientX,rect.top+ev.clientY-e.clientY);
+    };
+    const finish=(cancelled,ev)=>{
+      if(ev&&ev.pointerId!==e.pointerId)return;
+      if(!cancelled&&ev)move(ev);
+      window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);
+      window.removeEventListener('pointercancel',cancel);window.removeEventListener('blur',blur);
+      try{handle.releasePointerCapture(e.pointerId);}catch{}
+      banner.classList.remove('toolbar-dragging');cancelDrag=null;
+      if(cancelled){
+        reorgToolbarPosition=previous;
+        if(previous)positionReorgToolbar(banner,previous.x,previous.y);
+        else for(const key of ['left','top','bottom','transform'])banner.style[key]='';
+      }
+    };
+    const up=ev=>finish(false,ev),cancel=ev=>finish(true,ev),blur=()=>finish(true);
+    cancelDrag=blur;
+    window.addEventListener('pointermove',move);window.addEventListener('pointerup',up);
+    window.addEventListener('pointercancel',cancel);window.addEventListener('blur',blur);
+  });
+  handle.addEventListener('keydown',e=>{
+    const direction={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];
+    if(!direction)return;
+    e.preventDefault();e.stopPropagation();
+    const rect=banner.getBoundingClientRect(),step=e.shiftKey?10:1;
+    positionReorgToolbar(banner,rect.left+direction[0]*step,rect.top+direction[1]*step);
+  });
+  const resize=()=>{cancelDrag?.();if(reorgToolbarPosition)positionReorgToolbar(banner,reorgToolbarPosition.x,reorgToolbarPosition.y);};
+  window.addEventListener('resize',resize);
+  return ()=>{cancelDrag?.();window.removeEventListener('resize',resize);};
+}
 function renderReorgBanner() {
   let banner=document.querySelector('.reorg-banner');
-  if(!S.reorganize){banner?.remove();return;}
+  if(!S.reorganize){cleanupReorgToolbar?.();cleanupReorgToolbar=null;banner?.remove();return;}
   if(!banner){
     banner=el('div',{class:'reorg-banner',role:'toolbar','aria-label':'Reorganize panels'},
-      el('span',{class:'reorg-hint'},'Move and resize panels to snap to the grid. Select several to move or scale them together.'),
-      el('div',{class:'reorg-actions'},
+      el('div',{class:'reorg-bar'},
+        el('button',{type:'button',class:'reorg-drag','aria-label':'Move layout toolbar',
+          title:'Drag to move the toolbar, or use arrow keys. Select panels to move or scale them together.'},el('span',{'aria-hidden':'true',html:HANDLE_SVG}),el('span',{},'Layout')),
         el('label',{class:'reorg-grid'},'Grid',
           el('select',{'aria-label':'Layout grid spacing',onchange:e=>setLayoutGridSize(e.target.value)},
             ...LAYOUT_GRIDS.map(([size,name])=>el('option',{value:String(size)},name+' · '+size+' px')))),
-        el('button',{type:'button','data-reorg':'right',onclick:selectRightPanels},'Select right panels'),
-        el('button',{type:'button','data-reorg':'all',onclick:()=>selectPanels(visiblePanelKeys())},'Select all'),
+        el('button',{type:'button',class:'reorg-minimize',onclick:()=>{reorgToolbarMinimized=!reorgToolbarMinimized;renderReorgBanner();}}),
+        el('button',{type:'button',class:'reorg-done',onclick:toggleReorganize},'Done')),
+      el('div',{class:'reorg-actions'},
+        el('button',{type:'button','data-reorg':'right',onclick:selectRightPanels},'Right panels'),
+        el('button',{type:'button','data-reorg':'all',onclick:()=>selectPanels(visiblePanelKeys())},'All'),
         el('button',{type:'button','data-reorg':'clear',onclick:()=>selectPanels([])},'Clear'),
         el('span',{class:'reorg-count',role:'status'}),
-        el('button',{type:'button','data-reorg':'export',onclick:exportPanelLayout},'Export layout'),
-        el('button',{type:'button',class:'reorg-done',onclick:toggleReorganize},'Done')));
+        el('button',{type:'button','data-reorg':'export',onclick:exportPanelLayout},'Export')));
     document.body.append(banner);
+    cleanupReorgToolbar=makeReorgToolbarMovable(banner);
   }
+  banner.classList.toggle('is-minimized',reorgToolbarMinimized);
+  banner.querySelector('.reorg-grid').hidden=reorgToolbarMinimized;
+  banner.querySelector('.reorg-actions').hidden=reorgToolbarMinimized;
+  const minimize=banner.querySelector('.reorg-minimize'),label=reorgToolbarMinimized?'Expand layout toolbar':'Minimize layout toolbar';
+  minimize.textContent=reorgToolbarMinimized?'+':'−';
+  minimize.setAttribute('aria-label',label);minimize.title=label;
+  minimize.setAttribute('aria-expanded',String(!reorgToolbarMinimized));
+  if(reorgToolbarPosition)positionReorgToolbar(banner,reorgToolbarPosition.x,reorgToolbarPosition.y);
   const count=selectedPanelKeys().length;
   const grid=layoutGridSize();
   UI.canvas.style.setProperty('--layout-grid-size',grid+'px');

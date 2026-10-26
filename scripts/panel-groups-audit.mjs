@@ -17,6 +17,12 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const defaultShot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
   await fs.writeFile(path.join(out,'default-panels.png'),Buffer.from(defaultShot.data,'base64'));
   const rect=selector=>run(`(()=>{const r=document.querySelector('${selector}').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};})()`);
+  const drag=async(x,y,dx,dy)=>{
+    await call('Input.dispatchMouseEvent',{type:'mouseMoved',x,y},review.sessionId);
+    await call('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',buttons:1,clickCount:1},review.sessionId);
+    await call('Input.dispatchMouseEvent',{type:'mouseMoved',x:x+dx,y:y+dy,buttons:1},review.sessionId);
+    await call('Input.dispatchMouseEvent',{type:'mouseReleased',x:x+dx,y:y+dy,button:'left',buttons:0,clickCount:1},review.sessionId);
+  };
   const board=await rect('.board');
   await run("document.querySelector('[aria-label=Settings]').click();[...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Layout').click();document.querySelector('.reorg-toggle-btn').click()");
   const frozen=await nativeBoxes();
@@ -29,6 +35,33 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     const image=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
     await fs.writeFile(path.join(out,'layout-grid-'+spacing+'.png'),Buffer.from(image.data,'base64'));
   }
+  const toolbar=await rect('.reorg-banner');assert.ok(toolbar.width<420&&toolbar.height<85,JSON.stringify(toolbar));
+  let toolbarGrip=await rect('.reorg-drag');
+  await drag(toolbarGrip.x+10,toolbarGrip.y+10,80-toolbar.x,120-toolbar.y);
+  let floating=await rect('.reorg-banner');near(floating.x,80);near(floating.y,120);
+  assert.deepEqual(await nativeBoxes(),frozen,'Moving the toolbar must preserve panels');
+  await run("document.querySelector('.reorg-minimize').click()");
+  const minimized=await rect('.reorg-banner');assert.ok(minimized.width<200&&minimized.height<50);
+  assert.equal(await run("getComputedStyle(document.querySelector('.reorg-actions')).display"),'none');
+  assert.equal(await run("getComputedStyle(document.querySelector('.reorg-done')).display==='none'"),false);
+  toolbarGrip=await rect('.reorg-drag');
+  await drag(toolbarGrip.x+10,toolbarGrip.y+10,1910-minimized.width-minimized.x,900-minimized.height-minimized.y);
+  await run("document.querySelector('.reorg-minimize').click()");
+  for(const [width,height]of [[1366,768],[390,844],[320,568],[1919,919]]){
+    await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(150);
+    floating=await rect('.reorg-banner');
+    assert.ok(floating.x>=0&&floating.y>=0&&floating.x+floating.width<=width&&floating.y+floating.height<=height,JSON.stringify(floating));
+    if(width===390){
+      const image=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
+      await fs.writeFile(path.join(out,'layout-toolbar-mobile.png'),Buffer.from(image.data,'base64'));
+    }
+  }
+  const toolbarShot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
+  await fs.writeFile(path.join(out,'layout-toolbar-moved.png'),Buffer.from(toolbarShot.data,'base64'));
+  assert.deepEqual(await nativeBoxes(),frozen);
+  // Keep the floating toolbar away from the panel grips exercised below.
+  toolbarGrip=await rect('.reorg-drag');floating=await rect('.reorg-banner');
+  await drag(toolbarGrip.x+10,toolbarGrip.y+10,16-floating.x,90-floating.y);
   await run("document.querySelector('[data-reorg=right]').click()");
   const start=await run("import('./analysis.js').then(m=>({layout:structuredClone(m.S.layout),keys:[...document.querySelectorAll('.mod.panel-selected')].map(n=>n.dataset.mod)}))");
   assert.ok(start.keys.includes('moves')&&start.keys.includes('engine')&&!start.keys.includes('board'));
@@ -36,12 +69,6 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const boxes=start.keys.map(key=>start.layout[key]),left=Math.min(...boxes.map(b=>b.x)),top=Math.min(...boxes.map(b=>b.y)),engine=start.layout.engine;
   const grip=await rect('[data-mod=engine] .mod-resize.se'),x=grip.x+grip.width/2,y=grip.y+grip.height/2;
   const dx=-(engine.x+engine.w-left)*.2,dy=-(engine.y+engine.h-top)*.2;
-  const drag=async(x,y,dx,dy)=>{
-    await call('Input.dispatchMouseEvent',{type:'mouseMoved',x,y},review.sessionId);
-    await call('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',buttons:1,clickCount:1},review.sessionId);
-    await call('Input.dispatchMouseEvent',{type:'mouseMoved',x:x+dx,y:y+dy,buttons:1},review.sessionId);
-    await call('Input.dispatchMouseEvent',{type:'mouseReleased',x:x+dx,y:y+dy,button:'left',buttons:0,clickCount:1},review.sessionId);
-  };
   await drag(x,y,dx,dy);await sleep(100);
   let changed=await run("import('./analysis.js').then(m=>structuredClone(m.S.layout))");
   for(const key of start.keys){near(changed[key].w,start.layout[key].w*.8);near(changed[key].h,start.layout[key].h*.8);assert.ok(Math.abs(changed[key].scale-(start.layout[key].scale||1)*.8)<.001);}
