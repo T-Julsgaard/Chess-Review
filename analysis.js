@@ -3086,7 +3086,7 @@ async function requestLiveEval() {
       const node = v.positions[i];
       const terminal = variationTerminal(v, i);
       const res = terminal ? { score: terminal, bestmove: null, pv: "", lines: [] }
-        : await eng.analyse(node.fen, S.settings.engineDepth, S.settings.engineLines, variationSearchHistory(v, i), preview => {
+        : await eng.analyse(node.fen, S.settings.engineDepth, enginePanelLineCount(), variationSearchHistory(v, i), preview => {
           if (!valid()) return;
           node.searchPreview = preview; node.searchPreviewToken = token;
           refreshVariation();
@@ -5074,10 +5074,29 @@ function renderMoves() {
 }
 
 /* ---------------- Engine lines ---------------- */
+function enginePanelLineLimit() {
+  return panelDesign('engine', S.settings) === 'minimal' ? 3 : ENGINE_MAX_LINES;
+}
+function enginePanelLineCount() {
+  return Math.max(1, Math.min(enginePanelLineLimit(), S.settings.engineLines));
+}
 // Focus and Minimal share variation controls; Minimal moves playback into the header.
 function focusedEnginePanel(content, {locked = false, playable = false} = {}) {
   const name = activeEngineName();
   const minimal = panelDesign('engine', S.settings) === 'minimal';
+  const count = enginePanelLineCount();
+  const lineControl = (delta, label) => el('button', {
+    type: 'button', class: delta > 0 ? 'engine-minimal-add' : 'engine-minimal-remove',
+    disabled: locked || (delta > 0 ? !playable : S.blank),
+    'aria-label': delta > 0 ? 'Add another engine line' : 'Remove the last engine line',
+    onclick: async e => {
+      e.currentTarget.disabled = true;
+      await setEngineSetting('engineLines', Math.max(1, Math.min(enginePanelLineLimit(), enginePanelLineCount() + delta)));
+      const target = UI.engine.querySelector(delta > 0 ? '.engine-minimal-add' : '.engine-minimal-remove')
+        || UI.engine.querySelector('.engine-minimal-controls button');
+      target?.focus({preventScroll: true});
+    },
+  }, label);
   const play = el('button', {type: 'button', class: 'engine-focus-play' + (S.bestWalking ? ' on' : ''),
     disabled: locked || !playable && !S.bestWalking,
     title: S.bestWalking ? 'Stop playing best moves' : 'Play best moves from here. The engine searches each position; stop at any time.',
@@ -5090,18 +5109,9 @@ function focusedEnginePanel(content, {locked = false, playable = false} = {}) {
         locked ? 'Practice' : minimal ? 'Depth ' + S.settings.engineDepth : name + ' · depth ' + S.settings.engineDepth),
       minimal ? play : null),
     el('div', {class: 'panel-body engine-body'}, content,
-      minimal && S.settings.engineLines < ENGINE_MAX_LINES ? el('button', {
-        type: 'button', class: 'engine-minimal-add', disabled: locked || !playable,
-        'aria-label': 'Add another engine line',
-        onclick: async e => {
-          e.currentTarget.disabled = true;
-          await setEngineSetting('engineLines', Math.min(ENGINE_MAX_LINES, S.settings.engineLines + 1));
-          const target = UI.engine.querySelector('.engine-minimal-add')
-            || [...UI.engine.querySelectorAll('.engine-focus-candidate')].at(-1)
-            || UI.engine.querySelector('.engine-focus-play');
-          target?.focus({preventScroll: true});
-        },
-      }, '+ Add line') : null),
+      minimal ? el('div', {class: 'engine-minimal-controls'},
+        count > 1 ? lineControl(-1, '− Remove line') : null,
+        count < enginePanelLineLimit() ? lineControl(1, '+ Add line') : null) : null),
     minimal ? null : el('div', {class: 'engine-focus-foot'}, play));
   UI.engine.replaceChildren(panel);
   fitEnginePanel();
@@ -5150,7 +5160,8 @@ function renderEngineCurrent() {
     if (panelReady && (!lines || panel.lines.length > lines.length)) lines = panel.lines;
     // While the richer search for THIS position is still pending, keep the previous render's extra
     // lines on screen so the panel doesn't shrink to one line then grow back on every move.
-    const padFromCache = S.settings.engineLines > 1 && !panelReady && !!lines && lines.length < S.settings.engineLines;
+    const want = enginePanelLineCount();
+    const padFromCache = want > 1 && !panelReady && !!lines && lines.length < want;
     renderEngine(lines, padFromCache);
     requestPanelLines();
   }
@@ -5159,7 +5170,7 @@ function renderEngineCurrent() {
 // panel candidate lines beyond the single line the batch stored. Cheap: it only runs for the
 // position currently shown, is cancelled when you navigate away, and no-ops when 1 line is enough.
 const panelLineCache = new Map();
-function panelContextKey(i = S.idx, want = S.settings.engineLines) {
+function panelContextKey(i = S.idx, want = enginePanelLineCount()) {
   return JSON.stringify([S.positions[i]?.fen, searchHistory(S.positions, i),
     S.settings.enginePath, S.engineFallbackBuild || S.activeEngineBuild || S.settings.enginePath,
     S.settings.engineDepth, S.settings.engineHash, S.settings.engineSkill, want]);
@@ -5172,7 +5183,7 @@ function cachedPanelLines() {
 }
 async function requestPanelLines() {
   if (S.analyzing || S.analysisMode) return;          // not during the batch, not in variation mode
-  const want = S.settings.engineLines;
+  const want = enginePanelLineCount();
   if (!want || want <= 1 && !S._panelNeedsLive) {
     if (S._panelRequest) { S.panelToken++; S._panelRequest = null; S.liveEngine?.cancelPending(); S.liveEngine?.stop(); }
     return;
@@ -5231,7 +5242,7 @@ function renderEngine(lines, padFromCache = false) {
   const historyKey = JSON.stringify(activeSearchHistory());
   const configKey = JSON.stringify([S.settings.enginePath, S.activeEngineBuild, S.engineFallbackBuild,
     S.settings.engineDepth, S.settings.engineHash, S.settings.engineSkill, S.settings.classifyLines]);
-  const want = S.settings.engineLines;
+  const want = enginePanelLineCount();
   // The last full set of real lines we rendered, kept (with the fen they were computed for, so the
   // SAN stays correct) to fill slots that the new position hasn't searched yet — and to hold the
   // panel steady while the engine re-computes (lines === null, e.g. "Play best moves from here").
@@ -5645,10 +5656,11 @@ function toggleRow(label, key, onSet = setSetting, info) {
 }
 // Engine segment/slider: changing it saves + triggers re-analysis (scheduleReanalyze via setEngineSetting).
 function engineSeg(label, key, options, fmt, info) {
+  const selected = key === 'engineLines' ? enginePanelLineCount() : S.settings[key];
   return el("div", { class: "set-row" },
     setLabel(label, info),
     el("div", { class: "set-seg" },
-      ...options.map((o) => el("button", { type:"button", "data-setting":key, "data-value":String(o), class: S.settings[key] === o ? "on" : "", onclick: () => setEngineSetting(key, o) }, fmt ? fmt(o) : String(o)))),
+      ...options.map((o) => el("button", { type:"button", "data-setting":key, "data-value":String(o), class: selected === o ? "on" : "", onclick: () => setEngineSetting(key, o) }, fmt ? fmt(o) : String(o)))),
   );
 }
 function engineSlider(label, key, min, max, step, opts = {}) {
@@ -5936,7 +5948,7 @@ function motorSettings() {
       engineSeg("Analysis lines", "classifyLines", [1, 2, 3, 4], null, ENGINE_INFO.classifyLines),
       engineSlider("Depth", "engineDepth", 8, 22, 1, { info: ENGINE_INFO.engineDepth }),
       engineSlider("Workers", "engineWorkers", 1, 8, 1, { fmt: (v) => v + (v === 1 ? " (single)" : " parallel"), info: ENGINE_INFO.engineWorkers }),
-      engineSeg("Panel lines", "engineLines", [1, 2, 3, 4], null, ENGINE_INFO.engineLines),
+      engineSeg("Panel lines", "engineLines", Array.from({length: enginePanelLineLimit()}, (_, i) => i + 1), null, ENGINE_INFO.engineLines),
       el("div", { class: "set-row hint" },
         el("span", { class: "set-note" }, "Additional analysis lines provide alternatives for move annotations. Calibrated SF18 numerical scores require 1 analysis line. Panel lines are searched live as you reach each move.")),
     ),
@@ -6293,6 +6305,7 @@ function calibrationWarning(title, message, remainLabel, recommended = false) {
   return calibrationWarningPending;
 }
 async function setEngineSetting(key, value) {
+  if (key === 'engineLines') value = Math.max(1, Math.min(enginePanelLineLimit(), value));
   if (S.settings[key] === value) return;
   if (key === "enginePath" && value === "sf19lite") {
     const proceed = await calibrationWarning("Switch to Stockfish 19 Lite?",

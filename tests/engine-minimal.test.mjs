@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {app, loadGame, settle} from './helpers/app.mjs';
 
-test('Add line starts below one candidate, adds exactly one per press, saves and stops at four without changing the review', async t => {
+test('line controls add up to three candidates, remove back to one, and save without changing the review', async t => {
   const a=app(t),doc=a.dom.window.document;
   loadGame(a,'1. e4 e5 2. Nf3 Nc6');
   a.call('computeDerived');a.call('buildUI');
@@ -16,15 +16,45 @@ test('Add line starts below one candidate, adds exactly one per press, saves and
   a.call('renderEngineCurrent');
   const before=JSON.stringify({positions:a.state.positions,evals:a.state.evals,bests:a.state.bests,idx:a.state.idx,layout:a.state.layout});
   assert.equal(doc.querySelectorAll('.engine-focus-candidate').length,1);
-  assert.equal(doc.querySelector('.engine-minimal-add').previousElementSibling.className,'engine-candidates');
-  for(const count of [2,3,4]) {
+  assert.equal(doc.querySelector('.engine-minimal-controls').previousElementSibling.className,'engine-candidates');
+  assert.equal(doc.querySelector('.engine-minimal-remove'),null);
+  for(const count of [2,3]) {
     doc.querySelector('.engine-minimal-add').click();await settle();await a.run('_settingsWriteQueue');
     assert.equal(doc.querySelectorAll('.engine-focus-candidate').length,count);
     assert.equal(a.store.settings.engineLines,count);
-    assert.equal(doc.activeElement,doc.querySelector('.engine-minimal-add')||[...doc.querySelectorAll('.engine-focus-candidate')].at(-1));
+    assert.equal(doc.activeElement,doc.querySelector('.engine-minimal-add')||doc.querySelector('.engine-minimal-remove'));
     assert.equal(JSON.stringify({positions:a.state.positions,evals:a.state.evals,bests:a.state.bests,idx:a.state.idx,layout:a.state.layout}),before);
   }
   assert.equal(doc.querySelector('.engine-minimal-add'),null);
+  for(const count of [2,1]) {
+    doc.querySelector('.engine-minimal-remove').click();await settle();await a.run('_settingsWriteQueue');
+    assert.equal(doc.querySelectorAll('.engine-focus-candidate').length,count);
+    assert.equal(a.store.settings.engineLines,count);
+    assert.equal(doc.activeElement,doc.querySelector('.engine-minimal-remove')||doc.querySelector('.engine-minimal-add'));
+    assert.equal(JSON.stringify({positions:a.state.positions,evals:a.state.evals,bests:a.state.bests,idx:a.state.idx,layout:a.state.layout}),before);
+  }
+  assert.equal(doc.querySelector('.engine-minimal-remove'),null);
+});
+
+test('Minimal caps saved four-line preferences and searches at three; Focus still supports four', async t => {
+  const a=app(t),doc=a.dom.window.document;
+  loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');
+  Object.assign(a.state.settings,{engineDesign:'minimal',engineLines:4});
+  const line={score:{cp:42},pv:'e2e4 e7e5'};
+  a.state.bests[0].lines=[line];
+  let searched;
+  a.replace('ensureLiveEngine',async()=>({cancelPending(){},stop(){},async analyse(fen,depth,count){searched=count;return {lines:[line,line,line]};}}));
+  await a.call('requestPanelLines');
+  assert.equal(searched,3);
+  assert.equal(doc.querySelectorAll('.engine-focus-candidate').length,3);
+  assert.equal(doc.querySelector('.engine-minimal-add'),null);
+  const controls=a.call('engineSeg','Panel lines','engineLines',[1,2,3]);
+  assert.equal(controls.querySelector('.on').dataset.value,'3');
+  await a.call('setEngineSetting','engineLines',4);
+  assert.equal(a.state.settings.engineLines,3);
+  a.state.settings.engineDesign='focus';a.state.settings.engineLines=4;
+  a.call('renderEngine',[line,line,line,line]);
+  assert.equal(doc.querySelectorAll('.engine-focus-candidate').length,4);
 });
 
 test('Add line cannot reveal answers during practice or act on loading, final and error states', t => {
@@ -41,6 +71,10 @@ test('Add line cannot reveal answers during practice or act on loading, final an
   assert.equal(doc.querySelector('.engine-minimal-add').disabled,true);
   doc.querySelector('.engine-minimal-add').click();
   assert.equal(a.state.settings.engineLines,1);
+  a.state.settings.engineLines=3;a.call('renderEnginePractice');
+  assert.equal(doc.querySelector('.engine-minimal-remove').disabled,true);
+  doc.querySelector('.engine-minimal-remove').click();
+  assert.equal(a.state.settings.engineLines,3);
 });
 
 test('existing Modern defaults upgrade once, retaining saved geometry and later individual choices', async t => {

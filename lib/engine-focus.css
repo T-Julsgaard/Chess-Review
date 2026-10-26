@@ -58,39 +58,50 @@
 
 /* Top-aligned candidates with a quiet, inline action to request another line. */
 .stage .mod[data-mod="engine"] .engine-minimal .engine-focus-head {
-  height:30px; box-sizing:border-box; padding:3px 8px; gap:8px;
+  height:32px; box-sizing:border-box; padding:2px 8px; gap:8px;
 }
 .stage .mod[data-mod="engine"] .engine-minimal .engine-focus-head h3 {
-  font-size:10px; letter-spacing:.08em;
+  font-size:11.5px; letter-spacing:.08em;
 }
-.stage .mod[data-mod="engine"] .engine-minimal .count { font-size:10px; }
+.stage .mod[data-mod="engine"] .engine-minimal .count { font-size:11.5px; }
 .stage .mod[data-mod="engine"] .engine-minimal .engine-focus-play {
-  flex:none; width:24px; min-height:22px; height:22px; padding:0;
-  border:0; border-radius:4px; background:transparent; color:var(--ink-2); font-size:10px;
+  flex:none; width:28px; min-height:26px; height:26px; padding:0;
+  border:1px solid color-mix(in oklab,var(--q-best) 50%,transparent); border-radius:6px;
+  background:color-mix(in oklab,var(--q-best) 18%,var(--panel)); color:var(--q-best); font-size:12px;
 }
-.stage .mod[data-mod="engine"] .engine-minimal .engine-focus-play:hover { background:var(--panel-2); color:var(--ink); }
-.stage .mod[data-mod="engine"] .engine-minimal .engine-focus-play.on { color:var(--q-blunder); }
+.stage .mod[data-mod="engine"] .engine-minimal .engine-focus-play:hover:not(:disabled) {
+  background:var(--q-best); border-color:var(--q-best); color:#14200c;
+  box-shadow:0 0 10px color-mix(in oklab,var(--q-best) 20%,transparent);
+}
+.stage .mod[data-mod="engine"] .engine-minimal .engine-focus-play.on {
+  color:var(--q-blunder); border-color:color-mix(in oklab,var(--q-blunder) 50%,transparent);
+  background:color-mix(in oklab,var(--q-blunder) 15%,var(--panel));
+}
+.stage .mod[data-mod="engine"] .engine-minimal .engine-focus-play.on:hover:not(:disabled) {
+  background:var(--q-blunder); border-color:var(--q-blunder); color:#fff; box-shadow:none;
+}
 .stage .mod[data-mod="engine"] .engine-minimal .engine-body {
-  height:auto; padding:4px 8px; justify-content:flex-start; gap:4px; overflow:hidden;
+  height:auto; padding:2px 8px; justify-content:flex-start; gap:2px; overflow:hidden;
 }
-.engine-minimal-add {
-  display:flex; align-items:center; justify-content:center; flex:none;
-  width:100%; height:18px; min-height:18px; box-sizing:border-box; padding:1px 4px;
-  border:0; border-radius:4px; background:transparent; color:var(--ink-3);
-  font:500 10px/14px var(--font-ui); cursor:pointer;
+.engine-minimal-controls { display:flex; flex:none; gap:6px; height:22px; }
+.engine-minimal-add, .engine-minimal-remove {
+  display:flex; align-items:center; justify-content:center;
+  flex:1; min-width:0; height:22px; box-sizing:border-box; padding:1px 4px;
+  border:1px solid var(--line-soft); border-radius:4px; background:var(--panel-2); color:var(--ink-2);
+  font:600 12px/18px var(--font-ui); cursor:pointer;
 }
-.engine-minimal-add:hover { background:var(--panel-2); color:var(--ink); }
+.engine-minimal-controls button:hover:not(:disabled) { border-color:var(--line); color:var(--ink); }
 .engine-minimal .engine-focus-candidate {
-  grid-template-columns:44px minmax(0,1fr); gap:8px;
+  grid-template-columns:48px minmax(0,1fr); gap:8px;
   height:22px; min-height:22px; padding:0; border:0; border-radius:4px;
 }
 .engine-minimal .engine-focus-eval {
   padding:0 3px; background:transparent; color:var(--ink); box-shadow:none;
-  text-align:left; font-size:11px; line-height:22px;
+  text-align:left; font-size:13.5px; line-height:22px;
 }
 .engine-minimal .engine-focus-variation {
   display:block; max-height:none; overflow:hidden; text-overflow:ellipsis;
-  white-space:nowrap; font-size:11px; line-height:22px;
+  white-space:nowrap; font-size:13px; line-height:22px;
 }
-.engine-minimal .engine-focus-pending { min-height:22px; padding:0; font-size:10px; line-height:22px; }
-.engine-minimal .engine-empty { padding:0; font-size:11px; line-height:1.4; }
+.engine-minimal .engine-focus-pending { min-height:22px; padding:0; font-size:12px; line-height:22px; }
+.engine-minimal .engine-empty { padding:0; font-size:12px; line-height:1.4; }
