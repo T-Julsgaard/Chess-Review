@@ -206,7 +206,9 @@
 .stage.learning-active { position: relative; }
 .learning-active > .mod, .learning-active > .side .mod { visibility: hidden; }
 .has-learning > .feedback-floating { visibility: hidden; }
-.learn-board-placeholder { width: 100%; aspect-ratio: 1; flex: 1; }
+.learn-board-placeholder { min-width: 0; }
+.learn-board-anchor { flex: 1; aspect-ratio: 1; min-width: 0; }
+.stage:is(.canvas,.full-hd-reference) .learn-board-anchor { flex: 0 1 auto; height: 100%; width: auto; max-width: 100%; margin: auto; }
 .learning-workspace.learning-embedded { position: absolute; inset: 0; z-index: 30; overflow: visible; background: transparent; animation: none; pointer-events: none; }
 .learning-embedded .learn-board-dock { position: absolute; left: var(--learn-board-x); top: var(--learn-board-y); width: var(--learn-board-size); pointer-events: auto; }
 .learning-embedded .board-wrap { width: 100%; height: var(--learn-board-size); display: block; }
