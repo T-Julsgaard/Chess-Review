@@ -4599,16 +4599,18 @@ function graphPositionText(ply) {
   return `${Math.ceil(ply / 2)}${ply % 2 ? '.' : '…'} ${S.positions[ply]?.san || ''}`.trim();
 }
 function updateGraphReadout(refs) {
-  if (!refs.readout) return;
+  if (!refs.chart) return;
   const e = S.evals[S.idx], cp = e == null ? null : scoreToCp(e);
   const rounded = cp == null ? null : Math.abs(cp / 100).toFixed(1);
   const side = cp > 0 ? 'White' : 'Black';
   const label = e == null ? (S.blank ? 'Load a game' : 'Calculating…')
     : e.mate != null ? `${side} mates` : rounded === '0.0' ? 'Equal position' : `${side} ahead`;
-  refs.readout.textContent = e == null ? '—' : e.mate != null ? 'M' + Math.abs(e.mate) : rounded === '0.0' ? '0.0' : evalText(e);
-  refs.readout.dataset.side = cp == null || rounded === '0.0' && e.mate == null ? 'equal' : cp > 0 ? 'white' : 'black';
-  refs.verdict.textContent = label;
-  refs.move.textContent = S.blank ? 'Game overview' : graphPositionText(S.idx);
+  if (refs.readout) {
+    refs.readout.textContent = e == null ? '—' : e.mate != null ? 'M' + Math.abs(e.mate) : rounded === '0.0' ? '0.0' : evalText(e);
+    refs.readout.dataset.side = cp == null || rounded === '0.0' && e.mate == null ? 'equal' : cp > 0 ? 'white' : 'black';
+    refs.verdict.textContent = label;
+    refs.move.textContent = S.blank ? 'Game overview' : graphPositionText(S.idx);
+  }
   const description = e == null ? label : e.mate != null ? `${side} has mate in ${Math.abs(e.mate)}`
     : rounded === '0.0' ? label : `${side} is ahead by ${rounded} pawns`;
   refs.chart.setAttribute('aria-valuenow', Math.min(S.idx, refs.lastPly));
@@ -4623,7 +4625,7 @@ function renderGraph() {
   const mod = UI.graph.closest(".mod");
   if (mod) mod.hidden = !show;   // hidden, not just emptied, so the layout closes the gap
   if (!show) { UI.graph.replaceChildren(); UI.graphRefs = null; return; }
-  const design = panelDesign('graph', S.settings), modern = design !== 'original';
+  const design = panelDesign('graph', S.settings), modern = design !== 'original', compact = design === 'minimal';
   const W = 384, H = 120, mid = H / 2;
   const maxPly = Math.max(1, S.total);
   const toX = (p) => design === 'bars' ? ((p + .5) / (maxPly + 1)) * W : (p / maxPly) * W;
@@ -4697,7 +4699,15 @@ function renderGraph() {
   // Hover marker: a vertical guide + a dot that rides the curve, both hidden until the mouse enters.
   if (modern) {
     const guides = `<line x1="0" y1="${mid}" x2="${W}" y2="${mid}" class="evaluation-zero"/>`;
-    if (design === 'timeline') {
+    if (compact) {
+      // White grows downward as its advantage increases. Leave the unanalyzed suffix empty.
+      const boundary = pts.length ? 'M' + pts.map(p => `${toX(p.ply).toFixed(1)},${toYc(p.cp).toFixed(1)}`).join(' L') : '';
+      const end = pts.length ? toX(pts[pts.length - 1].ply).toFixed(1) : 0;
+      inner = boundary
+        ? `<path class="evaluation-field-white" d="${boundary} L${end},0 L0,0 Z" fill="#fff"/>`
+          + `<path class="evaluation-field-black" d="${boundary} L${end},${H} L0,${H} Z" fill="#000"/>` + marker
+        : marker;
+    } else if (design === 'timeline') {
       inner = guides + (fill ? `<path d="${fill}" class="evaluation-area"/>` : '')
         + (line ? `<path d="${line}" class="evaluation-curve" vector-effect="non-scaling-stroke"/>` : '')
         + dotsSvg + marker;
@@ -4710,7 +4720,7 @@ function renderGraph() {
       }).join('') + guides + marker;
     }
   }
-  const hoverY = !modern && style === "color" ? toYc : toY;
+  const hoverY = compact || !modern && style === "color" ? toYc : toY;
   const hover = `<g class="eval-hover" style="display:none"><line class="eval-hover-line" x1="0" y1="0" x2="0" y2="${H}" vector-effect="non-scaling-stroke"/><circle class="eval-hover-dot" cx="0" cy="0" r="4.7"/></g>`;
   const svg = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${inner}${hover}</svg>`;
   // Map a pointer event to the nearest plotted ply (0..last ply that has an eval).
@@ -4767,6 +4777,14 @@ function renderGraph() {
       'aria-label': 'Game evaluation. Use arrow keys to explore moves.', 'aria-valuemin': 0, 'aria-valuemax': lastPly,
       title: 'Click a move to explore · Arrow keys to step · Scores favor White (+) or Black (−)',
       onclick: jumpFromEvent, onmousemove: hoverMove, onmouseleave: hideHover, onblur: hideHover, onkeydown: onkey});
+    if (compact) {
+      UI.graph.replaceChildren(el('div', {class: 'panel eval-side evaluation-panel evaluation-minimal', 'data-design': design, 'aria-label': 'Evaluation'},
+        chart, !pts.length ? el('span', {class: 'evaluation-empty'}, S.blank ? 'Load a game to see its evaluation' : 'Waiting for analysis…') : null));
+      UI.graphRefs = {key:graphKey, marker:chart.querySelector('.eval-position'), chart, lastPly};
+      updateGraphReadout(UI.graphRefs);
+      if (restoreFocus) chart.focus({preventScroll: true});
+      return;
+    }
     const move = el('span', {class: 'evaluation-move'}), verdict = el('span', {class: 'evaluation-verdict'});
     const readout = el('strong', {class: 'evaluation-score', title: 'Positive favors White; negative favors Black. M means mate.'});
     const step = (label, delta) => el('button', {type: 'button', 'aria-label': label, onclick: () => gotoMainline(Math.max(0,Math.min(lastPly,S.idx + delta)))}, delta < 0 ? '‹' : '›');

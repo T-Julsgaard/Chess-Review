@@ -1,4 +1,4 @@
-/* Two compact, responsive views of the same White-relative evaluation history. */
+/* Responsive views of the same White-relative evaluation history. */
 .stage .evaluation-panel {
   display: flex; flex-direction: column; height: 100%; min-height: 0;
   padding: 12px 13px 7px; gap: 8px; overflow: hidden; container: evaluation / inline-size;
@@ -39,6 +39,19 @@
 .evaluation-steps button:disabled { opacity: .3; cursor: default; }
 .evaluation-empty { position: absolute; inset: 0 0 0 30px; display: grid; place-items: center;
   pointer-events: none; font-size: 11px; color: var(--ink-3); text-align: center; }
+/* A short, edge-to-edge graph. Its saved module can still be stretched horizontally. */
+.stage .evaluation-panel.evaluation-minimal {
+  position: relative; padding: 0; gap: 0; max-height: 96px; border-color: #000;
+}
+.evaluation-minimal .evalgraph { border-radius: inherit; overflow: hidden; }
+.evaluation-minimal .evalgraph.clickable-graph:hover svg { filter: none; }
+.evaluation-minimal .eval-position, .evaluation-minimal .eval-hover-line {
+  stroke: #fff; stroke-width: 1; opacity: 1;
+  filter: drop-shadow(1px 0 0 #000) drop-shadow(-1px 0 0 #000);
+}
+.evaluation-minimal .eval-hover-dot { fill: #fff; stroke: #000; }
+.evaluation-minimal .evalgraph:focus-visible { outline: 2px solid #fff; outline-offset: -3px; }
+.evaluation-minimal .evaluation-empty { inset: 0; padding: 6px; }
 @container evaluation (max-width: 215px) {
   .evaluation-hint { display: none; }
   .evaluation-heading h3 { font-size: 12px; }

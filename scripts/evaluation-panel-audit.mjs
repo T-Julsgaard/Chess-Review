@@ -22,14 +22,18 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const evidence=[];
   for (const [width,height] of [[1920,1080],[1366,768],[1280,600],[390,844],[320,640]]) {
     await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId); await sleep(160);
-    for (const design of ['timeline','bars','original']) {
+    for (const design of ['timeline','bars','minimal','original']) {
       const before = await run("import('./analysis.js').then(m=>JSON.stringify({idx:m.S.idx,evals:m.S.evals,bests:m.S.bests,layout:m.S.layout}))");
       await choose(design);
       assert.equal(await run("import('./analysis.js').then(m=>JSON.stringify({idx:m.S.idx,evals:m.S.evals,bests:m.S.bests,layout:m.S.layout}))"),before);
       if (design === 'original') continue;
-      const fit = await run("(()=>{const p=document.querySelector('.evaluation-panel'),q=p.getBoundingClientRect(),f=p.querySelector('.evaluation-footer').getBoundingClientRect(),s=p.querySelector('.evalgraph').getBoundingClientRect();return {overflow:p.scrollWidth-p.clientWidth,vertical:p.scrollHeight-p.clientHeight,footer:f.bottom<=q.bottom+1,plot:s.height,page:document.documentElement.scrollWidth-innerWidth,columns:p.querySelectorAll('.evaluation-column').length}})()");
+      const fit = await run("(()=>{const p=document.querySelector('.evaluation-panel'),q=p.getBoundingClientRect(),f=p.querySelector('.evaluation-footer')?.getBoundingClientRect(),s=p.querySelector('.evalgraph').getBoundingClientRect();return {overflow:p.scrollWidth-p.clientWidth,vertical:p.scrollHeight-p.clientHeight,footer:!f||f.bottom<=q.bottom+1,plot:s.height,height:p.offsetHeight,page:document.documentElement.scrollWidth-innerWidth,columns:p.querySelectorAll('.evaluation-column').length}})()");
       assert.ok(fit.overflow<=1&&fit.vertical<=1&&fit.footer&&fit.plot>=19&&fit.page<=1,JSON.stringify({width,height,design,fit}));
       if (design==='bars') assert.ok(fit.columns>25);
+      if (design==='minimal') {
+        assert.ok(fit.height<=96,JSON.stringify(fit));
+        assert.equal(await run("document.querySelector('.evaluation-minimal').textContent"),'');
+      }
       await shot(`evaluation-${design}-${width}`,'#graphMount .panel');
       if (width===1920) await shot('evaluation-'+design+'-desktop');
       evidence.push({width,height,design,...fit});
@@ -37,7 +41,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   }
   await call('Emulation.setDeviceMetricsOverride',{width:1920,height:1080,deviceScaleFactor:1,mobile:false},review.sessionId);
   await sleep(200);
-  for (const design of ['timeline','bars']) {
+  for (const design of ['timeline','bars','minimal']) {
     await choose(design);
     await run("document.querySelector('.evaluation-panel [role=slider]').focus()");
     await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Home',code:'Home'},review.sessionId);
@@ -52,7 +56,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await call('Page.reload',{},review.sessionId);
     await waitFor(review,`document.querySelector('.evaluation-panel')?.dataset.design==='${design}'&&!document.querySelector('#startup')&&import('./analysis.js').then(m=>!m.S.analyzing)`,'Restored '+design);
   }
-  await choose('timeline'); await settings(); await shot('evaluation-design-settings','#settings');
+  await choose('minimal'); await settings(); await shot('evaluation-design-settings','#settings');
   await fs.writeFile(path.join(out,'evaluation-panel.json'),JSON.stringify({passed:true,evidence},null,2));
-  console.log('Both Evaluation designs: fit at five sizes, stable analysis/layout, pointer/keyboard navigation and saved choices passed. Screenshots: '+out);
+  console.log('Evaluation designs: fit at five sizes, stable analysis/layout, pointer/keyboard navigation and saved choices passed. Screenshots: '+out);
 }
