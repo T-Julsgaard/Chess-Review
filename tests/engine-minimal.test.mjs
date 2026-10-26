@@ -14,6 +14,7 @@ test('line controls add up to three candidates, remove back to one, and save wit
   a.replace('requestPanelLines',()=>{});
   a.replace('scheduleReanalyze',()=>{throw Error('Adding a panel line must not reanalyze the game');});
   a.call('renderEngineCurrent');
+  assert.equal(doc.querySelector('.engine-focus-play').hasAttribute('title'),false);
   const before=JSON.stringify({positions:a.state.positions,evals:a.state.evals,bests:a.state.bests,idx:a.state.idx,layout:a.state.layout});
   assert.equal(doc.querySelectorAll('.engine-focus-candidate').length,1);
   assert.equal(doc.querySelector('.engine-minimal-controls').previousElementSibling.className,'engine-candidates');

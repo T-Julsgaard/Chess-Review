@@ -4867,7 +4867,6 @@ function renderGraph() {
     };
     const chart = el('div', {class: 'evalgraph clickable-graph', html: svg, role: 'slider', tabindex: 0,
       'aria-label': 'Game evaluation. Use arrow keys to explore moves.', 'aria-valuemin': 0, 'aria-valuemax': lastPly,
-      title: 'Click a move to explore · Arrow keys to step · Scores favor White (+) or Black (−)',
       onclick: jumpFromEvent, onmousemove: hoverMove, onmouseleave: hideHover, onblur: hideHover, onkeydown: onkey});
     if (compact) {
       UI.graph.replaceChildren(el('div', {class: 'panel eval-side evaluation-panel evaluation-minimal', 'data-design': design, 'aria-label': 'Evaluation'},
@@ -4899,7 +4898,7 @@ function renderGraph() {
   UI.graph.replaceChildren(el("div", { class: "panel eval-side", 'data-design': design },
     el("div", { class: "panel-head" }, el("h3", {}, "Evaluation")),
     el("div", { class: "panel-body", style: { paddingTop: "8px", paddingBottom: "8px" } },
-      el("div", { class: "evalgraph clickable-graph", title: "Click to jump to a move", html: svg, onclick: jumpFromEvent, onmousemove: hoverMove, onmouseleave: hideHover })),
+      el("div", { class: "evalgraph clickable-graph", html: svg, onclick: jumpFromEvent, onmousemove: hoverMove, onmouseleave: hideHover })),
   ));
   UI.graphRefs = {key:graphKey,marker:UI.graph.querySelector(".eval-position")};
 }
@@ -5037,7 +5036,6 @@ function focusedEnginePanel(content, {locked = false, playable = false} = {}) {
   }, label);
   const play = el('button', {type: 'button', class: 'engine-focus-play' + (S.bestWalking ? ' on' : ''),
     disabled: locked || !playable && !S.bestWalking,
-    title: S.bestWalking ? 'Stop playing best moves' : 'Play best moves from here. The engine searches each position; stop at any time.',
     'aria-label': S.bestWalking ? 'Stop playing best moves' : 'Play best moves from this position',
     onclick: () => { if (S.bestWalking) { stopBestWalk(); renderControls(); renderEngineCurrent(); } else playBestMoves(); },
   }, minimal ? (S.bestWalking ? '■' : '▶') : S.bestWalking ? '■ Stop' : '▶ Play best moves from here');

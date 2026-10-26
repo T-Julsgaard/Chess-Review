@@ -57,6 +57,7 @@ for (const design of ['timeline','bars','minimal']) {
     const a = review(t), doc = a.dom.window.document;
     await a.call('setSetting','graphDesign',design);
     const chart = doc.querySelector('#graphMount [role=slider]');
+    assert.equal(chart.hasAttribute('title'), false);
     chart.getBoundingClientRect = () => ({left:0,top:0,width:400,height:120});
     const x = design === 'bars' ? (2.5 / 5) * 400 : 200;
     chart.dispatchEvent(new a.dom.window.MouseEvent('click',{clientX:x,bubbles:true}));
