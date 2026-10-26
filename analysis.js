@@ -3107,6 +3107,43 @@ function animateMove(fromName, toName, ms) {
 function evalBarText(e) {
   return evalText(e).replace("#-", "#").replace(/^[+-]/, "");
 }
+function renderBalanceBar(bar, e) {
+  if (!bar.querySelector('.eval-balance-track')) {
+    bar.replaceChildren(
+      el('span', {class: 'eval-side eval-side-black', 'aria-hidden': 'true'}, 'B'),
+      el('div', {class: 'eval-balance-track', 'aria-hidden': 'true'},
+        el('div', {class: 'white-fill', style: {height: '50%'}}),
+        el('span', {class: 'eval-midpoint'})),
+      el('span', {class: 'eval-side eval-side-white', 'aria-hidden': 'true'}, 'W'),
+      el('div', {class: 'eval-balance-readout', 'aria-hidden': 'true'},
+        el('span', {class: 'eval-balance-score'}, '…')));
+  }
+  bar.className = 'evalbar eval-balance eb-' + (S.settings.barStyle || 'classic') + (S.flipped ? ' flipped' : '');
+  bar.dataset.motion = S.settings.moveAnim === false ? 'off' : 'on';
+  bar.dataset.pending = String(e == null);
+  bar.setAttribute('role', 'img');
+  bar.setAttribute('tabindex', '0');
+  const score = bar.querySelector('.eval-balance-score');
+  let description = 'Position evaluation: calculating…';
+  if (e == null) score.textContent = '…';
+  else {
+    const cp = scoreToCp(e), side = cp >= 0 ? 'White' : 'Black';
+    const share = e.mate != null ? (cp > 0 ? 100 : 0) : 50 + Math.max(-600, Math.min(600, cp)) / 600 * 46;
+    // Use the same scale as Original. The rail shows advantage, not win probability.
+    bar.querySelector('.white-fill').style.height = share + '%';
+    bar.style.setProperty('--balance-white', share + '%');
+    const rounded = Math.abs(cp / 100).toFixed(1);
+    bar.dataset.favored = e.mate == null && rounded === '0.0' ? 'equal' : cp > 0 ? 'white' : 'black';
+    score.textContent = e.mate != null ? 'M' + Math.abs(e.mate) : (rounded === '0.0' ? '0.0' : evalText(e));
+    bar.style.setProperty('--balance-chars', score.textContent.length);
+    description = e.mate != null ? `${side} has mate in ${Math.abs(e.mate)}.`
+      : rounded === '0.0' ? 'Equal position.' : `${side} is ahead by ${rounded} pawns.`;
+    description += ' Evaluation from White’s perspective: positive favors White; negative favors Black.';
+  }
+  // Keep the previous fill during live search, but never present its score as current.
+  bar.title = description;
+  bar.setAttribute('aria-label', description);
+}
 function renderEvalBar() {
   // The eval bar is now its own movable/resizable module — render into its mount and hide the whole
   // module when the bar isn't part of the chosen eval view.
@@ -3117,6 +3154,14 @@ function renderEvalBar() {
   if (!show || !UI.evalbar) return;
   let bar = UI.evalbar.querySelector(".evalbar");
   const e = activeEval();
+  const design = panelDesign('evalbar', S.settings);
+  if (design === 'balance') {
+    if (!bar) { bar = el('div'); UI.evalbar.append(bar); }
+    bar.dataset.design = design;
+    renderBalanceBar(bar, e);
+    return;
+  }
+  if (bar?.dataset.design !== 'original') { bar?.remove(); bar = null; }
   // Reuse the existing element, so the CSS transition on .white-fill animates
   // smoothly between moves (instead of jumping). Create it (once) at a neutral 50%.
   if (!bar) {
@@ -3127,6 +3172,7 @@ function renderEvalBar() {
     );
     UI.evalbar.append(bar);
   }
+  bar.dataset.design = design;
   // Reapply the look variant on every render (so switching it in settings updates live).
   // The bar always follows the board orientation: when the player is viewing from Black's side
   // (S.flipped), the whole bar is turned upside-down so Black's share sits at the bottom — just
@@ -5746,7 +5792,7 @@ async function setSetting(key, value) {
   if (key === 'movesDesign') updateMovesDesign();
   if (key === "pieceStyle") buildBoard();
   if (key === "mlStyle" || key === "badgeStyle") renderMoves();
-  if (key === "evalView" || key === "graphStyle" || key === "barStyle") { renderEvalBar(); renderGraph(); }
+  if (key === "evalView" || key === "graphStyle" || key === "barStyle" || key === "evalbarDesign" || key === "moveAnim") { renderEvalBar(); renderGraph(); }
   if (key === "bestArrow") renderBestArrow();
   if (key === "showThreat") renderThreatArrow();
   if (key === "loaderStyle") { renderReview(); renderStats(); }

@@ -129,7 +129,7 @@ test('saved choices survive startup and Visual reset restores the latest designs
 test('invalid or missing saved designs fall back to supported defaults', () => {
   const settings = {accuracyDesign: 'deleted', movesDesign: null};
   assert.equal(normalizePanelDesigns(settings), true);
-  assert.deepEqual(settings, {accuracyDesign: 'dials', movesDesign: 'full'});
+  assert.deepEqual(settings, {accuracyDesign: 'dials', movesDesign: 'full', evalbarDesign: 'balance'});
   assert.equal(normalizePanelDesigns(settings), false);
   assert.equal(panelDesign('accuracy', {}), 'dials');
 });

@@ -5,6 +5,7 @@ The choices are local visual preferences and survive reopening the extension.
 
 | Panel | Designs | Default |
 | --- | --- | --- |
+| Evaluation bar | Original, Balance | Balance |
 | Accuracy | Original, Page tabs, Dials | Dials |
 | Move list | Original, Full height | Full height |
 
@@ -23,6 +24,18 @@ Changing designs does not change the game, selected move, annotations, numerical
 accuracy, Elo estimate, engine settings, analysis cache key or panel arrangement.
 Both designs' choices participate in Visual's **Reset to default**. Missing or
 unrecognized saved IDs fall back to the current defaults.
+
+Balance uses a slim White/Black rail, labeled ends and a single score badge that
+follows the balance. A light badge favors White, a dark badge favors Black, and
+0.0 marks an equal position. Scores always use White's perspective (+ for White,
+− for Black); M means mate. Hover or focus the bar for an accessible description.
+It follows board flips, keeps the previous fill while showing an ellipsis during
+live search, and respects animation settings and reduced motion. The scale and
+engine scores match Original; the fill is not a win probability. Existing bar
+color styles and panel dimensions apply to both versions.
+
+Run `node scripts/learning-browser.mjs --working-tree --evaluation-bar` to check
+score fit, mates, flips and saved choices at four viewport sizes with screenshots.
 
 ## Adding another iteration
 
