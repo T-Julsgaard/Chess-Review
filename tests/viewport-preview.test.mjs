@@ -14,9 +14,9 @@ function previewDOM(t,display={width:1920,height:1080,pixelRatio:1,insetWidth:0,
 test('fit scales large screens without changing dimensions and actual size stays unscaled',()=>{
   assert.equal(previewScale(3840,2160,1920,1080,'fit'),0.5);
   assert.equal(previewScale(1920,1080,1920,1080),1);
-  assert.equal(previewScale(1280,720,1920,1080,'fit'),1.5);
-  assert.equal(previewScale(390,844,1968,1128,'fit'),1128/844);
-  assert.equal(previewScale(1920,1080,1920,919),1,'Actual size is the default even in a shorter browser window');
+  assert.equal(previewScale(1280,720,1920,1080,'fit'),1);
+  assert.equal(previewScale(390,844,1968,1128,'fit'),1);
+  assert.equal(previewScale(1920,1080,1920,919),919/1080,'Fit shows the whole screen by default');
   assert.equal(previewScale(3840,2160,1968,1128,'1'),1);
 });
 
@@ -30,6 +30,7 @@ test('presets, custom sizes, rotation keep native dimensions and resize the same
   assert.equal(frame.style.width,'1920px');assert.equal(frame.style.height,'1080px');
   click('Desktop');change('screen-preset','1');assert.match($('screen-preset').selectedOptions[0].textContent,/1440p.*2560 × 1440/);
   assert.equal(frame.style.width,'2560px');assert.equal(frame.style.height,'1440px');
+  assert.equal(frame.style.transform,'scale(0.75)','1440p fits completely on a 1080p display by default');
   change('preview-scale','fit');change('screen-preset','2');assert.equal(frame.style.width,'3840px');assert.equal(frame.style.transform,'scale(0.5)');
   change('preview-scale','1');assert.equal(frame.style.transform,'scale(1)');
   click('Phone');assert.equal(frame.style.width,'320px');assert.equal(frame.style.height,'568px');
@@ -109,9 +110,28 @@ test('current window matches the launching viewport and monitor settings leave m
 
 test('directly opened previews use the current browser viewport when there is no launch snapshot',t=>{
   const dom=previewDOM(t);dom.window.sessionStorage.setItem('screen-size-preview','invalid');
+  Object.defineProperties(dom.window.document.getElementById('preview-stage'),{clientWidth:{value:dom.window.innerWidth},clientHeight:{value:dom.window.innerHeight}});
   const {frame}=mountViewportPreview(dom.window.document);
   assert.equal(frame.style.width,dom.window.innerWidth+'px');assert.equal(frame.style.height,dom.window.innerHeight+'px');
   assert.equal(frame.style.transform,'scale(1)');
+});
+
+test('1440p shows the entire target screen on a shorter 1080p window while the app keeps its target viewport',t=>{
+  const dom=previewDOM(t,{width:1920,height:919,pixelRatio:1,insetWidth:0,insetHeight:161});
+  const doc=dom.window.document,$=id=>doc.getElementById(id);
+  Object.defineProperties($('preview-stage'),{clientWidth:{value:1920},clientHeight:{value:919}});
+  const {frame}=mountViewportPreview(doc),source=frame.src;
+  [...doc.querySelectorAll('#device-tabs button')].find(b=>b.textContent==='Desktop').click();
+  $('screen-preset').value='1';$('screen-preset').dispatchEvent(new dom.window.Event('change'));
+  assert.equal($('preview-scale').value,'fit');
+  assert.equal(frame.style.width,'2560px');assert.equal(frame.style.height,'1279px');
+  assert.equal(frame.style.transform,`scale(${919/1279})`);
+  assert.ok(parseFloat($('preview-surface').style.width)<=1920);
+  assert.ok(parseFloat($('preview-surface').style.height)<=919);
+  assert.match($('screen-readout').textContent,/Fit 72%/);
+  assert.match($('screen-readout').title,/App zoom: 100%/);
+  $('preview-scale').value='1';$('preview-scale').dispatchEvent(new dom.window.Event('change'));
+  assert.equal(frame.style.transform,'scale(1)');assert.equal(frame.src,source);
 });
 
 test('the preview viewer restores its own tab to 100% without touching other tabs',async()=>{
