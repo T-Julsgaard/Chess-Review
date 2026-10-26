@@ -38,11 +38,16 @@ function track(a,w,board) {
   return {pending,motions};
 }
 
-for(const source of ['home','puzzle','opening','history'])for(const flipped of [false,true])
+for(const source of ['home','puzzle','opening','history','timeAttack','knockout'])for(const flipped of [false,true])
 test(`${source} returns assemble into the saved ${flipped?'black':'white'} review position`,async t=>{
   const {a,w,board,target}=await setup(t,{flipped});
   if(source==='puzzle')await w.startRatedPuzzles();
   else if(source==='opening'){await w.startOpening('italian');w.stepOpening(3);}
+  else if(source==='timeAttack'||source==='knockout'){
+    t.mock.method(w,'showPuzzleRunStart',async()=>true);
+    await w.startPuzzleRun(source);await w.finishChallenge('Out of lives');
+    assert.ok(board.querySelector('.puzzle-run-end'));
+  }
   else {w.submitMove('d2d4');w.submitMove('d7d5');if(source==='history')w.stepHomePosition(1);}
   w.flipBoard();
   const from={...w.displayedBoard},{pending,motions}=track(a,w,board);
