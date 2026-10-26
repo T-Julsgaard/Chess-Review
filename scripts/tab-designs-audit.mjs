@@ -39,7 +39,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
       if (design === 'original') {
         await run("document.querySelector('.qbreak-toggle').click()");
         assert.equal(await run("document.querySelectorAll('.accuracy-original .qbreak-row').length"), 10);
-        assert.equal(await boxes(), geometry, 'The original expander stays inside the fixed comparison panel');
+        if(width===1920)assert.notEqual(await boxes(), geometry, 'The original expander reflows neighboring panels');
         await run("document.querySelector('.qbreak-toggle').click()");
       }
       if (width === 1920) await shot('accuracy-design-' + design, '.accuracy-panel');

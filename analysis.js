@@ -1827,7 +1827,10 @@ function applyPanelBox(mod,b) {
   inner.style.transform=scale===1?"":"scale("+scale+")";inner.style.transformOrigin=scale===1?"":"top left";
 }
 function panelContentScale(key) {
-  return isCustomLayout() ? panelScale(S.layout[key]) : panelScale(fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,S.qbreakExpanded)?.[key]);
+  return isCustomLayout() ? panelScale(S.layout[key]) : panelScale(fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,accuracyLayoutExpanded())?.[key]);
+}
+function accuracyLayoutExpanded() {
+  return panelDesign('accuracy', S.settings) === 'original' ? S.originalAccuracyExpanded : S.qbreakExpanded;
 }
 function applyLayoutMode() {
   const custom = isCustomLayout();
@@ -1839,7 +1842,8 @@ function applyLayoutMode() {
 function applyLayout() {
   UI.canvas.classList.add("no-concepts");
   UI.canvas.classList.remove("desktop-layout");
-  const reference=fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,S.qbreakExpanded);
+  const reference=fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,accuracyLayoutExpanded());
+  UI.canvas.classList.toggle('original-accuracy-expanded',panelDesign('accuracy',S.settings)==='original'&&S.originalAccuracyExpanded);
   UI.canvas.classList.toggle('full-hd-reference',!!reference);
   UI.canvas.classList.toggle('reference-components',!isCustomLayout()||!!reference);
   UI.canvas.style.setProperty('--reference-factor',reference?reference.review.scale/(DEFAULT_LAYOUT.review.scale*.87):1);
@@ -1854,7 +1858,7 @@ function applyLayout() {
 function snapshotLayout() {
   const base = UI.canvas.parentElement.getBoundingClientRect();
   const out = structuredClone(DEFAULT_LAYOUT);
-  const reference=fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,S.qbreakExpanded);
+  const reference=fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,accuracyLayoutExpanded());
   for (const mod of UI.canvas.querySelectorAll(".mod")) {
     if(reference&&!isCustomLayout()) {out[mod.dataset.mod]={...reference[mod.dataset.mod]};continue;}
     const r = mod.getBoundingClientRect();
@@ -2014,7 +2018,7 @@ function toggleReorganize() {
     S.layout = snapshotLayout();
     // The snapshot holds the breakdown as it is shown; record the collapse offset so the saved
     // baseline is the expanded one, like every other canvas layout (see layoutForSave()).
-    S._accReflow = S.qbreakExpanded ? null : accuracyReflowInfo();
+    S._accReflow = accuracyLayoutExpanded() ? null : accuracyReflowInfo();
     S.layoutMode = "custom";
     applyLayoutMode();
     saveLayout();
@@ -4543,7 +4547,7 @@ function renderOriginalStats() {
     class: "qbreak-toggle" + (S.originalAccuracyExpanded ? " open" : ""),
     title: S.originalAccuracyExpanded ? "Show fewer categories" : "Show all categories",
     "aria-expanded": S.originalAccuracyExpanded ? "true" : "false",
-    onclick: () => { S.originalAccuracyExpanded = !S.originalAccuracyExpanded; renderStats(); },
+    onclick: () => { S.originalAccuracyExpanded = !S.originalAccuracyExpanded; renderStats(); reflowAccuracy(S.originalAccuracyExpanded); applyLayout(); },
   }, icon("chevron"));
   const qbreak = el("div", { class: "qbreak" }, ...qrows, expander);
 
@@ -6118,7 +6122,7 @@ async function setSetting(key, value) {
   S.settings[key] = value;
   await writeSettings({ [key]: value });
   applySettings();
-  if (design?.panel.startsWith('accuracy')) { statsRefs = null; hideQTip(); renderStats(); }
+  if (design?.panel.startsWith('accuracy')) { statsRefs = null; hideQTip(); renderStats(); if(key==='accuracyDesign')reflowAccuracy(accuracyLayoutExpanded()); }
   if (key === 'movesDesign') updateMovesDesign();
   if (key === 'engineDesign') renderEngineCurrent();
   if (key === 'moveAnim' && S.settings.moveAnim === false) overviewReveal.stop();
@@ -7304,7 +7308,7 @@ async function applyGame(payload) {
   document.title = `${players.w.name} vs ${players.b.name} — Chess Review`;
   computeDerived();
   renderAll();
-  if (!S.qbreakExpanded) reflowAccuracy(false);
+  if (!accuracyLayoutExpanded()) reflowAccuracy(false);
   renderLibrary();
   requestAnimationFrame(alignPlayers);
   rememberReviewJob();

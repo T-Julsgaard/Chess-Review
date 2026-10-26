@@ -17,7 +17,7 @@ Original Accuracy restores the combined score/category panel, its seven-row
 summary, expandable full category list, explanations and practice button. Page
 tabs restores the first three-page design with named buttons. Dials retains the
 current compact overview, phase bars and carousel. Expanding the original category
-list scrolls inside the fixed panel rather than moving neighboring controls.
+list grows the panel and moves Engine and Solve puzzles down in the same column.
 
 Accuracy's three pages have separate rows in Tabs. The existing `accuracyDesign`
 preference and saved overview choices remain intact. Move quality has its own

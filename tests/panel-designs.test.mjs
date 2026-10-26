@@ -60,6 +60,31 @@ test('Original Accuracy restores the summary, expander and explainer; current de
   assert.equal(a.state.accuracyPage, 1);
 });
 
+test('Original Accuracy expansion moves Engine and Solve puzzles down and restores their positions', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  Object.defineProperties(a.dom.window, {innerWidth: {value:1920,configurable:true}, innerHeight: {value:1080,configurable:true}});
+  a.call('applyLayoutMode');
+  await a.call('setSetting', 'accuracyDesign', 'original');
+  const geometry = () => Object.fromEntries(['accuracy','engine','learn','controls'].map(key => {
+    const node = doc.querySelector('[data-mod="'+key+'"]');
+    return [key, {top:parseFloat(node.style.top),height:parseFloat(node.style.height)}];
+  }));
+  for (const custom of [false,true]) {
+    if(custom){a.call('toggleReorganize');a.call('toggleReorganize');}
+    const before = geometry(), saved = JSON.stringify(a.call('layoutForSave'));
+    for(let i=0;i<3;i++) {
+      doc.querySelector('.qbreak-toggle').click();
+      const expanded = geometry(), delta = expanded.accuracy.height-before.accuracy.height;
+      assert.ok(delta>70);
+      for(const key of ['engine','learn'])assert.ok(Math.abs(expanded[key].top-before[key].top-delta)<1e-8);
+      assert.deepEqual(expanded.controls,before.controls);
+      doc.querySelector('.qbreak-toggle').click();
+      assert.deepEqual(geometry(),before);
+      assert.equal(JSON.stringify(a.call('layoutForSave')),saved,'Toggling must not accumulate a saved offset');
+    }
+  }
+});
+
 test('Full height moves remove both frame strips and retain the mounted moves and current position', async t => {
   const a = review(t), doc = a.dom.window.document, list = doc.querySelector('#movesBody').firstChild;
   a.state.idx = 3;

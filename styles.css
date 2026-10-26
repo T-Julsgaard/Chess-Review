@@ -1424,6 +1424,7 @@ button { font-family: inherit; cursor: pointer; }
 /* ---------- ACCURACY PAGES ---------- */
 .accuracy-panel { container-type: inline-size; }
 .stage.auto:not(.full-hd-reference) .mod[data-mod="accuracy"] { height: 420px; max-height: none; }
+.stage.auto:not(.full-hd-reference).original-accuracy-expanded .mod[data-mod="accuracy"] { height: 507px; max-height: none; }
 .accuracy-panel button:focus-visible, .acc-page:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .stage .accuracy-panel .acc-page { padding: 14px 12px 8px; scrollbar-gutter: stable; }
 .acc-players, .acc-metric-values, .acc-scorecards { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; }
