@@ -32,6 +32,31 @@ test('learning follows the live review square through resizing without restartin
   assert.equal(a.dom.window.document.querySelectorAll('.board').length,1,'The anchor must not create a second interactive board');
 });
 
+test('compact puzzle status mirrors the live countdown and score without duplicate timer IDs or announcements',async t=>{
+  const a=app(t);loadGame(a,'1. e4 e5');a.state.settings.moveAnim=false;a.call('computeDerived');a.call('buildUI');a.call('renderAll');
+  const puzzle={id:'compact-clock',fen:'7k/5Q2/6K1/8/8/8/8/8 w - - 0 1',solution:['f7f8'],rating:1200,themes:[]};
+  t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[puzzle]})}));
+  await a.call('openLearning');const w=a.run('learningWorkspace');t.after(()=>w.close());
+  t.mock.method(w,'showPuzzleRunStart',async()=>true);
+  await w.startPuzzleRun('timeAttack');w.run.clock.pause();w.run.clock.remainingMs=23000;w.updateClock();
+  const compact=()=>w.boardInfo.querySelector('.puzzle-board-status');
+  assert.equal(compact().getAttribute('aria-hidden'),'true');
+  assert.equal(compact().querySelector('[data-board-status]').textContent,'White to move');
+  assert.equal(compact().querySelector('[data-board-clock]').textContent,'0:23');
+  assert.equal(w.root.querySelector('#learn-clock').textContent,'0:23');
+  assert.equal(w.root.querySelectorAll('#learn-clock').length,1);
+  assert.ok([...w.root.querySelectorAll('#learn-clock, [data-board-clock]')].every(n=>n.classList.contains('running-low')));
+  const clock=w.run.clock;w.run.solved=2;w.render();
+  assert.equal(w.run.clock,clock);assert.equal(compact().querySelector('[data-board-score]').textContent,'2 solved');
+  w.run.clock.remainingMs=61000;w.updateClock();
+  assert.equal(compact().querySelector('[data-board-clock]').textContent,'1:01');
+  assert.ok([...w.root.querySelectorAll('#learn-clock, [data-board-clock]')].every(n=>!n.classList.contains('running-low')));
+  await w.finishChallenge('Time is up');assert.equal(compact(),null);
+  await w.startPuzzleRun('knockout');
+  assert.ok(compact().querySelector('[data-board-status]'));assert.equal(compact().querySelector('[data-board-clock]'),null);
+  await w.navigate('puzzles');assert.equal(compact(),null);
+});
+
 test('learning tabs and scrollable content fill the side panel across libraries and Statistics',async t=>{
   const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
   const doc=a.dom.window.document,toggle=doc.querySelector('#learningToggle');

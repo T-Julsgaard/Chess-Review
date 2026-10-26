@@ -13,10 +13,12 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
   const capture=async label=>{
     const data=await run(`(()=>{
       const rect=n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom};};
-      const root=document.querySelector('.learning-workspace');
+      const root=document.querySelector('.learning-workspace'),status=root.querySelector('.puzzle-board-status'),clock=status?.querySelector('[data-board-clock]');
       return {width:innerWidth,height:innerHeight,board:rect(root.querySelector('.board')),shell:rect(root.querySelector('.learn-shell')),
         nav:rect(root.querySelector('.learn-nav')),navOverflow:root.querySelector('.learn-nav').scrollWidth-root.querySelector('.learn-nav').clientWidth,
-        scrollWidth:root.scrollWidth,clientWidth:root.clientWidth,stacked:root.classList.contains('learn-stacked'),error:document.querySelector('#error').textContent};
+        scrollWidth:root.scrollWidth,clientWidth:root.clientWidth,stacked:root.classList.contains('learn-stacked'),error:document.querySelector('#error').textContent,
+        status:status&&{...rect(status),visible:getComputedStyle(status).display!=='none',overflow:status.scrollWidth-status.clientWidth,clock:clock?.textContent,
+          turnFits:status.querySelector('[data-board-status]').scrollWidth<=status.querySelector('[data-board-status]').clientWidth+1}};
     })()`);
     const shot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
     await fs.writeFile(path.join(out,label+'.png'),Buffer.from(shot.data,'base64'));
@@ -46,6 +48,28 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
   for(const [width,height]of [[1920,960],[1366,648],[390,844],[320,568],[1366,648]]){
     await resize(width,height);await capture('puzzle-resize-'+width+'x'+height);
     assert.equal(await run("import('./analysis.js').then(m=>m.learningWorkspace.activity===resizeAudit.activity&&m.learningWorkspace.puzzleHistory===resizeAudit.history&&m.learningWorkspace.currentFen()==='7k/5Q2/6K1/8/8/8/8/8 w - - 0 1')"),true,'Resize must preserve the active puzzle and move history');
+  }
+  for(const mode of ['timeAttack','knockout']){
+    await run(`import('./analysis.js').then(async m=>{const w=m.learningWorkspace;await w.navigate('puzzles');await w.startPuzzleRun('${mode}');if(w.run.clock){w.run.clock.pause();w.run.clock.remainingMs=61000;w.updateClock();}resizeAudit.run=w.run;})`);
+    for(const [width,height]of [[320,568],[390,844],[430,932],[568,320],[844,390],[820,600],[1024,768],[1366,648],[1920,960],[320,568]]){
+      await resize(width,height);await run("document.querySelector('.learning-workspace').scrollTop=0");
+      const data=await capture(mode+'-board-status-'+width+'x'+height);
+      assert.equal(await run("import('./analysis.js').then(m=>m.learningWorkspace.run===resizeAudit.run)"),true,'Resize must not restart a timed run');
+      if(data.stacked){
+        assert.ok(data.status.visible&&data.status.y>=data.board.bottom&&data.status.bottom<=height,'Puzzle status must fit beside the visible board: '+JSON.stringify(data));
+        assert.ok(data.status.x>=0&&data.status.right<=width&&data.status.overflow<=1,'Compact status must not clip: '+JSON.stringify(data));
+        assert.equal(data.status.turnFits,true,'The turn instruction must remain readable on short landscape boards');
+        assert.ok(data.board.y>=52&&data.board.bottom<=height,'Entire puzzle board remains visible');
+        if(mode==='timeAttack')assert.equal(data.status.clock,'1:01');
+      }else assert.equal(data.status.visible,false,'Desktop keeps its existing dashboard');
+    }
+    if(mode==='timeAttack'){
+      await run("import('./analysis.js').then(m=>{m.learningWorkspace.run.clock.remainingMs=23000;m.learningWorkspace.updateClock();})");
+      assert.equal(await run("[...document.querySelectorAll('#learn-clock, [data-board-clock]')].every(n=>n.textContent==='0:23'&&n.classList.contains('running-low'))"),true,'Both countdown displays follow the same clock and low-time cue');
+      await capture('time-attack-low-time-320x568');
+    }
+    await run("import('./analysis.js').then(m=>m.learningWorkspace.finishChallenge('Audit complete'))");
+    assert.equal(await run("document.querySelector('.puzzle-board-status')"),null,'Completed runs remove the compact status');
   }
   await run("import('./analysis.js').then(m=>m.learningWorkspace.close())");
   await fs.writeFile(path.join(out,'responsive-layout.json'),JSON.stringify(results,null,2));

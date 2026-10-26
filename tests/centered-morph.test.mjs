@@ -36,6 +36,19 @@ test('board expands uniformly on a straight path with no upward arc or overshoot
   ]);
 });
 
+test('stacked puzzle boards reserve visible status space in portrait and short landscape viewports',()=>{
+  for(const [width,height]of [[320,568],[390,844],[430,932],[568,320],[844,390],[820,600],[768,1024]]){
+    const input={width,height,top:52,board:{x:309,y:108,width:734}},p=fullSizeLearningLayout({...input,boardFooter:48});
+    assert.equal(p.stacked,true);
+    assert.ok(p.boardY+52>=52);
+    assert.ok(p.boardY+52+p.boardSize+48<=height-24,'Status must fit below the board');
+    assert.ok(p.boardSize>=Math.min(width-32,180),'The square board remains usable');
+    assert.ok(p.panelY>=p.boardY+p.boardSize+48,'Status must not overlap learning navigation');
+  }
+  const desktop={width:1920,height:960,board:{x:309,y:108,width:734}};
+  assert.deepEqual(fullSizeLearningLayout({...desktop,boardFooter:48}),fullSizeLearningLayout(desktop),'Desktop geometry stays unchanged');
+});
+
 test('Full HD learning balances its vertical margins without changing board size or horizontal placement',()=>{
   const board={x:309.36,y:107.8,width:734.85};
   for(const height of [919,920,960,1080]){

@@ -279,8 +279,14 @@
 .puzzle-task-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--ink-2); margin-bottom: 16px; }
 .puzzle-played-line { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 16px 0; font: 13px var(--font-mono); color: var(--ink-2); }
 .puzzle-next-actions { padding: 4px 0 12px; }
-.puzzle-board-status { display: none; }
-.learning-embedded.learn-stacked .puzzle-board-status { display: flex; justify-content: space-between; gap: 10px; margin-top: 8px; font-size: 12px; line-height: 18px; }
+.puzzle-board-status { display: none; container: puzzle-status / inline-size; }
+.learning-embedded.learn-stacked .puzzle-board-status { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 32px; box-sizing: border-box; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); font-size: 12px; line-height: 18px; }
+.puzzle-board-status > [data-board-status] { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.puzzle-board-run { display: flex; align-items: center; gap: 12px; flex: none; }
+.puzzle-board-run > span { color: var(--ink-2); }
+.puzzle-board-status [data-board-clock] { color: var(--accent); font: 650 15px/18px var(--font-mono); font-variant-numeric: tabular-nums; }
+.puzzle-board-status .running-low[data-board-clock] { color: #f35a66; }
+@container puzzle-status (max-width: 220px) { .puzzle-board-run > [data-board-score] { display: none; } }
 .puzzle-board-status.incorrect { color: var(--q-mistake); }
 .puzzle-board-status.completed { color: var(--accent); }
 @media (max-width: 480px) { .puzzle-elo-panel { gap: 12px; padding: 14px; flex-wrap: wrap; } .puzzle-elo-copy { flex: 1 1 130px; } }
