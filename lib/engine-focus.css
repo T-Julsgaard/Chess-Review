@@ -65,9 +65,9 @@
 }
 .stage .mod[data-mod="engine"] .engine-minimal .count { font-size:11.5px; }
 .stage .mod[data-mod="engine"] .engine-minimal .engine-focus-play {
-  flex:none; width:24px; min-height:22px; height:22px; padding:0;
+  flex:none; width:22px; min-height:20px; height:20px; padding:0;
   border:1px solid color-mix(in oklab,var(--q-best) 50%,transparent); border-radius:5px;
-  background:color-mix(in oklab,var(--q-best) 18%,var(--panel)); color:var(--q-best); font-size:11px;
+  background:color-mix(in oklab,var(--q-best) 18%,var(--panel)); color:var(--q-best); font-size:10px;
 }
 .stage .mod[data-mod="engine"] .engine-minimal .engine-focus-play:hover:not(:disabled) {
   background:var(--q-best); border-color:var(--q-best); color:#14200c;
