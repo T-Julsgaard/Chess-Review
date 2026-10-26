@@ -43,9 +43,11 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     const values={opening:[96.2,87.9],middlegame:[43.8,64.5],endgame:[76.9,92.6]};
     for(const [phase,scores]of Object.entries(values))for(const [i,side]of ['w','b'].entries())Object.assign(m.S.gameStats[side].phases[phase],{accuracy:scores[i],decisions:8});
     m.renderStats();})`);
-  const colors=await run("[...document.querySelectorAll('.phase-report-cell')].map(n=>({category:n.dataset.phaseCategory,color:getComputedStyle(n).color,label:n.querySelector('.phase-category-label').textContent}))");
+  const colors=await run("[...document.querySelectorAll('.phase-report-cell')].map(n=>({category:n.dataset.phaseCategory,color:getComputedStyle(n).color,text:n.textContent,children:n.children.length}))");
   assert.deepEqual(colors.map(n=>n.category),['excellent','good','blunder','mistake','inacc','excellent']);
   assert.deepEqual(colors.map(n=>n.color),['rgb(129, 182, 76)','rgb(149, 183, 118)','rgb(238, 74, 47)','rgb(249, 168, 90)','rgb(247, 197, 49)','rgb(129, 182, 76)']);
+  assert.ok(colors.every(n=>n.children===1&&/^\d+\.\d%$/.test(n.text)));
+  assert.equal(await run("document.querySelector('.phase-rating').getBoundingClientRect().top>=document.querySelector('.phase-report').getBoundingClientRect().bottom"),true);
   await shot('phase-report-illustrative');
   await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=true;m.S.positions=[...m.S.positions];m.renderStats()})");
   assert.equal(await run("!!document.querySelector('[data-revealing]')"),true);

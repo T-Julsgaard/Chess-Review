@@ -27,9 +27,10 @@ results. Turning motion off or requesting reduced motion shows final values
 immediately. Original, Page tabs and Dials remain available with their earlier
 presentation; existing saved design choices are preserved.
 
-Phase report is the latest Accuracy overview: large headline scores and ratings
-above paired phase cards. Each card uses a category badge and the existing
-Excellent/Good/Inaccuracy/Mistake/Blunder color. Presentation thresholds are
+Phase report is the latest Accuracy overview: large headline scores, compact
+paired phase cards, then estimated ratings at the bottom. Cards show only their
+percentage with the existing Excellent/Good/Inaccuracy/Mistake/Blunder color;
+visible category text and symbols are omitted. Presentation thresholds are
 documented in [the Accuracy panel guide](ACCURACY_PANEL.md); numerical scores,
 annotations and rating calculations are unchanged. Missing samples stay neutral.
 It retains the compact height, carousel, synchronized reveal and earlier designs.

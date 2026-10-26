@@ -11,7 +11,7 @@
 }
 .set-section .set-seg:has([data-setting="accuracyDesign"]) { flex-wrap: wrap; }
 .set-section .set-seg [data-setting="accuracyDesign"] { flex: 1 1 40%; min-height: 32px; }
-/* Phase report: large headline scores and six category-colored phase cards. */
+/* Phase report: large headline scores, compact colored phases, then ratings. */
 .stage .accuracy-phase-report .acc-page { padding: 12px 12px 8px; }
 .accuracy-phase-report .acc-players { margin-bottom: 6px; }
 .phase-overview { display: flex; flex-direction: column; flex: 1; gap: 13px; }
@@ -24,24 +24,20 @@
 .accuracy-phase-report .acc-unit { font-size: 15px; }
 .phase-rating-values .acc-elo { font-size: 20px; color: var(--ink-2); }
 .phase-rating-values .acc-elo:first-child { color: var(--accent); }
-.phase-summary > .acc-elo-label { margin-top: 4px; font-size: 11px; }
-.phase-report { display: flex; flex-direction: column; justify-content: space-between; flex: 1; gap: 6px; min-height: 196px; }
+.phase-rating { display: flex; flex-direction: column; gap: 7px; margin-top: auto; border-top: 1px solid var(--line-soft); padding-top: 11px; text-align: center; }
+.phase-rating > .acc-elo-label { font-size: 12px; }
+.phase-report { display: flex; flex-direction: column; flex: none; gap: 9px; }
 .phase-report-row { display: flex; flex-direction: column; gap: 5px; flex: none; }
 .phase-report-name { display: flex; align-items: center; justify-content: center; gap: 9px; color: var(--ink-3); font-size: 12px; line-height: 1; }
 .phase-report-name::before, .phase-report-name::after { content: ''; height: 1px; background: var(--line-soft); flex: 1; }
 .phase-report-name > .acc-reveal-slot { flex: none; }
 .phase-report-cells { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; }
-.phase-report-cell { display: flex; align-items: center; justify-content: space-between; flex-direction: column; gap: 3px;
+.phase-report-cell { display: grid; place-items: center;
   border: 1px solid color-mix(in srgb,var(--phase-color) 23%,var(--line-soft));
-  border-radius: 8px; padding: 5px 3px 4px; color: var(--phase-color);
+  border-radius: 8px; padding: 6px 3px; color: var(--phase-color);
   background: color-mix(in srgb,var(--phase-color) 7%,var(--panel)); }
 .phase-report-score { font: 750 20px/1.1 var(--font-mono); letter-spacing: -.8px; }
-.phase-category { display: flex; align-items: center; justify-content: center; gap: 4px; max-width: 100%; min-width: 0; font-size: 11px; font-weight: 650; line-height: 1.2; }
-.phase-category-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.phase-category-mark { display: inline-grid; place-items: center; width: 13px; height: 13px; flex: none;
-  border-radius: 50%; color: #171713; background: var(--phase-color); font: 800 9px/1 var(--font-ui); letter-spacing: -.6px; }
 .phase-report-cell.unavailable { border-color: var(--line-soft); background: var(--panel-2); color: var(--ink-3); }
-.phase-report-cell.unavailable .phase-category { opacity: .55; }
 .set-section .set-seg:has([data-setting="movesDesign"]) { flex-wrap: wrap; }
 .set-section .set-seg [data-setting="movesDesign"] { flex: 1 1 40%; min-height: 32px; }
 .stage .accuracy-panel.accuracy-original .acc-head { padding: 10.2px 12px; }

@@ -24,7 +24,7 @@ test('phase display bands have precise boundaries and reject unavailable or inva
   for (const missing of [null, undefined, NaN, Infinity, -1, 101, '90']) assert.equal(phasePerformance(missing), null);
 });
 
-test('the phase report shows both players, all scores and category badges using the existing palette', t => {
+test('the phase report shows compact colored scores with estimated ratings below all phases', t => {
   const a = review(t), doc = a.dom.window.document;
   assert.equal(doc.querySelector('.accuracy-panel').dataset.design, 'phases');
   assert.equal(doc.querySelectorAll('.phase-report-row').length, 3);
@@ -33,13 +33,17 @@ test('the phase report shows both players, all scores and category badges using 
   const mine = middle.querySelector('.phase-report-cell'), theirs = middle.querySelector('.phase-report-cell:last-child');
   assert.equal(mine.dataset.phaseCategory, 'blunder');
   assert.equal(mine.style.getPropertyValue('--phase-color'), 'var(--q-blunder)');
-  assert.equal(mine.querySelector('.phase-category-label').textContent, 'Blunder');
+  assert.equal(mine.querySelector('.phase-category,.phase-category-label,.phase-category-mark'), null);
+  assert.equal(mine.children.length, 1);
   assert.equal(mine.querySelector('.phase-report-score').textContent, '42.5%');
   assert.equal(theirs.dataset.phaseCategory, 'inacc');
   assert.equal(theirs.style.getPropertyValue('--phase-color'), 'var(--q-inacc)');
   assert.match(mine.getAttribute('aria-label'), /White, Middlegame.*42.5% accuracy, Blunder, 8 scored decisions/);
   assert.match(doc.querySelector('.phase-summary').textContent, /89\.0%83\.0%/);
-  assert.match(doc.querySelector('.phase-summary').textContent, /Estimated rating/);
+  const overview = doc.querySelector('.phase-overview');
+  assert.deepEqual([...overview.children].map(n => n.className), ['phase-summary','phase-report','phase-rating']);
+  assert.match(overview.lastElementChild.textContent, /Estimated rating/);
+  assert.equal(doc.querySelector('.phase-summary .acc-elo'), null);
   assert.equal(doc.querySelector('.accuracy-panel .panel-head,.accuracy-panel .acc-note,.accuracy-panel .acc-dial'), null);
 });
 
@@ -69,7 +73,7 @@ test('category summaries are independent of annotations, board orientation and s
   assert.equal(doc.querySelector('.phase-report [data-category]'), null, 'Performance badges must not be move-category edit buttons');
 });
 
-test('phase scores retain the reveal animation and finish with the exact score and category text', t => {
+test('phase scores retain the reveal animation and finish with the exact score and category color', t => {
   const a = review(t), doc = a.dom.window.document, frames = new Map(); let id = 0;
   a.context.requestAnimationFrame = callback => {frames.set(++id,callback);return id;};
   a.context.cancelAnimationFrame = key => frames.delete(key);
@@ -78,11 +82,11 @@ test('phase scores retain the reveal animation and finish with the exact score a
   const cell = doc.querySelector('[data-phase="middlegame"] .phase-report-cell');
   assert.equal(cell.dataset.phaseCategory, 'blunder');
   assert.equal(cell.querySelector('.phase-report-score .acc-reveal-ink').textContent, '0.0%');
-  assert.equal(cell.querySelector('.phase-category-label .acc-reveal-ink').textContent, '');
+  assert.equal(cell.querySelector('.phase-category-label'), null);
   tick(0); tick(300);
   const halfway = parseFloat(cell.querySelector('.phase-report-score .acc-reveal-ink').textContent);
   assert.ok(halfway > 0 && halfway < 42.5);
   tick(1200);
   assert.equal(cell.querySelector('.phase-report-score').textContent, '42.5%');
-  assert.equal(cell.querySelector('.phase-category-label').textContent, 'Blunder');
+  assert.equal(cell.dataset.phaseCategory, 'blunder');
 });

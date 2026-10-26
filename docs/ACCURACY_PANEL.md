@@ -23,9 +23,10 @@ Overall accuracy and estimated Elo retain the existing calibrated scoring and
 rating modes. Phase accuracy is computed locally from the same scored decisions,
 without new searches, permissions, requests or changes to saved analysis.
 
-Phase report replaces the dials with large overall scores and estimated ratings,
-then three rows of paired phase cards. Each card shows the exact phase accuracy,
-a category badge and the corresponding category color from the move palette.
+Phase report replaces the dials with large overall scores, three compact rows of
+paired phase cards, and estimated ratings below the phases. Each card shows only
+the exact phase accuracy, colored with the corresponding move-category palette.
+Category names and symbols are omitted from the visible cards.
 The score display never changes the underlying calculated values. Dials and
 Reveal retain their earlier dial/bar layout for comparison.
 
@@ -42,9 +43,9 @@ move classification and its winning-chance-loss thresholds:
 
 These are original UI bands, not Lichess's thresholds or new calibration claims.
 Contextual move labels such as Brilliant, Great, Miss and Book are not inferred
-from aggregate phase accuracy. Badges include text and a mark so color is not
-the only signal. Missing/unreached/forced-only phase samples remain neutral with
-an em dash and **Not scored**; they never receive a bad-play badge. During
+from aggregate phase accuracy. Accessible card labels retain the performance
+category. Missing/unreached/forced-only phase samples remain neutral with
+an em dash; they never receive a bad-play color. During
 analysis they show a neutral pending state. Custom category names apply when the
 overview renders. Accessible card labels include player, phase, exact percentage,
 category and the number of scored decisions.
@@ -57,7 +58,7 @@ restores the exact original score text when complete. Motion-off and reduced-mot
 preferences display final results immediately. Earlier designs remain selectable.
 
 Phase report retains that synchronized reveal for its overall scores, estimated
-ratings, phase percentages, phase labels and category labels. The final category
+ratings, phase percentages and phase labels. The final category
 color stays stable throughout counting, rather than flashing through lower bands.
 
 Lichess's [phase accuracy implementation](https://github.com/lichess-org/lila/blob/master/modules/analyse/src/main/AccuracyPercent.scala)

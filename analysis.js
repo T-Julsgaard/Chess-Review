@@ -4337,12 +4337,7 @@ function renderPhaseOverview(sides, busy) {
       el('span', {class: 'phase-summary-label'}, 'Game accuracy'),
       el('div', {class: 'phase-overall-values'}, ...sides.map(side => busy ? loaderNode('acc-val', 'var(--accent)')
         : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side] >= 100 ? '100' : S.acc[side].toFixed(1),
-          S.acc[side] == null ? null : el('span', {class: 'acc-unit'}, '%')))),
-      el('div', {class: 'phase-rating-values'}, ...sides.map(side => {
-        const rating = estimateElo(S.accElo[side], S.players[side]?.rating, side);
-        return el('strong', {class: 'acc-elo'}, busy ? '···' : rating == null ? '—' : '≈ ' + rating);
-      })),
-      el('span', {class: 'acc-elo-label'}, 'Estimated rating')),
+          S.acc[side] == null ? null : el('span', {class: 'acc-unit'}, '%'))))),
     el('div', {class: 'phase-report', 'aria-label': 'Accuracy by game phase'}, ...GAME_PHASES.map((phase, index) => {
       const name = ['Opening', 'Middlegame', 'Endgame'][index];
       return el('div', {class: 'phase-report-row', 'data-phase': phase},
@@ -4353,12 +4348,15 @@ function renderPhaseOverview(sides, busy) {
           return el('div', {class: 'phase-report-cell' + (band ? '' : ' unavailable'), 'data-phase-category': band?.category || '',
             style: {'--phase-color': band ? QUALITY[band.category].color : 'var(--ink-3)'},
             'aria-label': S.players[side].name + ', ' + name + ': ' + (busy ? 'analyzing' : value == null ? 'not scored' : value.toFixed(1) + '% accuracy, ' + label + ', ' + stats.decisions + ' scored decisions')},
-            el('strong', {class: 'phase-report-score'}, percent(value)),
-            el('span', {class: 'phase-category'},
-              band ? el('span', {class: 'phase-category-mark', 'aria-hidden': 'true'}, band.mark) : null,
-              el('span', {class: 'phase-category-label'}, label)));
+            el('strong', {class: 'phase-report-score'}, percent(value)));
         })));
-    })));
+    })),
+    el('div', {class: 'phase-rating'},
+      el('span', {class: 'acc-elo-label'}, 'Estimated rating'),
+      el('div', {class: 'phase-rating-values'}, ...sides.map(side => {
+        const rating = estimateElo(S.accElo[side], S.players[side]?.rating, side);
+        return el('strong', {class: 'acc-elo'}, busy ? '···' : rating == null ? '—' : '≈ ' + rating);
+      }))));
 }
 
 function renderOriginalStats() {
