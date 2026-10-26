@@ -63,9 +63,10 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
       const panel=document.querySelector('.puzzle-run-results'),list=panel.querySelector('.puzzle-run-history');
       return {summary:!!panel.querySelector('.puzzle-run-summary'),score:panel.querySelector('[data-run-score]').textContent,best:panel.querySelector('.run-record strong').textContent,
         solved:list.querySelectorAll('li.solved').length,incorrect:list.querySelectorAll('li.missed').length,last:list.lastElementChild.getAttribute('aria-label'),
-        fits:list.scrollWidth<=list.clientWidth+1&&panel.scrollWidth<=panel.clientWidth+1};
+        fits:list.scrollWidth<=list.clientWidth+1&&panel.scrollWidth<=panel.clientWidth+1&&[...list.querySelectorAll('li, button')].every(n=>n.scrollWidth<=n.clientWidth+1)};
     })()`);
-    assert.deepEqual(summary,{summary:false,score:'31',best:'31',solved:31,incorrect:0,last:'Puzzle 31: solved',fits:true});
+    const lastRating=await run("import('./analysis.js').then(m=>m.learningWorkspace.result.results.at(-1).rating)");
+    assert.deepEqual(summary,{summary:false,score:'31',best:'31',solved:31,incorrect:0,last:`Puzzle rated ${lastRating}: solved`,fits:true});
     await capture(`time-attack-31-solved-${width}`);
   }
   console.log('Run dashboard and 31-solve score checks passed at desktop and mobile widths. Screenshots: '+out);

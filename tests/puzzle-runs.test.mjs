@@ -130,7 +130,7 @@ test('Time attack starts at three minutes, advances on success or failure, and e
   await solve(w);assert.equal(w.run.solved,1);assert.equal(data['learning:v1'].bests.timeAttack,1);
   const first=w.run.results[0].id;await wrong(w);
   assert.equal(w.run.lives,2);assert.equal(w.run.solved,1);assert.notEqual(w.activity.id,first);
-  assert.deepEqual([...w.root.querySelectorAll('.puzzle-run-history li')].map(n=>n.getAttribute('aria-label')),['Puzzle 1: solved','Puzzle 2: incorrect']);
+  assert.deepEqual([...w.root.querySelectorAll('.puzzle-run-history li')].map(n=>n.getAttribute('aria-label')),w.run.results.map(r=>`Puzzle rated ${r.rating}: ${r.correct?'solved':'incorrect'}`));
   await wrong(w);await wrong(w);
   assert.equal(w.run,null);assert.equal(w.result.reason,'Out of lives');assert.equal(w.result.solved,1);assert.equal(w.result.mistakes,3);
   assert.equal(w.result.results.length,4);assert.equal(data['learning:v1'].challenges.length,1);
@@ -230,7 +230,9 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} result badges select p
   const {w,dom,data}=await setup(t,{puzzles:[{...line,rating:400},...fixtures.map(p=>({...p,rating:3000}))]});
   t.mock.method(w,'waitForPuzzleReply',async()=>true);
   await w.startRatedPuzzles();await w.navigate('puzzles');
-  await w.startPuzzleRun(mode);await solve(w);await wrong(w);
+  await w.startPuzzleRun(mode);await solve(w);
+  assert.equal(w.root.querySelector('.puzzle-run-history li > span:last-child').textContent,'400');
+  await wrong(w);
   if(w.run)await w.finishChallenge('Ended early');
   const result=w.result,saved=structuredClone(data['learning:v1']),heading=w.root.querySelector('.learn-results h2').textContent;
   const finalTurn=w.root.querySelector('.puzzle-turn-cue').textContent;
@@ -241,7 +243,9 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} result badges select p
   const controls=()=>[...w.root.querySelectorAll('.puzzle-run-results button:not(.learn-square)')].map(n=>n.textContent);
   const originalControls=controls();
   const badges=w.root.querySelectorAll('.puzzle-run-history button');
-  assert.equal(badges.length,2);assert.match(badges[0].getAttribute('aria-label'),/Replay puzzle 1: solved/);
+  assert.equal(badges.length,2);
+  assert.deepEqual([...badges].map(n=>n.lastElementChild.textContent),['400','3000']);
+  assert.deepEqual([...badges].map(n=>n.getAttribute('aria-label')),['Replay puzzle rated 400: solved','Replay puzzle rated 3000: incorrect']);
   badges[0].focus();badges[0].click();
   for(let i=0;i<30;i++)await Promise.resolve();
   assert.equal(w.activity.id,result.results[0].id);assert.equal(w.activity.step,0);assert.equal(w.activity.rated,false);
