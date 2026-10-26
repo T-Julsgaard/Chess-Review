@@ -72,17 +72,18 @@ test('advanced loss links navigate using the mainline and retain the selected pa
   a.call('renderStats'); assert.equal(doc.querySelector('[aria-selected="true"]').getAttribute('aria-label'), 'Advanced');
 });
 
-test('named page buttons jump directly and preserve focus through result updates', t => {
+test('clicked page buttons jump directly without retaining keyboard focus', t => {
   const a = review(t), doc = a.dom.window.document;
   const rail = doc.querySelector('.acc-navigation');
   assert.deepEqual([...rail.querySelectorAll('button')].map(button => button.textContent), ['Accuracy', 'Quality', 'Advanced']);
   for (const page of [2, 0, 1]) {
-    doc.querySelector('#accuracy-tab-' + page).click();
+    const button = doc.querySelector('#accuracy-tab-' + page);
+    button.focus(); button.click();
     assert.equal(a.state.accuracyPage, page);
-    assert.equal(doc.activeElement.id, 'accuracy-tab-' + page);
+    assert.equal(doc.activeElement, doc.body);
     a.call('renderStats');
     assert.equal(doc.querySelector('.acc-navigation'), rail);
-    assert.equal(doc.activeElement.id, 'accuracy-tab-' + page);
+    assert.equal(doc.activeElement, doc.body);
   }
 });
 

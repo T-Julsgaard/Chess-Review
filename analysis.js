@@ -4334,7 +4334,7 @@ function setAccuracyPage(page, focus = false) {
 let accuracyNavigation = null;
 function accuracyPager() {
   accuracyNavigation ||= createAccuracyNavigation({doc: document, el, names: ACCURACY_PAGES,
-    select: page => setAccuracyPage(page, true),
+    select: (page, focus = false) => setAccuracyPage(page, focus),
     motion: () => S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches});
   return accuracyNavigation.element;
 }

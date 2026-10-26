@@ -12,6 +12,21 @@ test('review navigation clears leftover Feedback focus after returning from its 
   }
 });
 
+test('clicking Accuracy tabs or moves leaves arrows reviewing the game without a tab focus frame',t=>{
+  const a=review(t,'1. e4 e5 2. Nf3 Nc6'),doc=a.dom.window.document;
+  for(const page of [0,1,2]) {
+    const button=doc.querySelector('#accuracy-tab-'+page);
+    button.focus();button.click();
+    assert.equal(doc.activeElement,doc.body);
+    doc.querySelector('.ml-move[data-ply="1"]').click();
+    for(const [key,idx] of [['ArrowRight',2],['ArrowLeft',1],['End',4],['Home',0]]) {
+      doc.activeElement.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key,bubbles:true,cancelable:true}));
+      assert.equal(a.state.idx,idx);assert.equal(a.state.accuracyPage,page);
+      assert.equal(doc.activeElement,doc.body);
+    }
+  }
+});
+
 test('review has no typed move field and Tab does not traverse review sections',async t=>{
   const a=review(t),doc=a.dom.window.document;
   assert.equal(doc.querySelector('.review-move-entry'),null);
