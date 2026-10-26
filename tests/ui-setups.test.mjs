@@ -47,6 +47,21 @@ test('Modern reproduces every supplied box and scale, including the collapsed Ac
   assert.equal(a.store.layoutMode,'custom');
 });
 
+test('Modern omits the duplicate insight evaluation while other setups retain it',async t=>{
+  const a=review(t),doc=a.dom.window.document;
+  a.state.evals[1]={cp:72};a.call('go',1);
+  assert.equal(doc.querySelector('.ip-eval').textContent,'+0.7');
+  for(const setup of ['modern','old','modern']) {
+    await a.call('applyUiSetup',setup);
+    await a.call('setSetting','graphDesign','bars2');
+    assert.equal(doc.querySelector('.evaluation-score').textContent,'+0.7');
+    assert.equal(doc.querySelector('.ip-move').textContent,'e4');
+    assert.equal(doc.querySelector('.ip-eval')?.textContent,setup==='modern'?undefined:'+0.7');
+    a.call('go',2);a.call('go',1);
+    assert.equal(doc.querySelector('.ip-eval')?.textContent,setup==='modern'?undefined:'+0.7');
+  }
+});
+
 test('Reset layout restores the active setup after edits and retains independently selected tab designs',async t=>{
   const a=review(t);
   for(const value of ['modern','old','modern']) {

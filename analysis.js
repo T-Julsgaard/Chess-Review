@@ -4088,8 +4088,7 @@ function renderMoveComment() {
   const cls = S.classif[S.idx];
   const san = S.positions[S.idx].san || "";
   const cfg = cls && QUALITY[cls];
-  // The exact number shown on the eval bar for this position (white-relative), on the right
-  // instead of the quality label (the quality is already in the sentence below).
+  // Modern already shows the evaluation in its evaluation panel.
   const ev = S.evals[S.idx];
   const evCp = ev ? scoreToCp(ev) : null;
   const evTxt = ev ? evalText(ev) : "";
@@ -4099,7 +4098,7 @@ function renderMoveComment() {
   // Special coach phrasing can omit the category, so name it beside the move.
   const sanDisplay = S.settings.coach && !S.settings.coachPlain && cfg ? `${san} ${categoryName(cls)}` : san;
   head.append(el("span", { class: "ip-move" }, sanDisplay));
-  if (evTxt) head.append(el("span", { class: "ip-eval " + (evCp >= 0 ? "pos" : "neg") }, evTxt));
+  if (evTxt && S.settings.uiSetup !== 'modern') head.append(el("span", { class: "ip-eval " + (evCp >= 0 ? "pos" : "neg") }, evTxt));
   body.append(head);
 
   // Pick the line once per (ply + coach): a fresh signature → choose + type; otherwise reuse the
@@ -6283,7 +6282,7 @@ async function applyUiSetup(value) {
   Object.assign(S.settings, patch);
   S.originalAccuracyExpanded = false; S.qbreakExpanded = false; S.accuracyPage = 0;
   statsRefs = null; hideQTip(); overviewReveal.stop();
-  applySettings(); renderEvalBar(); renderGraph(); renderMoves(); renderStats(); renderEngineCurrent();
+  applySettings(); renderEvalBar(); renderGraph(); renderMoves(); renderStats(); renderEngineCurrent(); renderReview();
   const savedSettings = writeSettings(patch);
   await Promise.all([savedSettings, resetLayout()]);
   if (UI.settings && !UI.settings.hidden) renderSettings();
