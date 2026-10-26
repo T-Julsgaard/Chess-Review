@@ -129,6 +129,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await call('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowRight'},review.sessionId);
   assert.equal(await run("document.activeElement===document.querySelector('.learning-workspace')"),true,'Arrows focus the workspace');
   await run("import('./analysis.js').then(m=>m.learningWorkspace.submitPuzzle('g1f3'))");
+  assert.equal(await run("document.querySelector('.puzzle-practice-status').textContent"),'Solved! · 1200');
   for(const [width,height] of [[1920,1080],[390,844],[320,640]]){
     await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(800);
     assert.equal(await run(`(()=>{const next=document.querySelector('.puzzle-practice-actions .primary').getBoundingClientRect(),analyse=document.querySelector('.puzzle-analyse').getBoundingClientRect();
