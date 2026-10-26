@@ -15,6 +15,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:innerWidth,height:innerHeight,
       overflow:card.scrollWidth>card.clientWidth+1,targets,
       insightTop:insight?.getBoundingClientRect().top,
+      panelRight:Math.max(insight?.getBoundingClientRect().right||0,document.querySelector('[data-mod="accuracy"]')?.getBoundingClientRect().right||0),
       headingHeight:heading.getBoundingClientRect().height,headingLine:parseFloat(getComputedStyle(heading).lineHeight),
       headingSize:parseFloat(getComputedStyle(heading).fontSize),copySize:parseFloat(getComputedStyle(card.querySelector('p')).fontSize),
       developerSize:parseFloat(getComputedStyle(card.querySelector('.learning-announcement-eyebrow')).fontSize),
@@ -37,7 +38,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     for (const [point,expected] of [[anchors.start,anchors.from],[anchors.end,anchors.to]])
       assert.ok(Math.hypot(point.x-expected.x,point.y-expected.y)<1, 'Connect the bottom center to the middle of the button side: '+JSON.stringify(anchors));
   };
-  for (const [width, height] of [[1920,1080],[1366,900],[960,800],[390,844],[320,640]]) {
+  for (const [width, height] of [[1920,1080],[1880,1080],[2000,1080],[1366,900],[960,800],[390,844],[320,640]]) {
     await run('window.scrollTo(0,0)');
     await call('Emulation.setDeviceMetricsOverride', {width,height,deviceScaleFactor:1,mobile:false}, review.sessionId);
     await sleep(700);
@@ -47,8 +48,10 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     assert.ok(g.left >= 10 && g.right <= g.width - 10 && g.top >= 60 && g.bottom <= g.height - 10, JSON.stringify(g));
     assert.equal(g.overflow, false, JSON.stringify(g));
     assert.ok(g.headingHeight <= g.headingLine + 1, 'The title stays on one line: ' + JSON.stringify(g));
-    assert.equal(g.headingSize, 25); assert.equal(g.copySize, 14);
-    assert.equal(g.developerSize, 14);
+    assert.equal(g.headingSize, 21); assert.equal(g.copySize, 13);
+    assert.equal(g.developerSize, 12);
+    assert.ok(g.right - g.left <= 281, 'Keep the developer note compact: ' + JSON.stringify(g));
+    if (width >= 1880) assert.ok(g.left >= g.panelRight + 15, 'Fit beside Insights and Accuracy: ' + JSON.stringify(g));
     assert.equal(g.centered, true, 'Copy and actions should be centered');
     if (width >= 1366) assert.ok(Math.abs(g.top - g.insightTop) < 1, 'Align the note with Insights: ' + JSON.stringify(g));
     assert.equal(g.targets.length, 2);
@@ -71,7 +74,8 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     }
     await screenshot('learning-announcement-' + width);
     if (visible.length < 2) {
-      await run("document.querySelector('.learn-entry-button').scrollIntoView({block:'end'})");
+      // Leave room for subpixel rounding on the transformed review canvas.
+      await run("(()=>{const button=document.querySelector('.learn-entry-button');button.style.scrollMarginBottom='2px';button.scrollIntoView({block:'end'});})()");
       await sleep(200);
       const scrolled = await geometry();
       assert.equal(scrolled.targets[1].hit, true, JSON.stringify(scrolled));
