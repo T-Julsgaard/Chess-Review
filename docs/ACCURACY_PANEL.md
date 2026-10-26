@@ -127,6 +127,43 @@ not follow an exploratory variation or change the accuracy/rating models.
 
 No eligible sample or incomplete/mixed evidence produces an em dash, not zero.
 
+Modern's Advanced page keeps these three metrics and adds three comparisons.
+Its player cards share the overview's exact markup, position and typography.
+Six compact rows fit the taller Modern panel; shorter windows can scroll the
+body while retaining the navigation. Loss and streak links revisit the mainline.
+
+- **Time ahead:** percentage of usable recorded thinking seconds during which
+  that player had more time remaining. For each turn, reconstruct elapsed time
+  as `previous own clock + increment - current own clock`. Integrate the moving
+  clock against the opponent's stationary clock, splitting at a crossover.
+  Increments take no elapsed time. Missing tags invalidate their dependent
+  intervals rather than carrying a stale clock forward. The tooltip gives
+  recorded seconds and usable/total turns, so incomplete coverage stays visible.
+  Supports simple base-time and base-plus-increment controls; staged controls
+  and clockless games show an em dash. Custom starts require actual samples on
+  both sides before integration begins.
+- **Longest clean streak:** longest consecutive run of completed decisions
+  classified Good or better, including Book. Inaccuracy, Mistake, Miss and
+  Blunder break a run. Forced replies neither add to nor break it. Ties retain
+  the earliest run, and selecting a nonzero value jumps to its first move.
+  Missing eligible classifications leave the metric unavailable.
+- **Comeback meter:** an original 0–100 recovery measure using the shared
+  centipawn-to-expected-score curve (`SF19_OUTCOME`) for both engines. A clear
+  deficit requires expected score at or below 35%. The score is
+  `max(0, 100 × (finish − lowest expected score))`; without a clear deficit it
+  is zero. A declared result supplies the finish (win 1, draw 0.5, loss 0);
+  ongoing games use the final evaluation and say so in the tooltip. Mate scores
+  map to endpoints. Requires complete compatible analysis and all position
+  evaluations. This measures recovery retained at the finish, including help
+  from opponent mistakes, rather than attributing the recovery solely to skill.
+
+These additions use the completed mainline evidence, including when a review is
+restored from cache. They do not change accuracy, annotations or rating models.
+Run `node scripts/learning-browser.mjs --working-tree --modern-advanced` for eight
+viewport sizes, exact header geometry checks, real PGN clocks, keyboard links,
+cached reload and dark/light screenshots. Illustrative screenshots are labeled
+separately from the real analysis.
+
 ## Verification
 
 `tests/game-statistics.test.mjs` covers boundaries, custom starts, phase

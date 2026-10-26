@@ -846,7 +846,7 @@ function parseHeaders(pgn) {
   while ((m = re.exec(pgn))) h[m[1]] = m[2];
   return h;
 }
-function parseClocks(pgn) {
+function parseClocks(pgn, precise = false) {
   const chess = new Chess(); chess.loadPgn(pgn);
   const comments = new Map(chess.getComments().map(({ fen, comment }) => [fen, comment]));
   // Clock tags are optional. Match comments to their actual mainline positions
@@ -854,10 +854,11 @@ function parseClocks(pgn) {
   return [null, ...chess.history({ verbose: true }).map(move => {
     const m = (comments.get(move.after) || "").match(/\[%clk\s+([\d:.]+)\]/);
     if (!m) return null;
+    const fraction = precise && m[1].includes('.') ? '.' + m[1].split('.')[1] : '';
     let t = m[1].split(".")[0];
     const p = t.split(":").map(Number);
     if (p.length === 3) t = `${p[0] * 60 + p[1]}:${String(p[2]).padStart(2, "0")}`;
-    return t;
+    return t + fraction;
   })];
 }
 function buildPositions(pgn) {
@@ -1475,7 +1476,9 @@ function computeDerived() {
   }
   const N = S.total;
   const eloAccs = sideAccuracies();
-  S.gameStats = gameStatistics(S.positions, S.bests, S.calibrated);
+  const result = S.headers.Result || S.meta.result || S.pgn.trim().match(/(?:^|\s)(1-0|0-1|1\/2-1\/2)$/)?.[1];
+  S.gameStats = gameStatistics(S.positions, S.bests, S.calibrated,
+    {classifications: completedClasses, clocks: S.clocks, headers: {...S.headers, Result: result}, evals: S.evals});
   for (const side of ["w", "b"]) {
     const counts = {}; QUALITY_ORDER.forEach((k) => (counts[k] = 0));
     for (let i = 1; i <= N; i++) {
@@ -3333,7 +3336,7 @@ function clockFor(side) {
   // so fall back to the base time — but only for games that actually carry clock data, so a
   // clockless PGN doesn't get a frozen clock.
   if (!last && S.clocks.some(Boolean)) return initialClock();
-  return last;
+  return last?.split('.')[0] || last;
 }
 // Captured material at the currently-viewed position, read off the FEN board. For a side it returns
 // the opponent pieces that side has captured (as cburnett image codes like "bP"), plus the running
@@ -4416,6 +4419,61 @@ function updateAccuracyPhases(sides, busy, design) {
   if (current) current.replaceWith(design.startsWith('phases')
     ? renderPhaseReport(sides, busy, design === 'phases2') : renderAccuracyPhases(sides, busy, design !== 'pages'));
 }
+function renderModernAdvanced(sides, busy) {
+  const stats = sides.map(side => S.gameStats?.[side]);
+  const decimal = value => value == null ? '—' : value.toFixed(1);
+  const moveName = ply => {
+    const position = S.positions[ply];
+    if (!position || ply == null) return '';
+    const fullmove = Number(S.positions[ply - 1].fen.split(' ')[5]);
+    return fullmove + (position.color === 'w' ? '. ' : '… ') + position.san;
+  };
+  const cell = (index, value, {detail = '', hint = '', meter = null, jump = null, className = ''} = {}) => {
+    const available = value != null && !busy;
+    const label = S.players[sides[index]].name + ': ' + (busy ? 'Analyzing' : available ? value + '. ' + hint : hint || 'Unavailable');
+    return el(jump != null ? 'button' : 'div', {class: 'advanced-value ' + className,
+      ...(jump != null ? {type: 'button', onclick: () => gotoMainline(jump), disabled: !available} : {}),
+      'aria-label': label, ...(hint ? {title: hint} : {})},
+    el('strong', {class: 'acc-stat-value'}, busy ? '···' : value ?? '—'),
+    detail ? el('span', {class: 'advanced-detail'}, busy ? ' ' : detail) : null,
+    meter == null ? null : el('span', {class: 'advanced-meter', 'aria-hidden': 'true'},
+      el('i', {style: {width: (available ? Math.max(0, Math.min(100, meter)) : 0) + '%'}})));
+  };
+  const row = (id, label, hint, cells) => el('section', {class: 'advanced-row', 'data-metric': id, 'aria-label': label, 'aria-description': hint, title: hint},
+    el('div', {class: 'advanced-label'}, label), el('div', {class: 'advanced-pair'}, ...cells));
+  return el('div', {class: 'acc-advanced advanced-report'},
+    row('loss', 'Average centipawn loss', 'Lower is better. 100 centipawns = one pawn.', stats.map((stat, i) =>
+      cell(i, stat?.averageCpLoss == null ? null : decimal(stat.averageCpLoss),
+        {hint: (stat?.cpMoves || 0) + ' scored decisions. Lower is better; 100 cp = one pawn.'}))),
+    row('match', 'Engine top-move match', 'How often your decision matched the engine’s first choice. Forced moves excluded.', stats.map((stat, i) =>
+      cell(i, stat?.topMatch == null ? null : decimal(stat.topMatch) + '%', {meter: stat?.topMatch ?? 0}))),
+    row('largest', 'Largest evaluation loss', 'Select a move to revisit the largest centipawn loss.', stats.map((stat, i) => {
+      const loss = stat?.largestLoss;
+      return cell(i, loss ? Math.round(loss.loss) + ' cp' : null, {detail: loss?.loss > 0 ? moveName(loss.ply) + ' ↗' : ' ',
+        jump: !busy && loss?.loss > 0 ? loss.ply : null, className: 'acc-loss', hint: loss ? 'On ' + moveName(loss.ply) + '. Jump to move.' : 'No scored loss'});
+    })),
+    row('clock', 'Time ahead', 'Share of recorded thinking time with more time on your clock. Increments removed; clock crossovers included.', stats.map((stat, i) => {
+      const clock = stat?.timeAhead;
+      return cell(i, clock ? Math.round(clock.percent) + '%' : null, {meter: clock?.percent ?? 0,
+        detail: clock ? 'of recorded time' : 'Clock data needed',
+        hint: clock ? 'Based on ' + Math.round(clock.seconds) + ' seconds across ' + clock.turns + '/' + clock.totalTurns + ' turns with usable clocks. Increments excluded.'
+          : 'Requires clock tags and a supported base time with optional increment.'});
+    })),
+    row('streak', 'Longest clean streak', 'Consecutive decisions at Good or better, including Book. Forced moves neither add to nor break a streak.', stats.map((stat, i) => {
+      const streak = stat?.cleanStreak;
+      return cell(i, streak ? String(streak.count) : null, {detail: streak?.count > 0 ? 'decisions · revisit ↗' : 'clean decisions',
+        jump: !busy && streak?.count > 0 ? streak.startPly : null,
+        hint: streak?.count > 0 ? moveName(streak.startPly) + ' to ' + moveName(streak.endPly) + '. Jump to the start of the streak.' : 'No clean streak scored'});
+    })),
+    row('comeback', 'Comeback meter', 'Expected-score points recovered from a clear deficit to the finish. A declared loss scores zero; opponent mistakes can contribute.', stats.map((stat, i) => {
+      const comeback = stat?.comeback;
+      return cell(i, comeback ? String(Math.round(comeback.score)) : null, {meter: comeback?.score ?? 0,
+        detail: comeback ? comeback.hadDeficit ? 'points recovered' : 'No clear deficit' : 'Full analysis needed',
+        hint: comeback ? 'Expected score: ' + Math.round(comeback.worst * 100) + '% at the lowest point → '
+          + Math.round(comeback.finish * 100) + '% at the finish. ' + (comeback.finalResult ? 'Uses the recorded result.' : 'Uses the final evaluation; result unknown.')
+          : 'Requires complete analysis with compatible engine evidence.'});
+    })));
+}
 function renderStats() {
   const design = panelDesign('accuracy', S.settings);
   const phaseReport2 = design === 'phases2';
@@ -4453,7 +4511,7 @@ function renderStats() {
   const players = pair('acc-players' + (phaseReport2 && page === 0 ? ' phase2-players' : ''), [
     phaseReport2 && page === 0 ? el('span', {'aria-hidden': 'true'}) : null,
     ...sides.map(side => el('div', {class: 'acc-player'},
-    page === 0 || phaseModern && page === 1 ? null : el('span', {class: 'acc-side ' + side, 'aria-label': side === 'w' ? 'White' : 'Black'}),
+    page === 0 || phaseModern ? null : el('span', {class: 'acc-side ' + side, 'aria-label': side === 'w' ? 'White' : 'Black'}),
     el('span', {class: 'acc-name'}, S.players[side].name)))]);
   const rows = {};
   let content;
@@ -4472,6 +4530,8 @@ function renderStats() {
       renderAccuracyPhases(sides, busy));
   } else if (page === 1) {
     content = renderMoveQuality(sides, rows);
+  } else if (phaseModern) {
+    content = renderModernAdvanced(sides, busy);
   } else {
     const stats = sides.map(side => S.gameStats?.[side]);
     content = el('div', {class: 'acc-advanced'},
@@ -4490,7 +4550,7 @@ function renderStats() {
   }
   UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials accuracy-book' + (reveal ? ' accuracy-reveal' : '') + (phaseReport ? ' accuracy-phase-report' : '') + (phaseReport2 && page === 0 ? ' accuracy-phase-report-2' : '') + (phaseModern ? ' accuracy-phase-modern' : '') + (design === 'phases-modern-v2' ? ' accuracy-phase-modern-v2' : ''), 'data-design': design, 'aria-label': 'Accuracy'},
     accuracyPager(),
-    el('div', {class: 'panel-body acc-page' + (page === 0 ? ' acc-page-overview' : phaseModern && page === 1 ? ' acc-page-quality' : ''), id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
+    el('div', {class: 'panel-body acc-page' + (page === 0 ? ' acc-page-overview' : phaseModern ? page === 1 ? ' acc-page-quality' : ' acc-page-advanced' : ''), id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
       'aria-labelledby': 'accuracy-tab-' + page}, players, content)));
   statsRefs = busy ? {design, page, rows} : null;
   if (UI.canvas.classList.contains('full-hd-reference')) applyLayout();
@@ -7429,7 +7489,7 @@ async function applyGame(payload) {
   S.pgn = payload.pgn;
   S.meta = payload.meta || {};
   S.headers = parseHeaders(payload.pgn);
-  S.clocks = parseClocks(payload.pgn);
+  S.clocks = parseClocks(payload.pgn, true);
   S.positions = positions;
   S.total = S.positions.length - 1;
   S.evals = new Array(S.total + 1).fill(null);

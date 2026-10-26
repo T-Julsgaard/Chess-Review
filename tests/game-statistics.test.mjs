@@ -87,3 +87,89 @@ test('missing and mixed-engine evidence produces unavailable statistics', () => 
     assert.equal(empty[side].phases.opening.accuracy, null);
   }
 });
+
+test('clean streaks follow the player’s decisions, skip forced replies, break on errors, and retain earliest ties', () => {
+  const f = fixture();
+  const classifications = [null, 'book', 'blunder', 'best', 'good', 'excellent'];
+  let stats = gameStatistics(f.positions, f.bests, f.calibrated, {classifications});
+  assert.deepEqual(stats.w.cleanStreak, {count: 3, startPly: 1, endPly: 5});
+  assert.deepEqual(stats.b.cleanStreak, {count: 1, startPly: 4, endPly: 4});
+  f.calibrated.w.moves[1].eligible = false;
+  classifications[3] = 'best';
+  stats = gameStatistics(f.positions, f.bests, f.calibrated, {classifications});
+  assert.deepEqual(stats.w.cleanStreak, {count: 2, startPly: 1, endPly: 5});
+  f.calibrated.w.moves[1].eligible = true; classifications[3] = 'miss';
+  assert.deepEqual(gameStatistics(f.positions, f.bests, f.calibrated, {classifications}).w.cleanStreak,
+    {count: 1, startPly: 1, endPly: 1});
+  classifications[5] = null;
+  assert.equal(gameStatistics(f.positions, f.bests, f.calibrated, {classifications}).w.cleanStreak, null);
+});
+
+test('Time ahead integrates seconds across clock crossovers and excludes increment time', () => {
+  const f = fixture(), positions = f.positions.slice(0, 4);
+  for (const side of ['w', 'b']) f.calibrated[side].moves = f.calibrated[side].moves.filter(move => move.ply < 4);
+  const stats = gameStatistics(positions, f.bests, f.calibrated,
+    {clocks: [null, '1:35', '1:25', '1:20'], headers: {TimeControl: '100+5'}});
+  assert.equal(stats.w.timeAhead.percent, 50);
+  assert.equal(stats.b.timeAhead.percent, 50);
+  assert.equal(stats.w.timeAhead.seconds, 50);
+  assert.equal(stats.w.timeAhead.turns, 3);
+  assert.equal(stats.w.timeAhead.totalTurns, 3);
+  assert.deepEqual(stats.w.timeAhead.ahead, {w: 25, b: 25});
+});
+
+test('clock gaps, excerpts, zero elapsed time and unsupported controls are never imputed', () => {
+  const f = fixture(), headers = {TimeControl: '100+5'};
+  const calculate = (clocks, h = headers) => gameStatistics(f.positions, f.bests, f.calibrated, {clocks, headers: h}).w.timeAhead;
+  assert.equal(calculate([]), null);
+  assert.equal(calculate([null, '1:45', '1:45']), null, 'Increments alone consume no time');
+  assert.equal(calculate([null, '1:35'], {TimeControl: '40/7200:3600'}), null);
+  assert.equal(calculate([null, '1:35'], {...headers, FEN: opening, SetUp: '1'}), null);
+  const gap = calculate([null, '1:35', null, '1:20', '1:10', '1:00']);
+  assert.equal(gap.turns, 2, 'Missing clock invalidates adjacent turns until fresh samples exist');
+  assert.equal(gap.seconds, 35);
+  assert.equal(calculate([null, '1:99']), null);
+});
+
+test('clock integration preserves fractional seconds and waits for both clocks in a black-to-move excerpt', () => {
+  const f = fixture(), headers = {TimeControl: '100+5'};
+  const stats = gameStatistics(f.positions, f.bests, f.calibrated,
+    {clocks: [null, '1:35.5'], headers});
+  assert.equal(stats.w.timeAhead.seconds, 9.5);
+  assert.equal(stats.w.timeAhead.percent, 0);
+  const excerpt = [{fen: opening.replace(' w ', ' b ')},
+    ...['b', 'w', 'b', 'w'].map(color => ({fen: ending, color, from: 'a1', to: 'a2'}))];
+  const clock = gameStatistics(excerpt, [], null,
+    {clocks: [null, '1:35', '1:30', '1:20', '1:10'], headers: {...headers, SetUp: '1'}}).w.timeAhead;
+  assert.equal(clock.turns, 2);
+  assert.equal(clock.seconds, 45);
+  assert.ok(Math.abs(clock.percent - 100 * 25 / 45) < 1e-9);
+});
+
+test('comeback measures recovery retained at the finish, respects actual results, and requires a clear deficit', () => {
+  const f = fixture(), evals = [0, -400, -200, 100, 300, 0].map(cp => ({cp}));
+  const calculate = result => gameStatistics(f.positions, f.bests, f.calibrated, {evals, headers: {Result: result}});
+  const win = calculate('1-0');
+  assert.equal(win.w.comeback.ply, 1);
+  assert.ok(win.w.comeback.score > 80 && win.w.comeback.score < 82);
+  assert.equal(win.b.comeback.score, 0);
+  const draw = calculate('1/2-1/2').w.comeback;
+  assert.ok(draw.score > 30 && draw.score < 32);
+  assert.equal(calculate('0-1').w.comeback.score, 0, 'A brief rebound cannot earn comeback credit after a loss');
+  assert.equal(calculate('*').w.comeback.finalResult, false);
+  assert.equal(calculate('*').w.comeback.finish, .5);
+  const level = gameStatistics(f.positions, f.bests, f.calibrated, {evals: evals.map(() => ({cp: 0}))});
+  assert.equal(level.w.comeback.score, 0); assert.equal(level.w.comeback.hadDeficit, false);
+  evals[2] = null;
+  assert.equal(calculate('*').w.comeback, null);
+});
+
+test('mate scores map to endpoints for recovery and mixed-engine games cannot get a comeback score', () => {
+  const f = fixture(), evals = [0, 0, 0, 0, 0, 0].map(cp => ({cp}));
+  evals[1] = {mate: -4}; evals[5] = {mate: 1};
+  const stats = gameStatistics(f.positions, f.bests, f.calibrated, {evals});
+  assert.equal(stats.w.comeback.score, 100);
+  assert.equal(stats.b.comeback.score, 0);
+  f.calibrated.b.moves.forEach(move => { move.engine = 'sf19lite'; });
+  assert.equal(gameStatistics(f.positions, f.bests, f.calibrated, {evals}).w.comeback, null);
+});
