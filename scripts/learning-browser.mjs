@@ -22,6 +22,7 @@ await fs.appendFile(path.join(source,'analysis.js'),'\nexport {S, learningWorksp
 if(process.argv.includes('--move-list-layout'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {renderMoves};\n');
 if(process.argv.includes('--engine-minimal'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {applyUiSetup, renderEngine, renderEngineCurrent, renderEnginePractice};\n');
 if(process.argv.includes('--phase-modern')||process.argv.includes('--modern-quality')||process.argv.includes('--modern-advanced'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {applyUiSetup, renderStats, setAccuracyPage};\n');
+if(process.argv.includes('--accuracy-motion'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {applyUiSetup, renderStats, setAccuracyPage, renderGraph};\n');
 if(process.argv.includes('--phase-report-2')||process.argv.includes('--overview-reveal')||process.argv.includes('--phase-overview')||process.argv.includes('--move-quality'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {renderStats};\n');
 if(process.argv.includes('--viewport-preview'))await fs.appendFile(path.join(source,'analysis.js'),'\nglobalThis.__viewportAudit={S,openLearning,workspace:()=>learningWorkspace,fit:()=>_fittedDip};\n');
 if(process.argv.includes('--viewport-growth'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {applyUiSetup};\n');
@@ -64,6 +65,7 @@ try {
   else if(process.argv.includes('--responsive-reference'))await (await import('./responsive-reference-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--responsive-layout'))await (await import('./responsive-layout-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--review-interactions'))await (await import('./review-interactions-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
+  else if(process.argv.includes('--accuracy-motion'))await (await import('./accuracy-motion-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--accuracy-pages'))await (await import('./accuracy-pages-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out,source});
   else if(process.argv.includes('--overview-reveal'))await (await import('./overview-reveal-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--modern-advanced'))await (await import('./modern-advanced-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});

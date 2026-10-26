@@ -21,6 +21,12 @@
 .evaluation-move-badge.current, .evaluation-move-badge:hover { z-index: 2; box-shadow: 0 0 0 2px var(--ink); }
 .evaluation-column.white { fill: #e2dfd5; }
 .evaluation-column.black { fill: #77766d; }
+.evaluation-bars :is(.eval-position,.eval-hover-line),
+.evaluation-bars2 :is(.eval-position,.eval-hover-line) {
+  stroke: var(--ink); stroke-width: 1.5; opacity: .9;
+  filter: drop-shadow(1px 0 0 var(--panel)) drop-shadow(-1px 0 0 var(--panel));
+}
+.evaluation-bars .eval-hover-dot, .evaluation-bars2 .eval-hover-dot { fill: var(--ink); stroke: var(--panel); }
 .evaluation-bars2 .evalgraph { position: relative; }
 .evaluation-move-dot {
   position: absolute; width: 5px; height: 5px; border-radius: 50%;

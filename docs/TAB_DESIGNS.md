@@ -8,10 +8,9 @@ The choices are local visual preferences and survive reopening the extension.
 - **Old** restores the automatic arrangement used by Reset layout, with every
   tab design set to Original. Expanding Accuracy moves Engine and Solve puzzles
   down, and collapsing it restores their positions.
-- **Modern** uses the supplied `chess-review-layout (7) modern.json` arrangement,
-  including its panel content scales. Accuracy uses Phase report (the first
-  version), Move list uses Zoom +20%, Engine uses Minimal, and the remaining
-  tabs use Original.
+- **Modern** uses the supplied arrangement, including its panel content scales.
+  Accuracy uses Phase report Modern, Move list uses Zoom +20%, Engine uses Minimal,
+  Evaluation uses Move bars, and the remaining tabs use Original.
 - **Custom** is selected automatically after moving or resizing panels or changing
   a tab design. Selecting Custom directly keeps the current arrangement and designs.
 
@@ -31,7 +30,7 @@ visual preferences.
 | --- | --- | --- |
 | Engine | Original, Focus, Minimal | Original (Minimal in Modern setup) |
 | Evaluation bar | Original, Balance | Balance |
-| Evaluation | Original, Timeline, Timeline v2, Move bars, Minimal | Timeline |
+| Evaluation | Original, Timeline, Timeline v2, Move bars, Move bars v2, Minimal | Timeline (Move bars in Modern setup) |
 | Accuracy overview | Original, Page tabs, Dials, Reveal, Phase report, Phase report 2, Phase report Modern, Phase report Modern v2 | Phase report |
 | Accuracy move quality | Original, Distribution | Distribution |
 | Accuracy advanced | Original | Original |
@@ -117,14 +116,14 @@ original Modern report. Run
 `node scripts/learning-browser.mjs --working-tree --phase-modern --phase-modern-v2`
 to check v2 at eight viewport sizes, both themes and after reloading saved settings.
 
-All paged designs share a folded bottom-right corner. Click it, press Enter or
-Space, or drag it left/up to turn to the next page. Short drags, Escape and pointer
-cancellation return the corner without changing pages. Existing page buttons and
-arrow/Home/End navigation remain available. Sheet turns and the score reveal
-respect animation preferences and reduced motion. Run
-`node scripts/learning-browser.mjs --working-tree --phase-modern` to verify the
-Modern layout at eight viewports, settings persistence, real pointer dragging,
-sheet cleanup and reduced motion, with dark/light screenshots.
+All paged designs share Accuracy, Quality and Advanced tabs with a liquid selection
+animation and a short page transition. Player names stay stationary while the
+results move. Arrow/Home/End navigation remains available. During live analysis,
+each phase counts up when both players' scores are ready, keeping later phases
+behind earlier ones. Later updates and final totals preserve running phase reveals.
+Animations respect motion preferences and reduced motion. Run
+`node scripts/learning-browser.mjs --working-tree --accuracy-motion` to verify
+stationary names, phase arrivals and Move bars styling in both themes.
 
 Original Move list restores its title header and empty footer strip. Full height
 omits both nodes so the scrollable moves body reaches the panel bottom. It keeps
@@ -186,8 +185,11 @@ and size preferences, and can be clicked to jump directly to that move. The
 selected move's badge has an outline. Badges remain circular when the panel is
 resized and stay inside the plot at its ends. Choose it under **Settings → Visual
 → Tabs → Evaluation → Timeline v2**; the original Timeline stays the default.
-Move bars gives every analyzed position its own column: light above zero for
-White, gray below zero for Black. These designs support
+Move bars is the Modern setup's default. Existing Modern setups using Original
+upgrade once; other saved designs and subsequent choices are retained. It gives
+every analyzed position its own column: light above zero for White, gray below
+zero for Black. Move bars and Move bars v2 use an ivory position/hover guide in
+dark themes and charcoal in light themes. These designs support
 click-to-jump, hover scores and keyboard navigation (arrows, Home, End), preserve
 focus and chart nodes while navigating, and stop at the analyzed prefix. Empty
 and pending positions show explicit waiting states. Scores use White's

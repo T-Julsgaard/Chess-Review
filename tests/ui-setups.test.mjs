@@ -40,6 +40,7 @@ test('Modern reproduces every supplied box and scale, including the collapsed Ac
   const a=review(t);
   assert.deepEqual(MODERN_LAYOUT,supplied.layout);
   await a.call('applyUiSetup','modern');
+  assert.equal(a.state.settings.graphDesign,'bars');
   assert.equal(a.state.settings.accuracyDesign,'phases-modern');assert.equal(a.state.settings.movesDesign,'zoom20');
   for(const [key,box]of Object.entries(supplied.displayedLayout)) {
     for(const prop of ['x','y','w','h','scale'])near(a.state.layout[key][prop],box[prop]);
@@ -135,6 +136,29 @@ test('Modern move-list migration keeps individually selected zoomed designs', as
   assert.equal(a.state.settings.movesDesign, 'zoomed');
   assert.equal(a.store.settings.modernMovesVersion, 1);
   assert.equal(a.state.settings.uiSetup, 'custom');
+});
+
+test('saved Modern evaluations adopt Move bars once and preserve subsequent choices', async t => {
+  const a = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
+  a.replace('resetSettingsForRelease', async () => {});
+  a.store.settings = {uiSetup: 'modern', graphDesign: 'original'};
+  await a.start();
+  assert.equal(a.state.settings.graphDesign, 'bars');
+  assert.equal(a.store.settings.modernGraphVersion, 1);
+  await a.call('setSetting', 'graphDesign', 'original');
+  const b = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
+  b.replace('resetSettingsForRelease', async () => {});
+  Object.assign(b.store, structuredClone(a.store)); await b.start();
+  assert.equal(b.state.settings.graphDesign, 'original');
+});
+
+test('Modern evaluation migration retains individually chosen designs', async t => {
+  const a = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
+  a.replace('resetSettingsForRelease', async () => {});
+  a.store.settings = {uiSetup: 'modern', graphDesign: 'timeline2'};
+  await a.start();
+  assert.equal(a.state.settings.graphDesign, 'timeline2');
+  assert.equal(a.store.settings.modernGraphVersion, 1);
 });
 
 test('tab customization selects and persists Custom while unrelated preferences and no-op choices retain presets',async t=>{
