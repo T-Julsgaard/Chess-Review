@@ -28,9 +28,33 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   assert.equal(await run(popup,"document.querySelector('#analyzeCurrent').dataset.highlighted"),'true');
   assert.equal(await run(popup,"document.querySelector('.fluid-indicator').getAnimations().some(a=>a.playState==='running')"),true);
   await call('Input.dispatchMouseEvent',{type:'mouseMoved',x:2,y:2},popup.sessionId);
-  assert.equal(await run(popup,"getComputedStyle(document.querySelector('.fluid-indicator')).visibility"),'hidden');
+  assert.equal(await run(popup,"getComputedStyle(document.querySelector('.fluid-indicator')).visibility"),'visible');
   assert.equal(await run(popup,"document.querySelectorAll('[data-highlighted=true]').length"),0);
+  await waitFor(popup,"getComputedStyle(document.querySelector('.fluid-indicator')).visibility==='hidden'",'Initial popup exit');
+  assert.equal(await run(popup,"getComputedStyle(document.querySelector('.fluid-indicator')).visibility"),'hidden');
+  const bounds=await run(popup,"(()=>{const r=document.querySelector('#analyzeCurrent').getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom}})()");
+  for(const [edge,exitPoint,dimension] of [
+    ['left',{x:bounds.left-2,y:first.y},'width'],['right',{x:bounds.right+2,y:first.y},'width'],
+    ['top',{x:first.x,y:bounds.top-2},'height'],['bottom',{x:first.x,y:bounds.bottom+2},'height'],
+  ]){
+    await call('Input.dispatchMouseEvent',{type:'mouseMoved',...first},popup.sessionId);
+    await call('Input.dispatchMouseEvent',{type:'mouseMoved',...exitPoint},popup.sessionId);
+    const shape=await run(popup,"(()=>{const el=document.querySelector('.fluid-indicator'),a=el.getAnimations()[0];a.pause();a.currentTime=150;const s=getComputedStyle(el);return {opacity:+s.opacity,visibility:s.visibility,end:a.effect.getKeyframes().at(-1)}})()");
+    assert.equal(shape.visibility,'visible');assert.ok(shape.opacity>0&&shape.opacity<1);assert.equal(shape.end[dimension],'0px');
+    await shot(popup,'popup-exit-'+edge);
+    // Re-enter halfway through: the exit must be replaced, including on the same button.
+    await call('Input.dispatchMouseEvent',{type:'mouseMoved',...first},popup.sessionId);
+    assert.equal(await run(popup,"document.querySelector('#analyzeCurrent').dataset.highlighted"),'true');
+    await sleep(300);
+    assert.equal(await run(popup,"getComputedStyle(document.querySelector('.fluid-indicator')).opacity"),'1');
+    await call('Input.dispatchMouseEvent',{type:'mouseMoved',x:2,y:2},popup.sessionId);
+    await waitFor(popup,"getComputedStyle(document.querySelector('.fluid-indicator')).visibility==='hidden'",'Popup exit after '+edge+' re-entry');
+    assert.equal(await run(popup,"getComputedStyle(document.querySelector('.fluid-indicator')).visibility"),'hidden');
+  }
   await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]},popup.sessionId);
+  await call('Input.dispatchMouseEvent',{type:'mouseMoved',...first},popup.sessionId);
+  await call('Input.dispatchMouseEvent',{type:'mouseMoved',x:2,y:2},popup.sessionId);
+  assert.equal(await run(popup,"getComputedStyle(document.querySelector('.fluid-indicator')).visibility"),'hidden');
   await run(popup,"document.querySelector('#analyzeCurrent').focus()");
   assert.equal(await run(popup,"document.querySelector('.fluid-indicator').getAnimations().length"),0);
   await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9},popup.sessionId);
