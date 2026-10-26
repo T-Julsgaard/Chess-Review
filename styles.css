@@ -1152,6 +1152,10 @@ button { font-family: inherit; cursor: pointer; }
 .sq.flash-bad::after  { background: color-mix(in srgb, var(--q-blunder, #d23b3b) 55%, transparent); }
 @keyframes flashfade { from { opacity: .9; } to { opacity: 0; } }
 .sq { position: relative; display: grid; place-items: center; container-type: size; }
+/* Match each highlight to its square's painted bounds; the board mask fills
+   fractional gaps between squares while the board scales. */
+.sq.light { background-color: var(--sq-light); }
+.sq.dark { background-color: var(--sq-dark); }
 /* the square with the sliding piece is raised above the others during the animation */
 .sq.anim-top { z-index: 6; }
 .sq.anim-top .piece, .sq.anim-top .piece-svg, .sq.anim-top .piece-img { will-change: transform; }
