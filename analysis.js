@@ -3480,6 +3480,7 @@ let _coachPointerActive = false, _coachPointerRAF = null, _coachPointerPoint = n
 let _coachPointerBound = false;
 const COACH_SETTLE_MS = 250, COACH_REACTION_HOLD_MS = 1200;
 let _coachReactionT = null, _coachReactAt = -Infinity, _coachEmotion = null;
+let _coachSovietHeadAt = -Infinity;
 
 function resetCoachAnimation() {
   clearCoachPointer();
@@ -3487,6 +3488,7 @@ function resetCoachAnimation() {
   _coachReactionT = _coachIdleT = _coachGlanceT = _coachSpecialT = _coachCupT = null;
   _coachIdleStarted = false; _coachGlanceUntil = 0; _coachCupUp = false;
   _coachTalking = false; _coachReactAt = -Infinity; _coachEmotion = null;
+  _coachSovietHeadAt = -Infinity;
 }
 
 function coachSend(cmd) {
@@ -3626,12 +3628,40 @@ let _coachCupT = null, _coachCupUp = false;
 // old_soviet's sip: raise the cup, hold 2–4s, then lower — on its OWN timer, so moving to the
 // next move can't cut it short, and a re-trigger while it's already up is ignored. Never touches his
 // emotion (raise only moves the cup), and it's thinned a little so it's not on every eligible move.
-function coachSipCup() {
-  if (_coachCupUp || Math.random() > 0.21) return;   // only ~21% of eligible triggers raise the cup
+function coachSipCup(chance = 0.21) {
+  if (_coachCupUp || (chance < 1 && Math.random() >= chance)) return;
   _coachCupUp = true;
   coachSend({ coachCmd: "raise", value: true });
   clearTimeout(_coachCupT);
   _coachCupT = setTimeout(() => { coachSend({ coachCmd: "raise", value: false }); _coachCupUp = false; }, 2000 + Math.random() * 2000);
+}
+// Mutually exclusive actions leave room for expression-only reactions. Head gestures are
+// restrained even when rapidly browsing a run of good moves; tea keeps its own lowering timer.
+const SOVIET_REACTIONS = {
+  exceptional: [["nod", 0.35], ["tea", 0.15]],
+  positive: [["nod", 0.18], ["tea", 0.10]],
+  ordinary: [["tea", 0.05]],
+  negative: [["shake", 0.12], ["eyeRoll", 0.28]],
+  blunder: [["shake", 0.25], ["eyeRoll", 0.30]],
+};
+function coachSovietReaction(cls) {
+  const group = {brilliant:"exceptional", great:"exceptional", best:"positive", excellent:"positive",
+    good:"ordinary", book:"ordinary", inacc:"negative", mistake:"negative", miss:"negative", blunder:"blunder"}[cls];
+  let r = Math.random();
+  for (const [cmd, chance] of SOVIET_REACTIONS[group] || []) {
+    r -= chance;
+    if (r >= 0) continue;
+    if (cmd === "tea") coachSipCup(1);
+    else {
+      if (cmd === "nod" || cmd === "shake") {
+        const now = performance.now();
+        if (now - _coachSovietHeadAt < 8000) return;
+        _coachSovietHeadAt = now;
+      }
+      coachSend({coachCmd:cmd});
+    }
+    return;
+  }
 }
 function coachSpecial() {
   if (_coachId === "old_soviet") { coachSipCup(); return; }
@@ -3676,6 +3706,7 @@ function coachApplyReaction(idx) {
   clearTimeout(_coachGlanceT);
   _coachGlanceT = setTimeout(() => coachSend({ coachCmd: "look", value: "center" }), 1500);
   if (idx > 0) {
+    if (_coachId === "old_soviet") { coachSovietReaction(cls); return; }
     const r = Math.random();
     if (cls === "brilliant" || cls === "great") { coachSend({ coachCmd: "nod" }); coachSpecial(); }
     else if (cls === "best" || cls === "excellent") { coachSend({ coachCmd: "nod" }); if (r < 0.5) coachSpecial(); }

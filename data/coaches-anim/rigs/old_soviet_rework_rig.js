@@ -23,7 +23,7 @@
  function eyeRoll(){interruptIdle(1400);var t0=performance.now(),dur=1100;roll=function(now){var p=(now-t0)/dur;if(p>=1){roll=null;tgx=0;tgy=0;return;}var a=-Math.PI/2+p*Math.PI*2;tgx=Math.cos(a)*GX;tgy=Math.sin(a)*GY;};}
  function talk(v){talking=(v===undefined)?!talking:!!v;if(talking)interruptIdle(1800);var b=document.getElementById('c-talk');if(b)b.classList.toggle('on',talking);}
  function gest(el,dur,fn){if(!el)return;el._t=(el._t||0)+1;var id=el._t,t0=performance.now();(function s(){if(el._t!==id)return;var p=Math.min(1,(performance.now()-t0)/dur);attr(el,'transform',fn(p));if(p<1)requestAnimationFrame(s);else el.removeAttribute('transform');})();}
- function nod(){interruptIdle(1100);gest(headrig,820,function(p){return 'translate(0 '+(Math.sin(p*Math.PI*4)*(1-p)*9).toFixed(2)+')';});}
+ function nod(){interruptIdle(1100);gest(headrig,820,function(p){return 'translate(0 '+(Math.sin(p*Math.PI)*4).toFixed(2)+')';});}
  function shake(){interruptIdle(1100);gest(headrig,820,function(p){return 'rotate('+(Math.sin(p*Math.PI*4)*(1-p)*6).toFixed(2)+' 340 600)';});}
  function shrug(){interruptIdle(1100);gest(torso,760,function(p){return 'translate(0 '+(-Math.sin(p*Math.PI)*11).toFixed(2)+')';});gest(headrig,760,function(p){return 'translate(0 '+(Math.sin(p*Math.PI)*4).toFixed(2)+')';});}
 
@@ -33,29 +33,29 @@
  var motion=window.matchMedia?window.matchMedia('(prefers-reduced-motion: reduce)'):null;
  var idle=null,lastIdle=null,busyUntil=0;
  var IDLES={
-  sip:{duration:4600,weight:30,frames:[
-   [0,{}],[.22,{cupY:-82,cupR:-3,headY:4,gazeY:3,sqL:.45,sqR:.45,mw:13}],
-   [.58,{cupY:-82,cupR:-6,headY:4,headR:-1,sqL:.65,sqR:.65,mw:11}],
-   [.78,{cupY:-25,cupR:-1,headY:-2,sqL:.35,sqR:.35,mc:578,mb:588}],[1,{}]]},
-  ponder:{duration:4800,weight:25,frames:[
-   [0,{}],[.22,{headR:-4,headY:3,gazeX:-4,gazeY:4,bLY:3,bRY:-7,sqL:.6,sqR:.25}],
-   [.62,{headR:-4,headY:3,gazeX:3,gazeY:3,bLY:3,bRY:-7,sqL:.6,sqR:.25}],
-   [.80,{headY:5,bLY:-3,bRY:-3,mc:578,mb:587}],[1,{}]]},
-  whistle:{duration:3800,weight:22,frames:[
-   [0,{}],[.15,{headR:-3.4,gazeX:-5,gazeY:1,mc:584,mt:573,mb:595,mw:8}],
-   [.35,{headR:3.4,gazeX:5,gazeY:1,mc:584,mt:573,mb:595,mw:8}],
-   [.55,{headR:3.4,gazeX:5,gazeY:1,mc:584,mt:573,mb:595,mw:8}],
-   [.72,{headR:-3.4,gazeX:-5,gazeY:1,mc:584,mt:573,mb:595,mw:8}],
-   [.86,{headR:-3.4,gazeX:-5,gazeY:1,mc:584,mt:573,mb:595,mw:8}],[1,{}]]},
-  chuckle:{duration:2600,weight:13,frames:[
-   [0,{}],[.22,{headR:-2,headY:2,sqL:.65,sqR:.65,mc:575,mt:579,mb:598,mw:33}],
-   [.72,{headR:-2,headY:2,sqL:.65,sqR:.65,mc:575,mt:579,mb:598,mw:33}],[1,{}]]},
-  wink:{duration:1800,weight:7,frames:[
-   [0,{}],[.24,{headR:2,bLY:-4,bRY:-2,sqL:.12,mc:578,mb:589}],
-   [.40,{headR:2,bLY:-4,bRY:-2,sqL:.12,sqR:1,mc:578,mb:589}],
-   [.57,{headR:2,bLY:-4,bRY:-2,sqL:.12,sqR:1,mc:578,mb:589}],
-   [.72,{headR:1,bLY:-3,bRY:-2,sqL:.12,mc:578,mb:589}],[1,{}]]},
-  doze:{duration:6800,weight:3,frames:[
+  sip:{duration:4600,weight:35,frames:[
+   [0,{}],[.22,{cupY:-82,cupR:-3,gazeY:3,sqL:.45,sqR:.45,mw:13}],
+   [.58,{cupY:-82,cupR:-6,sqL:.65,sqR:.65,mw:11}],
+   [.78,{cupY:-25,cupR:-1,sqL:.35,sqR:.35,mc:578,mb:588}],[1,{}]]},
+  ponder:{duration:4800,weight:37,frames:[
+   [0,{}],[.22,{headR:-1.2,gazeX:-4,gazeY:4,bLY:3,bRY:-7,sqL:.6,sqR:.25}],
+   [.62,{headR:-1.2,gazeX:3,gazeY:3,bLY:3,bRY:-7,sqL:.6,sqR:.25}],
+   [.80,{bLY:-3,bRY:-3,mc:578,mb:587}],[1,{}]]},
+  whistle:{duration:3800,weight:10,frames:[
+   [0,{}],[.15,{headR:-1.5,gazeX:-5,gazeY:1,mc:584,mt:573,mb:595,mw:8}],
+   [.35,{headR:1.5,gazeX:5,gazeY:1,mc:584,mt:573,mb:595,mw:8}],
+   [.55,{headR:1.5,gazeX:5,gazeY:1,mc:584,mt:573,mb:595,mw:8}],
+   [.72,{headR:-1.5,gazeX:-5,gazeY:1,mc:584,mt:573,mb:595,mw:8}],
+   [.86,{headR:-1.5,gazeX:-5,gazeY:1,mc:584,mt:573,mb:595,mw:8}],[1,{}]]},
+  chuckle:{duration:2600,weight:10,frames:[
+   [0,{}],[.22,{sqL:.65,sqR:.65,mc:575,mt:579,mb:598,mw:33}],
+   [.72,{sqL:.65,sqR:.65,mc:575,mt:579,mb:598,mw:33}],[1,{}]]},
+  wink:{duration:1800,weight:6,frames:[
+   [0,{}],[.24,{bLY:-4,bRY:-2,sqL:.12,mc:578,mb:589}],
+   [.40,{bLY:-4,bRY:-2,sqL:.12,sqR:1,mc:578,mb:589}],
+   [.57,{bLY:-4,bRY:-2,sqL:.12,sqR:1,mc:578,mb:589}],
+   [.72,{bLY:-3,bRY:-2,sqL:.12,mc:578,mb:589}],[1,{}]]},
+  doze:{duration:6800,weight:2,frames:[
    [0,{}],[.24,{headY:9,headR:3,sqL:.8,sqR:.8,bLY:2,bRY:2,gazeY:4}],
    [.50,{headY:17,headR:5,sqL:1,sqR:1,bLY:3,bRY:3,gazeY:4}],
    [.67,{headY:19,headR:6,sqL:1,sqR:1,bLY:3,bRY:3,gazeY:4}],
@@ -105,7 +105,7 @@
   Object.keys(base).forEach(function(k){pose[k]=lerp(a[1][k]===undefined?base[k]:a[1][k],b[1][k]===undefined?base[k]:b[1][k],t);});
   if(idle.name==='chuckle'){
    var pulse=Math.sin(p*Math.PI*8)*Math.pow(Math.sin(p*Math.PI),2);
-   pose.torsoY=-Math.abs(pulse)*5;pose.headY+=pulse*2;pose.moustacheY=-Math.abs(pulse)*2;
+   pose.torsoY=-Math.abs(pulse)*3;pose.moustacheY=-Math.abs(pulse)*2;
   }
   attr(headrig,'transform','translate(0 '+pose.headY.toFixed(2)+') rotate('+pose.headR.toFixed(2)+' 340 600)');
   attr(torso,'transform','translate(0 '+pose.torsoY.toFixed(2)+')');

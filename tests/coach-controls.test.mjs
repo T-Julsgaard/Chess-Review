@@ -96,7 +96,7 @@ test('ordinary move navigation still reacts, without restarting identical expres
   const a = app(t), ui = coachUI(a), advance = animationClock(a);
   const S = loadGame(a, '1. e4 e5 2. Nf3');
   S.classif = [null, 'best', 'excellent', 'blunder'];
-  const {messages} = mountedCoach(a, ui);
+  const {messages} = mountedCoach(a, ui, 'mentor');
   for (const idx of [1, 2, 3]) {
     S.idx = idx; a.call('coachReactPly', idx); advance(1500);
   }
@@ -104,6 +104,55 @@ test('ordinary move navigation still reacts, without restarting identical expres
   assert.equal(messages.filter(m => m.coachCmd === 'look' && m.value === 'downleft').length, 3);
   assert.ok(messages.some(m => m.coachCmd === 'nod'));
   assert.ok(messages.some(m => ['shake', 'eyeRoll'].includes(m.coachCmd)));
+});
+
+test('Soviet move reactions use restrained, mutually exclusive action percentages', t => {
+  const a = app(t), ui = coachUI(a); animationClock(a); loadGame(a, '1. e4 e5');
+  const {messages} = mountedCoach(a, ui);
+  a.run('Math.random = () => __random');
+  let now = 0, tea = 0;
+  a.context.performance = {now:() => now};
+  a.replace('coachSipCup', chance => { assert.equal(chance, 1); tea++; });
+  for (const [classes, expected] of [
+    [['brilliant', 'great'], {nod:35, tea:15, quiet:50}],
+    [['best', 'excellent'], {nod:18, tea:10, quiet:72}],
+    [['good', 'book'], {tea:5, quiet:95}],
+    [['inacc', 'mistake', 'miss'], {shake:12, eyeRoll:28, quiet:60}],
+    [['blunder'], {shake:25, eyeRoll:30, quiet:45}],
+  ]) {
+    for (const cls of classes) {
+      const counts = {};
+      for (let i = 0; i < 100; i++) {
+        now += 8000; tea = 0; messages.length = 0; a.context.__random = (i + .5) / 100;
+        a.call('coachSovietReaction', cls);
+        assert.ok(messages.length + tea <= 1, 'a reaction cannot stack a nod with tea');
+        const action = tea ? 'tea' : messages[0]?.coachCmd || 'quiet';
+        counts[action] = (counts[action] || 0) + 1;
+      }
+      assert.deepEqual(counts, expected, cls);
+    }
+  }
+});
+
+test('Soviet nods and shakes share an eight-second pause while expressions and eye reactions still respond', t => {
+  const a = app(t), ui = coachUI(a), advance = animationClock(a);
+  const S = loadGame(a, '1. e4 e5 2. Nf3 Nc6');
+  S.classif = [null, 'best', 'excellent', 'blunder', 'mistake'];
+  const {messages} = mountedCoach(a, ui);
+  a.run('Math.random = () => 0.1');
+  for (const idx of [1, 2, 3]) { S.idx = idx; a.call('coachReactPly', idx); advance(1500); }
+  assert.deepEqual(messages.filter(m => ['nod', 'shake'].includes(m.coachCmd)).map(m => m.coachCmd), ['nod']);
+  assert.deepEqual(messages.filter(m => m.coachCmd === 'emotion').map(m => m.value), ['happy', 'angry']);
+  a.run('Math.random = () => 0.2');
+  S.idx = 4; a.call('coachReactPly', 4); advance(1500);
+  assert.ok(messages.some(m => m.coachCmd === 'eyeRoll'), 'eyes still react during the head cooldown');
+  advance(3000); a.run('Math.random = () => 0.1');
+  S.idx = 3; a.call('coachReactPly', 3); advance(1500);
+  assert.equal(messages.filter(m => m.coachCmd === 'shake').length, 1);
+  mountedCoach(a, ui, 'mentor'); mountedCoach(a, ui);
+  messages.length = 0;
+  const resetAt = a.run('_coachSovietHeadAt');
+  assert.equal(resetAt, -Infinity, 'changing coaches resets the gesture pause');
 });
 
 test('removing or switching coaches cancels pending reactions and old prop timers', t => {

@@ -76,6 +76,31 @@ test('Soviet doze closes both eyes then startles awake; sip lifts tea and chuckl
   assert.match(a.node('moustache').getAttribute('transform'), /translate\(0 -/);
 });
 
+test('ordinary Soviet idle moments keep the head level, with only a small tilt for pondering and whistling', t => {
+  const a = portrait(t);
+  for (const name of ['sip', 'ponder', 'whistle', 'chuckle', 'wink']) {
+    a.coach[name]();
+    for (let i = 0; i < 48; i++) {
+      a.advance(100);
+      const transform = a.node('headrig').getAttribute('transform');
+      if (!transform) continue;
+      const [, y, angle] = transform.match(/translate\(0 ([\d.-]+)\) rotate\(([\d.-]+)/);
+      assert.equal(Number(y), 0, `${name} should not bob the head`);
+      assert.ok(Math.abs(Number(angle)) <= 1.5, `${name} only needs a subtle tilt`);
+    }
+  }
+  a.coach.nod();
+  const heights = [];
+  for (let i = 0; i < 80; i++) {
+    a.advance(10);
+    heights.push(Number(a.node('headrig').getAttribute('transform').match(/translate\(0 ([\d.-]+)/)[1]));
+  }
+  assert.ok(heights.every(y => y >= 0 && y <= 4), 'a nod is one small dip');
+  const peak = heights.indexOf(Math.max(...heights));
+  assert.ok(heights.slice(0, peak).every((y, i) => y <= heights[i + 1]));
+  assert.ok(heights.slice(peak).every((y, i) => i === 0 || y <= heights[peak + i - 1]));
+});
+
 test('review commands interrupt rare moments without stale transforms or expression overrides', t => {
   for (const command of ['nod', 'shake', 'shrug', 'eyeRoll', 'look', 'setEmotion', 'raiseCup', 'talk']) {
     const a = portrait(t);
