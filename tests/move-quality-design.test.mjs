@@ -77,3 +77,19 @@ test('empty distributions show zero totals and no fabricated category shares', t
   assert.ok([...doc.querySelectorAll('.quality-spectrum i')].every(node => node.style.width === '0%'));
   assert.ok([...doc.querySelectorAll('.qbreak-row .ct')].every(node => node.disabled));
 });
+
+test('Modern distribution omits the summary and retains live shares, counts and category links', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  await a.call('setSetting', 'accuracyDesign', 'phases-modern');
+  assert.equal(doc.querySelector('.quality-summary'), null);
+  assert.equal(doc.querySelectorAll('.qbreak-row').length, 10);
+  const row = doc.querySelector('[data-category="best"]').closest('.qbreak-row');
+  assert.ok(Math.abs(parseFloat(row.style.getPropertyValue('--share-left')) - 200 / 3) < .0001);
+  a.state.analyzing = true; a.call('renderStats');
+  const count = doc.querySelector('[data-category="best"]').closest('.qbreak-row').querySelector('.ct.left');
+  count.focus(); a.state.counts.b.best = 5; a.call('renderStats');
+  assert.equal(doc.activeElement, count); assert.equal(count.textContent, '5');
+  assert.ok(Math.abs(parseFloat(count.parentElement.style.getPropertyValue('--share-left')) - 500 / 6) < .0001);
+  let ply; a.replace('gotoMainline', value => { ply = value; });
+  count.click(); assert.equal(ply, 2);
+});

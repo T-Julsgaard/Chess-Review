@@ -61,8 +61,9 @@ Run `node scripts/learning-browser.mjs --working-tree --move-quality` for eight
 viewport sizes, theme screenshots, keyboard activation and saved-choice checks.
 
 Modern's Quality page shares the overview's player cards and their exact position.
-Its Original category list is centered in the remaining portrait-panel height,
-with larger badges and balanced count columns. Hovering or focusing a category
+Both category designs omit classified totals and color strips, using that space
+for a centered list with larger text, badges and balanced count columns. The
+Distribution design keeps its per-category share backgrounds. Hovering or focusing a category
 enlarges its badge and label without shifting the rows; reduced motion disables
 the transition. Category renaming and count links retain their existing behavior.
 Run `node scripts/learning-browser.mjs --working-tree --modern-quality` to verify

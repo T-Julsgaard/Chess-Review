@@ -4395,8 +4395,9 @@ function updateQualityDistribution(root, sides) {
 }
 function renderMoveQuality(sides, rows) {
   const design = panelDesign('accuracyQuality', S.settings), distribution = design === 'distribution';
+  const modern = panelDesign('accuracy', S.settings) === 'phases-modern';
   const content = el('div', {class: 'acc-quality' + (distribution ? ' quality-distribution' : ''), 'data-quality-design': design},
-    distribution ? el('div', {class: 'quality-summary'},
+    distribution && !modern ? el('div', {class: 'quality-summary'},
       el('div', {class: 'quality-totals'},
         el('strong', {'data-quality-total': sides[0]}),
         el('span', {}, S.analyzing && !S.blank ? 'Classified so far' : 'Moves classified'),

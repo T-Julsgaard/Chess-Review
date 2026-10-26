@@ -22,27 +22,31 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await run("import('./analysis.js').then(async m=>{await m.applyUiSetup('modern');m.S.settings.moveAnim=false;m.renderStats()})");
   const original = await run("import('./analysis.js').then(m=>JSON.stringify({acc:m.S.acc,stats:m.S.gameStats,idx:m.S.idx,counts:m.S.counts,layout:m.S.layout}))");
   const evidence = [];
-  for (const [width,height] of [[1920,1080],[1920,919],[1366,768],[1280,600],[1100,480],[820,900],[390,844],[320,640]]) {
-    await resize(width,height);
-    await run("import('./analysis.js').then(m=>m.setAccuracyPage(0))");
-    const overview = await header();
-    const panel = await run("document.querySelector('.accuracy-panel').getBoundingClientRect().toJSON()");
-    await run("import('./analysis.js').then(m=>m.setAccuracyPage(1))");
-    assert.deepEqual(await header(),overview,'Names match overview style and coordinates at '+width+'x'+height);
-    assert.deepEqual(await run("document.querySelector('.accuracy-panel').getBoundingClientRect().toJSON()"),panel);
-    const fit = await run(`(()=>{
-      const p=document.querySelector('.accuracy-panel'),b=p.querySelector('.acc-page'),list=p.querySelector('.qbreak').getBoundingClientRect();
-      const names=p.querySelector('.acc-players').getBoundingClientRect(),body=b.getBoundingClientRect();
-      return {width:innerWidth,height:innerHeight,panel:p.getBoundingClientRect().toJSON(),body:b.clientHeight,content:b.scrollHeight,
-        overflow:b.scrollWidth-b.clientWidth,windowOverflow:document.documentElement.scrollWidth-innerWidth,rows:p.querySelectorAll('.qbreak-row').length,
-        topGap:list.top-names.bottom,bottomGap:body.bottom-list.bottom,
-        centered:[...p.querySelectorAll('.qlabel')].every(n=>{const r=n.getBoundingClientRect();return Math.abs((r.left+r.right)/2-(list.left+list.right)/2)<1})};})()`);
-    assert.equal(fit.rows,10); assert.equal(fit.centered,true);
-    assert.ok(fit.overflow<=1&&fit.windowOverflow<=1,JSON.stringify(fit));
-    assert.ok(fit.content<=fit.body+1,'All categories fit: '+JSON.stringify(fit));
-    assert.ok(Math.abs(fit.topGap-fit.bottomGap)<8,'List is vertically balanced: '+JSON.stringify(fit));
-    await shot('modern-quality-'+width+'x'+height);
-    evidence.push(fit);
+  for (const design of ['original','distribution']) {
+    await run(`import('./analysis.js').then(m=>{m.S.settings.accuracyQualityDesign='${design}';m.renderStats()})`);
+    for (const [width,height] of [[1920,1080],[1920,919],[1366,768],[1280,600],[1100,480],[820,900],[390,844],[320,640]]) {
+      await resize(width,height);
+      await run("import('./analysis.js').then(m=>m.setAccuracyPage(0))");
+      const overview = await header();
+      const panel = await run("document.querySelector('.accuracy-panel').getBoundingClientRect().toJSON()");
+      await run("import('./analysis.js').then(m=>m.setAccuracyPage(1))");
+      assert.equal(await run("!!document.querySelector('.quality-summary')"),false);
+      assert.deepEqual(await header(),overview,'Names match overview style and coordinates at '+width+'x'+height);
+      assert.deepEqual(await run("document.querySelector('.accuracy-panel').getBoundingClientRect().toJSON()"),panel);
+      const fit = await run(`(()=>{
+        const p=document.querySelector('.accuracy-panel'),b=p.querySelector('.acc-page'),list=p.querySelector('.qbreak').getBoundingClientRect();
+        const names=p.querySelector('.acc-players').getBoundingClientRect(),body=b.getBoundingClientRect();
+        return {width:innerWidth,height:innerHeight,panel:p.getBoundingClientRect().toJSON(),body:b.clientHeight,content:b.scrollHeight,
+          overflow:b.scrollWidth-b.clientWidth,windowOverflow:document.documentElement.scrollWidth-innerWidth,rows:p.querySelectorAll('.qbreak-row').length,
+          topGap:list.top-names.bottom,bottomGap:body.bottom-list.bottom,
+          centered:[...p.querySelectorAll('.qlabel')].every(n=>{const r=n.getBoundingClientRect();return Math.abs((r.left+r.right)/2-(list.left+list.right)/2)<1})};})()`);
+      assert.equal(fit.rows,10); assert.equal(fit.centered,true);
+      assert.ok(fit.overflow<=1&&fit.windowOverflow<=1,JSON.stringify(fit));
+      assert.ok(fit.content<=fit.body+1,'All categories fit: '+JSON.stringify(fit));
+      assert.ok(Math.abs(fit.topGap-fit.bottomGap)<8,'List is vertically balanced: '+JSON.stringify(fit));
+      await shot('modern-quality-'+design+'-'+width+'x'+height);
+      evidence.push({design,...fit});
+    }
   }
   assert.equal(await run("import('./analysis.js').then(m=>JSON.stringify({acc:m.S.acc,stats:m.S.gameStats,idx:m.S.idx,counts:m.S.counts,layout:m.S.layout}))"),original);
   await resize(1920,919);
@@ -77,5 +81,5 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13},review.sessionId);
   assert.equal(await run("document.querySelector('[data-category=brilliant] .nm').textContent"),'Inspired');
   await fs.writeFile(path.join(out,'modern-quality.json'),JSON.stringify(evidence,null,2));
-  console.log('Modern Quality passed eight viewports, exact overview headers, centered layout, pointer and keyboard enlargement, reduced motion and renaming. Screenshots: '+out);
+  console.log('Both Modern Quality designs passed eight viewports, exact overview headers, no summary, centered layout, pointer and keyboard enlargement, reduced motion and renaming. Screenshots: '+out);
 }
