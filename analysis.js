@@ -4275,47 +4275,14 @@ function setCategoryName(cls, value) {
 }
 function categoryLabel(cls) {
   const explain = panelDesign('accuracy', S.settings) === 'original';
-  const label = el("button", {
-    type: "button", class: "qlabel", "data-category": cls,
-    "aria-label": "Rename " + categoryName(cls),
+  return el("span", {
+    class: "qlabel", "data-category": cls, tabindex: 0,
     onmouseenter: explain ? e => showQTip(e.currentTarget, cls) : undefined,
     onmouseleave: explain ? hideQTip : undefined,
     onfocus: explain ? e => showQTip(e.currentTarget, cls) : undefined,
     onblur: explain ? hideQTip : undefined,
-    onclick: () => {
-      hideQTip();
-      let finished = false;
-      const finish = (save, value = input.value, focus = false) => {
-        if (finished) return;
-        finished = true;
-        if (save) setCategoryName(cls, value);
-        else editor.replaceWith(categoryLabel(cls));
-        if (focus) UI.stats.querySelector('[data-category="' + cls + '"]')?.focus();
-      };
-      const input = el("input", {
-        class: "category-name-input", type: "text", maxlength: CATEGORY_NAME_LIMIT,
-        value: categoryName(cls), "aria-label": "Name for " + QUALITY[cls].name,
-        onkeydown: e => {
-          e.stopPropagation();
-          if (e.key === "Enter" || e.key === "Escape") { e.preventDefault(); finish(e.key === "Enter", input.value, true); }
-        },
-      });
-      const editor = el("div", {
-        class: "qlabel category-name-editor", "data-category": cls,
-        onfocusout: e => { if (!editor.contains(e.relatedTarget)) finish(true); },
-        onkeydown: e => { e.stopPropagation(); if (e.key === "Escape") { e.preventDefault(); finish(false, input.value, true); } },
-      }, input,
-        el("button", {
-          type: "button", class: "category-name-reset", title: "Restore default name",
-          "aria-label": "Restore " + QUALITY[cls].name,
-          onpointerdown: e => e.preventDefault(), onmousedown: e => e.preventDefault(),
-          onclick: () => finish(true, "", true),
-        }, "↺"));
-      label.replaceWith(editor); input.focus(); input.select();
-    },
   }, gradeBadge(cls, null, "qsym", {}, true),
   el("span", { class: "nm" }, categoryName(cls)));
-  return label;
 }
 function setAccuracyPage(page, focus = false) {
   const previous = S.accuracyPage || 0;

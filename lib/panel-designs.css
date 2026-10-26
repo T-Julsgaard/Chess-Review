@@ -30,8 +30,6 @@
   background: color-mix(in srgb,var(--quality-color) 12%,transparent); }
 .quality-distribution .ct.left::before { left: auto; right: 0; width: var(--share-left,0%); }
 .stage .accuracy-panel .quality-distribution .ct.zero { color: var(--ink-3); opacity: .4; }
-.quality-distribution .category-name-input, .quality-distribution .category-name-reset { height: 23px; }
-.quality-distribution .category-name-reset { flex-basis: 18px; }
 /* Phase report: large headline scores, compact colored phases, then ratings. */
 .stage .accuracy-phase-report .acc-page { padding: 12px 12px 8px; }
 .accuracy-phase-report .acc-players { margin-bottom: 6px; }
@@ -128,15 +126,14 @@
 .stage .accuracy-phase-modern .acc-page-quality .acc-quality .qbreak { gap: 3px; }
 .stage .accuracy-phase-modern .acc-page-quality .acc-quality .qbreak-row {
   grid-template-columns: 32px minmax(0,1fr) 32px; min-height: 32px; gap: 6px; }
-.stage .accuracy-phase-modern .acc-page-quality .acc-quality .qlabel { width: 144px; gap: 9px; padding: 1px 0; font-size: 16px; }
+.stage .accuracy-phase-modern .acc-page-quality .acc-quality .qlabel { width: max-content; justify-content: center; gap: 9px; padding: 1px 0; font-size: 16px; }
 .stage .accuracy-phase-modern .acc-page-quality .acc-quality .qsym { width: 30px; height: 30px; flex-basis: 30px; filter: none; }
 .stage .accuracy-phase-modern .acc-page-quality .acc-quality .ct { min-height: 32px; font-size: 18px; }
 .accuracy-phase-modern .acc-page-quality .qbreak-row { position: relative; transition: background-color .16s ease; }
-.accuracy-phase-modern .acc-page-quality .qlabel:not(.category-name-editor) { transform-origin: center; transition: transform .16s ease; }
 .accuracy-phase-modern .acc-page-quality .qsym { transition: transform .16s ease; }
 .accuracy-phase-modern .acc-page-quality .qbreak-row:is(:hover,:focus-within) { z-index: 1; background: var(--panel-2); }
-.stage .accuracy-phase-modern .acc-page-quality .qbreak-row:is(:hover,:focus-within) .qlabel:not(.category-name-editor) { transform: scale(1.18); }
-.accuracy-phase-modern .acc-page-quality .qbreak-row:is(:hover,:focus-within) .qsym { transform: scale(1.12); }
+.accuracy-phase-modern .acc-page-quality .qbreak-row:is(:hover,:focus-within) .qsym { transform: scale(1.32); }
+.accuracy-phase-modern .acc-page-quality .ct::before { content: none; }
 @media (prefers-reduced-motion: reduce) {
   .accuracy-phase-modern .acc-page-quality .qbreak-row,
   .accuracy-phase-modern .acc-page-quality .qbreak-row :is(.qlabel,.qsym) { transition: none; }
@@ -169,8 +166,6 @@
 .accuracy-original .qbreak-toggle:hover { color: var(--ink); background: var(--panel-2); }
 .accuracy-original .qbreak-toggle svg { width: 18px; height: 18px; }
 .accuracy-original .qbreak-toggle.open svg { transform: rotate(180deg); }
-.stage .accuracy-panel.accuracy-original .qbreak-row .category-name-editor { transform: none; width: 100%; }
-.accuracy-original .category-name-input, .accuracy-original .category-name-reset { height: 22px; }
 
 /* The first paged iteration: comparison rows and three named page buttons. */
 .stage .accuracy-panel.accuracy-pages .acc-head { padding: 12px 14px 8px; }

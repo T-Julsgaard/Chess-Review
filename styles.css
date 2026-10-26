@@ -1425,7 +1425,7 @@ button { font-family: inherit; cursor: pointer; }
 .accuracy-panel { container-type: inline-size; }
 .stage.auto:not(.full-hd-reference) .mod[data-mod="accuracy"] { height: 420px; max-height: none; }
 .stage.auto:not(.full-hd-reference).original-accuracy-expanded .mod[data-mod="accuracy"] { height: 507px; max-height: none; }
-.accuracy-panel button:focus-visible, .acc-page:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.accuracy-panel button:focus-visible, .accuracy-panel .qlabel:focus-visible, .acc-page:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .stage .accuracy-panel .acc-page { padding: 14px 12px 8px; scrollbar-gutter: stable; }
 .acc-players, .acc-metric-values, .acc-scorecards { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; }
 .acc-players { margin-bottom: 10px; flex: none; }
@@ -1494,16 +1494,10 @@ button { font-family: inherit; cursor: pointer; }
 .qbreak-row:hover { background: var(--panel-2); }
 .stage .accuracy-panel .qbreak-row .qlabel { display: flex; align-items: center; justify-self: center; gap: 8px; width: 144px; max-width: 100%;
   min-width: 0; transform: none; border: 0; border-radius: 5px; padding: 2px 0; background: transparent; color: inherit;
-  font: 600 16px var(--font-ui); text-align: left; cursor: pointer; }
+  font: 600 16px var(--font-ui); text-align: left; cursor: default; }
 .qbreak-row .qlabel .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .stage .accuracy-panel .qbreak-row .qsym { width: 24px; height: 24px; display: block; flex: 0 0 24px; filter: drop-shadow(0 1px 1px #0003); }
 .qbreak-row .qlabel:hover .nm { color: var(--accent); }
-.stage .accuracy-panel .qbreak-row .category-name-editor { gap: 3px; width: 100%; }
-.category-name-input { min-width: 0; width: 100%; height: 27px; flex: 1; padding: 0 5px; border: 1px solid var(--accent);
-  border-radius: 5px; background: var(--panel-2); color: var(--ink); font: inherit; outline-offset: 2px; }
-.category-name-reset { flex: 0 0 22px; padding: 0; height: 27px; border: 0; border-radius: 5px;
-  background: var(--panel-2); color: var(--ink-2); font-size: 18px; cursor: pointer; }
-.category-name-reset:hover, .category-name-reset:focus-visible { color: var(--accent); }
 .qbreak-row .ct { font: 700 18px var(--font-mono); text-align: center; border: 0; min-height: 29px;
   border-radius: 6px; padding: 2px; background: transparent; color: var(--ink); cursor: pointer; }
 .qbreak-row .ct:not(:disabled):hover { color: var(--accent); background: var(--panel-3); }

@@ -49,7 +49,8 @@ preference and saved overview choices remain intact. Move quality has its own
 Distribution adds paired classified-move totals, category color strips and
 compact comparison rows. Count backgrounds show each category's share of that
 player's classified moves, using a separate denominator for each player. All ten
-categories, editable names and first-move links remain available. Empty totals
+categories and first-move links remain available. Category labels are read-only.
+Previously saved names still display. Empty totals
 stay at zero with empty strips; live analysis shows **Classified so far** and
 updates counters, totals and shares without replacing focused controls.
 
@@ -62,12 +63,12 @@ viewport sizes, theme screenshots, keyboard activation and saved-choice checks.
 
 Modern's Quality page shares the overview's player cards and their exact position.
 Both category designs omit classified totals and color strips, using that space
-for a centered list with larger text, badges and balanced count columns. The
-Distribution design keeps its per-category share backgrounds. Hovering or focusing a category
-enlarges its badge and label without shifting the rows; reduced motion disables
-the transition. Category renaming and count links retain their existing behavior.
+for a centered list with larger text, badges and balanced count columns. Each
+badge-and-label group sits halfway between the two counts, without category bars.
+Hovering or focusing a category enlarges only its badge; the text and rows stay
+in place. Reduced motion disables the transition. Count links still jump to moves.
 Run `node scripts/learning-browser.mjs --working-tree --modern-quality` to verify
-header alignment, fit at eight viewports, hover/focus enlargement and renaming.
+header alignment, fit at eight viewports, badge-only enlargement and read-only labels.
 
 Reveal is a new iteration of Dials with **Estimated rating** labels and no score
 glow. When its overview first receives completed results, all numbers count up,

@@ -39,8 +39,13 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
         return {width:innerWidth,height:innerHeight,panel:p.getBoundingClientRect().toJSON(),body:b.clientHeight,content:b.scrollHeight,
           overflow:b.scrollWidth-b.clientWidth,windowOverflow:document.documentElement.scrollWidth-innerWidth,rows:p.querySelectorAll('.qbreak-row').length,
           topGap:list.top-names.bottom,bottomGap:body.bottom-list.bottom,
-          centered:[...p.querySelectorAll('.qlabel')].every(n=>{const r=n.getBoundingClientRect();return Math.abs((r.left+r.right)/2-(list.left+list.right)/2)<1})};})()`);
+        bars:[...p.querySelectorAll('.ct')].some(n=>getComputedStyle(n,'::before').content!=='none'),
+        centered:[...p.querySelectorAll('.qlabel')].every(n=>{
+          const badge=n.querySelector('.qsym').getBoundingClientRect(),text=n.querySelector('.nm').getBoundingClientRect();
+          const left=n.previousElementSibling.getBoundingClientRect(),right=n.nextElementSibling.getBoundingClientRect();
+          return Math.abs((badge.left+text.right)/2-(left.left+left.width/2+right.left+right.width/2)/2)<1})};})()`);
       assert.equal(fit.rows,10); assert.equal(fit.centered,true);
+      assert.equal(fit.bars,false);
       assert.ok(fit.overflow<=1&&fit.windowOverflow<=1,JSON.stringify(fit));
       assert.ok(fit.content<=fit.body+1,'All categories fit: '+JSON.stringify(fit));
       assert.ok(Math.abs(fit.topGap-fit.bottomGap)<8,'List is vertically balanced: '+JSON.stringify(fit));
@@ -50,18 +55,19 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   }
   assert.equal(await run("import('./analysis.js').then(m=>JSON.stringify({acc:m.S.acc,stats:m.S.gameStats,idx:m.S.idx,counts:m.S.counts,layout:m.S.layout}))"),original);
   await resize(1920,919);
-  // Real pointer hover enlarges both the vector badge and its label without shifting rows.
+  // Real pointer hover enlarges only the badge, leaving the text and rows fixed.
   for (const category of ['brilliant','inacc','blunder','book']) {
     const before = await run(`(()=>{const n=document.querySelector('[data-category="${category}"]'),r=n.getBoundingClientRect();
       return {x:r.x+r.width/2,y:r.y+r.height/2,badge:n.querySelector('.qsym').getBoundingClientRect().width,
-        text:n.querySelector('.nm').getBoundingClientRect().width,rows:[...document.querySelectorAll('.qbreak-row')].map(n=>n.getBoundingClientRect().top)}})()`);
+        text:n.querySelector('.nm').getBoundingClientRect().toJSON(),rows:[...document.querySelectorAll('.qbreak-row')].map(n=>n.getBoundingClientRect().top)}})()`);
     await call('Input.dispatchMouseEvent',{type:'mouseMoved',x:before.x,y:before.y},review.sessionId);
     await sleep(220);
     const after = await run(`(()=>{const n=document.querySelector('[data-category="${category}"]');
-      return {badge:n.querySelector('.qsym').getBoundingClientRect().width,text:n.querySelector('.nm').getBoundingClientRect().width,
+      return {badge:n.querySelector('.qsym').getBoundingClientRect().width,text:n.querySelector('.nm').getBoundingClientRect().toJSON(),
         rows:[...document.querySelectorAll('.qbreak-row')].map(n=>n.getBoundingClientRect().top),
         label:n.getBoundingClientRect().toJSON(),left:n.previousElementSibling.getBoundingClientRect().right,right:n.nextElementSibling.getBoundingClientRect().left}})()`);
-    assert.ok(after.badge>before.badge*1.3&&after.text>before.text*1.15,JSON.stringify({category,before,after}));
+    assert.ok(after.badge>before.badge*1.3,JSON.stringify({category,before,after}));
+    assert.deepEqual(after.text,before.text,'Label text stays fixed');
     assert.deepEqual(after.rows,before.rows);
     assert.ok(after.label.left>=after.left&&after.label.right<=after.right,'Enlargement leaves counts clear');
     await shot('modern-quality-hover-'+category);
@@ -71,15 +77,15 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await run("document.documentElement.dataset.theme='dark'");
   await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]},review.sessionId);
   await run("document.querySelector('[data-category=brilliant]').focus()");
-  assert.equal(await run("getComputedStyle(document.querySelector('[data-category=brilliant]')).transitionDuration"),'0s');
-  assert.notEqual(await run("getComputedStyle(document.querySelector('[data-category=brilliant]')).transform"),'none');
+  assert.equal(await run("getComputedStyle(document.querySelector('[data-category=brilliant] .qsym')).transitionDuration"),'0s');
+  assert.notEqual(await run("getComputedStyle(document.querySelector('[data-category=brilliant] .qsym')).transform"),'none');
+  assert.equal(await run("getComputedStyle(document.querySelector('[data-category=brilliant]')).transform"),'none');
   await shot('modern-quality-keyboard');
-  // Editing an alias stays at normal size and still saves with Enter.
+  // Category labels are read-only for pointer and keyboard users.
   await run("document.querySelector('[data-category=brilliant]').click()");
-  assert.equal(await run("getComputedStyle(document.querySelector('.category-name-editor')).transform"),'none');
-  await run("document.querySelector('.category-name-input').value='Inspired'");
   await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13},review.sessionId);
-  assert.equal(await run("document.querySelector('[data-category=brilliant] .nm').textContent"),'Inspired');
+  assert.equal(await run("!!document.querySelector('.category-name-input,.category-name-reset')"),false);
+  assert.equal(await run("document.querySelector('[data-category=brilliant] .nm').textContent"),'Brilliant');
   await fs.writeFile(path.join(out,'modern-quality.json'),JSON.stringify(evidence,null,2));
-  console.log('Both Modern Quality designs passed eight viewports, exact overview headers, no summary, centered layout, pointer and keyboard enlargement, reduced motion and renaming. Screenshots: '+out);
+  console.log('Both Modern Quality designs passed eight viewports, exact overview headers, centered badge/text groups, no bars, badge-only enlargement, reduced motion and read-only categories. Screenshots: '+out);
 }
