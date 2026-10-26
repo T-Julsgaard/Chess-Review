@@ -8,7 +8,9 @@ The choices are local visual preferences and survive reopening the extension.
 | Engine | Original, Focus | Original |
 | Evaluation bar | Original, Balance | Balance |
 | Evaluation | Original, Timeline, Move bars | Timeline |
-| Accuracy | Original, Page tabs, Dials, Reveal, Phase report | Phase report |
+| Accuracy overview | Original, Page tabs, Dials, Reveal, Phase report | Phase report |
+| Accuracy move quality | Original, Distribution | Distribution |
+| Accuracy advanced | Original | Original |
 | Move list | Original, Full height, Zoomed in, Zoom +20% | Full height |
 
 Original Accuracy restores the combined score/category panel, its seven-row
@@ -16,6 +18,23 @@ summary, expandable full category list, explanations and practice button. Page
 tabs restores the first three-page design with named buttons. Dials retains the
 current compact overview, phase bars and carousel. Expanding the original category
 list scrolls inside the fixed panel rather than moving neighboring controls.
+
+Accuracy's three pages have separate rows in Tabs. The existing `accuracyDesign`
+preference and saved overview choices remain intact. Move quality has its own
+`accuracyQualityDesign` preference: Original retains the earlier category list;
+Distribution adds paired classified-move totals, category color strips and
+compact comparison rows. Count backgrounds show each category's share of that
+player's classified moves, using a separate denominator for each player. All ten
+categories, editable names and first-move links remain available. Empty totals
+stay at zero with empty strips; live analysis shows **Classified so far** and
+updates counters, totals and shares without replacing focused controls.
+
+These Move quality choices apply to all paged overview designs, including Page
+tabs. Original overview retains its historical combined panel. Accuracy advanced
+currently offers its existing Original metrics layout; its separate preference
+reserves the page for future iterations. Both new preferences reset with Visual.
+Run `node scripts/learning-browser.mjs --working-tree --move-quality` for eight
+viewport sizes, theme screenshots, keyboard activation and saved-choice checks.
 
 Reveal is a new iteration of Dials with **Estimated rating** labels and no score
 glow. When its overview first receives completed results, all numbers count up,

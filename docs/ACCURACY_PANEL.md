@@ -1,6 +1,7 @@
 # Accuracy panel
 
-**Settings → Visual → Tabs** selects the panel design. Accuracy offers Original,
+**Settings → Visual → Tabs** separates Accuracy overview, Accuracy move quality
+and Accuracy advanced. Overview offers Original,
 Page tabs, Dials, Reveal and Phase report. Phase report is the default. The original summary
 and first paged iteration remain available for comparison. See
 [panel design choices](TAB_DESIGNS.md) for saved settings and future iterations.
@@ -88,6 +89,15 @@ analysis is incomplete. While analysis is running the UI shows pending scores.
 
 ## Move quality
 
+Distribution is the default Move quality design. It pairs classified-move totals
+and slim category color strips above compact comparison rows. Each count has a
+subtle category-colored background proportional to that player's classified
+moves. Totals include all ten categories, including Book; the two players have
+independent denominators. Zero totals leave the strips empty. During analysis,
+**Classified so far** identifies partial counts; totals and shares update in place
+alongside the existing count buttons. The earlier list is available as Original
+in the separate Accuracy move quality setting, without changing Overview.
+
 All ten existing categories appear, including Excellent, Good and Book. The
 left column is the selected player's side, regardless of board orientation;
 player names and color dots identify both columns. A nonzero count jumps to
@@ -120,6 +130,10 @@ aggregation under both engines, missing evidence, mate/forced exclusions,
 perspective, exact matches and largest-loss plies. DOM regressions cover page
 selection, arrows, count/loss navigation, category aliases, disabled zero counts,
 loading updates and removal of explanation/practice controls.
+`tests/move-quality-design.test.mjs` covers distribution denominators, empty and
+live totals, preserved focus, saved page choices, reset behavior and navigation.
+Run `node scripts/learning-browser.mjs --working-tree --move-quality` to check
+the redesign at eight sizes with light/dark screenshots and real keyboard links.
 
 Run `node scripts/learning-browser.mjs --working-tree --accuracy-pages` for an
 isolated Chrome audit with the Opera Game, complete SF19 scoring, before/after

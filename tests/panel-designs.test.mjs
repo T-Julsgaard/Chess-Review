@@ -9,12 +9,16 @@ function review(t) {
   return a;
 }
 
-test('Visual > Tabs exposes independent Accuracy and Move list design choices', async t => {
+test('Visual > Tabs distinguishes Accuracy overview, move quality and advanced designs', async t => {
   const a = review(t), doc = a.dom.window.document;
   await a.call('toggleSettings');
   const section = () => [...doc.querySelectorAll('.set-section')].find(node => node.querySelector('.set-sect-head').textContent === 'Tabs');
   section().querySelector('.set-sect-head').click();
+  const labels = [...section().querySelectorAll('.set-lbl')].map(node => node.textContent);
+  for (const label of ['Accuracy overview', 'Accuracy move quality', 'Accuracy advanced']) assert.ok(labels.includes(label), label);
   assert.deepEqual([...section().querySelectorAll('[data-setting="accuracyDesign"]')].map(node => node.textContent), ['Original', 'Page tabs', 'Dials', 'Reveal', 'Phase report']);
+  assert.deepEqual([...section().querySelectorAll('[data-setting="accuracyQualityDesign"]')].map(node => node.textContent), ['Original', 'Distribution']);
+  assert.deepEqual([...section().querySelectorAll('[data-setting="accuracyAdvancedDesign"]')].map(node => node.textContent), ['Original']);
   assert.deepEqual([...section().querySelectorAll('[data-setting="movesDesign"]')].map(node => node.textContent), ['Original', 'Full height', 'Zoomed in', 'Zoom +20%']);
   const option = section().querySelector('[data-setting="accuracyDesign"][data-value="original"]');
   option.focus(); option.click(); await settle(); await a.run('_settingsWriteQueue');

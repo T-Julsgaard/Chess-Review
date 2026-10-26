@@ -11,6 +11,27 @@
 }
 .set-section .set-seg:has([data-setting="accuracyDesign"]) { flex-wrap: wrap; }
 .set-section .set-seg [data-setting="accuracyDesign"] { flex: 1 1 40%; min-height: 32px; }
+/* Move quality: a shared category key between two player distributions. */
+.quality-distribution { display: flex; flex-direction: column; gap: 10px; }
+.quality-summary { display: flex; flex-direction: column; gap: 8px; padding: 0 0 10px; border-bottom: 1px solid var(--line-soft); }
+.quality-totals { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 6px; text-align: center; }
+.quality-totals strong { font: 750 22px/1 var(--font-mono); letter-spacing: -1px; color: var(--ink); }
+.quality-totals span { font-size: 10px; letter-spacing: .04em; color: var(--ink-3); }
+.quality-spectrums { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; }
+.quality-spectrum { display: flex; height: 5px; overflow: hidden; border-radius: 4px; background: var(--panel-3); }
+.quality-spectrum i { height: 100%; flex: none; }
+.stage .accuracy-panel .quality-distribution .qbreak { gap: 2px; }
+.stage .accuracy-panel .quality-distribution .qbreak-row { grid-template-columns: minmax(32px,1fr) minmax(100px,1.8fr) minmax(32px,1fr); min-height: 23px; gap: 8px; border-radius: 5px; }
+.stage .accuracy-panel .quality-distribution .qlabel { width: 100%; gap: 7px; padding: 2px 0; font-size: 12px; }
+.stage .accuracy-panel .quality-distribution .qsym { width: 18px; height: 18px; flex-basis: 18px; filter: none; }
+.stage .accuracy-panel .quality-distribution .ct { position: relative; min-height: 23px; padding: 2px; border-radius: 4px;
+  font-size: 16px; line-height: 19px; color: var(--quality-color); isolation: isolate; }
+.quality-distribution .ct::before { content: ''; position: absolute; inset: 0 auto 0 0; width: var(--share-right,0%); z-index: -1; border-radius: inherit;
+  background: color-mix(in srgb,var(--quality-color) 12%,transparent); }
+.quality-distribution .ct.left::before { left: auto; right: 0; width: var(--share-left,0%); }
+.stage .accuracy-panel .quality-distribution .ct.zero { color: var(--ink-3); opacity: .4; }
+.quality-distribution .category-name-input, .quality-distribution .category-name-reset { height: 23px; }
+.quality-distribution .category-name-reset { flex-basis: 18px; }
 /* Phase report: large headline scores, compact colored phases, then ratings. */
 .stage .accuracy-phase-report .acc-page { padding: 12px 12px 8px; }
 .accuracy-phase-report .acc-players { margin-bottom: 6px; }

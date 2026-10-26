@@ -4223,6 +4223,47 @@ function accuracyDial(value, busy) {
       value == null ? '—' : value >= 100 ? '100' : value.toFixed(1), value == null ? null : el('span', {class: 'acc-unit'}, '%')),
     el('span', {class: 'acc-dial-label'}, 'Accuracy'));
 }
+function updateQualityDistribution(root, sides) {
+  if (!root) return;
+  const totals = sides.map(side => QBREAK_FULL.reduce((sum, k) => sum + (S.counts[side][k] || 0), 0));
+  sides.forEach((side, i) => {
+    root.querySelectorAll('[data-quality-total="' + side + '"]').forEach(node => {
+      node.textContent = totals[i];
+      node.setAttribute('aria-label', S.players[side].name + ': ' + totals[i] + ' moves classified' + (S.analyzing ? ' so far' : ''));
+    });
+    for (const k of QBREAK_FULL) {
+      const share = totals[i] ? (S.counts[side][k] || 0) / totals[i] * 100 : 0;
+      root.querySelector('[data-quality-segment="' + side + '-' + k + '"]')?.style.setProperty('width', share + '%');
+      root.querySelector('.quality-distribution [data-category="' + k + '"]')?.closest('.qbreak-row')
+        .style.setProperty(i === 0 ? '--share-left' : '--share-right', share + '%');
+    }
+  });
+}
+function renderMoveQuality(sides, rows) {
+  const design = panelDesign('accuracyQuality', S.settings), distribution = design === 'distribution';
+  const content = el('div', {class: 'acc-quality' + (distribution ? ' quality-distribution' : ''), 'data-quality-design': design},
+    distribution ? el('div', {class: 'quality-summary'},
+      el('div', {class: 'quality-totals'},
+        el('strong', {'data-quality-total': sides[0]}),
+        el('span', {}, S.analyzing && !S.blank ? 'Classified so far' : 'Moves classified'),
+        el('strong', {'data-quality-total': sides[1]})),
+      el('div', {class: 'quality-spectrums', 'aria-hidden': 'true'}, ...sides.map(side =>
+        el('div', {class: 'quality-spectrum'}, ...QBREAK_FULL.map(k =>
+          el('i', {'data-quality-segment': side + '-' + k, style: {background: QUALITY[k].color}})))))) : null,
+    el('div', {class: 'qbreak'}, ...QBREAK_FULL.map(k => {
+      const counts = sides.map((side, i) => {
+        const count = S.counts[side][k] || 0;
+        return el('button', {type: 'button', class: 'ct ' + (i === 0 ? 'left ' : '') + (count ? '' : 'zero'),
+          disabled: !count, 'aria-label': S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Jump to first move.',
+          onclick: () => jumpToCategory(side, k)}, count);
+      });
+      rows[k] = counts;
+      return el('div', {class: 'qbreak-row', style: distribution ? {'--quality-color': QUALITY[k].color} : {}},
+        counts[0], categoryLabel(k), counts[1]);
+    })));
+  if (distribution) updateQualityDistribution(content, sides);
+  return content;
+}
 function renderStats() {
   const design = panelDesign('accuracy', S.settings);
   const phaseReport = design === 'phases';
@@ -4245,6 +4286,7 @@ function renderStats() {
       row[i].classList.toggle('zero', !count);
       row[i].setAttribute('aria-label', S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Jump to first move.');
     });
+    if (page === 1) updateQualityDistribution(UI.stats, sides);
     return;
   }
   const pair = (className, values) => el('div', {class: className}, ...values);
@@ -4278,17 +4320,7 @@ function renderStats() {
               el('i', {style: {width: (busy || value == null ? 0 : value) + '%'}})))));
         })));
   } else if (page === 1) {
-    content = el('div', {class: 'acc-quality'},
-      el('div', {class: 'qbreak'}, ...QBREAK_FULL.map(k => {
-        const counts = sides.map((side, i) => {
-          const count = S.counts[side][k] || 0;
-          return el('button', {type: 'button', class: 'ct ' + (i === 0 ? 'left ' : '') + (count ? '' : 'zero'),
-            disabled: !count, 'aria-label': S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Jump to first move.',
-            onclick: () => jumpToCategory(side, k)}, count);
-        });
-        rows[k] = counts;
-        return el('div', {class: 'qbreak-row'}, counts[0], categoryLabel(k), counts[1]);
-      })));
+    content = renderMoveQuality(sides, rows);
   } else {
     const stats = sides.map(side => S.gameStats?.[side]);
     content = el('div', {class: 'acc-advanced'},
@@ -4442,6 +4474,7 @@ function renderPagedStats() {
       row[i].classList.toggle('zero', !count);
       row[i].setAttribute('aria-label', S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Jump to first move.');
     });
+    if (page === 1) updateQualityDistribution(UI.stats, sides);
     return;
   }
   const pair = (className, values) => el('div', {class: className}, ...values);
@@ -4471,17 +4504,7 @@ function renderPagedStats() {
         el('p', {class: 'acc-note'}, S.blank ? 'Load a game to see its accuracy.'
           : busy ? 'Scores appear when analysis finishes.' : '— Phase not reached or no scored decisions.')));
   } else if (page === 1) {
-    content = el('div', {class: 'acc-quality'},
-      el('div', {class: 'qbreak'}, ...QBREAK_FULL.map(k => {
-        const counts = sides.map((side, i) => {
-          const count = S.counts[side][k] || 0;
-          return el('button', {type: 'button', class: 'ct ' + (i === 0 ? 'left ' : '') + (count ? '' : 'zero'),
-            disabled: !count, 'aria-label': S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Jump to first move.',
-            onclick: () => jumpToCategory(side, k)}, count);
-        });
-        rows[k] = counts;
-        return el('div', {class: 'qbreak-row'}, counts[0], categoryLabel(k), counts[1]);
-      })), el('p', {class: 'acc-note'}, 'Select a count to revisit the first move.'));
+    content = renderMoveQuality(sides, rows);
   } else {
     const stats = sides.map(side => S.gameStats?.[side]);
     content = el('div', {class: 'acc-advanced'},
@@ -5962,7 +5985,7 @@ async function setSetting(key, value) {
   S.settings[key] = value;
   await writeSettings({ [key]: value });
   applySettings();
-  if (key === 'accuracyDesign') { statsRefs = null; hideQTip(); renderStats(); }
+  if (design?.panel.startsWith('accuracy')) { statsRefs = null; hideQTip(); renderStats(); }
   if (key === 'movesDesign') updateMovesDesign();
   if (key === 'engineDesign') renderEngineCurrent();
   if (key === 'moveAnim' && S.settings.moveAnim === false) overviewReveal.stop();
