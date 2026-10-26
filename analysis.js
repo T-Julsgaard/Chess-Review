@@ -4793,32 +4793,21 @@ function renderMoves() {
 }
 
 /* ---------------- Engine lines ---------------- */
-// Focus keeps the controls in place while only the candidate list scrolls.
+// Refine the original score / move rows, keeping playback outside the scrolling list.
 function focusedEnginePanel(content, {locked = false, playable = false} = {}) {
-  const side = !S.blank && activePos().fen.split(' ')[1] === 'b' ? 'Black' : 'White';
-  const lines = el('div', {class: 'engine-focus-lines', role: 'group', 'aria-label': 'Number of engine lines'},
-    el('span', {}, 'Lines'), ...[1, 2, 3, 4].map(count => el('button', {
-      type: 'button', 'aria-label': `Show ${count} engine ${count === 1 ? 'line' : 'lines'}`,
-      'aria-pressed': String(S.settings.engineLines === count), disabled: locked,
-      onclick: async () => {
-        await setEngineSetting('engineLines', count);
-        UI.engine.querySelector(`[aria-label="Show ${count} engine ${count === 1 ? 'line' : 'lines'}"]`)?.focus();
-      },
-    }, String(count))));
+  const name = activeEngineName();
   const panel = el('div', {class: 'panel engine-focus', 'data-design': 'focus', 'aria-label': 'Engine'},
-    el('div', {class: 'engine-focus-head'},
-      el('div', {class: 'engine-focus-title'}, el('h3', {}, 'Engine'),
-        el('span', {class: 'engine-focus-turn'}, S.blank ? 'Position analysis' : locked ? 'Practice' : `${side} to move`)), lines),
+    el('div', {class: 'panel-head engine-focus-head'}, el('h3', {}, 'Engine'),
+      el('span', {class: 'count', title: locked ? 'Engine lines are hidden during practice' : name + ' · target search depth ' + S.settings.engineDepth},
+        locked ? 'Practice' : name + ' · depth ' + S.settings.engineDepth)),
     el('div', {class: 'panel-body engine-body'}, content),
     el('div', {class: 'engine-focus-foot'},
-      el('span', {class: 'engine-focus-source', title: `${activeEngineName()} · search depth ${S.settings.engineDepth}. Scores favor White (+) or Black (−).`},
-        el('span', {}, 'White + / Black −'), el('span', {}, `${activeEngineName().replace('Stockfish ', 'SF ')} · depth ${S.settings.engineDepth}`)),
       el('button', {type: 'button', class: 'engine-focus-play' + (S.bestWalking ? ' on' : ''),
         disabled: locked || !playable && !S.bestWalking,
-        title: 'Let the engine play its best moves from this position. You can stop at any time.',
+        title: 'The engine searches and plays its best move at each position. You can stop at any time.',
         'aria-label': S.bestWalking ? 'Stop playing best moves' : 'Play best moves from this position',
         onclick: () => { if (S.bestWalking) { stopBestWalk(); renderControls(); renderEngineCurrent(); } else playBestMoves(); },
-      }, S.bestWalking ? '■ Stop' : '▶ Auto-play')));
+      }, S.bestWalking ? '■ Stop' : '▶ Play best moves from here')));
   UI.engine.replaceChildren(panel);
   fitEnginePanel();
 }
@@ -4983,27 +4972,28 @@ function renderEngine(lines, padFromCache = false) {
         // Empty slot (a forced move with no second line, etc.) → a blank row of the same height so
         // the panel keeps the size of `want` lines and never resizes between moves.
         if (!slot) return focus ? el('div', {class: 'engine-focus-pending', role: 'status'},
-          el('span', {}, String(index + 1).padStart(2, '0')), el('span', {}, padFromCache ? 'Finding another move…' : 'No other candidate'))
+          padFromCache ? 'Finding another line…' : 'No other candidate')
           : el("div", { class: "engine-line" }, el("span", { class: "ev" }, " "), el("span", { class: "moves" }, " "));
         const { l, fen } = slot;
         const wr = whiteRel(l.score, fen); const cp = scoreToCp(wr);
         const evTxt = wr.mate != null ? evalText(wr) : (cp >= 0 ? "+" : "") + (cp / 100).toFixed(2);
         const toks = uciLineToSan(fen, (l.pv || "").split(/\s+/).filter(Boolean), 6);
         if (focus) {
-          const move = toks[0]?.replace(/^\d+\.\s*/, '') || '—';
-          const continuation = toks.slice(1).join(' ');
+          const moves = [...toks];
+          if (moves.length && fen.split(' ')[1] === 'b') moves[0] = fen.split(' ')[5] + '… ' + moves[0];
           const evaluation = wr.mate != null ? `${cp >= 0 ? 'White' : 'Black'} can force mate in ${Math.abs(wr.mate)}`
             : cp === 0 ? 'Equal position' : `${cp > 0 ? 'White' : 'Black'} has an advantage of ${Math.abs(cp / 100).toFixed(2)} pawns`;
-          return el('button', {type: 'button', class: 'engine-focus-candidate' + (index === 0 ? ' recommended' : ''),
-            title: 'Explore this variation on the board',
-            'aria-label': `${index === 0 ? 'Best move' : 'Alternative ' + (index + 1)}: ${toks.join(' ')}. ${evaluation}. Explore variation.`,
+          return el('button', {type: 'button', class: 'engine-focus-candidate', disabled: !moves.length,
+            title: moves.join(' ') + '. ' + evaluation + '. Click to explore this variation.',
+            'aria-label': `${index === 0 ? 'Best line' : 'Alternative ' + (index + 1)}: ${moves.join(' ')}. ${evaluation}. Explore variation.`,
             onclick: () => playLine(l.pv)},
-            el('span', {class: 'engine-focus-rank', 'aria-hidden': 'true'}, String(index + 1).padStart(2, '0')),
-            el('span', {class: 'engine-focus-variation'},
-              el('span', {class: 'engine-focus-move'}, el('strong', {}, move), index === 0 ? el('span', {class: 'engine-focus-best'}, 'Best move') : null),
-              el('span', {class: 'engine-focus-continuation'}, continuation || 'Explore move')),
-            el('span', {class: 'engine-focus-eval ' + (cp >= 0 ? 'pos' : 'neg'), title: evaluation}, evTxt),
-            el('span', {class: 'engine-focus-arrow', 'aria-hidden': 'true'}, '›'));
+            el('span', {class: 'ev engine-focus-eval ' + (cp >= 0 ? 'pos' : 'neg'), title: evaluation}, evTxt),
+            el('span', {class: 'moves engine-focus-variation'}, ...moves.flatMap((move, i) => {
+              const number = move.match(/^\d+[.…]\s*/)?.[0] || '';
+              return [el('span', {class: 'engine-focus-token'},
+                number ? el('span', {class: 'engine-focus-number'}, number) : null,
+                el(i === 0 ? 'strong' : 'span', {}, move.slice(number.length))), ' '];
+            })));
         }
         // Click a line → play the whole line out as a variation (analysis mode).
         return el("button", { type:"button", class: "engine-line clickable", tabindex:"-1", "aria-label":"Play variation " + toks.join(" ") + ", evaluation " + evTxt, onclick: () => playLine(l.pv) },

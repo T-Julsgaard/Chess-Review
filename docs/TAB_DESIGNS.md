@@ -35,14 +35,14 @@ rows. Zoom +20% uniformly enlarges the original list contents by 20%, providing 
 gentler increase in text, icons, badges and row spacing. Both keep the same panel
 dimensions and full-height scroll area, with the current move kept in view.
 
-Focus Engine highlights the recommended move, separates its continuation, and
-keeps a White-relative score beside each candidate. Click a candidate to explore
-its variation. The inline **Lines** buttons show one to four candidates using the
-existing on-demand search; **Auto-play** lets the engine play its best moves and
-can be stopped at any time. The footer explains score signs and shows the engine
-and configured search depth. Candidate lines scroll independently of the fixed
-header and playback footer on desktop. Practice hides all answers and disables
-the controls. Original remains the default and is always available.
+Focus Engine refines the original layout: score badges on the left, compact move
+sequences on the right, Stockfish and depth in the header, and the full-width
+**Play best moves from here** button below. Notation wraps to two lines in narrow
+panels, with the first move emphasized and move numbers muted. Click a line to
+explore it; hover or focus it for the full continuation and score explanation.
+Set the number of lines in **Settings → Engine → Panel lines**. The candidate
+list scrolls independently of playback on desktop, and practice hides answers.
+Saved Focus selections use this revised layout. Original remains the default.
 
 Changing designs does not change the game, selected move, annotations, numerical
 accuracy, Elo estimate, engine settings, analysis cache key or panel arrangement.
