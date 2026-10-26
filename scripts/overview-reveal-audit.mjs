@@ -43,8 +43,8 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   assert.ok(partial, 'Numbers and player names must reveal together');
   assert.ok(partial.name.length > 0 && partial.phase.length > 0);
   assert.ok(samples.every(s => s.label === 'Estimated rating' && s.phase === 'Opening'), 'Labels stay fully visible throughout the reveal');
-  assert.equal(await run("document.querySelector('.acc-page-name').textContent"), 'Overview');
-  assert.equal(await run("!!document.querySelector('.acc-page-name .acc-reveal-slot,.acc-dial-label .acc-reveal-slot')"), false);
+  assert.equal(await run("document.querySelector('.acc-navigation [aria-selected=true]').textContent"), 'Overview');
+  assert.equal(await run("!!document.querySelector('.acc-navigation .acc-reveal-slot,.acc-dial-label .acc-reveal-slot')"), false);
   for (let i = 1; i < samples.length; i++) {
     assert.ok(samples[i].number >= samples[i-1].number);
     assert.ok(samples[i].arc >= samples[i-1].arc);
@@ -54,7 +54,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   assert.equal(final.shown, final.expected); assert.equal(final.label, 'Estimated rating');
   assert.equal(final.filter, 'none'); assert.equal(final.background, 'none');
   assert.equal(await snapshot(), before);
-  await run("document.querySelector('.acc-page-next').click();document.querySelector('.acc-page-prev').click()");
+  await run("document.querySelector('#accuracy-tab-1').click();document.querySelector('#accuracy-tab-0').click()");
   assert.equal(await run("!!document.querySelector('[data-revealing]')"), false, 'Changing pages must not repeat the reveal');
   await call('Emulation.setEmulatedMedia', {features: [{name: 'prefers-reduced-motion', value: 'reduce'}]}, review.sessionId);
   await run("import('./analysis.js').then(m=>{m.S.positions=[...m.S.positions];m.renderStats()})");

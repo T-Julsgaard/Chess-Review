@@ -19,6 +19,7 @@ import { gameStatistics, GAME_PHASES } from "./lib/game-statistics.js";
 import { PANEL_DESIGNS, panelDesign, normalizePanelDesigns } from "./lib/panel-designs.js";
 import { UI_SETUPS, MODERN_LAYOUT } from "./lib/ui-setups.js";
 import { createOverviewReveal } from "./lib/overview-reveal.js";
+import { createAccuracyNavigation } from "./lib/accuracy-navigation.js";
 import { phasePerformance } from "./lib/phase-performance.js";
 import { analyseCalibratedPosition } from "./lib/calibrated-search.js";
 import { loadLearningWorkspace, presentationFor } from "./lib/learning-loader.js";
@@ -4318,66 +4319,25 @@ function setAccuracyPage(page, focus = false) {
     panel.append(leaf);
     leaf.scrollTop = scrollTop;
     const forward = page > previous || previous === 2 && next === 0;
-    leaf.style.transformOrigin = forward ? 'left center' : 'right center';
+    const direction = forward ? 1 : -1;
     const turn = leaf.animate([
-      {transform: 'perspective(900px) rotateY(0deg)', opacity: 1},
-      {transform: 'perspective(900px) rotateY(' + (forward ? '-105' : '105') + 'deg)', opacity: 0},
-    ], {duration: 380, easing: 'cubic-bezier(.22,.65,.3,1)', fill: 'forwards'});
+      {transform: 'translateX(0)', opacity: 1},
+      {transform: 'translateX(' + (-direction * 10) + 'px)', opacity: 0},
+    ], {duration: 180, easing: 'cubic-bezier(.22,.65,.3,1)', fill: 'forwards'});
     turn.onfinish = turn.oncancel = () => leaf.remove();
+    incoming.animate([{transform: 'translateX(' + (direction * 10) + 'px)', opacity: .35},
+      {transform: 'translateX(0)', opacity: 1}], {duration: 280, easing: 'cubic-bezier(.22,.65,.3,1)'});
   }
   if (focus) UI.stats.querySelector(typeof focus === 'string' ? focus : '[aria-selected="true"]')?.focus({preventScroll: true});
 }
 
-// A real button supports click/keyboard; pointer capture keeps a corner drag
-// attached to the sheet even after the pointer leaves the panel.
-function accuracyPageCorner(page) {
-  let drag = null, suppressClick = false;
-  const clear = button => {
-    button.closest('.accuracy-panel')?.classList.remove('acc-page-grabbed');
-    button.closest('.accuracy-panel')?.style.removeProperty('--page-peel');
-    drag = null;
-  };
-  return el('button', {type: 'button', class: 'acc-page-corner',
-    'aria-label': 'Turn page: ' + ACCURACY_PAGES[(page + 1) % 3],
-    title: 'Turn page · drag the corner or click',
-    onclick: e => {
-      e.stopPropagation();
-      if (suppressClick) { suppressClick = false; return; }
-      setAccuracyPage(page + 1, '.acc-page-corner');
-    },
-    onpointerdown: e => {
-      if (e.button !== 0 || e.isPrimary === false) return;
-      e.stopPropagation(); suppressClick = false;
-      drag = {id: e.pointerId, x: e.clientX, y: e.clientY, distance: 0, moved: false};
-      e.currentTarget.closest('.accuracy-panel').classList.add('acc-page-grabbed');
-      try { e.currentTarget.setPointerCapture(e.pointerId); } catch {}
-    },
-    onpointermove: e => {
-      if (!drag || e.pointerId !== drag.id) return;
-      e.preventDefault(); e.stopPropagation();
-      const panel = e.currentTarget.closest('.accuracy-panel'), bounds = panel.getBoundingClientRect();
-      drag.distance = Math.max(0, drag.x - e.clientX, (drag.y - e.clientY) * .8);
-      drag.moved ||= Math.hypot(drag.x - e.clientX, drag.y - e.clientY) > 6;
-      // Convert screen distances into the panel's local (possibly scaled) units.
-      panel.style.setProperty('--page-peel', Math.min(panel.clientWidth * .85, 28 + drag.distance * panel.clientWidth / (bounds.width || 1)) + 'px');
-    },
-    onpointerup: e => {
-      if (!drag || e.pointerId !== drag.id) return;
-      e.stopPropagation();
-      const turn = drag.distance >= 44;
-      suppressClick = drag.moved;
-      clear(e.currentTarget);
-      if (turn) { suppressClick = true; setAccuracyPage(page + 1, '.acc-page-corner'); }
-    },
-    onpointercancel: e => { suppressClick = true; clear(e.currentTarget); },
-    onlostpointercapture: e => { if (drag) { suppressClick = true; clear(e.currentTarget); } },
-    onkeydown: e => {
-      if (e.key === 'Escape') { suppressClick = true; clear(e.currentTarget); e.stopPropagation(); }
-      if (e.key === 'Enter' || e.key === ' ') suppressClick = false;
-      const next = {ArrowRight: page + 1, ArrowLeft: page - 1, Home: 0, End: 2}[e.key];
-      if (next != null) { e.preventDefault(); e.stopPropagation(); clear(e.currentTarget); setAccuracyPage(next, '.acc-page-corner'); }
-    },
-  }, el('span', {'aria-hidden': 'true'}, '↖'));
+// Retain the same controls while the result panel is refreshed.
+let accuracyNavigation = null;
+function accuracyPager() {
+  accuracyNavigation ||= createAccuracyNavigation({doc: document, el, names: ACCURACY_PAGES,
+    select: page => setAccuracyPage(page, true),
+    motion: () => S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches});
+  return accuracyNavigation.element;
 }
 function accuracyDial(value, busy) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -4516,26 +4476,12 @@ function renderStats() {
           loss && loss.loss > 0 ? el('span', {}, Math.ceil(loss.ply / 2) + (position.color === 'w' ? '. ' : '… ') + position.san + ' ↗') : null);
       })));
   }
-  const navigatePage = e => {
-      const next = {ArrowRight: page + 1, ArrowLeft: page - 1, Home: 0, End: 2}[e.key];
-      if (next == null) return;
-      e.preventDefault(); e.stopPropagation(); setAccuracyPage(next, true);
-  };
-  const tabs = el('div', {class: 'acc-pager-steps', role: 'tablist', 'aria-label': 'Accuracy pages'},
-    ...ACCURACY_PAGES.map((name, i) => el('button', {type: 'button', role: 'tab', id: 'accuracy-tab-' + i,
-      'aria-selected': String(page === i), 'aria-controls': 'accuracy-page', tabindex: page === i ? 0 : -1,
-      'aria-label': name, onclick: () => setAccuracyPage(i, true)}, el('span', {class: 'acc-page-mark'}))));
-  const pager = el('div', {class: 'acc-pager', role: 'group', 'aria-label': 'Accuracy navigation', onkeydown: navigatePage},
-    el('button', {type: 'button', class: 'acc-page-prev', 'aria-label': 'Previous accuracy page: ' + ACCURACY_PAGES[(page + 2) % 3],
-      onclick: () => setAccuracyPage(page - 1, '.acc-page-prev')}, icon('chevron')),
-    el('div', {class: 'acc-pager-center'}, el('span', {class: 'acc-page-name', 'aria-hidden': 'true'}, ACCURACY_PAGES[page]), tabs),
-    el('button', {type: 'button', class: 'acc-page-next', 'aria-label': 'Next accuracy page: ' + ACCURACY_PAGES[(page + 1) % 3],
-      onclick: () => setAccuracyPage(page + 1, '.acc-page-next')}, icon('chevron')));
   UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials accuracy-book' + (reveal ? ' accuracy-reveal' : '') + (phaseReport ? ' accuracy-phase-report' : '') + (phaseReport2 && page === 0 ? ' accuracy-phase-report-2' : '') + (phaseModern ? ' accuracy-phase-modern' : ''), 'data-design': design, 'aria-label': 'Accuracy'},
     el('div', {class: 'panel-body acc-page' + (page === 0 ? ' acc-page-overview' : ''), id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
-      'aria-labelledby': 'accuracy-tab-' + page}, players, content), pager, accuracyPageCorner(page)));
+      'aria-labelledby': 'accuracy-tab-' + page}, players, content), accuracyPager()));
   statsRefs = busy ? {design, page, rows} : null;
   if (UI.canvas.classList.contains('full-hd-reference')) applyLayout();
+  accuracyNavigation?.sync(page);
   if (reveal && page === 0 && !busy && !S.blank && Object.values(S.acc).some(Number.isFinite)) {
     overviewReveal.mount(UI.stats.firstChild, {game: S.positions, key: revealKey, enabled: animate});
   }
@@ -4730,21 +4676,13 @@ function renderPagedStats() {
       el('p', {class: 'acc-note acc-evidence'}, busy ? 'Stats appear when analysis finishes.'
         : 'Forced moves excluded. Centipawn stats omit mate scores.'));
   }
-  const tabs = el('div', {class: 'acc-tabs', role: 'tablist', 'aria-label': 'Accuracy pages',
-    onkeydown: e => {
-      const next = {ArrowRight: page + 1, ArrowLeft: page - 1, Home: 0, End: 2}[e.key];
-      if (next == null) return;
-      e.preventDefault(); e.stopPropagation(); setAccuracyPage(next, true);
-    }}, ...ACCURACY_PAGES.map((name, i) => el('button', {type: 'button', role: 'tab', id: 'accuracy-tab-' + i,
-      'aria-selected': String(page === i), 'aria-controls': 'accuracy-page', tabindex: page === i ? 0 : -1,
-      onclick: () => setAccuracyPage(i, true)}, name)));
   UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-pages accuracy-book', 'data-design': 'pages', 'aria-label': 'Accuracy'},
     el('div', {class: 'panel-head acc-head'}, el('h3', {}, 'Accuracy'), el('span', {class: 'acc-page-count'}, (page + 1) + ' / 3')),
-    tabs,
     el('div', {class: 'panel-body acc-page', id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
-      'aria-labelledby': 'accuracy-tab-' + page}, players, content), accuracyPageCorner(page)));
+      'aria-labelledby': 'accuracy-tab-' + page}, players, content), accuracyPager()));
   statsRefs = busy ? {design: 'pages', page, rows} : null;
   if (UI.canvas.classList.contains('full-hd-reference')) applyLayout();
+  accuracyNavigation?.sync(page);
 }
 
 /* ---------------- Eval graph ---------------- */

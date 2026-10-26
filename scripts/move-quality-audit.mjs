@@ -39,7 +39,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     }
     if (width === 1920 && height === 1080) assert.ok(Math.abs(result.panel - 370.69) < 1);
     await shot('move-quality-' + width + 'x' + height);
-    await run("document.querySelector('.acc-page-next').click();document.querySelector('.acc-page-prev').click()");
+    await run("document.querySelector('#accuracy-tab-1').click();document.querySelector('#accuracy-tab-0').click()");
     assert.equal(await run("JSON.stringify([...document.querySelectorAll('.mod')].map(n=>{const r=n.getBoundingClientRect();return [n.dataset.mod,r.x,r.y,r.width,r.height]}))"), geometry);
     evidence.push(result);
   }

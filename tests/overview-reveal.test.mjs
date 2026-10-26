@@ -95,10 +95,10 @@ test('rerenders preserve a running overview and page changes do not replay it or
   const before = JSON.stringify({acc: a.state.acc, evals: a.state.evals, bests: a.state.bests, idx: a.state.idx});
   a.call('renderStats'); const panel = a.dom.window.document.querySelector('.accuracy-reveal');
   assert.equal(panel.dataset.revealing, 'true');
-  for (const selector of ['.acc-dial-label', '.acc-elo-label', '.acc-phase-values > span', '.acc-page-name']) {
+  for (const selector of ['.acc-dial-label', '.acc-elo-label', '.acc-phase-values > span', '.acc-navigation button']) {
     assert.equal(panel.querySelector(selector + ' .acc-reveal-slot'), null);
   }
-  assert.equal(panel.querySelector('.acc-page-name').textContent, 'Overview');
+  assert.equal(panel.querySelector('.acc-navigation [aria-selected="true"]').textContent, 'Overview');
   a.call('renderStats'); assert.equal(a.dom.window.document.querySelector('.accuracy-reveal'), panel);
   frames.tick(0); frames.tick(1200);
   a.call('setAccuracyPage', 1); a.call('setAccuracyPage', 0);

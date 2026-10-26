@@ -72,17 +72,18 @@ test('advanced loss links navigate using the mainline and retain the selected pa
   a.call('renderStats'); assert.equal(doc.querySelector('[aria-selected="true"]').getAttribute('aria-label'), 'Advanced');
 });
 
-test('the carousel arrows wrap between pages and retain focus without adding footer copy', t => {
+test('named page buttons jump directly and preserve focus through result updates', t => {
   const a = review(t), doc = a.dom.window.document;
-  for (const [selector, page] of [['.acc-page-next', 1], ['.acc-page-next', 2], ['.acc-page-next', 0], ['.acc-page-prev', 2]]) {
-    doc.querySelector(selector).click(); assert.equal(a.state.accuracyPage, page);
-    assert.equal(doc.activeElement, doc.querySelector(selector));
-    assert.equal(doc.querySelector('.accuracy-panel .acc-evidence,.accuracy-panel .acc-head'), null);
-    assert.equal(doc.querySelector('.acc-page').lastElementChild.lastElementChild.matches('p'), false);
+  const rail = doc.querySelector('.acc-navigation');
+  assert.deepEqual([...rail.querySelectorAll('button')].map(button => button.textContent), ['Overview', 'Quality', 'Advanced']);
+  for (const page of [2, 0, 1]) {
+    doc.querySelector('#accuracy-tab-' + page).click();
+    assert.equal(a.state.accuracyPage, page);
+    assert.equal(doc.activeElement.id, 'accuracy-tab-' + page);
+    a.call('renderStats');
+    assert.equal(doc.querySelector('.acc-navigation'), rail);
+    assert.equal(doc.activeElement.id, 'accuracy-tab-' + page);
   }
-  const idx = a.state.idx;
-  doc.querySelector('.acc-page-next').dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'Home', bubbles: true}));
-  assert.equal(a.state.accuracyPage, 0); assert.equal(a.state.idx, idx);
 });
 
 test('overview dials and paired phase bars reflect scores without changing numerical evidence', t => {

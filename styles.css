@@ -1464,22 +1464,26 @@ button { font-family: inherit; cursor: pointer; }
 .acc-phase-track { display: block; height: 3px; border-radius: 4px; overflow: hidden; background: var(--panel-3); }
 .acc-phase-track i { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
 .acc-phase-track:last-child i { margin-left: auto; background: var(--ink-2); opacity: .7; }
-.acc-pager { display: grid; grid-template-columns: 30px minmax(0,1fr) 30px; align-items: center; flex: none;
-  min-height: 36px; padding: 2px 10px; border-top: 1px solid var(--line-soft); }
-.acc-pager button { display: grid; place-items: center; border: 0; background: transparent; color: var(--ink-3); cursor: pointer; border-radius: 6px; }
-.acc-pager > button { width: 30px; height: 30px; }
-.acc-pager > button:hover { color: var(--accent); background: var(--panel-2); }
-.acc-pager svg { width: 18px; height: 18px; }
-.acc-page-prev svg { transform: rotate(90deg); }
-.acc-page-next svg { transform: rotate(-90deg); }
-.acc-pager-center { display: flex; align-items: center; justify-content: center; gap: 12px; }
-.acc-page-name { color: var(--ink-2); font-size: 13px; font-weight: 600; white-space: nowrap; }
-.acc-pager-steps { display: flex; align-items: center; gap: 1px; }
-.acc-pager-steps button { width: 16px; height: 28px; padding: 0; }
-.acc-pager-steps button[aria-selected="true"] { width: 25px; }
-.acc-page-mark { display: block; width: 5px; height: 4px; border-radius: 3px; background: var(--ink-3); opacity: .5; transition: width .2s,background .2s; }
-.acc-pager-steps [aria-selected="true"] .acc-page-mark { width: 19px; background: var(--accent); opacity: 1; }
-.acc-pager-steps button:hover .acc-page-mark { background: var(--accent); opacity: 1; }
+/* A quiet liquid surface: one selected destination, one passing wake. */
+.acc-navigation { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(3,minmax(0,1fr));
+  flex: none; gap: 0; margin: 0 8px 4px; padding: 4px; min-height: 36px; border: 1px solid var(--line-soft);
+  border-radius: 13px; background: color-mix(in srgb,var(--panel-2) 72%,var(--panel)); }
+.acc-navigation button { position: relative; z-index: 1; display: grid; place-items: center; min-width: 0; min-height: 28px;
+  padding: 6px 2px; border: 0; border-radius: 9px; background: transparent; color: var(--ink-3);
+  font: 650 11px/1.25 var(--font-ui); cursor: pointer; transition: color .18s ease; -webkit-tap-highlight-color: transparent; }
+.acc-navigation button:hover { color: var(--ink); }
+.acc-navigation button[aria-selected="true"] { color: var(--accent); }
+.acc-navigation:not([data-ready="true"]) button[aria-selected="true"] { background: color-mix(in srgb,var(--accent) 14%,var(--panel)); }
+.acc-navigation button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.acc-nav-current,.acc-nav-wake { position: absolute; z-index: 0; pointer-events: none; top: 4px; bottom: 4px; left: 0;
+  border-radius: 10px; transform-origin: left center; visibility: hidden; }
+.acc-navigation[data-ready="true"] :is(.acc-nav-current,.acc-nav-wake) { visibility: visible; }
+.acc-nav-current { background: linear-gradient(165deg,color-mix(in srgb,var(--accent) 23%,var(--panel)),color-mix(in srgb,var(--accent) 11%,var(--panel)));
+  box-shadow: inset 0 1px 0 color-mix(in srgb,var(--accent) 28%,transparent),inset 0 -1px 0 color-mix(in srgb,var(--accent) 12%,transparent),0 2px 5px #0000000a; }
+.acc-nav-current::after { content: ''; position: absolute; inset: auto 16% 0; height: 1px;
+  background: linear-gradient(90deg,transparent,color-mix(in srgb,var(--accent) 65%,transparent),transparent); }
+.acc-nav-wake { background: var(--accent); opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .acc-navigation button { transition: none; } }
 .acc-comparison { text-align: center; padding: 10px 0 12px; border-bottom: 1px solid var(--line-soft); }
 .acc-metric-label { font-size: 14px; font-weight: 600; color: var(--ink-2); margin-bottom: 9px; }
 .acc-metric-values { align-items: center; text-align: center; }
@@ -1517,8 +1521,7 @@ button { font-family: inherit; cursor: pointer; }
 .acc-evidence { margin-top: 12px; }
 @container (max-width: 260px) {
   .stage .accuracy-panel .acc-page { padding-inline: 10px; }
-  .acc-pager { padding-inline: 6px; }
-  .acc-pager-center { gap: 6px; }
+  .acc-navigation { margin-inline: 6px; }
   .acc-phase-values strong { font-size: 16px; }
 }
 /* explanation tooltip for each category (hover in the accuracy panel) */

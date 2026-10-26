@@ -39,7 +39,7 @@ test('Modern reproduces every supplied box and scale, including the collapsed Ac
   const a=review(t);
   assert.deepEqual(MODERN_LAYOUT,supplied.layout);
   await a.call('applyUiSetup','modern');
-  assert.equal(a.state.settings.accuracyDesign,'phases');assert.equal(a.state.settings.movesDesign,'zoom20');
+  assert.equal(a.state.settings.accuracyDesign,'phases-modern');assert.equal(a.state.settings.movesDesign,'zoom20');
   for(const [key,box]of Object.entries(supplied.displayedLayout)) {
     for(const prop of ['x','y','w','h','scale'])near(a.state.layout[key][prop],box[prop]);
   }

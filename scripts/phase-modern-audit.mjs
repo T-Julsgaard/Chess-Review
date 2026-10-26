@@ -19,6 +19,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await waitFor(review, "!document.querySelector('#startup')", 'Startup finished');
   await resize(1920, 919);
   await run("import('./analysis.js').then(async m=>{await m.applyUiSetup('modern');m.S.settings.moveAnim=false})");
+  assert.equal(await run("import('./analysis.js').then(m=>m.S.settings.accuracyDesign)"), 'phases-modern', 'Modern defaults to the Modern report');
   await run(`document.querySelector('[aria-label="Settings"]').click();
     [...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Tabs').click();
     document.querySelector('[data-setting="accuracyDesign"][data-value="phases-modern"]').click()`);
@@ -36,34 +37,45 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     assert.ok(fit.overflow <= 1 && fit.pageOverflow <= 1, JSON.stringify(fit));
     assert.ok(fit.content <= fit.body + 1, 'Modern overview fits without scrolling: ' + JSON.stringify(fit));
     await shot('phase-modern-' + width + 'x' + height);
+    for (const page of [1,2,0]) {
+      await run("document.querySelector('#accuracy-tab-"+page+"').click()");
+      const footer = await run("(()=>{const n=document.querySelector('.acc-navigation');return {overflow:n.scrollWidth-n.clientWidth,buttons:[...n.querySelectorAll('button')].map(b=>({width:b.clientWidth,overflow:b.scrollWidth-b.clientWidth})),pageOverflow:document.documentElement.scrollWidth-innerWidth}})()");
+      assert.ok(footer.overflow <= 1 && footer.pageOverflow <= 1 && footer.buttons.every(b=>b.overflow<=1), JSON.stringify({width,page,footer}));
+    }
     evidence.push(fit);
   }
   await resize(1920, 919);
   await shot('phase-modern-workspace', true);
-  // Drive actual captured mouse input, including cancellation and a full turn.
-  const corner = () => run("(()=>{const r=document.querySelector('.acc-page-corner').getBoundingClientRect();return {x:r.right-8,y:r.bottom-8}})()");
-  const mouse = (type, x, y, buttons = 0) => call('Input.dispatchMouseEvent', {type, x, y, button: 'left', buttons, clickCount: type === 'mouseMoved' ? 0 : 1}, review.sessionId);
-  let at = await corner();
-  await mouse('mousePressed', at.x, at.y, 1); await mouse('mouseMoved', at.x - 20, at.y - 10, 1); await mouse('mouseReleased', at.x - 20, at.y - 10);
-  assert.equal(await run("import('./analysis.js').then(m=>m.S.accuracyPage)"), 0, 'Short drag cancels');
-  at = await corner();
-  await mouse('mousePressed', at.x, at.y, 1); await mouse('mouseMoved', at.x - 90, at.y - 70, 1);
-  assert.ok(await run("parseFloat(getComputedStyle(document.querySelector('.accuracy-panel'),'::after').width)>100"), 'The fold follows the captured drag');
-  await shot('phase-modern-corner-drag');
-  await mouse('mouseReleased', at.x - 90, at.y - 70);
-  assert.equal(await run("import('./analysis.js').then(m=>m.S.accuracyPage)"), 1, 'Drag turns once');
-  assert.equal(await run("document.activeElement.classList.contains('acc-page-corner')"), true);
+  // Real pointer input targets one named destination, with no alternate pager.
+  const click = async page => {
+    const at = await run("(()=>{const r=document.querySelector('#accuracy-tab-"+page+"').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()");
+    for (const type of ['mousePressed','mouseReleased']) await call('Input.dispatchMouseEvent',
+      {type, x: at.x, y: at.y, button: 'left', clickCount: 1}, review.sessionId);
+  };
+  assert.equal(await run("!!document.querySelector('.acc-page-corner,.acc-page-prev,.acc-page-next,.acc-pager-steps')"), false);
+  await click(1);
+  assert.equal(await run("document.activeElement.id"), 'accuracy-tab-1');
   await shot('phase-modern-quality');
-  await run("document.querySelector('.acc-page-corner').click()"); await shot('phase-modern-advanced');
-  await run("document.querySelector('.acc-page-corner').click()");
-  assert.equal(await run("import('./analysis.js').then(m=>m.S.accuracyPage)"), 0);
+  await click(2); await shot('phase-modern-advanced');
+  await click(0);
   assert.equal(await snapshot(), before, 'Navigation preserves all review evidence and geometry');
-  await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=true;m.setAccuracyPage(1)})");
-  assert.equal(await run("!!document.querySelector('.acc-turn-leaf')"), true);
-  await waitFor(review, "!document.querySelector('.acc-turn-leaf')", 'Sheet turn cleaned up');
+  await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=true;m.setAccuracyPage(2)})");
+  const flows = await run("(()=>{const n=document.querySelector('.acc-navigation');const a=n.getAnimations({subtree:true}).filter(a=>a.effect.target.matches('.acc-nav-current,.acc-nav-wake'));a.forEach(a=>{a.pause();a.currentTime=150});return a.length})()");
+  assert.equal(flows, 2, 'A moving surface and a trailing wake');
+  await shot('phase-modern-liquid-flow');
+  const painted = await run("document.querySelector('.acc-nav-current').getBoundingClientRect().toJSON()");
+  await run("import('./analysis.js').then(m=>m.setAccuracyPage(1))");
+  const redirected = await run("(()=>{const n=document.querySelector('.acc-nav-current');n.getAnimations().forEach(a=>{a.pause();a.currentTime=0});return n.getBoundingClientRect().toJSON()})()");
+  assert.ok(Math.abs(painted.x-redirected.x)<1 && Math.abs(painted.width-redirected.width)<1, 'Rapid reversal starts at the painted water surface');
+  await run("document.querySelector('.acc-navigation').getAnimations({subtree:true}).forEach(a=>a.finish())");
+  await waitFor(review, "!document.querySelector('.acc-turn-leaf')", 'Page dissolve cleaned up');
+  await run("document.querySelector('#accuracy-tab-1').focus()");
+  await call('Input.dispatchKeyEvent', {type:'keyDown',key:'ArrowRight',code:'ArrowRight'}, review.sessionId);
+  assert.equal(await run('document.activeElement.id'), 'accuracy-tab-2');
   await call('Emulation.setEmulatedMedia', {features: [{name: 'prefers-reduced-motion', value: 'reduce'}]}, review.sessionId);
   await run("import('./analysis.js').then(m=>m.setAccuracyPage(0))");
   assert.equal(await run("!!document.querySelector('.acc-turn-leaf,[data-revealing]')"), false);
+  assert.equal(await run("document.querySelector('.acc-navigation').getAnimations({subtree:true}).length"), 0);
   await call('Emulation.setEmulatedMedia', {features: []}, review.sessionId);
   await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=false})");
   await call('Page.reload', {}, review.sessionId);
@@ -81,5 +93,5 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await run("document.documentElement.dataset.theme='light'"); await shot('phase-modern-illustrative-light');
   await run("import('./analysis.js').then(m=>{m.S.gameStats=originalPhaseStats;m.S.acc=originalPhaseAcc;m.S.calibrated=originalPhaseCalibration;m.renderStats()})");
   await fs.writeFile(path.join(out, 'phase-modern.json'), JSON.stringify({passed: true, evidence}, null, 2));
-  console.log('Modern report passed eight viewport sizes, saved settings/reload, real corner dragging, animation cleanup and reduced motion. Screenshots: ' + out);
+  console.log('Modern report passed eight viewport sizes, saved settings/reload, liquid navigation, rapid reversals, keyboard focus, animation cleanup and reduced motion. Screenshots: ' + out);
 }

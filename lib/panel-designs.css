@@ -104,11 +104,11 @@
 .stage .accuracy-phase-modern .phase-overall-values .acc-val { position: absolute; left: 50%; top: 50%;
   transform: translate(-50%,-50%); font-size: clamp(27px,12cqw,36px); color: var(--score-color) !important; letter-spacing: -1.8px; }
 .accuracy-phase-modern .acc-dial-label { display: none; }
-.accuracy-phase-modern .phase-report { gap: 8px; }
+.accuracy-phase-modern .phase-report { gap: 6px; }
 .accuracy-phase-modern .phase-report-name { font-size: 11px; }
 .accuracy-phase-modern .phase-report-cell { padding: 7px 3px; border-radius: 7px; }
 .accuracy-phase-modern .phase-report-score { font-size: 20px; }
-.accuracy-phase-modern .phase-rating { padding-top: 10px; gap: 6px; }
+.accuracy-phase-modern .phase-rating { padding-top: 8px; gap: 6px; }
 .accuracy-phase-modern .phase-rating-values .acc-elo { font-size: 21px; }
 /* Overview player cards keep names prominent and aligned with their scores. */
 .accuracy-panel .acc-page-overview .acc-players { align-items: stretch; margin-bottom: 6px; }
@@ -121,34 +121,11 @@
   border-color: color-mix(in srgb,var(--ink-3) 70%,transparent); box-shadow: 0 1px 2px #0002; }
 .accuracy-phase-report .acc-page-overview .phase-overview { gap: 10px; }
 .accuracy-phase-report-2 .acc-page-overview .phase-overview { gap: 8px; }
-.accuracy-phase-modern .acc-page-overview .phase-overview { gap: 6px; }
-/* Shared sheets: a visible folded corner, with click and drag affordances. */
+.accuracy-phase-modern .acc-page-overview .phase-overview { gap: 5px; }
+/* Shared result pages keep decorative transitions inside the panel. */
 .accuracy-book { position: relative; isolation: isolate; overflow: hidden; }
-.accuracy-book .acc-pager { padding-right: 42px; grid-template-columns: 26px minmax(0,1fr) 26px; }
-.accuracy-book .acc-pager > button { width: 26px; }
-.accuracy-book .acc-pager-center { gap: 7px; }
-.accuracy-book .acc-page-name { font-size: 12px; }
-.accuracy-book .acc-pager-steps button { width: 12px; }
-.accuracy-book .acc-pager-steps button[aria-selected="true"] { width: 21px; }
-.acc-page-corner { position: absolute; z-index: 4; right: 0; bottom: 0; width: 38px; height: 38px;
-  border: 0; padding: 0; background: transparent; color: var(--ink-3); cursor: grab; touch-action: none; }
-.acc-page-corner::before { content: ''; position: absolute; inset: 0; clip-path: polygon(100% 0,100% 100%,0 100%);
-  background: linear-gradient(135deg,transparent 46%,var(--line) 49%,var(--panel-3) 52%,var(--panel-2) 80%); }
-.acc-page-corner span { position: absolute; right: 5px; bottom: 4px; font-size: 14px; }
-.acc-page-corner:hover, .acc-page-corner:focus-visible { color: var(--accent); }
-.accuracy-book::after { content: ''; pointer-events: none; position: absolute; z-index: 3; right: 0; bottom: 0;
-  width: var(--page-peel,0px); height: var(--page-peel,0px); clip-path: polygon(100% 0,100% 100%,0 100%);
-  background: linear-gradient(135deg,transparent 46%,var(--line) 49%,var(--panel-3) 51%,var(--panel-2) 67%,var(--panel) 100%);
-  filter: drop-shadow(-5px -5px 8px #0003); transition: width .18s ease,height .18s ease; }
-.accuracy-book:has(.acc-page-corner:hover), .accuracy-book:has(.acc-page-corner:focus-visible) { --page-peel: 46px; }
-.accuracy-book.acc-page-grabbed::after { transition: none; }
-.acc-page-grabbed .acc-page-corner { cursor: grabbing; }
 .stage .accuracy-book .acc-turn-leaf { position: absolute; z-index: 2; left: 0; right: 0; margin: 0;
-  box-sizing: border-box; background: var(--panel); overflow: hidden; pointer-events: none; backface-visibility: hidden;
-  box-shadow: 12px 0 22px #0002; }
-@media (prefers-reduced-motion: reduce) {
-  .accuracy-book::after { transition: none; }
-}
+  box-sizing: border-box; background: var(--panel); overflow: hidden; pointer-events: none; }
 .set-section .set-seg:has([data-setting="movesDesign"]) { flex-wrap: wrap; }
 .set-section .set-seg [data-setting="movesDesign"] { flex: 1 1 40%; min-height: 32px; }
 .stage .accuracy-panel.accuracy-original .acc-head { padding: 10.2px 12px; }
@@ -180,12 +157,6 @@
 .stage .accuracy-panel.accuracy-pages .acc-head { padding: 12px 14px 8px; }
 .stage .accuracy-panel.accuracy-pages .acc-head h3 { font-size: 16px; letter-spacing: 0; text-transform: none; }
 .accuracy-pages .acc-page-count { margin-left: auto; color: var(--ink-3); font: 12px var(--font-mono); }
-.accuracy-pages .acc-tabs { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 3px; padding: 4px; margin: 0 12px 2px;
-  flex: none; border: 1px solid var(--line-soft); border-radius: 10px; background: var(--panel-2); }
-.accuracy-pages .acc-tabs button { border: 0; border-radius: 7px; background: transparent; padding: 9px 2px; min-width: 0;
-  color: var(--ink-2); font: 600 13px var(--font-ui); white-space: nowrap; cursor: pointer; }
-.accuracy-pages .acc-tabs button:hover { background: var(--panel-3); }
-.accuracy-pages .acc-tabs [aria-selected="true"] { color: var(--accent-ink); background: var(--accent); }
 .stage .accuracy-panel.accuracy-pages .acc-val { position: static; transform: none; font-size: 40px; color: inherit; }
 .accuracy-pages .acc-unit { font-size: 17px; }
 .accuracy-pages .acc-elo { color: inherit; }

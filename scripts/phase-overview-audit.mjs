@@ -33,7 +33,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     }
     if(width>=1800||width<=820)assert.ok(result.content<=result.body+1,'Overview must fit: '+JSON.stringify(result));
     if(width===1920&&height===1080)assert.ok(Math.abs(result.panel-370.69)<1,'Keep original compact size');
-    await run("document.querySelector('.acc-page-next').click();document.querySelector('.acc-page-prev').click()");
+    await run("document.querySelector('#accuracy-tab-1').click();document.querySelector('#accuracy-tab-0').click()");
     assert.equal(await run("JSON.stringify([...document.querySelectorAll('.mod')].map(n=>{const r=n.getBoundingClientRect();return [n.dataset.mod,r.x,r.y,r.width,r.height]}))"),geometry);
     evidence.push(result);
   }
@@ -58,7 +58,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=true;m.S.positions=[...m.S.positions];m.renderStats()})");
   assert.equal(await run("!!document.querySelector('[data-revealing]')"),true);
   assert.equal(await run("document.querySelector('.phase-summary-label').textContent"),'Accuracy');
-  assert.equal(await run("!!document.querySelector('.phase-summary-label .acc-reveal-slot,.phase-report-name .acc-reveal-slot,.acc-elo-label .acc-reveal-slot,.acc-page-name .acc-reveal-slot')"),false);
+  assert.equal(await run("!!document.querySelector('.phase-summary-label .acc-reveal-slot,.phase-report-name .acc-reveal-slot,.acc-elo-label .acc-reveal-slot,.acc-navigation .acc-reveal-slot')"),false);
   await waitFor(review,"!document.querySelector('[data-revealing]')",'Phase reveal complete');
   assert.equal(await run("document.querySelector('[data-phase=middlegame] .phase-report-score').textContent"),'43.8');
   await run("import('./analysis.js').then(m=>{Object.assign(m.S,phaseOriginal);m.S.settings.moveAnim=false;m.renderStats()})");

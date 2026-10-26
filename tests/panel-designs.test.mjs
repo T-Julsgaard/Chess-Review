@@ -53,7 +53,7 @@ test('Original Accuracy restores the summary, expander and explainer; current de
   assert.ok(doc.querySelector('.q-tip.show'));
   await a.call('setSetting', 'accuracyDesign', 'pages');
   assert.equal(doc.querySelector('.q-tip.show'), null);
-  assert.equal(doc.querySelectorAll('.acc-tabs [role="tab"]').length, 3);
+  assert.equal(doc.querySelectorAll('.acc-navigation [role="tab"]').length, 3);
   doc.querySelector('#accuracy-tab-1').click(); assert.equal(doc.querySelectorAll('.qbreak-row').length, 10);
   await a.call('setSetting', 'accuracyDesign', 'dials');
   assert.ok(doc.querySelector('.acc-pager')); assert.equal(doc.querySelector('.acc-tabs'), null);

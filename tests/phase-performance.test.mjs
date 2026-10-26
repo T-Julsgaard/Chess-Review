@@ -84,7 +84,7 @@ test('phase scores retain the reveal animation and finish with the exact score a
   assert.equal(cell.dataset.phaseCategory, 'blunder');
   assert.equal(cell.querySelector('.phase-report-score .acc-reveal-ink').textContent, '0.0');
   assert.equal(cell.querySelector('.phase-category-label'), null);
-  for (const selector of ['.phase-summary-label', '.phase-report-name', '.acc-elo-label', '.acc-page-name']) {
+  for (const selector of ['.phase-summary-label', '.phase-report-name', '.acc-elo-label', '.acc-navigation button']) {
     assert.equal(doc.querySelector(selector + ' .acc-reveal-slot'), null);
   }
   assert.equal(doc.querySelector('.phase-summary-label').textContent, 'Accuracy');
