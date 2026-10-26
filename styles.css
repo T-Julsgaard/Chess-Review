@@ -491,6 +491,7 @@
 .puzzle-run-ticket-heading .puzzle-mode-art { width: 44px; height: 32px; flex: 0 0 auto; }
 .puzzle-count-display,.puzzle-end-score { position: relative; display: grid; place-items: center; width: calc(100% - 32px); height: 1.4em; margin: 0 16px 16px; font-size: clamp(64px,12vw,84px); line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -3px; }
 .puzzle-run-start-count { display: grid; place-items: center; width: 100%; height: 100%; box-sizing: border-box; visibility: hidden; font-size: inherit; }
+.puzzle-run-start[data-step="Ready"] .puzzle-count-display > * { font-size: clamp(34px,8vw,48px); letter-spacing: -1.5px; }
 .puzzle-run-ticket-footer { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; align-self: stretch; min-height: 57px; padding: 11px 12px; box-sizing: border-box; border-top: 1px dashed color-mix(in srgb,var(--mode-stock) 40%,#24241f); border-radius: 0 0 12px 12px; background: #24241f; color: #f4f1e8; }
 .puzzle-run-ticket-footer::before,.puzzle-run-ticket-footer::after { content: ''; position: absolute; top: -4px; width: 7px; height: 7px; border-radius: 50%; background: #34342b; }
 .puzzle-run-ticket-footer::before { left: -4px; }
@@ -515,7 +516,8 @@
 .puzzle-flip-in { z-index: 3; transform: rotateX(0); animation: puzzle-flip-in .64s cubic-bezier(.2,.7,.3,1) both; }
 .puzzle-run-start[data-step="2"] .puzzle-flip-out { animation-name: puzzle-flip-out-b; }
 .puzzle-run-start[data-step="2"] .puzzle-flip-in { animation-name: puzzle-flip-in-b; }
-.puzzle-run-start[data-step="Go!"] .puzzle-flip-out, .puzzle-run-start[data-step="Go!"] .puzzle-flip-in { animation: none; }
+/* The first leaf is already in place; only changing digits turn the page. */
+.puzzle-run-start:is([data-step="3"],[data-step="Ready"],[data-step="Go!"]) :is(.puzzle-flip-out,.puzzle-flip-in) { animation: none; }
 .puzzle-flip::before, .puzzle-flip::after { content: ""; position: absolute; top: calc(50% - 4px); width: 3px; height: 8px; z-index: 4; border-radius: 2px; background: #444635; }
 .puzzle-flip::before { left: 5px; }
 .puzzle-flip::after { right: 5px; }
