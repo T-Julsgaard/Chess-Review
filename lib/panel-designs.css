@@ -1,4 +1,16 @@
 /* Original designs are scoped so future iterations can share live review data. */
+.accuracy-reveal .acc-scorecard { background: none; }
+.accuracy-reveal .acc-dial-fill { filter: none; }
+.acc-reveal-slot { display: inline-block; position: relative; white-space: pre; }
+.acc-reveal-ghost { visibility: hidden; }
+.acc-reveal-accessible { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.acc-reveal-ink { position: absolute; inset: 0; white-space: pre; text-align: inherit; }
+.accuracy-reveal[data-revealing] .acc-dial .acc-val { font-variant-numeric: tabular-nums; }
+@container (max-width: 260px) {
+  .accuracy-reveal .acc-elo-label { font-size: 11px; }
+}
+.set-section .set-seg:has([data-setting="accuracyDesign"]) { flex-wrap: wrap; }
+.set-section .set-seg [data-setting="accuracyDesign"] { flex: 1 1 40%; min-height: 32px; }
 .stage .accuracy-panel.accuracy-original .acc-head { padding: 10.2px 12px; }
 .stage .accuracy-panel.accuracy-original .acc-head h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .1em; }
 .accuracy-original .acc-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 14px; }

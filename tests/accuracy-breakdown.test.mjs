@@ -12,7 +12,7 @@ test('Accuracy opens on overview, with phase scores and Elo and no practice or e
   const a = review(t), panel = a.dom.window.document.querySelector('.accuracy-panel');
   assert.equal(panel.querySelector('[aria-selected="true"]').getAttribute('aria-label'), 'Overview');
   assert.equal(panel.querySelectorAll('.acc-phase-row').length, 3);
-  assert.match(panel.textContent, /Estimated Elo/);
+  assert.match(panel.textContent, /Estimated rating/);
   assert.equal(a.state.qbreakExpanded, false);
   assert.equal(panel.querySelector('.panel-head,.acc-note'), null);
   assert.equal(a.dom.window.document.querySelector('.moves-panel .panel-head'), null);

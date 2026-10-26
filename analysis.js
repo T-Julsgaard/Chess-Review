@@ -17,6 +17,7 @@ import { expectedPoints, SF19_OUTCOME } from "./lib/public-scoring.js";
 import { calibratedReview, scoringEvidenceComplete } from "./lib/calibrated-review.js";
 import { gameStatistics, GAME_PHASES } from "./lib/game-statistics.js";
 import { PANEL_DESIGNS, panelDesign, normalizePanelDesigns } from "./lib/panel-designs.js";
+import { createOverviewReveal } from "./lib/overview-reveal.js";
 import { analyseCalibratedPosition } from "./lib/calibrated-search.js";
 import { loadLearningWorkspace, presentationFor } from "./lib/learning-loader.js";
 import { mountLearningAnnouncement } from "./lib/learning-announcement.js";
@@ -782,6 +783,7 @@ let sqByName = {};
 // the analysis — so the CSS animation doesn't restart for each analyzed move.
 let revRefs = null;
 let statsRefs = null;
+const overviewReveal = createOverviewReveal({requestFrame: callback => requestAnimationFrame(callback), cancelFrame: id => cancelAnimationFrame(id)});
 
 /* ---------------- Active position (mainline vs. analysis mode) ----------------
    In analysis mode the shown position + eval + engine data come from the variation;
@@ -4222,6 +4224,12 @@ function accuracyDial(value, busy) {
 }
 function renderStats() {
   const design = panelDesign('accuracy', S.settings);
+  const reveal = design === 'reveal';
+  const revealKey = JSON.stringify([S.batchGen, S.meSide, S.acc, S.calibrated?.w.rating, S.calibrated?.b.rating, S.gameStats]);
+  const animate = S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  if (reveal && !S.analyzing && !S.accuracyPage && animate
+      && overviewReveal.matches(UI.stats.firstChild, S.positions, revealKey)) return;
+  overviewReveal.stop();
   if (design === 'original') return renderOriginalStats();
   if (design === 'pages') return renderPagedStats();
   const sides = [S.meSide, S.meSide === "w" ? "b" : "w"];
@@ -4254,7 +4262,7 @@ function renderStats() {
         const rating = estimateElo(S.accElo[side], S.players[side]?.rating, side);
         return el('div', {class: 'acc-scorecard'}, accuracyDial(S.acc[side], busy),
           el('div', {class: 'acc-estimate'}, el('strong', {class: 'acc-elo'}, pending(rating == null ? '—' : '≈ ' + rating)),
-            el('span', {class: 'acc-elo-label'}, 'Estimated Elo')));
+            el('span', {class: 'acc-elo-label'}, reveal ? 'Estimated rating' : 'Estimated Elo')));
       })),
       el('div', {class: 'acc-phases', 'aria-label': 'Accuracy by game phase'},
         ...GAME_PHASES.map((phase, i) => {
@@ -4308,11 +4316,14 @@ function renderStats() {
     el('div', {class: 'acc-pager-center'}, el('span', {class: 'acc-page-name', 'aria-hidden': 'true'}, ACCURACY_PAGES[page]), tabs),
     el('button', {type: 'button', class: 'acc-page-next', 'aria-label': 'Next accuracy page: ' + ACCURACY_PAGES[(page + 1) % 3],
       onclick: () => setAccuracyPage(page + 1, '.acc-page-next')}, icon('chevron')));
-  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials', 'data-design': design, 'aria-label': 'Accuracy'},
+  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials' + (reveal ? ' accuracy-reveal' : ''), 'data-design': design, 'aria-label': 'Accuracy'},
     el('div', {class: 'panel-body acc-page' + (page === 0 ? ' acc-page-overview' : ''), id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
       'aria-labelledby': 'accuracy-tab-' + page}, players, content), pager));
   statsRefs = busy ? {design, page, rows} : null;
   if (UI.canvas.classList.contains('full-hd-reference')) applyLayout();
+  if (reveal && page === 0 && !busy && !S.blank && Object.values(S.acc).some(Number.isFinite)) {
+    overviewReveal.mount(UI.stats.firstChild, {game: S.positions, key: revealKey, enabled: animate});
+  }
 }
 
 function renderOriginalStats() {
@@ -5790,6 +5801,7 @@ async function setSetting(key, value) {
   applySettings();
   if (key === 'accuracyDesign') { statsRefs = null; hideQTip(); renderStats(); }
   if (key === 'movesDesign') updateMovesDesign();
+  if (key === 'moveAnim' && S.settings.moveAnim === false) overviewReveal.stop();
   if (key === "pieceStyle") buildBoard();
   if (key === "mlStyle" || key === "badgeStyle") renderMoves();
   if (key === "evalView" || key === "graphStyle" || key === "barStyle" || key === "evalbarDesign" || key === "moveAnim") { renderEvalBar(); renderGraph(); }

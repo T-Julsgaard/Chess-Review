@@ -1,7 +1,7 @@
 # Accuracy panel
 
 **Settings → Visual → Tabs** selects the panel design. Accuracy offers Original,
-Page tabs and Dials; Dials is the default described below. The original summary
+Page tabs, Dials and Reveal; Reveal is the default described below. The original summary
 and first paged iteration remain available for comparison. See
 [panel design choices](TAB_DESIGNS.md) for saved settings and future iterations.
 
@@ -23,12 +23,19 @@ Overall accuracy and estimated Elo retain the existing calibrated scoring and
 rating modes. Phase accuracy is computed locally from the same scored decisions,
 without new searches, permissions, requests or changes to saved analysis.
 
-The overview pairs two open-arc accuracy dials with prominent Elo estimates.
+The overview pairs two open-arc accuracy dials with prominent estimated ratings.
 Opening, middlegame and endgame use paired bars aligned with the same player
 columns. Arcs and bars are decorative; numerical scores remain readable text,
 and unavailable scores show an em dash with an empty meter. Perfect accuracy
 uses `100%` so it fits comfortably inside the dial. The score display never
 changes the underlying calculated values.
+
+Reveal removes the glow from the previous Dials design and labels the estimate
+**Estimated rating**. Results count up and meters fill while all player/phase
+labels type in together, once per loaded set of results. The 1.2-second animation
+waits until cached reviews are visible, keeps final text sizes reserved, and
+restores the exact original score text when complete. Motion-off and reduced-motion
+preferences display final results immediately. Earlier designs remain selectable.
 
 Lichess's [phase accuracy implementation](https://github.com/lichess-org/lila/blob/master/modules/analyse/src/main/AccuracyPercent.scala)
 partitions a game and runs its accuracy aggregator on each phase. Its

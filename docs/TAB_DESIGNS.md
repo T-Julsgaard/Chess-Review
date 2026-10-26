@@ -6,7 +6,7 @@ The choices are local visual preferences and survive reopening the extension.
 | Panel | Designs | Default |
 | --- | --- | --- |
 | Evaluation bar | Original, Balance | Balance |
-| Accuracy | Original, Page tabs, Dials | Dials |
+| Accuracy | Original, Page tabs, Dials, Reveal | Reveal |
 | Move list | Original, Full height | Full height |
 
 Original Accuracy restores the combined score/category panel, its seven-row
@@ -14,6 +14,16 @@ summary, expandable full category list, explanations and practice button. Page
 tabs restores the first three-page design with named buttons. Dials retains the
 current compact overview, phase bars and carousel. Expanding the original category
 list scrolls inside the fixed panel rather than moving neighboring controls.
+
+Reveal is a new iteration of Dials with **Estimated rating** labels and no score
+glow. When its overview first receives completed results, all numbers count up,
+rings and phase bars fill, and player names/labels type in together over 1.2
+seconds. One clock drives the reveal. Final text reserves the exact layout and
+remains accessible throughout. It waits for startup shutters and background tabs,
+does not restart on normal redraws or page changes, and can play for new analysis
+results. Turning motion off or requesting reduced motion shows final values
+immediately. Original, Page tabs and Dials remain available with their earlier
+presentation; existing saved design choices are preserved.
 
 Original Move list restores its title header and empty footer strip. Full height
 omits both nodes so the scrollable moves body reaches the panel bottom. It keeps
