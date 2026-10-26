@@ -54,5 +54,5 @@ test('switching versions preserves scores, review position, animation preference
   const empty=a.dom.window.document.querySelector('[data-phase="endgame"] .phase-report-cell');
   assert.ok(empty.classList.contains('unavailable'));assert.equal(empty.textContent,'—');
   a.state.analyzing=true;a.call('renderStats');
-  assert.ok([...a.dom.window.document.querySelectorAll('.phase-report-score')].every(n=>n.textContent==='···'));
+  assert.ok([...a.dom.window.document.querySelectorAll('.phase-report-score')].every(n=>n.querySelector('.ld-bounce')));
 });

@@ -40,11 +40,17 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
       Object.assign(m.S.gameStats[side].phases[phase],{complete:false,accuracy:90});
     m.setAccuracyPage(0);
     window.motionLoader=document.querySelector('.acc-val');
+    window.motionPending=[...document.querySelectorAll('.phase-report-score .ld-bounce,.acc-elo .ld-bounce')].map(n=>({
+      label:n.getAttribute('aria-label'),dots:n.children.length,animation:getComputedStyle(n.firstElementChild).animationName,
+      width:n.getBoundingClientRect().width,height:n.getBoundingClientRect().height}));
     for(const side of ['w','b'])m.S.gameStats[side].phases.opening.complete=true;
     m.renderStats();window.motionOpening=document.querySelector('[data-phase=opening]');
     return motionOpening.querySelector('.acc-reveal-ink').textContent;
   })`);
   assert.equal(first, '0.0');
+  const pending = await run('motionPending');
+  assert.equal(pending.length, 8, 'Both phase scores and estimated ratings use Bounce');
+  assert.ok(pending.every(n=>n.label==='Calculating' && n.dots===3 && n.animation==='ld-bounce' && n.width>0 && n.height>0));
   await sleep(250);
   const middle = await run(`import('./analysis.js').then(m=>{
     const value=Number(motionOpening.querySelector('.acc-reveal-ink').textContent);
@@ -77,6 +83,6 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     const shot = await call('Page.captureScreenshot', {format: 'png', clip, captureBeyondViewport: true}, review.sessionId);
     await fs.writeFile(path.join(out, 'move-bars-' + theme + '.png'), Buffer.from(shot.data, 'base64'));
   }
-  await fs.writeFile(path.join(out, 'accuracy-motion.json'), JSON.stringify({evidence, middle, colors}, null, 2));
+  await fs.writeFile(path.join(out, 'accuracy-motion.json'), JSON.stringify({evidence, pending, middle, colors}, null, 2));
   console.log('Static player names, animated phase arrivals, retained loaders and themed Move bars passed. Screenshots: ' + out);
 }

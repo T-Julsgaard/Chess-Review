@@ -24,7 +24,7 @@ test('Modern Phase report saves independently, reuses arcs and phase evidence, a
   assert.equal(doc.querySelector('[data-phase="endgame"] .phase-report-score').textContent, '—');
   a.state.analyzing = true; a.call('renderStats');
   assert.ok(doc.querySelector('.acc-val.ld'));
-  assert.ok([...doc.querySelectorAll('.phase-report-score')].every(n => n.textContent === '···'));
+  assert.ok([...doc.querySelectorAll('.phase-report-score')].every(n => n.querySelector('.ld-bounce')));
 });
 
 test('Modern v2 saves separately and keeps Modern arcs, phase evidence and all three pages', async t => {

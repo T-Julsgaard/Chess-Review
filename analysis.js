@@ -1740,14 +1740,20 @@ async function openLearning() {
 /* ---------------- Loading indicator ----------------
    Selectable animation shown in place of the accuracy/elo number while Stockfish
    is still analyzing. The color is inherited from the parent (currentColor). */
-function loaderNode(extraClass = "", color = null) {
-  const variant = LOADERS[S.settings.loaderStyle] || "pulse";
+function loaderNode(extraClass = "", color = null, style = S.settings.loaderStyle) {
+  const variant = LOADERS[style] || "pulse";
   const props = { class: "ld ld-" + variant + (extraClass ? " " + extraClass : "") };
   if (color) props.style = { color };
   if (variant === "pulse")  return el("span", props, "•••");
   if (variant === "bounce") return el("span", props, el("i"), el("i"), el("i"));
   if (variant === "wave")   return el("span", props, el("i"), el("i"), el("i"), el("i"));
   return el("span", props); // spin (pure CSS ring)
+}
+function accuracyPendingValue() {
+  const loader = loaderNode('', null, 'bounce');
+  loader.setAttribute('role', 'img');
+  loader.setAttribute('aria-label', 'Calculating');
+  return loader;
 }
 
 /* ---------------- Movable modules (drag + resize + storage) ---------------- */
@@ -4407,7 +4413,7 @@ function renderAccuracyPhases(sides, busy, bars = true) {
     ...GAME_PHASES.map((phase, i) => {
       const pending = accuracyPhasePending(phase, busy);
       const values = sides.map(side => S.gameStats?.[side]?.phases[phase]?.accuracy);
-      const scores = values.map(value => el('strong', {}, pending ? '···' : value == null ? '—' : value.toFixed(1)));
+      const scores = values.map(value => el('strong', {}, pending ? accuracyPendingValue() : value == null ? '—' : value.toFixed(1)));
       const label = el('span', {}, ['Opening', 'Middlegame', 'Endgame'][i]);
       return el('div', {class: 'acc-phase-row', 'data-phase': phase, 'data-pending': String(pending)},
         ...(bars ? [el('div', {class: 'acc-phase-values'}, scores[0], label, scores[1]),
@@ -4429,6 +4435,7 @@ function updateAccuracyPhases(sides, busy, design) {
     statsRefs.phaseKeys[phase] = key;
     const oldRow = current.querySelector('[data-phase="' + phase + '"]');
     const row = next.querySelector('[data-phase="' + phase + '"]');
+    if (oldRow.dataset.pending === 'true' && row.dataset.pending === 'true') continue;
     const reveal = oldRow.dataset.pending === 'true' && row.dataset.pending === 'false';
     phaseReveals[phase].stop();
     oldRow.replaceWith(row);
@@ -4550,7 +4557,7 @@ function renderStats() {
       pair('acc-scorecards', sides.map(side => {
         const rating = estimateElo(S.accElo[side], S.players[side]?.rating, side);
         return el('div', {class: 'acc-scorecard'}, accuracyDial(S.acc[side], busy),
-          el('div', {class: 'acc-estimate'}, el('strong', {class: 'acc-elo'}, pending(rating == null ? '—' : '≈ ' + rating)),
+          el('div', {class: 'acc-estimate'}, el('strong', {class: 'acc-elo'}, busy ? accuracyPendingValue() : rating == null ? '—' : '≈ ' + rating),
             el('span', {class: 'acc-elo-label'}, reveal ? 'Estimated rating' : 'Estimated Elo')));
       })),
       renderAccuracyPhases(sides, busy));
@@ -4600,7 +4607,7 @@ function renderPhaseOverview2(sides, busy) {
       el('span', {class: 'acc-elo-label phase2-label'}, 'Estimated rating'),
       ...sides.map(side => {
         const rating = estimateElo(S.accElo[side], S.players[side]?.rating, side);
-        return el('strong', {class: 'acc-elo'}, busy ? '···' : rating == null ? '—' : '≈ ' + rating);
+        return el('strong', {class: 'acc-elo'}, busy ? accuracyPendingValue() : rating == null ? '—' : '≈ ' + rating);
       })));
 }
 
@@ -4614,7 +4621,7 @@ function renderPhaseReport(sides, busy, compact = false) {
       return el('div', {class: 'phase-report-cell' + (band ? '' : ' unavailable'), 'data-phase-category': band?.category || '',
         style: {'--phase-color': band ? QUALITY[band.category].color : 'var(--ink-3)'},
         'aria-label': S.players[side].name + ', ' + name + ': ' + (pending ? 'analyzing' : value == null ? 'not scored' : value.toFixed(1) + ' accuracy, ' + label + ', ' + stats.decisions + ' scored decisions')},
-        el('strong', {class: 'phase-report-score'}, pending ? '···' : value == null ? '—' : value.toFixed(1)));
+        el('strong', {class: 'phase-report-score'}, pending ? accuracyPendingValue() : value == null ? '—' : value.toFixed(1)));
     });
     return el('div', {class: 'phase-report-row' + (compact ? ' phase2-row' : ''), 'data-phase': phase, 'data-pending': String(pending)},
       el(compact ? 'span' : 'div', {class: 'phase-report-name'}, name),
@@ -4633,7 +4640,7 @@ function renderPhaseOverview(sides, busy, modern = false) {
       el('span', {class: 'acc-elo-label'}, 'Estimated rating'),
       el('div', {class: 'phase-rating-values'}, ...sides.map(side => {
         const rating = estimateElo(S.accElo[side], S.players[side]?.rating, side);
-        return el('strong', {class: 'acc-elo'}, busy ? '···' : rating == null ? '—' : '≈ ' + rating);
+        return el('strong', {class: 'acc-elo'}, busy ? accuracyPendingValue() : rating == null ? '—' : '≈ ' + rating);
       }))));
 }
 
@@ -4691,7 +4698,7 @@ function renderOriginalStats() {
             ? loaderNode("acc-val", "var(--accent)")
             : el("span", { class: "acc-val", style: { color: "var(--accent)" }, onmouseenter: (e) => showInfoTip(e.currentTarget, "Accuracy", ACCURACY_INFO), onmouseleave: hideQTip }, meAcc == null ? "—" : meAcc.toFixed(1)),
           el("span", { class: "acc-bar" }, el("i", { style: { width: (S.analyzing ? 0 : (meAcc || 0)) + "%", background: "var(--accent)" } })),
-          el("span", { class: "est-rating", onmouseenter: (e) => showInfoTip(e.currentTarget, "Estimated Elo", ELO_INFO), onmouseleave: hideQTip }, S.analyzing ? "≈ ··· elo" : "≈ " + (estimateElo(meEloAcc, meRating, S.meSide) ?? "—") + " elo")),
+          el("span", { class: "est-rating", onmouseenter: (e) => showInfoTip(e.currentTarget, "Estimated Elo", ELO_INFO), onmouseleave: hideQTip }, S.analyzing ? accuracyPendingValue() : "≈ " + (estimateElo(meEloAcc, meRating, S.meSide) ?? "—") + " elo")),
         el("span", { class: "acc-vs" }, "VS"),
         el("div", { class: "acc-cell right" },
           el("span", { class: "acc-name" }, S.players[opSide].name),
@@ -4699,7 +4706,7 @@ function renderOriginalStats() {
             ? loaderNode("acc-val", "var(--accent)")
             : el("span", { class: "acc-val", style: { color: "var(--ink-2)" }, onmouseenter: (e) => showInfoTip(e.currentTarget, "Accuracy", ACCURACY_INFO), onmouseleave: hideQTip }, opAcc == null ? "—" : opAcc.toFixed(1)),
           el("span", { class: "acc-bar" }, el("i", { style: { width: (S.analyzing ? 0 : (opAcc || 0)) + "%", background: "var(--ink-3)", marginLeft: (100 - (S.analyzing ? 100 : (opAcc || 0))) + "%" } })),
-          el("span", { class: "est-rating", onmouseenter: (e) => showInfoTip(e.currentTarget, "Estimated Elo", ELO_INFO), onmouseleave: hideQTip }, S.analyzing ? "≈ ··· elo" : "≈ " + (estimateElo(opEloAcc, opRating, opSide) ?? "—") + " elo")),
+          el("span", { class: "est-rating", onmouseenter: (e) => showInfoTip(e.currentTarget, "Estimated Elo", ELO_INFO), onmouseleave: hideQTip }, S.analyzing ? accuracyPendingValue() : "≈ " + (estimateElo(opEloAcc, opRating, opSide) ?? "—") + " elo")),
       ),
       qbreak,
     ),
@@ -4740,7 +4747,7 @@ function renderPagedStats() {
     content = el('div', {class: 'acc-overview'},
       comparison('Game accuracy', sides.map(side => busy ? loaderNode('acc-val', 'var(--accent)')
         : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side].toFixed(1))), null, 'acc-overall'),
-      comparison('Estimated Elo', sides.map(side => el('strong', {class: 'acc-elo'}, pending(
+      comparison('Estimated Elo', sides.map(side => el('strong', {class: 'acc-elo'}, busy ? accuracyPendingValue() : (
         estimateElo(S.accElo[side], S.players[side]?.rating, side) == null ? '—'
           : '≈ ' + estimateElo(S.accElo[side], S.players[side]?.rating, side))))),
       renderAccuracyPhases(sides, busy, false),

@@ -73,20 +73,28 @@ for (const design of ['pages', 'dials', 'reveal', 'phases', 'phases2', 'phases-m
     const rail = doc.querySelector('.acc-navigation'); rail.querySelector('button').focus();
     const focused = doc.activeElement;
     const text = phase => doc.querySelector(`[data-phase="${phase}"]`).textContent;
-    assert.ok(GAME_PHASES.every(phase => text(phase).includes('···')));
+    const pending = phase => doc.querySelectorAll(`[data-phase="${phase}"] .ld-bounce`).length === 2;
+    assert.ok(GAME_PHASES.every(pending));
+    const openingLoader = doc.querySelector('[data-phase="opening"] .ld-bounce');
+    const ratingLoader = doc.querySelector('.acc-elo .ld-bounce');
+    assert.ok(ratingLoader);
+    assert.equal(ratingLoader.getAttribute('aria-label'), 'Calculating');
     // A later phase must wait for the opening's missing Black observation.
     a.state.gameStats = scores([1, 3, 4]); a.call('renderStats');
-    assert.ok(GAME_PHASES.every(phase => text(phase).includes('···')));
+    assert.ok(GAME_PHASES.every(pending));
+    assert.equal(doc.querySelector('[data-phase="opening"] .ld-bounce'), openingLoader);
+    assert.equal(doc.querySelector('.acc-elo .ld-bounce'), ratingLoader);
     a.state.gameStats = scores([1, 2, 3, 4]); a.call('renderStats');
     for (const phase of ['opening', 'middlegame']) {
       assert.doesNotMatch(text(phase), /···/); assert.match(text(phase), /90\.0/);
     }
-    assert.match(text('endgame'), /···/);
+    assert.ok(pending('endgame'));
     assert.equal(doc.querySelector('.acc-val'), loader);
     assert.equal(doc.querySelector('.acc-navigation'), rail);
     assert.equal(doc.activeElement, focused);
     a.state.gameStats = scores([1, 2, 3, 4, 5, 6]); a.call('renderStats');
     assert.doesNotMatch(text('endgame'), /···/); assert.match(text('endgame'), /90\.0/);
+    assert.equal(doc.querySelector('[data-phase] .ld'), null);
     if (design === 'dials' || design === 'reveal') {
       assert.equal(doc.querySelector('.acc-phase-bars i').style.width, '90%');
     }
@@ -94,6 +102,7 @@ for (const design of ['pages', 'dials', 'reveal', 'phases', 'phases2', 'phases-m
     a.state.settings.moveAnim = true; a.call('renderStats');
     assert.equal(doc.querySelector('[data-phase] .acc-reveal-slot'), null, 'Completed phases must not restart at zero');
     assert.ok(GAME_PHASES.every(phase => text(phase).includes('90.0')));
+    assert.equal(doc.querySelector('.acc-elo .ld'), null);
   });
 }
 

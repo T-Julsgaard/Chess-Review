@@ -60,7 +60,7 @@ test('unreached and unscored phases stay neutral instead of appearing as bad pla
   assert.match(empty.getAttribute('aria-label'), /not scored/);
   a.state.analyzing = true; a.call('renderStats');
   assert.equal(doc.querySelectorAll('[data-phase-category="blunder"]').length, 0);
-  assert.ok([...doc.querySelectorAll('.phase-report-score')].every(n => n.textContent === '···'));
+  assert.ok([...doc.querySelectorAll('.phase-report-score')].every(n => n.querySelector('.ld-bounce')));
 });
 
 test('category summaries are independent of annotations, board orientation and selected player side', t => {
