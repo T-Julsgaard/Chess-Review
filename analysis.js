@@ -17,6 +17,7 @@ import { expectedPoints, SF19_OUTCOME } from "./lib/public-scoring.js";
 import { calibratedReview, scoringEvidenceComplete } from "./lib/calibrated-review.js";
 import { gameStatistics, GAME_PHASES } from "./lib/game-statistics.js";
 import { PANEL_DESIGNS, panelDesign, normalizePanelDesigns } from "./lib/panel-designs.js";
+import { UI_SETUPS, MODERN_LAYOUT } from "./lib/ui-setups.js";
 import { createOverviewReveal } from "./lib/overview-reveal.js";
 import { phasePerformance } from "./lib/phase-performance.js";
 import { analyseCalibratedPosition } from "./lib/calibrated-search.js";
@@ -302,6 +303,7 @@ const DEFAULT_SETTINGS = {
   ...Object.fromEntries(PANEL_DESIGNS.map(design => [design.setting, design.default])),
   categoryNames: {},
   layoutGridSize: 16,
+  uiSetup: "", // Existing arrangements stay intact until a setup is selected.
   theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
   badgeFont: "spacemono", badgeTooltip: "off",
@@ -1632,6 +1634,7 @@ function buildUI() {
   };
 
   applyLayoutMode();
+  if (!accuracyLayoutExpanded()) reflowAccuracy(false);
   initBoardInput();
   if(!S.blank)renderCoachAvatar(); // no unused animated portrait in the blank workspace
   renderLibrary();
@@ -1996,13 +1999,20 @@ function makeMovable(mod, handle, grips, key) {
   handle.addEventListener('pointerdown',begin('move',handle));
   for(const dir of ['e','s','se'])grips[dir].addEventListener('pointerdown',begin(dir,grips[dir]));
 }
-// Back to the automatic layout and its window-dependent fit.
+function setupLayout() {
+  return structuredClone(S.settings.uiSetup === 'modern' ? MODERN_LAYOUT : DEFAULT_LAYOUT);
+}
+function setupLayoutMode() {
+  return UI_SETUPS[S.settings.uiSetup]?.layoutMode || 'auto';
+}
+// Restore the selected setup's starting arrangement and window-dependent fit.
 async function resetLayout() {
   cancelPanelGesture?.();
   S._accReflow = null;   // drop any collapse offset so the fresh layout isn't double-adjusted
-  S.layout = structuredClone(DEFAULT_LAYOUT);
-  S.layoutMode = "auto";
+  S.layout = setupLayout();
+  S.layoutMode = setupLayoutMode();
   if (S.reorganize) toggleReorganize();
+  if (!accuracyLayoutExpanded()) reflowAccuracy(false);
   applyLayoutMode();
   // Reset is a committed action: a reload must not cancel a pending debounce.
   const saved = saveLayout(true);
@@ -5621,6 +5631,11 @@ async function resetVisualSettings() {
   closeBoardColorPicker();
   delete S.settings.wrongSound; // remove obsolete saved choices from older versions
   await resetSettingKeys(VISUAL_SETTING_KEYS);
+  const setup = UI_SETUPS[S.settings.uiSetup];
+  if (setup) {
+    Object.assign(S.settings, setup.designs);
+    await writeSettings(setup.designs);
+  }
   S.coach = null;
   _ipSig = null;
   if (S.practice) S.practice.coachTyped = false;
@@ -5680,6 +5695,11 @@ function visualSettings() {
   accentEntries.unshift({ value: "custom", title: "Choose custom accent color", onClick: (e) => openAccentColorPicker(e.currentTarget),
     render: (chip) => colorPickerChip(chip, [S.settings.accentCustom]) });
   return el("div", {},
+    section("Premade UI setups",
+      el("div", {class:"set-row hint"}, el("span", {class:"set-note"}, "Choose a panel arrangement and tab designs. You can customize them afterward. Reset layout restores the selected setup's arrangement.")),
+      seg("Setup", "uiSetup", Object.keys(UI_SETUPS), null, value => UI_SETUPS[value].label),
+      el("div", {class:"set-row hint"}, el("span", {class:"set-note"}, "Old: original tabs and automatic layout. Modern: Phase report 1, Move list Zoom +20%, Minimal Engine, and the modern panel layout.")),
+    ),
     section("Tabs",
       ...PANEL_DESIGNS.map(design => seg(design.label, design.setting, design.versions.map(version => version.id), null,
         value => design.versions.find(version => version.id === value).label)),
@@ -5725,7 +5745,7 @@ function visualSettings() {
       seg("Bar", "barStyle", ["gradient", "classic", "mono", "accent"], null, (value) => value === "classic" ? "Solid" : value),
       seg("Graph", "graphStyle", ["area", "line", "color", "minimal"]),
       el("button", { class: "set-reset reorg-toggle-btn", onclick: toggleReorganize }, S.reorganize ? "Done reorganizing" : "Reorganize panels"),
-      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Select several panels to move or scale them together. Your arrangement is saved. Export it to share a proposed layout; Reset layout restores the automatic layout.")),
+      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Select several panels to move or scale them together. Your arrangement is saved. Export it to share a proposed layout; Reset layout restores the selected premade UI setup's arrangement.")),
       el("button", { class: "set-reset", onclick: exportPanelLayout }, "Export panel layout"),
       el("button", { class: "set-reset", onclick: resetLayout }, "Reset layout"),
     ),
@@ -6116,6 +6136,7 @@ function writeSettings(patch, replaceKeys = []) {
   return pending;
 }
 async function setSetting(key, value) {
+  if (key === 'uiSetup') return applyUiSetup(value);
   const design = PANEL_DESIGNS.find(item => item.setting === key);
   if (design) value = panelDesign(design.panel, {[key]: value});
   if (key === "badgeTooltip") value = badgeLabelStyle(value);
@@ -6134,6 +6155,19 @@ async function setSetting(key, value) {
   if (key === "loaderStyle") { renderReview(); renderStats(); }
   if (BADGE_SETTING_KEYS.includes(key)) refreshBadgeAppearance();
   if (key === "badgeTooltip") syncBoardBadgeLabel(true);
+  if (UI.settings && !UI.settings.hidden) renderSettings();
+}
+async function applyUiSetup(value) {
+  const setup = UI_SETUPS[value];
+  if (!setup) return;
+  cancelPanelGesture?.();
+  const patch = {uiSetup:value, ...setup.designs, evalView:'both'};
+  Object.assign(S.settings, patch);
+  S.originalAccuracyExpanded = false; S.qbreakExpanded = false; S.accuracyPage = 0;
+  statsRefs = null; hideQTip(); overviewReveal.stop();
+  applySettings(); renderEvalBar(); renderGraph(); renderMoves(); renderStats(); renderEngineCurrent();
+  const savedSettings = writeSettings(patch);
+  await Promise.all([savedSettings, resetLayout()]);
   if (UI.settings && !UI.settings.hidden) renderSettings();
 }
 // Engine setting: save, discard the live engine (new build/options), and re-analyze.
@@ -7447,8 +7481,9 @@ async function showReadyWorkspace() {
     if (Object.keys(migration).length) await writeSettings(migration, Object.keys(migration));
     // Use the saved layout if it matches the current version; otherwise the new default.
     const useStored = store.layoutVersion === LAYOUT_VERSION && store.layout;
-    S.layout = useStored ? { ...structuredClone(DEFAULT_LAYOUT), ...store.layout } : structuredClone(DEFAULT_LAYOUT);
-    S.layoutMode = useStored && store.layoutMode === "custom" ? "custom" : "auto";
+    S.layout = useStored ? { ...setupLayout(), ...store.layout } : setupLayout();
+    S.layoutMode = useStored ? (store.layoutMode === "custom" ? "custom" : "auto") : setupLayoutMode();
+    S._accReflow = null;
     if (!useStored) saveLayout();
 
     S.username = store.username || "";

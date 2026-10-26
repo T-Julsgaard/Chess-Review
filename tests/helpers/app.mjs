@@ -9,6 +9,7 @@ import {expectedPoints, SF19_OUTCOME} from '../../lib/public-scoring.js';
 import {calibratedReview,scoringEvidenceComplete} from '../../lib/calibrated-review.js';
 import {gameStatistics,GAME_PHASES} from '../../lib/game-statistics.js';
 import {PANEL_DESIGNS,panelDesign,normalizePanelDesigns} from '../../lib/panel-designs.js';
+import {UI_SETUPS,MODERN_LAYOUT} from '../../lib/ui-setups.js';
 import {createOverviewReveal} from '../../lib/overview-reveal.js';
 import {phasePerformance} from '../../lib/phase-performance.js';
 import {analyseCalibratedPosition} from '../../lib/calibrated-search.js';
@@ -48,7 +49,7 @@ export function app(t, {hardware,url='https://extension.test/analysis.html#test-
   const context = vm.createContext({
     window: dom.window, document: dom.window.document, navigator: dom.window.navigator, LearningWorkspace,
     loadLearningWorkspace:async () => ({LearningWorkspace}), presentationFor, mountLearningAnnouncement,
-    panelScale,panelGroupBounds,scalePanelGroup,movePanelGroup,fullHdReferenceLayout,
+    panelScale,panelGroupBounds,scalePanelGroup,movePanelGroup,fullHdReferenceLayout,UI_SETUPS,MODERN_LAYOUT,
     location: dom.window.location, Node: dom.window.Node, HTMLElement: dom.window.HTMLElement,
     getComputedStyle: dom.window.getComputedStyle, performance, structuredClone,
     URL, TextEncoder, btoa, console, Chess, flagCodeForCountryId, countryNameForId, browserAPI,platformAPI:browserAPI,

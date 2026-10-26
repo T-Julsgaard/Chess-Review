@@ -3,6 +3,24 @@
 Open **Settings → Visual → Tabs** to choose a design for each panel independently.
 The choices are local visual preferences and survive reopening the extension.
 
+**Settings → Visual → Premade UI setups** also offers complete starting setups:
+
+- **Old** restores the automatic arrangement used by Reset layout, with every
+  tab design set to Original. Expanding Accuracy moves Engine and Solve puzzles
+  down, and collapsing it restores their positions.
+- **Modern** uses the supplied `chess-review-layout (7) modern.json` arrangement,
+  including its panel content scales. Accuracy uses Phase report (the first
+  version), Move list uses Zoom +20%, and every other tab uses Original.
+
+Choosing a setup applies its arrangement and tab designs. Individual tabs and
+panel positions can still be customized. **Reset layout** restores the selected
+setup's arrangement and keeps individual tab choices. Visual's **Reset to
+default** also restores that setup's tab designs. The selected setup and custom
+edits survive reopening. Existing users keep their settings and saved arrangement
+until they choose a setup; without a selection, Reset layout uses the automatic
+arrangement. Setups keep the current game, scores, engine settings and other
+visual preferences.
+
 | Panel | Designs | Default |
 | --- | --- | --- |
 | Engine | Original, Focus | Original |
