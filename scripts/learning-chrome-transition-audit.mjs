@@ -4,7 +4,9 @@ import path from 'node:path';
 
 export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const run=expression=>evaluate(review,expression);
+  const accuracyLayers=()=>run(`([...document.querySelectorAll('.stage .acc-nav-current, .stage .acc-nav-wake')].map(n=>getComputedStyle(n).visibility))`);
   await sleep(600); // Allow startup zoom and font fitting to settle.
+  assert.deepEqual(await accuracyLayers(),['visible','visible'],'Accuracy highlights must be initialized in Game Review');
   await run(`window.sampleReviewChrome=()=>{
     const box=n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};};
     const players=[...document.querySelectorAll('#playerTop, #playerBot')].map(n=>{
@@ -32,6 +34,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     assert.ok(frames.some(f=>f.libraryX<0&&f.libraryX>-39&&f.libraryVisible),'Library must slide visibly before hiding');
     assert.equal(frames.at(-1).libraryVisible,false);
     assert.equal(await run("getComputedStyle(document.querySelector('.topbar-meta')).visibility"),'hidden');
+    assert.deepEqual(await accuracyLayers(),['hidden','hidden'],'Accuracy highlights must not show through learning mode');
     await run("document.querySelector('#learningToggle').click()");
     await waitFor(review,"document.querySelector('.topbar-meta').classList.contains('meta-return')",'Metadata return');
     const slide=await run(`(()=>{
@@ -48,6 +51,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     }
     await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace)",'Review restored');
     assert.equal(await run("getComputedStyle(document.querySelector('.library-rail')).visibility"),'visible');
+    assert.deepEqual(await accuracyLayers(),['visible','visible'],'Accuracy highlights must return with Game Review');
   }
   // Close while entry is still moving, then reopen to catch stale animation state.
   await run("import('./analysis.js').then(m=>{void m.openLearning();})");
@@ -60,8 +64,10 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await run(`import('./analysis.js').then(m=>{m.S.settings.moveAnim=${reduced};return m.openLearning();})`);
     assert.equal(await run("getComputedStyle(document.querySelector('.library-rail')).transitionDuration"),'0s');
     assert.equal(await run("getComputedStyle(document.querySelector('.library-rail')).visibility"),'hidden');
+    assert.deepEqual(await accuracyLayers(),['hidden','hidden'],'Accuracy highlights must stay hidden without animations');
     await run("import('./analysis.js').then(m=>m.learningWorkspace.close())");
     assert.equal(await run("getComputedStyle(document.querySelector('.library-rail')).visibility"),'visible');
+    assert.deepEqual(await accuracyLayers(),['visible','visible']);
   }
   await auditReviewReturn({review,call,evaluate,waitFor,sleep,out});
   console.log('Both learning entries: stationary player fades, Library slide, smooth metadata return, interrupted entry and reduced motion passed. Evidence: '+out);

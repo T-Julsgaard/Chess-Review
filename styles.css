@@ -1477,7 +1477,8 @@ button { font-family: inherit; cursor: pointer; }
 .acc-navigation button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .acc-nav-current,.acc-nav-wake { position: absolute; z-index: 0; pointer-events: none; top: 4px; bottom: 4px; left: 0;
   border-radius: 10px; transform-origin: left center; visibility: hidden; }
-.acc-navigation[data-ready="true"] :is(.acc-nav-current,.acc-nav-wake) { visibility: visible; }
+/* Follow the review panel's visibility when learning mode hides it. */
+.acc-navigation[data-ready="true"] :is(.acc-nav-current,.acc-nav-wake) { visibility: inherit; }
 .acc-nav-current { background: color-mix(in srgb,var(--accent) 14%,var(--panel)); }
 .acc-nav-wake { background: var(--accent); opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .acc-navigation button { transition: none; } }
