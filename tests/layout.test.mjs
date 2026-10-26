@@ -67,7 +67,7 @@ test('custom drag converts screen deltas into canvas coordinates at the fitted s
   const handle=a.dom.window.document.querySelector('[data-mod=moves] .mod-handle');
   const event=(target,type,x)=>{const e=new a.dom.window.MouseEvent(type,{bubbles:true,clientX:x,clientY:0,button:0});Object.defineProperty(e,'pointerId',{value:1});target.dispatchEvent(e);};
   event(handle,'pointerdown',0);event(a.dom.window,'pointermove',100*scale);event(a.dom.window,'pointerup',100*scale);
-  assert.ok(Math.abs(a.state.layout.moves.x-start-100)<1e-8);
+  assert.ok(Math.abs(a.state.layout.moves.x-a.call('snapGrid',start+100))<1e-8);
 });
 
 test('small saved canvases keep their own bounds and do not upscale',async t=>{

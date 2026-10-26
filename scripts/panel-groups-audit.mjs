@@ -19,6 +19,16 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const rect=selector=>run(`(()=>{const r=document.querySelector('${selector}').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};})()`);
   const board=await rect('.board');
   await run("document.querySelector('[aria-label=Settings]').click();[...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Layout').click();document.querySelector('.reorg-toggle-btn').click()");
+  const frozen=await nativeBoxes();
+  for(const spacing of [16,8,2]){
+    await run(`(()=>{const n=document.querySelector('.reorg-grid select');n.value='${spacing}';n.dispatchEvent(new Event('change',{bubbles:true}));})()`);
+    const grid=await run("(()=>{const n=document.querySelector('.stage'),s=getComputedStyle(n),r=document.querySelector('.reorg-banner').getBoundingClientRect();return {size:s.getPropertyValue('--layout-grid-size'),image:s.backgroundImage,banner:{x:r.x,right:r.right,bottom:r.bottom},width:innerWidth,height:innerHeight}})()");
+    assert.equal(grid.size,spacing+'px');assert.match(grid.image,/linear-gradient/);
+    assert.ok(grid.banner.x>=0&&grid.banner.right<=grid.width&&grid.banner.bottom<=grid.height);
+    assert.deepEqual(await nativeBoxes(),frozen,'Changing grid spacing must preserve all panel geometry');
+    const image=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
+    await fs.writeFile(path.join(out,'layout-grid-'+spacing+'.png'),Buffer.from(image.data,'base64'));
+  }
   await run("document.querySelector('[data-reorg=right]').click()");
   const start=await run("import('./analysis.js').then(m=>({layout:structuredClone(m.S.layout),keys:[...document.querySelectorAll('.mod.panel-selected')].map(n=>n.dataset.mod)}))");
   assert.ok(start.keys.includes('moves')&&start.keys.includes('engine')&&!start.keys.includes('board'));
@@ -39,7 +49,9 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const sameBoard=await rect('.board');for(const key of ['x','y','width','height'])near(sameBoard[key],board[key]);
   const handle=await rect('[data-mod=review] .mod-handle');await drag(handle.x+10,handle.y+10,-40,30);await sleep(100);
   const moved=await run("import('./analysis.js').then(m=>structuredClone(m.S.layout))");
-  for(const key of start.keys){near(moved[key].x,changed[key].x-40);near(moved[key].y,changed[key].y+30);}
+  const originX=Math.min(...start.keys.map(key=>changed[key].x)),originY=Math.min(...start.keys.map(key=>changed[key].y));
+  const mx=Math.round((originX-40)/2)*2-originX,my=Math.round((originY+30)/2)*2-originY;
+  for(const key of start.keys){near(moved[key].x,changed[key].x+mx);near(moved[key].y,changed[key].y+my);}
   const shot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);await fs.writeFile(path.join(out,'selected-scaled-panels.png'),Buffer.from(shot.data,'base64'));
   await call('Browser.setDownloadBehavior',{behavior:'allow',downloadPath:out});
   await run("document.querySelector('[data-reorg=export]').click()");
@@ -50,6 +62,8 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await run("document.querySelector('.reorg-done').click()");await sleep(400);await call('Page.reload',{},review.sessionId);
   await waitFor(review,"!!document.querySelector('.board')&&import('./analysis.js').then(m=>!m.S.analyzing)",'Reloaded scaled layout');
   changed=await run("import('./analysis.js').then(m=>structuredClone(m.S.layout))");
+  assert.equal(await run("import('./analysis.js').then(m=>m.S.settings.layoutGridSize)"),2);
+  assert.equal(await run("getComputedStyle(document.querySelector('.stage')).backgroundImage"),'none');
   for(const key of start.keys)for(const value of ['x','y','w','h','scale'])near(changed[key][value],moved[key][value]);
   const transform=await run("document.querySelector('[data-mod=moves] .mod-inner').style.transform");
   assert.ok(Math.abs(parseFloat(transform.slice(6))-changed.moves.scale)<1e-5);

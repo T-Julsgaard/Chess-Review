@@ -38,6 +38,12 @@ desktops and overlays the workspace on smaller windows without reflowing it.
 The popup retains its independent 320–360px layout. Custom arrangements retain
 their saved coordinates and scales; Reset returns to the current automatic fit.
 Opening Reorganize captures the current panel geometry and content scales.
+Reorganize shows a square alignment grid beneath the panels. Its Grid selector
+offers Standard (16 px), Fine (8 px), and Extra fine (2 px) spacing and remembers
+the choice. Moving snaps the panel or selection's outer origin to the grid;
+resizing a single panel snaps its right and bottom edges. Group scaling retains
+the selected panels' proportions and internal spacing. Changing grid spacing
+preserves the existing arrangement, and Done hides the grid.
 
 Review startup and Reset restore 100% browser zoom. Resizing never changes browser
 zoom; a later manual zoom remains available. Display scaling is represented by

@@ -301,6 +301,7 @@ function engineWorkerCount(requested = null, positions = Infinity,
 const DEFAULT_SETTINGS = {
   ...Object.fromEntries(PANEL_DESIGNS.map(design => [design.setting, design.default])),
   categoryNames: {},
+  layoutGridSize: 16,
   theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
   badgeFont: "spacemono", badgeTooltip: "off",
@@ -415,7 +416,7 @@ const DEFAULT_LAYOUT = {
 const GRIP_SVG = `<svg viewBox="0 0 12 12" width="12" height="12"><path d="M11 4 4 11M11 8 8 11" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>`;
 const HANDLE_SVG = `<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><circle cx="5" cy="4" r="1.3"/><circle cx="11" cy="4" r="1.3"/><circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/><circle cx="5" cy="12" r="1.3"/><circle cx="11" cy="12" r="1.3"/></svg>`;
 // Engine depth/lines are now controlled via S.settings (engineDepth/engineLines).
-const GRID = 2;          // fine snap grid for modules (px) — small, so placement feels free
+const LAYOUT_GRIDS = [[16, 'Standard'], [8, 'Fine'], [2, 'Extra fine']];
 const MINW = 170;        // minimum module width (px)
 const MINH = 56;         // minimum module height (px)
 // Per-module width floors that override MINW — the eval bar is a thin strip, so it may go narrow.
@@ -1883,6 +1884,7 @@ function growCanvas() {
   const {pageW,pageH}=layoutPageSize(S.layout),height=pageH-TOPBAR_H;
   const width=window.innerWidth||innerWidth,availableHeight=(window.innerHeight||innerHeight)-TOPBAR_H;
   canvasScale=Math.min(1,width/pageW,Math.max(1,availableHeight)/height);
+  UI.canvas.style.setProperty('--layout-grid-line',1/canvasScale+'px');
   UI.canvas.style.minWidth=UI.canvas.style.width=pageW+'px';
   UI.canvas.style.minHeight=UI.canvas.style.height=height+'px';
   UI.canvas.style.transform='scale('+canvasScale+')';UI.canvas.style.transformOrigin='top left';
@@ -1926,14 +1928,22 @@ function reflowAccuracy(expanded) {
   }
   applyLayout(); growCanvas();
 }
-// Snap only to a fine grid — no magnetic pull toward neighbor modules' edges, so a panel goes
-// exactly where you drop it. The 2px grid just avoids sub-pixel positions.
-function snapGrid(v) { return Math.round(v / GRID) * GRID; }
-function snapDrag(b) {
-  return { x: Math.max(0, snapGrid(b.x)), y: Math.max(0, snapGrid(b.y)) };
+// The visible grid and snapping share the canvas origin, even when zoomed to fit.
+function layoutGridSize() {
+  return LAYOUT_GRIDS.some(([size])=>size===S.settings.layoutGridSize) ? S.settings.layoutGridSize : DEFAULT_SETTINGS.layoutGridSize;
 }
-function snapResize(b, mw = MINW) {
-  return { w: Math.max(mw, snapGrid(b.w)), h: Math.max(MINH, snapGrid(b.h)) };
+function snapGrid(v) { const size=layoutGridSize();return Math.round(v/size)*size; }
+function snapPanelEdge(origin, size, delta, minimum) {
+  if(!delta)return size;
+  const grid=layoutGridSize(),edge=Math.max(snapGrid(origin+size+delta),Math.ceil((origin+minimum)/grid)*grid);
+  return edge-origin;
+}
+function setLayoutGridSize(value) {
+  cancelPanelGesture?.();
+  S.settings.layoutGridSize=Number(value);
+  S.settings.layoutGridSize=layoutGridSize();
+  renderReorgBanner();
+  return writeSettings({layoutGridSize:S.settings.layoutGridSize});
 }
 function makeMovable(mod, handle, grips, key) {
   const begin=(kind,target)=>(e)=>{
@@ -1950,15 +1960,16 @@ function makeMovable(mod, handle, grips, key) {
     try{target.setPointerCapture(e.pointerId);}catch{}
     const apply=ev=>{
       const dx=(ev.clientX-sx)/gestureScale,dy=(ev.clientY-sy)/gestureScale;
-      if(kind==='move')S.layout=movePanelGroup(start,keys,snapGrid(dx),snapGrid(dy));
+      if(kind==='move')S.layout=movePanelGroup(start,keys,dx?snapGrid(bounds.x+dx)-bounds.x:0,dy?snapGrid(bounds.y+dy)-bounds.y:0);
       else if(group){
         const rx=box.x+box.w-bounds.x,ry=box.y+box.h-bounds.y;
         const factor=kind==='e'?1+dx/rx:kind==='s'?1+dy/ry:1+(dx*rx+dy*ry)/(rx*rx+ry*ry);
         S.layout=scalePanelGroup(start,keys,factor);
         if(reflow&&keys.includes('accuracy'))S._accReflow={...reflow,delta:reflow.delta*S.layout.accuracy.w/start.accuracy.w};
       }else{
-        const b={...box},size=snapResize({w:kind.includes('e')?box.w+dx:box.w,h:kind.includes('s')?box.h+dy:box.h},modMinW(key));
-        if(kind.includes('e'))b.w=size.w;if(kind.includes('s'))b.h=size.h;
+        const b={...box};
+        if(kind.includes('e'))b.w=snapPanelEdge(box.x,box.w,dx,modMinW(key));
+        if(kind.includes('s'))b.h=snapPanelEdge(box.y,box.h,dy,MINH);
         S.layout={...start,[key]:b};
       }
       applyLayout();growCanvas();if(keys.includes('board'))alignPlayers();
@@ -2023,8 +2034,11 @@ function renderReorgBanner() {
   if(!S.reorganize){banner?.remove();return;}
   if(!banner){
     banner=el('div',{class:'reorg-banner',role:'toolbar','aria-label':'Reorganize panels'},
-      el('span',{class:'reorg-hint'},'Select panels, then move or scale them together.'),
+      el('span',{class:'reorg-hint'},'Move and resize panels to snap to the grid. Select several to move or scale them together.'),
       el('div',{class:'reorg-actions'},
+        el('label',{class:'reorg-grid'},'Grid',
+          el('select',{'aria-label':'Layout grid spacing',onchange:e=>setLayoutGridSize(e.target.value)},
+            ...LAYOUT_GRIDS.map(([size,name])=>el('option',{value:String(size)},name+' · '+size+' px')))),
         el('button',{type:'button','data-reorg':'right',onclick:selectRightPanels},'Select right panels'),
         el('button',{type:'button','data-reorg':'all',onclick:()=>selectPanels(visiblePanelKeys())},'Select all'),
         el('button',{type:'button','data-reorg':'clear',onclick:()=>selectPanels([])},'Clear'),
@@ -2034,6 +2048,10 @@ function renderReorgBanner() {
     document.body.append(banner);
   }
   const count=selectedPanelKeys().length;
+  const grid=layoutGridSize();
+  UI.canvas.style.setProperty('--layout-grid-size',grid+'px');
+  UI.canvas.style.setProperty('--layout-grid-major',grid*4+'px');
+  banner.querySelector('.reorg-grid select').value=String(grid);
   banner.querySelector('.reorg-count').textContent=count+' panel'+(count===1?'':'s')+' selected';
   banner.querySelector('[data-reorg=clear]').disabled=!count;
 }
