@@ -6758,9 +6758,29 @@ async function showReadyWorkspace() {
   await Promise.all([...document.querySelectorAll("#boardWrap .piece-img")].map(img => img.decode?.().catch(() => {})));
   await new Promise(resolve => requestAnimationFrame(() => {
     alignPlayers();
-    dismissStartup();
+    document.body.removeAttribute("data-starting");
     resolve();
   }));
+  const startup = document.getElementById("startup");
+  if (startup && S.settings.moveAnim !== false && !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+    // Paint the closed shutters before changing their transforms, even on a warm launch.
+    // Keep the workspace inert until the reveal finishes. A fallback also handles
+    // background tabs or a motion preference changing during the transition.
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    await new Promise(resolve => {
+      const finish = event => {
+        if (event && (event.target !== shutter || event.propertyName !== "transform")) return;
+        clearTimeout(timer);
+        shutter.removeEventListener("transitionend", finish);
+        resolve();
+      };
+      const shutter = startup.querySelector(".startup-top");
+      const timer = setTimeout(finish, 650);
+      shutter.addEventListener("transitionend", finish);
+      startup.classList.add("opening");
+    });
+  }
+  dismissStartup();
 }
 (async function main() {
   try {
