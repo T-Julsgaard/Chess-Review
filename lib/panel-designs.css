@@ -177,7 +177,8 @@
 /* Shared result pages keep decorative transitions inside the panel. */
 .accuracy-book { position: relative; isolation: isolate; overflow: hidden; }
 .stage .accuracy-book .acc-turn-leaf { position: absolute; z-index: 2; left: 0; right: 0; margin: 0;
-  box-sizing: border-box; background: var(--panel); overflow: hidden; pointer-events: none; }
+  box-sizing: border-box; background: transparent; overflow: hidden; pointer-events: none; }
+.acc-turn-leaf .acc-players { visibility: hidden; }
 .set-section .set-seg:has([data-setting="movesDesign"]) { flex-wrap: wrap; }
 .set-section .set-seg [data-setting="movesDesign"] { flex: 1 1 40%; min-height: 32px; }
 .stage .accuracy-panel.accuracy-original .acc-head { padding: 10.2px 12px; }

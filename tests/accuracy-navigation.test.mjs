@@ -52,3 +52,26 @@ test('disabled and reduced motion settle selection immediately and cancel any pr
   assert.equal(animations.length, 2);
   assert.equal(surface.style.transform, 'translateX(4px) scale(1,1)');
 });
+
+test('page turns animate the results while player names remain outside the incoming animation', t => {
+  const {a} = navigation(t), animated = [];
+  a.dom.window.HTMLElement.prototype.animate = function(frames, options) {
+    const animation = {cancel() {}};
+    animated.push({node: this, frames, options, animation});
+    return animation;
+  };
+  for (const page of [1, 2, 0, 2, 1]) {
+    animated.length = 0;
+    a.call('setAccuracyPage', page);
+    const incoming = a.dom.window.document.querySelector('.acc-page:not(.acc-turn-leaf)');
+    const names = incoming.querySelector('.acc-players');
+    const turns = animated.filter(item => item.options.duration === 280);
+    assert.ok(turns.length);
+    assert.ok(turns.every(item => !item.node.contains(names)));
+    assert.equal(incoming.querySelector('.acc-players .acc-reveal-slot'), null);
+    const outgoing = animated.find(item => item.node.classList.contains('acc-turn-leaf'));
+    assert.ok(outgoing);
+    outgoing.animation.onfinish();
+    assert.equal(outgoing.node.isConnected, false);
+  }
+});

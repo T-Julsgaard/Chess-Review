@@ -13,6 +13,55 @@ const scores = (plies) => gameStatistics(positions, [], Object.fromEntries(['w',
   [side, {moves: plies.filter(ply => positions[ply].color === side).map(ply =>
     ({ply, eligible: true, engine: 'nnue', quality: 90}))}])));
 
+for (const design of ['dials', 'phases-modern', 'phases-modern-v2']) {
+  test(`${design} counts up each completed phase without interrupting earlier reveals`, t => {
+    const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6');
+    a.call('computeDerived'); a.call('buildUI');
+    const callbacks = new Map(); let id = 0;
+    a.context.requestAnimationFrame = callback => { callbacks.set(++id, callback); return id; };
+    a.context.cancelAnimationFrame = id => callbacks.delete(id);
+    const tick = now => { const work = [...callbacks.values()]; callbacks.clear(); work.forEach(fn => fn(now)); };
+    Object.assign(a.state, {analyzing: true, progressiveAccuracy: true, gameStats: scores([])});
+    Object.assign(a.state.settings, {accuracyDesign: design, moveAnim: true});
+    a.call('renderStats');
+    const doc = a.dom.window.document, loader = doc.querySelector('.acc-val');
+    a.state.gameStats = scores([1, 2]); a.call('renderStats');
+    const openingRow = doc.querySelector('[data-phase="opening"]');
+    const ink = openingRow.querySelector('.acc-reveal-ink');
+    assert.equal(ink.textContent, '0.0');
+    tick(0); tick(300);
+    assert.ok(+ink.textContent > 0 && +ink.textContent < 90);
+    a.state.gameStats = scores([1, 2, 3, 4]); a.call('renderStats');
+    assert.equal(doc.querySelector('[data-phase="opening"]'), openingRow);
+    assert.equal(doc.querySelector('.acc-val'), loader);
+    assert.equal(doc.querySelector('[data-phase="middlegame"] .acc-reveal-ink').textContent, '0.0');
+    tick(600); tick(1200);
+    assert.equal(openingRow.querySelector('.acc-reveal-slot'), null);
+    a.state.gameStats = scores([1, 2, 3, 4, 5, 6]); a.call('renderStats');
+    const endgameRow = doc.querySelector('[data-phase="endgame"]');
+    a.state.analyzing = false; a.state.acc = {w: 90, b: 90}; a.call('renderStats');
+    assert.equal(doc.querySelector('[data-phase="endgame"]'), endgameRow);
+    assert.equal(endgameRow.querySelector('.acc-reveal-ink').textContent, '0.0');
+    tick(1300); tick(2500);
+    assert.equal(doc.querySelector('[data-phase] .acc-reveal-slot'), null);
+    assert.equal(endgameRow.querySelector('strong').textContent, '90.0');
+    a.call('setAccuracyPage', 1); a.call('setAccuracyPage', 0);
+    assert.equal(doc.querySelector('[data-phase] .acc-reveal-slot'), null);
+  });
+}
+
+test('turning animations off settles an in-progress phase reveal', async t => {
+  const a = app(t); loadGame(a, '1. e4 e5');
+  a.call('computeDerived'); a.call('buildUI');
+  Object.assign(a.state, {analyzing: true, progressiveAccuracy: true, gameStats: scores([])});
+  Object.assign(a.state.settings, {accuracyDesign: 'phases-modern', moveAnim: true});
+  a.call('renderStats'); a.state.gameStats = scores([1, 2]); a.call('renderStats');
+  assert.ok(a.dom.window.document.querySelector('[data-phase="opening"] .acc-reveal-slot'));
+  await a.call('setSetting', 'moveAnim', false);
+  assert.equal(a.dom.window.document.querySelector('[data-phase] .acc-reveal-slot'), null);
+  assert.equal(a.dom.window.document.querySelector('[data-phase="opening"] strong').textContent, '90.0');
+});
+
 for (const design of ['pages', 'dials', 'reveal', 'phases', 'phases2', 'phases-modern', 'phases-modern-v2']) {
   test(`${design} reveals completed phases in order while preserving loaders, tabs and focus`, t => {
     const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6');

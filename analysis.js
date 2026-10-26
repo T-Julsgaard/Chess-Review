@@ -790,6 +790,8 @@ let sqByName = {};
 let revRefs = null;
 let statsRefs = null;
 const overviewReveal = createOverviewReveal({requestFrame: callback => requestAnimationFrame(callback), cancelFrame: id => cancelAnimationFrame(id)});
+const phaseReveals = Object.fromEntries(GAME_PHASES.map(phase => [phase,
+  createOverviewReveal({requestFrame: callback => requestAnimationFrame(callback), cancelFrame: id => cancelAnimationFrame(id)})]));
 
 /* ---------------- Active position (mainline vs. analysis mode) ----------------
    In analysis mode the shown position + eval + engine data come from the variation;
@@ -4293,6 +4295,7 @@ function setAccuracyPage(page, focus = false) {
   const oldPage = UI.stats.querySelector('.acc-page');
   const motion = S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   overviewReveal.stop();
+  Object.values(phaseReveals).forEach(reveal => reveal.stop());
   const leaf = motion && previous !== next && oldPage?.animate ? oldPage.cloneNode(true) : null;
   const scrollTop = oldPage?.scrollTop || 0;
   if (leaf && oldPage.closest('.accuracy-phase-report-2')) leaf.classList.add('accuracy-phase-report-2');
@@ -4317,8 +4320,11 @@ function setAccuracyPage(page, focus = false) {
       {transform: 'translateX(' + (-direction * 10) + 'px)', opacity: 0},
     ], {duration: 180, easing: 'cubic-bezier(.22,.65,.3,1)', fill: 'forwards'});
     turn.onfinish = turn.oncancel = () => leaf.remove();
-    incoming.animate([{transform: 'translateX(' + (direction * 10) + 'px)', opacity: .35},
-      {transform: 'translateX(0)', opacity: 1}], {duration: 280, easing: 'cubic-bezier(.22,.65,.3,1)'});
+    for (const content of incoming.children) {
+      if (content.classList.contains('acc-players')) continue;
+      content.animate([{transform: 'translateX(' + (direction * 10) + 'px)', opacity: .35},
+        {transform: 'translateX(0)', opacity: 1}], {duration: 280, easing: 'cubic-bezier(.22,.65,.3,1)'});
+    }
   }
   if (focus) UI.stats.querySelector(typeof focus === 'string' ? focus : '[aria-selected="true"]')?.focus({preventScroll: true});
 }
@@ -4403,7 +4409,7 @@ function renderAccuracyPhases(sides, busy, bars = true) {
       const values = sides.map(side => S.gameStats?.[side]?.phases[phase]?.accuracy);
       const scores = values.map(value => el('strong', {}, pending ? '···' : value == null ? '—' : value.toFixed(1)));
       const label = el('span', {}, ['Opening', 'Middlegame', 'Endgame'][i]);
-      return el('div', {class: 'acc-phase-row', 'data-phase': phase},
+      return el('div', {class: 'acc-phase-row', 'data-phase': phase, 'data-pending': String(pending)},
         ...(bars ? [el('div', {class: 'acc-phase-values'}, scores[0], label, scores[1]),
           el('div', {class: 'acc-phase-bars'}, ...values.map(value =>
             el('span', {class: 'acc-phase-track', 'aria-hidden': 'true'},
@@ -4412,12 +4418,23 @@ function renderAccuracyPhases(sides, busy, bars = true) {
     }));
 }
 function updateAccuracyPhases(sides, busy, design) {
-  const key = JSON.stringify(['w', 'b'].map(side => S.gameStats?.[side]?.phases));
-  if (statsRefs.phasesKey === key) return;
-  statsRefs.phasesKey = key;
   const current = UI.stats.querySelector('.acc-phases,.phase-report');
-  if (current) current.replaceWith(design.startsWith('phases')
-    ? renderPhaseReport(sides, busy, design === 'phases2') : renderAccuracyPhases(sides, busy, design !== 'pages'));
+  if (!current) return;
+  const next = design.startsWith('phases')
+    ? renderPhaseReport(sides, busy, design === 'phases2') : renderAccuracyPhases(sides, busy, design !== 'pages');
+  statsRefs.phaseKeys ||= {};
+  for (const phase of GAME_PHASES) {
+    const key = accuracyPhasePending(phase, busy) ? 'pending' : JSON.stringify(sides.map(side => S.gameStats?.[side]?.phases[phase]));
+    if (statsRefs.phaseKeys[phase] === key) continue;
+    statsRefs.phaseKeys[phase] = key;
+    const oldRow = current.querySelector('[data-phase="' + phase + '"]');
+    const row = next.querySelector('[data-phase="' + phase + '"]');
+    const reveal = oldRow.dataset.pending === 'true' && row.dataset.pending === 'false';
+    phaseReveals[phase].stop();
+    oldRow.replaceWith(row);
+    if (reveal) phaseReveals[phase].mount(row, {game: S.positions, key: JSON.stringify([design, S.batchGen, phase, key]),
+      enabled: S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches});
+  }
 }
 function renderModernAdvanced(sides, busy) {
   const stats = sides.map(side => S.gameStats?.[side]);
@@ -4485,7 +4502,10 @@ function renderStats() {
   if (reveal && !S.analyzing && !S.accuracyPage && animate
       && overviewReveal.matches(UI.stats.firstChild, S.positions, revealKey)) return;
   overviewReveal.stop();
-  if (design === 'original') return renderOriginalStats();
+  if (design === 'original') {
+    Object.values(phaseReveals).forEach(reveal => reveal.stop());
+    return renderOriginalStats();
+  }
   if (design === 'pages') return renderPagedStats();
   const sides = [S.meSide, S.meSide === "w" ? "b" : "w"];
   const page = S.accuracyPage || 0, busy = S.analyzing && !S.blank;
@@ -4502,6 +4522,12 @@ function renderStats() {
     if (page === 1) updateQualityDistribution(UI.stats, sides);
     return;
   }
+  // Preserve phases already counting up when the overall results finish.
+  let livePhases = null;
+  if (!busy && page === 0 && S.progressiveAccuracy && statsRefs?.design === design && statsRefs.page === page) {
+    updateAccuracyPhases(sides, busy, design);
+    livePhases = UI.stats.querySelector('.acc-phases,.phase-report');
+  } else Object.values(phaseReveals).forEach(reveal => reveal.stop());
   const pair = (className, values) => el('div', {class: className}, ...values);
   const number = value => value == null ? '—' : value.toFixed(1) + '%';
   const pending = value => busy ? '···' : value;
@@ -4548,6 +4574,7 @@ function renderStats() {
           loss && loss.loss > 0 ? el('span', {}, Math.ceil(loss.ply / 2) + (position.color === 'w' ? '. ' : '… ') + position.san + ' ↗') : null);
       })));
   }
+  if (livePhases) content.querySelector('.acc-phases,.phase-report')?.replaceWith(livePhases);
   UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials accuracy-book' + (reveal ? ' accuracy-reveal' : '') + (phaseReport ? ' accuracy-phase-report' : '') + (phaseReport2 && page === 0 ? ' accuracy-phase-report-2' : '') + (phaseModern ? ' accuracy-phase-modern' : '') + (design === 'phases-modern-v2' ? ' accuracy-phase-modern-v2' : ''), 'data-design': design, 'aria-label': 'Accuracy'},
     accuracyPager(),
     el('div', {class: 'panel-body acc-page' + (page === 0 ? ' acc-page-overview' : phaseModern ? page === 1 ? ' acc-page-quality' : ' acc-page-advanced' : ''), id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
@@ -4589,7 +4616,7 @@ function renderPhaseReport(sides, busy, compact = false) {
         'aria-label': S.players[side].name + ', ' + name + ': ' + (pending ? 'analyzing' : value == null ? 'not scored' : value.toFixed(1) + ' accuracy, ' + label + ', ' + stats.decisions + ' scored decisions')},
         el('strong', {class: 'phase-report-score'}, pending ? '···' : value == null ? '—' : value.toFixed(1)));
     });
-    return el('div', {class: 'phase-report-row' + (compact ? ' phase2-row' : ''), 'data-phase': phase},
+    return el('div', {class: 'phase-report-row' + (compact ? ' phase2-row' : ''), 'data-phase': phase, 'data-pending': String(pending)},
       el(compact ? 'span' : 'div', {class: 'phase-report-name'}, name),
       ...(compact ? cells : [el('div', {class: 'phase-report-cells'}, ...cells)]));
   }));
@@ -4697,6 +4724,7 @@ function renderPagedStats() {
     if (page === 1) updateQualityDistribution(UI.stats, sides);
     return;
   }
+  Object.values(phaseReveals).forEach(reveal => reveal.stop());
   const pair = (className, values) => el('div', {class: className}, ...values);
   const number = value => value == null ? '—' : value.toFixed(1) + '%';
   const pending = value => busy ? '···' : value;
@@ -6317,7 +6345,10 @@ async function setSetting(key, value) {
   if (design?.panel.startsWith('accuracy')) { statsRefs = null; hideQTip(); renderStats(); if(key==='accuracyDesign')reflowAccuracy(accuracyLayoutExpanded()); }
   if (key === 'movesDesign') updateMovesDesign();
   if (key === 'engineDesign') renderEngineCurrent();
-  if (key === 'moveAnim' && S.settings.moveAnim === false) overviewReveal.stop();
+  if (key === 'moveAnim' && S.settings.moveAnim === false) {
+    overviewReveal.stop();
+    Object.values(phaseReveals).forEach(reveal => reveal.stop());
+  }
   if (key === "pieceStyle") buildBoard();
   if (key === "mlStyle" || key === "badgeStyle") renderMoves();
   if (key === "evalView" || key === "graphStyle" || key === "barStyle" || key === "evalbarDesign" || key === "graphDesign" || key === "moveAnim") { renderEvalBar(); renderGraph(); }
