@@ -25,7 +25,7 @@ import { analyseCalibratedPosition } from "./lib/calibrated-search.js";
 import { loadLearningWorkspace, presentationFor } from "./lib/learning-loader.js";
 import { mountLearningAnnouncement } from "./lib/learning-announcement.js";
 import { panelScale, panelGroupBounds, scalePanelGroup, movePanelGroup } from "./lib/panel-layout.js";
-import { fullHdReferenceLayout } from "./lib/full-hd-layout.js";
+import { fullHdReferenceLayout, viewportGrowth } from "./lib/full-hd-layout.js";
 import { createScreenPreviewContext, loadScreenPreviewController } from "./lib/screen-previews.js";
 import { rememberAnalyzedGame, historyGame } from "./lib/player-history.js";
 
@@ -1891,8 +1891,9 @@ function growCanvas() {
     return;
   }
   const {pageW,pageH}=layoutPageSize(S.layout),height=pageH-TOPBAR_H;
-  const width=window.innerWidth||innerWidth,availableHeight=(window.innerHeight||innerHeight)-TOPBAR_H;
-  canvasScale=Math.min(1,width/pageW,Math.max(1,availableHeight)/height);
+  const top=viewport.getBoundingClientRect().top||TOPBAR_H;
+  const width=window.innerWidth||innerWidth,availableHeight=(window.innerHeight||innerHeight)-top;
+  canvasScale=Math.min(2,viewportGrowth(window.innerHeight||innerHeight),width/pageW,Math.max(1,availableHeight)/height);
   UI.canvas.style.setProperty('--layout-grid-line',1/canvasScale+'px');
   UI.canvas.style.minWidth=UI.canvas.style.width=pageW+'px';
   UI.canvas.style.minHeight=UI.canvas.style.height=height+'px';

@@ -188,6 +188,15 @@ references when switching so in-progress analysis updates the correct design.
 
 ## Verification
 
+Review layouts use the live content viewport. Above the approved 919px reference
+height, the automatic desktop composition and saved layouts grow together with
+their contents, limited by the available width and height. Hiding the bookmarks
+bar therefore enlarges the review; showing it again restores the fit. Resizing
+preserves saved panel geometry, review position and the user's browser zoom.
+Run `node scripts/learning-browser.mjs --working-tree --viewport-growth` to check
+both Old and Modern through height changes, laptop/large displays and learning
+entry/return, with screenshots and bounds checks.
+
 `tests/panel-designs.test.mjs` covers the settings controls, independent storage,
 startup/reset behavior, unknown IDs, live counters, score/layout preservation
 and full-height frame removal. Run

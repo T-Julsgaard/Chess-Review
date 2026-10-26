@@ -70,10 +70,41 @@ test('custom drag converts screen deltas into canvas coordinates at the fitted s
   assert.ok(Math.abs(a.state.layout.moves.x-a.call('snapGrid',start+100))<1e-8);
 });
 
-test('small saved canvases keep their own bounds and do not upscale',async t=>{
+test('growing a saved canvas reserves the actual toolbar height',t=>{
+  const a=layout(t);a.viewport(1920,1080);a.state.layoutMode='custom';
+  a.state.layout={board:{x:100,y:0,w:800,h:1000}};
+  a.dom.window.document.querySelector('.review-viewport').getBoundingClientRect=()=>({top:62});
+  a.call('applyLayoutMode');
+  const {pageH}=a.call('layoutPageSize',a.state.layout);
+  assert.ok((pageH-52)*a.run('canvasScale')<=1080-62);
+});
+
+test('small saved canvases keep their bounds and grow only with extra viewport height',async t=>{
   const a=layout(t);a.state.layoutMode='custom';a.state.layout={board:{x:36,y:0,w:640,h:760}};
-  a.viewport(1920,1080);a.call('applyLayoutMode');await a.call('initTabZoom');
+  a.viewport(1920,919);a.call('applyLayoutMode');await a.call('initTabZoom');
   assert.equal(a.run('canvasScale'),1);assert.equal(a.dom.window.document.querySelector('.stage').style.width,'688px');
+  a.viewport(1920,949);a.dom.window.dispatchEvent(new a.dom.window.Event('resize'));
+  assert.ok(a.run('canvasScale')>1);assert.equal(a.state.layout.board.w,640);
+});
+
+test('live height changes grow and restore both setups without changing saved geometry or browser zoom',async t=>{
+  const a=layout(t);await a.call('initTabZoom');
+  for(const setup of ['old','modern']){
+    a.viewport(1920,919);await a.call('applyUiSetup',setup);
+    const saved=JSON.stringify(a.state.layout),stored=JSON.stringify(a.store.layout),writes=a.writes.length;
+    const size=()=>{
+      const mod=a.dom.window.document.querySelector('[data-mod=board]');
+      return parseFloat(mod.style.width)*(setup==='modern'?a.run('canvasScale'):1);
+    };
+    const before=size();
+    for(const [width,height]of [[1920,949],[1920,979],[1600,979],[1920,919]]){
+      a.viewport(width,height);a.dom.window.dispatchEvent(new a.dom.window.Event('resize'));
+      if(width===1920&&height>919)assert.ok(size()>before,'Extra height enlarges '+setup);
+      if(height===919)assert.ok(Math.abs(size()-before)<1e-8,'Showing the bar restores the original fit');
+      assert.equal(JSON.stringify(a.state.layout),saved);assert.equal(JSON.stringify(a.store.layout),stored);
+      assert.equal(a.writes.length,writes);assert.equal(a.zoom(),1);
+    }
+  }
 });
 
 test('native Engine uses scrolling, and custom Engine respects its content scale and resize floor',async t=>{
