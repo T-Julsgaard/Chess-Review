@@ -66,6 +66,7 @@ try {
   else if(process.argv.includes('--accuracy-pages'))await (await import('./accuracy-pages-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out,source});
   else if(process.argv.includes('--overview-reveal'))await (await import('./overview-reveal-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--modern-quality'))await (await import('./modern-quality-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
+  else if(process.argv.includes('--phase-modern-v2'))await (await import('./phase-modern-v2-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--phase-modern'))await (await import('./phase-modern-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--phase-overview'))await (await import('./phase-overview-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--phase-report-2'))await (await import('./phase-overview-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out,phaseDesign:'phases2'});

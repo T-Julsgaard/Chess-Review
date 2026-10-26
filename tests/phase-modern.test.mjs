@@ -27,11 +27,41 @@ test('Modern Phase report saves independently, reuses arcs and phase evidence, a
   assert.ok([...doc.querySelectorAll('.phase-report-score')].every(n => n.textContent === '···'));
 });
 
+test('Modern v2 saves separately and keeps Modern arcs, phase evidence and all three pages', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  a.state.settings.moveAnim = false;
+  await a.call('setSetting', 'accuracyDesign', 'phases-modern');
+  const original = doc.querySelector('.phase-overview').textContent;
+  const before = JSON.stringify({acc:a.state.acc, stats:a.state.gameStats, layout:a.state.layout, idx:a.state.idx});
+  await a.call('setSetting', 'accuracyDesign', 'phases-modern-v2');
+  assert.equal(a.store.settings.accuracyDesign, 'phases-modern-v2');
+  assert.ok(doc.querySelector('.accuracy-phase-modern.accuracy-phase-modern-v2'));
+  assert.equal(doc.querySelector('.phase-overview').textContent, original);
+  assert.equal(doc.querySelectorAll('.acc-dial-fill').length, 2);
+  assert.equal(doc.querySelectorAll('.phase-report-cell').length, 6);
+  a.call('setAccuracyPage', 1);
+  assert.ok(doc.querySelector('.acc-page-quality'));
+  assert.equal(doc.querySelector('.quality-summary'), null);
+  a.call('setAccuracyPage', 2);
+  assert.equal(doc.querySelector('#accuracy-page').getAttribute('aria-labelledby'), 'accuracy-tab-2');
+  a.call('setAccuracyPage', 0);
+  a.state.acc.w = null; a.call('renderStats');
+  assert.equal(doc.querySelector('.acc-dial-fill').getAttribute('stroke-dasharray'), '0 100');
+  a.state.acc = JSON.parse(before).acc;
+  a.state.analyzing = true; a.call('renderStats');
+  assert.ok(doc.querySelector('.acc-val.ld'));
+  assert.equal(JSON.stringify({acc:a.state.acc, stats:a.state.gameStats, layout:a.state.layout, idx:a.state.idx}), before);
+  a.state.analyzing = false;
+  await a.call('setSetting', 'accuracyDesign', 'phases-modern');
+  assert.equal(doc.querySelector('.accuracy-phase-modern-v2'), null);
+  assert.equal(doc.querySelector('.phase-overview').textContent, original);
+});
+
 test('one retained liquid rail replaces both old controls across all shared pages', async t => {
   const a = review(t), doc = a.dom.window.document;
   const before = JSON.stringify({idx: a.state.idx, layout: a.state.layout, acc: a.state.acc});
   const rail = doc.querySelector('.acc-navigation');
-  for (const design of ['pages', 'dials', 'reveal', 'phases', 'phases2', 'phases-modern']) {
+  for (const design of ['pages', 'dials', 'reveal', 'phases', 'phases2', 'phases-modern', 'phases-modern-v2']) {
     await a.call('setSetting', 'accuracyDesign', design); a.call('setAccuracyPage', 0);
     for (const next of [1, 2, 0]) {
       const button = doc.querySelector('#accuracy-tab-' + next);

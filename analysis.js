@@ -4362,7 +4362,7 @@ function updateQualityDistribution(root, sides) {
 }
 function renderMoveQuality(sides, rows) {
   const design = panelDesign('accuracyQuality', S.settings), distribution = design === 'distribution';
-  const modern = panelDesign('accuracy', S.settings) === 'phases-modern';
+  const modern = ['phases-modern', 'phases-modern-v2'].includes(panelDesign('accuracy', S.settings));
   const content = el('div', {class: 'acc-quality' + (distribution ? ' quality-distribution' : ''), 'data-quality-design': design},
     distribution && !modern ? el('div', {class: 'quality-summary'},
       el('div', {class: 'quality-totals'},
@@ -4419,7 +4419,7 @@ function updateAccuracyPhases(sides, busy, design) {
 function renderStats() {
   const design = panelDesign('accuracy', S.settings);
   const phaseReport2 = design === 'phases2';
-  const phaseModern = design === 'phases-modern';
+  const phaseModern = design === 'phases-modern' || design === 'phases-modern-v2';
   const phaseReport = design === 'phases' || phaseReport2 || phaseModern;
   const reveal = design === 'reveal' || phaseReport;
   const revealKey = JSON.stringify([design, S.batchGen, S.meSide, S.acc, S.calibrated?.w.rating, S.calibrated?.b.rating, S.gameStats]);
@@ -4488,7 +4488,7 @@ function renderStats() {
           loss && loss.loss > 0 ? el('span', {}, Math.ceil(loss.ply / 2) + (position.color === 'w' ? '. ' : '… ') + position.san + ' ↗') : null);
       })));
   }
-  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials accuracy-book' + (reveal ? ' accuracy-reveal' : '') + (phaseReport ? ' accuracy-phase-report' : '') + (phaseReport2 && page === 0 ? ' accuracy-phase-report-2' : '') + (phaseModern ? ' accuracy-phase-modern' : ''), 'data-design': design, 'aria-label': 'Accuracy'},
+  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials accuracy-book' + (reveal ? ' accuracy-reveal' : '') + (phaseReport ? ' accuracy-phase-report' : '') + (phaseReport2 && page === 0 ? ' accuracy-phase-report-2' : '') + (phaseModern ? ' accuracy-phase-modern' : '') + (design === 'phases-modern-v2' ? ' accuracy-phase-modern-v2' : ''), 'data-design': design, 'aria-label': 'Accuracy'},
     accuracyPager(),
     el('div', {class: 'panel-body acc-page' + (page === 0 ? ' acc-page-overview' : phaseModern && page === 1 ? ' acc-page-quality' : ''), id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
       'aria-labelledby': 'accuracy-tab-' + page}, players, content)));

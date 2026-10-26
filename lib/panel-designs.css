@@ -108,6 +108,24 @@
 .accuracy-phase-modern .phase-report-score { font-size: 20px; }
 .accuracy-phase-modern .phase-rating { padding-top: 8px; gap: 6px; }
 .accuracy-phase-modern .phase-rating-values .acc-elo { font-size: 21px; }
+/* Modern v2: a little light and weight, within the original arc geometry. */
+.accuracy-phase-modern-v2 .acc-dial { isolation: isolate;
+  background: radial-gradient(ellipse at 50% 46%,color-mix(in srgb,var(--score-color) 9%,transparent),transparent 65%); }
+.accuracy-phase-modern-v2 .acc-dial circle { stroke-width: 4.5; }
+.accuracy-phase-modern-v2 .acc-dial-track { stroke: color-mix(in srgb,var(--score-color) 13%,var(--line-soft)); }
+.accuracy-phase-modern-v2 .acc-dial-fill { stroke: color-mix(in srgb,var(--score-color) 88%,var(--ink));
+  filter: drop-shadow(0 0 3px color-mix(in srgb,var(--score-color) 28%,transparent)); }
+.stage .accuracy-phase-modern-v2 .phase-overall-values .acc-val { font-size: clamp(29px,12.5cqw,38px); font-weight: 800;
+  text-shadow: 0 1px 10px color-mix(in srgb,var(--score-color) 16%,transparent); }
+.accuracy-phase-modern-v2 .phase-rating-values .acc-elo { --rating-color: var(--ink-2); position: relative; isolation: isolate;
+  font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.accuracy-phase-modern-v2 .phase-rating-values .acc-elo::before { content: ''; position: absolute; inset: -4px 0; z-index: -1;
+  border: 1px solid color-mix(in srgb,var(--rating-color) 16%,var(--line-soft)); border-radius: 9px;
+  background: linear-gradient(155deg,color-mix(in srgb,var(--rating-color) 8%,var(--panel)),var(--panel));
+  box-shadow: inset 0 1px 0 color-mix(in srgb,var(--rating-color) 10%,transparent); }
+.accuracy-phase-modern-v2 .phase-rating-values .acc-elo:first-child { --rating-color: var(--accent); }
+.accuracy-phase-modern-v2 .phase-rating-values .acc-elo::after { content: ''; position: absolute; bottom: -4px; left: 24%; right: 24%; height: 1px;
+  background: linear-gradient(90deg,transparent,color-mix(in srgb,var(--rating-color) 60%,transparent),transparent); }
 /* Overview player cards keep names prominent and aligned with their scores. */
 .accuracy-panel :is(.acc-page-overview,.acc-page-quality) .acc-players { align-items: stretch; margin-bottom: 6px; }
 .accuracy-panel :is(.acc-page-overview,.acc-page-quality) .acc-player { gap: 7px; padding: 5px 6px; border: 1px solid var(--line-soft);

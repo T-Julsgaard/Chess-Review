@@ -13,7 +13,7 @@ const scores = (plies) => gameStatistics(positions, [], Object.fromEntries(['w',
   [side, {moves: plies.filter(ply => positions[ply].color === side).map(ply =>
     ({ply, eligible: true, engine: 'nnue', quality: 90}))}])));
 
-for (const design of ['pages', 'dials', 'reveal', 'phases', 'phases2', 'phases-modern']) {
+for (const design of ['pages', 'dials', 'reveal', 'phases', 'phases2', 'phases-modern', 'phases-modern-v2']) {
   test(`${design} reveals completed phases in order while preserving loaders, tabs and focus`, t => {
     const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6');
     a.call('computeDerived'); a.call('buildUI');

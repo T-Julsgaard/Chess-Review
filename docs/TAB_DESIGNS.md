@@ -32,7 +32,7 @@ visual preferences.
 | Engine | Original, Focus, Minimal | Original (Minimal in Modern setup) |
 | Evaluation bar | Original, Balance | Balance |
 | Evaluation | Original, Timeline, Timeline v2, Move bars, Minimal | Timeline |
-| Accuracy overview | Original, Page tabs, Dials, Reveal, Phase report, Phase report 2, Phase report Modern | Phase report |
+| Accuracy overview | Original, Page tabs, Dials, Reveal, Phase report, Phase report 2, Phase report Modern, Phase report Modern v2 | Phase report |
 | Accuracy move quality | Original, Distribution | Distribution |
 | Accuracy advanced | Original | Original |
 | Move list | Original, Full height, Zoomed in, Zoom +20% | Full height |
@@ -108,6 +108,14 @@ phase cards and estimated ratings below. Select **Settings → Visual → Tabs �
 Accuracy overview → Phase report Modern**; it saves independently of the earlier
 designs. Accuracy scores throughout the overview designs omit the percent symbol;
 Advanced's engine top-move match remains a percentage.
+
+**Phase report Modern v2** is a separate saved Accuracy overview option. It keeps
+Modern's arc geometry, phase cards and shared pages, with slightly bolder headline
+scores, a soft arc glow and softly highlighted estimated-rating tiles. The effects
+are static and use the active theme's colors. The Modern setup still selects the
+original Modern report. Run
+`node scripts/learning-browser.mjs --working-tree --phase-modern --phase-modern-v2`
+to check v2 at eight viewport sizes, both themes and after reloading saved settings.
 
 All paged designs share a folded bottom-right corner. Click it, press Enter or
 Space, or drag it left/up to turn to the next page. Short drags, Escape and pointer
