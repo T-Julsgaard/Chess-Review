@@ -63,8 +63,9 @@ viewport sizes, theme screenshots, keyboard activation and saved-choice checks.
 
 Modern's Quality page shares the overview's player cards and their exact position.
 Both category designs omit classified totals and color strips, using that space
-for a centered list with larger text, badges and balanced count columns. Each
-badge-and-label group sits halfway between the two counts, without category bars.
+for a centered list with larger text, badges and balanced count columns. Badges
+and labels align in shared columns, with the whole block centered between
+the two count columns, without category bars.
 Hovering or focusing a category enlarges only its badge; the text and rows stay
 in place. Reduced motion disables the transition. Count links still jump to moves.
 Run `node scripts/learning-browser.mjs --working-tree --modern-quality` to verify

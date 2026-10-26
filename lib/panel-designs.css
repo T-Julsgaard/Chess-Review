@@ -123,10 +123,11 @@
 .stage .accuracy-phase-modern .acc-page-quality { display: flex; flex-direction: column; }
 .accuracy-phase-modern .acc-page-quality .acc-quality { display: flex; flex-direction: column; flex: 1 0 auto; justify-content: center; }
 .stage .accuracy-phase-modern .acc-page-quality .qbreak { padding-block: 4px; }
-.stage .accuracy-phase-modern .acc-page-quality .acc-quality .qbreak { gap: 3px; }
+.stage .accuracy-phase-modern .acc-page-quality .acc-quality .qbreak {
+  display: grid; grid-template-columns: 32px minmax(0,max-content) 32px; justify-content: space-between; gap: 3px 6px; }
 .stage .accuracy-phase-modern .acc-page-quality .acc-quality .qbreak-row {
-  grid-template-columns: 32px minmax(0,1fr) 32px; min-height: 32px; gap: 6px; }
-.stage .accuracy-phase-modern .acc-page-quality .acc-quality .qlabel { width: max-content; justify-content: center; gap: 9px; padding: 1px 0; font-size: 16px; }
+  grid-column: 1 / -1; grid-template-columns: subgrid; min-height: 32px; column-gap: normal; }
+.stage .accuracy-phase-modern .acc-page-quality .acc-quality .qlabel { width: auto; justify-self: stretch; justify-content: flex-start; gap: 9px; padding: 1px 0; font-size: 16px; }
 .stage .accuracy-phase-modern .acc-page-quality .acc-quality .qsym { width: 30px; height: 30px; flex-basis: 30px; filter: none; }
 .stage .accuracy-phase-modern .acc-page-quality .acc-quality .ct { min-height: 32px; font-size: 18px; }
 .accuracy-phase-modern .acc-page-quality .qbreak-row { position: relative; transition: background-color .16s ease; }

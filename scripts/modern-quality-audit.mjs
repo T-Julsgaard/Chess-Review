@@ -39,17 +39,23 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
         return {width:innerWidth,height:innerHeight,panel:p.getBoundingClientRect().toJSON(),body:b.clientHeight,content:b.scrollHeight,
           overflow:b.scrollWidth-b.clientWidth,windowOverflow:document.documentElement.scrollWidth-innerWidth,rows:p.querySelectorAll('.qbreak-row').length,
           topGap:list.top-names.bottom,bottomGap:body.bottom-list.bottom,
-        bars:[...p.querySelectorAll('.ct')].some(n=>getComputedStyle(n,'::before').content!=='none'),
-        centered:[...p.querySelectorAll('.qlabel')].every(n=>{
-          const badge=n.querySelector('.qsym').getBoundingClientRect(),text=n.querySelector('.nm').getBoundingClientRect();
-          const left=n.previousElementSibling.getBoundingClientRect(),right=n.nextElementSibling.getBoundingClientRect();
-          return Math.abs((badge.left+text.right)/2-(left.left+left.width/2+right.left+right.width/2)/2)<1})};})()`);
-      assert.equal(fit.rows,10); assert.equal(fit.centered,true);
+          bars:[...p.querySelectorAll('.ct')].some(n=>getComputedStyle(n,'::before').content!=='none'),
+          aligned:['.qsym','.nm'].every(selector=>{
+            const xs=[...p.querySelectorAll('.qlabel '+selector)].map(n=>n.getBoundingClientRect().left);
+            return Math.max(...xs)-Math.min(...xs)<1}),
+          centered:(()=>{
+            const labels=[...p.querySelectorAll('.qlabel')],badges=labels.map(n=>n.querySelector('.qsym').getBoundingClientRect()),
+              texts=labels.map(n=>n.querySelector('.nm').getBoundingClientRect());
+            const left=labels[0].previousElementSibling.getBoundingClientRect(),right=labels[0].nextElementSibling.getBoundingClientRect();
+            return Math.abs((Math.min(...badges.map(r=>r.left))+Math.max(...texts.map(r=>r.right)))/2
+              -(left.left+left.width/2+right.left+right.width/2)/2)<1})()};})()`);
+      await shot('modern-quality-'+design+'-'+width+'x'+height);
+      assert.equal(fit.rows,10); assert.equal(fit.centered,true,JSON.stringify(fit));
+      assert.equal(fit.aligned,true,'Badges and text align in shared columns');
       assert.equal(fit.bars,false);
       assert.ok(fit.overflow<=1&&fit.windowOverflow<=1,JSON.stringify(fit));
       assert.ok(fit.content<=fit.body+1,'All categories fit: '+JSON.stringify(fit));
       assert.ok(Math.abs(fit.topGap-fit.bottomGap)<8,'List is vertically balanced: '+JSON.stringify(fit));
-      await shot('modern-quality-'+design+'-'+width+'x'+height);
       evidence.push({design,...fit});
     }
   }
