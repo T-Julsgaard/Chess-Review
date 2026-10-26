@@ -92,6 +92,51 @@
 .phase2-rating > .acc-elo-label { font-size: 12px; }
 .phase2-rating .acc-elo { font-size: 19px; color: var(--ink); text-align: center; white-space: nowrap; }
 .phase2-rating .acc-elo:nth-child(2) { color: var(--accent); }
+/* Modern's narrow portrait panel: Reveal arcs above the first report's cards. */
+.accuracy-phase-modern .acc-players { margin-bottom: 8px; }
+.accuracy-phase-modern .acc-name { font-size: 12px; }
+.accuracy-phase-modern .phase-overview { gap: 10px; }
+.accuracy-phase-modern .phase-summary-label { font-size: 10px; letter-spacing: .12em; }
+.accuracy-phase-modern .phase-overall-values { margin: 4px 0 0; gap: 12px; }
+.accuracy-phase-modern .acc-dial { --score-color: var(--accent); max-width: 100px; margin: 0 auto; }
+.accuracy-phase-modern .acc-dial:last-child { --score-color: var(--ink-2); }
+.accuracy-phase-modern .acc-dial circle { stroke-width: 3.5; }
+.stage .accuracy-phase-modern .phase-overall-values .acc-val { position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%,-50%); font-size: clamp(27px,12cqw,36px); color: var(--score-color) !important; letter-spacing: -1.8px; }
+.accuracy-phase-modern .acc-dial-label { display: none; }
+.accuracy-phase-modern .phase-report { gap: 8px; }
+.accuracy-phase-modern .phase-report-name { font-size: 11px; }
+.accuracy-phase-modern .phase-report-cell { padding: 7px 3px; border-radius: 7px; }
+.accuracy-phase-modern .phase-report-score { font-size: 20px; }
+.accuracy-phase-modern .phase-rating { padding-top: 10px; gap: 6px; }
+.accuracy-phase-modern .phase-rating-values .acc-elo { font-size: 21px; }
+/* Shared sheets: a visible folded corner, with click and drag affordances. */
+.accuracy-book { position: relative; isolation: isolate; overflow: hidden; }
+.accuracy-book .acc-pager { padding-right: 42px; grid-template-columns: 26px minmax(0,1fr) 26px; }
+.accuracy-book .acc-pager > button { width: 26px; }
+.accuracy-book .acc-pager-center { gap: 7px; }
+.accuracy-book .acc-page-name { font-size: 12px; }
+.accuracy-book .acc-pager-steps button { width: 12px; }
+.accuracy-book .acc-pager-steps button[aria-selected="true"] { width: 21px; }
+.acc-page-corner { position: absolute; z-index: 4; right: 0; bottom: 0; width: 38px; height: 38px;
+  border: 0; padding: 0; background: transparent; color: var(--ink-3); cursor: grab; touch-action: none; }
+.acc-page-corner::before { content: ''; position: absolute; inset: 0; clip-path: polygon(100% 0,100% 100%,0 100%);
+  background: linear-gradient(135deg,transparent 46%,var(--line) 49%,var(--panel-3) 52%,var(--panel-2) 80%); }
+.acc-page-corner span { position: absolute; right: 5px; bottom: 4px; font-size: 14px; }
+.acc-page-corner:hover, .acc-page-corner:focus-visible { color: var(--accent); }
+.accuracy-book::after { content: ''; pointer-events: none; position: absolute; z-index: 3; right: 0; bottom: 0;
+  width: var(--page-peel,0px); height: var(--page-peel,0px); clip-path: polygon(100% 0,100% 100%,0 100%);
+  background: linear-gradient(135deg,transparent 46%,var(--line) 49%,var(--panel-3) 51%,var(--panel-2) 67%,var(--panel) 100%);
+  filter: drop-shadow(-5px -5px 8px #0003); transition: width .18s ease,height .18s ease; }
+.accuracy-book:has(.acc-page-corner:hover), .accuracy-book:has(.acc-page-corner:focus-visible) { --page-peel: 46px; }
+.accuracy-book.acc-page-grabbed::after { transition: none; }
+.acc-page-grabbed .acc-page-corner { cursor: grabbing; }
+.stage .accuracy-book .acc-turn-leaf { position: absolute; z-index: 2; left: 0; right: 0; margin: 0;
+  box-sizing: border-box; background: var(--panel); overflow: hidden; pointer-events: none; backface-visibility: hidden;
+  box-shadow: 12px 0 22px #0002; }
+@media (prefers-reduced-motion: reduce) {
+  .accuracy-book::after { transition: none; }
+}
 .set-section .set-seg:has([data-setting="movesDesign"]) { flex-wrap: wrap; }
 .set-section .set-seg [data-setting="movesDesign"] { flex: 1 1 40%; min-height: 32px; }
 .stage .accuracy-panel.accuracy-original .acc-head { padding: 10.2px 12px; }

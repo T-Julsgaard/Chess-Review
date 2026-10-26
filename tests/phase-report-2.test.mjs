@@ -33,7 +33,7 @@ test('the comparison grid keeps phase colors and places estimated rating last wi
   a.state.gameStats.b.phases.middlegame.accuracy=82.3;
   await a.call('setSetting','accuracyDesign','phases2');
   const middle=doc.querySelector('[data-phase="middlegame"]');
-  assert.deepEqual([...middle.children].map(n=>n.textContent),['Middlegame','43.8%','82.3%']);
+  assert.deepEqual([...middle.children].map(n=>n.textContent),['Middlegame','43.8','82.3']);
   const left=middle.querySelector('.phase-report-cell');
   assert.equal(left.style.getPropertyValue('--phase-color'),'var(--q-blunder)');
   assert.match(left.getAttribute('aria-label'),/White, Middlegame.*Blunder/);

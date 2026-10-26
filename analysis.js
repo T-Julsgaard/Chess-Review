@@ -4295,11 +4295,89 @@ function categoryLabel(cls) {
   return label;
 }
 function setAccuracyPage(page, focus = false) {
+  const previous = S.accuracyPage || 0;
+  const next = (page + ACCURACY_PAGES.length) % ACCURACY_PAGES.length;
+  const oldPage = UI.stats.querySelector('.acc-page');
+  const motion = S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  overviewReveal.stop();
+  const leaf = motion && previous !== next && oldPage?.animate ? oldPage.cloneNode(true) : null;
+  const scrollTop = oldPage?.scrollTop || 0;
+  if (leaf && oldPage.closest('.accuracy-phase-report-2')) leaf.classList.add('accuracy-phase-report-2');
   S.accuracyPage = (page + ACCURACY_PAGES.length) % ACCURACY_PAGES.length;
   statsRefs = null;
   hideQTip();
   renderStats();
+  if (leaf) {
+    const panel = UI.stats.querySelector('.accuracy-panel'), incoming = panel.querySelector('.acc-page');
+    leaf.removeAttribute('id'); leaf.removeAttribute('aria-labelledby');
+    leaf.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+    leaf.setAttribute('aria-hidden', 'true'); leaf.inert = true;
+    leaf.classList.add('acc-turn-leaf');
+    // Match the incoming page in local coordinates, including content scaling.
+    Object.assign(leaf.style, {top: incoming.offsetTop + 'px', height: incoming.offsetHeight + 'px'});
+    panel.append(leaf);
+    leaf.scrollTop = scrollTop;
+    const forward = page > previous || previous === 2 && next === 0;
+    leaf.style.transformOrigin = forward ? 'left center' : 'right center';
+    const turn = leaf.animate([
+      {transform: 'perspective(900px) rotateY(0deg)', opacity: 1},
+      {transform: 'perspective(900px) rotateY(' + (forward ? '-105' : '105') + 'deg)', opacity: 0},
+    ], {duration: 380, easing: 'cubic-bezier(.22,.65,.3,1)', fill: 'forwards'});
+    turn.onfinish = turn.oncancel = () => leaf.remove();
+  }
   if (focus) UI.stats.querySelector(typeof focus === 'string' ? focus : '[aria-selected="true"]')?.focus({preventScroll: true});
+}
+
+// A real button supports click/keyboard; pointer capture keeps a corner drag
+// attached to the sheet even after the pointer leaves the panel.
+function accuracyPageCorner(page) {
+  let drag = null, suppressClick = false;
+  const clear = button => {
+    button.closest('.accuracy-panel')?.classList.remove('acc-page-grabbed');
+    button.closest('.accuracy-panel')?.style.removeProperty('--page-peel');
+    drag = null;
+  };
+  return el('button', {type: 'button', class: 'acc-page-corner',
+    'aria-label': 'Turn page: ' + ACCURACY_PAGES[(page + 1) % 3],
+    title: 'Turn page · drag the corner or click',
+    onclick: e => {
+      e.stopPropagation();
+      if (suppressClick) { suppressClick = false; return; }
+      setAccuracyPage(page + 1, '.acc-page-corner');
+    },
+    onpointerdown: e => {
+      if (e.button !== 0 || e.isPrimary === false) return;
+      e.stopPropagation(); suppressClick = false;
+      drag = {id: e.pointerId, x: e.clientX, y: e.clientY, distance: 0, moved: false};
+      e.currentTarget.closest('.accuracy-panel').classList.add('acc-page-grabbed');
+      try { e.currentTarget.setPointerCapture(e.pointerId); } catch {}
+    },
+    onpointermove: e => {
+      if (!drag || e.pointerId !== drag.id) return;
+      e.preventDefault(); e.stopPropagation();
+      const panel = e.currentTarget.closest('.accuracy-panel'), bounds = panel.getBoundingClientRect();
+      drag.distance = Math.max(0, drag.x - e.clientX, (drag.y - e.clientY) * .8);
+      drag.moved ||= Math.hypot(drag.x - e.clientX, drag.y - e.clientY) > 6;
+      // Convert screen distances into the panel's local (possibly scaled) units.
+      panel.style.setProperty('--page-peel', Math.min(panel.clientWidth * .85, 28 + drag.distance * panel.clientWidth / (bounds.width || 1)) + 'px');
+    },
+    onpointerup: e => {
+      if (!drag || e.pointerId !== drag.id) return;
+      e.stopPropagation();
+      const turn = drag.distance >= 44;
+      suppressClick = drag.moved;
+      clear(e.currentTarget);
+      if (turn) { suppressClick = true; setAccuracyPage(page + 1, '.acc-page-corner'); }
+    },
+    onpointercancel: e => { suppressClick = true; clear(e.currentTarget); },
+    onlostpointercapture: e => { if (drag) { suppressClick = true; clear(e.currentTarget); } },
+    onkeydown: e => {
+      if (e.key === 'Escape') { suppressClick = true; clear(e.currentTarget); e.stopPropagation(); }
+      if (e.key === 'Enter' || e.key === ' ') suppressClick = false;
+      const next = {ArrowRight: page + 1, ArrowLeft: page - 1, Home: 0, End: 2}[e.key];
+      if (next != null) { e.preventDefault(); e.stopPropagation(); clear(e.currentTarget); setAccuracyPage(next, '.acc-page-corner'); }
+    },
+  }, el('span', {'aria-hidden': 'true'}, '↖'));
 }
 function accuracyDial(value, busy) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -4314,7 +4392,7 @@ function accuracyDial(value, busy) {
   }
   return el('div', {class: 'acc-dial'}, svg,
     busy ? loaderNode('acc-val', 'var(--accent)') : el('strong', {class: 'acc-val'},
-      value == null ? '—' : value >= 100 ? '100' : value.toFixed(1), value == null ? null : el('span', {class: 'acc-unit'}, '%')),
+      value == null ? '—' : value >= 100 ? '100' : value.toFixed(1)),
     el('span', {class: 'acc-dial-label'}, 'Accuracy'));
 }
 function updateQualityDistribution(root, sides) {
@@ -4361,7 +4439,8 @@ function renderMoveQuality(sides, rows) {
 function renderStats() {
   const design = panelDesign('accuracy', S.settings);
   const phaseReport2 = design === 'phases2';
-  const phaseReport = design === 'phases' || phaseReport2;
+  const phaseModern = design === 'phases-modern';
+  const phaseReport = design === 'phases' || phaseReport2 || phaseModern;
   const reveal = design === 'reveal' || phaseReport;
   const revealKey = JSON.stringify([design, S.batchGen, S.meSide, S.acc, S.calibrated?.w.rating, S.calibrated?.b.rating, S.gameStats]);
   const animate = S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -4400,7 +4479,7 @@ function renderStats() {
   if (page === 0 && phaseReport2) {
     content = renderPhaseOverview2(sides, busy);
   } else if (page === 0 && phaseReport) {
-    content = renderPhaseOverview(sides, busy);
+    content = renderPhaseOverview(sides, busy, phaseModern);
   } else if (page === 0) {
     content = el('div', {class: 'acc-overview'},
       pair('acc-scorecards', sides.map(side => {
@@ -4412,9 +4491,10 @@ function renderStats() {
       el('div', {class: 'acc-phases', 'aria-label': 'Accuracy by game phase'},
         ...GAME_PHASES.map((phase, i) => {
           const values = sides.map(side => S.gameStats?.[side]?.phases[phase].accuracy);
+          const score = value => value == null ? '—' : value.toFixed(1);
           return el('div', {class: 'acc-phase-row'},
-            el('div', {class: 'acc-phase-values'}, el('strong', {}, pending(number(values[0]))),
-              el('span', {}, ['Opening', 'Middlegame', 'Endgame'][i]), el('strong', {}, pending(number(values[1])))),
+            el('div', {class: 'acc-phase-values'}, el('strong', {}, pending(score(values[0]))),
+              el('span', {}, ['Opening', 'Middlegame', 'Endgame'][i]), el('strong', {}, pending(score(values[1])))),
             pair('acc-phase-bars', values.map(value => el('span', {class: 'acc-phase-track', 'aria-hidden': 'true'},
               el('i', {style: {width: (busy || value == null ? 0 : value) + '%'}})))));
         })));
@@ -4451,9 +4531,9 @@ function renderStats() {
     el('div', {class: 'acc-pager-center'}, el('span', {class: 'acc-page-name', 'aria-hidden': 'true'}, ACCURACY_PAGES[page]), tabs),
     el('button', {type: 'button', class: 'acc-page-next', 'aria-label': 'Next accuracy page: ' + ACCURACY_PAGES[(page + 1) % 3],
       onclick: () => setAccuracyPage(page + 1, '.acc-page-next')}, icon('chevron')));
-  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials' + (reveal ? ' accuracy-reveal' : '') + (phaseReport ? ' accuracy-phase-report' : '') + (phaseReport2 && page === 0 ? ' accuracy-phase-report-2' : ''), 'data-design': design, 'aria-label': 'Accuracy'},
+  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials accuracy-book' + (reveal ? ' accuracy-reveal' : '') + (phaseReport ? ' accuracy-phase-report' : '') + (phaseReport2 && page === 0 ? ' accuracy-phase-report-2' : '') + (phaseModern ? ' accuracy-phase-modern' : ''), 'data-design': design, 'aria-label': 'Accuracy'},
     el('div', {class: 'panel-body acc-page' + (page === 0 ? ' acc-page-overview' : ''), id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
-      'aria-labelledby': 'accuracy-tab-' + page}, players, content), pager));
+      'aria-labelledby': 'accuracy-tab-' + page}, players, content), pager, accuracyPageCorner(page)));
   statsRefs = busy ? {design, page, rows} : null;
   if (UI.canvas.classList.contains('full-hd-reference')) applyLayout();
   if (reveal && page === 0 && !busy && !S.blank && Object.values(S.acc).some(Number.isFinite)) {
@@ -4466,8 +4546,7 @@ function renderPhaseOverview2(sides, busy) {
     el('div', {class: 'phase2-overall'},
       el('span', {class: 'phase-summary-label phase2-label'}, 'Accuracy'),
       ...sides.map(side => busy ? loaderNode('acc-val', 'var(--accent)')
-        : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side] >= 100 ? '100' : S.acc[side].toFixed(1),
-          S.acc[side] == null ? null : el('span', {class: 'acc-unit'}, '%')))),
+        : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side] >= 100 ? '100' : S.acc[side].toFixed(1)))),
     el('div', {class: 'phase-report phase2-report', 'aria-label': 'Accuracy by game phase'},
       ...GAME_PHASES.map((phase, index) => {
         const name = ['Opening', 'Middlegame', 'Endgame'][index];
@@ -4479,8 +4558,8 @@ function renderPhaseOverview2(sides, busy) {
             return el('div', {class: 'phase-report-cell' + (band ? '' : ' unavailable'), 'data-phase-category': band?.category || '',
               style: {'--phase-color': band ? QUALITY[band.category].color : 'var(--ink-3)'},
               'aria-label': S.players[side].name + ', ' + name + ': ' + (busy ? 'analyzing' : value == null ? 'not scored'
-                : value.toFixed(1) + '% accuracy, ' + categoryName(band.category) + ', ' + stats.decisions + ' scored decisions')},
-              el('strong', {class: 'phase-report-score'}, busy ? '···' : value == null ? '—' : value.toFixed(1) + '%'));
+                : value.toFixed(1) + ' accuracy, ' + categoryName(band.category) + ', ' + stats.decisions + ' scored decisions')},
+              el('strong', {class: 'phase-report-score'}, busy ? '···' : value == null ? '—' : value.toFixed(1)));
           }));
       })),
     el('div', {class: 'phase-rating phase2-rating'},
@@ -4491,14 +4570,14 @@ function renderPhaseOverview2(sides, busy) {
       })));
 }
 
-function renderPhaseOverview(sides, busy) {
-  const percent = value => busy ? '···' : value == null ? '—' : value.toFixed(1) + '%';
+function renderPhaseOverview(sides, busy, modern = false) {
+  const score = value => busy ? '···' : value == null ? '—' : value.toFixed(1);
   return el('div', {class: 'phase-overview'},
     el('div', {class: 'phase-summary'},
       el('span', {class: 'phase-summary-label'}, 'Game accuracy'),
-      el('div', {class: 'phase-overall-values'}, ...sides.map(side => busy ? loaderNode('acc-val', 'var(--accent)')
-        : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side] >= 100 ? '100' : S.acc[side].toFixed(1),
-          S.acc[side] == null ? null : el('span', {class: 'acc-unit'}, '%'))))),
+      el('div', {class: 'phase-overall-values'}, ...sides.map(side => modern ? accuracyDial(S.acc[side], busy)
+        : busy ? loaderNode('acc-val', 'var(--accent)')
+        : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side] >= 100 ? '100' : S.acc[side].toFixed(1))))),
     el('div', {class: 'phase-report', 'aria-label': 'Accuracy by game phase'}, ...GAME_PHASES.map((phase, index) => {
       const name = ['Opening', 'Middlegame', 'Endgame'][index];
       return el('div', {class: 'phase-report-row', 'data-phase': phase},
@@ -4508,8 +4587,8 @@ function renderPhaseOverview(sides, busy) {
           const band = busy ? null : phasePerformance(value), label = band ? categoryName(band.category) : busy ? 'Analyzing' : 'Not scored';
           return el('div', {class: 'phase-report-cell' + (band ? '' : ' unavailable'), 'data-phase-category': band?.category || '',
             style: {'--phase-color': band ? QUALITY[band.category].color : 'var(--ink-3)'},
-            'aria-label': S.players[side].name + ', ' + name + ': ' + (busy ? 'analyzing' : value == null ? 'not scored' : value.toFixed(1) + '% accuracy, ' + label + ', ' + stats.decisions + ' scored decisions')},
-            el('strong', {class: 'phase-report-score'}, percent(value)));
+            'aria-label': S.players[side].name + ', ' + name + ': ' + (busy ? 'analyzing' : value == null ? 'not scored' : value.toFixed(1) + ' accuracy, ' + label + ', ' + stats.decisions + ' scored decisions')},
+            el('strong', {class: 'phase-report-score'}, score(value)));
         })));
     })),
     el('div', {class: 'phase-rating'},
@@ -4620,16 +4699,15 @@ function renderPagedStats() {
   if (page === 0) {
     content = el('div', {class: 'acc-overview'},
       comparison('Game accuracy', sides.map(side => busy ? loaderNode('acc-val', 'var(--accent)')
-        : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side].toFixed(1),
-          S.acc[side] == null ? null : el('span', {class: 'acc-unit'}, '%'))), null, 'acc-overall'),
+        : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side].toFixed(1))), null, 'acc-overall'),
       comparison('Estimated Elo', sides.map(side => el('strong', {class: 'acc-elo'}, pending(
         estimateElo(S.accElo[side], S.players[side]?.rating, side) == null ? '—'
           : '≈ ' + estimateElo(S.accElo[side], S.players[side]?.rating, side))))),
       el('div', {class: 'acc-phases'}, el('h4', {}, 'Accuracy by phase'),
         ...GAME_PHASES.map((phase, i) => el('div', {class: 'acc-phase-row'},
-          el('strong', {}, pending(number(S.gameStats?.[sides[0]]?.phases[phase].accuracy))),
+          el('strong', {}, pending(S.gameStats?.[sides[0]]?.phases[phase].accuracy?.toFixed(1) ?? '—')),
           el('span', {}, ['Opening', 'Middlegame', 'Endgame'][i]),
-          el('strong', {}, pending(number(S.gameStats?.[sides[1]]?.phases[phase].accuracy))))),
+          el('strong', {}, pending(S.gameStats?.[sides[1]]?.phases[phase].accuracy?.toFixed(1) ?? '—')))),
         el('p', {class: 'acc-note'}, S.blank ? 'Load a game to see its accuracy.'
           : busy ? 'Scores appear when analysis finishes.' : '— Phase not reached or no scored decisions.')));
   } else if (page === 1) {
@@ -4660,11 +4738,11 @@ function renderPagedStats() {
     }}, ...ACCURACY_PAGES.map((name, i) => el('button', {type: 'button', role: 'tab', id: 'accuracy-tab-' + i,
       'aria-selected': String(page === i), 'aria-controls': 'accuracy-page', tabindex: page === i ? 0 : -1,
       onclick: () => setAccuracyPage(i, true)}, name)));
-  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-pages', 'data-design': 'pages', 'aria-label': 'Accuracy'},
+  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-pages accuracy-book', 'data-design': 'pages', 'aria-label': 'Accuracy'},
     el('div', {class: 'panel-head acc-head'}, el('h3', {}, 'Accuracy'), el('span', {class: 'acc-page-count'}, (page + 1) + ' / 3')),
     tabs,
     el('div', {class: 'panel-body acc-page', id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
-      'aria-labelledby': 'accuracy-tab-' + page}, players, content)));
+      'aria-labelledby': 'accuracy-tab-' + page}, players, content), accuracyPageCorner(page)));
   statsRefs = busy ? {design: 'pages', page, rows} : null;
   if (UI.canvas.classList.contains('full-hd-reference')) applyLayout();
 }

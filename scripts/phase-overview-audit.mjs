@@ -52,13 +52,13 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   const colors=await run("[...document.querySelectorAll('.phase-report-cell')].map(n=>({category:n.dataset.phaseCategory,color:getComputedStyle(n).color,text:n.textContent,children:n.children.length}))");
   assert.deepEqual(colors.map(n=>n.category),['excellent','good','blunder','mistake','inacc','excellent']);
   assert.deepEqual(colors.map(n=>n.color),['rgb(129, 182, 76)','rgb(149, 183, 118)','rgb(238, 74, 47)','rgb(249, 168, 90)','rgb(247, 197, 49)','rgb(129, 182, 76)']);
-  assert.ok(colors.every(n=>n.children===1&&/^\d+\.\d%$/.test(n.text)));
+  assert.ok(colors.every(n=>n.children===1&&/^\d+\.\d$/.test(n.text)));
   assert.equal(await run("document.querySelector('.phase-rating').getBoundingClientRect().top>=document.querySelector('.phase-report').getBoundingClientRect().bottom"),true);
   await shot('phase-report-illustrative');
   await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=true;m.S.positions=[...m.S.positions];m.renderStats()})");
   assert.equal(await run("!!document.querySelector('[data-revealing]')"),true);
   await waitFor(review,"!document.querySelector('[data-revealing]')",'Phase reveal complete');
-  assert.equal(await run("document.querySelector('[data-phase=middlegame] .phase-report-score').textContent"),'43.8%');
+  assert.equal(await run("document.querySelector('[data-phase=middlegame] .phase-report-score').textContent"),'43.8');
   await run("import('./analysis.js').then(m=>{Object.assign(m.S,phaseOriginal);m.S.settings.moveAnim=false;m.renderStats()})");
   await fs.writeFile(path.join(out,'phase-report.json'),JSON.stringify({passed:true,evidence,illustrativeColors:colors},null,2));
   console.log(phaseDesign+' passed at eight viewport sizes: compact fit, aligned comparisons, category colors, animation and unchanged evidence. Screenshots: '+out);

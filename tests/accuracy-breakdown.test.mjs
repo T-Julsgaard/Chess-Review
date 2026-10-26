@@ -92,7 +92,7 @@ test('overview dials and paired phase bars reflect scores without changing numer
   const before = JSON.stringify({acc: S.acc, stats: S.gameStats, classif: S.classif});
   a.call('renderStats');
   assert.equal(doc.querySelectorAll('.acc-dial-fill')[0].getAttribute('stroke-dasharray'), '75 100');
-  assert.equal(doc.querySelectorAll('.acc-val')[0].textContent, '100%');
+  assert.equal(doc.querySelectorAll('.acc-val')[0].textContent, '100');
   assert.equal(doc.querySelectorAll('.acc-phase-bars i')[0].style.width, '90%');
   assert.equal(doc.querySelectorAll('.acc-phase-bars i')[1].style.width, '65%');
   assert.equal(JSON.stringify({acc: S.acc, stats: S.gameStats, classif: S.classif}), before);

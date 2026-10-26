@@ -27,7 +27,7 @@ visual preferences.
 | Engine | Original, Focus, Minimal | Original (Minimal in Modern setup) |
 | Evaluation bar | Original, Balance | Balance |
 | Evaluation | Original, Timeline, Move bars | Timeline |
-| Accuracy overview | Original, Page tabs, Dials, Reveal, Phase report, Phase report 2 | Phase report |
+| Accuracy overview | Original, Page tabs, Dials, Reveal, Phase report, Phase report 2, Phase report Modern | Phase report |
 | Accuracy move quality | Original, Distribution | Distribution |
 | Accuracy advanced | Original | Original |
 | Move list | Original, Full height, Zoomed in, Zoom +20% | Full height |
@@ -67,7 +67,7 @@ presentation; existing saved design choices are preserved.
 
 Phase report is the latest Accuracy overview: large headline scores, compact
 paired phase cards, then estimated ratings at the bottom. Cards show only their
-percentage with the existing Excellent/Good/Inaccuracy/Mistake/Blunder color;
+score with the existing Excellent/Good/Inaccuracy/Mistake/Blunder color;
 visible category text and symbols are omitted. Presentation thresholds are
 documented in [the Accuracy panel guide](ACCURACY_PANEL.md); numerical scores,
 annotations and rating calculations are unchanged. Missing samples stay neutral.
@@ -79,12 +79,28 @@ fixture demonstrating all five category bands without storing fake game analysis
 Phase report 2 is a separate overview option with a shared comparison grid.
 Player names sit above their numerical columns; a softly framed Accuracy row
 leads, followed by three aligned phase rows and Estimated rating below. Labels
-occupy the left column, colored percentages stay compact, and names can wrap to
+occupy the left column, colored scores stay compact, and names can wrap to
 two lines. The original Phase report remains unchanged and stays the default.
-The new arrangement preserves the same phase colors, percentages, rating model,
+The new arrangement preserves the same phase colors, scores, rating model,
 compact panel size, carousel and reveal animation. Select it under **Visual →
 Tabs → Accuracy overview**. Run the browser audit with `--phase-report-2` to
 verify alignment and fit at eight viewport sizes.
+
+Phase report Modern adapts the first Phase report to the Modern setup's narrow,
+taller Accuracy panel. Two Reveal arcs frame the headline scores, with paired
+phase cards and estimated ratings below. Select **Settings → Visual → Tabs →
+Accuracy overview → Phase report Modern**; it saves independently of the earlier
+designs. Accuracy scores throughout the overview designs omit the percent symbol;
+Advanced's engine top-move match remains a percentage.
+
+All paged designs share a folded bottom-right corner. Click it, press Enter or
+Space, or drag it left/up to turn to the next page. Short drags, Escape and pointer
+cancellation return the corner without changing pages. Existing page buttons and
+arrow/Home/End navigation remain available. Sheet turns and the score reveal
+respect animation preferences and reduced motion. Run
+`node scripts/learning-browser.mjs --working-tree --phase-modern` to verify the
+Modern layout at eight viewports, settings persistence, real pointer dragging,
+sheet cleanup and reduced motion, with dark/light screenshots.
 
 Original Move list restores its title header and empty footer strip. Full height
 omits both nodes so the scrollable moves body reaches the panel bottom. It keeps

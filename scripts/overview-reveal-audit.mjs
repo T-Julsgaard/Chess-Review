@@ -47,7 +47,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     assert.ok(samples[i].arc >= samples[i-1].arc);
     for (const key of ['x','y','width','height','valueWidth','valueX']) assert.ok(Math.abs(samples[i][key]-samples[0][key]) < 1, 'Layout shifts during reveal: ' + key);
   }
-  const final = await run("import('./analysis.js').then(m=>({shown:document.querySelector('.acc-val').textContent,expected:m.S.acc[m.S.meSide].toFixed(1)+'%',filter:getComputedStyle(document.querySelector('.acc-dial-fill')).filter,background:getComputedStyle(document.querySelector('.acc-scorecard')).backgroundImage,label:document.querySelector('.acc-elo-label').textContent}))");
+  const final = await run("import('./analysis.js').then(m=>({shown:document.querySelector('.acc-val').textContent,expected:m.S.acc[m.S.meSide].toFixed(1),filter:getComputedStyle(document.querySelector('.acc-dial-fill')).filter,background:getComputedStyle(document.querySelector('.acc-scorecard')).backgroundImage,label:document.querySelector('.acc-elo-label').textContent}))");
   assert.equal(final.shown, final.expected); assert.equal(final.label, 'Estimated rating');
   assert.equal(final.filter, 'none'); assert.equal(final.background, 'none');
   assert.equal(await snapshot(), before);
