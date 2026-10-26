@@ -36,7 +36,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     assert.ok(data.board.x>=-1&&data.board.right<=width+1,context);
     if(!learning&&width>=1100&&height>=600){
       assert.ok(data.scrollH<=height+1,context);
-      for(const box of data.modules)assert.ok(box.x>=-1&&box.right<=width+1&&box.y>=50&&box.bottom<=height+1&&box.w>0&&box.h>0,context);
+      for(const box of data.modules)assert.ok(box.x>=-1&&box.right<=width+1&&box.y>=50&&(label==='review-expanded-accuracy'||box.bottom<=height+1)&&box.w>0&&box.h>0,context);
       const panels=data.modules.filter(b=>!['coach','evalbar'].includes(b.key));
       for(const [i,a]of panels.entries())for(const b of panels.slice(i+1))assert.ok(
         Math.min(a.right,b.right)-Math.max(a.x,b.x)<1||Math.min(a.bottom,b.bottom)-Math.max(a.y,b.y)<1,

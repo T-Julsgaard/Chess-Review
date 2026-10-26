@@ -201,7 +201,7 @@ test('adaptive practice resumes, pairs from current Elo after each result, and f
 test('Black puzzles keep their orientation and use a board-focused practice surface',async t=>{
   const puzzle=library.find(p=>p.fen.split(' ')[1]==='b'&&p.solution.length>=3);
   const {w}=await setup(t,{puzzles:[puzzle]});await w.startPuzzleSelection([puzzle]);await w.submitPuzzle(puzzle.solution[0]);
-  assert.equal(w.flipped,true);assert.equal(w.root.querySelector('.learn-board').getAttribute('aria-label'),'Black to move. Chessboard.');
+  assert.equal(w.flipped,true);assert.equal(w.root.querySelector('.learn-board').getAttribute('aria-label'),'Black to move. Chessboard. Use Left and Right arrow keys for move history.');
   assert.equal(w.root.querySelector('.puzzle-played-line, .puzzle-task-meta, .learn-move-input'),null);
   assert.deepEqual([...w.root.querySelectorAll('.puzzle-practice-actions button')].map(n=>n.textContent),['Hint','Skip']);
   assert.doesNotMatch(w.root.textContent,/Find the best continuation|matched to your Elo|Flip board/);

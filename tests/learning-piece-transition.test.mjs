@@ -49,13 +49,14 @@ async function returningWorkspace(t,mode) {
   // Return to the user's scratch position and orientation, including any moves
   // made before entering the puzzle.
   w.homePosition.move('e4');w.homeBoardFlipped=true;w.render();
+  t.mock.method(w,'showPuzzleRunStart',async()=>true);
   if(mode)await w.startPuzzleRun(mode);else await w.startRatedPuzzles();
   const from={...w.displayedBoard},pending=[],board=w.boardElement;
   board.getBoundingClientRect=()=>({left:0,top:0,width:800,height:800});
   a.state.settings.moveAnim=true;
   a.dom.window.HTMLElement.prototype.animate=function(frames,options){
     let resolve;const animation={finished:new Promise(r=>{resolve=r;}),cancel(){resolve();}};
-    if(this.classList.contains('puzzle-transition-piece'))pending.push({frames,options,resolve});else resolve();
+    if(this.classList.contains('puzzle-transition-piece')&&!w.closing)pending.push({frames,options,resolve});else resolve();
     return animation;
   };
   return {a,w,board,from,pending};
@@ -102,6 +103,29 @@ async function replayWorkspace(t,mode) {
   return workspace;
 }
 
+for(const mode of ['timeAttack','knockout'])for(const page of ['puzzles','concepts','openings'])test(`leaving ${mode} results for ${page} assembles the final puzzle into the library board`,async t=>{
+  const {w,board,pending}=await replayWorkspace(t,mode),from={...w.displayedBoard};
+  // Redraws on the result screen must retain the final puzzle without animating it.
+  w.render();w.render();
+  assert.equal(pending.length,0);assert.deepEqual(w.displayedBoard,from);
+  assert.ok(board.querySelector('.puzzle-run-end'));
+  if(page==='puzzles'){
+    w.root.querySelector('[data-focus=puzzle-overview]').click();
+    for(let i=0;i<80;i++)await Promise.resolve();
+  }else await w.navigate(page);
+  const routes=pieceRoutes(from.fen,w.homePosition.fen(),{fromFlipped:from.flipped,toFlipped:true});
+  assert.equal(w.page,page);assert.equal(w.result,null);assert.equal(w.activity,null);
+  assert.deepEqual(w.displayedBoard,{fen:w.homePosition.fen(),flipped:true});
+  assert.equal(board.querySelector('.puzzle-run-end'),null);
+  assert.ok(board.classList.contains('puzzle-arranging'));
+  assert.equal(board.querySelectorAll('.puzzle-transition-piece').length,routes.length);
+  assert.equal(pending.length,routes.filter(r=>r.from.x!==r.to.x||r.from.y!==r.to.y).length);
+  pending.forEach(p=>p.resolve());
+  for(let i=0;i<20;i++)await Promise.resolve();
+  assert.equal(board.querySelector('.puzzle-piece-transition'),null);
+  assert.equal(board.classList.contains('puzzle-arranging'),false);
+});
+
 for(const mode of ['timeAttack','knockout'])test(`${mode} result selections assemble pieces and cancel unfinished assemblies when switching or closing`,async t=>{
   const {w,board,pending}=await replayWorkspace(t,mode);
   const result=w.result,saved=structuredClone(w.store.value);
@@ -141,6 +165,15 @@ for(const mode of ['timeAttack','knockout'])for(const reduced of [false,true])te
   await w.replayRunPuzzle('return-transition');
   assert.equal(pending.length,0);assert.equal(board.querySelector('.puzzle-piece-transition'),null);
   assert.equal(w.currentFen(),w.puzzleById('return-transition').fen);
+});
+
+for(const mode of ['timeAttack','knockout'])for(const reduced of [false,true])test(`leaving ${mode} results respects ${reduced?'system reduced motion':'disabled move animations'}`,async t=>{
+  const {a,w,board,pending}=await replayWorkspace(t,mode);
+  if(reduced)a.dom.window.matchMedia=()=>({matches:true});else a.state.settings.moveAnim=false;
+  await w.navigate('puzzles');
+  assert.equal(pending.length,0);assert.equal(board.querySelector('.puzzle-piece-transition'),null);
+  assert.equal(board.querySelector('.puzzle-run-end'),null);
+  assert.equal(w.currentFen(),w.homePosition.fen());
 });
 
 for(const reduced of [false,true])test(`returning from a puzzle respects ${reduced?'system reduced motion':'disabled move animations'}`,async t=>{

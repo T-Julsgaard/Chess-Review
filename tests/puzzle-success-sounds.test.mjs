@@ -21,6 +21,8 @@ test('success choices resolve to bundled WAVs, with a safe default and an indepe
   const {a, played} = setup(t);
   const choices = a.run('PUZZLE_SUCCESS_SOUNDS');
   assert.equal(choices.length, 5);
+  assert.equal(choices[0][0], 'soft-retro');
+  assert.equal(a.state.settings.puzzleSuccessSound, 'soft-retro');
   for (const [id, , file] of choices) {
     const wav = readFileSync(new URL('../' + file, import.meta.url));
     assert.equal(wav.toString('ascii', 0, 4), 'RIFF');
@@ -32,7 +34,7 @@ test('success choices resolve to bundled WAVs, with a safe default and an indepe
   for (const invalid of [undefined, 'removed-sound']) {
     a.state.settings.puzzleSuccessSound = invalid;
     a.call('playPuzzleSuccess');
-    assert.match(played.pop(), /01-warm-marimba\.wav$/);
+    assert.match(played.pop(), /04-soft-retro\.wav$/);
   }
   a.state.settings.puzzleSuccessSound = 'none';
   a.call('playPuzzleSuccess'); a.call('playPuzzleSuccess', true);
@@ -56,6 +58,7 @@ test('success audio respects master volume and Soft Retro plays at 25% of its or
     createGain() {const gain = {gain:{},connect(target) {assert.equal(target, destination);}};gains.push(gain);return gain;},
   }));
   a.replace('processedFx', async (...args) => {requests.push(args);return {buffer,rate:1};});
+  a.state.settings.puzzleSuccessSound = 'warm-marimba';
   a.call('playPuzzleSuccess'); await settle();
   assert.deepEqual(requests, [['https://extension.test/sounds/success/01-warm-marimba.wav', 0, 1]]);
   assert.equal(gains[0].gain.value, .27);assert.equal(sources[0].buffer, buffer);assert.equal(sources[0].started, true);
@@ -88,7 +91,7 @@ test('Sound settings save and preview each choice, support Off without a preview
   assert.equal(a.store.settings.puzzleSuccessSound, 'none');
   assert.deepEqual(played, []);
   await a.call('resetSettingKeys', a.run('VISUAL_SETTING_KEYS'));
-  assert.equal(a.store.settings.puzzleSuccessSound, 'warm-marimba');
+  assert.equal(a.store.settings.puzzleSuccessSound, 'soft-retro');
 });
 
 test('incorrect sounds can be muted independently in puzzles and practice and reset in Sound settings', async t => {
@@ -101,7 +104,7 @@ test('incorrect sounds can be muted independently in puzzles and practice and re
   a.call('toggleSettings');
   const doc = a.dom.window.document;
   const select = async value => {
-    const label = value ? 'Incorrect' : 'Off';
+    const label = value ? 'Try Again' : 'Off';
     [...doc.querySelectorAll('.set-puzzle-incorrect .lib-dd-opt')].find(b => b.textContent === label).click();
     await settle();await a.run('_settingsWriteQueue');await settle();
     assert.equal(a.store.settings.puzzleIncorrectSound, value ? 'default' : 'none');
@@ -130,7 +133,7 @@ test('incorrect sounds can be muted independently in puzzles and practice and re
   assert.equal(a.store.settings.puzzleIncorrectSound, 'default');
 });
 
-test('both puzzle sounds share the event dropdown, pitch and speed layout and save live tuning', async t => {
+test('both puzzle sounds share the event dropdown, volume, pitch and speed layout and save live tuning', async t => {
   const {a} = setup(t), played = [];
   a.replace('triggerAudio', (...args) => played.push(args));
   a.call('toggleSettings');
@@ -141,20 +144,20 @@ test('both puzzle sounds share the event dropdown, pitch and speed layout and sa
     assert.equal(controls.querySelector('.set-row > .set-lbl').textContent, label);
     assert.ok(controls.querySelector('.lib-dd-field'));
     assert.equal(controls.querySelector('.set-seg'), null);
-    assert.deepEqual([...controls.querySelectorAll('.set-fx-knob .set-lbl')].map(n => n.textContent), ['Pitch', 'Speed']);
-    const [pitch, speed] = controls.querySelectorAll('input[type=range]');
+    assert.deepEqual([...controls.querySelectorAll('.set-fx-knob .set-lbl')].map(n => n.textContent), ['Volume', 'Pitch', 'Speed']);
+    const [, pitch, speed] = controls.querySelectorAll('input[type=range]');
     pitch.value = -4;pitch.dispatchEvent(new a.dom.window.Event('input'));pitch.dispatchEvent(new a.dom.window.Event('change'));
     speed.value = 1.35;speed.dispatchEvent(new a.dom.window.Event('input'));speed.dispatchEvent(new a.dom.window.Event('change'));
     await a.run('_settingsWriteQueue');
     assert.equal(a.store.settings.soundFx[event].pitch, -4);
     assert.equal(a.store.settings.soundFx[event].speed, 1.35);
-    assert.deepEqual(played.at(-1).slice(1), [-4, 1.35, 1]);
+    assert.deepEqual(played.at(-1).slice(1), [-4, 1.35, event === 'puzzleSuccess' ? .25 : 1]);
   }
   const controls = () => doc.querySelector('.set-puzzle-incorrect');
-  [...controls().querySelectorAll('.lib-dd-opt')].find(b => b.textContent === 'Sound 03').click();
+  [...controls().querySelectorAll('.lib-dd-opt')].find(b => b.textContent === 'Retro Wobble').click();
   await settle();await a.run('_settingsWriteQueue');await settle();
-  assert.equal(a.store.settings.puzzleIncorrectSound, '03');
-  assert.deepEqual(played.at(-1), ['https://extension.test/sounds/fx/chess_sound_03.wav', -4, 1.35, 1]);
+  assert.equal(a.store.settings.puzzleIncorrectSound, 'retro-wobble');
+  assert.deepEqual(played.at(-1), ['https://extension.test/sounds/Wrong/retro-wobble.wav', -4, 1.35, 1]);
   [...controls().querySelectorAll('.lib-dd-opt')].find(b => b.textContent === 'Off').click();
   await settle();await a.run('_settingsWriteQueue');await settle();
   const count = played.length;
@@ -200,7 +203,7 @@ test('practice plays success once for an accepted answer and stays silent for wr
   assert.deepEqual(played, []);
   await a.call('practiceAttempt', 'e2', 'e4');
   await a.call('practiceAttempt', 'e2', 'e4');
-  assert.equal(played.length, 1);assert.match(played[0], /01-warm-marimba\.wav$/);
+  assert.equal(played.length, 1);assert.match(played[0], /04-soft-retro\.wav$/);
 });
 
 async function learning(t) {

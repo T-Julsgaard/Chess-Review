@@ -130,7 +130,7 @@ test('Time attack starts at three minutes, advances on success or failure, and e
   await solve(w);assert.equal(w.run.solved,1);assert.equal(data['learning:v1'].bests.timeAttack,1);
   const first=w.run.results[0].id;await wrong(w);
   assert.equal(w.run.lives,2);assert.equal(w.run.solved,1);assert.notEqual(w.activity.id,first);
-  assert.deepEqual([...w.root.querySelectorAll('.puzzle-run-history li')].map(n=>n.getAttribute('aria-label')),['Puzzle 1: solved','Puzzle 2: incorrect']);
+  assert.deepEqual([...w.root.querySelectorAll('.puzzle-run-history li')].map(n=>n.getAttribute('aria-label')),w.run.results.map(r=>`Puzzle rated ${r.rating}: ${r.correct?'solved':'incorrect'}`));
   await wrong(w);await wrong(w);
   assert.equal(w.run,null);assert.equal(w.result.reason,'Out of lives');assert.equal(w.result.solved,1);assert.equal(w.result.mistakes,3);
   assert.equal(w.result.results.length,4);assert.equal(data['learning:v1'].challenges.length,1);
@@ -230,7 +230,9 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} result badges select p
   const {w,dom,data}=await setup(t,{puzzles:[{...line,rating:400},...fixtures.map(p=>({...p,rating:3000}))]});
   t.mock.method(w,'waitForPuzzleReply',async()=>true);
   await w.startRatedPuzzles();await w.navigate('puzzles');
-  await w.startPuzzleRun(mode);await solve(w);await wrong(w);
+  await w.startPuzzleRun(mode);await solve(w);
+  assert.equal(w.root.querySelector('.puzzle-run-history li > span:last-child').textContent,'400');
+  await wrong(w);
   if(w.run)await w.finishChallenge('Ended early');
   const result=w.result,saved=structuredClone(data['learning:v1']),heading=w.root.querySelector('.learn-results h2').textContent;
   const finalTurn=w.root.querySelector('.puzzle-turn-cue').textContent;
@@ -241,7 +243,9 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} result badges select p
   const controls=()=>[...w.root.querySelectorAll('.puzzle-run-results button:not(.learn-square)')].map(n=>n.textContent);
   const originalControls=controls();
   const badges=w.root.querySelectorAll('.puzzle-run-history button');
-  assert.equal(badges.length,2);assert.match(badges[0].getAttribute('aria-label'),/Replay puzzle 1: solved/);
+  assert.equal(badges.length,2);
+  assert.deepEqual([...badges].map(n=>n.lastElementChild.textContent),['400','3000']);
+  assert.deepEqual([...badges].map(n=>n.getAttribute('aria-label')),['Replay puzzle rated 400: solved','Replay puzzle rated 3000: incorrect']);
   badges[0].focus();badges[0].click();
   for(let i=0;i<30;i++)await Promise.resolve();
   assert.equal(w.activity.id,result.results[0].id);assert.equal(w.activity.step,0);assert.equal(w.activity.rated,false);
@@ -351,6 +355,84 @@ for(const elapsed of [179999,180000])test(`Time attack ${elapsed<180000?'accepts
   await solve(w);
   if(w.run)await w.finishChallenge('Ended early');
   assert.equal(w.result.solved,elapsed<180000?1:0);
+});
+
+for(const elapsed of [179999,180000])test(`Time attack reconciles 31 attempts with two mistakes when the last answer arrives at ${elapsed}ms`,async t=>{
+  const puzzles=Array.from({length:32},(_,i)=>({...mate,id:'score-'+i,rating:450+i*40}));
+  const {w,data}=await setup(t,{puzzles});
+  await w.startPuzzleRun('timeAttack');clearInterval(w.ticker);
+  let now=0;w.run.clock=new ChallengeClock(180,()=>now);w.run.clock.ready();
+  for(let number=1;number<=30;number++) {
+    if(number===28||number===30)await wrong(w);else await solve(w);
+  }
+  assert.equal(w.root.querySelector('[data-run-score]').textContent,'28');
+  const finalId=w.activity.id;
+  now=elapsed;
+  // Expiry during the accepted solve's record write must keep its point and tile.
+  const set=w.store.storage.set.bind(w.store.storage);
+  t.mock.method(w.store.storage,'set',async values=>{now=180001;await set(values);});
+  await solve(w);
+  const accepted=elapsed<180000,score=accepted?29:28,attempts=accepted?31:30;
+  assert.equal(w.result.reason,'Time is up');
+  assert.equal(w.result.solved,score);assert.equal(w.result.best,score);
+  assert.equal(w.result.results.length,attempts);
+  assert.equal(w.result.results.filter(r=>r.correct).length,score);
+  assert.deepEqual(w.result.results.filter(r=>!r.correct).map(r=>r.number),[28,30]);
+  assert.equal(w.result.results.some(r=>r.id===finalId&&r.correct),accepted);
+  assert.equal(w.root.querySelector('[data-run-score]').textContent,String(score));
+  assert.equal(w.root.querySelector('.run-record strong').textContent,String(score));
+  assert.equal(w.root.querySelectorAll('.puzzle-run-history li.solved').length,score);
+  assert.equal(w.root.querySelectorAll('.puzzle-run-history li.missed').length,2);
+  assert.equal(data['learning:v1'].bests.timeAttack,score);
+  assert.equal(data['learning:v1'].challenges.at(-1).solved,score);
+  assert.deepEqual(data['learning:v1'].challenges.at(-1).results,w.result.results);
+  await w.store.load();assert.equal(w.store.value.bests.timeAttack,score);
+  await w.replayRunPuzzle(w.result.results.at(-1).id);
+  assert.equal(w.root.querySelector('[data-run-score]').textContent,String(score));
+});
+
+test('the 31st solve updates its checkmark, score and record in the same render before saving or timeout',async t=>{
+  const puzzles=Array.from({length:32},(_,i)=>({...mate,id:'atomic-score-'+i,rating:450+i*40}));
+  const {w,data}=await setup(t,{puzzles});
+  await w.startPuzzleRun('timeAttack');clearInterval(w.ticker);
+  let now=0;const run=w.run;run.clock=new ChallengeClock(180,()=>now);run.clock.ready();
+  for(let i=0;i<30;i++)await solve(w);
+  const renders=[],render=w.render.bind(w);
+  t.mock.method(w,'render',(...args)=>{
+    const value=render(...args);
+    if(w.feedback?.status==='completed'&&!w.activity?.replay)renders.push({
+      score:w.root.querySelector('[data-run-score]')?.textContent,
+      best:w.root.querySelector('.run-record strong')?.textContent,
+      checks:w.root.querySelectorAll('.puzzle-run-history li.solved').length
+    });
+    return value;
+  });
+  const saving=Promise.withResolvers(),blocked=Promise.withResolvers();
+  t.after(()=>blocked.resolve());
+  const set=w.store.storage.set.bind(w.store.storage);let held=false;
+  t.mock.method(w.store.storage,'set',async values=>{
+    if(!held){held=true;saving.resolve();await blocked.promise;}
+    await set(values);
+  });
+  const move=current(w).solution[w.activity.step];now=179999;
+  const answer=w.submitPuzzle(move);await saving.promise;
+  // The timer and a duplicate input arrive while the accepted solve is saving.
+  now=180001;const ending=w.finishChallenge('Time is up');
+  await w.submitPuzzle(move);
+  blocked.resolve();await Promise.all([answer,ending]);
+  assert.ok(renders.length);
+  for(const snapshot of renders)assert.deepEqual(snapshot,{score:'31',best:'31',checks:31});
+  assert.equal(w.result.solved,31);assert.equal(w.result.best,31);
+  assert.equal(w.result.results.length,31);assert.ok(w.result.results.every(r=>r.correct));
+  assert.equal(w.result.results.at(-1).number,31);
+  assert.equal(data['learning:v1'].bests.timeAttack,31);
+  assert.equal(data['learning:v1'].challenges.length,1);
+  assert.equal(data['learning:v1'].challenges[0].solved,31);
+  assert.deepEqual(data['learning:v1'].challenges[0].results,w.result.results);
+  assert.equal(w.root.querySelector('[data-run-score]').textContent,'31');
+  assert.equal(w.root.querySelector('.run-record strong').textContent,'31');
+  assert.equal(w.root.querySelectorAll('.puzzle-run-history li.solved').length,31);
+  assert.equal(w.root.querySelector('.puzzle-run-summary'),null);
 });
 
 test('timer keeps running during replies and expiry cancels pending work without counting a partial solve',async t=>{

@@ -11,9 +11,15 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     window.readyBefore=before.fen();window.readyMoves=[];w.onPuzzleMove=san=>readyMoves.push(san);
     w.puzzles=[{id:'ready-audit',fen:after.fen(),setup:{fen:before.fen(),move:'d7d5'},solution:['e4d5','d8d5','b1c3'],rating:450,themes:[]}];
     window.startCues=[];
+    window.startModeCues=[];window.knockoutAudio=[];
+    const bufferSource=AudioContext.prototype.createBufferSource;
+    AudioContext.prototype.createBufferSource=function(){
+      const source=bufferSource.call(this),start=source.start.bind(source);
+      source.start=(...args)=>{knockoutAudio.push({duration:source.buffer.duration,state:this.state});return start(...args);};return source;
+    };
     const {createRunStartSound}=await import('./lib/learning/run-start-sound.js');
     w.runStartSound=createRunStartSound(window,()=>m.S.settings);
-    const play=w.runStartSound.play;w.runStartSound.play=step=>{startCues.push(step);play(step);};
+    const play=w.runStartSound.play;w.runStartSound.play=(step,mode)=>{startCues.push(step);startModeCues.push([step,mode]);play(step,mode);};
   })`);
   const capture=async name=>{
     const shot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
@@ -55,11 +61,43 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await run("import('./analysis.js').then(m=>m.learningWorkspace.submitPuzzle('e4d5'))");
     assert.equal(await run("import('./analysis.js').then(m=>m.learningWorkspace.run.correctMoves)"),1);
   }
+  for(const [width,height,motion,reduced] of [[1280,800,true,false],[390,844,false,false],[320,640,true,true]]){
+    await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);
+    await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:reduced?'reduce':'no-preference'}]},review.sessionId);
+    await run(`import('./analysis.js').then(async m=>{
+      await m.learningWorkspace.navigate('puzzles');m.S.settings.moveAnim=${motion};m.S.settings.sound=true;m.S.settings.soundVolume=15;
+      m.learningWorkspace.refreshSettings();window.startCues=[];window.startModeCues=[];window.readyMoves=[];window.knockoutAudio=[];
+      document.querySelector('[data-focus=knockout]').scrollIntoView({block:'center'});
+    })`);
+    const point=await run("(()=>{const r=document.querySelector('[data-focus=knockout]').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()");
+    await call('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',buttons:1,clickCount:1},review.sessionId);
+    await call('Input.dispatchMouseEvent',{type:'mouseReleased',...point,button:'left',buttons:0,clickCount:1},review.sessionId);
+    await waitFor(review,"!!document.querySelector('.puzzle-run-start[data-mode=knockout][data-step=\"1\"]')",'One-life intro');
+    const state=await run(`import('./analysis.js').then(m=>{
+      const w=m.learningWorkspace,e=w.runStartOverlay,b=e.getBoundingClientRect(),c=e.firstChild.getBoundingClientRect();
+      return {mode:e.dataset.mode,stock:getComputedStyle(e).getPropertyValue('--mode-stock').trim(),title:e.querySelector('.puzzle-run-start-title').textContent,
+        lives:w.run.lives,clock:w.run.clock,busy:w.busy,waiting:w.currentFen()===readyBefore&&!readyMoves.length,
+        leaf:getComputedStyle(e.querySelector('.puzzle-flip-in')).animationName,fits:c.left>=b.left&&c.right<=b.right&&c.top-7>=b.top&&c.bottom+4<=b.bottom};
+    })`);
+    assert.equal(state.mode,'knockout');assert.equal(state.stock,'#eaa18e');assert.equal(state.title,'One life');
+    assert.equal(state.lives,1);assert.equal(state.clock,null);assert.equal(state.busy,true);assert.equal(state.waiting,true);
+    assert.equal(state.leaf==='none',!motion||reduced);assert.equal(state.fits,true);
+    await sleep(300);await capture(`knockout-ready-${width}`);
+    await run("import('./analysis.js').then(m=>m.learningWorkspace.submitPuzzle('e4d5'))");
+    assert.equal(await run("import('./analysis.js').then(m=>m.learningWorkspace.run.correctMoves)"),0);
+    await waitFor(review,"document.querySelector('.puzzle-run-start[data-mode=knockout]')?.dataset.step==='Go!'",'Knockout bell');
+    await capture(`knockout-go-${width}`);
+    assert.deepEqual(await run('startModeCues'),[['1','knockout'],['Go!','knockout']]);
+    assert.deepEqual(await run('knockoutAudio'),[{duration:.16,state:'running'},{duration:.84,state:'running'}]);
+    await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace.busy&&!m.learningWorkspace.runStartOverlay)",'Knockout intro clears');
+    await run("import('./analysis.js').then(m=>m.learningWorkspace.submitPuzzle('e4d5'))");
+    assert.equal(await run("import('./analysis.js').then(m=>m.learningWorkspace.run.correctMoves)"),1);
+  }
   await run("import('./analysis.js').then(async m=>{const w=m.learningWorkspace;await w.navigate('puzzles');void w.startPuzzleRun('timeAttack');})");
   await waitFor(review,"!!document.querySelector('.puzzle-run-start')",'Second countdown');
   await run("document.querySelector('[data-focus=puzzle-overview]').click()");
   await waitFor(review,"!!document.querySelector('.puzzle-mode-grid')&&!document.querySelector('.puzzle-run-start')",'Cancel returns to overview');
   await sleep(3200);
   assert.equal(await run("import('./analysis.js').then(m=>!m.learningWorkspace.run&&!m.learningWorkspace.activity&&!m.learningWorkspace.runStartOverlay)"),true);
-  console.log(JSON.stringify({ok:true,out,checks:['three-second readiness countdown','clock and input gating','generated sound cue sequence','desktop and mobile layout','reduced motion','cancellation']},null,2));
+  console.log(JSON.stringify({ok:true,out,checks:['three-second Time attack countdown','one-life Knockout intro','clock and input gating','generated Knockout audio plays in a real AudioContext','desktop and mobile layout','reduced motion','cancellation']},null,2));
 }

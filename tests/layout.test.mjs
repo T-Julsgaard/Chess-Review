@@ -79,7 +79,8 @@ test('small saved canvases keep their own bounds and do not upscale',async t=>{
 test('native Engine uses scrolling, and custom Engine respects its content scale and resize floor',async t=>{
   const a=layout(t);a.viewport(1366,768);await a.call('initTabZoom');const mod=a.dom.window.document.querySelector('[data-mod=engine]');
   Object.defineProperty(mod.querySelector('.engine-body'),'scrollHeight',{configurable:true,value:1000});
-  a.call('fitEnginePanel');assert.equal(mod.style.minHeight,'');assert.equal(mod.style.height,'');
+  const height=mod.style.height;
+  a.call('fitEnginePanel');assert.equal(mod.style.minHeight,'');assert.equal(mod.style.height,height,'Long engine content scrolls without growing the fitted panel');
   a.state.layoutMode='custom';a.state.layout.engine.h=20;a.call('applyLayoutMode');
   assert.equal(a.state.layout.engine.h,120*a.state.layout.engine.scale);
 });

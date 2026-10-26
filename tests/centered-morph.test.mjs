@@ -36,6 +36,21 @@ test('board expands uniformly on a straight path with no upward arc or overshoot
   ]);
 });
 
+test('Full HD learning balances its vertical margins without changing board size or horizontal placement',()=>{
+  const board={x:309.36,y:107.8,width:734.85};
+  for(const height of [919,920,960,1080]){
+    const input={width:1920,height,top:52.2,board};
+    const before=fullSizeLearningLayout(input),centered=fullSizeLearningLayout({...input,balanceVertically:true});
+    assert.equal(centered.boardSize,before.boardSize);assert.equal(centered.boardX,before.boardX);assert.equal(centered.panelX,before.panelX);
+    const bottom=height-input.top-centered.boardY-centered.boardSize;
+    assert.ok(Math.abs(centered.boardY-bottom)<1e-8);
+    assert.equal(centered.panelY,centered.boardY);assert.equal(centered.panelHeight,centered.boardSize);
+    if(height===920)assert.ok(centered.boardY<before.boardY,'Normal Full HD browser window should move up');
+  }
+  const tablet={width:820,height:1180,board};
+  assert.deepEqual(fullSizeLearningLayout({...tablet,balanceVertically:true}),fullSizeLearningLayout(tablet),'Stacked layouts keep their existing placement');
+});
+
 test('return animation converts screen movement through a scaled review ancestor',()=>{
   assert.deepEqual(boardExpansionFrames({x:80,y:130,width:600},{x:100,y:150,width:500},.8),[
     {transform:'translate(-25px, -25px) scale(1.2)'},

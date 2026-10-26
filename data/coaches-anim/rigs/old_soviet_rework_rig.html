@@ -22,7 +22,7 @@
 @media (prefers-reduced-motion:reduce){#figure,#head,.stm{animation:none}}
 </style>
 <div class="coach-wrap">
-<svg class="coach-svg" viewBox="0 0 680 760" role="img" xmlns="http://www.w3.org/2000/svg"><title>Soviet coach portrait</title><desc>A gruff late-60s man with a black fur ushanka, bushy grey eyebrows and moustache, dark wool cardigan, holding a steaming glass of tea in a metal podstakannik. His expression can change and the cup can be raised.</desc>
+<svg class="coach-svg" viewBox="0 0 680 760" role="img" xmlns="http://www.w3.org/2000/svg"><title>Soviet coach portrait</title><desc>A gruff late-60s man with a black fur ushanka, bushy grey eyebrows and moustache, dark wool cardigan, holding a steaming glass of tea in a metal podstakannik. Between lessons he sips tea, ponders, chuckles, winks, whistles and occasionally nods off.</desc>
 <g id="figure">
 <g id="torso">
 <path d="M108 760 L108 712 Q118 666 176 646 Q236 624 300 656 Q340 674 380 656 Q444 624 504 646 Q562 666 572 712 L572 760 Z" fill="#17171A"/>
@@ -72,11 +72,13 @@
 </g>
 <path id="mouth" d="M310 582 Q340 581 370 582 Q340 583 310 582 Z" fill="#6E3B30"/>
 <path d="M312 590 Q340 596 368 590" stroke="#C98B6E" stroke-width="2" fill="none" opacity="0.6"/>
+<g id="moustache">
 <path d="M340 506 Q362 496 392 498 Q420 502 416 540 Q414 568 392 568 Q372 564 356 540 Q346 524 340 520 Q334 524 324 540 Q308 564 288 568 Q266 568 264 540 Q260 502 288 498 Q318 496 340 506 Z" fill="#A0A0A0"/>
 <path d="M340 506 Q318 522 290 524 Q270 526 266 542 Q286 540 308 526 Q326 516 340 518 Q354 516 372 526 Q394 540 414 542 Q410 526 390 524 Q362 522 340 506 Z" fill="#828282"/>
 <path d="M300 510 l-8 44 M320 512 l-6 46 M360 512 l6 46 M380 510 l8 44" stroke="#bcbcbc" stroke-width="1.4" fill="none" opacity="0.6"/>
 </g>
-</g><g id="cupgroup">
+</g>
+</g><g id="cuprig"><g id="cupgroup">
 <path d="M232 800 Q236 726 286 706 L330 704 Q354 712 358 738 L354 800 Z" fill="#17171A"/>
 <path d="M300 712 Q278 716 278 734 Q278 752 300 754" stroke="#8E949B" stroke-width="10" fill="none" stroke-linecap="round"/>
 <path d="M300 714 Q282 718 282 734 Q282 750 300 752" stroke="#E2E6EA" stroke-width="3" fill="none" stroke-linecap="round"/>
@@ -101,6 +103,7 @@
 </g>
 </g>
 </g>
+</g>
 </svg>
 <div class="coach-ctrl">
 <button data-emo="neutral" class="on">Neutral</button>
@@ -116,6 +119,11 @@
 <button id="c-shake">Shake</button>
 <button id="c-shrug">Shrug</button>
 <button id="c-whistle">Whistle</button>
+<button id="c-sip">Sip tea</button>
+<button id="c-ponder">Ponder</button>
+<button id="c-chuckle">Chuckle</button>
+<button id="c-wink">Wink</button>
+<button id="c-doze">Doze</button>
 <button id="c-raise">Raise cup</button>
 <button id="c-cycle">Auto-cycle: off</button>
 <span class="coach-sep"></span>
@@ -131,3 +139,4 @@
 </div>
 </div>
 <script src="old_soviet_rework_rig.js"></script>
+<script src="pointer-gaze.js"></script>

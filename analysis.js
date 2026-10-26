@@ -318,19 +318,20 @@ const DEFAULT_SETTINGS = {
   boardTheme: "maple", pieceStyle: "image", sound: true,
   // Master volume (0–100) applied to every sound the extension plays.
   soundVolume: 50,
-  puzzleSuccessSound: "warm-marimba",
+  puzzleSuccessSound: "soft-retro",
   puzzleIncorrectSound: "default",
   // Custom board colours (used when boardTheme === "custom" — the colour-picker chip, shown first).
   boardCustomLight: "#f9f9f9", boardCustomDark: "#e1a652",
   // Per-event sound mapping + knobs (see FX_SOUNDS / SOUND_EVENTS). snd = an FX_SOUNDS id or "default"
-  // (the original cue); pitch in semitones; speed is a duration multiplier (1 = unchanged).
+  // (the original cue); pitch in semitones; speed is a duration multiplier (1 = unchanged), volume 0–100.
   soundFx: {
-    move:    { snd: "default", pitch: 0, speed: 1 },
-    capture: { snd: "default", pitch: 0, speed: 1 },
-    check:   { snd: "default", pitch: 0, speed: 1 },
-    castle:  { snd: "default", pitch: 0, speed: 1 },
-    puzzleSuccess: { pitch: 0, speed: 1 },
-    puzzleIncorrect: { pitch: 0, speed: 1 },
+    move:    { snd: "default", pitch: 0, speed: 1, volume: 100 },
+    capture: { snd: "default", pitch: 0, speed: 1, volume: 100 },
+    check:   { snd: "default", pitch: 0, speed: 1, volume: 100 },
+    castle:  { snd: "default", pitch: 0, speed: 1, volume: 100 },
+    puzzleSuccess: { pitch: 0, speed: 1, volume: 100 },
+    puzzleIncorrect: { pitch: 0, speed: 1, volume: 100 },
+    runStart: { volume: 100 },
   },
   // Best-move arrow (the engine's recommendation in the current position)
   bestArrow: true, bestArrowColor: "#85ae4a", arrowOpacity: 0.65, arrowShaft: 0.2, arrowHead: 0.4,
@@ -531,11 +532,17 @@ const FX_SOUNDS = [
   ["09", "Sound 09", "sounds/fx/chess_sound_09.wav"],
 ];
 const PUZZLE_SUCCESS_SOUNDS = [
+  ["soft-retro", "Soft Retro", "sounds/success/04-soft-retro.wav", .25],
   ["warm-marimba", "Warm Marimba", "sounds/success/01-warm-marimba.wav"],
   ["crystal-chime", "Crystal Chime", "sounds/success/02-crystal-chime.wav"],
   ["gentle-piano", "Gentle Piano", "sounds/success/03-gentle-piano.wav"],
-  ["soft-retro", "Soft Retro", "sounds/success/04-soft-retro.wav", .25],
   ["airy-bloom", "Airy Bloom", "sounds/success/05-airy-bloom.wav"],
+];
+const PUZZLE_INCORRECT_SOUNDS = [
+  ["default", "Try Again", "sounds/Wrong/Incorrect.mp3"],
+  ["soft-descent", "Soft Descent", "sounds/Wrong/soft-descent.wav"],
+  ["retro-wobble", "Retro Wobble", "sounds/Wrong/retro-wobble.wav"],
+  ["wooden-knock", "Wooden Knock", "sounds/Wrong/wooden-knock.wav"],
 ];
 function puzzleSuccessChoice() {
   const id = S.settings.puzzleSuccessSound;
@@ -551,7 +558,7 @@ const SOUND_EVENTS = [
 ];
 const _fxFileById = (id) => (FX_SOUNDS.find(([x]) => x === id) || [])[2] || null;
 const _eventDef = (ev) => SOUND_EVENTS.find(([k]) => k === ev) || SOUND_EVENTS[0];
-// Per-event config { snd, pitch, speed }, with safe fallbacks for old/missing stored settings.
+// Per-event config { snd, pitch, speed, volume }, with safe fallbacks for old/missing stored settings.
 function fxConfig(ev) {
   const c = (S.settings.soundFx && S.settings.soundFx[ev]) || {};
   let snd = c.snd === "default" || _fxFileById(c.snd) ? c.snd : "default";
@@ -559,9 +566,10 @@ function fxConfig(ev) {
   if (ev === "puzzleIncorrect") {
     const id = S.settings.puzzleIncorrectSound;
     // Preserve On/Off choices saved by the earlier toggle.
-    snd = id === false || id === "none" ? "none" : _fxFileById(id) ? id : "default";
+    snd = id === false || id === "none" ? "none" : PUZZLE_INCORRECT_SOUNDS.some(([key]) => key === id) ? id : "default";
   }
-  return { snd, pitch: Number.isFinite(+c.pitch) ? +c.pitch : 0, speed: +c.speed > 0 ? +c.speed : 1 };
+  const volume = c.volume == null || !Number.isFinite(+c.volume) ? 100 : Math.max(0, Math.min(100, +c.volume));
+  return { snd, pitch: Number.isFinite(+c.pitch) ? +c.pitch : 0, speed: +c.speed > 0 ? +c.speed : 1, volume };
 }
 function setFx(ev, field, val) {
   if (field === "snd" && (ev === "puzzleSuccess" || ev === "puzzleIncorrect")) {
@@ -573,7 +581,7 @@ function setFx(ev, field, val) {
   // shared DEFAULT_SETTINGS object (settings are loaded with a shallow spread).
   const fx = { ...(S.settings.soundFx || {}) };
   fx[ev] = { ...fxConfig(ev), [field]: val };
-  if (ev === "puzzleSuccess" || ev === "puzzleIncorrect") delete fx[ev].snd;
+  if (ev === "puzzleSuccess" || ev === "puzzleIncorrect" || ev === "runStart") delete fx[ev].snd;
   S.settings.soundFx = fx;
   return writeSettings({ soundFx: { [ev]: { [field]: val } } });
 }
@@ -582,7 +590,7 @@ function fxUrl(ev) {
   const cfg = fxConfig(ev);
   if (cfg.snd === "none") return null;
   if (ev === "puzzleSuccess") return _url(puzzleSuccessChoice()[2]);
-  if (ev === "puzzleIncorrect") return _url(_fxFileById(cfg.snd) || "sounds/Wrong/Incorrect.mp3");
+  if (ev === "puzzleIncorrect") return _url(PUZZLE_INCORRECT_SOUNDS.find(([id]) => id === cfg.snd)[2]);
   if (cfg.snd === "default") return _url(_eventDef(ev)[2]);
   return _url(_fxFileById(cfg.snd) || _eventDef(ev)[2]);
 }
@@ -671,7 +679,7 @@ function triggerFx(ev) {
   const url = fxUrl(ev);
   if (!url) return;
   const volume = ev === "puzzleSuccess" ? puzzleSuccessChoice()?.[3] ?? 1 : 1;
-  triggerAudio(url, cfg.pitch, cfg.speed, volume);
+  triggerAudio(url, cfg.pitch, cfg.speed, volume * cfg.volume / 100);
 }
 function triggerAudio(url, pitch = 0, speed = 1, volume = 1) {
   const ctx = audioCtx();
@@ -1686,7 +1694,7 @@ async function openLearning() {
     settings:()=>S.settings, flipped:S.flipped, book:()=>BOOK || {}, startDrag, onPuzzleWrong:playWrongSound, onPuzzleMove:playSanSound, onOpeningMove:playSanSound, onFreeMove:playSanSound, onPuzzleSuccess:playPuzzleSuccess,
     createAnalysisEngine:()=>createEngine({Hash:S.settings.engineHash, "Skill Level":S.settings.engineSkill}),
     navigationButton:document.getElementById("learningToggle"),
-    embedded:{stage:UI.canvas, boardWrap:UI.boardWrap, fen:sourceFen, startDrag,
+    embedded:{stage:UI.canvas, boardWrap:UI.boardWrap, fen:sourceFen, reviewFen:activePos().fen, startDrag,
       restoreBoard:()=>{
         paintBoard({restoring:true});
         if(wasAnalysis){renderEvalBar();renderPlayers();renderControls();renderReview();renderEngineCurrent();}
@@ -1829,6 +1837,9 @@ function applyLayout() {
   UI.canvas.classList.remove("desktop-layout");
   const reference=fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,S.qbreakExpanded);
   UI.canvas.classList.toggle('full-hd-reference',!!reference);
+  UI.canvas.classList.toggle('reference-components',!isCustomLayout()||!!reference);
+  UI.canvas.style.setProperty('--reference-factor',reference?reference.review.scale/(DEFAULT_LAYOUT.review.scale*.87):1);
+  UI.canvas.closest('.app').style.setProperty('--reference-chrome-scale',reference?Math.max(1,reference.review.scale/(DEFAULT_LAYOUT.review.scale*.87)):1);
   const boxes=isCustomLayout()?S.layout:reference;
   for (const mod of UI.canvas.querySelectorAll(".mod")) applyPanelBox(mod,boxes?.[mod.dataset.mod]);
   fitEnginePanel();
@@ -3437,9 +3448,9 @@ async function setCoachPlain(plain) {
 
 /* ---------------- Animated coach avatar ----------------
    The lifelike portraits live as self-contained rig HTML files (one per personality) that expose a
-   uniform postMessage API. They use inline scripts, so they're declared as sandboxed pages in the
-   manifest and embedded via <iframe> here; we drive them purely with postMessage (emotion/look/
-   talk/gestures/prop). Personalities without a built rig (or "Off") simply hide the module. */
+   uniform postMessage API. They load as extension pages in an <iframe>; animation commands use
+   postMessage (emotion/look/talk/gestures/prop). The parent also hit-tests the painted SVG so pressing
+   the character reacts without blocking the transparent space. Unbuilt rigs and "Off" hide the module. */
 const COACH_RIG_DIR = "data/coaches-anim/rigs/";
 const COACH_RIGS = {
   mentor: "animated_mentor_rig.html",
@@ -3465,20 +3476,97 @@ let _coachId = null;           // which rig is currently mounted
 let _coachIdleT = null, _coachGlanceT = null, _coachIdleStarted = false;
 let _coachGlanceUntil = 0;     // suppress idle look-around until this timestamp (board glance in progress)
 let _coachTalking = false;
+let _coachPointerActive = false, _coachPointerRAF = null, _coachPointerPoint = null;
+let _coachPointerBound = false;
 const COACH_SETTLE_MS = 250, COACH_REACTION_HOLD_MS = 1200;
 let _coachReactionT = null, _coachReactAt = -Infinity, _coachEmotion = null;
+let _coachSovietHeadAt = -Infinity;
 
 function resetCoachAnimation() {
+  clearCoachPointer();
   for (const timer of [_coachReactionT, _coachIdleT, _coachGlanceT, _coachSpecialT, _coachCupT]) clearTimeout(timer);
   _coachReactionT = _coachIdleT = _coachGlanceT = _coachSpecialT = _coachCupT = null;
   _coachIdleStarted = false; _coachGlanceUntil = 0; _coachCupUp = false;
   _coachTalking = false; _coachReactAt = -Infinity; _coachEmotion = null;
+  _coachSovietHeadAt = -Infinity;
 }
 
 function coachSend(cmd) {
   if (_coachFrame && _coachReady && _coachFrame.contentWindow) {
     try { _coachFrame.contentWindow.postMessage(cmd, "*"); } catch {}
   }
+}
+// The portrait lets clicks pass through, so observe the pointer in the parent document.
+// Coalesce movement into one message per paint, using the current scaled frame bounds.
+function clearCoachPointer() {
+  if (_coachPointerRAF !== null) cancelAnimationFrame(_coachPointerRAF);
+  _coachPointerRAF = null; _coachPointerPoint = null;
+  if (_coachPointerActive) coachSend({ coachCmd: "pointer", value: null });
+  _coachPointerActive = false;
+}
+function coachHitTest(x, y) {
+  if (!_coachReady || !_coachFrame || S.reorganize) return false;
+  const rect = _coachFrame.getBoundingClientRect();
+  if (!rect.width || !rect.height || x < rect.left || x >= rect.right || y < rect.top || y >= rect.bottom) return false;
+  try {
+    // Probe the stacking order without letting the otherwise transparent iframe capture input.
+    const previous = _coachFrame.style.pointerEvents;
+    try {
+      _coachFrame.style.pointerEvents = "auto";
+      if (document.elementFromPoint(x, y) !== _coachFrame) return false;
+    } finally { _coachFrame.style.pointerEvents = previous; }
+    // Use the rig's painted SVG shapes; its empty background must still pass clicks through.
+    const target = _coachFrame.contentDocument?.elementFromPoint(
+      (x - rect.left) * _coachFrame.clientWidth / rect.width,
+      (y - rect.top) * _coachFrame.clientHeight / rect.height);
+    return !!target?.closest("#figure");
+  } catch { return false; }
+}
+function bindCoachPointer() {
+  if (_coachPointerBound) return;
+  _coachPointerBound = true;
+  let pressedPointer = null, suppressClick = false;
+  const consume = ev => { ev.preventDefault(); ev.stopImmediatePropagation(); };
+  document.addEventListener("pointerdown", ev => {
+    if (ev.button !== 0 || ev.isPrimary === false) return;
+    pressedPointer = null; suppressClick = false;
+    if (!coachHitTest(ev.clientX, ev.clientY)) return;
+    pressedPointer = ev.pointerId; suppressClick = true;
+    consume(ev);
+    coachSend({ coachCmd: "shake" });
+  }, true);
+  document.addEventListener("pointerup", ev => {
+    if (pressedPointer === null || ev.pointerId !== pressedPointer) return;
+    pressedPointer = null; consume(ev);
+  }, true);
+  document.addEventListener("click", ev => {
+    if (!suppressClick) return;
+    suppressClick = false; consume(ev);
+  }, true);
+  const cancelPress = () => { pressedPointer = null; suppressClick = false; };
+  document.addEventListener("pointercancel", cancelPress);
+  window.addEventListener("blur", cancelPress);
+  document.addEventListener("pointermove", ev => {
+    if (ev.pointerType === "touch" || !_coachReady || document.hidden) return;
+    _coachPointerPoint = { x: ev.clientX, y: ev.clientY };
+    if (_coachPointerRAF !== null) return;
+    _coachPointerRAF = requestAnimationFrame(() => {
+      _coachPointerRAF = null;
+      if (!_coachFrame || !_coachReady || !_coachPointerPoint) return;
+      const rect = _coachFrame.getBoundingClientRect(), p = _coachPointerPoint;
+      const dx = Math.max(rect.left - p.x, 0, p.x - rect.right);
+      const dy = Math.max(rect.top - p.y, 0, p.y - rect.bottom);
+      if (!rect.width || !rect.height || Math.hypot(dx, dy) > 100) { clearCoachPointer(); return; }
+      _coachPointerActive = true;
+      coachSend({ coachCmd: "pointer", value: { x: (p.x - rect.left) / rect.width, y: (p.y - rect.top) / rect.height } });
+    });
+  }, { passive: true });
+  document.addEventListener("pointerleave", clearCoachPointer);
+  document.addEventListener("pointercancel", clearCoachPointer);
+  document.addEventListener("scroll", clearCoachPointer, { capture: true, passive: true });
+  document.addEventListener("visibilitychange", clearCoachPointer);
+  window.addEventListener("blur", clearCoachPointer);
+  window.addEventListener("resize", clearCoachPointer);
 }
 // (Re)mount the iframe for the active personality. Reuses the frame if the coach hasn't changed.
 function renderCoachAvatar() {
@@ -3495,6 +3583,7 @@ function renderCoachAvatar() {
     return;
   }
   if (mod) mod.hidden = false;
+  bindCoachPointer();
   if (id === _coachId && _coachFrame) return;   // same coach already mounted → keep it (no fl/reset)
   resetCoachAnimation();
   _coachId = id; _coachReady = false;
@@ -3539,12 +3628,40 @@ let _coachCupT = null, _coachCupUp = false;
 // old_soviet's sip: raise the cup, hold 2–4s, then lower — on its OWN timer, so moving to the
 // next move can't cut it short, and a re-trigger while it's already up is ignored. Never touches his
 // emotion (raise only moves the cup), and it's thinned a little so it's not on every eligible move.
-function coachSipCup() {
-  if (_coachCupUp || Math.random() > 0.21) return;   // only ~21% of eligible triggers raise the cup
+function coachSipCup(chance = 0.21) {
+  if (_coachCupUp || (chance < 1 && Math.random() >= chance)) return;
   _coachCupUp = true;
   coachSend({ coachCmd: "raise", value: true });
   clearTimeout(_coachCupT);
   _coachCupT = setTimeout(() => { coachSend({ coachCmd: "raise", value: false }); _coachCupUp = false; }, 2000 + Math.random() * 2000);
+}
+// Mutually exclusive actions leave room for expression-only reactions. Head gestures are
+// restrained even when rapidly browsing a run of good moves; tea keeps its own lowering timer.
+const SOVIET_REACTIONS = {
+  exceptional: [["nod", 0.35], ["tea", 0.15]],
+  positive: [["nod", 0.18], ["tea", 0.10]],
+  ordinary: [["tea", 0.05]],
+  negative: [["shake", 0.12], ["eyeRoll", 0.28]],
+  blunder: [["shake", 0.25], ["eyeRoll", 0.30]],
+};
+function coachSovietReaction(cls) {
+  const group = {brilliant:"exceptional", great:"exceptional", best:"positive", excellent:"positive",
+    good:"ordinary", book:"ordinary", inacc:"negative", mistake:"negative", miss:"negative", blunder:"blunder"}[cls];
+  let r = Math.random();
+  for (const [cmd, chance] of SOVIET_REACTIONS[group] || []) {
+    r -= chance;
+    if (r >= 0) continue;
+    if (cmd === "tea") coachSipCup(1);
+    else {
+      if (cmd === "nod" || cmd === "shake") {
+        const now = performance.now();
+        if (now - _coachSovietHeadAt < 8000) return;
+        _coachSovietHeadAt = now;
+      }
+      coachSend({coachCmd:cmd});
+    }
+    return;
+  }
 }
 function coachSpecial() {
   if (_coachId === "old_soviet") { coachSipCup(); return; }
@@ -3589,6 +3706,7 @@ function coachApplyReaction(idx) {
   clearTimeout(_coachGlanceT);
   _coachGlanceT = setTimeout(() => coachSend({ coachCmd: "look", value: "center" }), 1500);
   if (idx > 0) {
+    if (_coachId === "old_soviet") { coachSovietReaction(cls); return; }
     const r = Math.random();
     if (cls === "brilliant" || cls === "great") { coachSend({ coachCmd: "nod" }); coachSpecial(); }
     else if (cls === "best" || cls === "excellent") { coachSend({ coachCmd: "nod" }); if (r < 0.5) coachSpecial(); }
@@ -3609,7 +3727,9 @@ function startCoachIdle() {
   const dirs = ["left", "right", "up", "upleft", "upright", "downright", "center", "center"];
   const tick = () => {
     _coachIdleT = setTimeout(() => {
-      if (_coachReady && !document.hidden && performance.now() > _coachGlanceUntil && !_coachTalking) {
+      if (_coachReady && !document.hidden && !_coachPointerActive && performance.now() > _coachGlanceUntil && !_coachTalking) {
+        // His longer vignettes own the head, face and tea until a review reaction interrupts.
+        if (_coachId === "old_soviet") { coachSend({ coachCmd: "ambient" }); tick(); return; }
         coachSend({ coachCmd: "look", value: dirs[Math.floor(Math.random() * dirs.length)] });
         const r = Math.random();
         if (r < 0.10) coachSend({ coachCmd: "nod" });
@@ -4118,10 +4238,12 @@ function renderGraph() {
   const pts = [];
   for (let p = 0; p <= S.total; p++) { if (!S.evals[p]) break; pts.push({ ply: p, cp: scoreToCp(S.evals[p]) }); }
   const graphKey = JSON.stringify([S.total,S.settings.graphStyle || "area",pts,S.classif]);
+  const markerVisible = S.idx > 0 && S.idx < S.total;
   const retained = UI.graphRefs;
   if (retained?.key === graphKey && retained.marker.isConnected) {
     const x = String(toX(Math.min(S.idx,maxPly)));
     if (retained.marker.getAttribute("x1") !== x) { retained.marker.setAttribute("x1",x); retained.marker.setAttribute("x2",x); }
+    retained.marker.style.display = markerVisible ? "" : "none";
     return;
   }
   let line = "", fill = "";
@@ -4132,7 +4254,7 @@ function renderGraph() {
   const dots = pts.filter((s) => ["blunder", "mistake", "miss", "brilliant", "great"].includes(S.classif[s.ply]));
   const markerX = toX(Math.min(S.idx, maxPly));
   const midLine = `<line x1="0" y1="${mid}" x2="${W}" y2="${mid}" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 3"/>`;
-  const marker = `<line class="eval-position" x1="${markerX}" y1="0" x2="${markerX}" y2="${H}" stroke="var(--accent)" stroke-width="1.5" opacity="0.7"/>`;
+  const marker = `<line class="eval-position" x1="${markerX}" y1="0" x2="${markerX}" y2="${H}" stroke="var(--accent)" stroke-width="1.5" opacity="0.7" style="display:${markerVisible ? "" : "none"}"/>`;
   const style = S.settings.graphStyle || "area";
   // Classification dots are drawn on every style except the bare "minimal" one.
   const dotsSvg = style === "minimal" ? "" : dots.map((s) =>
@@ -5036,11 +5158,13 @@ function visualSettings() {
     ),
     section("Sound",
       toggleRow("Sound effects", "sound"),
-      slider("Volume", "soundVolume", 0, 100, 1, { fmt: (v) => v + " %" }),
-      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Pick a sound for each event, then shape it with the pitch and speed knobs. Changes preview as you make them.")),
+      slider("Master volume", "soundVolume", 0, 100, 1, { fmt: (v) => v + " %" }),
+      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Pick a sound for each event, then adjust its volume, pitch and speed. Each volume is relative to the master volume. Changes preview as you make them.")),
       fxEventControls("puzzleSuccess", "Puzzle success"),
       fxEventControls("puzzleIncorrect", "Incorrect puzzle"),
       ...SOUND_EVENTS.map(([key, label]) => fxEventControls(key, label)),
+      el("div", { class: "set-fx", "data-sound-event": "runStart" },
+        fxSlider("runStart", "volume", "Puzzle intro volume", 0, 100, 1, (v) => v + " %")),
     ),
     el("button", { class: "set-reset", onclick: resetVisualSettings }, "Reset to default"),
   );
@@ -5058,14 +5182,14 @@ function coachPicker() {
   dropdown.classList.add("coach-dropdown");
   return el("div", { class: "set-row" }, el("span", { class: "set-lbl" }, "Coach"), dropdown);
 }
-// Controls for one event: a sound dropdown plus pitch and speed knobs.
+// Controls for one event: a sound dropdown plus volume, pitch and speed knobs.
 // Everything previews on change. The dropdown re-renders the panel so its label updates;
 // the sliders save + preview live without a rebuild (so the drag isn't interrupted).
 function fxEventControls(ev, label) {
   const cfg = fxConfig(ev);
   let opts = [["default", "Lichess"], ...FX_SOUNDS.map(([id, l]) => [id, l])];
   if (ev === "puzzleSuccess") opts = [...PUZZLE_SUCCESS_SOUNDS.map(([id, label]) => [id, label]), ["none", "Off"]];
-  else if (ev === "puzzleIncorrect") {opts[0] = ["default", "Incorrect"];opts.push(["none", "Off"]);}
+  else if (ev === "puzzleIncorrect") opts = [...PUZZLE_INCORRECT_SOUNDS.map(([id, label]) => [id, label]), ["none", "Off"]];
   const cls = ev === "puzzleSuccess" ? " set-puzzle-success" : ev === "puzzleIncorrect" ? " set-puzzle-incorrect" : "";
   return el("div", { class: "set-fx" + cls, "data-sound-event": ev },
     el("div", { class: "set-row" }, el("span", { class: "set-lbl" }, label),
@@ -5074,6 +5198,7 @@ function fxEventControls(ev, label) {
         triggerFx(ev);
         if (UI.settings && !UI.settings.hidden) renderSettings();
       })),
+    fxSlider(ev, "volume", "Volume", 0, 100, 1, (v) => v + " %"),
     fxSlider(ev, "pitch", "Pitch", -12, 12, 1, (v) => (v > 0 ? "+" : "") + v + " st"),
     fxSlider(ev, "speed", "Speed", 0.5, 2, 0.05, (v) => (+v).toFixed(2) + "×"),
   );
@@ -5082,12 +5207,13 @@ function fxEventControls(ev, label) {
 // drag survives); previewing on change (release) keeps the cue from machine-gunning while dragging.
 function fxSlider(ev, field, label, min, max, step, fmt) {
   const out = el("b", {}, fmt(fxConfig(ev)[field]));
+  const eventLabel = {puzzleSuccess: "Puzzle success", puzzleIncorrect: "Incorrect puzzle", runStart: "Puzzle intro"}[ev] || _eventDef(ev)[1];
   return el("div", { class: "set-ctrl set-fx-knob" },
     el("div", { class: "set-ctrl-top" }, el("span", { class: "set-lbl" }, label), out),
     el("input", {
-      type: "range", min, max, step, value: fxConfig(ev)[field],
+      type: "range", min, max, step, value: fxConfig(ev)[field], "aria-label": eventLabel + " " + field,
       oninput: (e) => { const v = +e.target.value; out.textContent = fmt(v); setFx(ev, field, v); },
-      onchange: () => triggerFx(ev),
+      onchange: () => { if (ev !== "runStart") triggerFx(ev); },
     }),
   );
 }
@@ -5619,8 +5745,10 @@ function removeMoveCallout() {
 }
 function clearPracticeResult() {
   if (!S.practice?.resultBadge) return;
+  const square = sqByName[S.practice.resultBadge.square];
   S.practice.resultBadge = null;
-  UI.boardWrap.querySelectorAll('.puzzle-result-badge').forEach(n => {n.parentElement.classList.remove('has-badge');n.remove();});
+  square?.classList.remove('has-badge');
+  square?.querySelectorAll('.puzzle-result-badge').forEach(n => n.remove());
 }
 function exitPractice() {
   if (!S.practice) return;
@@ -5723,23 +5851,36 @@ function practiceAdvance() {
   practiceRoll(p.spots[p.i] - 1, practiceEnterSolve);   // roll from where we are to the next mistake
 }
 // Flash the from/to squares green (good) or red (bad) as quick feedback.
+const practiceFlashTimers = new WeakMap();
 function flashSquares(names, kind) {
   const cls = kind === "good" ? "flash-good" : "flash-bad";
-  for (const n of names) {
-    const sq = sqByName[n]; if (!sq) continue;
+  const squares = names.map(n => sqByName[n]).filter(Boolean);
+  for (const sq of squares) {
+    clearTimeout(practiceFlashTimers.get(sq));
+    sq.classList.remove("flash-good", "flash-bad");
+  }
+  // Repeated attempts on the same squares must replay the fade from its start.
+  if (squares.length) void squares[0].offsetWidth;
+  for (const sq of squares) {
     sq.classList.add(cls);
-    setTimeout(() => sq.classList.remove(cls), 680);
+    practiceFlashTimers.set(sq, setTimeout(() => {
+      sq.classList.remove(cls); practiceFlashTimers.delete(sq);
+    }, 680));
   }
 }
 // Short "buzz" on the board to make a rejected move feel like a wrong answer (instead of the
 // piece just silently snapping back). The class is removed once the keyframes finish.
+const practiceBuzzTimers = new WeakMap();
 function buzzBoard() {
   const board = UI.boardWrap && UI.boardWrap.querySelector(".board");
   if (!board) return;
+  clearTimeout(practiceBuzzTimers.get(board));
   board.classList.remove("buzz");
   void board.offsetWidth;             // restart the animation if it's still mid-buzz
   board.classList.add("buzz");
-  setTimeout(() => board.classList.remove("buzz"), 420);
+  practiceBuzzTimers.set(board, setTimeout(() => {
+    board.classList.remove("buzz"); practiceBuzzTimers.delete(board);
+  }, 420));
 }
 // Reveal the answer for the current practice spot: light up the engine's best move (the piece
 // it starts from + its target square) with the analytical highlight.
@@ -5779,6 +5920,7 @@ async function practiceAttempt(from, to, promotion = "q") {
     UI.boardWrap.querySelectorAll('.puzzle-result-badge').forEach(n => {n.parentElement.classList.remove('has-badge');n.remove();});
     p.solving = false;              // lock out further attempts until the next spot
     S.practiceHint = null;
+    S.selectedSq = null; renderSelection();
     // Visually play the correct move so the piece lands on its square and STAYS there for a beat
     // — confirming the answer instead of snapping straight back.
     const fromSq = sqByName[mv.from], toSq = sqByName[mv.to];
@@ -5811,12 +5953,15 @@ async function practiceAttempt(from, to, promotion = "q") {
     renderControls(); renderReview();
     setTimeout(() => { if (S.practice === p) practiceAdvance(); }, 1300);
   } else {
-    p.resultBadge = {solvePos, square:mv.from, status:"incorrect"};
+    const result = p.resultBadge = {solvePos, square:mv.from, status:"incorrect"};
+    setTimeout(() => {
+      if (S.practice === p && p.resultBadge === result) clearPracticeResult();
+    }, 1000);
     p.fails = (p.fails || 0) + 1;
+    S.selectedSq = null; paintBoard(); renderControls(); renderReview();
     flashSquares([mv.from, mv.to], "bad");
     buzzBoard();
     playWrongSound();
-    S.selectedSq = null; paintBoard(); renderControls(); renderReview();
   }
 }
 
@@ -6599,6 +6744,24 @@ async function initTabZoom() {
   // A reset also restores 100% after deliberate manual browser zoom.
   _zoomInit=null;
 }
+function dismissStartup() {
+  document.body.removeAttribute("data-starting");
+  const root = document.getElementById("root");
+  root.removeAttribute("inert");
+  root.removeAttribute("aria-busy");
+  document.getElementById("startup")?.remove();
+}
+async function showReadyWorkspace() {
+  if (!document.body.hasAttribute("data-starting")) return;
+  // Decode the actual saved piece set, including a flipped board, before revealing it.
+  // A missing image must not leave the workspace stuck behind the startup screen.
+  await Promise.all([...document.querySelectorAll("#boardWrap .piece-img")].map(img => img.decode?.().catch(() => {})));
+  await new Promise(resolve => requestAnimationFrame(() => {
+    alignPlayers();
+    dismissStartup();
+    resolve();
+  }));
+}
 (async function main() {
   try {
     if(screenPreview){
@@ -6607,10 +6770,7 @@ async function initTabZoom() {
       await screenPreview.configure(await platformAPI.storage.local.get(screenPreview.viewport?null:["settings","layout","layoutMode","layoutVersion"]),snapshot);
     }
     else await resetSettingsForRelease({ reason: "startup" });
-    // Only the job + stored prefs are needed to build and show the UI. The opening book (~690 KB)
-    // and the calibration file are only consumed once scoring/opening refinement runs, so we load
-    // them in parallel and don't block the first paint on them — buildUI() can run as soon as the
-    // job and settings are in, while the book is still downloading.
+    // Load review data alongside the job and preferences while the startup mark is visible.
     const dataReady = blankLaunch&&!location.hash&&!screenPreview ? Promise.resolve()
       : Promise.all([loadBook(), loadCalibration().catch(error => {console.warn(error);return null;})]);
     const [payload, store] = await Promise.all([loadJob(), browserAPI.storage.local.get(["settings", "username", "layout", "layoutMode", "layoutVersion", "library"])]);
@@ -6662,11 +6822,8 @@ async function initTabZoom() {
 
     S.username = store.username || "";
 
-    // Everything the first render needs must be resolved BEFORE buildUI(), so that buildUI() and
-    // applyGame() run back-to-back with no await between them — i.e. the browser paints the whole
-    // page in one frame. Any await in that gap lets the empty shell paint first, and since the
-    // Moves panel is the only module whose header is built in buildUI() (the rest are empty mounts
-    // filled by renderAll()), that intermediate frame showed the Moves panel sitting on its own.
+    // Resolve review data before mounting. The startup screen also covers async work inside
+    // applyGame(), such as remembering the player's identity, so the empty shell never paints.
     await dataReady;         // book + calibration (downloaded in parallel; usually already resolved)
     if(blankLaunch&&!location.hash&&payload.source!=="blank"&&!screenPreview)
       await Promise.all([loadBook(),loadCalibration().catch(error=>{console.warn(error);return null;})]);
@@ -6685,14 +6842,14 @@ async function initTabZoom() {
     buildUI();               // built once; switching games re-uses it (no full page reload)
     if(S.blank)showBlankWorkspace();
     else await applyGame(payload);
+    // Fit and reveal the board as soon as it can paint; engine analysis continues normally.
+    await initTabZoom();
+    await showReadyWorkspace();
     // Two-phase load: now that initialization succeeded, remove the job data so it doesn't accumulate.
     const jobId = location.hash.replace(/^#/, "");
     if (jobId && rememberReviewJob()) {
       await browserAPI.storage.local.remove(`job:${jobId}`);
     }
-    // Fit the desktop composition or custom canvas; narrow windows retain the responsive grid.
-    initTabZoom();
-    requestAnimationFrame(alignPlayers); // measure the board after the first layout
     if (!screenPreview) learningAnnouncement = mountLearningAnnouncement({document, storage:browserAPI.storage.local,
       motion:()=>S.settings.moveAnim!==false});
     if(screenPreview?.viewport){
@@ -6706,6 +6863,8 @@ async function initTabZoom() {
         close:async()=>{const tab=await platformAPI.tabs.getCurrent();if(tab?.id!=null)await platformAPI.tabs.remove(tab.id);}});
     }
   } catch (err) {
+    document.getElementById("root").hidden = true;
+    dismissStartup();
     const e = document.getElementById("error");
     e.hidden = false;
     e.textContent = "Error: " + err.message;

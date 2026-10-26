@@ -1,90 +1,70 @@
 # Layout at 100% browser zoom
 
-The current Full HD review pass restores the approved pre-redesign composition
-at 100% browser zoom. It converts the original coordinates and content scales
-together, with scoped component styles, rather than stretching the panel grid.
-It applies to 1800–2000px wide, 880–1100px high viewports, covering the 1920 × 1080
-screen with browser chrome. Other sizes retain the responsive layout below while
-the Full HD appearance is reviewed.
+The approved 1920 × 1080 composition is the reference for automatic layouts.
+Its panel coordinates and content scales are converted together from the original
+87% arrangement. The original 1800–2000px wide, 880–1100px high viewport result
+is preserved exactly, including the narrower Settings panel.
 
-`node scripts/learning-browser.mjs --working-tree --full-hd-reference` renders
-revision `8516f684` at 87% and the prototype at 100% in separate test extensions.
-It compares panel and content dimensions in physical pixels, saves paired
-screenshots, and checks that Reorganize, Reset, and reload preserve the result.
+Larger desktops grow the board, panels and their contents together, up to twice
+the reference size. The toolbar and Settings grow with them. Ultrawide windows
+center the composition rather than stretching the columns across all available
+width. Laptop windows keep a content scale floor: their board and scrollable
+panel bodies adapt to the available space instead of making all text tiny.
 
-The Full HD review viewport clips panels that expand below the window instead
-of adding page scrolling. Individual panel bodies still scroll. The move-list
-highlight converts screen distances back to layout pixels when following a
-move, and updates without a color transition during rapid navigation.
-
-Learning fades use the individual `translate` property so panel content scales
-remain intact. Board return motion converts translations through the review's
-scaled ancestor. `--review-interactions` records entry/return frames and checks
-interruption, reduced motion, expanded viewport bounds, and rapid move following.
-
-Review startup and Reset layout restore 100% browser zoom. Window resizing uses
-the actual CSS viewport and never changes browser zoom. A manual zoom choice
-made after startup remains available for accessibility.
-
-The automatic review uses CSS grid, real panel dimensions and normal text sizes.
-It does not scale or zoom the whole document. The board stays square. The chosen
-panel order is retained: review above Moves and Accuracy, with Evaluation,
-Engine, playback and Solve Puzzles below them.
-
-| Available viewport | Review behavior | Learning behavior |
+| Available viewport | Review | Learning |
 | --- | --- | --- |
-| At least 1100px wide and 600px high | Board beside two panel columns; all panels and playback fit the window. Long panel contents scroll within their panels. | Board and content beside each other. |
-| 820–1099px wide, or a wide window under 600px high | Board, commentary, moves and playback first; remaining panels follow vertically. | Side by side from 980px; otherwise board and content stack. |
-| Under 820px wide | Board and playback first; all review panels remain available below. | Board and content stack, with local scrolling and navigation to the current activity. |
-| At least 2200px wide and 1200px high | Larger board, columns, labels and controls; board capped at 1400px to keep the workspace coherent on 4K and ultrawide displays. | Wide desktops retain a separate Settings gutter. |
+| At least 1100px wide and 600px high | Reference composition with two panel columns. All collapsed panels fit. Only panel bodies scroll. | Board and UI beside each other, centered vertically beneath the toolbar. The visible UI reaches the review column's right edge. |
+| 820–1099px wide, or a wide window below 600px high | Board, commentary, moves and playback first; other panels follow below. | Side by side from 980px; otherwise board and UI stack. |
+| Below 820px wide | Board and playback first, followed by all remaining panels. Text keeps its normal size. | Board and UI stack, with navigation and local scrolling to the active exercise. |
 
-The top bar is 52px tall. On narrow screens its controls compact to fit rather
-than introducing horizontal scrolling. Settings stays within the viewport and
-scrolls internally. The popup uses its own native 320–360px layout.
+Panel styling is shared across these arrangements: normal panel labels, move
+rows, Accuracy categories, Engine controls and Insight typography retain the
+reference character. Narrow windows reflow the layout instead of shrinking a
+desktop screenshot. Portrait and landscape use the actual available CSS viewport.
 
-Custom panel arrangements retain their saved coordinates and content scales.
-Only the custom canvas gets a local transform when the window is smaller than
-the arrangement. Drag deltas are converted back to canvas coordinates, and
-opening Reorganize preserves the responsive panels' measured dimensions.
+Desktop page bounds stay fixed when Accuracy expands; content extending beyond
+the viewport is clipped. Panel bodies can still scroll. Narrow and short windows
+scroll vertically so every section remains reachable. No layout requires
+horizontal page scrolling.
 
-Learning reserves a Settings gutter on desktops at least 1600px wide. On laptops
-and tablets Settings overlays the content without moving it; reserving a fixed
-334px gutter there would unnecessarily force the board above the lesson.
+Learning preserves the real board and its straight expansion/return animation.
+Translations are converted through scaled ancestors. The tab indicator converts
+painted coordinates back into content coordinates, including interrupted tab
+animations. Panel fades use individual translate animations to preserve content
+scale. The active move follows immediately during rapid review navigation.
 
-The former default commentary size of 18px migrates once to 16px. Other chosen
-sizes are retained, and the migration marker protects later custom choices.
+Settings stays anchored at the right edge. It has a separate gutter on large
+desktops and overlays the workspace on smaller windows without reflowing it.
+The popup retains its independent 320–360px layout. Custom arrangements retain
+their saved coordinates and scales; Reset returns to the current automatic fit.
+Opening Reorganize captures the current panel geometry and content scales.
+
+Review startup and Reset restore 100% browser zoom. Resizing never changes browser
+zoom; a later manual zoom remains available. Display scaling is represented by
+the CSS viewport, independently of browser zoom.
 
 ## Verification
 
-`node scripts/learning-browser.mjs --working-tree --native-zoom` runs the real
-extension in an isolated Chrome profile. It records screenshots and geometry
-in `web-ext-artifacts`, with an HTML gallery and JSON measurements.
+Run these against the working tree in an isolated Chrome extension profile:
 
-Coverage includes every preset from the Screen sizes tool:
+- `node scripts/learning-browser.mjs --working-tree --responsive-reference`
+  renders every screen preset, browser toolbar allowances, rotated tablets and
+  phones, and short windows. It checks review, both Settings tabs, learning
+  destinations and active puzzles, and writes a screenshot gallery and geometry.
+- `node scripts/learning-browser.mjs --working-tree --review-interactions`
+  checks entry/return frames across desktop and laptop sizes, exact learning
+  alignment, expanded Accuracy, interruption, reduced motion, and rapid move
+  following at several content scales and in narrow layouts.
+- `node scripts/learning-browser.mjs --working-tree --full-hd-reference`
+  compares Full HD panel/content dimensions with revision 8516f684 at 87%, then
+  checks Reorganize, Reset and reload against the approved physical sizes.
+- `--viewport-preview` checks the live Screen sizes viewer, rotation, fullscreen,
+  and isolation from saved user data.
 
-| Group | Display sizes |
-| --- | --- |
-| Desktop | 1920 × 1080, 2560 × 1440, 3840 × 2160, 3440 × 1440 |
-| Laptop | 1280 × 720, 1366 × 768, 1440 × 900, 1536 × 864, 1920 × 1200 |
-| Tablet | 768 × 1024, 820 × 1180, 1024 × 1366 |
-| Phone | 320 × 568, 390 × 844, 430 × 932 |
+Presets include Full HD, QHD, 4K and ultrawide desktops; 1280, 1366, 1440, 1536
+and 1920px laptops; 768, 820 and 1024px tablets; and 320, 390 and 430px phones.
+Desktop/laptop runs include 120px and 160px browser toolbar allowances. Browser
+screenshots and emulation supplement geometry assertions; they do not constitute
+physical-device testing.
 
-Desktop and laptop cases also reserve 120px and 160px for browser chrome.
-Additional checks cover short windows and landscape orientations; expanded
-Accuracy; panel editing, Reset and reload; migration from 87% zoom; both Settings
-tabs; light theme; opening lessons; puzzles; both run modes and their results;
-and expanded manual entry in the popup.
-Display densities of 125%, 150%, and 200% are also emulated while the browser
-zoom remains at 100%.
-
-`--viewport-preview`, `--panel-groups`, and `--navigation` provide additional
-checks for the live preview, real pointer gestures, saving, keyboard navigation
-and returning between review and learning. `scripts/release-layout.mjs
---working-tree` additionally exercises real browser window resizing rather than
-only emulated CSS viewports. `npm test`, `npm run verify:source`, and `npm run lint`
-remain required checks.
-
-Phone and short-window cases intentionally scroll vertically. Full desktop and
-laptop compositions must have no page overflow, no overlapping panels, and no
-controls outside the window. Screenshot review supplements those measurements;
-the emulated sizes do not constitute testing on physical mobile devices.
+Run `npm test`, `npm run verify:source`, and `npm run lint` for source changes.

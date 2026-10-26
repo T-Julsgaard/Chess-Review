@@ -16,6 +16,7 @@ if (process.argv.includes('--working-tree')) {
   for (const file of files) await fs.copyFile(path.join(root,file),path.join(source,file));
   // Keep the workspace and its progress/input dependencies from the same revision.
   await fs.cp(path.join(root,'lib'),path.join(source,'lib'),{recursive:true});
+  await fs.cp(path.join(root,'icons'),path.join(source,'icons'),{recursive:true});
 }
 await fs.appendFile(path.join(source,'analysis.js'),'\nexport {S, learningWorkspace, openLearning, go, toggleFlip, applyLayoutMode, applyUserMove, paintBoard, exitAnalysis};\n');
 if(process.argv.includes('--viewport-preview'))await fs.appendFile(path.join(source,'analysis.js'),'\nglobalThis.__viewportAudit={S,openLearning,workspace:()=>learningWorkspace,fit:()=>_fittedDip};\n');
@@ -47,7 +48,11 @@ try {
   await call('Browser.setWindowBounds',{windowId,bounds:{width:1920,height:1080}});await sleep(400);
   const {auditLearning}=await import(process.argv.includes('--puzzle-slider')?'./puzzle-slider-audit.mjs':process.argv.includes('--puzzle-ui')?'./puzzle-ui-audit.mjs':process.argv.includes('--openings')?'./openings-audit.mjs':process.argv.includes('--concept-notice')?'./concept-notice-audit.mjs':process.argv.includes('--run-notice')?'./puzzle-run-notice-audit.mjs':process.argv.includes('--run-layout')?'./puzzle-run-layout-audit.mjs':process.argv.includes('--puzzle-speed')?'./puzzle-speed-audit.mjs':process.argv.includes('--statistics')?'./puzzle-statistics-audit.mjs':process.argv.includes('--panel-groups')?'./panel-groups-audit.mjs':process.argv.includes('--screen-previews')?'./screen-previews-audit.mjs':process.argv.includes('--popup-workspace')?'./popup-workspace-audit.mjs':'./learning-audit.mjs');
   const runAudit=process.argv.includes('--native-zoom')?(await import('./native-zoom-audit.mjs')).auditLearning:process.argv.includes('--announcement')?(await import('./learning-announcement-audit.mjs')).auditLearning:process.argv.includes('--run-start')?(await import('./puzzle-run-start-audit.mjs')).auditLearning:process.argv.includes('--review-chrome')?(await import('./learning-chrome-transition-audit.mjs')).auditLearning:process.argv.includes('--viewport-preview')?(await import('./viewport-preview-audit.mjs')).auditLearning:process.argv.includes('--navigation')?(await import('./learning-navigation-audit.mjs')).auditLearning:auditLearning;
-  if(process.argv.includes('--run-dashboard'))await (await import('./run-dashboard-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
+  if(process.argv.includes('--review-return'))await (await import('./learning-chrome-transition-audit.mjs')).auditReviewReturn({review,call,evaluate,waitFor,sleep,out});
+  else if(process.argv.includes('--mode-tickets'))await (await import('./puzzle-mode-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
+  else if(process.argv.includes('--startup'))await (await import('./startup-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
+  else if(process.argv.includes('--run-dashboard'))await (await import('./run-dashboard-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
+  else if(process.argv.includes('--responsive-reference'))await (await import('./responsive-reference-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--review-interactions'))await (await import('./review-interactions-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--full-hd-reference'))await (await import('./full-hd-reference-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out,source});
   else await (process.argv.includes('--puzzle-animations')?(await import('./puzzle-animation-audit.mjs')).auditLearning:runAudit)({review,call,evaluate,waitFor,sleep,out});

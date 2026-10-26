@@ -51,12 +51,13 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     }
   }
   const grid=async()=>{
-    const boxes=await run("(()=>{const list=document.querySelector('.puzzle-run-history'),r=list.getBoundingClientRect();return [...list.children].map(n=>{const b=n.getBoundingClientRect();return {left:b.left,top:b.top,width:b.width,height:b.height,right:b.right,listRight:r.right};});})()");
+    const boxes=await run("(()=>{const list=document.querySelector('.puzzle-run-history'),r=list.getBoundingClientRect();return [...list.children].map(n=>{const b=n.getBoundingClientRect();return {left:b.left,top:b.top,width:b.width,height:b.height,right:b.right,listRight:r.right,fits:n.scrollWidth<=n.clientWidth+1&&(!n.firstElementChild.matches('button')||n.firstElementChild.scrollWidth<=n.firstElementChild.clientWidth+1)};});})()");
     assert.equal(boxes.length,26);
     const rows=new Map();
     for(const box of boxes){
       assert.ok(Math.abs(box.width-boxes[0].width)<1&&Math.abs(box.height-boxes[0].height)<1,'Puzzle cells must have uniform dimensions');
       assert.ok(box.right<=box.listRight+1,'Puzzle cells must fit their list');
+      assert.ok(box.fits,'Puzzle ratings must fit their cells');
       const row=Math.round(box.top);if(!rows.has(row))rows.set(row,box.left);
     }
     assert.ok([...rows.values()].every(left=>Math.abs(left-boxes[0].left)<1),'Each wrapped row must start at the same position');

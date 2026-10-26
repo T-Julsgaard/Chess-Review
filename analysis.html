@@ -25,8 +25,11 @@
     <link rel="preload" as="image" href="pieces-img/cburnett/bN.svg" />
     <link rel="preload" as="image" href="pieces-img/cburnett/bP.svg" />
   </head>
-  <body>
-    <div id="root"></div>
+  <body data-starting>
+    <div id="startup" role="status" aria-label="Loading chessboard">
+      <span class="startup-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    </div>
+    <div id="root" inert aria-busy="true"></div>
     <div id="error" hidden></div>
     <script type="module" src="analysis.js"></script>
   </body>

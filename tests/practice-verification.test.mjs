@@ -21,6 +21,64 @@ test('illegal practice input remains uncounted and does not lock the board',t=>{
   assert.equal(a.state.practice.fails||0,0);assert.equal(a.state.practice.solving,true);assert.equal(a.state.practice.busy,false);
 });
 
+for(const input of ['click','drag'])test(`correct practice ${input} clears legal move dots immediately while keeping the success badge`,t=>{
+  const a=practice(t),doc=a.dom.window.document,board=doc.querySelector('.board'),view=a.dom.window;
+  board.getBoundingClientRect=()=>({left:0,top:0,width:800,height:800});
+  const pointer=(target,type,x,y)=>{
+    const event=new view.MouseEvent(type,{bubbles:true,cancelable:true,button:0,buttons:type==='pointerup'?0:1,clientX:x,clientY:y});
+    Object.defineProperty(event,'pointerId',{value:1});target.dispatchEvent(event);
+  };
+  pointer(a.run('sqByName.e2'),'pointerdown',450,650);
+  assert.ok(board.querySelector('.legal'));
+  if(input==='click'){
+    pointer(view,'pointerup',450,650);
+    pointer(a.run('sqByName.e4'),'pointerdown',450,450);
+  }else{
+    pointer(view,'pointermove',450,450);
+    pointer(view,'pointerup',450,450);
+  }
+  assert.equal(a.state.practice.solving,false);
+  assert.equal(a.state.selectedSq,null);
+  assert.equal(board.querySelector('.sel, .legal, .legal-cap'),null);
+  assert.ok(a.run('sqByName.e4').querySelector('.piece-img[data-piece=wP]'));
+  assert.ok(a.run('sqByName.e4').querySelector('.puzzle-result-badge[data-result=correct]'));
+});
+
+test('correct practice captures also clear legal capture rings',t=>{
+  const a=app(t);loadGame(a,'[SetUp "1"]\n[FEN "7k/8/8/3p4/2P5/8/8/7K w - - 0 1"]\n\n1. cxd5');
+  a.state.bests[0]={bestmove:'c4d5',score:{cp:0},lines:[]};
+  a.call('computeDerived');a.call('buildUI');a.call('renderAll');
+  a.state.practice={spots:[1],i:0,solving:true,busy:false};a.state.selectedSq='c4';a.call('renderSelection');
+  const board=a.dom.window.document.querySelector('.board');
+  assert.ok(board.querySelector('.legal-cap'));
+  a.call('practiceAttempt','c4','d5');
+  assert.equal(a.state.selectedSq,null);
+  assert.equal(board.querySelector('.sel, .legal, .legal-cap'),null);
+  assert.ok(a.run('sqByName.d5').querySelector('.puzzle-result-badge[data-result=correct]'));
+});
+
+test('repeated incorrect attempts replay the full board shake and red flashes alongside the badge',t=>{
+  t.mock.timers.enable({apis:['setTimeout']});
+  const a=practice(t),board=a.dom.window.document.querySelector('.board');
+  const from=a.run('sqByName.d2'),to=a.run('sqByName.d4');
+  a.call('practiceAttempt','d2','d4');
+  assert.ok(board.classList.contains('buzz'));
+  assert.ok(from.classList.contains('flash-bad'));assert.ok(to.classList.contains('flash-bad'));
+  assert.ok(from.querySelector('.puzzle-result-badge[data-result=incorrect]'));
+  t.mock.timers.tick(300);a.call('practiceAttempt','d2','d4');
+  t.mock.timers.tick(120);
+  assert.ok(board.classList.contains('buzz'),'the previous attempt must not cut the new shake short');
+  t.mock.timers.tick(260);
+  assert.ok(from.classList.contains('flash-bad'));assert.ok(to.classList.contains('flash-bad'));
+  t.mock.timers.tick(40);assert.equal(board.classList.contains('buzz'),false);
+  t.mock.timers.tick(260);
+  assert.equal(from.classList.contains('flash-bad'),false);assert.equal(to.classList.contains('flash-bad'),false);
+  assert.ok(from.querySelector('.puzzle-result-badge[data-result=incorrect]'));
+  assert.ok(from.querySelector('.piece-img[data-piece=wP]'));
+  assert.equal(a.state.practice.fails,2);assert.equal(a.state.practice.solving,true);
+  t.mock.timers.tick(320);assert.equal(board.querySelector('.puzzle-result-badge'),null);
+});
+
 test('the first wrong practice move offers one working Hint button inside the coach message',t=>{
   const a=practice(t),doc=a.dom.window.document;
   a.call('renderReview');
