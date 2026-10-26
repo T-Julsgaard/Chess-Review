@@ -4715,7 +4715,7 @@ function updateGraphReadout(refs) {
   }
   const description = e == null ? label : e.mate != null ? `${side} has mate in ${Math.abs(e.mate)}`
     : rounded === '0.0' ? label : `${side} is ahead by ${rounded} pawns`;
-  const category = panelDesign('graph', S.settings) === 'timeline2' && S.idx > 0 && e && S.classif[S.idx]
+  const category = ['timeline2', 'bars2'].includes(panelDesign('graph', S.settings)) && S.idx > 0 && e && S.classif[S.idx]
     ? ` ${gradeLabel(S.classif[S.idx], S.moveGrades[S.idx], categoryName(S.classif[S.idx]))}.` : '';
   refs.chart.setAttribute('aria-valuenow', Math.min(S.idx, refs.lastPly));
   refs.chart.setAttribute('aria-valuetext', `${graphPositionText(S.idx)}. ${description}.${category} Positive scores favor White; negative scores favor Black.`);
@@ -4731,10 +4731,11 @@ function renderGraph() {
   if (mod) mod.hidden = !show;   // hidden, not just emptied, so the layout closes the gap
   if (!show) { UI.graph.replaceChildren(); UI.graphRefs = null; return; }
   const design = panelDesign('graph', S.settings), modern = design !== 'original', compact = design === 'minimal';
+  const bars = design === 'bars' || design === 'bars2';
   const W = 384, H = 120, mid = H / 2;
   const maxPly = Math.max(1, S.total);
-  const toX = (p) => design === 'bars' ? ((p + .5) / (maxPly + 1)) * W : (p / maxPly) * W;
-  const fromFraction = fraction => Math.round(design === 'bars' ? fraction * (maxPly + 1) - .5 : fraction * maxPly);
+  const toX = (p) => bars ? ((p + .5) / (maxPly + 1)) * W : (p / maxPly) * W;
+  const fromFraction = fraction => Math.round(bars ? fraction * (maxPly + 1) - .5 : fraction * maxPly);
   const toY = (cp) => { const c = Math.max(-500, Math.min(500, cp)); return mid - (c / 500) * (mid - 8); };
   // The "color" style flips the y-axis (White advantage pushes the boundary DOWN); the hover marker
   // re-uses whichever mapping the active style draws with, so the dot rides the visible curve.
@@ -4884,6 +4885,16 @@ function renderGraph() {
     const chart = el('div', {class: 'evalgraph clickable-graph', html: svg, role: 'slider', tabindex: 0,
       'aria-label': 'Game evaluation. Use arrow keys to explore moves.', 'aria-valuemin': 0, 'aria-valuemax': lastPly,
       onclick: jumpFromEvent, onmousemove: hoverMove, onmouseleave: hideHover, onblur: hideHover, onkeydown: onkey});
+    if (design === 'bars2') {
+      // Fixed-size HTML circles stay round even when the underlying SVG is stretched.
+      for (const p of dots.filter(p => p.ply > 0)) {
+        chart.append(el('span', {class: 'evaluation-move-dot', 'data-ply': p.ply,
+          'data-category': S.classif[p.ply], 'aria-hidden': 'true',
+          style: {left: `clamp(3.5px, ${toX(p.ply) / W * 100}%, calc(100% - 3.5px))`,
+            top: `clamp(3.5px, ${toY(p.cp) / H * 100}%, calc(100% - 3.5px))`,
+            background: QUALITY[S.classif[p.ply]].color}}));
+      }
+    }
     if (design === 'timeline2') {
       // HTML overlays keep the shared badges circular when the SVG stretches to fit the panel.
       for (const p of pts.filter(p => p.ply > 0 && NOTEWORTHY.has(S.classif[p.ply]))) {
@@ -4904,7 +4915,7 @@ function renderGraph() {
       return;
     }
     const readout = el('strong', {class: 'evaluation-score', title: 'Positive favors White; negative favors Black. M means mate.'});
-    UI.graph.replaceChildren(el('div', {class: 'panel eval-side evaluation-panel evaluation-' + design, 'data-design': design, 'aria-label': 'Evaluation'},
+    UI.graph.replaceChildren(el('div', {class: 'panel eval-side evaluation-panel evaluation-' + design + (design === 'bars2' ? ' evaluation-bars' : ''), 'data-design': design, 'aria-label': 'Evaluation'},
       readout,
       el('div', {class: 'evaluation-plot'}, chart,
         !pts.length ? el('span', {class: 'evaluation-empty'}, S.blank ? 'Load a game to see its evaluation' : 'Waiting for analysis…') : null)));

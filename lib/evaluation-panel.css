@@ -21,6 +21,12 @@
 .evaluation-move-badge.current, .evaluation-move-badge:hover { z-index: 2; box-shadow: 0 0 0 2px var(--ink); }
 .evaluation-column.white { fill: #e2dfd5; }
 .evaluation-column.black { fill: #77766d; }
+.evaluation-bars2 .evalgraph { position: relative; }
+.evaluation-move-dot {
+  position: absolute; width: 5px; height: 5px; border-radius: 50%;
+  transform: translate(-50%, -50%); box-shadow: 0 0 0 1px var(--panel);
+  pointer-events: none;
+}
 .evaluation-bars .evaluation-score { padding: 5px 7px; border-radius: 5px; font-size: 16px; letter-spacing: -.3px; background: var(--panel-3); }
 .evaluation-bars .evaluation-score[data-side="white"] { background: #e2dfd5; color: #252629; }
 .evaluation-bars .evaluation-score[data-side="black"] { background: #3b3c3e; color: #f0ede5; }

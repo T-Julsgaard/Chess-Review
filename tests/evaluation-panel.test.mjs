@@ -14,10 +14,10 @@ test('Tabs exposes Evaluation designs, saves them and preserves all analysis', a
   await a.call('toggleSettings');
   const section = [...doc.querySelectorAll('.set-section')].find(n => n.querySelector('.set-sect-head').textContent === 'Tabs');
   section.querySelector('.set-sect-head').click();
-  assert.deepEqual([...section.querySelectorAll('[data-setting="graphDesign"]')].map(n => n.textContent), ['Original','Timeline','Timeline v2','Move bars','Minimal']);
+  assert.deepEqual([...section.querySelectorAll('[data-setting="graphDesign"]')].map(n => n.textContent), ['Original','Timeline','Timeline v2','Move bars','Move bars v2','Minimal']);
   const before = JSON.stringify({evals:a.state.evals,bests:a.state.bests,idx:a.state.idx,layout:a.state.layout});
   a.replace('scheduleReanalyze', () => { throw Error('Design changes must not analyze'); });
-  for (const design of ['bars','original','timeline','timeline2','minimal']) {
+  for (const design of ['bars','bars2','original','timeline','timeline2','minimal']) {
     doc.querySelector(`[data-setting="graphDesign"][data-value="${design}"]`).click();
     await settle(); await a.run('_settingsWriteQueue');
     assert.equal(a.store.settings.graphDesign, design);
@@ -26,7 +26,7 @@ test('Tabs exposes Evaluation designs, saves them and preserves all analysis', a
   }
 });
 
-for (const design of ['timeline','timeline2','bars','minimal']) {
+for (const design of ['timeline','timeline2','bars','bars2','minimal']) {
   test(`${design} retains chart and keyboard focus while updating score and accessible position descriptions`, async t => {
     const a = review(t), doc = a.dom.window.document;
     await a.call('setSetting','graphDesign',design);
@@ -60,7 +60,7 @@ for (const design of ['timeline','timeline2','bars','minimal']) {
     const chart = doc.querySelector('#graphMount [role=slider]');
     assert.equal(chart.hasAttribute('title'), false);
     chart.getBoundingClientRect = () => ({left:0,top:0,width:400,height:120});
-    const x = design === 'bars' ? (2.5 / 5) * 400 : 200;
+    const x = design.startsWith('bars') ? (2.5 / 5) * 400 : 200;
     chart.dispatchEvent(new a.dom.window.MouseEvent('click',{clientX:x,bubbles:true}));
     assert.equal(a.state.idx,2);
     chart.dispatchEvent(new a.dom.window.MouseEvent('mousemove',{clientX:x,bubbles:true}));
@@ -121,6 +121,41 @@ test('Move bars keeps scores oriented toward White on board flips', async t => {
   a.state.flipped = true; a.call('renderGraph');
   assert.equal(doc.querySelector('.evaluation-score').textContent,'+0.6');
   assert.equal(doc.querySelector('.evaluation-panel').textContent,'+0.6');
+});
+
+test('Move bars v2 adds Timeline dots at the bar tips and updates them with classifications', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  a.state.classif = [null,'mistake','great','brilliant','blunder'];
+  await a.call('setSetting','graphDesign','bars2');
+  const chart = doc.querySelector('.evaluation-bars2 [role=slider]');
+  const dots = () => [...doc.querySelectorAll('.evaluation-move-dot')];
+  assert.equal(chart.querySelectorAll('.evaluation-column').length,5);
+  assert.equal(chart.querySelector('.evaluation-move-badge'),null);
+  assert.deepEqual(dots().map(dot => dot.dataset.ply), ['1','2','3','4']);
+  assert.deepEqual(dots().map(dot => dot.dataset.category), ['mistake','great','brilliant','blunder']);
+  assert.ok(dots().every(dot => dot.tagName === 'SPAN' && dot.getAttribute('aria-hidden') === 'true'));
+  assert.match(dots()[0].style.left, /30%/);
+  assert.ok(Math.abs(Number(dots()[0].style.top.match(/, ([\d.]+)%/)[1]) - 44.8) < 1e-8);
+  a.call('go',4);
+  assert.equal(doc.querySelector('.evaluation-score').textContent,'M3');
+  assert.match(chart.getAttribute('aria-valuetext'),/Blunder/);
+  a.state.flipped = true; a.call('renderGraph');
+  assert.equal(doc.querySelector('.evaluation-bars2 [role=slider]'),chart);
+  a.state.classif[1] = 'inacc'; a.state.classif[2] = 'miss'; a.call('renderGraph');
+  assert.deepEqual(dots().map(dot => dot.dataset.category), ['miss','brilliant','blunder']);
+  a.state.evals[3] = null; a.call('renderGraph');
+  assert.deepEqual(dots().map(dot => dot.dataset.ply), ['2']);
+  await a.call('setSetting','graphDesign','bars');
+  assert.equal(doc.querySelector('.evaluation-move-dot'),null);
+});
+
+test('Move bars v2 restores its saved choice in a blank workspace without dots', async t => {
+  const a = app(t,{url:'https://extension.test/analysis.html?workspace=blank'}), doc = a.dom.window.document;
+  a.replace('resetSettingsForRelease',async () => {});
+  a.store.settings = {graphDesign:'bars2'}; await a.start();
+  assert.equal(doc.querySelector('.evaluation-panel').dataset.design,'bars2');
+  assert.match(doc.querySelector('.evaluation-empty').textContent,/Load a game/);
+  assert.equal(doc.querySelector('.evaluation-move-dot'),null);
 });
 
 test('Minimal shows only black and white fields, with hover on the boundary and no labels or colored annotations', async t => {
