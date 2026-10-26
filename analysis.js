@@ -4462,7 +4462,7 @@ function renderStats() {
   const players = pair('acc-players' + (phaseReport2 && page === 0 ? ' phase2-players' : ''), [
     phaseReport2 && page === 0 ? el('span', {'aria-hidden': 'true'}) : null,
     ...sides.map(side => el('div', {class: 'acc-player'},
-    el('span', {class: 'acc-side ' + side, 'aria-label': side === 'w' ? 'White' : 'Black'}),
+    page === 0 ? null : el('span', {class: 'acc-side ' + side, 'aria-label': side === 'w' ? 'White' : 'Black'}),
     el('span', {class: 'acc-name'}, S.players[side].name)))]);
   const rows = {};
   let content;
@@ -4653,7 +4653,7 @@ function renderPagedStats() {
     el('div', {class: 'acc-metric-label'}, label), pair('acc-metric-values', values),
     note ? el('p', {class: 'acc-note'}, note) : null);
   const players = pair('acc-players', sides.map(side => el('div', {class: 'acc-player'},
-    el('span', {class: 'acc-side ' + side, 'aria-label': side === 'w' ? 'White' : 'Black'}),
+    page === 0 ? null : el('span', {class: 'acc-side ' + side, 'aria-label': side === 'w' ? 'White' : 'Black'}),
     el('span', {class: 'acc-name'}, S.players[side].name))));
   const rows = {};
   let content;
