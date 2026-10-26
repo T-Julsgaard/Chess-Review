@@ -19,18 +19,16 @@ function parseGameId(path) {
   return m ? { type: (m[1] || "live").toLowerCase(), id: m[2] } : null;
 }
 
-// chess.com's review/analysis URL adds ?flip=true when the board is shown from BLACK's side — i.e.
-// when YOU played Black and it sat at the bottom. That's the most reliable read of the user's own
-// perspective, so we surface it to the analysis page. Tri-state: true (flip) / false (explicit
-// white) / null (no hint — defer to the username match, which defaults to White at the bottom).
-// Accepts a few spellings so a slightly different link (flip=1, flip=yes…) still works.
+// Read explicit URL hints first, then the live board's orientation (also present on
+// game links with ?username= but no ?flip=). Null means the board isn't available yet.
 function detectFlip() {
   try {
     const v = (new URL(location.href).searchParams.get("flip") || "").trim().toLowerCase();
     if (/^(true|1|yes|on)$/.test(v)) return true;
     if (/^(false|0|no|off)$/.test(v)) return false;
   } catch {}
-  return null;
+  const board = document.querySelector("wc-chess-board, chess-board");
+  return board ? board.classList.contains("flipped") : null;
 }
 
 // Best-effort: try to collect SAN moves from the DOM move list if the API
@@ -411,7 +409,7 @@ browserAPI.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       username: detectUsername(), // POV/bottom player (or null) — kept for back-compat
       usernames: detectUsernames(), // every readable player, best → worst archive to search
       countries: detectCountries(), // { usernameLower: countryId } scraped from the player flags
-      flip: detectFlip(),         // user's board perspective from ?flip= (true=Black at bottom)
+      flip: detectFlip(),         // explicit URL hint or displayed board (true=Black at bottom)
       moveListText: parsed ? null : null, // only filled on explicit fallback below
     });
     return true;

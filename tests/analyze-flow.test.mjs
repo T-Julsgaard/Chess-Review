@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 globalThis.chrome = {};
 const { analyzeActiveTab, reloadActiveAndAnalyze, openAnalysisTab, openBlankWorkspaceTab, analyzeChesscomUrl } = await import('../analyze-flow.js');
 import {createImportRequest} from '../lib/import-request.js';
-import {deferred,settle} from './helpers/app.mjs';
+import {app,deferred,settle} from './helpers/app.mjs';
 
 function setup(t, url = 'https://www.chess.com/game/live/12345678') {
   const store = {}, opened = [], listeners = new Set();
@@ -65,6 +65,34 @@ test('missing content script and username produces a recoverable username error'
 test('active-tab imports do not permanently adopt the first detected player',async t=>{
   const s=setup(t);t.mock.method(chrome.tabs,'sendMessage',async()=>({gameId:'12345678',usernames:['SomeoneElse','TheirOpponent']}));
   await analyzeActiveTab();assert.equal(s.opened.length,1);assert.equal(s.store.username,undefined);
+});
+
+const perspectiveUrl = 'https://www.chess.com/game/live/185657116394?username=julsgaard&move=0';
+const perspectiveGame = {
+  url:'https://www.chess.com/game/live/185657116394',
+  white:{username:'JaJaMinks'},black:{username:'Julsgaard'},
+  pgn:'[Site "Chess.com"]\n[White "JaJaMinks"]\n[Black "Julsgaard"]\n[Result "0-1"]\n\n1. e4 e5 0-1',
+};
+
+for(const source of ['active','pasted'])test(`fresh ${source} import uses the link player for lookup and Black perspective`,async t=>{
+  const s=setup(t,perspectiveUrl),requests=[];
+  t.mock.method(globalThis,'fetch',async url=>{requests.push(url);return {ok:true,json:async()=>({games:[perspectiveGame]})};});
+  if(source==='active')await analyzeActiveTab();else await analyzeChesscomUrl(perspectiveUrl);
+  assert.ok(requests.length>0);assert.ok(requests.every(url=>url.includes('/player/julsgaard/')));
+  assert.equal(s.payload().meta.flip,true);assert.equal(s.store.username,undefined);
+  const a=app(t);a.replace('startAnalysis',()=>{});a.call('buildUI');
+  await a.call('applyGame',{...s.payload(),analysis:null});
+  assert.equal(a.state.flipped,true);assert.equal(a.state.players.b.name,'Julsgaard');
+  assert.equal(a.state.playerKnown,false,'A perspective hint does not establish account ownership');
+});
+
+for(const [query,domFlip,expected] of [
+  ['',false,false],['&flip=false',true,false],['&flip=true',false,true],
+])test(`active import preserves explicit or displayed orientation: ${query||'DOM'}`,async t=>{
+  const s=setup(t,perspectiveUrl+query);
+  s.store['gamecache:chesscom:185657116394']={data:perspectiveGame};
+  t.mock.method(chrome.tabs,'sendMessage',async()=>({gameId:'185657116394',flip:domFlip}));
+  await analyzeActiveTab();assert.equal(s.payload().meta.flip,expected);
 });
 
 test('active-tab lookup can use player evidence without a content script or saved username',async t=>{
