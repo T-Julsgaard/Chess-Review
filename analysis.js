@@ -173,7 +173,7 @@ const ACCURACY_INFO = "SF18 uses the published public-data move-quality model. S
 const ELO_INFO = "Both engines support both rating modes using their own models. Use recorded rating compares this game's performance with players around the rating saved in the game. Stockfish 18 uses calibrated accuracy; Stockfish 19 uses its own expected-point losses, separately from displayed accuracy. Moves only ignores the saved rating and estimates a blitz rating level from the moves themselves; it needs at least 10 moves with more than one legal choice. Neither estimate changes your account rating.";
 // Explanations for the engine settings (shown on hover, same tooltip as the accuracy panel).
 const ENGINE_INFO = {
-  engineLines:   "How many candidate moves (lines) the engine panel shows for the position you're viewing. Extra lines are searched on demand — changing this doesn't re-analyze the game.",
+  engineLines:   "How many candidate moves (lines) the engine panel shows. Extra lines are precomputed across the game after review statistics are ready. Changing this doesn't re-analyze the game.",
   classifyLines: "Lines searched for annotation and candidate inspection. Calibrated SF18 numerical scores require one analysis line. Changing this re-analyzes the game.",
   engineDepth:   "How many plies (half-moves) deep Stockfish searches each position. Higher depth gives more accurate evaluations and fewer false mistakes, but takes longer.",
   engineWorkers: "Number of Stockfish instances analysing positions in parallel. The default uses available CPU cores, up to four workers. Your selection is respected; if a worker fails to start, the review continues with the workers that did start. Search depth and scoring settings stay the same.",
@@ -2933,10 +2933,11 @@ function applyUserMove(from, to, animate = true, promotion = null) {
   renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent();
   requestLiveEval();
 }
-// Click an engine line → play the whole PV out as a variation from the shown position.
+// Open a candidate at its first move; navigation through the rest stays manual.
 function playLine(pv) {
   const ucis = (pv || "").split(/\s+/).filter(Boolean);
   if (!ucis.length) return;
+  stopLineWalk();
   if (!S.analysisMode) {
     const currentPos = activePos();
     const currentIdx = S.analysisMode && S.variation ? S.variation.idx : S.idx;
@@ -2964,17 +2965,13 @@ function playLine(pv) {
     if (!mv) break;
     v.positions.push({ fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "", eval: null, best: null });
   }
-  // Start just one move into the line (not at the end) — the rest plays out automatically.
+  // Show the candidate move and leave the remaining continuation for manual navigation.
   v.idx = Math.min(startIdx + 1, v.positions.length - 1);
   S.selectedSq = null;
-  // No best-move arrow while a clicked line plays out: the engine's best move for each position
-  // often differs from the line's next move (the PV tail is unreliable), which is confusing.
-  S.lineWalking = true;
   playSanSound(v.positions[v.idx].san);
   paintBoard();
   renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent();
   requestLiveEval();
-  startLineWalk();   // auto-step through the rest of the line (~2 s per move)
 }
 // Automatic walkthrough of the clicked engine line. Steps one move forward every
 // LINE_WALK_MS until the end of the variation. Any manual navigation (keyboard,
@@ -3125,6 +3122,7 @@ function invalidateVariationEvals() {
 }
 
 function resetLiveEngine() {
+  stopPanelPrecalculation();
   S._lastEngineLines = null;
   S._panelCache = null;
   panelLineCache.clear();
@@ -5103,43 +5101,96 @@ function renderEngineCurrent() {
     const b = S.bests[S.idx];
     let lines = b ? b.lines : null;
     if (S._panelNeedsLive && !terminalScore(S.positions[S.idx].fen)) lines = null;
-    // The batch only stored the single best line. If the user wants more, show the richer set we
-    // searched on demand for THIS position (requestPanelLines), then ensure that search is running.
+    // The scoring batch stores its own evidence; prefer the richer candidates from panel searches.
     const panel = cachedPanelLines();
-    const panelReady = !!panel;
-    if (panelReady && (!lines || panel.lines.length > lines.length)) lines = panel.lines;
-    // While the richer search for THIS position is still pending, keep the previous render's extra
-    // lines on screen so the panel doesn't shrink to one line then grow back on every move.
     const want = enginePanelLineCount();
+    const panelReady = panel?.count >= want;
+    if (panel && (!lines || panel.lines.length > lines.length)) lines = panel.lines;
+    // Keep this position's known candidates visible while a newly requested rank is pending.
     const padFromCache = want > 1 && !panelReady && !!lines && lines.length < want;
     renderEngine(lines, padFromCache);
     requestPanelLines();
   }
 }
-// Live, on-demand search of the position you're viewing on the mainline, to fill the extra engine-
-// panel candidate lines beyond the single line the batch stored. Cheap: it only runs for the
-// position currently shown, is cancelled when you navigate away, and no-ops when 1 line is enough.
+// Panel evidence is separate from calibrated scoring. Keep the richest result for each
+// position/settings/history, including when the displayed candidate count changes.
 const panelLineCache = new Map();
-function panelContextKey(i = S.idx, want = enginePanelLineCount()) {
+function panelContextKey(i = S.idx) {
   return JSON.stringify([S.positions[i]?.fen, searchHistory(S.positions, i),
     S.settings.enginePath, S.engineFallbackBuild || S.activeEngineBuild || S.settings.enginePath,
-    S.settings.engineDepth, S.settings.engineHash, S.settings.engineSkill, want]);
+    S.settings.engineDepth, S.settings.engineHash, S.settings.engineSkill]);
 }
-function cachedPanelLines() {
+function cachedPanelLines(i = S.idx) {
   if (!panelLineCache.size) return null;
-  const key = panelContextKey(), entry = panelLineCache.get(key);
+  const key = panelContextKey(i), entry = panelLineCache.get(key);
   if (entry) { panelLineCache.delete(key); panelLineCache.set(key, entry); }
   return entry;
 }
+function rememberPanelLines(i, key, count, lines) {
+  const entry = {idx: i, fen: S.positions[i].fen, count, lines};
+  if ((panelLineCache.get(key)?.count || 0) > count) return panelLineCache.get(key);
+  if (key.length <= 16384) {
+    panelLineCache.set(key, entry);
+    // Retain an entire game's precalculated positions, with a small minimum for navigation.
+    if (panelLineCache.size > Math.max(16, S.positions.length)) panelLineCache.delete(panelLineCache.keys().next().value);
+  }
+  return entry;
+}
+let panelWarmJob = null;
+function stopPanelPrecalculation() {
+  if (!panelWarmJob) return;
+  panelWarmJob.cancelled = true;
+  clearTimeout(panelWarmJob.timer);
+  panelWarmJob.engine?.terminate();
+  panelWarmJob = null;
+}
+function schedulePanelPrecalculation() {
+  if (S.blank || S.analyzing || enginePanelLineCount() <= 1 && !S._panelNeedsLive) return;
+  const context = JSON.stringify([S.batchGen, S.pgn, panelContextKey(0), enginePanelLineCount()]);
+  if (panelWarmJob?.context === context) return;
+  stopPanelPrecalculation();
+  const job = {context, cancelled: false, engine: null, idx: null, pending: null};
+  panelWarmJob = job;
+  const count = enginePanelLineCount();
+  const positions = S.positions;
+  // Let the foreground request claim the visible position first. Statistics never await this job.
+  job.timer = setTimeout(() => { job.promise = (async () => {
+    try {
+      const order = [S.idx, ...positions.map((_, i) => i).filter(i => i !== S.idx)];
+      for (const i of order) {
+        if (job.cancelled || S.positions !== positions || S.analyzing) return;
+        if (!S.bests[i]?.lines || terminalScore(positions[i].fen)) continue;
+        const key = panelContextKey(i);
+        if (S._panelRequest?.key === key && S._panelRequest.count >= count) await S._panelRequest.promise;
+        if (job.cancelled) return;
+        if (cachedPanelLines(i)?.count >= count || !S._panelNeedsLive && S.bests[i].lines.length >= count) continue;
+        if (!job.engine) job.engine = await createEngine({Hash: S.settings.engineHash, 'Skill Level': S.settings.engineSkill});
+        if (job.cancelled) { job.engine.terminate(); return; }
+        job.idx = i;
+        job.pending = job.engine.analyse(positions[i].fen, S.settings.engineDepth, count, searchHistory(positions, i));
+        const result = await job.pending;
+        if (job.cancelled || S.positions !== positions || panelContextKey(i) !== key) return;
+        const entry = rememberPanelLines(i, key, count, result.lines);
+        if (!S.analysisMode && S.idx === i) {
+          S._panelCache = entry;
+          renderEngineCurrent();
+        }
+        job.idx = null; job.pending = null;
+      }
+    } catch { /* Foreground navigation can retry an interrupted or failed background search. */ }
+    finally { job.engine?.terminate(); job.engine = null; job.idx = null; job.pending = null; }
+  })(); }, 0);
+}
 async function requestPanelLines() {
   if (S.analyzing || S.analysisMode) return;          // not during the batch, not in variation mode
+  schedulePanelPrecalculation();
   const want = enginePanelLineCount();
   if (!want || want <= 1 && !S._panelNeedsLive) {
     if (S._panelRequest) { S.panelToken++; S._panelRequest = null; S.liveEngine?.cancelPending(); S.liveEngine?.stop(); }
     return;
   }
   const key = panelContextKey();
-  if (S._panelRequest && S._panelRequest.key !== key) {
+  if (S._panelRequest && (S._panelRequest.key !== key || S._panelRequest.count !== want)) {
     S.panelToken++; S._panelRequest = null;
     S.liveEngine?.cancelPending(); S.liveEngine?.stop();
   }
@@ -5147,12 +5198,13 @@ async function requestPanelLines() {
   const stored = S.bests[i];
   if (!stored || !stored.lines) return;               // position not analysed yet
   if (stored.lines.length >= want && !S._panelNeedsLive) return;
-  if (cachedPanelLines()) return; // includes completed forced positions with fewer legal moves
+  if (cachedPanelLines()?.count >= want) return; // includes forced positions with fewer legal moves
   if (S._panelRequest?.key === key) return S._panelRequest.promise;
+  if (panelWarmJob?.idx === i && panelWarmJob.pending) return panelWarmJob.pending;
   const fen = S.positions[i].fen;
   if (terminalScore(fen)) return;
   const token = ++S.panelToken;
-  const entry = {key, promise: null};
+  const entry = {key, count: want, promise: null};
   S._panelRequest = entry;
   entry.promise = (async () => { try {
     // Publish ownership before engine startup can re-render the panel.
@@ -5162,11 +5214,7 @@ async function requestPanelLines() {
     eng.cancelPending(); eng.stop();
     const res = await eng.analyse(fen, S.settings.engineDepth, want, searchHistory(S.positions, i));
     if (token !== S.panelToken || S.idx !== i || S.analysisMode || panelContextKey() !== key) return;
-    S._panelCache = { idx: i, fen, lines: res.lines };
-    if (key.length <= 16384) {
-      panelLineCache.set(key, S._panelCache);
-      if (panelLineCache.size > 16) panelLineCache.delete(panelLineCache.keys().next().value);
-    }
+    S._panelCache = rememberPanelLines(i, key, want, res.lines);
     // Clear before rendering so a failed/uncacheable result cannot leave stale ownership.
     if (S._panelRequest === entry) S._panelRequest = null;
     renderEngine(res.lines);
@@ -5240,10 +5288,9 @@ function renderEngine(lines, padFromCache = false) {
           const evaluation = wr.mate != null ? `${cp >= 0 ? 'White' : 'Black'} can force mate in ${Math.abs(wr.mate)}`
             : cp === 0 ? 'Equal position' : `${cp > 0 ? 'White' : 'Black'} has an advantage of ${Math.abs(cp / 100).toFixed(2)} pawns`;
           return el('button', {type: 'button', class: 'engine-focus-candidate', disabled: !moves.length,
-            title: moves.join(' ') + '. ' + evaluation + '. Click to explore this variation.',
             'aria-label': `${index === 0 ? 'Best line' : 'Alternative ' + (index + 1)}: ${moves.join(' ')}. ${evaluation}. Explore variation.`,
             onclick: () => playLine(l.pv)},
-            el('span', {class: 'ev engine-focus-eval ' + (cp >= 0 ? 'pos' : 'neg'), title: evaluation}, evTxt),
+            el('span', {class: 'ev engine-focus-eval ' + (cp >= 0 ? 'pos' : 'neg')}, evTxt),
             el('span', {class: 'moves engine-focus-variation'}, ...moves.flatMap((move, i) => {
               const number = move.match(/^\d+[.…]\s*/)?.[0] || '';
               return [el('span', {class: 'engine-focus-token'},
@@ -5251,8 +5298,8 @@ function renderEngine(lines, padFromCache = false) {
                 el(i === 0 ? 'strong' : 'span', {}, move.slice(number.length))), ' '];
             })));
         }
-        // Click a line → play the whole line out as a variation (analysis mode).
-        return el("button", { type:"button", class: "engine-line clickable", tabindex:"-1", "aria-label":"Play variation " + toks.join(" ") + ", evaluation " + evTxt, onclick: () => playLine(l.pv) },
+        // Click a line to open a variation for manual navigation.
+        return el("button", { type:"button", class: "engine-line clickable", tabindex:"-1", "aria-label":"Explore variation " + toks.join(" ") + ", evaluation " + evTxt, onclick: () => playLine(l.pv) },
           el("span", { class: "ev " + (cp >= 0 ? "pos" : "neg") }, evTxt),
           el("span", { class: "moves" }, ...toks.map((t) => /^\d/.test(t) ? el("b", {}, t + " ") : el("span", {}, t + " "))),
         );
@@ -6276,6 +6323,15 @@ async function setEngineSetting(key, value) {
     if (UI.settings && !UI.settings.hidden) renderSettings();
     return;
   }
+  if (key === 'engineLines') {
+    // A display-count change must not discard previously calculated candidates or scores.
+    stopPanelPrecalculation();
+    S.panelToken++; S._panelRequest = null;
+    if (!S.analysisMode) { S.liveEngine?.cancelPending(); S.liveEngine?.stop(); }
+    renderEngineCurrent();
+    if (UI.settings && !UI.settings.hidden) renderSettings();
+    return;
+  }
   const lineKey = key === "engineLines" || key === "fastLines" || key === "fastAnalysis";
   const scoringBuild = S.analyzing ? S.evalEngines[0]?.buildKey : previous.engineBuild;
   const fixedProtocol = ["engineDepth","engineHash","engineSkill","classifyLines","ratingMode"].includes(key)
@@ -7140,6 +7196,7 @@ function requestProgress(gen) {
 }
 async function startAnalysis({preserveCompleted = false} = {}) {
   if(S.blank)return;
+  stopPanelPrecalculation();
   S.progressiveAccuracy = true;
   if (S.practice) exitPractice();
   S._lastEngineLines = null;
@@ -7179,8 +7236,8 @@ async function startAnalysis({preserveCompleted = false} = {}) {
   }
   if (gen !== S.batchGen) return;
 
-  // Batch analysis defaults to MultiPV=1. Extra lines provide root alternatives for
-  // annotations and inspection; the engine panel fills its lines on demand.
+  // Batch analysis defaults to MultiPV=1. Panel candidates are precomputed separately
+  // after statistics are ready, preserving the calibrated scoring protocol.
   const multipv = Math.max(1, Math.min(ENGINE_MAX_LINES, S.settings.classifyLines || 1));
   S.analyzedSettingsKey = analysisSettingsKey();
   S.analyzedMultipv = multipv; // remember how many lines this run computed (for setEngineSetting)

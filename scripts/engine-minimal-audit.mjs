@@ -85,6 +85,15 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     await shot('engine-remove-line-'+count);
   }
   assert.equal(await run("!!document.querySelector('.engine-minimal-remove')"),false);
+  assert.equal(await run("!!document.querySelector('.engine-focus-candidate[title],.engine-focus-candidate [title]')"),false,'Candidate rows and evaluations have no hover text');
+  await run("document.querySelector('.engine-focus-candidate').click()");
+  const opened = await run("import('./analysis.js').then(m=>({idx:m.S.variation.idx,length:m.S.variation.positions.length,walking:m.S.lineWalking}))");
+  assert.equal(opened.idx,1);assert.ok(opened.length>2);assert.equal(opened.walking,false);
+  await sleep(2200);
+  assert.equal(await run("import('./analysis.js').then(m=>m.S.variation.idx)"),1,'Opening a candidate must not start automatic playback');
+  await call('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowRight',code:'ArrowRight'},review.sessionId);
+  assert.equal(await run("import('./analysis.js').then(m=>m.S.variation.idx)"),2,'The user can advance the line manually');
+  await run("import('./analysis.js').then(m=>{m.exitAnalysis();m.go(0);})");
   for (const state of ['pending','terminal','error','practice']) {
     await run(`import('./analysis.js').then(m=>{m.S._lastEngineLines=null;
       if('${state}'==='practice')m.renderEnginePractice();
