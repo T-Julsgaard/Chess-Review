@@ -72,6 +72,25 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
     assert.equal(await run("document.querySelector('.puzzle-board-status')"),null,'Completed runs remove the compact status');
   }
   await run("import('./analysis.js').then(m=>m.learningWorkspace.close())");
+  for(const [width,height]of [[1280,600],[1280,599],[1280,560],[1280,520],[1280,480],[1366,560],[1366,480],[1100,480],[1920,560]]){
+    await resize(width,height);await run('scrollTo(0,0)');
+    const data=await run(`(()=>{
+      const rect=n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom};};
+      return {width:innerWidth,height:innerHeight,scrollHeight:document.documentElement.scrollHeight,
+        modules:[...document.querySelectorAll('.stage .mod')].filter(n=>!n.hidden&&getComputedStyle(n).display!=='none').map(n=>({key:n.dataset.mod,...rect(n)})),
+        buttons:[...document.querySelectorAll('.controls button')].filter(n=>n.getClientRects().length).map(n=>{const r=n.getBoundingClientRect();return {...rect(n),hit:n.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2))};})};
+    })()`);
+    const label='review-short-'+width+'x'+height,shot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
+    await fs.writeFile(path.join(out,label+'.png'),Buffer.from(shot.data,'base64'));results.push({label,...data});
+    assert.ok(data.scrollHeight<=height+1,'Short laptop review must fit the viewport: '+JSON.stringify(data));
+    for(const box of data.modules)assert.ok(box.x>=0&&box.y>=50&&box.right<=width+1&&box.bottom<=height+1&&box.w>0&&box.h>0,'Visible review module bounds: '+JSON.stringify(box));
+    for(const button of data.buttons)assert.ok(button.y>=52&&button.bottom<=height&&button.hit,'Review navigation must remain visible and clickable: '+JSON.stringify(button));
+    const panels=data.modules.filter(n=>!['coach','evalbar'].includes(n.key));
+    for(const [i,a]of panels.entries())for(const b of panels.slice(i+1))assert.ok(Math.min(a.right,b.right)-Math.max(a.x,b.x)<1||Math.min(a.bottom,b.bottom)-Math.max(a.y,b.y)<1,'Short review panels overlap: '+a.key+'/'+b.key);
+  }
+  const reviewIndex=await run("import('./analysis.js').then(m=>m.S.idx)");
+  await run("document.querySelector('.controls button[aria-label=Next]').click()");
+  assert.equal(await run("import('./analysis.js').then(m=>m.S.idx)"),reviewIndex+1,'Short-window navigation still advances the real game');
   await fs.writeFile(path.join(out,'responsive-layout.json'),JSON.stringify(results,null,2));
   console.log('Responsive live resize checks passed. Screenshots and measurements: '+out);
 }

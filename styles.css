@@ -1986,7 +1986,7 @@ button { font-family: inherit; cursor: pointer; }
 .stage .ip-head { min-height:24px; }
 
 /* Board and two panel columns fit a desktop or laptop viewport. Only panel bodies scroll. */
-@media (min-width:1100px) and (min-height:600px) {
+@media (min-width:1100px) and (min-height:480px) {
   .stage.auto {
     --side-w:clamp(540px,32vw,720px);
     --board-wmax:calc(100vw - 44px - var(--eb-w) - var(--side-w) - 2 * var(--gap));
@@ -2004,7 +2004,7 @@ button { font-family: inherit; cursor: pointer; }
   .stage.auto.has-coach .ip-opening { padding-right:156px; }
   .stage.auto.has-coach .ip-head { padding-right:156px; }
 }
-@media (min-width:1100px) and (min-height:600px) and (max-height:799.98px) {
+@media (min-width:1100px) and (min-height:480px) and (max-height:799.98px) {
   .stage { --strip-h:44px; --review-h:100px; --gap:10px; }
   .stage.auto .side { padding-top:0; }
   .stage.auto .mod[data-mod="coach"] { width:100px; height:102px; right:0; }
@@ -2016,7 +2016,7 @@ button { font-family: inherit; cursor: pointer; }
   .stage.auto .evalgraph svg { height:76px; }
 }
 /* Medium windows keep playback beside the board, with the remaining panels below. */
-@media (min-width:820px) and (max-width:1099.98px), (min-width:1100px) and (max-height:599.98px) {
+@media (min-width:820px) and (max-width:1099.98px), (min-width:1100px) and (max-height:479.98px) {
   .stage.auto {
     --side-w:clamp(280px,32vw,350px); --review-h:126px;
     --board-wmax:calc(100vw - 44px - var(--eb-w) - var(--side-w) - 2 * var(--gap));

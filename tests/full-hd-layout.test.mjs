@@ -20,7 +20,7 @@ test('Accuracy expansion preserves its original spacing and does not alter the s
   assert.deepEqual(reference.layout,before);
 });
 test('Desktop reference proportions adapt to larger screens and readable laptop panels',()=>{
-  for(const [width,height]of [[1100,600],[1180,820],[1100,900],[1280,600],[1366,608],[1536,704],[2560,1280],[2560,1440],[3840,2160],[3440,1280],[1920,1200]]){
+  for(const [width,height]of [[1100,480],[1100,520],[1280,480],[1280,560],[1366,560],[1920,480],[1920,599],[1100,600],[1180,820],[1100,900],[1280,600],[1366,608],[1536,704],[2560,1280],[2560,1440],[3840,2160],[3440,1280],[1920,1200]]){
     const layout=fullHdReferenceLayout(reference.layout,width,height),before=structuredClone(reference.layout);
     for(const [key,box]of Object.entries(layout)){
       assert.ok(box.x>=0&&box.y>=0&&box.x+box.w<=width&&box.y+box.h<=height-52.2,`${width}×${height}: ${key} bounds`);
@@ -32,6 +32,16 @@ test('Desktop reference proportions adapt to larger screens and readable laptop 
     assert.deepEqual(reference.layout,before);
   }
 });
-test('Narrow and short windows use stacked panels instead of shrinking the desktop canvas',()=>{
-  for(const [width,height]of [[1024,1366],[820,1180],[1280,560],[390,844]])assert.equal(fullHdReferenceLayout(reference.layout,width,height),null);
+test('Narrow and very short windows use stacked panels instead of shrinking the desktop canvas',()=>{
+  for(const [width,height]of [[1024,1366],[820,1180],[1280,479],[390,844]])assert.equal(fullHdReferenceLayout(reference.layout,width,height),null);
+});
+test('short laptop windows retain readable move and accuracy bodies with visible navigation',()=>{
+  for(const width of [1100,1280,1366,1600,1920])for(const height of [480,520,560,599,600])for(const expanded of [false,true]){
+    const layout=fullHdReferenceLayout(reference.layout,width,height,expanded);
+    for(const key of ['moves','accuracy'])assert.ok(layout[key].h>=76,'Scrollable bodies retain space below their headers');
+    for(const key of ['controls','learn']){
+      assert.ok(layout[key].y+layout[key].h<=height-52.2-20,'Navigation stays above the viewport bottom');
+      assert.ok(layout[key].h>=40,'Navigation retains its click target size');
+    }
+  }
 });
