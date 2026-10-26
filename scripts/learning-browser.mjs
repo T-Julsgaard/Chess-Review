@@ -42,6 +42,7 @@ try {
   const waitFor=async(t,expression,label)=>{for(let i=0;i<250;i++){if(await evaluate(t,expression))return;await sleep(100);}throw Error(label+' did not become ready');};
   const audit=await tab(`chrome-extension://${loaded.id}/audit.html`);await waitFor(audit,'!!window.api','Storage API');
   await evaluate(audit,"api.storage.local.set({settings:{engineDepth:4,engineWorkers:1,depthBumped:true,sound:false,coachPlain:true},'job:learn-audit':{pgn:'1. e4 e5 2. Nf3 Nc6 *',meta:{gameId:'learn-audit'},source:'pgn'}})");
+  if(process.argv.includes('--accuracy-pages'))await evaluate(audit,`api.storage.local.set({settingsResetFor030:true,settings:{enginePath:'sf19lite',engineDepth:4,engineWorkers:1,depthBumped:true,sound:false,coachPlain:true},'job:learn-audit':{pgn:'[White "Paul Morphy"]\\n[Black "Duke & Count"]\\n[WhiteElo "2500"]\\n[BlackElo "1900"]\\n\\n1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3 5. Qxf3 dxe5 6. Bc4 Nf6 7. Qb3 Qe7 8. Nc3 c6 9. Bg5 b5 10. Nxb5 cxb5 11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7 14. Rd1 Qe6 15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8#',meta:{gameId:'learn-audit'},source:'pgn'}})`);
   const review=await tab(`chrome-extension://${loaded.id}/analysis.html#learn-audit`);
   await waitFor(review,"!!document.querySelector('.board')&&import('./analysis.js').then(m=>!m.S.analyzing)",'Review');
   const {windowId}=await call('Browser.getWindowForTarget',{targetId:review.targetId});
@@ -55,6 +56,7 @@ try {
   else if(process.argv.includes('--responsive-reference'))await (await import('./responsive-reference-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--responsive-layout'))await (await import('./responsive-layout-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--review-interactions'))await (await import('./review-interactions-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
+  else if(process.argv.includes('--accuracy-pages'))await (await import('./accuracy-pages-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out,source});
   else if(process.argv.includes('--full-hd-reference'))await (await import('./full-hd-reference-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out,source});
   else await (process.argv.includes('--puzzle-animations')?(await import('./puzzle-animation-audit.mjs')).auditLearning:runAudit)({review,call,evaluate,waitFor,sleep,out});
 } finally {clearInterval(keepAlive);ws?.close();chrome.kill();}

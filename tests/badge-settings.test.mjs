@@ -153,20 +153,20 @@ test('style cards persist choices, preview the board and preserve scroll and key
   assert.equal(JSON.stringify({ grades: a.state.moveGrades, evals: a.state.evals, acc: a.state.acc }), before);
 });
 
-test('accuracy category explainers work with hover labels off and after renaming', t => {
+test('accuracy categories have no hover or focus explainers, including after renaming', t => {
   const a = review(t), doc = a.dom.window.document;
+  a.call('setAccuracyPage', 1);
   for (const cls of ['brilliant', 'blunder']) {
     const label = doc.querySelector(`[data-category="${cls}"]`);
     assert.equal(label.hasAttribute('title'), false);
     label.dispatchEvent(new a.dom.window.MouseEvent('mouseenter'));
-    assert.ok(doc.querySelector('.q-tip').classList.contains('show'));
-    assert.match(doc.querySelector('.q-tip-body').textContent, cls === 'brilliant' ? /sacrifice/ : /mate/);
-    label.dispatchEvent(new a.dom.window.MouseEvent('mouseleave'));
-    assert.equal(doc.querySelector('.q-tip').classList.contains('show'), false);
+    assert.equal(doc.querySelector('.q-tip.show'), null);
+    label.focus();
+    assert.equal(doc.querySelector('.q-tip.show'), null);
   }
   a.call('setCategoryName', 'blunder', 'Oops');
   doc.querySelector('[data-category="blunder"]').focus();
-  assert.equal(doc.querySelector('.q-tip-nm').textContent, 'Oops');
+  assert.equal(doc.querySelector('.q-tip.show'), null);
 });
 
 test('obsolete number sizing and animation preferences are removed while font choices survive', t => {

@@ -15,7 +15,7 @@ test('blank startup creates no game, engine, opening-book or calibration work',a
   assert.equal(a.state.positions.length,1);assert.equal(a.call('activePos').fen,new Chess().fen());
   assert.equal(doc.querySelectorAll('.board .sq').length,64);assert.equal(doc.querySelectorAll('.board .piece-img').length,32);
   assert.equal(doc.querySelectorAll('.ml-move').length,0);assert.ok(doc.querySelector('#statsMount .panel'));
-  assert.ok(doc.querySelector('#graphMount svg'));assert.equal(doc.querySelector('.practice-btn').disabled,true);
+  assert.ok(doc.querySelector('#graphMount svg'));assert.equal(doc.querySelector('.practice-btn'),null);
   for(const name of ['Start','Previous','Play','Next','End'])assert.equal(doc.querySelector(`[aria-label="${name}"]`).disabled,true);
   assert.doesNotMatch(doc.querySelector('#canvas').textContent,/Analyzing|Use ← and →/);
   assert.equal(doc.title,'Chess Review');assert.equal(doc.querySelectorAll('[data-game-action]:not([hidden])').length,0);

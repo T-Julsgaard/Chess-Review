@@ -15,6 +15,7 @@ import { browserAPI as platformAPI } from "./browser-compat.js";
 import { resetSettingsForRelease } from "./release-settings.js";
 import { expectedPoints, SF19_OUTCOME } from "./lib/public-scoring.js";
 import { calibratedReview, scoringEvidenceComplete } from "./lib/calibrated-review.js";
+import { gameStatistics, GAME_PHASES } from "./lib/game-statistics.js";
 import { analyseCalibratedPosition } from "./lib/calibrated-search.js";
 import { loadLearningWorkspace, presentationFor } from "./lib/learning-loader.js";
 import { mountLearningAnnouncement } from "./lib/learning-announcement.js";
@@ -141,11 +142,10 @@ function badgeLabelStyle(value = S.settings.badgeTooltip) {
   if (value === true) return "original";
   return Object.hasOwn(BADGE_LABEL_STYLES, value) ? value : "off";
 }
-// Accuracy breakdown: compact (default) vs. full list (expanded via the expander arrow).
-// The compact list holds every category the move list badges (NOTEWORTHY) plus Best, so its
-// totals match the badges at a glance; the expander adds Excellent, Good and book moves.
+// Retain the legacy layout baselines when loading saved custom panel placements.
 const QBREAK_SUMMARY = ["brilliant","great","best","inacc","mistake","miss","blunder"];
 const QBREAK_FULL = ["brilliant","great","best","excellent","good","inacc","mistake","miss","blunder","book"];
+const ACCURACY_PAGES = ['Overview', 'Move quality', 'Advanced'];
 const NOTEWORTHY = new Set(["brilliant","great","inacc","mistake","miss","blunder"]);
 // Explanation for each category (shown as a tooltip in the accuracy panel). The classifier
 // (computeDerived → classifyMove) works on the engine's eval in PAWNS: "loss" is how much the
@@ -747,7 +747,7 @@ const S = {
   // `progress` is the contiguous prefix that is safe to navigate to while a batch is
   // still running. `completed` is the total number of game plies already returned by
   // any worker. They differ when parallel workers finish out of order.
-  analyzing: true, progress: 0, completed: 0, analysisError: null, userArrows: [], userMarks: [], qbreakExpanded: false,
+  analyzing: true, progress: 0, completed: 0, analysisError: null, userArrows: [], userMarks: [], qbreakExpanded: true, accuracyPage: 0,
   // Collapsible settings sections: open/closed state, keyed by section title.
   setOpen: {},
   settings: { ...DEFAULT_SETTINGS },
@@ -1465,6 +1465,7 @@ function computeDerived() {
   }
   const N = S.total;
   const eloAccs = sideAccuracies();
+  S.gameStats = gameStatistics(S.positions, S.bests, S.calibrated);
   for (const side of ["w", "b"]) {
     const counts = {}; QUALITY_ORDER.forEach((k) => (counts[k] = 0));
     for (let i = 1; i <= N; i++) {
@@ -4114,8 +4115,6 @@ function categoryLabel(cls) {
   const label = el("button", {
     type: "button", class: "qlabel", "data-category": cls,
     "aria-label": "Rename " + categoryName(cls),
-    onmouseenter: e => showQTip(e.currentTarget, cls), onmouseleave: hideQTip,
-    onfocus: e => showQTip(e.currentTarget, cls), onblur: hideQTip,
     onclick: () => {
       hideQTip();
       let finished = false;
@@ -4151,75 +4150,98 @@ function categoryLabel(cls) {
   el("span", { class: "nm" }, categoryName(cls)));
   return label;
 }
+function setAccuracyPage(page, focus = false) {
+  S.accuracyPage = (page + ACCURACY_PAGES.length) % ACCURACY_PAGES.length;
+  statsRefs = null;
+  hideQTip();
+  renderStats();
+  if (focus) UI.stats.querySelector('[aria-selected="true"]')?.focus({preventScroll: true});
+}
 function renderStats() {
-  const opSide = S.meSide === "w" ? "b" : "w";
-  const meAcc = S.acc[S.meSide], opAcc = S.acc[opSide];
-  const meRating = S.players[S.meSide]?.rating, opRating = S.players[opSide]?.rating;
-  const meEloAcc = S.accElo[S.meSide], opEloAcc = S.accElo[opSide];
-  // Compact list by default; the expander arrow unfolds the whole list (incl. book moves).
-  const list = S.qbreakExpanded ? QBREAK_FULL : QBREAK_SUMMARY;
-
-  // In-place counter update during analysis (so the loader animation doesn't restart).
-  if (S.analyzing && statsRefs && statsRefs.expanded === S.qbreakExpanded) {
-    for (const k of list) {
-      const r = statsRefs.rows[k]; if (!r) continue;
-      const cMe = S.counts[S.meSide][k] || 0, cOp = S.counts[opSide][k] || 0;
-      r.me.textContent = cMe; r.me.classList.toggle("zero", !cMe);
-      r.op.textContent = cOp; r.op.classList.toggle("zero", !cOp);
-    }
+  const sides = [S.meSide, S.meSide === "w" ? "b" : "w"];
+  const page = S.accuracyPage || 0, busy = S.analyzing && !S.blank;
+  // Keep the analysis animation and keyboard focus intact while results arrive.
+  if (busy && statsRefs?.page === page) {
+    for (const [k, row] of Object.entries(statsRefs.rows)) sides.forEach((side, i) => {
+      const count = S.counts[side][k] || 0;
+      row[i].textContent = count;
+      row[i].disabled = !count;
+      row[i].classList.toggle('zero', !count);
+      row[i].setAttribute('aria-label', S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Jump to first move.');
+    });
     return;
   }
-
+  const pair = (className, values) => el('div', {class: className}, ...values);
+  const number = value => value == null ? '—' : value.toFixed(1) + '%';
+  const pending = value => busy ? '···' : value;
+  const comparison = (label, values, note = null, className = '') => el('div', {class: 'acc-comparison ' + className},
+    el('div', {class: 'acc-metric-label'}, label), pair('acc-metric-values', values),
+    note ? el('p', {class: 'acc-note'}, note) : null);
+  const players = pair('acc-players', sides.map(side => el('div', {class: 'acc-player'},
+    el('span', {class: 'acc-side ' + side, 'aria-label': side === 'w' ? 'White' : 'Black'}),
+    el('span', {class: 'acc-name'}, S.players[side].name))));
   const rows = {};
-  const qrows = list.map((k) => {
-    const cMe = S.counts[S.meSide][k] || 0, cOp = S.counts[opSide][k] || 0;
-    const meCt = el("span", { class: "ct left " + (cMe ? "" : "zero"), onclick: () => jumpToCategory(S.meSide, k) }, cMe);
-    const opCt = el("span", { class: "ct " + (cOp ? "" : "zero"), onclick: () => jumpToCategory(opSide, k) }, cOp);
-    rows[k] = { me: meCt, op: opCt };
-    return el("div", { class: "qbreak-row" },
-      meCt,
-      // The category explainer tooltip lives on the label only — hovering the counts (which are
-      // clickable jump targets) must not trigger it.
-      categoryLabel(k),
-      opCt,
-    );
-  });
-  const expander = el("button", {
-    class: "qbreak-toggle" + (S.qbreakExpanded ? " open" : ""),
-    title: S.qbreakExpanded ? "Show fewer categories" : "Show all categories",
-    "aria-expanded": S.qbreakExpanded ? "true" : "false",
-    onclick: () => { S.qbreakExpanded = !S.qbreakExpanded; renderStats(); reflowAccuracy(S.qbreakExpanded); },
-  }, icon("chevron"));
-  const qbreak = el("div", { class: "qbreak" }, ...qrows, expander);
-
-  UI.stats.replaceChildren(el("div", { class: "panel" },
-    // The button is always rendered (disabled while analyzing or already practicing) so the
-    // header height never changes between states.
-    el("div", { class: "panel-head acc-head" }, el("h3", {}, "Accuracy"),
-      el("button", { class: "practice-btn", disabled: S.blank || S.analyzing || !!S.practice, title: "Replay the game and re-solve every mistake you made", onclick: startPractice }, "Practice your mistakes")),
-    el("div", { class: "panel-body" },
-      el("div", { class: "acc-row" },
-        el("div", { class: "acc-cell" },
-          el("span", { class: "acc-name" }, S.players[S.meSide].name),
-          S.analyzing
-            ? loaderNode("acc-val", "var(--accent)")
-            : el("span", { class: "acc-val", style: { color: "var(--accent)" }, onmouseenter: (e) => showInfoTip(e.currentTarget, "Accuracy", ACCURACY_INFO), onmouseleave: hideQTip }, meAcc == null ? "—" : meAcc.toFixed(1)),
-          el("span", { class: "acc-bar" }, el("i", { style: { width: (S.analyzing ? 0 : (meAcc || 0)) + "%", background: "var(--accent)" } })),
-          el("span", { class: "est-rating", onmouseenter: (e) => showInfoTip(e.currentTarget, "Estimated Elo", ELO_INFO), onmouseleave: hideQTip }, S.analyzing ? "≈ ··· elo" : "≈ " + (estimateElo(meEloAcc, meRating, S.meSide) ?? "—") + " elo")),
-        el("span", { class: "acc-vs" }, "VS"),
-        el("div", { class: "acc-cell right" },
-          el("span", { class: "acc-name" }, S.players[opSide].name),
-          S.analyzing
-            ? loaderNode("acc-val", "var(--accent)")
-            : el("span", { class: "acc-val", style: { color: "var(--ink-2)" }, onmouseenter: (e) => showInfoTip(e.currentTarget, "Accuracy", ACCURACY_INFO), onmouseleave: hideQTip }, opAcc == null ? "—" : opAcc.toFixed(1)),
-          el("span", { class: "acc-bar" }, el("i", { style: { width: (S.analyzing ? 0 : (opAcc || 0)) + "%", background: "var(--ink-3)", marginLeft: (100 - (S.analyzing ? 100 : (opAcc || 0))) + "%" } })),
-          el("span", { class: "est-rating", onmouseenter: (e) => showInfoTip(e.currentTarget, "Estimated Elo", ELO_INFO), onmouseleave: hideQTip }, S.analyzing ? "≈ ··· elo" : "≈ " + (estimateElo(opEloAcc, opRating, opSide) ?? "—") + " elo")),
-      ),
-      qbreak,
-    ),
-  ));
-  statsRefs = S.analyzing ? { expanded: S.qbreakExpanded, rows } : null;
-  if(UI.canvas.classList.contains("full-hd-reference"))applyLayout();
+  let content;
+  if (page === 0) {
+    content = el('div', {class: 'acc-overview'},
+      comparison('Game accuracy', sides.map(side => busy ? loaderNode('acc-val', 'var(--accent)')
+        : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side].toFixed(1),
+          S.acc[side] == null ? null : el('span', {class: 'acc-unit'}, '%'))), null, 'acc-overall'),
+      comparison('Estimated Elo', sides.map(side => el('strong', {class: 'acc-elo'}, pending(
+        estimateElo(S.accElo[side], S.players[side]?.rating, side) == null ? '—'
+          : '≈ ' + estimateElo(S.accElo[side], S.players[side]?.rating, side))))),
+      el('div', {class: 'acc-phases'}, el('h4', {}, 'Accuracy by phase'),
+        ...GAME_PHASES.map((phase, i) => el('div', {class: 'acc-phase-row'},
+          el('strong', {}, pending(number(S.gameStats?.[sides[0]]?.phases[phase].accuracy))),
+          el('span', {}, ['Opening', 'Middlegame', 'Endgame'][i]),
+          el('strong', {}, pending(number(S.gameStats?.[sides[1]]?.phases[phase].accuracy))))),
+        el('p', {class: 'acc-note'}, S.blank ? 'Load a game to see its accuracy.'
+          : busy ? 'Scores appear when analysis finishes.' : '— Phase not reached or no scored decisions.')));
+  } else if (page === 1) {
+    content = el('div', {class: 'acc-quality'},
+      el('div', {class: 'qbreak'}, ...QBREAK_FULL.map(k => {
+        const counts = sides.map((side, i) => {
+          const count = S.counts[side][k] || 0;
+          return el('button', {type: 'button', class: 'ct ' + (i === 0 ? 'left ' : '') + (count ? '' : 'zero'),
+            disabled: !count, 'aria-label': S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Jump to first move.',
+            onclick: () => jumpToCategory(side, k)}, count);
+        });
+        rows[k] = counts;
+        return el('div', {class: 'qbreak-row'}, counts[0], categoryLabel(k), counts[1]);
+      })), el('p', {class: 'acc-note'}, 'Select a count to revisit the first move.'));
+  } else {
+    const stats = sides.map(side => S.gameStats?.[side]);
+    content = el('div', {class: 'acc-advanced'},
+      comparison('Average centipawn loss', stats.map(stat => el('strong', {class: 'acc-stat-value',
+        'aria-label': busy ? 'Analyzing' : (stat?.averageCpLoss == null ? 'Unavailable' : stat.averageCpLoss.toFixed(1) + ' centipawns, from ' + stat.cpMoves + ' moves')},
+        pending(stat?.averageCpLoss == null ? '—' : stat.averageCpLoss.toFixed(1)))), 'Lower is better · 100 cp = 1 pawn'),
+      comparison('Engine top-move match', stats.map(stat => el('strong', {class: 'acc-stat-value'}, pending(number(stat?.topMatch))))),
+      comparison('Largest evaluation loss', stats.map((stat, i) => {
+        const loss = busy ? null : stat?.largestLoss, position = loss && S.positions[loss.ply];
+        return el('button', {type: 'button', class: 'acc-loss', disabled: !loss || loss.loss === 0,
+          'aria-label': S.players[sides[i]].name + ': ' + (loss ? loss.loss + ' centipawns lost on ' + position.san + '. Jump to move.' : 'No scored loss'),
+          onclick: () => gotoMainline(loss.ply)},
+          el('strong', {class: 'acc-stat-value'}, pending(loss ? Math.round(loss.loss) + ' cp' : '—')),
+          loss && loss.loss > 0 ? el('span', {}, Math.ceil(loss.ply / 2) + (position.color === 'w' ? '. ' : '… ') + position.san + ' ↗') : null);
+      })),
+      el('p', {class: 'acc-note acc-evidence'}, busy ? 'Stats appear when analysis finishes.'
+        : 'Forced moves excluded. Centipawn stats omit mate scores.'));
+  }
+  const tabs = el('div', {class: 'acc-tabs', role: 'tablist', 'aria-label': 'Accuracy pages',
+    onkeydown: e => {
+      const next = {ArrowRight: page + 1, ArrowLeft: page - 1, Home: 0, End: 2}[e.key];
+      if (next == null) return;
+      e.preventDefault(); e.stopPropagation(); setAccuracyPage(next, true);
+    }}, ...ACCURACY_PAGES.map((name, i) => el('button', {type: 'button', role: 'tab', id: 'accuracy-tab-' + i,
+      'aria-selected': String(page === i), 'aria-controls': 'accuracy-page', tabindex: page === i ? 0 : -1,
+      onclick: () => setAccuracyPage(i, true)}, name)));
+  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel'},
+    el('div', {class: 'panel-head acc-head'}, el('h3', {}, 'Accuracy'), el('span', {class: 'acc-page-count'}, (page + 1) + ' / 3')),
+    tabs,
+    el('div', {class: 'panel-body acc-page', id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
+      'aria-labelledby': 'accuracy-tab-' + page}, players, content)));
+  statsRefs = busy ? {page, rows} : null;
+  if (UI.canvas.classList.contains('full-hd-reference')) applyLayout();
 }
 
 /* ---------------- Eval graph ---------------- */
@@ -6388,7 +6410,7 @@ function toggleAuto() {
 }
 document.addEventListener("keydown", (e) => {
   if (learningWorkspace || S.blank) return;
-  if (e.key === "Tab" && !e.target?.closest?.('#settings,[role="dialog"],[role="alertdialog"]')) {
+  if (e.key === "Tab" && !e.target?.closest?.('#settings,.accuracy-panel,[role="dialog"],[role="alertdialog"]')) {
     e.preventDefault(); return;
   }
   if (UI.settings?.contains(e.target) || UI.libRail?.contains(e.target)) return;

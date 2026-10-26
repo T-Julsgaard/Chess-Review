@@ -14,10 +14,19 @@ test('Full HD converts the approved panel positions and contents to their physic
     }
   }
 });
-test('Accuracy expansion preserves its original spacing and does not alter the saved reference',()=>{
-  const before=structuredClone(reference.layout),expanded=fullHdReferenceLayout(reference.layout,1920,920,true);
+test('Accuracy pages preserve original expanded spacing when there is room and do not alter the saved reference',()=>{
+  const before=structuredClone(reference.layout),expanded=fullHdReferenceLayout(reference.layout,1920,1080,true);
   for(const [key,box]of Object.entries(before))for(const prop of ['x','y','w','h'])near(expanded[key][prop],box[prop]*FULL_HD_SCALE);
   assert.deepEqual(reference.layout,before);
+});
+test('the fixed expanded Accuracy panel keeps Engine and puzzle entry in short Full HD windows',()=>{
+  for(const height of [880,900,919,920,960,1080]){
+    const layout=fullHdReferenceLayout(reference.layout,1920,height,true);
+    assert.ok(layout.learn.y+layout.learn.h<=height-52.2-19);
+    assert.ok(layout.engine.h>=84);
+    assert.ok(layout.accuracy.y+layout.accuracy.h<layout.engine.y);
+    assert.ok(layout.engine.y+layout.engine.h<layout.learn.y);
+  }
 });
 test('Desktop reference proportions adapt to larger screens and readable laptop panels',()=>{
   for(const [width,height]of [[1100,480],[1100,520],[1280,480],[1280,560],[1366,560],[1920,480],[1920,599],[1100,600],[1180,820],[1100,900],[1280,600],[1366,608],[1536,704],[2560,1280],[2560,1440],[3840,2160],[3440,1280],[1920,1200]]){

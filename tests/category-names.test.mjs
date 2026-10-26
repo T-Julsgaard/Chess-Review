@@ -5,6 +5,7 @@ import { app, loadGame } from './helpers/app.mjs';
 function review(t) {
   const a = app(t);
   loadGame(a, '1. e4 e5 2. Nf3');
+  a.state.accuracyPage = 1;
   a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
   return a;
 }
@@ -52,8 +53,8 @@ test('Escape cancels, blur saves, and the reset control restores the default', a
   assert.equal(Object.hasOwn(a.store.settings.categoryNames, 'blunder'), false);
 });
 
-test('expanded categories are editable and renaming preserves count navigation', t => {
-  const a = review(t); a.state.qbreakExpanded = true; a.call('renderStats');
+test('all categories are editable and renaming preserves count navigation', t => {
+  const a = review(t); a.call('renderStats');
   assert.equal(a.dom.window.document.querySelectorAll('[data-category]').length, 10);
   const input = edit(a, 'book'); input.value = 'Opening'; key(a, input, 'Enter');
   a.state.classif[1] = 'book'; a.state.counts.w.book = 1; a.call('renderStats');
