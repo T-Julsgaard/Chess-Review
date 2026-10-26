@@ -18,6 +18,7 @@ import { calibratedReview, scoringEvidenceComplete } from "./lib/calibrated-revi
 import { gameStatistics, GAME_PHASES } from "./lib/game-statistics.js";
 import { PANEL_DESIGNS, panelDesign, normalizePanelDesigns } from "./lib/panel-designs.js";
 import { createOverviewReveal } from "./lib/overview-reveal.js";
+import { phasePerformance } from "./lib/phase-performance.js";
 import { analyseCalibratedPosition } from "./lib/calibrated-search.js";
 import { loadLearningWorkspace, presentationFor } from "./lib/learning-loader.js";
 import { mountLearningAnnouncement } from "./lib/learning-announcement.js";
@@ -4224,8 +4225,9 @@ function accuracyDial(value, busy) {
 }
 function renderStats() {
   const design = panelDesign('accuracy', S.settings);
-  const reveal = design === 'reveal';
-  const revealKey = JSON.stringify([S.batchGen, S.meSide, S.acc, S.calibrated?.w.rating, S.calibrated?.b.rating, S.gameStats]);
+  const phaseReport = design === 'phases';
+  const reveal = design === 'reveal' || phaseReport;
+  const revealKey = JSON.stringify([design, S.batchGen, S.meSide, S.acc, S.calibrated?.w.rating, S.calibrated?.b.rating, S.gameStats]);
   const animate = S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   if (reveal && !S.analyzing && !S.accuracyPage && animate
       && overviewReveal.matches(UI.stats.firstChild, S.positions, revealKey)) return;
@@ -4256,7 +4258,9 @@ function renderStats() {
     el('span', {class: 'acc-name'}, S.players[side].name))));
   const rows = {};
   let content;
-  if (page === 0) {
+  if (page === 0 && phaseReport) {
+    content = renderPhaseOverview(sides, busy);
+  } else if (page === 0) {
     content = el('div', {class: 'acc-overview'},
       pair('acc-scorecards', sides.map(side => {
         const rating = estimateElo(S.accElo[side], S.players[side]?.rating, side);
@@ -4316,7 +4320,7 @@ function renderStats() {
     el('div', {class: 'acc-pager-center'}, el('span', {class: 'acc-page-name', 'aria-hidden': 'true'}, ACCURACY_PAGES[page]), tabs),
     el('button', {type: 'button', class: 'acc-page-next', 'aria-label': 'Next accuracy page: ' + ACCURACY_PAGES[(page + 1) % 3],
       onclick: () => setAccuracyPage(page + 1, '.acc-page-next')}, icon('chevron')));
-  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials' + (reveal ? ' accuracy-reveal' : ''), 'data-design': design, 'aria-label': 'Accuracy'},
+  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials' + (reveal ? ' accuracy-reveal' : '') + (phaseReport ? ' accuracy-phase-report' : ''), 'data-design': design, 'aria-label': 'Accuracy'},
     el('div', {class: 'panel-body acc-page' + (page === 0 ? ' acc-page-overview' : ''), id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
       'aria-labelledby': 'accuracy-tab-' + page}, players, content), pager));
   statsRefs = busy ? {design, page, rows} : null;
@@ -4324,6 +4328,37 @@ function renderStats() {
   if (reveal && page === 0 && !busy && !S.blank && Object.values(S.acc).some(Number.isFinite)) {
     overviewReveal.mount(UI.stats.firstChild, {game: S.positions, key: revealKey, enabled: animate});
   }
+}
+
+function renderPhaseOverview(sides, busy) {
+  const percent = value => busy ? '···' : value == null ? '—' : value.toFixed(1) + '%';
+  return el('div', {class: 'phase-overview'},
+    el('div', {class: 'phase-summary'},
+      el('span', {class: 'phase-summary-label'}, 'Game accuracy'),
+      el('div', {class: 'phase-overall-values'}, ...sides.map(side => busy ? loaderNode('acc-val', 'var(--accent)')
+        : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side] >= 100 ? '100' : S.acc[side].toFixed(1),
+          S.acc[side] == null ? null : el('span', {class: 'acc-unit'}, '%')))),
+      el('div', {class: 'phase-rating-values'}, ...sides.map(side => {
+        const rating = estimateElo(S.accElo[side], S.players[side]?.rating, side);
+        return el('strong', {class: 'acc-elo'}, busy ? '···' : rating == null ? '—' : '≈ ' + rating);
+      })),
+      el('span', {class: 'acc-elo-label'}, 'Estimated rating')),
+    el('div', {class: 'phase-report', 'aria-label': 'Accuracy by game phase'}, ...GAME_PHASES.map((phase, index) => {
+      const name = ['Opening', 'Middlegame', 'Endgame'][index];
+      return el('div', {class: 'phase-report-row', 'data-phase': phase},
+        el('div', {class: 'phase-report-name'}, name),
+        el('div', {class: 'phase-report-cells'}, ...sides.map(side => {
+          const stats = S.gameStats?.[side]?.phases[phase], value = stats?.accuracy;
+          const band = busy ? null : phasePerformance(value), label = band ? categoryName(band.category) : busy ? 'Analyzing' : 'Not scored';
+          return el('div', {class: 'phase-report-cell' + (band ? '' : ' unavailable'), 'data-phase-category': band?.category || '',
+            style: {'--phase-color': band ? QUALITY[band.category].color : 'var(--ink-3)'},
+            'aria-label': S.players[side].name + ', ' + name + ': ' + (busy ? 'analyzing' : value == null ? 'not scored' : value.toFixed(1) + '% accuracy, ' + label + ', ' + stats.decisions + ' scored decisions')},
+            el('strong', {class: 'phase-report-score'}, percent(value)),
+            el('span', {class: 'phase-category'},
+              band ? el('span', {class: 'phase-category-mark', 'aria-hidden': 'true'}, band.mark) : null,
+              el('span', {class: 'phase-category-label'}, label)));
+        })));
+    })));
 }
 
 function renderOriginalStats() {

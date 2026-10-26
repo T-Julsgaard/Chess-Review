@@ -1,7 +1,7 @@
 # Accuracy panel
 
 **Settings → Visual → Tabs** selects the panel design. Accuracy offers Original,
-Page tabs, Dials and Reveal; Reveal is the default described below. The original summary
+Page tabs, Dials, Reveal and Phase report. Phase report is the default. The original summary
 and first paged iteration remain available for comparison. See
 [panel design choices](TAB_DESIGNS.md) for saved settings and future iterations.
 
@@ -23,12 +23,31 @@ Overall accuracy and estimated Elo retain the existing calibrated scoring and
 rating modes. Phase accuracy is computed locally from the same scored decisions,
 without new searches, permissions, requests or changes to saved analysis.
 
-The overview pairs two open-arc accuracy dials with prominent estimated ratings.
-Opening, middlegame and endgame use paired bars aligned with the same player
-columns. Arcs and bars are decorative; numerical scores remain readable text,
-and unavailable scores show an em dash with an empty meter. Perfect accuracy
-uses `100%` so it fits comfortably inside the dial. The score display never
-changes the underlying calculated values.
+Phase report replaces the dials with large overall scores and estimated ratings,
+then three rows of paired phase cards. Each card shows the exact phase accuracy,
+a category badge and the corresponding category color from the move palette.
+The score display never changes the underlying calculated values. Dials and
+Reveal retain their earlier dial/bar layout for comparison.
+
+The new phase badges use these **presentation bands**, independent of individual
+move classification and its winning-chance-loss thresholds:
+
+| Phase accuracy | Badge | Existing category color |
+| --- | --- | --- |
+| 90–100% | Excellent | `--q-excellent` (green) |
+| 80–<90% | Good | `--q-good` (soft green) |
+| 65–<80% | Inaccuracy | `--q-inacc` (yellow) |
+| 50–<65% | Mistake | `--q-mistake` (orange) |
+| 0–<50% | Blunder | `--q-blunder` (red) |
+
+These are original UI bands, not Lichess's thresholds or new calibration claims.
+Contextual move labels such as Brilliant, Great, Miss and Book are not inferred
+from aggregate phase accuracy. Badges include text and a mark so color is not
+the only signal. Missing/unreached/forced-only phase samples remain neutral with
+an em dash and **Not scored**; they never receive a bad-play badge. During
+analysis they show a neutral pending state. Custom category names apply when the
+overview renders. Accessible card labels include player, phase, exact percentage,
+category and the number of scored decisions.
 
 Reveal removes the glow from the previous Dials design and labels the estimate
 **Estimated rating**. Results count up and meters fill while all player/phase
@@ -36,6 +55,10 @@ labels type in together, once per loaded set of results. The 1.2-second animatio
 waits until cached reviews are visible, keeps final text sizes reserved, and
 restores the exact original score text when complete. Motion-off and reduced-motion
 preferences display final results immediately. Earlier designs remain selectable.
+
+Phase report retains that synchronized reveal for its overall scores, estimated
+ratings, phase percentages, phase labels and category labels. The final category
+color stays stable throughout counting, rather than flashing through lower bands.
 
 Lichess's [phase accuracy implementation](https://github.com/lichess-org/lila/blob/master/modules/analyse/src/main/AccuracyPercent.scala)
 partitions a game and runs its accuracy aggregator on each phase. Its

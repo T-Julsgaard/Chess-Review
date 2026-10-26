@@ -14,7 +14,7 @@ test('Visual > Tabs exposes independent Accuracy and Move list design choices', 
   await a.call('toggleSettings');
   const section = () => [...doc.querySelectorAll('.set-section')].find(node => node.querySelector('.set-sect-head').textContent === 'Tabs');
   section().querySelector('.set-sect-head').click();
-  assert.deepEqual([...section().querySelectorAll('[data-setting="accuracyDesign"]')].map(node => node.textContent), ['Original', 'Page tabs', 'Dials', 'Reveal']);
+  assert.deepEqual([...section().querySelectorAll('[data-setting="accuracyDesign"]')].map(node => node.textContent), ['Original', 'Page tabs', 'Dials', 'Reveal', 'Phase report']);
   assert.deepEqual([...section().querySelectorAll('[data-setting="movesDesign"]')].map(node => node.textContent), ['Original', 'Full height', 'Zoomed in', 'Zoom +20%']);
   const option = section().querySelector('[data-setting="accuracyDesign"][data-value="original"]');
   option.focus(); option.click(); await settle(); await a.run('_settingsWriteQueue');
@@ -29,7 +29,7 @@ test('all Accuracy iterations use the same scores and fixed layout without engin
   S.acc = {w: 93.6, b: 81.2}; S.idx = 3;
   const before = JSON.stringify({positions: S.positions, bests: S.bests, evals: S.evals, acc: S.acc, classif: S.classif, idx: S.idx, layout: S.layout});
   a.replace('scheduleReanalyze', () => { throw Error('Design changes must not reanalyze'); });
-  for (const design of ['original', 'pages', 'dials', 'reveal', 'original', 'reveal']) {
+  for (const design of ['original', 'pages', 'dials', 'reveal', 'phases', 'original', 'phases']) {
     await a.call('setSetting', 'accuracyDesign', design);
     assert.equal(doc.querySelector('.accuracy-panel').dataset.design, design);
     assert.match(doc.querySelector('.accuracy-panel').textContent, /93\.6/);
@@ -69,12 +69,12 @@ test('Full height moves remove both frame strips and retain the mounted moves an
   assert.equal(doc.querySelector('.moves-head,.moves-foot'), null);
   assert.equal(doc.querySelector('.moves-panel').lastElementChild.id, 'movesBody');
   assert.equal(doc.querySelector('#movesBody').firstChild, list);
-  assert.equal(a.state.idx, 3); assert.equal(a.state.settings.accuracyDesign, 'reveal');
+  assert.equal(a.state.idx, 3); assert.equal(a.state.settings.accuracyDesign, 'phases');
 });
 
 test('switching designs during analysis rebuilds the correct counters and keeps updates live', async t => {
   const a = review(t), doc = a.dom.window.document; a.state.analyzing = true;
-  for (const design of ['original', 'pages', 'dials', 'reveal']) {
+  for (const design of ['original', 'pages', 'dials', 'reveal', 'phases']) {
     await a.call('setSetting', 'accuracyDesign', design);
     if (design !== 'original') a.call('setAccuracyPage', 1);
     a.state.counts.w.blunder = 4;
@@ -120,9 +120,9 @@ test('saved choices survive startup and Visual reset restores the latest designs
   assert.equal(doc.querySelector('.accuracy-panel').dataset.design, 'original');
   assert.equal(doc.querySelector('.moves-panel').dataset.design, 'original');
   await a.call('resetVisualSettings');
-  assert.equal(a.store.settings.accuracyDesign, 'reveal');
+  assert.equal(a.store.settings.accuracyDesign, 'phases');
   assert.equal(a.store.settings.movesDesign, 'full');
-  assert.equal(doc.querySelector('.accuracy-panel').dataset.design, 'reveal');
+  assert.equal(doc.querySelector('.accuracy-panel').dataset.design, 'phases');
   assert.equal(doc.querySelector('.moves-foot,.moves-head'), null);
 });
 
@@ -131,5 +131,5 @@ test('invalid or missing saved designs fall back to supported defaults', () => {
   assert.equal(normalizePanelDesigns(settings), true);
   assert.deepEqual(settings, Object.fromEntries(PANEL_DESIGNS.map(design => [design.setting, design.default])));
   assert.equal(normalizePanelDesigns(settings), false);
-  assert.equal(panelDesign('accuracy', {}), 'reveal');
+  assert.equal(panelDesign('accuracy', {}), 'phases');
 });

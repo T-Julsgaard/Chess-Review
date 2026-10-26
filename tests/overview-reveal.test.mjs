@@ -85,6 +85,7 @@ test('cached reviews wait for startup shutters and background tabs wait until vi
 
 test('rerenders preserve a running overview and page changes do not replay it or mutate analysis', t => {
   const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6');
+  a.state.settings.accuracyDesign = 'reveal';
   a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
   const frames = clock(); a.context.requestAnimationFrame = frames.requestFrame; a.context.cancelAnimationFrame = frames.cancelFrame;
   a.state.acc = {w: 94.5, b: 82}; a.state.settings.moveAnim = true;

@@ -8,7 +8,7 @@ The choices are local visual preferences and survive reopening the extension.
 | Engine | Original, Focus | Original |
 | Evaluation bar | Original, Balance | Balance |
 | Evaluation | Original, Timeline, Move bars | Timeline |
-| Accuracy | Original, Page tabs, Dials, Reveal | Reveal |
+| Accuracy | Original, Page tabs, Dials, Reveal, Phase report | Phase report |
 | Move list | Original, Full height, Zoomed in, Zoom +20% | Full height |
 
 Original Accuracy restores the combined score/category panel, its seven-row
@@ -26,6 +26,16 @@ does not restart on normal redraws or page changes, and can play for new analysi
 results. Turning motion off or requesting reduced motion shows final values
 immediately. Original, Page tabs and Dials remain available with their earlier
 presentation; existing saved design choices are preserved.
+
+Phase report is the latest Accuracy overview: large headline scores and ratings
+above paired phase cards. Each card uses a category badge and the existing
+Excellent/Good/Inaccuracy/Mistake/Blunder color. Presentation thresholds are
+documented in [the Accuracy panel guide](ACCURACY_PANEL.md); numerical scores,
+annotations and rating calculations are unchanged. Missing samples stay neutral.
+It retains the compact height, carousel, synchronized reveal and earlier designs.
+Run `node scripts/learning-browser.mjs --working-tree --phase-overview` to check
+eight viewport sizes and save screenshots, including a clearly named display
+fixture demonstrating all five category bands without storing fake game analysis.
 
 Original Move list restores its title header and empty footer strip. Full height
 omits both nodes so the scrollable moves body reaches the panel bottom. It keeps

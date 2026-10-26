@@ -4,6 +4,7 @@ import {app, loadGame} from './helpers/app.mjs';
 
 function review(t) {
   const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5');
+  a.state.settings.accuracyDesign = 'reveal';
   a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
   return a;
 }
