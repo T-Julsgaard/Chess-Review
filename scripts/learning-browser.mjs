@@ -19,6 +19,7 @@ if (process.argv.includes('--working-tree')) {
   await fs.cp(path.join(root,'icons'),path.join(source,'icons'),{recursive:true});
 }
 await fs.appendFile(path.join(source,'analysis.js'),'\nexport {S, learningWorkspace, openLearning, go, toggleFlip, applyLayoutMode, applyUserMove, paintBoard, exitAnalysis};\n');
+if(process.argv.includes('--move-list-layout'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {renderMoves};\n');
 if(process.argv.includes('--engine-minimal'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {applyUiSetup, renderEngine, renderEngineCurrent, renderEnginePractice};\n');
 if(process.argv.includes('--phase-modern'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {applyUiSetup, renderStats, setAccuracyPage};\n');
 if(process.argv.includes('--phase-report-2')||process.argv.includes('--overview-reveal')||process.argv.includes('--phase-overview')||process.argv.includes('--move-quality'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {renderStats};\n');
@@ -65,6 +66,7 @@ try {
   else if(process.argv.includes('--phase-modern'))await (await import('./phase-modern-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--phase-overview'))await (await import('./phase-overview-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--phase-report-2'))await (await import('./phase-overview-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out,phaseDesign:'phases2'});
+  else if(process.argv.includes('--move-list-layout'))await (await import('./move-list-layout-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--move-quality'))await (await import('./move-quality-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--evaluation-panel'))await (await import('./evaluation-panel-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--evaluation-bar'))await (await import('./evaluation-bar-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
