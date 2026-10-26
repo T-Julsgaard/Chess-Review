@@ -8,7 +8,7 @@ The choices are local visual preferences and survive reopening the extension.
 | Engine | Original, Focus | Original |
 | Evaluation bar | Original, Balance | Balance |
 | Evaluation | Original, Timeline, Move bars | Timeline |
-| Accuracy overview | Original, Page tabs, Dials, Reveal, Phase report | Phase report |
+| Accuracy overview | Original, Page tabs, Dials, Reveal, Phase report, Phase report 2 | Phase report |
 | Accuracy move quality | Original, Distribution | Distribution |
 | Accuracy advanced | Original | Original |
 | Move list | Original, Full height, Zoomed in, Zoom +20% | Full height |
@@ -56,6 +56,16 @@ It retains the compact height, carousel, synchronized reveal and earlier designs
 Run `node scripts/learning-browser.mjs --working-tree --phase-overview` to check
 eight viewport sizes and save screenshots, including a clearly named display
 fixture demonstrating all five category bands without storing fake game analysis.
+
+Phase report 2 is a separate overview option with a shared comparison grid.
+Player names sit above their numerical columns; a softly framed Accuracy row
+leads, followed by three aligned phase rows and Estimated rating below. Labels
+occupy the left column, colored percentages stay compact, and names can wrap to
+two lines. The original Phase report remains unchanged and stays the default.
+The new arrangement preserves the same phase colors, percentages, rating model,
+compact panel size, carousel and reveal animation. Select it under **Visual →
+Tabs → Accuracy overview**. Run the browser audit with `--phase-report-2` to
+verify alignment and fit at eight viewport sizes.
 
 Original Move list restores its title header and empty footer strip. Full height
 omits both nodes so the scrollable moves body reaches the panel bottom. It keeps

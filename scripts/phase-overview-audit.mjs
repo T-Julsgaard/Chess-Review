@@ -2,11 +2,13 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 
-export async function auditLearning({review, call, evaluate, waitFor, sleep, out}) {
+export async function auditLearning({review, call, evaluate, waitFor, sleep, out, phaseDesign = 'phases'}) {
   const run = expression => evaluate(review, expression);
   const resize = async (width,height) => {
     await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);
     await sleep(150);
+    await run("import('./analysis.js').then(m=>m.applyLayoutMode())");
+    await run("new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))");
   };
   const shot = async name => {
     const clip=await run("(()=>{const r=document.querySelector('.accuracy-panel').getBoundingClientRect();return {x:r.x+scrollX,y:r.y+scrollY,width:r.width,height:r.height,scale:1}})()");
@@ -15,7 +17,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   };
   await run("document.querySelector('.learning-announcement-disable')?.click()");
   await waitFor(review,"!document.querySelector('#startup')",'Visible review');
-  await run("import('./analysis.js').then(m=>{m.S.settings.accuracyDesign='phases';m.S.settings.moveAnim=false;m.S.accuracyPage=0;m.renderStats()})");
+  await run(`import('./analysis.js').then(m=>{m.S.settings.accuracyDesign=${JSON.stringify(phaseDesign)};m.S.settings.moveAnim=false;m.S.accuracyPage=0;m.renderStats()})`);
   const original = await run("import('./analysis.js').then(m=>JSON.stringify({acc:m.S.acc,evals:m.S.evals,bests:m.S.bests,stats:m.S.gameStats,classif:m.S.classif,idx:m.S.idx}))");
   const evidence=[];
   for(const [width,height] of [[1920,1080],[1920,919],[1366,768],[1280,600],[1100,480],[820,900],[390,844],[320,640]]){
@@ -25,6 +27,10 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     assert.ok(result.overflow<=1,JSON.stringify(result));assert.equal(result.cells,6);assert.equal(result.headers,0);
     assert.equal(result.ratingLabel,'Estimated rating');
     if(width!==1100)await shot('phase-report-'+width+'x'+height);
+    if(phaseDesign==='phases2'){
+      const alignment=await run("(()=>{const center=n=>{const r=n.getBoundingClientRect();return r.x+r.width/2;};const names=[...document.querySelectorAll('.phase2-players .acc-player')].map(center);return [...document.querySelectorAll('.phase2-overall .acc-val,.phase2-row .phase-report-cell,.phase2-rating .acc-elo')].map((n,i)=>Math.abs(center(n)-names[i%2]));})()");
+      assert.ok(alignment.every(delta=>delta<1.5),'Player columns must align: '+JSON.stringify(alignment));
+    }
     if(width>=1800||width<=820)assert.ok(result.content<=result.body+1,'Overview must fit: '+JSON.stringify(result));
     if(width===1920&&height===1080)assert.ok(Math.abs(result.panel-370.69)<1,'Keep original compact size');
     await run("document.querySelector('.acc-page-next').click();document.querySelector('.acc-page-prev').click()");
@@ -55,5 +61,5 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   assert.equal(await run("document.querySelector('[data-phase=middlegame] .phase-report-score').textContent"),'43.8%');
   await run("import('./analysis.js').then(m=>{Object.assign(m.S,phaseOriginal);m.S.settings.moveAnim=false;m.renderStats()})");
   await fs.writeFile(path.join(out,'phase-report.json'),JSON.stringify({passed:true,evidence,illustrativeColors:colors},null,2));
-  console.log('Phase report passed at eight viewport sizes: compact fit, category colors, missing scores, animation and unchanged evidence. Screenshots: '+out);
+  console.log(phaseDesign+' passed at eight viewport sizes: compact fit, aligned comparisons, category colors, animation and unchanged evidence. Screenshots: '+out);
 }

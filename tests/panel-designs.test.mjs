@@ -16,7 +16,7 @@ test('Visual > Tabs distinguishes Accuracy overview, move quality and advanced d
   section().querySelector('.set-sect-head').click();
   const labels = [...section().querySelectorAll('.set-lbl')].map(node => node.textContent);
   for (const label of ['Accuracy overview', 'Accuracy move quality', 'Accuracy advanced']) assert.ok(labels.includes(label), label);
-  assert.deepEqual([...section().querySelectorAll('[data-setting="accuracyDesign"]')].map(node => node.textContent), ['Original', 'Page tabs', 'Dials', 'Reveal', 'Phase report']);
+  assert.deepEqual([...section().querySelectorAll('[data-setting="accuracyDesign"]')].map(node => node.textContent), ['Original', 'Page tabs', 'Dials', 'Reveal', 'Phase report', 'Phase report 2']);
   assert.deepEqual([...section().querySelectorAll('[data-setting="accuracyQualityDesign"]')].map(node => node.textContent), ['Original', 'Distribution']);
   assert.deepEqual([...section().querySelectorAll('[data-setting="accuracyAdvancedDesign"]')].map(node => node.textContent), ['Original']);
   assert.deepEqual([...section().querySelectorAll('[data-setting="movesDesign"]')].map(node => node.textContent), ['Original', 'Full height', 'Zoomed in', 'Zoom +20%']);
@@ -33,7 +33,7 @@ test('all Accuracy iterations use the same scores and fixed layout without engin
   S.acc = {w: 93.6, b: 81.2}; S.idx = 3;
   const before = JSON.stringify({positions: S.positions, bests: S.bests, evals: S.evals, acc: S.acc, classif: S.classif, idx: S.idx, layout: S.layout});
   a.replace('scheduleReanalyze', () => { throw Error('Design changes must not reanalyze'); });
-  for (const design of ['original', 'pages', 'dials', 'reveal', 'phases', 'original', 'phases']) {
+  for (const design of ['original', 'pages', 'dials', 'reveal', 'phases', 'phases2', 'original', 'phases']) {
     await a.call('setSetting', 'accuracyDesign', design);
     assert.equal(doc.querySelector('.accuracy-panel').dataset.design, design);
     assert.match(doc.querySelector('.accuracy-panel').textContent, /93\.6/);
@@ -78,7 +78,7 @@ test('Full height moves remove both frame strips and retain the mounted moves an
 
 test('switching designs during analysis rebuilds the correct counters and keeps updates live', async t => {
   const a = review(t), doc = a.dom.window.document; a.state.analyzing = true;
-  for (const design of ['original', 'pages', 'dials', 'reveal', 'phases']) {
+  for (const design of ['original', 'pages', 'dials', 'reveal', 'phases', 'phases2']) {
     await a.call('setSetting', 'accuracyDesign', design);
     if (design !== 'original') a.call('setAccuracyPage', 1);
     a.state.counts.w.blunder = 4;

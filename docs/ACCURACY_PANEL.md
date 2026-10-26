@@ -2,7 +2,7 @@
 
 **Settings → Visual → Tabs** separates Accuracy overview, Accuracy move quality
 and Accuracy advanced. Overview offers Original,
-Page tabs, Dials, Reveal and Phase report. Phase report is the default. The original summary
+Page tabs, Dials, Reveal, Phase report and Phase report 2. Phase report is the default. The original summary
 and first paged iteration remain available for comparison. See
 [panel design choices](TAB_DESIGNS.md) for saved settings and future iterations.
 
@@ -28,6 +28,10 @@ Phase report replaces the dials with large overall scores, three compact rows of
 paired phase cards, and estimated ratings below the phases. Each card shows only
 the exact phase accuracy, colored with the corresponding move-category palette.
 Category names and symbols are omitted from the visible cards.
+Phase report 2 keeps these elements but arranges them in a comparison grid, with
+player names, overall accuracy, phase percentages and estimated ratings sharing
+the same two numerical columns. The row labels sit on the left; Estimated rating
+remains last. It is a separate option, preserving the first Phase report.
 The score display never changes the underlying calculated values. Dials and
 Reveal retain their earlier dial/bar layout for comparison.
 
