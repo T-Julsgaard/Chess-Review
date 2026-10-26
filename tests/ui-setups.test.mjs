@@ -91,3 +91,29 @@ test('opening a saved Modern setup retains custom edits and missing layouts fall
     assert.deepEqual(a.call('setupLayout'),MODERN_LAYOUT);
   }
 });
+
+test('saved Modern move lists adopt Zoom +20% once while preserving later choices and geometry', async t => {
+  const original = review(t); await original.call('applyUiSetup', 'modern');
+  original.store.settings.movesDesign = 'original'; delete original.store.settings.modernMovesVersion;
+  original.store.layout.moves.w += 12;
+  const a = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
+  a.replace('resetSettingsForRelease', async () => {});
+  Object.assign(a.store, structuredClone(original.store)); await a.start();
+  assert.equal(a.state.settings.movesDesign, 'zoom20');
+  assert.equal(a.store.settings.modernMovesVersion, 1);
+  assert.equal(a.state.layout.moves.w, original.store.layout.moves.w);
+  await a.call('setSetting', 'movesDesign', 'original');
+  const b = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
+  b.replace('resetSettingsForRelease', async () => {});
+  Object.assign(b.store, structuredClone(a.store)); await b.start();
+  assert.equal(b.state.settings.movesDesign, 'original');
+});
+
+test('Modern move-list migration keeps individually selected zoomed designs', async t => {
+  const a = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
+  a.replace('resetSettingsForRelease', async () => {});
+  a.store.settings = {uiSetup: 'modern', movesDesign: 'zoomed'};
+  await a.start();
+  assert.equal(a.state.settings.movesDesign, 'zoomed');
+  assert.equal(a.store.settings.modernMovesVersion, 1);
+});
