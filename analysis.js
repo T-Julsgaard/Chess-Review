@@ -4574,7 +4574,7 @@ function renderPhaseOverview(sides, busy, modern = false) {
   const score = value => busy ? '···' : value == null ? '—' : value.toFixed(1);
   return el('div', {class: 'phase-overview'},
     el('div', {class: 'phase-summary'},
-      el('span', {class: 'phase-summary-label'}, 'Game accuracy'),
+      el('span', {class: 'phase-summary-label'}, 'Accuracy'),
       el('div', {class: 'phase-overall-values'}, ...sides.map(side => modern ? accuracyDial(S.acc[side], busy)
         : busy ? loaderNode('acc-val', 'var(--accent)')
         : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side] >= 100 ? '100' : S.acc[side].toFixed(1))))),

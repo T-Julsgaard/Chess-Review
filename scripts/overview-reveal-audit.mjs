@@ -39,9 +39,12 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   const samples = await run('revealSamples');
   assert.ok(samples.length > 8);
   assert.equal(samples[0].number, 0); assert.equal(samples[0].arc, 0); assert.equal(samples[0].bar, 0);
-  const partial = samples.find(s => s.running && s.number > 0 && s.label.length > 0 && s.label.length < 'Estimated rating'.length);
-  assert.ok(partial, 'Numbers and all text must reveal together');
+  const partial = samples.find(s => s.running && s.number > 0 && s.name.length > 0 && s.name.length < samples.at(-1).name.length);
+  assert.ok(partial, 'Numbers and player names must reveal together');
   assert.ok(partial.name.length > 0 && partial.phase.length > 0);
+  assert.ok(samples.every(s => s.label === 'Estimated rating' && s.phase === 'Opening'), 'Labels stay fully visible throughout the reveal');
+  assert.equal(await run("document.querySelector('.acc-page-name').textContent"), 'Overview');
+  assert.equal(await run("!!document.querySelector('.acc-page-name .acc-reveal-slot,.acc-dial-label .acc-reveal-slot')"), false);
   for (let i = 1; i < samples.length; i++) {
     assert.ok(samples[i].number >= samples[i-1].number);
     assert.ok(samples[i].arc >= samples[i-1].arc);
@@ -67,5 +70,5 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     if (width === 1920 || width === 390) await shot('overview-reveal-' + width + 'x' + height);
   }
   await fs.writeFile(path.join(out, 'overview-reveal.json'), JSON.stringify({passed: true, samples, final}, null, 2));
-  console.log('Overview reveal passed: synchronized counters/text/meters, stable geometry, exact final stats, once-only playback and motion preferences. Screenshots: ' + out);
+  console.log('Overview reveal passed: synchronized counters/names/meters, static labels, stable geometry, exact final stats, once-only playback and motion preferences. Screenshots: ' + out);
 }

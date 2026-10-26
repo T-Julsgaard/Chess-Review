@@ -57,6 +57,8 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await shot('phase-report-illustrative');
   await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=true;m.S.positions=[...m.S.positions];m.renderStats()})");
   assert.equal(await run("!!document.querySelector('[data-revealing]')"),true);
+  assert.equal(await run("document.querySelector('.phase-summary-label').textContent"),'Accuracy');
+  assert.equal(await run("!!document.querySelector('.phase-summary-label .acc-reveal-slot,.phase-report-name .acc-reveal-slot,.acc-elo-label .acc-reveal-slot,.acc-page-name .acc-reveal-slot')"),false);
   await waitFor(review,"!document.querySelector('[data-revealing]')",'Phase reveal complete');
   assert.equal(await run("document.querySelector('[data-phase=middlegame] .phase-report-score').textContent"),'43.8');
   await run("import('./analysis.js').then(m=>{Object.assign(m.S,phaseOriginal);m.S.settings.moveAnim=false;m.renderStats()})");

@@ -27,6 +27,7 @@ test('phase display bands have precise boundaries and reject unavailable or inva
 test('the phase report shows compact colored scores with estimated ratings below all phases', t => {
   const a = review(t), doc = a.dom.window.document;
   assert.equal(doc.querySelector('.accuracy-panel').dataset.design, 'phases');
+  assert.equal(doc.querySelector('.phase-summary-label').textContent, 'Accuracy');
   assert.equal(doc.querySelectorAll('.phase-report-row').length, 3);
   assert.equal(doc.querySelectorAll('.phase-report-cell').length, 6);
   const middle = doc.querySelector('[data-phase="middlegame"]');
@@ -83,6 +84,11 @@ test('phase scores retain the reveal animation and finish with the exact score a
   assert.equal(cell.dataset.phaseCategory, 'blunder');
   assert.equal(cell.querySelector('.phase-report-score .acc-reveal-ink').textContent, '0.0');
   assert.equal(cell.querySelector('.phase-category-label'), null);
+  for (const selector of ['.phase-summary-label', '.phase-report-name', '.acc-elo-label', '.acc-page-name']) {
+    assert.equal(doc.querySelector(selector + ' .acc-reveal-slot'), null);
+  }
+  assert.equal(doc.querySelector('.phase-summary-label').textContent, 'Accuracy');
+  assert.deepEqual([...doc.querySelectorAll('.phase-report-name')].map(n => n.textContent), ['Opening', 'Middlegame', 'Endgame']);
   tick(0); tick(300);
   const halfway = parseFloat(cell.querySelector('.phase-report-score .acc-reveal-ink').textContent);
   assert.ok(halfway > 0 && halfway < 42.5);

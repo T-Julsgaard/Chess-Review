@@ -37,7 +37,7 @@
 .accuracy-phase-report .acc-players { margin-bottom: 6px; }
 .phase-overview { display: flex; flex-direction: column; flex: 1; gap: 13px; }
 .phase-summary { display: flex; flex-direction: column; align-items: stretch; flex: none; text-align: center; }
-.phase-summary-label { color: var(--ink-3); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+.phase-summary-label { position: relative; top: 3px; color: var(--ink-3); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
 .phase-overall-values, .phase-rating-values { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; align-items: center; }
 .phase-overall-values { margin: 4px 0 6px; }
 .stage .accuracy-phase-report .phase-overall-values .acc-val { position: static; transform: none; font-size: clamp(34px,14cqw,42px); letter-spacing: -2px; color: var(--ink); }

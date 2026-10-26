@@ -21,12 +21,15 @@ function fixture(t) {
   return {dom, frames, reveal, panel, game: {}, key: 'review:1'};
 }
 
-test('one synchronized clock counts stats up, fills meters and types all text without changing accessible final text', t => {
+test('one synchronized clock counts stats up, fills meters and types player names while labels stay visible', t => {
   const f = fixture(t), {panel, reveal, frames} = f, before = panel.innerHTML;
   reveal.mount(panel, f);
   assert.equal(panel.querySelector('.acc-val .acc-reveal-ink').textContent, '0.0%');
   assert.equal(panel.querySelector('.acc-name .acc-reveal-ink').textContent, '');
-  assert.equal(panel.querySelector('.acc-elo-label .acc-reveal-ink').textContent, '');
+  assert.equal(panel.querySelector('.acc-elo-label').textContent, 'Estimated rating');
+  assert.equal(panel.querySelector('.acc-elo-label .acc-reveal-slot'), null);
+  assert.equal(panel.querySelector('.acc-phase-values > span').textContent, 'Opening');
+  assert.equal(panel.querySelector('.acc-phase-values > span .acc-reveal-slot'), null);
   assert.equal(panel.querySelector('.acc-val .acc-reveal-accessible').textContent, '94.5%');
   assert.equal(panel.querySelector('.acc-val .acc-reveal-ghost .acc-unit').textContent, '%');
   assert.equal(panel.querySelector('.acc-dial-fill').getAttribute('stroke-dasharray'), '0 100');
@@ -34,7 +37,7 @@ test('one synchronized clock counts stats up, fills meters and types all text wi
   const value = parseFloat(panel.querySelector('.acc-val .acc-reveal-ink').textContent);
   assert.ok(value > 0 && value < 94.5);
   assert.ok(parseFloat(panel.querySelector('.acc-elo .acc-reveal-ink').textContent.replace('≈ ', '')) > 0);
-  for (const selector of ['.acc-name', '.acc-elo-label', '.acc-phase-values > span']) {
+  for (const selector of ['.acc-name']) {
     const text = panel.querySelector(selector + ' .acc-reveal-ink').textContent;
     assert.ok(text.length > 0); assert.ok(text.length < panel.querySelector(selector + ' .acc-reveal-accessible').textContent.length);
   }
@@ -92,6 +95,10 @@ test('rerenders preserve a running overview and page changes do not replay it or
   const before = JSON.stringify({acc: a.state.acc, evals: a.state.evals, bests: a.state.bests, idx: a.state.idx});
   a.call('renderStats'); const panel = a.dom.window.document.querySelector('.accuracy-reveal');
   assert.equal(panel.dataset.revealing, 'true');
+  for (const selector of ['.acc-dial-label', '.acc-elo-label', '.acc-phase-values > span', '.acc-page-name']) {
+    assert.equal(panel.querySelector(selector + ' .acc-reveal-slot'), null);
+  }
+  assert.equal(panel.querySelector('.acc-page-name').textContent, 'Overview');
   a.call('renderStats'); assert.equal(a.dom.window.document.querySelector('.accuracy-reveal'), panel);
   frames.tick(0); frames.tick(1200);
   a.call('setAccuracyPage', 1); a.call('setAccuracyPage', 0);
