@@ -27,10 +27,13 @@ test('only an explicit preview query creates a memory context and invalid views 
 
 test('Visual settings opens screen sizes with a session snapshot of the current game',async t=>{
   const a=app(t);loadGame(a,'1. e4');a.call('buildUI');a.call('renderSettings');let created,snapshot;
+  Object.defineProperties(a.dom.window,{innerWidth:{value:1920},innerHeight:{value:919},outerWidth:{value:1920},outerHeight:{value:1040},devicePixelRatio:{value:1}});
+  Object.defineProperties(a.dom.window.screen,{width:{value:1920},height:{value:1080},availWidth:{value:1920},availHeight:{value:1040}});
   a.dom.window.open=(url)=>{created=url;snapshot=JSON.parse(a.dom.window.sessionStorage.getItem('screen-size-preview'));return {};};
   a.dom.window.document.querySelector('[data-debug=screen-previews]').click();await Promise.resolve();
   assert.equal(created,'https://extension.test/screen-preview.html');assert.equal(a.writes.length,0);
   assert.equal(snapshot.job.pgn,'1. e4');assert.equal(snapshot.preferences.settings.sound,false);
+  assert.deepEqual(snapshot.display,{width:1920,height:919,pixelRatio:1,insetWidth:0,insetHeight:161});
   assert.equal(a.dom.window.sessionStorage.getItem('screen-size-preview'),null);
 });
 

@@ -5130,7 +5130,7 @@ function visualSettings() {
     ),
     section("Screen sizes",
       el("button", {class:"set-reset","data-debug":"screen-previews",onclick:openScreenSizePreview}, "Open screen-size preview"),
-      el("div", {class:"set-row hint"},el("span",{class:"set-note"},"Try your current review at desktop, laptop, tablet and phone sizes. Open full screen and hide the controls for an immersive preview. Switch resolutions without losing your place. Preview changes are not saved.")),
+      el("div", {class:"set-row hint"},el("span",{class:"set-note"},"Preview starts at 100%, matching your current window. Try 1080p, 1440p and other screen sizes with your display scaling and browser toolbar accounted for. Switch resolutions without losing your place. Preview changes are not saved.")),
     ),
     section("Move list",
       seg("Style", "mlStyle", ["rows", "cards", "compact"]),
@@ -6132,8 +6132,11 @@ function openScreenSizePreview() {
   // window.open copies this tab's session storage synchronously. The preview
   // receives a snapshot without writing a handoff into persistent account data.
   const key="screen-size-preview",previous=window.sessionStorage.getItem(key);
+  const display={width:window.innerWidth,height:window.innerHeight,pixelRatio:window.devicePixelRatio||1,
+    insetWidth:Math.max(0,window.outerWidth-window.innerWidth)+Math.max(0,window.screen.width-window.screen.availWidth),
+    insetHeight:Math.max(0,window.outerHeight-window.innerHeight)+Math.max(0,window.screen.height-window.screen.availHeight)};
   try {
-    window.sessionStorage.setItem(key,JSON.stringify({job,idx:S.idx,preferences:{settings:S.settings,
+    window.sessionStorage.setItem(key,JSON.stringify({job,idx:S.idx,display,preferences:{settings:S.settings,
       layout:layoutForSave(),layoutMode:S.layoutMode,layoutVersion:LAYOUT_VERSION}}));
     const opened=window.open(_url("screen-preview.html"),"_blank");
     if(!opened)return browserAPI.tabs.create({url:_url("screen-preview.html")});
