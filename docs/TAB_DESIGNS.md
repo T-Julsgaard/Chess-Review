@@ -10,7 +10,8 @@ The choices are local visual preferences and survive reopening the extension.
   down, and collapsing it restores their positions.
 - **Modern** uses the supplied `chess-review-layout (7) modern.json` arrangement,
   including its panel content scales. Accuracy uses Phase report (the first
-  version), Move list uses Zoom +20%, and every other tab uses Original.
+  version), Move list uses Zoom +20%, Engine uses Minimal, and the remaining
+  tabs use Original.
 
 Choosing a setup applies its arrangement and tab designs. Individual tabs and
 panel positions can still be customized. **Reset layout** restores the selected
@@ -23,7 +24,7 @@ visual preferences.
 
 | Panel | Designs | Default |
 | --- | --- | --- |
-| Engine | Original, Focus | Original |
+| Engine | Original, Focus, Minimal | Original (Minimal in Modern setup) |
 | Evaluation bar | Original, Balance | Balance |
 | Evaluation | Original, Timeline, Move bars | Timeline |
 | Accuracy overview | Original, Page tabs, Dials, Reveal, Phase report, Phase report 2 | Phase report |
@@ -101,6 +102,17 @@ explore it; hover or focus it for the full continuation and score explanation.
 Set the number of lines in **Settings → Engine → Panel lines**. The candidate
 list scrolls independently of playback on desktop, and practice hides answers.
 Saved Focus selections use this revised layout. Original remains the default.
+
+Minimal is the Modern setup's Engine design. A slim header holds depth and the
+play/stop control; single-line variations show plain scores and an emphasized
+first move. Up to four candidates fit the preset's existing height without a
+scrollbar. Hover or focus a row for its continuation and score explanation, or
+activate it to explore the variation. The full engine name is in the depth
+tooltip. Existing Modern setups using the former Original default upgrade once;
+later individual design choices are retained. Select Minimal independently under
+**Visual → Tabs → Engine**.
+Run `node scripts/learning-browser.mjs --working-tree --engine-minimal` to check
+all four line counts at six viewport sizes and save screenshots.
 
 Changing designs does not change the game, selected move, annotations, numerical
 accuracy, Elo estimate, engine settings, analysis cache key or panel arrangement.

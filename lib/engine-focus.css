@@ -55,3 +55,35 @@
   .engine-focus-foot { padding-inline:9px; }
   .engine-focus-play { font-size:11px; }
 }
+
+/* Modern's shallow Engine panel: one slim toolbar and up to four single rows. */
+.stage .mod[data-mod="engine"] .engine-minimal .engine-focus-head {
+  height:30px; box-sizing:border-box; padding:3px 8px; gap:8px;
+}
+.stage .mod[data-mod="engine"] .engine-minimal .engine-focus-head h3 {
+  font-size:10px; letter-spacing:.08em;
+}
+.stage .mod[data-mod="engine"] .engine-minimal .count { font-size:10px; }
+.stage .mod[data-mod="engine"] .engine-minimal .engine-focus-play {
+  flex:none; width:24px; min-height:22px; height:22px; padding:0;
+  border:0; border-radius:4px; background:transparent; color:var(--ink-2); font-size:10px;
+}
+.stage .mod[data-mod="engine"] .engine-minimal .engine-focus-play:hover { background:var(--panel-2); color:var(--ink); }
+.stage .mod[data-mod="engine"] .engine-minimal .engine-focus-play.on { color:var(--q-blunder); }
+.stage .mod[data-mod="engine"] .engine-minimal .engine-body {
+  height:auto; padding:4px 8px; justify-content:center; overflow:hidden;
+}
+.engine-minimal .engine-focus-candidate {
+  grid-template-columns:44px minmax(0,1fr); gap:8px;
+  height:22px; min-height:22px; padding:0; border:0; border-radius:4px;
+}
+.engine-minimal .engine-focus-eval {
+  padding:0 3px; background:transparent; color:var(--ink); box-shadow:none;
+  text-align:left; font-size:11px; line-height:22px;
+}
+.engine-minimal .engine-focus-variation {
+  display:block; max-height:none; overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap; font-size:11px; line-height:22px;
+}
+.engine-minimal .engine-focus-pending { min-height:22px; padding:0; font-size:10px; line-height:22px; }
+.engine-minimal .engine-empty { padding:0; font-size:11px; line-height:1.4; }

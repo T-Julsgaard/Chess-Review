@@ -4996,27 +4996,29 @@ function renderMoves() {
 }
 
 /* ---------------- Engine lines ---------------- */
-// Refine the original score / move rows, keeping playback outside the scrolling list.
+// Focus and Minimal share variation controls; Minimal moves playback into the header.
 function focusedEnginePanel(content, {locked = false, playable = false} = {}) {
   const name = activeEngineName();
-  const panel = el('div', {class: 'panel engine-focus', 'data-design': 'focus', 'aria-label': 'Engine'},
+  const minimal = panelDesign('engine', S.settings) === 'minimal';
+  const play = el('button', {type: 'button', class: 'engine-focus-play' + (S.bestWalking ? ' on' : ''),
+    disabled: locked || !playable && !S.bestWalking,
+    title: S.bestWalking ? 'Stop playing best moves' : 'Play best moves from here. The engine searches each position; stop at any time.',
+    'aria-label': S.bestWalking ? 'Stop playing best moves' : 'Play best moves from this position',
+    onclick: () => { if (S.bestWalking) { stopBestWalk(); renderControls(); renderEngineCurrent(); } else playBestMoves(); },
+  }, minimal ? (S.bestWalking ? '■' : '▶') : S.bestWalking ? '■ Stop' : '▶ Play best moves from here');
+  const panel = el('div', {class: 'panel engine-focus' + (minimal ? ' engine-minimal' : ''), 'data-design': minimal ? 'minimal' : 'focus', 'aria-label': 'Engine'},
     el('div', {class: 'panel-head engine-focus-head'}, el('h3', {}, 'Engine'),
       el('span', {class: 'count', title: locked ? 'Engine lines are hidden during practice' : name + ' · target search depth ' + S.settings.engineDepth},
-        locked ? 'Practice' : name + ' · depth ' + S.settings.engineDepth)),
+        locked ? 'Practice' : minimal ? 'Depth ' + S.settings.engineDepth : name + ' · depth ' + S.settings.engineDepth),
+      minimal ? play : null),
     el('div', {class: 'panel-body engine-body'}, content),
-    el('div', {class: 'engine-focus-foot'},
-      el('button', {type: 'button', class: 'engine-focus-play' + (S.bestWalking ? ' on' : ''),
-        disabled: locked || !playable && !S.bestWalking,
-        title: 'The engine searches and plays its best move at each position. You can stop at any time.',
-        'aria-label': S.bestWalking ? 'Stop playing best moves' : 'Play best moves from this position',
-        onclick: () => { if (S.bestWalking) { stopBestWalk(); renderControls(); renderEngineCurrent(); } else playBestMoves(); },
-      }, S.bestWalking ? '■ Stop' : '▶ Play best moves from here')));
+    minimal ? null : el('div', {class: 'engine-focus-foot'}, play));
   UI.engine.replaceChildren(panel);
   fitEnginePanel();
 }
 // While solving a practice position, the engine lines would give the answer away → hide them.
 function renderEnginePractice() {
-  if (panelDesign('engine', S.settings) === 'focus') {
+  if (panelDesign('engine', S.settings) !== 'original') {
     focusedEnginePanel(el('div', {class: 'engine-empty', role: 'status'}, 'Find the best move — engine lines are hidden until you solve it.'), {locked: true});
     return;
   }
@@ -5030,7 +5032,7 @@ function renderEnginePractice() {
 // Choose the source of the engine lines for the shown position and draw the panel.
 function renderEngineCurrent() {
   if(S.blank){
-    if (panelDesign('engine', S.settings) === 'focus') {
+    if (panelDesign('engine', S.settings) !== 'original') {
       focusedEnginePanel(el('div', {class: 'engine-empty'}, 'Load a game to explore the best moves.'));
       return;
     }
@@ -5128,13 +5130,13 @@ function fitEnginePanel() {
   const mod=UI.engine?.closest('.mod');if(!mod)return;
   if(!isCustomLayout()){mod.style.minHeight="";return;}
   if(!S.layout.engine){mod.style.minHeight="";return;}
-  const height=120*panelScale(S.layout.engine);
+  const height=(panelDesign('engine', S.settings) === 'minimal' ? 128 : 120)*panelScale(S.layout.engine);
   mod.style.minHeight=height+'px';
   S.layout.engine.h=Math.max(S.layout.engine.h,height);
   applyPanelBox(mod,S.layout.engine);growCanvas();
 }
 function renderEngine(lines, padFromCache = false) {
-  const design = panelDesign('engine', S.settings), focus = design === 'focus';
+  const design = panelDesign('engine', S.settings), focus = design !== 'original';
   const curFen = activePos().fen;
   const historyKey = JSON.stringify(activeSearchHistory());
   const configKey = JSON.stringify([S.settings.enginePath, S.activeEngineBuild, S.engineFallbackBuild,
@@ -6161,7 +6163,7 @@ async function applyUiSetup(value) {
   const setup = UI_SETUPS[value];
   if (!setup) return;
   cancelPanelGesture?.();
-  const patch = {uiSetup:value, ...setup.designs, evalView:'both'};
+  const patch = {uiSetup:value, ...setup.designs, evalView:'both', ...(value === 'modern' ? {modernEngineVersion:1} : {})};
   Object.assign(S.settings, patch);
   S.originalAccuracyExpanded = false; S.qbreakExpanded = false; S.accuracyPage = 0;
   statsRefs = null; hideQTip(); overviewReveal.stop();
@@ -7449,6 +7451,11 @@ async function showReadyWorkspace() {
     for (const key of ["showConcepts", "conceptsEnabled", "conceptGroups", "disabledConcepts", "conceptsView", "conceptsDefaultedOff"]) delete S.settings[key];
     migrateVisualAssetSettings(S.settings);
     normalizePanelDesigns(S.settings);
+    // Upgrade Modern's former default once; later individual design choices stick.
+    if (S.settings.uiSetup === 'modern' && !S.settings.modernEngineVersion) {
+      if (S.settings.engineDesign === 'original') S.settings.engineDesign = 'minimal';
+      S.settings.modernEngineVersion = 1;
+    }
     migrateEngineSettings(S.settings);
     delete S.settings.wrongSound; // older selectable mistake cues were removed
     { const lm = { prikker: "dots", hop: "bounce", "bølge": "wave" }; if (lm[S.settings.loaderStyle]) S.settings.loaderStyle = lm[S.settings.loaderStyle]; } // migrate renamed loader keys
