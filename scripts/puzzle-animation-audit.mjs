@@ -40,7 +40,7 @@ export async function auditLearning(context) {
           return {held,faded,stable,detached,leafAnimation:getComputedStyle(e.querySelector('.puzzle-flip-in')).animationName,background:getComputedStyle(e).backgroundColor,goColor:getComputedStyle(e.querySelector('.puzzle-flip')).color};
         })`);
         assert.equal(transition.held,1);assert.ok(transition.faded<.3);assert.equal(transition.stable,true);assert.equal(transition.detached,false);
-        assert.equal(transition.leafAnimation,'none');assert.match(transition.background,/, 0\.6\)$/);assert.equal(transition.goColor,'rgb(255, 255, 255)');
+        assert.equal(transition.leafAnimation,'none');assert.match(transition.background,/, 0\.6\)$/);assert.equal(transition.goColor,'rgb(38, 41, 31)');
         await capture('puzzle-flip-go');
       }
       await run('animationStarting');
@@ -50,27 +50,50 @@ export async function auditLearning(context) {
         await sleep(1000);
         const end=await run(`(()=>{
           const e=document.querySelector('.puzzle-run-end'),s=e.querySelector('.puzzle-end-score'),r=s.getBoundingClientRect(),b=e.getBoundingClientRect(),c=e.firstChild.getBoundingClientRect();
-          return {style:e.dataset.style,width:r.width,height:r.height,title:e.querySelector('.puzzle-run-end-title').textContent,score:s.getAttribute('aria-label'),leaf:getComputedStyle(s.querySelector('.puzzle-flip-in')).animationName,
+          return {style:e.dataset.style,mode:e.dataset.mode,stock:getComputedStyle(e).getPropertyValue('--mode-stock').trim(),art:!!e.querySelector('.puzzle-mode-art'),width:r.width,height:r.height,title:e.querySelector('.puzzle-run-end-title').textContent,score:s.getAttribute('aria-label'),leaf:getComputedStyle(s.querySelector('.puzzle-flip-in')).animationName,
             fits:c.left>=b.left&&c.right<=b.right&&c.top>=b.top&&c.bottom<=b.bottom,color:getComputedStyle(s.querySelector('.puzzle-flip')).color};
         })()`);
         assert.equal(end.style,'flip');assert.equal(end.width,start.width,'Result counter matches countdown width');assert.equal(end.height,start.height,'Result counter matches countdown height');
-        assert.equal(end.title,'Puzzles solved');assert.equal(end.score,'24 puzzles solved');assert.equal(end.leaf==='none',!motion||reduced);assert.equal(end.fits,true);assert.equal(end.color,'rgb(255, 255, 255)');
+        assert.equal(end.mode,mode);assert.equal(end.stock,mode==='timeAttack'?'#edc278':'#eaa18e');assert.equal(end.art,true);
+        assert.equal(end.title,'Puzzles solved');assert.equal(end.score,'24 puzzles solved');assert.equal(end.leaf==='none',!motion||reduced);assert.equal(end.fits,true);assert.equal(end.color,'rgb(38, 41, 31)');
         if(motion&&!reduced)await capture('puzzle-end-flip-'+mode+'-'+width);
       }
     }
   }
+  // Small boards must also hold longer scores and the footer without a record.
+  await call('Emulation.setDeviceMetricsOverride',{width:320,height:640,deviceScaleFactor:1,mobile:false},review.sessionId);
+  for(const theme of ['dark','light'])for(const mode of ['timeAttack','knockout']){
+    await run(`document.documentElement.dataset.theme='${theme}'`);
+    for(const solved of [0,1,128,9999]){
+      await run(`import('./analysis.js').then(m=>{const w=m.learningWorkspace;w.result.mode='${mode}';w.result.solved=${solved};w.result.personalBest=false;w.showPuzzleRunEnd();})`);
+      const score=await run(`(()=>{
+        const e=document.querySelector('.puzzle-run-end'),card=e.firstChild,b=e.getBoundingClientRect(),c=card.getBoundingClientRect(),panel=e.querySelector('.puzzle-end-score'),leaf=e.querySelector('.puzzle-flip-in'),style=getComputedStyle(leaf,'::after'),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
+        ctx.font=style.font;ctx.letterSpacing=style.letterSpacing;
+        return {fits:c.left>=b.left&&c.right<=b.right&&c.top-7>=b.top&&c.bottom+4<=b.bottom,
+          textFits:ctx.measureText(leaf.dataset.value).width<panel.clientWidth-16,label:panel.getAttribute('aria-label'),best:!!e.querySelector('.puzzle-run-end-best')};
+      })()`);
+      assert.equal(score.fits,true);assert.equal(score.textFits,true);assert.equal(score.best,false);
+      assert.equal(score.label,`${solved} ${solved===1?'puzzle':'puzzles'} solved`);
+    }
+    await capture(`puzzle-end-long-score-${mode}-${theme}`);
+  }
+  await call('Emulation.setEmulatedMedia',{features:[{name:'forced-colors',value:'active'}]},review.sessionId);
+  assert.equal(await run(`(()=>{const e=document.querySelector('.puzzle-run-end'),ink=getComputedStyle(e.querySelector('.puzzle-flip')).color,paper=getComputedStyle(e.querySelector('.puzzle-flip-in')).backgroundColor;return ink!==paper;})()`),true);
+  await capture('puzzle-end-forced-colors');
+  await call('Emulation.setEmulatedMedia',{features:[]},review.sessionId);
+  await run("document.documentElement.dataset.theme='dark'");
   for(const mode of ['timeAttack','knockout']){
     await run(`import('./analysis.js').then(m=>{
-      const w=m.learningWorkspace;w.result.mode='${mode}';w.result.results=[{id:w.puzzles[0].id,number:1,correct:true}];
+      const w=m.learningWorkspace;w.result.mode='${mode}';w.result.results=[{id:w.puzzles[0].id,number:1,rating:w.puzzles[0].rating,correct:true}];
       w.render();w.showPuzzleRunEnd();window.persistentEnding=w.runEndOverlay;
     })`);
     await sleep(3300);
     assert.equal(await run(`import('./analysis.js').then(m=>{const w=m.learningWorkspace;w.render();return w.runEndOverlay===persistentEnding&&persistentEnding.isConnected&&getComputedStyle(persistentEnding).opacity==='1';})`),true);
     await run(`document.querySelector('[data-focus=replay-1]').click()`);
-    await waitFor(review,`import('./analysis.js').then(m=>m.learningWorkspace.activity?.replay&&!m.learningWorkspace.runEndOverlay)`,'Puzzle selection clears the ending');
+    await waitFor(review,`import('./analysis.js').then(m=>m.learningWorkspace.activity?.replay&&!m.learningWorkspace.runEndOverlay&&!m.learningWorkspace.busy)`,'Puzzle selection clears the ending and finishes setup');
     await run(`import('./analysis.js').then(m=>{const w=m.learningWorkspace;w.returnToRunResults();w.showPuzzleRunEnd();document.querySelector('[data-focus=run-again]').click();})`);
     await waitFor(review,`import('./analysis.js').then(m=>m.learningWorkspace.run?.mode==='${mode}'&&!m.learningWorkspace.runEndOverlay&&!m.learningWorkspace.busy)`,'Play again clears the ending');
     await run(`import('./analysis.js').then(m=>m.learningWorkspace.finishChallenge('Out of lives'))`);
   }
-  console.log(JSON.stringify({ok:true,out,checks:['countdown timing and gating','settings without Puzzles tab','Flip replaces saved choices','equal counter dimensions at desktop and phone sizes','Go fade continuity','both run modes','global and reduced motion','persistent endings and dismissal']},null,2));
+  console.log(JSON.stringify({ok:true,out,checks:['countdown timing and gating','settings without Puzzles tab','Flip replaces saved choices','equal counter dimensions at desktop and phone sizes','Go fade continuity','matching mode colors and artwork','global and reduced motion','zero to four-digit scores in dark/light themes','forced colors','persistent endings and dismissal']},null,2));
 }
