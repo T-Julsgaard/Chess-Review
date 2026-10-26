@@ -9,8 +9,8 @@ export async function auditLearning({review, call, evaluate, out}) {
     // Exercise long legal SAN and both ordinary and custom category labels.
     m.S.positions[1].san = 'Nfxe5+';
     m.S.positions[2].san = 'exd8=Q+';
-    m.S.positions[3].san = 'O-O-O';
-    m.S.classif = [null, 'blunder', 'miss', 'brilliant', null];
+    m.S.positions[3].san = 'Qxe7';
+    m.S.classif = [null, 'blunder', 'miss', 'blunder', null];
     m.S.settings.categoryNames = {miss: 'Extraordinary missed opportunity'};
     const original = document.querySelector('.moves-panel');
     const results = [];
@@ -24,14 +24,17 @@ export async function auditLearning({review, call, evaluate, out}) {
           document.body.append(panel);
           for (const width of [240, 300, 400]) {
             panel.style.width = width + 'px';
-            for (const selected of [1, 2]) {
+            panel.querySelectorAll('.ml-move').forEach(cell => cell.classList.remove('current'));
+            const rowHeights = [...panel.querySelectorAll('.ml-pair')].map(pair => pair.getBoundingClientRect().height);
+            for (const selected of [1, 2, 3, 4]) {
               panel.querySelectorAll('.ml-move').forEach(cell => cell.classList.toggle('current', +cell.dataset.ply === selected));
               const errors = [];
               const list = panel.querySelector('.movelist');
-              for (const pair of panel.querySelectorAll('.ml-pair')) {
+              for (const [row, pair] of [...panel.querySelectorAll('.ml-pair')].entries()) {
                 const cells = [...pair.querySelectorAll('.ml-move')];
                 const boxes = cells.map(cell => cell.getBoundingClientRect());
                 const bounds = pair.getBoundingClientRect();
+                if (Math.abs(bounds.height - rowHeights[row]) > 1) errors.push('Selecting a move changes row height');
                 if (boxes[0].right > boxes[1].left + 1) errors.push('Move boxes overlap');
                 if (Math.abs(boxes[0].width - boxes[1].width) > 1) errors.push('Unequal move columns');
                 for (const [i, cell] of cells.entries()) {
