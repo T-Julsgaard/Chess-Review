@@ -191,7 +191,7 @@ window.addEventListener("hashchange", handleShareFragment);
 setTimeout(handleShareFragment, 1200);
 
 // ---- Inject "Analyze with Chess Review" buttons ----
-// Two spots on chess.com use the same button: (1) the game-over modal, and (2) the play-page
+// Two spots on chess.com use the same button: (1) the game-over modal, and (2) the game-page
 // sidebar, each right beneath chess.com's "Game Review" CTA. They share an extension-owned builder;
 // only spacing and the insertion point differ. chess.com renders both with Vue (note the
 // <!----> v-if anchors) and re-renders them while the tally/coach-speech animate, so a MutationObserver
@@ -213,8 +213,9 @@ const CC = {
   modalSecondaryRow: [".game-over-secondary-actions-row-component", "[class*='secondary-actions-row']"],
   modalPrimaryCta: ['a[href*="review"]', '[class*="game-over-primary-cta"]', 'a.cc-button-component', 'button.cc-button-component'],
   modalContext: [".game-over-modal-component", "[class*='game-over-modal']"], // "is a game-over modal on screen?"
-  // Play-page sidebar.
-  sidebarEmphasis: [".game-review-emphasis-content", "[class*='game-review-emphasis']"],
+  // Own games wrap the actions in an emphasis section; profile/archive games place
+  // them directly in .sidebar-content. Keep the latter scoped to the sidebar.
+  sidebarSections: [".game-review-emphasis-content", "[class*='game-review-emphasis']", ".sidebar-content .game-review-buttons-component", ".sidebar-content [class*='game-review-buttons']"],
   sidebarReviewButtons: [".game-review-buttons-component", "[class*='game-review-buttons']"],
   // The Game Review CTA inside the sidebar buttons container. href first: durable + locale-proof.
   sidebarCta: ['a[href*="tab=review"]', 'a[aria-label="Game Review"]', "a.cc-button-component", "button.cc-button-component"],
@@ -321,12 +322,12 @@ function injectModalReviewButton(buttonsContainer) {
   console.log("[Chess Analyzer] injected review button (modal)");
 }
 
-// (2) Play-page sidebar: beneath chess.com's "Game Review" CTA, inside its existing container.
+// (2) Game-page sidebar: beneath chess.com's "Game Review" CTA, inside its existing container.
 // Our own stylesheet fills the container width. The moves list above is the sidebar's flex-growing
 // scroll area and the sidebar is height-locked to the board, so adding this button automatically
 // shortens the moves list rather than making the sidebar taller — exactly the trade-off we want.
-function injectSidebarReviewButton(emphasisContent) {
-  const reviewBtns = firstEl(emphasisContent, CC.sidebarReviewButtons);
+function injectSidebarReviewButton(section) {
+  const reviewBtns = section.matches(CC.sidebarReviewButtons.join(",")) ? section : firstEl(section, CC.sidebarReviewButtons);
   if (!reviewBtns) return;
   // Wait until chess.com has actually rendered its own Game Review CTA. Injecting into the section
   // while Vue is still building it corrupts Vue's child diffing and stalls the whole section — it
@@ -359,22 +360,22 @@ function injectSidebarReviewButton(emphasisContent) {
     }
     // (2) Sidebar. The review section only renders post-game, so if it's present but our button still
     // isn't there a few seconds later, an inner selector (review-buttons / CTA) likely changed.
-    const emphasis = firstEl(document, CC.sidebarEmphasis);
-    sidebarRoot = emphasis;
-    if (emphasis) {
-      injectSidebarReviewButton(emphasis);
-      if (!emphasis.querySelector(".chess-analyzer-free-review") && !sidebarTimer) {
+    const section = firstEl(document, CC.sidebarSections);
+    sidebarRoot = section;
+    if (section) {
+      injectSidebarReviewButton(section);
+      if (!section.querySelector(".chess-analyzer-free-review") && !sidebarTimer) {
         sidebarTimer = setTimeout(() => {
           sidebarTimer = null;
-          const emph = firstEl(document, CC.sidebarEmphasis);
-          if (emph && !emph.querySelector(".chess-analyzer-free-review")) {
+          const current = firstEl(document, CC.sidebarSections);
+          if (current && !current.querySelector(".chess-analyzer-free-review")) {
             warnMarkupChanged("sidebar", "the game-review sidebar was detected");
           }
         }, 6000);
       }
     }
   };
-  const relevantSelector = [...CC.modalContainer, ...CC.modalContext, ...CC.sidebarEmphasis].join(",");
+  const relevantSelector = [...CC.modalContainer, ...CC.modalContext, ...CC.sidebarSections].join(",");
   const schedule = () => {
     if (scheduled) return;
     scheduled = true;

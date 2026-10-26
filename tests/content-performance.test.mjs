@@ -5,8 +5,9 @@ import {JSDOM} from 'jsdom';
 
 for(const [file,html,rootSelector,buttonSelector] of [
   ['content.js','<div class="game-over-modal-shell-buttons"><a href="/review">Review</a></div>','.game-over-modal-shell-buttons','.chess-analyzer-free-review'],
+  ['content.js','<div class="sidebar-content"><div class="game-review-buttons-component"><a href="/analysis?tab=review">Game Review</a></div></div>','.game-review-buttons-component','.chess-analyzer-free-review'],
   ['lichess-content.js','<div class="follow-up"><a class="fbt" href="/analysis">Analysis board</a></div>','.follow-up','.chess-analyzer-review'],
-])test(file+': unrelated mutations stay idle, relevant bursts batch, and replacement recovers',async t=>{
+])test(file+' '+rootSelector+': unrelated mutations stay idle, relevant bursts batch, and replacement recovers',async t=>{
   const dom=new JSDOM('<div id="other"></div>'+html,{url:'https://example.test/abcdefgh',runScripts:'outside-only',pretendToBeVisual:true});
   t.after(()=>dom.window.close());const w=dom.window,frames=[],timers=[];
   w.console={log(){},info(){},warn(){}};w.requestAnimationFrame=fn=>{frames.push(fn);return frames.length;};
