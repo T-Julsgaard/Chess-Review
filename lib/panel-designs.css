@@ -11,6 +11,8 @@
 }
 .set-section .set-seg:has([data-setting="accuracyDesign"]) { flex-wrap: wrap; }
 .set-section .set-seg [data-setting="accuracyDesign"] { flex: 1 1 40%; min-height: 32px; }
+.set-section .set-seg:has([data-setting="movesDesign"]) { flex-wrap: wrap; }
+.set-section .set-seg [data-setting="movesDesign"] { flex: 1 1 40%; min-height: 32px; }
 .stage .accuracy-panel.accuracy-original .acc-head { padding: 10.2px 12px; }
 .stage .accuracy-panel.accuracy-original .acc-head h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .1em; }
 .accuracy-original .acc-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 14px; }
@@ -59,8 +61,8 @@
 .accuracy-pages .acc-phase-row strong:last-child { color: var(--ink); }
 
 /* Full height has no header/footer nodes, leaving all panel space for moves. */
-.moves-panel:is([data-design="full"], [data-design="zoomed"]) { overflow: hidden; }
-.mod .moves-panel:is([data-design="full"], [data-design="zoomed"]) > #movesBody { flex: 1 1 auto; min-height: 0; border-radius: inherit; }
+.moves-panel:is([data-design="full"], [data-design="zoomed"], [data-design="zoom20"]) { overflow: hidden; }
+.mod .moves-panel:is([data-design="full"], [data-design="zoomed"], [data-design="zoom20"]) > #movesBody { flex: 1 1 auto; min-height: 0; border-radius: inherit; }
 .moves-panel[data-design="original"] > .moves-head,
 .moves-panel[data-design="original"] > .moves-foot { flex: none; }
 
@@ -76,3 +78,6 @@
 .moves-panel[data-design="zoomed"] .qb.icon { width: 22px; height: 22px; }
 .moves-panel[data-design="zoomed"] .qb.dot { width: 11px; height: 11px; }
 .moves-panel[data-design="zoomed"] .qb.label { font-size: 11px; }
+
+/* A gentler version scales the original rows, cards or compact list uniformly. */
+.moves-panel[data-design="zoom20"] .movelist { zoom: 1.2; }

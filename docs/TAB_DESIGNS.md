@@ -8,7 +8,7 @@ The choices are local visual preferences and survive reopening the extension.
 | Engine | Original, Focus | Original |
 | Evaluation bar | Original, Balance | Balance |
 | Accuracy | Original, Page tabs, Dials, Reveal | Reveal |
-| Move list | Original, Full height | Full height |
+| Move list | Original, Full height, Zoomed in, Zoom +20% | Full height |
 
 Original Accuracy restores the combined score/category panel, its seven-row
 summary, expandable full category list, explanations and practice button. Page
@@ -29,7 +29,10 @@ presentation; existing saved design choices are preserved.
 Original Move list restores its title header and empty footer strip. Full height
 omits both nodes so the scrollable moves body reaches the panel bottom. It keeps
 the same move cells mounted when switching; the separate rows/cards/compact and
-badge preferences apply to either design.
+badge preferences apply to all designs. Zoomed in uses large notation and spacious
+rows. Zoom +20% uniformly enlarges the original list contents by 20%, providing a
+gentler increase in text, icons, badges and row spacing. Both keep the same panel
+dimensions and full-height scroll area, with the current move kept in view.
 
 Focus Engine highlights the recommended move, separates its continuation, and
 keeps a White-relative score beside each candidate. Click a candidate to explore
