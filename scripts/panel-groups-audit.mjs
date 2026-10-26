@@ -22,7 +22,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await run("document.querySelector('[data-reorg=right]').click()");
   const start=await run("import('./analysis.js').then(m=>({layout:structuredClone(m.S.layout),keys:[...document.querySelectorAll('.mod.panel-selected')].map(n=>n.dataset.mod)}))");
   assert.ok(start.keys.includes('moves')&&start.keys.includes('engine')&&!start.keys.includes('board'));
-  const label=await rect('.moves-panel .panel-head h3');
+  const label=await rect('.moves-panel .ml-move');
   const boxes=start.keys.map(key=>start.layout[key]),left=Math.min(...boxes.map(b=>b.x)),top=Math.min(...boxes.map(b=>b.y)),engine=start.layout.engine;
   const grip=await rect('[data-mod=engine] .mod-resize.se'),x=grip.x+grip.width/2,y=grip.y+grip.height/2;
   const dx=-(engine.x+engine.w-left)*.2,dy=-(engine.y+engine.h-top)*.2;
@@ -35,7 +35,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await drag(x,y,dx,dy);await sleep(100);
   let changed=await run("import('./analysis.js').then(m=>structuredClone(m.S.layout))");
   for(const key of start.keys){near(changed[key].w,start.layout[key].w*.8);near(changed[key].h,start.layout[key].h*.8);assert.ok(Math.abs(changed[key].scale-(start.layout[key].scale||1)*.8)<.001);}
-  const smallLabel=await rect('.moves-panel .panel-head h3');near(smallLabel.height,label.height*.8);
+  const smallLabel=await rect('.moves-panel .ml-move');near(smallLabel.height,label.height*.8);
   const sameBoard=await rect('.board');for(const key of ['x','y','width','height'])near(sameBoard[key],board[key]);
   const handle=await rect('[data-mod=review] .mod-handle');await drag(handle.x+10,handle.y+10,-40,30);await sleep(100);
   const moved=await run("import('./analysis.js').then(m=>structuredClone(m.S.layout))");

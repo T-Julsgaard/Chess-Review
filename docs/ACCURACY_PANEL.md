@@ -2,18 +2,28 @@
 
 The panel has three pages with fixed, shared dimensions. Overview is the initial
 page; selecting a page never resizes a panel or moves playback controls. Desktop
-uses the former expanded Accuracy height, with spare Engine height reduced in
-shorter Full HD windows so the puzzle entry remains visible. Short windows scroll the page body
-while the page selector stays visible. The three labeled tabs support Left,
-Right, Home and End; move counts and evaluation-loss links are keyboard buttons.
-Category aliases remain editable. There are no category/score explanation
-tooltips or practice button in this panel.
+uses the original **compact** Accuracy height, including the original 87px
+content inset when loading a saved expanded layout. A slim bottom carousel
+replaces the three large tabs: previous/next arrows flank the current page name
+and three clickable position markers. The carousel supports Left, Right, Home
+and End. Short windows scroll the page body while navigation remains visible.
+Move counts and evaluation-loss links are keyboard buttons. Category aliases
+remain editable. Accuracy and Moves have no visible title headers; their panels
+retain accessible names. No page has explanatory footer copy, score/category
+tooltips or a practice button.
 
 ## Overview and phase scores
 
 Overall accuracy and estimated Elo retain the existing calibrated scoring and
 rating modes. Phase accuracy is computed locally from the same scored decisions,
 without new searches, permissions, requests or changes to saved analysis.
+
+The overview pairs two open-arc accuracy dials with prominent Elo estimates.
+Opening, middlegame and endgame use paired bars aligned with the same player
+columns. Arcs and bars are decorative; numerical scores remain readable text,
+and unavailable scores show an em dash with an empty meter. Perfect accuracy
+uses `100%` so it fits comfortably inside the dial. The score display never
+changes the underlying calculated values.
 
 Lichess's [phase accuracy implementation](https://github.com/lichess-org/lila/blob/master/modules/analyse/src/main/AccuracyPercent.scala)
 partitions a game and runs its accuracy aggregator on each phase. Its

@@ -41,12 +41,12 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     for (let page = 0; page < 3; page++) {
       await run(`document.querySelector('#accuracy-tab-${page}').click()`);
       const state = await run(`(()=>{
-        const p=document.querySelector('.accuracy-panel'),body=p.querySelector('.acc-page'),tabs=p.querySelector('.acc-tabs');
-        return {page:document.querySelector('[aria-selected=true]').textContent,
+        const p=document.querySelector('.accuracy-panel'),body=p.querySelector('.acc-page'),tabs=p.querySelector('.acc-pager');
+        return {page:document.querySelector('[aria-selected=true]').getAttribute('aria-label'),
           overflow:body.scrollWidth>body.clientWidth+1, tabsOverflow:tabs.scrollWidth>tabs.clientWidth+1,
           windowOverflow:document.documentElement.scrollWidth>innerWidth+1,
           panelHeight:p.getBoundingClientRect().height,bodyHeight:body.clientHeight,contentHeight:body.scrollHeight,
-          font:getComputedStyle(p.querySelector('.acc-name')).fontSize, headingFont:getComputedStyle(p.querySelector('h3')).fontSize,
+          font:getComputedStyle(p.querySelector('.acc-name')).fontSize, headers:document.querySelectorAll('.accuracy-panel .panel-head,.moves-panel .panel-head').length,
           valueFont:p.querySelector('.acc-val')?getComputedStyle(p.querySelector('.acc-val')).fontSize:null,
           puzzleBottom:document.querySelector('[data-mod=learn]').getBoundingClientRect().bottom,
           layout:JSON.stringify([...document.querySelectorAll('.mod')].map(n=>{const r=n.getBoundingClientRect();return [n.dataset.mod,r.x,r.y,r.width,r.height]}))};})()`);
@@ -56,13 +56,14 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
       if(width>=1100)assert.ok(state.puzzleBottom<=height+1,'Puzzle entry must remain visible');
       assert.equal(state.layout, before, 'Changing pages must not move panels');
       assert.equal(state.font, '14px');
-      assert.equal(state.headingFont, '16px');
-      if (page === 0) assert.equal(state.valueFont, '40px');
+      assert.equal(state.headers, 0);
+      if (page === 0) assert.ok(parseFloat(state.valueFont)>=32&&parseFloat(state.valueFont)<=38);
       if (page === 1) assert.equal(await run("document.querySelectorAll('.qbreak-row').length"), 10);
       if (width >= 1280 || width === 390) await shot(`accuracy-${page}-${width}x${height}`);
       const clip=await run("(()=>{const r=document.querySelector('.accuracy-panel').getBoundingClientRect();return {x:r.x+scrollX,y:r.y+scrollY,width:r.width,height:r.height,scale:1}})()");
       const panelImage=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true,clip},review.sessionId);
       await fs.writeFile(path.join(out,`accuracy-panel-${page}-${width}x${height}.png`),Buffer.from(panelImage.data,'base64'));
+      if(width===1920&&height===1080)assert.ok(Math.abs(state.panelHeight-370.69)<1,'Restore the original compact panel height');
       if (width >= 1800 && height >= 1000) assert.ok(state.contentHeight <= state.bodyHeight + 1, 'Desktop page must fit: ' + JSON.stringify(state));
       evidence.push({width, height, page, ...state, layout: undefined});
     }
@@ -89,12 +90,14 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   const {sessionId:gallerySession}=await call('Target.attachToTarget',{targetId:galleryId,flatten:true});
   try{
     await waitFor({sessionId:gallerySession},'!!document.body','Preview gallery');
-    await evaluate({sessionId:gallerySession},`document.documentElement.dataset.theme='dark';document.head.innerHTML='<link rel="stylesheet" href="${origin}/styles.css">';document.body.innerHTML=${JSON.stringify('<div class="stage" style="display:flex;gap:16px;padding:20px;align-items:flex-start">'+panels.map(panel=>'<div class="mod" style="width:310px;height:510px;flex:none"><div class="mod-inner"><div>'+panel+'</div></div></div>').join('')+'</div>')}`);
-    await call('Emulation.setDeviceMetricsOverride',{width:1010,height:550,deviceScaleFactor:1,mobile:false},gallerySession);
+    await evaluate({sessionId:gallerySession},`document.documentElement.dataset.theme='dark';document.head.innerHTML='<link rel="stylesheet" href="${origin}/styles.css">';document.body.innerHTML=${JSON.stringify('<div class="stage" style="display:flex;gap:16px;padding:20px;align-items:flex-start">'+panels.map(panel=>'<div class="mod" style="width:310px;height:420px;flex:none"><div class="mod-inner"><div>'+panel+'</div></div></div>').join('')+'</div>')}`);
+    await call('Emulation.setDeviceMetricsOverride',{width:1010,height:460,deviceScaleFactor:1,mobile:false},gallerySession);
     await sleep(300);
-    assert.equal(await evaluate({sessionId:gallerySession},"getComputedStyle(document.querySelector('.acc-val')).fontSize"),'40px');
+    assert.equal(await evaluate({sessionId:gallerySession},"getComputedStyle(document.querySelector('.acc-val')).fontSize"),'38px');
     const image=await call('Page.captureScreenshot',{format:'png'},gallerySession);
     await fs.writeFile(path.join(out,'accuracy-pages-preview.png'),Buffer.from(image.data,'base64'));
+    const overview=await call('Page.captureScreenshot',{format:'png',clip:{x:20,y:20,width:310,height:420,scale:1}},gallerySession);
+    await fs.writeFile(path.join(out,'accuracy-overview-preview.png'),Buffer.from(overview.data,'base64'));
   }finally{await call('Target.closeTarget',{targetId:galleryId});}
   await run("document.documentElement.dataset.theme='light';document.querySelector('#accuracy-tab-0').click()");
   await shot('accuracy-light');

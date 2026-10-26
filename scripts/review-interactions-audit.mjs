@@ -12,7 +12,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await resize(width,height);
     const initial=await run("({w:document.documentElement.clientWidth,h:document.documentElement.clientHeight})");
     for(let n=0;n<4;n++){
-      await run("document.querySelectorAll('.acc-tabs button')[(Number(document.querySelector('.acc-page-count').textContent[0]))%3].click()");
+      await run("document.querySelector('.acc-page-next').click()");
       const state=await run("({w:document.documentElement.clientWidth,h:document.documentElement.clientHeight,scrollW:document.documentElement.scrollWidth,scrollH:document.documentElement.scrollHeight,x:scrollX,y:scrollY})");
       assert.deepEqual({w:state.w,h:state.h},initial);assert.equal(state.scrollH,height);assert.equal(state.scrollW,width);assert.equal(state.y,0);
       if(n===0)await shot(`expanded-accuracy-${width}x${height}`);

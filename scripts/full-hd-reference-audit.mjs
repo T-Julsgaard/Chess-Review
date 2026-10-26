@@ -24,9 +24,6 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out,sour
     await evaluate(tab,"document.querySelector('.learning-announcement-disable')?.click()");
     await evaluate(tab,"import('./analysis.js').then(m=>{m.S.settings.moveAnim=false;})");
   }
-  // Accuracy now permanently uses its former expanded height. Its larger
-  // typography is intentional; the rest of the composition remains comparable.
-  await evaluate(reference,"document.querySelector('.qbreak-toggle').click()");
   await evaluate(review,"document.documentElement.style.setProperty('--ip-font','20px')");
   assert.equal(await evaluate(review,"getComputedStyle(document.querySelector('.ip-text')).fontSize"),'22.5px','Commentary sizing must remain live');
   await evaluate(review,"document.documentElement.style.setProperty('--ip-font','16px')");
@@ -37,7 +34,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out,sour
     return evaluate(tab,`(async()=>{
     const currentTab=await chrome.tabs.getCurrent(),zoom=await chrome.tabs.getZoom(currentTab.id);
     const rect=n=>{const r=n.getBoundingClientRect();return {x:r.x*zoom,y:r.y*zoom,w:r.width*zoom,h:r.height*zoom};};
-    const selectors=['.topbar','.brand-mark','.learning-toggle','.board','[data-mod=moves] .panel-head h3','.controls button.play','.engine-bestwalk','.lib-tab','.feedback-floating'];
+    const selectors=['.topbar','.brand-mark','.learning-toggle','.board','.controls button.play','.engine-bestwalk','.lib-tab','.feedback-floating'];
     return {zoom,width:Math.round(innerWidth*zoom),height:Math.round(innerHeight*zoom),
       panels:Object.fromEntries([...document.querySelectorAll('.mod')].map(n=>[n.dataset.mod,rect(n)])),
       contents:Object.fromEntries(selectors.map(s=>[s,rect(document.querySelector(s))]))};
@@ -56,7 +53,6 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out,sour
       assert.equal(old.zoom,.87);assert.equal(native.zoom,1);
       const differences=[];
       for(const group of ['panels','contents'])for(const [key,box]of Object.entries(old[group]))for(const prop of ['x','y','w','h']){
-        if(group==='panels'&&height<942&&((key==='engine'&&prop==='h')||(key==='learn'&&prop==='y')))continue;
         const delta=native[group][key][prop]-box[prop];
         if(Math.abs(delta)>1.1)differences.push({group,key,prop,old:box[prop],native:native[group][key][prop],delta});
       }

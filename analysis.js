@@ -142,8 +142,7 @@ function badgeLabelStyle(value = S.settings.badgeTooltip) {
   if (value === true) return "original";
   return Object.hasOwn(BADGE_LABEL_STYLES, value) ? value : "off";
 }
-// Retain the legacy layout baselines when loading saved custom panel placements.
-const QBREAK_SUMMARY = ["brilliant","great","best","inacc","mistake","miss","blunder"];
+// The move-quality page keeps the complete category list, with Book last.
 const QBREAK_FULL = ["brilliant","great","best","excellent","good","inacc","mistake","miss","blunder","book"];
 const ACCURACY_PAGES = ['Overview', 'Move quality', 'Advanced'];
 const NOTEWORTHY = new Set(["brilliant","great","inacc","mistake","miss","blunder"]);
@@ -747,7 +746,7 @@ const S = {
   // `progress` is the contiguous prefix that is safe to navigate to while a batch is
   // still running. `completed` is the total number of game plies already returned by
   // any worker. They differ when parallel workers finish out of order.
-  analyzing: true, progress: 0, completed: 0, analysisError: null, userArrows: [], userMarks: [], qbreakExpanded: true, accuracyPage: 0,
+  analyzing: true, progress: 0, completed: 0, analysisError: null, userArrows: [], userMarks: [], qbreakExpanded: false, accuracyPage: 0,
   // Collapsible settings sections: open/closed state, keyed by section title.
   setOpen: {},
   settings: { ...DEFAULT_SETTINGS },
@@ -1554,12 +1553,10 @@ function buildUI() {
   const playerBot = el("div", { id: "playerBot" });
   const controls = el("div", { class: "controls", id: "controls" });
 
-  // moves panel skeleton (head + scroll body + foot)
+  // The move list starts directly with moves; keep its name accessible.
   const movesBody = el("div", { class: "panel-body", id: "movesBody" });
-  const movesCount = el("span", { class: "count", id: "movesCount" });
   const movesFoot = el("div", { class: "moves-foot", id: "movesFoot", hidden: true });
-  const movesPanel = el("div", { class: "panel moves-panel" },
-    el("div", { class: "panel-head" }, el("h3", {}, "Moves"), movesCount),
+  const movesPanel = el("div", { class: "panel moves-panel", "aria-label": "Moves" },
     movesBody, movesFoot,
   );
 
@@ -1623,7 +1620,7 @@ function buildUI() {
   UI = {
     meta: document.getElementById("meta"), settings, canvas, boardWrap,
     playerTop, playerBot, controls, coach: coachMount, evalbar: evalbarMount,
-    review: reviewMount, movesBody, movesCount, movesFoot,
+    review: reviewMount, movesBody, movesFoot,
     graph: graphMount, stats: statsMount, engine: engineMount,
     libRail, libControls, libList, libCount, libPanel:libRail.querySelector(".lib-panel"), saveStatus,
   };
@@ -1890,13 +1887,10 @@ function growCanvas() {
 // What collapsing the accuracy breakdown is worth on the canvas: the hidden rows' height (+ the
 // column row-gap), and modules below it in the same column. Playback controls stay anchored.
 function accuracyReflowInfo(layout = S.layout) {
-  const accMod = UI.canvas.querySelector('.mod[data-mod="accuracy"]');
   const acc = layout.accuracy;
-  const row = accMod && accMod.querySelector(".qbreak-row");
-  const qb = accMod && accMod.querySelector(".qbreak");
-  const gap = qb ? (parseFloat(getComputedStyle(qb).rowGap) || 0) : 0;
-  const rowH = row ? row.offsetHeight : 24;
-  const delta = Math.round((QBREAK_FULL.length - QBREAK_SUMMARY.length) * (rowH + gap))*panelScale(acc);
+  // Saved custom layouts use the old expanded baseline. Its original compact
+  // inset was three 22px rows plus 7px gaps, independent of the selected page.
+  const delta = 87 * panelScale(acc);
   const belowKeys = [];
   for (const [k, o] of Object.entries(layout)) {
     if (k === "accuracy" || k === "controls") continue;
@@ -4155,7 +4149,23 @@ function setAccuracyPage(page, focus = false) {
   statsRefs = null;
   hideQTip();
   renderStats();
-  if (focus) UI.stats.querySelector('[aria-selected="true"]')?.focus({preventScroll: true});
+  if (focus) UI.stats.querySelector(typeof focus === 'string' ? focus : '[aria-selected="true"]')?.focus({preventScroll: true});
+}
+function accuracyDial(value, busy) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 120 120');
+  svg.setAttribute('aria-hidden', 'true');
+  for (const [className, length] of [['acc-dial-track', 75], ['acc-dial-fill', busy || value == null ? 0 : .75 * Math.max(0, Math.min(100, value))]]) {
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    for (const [key, val] of Object.entries({cx: 60, cy: 60, r: 51, pathLength: 100,
+      fill: 'none', transform: 'rotate(135 60 60)', class: className, 'stroke-dasharray': length + ' 100'})) circle.setAttribute(key, val);
+    if (className === 'acc-dial-fill' && length === 0) circle.setAttribute('stroke-opacity', 0);
+    svg.append(circle);
+  }
+  return el('div', {class: 'acc-dial'}, svg,
+    busy ? loaderNode('acc-val', 'var(--accent)') : el('strong', {class: 'acc-val'},
+      value == null ? '—' : value >= 100 ? '100' : value.toFixed(1), value == null ? null : el('span', {class: 'acc-unit'}, '%')),
+    el('span', {class: 'acc-dial-label'}, 'Accuracy'));
 }
 function renderStats() {
   const sides = [S.meSide, S.meSide === "w" ? "b" : "w"];
@@ -4184,19 +4194,21 @@ function renderStats() {
   let content;
   if (page === 0) {
     content = el('div', {class: 'acc-overview'},
-      comparison('Game accuracy', sides.map(side => busy ? loaderNode('acc-val', 'var(--accent)')
-        : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side].toFixed(1),
-          S.acc[side] == null ? null : el('span', {class: 'acc-unit'}, '%'))), null, 'acc-overall'),
-      comparison('Estimated Elo', sides.map(side => el('strong', {class: 'acc-elo'}, pending(
-        estimateElo(S.accElo[side], S.players[side]?.rating, side) == null ? '—'
-          : '≈ ' + estimateElo(S.accElo[side], S.players[side]?.rating, side))))),
-      el('div', {class: 'acc-phases'}, el('h4', {}, 'Accuracy by phase'),
-        ...GAME_PHASES.map((phase, i) => el('div', {class: 'acc-phase-row'},
-          el('strong', {}, pending(number(S.gameStats?.[sides[0]]?.phases[phase].accuracy))),
-          el('span', {}, ['Opening', 'Middlegame', 'Endgame'][i]),
-          el('strong', {}, pending(number(S.gameStats?.[sides[1]]?.phases[phase].accuracy))))),
-        el('p', {class: 'acc-note'}, S.blank ? 'Load a game to see its accuracy.'
-          : busy ? 'Scores appear when analysis finishes.' : '— Phase not reached or no scored decisions.')));
+      pair('acc-scorecards', sides.map(side => {
+        const rating = estimateElo(S.accElo[side], S.players[side]?.rating, side);
+        return el('div', {class: 'acc-scorecard'}, accuracyDial(S.acc[side], busy),
+          el('div', {class: 'acc-estimate'}, el('strong', {class: 'acc-elo'}, pending(rating == null ? '—' : '≈ ' + rating)),
+            el('span', {class: 'acc-elo-label'}, 'Estimated Elo')));
+      })),
+      el('div', {class: 'acc-phases', 'aria-label': 'Accuracy by game phase'},
+        ...GAME_PHASES.map((phase, i) => {
+          const values = sides.map(side => S.gameStats?.[side]?.phases[phase].accuracy);
+          return el('div', {class: 'acc-phase-row'},
+            el('div', {class: 'acc-phase-values'}, el('strong', {}, pending(number(values[0]))),
+              el('span', {}, ['Opening', 'Middlegame', 'Endgame'][i]), el('strong', {}, pending(number(values[1])))),
+            pair('acc-phase-bars', values.map(value => el('span', {class: 'acc-phase-track', 'aria-hidden': 'true'},
+              el('i', {style: {width: (busy || value == null ? 0 : value) + '%'}})))));
+        })));
   } else if (page === 1) {
     content = el('div', {class: 'acc-quality'},
       el('div', {class: 'qbreak'}, ...QBREAK_FULL.map(k => {
@@ -4208,7 +4220,7 @@ function renderStats() {
         });
         rows[k] = counts;
         return el('div', {class: 'qbreak-row'}, counts[0], categoryLabel(k), counts[1]);
-      })), el('p', {class: 'acc-note'}, 'Select a count to revisit the first move.'));
+      })));
   } else {
     const stats = sides.map(side => S.gameStats?.[side]);
     content = el('div', {class: 'acc-advanced'},
@@ -4223,23 +4235,26 @@ function renderStats() {
           onclick: () => gotoMainline(loss.ply)},
           el('strong', {class: 'acc-stat-value'}, pending(loss ? Math.round(loss.loss) + ' cp' : '—')),
           loss && loss.loss > 0 ? el('span', {}, Math.ceil(loss.ply / 2) + (position.color === 'w' ? '. ' : '… ') + position.san + ' ↗') : null);
-      })),
-      el('p', {class: 'acc-note acc-evidence'}, busy ? 'Stats appear when analysis finishes.'
-        : 'Forced moves excluded. Centipawn stats omit mate scores.'));
+      })));
   }
-  const tabs = el('div', {class: 'acc-tabs', role: 'tablist', 'aria-label': 'Accuracy pages',
-    onkeydown: e => {
+  const navigatePage = e => {
       const next = {ArrowRight: page + 1, ArrowLeft: page - 1, Home: 0, End: 2}[e.key];
       if (next == null) return;
       e.preventDefault(); e.stopPropagation(); setAccuracyPage(next, true);
-    }}, ...ACCURACY_PAGES.map((name, i) => el('button', {type: 'button', role: 'tab', id: 'accuracy-tab-' + i,
+  };
+  const tabs = el('div', {class: 'acc-pager-steps', role: 'tablist', 'aria-label': 'Accuracy pages'},
+    ...ACCURACY_PAGES.map((name, i) => el('button', {type: 'button', role: 'tab', id: 'accuracy-tab-' + i,
       'aria-selected': String(page === i), 'aria-controls': 'accuracy-page', tabindex: page === i ? 0 : -1,
-      onclick: () => setAccuracyPage(i, true)}, name)));
-  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel'},
-    el('div', {class: 'panel-head acc-head'}, el('h3', {}, 'Accuracy'), el('span', {class: 'acc-page-count'}, (page + 1) + ' / 3')),
-    tabs,
-    el('div', {class: 'panel-body acc-page', id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
-      'aria-labelledby': 'accuracy-tab-' + page}, players, content)));
+      'aria-label': name, onclick: () => setAccuracyPage(i, true)}, el('span', {class: 'acc-page-mark'}))));
+  const pager = el('div', {class: 'acc-pager', role: 'group', 'aria-label': 'Accuracy navigation', onkeydown: navigatePage},
+    el('button', {type: 'button', class: 'acc-page-prev', 'aria-label': 'Previous accuracy page: ' + ACCURACY_PAGES[(page + 2) % 3],
+      onclick: () => setAccuracyPage(page - 1, '.acc-page-prev')}, icon('chevron')),
+    el('div', {class: 'acc-pager-center'}, el('span', {class: 'acc-page-name', 'aria-hidden': 'true'}, ACCURACY_PAGES[page]), tabs),
+    el('button', {type: 'button', class: 'acc-page-next', 'aria-label': 'Next accuracy page: ' + ACCURACY_PAGES[(page + 1) % 3],
+      onclick: () => setAccuracyPage(page + 1, '.acc-page-next')}, icon('chevron')));
+  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel', 'aria-label': 'Accuracy'},
+    el('div', {class: 'panel-body acc-page' + (page === 0 ? ' acc-page-overview' : ''), id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
+      'aria-labelledby': 'accuracy-tab-' + page}, players, content), pager));
   statsRefs = busy ? {page, rows} : null;
   if (UI.canvas.classList.contains('full-hd-reference')) applyLayout();
 }
@@ -4456,9 +4471,7 @@ function renderMoves() {
   }
   UI.movesBody.style.padding = ml === "rows" ? "0" : "var(--pad)";
   UI.movesBody.replaceChildren(list);
-  // The Moves header stays clean — no "Start" placeholder and no running current-move readout.
-  UI.movesCount.textContent = "";
-  // Book moves are now shown in the Accuracy breakdown (expanded), no longer here in "Moves".
+  // Book counts live on the move-quality page, separate from the move list.
   UI.movesFoot.hidden = true;
   // auto-scroll to the current move
   highlightCurrentMove(true);

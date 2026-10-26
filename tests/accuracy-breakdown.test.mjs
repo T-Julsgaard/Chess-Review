@@ -10,9 +10,13 @@ function review(t) {
 
 test('Accuracy opens on overview, with phase scores and Elo and no practice or explanation controls', t => {
   const a = review(t), panel = a.dom.window.document.querySelector('.accuracy-panel');
-  assert.equal(panel.querySelector('[aria-selected="true"]').textContent, 'Overview');
+  assert.equal(panel.querySelector('[aria-selected="true"]').getAttribute('aria-label'), 'Overview');
   assert.equal(panel.querySelectorAll('.acc-phase-row').length, 3);
   assert.match(panel.textContent, /Estimated Elo/);
+  assert.equal(a.state.qbreakExpanded, false);
+  assert.equal(panel.querySelector('.panel-head,.acc-note'), null);
+  assert.equal(a.dom.window.document.querySelector('.moves-panel .panel-head'), null);
+  assert.equal(panel.querySelectorAll('.acc-dial svg circle').length, 4);
   assert.equal(panel.querySelector('.practice-btn,.qbreak-toggle,.qbreak'), null);
   panel.querySelector('.acc-val').dispatchEvent(new a.dom.window.MouseEvent('mouseenter'));
   assert.equal(a.dom.window.document.querySelector('.q-tip.show'), null);
@@ -54,7 +58,7 @@ test('analyzing can change pages and update counts without restarting loaders or
   a.call('setAccuracyPage', 1, true); a.state.counts.w.blunder = 2; a.call('renderStats');
   assert.equal(doc.querySelector('[data-category="blunder"]').closest('.qbreak-row').querySelector('.ct.left').textContent, '2');
   assert.equal(doc.activeElement.id, 'accuracy-tab-1');
-  a.call('setAccuracyPage', 2); assert.match(doc.querySelector('.acc-advanced').textContent, /Stats appear when analysis finishes/);
+  a.call('setAccuracyPage', 2); assert.match(doc.querySelector('.acc-advanced').textContent, /···/);
   a.state.analyzing = false; a.call('renderStats'); assert.doesNotMatch(doc.querySelector('.acc-advanced').textContent, /···/);
 });
 
@@ -64,5 +68,34 @@ test('advanced loss links navigate using the mainline and retain the selected pa
   a.call('setAccuracyPage', 2); let ply; a.replace('gotoMainline', n => { ply = n; });
   const links = doc.querySelectorAll('.acc-loss'); links[0].click(); assert.equal(ply, 3);
   links[1].click(); assert.equal(ply, 6);
-  a.call('renderStats'); assert.equal(doc.querySelector('[aria-selected="true"]').textContent, 'Advanced');
+  a.call('renderStats'); assert.equal(doc.querySelector('[aria-selected="true"]').getAttribute('aria-label'), 'Advanced');
+});
+
+test('the carousel arrows wrap between pages and retain focus without adding footer copy', t => {
+  const a = review(t), doc = a.dom.window.document;
+  for (const [selector, page] of [['.acc-page-next', 1], ['.acc-page-next', 2], ['.acc-page-next', 0], ['.acc-page-prev', 2]]) {
+    doc.querySelector(selector).click(); assert.equal(a.state.accuracyPage, page);
+    assert.equal(doc.activeElement, doc.querySelector(selector));
+    assert.equal(doc.querySelector('.accuracy-panel .acc-evidence,.accuracy-panel .acc-head'), null);
+    assert.equal(doc.querySelector('.acc-page').lastElementChild.lastElementChild.matches('p'), false);
+  }
+  const idx = a.state.idx;
+  doc.querySelector('.acc-page-next').dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'Home', bubbles: true}));
+  assert.equal(a.state.accuracyPage, 0); assert.equal(a.state.idx, idx);
+});
+
+test('overview dials and paired phase bars reflect scores without changing numerical evidence', t => {
+  const a = review(t), S = a.state, doc = a.dom.window.document;
+  S.acc = {w: 100, b: 72.4};
+  for (const side of ['w', 'b']) S.gameStats[side].phases.opening.accuracy = side === 'w' ? 90 : 65;
+  const before = JSON.stringify({acc: S.acc, stats: S.gameStats, classif: S.classif});
+  a.call('renderStats');
+  assert.equal(doc.querySelectorAll('.acc-dial-fill')[0].getAttribute('stroke-dasharray'), '75 100');
+  assert.equal(doc.querySelectorAll('.acc-val')[0].textContent, '100%');
+  assert.equal(doc.querySelectorAll('.acc-phase-bars i')[0].style.width, '90%');
+  assert.equal(doc.querySelectorAll('.acc-phase-bars i')[1].style.width, '65%');
+  assert.equal(JSON.stringify({acc: S.acc, stats: S.gameStats, classif: S.classif}), before);
+  S.acc.w = null; a.call('renderStats');
+  assert.equal(doc.querySelector('.acc-dial-fill').getAttribute('stroke-opacity'), '0');
+  assert.equal(doc.querySelector('.acc-val').textContent, '—');
 });
