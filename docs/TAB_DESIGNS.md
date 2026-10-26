@@ -60,6 +60,14 @@ reserves the page for future iterations. Both new preferences reset with Visual.
 Run `node scripts/learning-browser.mjs --working-tree --move-quality` for eight
 viewport sizes, theme screenshots, keyboard activation and saved-choice checks.
 
+Modern's Quality page shares the overview's player cards and their exact position.
+Its Original category list is centered in the remaining portrait-panel height,
+with larger badges and balanced count columns. Hovering or focusing a category
+enlarges its badge and label without shifting the rows; reduced motion disables
+the transition. Category renaming and count links retain their existing behavior.
+Run `node scripts/learning-browser.mjs --working-tree --modern-quality` to verify
+header alignment, fit at eight viewports, hover/focus enlargement and renaming.
+
 Reveal is a new iteration of Dials with **Estimated rating** labels and no score
 glow. When its overview first receives completed results, all numbers count up,
 rings and phase bars fill, and player names/labels type in together over 1.2

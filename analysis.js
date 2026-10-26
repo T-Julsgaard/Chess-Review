@@ -4485,7 +4485,7 @@ function renderStats() {
   const players = pair('acc-players' + (phaseReport2 && page === 0 ? ' phase2-players' : ''), [
     phaseReport2 && page === 0 ? el('span', {'aria-hidden': 'true'}) : null,
     ...sides.map(side => el('div', {class: 'acc-player'},
-    page === 0 ? null : el('span', {class: 'acc-side ' + side, 'aria-label': side === 'w' ? 'White' : 'Black'}),
+    page === 0 || phaseModern && page === 1 ? null : el('span', {class: 'acc-side ' + side, 'aria-label': side === 'w' ? 'White' : 'Black'}),
     el('span', {class: 'acc-name'}, S.players[side].name)))]);
   const rows = {};
   let content;
@@ -4522,7 +4522,7 @@ function renderStats() {
   }
   UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials accuracy-book' + (reveal ? ' accuracy-reveal' : '') + (phaseReport ? ' accuracy-phase-report' : '') + (phaseReport2 && page === 0 ? ' accuracy-phase-report-2' : '') + (phaseModern ? ' accuracy-phase-modern' : ''), 'data-design': design, 'aria-label': 'Accuracy'},
     accuracyPager(),
-    el('div', {class: 'panel-body acc-page' + (page === 0 ? ' acc-page-overview' : ''), id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
+    el('div', {class: 'panel-body acc-page' + (page === 0 ? ' acc-page-overview' : phaseModern && page === 1 ? ' acc-page-quality' : ''), id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
       'aria-labelledby': 'accuracy-tab-' + page}, players, content)));
   statsRefs = busy ? {design, page, rows} : null;
   if (UI.canvas.classList.contains('full-hd-reference')) applyLayout();
