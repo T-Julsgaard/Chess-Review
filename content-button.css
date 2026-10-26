@@ -34,6 +34,26 @@ button.chess-analyzer-free-review--modal {
   width: var(--chess-review-modal-width, calc(100% - 32px)) !important;
 }
 
+/* Outside the native panel's animated height/overflow constraints. Only
+   extension-owned elements receive these layout rules. */
+div.chess-analyzer-review-slot {
+  all: initial !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  flex: 0 0 auto !important;
+}
+
+div.chess-analyzer-review-slot[hidden] {
+  display: none !important;
+}
+
+button.chess-analyzer-free-review--sidebar {
+  width: var(--chess-review-sidebar-width, 100%) !important;
+}
+
 button.chess-analyzer-free-review:hover:not(:disabled) {
   background: linear-gradient(160deg, #383a2f, #262a22) !important;
   border-color: #7fb45f !important;
