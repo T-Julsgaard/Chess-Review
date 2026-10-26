@@ -26,7 +26,7 @@ visual preferences.
 | --- | --- | --- |
 | Engine | Original, Focus, Minimal | Original (Minimal in Modern setup) |
 | Evaluation bar | Original, Balance | Balance |
-| Evaluation | Original, Timeline, Move bars | Timeline |
+| Evaluation | Original, Timeline, Timeline v2, Move bars, Minimal | Timeline |
 | Accuracy overview | Original, Page tabs, Dials, Reveal, Phase report, Phase report 2, Phase report Modern | Phase report |
 | Accuracy move quality | Original, Distribution | Distribution |
 | Accuracy advanced | Original | Original |
@@ -154,11 +154,16 @@ color styles and panel dimensions apply to both versions.
 Run `node scripts/learning-browser.mjs --working-tree --evaluation-bar` to check
 score fit, mates, flips and saved choices at four viewport sizes with screenshots.
 
-Timeline Evaluation shows a continuous curve around a labeled equal-position
-line. Its header pairs the selected move with its score and a plain-language
-White/Black advantage label. Move bars gives every analyzed position its own
-column: light above zero for White, gray below zero for Black. Its compact
-previous/next buttons step through evaluated positions. Both designs support
+Timeline Evaluation shows a continuous curve around an equal-position line,
+with the current score in the upper-right corner. **Timeline v2** adds the shared
+category badges for Brilliant, Great, Inaccuracy, Mistake, Miss and Blunder moves
+along the curve. Badges show each move's numerical grade, follow the badge font
+and size preferences, and can be clicked to jump directly to that move. The
+selected move's badge has an outline. Badges remain circular when the panel is
+resized and stay inside the plot at its ends. Choose it under **Settings → Visual
+→ Tabs → Evaluation → Timeline v2**; the original Timeline stays the default.
+Move bars gives every analyzed position its own column: light above zero for
+White, gray below zero for Black. These designs support
 click-to-jump, hover scores and keyboard navigation (arrows, Home, End), preserve
 focus and chart nodes while navigating, and stop at the analyzed prefix. Empty
 and pending positions show explicit waiting states. Scores use White's

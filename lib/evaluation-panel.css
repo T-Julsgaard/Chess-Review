@@ -11,6 +11,14 @@
 .evaluation-zero { stroke: var(--line); stroke-width: 1; stroke-dasharray: 3 4; }
 .evaluation-area { fill: color-mix(in oklab,var(--accent) 12%,transparent); }
 .evaluation-curve { fill: none; stroke: var(--accent); stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
+.evaluation-timeline2 .evalgraph { position: relative; --evaluation-badge-radius: calc(11px * var(--badge-scale, 1)); }
+.evaluation-move-badge {
+  position: absolute; width: calc(2 * var(--evaluation-badge-radius)); height: calc(2 * var(--evaluation-badge-radius));
+  transform: translate(-50%, -50%); border-radius: 50%; cursor: pointer; z-index: 1;
+  box-shadow: 0 0 0 1.5px var(--panel);
+}
+.stage .evaluation-panel .evaluation-move-badge svg { display: block; width: 100%; height: 100%; }
+.evaluation-move-badge.current, .evaluation-move-badge:hover { z-index: 2; box-shadow: 0 0 0 2px var(--ink); }
 .evaluation-column.white { fill: #e2dfd5; }
 .evaluation-column.black { fill: #77766d; }
 .evaluation-bars .evaluation-score { padding: 5px 7px; border-radius: 5px; font-size: 16px; letter-spacing: -.3px; background: var(--panel-3); }

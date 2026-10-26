@@ -4715,9 +4715,14 @@ function updateGraphReadout(refs) {
   }
   const description = e == null ? label : e.mate != null ? `${side} has mate in ${Math.abs(e.mate)}`
     : rounded === '0.0' ? label : `${side} is ahead by ${rounded} pawns`;
+  const category = panelDesign('graph', S.settings) === 'timeline2' && S.idx > 0 && e && S.classif[S.idx]
+    ? ` ${gradeLabel(S.classif[S.idx], S.moveGrades[S.idx], categoryName(S.classif[S.idx]))}.` : '';
   refs.chart.setAttribute('aria-valuenow', Math.min(S.idx, refs.lastPly));
-  refs.chart.setAttribute('aria-valuetext', `${graphPositionText(S.idx)}. ${description}. Positive scores favor White; negative scores favor Black.`);
+  refs.chart.setAttribute('aria-valuetext', `${graphPositionText(S.idx)}. ${description}.${category} Positive scores favor White; negative scores favor Black.`);
   refs.chart.setAttribute('aria-disabled', String(!!S.practice || refs.lastPly === 0));
+  for (const badge of refs.chart.querySelectorAll('.evaluation-move-badge')) {
+    badge.classList.toggle('current', Number(badge.dataset.ply) === S.idx);
+  }
 }
 function renderGraph() {
   const restoreFocus = document.activeElement === UI.graphRefs?.chart;
@@ -4736,7 +4741,8 @@ function renderGraph() {
   const toYc = (cp) => { const c = Math.max(-500, Math.min(500, cp)); return mid + (c / 500) * (mid - 8); };
   const pts = [];
   for (let p = 0; p <= S.total; p++) { if (!S.evals[p]) break; pts.push({ ply: p, cp: scoreToCp(S.evals[p]) }); }
-  const graphKey = JSON.stringify([design,S.total,S.settings.graphStyle || "area",pts,S.classif,S.blank]);
+  const graphKey = JSON.stringify([design,S.total,S.settings.graphStyle || "area",pts,S.classif,S.blank,
+    design === 'timeline2' ? S.moveGrades : null]);
   const markerVisible = modern ? pts.length > 0 && S.idx < pts.length : S.idx > 0 && S.idx < S.total;
   const retained = UI.graphRefs;
   if (retained?.key === graphKey && retained.marker.isConnected) {
@@ -4807,10 +4813,10 @@ function renderGraph() {
         ? `<path class="evaluation-field-white" d="${boundary} L${end},0 L0,0 Z" fill="#fff"/>`
           + `<path class="evaluation-field-black" d="${boundary} L${end},${H} L0,${H} Z" fill="#000"/>` + marker
         : marker;
-    } else if (design === 'timeline') {
+    } else if (design === 'timeline' || design === 'timeline2') {
       inner = guides + (fill ? `<path d="${fill}" class="evaluation-area"/>` : '')
         + (line ? `<path d="${line}" class="evaluation-curve" vector-effect="non-scaling-stroke"/>` : '')
-        + dotsSvg + marker;
+        + (design === 'timeline2' ? '' : dotsSvg) + marker;
     } else {
       // Keep every analyzed position: a bar represents its evaluation, not a score change.
       const unit = W / (maxPly + 1), width = Math.max(.25, unit * .72);
@@ -4825,6 +4831,8 @@ function renderGraph() {
   const svg = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${inner}${hover}</svg>`;
   // Map a pointer event to the nearest plotted ply (0..last ply that has an eval).
   const plyFromEvent = (e) => {
+    const badge = e.target.closest?.('.evaluation-move-badge');
+    if (badge) return Number(badge.dataset.ply);
     const r = e.currentTarget.getBoundingClientRect();
     if (!r.width || !pts.length) return null;
     return Math.max(0, Math.min(pts.length - 1, fromFraction((e.clientX - r.left) / r.width)));
@@ -4876,6 +4884,17 @@ function renderGraph() {
     const chart = el('div', {class: 'evalgraph clickable-graph', html: svg, role: 'slider', tabindex: 0,
       'aria-label': 'Game evaluation. Use arrow keys to explore moves.', 'aria-valuemin': 0, 'aria-valuemax': lastPly,
       onclick: jumpFromEvent, onmousemove: hoverMove, onmouseleave: hideHover, onblur: hideHover, onkeydown: onkey});
+    if (design === 'timeline2') {
+      // HTML overlays keep the shared badges circular when the SVG stretches to fit the panel.
+      for (const p of pts.filter(p => p.ply > 0 && NOTEWORTHY.has(S.classif[p.ply]))) {
+        chart.append(gradeBadge(S.classif[p.ply], S.moveGrades[p.ply], 'evaluation-move-badge', {
+          'data-ply': p.ply,
+          style: {left: `clamp(var(--evaluation-badge-radius), ${toX(p.ply) / W * 100}%, calc(100% - var(--evaluation-badge-radius)))`,
+            top: `clamp(var(--evaluation-badge-radius), ${toY(p.cp) / H * 100}%, calc(100% - var(--evaluation-badge-radius)))`},
+          onclick: e => { e.stopPropagation(); gotoMainline(p.ply); },
+        }));
+      }
+    }
     if (compact) {
       UI.graph.replaceChildren(el('div', {class: 'panel eval-side evaluation-panel evaluation-minimal', 'data-design': design, 'aria-label': 'Evaluation'},
         chart, !pts.length ? el('span', {class: 'evaluation-empty'}, S.blank ? 'Load a game to see its evaluation' : 'Waiting for analysis…') : null));

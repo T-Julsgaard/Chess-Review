@@ -22,7 +22,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const evidence=[];
   for (const [width,height] of [[1920,1080],[1366,768],[1280,600],[390,844],[320,640]]) {
     await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId); await sleep(160);
-    for (const design of ['timeline','bars','minimal','original']) {
+    for (const design of ['timeline','timeline2','bars','minimal','original']) {
       const before = await run("import('./analysis.js').then(m=>JSON.stringify({idx:m.S.idx,evals:m.S.evals,bests:m.S.bests,layout:m.S.layout}))");
       await choose(design);
       assert.equal(await run("import('./analysis.js').then(m=>JSON.stringify({idx:m.S.idx,evals:m.S.evals,bests:m.S.bests,layout:m.S.layout}))"),before);
@@ -35,8 +35,12 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
         assert.equal(await run("document.querySelector('.evaluation-minimal').textContent"),'');
       } else {
         const readout = await run("(()=>{const p=document.querySelector('.evaluation-panel'),s=p.querySelector('.evaluation-score'),r=p.getBoundingClientRect(),q=s.getBoundingClientRect(),scale=r.width/p.offsetWidth;return {text:p.textContent,score:s.textContent,top:(q.top-r.top)/scale,right:(r.right-q.right)/scale}})()");
-        assert.equal(readout.text,readout.score,'Only evaluation data should be visible');
+        if (design !== 'timeline2') assert.equal(readout.text,readout.score,'Only evaluation data should be visible');
         assert.ok(readout.top>=0&&readout.top<=8&&readout.right>=0&&readout.right<=8,JSON.stringify({width,height,design,readout}));
+        if (design === 'timeline2') {
+          const badges = await run("(()=>{const chart=document.querySelector('.evaluation-timeline2 .evalgraph').getBoundingClientRect();return [...document.querySelectorAll('.evaluation-move-badge')].map(b=>{const r=b.getBoundingClientRect();return {ply:+b.dataset.ply,round:Math.abs(r.width-r.height)<1,inside:r.left>=chart.left-1&&r.right<=chart.right+1&&r.top>=chart.top-1&&r.bottom<=chart.bottom+1}})})()");
+          assert.ok(badges.length>0&&badges.every(b=>b.round&&b.inside),JSON.stringify({width,height,badges}));
+        }
       }
       await shot(`evaluation-${design}-${width}`,'#graphMount .panel');
       if (width===1920) await shot('evaluation-'+design+'-desktop');
@@ -45,7 +49,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   }
   await call('Emulation.setDeviceMetricsOverride',{width:1920,height:1080,deviceScaleFactor:1,mobile:false},review.sessionId);
   await sleep(200);
-  for (const design of ['timeline','bars','minimal']) {
+  for (const design of ['timeline','timeline2','bars','minimal']) {
     await choose(design);
     await run("document.querySelector('.evaluation-panel [role=slider]').focus()");
     await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Home',code:'Home'},review.sessionId);

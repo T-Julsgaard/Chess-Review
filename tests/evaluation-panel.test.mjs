@@ -14,10 +14,10 @@ test('Tabs exposes Evaluation designs, saves them and preserves all analysis', a
   await a.call('toggleSettings');
   const section = [...doc.querySelectorAll('.set-section')].find(n => n.querySelector('.set-sect-head').textContent === 'Tabs');
   section.querySelector('.set-sect-head').click();
-  assert.deepEqual([...section.querySelectorAll('[data-setting="graphDesign"]')].map(n => n.textContent), ['Original','Timeline','Move bars','Minimal']);
+  assert.deepEqual([...section.querySelectorAll('[data-setting="graphDesign"]')].map(n => n.textContent), ['Original','Timeline','Timeline v2','Move bars','Minimal']);
   const before = JSON.stringify({evals:a.state.evals,bests:a.state.bests,idx:a.state.idx,layout:a.state.layout});
   a.replace('scheduleReanalyze', () => { throw Error('Design changes must not analyze'); });
-  for (const design of ['bars','original','timeline','minimal']) {
+  for (const design of ['bars','original','timeline','timeline2','minimal']) {
     doc.querySelector(`[data-setting="graphDesign"][data-value="${design}"]`).click();
     await settle(); await a.run('_settingsWriteQueue');
     assert.equal(a.store.settings.graphDesign, design);
@@ -26,7 +26,7 @@ test('Tabs exposes Evaluation designs, saves them and preserves all analysis', a
   }
 });
 
-for (const design of ['timeline','bars','minimal']) {
+for (const design of ['timeline','timeline2','bars','minimal']) {
   test(`${design} retains chart and keyboard focus while updating score and accessible position descriptions`, async t => {
     const a = review(t), doc = a.dom.window.document;
     await a.call('setSetting','graphDesign',design);
@@ -40,7 +40,7 @@ for (const design of ['timeline','bars','minimal']) {
       assert.equal(a.state.idx,ply);
       if (design !== 'minimal') {
         assert.equal(doc.querySelector('.evaluation-score').textContent,text);
-        assert.equal(doc.querySelector('.evaluation-panel').textContent,text, 'Only the score is visible alongside the chart');
+        if (design !== 'timeline2') assert.equal(doc.querySelector('.evaluation-panel').textContent,text, 'Only the score is visible alongside the chart');
         assert.equal(doc.querySelector('.evaluation-header,.evaluation-footer,.evaluation-axis, .evaluation-panel button'),null);
       }
       assert.match(chart.getAttribute('aria-valuetext'), new RegExp(ply === 0 ? 'Equal position' : label.startsWith('White') ? 'White' : 'Black'));
@@ -74,6 +74,44 @@ for (const design of ['timeline','bars','minimal']) {
     assert.equal(a.state.idx,2);
   });
 }
+
+test('Timeline v2 badges show notable move grades, navigate directly and update with analysis and badge preferences', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  a.state.classif = [null,'inacc','best','brilliant','blunder'];
+  a.state.moveGrades = [null,4.3,10,9.8,0.2];
+  await a.call('setSetting','graphDesign','timeline2');
+  const chart = doc.querySelector('.evaluation-timeline2 [role=slider]');
+  const badges = () => [...chart.querySelectorAll('.evaluation-move-badge')];
+  assert.deepEqual(badges().map(b => b.dataset.ply), ['1','3','4']);
+  assert.deepEqual(badges().map(b => b.querySelector('text').textContent), ['4.3','9.8','0.2']);
+  assert.equal(chart.querySelectorAll('circle').length,4, 'Three shared badges and the hidden hover dot');
+  chart.getBoundingClientRect = () => ({left:0,top:0,width:400,height:120});
+  badges()[2].dispatchEvent(new a.dom.window.MouseEvent('click',{clientX:390,bubbles:true}));
+  assert.equal(a.state.idx,4, 'The inset final badge still selects its exact move');
+  assert.equal(badges()[2].classList.contains('current'),true);
+  assert.match(chart.getAttribute('aria-valuetext'),/Blunder, score 0.2/);
+  badges()[2].dispatchEvent(new a.dom.window.MouseEvent('mousemove',{clientX:390,bubbles:true}));
+  assert.equal(doc.querySelector('.eval-tip').textContent,'#3');
+  const first = badges()[0];
+  await a.call('setSetting','badgeFont','spacegrotesk');
+  assert.equal(badges()[0],first);
+  assert.match(first.querySelector('text').getAttribute('font-family'),/Badge Space Grotesk/);
+  a.state.moveGrades[1] = 4.6; a.call('renderGraph');
+  assert.equal(doc.querySelector('.evaluation-move-badge text').textContent,'4.6');
+  a.state.evals[3] = null; a.call('renderGraph');
+  assert.deepEqual([...doc.querySelectorAll('.evaluation-move-badge')].map(b => b.dataset.ply),['1']);
+  await a.call('setSetting','graphDesign','timeline');
+  assert.equal(doc.querySelector('.evaluation-move-badge'),null);
+});
+
+test('Timeline v2 restores its saved design and shows honest empty states', async t => {
+  const a = app(t,{url:'https://extension.test/analysis.html?workspace=blank'}), doc = a.dom.window.document;
+  a.replace('resetSettingsForRelease',async () => {});
+  a.store.settings = {graphDesign:'timeline2'}; await a.start();
+  assert.equal(doc.querySelector('.evaluation-panel').dataset.design,'timeline2');
+  assert.match(doc.querySelector('.evaluation-empty').textContent,/Load a game/);
+  assert.equal(doc.querySelector('.evaluation-move-badge'),null);
+});
 
 test('Move bars keeps scores oriented toward White on board flips', async t => {
   const a = review(t), doc = a.dom.window.document;
