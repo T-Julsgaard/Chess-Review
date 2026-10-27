@@ -29,8 +29,8 @@ body:has(.full-hd-reference) .learning-embedded .learn-shell {
 .stage.auto.full-hd-reference .side-b {display:contents;position:static;padding:0;contain:none;}
 .stage.auto.full-hd-reference .mod {position:absolute;margin:0;min-height:0;contain:none;}
 .stage.auto.full-hd-reference .mod[data-mod="coach"] {right:auto;justify-self:auto;align-self:auto;}
-.stage.full-hd-reference .mod[data-mod="board"] .board-wrap {flex:1;min-height:0;align-items:stretch;justify-content:center;}
-.stage.full-hd-reference .mod[data-mod="board"] .board {flex:0 1 auto;height:100%;width:auto;aspect-ratio:1;max-width:100%;margin:auto;}
+.stage.full-hd-reference .mod[data-mod="board"] .board-wrap {flex:1;min-height:0;align-items:stretch;justify-content:center;container-type:size;}
+.stage.full-hd-reference .mod[data-mod="board"] .board {flex:none;height:min(100cqw,100cqh);width:min(100cqw,100cqh);aspect-ratio:1;max-width:100%;margin:auto;}
 .stage.reference-components .evalgraph svg {height:120px;}
 
 .stage.reference-components .panel-head:not(.acc-head) {

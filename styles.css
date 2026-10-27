@@ -1933,8 +1933,9 @@ button { font-family: inherit; cursor: pointer; }
 
 /* board module */
 .mod[data-mod="board"] .mod-inner { display: flex; flex-direction: column; }
-.stage.canvas .mod[data-mod="board"] .board-wrap { flex: 1; min-height: 0; align-items: stretch; justify-content: center; }
-.stage.canvas .mod[data-mod="board"] .board { flex: 0 1 auto; height: 100%; width: auto; aspect-ratio: 1; max-width: 100%; margin: auto; }
+/* Fit both dimensions: max-width alone can squeeze a height-sized board into a rectangle. */
+.stage.canvas .mod[data-mod="board"] .board-wrap { flex: 1; min-height: 0; align-items: stretch; justify-content: center; container-type: size; }
+.stage.canvas .mod[data-mod="board"] .board { flex: none; height: min(100cqw,100cqh); width: min(100cqw,100cqh); aspect-ratio: 1; max-width: 100%; margin: auto; }
 .mod[data-mod="controls"] .mod-inner { display: grid; place-items: center; }
 
 /* animated coach portrait module — transparent; the sandboxed rig <iframe> fills it and its own

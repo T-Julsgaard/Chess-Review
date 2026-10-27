@@ -85,7 +85,7 @@ try {
   const capture=async(label)=>{
     const data=await evaluate(review,measure);
     assert.equal(data.error,'');assert.equal(data.zoom,1,label+': browser zoom must remain 100%');
-    assert.ok(Math.abs(data.board.w-data.board.h)<1,`${label}: board is not square`);
+    assert.ok(Math.abs(data.board.w-data.board.h)<1,`${label}: board is not square: ${JSON.stringify(data)}`);
     assert.ok(data.scroll.w<=data.width+1,`${label}: horizontal overflow`);
     if(data.width>=1100&&data.height>=600||data.mode==='custom')assert.ok(data.scroll.h<=data.height+1,`${label}: vertical overflow`);
     results.push({label,...data});
