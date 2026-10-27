@@ -4109,9 +4109,8 @@ function renderReview() {
 function renderMoveComment() {
   const body = el("div", { class: "ip-body" });
   if (S.idx === 0) {
-    // Mirror a move comment's layout: an empty head row keeps the panel the same height, and the
-    // note uses .ip-text so it shares the move comment's font/colour/position.
-    body.append(el("div", { class: "ip-head" }));
+    body.append(el("div", { class: "ip-head" },
+      el("button", { type: "button", class: "practice-btn", title: "Replay the game and re-solve every mistake you made", onclick: startPractice }, "Practice your mistakes")));
     const sig = "start:" + (S.settings.coach || "");
     const fresh = sig !== _ipSig;
     if (fresh) { _ipText = (S.coach && coachLine("non_move_states", "starting_position", {})) || "Use ← and → to step through the game."; _ipSig = sig; }
@@ -4686,10 +4685,7 @@ function renderOriginalStats() {
   const qbreak = el("div", { class: "qbreak" }, ...qrows, expander);
 
   UI.stats.replaceChildren(el("div", { class: "panel accuracy-panel accuracy-original", "data-design": "original", "aria-label": "Accuracy" },
-    // The button is always rendered (disabled while analyzing or already practicing) so the
-    // header height never changes between states.
-    el("div", { class: "panel-head acc-head" }, el("h3", {}, "Accuracy"),
-      el("button", { class: "practice-btn", disabled: S.blank || S.analyzing || !!S.practice, title: "Replay the game and re-solve every mistake you made", onclick: startPractice }, "Practice your mistakes")),
+    el("div", { class: "panel-head acc-head" }, el("h3", {}, "Accuracy")),
     el("div", { class: "panel-body" },
       el("div", { class: "acc-row" },
         el("div", { class: "acc-cell" },

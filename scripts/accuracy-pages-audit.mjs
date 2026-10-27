@@ -74,7 +74,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   assert.equal(await run('document.activeElement.id'), 'accuracy-tab-1');
   await run("document.querySelector('.qbreak [data-category]').dispatchEvent(new MouseEvent('mouseenter'))");
   assert.equal(await run("!!document.querySelector('.q-tip.show')"), false);
-  assert.equal(await run("!!document.querySelector('.practice-btn,.qbreak-toggle')"), false);
+  assert.equal(await run("!!document.querySelector('.accuracy-panel .practice-btn,.qbreak-toggle')"), false);
   await run("document.querySelector('#accuracy-tab-2').click()");
   const expected=scores.stats.w.largestLoss.ply;
   await run("document.querySelector('.acc-loss').click()");

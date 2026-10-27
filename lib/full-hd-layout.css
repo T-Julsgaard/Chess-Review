@@ -45,14 +45,6 @@ body:has(.full-hd-reference) .learning-embedded .learn-shell {
   text-transform: uppercase; color: var(--ink-2);
 }
 
-.stage.reference-components .panel-head .practice-btn {
-  line-height:1.4;
-  margin-left: auto; border: 1px solid color-mix(in oklab, var(--accent) 45%, var(--line));
-  background: color-mix(in oklab, var(--accent) 14%, var(--panel-2)); color: var(--ink);
-  border-radius: 8px; padding: 5px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer;
-  transition: .12s; white-space: nowrap;
-}
-
 .stage.reference-components .panel-body:not(.acc-page) { padding: var(--pad); }
 
 .stage.reference-components .player-strip {

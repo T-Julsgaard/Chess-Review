@@ -1377,16 +1377,16 @@ button { font-family: inherit; cursor: pointer; }
 /* mistake-practice status text in the controls bar */
 .controls .practice-pos { color: var(--ink-2); font-weight: 700; font-family: var(--font-ui); }
 .controls .practice-status { color: var(--ink-3); font-size: 13px; margin-right: 4px; }
-/* "Practice your mistakes" button in the Accuracy panel header */
-.panel-head .practice-btn {
-  margin-left: auto; border: 1px solid color-mix(in oklab, var(--accent) 45%, var(--line));
+/* Starting-position action, above the navigation hint in Insights. */
+.insight-panel .practice-btn {
+  border: 1px solid color-mix(in oklab, var(--accent) 45%, var(--line));
   background: color-mix(in oklab, var(--accent) 14%, var(--panel-2)); color: var(--ink);
-  border-radius: 8px; padding: 5px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer;
-  transition: .12s; white-space: nowrap;
+  border-radius: 8px; padding: 6px 12px; font-family: var(--font-ui); font-size: 12px; font-weight: 700; line-height: 1.4; cursor: pointer;
+  max-width: 100%; text-align: left;
+  transition: border-color .12s, background .12s;
 }
-.panel-head .practice-btn:hover { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 24%, var(--panel-2)); }
-.panel-head .practice-btn:disabled { opacity: .45; cursor: default; border-color: var(--line); background: var(--panel-2); }
-.panel-head .practice-btn:disabled:hover { border-color: var(--line); background: var(--panel-2); }
+.insight-panel .practice-btn:hover { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 24%, var(--panel-2)); }
+.insight-panel .practice-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
 /* ---------- REVIEW SUMMARY ---------- */
 .review {
@@ -2018,7 +2018,6 @@ button { font-family: inherit; cursor: pointer; }
 .stage.auto .mod[data-mod="learn"] { grid-area:learn; }
 .stage .panel-head { padding:9px 10px; gap:6px; flex-wrap:wrap; }
 .stage .panel-head h3 { font-size:11px; }
-.stage .panel-head .practice-btn { padding:5px 7px; font-size:10px; margin-left:auto; }
 .stage .panel-body { padding:10px; }
 .stage .controls { gap:6px; }
 .stage .controls button { height:40px; min-width:36px; border-radius:9px; }
