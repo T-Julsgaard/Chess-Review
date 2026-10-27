@@ -58,6 +58,22 @@ test('Modern reproduces every supplied box and scale, including the collapsed Ac
   }
   for(const [key,box]of Object.entries(supplied.layout))for(const prop of ['x','y','w','h','scale'])near(a.store.layout[key][prop],box[prop]);
   assert.equal(a.store.layoutMode,'custom');
+  a.call('setAccuracyPage',1);
+  assert.equal(a.dom.window.document.querySelectorAll('.quality-distribution .qbreak-row').length,10);
+});
+
+test('saved Modern adopts Category bars while an individually selected Original remains Custom',async t=>{
+  for(const setup of ['modern','custom']) {
+    const a=app(t,{url:'https://extension.test/analysis.html?workspace=blank'});
+    a.replace('resetSettingsForRelease',async()=>{});
+    a.store.settings={...UI_SETUPS.modern.designs,uiSetup:setup,uiSetupBase:'modern',accuracyQualityDesign:'original'};
+    await a.start();a.call('setAccuracyPage',1);
+    const expected=setup==='modern'?'distribution':'original';
+    assert.equal(a.state.settings.uiSetup,setup);
+    assert.equal(a.state.settings.accuracyQualityDesign,expected);
+    assert.equal(a.dom.window.document.querySelector('.acc-quality').dataset.qualityDesign,expected);
+    if(setup==='modern')assert.equal(a.store.settings.modernQualityVersion,1);
+  }
 });
 
 test('Modern omits the duplicate insight evaluation while other setups retain it',async t=>{

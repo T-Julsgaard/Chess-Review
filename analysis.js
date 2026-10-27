@@ -6603,7 +6603,7 @@ async function applyUiSetup(value) {
     return;
   }
   cancelPanelGesture?.();
-  const patch = {uiSetup:value, uiSetupBase:value, ...setup.designs, evalView:'both', ...(value === 'modern' ? {modernEngineVersion:1,modernMovesVersion:1,modernGraphVersion:1} : {})};
+  const patch = {uiSetup:value, uiSetupBase:value, ...setup.designs, evalView:'both', ...(value === 'modern' ? {modernEngineVersion:1,modernMovesVersion:1,modernGraphVersion:1,modernQualityVersion:1} : {})};
   Object.assign(S.settings, patch);
   S.originalAccuracyExpanded = false; S.qbreakExpanded = false; S.accuracyPage = 0;
   statsRefs = null; hideQTip(); overviewReveal.stop();
@@ -7983,6 +7983,10 @@ async function showReadyWorkspace() {
     if (S.settings.uiSetup === 'modern' && !S.settings.modernGraphVersion) {
       if (S.settings.graphDesign === 'original') S.settings.graphDesign = 'bars';
       S.settings.modernGraphVersion = 1;
+    }
+    if (S.settings.uiSetup === 'modern' && !S.settings.modernQualityVersion) {
+      if (S.settings.accuracyQualityDesign === 'original') S.settings.accuracyQualityDesign = 'distribution';
+      S.settings.modernQualityVersion = 1;
     }
     migrateEngineSettings(S.settings);
     delete S.settings.wrongSound; // older selectable mistake cues were removed

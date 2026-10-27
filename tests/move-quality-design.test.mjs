@@ -86,10 +86,10 @@ test('page design choices save independently, restore on startup and reset with 
   await restored.start(); restored.call('setAccuracyPage', 1);
   assert.equal(restored.dom.window.document.querySelector('.acc-quality').dataset.qualityDesign, 'original');
   await restored.call('resetVisualSettings');
-  assert.equal(restored.store.settings.accuracyQualityDesign, 'original');
+  assert.equal(restored.store.settings.accuracyQualityDesign, 'distribution');
   assert.equal(restored.store.settings.accuracyAdvancedDesign, 'original');
   restored.call('setAccuracyPage', 1);
-  assert.equal(restored.dom.window.document.querySelectorAll('.quality-original .qbreak-row').length, 7);
+  assert.equal(restored.dom.window.document.querySelectorAll('.quality-distribution .qbreak-row').length, 10);
 });
 
 test('empty distributions show zero totals and no fabricated category shares', t => {
