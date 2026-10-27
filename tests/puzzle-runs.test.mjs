@@ -471,7 +471,7 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} warns on entry with se
   const trigger=w.root.querySelector(`[data-focus=${mode}]`);trigger.focus();
   const starting=w.startPuzzleRun(mode);
   const dialog=w.root.querySelector('.puzzle-run-notice-card');
-  assert.equal(dialog.getAttribute('role'),'dialog');assert.match(dialog.textContent,/Personal best disabled/);
+  assert.equal(dialog.getAttribute('role'),'dialog');assert.match(dialog.textContent,/Personal best unavailable/);
   assert.match(dialog.textContent,/All types/);assert.equal(w.run,null);
   assert.equal(dom.window.document.activeElement.dataset.focus,'run-notice-continue');
   dom.window.document.activeElement.dispatchEvent(new dom.window.KeyboardEvent('keydown',{key:'Tab',bubbles:true,cancelable:true}));
