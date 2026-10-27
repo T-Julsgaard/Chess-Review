@@ -1816,6 +1816,16 @@ function saveLayout(immediate = false) {
 // "auto" = the responsive layout in styles.css, which fits any window. "custom" = the free canvas the
 // user arranged in Reorganize mode, placed from S.layout and zoomed to fit the window.
 const isCustomLayout = () => S.layoutMode === "custom";
+function isResponsiveModern() {
+  // Panel-design edits may label the setup Custom without changing its geometry.
+  // Only genuine panel arrangement edits should switch to a fitted free canvas.
+  return isCustomLayout() && baseUiSetup() === 'modern' && setupLayoutMatches(layoutForSave(), S.layoutMode);
+}
+function referenceLayout() {
+  const modern = isResponsiveModern();
+  return fullHdReferenceLayout(modern ? MODERN_LAYOUT : DEFAULT_LAYOUT,
+    window.innerWidth, window.innerHeight, accuracyLayoutExpanded(), modern);
+}
 const selectedPanels = new Set();
 let cancelPanelGesture = null;
 function visiblePanelKeys() {
@@ -1864,28 +1874,26 @@ function applyPanelBox(mod,b) {
   inner.style.transform=scale===1?"":"scale("+scale+")";inner.style.transformOrigin=scale===1?"":"top left";
 }
 function panelContentScale(key) {
-  return isCustomLayout() ? panelScale(S.layout[key]) : panelScale(fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,accuracyLayoutExpanded())?.[key]);
+  return isCustomLayout() && !isResponsiveModern() ? panelScale(S.layout[key]) : panelScale(referenceLayout()?.[key]);
 }
 function accuracyLayoutExpanded() {
   return panelDesign('accuracy', S.settings) === 'original' ? S.originalAccuracyExpanded : S.qbreakExpanded;
 }
 function applyLayoutMode() {
-  const custom = isCustomLayout();
-  UI.canvas.classList.toggle("auto", !custom);
-  UI.canvas.classList.toggle("canvas", custom);
-  if (custom) UI.canvas.classList.remove("desktop-layout");
   applyLayout(); growCanvas();
 }
 function applyLayout() {
   UI.canvas.classList.add("no-concepts");
   UI.canvas.classList.remove("desktop-layout");
-  const reference=fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,accuracyLayoutExpanded());
+  const custom = isCustomLayout() && !isResponsiveModern(), reference = referenceLayout();
+  UI.canvas.classList.toggle('auto', !custom);
+  UI.canvas.classList.toggle('canvas', custom);
   UI.canvas.classList.toggle('original-accuracy-expanded',panelDesign('accuracy',S.settings)==='original'&&S.originalAccuracyExpanded);
   UI.canvas.classList.toggle('full-hd-reference',!!reference);
-  UI.canvas.classList.toggle('reference-components',!isCustomLayout()||!!reference);
+  UI.canvas.classList.toggle('reference-components',!custom||!!reference);
   UI.canvas.style.setProperty('--reference-factor',reference?reference.review.scale/(DEFAULT_LAYOUT.review.scale*.87):1);
   UI.canvas.closest('.app').style.setProperty('--reference-chrome-scale',reference?Math.max(1,reference.review.scale/(DEFAULT_LAYOUT.review.scale*.87)):1);
-  const boxes=isCustomLayout()?S.layout:reference;
+  const boxes=custom?S.layout:reference;
   for (const mod of UI.canvas.querySelectorAll(".mod")) applyPanelBox(mod,boxes?.[mod.dataset.mod]);
   fitEnginePanel();
   requestAnimationFrame(positionSettings);
@@ -1895,9 +1903,9 @@ function applyLayout() {
 function snapshotLayout() {
   const base = UI.canvas.parentElement.getBoundingClientRect();
   const out = structuredClone(DEFAULT_LAYOUT);
-  const reference=fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,accuracyLayoutExpanded());
+  const reference=referenceLayout();
   for (const mod of UI.canvas.querySelectorAll(".mod")) {
-    if(reference&&!isCustomLayout()) {out[mod.dataset.mod]={...reference[mod.dataset.mod]};continue;}
+    if(reference&&(!isCustomLayout()||isResponsiveModern())) {out[mod.dataset.mod]={...reference[mod.dataset.mod]};continue;}
     const r = mod.getBoundingClientRect();
     if (!r.width || !r.height) continue;
     // Preserve the rendered geometry when unlocking panels; grid snapping applies
@@ -1916,7 +1924,7 @@ function layoutExtent(layout) {
 }
 function growCanvas() {
   const viewport=UI.canvas.parentElement;
-  if (!isCustomLayout()) {
+  if (!isCustomLayout() || isResponsiveModern()) {
     canvasScale=1;
     for(const key of ['minHeight','minWidth','width','height','transform','transformOrigin','marginLeft'])UI.canvas.style[key]="";
     viewport.style.height="";viewport.classList.remove('custom-viewport');
@@ -1994,6 +2002,13 @@ function makeMovable(mod, handle, grips, key) {
     cancelPanelGesture?.();
     if(e.ctrlKey||e.metaKey||e.shiftKey){togglePanelSelection(key);return;}
     if(!selectedPanels.has(key))selectPanels([key]);
+    const responsive = isResponsiveModern() ? {layout:structuredClone(S.layout), reflow:S._accReflow&&structuredClone(S._accReflow)} : null;
+    if (responsive) {
+      // Materialize the displayed preset only when a gesture begins. Cancelled
+      // gestures and clicks restore its responsive baseline without saving edits.
+      S.layout = snapshotLayout();
+      S._accReflow = responsive.reflow ? accuracyReflowInfo() : null;
+    }
     const keys=selectedPanelKeys(),group=keys.length>1,start=structuredClone(S.layout),reflow=S._accReflow&&structuredClone(S._accReflow);
     const bounds=panelGroupBounds(start,keys),box=start[key],sx=e.clientX,sy=e.clientY,gestureScale=canvasScale;
     if(!bounds||!box)return;
@@ -2022,10 +2037,11 @@ function makeMovable(mod, handle, grips, key) {
       window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);window.removeEventListener('pointercancel',cancel);window.removeEventListener('blur',blur);
       try{target.releasePointerCapture(e.pointerId);}catch{}
       cancelPanelGesture=null;
-      if(cancelled){S.layout=start;S._accReflow=reflow;applyLayout();growCanvas();}
+      if(cancelled){S.layout=responsive?.layout||start;S._accReflow=responsive?responsive.reflow:reflow;applyLayout();growCanvas();}
       else if(ev)apply(ev);
       for(const name of keys)UI.canvas.querySelector('[data-mod="'+name+'"]').classList.remove('dragging','resizing');
       if(!cancelled&&JSON.stringify(S.layout)!==JSON.stringify(start))writeSettings(customUiSetupPatch());
+      else if(responsive&&!cancelled){S.layout=responsive.layout;S._accReflow=responsive.reflow;applyLayout();growCanvas();}
       saveLayout();if(keys.includes('board'))alignPlayers();
     };
     const up=ev=>finish(false,ev),cancel=ev=>finish(true,ev),blur=()=>finish(true);
@@ -5539,7 +5555,7 @@ const ENGINE_NAME = { nnue: "Stockfish 18 NNUE", sf19lite: "Stockfish 19 Lite" }
 // playback or learning controls outside the viewport when more lines are shown.
 function fitEnginePanel() {
   const mod=UI.engine?.closest('.mod');if(!mod)return;
-  if(!isCustomLayout()){mod.style.minHeight="";return;}
+  if(!isCustomLayout()||isResponsiveModern()){mod.style.minHeight="";return;}
   if(!S.layout.engine){mod.style.minHeight="";return;}
   const height=(panelDesign('engine', S.settings) === 'minimal' ? 128 : 120)*panelScale(S.layout.engine);
   mod.style.minHeight=height+'px';

@@ -22,7 +22,7 @@ respects previous dismissal/opt-out, and never changes the selected layout.
 
 ## Verification performed
 
-- Full suite after the furthest-result navigation follow-up: **1,245 passed**, zero failures, cancellations or skips, using
+- Full suite after the laptop preset-sizing follow-up: **1,248 passed**, zero failures, cancellations or skips, using
   `node --test --test-concurrency=4 tests/*.test.mjs`. A prior unrestricted run
   during concurrent lint/browser work hit an existing wall-clock Elo animation
   assertion; limiting test concurrency produced the clean final run.
@@ -95,6 +95,40 @@ boundary and confirm that new results extend it independently.
 The selected extension summary is now: “Free, open-source chess analysis, puzzles
 and opening lessons.” These changes remain part of the unreleased 0.4.0 packages;
 use the newest release directory from `latest-release.json` for upload.
+
+## Laptop preset sizing
+
+The laptop report described browser zoom at 100%, a larger right-hand gap and
+relatively larger Settings on Modern. This was reproduced with isolated Chrome
+viewports; the laptop's exact viewport was not captured. Equal physical display
+resolutions can still expose different CSS viewport widths or heights.
+
+Modern was fitting its entire fixed canvas into that viewport, shrinking the
+panels and text together. Old already resized the board and panel bodies while
+retaining readable component scales. Settings sized itself independently into the
+remaining gutter, and learning derived its usable width from the rendered review
+column. That combination explains the different proportions despite 100% zoom.
+
+Measured before/after at 1280×560 CSS pixels: Modern's component scale was 0.53
+against Old's 0.81, its right-hand gap was 325 against 162 pixels, and its learning
+column was 304 against 490 pixels. After the fix Modern matches Old for all three.
+At 1536×704, Modern's component scale increases from 0.67 to 0.81 and its learning
+column from 399 to 490 pixels. The 1920×919 desktop baseline remains unchanged.
+
+Unedited Modern geometry now uses the same responsive sizing rules as Old while
+retaining Modern's graph above its move list. Its saved preset baseline and panel
+designs remain intact. Arrangements edited by the user keep the custom canvas;
+design-only changes can retain the responsive Modern baseline. A real drag or
+resize snapshots the currently displayed boxes, while clicks and cancelled
+gestures preserve the preset. Reorganize handles work on either rendered layout.
+
+Verification includes 55 focused layout/preset tests, the full 1,248-test suite,
+and a browser audit comparing both presets at 1920×919, 1920×880, 1920×800,
+1536×704, 1280×560 and 960×600, including pixel ratios 1, 1.25, 1.5 and 2.
+The audit compares component scales, Settings widths, right-hand spacing and
+learning widths, preserves the saved review, and performs a native laptop drag
+followed by a reload to verify that custom edits persist without other panels
+jumping. Before/after learning screenshots were visually inspected.
 
 ## Remaining tooling limitation
 

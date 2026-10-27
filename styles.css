@@ -1887,7 +1887,7 @@ button { font-family: inherit; cursor: pointer; }
 .mod[hidden] { display: none !important; }
 .stage.canvas .mod { position: absolute; }
 /* Draw beneath panels, in the same scaled coordinates used by drag and resize. */
-.stage.canvas.reorganizing {
+.stage.reorganizing {
   --layout-grid-line: 1px;
   background-image:
     linear-gradient(to right, color-mix(in oklab, var(--ink) 18%, transparent) var(--layout-grid-line), transparent var(--layout-grid-line)),
@@ -1953,7 +1953,7 @@ button { font-family: inherit; cursor: pointer; }
    rest of the panels. Fade it in on load instead of letting it pop in. */
 .coach-frame { width: 100%; height: 100%; border: 0; background: transparent; display: block; opacity: 0; transition: opacity .22s ease; }
 .coach-frame.ready { opacity: 1; }
-.canvas.reorganizing .mod[data-mod="coach"] .mod-inner { outline: 1px dashed color-mix(in oklab, var(--accent) 45%, transparent); outline-offset: -1px; }
+.stage.reorganizing .mod[data-mod="coach"] .mod-inner { outline: 1px dashed color-mix(in oklab, var(--accent) 45%, transparent); outline-offset: -1px; }
 
 /* eval-bar module — the bar fills the whole module so it grows/shrinks as you resize it. */
 .evalbar-mount { width: 100%; height: 100%; }
@@ -1961,7 +1961,7 @@ button { font-family: inherit; cursor: pointer; }
 
 /* drag handle + resize grips — ONLY interactive in Reorganize mode (toggled in Settings). They
    are hidden (display:none → not grabbable) otherwise, so normal hovering shows no move/resize
-   bloat. Positions/sizes are defined here; .canvas.reorganizing flips them on. */
+   bloat. Positions/sizes are defined here; .stage.reorganizing flips them on. */
 .mod-handle {
   position: absolute; z-index: 6; display: none; place-items: center;
   top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 6px; cursor: move;
@@ -1970,23 +1970,23 @@ button { font-family: inherit; cursor: pointer; }
 }
 .mod-resize { position: absolute; display: none; }
 .mod-select { position: absolute; display: none; place-items: center; top: 3px; right: 22px; width: 22px; height: 22px; padding: 0; border: 1px solid var(--line); border-radius: 5px; background: var(--panel); color: transparent; cursor: pointer; z-index: 9; }
-.canvas.reorganizing .mod-select { display: grid; }
+.stage.reorganizing .mod-select { display: grid; }
 .mod-select[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-.canvas.reorganizing .mod.panel-selected { outline: 2px solid var(--accent); outline-offset: 3px; }
-.canvas.reorganizing .panel-selected .mod-handle, .canvas.reorganizing .panel-selected .mod-resize.se { opacity: .85; }
+.stage.reorganizing .mod.panel-selected { outline: 2px solid var(--accent); outline-offset: 3px; }
+.stage.reorganizing .panel-selected .mod-handle, .stage.reorganizing .panel-selected .mod-resize.se { opacity: .85; }
 .mod-resize.e { top: 8px; bottom: 8px; right: -6px; width: 9px; cursor: ew-resize; z-index: 7; }
 .mod-resize.s { left: 8px; right: 8px; bottom: -6px; height: 9px; cursor: ns-resize; z-index: 7; }
 .mod-resize.se { right: -5px; bottom: -5px; width: 18px; height: 18px; cursor: nwse-resize; z-index: 8;
   place-items: center; color: var(--ink-3); opacity: 0; transition: opacity .14s, color .14s; }
-.canvas.reorganizing .mod-handle { display: grid; }
-.canvas.reorganizing .mod-resize { display: block; }
-.canvas.reorganizing .mod-resize.se { display: grid; }
-.canvas.reorganizing .mod:hover .mod-handle, .canvas.reorganizing .mod:hover .mod-resize.se { opacity: .65; }
-.canvas.reorganizing .mod-handle:hover, .canvas.reorganizing .mod-resize.se:hover { opacity: 1; color: var(--ink); }
+.stage.reorganizing .mod-handle { display: grid; }
+.stage.reorganizing .mod-resize { display: block; }
+.stage.reorganizing .mod-resize.se { display: grid; }
+.stage.reorganizing .mod:hover .mod-handle, .stage.reorganizing .mod:hover .mod-resize.se { opacity: .65; }
+.stage.reorganizing .mod-handle:hover, .stage.reorganizing .mod-resize.se:hover { opacity: 1; color: var(--ink); }
 /* make it obvious which boxes are movable while reorganizing */
-.canvas.reorganizing .mod .panel,
-.canvas.reorganizing .mod[data-mod="board"] .mod-inner,
-.canvas.reorganizing .mod[data-mod="controls"] .mod-inner {
+.stage.reorganizing .mod .panel,
+.stage.reorganizing .mod[data-mod="board"] .mod-inner,
+.stage.reorganizing .mod[data-mod="controls"] .mod-inner {
   outline: 1px dashed color-mix(in oklab, var(--accent) 45%, transparent); outline-offset: -1px;
 }
 .mod.dragging, .mod.resizing { z-index: 50; }

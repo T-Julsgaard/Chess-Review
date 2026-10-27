@@ -80,14 +80,14 @@ try {
   const fresh=await evaluate(review,"import('./analysis.js').then(m=>({engine:m.S.activeEngineBuild,error:m.S.analysisError,settings:m.S.settings}))");
   assert.equal(fresh.engine,'nnue');assert.equal(fresh.error,null);
   assert.equal(fresh.settings.enginePath,'nnue');
-  const measure=`(async()=>{const m=await import('./analysis.js');const rect=n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom}};return {width:innerWidth,height:innerHeight,zoom:await chrome.tabs.getZoom(),mode:m.S.layoutMode,desktop:document.querySelector('.stage').classList.contains('desktop-layout'),board:rect(document.querySelector('.board')),scroll:{w:document.documentElement.scrollWidth,h:document.documentElement.scrollHeight},modules:[...document.querySelectorAll('.mod')].map(n=>({key:n.dataset.mod,...rect(n)})),error:document.querySelector('#error').textContent}})()`;
+  const measure=`(async()=>{const m=await import('./analysis.js');const rect=n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom}};return {width:innerWidth,height:innerHeight,zoom:await chrome.tabs.getZoom(),mode:m.S.layoutMode,canvas:document.querySelector('.stage').classList.contains('canvas'),desktop:document.querySelector('.stage').classList.contains('desktop-layout'),board:rect(document.querySelector('.board')),scroll:{w:document.documentElement.scrollWidth,h:document.documentElement.scrollHeight},modules:[...document.querySelectorAll('.mod')].map(n=>({key:n.dataset.mod,...rect(n)})),error:document.querySelector('#error').textContent}})()`;
   const results=[];
   const capture=async(label)=>{
     const data=await evaluate(review,measure);
     assert.equal(data.error,'');assert.equal(data.zoom,1,label+': browser zoom must remain 100%');
     assert.ok(Math.abs(data.board.w-data.board.h)<1,`${label}: board is not square: ${JSON.stringify(data)}`);
     assert.ok(data.scroll.w<=data.width+1,`${label}: horizontal overflow`);
-    if(data.width>=1100&&data.height>=600||data.mode==='custom')assert.ok(data.scroll.h<=data.height+1,`${label}: vertical overflow`);
+    if(data.width>=1100&&data.height>=600||data.canvas)assert.ok(data.scroll.h<=data.height+1,`${label}: vertical overflow`);
     results.push({label,...data});
     const screenshot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
     await fs.writeFile(path.join(out,label+'.png'),Buffer.from(screenshot.data,'base64'));

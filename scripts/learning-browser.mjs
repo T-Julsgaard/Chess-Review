@@ -25,7 +25,7 @@ if(process.argv.includes('--phase-modern')||process.argv.includes('--modern-qual
 if(process.argv.includes('--accuracy-motion'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {applyUiSetup, renderStats, setAccuracyPage, renderGraph};\n');
 if(process.argv.includes('--phase-report-2')||process.argv.includes('--overview-reveal')||process.argv.includes('--phase-overview')||process.argv.includes('--move-quality'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {renderStats};\n');
 if(process.argv.includes('--viewport-preview'))await fs.appendFile(path.join(source,'analysis.js'),'\nglobalThis.__viewportAudit={S,openLearning,workspace:()=>learningWorkspace,fit:()=>_fittedDip};\n');
-if(process.argv.includes('--viewport-growth')||process.argv.includes('--settings-gutter'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {applyUiSetup};\n');
+if(process.argv.includes('--viewport-growth')||process.argv.includes('--settings-gutter')||process.argv.includes('--preset-scaling'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {applyUiSetup};\n');
 await fs.writeFile(path.join(source,'audit.html'),'<!doctype html><script type="module" src="audit.js"></script>');
 await fs.writeFile(path.join(source,'audit.js'),"import {browserAPI} from './browser-compat.js'; window.api=browserAPI;");
 const profile=await fs.mkdtemp(path.join(artifacts,'learning-profile-'));
@@ -62,6 +62,7 @@ try {
   else if(process.argv.includes('--startup'))await (await import('./startup-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--promotion'))await (await import('./promotion-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--run-dashboard'))await (await import('./run-dashboard-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
+  else if(process.argv.includes('--preset-scaling'))await (await import('./preset-scaling-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--settings-gutter'))await (await import('./settings-gutter-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--viewport-growth'))await (await import('./viewport-growth-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--responsive-reference'))await (await import('./responsive-reference-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});

@@ -11,6 +11,10 @@ The choices are local visual preferences and survive reopening the extension.
 - **Modern** uses the supplied arrangement, including its panel content scales.
   Accuracy uses Phase report Modern, Move list uses Zoom +20%, Engine uses Minimal,
   Evaluation uses Move bars, and the remaining tabs use Original.
+  Its unedited arrangement adapts to the available browser viewport with the same
+  readable component sizes as Old, including shorter laptop windows. Learning and
+  Settings keep their usable width when switching between presets. Moving or
+  resizing panels freezes the currently displayed arrangement into a custom canvas.
 - **Custom** is selected automatically after moving or resizing panels or changing
   a tab design. Selecting Custom directly keeps the current arrangement and designs.
 

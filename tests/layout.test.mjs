@@ -116,6 +116,45 @@ test('native Engine uses scrolling, and custom Engine respects its content scale
   assert.equal(a.state.layout.engine.h,120*a.state.layout.engine.scale);
 });
 
+test('Modern adapts to laptop viewports without shrinking the whole canvas or rewriting saved preferences',async t=>{
+  const a=layout(t);await a.call('applyUiSetup','modern');
+  const saved=JSON.stringify(a.state.layout),stored=JSON.stringify(a.store.layout),writes=a.writes.length;
+  for(const [width,height]of [[1920,919],[1920,800],[1536,704],[1280,560],[960,600]]){
+    a.viewport(width,height);a.call('fitViewport');
+    const canvas=a.dom.window.document.querySelector('.stage');
+    assert.equal(a.call('isResponsiveModern'),true);
+    assert.equal(canvas.classList.contains('auto'),true);assert.equal(canvas.classList.contains('canvas'),false);
+    assert.equal(canvas.style.transform,'');assert.equal(a.run('canvasScale'),1);
+    assert.equal(JSON.stringify(a.state.layout),saved);assert.equal(JSON.stringify(a.store.layout),stored);
+    assert.equal(a.writes.length,writes);assert.equal(a.zoom(),1);
+  }
+  a.state.layout.moves.x+=16;a.call('applyLayoutMode');
+  assert.equal(a.call('isResponsiveModern'),false,'An edited arrangement retains the free-canvas behavior');
+  assert.equal(a.dom.window.document.querySelector('.stage').classList.contains('canvas'),true);
+});
+
+test('editing a laptop Modern layout freezes its displayed geometry only for a completed gesture',async t=>{
+  const a=layout(t);a.viewport(1536,704);await a.call('applyUiSetup','modern');a.call('toggleReorganize');
+  const before=structuredClone(a.state.layout),doc=a.dom.window.document,win=a.dom.window;
+  const mod=doc.querySelector('[data-mod=moves]'),handle=mod.querySelector('.mod-handle');
+  const left=parseFloat(mod.style.left);
+  const event=(target,type,x,y)=>{const e=new win.MouseEvent(type,{bubbles:true,button:0,clientX:x,clientY:y});Object.defineProperty(e,'pointerId',{value:7});target.dispatchEvent(e);};
+  for(const end of ['pointerup','pointercancel']){
+    event(handle,'pointerdown',0,0);
+    if(end==='pointercancel')event(win,'pointermove',48,32);
+    event(win,end,0,0);
+    assert.deepEqual(a.state.layout,before);assert.equal(a.state.settings.uiSetup,'modern');
+    assert.equal(a.call('isResponsiveModern'),true);
+    assert.equal(parseFloat(mod.style.left),left);
+  }
+  event(handle,'pointerdown',0,0);event(win,'pointermove',48,32);event(win,'pointerup',48,32);
+  await a.run('_settingsWriteQueue');await a.call('saveLayout',true);
+  assert.equal(a.state.settings.uiSetup,'custom');assert.equal(a.state.settings.uiSetupBase,'modern');
+  assert.equal(a.call('isResponsiveModern'),false);
+  assert.equal(parseFloat(mod.style.left),a.call('snapGrid',left+48));
+  assert.equal(a.store.layout.moves.x,a.state.layout.moves.x);
+});
+
 test('settings remains right aligned through visual and layout resets',async t=>{
   const a=layout(t);a.viewport(1920,920);a.call('toggleSettings');
   const settings=a.dom.window.document.getElementById('settings');

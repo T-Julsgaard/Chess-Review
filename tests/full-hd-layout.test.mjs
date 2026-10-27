@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {fullHdReferenceLayout,FULL_HD_SCALE} from '../lib/full-hd-layout.js';
+import {MODERN_LAYOUT} from '../lib/ui-setups.js';
 
 const reference=JSON.parse(fs.readFileSync(new URL('./fixtures/default-panel-layout.json',import.meta.url)));
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-8,`${a} must equal ${b}`);
@@ -62,6 +63,25 @@ test('Desktop reference proportions adapt to larger screens and readable laptop 
 });
 test('Narrow and very short windows use stacked panels instead of shrinking the desktop canvas',()=>{
   for(const [width,height]of [[1024,1366],[820,1180],[1280,479],[390,844]])assert.equal(fullHdReferenceLayout(reference.layout,width,height),null);
+});
+
+test('Modern retains the approved desktop geometry and shares readable laptop sizing with Old',()=>{
+  const before=structuredClone(MODERN_LAYOUT);
+  const baseline=fullHdReferenceLayout(MODERN_LAYOUT,1920,919,false,true);
+  const approved=JSON.parse(fs.readFileSync(new URL('./fixtures/modern-panel-layout.json',import.meta.url)));
+  assert.deepEqual(baseline,approved.displayedLayout);
+  for(const [width,height]of [[1920,880],[1920,800],[1536,704],[1280,560],[1100,480]]){
+    const old=fullHdReferenceLayout(reference.layout,width,height,false);
+    const modern=fullHdReferenceLayout(MODERN_LAYOUT,width,height,false,true);
+    near(modern.moves.scale,old.moves.scale);near(modern.review.w,old.review.w);
+    near(modern.review.x,old.review.x);near(modern.board.w,old.board.w);
+    assert.ok(modern.graph.y+modern.graph.h<modern.moves.y,'Modern keeps its graph above the move list');
+    for(const [key,box]of Object.entries(modern)){
+      assert.ok(box.w>0&&box.h>0,`${width}x${height}: ${key} has usable area`);
+      assert.ok(box.x>=0&&box.y>=0&&box.x+box.w<=width&&box.y+box.h<=height-52.2,`${width}x${height}: ${key} bounds`);
+    }
+  }
+  assert.deepEqual(MODERN_LAYOUT,before,'Rendering never rewrites saved preset coordinates');
 });
 test('short laptop windows retain readable move and accuracy bodies with visible navigation',()=>{
   for(const width of [1100,1280,1366,1600,1920])for(const height of [480,520,560,599,600])for(const expanded of [false,true]){
