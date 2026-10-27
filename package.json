@@ -6,8 +6,6 @@
   "license": "GPL-3.0",
   "type": "module",
   "scripts": {
-    "postinstall": "node scripts/patch-node-forge.mjs",
-    "patch:dependencies": "node scripts/patch-node-forge.mjs",
     "build": "node scripts/package.mjs",
     "verify:engines": "node scripts/verify-engines.mjs",
     "verify:source": "node scripts/verify-source.mjs",
@@ -31,7 +29,6 @@
     "web-ext": "^10.8.0"
   },
   "overrides": {
-    "node-forge": "1.4.0",
     "shell-quote": "^1.12.0"
   }
 }
