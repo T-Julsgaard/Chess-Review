@@ -21,7 +21,7 @@ test('Visual > Tabs offers compact dropdowns for Accuracy and Move list designs'
   assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="accuracyDesign"]')].map(node => node.textContent), ['Original', 'Game phases']);
   assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="accuracyQualityDesign"]')].map(node => node.textContent), ['Original', 'Category bars']);
   assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="accuracyAdvancedDesign"]')].map(node => node.textContent), []);
-  assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="movesDesign"]')].map(node => node.textContent), ['Original', 'Edge-to-edge', 'Large text', 'Comfortable']);
+  assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="movesDesign"]')].map(node => node.textContent), ['Original', 'Edge-to-edge', 'Comfortable', 'Large text']);
   const option = section().querySelector('[data-setting="accuracyDesign"][data-value="original"]');
   option.focus(); option.click(); await settle(); await a.run('_settingsWriteQueue');
   assert.equal(a.store.settings.accuracyDesign, 'original');
