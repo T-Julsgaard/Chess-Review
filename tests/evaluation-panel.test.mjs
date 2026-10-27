@@ -123,6 +123,61 @@ test('Move bars keeps scores oriented toward White on board flips', async t => {
   assert.equal(doc.querySelector('.evaluation-panel').textContent,'+0.6');
 });
 
+for (const design of ['bars', 'bars2']) {
+  test(`${design} reveals small changes and growing advantages through ten pawns on both sides`, async t => {
+    const a = review(t), doc = a.dom.window.document;
+    for (const sign of [1, -1]) {
+      const scores = [0, 10, 50, 100, 500, 600, 900, 1000, 1200, 2000].map(cp => ({cp: cp * sign}));
+      scores.push({mate: 3 * sign});
+      loadGame(a, '1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7', scores);
+      a.state.classif = scores.map((_, ply) => ply ? 'mistake' : null);
+      await a.call('setSetting', 'graphDesign', design);
+      const chart = doc.querySelector('#graphMount [role=slider]');
+      const columns = [...chart.querySelectorAll('.evaluation-column')];
+      const heights = columns.map(column => +column.getAttribute('height'));
+      assert.equal(columns.length, scores.length);
+      assert.ok(heights[1] > 1.5, 'A tenth of a pawn is more visible than on the old five-pawn scale');
+      for (let ply = 1; ply < 8; ply++) assert.ok(heights[ply] > heights[ply - 1]);
+      assert.ok(heights[7] - heights[4] > 10, 'Five to ten pawns still has visible headroom');
+      assert.deepEqual(heights.slice(7), [52, 52, 52, 52], 'Ten pawns caps the bars, including mate');
+      chart.getBoundingClientRect = () => ({left:0, top:0, width:384, height:120});
+      for (let ply = 1; ply < scores.length; ply++) {
+        const tip = sign > 0 ? +columns[ply].getAttribute('y') : 60 + heights[ply];
+        assert.equal(columns[ply].classList.contains(sign > 0 ? 'white' : 'black'), true);
+        chart.dispatchEvent(new a.dom.window.MouseEvent('mousemove', {clientX:(ply + .5) / scores.length * 384, bubbles:true}));
+        assert.ok(Math.abs(+chart.querySelector('.eval-hover-dot').getAttribute('cy') - tip) < 1e-8);
+        assert.equal(doc.querySelector('.eval-tip').textContent, a.call('evalText', scores[ply]));
+        if (design === 'bars2') {
+          const dot = chart.querySelector(`.evaluation-move-dot[data-ply="${ply}"]`);
+          assert.ok(Math.abs(Number(dot.style.top.match(/, ([\d.]+)%/)[1]) - tip / 120 * 100) < 1e-8);
+        }
+      }
+    }
+  });
+
+  test(`${design} fits the analyzed prefix and rescales as larger evaluations arrive, excluding mates`, async t => {
+    const a = review(t), doc = a.dom.window.document;
+    a.state.evals = [{cp:0}, {cp:10}, {cp:-100}, null, {cp:1000}];
+    await a.call('setSetting', 'graphDesign', design);
+    const heights = () => [...doc.querySelectorAll('.evaluation-column')].map(n => +n.getAttribute('height'));
+    const initial = heights();
+    assert.equal(initial.length, 3, 'Unanalyzed suffix must not determine the scale');
+    assert.ok(initial[1] > 5, 'Close games expand to show small differences');
+    assert.equal(initial[2], 52);
+    a.state.evals[3] = {mate:3}; a.state.evals[4] = null; a.call('renderGraph');
+    assert.deepEqual(heights(), [...initial, 52], 'Mate does not compress finite scores');
+    a.state.evals[4] = {cp:1000}; a.call('renderGraph');
+    assert.ok(heights()[1] < initial[1]);
+    assert.ok(heights()[2] < initial[2]);
+    assert.equal(heights()[4], 52);
+    a.state.evals[4] = {cp:9700}; a.call('renderGraph');
+    a.state.evals[4] = {mate:3}; a.call('renderGraph');
+    assert.deepEqual(heights().slice(0, 3), initial, 'Switching a finite score to an equivalent mate sentinel refreshes the range');
+    a.state.evals = [{cp:0}, {cp:0}, {cp:0}, null, null]; a.call('renderGraph');
+    assert.deepEqual(heights(), [.8, .8, .8], 'Equal positions keep finite, minimal bars');
+  });
+}
+
 test('Move bars v2 adds Timeline dots at the bar tips and updates them with classifications', async t => {
   const a = review(t), doc = a.dom.window.document;
   a.state.classif = [null,'mistake','great','brilliant','blunder'];
@@ -135,7 +190,8 @@ test('Move bars v2 adds Timeline dots at the bar tips and updates them with clas
   assert.deepEqual(dots().map(dot => dot.dataset.category), ['mistake','great','brilliant','blunder']);
   assert.ok(dots().every(dot => dot.tagName === 'SPAN' && dot.getAttribute('aria-hidden') === 'true'));
   assert.match(dots()[0].style.left, /30%/);
-  assert.ok(Math.abs(Number(dots()[0].style.top.match(/, ([\d.]+)%/)[1]) - 44.8) < 1e-8);
+  const firstTip = +chart.querySelectorAll('.evaluation-column')[1].getAttribute('y') / 120 * 100;
+  assert.ok(Math.abs(Number(dots()[0].style.top.match(/, ([\d.]+)%/)[1]) - firstTip) < 1e-8);
   a.call('go',4);
   assert.equal(doc.querySelector('.evaluation-score').textContent,'M3');
   assert.match(chart.getAttribute('aria-valuetext'),/Blunder/);

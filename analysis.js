@@ -4822,14 +4822,24 @@ function renderGraph() {
   const maxPly = Math.max(1, S.total);
   const toX = (p) => bars ? ((p + .5) / (maxPly + 1)) * W : (p / maxPly) * W;
   const fromFraction = fraction => Math.round(bars ? fraction * (maxPly + 1) - .5 : fraction * maxPly);
-  const toY = (cp) => { const c = Math.max(-500, Math.min(500, cp)); return mid - (c / 500) * (mid - 8); };
+  const pts = [];
+  for (let p = 0; p <= S.total; p++) { if (!S.evals[p]) break; pts.push({ ply: p, cp: scoreToCp(S.evals[p]) }); }
+  // Move bars fit the analyzed game's range (at least one pawn, at most ten).
+  // asinh is nearly linear near equality and compresses large advantages smoothly,
+  // keeping small changes legible without flattening everything beyond five pawns.
+  // Mate scores reach the edge but do not squeeze the finite evaluations.
+  const barLimit = pts.reduce((limit, p) => S.evals[p.ply].mate != null ? limit
+    : Math.max(limit, Math.min(1000, Math.abs(p.cp))), 100);
+  const toY = (cp) => {
+    const fraction = bars ? Math.asinh(Math.max(-barLimit, Math.min(barLimit, cp)) / 100) / Math.asinh(barLimit / 100)
+      : Math.max(-500, Math.min(500, cp)) / 500;
+    return mid - fraction * (mid - 8);
+  };
   // The "color" style flips the y-axis (White advantage pushes the boundary DOWN); the hover marker
   // re-uses whichever mapping the active style draws with, so the dot rides the visible curve.
   const toYc = (cp) => { const c = Math.max(-500, Math.min(500, cp)); return mid + (c / 500) * (mid - 8); };
-  const pts = [];
-  for (let p = 0; p <= S.total; p++) { if (!S.evals[p]) break; pts.push({ ply: p, cp: scoreToCp(S.evals[p]) }); }
   const graphKey = JSON.stringify([design,S.total,S.settings.graphStyle || "area",pts,S.classif,S.blank,
-    design === 'timeline2' ? S.moveGrades : null]);
+    design === 'timeline2' ? S.moveGrades : null, bars ? barLimit : null]);
   const markerVisible = modern ? pts.length > 0 && S.idx < pts.length : S.idx > 0 && S.idx < S.total;
   const retained = UI.graphRefs;
   if (retained?.key === graphKey && retained.marker.isConnected) {
