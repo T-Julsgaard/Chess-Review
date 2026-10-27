@@ -768,7 +768,7 @@ const S = {
   // The build that is ACTUALLY running (set by createEngine; may differ from settings.enginePath if
   // the chosen build failed to load and we fell back). The Engine tab shows this, not the selection.
   activeEngineBuild: null, engineFallbackBuild: null,
-  // "Play best moves from here": auto-walk that re-analyzes each position and plays the engine's
+  // "Play best moves from here": auto-walk that analyzes missing positions and plays the engine's
   // best move until mate/draw or the user takes over. Token invalidates an in-flight walk.
   bestWalkToken: 0, bestWalking: false,
   // Commentary coach: the loaded phrase bank (null = plain lines). _turnPly caches the game's
@@ -3035,8 +3035,8 @@ function startLineWalk() {
 }
 
 /* ---------------- "Play best moves from here" ----------------
-   Unlike clicking a line (which plays a fixed PV whose tail is unreliable), this re-analyzes
-   EACH position at full depth and plays the engine's actual best move, building the variation
+   Unlike clicking a line (which plays a fixed PV whose tail is unreliable), this uses each
+   position's own analysis, reusing completed searches and analyzing missing positions, building the variation
    move by move until checkmate/draw — or until the user takes over (any nav, a board move,
    picking up a piece, or exiting all call stopLineWalk → stopBestWalk). */
 const BEST_WALK_MS = 850;       // pause to view the highlighted best move before it's played
@@ -3098,19 +3098,21 @@ async function playBestMoves() {
 async function requestLiveEval() {
   const token = ++S.liveToken; // navigation always invalidates pending work, even on cache hits
   if (!S.analysisMode || !S.variation) return;
-  const v = S.variation, idx = v.idx, pos = v.positions[idx];
+  const v = S.variation, idx = v.idx, pos = v.positions[idx], count = enginePanelLineCount();
   const valid = () => token === S.liveToken && S.analysisMode && S.variation === v
     && v.idx === idx && v.positions[idx] === pos;
   for (const node of v.positions) node.searchPreview = null;
   S.liveError = null;
   S.liveEngine?.cancelPending();
   S.liveEngine?.stop();
+  for (let i = idx; i >= Math.max(0, idx - 4); i--) reuseVariationAnalysis(v, i);
   refreshVariation();
   try {
     // The classifier looks back up to three moves, requiring four prior positions.
     const missing = [];
     for (let i = idx; i >= Math.max(0, idx - 4); i--) {
-      if (!v.positions[i].best || !v.positions[i].eval) missing.push(i);
+      const node = v.positions[i];
+      if (!node.best || !node.eval || i === idx && variationNeedsLines(node)) missing.push(i);
     }
     if (!missing.length) return;
     const eng = await ensureLiveEngine();
@@ -3119,7 +3121,7 @@ async function requestLiveEval() {
       const node = v.positions[i];
       const terminal = variationTerminal(v, i);
       const res = terminal ? { score: terminal, bestmove: null, pv: "", lines: [] }
-        : await eng.analyse(node.fen, S.settings.engineDepth, enginePanelLineCount(), variationSearchHistory(v, i), preview => {
+        : await eng.analyse(node.fen, S.settings.engineDepth, count, variationSearchHistory(v, i), preview => {
           if (!valid()) return;
           node.searchPreview = preview; node.searchPreviewToken = token;
           refreshVariation();
@@ -3127,6 +3129,9 @@ async function requestLiveEval() {
       if (!valid()) return;
       node.eval = terminal || whiteRel(res.score, node.fen);
       node.best = res;
+      node.analysisLineCount = count;
+      const entry = rememberPanelLines(i, variationContextKey(v, i), count, res.lines || [], node.fen);
+      if (entry.count === node.analysisLineCount) entry.result = res;
       node.searchPreview = null;
       refreshVariation();
     }
@@ -3143,6 +3148,34 @@ async function requestLiveEval() {
   }
 }
 
+function variationContextKey(v, idx) {
+  return engineContextKey(v.positions[idx].fen, variationSearchHistory(v, idx));
+}
+function reuseVariationAnalysis(v, idx) {
+  const node = v.positions[idx], mainIdx = v.branchIdx + idx;
+  const compatible = !S._panelNeedsLive && (!S.analyzedSettingsKey || S.analyzedSettingsKey === analysisSettingsKey());
+  if (!compatible && node.best === S.bests[mainIdx]) { node.best = null; node.eval = null; }
+  // Equal boards alone are insufficient: repetition and fifty-move history affect the search.
+  if ((!node.best || !node.eval) && compatible
+      && S.positions[mainIdx]?.fen === node.fen
+      && JSON.stringify(variationSearchHistory(v, idx)) === JSON.stringify(searchHistory(S.positions, mainIdx))) {
+    node.best = S.bests[mainIdx] || null;
+    node.eval = S.evals[mainIdx] || null;
+  }
+  const cached = panelLineCache.get(variationContextKey(v, idx));
+  if (!cached) return;
+  const first = cached.lines?.[0];
+  if (cached.result || first && (!node.best || cached.lines.length > (node.best.lines?.length || 0))) {
+    node.best = cached.result || {score: first.score, bestmove: first.pv.trim().split(/\s+/)[0], lines: cached.lines};
+    node.eval = whiteRel(node.best.score, node.fen);
+  }
+  node.analysisLineCount = Math.max(node.analysisLineCount || 0, cached.count);
+}
+function variationNeedsLines(node) {
+  return enginePanelLineCount() > Math.max(node.analysisLineCount || 1, node.best?.lines?.length || 0)
+    && !terminalScore(node.fen);
+}
+
 function refreshVariation() {
   if (!S.analysisMode || !S.variation) return;
   classifyVariationMoves();
@@ -3152,7 +3185,7 @@ function refreshVariation() {
 
 function invalidateVariationEvals() {
   if (!S.variation) return;
-  for (const p of S.variation.positions) { p.eval = null; p.best = null; p.classif = null; p.moveGrade = null; p.searchPreview = null; }
+  for (const p of S.variation.positions) { p.eval = null; p.best = null; p.classif = null; p.moveGrade = null; p.searchPreview = null; p.analysisLineCount = 0; }
 }
 
 function resetLiveEngine() {
@@ -5244,8 +5277,9 @@ function renderEngineCurrent() {
   // position. They only reappear once practice is fully finished/exited.
   if (S.practice && (S.practice.solving || S.practice.rolling || S.practice.demoing)) { renderEnginePractice(); return; }
   if (S.analysisMode && S.variation) {
-    const b = activePos().best;
-    renderEngine(b ? b.lines : null);
+    reuseVariationAnalysis(S.variation, S.variation.idx);
+    const pos = activePos(), b = pos.best;
+    renderEngine(b ? b.lines : null, !!b && variationNeedsLines(pos));
   } else {
     const b = S.bests[S.idx];
     let lines = b ? b.lines : null;
@@ -5264,10 +5298,13 @@ function renderEngineCurrent() {
 // Panel evidence is separate from calibrated scoring. Keep the richest result for each
 // position/settings/history, including when the displayed candidate count changes.
 const panelLineCache = new Map();
-function panelContextKey(i = S.idx) {
-  return JSON.stringify([S.positions[i]?.fen, searchHistory(S.positions, i),
+function engineContextKey(fen, history) {
+  return JSON.stringify([fen, history,
     S.settings.enginePath, S.engineFallbackBuild || S.activeEngineBuild || S.settings.enginePath,
     S.settings.engineDepth, S.settings.engineHash, S.settings.engineSkill]);
+}
+function panelContextKey(i = S.idx) {
+  return engineContextKey(S.positions[i]?.fen, searchHistory(S.positions, i));
 }
 function cachedPanelLines(i = S.idx) {
   if (!panelLineCache.size) return null;
@@ -5275,8 +5312,8 @@ function cachedPanelLines(i = S.idx) {
   if (entry) { panelLineCache.delete(key); panelLineCache.set(key, entry); }
   return entry;
 }
-function rememberPanelLines(i, key, count, lines) {
-  const entry = {idx: i, fen: S.positions[i].fen, count, lines};
+function rememberPanelLines(i, key, count, lines, fen = S.positions[i]?.fen) {
+  const entry = {idx: i, fen, count, lines};
   if ((panelLineCache.get(key)?.count || 0) > count) return panelLineCache.get(key);
   if (key.length <= 16384) {
     panelLineCache.set(key, entry);
@@ -5462,9 +5499,8 @@ function renderEngine(lines, padFromCache = false) {
     UI.engineRenderKey = renderKey; UI.engineRenderNode = UI.engine.firstChild;
     return;
   }
-  // "Play best moves from here": re-analyzes each position and plays the engine's actual best
-  // move until mate/draw (or until the user takes over). Not a fixed line — so the moves are
-  // always the genuine best, unlike an engine line's (unreliable) tail.
+  // Play each position's best move until mate/draw or the user takes over, reusing completed
+  // searches rather than treating an engine line's unsearched tail as position analysis.
   const bestWalkBtn = el("button", {
     class: "engine-bestwalk" + (S.bestWalking ? " on" : ""),
     onclick: () => { if (S.bestWalking) { stopBestWalk(); renderControls(); renderEngineCurrent(); } else playBestMoves(); },
@@ -6501,6 +6537,7 @@ async function setEngineSetting(key, value) {
     S.panelToken++; S._panelRequest = null;
     if (!S.analysisMode) { S.liveEngine?.cancelPending(); S.liveEngine?.stop(); }
     renderEngineCurrent();
+    if (S.analysisMode && S.variation) requestLiveEval();
     if (UI.settings && !UI.settings.hidden) renderSettings();
     return;
   }
