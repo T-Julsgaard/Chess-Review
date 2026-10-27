@@ -8,7 +8,12 @@ function setup(t) {
   const a=app(t);Object.defineProperties(a.dom.window,{innerWidth:{value:2206,configurable:true},innerHeight:{value:1100,configurable:true}});loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
   a.state.layoutMode='custom';a.call('applyLayoutMode');a.call('toggleReorganize');
   const doc=a.dom.window.document,mod=key=>doc.querySelector(`[data-mod=${key}]`);
-  const event=(target,type,x,y,id=1)=>{const e=new a.dom.window.MouseEvent(type,{bubbles:true,clientX:x,clientY:y,button:0});Object.defineProperty(e,'pointerId',{value:id});target.dispatchEvent(e);};
+  let gestureScale=1;
+  const event=(target,type,x,y,id=1)=>{
+    if(type==='pointerdown')gestureScale=a.run('canvasScale');
+    const e=new a.dom.window.MouseEvent(type,{bubbles:true,clientX:x*gestureScale,clientY:y*gestureScale,button:0});
+    Object.defineProperty(e,'pointerId',{value:id});target.dispatchEvent(e);
+  };
   return {...a,doc,mod,event,select:key=>mod(key).querySelector('.mod-select').click()};
 }
 
@@ -32,8 +37,10 @@ test('selected panels move and resize together while content retains its origina
   assert.equal(a.mod('moves').querySelector('.mod-select').getAttribute('aria-pressed'),'true');
   assert.match(a.doc.querySelector('.reorg-count').textContent,/2 panels selected/);
   const handle=a.mod('moves').querySelector('.mod-handle');
+  const origin=panelGroupBounds(before,['moves','graph']);
+  const mx=a.call('snapGrid',origin.x+100)-origin.x,my=a.call('snapGrid',origin.y-20)-origin.y;
   a.event(handle,'pointerdown',0,0);a.event(a.dom.window,'pointermove',100,-20);a.event(a.dom.window,'pointerup',100,-20);
-  for(const key of ['moves','graph']){near(a.state.layout[key].x,before[key].x+100);near(a.state.layout[key].y,before[key].y-20);}
+  for(const key of ['moves','graph']){near(a.state.layout[key].x,before[key].x+mx);near(a.state.layout[key].y,before[key].y+my);}
   const start=structuredClone(a.state.layout),bounds=panelGroupBounds(start,['moves','graph']),box=start.graph;
   const grip=a.mod('graph').querySelector('.mod-resize.se'),dx=-(box.x+box.w-bounds.x)/2,dy=-(box.y+box.h-bounds.y)/2;
   a.event(grip,'pointerdown',0,0);a.event(a.dom.window,'pointermove',dx,dy);a.event(a.dom.window,'pointerup',dx,dy);

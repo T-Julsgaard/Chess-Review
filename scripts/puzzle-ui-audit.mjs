@@ -9,8 +9,8 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await run(`import('./analysis.js').then(m=>{m.S.layoutMode='${mode}';m.applyLayoutMode();})`);
     const top=await controlsTop();
     for(let i=0;i<4;i++){
-      await run("document.querySelector('.qbreak-toggle').click()");await sleep(100);
-      assert.ok(Math.abs(await controlsTop()-top)<1,mode+': accuracy expansion must keep playback controls in place');
+      await run("(()=>{const tabs=[...document.querySelectorAll('.acc-navigation button')];tabs[(tabs.findIndex(b=>b.getAttribute('aria-selected')==='true')+1)%tabs.length].click()})()");await sleep(100);
+      assert.ok(Math.abs(await controlsTop()-top)<1,mode+': accuracy pages must keep playback controls in place');
     }
   }
   await run("import('./analysis.js').then(m=>{m.S.layoutMode='auto';m.applyLayoutMode();})");

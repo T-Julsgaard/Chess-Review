@@ -34,14 +34,16 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out,sour
     return evaluate(tab,`(async()=>{
     const currentTab=await chrome.tabs.getCurrent(),zoom=await chrome.tabs.getZoom(currentTab.id);
     const rect=n=>{const r=n.getBoundingClientRect();return {x:r.x*zoom,y:r.y*zoom,w:r.width*zoom,h:r.height*zoom};};
-    const selectors=['.topbar','.brand-mark','.learning-toggle','.board','[data-mod=moves] .panel-head h3','.qbreak-row .qlabel','.qbreak-row .qsym','.controls button.play','.engine-bestwalk','.lib-tab','.feedback-floating'];
+    const selectors=['.topbar','.brand-mark','.learning-toggle','.board','.controls button.play','.engine-bestwalk','.lib-tab','.feedback-floating'];
     return {zoom,width:Math.round(innerWidth*zoom),height:Math.round(innerHeight*zoom),
       panels:Object.fromEntries([...document.querySelectorAll('.mod')].map(n=>[n.dataset.mod,rect(n)])),
       contents:Object.fromEntries(selectors.map(s=>[s,rect(document.querySelector(s))]))};
   })()`);
   };
   const results=[];
-  for(const [width,height]of [[1920,1080],[1920,960],[1919,919]]){
+  // Taller views now enlarge the composition; compare the approved baseline
+  // here and exercise growth separately in viewport-growth-audit.mjs.
+  for(const [width,height]of [[1920,919],[1919,919]]){
     const current=await measurements(review);
     const outer=await evaluate(review,'({w:outerWidth,h:outerHeight})');
     await call('Browser.setWindowBounds',{windowId,bounds:{width:outer.w+width-current.width,height:outer.h+height-current.height}});
@@ -80,5 +82,5 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out,sour
   await fs.writeFile(path.join(out,'full-hd-comparison.html'),`<!doctype html><meta charset="utf-8"><title>Full HD reference comparison</title><style>body{font:14px system-ui;background:#191917;color:#eee;margin:24px}article>div{display:grid;grid-template-columns:1fr 1fr;gap:16px}figure{margin:0}img{width:100%}figcaption{margin-top:8px}</style><h1>Full HD · original appearance at 100%</h1><p>Click a screenshot for full size. Browser chrome is accounted for in the shorter views.</p>${pairs}`);
   console.log('Full HD comparison: '+out);
   assert.equal(differences.length,0,JSON.stringify(differences,null,2));
-  console.log('Reference 87% and native 100% panel and content measurements match within 1.1 physical pixels in all six views.');
+  console.log('Reference 87% and native 100% panel and content measurements match within 1.1 physical pixels in the baseline views.');
 }

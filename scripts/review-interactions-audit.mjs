@@ -12,7 +12,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await resize(width,height);
     const initial=await run("({w:document.documentElement.clientWidth,h:document.documentElement.clientHeight})");
     for(let n=0;n<4;n++){
-      await run("document.querySelector('.qbreak-toggle').click()");
+      await run("(()=>{const tabs=[...document.querySelectorAll('.acc-navigation button')];tabs[(tabs.findIndex(b=>b.getAttribute('aria-selected')==='true')+1)%tabs.length].click()})()");
       const state=await run("({w:document.documentElement.clientWidth,h:document.documentElement.clientHeight,scrollW:document.documentElement.scrollWidth,scrollH:document.documentElement.scrollHeight,x:scrollX,y:scrollY})");
       assert.deepEqual({w:state.w,h:state.h},initial);assert.equal(state.scrollH,height);assert.equal(state.scrollW,width);assert.equal(state.y,0);
       if(n===0)await shot(`expanded-accuracy-${width}x${height}`);

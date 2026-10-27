@@ -217,6 +217,9 @@ const CC = {
   // them directly in .sidebar-content. Keep the latter scoped to the sidebar.
   sidebarSections: [".game-review-emphasis-content", "[class*='game-review-emphasis']", ".sidebar-content .game-review-buttons-component", ".sidebar-content [class*='game-review-buttons']"],
   sidebarReviewButtons: [".game-review-buttons-component", "[class*='game-review-buttons']"],
+  // Post-game coach actions have a 20dvh animated height limit. Keep our slot
+  // outside that whole panel, and outside the emphasis panel's overflow clip.
+  sidebarPanels: [".coach-nudge-game-review-component", ".game-review-emphasis-component"],
   // The Game Review CTA inside the sidebar buttons container. href first: durable + locale-proof.
   sidebarCta: ['a[href*="tab=review"]', 'a[aria-label="Game Review"]', "a.cc-button-component", "button.cc-button-component"],
 };
@@ -322,27 +325,49 @@ function injectModalReviewButton(buttonsContainer) {
   console.log("[Chess Analyzer] injected review button (modal)");
 }
 
-// (2) Game-page sidebar: beneath chess.com's "Game Review" CTA, inside its existing container.
-// Our own stylesheet fills the container width. The moves list above is the sidebar's flex-growing
-// scroll area and the sidebar is height-locked to the board, so adding this button automatically
-// shortens the moves list rather than making the sidebar taller — exactly the trade-off we want.
+// (2) Game-page sidebar. Keep Chess.com's action row intact: its layout and Vue
+// updates expect only native actions there. A separate, non-shrinking sibling
+// outside the native panel avoids its animated max-height and overflow clipping.
+const sidebarReviews = new Map();
 function injectSidebarReviewButton(section) {
   const reviewBtns = section.matches(CC.sidebarReviewButtons.join(",")) ? section : firstEl(section, CC.sidebarReviewButtons);
   if (!reviewBtns) return;
-  // Wait until chess.com has actually rendered its own Game Review CTA. Injecting into the section
-  // while Vue is still building it corrupts Vue's child diffing and stalls the whole section — it
-  // then only appears after a click forces a fresh render. The CTA's presence means it's ready.
   const cta = firstEl(reviewBtns, CC.sidebarCta);
   if (!cta) return;
-  if (reviewBtns.querySelector(".chess-analyzer-free-review")) return;
-  const btn = buildReviewButton("sidebar");
-  cta.insertAdjacentElement("afterend", btn);
-  console.log("[Chess Analyzer] injected review button (sidebar)");
+  let entry = sidebarReviews.get(reviewBtns);
+  if (!entry) {
+    const host = document.createElement("div");
+    host.className = "chess-analyzer-review-slot";
+    const btn = buildReviewButton("sidebar", 6, 8);
+    host.append(btn);
+    entry = { host, btn };
+    sidebarReviews.set(reviewBtns, entry);
+  }
+  const { host, btn } = entry;
+  // Reuse the same control if Vue replaces the CTA or drops our sibling. In
+  // particular, do not reset an in-flight review when the coach/tally animates.
+  const anchor = reviewBtns.closest(CC.sidebarPanels.join(",")) || reviewBtns;
+  if (anchor.nextElementSibling !== host) anchor.after(host);
+  if (btn.parentElement !== host) host.append(btn);
+  if (cta.offsetWidth > 0) {
+    const width = `${cta.offsetWidth}px`;
+    if (btn.style.getPropertyValue("--chess-review-sidebar-width") !== width) {
+      btn.style.setProperty("--chess-review-sidebar-width", width);
+    }
+  }
+  let hidden = false;
+  for (let node = cta; node; node = node.parentElement) {
+    const style = getComputedStyle(node);
+    if (node.hidden || style.display === "none" || style.visibility === "hidden"
+      || style.maxHeight === "0px" && [style.overflowY, style.overflow].some(value => value === "hidden" || value === "clip")) { hidden = true; break; }
+  }
+  if (host.hidden !== hidden) host.hidden = hidden;
+  return reviewBtns;
 }
 
 (function watchForReviewSpots() {
   let modalTimer = null, sidebarTimer = null;
-  let modalRoot = null, sidebarRoot = null, scheduled = false;
+  let modalRoot = null, sidebarRoots = [], scheduled = false;
   const tryInject = () => {
     // (1) Modal.
     const modal = firstEl(document, CC.modalContainer);
@@ -360,18 +385,26 @@ function injectSidebarReviewButton(section) {
     }
     // (2) Sidebar. The review section only renders post-game, so if it's present but our button still
     // isn't there a few seconds later, an inner selector (review-buttons / CTA) likely changed.
-    const section = firstEl(document, CC.sidebarSections);
-    sidebarRoot = section;
-    if (section) {
-      injectSidebarReviewButton(section);
-      if (!section.querySelector(".chess-analyzer-free-review") && !sidebarTimer) {
+    sidebarRoots = [...document.querySelectorAll(CC.sidebarSections.join(","))];
+    const activeRows = new Set();
+    for (const section of sidebarRoots) {
+      const row = injectSidebarReviewButton(section);
+      if (row) activeRows.add(row);
+      if (!row && !sidebarTimer) {
         sidebarTimer = setTimeout(() => {
           sidebarTimer = null;
           const current = firstEl(document, CC.sidebarSections);
-          if (current && !current.querySelector(".chess-analyzer-free-review")) {
+          const row = current?.matches(CC.sidebarReviewButtons.join(",")) ? current : current && firstEl(current, CC.sidebarReviewButtons);
+          if (current && !sidebarReviews.has(row)) {
             warnMarkupChanged("sidebar", "the game-review sidebar was detected");
           }
         }, 6000);
+      }
+    }
+    for (const [row, { host }] of sidebarReviews) {
+      if (!activeRows.has(row)) {
+        host.remove();
+        sidebarReviews.delete(row);
       }
     }
   };
@@ -385,15 +418,18 @@ function injectSidebarReviewButton(section) {
     else requestAnimationFrame(run);
   };
   const observer = new MutationObserver(records => {
-    if (modalRoot && !modalRoot.isConnected || sidebarRoot && !sidebarRoot.isConnected) { schedule(); return; }
+    if (modalRoot && !modalRoot.isConnected || sidebarRoots.some(root => !root.isConnected)) { schedule(); return; }
     for (const record of records) {
-      if (record.target.closest?.(".chess-analyzer-free-review")) continue;
-      if (modalRoot?.contains(record.target) || sidebarRoot?.contains(record.target)
+      if (record.target.matches?.(".chess-analyzer-review-slot") && record.removedNodes.length) { schedule(); return; }
+      if (record.target.closest?.(".chess-analyzer-free-review, .chess-analyzer-review-slot")) continue;
+      if (modalRoot?.contains(record.target) || sidebarRoots.some(root => root.contains(record.target)
+          || record.type === "attributes" && record.target.contains(root))
+        || [...record.removedNodes].some(node => node.nodeType === 1 && node.matches(".chess-analyzer-review-slot"))
         || [...record.addedNodes].some(node => node.nodeType === 1
           && (node.matches(relevantSelector) || node.querySelector(relevantSelector)))) { schedule(); return; }
     }
   });
-  observer.observe(document.body, { childList: true, subtree: true });
+  observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "style", "hidden"] });
   window.addEventListener("resize", tryInject);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) tryInject(); });
   tryInject();

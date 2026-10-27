@@ -76,7 +76,7 @@ for(const mode of ['timeAttack','knockout'])for(const action of ['overview','nav
   await settle();await starting;
   assert.equal(run.clock?.started||false,false);assert.equal(w.run,null);assert.equal(w.runStartOverlay,null);
   assert.equal(w.root.querySelector('.puzzle-run-start'),null);assert.equal(w.cancelRunStart,null);
-  assert.equal(timers.size,0);assert.deepEqual(sounds,[mode==='knockout'?'1':'3']);assert.equal(w.puzzleThinkingAt==null,true);
+  assert.equal(timers.size,0);assert.deepEqual(sounds,[mode==='knockout'?'Ready':'3']);assert.equal(w.puzzleThinkingAt==null,true);
   assert.equal(data['learning:v1'].challenges.at(-1).solved,0);
 });
 
@@ -84,11 +84,11 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} Play again gets a fres
   const {w,advance,sounds}=await setup(t);
   for(let attempt=0;attempt<2;attempt++){
     const starting=w.startPuzzleRun(mode,{again:!!attempt});await settle();
-    assert.equal(w.root.querySelector('.puzzle-run-start strong').textContent,mode==='knockout'?'1':'3');
+    assert.equal(w.root.querySelector('.puzzle-run-start strong').textContent,mode==='knockout'?'Ready':'3');
     for(let i=0;i<(mode==='knockout'?1:3);i++)await advance(1000);
     await starting;await advance(mode==='knockout'?900:600);await w.finishChallenge('Ended early');
   }
-  assert.deepEqual(sounds,mode==='knockout'?['1','Go!','1','Go!']:['3','2','1','Go!','3','2','1','Go!']);
+  assert.deepEqual(sounds,mode==='knockout'?['Ready','Go!','Ready','Go!']:['3','2','1','Go!','3','2','1','Go!']);
 });
 
 for(const options of [{motion:true},{motion:false},{motion:true,reduced:true}])test(`Knockout prepares one life before the bell ${JSON.stringify(options)}`,async t=>{
@@ -96,7 +96,9 @@ for(const options of [{motion:true},{motion:false},{motion:true,reduced:true}])t
   w.onPuzzleMove=san=>moves.push(san);
   const starting=w.startPuzzleRun('knockout');await settle();
   const overlay=w.runStartOverlay;
-  assert.equal(overlay.dataset.mode,'knockout');assert.equal(overlay.dataset.step,'1');
+  assert.equal(overlay.dataset.mode,'knockout');assert.equal(overlay.dataset.step,'Ready');
+  assert.equal(overlay.querySelector('strong').textContent,'Ready');
+  assert.ok([...overlay.querySelectorAll('.puzzle-flip > span')].every(p=>p.dataset.value==='Ready'));
   assert.equal(overlay.dataset.motion,options.motion&&!options.reduced?'on':'off');
   assert.equal(overlay.querySelector('.puzzle-run-start-title').textContent,'One life');
   assert.equal(overlay.querySelector('.puzzle-run-ticket-note').textContent,'Sudden death');
@@ -108,7 +110,7 @@ for(const options of [{motion:true},{motion:false},{motion:true,reduced:true}])t
   w.render();assert.equal(w.runStartOverlay,overlay);assert.equal(overlay.isConnected,true);
   await advance(1000);await starting;
   assert.equal(overlay.dataset.step,'Go!');assert.equal(w.busy,false);assert.deepEqual(moves,['d5']);
-  assert.deepEqual(cues,[['1','knockout'],['Go!','knockout']]);
+  assert.deepEqual(cues,[['Ready','knockout'],['Go!','knockout']]);
   assert.ok([...overlay.querySelectorAll('.puzzle-flip > span')].every(p=>p.dataset.value==='Go!'));
   await advance(900);assert.equal(overlay.isConnected,false);
   await w.submitPuzzle('e4d5');assert.equal(w.run.correctMoves,1);
@@ -201,7 +203,7 @@ test('synthesized ticks and Go chord obey live mute/volume and release audio res
 });
 
 test('Knockout synthesis has headroom and silent boundaries at device sample rates',()=>{
-  for(const rate of [44100,48000])for(const step of ['1','Go!']){
+  for(const rate of [44100,48000])for(const step of ['Ready','Go!']){
     const samples=knockoutCue(step,rate);
     let peak=0,energy=0;
     for(const v of samples){assert.ok(Number.isFinite(v));peak=Math.max(peak,Math.abs(v));energy+=v*v;}
@@ -214,11 +216,11 @@ test('Knockout synthesis has headroom and silent boundaries at device sample rat
 test('Knockout playback obeys intro/master volume, reuses synthesis and stops on mute/close',()=>{
   const {sound,settings,notes,contexts}=audioFixture();
   settings.soundFx={runStart:{volume:40}};
-  sound.play('1','knockout');const tap=notes[0];
+  sound.play('Ready','knockout');const tap=notes[0];
   assert.equal(tap.buffer.duration,.16);assert.equal(tap.gain.value,.5*.4*.45);
   sound.play('Go!','knockout');assert.equal(tap.disconnected,true);
   assert.equal(notes[1].buffer.duration,.84);assert.equal(notes[1].started,true);
-  sound.play('1','knockout');assert.equal(notes[2].buffer,tap.buffer);
+  sound.play('Ready','knockout');assert.equal(notes[2].buffer,tap.buffer);
   settings.soundFx.runStart.volume=0;sound.play('Go!','knockout');
   assert.equal(notes.length,3);assert.ok(notes.every(n=>n.disconnected));
   settings.soundFx.runStart.volume=100;sound.play('Go!','knockout');

@@ -15,11 +15,17 @@ import { browserAPI as platformAPI } from "./browser-compat.js";
 import { resetSettingsForRelease } from "./release-settings.js";
 import { expectedPoints, SF19_OUTCOME } from "./lib/public-scoring.js";
 import { calibratedReview, scoringEvidenceComplete } from "./lib/calibrated-review.js";
+import { gameStatistics, GAME_PHASES } from "./lib/game-statistics.js";
+import { PANEL_DESIGNS, panelDesign, normalizePanelDesigns } from "./lib/panel-designs.js";
+import { UI_SETUPS, MODERN_LAYOUT } from "./lib/ui-setups.js";
+import { createOverviewReveal } from "./lib/overview-reveal.js";
+import { createAccuracyNavigation } from "./lib/accuracy-navigation.js";
+import { phasePerformance } from "./lib/phase-performance.js";
 import { analyseCalibratedPosition } from "./lib/calibrated-search.js";
 import { loadLearningWorkspace, presentationFor } from "./lib/learning-loader.js";
 import { mountLearningAnnouncement } from "./lib/learning-announcement.js";
 import { panelScale, panelGroupBounds, scalePanelGroup, movePanelGroup } from "./lib/panel-layout.js";
-import { fullHdReferenceLayout } from "./lib/full-hd-layout.js";
+import { fullHdReferenceLayout, viewportGrowth } from "./lib/full-hd-layout.js";
 import { createScreenPreviewContext, loadScreenPreviewController } from "./lib/screen-previews.js";
 import { rememberAnalyzedGame, historyGame } from "./lib/player-history.js";
 
@@ -141,11 +147,10 @@ function badgeLabelStyle(value = S.settings.badgeTooltip) {
   if (value === true) return "original";
   return Object.hasOwn(BADGE_LABEL_STYLES, value) ? value : "off";
 }
-// Accuracy breakdown: compact (default) vs. full list (expanded via the expander arrow).
-// The compact list holds every category the move list badges (NOTEWORTHY) plus Best, so its
-// totals match the badges at a glance; the expander adds Excellent, Good and book moves.
-const QBREAK_SUMMARY = ["brilliant","great","best","inacc","mistake","miss","blunder"];
+// The move-quality page keeps the complete category list, with Book last.
 const QBREAK_FULL = ["brilliant","great","best","excellent","good","inacc","mistake","miss","blunder","book"];
+const QBREAK_SUMMARY = ["brilliant","great","best","inacc","mistake","miss","blunder"];
+const ACCURACY_PAGES = ['Accuracy', 'Move quality', 'Advanced'];
 const NOTEWORTHY = new Set(["brilliant","great","inacc","mistake","miss","blunder"]);
 // Explanation for each category (shown as a tooltip in the accuracy panel). The classifier
 // (computeDerived → classifyMove) works on the engine's eval in PAWNS: "loss" is how much the
@@ -168,7 +173,7 @@ const ACCURACY_INFO = "SF18 uses the published public-data move-quality model. S
 const ELO_INFO = "Both engines support both rating modes using their own models. Use recorded rating compares this game's performance with players around the rating saved in the game. Stockfish 18 uses calibrated accuracy; Stockfish 19 uses its own expected-point losses, separately from displayed accuracy. Moves only ignores the saved rating and estimates a blitz rating level from the moves themselves; it needs at least 10 moves with more than one legal choice. Neither estimate changes your account rating.";
 // Explanations for the engine settings (shown on hover, same tooltip as the accuracy panel).
 const ENGINE_INFO = {
-  engineLines:   "How many candidate moves (lines) the engine panel shows for the position you're viewing. Extra lines are searched on demand — changing this doesn't re-analyze the game.",
+  engineLines:   "How many candidate moves (lines) the engine panel shows. Extra lines are precomputed across the game after review statistics are ready. Changing this doesn't re-analyze the game.",
   classifyLines: "Lines searched for annotation and candidate inspection. Calibrated SF18 numerical scores require one analysis line. Changing this re-analyzes the game.",
   engineDepth:   "How many plies (half-moves) deep Stockfish searches each position. Higher depth gives more accurate evaluations and fewer false mistakes, but takes longer.",
   engineWorkers: "Number of Stockfish instances analysing positions in parallel. The default uses available CPU cores, up to four workers. Your selection is respected; if a worker fails to start, the review continues with the workers that did start. Search depth and scoring settings stay the same.",
@@ -296,7 +301,10 @@ function engineWorkerCount(requested = null, positions = Infinity,
 }
 
 const DEFAULT_SETTINGS = {
+  ...Object.fromEntries(PANEL_DESIGNS.map(design => [design.setting, design.default])),
   categoryNames: {},
+  layoutGridSize: 16,
+  uiSetup: "custom", uiSetupBase: "", // Custom retains its starting preset for resets.
   theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
   badgeFont: "spacemono", badgeTooltip: "off",
@@ -411,7 +419,7 @@ const DEFAULT_LAYOUT = {
 const GRIP_SVG = `<svg viewBox="0 0 12 12" width="12" height="12"><path d="M11 4 4 11M11 8 8 11" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>`;
 const HANDLE_SVG = `<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><circle cx="5" cy="4" r="1.3"/><circle cx="11" cy="4" r="1.3"/><circle cx="5" cy="8" r="1.3"/><circle cx="11" cy="8" r="1.3"/><circle cx="5" cy="12" r="1.3"/><circle cx="11" cy="12" r="1.3"/></svg>`;
 // Engine depth/lines are now controlled via S.settings (engineDepth/engineLines).
-const GRID = 2;          // fine snap grid for modules (px) — small, so placement feels free
+const LAYOUT_GRIDS = [[16, 'Standard'], [8, 'Fine'], [2, 'Extra fine']];
 const MINW = 170;        // minimum module width (px)
 const MINH = 56;         // minimum module height (px)
 // Per-module width floors that override MINW — the eval bar is a thin strip, so it may go narrow.
@@ -747,7 +755,8 @@ const S = {
   // `progress` is the contiguous prefix that is safe to navigate to while a batch is
   // still running. `completed` is the total number of game plies already returned by
   // any worker. They differ when parallel workers finish out of order.
-  analyzing: true, progress: 0, completed: 0, analysisError: null, userArrows: [], userMarks: [], qbreakExpanded: false,
+  analyzing: true, progress: 0, completed: 0, analysisError: null, userArrows: [], userMarks: [], qbreakExpanded: false, accuracyPage: 0, originalAccuracyExpanded: false,
+  restoredAnalysis: false, progressiveAccuracy: false,
   // Collapsible settings sections: open/closed state, keyed by section title.
   setOpen: {},
   settings: { ...DEFAULT_SETTINGS },
@@ -780,6 +789,9 @@ let sqByName = {};
 // the analysis — so the CSS animation doesn't restart for each analyzed move.
 let revRefs = null;
 let statsRefs = null;
+const overviewReveal = createOverviewReveal({requestFrame: callback => requestAnimationFrame(callback), cancelFrame: id => cancelAnimationFrame(id)});
+const phaseReveals = Object.fromEntries(GAME_PHASES.map(phase => [phase,
+  createOverviewReveal({requestFrame: callback => requestAnimationFrame(callback), cancelFrame: id => cancelAnimationFrame(id)})]));
 
 /* ---------------- Active position (mainline vs. analysis mode) ----------------
    In analysis mode the shown position + eval + engine data come from the variation;
@@ -836,7 +848,7 @@ function parseHeaders(pgn) {
   while ((m = re.exec(pgn))) h[m[1]] = m[2];
   return h;
 }
-function parseClocks(pgn) {
+function parseClocks(pgn, precise = false) {
   const chess = new Chess(); chess.loadPgn(pgn);
   const comments = new Map(chess.getComments().map(({ fen, comment }) => [fen, comment]));
   // Clock tags are optional. Match comments to their actual mainline positions
@@ -844,10 +856,11 @@ function parseClocks(pgn) {
   return [null, ...chess.history({ verbose: true }).map(move => {
     const m = (comments.get(move.after) || "").match(/\[%clk\s+([\d:.]+)\]/);
     if (!m) return null;
+    const fraction = precise && m[1].includes('.') ? '.' + m[1].split('.')[1] : '';
     let t = m[1].split(".")[0];
     const p = t.split(":").map(Number);
     if (p.length === 3) t = `${p[0] * 60 + p[1]}:${String(p[2]).padStart(2, "0")}`;
-    return t;
+    return t + fraction;
   })];
 }
 function buildPositions(pgn) {
@@ -1465,6 +1478,9 @@ function computeDerived() {
   }
   const N = S.total;
   const eloAccs = sideAccuracies();
+  const result = S.headers.Result || S.meta.result || S.pgn.trim().match(/(?:^|\s)(1-0|0-1|1\/2-1\/2)$/)?.[1];
+  S.gameStats = gameStatistics(S.positions, S.bests, S.calibrated,
+    {classifications: completedClasses, clocks: S.clocks, headers: {...S.headers, Result: result}, evals: S.evals});
   for (const side of ["w", "b"]) {
     const counts = {}; QUALITY_ORDER.forEach((k) => (counts[k] = 0));
     for (let i = 1; i <= N; i++) {
@@ -1553,13 +1569,10 @@ function buildUI() {
   const playerBot = el("div", { id: "playerBot" });
   const controls = el("div", { class: "controls", id: "controls" });
 
-  // moves panel skeleton (head + scroll body + foot)
+  // The move list starts directly with moves; keep its name accessible.
   const movesBody = el("div", { class: "panel-body", id: "movesBody" });
-  const movesCount = el("span", { class: "count", id: "movesCount" });
-  const movesFoot = el("div", { class: "moves-foot", id: "movesFoot", hidden: true });
-  const movesPanel = el("div", { class: "panel moves-panel" },
-    el("div", { class: "panel-head" }, el("h3", {}, "Moves"), movesCount),
-    movesBody, movesFoot,
+  const movesPanel = el("div", { class: "panel moves-panel", "aria-label": "Moves" },
+    movesBody,
   );
 
   const coachMount = el("div", { id: "coachMount", class: "coach-mount" });
@@ -1622,12 +1635,13 @@ function buildUI() {
   UI = {
     meta: document.getElementById("meta"), settings, canvas, boardWrap,
     playerTop, playerBot, controls, coach: coachMount, evalbar: evalbarMount,
-    review: reviewMount, movesBody, movesCount, movesFoot,
+    review: reviewMount, movesBody,
     graph: graphMount, stats: statsMount, engine: engineMount,
     libRail, libControls, libList, libCount, libPanel:libRail.querySelector(".lib-panel"), saveStatus,
   };
 
   applyLayoutMode();
+  if (!accuracyLayoutExpanded()) reflowAccuracy(false);
   initBoardInput();
   if(!S.blank)renderCoachAvatar(); // no unused animated portrait in the blank workspace
   renderLibrary();
@@ -1726,14 +1740,20 @@ async function openLearning() {
 /* ---------------- Loading indicator ----------------
    Selectable animation shown in place of the accuracy/elo number while Stockfish
    is still analyzing. The color is inherited from the parent (currentColor). */
-function loaderNode(extraClass = "", color = null) {
-  const variant = LOADERS[S.settings.loaderStyle] || "pulse";
+function loaderNode(extraClass = "", color = null, style = S.settings.loaderStyle) {
+  const variant = LOADERS[style] || "pulse";
   const props = { class: "ld ld-" + variant + (extraClass ? " " + extraClass : "") };
   if (color) props.style = { color };
   if (variant === "pulse")  return el("span", props, "•••");
   if (variant === "bounce") return el("span", props, el("i"), el("i"), el("i"));
   if (variant === "wave")   return el("span", props, el("i"), el("i"), el("i"), el("i"));
   return el("span", props); // spin (pure CSS ring)
+}
+function accuracyPendingValue() {
+  const loader = loaderNode('', null, 'bounce');
+  loader.setAttribute('role', 'img');
+  loader.setAttribute('aria-label', 'Calculating');
+  return loader;
 }
 
 /* ---------------- Movable modules (drag + resize + storage) ---------------- */
@@ -1823,7 +1843,10 @@ function applyPanelBox(mod,b) {
   inner.style.transform=scale===1?"":"scale("+scale+")";inner.style.transformOrigin=scale===1?"":"top left";
 }
 function panelContentScale(key) {
-  return isCustomLayout() ? panelScale(S.layout[key]) : panelScale(fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,S.qbreakExpanded)?.[key]);
+  return isCustomLayout() ? panelScale(S.layout[key]) : panelScale(fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,accuracyLayoutExpanded())?.[key]);
+}
+function accuracyLayoutExpanded() {
+  return panelDesign('accuracy', S.settings) === 'original' ? S.originalAccuracyExpanded : S.qbreakExpanded;
 }
 function applyLayoutMode() {
   const custom = isCustomLayout();
@@ -1835,7 +1858,8 @@ function applyLayoutMode() {
 function applyLayout() {
   UI.canvas.classList.add("no-concepts");
   UI.canvas.classList.remove("desktop-layout");
-  const reference=fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,S.qbreakExpanded);
+  const reference=fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,accuracyLayoutExpanded());
+  UI.canvas.classList.toggle('original-accuracy-expanded',panelDesign('accuracy',S.settings)==='original'&&S.originalAccuracyExpanded);
   UI.canvas.classList.toggle('full-hd-reference',!!reference);
   UI.canvas.classList.toggle('reference-components',!isCustomLayout()||!!reference);
   UI.canvas.style.setProperty('--reference-factor',reference?reference.review.scale/(DEFAULT_LAYOUT.review.scale*.87):1);
@@ -1850,7 +1874,7 @@ function applyLayout() {
 function snapshotLayout() {
   const base = UI.canvas.parentElement.getBoundingClientRect();
   const out = structuredClone(DEFAULT_LAYOUT);
-  const reference=fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,S.qbreakExpanded);
+  const reference=fullHdReferenceLayout(DEFAULT_LAYOUT,window.innerWidth,window.innerHeight,accuracyLayoutExpanded());
   for (const mod of UI.canvas.querySelectorAll(".mod")) {
     if(reference&&!isCustomLayout()) {out[mod.dataset.mod]={...reference[mod.dataset.mod]};continue;}
     const r = mod.getBoundingClientRect();
@@ -1878,8 +1902,10 @@ function growCanvas() {
     return;
   }
   const {pageW,pageH}=layoutPageSize(S.layout),height=pageH-TOPBAR_H;
-  const width=window.innerWidth||innerWidth,availableHeight=(window.innerHeight||innerHeight)-TOPBAR_H;
-  canvasScale=Math.min(1,width/pageW,Math.max(1,availableHeight)/height);
+  const top=viewport.getBoundingClientRect().top||TOPBAR_H;
+  const width=window.innerWidth||innerWidth,availableHeight=(window.innerHeight||innerHeight)-top;
+  canvasScale=Math.min(2,viewportGrowth(window.innerHeight||innerHeight),width/pageW,Math.max(1,availableHeight)/height);
+  UI.canvas.style.setProperty('--layout-grid-line',1/canvasScale+'px');
   UI.canvas.style.minWidth=UI.canvas.style.width=pageW+'px';
   UI.canvas.style.minHeight=UI.canvas.style.height=height+'px';
   UI.canvas.style.transform='scale('+canvasScale+')';UI.canvas.style.transformOrigin='top left';
@@ -1889,13 +1915,10 @@ function growCanvas() {
 // What collapsing the accuracy breakdown is worth on the canvas: the hidden rows' height (+ the
 // column row-gap), and modules below it in the same column. Playback controls stay anchored.
 function accuracyReflowInfo(layout = S.layout) {
-  const accMod = UI.canvas.querySelector('.mod[data-mod="accuracy"]');
   const acc = layout.accuracy;
-  const row = accMod && accMod.querySelector(".qbreak-row");
-  const qb = accMod && accMod.querySelector(".qbreak");
-  const gap = qb ? (parseFloat(getComputedStyle(qb).rowGap) || 0) : 0;
-  const rowH = row ? row.offsetHeight : 24;
-  const delta = Math.round((QBREAK_FULL.length - QBREAK_SUMMARY.length) * (rowH + gap))*panelScale(acc);
+  // Saved custom layouts use the old expanded baseline. Its original compact
+  // inset was three 22px rows plus 7px gaps, independent of the selected page.
+  const delta = 87 * panelScale(acc);
   const belowKeys = [];
   for (const [k, o] of Object.entries(layout)) {
     if (k === "accuracy" || k === "controls") continue;
@@ -1926,14 +1949,22 @@ function reflowAccuracy(expanded) {
   }
   applyLayout(); growCanvas();
 }
-// Snap only to a fine grid — no magnetic pull toward neighbor modules' edges, so a panel goes
-// exactly where you drop it. The 2px grid just avoids sub-pixel positions.
-function snapGrid(v) { return Math.round(v / GRID) * GRID; }
-function snapDrag(b) {
-  return { x: Math.max(0, snapGrid(b.x)), y: Math.max(0, snapGrid(b.y)) };
+// The visible grid and snapping share the canvas origin, even when zoomed to fit.
+function layoutGridSize() {
+  return LAYOUT_GRIDS.some(([size])=>size===S.settings.layoutGridSize) ? S.settings.layoutGridSize : DEFAULT_SETTINGS.layoutGridSize;
 }
-function snapResize(b, mw = MINW) {
-  return { w: Math.max(mw, snapGrid(b.w)), h: Math.max(MINH, snapGrid(b.h)) };
+function snapGrid(v) { const size=layoutGridSize();return Math.round(v/size)*size; }
+function snapPanelEdge(origin, size, delta, minimum) {
+  if(!delta)return size;
+  const grid=layoutGridSize(),edge=Math.max(snapGrid(origin+size+delta),Math.ceil((origin+minimum)/grid)*grid);
+  return edge-origin;
+}
+function setLayoutGridSize(value) {
+  cancelPanelGesture?.();
+  S.settings.layoutGridSize=Number(value);
+  S.settings.layoutGridSize=layoutGridSize();
+  renderReorgBanner();
+  return writeSettings({layoutGridSize:S.settings.layoutGridSize});
 }
 function makeMovable(mod, handle, grips, key) {
   const begin=(kind,target)=>(e)=>{
@@ -1950,15 +1981,16 @@ function makeMovable(mod, handle, grips, key) {
     try{target.setPointerCapture(e.pointerId);}catch{}
     const apply=ev=>{
       const dx=(ev.clientX-sx)/gestureScale,dy=(ev.clientY-sy)/gestureScale;
-      if(kind==='move')S.layout=movePanelGroup(start,keys,snapGrid(dx),snapGrid(dy));
+      if(kind==='move')S.layout=movePanelGroup(start,keys,dx?snapGrid(bounds.x+dx)-bounds.x:0,dy?snapGrid(bounds.y+dy)-bounds.y:0);
       else if(group){
         const rx=box.x+box.w-bounds.x,ry=box.y+box.h-bounds.y;
         const factor=kind==='e'?1+dx/rx:kind==='s'?1+dy/ry:1+(dx*rx+dy*ry)/(rx*rx+ry*ry);
         S.layout=scalePanelGroup(start,keys,factor);
         if(reflow&&keys.includes('accuracy'))S._accReflow={...reflow,delta:reflow.delta*S.layout.accuracy.w/start.accuracy.w};
       }else{
-        const b={...box},size=snapResize({w:kind.includes('e')?box.w+dx:box.w,h:kind.includes('s')?box.h+dy:box.h},modMinW(key));
-        if(kind.includes('e'))b.w=size.w;if(kind.includes('s'))b.h=size.h;
+        const b={...box};
+        if(kind.includes('e'))b.w=snapPanelEdge(box.x,box.w,dx,modMinW(key));
+        if(kind.includes('s'))b.h=snapPanelEdge(box.y,box.h,dy,MINH);
         S.layout={...start,[key]:b};
       }
       applyLayout();growCanvas();if(keys.includes('board'))alignPlayers();
@@ -1972,6 +2004,7 @@ function makeMovable(mod, handle, grips, key) {
       if(cancelled){S.layout=start;S._accReflow=reflow;applyLayout();growCanvas();}
       else if(ev)apply(ev);
       for(const name of keys)UI.canvas.querySelector('[data-mod="'+name+'"]').classList.remove('dragging','resizing');
+      if(!cancelled&&JSON.stringify(S.layout)!==JSON.stringify(start))writeSettings(customUiSetupPatch());
       saveLayout();if(keys.includes('board'))alignPlayers();
     };
     const up=ev=>finish(false,ev),cancel=ev=>finish(true,ev),blur=()=>finish(true);
@@ -1981,18 +2014,47 @@ function makeMovable(mod, handle, grips, key) {
   handle.addEventListener('pointerdown',begin('move',handle));
   for(const dir of ['e','s','se'])grips[dir].addEventListener('pointerdown',begin(dir,grips[dir]));
 }
-// Back to the automatic layout and its window-dependent fit.
+function baseUiSetup() {
+  return UI_SETUPS[S.settings.uiSetup]?.designs ? S.settings.uiSetup
+    : UI_SETUPS[S.settings.uiSetupBase]?.designs ? S.settings.uiSetupBase : '';
+}
+function customUiSetupPatch() {
+  const patch = {uiSetup:'custom', uiSetupBase:baseUiSetup()};
+  Object.assign(S.settings,patch);
+  return patch;
+}
+function setupDesignsMatch() {
+  const setup = UI_SETUPS[baseUiSetup()];
+  return !!setup && Object.entries(setup.designs).every(([key,value])=>S.settings[key]===value);
+}
+function setupLayout() {
+  return structuredClone(baseUiSetup() === 'modern' ? MODERN_LAYOUT : DEFAULT_LAYOUT);
+}
+function setupLayoutMode() {
+  return UI_SETUPS[baseUiSetup()]?.layoutMode || 'auto';
+}
+function setupLayoutMatches(layout,mode) {
+  const baseline=setupLayout();
+  return mode===setupLayoutMode()&&Object.keys(layout).every(key=>key in baseline)&&Object.entries(baseline).every(([key,box])=>
+    ['x','y','w','h','scale'].every(prop=>Math.abs((layout[key]?.[prop]??(prop==='scale'?1:NaN))-(box[prop]??1))<1e-6));
+}
+// Restore the selected setup's starting arrangement and window-dependent fit.
 async function resetLayout() {
   cancelPanelGesture?.();
   S._accReflow = null;   // drop any collapse offset so the fresh layout isn't double-adjusted
-  S.layout = structuredClone(DEFAULT_LAYOUT);
-  S.layoutMode = "auto";
+  S.layout = setupLayout();
+  S.layoutMode = setupLayoutMode();
   if (S.reorganize) toggleReorganize();
+  if (!accuracyLayoutExpanded()) reflowAccuracy(false);
   applyLayoutMode();
   // Reset is a committed action: a reload must not cancel a pending debounce.
+  const uiSetup = setupDesignsMatch() ? baseUiSetup() : 'custom';
+  const savedSettings = S.settings.uiSetup === uiSetup ? Promise.resolve() : writeSettings({uiSetup,uiSetupBase:baseUiSetup()});
+  S.settings.uiSetup = uiSetup;
   const saved = saveLayout(true);
   requestAnimationFrame(alignPlayers);
-  await Promise.all([saved, initTabZoom()]);
+  await Promise.all([saved, savedSettings, initTabZoom()]);
+  if (UI.settings && !UI.settings.hidden) renderSettings();
 }
 // Reorganize mode: while ON, panels can be dragged/resized (handles + grips appear); while OFF
 // they're locked and hover shows nothing. The arranged layout auto-saves and persists. Entering it
@@ -2003,7 +2065,7 @@ function toggleReorganize() {
     S.layout = snapshotLayout();
     // The snapshot holds the breakdown as it is shown; record the collapse offset so the saved
     // baseline is the expanded one, like every other canvas layout (see layoutForSave()).
-    S._accReflow = S.qbreakExpanded ? null : accuracyReflowInfo();
+    S._accReflow = accuracyLayoutExpanded() ? null : accuracyReflowInfo();
     S.layoutMode = "custom";
     applyLayoutMode();
     saveLayout();
@@ -2018,22 +2080,91 @@ function toggleReorganize() {
   syncPanelSelection();
   if (UI.settings && !UI.settings.hidden) renderSettings();   // refresh the button label if open
 }
+let reorgToolbarPosition = null, reorgToolbarMinimized = false, cleanupReorgToolbar = null;
+function positionReorgToolbar(banner, x, y) {
+  const rect=banner.getBoundingClientRect(),margin=8;
+  const left=Math.max(margin,Math.min(x,window.innerWidth-rect.width-margin));
+  const top=Math.max(margin,Math.min(y,window.innerHeight-rect.height-margin));
+  reorgToolbarPosition={x:left,y:top};
+  Object.assign(banner.style,{left:left+'px',top:top+'px',bottom:'auto',transform:'none'});
+}
+function makeReorgToolbarMovable(banner) {
+  const handle=banner.querySelector('.reorg-drag');
+  let cancelDrag=null;
+  handle.addEventListener('pointerdown',e=>{
+    if(e.button!==0)return;
+    e.preventDefault();e.stopPropagation();cancelDrag?.();
+    const rect=banner.getBoundingClientRect(),previous=reorgToolbarPosition&&{...reorgToolbarPosition};
+    try{handle.setPointerCapture(e.pointerId);}catch{}
+    banner.classList.add('toolbar-dragging');
+    const move=ev=>{
+      if(ev.pointerId!==e.pointerId)return;
+      positionReorgToolbar(banner,rect.left+ev.clientX-e.clientX,rect.top+ev.clientY-e.clientY);
+    };
+    const finish=(cancelled,ev)=>{
+      if(ev&&ev.pointerId!==e.pointerId)return;
+      if(!cancelled&&ev)move(ev);
+      window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);
+      window.removeEventListener('pointercancel',cancel);window.removeEventListener('blur',blur);
+      try{handle.releasePointerCapture(e.pointerId);}catch{}
+      banner.classList.remove('toolbar-dragging');cancelDrag=null;
+      if(cancelled){
+        reorgToolbarPosition=previous;
+        if(previous)positionReorgToolbar(banner,previous.x,previous.y);
+        else for(const key of ['left','top','bottom','transform'])banner.style[key]='';
+      }
+    };
+    const up=ev=>finish(false,ev),cancel=ev=>finish(true,ev),blur=()=>finish(true);
+    cancelDrag=blur;
+    window.addEventListener('pointermove',move);window.addEventListener('pointerup',up);
+    window.addEventListener('pointercancel',cancel);window.addEventListener('blur',blur);
+  });
+  handle.addEventListener('keydown',e=>{
+    const direction={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];
+    if(!direction)return;
+    e.preventDefault();e.stopPropagation();
+    const rect=banner.getBoundingClientRect(),step=e.shiftKey?10:1;
+    positionReorgToolbar(banner,rect.left+direction[0]*step,rect.top+direction[1]*step);
+  });
+  const resize=()=>{cancelDrag?.();if(reorgToolbarPosition)positionReorgToolbar(banner,reorgToolbarPosition.x,reorgToolbarPosition.y);};
+  window.addEventListener('resize',resize);
+  return ()=>{cancelDrag?.();window.removeEventListener('resize',resize);};
+}
 function renderReorgBanner() {
   let banner=document.querySelector('.reorg-banner');
-  if(!S.reorganize){banner?.remove();return;}
+  if(!S.reorganize){cleanupReorgToolbar?.();cleanupReorgToolbar=null;banner?.remove();return;}
   if(!banner){
     banner=el('div',{class:'reorg-banner',role:'toolbar','aria-label':'Reorganize panels'},
-      el('span',{class:'reorg-hint'},'Select panels, then move or scale them together.'),
+      el('div',{class:'reorg-bar'},
+        el('button',{type:'button',class:'reorg-drag','aria-label':'Move layout toolbar',
+          title:'Drag to move the toolbar, or use arrow keys. Select panels to move or scale them together.'},el('span',{'aria-hidden':'true',html:HANDLE_SVG}),el('span',{},'Layout')),
+        el('label',{class:'reorg-grid'},'Grid',
+          el('select',{'aria-label':'Layout grid spacing',onchange:e=>setLayoutGridSize(e.target.value)},
+            ...LAYOUT_GRIDS.map(([size,name])=>el('option',{value:String(size)},name+' · '+size+' px')))),
+        el('button',{type:'button',class:'reorg-minimize',onclick:()=>{reorgToolbarMinimized=!reorgToolbarMinimized;renderReorgBanner();}}),
+        el('button',{type:'button',class:'reorg-done',onclick:toggleReorganize},'Done')),
       el('div',{class:'reorg-actions'},
-        el('button',{type:'button','data-reorg':'right',onclick:selectRightPanels},'Select right panels'),
-        el('button',{type:'button','data-reorg':'all',onclick:()=>selectPanels(visiblePanelKeys())},'Select all'),
+        el('button',{type:'button','data-reorg':'right',onclick:selectRightPanels},'Right panels'),
+        el('button',{type:'button','data-reorg':'all',onclick:()=>selectPanels(visiblePanelKeys())},'All'),
         el('button',{type:'button','data-reorg':'clear',onclick:()=>selectPanels([])},'Clear'),
         el('span',{class:'reorg-count',role:'status'}),
-        el('button',{type:'button','data-reorg':'export',onclick:exportPanelLayout},'Export layout'),
-        el('button',{type:'button',class:'reorg-done',onclick:toggleReorganize},'Done')));
+        el('button',{type:'button','data-reorg':'export',onclick:exportPanelLayout},'Export')));
     document.body.append(banner);
+    cleanupReorgToolbar=makeReorgToolbarMovable(banner);
   }
+  banner.classList.toggle('is-minimized',reorgToolbarMinimized);
+  banner.querySelector('.reorg-grid').hidden=reorgToolbarMinimized;
+  banner.querySelector('.reorg-actions').hidden=reorgToolbarMinimized;
+  const minimize=banner.querySelector('.reorg-minimize'),label=reorgToolbarMinimized?'Expand layout toolbar':'Minimize layout toolbar';
+  minimize.textContent=reorgToolbarMinimized?'+':'−';
+  minimize.setAttribute('aria-label',label);minimize.title=label;
+  minimize.setAttribute('aria-expanded',String(!reorgToolbarMinimized));
+  if(reorgToolbarPosition)positionReorgToolbar(banner,reorgToolbarPosition.x,reorgToolbarPosition.y);
   const count=selectedPanelKeys().length;
+  const grid=layoutGridSize();
+  UI.canvas.style.setProperty('--layout-grid-size',grid+'px');
+  UI.canvas.style.setProperty('--layout-grid-major',grid*4+'px');
+  banner.querySelector('.reorg-grid select').value=String(grid);
   banner.querySelector('.reorg-count').textContent=count+' panel'+(count===1?'':'s')+' selected';
   banner.querySelector('[data-reorg=clear]').disabled=!count;
 }
@@ -2837,10 +2968,11 @@ function applyUserMove(from, to, animate = true, promotion = null) {
   renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent();
   requestLiveEval();
 }
-// Click an engine line → play the whole PV out as a variation from the shown position.
+// Open a candidate at its first move; navigation through the rest stays manual.
 function playLine(pv) {
   const ucis = (pv || "").split(/\s+/).filter(Boolean);
   if (!ucis.length) return;
+  stopLineWalk();
   if (!S.analysisMode) {
     const currentPos = activePos();
     const currentIdx = S.analysisMode && S.variation ? S.variation.idx : S.idx;
@@ -2868,17 +3000,13 @@ function playLine(pv) {
     if (!mv) break;
     v.positions.push({ fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "", eval: null, best: null });
   }
-  // Start just one move into the line (not at the end) — the rest plays out automatically.
+  // Show the candidate move and leave the remaining continuation for manual navigation.
   v.idx = Math.min(startIdx + 1, v.positions.length - 1);
   S.selectedSq = null;
-  // No best-move arrow while a clicked line plays out: the engine's best move for each position
-  // often differs from the line's next move (the PV tail is unreliable), which is confusing.
-  S.lineWalking = true;
   playSanSound(v.positions[v.idx].san);
   paintBoard();
   renderEvalBar(); renderPlayers(); renderControls(); renderReview(); renderEngineCurrent();
   requestLiveEval();
-  startLineWalk();   // auto-step through the rest of the line (~2 s per move)
 }
 // Automatic walkthrough of the clicked engine line. Steps one move forward every
 // LINE_WALK_MS until the end of the variation. Any manual navigation (keyboard,
@@ -2992,7 +3120,7 @@ async function requestLiveEval() {
       const node = v.positions[i];
       const terminal = variationTerminal(v, i);
       const res = terminal ? { score: terminal, bestmove: null, pv: "", lines: [] }
-        : await eng.analyse(node.fen, S.settings.engineDepth, S.settings.engineLines, variationSearchHistory(v, i), preview => {
+        : await eng.analyse(node.fen, S.settings.engineDepth, enginePanelLineCount(), variationSearchHistory(v, i), preview => {
           if (!valid()) return;
           node.searchPreview = preview; node.searchPreviewToken = token;
           refreshVariation();
@@ -3029,6 +3157,7 @@ function invalidateVariationEvals() {
 }
 
 function resetLiveEngine() {
+  stopPanelPrecalculation();
   S._lastEngineLines = null;
   S._panelCache = null;
   panelLineCache.clear();
@@ -3110,6 +3239,43 @@ function animateMove(fromName, toName, ms) {
 function evalBarText(e) {
   return evalText(e).replace("#-", "#").replace(/^[+-]/, "");
 }
+function renderBalanceBar(bar, e) {
+  if (!bar.querySelector('.eval-balance-track')) {
+    bar.replaceChildren(
+      el('span', {class: 'eval-side eval-side-black', 'aria-hidden': 'true'}, 'B'),
+      el('div', {class: 'eval-balance-track', 'aria-hidden': 'true'},
+        el('div', {class: 'white-fill', style: {height: '50%'}}),
+        el('span', {class: 'eval-midpoint'})),
+      el('span', {class: 'eval-side eval-side-white', 'aria-hidden': 'true'}, 'W'),
+      el('div', {class: 'eval-balance-readout', 'aria-hidden': 'true'},
+        el('span', {class: 'eval-balance-score'}, '…')));
+  }
+  bar.className = 'evalbar eval-balance eb-' + (S.settings.barStyle || 'classic') + (S.flipped ? ' flipped' : '');
+  bar.dataset.motion = S.settings.moveAnim === false ? 'off' : 'on';
+  bar.dataset.pending = String(e == null);
+  bar.setAttribute('role', 'img');
+  bar.setAttribute('tabindex', '0');
+  const score = bar.querySelector('.eval-balance-score');
+  let description = 'Position evaluation: calculating…';
+  if (e == null) score.textContent = '…';
+  else {
+    const cp = scoreToCp(e), side = cp >= 0 ? 'White' : 'Black';
+    const share = e.mate != null ? (cp > 0 ? 100 : 0) : 50 + Math.max(-600, Math.min(600, cp)) / 600 * 46;
+    // Use the same scale as Original. The rail shows advantage, not win probability.
+    bar.querySelector('.white-fill').style.height = share + '%';
+    bar.style.setProperty('--balance-white', share + '%');
+    const rounded = Math.abs(cp / 100).toFixed(1);
+    bar.dataset.favored = e.mate == null && rounded === '0.0' ? 'equal' : cp > 0 ? 'white' : 'black';
+    score.textContent = e.mate != null ? 'M' + Math.abs(e.mate) : (rounded === '0.0' ? '0.0' : evalText(e));
+    bar.style.setProperty('--balance-chars', score.textContent.length);
+    description = e.mate != null ? `${side} has mate in ${Math.abs(e.mate)}.`
+      : rounded === '0.0' ? 'Equal position.' : `${side} is ahead by ${rounded} pawns.`;
+    description += ' Evaluation from White’s perspective: positive favors White; negative favors Black.';
+  }
+  // Keep the previous fill during live search, but never present its score as current.
+  bar.title = description;
+  bar.setAttribute('aria-label', description);
+}
 function renderEvalBar() {
   // The eval bar is now its own movable/resizable module — render into its mount and hide the whole
   // module when the bar isn't part of the chosen eval view.
@@ -3120,6 +3286,14 @@ function renderEvalBar() {
   if (!show || !UI.evalbar) return;
   let bar = UI.evalbar.querySelector(".evalbar");
   const e = activeEval();
+  const design = panelDesign('evalbar', S.settings);
+  if (design === 'balance') {
+    if (!bar) { bar = el('div'); UI.evalbar.append(bar); }
+    bar.dataset.design = design;
+    renderBalanceBar(bar, e);
+    return;
+  }
+  if (bar?.dataset.design !== 'original') { bar?.remove(); bar = null; }
   // Reuse the existing element, so the CSS transition on .white-fill animates
   // smoothly between moves (instead of jumping). Create it (once) at a neutral 50%.
   if (!bar) {
@@ -3130,6 +3304,7 @@ function renderEvalBar() {
     );
     UI.evalbar.append(bar);
   }
+  bar.dataset.design = design;
   // Reapply the look variant on every render (so switching it in settings updates live).
   // The bar always follows the board orientation: when the player is viewing from Black's side
   // (S.flipped), the whole bar is turned upside-down so Black's share sits at the bottom — just
@@ -3169,7 +3344,7 @@ function clockFor(side) {
   // so fall back to the base time — but only for games that actually carry clock data, so a
   // clockless PGN doesn't get a frozen clock.
   if (!last && S.clocks.some(Boolean)) return initialClock();
-  return last;
+  return last?.split('.')[0] || last;
 }
 // Captured material at the currently-viewed position, read off the FEN board. For a side it returns
 // the opponent pieces that side has captured (as cburnett image codes like "bP"), plus the running
@@ -3948,8 +4123,7 @@ function renderMoveComment() {
   const cls = S.classif[S.idx];
   const san = S.positions[S.idx].san || "";
   const cfg = cls && QUALITY[cls];
-  // The exact number shown on the eval bar for this position (white-relative), on the right
-  // instead of the quality label (the quality is already in the sentence below).
+  // Modern already shows the evaluation in its evaluation panel.
   const ev = S.evals[S.idx];
   const evCp = ev ? scoreToCp(ev) : null;
   const evTxt = ev ? evalText(ev) : "";
@@ -3959,7 +4133,7 @@ function renderMoveComment() {
   // Special coach phrasing can omit the category, so name it beside the move.
   const sanDisplay = S.settings.coach && !S.settings.coachPlain && cfg ? `${san} ${categoryName(cls)}` : san;
   head.append(el("span", { class: "ip-move" }, sanDisplay));
-  if (evTxt) head.append(el("span", { class: "ip-eval " + (evCp >= 0 ? "pos" : "neg") }, evTxt));
+  if (evTxt && baseUiSetup() !== 'modern') head.append(el("span", { class: "ip-eval " + (evCp >= 0 ? "pos" : "neg") }, evTxt));
   body.append(head);
 
   // Pick the line once per (ply + coach): a fresh signature → choose + type; otherwise reuse the
@@ -4111,56 +4285,375 @@ function setCategoryName(cls, value) {
   renderMoves(); buildBoard(); renderReview();
 }
 function categoryLabel(cls) {
-  const label = el("button", {
-    type: "button", class: "qlabel", "data-category": cls,
-    "aria-label": "Rename " + categoryName(cls),
-    onmouseenter: e => showQTip(e.currentTarget, cls), onmouseleave: hideQTip,
-    onfocus: e => showQTip(e.currentTarget, cls), onblur: hideQTip,
-    onclick: () => {
-      hideQTip();
-      let finished = false;
-      const finish = (save, value = input.value, focus = false) => {
-        if (finished) return;
-        finished = true;
-        if (save) setCategoryName(cls, value);
-        else editor.replaceWith(categoryLabel(cls));
-        if (focus) UI.stats.querySelector('[data-category="' + cls + '"]')?.focus();
-      };
-      const input = el("input", {
-        class: "category-name-input", type: "text", maxlength: CATEGORY_NAME_LIMIT,
-        value: categoryName(cls), "aria-label": "Name for " + QUALITY[cls].name,
-        onkeydown: e => {
-          e.stopPropagation();
-          if (e.key === "Enter" || e.key === "Escape") { e.preventDefault(); finish(e.key === "Enter", input.value, true); }
-        },
-      });
-      const editor = el("div", {
-        class: "qlabel category-name-editor", "data-category": cls,
-        onfocusout: e => { if (!editor.contains(e.relatedTarget)) finish(true); },
-        onkeydown: e => { e.stopPropagation(); if (e.key === "Escape") { e.preventDefault(); finish(false, input.value, true); } },
-      }, input,
-        el("button", {
-          type: "button", class: "category-name-reset", title: "Restore default name",
-          "aria-label": "Restore " + QUALITY[cls].name,
-          onpointerdown: e => e.preventDefault(), onmousedown: e => e.preventDefault(),
-          onclick: () => finish(true, "", true),
-        }, "↺"));
-      label.replaceWith(editor); input.focus(); input.select();
-    },
+  const explain = panelDesign('accuracy', S.settings) === 'original';
+  return el("span", {
+    class: "qlabel", "data-category": cls, tabindex: 0,
+    onmouseenter: explain ? e => showQTip(e.currentTarget, cls) : undefined,
+    onmouseleave: explain ? hideQTip : undefined,
+    onfocus: explain ? e => showQTip(e.currentTarget, cls) : undefined,
+    onblur: explain ? hideQTip : undefined,
   }, gradeBadge(cls, null, "qsym", {}, true),
   el("span", { class: "nm" }, categoryName(cls)));
-  return label;
+}
+function setAccuracyPage(page, focus = false) {
+  const previous = S.accuracyPage || 0;
+  const next = (page + ACCURACY_PAGES.length) % ACCURACY_PAGES.length;
+  const oldPage = UI.stats.querySelector('.acc-page');
+  const motion = S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  overviewReveal.stop();
+  Object.values(phaseReveals).forEach(reveal => reveal.stop());
+  const leaf = motion && previous !== next && oldPage?.animate ? oldPage.cloneNode(true) : null;
+  const scrollTop = oldPage?.scrollTop || 0;
+  if (leaf && oldPage.closest('.accuracy-phase-report-2')) leaf.classList.add('accuracy-phase-report-2');
+  S.accuracyPage = (page + ACCURACY_PAGES.length) % ACCURACY_PAGES.length;
+  statsRefs = null;
+  hideQTip();
+  renderStats();
+  if (leaf) {
+    const panel = UI.stats.querySelector('.accuracy-panel'), incoming = panel.querySelector('.acc-page');
+    leaf.removeAttribute('id'); leaf.removeAttribute('aria-labelledby');
+    leaf.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+    leaf.setAttribute('aria-hidden', 'true'); leaf.inert = true;
+    leaf.classList.add('acc-turn-leaf');
+    // Match the incoming page in local coordinates, including content scaling.
+    Object.assign(leaf.style, {top: incoming.offsetTop + 'px', height: incoming.offsetHeight + 'px'});
+    panel.append(leaf);
+    leaf.scrollTop = scrollTop;
+    const forward = page > previous || previous === 2 && next === 0;
+    const direction = forward ? 1 : -1;
+    const turn = leaf.animate([
+      {transform: 'translateX(0)', opacity: 1},
+      {transform: 'translateX(' + (-direction * 10) + 'px)', opacity: 0},
+    ], {duration: 180, easing: 'cubic-bezier(.22,.65,.3,1)', fill: 'forwards'});
+    turn.onfinish = turn.oncancel = () => leaf.remove();
+    for (const content of incoming.children) {
+      if (content.classList.contains('acc-players')) continue;
+      content.animate([{transform: 'translateX(' + (direction * 10) + 'px)', opacity: .35},
+        {transform: 'translateX(0)', opacity: 1}], {duration: 280, easing: 'cubic-bezier(.22,.65,.3,1)'});
+    }
+  }
+  if (focus) UI.stats.querySelector(typeof focus === 'string' ? focus : '[aria-selected="true"]')?.focus({preventScroll: true});
+}
+
+// Retain the same controls while the result panel is refreshed.
+let accuracyNavigation = null;
+function accuracyPager() {
+  accuracyNavigation ||= createAccuracyNavigation({doc: document, el, names: ACCURACY_PAGES,
+    select: (page, focus = false) => setAccuracyPage(page, focus),
+    motion: () => S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches});
+  return accuracyNavigation.element;
+}
+function accuracyDial(value, busy) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 120 120');
+  svg.setAttribute('aria-hidden', 'true');
+  for (const [className, length] of [['acc-dial-track', 75], ['acc-dial-fill', busy || value == null ? 0 : .75 * Math.max(0, Math.min(100, value))]]) {
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    for (const [key, val] of Object.entries({cx: 60, cy: 60, r: 51, pathLength: 100,
+      fill: 'none', transform: 'rotate(135 60 60)', class: className, 'stroke-dasharray': length + ' 100'})) circle.setAttribute(key, val);
+    if (className === 'acc-dial-fill' && length === 0) circle.setAttribute('stroke-opacity', 0);
+    svg.append(circle);
+  }
+  return el('div', {class: 'acc-dial'}, svg,
+    busy ? loaderNode('acc-val', 'var(--accent)') : el('strong', {class: 'acc-val'},
+      value == null ? '—' : value >= 100 ? '100' : value.toFixed(1)),
+    el('span', {class: 'acc-dial-label'}, 'Accuracy'));
+}
+function updateQualityDistribution(root, sides) {
+  if (!root) return;
+  const totals = sides.map(side => QBREAK_FULL.reduce((sum, k) => sum + (S.counts[side][k] || 0), 0));
+  sides.forEach((side, i) => {
+    root.querySelectorAll('[data-quality-total="' + side + '"]').forEach(node => {
+      node.textContent = totals[i];
+      node.setAttribute('aria-label', S.players[side].name + ': ' + totals[i] + ' moves classified' + (S.analyzing ? ' so far' : ''));
+    });
+    for (const k of QBREAK_FULL) {
+      const share = totals[i] ? (S.counts[side][k] || 0) / totals[i] * 100 : 0;
+      root.querySelector('[data-quality-segment="' + side + '-' + k + '"]')?.style.setProperty('width', share + '%');
+      root.querySelector('.quality-distribution [data-category="' + k + '"]')?.closest('.qbreak-row')
+        .style.setProperty(i === 0 ? '--share-left' : '--share-right', share + '%');
+    }
+  });
+}
+function renderMoveQuality(sides, rows) {
+  const design = panelDesign('accuracyQuality', S.settings), distribution = design === 'distribution';
+  const modern = ['phases-modern', 'phases-modern-v2'].includes(panelDesign('accuracy', S.settings));
+  const content = el('div', {class: 'acc-quality' + (distribution ? ' quality-distribution' : ''), 'data-quality-design': design},
+    distribution && !modern ? el('div', {class: 'quality-summary'},
+      el('div', {class: 'quality-totals'},
+        el('strong', {'data-quality-total': sides[0]}),
+        el('span', {}, S.analyzing && !S.blank ? 'Classified so far' : 'Moves classified'),
+        el('strong', {'data-quality-total': sides[1]})),
+      el('div', {class: 'quality-spectrums', 'aria-hidden': 'true'}, ...sides.map(side =>
+        el('div', {class: 'quality-spectrum'}, ...QBREAK_FULL.map(k =>
+          el('i', {'data-quality-segment': side + '-' + k, style: {background: QUALITY[k].color}})))))) : null,
+    el('div', {class: 'qbreak'}, ...QBREAK_FULL.map(k => {
+      const counts = sides.map((side, i) => {
+        const count = S.counts[side][k] || 0;
+        return el('button', {type: 'button', class: 'ct ' + (i === 0 ? 'left ' : '') + (count ? '' : 'zero'),
+          disabled: !count, 'aria-label': S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Jump to first move.',
+          onclick: () => jumpToCategory(side, k)}, count);
+      });
+      rows[k] = counts;
+      return el('div', {class: 'qbreak-row', style: distribution ? {'--quality-color': QUALITY[k].color} : {}},
+        counts[0], categoryLabel(k), counts[1]);
+    })));
+  if (distribution) updateQualityDistribution(content, sides);
+  return content;
+}
+// Wait for completed evidence on both sides and keep later phases behind earlier
+// ones, even when pool workers finish positions out of order.
+function accuracyPhasePending(phase, busy) {
+  return busy && GAME_PHASES.slice(0, GAME_PHASES.indexOf(phase) + 1).some(key =>
+    ['w', 'b'].some(side => !S.gameStats?.[side]?.phases[key]?.complete));
+}
+function renderAccuracyPhases(sides, busy, bars = true) {
+  return el('div', {class: 'acc-phases', 'aria-label': 'Accuracy by game phase'},
+    bars ? null : el('h4', {}, 'Accuracy by phase'),
+    ...GAME_PHASES.map((phase, i) => {
+      const pending = accuracyPhasePending(phase, busy);
+      const values = sides.map(side => S.gameStats?.[side]?.phases[phase]?.accuracy);
+      const scores = values.map(value => el('strong', {}, pending ? accuracyPendingValue() : value == null ? '—' : value.toFixed(1)));
+      const label = el('span', {}, ['Opening', 'Middlegame', 'Endgame'][i]);
+      return el('div', {class: 'acc-phase-row', 'data-phase': phase, 'data-pending': String(pending)},
+        ...(bars ? [el('div', {class: 'acc-phase-values'}, scores[0], label, scores[1]),
+          el('div', {class: 'acc-phase-bars'}, ...values.map(value =>
+            el('span', {class: 'acc-phase-track', 'aria-hidden': 'true'},
+              el('i', {style: {width: (pending || value == null ? 0 : value) + '%'}}))))]
+          : [scores[0], label, scores[1]]));
+    }));
+}
+function updateAccuracyPhases(sides, busy, design) {
+  const current = UI.stats.querySelector('.acc-phases,.phase-report');
+  if (!current) return;
+  const next = design.startsWith('phases')
+    ? renderPhaseReport(sides, busy, design === 'phases2') : renderAccuracyPhases(sides, busy, design !== 'pages');
+  statsRefs.phaseKeys ||= {};
+  for (const phase of GAME_PHASES) {
+    const key = accuracyPhasePending(phase, busy) ? 'pending' : JSON.stringify(sides.map(side => S.gameStats?.[side]?.phases[phase]));
+    if (statsRefs.phaseKeys[phase] === key) continue;
+    statsRefs.phaseKeys[phase] = key;
+    const oldRow = current.querySelector('[data-phase="' + phase + '"]');
+    const row = next.querySelector('[data-phase="' + phase + '"]');
+    if (oldRow.dataset.pending === 'true' && row.dataset.pending === 'true') continue;
+    const reveal = oldRow.dataset.pending === 'true' && row.dataset.pending === 'false';
+    phaseReveals[phase].stop();
+    oldRow.replaceWith(row);
+    if (reveal) phaseReveals[phase].mount(row, {game: S.positions, key: JSON.stringify([design, S.batchGen, phase, key]),
+      enabled: S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches});
+  }
+}
+function renderModernAdvanced(sides, busy) {
+  const stats = sides.map(side => S.gameStats?.[side]);
+  const decimal = value => value == null ? '—' : value.toFixed(1);
+  const moveName = ply => {
+    const position = S.positions[ply];
+    if (!position || ply == null) return '';
+    const fullmove = Number(S.positions[ply - 1].fen.split(' ')[5]);
+    return fullmove + (position.color === 'w' ? '. ' : '… ') + position.san;
+  };
+  const cell = (index, value, {detail = '', hint = '', meter = null, jump = null, className = ''} = {}) => {
+    const available = value != null && !busy;
+    const label = S.players[sides[index]].name + ': ' + (busy ? 'Analyzing' : available ? value + '. ' + hint : hint || 'Unavailable');
+    return el(jump != null ? 'button' : 'div', {class: 'advanced-value ' + className,
+      ...(jump != null ? {type: 'button', onclick: () => gotoMainline(jump), disabled: !available} : {}),
+      'aria-label': label, ...(hint ? {title: hint} : {})},
+    el('strong', {class: 'acc-stat-value'}, busy ? '···' : value ?? '—'),
+    detail ? el('span', {class: 'advanced-detail'}, busy ? ' ' : detail) : null,
+    meter == null ? null : el('span', {class: 'advanced-meter', 'aria-hidden': 'true'},
+      el('i', {style: {width: (available ? Math.max(0, Math.min(100, meter)) : 0) + '%'}})));
+  };
+  const row = (id, label, hint, cells) => el('section', {class: 'advanced-row', 'data-metric': id, 'aria-label': label, 'aria-description': hint, title: hint},
+    el('div', {class: 'advanced-label'}, label), el('div', {class: 'advanced-pair'}, ...cells));
+  return el('div', {class: 'acc-advanced advanced-report'},
+    row('loss', 'Average centipawn loss', 'Lower is better. 100 centipawns = one pawn.', stats.map((stat, i) =>
+      cell(i, stat?.averageCpLoss == null ? null : decimal(stat.averageCpLoss),
+        {hint: (stat?.cpMoves || 0) + ' scored decisions. Lower is better; 100 cp = one pawn.'}))),
+    row('match', 'Engine top-move match', 'How often your decision matched the engine’s first choice. Forced moves excluded.', stats.map((stat, i) =>
+      cell(i, stat?.topMatch == null ? null : decimal(stat.topMatch) + '%', {meter: stat?.topMatch ?? 0}))),
+    row('largest', 'Largest evaluation loss', 'Select a move to revisit the largest centipawn loss.', stats.map((stat, i) => {
+      const loss = stat?.largestLoss;
+      return cell(i, loss ? Math.round(loss.loss) + ' cp' : null, {detail: loss?.loss > 0 ? moveName(loss.ply) + ' ↗' : ' ',
+        jump: !busy && loss?.loss > 0 ? loss.ply : null, className: 'acc-loss', hint: loss ? 'On ' + moveName(loss.ply) + '. Jump to move.' : 'No scored loss'});
+    })),
+    row('clock', 'Time ahead', 'Share of recorded thinking time with more time on your clock. Increments removed; clock crossovers included.', stats.map((stat, i) => {
+      const clock = stat?.timeAhead;
+      return cell(i, clock ? Math.round(clock.percent) + '%' : null, {meter: clock?.percent ?? 0,
+        detail: clock ? 'of recorded time' : 'Clock data needed',
+        hint: clock ? 'Based on ' + Math.round(clock.seconds) + ' seconds across ' + clock.turns + '/' + clock.totalTurns + ' turns with usable clocks. Increments excluded.'
+          : 'Requires clock tags and a supported base time with optional increment.'});
+    })),
+    row('streak', 'Longest clean streak', 'Consecutive decisions at Good or better, including Book. Forced moves neither add to nor break a streak.', stats.map((stat, i) => {
+      const streak = stat?.cleanStreak;
+      return cell(i, streak ? String(streak.count) : null, {detail: streak?.count > 0 ? 'decisions · revisit ↗' : 'clean decisions',
+        jump: !busy && streak?.count > 0 ? streak.startPly : null,
+        hint: streak?.count > 0 ? moveName(streak.startPly) + ' to ' + moveName(streak.endPly) + '. Jump to the start of the streak.' : 'No clean streak scored'});
+    })),
+    row('comeback', 'Comeback meter', 'Expected-score points recovered from a clear deficit to the finish. A declared loss scores zero; opponent mistakes can contribute.', stats.map((stat, i) => {
+      const comeback = stat?.comeback;
+      return cell(i, comeback ? String(Math.round(comeback.score)) : null, {meter: comeback?.score ?? 0,
+        detail: comeback ? comeback.hadDeficit ? 'points recovered' : 'No clear deficit' : 'Full analysis needed',
+        hint: comeback ? 'Expected score: ' + Math.round(comeback.worst * 100) + '% at the lowest point → '
+          + Math.round(comeback.finish * 100) + '% at the finish. ' + (comeback.finalResult ? 'Uses the recorded result.' : 'Uses the final evaluation; result unknown.')
+          : 'Requires complete analysis with compatible engine evidence.'});
+    })));
 }
 function renderStats() {
+  const design = panelDesign('accuracy', S.settings);
+  const phaseReport2 = design === 'phases2';
+  const phaseModern = design === 'phases-modern' || design === 'phases-modern-v2';
+  const phaseReport = design === 'phases' || phaseReport2 || phaseModern;
+  const reveal = design === 'reveal' || phaseReport;
+  const revealKey = JSON.stringify([design, S.batchGen, S.meSide, S.acc, S.calibrated?.w.rating, S.calibrated?.b.rating, S.gameStats]);
+  const animate = S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  if (reveal && !S.analyzing && !S.accuracyPage && animate
+      && overviewReveal.matches(UI.stats.firstChild, S.positions, revealKey)) return;
+  overviewReveal.stop();
+  if (design === 'original') {
+    Object.values(phaseReveals).forEach(reveal => reveal.stop());
+    return renderOriginalStats();
+  }
+  if (design === 'pages') return renderPagedStats();
+  const sides = [S.meSide, S.meSide === "w" ? "b" : "w"];
+  const page = S.accuracyPage || 0, busy = S.analyzing && !S.blank;
+  // Keep the analysis animation and keyboard focus intact while results arrive.
+  if (busy && statsRefs?.design === design && statsRefs.page === page) {
+    if (page === 0) updateAccuracyPhases(sides, busy, design);
+    for (const [k, row] of Object.entries(statsRefs.rows)) sides.forEach((side, i) => {
+      const count = S.counts[side][k] || 0;
+      row[i].textContent = count;
+      row[i].disabled = !count;
+      row[i].classList.toggle('zero', !count);
+      row[i].setAttribute('aria-label', S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Jump to first move.');
+    });
+    if (page === 1) updateQualityDistribution(UI.stats, sides);
+    return;
+  }
+  // Preserve phases already counting up when the overall results finish.
+  let livePhases = null;
+  if (!busy && page === 0 && S.progressiveAccuracy && statsRefs?.design === design && statsRefs.page === page) {
+    updateAccuracyPhases(sides, busy, design);
+    livePhases = UI.stats.querySelector('.acc-phases,.phase-report');
+  } else Object.values(phaseReveals).forEach(reveal => reveal.stop());
+  const pair = (className, values) => el('div', {class: className}, ...values);
+  const number = value => value == null ? '—' : value.toFixed(1) + '%';
+  const pending = value => busy ? '···' : value;
+  const comparison = (label, values, note = null, className = '') => el('div', {class: 'acc-comparison ' + className},
+    el('div', {class: 'acc-metric-label'}, label), pair('acc-metric-values', values),
+    note ? el('p', {class: 'acc-note'}, note) : null);
+  const players = pair('acc-players' + (phaseReport2 && page === 0 ? ' phase2-players' : ''), [
+    phaseReport2 && page === 0 ? el('span', {'aria-hidden': 'true'}) : null,
+    ...sides.map(side => el('div', {class: 'acc-player'},
+    page === 0 || phaseModern ? null : el('span', {class: 'acc-side ' + side, 'aria-label': side === 'w' ? 'White' : 'Black'}),
+    el('span', {class: 'acc-name'}, S.players[side].name)))]);
+  const rows = {};
+  let content;
+  if (page === 0 && phaseReport2) {
+    content = renderPhaseOverview2(sides, busy);
+  } else if (page === 0 && phaseReport) {
+    content = renderPhaseOverview(sides, busy, phaseModern);
+  } else if (page === 0) {
+    content = el('div', {class: 'acc-overview'},
+      pair('acc-scorecards', sides.map(side => {
+        const rating = estimateElo(S.accElo[side], S.players[side]?.rating, side);
+        return el('div', {class: 'acc-scorecard'}, accuracyDial(S.acc[side], busy),
+          el('div', {class: 'acc-estimate'}, el('strong', {class: 'acc-elo'}, busy ? accuracyPendingValue() : rating == null ? '—' : '≈ ' + rating),
+            el('span', {class: 'acc-elo-label'}, reveal ? 'Estimated rating' : 'Estimated Elo')));
+      })),
+      renderAccuracyPhases(sides, busy));
+  } else if (page === 1) {
+    content = renderMoveQuality(sides, rows);
+  } else if (phaseModern) {
+    content = renderModernAdvanced(sides, busy);
+  } else {
+    const stats = sides.map(side => S.gameStats?.[side]);
+    content = el('div', {class: 'acc-advanced'},
+      comparison('Average centipawn loss', stats.map(stat => el('strong', {class: 'acc-stat-value',
+        'aria-label': busy ? 'Analyzing' : (stat?.averageCpLoss == null ? 'Unavailable' : stat.averageCpLoss.toFixed(1) + ' centipawns, from ' + stat.cpMoves + ' moves')},
+        pending(stat?.averageCpLoss == null ? '—' : stat.averageCpLoss.toFixed(1)))), 'Lower is better · 100 cp = 1 pawn'),
+      comparison('Engine top-move match', stats.map(stat => el('strong', {class: 'acc-stat-value'}, pending(number(stat?.topMatch))))),
+      comparison('Largest evaluation loss', stats.map((stat, i) => {
+        const loss = busy ? null : stat?.largestLoss, position = loss && S.positions[loss.ply];
+        return el('button', {type: 'button', class: 'acc-loss', disabled: !loss || loss.loss === 0,
+          'aria-label': S.players[sides[i]].name + ': ' + (loss ? loss.loss + ' centipawns lost on ' + position.san + '. Jump to move.' : 'No scored loss'),
+          onclick: () => gotoMainline(loss.ply)},
+          el('strong', {class: 'acc-stat-value'}, pending(loss ? Math.round(loss.loss) + ' cp' : '—')),
+          loss && loss.loss > 0 ? el('span', {}, Math.ceil(loss.ply / 2) + (position.color === 'w' ? '. ' : '… ') + position.san + ' ↗') : null);
+      })));
+  }
+  if (livePhases) content.querySelector('.acc-phases,.phase-report')?.replaceWith(livePhases);
+  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials accuracy-book' + (reveal ? ' accuracy-reveal' : '') + (phaseReport ? ' accuracy-phase-report' : '') + (phaseReport2 && page === 0 ? ' accuracy-phase-report-2' : '') + (phaseModern ? ' accuracy-phase-modern' : '') + (design === 'phases-modern-v2' ? ' accuracy-phase-modern-v2' : ''), 'data-design': design, 'aria-label': 'Accuracy'},
+    accuracyPager(),
+    el('div', {class: 'panel-body acc-page' + (page === 0 ? ' acc-page-overview' : phaseModern ? page === 1 ? ' acc-page-quality' : ' acc-page-advanced' : ''), id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
+      'aria-labelledby': 'accuracy-tab-' + page}, players, content)));
+  statsRefs = busy ? {design, page, rows} : null;
+  if (UI.canvas.classList.contains('full-hd-reference')) applyLayout();
+  accuracyNavigation?.sync(page);
+  // Saved reviews open with their full results. Live reviews have already shown
+  // their phases, so finishing must not count those scores up from zero again.
+  if (reveal && page === 0 && !busy && !S.blank && !S.restoredAnalysis && Object.values(S.acc).some(Number.isFinite)) {
+    overviewReveal.mount(UI.stats.firstChild, {game: S.positions, key: revealKey, enabled: animate, includePhases: !S.progressiveAccuracy});
+  }
+}
+
+function renderPhaseOverview2(sides, busy) {
+  return el('div', {class: 'phase-overview phase-overview-2'},
+    el('div', {class: 'phase2-overall'},
+      el('span', {class: 'phase-summary-label phase2-label'}, 'Accuracy'),
+      ...sides.map(side => busy ? loaderNode('acc-val', 'var(--accent)')
+        : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side] >= 100 ? '100' : S.acc[side].toFixed(1)))),
+    renderPhaseReport(sides, busy, true),
+    el('div', {class: 'phase-rating phase2-rating'},
+      el('span', {class: 'acc-elo-label phase2-label'}, 'Estimated rating'),
+      ...sides.map(side => {
+        const rating = estimateElo(S.accElo[side], S.players[side]?.rating, side);
+        return el('strong', {class: 'acc-elo'}, busy ? accuracyPendingValue() : rating == null ? '—' : '≈ ' + rating);
+      })));
+}
+
+function renderPhaseReport(sides, busy, compact = false) {
+  return el('div', {class: 'phase-report' + (compact ? ' phase2-report' : ''), 'aria-label': 'Accuracy by game phase'}, ...GAME_PHASES.map((phase, index) => {
+    const pending = accuracyPhasePending(phase, busy);
+    const name = ['Opening', 'Middlegame', 'Endgame'][index];
+    const cells = sides.map(side => {
+      const stats = S.gameStats?.[side]?.phases[phase], value = stats?.accuracy;
+      const band = pending ? null : phasePerformance(value), label = band ? categoryName(band.category) : pending ? 'Analyzing' : 'Not scored';
+      return el('div', {class: 'phase-report-cell' + (band ? '' : ' unavailable'), 'data-phase-category': band?.category || '',
+        style: {'--phase-color': band ? QUALITY[band.category].color : 'var(--ink-3)'},
+        'aria-label': S.players[side].name + ', ' + name + ': ' + (pending ? 'analyzing' : value == null ? 'not scored' : value.toFixed(1) + ' accuracy, ' + label + ', ' + stats.decisions + ' scored decisions')},
+        el('strong', {class: 'phase-report-score'}, pending ? accuracyPendingValue() : value == null ? '—' : value.toFixed(1)));
+    });
+    return el('div', {class: 'phase-report-row' + (compact ? ' phase2-row' : ''), 'data-phase': phase, 'data-pending': String(pending)},
+      el(compact ? 'span' : 'div', {class: 'phase-report-name'}, name),
+      ...(compact ? cells : [el('div', {class: 'phase-report-cells'}, ...cells)]));
+  }));
+}
+function renderPhaseOverview(sides, busy, modern = false) {
+  return el('div', {class: 'phase-overview'},
+    el('div', {class: 'phase-summary'},
+      el('span', {class: 'phase-summary-label'}, 'Accuracy'),
+      el('div', {class: 'phase-overall-values'}, ...sides.map(side => modern ? accuracyDial(S.acc[side], busy)
+        : busy ? loaderNode('acc-val', 'var(--accent)')
+        : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side] >= 100 ? '100' : S.acc[side].toFixed(1))))),
+    renderPhaseReport(sides, busy),
+    el('div', {class: 'phase-rating'},
+      el('span', {class: 'acc-elo-label'}, 'Estimated rating'),
+      el('div', {class: 'phase-rating-values'}, ...sides.map(side => {
+        const rating = estimateElo(S.accElo[side], S.players[side]?.rating, side);
+        return el('strong', {class: 'acc-elo'}, busy ? accuracyPendingValue() : rating == null ? '—' : '≈ ' + rating);
+      }))));
+}
+
+function renderOriginalStats() {
   const opSide = S.meSide === "w" ? "b" : "w";
   const meAcc = S.acc[S.meSide], opAcc = S.acc[opSide];
   const meRating = S.players[S.meSide]?.rating, opRating = S.players[opSide]?.rating;
   const meEloAcc = S.accElo[S.meSide], opEloAcc = S.accElo[opSide];
   // Compact list by default; the expander arrow unfolds the whole list (incl. book moves).
-  const list = S.qbreakExpanded ? QBREAK_FULL : QBREAK_SUMMARY;
+  const list = S.originalAccuracyExpanded ? QBREAK_FULL : QBREAK_SUMMARY;
 
   // In-place counter update during analysis (so the loader animation doesn't restart).
-  if (S.analyzing && statsRefs && statsRefs.expanded === S.qbreakExpanded) {
+  if (S.analyzing && statsRefs?.design === 'original' && statsRefs.expanded === S.originalAccuracyExpanded) {
     for (const k of list) {
       const r = statsRefs.rows[k]; if (!r) continue;
       const cMe = S.counts[S.meSide][k] || 0, cOp = S.counts[opSide][k] || 0;
@@ -4185,14 +4678,14 @@ function renderStats() {
     );
   });
   const expander = el("button", {
-    class: "qbreak-toggle" + (S.qbreakExpanded ? " open" : ""),
-    title: S.qbreakExpanded ? "Show fewer categories" : "Show all categories",
-    "aria-expanded": S.qbreakExpanded ? "true" : "false",
-    onclick: () => { S.qbreakExpanded = !S.qbreakExpanded; renderStats(); reflowAccuracy(S.qbreakExpanded); },
+    class: "qbreak-toggle" + (S.originalAccuracyExpanded ? " open" : ""),
+    title: S.originalAccuracyExpanded ? "Show fewer categories" : "Show all categories",
+    "aria-expanded": S.originalAccuracyExpanded ? "true" : "false",
+    onclick: () => { S.originalAccuracyExpanded = !S.originalAccuracyExpanded; renderStats(); reflowAccuracy(S.originalAccuracyExpanded); applyLayout(); },
   }, icon("chevron"));
   const qbreak = el("div", { class: "qbreak" }, ...qrows, expander);
 
-  UI.stats.replaceChildren(el("div", { class: "panel" },
+  UI.stats.replaceChildren(el("div", { class: "panel accuracy-panel accuracy-original", "data-design": "original", "aria-label": "Accuracy" },
     // The button is always rendered (disabled while analyzing or already practicing) so the
     // header height never changes between states.
     el("div", { class: "panel-head acc-head" }, el("h3", {}, "Accuracy"),
@@ -4205,7 +4698,7 @@ function renderStats() {
             ? loaderNode("acc-val", "var(--accent)")
             : el("span", { class: "acc-val", style: { color: "var(--accent)" }, onmouseenter: (e) => showInfoTip(e.currentTarget, "Accuracy", ACCURACY_INFO), onmouseleave: hideQTip }, meAcc == null ? "—" : meAcc.toFixed(1)),
           el("span", { class: "acc-bar" }, el("i", { style: { width: (S.analyzing ? 0 : (meAcc || 0)) + "%", background: "var(--accent)" } })),
-          el("span", { class: "est-rating", onmouseenter: (e) => showInfoTip(e.currentTarget, "Estimated Elo", ELO_INFO), onmouseleave: hideQTip }, S.analyzing ? "≈ ··· elo" : "≈ " + (estimateElo(meEloAcc, meRating, S.meSide) ?? "—") + " elo")),
+          el("span", { class: "est-rating", onmouseenter: (e) => showInfoTip(e.currentTarget, "Estimated Elo", ELO_INFO), onmouseleave: hideQTip }, S.analyzing ? accuracyPendingValue() : "≈ " + (estimateElo(meEloAcc, meRating, S.meSide) ?? "—") + " elo")),
         el("span", { class: "acc-vs" }, "VS"),
         el("div", { class: "acc-cell right" },
           el("span", { class: "acc-name" }, S.players[opSide].name),
@@ -4213,37 +4706,148 @@ function renderStats() {
             ? loaderNode("acc-val", "var(--accent)")
             : el("span", { class: "acc-val", style: { color: "var(--ink-2)" }, onmouseenter: (e) => showInfoTip(e.currentTarget, "Accuracy", ACCURACY_INFO), onmouseleave: hideQTip }, opAcc == null ? "—" : opAcc.toFixed(1)),
           el("span", { class: "acc-bar" }, el("i", { style: { width: (S.analyzing ? 0 : (opAcc || 0)) + "%", background: "var(--ink-3)", marginLeft: (100 - (S.analyzing ? 100 : (opAcc || 0))) + "%" } })),
-          el("span", { class: "est-rating", onmouseenter: (e) => showInfoTip(e.currentTarget, "Estimated Elo", ELO_INFO), onmouseleave: hideQTip }, S.analyzing ? "≈ ··· elo" : "≈ " + (estimateElo(opEloAcc, opRating, opSide) ?? "—") + " elo")),
+          el("span", { class: "est-rating", onmouseenter: (e) => showInfoTip(e.currentTarget, "Estimated Elo", ELO_INFO), onmouseleave: hideQTip }, S.analyzing ? accuracyPendingValue() : "≈ " + (estimateElo(opEloAcc, opRating, opSide) ?? "—") + " elo")),
       ),
       qbreak,
     ),
   ));
-  statsRefs = S.analyzing ? { expanded: S.qbreakExpanded, rows } : null;
+  statsRefs = S.analyzing ? { design: 'original', expanded: S.originalAccuracyExpanded, rows } : null;
   if(UI.canvas.classList.contains("full-hd-reference"))applyLayout();
 }
 
+function renderPagedStats() {
+  const sides = [S.meSide, S.meSide === "w" ? "b" : "w"];
+  const page = S.accuracyPage || 0, busy = S.analyzing && !S.blank;
+  // Keep the analysis animation and keyboard focus intact while results arrive.
+  if (busy && statsRefs?.design === 'pages' && statsRefs.page === page) {
+    if (page === 0) updateAccuracyPhases(sides, busy, 'pages');
+    for (const [k, row] of Object.entries(statsRefs.rows)) sides.forEach((side, i) => {
+      const count = S.counts[side][k] || 0;
+      row[i].textContent = count;
+      row[i].disabled = !count;
+      row[i].classList.toggle('zero', !count);
+      row[i].setAttribute('aria-label', S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Jump to first move.');
+    });
+    if (page === 1) updateQualityDistribution(UI.stats, sides);
+    return;
+  }
+  Object.values(phaseReveals).forEach(reveal => reveal.stop());
+  const pair = (className, values) => el('div', {class: className}, ...values);
+  const number = value => value == null ? '—' : value.toFixed(1) + '%';
+  const pending = value => busy ? '···' : value;
+  const comparison = (label, values, note = null, className = '') => el('div', {class: 'acc-comparison ' + className},
+    el('div', {class: 'acc-metric-label'}, label), pair('acc-metric-values', values),
+    note ? el('p', {class: 'acc-note'}, note) : null);
+  const players = pair('acc-players', sides.map(side => el('div', {class: 'acc-player'},
+    page === 0 ? null : el('span', {class: 'acc-side ' + side, 'aria-label': side === 'w' ? 'White' : 'Black'}),
+    el('span', {class: 'acc-name'}, S.players[side].name))));
+  const rows = {};
+  let content;
+  if (page === 0) {
+    content = el('div', {class: 'acc-overview'},
+      comparison('Game accuracy', sides.map(side => busy ? loaderNode('acc-val', 'var(--accent)')
+        : el('strong', {class: 'acc-val'}, S.acc[side] == null ? '—' : S.acc[side].toFixed(1))), null, 'acc-overall'),
+      comparison('Estimated Elo', sides.map(side => el('strong', {class: 'acc-elo'}, busy ? accuracyPendingValue() : (
+        estimateElo(S.accElo[side], S.players[side]?.rating, side) == null ? '—'
+          : '≈ ' + estimateElo(S.accElo[side], S.players[side]?.rating, side))))),
+      renderAccuracyPhases(sides, busy, false),
+      el('p', {class: 'acc-note'}, S.blank ? 'Load a game to see its accuracy.'
+        : busy ? 'Phase scores appear as analysis progresses.' : '— Phase not reached or no scored decisions.'));
+  } else if (page === 1) {
+    content = renderMoveQuality(sides, rows);
+  } else {
+    const stats = sides.map(side => S.gameStats?.[side]);
+    content = el('div', {class: 'acc-advanced'},
+      comparison('Average centipawn loss', stats.map(stat => el('strong', {class: 'acc-stat-value',
+        'aria-label': busy ? 'Analyzing' : (stat?.averageCpLoss == null ? 'Unavailable' : stat.averageCpLoss.toFixed(1) + ' centipawns, from ' + stat.cpMoves + ' moves')},
+        pending(stat?.averageCpLoss == null ? '—' : stat.averageCpLoss.toFixed(1)))), 'Lower is better · 100 cp = 1 pawn'),
+      comparison('Engine top-move match', stats.map(stat => el('strong', {class: 'acc-stat-value'}, pending(number(stat?.topMatch))))),
+      comparison('Largest evaluation loss', stats.map((stat, i) => {
+        const loss = busy ? null : stat?.largestLoss, position = loss && S.positions[loss.ply];
+        return el('button', {type: 'button', class: 'acc-loss', disabled: !loss || loss.loss === 0,
+          'aria-label': S.players[sides[i]].name + ': ' + (loss ? loss.loss + ' centipawns lost on ' + position.san + '. Jump to move.' : 'No scored loss'),
+          onclick: () => gotoMainline(loss.ply)},
+          el('strong', {class: 'acc-stat-value'}, pending(loss ? Math.round(loss.loss) + ' cp' : '—')),
+          loss && loss.loss > 0 ? el('span', {}, Math.ceil(loss.ply / 2) + (position.color === 'w' ? '. ' : '… ') + position.san + ' ↗') : null);
+      })),
+      el('p', {class: 'acc-note acc-evidence'}, busy ? 'Stats appear when analysis finishes.'
+        : 'Forced moves excluded. Centipawn stats omit mate scores.'));
+  }
+  UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-pages accuracy-book', 'data-design': 'pages', 'aria-label': 'Accuracy'},
+    el('div', {class: 'panel-head acc-head'}, el('h3', {}, 'Accuracy'), el('span', {class: 'acc-page-count'}, (page + 1) + ' / 3')),
+    accuracyPager(),
+    el('div', {class: 'panel-body acc-page', id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
+      'aria-labelledby': 'accuracy-tab-' + page}, players, content)));
+  statsRefs = busy ? {design: 'pages', page, rows} : null;
+  if (UI.canvas.classList.contains('full-hd-reference')) applyLayout();
+  accuracyNavigation?.sync(page);
+}
+
 /* ---------------- Eval graph ---------------- */
+function graphPositionText(ply) {
+  if (!ply) return 'Starting position';
+  return `${Math.ceil(ply / 2)}${ply % 2 ? '.' : '…'} ${S.positions[ply]?.san || ''}`.trim();
+}
+function updateGraphReadout(refs) {
+  if (!refs.chart) return;
+  const e = S.evals[S.idx], cp = e == null ? null : scoreToCp(e);
+  const rounded = cp == null ? null : Math.abs(cp / 100).toFixed(1);
+  const side = cp > 0 ? 'White' : 'Black';
+  const label = e == null ? (S.blank ? 'Load a game' : 'Calculating…')
+    : e.mate != null ? `${side} mates` : rounded === '0.0' ? 'Equal position' : `${side} ahead`;
+  if (refs.readout) {
+    refs.readout.textContent = e == null ? '—' : e.mate != null ? 'M' + Math.abs(e.mate) : rounded === '0.0' ? '0.0' : evalText(e);
+    refs.readout.dataset.side = cp == null || rounded === '0.0' && e.mate == null ? 'equal' : cp > 0 ? 'white' : 'black';
+  }
+  const description = e == null ? label : e.mate != null ? `${side} has mate in ${Math.abs(e.mate)}`
+    : rounded === '0.0' ? label : `${side} is ahead by ${rounded} pawns`;
+  const category = ['timeline2', 'bars', 'bars2'].includes(panelDesign('graph', S.settings)) && S.idx > 0 && e && S.classif[S.idx]
+    ? ` ${gradeLabel(S.classif[S.idx], S.moveGrades[S.idx], categoryName(S.classif[S.idx]))}.` : '';
+  refs.chart.setAttribute('aria-valuenow', Math.min(S.idx, refs.lastPly));
+  refs.chart.setAttribute('aria-valuetext', `${graphPositionText(S.idx)}. ${description}.${category} Positive scores favor White; negative scores favor Black.`);
+  refs.chart.setAttribute('aria-disabled', String(!!S.practice || refs.lastPly === 0));
+  for (const badge of refs.chart.querySelectorAll('.evaluation-move-badge')) {
+    badge.classList.toggle('current', Number(badge.dataset.ply) === S.idx);
+  }
+}
 function renderGraph() {
+  const restoreFocus = document.activeElement === UI.graphRefs?.chart;
   const show = S.settings.evalView === "both" || S.settings.evalView === "graph";
   const mod = UI.graph.closest(".mod");
   if (mod) mod.hidden = !show;   // hidden, not just emptied, so the layout closes the gap
   if (!show) { UI.graph.replaceChildren(); UI.graphRefs = null; return; }
+  const design = panelDesign('graph', S.settings), modern = design !== 'original', compact = design === 'minimal';
+  const bars = design === 'bars' || design === 'bars2';
   const W = 384, H = 120, mid = H / 2;
   const maxPly = Math.max(1, S.total);
-  const toX = (p) => (p / maxPly) * W;
-  const toY = (cp) => { const c = Math.max(-500, Math.min(500, cp)); return mid - (c / 500) * (mid - 8); };
+  const toX = (p) => bars ? ((p + .5) / (maxPly + 1)) * W : (p / maxPly) * W;
+  const fromFraction = fraction => Math.round(bars ? fraction * (maxPly + 1) - .5 : fraction * maxPly);
+  const pts = [];
+  for (let p = 0; p <= S.total; p++) { if (!S.evals[p]) break; pts.push({ ply: p, cp: scoreToCp(S.evals[p]) }); }
+  // Move bars fit the analyzed game's range (at least one pawn, at most ten).
+  // asinh is nearly linear near equality and compresses large advantages smoothly,
+  // keeping small changes legible without flattening everything beyond five pawns.
+  // Mate scores reach the edge but do not squeeze the finite evaluations.
+  const barLimit = pts.reduce((limit, p) => S.evals[p.ply].mate != null ? limit
+    : Math.max(limit, Math.min(1000, Math.abs(p.cp))), 100);
+  const toY = (cp) => {
+    const fraction = bars ? Math.asinh(Math.max(-barLimit, Math.min(barLimit, cp)) / 100) / Math.asinh(barLimit / 100)
+      : Math.max(-500, Math.min(500, cp)) / 500;
+    return mid - fraction * (mid - 8);
+  };
   // The "color" style flips the y-axis (White advantage pushes the boundary DOWN); the hover marker
   // re-uses whichever mapping the active style draws with, so the dot rides the visible curve.
   const toYc = (cp) => { const c = Math.max(-500, Math.min(500, cp)); return mid + (c / 500) * (mid - 8); };
-  const pts = [];
-  for (let p = 0; p <= S.total; p++) { if (!S.evals[p]) break; pts.push({ ply: p, cp: scoreToCp(S.evals[p]) }); }
-  const graphKey = JSON.stringify([S.total,S.settings.graphStyle || "area",pts,S.classif]);
-  const markerVisible = S.idx > 0 && S.idx < S.total;
+  const graphKey = JSON.stringify([design,S.total,S.settings.graphStyle || "area",pts,S.classif,S.blank,
+    design === 'timeline2' ? S.moveGrades : null, bars ? barLimit : null]);
+  const markerVisible = modern ? pts.length > 0 && S.idx < pts.length : S.idx > 0 && S.idx < S.total;
   const retained = UI.graphRefs;
   if (retained?.key === graphKey && retained.marker.isConnected) {
-    const x = String(toX(Math.min(S.idx,maxPly)));
-    if (retained.marker.getAttribute("x1") !== x) { retained.marker.setAttribute("x1",x); retained.marker.setAttribute("x2",x); }
+    const x = toX(Math.min(S.idx,maxPly));
+    if (bars) retained.marker.style.left = `${x / W * 100}%`;
+    else if (retained.marker.getAttribute("x1") !== String(x)) { retained.marker.setAttribute("x1",x); retained.marker.setAttribute("x2",x); }
     retained.marker.style.display = markerVisible ? "" : "none";
+    updateGraphReadout(retained);
     return;
   }
   let line = "", fill = "";
@@ -4297,20 +4901,46 @@ function renderGraph() {
       + dotsSvg + marker;
   }
   // Hover marker: a vertical guide + a dot that rides the curve, both hidden until the mouse enters.
-  const hoverY = style === "color" ? toYc : toY;
-  const hover = `<g class="eval-hover" style="display:none"><line class="eval-hover-line" x1="0" y1="0" x2="0" y2="${H}" vector-effect="non-scaling-stroke"/><circle class="eval-hover-dot" cx="0" cy="0" r="4.7"/></g>`;
+  if (modern) {
+    const guides = `<line x1="0" y1="${mid}" x2="${W}" y2="${mid}" class="evaluation-zero"/>`;
+    if (compact) {
+      // White grows downward as its advantage increases. Leave the unanalyzed suffix empty.
+      const boundary = pts.length ? 'M' + pts.map(p => `${toX(p.ply).toFixed(1)},${toYc(p.cp).toFixed(1)}`).join(' L') : '';
+      const end = pts.length ? toX(pts[pts.length - 1].ply).toFixed(1) : 0;
+      inner = boundary
+        ? `<path class="evaluation-field-white" d="${boundary} L${end},0 L0,0 Z" fill="#fff"/>`
+          + `<path class="evaluation-field-black" d="${boundary} L${end},${H} L0,${H} Z" fill="#000"/>` + marker
+        : marker;
+    } else if (design === 'timeline' || design === 'timeline2') {
+      inner = guides + (fill ? `<path d="${fill}" class="evaluation-area"/>` : '')
+        + (line ? `<path d="${line}" class="evaluation-curve" vector-effect="non-scaling-stroke"/>` : '')
+        + (design === 'timeline2' ? '' : dotsSvg) + marker;
+    } else {
+      // Keep every analyzed position: a bar represents its evaluation, not a score change.
+      const unit = W / (maxPly + 1), width = Math.max(.25, unit * .72);
+      inner = pts.map(p => {
+        const y = toY(p.cp), height = Math.max(.8, Math.abs(y - mid));
+        return `<rect class="evaluation-column ${p.cp >= 0 ? 'white' : 'black'}" x="${p.ply * unit + (unit - width) / 2}" y="${p.cp >= 0 ? mid - height : mid}" width="${width}" height="${height}" rx="${Math.min(1.5,width/3)}"/>`;
+      }).join('') + guides;
+    }
+  }
+  const hoverY = compact || !modern && style === "color" ? toYc : toY;
+  const hover = `<g class="eval-hover" style="display:none">${bars ? '' : `<line class="eval-hover-line" x1="0" y1="0" x2="0" y2="${H}" vector-effect="non-scaling-stroke"/>`}<circle class="eval-hover-dot" cx="0" cy="0" r="4.7"/></g>`;
   const svg = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${inner}${hover}</svg>`;
   // Map a pointer event to the nearest plotted ply (0..last ply that has an eval).
   const plyFromEvent = (e) => {
+    const badge = e.target.closest?.('.evaluation-move-badge');
+    if (badge) return Number(badge.dataset.ply);
     const r = e.currentTarget.getBoundingClientRect();
     if (!r.width || !pts.length) return null;
-    return Math.max(0, Math.min(pts.length - 1, Math.round(((e.clientX - r.left) / r.width) * maxPly)));
+    return Math.max(0, Math.min(pts.length - 1, fromFraction((e.clientX - r.left) / r.width)));
   };
   // Click anywhere on the graph → jump straight to that move (instant, no stepping through).
   const jumpFromEvent = (e) => {
     const r = e.currentTarget.getBoundingClientRect();
     if (!r.width) return;
-    const ply = Math.max(0, Math.min(S.total, Math.round(((e.clientX - r.left) / r.width) * S.total)));
+    const ply = Math.max(0, Math.min(modern ? pts.length - 1 : S.total, fromFraction((e.clientX - r.left) / r.width)));
+    if (modern && !pts.length) return;
     gotoMainline(ply);
   };
   // Move the hover marker to the pointed ply and float its eval value above the dot.
@@ -4325,8 +4955,9 @@ function renderGraph() {
     const x = toX(ply), y = hoverY(pts[ply].cp);
     const g = e.currentTarget.querySelector(".eval-hover");
     if (g) {
-      g.querySelector(".eval-hover-line").setAttribute("x1", x);
-      g.querySelector(".eval-hover-line").setAttribute("x2", x);
+      const guide = g.querySelector(".eval-hover-line");
+      guide?.setAttribute("x1", x);
+      guide?.setAttribute("x2", x);
       const dot = g.querySelector(".eval-hover-dot");
       dot.setAttribute("cx", x); dot.setAttribute("cy", y);
       g.style.display = "";
@@ -4338,10 +4969,65 @@ function renderGraph() {
     t.style.top = (r.top + (y / H) * r.height - 10) + "px";
     t.classList.add("show");
   };
-  UI.graph.replaceChildren(el("div", { class: "panel eval-side" },
+  hideHover();
+  if (modern) {
+    const lastPly = Math.max(0, pts.length - 1);
+    const onkey = e => {
+      if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key)) return;
+      e.preventDefault(); e.stopPropagation();
+      if (S.practice || !pts.length) return;
+      const target = e.key === 'Home' ? 0 : e.key === 'End' ? lastPly
+        : S.idx + (['ArrowLeft','ArrowDown'].includes(e.key) ? -1 : 1);
+      gotoMainline(Math.max(0, Math.min(lastPly, target)));
+    };
+    const chart = el('div', {class: 'evalgraph clickable-graph', html: svg, role: 'slider', tabindex: 0,
+      'aria-label': 'Game evaluation. Use arrow keys to explore moves.', 'aria-valuemin': 0, 'aria-valuemax': lastPly,
+      onclick: jumpFromEvent, onmousemove: hoverMove, onmouseleave: hideHover, onblur: hideHover, onkeydown: onkey});
+    if (bars) {
+      chart.append(el('span', {class: 'eval-position evaluation-position-marker', 'aria-hidden': 'true',
+        style: {left: `${markerX / W * 100}%`, display: markerVisible ? '' : 'none'}}));
+      // Fixed-size HTML circles stay round even when the underlying SVG is stretched.
+      for (const p of dots.filter(p => p.ply > 0 && (design === 'bars2' || S.classif[p.ply] !== 'mistake'))) {
+        chart.append(el('span', {class: 'evaluation-move-dot', 'data-ply': p.ply,
+          'data-category': S.classif[p.ply], 'aria-hidden': 'true',
+          style: {left: `clamp(3.5px, ${toX(p.ply) / W * 100}%, calc(100% - 3.5px))`,
+            top: `clamp(3.5px, ${toY(p.cp) / H * 100}%, calc(100% - 3.5px))`,
+            background: QUALITY[S.classif[p.ply]].color}}));
+      }
+    }
+    if (design === 'timeline2') {
+      // HTML overlays keep the shared badges circular when the SVG stretches to fit the panel.
+      for (const p of pts.filter(p => p.ply > 0 && NOTEWORTHY.has(S.classif[p.ply]))) {
+        chart.append(gradeBadge(S.classif[p.ply], S.moveGrades[p.ply], 'evaluation-move-badge', {
+          'data-ply': p.ply,
+          style: {left: `clamp(var(--evaluation-badge-radius), ${toX(p.ply) / W * 100}%, calc(100% - var(--evaluation-badge-radius)))`,
+            top: `clamp(var(--evaluation-badge-radius), ${toY(p.cp) / H * 100}%, calc(100% - var(--evaluation-badge-radius)))`},
+          onclick: e => { e.stopPropagation(); gotoMainline(p.ply); },
+        }));
+      }
+    }
+    if (compact) {
+      UI.graph.replaceChildren(el('div', {class: 'panel eval-side evaluation-panel evaluation-minimal', 'data-design': design, 'aria-label': 'Evaluation'},
+        chart, !pts.length ? el('span', {class: 'evaluation-empty'}, S.blank ? 'Load a game to see its evaluation' : 'Waiting for analysis…') : null));
+      UI.graphRefs = {key:graphKey, marker:chart.querySelector('.eval-position'), chart, lastPly};
+      updateGraphReadout(UI.graphRefs);
+      if (restoreFocus) chart.focus({preventScroll: true});
+      return;
+    }
+    const readout = el('strong', {class: 'evaluation-score', title: 'Positive favors White; negative favors Black. M means mate.'});
+    UI.graph.replaceChildren(el('div', {class: 'panel eval-side evaluation-panel evaluation-' + design + (design === 'bars2' ? ' evaluation-bars' : ''), 'data-design': design, 'aria-label': 'Evaluation'},
+      readout,
+      el('div', {class: 'evaluation-plot'}, chart,
+        !pts.length ? el('span', {class: 'evaluation-empty'}, S.blank ? 'Load a game to see its evaluation' : 'Waiting for analysis…') : null)));
+    UI.graphRefs = {key:graphKey, marker:chart.querySelector('.eval-position'), readout, chart, lastPly};
+    updateGraphReadout(UI.graphRefs);
+    if (restoreFocus) chart.focus({preventScroll: true});
+    return;
+  }
+  UI.graph.replaceChildren(el("div", { class: "panel eval-side", 'data-design': design },
     el("div", { class: "panel-head" }, el("h3", {}, "Evaluation")),
     el("div", { class: "panel-body", style: { paddingTop: "8px", paddingBottom: "8px" } },
-      el("div", { class: "evalgraph clickable-graph", title: "Click to jump to a move", html: svg, onclick: jumpFromEvent, onmousemove: hoverMove, onmouseleave: hideHover })),
+      el("div", { class: "evalgraph clickable-graph", html: svg, onclick: jumpFromEvent, onmousemove: hoverMove, onmouseleave: hideHover })),
   ));
   UI.graphRefs = {key:graphKey,marker:UI.graph.querySelector(".eval-position")};
 }
@@ -4392,7 +5078,22 @@ function highlightCurrentMove(forceScroll = false) {
 }
 let _movesSig = null;
 let _movesClassSig = null;
+function updateMovesDesign() {
+  const panel = UI.movesBody.closest('.moves-panel'), design = panelDesign('moves', S.settings);
+  if (panel.dataset.design === design) return;
+  const scroll = UI.movesBody.scrollTop;
+  panel.querySelector('.moves-head')?.remove();
+  panel.querySelector('.moves-foot')?.remove();
+  panel.dataset.design = design;
+  if (design === 'original') {
+    panel.prepend(el('div', {class: 'panel-head moves-head'}, el('h3', {}, 'Moves')));
+    panel.append(el('div', {class: 'moves-foot', 'aria-hidden': 'true'}));
+  }
+  UI.movesBody.scrollTop = scroll;
+  highlightCurrentMove(true);
+}
 function renderMoves() {
+  updateMovesDesign();
   const ml = S.settings.mlStyle;
   // Keep move cells mounted while classifications arrive. Replacing the list during analysis
   // drops the hovered element and makes its hover state flicker; only changed badges need updates.
@@ -4434,17 +5135,58 @@ function renderMoves() {
   }
   UI.movesBody.style.padding = ml === "rows" ? "0" : "var(--pad)";
   UI.movesBody.replaceChildren(list);
-  // The Moves header stays clean — no "Start" placeholder and no running current-move readout.
-  UI.movesCount.textContent = "";
-  // Book moves are now shown in the Accuracy breakdown (expanded), no longer here in "Moves".
-  UI.movesFoot.hidden = true;
   // auto-scroll to the current move
   highlightCurrentMove(true);
 }
 
 /* ---------------- Engine lines ---------------- */
+function enginePanelLineLimit() {
+  return panelDesign('engine', S.settings) === 'minimal' ? 3 : ENGINE_MAX_LINES;
+}
+function enginePanelLineCount() {
+  return Math.max(1, Math.min(enginePanelLineLimit(), S.settings.engineLines));
+}
+// Focus and Minimal share variation controls; Minimal moves playback into the header.
+function focusedEnginePanel(content, {locked = false, playable = false} = {}) {
+  const name = activeEngineName();
+  const minimal = panelDesign('engine', S.settings) === 'minimal';
+  const count = enginePanelLineCount();
+  const lineControl = (delta, label) => el('button', {
+    type: 'button', class: delta > 0 ? 'engine-minimal-add' : 'engine-minimal-remove',
+    disabled: locked || (delta > 0 ? !playable : S.blank),
+    'aria-label': delta > 0 ? 'Add another engine line' : 'Remove the last engine line',
+    onclick: async e => {
+      e.currentTarget.disabled = true;
+      await setEngineSetting('engineLines', Math.max(1, Math.min(enginePanelLineLimit(), enginePanelLineCount() + delta)));
+      const target = UI.engine.querySelector(delta > 0 ? '.engine-minimal-add' : '.engine-minimal-remove')
+        || UI.engine.querySelector('.engine-minimal-controls button');
+      target?.focus({preventScroll: true});
+    },
+  }, label);
+  const play = el('button', {type: 'button', class: 'engine-focus-play' + (S.bestWalking ? ' on' : ''),
+    disabled: locked || !playable && !S.bestWalking,
+    'aria-label': S.bestWalking ? 'Stop playing best moves' : 'Play best moves from this position',
+    onclick: () => { if (S.bestWalking) { stopBestWalk(); renderControls(); renderEngineCurrent(); } else playBestMoves(); },
+  }, minimal ? (S.bestWalking ? '■' : '▶') : S.bestWalking ? '■ Stop' : '▶ Play best moves from here');
+  const panel = el('div', {class: 'panel engine-focus' + (minimal ? ' engine-minimal' : ''), 'data-design': minimal ? 'minimal' : 'focus', 'aria-label': 'Engine'},
+    el('div', {class: 'panel-head engine-focus-head'}, el('h3', {}, 'Engine'),
+      el('span', {class: 'count', title: locked ? 'Engine lines are hidden during practice' : name + ' · target search depth ' + S.settings.engineDepth},
+        locked ? 'Practice' : minimal ? 'Depth ' + S.settings.engineDepth : name + ' · depth ' + S.settings.engineDepth),
+      minimal ? play : null),
+    el('div', {class: 'panel-body engine-body'}, content,
+      minimal ? el('div', {class: 'engine-minimal-controls'},
+        count > 1 ? lineControl(-1, '− Remove line') : null,
+        count < enginePanelLineLimit() ? lineControl(1, '+ Add line') : null) : null),
+    minimal ? null : el('div', {class: 'engine-focus-foot'}, play));
+  UI.engine.replaceChildren(panel);
+  fitEnginePanel();
+}
 // While solving a practice position, the engine lines would give the answer away → hide them.
 function renderEnginePractice() {
+  if (panelDesign('engine', S.settings) !== 'original') {
+    focusedEnginePanel(el('div', {class: 'engine-empty', role: 'status'}, 'Find the best move — engine lines are hidden until you solve it.'), {locked: true});
+    return;
+  }
   UI.engine.replaceChildren(el("div", { class: "panel" },
     el("div", { class: "panel-head" }, el("h3", {}, "Engine"), el("span", { class: "count" }, "Practice")),
     el("div", { class: "panel-body engine-body" },
@@ -4455,6 +5197,10 @@ function renderEnginePractice() {
 // Choose the source of the engine lines for the shown position and draw the panel.
 function renderEngineCurrent() {
   if(S.blank){
+    if (panelDesign('engine', S.settings) !== 'original') {
+      focusedEnginePanel(el('div', {class: 'engine-empty'}, 'Load a game to explore the best moves.'));
+      return;
+    }
     UI.engine.replaceChildren(el("div",{class:"panel"},
       el("div",{class:"panel-head"},el("h3",{},"Engine")),
       el("div",{class:"panel-body engine-body"},el("div",{class:"engine-empty"},"No game loaded."))));
@@ -4472,42 +5218,96 @@ function renderEngineCurrent() {
     const b = S.bests[S.idx];
     let lines = b ? b.lines : null;
     if (S._panelNeedsLive && !terminalScore(S.positions[S.idx].fen)) lines = null;
-    // The batch only stored the single best line. If the user wants more, show the richer set we
-    // searched on demand for THIS position (requestPanelLines), then ensure that search is running.
+    // The scoring batch stores its own evidence; prefer the richer candidates from panel searches.
     const panel = cachedPanelLines();
-    const panelReady = !!panel;
-    if (panelReady && (!lines || panel.lines.length > lines.length)) lines = panel.lines;
-    // While the richer search for THIS position is still pending, keep the previous render's extra
-    // lines on screen so the panel doesn't shrink to one line then grow back on every move.
-    const padFromCache = S.settings.engineLines > 1 && !panelReady && !!lines && lines.length < S.settings.engineLines;
+    const want = enginePanelLineCount();
+    const panelReady = panel?.count >= want;
+    if (panel && (!lines || panel.lines.length > lines.length)) lines = panel.lines;
+    // Keep this position's known candidates visible while a newly requested rank is pending.
+    const padFromCache = want > 1 && !panelReady && !!lines && lines.length < want;
     renderEngine(lines, padFromCache);
     requestPanelLines();
   }
 }
-// Live, on-demand search of the position you're viewing on the mainline, to fill the extra engine-
-// panel candidate lines beyond the single line the batch stored. Cheap: it only runs for the
-// position currently shown, is cancelled when you navigate away, and no-ops when 1 line is enough.
+// Panel evidence is separate from calibrated scoring. Keep the richest result for each
+// position/settings/history, including when the displayed candidate count changes.
 const panelLineCache = new Map();
-function panelContextKey(i = S.idx, want = S.settings.engineLines) {
+function panelContextKey(i = S.idx) {
   return JSON.stringify([S.positions[i]?.fen, searchHistory(S.positions, i),
     S.settings.enginePath, S.engineFallbackBuild || S.activeEngineBuild || S.settings.enginePath,
-    S.settings.engineDepth, S.settings.engineHash, S.settings.engineSkill, want]);
+    S.settings.engineDepth, S.settings.engineHash, S.settings.engineSkill]);
 }
-function cachedPanelLines() {
+function cachedPanelLines(i = S.idx) {
   if (!panelLineCache.size) return null;
-  const key = panelContextKey(), entry = panelLineCache.get(key);
+  const key = panelContextKey(i), entry = panelLineCache.get(key);
   if (entry) { panelLineCache.delete(key); panelLineCache.set(key, entry); }
   return entry;
 }
+function rememberPanelLines(i, key, count, lines) {
+  const entry = {idx: i, fen: S.positions[i].fen, count, lines};
+  if ((panelLineCache.get(key)?.count || 0) > count) return panelLineCache.get(key);
+  if (key.length <= 16384) {
+    panelLineCache.set(key, entry);
+    // Retain an entire game's precalculated positions, with a small minimum for navigation.
+    if (panelLineCache.size > Math.max(16, S.positions.length)) panelLineCache.delete(panelLineCache.keys().next().value);
+  }
+  return entry;
+}
+let panelWarmJob = null;
+function stopPanelPrecalculation() {
+  if (!panelWarmJob) return;
+  panelWarmJob.cancelled = true;
+  clearTimeout(panelWarmJob.timer);
+  panelWarmJob.engine?.terminate();
+  panelWarmJob = null;
+}
+function schedulePanelPrecalculation() {
+  if (S.blank || S.analyzing || enginePanelLineCount() <= 1 && !S._panelNeedsLive) return;
+  const context = JSON.stringify([S.batchGen, S.pgn, panelContextKey(0), enginePanelLineCount()]);
+  if (panelWarmJob?.context === context) return;
+  stopPanelPrecalculation();
+  const job = {context, cancelled: false, engine: null, idx: null, pending: null};
+  panelWarmJob = job;
+  const count = enginePanelLineCount();
+  const positions = S.positions;
+  // Let the foreground request claim the visible position first. Statistics never await this job.
+  job.timer = setTimeout(() => { job.promise = (async () => {
+    try {
+      const order = [S.idx, ...positions.map((_, i) => i).filter(i => i !== S.idx)];
+      for (const i of order) {
+        if (job.cancelled || S.positions !== positions || S.analyzing) return;
+        if (!S.bests[i]?.lines || terminalScore(positions[i].fen)) continue;
+        const key = panelContextKey(i);
+        if (S._panelRequest?.key === key && S._panelRequest.count >= count) await S._panelRequest.promise;
+        if (job.cancelled) return;
+        if (cachedPanelLines(i)?.count >= count || !S._panelNeedsLive && S.bests[i].lines.length >= count) continue;
+        if (!job.engine) job.engine = await createEngine({Hash: S.settings.engineHash, 'Skill Level': S.settings.engineSkill});
+        if (job.cancelled) { job.engine.terminate(); return; }
+        job.idx = i;
+        job.pending = job.engine.analyse(positions[i].fen, S.settings.engineDepth, count, searchHistory(positions, i));
+        const result = await job.pending;
+        if (job.cancelled || S.positions !== positions || panelContextKey(i) !== key) return;
+        const entry = rememberPanelLines(i, key, count, result.lines);
+        if (!S.analysisMode && S.idx === i) {
+          S._panelCache = entry;
+          renderEngineCurrent();
+        }
+        job.idx = null; job.pending = null;
+      }
+    } catch { /* Foreground navigation can retry an interrupted or failed background search. */ }
+    finally { job.engine?.terminate(); job.engine = null; job.idx = null; job.pending = null; }
+  })(); }, 0);
+}
 async function requestPanelLines() {
   if (S.analyzing || S.analysisMode) return;          // not during the batch, not in variation mode
-  const want = S.settings.engineLines;
+  schedulePanelPrecalculation();
+  const want = enginePanelLineCount();
   if (!want || want <= 1 && !S._panelNeedsLive) {
     if (S._panelRequest) { S.panelToken++; S._panelRequest = null; S.liveEngine?.cancelPending(); S.liveEngine?.stop(); }
     return;
   }
   const key = panelContextKey();
-  if (S._panelRequest && S._panelRequest.key !== key) {
+  if (S._panelRequest && (S._panelRequest.key !== key || S._panelRequest.count !== want)) {
     S.panelToken++; S._panelRequest = null;
     S.liveEngine?.cancelPending(); S.liveEngine?.stop();
   }
@@ -4515,12 +5315,13 @@ async function requestPanelLines() {
   const stored = S.bests[i];
   if (!stored || !stored.lines) return;               // position not analysed yet
   if (stored.lines.length >= want && !S._panelNeedsLive) return;
-  if (cachedPanelLines()) return; // includes completed forced positions with fewer legal moves
+  if (cachedPanelLines()?.count >= want) return; // includes forced positions with fewer legal moves
   if (S._panelRequest?.key === key) return S._panelRequest.promise;
+  if (panelWarmJob?.idx === i && panelWarmJob.pending) return panelWarmJob.pending;
   const fen = S.positions[i].fen;
   if (terminalScore(fen)) return;
   const token = ++S.panelToken;
-  const entry = {key, promise: null};
+  const entry = {key, count: want, promise: null};
   S._panelRequest = entry;
   entry.promise = (async () => { try {
     // Publish ownership before engine startup can re-render the panel.
@@ -4530,11 +5331,7 @@ async function requestPanelLines() {
     eng.cancelPending(); eng.stop();
     const res = await eng.analyse(fen, S.settings.engineDepth, want, searchHistory(S.positions, i));
     if (token !== S.panelToken || S.idx !== i || S.analysisMode || panelContextKey() !== key) return;
-    S._panelCache = { idx: i, fen, lines: res.lines };
-    if (key.length <= 16384) {
-      panelLineCache.set(key, S._panelCache);
-      if (panelLineCache.size > 16) panelLineCache.delete(panelLineCache.keys().next().value);
-    }
+    S._panelCache = rememberPanelLines(i, key, want, res.lines);
     // Clear before rendering so a failed/uncacheable result cannot leave stale ownership.
     if (S._panelRequest === entry) S._panelRequest = null;
     renderEngine(res.lines);
@@ -4549,22 +5346,23 @@ function fitEnginePanel() {
   const mod=UI.engine?.closest('.mod');if(!mod)return;
   if(!isCustomLayout()){mod.style.minHeight="";return;}
   if(!S.layout.engine){mod.style.minHeight="";return;}
-  const height=120*panelScale(S.layout.engine);
+  const height=(panelDesign('engine', S.settings) === 'minimal' ? 128 : 120)*panelScale(S.layout.engine);
   mod.style.minHeight=height+'px';
   S.layout.engine.h=Math.max(S.layout.engine.h,height);
   applyPanelBox(mod,S.layout.engine);growCanvas();
 }
 function renderEngine(lines, padFromCache = false) {
+  const design = panelDesign('engine', S.settings), focus = design !== 'original';
   const curFen = activePos().fen;
   const historyKey = JSON.stringify(activeSearchHistory());
   const configKey = JSON.stringify([S.settings.enginePath, S.activeEngineBuild, S.engineFallbackBuild,
     S.settings.engineDepth, S.settings.engineHash, S.settings.engineSkill, S.settings.classifyLines]);
-  const want = S.settings.engineLines;
+  const want = enginePanelLineCount();
   // The last full set of real lines we rendered, kept (with the fen they were computed for, so the
   // SAN stays correct) to fill slots that the new position hasn't searched yet — and to hold the
   // panel steady while the engine re-computes (lines === null, e.g. "Play best moves from here").
   const cached = S._lastEngineLines?.fen === curFen && S._lastEngineLines?.historyKey === historyKey && S._lastEngineLines?.configKey === configKey ? S._lastEngineLines : null;
-  const renderKey = JSON.stringify([curFen,historyKey,configKey,want,S.analysisMode,S.liveError,S.bestWalking,
+  const renderKey = JSON.stringify([design,curFen,historyKey,configKey,want,S.analysisMode,S.liveError,S.bestWalking,
     padFromCache,lines,(!lines || padFromCache) && cached?.lines]);
   if (UI.engineRenderKey === renderKey && UI.engineRenderNode === UI.engine.firstChild) return;
   let body;
@@ -4591,21 +5389,46 @@ function renderEngine(lines, padFromCache = false) {
     // don't wipe the previous second line we still want to show.
     if (cur.length >= want) S._lastEngineLines = { lines: cur, fen: curFen, historyKey, configKey };
     body = el("div", {},
-      ...slots.map((slot) => {
+      ...slots.map((slot, index) => {
         // Empty slot (a forced move with no second line, etc.) → a blank row of the same height so
         // the panel keeps the size of `want` lines and never resizes between moves.
-        if (!slot) return el("div", { class: "engine-line" }, el("span", { class: "ev" }, " "), el("span", { class: "moves" }, " "));
+        if (!slot) return focus ? el('div', {class: 'engine-focus-pending', role: 'status'},
+          padFromCache ? 'Finding another line…' : 'No other candidate')
+          : el("div", { class: "engine-line" }, el("span", { class: "ev" }, " "), el("span", { class: "moves" }, " "));
         const { l, fen } = slot;
         const wr = whiteRel(l.score, fen); const cp = scoreToCp(wr);
         const evTxt = wr.mate != null ? evalText(wr) : (cp >= 0 ? "+" : "") + (cp / 100).toFixed(2);
         const toks = uciLineToSan(fen, (l.pv || "").split(/\s+/).filter(Boolean), 6);
-        // Click a line → play the whole line out as a variation (analysis mode).
-        return el("button", { type:"button", class: "engine-line clickable", tabindex:"-1", "aria-label":"Play variation " + toks.join(" ") + ", evaluation " + evTxt, onclick: () => playLine(l.pv) },
+        if (focus) {
+          const moves = [...toks];
+          if (moves.length && fen.split(' ')[1] === 'b') moves[0] = fen.split(' ')[5] + '… ' + moves[0];
+          const evaluation = wr.mate != null ? `${cp >= 0 ? 'White' : 'Black'} can force mate in ${Math.abs(wr.mate)}`
+            : cp === 0 ? 'Equal position' : `${cp > 0 ? 'White' : 'Black'} has an advantage of ${Math.abs(cp / 100).toFixed(2)} pawns`;
+          return el('button', {type: 'button', class: 'engine-focus-candidate', disabled: !moves.length,
+            'aria-label': `${index === 0 ? 'Best line' : 'Alternative ' + (index + 1)}: ${moves.join(' ')}. ${evaluation}. Explore variation.`,
+            onclick: () => playLine(l.pv)},
+            el('span', {class: 'ev engine-focus-eval ' + (cp >= 0 ? 'pos' : 'neg')}, evTxt),
+            el('span', {class: 'moves engine-focus-variation'}, ...moves.flatMap((move, i) => {
+              const number = move.match(/^\d+[.…]\s*/)?.[0] || '';
+              return [el('span', {class: 'engine-focus-token'},
+                number ? el('span', {class: 'engine-focus-number'}, number) : null,
+                el(i === 0 ? 'strong' : 'span', {}, move.slice(number.length))), ' '];
+            })));
+        }
+        // Click a line to open a variation for manual navigation.
+        return el("button", { type:"button", class: "engine-line clickable", tabindex:"-1", "aria-label":"Explore variation " + toks.join(" ") + ", evaluation " + evTxt, onclick: () => playLine(l.pv) },
           el("span", { class: "ev " + (cp >= 0 ? "pos" : "neg") }, evTxt),
           el("span", { class: "moves" }, ...toks.map((t) => /^\d/.test(t) ? el("b", {}, t + " ") : el("span", {}, t + " "))),
         );
       }),
     );
+  }
+  if (focus) {
+    focusedEnginePanel(el('div', {class: 'engine-candidates'}, body), {
+      playable: !S.liveError && lines?.length !== 0 && !!(lines?.some(line => line.pv?.trim()) || cached?.lines.some(line => line.pv?.trim())),
+    });
+    UI.engineRenderKey = renderKey; UI.engineRenderNode = UI.engine.firstChild;
+    return;
   }
   // "Play best moves from here": re-analyzes each position and plays the engine's actual best
   // move until mate/draw (or until the user takes over). Not a fixed line — so the moves are
@@ -4947,10 +5770,11 @@ function toggleRow(label, key, onSet = setSetting, info) {
 }
 // Engine segment/slider: changing it saves + triggers re-analysis (scheduleReanalyze via setEngineSetting).
 function engineSeg(label, key, options, fmt, info) {
+  const selected = key === 'engineLines' ? enginePanelLineCount() : S.settings[key];
   return el("div", { class: "set-row" },
     setLabel(label, info),
     el("div", { class: "set-seg" },
-      ...options.map((o) => el("button", { type:"button", "data-setting":key, "data-value":String(o), class: S.settings[key] === o ? "on" : "", onclick: () => setEngineSetting(key, o) }, fmt ? fmt(o) : String(o)))),
+      ...options.map((o) => el("button", { type:"button", "data-setting":key, "data-value":String(o), class: selected === o ? "on" : "", onclick: () => setEngineSetting(key, o) }, fmt ? fmt(o) : String(o)))),
   );
 }
 function engineSlider(label, key, min, max, step, opts = {}) {
@@ -4998,6 +5822,7 @@ const ARROW_SETTING_KEYS = ["bestArrow", "showThreat", "bestArrowColor", "arrowO
 const BACKGROUND_SETTING_KEYS = ["bg", "bgFit", "bgTile", "bgCustom", "bgHue", "bgSat", "bgLight"];
 const BADGE_SETTING_KEYS = ["badgeFont", "badgeTooltip"];
 const VISUAL_SETTING_KEYS = [
+  ...PANEL_DESIGNS.map(design => design.setting),
   "theme", "accent", "accentCustom", "density", "evalView", "mlStyle", "badgeStyle", "badgeScale",
   ...BADGE_SETTING_KEYS,
   "graphStyle", "barStyle", "insightFont", "showCoords", "coordSize", ...BACKGROUND_SETTING_KEYS,
@@ -5024,12 +5849,17 @@ async function resetVisualSettings() {
   closeBoardColorPicker();
   delete S.settings.wrongSound; // remove obsolete saved choices from older versions
   await resetSettingKeys(VISUAL_SETTING_KEYS);
+  const setup = UI_SETUPS[baseUiSetup()];
+  if (setup) {
+    Object.assign(S.settings, setup.designs);
+    await writeSettings(setup.designs);
+  }
   S.coach = null;
   _ipSig = null;
   if (S.practice) S.practice.coachTyped = false;
   await resetLayout();
   applySettings(); buildBoard(); renderEvalBar(); renderGraph(); renderMoves();
-  renderCoachAvatar(); renderReview(); renderStats(); renderControls();
+  renderCoachAvatar(); renderReview(); renderStats(); renderControls(); renderEngineCurrent();
   renderSettings();
 }
 // Controls for the "Background" section: preset/custom picker, fit mode, tile size, upload button.
@@ -5083,6 +5913,19 @@ function visualSettings() {
   accentEntries.unshift({ value: "custom", title: "Choose custom accent color", onClick: (e) => openAccentColorPicker(e.currentTarget),
     render: (chip) => colorPickerChip(chip, [S.settings.accentCustom]) });
   return el("div", {},
+    section("Premade UI setups",
+      el("div", {class:"set-row hint"}, el("span", {class:"set-note"}, "Choose a panel arrangement and tab designs. Moving or resizing panels or changing tab designs selects Custom automatically. Reset layout restores your starting setup's arrangement.")),
+      seg("Setup", "uiSetup", Object.keys(UI_SETUPS), null, value => UI_SETUPS[value].label),
+      el("div", {class:"set-row hint"}, el("span", {class:"set-note"}, "Old: original tabs and automatic layout. Modern: Phase report 1, Move list Zoom +20%, Minimal Engine, and the modern panel layout.")),
+    ),
+    section("Tabs",
+      ...PANEL_DESIGNS.flatMap(design => [
+        seg(design.label, design.setting, design.versions.map(version => version.id), null,
+          value => design.versions.find(version => version.id === value).label),
+        design.panel === "evalbar" ? seg("Bar style", "barStyle", ["gradient", "classic", "mono", "accent"], null,
+          value => value === "classic" ? "Solid" : value) : null,
+      ]),
+    ),
     section("Theme",
       colorChips("Accent", "accent", accentEntries),
     ),
@@ -5120,17 +5963,14 @@ function visualSettings() {
       slider("Speed", "animSpeed", 1, 10, 1, { fmt: (v) => (440 - v * 40) + " ms" }),
     ),
     section("Layout",
-      seg("Eval", "evalView", ["both", "bar", "graph"]),
-      seg("Bar", "barStyle", ["gradient", "classic", "mono", "accent"], null, (value) => value === "classic" ? "Solid" : value),
-      seg("Graph", "graphStyle", ["area", "line", "color", "minimal"]),
       el("button", { class: "set-reset reorg-toggle-btn", onclick: toggleReorganize }, S.reorganize ? "Done reorganizing" : "Reorganize panels"),
-      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Select several panels to move or scale them together. Your arrangement is saved. Export it to share a proposed layout; Reset layout restores the automatic layout.")),
+      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Select several panels to move or scale them together. Your arrangement is saved. Export it to share a proposed layout; Reset layout restores the selected premade UI setup's arrangement.")),
       el("button", { class: "set-reset", onclick: exportPanelLayout }, "Export panel layout"),
       el("button", { class: "set-reset", onclick: resetLayout }, "Reset layout"),
     ),
     section("Screen sizes",
       el("button", {class:"set-reset","data-debug":"screen-previews",onclick:openScreenSizePreview}, "Open screen-size preview"),
-      el("div", {class:"set-row hint"},el("span",{class:"set-note"},"Try your current review at desktop, laptop, tablet and phone sizes. Open full screen and hide the controls for an immersive preview. Switch resolutions without losing your place. Preview changes are not saved.")),
+      el("div", {class:"set-row hint"},el("span",{class:"set-note"},"Preview starts at 100%, matching your current window. Try 1080p, 1440p and other screen sizes with your display scaling and browser toolbar accounted for. Switch resolutions without losing your place. Preview changes are not saved.")),
     ),
     section("Move list",
       seg("Style", "mlStyle", ["rows", "cards", "compact"]),
@@ -5223,7 +6063,7 @@ function motorSettings() {
       engineSeg("Analysis lines", "classifyLines", [1, 2, 3, 4], null, ENGINE_INFO.classifyLines),
       engineSlider("Depth", "engineDepth", 8, 22, 1, { info: ENGINE_INFO.engineDepth }),
       engineSlider("Workers", "engineWorkers", 1, 8, 1, { fmt: (v) => v + (v === 1 ? " (single)" : " parallel"), info: ENGINE_INFO.engineWorkers }),
-      engineSeg("Panel lines", "engineLines", [1, 2, 3, 4], null, ENGINE_INFO.engineLines),
+      engineSeg("Panel lines", "engineLines", Array.from({length: enginePanelLineLimit()}, (_, i) => i + 1), null, ENGINE_INFO.engineLines),
       el("div", { class: "set-row hint" },
         el("span", { class: "set-note" }, "Additional analysis lines provide alternatives for move annotations. Calibrated SF18 numerical scores require 1 analysis line. Panel lines are searched live as you reach each move.")),
     ),
@@ -5343,10 +6183,23 @@ function renderSettings() {
 }
 function positionSettings() {
   if (!UI.settings || UI.settings.hidden) return;
-  // Keep the popover anchored to the right edge, beneath its toolbar button. Tying this
-  // offset to the analysis panels made it drift left on wide windows and briefly reuse
-  // stale panel geometry when the automatic/custom layout was reset.
-  UI.settings.style.right = window.innerWidth <= 520 ? "" : "24px";
+  const app=UI.canvas.closest('.app'),reference=UI.canvas.classList.contains('full-hd-reference');
+  const chromeScale=reference?parseFloat(app.style.getPropertyValue('--reference-chrome-scale'))||1:1;
+  let scale=chromeScale;
+  if(reference){
+    const currentScale=parseFloat(getComputedStyle(UI.settings).zoom)||1;
+    const width=UI.settings.getBoundingClientRect().width/currentScale;
+    const right=Math.max(0,...[...UI.canvas.querySelectorAll('.mod')]
+      .filter(mod=>!mod.hidden&&getComputedStyle(mod).display!=='none')
+      .map(mod=>mod.getBoundingClientRect().right));
+    const available=window.innerWidth-right-24-12;
+    // Fit the remaining desktop gutter independently of the growing panels.
+    // Small windows retain the regular popover rather than illegible controls.
+    if(width>0&&available>=width*.6)scale=Math.min(scale,available/width);
+  }
+  UI.settings.style.setProperty('--settings-scale',scale);
+  // Fixed offsets are in the popover's zoomed coordinates; keep the screen inset constant.
+  UI.settings.style.right = window.innerWidth <= 520 ? "" : 24/scale+"px";
 }
 async function toggleSettings() {
   closeArrowColorPicker();
@@ -5515,18 +6368,47 @@ function writeSettings(patch, replaceKeys = []) {
   return pending;
 }
 async function setSetting(key, value) {
+  if (key === 'uiSetup') return applyUiSetup(value);
+  const design = PANEL_DESIGNS.find(item => item.setting === key);
+  if (design) value = panelDesign(design.panel, {[key]: value});
   if (key === "badgeTooltip") value = badgeLabelStyle(value);
+  const setupPatch = design && S.settings[key] !== value ? customUiSetupPatch() : {};
   S.settings[key] = value;
-  await writeSettings({ [key]: value });
+  await writeSettings({ [key]: value, ...setupPatch });
   applySettings();
+  if (design?.panel.startsWith('accuracy')) { statsRefs = null; hideQTip(); renderStats(); if(key==='accuracyDesign')reflowAccuracy(accuracyLayoutExpanded()); }
+  if (key === 'movesDesign') updateMovesDesign();
+  if (key === 'engineDesign') renderEngineCurrent();
+  if (key === 'moveAnim' && S.settings.moveAnim === false) {
+    overviewReveal.stop();
+    Object.values(phaseReveals).forEach(reveal => reveal.stop());
+  }
   if (key === "pieceStyle") buildBoard();
   if (key === "mlStyle" || key === "badgeStyle") renderMoves();
-  if (key === "evalView" || key === "graphStyle" || key === "barStyle") { renderEvalBar(); renderGraph(); }
+  if (key === "evalView" || key === "graphStyle" || key === "barStyle" || key === "evalbarDesign" || key === "graphDesign" || key === "moveAnim") { renderEvalBar(); renderGraph(); }
   if (key === "bestArrow") renderBestArrow();
   if (key === "showThreat") renderThreatArrow();
   if (key === "loaderStyle") { renderReview(); renderStats(); }
   if (BADGE_SETTING_KEYS.includes(key)) refreshBadgeAppearance();
   if (key === "badgeTooltip") syncBoardBadgeLabel(true);
+  if (UI.settings && !UI.settings.hidden) renderSettings();
+}
+async function applyUiSetup(value) {
+  const setup = UI_SETUPS[value];
+  if (!setup) return;
+  if (value === 'custom') {
+    await writeSettings(customUiSetupPatch());
+    if (UI.settings && !UI.settings.hidden) renderSettings();
+    return;
+  }
+  cancelPanelGesture?.();
+  const patch = {uiSetup:value, uiSetupBase:value, ...setup.designs, evalView:'both', ...(value === 'modern' ? {modernEngineVersion:1,modernMovesVersion:1,modernGraphVersion:1} : {})};
+  Object.assign(S.settings, patch);
+  S.originalAccuracyExpanded = false; S.qbreakExpanded = false; S.accuracyPage = 0;
+  statsRefs = null; hideQTip(); overviewReveal.stop();
+  applySettings(); renderEvalBar(); renderGraph(); renderMoves(); renderStats(); renderEngineCurrent(); renderReview();
+  const savedSettings = writeSettings(patch);
+  await Promise.all([savedSettings, resetLayout()]);
   if (UI.settings && !UI.settings.hidden) renderSettings();
 }
 // Engine setting: save, discard the live engine (new build/options), and re-analyze.
@@ -5560,6 +6442,7 @@ function calibrationWarning(title, message, remainLabel, recommended = false) {
   return calibrationWarningPending;
 }
 async function setEngineSetting(key, value) {
+  if (key === 'engineLines') value = Math.max(1, Math.min(enginePanelLineLimit(), value));
   if (S.settings[key] === value) return;
   if (key === "enginePath" && value === "sf19lite") {
     const proceed = await calibrationWarning("Switch to Stockfish 19 Lite?",
@@ -5577,6 +6460,15 @@ async function setEngineSetting(key, value) {
   await writeSettings({ [key]: value });
   if (key === "engineWorkers") {
     if (S.analyzing) scheduleReanalyze(true);
+    if (UI.settings && !UI.settings.hidden) renderSettings();
+    return;
+  }
+  if (key === 'engineLines') {
+    // A display-count change must not discard previously calculated candidates or scores.
+    stopPanelPrecalculation();
+    S.panelToken++; S._panelRequest = null;
+    if (!S.analysisMode) { S.liveEngine?.cancelPending(); S.liveEngine?.stop(); }
+    renderEngineCurrent();
     if (UI.settings && !UI.settings.hidden) renderSettings();
     return;
   }
@@ -6132,8 +7024,11 @@ function openScreenSizePreview() {
   // window.open copies this tab's session storage synchronously. The preview
   // receives a snapshot without writing a handoff into persistent account data.
   const key="screen-size-preview",previous=window.sessionStorage.getItem(key);
+  const display={width:window.innerWidth,height:window.innerHeight,pixelRatio:window.devicePixelRatio||1,
+    insetWidth:Math.max(0,window.outerWidth-window.innerWidth)+Math.max(0,window.screen.width-window.screen.availWidth),
+    insetHeight:Math.max(0,window.outerHeight-window.innerHeight)+Math.max(0,window.screen.height-window.screen.availHeight)};
   try {
-    window.sessionStorage.setItem(key,JSON.stringify({job,idx:S.idx,preferences:{settings:S.settings,
+    window.sessionStorage.setItem(key,JSON.stringify({job,idx:S.idx,display,preferences:{settings:S.settings,
       layout:layoutForSave(),layoutMode:S.layoutMode,layoutVersion:LAYOUT_VERSION}}));
     const opened=window.open(_url("screen-preview.html"),"_blank");
     if(!opened)return browserAPI.tabs.create({url:_url("screen-preview.html")});
@@ -6385,7 +7280,7 @@ function toggleAuto() {
 }
 document.addEventListener("keydown", (e) => {
   if (learningWorkspace || S.blank) return;
-  if (e.key === "Tab" && !e.target?.closest?.('#settings,[role="dialog"],[role="alertdialog"]')) {
+  if (e.key === "Tab" && !e.target?.closest?.('#settings,.accuracy-panel,.engine-focus,[role="dialog"],[role="alertdialog"]')) {
     e.preventDefault(); return;
   }
   if (UI.settings?.contains(e.target) || UI.libRail?.contains(e.target)) return;
@@ -6441,6 +7336,8 @@ function requestProgress(gen) {
 }
 async function startAnalysis({preserveCompleted = false} = {}) {
   if(S.blank)return;
+  stopPanelPrecalculation();
+  S.progressiveAccuracy = true;
   if (S.practice) exitPractice();
   S._lastEngineLines = null;
   panelLineCache.clear(); S._panelRequest = null; S.panelToken++;
@@ -6479,8 +7376,8 @@ async function startAnalysis({preserveCompleted = false} = {}) {
   }
   if (gen !== S.batchGen) return;
 
-  // Batch analysis defaults to MultiPV=1. Extra lines provide root alternatives for
-  // annotations and inspection; the engine panel fills its lines on demand.
+  // Batch analysis defaults to MultiPV=1. Panel candidates are precomputed separately
+  // after statistics are ready, preserving the calibrated scoring protocol.
   const multipv = Math.max(1, Math.min(ENGINE_MAX_LINES, S.settings.classifyLines || 1));
   S.analyzedSettingsKey = analysisSettingsKey();
   S.analyzedMultipv = multipv; // remember how many lines this run computed (for setEngineSetting)
@@ -6657,7 +7554,7 @@ async function applyGame(payload) {
   S.pgn = payload.pgn;
   S.meta = payload.meta || {};
   S.headers = parseHeaders(payload.pgn);
-  S.clocks = parseClocks(payload.pgn);
+  S.clocks = parseClocks(payload.pgn, true);
   S.positions = positions;
   S.total = S.positions.length - 1;
   S.evals = new Array(S.total + 1).fill(null);
@@ -6681,6 +7578,8 @@ async function applyGame(payload) {
     try { const k = "analysis:" + currentGameId(); const s = await browserAPI.storage.local.get(k); saved = s[k] || null; } catch {}
   }
   const restored = canRestoreAnalysis(saved);
+  S.restoredAnalysis = restored;
+  S.progressiveAccuracy = false;
   S._panelNeedsLive = false;
   if (restored) {
     const oldSettings = JSON.parse(saved.settingsKey), currentSettings = JSON.parse(analysisSettingsKey());
@@ -6698,7 +7597,7 @@ async function applyGame(payload) {
   document.title = `${players.w.name} vs ${players.b.name} — Chess Review`;
   computeDerived();
   renderAll();
-  if (!S.qbreakExpanded) reflowAccuracy(false);
+  if (!accuracyLayoutExpanded()) reflowAccuracy(false);
   renderLibrary();
   requestAnimationFrame(alignPlayers);
   rememberReviewJob();
@@ -6758,9 +7657,29 @@ async function showReadyWorkspace() {
   await Promise.all([...document.querySelectorAll("#boardWrap .piece-img")].map(img => img.decode?.().catch(() => {})));
   await new Promise(resolve => requestAnimationFrame(() => {
     alignPlayers();
-    dismissStartup();
+    document.body.removeAttribute("data-starting");
     resolve();
   }));
+  const startup = document.getElementById("startup");
+  if (startup && S.settings.moveAnim !== false && !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+    // Paint the closed shutters before changing their transforms, even on a warm launch.
+    // Keep the workspace inert until the reveal finishes. A fallback also handles
+    // background tabs or a motion preference changing during the transition.
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    await new Promise(resolve => {
+      const finish = event => {
+        if (event && (event.target !== shutter || event.propertyName !== "transform")) return;
+        clearTimeout(timer);
+        shutter.removeEventListener("transitionend", finish);
+        resolve();
+      };
+      const shutter = startup.querySelector(".startup-top");
+      const timer = setTimeout(finish, 650);
+      shutter.addEventListener("transitionend", finish);
+      startup.classList.add("opening");
+    });
+  }
+  dismissStartup();
 }
 (async function main() {
   try {
@@ -6784,6 +7703,20 @@ async function showReadyWorkspace() {
     S.settings.learningTransition = presentationFor(store.settings || {});
     for (const key of ["showConcepts", "conceptsEnabled", "conceptGroups", "disabledConcepts", "conceptsView", "conceptsDefaultedOff"]) delete S.settings[key];
     migrateVisualAssetSettings(S.settings);
+    normalizePanelDesigns(S.settings);
+    // Upgrade Modern's former default once; later individual design choices stick.
+    if (S.settings.uiSetup === 'modern' && !S.settings.modernEngineVersion) {
+      if (S.settings.engineDesign === 'original') S.settings.engineDesign = 'minimal';
+      S.settings.modernEngineVersion = 1;
+    }
+    if (S.settings.uiSetup === 'modern' && !S.settings.modernMovesVersion) {
+      if (['original', 'full'].includes(S.settings.movesDesign)) S.settings.movesDesign = 'zoom20';
+      S.settings.modernMovesVersion = 1;
+    }
+    if (S.settings.uiSetup === 'modern' && !S.settings.modernGraphVersion) {
+      if (S.settings.graphDesign === 'original') S.settings.graphDesign = 'bars';
+      S.settings.modernGraphVersion = 1;
+    }
     migrateEngineSettings(S.settings);
     delete S.settings.wrongSound; // older selectable mistake cues were removed
     { const lm = { prikker: "dots", hop: "bounce", "bølge": "wave" }; if (lm[S.settings.loaderStyle]) S.settings.loaderStyle = lm[S.settings.loaderStyle]; } // migrate renamed loader keys
@@ -6808,6 +7741,13 @@ async function showReadyWorkspace() {
     }
     // The 5-line option was removed — clamp any stored value to the new max.
     if (S.settings.engineLines > ENGINE_MAX_LINES) S.settings.engineLines = ENGINE_MAX_LINES;
+    // Existing edited presets become Custom without changing their designs or saved boxes.
+    const savedLayout = store.layoutVersion === LAYOUT_VERSION && store.layout;
+    const trackedSetup = store.settings?.uiSetupBase === S.settings.uiSetup;
+    if (!UI_SETUPS[S.settings.uiSetup] || (S.settings.uiSetup !== 'custom' &&
+      (!setupDesignsMatch() || !trackedSetup && savedLayout && !setupLayoutMatches(savedLayout,store.layoutMode)))) {
+      customUiSetupPatch();
+    }
     const migration = {};
     if (!store.settings?.nativeSizingVersion) migration.nativeSizingVersion = 1;
     for (const key of new Set([...Object.keys(loadedSettings), ...Object.keys(S.settings)])) {
@@ -6816,8 +7756,9 @@ async function showReadyWorkspace() {
     if (Object.keys(migration).length) await writeSettings(migration, Object.keys(migration));
     // Use the saved layout if it matches the current version; otherwise the new default.
     const useStored = store.layoutVersion === LAYOUT_VERSION && store.layout;
-    S.layout = useStored ? { ...structuredClone(DEFAULT_LAYOUT), ...store.layout } : structuredClone(DEFAULT_LAYOUT);
-    S.layoutMode = useStored && store.layoutMode === "custom" ? "custom" : "auto";
+    S.layout = useStored ? { ...setupLayout(), ...store.layout } : setupLayout();
+    S.layoutMode = useStored ? (store.layoutMode === "custom" ? "custom" : "auto") : setupLayoutMode();
+    S._accReflow = null;
     if (!useStored) saveLayout();
 
     S.username = store.username || "";

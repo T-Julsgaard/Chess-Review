@@ -63,9 +63,9 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   }
   // Review details, saved panel editing, Reset, and an old browser zoom all use 100%.
   await resize(1919,919);
-  await run("document.querySelector('.qbreak-toggle').click()");
+  await run("document.querySelector('#accuracy-tab-1').click()");
   await inspect('review-expanded-accuracy',1919,919);
-  await run("document.querySelector('.qbreak-toggle').click();document.querySelector('[aria-label=Settings]').click();[...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Layout').click();document.querySelector('.reorg-toggle-btn').click()");
+  await run("document.querySelector('#accuracy-tab-0').click();document.querySelector('[aria-label=Settings]').click();[...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Layout').click();document.querySelector('.reorg-toggle-btn').click()");
   await inspect('review-custom-canvas',1919,919);
   await run("[...document.querySelectorAll('.set-reset')].find(n=>n.textContent==='Reset layout').click()");
   await run("document.querySelector('[aria-label=Settings]').click()");

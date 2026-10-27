@@ -30,8 +30,10 @@ function page(t, html) {
 test('profile-game sidebar places its review action below the CTA and above replay controls',async t=>{
   const p=page(t,profileSidebar+'<div class="game-over-modal-shell-buttons"><a href="/analysis?tab=review">Game Review</a></div>');
   const doc=p.w.document,actions=doc.querySelector('.game-review-buttons-component'),cta=actions.querySelector('a');
-  const button=actions.querySelector('.chess-analyzer-free-review--sidebar');assert.ok(button);
-  assert.equal(cta.nextElementSibling,button);assert.equal(actions.nextElementSibling.className,'game-buttons-container-component');
+  const slot=actions.nextElementSibling,button=slot.querySelector('.chess-analyzer-free-review--sidebar');assert.ok(button);
+  assert.equal(cta.nextElementSibling,null,'Native action row retains its original children');
+  assert.equal(slot.className,'chess-analyzer-review-slot');
+  assert.equal(slot.nextElementSibling.className,'game-buttons-container-component');
   assert.equal(doc.querySelectorAll('.chess-analyzer-free-review').length,2);
   assert.equal(doc.querySelector('.quick-analysis-component .chess-analyzer-free-review'),null);
   button.click();await p.flush();
@@ -46,13 +48,60 @@ test('profile sidebar waits for its CTA and recovers from late insertion and sec
   const actions=doc.createElement('div');actions.className='game-review-buttons-component';sidebar.append(actions);await p.flush();
   assert.equal(doc.querySelector('.chess-analyzer-free-review'),null,'Do not insert into an unfinished Vue section');
   actions.innerHTML='<a href="/analysis/game/live/185946151208?tab=review">Game Review</a>';await p.flush();
-  const button=actions.querySelector('.chess-analyzer-free-review');assert.ok(button);button.click();
+  const button=actions.nextElementSibling.querySelector('.chess-analyzer-free-review');assert.ok(button);button.click();
   actions.append(doc.createElement('span'));await p.flush();
-  assert.equal(actions.querySelector('.chess-analyzer-free-review'),button);assert.equal(button.disabled,true);
+  assert.equal(actions.nextElementSibling.querySelector('.chess-analyzer-free-review'),button);assert.equal(button.disabled,true);
   actions.outerHTML='<div class="game-review-buttons-component"><a href="/analysis/game/live/185946151208?tab=review">Game Review</a></div>';
   await p.flush();assert.equal(doc.querySelectorAll('.chess-analyzer-free-review--sidebar').length,1);
   doc.querySelector('.sidebar-content').outerHTML=profileSidebar;await p.flush();
   assert.equal(doc.querySelectorAll('.chess-analyzer-free-review--sidebar').length,1);
+});
+
+test('post-game emphasis keeps native action children intact through coach and CTA updates',async t=>{
+  const p=page(t,`<div class="game-review-emphasis-component"><div class="game-review-emphasis-content">
+    <div class="coach-message">Well played</div><div class="game-review-buttons-component"><a href="/analysis?tab=review">Game Review</a><!--Vue anchor--></div>
+  </div></div>`),doc=p.w.document,actions=doc.querySelector('.game-review-buttons-component');
+  const emphasis=doc.querySelector('.game-review-emphasis-component');
+  const slot=emphasis.nextElementSibling,button=slot.querySelector('button');
+  assert.equal(actions.childNodes.length,2,'No extension nodes inside the native action row');
+  button.click();await p.flush();
+  actions.innerHTML='<a href="/analysis?tab=review">Updated Game Review</a><!--Vue anchor-->';
+  doc.querySelector('.coach-message').textContent='Next coach message';await p.flush();
+  assert.equal(actions.childNodes.length,2);
+  assert.equal(emphasis.nextElementSibling,slot);assert.equal(slot.querySelector('button'),button);
+  assert.equal(button.disabled,true);assert.equal(button.textContent,'Opening review…');
+  slot.remove();await p.flush();assert.equal(emphasis.nextElementSibling,slot,'Restore sibling removed by a parent update');
+  emphasis.style.display='none';await p.flush();assert.equal(slot.hidden,true);
+  emphasis.style.display='';await p.flush();assert.equal(slot.hidden,false);
+  actions.querySelector('a').hidden=true;await p.flush();assert.equal(slot.hidden,true);
+  actions.querySelector('a').hidden=false;await p.flush();assert.equal(slot.hidden,false);
+  actions.replaceChildren();await p.flush();assert.equal(doc.querySelector('.chess-analyzer-review-slot'),null,'Remove stale action when native review is dismissed');
+});
+
+test('post-game coach action stays outside the capped animation and native click handler',async t=>{
+  const p=page(t,`<div class="sidebar-content"><div class="coach-nudge-game-review-component">
+    <div class="coach-nudge-game-review-content-animation" style="max-height:20dvh;overflow:hidden">
+      <div class="native-review-click"><div class="game-review-buttons-component"><a href="/analysis?tab=review">Game Review</a></div></div>
+      <div class="new-game-buttons">New Game</div>
+    </div></div><div class="game-buttons-container-component">Replay</div></div>`),doc=p.w.document;
+  const panel=doc.querySelector('.coach-nudge-game-review-component'),slot=panel.nextElementSibling;
+  assert.equal(slot.className,'chess-analyzer-review-slot');
+  assert.equal(slot.nextElementSibling.className,'game-buttons-container-component');
+  let nativeClicks=0;doc.querySelector('.native-review-click').addEventListener('click',()=>nativeClicks++);
+  slot.querySelector('button').click();await p.flush();assert.equal(nativeClicks,0);
+  const animation=doc.querySelector('.coach-nudge-game-review-content-animation');
+  animation.style.maxHeight='0px';await p.flush();assert.equal(slot.hidden,true);
+  animation.style.maxHeight='20dvh';await p.flush();assert.equal(slot.hidden,false);
+  panel.remove();await p.flush();assert.equal(doc.querySelector('.chess-analyzer-review-slot'),null);
+});
+
+test('several sidebars recover independently without duplicates or stale slots',async t=>{
+  const p=page(t,profileSidebar+profileSidebar),doc=p.w.document;
+  assert.equal(doc.querySelectorAll('.chess-analyzer-review-slot').length,2);
+  doc.querySelector('.game-review-buttons-component').remove();await p.flush();
+  assert.equal(doc.querySelectorAll('.chess-analyzer-review-slot').length,1);
+  doc.querySelector('.sidebar-content').innerHTML='<div class="game-review-buttons-component"><a href="/analysis?tab=review">Game Review</a></div>';
+  await p.flush();assert.equal(doc.querySelectorAll('.chess-analyzer-review-slot').length,2);
 });
 
 test('profile sidebar selector fallback remains scoped to the sidebar',t=>{

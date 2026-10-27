@@ -33,14 +33,14 @@ body:has(.full-hd-reference) .learning-embedded .learn-shell {
 .stage.full-hd-reference .mod[data-mod="board"] .board {flex:0 1 auto;height:100%;width:auto;aspect-ratio:1;max-width:100%;margin:auto;}
 .stage.reference-components .evalgraph svg {height:120px;}
 
-.stage.reference-components .panel-head {
+.stage.reference-components .panel-head:not(.acc-head) {
   flex-wrap:nowrap;
   display: flex; align-items: center; gap: 10px;
   padding: calc(var(--pad) * .85) var(--pad);
   border-bottom: 1px solid var(--line-soft);
 }
 
-.stage.reference-components .panel-head h3 {
+.stage.reference-components .panel-head:not(.acc-head) h3 {
   margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .1em;
   text-transform: uppercase; color: var(--ink-2);
 }
@@ -53,7 +53,7 @@ body:has(.full-hd-reference) .learning-embedded .learn-shell {
   transition: .12s; white-space: nowrap;
 }
 
-.stage.reference-components .panel-body { padding: var(--pad); }
+.stage.reference-components .panel-body:not(.acc-page) { padding: var(--pad); }
 
 .stage.reference-components .player-strip {
   display: flex; align-items: center; gap: 12px;
@@ -67,33 +67,6 @@ body:has(.full-hd-reference) .learning-embedded .learn-shell {
 }
 
 .stage.reference-components .player-strip .name { font-weight: 700; font-size: 15px; display: flex; align-items: baseline; gap: 4px; white-space: nowrap; }
-
-.stage.reference-components .acc-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 14px; }
-
-.stage.reference-components .acc-cell { display: flex; flex-direction: column; gap: 6px; }
-
-.stage.reference-components .acc-val { font-size: 30px; font-weight: 800; font-family: var(--font-mono); line-height: 1; cursor: default; }
-
-.stage.reference-components .qbreak { margin-top: 14px; display: flex; flex-direction: column; gap: 7px; }
-
-.stage.reference-components .qbreak-row { display: grid; grid-template-columns: 30px 1fr 30px; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 12.5px; cursor: default; border-radius: 8px; transition: background .12s; }
-
-.stage.reference-components .qbreak-row .qlabel { display: flex; align-items: center; gap: 8px; font-family: var(--font-ui);
-  justify-self: center; width: 132px; max-width: 100%; min-width: 0; transform: translateX(16px);
-  border: 0; padding: 0; border-radius: 5px; background: transparent; color: inherit;
-  font-size: inherit; text-align: left; cursor: pointer; }
-
-.stage.reference-components .qbreak-row .qsym {
-  width: 22px; height: 22px; justify-self: center; display: block;
-  filter: drop-shadow(0 1px 1px rgba(0,0,0,.25));
-}
-.stage.reference-components .qbreak-row .qlabel .qsym {flex:0 0 22px;}
-
-.stage.reference-components .qbreak-toggle {
-  margin-top: 4px; width: 100%; display: grid; place-items: center;
-  background: none; border: 0; cursor: pointer; color: var(--ink-3);
-  padding: 5px 0; border-radius: 8px; transition: color .12s, background .12s;
-}
 
 .stage.reference-components .controls {
   display: flex; align-items: center; gap: 8px; justify-content: center;
@@ -175,6 +148,10 @@ body:has(.full-hd-reference) .learning-embedded .learn-shell {
 }
 
 .app:has(.full-hd-reference) .topbar {height:52.2px;zoom:var(--reference-chrome-scale,1);}
-.app:has(.full-hd-reference) .settings-pop {zoom:var(--reference-chrome-scale,1);max-height:calc(100dvh / var(--reference-chrome-scale,1) - 84px);}
+.app:has(.full-hd-reference) .settings-pop {
+  zoom:var(--settings-scale,var(--reference-chrome-scale,1));
+  top:calc((var(--topbar-h) + 12px) / var(--settings-scale,var(--reference-chrome-scale,1)));
+  max-height:calc((100dvh - var(--topbar-h) - 28px) / var(--settings-scale,var(--reference-chrome-scale,1)));
+}
 .stage.auto.reference-components:not(.full-hd-reference) {--review-h:180px;}
 .stage.auto.reference-components:not(.full-hd-reference) .ip-head:empty {display:none;}

@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
+import {monitorViewport} from '../lib/viewport-preview.js';
 
 export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await evaluate(review,"import('./analysis.js').then(m=>m.go(2))");
@@ -18,6 +19,13 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const inside=expression=>run(`(async()=>{const w=document.querySelector('iframe').contentWindow;return (${expression})})()`);
   await waitFor(tab,"document.querySelector('iframe')?.contentDocument?.body?.dataset.previewReady==='true'",'Viewport preview');
   const initial=await inside("w.document.querySelector('#error').textContent");assert.equal(initial,'');
+  const geometry="(()=>{const r=document.querySelector('.stage .board').getBoundingClientRect();return {width:innerWidth,height:innerHeight,board:{x:r.x,y:r.y,width:r.width,height:r.height}}})()";
+  const liveGeometry=await evaluate(review,geometry);
+  const previewGeometry=await inside("(()=>{const r=w.document.querySelector('.stage .board').getBoundingClientRect();return {width:w.innerWidth,height:w.innerHeight,board:{x:r.x,y:r.y,width:r.width,height:r.height}}})()");
+  assert.deepEqual(previewGeometry,liveGeometry,'Default preview matches the real review viewport and board at 100%');
+  assert.equal(await run("document.querySelector('iframe').style.transform"),'scale(1)');
+  assert.equal(await run('chrome.tabs.getZoom()'),1,'Preview tab uses 100% browser zoom');
+  const display=await run("JSON.parse(sessionStorage.getItem('screen-size-preview')).display");
   const game=await inside("({pgn:w.__viewportAudit.S.pgn,idx:w.__viewportAudit.S.idx})");
   assert.equal(game.pgn,'1. e4 e5 2. Nf3 Nc6 *');assert.equal(game.idx,2);
   await run("window.originalFrame=document.querySelector('iframe').contentWindow;window.originalDoc=originalFrame.document");
@@ -43,8 +51,10 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await waitFor(audit,'!!window.api','Storage');
   const baseline=await evaluate(audit,'api.storage.local.get(null).then(JSON.stringify)');
   await call('Page.bringToFront',{},sessionId);
+  assert.equal(await run("document.querySelector('#preview-scale').value"),'fit','Whole screen is visible by default');
   let checked=0;
-  for(const [group,index,width,height]of [['Desktop',0,1920,1080],['Desktop',2,3840,2160],['Desktop',3,3440,1440],['Laptop',1,1366,768],['Tablet',1,820,1180],['Phone',1,390,844]]){
+  for(const [group,index,screenWidth,screenHeight]of [['Desktop',0,1920,1080],['Desktop',1,2560,1440],['Desktop',2,3840,2160],['Desktop',3,3440,1440],['Laptop',1,1366,768],['Tablet',1,820,1180],['Phone',1,390,844]]){
+    const [width,height]=['Desktop','Laptop'].includes(group)?monitorViewport(screenWidth,screenHeight,display):[screenWidth,screenHeight];
     await run(`(()=>{[...document.querySelectorAll('#device-tabs button')].find(b=>b.textContent==='${group}').click();const s=document.querySelector('#screen-preset');s.value='${index}';s.dispatchEvent(new Event('change'));})()`);
     await waitFor(tab,`(()=>{const fit=document.querySelector('iframe').contentWindow.__viewportAudit.fit();return Math.abs(fit?.w-${width})<3&&Math.abs(fit?.h-${height})<3})()`,`${group} layout fit`).catch(async error=>{
       throw Error(error.message+': '+JSON.stringify(await inside("({fit:w.__viewportAudit.fit(),width:w.innerWidth,height:w.innerHeight,zoom:w.frameElement.dataset.previewZoom})")));
@@ -55,7 +65,19 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     assert.equal(state.same,true,'Size changes preserve the live document');assert.equal(state.error,'');
     const fit=await run("(()=>{const s=document.querySelector('#preview-stage');return {width:s.clientWidth,height:s.clientHeight,scrollWidth:s.scrollWidth,scrollHeight:s.scrollHeight}})()");
     assert.ok(fit.scrollWidth<=fit.width+1&&fit.scrollHeight<=fit.height+1,`${group}: fitted review fills the stage without outer scrolling`);
-    assert.equal(await run("(()=>{const s=document.querySelector('#preview-stage'),r=document.querySelector('#preview-surface').getBoundingClientRect();return Math.abs(r.width-s.clientWidth)<1||Math.abs(r.height-s.clientHeight)<1})()"),true,`${group}: fitted review uses all available width or height`);
+    assert.equal(await run("(()=>{const s=document.querySelector('#preview-stage'),f=document.querySelector('iframe'),r=document.querySelector('#preview-surface').getBoundingClientRect();return Math.abs(r.width-s.clientWidth)<1||Math.abs(r.height-s.clientHeight)<1||f.style.transform==='scale(1)'})()"),true,`${group}: preview fits without enlarging smaller screens`);
+    if(group==='Desktop'&&index===1){
+      await call('Page.bringToFront',{},review.sessionId);
+      await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);
+      await waitFor(review,`window.__viewportAudit.fit()?.w===${width}&&window.__viewportAudit.fit()?.h===${height}`,'Native 1440p review');
+      const nativeGeometry=await evaluate(review,geometry);
+      const frameGeometry=await inside("(()=>{const r=w.document.querySelector('.stage .board').getBoundingClientRect();return {width:w.innerWidth,height:w.innerHeight,board:{x:r.x,y:r.y,width:r.width,height:r.height}}})()");
+      assert.deepEqual(frameGeometry,nativeGeometry,'Fitted 1440p preview uses the same layout as a real 1440p review at 100%');
+      await evaluate(review,"document.querySelector('[aria-label=Settings]').click()");
+      const nativeShot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);await fs.writeFile(path.join(out,'screen-size-native-1440p.png'),Buffer.from(nativeShot.data,'base64'));
+      await call('Emulation.clearDeviceMetricsOverride',{},review.sessionId);
+      await call('Page.bringToFront',{},sessionId);
+    }
     const shot=await call('Page.captureScreenshot',{format:'png'},sessionId);await fs.writeFile(path.join(out,`screen-size-${group.toLowerCase()}-${index}.png`),Buffer.from(shot.data,'base64'));
     assert.ok(state.scroll<=state.innerWidth+1,`${group}: horizontal overflow ${JSON.stringify(state)}; screenshot: ${out}`);
     checked++;
@@ -78,5 +100,10 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   shot=await call('Page.captureScreenshot',{format:'png'},sessionId);await fs.writeFile(path.join(out,'screen-size-narrow-setup.png'),Buffer.from(shot.data,'base64'));
   await call('Emulation.clearDeviceMetricsOverride',{},sessionId);
   assert.equal(await evaluate(audit,'api.storage.local.get(null).then(JSON.stringify)'),baseline,'Preview leaves real account data unchanged');
-  console.log(`Passed full-viewport layout, setup overlay, native fullscreen, ${checked} viewport sizes, current-game handoff, persistent iframe, settings rotation, learning navigation and isolated storage. Screenshots: ${out}`);
+  await run("chrome.tabs.getCurrent().then(t=>chrome.tabs.setZoom(t.id,.8))");
+  await call('Page.reload',{},sessionId);
+  await waitFor(tab,"document.querySelector('iframe')?.contentDocument?.body?.dataset.previewReady==='true'&&chrome.tabs.getZoom().then(z=>z===1)",'Preview restores 100% browser zoom');
+  assert.equal(await evaluate(review,'chrome.tabs.getZoom()'),1,'Preview zoom leaves the review tab unchanged');
+  assert.deepEqual(await inside("({width:w.innerWidth,height:w.innerHeight})"),{width:liveGeometry.width,height:liveGeometry.height});
+  console.log(`Passed matching live-review geometry at 100%, native 1440p layout comparison, whole-screen fit by default, setup overlay, native fullscreen, ${checked} viewport sizes, current-game handoff, persistent iframe, settings rotation, learning navigation and isolated storage. Screenshots: ${out}`);
 }

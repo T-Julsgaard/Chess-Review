@@ -56,3 +56,5 @@ documentation and be linked from the appropriate guide.
 
 The [research maintenance review](RESEARCH-MAINTENANCE.md) records the 2026-10-18
 cleanup, evidence that must be preserved, and research decisions still open.
+The [local folder cleanup](FOLDER-CLEANUP.md) records the 2026-10-26 disk audit,
+temporary browser-test removals and material deliberately retained.

@@ -46,7 +46,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     })`);
     assert.equal(state.clock,'3:00');assert.equal(state.started,false);assert.equal(state.busy,true);assert.equal(state.thinking,false);
     assert.equal(state.waiting,true);assert.equal(state.cursor,'default');
-    assert.equal(state.motion,motion&&!reduced?'on':'off');assert.equal(state.animation==='none',!motion||reduced);
+    assert.equal(state.motion,motion&&!reduced?'on':'off');assert.equal(state.animation,'none','The initial 3 must not flip to itself');
     assert.equal(state.fits,true);assert.equal(state.contained,true);
     const point=async square=>run(`(()=>{const r=document.querySelector('[data-square=${square}]').getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2};})()`);
     const from=await point('e4'),to=await point('d5');
@@ -54,6 +54,8 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await call('Input.dispatchMouseEvent',{type:'mouseReleased',...to,button:'left',buttons:0,clickCount:1},review.sessionId);
     assert.equal(await run("import('./analysis.js').then(m=>m.learningWorkspace.run.correctMoves)"),0);
     await capture(`time-attack-ready-${width}-${reduced?'reduced':motion?'animated':'static'}`);
+    await waitFor(review,"!!document.querySelector('.puzzle-run-start[data-step=\"2\"]')",'Second countdown digit');
+    assert.equal(await run("getComputedStyle(document.querySelector('.puzzle-run-start .puzzle-flip-in')).animationName"),motion&&!reduced?'puzzle-flip-in-b':'none');
     await waitFor(review,"import('./analysis.js').then(m=>m.learningWorkspace.run.clock.started&&!m.learningWorkspace.busy)",'Go unlocks play');
     assert.ok(await run('performance.now()-readyStarted>=3000'));
     assert.deepEqual(await run('startCues'),['3','2','1','Go!']);
@@ -72,7 +74,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     const point=await run("(()=>{const r=document.querySelector('[data-focus=knockout]').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()");
     await call('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',buttons:1,clickCount:1},review.sessionId);
     await call('Input.dispatchMouseEvent',{type:'mouseReleased',...point,button:'left',buttons:0,clickCount:1},review.sessionId);
-    await waitFor(review,"!!document.querySelector('.puzzle-run-start[data-mode=knockout][data-step=\"1\"]')",'One-life intro');
+    await waitFor(review,"!!document.querySelector('.puzzle-run-start[data-mode=knockout][data-step=\"Ready\"]')",'Knockout ready intro');
     const state=await run(`import('./analysis.js').then(m=>{
       const w=m.learningWorkspace,e=w.runStartOverlay,b=e.getBoundingClientRect(),c=e.firstChild.getBoundingClientRect();
       return {mode:e.dataset.mode,stock:getComputedStyle(e).getPropertyValue('--mode-stock').trim(),title:e.querySelector('.puzzle-run-start-title').textContent,
@@ -81,13 +83,13 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     })`);
     assert.equal(state.mode,'knockout');assert.equal(state.stock,'#eaa18e');assert.equal(state.title,'One life');
     assert.equal(state.lives,1);assert.equal(state.clock,null);assert.equal(state.busy,true);assert.equal(state.waiting,true);
-    assert.equal(state.leaf==='none',!motion||reduced);assert.equal(state.fits,true);
+    assert.equal(state.leaf,'none');assert.equal(state.fits,true);
     await sleep(300);await capture(`knockout-ready-${width}`);
     await run("import('./analysis.js').then(m=>m.learningWorkspace.submitPuzzle('e4d5'))");
     assert.equal(await run("import('./analysis.js').then(m=>m.learningWorkspace.run.correctMoves)"),0);
     await waitFor(review,"document.querySelector('.puzzle-run-start[data-mode=knockout]')?.dataset.step==='Go!'",'Knockout bell');
     await capture(`knockout-go-${width}`);
-    assert.deepEqual(await run('startModeCues'),[['1','knockout'],['Go!','knockout']]);
+    assert.deepEqual(await run('startModeCues'),[['Ready','knockout'],['Go!','knockout']]);
     assert.deepEqual(await run('knockoutAudio'),[{duration:.16,state:'running'},{duration:.84,state:'running'}]);
     await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace.busy&&!m.learningWorkspace.runStartOverlay)",'Knockout intro clears');
     await run("import('./analysis.js').then(m=>m.learningWorkspace.submitPuzzle('e4d5'))");
