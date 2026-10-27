@@ -5,26 +5,35 @@ import {panelDesign} from '../lib/panel-designs.js';
 
 function review(t) {
   const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6');
+  a.state.settings.evalbarDesign = 'balance';
   a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
   return a;
 }
 
-test('Tabs offers a saved Balance design and switching preserves analysis and layout', async t => {
+test('Tabs offers only Evaluation bar styles and saves without changing analysis or layout', async t => {
   const a = review(t), doc = a.dom.window.document;
-  assert.equal(panelDesign('evalbar', {}), 'balance');
+  await a.call('setSetting', 'evalbarDesign', 'original');
+  assert.equal(panelDesign('evalbar', {}), 'original');
   await a.call('toggleSettings');
   const section = [...doc.querySelectorAll('.set-section')].find(n => n.querySelector('.set-sect-head').textContent === 'Tabs');
   section.querySelector('.set-sect-head').click();
-  assert.deepEqual([...section.querySelectorAll('.lib-dd-opt[data-setting="evalbarDesign"]')].map(n => n.textContent), ['Original', 'Balance']);
+  assert.equal(section.querySelector('[data-setting="evalbarDesign"]'), null);
+  assert.equal(section.querySelector('[data-setting="barStyle"]').getAttribute('aria-label'), 'Evaluation bar');
+  assert.deepEqual([...section.querySelectorAll('.lib-dd-opt[data-setting="barStyle"]')].map(n => n.textContent), ['Gradient', 'Solid', 'Mono', 'Accent']);
   const before = JSON.stringify({evals: a.state.evals, bests: a.state.bests, idx: a.state.idx, layout: a.state.layout});
   a.replace('scheduleReanalyze', () => { throw Error('Design choices must not start analysis'); });
-  for (const value of ['original', 'balance', 'original', 'balance']) {
-    doc.querySelector(`[data-setting="evalbarDesign"][data-value="${value}"]`).click();
+  for (const value of ['classic', 'mono', 'accent', 'gradient']) {
+    doc.querySelector('[data-setting="barStyle"][data-value="'+value+'"]').click();
     await settle(); await a.run('_settingsWriteQueue');
-    assert.equal(a.store.settings.evalbarDesign, value);
-    assert.equal(doc.querySelector('.evalbar').dataset.design, value);
+    assert.equal(a.store.settings.barStyle, value);
+    assert.equal(doc.querySelector('.evalbar').dataset.design, 'original');
     assert.equal(JSON.stringify({evals: a.state.evals, bests: a.state.bests, idx: a.state.idx, layout: a.state.layout}), before);
   }
+  const restored = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
+  restored.replace('resetSettingsForRelease', async () => {});
+  restored.store.settings = {evalbarDesign: 'balance'};
+  await restored.start();
+  assert.equal(restored.store.settings.evalbarDesign, 'original');
 });
 
 test('Balance explains signs and mates, follows flips, and keeps live nodes mounted', t => {

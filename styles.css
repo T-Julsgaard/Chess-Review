@@ -1778,6 +1778,8 @@ button { font-family: inherit; cursor: pointer; }
   transition: color .12s;
 }
 .set-sect-head:hover { color: var(--ink-2); }
+.set-sect-head > span:first-child { white-space: nowrap; text-align: left; }
+.set-sect-head > span:last-child { flex: none; }
 .set-sect-head svg { width: 15px; height: 15px; transform: rotate(-90deg); transition: transform .2s ease; opacity: .8; }
 .set-section.open .set-sect-head svg { transform: rotate(0deg); }
 .set-sect-body { display: flex; flex-direction: column; gap: 12px; padding: 2px 0 12px; }
@@ -2351,8 +2353,10 @@ button { font-family: inherit; cursor: pointer; }
 .coach-thumbnail { display: block; flex: none; width: 28px; height: 32px; object-fit: contain;
   border-radius: 5px; background: var(--panel-2); }
 .coach-dropdown .lib-dd-cur { text-align: left; }
-.coach-dropdown .lib-dd-menu, .set-dropdown .lib-dd-menu { position: static; margin-top: 4px; max-height: min(300px, 40vh);
+.coach-dropdown .lib-dd-menu, .set-dropdown .lib-dd-menu { max-height: min(300px, 40vh);
   overflow-y: auto; overscroll-behavior: contain; }
+.lib-dd-field.open { z-index: 30; }
+.lib-dd-menu.above { top: auto; bottom: calc(100% + 4px); }
 .lib-list { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 10px 14px 16px; display: flex; flex-direction: column; gap: 8px; }
 .lib-empty { color: var(--ink-3); font-size: 13px; line-height: 1.5; text-align: center; padding: 30px 16px; text-wrap: pretty; }
 .lib-card {

@@ -6060,15 +6060,10 @@ async function resetVisualSettings() {
   closeBoardColorPicker();
   delete S.settings.wrongSound; // remove obsolete saved choices from older versions
   await resetSettingKeys(VISUAL_SETTING_KEYS);
-  const setup = UI_SETUPS[baseUiSetup()];
-  if (setup) {
-    Object.assign(S.settings, setup.designs);
-    await writeSettings(setup.designs);
-  }
   S.coach = null;
   _ipSig = null;
   if (S.practice) S.practice.coachTyped = false;
-  await resetLayout();
+  await applyUiSetup('modern');
   applySettings(); buildBoard(); renderEvalBar(); renderGraph(); renderMoves();
   renderCoachAvatar(); renderReview(); renderStats(); renderControls(); renderEngineCurrent();
   renderSettings();
@@ -6128,11 +6123,10 @@ function visualSettings() {
       seg("Setup", "uiSetup", Object.keys(UI_SETUPS), null, value => UI_SETUPS[value].label),
     ),
     section("Tabs",
-      ...PANEL_DESIGNS.filter(design => design.versions.length > 1).flatMap(design => [
-        settingDropdown(design.label, design.setting, design.versions.map(version => [version.id, version.label])),
-        design.panel === "evalbar" ? settingDropdown("Bar style", "barStyle",
-          [["gradient", "Gradient"], ["classic", "Solid"], ["mono", "Mono"], ["accent", "Accent"]]) : null,
-      ]),
+      ...PANEL_DESIGNS.filter(design => design.panel === "evalbar" || design.versions.length > 1).map(design =>
+        design.panel === "evalbar" ? settingDropdown("Evaluation bar", "barStyle",
+          [["gradient", "Gradient"], ["classic", "Solid"], ["mono", "Mono"], ["accent", "Accent"]])
+          : settingDropdown(design.label, design.setting, design.versions.map(version => [version.id, version.label]))),
     ),
     section("Theme",
       colorChips("Accent", "accent", accentEntries),
@@ -6146,7 +6140,7 @@ function visualSettings() {
         onChange: (v) => document.documentElement.style.setProperty("--coord-size", v + "px"),
       }),
     ),
-    section("Best-move/Show threat arrow",
+    section("Best-move/Threat arrow",
       toggleRow("Show best-move arrow", "bestArrow"),
       arrowColorSetting("Best-move color", "bestArrowColor"),
       toggleRow("Show threat arrow", "showThreat"),
@@ -6200,11 +6194,11 @@ function visualSettings() {
       el("div", { class: "set-fx", "data-sound-event": "runStart" },
         fxSlider("runStart", "volume", "Puzzle intro volume", 0, 100, 1, (v) => v + " %")),
     ),
-    el("button", { class: "set-reset", onclick: resetVisualSettings }, "Reset to default"),
     section("Developer debugger",
       el("button", {class:"set-reset","data-debug":"screen-previews",onclick:openScreenSizePreview}, "Open screen-size preview"),
       el("div", {class:"set-row hint"},el("span",{class:"set-note"},"Preview layouts at different screen sizes. Changes are not saved.")),
     ),
+    el("button", { class: "set-reset", onclick: resetVisualSettings }, "Reset all visual settings"),
   );
 }
 function arrowColorSetting(label, key) {
@@ -6303,7 +6297,7 @@ function motorSettings() {
       el("div", { class: "set-row hint" },
         el("span", { class: "set-note" }, "Engine build & search options. Changes here re-analyze the game.")),
     ),
-    el("button", { class: "set-reset", onclick: resetEngineSettings }, "Reset to default"),
+    el("button", { class: "set-reset", onclick: resetEngineSettings }, "Reset all engine settings"),
   );
 }
 function badgeLabelPicker() {
@@ -7339,6 +7333,18 @@ function closeDropdowns() {
     field.querySelector(".lib-dd-btn").setAttribute("aria-expanded", "false");
   });
 }
+function positionSettingsDropdown(field) {
+  const settings = field.closest('#settings');
+  if (!settings) return;
+  const menu = field.querySelector('.lib-dd-menu');
+  menu.classList.remove('above'); menu.style.maxHeight = '';
+  const bounds = settings.getBoundingClientRect(), rect = field.getBoundingClientRect();
+  const below = Math.min(bounds.bottom, window.innerHeight) - rect.bottom - 8;
+  const above = rect.top - Math.max(0, bounds.top) - 8;
+  const flip = below < menu.getBoundingClientRect().height && above > below;
+  menu.classList.toggle('above', flip);
+  menu.style.maxHeight = Math.max(40, Math.min(300, window.innerHeight * .4, flip ? above : below)) + 'px';
+}
 function ddField(value, options, onChange, renderOption = (_value, label) => label) {
   const [currentValue, currentLabel] = options.find(([v]) => v === value) || options[0] || ["", "—"];
   const menu = el("div", { class: "lib-dd-menu" },
@@ -7351,6 +7357,7 @@ function ddField(value, options, onChange, renderOption = (_value, label) => lab
       closeDropdowns();
       field.classList.toggle("open", willOpen);
       e.currentTarget.setAttribute("aria-expanded", String(willOpen));
+      if (willOpen) positionSettingsDropdown(field);
     } }, el("span", { class: "lib-dd-cur" }, renderOption(currentValue, currentLabel)), el("span", { class: "lib-dd-chev", html: ICONS.chevron })),
     menu);
   field.addEventListener("keydown", event => {
@@ -7361,6 +7368,7 @@ function ddField(value, options, onChange, renderOption = (_value, label) => lab
     } else if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
       event.preventDefault(); event.stopPropagation(); closeDropdowns();
       field.classList.add("open"); button.setAttribute("aria-expanded", "true");
+      positionSettingsDropdown(field);
       const index = items.indexOf(document.activeElement);
       const next = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1
         : index < 0 ? Math.max(0, items.findIndex(item => item.classList.contains("sel")))
@@ -7952,6 +7960,9 @@ async function showReadyWorkspace() {
     S.library = Array.isArray(store.library) ? store.library : [];
     S.settings = { ...DEFAULT_SETTINGS, ...(store.settings || {}) };
     const loadedSettings = structuredClone(S.settings);
+    if (!store.settings?.uiSetup && !store.layout && !PANEL_DESIGNS.some(design => store.settings?.[design.setting] != null)) {
+      Object.assign(S.settings, UI_SETUPS.modern.designs, {uiSetup: 'modern', uiSetupBase: 'modern'});
+    }
     if (!store.settings?.nativeSizingVersion) {
       if (S.settings.insightFont === 18) S.settings.insightFont = 16;
       S.settings.nativeSizingVersion = 1;

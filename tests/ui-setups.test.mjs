@@ -7,6 +7,17 @@ import {UI_SETUPS,MODERN_LAYOUT} from '../lib/ui-setups.js';
 
 const supplied = JSON.parse(fs.readFileSync(new URL('./fixtures/modern-panel-layout.json',import.meta.url),'utf8'));
 const near = (a,b) => assert.ok(Math.abs(a-b)<1e-8,`${a} must equal ${b}`);
+test('fresh workspaces default to Modern and retain it after reload', async t => {
+  const a=app(t,{url:'https://extension.test/analysis.html?workspace=blank'});
+  a.replace('resetSettingsForRelease',async()=>{});
+  await a.start();
+  assert.equal(a.state.settings.uiSetup,'modern');
+  for(const [key,value] of Object.entries(UI_SETUPS.modern.designs))assert.equal(a.state.settings[key],value);
+  assert.deepEqual(a.call('layoutForSave'),MODERN_LAYOUT);
+  const b=app(t,{url:'https://extension.test/analysis.html?workspace=blank'});
+  b.replace('resetSettingsForRelease',async()=>{});Object.assign(b.store,structuredClone(a.store));
+  await b.start();assert.equal(b.state.settings.uiSetup,'modern');
+});
 function review(t) {
   const a=app(t);loadGame(a,'1. e4 e5 2. Nf3 Nc6');
   Object.defineProperties(a.dom.window,{innerWidth:{value:1920,configurable:true},innerHeight:{value:919,configurable:true}});
@@ -81,14 +92,17 @@ test('Reset layout restores the active setup after edits and retains independent
   }
 });
 
-test('Visual reset retains the chosen setup and restores its panel design combination',async t=>{
+test('Visual reset always restores Modern designs and layout and preserves engine preferences',async t=>{
   const a=review(t);
-  for(const value of ['modern','old']) {
+  for(const value of ['modern','old','custom']) {
     await a.call('applyUiSetup',value);await a.call('setSetting','accuracyDesign','dials');
+    a.state.settings.engineDepth=18;
     await a.call('setSetting','movesDesign','zoomed');await a.call('resetVisualSettings');
-    assert.equal(a.state.settings.uiSetup,value);assert.equal(a.store.settings.uiSetup,value);
-    for(const [key,design]of Object.entries(UI_SETUPS[value].designs))assert.equal(a.store.settings[key],design);
-    assert.equal(a.state.layoutMode,UI_SETUPS[value].layoutMode);
+    assert.equal(a.state.settings.uiSetup,'modern');assert.equal(a.store.settings.uiSetup,'modern');
+    assert.equal(a.state.settings.uiSetupBase,'modern');
+    for(const [key,design]of Object.entries(UI_SETUPS.modern.designs))assert.equal(a.store.settings[key],design);
+    assert.deepEqual(a.call('layoutForSave'),MODERN_LAYOUT);
+    assert.equal(a.state.layoutMode,'custom');assert.equal(a.state.settings.engineDepth,18);
   }
 });
 

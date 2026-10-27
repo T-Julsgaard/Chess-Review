@@ -15,7 +15,7 @@ test('Visual > Tabs offers compact dropdowns for Accuracy and Move list designs'
   const section = () => [...doc.querySelectorAll('.set-section')].find(node => node.querySelector('.set-sect-head').textContent === 'Tabs');
   section().querySelector('.set-sect-head').click();
   assert.equal(section().querySelector('.set-seg'), null);
-  assert.equal(section().querySelectorAll('.set-dropdown').length, 7);
+  assert.equal(section().querySelectorAll('.set-dropdown').length, 6);
   const labels = [...section().querySelectorAll('.set-lbl')].map(node => node.textContent);
   for (const label of ['Accuracy overview', 'Accuracy move quality']) assert.ok(labels.includes(label), label);
   assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="accuracyDesign"]')].map(node => node.textContent), ['Original', 'Game phases']);
@@ -197,7 +197,7 @@ test('saved choices survive startup and Visual reset restores the latest designs
   assert.equal(doc.querySelector('.moves-panel').dataset.design, 'original');
   await a.call('resetVisualSettings');
   assert.equal(a.store.settings.accuracyDesign, 'phases-modern');
-  assert.equal(a.store.settings.movesDesign, 'full');
+  assert.equal(a.store.settings.movesDesign, 'zoom20');
   assert.equal(doc.querySelector('.accuracy-panel').dataset.design, 'phases-modern');
   assert.equal(doc.querySelector('.moves-foot,.moves-head'), null);
 });

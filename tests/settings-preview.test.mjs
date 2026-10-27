@@ -61,7 +61,7 @@ test('custom accent and arrow buttons open pickers and update their framed swatc
   const accent = section('Theme').querySelector('.set-chip');
   assert.ok(accent.classList.contains('chip-custom'));
   assert.equal(accent.classList.contains('on'), false);
-  for (const [title, key] of [['Theme', 'accentCustom'], ['Best-move/Show threat arrow', 'bestArrowColor']]) {
+  for (const [title, key] of [['Theme', 'accentCustom'], ['Best-move/Threat arrow', 'bestArrowColor']]) {
     if (title !== 'Theme') open(title);
     const chip = section(title).querySelector('.chip-custom');
     assert.equal(chip.getAttribute('aria-haspopup'), 'dialog');
@@ -108,6 +108,12 @@ test('Visual sections stay concise, remove the purple accent and offer Porcelain
   assert.equal(section('Interface presets').querySelector('.set-note'), null);
   assert.deepEqual([...section('Interface presets').querySelectorAll('[data-setting="uiSetup"]')].map(n => n.textContent), ['Old', 'Modern', 'Custom']);
   assert.equal([...doc.querySelectorAll('.set-sect-head')].at(-1).querySelector('span').textContent, 'Developer debugger');
+  const visualReset = doc.querySelector('#settings > div:last-child > button:last-child');
+  assert.equal(visualReset.textContent, 'Reset all visual settings');
+  assert.equal(visualReset.previousElementSibling, section('Developer debugger'));
+  [...doc.querySelectorAll('.set-tab')].find(n => n.textContent === 'Engine').click();
+  assert.equal(doc.querySelector('#settings > div:last-child > button:last-child').textContent, 'Reset all engine settings');
+  [...doc.querySelectorAll('.set-tab')].find(n => n.textContent === 'Visual').click();
   assert.equal(section('Theme').querySelectorAll('.set-chip').length, 4);
   assert.equal(section('Theme').querySelector('[title="#c77edb"]'), null);
   open('Board & Pieces');
@@ -129,8 +135,8 @@ test('threat color previews, saves and resets independently of best-move and use
   a.state.settings.showThreat = true;
   a.replace('getHelperEngine', async () => ({stop() {}, analyse: async () => ({bestmove: 'e7e5'})}));
   await a.call('renderThreatArrow');
-  open('Best-move/Show threat arrow');
-  const rows = section('Best-move/Show threat arrow').querySelectorAll('.set-row');
+  open('Best-move/Threat arrow');
+  const rows = section('Best-move/Threat arrow').querySelectorAll('.set-row');
   assert.equal(rows[0].querySelector('.set-lbl').textContent, 'Show best-move arrow');
   assert.equal(rows[2].querySelector('.set-lbl').textContent, 'Show threat arrow');
   const bestColor = a.state.settings.bestArrowColor;

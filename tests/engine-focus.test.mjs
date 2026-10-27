@@ -105,7 +105,7 @@ test(`${design} auto-play can start and stop, and its saved choice survives star
   assert.match(b.dom.window.document.querySelector('.engine-focus').textContent, /Load a game/);
   assert.equal(b.dom.window.document.querySelector('.engine-focus-play').disabled, true);
   await b.call('resetVisualSettings');
-  assert.equal(b.store.settings.engineDesign, 'original');
-  assert.equal(b.dom.window.document.querySelector('.engine-focus'), null);
+  assert.equal(b.store.settings.engineDesign, 'minimal');
+  assert.ok(b.dom.window.document.querySelector('.engine-minimal'));
 });
 }
