@@ -12,7 +12,8 @@
       --ink:#f3f1ea;--ink-2:#b8b4a8;--ink-3:#969183;--accent:#7fb45f;
     }
     *{box-sizing:border-box} [hidden]{display:none!important}
-    html,body{margin:0}
+    html,body{margin:0;scrollbar-width:none}
+    html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}
     body{width:360px;max-width:100%;padding:18px;background:radial-gradient(110% 80% at 0 0,#282a21,var(--bg) 75%);color:var(--ink);font:13px/1.45 var(--font-ui);-webkit-font-smoothing:antialiased}
     button,input,textarea{font:inherit} button{cursor:pointer;color:inherit}
     button:disabled{opacity:.5;cursor:default}
