@@ -32,11 +32,13 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
       const button=document.querySelector('.learn-entry-button').getBoundingClientRect();
       const path=document.querySelectorAll('.learning-announcement-arrow')[1];
       const start=path.getPointAtLength(0),end=path.getPointAtLength(path.getTotalLength());
+      const above=button.bottom<=box.top;
       return {start:{x:start.x,y:start.y},end:{x:end.x,y:end.y},
-        from:{x:box.left+box.width/2,y:box.bottom+5},to:{x:button.right+2,y:button.top+button.height/2}};
+        from:{x:above?Math.max(box.left+24,Math.min(box.right-24,button.left+button.width/2)):box.left+box.width/2,y:above?box.top-5:box.bottom+5},
+        to:{x:above?button.left+button.width/2:button.right+2,y:above?button.bottom+9:button.top+button.height/2}};
     })()`);
     for (const [point,expected] of [[anchors.start,anchors.from],[anchors.end,anchors.to]])
-      assert.ok(Math.hypot(point.x-expected.x,point.y-expected.y)<1, 'Connect the bottom center to the middle of the button side: '+JSON.stringify(anchors));
+      assert.ok(Math.hypot(point.x-expected.x,point.y-expected.y)<1, 'Connect the card edge to the puzzle button: '+JSON.stringify(anchors));
   };
   for (const [width, height] of [[1920,1080],[1880,1080],[2000,1080],[1366,900],[960,800],[390,844],[320,640]]) {
     await run('window.scrollTo(0,0)');
@@ -51,7 +53,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     assert.equal(g.headingSize, 21); assert.equal(g.copySize, 13);
     assert.equal(g.developerSize, 12);
     assert.ok(g.right - g.left <= 281, 'Keep the developer note compact: ' + JSON.stringify(g));
-    if (width >= 1880) assert.ok(g.left >= g.panelRight + 15, 'Fit beside Insights and Accuracy: ' + JSON.stringify(g));
+    if (g.width - g.panelRight - 32 >= 220) assert.ok(g.left >= g.panelRight + 15, 'Use the gutter when it has room: ' + JSON.stringify(g));
     assert.equal(g.centered, true, 'Copy and actions should be centered');
     if (width >= 1366) assert.ok(Math.abs(g.top - g.insightTop) < 1, 'Align the note with Insights: ' + JSON.stringify(g));
     assert.equal(g.targets.length, 2);

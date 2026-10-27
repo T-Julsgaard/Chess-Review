@@ -26,7 +26,7 @@ test('claim persists before showing and never repeats without a dismissal, after
   assert.equal(await claimLearningAnnouncement(p), true);
   assert.equal(p.data[seen], true); assert.equal(p.backup.get(seen), 'true');
   assert.equal(await claimLearningAnnouncement(p), false);
-  Object.assign(p.data, {settings: {}, layout: null, 'learning:v1': {}, settingsResetFor030: true});
+  Object.assign(p.data, {settings: {}, layout: null, 'learning:v1': {}, settingsResetFor040: true});
   assert.equal(await claimLearningAnnouncement(p), false);
   p.backup.clear(); // Extension storage alone survives a browser restart.
   assert.equal(await claimLearningAnnouncement(p), false);
@@ -126,6 +126,25 @@ test('opening in a background tab waits for visibility without consuming the ann
   assert.ok(p.document.querySelector('.learning-announcement')); controller.dispose();
 });
 
+test('the note moves below a scaled Modern puzzle button in a narrow workspace', async t => {
+  const p = setup(t), win = p.dom.window;
+  Object.defineProperties(win, {innerWidth: {value: 390}, innerHeight: {value: 844}});
+  const rect = (left, top, width, height) => ({left, top, width, height, right: left + width, bottom: top + height});
+  win.HTMLElement.prototype.getBoundingClientRect = function () {
+    if (this.classList.contains('topbar')) return rect(0, 0, 390, 52);
+    if (this.id === 'learningToggle') return rect(144, 8, 100, 34);
+    if (this.classList.contains('learn-entry-button')) return rect(324, 232, 63, 9);
+    if (this.classList.contains('learning-announcement')) return rect(98, parseFloat(this.style.top) || 0, 280, 240);
+    return rect(0, 0, 0, 0);
+  };
+  Object.defineProperty(win.HTMLElement.prototype, 'offsetHeight', {get() {return this.classList.contains('learning-announcement') ? 240 : 0;}});
+  const controller = p.mount(); await controller.ready;
+  const card = p.document.querySelector('.learning-announcement').getBoundingClientRect();
+  assert.ok(card.top >= 257); assert.ok(card.bottom <= win.innerHeight - 16);
+  assert.equal(p.document.querySelectorAll('.learning-announcement-target').length, 2);
+  assert.ok([...p.document.querySelectorAll('.learning-announcement-arrow')].every(path => path.style.display !== 'none'));
+});
+
 test('disposing during an unfinished claim cannot mount a late announcement', async t => {
   const p = setup(t), controller = p.mount(); controller.dispose(); await controller.ready;
   assert.equal(p.data[seen], undefined); assert.equal(p.document.querySelector('.learning-announcement'), null);
@@ -133,7 +152,7 @@ test('disposing during an unfinished claim cannot mount a late announcement', as
 
 test('preview workspaces never consume or display the announcement', async t => {
   const a = app(t, {url: 'https://extension.test/analysis.html?screen-preview=workspace-blank'});
-  a.store.settingsResetFor030 = true;
+  a.store.settingsResetFor040 = true;
   // Preview startup may read bundled data; none of it uses live announcement storage.
   await a.start();
   assert.ok(a.dom.window.document.querySelector('#learningToggle'));
