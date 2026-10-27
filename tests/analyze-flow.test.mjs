@@ -9,7 +9,7 @@ import {app,deferred,settle} from './helpers/app.mjs';
 
 function setup(t, url = 'https://www.chess.com/game/live/12345678') {
   const store = {}, opened = [], listeners = new Set();
-  const tabs = new Map([[1, { id: 1, url }]]);
+  const tabs = new Map([[1, { id: 1, url, index: 1, windowId: 10 }]]);
   const state = { activeId: 1, store, opened, listeners, tabs };
   Object.assign(globalThis.chrome, {
     runtime: { getURL: path => `chrome-extension://test/${path}` },
@@ -42,6 +42,66 @@ test('Chess.com without a content script uses the saved username and URL', async
   assert.equal(s.opened.length, 1);
   assert.equal(s.payload().meta.gameId, '12345678');
   assert.equal(Object.hasOwn(s.payload(), 'theme'), false);
+});
+
+for (const url of ['https://www.chess.com/game/live/12345678', 'https://lichess.org/AAAAAAAA']) {
+  test(`analysis opens immediately to the right of its source: ${url}`, async t => {
+    const s = setup(t, url);
+    await analyzeActiveTab('saved-user');
+    assert.equal(s.opened.length, 1);
+    assert.equal(s.opened[0].index, 2, 'A game in the second tab opens its review in the third');
+    assert.equal(s.opened[0].windowId, 10);
+  });
+
+  test(`analysis follows the original source after tab switches and moves: ${url}`, async t => {
+    const s = setup(t, url), pending = deferred();
+    t.mock.method(chrome.tabs, 'sendMessage', () => pending.promise);
+    const opening = analyzeActiveTab('saved-user');
+    await settle();
+    s.tabs.set(2, {id:2, url:'https://lichess.org/BBBBBBBB', index:0, windowId:20});
+    s.activeId = 2;
+    s.tabs.set(1, {...s.tabs.get(1), index:4, windowId:30});
+    pending.resolve({});
+    await opening;
+    assert.equal(s.opened.length, 1);
+    assert.equal(s.opened[0].index, 5);
+    assert.equal(s.opened[0].windowId, 30);
+  });
+}
+
+test('pasted analysis uses the active chess tab for placement', async t => {
+  const s = setup(t, 'https://lichess.org/AAAAAAAA');
+  await openAnalysisTab({pgn:'1. e4 e5'});
+  assert.equal(s.opened[0].index, 2);
+  assert.equal(s.opened[0].windowId, 10);
+});
+
+for (const fallback of ['unrelated site', 'closed source', 'unavailable position', 'failed lookup']) {
+  test(`analysis keeps default tab placement with ${fallback}`, async t => {
+    const s = setup(t, fallback === 'unrelated site' ? 'https://example.test/' : undefined);
+    if (fallback === 'closed source') s.tabs.delete(1);
+    if (fallback === 'unavailable position') delete s.tabs.get(1).index;
+    if (fallback === 'failed lookup') t.mock.method(chrome.tabs, 'query', async () => {throw Error('No window');});
+    await openAnalysisTab({pgn:'1. e4 e5'}, fallback === 'closed source' ? {sourceTabId:1} : {});
+    assert.equal(s.opened.length, 1);
+    assert.deepEqual(Object.keys(s.opened[0]), ['url']);
+  });
+}
+
+test('a rejected adjacent launch retries default placement with the same game handoff', async t => {
+  const s = setup(t), attempts = [];
+  t.mock.method(chrome.tabs, 'create', async properties => {
+    attempts.push(properties);
+    if (properties.index != null) throw Error('Source window closed');
+    return {id:99};
+  });
+  const tab = await openAnalysisTab({pgn:'1. e4 e5'}, {sourceTabId:1});
+  assert.equal(tab.id, 99);
+  assert.equal(attempts.length, 2);
+  assert.deepEqual(attempts[0], {url:attempts[1].url, index:2, windowId:10});
+  assert.deepEqual(Object.keys(attempts[1]), ['url']);
+  assert.equal(Object.keys(s.store).filter(key => key.startsWith('job:')).length, 1);
+  assert.equal(s.payload().pgn, '1. e4 e5');
 });
 
 for (const url of ['https://www.chess.com/game/live/12345678', 'https://lichess.org/AAAAAAAA']) {
@@ -170,6 +230,17 @@ test('canceling tab creation closes only that operation\'s late tab',async t=>{
   const opening=openAnalysisTab({pgn:'1. e4'},{signal:request.signal});await settle();request.cancel();
   await assert.rejects(opening,error=>error.code==='IMPORT_CANCELLED');pending.resolve({id:99});await settle();
   assert.deepEqual(removed,[99]);assert.equal(s.payload(),undefined);
+});
+
+test('canceling a source lookup cannot open a late analysis or fallback tab', async t => {
+  const s = setup(t), pending = deferred(), request = createImportRequest();
+  t.after(() => request.dispose());
+  t.mock.method(chrome.tabs, 'get', () => pending.promise);
+  const opening = openAnalysisTab({pgn:'1. e4'}, {signal:request.signal, sourceTabId:1});
+  await settle();request.cancel();
+  await assert.rejects(opening, error => error.code === 'IMPORT_CANCELLED');
+  pending.resolve(s.tabs.get(1));await settle();
+  assert.equal(s.opened.length, 0);assert.equal(s.payload(), undefined);
 });
 
 test('blank workspace opens an extension tab without writing a game job',async t=>{

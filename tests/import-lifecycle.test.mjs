@@ -50,7 +50,7 @@ test('background joins same-game requests, cancels replaced games, and acknowled
     browserAPI:{runtime:{onInstalled:{addListener(){}},onMessage:{addListener(fn){listener=fn;}}},commands:{onCommand:{addListener(){}}},storage:{local:{async get(){return {};},async set(value){errors.push(value);}}}},
     resetSettingsForRelease:async()=>{},reloadActiveAndAnalyze:async()=>{},
     analyzeActiveTab:(_user,tab,{signal})=>{const work=deferred();calls.push({tab,signal,work});return waitImport(work.promise,signal);},
-    openAnalysisTab:payload=>{const work=deferred();shares.push({payload,work});return work.promise;},
+    openAnalysisTab:(payload,options)=>{const work=deferred();shares.push({payload,options,work});return work.promise;},
   });
   vm.runInContext(fs.readFileSync(new URL('../background.js',import.meta.url),'utf8').replace(/^import .*;\r?\n/gm,''),context);
   const send=message=>new Promise(resolve=>assert.equal(listener(message,{tab:{id:7}},resolve),true));
@@ -58,5 +58,6 @@ test('background joins same-game requests, cancels replaced games, and acknowled
   const c=send({type:'freeGameReview',gameKey:'B'});await settle();assert.equal(calls.length,2);assert.equal(calls[0].signal.aborted,true);assert.equal((await a).ok,false);assert.equal((await b).ok,false);
   calls[1].work.resolve();assert.equal((await c).ok,true);assert.equal(errors.length,0);
   let acknowledged=false;const share=send({type:'openShared',payload:{pgn:'1. e4'}}).then(value=>{acknowledged=true;return value;});await settle();assert.equal(acknowledged,false);
+  assert.equal(shares[0].options.sourceTabId,7);
   shares[0].work.resolve();assert.equal((await share).ok,true);
 });

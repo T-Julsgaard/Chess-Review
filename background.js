@@ -36,7 +36,7 @@ browserAPI.runtime.onInstalled.addListener(details =>
 // "Free game review" button injected into the chess.com game-over modal → same flow as the popup.
 browserAPI.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg && msg.type === "openShared" && msg.payload && msg.payload.pgn) {
-    openAnalysisTab(msg.payload).then(() => sendResponse({ok:true}), error => {
+    openAnalysisTab(msg.payload, {sourceTabId:sender.tab?.id}).then(() => sendResponse({ok:true}), error => {
       stashError(error);sendResponse({ok:false,error:error.message});
     });
     return true;
