@@ -37,7 +37,7 @@ test('line controls add up to three candidates, remove back to one, and save wit
   assert.equal(doc.querySelector('.engine-minimal-remove'),null);
 });
 
-test('Minimal caps saved four-line preferences and searches at three; Focus still supports four', async t => {
+test('all engine designs cap saved four-line preferences and searches at three', async t => {
   const a=app(t),doc=a.dom.window.document;
   loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');
   Object.assign(a.state.settings,{engineDesign:'minimal',engineLines:4});
@@ -55,7 +55,7 @@ test('Minimal caps saved four-line preferences and searches at three; Focus stil
   assert.equal(a.state.settings.engineLines,3);
   a.state.settings.engineDesign='focus';a.state.settings.engineLines=4;
   a.call('renderEngine',[line,line,line,line]);
-  assert.equal(doc.querySelectorAll('.engine-focus-candidate').length,4);
+  assert.equal(doc.querySelectorAll('.engine-focus-candidate').length,3);
 });
 
 test('Add line cannot reveal answers during practice or act on loading, final and error states', t => {

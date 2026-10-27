@@ -388,9 +388,16 @@ const ENGINE_FALLBACK_ORDER = ["nnue", "sf19lite"];
 function migrateEngineSettings(settings) {
   if (settings.enginePath === "sf19") settings.enginePath = "sf19lite";
   if (!Object.hasOwn(ENGINE_BUILDS, settings.enginePath)) settings.enginePath = DEFAULT_SETTINGS.enginePath;
+  for (const key of ['engineLines', 'classifyLines']) {
+    if (settings[key] != null) settings[key] = normalizeEngineLineCount(settings[key]);
+  }
 }
 // The engine panel shows up to this many candidate lines (searched on demand for the viewed position).
-const ENGINE_MAX_LINES = 4;
+const ENGINE_MAX_LINES = 3;
+function normalizeEngineLineCount(value) {
+  const count = Number(value);
+  return Number.isFinite(count) ? Math.max(1, Math.min(ENGINE_MAX_LINES, Math.trunc(count))) : 1;
+}
 // Best-move arrow color — a muted hint green.
 const ARROW_COLOR = "#85ae4a";
 // User arrow color — yellow/orange.
@@ -5208,10 +5215,10 @@ function renderMoves() {
 
 /* ---------------- Engine lines ---------------- */
 function enginePanelLineLimit() {
-  return panelDesign('engine', S.settings) === 'minimal' ? 3 : ENGINE_MAX_LINES;
+  return ENGINE_MAX_LINES;
 }
 function enginePanelLineCount() {
-  return Math.max(1, Math.min(enginePanelLineLimit(), S.settings.engineLines));
+  return normalizeEngineLineCount(S.settings.engineLines);
 }
 // Focus and Minimal share variation controls; Minimal moves playback into the header.
 function focusedEnginePanel(content, {locked = false, playable = false} = {}) {
@@ -6130,7 +6137,7 @@ function fxSlider(ev, field, label, min, max, step, fmt) {
 function motorSettings() {
   return el("div", {},
     section("Search",
-      engineSeg("Analysis lines", "classifyLines", [1, 2, 3, 4], null, ENGINE_INFO.classifyLines),
+      engineSeg("Analysis lines", "classifyLines", [1, 2, 3], null, ENGINE_INFO.classifyLines),
       engineSlider("Depth", "engineDepth", 8, 22, 1, { info: ENGINE_INFO.engineDepth }),
       engineSlider("Workers", "engineWorkers", 1, 8, 1, { fmt: (v) => v + (v === 1 ? " (single)" : " parallel"), info: ENGINE_INFO.engineWorkers }),
       engineSeg("Panel lines", "engineLines", Array.from({length: enginePanelLineLimit()}, (_, i) => i + 1), null, ENGINE_INFO.engineLines),
@@ -6512,8 +6519,11 @@ function calibrationWarning(title, message, remainLabel, recommended = false) {
   return calibrationWarningPending;
 }
 async function setEngineSetting(key, value) {
-  if (key === 'engineLines') value = Math.max(1, Math.min(enginePanelLineLimit(), value));
-  if (S.settings[key] === value) return;
+  if (key === 'engineLines' || key === 'classifyLines') value = normalizeEngineLineCount(value);
+  const patch = {[key]: value};
+  // Selecting analysis lines also selects the candidates shown in the evaluation panel.
+  if (key === 'classifyLines') patch.engineLines = value;
+  if (Object.entries(patch).every(([name, next]) => S.settings[name] === next)) return;
   if (key === "enginePath" && value === "sf19lite") {
     const proceed = await calibrationWarning("Switch to Stockfish 19 Lite?",
       "Our accuracy and estimated-rating calibration is built primarily around Stockfish 18 NNUE. Stockfish 19 Lite has less validation behind its review scores, so switching may produce less reliable results. We recommend remaining on Stockfish 18 for the most consistent game reviews.", "Remain on Stockfish 18", true);
@@ -6526,14 +6536,14 @@ async function setEngineSetting(key, value) {
   }
   const previous = {pgn:S.pgn, settingsKey:analysisSettingsKey(), bests:S.bests, evals:S.evals,
     engineBuild:S.engineFallbackBuild || S.activeEngineBuild};
-  S.settings[key] = value;
-  await writeSettings({ [key]: value });
+  Object.assign(S.settings, patch);
+  await writeSettings(patch);
   if (key === "engineWorkers") {
     if (S.analyzing) scheduleReanalyze(true);
     if (UI.settings && !UI.settings.hidden) renderSettings();
     return;
   }
-  if (key === 'engineLines') {
+  if (Object.hasOwn(patch, 'engineLines')) {
     // A display-count change must not discard previously calculated candidates or scores.
     stopPanelPrecalculation();
     S.panelToken++; S._panelRequest = null;
@@ -6964,9 +6974,13 @@ function currentGameId() {
   return (S.meta && (S.meta.gameId || S.meta.libraryId)) || ("pgn:" + simpleHash(S.pgn || ""));
 }
 
+function scoringSettingsSnapshot() {
+  return {...S.settings, classifyLines: 1};
+}
 function analysisSettingsKey() {
-  return JSON.stringify(["public-scoring-v4", CALIB?.version, CALIB?.context?.sf19?.candidateVersion, S.settings.ratingMode, S.settings.enginePath, S.settings.engineDepth, S.settings.classifyLines,
-    S.settings.engineHash, S.settings.engineSkill]);
+  const settings = scoringSettingsSnapshot();
+  return JSON.stringify(["public-scoring-v4", CALIB?.version, CALIB?.context?.sf19?.candidateVersion, settings.ratingMode, settings.enginePath, settings.engineDepth, settings.classifyLines,
+    settings.engineHash, settings.engineSkill]);
 }
 
 function reusableSf19Analysis(saved) {
@@ -7421,6 +7435,8 @@ async function startAnalysis({preserveCompleted = false} = {}) {
   S.analyzedSettingsKey = analysisSettingsKey();
   S.analyzedSettings = Object.fromEntries(["enginePath","engineDepth","engineHash","engineSkill","classifyLines"].map(key => [key,S.settings[key]]));
   const gen = ++S.batchGen;
+  // Freeze the scoring protocol for this run. Candidate preferences can change mid-search.
+  const scoringSettings = scoringSettingsSnapshot();
   S.engineFallbackBuild = null;
   S.activeEngineBuild = null;
   terminateEngines();
@@ -7451,7 +7467,7 @@ async function startAnalysis({preserveCompleted = false} = {}) {
 
   // Batch analysis defaults to MultiPV=1. Panel candidates are precomputed separately
   // after statistics are ready, preserving the calibrated scoring protocol.
-  const multipv = Math.max(1, Math.min(ENGINE_MAX_LINES, S.settings.classifyLines || 1));
+  const multipv = scoringSettings.classifyLines;
   S.analyzedSettingsKey = analysisSettingsKey();
   S.analyzedMultipv = multipv; // remember how many lines this run computed (for setEngineSetting)
   const nWorkers = engineWorkerCount(S.settings.engineWorkers, S.total + 1);
@@ -7505,8 +7521,8 @@ async function startAnalysis({preserveCompleted = false} = {}) {
       const res = terminal ? { score: terminal, bestmove: null, pv: "", lines: [] }
         : await analyseCalibratedPosition(eng, {fen: S.positions[i].fen, history: searchHistory(S.positions, i),
           played: i < S.total ? S.positions[i + 1].from + S.positions[i + 1].to + (S.positions[i + 1].promotion || "") : null,
-          settings: S.settings, calibration: CALIB,
-          needMovesOnly: S.settings.ratingMode === "moves" || !Number(S.players.w?.rating) || !Number(S.players.b?.rating),
+          settings: scoringSettings, calibration: CALIB,
+          needMovesOnly: scoringSettings.ratingMode === "moves" || !Number(S.players.w?.rating) || !Number(S.players.b?.rating),
           onProgress: preview => {
           if (gen !== S.batchGen) return;
           S.searchPreviews[i] = preview;
@@ -7812,7 +7828,7 @@ async function showReadyWorkspace() {
       if ((store.settings?.engineDepth ?? 12) <= 12) S.settings.engineDepth = Math.max(S.settings.engineDepth, 16);
       S.settings.depthBumped = true;
     }
-    // The 5-line option was removed — clamp any stored value to the new max.
+    // Retain older saved preferences within the current three-line limit.
     if (S.settings.engineLines > ENGINE_MAX_LINES) S.settings.engineLines = ENGINE_MAX_LINES;
     // Existing edited presets become Custom without changing their designs or saved boxes.
     const savedLayout = store.layoutVersion === LAYOUT_VERSION && store.layout;

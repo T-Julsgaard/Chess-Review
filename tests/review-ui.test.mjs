@@ -58,7 +58,7 @@ test('engine panel does not reuse lines from the same FEN reached through differ
 test('engine loading, ready and terminal states reserve identical candidate space above Stop', t => {
   const a = board(t), doc = a.dom.window.document;
   a.state.bestWalking = true;
-  for (let count = 1; count <= 4; count++) {
+  for (let count = 1; count <= 3; count++) {
     a.state.settings.engineLines = count;
     for (const lines of [null, Array.from({length: count}, () => ({score: {cp: 12}, pv: '', depth: 16})), []]) {
       a.state._lastEngineLines = null; a.call('renderEngine', lines);
