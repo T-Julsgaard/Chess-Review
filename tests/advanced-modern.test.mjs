@@ -9,20 +9,22 @@ function review(t) {
   return a;
 }
 
-test('Modern Advanced shares the overview header and provides eighteen larger comparisons without meters or hover explanations', t => {
+test('Modern Advanced shares the overview header and provides thirteen comparisons without cut stats, meters or hover explanations', t => {
   const a = review(t), doc = a.dom.window.document;
   const header = doc.querySelector('.acc-players').outerHTML;
   const layout = JSON.stringify(a.state.layout);
   a.call('setAccuracyPage', 2);
   assert.equal(doc.querySelector('.acc-players').outerHTML, header);
   assert.ok(doc.querySelector('.acc-page-advanced'));
-  assert.equal(doc.querySelectorAll('.advanced-row').length, 18);
+  assert.equal(doc.querySelectorAll('.advanced-row').length, 13);
+  assert.deepEqual([...doc.querySelectorAll('.advanced-group-label')].map(n => n.textContent), ['Decision quality', 'On the clock']);
+  assert.equal(doc.querySelector('[data-metric=finish],[data-metric=active-piece],[data-metric=castling],[data-metric=captures],[data-metric=checks]'), null);
   assert.ok([...doc.querySelectorAll('.advanced-pair')].every(n => n.children.length === 2));
   assert.equal(doc.querySelectorAll('.advanced-meter,[data-metric=comeback],.advanced-report [title]').length, 0);
-  assert.equal(doc.querySelectorAll('.advanced-info').length, 18);
+  assert.equal(doc.querySelectorAll('.advanced-info').length, 13);
   assert.equal(doc.querySelectorAll('.advanced-explainer:not([hidden])').length, 0);
   assert.equal(JSON.stringify(a.state.layout), layout);
-  assert.match(doc.querySelector('[data-metric=clock]').textContent, /Clock data needed/);
+  assert.equal(doc.querySelector('[data-metric=clock] .advanced-detail'), null);
   assert.equal(doc.querySelector('[data-metric=best-five] .acc-stat-value').textContent, '—');
 });
 
@@ -39,6 +41,7 @@ test('Modern streak and loss links use their own player evidence and remain keyb
   streaks[1].click(); assert.equal(ply, 2);
   doc.querySelector('[data-metric=largest] button.advanced-value').click(); assert.equal(ply, 3);
   assert.equal(doc.querySelector('[data-metric=clock] .acc-stat-value').textContent, '75%');
+  assert.equal(doc.querySelector('[data-metric=clock] .advanced-detail'), null);
   a.state.meSide = 'b'; a.call('renderStats');
   assert.equal(doc.querySelector('[data-metric=clock] .acc-stat-value').textContent, '25%');
   assert.match(doc.querySelector('[data-metric=clock] .advanced-value').getAttribute('aria-label'), /Black/);

@@ -26,20 +26,24 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     await run("document.querySelector('#accuracy-tab-2').click()");
     assert.deepEqual(await header(),overviewHeader,'Advanced header matches overview at '+width+'x'+height);
     const fit = await run("(()=>{const b=document.querySelector('.acc-page'),p=document.querySelector('.accuracy-panel');return {width:innerWidth,height:innerHeight,body:b.clientHeight,content:b.scrollHeight,overflow:b.scrollWidth-b.clientWidth,pageOverflow:document.documentElement.scrollWidth-innerWidth,rows:p.querySelectorAll('.advanced-row').length,infos:p.querySelectorAll('.advanced-info').length,hover:p.querySelectorAll('[title]').length,meters:p.querySelectorAll('.advanced-meter').length,font:getComputedStyle(p.querySelector('.acc-stat-value')).fontSize,panel:p.getBoundingClientRect().toJSON()}})()");
-    assert.equal(fit.rows,18); assert.equal(fit.infos,18); assert.equal(fit.hover,0); assert.equal(fit.meters,0);
+    assert.equal(fit.rows,13); assert.equal(fit.infos,13); assert.equal(fit.hover,0); assert.equal(fit.meters,0);
     assert.ok(fit.overflow<=1&&fit.pageOverflow<=1,JSON.stringify(fit));
     assert.ok(fit.content>fit.body+500,'Advanced is generously spaced and scrollable');
     assert.equal(fit.font,'29px');
+    const alignment = await run("(()=>{const rows=[...document.querySelectorAll('.advanced-row')];return {rows:rows.map(row=>{const r=row.getBoundingClientRect(),i=row.querySelector('.advanced-info').getBoundingClientRect(),label=row.querySelector('.advanced-label').getBoundingClientRect(),text=row.querySelector('.advanced-label>span').getBoundingClientRect();return {inset:r.right-i.right,top:i.top-label.top,titleOffset:(text.left+text.right-r.left-r.right)/2}}),headings:[...document.querySelectorAll('.advanced-group-label')].map(n=>getComputedStyle(n).textAlign)}})()");
+    assert.ok(alignment.rows.every(r=>Math.abs(r.inset-alignment.rows[0].inset)<.1&&Math.abs(r.top)<.1&&Math.abs(r.titleOffset)<.1),'Info icons share a fixed top-right position and titles stay centered: '+JSON.stringify(alignment));
+    assert.ok(alignment.headings.every(value=>value==='center'));
+
     await shot('modern-advanced-'+width+'x'+height);
     await run("document.querySelector('.acc-page').scrollTop=10000"); await sleep(100);
     assert.deepEqual(await header(),overviewHeader,'Player names stay anchored while scrolling');
-    assert.equal(await run("(()=>{const row=document.querySelector('[data-metric=active-piece]').getBoundingClientRect(),body=document.querySelector('.acc-page').getBoundingClientRect();return row.bottom<=body.bottom+1&&row.top>=body.top})()"),true,'Last metric is reachable');
+    assert.equal(await run("(()=>{const row=document.querySelector('[data-metric=think-longest]').getBoundingClientRect(),body=document.querySelector('.acc-page').getBoundingClientRect();return row.bottom<=body.bottom+1&&row.top>=body.top})()"),true,'Last metric is reachable');
     await shot('modern-advanced-bottom-'+width+'x'+height);
     assert.equal(await run("import('./analysis.js').then(m=>JSON.stringify({layout:m.S.layout,stats:m.S.gameStats,idx:m.S.idx}))"),before);
     evidence.push(fit);
   }
   await resize(1920,919);
-  assert.match(await run("document.querySelector('[data-metric=clock] .advanced-detail').textContent"),/checkpoints/);
+  assert.equal(await run("document.querySelector('[data-metric=clock] .advanced-detail')===null"),true);
   await call('Page.bringToFront',{},review.sessionId);
   await call('Emulation.setFocusEmulationEnabled',{enabled:true},review.sessionId);
   // Native keyboard activation opens a plain-language explanation.
@@ -75,13 +79,13 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await run("document.documentElement.dataset.theme='dark'");
   // Both Modern overview variants share this Advanced report.
   await run("import('./analysis.js').then(m=>{m.S.settings.accuracyDesign='phases-modern-v2';m.renderStats()})");
-  assert.equal(await run("document.querySelectorAll('.advanced-row').length"),18);
+  assert.equal(await run("document.querySelectorAll('.advanced-row').length"),13);
   await call('Page.reload',{},review.sessionId);
   await waitFor(review,"document.querySelector('.accuracy-phase-modern')&&import('./analysis.js').then(m=>!m.S.analyzing)",'Saved review');
   await waitFor(review,"!document.querySelector('#startup')&&!document.querySelector('[data-revealing]')",'Saved reveal');
   await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=false;m.setAccuracyPage(2)})");
-  assert.match(await run("document.querySelector('[data-metric=clock] .advanced-detail').textContent"),/checkpoints/);
+  assert.equal(await run("document.querySelector('[data-metric=clock] .advanced-detail')===null"),true);
   assert.equal(await run("document.querySelectorAll('.advanced-explainer:not([hidden])').length"),0);
   await fs.writeFile(path.join(out,'modern-advanced.json'),JSON.stringify(evidence,null,2));
-  console.log('Modern Advanced passed eight viewports, anchored names, eighteen scrollable stats, click-only explanations, real wheel/keyboard input and cached reload. Screenshots: '+out);
+  console.log('Modern Advanced passed eight viewports, anchored names, thirteen scrollable stats, click-only explanations, real wheel/keyboard input and cached reload. Screenshots: '+out);
 }

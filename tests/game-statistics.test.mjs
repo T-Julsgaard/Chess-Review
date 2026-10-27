@@ -173,20 +173,4 @@ test('best five-decision stretch keeps the earliest tie and uses the engine’s 
   assert.equal(stats.w.insights.bestStretch.startPly, 1);
   assert.equal(stats.w.insights.bestStretch.endPly, 9);
   assert.equal(stats.w.insights.bestStretch.accuracy, sf19GameAccuracy(moves.slice(0, 5)));
-  assert.equal(stats.w.insights.lastTen.count, 6);
-});
-
-test('playing-style counts include checking captures and castling as a king move without needing engine evidence', () => {
-  const positions = [{fen: opening},
-    {fen: middle, color: 'w', san: 'Nxd5+', captured: 'p'}, {fen: middle, color: 'b', san: 'O-O'},
-    {fen: middle, color: 'w', san: 'e8=Q#'}, {fen: middle, color: 'b', san: 'Kf8'},
-    {fen: middle, color: 'w', san: 'Ng4'}, {fen: middle, color: 'b', san: 'Rxe8', captured: 'q'}];
-  const stats = gameStatistics(positions, [], null);
-  assert.equal(stats.w.activity.checks, 2);
-  assert.equal(stats.w.activity.captures, 1);
-  assert.deepEqual(stats.w.activity.activePiece, {piece: 'N', moves: 2});
-  assert.equal(stats.w.activity.castled, null);
-  assert.equal(stats.b.activity.castled, 2);
-  assert.deepEqual(stats.b.activity.activePiece, {piece: 'K', moves: 2});
-  assert.equal('comeback' in stats.w, false);
 });

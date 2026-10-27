@@ -4514,14 +4514,13 @@ function renderModernAdvanced(sides, busy) {
     row('balanced', 'Accuracy in balanced positions', 'How accurately you played when the engine’s evaluation before your move was less than one pawn in either direction. A useful look at your decisions when neither side had a clear advantage. Mate scores and forced replies are left out.', sampleCells('balanced')),
     row('defending', 'Accuracy while defending', 'How accurately you played when you started your turn at least one pawn behind in the engine’s evaluation. It shows the quality of your resistance, even if you eventually lost. Mate scores and forced replies are left out.', sampleCells('defending')),
     row('winning', 'Accuracy while ahead', 'How accurately you played when you started your turn at least one pawn ahead in the engine’s evaluation. It helps you see how well you handled an advantage. Mate scores and forced replies are left out.', sampleCells('winning')),
-    row('finish', 'Final ten decisions', 'Your accuracy over your last ten non-forced decisions. Compare it with your overall accuracy to see how strongly you finished. For shorter games, all available decisions are used; the count appears below.', sampleCells('lastTen')),
   ]);
   group('On the clock', [
-    row('clock', 'Clock advantage', 'How often you had more time left after both players had moved. For example, 70% means you were ahead at 7 of 10 recorded checkpoints. Ties count for neither player; missing clock pairs are skipped. The count below shows the available data.', stats.map((stat, i) => {
+    row('clock', 'Clock advantage', 'How often you had more time left than your opponent. We compare after each full move: one turn by each player. For example, 70% means you were ahead after 7 of 10 compared moves. Ties count for neither player; moves with missing clock data are skipped.', stats.map((stat, i) => {
       const clock = stat?.clock?.advantage;
-      return cell(i, percent(clock?.percent), {detail: clock ? clock.ahead + '/' + clock.samples + ' checkpoints · ' + clock.samples + '/' + clock.total + ' recorded' : 'Clock data needed'});
+      return cell(i, percent(clock?.percent));
     })),
-    row('clock-lead', 'Biggest clock lead', 'The most extra time you had compared with your opponent at any recorded checkpoint after both players had moved. Select a value to see the position. Zero means you were never ahead at those checkpoints.', stats.map((stat, i) => {
+    row('clock-lead', 'Biggest clock lead', 'The most extra time you had compared with your opponent after any full move, once both players had moved. Select a value to see the position. Zero means you were never ahead at those points.', stats.map((stat, i) => {
       const lead = stat?.clock?.largestLead;
       return cell(i, duration(lead?.seconds), {detail: lead?.seconds > 0 ? moveName(lead.ply) + ' ↗' : lead ? 'Never ahead' : 'Clock data needed', jump: lead?.seconds > 0 ? lead.ply : null});
     })),
@@ -4530,18 +4529,6 @@ function renderModernAdvanced(sides, busy) {
     row('think-longest', 'Longest think', 'The most time you spent on a single recorded move, with any increment removed. Select the value to revisit the decision that made you pause.', stats.map((stat, i) => {
       const think = stat?.clock?.longestThink;
       return cell(i, duration(think?.seconds), {detail: think ? moveName(think.ply) + ' ↗' : 'Clock data needed', jump: think?.ply});
-    })),
-  ]);
-  group('Your playing style', [
-    row('checks', 'Checks delivered', 'How many of your moves put the opponent’s king in check, including checkmate. This is a description of the game, not a score: a quiet move can be stronger than a check.', stats.map((stat, i) => cell(i, stat?.activity ? String(stat.activity.checks) : null))),
-    row('captures', 'Captures made', 'How many captures you played, including en passant and captures that promote a pawn. A high number can reflect a tactical game or lots of exchanges; it does not automatically mean better play.', stats.map((stat, i) => cell(i, stat?.activity ? String(stat.activity.captures) : null))),
-    row('castling', 'When you castled', 'The move on which you castled. Select it to revisit the position. “Not castled” means no castling move was recorded in this game or excerpt. Delaying castling can be sensible in some positions.', stats.map((stat, i) => {
-      const ply = stat?.activity?.castled;
-      return cell(i, stat?.activity ? ply == null ? '—' : moveName(ply) : null, {detail: ply == null ? 'Not castled' : 'revisit ↗', jump: ply});
-    })),
-    row('active-piece', 'Most-used piece type', 'Which type of piece you moved most: pawns, knights, bishops, rooks, queen or king. All pieces of the same type are grouped together; castling counts as a king move. If types tie, the one used first is shown.', stats.map((stat, i) => {
-      const active = stat?.activity?.activePiece, names = {P: 'Pawns', N: 'Knights', B: 'Bishops', R: 'Rooks', Q: 'Queen', K: 'King'};
-      return cell(i, active ? names[active.piece] : null, {detail: active ? active.moves + ' moves' : 'No moves recorded'});
     })),
   ]);
   return root;

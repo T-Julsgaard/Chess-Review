@@ -127,18 +127,19 @@ not follow an exploratory variation or change the accuracy/rating models.
 
 No eligible sample or incomplete/mixed evidence produces an em dash, not zero.
 
-Modern's Advanced page is a larger, scrollable post-game report with 18
-comparisons in three groups. Its player cards use the overview's exact markup,
-position and typography, and stay pinned while the body scrolls. Navigation
+Modern's Advanced page is a larger, scrollable post-game report with 13
+comparisons in two groups with centered section headings. Its player cards use
+the overview's exact markup, position and typography, and stay pinned while the body scrolls. Navigation
 stays visible. There are no percentage bars, hover explanations or comeback
-meter. Every metric has an **i** button that opens its plain-language explanation
-inside the card. One explanation opens at a time; clicking again or pressing
+meter. Every metric has an **i** button in a fixed top-right position beside the
+title that opens its plain-language explanation inside the card. One explanation
+opens at a time; clicking again or pressing
 Escape closes it. Escape restores focus to the info button. Opening a card
 brings it into view, and changing pages dismisses explanations.
 
 **Decision quality** includes the original three metrics, Longest clean streak,
 Clean decisions, Best five-decision stretch, Accuracy in balanced positions,
-Accuracy while defending, Accuracy while ahead, and Final ten decisions.
+Accuracy while defending, and Accuracy while ahead.
 
 - Clean streak/share use completed classifications rated Good or better,
   including Book. Inaccuracy, Mistake, Miss and Blunder are errors. Forced
@@ -151,8 +152,7 @@ Accuracy while defending, Accuracy while ahead, and Final ten decisions.
 - Balanced/defending/ahead accuracy select eligible decisions by the paired
   root search's mover-relative score before the decision: absolute cp <100,
   cp <=−100, and cp >=100 respectively. Mate scores are omitted from these
-  subsets. Sample counts appear below each accuracy. Final ten uses the last
-  ten eligible decisions, or all available decisions for a shorter game.
+  subsets. Sample counts appear below each accuracy.
 
 **On the clock** includes Clock advantage, Biggest clock lead, Average thinking
 time and Longest think.
@@ -161,8 +161,9 @@ time and Longest think.
   remaining clock was strictly higher. A checkpoint follows each pair of turns,
   including black-to-move excerpts, so both players have moved once. Only pairs
   with both clock tags are compared. Ties enter the denominator but count for
-  neither side. The visible detail includes ahead/sample counts and
-  recorded/possible coverage. This is a share of checkpoints, not an estimate
+  neither side. Only the percentage appears on the card; the clickable
+  explanation describes comparing full moves and skipping missing clock pairs.
+  This is a share of checkpoints, not an estimate
   of elapsed wall-clock seconds. It works without a TimeControl header and
   with staged controls because remaining clocks can be compared directly.
 - Biggest clock lead is the largest positive difference at those checkpoints,
@@ -175,18 +176,12 @@ time and Longest think.
   Unsupported controls show an em dash for thinking times while clock
   comparisons remain available. Longest think links to its original move.
 
-**Your playing style** includes Checks delivered (including mate), Captures made
-(including en passant/promotion captures), When you castled, and Most-used piece
-type. The latter groups pieces by type, treats castling as a king move, and
-breaks ties by first use. These descriptive counts require only the recorded
-mainline, not engine evidence; they make no claim about move quality.
-
 The report uses the original mainline, including cached reviews. It does not
 follow variations or change accuracy, annotations or rating models. The same
 report appears under both Modern overview designs; other designs retain their
 existing Advanced layout. Run
 `node scripts/learning-browser.mjs --working-tree --modern-advanced` for eight
-viewports, pinned header geometry, genuine wheel/keyboard input, all 18
+viewports, pinned header and info-button geometry, genuine wheel/keyboard input, all 13
 explainers, clock data, cached reload and dark/light screenshots.
 
 ## Verification
