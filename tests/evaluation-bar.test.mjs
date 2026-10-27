@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {app, loadGame, branch, settle} from './helpers/app.mjs';
+import {app, loadGame, branch, fakeEngine, settle} from './helpers/app.mjs';
 import {panelDesign} from '../lib/panel-designs.js';
 
 function review(t) {
@@ -63,6 +63,35 @@ test('pending variation search retains the rail but replaces stale score with a 
   assert.equal(bar.querySelector('.eval-balance-score').textContent, '-0.8');
   assert.equal(bar.dataset.pending, 'false');
 });
+
+for (const design of ['original', 'balance']) for (const [winner, pgn, share] of [
+  ['White', '1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qxf7#', '100%'],
+  ['Black', '1. f3 e5 2. g4 Qh4#', '0%'],
+]) {
+  test(`${design}: ${winner}'s checkmate keeps its color when live analysis is reused`, async t => {
+    const a = app(t), S = loadGame(a, pgn);
+    Object.assign(S.settings, {evalbarDesign: design, engineLines: 1});
+    S.bests[S.total] = null; S.evals[S.total] = null;
+    a.call('computeDerived'); a.call('buildUI');
+    const v = branch(a), node = v.positions[v.idx];
+    a.replace('ensureLiveEngine', async () => fakeEngine(() => {
+      throw Error('Checkmate must be evaluated from the board');
+    }));
+    for (let visit = 0; visit < 3; visit++) {
+      await a.call('requestLiveEval');
+      assert.equal(S.liveError, null);
+      assert.equal(node.eval.mate, winner === 'White' ? 1 : -1);
+      for (const flipped of [false, true]) {
+        S.flipped = flipped; a.call('renderEvalBar');
+        const bar = a.dom.window.document.querySelector('.evalbar');
+        assert.equal(bar.querySelector('.white-fill').style.height, share);
+        if (design === 'balance') assert.equal(bar.dataset.favored, winner.toLowerCase());
+      }
+      // Reopening a branch must also recover the correct score from the cache.
+      node.eval = null; node.best = null;
+    }
+  });
+}
 
 test('visibility and animation settings apply to Balance and saved choices restore on startup', async t => {
   const a = review(t), doc = a.dom.window.document;

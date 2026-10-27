@@ -3167,7 +3167,9 @@ function reuseVariationAnalysis(v, idx) {
   const first = cached.lines?.[0];
   if (cached.result || first && (!node.best || cached.lines.length > (node.best.lines?.length || 0))) {
     node.best = cached.result || {score: first.score, bestmove: first.pv.trim().split(/\s+/)[0], lines: cached.lines};
-    node.eval = whiteRel(node.best.score, node.fen);
+    // Cached terminal results already use White's perspective; converting again reverses a White win.
+    const terminal = !node.best.bestmove && variationTerminal(v, idx);
+    node.eval = terminal || whiteRel(node.best.score, node.fen);
   }
   node.analysisLineCount = Math.max(node.analysisLineCount || 0, cached.count);
 }
