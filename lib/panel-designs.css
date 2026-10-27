@@ -204,16 +204,23 @@
 .accuracy-original .acc-bar i { display: block; height: 100%; border-radius: 4px; }
 .accuracy-original .acc-vs { font-size: 11px; color: var(--ink-3); font-weight: 700; letter-spacing: .1em; }
 .stage .accuracy-panel.accuracy-original .qbreak { margin-top: 14px; gap: 7px; }
+.stage .accuracy-panel .acc-page-quality .quality-original .qbreak { display: flex; flex-direction: column; gap: 7px; }
+.stage .accuracy-panel .acc-page-quality .quality-original .qbreak-row { display: grid; grid-template-columns: 30px minmax(0,1fr) 30px;
+  gap: 10px; min-height: 22px; font-size: 12.5px; }
+.stage .accuracy-panel .acc-page-quality .quality-original .qbreak-row .qlabel { width: auto; padding: 0; font-size: 12.5px; }
+.stage .accuracy-panel .acc-page-quality .quality-original .qbreak-row .qsym { width: 22px; height: 22px; flex-basis: 22px; }
+.stage .accuracy-panel .acc-page-quality .quality-original .qbreak-row .ct { font-size: 12.5px; min-height: 0; padding: 0; }
+.quality-original .ct.left { text-align: right; }
 .stage .accuracy-panel.accuracy-original .qbreak-row { grid-template-columns: 30px minmax(0,1fr) 30px; gap: 10px; min-height: 22px; font-size: 12.5px; }
 .stage .accuracy-panel.accuracy-original .qbreak-row .qlabel { width: 132px; transform: translateX(16px); padding: 0; font-size: 12.5px; }
 .stage .accuracy-panel.accuracy-original .qbreak-row .qsym { width: 22px; height: 22px; flex-basis: 22px; }
 .stage .accuracy-panel.accuracy-original .qbreak-row .ct { font-size: 12.5px; min-height: 0; padding: 0; }
 .accuracy-original .qbreak-row .ct.left { text-align: right; }
-.accuracy-original .qbreak-toggle { margin-top: 4px; width: 100%; display: grid; place-items: center;
+:is(.accuracy-original,.quality-original) .qbreak-toggle { margin-top: 4px; width: 100%; display: grid; place-items: center;
   background: none; border: 0; cursor: pointer; color: var(--ink-3); padding: 5px 0; border-radius: 8px; }
-.accuracy-original .qbreak-toggle:hover { color: var(--ink); background: var(--panel-2); }
-.accuracy-original .qbreak-toggle svg { width: 18px; height: 18px; }
-.accuracy-original .qbreak-toggle.open svg { transform: rotate(180deg); }
+:is(.accuracy-original,.quality-original) .qbreak-toggle:hover { color: var(--ink); background: var(--panel-2); }
+:is(.accuracy-original,.quality-original) .qbreak-toggle svg { width: 18px; height: 18px; }
+:is(.accuracy-original,.quality-original) .qbreak-toggle.open svg { transform: rotate(180deg); }
 
 /* The first paged iteration: comparison rows and three named page buttons. */
 .stage .accuracy-panel.accuracy-pages .acc-head { padding: 12px 14px 8px; }

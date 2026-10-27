@@ -107,16 +107,16 @@ const BOARD_THEMES = {
   coral:   ["#f7dfca", "#c8835a"],   // warm terracotta
   green:   ["#e9edcc", "#6f9c54"],
   plum:    ["#e8dfca", "#6d5c79"],   // parchment and smoky aubergine
+  porcelain: ["#f1eee6", "#64849a"], // warm cream and muted blue
 };
 // Display names are separate from persisted keys so existing board preferences keep working.
 const BOARD_THEME_LABEL = { green: "Meadow", walnut: "Hazel", slate: "Mist", ocean: "Harbor",
   ink: "Graphite", maple: "Honeywood", emerald: "Forest", coral: "Terracotta", lavender: "Lavender",
-  patina: "Patina", mulberry: "Mulberry", reed: "Reed", dusk: "Dusk", plum: "Plum" };
+  patina: "Patina", mulberry: "Mulberry", reed: "Reed", dusk: "Dusk", plum: "Plum", porcelain: "Porcelain" };
 const ACCENTS = {
   "#7fb45f": { accent: "#7fb45f", strong: "#6aa14a", ink: "#11210a" },
   "#5a8bef": { accent: "#5a8bef", strong: "#4574db", ink: "#06122e" },
   "#d9a544": { accent: "#d9a544", strong: "#c4902f", ink: "#2a1c05" },
-  "#c77edb": { accent: "#c77edb", strong: "#aa5fc1", ink: "#260d30" },
 };
 // Display names are independent of stored classification keys and scoring rules.
 // Annotation names and colors stay independent of move grades.
@@ -256,6 +256,10 @@ const REMOVED_BOARD_THEMES = {
 };
 function migrateVisualAssetSettings(settings) {
   let changed = false;
+  if (settings.accent === "#c77edb") {
+    settings.accent = "#7fb45f";
+    changed = true;
+  }
   const labelStyle = badgeLabelStyle(settings.badgeTooltip ?? "off");
   if (settings.badgeTooltip !== labelStyle) {
     settings.badgeTooltip = labelStyle;
@@ -342,13 +346,11 @@ const DEFAULT_SETTINGS = {
   },
   // Best-move arrow (the engine's recommendation in the current position)
   bestArrow: true, bestArrowColor: "#85ae4a", arrowOpacity: 0.65, arrowShaft: 0.2, arrowHead: 0.4,
-  // "Show the threat": a yellow arrow with the opponent's best move as if it were their turn.
-  showThreat: false,
+  // The opponent's best move as if it were their turn.
+  showThreat: false, threatArrowColor: "#E89B3C",
   // Move animation (sliding piece on single-step navigation). 1 = slow, 10 = fast.
   moveAnim: true, animSpeed: 7,
   learningTransition: "morph3",
-  // Loading animation while the analysis runs (selectable style).
-  loaderStyle: "wave",
   // Display the selected analysis lines unless the user adds or removes lines in the panel.
   // Extra candidates are searched after scoring or on demand without re-analyzing the game.
   // Default SF18 searches match the published depth16/Hash16 quality model.
@@ -411,8 +413,6 @@ function normalizeEngineLineCount(value) {
 const ARROW_COLOR = "#85ae4a";
 // User arrow color — yellow/orange.
 const USER_ARROW_COLOR = "#E89B3C";
-// Loading style → CSS variant. The keys are shown directly in the settings.
-const LOADERS = { dots: "pulse", bounce: "bounce", spinner: "spin", wave: "wave" };
 // Default placement of the movable modules (free canvas). Saved per user.
 // When LAYOUT_VERSION is bumped, saved layouts are reset to this default once.
 // Responsive placement is the default. Custom layouts start from the current screen.
@@ -1647,7 +1647,7 @@ function buildUI() {
   // Close any open library dropdown when clicking elsewhere.
   document.addEventListener("mousedown", (e) => {
     if (!libRail.contains(e.target)) setLibraryOpen(false);
-    if (!e.target.closest(".lib-dd-field")) document.querySelectorAll(".lib-dd-field.open").forEach((d) => d.classList.remove("open"));
+    if (!e.target.closest(".lib-dd-field")) closeDropdowns();
   });
 
   const saveStatus = el("div", {class:"review-save-status", hidden:true, "aria-live":"polite"});
@@ -1761,16 +1761,14 @@ async function openLearning() {
 }
 
 /* ---------------- Loading indicator ----------------
-   Selectable animation shown in place of the accuracy/elo number while Stockfish
+   Animation shown in place of the accuracy/elo number while Stockfish
    is still analyzing. The color is inherited from the parent (currentColor). */
-function loaderNode(extraClass = "", color = null, style = S.settings.loaderStyle) {
-  const variant = LOADERS[style] || "pulse";
+function loaderNode(extraClass = "", color = null, style = "wave") {
+  const variant = style === "bounce" ? "bounce" : "wave";
   const props = { class: "ld ld-" + variant + (extraClass ? " " + extraClass : "") };
   if (color) props.style = { color };
-  if (variant === "pulse")  return el("span", props, "•••");
   if (variant === "bounce") return el("span", props, el("i"), el("i"), el("i"));
-  if (variant === "wave")   return el("span", props, el("i"), el("i"), el("i"), el("i"));
-  return el("span", props); // spin (pure CSS ring)
+  return el("span", props, el("i"), el("i"), el("i"), el("i"));
 }
 function accuracyPendingValue() {
   const loader = loaderNode('', null, 'bounce');
@@ -2676,7 +2674,7 @@ function threatFen(fen) {
   p[3] = "-"; // en-passant target is no longer valid after a "pass"
   return p.join(" ");
 }
-// "Show the threat": draw the opponent's best move (as if it were their turn) as a yellow arrow.
+// Draw the opponent's best move as if it were their turn.
 let _threatToken = 0;
 async function renderThreatArrow() {
   if (S.helperEngine?.dead) resetHelperEngine();
@@ -2715,7 +2713,9 @@ async function renderThreatArrow() {
   const a = arrowXY(uci.slice(0, 2)), b = arrowXY(uci.slice(2, 4));
   const headLen = S.settings.arrowHead, headHalf = headLen * 0.70;
   const { shaft, head } = arrowBuild(arrowWaypoints(a, b), headLen, headHalf);
-  svg.replaceChildren(arrowNode(shaft, head, USER_ARROW_COLOR));
+  const color = /^#[0-9a-f]{6}$/i.test(S.settings.threatArrowColor || "")
+    ? S.settings.threatArrowColor : DEFAULT_SETTINGS.threatArrowColor;
+  svg.replaceChildren(arrowNode(shaft, head, color));
 }
 // Single-square marking (red tint). Toggles on repeated right-click on the same square.
 function toggleMark(sq) {
@@ -4439,6 +4439,12 @@ function updateQualityDistribution(root, sides) {
 }
 function renderMoveQuality(sides, rows) {
   const design = panelDesign('accuracyQuality', S.settings), distribution = design === 'distribution';
+  if (!distribution) return el('div', {class: 'acc-quality quality-original', 'data-quality-design': design},
+    originalQualityBreakdown(sides, rows, S.originalAccuracyExpanded, () => {
+      S.originalAccuracyExpanded = !S.originalAccuracyExpanded;
+      statsRefs = null; renderStats();
+      UI.stats.querySelector('.qbreak-toggle')?.focus({preventScroll: true});
+    }));
   const modern = ['phases-modern', 'phases-modern-v2'].includes(panelDesign('accuracy', S.settings));
   const content = el('div', {class: 'acc-quality' + (distribution ? ' quality-distribution' : ''), 'data-quality-design': design},
     distribution && !modern ? el('div', {class: 'quality-summary'},
@@ -4462,6 +4468,22 @@ function renderMoveQuality(sides, rows) {
     })));
   if (distribution) updateQualityDistribution(content, sides);
   return content;
+}
+// Share Old's compact breakdown and category order with the Original page option.
+function originalQualityBreakdown(sides, rows, expanded, onToggle) {
+  const keys = expanded ? QBREAK_FULL : QBREAK_SUMMARY;
+  return el('div', {class: 'qbreak'}, ...keys.map(k => {
+    const counts = sides.map((side, i) => {
+      const count = S.counts[side][k] || 0;
+      return el('button', {type: 'button', class: 'ct ' + (i === 0 ? 'left ' : '') + (count ? '' : 'zero'),
+        disabled: !count, 'aria-label': S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Cycle through moves.',
+        onclick: event => { if (event.detail) event.currentTarget.blur(); jumpToCategory(side, k); }}, count);
+    });
+    rows[k] = counts;
+    return el('div', {class: 'qbreak-row'}, counts[0], categoryLabel(k), counts[1]);
+  }), el('button', {type: 'button', class: 'qbreak-toggle' + (expanded ? ' open' : ''),
+    title: expanded ? 'Show fewer categories' : 'Show all categories',
+    'aria-expanded': String(expanded), onclick: onToggle}, icon('chevron')));
 }
 // Wait for completed evidence on both sides and keep later phases behind earlier
 // ones, even when pool workers finish positions out of order.
@@ -4753,33 +4775,20 @@ function renderOriginalStats() {
     for (const k of list) {
       const r = statsRefs.rows[k]; if (!r) continue;
       const cMe = S.counts[S.meSide][k] || 0, cOp = S.counts[opSide][k] || 0;
-      r.me.textContent = cMe; r.me.classList.toggle("zero", !cMe);
-      r.op.textContent = cOp; r.op.classList.toggle("zero", !cOp);
+      for (const [i, count] of [cMe, cOp].entries()) {
+        r[i].textContent = count; r[i].classList.toggle("zero", !count); r[i].disabled = !count;
+        r[i].setAttribute('aria-label', S.players[i === 0 ? S.meSide : opSide].name + ': ' + count + ' ' + categoryName(k) + ' moves. Cycle through moves.');
+      }
     }
     return;
   }
 
   const rows = {};
-  const qrows = list.map((k) => {
-    const cMe = S.counts[S.meSide][k] || 0, cOp = S.counts[opSide][k] || 0;
-    const meCt = el("span", { class: "ct left " + (cMe ? "" : "zero"), onclick: () => jumpToCategory(S.meSide, k) }, cMe);
-    const opCt = el("span", { class: "ct " + (cOp ? "" : "zero"), onclick: () => jumpToCategory(opSide, k) }, cOp);
-    rows[k] = { me: meCt, op: opCt };
-    return el("div", { class: "qbreak-row" },
-      meCt,
-      // The category explainer tooltip lives on the label only — hovering the counts (which are
-      // clickable jump targets) must not trigger it.
-      categoryLabel(k),
-      opCt,
-    );
+  const qbreak = originalQualityBreakdown([S.meSide, opSide], rows, S.originalAccuracyExpanded, () => {
+    S.originalAccuracyExpanded = !S.originalAccuracyExpanded;
+    renderStats(); reflowAccuracy(S.originalAccuracyExpanded); applyLayout();
+    UI.stats.querySelector('.qbreak-toggle')?.focus({preventScroll: true});
   });
-  const expander = el("button", {
-    class: "qbreak-toggle" + (S.originalAccuracyExpanded ? " open" : ""),
-    title: S.originalAccuracyExpanded ? "Show fewer categories" : "Show all categories",
-    "aria-expanded": S.originalAccuracyExpanded ? "true" : "false",
-    onclick: () => { S.originalAccuracyExpanded = !S.originalAccuracyExpanded; renderStats(); reflowAccuracy(S.originalAccuracyExpanded); applyLayout(); },
-  }, icon("chevron"));
-  const qbreak = el("div", { class: "qbreak" }, ...qrows, expander);
 
   UI.stats.replaceChildren(el("div", { class: "panel accuracy-panel accuracy-original", "data-design": "original", "aria-label": "Accuracy" },
     el("div", { class: "panel-head acc-head" }, el("h3", {}, "Accuracy")),
@@ -5684,6 +5693,26 @@ function seg(label, key, options, info, fmt = (value) => value) {
       ...options.map((o) => el("button", { type:"button", "data-setting":key, "data-value":String(o), class: S.settings[key] === o ? "on" : "", onclick: () => setSetting(key, o) }, fmt(o)))),
   );
 }
+function settingDropdown(label, key, options) {
+  const field = ddField(S.settings[key], options, async value => {
+    await setSetting(key, value);
+    UI.settings.querySelector('.lib-dd-btn[data-setting="' + key + '"]')?.focus({preventScroll: true});
+  });
+  field.classList.add("set-dropdown");
+  const button = field.querySelector(".lib-dd-btn");
+  button.dataset.setting = key;
+  button.setAttribute("aria-label", label);
+  button.setAttribute("aria-haspopup", "listbox");
+  field.querySelector(".lib-dd-menu").setAttribute("role", "listbox");
+  field.querySelector(".lib-dd-menu").setAttribute("aria-label", label);
+  field.querySelectorAll(".lib-dd-opt").forEach((option, index) => {
+    option.dataset.setting = key;
+    option.dataset.value = options[index][0];
+    option.setAttribute("role", "option");
+    option.setAttribute("aria-selected", String(options[index][0] === S.settings[key]));
+  });
+  return el("div", {class: "set-row"}, setLabel(label), field);
+}
 // Generic slider. opts: { fmt(v)→text, onChange(v) }. Updates + saves live
 // without rebuilding the whole panel (so you can drag smoothly without losing the slider).
 function slider(label, key, min, max, step, opts = {}) {
@@ -5730,10 +5759,6 @@ function paintColorPickerChip(chip, colors) {
   if (!swatch) return;
   swatch.style.background = colors[0];
   swatch.replaceChildren(...(colors.length > 1 ? [el("span", { class: "half r", style: { background: colors[1] } })] : []));
-}
-function loadingPreview() {
-  return el("div", { class: "set-loader-preview", "aria-hidden": "true" },
-    S.setOpen["Loading"] ? loaderNode("", "var(--accent)") : null);
 }
 let _accentPickCleanup = null;
 function openAccentColorPicker(anchor) {
@@ -5855,17 +5880,18 @@ function buildColorPicker(initialHex, onLive, onCommit) {
 // Use the same themed picker and swatch as the custom board colours.
 let _arrowPickCleanup = null;
 function closeArrowColorPicker() { if (_arrowPickCleanup) _arrowPickCleanup(); }
-function openArrowColorPicker(anchor) {
+function openArrowColorPicker(anchor, key = "bestArrowColor") {
   closeArrowColorPicker();
+  const title = key === "threatArrowColor" ? "Threat arrow" : "Best-move arrow";
   const update = (hex) => {
-    S.settings.bestArrowColor = hex;
+    S.settings[key] = hex;
     paintColorPickerChip(anchor, [hex]);
     refreshArrows();
   };
-  const save = () => writeSettings({ bestArrowColor: S.settings.bestArrowColor });
-  const picker = buildColorPicker(S.settings.bestArrowColor || ARROW_COLOR, update, save);
-  const pop = el("div", { class: "board-cpick", role: "dialog", "aria-label": "Best-move arrow color" },
-    el("div", { class: "cpick-title" }, "Best-move arrow"), picker.el);
+  const save = () => writeSettings({ [key]: S.settings[key] });
+  const picker = buildColorPicker(S.settings[key] || DEFAULT_SETTINGS[key], update, save);
+  const pop = el("div", { class: "board-cpick", role: "dialog", "aria-label": title + " color" },
+    el("div", { class: "cpick-title" }, title), picker.el);
   document.body.append(pop);
   const r = anchor.getBoundingClientRect(), pr = pop.getBoundingClientRect();
   pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - pr.width - 8)) + "px";
@@ -6003,7 +6029,7 @@ async function resetEngineSettings() {
   scheduleReanalyze();
   if (UI.settings && !UI.settings.hidden) renderSettings();
 }
-const ARROW_SETTING_KEYS = ["bestArrow", "showThreat", "bestArrowColor", "arrowOpacity", "arrowShaft", "arrowHead"];
+const ARROW_SETTING_KEYS = ["bestArrow", "showThreat", "bestArrowColor", "threatArrowColor", "arrowOpacity", "arrowShaft", "arrowHead"];
 const BACKGROUND_SETTING_KEYS = ["bg", "bgFit", "bgTile", "bgCustom", "bgHue", "bgSat", "bgLight"];
 const BADGE_SETTING_KEYS = ["badgeFont", "badgeTooltip"];
 const VISUAL_SETTING_KEYS = [
@@ -6013,7 +6039,7 @@ const VISUAL_SETTING_KEYS = [
   "graphStyle", "barStyle", "insightFont", "showCoords", "coordSize", ...BACKGROUND_SETTING_KEYS,
   "coach", "coachPlain", "boardTheme", "pieceStyle", "boardCustomLight", "boardCustomDark",
   "sound", "soundVolume", "soundFx", "puzzleSuccessSound", "puzzleIncorrectSound", ...ARROW_SETTING_KEYS,
-  "moveAnim", "animSpeed", "loaderStyle", "learningTransition",
+  "moveAnim", "animSpeed", "learningTransition",
 ];
 function resetSettingKeys(keys) {
   for (const key of keys) S.settings[key] = structuredClone(DEFAULT_SETTINGS[key]);
@@ -6098,23 +6124,20 @@ function visualSettings() {
   accentEntries.unshift({ value: "custom", title: "Choose custom accent color", onClick: (e) => openAccentColorPicker(e.currentTarget),
     render: (chip) => colorPickerChip(chip, [S.settings.accentCustom]) });
   return el("div", {},
-    section("Premade UI setups",
-      el("div", {class:"set-row hint"}, el("span", {class:"set-note"}, "Choose a panel arrangement and tab designs. Moving or resizing panels or changing tab designs selects Custom automatically. Reset layout restores your starting setup's arrangement.")),
+    section("Interface presets",
       seg("Setup", "uiSetup", Object.keys(UI_SETUPS), null, value => UI_SETUPS[value].label),
-      el("div", {class:"set-row hint"}, el("span", {class:"set-note"}, "Old: original tabs and automatic layout. Modern: Phase report 1, Move list Zoom +20%, Minimal Engine, and the modern panel layout.")),
     ),
     section("Tabs",
-      ...PANEL_DESIGNS.flatMap(design => [
-        seg(design.label, design.setting, design.versions.map(version => version.id), null,
-          value => design.versions.find(version => version.id === value).label),
-        design.panel === "evalbar" ? seg("Bar style", "barStyle", ["gradient", "classic", "mono", "accent"], null,
-          value => value === "classic" ? "Solid" : value) : null,
+      ...PANEL_DESIGNS.filter(design => design.versions.length > 1).flatMap(design => [
+        settingDropdown(design.label, design.setting, design.versions.map(version => [version.id, version.label])),
+        design.panel === "evalbar" ? settingDropdown("Bar style", "barStyle",
+          [["gradient", "Gradient"], ["classic", "Solid"], ["mono", "Mono"], ["accent", "Accent"]]) : null,
       ]),
     ),
     section("Theme",
       colorChips("Accent", "accent", accentEntries),
     ),
-    section("Board / Pieces",
+    section("Board & Pieces",
       colorChips("", "boardTheme", boardEntries),
       pieceGrid(),
       toggleRow("Board coordinates", "showCoords"),
@@ -6123,25 +6146,15 @@ function visualSettings() {
         onChange: (v) => document.documentElement.style.setProperty("--coord-size", v + "px"),
       }),
     ),
-    section("Best-move arrow",
-      colorChips("Arrow color", "bestArrowColor", [{
-        value: S.settings.bestArrowColor || ARROW_COLOR,
-        title: "Choose arrow color",
-        onClick: (e) => openArrowColorPicker(e.currentTarget),
-        render: (chip) => {
-          colorPickerChip(chip, [S.settings.bestArrowColor || ARROW_COLOR]);
-        },
-      }]),
-      toggleRow("Show arrow", "bestArrow"),
-      toggleRow("Show the threat", "showThreat", setSetting, "Draws a yellow arrow with the opponent's best move as if it were their turn — i.e. the threat against the move you just played. Helps answer \"why was that bad / what am I missing?\""),
+    section("Best-move/Show threat arrow",
+      toggleRow("Show best-move arrow", "bestArrow"),
+      arrowColorSetting("Best-move color", "bestArrowColor"),
+      toggleRow("Show threat arrow", "showThreat"),
+      arrowColorSetting("Threat color", "threatArrowColor"),
       slider("Opacity", "arrowOpacity", 0.3, 1, 0.02, { onChange: refreshArrows }),
       slider("Shaft width", "arrowShaft", 0.14, 0.42, 0.01, { onChange: refreshArrows }),
       slider("Head size", "arrowHead", 0.22, 0.55, 0.01, { onChange: refreshArrows }),
       el("button", { class: "set-reset", onclick: resetArrowSettings }, "Reset to default"),
-    ),
-    section("Loading",
-      seg("Animation", "loaderStyle", ["wave", "dots", "bounce", "spinner"]),
-      loadingPreview(),
     ),
     section("Move animation",
       toggleRow("Animation", "moveAnim"),
@@ -6149,13 +6162,9 @@ function visualSettings() {
     ),
     section("Layout",
       el("button", { class: "set-reset reorg-toggle-btn", onclick: toggleReorganize }, S.reorganize ? "Done reorganizing" : "Reorganize panels"),
-      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Select several panels to move or scale them together. Your arrangement is saved. Export it to share a proposed layout; Reset layout restores the selected premade UI setup's arrangement.")),
+      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Drag to move panels; use their edges to resize.")),
       el("button", { class: "set-reset", onclick: exportPanelLayout }, "Export panel layout"),
       el("button", { class: "set-reset", onclick: resetLayout }, "Reset layout"),
-    ),
-    section("Screen sizes",
-      el("button", {class:"set-reset","data-debug":"screen-previews",onclick:openScreenSizePreview}, "Open screen-size preview"),
-      el("div", {class:"set-row hint"},el("span",{class:"set-note"},"Preview starts at 100%, matching your current window. Try 1080p, 1440p and other screen sizes with your display scaling and browser toolbar accounted for. Switch resolutions without losing your place. Preview changes are not saved.")),
     ),
     section("Move list",
       seg("Style", "mlStyle", ["rows", "cards", "compact"]),
@@ -6192,7 +6201,18 @@ function visualSettings() {
         fxSlider("runStart", "volume", "Puzzle intro volume", 0, 100, 1, (v) => v + " %")),
     ),
     el("button", { class: "set-reset", onclick: resetVisualSettings }, "Reset to default"),
+    section("Developer debugger",
+      el("button", {class:"set-reset","data-debug":"screen-previews",onclick:openScreenSizePreview}, "Open screen-size preview"),
+      el("div", {class:"set-row hint"},el("span",{class:"set-note"},"Preview layouts at different screen sizes. Changes are not saved.")),
+    ),
   );
+}
+function arrowColorSetting(label, key) {
+  return colorChips(label, key, [{
+    value: S.settings[key] || DEFAULT_SETTINGS[key], title: "Choose " + label.toLowerCase(),
+    onClick: event => openArrowColorPicker(event.currentTarget, key),
+    render: chip => colorPickerChip(chip, [S.settings[key] || DEFAULT_SETTINGS[key]]),
+  }]);
 }
 // Coach dropdown — only coaches that have a built animated character. Uses the
 // library's custom dropdown (ddField) rather than a native <select> so the option hover matches the
@@ -6358,7 +6378,10 @@ function renderSettings() {
   if (focusedFont) UI.settings.querySelector(`[data-font="${focusedFont}"]`)?.focus({ preventScroll: true });
   if (focusedLabelStyle) UI.settings.querySelector(`[data-label-style="${focusedLabelStyle}"]`)?.focus({ preventScroll: true });
   if (focusedSection) [...UI.settings.querySelectorAll(".set-sect-head")].find(head => head.querySelector("span")?.textContent === focusedSection)?.focus({ preventScroll: true });
-  if (activeSetting) [...UI.settings.querySelectorAll("[data-setting]")].find(node => node.dataset.setting === activeSetting && node.dataset.value === activeValue)?.focus({preventScroll:true});
+  if (activeSetting) {
+    const candidates = [...UI.settings.querySelectorAll("[data-setting]")].filter(node => node.dataset.setting === activeSetting);
+    (candidates.find(node => node.classList.contains("lib-dd-btn")) || candidates.find(node => node.dataset.value === activeValue))?.focus({preventScroll:true});
+  }
   else if (activeButton && !UI.settings.contains(document.activeElement)) {
     const matches = [...UI.settings.querySelectorAll("button")].filter(node => JSON.stringify(focusContext(node)) === JSON.stringify(activeButton));
     if(matches.length === 1)matches[0].focus({preventScroll:true});
@@ -6572,7 +6595,7 @@ async function setSetting(key, value) {
   if (key === "evalView" || key === "graphStyle" || key === "barStyle" || key === "evalbarDesign" || key === "graphDesign" || key === "moveAnim") { renderEvalBar(); renderGraph(); }
   if (key === "bestArrow") renderBestArrow();
   if (key === "showThreat") renderThreatArrow();
-  if (key === "loaderStyle") { renderReview(); renderStats(); }
+  if (key === "bestArrowColor" || key === "threatArrowColor") refreshArrows();
   if (BADGE_SETTING_KEYS.includes(key)) refreshBadgeAppearance();
   if (key === "badgeTooltip") syncBoardBadgeLabel(true);
   if (UI.settings && !UI.settings.hidden) renderSettings();
@@ -7310,19 +7333,41 @@ function libRecords() {
 // [[value, label], …]. Clicking outside closes it (handled by a global listener in buildUI).
 // ddField is the standalone control (button + menu); libDropdown wraps it with an inline label for
 // the library rail, and the settings panel reuses ddField on its own so its menus match (no blue).
+function closeDropdowns() {
+  document.querySelectorAll(".lib-dd-field.open").forEach(field => {
+    field.classList.remove("open");
+    field.querySelector(".lib-dd-btn").setAttribute("aria-expanded", "false");
+  });
+}
 function ddField(value, options, onChange, renderOption = (_value, label) => label) {
   const [currentValue, currentLabel] = options.find(([v]) => v === value) || options[0] || ["", "—"];
   const menu = el("div", { class: "lib-dd-menu" },
     ...options.map(([v, t]) => el("button", { class: "lib-dd-opt" + (v === value ? " sel" : ""),
-      onclick: (e) => { e.stopPropagation(); onChange(v); } }, renderOption(v, t))));
+      onclick: (e) => { e.stopPropagation(); closeDropdowns(); onChange(v); } }, renderOption(v, t))));
   const field = el("div", { class: "lib-dd-field" },
-    el("button", { class: "lib-dd-btn", onclick: (e) => {
+    el("button", { class: "lib-dd-btn", "aria-expanded": "false", onclick: (e) => {
       e.stopPropagation();
       const willOpen = !field.classList.contains("open");
-      document.querySelectorAll(".lib-dd-field.open").forEach((d) => d.classList.remove("open"));
+      closeDropdowns();
       field.classList.toggle("open", willOpen);
+      e.currentTarget.setAttribute("aria-expanded", String(willOpen));
     } }, el("span", { class: "lib-dd-cur" }, renderOption(currentValue, currentLabel)), el("span", { class: "lib-dd-chev", html: ICONS.chevron })),
     menu);
+  field.addEventListener("keydown", event => {
+    const button = field.querySelector(".lib-dd-btn"), items = [...menu.children];
+    if (event.key === "Escape") {
+      if (!field.classList.contains("open")) return;
+      event.preventDefault(); event.stopPropagation(); closeDropdowns(); button.focus();
+    } else if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
+      event.preventDefault(); event.stopPropagation(); closeDropdowns();
+      field.classList.add("open"); button.setAttribute("aria-expanded", "true");
+      const index = items.indexOf(document.activeElement);
+      const next = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1
+        : index < 0 ? Math.max(0, items.findIndex(item => item.classList.contains("sel")))
+        : (index + (event.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+      items[next]?.focus();
+    } else if (event.key === "Tab") closeDropdowns();
+  });
   return field;
 }
 function libDropdown(label, value, options, onChange) {
@@ -7930,7 +7975,7 @@ async function showReadyWorkspace() {
     }
     migrateEngineSettings(S.settings);
     delete S.settings.wrongSound; // older selectable mistake cues were removed
-    { const lm = { prikker: "dots", hop: "bounce", "bølge": "wave" }; if (lm[S.settings.loaderStyle]) S.settings.loaderStyle = lm[S.settings.loaderStyle]; } // migrate renamed loader keys
+    delete S.settings.loaderStyle;
     if (S.settings.bg === "default" || S.settings.bg === "ember") S.settings.bg = "color";
     if (S.settings.coach === "old_soviet_rework") S.settings.coach = "old_soviet"; // the rework became the canonical "Old Soviet"
     S.settings.density = "compact"; // density picker removed — compact is the only layout now

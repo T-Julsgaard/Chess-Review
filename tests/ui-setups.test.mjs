@@ -20,7 +20,7 @@ test('Visual offers Old, Modern and Custom and selecting a setup preserves the r
   a.replace('scheduleReanalyze',()=>{throw Error('UI setups must not reanalyze');});
   const before=JSON.stringify({pgn:a.state.pgn,idx:a.state.idx,evals:a.state.evals,acc:a.state.acc,classif:a.state.classif});
   a.call('toggleSettings');
-  const section=()=>[...doc.querySelectorAll('.set-section')].find(n=>n.querySelector('.set-sect-head').textContent==='Premade UI setups');
+  const section=()=>[...doc.querySelectorAll('.set-section')].find(n=>n.querySelector('.set-sect-head').textContent==='Interface presets');
   section().querySelector('.set-sect-head').click();
   assert.deepEqual([...section().querySelectorAll('[data-setting="uiSetup"]')].map(n=>n.textContent),['Old','Modern','Custom']);
   assert.equal(section().querySelector('.on').dataset.value,'custom');
@@ -155,15 +155,15 @@ test('saved Modern evaluations adopt Move bars once and preserve subsequent choi
 test('Modern evaluation migration retains individually chosen designs', async t => {
   const a = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
   a.replace('resetSettingsForRelease', async () => {});
-  a.store.settings = {uiSetup: 'modern', graphDesign: 'timeline2'};
+  a.store.settings = {uiSetup: 'modern', graphDesign: 'timeline'};
   await a.start();
-  assert.equal(a.state.settings.graphDesign, 'timeline2');
+  assert.equal(a.state.settings.graphDesign, 'timeline');
   assert.equal(a.store.settings.modernGraphVersion, 1);
 });
 
 test('tab customization selects and persists Custom while unrelated preferences and no-op choices retain presets',async t=>{
   const a=review(t),doc=a.dom.window.document;
-  a.call('toggleSettings');a.state.setOpen['Premade UI setups']=true;
+  a.call('toggleSettings');a.state.setOpen['Interface presets']=true;
   for(const preset of ['modern','old']) {
     await a.call('applyUiSetup',preset);
     await a.call('setSetting','accent','#5a8bef');a.call('fitViewport');
@@ -172,13 +172,13 @@ test('tab customization selects and persists Custom while unrelated preferences 
     assert.equal(a.state.settings.uiSetup,preset);
     if(a.run('UI.settings.hidden'))a.call('toggleSettings');
     const layout=structuredClone(a.call('layoutForSave'));
-    await a.call('setSetting','engineDesign','focus');
+    await a.call('setSetting','graphDesign','minimal');
     assert.equal(a.state.settings.uiSetup,'custom');
     assert.equal(a.store.settings.uiSetup,'custom');assert.equal(a.store.settings.uiSetupBase,preset);
     assert.equal(doc.querySelector('[data-setting="uiSetup"].on').dataset.value,'custom');
     assert.deepEqual(a.call('layoutForSave'),layout);
     await a.call('applyUiSetup','custom');
-    assert.equal(a.state.settings.engineDesign,'focus');assert.deepEqual(a.call('layoutForSave'),layout);
+    assert.equal(a.state.settings.graphDesign,'minimal');assert.deepEqual(a.call('layoutForSave'),layout);
     await a.call('applyUiSetup',preset);
     assert.equal(a.state.settings.uiSetup,preset);assert.equal(a.store.settings.uiSetup,preset);
   }

@@ -15,14 +15,14 @@ function review(t, design = 'focus') {
   return a;
 }
 
-for (const design of ['focus', 'minimal']) {
+for (const design of ['minimal']) {
 test(`${design} is selectable under Visual > Tabs, saves, and switches without changing analysis`, async t => {
   const a = review(t, design), doc = a.dom.window.document, S = a.state;
   const before = JSON.stringify({positions: S.positions, bests: S.bests, evals: S.evals, idx: S.idx, layout: S.layout});
   a.replace('scheduleReanalyze', () => { throw Error('Design changes must not reanalyze'); });
   await a.call('toggleSettings');
   [...doc.querySelectorAll('.set-sect-head')].find(n => n.textContent === 'Tabs').click();
-  assert.deepEqual([...doc.querySelectorAll('[data-setting="engineDesign"]')].map(n => n.textContent), ['Original', 'Focus', 'Minimal']);
+  assert.deepEqual([...doc.querySelectorAll('.lib-dd-opt[data-setting="engineDesign"]')].map(n => n.textContent), ['Original', 'Minimal']);
   await a.call('setSetting', 'engineDesign', 'original');
   assert.equal(doc.querySelector('.engine-focus'), null);
   await a.call('setSetting', 'engineDesign', design);

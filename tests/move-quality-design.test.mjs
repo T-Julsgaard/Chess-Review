@@ -5,6 +5,7 @@ import {app, loadGame} from './helpers/app.mjs';
 function review(t) {
   const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5');
   a.state.meSide = 'b';
+  a.state.settings.accuracyDesign = 'phases';
   a.call('computeDerived'); a.call('buildUI');
   for (const side of ['w', 'b']) for (const key of Object.keys(a.state.counts[side])) a.state.counts[side][key] = 0;
   Object.assign(a.state.counts.b, {best: 2, blunder: 1});
@@ -13,6 +14,25 @@ function review(t) {
   a.call('setAccuracyPage', 1);
   return a;
 }
+
+test('Original move quality reuses Old’s compact breakdown and expansion with live counts', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  await a.call('applyUiSetup', 'old');
+  const original = doc.querySelector('.qbreak').innerHTML;
+  await a.call('setSetting', 'accuracyDesign', 'phases-modern');
+  a.call('setAccuracyPage', 1);
+  assert.equal(doc.querySelector('.quality-original .qbreak').innerHTML, original);
+  assert.equal(doc.querySelectorAll('.qbreak-row').length, 7);
+  doc.querySelector('.qbreak-toggle').click();
+  assert.equal(doc.querySelectorAll('.qbreak-row').length, 10);
+  assert.equal(doc.querySelector('.qbreak-toggle').getAttribute('aria-expanded'), 'true');
+  a.state.analyzing = true; a.call('renderStats');
+  const counter = doc.querySelector('[data-category="good"]').closest('.qbreak-row').querySelector('.ct.left');
+  a.state.counts.b.good = 3; a.call('renderStats');
+  assert.equal(counter.textContent, '3'); assert.equal(counter.disabled, false);
+  doc.querySelector('.qbreak-toggle').click();
+  assert.equal(doc.querySelectorAll('.qbreak-row').length, 7);
+});
 
 test('distribution uses each player’s classified total and preserves category navigation', t => {
   const a = review(t), doc = a.dom.window.document;
@@ -49,6 +69,8 @@ test('page design choices save independently, restore on startup and reset with 
   a.replace('scheduleReanalyze', () => { throw Error('Visual changes must not reanalyze'); });
   await a.call('setSetting', 'accuracyQualityDesign', 'original');
   assert.equal(doc.querySelector('.quality-summary'), null);
+  assert.equal(doc.querySelectorAll('.qbreak-row').length, 7);
+  doc.querySelector('.qbreak-toggle').click();
   assert.equal(doc.querySelectorAll('.qbreak-row').length, 10);
   assert.equal(a.state.settings.accuracyDesign, 'phases');
   await a.call('setSetting', 'accuracyDesign', 'pages');
@@ -66,7 +88,7 @@ test('page design choices save independently, restore on startup and reset with 
   await restored.call('resetVisualSettings');
   assert.equal(restored.store.settings.accuracyQualityDesign, 'distribution');
   assert.equal(restored.store.settings.accuracyAdvancedDesign, 'original');
-  assert.ok(restored.dom.window.document.querySelector('.quality-summary'));
+  assert.equal(restored.dom.window.document.querySelectorAll('.quality-distribution .qbreak-row').length, 10);
 });
 
 test('empty distributions show zero totals and no fabricated category shares', t => {

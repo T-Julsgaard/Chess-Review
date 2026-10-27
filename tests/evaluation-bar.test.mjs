@@ -15,7 +15,7 @@ test('Tabs offers a saved Balance design and switching preserves analysis and la
   await a.call('toggleSettings');
   const section = [...doc.querySelectorAll('.set-section')].find(n => n.querySelector('.set-sect-head').textContent === 'Tabs');
   section.querySelector('.set-sect-head').click();
-  assert.deepEqual([...section.querySelectorAll('[data-setting="evalbarDesign"]')].map(n => n.textContent), ['Original', 'Balance']);
+  assert.deepEqual([...section.querySelectorAll('.lib-dd-opt[data-setting="evalbarDesign"]')].map(n => n.textContent), ['Original', 'Balance']);
   const before = JSON.stringify({evals: a.state.evals, bests: a.state.bests, idx: a.state.idx, layout: a.state.layout});
   a.replace('scheduleReanalyze', () => { throw Error('Design choices must not start analysis'); });
   for (const value of ['original', 'balance', 'original', 'balance']) {

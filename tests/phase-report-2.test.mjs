@@ -8,23 +8,13 @@ function review(t) {
   return a;
 }
 
-test('Phase report 2 is a separate saved option and does not replace Phase report',async t=>{
-  const a=review(t),doc=a.dom.window.document;
-  const designs=a.run("PANEL_DESIGNS.find(d=>d.panel==='accuracy').versions");
-  assert.ok(designs.some(d=>d.id==='phases'&&d.label==='Phase report'));
-  assert.ok(designs.some(d=>d.id==='phases2'&&d.label==='Phase report 2'));
-  assert.equal(a.state.settings.accuracyDesign,'phases');
-  await a.call('setSetting','accuracyDesign','phases2');
-  assert.equal(a.store.settings.accuracyDesign,'phases2');
-  assert.ok(doc.querySelector('.phase2-players'));
-  assert.deepEqual([...doc.querySelector('.phase2-players').children].map(n=>n.textContent),['','White','Black']);
-  a.call('setAccuracyPage',1);
-  assert.equal(doc.querySelector('.accuracy-phase-report-2,.phase2-players'),null);
-  a.call('setAccuracyPage',0);
-  assert.ok(doc.querySelector('.accuracy-phase-report-2'));
-  await a.call('setSetting','accuracyDesign','phases');
-  assert.equal(doc.querySelector('.phase2-overall'),null);
-  assert.ok(doc.querySelector('.phase-report-cells'));
+test('retired phase reports migrate to Game phases', async t => {
+  const a=app(t,{url:'https://extension.test/analysis.html?workspace=blank'});
+  a.replace('resetSettingsForRelease',async()=>{});
+  a.store.settings={accuracyDesign:'phases2'};
+  await a.start();
+  assert.equal(a.store.settings.accuracyDesign,'phases-modern');
+  assert.ok(a.dom.window.document.querySelector('.accuracy-phase-modern'));
 });
 
 test('the comparison grid keeps phase colors and places estimated rating last without extra labels',async t=>{

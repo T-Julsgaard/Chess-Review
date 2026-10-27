@@ -14,10 +14,10 @@ test('Tabs exposes Evaluation designs, saves them and preserves all analysis', a
   await a.call('toggleSettings');
   const section = [...doc.querySelectorAll('.set-section')].find(n => n.querySelector('.set-sect-head').textContent === 'Tabs');
   section.querySelector('.set-sect-head').click();
-  assert.deepEqual([...section.querySelectorAll('[data-setting="graphDesign"]')].map(n => n.textContent), ['Original','Timeline','Timeline v2','Move bars','Move bars v2','Minimal']);
+  assert.deepEqual([...section.querySelectorAll('.lib-dd-opt[data-setting="graphDesign"]')].map(n => n.textContent), ['Original','Timeline','Move bars','Move bars v2','Minimal']);
   const before = JSON.stringify({evals:a.state.evals,bests:a.state.bests,idx:a.state.idx,layout:a.state.layout});
   a.replace('scheduleReanalyze', () => { throw Error('Design changes must not analyze'); });
-  for (const design of ['bars','bars2','original','timeline','timeline2','minimal']) {
+  for (const design of ['bars','bars2','original','timeline','minimal']) {
     doc.querySelector(`[data-setting="graphDesign"][data-value="${design}"]`).click();
     await settle(); await a.run('_settingsWriteQueue');
     assert.equal(a.store.settings.graphDesign, design);
@@ -109,11 +109,12 @@ test('Timeline v2 badges show notable move grades, navigate directly and update 
   assert.equal(doc.querySelector('.evaluation-move-badge'),null);
 });
 
-test('Timeline v2 restores its saved design and shows honest empty states', async t => {
+test('retired Timeline v2 migrates to Timeline and shows honest empty states', async t => {
   const a = app(t,{url:'https://extension.test/analysis.html?workspace=blank'}), doc = a.dom.window.document;
   a.replace('resetSettingsForRelease',async () => {});
   a.store.settings = {graphDesign:'timeline2'}; await a.start();
-  assert.equal(doc.querySelector('.evaluation-panel').dataset.design,'timeline2');
+  assert.equal(doc.querySelector('.evaluation-panel').dataset.design,'timeline');
+  assert.equal(a.store.settings.graphDesign,'timeline');
   assert.match(doc.querySelector('.evaluation-empty').textContent,/Load a game/);
   assert.equal(doc.querySelector('.evaluation-move-badge'),null);
 });

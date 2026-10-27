@@ -36,5 +36,27 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     }
     await run("document.querySelector('[aria-label=Settings]').click()");
   }
+  await run("document.querySelector('[aria-label=Settings]').click();[...document.querySelectorAll('.set-tab')].find(n=>n.textContent==='Visual').click()");
+  for (const [width,height] of [[1920,919],[390,844]]) {
+    await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);
+    await sleep(200);
+    for (const section of ['Tabs','Board & Pieces','Best-move/Show threat arrow']) {
+      await run(`(()=>{const head=[...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent===${JSON.stringify(section)});if(head.getAttribute('aria-expanded')!=='true')head.click();head.scrollIntoView({block:'start'});})()`);
+      if (section==='Tabs') {
+        const choices=await run(`Object.fromEntries([...document.querySelectorAll('.set-section.open .set-dropdown')].map(field=>[field.querySelector('.lib-dd-btn').dataset.setting,[...field.querySelectorAll('.lib-dd-opt')].map(n=>n.textContent)]))`);
+        assert.deepEqual(choices.accuracyDesign,['Original','Game phases']);
+        assert.deepEqual(choices.accuracyQualityDesign,['Original','Category bars']);
+        assert.deepEqual(choices.engineDesign,['Original','Minimal']);
+        assert.ok(!choices.graphDesign.includes('Timeline v2'));
+        assert.equal(choices.accuracyAdvancedDesign,undefined);
+        await run("document.querySelector('.lib-dd-btn[data-setting=accuracyDesign]').click()");
+        const bounds=await run(`(()=>{const settings=document.querySelector('#settings').getBoundingClientRect(),menu=document.querySelector('.set-dropdown.open .lib-dd-menu').getBoundingClientRect();return {left:menu.left,right:menu.right,min:settings.left,max:settings.right};})()`);
+        assert.ok(bounds.left>=bounds.min&&bounds.right<=bounds.max,JSON.stringify(bounds));
+      }
+      assert.ok(await run("document.querySelector('#settings').scrollWidth<=document.querySelector('#settings').clientWidth+1"));
+      const shot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
+      await fs.writeFile(path.join(out,`cleanup-${section.replace(/[^a-z]/gi,'-')}-${width}.png`),Buffer.from(shot.data,'base64'));
+    }
+  }
   console.log('Settings gutter fits through live bookmarks-bar changes in both setups and both tabs. Evidence: '+out);
 }
