@@ -2959,11 +2959,10 @@ function applyUserMove(from, to, animate = true, promotion = null) {
   if (!mv) { S.selectedSq = null; renderSelection(); return; }
   const node = { fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "", eval: null, best: null };
   if (!S.analysisMode) {
-    // On the mainline (and only if the position is analyzed): if the move matches the next
-    // mainline move, just stay on the mainline.
+    // Following the recorded game remains mainline navigation even while its
+    // evaluation is pending. Only a different legal move creates a variation.
     const nextMain = S.positions[S.idx + 1];
-    const reachable = !S.analyzing || S.idx < S.progress;
-    if (reachable && nextMain && nextMain.from === from && nextMain.to === to && (nextMain.promotion || "") === (mv.promotion || "")) {
+    if (nextMain && nextMain.from === from && nextMain.to === to && (nextMain.promotion || "") === (mv.promotion || "")) {
       S.selectedSq = null; go(S.idx + 1); return;
     }
     S.variation = { 
@@ -3529,9 +3528,9 @@ function renderControls() {
         ? el("button", { class: "exit-analysis", title: "Exit analysis (Esc)", onclick: () => exitAnalysis(S.variation.branchIdx) }, el("span", { class: "ea-x" }, "✕"), "Exit")
         : el("button", { class: "play", onclick: toggleAuto });
       refs.next = el("button", { "aria-label": variation ? "Next move" : "Next", onclick: navNext }, icon("next"));
-      // Read the current endpoint on click; the analysis frontier or variation can grow.
+      // Read the current endpoint on click; the game or variation can change.
       refs.last = el("button", { "aria-label": variation ? "Variation end" : "End",
-        onclick: variation ? () => gotoVar(S.variation.positions.length - 1) : () => go(S.analyzing ? S.progress : S.total) }, icon("last"));
+        onclick: variation ? () => gotoVar(S.variation.positions.length - 1) : () => go(S.total) }, icon("last"));
       UI.controls.replaceChildren(refs.first, refs.previous, refs.center, refs.next, refs.last);
     }
   }
@@ -3557,9 +3556,8 @@ function renderControls() {
     if (refs.last.disabled !== atEnd) refs.last.disabled = atEnd;
     return;
   }
-  // The forward buttons are blocked when at the analysis front (only during analysis).
-  const maxPly = S.analyzing ? S.progress : S.total;
-  const atEnd = S.idx >= maxPly;
+  // The game is already loaded: pending engine results must not block browsing.
+  const atEnd = S.blank || S.idx >= S.total;
   refs.first.disabled = S.blank;
   refs.previous.disabled = S.blank;
   if (refs.next.disabled !== atEnd) refs.next.disabled = atEnd;
@@ -4933,9 +4931,9 @@ function renderGraph() {
     if (pts.at(-1)?.ply !== p - 1) runs.push([]);
     runs.at(-1).push(point); pts.push(point);
   }
-  // Navigation still follows the completed prefix while analysis is running.
-  const prefixEnd = runs[0]?.[0].ply === 0 ? runs[0].at(-1).ply : 0;
-  const lastPly = Math.min(prefixEnd, S.analyzing ? S.progress : S.total);
+  // Plot only returned scores, but allow navigation through the whole loaded
+  // game. A slow earlier search must not lock out later results or pending moves.
+  const lastPly = S.total;
   const pathFor = (run, y, closeY) => {
     let points = run.map(p => ({x: toX(p.ply), y: y(p.cp)}));
     if (points.length === 1) {
@@ -5056,8 +5054,7 @@ function renderGraph() {
   const jumpFromEvent = (e) => {
     const r = e.currentTarget.getBoundingClientRect();
     if (!r.width) return;
-    const ply = Math.max(0, Math.min(modern ? lastPly : S.total, fromFraction((e.clientX - r.left) / r.width)));
-    if (modern && !pts.length) return;
+    const ply = Math.max(0, Math.min(lastPly, fromFraction((e.clientX - r.left) / r.width)));
     gotoMainline(ply);
   };
   // Move the hover marker to the pointed ply and float its eval value above the dot.
@@ -5091,7 +5088,7 @@ function renderGraph() {
     const onkey = e => {
       if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key)) return;
       e.preventDefault(); e.stopPropagation();
-      if (S.practice || !pts.length) return;
+      if (S.practice || S.blank) return;
       const target = e.key === 'Home' ? 0 : e.key === 'End' ? lastPly
         : S.idx + (['ArrowLeft','ArrowDown'].includes(e.key) ? -1 : 1);
       gotoMainline(Math.max(0, Math.min(lastPly, target)));
@@ -7457,10 +7454,9 @@ function go(to) {
   _cancelPromotion?.();
   _cancelBoardDrag?.();
   const prev = S.idx;
-  // During analysis you can't go further than the move that HAS been analyzed (S.progress).
-  // When the analysis is done, the whole game (S.total) is free.
-  const maxPly = S.analyzing ? S.progress : S.total;
-  S.idx = Math.max(0, Math.min(maxPly, to));
+  // Scores arrive independently and out of order. The recorded moves are already
+  // known, so navigation never waits for the completed evaluation prefix.
+  S.idx = Math.max(0, Math.min(S.total, to));
   // Changing moves resets the user's own arrows, square marks and piece selection. The sound must
   // match the move that actually animates: stepping FORWARD = the move just made (lands on idx);
   // stepping BACK = the move being UNDONE (the one that left `prev`). Keying both on idx made
@@ -7682,8 +7678,8 @@ async function startAnalysis({preserveCompleted = false} = {}) {
   // Shared work queue. `nextIdx++` is atomic (no await between read and increment in a
   // single-threaded runtime), so each position is handed to exactly one worker. Completion
   // order doesn't affect the final values — computeDerived() is a pure function of the
-  // filled arrays. `contig` tracks the completed prefix that navigation can
-  // expose during analysis; the graph can already show later results with gaps.
+  // filled arrays. `contig` tracks analysis progress only; navigation is independent
+  // of completion, and the graph shows later results with gaps for pending scores.
   let nextIdx = 0, contig = -1;
   while (contig + 1 <= S.total && S.bests[contig + 1]) contig++;
   async function worker(eng) {

@@ -30,17 +30,17 @@ test('engine progress preserves the pressed navigation button, icon and focus', 
   assert.equal(doc.querySelector('#controls [aria-label="Next"]'), next);
 });
 
-test('retained controls follow the analysis frontier and use the latest End target', t => {
+test('retained controls browse the whole game while earlier evaluations are pending', t => {
   const a = board(t), S = a.state, controls = a.dom.window.document.getElementById('controls');
   const next = controls.querySelector('[aria-label="Next"]');
   const end = controls.querySelector('[aria-label="End"]');
   S.analyzing = true; S.progress = 0; a.call('renderControls');
-  assert.equal(next.disabled, true); assert.equal(end.disabled, true);
-  next.click(); assert.equal(S.idx, 0);
+  assert.equal(next.disabled, false); assert.equal(end.disabled, false);
+  next.click(); assert.equal(S.idx, 1);
   S.progress = 2; a.call('renderControls');
-  assert.equal(next.disabled, false); end.click(); assert.equal(S.idx, 2);
+  assert.equal(next.disabled, false); end.click(); assert.equal(S.idx, 4);
   assert.equal(next.disabled, true);
-  S.progress = 3; a.call('renderControls'); end.click(); assert.equal(S.idx, 3);
+  S.progress = 3; a.call('renderControls'); end.click(); assert.equal(S.idx, 4);
   S.analyzing = false; a.call('renderControls'); end.click(); assert.equal(S.idx, 4);
   assert.equal(controls.querySelector('[aria-label="End"]'), end);
   a.call('go', 0); assert.equal(next.disabled, false);

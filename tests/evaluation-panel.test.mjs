@@ -74,9 +74,9 @@ for (const design of ['timeline','timeline2','bars','bars2','minimal']) {
     a.state.evals[3] = null; a.state.evals[4] = null; a.call('go',0);
     const partial = doc.querySelector('#graphMount [role=slider]');
     partial.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'End',bubbles:true}));
-    assert.equal(a.state.idx,2); assert.equal(partial.getAttribute('aria-valuemax'),'2');
+    assert.equal(a.state.idx,4); assert.equal(partial.getAttribute('aria-valuemax'),'4');
     a.state.practice = {}; partial.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'Home',bubbles:true}));
-    assert.equal(a.state.idx,2);
+    assert.equal(a.state.idx,4);
   });
 }
 
@@ -282,7 +282,7 @@ test('Minimal restores at startup and gives honest empty and partial analysis st
   a.state.blank=false;
   a.state.evals=[{cp:0},{cp:100},null,null,null]; a.call('renderGraph');
   const chart=doc.querySelector('.evaluation-minimal [role=slider]');
-  assert.equal(chart.getAttribute('aria-valuemax'),'1');
+  assert.equal(chart.getAttribute('aria-valuemax'),'4');
   assert.match(chart.querySelector('.evaluation-field-white').getAttribute('d'),/L96\.0,0/);
   a.state.evals=[]; a.call('renderGraph');
   assert.match(doc.querySelector('.evaluation-empty').textContent,/Waiting for analysis/);
@@ -334,8 +334,8 @@ for (const [design, style] of [
     assert.equal(doc.querySelector('.eval-tip').classList.contains('show'), false);
     if (design !== 'original') {
       chart().dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key:'End',bubbles:true}));
-      assert.equal(S.idx, 0, 'Drawing later results does not unlock pending navigation');
-      assert.equal(chart().getAttribute('aria-valuemax'), '0');
+      assert.equal(S.idx, 4, 'Slow earlier positions cannot block navigation to a completed result');
+      assert.equal(chart().getAttribute('aria-valuemax'), '4');
     }
     S.evals[2] = {cp:-40}; a.call('flushProgress', S.batchGen);
     assert.equal(segments(), design.startsWith('bars') ? 3 : 2);
@@ -364,6 +364,18 @@ test('a live worker pool updates the graph before a slow earlier search complete
   const columns = [...doc.querySelectorAll('.evaluation-column')];
   assert.equal(columns.length, 2, 'Throttled progress paints completed moves while position zero is pending');
   assert.ok(+columns[0].getAttribute('x') > 0, 'Results keep their position on the game timeline');
+  doc.querySelector('.ml-move[data-ply="2"]').click();
+  assert.equal(S.idx, 2, 'A completed move is reachable before the first search returns');
+  doc.querySelector('#controls [aria-label="Next"]').click();
+  assert.equal(S.idx, 3, 'A pending move is also reachable');
+  assert.equal(doc.querySelector('.evaluation-score').textContent, '—');
+  assert.match(doc.querySelector('.evalgraph').getAttribute('aria-valuetext'), /Calculating/);
+  a.call('flushProgress', S.batchGen);
+  assert.equal(S.idx, 3, 'Progress repaint cannot move the selected position');
+  results[3].resolve({score:{cp:-90},bestmove:'d8d5',lines:[]}); await settle();
+  a.call('flushProgress', S.batchGen);
+  assert.equal(S.idx, 3); assert.equal(S.progress, 0);
+  assert.equal(doc.querySelector('.evaluation-score').textContent, '+0.9', 'The selected result appears while the slow earlier search is still pending');
   for (const result of results) result.resolve({score:{cp:0},bestmove:'e2e4',lines:[]});
   await run;
   assert.equal(S.analyzing, false);

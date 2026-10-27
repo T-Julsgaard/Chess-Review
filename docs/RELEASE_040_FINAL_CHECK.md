@@ -22,7 +22,7 @@ respects previous dismissal/opt-out, and never changes the selected layout.
 
 ## Verification performed
 
-- Full suite: **1,235 passed**, zero failures, cancellations or skips, using
+- Full suite after the navigation follow-up: **1,244 passed**, zero failures, cancellations or skips, using
   `node --test --test-concurrency=4 tests/*.test.mjs`. A prior unrestricted run
   during concurrent lint/browser work hit an existing wall-clock Elo animation
   assertion; limiting test concurrency produced the clean final run.
@@ -65,6 +65,30 @@ The final build record and checksums are available through
 `web-ext-artifacts/latest-release.json`; export folders are preserved independently.
 The upload ZIPs are generated from the committed working tree. No store upload or
 Git push is performed by this task.
+
+## Pending-analysis navigation follow-up
+
+Parallel engine workers finish different positions at different times. The graph
+already plotted later results with gaps, but buttons, keyboard, graph and move-list
+navigation were capped at the uninterrupted completed prefix. A slow earlier
+position could therefore prevent browsing until the rest of the analysis finished.
+
+Navigation now uses the loaded game's full move range independently of engine
+progress. Pending positions retain explicit calculating states; arriving results
+update the selected position without moving it. Following the recorded move on
+the board stays on the mainline even when its evaluation is pending. Search
+budgets, worker scheduling, scores and saved analyses are unchanged.
+
+Nine added navigation regressions cover keyboard, move-list clicks, all six graph
+designs, matching board moves and autoplay. The deferred-worker regression also
+holds position zero unfinished while later results arrive and confirms the
+selected result updates. The 47 focused tests and the full 1,244-test suite passed.
+The packaged Chrome/Firefox smoke tests reproduce the gap and verify buttons,
+keyboard, move list, graph clicks and independent score arrival in both browsers.
+
+The selected extension summary is now: “Free, open-source chess analysis, puzzles
+and opening lessons.” These changes remain part of the unreleased 0.4.0 packages;
+use the newest release directory from `latest-release.json` for upload.
 
 ## Remaining tooling limitation
 

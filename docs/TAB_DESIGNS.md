@@ -193,8 +193,11 @@ every analyzed position its own column: light above zero for White, gray below
 zero for Black. Move bars and Move bars v2 use an ivory position/hover guide in
 dark themes and charcoal in light themes. These designs support
 click-to-jump, hover scores and keyboard navigation (arrows, Home, End), preserve
-focus and chart nodes while navigating, and stop at the analyzed prefix. Empty
-and pending positions show explicit waiting states. Scores use White's
+focus and chart nodes while navigating. Empty
+and pending positions show explicit waiting states. Browsing with the move list,
+graph, keyboard, playback or board does not wait for completed analysis. Parallel
+searches can finish out of order: later results remain selectable, pending moves
+show “Calculating…” and receive their scores when ready. Scores use White's
 perspective regardless of board orientation; M means mate. Original retains the
 earlier graph styles. Designs share engine results and do not change analysis.
 
