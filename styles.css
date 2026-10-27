@@ -698,15 +698,15 @@ body {
 /* Keep the first layout measurable without exposing the unfinished panels. */
 body[data-starting] #root { visibility: hidden; }
 #startup { position: fixed; inset: 0; z-index: 10000; overflow: hidden; }
-/* Two ruled shutters frame the mark, then open onto the fully painted board. */
-.startup-shutter { position: absolute; left: 0; width: 100%; height: calc(50% - 30px); background: var(--bg); transition: transform .55s cubic-bezier(.76, 0, .24, 1); }
+/* The ruled edges meet at the center, then separate to reveal the ready board. */
+.startup-shutter { position: absolute; left: 0; width: 100%; height: 50%; background: var(--bg); transition: transform .55s cubic-bezier(.76, 0, .24, 1); }
 .startup-top { top: 0; border-bottom: 1px solid var(--line); }
 .startup-bottom { bottom: 0; border-top: 1px solid var(--line); }
-.startup-center { position: absolute; top: calc(50% - 30px); left: 0; width: 100%; height: 60px; display: grid; place-items: center; background: var(--bg); transition: opacity .14s ease; }
+.startup-center { position: absolute; top: calc(50% - 30px); left: 0; width: 100%; height: 60px; display: grid; place-items: center; transition: opacity .14s ease; }
 #startup.opening .startup-top { transform: translateY(-101%); }
 #startup.opening .startup-bottom { transform: translateY(101%); }
 #startup.opening .startup-center { opacity: 0; }
-.startup-mark { display: grid; grid-template-columns: repeat(2, 9px); gap: 3px; }
+.startup-mark { display: grid; grid-template-columns: repeat(2, 9px); gap: 3px; padding: 8px; background: var(--bg); }
 .startup-mark i { width: 9px; height: 9px; border-radius: 2px; background: var(--accent); opacity: .3; animation: startup-pulse .65s ease-in-out infinite alternate; }
 .startup-mark i:nth-child(2), .startup-mark i:nth-child(3) { animation-delay: -.325s; }
 @keyframes startup-pulse { to { opacity: .9; } }
