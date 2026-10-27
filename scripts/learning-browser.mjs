@@ -60,6 +60,7 @@ try {
   if(process.argv.includes('--review-return'))await (await import('./learning-chrome-transition-audit.mjs')).auditReviewReturn({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--mode-tickets'))await (await import('./puzzle-mode-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--startup'))await (await import('./startup-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
+  else if(process.argv.includes('--promotion'))await (await import('./promotion-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--run-dashboard'))await (await import('./run-dashboard-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--settings-gutter'))await (await import('./settings-gutter-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--viewport-growth'))await (await import('./viewport-growth-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});

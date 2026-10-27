@@ -41,6 +41,7 @@ test('promotion picker supports cancellation and explicit rook selection',t=>{
   a.call('applyUserMove','c7','c8',false);assert.ok(doc.querySelector('.promotion-picker'));assert.equal(doc.querySelector('.app').inert,true);
   doc.querySelector('.promotion-cancel').click();assert.equal(a.state.analysisMode,false);assert.equal(doc.querySelector('.promotion-picker'),null);
   a.call('applyUserMove','c7','c8',false);
+  assert.equal(doc.querySelector('.promotion-picker').dataset.color,'w');
   const options=[...doc.querySelectorAll('.promotion-options button')];assert.equal(options.length,4);
   assert.deepEqual(options.map(n=>n.querySelector('img').dataset.piece),['wQ','wR','wB','wN']);assert.ok(options.every(n=>n.textContent===''));
   options[0].dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'ArrowDown',bubbles:true,cancelable:true}));assert.equal(doc.activeElement,options[1]);
@@ -54,6 +55,7 @@ test('different promotion does not silently replay the recorded mainline',t=>{
 test('Black promotion uses only Black queen, rook, bishop and knight images',t=>{
   const a=review(t,'[SetUp "1"]\n[FEN "7k/8/8/8/8/8/p7/7K b - - 0 1"]\n\n1... a1=Q'),doc=a.dom.window.document;
   a.call('applyUserMove','a2','a1',false);
+  assert.equal(doc.querySelector('.promotion-picker').dataset.color,'b');
   assert.deepEqual([...doc.querySelectorAll('.promotion-options img')].map(n=>n.dataset.piece),['bQ','bR','bB','bN']);
   doc.querySelector('[aria-label="Promote to knight"]').click();assert.equal(a.state.variation.positions[1].promotion,'n');
 });

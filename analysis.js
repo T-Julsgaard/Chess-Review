@@ -2749,7 +2749,7 @@ function requestPromotion(from, to, animate) {
     else if(e.key === 'ArrowUp' || e.key === 'ArrowDown') {e.preventDefault();e.stopImmediatePropagation();const nodes=[...card.querySelectorAll('.promotion-options button')],index=nodes.indexOf(document.activeElement);nodes[(index+(e.key==='ArrowUp'?-1:1)+nodes.length)%nodes.length].focus();}
     else if(e.key.startsWith("Arrow")||["Home","End","f"].includes(e.key))e.stopImmediatePropagation();
   };
-  const card = el("div", {class:"promotion-picker", role:"dialog", "aria-modal":"true", "aria-label":"Choose promotion piece"},
+  const card = el("div", {class:"promotion-picker", 'data-color':sideToMove(fen), role:"dialog", "aria-modal":"true", "aria-label":"Choose promotion piece"},
     el("h3", {}, "Promote to"),
     el("div", {class:"promotion-options"}, ...[["q","Queen"],["r","Rook"],["b","Bishop"],["n","Knight"]].map(([piece,label]) =>
       el("button", {type:"button", 'aria-label':'Promote to '+label.toLowerCase(), title:label, onclick:()=>{close();if(S.pgn===pgn&&activePos().fen===fen&&S.practice===practice)applyUserMove(from,to,animate,piece);}}, makePiece(piece,sideToMove(fen))))),

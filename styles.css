@@ -2527,6 +2527,11 @@ button { font-family: inherit; cursor: pointer; }
 .lc-open:focus-visible, .lc-fav:focus-visible, .lib-tab:focus-visible, .engine-line:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
 .promotion-overlay { position:fixed; inset:0; z-index:200; display:grid; place-items:center; background:rgba(0,0,0,.45); padding:16px; }
 .promotion-picker { max-width:100%; padding:12px; background:var(--panel); border:1px solid var(--line); border-radius:12px; color:var(--ink); box-shadow:0 16px 48px #0006; }
+/* Every board uses a light picker for Black so dark piece artwork stays visible. */
+.promotion-picker[data-color="b"] {
+  --panel:#eeeae1; --panel-2:#dedacd; --line:#aaa99e;
+  --ink:#252629; --ink-2:#50534b;
+}
 .promotion-picker button { border:1px solid var(--line); border-radius:6px; padding:7px 10px; color:var(--ink); background:var(--panel-2); font:inherit; cursor:pointer; }
 .promotion-picker button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
 .promotion-picker h3 { margin:0 0 10px; font-size:12px; font-weight:600; text-align:center; color:var(--ink-2); }
