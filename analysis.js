@@ -4254,19 +4254,22 @@ function hideQTip() {
   const tip = document.querySelector(".q-tip");
   if (tip) tip.classList.remove("show");
 }
-// Clicking a count in the accuracy breakdown jumps to that player's FIRST move of that category
-// (e.g. your first Blunder). A category with a 0 count finds no ply and does nothing — so clicking
-// the opponent's "0 blunders" is a harmless no-op, exactly as expected.
-function firstPlyForCategory(side, k) {
+// Repeated category clicks cycle chronologically, wrapping after the last match.
+// Other navigation starts a fresh cycle at the first match.
+let _categoryJump = null;
+function jumpToCategory(side, k) {
+  if (S.blank || S.practice) return;
+  const plies = [];
   for (let i = 1; i <= S.total; i++) {
     const pos = S.positions[i];
-    if (pos && pos.color === side && S.classif[i] === k) return i;
+    if (pos && pos.color === side && S.classif[i] === k) plies.push(i);
   }
-  return -1;
-}
-function jumpToCategory(side, k) {
-  const ply = firstPlyForCategory(side, k);
-  if (ply > 0) gotoMainline(ply);
+  if (!plies.length) return;
+  const repeat = !S.analysisMode && _categoryJump?.positions === S.positions &&
+    _categoryJump.side === side && _categoryJump.k === k && _categoryJump.ply === S.idx;
+  const ply = plies[repeat ? (plies.indexOf(S.idx) + 1) % plies.length : 0];
+  gotoMainline(ply);
+  _categoryJump = {positions: S.positions, side, k, ply};
 }
 function setCategoryName(cls, value) {
   const name = cleanCategoryName(value);
@@ -4390,8 +4393,8 @@ function renderMoveQuality(sides, rows) {
       const counts = sides.map((side, i) => {
         const count = S.counts[side][k] || 0;
         return el('button', {type: 'button', class: 'ct ' + (i === 0 ? 'left ' : '') + (count ? '' : 'zero'),
-          disabled: !count, 'aria-label': S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Jump to first move.',
-          onclick: () => jumpToCategory(side, k)}, count);
+          disabled: !count, 'aria-label': S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Cycle through moves.',
+          onclick: event => { if (event.detail) event.currentTarget.blur(); jumpToCategory(side, k); }}, count);
       });
       rows[k] = counts;
       return el('div', {class: 'qbreak-row', style: distribution ? {'--quality-color': QUALITY[k].color} : {}},
@@ -4523,7 +4526,7 @@ function renderStats() {
       row[i].textContent = count;
       row[i].disabled = !count;
       row[i].classList.toggle('zero', !count);
-      row[i].setAttribute('aria-label', S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Jump to first move.');
+      row[i].setAttribute('aria-label', S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Cycle through moves.');
     });
     if (page === 1) updateQualityDistribution(UI.stats, sides);
     return;
@@ -4722,7 +4725,7 @@ function renderPagedStats() {
       row[i].textContent = count;
       row[i].disabled = !count;
       row[i].classList.toggle('zero', !count);
-      row[i].setAttribute('aria-label', S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Jump to first move.');
+      row[i].setAttribute('aria-label', S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Cycle through moves.');
     });
     if (page === 1) updateQualityDistribution(UI.stats, sides);
     return;
@@ -7195,6 +7198,7 @@ function renderLibrary() {
 
 /* ---------------- Navigation ---------------- */
 function go(to) {
+  _categoryJump = null;
   _cancelPromotion?.();
   _cancelBoardDrag?.();
   const prev = S.idx;

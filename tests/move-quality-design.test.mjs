@@ -93,3 +93,42 @@ test('Modern distribution omits the summary and retains live shares, counts and 
   let ply; a.replace('gotoMainline', value => { ply = value; });
   count.click(); assert.equal(ply, 2);
 });
+
+test('repeated category count clicks cycle through each player’s moves and wrap', t => {
+  const a = review(t), S = a.state, doc = a.dom.window.document;
+  S.classif = [null, 'best', 'blunder', 'blunder', 'best', 'blunder', 'blunder'];
+  S.counts.b.blunder = 2; S.counts.w.blunder = 2;
+  for (const design of ['original', 'distribution']) {
+    S.settings.accuracyQualityDesign = design; a.call('renderStats');
+    const row = doc.querySelector('[data-category="blunder"]').closest('.qbreak-row');
+    for (const [selector, plies] of [['.ct.left', [2, 6, 2]], ['.ct:not(.left)', [3, 5, 3]]]) {
+      a.call('go', 0);
+      for (const ply of plies) { row.querySelector(selector).click(); assert.equal(S.idx, ply); }
+    }
+  }
+});
+
+test('category cycling restarts after other navigation, changing category or loading a game', t => {
+  const a = review(t), S = a.state, doc = a.dom.window.document;
+  const count = () => doc.querySelector('[data-category="best"]').closest('.qbreak-row').querySelector('.ct.left');
+  count().click(); assert.equal(S.idx, 2);
+  a.call('go', 4); count().click(); assert.equal(S.idx, 2);
+  count().click(); assert.equal(S.idx, 4);
+  doc.querySelector('[data-category="blunder"]').closest('.qbreak-row').querySelector('.ct.left').click();
+  count().click(); assert.equal(S.idx, 2);
+  loadGame(a, '1. d4 d5 2. c4 e6');
+  S.classif = [null, 'best', 'best', 'best', 'best'];
+  a.call('renderStats'); count().click(); assert.equal(S.idx, 2);
+});
+
+test('pointer clicks release category count focus while keyboard activation retains it', t => {
+  const a = review(t), doc = a.dom.window.document;
+  const count = doc.querySelector('[data-category="best"]').closest('.qbreak-row').querySelector('.ct.left');
+  count.focus();
+  count.dispatchEvent(new a.dom.window.MouseEvent('click', {bubbles: true, detail: 1}));
+  assert.equal(doc.activeElement, doc.body);
+  assert.equal(a.state.idx, 2);
+  count.focus(); count.click();
+  assert.equal(doc.activeElement, count);
+  assert.equal(a.state.idx, 4);
+});

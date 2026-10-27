@@ -167,8 +167,8 @@
 .stage .accuracy-phase-modern .acc-page-quality .acc-quality .ct { min-height: 32px; font-size: 18px; }
 .accuracy-phase-modern .acc-page-quality .qbreak-row { position: relative; transition: background-color .16s ease; }
 .accuracy-phase-modern .acc-page-quality .qsym { transition: transform .16s ease; }
-.accuracy-phase-modern .acc-page-quality .qbreak-row:is(:hover,:focus-within) { z-index: 1; background: var(--panel-2); }
-.accuracy-phase-modern .acc-page-quality .qbreak-row:is(:hover,:focus-within) .qsym { transform: scale(1.32); }
+.accuracy-phase-modern .acc-page-quality .qbreak-row:is(:hover,:has(:focus-visible)) { z-index: 1; background: var(--panel-2); }
+.accuracy-phase-modern .acc-page-quality .qbreak-row:is(:hover,:has(:focus-visible)) .qsym { transform: scale(1.32); }
 .accuracy-phase-modern .acc-page-quality .ct::before { content: none; }
 @media (prefers-reduced-motion: reduce) {
   .accuracy-phase-modern .acc-page-quality .qbreak-row,
