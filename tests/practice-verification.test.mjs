@@ -22,7 +22,9 @@ test('illegal practice input remains uncounted and does not lock the board',t=>{
 });
 
 for(const input of ['click','drag'])test(`correct practice ${input} clears legal move dots immediately while keeping the success badge`,t=>{
+  t.mock.timers.enable({apis:['setTimeout']});
   const a=practice(t),doc=a.dom.window.document,board=doc.querySelector('.board'),view=a.dom.window;
+  a.call('showPracticeHint');assert.ok(board.querySelector('.hint-from'));
   board.getBoundingClientRect=()=>({left:0,top:0,width:800,height:800});
   const pointer=(target,type,x,y)=>{
     const event=new view.MouseEvent(type,{bubbles:true,cancelable:true,button:0,buttons:type==='pointerup'?0:1,clientX:x,clientY:y});
@@ -40,8 +42,26 @@ for(const input of ['click','drag'])test(`correct practice ${input} clears legal
   assert.equal(a.state.practice.solving,false);
   assert.equal(a.state.selectedSq,null);
   assert.equal(board.querySelector('.sel, .legal, .legal-cap'),null);
+  assert.equal(board.querySelector('.hint-from'),null);
   assert.ok(a.run('sqByName.e4').querySelector('.piece-img[data-piece=wP]'));
   assert.ok(a.run('sqByName.e4').querySelector('.puzzle-result-badge[data-result=correct]'));
+  t.mock.timers.tick(680);
+  assert.equal(board.querySelector('.flash-good, .hint-from'),null,'the hint must remain absent after the success flash fades');
+  assert.ok(a.run('sqByName.e4').querySelector('.puzzle-result-badge[data-result=correct]'));
+});
+
+test('a solved hint stays cleared throughout the roll and demo for the next practice move',t=>{
+  t.mock.timers.enable({apis:['setTimeout']});
+  const a=practice(t),board=a.dom.window.document.querySelector('.board');
+  a.state.practice.spots=[1,2];
+  a.call('showPracticeHint');
+  a.call('practiceAttempt','e2','e4');
+  for(const elapsed of [680,620,240,95,650,760,780]){
+    t.mock.timers.tick(elapsed);
+    assert.equal(board.querySelector('.hint-from'),null);
+    assert.equal(a.state.practiceHint,null);
+  }
+  assert.equal(a.state.practice.i,1);assert.equal(a.state.practice.solving,true);
 });
 
 test('correct practice captures also clear legal capture rings',t=>{

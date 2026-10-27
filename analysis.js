@@ -6881,6 +6881,7 @@ async function practiceAttempt(from, to, promotion = "q") {
     UI.boardWrap.querySelectorAll('.puzzle-result-badge').forEach(n => {n.parentElement.classList.remove('has-badge');n.remove();});
     p.solving = false;              // lock out further attempts until the next spot
     S.practiceHint = null;
+    renderPracticeHint();           // remove the tint before the success flash can fade
     S.selectedSq = null; renderSelection();
     // Visually play the correct move so the piece lands on its square and STAYS there for a beat
     // — confirming the answer instead of snapping straight back.
