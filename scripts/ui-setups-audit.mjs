@@ -10,10 +10,23 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   };
   const section=async title=>{
     await run("document.querySelector('#settings').hidden&&document.querySelector('[aria-label=Settings]').click()");
-    await run(`(()=>{const head=[...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent===${JSON.stringify(title)});if(head.getAttribute('aria-expanded')!=='true')head.click();})()`);
+    const {result,exceptionDetails}=await call('Runtime.evaluate',{expression:'globalThis'},review.sessionId);
+    if(exceptionDetails)throw Error(JSON.stringify(exceptionDetails));
+    try {
+      const response=await call('Runtime.callFunctionOn',{
+        objectId:result.objectId,
+        functionDeclaration:function(title) {
+          const head=[...this.document.querySelectorAll('.set-sect-head')].find(n=>n.querySelector('span')?.textContent===title);
+          if(!head)throw Error('Settings section not found');
+          if(head.getAttribute('aria-expanded')!=='true')head.click();
+        }.toString(),
+        arguments:[{value:title}],returnByValue:true,
+      },review.sessionId);
+      if(response.exceptionDetails)throw Error(JSON.stringify(response.exceptionDetails));
+    } finally {await call('Runtime.releaseObject',{objectId:result.objectId},review.sessionId);}
   };
   const choose=async value=>{
-    await section('Premade UI setups');
+    await section('Interface presets');
     await run(`document.querySelector('[data-setting="uiSetup"][data-value="${value}"]').click()`);
     await waitFor(review,`chrome.storage.local.get('settings').then(s=>s.settings.uiSetup==='${value}')`,'Saved setup');
     await waitFor(review,`import('./analysis.js').then(m=>m.S.layoutMode==='${value==='modern'?'custom':'auto'}')`,'Applied layout');
@@ -46,7 +59,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   for(const [key,box]of Object.entries(supplied.displayedLayout))for(const prop of ['x','y','w','h','scale'])
     assert.ok(Math.abs(modern[key][prop]-box[prop])<1e-8,`${key}.${prop}`);
   const designs=await run("import('./analysis.js').then(m=>Object.fromEntries(Object.entries(m.S.settings).filter(([key])=>key.endsWith('Design'))))");
-  assert.equal(designs.accuracyDesign,'phases');assert.equal(designs.movesDesign,'zoom20');
+  assert.equal(designs.accuracyDesign,'phases-modern');assert.equal(designs.movesDesign,'zoom20');
   const {UI_SETUPS}=await import('../lib/ui-setups.js');
   for(const [key,value]of Object.entries(UI_SETUPS.modern.designs))assert.equal(designs[key],value);
   await screenshot('modern');
@@ -64,7 +77,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     assert.ok(dimensions.page<=1);assert.ok(dimensions.canvas<=width+1);
     fit.push({width,height,...dimensions});await screenshot('modern-'+width);
   }
-  await section('Premade UI setups');await screenshot('premade-ui-settings');
+  await section('Interface presets');await screenshot('premade-ui-settings');
   await choose('old');await close();assert.deepEqual(await boxes(),collapsed);
   assert.equal(await evidence(),unchanged);
   await fs.writeFile(path.join(out,'ui-setups.json'),JSON.stringify({passed:true,collapsed,expanded,modern,designs,fit},null,2));
