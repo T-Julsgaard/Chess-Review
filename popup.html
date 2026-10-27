@@ -44,6 +44,15 @@
     .secondary,.ghost{padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel-2);font-size:12px;font-weight:650;transition:background .2s,border-color .2s}
     .secondary:hover,.ghost:hover{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--panel-2))}
     .ghost{width:100%;margin-top:9px}.secondary{color:var(--accent)}
+    /* Leave room for the 240px input inside Chrome's 600px popup height limit. */
+    body:has(#manual[open]){position:relative;padding:14px}
+    body:has(#manual[open]) .intro{display:none}
+    body:has(#manual[open]) .action-button{min-height:54px;padding:8px 13px}
+    body:has(#manual[open]) #status{margin-top:8px}
+    #manual[open]{margin-top:8px}
+    #manual[open] summary{padding-block:9px}
+    #manual[open] label{margin-top:8px}
+    body:has(#manual[open]) #cancelImport{position:absolute;top:14px;right:14px;width:auto;margin:0;padding:5px 8px;font-size:11px}
     @media(prefers-reduced-motion:reduce){*{transition:none!important}}
   </style>
 </head>
