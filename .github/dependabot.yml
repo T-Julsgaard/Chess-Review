@@ -1,7 +1,9 @@
 version: 2
 updates:
   - package-ecosystem: npm
-    directory: /
+    directories:
+      - /
+      - /marketing/video
     schedule:
       interval: weekly
       day: monday

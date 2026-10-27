@@ -39,6 +39,23 @@ non-minimal DER lengths while accepting valid RSA signatures, including
 AlgorithmIdentifiers with or without NULL. The disposable test key uses a
 2048-bit modulus and exponent 3 to exercise the affected verification path.
 
+### Video-production dependencies
+
+Dependabot #11 affects `zod` in the separate `marketing/video` project, which is
+excluded from the browser store ZIPs. An npm override upgrades its declared
+transitive dependency from 4.5.4 to 4.6.7; the
+[oversized-collection validation advisory](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5)
+is fixed in 4.6.6. Remotion 4.0.532 pins the older version, so retain the override
+until its dependency declarations accept a fixed release. Dependabot monitors
+both npm projects on the same weekly schedule.
+
+The override does not rewrite dependencies embedded in published bundles.
+`@remotion/studio-protocol@4.0.532` also embeds Zod 4.5.4 in its compiled output;
+this copy still requires an upstream rebuild (the current 4.0.539 release also
+declares 4.5.4). Its Studio HTTP protocol handlers enforce request-body size
+limits before parsing. A clean npm audit covers the declared dependency tree,
+not this embedded copy.
+
 ## Report a vulnerability privately
 
 Use GitHub's **[Report a vulnerability](https://github.com/T-Julsgaard/Chess-Review/security/advisories/new)**
