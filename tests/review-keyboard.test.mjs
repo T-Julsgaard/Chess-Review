@@ -12,6 +12,33 @@ test('review navigation clears leftover Feedback focus after returning from its 
   }
 });
 
+test('all arrow keys clear the learning button focus after returning to game review',async t=>{
+  t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[]})}));
+  const a=review(t),doc=a.dom.window.document,toggle=doc.querySelector('#learningToggle');
+  for(const [key,idx] of [['ArrowRight',1],['ArrowLeft',0],['ArrowUp',0],['ArrowDown',0],['End',2],['Home',0]]){
+    toggle.focus();await a.call('openLearning');await a.run('learningWorkspace').close();
+    assert.equal(doc.activeElement,toggle);
+    const event=new a.dom.window.KeyboardEvent('keydown',{key,bubbles:true,cancelable:true});
+    toggle.dispatchEvent(event);
+    assert.equal(a.state.idx,idx);assert.equal(doc.activeElement,doc.body,key);
+  }
+});
+
+test('arrows during the return animation do not restore learning button focus',async t=>{
+  t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[]})}));
+  const a=review(t),doc=a.dom.window.document,toggle=doc.querySelector('#learningToggle');
+  for(const key of ['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End']){
+    toggle.focus();await a.call('openLearning');const w=a.run('learningWorkspace');
+    let finishReturn;
+    t.mock.method(w,'transitionPanels',()=>new Promise(resolve=>{finishReturn=resolve;}));
+    const closing=w.close();await settle();assert.equal(typeof finishReturn,'function');
+    toggle.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key,bubbles:true,cancelable:true}));
+    assert.equal(doc.activeElement,doc.body,key);
+    finishReturn();await closing;
+    assert.equal(doc.activeElement,doc.body,key);assert.equal(a.state.idx,0);
+  }
+});
+
 test('clicking Accuracy tabs or moves leaves arrows reviewing the game without a tab focus frame',t=>{
   const a=review(t,'1. e4 e5 2. Nf3 Nc6'),doc=a.dom.window.document;
   for(const page of [0,1,2]) {

@@ -7481,6 +7481,13 @@ function toggleAuto() {
   renderControls();
 }
 document.addEventListener("keydown", (e) => {
+  if (learningWorkspace?.closing && e.target?.closest?.('#learningToggle,.learn-entry-button')
+      && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) {
+    e.preventDefault();
+    document.activeElement?.blur();
+    // The return animation must not restore button focus after navigation starts.
+    learningWorkspace.previousFocus = null;
+  }
   if (learningWorkspace || S.blank) return;
   if (e.key === "Tab" && !e.target?.closest?.('#settings,.accuracy-panel,.engine-focus,[role="dialog"],[role="alertdialog"]')) {
     e.preventDefault(); return;
@@ -7489,11 +7496,11 @@ document.addEventListener("keydown", (e) => {
   if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
   // During practice the only shortcut is Escape to exit; nav keys are disabled.
   if (S.practice) { if (e.key === "Escape") exitPractice(); return; }
-  if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) {
-    e.preventDefault();
+  if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) {
     // Navigation takes focus away from the last clicked control (e.g. Feedback).
     document.activeElement?.blur();
   }
+  if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) e.preventDefault();
   if (e.key === "ArrowLeft") navPrev();
   else if (e.key === "ArrowRight") navNext();
   else if (e.key === "Home") { if (S.analysisMode) gotoVar(0); else gotoMainline(0); }
