@@ -1896,6 +1896,7 @@ function applyLayout() {
   const boxes=custom?S.layout:reference;
   for (const mod of UI.canvas.querySelectorAll(".mod")) applyPanelBox(mod,boxes?.[mod.dataset.mod]);
   fitEnginePanel();
+  scheduleAccuracyFit();
   requestAnimationFrame(positionSettings);
 }
 // Freeze the automatic layout into free-canvas boxes, so Reorganize starts from exactly what is on
@@ -4405,7 +4406,7 @@ function setAccuracyPage(page, focus = false) {
       {transform: 'translateX(' + (-direction * 10) + 'px)', opacity: 0},
     ], {duration: 180, easing: 'cubic-bezier(.22,.65,.3,1)', fill: 'forwards'});
     turn.onfinish = turn.oncancel = () => leaf.remove();
-    for (const content of incoming.children) {
+    for (const content of (incoming.querySelector('.acc-fit-content') || incoming).children) {
       if (content.classList.contains('acc-players')) continue;
       content.animate([{transform: 'translateX(' + (direction * 10) + 'px)', opacity: .35},
         {transform: 'translateX(0)', opacity: 1}], {duration: 280, easing: 'cubic-bezier(.22,.65,.3,1)'});
@@ -4662,6 +4663,7 @@ function renderStats() {
       row[i].setAttribute('aria-label', S.players[side].name + ': ' + count + ' ' + categoryName(k) + ' moves. Cycle through moves.');
     });
     if (page === 1) updateQualityDistribution(UI.stats, sides);
+    scheduleAccuracyFit();
     return;
   }
   // Preserve phases already counting up when the overall results finish.
@@ -4717,18 +4719,43 @@ function renderStats() {
       })));
   }
   if (livePhases) content.querySelector('.acc-phases,.phase-report')?.replaceWith(livePhases);
+  const fitPage = phaseModern && page < 2;
   UI.stats.replaceChildren(el('div', {class: 'panel accuracy-panel accuracy-dials accuracy-book' + (reveal ? ' accuracy-reveal' : '') + (phaseReport ? ' accuracy-phase-report' : '') + (phaseReport2 && page === 0 ? ' accuracy-phase-report-2' : '') + (phaseModern ? ' accuracy-phase-modern' : '') + (design === 'phases-modern-v2' ? ' accuracy-phase-modern-v2' : ''), 'data-design': design, 'aria-label': 'Accuracy'},
     accuracyPager(),
-    el('div', {class: 'panel-body acc-page' + (page === 0 ? ' acc-page-overview' : phaseModern ? page === 1 ? ' acc-page-quality' : ' acc-page-advanced' : ''), id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
-      'aria-labelledby': 'accuracy-tab-' + page}, players, content)));
+    el('div', {class: 'panel-body acc-page' + (fitPage ? ' acc-fit-page' : '') + (page === 0 ? ' acc-page-overview' : phaseModern ? page === 1 ? ' acc-page-quality' : ' acc-page-advanced' : ''), id: 'accuracy-page', role: 'tabpanel', tabindex: 0,
+      'aria-labelledby': 'accuracy-tab-' + page}, ...(fitPage ? [el('div', {class: 'acc-fit-content'}, players, content)] : [players, content]))));
   statsRefs = busy ? {design, page, rows} : null;
   if (UI.canvas.classList.contains('full-hd-reference')) applyLayout();
   accuracyNavigation?.sync(page);
+  scheduleAccuracyFit();
   // Saved reviews open with their full results. Live reviews have already shown
   // their phases, so finishing must not count those scores up from zero again.
   if (reveal && page === 0 && !busy && !S.blank && !S.restoredAnalysis && Object.values(S.acc).some(Number.isFinite)) {
     overviewReveal.mount(UI.stats.firstChild, {game: S.positions, key: revealKey, enabled: animate, includePhases: !S.progressiveAccuracy});
   }
+}
+
+let accuracyFitFrame = 0;
+function scheduleAccuracyFit() {
+  if (accuracyFitFrame) return;
+  accuracyFitFrame = requestAnimationFrame(() => {
+    accuracyFitFrame = 0;
+    const page = UI.stats?.querySelector('.acc-fit-page'), content = page?.querySelector('.acc-fit-content');
+    if (!content || !page.clientHeight) return;
+    const style = getComputedStyle(page);
+    const available = page.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom) - 1;
+    if (available <= 0) return;
+    // Keep the original design and fit its contents proportionally. Reset before
+    // measuring so a larger window restores the full size; never enlarge it.
+    content.style.zoom = '1';
+    if (page.scrollHeight <= page.clientHeight) return;
+    for (let i = 0; i < 3; i++) {
+      const scale = Math.min(1, available / content.scrollHeight);
+      if (!Number.isFinite(scale) || scale <= 0) break;
+      content.style.zoom = String(scale);
+      if (page.scrollHeight <= page.clientHeight) break;
+    }
+  });
 }
 
 function renderPhaseOverview2(sides, busy) {

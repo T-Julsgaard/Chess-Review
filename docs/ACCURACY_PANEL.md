@@ -12,7 +12,9 @@ uses the original **compact** Accuracy height, including the original 87px
 content inset when loading a saved expanded layout. A slim bottom carousel
 replaces the three large tabs: previous/next arrows flank the current page name
 and three clickable position markers. The carousel supports Left, Right, Home
-and End. Short windows scroll the page body while navigation remains visible.
+and End. Modern's Accuracy and Quality pages fit their existing contents
+proportionally into short panels, without scrolling or changing their design.
+Navigation keeps its normal size. Advanced retains its longer scrollable report.
 Move counts and evaluation-loss links are keyboard buttons. Category aliases
 remain editable. Accuracy and Moves have no visible title headers; their panels
 retain accessible names. No page has explanatory footer copy, score/category

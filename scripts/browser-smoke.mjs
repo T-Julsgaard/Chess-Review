@@ -41,6 +41,7 @@ try {
     await fs.appendFile(path.join(sourceDir,'analysis.js'), '\nglobalThis.__smokeResponsive=()=>{fitViewport();};\nglobalThis.__smokePreferences=()=>({settings:structuredClone(S.settings),layoutMode:S.layoutMode,layout:structuredClone(layoutForSave())});\n');
     await fs.appendFile(path.join(sourceDir,'analysis.js'), '\nglobalThis.__smokeLearningReview=()=>({idx:S.idx,flipped:S.flipped,fen:activePos().fen,classif:[...S.classif]});\n');
     await fs.appendFile(path.join(sourceDir,'analysis.js'), '\nglobalThis.__smokePuzzleCount=()=>learningWorkspace?.ready?learningWorkspace.puzzles.length:0;\n');
+    await fs.appendFile(path.join(sourceDir,'analysis.js'), '\nglobalThis.__smokeModernAccuracy=async()=>{await applyUiSetup("modern");S.settings.moveAnim=false;};\nglobalThis.__smokeAccuracyBusy=busy=>{S.analyzing=busy;statsRefs=null;renderStats();};\n');
     await fs.appendFile(path.join(sourceDir,'analysis.js'), `
 let smokeSavedAnalysis;
 globalThis.__smokePendingNavigation=action=>{
@@ -210,6 +211,26 @@ try {
       }
       frame.style.width='1680px';frame.style.height='1000px';await wait(250);
       await report({step:'responsive-layouts',sizes});
+      await frame.contentWindow.__smokeModernAccuracy();
+      const accuracySizes=[[1920,919],[1920,800],[1536,704],[1366,768],[1280,600],[1280,560],[1100,480],[820,900],[390,844],[320,640]];
+      for(const busy of [false,true]) {
+        frame.contentWindow.__smokeAccuracyBusy(busy);
+        for(const [width,height] of accuracySizes) {
+          frame.style.width=width+'px';frame.style.height=height+'px';await wait(120);
+          for(const page of [0,1]) {
+            doc.querySelector('#accuracy-tab-'+page).click();await wait(25);
+            const body=doc.querySelector('.accuracy-panel .acc-page'),rect=body.getBoundingClientRect();
+            const children=[...body.querySelectorAll('.phase-rating,.phase-report-row,.qbreak-row')];
+            if(body.scrollHeight!==body.clientHeight||body.scrollWidth!==body.clientWidth||children.some(n=>n.getBoundingClientRect().bottom>rect.bottom+.5))
+              throw Error('Accuracy page needs scrolling or clips results: '+JSON.stringify({width,height,page,busy,body:body.clientHeight,content:body.scrollHeight}));
+            if(page===0&&(body.querySelectorAll('.acc-dial svg').length!==2||body.querySelectorAll('.phase-report-row').length!==3))throw Error('Accuracy design changed');
+            if(page===1&&(body.querySelectorAll('.qbreak-row').length!==10||new Set([...body.querySelectorAll('.qbreak-row')].map(n=>Math.round(n.getBoundingClientRect().left))).size!==1))throw Error('Quality category list changed');
+          }
+        }
+      }
+      frame.contentWindow.__smokeAccuracyBusy(false);doc.querySelector('#accuracy-tab-0').click();
+      frame.style.width='1680px';frame.style.height='1000px';await wait(250);
+      await report({step:'accuracy-without-scrolling',sizes:accuracySizes,completed:true,pending:true,existingDesignPreserved:true});
       if (${!reviewOnly}) {
       const reviewBefore=JSON.stringify(frame.contentWindow.__smokeLearningReview());
       const clickLearning=text=>{

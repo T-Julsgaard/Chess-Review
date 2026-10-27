@@ -1428,6 +1428,8 @@ button { font-family: inherit; cursor: pointer; }
 .stage.auto:not(.full-hd-reference).original-accuracy-expanded .mod[data-mod="accuracy"] { height: 507px; max-height: none; }
 .accuracy-panel button:focus-visible, .accuracy-panel .qlabel:focus-visible, .acc-page:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .stage .accuracy-panel .acc-page { padding: 14px 12px 8px; scrollbar-gutter: stable; }
+.stage .accuracy-panel .acc-fit-page { scrollbar-gutter: auto; }
+.acc-fit-content { display: flex; flex-direction: column; flex: 1 0 auto; min-width: 0; }
 .acc-players, .acc-metric-values, .acc-scorecards { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; }
 .acc-players { margin-bottom: 10px; flex: none; }
 .acc-player { display: flex; align-items: center; justify-content: center; gap: 6px; min-width: 0; }
