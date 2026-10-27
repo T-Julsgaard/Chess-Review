@@ -136,23 +136,33 @@
 .accuracy-phase-report .acc-page-overview .phase-overview { gap: 10px; }
 .accuracy-phase-report-2 .acc-page-overview .phase-overview { gap: 8px; }
 .accuracy-phase-modern .acc-page-overview .phase-overview { gap: 5px; }
-/* Six comparisons share the overview's anchored player columns. */
+/* Scrollable post-game comparisons keep the overview's player columns. */
 .stage .accuracy-phase-modern .acc-page-advanced { display: flex; flex-direction: column; }
-.advanced-report { display: flex; flex-direction: column; justify-content: space-evenly; gap: 2px; flex: 1 0 auto; }
-.advanced-row { padding: 2.5px 8px; border: 1px solid var(--line-soft); border-radius: 9px;
+.acc-page-advanced .acc-players { position: sticky; top: 0; z-index: 2; background: var(--panel); box-shadow: 0 -14px 0 var(--panel), 0 6px 0 var(--panel); }
+.advanced-report { display: flex; flex-direction: column; gap: 20px; flex: none; padding-bottom: 8px; }
+.advanced-group { display: flex; flex-direction: column; gap: 9px; }
+.advanced-group-label { margin: 10px 2px 0; color: var(--ink-3); font: 650 11px/1.4 var(--font-ui); letter-spacing: .09em; text-transform: uppercase; }
+.advanced-row { padding: 11px 9px; border: 1px solid var(--line-soft); border-radius: 11px; scroll-margin-top: 50px;
   background: color-mix(in srgb,var(--panel-2) 65%,var(--panel)); }
-.advanced-label { text-align: center; font-size: 11.5px; line-height: 1.2; font-weight: 600; color: var(--ink-2); margin-bottom: 2px; }
+.advanced-label { display: flex; align-items: center; justify-content: center; gap: 7px; text-align: center;
+  font: 600 14px/1.3 var(--font-ui); color: var(--ink-2); margin-bottom: 9px; }
 .advanced-pair { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; }
 .advanced-value { --metric-color: var(--ink-2); display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 1px; min-width: 0; padding: 0 3px; color: var(--metric-color); text-align: center; }
+  gap: 5px; min-width: 0; padding: 3px; color: var(--metric-color); text-align: center; }
 .advanced-value:first-child { --metric-color: var(--accent); }
-.advanced-report .acc-stat-value { font-size: 22px; line-height: 1.05; letter-spacing: -.8px; color: var(--metric-color); }
+.advanced-report .acc-stat-value { font-size: 29px; line-height: 1.15; letter-spacing: -.8px; color: var(--metric-color); overflow-wrap: anywhere; }
+.advanced-report :is([data-metric="castling"],[data-metric="active-piece"]) .acc-stat-value { font-size: 22px; }
 .advanced-report .acc-loss, .advanced-report button.advanced-value { border: 0; background: transparent; border-radius: 5px; cursor: pointer; }
 .advanced-report .acc-loss:not(button) { cursor: default; }
 .advanced-report button.advanced-value:hover { background: var(--panel-3); }
-.advanced-detail { color: var(--ink-3); font: 10px/1.2 var(--font-ui); white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-.advanced-meter { width: 78%; height: 3px; border-radius: 4px; background: var(--line-soft); overflow: hidden; margin-top: 1px; }
-.advanced-meter i { display: block; height: 100%; border-radius: inherit; background: var(--metric-color); opacity: .8; }
+.advanced-detail { color: var(--ink-3); font: 11px/1.4 var(--font-ui); max-width: 100%; overflow-wrap: anywhere; }
+.advanced-info { display: inline-grid; place-items: center; flex: 0 0 24px; width: 24px; height: 24px; padding: 0;
+  border: 1px solid color-mix(in srgb,var(--ink-3) 45%,var(--line-soft)); border-radius: 50%; background: transparent; color: var(--ink-2); cursor: pointer; }
+.advanced-info span { font: 700 13px/1 Georgia,serif; }
+.advanced-info:is(:hover,[aria-expanded="true"]) { color: var(--accent); border-color: var(--accent); background: var(--panel-2); }
+.advanced-explainer { margin: 11px 0 0; padding: 11px; border: 1px solid var(--line-soft); border-radius: 8px;
+  background: var(--panel); color: var(--ink-2); font: 400 13px/1.55 var(--font-ui); text-align: left; }
+.advanced-explainer[hidden] { display: none; }
 /* Modern Quality shares the overview header and centers the full category list
    in the portrait panel's remaining height. Transforms keep hover from reflowing it. */
 .stage .accuracy-phase-modern .acc-page-quality { display: flex; flex-direction: column; }

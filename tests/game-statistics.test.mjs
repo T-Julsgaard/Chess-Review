@@ -105,71 +105,88 @@ test('clean streaks follow the player’s decisions, skip forced replies, break 
   assert.equal(gameStatistics(f.positions, f.bests, f.calibrated, {classifications}).w.cleanStreak, null);
 });
 
-test('Time ahead integrates seconds across clock crossovers and excludes increment time', () => {
-  const f = fixture(), positions = f.positions.slice(0, 4);
-  for (const side of ['w', 'b']) f.calibrated[side].moves = f.calibrated[side].moves.filter(move => move.ply < 4);
-  const stats = gameStatistics(positions, f.bests, f.calibrated,
-    {clocks: [null, '1:35', '1:25', '1:20'], headers: {TimeControl: '100+5'}});
-  assert.equal(stats.w.timeAhead.percent, 50);
-  assert.equal(stats.b.timeAhead.percent, 50);
-  assert.equal(stats.w.timeAhead.seconds, 50);
-  assert.equal(stats.w.timeAhead.turns, 3);
-  assert.equal(stats.w.timeAhead.totalTurns, 3);
-  assert.deepEqual(stats.w.timeAhead.ahead, {w: 25, b: 25});
+test('clock advantage compares paired turns with ties in the denominator, independent of time control', () => {
+  const f = fixture();
+  const options = {clocks: [null, '1:35', '1:25', '1:20', '1:20', '1:10']};
+  const stats = gameStatistics(f.positions, f.bests, f.calibrated, options);
+  assert.deepEqual(stats.w.clock.advantage, {percent: 50, ahead: 1, samples: 2, total: 2});
+  assert.equal(stats.b.clock.advantage.percent, 0);
+  assert.deepEqual(stats.w.clock.largestLead, {seconds: 10, ply: 2});
+  assert.equal(stats.w.clock.averageThink, null, 'Unknown increment must not produce thinking times');
+  const staged = gameStatistics(f.positions, f.bests, f.calibrated, {...options, headers: {TimeControl: '40/7200:3600'}});
+  assert.equal(staged.w.clock.advantage.percent, 50, 'Remaining clocks can still be compared with staged controls');
 });
 
-test('clock gaps, excerpts, zero elapsed time and unsupported controls are never imputed', () => {
-  const f = fixture(), headers = {TimeControl: '100+5'};
-  const calculate = (clocks, h = headers) => gameStatistics(f.positions, f.bests, f.calibrated, {clocks, headers: h}).w.timeAhead;
-  assert.equal(calculate([]), null);
-  assert.equal(calculate([null, '1:45', '1:45']), null, 'Increments alone consume no time');
-  assert.equal(calculate([null, '1:35'], {TimeControl: '40/7200:3600'}), null);
-  assert.equal(calculate([null, '1:35'], {...headers, FEN: opening, SetUp: '1'}), null);
-  const gap = calculate([null, '1:35', null, '1:20', '1:10', '1:00']);
-  assert.equal(gap.turns, 2, 'Missing clock invalidates adjacent turns until fresh samples exist');
-  assert.equal(gap.seconds, 35);
-  assert.equal(calculate([null, '1:99']), null);
-});
-
-test('clock integration preserves fractional seconds and waits for both clocks in a black-to-move excerpt', () => {
-  const f = fixture(), headers = {TimeControl: '100+5'};
-  const stats = gameStatistics(f.positions, f.bests, f.calibrated,
-    {clocks: [null, '1:35.5'], headers});
-  assert.equal(stats.w.timeAhead.seconds, 9.5);
-  assert.equal(stats.w.timeAhead.percent, 0);
+test('clock pairs never bridge gaps, handle black-to-move starts, and preserve fractions', () => {
+  const f = fixture();
+  const missing = gameStatistics(f.positions, f.bests, f.calibrated, {clocks: [null, '1:30', null, '1:20', '1:10']});
+  assert.deepEqual(missing.w.clock.advantage, {percent: 100, ahead: 1, samples: 1, total: 2});
   const excerpt = [{fen: opening.replace(' w ', ' b ')},
     ...['b', 'w', 'b', 'w'].map(color => ({fen: ending, color, from: 'a1', to: 'a2'}))];
-  const clock = gameStatistics(excerpt, [], null,
-    {clocks: [null, '1:35', '1:30', '1:20', '1:10'], headers: {...headers, SetUp: '1'}}).w.timeAhead;
-  assert.equal(clock.turns, 2);
-  assert.equal(clock.seconds, 45);
-  assert.ok(Math.abs(clock.percent - 100 * 25 / 45) < 1e-9);
+  const clock = gameStatistics(excerpt, [], null, {clocks: [null, '1:35.5', '1:35.25', '1:20', '1:30']}).b.clock;
+  assert.equal(clock.advantage.percent, 50);
+  assert.equal(clock.largestLead.seconds, .25);
+  assert.equal(gameStatistics(f.positions, f.bests, f.calibrated).w.clock.advantage, null);
+  assert.equal(gameStatistics(f.positions, f.bests, f.calibrated, {clocks: [null, '1:99', '1:00']}).w.clock.advantage, null);
 });
 
-test('comeback measures recovery retained at the finish, respects actual results, and requires a clear deficit', () => {
-  const f = fixture(), evals = [0, -400, -200, 100, 300, 0].map(cp => ({cp}));
-  const calculate = result => gameStatistics(f.positions, f.bests, f.calibrated, {evals, headers: {Result: result}});
-  const win = calculate('1-0');
-  assert.equal(win.w.comeback.ply, 1);
-  assert.ok(win.w.comeback.score > 80 && win.w.comeback.score < 82);
-  assert.equal(win.b.comeback.score, 0);
-  const draw = calculate('1/2-1/2').w.comeback;
-  assert.ok(draw.score > 30 && draw.score < 32);
-  assert.equal(calculate('0-1').w.comeback.score, 0, 'A brief rebound cannot earn comeback credit after a loss');
-  assert.equal(calculate('*').w.comeback.finalResult, false);
-  assert.equal(calculate('*').w.comeback.finish, .5);
-  const level = gameStatistics(f.positions, f.bests, f.calibrated, {evals: evals.map(() => ({cp: 0}))});
-  assert.equal(level.w.comeback.score, 0); assert.equal(level.w.comeback.hadDeficit, false);
-  evals[2] = null;
-  assert.equal(calculate('*').w.comeback, null);
+test('thinking times remove increments, include zero-second moves, and do not bridge missing clocks', () => {
+  const f = fixture(), headers = {TimeControl: '100+5'};
+  const stats = gameStatistics(f.positions, f.bests, f.calibrated,
+    {clocks: [null, '1:35.5', '1:45', '1:20', null, '1:00'], headers});
+  assert.equal(stats.w.clock.thinkMoves, 3);
+  assert.equal(stats.w.clock.averageThink, 55 / 3);
+  assert.deepEqual(stats.w.clock.longestThink, {seconds: 25, ply: 5});
+  assert.equal(stats.b.clock.averageThink, 0);
+  const gap = gameStatistics(f.positions, f.bests, f.calibrated,
+    {clocks: [null, null, '1:35', '1:20', '1:10', '1:00'], headers}).w.clock;
+  assert.equal(gap.thinkMoves, 1);
+  assert.equal(gap.longestThink.ply, 5);
+  assert.equal(gap.longestThink.seconds, 25);
 });
 
-test('mate scores map to endpoints for recovery and mixed-engine games cannot get a comeback score', () => {
-  const f = fixture(), evals = [0, 0, 0, 0, 0, 0].map(cp => ({cp}));
-  evals[1] = {mate: -4}; evals[5] = {mate: 1};
-  const stats = gameStatistics(f.positions, f.bests, f.calibrated, {evals});
-  assert.equal(stats.w.comeback.score, 100);
-  assert.equal(stats.b.comeback.score, 0);
-  f.calibrated.b.moves.forEach(move => { move.engine = 'sf19lite'; });
-  assert.equal(gameStatistics(f.positions, f.bests, f.calibrated, {evals}).w.comeback, null);
+test('decision insights use mover-relative starting positions and only eligible decisions', () => {
+  const f = fixture();
+  f.bests[0].score.cp = 0; f.bests[2].score.cp = -100; f.bests[4].score.cp = 100;
+  const stats = gameStatistics(f.positions, f.bests, f.calibrated,
+    {classifications: [null, 'book', 'good', 'mistake', 'inaccuracy', 'excellent']});
+  assert.equal(stats.w.insights.balanced.accuracy, 90);
+  assert.equal(stats.w.insights.defending.accuracy, 70);
+  assert.equal(stats.w.insights.winning.accuracy, 50);
+  assert.equal(stats.w.insights.cleanShare, 200 / 3);
+  assert.equal(stats.w.insights.bestStretch, null);
+  assert.equal(stats.b.insights.defending.accuracy, null, 'No matching sample is unavailable, not zero');
+  f.calibrated.w.moves[1].eligible = false;
+  assert.equal(gameStatistics(f.positions, f.bests, f.calibrated).w.insights.defending.count, 0);
+  f.calibrated.w.complete = false;
+  assert.equal(gameStatistics(f.positions, f.bests, f.calibrated).w.insights, null);
+});
+
+test('best five-decision stretch keeps the earliest tie and uses the engine’s actual accuracy aggregator', () => {
+  const positions = [{fen: opening}], moves = [];
+  for (let i = 1; i <= 12; i++) {
+    positions.push({fen: opening, color: i % 2 ? 'w' : 'b', from: 'a1', to: 'a2'});
+    if (i % 2) moves.push({ply: i, eligible: true, quality: 90, engine: 'sf19lite'});
+  }
+  const calibrated = {w: {complete: true, moves}};
+  const stats = gameStatistics(positions, [], calibrated);
+  assert.equal(stats.w.insights.bestStretch.startPly, 1);
+  assert.equal(stats.w.insights.bestStretch.endPly, 9);
+  assert.equal(stats.w.insights.bestStretch.accuracy, sf19GameAccuracy(moves.slice(0, 5)));
+  assert.equal(stats.w.insights.lastTen.count, 6);
+});
+
+test('playing-style counts include checking captures and castling as a king move without needing engine evidence', () => {
+  const positions = [{fen: opening},
+    {fen: middle, color: 'w', san: 'Nxd5+', captured: 'p'}, {fen: middle, color: 'b', san: 'O-O'},
+    {fen: middle, color: 'w', san: 'e8=Q#'}, {fen: middle, color: 'b', san: 'Kf8'},
+    {fen: middle, color: 'w', san: 'Ng4'}, {fen: middle, color: 'b', san: 'Rxe8', captured: 'q'}];
+  const stats = gameStatistics(positions, [], null);
+  assert.equal(stats.w.activity.checks, 2);
+  assert.equal(stats.w.activity.captures, 1);
+  assert.deepEqual(stats.w.activity.activePiece, {piece: 'N', moves: 2});
+  assert.equal(stats.w.activity.castled, null);
+  assert.equal(stats.b.activity.castled, 2);
+  assert.deepEqual(stats.b.activity.activePiece, {piece: 'K', moves: 2});
+  assert.equal('comeback' in stats.w, false);
 });

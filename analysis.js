@@ -1478,9 +1478,8 @@ function computeDerived() {
   }
   const N = S.total;
   const eloAccs = sideAccuracies();
-  const result = S.headers.Result || S.meta.result || S.pgn.trim().match(/(?:^|\s)(1-0|0-1|1\/2-1\/2)$/)?.[1];
   S.gameStats = gameStatistics(S.positions, S.bests, S.calibrated,
-    {classifications: completedClasses, clocks: S.clocks, headers: {...S.headers, Result: result}, evals: S.evals});
+    {classifications: completedClasses, clocks: S.clocks, headers: S.headers});
   for (const side of ["w", "b"]) {
     const counts = {}; QUALITY_ORDER.forEach((k) => (counts[k] = 0));
     for (let i = 1; i <= N; i++) {
@@ -4447,58 +4446,105 @@ function updateAccuracyPhases(sides, busy, design) {
 }
 function renderModernAdvanced(sides, busy) {
   const stats = sides.map(side => S.gameStats?.[side]);
-  const decimal = value => value == null ? '—' : value.toFixed(1);
+  const decimal = value => value == null ? null : value.toFixed(1);
+  const percent = value => value == null ? null : Math.round(value) + '%';
+  const duration = value => value == null ? null : value < 60 ? value.toFixed(1) + 's'
+    : Math.floor(Math.round(value) / 60) + ':' + String(Math.round(value) % 60).padStart(2, '0');
   const moveName = ply => {
-    const position = S.positions[ply];
-    if (!position || ply == null) return '';
-    const fullmove = Number(S.positions[ply - 1].fen.split(' ')[5]);
-    return fullmove + (position.color === 'w' ? '. ' : '… ') + position.san;
+    if (ply == null || !S.positions[ply]) return '';
+    return Number(S.positions[ply - 1].fen.split(' ')[5]) + (S.positions[ply].color === 'w' ? '. ' : '… ') + S.positions[ply].san;
   };
-  const cell = (index, value, {detail = '', hint = '', meter = null, jump = null, className = ''} = {}) => {
+  const root = el('div', {class: 'acc-advanced advanced-report'});
+  const cell = (index, value, {detail = '', jump = null, className = ''} = {}) => {
     const available = value != null && !busy;
-    const label = S.players[sides[index]].name + ': ' + (busy ? 'Analyzing' : available ? value + '. ' + hint : hint || 'Unavailable');
-    return el(jump != null ? 'button' : 'div', {class: 'advanced-value ' + className,
-      ...(jump != null ? {type: 'button', onclick: () => gotoMainline(jump), disabled: !available} : {}),
-      'aria-label': label, ...(hint ? {title: hint} : {})},
-    el('strong', {class: 'acc-stat-value'}, busy ? '···' : value ?? '—'),
-    detail ? el('span', {class: 'advanced-detail'}, busy ? ' ' : detail) : null,
-    meter == null ? null : el('span', {class: 'advanced-meter', 'aria-hidden': 'true'},
-      el('i', {style: {width: (available ? Math.max(0, Math.min(100, meter)) : 0) + '%'}})));
+    return el(jump != null && available ? 'button' : 'div', {class: 'advanced-value ' + className,
+      ...(jump != null && available ? {type: 'button', onclick: () => gotoMainline(jump)} : {}),
+      'aria-label': S.players[sides[index]].name + ': ' + (busy ? 'Analyzing' : value ?? 'Not enough data') + (available && detail ? '. ' + detail : '')},
+      el('strong', {class: 'acc-stat-value'}, busy ? accuracyPendingValue() : value ?? '—'),
+      detail ? el('span', {class: 'advanced-detail'}, busy ? ' ' : detail) : null);
   };
-  const row = (id, label, hint, cells) => el('section', {class: 'advanced-row', 'data-metric': id, 'aria-label': label, 'aria-description': hint, title: hint},
-    el('div', {class: 'advanced-label'}, label), el('div', {class: 'advanced-pair'}, ...cells));
-  return el('div', {class: 'acc-advanced advanced-report'},
-    row('loss', 'Average centipawn loss', 'Lower is better. 100 centipawns = one pawn.', stats.map((stat, i) =>
-      cell(i, stat?.averageCpLoss == null ? null : decimal(stat.averageCpLoss),
-        {hint: (stat?.cpMoves || 0) + ' scored decisions. Lower is better; 100 cp = one pawn.'}))),
-    row('match', 'Engine top-move match', 'How often your decision matched the engine’s first choice. Forced moves excluded.', stats.map((stat, i) =>
-      cell(i, stat?.topMatch == null ? null : decimal(stat.topMatch) + '%', {meter: stat?.topMatch ?? 0}))),
-    row('largest', 'Largest evaluation loss', 'Select a move to revisit the largest centipawn loss.', stats.map((stat, i) => {
+  const closeInfo = () => {
+    root.querySelectorAll('.advanced-info[aria-expanded="true"]').forEach(button => {
+      button.setAttribute('aria-expanded', 'false');
+      root.querySelector('#' + button.getAttribute('aria-controls')).hidden = true;
+    });
+  };
+  const row = (id, label, explanation, cells) => {
+    const description = el('p', {class: 'advanced-explainer', id: 'advanced-info-' + id, hidden: true}, explanation);
+    const info = el('button', {class: 'advanced-info', type: 'button', 'aria-label': 'About ' + label,
+      'aria-expanded': 'false', 'aria-controls': description.id, onclick: () => {
+        const open = info.getAttribute('aria-expanded') !== 'true';
+        closeInfo(); info.setAttribute('aria-expanded', String(open)); description.hidden = !open;
+        if (open) section.scrollIntoView?.({block: 'nearest'});
+      }}, el('span', {'aria-hidden': 'true'}, 'i'));
+    const section = el('section', {class: 'advanced-row', 'data-metric': id, 'aria-label': label},
+      el('div', {class: 'advanced-label'}, el('span', {}, label), info),
+      el('div', {class: 'advanced-pair'}, ...cells), description);
+    return section;
+  };
+  root.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return;
+    const info = root.querySelector('.advanced-info[aria-expanded="true"]');
+    if (info) { event.stopPropagation(); closeInfo(); info.focus(); }
+  });
+  const group = (name, rows) => root.append(el('div', {class: 'advanced-group'},
+    el('h4', {class: 'advanced-group-label'}, name), ...rows));
+  const sampleCells = key => stats.map((stat, i) => {
+    const sample = stat?.insights?.[key];
+    return cell(i, decimal(sample?.accuracy), {detail: sample?.count ? sample.count + ' decisions' : 'No scored decisions'});
+  });
+  group('Decision quality', [
+    row('loss', 'Average centipawn loss', 'How much your moves gave away on average compared with the engine’s best move. Lower is better. 100 centipawns is roughly one pawn. Forced moves and mate scores are left out.', stats.map((stat, i) =>
+      cell(i, decimal(stat?.averageCpLoss), {detail: stat?.cpMoves ? stat.cpMoves + ' decisions' : 'No scored decisions'}))),
+    row('match', 'Engine top-move match', 'How often you chose the engine’s first-choice move. A different move can still be very good, so a lower match rate does not automatically mean poor play. Forced replies are left out.', stats.map((stat, i) => cell(i, percent(stat?.topMatch)))),
+    row('largest', 'Largest evaluation loss', 'Your single biggest drop compared with the engine’s best move, measured in centipawns. 100 centipawns is roughly one pawn. Select the move underneath to revisit it. Mate scores are left out.', stats.map((stat, i) => {
       const loss = stat?.largestLoss;
-      return cell(i, loss ? Math.round(loss.loss) + ' cp' : null, {detail: loss?.loss > 0 ? moveName(loss.ply) + ' ↗' : ' ',
-        jump: !busy && loss?.loss > 0 ? loss.ply : null, className: 'acc-loss', hint: loss ? 'On ' + moveName(loss.ply) + '. Jump to move.' : 'No scored loss'});
+      return cell(i, loss ? Math.round(loss.loss) + ' cp' : null, {detail: loss?.loss > 0 ? moveName(loss.ply) + ' ↗' : 'No scored loss',
+        jump: loss?.loss > 0 ? loss.ply : null, className: 'acc-loss'});
     })),
-    row('clock', 'Time ahead', 'Share of recorded thinking time with more time on your clock. Increments removed; clock crossovers included.', stats.map((stat, i) => {
-      const clock = stat?.timeAhead;
-      return cell(i, clock ? Math.round(clock.percent) + '%' : null, {meter: clock?.percent ?? 0,
-        detail: clock ? 'of recorded time' : 'Clock data needed',
-        hint: clock ? 'Based on ' + Math.round(clock.seconds) + ' seconds across ' + clock.turns + '/' + clock.totalTurns + ' turns with usable clocks. Increments excluded.'
-          : 'Requires clock tags and a supported base time with optional increment.'});
-    })),
-    row('streak', 'Longest clean streak', 'Consecutive decisions at Good or better, including Book. Forced moves neither add to nor break a streak.', stats.map((stat, i) => {
+    row('streak', 'Longest clean streak', 'Your longest run of decisions rated Good or better, including opening-book moves. Inaccuracies, mistakes, missed chances and blunders end the run. Forced replies do not add to or break it. Select a value to revisit the start.', stats.map((stat, i) => {
       const streak = stat?.cleanStreak;
-      return cell(i, streak ? String(streak.count) : null, {detail: streak?.count > 0 ? 'decisions · revisit ↗' : 'clean decisions',
-        jump: !busy && streak?.count > 0 ? streak.startPly : null,
-        hint: streak?.count > 0 ? moveName(streak.startPly) + ' to ' + moveName(streak.endPly) + '. Jump to the start of the streak.' : 'No clean streak scored'});
+      return cell(i, streak ? String(streak.count) : null, {detail: streak?.count > 0 ? 'decisions · revisit ↗' : 'No clean decisions', jump: streak?.count > 0 ? streak.startPly : null});
     })),
-    row('comeback', 'Comeback meter', 'Expected-score points recovered from a clear deficit to the finish. A declared loss scores zero; opponent mistakes can contribute.', stats.map((stat, i) => {
-      const comeback = stat?.comeback;
-      return cell(i, comeback ? String(Math.round(comeback.score)) : null, {meter: comeback?.score ?? 0,
-        detail: comeback ? comeback.hadDeficit ? 'points recovered' : 'No clear deficit' : 'Full analysis needed',
-        hint: comeback ? 'Expected score: ' + Math.round(comeback.worst * 100) + '% at the lowest point → '
-          + Math.round(comeback.finish * 100) + '% at the finish. ' + (comeback.finalResult ? 'Uses the recorded result.' : 'Uses the final evaluation; result unknown.')
-          : 'Requires complete analysis with compatible engine evidence.'});
-    })));
+    row('clean', 'Clean decisions', 'The percentage of your non-forced decisions rated Good or better, including Book. This shows how often you avoided a move rated as an error.', stats.map((stat, i) => cell(i, percent(stat?.insights?.cleanShare)))),
+    row('best-five', 'Best five-decision stretch', 'Your highest accuracy across five consecutive non-forced decisions. It highlights a sustained stretch of strong play. You need at least five scored decisions. Select a value to revisit that stretch.', stats.map((stat, i) => {
+      const best = stat?.insights?.bestStretch;
+      return cell(i, decimal(best?.accuracy), {detail: best ? 'accuracy · revisit ↗' : 'Needs five decisions', jump: best?.startPly});
+    })),
+    row('balanced', 'Accuracy in balanced positions', 'How accurately you played when the engine’s evaluation before your move was less than one pawn in either direction. A useful look at your decisions when neither side had a clear advantage. Mate scores and forced replies are left out.', sampleCells('balanced')),
+    row('defending', 'Accuracy while defending', 'How accurately you played when you started your turn at least one pawn behind in the engine’s evaluation. It shows the quality of your resistance, even if you eventually lost. Mate scores and forced replies are left out.', sampleCells('defending')),
+    row('winning', 'Accuracy while ahead', 'How accurately you played when you started your turn at least one pawn ahead in the engine’s evaluation. It helps you see how well you handled an advantage. Mate scores and forced replies are left out.', sampleCells('winning')),
+    row('finish', 'Final ten decisions', 'Your accuracy over your last ten non-forced decisions. Compare it with your overall accuracy to see how strongly you finished. For shorter games, all available decisions are used; the count appears below.', sampleCells('lastTen')),
+  ]);
+  group('On the clock', [
+    row('clock', 'Clock advantage', 'How often you had more time left after both players had moved. For example, 70% means you were ahead at 7 of 10 recorded checkpoints. Ties count for neither player; missing clock pairs are skipped. The count below shows the available data.', stats.map((stat, i) => {
+      const clock = stat?.clock?.advantage;
+      return cell(i, percent(clock?.percent), {detail: clock ? clock.ahead + '/' + clock.samples + ' checkpoints · ' + clock.samples + '/' + clock.total + ' recorded' : 'Clock data needed'});
+    })),
+    row('clock-lead', 'Biggest clock lead', 'The most extra time you had compared with your opponent at any recorded checkpoint after both players had moved. Select a value to see the position. Zero means you were never ahead at those checkpoints.', stats.map((stat, i) => {
+      const lead = stat?.clock?.largestLead;
+      return cell(i, duration(lead?.seconds), {detail: lead?.seconds > 0 ? moveName(lead.ply) + ' ↗' : lead ? 'Never ahead' : 'Clock data needed', jump: lead?.seconds > 0 ? lead.ply : null});
+    })),
+    row('think-average', 'Average thinking time', 'How long you spent on a move on average. We subtract the increment so bonus seconds are not mistaken for thinking time. Only moves with usable before-and-after clocks are included. Some time controls do not provide enough information.', stats.map((stat, i) =>
+      cell(i, duration(stat?.clock?.averageThink), {detail: stat?.clock?.thinkMoves ? stat.clock.thinkMoves + ' clocked moves' : 'Clock data needed'}))),
+    row('think-longest', 'Longest think', 'The most time you spent on a single recorded move, with any increment removed. Select the value to revisit the decision that made you pause.', stats.map((stat, i) => {
+      const think = stat?.clock?.longestThink;
+      return cell(i, duration(think?.seconds), {detail: think ? moveName(think.ply) + ' ↗' : 'Clock data needed', jump: think?.ply});
+    })),
+  ]);
+  group('Your playing style', [
+    row('checks', 'Checks delivered', 'How many of your moves put the opponent’s king in check, including checkmate. This is a description of the game, not a score: a quiet move can be stronger than a check.', stats.map((stat, i) => cell(i, stat?.activity ? String(stat.activity.checks) : null))),
+    row('captures', 'Captures made', 'How many captures you played, including en passant and captures that promote a pawn. A high number can reflect a tactical game or lots of exchanges; it does not automatically mean better play.', stats.map((stat, i) => cell(i, stat?.activity ? String(stat.activity.captures) : null))),
+    row('castling', 'When you castled', 'The move on which you castled. Select it to revisit the position. “Not castled” means no castling move was recorded in this game or excerpt. Delaying castling can be sensible in some positions.', stats.map((stat, i) => {
+      const ply = stat?.activity?.castled;
+      return cell(i, stat?.activity ? ply == null ? '—' : moveName(ply) : null, {detail: ply == null ? 'Not castled' : 'revisit ↗', jump: ply});
+    })),
+    row('active-piece', 'Most-used piece type', 'Which type of piece you moved most: pawns, knights, bishops, rooks, queen or king. All pieces of the same type are grouped together; castling counts as a king move. If types tie, the one used first is shown.', stats.map((stat, i) => {
+      const active = stat?.activity?.activePiece, names = {P: 'Pawns', N: 'Knights', B: 'Bishops', R: 'Rooks', Q: 'Queen', K: 'King'};
+      return cell(i, active ? names[active.piece] : null, {detail: active ? active.moves + ' moves' : 'No moves recorded'});
+    })),
+  ]);
+  return root;
 }
 function renderStats() {
   const design = panelDesign('accuracy', S.settings);

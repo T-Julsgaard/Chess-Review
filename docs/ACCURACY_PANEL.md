@@ -127,42 +127,67 @@ not follow an exploratory variation or change the accuracy/rating models.
 
 No eligible sample or incomplete/mixed evidence produces an em dash, not zero.
 
-Modern's Advanced page keeps these three metrics and adds three comparisons.
-Its player cards share the overview's exact markup, position and typography.
-Six compact rows fit the taller Modern panel; shorter windows can scroll the
-body while retaining the navigation. Loss and streak links revisit the mainline.
+Modern's Advanced page is a larger, scrollable post-game report with 18
+comparisons in three groups. Its player cards use the overview's exact markup,
+position and typography, and stay pinned while the body scrolls. Navigation
+stays visible. There are no percentage bars, hover explanations or comeback
+meter. Every metric has an **i** button that opens its plain-language explanation
+inside the card. One explanation opens at a time; clicking again or pressing
+Escape closes it. Escape restores focus to the info button. Opening a card
+brings it into view, and changing pages dismisses explanations.
 
-- **Time ahead:** percentage of usable recorded thinking seconds during which
-  that player had more time remaining. For each turn, reconstruct elapsed time
-  as `previous own clock + increment - current own clock`. Integrate the moving
-  clock against the opponent's stationary clock, splitting at a crossover.
-  Increments take no elapsed time. Missing tags invalidate their dependent
-  intervals rather than carrying a stale clock forward. The tooltip gives
-  recorded seconds and usable/total turns, so incomplete coverage stays visible.
-  Supports simple base-time and base-plus-increment controls; staged controls
-  and clockless games show an em dash. Custom starts require actual samples on
-  both sides before integration begins.
-- **Longest clean streak:** longest consecutive run of completed decisions
-  classified Good or better, including Book. Inaccuracy, Mistake, Miss and
-  Blunder break a run. Forced replies neither add to nor break it. Ties retain
-  the earliest run, and selecting a nonzero value jumps to its first move.
-  Missing eligible classifications leave the metric unavailable.
-- **Comeback meter:** an original 0–100 recovery measure using the shared
-  centipawn-to-expected-score curve (`SF19_OUTCOME`) for both engines. A clear
-  deficit requires expected score at or below 35%. The score is
-  `max(0, 100 × (finish − lowest expected score))`; without a clear deficit it
-  is zero. A declared result supplies the finish (win 1, draw 0.5, loss 0);
-  ongoing games use the final evaluation and say so in the tooltip. Mate scores
-  map to endpoints. Requires complete compatible analysis and all position
-  evaluations. This measures recovery retained at the finish, including help
-  from opponent mistakes, rather than attributing the recovery solely to skill.
+**Decision quality** includes the original three metrics, Longest clean streak,
+Clean decisions, Best five-decision stretch, Accuracy in balanced positions,
+Accuracy while defending, Accuracy while ahead, and Final ten decisions.
 
-These additions use the completed mainline evidence, including when a review is
-restored from cache. They do not change accuracy, annotations or rating models.
-Run `node scripts/learning-browser.mjs --working-tree --modern-advanced` for eight
-viewport sizes, exact header geometry checks, real PGN clocks, keyboard links,
-cached reload and dark/light screenshots. Illustrative screenshots are labeled
-separately from the real analysis.
+- Clean streak/share use completed classifications rated Good or better,
+  including Book. Inaccuracy, Mistake, Miss and Blunder are errors. Forced
+  replies neither extend nor break a streak and do not enter the share.
+  Missing eligible classifications leave the result unavailable. Tied longest
+  streaks retain the earliest run; selecting a streak revisits its first move.
+- Best stretch uses five consecutive eligible decisions with the existing
+  engine-specific accuracy aggregator. At least five decisions are required;
+  tied stretches retain the earliest. The value links to its first decision.
+- Balanced/defending/ahead accuracy select eligible decisions by the paired
+  root search's mover-relative score before the decision: absolute cp <100,
+  cp <=−100, and cp >=100 respectively. Mate scores are omitted from these
+  subsets. Sample counts appear below each accuracy. Final ten uses the last
+  ten eligible decisions, or all available decisions for a shorter game.
+
+**On the clock** includes Clock advantage, Biggest clock lead, Average thinking
+time and Longest think.
+
+- Clock advantage is the percentage of recorded checkpoints where a player's
+  remaining clock was strictly higher. A checkpoint follows each pair of turns,
+  including black-to-move excerpts, so both players have moved once. Only pairs
+  with both clock tags are compared. Ties enter the denominator but count for
+  neither side. The visible detail includes ahead/sample counts and
+  recorded/possible coverage. This is a share of checkpoints, not an estimate
+  of elapsed wall-clock seconds. It works without a TimeControl header and
+  with staged controls because remaining clocks can be compared directly.
+- Biggest clock lead is the largest positive difference at those checkpoints,
+  linked to the corresponding position. Never ahead is zero; no sample is
+  unavailable. Ties retain the earliest checkpoint.
+- Thinking times use previous own clock + increment − current own clock,
+  retaining fractional seconds and zero-second moves. Missing tags invalidate
+  dependent intervals; they are never bridged. Simple base time and optional
+  increment controls are supported. Custom starts require real prior samples.
+  Unsupported controls show an em dash for thinking times while clock
+  comparisons remain available. Longest think links to its original move.
+
+**Your playing style** includes Checks delivered (including mate), Captures made
+(including en passant/promotion captures), When you castled, and Most-used piece
+type. The latter groups pieces by type, treats castling as a king move, and
+breaks ties by first use. These descriptive counts require only the recorded
+mainline, not engine evidence; they make no claim about move quality.
+
+The report uses the original mainline, including cached reviews. It does not
+follow variations or change accuracy, annotations or rating models. The same
+report appears under both Modern overview designs; other designs retain their
+existing Advanced layout. Run
+`node scripts/learning-browser.mjs --working-tree --modern-advanced` for eight
+viewports, pinned header geometry, genuine wheel/keyboard input, all 18
+explainers, clock data, cached reload and dark/light screenshots.
 
 ## Verification
 

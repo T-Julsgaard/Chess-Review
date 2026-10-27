@@ -55,8 +55,10 @@ updates counters, totals and shares without replacing focused controls.
 
 These Move quality choices apply to all paged overview designs, including Page
 tabs. Original overview retains its historical combined panel. Accuracy advanced
-currently offers its existing Original metrics layout; its separate preference
-reserves the page for future iterations. Both new preferences reset with Visual.
+uses a scrollable 18-stat report under both Modern overviews, with larger values,
+pinned player cards and click-to-open explanations. Other overviews retain the
+Original metrics layout; the separate preference reserves future design choices.
+Both new preferences reset with Visual.
 Run `node scripts/learning-browser.mjs --working-tree --move-quality` for eight
 viewport sizes, theme screenshots, keyboard activation and saved-choice checks.
 
