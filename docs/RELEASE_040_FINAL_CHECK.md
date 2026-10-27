@@ -22,7 +22,7 @@ respects previous dismissal/opt-out, and never changes the selected layout.
 
 ## Verification performed
 
-- Full suite after the navigation follow-up: **1,244 passed**, zero failures, cancellations or skips, using
+- Full suite after the furthest-result navigation follow-up: **1,245 passed**, zero failures, cancellations or skips, using
   `node --test --test-concurrency=4 tests/*.test.mjs`. A prior unrestricted run
   during concurrent lint/browser work hit an existing wall-clock Elo animation
   assertion; limiting test concurrency produced the clean final run.
@@ -73,18 +73,24 @@ already plotted later results with gaps, but buttons, keyboard, graph and move-l
 navigation were capped at the uninterrupted completed prefix. A slow earlier
 position could therefore prevent browsing until the rest of the analysis finished.
 
-Navigation now uses the loaded game's full move range independently of engine
-progress. Pending positions retain explicit calculating states; arriving results
-update the selected position without moving it. Following the recorded move on
-the board stays on the mainline even when its evaluation is pending. Search
-budgets, worker scheduling, scores and saved analyses are unchanged.
+Navigation now stops at the furthest position with a completed evaluation, rather
+than the first unfinished position or the end of the loaded game. Pending gaps
+before that limit remain accessible and show calculating states. Later moves stay
+locked, and new completed results extend the limit without moving the selected
+position. Buttons, keyboard, move-list clicks, every graph design, playback and
+recorded board moves share this limit. Autoplay waits at the boundary and resumes
+when it advances. Preview scores and completion counters cannot unlock moves;
+interrupted analysis retains the same boundary. Search budgets, worker scheduling,
+scores and saved analyses are unchanged.
 
-Nine added navigation regressions cover keyboard, move-list clicks, all six graph
-designs, matching board moves and autoplay. The deferred-worker regression also
-holds position zero unfinished while later results arrive and confirms the
-selected result updates. The 47 focused tests and the full 1,244-test suite passed.
-The packaged Chrome/Firefox smoke tests reproduce the gap and verify buttons,
-keyboard, move list, graph clicks and independent score arrival in both browsers.
+Ten navigation regressions cover keyboard, move-list clicks, all six graph designs,
+matching board moves, autoplay and stopped analysis. The deferred-worker regression
+also holds positions zero and one unfinished while later results arrive and checks
+the boundary and independent updates to the selected gap. All 48 focused tests
+passed, followed by the full 1,245-test suite. The viewport-preview fixture now
+publishes scores when simulating completed analysis before restoring a saved move.
+The packaged Chrome/Firefox smoke checks reproduce gaps, verify the navigation
+boundary and confirm that new results extend it independently.
 
 The selected extension summary is now: “Free, open-source chess analysis, puzzles
 and opening lessons.” These changes remain part of the unreleased 0.4.0 packages;

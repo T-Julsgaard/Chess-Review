@@ -194,10 +194,12 @@ zero for Black. Move bars and Move bars v2 use an ivory position/hover guide in
 dark themes and charcoal in light themes. These designs support
 click-to-jump, hover scores and keyboard navigation (arrows, Home, End), preserve
 focus and chart nodes while navigating. Empty
-and pending positions show explicit waiting states. Browsing with the move list,
-graph, keyboard, playback or board does not wait for completed analysis. Parallel
-searches can finish out of order: later results remain selectable, pending moves
-show “Calculating…” and receive their scores when ready. Scores use White's
+and pending positions show explicit waiting states. The move list, graph,
+keyboard, playback and recorded board moves stop at the furthest completed
+evaluation. Parallel searches can finish out of order: earlier pending gaps remain
+selectable, while moves beyond the last result stay locked. New completed results
+extend that limit; autoplay waits there and resumes when it advances. Pending
+positions show “Calculating…” and receive their scores when ready. Scores use White's
 perspective regardless of board orientation; M means mate. Original retains the
 earlier graph styles. Designs share engine results and do not change analysis.
 

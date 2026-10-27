@@ -2959,11 +2959,14 @@ function applyUserMove(from, to, animate = true, promotion = null) {
   if (!mv) { S.selectedSq = null; renderSelection(); return; }
   const node = { fen: c.fen(), san: mv.san, from: mv.from, to: mv.to, color: mv.color, promotion: mv.promotion || "", captured: mv.captured || "", eval: null, best: null };
   if (!S.analysisMode) {
-    // Following the recorded game remains mainline navigation even while its
-    // evaluation is pending. Only a different legal move creates a variation.
+    // Following the recorded game stays on the mainline, including pending gaps
+    // before a later completed evaluation. Never turn a locked move into a variation.
     const nextMain = S.positions[S.idx + 1];
     if (nextMain && nextMain.from === from && nextMain.to === to && (nextMain.promotion || "") === (mv.promotion || "")) {
-      S.selectedSq = null; go(S.idx + 1); return;
+      S.selectedSq = null;
+      if (S.idx < mainlineNavigationLimit()) go(S.idx + 1);
+      else renderSelection();
+      return;
     }
     S.variation = { 
       branchIdx: S.idx, 
@@ -3530,7 +3533,7 @@ function renderControls() {
       refs.next = el("button", { "aria-label": variation ? "Next move" : "Next", onclick: navNext }, icon("next"));
       // Read the current endpoint on click; the game or variation can change.
       refs.last = el("button", { "aria-label": variation ? "Variation end" : "End",
-        onclick: variation ? () => gotoVar(S.variation.positions.length - 1) : () => go(S.total) }, icon("last"));
+        onclick: variation ? () => gotoVar(S.variation.positions.length - 1) : () => go(mainlineNavigationLimit()) }, icon("last"));
       UI.controls.replaceChildren(refs.first, refs.previous, refs.center, refs.next, refs.last);
     }
   }
@@ -3556,8 +3559,8 @@ function renderControls() {
     if (refs.last.disabled !== atEnd) refs.last.disabled = atEnd;
     return;
   }
-  // The game is already loaded: pending engine results must not block browsing.
-  const atEnd = S.blank || S.idx >= S.total;
+  // Pending gaps can be crossed, but moves after the furthest result stay locked.
+  const atEnd = S.blank || S.idx >= mainlineNavigationLimit();
   refs.first.disabled = S.blank;
   refs.previous.disabled = S.blank;
   if (refs.next.disabled !== atEnd) refs.next.disabled = atEnd;
@@ -4931,9 +4934,9 @@ function renderGraph() {
     if (pts.at(-1)?.ply !== p - 1) runs.push([]);
     runs.at(-1).push(point); pts.push(point);
   }
-  // Plot only returned scores, but allow navigation through the whole loaded
-  // game. A slow earlier search must not lock out later results or pending moves.
-  const lastPly = S.total;
+  // A slow earlier search must not lock out later results or the gaps before
+  // them. Keep the rest of the game locked until a completed evaluation arrives.
+  const lastPly = mainlineNavigationLimit();
   const pathFor = (run, y, closeY) => {
     let points = run.map(p => ({x: toX(p.ply), y: y(p.cp)}));
     if (points.length === 1) {
@@ -7449,14 +7452,21 @@ function renderLibrary() {
 }
 
 /* ---------------- Navigation ---------------- */
+function mainlineNavigationLimit() {
+  // Completion order is independent of game order. Use the furthest published
+  // evaluation, not the uninterrupted prefix or number of completed positions.
+  for (let ply = Math.min(S.total, S.evals.length - 1); ply > 0; ply--) {
+    if (S.evals[ply] != null) return ply;
+  }
+  return 0;
+}
 function go(to) {
   _categoryJump = null;
   _cancelPromotion?.();
   _cancelBoardDrag?.();
   const prev = S.idx;
-  // Scores arrive independently and out of order. The recorded moves are already
-  // known, so navigation never waits for the completed evaluation prefix.
-  S.idx = Math.max(0, Math.min(S.total, to));
+  // Cross unfinished earlier positions, stopping at the furthest completed one.
+  S.idx = Math.max(0, Math.min(mainlineNavigationLimit(), to));
   // Changing moves resets the user's own arrows, square marks and piece selection. The sound must
   // match the move that actually animates: stepping FORWARD = the move just made (lands on idx);
   // stepping BACK = the move being UNDONE (the one that left `prev`). Keying both on idx made
@@ -7525,6 +7535,11 @@ function toggleAuto() {
   if (S.autoTimer) { clearInterval(S.autoTimer); S.autoTimer = null; }
   else S.autoTimer = setInterval(() => {
     if (S.analysisMode || S.idx >= S.total) { clearInterval(S.autoTimer); S.autoTimer = null; renderControls(); return; }
+    if (S.idx >= mainlineNavigationLimit()) {
+      // Wait without repeating a move; resume when another result extends the limit.
+      if (S.analyzing) return;
+      clearInterval(S.autoTimer); S.autoTimer = null; renderControls(); return;
+    }
     go(S.idx + 1);
   }, 900);
   renderControls();
@@ -7678,8 +7693,8 @@ async function startAnalysis({preserveCompleted = false} = {}) {
   // Shared work queue. `nextIdx++` is atomic (no await between read and increment in a
   // single-threaded runtime), so each position is handed to exactly one worker. Completion
   // order doesn't affect the final values — computeDerived() is a pure function of the
-  // filled arrays. `contig` tracks analysis progress only; navigation is independent
-  // of completion, and the graph shows later results with gaps for pending scores.
+  // filled arrays. `contig` tracks the completed prefix; navigation uses the
+  // furthest completed evaluation and the graph keeps gaps for pending scores.
   let nextIdx = 0, contig = -1;
   while (contig + 1 <= S.total && S.bests[contig + 1]) contig++;
   async function worker(eng) {

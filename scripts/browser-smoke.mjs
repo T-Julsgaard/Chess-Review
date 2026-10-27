@@ -46,15 +46,18 @@ let smokeSavedAnalysis;
 globalThis.__smokePendingNavigation=action=>{
   if(action==='start'){
     smokeSavedAnalysis={evals:S.evals,bests:S.bests,analyzing:S.analyzing,progress:S.progress,completed:S.completed,idx:S.idx};
-    S.evals=S.evals.map((score,i)=>i===2?score:null);S.bests=S.bests.map((result,i)=>i===2?result:null);
+    S.evals=S.evals.map((score,i)=>i===3?score:null);S.bests=S.bests.map((result,i)=>i===3?result:null);
     S.analyzing=true;S.progress=0;S.completed=1;go(0);
   }else if(action==='arrive'){
-    S.evals[3]=smokeSavedAnalysis.evals[3];S.bests[3]=smokeSavedAnalysis.bests[3];S.completed++;
+    S.evals[5]=smokeSavedAnalysis.evals[5];S.bests[5]=smokeSavedAnalysis.bests[5];S.completed++;
+    flushProgress(S.batchGen);
+  }else if(action==='gap'){
+    S.evals[2]=smokeSavedAnalysis.evals[2];S.bests[2]=smokeSavedAnalysis.bests[2];S.completed++;
     flushProgress(S.batchGen);
   }else if(action==='restore'){
     Object.assign(S,smokeSavedAnalysis);revRefs=null;flushProgress(S.batchGen);
   }
-  return {idx:S.idx,total:S.total,progress:S.progress,analyzing:S.analyzing,pending:S.evals[S.idx]==null};
+  return {idx:S.idx,total:S.total,limit:mainlineNavigationLimit(),progress:S.progress,analyzing:S.analyzing,pending:S.evals[S.idx]==null};
 };
 `);
     await fs.appendFile(path.join(sourceDir,'background.js'), '\nbrowserAPI.runtime.onInstalled.addListener(() => browserAPI.tabs.create({url:browserAPI.runtime.getURL("smoke.html")}));\n');
@@ -177,20 +180,26 @@ try {
       if(frame.contentWindow.__smokePendingNavigation().idx!==1)throw Error('Next blocked by pending analysis');
       doc.dispatchEvent(new frame.contentWindow.KeyboardEvent('keydown',{key:'End',bubbles:true}));
       const atEnd=frame.contentWindow.__smokePendingNavigation();
-      if(atEnd.idx!==atEnd.total)throw Error('Keyboard End blocked by pending analysis');
-      doc.querySelector('.ml-move[data-ply="2"]').click();
-      if(frame.contentWindow.__smokePendingNavigation().idx!==2)throw Error('Completed later move blocked');
+      if(atEnd.idx!==3||atEnd.limit!==3)throw Error('Keyboard End did not stop at the last result');
+      doc.querySelector('.ml-move[data-ply="10"]').click();
+      if(frame.contentWindow.__smokePendingNavigation().idx!==3)throw Error('Move list passed the last result');
+      doc.querySelector('#controls [aria-label="Next"]').click();
+      if(frame.contentWindow.__smokePendingNavigation().idx!==3)throw Error('Next passed the last result');
       const chart=doc.querySelector('.evalgraph'),rect=chart.getBoundingClientRect();
       const graphDesign=doc.querySelector('.evaluation-panel').dataset.design;
-      const fraction=graphDesign.startsWith('bars')?3.5/(atEnd.total+1):3/atEnd.total;
+      const fraction=graphDesign.startsWith('bars')?2.5/(atEnd.total+1):2/atEnd.total;
       chart.dispatchEvent(new frame.contentWindow.MouseEvent('click',{clientX:rect.left+fraction*rect.width,clientY:rect.top+rect.height/2,bubbles:true}));
       const pending=frame.contentWindow.__smokePendingNavigation();
-      if(pending.idx!==3||!pending.pending||pending.progress!==0||!pending.analyzing)throw Error('Graph cannot browse a pending move');
+      if(pending.idx!==2||!pending.pending||pending.progress!==0||!pending.analyzing)throw Error('Graph cannot browse a pending gap');
       if(doc.querySelector('.evaluation-score').textContent!=='—')throw Error('Pending move displayed a score');
       const arrived=frame.contentWindow.__smokePendingNavigation('arrive');
-      if(arrived.idx!==3||arrived.pending||arrived.progress!==0||doc.querySelector('.evaluation-score').textContent==='—')throw Error('Selected result did not update independently');
+      if(arrived.idx!==2||!arrived.pending||arrived.limit!==5)throw Error('A later result did not extend the navigation limit');
+      const gap=frame.contentWindow.__smokePendingNavigation('gap');
+      if(gap.idx!==2||gap.pending||gap.progress!==0||doc.querySelector('.evaluation-score').textContent==='—')throw Error('Selected gap result did not update independently');
+      doc.querySelector('#controls [aria-label="End"]').click();
+      if(frame.contentWindow.__smokePendingNavigation().idx!==5)throw Error('End did not follow the new last result');
       frame.contentWindow.__smokePendingNavigation('restore');
-      await report({step:'pending-move-navigation',buttons:true,keyboard:true,moveList:true,graph:true,selectedResultUpdates:true});
+      await report({step:'furthest-result-navigation',buttons:true,keyboard:true,moveList:true,graph:true,pendingGapsReachable:true,laterMovesLocked:true,newResultsExtendLimit:true,selectedResultUpdates:true});
       frame.contentWindow.__smokeResponsive();
       const sizes=[[1920,920],[1366,648],[1280,600],[1470,836],[1024,648],[820,648],[768,900],[390,844],[320,640]];
       for(const [width,height] of sizes) {

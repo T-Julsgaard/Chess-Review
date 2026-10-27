@@ -52,7 +52,9 @@ test('viewport startup uses the current game without mounting a scenario toolbar
   const a=app(t,{url:'https://extension.test/analysis.html?viewport-preview=1'});
   const original={settings:{accent:'#123456'},library:[{id:'keep'}]};Object.assign(a.store,structuredClone(original));
   a.dom.window.sessionStorage.setItem('screen-size-preview',JSON.stringify({job:{pgn:'1. d4 d5',meta:{},source:'pgn'},idx:1}));
-  a.replace('loadBook',async()=>{});a.replace('loadCalibration',async()=>{});a.replace('startAnalysis',()=>{a.state.analyzing=false;});
+  a.replace('loadBook',async()=>{});a.replace('loadCalibration',async()=>{});
+  // A completed preview analysis must publish scores before restoring its move.
+  a.replace('startAnalysis',()=>{a.state.evals=a.state.positions.map(()=>({cp:0}));a.state.analyzing=false;});
   a.replace('loadScreenPreviewController',async()=>{throw Error('Unexpected scenario toolbar');});
   await a.start();
   assert.equal(a.state.pgn,'1. d4 d5');assert.equal(a.state.idx,1);assert.equal(a.dom.window.document.body.dataset.previewReady,'true');

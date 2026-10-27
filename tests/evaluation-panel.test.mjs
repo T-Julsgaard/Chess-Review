@@ -74,9 +74,9 @@ for (const design of ['timeline','timeline2','bars','bars2','minimal']) {
     a.state.evals[3] = null; a.state.evals[4] = null; a.call('go',0);
     const partial = doc.querySelector('#graphMount [role=slider]');
     partial.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'End',bubbles:true}));
-    assert.equal(a.state.idx,4); assert.equal(partial.getAttribute('aria-valuemax'),'4');
+    assert.equal(a.state.idx,2); assert.equal(partial.getAttribute('aria-valuemax'),'2');
     a.state.practice = {}; partial.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'Home',bubbles:true}));
-    assert.equal(a.state.idx,4);
+    assert.equal(a.state.idx,2);
   });
 }
 
@@ -282,7 +282,7 @@ test('Minimal restores at startup and gives honest empty and partial analysis st
   a.state.blank=false;
   a.state.evals=[{cp:0},{cp:100},null,null,null]; a.call('renderGraph');
   const chart=doc.querySelector('.evaluation-minimal [role=slider]');
-  assert.equal(chart.getAttribute('aria-valuemax'),'4');
+  assert.equal(chart.getAttribute('aria-valuemax'),'1');
   assert.match(chart.querySelector('.evaluation-field-white').getAttribute('d'),/L96\.0,0/);
   a.state.evals=[]; a.call('renderGraph');
   assert.match(doc.querySelector('.evaluation-empty').textContent,/Waiting for analysis/);
@@ -348,34 +348,44 @@ for (const [design, style] of [
 
 test('a live worker pool updates the graph before a slow earlier search completes', async t => {
   const a = review(t), S = a.state, doc = a.dom.window.document;
-  S.settings.engineWorkers = 2; S.settings.graphDesign = 'bars2';
+  S.settings.engineWorkers = 3; S.settings.graphDesign = 'bars2';
   const results = S.positions.map(() => deferred());
   a.replace('createEngine', async () => fakeEngine());
   a.replace('analyseCalibratedPosition', (_engine, {fen}) => results[S.positions.findIndex(p => p.fen === fen)].promise);
   a.replace('saveToLibrary', () => {});
   a.replace('schedulePanelPrecalculation', () => {});
   const run = a.call('startAnalysis'); await settle();
-  results[1].resolve({score:{cp:-60},bestmove:'e7e5',lines:[]}); await settle();
   results[2].resolve({score:{cp:120},bestmove:'e4d5',lines:[]}); await settle();
   await new Promise(resolve => setTimeout(resolve, 180));
   assert.equal(S.analyzing, true);
   assert.equal(S.progress, 0);
-  assert.equal(S.completed, 2);
+  assert.equal(S.completed, 1);
   const columns = [...doc.querySelectorAll('.evaluation-column')];
-  assert.equal(columns.length, 2, 'Throttled progress paints completed moves while position zero is pending');
+  assert.equal(columns.length, 1, 'Throttled progress paints completed moves while earlier searches are pending');
   assert.ok(+columns[0].getAttribute('x') > 0, 'Results keep their position on the game timeline');
   doc.querySelector('.ml-move[data-ply="2"]').click();
   assert.equal(S.idx, 2, 'A completed move is reachable before the first search returns');
   doc.querySelector('#controls [aria-label="Next"]').click();
-  assert.equal(S.idx, 3, 'A pending move is also reachable');
+  assert.equal(S.idx, 2, 'The next move stays locked beyond the furthest result');
+  assert.equal(doc.querySelector('#controls [aria-label="End"]').disabled, true);
+  results[4].resolve({score:{cp:40},bestmove:'e2e4',lines:[]});
+  // Position four is still queued behind position three. Both become reachable
+  // when this worker returns, even though positions zero and one remain busy.
+  results[3].resolve({score:{cp:-90},bestmove:'d8d5',lines:[]}); await settle();
+  a.call('flushProgress', S.batchGen);
+  assert.equal(S.progress, 0);
+  doc.querySelector('#controls [aria-label="Next"]').click();
+  assert.equal(S.idx, 3);
+  assert.equal(doc.querySelector('.evaluation-score').textContent, '+0.9');
+  a.call('go', 1);
   assert.equal(doc.querySelector('.evaluation-score').textContent, '—');
   assert.match(doc.querySelector('.evalgraph').getAttribute('aria-valuetext'), /Calculating/);
   a.call('flushProgress', S.batchGen);
-  assert.equal(S.idx, 3, 'Progress repaint cannot move the selected position');
-  results[3].resolve({score:{cp:-90},bestmove:'d8d5',lines:[]}); await settle();
+  assert.equal(S.idx, 1, 'Progress repaint cannot move the selected position');
+  results[1].resolve({score:{cp:-60},bestmove:'e7e5',lines:[]}); await settle();
   a.call('flushProgress', S.batchGen);
-  assert.equal(S.idx, 3); assert.equal(S.progress, 0);
-  assert.equal(doc.querySelector('.evaluation-score').textContent, '+0.9', 'The selected result appears while the slow earlier search is still pending');
+  assert.equal(S.idx, 1); assert.equal(S.progress, 0);
+  assert.equal(doc.querySelector('.evaluation-score').textContent, '+0.6', 'The selected result appears while the slow earlier search is still pending');
   for (const result of results) result.resolve({score:{cp:0},bestmove:'e2e4',lines:[]});
   await run;
   assert.equal(S.analyzing, false);
