@@ -2543,10 +2543,10 @@ button { font-family: inherit; cursor: pointer; }
 
 .puzzle-run-notice-overlay { position: fixed; inset: 0; z-index: 210; display: grid; place-items: center; box-sizing: border-box; padding: 16px; background: #0004; pointer-events: auto; }
 .learning-workspace:has(.puzzle-run-notice-overlay) { z-index: 2200; }
-.puzzle-run-notice-card { width: min(100%,340px); max-height: 100%; overflow: auto; box-sizing: border-box; padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); box-shadow: 0 10px 32px #0003; }
+.puzzle-run-notice-card { width: min(100%,400px); max-height: 100%; overflow: auto; box-sizing: border-box; padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); box-shadow: 0 10px 32px #0003; }
 .puzzle-run-notice-card h2 { margin: 0 0 8px; font-size: 17px; text-align: center; }
 .puzzle-run-notice-card p { color: var(--ink-2); font-size: 14px; line-height: 1.5; margin: 0 0 16px; text-align: center; text-wrap: balance; }
-.puzzle-run-notice-card .learn-inline { justify-content: flex-end; }
+.puzzle-run-notice-card .learn-inline { justify-content: center; }
 
 /* Keep the filtered count beside the puzzle-type choices. */
 .learn-theme-list legend { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; width: 100%; box-sizing: border-box; }
