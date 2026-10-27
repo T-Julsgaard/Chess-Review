@@ -165,6 +165,29 @@ test('the compact countdown keeps its low-time cue through re-renders without re
   assert.equal(w.root.querySelector('#learn-clock').textContent,'0:00');
 });
 
+for(const [elapsed,text] of [[85499,'1:35'],[157499,'0:23'],[180000,'0:00']])test(`Time attack keeps its timer frozen after ${elapsed<180000?'the third mistake':'timeout'} at ${elapsed}ms`,async t=>{
+  const {w,data}=await setup(t);await w.startPuzzleRun('timeAttack');clearInterval(w.ticker);
+  let now=0;const clock=new ChallengeClock(180,()=>now);w.run.clock=clock;clock.ready();
+  await wrong(w);await wrong(w);now=elapsed;
+  if(elapsed<180000)await wrong(w);
+  else await w.submitPuzzle(current(w).solution[w.activity.step]);
+  const remainingMs=180000-elapsed;
+  const assertTimer=()=>{
+    assert.equal(w.root.querySelectorAll('[role=timer]').length,1);
+    assert.equal(w.root.querySelector('[role=timer]').getAttribute('aria-label'),'Time remaining');
+    assert.equal(w.root.querySelector('#learn-clock').textContent,text);
+    assert.equal(w.root.querySelector('#learn-clock').classList.contains('running-low'),remainingMs<=30000);
+  };
+  assert.equal(w.run,null);assert.equal(clock.runningAt,null);
+  assert.equal(w.result.reason,elapsed<180000?'Out of lives':'Time is up');
+  assert.equal(w.result.remainingMs,remainingMs);assert.equal(data['learning:v1'].challenges.at(-1).remainingMs,remainingMs);
+  assertTimer();now+=60000;w.updateClock();w.render();assertTimer();
+  await w.replayRunPuzzle(w.result.results[0].id);assertTimer();
+  w.returnToRunResults();assertTimer();
+  await w.startPuzzleRun('timeAttack',{again:true});
+  assert.equal(w.root.querySelector('#learn-clock').textContent,'3:00');
+});
+
 for(const mode of ['timeAttack','knockout'])for(const previousBest of [0,10])test(`${mode} keeps its labels and announces the ending on the board ${previousBest?'without':'with'} a personal best`,async t=>{
   const {w,dom}=await setup(t);
   await w.persist(p=>{p.bests[mode]=previousBest;});
@@ -176,7 +199,7 @@ for(const mode of ['timeAttack','knockout'])for(const previousBest of [0,10])tes
   assert.equal(w.root.querySelector('.puzzle-practice-heading h2').textContent,title);
   assert.equal(w.root.querySelector('.puzzle-run-stats > div > span').textContent,'Solved');
   assert.ok(w.root.querySelector('.puzzle-run-results .run-dashboard'));
-  assert.equal(w.root.querySelector('.puzzle-run-results [role=timer]'),null);
+  assert.equal(!!w.root.querySelector('.puzzle-run-results [role=timer]'),mode==='timeAttack');
   const overlay=w.root.querySelector('.learn-board > .puzzle-run-end[role=status]');
   assert.ok(overlay);assert.equal(overlay.dataset.motion,'off');
   assert.equal(overlay.querySelector('.puzzle-run-end-title').textContent,'Puzzles solved');
@@ -259,7 +282,8 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} result badges select p
   assert.equal(w.root.querySelector('.puzzle-practice-actions, .puzzle-run-meta'),null);
   await w.replayRunPuzzle(result.results[1].id);assert.equal(w.activity.id,result.results[1].id);
   await w.replayRunPuzzle(result.results[0].id);assert.equal(w.activity.id,result.results[0].id);
-  assert.equal(w.root.querySelector('.puzzle-rating-region, .puzzle-rating-toggle, #learn-clock'),null);
+  assert.equal(w.root.querySelector('.puzzle-rating-region, .puzzle-rating-toggle'),null);
+  assert.equal(!!w.root.querySelector('#learn-clock'),mode==='timeAttack');
   const fen=w.currentFen();
   await wrong(w);assert.equal(w.currentFen(),fen);assert.equal(w.activity.mistakes,1);
   assert.equal(w.root.querySelector('.puzzle-practice-status').textContent,'Wrong move');

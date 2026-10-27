@@ -44,19 +44,27 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
     await run("import('./analysis.js').then(m=>{m.learningWorkspace.run.bestEligible=false;m.learningWorkspace.render();})");
     assert.equal(await run("!!document.querySelector('.run-record')"),false);
     await capture(`${mode}-custom`);
-    await run(`import('./analysis.js').then(m=>m.learningWorkspace.finishChallenge('${mode==='timeAttack'?'Time is up':'Out of lives'}'))`);
+    await run("import('./analysis.js').then(m=>m.learningWorkspace.finishChallenge('Out of lives'))");
     assert.equal(await run("!!document.querySelector('.puzzle-run-results .run-dashboard')"),true);
-    assert.equal(await run("!!document.querySelector('.run-record, [role=timer]')"),false);
+    assert.equal(await run("!!document.querySelector('.run-record')"),false);
+    assert.equal(await run("!!document.querySelector('[role=timer]')"),mode==='timeAttack');
+    if(mode==='timeAttack') {
+      assert.equal(await run("document.querySelector('#learn-clock').textContent"),'0:23');
+      await sleep(1100);
+      await run("import('./analysis.js').then(m=>{m.learningWorkspace.updateClock();m.learningWorkspace.render();})");
+      assert.equal(await run("document.querySelector('#learn-clock').textContent"),'0:23');
+      assert.equal(await run("document.querySelector('#learn-clock').classList.contains('running-low')"),true);
+    }
     await capture(`${mode}-results-custom`);
     await run("import('./analysis.js').then(m=>{m.learningWorkspace.result.bestEligible=true;m.learningWorkspace.render();})");
     for(const [width,height] of [[1920,1080],[390,844],[320,740]]) {
       await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(150);
-      assert.equal(await run("(()=>{const card=document.querySelector('.puzzle-run-results .run-dashboard');return card.scrollWidth<=card.clientWidth+1&&card.children.length===2&&!!card.querySelector('.run-record');})()"),true);
+      assert.equal(await run(`(()=>{const card=document.querySelector('.puzzle-run-results .run-dashboard');return card.scrollWidth<=card.clientWidth+1&&card.children.length===${mode==='timeAttack'?3:2}&&!!card.querySelector('.run-record');})()`),true);
       await capture(`${mode}-results-${width}`);
     }
   }
   // A completed run with 31 correct outcomes must show 31 everywhere.
-  await run("import('./analysis.js').then(async m=>{const w=m.learningWorkspace;await w.navigate('puzzles');await w.startPuzzleRun('timeAttack');w.run.clock.pause();w.run.results=w.puzzles.slice(0,31).map((p,i)=>({id:p.id,number:i+1,rating:p.rating,correct:true}));w.run.solved=31;await w.finishChallenge('Time is up');})");
+  await run("import('./analysis.js').then(async m=>{const w=m.learningWorkspace;await w.navigate('puzzles');await w.startPuzzleRun('timeAttack');w.run.clock.pause();w.run.clock.remainingMs=0;w.run.results=w.puzzles.slice(0,31).map((p,i)=>({id:p.id,number:i+1,rating:p.rating,correct:true}));w.run.solved=31;await w.finishChallenge('Time is up');})");
   for(const [width,height] of [[1920,1080],[390,844],[320,740]]) {
     await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(150);
     const summary=await run(`(()=>{
@@ -67,6 +75,7 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
     })()`);
     const lastRating=await run("import('./analysis.js').then(m=>m.learningWorkspace.result.results.at(-1).rating)");
     assert.deepEqual(summary,{summary:false,score:'31',best:'31',solved:31,incorrect:0,last:`Puzzle rated ${lastRating}: solved`,fits:true});
+    assert.equal(await run("document.querySelector('#learn-clock').textContent"),'0:00');
     await capture(`time-attack-31-solved-${width}`);
   }
   console.log('Run dashboard and 31-solve score checks passed at desktop and mobile widths. Screenshots: '+out);
