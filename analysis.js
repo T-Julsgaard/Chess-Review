@@ -4735,11 +4735,14 @@ function renderStats() {
   }
 }
 
-let accuracyFitFrame = 0;
+let accuracyFitPending = false;
 function scheduleAccuracyFit() {
-  if (accuracyFitFrame) return;
-  accuracyFitFrame = requestAnimationFrame(() => {
-    accuracyFitFrame = 0;
+  if (accuracyFitPending) return;
+  accuracyFitPending = true;
+  // Resize and result updates also run in background/offscreen review frames,
+  // where animation frames may be suspended. Fit before the next paint anyway.
+  Promise.resolve().then(() => {
+    accuracyFitPending = false;
     const page = UI.stats?.querySelector('.acc-fit-page'), content = page?.querySelector('.acc-fit-content');
     if (!content || !page.clientHeight) return;
     const style = getComputedStyle(page);

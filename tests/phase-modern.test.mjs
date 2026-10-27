@@ -7,6 +7,31 @@ function review(t) {
   a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
   return a;
 }
+
+test('Accuracy fitting completes without an animation frame and restores full size after resize', async t => {
+  const a = review(t);
+  await a.call('applyUiSetup', 'modern');
+  const doc = a.dom.window.document, page = doc.querySelector('.acc-fit-page');
+  const content = page.querySelector('.acc-fit-content');
+  page.style.padding = '14px 12px 8px';
+  let height = 200;
+  // The test runtime deliberately never runs animation frames, as happens with
+  // an offscreen review iframe. Supply only the layout measurements jsdom lacks.
+  Object.defineProperties(page, {
+    clientHeight: {get: () => height},
+    scrollHeight: {get: () => Math.max(height, Math.ceil(22 + 400 * Number(content.style.zoom || 1)))},
+  });
+  Object.defineProperty(content, 'scrollHeight', {get: () => 400});
+  a.call('scheduleAccuracyFit');
+  await Promise.resolve();
+  assert.ok(Number(content.style.zoom) < 1);
+  assert.equal(page.scrollHeight, height);
+  height = 500;
+  a.call('scheduleAccuracyFit');
+  await Promise.resolve();
+  assert.equal(content.style.zoom, '1');
+  assert.equal(page.scrollHeight, height);
+});
 test('Modern Phase report saves independently, reuses arcs and phase evidence, and preserves the layout', async t => {
   const a = review(t), doc = a.dom.window.document;
   await a.call('applyUiSetup', 'modern');
