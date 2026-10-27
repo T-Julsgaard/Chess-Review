@@ -4911,8 +4911,28 @@ function renderGraph() {
   const maxPly = Math.max(1, S.total);
   const toX = (p) => bars ? ((p + .5) / (maxPly + 1)) * W : (p / maxPly) * W;
   const fromFraction = fraction => Math.round(bars ? fraction * (maxPly + 1) - .5 : fraction * maxPly);
-  const pts = [];
-  for (let p = 0; p <= S.total; p++) { if (!S.evals[p]) break; pts.push({ ply: p, cp: scoreToCp(S.evals[p]) }); }
+  // Workers finish out of order. Draw every returned evaluation, leaving gaps
+  // for pending positions instead of letting one slow search hide later results.
+  const pts = [], runs = [];
+  for (let p = 0; p <= S.total; p++) {
+    if (!S.evals[p]) continue;
+    const point = {ply: p, cp: scoreToCp(S.evals[p])};
+    if (pts.at(-1)?.ply !== p - 1) runs.push([]);
+    runs.at(-1).push(point); pts.push(point);
+  }
+  // Navigation still follows the completed prefix while analysis is running.
+  const prefixEnd = runs[0]?.[0].ply === 0 ? runs[0].at(-1).ply : 0;
+  const lastPly = Math.min(prefixEnd, S.analyzing ? S.progress : S.total);
+  const pathFor = (run, y, closeY) => {
+    let points = run.map(p => ({x: toX(p.ply), y: y(p.cp)}));
+    if (points.length === 1) {
+      // Give an isolated result a visible sliver until its neighbors arrive.
+      const {x, y} = points[0], half = Math.min(1, W / maxPly / 2);
+      points = [{x: Math.max(0, x - half), y}, {x: Math.min(W, x + half), y}];
+    }
+    const path = 'M' + points.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' L');
+    return closeY == null ? path : path + ` L${points.at(-1).x.toFixed(1)},${closeY} L${points[0].x.toFixed(1)},${closeY} Z`;
+  };
   // Move bars fit the analyzed game's range (at least one pawn, at most ten).
   // asinh is nearly linear near equality and compresses large advantages smoothly,
   // keeping small changes legible without flattening everything beyond five pawns.
@@ -4928,8 +4948,8 @@ function renderGraph() {
   // re-uses whichever mapping the active style draws with, so the dot rides the visible curve.
   const toYc = (cp) => { const c = Math.max(-500, Math.min(500, cp)); return mid + (c / 500) * (mid - 8); };
   const graphKey = JSON.stringify([design,S.total,S.settings.graphStyle || "area",pts,S.classif,S.blank,
-    design === 'timeline2' ? S.moveGrades : null, bars ? barLimit : null]);
-  const markerVisible = modern ? pts.length > 0 && S.idx < pts.length : S.idx > 0 && S.idx < S.total;
+    design === 'timeline2' ? S.moveGrades : null, bars ? barLimit : null, lastPly]);
+  const markerVisible = modern ? !!S.evals[S.idx] : S.idx > 0 && S.idx < S.total;
   const retained = UI.graphRefs;
   if (retained?.key === graphKey && retained.marker.isConnected) {
     const x = toX(Math.min(S.idx,maxPly));
@@ -4939,11 +4959,8 @@ function renderGraph() {
     updateGraphReadout(retained);
     return;
   }
-  let line = "", fill = "";
-  if (pts.length) {
-    line = "M" + pts.map((s) => `${toX(s.ply).toFixed(1)},${toY(s.cp).toFixed(1)}`).join(" L");
-    fill = line + ` L${toX(pts[pts.length - 1].ply)},${mid} L0,${mid} Z`;
-  }
+  const line = runs.map(run => pathFor(run, toY)).join(' ');
+  const fill = runs.map(run => pathFor(run, toY, mid)).join(' ');
   const dots = pts.filter((s) => ["blunder", "mistake", "miss", "brilliant", "great"].includes(S.classif[s.ply]));
   const markerX = toX(Math.min(S.idx, maxPly));
   const midLine = `<line x1="0" y1="${mid}" x2="${W}" y2="${mid}" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 3"/>`;
@@ -4958,19 +4975,16 @@ function renderGraph() {
     // eval curve, so a single glance tells you who's ahead — when White is winning the white field
     // swells downward and dominates the chart, and vice-versa. (Uses its own y-mapping where a White
     // advantage pushes the boundary DOWN, matching the familiar eval-graph look.)
-    const cpts = pts.map((s) => ({ x: toX(s.ply), y: toYc(s.cp) }));
-    const boundary = cpts.length ? "M" + cpts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" L") : "";
-    // Black field = area below the boundary curve; the white background shows through above it.
-    const blackArea = cpts.length
-      ? boundary + ` L${cpts[cpts.length - 1].x.toFixed(1)},${H} L0,${H} Z`
-      : "";
+    const boundary = runs.map(run => pathFor(run, toYc)).join(' ');
+    const whiteArea = runs.map(run => pathFor(run, toYc, 0)).join(' ');
+    const blackArea = runs.map(run => pathFor(run, toYc, H)).join(' ');
     // Classification dots ride on the boundary (re-projected with this style's y-mapping).
     const dotsC = dots.map((s) =>
       `<circle cx="${toX(s.ply)}" cy="${toYc(s.cp)}" r="3.2" fill="${QUALITY[S.classif[s.ply]].color}" stroke="var(--panel)" stroke-width="1.4"/>`).join("");
     // The 0.00 "ground" line sits dead-centre, drawn over both fields in a light grey so it reads
     // against the white above and the black below.
     const groundLine = `<line x1="0" y1="${mid}" x2="${W}" y2="${mid}" stroke="#c7c5bc" stroke-width="1.4"/>`;
-    inner = `<rect x="0" y="0" width="${W}" height="${H}" fill="#f4f2ea"/>`
+    inner = (whiteArea ? `<path d="${whiteArea}" fill="#f4f2ea"/>` : '')
       + (blackArea ? `<path d="${blackArea}" fill="#262626"/>` : "")
       + groundLine
       + (boundary ? `<path d="${boundary}" fill="none" stroke="#9a9a9a" stroke-width="1.2" stroke-linejoin="round"/>` : "")
@@ -4993,12 +5007,12 @@ function renderGraph() {
   if (modern) {
     const guides = `<line x1="0" y1="${mid}" x2="${W}" y2="${mid}" class="evaluation-zero"/>`;
     if (compact) {
-      // White grows downward as its advantage increases. Leave the unanalyzed suffix empty.
-      const boundary = pts.length ? 'M' + pts.map(p => `${toX(p.ply).toFixed(1)},${toYc(p.cp).toFixed(1)}`).join(' L') : '';
-      const end = pts.length ? toX(pts[pts.length - 1].ply).toFixed(1) : 0;
-      inner = boundary
-        ? `<path class="evaluation-field-white" d="${boundary} L${end},0 L0,0 Z" fill="#fff"/>`
-          + `<path class="evaluation-field-black" d="${boundary} L${end},${H} L0,${H} Z" fill="#000"/>` + marker
+      // White grows downward as its advantage increases. Leave pending positions empty.
+      const whiteArea = runs.map(run => pathFor(run, toYc, 0)).join(' ');
+      const blackArea = runs.map(run => pathFor(run, toYc, H)).join(' ');
+      inner = pts.length
+        ? `<path class="evaluation-field-white" d="${whiteArea}" fill="#fff"/>`
+          + `<path class="evaluation-field-black" d="${blackArea}" fill="#000"/>` + marker
         : marker;
     } else if (design === 'timeline' || design === 'timeline2') {
       inner = guides + (fill ? `<path d="${fill}" class="evaluation-area"/>` : '')
@@ -5022,13 +5036,14 @@ function renderGraph() {
     if (badge) return Number(badge.dataset.ply);
     const r = e.currentTarget.getBoundingClientRect();
     if (!r.width || !pts.length) return null;
-    return Math.max(0, Math.min(pts.length - 1, fromFraction((e.clientX - r.left) / r.width)));
+    const ply = Math.max(0, Math.min(pts.at(-1).ply, fromFraction((e.clientX - r.left) / r.width)));
+    return S.evals[ply] ? ply : null;
   };
   // Click anywhere on the graph → jump straight to that move (instant, no stepping through).
   const jumpFromEvent = (e) => {
     const r = e.currentTarget.getBoundingClientRect();
     if (!r.width) return;
-    const ply = Math.max(0, Math.min(modern ? pts.length - 1 : S.total, fromFraction((e.clientX - r.left) / r.width)));
+    const ply = Math.max(0, Math.min(modern ? lastPly : S.total, fromFraction((e.clientX - r.left) / r.width)));
     if (modern && !pts.length) return;
     gotoMainline(ply);
   };
@@ -5040,8 +5055,8 @@ function renderGraph() {
   };
   const hoverMove = (e) => {
     const ply = plyFromEvent(e);
-    if (ply == null) return;
-    const x = toX(ply), y = hoverY(pts[ply].cp);
+    if (ply == null) { hideHover(); return; }
+    const x = toX(ply), y = hoverY(scoreToCp(S.evals[ply]));
     const g = e.currentTarget.querySelector(".eval-hover");
     if (g) {
       const guide = g.querySelector(".eval-hover-line");
@@ -5060,7 +5075,6 @@ function renderGraph() {
   };
   hideHover();
   if (modern) {
-    const lastPly = Math.max(0, pts.length - 1);
     const onkey = e => {
       if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key)) return;
       e.preventDefault(); e.stopPropagation();
@@ -7605,8 +7619,8 @@ async function startAnalysis({preserveCompleted = false} = {}) {
   // Shared work queue. `nextIdx++` is atomic (no await between read and increment in a
   // single-threaded runtime), so each position is handed to exactly one worker. Completion
   // order doesn't affect the final values — computeDerived() is a pure function of the
-  // filled arrays. `contig` tracks the contiguous-analyzed prefix that navigation/eval-graph
-  // are allowed to expose during analysis.
+  // filled arrays. `contig` tracks the completed prefix that navigation can
+  // expose during analysis; the graph can already show later results with gaps.
   let nextIdx = 0, contig = -1;
   while (contig + 1 <= S.total && S.bests[contig + 1]) contig++;
   async function worker(eng) {

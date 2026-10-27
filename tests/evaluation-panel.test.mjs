@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {app, loadGame, settle} from './helpers/app.mjs';
+import {app, loadGame, settle, deferred, fakeEngine} from './helpers/app.mjs';
 
 function review(t) {
   const a = app(t); loadGame(a, '1. e4 d5 2. exd5 Qxd5');
@@ -104,7 +104,7 @@ test('Timeline v2 badges show notable move grades, navigate directly and update 
   a.state.moveGrades[1] = 4.6; a.call('renderGraph');
   assert.equal(doc.querySelector('.evaluation-move-badge text').textContent,'4.6');
   a.state.evals[3] = null; a.call('renderGraph');
-  assert.deepEqual([...doc.querySelectorAll('.evaluation-move-badge')].map(b => b.dataset.ply),['1']);
+  assert.deepEqual([...doc.querySelectorAll('.evaluation-move-badge')].map(b => b.dataset.ply),['1','4']);
   await a.call('setSetting','graphDesign','timeline');
   assert.equal(doc.querySelector('.evaluation-move-badge'),null);
 });
@@ -189,13 +189,13 @@ for (const design of ['bars', 'bars2']) {
     }
   });
 
-  test(`${design} fits the analyzed prefix and rescales as larger evaluations arrive, excluding mates`, async t => {
+  test(`${design} fits available evaluations and rescales as larger evaluations arrive, excluding mates`, async t => {
     const a = review(t), doc = a.dom.window.document;
-    a.state.evals = [{cp:0}, {cp:10}, {cp:-100}, null, {cp:1000}];
+    a.state.evals = [{cp:0}, {cp:10}, {cp:-100}, null, null];
     await a.call('setSetting', 'graphDesign', design);
     const heights = () => [...doc.querySelectorAll('.evaluation-column')].map(n => +n.getAttribute('height'));
     const initial = heights();
-    assert.equal(initial.length, 3, 'Unanalyzed suffix must not determine the scale');
+    assert.equal(initial.length, 3, 'Pending positions have no bars');
     assert.ok(initial[1] > 5, 'Close games expand to show small differences');
     assert.equal(initial[2], 52);
     a.state.evals[3] = {mate:3}; a.state.evals[4] = null; a.call('renderGraph');
@@ -204,6 +204,9 @@ for (const design of ['bars', 'bars2']) {
     assert.ok(heights()[1] < initial[1]);
     assert.ok(heights()[2] < initial[2]);
     assert.equal(heights()[4], 52);
+    const expanded = heights();
+    a.state.evals[3] = null; a.call('renderGraph');
+    assert.deepEqual(heights(), expanded.filter((_, i) => i !== 3), 'A pending position does not hide later results');
     a.state.evals[4] = {cp:9700}; a.call('renderGraph');
     a.state.evals[4] = {mate:3}; a.call('renderGraph');
     assert.deepEqual(heights().slice(0, 3), initial, 'Switching a finite score to an equivalent mate sentinel refreshes the range');
@@ -234,9 +237,9 @@ test('Move bars v2 adds Timeline dots at the bar tips and updates them with clas
   a.state.classif[1] = 'inacc'; a.state.classif[2] = 'miss'; a.call('renderGraph');
   assert.deepEqual(dots().map(dot => dot.dataset.category), ['miss','brilliant','blunder']);
   a.state.evals[3] = null; a.call('renderGraph');
-  assert.deepEqual(dots().map(dot => dot.dataset.ply), ['2']);
+  assert.deepEqual(dots().map(dot => dot.dataset.ply), ['2','4']);
   await a.call('setSetting','graphDesign','bars');
-  assert.deepEqual(dots().map(dot => dot.dataset.category), ['miss']);
+  assert.deepEqual(dots().map(dot => dot.dataset.category), ['miss','blunder']);
 });
 
 test('Move bars v2 restores its saved choice in a blank workspace without dots', async t => {
@@ -296,4 +299,72 @@ test('empty and missing evaluations have honest states; saved designs restore af
   assert.equal(b.dom.window.document.querySelector('.evaluation-panel').dataset.design,'bars');
   assert.match(b.dom.window.document.querySelector('.evaluation-empty').textContent,/Load a game/);
   assert.equal(b.dom.window.document.querySelector('.evaluation-score').textContent,'—');
+});
+
+for (const [design, style] of [
+  ['timeline','area'], ['timeline2','area'], ['bars','area'], ['bars2','area'], ['minimal','area'],
+  ...['area','line','minimal','color'].map(style => ['original',style]),
+]) {
+  test(`${design}/${style} renders out-of-order results without bridging pending positions`, t => {
+    const a = review(t), S = a.state, doc = a.dom.window.document;
+    Object.assign(S.settings, {graphDesign:design, graphStyle:style});
+    S.analyzing = true; S.progress = 0;
+    S.evals = [null, {cp:60}, null, null, {mate:3}];
+    a.call('flushProgress', S.batchGen);
+    const chart = () => doc.querySelector('#graphMount .evalgraph');
+    const plot = () => chart().querySelector('svg');
+    const segments = () => {
+      if (design.startsWith('bars')) return plot().querySelectorAll('.evaluation-column').length;
+      const path = plot().querySelector('path');
+      assert.ok(path, 'Results after a slow starting position are visible');
+      return path.getAttribute('d').match(/M/g).length;
+    };
+    assert.equal(segments(), 2);
+    assert.equal(doc.querySelector('.evaluation-empty'), null);
+    chart().getBoundingClientRect = () => ({left:0,top:0,width:400,height:120});
+    const hover = ply => chart().dispatchEvent(new a.dom.window.MouseEvent('mousemove', {
+      clientX: design.startsWith('bars') ? (ply + .5) / 5 * 400 : ply / 4 * 400, bubbles:true,
+    }));
+    hover(4);
+    assert.equal(doc.querySelector('.eval-tip').textContent, '#3', 'Sparse hover uses the actual ply');
+    assert.equal(plot().querySelector('.eval-hover-dot').getAttribute('cx'), String(design.startsWith('bars') ? 345.6 : 384));
+    hover(2);
+    assert.equal(plot().querySelector('.eval-hover').style.display, 'none');
+    assert.equal(doc.querySelector('.eval-tip').classList.contains('show'), false);
+    if (design !== 'original') {
+      chart().dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key:'End',bubbles:true}));
+      assert.equal(S.idx, 0, 'Drawing later results does not unlock pending navigation');
+      assert.equal(chart().getAttribute('aria-valuemax'), '0');
+    }
+    S.evals[2] = {cp:-40}; a.call('flushProgress', S.batchGen);
+    assert.equal(segments(), design.startsWith('bars') ? 3 : 2);
+    S.evals[0] = {cp:0}; S.evals[3] = {cp:90}; S.progress = S.total;
+    a.call('flushProgress', S.batchGen);
+    assert.equal(segments(), design.startsWith('bars') ? 5 : 1, 'Gaps join as evaluations arrive');
+    if (design !== 'original') assert.equal(chart().getAttribute('aria-valuemax'), '4');
+  });
+}
+
+test('a live worker pool updates the graph before a slow earlier search completes', async t => {
+  const a = review(t), S = a.state, doc = a.dom.window.document;
+  S.settings.engineWorkers = 2; S.settings.graphDesign = 'bars2';
+  const results = S.positions.map(() => deferred());
+  a.replace('createEngine', async () => fakeEngine());
+  a.replace('analyseCalibratedPosition', (_engine, {fen}) => results[S.positions.findIndex(p => p.fen === fen)].promise);
+  a.replace('saveToLibrary', () => {});
+  a.replace('schedulePanelPrecalculation', () => {});
+  const run = a.call('startAnalysis'); await settle();
+  results[1].resolve({score:{cp:-60},bestmove:'e7e5',lines:[]}); await settle();
+  results[2].resolve({score:{cp:120},bestmove:'e4d5',lines:[]}); await settle();
+  await new Promise(resolve => setTimeout(resolve, 180));
+  assert.equal(S.analyzing, true);
+  assert.equal(S.progress, 0);
+  assert.equal(S.completed, 2);
+  const columns = [...doc.querySelectorAll('.evaluation-column')];
+  assert.equal(columns.length, 2, 'Throttled progress paints completed moves while position zero is pending');
+  assert.ok(+columns[0].getAttribute('x') > 0, 'Results keep their position on the game timeline');
+  for (const result of results) result.resolve({score:{cp:0},bestmove:'e2e4',lines:[]});
+  await run;
+  assert.equal(S.analyzing, false);
+  assert.equal(doc.querySelectorAll('.evaluation-column').length, 5);
 });
