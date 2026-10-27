@@ -1554,7 +1554,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 .ml-rows .ml-num { display: grid; place-items: center; color: var(--ink-3); font-family: var(--font-mono); font-size: 12px; background: var(--panel-2); }
 .ml-rows .ml-move {
-  display: flex; align-items: center; gap: 4px 8px; padding: 4px 10px; min-height: var(--row-h);
+  display: flex; align-items: center; gap: 4px; padding: 4px; min-height: var(--row-h);
   font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--ink);
   border-left: 1px solid var(--line-soft); transition: .1s;
 }
@@ -1567,17 +1567,19 @@ button { font-family: inherit; cursor: pointer; }
 .ml-cards .ml-pair { display: grid; grid-template-columns: 26px minmax(0, 1fr) minmax(0, 1fr); gap: 6px; align-items: center; }
 .ml-cards .ml-num { color: var(--ink-3); font-family: var(--font-mono); font-size: 11px; text-align: center; }
 .ml-cards .ml-move {
-  display: flex; align-items: center; gap: 7px; padding: 7px 9px; border-radius: 9px;
+  display: flex; align-items: center; gap: 4px; padding: 7px 4px; border-radius: 9px;
   background: var(--panel-2); border: 1px solid var(--line-soft);
   font-family: var(--font-mono); font-size: 12.5px; font-weight: 600;
 }
 .ml-cards .ml-move.current { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 14%, var(--panel-2)); }
 .ml-cards .ml-move .pc { font-size: 14px; }
 
-/* Badges and long notation wrap within their own player's column. */
-:is(.ml-rows, .ml-cards) .ml-move { min-width: 0; flex-wrap: wrap; }
+/* Keep notation and score badges together, even in narrow or zoomed lists. */
+:is(.ml-rows, .ml-cards) .ml-move { min-width: 0; flex-wrap: nowrap; }
 :is(.ml-rows, .ml-cards) .ml-move .pc { flex: none; }
-:is(.ml-rows, .ml-cards) .ml-move > span:not(.pc):not(.qb) { min-width: 0; overflow-wrap: anywhere; }
+:is(.ml-rows, .ml-cards) .ml-move > span:not(.pc):not(.qb) { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Custom category names can still use a separate line within the move cell. */
+:is(.ml-rows, .ml-cards) .ml-move:has(.qb.label) { flex-wrap: wrap; }
 :is(.ml-rows, .ml-cards) .qb.label { min-width: 0; max-width: 100%; overflow-wrap: anywhere; text-align: center; }
 
 /* compact inline */

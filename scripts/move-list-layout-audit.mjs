@@ -10,7 +10,9 @@ export async function auditLearning({review, call, evaluate, out}) {
     m.S.positions[1].san = 'Nfxe5+';
     m.S.positions[2].san = 'exd8=Q+';
     m.S.positions[3].san = 'Qxe7';
-    m.S.classif = [null, 'blunder', 'miss', 'blunder', null];
+    m.S.positions[4].san = 'Nbxc6';
+    m.S.classif = [null, 'blunder', 'miss', 'blunder', 'mistake'];
+    m.S.moveGrades = [null, 0.4, 1.2, 0.6, 2.6];
     m.S.settings.categoryNames = {miss: 'Extraordinary missed opportunity'};
     const original = document.querySelector('.moves-panel');
     const results = [];
@@ -22,7 +24,7 @@ export async function auditLearning({review, call, evaluate, out}) {
           const panel = original.cloneNode(true);
           panel.style.cssText = 'position:absolute;left:0;top:0;max-height:none;overflow:visible';
           document.body.append(panel);
-          for (const width of [240, 300, 400]) {
+          for (const width of [240, 256, 300, 400]) {
             panel.style.width = width + 'px';
             panel.querySelectorAll('.ml-move').forEach(cell => cell.classList.remove('current'));
             const rowHeights = [...panel.querySelectorAll('.ml-pair')].map(pair => pair.getBoundingClientRect().height);
@@ -41,6 +43,12 @@ export async function auditLearning({review, call, evaluate, out}) {
                   const box = boxes[i];
                   if (box.right > bounds.right + 1) errors.push('Move box exceeds row');
                   if (cell.scrollWidth > cell.clientWidth + 1) errors.push('Move contents overflow horizontally');
+                  if (badge !== 'label') {
+                    const children = [...cell.children].map(child => child.getBoundingClientRect());
+                    if (children.some(r => Math.abs((r.top + r.bottom) / 2 - (children[0].top + children[0].bottom) / 2) > 1)) errors.push('Move notation and badge wrap onto separate lines');
+                    const san = cell.querySelector('[title="Nbxc6"]');
+                    if (san && style === 'rows' && design !== 'zoomed' && width >= 256 && san.scrollWidth > san.clientWidth + 1) errors.push('Knight capture notation is truncated');
+                  }
                   for (const child of cell.children) {
                     const r = child.getBoundingClientRect();
                     if (r.left < box.left - 1 || r.right > box.right + 1 || r.top < box.top - 1 || r.bottom > box.bottom + 1) errors.push('Move content escapes its box');
@@ -65,5 +73,16 @@ export async function auditLearning({review, call, evaluate, out}) {
   const clip = await evaluate(review, "(()=>{const r=document.querySelector('.moves-panel').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,scale:1}})()");
   const image = await call('Page.captureScreenshot', {format: 'png', clip, captureBeyondViewport: true}, review.sessionId);
   await fs.writeFile(path.join(out, 'move-list-labels.png'), Buffer.from(image.data, 'base64'));
+  const narrowClip = await evaluate(review, `import('./analysis.js').then(m => {
+    Object.assign(m.S.settings, {movesDesign: 'zoom20', mlStyle: 'rows', badgeStyle: 'icon'});
+    m.renderMoves();
+    const panel = document.querySelector('.moves-panel').cloneNode(true);
+    panel.style.cssText = 'position:absolute;left:0;top:100px;z-index:100;width:256px;max-height:none;overflow:visible';
+    document.body.append(panel);
+    const r = panel.getBoundingClientRect();
+    return {x:r.x, y:r.y, width:r.width, height:r.height, scale:1};
+  })`);
+  const narrowImage = await call('Page.captureScreenshot', {format: 'png', clip: narrowClip, captureBeyondViewport: true}, review.sessionId);
+  await fs.writeFile(path.join(out, 'move-list-knight-capture.png'), Buffer.from(narrowImage.data, 'base64'));
   console.log('Move list layout passed ' + results.length + ' cases across panel designs, list styles, badge styles, widths and selected sides. Evidence: ' + out);
 }

@@ -241,9 +241,8 @@
 .moves-panel[data-design="zoomed"] .ml-pair { grid-template-columns: 40px minmax(0,1fr) minmax(0,1fr); }
 .moves-panel[data-design="zoomed"] .ml-move {
   min-width: 0; min-height: 48px; height: auto; box-sizing: border-box;
-  padding: 10px; gap: 8px; flex-wrap: wrap; font-size: 18px; line-height: 1.4;
+  padding: 10px 4px; gap: 4px; font-size: 18px; line-height: 1.4;
 }
-.moves-panel[data-design="zoomed"] .ml-move > span:not(.pc):not(.qb) { overflow-wrap: anywhere; }
 .moves-panel[data-design="zoomed"] .ml-num { font-size: 15px; }
 .moves-panel[data-design="zoomed"] .ml-move .pc { font-size: 22px; }
 .moves-panel[data-design="zoomed"] .qb.icon { width: 22px; height: 22px; }
