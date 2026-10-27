@@ -622,7 +622,8 @@
 @keyframes puzzle-elo-delta { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .puzzle-elo-panel [data-puzzle-elo], .puzzle-elo-panel .puzzle-elo-change { animation: none !important; } }
 .learning-workspace[data-motion="off"] .puzzle-elo-panel [data-puzzle-elo], .learning-workspace[data-motion="off"] .puzzle-elo-panel .puzzle-elo-change { animation: none; }
-.learn-theme-row { display: flex; align-items: center; gap: 12px; min-height: 45px; border-bottom: 1px solid var(--line); color: var(--ink-2); font-size: 14px; cursor: pointer; -webkit-user-select: none; user-select: none; }
+/* Inset checkbox borders from the scrollport's clipping edge at fractional scales. */
+.learn-theme-row { display: flex; align-items: center; gap: 12px; min-height: 45px; padding-inline: 2px; border-bottom: 1px solid var(--line); color: var(--ink-2); font-size: 14px; cursor: pointer; -webkit-user-select: none; user-select: none; }
 .learning-workspace .learn-theme-row input { appearance: none; display: grid; place-content: center; flex: 0 0 18px; width: 18px; height: 18px; min-height: 18px; padding: 0; margin: 0; border: 1px solid color-mix(in srgb,var(--ink-3) 75%,var(--line)); border-radius: 5px; background: var(--panel-2); cursor: pointer; }
 .learn-theme-row input::before { content: ''; width: 5px; height: 9px; margin-top: -2px; border: solid var(--accent-ink); border-width: 0 2px 2px 0; transform: rotate(45deg); opacity: 0; }
 .learn-theme-row:hover input { border-color: var(--accent); }
