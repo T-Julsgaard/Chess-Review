@@ -47,7 +47,7 @@ for (const design of ['timeline','timeline2','bars','bars2','minimal']) {
       assert.equal(chart.getAttribute('aria-valuenow'),String(ply));
       assert.equal(doc.activeElement,chart);
       assert.equal(chart.querySelector('svg'),svg);
-      assert.equal(svg.querySelector('.eval-position').style.display,'');
+      assert.equal(chart.querySelector('.eval-position').style.display,'');
     }
     a.state.evals[2] = {cp:220}; a.call('renderGraph');
     assert.notEqual(doc.querySelector('#graphMount svg'),svg);
@@ -65,7 +65,12 @@ for (const design of ['timeline','timeline2','bars','bars2','minimal']) {
     assert.equal(a.state.idx,2);
     chart.dispatchEvent(new a.dom.window.MouseEvent('mousemove',{clientX:x,bubbles:true}));
     assert.equal(doc.querySelector('.eval-tip').textContent,'+1.8');
-    assert.equal(+chart.querySelector('.eval-position').getAttribute('x1'),192);
+    const marker = chart.querySelector('.eval-position');
+    if (design.startsWith('bars')) {
+      assert.equal(marker.style.left,'50%');
+      assert.equal(marker.classList.contains('evaluation-position-marker'),true);
+      assert.equal(chart.querySelector('svg .eval-position,.eval-hover-line'),null);
+    } else assert.equal(+marker.getAttribute('x1'),192);
     a.state.evals[3] = null; a.state.evals[4] = null; a.call('go',0);
     const partial = doc.querySelector('#graphMount [role=slider]');
     partial.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'End',bubbles:true}));
@@ -121,6 +126,35 @@ test('Move bars keeps scores oriented toward White on board flips', async t => {
   a.state.flipped = true; a.call('renderGraph');
   assert.equal(doc.querySelector('.evaluation-score').textContent,'+0.6');
   assert.equal(doc.querySelector('.evaluation-panel').textContent,'+0.6');
+});
+
+test('Move bars marks only brilliant, great, miss and blunder moves with colored circles and a moving pointer', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  loadGame(a, '1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6',
+    [0,20,50,-100,100,200,150,-60,0].map(cp => ({cp})));
+  a.state.classif = ['brilliant','brilliant','great','miss','blunder','mistake','inacc','best','book'];
+  await a.call('setSetting','graphDesign','bars');
+  const chart = doc.querySelector('.evaluation-bars [role=slider]');
+  const dots = [...chart.querySelectorAll('.evaluation-move-dot')];
+  assert.deepEqual(dots.map(dot => dot.dataset.ply), ['1','2','3','4']);
+  assert.deepEqual(dots.map(dot => dot.dataset.category), ['brilliant','great','miss','blunder']);
+  for (const dot of dots) {
+    assert.equal(dot.textContent, '');
+    assert.equal(dot.style.background, `var(--q-${dot.dataset.category})`);
+    assert.equal(dot.getAttribute('aria-hidden'), 'true');
+    const bar = chart.querySelectorAll('.evaluation-column')[+dot.dataset.ply];
+    const tip = +bar.getAttribute('y') + (bar.classList.contains('black') ? +bar.getAttribute('height') : 0);
+    assert.ok(Math.abs(Number(dot.style.top.match(/, ([\d.]+)%/)[1]) - tip / 120 * 100) < 1e-8);
+  }
+  const marker = chart.querySelector('.evaluation-position-marker');
+  a.call('go',4);
+  assert.equal(chart.querySelector('.evaluation-position-marker'), marker);
+  assert.equal(marker.style.left, '50%');
+  assert.match(chart.getAttribute('aria-valuetext'), /Blunder/);
+  a.call('go',0);
+  assert.equal(marker.style.left, `${.5 / 9 * 100}%`);
+  a.state.evals[4] = null; a.call('renderGraph');
+  assert.deepEqual([...doc.querySelectorAll('.evaluation-move-dot')].map(dot => dot.dataset.ply), ['1','2','3']);
 });
 
 for (const design of ['bars', 'bars2']) {
@@ -202,7 +236,7 @@ test('Move bars v2 adds Timeline dots at the bar tips and updates them with clas
   a.state.evals[3] = null; a.call('renderGraph');
   assert.deepEqual(dots().map(dot => dot.dataset.ply), ['2']);
   await a.call('setSetting','graphDesign','bars');
-  assert.equal(doc.querySelector('.evaluation-move-dot'),null);
+  assert.deepEqual(dots().map(dot => dot.dataset.category), ['miss']);
 });
 
 test('Move bars v2 restores its saved choice in a blank workspace without dots', async t => {

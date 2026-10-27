@@ -29,7 +29,23 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       if (design === 'original') continue;
       const fit = await run("(()=>{const p=document.querySelector('.evaluation-panel'),q=p.getBoundingClientRect(),f=p.querySelector('.evaluation-footer')?.getBoundingClientRect(),s=p.querySelector('.evalgraph').getBoundingClientRect();return {overflow:p.scrollWidth-p.clientWidth,vertical:p.scrollHeight-p.clientHeight,footer:!f||f.bottom<=q.bottom+1,plot:s.height,height:p.offsetHeight,page:document.documentElement.scrollWidth-innerWidth,columns:p.querySelectorAll('.evaluation-column').length}})()");
       assert.ok(fit.overflow<=1&&fit.vertical<=1&&fit.footer&&fit.plot>=19&&fit.page<=1,JSON.stringify({width,height,design,fit}));
-      if (design==='bars') assert.ok(fit.columns>25);
+      if (design==='bars') {
+        assert.ok(fit.columns>25);
+        const markers = await run(`(()=>{
+          const chart=document.querySelector('.evaluation-bars .evalgraph'),r=chart.getBoundingClientRect();
+          return {pointer:!!chart.querySelector('.evaluation-position-marker'),
+            guides:chart.querySelectorAll('svg .eval-position,.eval-hover-line').length,
+            dots:[...chart.querySelectorAll('.evaluation-move-dot')].map(dot=>{
+              const q=dot.getBoundingClientRect();return {category:dot.dataset.category,text:dot.textContent,
+                round:Math.abs(q.width-q.height)<.1,
+                inside:q.left>=r.left-1&&q.right<=r.right+1&&q.top>=r.top-1&&q.bottom<=r.bottom+1};
+            })};
+        })()`);
+        assert.equal(markers.pointer,true); assert.equal(markers.guides,0);
+        assert.ok(markers.dots.length>0&&markers.dots.every(dot=>
+          ['brilliant','great','miss','blunder'].includes(dot.category)&&dot.text===''&&dot.round&&dot.inside),
+        JSON.stringify({width,height,markers}));
+      }
       if (design==='minimal') {
         assert.ok(fit.height<=96,JSON.stringify(fit));
         assert.equal(await run("document.querySelector('.evaluation-minimal').textContent"),'');

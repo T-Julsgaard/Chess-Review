@@ -4801,7 +4801,7 @@ function updateGraphReadout(refs) {
   }
   const description = e == null ? label : e.mate != null ? `${side} has mate in ${Math.abs(e.mate)}`
     : rounded === '0.0' ? label : `${side} is ahead by ${rounded} pawns`;
-  const category = ['timeline2', 'bars2'].includes(panelDesign('graph', S.settings)) && S.idx > 0 && e && S.classif[S.idx]
+  const category = ['timeline2', 'bars', 'bars2'].includes(panelDesign('graph', S.settings)) && S.idx > 0 && e && S.classif[S.idx]
     ? ` ${gradeLabel(S.classif[S.idx], S.moveGrades[S.idx], categoryName(S.classif[S.idx]))}.` : '';
   refs.chart.setAttribute('aria-valuenow', Math.min(S.idx, refs.lastPly));
   refs.chart.setAttribute('aria-valuetext', `${graphPositionText(S.idx)}. ${description}.${category} Positive scores favor White; negative scores favor Black.`);
@@ -4843,8 +4843,9 @@ function renderGraph() {
   const markerVisible = modern ? pts.length > 0 && S.idx < pts.length : S.idx > 0 && S.idx < S.total;
   const retained = UI.graphRefs;
   if (retained?.key === graphKey && retained.marker.isConnected) {
-    const x = String(toX(Math.min(S.idx,maxPly)));
-    if (retained.marker.getAttribute("x1") !== x) { retained.marker.setAttribute("x1",x); retained.marker.setAttribute("x2",x); }
+    const x = toX(Math.min(S.idx,maxPly));
+    if (bars) retained.marker.style.left = `${x / W * 100}%`;
+    else if (retained.marker.getAttribute("x1") !== String(x)) { retained.marker.setAttribute("x1",x); retained.marker.setAttribute("x2",x); }
     retained.marker.style.display = markerVisible ? "" : "none";
     updateGraphReadout(retained);
     return;
@@ -4920,11 +4921,11 @@ function renderGraph() {
       inner = pts.map(p => {
         const y = toY(p.cp), height = Math.max(.8, Math.abs(y - mid));
         return `<rect class="evaluation-column ${p.cp >= 0 ? 'white' : 'black'}" x="${p.ply * unit + (unit - width) / 2}" y="${p.cp >= 0 ? mid - height : mid}" width="${width}" height="${height}" rx="${Math.min(1.5,width/3)}"/>`;
-      }).join('') + guides + marker;
+      }).join('') + guides;
     }
   }
   const hoverY = compact || !modern && style === "color" ? toYc : toY;
-  const hover = `<g class="eval-hover" style="display:none"><line class="eval-hover-line" x1="0" y1="0" x2="0" y2="${H}" vector-effect="non-scaling-stroke"/><circle class="eval-hover-dot" cx="0" cy="0" r="4.7"/></g>`;
+  const hover = `<g class="eval-hover" style="display:none">${bars ? '' : `<line class="eval-hover-line" x1="0" y1="0" x2="0" y2="${H}" vector-effect="non-scaling-stroke"/>`}<circle class="eval-hover-dot" cx="0" cy="0" r="4.7"/></g>`;
   const svg = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${inner}${hover}</svg>`;
   // Map a pointer event to the nearest plotted ply (0..last ply that has an eval).
   const plyFromEvent = (e) => {
@@ -4954,8 +4955,9 @@ function renderGraph() {
     const x = toX(ply), y = hoverY(pts[ply].cp);
     const g = e.currentTarget.querySelector(".eval-hover");
     if (g) {
-      g.querySelector(".eval-hover-line").setAttribute("x1", x);
-      g.querySelector(".eval-hover-line").setAttribute("x2", x);
+      const guide = g.querySelector(".eval-hover-line");
+      guide?.setAttribute("x1", x);
+      guide?.setAttribute("x2", x);
       const dot = g.querySelector(".eval-hover-dot");
       dot.setAttribute("cx", x); dot.setAttribute("cy", y);
       g.style.display = "";
@@ -4981,9 +4983,11 @@ function renderGraph() {
     const chart = el('div', {class: 'evalgraph clickable-graph', html: svg, role: 'slider', tabindex: 0,
       'aria-label': 'Game evaluation. Use arrow keys to explore moves.', 'aria-valuemin': 0, 'aria-valuemax': lastPly,
       onclick: jumpFromEvent, onmousemove: hoverMove, onmouseleave: hideHover, onblur: hideHover, onkeydown: onkey});
-    if (design === 'bars2') {
+    if (bars) {
+      chart.append(el('span', {class: 'eval-position evaluation-position-marker', 'aria-hidden': 'true',
+        style: {left: `${markerX / W * 100}%`, display: markerVisible ? '' : 'none'}}));
       // Fixed-size HTML circles stay round even when the underlying SVG is stretched.
-      for (const p of dots.filter(p => p.ply > 0)) {
+      for (const p of dots.filter(p => p.ply > 0 && (design === 'bars2' || S.classif[p.ply] !== 'mistake'))) {
         chart.append(el('span', {class: 'evaluation-move-dot', 'data-ply': p.ply,
           'data-category': S.classif[p.ply], 'aria-hidden': 'true',
           style: {left: `clamp(3.5px, ${toX(p.ply) / W * 100}%, calc(100% - 3.5px))`,
