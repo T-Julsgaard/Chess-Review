@@ -7,6 +7,9 @@ function review(t, pgn = '1. e4 e5 2. Nf3 Nc6') {
   const a = app(t);
   loadGame(a, pgn); a.call('computeDerived'); a.call('buildUI');
   Object.assign(a.state.settings, {engineDesign: 'minimal', engineLines: 2});
+  // Scheduling/duty-cycle behavior is covered by background-annotations.test.mjs.
+  a.replace('waitForBackgroundAnalysis', async job => !job.cancelled);
+  a.replace('backgroundAnalysisBusy', () => false);
   return a;
 }
 function lines(fen, count) {

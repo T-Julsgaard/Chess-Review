@@ -174,7 +174,7 @@ const ELO_INFO = "Both engines support both rating modes using their own models.
 // Explanations for the engine settings (shown on hover, same tooltip as the accuracy panel).
 const ENGINE_INFO = {
   engineLines:   "How many candidate moves (lines) the engine panel shows. Extra lines are precomputed across the game after review statistics are ready. Changing this doesn't re-analyze the game.",
-  classifyLines: "Lines searched for annotation and candidate inspection. Calibrated SF18 numerical scores require one analysis line. Changing this re-analyzes the game.",
+  classifyLines: "Results appear after the first analysis line. Additional lines run in the background to check move categories, including Great. Background work uses one worker, pauses between positions and yields while you interact. Accuracy and rating scores stay unchanged.",
   engineDepth:   "How many plies (half-moves) deep Stockfish searches each position. Higher depth gives more accurate evaluations and fewer false mistakes, but takes longer.",
   engineWorkers: "Number of Stockfish instances analysing positions in parallel. The default uses available CPU cores, up to four workers. Your selection is respected; if a worker fails to start, the review continues with the workers that did start. Search depth and scoring settings stay the same.",
   fastAnalysis:  "Trades quality for speed: the classification pass uses fewer engine lines. ~1.3×/1.6× faster, but evals shift slightly and clean games can pick up a few false inaccuracies.",
@@ -361,7 +361,7 @@ const DEFAULT_SETTINGS = {
   // (CPU cores − 1), capped at 4. Manual selections are respected.
   engineWorkers: engineWorkerCount(),
   // Extra lines serve annotation and candidate inspection. Calibrated SF18 scores use one line.
-  classifyLines: 1,
+  classifyLines: 2,
   // Fast analysis: kept for backwards compatibility, but now a no-op for line count — the batch
   // already searches a single line, so there are no extra lines to drop.
   fastAnalysis: false, fastLines: 3,
@@ -390,6 +390,11 @@ function migrateEngineSettings(settings) {
   if (!Object.hasOwn(ENGINE_BUILDS, settings.enginePath)) settings.enginePath = DEFAULT_SETTINGS.enginePath;
   for (const key of ['engineLines', 'classifyLines']) {
     if (settings[key] != null) settings[key] = normalizeEngineLineCount(settings[key]);
+  }
+  // Upgrade the former single-line default once; subsequent explicit choices stick.
+  if (!settings.backgroundAnalysisVersion) {
+    if (settings.classifyLines === 1 || settings.classifyLines == null) settings.classifyLines = 2;
+    settings.backgroundAnalysisVersion = 1;
   }
 }
 // The engine panel shows up to this many candidate lines (searched on demand for the viewed position).
@@ -1192,7 +1197,7 @@ function isSacrifice(move) {
 const BRILLIANT_POLICY = { minAfterPawns: -0.5, clearlyWinningPawns: 5 };
 function brilliantEligible(i, mover, std, wpDrop, state) {
   if (std[i] !== "excellent" || !Number.isFinite(wpDrop?.[i])) return false;
-  const root = state.bests[i - 1], topLine = root?.lines?.[0];
+  const root = annotationRoot(i - 1, state), topLine = root?.lines?.[0];
   const afterLine = state.bests[i]?.lines?.[0];
   if ([topLine, ...(state.annotationEvidence[i]?.paired ? [] : [afterLine])].some(l => l?.bound && l.bound !== "exact")) return false;
   const after = decisionPawns(i, "played", mover, state), before = decisionPawns(i, "best", mover, state);
@@ -1215,11 +1220,17 @@ function brilliantEligible(i, mover, std, wpDrop, state) {
   if (alternative.mate != null) return alternative.mate < 0;
   return Number.isFinite(alternative.cp) && alternative.cp / 100 < BRILLIANT_POLICY.clearlyWinningPawns;
 }
+// Annotation searches never replace the original best/played pair used by numerical scoring.
+function annotationRoot(index, state = S) {
+  const root = state.bests[index], extra = root?.annotationSearch;
+  return state.settings.classifyLines > 1 && extra?.key === engineContextKey(state.positions[index].fen, searchHistory(state.positions, index))
+    ? extra.result : root;
+}
 // Great means finding the only good reply, not merely replying after an error. The runner-up
 // must be worse than the Good band in the same completed root depth. With one line, this is
 // unknown; retain the ordinary category without scheduling more engine searches.
 function onlyGoodReply(i, state) {
-  const root = state.bests[i - 1], top = root?.lines?.find(l => l.multipv === 1);
+  const root = annotationRoot(i - 1, state), top = root?.lines?.find(l => l.multipv === 1);
   const next = root?.lines?.find(l => l.multipv === 2);
   const move = state.positions[i];
   const played = (move.from || "") + (move.to || "") + (move.promotion || "");
@@ -1459,7 +1470,7 @@ function classifyLine(state) {
     const safeBook = bookAt[i] && !((decisionMate(i, "played", state.positions[i].color, state) ?? 0) < 0)
       && wpDrop[i] != null && wpDrop[i] < (CALIB?.clsWp?.inacc ?? 5);
     state.classif[i] = classifyMove(i, state.positions[i].color, isTop[i], safeBook, std, loss, wpDrop, state);
-    const root = state.bests[i - 1];
+    const root = annotationRoot(i - 1, state);
     const top = root?.lines?.find(l => l.multipv === 1), runnerUp = root?.lines?.find(l => l.multipv === 2);
     const criticalLoss = top && runnerUp ? Math.max(0, annotationPoints(top.score, i, state) - annotationPoints(runnerUp.score, i, state)) : null;
     state.moveGrades[i] = moveGrade(state.classif[i], wpDrop[i], CALIB?.clsWp, criticalLoss);
@@ -1545,6 +1556,7 @@ function uciLineToSan(fen, uciMoves, maxPlies = 6) {
    UI skeleton
    =================================================================== */
 function buildUI() {
+  bindBackgroundAnalysisActivity();
   learningAnnouncement?.dispose();
   UI.boardObserver?.disconnect();
   const root = document.getElementById("root");
@@ -1685,6 +1697,7 @@ function syncLearningToggle() {
   button.dataset.mode=mode;
 }
 async function openLearning() {
+  pauseBackgroundAnalysis();
   if (learningWorkspace || openingLearning) return;
   learningAnnouncement?.close();
   openingLearning = true;
@@ -2621,6 +2634,7 @@ function activeEngineName() {
 // Shared on-demand engine for the lightweight extras (threat preview + practice judging),
 // kept separate from the analysis batch + the analysis-mode live engine.
 async function getHelperEngine() {
+  pauseBackgroundAnalysis();
   if (S.helperEngine?.dead) resetHelperEngine();
   if (S.helperEngine) return S.helperEngine;
   if (!S.helperEnginePromise) {
@@ -3103,6 +3117,7 @@ async function playBestMoves() {
 }
 // Live analysis of the current variation position (its own engine instance, so the batch isn't disturbed).
 async function requestLiveEval() {
+  pauseBackgroundAnalysis();
   const token = ++S.liveToken; // navigation always invalidates pending work, even on cache hits
   if (!S.analysisMode || !S.variation) return;
   const v = S.variation, idx = v.idx, pos = v.positions[idx], count = enginePanelLineCount();
@@ -5332,48 +5347,121 @@ function rememberPanelLines(i, key, count, lines, fen = S.positions[i]?.fen) {
   return entry;
 }
 let panelWarmJob = null;
+let backgroundActivityBound = false, backgroundInteractionAt = 0;
+function pauseBackgroundAnalysis() {
+  backgroundInteractionAt = Date.now();
+  const job = panelWarmJob;
+  if (job?.pending) {
+    job.interrupted = true;
+    job.engine?.cancelPending(); job.engine?.stop();
+  }
+}
+function bindBackgroundAnalysisActivity() {
+  if (backgroundActivityBound) return;
+  backgroundActivityBound = true;
+  for (const type of ['pointerdown', 'keydown', 'wheel']) document.addEventListener(type, pauseBackgroundAnalysis, {capture: true, passive: true});
+  document.addEventListener('visibilitychange', () => { if (document.hidden) pauseBackgroundAnalysis(); });
+}
+function waitForBackgroundAnalysis(job, delay) {
+  return new Promise(resolve => {
+    job.resume = resolve;
+    job.timer = setTimeout(() => { job.resume = null; resolve(!job.cancelled); }, delay);
+  });
+}
+function backgroundAnalysisBusy() {
+  return document.hidden || learningWorkspace?.embedded || S.analysisMode || !!S.practice || S.bestWalking || S.lineWalking
+    || !!S._panelRequest || !!S.liveEngine?.current || !!S.helperEngine?.current
+    || Date.now() - backgroundInteractionAt < 500;
+}
+function rememberAnnotationSearch(i, key, count, result) {
+  const root = S.bests[i], top = result?.lines?.find(line => line.multipv === 1);
+  if (S.settings.classifyLines <= 1 || !root || i >= S.total || count < 2
+    || key !== panelContextKey(i) || !top || !Number.isInteger(top.depth) || top.depth < S.settings.engineDepth
+    || result.bestmove !== (top.pv || '').split(' ')[0]) return false;
+  const legal = new Set(new Chess(S.positions[i].fen).moves({verbose: true}).map(move => move.lan));
+  const lines = result.lines.slice(0, Math.min(count, legal.size));
+  if (lines.length < Math.min(count, legal.size) || lines.some((line, rank) => line.multipv !== rank + 1
+    || line.depth !== top.depth || line.bound !== 'exact' || !legal.has((line.pv || '').split(' ')[0])
+    || (line.score?.mate != null ? !Number.isInteger(line.score.mate) || line.score.mate === 0 : !Number.isFinite(line.score?.cp)))
+    || new Set(lines.map(line => line.pv.split(' ')[0])).size !== lines.length) return false;
+  root.annotationSearch = {key, count, result: {...result, lines}};
+  if (!['best', 'excellent', 'great', 'brilliant'].includes(S.classif[i + 1])) return true;
+  const before = JSON.stringify({classif: S.classif, grades: S.moveGrades});
+  computeDerived();
+  if (before !== JSON.stringify({classif: S.classif, grades: S.moveGrades})) {
+    if (S.analysisMode) classifyVariationMoves();
+    paintBoard(); renderBestArrow(); renderReview(); renderStats(); renderGraph(); renderMoves();
+    saveToLibrary();
+  }
+  return true;
+}
 function stopPanelPrecalculation() {
   if (!panelWarmJob) return;
   panelWarmJob.cancelled = true;
   clearTimeout(panelWarmJob.timer);
+  panelWarmJob.resume?.(false);
   panelWarmJob.engine?.terminate();
   panelWarmJob = null;
 }
 function schedulePanelPrecalculation() {
-  if (S.blank || S.analyzing || enginePanelLineCount() <= 1 && !S._panelNeedsLive) return;
-  const context = JSON.stringify([S.batchGen, S.pgn, panelContextKey(0), enginePanelLineCount()]);
+  const count = Math.max(enginePanelLineCount(), S.settings.classifyLines || 1);
+  if (S.blank || S.analyzing || S.analysisError || count <= 1 && !S._panelNeedsLive) return;
+  const context = JSON.stringify([S.batchGen, S.pgn, panelContextKey(0), count, S.settings.classifyLines]);
   if (panelWarmJob?.context === context) return;
   stopPanelPrecalculation();
-  const job = {context, cancelled: false, engine: null, idx: null, pending: null};
+  const job = {context, cancelled: false, engine: null, idx: null, pending: null, interrupted: false, dirty: false};
   panelWarmJob = job;
-  const count = enginePanelLineCount();
   const positions = S.positions;
   // Let the foreground request claim the visible position first. Statistics never await this job.
   job.timer = setTimeout(() => { job.promise = (async () => {
     try {
+      if (!await waitForBackgroundAnalysis(job, 500)) return;
       const order = [S.idx, ...positions.map((_, i) => i).filter(i => i !== S.idx)];
-      for (const i of order) {
+      for (let cursor = 0; cursor < order.length; cursor++) {
+        const i = order[cursor];
         if (job.cancelled || S.positions !== positions || S.analyzing) return;
         if (!S.bests[i]?.lines || terminalScore(positions[i].fen)) continue;
         const key = panelContextKey(i);
         if (S._panelRequest?.key === key && S._panelRequest.count >= count) await S._panelRequest.promise;
         if (job.cancelled) return;
-        if (cachedPanelLines(i)?.count >= count || !S._panelNeedsLive && S.bests[i].lines.length >= count) continue;
-        if (!job.engine) job.engine = await createEngine({Hash: S.settings.engineHash, 'Skill Level': S.settings.engineSkill});
+        const cached = cachedPanelLines(i);
+        if (cached?.count >= count || !S._panelNeedsLive && S.bests[i].lines.length >= count) continue;
+        const extra = S.bests[i].annotationSearch;
+        if (extra?.key === key && extra.count >= count) {
+          rememberPanelLines(i, key, count, extra.result.lines); continue;
+        }
+        while (backgroundAnalysisBusy()) { if (!await waitForBackgroundAnalysis(job, 500)) return; }
+        // One worker regardless of the foreground pool size; cap hash and leave
+        // three times the search duration idle (at most 25% of one core on average).
+        if (!job.engine) job.engine = await createEngine({Threads: 1, Hash: 16, 'Skill Level': S.settings.engineSkill});
         if (job.cancelled) { job.engine.terminate(); return; }
+        while (backgroundAnalysisBusy()) { if (!await waitForBackgroundAnalysis(job, 500)) return; }
         job.idx = i;
+        job.interrupted = false;
+        const started = Date.now();
         job.pending = job.engine.analyse(positions[i].fen, S.settings.engineDepth, count, searchHistory(positions, i));
         const result = await job.pending;
         if (job.cancelled || S.positions !== positions || panelContextKey(i) !== key) return;
+        job.idx = null; job.pending = null;
+        if (job.interrupted) {
+          // Resume this position after interaction settles. An interrupted search
+          // cannot certify a category or leave a partial result in the cache.
+          if (!await waitForBackgroundAnalysis(job, 500)) return;
+          cursor--; continue;
+        }
         const entry = rememberPanelLines(i, key, count, result.lines);
+        job.dirty = rememberAnnotationSearch(i, key, count, result) || job.dirty;
         if (!S.analysisMode && S.idx === i) {
           S._panelCache = entry;
           renderEngineCurrent();
         }
-        job.idx = null; job.pending = null;
+        if (!await waitForBackgroundAnalysis(job, Math.max(250, (Date.now() - started) * 3))) return;
       }
     } catch { /* Foreground navigation can retry an interrupted or failed background search. */ }
-    finally { job.engine?.terminate(); job.engine = null; job.idx = null; job.pending = null; }
+    finally {
+      job.engine?.terminate(); job.engine = null; job.idx = null; job.pending = null;
+      if (job.dirty && !job.cancelled && S.positions === positions) saveToLibrary();
+    }
   })(); }, 0);
 }
 async function requestPanelLines() {
@@ -5404,12 +5492,14 @@ async function requestPanelLines() {
   entry.promise = (async () => { try {
     // Publish ownership before engine startup can re-render the panel.
     await Promise.resolve();
+    pauseBackgroundAnalysis();
     const eng = await ensureLiveEngine();
     if (token !== S.panelToken || S.analysisMode || panelContextKey() !== key) return;
     eng.cancelPending(); eng.stop();
     const res = await eng.analyse(fen, S.settings.engineDepth, want, searchHistory(S.positions, i));
     if (token !== S.panelToken || S.idx !== i || S.analysisMode || panelContextKey() !== key) return;
     S._panelCache = rememberPanelLines(i, key, want, res.lines);
+    rememberAnnotationSearch(i, key, want, res);
     // Clear before rendering so a failed/uncacheable result cannot leave stale ownership.
     if (S._panelRequest === entry) S._panelRequest = null;
     renderEngine(res.lines);
@@ -6142,7 +6232,7 @@ function motorSettings() {
       engineSlider("Workers", "engineWorkers", 1, 8, 1, { fmt: (v) => v + (v === 1 ? " (single)" : " parallel"), info: ENGINE_INFO.engineWorkers }),
       engineSeg("Panel lines", "engineLines", Array.from({length: enginePanelLineLimit()}, (_, i) => i + 1), null, ENGINE_INFO.engineLines),
       el("div", { class: "set-row hint" },
-        el("span", { class: "set-note" }, "Additional analysis lines provide alternatives for move annotations. Calibrated SF18 numerical scores require 1 analysis line. Panel lines are searched live as you reach each move.")),
+        el("span", { class: "set-note" }, "Results appear after the first line. Extra analysis lines check move quality in the background and update categories such as Great. One background worker pauses between positions and yields while you interact. Accuracy and rating scores stay unchanged.")),
     ),
     section("Estimated rating",
       el("div", { class: "set-row" }, setLabel("Rating mode", ELO_INFO),
@@ -6152,8 +6242,8 @@ function motorSettings() {
       S.settings.enginePath === "sf19lite" ? el("div", { class: "set-row hint" }, el("span", { class: "set-note" },
         "Stockfish 19 compares expected-point losses with its own public peers. This rating comparison is separate from displayed accuracy.")) : null,
       el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Moves only: ignores the saved rating and estimates a blitz rating level from your move choices. Needs at least 10 moves with more than one legal choice. These estimates do not change your account rating.")),
-      (S.settings.enginePath === "nnue" && (S.settings.engineDepth !== 16 || S.settings.engineHash !== 16 || S.settings.engineSkill !== 20 || S.settings.classifyLines !== 1))
-        ? el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Use depth 16, hash 16 MB, maximum strength and 1 analysis line for calibrated SF18 numerical scores.")) : null,
+      (S.settings.enginePath === "nnue" && (S.settings.engineDepth !== 16 || S.settings.engineHash !== 16 || S.settings.engineSkill !== 20))
+        ? el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Use depth 16, hash 16 MB and maximum strength for calibrated SF18 numerical scores.")) : null,
     ),
     section("Engine",
       el("div", { class: "set-row" },
@@ -6548,6 +6638,13 @@ async function setEngineSetting(key, value) {
     stopPanelPrecalculation();
     S.panelToken++; S._panelRequest = null;
     if (!S.analysisMode) { S.liveEngine?.cancelPending(); S.liveEngine?.stop(); }
+    if (key === 'classifyLines') {
+      computeDerived();
+      if (S.analysisMode) classifyVariationMoves();
+      paintBoard(); renderReview(); renderStats(); renderGraph(); renderMoves();
+      if (!S.analyzing) saveToLibrary();
+    }
+    schedulePanelPrecalculation();
     renderEngineCurrent();
     if (S.analysisMode && S.variation) requestLiveEval();
     if (UI.settings && !UI.settings.hidden) renderSettings();
@@ -6695,6 +6792,7 @@ function practiceSpots() {
   return out;
 }
 function startPractice() {
+  pauseBackgroundAnalysis();
   if (S.analyzing || S.practice) return;
   if (S.analysisMode) exitAnalysis();
   if (S.autoTimer) { clearInterval(S.autoTimer); S.autoTimer = null; }
@@ -7465,8 +7563,7 @@ async function startAnalysis({preserveCompleted = false} = {}) {
   }
   if (gen !== S.batchGen) return;
 
-  // Batch analysis defaults to MultiPV=1. Panel candidates are precomputed separately
-  // after statistics are ready, preserving the calibrated scoring protocol.
+  // Publish the single-line scoring pass before any extra annotation/candidate work.
   const multipv = scoringSettings.classifyLines;
   S.analyzedSettingsKey = analysisSettingsKey();
   S.analyzedMultipv = multipv; // remember how many lines this run computed (for setEngineSetting)
@@ -7565,6 +7662,7 @@ async function startAnalysis({preserveCompleted = false} = {}) {
   renderStats();
   if (!S.analysisMode) renderEngineCurrent();
   saveToLibrary();   // the game is fully analyzed → keep it in the user's library
+  schedulePanelPrecalculation();
 }
 
 /* ---------------- Render everything ---------------- */

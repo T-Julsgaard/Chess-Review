@@ -55,6 +55,17 @@ analysis they show a neutral pending state. Custom category names apply when the
 overview renders. Accessible card labels include player, phase, exact percentage,
 category and the number of scored decisions.
 
+Engine settings default to two analysis lines. The first line finishes the scoring
+pass and makes the review available; extra lines run afterward in one background
+worker with a 16 MB hash. Searches retain the selected depth and full game history.
+The worker rests for at least three times each search duration, yields on keyboard,
+pointer and scroll input, and pauses while hidden or while foreground analysis or
+practice is active. Only completed, exact alternatives at a common depth can
+certify Great. New categories update Quality counts, move labels and board badges,
+and are saved with the review. Accuracy and estimated rating retain their original
+single-line scoring evidence. Changing the analysis-line count does not repeat
+the scoring pass.
+
 Reveal removes the glow from the previous Dials design and labels the estimate
 **Estimated rating**. Results count up and meters fill while all player/phase
 labels type in together, once per loaded set of results. The 1.2-second animation
