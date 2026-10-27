@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Chess Review",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Free, open-source analysis for your chess games.",
   "minimum_chrome_version": "121",
   "icons": {

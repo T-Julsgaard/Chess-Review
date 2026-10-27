@@ -1,36 +1,40 @@
-# Release 0.3.0
+# Release 0.4.0
 
-This release brings the improved review interface to existing users with a
-one-time settings reset, preserving their saved game library. It also includes
-the review reliability fixes and navigation improvements audited for 0.2.1.
+This release introduces the Modern interface, 50,000 puzzles and opening lessons.
+Modern is the saved default for new installations and upgrades from 0.3.0 or older,
+with the complete preset panel arrangement/designs and two engine panel lines.
+Users can customise the interface afterward; later openings and updates retain
+those choices.
 
-The preceding maintenance work improves commit descriptions and retires obsolete
-experiments, superseded tooling and discarded design work from repository history.
-Contributors using older clones should start from current `main` and port their
-reviewed changes individually, as described in CONTRIBUTING.md.
+The migration uses `settingsResetFor040`, independently of the older
+`settingsResetFor030` marker. Keep the 0.4.0 minimum version and its marker fixed
+in future releases: users who skip 0.4.0 migrate on their next update, while users
+who have already migrated never reset again. New installations save the same
+Modern defaults and completion marker.
 
-The October 4 release audit also fixes review reloads, clock-tag alignment,
-callbacks from exited practice sessions, and library overwrites between review
-tabs. The functional audit and its limits are recorded in docs/RELEASE_AUDIT.md.
-
-Updating to 0.3.0 resets all preferences and panel layouts once to the current
-defaults, so existing users receive the new default appearance. Usernames, saved
-games, favorites, stored analyses and game caches are preserved. A separate
-completion marker prevents repeat resets. The reset is restricted to the 0.3.0
-extension update event; keep its release constant and marker fixed in later
-releases, including for users who skip 0.3.0. New installs only record the marker.
-Review startup waits for the same reset under a shared browser lock and retries
-it if update handling was missed or its storage write failed. The marker is
-written with the reset so a late update handler cannot erase new customizations.
+Only settings and layout are replaced. Sound on/off, master and per-event volume,
+sound selections, move animation on/off/speed and learning transition preferences
+are preserved. Usernames, player history, saved games, favourites, stored analyses,
+game caches, pending review jobs and any learning progress remain untouched.
 Stored analyses can still be recalculated when incompatible with the default
 engine or scoring settings, without removing the saved games.
+
+Review startup waits for the migration under the same browser lock as the update
+handler, before reading preferences or displaying the workspace. A missed or
+failed update is retried at startup. Preferences and completion are written
+together so a late update event cannot erase subsequent customisations.
+
+The independent developer note appears once for both upgrading and newly installed
+users, including installations of later releases. It highlights **Learn with Chess
+review** and **Solve Puzzles**. Dismissal never changes Modern or resets preferences;
+existing seen/opt-out markers are respected across updates and settings resets.
 
 ## Packages and verification
 
 Run `npm ci`, `npm test`, `npm run verify:engines`, and `npm run build`.
-Each build creates a new `web-ext-artifacts/release-0.3.0-<unique>/` directory.
-It preserves `chess-review-0.3.0-chrome.zip`, `chess-review-0.3.0-firefox.zip`, and
-`chess-review-0.3.0-source.zip`, alongside staged copies. Existing packages are
+Each build creates a new `web-ext-artifacts/release-0.4.0-<unique>/` directory.
+It preserves `chess-review-0.4.0-chrome.zip`, `chess-review-0.4.0-firefox.zip`, and
+`chess-review-0.4.0-source.zip`, alongside staged copies. Existing packages are
 never overwritten. `release-record.json` records SHA-256 checksums, source-file
 hashes, the Git HEAD and working-tree status, Node version, and build time.
 `web-ext-artifacts/latest-release.json` points to the newest completed record;
@@ -50,16 +54,30 @@ not be described as identical to its HEAD commit. Preserve the submitted source
 snapshot and checksums with the actual store-upload record; do not invent tags
 or reconstruct older releases from today's source.
 
-Then run `npm run test:browsers` for real engine startup and completed reviews in
-headless Chrome and Firefox. The script defaults to their standard Windows install
+The source snapshot retains the complete readable puzzle JSON. Browser packages
+replace it with a small index and JSON parts below 4 MiB, generated locally by
+`scripts/package-puzzles.mjs`. The index retains the library metadata; puzzle IDs,
+order, positions, solutions and ratings are unchanged. Each package record includes
+the source dataset hash and hashes of every generated part. This allows the actual
+Firefox ZIP to pass the validator's 5 MiB per-file parsing limit without excluding
+the puzzle library from validation.
+
+Then run `node scripts/browser-smoke.mjs --review-only` for real engine startup and
+completed reviews in headless Chrome and Firefox. The script defaults to their standard Windows install
 paths; override with CHROME_PATH and FIREFOX_PATH where needed. It uses isolated
 profiles and test-only extension copies with a loopback reporting endpoint; the
 store ZIPs are never modified. It checks a fresh default-18 review and migration
 from the old full-19 preference to Lite. Results are saved in
 `browser-smoke-results.json` in the latest release directory.
-It also simulates the one-time 0.3.0 reset against real browser storage, checks
+It also simulates the one-time 0.4.0 migration against real browser storage, checks
 that games/favorites/analyses survive, renders the default preferences, and
-reopens a review after customization to check that the reset does not repeat.
+reopens a review after customization to check that the migration does not repeat.
+It also checks Modern and the once-only developer note for a fresh installation.
+Run `node scripts/learning-browser.mjs --announcement` for note geometry/dismissal.
+The dedicated `--puzzle-ui`, `--openings` and `--statistics` modes of that script
+check the current learning flows. The older combined learning audit still assumes
+retired tab ordering, an empty statistics view and a fixed board top edge; it is
+not a release gate for the current interface.
 
 Run `npm run test:layout` for native Chrome window fitting, square-board and
 overflow checks, 320/390-pixel responsive viewports, custom layout reload/reset,
@@ -72,20 +90,18 @@ reviews with both engines.
 Validate the actual Firefox ZIP with:
 
 ```sh
-npx web-ext lint --source-dir=web-ext-artifacts/release-0.3.0-<unique>/chess-review-0.3.0-firefox.zip
+npx web-ext lint --source-dir=web-ext-artifacts/release-0.4.0-<unique>/chess-review-0.4.0-firefox.zip
 ```
 
 Chrome uses an MV3 module service worker. Firefox uses an MV3 module event page.
 Store packages omit the other browser's background declaration. The development
 manifest includes both so the project can be loaded directly in either browser.
 
-Before uploading, confirm 0.3.0 is greater than the latest uploaded version in both
-store dashboards. Keep the existing Chrome item. The previous Firefox listing
-was deleted, so its retired extension ID cannot be reused. This build uses a new
-Firefox ID for submission as a new add-on; retain that ID for all future updates
-and upload those updates through the replacement listing. Firefox treats this
-as a separate installation, without automatic updates or storage migration from
-the deleted add-on. See [Mozilla's deletion documentation](https://mozilla.github.io/addons-server/topics/api/addons#delete). This repository does not authenticate to or publish
+Before uploading, confirm 0.4.0 is greater than the latest uploaded version in both
+store dashboards. Upload through the existing Chrome and Firefox listings and keep
+the Firefox extension ID from `manifest.json`; 0.4.0 does not change it or the
+extension permissions. Keeping the existing extension identity preserves installed
+users' storage across updates. This repository does not authenticate to or publish
 to either store during build. Check that current screenshots match the two engine
 choices, and use PRIVACY.md as the basis for the hosted privacy-policy URL.
 [marketing/STORE_LISTING2.md](marketing/STORE_LISTING2.md) contains prepared
@@ -100,8 +116,9 @@ tools/calibration/PUBLIC_METHOD.md. This establishes reproducibility from bundle
 evidence, not platform permission, independently validated move labels or rights
 to third-party assets. ATTRIBUTIONS.md records current asset provenance and limitations. Platform integration and applicable terms still need review;
 a generated ZIP is not legal clearance. The Chrome store download checked on
-October 3, 2026 was version 0.2.0. Version 0.3.0 is prepared for the maintainer's
-store upload; the Firefox public listing was unavailable at that check.
+October 3, 2026 was version 0.2.0; the Firefox public listing was unavailable at
+that check. The maintainer reports 0.3.0 is currently released. Version 0.4.0 is
+prepared for the maintainer's store upload.
 
 ## Reviewer notes
 

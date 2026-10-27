@@ -17,7 +17,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out,sour
   };
   const storage=await create(`chrome-extension://${loaded.id}/audit.html`);
   await waitFor(storage,'!!window.api','Reference storage');
-  await evaluate(storage,"api.storage.local.set({settingsResetFor030:true,settings:{engineDepth:4,engineWorkers:1,depthBumped:true,sound:false,moveAnim:false,coachPlain:true,coach:'old_soviet',coachDefaulted:true,insightFont:18},'job:reference':{pgn:'1. e4 e5 2. Nf3 Nc6 *',meta:{gameId:'reference'},source:'pgn'}})");
+  await evaluate(storage,"api.storage.local.set({settingsResetFor040:true,settings:{engineDepth:4,engineWorkers:1,depthBumped:true,sound:false,moveAnim:false,coachPlain:true,coach:'old_soviet',coachDefaulted:true,insightFont:18},'job:reference':{pgn:'1. e4 e5 2. Nf3 Nc6 *',meta:{gameId:'reference'},source:'pgn'}})");
   const reference=await create(`chrome-extension://${loaded.id}/analysis.html#reference`);
   await waitFor(reference,"!!document.querySelector('.board')&&import('./analysis.js').then(m=>!m.S.analyzing)",'Reference review');
   for(const tab of [reference,review]){
