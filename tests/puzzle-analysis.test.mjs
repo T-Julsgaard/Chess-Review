@@ -4,7 +4,10 @@ import {Chess} from '../lib/chess.js';
 import {app, loadGame, fakeEngine, deferred, settle} from './helpers/app.mjs';
 
 async function setup(t,{puzzle,analyse}={}) {
-  const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
+  const a=app(t);
+  // Keep review candidate searches separate from the puzzle engines counted below.
+  a.replace('requestPanelLines',()=>{});
+  loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
   const p=puzzle||{id:'analysis-test',fen:new Chess().fen(),solution:['e2e4'],rating:1200,themes:[],source:{url:'https://lichess.org/training'}};
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[p]})}));
   const calls=[],engines=[];

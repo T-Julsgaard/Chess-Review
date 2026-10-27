@@ -16,9 +16,11 @@ test('line controls add up to three candidates, remove back to one, and save wit
   a.call('renderEngineCurrent');
   assert.equal(doc.querySelector('.engine-focus-play').hasAttribute('title'),false);
   const before=JSON.stringify({positions:a.state.positions,evals:a.state.evals,bests:a.state.bests,idx:a.state.idx,layout:a.state.layout});
-  assert.equal(doc.querySelectorAll('.engine-focus-candidate').length,1);
+  assert.equal(doc.querySelectorAll('.engine-focus-candidate').length,2);
   assert.equal(doc.querySelector('.engine-minimal-controls').previousElementSibling.className,'engine-candidates');
-  assert.equal(doc.querySelector('.engine-minimal-remove'),null);
+  assert.ok(doc.querySelector('.engine-minimal-remove'));
+  doc.querySelector('.engine-minimal-remove').click();await settle();await a.run('_settingsWriteQueue');
+  assert.equal(doc.querySelectorAll('.engine-focus-candidate').length,1);
   for(const count of [2,3]) {
     doc.querySelector('.engine-minimal-add').click();await settle();await a.run('_settingsWriteQueue');
     assert.equal(doc.querySelectorAll('.engine-focus-candidate').length,count);
@@ -49,8 +51,6 @@ test('all engine designs cap saved four-line preferences and searches at three',
   assert.equal(searched,3);
   assert.equal(doc.querySelectorAll('.engine-focus-candidate').length,3);
   assert.equal(doc.querySelector('.engine-minimal-add'),null);
-  const controls=a.call('engineSeg','Panel lines','engineLines',[1,2,3]);
-  assert.equal(controls.querySelector('.on').dataset.value,'3');
   await a.call('setEngineSetting','engineLines',4);
   assert.equal(a.state.settings.engineLines,3);
   a.state.settings.engineDesign='focus';a.state.settings.engineLines=4;
@@ -71,7 +71,7 @@ test('Add line cannot reveal answers during practice or act on loading, final an
   a.call('renderEnginePractice');
   assert.equal(doc.querySelector('.engine-minimal-add').disabled,true);
   doc.querySelector('.engine-minimal-add').click();
-  assert.equal(a.state.settings.engineLines,1);
+  assert.equal(a.state.settings.engineLines,2);
   a.state.settings.engineLines=3;a.call('renderEnginePractice');
   assert.equal(doc.querySelector('.engine-minimal-remove').disabled,true);
   doc.querySelector('.engine-minimal-remove').click();

@@ -173,8 +173,7 @@ const ACCURACY_INFO = "SF18 uses the published public-data move-quality model. S
 const ELO_INFO = "Both engines support both rating modes using their own models. Use recorded rating compares this game's performance with players around the rating saved in the game. Stockfish 18 uses calibrated accuracy; Stockfish 19 uses its own expected-point losses, separately from displayed accuracy. Moves only ignores the saved rating and estimates a blitz rating level from the moves themselves; it needs at least 10 moves with more than one legal choice. Neither estimate changes your account rating.";
 // Explanations for the engine settings (shown on hover, same tooltip as the accuracy panel).
 const ENGINE_INFO = {
-  engineLines:   "How many candidate moves (lines) the engine panel shows. Extra lines are precomputed across the game after review statistics are ready. Changing this doesn't re-analyze the game.",
-  classifyLines: "Results appear after the first analysis line. Additional lines run in the background to check move categories, including Great. Background work uses one worker, pauses between positions and yields while you interact. Accuracy and rating scores stay unchanged.",
+  classifyLines: "How many candidate moves the engine analyzes and shows in the panel. You can remove displayed lines in the panel. Results appear after the first analysis line. Additional lines run in the background to check move categories, including Great. Background work uses one worker, pauses between positions and yields while you interact. Accuracy and rating scores stay unchanged.",
   engineDepth:   "How many plies (half-moves) deep Stockfish searches each position. Higher depth gives more accurate evaluations and fewer false mistakes, but takes longer.",
   engineWorkers: "Number of Stockfish instances analysing positions in parallel. The default uses available CPU cores, up to four workers. Your selection is respected; if a worker fails to start, the review continues with the workers that did start. Search depth and scoring settings stay the same.",
   fastAnalysis:  "Trades quality for speed: the classification pass uses fewer engine lines. ~1.3×/1.6× faster, but evals shift slightly and clean games can pick up a few false inaccuracies.",
@@ -350,11 +349,10 @@ const DEFAULT_SETTINGS = {
   learningTransition: "morph3",
   // Loading animation while the analysis runs (selectable style).
   loaderStyle: "wave",
-  // Engine panel: how many candidate lines to show. The batch only searches the single best line
-  // (all the classification logic needs); extra lines are searched on demand for the position you're
-  // viewing, so changing this never re-analyzes — it just refreshes the panel.
+  // Display the selected analysis lines unless the user adds or removes lines in the panel.
+  // Extra candidates are searched after scoring or on demand without re-analyzing the game.
   // Default SF18 searches match the published depth16/Hash16 quality model.
-  engineLines: 1, engineDepth: 16, enginePath: "nnue", engineHash: 16, engineSkill: 20,
+  engineLines: 2, engineDepth: 16, enginePath: "nnue", engineHash: 16, engineSkill: 20,
   // Parallel analysis workers: independent single-threaded Stockfish instances that pull
   // positions from a shared queue. Each position is still searched identically (cold, same
   // depth/lines), so results are unchanged — only the wall-clock is parallelized. Default ≈
@@ -395,6 +393,12 @@ function migrateEngineSettings(settings) {
   if (!settings.backgroundAnalysisVersion) {
     if (settings.classifyLines === 1 || settings.classifyLines == null) settings.classifyLines = 2;
     settings.backgroundAnalysisVersion = 1;
+  }
+  // Replace the former independent panel preference with the analysis count once.
+  // Later additions or removals in the panel remain saved across reloads.
+  if (!settings.analysisPanelLinesVersion) {
+    settings.engineLines = settings.classifyLines ?? DEFAULT_SETTINGS.classifyLines;
+    settings.analysisPanelLinesVersion = 1;
   }
 }
 // The engine panel shows up to this many candidate lines (searched on demand for the viewed position).
@@ -6244,7 +6248,6 @@ function motorSettings() {
       engineSeg("Analysis lines", "classifyLines", [1, 2, 3], null, ENGINE_INFO.classifyLines),
       engineSlider("Depth", "engineDepth", 8, 22, 1, { info: ENGINE_INFO.engineDepth }),
       engineSlider("Workers", "engineWorkers", 1, 8, 1, { fmt: (v) => v + (v === 1 ? " (single)" : " parallel"), info: ENGINE_INFO.engineWorkers }),
-      engineSeg("Panel lines", "engineLines", Array.from({length: enginePanelLineLimit()}, (_, i) => i + 1), null, ENGINE_INFO.engineLines),
       el("div", { class: "set-row hint" },
         el("span", { class: "set-note" }, "Results appear after the first line. Extra analysis lines check move quality in the background and update categories such as Great. One background worker pauses between positions and yields while you interact. Accuracy and rating scores stay unchanged.")),
     ),

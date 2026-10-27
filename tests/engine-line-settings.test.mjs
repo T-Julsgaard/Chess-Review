@@ -39,11 +39,51 @@ for (const design of ['original', 'focus', 'minimal']) {
       assert.equal(JSON.stringify({bests: S.bests, evals: S.evals, acc: S.acc, idx: S.idx}), evidence);
     }
     const controls = a.call('motorSettings');
-    for (const key of ['engineLines', 'classifyLines']) {
-      assert.deepEqual([...controls.querySelectorAll(`[data-setting="${key}"]`)].map(n => n.dataset.value), ['1', '2', '3']);
-    }
+    assert.deepEqual([...controls.querySelectorAll('[data-setting="classifyLines"]')].map(n => n.dataset.value), ['1', '2', '3']);
+    assert.equal(controls.querySelector('[data-setting="engineLines"]'), null);
+    assert.doesNotMatch(controls.textContent, /Panel lines/);
   });
 }
+
+test('new and reset engine settings show two analysis lines', async t => {
+  const a = review(t);
+  assert.equal(a.state.settings.classifyLines, 2);
+  assert.equal(a.state.settings.engineLines, 2);
+  assert.equal(rowCount(a), 2);
+  await a.call('setEngineSetting', 'classifyLines', 3);
+  a.replace('applySettings', () => {});
+  a.replace('scheduleReanalyze', () => {});
+  await a.call('resetEngineSettings');
+  assert.equal(a.state.settings.classifyLines, 2);
+  assert.equal(a.state.settings.engineLines, 2);
+  assert.equal(a.store.settings.engineLines, 2);
+});
+
+test('saved panel counts follow analysis lines once, then retain explicit removals across reloads', async t => {
+  const a = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
+  a.replace('resetSettingsForRelease', async () => {});
+  a.store.settings = {engineLines: 1, classifyLines: 2, backgroundAnalysisVersion: 1};
+  await a.start();
+  assert.equal(a.state.settings.engineLines, 2);
+  assert.equal(a.store.settings.engineLines, 2);
+  assert.equal(a.store.settings.analysisPanelLinesVersion, 1);
+  loadGame(a, '1. e4 e5');
+  a.state.blank = false;
+  a.state.settings.engineDesign = 'minimal';
+  a.state.bests[0].lines = candidates(a.state.positions[0].fen, 2);
+  a.call('renderEngineCurrent');
+  a.dom.window.document.querySelector('.engine-minimal-remove').click();
+  await settle(); await a.run('_settingsWriteQueue');
+  assert.equal(a.store.settings.engineLines, 1);
+  assert.equal(a.store.settings.classifyLines, 2);
+
+  const b = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
+  b.replace('resetSettingsForRelease', async () => {});
+  Object.assign(b.store, structuredClone(a.store));
+  await b.start();
+  assert.equal(b.state.settings.engineLines, 1);
+  assert.equal(b.state.settings.classifyLines, 2);
+});
 
 test('old four-line preferences migrate to three and survive reload', async t => {
   const a = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
@@ -114,6 +154,7 @@ for (const count of [1, 2, 3]) {
 
 test('changing candidates during a scoring run cannot change its in-flight scoring settings', async t => {
   const a = review(t), S = a.state, ready = deferred(), observed = [];
+  await a.call('setEngineSetting', 'classifyLines', 1);
   a.replace('requestPanelLines', () => {});
   a.replace('saveToLibrary', () => {});
   a.replace('createEngine', async () => ({...fakeEngine(), buildKey: 'nnue'}));

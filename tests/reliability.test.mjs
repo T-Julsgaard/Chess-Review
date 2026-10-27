@@ -26,6 +26,7 @@ test('a delayed practice success cannot advance a different practice session', t
 
 test('cached navigation invalidates a pending live result', async t=>{
   const a=app(t);loadGame(a,'1. e4 e5');const v=branch(a);quiet(a);
+  v.positions[1].best.lines=[{score:{cp:0},pv:'e7e5'},{score:{cp:0},pv:'d7d5'}];
   v.positions[2].best=null;v.positions[2].eval=null;
   a.state.bests[2]=null;a.state.evals[2]=null;
   const result=deferred();a.state.liveEngine=fakeEngine(()=>result.promise);
