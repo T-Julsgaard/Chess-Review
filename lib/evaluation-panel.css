@@ -8,6 +8,8 @@
 .evaluation-panel .evalgraph { flex: 1; min-width: 0; min-height: 0; border-radius: 4px; }
 .stage .evaluation-panel .evalgraph svg { width: 100%; height: 100%; min-height: 0; overflow: visible; }
 .evaluation-panel .evalgraph:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+/* Navigating a bar chart keeps its position marker without framing the plot. */
+.evaluation-bars .evalgraph:focus-visible, .evaluation-bars2 .evalgraph:focus-visible { outline: none; }
 .evaluation-zero { stroke: var(--line); stroke-width: 1; stroke-dasharray: 3 4; }
 .evaluation-area { fill: color-mix(in oklab,var(--accent) 12%,transparent); }
 .evaluation-curve { fill: none; stroke: var(--accent); stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }

@@ -65,7 +65,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   }
   await call('Emulation.setDeviceMetricsOverride',{width:1920,height:1080,deviceScaleFactor:1,mobile:false},review.sessionId);
   await sleep(200);
-  for (const design of ['timeline','timeline2','bars','minimal']) {
+  for (const design of ['timeline','timeline2','bars','bars2','minimal']) {
     await choose(design);
     await run("document.querySelector('.evaluation-panel [role=slider]').focus()");
     await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Home',code:'Home'},review.sessionId);
@@ -77,6 +77,24 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await call('Input.dispatchMouseEvent',{type:'mouseReleased',button:'left',clickCount:1,...p},review.sessionId);
     const clicked = await run(`import('./analysis.js').then(m=>({idx:m.S.idx,total:m.S.total,hit:document.elementFromPoint(${p.x},${p.y})?.outerHTML.slice(0,250),point:${JSON.stringify(p)},scroll:scrollY}))`);
     assert.ok(clicked.idx>10,JSON.stringify({design,...clicked}));
+    if (design.startsWith('bars')) {
+      // Clicking then navigating with arrows must not add a frame to Move bars.
+      for (const [key,delta] of [['ArrowLeft',-1],['ArrowRight',0]]) {
+        await call('Input.dispatchKeyEvent',{type:'keyDown',key,code:key},review.sessionId);
+        await call('Input.dispatchKeyEvent',{type:'keyUp',key,code:key},review.sessionId);
+        const state = await run(`import('./analysis.js').then(m=>{
+          const chart=document.querySelector('.evaluation-panel [role=slider]');
+          return {idx:m.S.idx,focused:document.activeElement===chart,
+            outline:getComputedStyle(chart).outlineStyle,
+            marker:chart.querySelector('.evaluation-position-marker').style.display};
+        })`);
+        assert.equal(state.idx,clicked.idx+delta);
+        assert.equal(state.focused,true);
+        assert.equal(state.outline,'none',JSON.stringify({design,key,...state}));
+        assert.equal(state.marker,'');
+      }
+      await shot(`evaluation-${design}-keyboard-navigation`,'#graphMount .panel');
+    }
     await call('Page.reload',{},review.sessionId);
     await waitFor(review,`document.querySelector('.evaluation-panel')?.dataset.design==='${design}'&&!document.querySelector('#startup')&&import('./analysis.js').then(m=>!m.S.analyzing)`,'Restored '+design);
   }
