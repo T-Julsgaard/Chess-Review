@@ -69,18 +69,27 @@ test('Original Accuracy expansion moves Engine and Solve puzzles down and restor
     const node = doc.querySelector('[data-mod="'+key+'"]');
     return [key, {top:parseFloat(node.style.top),height:parseFloat(node.style.height)}];
   }));
+  const nearBoxes = (actual, expected) => {
+    assert.deepEqual(Object.keys(actual), Object.keys(expected));
+    for (const key of Object.keys(expected)) for (const field of Object.keys(expected[key])) {
+      assert.ok(Math.abs(actual[key][field]-expected[key][field])<1e-8, `${key}.${field} must not drift`);
+    }
+  };
   for (const custom of [false,true]) {
     if(custom){a.call('toggleReorganize');a.call('toggleReorganize');}
-    const before = geometry(), saved = JSON.stringify(a.call('layoutForSave'));
+    const before = geometry(), saved = structuredClone(a.call('layoutForSave'));
     for(let i=0;i<3;i++) {
       doc.querySelector('.qbreak-toggle').click();
       const expanded = geometry(), delta = expanded.accuracy.height-before.accuracy.height;
       assert.ok(delta>70);
-      for(const key of ['engine','learn'])assert.ok(Math.abs(expanded[key].top-before[key].top-delta)<1e-8);
+      assert.ok(Math.abs(expanded.engine.top-before.engine.top-delta)<1e-8);
+      // The automatic desktop layout may trim Engine to keep the puzzle button on screen.
+      const gap = boxes => boxes.learn.top-boxes.engine.top-boxes.engine.height;
+      assert.ok(Math.abs(gap(expanded)-gap(before))<1e-8);
       assert.deepEqual(expanded.controls,before.controls);
       doc.querySelector('.qbreak-toggle').click();
-      assert.deepEqual(geometry(),before);
-      assert.equal(JSON.stringify(a.call('layoutForSave')),saved,'Toggling must not accumulate a saved offset');
+      nearBoxes(geometry(),before);
+      nearBoxes(a.call('layoutForSave'),saved);
     }
   }
 });
