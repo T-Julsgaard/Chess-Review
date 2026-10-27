@@ -118,9 +118,32 @@ test('native Engine uses scrolling, and custom Engine respects its content scale
 
 test('settings remains right aligned through visual and layout resets',async t=>{
   const a=layout(t);a.viewport(1920,920);a.call('toggleSettings');
-  const settings=a.dom.window.document.getElementById('settings');assert.equal(settings.style.right,'24px');
-  await a.call('resetVisualSettings');await a.call('resetLayout');assert.equal(settings.style.right,'24px');
+  const settings=a.dom.window.document.getElementById('settings');
+  const inset=()=>parseFloat(settings.style.right)*parseFloat(settings.style.getPropertyValue('--settings-scale'));
+  assert.equal(inset(),24);
+  await a.call('resetVisualSettings');await a.call('resetLayout');assert.equal(inset(),24);
   a.viewport(390,844);a.dom.window.dispatchEvent(new a.dom.window.Event('resize'));assert.equal(settings.style.right,'');
+});
+
+test('settings fits the remaining panel gutter when the bookmarks bar is hidden',t=>{
+  const a=layout(t),document=a.dom.window.document,settings=document.getElementById('settings');
+  // Simulate the browser's zoom-aware popover measurements. The production panel
+  // geometry still comes from the real layout and custom-canvas fitting code.
+  const scale=()=>parseFloat(settings.style.getPropertyValue('--settings-scale'))||1;
+  settings.getBoundingClientRect=()=>({width:256*scale()});
+  const computed=a.context.getComputedStyle;
+  a.context.getComputedStyle=node=>node===settings?{zoom:String(scale())}:computed(node);
+  for(const mod of document.querySelectorAll('.stage .mod'))mod.getBoundingClientRect=()=>({
+    right:parseFloat(mod.style.left)+parseFloat(mod.style.width),
+  });
+  a.call('toggleSettings');
+  for(const height of [919,949,979,919]){
+    a.viewport(1920,height);a.call('applyLayoutMode');a.call('positionSettings');
+    const right=Math.max(...[...document.querySelectorAll('.stage .mod')].map(mod=>mod.getBoundingClientRect().right));
+    assert.ok(1920-24-256*scale()>=right+11.99,'Settings stays clear of the review panels');
+    if(height>919)assert.ok(scale()<1,'Settings shrinks as the review panels grow');
+    else assert.equal(scale(),1,'Showing bookmarks restores the original settings size');
+  }
 });
 
 test('native commentary sizing migrates the old default once and preserves later choices',async t=>{

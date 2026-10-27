@@ -6179,10 +6179,23 @@ function renderSettings() {
 }
 function positionSettings() {
   if (!UI.settings || UI.settings.hidden) return;
-  // Keep the popover anchored to the right edge, beneath its toolbar button. Tying this
-  // offset to the analysis panels made it drift left on wide windows and briefly reuse
-  // stale panel geometry when the automatic/custom layout was reset.
-  UI.settings.style.right = window.innerWidth <= 520 ? "" : "24px";
+  const app=UI.canvas.closest('.app'),reference=UI.canvas.classList.contains('full-hd-reference');
+  const chromeScale=reference?parseFloat(app.style.getPropertyValue('--reference-chrome-scale'))||1:1;
+  let scale=chromeScale;
+  if(reference){
+    const currentScale=parseFloat(getComputedStyle(UI.settings).zoom)||1;
+    const width=UI.settings.getBoundingClientRect().width/currentScale;
+    const right=Math.max(0,...[...UI.canvas.querySelectorAll('.mod')]
+      .filter(mod=>!mod.hidden&&getComputedStyle(mod).display!=='none')
+      .map(mod=>mod.getBoundingClientRect().right));
+    const available=window.innerWidth-right-24-12;
+    // Fit the remaining desktop gutter independently of the growing panels.
+    // Small windows retain the regular popover rather than illegible controls.
+    if(width>0&&available>=width*.6)scale=Math.min(scale,available/width);
+  }
+  UI.settings.style.setProperty('--settings-scale',scale);
+  // Fixed offsets are in the popover's zoomed coordinates; keep the screen inset constant.
+  UI.settings.style.right = window.innerWidth <= 520 ? "" : 24/scale+"px";
 }
 async function toggleSettings() {
   closeArrowColorPicker();
