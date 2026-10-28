@@ -27,6 +27,15 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep}) {
       await waitFor(review,`document.querySelector('.leaderboard-rank')?.textContent==='${rank}'`,'Preview page');
     }
     assert.equal(await run("document.querySelector('[data-focus=leaderboard-next]').disabled"),true);
+    const unchanged=await run(`import('./analysis.js').then(({learningWorkspace:w})=>{
+      w.stepHomePosition(0);const main=w.shell.querySelector('.learn-main'),panel=main.querySelector('.learn-leaderboard'),row=panel.querySelector('tbody tr');main.scrollTop=80;
+      const observer=new MutationObserver(()=>{});observer.observe(main,{childList:true,subtree:true});
+      w.boardElement.querySelector('[data-square=e2]').click();w.boardElement.querySelector('[data-square=e4]').click();
+      w.submitMove('e7e5');w.stepHomePosition(0);w.stepHomePosition(2);w.flipBoard();
+      const result=panel.isConnected&&row.isConnected&&w.shell.querySelector('.learn-main')===main&&main.scrollTop===80&&observer.takeRecords().length===0&&w.leaderboard.page===3;
+      observer.disconnect();return result;
+    })`);
+    assert.equal(unchanged,true,'Free-board moves, history and flips leave the leaderboard connected and still');
     const reverse=await run(`import('./analysis.js').then(({learningWorkspace:w})=>{window.previewReturning=w.returnFromLeaderboard();const hero=document.querySelector('.leaderboard-returning .leaderboard-hero');
       return hero.getAnimations()[0].effect.getKeyframes().map(f=>f.clipPath);})`);
     assert.match(reverse[0],/^inset\(0px 0%(?: 0px 0%)? round 13px\)$/);assert.notEqual(reverse[0],reverse.at(-1));
@@ -41,5 +50,5 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep}) {
   await upload();await call('Page.reload',{},review.sessionId);
   await waitFor(review,"!!document.querySelector('.board')",'Review reload');
   assert.equal(await run("import('./lib/learning/leaderboard-preview.js').then(m=>m.leaderboardPreview.active)"),false);
-  console.log('CSV preview: native file import, three pages per mode, reverse transitions, no network/storage changes, clear and reload reset passed.');
+  console.log('CSV preview: file import, pagination, stable leaderboard during free-board moves/history/flips, reverse transitions, isolation and reload reset passed.');
 }

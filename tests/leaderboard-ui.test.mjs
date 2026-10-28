@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 import {JSDOM} from 'jsdom';
 import {LearningWorkspace} from '../lib/learning/workspace.js';
 import {LeaderboardClient} from '../lib/learning/leaderboard-client.js';
+import {app,loadGame} from './helpers/app.mjs';
 
 const library=JSON.parse(readFileSync(new URL('../data/learning/puzzles.json',import.meta.url))).puzzles.slice(0,20);
 const drain=async()=>{for(let i=0;i<30;i++)await Promise.resolve();};
@@ -135,4 +136,24 @@ for(const mode of ['solve-puzzle','timeAttack','knockout'])test(`${mode} returns
   assert.equal(frames[0][0].clipPath,'inset(0 0% 0 0% round 13px)');assert.notEqual(frames[0][0].clipPath,frames[0][1].clipPath);
   if(mode==='knockout')await w.navigate('concepts');else finishHero();
   await pending;assert.equal(w.root.querySelector('.leaderboard-returning'),null);assert.equal(w.leaderboardReturn,null);
+});
+
+for(const mode of ['solve-puzzle','timeAttack','knockout'])test(`${mode} keeps leaderboard rows and input connected during free-board moves, history and flips`,async t=>{
+  t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:library})}));
+  const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');await a.call('openLearning');
+  const w=a.run('learningWorkspace');t.after(()=>w.close());let reads=0;
+  w.leaderboardClient={configured:true,credentials:async()=>null,list:async(mode,page)=>{reads++;return {rows:[{name:'Knight-'+page,score:42-page}],hasNext:page<3};}};
+  await w.showLeaderboard(mode);await w.loadLeaderboard(2);
+  const main=w.shell.querySelector('.learn-main'),panel=main.querySelector('.learn-leaderboard'),row=panel.querySelector('tbody tr'),key=panel.querySelector('input');
+  key.value='unfinished player key';key.dispatchEvent(new a.dom.window.Event('input'));main.scrollTop=123;
+  const observer=new a.dom.window.MutationObserver(()=>{});observer.observe(main,{childList:true,subtree:true});t.after(()=>observer.disconnect());
+  w.boardElement.querySelector('[data-square=e2]').click();assert.equal(w.selected,'e2');
+  w.boardElement.querySelector('[data-square=e4]').click();assert.equal(w.homePosition.get('e4')?.type,'p');
+  w.submitMove('e7e5');w.stepHomePosition(0);w.stepHomePosition(2);w.flipBoard();
+  assert.equal(w.shell.querySelector('.learn-main'),main);assert.equal(panel.isConnected,true);assert.equal(row.isConnected,true);
+  assert.equal(panel.querySelector('input'),key);assert.equal(key.value,'unfinished player key');assert.equal(main.scrollTop,123);
+  assert.equal(observer.takeRecords().length,0,'Board updates must not mutate the connected leaderboard');
+  assert.equal(w.leaderboard.page,2);assert.equal(reads,2,'Board updates must not fetch rankings');
+  await w.loadLeaderboard(3);assert.equal(reads,3);assert.equal(w.leaderboard.page,3);
+  assert.equal(w.root.querySelector('.leaderboard-score').textContent,'39','Real leaderboard updates still render');
 });
