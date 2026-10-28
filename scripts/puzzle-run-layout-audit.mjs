@@ -104,5 +104,38 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     const shot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);await fs.writeFile(path.join(out,`${mode}-replay-320.png`),Buffer.from(shot.data,'base64'));
     await run("import('./analysis.js').then(m=>m.learningWorkspace.returnToRunResults())");
   }
-  console.log('Run layout and in-place replay checks passed at 1920, 1280, 390 and 320 pixels. Screenshots: '+out);
+  await auditHistoryScrolling({review,call,evaluate,sleep});
+  console.log('Run layout, history scrolling and in-place replay checks passed at 1920, 1280, 390 and 320 pixels. Screenshots: '+out);
+}
+
+export async function auditHistoryScrolling({review,call,evaluate,sleep}) {
+  const run=expression=>evaluate(review,expression);
+  await run("import('./analysis.js').then(async m=>{m.S.settings.moveAnim=false;await m.openLearning();})");
+  for(const mode of ['timeAttack','knockout']) {
+    await run(`import('./analysis.js').then(async m=>{
+      const w=m.learningWorkspace;await w.navigate('puzzles');await w.startPuzzleRun('${mode}');
+      w.run.results=w.puzzles.slice(0,40).map((p,i)=>({id:p.id,number:i+1,rating:p.rating,correct:true}));
+      w.run.solved=40;w.run.bestEligible=false;w.render();
+    })`);
+    const scrollState=()=>run(`(()=>{
+      const list=document.querySelector('.puzzle-run-history'),last=list.lastElementChild.getBoundingClientRect(),rect=list.getBoundingClientRect();
+      return {top:list.scrollTop,max:list.scrollHeight-list.clientHeight,visible:last.top>=rect.top-1&&last.bottom<=rect.bottom+1};
+    })()`);
+    for(const [width,height] of [[1280,800],[320,640]]) {
+      await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(300);
+      await run("import('./analysis.js').then(m=>{const list=document.querySelector('.puzzle-run-history');list.scrollTop=52;m.learningWorkspace.render();})");
+      assert.equal((await scrollState()).top,52,'Redraws must preserve manual history scrolling');
+      await run(`import('./analysis.js').then(async m=>{
+        const w=m.learningWorkspace,id=w.activity.id;
+        while(w.run&&w.activity.id===id)await w.submitPuzzle(w.puzzleById(id).solution[w.activity.step]);
+      })`);
+      const state=await scrollState();
+      assert.ok(state.max>0,'The result history must overflow');
+      assert.ok(Math.abs(state.top-state.max)<=1,'A solved puzzle must scroll its result into view');
+      assert.equal(state.visible,true,'The newest result must fit inside the list');
+      await run("import('./analysis.js').then(m=>m.learningWorkspace.render())");
+      assert.ok(Math.abs((await scrollState()).top-state.max)<=1,'Following redraws must keep the newest result visible');
+    }
+  }
+  console.log('Run history follows new results and preserves manual scrolling at 1280 and 320 pixels.');
 }

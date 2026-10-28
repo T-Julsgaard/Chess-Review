@@ -24,6 +24,35 @@ const current=w=>w.puzzles.find(p=>p.id===w.activity.id);
 const solve=async w=>{const id=w.activity.id;while(w.activity?.id===id)await w.submitPuzzle(current(w).solution[w.activity.step]);};
 const wrong=async w=>{const p=current(w),c=new Chess(w.currentFen());await w.submitPuzzle(c.moves({verbose:true}).find(m=>m.lan!==p.solution[w.activity.step]&&!new Chess(m.after).isCheckmate()).lan);};
 
+for(const mode of ['timeAttack','knockout'])test(`${mode} follows new results and preserves history scrolling between puzzles`,async t=>{
+  const {w,dom}=await setup(t),offsets=new WeakMap();
+  // JSDOM has no layout: model a list that overflows after five rows and clamps
+  // scrollTop just as the browser does. Exercise actual solve/advance renders.
+  Object.defineProperties(dom.window.HTMLOListElement.prototype,{
+    scrollHeight:{get(){return this.children.length*52;}},
+    clientHeight:{get(){return Math.min(260,this.scrollHeight);}},
+    scrollTop:{get(){return offsets.get(this)||0;},set(value){offsets.set(this,Math.max(0,Math.min(value,this.scrollHeight-this.clientHeight)));}}
+  });
+  const history=()=>w.root.querySelector('.puzzle-run-history');
+  const atBottom=()=>assert.equal(history().scrollTop,history().scrollHeight-history().clientHeight);
+  await w.startPuzzleRun(mode);
+  for(let i=0;i<8;i++){await solve(w);atBottom();}
+  assert.ok(history().scrollTop>0);
+  w.render();atBottom();
+  history().scrollTop=52;w.render();assert.equal(history().scrollTop,52);
+  w.selected='a1';w.render();assert.equal(history().scrollTop,52);
+  await solve(w);atBottom();
+  if(mode==='timeAttack'){
+    history().scrollTop=0;await wrong(w);atBottom();
+  }
+  w.render();atBottom();
+  await w.finishChallenge('Ended early');
+  history().scrollTop=104;w.render();assert.equal(history().scrollTop,104);
+  await w.replayRunPuzzle(w.result.results[0].id);assert.equal(history().scrollTop,104);
+  await w.navigate('puzzles');await w.startPuzzleRun(mode);
+  assert.equal(history().children.length,0);assert.equal(history().scrollTop,0);
+});
+
 for(const mode of ['practice','timeAttack','knockout'])for(const phase of ['arrangement','opponent setup']) {
   test(`${mode} can return immediately during ${phase} without a late startup restoring the puzzle`,async t=>{
     const {w,data}=await setup(t,{puzzles:[mate]});
