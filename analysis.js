@@ -1728,7 +1728,7 @@ async function openLearning() {
   UI.settings.hidden = true;
   hideBoardBadgeTip();
   learningWorkspace = new LearningWorkspace({document, storage:browserAPI.storage.local, makePiece, url:_url,
-    settings:()=>S.settings, flipped:S.flipped, book:()=>BOOK || {}, startDrag, onPuzzleWrong:playWrongSound, onPuzzleMove:playSanSound, onOpeningMove:playSanSound, onFreeMove:playSanSound, onPuzzleSuccess:playPuzzleSuccess,
+    settings:()=>S.settings, flipped:S.flipped, book:()=>BOOK || {}, startDrag, onPuzzleWrong:playWrongSound, onPuzzleMove:playSanSound, onPuzzlePremove:playPremoveSound, onOpeningMove:playSanSound, onFreeMove:playSanSound, onPuzzleSuccess:playPuzzleSuccess,
     createAnalysisEngine:()=>createEngine({Hash:S.settings.engineHash, "Skill Level":S.settings.engineSkill}),
     navigationButton:document.getElementById("learningToggle"),
     embedded:{stage:UI.canvas, boardWrap:UI.boardWrap, fen:sourceFen, reviewFen:activePos().fen, startDrag,
@@ -2958,6 +2958,10 @@ function startDrag(e, from, input = null) {
 function playSanSound(san) {
   if (!S.settings.sound) return;
   playEvent(sanSound(san));
+}
+function playPremoveSound() {
+  if (!S.settings.sound) return;
+  triggerFx("move");
 }
 // Make a user move from the shown position. Starts/extends a variation (analysis mode),
 // unless the move on the mainline is simply the next mainline move.

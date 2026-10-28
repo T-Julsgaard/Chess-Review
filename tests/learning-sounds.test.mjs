@@ -45,6 +45,35 @@ test('puzzle move sounds follow the existing mute setting',async t=>{
 function replyPuzzle() {
   const c=new Chess();c.move('e4');c.move('d5');return puzzle(c.fen(),['e4d5','d8d5','b1c3']);
 }
+test('queueing a premove immediately plays the configured move effect, including captures',async t=>{
+  const {a,w,sounds,wrong}=await setup(t,puzzle(new Chess().fen(),['e2e4','d7d5','e4d5'])),queued=[];
+  a.replace('triggerFx',event=>queued.push(event));
+  t.mock.method(w,'waitForPuzzleReply',function(){return new Promise(resolve=>{this.releaseReply=resolve;});});
+  const playing=w.submitPuzzle('e2e4');
+  const premoving=w.queuePuzzlePremove('e4d5');
+  assert.deepEqual(queued,['move']);assert.deepEqual(sounds,['move']);
+  assert.equal(w.activity.step,1);assert.equal(wrong(),0);
+  await w.queuePuzzlePremove('a1a8');assert.deepEqual(queued,['move']);
+  w.releaseReply(true);await playing;await premoving;
+  assert.equal(w.feedback.status,'completed');assert.deepEqual(queued,['move','puzzleSuccess']);
+  assert.deepEqual(sounds,['move','move','capture']);
+});
+
+test('premove placement obeys live mute and stays silent on cancellation',async t=>{
+  const {a,w}=await setup(t,replyPuzzle()),queued=[];
+  a.replace('triggerFx',event=>queued.push(event));
+  t.mock.method(w,'waitForPuzzleReply',function(){return new Promise(resolve=>{this.releaseReply=resolve;});});
+  const playing=w.submitPuzzle('e4d5');
+  a.state.settings.sound=false;
+  const premoving=w.queuePuzzlePremove('b1c3');
+  assert.deepEqual(queued,[]);
+  a.state.settings.sound=true;
+  a.dom.window.document.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
+  assert.deepEqual(queued,[]);
+  w.releaseReply(true);await playing;await premoving;
+  assert.equal(w.activity.step,2);assert.equal(w.premove,null);
+});
+
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 test('accepted moves stay on the board before a delayed opponent reply and its sound',async t=>{
   const {w,sounds}=await setup(t,replyPuzzle());const pending=w.submitPuzzle('e4d5');
