@@ -31,6 +31,12 @@ existing seen/opt-out markers are respected across updates and settings resets.
 
 ## Packages and verification
 
+The extension targets desktop browsers. Keep `browser_specific_settings.gecko_android`
+out of the manifest: that key opts the Firefox listing into Android availability.
+When updating an existing AMO listing, also check **Manage Status & Versions →
+Compatibility** and remove any Android compatibility override on the currently
+listed version. A local manifest change does not edit an already published listing.
+
 Run `npm ci`, `npm test`, `npm run verify:engines`, and `npm run build`.
 Each build creates a new `web-ext-artifacts/release-0.4.0-<unique>/` directory.
 It preserves `chess-review-0.4.0-chrome.zip`, `chess-review-0.4.0-firefox.zip`, and
