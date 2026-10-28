@@ -74,10 +74,10 @@ that games/favorites/analyses survive, renders the default preferences, and
 reopens a review after customization to check that the migration does not repeat.
 It also checks Modern and the once-only developer note for a fresh installation.
 Run `node scripts/learning-browser.mjs --announcement` for note geometry/dismissal.
-The dedicated `--puzzle-ui`, `--openings` and `--statistics` modes of that script
-check the current learning flows. The older combined learning audit still assumes
-retired tab ordering, an empty statistics view and a fixed board top edge; it is
-not a release gate for the current interface.
+The default audit (also available as `--puzzle-ui`) checks the current puzzle UI.
+The dedicated `--openings` and `--statistics` modes check those learning flows.
+The older combined learning audit was removed because it assumed retired tab
+ordering, an empty statistics view and a fixed board top edge.
 
 Run `npm run test:layout` for native Chrome window fitting, square-board and
 overflow checks, 320/390-pixel responsive viewports, custom layout reload/reset,
