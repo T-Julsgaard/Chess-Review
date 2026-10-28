@@ -68,3 +68,60 @@ can change the observed total.
 
 No application behavior changed, so application and browser test suites were
 not rerun solely for this cleanup. No remote Git operation was performed.
+
+## Follow-up cleanup, 2026-10-28
+
+The follow-up audit found 44,398,614,894 bytes (44.40 GB) in
+`web-ext-artifacts/`. The largest disposable outputs were isolated browser-test
+profiles and extension copies. Maintained test source is comparatively small:
+the entire tracked `tests/` directory is about 1 MB.
+The generated outputs were already ignored and untracked; removing them frees
+local disk space without rewriting Git history.
+
+| Removed generated material | Count | Bytes removed |
+| --- | ---: | ---: |
+| Stale browser-test directories | 765 | 31,758,423,051 |
+| Temporary directories from this verification | 4 | 166,161,413 |
+| Verified redundant source ZIPs | 49 | 1,178,519,566 |
+| Old root-level diagnostic logs | 629 | 9,103,237 |
+
+All 1,447 selected paths were removed without failures, totaling 353,753 files
+and 33,112,207,267 bytes (33.11 GB). This includes the temporary outputs produced
+and then removed by this task's verification. Four recent pre-existing browser
+test directories were retained.
+
+Removed the obsolete 448-line `scripts/learning-audit.mjs`. It assumed retired
+learning-tab ordering, empty statistics and fixed board positioning, and was
+already excluded from release gates. `npm run test:learning-browser` now defaults
+to the maintained puzzle UI audit; the focused browser audits remain available.
+
+The ignored local inventory and verification reports are in
+`scratch/cleanup-20261028/`. Selection was limited to known generated browser
+directory names with six-character suffixes, no links or Git metadata, and no
+files modified in the preceding hour. Absolute deletion targets were checked
+against the artifact root and running browser/test command lines. Existing
+research evidence, Git worktrees, marketing work and the latest release were
+preserved. The four directories created by this task's browser checks were
+removed separately after confirming that no browser process still used them.
+
+Older source ZIPs were selected only when all files in their unpacked snapshot
+matched the release record's SHA-256 hashes, or every archived file matched a
+blob reachable in local Git history (allowing checkout line-ending conversion).
+Release records and browser ZIPs were retained. Historical records can therefore
+refer to a deliberately removed redundant source ZIP; those records were not
+rewritten to claim a different build.
+
+The remaining 46 older source ZIPs contain files not confirmed in reachable
+history and have no unpacked source snapshot. They remain, along with the latest
+complete release. Git history alone does not establish that every dirty build
+can be recreated exactly. The large research files, runtime engines, offline
+puzzles and finished marketing media also retain active uses.
+
+Verification: all 1,252 regression tests passed; extension lint reported zero
+errors and two existing warnings (the shared manifest's Firefox service-worker
+declaration and a dynamic HTML assignment). Maintained-source checks and both
+engine checksum checks passed. The current default puzzle browser audit passed
+in headless Chrome at desktop and mobile sizes on an unsandboxed retry; the
+initial sandboxed attempt timed out before the storage API became available.
+All three latest-release ZIPs still match their recorded SHA-256 hashes. Every
+selected deletion target was confirmed absent, and `git diff --check` passed.
