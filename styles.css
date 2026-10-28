@@ -463,6 +463,10 @@
 .learning-workspace .learn-leaderboard #leaderboard-title { margin: 0; outline: none; }
 .leaderboard-backdrop { position: absolute; left: 0; width: 100%; margin-top: 0; pointer-events: none; overflow: hidden; z-index: 0; }
 .leaderboard-hero { position: relative; z-index: 1; }
+.leaderboard-return-host { position: relative; }
+.leaderboard-returning { position: absolute; z-index: 3; pointer-events: none; }
+.leaderboard-returning > .learn-puzzle-heading { visibility: hidden; }
+.leaderboard-returning .learn-puzzle-heading h2 { margin: 0; }
 .learn-leaderboard[data-mode="timeAttack"] { --mode-stock: #edc278; }
 .learn-leaderboard[data-mode="knockout"] { --mode-stock: #eaa18e; }
 .leaderboard-hero { display: flex; align-items: center; justify-content: space-between; gap: 16px; box-sizing: border-box; width: 100%; min-height: 164px; margin-top: 24px; padding: 24px 28px; border-radius: 13px; background: var(--mode-stock); color: #26291f; overflow: hidden; box-shadow: inset 0 1px 0 #fff5; }

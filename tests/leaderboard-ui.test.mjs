@@ -118,3 +118,21 @@ for(const leave of [false,true])test(`leaderboard entrance keeps its clicked foo
   if(leave){assert.equal(w.page,'puzzles');assert.equal(w.leaderboardTimer,null);}
   else {assert.equal(w.root.querySelector('.leaderboard-hero'),hero);assert.equal(w.root.querySelectorAll('tbody tr').length,1);}
 });
+
+for(const mode of ['solve-puzzle','timeAttack','knockout'])test(`${mode} returns through the inverse reveal and cancels cleanly on navigation`,async t=>{
+  const {w,dom}=await setup(t);await w.showLeaderboard(mode);let finishHero;
+  const frames=[];w.puzzleMotionEnabled=()=>true;
+  const rect=(left,top,width,height)=>({left,right:left+width,top,bottom:top+height,width,height,x:left,y:top});
+  t.mock.method(dom.window.HTMLElement.prototype,'getBoundingClientRect',function(){
+    if(this.matches('.puzzle-mode'))return rect(['solve-puzzle','timeAttack','knockout'].indexOf(mode)*210,100,180,254);
+    if(this.matches('.leaderboard-hero'))return rect(0,100,600,164);
+    if(this.matches('.puzzle-mode-grid'))return rect(0,100,600,254);return rect(0,0,600,700);
+  });
+  dom.window.Element.prototype.animate=function(keyframes){let resolve;const finished=new Promise(r=>{resolve=r;});
+    if(this.matches('.leaderboard-hero')){finishHero=resolve;frames.push(keyframes);}else resolve();return {finished,cancel(){resolve();}};};
+  const pending=w.returnFromLeaderboard();assert.equal(w.page,'puzzles');assert.ok(w.root.querySelector('.leaderboard-returning'));
+  assert.equal(dom.window.document.activeElement.dataset.focus,'leaderboard-'+mode);
+  assert.equal(frames[0][0].clipPath,'inset(0 0% 0 0% round 13px)');assert.notEqual(frames[0][0].clipPath,frames[0][1].clipPath);
+  if(mode==='knockout')await w.navigate('concepts');else finishHero();
+  await pending;assert.equal(w.root.querySelector('.leaderboard-returning'),null);assert.equal(w.leaderboardReturn,null);
+});
