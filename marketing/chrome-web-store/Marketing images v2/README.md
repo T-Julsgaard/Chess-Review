@@ -77,3 +77,83 @@ Accuracy headline is centered at approximately y67–123. Displayed accuracy val
 Although preservation was explicit in the prompts, generated UI is not guaranteed pixel-identical to the source. Minor raster texture, antialiasing and small type rendering changes are visible, especially puzzle board shading and tiny labels. Final resampling also changes pixels. Background and headline colors are visual matches to the reference rather than guaranteed uniform exact RGB fills.
 
 No staging or commits performed by this subagent; root agent handles the cohesive task commit.
+
+## Layout follow-up: reduce headline-to-product gaps
+
+Moved the main product group upward in the five requested images while retaining the existing headings and 1280 x 800 canvas. The same three agents handled their previous image assignments using built-in imagegen. Accuracy & move quality was excluded and verified byte-identical with SHA-256 `35AC4A21C91E7E3729EEFC21899932C3C24E741AEAC4300C84233B4599E1C62A`.
+
+| Export | Previous group top | Revised group top | Approximate upward move |
+| --- | --- | --- | --- |
+| whole-game-review.png | 230 px | 175 px | 55 px |
+| chess-com-one-click-review.png | 225 px | 175 px | 50 px |
+| lichess-one-click-review.png | 225 px | 175 px | 50 px |
+| ten-chess-coaches.png | 208 px | 183 px | 25 px |
+| fifty-thousand-chess-puzzles.png | 221 px | 179 px | 42 px |
+
+Reviewed all five final images visually, verified all six exports decode at 1280 x 800, and checked the overview board after removing an extra selected-square highlight introduced during editing. Exact coordinates and fine raster details can vary with imagegen. Original source images remain unchanged.
+
+### Layout edit prompts and method
+
+### Overview/coaches layout revision
+
+Method: inspected both approved v2 files, then used built-in image_gen edits only. First pass overshot upward (overview top ~164, grid ~155). One targeted correction per file was approved by root. Selected tool outputs were 1586x992; System.Drawing HighQualityBicubic normalized final export only to 1280x800. Replaced only whole-game-review.png and ten-chess-coaches.png. No staging/commits. Sources remain in previous Git commit.
+
+Review: final exports inspected with view_image. Overview frame top ~175, bottom ~707; coaches grid top ~183, bottom ~648. Headline positions/colors/type visually unchanged. Requested targets were ~185/~173, so final translations are approximate (overview ~55px up; coaches ~25px up). All ten name labels remain correct; full board/frame and 2x5 grid preserved. Imagegen can produce small face/UI/text detail drift and does not guarantee pixel-identical rigid translation. Existing backdrop remains visually consistent.
+
+## Exact prompts
+
+### Overview initial
+Use case: precise-object-edit. Edit the supplied current approved marketing image. Final 1280x800. Perform ONLY a layout translation: move the ENTIRE main rounded rectangular product screenshot group UPWARD by exactly 45 px, from its current top edge y230 to top edge y185, current bottom y762 to y717. Preserve its x position, width and height exactly (left x131, right x1148), no scaling, no cropping, no redesign. Treat every pixel inside this rounded screenshot frame as one locked group: preserve all chess pieces and board position, arrow, coach illustration, texts, stats, charts, icons, button controls and borders with their same internal relative positions. Keep the headline 'Your whole game, reviewed in one view' EXACTLY unchanged in its current location, font, letter sizes, alignment and white/green colors. Do not move the headline. Preserve the existing warm near-black charcoal subtly textured backdrop throughout. Seamlessly fill only the newly exposed bottom region with that same background. No additional text, branding or new elements. The sole requested change is rigidly translating the existing screenshot box 45px upward to reduce the gap below the headline. Preserve all original visual details rather than redraw.
+
+### Coaches initial
+Use case: precise-object-edit. Edit supplied current approved coaches marketing image, final 1280x800. Perform ONLY a layout translation: move ENTIRE 2-row by 5-column grid of ten coach cards UPWARD by exactly 35px, from current top y208 to target top y173, current grid bottom y673 to y638. Treat all ten cards and spaces between them as one locked group; preserve x positions, original widths and heights, inter-card spacing and internal relative positions; do NOT scale, crop, redraw or redesign. Preserve every illustration detail, accessory, face, clothing, green rounded card border, and all exact name labels: Old Soviet, Professor, Chess Hustler, Wise Grandma, Drunk Uncle, Conspiracy Theorist, Kid Prodigy, Ralph, Julie, Nature Documentarian. Keep the headline 'Choose between 10 different coaches' EXACTLY unchanged in its existing position, heavy geometric font, letter sizes, alignment, off-white color and green 10. Do not move headline. Preserve warm charcoal subtly textured backdrop; seamlessly fill newly exposed lower region with that same backdrop. No additional text, subtitles, branding or new elements. Sole change is rigidly translating existing complete two-row card grid 35px upward to reduce gap beneath headline.
+
+### Overview correction
+Precise-object-edit, 1280x800. Make one small correction to THIS image: move the existing complete rounded screenshot box DOWNWARD by 21px, keeping x position and size identical. Its top edge currently y164; corrected top MUST be y185, bottom y717, left x131 right1148. This creates roughly 30px of clear background below the headline descenders and above the frame. Do NOT move headline or change any text/style/color. Keep headline 'Your whole game, reviewed in one view' exactly fixed, all letter positions preserved. The screenshot including everything inside it is a locked rigid group, translate only: preserve chessboard/pieces/arrow, coach, stats, engine text, controls and borders. Fill exposed top strip seamlessly with existing background and keep entire warm charcoal backdrop identical. No scaling, no cropping, no redesign, no added elements. Only change: shift screenshot group 21px DOWN from current version.
+
+### Coaches correction
+Precise-object-edit, final1280x800. Make ONE small layout correction to THIS image: move entire existing 2-row by 5-column coaches card grid DOWNWARD by 18px. Current top edge y155 must become y173; bottom y620 becomes y638. Keep all original x positions, widths, heights, spaces and relative positions unchanged. This leaves about30px blank background below headline and above card borders. Headline 'Choose between 10 different coaches' must stay EXACTLY fixed in current location, letter sizes/typography/colors/alignment unchanged. The ten cards are a locked rigid group: translate only, do not redraw any faces, clothing, accessories, illustrations, borders or name labels. Keep all ten exact names. Seamlessly fill newly exposed thin top strip with identical existing warm charcoal subtle texture. No scaling, no cropping, no redesign, no extra text or branding. Sole requested change is moving this existing complete grid 18px DOWNWARD.
+
+## Final board correction
+Root requested removing extra b1 yellow highlight while retaining d2 knight/selected-square/badge. Reload confirmed d2 knight had remained present. One built-in imagegen correction used current moved-layout overview as edit target plus original1(1) as board-content-only reference. Corrected b1 to an ordinary unselected light board square (matching checkerboard parity); preserved white knight on yellow d2 and4.1 badge. Final overview was export-normalized to1280x800 and inspected; full piece placement checked against original. Top frame remains ~175. Coaches unchanged.
+
+Exact correction prompt:
+Precise-object-edit. Image1 is CURRENT EDIT TARGET at1280x800; Image2 is BOARD CONTENT REFERENCE ONLY, not layout/branding reference. Make ONE tiny correction on Image1 chessboard: erroneous bright yellow EMPTY b1 square, bottom row second square from left, x306–363 y613–670, must become ordinary medium brown exactly like other dark squares and like b1 in Image2. Keep b1 EMPTY. IMPORTANT preserve WHITE KNIGHT on d2 exactly, at fourth column from left/second row from bottom x422–479 y555–613, and preserve d2 YELLOW selected square and nearby yellow4.1 rating badge. Final sole yellow highlighted board square must be d2, under white knight. Every piece must match Image2: black Ra8 Rh8 Qd8 Ke8 Nd7 Nf6 Bd6, black pawns a7 b7 c7 f7 g7 e6 g6 d5; white Ra1 Rh1 Qd1 Ke1 Nd2 Bd3 Bg3, white pawns a2 b2 c2 f2 g2 h2 d4 e3. Preserve all other board squares/pieces, arrow, UI, coach, labels and all entire screenshot and header content unchanged. Keep Image1 current frame top y175, fixed headline position/type/colors, screenshot size/x position, backdrop. Never copy source Image2 branding, subtitle or layout. Do not move or resize anything. Only repaint b1 normal brown, keeping source-correct knight d2 on yellow and4.1 badge.
+
+
+### Entry-point frame spacing adjustment
+
+Method: built-in image_gen raster editing, supplied current v2 image as sole edit target, inspected before editing. Only final native-output-to-1280x800 normalization used System.Drawing high-quality bicubic resampling. Both selected native outputs were 1586x992. No CLI/API fallback, Python, content transforms, source-original changes, staging, commits, or shared README edits.
+
+Updated existing outputs:
+- chess-com-one-click-review.png
+- lichess-one-click-review.png
+
+Review: both final PNGs visually inspected at 1280x800. Frame tops now approximately y175 (previously y225), moving entire assembly about 50 px upward. This is about 10 px farther upward than the requested approximate y185 target. Headline locations, exact wording, sizes and colors appear preserved. Visible gap from lowest headline glyphs to frame is now about 12–20 px, instead of about 65–75 px. Frame width and height, screenshot/callout arrangement, chess positions, and internal logos remain visually consistent. New bottom area is seamlessly filled with existing warm charcoal background. Imagegen resynthesizes raster content, so tiny UI text/pixels are not guaranteed bit-identical.
+
+Chess.com first generation was rejected because it shifted headline and put frame around y161. One targeted retry corrected headline and yielded selected y175 layout. Lichess needed one generation. No additional retries.
+
+Selected Chess.com exact prompt:
+Precise minimal layout edit of the supplied 1280×800 raster. Use supplied image as actual EDIT TARGET. LOCK THE TOP 180 PIXELS: headline and background from y0 through y179 must remain EXACTLY as input, same coordinates, glyph shapes, type size, colors, wording. Headline begins about y104 and ends y153; never shift it. The ONLY edit is to translate the whole lower screenshot assembly straight upward by 40 px: outer rounded frame top y225 -> y185, bottom y766 -> y726. No scaling: outer frame retains same x137 to x1141 width and same 541 px height. Keep all screenshot pixels/UI geometry, board pieces, modal, borders, arrow, and green zoom callout together as ONE intact group. Zoom callout x856–1253 y680–765 becomes x856–1253 y640–725. Keep its width/height unchanged. Fill exposed bottom area y726–799 seamlessly using original near-black textured background. Do NOT move headline. Do NOT enlarge screenshot. Do NOT recompose. Do NOT change UI or branding. Only translation of lower screenshot group up 40 pixels. Output single final 1280×800 image with top frame at y185, not y160.
+
+Lichess exact prompt:
+Precise minimal layout edit of supplied 1280×800 raster. Supplied image is actual EDIT TARGET. LOCK THE TOP 180 PIXELS: headline and background from y0 through y179 must remain EXACTLY as input, same coordinates, glyph shapes, type size, colors and wording. Headline begins about y104 and ends y153; never shift it. The ONLY edit: translate whole lower screenshot assembly straight upward by 40 px: outer rounded frame top y225 -> y185, bottom y766 -> y726. No scaling: outer frame retains x137 to x1141 width and same 541 px height. Preserve all genuine screenshot/UI geometry and text, board pieces, lichess logo, borders, green arrow and green zoom callout together as ONE intact group. Zoom callout x915–1258 y685–764 becomes x915–1258 y645–724. Same width/height unchanged. Fill exposed bottom area y726–799 seamlessly using original near-black textured background. Do NOT move headline. Do NOT enlarge screenshot. Do NOT recompose. Do NOT change UI or branding. Only translation of lower screenshot group up 40 pixels. Single final 1280×800 image, top frame y185. Preserve exact headline 'Open Chess Review directly from Lichess.' at original location.
+
+
+### Puzzle frame layout follow-up
+
+Edited only `fifty-thousand-chess-puzzles.png` using built-in `image_gen.imagegen` from the approved v2 image. One generation; no further regeneration. Generated file: `C:/Users/thoma/.codex/generated_images/01a1800a-4d9c-70c3-ad88-c70174d1b689/exec-cc920824-4cc4-416f-a86c-f4ec4de1525c.png`.
+
+Exact prompt:
+
+> Use case: precise-object-edit. The supplied image is the edit target. Make exactly ONE spatial translation, no redesign: move the entire large lower rounded rectangular screenshot frame UP 36 pixels on the final 1280×800 canvas, from its current top y221 to target y185. Preserve its exact existing size: x115–1138, width1023, height534; only its y coordinate changes, so new bottom is approximately719. Treat the frame and ALL of its contents as ONE intact raster unit: exact authentic complete chessboard, every starting-position chess piece, board coordinates, modes cards, settings, all labels, buttons, numbers, icons, scrollbar, subtle background and rounded border. Preserve sharpness and original appearance; do not scale, crop, reinterpret or redraw UI. Keep the headline '50,000 puzzles. All yours.' absolutely unchanged at its current x/y position, size, geometric sans type, green/off-white colors and spacing. Keep the original charcoal textured background color/style untouched outside the moved card; seamlessly fill only the newly exposed bottom strip using this same background. Do not move headline. No new copy, logos or subtitles. Output a single1280×800 landscape PNG, same composition with only frame translated upward36px. Key spacing: headline glyph bottom about y150; frame top y185, giving35px clear gap.
+
+The built-in result was 1586×992 and was normalized once to 1280×800 using Windows System.Drawing HighQualityBicubic export, without cropping or content redraw. Both generated and delivered images were inspected visually.
+
+Achieved frame bounds approximately x115–1138, y179–712: an upward movement of approximately42px (6px beyond target), with frame size essentially preserved. Headline remains in its prior position; main letter bodies end around y150, while descenders extend around y165. Minimum clear gap to frame is therefore approximately14px; gap from the headline main baseline/body is approximately29px. No overlap or visual defect warranted another generation.
+
+Complete starting-position board, mode cards, settings and visible puzzle type rows remain present. Background fills the exposed bottom area seamlessly. As with imagegen editing, minor raster/antialiasing/small-type differences can occur, so this is visually preserved content rather than guaranteed pixel-identical screenshot translation.
+
+`accuracy-and-move-quality.png` was never modified. Its SHA256 before and after this task is identical: `35AC4A21C91E7E3729EEFC21899932C3C24E741AEAC4300C84233B4599E1C62A`.
+
+No staging, commits or shared README changes were made by this subagent.
