@@ -83,6 +83,7 @@
 .learn-button:disabled { opacity: .45; cursor: default; }
 .learning-workspace :focus-visible, .learn-entry-button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 .learning-workspace:focus { outline: none; }
+.learning-workspace .learn-square:focus-visible { outline: none; }
 /* Move checks keep navigation locked without flashing its disabled appearance. */
 .learning-workspace:has(.puzzle-session) .learn-nav button:disabled,
 .puzzle-session-navigation .learn-button:disabled { opacity: 1; }
