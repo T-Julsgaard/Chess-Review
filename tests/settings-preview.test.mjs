@@ -12,45 +12,27 @@ function settings(t) {
   return { a, doc, section, open };
 }
 
-test('loading preview plays automatically and follows the selected animation without changing the review', async t => {
-  const { a, section, open } = settings(t);
-  const before = JSON.stringify({ evals: a.state.evals, grades: a.state.moveGrades, analyzing: a.state.analyzing, progress: a.state.progress });
-  assert.equal(section('Loading').querySelector('.set-loader-preview .ld'), null);
-  open('Loading');
-  assert.equal(section('Loading').querySelector('.set-test'), null);
-  assert.ok(section('Loading').querySelector('.set-loader-preview .ld-wave'));
-  section('Loading').querySelectorAll('.set-seg button')[3].click();
-  await settle();
-  assert.equal(a.store.settings.loaderStyle, 'spinner');
-  assert.ok(section('Loading').querySelector('.set-loader-preview .ld-spin'));
-  section('Loading').querySelector('.set-sect-head').click();
-  assert.equal(section('Loading').querySelector('.set-loader-preview .ld'), null);
-  assert.equal(JSON.stringify({ evals: a.state.evals, grades: a.state.moveGrades, analyzing: a.state.analyzing, progress: a.state.progress }), before);
-});
-
-test('loading preview resumes when its section becomes visible again', t => {
-  const { a, doc, section, open } = settings(t);
-  open('Loading');
-  section('Loading').querySelector('.set-sect-head').click();
-  assert.equal(section('Loading').querySelector('.set-loader-preview .ld'), null);
-  assert.ok(open('Loading').querySelector('.set-loader-preview .ld-wave'));
-  a.call('toggleSettings');
-  assert.equal(doc.getElementById('settings').hidden, true);
-  a.call('toggleSettings');
-  assert.ok(section('Loading').querySelector('.set-loader-preview .ld-wave'));
-  [...doc.querySelectorAll('.set-tab')].find(b => b.textContent === 'Engine').click();
+test('loading controls are removed and only active loading indicators remain', async t => {
+  const {a, doc, section} = settings(t);
+  assert.equal(section('Loading'), undefined);
   assert.equal(doc.querySelector('.set-loader-preview'), null);
-  [...doc.querySelectorAll('.set-tab')].find(b => b.textContent === 'Visual').click();
-  assert.ok(section('Loading').querySelector('.set-loader-preview .ld-wave'));
+  for (const retired of ['dots', 'spinner']) {
+    assert.equal(a.call('loaderNode', '', null, retired).className, 'ld ld-wave');
+  }
+  assert.equal(a.call('accuracyPendingValue').className, 'ld ld-bounce');
+  const restored = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
+  restored.replace('resetSettingsForRelease', async () => {});
+  restored.store.settings = {loaderStyle: 'spinner'};
+  await restored.start();
+  assert.equal(Object.hasOwn(restored.store.settings, 'loaderStyle'), false);
 });
 
 test('opening a settings section collapses the previous one and keeps its header focused', t => {
   const { doc, section, open } = settings(t);
-  open('Loading');
+  open('Move animation');
   const head = section('Category badges').querySelector('.set-sect-head');
   head.focus(); head.click();
-  assert.equal(section('Loading').querySelector('.set-loader-preview .ld'), null);
-  assert.equal(section('Loading').querySelector('.set-sect-head').getAttribute('aria-expanded'), 'false');
+  assert.equal(section('Move animation').querySelector('.set-sect-head').getAttribute('aria-expanded'), 'false');
   assert.equal(doc.querySelectorAll('.set-section.open').length, 1);
   assert.equal(doc.activeElement, section('Category badges').querySelector('.set-sect-head'));
   section('Category badges').querySelector('.set-sect-head').click();
@@ -79,7 +61,7 @@ test('custom accent and arrow buttons open pickers and update their framed swatc
   const accent = section('Theme').querySelector('.set-chip');
   assert.ok(accent.classList.contains('chip-custom'));
   assert.equal(accent.classList.contains('on'), false);
-  for (const [title, key] of [['Theme', 'accentCustom'], ['Best-move arrow', 'bestArrowColor']]) {
+  for (const [title, key] of [['Theme', 'accentCustom'], ['Best-move/Threat arrow', 'bestArrowColor']]) {
     if (title !== 'Theme') open(title);
     const chip = section(title).querySelector('.chip-custom');
     assert.equal(chip.getAttribute('aria-haspopup'), 'dialog');
@@ -100,11 +82,11 @@ test('custom accent and arrow buttons open pickers and update their framed swatc
 
 test('custom board picker keeps its button mounted and previews both square colors', async t => {
   const { a, doc, section, open } = settings(t);
-  open('Board / Pieces');
-  const chip = section('Board / Pieces').querySelector('.chip-custom');
+  open('Board & Pieces');
+  const chip = section('Board & Pieces').querySelector('.chip-custom');
   chip.click(); await settle(); await a.run('_settingsWriteQueue');
   assert.equal(a.store.settings.boardTheme, 'custom');
-  assert.equal(section('Board / Pieces').querySelector('.chip-custom'), chip);
+  assert.equal(section('Board & Pieces').querySelector('.chip-custom'), chip);
   const input = doc.querySelector('[role="dialog"] .cpick-hexin');
   const edit = color => {
     input.value = color; input.dispatchEvent(new a.dom.window.Event('input'));
@@ -119,4 +101,58 @@ test('custom board picker keeps its button mounted and previews both square colo
   assert.equal(a.store.settings.boardCustomDark, '#654321');
   a.call('closeBoardColorPicker');
   assert.equal(doc.querySelector('.board-cpick'), null);
+});
+
+test('Visual sections stay concise, remove the purple accent and offer Porcelain', async t => {
+  const {a, doc, section, open} = settings(t);
+  assert.equal(section('Interface presets').querySelector('.set-note'), null);
+  assert.deepEqual([...section('Interface presets').querySelectorAll('[data-setting="uiSetup"]')].map(n => n.textContent), ['Old', 'Modern', 'Custom']);
+  assert.equal([...doc.querySelectorAll('.set-sect-head')].at(-1).querySelector('span').textContent, 'Developer debugger');
+  const visualReset = doc.querySelector('#settings > div:last-child > button:last-child');
+  assert.equal(visualReset.textContent, 'Reset all visual settings');
+  assert.equal(visualReset.previousElementSibling, section('Developer debugger'));
+  [...doc.querySelectorAll('.set-tab')].find(n => n.textContent === 'Engine').click();
+  assert.equal(doc.querySelector('#settings > div:last-child > button:last-child').textContent, 'Reset all engine settings');
+  [...doc.querySelectorAll('.set-tab')].find(n => n.textContent === 'Visual').click();
+  assert.equal(section('Theme').querySelectorAll('.set-chip').length, 4);
+  assert.equal(section('Theme').querySelector('[title="#c77edb"]'), null);
+  open('Board & Pieces');
+  const porcelain = section('Board & Pieces').querySelector('[title="Porcelain"]');
+  assert.ok(porcelain);
+  porcelain.click(); await settle(); await a.run('_settingsWriteQueue');
+  assert.equal(a.store.settings.boardTheme, 'porcelain');
+  assert.equal(doc.documentElement.style.getPropertyValue('--sq-light'), '#f1eee6');
+  const restored = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
+  restored.replace('resetSettingsForRelease', async () => {});
+  restored.store.settings = {accent: '#c77edb', boardTheme: 'porcelain'};
+  await restored.start();
+  assert.equal(restored.store.settings.accent, '#7fb45f');
+  assert.equal(restored.state.settings.boardTheme, 'porcelain');
+});
+
+test('threat color previews, saves and resets independently of best-move and user arrows', async t => {
+  const {a, doc, section, open} = settings(t);
+  a.state.settings.showThreat = true;
+  a.replace('getHelperEngine', async () => ({stop() {}, analyse: async () => ({bestmove: 'e7e5'})}));
+  await a.call('renderThreatArrow');
+  open('Best-move/Threat arrow');
+  const rows = section('Best-move/Threat arrow').querySelectorAll('.set-row');
+  assert.equal(rows[0].querySelector('.set-lbl').textContent, 'Show best-move arrow');
+  assert.equal(rows[2].querySelector('.set-lbl').textContent, 'Show threat arrow');
+  const bestColor = a.state.settings.bestArrowColor;
+  const chip = rows[3].querySelector('.chip-custom'); chip.click();
+  assert.ok(doc.querySelector('[aria-label="Threat arrow color"]'));
+  const input = doc.querySelector('.cpick-hexin');
+  input.value = '#123456'; input.dispatchEvent(new a.dom.window.Event('input'));
+  input.dispatchEvent(new a.dom.window.Event('change'));
+  await settle(); await a.run('_settingsWriteQueue');
+  assert.equal(doc.querySelector('.threat-arrow g').getAttribute('fill'), '#123456');
+  assert.equal(a.store.settings.threatArrowColor, '#123456');
+  assert.equal(a.state.settings.bestArrowColor, bestColor);
+  a.call('toggleUserArrow', 'a2', 'a4'); a.call('renderUserArrows');
+  assert.equal(doc.querySelector('.user-arrows g').getAttribute('fill'), '#E89B3C');
+  await a.call('resetArrowSettings'); await a.run('_settingsWriteQueue');
+  assert.equal(a.store.settings.threatArrowColor, '#E89B3C');
+  assert.equal(a.store.settings.bestArrowColor, bestColor);
+  assert.equal(doc.querySelector('.threat-arrow'), null);
 });

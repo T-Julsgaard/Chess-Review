@@ -16,7 +16,7 @@ Settings available alongside learning, with reserved space on desktop windows.
 **Morph in place 3** keeps the review board size and familiar piece handling while
 the surrounding panels transition into learning.
 The learning workspace includes 23 concept lessons with 47
-exercises, 50,000 offline puzzles, Time attack and Knockout modes, and 36 opening courses
+exercises, 25,000 offline puzzles, 1/5/10-minute challenges, and 12 opening courses
 with 24 annotated lines. Lessons use move, square-selection and position-reading
 exercises. Opening practice supports both colors and automatic opponent replies.
 Progress and bookmarks stay in your browser, and **Back to review** restores your
@@ -24,12 +24,21 @@ game position and orientation. The [learning objective and progress tracker](doc
 preserves the full development brief for work on another computer; [content sources](data/learning/SOURCES.md)
 record licensing and validation scope.
 
-The former live concept-analysis prototype is retained under
-[research/concepts/legacy/](research/concepts/legacy/README.md), including its
-proofs, detectors and historical UI tests, for anyone to inspect, implement or
-reuse under the repository license. It is separate from the extension and is
-excluded from release packages. The learning concept lessons remain available;
-their small, bounded exercise validators run only when needed.
+The right-hand Settings panel includes an optional **Concepts** tab after Visual
+and Engine. A separate **Concepts** panel to the right of Accuracy and Engine
+uses those same findings,
+ordered by likely relevance and phrased from your playing side. It follows the
+selected move, includes every match, and separates insights with space. Its top
+aligns with the coach commentary panel; its bottom aligns with Engine. Expand
+an insight's evidence to inspect the original explanation and exact scope.
+Accuracy and the existing move commentary retain their scoring and behavior.
+
+The Settings Concepts panel remains the raw inspection and game-debug view.
+Check **Enable concept analysis** to list supported findings for the
+selected move, with exact verified scopes and game-wide debug metrics. It defaults
+off and stops its worker immediately when disabled. Findings use completed E080
+research's bounded mechanics; broader strategic benefits and coaching usefulness
+remain unproven. Existing scores and coach comments are unchanged.
 
 **Source:** https://github.com/T-Julsgaard/Chess-Review
 
@@ -64,41 +73,13 @@ Click the image below to watch the introduction video.
 2. Click the extension icon → **Analyze this game**, or press `Ctrl+Shift+Y`.
 3. Stockfish reviews the game in an analysis tab.
 
-You can also paste a game URL or PGN into the popup. Player detection runs locally
-and separately for Chess.com and Lichess, using the 50 most recent distinct games
-opened for analysis and the saved library (up to 300 games). It requires a clear
-frequency lead and several different opponents; ties remain unknown. The site's
-board orientation takes priority. Repeatedly watching one player can still produce
-an incorrect account guess. A pasted Chess.com URL needs a cached game or known
-players' archives; otherwise, open the game on Chess.com or paste its PGN.
-Chess Review is intended for review after play.
-
-Choose **Open Chess Review** in the popup to start without a game. The welcome
-screen offers learning and your saved game library, without starting Stockfish.
-The popup stays open on chess sites until you choose an action; the keyboard
-shortcut and in-page review button still launch a game review directly.
+You can also paste a game URL or PGN into the popup. If your username cannot be
+detected, enter it once; it is remembered locally. Chess Review is intended for
+review after play.
 
 Settings let you choose an engine, rating mode, board, pieces, sounds, coach and
 category-badge appearance. Badge numbers describe move categories; they are
 separate from position evaluation and game accuracy.
-
-**Settings → Visual → Layout → Reorganize panels** unlocks the review layout.
-Use each panel’s selection check, **Select right panels**, or **Select all** to
-choose a group. Drag a handle to move the group or a corner to scale its spacing,
-contents and dimensions together. **Export layout** downloads a JSON proposal
-that can be shared for a future default arrangement.
-
-### Screen sizes
-
-Open **Settings → Visual → Screen sizes → Open screen-size preview** to use the
-app at desktop, laptop, tablet and phone viewport sizes. The preview starts with
-your current game and settings. Choose a resolution, enter custom dimensions or
-rotate the viewport without losing your place. **Fit to window** shows the whole
-viewport; **100%** lets you inspect it at actual size with scrolling. Dimensions
-are browser viewport pixels, and phone/tablet presets test layout rather than
-device hardware or touch input. Progress and settings changes stay in the preview
-tab and do not change your saved data.
-
 
 Both engines offer **Use recorded rating** and **Moves only**. The first compares
 your performance with public players near the rating saved in the game; the

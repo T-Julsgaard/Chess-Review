@@ -7,6 +7,7 @@ import { cmd } from 'web-ext';
 import './verify-engines.mjs';
 import {verifySource} from './verify-source.mjs';
 import {files, directories, pieceSets} from './package-inputs.mjs';
+import {packagePuzzles} from './package-puzzles.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 await verifySource(root);
@@ -44,7 +45,7 @@ const releaseDir = await mkdtemp(path.join(artifactsDir, `release-${manifest.ver
 const snapshotDir = path.join(releaseDir, 'source');
 await mkdir(snapshotDir);
 const sourceFiles = [...files, 'manifest.json', 'package.json', 'package-lock.json',
-  'marketing/STORE_LISTING2.md', 'CONTRIBUTING.md', 'SECURITY.md'];
+  'marketing/STORE_LISTING.md', 'CONTRIBUTING.md', 'SECURITY.md'];
 await copyInputs(root, snapshotDir, [...sourceFiles, ...directories, 'docs', 'scripts', 'tests', 'tools']);
 const sha256 = async file => createHash('sha256').update(await readFile(file)).digest('hex');
 async function fileHashes(dir, base = dir) {
@@ -69,6 +70,7 @@ for (const browser of ['chrome', 'firefox']) {
   // Fresh staging directories prevent stale or removed files from entering an update.
   const sourceDir = await mkdtemp(path.join(releaseDir, `${browser}-${manifest.version}-`));
   await copyInputs(snapshotDir, sourceDir, [...files, ...directories]);
+  const puzzleLibrary = await packagePuzzles(sourceDir);
   const target = structuredClone(manifest);
   if (browser === 'chrome') {
     delete target.browser_specific_settings;
@@ -81,7 +83,7 @@ for (const browser of ['chrome', 'firefox']) {
   const filename = `chess-review-${manifest.version}-${browser}.zip`;
   await cmd.build({ sourceDir, artifactsDir: releaseDir, filename, overwriteDest: false });
   const zip = path.join(releaseDir, filename);
-  results.push({ browser, sourceDir, zip, sha256: await sha256(zip), unpackedBytes: await size(sourceDir), zipBytes: (await stat(zip)).size });
+  results.push({ browser, sourceDir, zip, sha256: await sha256(zip), unpackedBytes: await size(sourceDir), zipBytes: (await stat(zip)).size, puzzleLibrary });
 }
 await writeFile(path.join(releaseDir, 'release-sizes.json'), JSON.stringify(results, null, 2) + '\n');
 const record = {

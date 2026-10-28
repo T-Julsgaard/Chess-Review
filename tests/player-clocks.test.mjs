@@ -9,6 +9,7 @@ test('missing clock tags and annotated variations cannot shift the mainline cloc
   loadGame(a, pgn); a.state.headers = a.call('parseHeaders', pgn);
   a.state.clocks = a.call('parseClocks', pgn);
   assert.deepEqual(Array.from(a.state.clocks), [null, null, '9:58', '9:55', null]);
+  assert.deepEqual(Array.from(a.call('parseClocks', pgn, true)), [null, null, '9:58.5', '9:55', null]);
   a.state.idx = 1;
   assert.equal(a.call('clockFor', 'w'), '10:00');
   assert.equal(a.call('clockFor', 'b'), '10:00');
@@ -18,6 +19,15 @@ test('missing clock tags and annotated variations cannot shift the mainline cloc
   a.state.idx = 4;
   assert.equal(a.call('clockFor', 'w'), '9:55');
   assert.equal(a.call('clockFor', 'b'), '9:58');
+});
+
+test('precise clock history retains fractions for elapsed-time statistics while player strips show whole seconds', t => {
+  const a = app(t), pgn = '[TimeControl "600+5"]\n\n1. e4 {[%clk 0:09:58.75]} e5 {[%clk 0:09:53.25]} *';
+  loadGame(a, pgn); a.state.headers = a.call('parseHeaders', pgn);
+  a.state.clocks = a.call('parseClocks', pgn, true); a.state.idx = 2;
+  assert.deepEqual(Array.from(a.state.clocks), [null, '9:58.75', '9:53.25']);
+  assert.equal(a.call('clockFor', 'w'), '9:58');
+  assert.equal(a.call('clockFor', 'b'), '9:53');
 });
 
 test('clockless games and black-to-move excerpts retain the correct clock owner', t => {

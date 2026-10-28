@@ -1,0 +1,107 @@
+/* Focus follows the original Engine: scores on the left, notation on the right. */
+.stage .mod[data-mod="engine"] .engine-focus { container-type:inline-size; overflow:hidden; }
+.stage .mod[data-mod="engine"] .engine-focus .engine-focus-head {
+  display:flex; align-items:center; flex-wrap:nowrap; gap:10px;
+  padding:8px 12px; border-bottom:1px solid var(--line-soft); flex:none;
+}
+.engine-focus-head h3 { flex:none; }
+.stage .mod[data-mod="engine"] .engine-focus-head .count {
+  min-width:0; margin-left:auto; overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap; font-size:11px; line-height:1.4;
+}
+.stage .mod[data-mod="engine"] .engine-focus .engine-body {
+  padding:4px 8px; height:auto; flex:1 1 auto; min-height:0; overflow:auto; scrollbar-width:thin;
+}
+.engine-focus .engine-candidates { min-height:0; }
+.engine-focus-candidate {
+  display:grid; grid-template-columns:52px minmax(0,1fr); align-items:center; gap:10px;
+  width:100%; min-height:42px; box-sizing:border-box; padding:6px 4px;
+  border:0; border-bottom:1px solid var(--line-soft); border-radius:0;
+  background:transparent; color:var(--ink); text-align:left; cursor:pointer; font:inherit;
+}
+.engine-focus-candidate:last-child { border-bottom:0; }
+.engine-focus-candidate:hover { background:var(--panel-2); border-radius:6px; }
+.engine-focus-eval {
+  padding:5px 2px; border-radius:6px; text-align:center; font:700 13px var(--font-mono);
+  font-variant-numeric:tabular-nums; line-height:1.3;
+}
+.engine-focus-eval.pos { color:#1a1a1a; background:#f4f2ea; }
+.engine-focus-eval.neg { color:#f4f2ea; background:#2b2b2b; box-shadow:inset 0 0 0 1px var(--line); }
+.engine-focus-variation {
+  display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2;
+  min-width:0; max-height:2.9em; overflow:hidden; color:var(--ink);
+  font:12.5px/1.45 var(--font-mono);
+}
+.engine-focus-token { white-space:nowrap; }
+.engine-focus-token strong { color:var(--ink); font-weight:750; }
+.engine-focus-number { color:var(--ink); }
+.engine-focus-pending { display:flex; align-items:center; min-height:42px; box-sizing:border-box; padding:6px 4px; color:var(--ink-3); font-size:11px; }
+.engine-focus-foot { flex:none; padding:4px 12px 9px; }
+.engine-focus-play {
+  display:flex; align-items:center; justify-content:center; width:100%; min-height:32px;
+  padding:7px 8px; border:1px solid color-mix(in oklab,var(--accent) 30%,var(--line)); border-radius:7px;
+  background:color-mix(in oklab,var(--accent) 10%,var(--panel-2)); color:var(--ink);
+  font:600 12px/1.3 var(--font-ui); cursor:pointer;
+}
+.engine-focus-play:hover { border-color:var(--accent); background:color-mix(in oklab,var(--accent) 18%,var(--panel-2)); }
+.engine-focus-play.on { color:#fff; background:var(--q-blunder); border-color:transparent; }
+.engine-focus button:disabled { opacity:.4; cursor:default; }
+.engine-focus button:focus-visible { outline:2px solid var(--accent); outline-offset:-2px; border-radius:6px; }
+.engine-focus .engine-empty { padding:6px 4px; line-height:1.5; }
+@container (max-width:230px) {
+  .stage .mod[data-mod="engine"] .engine-focus .engine-focus-head { padding-inline:9px; gap:6px; }
+  .engine-focus-candidate { grid-template-columns:45px minmax(0,1fr); gap:8px; }
+  .engine-focus-variation { font-size:11px; }
+  .engine-focus-foot { padding-inline:9px; }
+  .engine-focus-play { font-size:11px; }
+}
+
+/* Top-aligned candidates with a quiet, inline action to request another line. */
+.stage .mod[data-mod="engine"] .engine-minimal .engine-focus-head {
+  height:32px; box-sizing:border-box; padding:2px 8px; gap:8px;
+}
+.stage .mod[data-mod="engine"] .engine-minimal .engine-focus-head h3 {
+  font-size:11.5px; letter-spacing:.08em;
+}
+.stage .mod[data-mod="engine"] .engine-minimal .count { font-size:11.5px; }
+.stage .mod[data-mod="engine"] .engine-minimal .engine-focus-play {
+  flex:none; width:22px; min-height:20px; height:20px; padding:0;
+  border:1px solid color-mix(in oklab,var(--q-best) 50%,transparent); border-radius:5px;
+  background:color-mix(in oklab,var(--q-best) 18%,var(--panel)); color:var(--q-best); font-size:10px;
+}
+.stage .mod[data-mod="engine"] .engine-minimal .engine-focus-play:hover:not(:disabled) {
+  background:var(--q-best); border-color:var(--q-best); color:#14200c;
+  box-shadow:0 0 10px color-mix(in oklab,var(--q-best) 20%,transparent);
+}
+.stage .mod[data-mod="engine"] .engine-minimal .engine-focus-play.on {
+  color:var(--q-blunder); border-color:color-mix(in oklab,var(--q-blunder) 50%,transparent);
+  background:color-mix(in oklab,var(--q-blunder) 15%,var(--panel));
+}
+.stage .mod[data-mod="engine"] .engine-minimal .engine-focus-play.on:hover:not(:disabled) {
+  background:var(--q-blunder); border-color:var(--q-blunder); color:#fff; box-shadow:none;
+}
+.stage .mod[data-mod="engine"] .engine-minimal .engine-body {
+  height:auto; padding:2px 8px; justify-content:flex-start; gap:2px; overflow:hidden;
+}
+.engine-minimal-controls { display:flex; flex:none; gap:6px; height:22px; }
+.engine-minimal-add, .engine-minimal-remove {
+  display:flex; align-items:center; justify-content:center;
+  flex:1; min-width:0; height:22px; box-sizing:border-box; padding:1px 4px;
+  border:1px solid var(--line-soft); border-radius:4px; background:var(--panel-2); color:var(--ink-2);
+  font:600 12px/18px var(--font-ui); cursor:pointer;
+}
+.engine-minimal-controls button:hover:not(:disabled) { border-color:var(--line); color:var(--ink); }
+.engine-minimal .engine-focus-candidate {
+  grid-template-columns:48px minmax(0,1fr); gap:8px;
+  height:22px; min-height:22px; padding:0; border:0; border-radius:4px;
+}
+.engine-minimal .engine-focus-eval {
+  padding:0 3px; background:transparent; color:var(--ink); box-shadow:none;
+  text-align:left; font-size:13.5px; line-height:22px;
+}
+.engine-minimal .engine-focus-variation {
+  display:block; max-height:none; overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap; font-size:13px; line-height:22px;
+}
+.engine-minimal .engine-focus-pending { min-height:22px; padding:0; font-size:12px; line-height:22px; }
+.engine-minimal .engine-empty { padding:0; font-size:12px; line-height:1.4; }

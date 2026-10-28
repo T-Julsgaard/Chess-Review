@@ -7,10 +7,18 @@ import { BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, grade
 import { CATEGORY_LABEL_FONT, categoryLabelPng } from '../../lib/category-label.js';
 import {expectedPoints, SF19_OUTCOME} from '../../lib/public-scoring.js';
 import {calibratedReview,scoringEvidenceComplete} from '../../lib/calibrated-review.js';
+import {gameStatistics,GAME_PHASES} from '../../lib/game-statistics.js';
+import {PANEL_DESIGNS,panelDesign,normalizePanelDesigns} from '../../lib/panel-designs.js';
+import {UI_SETUPS,MODERN_LAYOUT} from '../../lib/ui-setups.js';
+import {createOverviewReveal} from '../../lib/overview-reveal.js';
+import {createAccuracyNavigation} from '../../lib/accuracy-navigation.js';
+import {phasePerformance} from '../../lib/phase-performance.js';
 import {analyseCalibratedPosition} from '../../lib/calibrated-search.js';
 import {LearningWorkspace} from '../../lib/learning/workspace.js';
+import {mountLearningAnnouncement} from '../../lib/learning-announcement.js';
 import {presentationFor} from '../../lib/learning/presentations.js';
 import {panelScale,panelGroupBounds,scalePanelGroup,movePanelGroup} from '../../lib/panel-layout.js';
+import {fullHdReferenceLayout,viewportGrowth} from '../../lib/full-hd-layout.js';
 import {createScreenPreviewContext,loadScreenPreviewController} from '../../lib/screen-previews.js';
 import {puzzleResultBadge} from '../../lib/puzzle-badge.js';
 import {matedKingSquare,mateMark} from '../../lib/mate-mark.js';
@@ -24,8 +32,8 @@ const startup = raw.indexOf('(async function main()');
 if (startup < 0) throw Error('Application startup marker missing');
 const source = raw.slice(0, startup).replace(/^import .*;\r?\n/gm, '');
 
-export function app(t, {hardware,url='https://extension.test/analysis.html#test-game'} = {}) {
-  const dom = new JSDOM('<!doctype html><div id="root"></div>', { url, pretendToBeVisual: true });
+export function app(t, {hardware,url='https://extension.test/analysis.html#test-game',html='<!doctype html><div id="root"></div>'} = {}) {
+  const dom = new JSDOM(html, { url, pretendToBeVisual: true });
   if (hardware) Object.defineProperties(dom.window.navigator, {
     hardwareConcurrency: {configurable:true,value:hardware.hardwareConcurrency},
     deviceMemory: {configurable:true,value:hardware.deviceMemory},
@@ -41,8 +49,8 @@ export function app(t, {hardware,url='https://extension.test/analysis.html#test-
   };
   const context = vm.createContext({
     window: dom.window, document: dom.window.document, navigator: dom.window.navigator, LearningWorkspace,
-    loadLearningWorkspace:async () => ({LearningWorkspace}), presentationFor,
-    panelScale,panelGroupBounds,scalePanelGroup,movePanelGroup,
+    loadLearningWorkspace:async () => ({LearningWorkspace}), presentationFor, mountLearningAnnouncement,
+    panelScale,panelGroupBounds,scalePanelGroup,movePanelGroup,fullHdReferenceLayout,viewportGrowth,UI_SETUPS,MODERN_LAYOUT,
     location: dom.window.location, Node: dom.window.Node, HTMLElement: dom.window.HTMLElement,
     getComputedStyle: dom.window.getComputedStyle, performance, structuredClone,
     URL, TextEncoder, btoa, console, Chess, flagCodeForCountryId, countryNameForId, browserAPI,platformAPI:browserAPI,
@@ -51,7 +59,7 @@ export function app(t, {hardware,url='https://extension.test/analysis.html#test-
     BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg, puzzleResultBadge, matedKingSquare, mateMark,
     moveAnimationDuration, MOVE_ANIMATION_EASING,
     CATEGORY_LABEL_FONT, categoryLabelPng,
-    expectedPoints, SF19_OUTCOME, calibratedReview, scoringEvidenceComplete, analyseCalibratedPosition,
+    expectedPoints, SF19_OUTCOME, calibratedReview, scoringEvidenceComplete, gameStatistics, GAME_PHASES, PANEL_DESIGNS, panelDesign, normalizePanelDesigns, createOverviewReveal, createAccuracyNavigation, phasePerformance, analyseCalibratedPosition,
     Engine: class { constructor() { throw Error('Unexpected real engine'); } },
     fetch: async () => { throw Error('Unexpected network access'); },
     requestAnimationFrame: () => 0, cancelAnimationFrame() {},

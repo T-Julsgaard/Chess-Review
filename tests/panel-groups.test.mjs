@@ -5,10 +5,15 @@ import {app,loadGame} from './helpers/app.mjs';
 
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-8,`${a} must equal ${b}`);
 function setup(t) {
-  const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
+  const a=app(t);Object.defineProperties(a.dom.window,{innerWidth:{value:2206,configurable:true},innerHeight:{value:1100,configurable:true}});loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
   a.state.layoutMode='custom';a.call('applyLayoutMode');a.call('toggleReorganize');
   const doc=a.dom.window.document,mod=key=>doc.querySelector(`[data-mod=${key}]`);
-  const event=(target,type,x,y,id=1)=>{const e=new a.dom.window.MouseEvent(type,{bubbles:true,clientX:x,clientY:y,button:0});Object.defineProperty(e,'pointerId',{value:id});target.dispatchEvent(e);};
+  let gestureScale=1;
+  const event=(target,type,x,y,id=1)=>{
+    if(type==='pointerdown')gestureScale=a.run('canvasScale');
+    const e=new a.dom.window.MouseEvent(type,{bubbles:true,clientX:x*gestureScale,clientY:y*gestureScale,button:0});
+    Object.defineProperty(e,'pointerId',{value:id});target.dispatchEvent(e);
+  };
   return {...a,doc,mod,event,select:key=>mod(key).querySelector('.mod-select').click()};
 }
 
@@ -32,15 +37,17 @@ test('selected panels move and resize together while content retains its origina
   assert.equal(a.mod('moves').querySelector('.mod-select').getAttribute('aria-pressed'),'true');
   assert.match(a.doc.querySelector('.reorg-count').textContent,/2 panels selected/);
   const handle=a.mod('moves').querySelector('.mod-handle');
+  const origin=panelGroupBounds(before,['moves','graph']);
+  const mx=a.call('snapGrid',origin.x+100)-origin.x,my=a.call('snapGrid',origin.y-20)-origin.y;
   a.event(handle,'pointerdown',0,0);a.event(a.dom.window,'pointermove',100,-20);a.event(a.dom.window,'pointerup',100,-20);
-  for(const key of ['moves','graph']){near(a.state.layout[key].x,before[key].x+100);near(a.state.layout[key].y,before[key].y-20);}
+  for(const key of ['moves','graph']){near(a.state.layout[key].x,before[key].x+mx);near(a.state.layout[key].y,before[key].y+my);}
   const start=structuredClone(a.state.layout),bounds=panelGroupBounds(start,['moves','graph']),box=start.graph;
   const grip=a.mod('graph').querySelector('.mod-resize.se'),dx=-(box.x+box.w-bounds.x)/2,dy=-(box.y+box.h-bounds.y)/2;
   a.event(grip,'pointerdown',0,0);a.event(a.dom.window,'pointermove',dx,dy);a.event(a.dom.window,'pointerup',dx,dy);
   for(const key of ['moves','graph']){
     near(a.state.layout[key].w,start[key].w*.5);near(a.state.layout[key].h,start[key].h*.5);
-    assert.equal(a.mod(key).querySelector('.mod-inner').style.transform,'scale(0.5)');
-    assert.equal(parseFloat(a.mod(key).querySelector('.mod-inner').style.width),start[key].w);
+    assert.equal(a.mod(key).querySelector('.mod-inner').style.transform,`scale(${panelScale(start[key])*.5})`);
+    near(parseFloat(a.mod(key).querySelector('.mod-inner').style.width),start[key].w/panelScale(start[key]));
   }
   assert.deepEqual(a.state.layout.board,before.board);
 });
@@ -57,7 +64,7 @@ test('right-panel scaling preserves the collapsed Accuracy baseline and engine c
   const exported=structuredClone(a.call('panelLayoutExport'));
   near(exported.layout.accuracy.h,exported.displayedLayout.accuracy.h+delta*.75);
   assert.equal(exported.schema,'chess-review-layout-v1');assert.equal(exported.layoutMode,'custom');
-  assert.equal(exported.layout.engine.scale,.75);assert.ok(!('pgn' in exported));
+  near(exported.layout.engine.scale,panelScale(before.engine)*.75);assert.ok(!('pgn' in exported));
   assert.equal(a.run('JSON.stringify(DEFAULT_LAYOUT)'),defaults);
 });
 
@@ -72,14 +79,16 @@ test('cancelled or blurred group gestures restore geometry and reset returns to 
   a.event(grip,'pointerdown',0,0);a.event(a.dom.window,'pointermove',100,100);await a.call('resetLayout');
   assert.equal(a.state.layoutMode,'auto');assert.equal(a.state.reorganize,false);assert.equal(a.doc.querySelector('.reorg-banner'),null);
   assert.equal(JSON.stringify(a.state.layout),a.run('JSON.stringify(DEFAULT_LAYOUT)'));
-  assert.equal(a.mod('moves').querySelector('.mod-inner').style.transform,'');
+  const automatic=a.call('snapshotLayout');
+  assert.equal(a.mod('moves').querySelector('.mod-inner').style.transform,`scale(${automatic.moves.scale})`);
 });
 
 test('completed panel scale is persisted and can be restored without drift',async t=>{
   const a=setup(t);a.select('moves');a.select('graph');const before=structuredClone(a.state.layout),grip=a.mod('graph').querySelector('.mod-resize.e');
-  a.event(grip,'pointerdown',0,0);a.event(a.dom.window,'pointermove',60,0);a.event(a.dom.window,'pointerup',60,0);
+  const dx=before.graph.w*.2;
+  a.event(grip,'pointerdown',0,0);a.event(a.dom.window,'pointermove',dx,0);a.event(a.dom.window,'pointerup',dx,0);
   await new Promise(resolve=>setTimeout(resolve,300));
-  const saved=structuredClone(a.store.layout);assert.equal(saved.moves.scale,1.2);near(saved.graph.w,before.graph.w*1.2);
-  a.state.layout=saved;a.call('applyLayoutMode');assert.equal(a.mod('moves').querySelector('.mod-inner').style.transform,'scale(1.2)');
+  const saved=structuredClone(a.store.layout);near(saved.moves.scale,panelScale(before.moves)*1.2);near(saved.graph.w,before.graph.w*1.2);
+  a.state.layout=saved;a.call('applyLayoutMode');assert.equal(a.mod('moves').querySelector('.mod-inner').style.transform,`scale(${saved.moves.scale})`);
   assert.equal(a.state.layout.moves.w,saved.moves.w);
 });

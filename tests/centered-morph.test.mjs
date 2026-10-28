@@ -6,7 +6,7 @@ import {capturePanels} from '../lib/learning/morph.js';
 import {app, loadGame} from './helpers/app.mjs';
 import {LearningWorkspace} from '../lib/learning/workspace.js';
 
-test('learning reserves Settings without moving and bounds the square board at all window sizes',()=>{
+test('learning adapts its Settings gutter without moving and bounds the square board at all window sizes',()=>{
   for(const width of [320,390,600,760,960,1280,1440,1920,2560]){
     const board={x:80,y:140,width:Math.min(width-48,700)};
     const closed=fullSizeLearningLayout({width,height:1080,board,settingsOpen:false});
@@ -14,7 +14,7 @@ test('learning reserves Settings without moving and bounds the square board at a
     assert.deepEqual(open,closed);const p=open;
     assert.ok(p.boardX>=0&&p.boardX+p.boardSize<=width);
     assert.ok(p.panelX>=0&&p.panelX+p.panelWidth<=width);
-    if(width>=760)assert.ok(p.panelX+p.panelWidth<=width-334);
+    if(width>=1600)assert.ok(p.panelX+p.panelWidth<=width-334);
     if(p.stacked)assert.ok(p.panelY>p.boardY+p.boardSize);
     else {
       assert.ok(p.panelX>=p.boardX+p.boardSize+24);
@@ -22,11 +22,11 @@ test('learning reserves Settings without moving and bounds the square board at a
     }
   }
   const board={x:92,y:142,width:700};const p=fullSizeLearningLayout({width:1920,height:1080,board});
-  assert.ok(p.boardSize>board.width);assert.ok(p.boardX<board.x);assert.equal(p.boardY+60,board.y);
+  assert.ok(p.boardSize>board.width);assert.ok(p.boardX<board.x);assert.equal(p.boardY+52,board.y);
   assert.equal(p.boardX+p.boardSize,board.x+board.width);
   assert.ok(board.x-p.boardX>32&&board.x-p.boardX<=80);assert.equal(p.panelX,board.x+board.width+32);
   const tight=fullSizeLearningLayout({width:1366,height:1080,board:{x:350,y:70,width:800}});
-  assert.equal(tight.boardX+tight.boardSize,1150);assert.equal(tight.boardY+60,70);
+  assert.ok(tight.boardX+tight.boardSize<=1366-24-24-340);assert.equal(tight.stacked,false);assert.equal(tight.boardY+52,70);
 });
 
 test('board expands uniformly on a straight path with no upward arc or overshoot',()=>{
@@ -34,6 +34,54 @@ test('board expands uniformly on a straight path with no upward arc or overshoot
     {transform:'translate(56px, 0px) scale('+600/660+')'},
     {transform:'translate(0px, 0px) scale(1)'},
   ]);
+});
+
+test('stacked puzzle boards reserve visible status space in portrait and short landscape viewports',()=>{
+  for(const [width,height]of [[320,568],[390,844],[430,932],[568,320],[844,390],[820,600],[768,1024]]){
+    const input={width,height,top:52,board:{x:309,y:108,width:734}},p=fullSizeLearningLayout({...input,boardFooter:48});
+    assert.equal(p.stacked,true);
+    assert.ok(p.boardY+52>=52);
+    assert.ok(p.boardY+52+p.boardSize+48<=height-24,'Status must fit below the board');
+    assert.ok(p.boardSize>=Math.min(width-32,180),'The square board remains usable');
+    assert.ok(p.panelY>=p.boardY+p.boardSize+48,'Status must not overlap learning navigation');
+  }
+  const desktop={width:1920,height:960,board:{x:309,y:108,width:734}};
+  assert.deepEqual(fullSizeLearningLayout({...desktop,boardFooter:48}),fullSizeLearningLayout(desktop),'Desktop geometry stays unchanged');
+});
+
+test('Full HD learning balances its vertical margins without changing board size or horizontal placement',()=>{
+  const board={x:309.36,y:107.8,width:734.85};
+  for(const height of [919,920,960,1080]){
+    const input={width:1920,height,top:52.2,board};
+    const before=fullSizeLearningLayout(input),centered=fullSizeLearningLayout({...input,balanceVertically:true});
+    assert.equal(centered.boardSize,before.boardSize);assert.equal(centered.boardX,before.boardX);assert.equal(centered.panelX,before.panelX);
+    const bottom=height-input.top-centered.boardY-centered.boardSize;
+    assert.ok(Math.abs(centered.boardY-bottom)<1e-8);
+    assert.equal(centered.panelY,centered.boardY);assert.equal(centered.panelHeight,centered.boardSize);
+    if(height===920)assert.ok(centered.boardY<before.boardY,'Normal Full HD browser window should move up');
+  }
+  const tablet={width:820,height:1180,board};
+  assert.deepEqual(fullSizeLearningLayout({...tablet,balanceVertically:true}),fullSizeLearningLayout(tablet),'Stacked layouts keep their existing placement');
+});
+
+test('return animation converts screen movement through a scaled review ancestor',()=>{
+  assert.deepEqual(boardExpansionFrames({x:80,y:130,width:600},{x:100,y:150,width:500},.8),[
+    {transform:'translate(-25px, -25px) scale(1.2)'},
+    {transform:'translate(0px, 0px) scale(1)'},
+  ]);
+});
+
+test('panel fades preserve existing content transforms in both directions',async t=>{
+  const {dom,doc,source,board,target,animations}=scene(t);
+  source.style.transform='scale(0.8847)';target.style.transform='scale(0.9038)';
+  const controller=new dom.window.AbortController();
+  const pending=centeredMorph(doc,capturePanels([source]),[target],{board,fromBoard:board.getBoundingClientRect(),signal:controller.signal});
+  for(const animation of animations.filter(a=>a.target===source||a.target===target)){
+    assert.ok(animation.frames.every(frame=>!('transform'in frame)));
+    assert.ok(animation.frames.every(frame=>'translate'in frame));
+  }
+  controller.abort();await pending;
+  assert.equal(source.style.transform,'scale(0.8847)');assert.equal(target.style.transform,'scale(0.9038)');
 });
 
 test('Morph 3 clears outgoing text before revealing its single live destination and cancels cleanly',async t=>{

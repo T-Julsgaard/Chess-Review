@@ -35,7 +35,7 @@ test('bounds and active-puzzle reads avoid repeated full-library scans and refre
   assert.deepEqual(library.bounds(puzzles),[0,3250]);
   const bounds=library.bounds(puzzles);bounds[0]=-1;
   assert.equal(library.bounds(puzzles)[0],0);
-  assert.equal(pickRunPuzzle(puzzles,[],()=>0).rating,400);
+  assert.equal(pickRunPuzzle(puzzles,[],'timeAttack',()=>0).rating,410);
 });
 
 test('review startup defers learning content and exercise rules until learning opens', async () => {

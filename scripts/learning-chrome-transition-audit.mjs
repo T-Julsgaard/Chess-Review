@@ -4,7 +4,9 @@ import path from 'node:path';
 
 export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const run=expression=>evaluate(review,expression);
+  const accuracyLayers=()=>run(`([...document.querySelectorAll('.stage .acc-nav-current, .stage .acc-nav-wake')].map(n=>getComputedStyle(n).visibility))`);
   await sleep(600); // Allow startup zoom and font fitting to settle.
+  assert.deepEqual(await accuracyLayers(),['visible','visible'],'Accuracy highlights must be initialized in Game Review');
   await run(`window.sampleReviewChrome=()=>{
     const box=n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};};
     const players=[...document.querySelectorAll('#playerTop, #playerBot')].map(n=>{
@@ -32,6 +34,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     assert.ok(frames.some(f=>f.libraryX<0&&f.libraryX>-39&&f.libraryVisible),'Library must slide visibly before hiding');
     assert.equal(frames.at(-1).libraryVisible,false);
     assert.equal(await run("getComputedStyle(document.querySelector('.topbar-meta')).visibility"),'hidden');
+    assert.deepEqual(await accuracyLayers(),['hidden','hidden'],'Accuracy highlights must not show through learning mode');
     await run("document.querySelector('#learningToggle').click()");
     await waitFor(review,"document.querySelector('.topbar-meta').classList.contains('meta-return')",'Metadata return');
     const slide=await run(`(()=>{
@@ -48,6 +51,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     }
     await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace)",'Review restored');
     assert.equal(await run("getComputedStyle(document.querySelector('.library-rail')).visibility"),'visible');
+    assert.deepEqual(await accuracyLayers(),['visible','visible'],'Accuracy highlights must return with Game Review');
   }
   // Close while entry is still moving, then reopen to catch stale animation state.
   await run("import('./analysis.js').then(m=>{void m.openLearning();})");
@@ -60,10 +64,42 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await run(`import('./analysis.js').then(m=>{m.S.settings.moveAnim=${reduced};return m.openLearning();})`);
     assert.equal(await run("getComputedStyle(document.querySelector('.library-rail')).transitionDuration"),'0s');
     assert.equal(await run("getComputedStyle(document.querySelector('.library-rail')).visibility"),'hidden');
+    assert.deepEqual(await accuracyLayers(),['hidden','hidden'],'Accuracy highlights must stay hidden without animations');
     await run("import('./analysis.js').then(m=>m.learningWorkspace.close())");
     assert.equal(await run("getComputedStyle(document.querySelector('.library-rail')).visibility"),'visible');
+    assert.deepEqual(await accuracyLayers(),['visible','visible']);
   }
+  await auditReviewReturn({review,call,evaluate,waitFor,sleep,out});
+  console.log('Both learning entries: stationary player fades, Library slide, smooth metadata return, interrupted entry and reduced motion passed. Evidence: '+out);
+}
+
+export async function auditReviewReturn({review,call,evaluate,waitFor,sleep,out}) {
+  const run=expression=>evaluate(review,expression);
+  await sleep(600);
+  // Piece assembly can outlast the panel/board morph. Once Puzzles fades out,
+  // releasing its opacity animation must not reveal it again over Game Review.
+  await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]},review.sessionId);
+  await run("import('./analysis.js').then(async m=>{m.S.settings.moveAnim=true;m.go(2);await m.openLearning();const w=m.learningWorkspace;w.homePosition.load('7k/8/8/8/8/8/8/K7 w - - 0 1');w.render();})");
+  await run(`window.returnFrames=[];window.samplingReturn=true;
+    window.sampleReturnFrame=()=>{
+      const shell=document.querySelector('.learn-shell'),s=shell&&getComputedStyle(shell);
+      returnFrames.push({time:performance.now(),visible:!!s&&s.visibility==='visible'&&+s.opacity>.001,
+        opacity:s?+s.opacity:0,assembling:!!document.querySelector('.puzzle-arranging'),connected:!!shell});
+      if(samplingReturn)requestAnimationFrame(sampleReturnFrame);
+    };sampleReturnFrame();document.querySelector('#learningToggle').click();`);
+  await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace)",'Review return with longer piece assembly');
+  const returnFrames=await run('samplingReturn=false;returnFrames');
+  await fs.writeFile(path.join(out,'review-return-visibility.json'),JSON.stringify(returnFrames,null,2));
+  assert.ok(returnFrames.length>10,'Return must be sampled across animation frames');
+  assert.ok(returnFrames[0].visible,'Puzzles must start visible');
+  assert.ok(returnFrames.some(f=>!f.connected&&f.assembling),'Outgoing UI must detach while the slower piece assembly continues');
+  let faded=false;
+  for(const frame of returnFrames){
+    if(!frame.visible)faded=true;
+    if(faded)assert.equal(frame.visible,false,'Puzzles must never flash back after fading out: '+JSON.stringify(frame));
+  }
+  assert.equal(await run("import('./analysis.js').then(m=>m.S.idx)"),2,'Return must keep the saved review move');
   const shot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
   await fs.writeFile(path.join(out,'review-restored.png'),Buffer.from(shot.data,'base64'));
-  console.log('Both learning entries: stationary player fades, Library slide, smooth metadata return, interrupted entry and reduced motion passed. Evidence: '+out);
+  console.log('Review return: no puzzle UI flash during slower piece assembly; saved review move preserved. Evidence: '+out);
 }

@@ -1,0 +1,149 @@
+/* Full HD reference pass: the approved 87% composition expressed at native 100%.
+   Component dimensions below come from the pre-redesign stylesheet. */
+.stage.reference-components {
+  --gap:12px;--pad:12px;--row-h:28px;--radius:10px;--fs-body:13px;--engine-line-h:46px;
+  --coach-clear:194px;--coach-float-h:47px;
+}
+.stage.auto.full-hd-reference {
+  position:relative;display:block;padding:0;margin:0;max-width:none;width:100%;min-height:0;height:calc(100dvh - var(--topbar-h));
+  --gap:12px;--pad:12px;--row-h:28px;--radius:10px;--fs-body:13px;--engine-line-h:46px;
+  --coach-clear:194px;--coach-float-h:47px;
+}
+/* Expanded panels may extend below the composition; keep the page itself fixed.
+   Panel bodies retain their own scrolling and learning has its own viewport. */
+.app:has(.full-hd-reference) > .review-viewport {height:calc(100dvh - var(--topbar-h));overflow:clip;}
+html:has(.full-hd-reference), body:has(.full-hd-reference) {height:100%;overflow:hidden;}
+.stage.reference-components #movesBody {scroll-behavior:auto;}
+.stage.reference-components .ml-move {transition:none;}
+/* Only the learning content scrolls; its outer shell needs no extra gutter. */
+body:has(.full-hd-reference) .learning-embedded .learn-shell {scrollbar-gutter:auto;}
+body:has(.full-hd-reference) .learning-embedded .learn-shell {
+  width:calc(var(--learn-panel-width) / var(--learn-content-scale,1));
+  height:calc(var(--learn-panel-height) / var(--learn-content-scale,1));
+  max-height:calc(var(--learn-panel-height) / var(--learn-content-scale,1));
+  transform:scale(var(--learn-content-scale,1));transform-origin:top left;
+}
+.stage.auto.full-hd-reference .side,
+.stage.auto.full-hd-reference .side-cols,
+.stage.auto.full-hd-reference .side-a,
+.stage.auto.full-hd-reference .side-b {display:contents;position:static;padding:0;contain:none;}
+.stage.auto.full-hd-reference .mod {position:absolute;margin:0;min-height:0;contain:none;}
+.stage.auto.full-hd-reference .mod[data-mod="coach"] {right:auto;justify-self:auto;align-self:auto;}
+.stage.full-hd-reference .mod[data-mod="board"] .board-wrap {flex:1;min-height:0;align-items:stretch;justify-content:center;container-type:size;}
+.stage.full-hd-reference .mod[data-mod="board"] .board {flex:none;height:min(100cqw,100cqh);width:min(100cqw,100cqh);aspect-ratio:1;max-width:100%;margin:auto;}
+.stage.reference-components .evalgraph svg {height:120px;}
+
+.stage.reference-components .panel-head:not(.acc-head) {
+  flex-wrap:nowrap;
+  display: flex; align-items: center; gap: 10px;
+  padding: calc(var(--pad) * .85) var(--pad);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.stage.reference-components .panel-head:not(.acc-head) h3 {
+  margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-2);
+}
+
+.stage.reference-components .panel-body:not(.acc-page) { padding: var(--pad); }
+
+.stage.reference-components .player-strip {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 4px;
+}
+
+.stage.reference-components .avatar {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: grid; place-items: center; font-weight: 700; font-size: 15px;
+  color: #fff; flex: none; box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+}
+
+.stage.reference-components .player-strip .name { font-weight: 700; font-size: 15px; display: flex; align-items: baseline; gap: 4px; white-space: nowrap; }
+
+.stage.reference-components .controls {
+  display: flex; align-items: center; gap: 8px; justify-content: center;
+  /* A double-click on a disabled nav button (at the start/end of the game) would otherwise start a
+     text selection that extends onto the coach iframe and "marks" it. Block selection in the bar. */
+  user-select: none; -webkit-user-select: none;
+}
+
+.stage.reference-components .controls button {
+  height: 44px; min-width: 44px; border-radius: 11px;
+  border: 1px solid var(--line); background: var(--panel-2); color: var(--ink-2);
+  display: grid; place-items: center; transition: .14s;
+}
+
+.stage.reference-components .controls button.play {
+  background: linear-gradient(160deg, var(--accent), var(--accent-strong));
+  color: var(--accent-ink); border: 0; min-width: 64px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
+}
+
+.stage.reference-components .learn-entry-button { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: 10px; background: var(--panel-2); color: var(--ink); font-weight: 700; font-size: 13px; }
+
+.stage.reference-components .ip-body { position: relative; z-index: 20; padding: 13px var(--pad) 15px; display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; overflow-y: auto;
+  scrollbar-width: none; }
+
+.stage.reference-components .ip-head { display: flex; align-items: center; gap: 9px; min-height: 28px; }
+
+.stage.reference-components .engine-line {
+  height: 46px; box-sizing: border-box;
+  display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 12px; align-items: center;
+  padding: 9px 4px; border-bottom: 1px solid var(--line-soft); font-family: var(--font-mono);
+}
+
+.stage.reference-components .engine-bestwalk {
+  margin-top: 10px; width: 100%;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 9px 12px; border-radius: 9px; cursor: pointer; transition: .12s;
+  font-size: 12.5px; font-weight: 700; color: var(--ink); white-space: nowrap;
+  border: 1px solid color-mix(in oklab, var(--accent) 45%, var(--line));
+  background: color-mix(in oklab, var(--accent) 16%, var(--panel-2));
+}
+
+.stage.reference-components .player-strip {height:auto;}
+.stage.reference-components .ip-head:empty {display:flex;}
+.stage.reference-components .ip-text, .stage.reference-components .ip-note {font-size:calc(var(--ip-font,16px) * 1.125);}
+.stage.reference-components.has-coach .insight-panel .ip-opening {padding-right:194px;}
+.stage.reference-components.has-coach .insight-panel .ip-head {padding-right:0;}
+.stage.reference-components.has-coach .ip-text::before {content:"";float:right;width:calc(194px - var(--pad));height:47px;}
+.stage.reference-components .mod[data-mod="engine"] .engine-body {padding:12px;}
+.stage.reference-components .mod[data-mod="engine"] .engine-line {height:46px;padding:9px 4px;}
+.stage.reference-components .mod[data-mod="engine"] .engine-bestwalk {margin-top:10px;padding:9px 12px;min-height:0;font-size:12.5px;line-height:1.4;}
+.app:has(.full-hd-reference) {--topbar-h:calc(52.2px * var(--reference-chrome-scale,1));}
+.app:has(.full-hd-reference) .settings-pop {width:256px;padding-inline:14px;}
+.app:has(.full-hd-reference) .topbar {gap:15.66px;padding:0 20.88px;}
+.app:has(.full-hd-reference) .brand {gap:9.57px;}
+.app:has(.full-hd-reference) .brand-mark {width:26.1px;height:26.1px;border-radius:6.96px;font-size:15.66px;}
+.app:has(.full-hd-reference) .brand-mark .brand-img {width:19.14px;height:19.14px;}
+.app:has(.full-hd-reference) .brand-name {font-size:12.18px;}
+.app:has(.full-hd-reference) .topbar-meta {gap:15.66px;margin-left:5.22px;}
+.app:has(.full-hd-reference) .meta-chip {gap:6.09px;font-size:10.875px;}
+.app:has(.full-hd-reference) .topbar-right {gap:6.96px;}
+.app:has(.full-hd-reference) .icon-btn {width:31.32px;height:31.32px;border-radius:7.83px;}
+.app:has(.full-hd-reference) .icon-btn svg {width:14.79px;height:14.79px;}
+.app:has(.full-hd-reference) .learning-toggle {width:174px;padding:0 10.44px;grid-template-columns:14.79px 1fr;gap:6.96px;font-size:10.44px;}
+.app:has(.full-hd-reference):not(.has-learning) .library-rail {height:calc((100dvh - var(--topbar-h)) / (.87 * var(--reference-chrome-scale,1)));bottom:auto;transform:scale(calc(.87 * var(--reference-chrome-scale,1)));transform-origin:top left;}
+.app:has(.full-hd-reference).has-learning .library-rail {height:calc((100dvh - var(--topbar-h)) / (.87 * var(--reference-chrome-scale,1)));bottom:auto;transform:translateX(calc(var(--learning-library-offset, -40px) * var(--reference-chrome-scale,1))) scale(calc(.87 * var(--reference-chrome-scale,1)));transform-origin:top left;}
+.app:has(.full-hd-reference) .feedback-floating {transform:scale(calc(.87 * var(--reference-chrome-scale,1)));transform-origin:bottom right;right:calc(15.66px * var(--reference-chrome-scale,1));bottom:calc(15.66px * var(--reference-chrome-scale,1));}
+
+/* Stacked layouts keep normal text sizes and the same panel styling. */
+.stage.auto.reference-components:not(.full-hd-reference) .mod[data-mod="engine"] {min-height:180px;}
+.stage.auto.reference-components:not(.full-hd-reference) .mod[data-mod="coach"] {width:120px;height:123px;}
+.stage.auto.reference-components:not(.full-hd-reference).has-coach .insight-panel .ip-opening {padding-right:128px;}
+.stage.auto.reference-components:not(.full-hd-reference).has-coach .ip-text::before {width:116px;height:38px;}
+.stage.auto.reference-components:not(.full-hd-reference) .panel-head {flex-wrap:wrap;}
+@media (max-width:819.98px) {
+ .stage.auto.reference-components .player-strip {padding:4px;gap:8px;}
+ .stage.auto.reference-components .avatar {width:34px;height:34px;}
+ .stage.auto.reference-components .player-strip .name {font-size:14px;}
+}
+
+.app:has(.full-hd-reference) .topbar {height:52.2px;zoom:var(--reference-chrome-scale,1);}
+.app:has(.full-hd-reference) .settings-pop {
+  zoom:var(--settings-scale,var(--reference-chrome-scale,1));
+  top:calc((var(--topbar-h) + 12px) / var(--settings-scale,var(--reference-chrome-scale,1)));
+  max-height:calc((100dvh - var(--topbar-h) - 28px) / var(--settings-scale,var(--reference-chrome-scale,1)));
+}
+.stage.auto.reference-components:not(.full-hd-reference) {--review-h:180px;}
+.stage.auto.reference-components:not(.full-hd-reference) .ip-head:empty {display:none;}

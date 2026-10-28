@@ -12,18 +12,19 @@
       --ink:#f3f1ea;--ink-2:#b8b4a8;--ink-3:#969183;--accent:#7fb45f;
     }
     *{box-sizing:border-box} [hidden]{display:none!important}
-    html,body{margin:0}
-    body{width:360px;max-width:100%;padding:18px;background:radial-gradient(110% 80% at 0 0,#282a21,var(--bg) 75%);color:var(--ink);font:13px/1.45 var(--font-ui);-webkit-font-smoothing:antialiased}
+    html,body{margin:0;scrollbar-width:none}
+    html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}
+    /* Keep the same spacing open or closed, with room for the 240px input. */
+    body{position:relative;width:360px;max-width:100%;padding:12px;background:radial-gradient(110% 80% at 0 0,#282a21,var(--bg) 75%);color:var(--ink);font:13px/1.45 var(--font-ui);-webkit-font-smoothing:antialiased}
     button,input,textarea{font:inherit} button{cursor:pointer;color:inherit}
     button:disabled{opacity:.5;cursor:default}
     button:focus-visible,summary:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-    .brand{display:flex;align-items:center;gap:10px}
+    .brand{display:flex;align-items:center;gap:10px;margin-bottom:8px}
     .brand-mark{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--accent);box-shadow:inset 0 1px 0 #ffffff30}
     .brand-img{width:23px;height:23px}
     .brand-name{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.brand-name span{color:var(--ink-3);font-weight:600}
-    .intro{margin:13px 0 10px;color:var(--ink-2);font-size:14px}
     .popup-actions{position:relative;isolation:isolate;display:grid;gap:5px;padding:5px;border:1px solid var(--line);border-radius:15px;background:var(--panel)}
-    .action-button{position:relative;z-index:1;display:flex;align-items:center;gap:13px;width:100%;min-height:64px;padding:11px 13px;border:0;border-radius:10px;background:transparent;text-align:left;transition:color .2s}
+    .action-button{position:relative;z-index:1;display:flex;align-items:center;gap:13px;width:100%;min-height:54px;padding:8px 13px;border:0;border-radius:10px;background:transparent;text-align:left;transition:color .2s}
     .action-button svg{width:23px;height:23px;flex:none;color:var(--accent)}
     .action-copy{flex:1;min-width:0}.action-copy strong{display:block;font-size:14px;font-weight:700;line-height:1.3}.action-copy small{display:block;margin-top:4px;font-size:11px;color:var(--ink-2)}
     .action-arrow{font-size:18px;color:var(--ink-3)}
@@ -32,11 +33,12 @@
       background:radial-gradient(ellipse at 24% 0%,#ffffff0d,transparent 65%),linear-gradient(115deg,color-mix(in oklab,var(--accent) 22%,var(--panel)),color-mix(in oklab,var(--accent) 12%,var(--panel)));
       box-shadow:inset 0 1px 0 #ffffff12,inset 0 -1px 0 #00000014}
     .popup-actions[data-ready="true"] .fluid-indicator{visibility:visible}
-    #status{margin:12px 3px 0;color:var(--ink-2);font-size:11.5px;line-height:1.55;white-space:pre-line;overflow-wrap:anywhere}#status:empty{display:none}#status.error{color:#f99188}
-    details{margin-top:14px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
-    summary{display:flex;align-items:center;gap:8px;list-style:none;cursor:pointer;padding:11px 13px;color:var(--ink-2);font-size:12px;font-weight:650;user-select:none}
-    summary::-webkit-details-marker{display:none}summary:hover{color:var(--ink)}.chev{display:inline-flex;transition:transform .2s}.chev svg{width:13px;height:13px}details[open] .chev{transform:rotate(90deg)}details[open]{margin-top:10px}
-    .manual-fields{padding:0 13px 10px}label{display:block;margin:12px 0 5px;font-size:11px;color:var(--ink-2)}.hint{display:inline;font-size:10px;color:var(--ink-3);margin-top:2px}
+    #status{margin:8px 3px 0;color:var(--ink-2);font-size:11.5px;line-height:1.55;white-space:pre-line;overflow-wrap:anywhere}#status:empty{display:none}#status.error{color:#f99188}
+    #cancelImport{position:absolute;top:12px;right:12px;width:auto;margin:0;padding:5px 8px;font-size:11px}
+    details{margin-top:8px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+    summary{display:flex;align-items:center;gap:8px;list-style:none;cursor:pointer;padding:8px 13px;color:var(--ink-2);font-size:12px;font-weight:650;user-select:none}
+    summary::-webkit-details-marker{display:none}summary:hover{color:var(--ink)}.chev{display:inline-flex;transition:transform .2s}.chev svg{width:13px;height:13px}details[open] .chev{transform:rotate(90deg)}
+    .manual-fields{padding:0 13px 10px}label{display:block;margin:6px 0 5px;font-size:11px;color:var(--ink-2)}.hint{display:inline;font-size:10px;color:var(--ink-3);margin-top:2px}
     input,textarea{min-width:0;width:100%;padding:9px 10px;color:var(--ink);background:var(--panel-2);border:1px solid var(--line);border-radius:8px;font-size:12px}
     input::placeholder,textarea::placeholder{color:var(--ink-3)}textarea{display:block;resize:vertical;min-height:84px;max-height:240px;line-height:1.5;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
     .row{display:flex;gap:7px}.row input{flex:1}
@@ -51,7 +53,6 @@
     <div class="brand-mark"><img class="brand-img" src="pieces-img/cburnett/wN.svg" alt=""></div>
     <div class="brand-name">Chess <span>/ Review</span></div>
   </header>
-  <p class="intro">Choose your next move.</p>
   <main>
     <div class="popup-actions" aria-label="Chess Review actions">
       <span class="fluid-indicator" aria-hidden="true"></span>

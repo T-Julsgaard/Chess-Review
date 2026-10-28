@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {app,loadGame,settle} from './helpers/app.mjs';
 
-function review(t){const a=app(t);loadGame(a,'1. e4 d5 2. exd5 Qxd5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');return a;}
+function review(t){const a=app(t);a.state.settings.graphDesign='original';loadGame(a,'1. e4 d5 2. exd5 Qxd5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');return a;}
 test('navigation retains graph/player nodes and updates turns, clocks and captured material',t=>{
   const a=review(t),S=a.state,doc=a.dom.window.document;S.clocks=['','9:59','9:58','9:55','9:54'];S.headers.TimeControl='600';a.call('renderPlayers');
   const top=doc.querySelector('#playerTop .player-strip'),bottom=doc.querySelector('#playerBot .player-strip'),name=bottom.querySelector('.name');
@@ -25,6 +25,24 @@ test('every graph style retains its hover targets and changes geometry when evid
   }
   S.settings.evalView='bar';a.call('renderGraph');assert.equal(doc.querySelector('#graphMount svg'),null);
   S.settings.evalView='both';a.call('renderGraph');assert.ok(doc.querySelector('#graphMount svg'));
+});
+
+test('every graph style hides the position marker at both game endpoints, including after redraws',t=>{
+  const a=review(t),S=a.state,doc=a.dom.window.document;
+  for(const style of ['area','line','minimal','color']){
+    S.settings.graphStyle=style;S.idx=0;a.call('renderGraph');
+    const svg=doc.querySelector('#graphMount svg'),marker=svg.querySelector('.eval-position');
+    assert.equal(marker.style.display,'none');
+    for(const ply of [1,S.total,2,0]){
+      a.call('go',ply);
+      assert.equal(doc.querySelector('#graphMount svg'),svg);
+      assert.equal(marker.style.display,ply===0||ply===S.total?'none':'');
+    }
+    S.idx=S.total;S.evals[1]={cp:(S.evals[1]?.cp||0)+100};a.call('renderGraph');
+    assert.equal(doc.querySelector('.eval-position').style.display,'none');
+  }
+  loadGame(a,'1. e4');a.call('computeDerived');
+  for(const ply of [0,1]){a.call('go',ply);assert.equal(doc.querySelector('.eval-position').style.display,'none');}
 });
 test('unchanged engine panels stay mounted and returning from practice restores the real lines',t=>{
   const a=review(t),doc=a.dom.window.document,lines=[{score:{cp:30},pv:'e2e4',depth:16}];

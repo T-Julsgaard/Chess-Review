@@ -38,10 +38,31 @@ try {
     // Iframe dimensions are CSS pixels and do not resize when their parent tab
     // zooms. Exercise the responsive fallback here; release-layout.mjs checks
     // the real tab/window zoom fit separately.
-    await fs.appendFile(path.join(sourceDir,'analysis.js'), '\nglobalThis.__smokeResponsive=()=>{_zoomTabId=null;UI.canvas.classList.remove("desktop-layout");applyLayout();};\nglobalThis.__smokePreferences=()=>({settings:structuredClone(S.settings),layoutMode:S.layoutMode});\n');
+    await fs.appendFile(path.join(sourceDir,'analysis.js'), '\nglobalThis.__smokeResponsive=()=>{fitViewport();};\nglobalThis.__smokePreferences=()=>({settings:structuredClone(S.settings),layoutMode:S.layoutMode,layout:structuredClone(layoutForSave())});\n');
     await fs.appendFile(path.join(sourceDir,'analysis.js'), '\nglobalThis.__smokeLearningReview=()=>({idx:S.idx,flipped:S.flipped,fen:activePos().fen,classif:[...S.classif]});\n');
+    await fs.appendFile(path.join(sourceDir,'analysis.js'), '\nglobalThis.__smokePuzzleCount=()=>learningWorkspace?.ready?learningWorkspace.puzzles.length:0;\n');
+    await fs.appendFile(path.join(sourceDir,'analysis.js'), '\nglobalThis.__smokeModernAccuracy=async()=>{await applyUiSetup("modern");S.settings.moveAnim=false;};\nglobalThis.__smokeAccuracyBusy=busy=>{S.analyzing=busy;statsRefs=null;renderStats();};\n');
+    await fs.appendFile(path.join(sourceDir,'analysis.js'), `
+let smokeSavedAnalysis;
+globalThis.__smokePendingNavigation=action=>{
+  if(action==='start'){
+    smokeSavedAnalysis={evals:S.evals,bests:S.bests,analyzing:S.analyzing,progress:S.progress,completed:S.completed,idx:S.idx};
+    S.evals=S.evals.map((score,i)=>i===3?score:null);S.bests=S.bests.map((result,i)=>i===3?result:null);
+    S.analyzing=true;S.progress=0;S.completed=1;go(0);
+  }else if(action==='arrive'){
+    S.evals[5]=smokeSavedAnalysis.evals[5];S.bests[5]=smokeSavedAnalysis.bests[5];S.completed++;
+    flushProgress(S.batchGen);
+  }else if(action==='gap'){
+    S.evals[2]=smokeSavedAnalysis.evals[2];S.bests[2]=smokeSavedAnalysis.bests[2];S.completed++;
+    flushProgress(S.batchGen);
+  }else if(action==='restore'){
+    Object.assign(S,smokeSavedAnalysis);revRefs=null;flushProgress(S.batchGen);
+  }
+  return {idx:S.idx,total:S.total,limit:mainlineNavigationLimit(),progress:S.progress,analyzing:S.analyzing,pending:S.evals[S.idx]==null};
+};
+`);
     await fs.appendFile(path.join(sourceDir,'background.js'), '\nbrowserAPI.runtime.onInstalled.addListener(() => browserAPI.tabs.create({url:browserAPI.runtime.getURL("smoke.html")}));\n');
-    await fs.appendFile(path.join(sourceDir,'background.js'), '\nbrowserAPI.runtime.onMessage.addListener((message,sender,reply)=>{if(message.type!=="smokeReleaseReset")return;resetSettingsForRelease({reason:"update",previousVersion:"0.2.0"}).then(()=>reply({ok:true}),error=>reply({error:error.message}));return true;});\n');
+    await fs.appendFile(path.join(sourceDir,'background.js'), '\nbrowserAPI.runtime.onMessage.addListener((message,sender,reply)=>{if(message.type!=="smokeReleaseReset")return;resetSettingsForRelease({reason:"update",previousVersion:"0.3.0"}).then(()=>reply({ok:true}),error=>reply({error:error.message}));return true;});\n');
     await fs.writeFile(path.join(sourceDir,'smoke.html'),'<!doctype html><script type="module" src="smoke-client.js"></script>');
     await fs.writeFile(path.join(sourceDir,'smoke-client.js'), `
 import {browserAPI} from './browser-compat.js';
@@ -49,9 +70,48 @@ import {Engine} from './engine/uci.js';
 import {Chess} from './lib/chess.js';
 import {calibratedReview} from './lib/calibrated-review.js';
 import {resetSettingsForRelease} from './release-settings.js';
+import {UI_SETUPS,MODERN_LAYOUT} from './lib/ui-setups.js';
 const report=data=>fetch(${JSON.stringify(endpoint)},{method:'POST',body:JSON.stringify({browser:${JSON.stringify(release.browser)},...data})});
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 try {
+  const waitWorkspace=async(frame,previousDocument)=>{
+    for(let i=0;i<150;i++){
+      await wait(100);
+      const doc=frame.contentDocument;
+      if(doc===previousDocument)continue;
+      if(doc?.querySelector('.board')&&frame.contentWindow.__smokePreferences&&!doc.querySelector('#startup'))return frame.contentWindow.__smokePreferences();
+      const error=doc?.querySelector('#error');if(error&&!error.hidden)throw Error(error.textContent);
+    }
+    throw Error('Workspace did not become ready');
+  };
+  const assertModern=preferences=>{
+    const settings=preferences.settings;
+    if(settings.uiSetup!=='modern'||settings.uiSetupBase!=='modern'||settings.engineLines!==2||settings.classifyLines!==2||preferences.layoutMode!=='custom')throw Error('Modern defaults missing');
+    for(const [key,value]of Object.entries(UI_SETUPS.modern.designs))if(settings[key]!==value)throw Error('Modern design missing: '+key);
+    for(const [key,box]of Object.entries(MODERN_LAYOUT))for(const [property,value]of Object.entries(box)){
+      if(!(Math.abs(preferences.layout[key]?.[property]-value)<=1e-6))throw Error('Modern layout mismatch: '+key+'.'+property+' '+preferences.layout[key]?.[property]+' instead of '+value);
+    }
+  };
+  const waitNote=async frame=>{
+    for(let i=0;i<100;i++){if(frame.contentDocument.querySelector('.learning-announcement'))return;await wait(100);}
+    throw Error('Developer note missing');
+  };
+  // A brand-new isolated profile must get both Modern and the once-only note.
+  await resetSettingsForRelease({reason:'startup'});
+  const fresh=document.createElement('iframe');fresh.style='width:1680px;height:1000px';
+  fresh.src='analysis.html?workspace=blank';document.body.append(fresh);
+  assertModern(await waitWorkspace(fresh));await waitNote(fresh);
+  if(fresh.contentDocument.querySelectorAll('.learning-announcement-target').length!==2)throw Error('Developer note must highlight both learning buttons');
+  fresh.contentDocument.querySelector('.learning-announcement-dismiss').click();
+  const firstDocument=fresh.contentDocument;
+  fresh.src='analysis.html?workspace=blank';
+  assertModern(await waitWorkspace(fresh,firstDocument));await wait(300);
+  if(fresh.contentDocument.querySelector('.learning-announcement'))throw Error('New-install note repeated');
+  fresh.contentDocument.querySelector('.learn-entry-button').click();
+  for(let i=0;i<200&&fresh.contentWindow.__smokePuzzleCount()!==50000;i++)await wait(100);
+  if(fresh.contentWindow.__smokePuzzleCount()!==50000)throw Error('Packaged puzzle library did not load all 50,000 puzzles');
+  fresh.remove();await report({step:'fresh-install-modern-and-note',modernPersists:true,twoPanelLines:true,bothButtonsHighlighted:true,noteShownOnce:true});
+  await report({step:'packaged-puzzle-library',count:50000});
   const results=[];
   for(const [key,file] of [['nnue','engine/stockfish-nnue.js'],['sf19lite','engine/stockfish-19-lite-single.js']]) {
     const engine=new Engine(file);
@@ -114,6 +174,33 @@ try {
     }
     await report({step:'rating-controls',key,labels,persistedModes:['moves','context']});
     if(key==='nnue') {
+      // Reproduce a slow early search deterministically in the isolated copy.
+      // The real engine run above supplies results; no production exports change.
+      frame.contentWindow.__smokePendingNavigation('start');
+      doc.querySelector('#controls [aria-label="Next"]').click();
+      if(frame.contentWindow.__smokePendingNavigation().idx!==1)throw Error('Next blocked by pending analysis');
+      doc.dispatchEvent(new frame.contentWindow.KeyboardEvent('keydown',{key:'End',bubbles:true}));
+      const atEnd=frame.contentWindow.__smokePendingNavigation();
+      if(atEnd.idx!==3||atEnd.limit!==3)throw Error('Keyboard End did not stop at the last result');
+      doc.querySelector('.ml-move[data-ply="10"]').click();
+      if(frame.contentWindow.__smokePendingNavigation().idx!==3)throw Error('Move list passed the last result');
+      doc.querySelector('#controls [aria-label="Next"]').click();
+      if(frame.contentWindow.__smokePendingNavigation().idx!==3)throw Error('Next passed the last result');
+      const chart=doc.querySelector('.evalgraph'),rect=chart.getBoundingClientRect();
+      const graphDesign=doc.querySelector('.evaluation-panel').dataset.design;
+      const fraction=graphDesign.startsWith('bars')?2.5/(atEnd.total+1):2/atEnd.total;
+      chart.dispatchEvent(new frame.contentWindow.MouseEvent('click',{clientX:rect.left+fraction*rect.width,clientY:rect.top+rect.height/2,bubbles:true}));
+      const pending=frame.contentWindow.__smokePendingNavigation();
+      if(pending.idx!==2||!pending.pending||pending.progress!==0||!pending.analyzing)throw Error('Graph cannot browse a pending gap');
+      if(doc.querySelector('.evaluation-score').textContent!=='—')throw Error('Pending move displayed a score');
+      const arrived=frame.contentWindow.__smokePendingNavigation('arrive');
+      if(arrived.idx!==2||!arrived.pending||arrived.limit!==5)throw Error('A later result did not extend the navigation limit');
+      const gap=frame.contentWindow.__smokePendingNavigation('gap');
+      if(gap.idx!==2||gap.pending||gap.progress!==0||doc.querySelector('.evaluation-score').textContent==='—')throw Error('Selected gap result did not update independently');
+      doc.querySelector('#controls [aria-label="End"]').click();
+      if(frame.contentWindow.__smokePendingNavigation().idx!==5)throw Error('End did not follow the new last result');
+      frame.contentWindow.__smokePendingNavigation('restore');
+      await report({step:'furthest-result-navigation',buttons:true,keyboard:true,moveList:true,graph:true,pendingGapsReachable:true,laterMovesLocked:true,newResultsExtendLimit:true,selectedResultUpdates:true});
       frame.contentWindow.__smokeResponsive();
       const sizes=[[1920,920],[1366,648],[1280,600],[1470,836],[1024,648],[820,648],[768,900],[390,844],[320,640]];
       for(const [width,height] of sizes) {
@@ -124,6 +211,26 @@ try {
       }
       frame.style.width='1680px';frame.style.height='1000px';await wait(250);
       await report({step:'responsive-layouts',sizes});
+      await frame.contentWindow.__smokeModernAccuracy();
+      const accuracySizes=[[1920,919],[1920,800],[1536,704],[1366,768],[1280,600],[1280,560],[1100,480],[820,900],[390,844],[320,640]];
+      for(const busy of [false,true]) {
+        frame.contentWindow.__smokeAccuracyBusy(busy);
+        for(const [width,height] of accuracySizes) {
+          frame.style.width=width+'px';frame.style.height=height+'px';await wait(120);
+          for(const page of [0,1]) {
+            doc.querySelector('#accuracy-tab-'+page).click();await wait(25);
+            const body=doc.querySelector('.accuracy-panel .acc-page'),rect=body.getBoundingClientRect();
+            const children=[...body.querySelectorAll('.phase-rating,.phase-report-row,.qbreak-row')];
+            if(body.scrollHeight!==body.clientHeight||body.scrollWidth!==body.clientWidth||children.some(n=>n.getBoundingClientRect().bottom>rect.bottom+.5))
+              throw Error('Accuracy page needs scrolling or clips results: '+JSON.stringify({width,height,page,busy,body:body.clientHeight,content:body.scrollHeight}));
+            if(page===0&&(body.querySelectorAll('.acc-dial svg').length!==2||body.querySelectorAll('.phase-report-row').length!==3))throw Error('Accuracy design changed');
+            if(page===1&&(body.querySelectorAll('.qbreak-row').length!==10||new Set([...body.querySelectorAll('.qbreak-row')].map(n=>Math.round(n.getBoundingClientRect().left))).size!==1))throw Error('Quality category list changed');
+          }
+        }
+      }
+      frame.contentWindow.__smokeAccuracyBusy(false);doc.querySelector('#accuracy-tab-0').click();
+      frame.style.width='1680px';frame.style.height='1000px';await wait(250);
+      await report({step:'accuracy-without-scrolling',sizes:accuracySizes,completed:true,pending:true,existingDesignPreserved:true});
       if (${!reviewOnly}) {
       const reviewBefore=JSON.stringify(frame.contentWindow.__smokeLearningReview());
       const clickLearning=text=>{
@@ -170,21 +277,23 @@ try {
     await report({step:'review-reload',key});
     frame.remove();
   }
-  // Simulate the 0.3.0 update event against real browser storage and render the
+  // Simulate upgrading a 0.3.0 user to 0.4.0 against real browser storage and render the
   // resulting defaults. Existing engine tests above also populate saved games.
-  await browserAPI.storage.local.remove('settingsResetFor030');
+  await browserAPI.storage.local.remove(['settingsResetFor040','learningAnnouncement:puzzles:seen','learningAnnouncement:puzzles:disabled']);
+  localStorage.removeItem('learningAnnouncement:puzzles:seen');localStorage.removeItem('learningAnnouncement:puzzles:disabled');
   const resetJob={pgn:'1. e4 e5 *',meta:{gameId:'reset-smoke'},source:'pgn'};
   const library=(await browserAPI.storage.local.get('library')).library;
   library[0].fav=true;
-  await browserAPI.storage.local.set({username:'reset-user',library,
-    settings:{boardTheme:'custom',pieceStyle:'merida',coach:'professor',soundVolume:37,enginePath:'sf19lite'},
+  await browserAPI.storage.local.set({settingsResetFor030:true,username:'reset-user',library,
+    settings:{uiSetup:'old',boardTheme:'custom',pieceStyle:'merida',coach:'professor',sound:false,soundVolume:0,moveAnim:false,animSpeed:3,soundFx:{move:{snd:'default',volume:21}},enginePath:'sf19lite',engineLines:1,classifyLines:3},
+    'playerHistory:v1':{chesscom:[{id:'preserved-history',white:'reset-user',black:'opponent'}]},
     layout:{board:{x:20,y:30,w:400,h:400}},layoutMode:'custom',layoutVersion:8,
     'job:reset-smoke':resetJob});
   const before=await browserAPI.storage.local.get(null);
   const [backgroundReset]=await Promise.all([
     browserAPI.runtime.sendMessage({type:'smokeReleaseReset'}),
     resetSettingsForRelease({reason:'startup'}),
-    resetSettingsForRelease({reason:'update',previousVersion:'0.2.0'}),
+    resetSettingsForRelease({reason:'update',previousVersion:'0.3.0'}),
   ]);
   if(!backgroundReset.ok)throw Error('Background reset failed: '+backgroundReset.error);
   const after=await browserAPI.storage.local.get(null);
@@ -192,42 +301,43 @@ try {
     if(['settings','layout','layoutMode','layoutVersion'].includes(key))continue;
     if(JSON.stringify(before[key])!==JSON.stringify(after[key]))throw Error('Release reset changed '+key);
   }
-  if(!after.settingsResetFor030||Object.keys(after.settings).length||after.layout!==null||after.layoutMode!=='auto')throw Error('Release reset did not clear preferences');
+  if(!after.settingsResetFor040||after.settings.uiSetup!=='modern'||after.layout!==null||after.layoutMode!=='custom')throw Error('Release migration did not save Modern');
   const resetFrame=document.createElement('iframe');resetFrame.style='width:1680px;height:1000px';
   resetFrame.src='analysis.html#reset-smoke';document.body.append(resetFrame);
+  let previousWorkspace;
   const preferences=async()=>{
-    for(let i=0;i<100;i++) {
-      await wait(100);
-      if(resetFrame.contentDocument?.querySelector('.board')&&resetFrame.contentWindow.__smokePreferences)return resetFrame.contentWindow.__smokePreferences();
-      const error=resetFrame.contentDocument?.querySelector('#error');if(error&&!error.hidden)throw Error(error.textContent);
-    }
-    throw Error('Reset review did not render');
+    const result=await waitWorkspace(resetFrame,previousWorkspace);
+    previousWorkspace=resetFrame.contentDocument;return result;
   };
   const defaults=await preferences();
-  for(const [key,value] of Object.entries({boardTheme:'maple',pieceStyle:'image',coach:'old_soviet',soundVolume:50,enginePath:'nnue'})) {
+  assertModern(defaults);await waitNote(resetFrame);
+  resetFrame.contentDocument.querySelector('.learning-announcement-dismiss').click();
+  for(const [key,value] of Object.entries({boardTheme:'maple',pieceStyle:'image',coach:'old_soviet',sound:false,soundVolume:0,moveAnim:false,animSpeed:3,enginePath:'nnue'})) {
     if(defaults.settings[key]!==value)throw Error('Reset default incorrect: '+key);
   }
-  if(defaults.layoutMode!=='auto')throw Error('Reset review retained custom layout');
   await wait(400); // Let startup's saved layout settle before the customization.
   await browserAPI.storage.local.set({settings:{...defaults.settings,boardTheme:'coral',soundVolume:23}});
-  await resetSettingsForRelease({reason:'update',previousVersion:'0.3.0'});
+  await resetSettingsForRelease({reason:'update',previousVersion:'0.4.0'});
   resetFrame.src='about:blank';await wait(100);
   await browserAPI.storage.local.set({'job:reset-smoke':resetJob});
   resetFrame.src='analysis.html#reset-smoke';
   const reopened=await preferences();
+  assertModern(reopened);await wait(300);
+  if(resetFrame.contentDocument.querySelector('.learning-announcement'))throw Error('Upgrade note repeated');
   if(reopened.settings.boardTheme!=='coral'||reopened.settings.soundVolume!==23)throw Error('Release reset repeated after customization');
   if(!(await browserAPI.storage.local.get('library')).library.find(game=>game.id===library[0].id)?.fav)throw Error('Favorite flag lost after reopening');
   // Exercise recovery when the install/update handler never completed: actual
   // review startup must reset before building its first UI, without an event.
   resetFrame.src='about:blank';await wait(100);
-  await browserAPI.storage.local.remove('settingsResetFor030');
+  await browserAPI.storage.local.remove('settingsResetFor040');
   await browserAPI.storage.local.set({'job:reset-smoke':resetJob});
   resetFrame.src='analysis.html#reset-smoke';
   const retried=await preferences();
-  if(retried.settings.boardTheme!=='maple'||retried.settings.soundVolume!==50)throw Error('Review startup failed to recover the reset');
+  assertModern(retried);
+  if(retried.settings.boardTheme!=='maple'||retried.settings.soundVolume!==23||retried.settings.moveAnim!==false)throw Error('Review startup failed to recover the migration');
   if(!(await browserAPI.storage.local.get('library')).library.find(game=>game.id===library[0].id)?.fav)throw Error('Favorite flag lost after startup recovery');
   resetFrame.remove();
-  await report({step:'one-time-release-reset',preservedUsername:true,preservedGamesAndFavorites:true,preservedAnalyses:true,defaultsRendered:true,customizationsRetained:true,backgroundAndPageCoordination:true,startupRecovery:true});
+  await report({step:'one-time-release-migration-040',preservedUsername:true,preservedGamesAndFavorites:true,preservedAnalyses:true,preservedPlayerHistory:true,preservedAudioAndMotion:true,modernPersisted:true,twoPanelLines:true,noteShownOnce:true,customizationsRetained:true,backgroundAndPageCoordination:true,startupRecovery:true});
   await report({done:true,ok:true,results,learning:${!reviewOnly}});
 } catch(e){await report({done:true,ok:false,error:e.message,stack:e.stack});}
 `);
@@ -248,7 +358,8 @@ try {
       const loaded=await call('Extensions.loadUnpacked',{path:sourceDir});
       console.log('Chrome extension loaded:',loaded.id);
     } else {
-      firefoxRunner=await cmd.run({sourceDir,artifactsDir:artifacts,firefox:process.env.FIREFOX_PATH || 'C:\\Program Files\\Mozilla Firefox\\firefox.exe',target:['firefox-desktop'],args:['-headless'],noReload:true,noInput:true,startUrl:['about:blank']});
+      const profile=await fs.mkdtemp(path.join(artifacts,'smoke-firefox-profile-'));
+      firefoxRunner=await cmd.run({sourceDir,artifactsDir:artifacts,firefox:process.env.FIREFOX_PATH || 'C:\\Program Files\\Mozilla Firefox\\firefox.exe',firefoxProfile:profile,keepProfileChanges:true,target:['firefox-desktop'],args:['-headless'],noReload:true,noInput:true,startUrl:['about:blank']});
     }
     for(let i=0;i<6000&&!reports.has(release.browser);i++)await sleep(100);
     if(!reports.get(release.browser)?.ok)throw Error(JSON.stringify(reports.get(release.browser)||{error:'Browser smoke timed out',browser:release.browser}));

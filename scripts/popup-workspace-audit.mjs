@@ -15,12 +15,67 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   assert.equal(await run(popup,'document.documentElement.scrollWidth<=document.documentElement.clientWidth'),true);
   await shot(popup,'popup-default');
   // Use real pointer events and inspect the in-flight liquid shape.
+  assert.equal(await run(popup,"getComputedStyle(document.querySelector('.fluid-indicator')).visibility"),'hidden');
+  const first=await run(popup,"(()=>{const r=document.querySelector('#analyzeCurrent').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()");
+  await call('Input.dispatchMouseEvent',{type:'mouseMoved',...first},popup.sessionId);
+  assert.equal(await run(popup,"document.querySelector('#analyzeCurrent').dataset.highlighted"),'true');
   const point=await run(popup,"(()=>{const r=document.querySelector('#openWorkspace').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()");
   await call('Input.dispatchMouseEvent',{type:'mouseMoved',...point},popup.sessionId);await sleep(50);
   assert.equal(await run(popup,"document.querySelector('#openWorkspace').dataset.highlighted"),'true');
   assert.equal(await run(popup,"document.querySelector('.fluid-indicator').getAnimations().some(a=>a.playState==='running')"),true);
   await sleep(300);await shot(popup,'popup-open-highlight');
+  await call('Input.dispatchMouseEvent',{type:'mouseMoved',...first},popup.sessionId);await sleep(50);
+  assert.equal(await run(popup,"document.querySelector('#analyzeCurrent').dataset.highlighted"),'true');
+  assert.equal(await run(popup,"document.querySelector('.fluid-indicator').getAnimations().some(a=>a.playState==='running')"),true);
+  await call('Input.dispatchMouseEvent',{type:'mouseMoved',x:2,y:2},popup.sessionId);
+  assert.equal(await run(popup,"getComputedStyle(document.querySelector('.fluid-indicator')).visibility"),'visible');
+  assert.equal(await run(popup,"document.querySelectorAll('[data-highlighted=true]').length"),0);
+  await waitFor(popup,"getComputedStyle(document.querySelector('.fluid-indicator')).visibility==='hidden'",'Initial popup exit');
+  assert.equal(await run(popup,"getComputedStyle(document.querySelector('.fluid-indicator')).visibility"),'hidden');
+  const bounds=await run(popup,"(()=>{const r=document.querySelector('#analyzeCurrent').getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom}})()");
+  for(const [edge,approach,dimension,coordinate,start] of [
+    ['left',{x:bounds.left-2,y:first.y},'width','left',bounds.left],
+    ['right',{x:bounds.right+2,y:first.y},'width','left',bounds.right],
+    ['top',{x:first.x,y:bounds.top-2},'height','top',bounds.top],
+    ['bottom',{x:first.x,y:bounds.bottom+2},'height','top',bounds.bottom],
+  ]){
+    await call('Input.dispatchMouseEvent',{type:'mouseMoved',...approach},popup.sessionId);
+    await call('Input.dispatchMouseEvent',{type:'mouseMoved',...first},popup.sessionId);
+    const shape=await run(popup,"(()=>{const el=document.querySelector('.fluid-indicator'),a=el.getAnimations()[0];a.pause();a.currentTime=150;const s=getComputedStyle(el),frames=a.effect.getKeyframes();return {opacity:+s.opacity,start:frames[0],end:frames.at(-1),origin:document.querySelector('.popup-actions').getBoundingClientRect().toJSON()}})()");
+    assert.equal(shape.start[dimension],'0px');assert.equal(+shape.start.opacity,0);assert.equal(+shape.end.opacity,1);
+    assert.ok(shape.opacity>0&&shape.opacity<1);
+    // Keyframe positions are relative to the action group's inner border.
+    assert.ok(Math.abs(parseFloat(shape.start[coordinate])+shape.origin[coordinate]+1-start)<1);
+    await shot(popup,'popup-enter-'+edge);
+    await run(popup,"document.querySelector('.fluid-indicator').getAnimations()[0].play()");
+    await waitFor(popup,"!document.querySelector('.fluid-indicator').getAnimations().length",'Popup entrance from '+edge);
+    await call('Input.dispatchMouseEvent',{type:'mouseMoved',x:2,y:2},popup.sessionId);
+    await waitFor(popup,"getComputedStyle(document.querySelector('.fluid-indicator')).visibility==='hidden'",'Popup exit after entrance from '+edge);
+  }
+  for(const [edge,exitPoint,dimension] of [
+    ['left',{x:bounds.left-2,y:first.y},'width'],['right',{x:bounds.right+2,y:first.y},'width'],
+    ['top',{x:first.x,y:bounds.top-2},'height'],['bottom',{x:first.x,y:bounds.bottom+2},'height'],
+  ]){
+    await call('Input.dispatchMouseEvent',{type:'mouseMoved',...first},popup.sessionId);
+    await waitFor(popup,"!document.querySelector('.fluid-indicator').getAnimations().length",'Popup entrance before exit to '+edge);
+    await call('Input.dispatchMouseEvent',{type:'mouseMoved',...exitPoint},popup.sessionId);
+    const shape=await run(popup,"(()=>{const el=document.querySelector('.fluid-indicator'),a=el.getAnimations()[0];a.pause();a.currentTime=150;const s=getComputedStyle(el);return {opacity:+s.opacity,visibility:s.visibility,end:a.effect.getKeyframes().at(-1)}})()");
+    assert.equal(shape.visibility,'visible');assert.ok(shape.opacity>0&&shape.opacity<1);assert.equal(shape.end[dimension],'0px');
+    await shot(popup,'popup-exit-'+edge);
+    // Re-enter halfway through: the exit must be replaced, including on the same button.
+    await call('Input.dispatchMouseEvent',{type:'mouseMoved',...first},popup.sessionId);
+    assert.equal(await run(popup,"document.querySelector('#analyzeCurrent').dataset.highlighted"),'true');
+    await sleep(300);
+    assert.equal(await run(popup,"getComputedStyle(document.querySelector('.fluid-indicator')).opacity"),'1');
+    await call('Input.dispatchMouseEvent',{type:'mouseMoved',x:2,y:2},popup.sessionId);
+    await waitFor(popup,"getComputedStyle(document.querySelector('.fluid-indicator')).visibility==='hidden'",'Popup exit after '+edge+' re-entry');
+    assert.equal(await run(popup,"getComputedStyle(document.querySelector('.fluid-indicator')).visibility"),'hidden');
+  }
   await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]},popup.sessionId);
+  await call('Input.dispatchMouseEvent',{type:'mouseMoved',...first},popup.sessionId);
+  assert.equal(await run(popup,"document.querySelector('.fluid-indicator').getAnimations().length"),0);
+  await call('Input.dispatchMouseEvent',{type:'mouseMoved',x:2,y:2},popup.sessionId);
+  assert.equal(await run(popup,"getComputedStyle(document.querySelector('.fluid-indicator')).visibility"),'hidden');
   await run(popup,"document.querySelector('#analyzeCurrent').focus()");
   assert.equal(await run(popup,"document.querySelector('.fluid-indicator').getAnimations().length"),0);
   await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9},popup.sessionId);
@@ -32,25 +87,36 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
 
   let previous=new Set((await targets()).map(t=>t.targetId));await run(popup,"document.querySelector('#openWorkspace').click()");
   const blank=await newTarget(previous,/analysis.html\?workspace=blank/);
-  await waitFor(blank,"!!document.querySelector('.workspace-home')",'Blank workspace');
-  assert.equal(await run(blank,"getComputedStyle(document.querySelector('#canvas')).display"),'none');
+  await waitFor(blank,"!!document.querySelector('.board')",'Blank review board');
+  assert.notEqual(await run(blank,"getComputedStyle(document.querySelector('#canvas')).display"),'none');
+  assert.equal(await run(blank,"document.querySelector('.workspace-home')"),null);
+  assert.equal(await run(blank,"document.querySelectorAll('.board .piece-img').length"),32);
+  assert.equal(await run(blank,"document.querySelectorAll('.ml-move').length"),0);
+  assert.equal(await run(blank,"import('./analysis.js').then(m=>m.S.positions[0].fen==='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')"),true);
   assert.equal(await run(blank,"import('./analysis.js').then(m=>m.S.blank&&!m.S.analyzing&&m.S.pgn===''&&m.S.evalEngines.length===0)"),true);
   assert.equal(await run(blank,"performance.getEntriesByType('resource').some(r=>['/data/book.json','/data/calibration.json','.wasm','.nnue'].some(part=>r.name.includes(part)))"),false);
-  for(const width of [1280,390,320]){await resize(blank,width,900);await shot(blank,'blank-'+width);assert.equal(await run(blank,'document.documentElement.scrollWidth<=innerWidth'),true);}
+  for(const width of [1280,390,320]){await resize(blank,width,900);await sleep(600);await shot(blank,'blank-'+width);assert.equal(await run(blank,'document.documentElement.scrollWidth<=innerWidth'),true,`Blank review overflows at ${width}px`);}
   await resize(blank,1280,900);
-  await run(blank,"document.querySelector('.workspace-home-action').click()");
+  await run(blank,"document.querySelector('#learningToggle').click()");
   await waitFor(blank,"!!document.querySelector('.learning-workspace .learn-theme-list')",'Learning without a game');
   assert.equal(await run(blank,"import('./analysis.js').then(m=>!m.S.analyzing&&m.S.blank)"),true);
   assert.equal(await run(blank,"document.querySelector('#learningToggle').textContent"),'Return to Game review');
   assert.equal(await run(blank,"document.querySelector('.learn-footer, [data-focus=review]')"),null);
+  assert.equal(await run(blank,"!!document.querySelector('.learning-embedded .learn-board-dock .learn-board')"),true);
+  assert.equal(await run(blank,"document.querySelectorAll('.learn-board .piece-img').length"),32);
   await shot(blank,'blank-learning');
   await run(blank,"document.querySelector('#learningToggle').click()");
   await waitFor(blank,"!document.querySelector('.learning-workspace')",'Return to blank workspace');
-  assert.equal(await run(blank,"document.activeElement===document.querySelector('.workspace-home-action')"),true);
+  assert.equal(await run(blank,"document.activeElement===document.querySelector('#learningToggle')"),true);
+  assert.equal(await run(blank,"document.querySelectorAll('.board .piece-img').length"),32);
   assert.equal(await run(review,"import('./browser-compat.js').then(async({browserAPI:api})=>JSON.stringify(await api.storage.local.get(['username','learning:v1','library']))===JSON.stringify(blankBaseline))"),true);
+  await run(blank,"document.querySelector('.learn-entry-button').click()");
+  await waitFor(blank,"!!document.querySelector('.learning-embedded .learn-board-dock .learn-board')",'Solve puzzles with the normal board');
+  await run(blank,"document.querySelector('#learningToggle').click()");
+  await waitFor(blank,"!document.querySelector('.learning-workspace')",'Return from Solve puzzles');
   console.log('Blank startup, zero engine/data work, narrow layouts and learning round-trip passed.');
 
-  await run(blank,"document.querySelectorAll('.workspace-home-action')[1].click();document.querySelector('.lc-open').click()");
+  await run(blank,"document.querySelector('.lib-tab').click();document.querySelector('.lc-open').click()");
   await waitFor(blank,"import('./analysis.js').then(m=>!m.S.blank&&!m.S.analyzing&&m.S.pgn==='1. d4 d5')",'Saved game from blank');
   assert.notEqual(await run(blank,"getComputedStyle(document.querySelector('#canvas')).display"),'none');
   const beforeReload=await run(blank,'performance.timeOrigin');
@@ -59,7 +125,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await waitFor(blank,"!!document.querySelector('.board')&&import('./analysis.js').then(m=>!m.S.blank&&!m.S.analyzing&&m.S.pgn==='1. d4 d5')",'Reload saved game');
   const secondPopup=await tab(base+'/popup.html');await waitFor(secondPopup,"!!document.querySelector('#status')?.textContent",'Second popup');
   previous=new Set((await targets()).map(t=>t.targetId));await run(secondPopup,"document.querySelector('#openWorkspace').click()");
-  const secondBlank=await newTarget(previous,/analysis.html\?workspace=blank/);await waitFor(secondBlank,"!!document.querySelector('.workspace-home')",'Independent blank tab');
+  const secondBlank=await newTarget(previous,/analysis.html\?workspace=blank/);await waitFor(secondBlank,"!!document.querySelector('.board')",'Independent blank tab');
   assert.equal(await run(secondBlank,"import('./analysis.js').then(m=>m.S.blank&&m.S.pgn==='')"),true);
   console.log('Saved-game review, reload recovery and independent blank tabs passed.');
 
@@ -67,12 +133,13 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   previous=new Set((await targets()).map(t=>t.targetId));
   await run(paste,"document.querySelector('#manual').open=true;document.querySelector('#manualInput').value='1. e4 e5 2. Nf3 Nc6';document.querySelector('#analyzeManual').click()");
   const pasted=await newTarget(previous,/analysis.html#/);await waitFor(pasted,"!!document.querySelector('.board')&&import('./analysis.js').then(m=>!m.S.analyzing&&m.S.total===4)",'Pasted game');
-  const preview=await tab(base+'/popup.html?screen-preview=popup');await waitFor(preview,"document.body.dataset.previewReady==='true'",'Popup preview');
+  const preview=await tab(base+'/popup.html?screen-preview=popup');await waitFor(preview,"document.body?.dataset.previewReady==='true'",'Popup preview');
   previous=new Set((await targets()).map(t=>t.targetId));await run(preview,"document.querySelector('#openWorkspace').click()");await sleep(100);
   assert.equal((await targets()).filter(target=>target.type==='page').every(target=>previous.has(target.targetId)),true);assert.match(await run(preview,"document.querySelector('#status').textContent"),/Preview actions are disabled/);
   const homePreview=await tab(base+'/analysis.html?screen-preview=workspace-blank');
   await waitFor(homePreview,"document.body?.dataset.previewReady==='true'",'Blank screen preview');
   assert.equal(await run(homePreview,"document.querySelector('[aria-label=\"Screen preview\"]').value"),'workspace-blank');
-  assert.equal(await run(homePreview,"getComputedStyle(document.querySelector('#canvas')).display"),'none');
+  assert.notEqual(await run(homePreview,"getComputedStyle(document.querySelector('#canvas')).display"),'none');
+  assert.equal(await run(homePreview,"document.querySelectorAll('.board .piece-img').length"),32);
   console.log('Pasted-game import, preview launch guard and blank screen preview passed. Screenshots: '+out);
 }

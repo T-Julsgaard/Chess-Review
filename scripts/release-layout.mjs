@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
+import {files} from './package-inputs.mjs';
 
 // Audit a disposable copy of the latest Chrome package. Test exports, profiles,
 // screenshots and fixture games never enter either store ZIP or the user's profile.
@@ -11,6 +12,7 @@ const record=JSON.parse(await fs.readFile(recordPath));
 const out=await fs.mkdtemp(path.join(path.dirname(recordPath),'layout-'));
 const source=await fs.mkdtemp(path.join(artifacts,'layout-chrome-'));
 await fs.cp(record.packages.find(p=>p.browser==='chrome').sourceDir,source,{recursive:true});
+if(process.argv.includes('--working-tree')){for(const file of files)await fs.copyFile(path.join(root,file),path.join(source,file));await fs.cp(path.join(root,'lib'),path.join(source,'lib'),{recursive:true});}
 await fs.appendFile(path.join(source,'analysis.js'),'\nexport {S, resetLayout, toggleReorganize, updateLibrary, go, applyGame, renderEngine, renderEngineCurrent, renderStats};\n');
 await fs.writeFile(path.join(source,'audit.html'),'<!doctype html><script type="module" src="audit.js"></script>');
 await fs.writeFile(path.join(source,'audit.js'),"import {browserAPI} from './browser-compat.js'; window.api=browserAPI;");
@@ -31,7 +33,7 @@ try {
   await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('CDP connection timed out')),10000);ws.onopen=()=>{clearTimeout(timer);resolve();};ws.onerror=()=>{clearTimeout(timer);reject(Error('CDP connection failed'));};});
   let seq=0;const pending=new Map();
   ws.onmessage=e=>{const m=JSON.parse(e.data);if(pending.has(m.id)){const {resolve,reject,timer}=pending.get(m.id);pending.delete(m.id);clearTimeout(timer);m.error?reject(Error(JSON.stringify(m.error))):resolve(m.result);}};
-  const call=(method,params={},sessionId)=>new Promise((resolve,reject)=>{const id=++seq;const timer=setTimeout(()=>{pending.delete(id);reject(Error(method+' timed out'));},20000);pending.set(id,{resolve,reject,timer});ws.send(JSON.stringify({id,method,params,sessionId}));});
+  const call=(method,params={},sessionId)=>new Promise((resolve,reject)=>{const id=++seq;const timer=setTimeout(()=>{pending.delete(id);reject(Error(method+' timed out'));},method==='Extensions.loadUnpacked'?60000:20000);pending.set(id,{resolve,reject,timer});ws.send(JSON.stringify({id,method,params,sessionId}));});
   const loaded=await call('Extensions.loadUnpacked',{path:source});
   const create=async(url)=>{const {targetId}=await call('Target.createTarget',{url});const {sessionId}=await call('Target.attachToTarget',{targetId,flatten:true});return {targetId,sessionId};};
   const evaluate=async(t,expression)=>{const r=await call('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true},t.sessionId);if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;};
@@ -78,14 +80,14 @@ try {
   const fresh=await evaluate(review,"import('./analysis.js').then(m=>({engine:m.S.activeEngineBuild,error:m.S.analysisError,settings:m.S.settings}))");
   assert.equal(fresh.engine,'nnue');assert.equal(fresh.error,null);
   assert.equal(fresh.settings.enginePath,'nnue');
-  const measure=`(async()=>{const m=await import('./analysis.js');const rect=n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom}};return {width:innerWidth,height:innerHeight,zoom:await chrome.tabs.getZoom(),mode:m.S.layoutMode,desktop:document.querySelector('.stage').classList.contains('desktop-layout'),board:rect(document.querySelector('.board')),scroll:{w:document.documentElement.scrollWidth,h:document.documentElement.scrollHeight},modules:[...document.querySelectorAll('.mod')].map(n=>({key:n.dataset.mod,...rect(n)})),error:document.querySelector('#error').textContent}})()`;
+  const measure=`(async()=>{const m=await import('./analysis.js');const rect=n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom}};return {width:innerWidth,height:innerHeight,zoom:await chrome.tabs.getZoom(),mode:m.S.layoutMode,canvas:document.querySelector('.stage').classList.contains('canvas'),desktop:document.querySelector('.stage').classList.contains('desktop-layout'),board:rect(document.querySelector('.board')),scroll:{w:document.documentElement.scrollWidth,h:document.documentElement.scrollHeight},modules:[...document.querySelectorAll('.mod')].map(n=>({key:n.dataset.mod,...rect(n)})),error:document.querySelector('#error').textContent}})()`;
   const results=[];
   const capture=async(label)=>{
     const data=await evaluate(review,measure);
-    assert.equal(data.error,'');
-    assert.ok(Math.abs(data.board.w-data.board.h)<1,`${label}: board is not square`);
+    assert.equal(data.error,'');assert.equal(data.zoom,1,label+': browser zoom must remain 100%');
+    assert.ok(Math.abs(data.board.w-data.board.h)<1,`${label}: board is not square: ${JSON.stringify(data)}`);
     assert.ok(data.scroll.w<=data.width+1,`${label}: horizontal overflow`);
-    if(data.desktop||data.mode==='custom')assert.ok(data.scroll.h<=data.height+1,`${label}: vertical overflow`);
+    if(data.width>=1100&&data.height>=600||data.canvas)assert.ok(data.scroll.h<=data.height+1,`${label}: vertical overflow`);
     results.push({label,...data});
     const screenshot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
     await fs.writeFile(path.join(out,label+'.png'),Buffer.from(screenshot.data,'base64'));

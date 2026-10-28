@@ -7,7 +7,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const resize=async width=>{await call('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(150);};
   const screenshot=async name=>{const shot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);await fs.writeFile(path.join(out,name+'.png'),Buffer.from(shot.data,'base64'));};
   const checkTopbar=async()=>{
-    const bounds=await run("(()=>{const b=document.querySelector('#learningToggle'),r=b.getBoundingClientRect(),bar=document.querySelector('.topbar').getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,barBottom:bar.bottom,width:innerWidth,hit:document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)===b,overflow:b.scrollWidth>b.clientWidth+1,barScroll:document.querySelector('.topbar').scrollWidth};})()");
+    const bounds=await run("(()=>{const b=document.querySelector('#learningToggle'),r=b.getBoundingClientRect(),bar=document.querySelector('.topbar').getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,barBottom:bar.bottom,width:innerWidth,hit:document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('button')===b,overflow:b.scrollWidth>b.clientWidth+1,barScroll:document.querySelector('.topbar').scrollWidth};})()");
     assert.ok(bounds.left>=0&&bounds.right<=bounds.width&&bounds.top>=0&&bounds.bottom<=bounds.barBottom,JSON.stringify(bounds));
     assert.ok(bounds.hit,'Navigation button must be clickable');assert.equal(bounds.overflow,false);
     assert.ok(bounds.barScroll<=bounds.width+1,'Top bar must fit the viewport: '+JSON.stringify(bounds));
@@ -41,7 +41,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace)",'Return from Solve Puzzles');
 
   await call('Page.navigate',{url:await run("location.origin+'/analysis.html?workspace=blank'")},review.sessionId);
-  await waitFor(review,"!!document.querySelector('.workspace-home')",'Blank workspace');
+  await waitFor(review,"!!document.querySelector('.board')&&import('./analysis.js').then(m=>m.S.blank)",'Blank workspace');
   await run("document.querySelector('#learningToggle').click()");
   await waitFor(review,"!!document.querySelector('.learn-theme-list')",'Learning without a game');
   for(const width of [1280,390,320]){await resize(width);await checkTopbar();}
@@ -52,6 +52,6 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13,text:'\r',unmodifiedText:'\r'},review.sessionId);
   await call('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13},review.sessionId);
   await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace)",'Keyboard return to blank workspace');
-  assert.equal(await run("document.querySelector('.workspace-home').inert"),false);
+  assert.equal(await run("document.querySelector('.stage').inert"),false);
   console.log('Learning navigation, both entries, full-height scroll area, game restoration, blank workspace and 320–1920px top bars passed. Screenshots: '+out);
 }

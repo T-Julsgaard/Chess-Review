@@ -9,7 +9,7 @@ whether a problem still occurs.
 ## Development dependency alerts
 
 All three packages below are transitive development dependencies of `web-ext`
-and are excluded from the browser store ZIPs. Checked on 2026-10-08:
+and are excluded from the browser store ZIPs. Checked on 2026-10-27:
 
 - Dependabot #10, [shell-quote command injection](https://github.com/advisories/GHSA-pqg4-j6r4-53mv):
   upgraded from 1.10.0 to 1.12.0 (fixed in 1.11.0). An npm override is needed
@@ -17,33 +17,44 @@ and are excluded from the browser store ZIPs. Checked on 2026-10-08:
   accepts a fixed version.
 - Dependabot #9, [source-map-js denial of service](https://github.com/advisories/GHSA-68fv-2mgg-jv7q):
   upgraded from 1.2.1 to the patched 1.2.2 within `css-tree`'s existing range.
-- Dependabot #8, `node-forge`: the temporary backport below remains necessary.
+- Dependabot #8, [node-forge RSA signature verification](https://github.com/advisories/GHSA-86w9-cpqp-85rv):
+  upgraded from 1.4.0 with a local backport to the official 1.4.2 release within
+  `@devicefarmer/adbkit`'s existing dependency range. The temporary override,
+  installation hook, and patch script have been removed.
 
 `tests/dependency-security.test.mjs` checks rejection of the shell-quote attack
 inputs and excessive indexed source-map offsets, alongside valid input behavior.
-After the updates, `npm audit` reports no critical vulnerabilities and only the
-known node-forge advisory (also counted against `adbkit` and `web-ext`).
 
-### node-forge backport
+### node-forge signature verification
 
-`web-ext` brings in `node-forge@1.4.0` through its Android debugging dependency,
+`web-ext` brings in `node-forge` through its Android debugging dependency,
 `@devicefarmer/adbkit`. This dependency is excluded from both browser store ZIPs.
-For [CVE-2026-85393](https://github.com/advisories/GHSA-86w9-cpqp-85rv), no official
-fixed npm release was available when checked on 2026-10-08.
+The [official security fixes](https://github.com/digitalbazaar/forge/blob/v1.4.2/CHANGELOG.md)
+released on 2026-10-27 validate canonical DigestInfo encodings, covering cases
+that the former nested-element-count backport did not reject. Version 1.4.2 also
+preserves PEM decoding of Buffer input after the 1.4.1 security changes.
 
-`npm ci` and `npm install` apply `scripts/patch-node-forge.mjs` automatically.
-The temporary backport adds the nested DigestAlgorithm element-count check
-proposed in [the upstream fix](https://github.com/digitalbazaar/forge/pull/1152).
-It verifies the entire RSA source file before patching and fails on unexpected
-source or versions. Regression tests reject nested extra elements while accepting
-valid RSA signatures, including AlgorithmIdentifiers with or without NULL.
+Regression tests reject nested extra elements, nonempty NULL parameters, and
+non-minimal DER lengths while accepting valid RSA signatures, including
+AlgorithmIdentifiers with or without NULL. The disposable test key uses a
+2048-bit modulus and exponent 3 to exercise the affected verification path.
 
-If installing with `--ignore-scripts`, run `npm run patch:dependencies` before
-using development tools, then run `npm test`. The security tests fail against an
-unpatched installation. Keep the Dependabot alert open to track the official fix:
-the lockfile honestly retains version 1.4.0, so version-based scanners still report
-it despite the local backport. Once a fixed release is available, update the
-dependency and remove the override and installation patch together.
+### Video-production dependencies
+
+Dependabot #11 affects `zod` in the separate `marketing/video` project, which is
+excluded from the browser store ZIPs. An npm override upgrades its declared
+transitive dependency from 4.5.4 to 4.6.7; the
+[oversized-collection validation advisory](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5)
+is fixed in 4.6.6. Remotion 4.0.532 pins the older version, so retain the override
+until its dependency declarations accept a fixed release. Dependabot monitors
+both npm projects on the same weekly schedule.
+
+The override does not rewrite dependencies embedded in published bundles.
+`@remotion/studio-protocol@4.0.532` also embeds Zod 4.5.4 in its compiled output;
+this copy still requires an upstream rebuild (the current 4.0.539 release also
+declares 4.5.4). Its Studio HTTP protocol handlers enforce request-body size
+limits before parsing. A clean npm audit covers the declared dependency tree,
+not this embedded copy.
 
 ## Report a vulnerability privately
 

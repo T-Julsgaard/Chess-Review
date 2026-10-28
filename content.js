@@ -19,18 +19,16 @@ function parseGameId(path) {
   return m ? { type: (m[1] || "live").toLowerCase(), id: m[2] } : null;
 }
 
-// chess.com's review/analysis URL adds ?flip=true when the board is shown from BLACK's side — i.e.
-// when YOU played Black and it sat at the bottom. That's the most reliable read of the user's own
-// perspective, so we surface it to the analysis page. Tri-state: true (flip) / false (explicit
-// white) / null (no hint — defer to the username match, which defaults to White at the bottom).
-// Accepts a few spellings so a slightly different link (flip=1, flip=yes…) still works.
+// Read explicit URL hints first, then the live board's orientation (also present on
+// game links with ?username= but no ?flip=). Null means the board isn't available yet.
 function detectFlip() {
   try {
     const v = (new URL(location.href).searchParams.get("flip") || "").trim().toLowerCase();
     if (/^(true|1|yes|on)$/.test(v)) return true;
     if (/^(false|0|no|off)$/.test(v)) return false;
   } catch {}
-  return null;
+  const board = document.querySelector("wc-chess-board, chess-board");
+  return board ? board.classList.contains("flipped") : null;
 }
 
 // Best-effort: try to collect SAN moves from the DOM move list if the API
@@ -193,7 +191,7 @@ window.addEventListener("hashchange", handleShareFragment);
 setTimeout(handleShareFragment, 1200);
 
 // ---- Inject "Analyze with Chess Review" buttons ----
-// Two spots on chess.com use the same button: (1) the game-over modal, and (2) the play-page
+// Two spots on chess.com use the same button: (1) the game-over modal, and (2) the game-page
 // sidebar, each right beneath chess.com's "Game Review" CTA. They share an extension-owned builder;
 // only spacing and the insertion point differ. chess.com renders both with Vue (note the
 // <!----> v-if anchors) and re-renders them while the tally/coach-speech animate, so a MutationObserver
@@ -215,9 +213,13 @@ const CC = {
   modalSecondaryRow: [".game-over-secondary-actions-row-component", "[class*='secondary-actions-row']"],
   modalPrimaryCta: ['a[href*="review"]', '[class*="game-over-primary-cta"]', 'a.cc-button-component', 'button.cc-button-component'],
   modalContext: [".game-over-modal-component", "[class*='game-over-modal']"], // "is a game-over modal on screen?"
-  // Play-page sidebar.
-  sidebarEmphasis: [".game-review-emphasis-content", "[class*='game-review-emphasis']"],
+  // Own games wrap the actions in an emphasis section; profile/archive games place
+  // them directly in .sidebar-content. Keep the latter scoped to the sidebar.
+  sidebarSections: [".game-review-emphasis-content", "[class*='game-review-emphasis']", ".sidebar-content .game-review-buttons-component", ".sidebar-content [class*='game-review-buttons']"],
   sidebarReviewButtons: [".game-review-buttons-component", "[class*='game-review-buttons']"],
+  // Post-game coach actions have a 20dvh animated height limit. Keep our slot
+  // outside that whole panel, and outside the emphasis panel's overflow clip.
+  sidebarPanels: [".coach-nudge-game-review-component", ".game-review-emphasis-component"],
   // The Game Review CTA inside the sidebar buttons container. href first: durable + locale-proof.
   sidebarCta: ['a[href*="tab=review"]', 'a[aria-label="Game Review"]', "a.cc-button-component", "button.cc-button-component"],
 };
@@ -323,27 +325,49 @@ function injectModalReviewButton(buttonsContainer) {
   console.log("[Chess Analyzer] injected review button (modal)");
 }
 
-// (2) Play-page sidebar: beneath chess.com's "Game Review" CTA, inside its existing container.
-// Our own stylesheet fills the container width. The moves list above is the sidebar's flex-growing
-// scroll area and the sidebar is height-locked to the board, so adding this button automatically
-// shortens the moves list rather than making the sidebar taller — exactly the trade-off we want.
-function injectSidebarReviewButton(emphasisContent) {
-  const reviewBtns = firstEl(emphasisContent, CC.sidebarReviewButtons);
+// (2) Game-page sidebar. Keep Chess.com's action row intact: its layout and Vue
+// updates expect only native actions there. A separate, non-shrinking sibling
+// outside the native panel avoids its animated max-height and overflow clipping.
+const sidebarReviews = new Map();
+function injectSidebarReviewButton(section) {
+  const reviewBtns = section.matches(CC.sidebarReviewButtons.join(",")) ? section : firstEl(section, CC.sidebarReviewButtons);
   if (!reviewBtns) return;
-  // Wait until chess.com has actually rendered its own Game Review CTA. Injecting into the section
-  // while Vue is still building it corrupts Vue's child diffing and stalls the whole section — it
-  // then only appears after a click forces a fresh render. The CTA's presence means it's ready.
   const cta = firstEl(reviewBtns, CC.sidebarCta);
   if (!cta) return;
-  if (reviewBtns.querySelector(".chess-analyzer-free-review")) return;
-  const btn = buildReviewButton("sidebar");
-  cta.insertAdjacentElement("afterend", btn);
-  console.log("[Chess Analyzer] injected review button (sidebar)");
+  let entry = sidebarReviews.get(reviewBtns);
+  if (!entry) {
+    const host = document.createElement("div");
+    host.className = "chess-analyzer-review-slot";
+    const btn = buildReviewButton("sidebar", 6, 8);
+    host.append(btn);
+    entry = { host, btn };
+    sidebarReviews.set(reviewBtns, entry);
+  }
+  const { host, btn } = entry;
+  // Reuse the same control if Vue replaces the CTA or drops our sibling. In
+  // particular, do not reset an in-flight review when the coach/tally animates.
+  const anchor = reviewBtns.closest(CC.sidebarPanels.join(",")) || reviewBtns;
+  if (anchor.nextElementSibling !== host) anchor.after(host);
+  if (btn.parentElement !== host) host.append(btn);
+  if (cta.offsetWidth > 0) {
+    const width = `${cta.offsetWidth}px`;
+    if (btn.style.getPropertyValue("--chess-review-sidebar-width") !== width) {
+      btn.style.setProperty("--chess-review-sidebar-width", width);
+    }
+  }
+  let hidden = false;
+  for (let node = cta; node; node = node.parentElement) {
+    const style = getComputedStyle(node);
+    if (node.hidden || style.display === "none" || style.visibility === "hidden"
+      || style.maxHeight === "0px" && [style.overflowY, style.overflow].some(value => value === "hidden" || value === "clip")) { hidden = true; break; }
+  }
+  if (host.hidden !== hidden) host.hidden = hidden;
+  return reviewBtns;
 }
 
 (function watchForReviewSpots() {
   let modalTimer = null, sidebarTimer = null;
-  let modalRoot = null, sidebarRoot = null, scheduled = false;
+  let modalRoot = null, sidebarRoots = [], scheduled = false;
   const tryInject = () => {
     // (1) Modal.
     const modal = firstEl(document, CC.modalContainer);
@@ -361,22 +385,30 @@ function injectSidebarReviewButton(emphasisContent) {
     }
     // (2) Sidebar. The review section only renders post-game, so if it's present but our button still
     // isn't there a few seconds later, an inner selector (review-buttons / CTA) likely changed.
-    const emphasis = firstEl(document, CC.sidebarEmphasis);
-    sidebarRoot = emphasis;
-    if (emphasis) {
-      injectSidebarReviewButton(emphasis);
-      if (!emphasis.querySelector(".chess-analyzer-free-review") && !sidebarTimer) {
+    sidebarRoots = [...document.querySelectorAll(CC.sidebarSections.join(","))];
+    const activeRows = new Set();
+    for (const section of sidebarRoots) {
+      const row = injectSidebarReviewButton(section);
+      if (row) activeRows.add(row);
+      if (!row && !sidebarTimer) {
         sidebarTimer = setTimeout(() => {
           sidebarTimer = null;
-          const emph = firstEl(document, CC.sidebarEmphasis);
-          if (emph && !emph.querySelector(".chess-analyzer-free-review")) {
+          const current = firstEl(document, CC.sidebarSections);
+          const row = current?.matches(CC.sidebarReviewButtons.join(",")) ? current : current && firstEl(current, CC.sidebarReviewButtons);
+          if (current && !sidebarReviews.has(row)) {
             warnMarkupChanged("sidebar", "the game-review sidebar was detected");
           }
         }, 6000);
       }
     }
+    for (const [row, { host }] of sidebarReviews) {
+      if (!activeRows.has(row)) {
+        host.remove();
+        sidebarReviews.delete(row);
+      }
+    }
   };
-  const relevantSelector = [...CC.modalContainer, ...CC.modalContext, ...CC.sidebarEmphasis].join(",");
+  const relevantSelector = [...CC.modalContainer, ...CC.modalContext, ...CC.sidebarSections].join(",");
   const schedule = () => {
     if (scheduled) return;
     scheduled = true;
@@ -386,15 +418,18 @@ function injectSidebarReviewButton(emphasisContent) {
     else requestAnimationFrame(run);
   };
   const observer = new MutationObserver(records => {
-    if (modalRoot && !modalRoot.isConnected || sidebarRoot && !sidebarRoot.isConnected) { schedule(); return; }
+    if (modalRoot && !modalRoot.isConnected || sidebarRoots.some(root => !root.isConnected)) { schedule(); return; }
     for (const record of records) {
-      if (record.target.closest?.(".chess-analyzer-free-review")) continue;
-      if (modalRoot?.contains(record.target) || sidebarRoot?.contains(record.target)
+      if (record.target.matches?.(".chess-analyzer-review-slot") && record.removedNodes.length) { schedule(); return; }
+      if (record.target.closest?.(".chess-analyzer-free-review, .chess-analyzer-review-slot")) continue;
+      if (modalRoot?.contains(record.target) || sidebarRoots.some(root => root.contains(record.target)
+          || record.type === "attributes" && record.target.contains(root))
+        || [...record.removedNodes].some(node => node.nodeType === 1 && node.matches(".chess-analyzer-review-slot"))
         || [...record.addedNodes].some(node => node.nodeType === 1
           && (node.matches(relevantSelector) || node.querySelector(relevantSelector)))) { schedule(); return; }
     }
   });
-  observer.observe(document.body, { childList: true, subtree: true });
+  observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "style", "hidden"] });
   window.addEventListener("resize", tryInject);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) tryInject(); });
   tryInject();
@@ -411,7 +446,7 @@ browserAPI.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       username: detectUsername(), // POV/bottom player (or null) — kept for back-compat
       usernames: detectUsernames(), // every readable player, best → worst archive to search
       countries: detectCountries(), // { usernameLower: countryId } scraped from the player flags
-      flip: detectFlip(),         // user's board perspective from ?flip= (true=Black at bottom)
+      flip: detectFlip(),         // explicit URL hint or displayed board (true=Black at bottom)
       moveListText: parsed ? null : null, // only filled on explicit fallback below
     });
     return true;

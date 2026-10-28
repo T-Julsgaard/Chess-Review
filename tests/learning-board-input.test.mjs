@@ -9,6 +9,7 @@ async function setup(t) {
   const original=globalThis.fetch;globalThis.fetch=async()=>({ok:true,json:async()=>({schema:1,puzzles:[{}]})});
   t.after(()=>{globalThis.fetch=original;});
   await a.call('openLearning');const w=a.run('learningWorkspace'),doc=a.dom.window.document;
+  t.mock.method(w,'showPuzzleRunStart',async()=>true); // Exercise input after the ready countdown.
   const puzzle={id:'board-input',fen:new Chess().fen(),solution:['e2e4','e7e5','g1f3','b8c6','f1c4'],rating:1200,themes:[]};
   w.puzzles=[puzzle];await w.startPuzzleSelection([puzzle]);
   const board=doc.querySelector('.board');board.getBoundingClientRect=()=>({left:0,top:0,width:800,height:800});
@@ -32,7 +33,8 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} results retain the emb
   const expected=position();await w.submitPuzzle('g1h3');
   assert.equal(w.run,null);assert.equal(w.currentFen(),fen);assert.equal(w.flipped,flipped);
   assert.equal(doc.querySelector('.board'),board);assert.deepEqual(position(),expected);
-  assert.equal(board.querySelector('.puzzle-run-end-reason').textContent,'Out of lives');
+  assert.equal(board.querySelector('.puzzle-run-end-title').textContent,'Puzzles solved');
+  assert.equal(board.querySelector('.puzzle-run-end-reason'),null);
   assert.ok(board.querySelector('[data-square=g1] .puzzle-result-badge[data-result=incorrect]'));
   assert.ok(board.querySelector('[data-square=g1].puzzle-wrong'));
   assert.ok(board.querySelector('[data-square=h3].puzzle-wrong'));
@@ -40,7 +42,7 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} results retain the emb
   assert.equal(doc.querySelector('.drag-piece'),null);assert.equal(w.selected,null);assert.equal(w.currentFen(),fen);
   assert.ok(board.querySelector('.puzzle-result-badge[data-result=incorrect]'));
   w.render();assert.deepEqual(position(),expected);assert.ok(board.querySelector('.puzzle-result-badge'));
-  assert.equal(board.querySelector('.puzzle-run-end'),null);
+  assert.ok(board.querySelector('.puzzle-run-end'),'Results redraws keep the final screen visible');
   assert.equal(a.state.analysisMode,false);
 });
 
@@ -171,6 +173,7 @@ test('learning promotion requires an explicit choice and Escape cancels without 
   down('a7');up('a7');down('a8');up('a8');
   assert.equal(doc.querySelectorAll('.learn-promotion .promotion-options button').length,4);
   assert.equal(doc.querySelector('.learn-promotion').parentNode,board);
+  assert.equal(doc.querySelector('.promotion-picker').dataset.color,'w');
   assert.equal(doc.querySelector('.learn-promotion h3'),null);
   assert.deepEqual([...doc.querySelectorAll('.promotion-options img')].map(n=>n.dataset.piece),['wQ','wR','wB','wN']);
   assert.ok([...doc.querySelectorAll('.promotion-options button')].every(n=>n.textContent===''));
@@ -221,6 +224,23 @@ test('puzzle promotion uses the graphical picker and submits the selected underp
   assert.equal(w.activity.step,0);assert.deepEqual([...doc.querySelectorAll('.promotion-options img')].map(n=>n.dataset.piece),['wQ','wR','wB','wN']);
   doc.querySelector('[aria-label="Promote to rook"]').click();await settle();
   assert.equal(w.feedback.status,'completed');assert.equal(board.querySelector('[data-square=a8] img').dataset.piece,'wR');
+});
+
+for(const mode of ['free','puzzle'])for(const flipped of [false,true])test(`Black ${mode} promotion identifies its color when flipped=${flipped}`,async t=>{
+  const {w,doc,board}=await setup(t);
+  const fen='7k/8/8/8/8/8/p7/7K b - - 0 1';
+  await w.navigate('puzzles');
+  if(mode==='puzzle') {
+    w.puzzles=[{id:'black-promotion',fen,solution:['a2a1n'],rating:1200,themes:[]}];
+    await w.startPuzzleSelection(w.puzzles);
+  } else w.homePosition.load(fen);
+  w.render();if(w.flipped!==flipped)w.flipBoard();
+  board.querySelector('[data-square=a2]').click();board.querySelector('[data-square=a1]').click();
+  assert.equal(doc.querySelector('.promotion-picker').dataset.color,'b');
+  assert.equal(doc.querySelector('.learn-promotion').dataset.edge,flipped?'top':'bottom');
+  assert.deepEqual([...doc.querySelectorAll('.promotion-options img')].map(n=>n.dataset.piece),['bQ','bR','bB','bN']);
+  doc.querySelector('[aria-label="Promote to knight"]').click();await settle();
+  assert.equal(board.querySelector('[data-square=a1] img').dataset.piece,'bN');
 });
 
 test('a solver piece captured by the opponent cancels its pickup cleanly',async t=>{

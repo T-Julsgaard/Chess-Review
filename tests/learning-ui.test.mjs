@@ -42,7 +42,7 @@ test('puzzle statistics show saved patterns, preserve settings and resume, and r
   assert.equal(w.root.querySelector('.learn-stat-untried'),null);
   assert.equal(w.root.querySelectorAll('.learn-stat-track').length,Object.keys(THEME_NAMES).length);
   assert.ok([...w.root.querySelectorAll('.learn-stat-track > span')].every(n=>n.style.width==='0%'));
-  assert.equal(button().textContent,'Back to puzzle overview');
+  assert.equal(button().textContent,'Return to puzzle overview');
   assert.equal(w.root.querySelector('[data-focus="review"]').textContent,'← Back to review');
   assert.equal(doc.activeElement.id,'learn-statistics-title');
   assert.equal(w.root.querySelector('.learn-nav [aria-current]').textContent,'Puzzles');
@@ -95,6 +95,22 @@ test('the navigation indicator stays still within Puzzles and animates between d
   await w.navigate('openings');assert.equal(animations,1);
   await w.navigate('puzzles');assert.equal(animations,2);
   w.showPuzzleStatistics(true);w.showPuzzleStatistics(false);assert.equal(animations,2);
+});
+
+for(const scale of [.92,4/3,2])test(`navigation starts from its painted tab at ${scale} content scale`,async t=>{
+  const {w}=await workspace(t);
+  for(const [index,button]of [...w.nav.querySelectorAll('button')].entries()){
+    for(const [key,value]of Object.entries({offsetLeft:index*100,offsetTop:6,offsetWidth:90,offsetHeight:40}))Object.defineProperty(button,key,{value});
+  }
+  Object.defineProperties(w.nav,{offsetWidth:{value:300},offsetHeight:{value:52}});
+  w.nav.getBoundingClientRect=()=>({left:200,top:100,width:300*scale,height:52*scale});
+  w.navIndicator.getBoundingClientRect=()=>({left:200+(parseFloat(w.navIndicator.style.left)||0)*scale,top:100+6*scale,width:90*scale,height:40*scale});
+  let frames;w.navIndicator.animate=value=>{frames=value;return {cancel(){}};};
+  w.syncNavigation();await w.navigate('openings');
+  assert.ok(Math.abs(parseFloat(frames[0].left))<1e-8);
+  assert.ok(Math.abs(parseFloat(frames[0].top)-6)<1e-8);
+  assert.ok(Math.abs(parseFloat(frames[0].width)-90)<1e-8);
+  assert.ok(Math.abs(parseFloat(frames.at(-1).left)-100)<1e-8);
 });
 
 test('Escape closes Settings before leaving puzzle statistics on the embedded learning board',async t=>{
@@ -272,6 +288,7 @@ test('puzzles hide solution information, persist intermediate steps and distingu
   await w.submitPuzzle(p.solution[0]);assert.equal(w.activity.step,2);assert.equal(data['learning:v1'].resume.step,2);
   const resume=structuredClone(data['learning:v1'].resume);await w.navigate('home');await w.resume(resume);assert.equal(w.activity.step,0);assert.equal(w.currentFen(),p.fen);
   while(!w.attemptRecorded)await w.submitPuzzle(p.solution[w.activity.step]);assert.equal(w.store.value.puzzles[p.id].clean,1);
+  assert.equal(w.root.querySelector('.puzzle-practice-status').textContent,`Solved! · ${p.rating}`);
   assert.equal(w.root.querySelector('.puzzle-explanation, .puzzle-completion'),null);assert.equal(w.root.textContent.includes('View solution'),false);
   await w.preparePuzzle(p);await w.hintPuzzle();assert.equal(w.activity.assisted,true);assert.equal(w.root.querySelectorAll('.puzzle-hint-square').length,1);
   w.root.querySelector(`[data-square="${p.solution[0].slice(0,2)}"]`).click();
@@ -287,11 +304,11 @@ test('the upper puzzle overview link preserves the attempt and the footer return
   assert.equal(back(),null);
   await w.startPuzzleSelection([p],null,{adaptive:true});await w.submitPuzzle(p.solution[0]);
   const step=w.activity.step,elo=w.store.value.puzzleRating.elo;
-  assert.equal(back().textContent,'Back to puzzle overview');assert.ok(w.root.querySelector('.puzzle-session-navigation').contains(back()));
+  assert.equal(back().textContent,'Return to puzzle overview');assert.ok(w.root.querySelector('.puzzle-session-navigation').contains(back()));
   assert.equal(w.root.querySelector('.learn-header [data-focus="review"]').textContent,'← Back to review');
   back().click();await settle();assert.equal(w.closed,false);assert.equal(w.activity,null);assert.equal(w.page,'puzzles');assert.equal(back(),null);
   assert.equal(w.store.value.puzzleResume.step,step);assert.equal(w.store.value.puzzleRating.elo,elo);
-  await w.startRatedPuzzles();assert.equal(w.activity.id,p.id);assert.equal(w.activity.step,0);assert.equal(w.currentFen(),p.fen);assert.equal(w.lastMove,p.setup.move);assert.equal(back().textContent,'Back to puzzle overview');
+  await w.startRatedPuzzles();assert.equal(w.activity.id,p.id);assert.equal(w.activity.step,0);assert.equal(w.currentFen(),p.fen);assert.equal(w.lastMove,p.setup.move);assert.equal(back().textContent,'Return to puzzle overview');
   back().click();await settle();w.root.querySelector('[data-focus="review"]').click();await settle();assert.equal(w.closed,true);assert.equal(w.root.isConnected,false);
 });
 

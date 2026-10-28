@@ -12,6 +12,48 @@ test('review navigation clears leftover Feedback focus after returning from its 
   }
 });
 
+test('all arrow keys clear the learning button focus after returning to game review',async t=>{
+  t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[]})}));
+  const a=review(t),doc=a.dom.window.document,toggle=doc.querySelector('#learningToggle');
+  for(const [key,idx] of [['ArrowRight',1],['ArrowLeft',0],['ArrowUp',0],['ArrowDown',0],['End',2],['Home',0]]){
+    toggle.focus();await a.call('openLearning');await a.run('learningWorkspace').close();
+    assert.equal(doc.activeElement,toggle);
+    const event=new a.dom.window.KeyboardEvent('keydown',{key,bubbles:true,cancelable:true});
+    toggle.dispatchEvent(event);
+    assert.equal(a.state.idx,idx);assert.equal(doc.activeElement,doc.body,key);
+  }
+});
+
+test('arrows during the return animation do not restore learning button focus',async t=>{
+  t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[]})}));
+  const a=review(t),doc=a.dom.window.document,toggle=doc.querySelector('#learningToggle');
+  for(const key of ['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End']){
+    toggle.focus();await a.call('openLearning');const w=a.run('learningWorkspace');
+    let finishReturn;
+    t.mock.method(w,'transitionPanels',()=>new Promise(resolve=>{finishReturn=resolve;}));
+    const closing=w.close();await settle();assert.equal(typeof finishReturn,'function');
+    toggle.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key,bubbles:true,cancelable:true}));
+    assert.equal(doc.activeElement,doc.body,key);
+    finishReturn();await closing;
+    assert.equal(doc.activeElement,doc.body,key);assert.equal(a.state.idx,0);
+  }
+});
+
+test('clicking Accuracy tabs or moves leaves arrows reviewing the game without a tab focus frame',t=>{
+  const a=review(t,'1. e4 e5 2. Nf3 Nc6'),doc=a.dom.window.document;
+  for(const page of [0,1,2]) {
+    const button=doc.querySelector('#accuracy-tab-'+page);
+    button.focus();button.click();
+    assert.equal(doc.activeElement,doc.body);
+    doc.querySelector('.ml-move[data-ply="1"]').click();
+    for(const [key,idx] of [['ArrowRight',2],['ArrowLeft',1],['End',4],['Home',0]]) {
+      doc.activeElement.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key,bubbles:true,cancelable:true}));
+      assert.equal(a.state.idx,idx);assert.equal(a.state.accuracyPage,page);
+      assert.equal(doc.activeElement,doc.body);
+    }
+  }
+});
+
 test('review has no typed move field and Tab does not traverse review sections',async t=>{
   const a=review(t),doc=a.dom.window.document;
   assert.equal(doc.querySelector('.review-move-entry'),null);
@@ -26,6 +68,7 @@ test('promotion picker supports cancellation and explicit rook selection',t=>{
   a.call('applyUserMove','c7','c8',false);assert.ok(doc.querySelector('.promotion-picker'));assert.equal(doc.querySelector('.app').inert,true);
   doc.querySelector('.promotion-cancel').click();assert.equal(a.state.analysisMode,false);assert.equal(doc.querySelector('.promotion-picker'),null);
   a.call('applyUserMove','c7','c8',false);
+  assert.equal(doc.querySelector('.promotion-picker').dataset.color,'w');
   const options=[...doc.querySelectorAll('.promotion-options button')];assert.equal(options.length,4);
   assert.deepEqual(options.map(n=>n.querySelector('img').dataset.piece),['wQ','wR','wB','wN']);assert.ok(options.every(n=>n.textContent===''));
   options[0].dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'ArrowDown',bubbles:true,cancelable:true}));assert.equal(doc.activeElement,options[1]);
@@ -39,6 +82,7 @@ test('different promotion does not silently replay the recorded mainline',t=>{
 test('Black promotion uses only Black queen, rook, bishop and knight images',t=>{
   const a=review(t,'[SetUp "1"]\n[FEN "7k/8/8/8/8/8/p7/7K b - - 0 1"]\n\n1... a1=Q'),doc=a.dom.window.document;
   a.call('applyUserMove','a2','a1',false);
+  assert.equal(doc.querySelector('.promotion-picker').dataset.color,'b');
   assert.deepEqual([...doc.querySelectorAll('.promotion-options img')].map(n=>n.dataset.piece),['bQ','bR','bB','bN']);
   doc.querySelector('[aria-label="Promote to knight"]').click();assert.equal(a.state.variation.positions[1].promotion,'n');
 });
@@ -50,6 +94,23 @@ test('library toggle, game buttons, favorite focus and Escape form one keyboard 
   favorite.click();await a.run('_libraryWriteQueue');
   assert.equal(a.store.library[0].fav,true);assert.equal(doc.activeElement.classList.contains('lc-fav'),true);assert.equal(a.state.pgn,'1. e4 e5');assert.equal(panel.inert,false);
   doc.activeElement.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}));assert.equal(panel.inert,true);assert.equal(doc.activeElement,toggle);
+});
+
+test('leaving the library collapses it after opening a game even while its card has focus',async t=>{
+  const a=review(t),doc=a.dom.window.document;
+  const rec={id:'saved',pgn:'1. d4 d5',meta:{gameId:'saved'},opName:'Opponent'};
+  a.state.library=[rec];a.call('renderLibrary');a.replace('startAnalysis',()=>{});
+  const rail=doc.querySelector('.library-rail'),panel=doc.querySelector('.lib-panel'),toggle=doc.querySelector('.lib-tab');
+  rail.dispatchEvent(new a.dom.window.MouseEvent('mouseenter'));
+  const open=doc.querySelector('.lc-open');open.focus();open.click();await settle();
+  assert.equal(a.state.pgn,rec.pgn);assert.equal(doc.activeElement,open);
+  assert.equal(a.state.libraryOpen,true);assert.equal(panel.inert,false);
+  rail.dispatchEvent(new a.dom.window.MouseEvent('mouseleave'));
+  assert.equal(a.state.libraryOpen,false);assert.equal(rail.classList.contains('open'),false);
+  assert.equal(panel.inert,true);assert.equal(toggle.getAttribute('aria-expanded'),'false');
+  a.call('renderLibrary');await settle();assert.equal(a.state.libraryOpen,false);
+  rail.dispatchEvent(new a.dom.window.MouseEvent('mouseenter'));
+  assert.equal(a.state.libraryOpen,true);assert.equal(panel.inert,false);
 });
 test('settings toggle updates retain control identity and Credits owns keyboard focus',async t=>{
   const a=review(t),doc=a.dom.window.document;await a.call('toggleSettings');[...doc.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Sound').click();

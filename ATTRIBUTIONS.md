@@ -49,8 +49,8 @@ Distributed by Lichess (lila); high-quality vector SVGs.
   "Copyright 2000, Sounddogs.com" (commercial royalty-free library, as redistributed
   by Lichess). Retained here for transparency.
 
-## "Wrong answer" practice sound
-- **File:** `sounds/Wrong/Incorrect.mp3`
+## Incorrect puzzle sounds
+- **File:** `sounds/Wrong/Incorrect.mp3` — Try Again (display name).
 - **Source:** [Pixabay](https://pixabay.com/sound-effects/) — used under the
   **Pixabay Content License** (https://pixabay.com/service/license-summary/):
   free for commercial and non-commercial use, no attribution required; the
@@ -60,6 +60,10 @@ Distributed by Lichess (lila); high-quality vector SVGs.
   ([Freesound profile](https://freesound.org/people/timgormly/)) — originally a
   CC0 Freesound upload, mirrored to Pixabay via the `freesound_community` account.
   Source: https://pixabay.com/sound-effects/film-special-effects-training-program-incorrect2-88735/
+- **Original generated cues:** `sounds/Wrong/soft-descent.wav` (Soft Descent),
+  `sounds/Wrong/retro-wobble.wav` (Retro Wobble), and `sounds/Wrong/wooden-knock.wav`
+  (Wooden Knock). Synthesized for Chess Review with
+  `scripts/generate-incorrect-sounds.mjs`; no external samples.
 
 ## Puzzle success sounds
 - **Files:** `sounds/success/*.wav` — Warm Marimba, Crystal Chime, Gentle Piano,

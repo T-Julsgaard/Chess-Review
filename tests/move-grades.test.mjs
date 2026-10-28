@@ -110,6 +110,7 @@ test('mainline and variation grades agree and do not depend on player rating', t
 test('variations show streamed grades, then discards cancelled snapshots', async t => {
   const a=app(t);loadGame(a,'1. e4',[{cp:0},{cp:-50}]);a.call('computeDerived');
   const v=branch(a,0);v.positions[1].eval=null;v.positions[1].best=null;
+  a.state.bests[1]=null;a.state.evals[1]=null;
   const done=deferred();let progress;
   a.state.liveEngine=fakeEngine(async (...args)=>{progress=args[4];return done.promise;});
   a.replace('refreshVariation',()=>a.call('classifyVariationMoves'));

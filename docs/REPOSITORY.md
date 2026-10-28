@@ -27,7 +27,7 @@ Many small asset files are intentional; removing them can break optional setting
 | `README.md` | Installation, usage, scoring overview and links to detailed information. |
 | `LICENSE`, `ATTRIBUTIONS.md`, `THIRD_PARTY_NOTICES.md` | Project license, third-party notices and asset provenance. |
 | `PRIVACY.md`, `SECURITY.md` | Actual data handling and how to report vulnerabilities. |
-| `RELEASE.md`, [marketing/STORE_LISTING2.md](../marketing/STORE_LISTING2.md) | Packaging, store review guidance and prepared listing/privacy text. These are operational documents, even though the app does not execute them. |
+| `RELEASE.md`, [marketing/STORE_LISTING.md](../marketing/STORE_LISTING.md) | Packaging, store review guidance and prepared listing text. These are operational documents, even though the app does not execute them. |
 | [marketing/video/](../marketing/video/README.md) | Finished introduction video and thumbnail in `media/`, linked from the main README, plus captions, script, cached narration and music, and the Remotion rendering project. It is not part of the extension package. |
 | `CONTRIBUTING.md`, `.github/` | Contributor guidance, issue/PR forms and dependency update configuration. |
 | `package.json`, `package-lock.json` | Commands and reproducible development dependency versions. |
@@ -56,3 +56,6 @@ documentation and be linked from the appropriate guide.
 
 The [research maintenance review](RESEARCH-MAINTENANCE.md) records the 2026-10-18
 cleanup, evidence that must be preserved, and research decisions still open.
+The [local folder cleanup](FOLDER-CLEANUP.md) records the October disk audits,
+temporary browser-test and redundant source-ZIP removals, and material deliberately
+retained.

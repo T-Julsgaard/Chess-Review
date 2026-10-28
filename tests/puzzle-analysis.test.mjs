@@ -4,7 +4,10 @@ import {Chess} from '../lib/chess.js';
 import {app, loadGame, fakeEngine, deferred, settle} from './helpers/app.mjs';
 
 async function setup(t,{puzzle,analyse}={}) {
-  const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
+  const a=app(t);
+  // Keep review candidate searches separate from the puzzle engines counted below.
+  a.replace('requestPanelLines',()=>{});
+  loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
   const p=puzzle||{id:'analysis-test',fen:new Chess().fen(),solution:['e2e4'],rating:1200,themes:[],source:{url:'https://lichess.org/training'}};
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[p]})}));
   const calls=[],engines=[];
@@ -27,6 +30,7 @@ test('Analyse stays in puzzle practice with a disabled Analysing button and allo
   const {a,w,p,calls,engines,board}=await setup(t);
   assert.equal(w.root.querySelector('[data-focus=puzzle-analyse]'),null);
   await complete(w,p);const progress=JSON.stringify(w.store.value),review=JSON.stringify(a.state.positions),status=w.root.querySelector('.puzzle-practice-status').textContent,rating=w.root.querySelector('.puzzle-elo-panel').textContent;
+  assert.equal(status,'Solved! · 1200');
   const button=w.root.querySelector('[data-focus=puzzle-analyse]');assert.equal(button.textContent,'Analyse');
   assert.ok(w.root.querySelector('.puzzle-practice-status').compareDocumentPosition(button)&4);
   await explore(w);assert.equal(w.currentFen(),p.fen);assert.equal(board.querySelector('.puzzle-result-badge'),null);

@@ -1,7 +1,7 @@
 // analyze-flow.js — shared flow used by both the popup (click) and background
-// (shortcut): find the game from the active chess.com tab and open the analysis page.
+// (shortcut): find the game from the active chess tab and open the analysis beside it.
 
-import { findGameById, gameMeta, parseFlip, parseGameId } from "./chesscom.js";
+import { findGameById, gameMeta, parseFlip, parseGameId, parseUsername, gameFlip } from "./chesscom.js";
 import { parseLichessGameId, parseLichessFlip, fetchGamePgn as fetchLichessPgn } from "./lichess.js";
 import { browserAPI } from "./browser-compat.js";
 import {createImportRequest, checkImport, importDelay, waitImport} from "./lib/import-request.js";
@@ -9,7 +9,7 @@ import {archivePlayers} from "./lib/player-history.js";
 import {getCachedGame} from "./gamecache.js";
 
 /** Save the analysis payload and open analysis.html in a new tab. */
-export async function openAnalysisTab(payload, {signal} = {}) {
+export async function openAnalysisTab(payload, {signal, sourceTabId} = {}) {
   const request = createImportRequest(signal);
   signal = request.signal;
   // The popup, keyboard shortcut, and in-page button can all launch a review. A timestamp
@@ -26,7 +26,7 @@ export async function openAnalysisTab(payload, {signal} = {}) {
     });
     await waitImport(storing, signal);
     checkImport(signal);
-    const opening = browserAPI.tabs.create({url:browserAPI.runtime.getURL(`analysis.html#${jobId}`)}).then(async opened => {
+    const opening = createAnalysisTab(browserAPI.runtime.getURL(`analysis.html#${jobId}`), sourceTabId, signal).then(async opened => {
       // Browser APIs cannot be aborted: clean up our own late result after cancellation.
       if(signal.aborted && opened?.id != null && browserAPI.tabs.remove) {
         try {await browserAPI.tabs.remove(opened.id);} catch {}
@@ -61,6 +61,30 @@ export async function openBlankWorkspaceTab({signal} = {}) {
 async function getActiveTab() {
   const [tab] = await browserAPI.tabs.query({ active: true, currentWindow: true });
   return tab || null;
+}
+
+async function createAnalysisTab(url, sourceTabId, signal) {
+  let sourceTab;
+  try {
+    // Refresh the source just before opening: imports can outlast tab switches or moves.
+    sourceTab = await waitImport(sourceTabId == null ? getActiveTab() : browserAPI.tabs.get(sourceTabId), signal);
+  } catch {checkImport(signal);}
+  checkImport(signal);
+  const properties = {url};
+  if (isSupportedChessUrl(sourceTab?.url)
+      && Number.isInteger(sourceTab.index) && sourceTab.index >= 0
+      && Number.isInteger(sourceTab.windowId) && sourceTab.windowId >= 0) {
+    properties.index = sourceTab.index + 1;
+    properties.windowId = sourceTab.windowId;
+  }
+  try {
+    return await browserAPI.tabs.create(properties);
+  } catch (error) {
+    checkImport(signal);
+    if (properties.index == null) throw error;
+    // The source window may have closed between lookup and creation; keep reviews usable.
+    return browserAPI.tabs.create({url});
+  }
 }
 
 // True for chess.com / lichess.org pages — the only sites where the analyze flow can find a game.
@@ -139,7 +163,7 @@ async function analyzeTab(tab, username, signal) {
   // Lichess: the content script reports site:"lichess" (or we recognise the URL). Lichess gives us
   // the full PGN directly from a game id — no username/archive search needed.
   const isLichess = (info && info.site === "lichess") || /:\/\/(www\.)?lichess\.org\//i.test(tab.url || "");
-  if (isLichess) return analyzeLichessTab(info, tab.url || "", signal);
+  if (isLichess) return analyzeLichessTab(info, tab, signal);
 
   // Game id: prefer the content script's real-time location.pathname (authoritative for SPA navigation
   // where tab.url may lag behind history.pushState), then fall back to the tab URL. The content script
@@ -161,7 +185,7 @@ async function analyzeTab(tab, username, signal) {
   }
 
   // Build the list of usernames whose archive might hold this game, best → worst:
-  // the player(s) read off the page first, then any provided/stored handle. A game lives in BOTH
+  // the link's named player, the player(s) read off the page, then any provided/stored handle. A game lives in BOTH
   // players' archives, so trying each in turn means a wrong or own stored username (e.g. when you
   // open SOMEONE ELSE'S game) no longer blocks the lookup.
   const savedCandidates = await waitImport(archivePlayers(browserAPI.storage.local, username), signal);
@@ -171,10 +195,11 @@ async function analyzeTab(tab, username, signal) {
     n = (n || "").trim();
     if (n && !candidates.some((x) => x.toLowerCase() === n.toLowerCase())) candidates.push(n);
   };
+  addCand(parseUsername(tab.url));
   detected.forEach(addCand);
   savedCandidates.forEach(addCand);
   // Bound the archive lookups: on a busy page the sweep may surface a few extra handles, but the
-  // two players + the stored handle are always at the front, so 4 candidates is plenty.
+  // linked player + two detected players + stored handle fit in four candidates.
   candidates.length = Math.min(candidates.length, 4);
   let game = await waitImport(getCachedGame("chesscom", gameId), signal);
   if (!candidates.length && !game?.pgn) {
@@ -204,19 +229,17 @@ async function analyzeTab(tab, username, signal) {
   }
 
   checkImport(signal);
-  // Board perspective: the page's own ?flip= hint is the user's actual POV, so it's the primary
-  // signal. Read it straight from the tab URL (works even if the content script is stale), falling
-  // back to whatever the content script reported. Null = no hint → the analysis page uses the
-  // username match (defaults to White at the bottom).
-  const flip = parseFlip(tab.url) ?? (info && info.flip != null ? info.flip : null);
+  // Explicit URL flip, then the displayed board, then the link's named player. A fresh
+  // install has no identity history, so links with only ?username= must resolve here.
+  const flip = parseFlip(tab.url) ?? info.flip ?? gameFlip(game, tab.url);
   const meta = { ...gameMeta(game), flip };
   // Country flags: the API knows WHO is white/black; the page knows each player's country id. Match
   // them by username so the right flag lands on the right side (analysis.js resolves id → flag art).
   attachCountries(meta, info && info.countries);
-  await openAnalysisTab({ pgn: game.pgn, meta, source: "active-tab" }, {signal});
+  await openAnalysisTab({ pgn: game.pgn, meta, source: "active-tab" }, {signal, sourceTabId:tab.id});
 }
 
-/** Pasted Chess.com URLs use local player evidence for public archive lookup. */
+/** Pasted Chess.com URLs use the named player and local evidence for public archive lookup. */
 export async function analyzeChesscomUrl(url, {signal} = {}) {
   const request = createImportRequest(signal);
   try {
@@ -225,7 +248,7 @@ export async function analyzeChesscomUrl(url, {signal} = {}) {
     if (!parsed) throw new Error("Couldn't read a game ID from the URL.");
     let game = await waitImport(getCachedGame("chesscom", parsed.id), signal);
     if (!game?.pgn) {
-      const candidates = await waitImport(archivePlayers(browserAPI.storage.local), signal);
+      const candidates = await waitImport(archivePlayers(browserAPI.storage.local, parseUsername(url)), signal);
       if (!candidates.length) throw new Error("Open this game on Chess.com and choose Analyze this game, or paste its PGN.");
       let lookupError;
       for (const name of candidates) {
@@ -234,7 +257,7 @@ export async function analyzeChesscomUrl(url, {signal} = {}) {
       }
       if (!game?.pgn) throw new Error("Couldn't find this game in the known players' archives. Open it on Chess.com and choose Analyze this game, or paste its PGN.", {cause:lookupError});
     }
-    await openAnalysisTab({pgn:game.pgn, meta:{...gameMeta(game),flip:parseFlip(url)},source:"url"}, {signal});
+    await openAnalysisTab({pgn:game.pgn, meta:{...gameMeta(game),flip:gameFlip(game,url)},source:"url"}, {signal});
   } finally {request.dispose();}
 }
 
@@ -258,7 +281,8 @@ function attachCountries(meta, countries) {
  * extension was reloaded) — no page reload needed. The content script, when present, only adds the
  * board orientation and a DOM move-list fallback. The PGN's own tags carry players/result.
  */
-async function analyzeLichessTab(info, tabUrl, signal) {
+async function analyzeLichessTab(info, tab, signal) {
+  const tabUrl = tab.url || "";
   const fromUrl = parseLichessGameId(tabUrl);
   const gameId = (info && info.gameId) || (fromUrl && fromUrl.id) || null;
   if (!gameId) {
@@ -286,5 +310,5 @@ async function analyzeLichessTab(info, tabUrl, signal) {
     pgn,
     meta: { url: `https://lichess.org/${gameId}`, gameId, flip },
     source: "active-tab-lichess",
-  }, {signal});
+  }, {signal, sourceTabId:tab.id});
 }

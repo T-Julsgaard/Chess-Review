@@ -8,8 +8,11 @@
     <link rel="stylesheet" href="lib/viewport-preview.css">
   </head>
   <body>
-    <header>
-      <div class="preview-heading"><div><strong>Screen sizes</strong><span>Chess Review</span></div><button id="close-preview" type="button">Close preview</button></div>
+    <main id="preview-stage" aria-label="Interactive screen preview">
+      <div id="preview-surface"><iframe id="preview-app" title="Chess Review at the selected screen size"></iframe></div>
+    </main>
+    <section id="preview-settings" aria-label="Screen setup" hidden>
+      <div class="preview-heading"><div><strong>Screen setup</strong><span>Chess Review</span></div><button id="close-settings" type="button" aria-label="Close screen setup">Done</button></div>
       <nav id="device-tabs" aria-label="Screen type"></nav>
       <div class="preview-controls">
         <label class="preset-label">Screen <select id="screen-preset"></select></label>
@@ -17,14 +20,19 @@
         <span aria-hidden="true">×</span>
         <label>Height <input id="screen-height" type="number" min="240" max="7680" step="1" inputmode="numeric"></label>
         <button id="rotate-screen" type="button" title="Swap width and height">Rotate</button>
-        <label>View <select id="preview-scale"><option value="fit">Fit to window</option><option value="1">100%</option></select></label>
-        <output id="screen-readout" aria-live="polite"></output>
+        <label>View <select id="preview-scale"><option value="fit">Fit whole screen</option><option value="1">Actual size (scroll)</option></select></label>
       </div>
-      <p>Use the app below. Switching sizes keeps your place. Dimensions are browser viewport pixels; previews of tablets and phones show layout only. Changes stay in this tab.</p>
-    </header>
-    <main id="preview-stage" aria-label="Interactive screen preview">
-      <div id="preview-surface"><iframe id="preview-app" title="Chess Review at the selected screen size"></iframe></div>
-    </main>
+      <p>The app runs at 100% zoom for the selected screen. Fit whole screen shrinks larger screens to show their complete layout in your window. Actual size may require scrolling. Current matches the window you opened this preview from. Desktop and laptop presets use your display scaling, browser toolbar and taskbar space. Width and height show the app viewport. Tablet, phone and custom sizes use viewport pixels. Switching sizes keeps your place. Changes stay in this tab.</p>
+    </section>
+    <footer id="preview-toolbar" aria-label="Preview controls">
+      <button id="toggle-settings" type="button" aria-controls="preview-settings" aria-expanded="false">Screen setup</button>
+      <output id="screen-readout" aria-live="polite"></output>
+      <button id="fullscreen-preview" type="button" aria-pressed="false">Full screen</button>
+      <button id="hide-controls" type="button">Hide controls</button>
+      <button id="close-preview" type="button" aria-label="Close preview" title="Close preview">×</button>
+    </footer>
+    <button id="show-controls" type="button" aria-label="Show screen preview controls" hidden>Screen sizes</button>
+    <p id="preview-status" role="status" hidden></p>
     <script type="module" src="lib/viewport-preview.js"></script>
   </body>
 </html>

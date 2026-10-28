@@ -47,6 +47,26 @@ export function parseFlip(urlOrPath) {
   return null;
 }
 
+/** The player named by a game link is a lookup/perspective hint, not account ownership. */
+export function parseUsername(urlOrPath) {
+  try {
+    const name = new URL(urlOrPath, "https://www.chess.com").searchParams.get("username")?.trim() || "";
+    return /^[\w-]{2,30}$/.test(name) ? name : "";
+  } catch { return ""; }
+}
+
+/** Resolve a link's perspective once the game's players are known. */
+export function gameFlip(game, urlOrPath) {
+  const explicit = parseFlip(urlOrPath);
+  if (explicit != null) return explicit;
+  const name = parseUsername(urlOrPath).toLowerCase();
+  if (!name) return null;
+  const player = side => String(game[side.toLowerCase()]?.username
+    || game.pgn?.match(new RegExp('^\\[' + side + '\\s+"([^"\\r\\n]*)"\\]', 'm'))?.[1] || "").toLowerCase();
+  const white = player("White") === name, black = player("Black") === name;
+  return white !== black ? black : null;
+}
+
 // chess.com's public API is heavily CDN-cached and their guidance is to keep requests serial; when
 // you do hit the rate limit it answers 429 (often with Retry-After). We honour that with a short
 // backoff + a couple of retries so a transient throttle doesn't turn a findable game into "not found"

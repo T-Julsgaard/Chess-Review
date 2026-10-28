@@ -26,7 +26,9 @@ test('a delayed practice success cannot advance a different practice session', t
 
 test('cached navigation invalidates a pending live result', async t=>{
   const a=app(t);loadGame(a,'1. e4 e5');const v=branch(a);quiet(a);
+  v.positions[1].best.lines=[{score:{cp:0},pv:'e7e5'},{score:{cp:0},pv:'d7d5'}];
   v.positions[2].best=null;v.positions[2].eval=null;
+  a.state.bests[2]=null;a.state.evals[2]=null;
   const result=deferred();a.state.liveEngine=fakeEngine(()=>result.promise);
   const pending=a.call('requestLiveEval');await settle();
   const token=a.state.liveToken;v.idx=1;
@@ -49,6 +51,7 @@ test('concurrent engine initialization shares one worker, and reset disposes sta
 test('live startup errors are recoverable and Retry evaluates the position',async t=>{
   const a=app(t);loadGame(a,'1. e4');const v=branch(a);quiet(a);
   v.positions[1].eval=null;v.positions[1].best=null;
+  a.state.bests[1]=null;a.state.evals[1]=null;
   a.replace('createEngine',async()=>{throw Error('cannot start');});
   await a.call('requestLiveEval');assert.match(a.state.liveError,/Stockfish/);
   a.replace('createEngine',async()=>fakeEngine());

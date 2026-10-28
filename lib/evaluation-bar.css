@@ -1,0 +1,54 @@
+/* Balance keeps the board's orientation and the existing module's dimensions. */
+.evalbar.eval-balance {
+  --balance-white: 50%;
+  border: 0; border-radius: 0; clip-path: none; overflow: visible;
+  background: none; isolation: isolate;
+}
+.eval-balance .eval-balance-track {
+  position: absolute; inset: 26px max(5px, calc(50% - 5px));
+  border-radius: 5px; background: #252629;
+  box-shadow: 0 0 0 1px #ffffff24; overflow: hidden;
+}
+.eval-balance .white-fill { background: #eeeae1; }
+.eval-balance .eval-midpoint {
+  position: absolute; top: 50%; left: 0; right: 0; height: 1px;
+  background: #9c998f; opacity: .65;
+}
+.eval-balance .eval-side {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  width: min(18px, 100cqw); height: 18px; border-radius: 50%;
+  display: grid; place-items: center;
+  font: 700 min(10px, 60cqw)/1 var(--font-ui);
+}
+.eval-balance .eval-side-black { top: 0; background: #252629; color: #e6e3dc; box-shadow: inset 0 0 0 1px #ffffff38; }
+.eval-balance .eval-side-white { bottom: 0; background: #eeeae1; color: #252629; }
+.eval-balance.flipped .eval-side-black { top: auto; bottom: 0; }
+.eval-balance.flipped .eval-side-white { bottom: auto; top: 0; }
+.eval-balance .eval-balance-readout {
+  position: absolute; inset: 26px 0; pointer-events: none;
+  --balance-position: calc(100% - var(--balance-white));
+}
+.eval-balance.flipped .eval-balance-readout { --balance-position: var(--balance-white); }
+.eval-balance .eval-balance-score {
+  position: absolute; top: clamp(14px, var(--balance-position), calc(100% - 14px));
+  left: 0; right: 0; transform: translateY(-50%);
+  display: grid; place-items: center; height: 25px;
+  border-radius: 5px; color: var(--ink); background: var(--panel);
+  box-shadow: 0 0 0 1px var(--line), 0 2px 6px #0003;
+  font: 650 min(11px, calc((100cqw - 3px) / (var(--balance-chars, 4) * .62)))/1 var(--font-mono);
+  font-variant-numeric: tabular-nums; letter-spacing: -.4px; white-space: nowrap;
+  transition: top .4s cubic-bezier(.4,0,.2,1);
+}
+.eval-balance[data-favored="white"] .eval-balance-score { background: #eeeae1; color: #252629; }
+.eval-balance[data-favored="black"] .eval-balance-score { background: #252629; color: #eeeae1; }
+.eval-balance[data-pending="true"] .eval-balance-score { background: var(--panel); color: var(--ink-3); }
+.eval-balance:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 5px; }
+.eval-balance.eb-gradient .eval-balance-track { background: linear-gradient(90deg,#343434,#232323); }
+.eval-balance.eb-mono .eval-balance-track { background: #111; }
+.eval-balance.eb-accent .eval-balance-track { background: color-mix(in oklab,var(--accent) 22%,#1d1d1d); }
+.eval-balance.flipped .eval-balance-score,
+.eval-balance[data-motion="off"] .eval-balance-score,
+.eval-balance[data-motion="off"] .white-fill { transition: none; }
+@media (prefers-reduced-motion: reduce) {
+  .eval-balance .eval-balance-score, .eval-balance .white-fill { transition: none; }
+}
