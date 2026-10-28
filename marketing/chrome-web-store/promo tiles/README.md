@@ -35,3 +35,32 @@ Marquee prompt:
 > the c6 black knight. Highlight the c8 black bishop green and retain d7 green.
 > Replace the arrow with a straight translucent green c8-h3 bishop diagonal.
 > Preserve all remaining pieces and styling. No extra words or watermark.
+
+## Open-source headline variants
+
+- `small-promo-tile-open-source-440x280.png`: 440 x 280 PNG.
+- `marquee-promo-tile-open-source-1400x560.png`: 1400 x 560 PNG.
+
+These new sibling versions preserve the corrected originals above. The headline
+is "Open-source, free" in white followed by "Chess analysis" in green. The small
+tile wraps this over four lines; the marquee uses two lines. Both exports were
+created with built-in imagegen, resampled with System.Drawing HighQualityBicubic,
+decoded to confirm PNG format and dimensions, and visually checked. The original
+tile hashes were checked to confirm neither original changed.
+
+Small variant prompt:
+
+> Use case: text-localization. Replace only the left headline with Open-source,
+> free in white followed by Chess analysis in green. Use four lines: Open-source,
+> / free / Chess / analysis, matching the bold sans serif and original left text
+> area. Preserve the logo, dark texture, board placement, all pieces, green c8
+> bishop, ordinary c6 knight square, absent e6 pawn, green d7 and c8-h3 arrow.
+> No accuracy panel, added text or watermark. Keep the 440:280 aspect ratio.
+
+Marquee variant prompt:
+
+> Replace only the two headline lines with Open-source, free in white and Chess
+> analysis in green. Match the existing bold typography and left alignment, and
+> fit before the board. Preserve the logo, background, board, corrected c8-h3
+> arrow, bishop green square, tan knight square, cleared e6 square and remaining
+> pieces. No accuracy panel, extra text or watermark.
