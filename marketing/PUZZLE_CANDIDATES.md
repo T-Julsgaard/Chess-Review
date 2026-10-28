@@ -8,6 +8,17 @@ Three new alternatives for the Chrome Web Store image set. The existing campaign
 
 All exports: 1280 × 800 PNG. Generated with the built-in imagegen tool using existing campaign images and fresh captures from an isolated copy of the current extension as references. Generated UI is a visual reconstruction, rather than a pixel-exact screenshot. Candidate 2 received a targeted correction to restore the g1 knight. The generated compositions were resampled to the existing campaign dimensions for delivery.
 
+## Candidate 2 — selected revision
+
+The selected All yours candidate now centers its headline and subtitle independently on the canvas, while retaining the logo at the top left and the product frame below. Edited with the built-in imagegen tool and exported at 1280 × 800.
+
+### Centering edit prompt
+
+Use case: text-localization / precise layout edit. Edit the supplied finished Chess Review marketing image. Make ONLY this layout adjustment: horizontally CENTER the main headline and subtitle on the full 1280-pixel-wide canvas.
+Headline exact text: "50,000 puzzles. All yours." Keep it on ONE line, same bold font, same large size, same y-position around y95-152, same green "50,000 puzzles." and off-white "All yours.". The headline block's horizontal center must be x640, with equal left and right outer margins (about160px each for its current width).
+Subtitle exact text: "Learn with Chess Review. Free and offline." Keep on ONE line, same light gray font, same size, same vertical position around y171-195. The subtitle's own horizontal center must independently be x640, with balanced left/right margins (about220px each for its current width).
+Keep the CHESS / REVIEW logo at the TOP LEFT exactly where it is. Do not center the logo. Keep all elements BELOW y215 unchanged: the entire rounded product frame, board, all 32 chess pieces including white knight on g1, puzzle UI, UI words, controls, colors, shadows, spacing and background. No redesign, no new text, no removal of elements. The only change is moving the two marketing text lines rightwards to center each independently over the existing product frame. Preserve the 1280x800 canvas and all copy.
+
 ## Generation prompts
 
 ### Candidate 1
