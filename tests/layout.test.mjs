@@ -4,11 +4,11 @@ import fs from 'node:fs';
 import {app,loadGame,settle} from './helpers/app.mjs';
 const exportedLayout=JSON.parse(fs.readFileSync(new URL('./fixtures/default-panel-layout.json',import.meta.url),'utf8'));
 
-function layout(t,initialZoom=1) {
+function layout(t,initialZoom=1,effectiveZoom=z=>z) {
   const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
   let zoom=initialZoom,width=1920,height=920;
   const viewport=(w,h)=>{width=w;height=h;sync();};
-  const sync=()=>{for(const [key,value]of [['innerWidth',Math.round(width/zoom)],['innerHeight',Math.round(height/zoom)]]){Object.defineProperty(a.dom.window,key,{value,configurable:true});a.context[key]=value;}};
+  const sync=()=>{const scale=effectiveZoom(zoom);for(const [key,value]of [['innerWidth',Math.round(width/scale)],['innerHeight',Math.round(height/scale)],['devicePixelRatio',scale]]){Object.defineProperty(a.dom.window,key,{value,configurable:true});a.context[key]=value;}};
   sync();const changes=[];
   a.context.browserAPI.tabs={getCurrent:async()=>({id:7}),setZoomSettings:async()=>{},getZoom:async()=>zoom,
     setZoom:async(id,value)=>{assert.equal(id,7);changes.push(value);zoom=value;sync();}};
@@ -27,6 +27,29 @@ for(const [width,height]of [[1920,1080],[1366,768],[1536,864],[1280,720],[2560,1
     assert.deepEqual(a.changes,[1]);
   });
 }
+
+test('Firefox quantized zoom stays stable through refits, viewport changes and reset',async t=>{
+  const effectiveZoom=z=>60/Math.round(60/z);
+  const a=layout(t,.59,effectiveZoom);
+  a.viewport(1100,635);await a.call('initTabZoom');
+  assert.equal(a.zoom(),1);assert.deepEqual(a.changes,[1]);
+  await a.context.browserAPI.tabs.setZoom(7,.59);
+  for(const [width,height]of [[1100,635],[1200,700]]){
+    a.viewport(width,height);
+    for(let i=0;i<6;i++){
+      a.dom.window.dispatchEvent(new a.dom.window.Event('resize'));
+      a.call('fitViewport');
+    }
+    assert.equal(a.zoom(),.59);
+    assert.deepEqual(a.changes,[1,.59]);
+    assert.deepEqual(structuredClone(a.run('_fittedDip')),
+      {w:Math.round(width/effectiveZoom(.59)),h:Math.round(height/effectiveZoom(.59))});
+  }
+  await a.call('resetLayout');
+  for(let i=0;i<3;i++)await a.call('initTabZoom');
+  assert.equal(a.zoom(),1);assert.deepEqual(a.changes,[1,.59,1]);
+  assert.deepEqual(structuredClone(a.run('_fittedDip')),{w:1200,h:700});
+});
 
 test('simultaneous startup shares zoom normalization and resizing respects manual zoom',async t=>{
   const a=layout(t,.85);let scopes=0;
