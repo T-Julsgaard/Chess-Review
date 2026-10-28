@@ -125,3 +125,31 @@ in headless Chrome at desktop and mobile sizes on an unsandboxed retry; the
 initial sandboxed attempt timed out before the storage API became available.
 All three latest-release ZIPs still match their recorded SHA-256 hashes. Every
 selected deletion target was confirmed absent, and `git diff --check` passed.
+
+## Approved scratch cleanup, 2026-10-28
+
+After explicit approval of the prepared deletion list, removed another 107
+disposable directories and 866 loose files from `scratch/` and `.scratch/`.
+Together these contained 41,279 files totaling 3,421,154,320 bytes (3.42 GB).
+They included inactive browser profiles, diagnostic extension copies, a temporary
+Firefox download, screenshots, logs, reports and unreferenced one-off scripts.
+All 973 selected entries were deleted without failures and confirmed absent.
+
+Before deletion, every target was checked again against the approved inventory:
+sizes, file counts and modification times still matched. No target contained
+links or Git metadata, overlapped a registered worktree, was tracked by Git, or
+was referenced by a running browser/test process. All five other registered
+worktrees and 173 protected loose files remained present afterward. Active
+`scratch/store-refresh/` and `scratch/puzzle-marketing/` work was preserved, as
+were recovery patches, index backups, potentially unique source copies,
+documented performance evidence and research-related material.
+
+The 629 root-level scratch logs had already been removed in the earlier pass;
+there were no root-level scratch files left at this check. Detailed selection,
+deletion and preservation records are in ignored
+`scratch/cleanup-scratch-20261028/`.
+
+Maintained-source validation, both engine checksum checks and `git diff --check`
+passed. Only ignored local artifacts and this report changed for this cleanup;
+application test suites were not rerun. Concurrent marketing edits were excluded
+from the cleanup commit.
