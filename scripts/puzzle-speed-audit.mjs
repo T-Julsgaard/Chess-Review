@@ -63,5 +63,28 @@ export async function auditLearning({review,call,evaluate,waitFor,out}) {
   await run("import('./analysis.js').then(m=>m.learningWorkspace.releaseReply(true))");
   await waitFor(review,"import('./analysis.js').then(m=>m.learningWorkspace.feedback?.status==='completed')",'Premoved puzzle solve');
   assert.equal(await run("!!document.querySelector('.premove, .drag-piece')"),false);
+  for(const mode of ['practice','knockout']) {
+    await run(`import('./analysis.js').then(async m=>{
+      const {Chess}=await import('./lib/chess.js'),w=m.learningWorkspace;await w.navigate('puzzles');
+      w.puzzles=[{id:'queued-authored',fen:new Chess().fen(),solution:['e2e4','e7e5','g1f3','b8c6','f3g5','h7h6','g5f7'],rating:450,themes:[]}];
+      w.showPuzzleRunStart=async()=>true;
+      if('${mode}'==='practice')await w.startPuzzleSelection(w.puzzles);else await w.startPuzzleRun('${mode}');
+      window.queuedSounds=0;const sound=w.onPuzzlePremove;w.onPuzzlePremove=()=>{queuedSounds++;sound();};
+      void w.submitPuzzle('e2e4');
+    })`);
+    await waitFor(review,"import('./analysis.js').then(m=>!!m.learningWorkspace.releaseReply)",'First queued reply');
+    for(const [from,to] of [['g1','f3'],['f3','g5'],['g5','f7']]){await press(from);await drop(to);}
+    assert.deepEqual(await run("import('./analysis.js').then(m=>m.learningWorkspace.premove.moves)"),['g1f3','f3g5','g5f7']);
+    assert.equal(await run("document.querySelector('[data-square=f7].premove img')?.dataset.piece"),'wN');
+    assert.equal(await run('queuedSounds'),3);
+    for(const step of [3,5,7]){
+      await run("import('./analysis.js').then(m=>m.learningWorkspace.releaseReply(true))");
+      await waitFor(review,`import('./analysis.js').then(m=>m.learningWorkspace.activity?.step===${step}||m.learningWorkspace.result?.solved===1)`, 'Queued turn '+step);
+    }
+    await waitFor(review,"import('./analysis.js').then(m=>m.learningWorkspace.premove===null&&m.learningWorkspace.pendingOpponent===null)",'Queue completed');
+    assert.equal(await run("document.querySelector('[data-square=f7] img')?.dataset.piece"),'wN');
+    assert.equal(await run("!!document.querySelector('.premove, .drag-piece')"),false);
+    await run("import('./analysis.js').then(m=>{m.learningWorkspace.onPuzzlePremove=()=>{};})");
+  }
   console.log('Real pointer premove previews, red highlight matching, cancellation, automatic execution and Time attack checks passed. Screenshots: '+out);
 }

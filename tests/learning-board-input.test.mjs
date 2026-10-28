@@ -199,6 +199,7 @@ test('a picked-up solver piece survives the opponent introduction and reply afte
   a.dom.window.dispatchEvent(event('pointermove','d5'));up('d5');
   assert.equal(w.activity.step,0);assert.equal(w.store.value.puzzleRating.played,0);assert.equal(doc.querySelector('.drag-piece'),null);
   assert.equal(board.querySelector('[data-square=d5] img').dataset.piece,'wP');assert.ok(board.querySelector('[data-square=d5].premove'));
+  down('d5',2);up('d5',2);
   down('e4');const ghost=doc.querySelector('.drag-piece');advance();await settle();
   assert.equal(doc.querySelector('.drag-piece'),ghost);assert.equal(board.querySelector('[data-square=e4] img').style.visibility,'hidden');
   finishSlide();await opening;assert.equal(doc.querySelector('.drag-piece'),ghost);
@@ -286,25 +287,119 @@ test('practice premoves preview captures and execute once after introductions an
   assert.equal(board.querySelector('.premove'),null);assert.equal(doc.querySelector('.drag-piece'),null);
 });
 
-for(const cancel of ['right-click','Escape','replacement'])test(`practice premoves support ${cancel} cancellation`,async t=>{
+for(const cancel of ['right-click','Escape'])test(`practice premoves support ${cancel} cancellation`,async t=>{
   const {a,w,board,down,up,event}=await setup(t);controlledReplies(t,w);
   const playing=w.submitPuzzle('e2e4');await drain();
   down('g1');a.dom.window.dispatchEvent(event('pointermove','h3'));up('h3');
   assert.ok(board.querySelector('[data-square=h3].premove'));
+  down('h3');a.dom.window.dispatchEvent(event('pointermove','g5'));up('g5');
+  assert.deepEqual(w.premove.moves,['g1h3','h3g5']);
   if(cancel==='right-click'){down('h3',2);up('h3',2);}
   if(cancel==='Escape')a.dom.window.document.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
-  if(cancel==='replacement'){
-    down('g1');up('g1');down('f3');up('f3');
-    assert.equal(board.querySelector('[data-square=h3] img'),null);
-    assert.ok(board.querySelector('[data-square=f3].premove'));
-  } else {
-    assert.equal(w.premove,null);assert.equal(board.querySelector('.premove'),null);
-    assert.equal(board.querySelector('[data-square=g1] img').dataset.piece,'wN');
-  }
+  assert.equal(w.premove,null);assert.equal(board.querySelector('.premove'),null);
+  assert.equal(board.querySelector('[data-square=g1] img').dataset.piece,'wN');
   w.releaseReply(true);await playing;await drain();
   assert.equal(w.activity.mistakes,0);assert.equal(w.closed,false);
-  assert.equal(w.activity.step,cancel==='replacement'?3:2);
+  assert.equal(w.activity.step,2);
   if(w.releaseReply)w.releaseReply(true);await drain();
+});
+
+for(const mode of ['practice','knockout','timeAttack'])for(const input of ['drag','click'])test(`${mode} queues successive ${input} premoves with the same piece and executes each once`,async t=>{
+  const {a,w,board,down,up,event}=await setup(t),queued=[];
+  controlledReplies(t,w);
+  w.puzzles=[{...w.puzzles[0],solution:['e2e4','e7e5','g1f3','b8c6','f3g5','h7h6','g5f7']}];
+  if(mode==='practice')await w.startPuzzleSelection(w.puzzles);else await w.startPuzzleRun(mode);
+  const run=w.run;
+  w.onPuzzlePremove=()=>queued.push('move');
+  const playing=w.submitPuzzle('e2e4');await drain();
+  const queue=(from,to)=>{
+    if(input==='click'){board.querySelector(`[data-square=${from}]`).click();board.querySelector(`[data-square=${to}]`).click();}
+    else {down(from);a.dom.window.dispatchEvent(event('pointermove',to));up(to);}
+  };
+  queue('g1','f3');queue('f3','g5');queue('g5','f7');
+  assert.deepEqual(w.premove.moves,['g1f3','f3g5','g5f7']);
+  assert.deepEqual(queued,['move','move','move']);
+  assert.equal(board.querySelector('[data-square=f7].premove img').dataset.piece,'wN');
+  assert.equal(board.querySelector('[data-square=g1] img'),null);
+  assert.equal(board.querySelector('[data-square=f3] img'),null);
+  w.render();assert.equal(board.querySelector('[data-square=f7].premove img').dataset.piece,'wN');
+  if(mode!=='timeAttack'){
+    assert.equal(w.activity.step,1);w.releaseReply(true);await drain();
+    assert.equal(w.activity.step,3);assert.deepEqual(w.premove.moves,['f3g5','g5f7']);
+    w.releaseReply(true);await drain();
+    assert.equal(w.activity.step,5);assert.deepEqual(w.premove.moves,['g5f7']);
+    w.releaseReply(true);
+  }
+  await playing;await drain();
+  assert.equal(w.premove,null);assert.equal(w.pendingOpponent,null);
+  assert.equal(board.querySelector('.premove'),null);
+  assert.equal(board.querySelector('[data-square=f7] img').dataset.piece,'wN');
+  if(run){assert.equal(run.solved,1);assert.equal(run.correctMoves,4);assert.equal(run.mistakes,0);}
+  else {assert.equal(w.activity.step,7);assert.equal(w.feedback.status,'completed');assert.equal(w.activity.mistakes,0);assert.equal(w.store.value.puzzleRating.played,1);}
+  assert.deepEqual(queued,['move','move','move']);
+});
+
+test('a second piece can be premoved while an invalid drop preserves the existing queue',async t=>{
+  const {a,w,board,down,up,event}=await setup(t);controlledReplies(t,w);
+  const playing=w.submitPuzzle('e2e4');await drain();
+  down('g1');a.dom.window.dispatchEvent(event('pointermove','f3'));up('f3');
+  const request=w.premove;
+  down('f3');a.dom.window.dispatchEvent(event('pointermove','f4'));up('f4');
+  assert.equal(w.premove,request);assert.deepEqual(w.premove.moves,['g1f3']);
+  down('f1');up('f1');down('c4');up('c4');
+  assert.deepEqual(w.premove.moves,['g1f3','f1c4']);
+  assert.equal(board.querySelector('[data-square=f3].premove img').dataset.piece,'wN');
+  assert.equal(board.querySelector('[data-square=c4].premove img').dataset.piece,'wB');
+  w.releaseReply(true);await drain();w.releaseReply(true);await playing;await drain();
+  assert.equal(w.feedback.status,'completed');assert.equal(w.premove,null);
+});
+
+test('more premoves can be appended after the first queued move has executed',async t=>{
+  const {w,board}=await setup(t);controlledReplies(t,w);
+  w.puzzles=[{...w.puzzles[0],solution:['e2e4','e7e5','g1f3','b8c6','f3g5','h7h6','g5f7']}];await w.startPuzzleSelection(w.puzzles);
+  const playing=w.submitPuzzle('e2e4');await drain();
+  for(const sq of ['g1','f3','f3','g5'])board.querySelector(`[data-square=${sq}]`).click();
+  const request=w.premove;
+  w.releaseReply(true);await drain();assert.equal(w.activity.step,3);
+  for(const sq of ['g5','f7'])board.querySelector(`[data-square=${sq}]`).click();
+  assert.equal(w.premove,request);assert.deepEqual(w.premove.moves,['f3g5','g5f7']);
+  w.releaseReply(true);await drain();w.releaseReply(true);await playing;await drain();
+  assert.equal(w.activity.step,7);assert.equal(w.feedback.status,'completed');assert.equal(w.premove,null);
+});
+
+test('Black can chain premoves from the projected piece position on a flipped board',async t=>{
+  const {w,board}=await setup(t),before=new Chess();before.move('e4');controlledReplies(t,w);
+  w.puzzles=[{...w.puzzles[0],fen:before.fen(),solution:['e7e5','g1f3','b8c6','f1c4','c6b4']}];await w.startPuzzleSelection(w.puzzles);
+  assert.equal(w.flipped,true);
+  const playing=w.submitPuzzle('e7e5');await drain();
+  for(const sq of ['b8','c6','c6','b4'])board.querySelector(`[data-square=${sq}]`).click();
+  assert.deepEqual(w.premove.moves,['b8c6','c6b4']);
+  assert.equal(board.querySelector('[data-square=b4].premove img').dataset.piece,'bN');
+  w.releaseReply(true);await drain();w.releaseReply(true);await playing;await drain();
+  assert.equal(w.activity.step,5);assert.equal(w.feedback.status,'completed');assert.equal(w.premove,null);
+});
+
+test('an incorrect premove discards its queued continuation without another mistake',async t=>{
+  const {a,w,board,down,up,event}=await setup(t);controlledReplies(t,w);
+  const playing=w.submitPuzzle('e2e4');await drain();
+  for(const [from,to] of [['g1','h3'],['h3','g5']]){down(from);a.dom.window.dispatchEvent(event('pointermove',to));up(to);}
+  assert.equal(w.premove.moves.length,2);
+  w.releaseReply(true);await playing;await drain();
+  assert.equal(w.activity.mistakes,1);assert.equal(w.activity.step,2);assert.equal(w.premove,null);
+  assert.equal(board.querySelector('[data-square=g1] img').dataset.piece,'wN');
+});
+
+test('an opponent capture invalidating a later premove clears the queue without submitting it',async t=>{
+  const {a,w,board,down,up,event}=await setup(t);controlledReplies(t,w);
+  w.puzzles=[{...w.puzzles[0],solution:['e2e4','d7d5','g1f3','d5e4','f3g5']}];await w.startPuzzleSelection(w.puzzles);
+  const playing=w.submitPuzzle('e2e4');await drain();
+  for(const [from,to] of [['g1','f3'],['e4','e5']]){down(from);a.dom.window.dispatchEvent(event('pointermove',to));up(to);}
+  assert.deepEqual(w.premove.moves,['g1f3','e4e5']);
+  w.releaseReply(true);await drain();assert.equal(w.premove,null);
+  w.releaseReply(true);await playing;await drain();
+  assert.equal(w.activity.step,4);assert.equal(w.activity.mistakes,0);
+  assert.equal(board.querySelector('[data-square=e4] img').dataset.piece,'bP');
+  assert.equal(board.querySelector('.premove'),null);
 });
 
 test('a wrong premove is validated once on the solver turn',async t=>{
@@ -321,6 +416,7 @@ for(const ending of ['close','navigation','deadline'])test(`queued premoves are 
   a.state.settings.moveAnim=true;controlledReplies(t,w);
   const starting=w.startPuzzleRun('knockout');await drain();const run=w.run;
   down('e4');a.dom.window.dispatchEvent(event('pointermove','d5'));up('d5');assert.ok(w.premove);
+  down('b1');a.dom.window.dispatchEvent(event('pointermove','c3'));up('c3');assert.equal(w.premove.moves.length,2);
   if(ending==='close')await w.close();
   else if(ending==='navigation')await w.navigate('openings');
   else await w.finishChallenge('Time is up');
