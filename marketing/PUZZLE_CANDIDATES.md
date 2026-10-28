@@ -6,11 +6,19 @@ Three new alternatives for the Chrome Web Store image set. The existing campaign
 - `chrome-web-store/puzzles-candidate-02.png` — **All yours.** Campaign-style headline above the puzzle overview and its three modes.
 - `chrome-web-store/puzzles-candidate-03.png` — **Small puzzles. Big progress.** Centered headline with the puzzle count and board in a shared frame.
 
-All exports: 1280 × 800 PNG. Generated with the built-in imagegen tool using existing campaign images and fresh captures from an isolated copy of the current extension as references. Generated UI is a visual reconstruction, rather than a pixel-exact screenshot. Candidate 2 received a targeted correction to restore the g1 knight. The generated compositions were resampled to the existing campaign dimensions for delivery.
+All exports: 1280 × 800 PNG. The initial candidates were generated with the built-in imagegen tool using existing campaign images and fresh captures from an isolated copy of the current extension as references. Candidates 1 and 3 retain generated UI reconstructions. The selected candidate 2 now uses a direct screenshot of the real extension inside its product frame.
 
 ## Candidate 2 — selected revision
 
 The selected All yours candidate has a centered headline, no marketing subtitle, and an outer background using the reference's sampled base color, #171512. The logo remains at the top left and the product frame below. Exported at 1280 × 800.
+
+### Native product screenshot
+
+Replaced the entire generated product screenshot with an authentic Chrome extension capture to remove warped lettering, uneven lighting and other generation artifacts, especially around Puzzle types. No image generation was used for this replacement.
+
+Source: `sources/puzzles-overview-native.png`, captured from an isolated copy of the current working extension at a 1840 × 900 viewport and 2× device scale. The crop contains the actual board and puzzle panel. The source is uniformly scaled to 861.3 × 496 pixels, centered inside the rounded frame, without stretching the board or redrawing UI text. The marketing headline, logo and outer background are preserved.
+
+Earlier generation and editing prompts below describe the design history, not the current screenshot insert.
 
 ### Exact background and subtitle removal
 
