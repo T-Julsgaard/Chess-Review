@@ -19,6 +19,16 @@ Headline exact text: "50,000 puzzles. All yours." Keep it on ONE line, same bold
 Subtitle exact text: "Learn with Chess Review. Free and offline." Keep on ONE line, same light gray font, same size, same vertical position around y171-195. The subtitle's own horizontal center must independently be x640, with balanced left/right margins (about220px each for its current width).
 Keep the CHESS / REVIEW logo at the TOP LEFT exactly where it is. Do not center the logo. Keep all elements BELOW y215 unchanged: the entire rounded product frame, board, all 32 chess pieces including white knight on g1, puzzle UI, UI words, controls, colors, shadows, spacing and background. No redesign, no new text, no removal of elements. The only change is moving the two marketing text lines rightwards to center each independently over the existing product frame. Preserve the 1280x800 canvas and all copy.
 
+### Background match revision
+
+Darkened the outer background and reduced its brown glow to better match `chrome-web-store/1 (1).png`. The centered headline, subtitle, logo and product layout are retained. Edited using the built-in imagegen tool.
+
+#### Background edit prompt
+
+Use case: precise-object-edit. Input image 1 is the EDIT TARGET: the centered "50,000 puzzles. All yours." marketing image. Input image 2 is a BACKGROUND COLOR REFERENCE ONLY: the matching existing Chess Review campaign image.
+Change ONLY the outer canvas BACKGROUND of image1 to match the dark background of image2. The reference background is a very dark, almost uniform warm charcoal, approximately RGB(23,21,18), HEX #171512, with only extremely faint fine texture. It does NOT have the pronounced mottled golden/brown haze, bright sepia glow behind the product, or lighter tan patches currently visible in image1. Especially darken the bright brown background area beneath the product frame, making it match the reference. Use the reference's restrained near-black background consistently around the entire canvas. This must be a perceptible darkening and reduction of the golden-brown cast, bringing it into the same series as image2.
+Preserve EVERYTHING ELSE from image1: the exact centered headline and subtitle positions and sizes; green "50,000 puzzles." and off-white "All yours."; subtitle "Learn with Chess Review. Free and offline."; top-left knight logo and CHESS / REVIEW wordmark; the entire product screenshot and rounded product frame including its location, borders, puzzle mode cards, filters, text, all 64 chessboard squares and all 32 pieces including the white knight on g1. Do not darken the board, interface, lettering or logo; only the OUTSIDE canvas background. Do not copy content from image2. No new text, no rearrangement, no crop, no extra objects. Same 1280x800 landscape composition.
+
 ## Generation prompts
 
 ### Candidate 1
