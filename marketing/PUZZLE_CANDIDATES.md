@@ -10,7 +10,19 @@ All exports: 1280 × 800 PNG. Generated with the built-in imagegen tool using ex
 
 ## Candidate 2 — selected revision
 
-The selected All yours candidate now centers its headline and subtitle independently on the canvas, while retaining the logo at the top left and the product frame below. Edited with the built-in imagegen tool and exported at 1280 × 800.
+The selected All yours candidate has a centered headline, no marketing subtitle, and an outer background using the reference's sampled base color, #171512. The logo remains at the top left and the product frame below. Exported at 1280 × 800.
+
+### Exact background and subtitle removal
+
+Removed the marketing subtitle while keeping the centered headline. The built-in imagegen tool performed the image edit; PNG export normalizes the outer background to the reference's sampled base color, sRGB `#171512` (23, 21, 18). Verified the exported 1280 × 800 PNG at seven background positions. The reference's faint per-pixel texture is represented by its base color.
+
+#### Edit prompt
+
+Use case: precise-object-edit. Image 1 is the edit target: centered Chess Review puzzle advertisement. Image 2 is the authoritative background-color reference.
+Two changes ONLY:
+1. REMOVE the entire gray marketing subtitle "Learn with Chess Review. Free and offline." below the headline. Leave that space empty and seamlessly fill with the outer background. Do not substitute any other text. Keep the headline at the same position and size, and the product frame in its same position.
+2. Match the OUTER BACKGROUND to the second reference exactly: the required color is sRGB HEX #171512, RGB 23,21,18, virtually flat dark charcoal. Use exactly this color across the canvas outside the product frame and behind the logo/headline. NO vignette, NO black gradient, NO warmer brown cast, NO hazy cloudy texture, NO glow around or below the frame. Treat this as a strict technical color match to reference 2. The previous approximation was too brown. The background should look identical in color when the two campaign images are placed side by side.
+Preserve everything else in image1: top-left white knight green square and CHESS / REVIEW wordmark; centered one-line headline "50,000 puzzles. All yours." with green and white lettering; its original typography; the entire rounded product frame including border, board, UI text, mode cards, settings and controls, all 32 chess pieces and 8x8 squares. Do not darken or recolor the product screenshot. Do not copy any text or screenshot content from reference2. Output same 1280x800 composition.
 
 ### Centering edit prompt
 
