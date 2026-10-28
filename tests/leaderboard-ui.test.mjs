@@ -6,6 +6,7 @@ import {LearningWorkspace} from '../lib/learning/workspace.js';
 import {LeaderboardClient} from '../lib/learning/leaderboard-client.js';
 
 const library=JSON.parse(readFileSync(new URL('../data/learning/puzzles.json',import.meta.url))).puzzles.slice(0,20);
+const drain=async()=>{for(let i=0;i<30;i++)await Promise.resolve();};
 async function setup(t){
   const dom=new JSDOM('<div id="root"><div class="app"></div></div>',{url:'https://extension.test'}),data={};
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:library})}));
@@ -86,4 +87,34 @@ test('Firefox consent denial and later revocation prevent authenticated network 
   assert.deepEqual(permissions.data_collection,['authenticationInfo','technicalAndInteraction']);
   allowed=true;await client.connect('a'.repeat(64));assert.equal(calls,1);
   allowed=false;await assert.rejects(client.start('knockout'),/permission was removed/);assert.equal(calls,1);
+});
+
+for(const leave of [false,true])test(`leaderboard entrance keeps its clicked footer and survives an immediate response${leave?' then navigation':''}`,async t=>{
+  const {w,dom}=await setup(t),animations=[];let finishHero;
+  w.puzzleMotionEnabled=()=>true;
+  const rect=(left,top,width,height)=>({left,right:left+width,top,bottom:top+height,width,height,x:left,y:top});
+  t.mock.method(dom.window.HTMLElement.prototype,'getBoundingClientRect',function(){
+    if(this.matches('.puzzle-mode'))return rect(420,100,180,254);
+    if(this.matches('.puzzle-mode-grid'))return rect(0,100,600,254);
+    if(this.matches('.leaderboard-hero'))return rect(0,100,600,164);
+    return rect(0,0,600,700);
+  });
+  dom.window.Element.prototype.animate=function(frames,options){
+    let resolve;const finished=new Promise(r=>{resolve=r;});
+    const animation={finished,cancel(){resolve();}};animations.push({node:this,frames,options,animation});
+    if(this.matches('.leaderboard-hero'))finishHero=resolve;else resolve();return animation;
+  };
+  w.leaderboardClient={configured:true,credentials:async()=>null,list:async()=>({rows:[{name:'Knight-fast',score:42}],hasNext:false})};
+  const pending=w.showLeaderboard('knockout');await drain();
+  const section=w.root.querySelector('.learn-leaderboard'),hero=section.querySelector('.leaderboard-hero');
+  assert.equal(section.querySelector('.leaderboard-backdrop').style.height,'254px','The entire original ticket/footer remains available to fade');
+  assert.equal(section.querySelector('.leaderboard-backdrop [data-focus=leaderboard-knockout]').textContent,'Leaderboard');
+  assert.equal(section.querySelectorAll('tbody tr').length,0,'A fast result does not detach an animating hero');
+  for(const {frames} of animations)for(const frame of frames){assert.equal('width' in frame,false);assert.equal('marginLeft' in frame,false);}
+  assert.equal(animations.find(a=>a.node===hero).frames[0].clipPath,'inset(0 0% 0 70% round 13px)');
+  if(leave)w.returnFromLeaderboard();else finishHero();
+  await pending;
+  assert.equal(w.root.querySelector('.leaderboard-backdrop'),null);
+  if(leave){assert.equal(w.page,'puzzles');assert.equal(w.leaderboardTimer,null);}
+  else {assert.equal(w.root.querySelector('.leaderboard-hero'),hero);assert.equal(w.root.querySelectorAll('tbody tr').length,1);}
 });

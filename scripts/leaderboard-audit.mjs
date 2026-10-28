@@ -8,7 +8,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await waitFor(review,"!!document.querySelector('.puzzle-mode-grid')&&!document.querySelector('.learn-transition-surface')",'Puzzle modes');
   // Deliberate test data lives only in this isolated profile, never the product.
   await run(`import('./analysis.js').then(({learningWorkspace:w})=>{w.leaderboardClient={configured:true,endpoint:'https://leaderboard.example',credentials:async()=>({id:'you',name:'Knight-a13f08c5d2'}),
-    list:async(mode,page)=>({rows:Array.from({length:10},(_,i)=>({id:i===3?'you':'player-'+i,name:i===3?'Knight-a13f08c5d2':'Knight-'+String(9876543210-i*2377),score:mode==='solve-puzzle'?1854-i*93:mode==='timeAttack'?72-i*3:46-i*2})),hasNext:page===1})};})`);
+    list:async(mode,page)=>({rows:Array.from({length:27},(_,i)=>({id:i===13?'you':'player-'+i,name:i===13?'Knight-a13f08c5d2':'Knight-'+((i+1)*2654435761>>>0).toString(16).padStart(8,'0')+'e2',score:mode==='solve-puzzle'?1854-i*39:mode==='timeAttack'?72-Math.floor(i*1.5):46-i})).slice((page-1)*10,page*10),hasNext:page<3})};})`);
   for(const [width,height] of [[1920,1080],[390,844],[320,740]]) {
     await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);
     for(const theme of ['dark','light']) {
@@ -16,13 +16,20 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       // surface too so the component's contrast can be checked independently.
       await run(`document.documentElement.dataset.theme='${theme}';document.querySelector('#root > .app').style.background= 'var(--bg)'`);
       for(const mode of ['solve-puzzle','timeAttack','knockout']) {
-        const frames=await run(`import('./analysis.js').then(async({learningWorkspace:w})=>{await w.showLeaderboard('${mode}');const hero=document.querySelector('.leaderboard-hero');return hero.getAnimations().map(a=>a.effect.getKeyframes().map(f=>({width:f.width,marginLeft:f.marginLeft})));})`);
+        const entrance=await run(`import('./analysis.js').then(({learningWorkspace:w})=>{window.leaderboardOpening=w.showLeaderboard('${mode}');const hero=window.openingHero=document.querySelector('.leaderboard-hero'),backdrop=document.querySelector('.leaderboard-backdrop'),button=backdrop?.querySelector('[data-focus=leaderboard-${mode}]');return {frames:hero.getAnimations().map(a=>a.effect.getKeyframes().map(f=>({clipPath:f.clipPath,transform:f.transform}))),footerFits:!backdrop||button.getBoundingClientRect().bottom<=backdrop.getBoundingClientRect().bottom+1};})`);
         if(width===1920&&theme==='dark') {
+          const frames=entrance.frames;
           assert.ok(frames.length,'Expansion is animated');const first=frames[0][0],last=frames[0].at(-1);
-          assert.ok(parseFloat(last.width)>parseFloat(first.width)*2.5);
-          assert.equal(mode==='solve-puzzle'?parseFloat(first.marginLeft)===0:parseFloat(first.marginLeft)>0,true);
+          assert.notEqual(first.clipPath,last.clipPath);assert.equal(last.transform,'translateY(0px)');
+          assert.equal(entrance.footerFits,true,'Original leaderboard footer is not cropped on click');
+          await sleep(80);
+          assert.equal(await run("window.openingHero===document.querySelector('.leaderboard-hero')"),true,'Immediate data does not detach the animating card');
+          const clip=await run(`(()=>{const hero=document.querySelector('.leaderboard-hero').getBoundingClientRect(),backdrop=document.querySelector('.leaderboard-backdrop')?.getBoundingClientRect();
+            return {x:hero.x-6,y:Math.min(hero.y,backdrop?.y??hero.y)-6,width:hero.width+12,height:Math.max(hero.bottom,backdrop?.bottom??hero.bottom)-Math.min(hero.y,backdrop?.y??hero.y)+12,scale:1}})()`);
+          const {data}=await call('Page.captureScreenshot',{format:'png',clip},review.sessionId);
+          await fs.writeFile(path.join(out,`entrance-${mode}.png`),Buffer.from(data,'base64'));
         }
-        await sleep(650);
+        await run('window.leaderboardOpening');await sleep(100);
         const layout=await run(`(()=>{const s=document.querySelector('.learn-leaderboard'),r=s.getBoundingClientRect();return {overflow:s.scrollWidth>s.clientWidth+1,x:r.x,width:r.width,
           hero:document.querySelector('.leaderboard-hero').getBoundingClientRect().width,rows:s.querySelectorAll('tbody tr').length,focus:document.activeElement.id,
           clip:{x:Math.max(0,r.x-8),y:Math.max(0,r.y-8),width:Math.min(innerWidth-Math.max(0,r.x-8),r.width+16),height:Math.min(innerHeight-Math.max(0,r.y-8),r.height+16),scale:1}}})()`);
@@ -46,5 +53,23 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await run("document.querySelector('[data-focus=leaderboard-return]').click()");
   await run("import('./analysis.js').then(m=>{m.learningWorkspace.root.dataset.motion='off';m.learningWorkspace.settings=()=>({moveAnim:false});return m.learningWorkspace.showLeaderboard('timeAttack');})");
   assert.equal(await run("document.querySelector('.leaderboard-hero').getAnimations().length"),0);
+  await run("document.querySelector('[data-focus=leaderboard-return]').click()");
+  await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]},review.sessionId);
+  await call('Emulation.setDeviceMetricsOverride',{width:1920,height:1500,deviceScaleFactor:1,mobile:false},review.sessionId);
+  await run(`document.documentElement.dataset.theme='dark';document.querySelector('#root > .app').style.background='var(--bg)';
+    const style=document.createElement('style');style.textContent='.leaderboard-capture.learning-embedded {inset:0;overflow:visible} .leaderboard-capture .learn-shell {position:absolute;left:0!important;top:0!important;width:680px!important;height:auto!important;max-height:none!important;transform:none!important;overflow:visible;display:block} .leaderboard-capture .learn-main {overflow:visible;max-height:none;height:auto;flex:none;padding:24px!important} .leaderboard-capture .learn-board-dock,.leaderboard-capture .learn-nav,.leaderboard-capture .learn-footer {display:none!important}';document.head.append(style)`);
+  for(const mode of ['solve-puzzle','timeAttack','knockout']) {
+    await run(`import('./analysis.js').then(async({learningWorkspace:w})=>{await w.showLeaderboard('${mode}');w.root.classList.add('leaderboard-capture');})`);
+    for(const page of [1,2,3]) {
+      if(page>1)await run(`import('./analysis.js').then(m=>m.learningWorkspace.loadLeaderboard(${page}))`);
+      await sleep(100);
+      const capture=await run(`(()=>{const s=document.querySelector('.learn-leaderboard'),r=s.getBoundingClientRect();return {rows:s.querySelectorAll('tbody tr').length,rank:s.querySelector('.leaderboard-rank').textContent,
+        pagination:s.querySelector('.leaderboard-pagination').textContent,clip:{x:r.x-16,y:r.y-16,width:r.width+32,height:r.height+32,scale:1}}})()`);
+      assert.equal(capture.rows,page===3?7:10);assert.equal(Number(capture.rank),(page-1)*10+1);assert.match(capture.pagination,new RegExp('Page '+page));
+      const {data}=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true,clip:capture.clip},review.sessionId);
+      await fs.writeFile(path.join(out,`preview-${mode}-page-${page}.png`),Buffer.from(data,'base64'));
+    }
+    await run("import('./analysis.js').then(m=>{m.learningWorkspace.root.classList.remove('leaderboard-capture');m.learningWorkspace.returnFromLeaderboard();})");
+  }
   console.log('Leaderboards: three mode expansions, pagination, focus, dark/light, desktop/mobile, and reduced motion passed. Screenshots: '+out);
 }
