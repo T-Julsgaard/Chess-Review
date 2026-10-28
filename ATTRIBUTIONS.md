@@ -12,6 +12,7 @@ redistribution permission.
 - **[Kristian Julsgaard](https://github.com/Julsgaard)** — Contributor
 - **[Arthur Guedes](https://github.com/arthurhguedes)** — Contributor
 - **[Thomas Murray](https://github.com/MurrayThomas)** — Contributor
+- **[lautpuspa](https://github.com/lautpuspa)** — Contributor
 - **[T-Julsgaard](https://github.com/T-Julsgaard)** — Creator & lead developer
 
 ## Chess pieces (bundled SVG sets)
