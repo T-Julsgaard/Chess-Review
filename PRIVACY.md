@@ -52,6 +52,11 @@ its storage in your browser.
 
 ## Optional puzzle leaderboards
 
+Developer debugger can import a CSV for temporary leaderboard previews. Imported
+rows stay in the current tab's memory and disappear on reload or **Clear test
+data**. They are not written to browser storage or uploaded. Online leaderboard
+requests and ranked submissions are blocked while that preview is active.
+
 Leaderboards are disabled until an online service is configured in a release.
 Opening a configured leaderboard fetches public rankings from a Cloudflare Worker;
 Cloudflare receives normal network information, including your IP address. The

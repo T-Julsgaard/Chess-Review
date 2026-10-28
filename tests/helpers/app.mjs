@@ -24,6 +24,7 @@ import {puzzleResultBadge} from '../../lib/puzzle-badge.js';
 import {matedKingSquare,mateMark} from '../../lib/mate-mark.js';
 import {moveAnimationDuration, MOVE_ANIMATION_EASING} from '../../lib/move-animation.js';
 import {rememberAnalyzedGame,historyGame} from '../../lib/player-history.js';
+import {leaderboardPreviewControls} from '../../lib/learning/leaderboard-preview.js';
 
 // Execute the real application in a DOM, stubbing only browser/engine boundaries.
 // Automatic startup and imports are omitted; production needs no test exports.
@@ -55,7 +56,7 @@ export function app(t, {hardware,url='https://extension.test/analysis.html#test-
     getComputedStyle: dom.window.getComputedStyle, performance, structuredClone,
     URL, TextEncoder, btoa, console, Chess, flagCodeForCountryId, countryNameForId, browserAPI,platformAPI:browserAPI,
     createScreenPreviewContext,loadScreenPreviewController,
-    rememberAnalyzedGame,historyGame,
+    rememberAnalyzedGame,historyGame,leaderboardPreviewControls,
     BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg, puzzleResultBadge, matedKingSquare, mateMark,
     moveAnimationDuration, MOVE_ANIMATION_EASING,
     CATEGORY_LABEL_FONT, categoryLabelPng,

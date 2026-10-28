@@ -5,6 +5,14 @@ is **disabled by default** and no production address or credentials are included
 Until deployed, each screen says that online rankings are not connected. Ordinary
 practice, filters, personal bests, and statistics continue to work offline.
 
+Developer debugger includes **Import leaderboard CSV** and **Clear test data**.
+CSV columns are `mode,player,solved,is_you`; `is_you` is optional (0/1).
+Modes are `solve-puzzle`, `timeAttack` and `knockout`. Imports replace only the
+current tab's in-memory leaderboard preview. They are never saved or uploaded,
+and disappear on Clear or page reload. Preview mode shows **Test data**, hides
+online account/play controls and blocks leaderboard requests. No sample CSV is
+bundled with the extension. Normal puzzle progress remains separate.
+
 ## Scoring and privacy
 
 Players explicitly choose **Play ranked** after verifying once on the service's

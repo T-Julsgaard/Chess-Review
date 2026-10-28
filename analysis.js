@@ -28,6 +28,7 @@ import { panelScale, panelGroupBounds, scalePanelGroup, movePanelGroup } from ".
 import { fullHdReferenceLayout, viewportGrowth } from "./lib/full-hd-layout.js";
 import { createScreenPreviewContext, loadScreenPreviewController } from "./lib/screen-previews.js";
 import { rememberAnalyzedGame, historyGame } from "./lib/player-history.js";
+import { leaderboardPreviewControls } from "./lib/learning/leaderboard-preview.js";
 
 const screenPreview = createScreenPreviewContext(location);
 const blankLaunch = new window.URLSearchParams(location.search).get("workspace") === "blank";
@@ -6247,6 +6248,12 @@ function visualSettings() {
     section("Developer debugger",
       el("button", {class:"set-reset","data-debug":"screen-previews",onclick:openScreenSizePreview}, "Open screen-size preview"),
       el("div", {class:"set-row hint"},el("span",{class:"set-note"},"Preview layouts at different screen sizes. Changes are not saved.")),
+      leaderboardPreviewControls({document,onError:toast,onChange:()=>{
+        if(learningWorkspace?.ranked){learningWorkspace.ranked=null;learningWorkspace.rankedNotice='Ranked play stopped while test data is active.';}
+        if(learningWorkspace?.page==='leaderboard')learningWorkspace.showLeaderboard(learningWorkspace.leaderboard.mode);
+        else if(learningWorkspace){learningWorkspace.leaderboard=null;learningWorkspace.render();}
+        renderSettings();
+      }}),
     ),
     el("button", { class: "set-reset", onclick: resetVisualSettings }, "Reset all visual settings"),
   );
