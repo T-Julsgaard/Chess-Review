@@ -43,13 +43,21 @@ Marquee prompt:
 
 These sibling versions preserve the corrected originals above. The small tile
 uses three lines: "Open-source" in white, "Free Chess" with white "Free" and
-green "Chess", and green "Analysis". Naturally proportioned, less inflated
-lettering and clear spacing take priority over matching line widths exactly.
-The small tile's green is visually matched to the marquee. The marquee uses
+green "Chess", and green "Analysis". The larger bold typography and layout use
+the user's preferred clipboard image as the small tile edit target. The marquee uses
 "Open-source, free" in white above "Chess Analysis" in
 green, with both lines centered on the same axis. The logo is centered above
-the enlarged headline, and the board sits farther right. Both backgrounds use
-the original tiles as references for darker charcoal with less brown haze.
+the enlarged headline, and the board sits farther right. Both backgrounds are
+replaced using `../Marketing images v2/accuracy-and-move-quality.png` as the
+palette reference. Sampled background target is #191712 (RGB 25,23,18), with
+smooth near-uniform charcoal instead of the previous mottled brown texture.
+The shared green headline target is #7cb94d (RGB 124,185,77), sampled from the
+reference headline. These are generation targets; output samples are reviewed
+for a visual match rather than assuming exact color reproduction.
+Final sampled headline interiors are approximately RGB 119,197,76 (small) and
+118,188,76 (marquee). Both use the reference green family, but the small remains
+slightly brighter. Background samples are approximately RGB 21-22,19-20,14-15
+(small) and 22-24,20-22,15-17 (marquee).
 Both exports were
 created with built-in imagegen, resampled with System.Drawing HighQualityBicubic,
 decoded to confirm PNG format and dimensions, and visually checked. The original
@@ -57,21 +65,16 @@ tile hashes were checked to confirm neither original changed.
 
 Small variant prompt:
 
-> Use the current small variant as edit target, original small tile as dark
-> background and typography reference, and marquee as green color reference.
-> Keep exactly three lines: Open-source / Free Chess / Analysis. Open-source and
-> Free must be white; Chess and Analysis green. Use clean heavy geometric sans
-> serif with naturally proportioned stable letterforms, clear counters and
-> spacing, no horizontal squeezing or inflated rounded shapes. A targeted
-> typography refinement requests Inter Bold 700 / ExtraBold 800-style lettering,
-> smaller calmer type about 175-190 px wide and natural spacing between Free and
-> Chess. Approximate sizes are 25 px, 32 px and 34 px for the three lines, with
-> green #7dc34f as a visual target from the marquee. Similar line
-> widths are secondary to good typography. Slightly darken the backdrop toward
-> the original near-black warm charcoal and reduce brown haze. Preserve the logo,
-> board placement, pieces, green c8 bishop, ordinary c6 knight square, absent e6
-> pawn, green d7 and c8-h3 arrow. No accuracy panel, added text or watermark.
-> Keep the 440:280 aspect ratio.
+> Use the user's preferred clipboard image as the edit target and the Accuracy
+> & Move Quality listing image as the palette reference. Preserve the supplied
+> larger bold typography and its three lines: Open-source / Free Chess /
+> Analysis. Change only Free to white; Open-source stays white, Chess and
+> Analysis use the shared green target #7cb94d. Completely remove the old
+> textured background and replace with smooth premium dark charcoal #191712,
+> matching the reference. No brown haze, mottling, vignette or gradient. Preserve
+> the logo, board placement, pieces, green c8 bishop, ordinary c6 knight square,
+> absent e6 pawn, green d7 and c8-h3 arrow. No accuracy panel, extra copy or
+> watermark. Keep the 440:280 aspect ratio.
 
 Marquee variant prompt:
 
@@ -81,10 +84,12 @@ Marquee variant prompt:
 > Preserve the background, pieces, highlights and corrected bishop arrow.
 > No accuracy panel, extra copy or watermark. Keep the 1400:560 aspect ratio.
 
-Marquee background refinement prompt:
+Marquee background replacement and palette prompt:
 
-> Use the current marquee variant as edit target and original marquee only as
-> backdrop reference. Slightly darken the outer background to near-black warm
-> charcoal, reduce brown haze and preserve subtle texture. Leave foreground
-> layout, wording, colors, pieces and highlights unchanged. No new gradient or
-> lighting.
+> Use the current marquee as the foreground/layout target and the Accuracy &
+> Move Quality listing image as palette reference. Completely replace the old
+> textured backdrop with smooth near-uniform premium dark charcoal #191712.
+> Remove old brown haze and mottling, with no vignette or gradient. Use shared
+> green #7cb94d for the headline. Preserve wording, typography, logo placement,
+> board location, size, pieces and corrected arrow. No extra copy or watermark.
+> Keep the 1400:560 aspect ratio.
