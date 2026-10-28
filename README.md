@@ -3,7 +3,7 @@
 Free, open-source game review for your online chess games, powered by Stockfish NNUE running
 locally in your browser. One click turns any **Chess.com** or **Lichess** game into a full
 review — accuracy scores, move-by-move classifications, an evaluation graph, and an estimated
-rating. No account, no server, no manual PGN copying.
+rating. Local analysis needs no account or server, and no manual PGN copying.
 
 **Learn with Chess Review** opens from the button beneath Engine, beside the move
 controls. By default, the review panels morph into one learning workspace while
@@ -137,6 +137,10 @@ usernames or game IDs. No games or analysis are sent to the developer or analyti
 Firefox discloses the browsing activity and website content used for these requests.
 Sharing a game copies an encoded, unencrypted PGN/metadata link to your clipboard;
 anyone you send it to can read that information. See [PRIVACY.md](PRIVACY.md).
+
+Optional puzzle leaderboards have a Cloudflare Workers + D1 service, server-verified
+ranked play and matching screens for all three modes. They are disabled until a
+deployment is configured. See [leaderboard setup and security](docs/LEADERBOARDS.md).
 
 ## Maintained-source checks
 

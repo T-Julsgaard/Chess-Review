@@ -6,8 +6,9 @@ import { execFileSync } from 'node:child_process';
 import { cmd } from 'web-ext';
 import './verify-engines.mjs';
 import {verifySource} from './verify-source.mjs';
-import {files, directories, pieceSets} from './package-inputs.mjs';
+import {files, directories, pieceSets,privatePackagePath} from './package-inputs.mjs';
 import {packagePuzzles} from './package-puzzles.mjs';
+import {LEADERBOARD_URL} from '../lib/learning/leaderboard-config.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 await verifySource(root);
@@ -21,13 +22,14 @@ if (lock.version !== pkg.version || lock.packages[''].version !== pkg.version) {
 }
 
 async function copyInputs(from, to, entries) {
+  const options={recursive:true,filter:source=>!privatePackagePath(path.relative(from,source))};
   for (const file of entries) {
     if (file === 'pieces-img') {
       await mkdir(path.join(to, file), { recursive: true });
       for (const set of pieceSets) {
-        await cp(path.join(from, file, set), path.join(to, file, set), { recursive: true });
+        await cp(path.join(from, file, set), path.join(to, file, set), options);
       }
-    } else await cp(path.join(from, file), path.join(to, file), { recursive: true });
+    } else await cp(path.join(from, file), path.join(to, file), options);
   }
 }
 async function size(dir) {
@@ -45,7 +47,10 @@ const releaseDir = await mkdtemp(path.join(artifactsDir, `release-${manifest.ver
 const snapshotDir = path.join(releaseDir, 'source');
 await mkdir(snapshotDir);
 const sourceFiles = [...files, 'manifest.json', 'package.json', 'package-lock.json',
-  'marketing/STORE_LISTING.md', 'CONTRIBUTING.md', 'SECURITY.md'];
+  'marketing/STORE_LISTING.md', 'CONTRIBUTING.md', 'SECURITY.md',
+  // Explicit allowlist: private Wrangler state and .dev.vars must never enter archives.
+  'services/leaderboard/worker.js', 'services/leaderboard/wrangler.toml',
+  'services/leaderboard/export-puzzles.mjs', 'services/leaderboard/migrations/0001_leaderboards.sql'];
 await copyInputs(root, snapshotDir, [...sourceFiles, ...directories, 'docs', 'scripts', 'tests', 'tools']);
 const sha256 = async file => createHash('sha256').update(await readFile(file)).digest('hex');
 async function fileHashes(dir, base = dir) {
@@ -72,6 +77,11 @@ for (const browser of ['chrome', 'firefox']) {
   await copyInputs(snapshotDir, sourceDir, [...files, ...directories]);
   const puzzleLibrary = await packagePuzzles(sourceDir);
   const target = structuredClone(manifest);
+  if(LEADERBOARD_URL){
+    const endpoint=new URL(LEADERBOARD_URL);
+    if(endpoint.protocol!=='https:'||endpoint.origin!==LEADERBOARD_URL)throw Error('Leaderboard URL must be an HTTPS origin');
+    target.host_permissions.push(endpoint.origin+'/*');
+  }
   if (browser === 'chrome') {
     delete target.browser_specific_settings;
     delete target.background.scripts;

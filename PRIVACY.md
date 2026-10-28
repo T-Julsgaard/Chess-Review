@@ -1,12 +1,12 @@
 # Privacy Policy — Chess Review
 
-_Last updated: 2026-10-24_
+_Last updated: 2026-10-28_
 
 Chess Review is a browser extension that reviews the chess games you play on
 **Chess.com** and **Lichess**. This policy explains exactly what the extension
 does with data. **Analysis runs locally. Game lookup requests go directly to the
-chess platforms. No data is sent to the developer or to an analytics or advertising
-service by the extension.** Sharing a game is an explicit user action described below.
+chess platforms. No analytics or advertising services are used.** Optional online
+puzzle rankings and sharing a game are explicit user actions described below.
 
 ## What the extension does
 
@@ -50,6 +50,38 @@ or game ID is sent to the relevant chess platform when needed for a game lookup,
 as described above. You can clear local data by removing the extension or clearing
 its storage in your browser.
 
+## Optional puzzle leaderboards
+
+Leaderboards are disabled until an online service is configured in a release.
+Opening a configured leaderboard fetches public rankings from a Cloudflare Worker;
+Cloudflare receives normal network information, including your IP address. The
+rankings refresh every 30 seconds while open. Viewing does not upload your local
+progress or require a player key.
+
+To participate, you explicitly verify on the service's hosted Turnstile page,
+connect a private player key, then choose **Play ranked**. The key and generated
+player name are stored locally. Firefox requests optional authentication-data
+and puzzle-interaction consent before connecting. Ranked play sends the key, session identifiers and
+puzzle move sequences to the service to verify results. Your games, PGNs, chess-site
+identity, browsing history, settings and historical local progress are not sent.
+Your generated name and verified scores are public.
+
+The service stores a hash of your player key, generated name, creation time,
+unique solved puzzle IDs, scores and achievement times, and a short-lived session
+with assigned/previous puzzle IDs. Submitted moves are checked in memory; only a
+digest and the previous result are retained for safe retries. One session per
+player is retained and removed by scheduled cleanup after expiry. Scores and
+unique solve IDs remain until you delete them. The service does not store raw IP
+addresses; it uses daily rotating keyed digests for short-lived rate limiting.
+Cloudflare processes network information for hosting, abuse prevention and
+Turnstile verification under its own policies. Worker request logging is disabled.
+
+Use **Player settings → Disconnect** to remove the key locally, or **Delete online
+records** to delete your player and scores from the service. Cached public records
+may remain visible for up to 30 seconds. Clearing extension storage alone does not
+delete public scores. Keep the player key private and save it if you need future
+access; the service does not collect an email address for recovery.
+
 ## Sharing a game
 
 Choosing **Share game** copies a link to your clipboard. Its URL fragment contains
@@ -64,14 +96,15 @@ visits the chess platform named in the URL.
 
 ## What we do NOT do
 
-- We do **not** collect, transmit, or store your data on any server operated by
-  the developer. The extension has no backend.
+- We do **not** upload your games, analysis or local learning history to a
+  developer server. Optional ranked puzzle play uses the service described above.
 - We do **not** use any analytics, telemetry, tracking, or advertising.
 - We do **not** sell your data. Apart from the platform lookup requests above,
   the extension does not automatically send your games or analysis to third parties;
   you control whether to share a game link.
 - We do **not** use your data to determine creditworthiness or for lending.
-- We do **not** access any websites other than Chess.com and Lichess.
+- Network access consists of chess-platform lookups and the optional configured
+  leaderboard service; its verification page also loads Cloudflare Turnstile.
 
 ## Permissions
 
@@ -81,9 +114,13 @@ visits the chess platform named in the URL.
   read the current tab's URL and detect the Chess.com / Lichess game to review.
 - **Host access to `chess.com` and `lichess.org`** — to add the review button to
   those game pages and to fetch your game's PGN from their public APIs.
+- **Host access to the configured leaderboard origin**, when enabled in a release
+  — to fetch rankings and verify explicitly chosen ranked puzzle play.
 - **Firefox data permissions (`browsingActivity`, `websiteContent`)** — disclose
   the game identifiers and public player usernames used in those lookup requests.
-  These permissions do not add tracking, telemetry, or a developer backend.
+  These permissions do not add tracking or telemetry. Optional `authenticationInfo`
+  consent covers the player key used for online rankings; optional
+  `technicalAndInteraction` consent covers ranked puzzle moves and scores.
 
 ## Contact
 

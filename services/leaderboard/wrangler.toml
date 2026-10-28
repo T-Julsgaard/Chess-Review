@@ -1,0 +1,42 @@
+name = "chess-review-leaderboard"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+# Replace these public identifiers after creating your own D1 database / widget.
+[[d1_databases]]
+binding = "DB"
+database_name = "chess-review-leaderboard"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+migrations_dir = "migrations"
+
+[vars]
+ENABLED = "false"
+TURNSTILE_SITE_KEY = "REPLACE_WITH_PUBLIC_SITE_KEY"
+TURNSTILE_HOSTNAME = "REPLACE_WITH_WORKER_HOSTNAME"
+
+[[ratelimits]]
+name = "READ_LIMIT"
+namespace_id = "1801"
+simple = { limit = 30, period = 60 }
+
+[[ratelimits]]
+name = "WRITE_LIMIT"
+namespace_id = "1802"
+simple = { limit = 100, period = 60 }
+
+[[ratelimits]]
+name = "JOIN_LIMIT"
+namespace_id = "1803"
+simple = { limit = 3, period = 60 }
+
+[[ratelimits]]
+name = "GLOBAL_LIMIT"
+namespace_id = "1804"
+simple = { limit = 800, period = 60 }
+
+[triggers]
+crons = ["17 3 * * *"]
+
+[observability]
+enabled = false

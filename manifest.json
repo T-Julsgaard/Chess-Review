@@ -47,6 +47,10 @@
         "required": [
           "browsingActivity",
           "websiteContent"
+        ],
+        "optional": [
+          "authenticationInfo",
+          "technicalAndInteraction"
         ]
       }
     },

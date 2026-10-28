@@ -4,3 +4,11 @@ web-ext-artifacts/
 calibration-runs/
 scratch/
 research/runs/
+.wrangler/
+.dev.vars
+.dev.vars.*
+.env
+.env.*
+!.env.example
+*.pem
+*.key
