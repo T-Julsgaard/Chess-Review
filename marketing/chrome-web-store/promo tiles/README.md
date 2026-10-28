@@ -42,23 +42,34 @@ Marquee prompt:
 - `marquee-promo-tile-open-source-1400x560.png`: 1400 x 560 PNG.
 
 These sibling versions preserve the corrected originals above. The small tile
-uses three lines: "Open-source" in white, then "Free Chess" and "Analysis" in
-green. Each line uses a naturally proportioned font size to give similar visual
-widths. The marquee uses "Open-source, free" in white above "Chess Analysis" in
+uses three lines: "Open-source" in white, "Free Chess" with white "Free" and
+green "Chess", and green "Analysis". Naturally proportioned, less inflated
+lettering and clear spacing take priority over matching line widths exactly.
+The small tile's green is visually matched to the marquee. The marquee uses
+"Open-source, free" in white above "Chess Analysis" in
 green, with both lines centered on the same axis. The logo is centered above
-the enlarged headline, and the board sits farther right. Both exports were
+the enlarged headline, and the board sits farther right. Both backgrounds use
+the original tiles as references for darker charcoal with less brown haze.
+Both exports were
 created with built-in imagegen, resampled with System.Drawing HighQualityBicubic,
 decoded to confirm PNG format and dimensions, and visually checked. The original
 tile hashes were checked to confirm neither original changed.
 
 Small variant prompt:
 
-> Use case: text-localization. Change only the left headline to exactly three
-> lines: Open-source / Free Chess / Analysis. Use white for the first line and
-> green for the others. Use naturally proportioned bold sans serif with no
-> horizontal compression: first line about 28-30 px and following lines larger
-> so each line is about 205 px wide. Preserve the logo, dark texture, board
-> placement, all pieces, green c8 bishop, ordinary c6 knight square, absent e6
+> Use the current small variant as edit target, original small tile as dark
+> background and typography reference, and marquee as green color reference.
+> Keep exactly three lines: Open-source / Free Chess / Analysis. Open-source and
+> Free must be white; Chess and Analysis green. Use clean heavy geometric sans
+> serif with naturally proportioned stable letterforms, clear counters and
+> spacing, no horizontal squeezing or inflated rounded shapes. A targeted
+> typography refinement requests Inter Bold 700 / ExtraBold 800-style lettering,
+> smaller calmer type about 175-190 px wide and natural spacing between Free and
+> Chess. Approximate sizes are 25 px, 32 px and 34 px for the three lines, with
+> green #7dc34f as a visual target from the marquee. Similar line
+> widths are secondary to good typography. Slightly darken the backdrop toward
+> the original near-black warm charcoal and reduce brown haze. Preserve the logo,
+> board placement, pieces, green c8 bishop, ordinary c6 knight square, absent e6
 > pawn, green d7 and c8-h3 arrow. No accuracy panel, added text or watermark.
 > Keep the 440:280 aspect ratio.
 
@@ -69,3 +80,11 @@ Marquee variant prompt:
 > Analysis, centering both on one axis. Center the logo lockup above them.
 > Preserve the background, pieces, highlights and corrected bishop arrow.
 > No accuracy panel, extra copy or watermark. Keep the 1400:560 aspect ratio.
+
+Marquee background refinement prompt:
+
+> Use the current marquee variant as edit target and original marquee only as
+> backdrop reference. Slightly darken the outer background to near-black warm
+> charcoal, reduce brown haze and preserve subtle texture. Leave foreground
+> layout, wording, colors, pieces and highlights unchanged. No new gradient or
+> lighting.
