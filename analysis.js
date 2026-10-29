@@ -1734,6 +1734,9 @@ async function openLearning() {
   if(wasAnalysis)exitAnalysis(undefined,{render:false});
   UI.settings.hidden = true;
   hideBoardBadgeTip();
+  // Learning snapshots the board's children for restoration. Transient review
+  // reactions must not become part of that saved board.
+  reviewEffects.clear();
   learningWorkspace = new LearningWorkspace({document, storage:browserAPI.storage.local, makePiece, url:_url,
     settings:()=>S.settings, flipped:S.flipped, book:()=>BOOK || {}, startDrag, onPuzzleWrong:playWrongSound, onPuzzleMove:playSanSound, onPuzzlePremove:playPremoveSound, onOpeningMove:playSanSound, onFreeMove:playSanSound, onPuzzleSuccess:playPuzzleSuccess,
     createAnalysisEngine:()=>createEngine({Hash:S.settings.engineHash, "Skill Level":S.settings.engineSkill}),
@@ -1750,6 +1753,7 @@ async function openLearning() {
       learningWorkspace = null;
       syncLearningToggle();
       alignPlayers();
+      if (UI.settings && !UI.settings.hidden) renderSettings();
       if(wasBlank){document.getElementById("learningToggle")?.focus();return;}
       S.idx=snapshot.idx; S.flipped=snapshot.flipped; S.selectedSq=snapshot.selectedSq;
       if(!S.practice){paintBoard();}
@@ -2128,6 +2132,7 @@ function toggleReorganize() {
   }
   cancelPanelGesture?.();
   S.reorganize = !S.reorganize;
+  if (S.reorganize) reviewEffects.clear();
   if(!S.reorganize)selectedPanels.clear();
   UI.canvas.classList.toggle("reorganizing", S.reorganize);
   if (S.reorganize && UI.settings) UI.settings.hidden = true; // move the settings panel out of the way
@@ -2351,6 +2356,7 @@ function makePiece(type, side) {
 function buildBoard() {
   _cancelBoardDrag?.();
   if (learningWorkspace?.embedded) return;
+  reviewEffects.clear();
   const files = ["a","b","c","d","e","f","g","h"];
   const ranks = [8,7,6,5,4,3,2,1];
   const rowOrder = S.flipped ? [...ranks].reverse() : ranks;
@@ -2451,7 +2457,7 @@ function paintBoard({restoring=false}={}) {
   reviewEffects.update(boardEl, {
     key: JSON.stringify([S.pgn, S.idx, S.analysisMode, S.variation?.idx, pos.fen]),
     category: cls, square: pos.to, flipped: S.flipped,
-    enabled: S.settings.reviewMode === "dopamine" && !S.practice && !S.reorganize && !S.blank,
+    enabled: S.settings.reviewMode === "dopamine" && !learningWorkspace && !S.practice && !S.reorganize && !S.blank,
     motion: S.settings.moveAnim !== false,
   });
   if (clean && S.practice.resultBadge?.solvePos === solvePly) {
@@ -6196,6 +6202,7 @@ function bgControls() {
   ];
 }
 function visualSettings() {
+  const canPreviewReviewEffects = !learningWorkspace && !S.practice && !S.reorganize;
   const boardEntries = Object.entries(BOARD_THEMES).map(([k, [lt, dk]]) => ({
     value: k, title: BOARD_THEME_LABEL[k] || k,
     render: (chip) => chip.append(el("span", { class: "half l", style: { background: lt } }), el("span", { class: "half r", style: { background: dk } })),
@@ -6222,10 +6229,11 @@ function visualSettings() {
       seg("Mode", "reviewMode", ["normal", "dopamine"], null, value => value === "dopamine" ? "Dopamine" : "Normal"),
       el("p", { class: "set-note" }, "Dopamine mode adds vivid move reactions, a purple review theme and explanations from the engine’s available continuation. Brilliant moves light up the board; blunders send a red shockwave. Reduced motion keeps a static square outline."),
       el("div", { class: "dopamine-preview-buttons" }, ...["brilliant", "blunder"].map(category =>
-        el("button", { type: "button", class: "set-reset", disabled: S.settings.reviewMode !== "dopamine",
+        el("button", { type: "button", class: "set-reset", disabled: S.settings.reviewMode !== "dopamine" || !canPreviewReviewEffects,
           onclick: () => reviewEffects.show(UI.boardWrap.querySelector(".board"), {
             category, square: activePos().to, flipped: S.flipped, motion: S.settings.moveAnim !== false,
           }) }, "Preview " + categoryName(category) + " effect"))),
+      !canPreviewReviewEffects ? el("p", { class: "set-note" }, "Return to game review to preview these effects.") : null,
     ),
     section("Interface presets",
       seg("Setup", "uiSetup", Object.keys(UI_SETUPS), null, value => UI_SETUPS[value].label),

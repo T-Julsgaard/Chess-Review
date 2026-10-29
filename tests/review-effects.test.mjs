@@ -161,3 +161,40 @@ test('Dopamine gives Modern commentary room without rewriting saved layout geome
   a.state.settings.reviewMode = 'normal';
   assert.deepEqual(JSON.parse(JSON.stringify(a.call('referenceLayout'))), JSON.parse(JSON.stringify(normal)));
 });
+
+test('review reactions are not saved into learning or replayed when returning to review', async t => {
+  t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[
+    {id:'effect-lifecycle',fen:'7k/8/8/8/8/8/8/K7 w - - 0 1',solution:['a1b1'],rating:450,themes:[]},
+  ]})}));
+  const a=app(t); loadGame(a,'1. e4 e5 2. Nf3 Nc6');
+  a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
+  a.state.settings.reviewMode='dopamine'; a.state.classif[1]='brilliant'; a.call('go',1);
+  const doc=a.dom.window.document;
+  assert.ok(doc.querySelector('.dopamine-effect'));
+  await a.call('openLearning'); const workspace=a.run('learningWorkspace');
+  t.after(async()=>{await workspace.close();});
+  assert.equal(workspace.boardChildren.some(node=>node.classList?.contains('dopamine-effect')),false);
+  const previews=[...a.call('visualSettings').querySelectorAll('button')].filter(button=>button.textContent.startsWith('Preview '));
+  assert.ok(previews.length===2 && previews.every(button=>button.disabled));
+  a.state.setOpen['Review experience']=true;
+  a.call('toggleSettings');
+  const livePreview=()=>[...doc.querySelectorAll('#settings button')].find(button=>button.textContent==='Preview Brilliant effect');
+  assert.equal(livePreview().disabled,true);
+  await workspace.close();
+  assert.equal(livePreview().disabled,false,'open settings refresh when game review resumes');
+  assert.equal(doc.querySelector('#settings').textContent.includes('Return to game review to preview these effects.'),false);
+  assert.equal(doc.querySelector('.dopamine-effect'),null);
+  a.call('paintBoard');
+  assert.equal(doc.querySelector('.dopamine-effect'),null);
+  a.state.classif[2]='best'; a.call('go',2);
+  assert.ok(doc.querySelector('.dopamine-effect'),'new review navigation still reacts');
+});
+
+test('entering panel arrangement stops an active reaction', t => {
+  const a=app(t); loadGame(a,'1. e4 e5');
+  a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
+  a.state.settings.reviewMode='dopamine'; a.state.classif[1]='blunder'; a.call('go',1);
+  assert.ok(a.dom.window.document.querySelector('.dopamine-effect'));
+  a.state.layoutMode='custom'; a.call('toggleReorganize');
+  assert.equal(a.dom.window.document.querySelector('.dopamine-effect'),null);
+});
