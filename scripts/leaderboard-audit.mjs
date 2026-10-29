@@ -8,7 +8,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await waitFor(review,"!!document.querySelector('.puzzle-mode-grid')&&!document.querySelector('.learn-transition-surface')",'Puzzle modes');
   // Deliberate test data lives only in this isolated profile, never the product.
   await run(`import('./analysis.js').then(({learningWorkspace:w})=>{w.leaderboardClient={configured:true,endpoint:'https://leaderboard.example',credentials:async()=>({id:'you',name:'Knight-a13f08c5d2'}),
-    list:async(mode,page)=>({rows:Array.from({length:27},(_,i)=>({id:i===13?'you':'player-'+i,name:i===13?'Knight-a13f08c5d2':'Knight-'+((i+1)*2654435761>>>0).toString(16).padStart(8,'0')+'e2',country:['DK','2','XE'][i%3],score:mode==='solve-puzzle'?1854-i*39:mode==='timeAttack'?72-Math.floor(i*1.5):46-i})).slice((page-1)*10,page*10),hasNext:page<3})};})`);
+    list:async(mode,page)=>{await window.leaderboardReadDelay;return {rows:Array.from({length:27},(_,i)=>({id:i===13?'you':'player-'+i,name:i===13?'Knight-a13f08c5d2':'Knight-'+((i+1)*2654435761>>>0).toString(16).padStart(8,'0')+'e2',country:['DK','2','XE'][i%3],score:mode==='solve-puzzle'?1854-i*39:mode==='timeAttack'?72-Math.floor(i*1.5):46-i})).slice((page-1)*10,page*10),hasNext:page<3};}};})`);
   for(const [width,height] of [[1920,1080],[390,844],[320,740]]) {
     await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);
     for(const theme of ['dark','light']) {
@@ -16,6 +16,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       // surface too so the component's contrast can be checked independently.
       await run(`document.documentElement.dataset.theme='${theme}';document.querySelector('#root > .app').style.background= 'var(--bg)'`);
       for(const mode of ['solve-puzzle','timeAttack','knockout']) {
+        await run('window.leaderboardReadDelay=new Promise(resolve=>{window.finishLeaderboardRead=resolve;});void 0');
         const entrance=await run(`import('./analysis.js').then(({learningWorkspace:w})=>{window.leaderboardOpening=w.showLeaderboard('${mode}');const hero=window.openingHero=document.querySelector('.leaderboard-hero'),backdrop=document.querySelector('.leaderboard-backdrop'),button=backdrop?.querySelector('[data-focus=leaderboard-${mode}]');return {frames:hero.getAnimations().map(a=>a.effect.getKeyframes().map(f=>({clipPath:f.clipPath,transform:f.transform}))),footerFits:!backdrop||button.getBoundingClientRect().bottom<=backdrop.getBoundingClientRect().bottom+1};})`);
         if(width===1920&&theme==='dark') {
           const frames=entrance.frames;
@@ -29,7 +30,12 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
           const {data}=await call('Page.captureScreenshot',{format:'png',clip},review.sessionId);
           await fs.writeFile(path.join(out,`entrance-${mode}.png`),Buffer.from(data,'base64'));
         }
-        await run('window.leaderboardOpening');await sleep(100);
+        await waitFor(review,"!!document.querySelector('.leaderboard-empty')&&!document.querySelector('.leaderboard-entering')",'Loading leaderboard');
+        await sleep(100);
+        const loadingHeight=await run("document.querySelector('.leaderboard-table-wrap').getBoundingClientRect().height");
+        await run('window.finishLeaderboardRead();window.leaderboardOpening');await sleep(100);
+        const loadedHeight=await run("document.querySelector('.leaderboard-table-wrap').getBoundingClientRect().height");
+        assert.ok(Math.abs(loadingHeight-loadedHeight)<1,`${mode}/${width}/${theme}: loading height ${loadingHeight} matches loaded height ${loadedHeight}`);
         const layout=await run(`(()=>{const s=document.querySelector('.learn-leaderboard'),r=s.getBoundingClientRect();return {overflow:s.scrollWidth>s.clientWidth+1,x:r.x,width:r.width,
           hero:document.querySelector('.leaderboard-hero').getBoundingClientRect().width,rows:s.querySelectorAll('tbody tr').length,focus:document.activeElement.id,
           clip:{x:Math.max(0,r.x-8),y:Math.max(0,r.y-8),width:Math.min(innerWidth-Math.max(0,r.x-8),r.width+16),height:Math.min(innerHeight-Math.max(0,r.y-8),r.height+16),scale:1}}})()`);

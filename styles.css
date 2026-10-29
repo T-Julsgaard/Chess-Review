@@ -480,13 +480,14 @@
 .learn-leaderboard .leaderboard-refresh { font-size: 11px; padding: 6px 10px; }
 .leaderboard-personal { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 14px; background: color-mix(in srgb, var(--mode-stock) 10%, transparent); border: 1px solid var(--line); border-radius: 10px; font-size: 12px; }
 .leaderboard-personal strong { font-size: 20px; margin-right: auto; font-variant-numeric: tabular-nums; }
-.leaderboard-table-wrap { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); }
+.leaderboard-table-wrap { --leaderboard-row-height: 54px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); }
 .leaderboard-table { border-collapse: collapse; width: 100%; table-layout: fixed; font-variant-numeric: tabular-nums; }
 .leaderboard-table th,.leaderboard-table td { padding: 13px 16px; text-align: left; border-bottom: 1px solid var(--line); }
 .leaderboard-table thead th { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 650; color: var(--ink-2); background: color-mix(in srgb,var(--mode-stock) 6%,var(--panel)); }
 .leaderboard-table thead th:first-child { width: 70px; }
 .leaderboard-table thead th:last-child { width: 96px; text-align: right; }
 .leaderboard-table tbody th { font-size: 12px; font-weight: 550; overflow-wrap: anywhere; }
+.leaderboard-table tbody tr { height: var(--leaderboard-row-height); }
 .leaderboard-table tr:last-child > * { border-bottom: 0; }
 .leaderboard-rank { color: var(--ink-2); font-size: 12px; }
 .leaderboard-rank span { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; }
@@ -502,6 +503,8 @@
 .leaderboard-table .is-you { background: color-mix(in srgb,var(--mode-stock) 9%,var(--panel)); }
 .leaderboard-you { display: inline-block; margin-left: 7px; color: var(--ink-2); font-size: 9px; font-weight: 500; }
 .leaderboard-empty { min-height: 190px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 28px 20px; gap: 10px; text-align: center; }
+/* Reserve the same ten rows as a full page while its rankings are loading. */
+.leaderboard-table-wrap[aria-busy="true"] .leaderboard-empty { box-sizing: border-box; min-height: calc(10 * var(--leaderboard-row-height)); }
 .leaderboard-empty > span { font-size: 40px; color: var(--mode-stock); }
 .leaderboard-empty strong { font-size: 15px; color: var(--ink); }
 .learn-leaderboard .leaderboard-empty p { max-width: 280px; margin: 0; color: var(--ink-2); font-size: 12px; line-height: 1.6; }
@@ -527,6 +530,7 @@
   .leaderboard-hero { padding: 20px; gap: 8px; min-height: 150px; }
   .leaderboard-hero .puzzle-mode-art { flex-basis: 74px; width: 74px; }
   .leaderboard-table th,.leaderboard-table td { padding: 12px 9px; }
+  .leaderboard-table-wrap { --leaderboard-row-height: 52px; }
   .leaderboard-table thead th:first-child { width: 48px; }
   .leaderboard-table thead th:last-child { width: 74px; }
   .leaderboard-score { font-size: 16px; }
