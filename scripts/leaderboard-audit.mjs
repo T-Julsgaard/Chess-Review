@@ -17,7 +17,20 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       await run(`document.documentElement.dataset.theme='${theme}';document.querySelector('#root > .app').style.background= 'var(--bg)'`);
       for(const mode of ['solve-puzzle','timeAttack','knockout']) {
         await run('window.leaderboardReadDelay=new Promise(resolve=>{window.finishLeaderboardRead=resolve;});void 0');
-        const entrance=await run(`import('./analysis.js').then(({learningWorkspace:w})=>{window.leaderboardOpening=w.showLeaderboard('${mode}');const hero=window.openingHero=document.querySelector('.leaderboard-hero'),backdrop=document.querySelector('.leaderboard-backdrop'),button=backdrop?.querySelector('[data-focus=leaderboard-${mode}]');return {frames:hero.getAnimations().map(a=>a.effect.getKeyframes().map(f=>({clipPath:f.clipPath,transform:f.transform}))),footerFits:!backdrop||button.getBoundingClientRect().bottom<=backdrop.getBoundingClientRect().bottom+1};})`);
+        await run("document.querySelector('.puzzle-mode-grid').scrollIntoView({block:'center'})");
+        const pointer=await run(`(()=>{const r=document.querySelector('[data-focus=leaderboard-${mode}]').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
+        await call('Input.dispatchMouseEvent',{type:'mouseMoved',...pointer},review.sessionId);await sleep(300);
+        await call('Input.dispatchMouseEvent',{type:'mousePressed',button:'left',clickCount:1,...pointer},review.sessionId);await sleep(80);
+        const entrance=await run(`import('./analysis.js').then(({learningWorkspace:w})=>{
+          const source=document.querySelector('.puzzle-mode[data-mode="${mode}"] .puzzle-mode-button').getBoundingClientRect(),expected=[source.x,source.y,source.width,source.height];
+          window.leaderboardOpening=w.showLeaderboard('${mode}');const hero=window.openingHero=document.querySelector('.leaderboard-hero'),backdrop=document.querySelector('.leaderboard-backdrop'),button=backdrop?.querySelector('[data-focus=leaderboard-${mode}]');
+          const animation=hero.getAnimations()[0];animation.pause();animation.currentTime=0;
+          const r=hero.getBoundingClientRect(),clip=getComputedStyle(hero).clipPath.slice(6).split(' round')[0].split(' ').map(parseFloat),[top,right,bottom,left]=clip;
+          const actual=[r.x+r.width*left/100,r.y,r.width*(1-(left+right)/100),r.height*(1-bottom/100)];
+          const original=backdrop.querySelector('.puzzle-mode[data-mode="${mode}"] .puzzle-mode-button').getBoundingClientRect(),fading=[original.x,original.y,original.width,original.height];
+          animation.play();return {expected,actual,fading,frames:hero.getAnimations().map(a=>a.effect.getKeyframes().map(f=>({clipPath:f.clipPath,transform:f.transform}))),footerFits:!backdrop||button.getBoundingClientRect().bottom<=backdrop.getBoundingClientRect().bottom+2};})`);
+        await call('Input.dispatchMouseEvent',{type:'mouseReleased',button:'left',clickCount:1,...pointer},review.sessionId);
+        for(const key of ['actual','fading'])entrance[key].forEach((value,index)=>assert.ok(Math.abs(value-entrance.expected[index])<.5,`${mode}/${width}/${theme}: ${key} starts at the pressed colored button`));
         if(width===1920&&theme==='dark') {
           const frames=entrance.frames;
           assert.ok(frames.length,'Expansion is animated');const first=frames[0][0],last=frames[0].at(-1);

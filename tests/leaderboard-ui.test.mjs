@@ -151,6 +151,7 @@ for(const leave of [false,true])test(`leaderboard entrance keeps its clicked foo
   w.puzzleMotionEnabled=()=>true;
   const rect=(left,top,width,height)=>({left,right:left+width,top,bottom:top+height,width,height,x:left,y:top});
   t.mock.method(dom.window.HTMLElement.prototype,'getBoundingClientRect',function(){
+    if(this.matches('.puzzle-mode-button'))return rect(421,104,178,158);
     if(this.matches('.puzzle-mode'))return rect(420,100,180,254);
     if(this.matches('.puzzle-mode-grid'))return rect(0,100,600,254);
     if(this.matches('.leaderboard-hero'))return rect(0,100,600,164);
@@ -168,7 +169,9 @@ for(const leave of [false,true])test(`leaderboard entrance keeps its clicked foo
   assert.equal(section.querySelector('.leaderboard-backdrop [data-focus=leaderboard-knockout]').textContent,'Leaderboard');
   assert.equal(section.querySelectorAll('tbody tr').length,0,'A fast result does not detach an animating hero');
   for(const {frames} of animations)for(const frame of frames){assert.equal('width' in frame,false);assert.equal('marginLeft' in frame,false);}
-  assert.equal(animations.find(a=>a.node===hero).frames[0].clipPath,'inset(0 0% 0 70% round 13px)');
+  const first=animations.find(a=>a.node===hero).frames[0];
+  assert.equal(first.clipPath,`inset(0 ${1/600*100}% ${6/164*100}% ${421/600*100}% round 13px)`);
+  assert.equal(first.transform,'translateY(4px)','Reveal starts at the visible colored button, including its pressed offset and border');
   if(leave)w.returnFromLeaderboard();else finishHero();
   await pending;
   assert.equal(w.root.querySelector('.leaderboard-backdrop'),null);
