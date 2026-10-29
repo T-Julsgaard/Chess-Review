@@ -1,0 +1,108 @@
+/* Every override belongs to the optional mode; saved Normal preferences survive. */
+:root[data-review-mode="dopamine"] {
+  --panel: #191824; --panel-2: #211e30; --line: #3b3551; --line-soft: #302b40;
+  --q-brilliant: #60ebd6; --q-great: #a78bfa; --q-blunder: #ff5d73;
+}
+:root[data-review-mode="dopamine"] .board {
+  --sq-light: #c3bce9; --sq-dark: #6345d4;
+  box-shadow: 0 0 0 1px #b69bf27d, 0 18px 75px -26px #7553ed99;
+}
+:root[data-review-mode="dopamine"] .panel {
+  border-color: #4c3d6859;
+  background: linear-gradient(150deg, #201c2e, #15151e 75%);
+}
+:root[data-review-mode="dopamine"] .topbar { background: #15121ee8; border-bottom-color: #a78bfa2e; }
+:root[data-review-mode="dopamine"] .ml-move { border-left: 3px solid transparent; border-radius: 7px; }
+:root[data-review-mode="dopamine"] .ml-move[data-class="brilliant"] { border-left-color: #60ebd6; background: #60ebd60e; }
+:root[data-review-mode="dopamine"] .ml-move[data-class="great"] { border-left-color: #a78bfa; }
+:root[data-review-mode="dopamine"] .ml-move[data-class="blunder"] { border-left-color: #ff5d73; background: #ff5d730e; }
+:root[data-review-mode="dopamine"] .ml-move[data-class="mistake"],
+:root[data-review-mode="dopamine"] .ml-move[data-class="miss"] { border-left-color: #ffab66; }
+:root[data-review-mode="dopamine"] .ml-move.current { background: #a78bfa2b; box-shadow: inset 0 0 0 1px #b5a0fa50; }
+:root[data-review-mode="dopamine"] .insight-panel { display: flex; flex-direction: column; min-height: 0; }
+:root[data-review-mode="dopamine"] .ip-opening { flex: none; }
+:root[data-review-mode="dopamine"] .stage.auto:not(.full-hd-reference) { --review-h: auto; }
+:root[data-review-mode="dopamine"] .stage.auto:not(.full-hd-reference) .mod[data-mod="review"] { height: auto; }
+:root[data-review-mode="dopamine"] .stage.auto:not(.full-hd-reference) .insight-panel { height: auto; }
+:root[data-review-mode="dopamine"] .stage.auto:not(.full-hd-reference) .dopamine-comment { flex: none; overflow: visible; }
+:root[data-review-mode="dopamine"] .dopamine-comment {
+  flex: 1; min-height: 0; overflow: auto; border-left: 3px solid var(--move-color);
+  padding: 14px 18px; scrollbar-width: thin;
+}
+.dopamine-comment { --move-color: #b9a2ff; }
+.dopamine-comment[data-move-category="brilliant"] { --move-color: #60ebd6; }
+.dopamine-comment[data-move-category="blunder"] { --move-color: #ff5d73; }
+.dopamine-comment[data-move-category="mistake"], .dopamine-comment[data-move-category="miss"] { --move-color: #ffab66; }
+.dopamine-comment .ip-head { gap: 9px; margin-bottom: 9px; }
+.dopamine-comment .ip-move { font-size: 17px; font-weight: 800; color: var(--move-color); }
+.dopamine-comment .ip-text { font-family: var(--font-ui); font-size: 16px; line-height: 1.45; font-weight: 600; }
+.dopamine-detail { margin: 8px 0; color: var(--ink-2); font-size: 13px; line-height: 1.5; }
+.dopamine-evaluation { display: inline-block; margin: 7px 0; color: var(--ink-3); font-size: 11px; }
+.dopamine-lines { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; margin-top: 8px; }
+.dopamine-line {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 5px;
+  width: 100%; min-width: 0; padding: 10px 12px; border-radius: 9px;
+  background: #a78bfa0c; border: 1px solid #a78bfa38; text-align: left; color: var(--ink);
+  cursor: pointer; line-height: 1.45;
+}
+.dopamine-line strong { color: var(--move-color); font: 700 11px var(--font-ui); }
+.dopamine-line span { font: 12px var(--font-mono); overflow-wrap: anywhere; }
+.dopamine-line:hover { background: #a78bfa20; border-color: #a78bfa80; }
+.dopamine-line:focus-visible { outline: 2px solid var(--move-color); outline-offset: 2px; }
+.dopamine-preview-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+.dopamine-preview-buttons .set-reset { flex: 1; }
+.dopamine-effect {
+  --effect-color: #c9b6ff; --effect-x: 50%; --effect-y: 50%;
+  position: absolute; inset: 0; z-index: 15; pointer-events: none;
+  overflow: hidden; border-radius: inherit; container-type: inline-size;
+  animation: dopamine-fade 1.3s ease both;
+}
+.dopamine-effect[data-category="brilliant"] { --effect-color: #83ffe7; animation-duration: 2.4s; }
+.dopamine-effect[data-category="blunder"] { --effect-color: #ff526c; animation-duration: 2.4s; }
+.dopamine-effect[data-category="best"], .dopamine-effect[data-category="excellent"], .dopamine-effect[data-category="good"] { --effect-color: #b2f28c; }
+.dopamine-effect[data-category="mistake"], .dopamine-effect[data-category="miss"], .dopamine-effect[data-category="inacc"] { --effect-color: #ffb45f; }
+.dopamine-origin {
+  position: absolute; left: var(--effect-x); top: var(--effect-y); width: 12.5%; height: 12.5%;
+  transform: translate(-50%, -50%); border: 3px solid var(--effect-color); border-radius: 5px;
+  box-shadow: inset 0 0 22px color-mix(in srgb, var(--effect-color) 35%, transparent), 0 0 16px color-mix(in srgb, var(--effect-color) 40%, transparent);
+  animation: dopamine-origin .75s ease-out both;
+}
+.dopamine-wave { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); }
+.dopamine-wave-cell {
+  border-radius: 3px; background: color-mix(in srgb, var(--effect-color) 65%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--effect-color) 85%, transparent), inset 0 0 18px color-mix(in srgb, var(--effect-color) 60%, transparent);
+  animation: dopamine-square-wave 1s ease-out both; animation-delay: var(--wave-delay);
+}
+.dopamine-effect[data-category="blunder"] .dopamine-wave-cell { animation-name: dopamine-impact; }
+.dopamine-ripple {
+  position: absolute; left: var(--effect-x); top: var(--effect-y); width: 20%; aspect-ratio: 1;
+  border: 2px solid var(--effect-color); border-radius: 50%;
+  box-shadow: 0 0 24px color-mix(in srgb, var(--effect-color) 55%, transparent);
+  animation: dopamine-ripple 1.2s cubic-bezier(.16,1,.3,1) both;
+}
+.dopamine-aura {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at var(--effect-x) var(--effect-y), transparent 25%, color-mix(in srgb, var(--effect-color) 8%, transparent) 70%, color-mix(in srgb, var(--effect-color) 30%, transparent));
+  box-shadow: inset 0 0 45px color-mix(in srgb, var(--effect-color) 30%, transparent);
+}
+.dopamine-effect[data-category="blunder"] .dopamine-aura { box-shadow: inset 0 0 65px #ff294c80; }
+.dopamine-sweep { position: absolute; inset: -50%; background: linear-gradient(115deg, transparent 40%, #b7fff52e 50%, transparent 60%); animation: dopamine-sweep 1.6s ease-out both; }
+.dopamine-spark {
+  position: absolute; left: var(--effect-x); top: var(--effect-y); width: 5px; height: 8px;
+  border-radius: 2px; background: var(--effect-color); box-shadow: 0 0 7px var(--effect-color);
+  animation: dopamine-spark 1.5s cubic-bezier(.15,.6,.3,1) both; animation-delay: calc(var(--i) * 12ms);
+}
+.dopamine-spark:nth-child(3n) { background: #d4b5ff; width: 5px; height: 5px; border-radius: 50%; }
+.dopamine-effect[data-category="blunder"] .dopamine-spark { border-radius: 0; clip-path: polygon(0 0, 100% 20%, 70% 100%); background: #ff7d8d; }
+@keyframes dopamine-fade { 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes dopamine-origin { from { opacity: 0; scale: .8; } 35% { opacity: 1; scale: 1.04; } to { opacity: .25; scale: 1; } }
+@keyframes dopamine-square-wave { 0% { opacity: 0; scale: .72; } 18% { opacity: .85; scale: 1; } 44% { opacity: .05; scale: 1; } 64% { opacity: .35; scale: .96; } 100% { opacity: 0; scale: 1; } }
+@keyframes dopamine-impact { 0% { opacity: 0; scale: 1; } 20% { opacity: .8; scale: .91; } 50% { opacity: .15; scale: 1; } 100% { opacity: 0; scale: 1; } }
+@keyframes dopamine-ripple { from { transform: translate(-50%, -50%) scale(.3); opacity: .85; } to { transform: translate(-50%, -50%) scale(6); opacity: 0; } }
+@keyframes dopamine-sweep { from { translate: -60% 0; } to { translate: 60% 0; } }
+@keyframes dopamine-spark { from { translate: 0 0; opacity: 0; scale: .5; } 15% { opacity: 1; } to { translate: var(--dx) var(--dy); rotate: 160deg; scale: .4; opacity: 0; } }
+/* Reduced motion keeps only a static outline on the landing square. */
+.dopamine-effect[data-motion="off"], .dopamine-effect[data-motion="off"] * { animation: none; }
+.dopamine-effect[data-motion="off"] > :not(.dopamine-origin) { display: none; }
+@media (prefers-reduced-motion: reduce) { .dopamine-effect, .dopamine-effect * { animation: none; } .dopamine-effect > :not(.dopamine-origin) { display: none; } }
+@media (max-width: 600px) { .dopamine-comment .ip-text { font-size: 15px; } .dopamine-lines { grid-template-columns: 1fr; } }
