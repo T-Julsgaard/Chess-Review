@@ -136,6 +136,8 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await run("import('./analysis.js').then(m=>m.learningWorkspace.close())");
   }
   // Popup and manual entry have their own native-size document.
+  // Clear the inherited-zoom fixture before opening a separate extension page.
+  await run("chrome.tabs.getCurrent().then(async t=>{await chrome.tabs.setZoomSettings(t.id,{scope:'per-origin',mode:'automatic'});await chrome.tabs.setZoom(t.id,1);})");
   const origin=await run('location.origin');
   const {targetId}=await call('Target.createTarget',{url:origin+'/popup.html'});
   const {sessionId}=await call('Target.attachToTarget',{targetId,flatten:true});
