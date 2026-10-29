@@ -50,6 +50,7 @@
         ],
         "optional": [
           "authenticationInfo",
+          "locationInfo",
           "technicalAndInteraction"
         ]
       }

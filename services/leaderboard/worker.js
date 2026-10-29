@@ -1,4 +1,5 @@
 import {Chess} from '../../lib/chess.js';
+import {flagCodeForCountryId,countryNameForId} from '../../flags.js';
 
 const MODES=new Set(['solve-puzzle','timeAttack','knockout']);
 const MAX_BODY=4096,DAY=86400000;
@@ -131,7 +132,8 @@ async function board(request,env,ctx,mode) {
   if(!MODES.has(mode)||!/^\d{1,3}$/.test(raw)||Number(raw)<1||Number(raw)>100)fail(400,'Invalid page');
   const page=Number(raw),key=new Request(url.origin+`/v1/boards/${mode}?page=${page}`);
   const cache=globalThis.caches?.default,cached=await cache?.match(key);if(cached)return cached;
-  const {results}=await env.DB.prepare(`SELECT p.id,p.name,r.score FROM records r JOIN players p ON p.id=r.player_id
+  const {results}=await env.DB.prepare(`SELECT p.id,p.name,r.score,c.country FROM records r JOIN players p ON p.id=r.player_id
+    LEFT JOIN player_countries c ON c.player_id=p.id
     WHERE r.mode=? ORDER BY r.score DESC,r.achieved_at,r.player_id LIMIT 11 OFFSET ?`).bind(mode,(page-1)*10).all();
   const response=json({rows:results.slice(0,10),hasNext:results.length>10&&page<100});
   response.headers.set('Cache-Control','public, max-age=30');
@@ -175,6 +177,14 @@ export default {
       if(request.method==='POST'&&!(await env.WRITE_LIMIT.limit({key:'player:'+player.id})).success)fail(429,'Slow down');
       if(request.method==='GET'&&path==='/v1/me')return json(player);
       if(request.method==='POST'&&path==='/v1/sessions')return await start(request,env,player,now);
+      if(request.method==='POST'&&path==='/v1/me'){
+        const {country}=await bodyOf(request);
+        if(typeof country!=='string'||country.length>12||!flagCodeForCountryId(country)||!countryNameForId(country))fail(400,'Invalid country');
+        await budget(env,'country-updates',100,now);
+        await env.DB.prepare(`INSERT INTO player_countries(player_id,country) VALUES (?,?)
+          ON CONFLICT(player_id) DO UPDATE SET country=excluded.country`).bind(player.id,country.trim().toUpperCase()).run();
+        return json({country:country.trim().toUpperCase()});
+      }
       if(request.method==='POST'&&path==='/v1/ready')return await ready(request,env,player,now);
       if(request.method==='POST'&&path==='/v1/attempts')return await attempt(request,env,player,now);
       if(request.method==='POST'&&path==='/v1/delete-player'){

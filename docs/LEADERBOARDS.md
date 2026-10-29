@@ -6,7 +6,8 @@ Until deployed, each screen says that online rankings are not connected. Ordinar
 practice, filters, personal bests, and statistics continue to work offline.
 
 Developer debugger includes **Import leaderboard CSV** and **Clear test data**.
-CSV columns are `mode,player,solved,is_you`; `is_you` is optional (0/1).
+CSV columns are `mode,player,solved,is_you,country`; `is_you` is optional (0/1),
+as is `country` (a Chess.com token such as `dk`, `2`, or `xe`). Older CSVs still work.
 Modes are `solve-puzzle`, `timeAttack` and `knockout`. Imports replace only the
 current tab's in-memory leaderboard preview. They are never saved or uploaded,
 and disappear on Clear or page reload. Preview mode shows **Test data**, hides
@@ -14,6 +15,17 @@ online account/play controls and blocks leaderboard requests. No sample CSV is
 bundled with the extension. Normal puzzle progress remains separate.
 
 ## Scoring and privacy
+
+Country flags use the bundled flag pack. The local player history keeps up to 50
+recent games per site, including each username's scraped country when available.
+The inferred Chess.com player must have several opponents and a clear frequency
+lead. When that player has a known country and a leaderboard key is connected,
+opening a leaderboard publishes only the country token for that key. The inferred
+username stays local; public names remain generated `Knight-…` names. This is a
+display flag, not verified account ownership. Missing or unsupported countries
+keep the initial avatar. Hover or keyboard focus shows the country name.
+Apply migration `0003_player_countries.sql` before deploying the updated Worker.
+Country records are deleted with the player; public caches may take time to update.
 
 Players explicitly choose **Play ranked** after verifying once on the service's
 `/join` page and connecting a private player key. Names are generated (for example
@@ -47,8 +59,9 @@ the first time the score was achieved, then player ID. Pagination shows at most
 the top 1,000 players. A connection failure stops further ranked scoring; verified
 earlier scores remain saved. Offline play is still available.
 
-Only puzzle moves, session identifiers and the player key travel in authenticated
-requests. Games, PGNs, website history, settings and local learning progress do not.
+Only puzzle moves, session identifiers, the known country token and the player key
+travel in authenticated requests. Games, PGNs, website history, settings and local
+learning progress do not.
 The service retains generated names, token hashes, unique solve IDs, records, and
 one short-lived session per player. Move transcripts are checked in memory and
 not retained; only a digest and the previous response are stored for safe retry.

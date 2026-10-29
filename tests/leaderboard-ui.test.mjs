@@ -56,6 +56,47 @@ test('leaving aborts reads and late responses cannot replace the current screen'
   w.returnFromLeaderboard();assert.equal(signal.aborted,true);release({rows:[{name:'Late',score:9}],hasNext:false});await pending;
   assert.equal(w.page,'puzzles');assert.equal(w.leaderboardTimer,null);assert.equal(w.root.querySelector('.learn-leaderboard'),null);
 });
+
+test('flags use bundled art and country tooltips; unknown countries retain the initial',async t=>{
+  const {w,dom}=await setup(t);
+  w.leaderboardClient={configured:true,credentials:async()=>null,list:async()=>({rows:[
+    {id:'danish',name:'Danish player',country:'dk',score:42},
+    {id:'american',name:'American player',country:'2',score:41},
+    {id:'english',name:'English player',country:'xe',score:40},
+    {id:'unknown',name:'Unknown player',country:'../../DK',score:39}
+  ]})};
+  await w.showLeaderboard('knockout');
+  const flags=w.root.querySelectorAll('.leaderboard-flag');assert.equal(flags.length,3);
+  assert.match(flags[0].src,/flags\/DK.svg$/);assert.equal(flags[0].alt,'Denmark');
+  assert.match(flags[1].src,/flags\/US.svg$/);assert.match(flags[2].src,/flags\/GB_ENG.svg$/);
+  assert.equal(w.root.querySelector('tbody tr:last-child .leaderboard-avatar').textContent,'U');
+  flags[0].dispatchEvent(new dom.window.MouseEvent('mouseenter'));
+  assert.equal(dom.window.document.querySelector('[role=tooltip]').textContent,'Denmark');
+  flags[0].dispatchEvent(new dom.window.MouseEvent('mouseleave'));assert.equal(dom.window.document.querySelector('[role=tooltip]'),null);
+  flags[1].focus();assert.equal(dom.window.document.querySelector('[role=tooltip]').textContent,'United States');
+  flags[1].dispatchEvent(new dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
+  assert.equal(dom.window.document.querySelector('[role=tooltip]'),null);assert.equal(w.page,'leaderboard');
+  flags[0].focus();w.returnFromLeaderboard();assert.equal(dom.window.document.querySelector('[role=tooltip]'),null);
+});
+
+test('pagination captures scroll before moving the cached hero, including loading and failed reads',async t=>{
+  t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:library})}));
+  const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');await a.call('openLearning');
+  const w=a.run('learningWorkspace');t.after(()=>w.close());let fail=false;
+  w.leaderboardClient={configured:true,credentials:async()=>null,list:async(mode,page)=>{if(fail)throw Error('Offline');return {rows:[{name:'Player '+page,score:42}],hasNext:page<3};}};
+  await w.showLeaderboard('knockout');
+  const view=w.leaderboardView;
+  t.mock.method(w,'leaderboardView',function(){
+    const previous=this.shell.querySelector('.learn-main'),result=view.call(this);
+    // Model the browser clamping the old scroller when its hero moves out.
+    previous.scrollTop=0;this.root.scrollTop=0;this.shell.scrollTop=0;return result;
+  });
+  const scroll=()=>[w.shell.querySelector('.learn-main').scrollTop,w.root.scrollTop,w.shell.scrollTop];
+  w.shell.querySelector('.learn-main').scrollTop=180;w.root.scrollTop=32;w.shell.scrollTop=16;
+  await w.loadLeaderboard(2);assert.deepEqual(scroll(),[180,32,16]);
+  fail=true;await w.loadLeaderboard(3);assert.deepEqual(scroll(),[180,32,16]);
+  fail=false;await w.loadLeaderboard(1,{quiet:true});assert.deepEqual(scroll(),[180,32,16]);
+});
 test('client stores only a personal key locally and never sends it when reading public boards',async t=>{
   const {storage,data}=await setup(t),calls=[],token='a'.repeat(64);
   const client=new LeaderboardClient(storage,{endpoint:'https://rank.example',fetcher:async(url,options)=>{
@@ -83,11 +124,11 @@ test('a late ranked start cannot open a puzzle after leaving or switching boards
 
 test('Firefox consent denial and later revocation prevent authenticated network traffic',async t=>{
   const {storage}=await setup(t),original=globalThis.browser;let allowed=false,calls=0,permissions;
-  globalThis.browser={permissions:{async request(input){permissions=input;return allowed;},async contains(){return allowed;}}};
+  globalThis.browser={runtime:{getBrowserInfo(){}},permissions:{async request(input){permissions=input;return allowed;},async contains(){return allowed;}}};
   t.after(()=>{if(original===undefined)delete globalThis.browser;else globalThis.browser=original;});
   const client=new LeaderboardClient(storage,{endpoint:'https://rank.example',fetcher:async()=>{calls++;return Response.json({name:'Knight-me',id:'me'});}});
   await assert.rejects(client.connect('a'.repeat(64)),/Allow online player data/);assert.equal(calls,0);
-  assert.deepEqual(permissions.data_collection,['authenticationInfo','technicalAndInteraction']);
+  assert.deepEqual(permissions.data_collection,['authenticationInfo','locationInfo','technicalAndInteraction']);
   allowed=true;await client.connect('a'.repeat(64));assert.equal(calls,1);
   allowed=false;await assert.rejects(client.start('knockout'),/permission was removed/);assert.equal(calls,1);
 });
@@ -159,23 +200,4 @@ for(const mode of ['solve-puzzle','timeAttack','knockout'])test(`${mode} keeps l
   assert.equal(w.leaderboard.page,2);assert.equal(reads,2,'Board updates must not fetch rankings');
   await w.loadLeaderboard(3);assert.equal(reads,3);assert.equal(w.leaderboard.page,3);
   assert.equal(w.root.querySelector('.leaderboard-score').textContent,'39','Real leaderboard updates still render');
-});
-
-test('pagination captures scroll before moving the cached hero, including loading and failed reads',async t=>{
-  t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:library})}));
-  const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');await a.call('openLearning');
-  const w=a.run('learningWorkspace');t.after(()=>w.close());let fail=false;
-  w.leaderboardClient={configured:true,credentials:async()=>null,list:async(mode,page)=>{if(fail)throw Error('Offline');return {rows:[{name:'Player '+page,score:42}],hasNext:page<3};}};
-  await w.showLeaderboard('knockout');
-  const view=w.leaderboardView;
-  t.mock.method(w,'leaderboardView',function(){
-    const previous=this.shell.querySelector('.learn-main'),result=view.call(this);
-    // Model the browser clamping the old scroller when its hero moves out.
-    previous.scrollTop=0;this.root.scrollTop=0;this.shell.scrollTop=0;return result;
-  });
-  const scroll=()=>[w.shell.querySelector('.learn-main').scrollTop,w.root.scrollTop,w.shell.scrollTop];
-  w.shell.querySelector('.learn-main').scrollTop=180;w.root.scrollTop=32;w.shell.scrollTop=16;
-  await w.loadLeaderboard(2);assert.deepEqual(scroll(),[180,32,16]);
-  fail=true;await w.loadLeaderboard(3);assert.deepEqual(scroll(),[180,32,16]);
-  fail=false;await w.loadLeaderboard(1,{quiet:true});assert.deepEqual(scroll(),[180,32,16]);
 });

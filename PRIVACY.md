@@ -1,6 +1,6 @@
 # Privacy Policy — Chess Review
 
-_Last updated: 2026-10-28_
+_Last updated: 2026-10-29_
 
 Chess Review is a browser extension that reviews the chess games you play on
 **Chess.com** and **Lichess**. This policy explains exactly what the extension
@@ -70,6 +70,13 @@ and puzzle-interaction consent before connecting. Ranked play sends the key, ses
 puzzle move sequences to the service to verify results. Your games, PGNs, chess-site
 identity, browsing history, settings and historical local progress are not sent.
 Your generated name and verified scores are public.
+
+If your local game history identifies a recurring Chess.com player with a known
+country, opening a leaderboard with a connected player key also sends that country
+token. Its bundled flag and country name are public alongside your generated name.
+The inferred Chess.com username remains on your device. Countries are saved with
+the matching usernames in local history and are not inferred from your IP address.
+The service's country record is removed when you delete your online player.
 
 The service stores a hash of your player key, generated name, creation time,
 unique solved puzzle IDs, scores and achievement times, and a short-lived session

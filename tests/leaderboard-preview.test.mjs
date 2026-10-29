@@ -5,6 +5,12 @@ import {LeaderboardClient} from '../lib/learning/leaderboard-client.js';
 import {app,loadGame,settle} from './helpers/app.mjs';
 
 const csv='mode,player,solved,is_you\r\nknockout,"Queen, ""Gambit""",42,0\r\nknockout,Preview Player,53,1\r\ntimeAttack,Speed Knight,33,0\r\nsolve-puzzle,Daily Knight,1200,0\r\n';
+
+test('optional country column accepts Chess.com codes and IDs without requiring changes to older CSVs',()=>{
+  const parsed=parseLeaderboardCsv('mode,player,solved,is_you,country\nknockout,Danish Player,9,1,dk\nknockout,American Player,8,0,2\nknockout,Unknown,7,0,ZZ\nknockout,No flag,6,0,');
+  assert.deepEqual(parsed.boards.knockout.map(r=>r.country),['dk','2','ZZ',undefined]);
+  assert.throws(()=>parseLeaderboardCsv('mode,player,solved,country\nknockout,Player,9,../../DK'),/Invalid CSV/);
+});
 test('CSV supports quoted fields, sorts scores, marks the preview player and keeps boards separate',()=>{
   const data=parseLeaderboardCsv('\uFEFF'+csv);assert.equal(data.count,4);
   assert.deepEqual(data.boards.knockout.map(r=>r.score),[53,42]);assert.equal(data.boards.knockout[1].name,'Queen, "Gambit"');

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {historyGame,inferredPlayer,rankPlayers,rememberAnalyzedGame,archivePlayers,PLAYER_HISTORY_KEY} from '../lib/player-history.js';
+import {historyGame,inferredPlayer,inferredPlayerProfile,rankPlayers,rememberAnalyzedGame,archivePlayers,PLAYER_HISTORY_KEY} from '../lib/player-history.js';
 import {app,settle} from './helpers/app.mjs';
 
 function game(id,white='Owner',black='Opponent',site='chesscom') {
@@ -64,6 +64,33 @@ test('legacy usernames remain lookup candidates but never establish ownership',a
   assert.deepEqual(await archivePlayers(s),['wrongfirstplayer']);
   assert.equal(await rememberAnalyzedGame(game(1),s),'');
   assert.equal(s.store.username,'WrongFirstPlayer');
+});
+
+test('country evidence follows the inferred username across sides and survives reopening without flags',async()=>{
+  const s=storage();
+  const first=game(1,'Owner','Alice');first.meta.white={user:'owner',countryId:'dk'};first.meta.black={user:'Alice',countryId:'2'};
+  await rememberAnalyzedGame(first,s);
+  assert.equal(inferredPlayerProfile(s.store),null,'A flag does not establish account ownership');
+  await rememberAnalyzedGame(game(2,'Bob','OWNER'),s);
+  await rememberAnalyzedGame(game(3,'Owner','Carol'),s);
+  assert.deepEqual(inferredPlayerProfile(s.store),{name:'Owner',country:'DK'});
+  await rememberAnalyzedGame(game(1,'Owner','Alice'),s);
+  assert.equal(s.store[PLAYER_HISTORY_KEY].chesscom[0].whiteCountry,'DK');
+  assert.equal(inferredPlayerProfile(s.store).country,'DK');
+  const changed=game(4,'Dave','Owner');changed.meta.black={user:'Owner',countryId:'xe'};
+  await rememberAnalyzedGame(changed,s);
+  assert.equal(inferredPlayerProfile(s.store).country,'XE');
+});
+
+test('missing, unrecognized, mismatched and other-site flags cannot borrow an opponent country',()=>{
+  const library=[1,2,3].map(id=>{
+    const g=game(id,'Owner','Opponent'+id);g.meta.white={user:'SomebodyElse',countryId:'DK'};g.meta.black={user:'Opponent'+id,countryId:'US'};return g;
+  });
+  assert.deepEqual(inferredPlayerProfile({library}),{name:'Owner',country:null});
+  library[0].meta.white={user:'Owner',countryId:'../../DK'};
+  assert.equal(inferredPlayerProfile({library}).country,null);
+  const lichess=game(1,'Owner','Alice','lichess');lichess.meta.white={user:'Owner',countryId:'DK'};
+  assert.equal(historyGame(lichess).whiteCountry,undefined);
 });
 
 test('unavailable history storage cannot block reviewing a game',async()=>{

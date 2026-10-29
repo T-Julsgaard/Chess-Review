@@ -8,7 +8,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await waitFor(review,"!!document.querySelector('.puzzle-mode-grid')&&!document.querySelector('.learn-transition-surface')",'Puzzle modes');
   // Deliberate test data lives only in this isolated profile, never the product.
   await run(`import('./analysis.js').then(({learningWorkspace:w})=>{w.leaderboardClient={configured:true,endpoint:'https://leaderboard.example',credentials:async()=>({id:'you',name:'Knight-a13f08c5d2'}),
-    list:async(mode,page)=>({rows:Array.from({length:27},(_,i)=>({id:i===13?'you':'player-'+i,name:i===13?'Knight-a13f08c5d2':'Knight-'+((i+1)*2654435761>>>0).toString(16).padStart(8,'0')+'e2',score:mode==='solve-puzzle'?1854-i*39:mode==='timeAttack'?72-Math.floor(i*1.5):46-i})).slice((page-1)*10,page*10),hasNext:page<3})};})`);
+    list:async(mode,page)=>({rows:Array.from({length:27},(_,i)=>({id:i===13?'you':'player-'+i,name:i===13?'Knight-a13f08c5d2':'Knight-'+((i+1)*2654435761>>>0).toString(16).padStart(8,'0')+'e2',country:['DK','2','XE'][i%3],score:mode==='solve-puzzle'?1854-i*39:mode==='timeAttack'?72-Math.floor(i*1.5):46-i})).slice((page-1)*10,page*10),hasNext:page<3})};})`);
   for(const [width,height] of [[1920,1080],[390,844],[320,740]]) {
     await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);
     for(const theme of ['dark','light']) {
@@ -35,13 +35,20 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
           clip:{x:Math.max(0,r.x-8),y:Math.max(0,r.y-8),width:Math.min(innerWidth-Math.max(0,r.x-8),r.width+16),height:Math.min(innerHeight-Math.max(0,r.y-8),r.height+16),scale:1}}})()`);
         assert.equal(layout.overflow,false,`${mode}/${width}/${theme}: no horizontal overflow`);
         assert.equal(layout.rows,10);assert.equal(layout.focus,'leaderboard-title');assert.ok(layout.hero<=layout.width+1);
+        assert.equal(await run("!!document.querySelector('.leaderboard-toolbar h3')"),false);
+        assert.equal(await run("[...document.querySelectorAll('.leaderboard-flag')].every(img=>img.complete&&img.naturalWidth>0)"),true);
+        await run("document.querySelector('.leaderboard-flag').dispatchEvent(new MouseEvent('mouseenter'))");
+        assert.equal(await run("document.querySelector('[role=tooltip]').textContent"),'Denmark');
+        await run("document.querySelector('.leaderboard-flag').dispatchEvent(new MouseEvent('mouseleave'))");
         assert.equal(await run("getComputedStyle(document.querySelector('.leaderboard-table caption')).position"),'absolute');
         assert.equal(await run("getComputedStyle(document.querySelector('.leaderboard-hero p')).color"),'rgb(65, 69, 53)');
         assert.ok(layout.x>=0&&layout.x+layout.width<=width+1);
         const {data}=await call('Page.captureScreenshot',{format:'png',clip:layout.clip},review.sessionId);
         await fs.writeFile(path.join(out,`leaderboard-${mode}-${width}-${theme}.png`),Buffer.from(data,'base64'));
+        const scroll=await run("(()=>{const main=document.querySelector('.learn-main');main.scrollTop=Math.min(160,main.scrollHeight-main.clientHeight);return main.scrollTop;})()");
         await run("document.querySelector('[data-focus=leaderboard-next]').click()");
         await waitFor(review,"document.querySelector('.leaderboard-rank')?.textContent==='11'",'Next leaderboard page');
+        assert.ok(Math.abs(await run("document.querySelector('.learn-main').scrollTop")-scroll)<1,'Pagination preserves the panel scroll position');
         await run("document.querySelector('[data-focus=leaderboard-return]').click()");
         assert.equal(await run(`document.activeElement.dataset.focus`),'leaderboard-'+mode);
       }

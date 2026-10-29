@@ -19,6 +19,7 @@ function adapter(db) {
 async function setup(t) {
   const db=new DatabaseSync(':memory:');t.after(()=>db.close());
   db.exec(readFileSync(new URL('../services/leaderboard/migrations/0001_leaderboards.sql',import.meta.url),'utf8'));
+  db.exec(readFileSync(new URL('../services/leaderboard/migrations/0003_player_countries.sql',import.meta.url),'utf8'));
   db.prepare('INSERT INTO players VALUES (?,?,?,?)').run('player',await digest(token),'Knight-test',1);
   db.prepare('INSERT INTO players VALUES (?,?,?,?)').run('other',await digest(otherToken),'Knight-other',1);
   for(let i=0;i<12;i++)db.prepare('INSERT INTO puzzles VALUES (?,?,?,?)').run('p'+i,450+i*40,mate.fen,JSON.stringify(mate.solution));
