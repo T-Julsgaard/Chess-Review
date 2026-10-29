@@ -62,6 +62,20 @@ test('simultaneous startup shares zoom normalization and resizing respects manua
   await a.call('resetLayout');assert.equal(a.zoom(),1);
 });
 
+test('opening or reloading at 100% does not reapply tab zoom settings',async t=>{
+  const a=layout(t);let scopes=0;
+  a.context.browserAPI.tabs.setZoomSettings=async()=>{
+    scopes++;
+    // Reapplying Chrome's zoom scope can reintroduce an inherited zoom before
+    // setZoom restores 100%, producing a notice and two viewport changes.
+    await a.context.browserAPI.tabs.setZoom(7,.87);
+  };
+  for(let i=0;i<3;i++)await a.call('initTabZoom');
+  assert.equal(scopes,0,'A native-size tab needs no zoom settings mutation');
+  assert.deepEqual(a.changes,[]);
+  assert.equal(a.zoom(),1);
+});
+
 test('missing or failed tab zoom APIs do not prevent responsive layout or later retries',async t=>{
   const a=layout(t,.87),tabs=a.context.browserAPI.tabs;
   const setZoom=tabs.setZoom;tabs.setZoom=async()=>{throw Error('Temporary error');};

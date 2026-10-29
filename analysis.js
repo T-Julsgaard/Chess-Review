@@ -7970,7 +7970,10 @@ async function initTabZoom() {
       // Iframes always render their requested CSS size and never change the host tab.
       if(!screenPreview&&tabs?.getCurrent){
         const tab=await tabs.getCurrent();
-        if(tab?.id!=null){
+        // Reapplying the zoom scope can reset Chrome's per-tab zoom to its
+        // inherited value, then bounce back to 100% with a zoom notification.
+        // Leave an already native-size tab untouched on open and reload.
+        if(tab?.id!=null&&Math.abs((await tabs.getZoom(tab.id))-1)>.005){
           await tabs.setZoomSettings(tab.id,{scope:"per-tab",mode:"automatic"}).catch(()=>{});
           if(Math.abs((await tabs.getZoom(tab.id))-1)>.005)await tabs.setZoom(tab.id,1);
         }
