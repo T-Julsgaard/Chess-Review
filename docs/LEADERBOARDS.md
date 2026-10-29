@@ -32,11 +32,13 @@ bundled with the extension. Normal puzzle progress remains separate.
 
 ## Scoring and privacy
 
-The first-layer notice identifies Thomas Julsgaard as the operator. Both the
-opt-in panel and General settings link to the bundled `PRIVACY.md`, which names
-the controller and privacy contact, explains legal bases, and describes rights,
+Joining summaries use the Chess Review brand. Both the opt-in panel and General
+settings provide a direct **Privacy policy & operator details** link before
+consent. This opens the bundled `PRIVACY.md`, which names Thomas Julsgaard as the
+controller near its beginning and gives the privacy contact, legal bases, rights,
 response times and the complaint route. This notice update does not add an export
 endpoint or verify a live Cloudflare processing agreement.
+General settings also shows the controller's name and email under **About your data**.
 
 Public participation and optional nationality rely on consent (Article 6(1)(a)).
 Limited service-security processing relies separately on legitimate interests
