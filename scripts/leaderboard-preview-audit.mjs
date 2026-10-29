@@ -77,13 +77,50 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     settledCard.forEach((value,index)=>assert.ok(Math.abs(value-ending.card[index])<.5,'Cleanup does not shift the destination card'));
     assert.equal(await run('document.activeElement.dataset.focus'),'leaderboard-'+mode);
   }
+  const show=async(mode,state)=>{
+    await run(`import('./analysis.js').then(async m=>{
+      if(document.querySelector('#settings').hidden)await m.toggleSettings();
+      document.querySelector('[data-debug=leaderboard-preview-mode]').value='${mode}';
+      document.querySelector('[data-debug=leaderboard-preview-state]').value='${state}';
+      document.querySelector('[data-debug=leaderboard-preview-show]').click();
+    })`);
+    await waitFor(review,`document.querySelector('.learn-leaderboard')?.dataset.previewState==='${state}'&&document.querySelector('.learn-leaderboard')?.dataset.mode==='${mode}'&&!document.querySelector('.leaderboard-entering')&&document.querySelector('#settings').hidden`,'Debugger preview '+state);
+  };
+  for(const mode of ['solve-puzzle','timeAttack','knockout']){
+    let gap;
+    for(const state of ['coming-soon','rankings','empty']){
+      await show(mode,state);
+      const actual=await run("document.querySelector('.leaderboard-table-wrap').getBoundingClientRect().top-document.querySelector('.leaderboard-hero').getBoundingClientRect().bottom");
+      assert.ok(actual>=40,'The toolbar reserves a visible banner-to-table gap');
+      if(gap!==undefined)assert.ok(Math.abs(gap-actual)<1,`${mode}/${state}: empty and populated rankings share the same gap (${gap} vs ${actual})`);gap=actual;
+    }
+  }
+  const states=await run("import('./lib/learning/leaderboard-preview.js').then(m=>m.LEADERBOARD_PREVIEW_STATES.map(([key])=>key))");
+  for(const state of states){
+    await show('solve-puzzle',state);
+    const actual=await run("({busy:document.querySelector('.leaderboard-table-wrap').getAttribute('aria-busy'),personal:document.querySelector('.leaderboard-personal')?.textContent,alert:document.querySelector('.leaderboard-error')?.textContent})");
+    if(state==='loading')assert.equal(actual.busy,'true');
+    if(state==='syncing')assert.match(actual.personal,/Syncing…/);
+    if(state==='sync-failed')assert.match(actual.personal,/Sync needs attention/);
+    if(state==='saved')assert.match(actual.personal,/Saved/);
+    if(['offline','unavailable','capacity','rate-limited','connection-error'].includes(state))assert.ok(actual.alert);
+  }
+  for(const [action,label] of [['start-sync','Syncing…'],['finish-sync','Saved'],['fail-sync','Sync needs attention'],['retry-sync','Syncing…']]){
+    await run(`import('./analysis.js').then(async m=>{if(document.querySelector('#settings').hidden)await m.toggleSettings();document.querySelector('[data-debug=leaderboard-${action}]').click();})`);
+    await waitFor(review,`document.querySelector('.leaderboard-personal')?.textContent.includes('${label}')&&!document.querySelector('.leaderboard-entering')`,'Debugger action '+action);
+  }
+  await run("import('./analysis.js').then(m=>m.toggleSettings())");
+  await run("document.querySelector('#settings').scrollTop=document.querySelector('#settings').scrollHeight");
+  const debugClip=await run("(()=>{const r=document.querySelector('#settings').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,scale:1};})()");
+  const debugImage=await call('Page.captureScreenshot',{format:'png',clip:debugClip},review.sessionId);
+  await fs.writeFile(path.join(out,'leaderboard-debugger-controls.png'),Buffer.from(debugImage.data,'base64'));
   assert.equal(await run('window.previewRemoteRequests'),0);
   assert.equal(await run("import('./browser-compat.js').then(async({browserAPI:api})=>JSON.stringify(await api.storage.local.get(null))===JSON.stringify(window.previewSaved))"),true);
-  await run("import('./analysis.js').then(m=>{m.learningWorkspace.leaderboardClient.endpoint='';return m.toggleSettings();})");
+  await run("import('./analysis.js').then(async m=>{m.learningWorkspace.leaderboardClient.endpoint='';if(document.querySelector('#settings').hidden)await m.toggleSettings();})");
   await run("document.querySelector('[data-debug=leaderboard-csv-clear]').click()");
   assert.equal(await run("import('./lib/learning/leaderboard-preview.js').then(m=>m.leaderboardPreview.active)"),false);
   await upload();await call('Page.reload',{},review.sessionId);
   await waitFor(review,"!!document.querySelector('.board')",'Review reload');
   assert.equal(await run("import('./lib/learning/leaderboard-preview.js').then(m=>m.leaderboardPreview.active)"),false);
-  console.log('CSV preview: file import, pagination, stable leaderboard during free-board moves/history/flips, reverse transitions, isolation and reload reset passed.');
+  console.log('Leaderboard previews: CSV import, consistent spacing, all debugger states/sync actions, pagination, free-board isolation, reverse transitions and reload reset passed. Screenshots: '+out);
 }

@@ -6248,9 +6248,18 @@ function visualSettings() {
     section("Developer debugger",
       el("button", {class:"set-reset","data-debug":"screen-previews",onclick:openScreenSizePreview}, "Open screen-size preview"),
       el("div", {class:"set-row hint"},el("span",{class:"set-note"},"Preview layouts at different screen sizes. Changes are not saved.")),
-      leaderboardPreviewControls({document,onError:toast,onChange:()=>{
+      leaderboardPreviewControls({document,onError:toast,onChange:async({mode,open=false}={})=>{
         if(learningWorkspace?.ranked){learningWorkspace.ranked=null;learningWorkspace.rankedNotice='Ranked play stopped while test data is active.';}
-        if(learningWorkspace?.page==='leaderboard')learningWorkspace.showLeaderboard(learningWorkspace.leaderboard.mode);
+        if(open){
+          if(!learningWorkspace)await openLearning();
+          if(!learningWorkspace){renderSettings();return;}
+          if(learningWorkspace.activity||learningWorkspace.run||learningWorkspace.busy){
+            toast('Return to the puzzle overview before opening a leaderboard preview.');renderSettings();return;
+          }
+          if(UI.settings&&!UI.settings.hidden)await toggleSettings();
+          await learningWorkspace.showLeaderboard(mode);
+        }
+        else if(learningWorkspace?.page==='leaderboard')await learningWorkspace.showLeaderboard(learningWorkspace.leaderboard.mode);
         else if(learningWorkspace){learningWorkspace.leaderboard=null;learningWorkspace.render();}
         renderSettings();
       }}),

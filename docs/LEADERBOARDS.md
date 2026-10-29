@@ -6,12 +6,26 @@ Until deployed, each screen says that online rankings are not connected. Ordinar
 practice, filters, personal bests, and statistics continue to work offline.
 
 Developer debugger includes **Import leaderboard CSV** and **Clear test data**.
+It also includes **Load sample rankings**, a puzzle-mode selector, and a preview
+state selector. Choose a mode and state, then **Show preview** to open it directly.
+Available states include Coming soon, Loading, Empty, Score saved, Score syncing,
+Sync needs attention, Offline with saved rankings, Rankings unavailable,
+rate-limit/capacity errors, a rejected player key, and the
+disconnected/connecting/connected/deletion account screens. Imported CSV data can
+be used with these states; sample rankings are generated on demand if none is loaded.
+**Simulate solve**, **Start sync**, **Finish sync**, **Fail sync**, and **Retry sync**
+exercise the same personal-score UI. The sync indicator is the **Syncing…** text
+beside Your total/Your best; it changes to **Saved** or **Sync needs attention**.
+Account controls in these previews simulate connecting, disconnecting and deleting
+records. The ranked-play button previews its interaction without starting a run.
+All previews stay in memory and do not alter real player keys, scores or progress.
 CSV columns are `mode,player,solved,is_you,country`; `is_you` is optional (0/1),
 as is `country` (a Chess.com token such as `dk`, `2`, or `xe`). Older CSVs still work.
 Modes are `solve-puzzle`, `timeAttack` and `knockout`. Imports replace only the
 current tab's in-memory leaderboard preview. They are never saved or uploaded,
-and disappear on Clear or page reload. Preview mode shows **Test data**, hides
-online account/play controls and blocks leaderboard requests. No sample CSV is
+and disappear on Clear or page reload. Preview mode shows **Test data** and blocks
+leaderboard requests. Account/play controls only appear in the simulated account
+states and cannot contact the service. No sample CSV is
 bundled with the extension. Normal puzzle progress remains separate.
 
 ## Scoring and privacy
