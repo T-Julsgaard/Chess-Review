@@ -36,10 +36,22 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep}) {
       observer.disconnect();return result;
     })`);
     assert.equal(unchanged,true,'Free-board moves, history and flips leave the leaderboard connected and still');
-    const reverse=await run(`import('./analysis.js').then(({learningWorkspace:w})=>{window.previewReturning=w.returnFromLeaderboard();const hero=document.querySelector('.leaderboard-returning .leaderboard-hero');
-      return hero.getAnimations()[0].effect.getKeyframes().map(f=>f.clipPath);})`);
+    const reverse=await run(`import('./analysis.js').then(({learningWorkspace:w})=>{window.previewReturning=w.returnFromLeaderboard();const hero=window.returningHero=document.querySelector('.leaderboard-returning .leaderboard-hero');
+      window.returningMotion=hero.getAnimations()[0];window.returningReveal=document.querySelector('.puzzle-mode-grid').getAnimations()[0];
+      window.returningReveal.pause();return window.returningMotion.effect.getKeyframes().map(f=>f.clipPath);})`);
     assert.match(reverse[0],/^inset\(0px 0%(?: 0px 0%)? round 13px\)$/);assert.notEqual(reverse[0],reverse.at(-1));
+    // Delay another participant so we can inspect the hero after its animation
+    // finishes, before aggregate cleanup. This catches a full-header flash that
+    // inspecting only the final DOM would miss.
+    await waitFor(review,"window.returningMotion.playState==='finished'",'Return animation final frame');
+    const ending=await run(`(()=>{const style=getComputedStyle(window.returningHero),card=document.querySelector('.puzzle-mode[data-mode="${mode}"]').getBoundingClientRect();
+      return {opacity:style.opacity,clip:style.clipPath,connected:window.returningHero.isConnected,card:[card.x,card.y,card.width,card.height]};})()`);
+    assert.equal(ending.connected,true);assert.equal(ending.opacity,'0','Finished header stays invisible until removed');
+    assert.equal(ending.clip,reverse.at(-1),'Finished header holds its collapsed shape');
+    await run('window.returningReveal.finish()');
     await run('window.previewReturning');assert.equal(await run("!!document.querySelector('.leaderboard-returning')"),false);
+    const settledCard=await run(`(()=>{const r=document.querySelector('.puzzle-mode[data-mode="${mode}"]').getBoundingClientRect();return [r.x,r.y,r.width,r.height];})()`);
+    settledCard.forEach((value,index)=>assert.ok(Math.abs(value-ending.card[index])<.5,'Cleanup does not shift the destination card'));
     assert.equal(await run('document.activeElement.dataset.focus'),'leaderboard-'+mode);
   }
   assert.equal(await run('window.previewRemoteRequests'),0);
