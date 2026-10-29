@@ -54,6 +54,29 @@ Repository metadata lives in `.git/`.
 Tracked files should support runtime, maintained tooling, reproduction or
 documentation and be linked from the appropriate guide.
 
+### Lichess compatibility
+
+`npm run test:lichess-live` renders a public finished game in an isolated headless
+Chrome profile, then runs the extension's content script and import flow against
+that DOM. Set `CHROME_PATH` if Chrome is installed outside the platform default.
+It checks the legacy redirect, current URL, Black/White perspective, and all 87
+legal moves through both the live export and a forced DOM fallback.
+It uses a browser API test facade for the analysis-tab handoff; it does
+not install the extension or exercise the toolbar UI.
+
+The `Lichess compatibility` GitHub workflow runs this check daily, on relevant pull
+requests, or manually. Failures can mean changed URLs/markup, a removed public
+game, a network problem, or a site challenge; inspect the run before changing the
+integration. The daily check starts once its workflow reaches the default branch.
+Offline URL, metadata, button and import regressions remain part of `npm test`.
+
+The content script also reads Lichess's embedded `page-init-data` game ID when a
+board exists and neither the current URL nor metadata can identify the game.
+This provides a fallback independent of the game-page path. The live check still
+flags an unknown canonical URL so it can be supported explicitly.
+When export fails, replay pages' embedded full PGN takes priority over reconstructed
+move-list text, preserving player names, ratings, result and any setup position.
+
 The [research maintenance review](RESEARCH-MAINTENANCE.md) records the 2026-10-18
 cleanup, evidence that must be preserved, and research decisions still open.
 The [local folder cleanup](FOLDER-CLEANUP.md) records the October disk audits,
