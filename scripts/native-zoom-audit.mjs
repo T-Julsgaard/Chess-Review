@@ -61,7 +61,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     assert.ok(settings.x>=0&&settings.right<=width+1&&settings.y>=0&&settings.bottom<=height+1,JSON.stringify({width,height,settings}));
     await run("document.querySelector('[aria-label=Settings]').click()");
   }
-  // Review details, saved panel editing, Reset, and an old browser zoom all use 100%.
+  // Review details, saved panel editing and explicit Reset use 100%.
   await resize(1919,919);
   await run("document.querySelector('#accuracy-tab-1').click()");
   await inspect('review-expanded-accuracy',1919,919);
@@ -69,16 +69,22 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await inspect('review-custom-canvas',1919,919);
   await run("[...document.querySelectorAll('.set-reset')].find(n=>n.textContent==='Reset layout').click()");
   await run("document.querySelector('[aria-label=Settings]').click()");
+  await run('window.__zoomReloadPending=true');
   await call('Page.reload',{},review.sessionId);
-  await waitFor(review,"!!document.querySelector('.board')&&import('./analysis.js').then(m=>!m.S.analyzing)",'Reloaded review');
+  await waitFor(review,"!window.__zoomReloadPending&&!!document.querySelector('.board')&&!document.getElementById('startup')&&import('./analysis.js').then(m=>!m.S.analyzing)",'Reloaded review');
   await inspect('review-reset-reloaded',1919,919);
-  await run("chrome.tabs.getCurrent().then(t=>chrome.tabs.setZoom(t.id,.87))");
+  await run("chrome.tabs.getCurrent().then(async t=>{await chrome.tabs.setZoomSettings(t.id,{scope:'per-origin',mode:'automatic'});await chrome.tabs.setZoom(t.id,.87);})");
+  await run('window.__zoomReloadPending=true');
   await call('Page.reload',{},review.sessionId);
-  await waitFor(review,"!!document.querySelector('.board')&&chrome.tabs.getZoom().then(z=>z===1)",'Legacy zoom restored to 100%');
-  await inspect('review-legacy-zoom-reloaded',1919,919);
+  await waitFor(review,"!window.__zoomReloadPending&&!!document.querySelector('.board')&&!document.getElementById('startup')",'Manual zoom reloaded');
+  assert.ok(Math.abs(await run('chrome.tabs.getZoom()')-.87)<.005,'Reload must preserve manual zoom');
+  await run("document.querySelector('[aria-label=Settings]').click();[...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Layout').click();[...document.querySelectorAll('.set-reset')].find(n=>n.textContent==='Reset layout').click()");
+  await waitFor(review,"chrome.tabs.getZoom().then(z=>z===1)",'Explicit Reset restored 100%');
+  await run("document.querySelector('[aria-label=Settings]').click()");
+  await inspect('review-zoom-explicitly-reset',1919,919);
   for(const [width,height]of [[1919,919],[1366,648],[320,568]]){
     await resize(width,height);await run("document.querySelector('[aria-label=Settings]').click()");
-    for(const tab of ['Visual','Engine']){
+    for(const tab of ['General','Engine']){
       await run(`[...document.querySelectorAll('.set-tab')].find(n=>n.textContent==='${tab}').click()`);
       const fits=await run("(()=>{const n=document.querySelector('#settings');return n.scrollWidth<=n.clientWidth+1;})()");
       assert.ok(fits,`Settings ${tab} at ${width}`);

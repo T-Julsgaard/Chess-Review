@@ -806,7 +806,9 @@ body {
 }
 /* Keep the first layout measurable without exposing the unfinished panels. */
 body[data-starting] #root { visibility: hidden; }
-#startup { position: fixed; inset: 0; z-index: 10000; overflow: hidden; }
+/* Scrollbars can appear while the hidden workspace mounts. Keep the loading
+   mark centered on the viewport rather than the changing content width. */
+#startup { position: fixed; inset: 0; width: 100vw; height: 100dvh; z-index: 10000; overflow: hidden; }
 /* The ruled edges meet at the center, then separate to reveal the ready board. */
 .startup-shutter { position: absolute; left: 0; width: 100%; height: 50%; background: var(--bg); transition: transform .55s cubic-bezier(.76, 0, .24, 1); }
 .startup-top { top: 0; border-bottom: 1px solid var(--line); }

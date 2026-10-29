@@ -16,6 +16,19 @@ function startup(t,blank=false) {
   return a;
 }
 
+for(const blank of [false,true])test(`${blank?'blank':'review'} startup never changes browser zoom while the loading mark is visible`,async t=>{
+  const a=startup(t,blank),calls=[];
+  a.context.browserAPI.tabs={
+    getCurrent:async()=>{calls.push('getCurrent');return {id:7};},
+    getZoom:async()=>{calls.push('getZoom');return 1.25;},
+    setZoomSettings:async()=>{calls.push('setZoomSettings');},
+    setZoom:async()=>{calls.push('setZoom');},
+  };
+  await a.start();
+  if(blank)await a.call('applyGame',{pgn:'1. e4 e5',meta:{},source:'pgn',analysis:null});
+  assert.deepEqual(calls,[],'Opening a review, reloading, or leaving the blank workspace must not reset browser zoom');
+});
+
 test('startup hides the partial shell through identity loading and piece decoding, then reveals the ready board',async t=>{
   const a=startup(t),doc=a.dom.window.document,identity=deferred(),pieces=deferred();
   a.store.settings.moveAnim=true;

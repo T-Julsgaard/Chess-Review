@@ -2098,7 +2098,7 @@ async function resetLayout() {
   S.settings.uiSetup = uiSetup;
   const saved = saveLayout(true);
   requestAnimationFrame(alignPlayers);
-  await Promise.all([saved, savedSettings, initTabZoom()]);
+  await Promise.all([saved, savedSettings, initTabZoom({resetZoom:true})]);
   if (UI.settings && !UI.settings.hidden) renderSettings();
 }
 // Reorganize mode: while ON, panels can be dragged/resized (handles + grips appear); while OFF
@@ -7958,8 +7958,8 @@ async function applyGame(payload) {
 }
 
 /* ---------------- Start ---------------- */
-// Layout follows the CSS viewport. Browser zoom is normalized once on open/reset;
-// resizing never changes it, and manual zoom remains an accessibility choice.
+// Layout follows the CSS viewport. Opening and resizing preserve browser zoom;
+// only an explicit layout reset restores 100%.
 const TOPBAR_H = 52;
 let _fittedDip = null;
 let _zoomInit = null;
@@ -7973,16 +7973,15 @@ function fitViewport() {
   _fittedDip={w:window.innerWidth,h:window.innerHeight};
   applyLayout();growCanvas();requestAnimationFrame(alignPlayers);
 }
-async function initTabZoom() {
+async function initTabZoom({resetZoom=false}={}) {
   if(!_zoomInit)_zoomInit=(async()=>{
     try {
       const tabs=browserAPI?.tabs;
+      // Changing zoom while the loading mark is visible makes it resize and move,
+      // and opens Chrome's zoom bubble. Only change it for an explicit reset.
       // Iframes always render their requested CSS size and never change the host tab.
-      if(!screenPreview&&tabs?.getCurrent){
+      if(resetZoom&&!screenPreview&&tabs?.getCurrent){
         const tab=await tabs.getCurrent();
-        // Reapplying the zoom scope can reset Chrome's per-tab zoom to its
-        // inherited value, then bounce back to 100% with a zoom notification.
-        // Leave an already native-size tab untouched on open and reload.
         if(tab?.id!=null&&Math.abs((await tabs.getZoom(tab.id))-1)>.005){
           await tabs.setZoomSettings(tab.id,{scope:"per-tab",mode:"automatic"}).catch(()=>{});
           if(Math.abs((await tabs.getZoom(tab.id))-1)>.005)await tabs.setZoom(tab.id,1);
@@ -7995,7 +7994,7 @@ async function initTabZoom() {
     _zoomResizeBound=true;
     window.addEventListener('resize',fitViewport);
   }
-  // A reset also restores 100% after deliberate manual browser zoom.
+  // Allow later explicit resets to restore 100% after manual browser zoom.
   _zoomInit=null;
 }
 function dismissStartup() {

@@ -4,14 +4,26 @@ import path from 'node:path';
 
 export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const base=await evaluate(review,'location.origin');
-  await evaluate(review,"import('./browser-compat.js').then(({browserAPI})=>browserAPI.storage.local.set({'job:startup-audit':{pgn:'1. e4 e5 2. Nf3 Nc6 *',meta:{gameId:'startup-audit'},source:'pgn'}}))");
-  for(const [name,url,reduced]of [['review','analysis.html#startup-audit',false],['blank','analysis.html?workspace=blank',true]]) {
-    const {targetId}=await call('Target.createTarget',{url:'about:blank'});
+  for(const [name,url,reduced,zoom]of [
+    ['review','analysis.html#startup-audit',false,1],
+    ['blank','analysis.html?workspace=blank',true,1],
+    ['review-125','analysis.html#startup-audit',false,1.25],
+    ['blank-80','analysis.html?workspace=blank',false,.8],
+  ]) {
+    await evaluate(review,"import('./browser-compat.js').then(({browserAPI})=>browserAPI.storage.local.set({'job:startup-audit':{pgn:'1. e4 e5 2. Nf3 Nc6 *',meta:{gameId:'startup-audit'},source:'pgn'}}))");
+    const {targetId}=await call('Target.createTarget',{url:base+'/audit.html'});
     const {sessionId}=await call('Target.attachToTarget',{targetId,flatten:true});
     const tab={targetId,sessionId};
     await call('Page.enable',{},sessionId);
     await call('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false},sessionId);
     if(reduced)await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]},sessionId);
+    // Set an inherited browser zoom before navigation, while no loading mark is
+    // present. A 100%-only audit misses the startup resize reported by users.
+    await waitFor(tab,'!!window.api','Zoom fixture');
+    await evaluate(tab,`chrome.tabs.getCurrent().then(async t=>{
+      await chrome.tabs.setZoomSettings(t.id,{scope:'per-origin',mode:'automatic'});
+      await chrome.tabs.setZoom(t.id,${zoom});
+    })`);
     await call('Page.addScriptToEvaluateOnNewDocument',{source:`
       window.startupFrames=[];
       window.startupZoomCalls=[];
@@ -31,8 +43,10 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
         const root=document.getElementById('root'),board=document.querySelector('.board');
         const visible=!!root&&getComputedStyle(root).visibility==='visible'&&!root.hidden;
         const rect=board?.getBoundingClientRect();
+        const mark=document.querySelector('.startup-mark')?.getBoundingClientRect();
         startupFrames.push({visible,pieces:board?.querySelectorAll('.piece-img').length||0,
           squares:board?.querySelectorAll('.sq').length||0,width:rect?.width||0,x:rect?.x||0,
+          mark:mark&&mark.width>0?{x:mark.x,width:mark.width}:null,
           viewport:innerWidth,pixelRatio:devicePixelRatio});
         if(!window.startupSamplingDone)requestAnimationFrame(sample);
       };
@@ -68,9 +82,18 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       }
       await waitFor(tab,"!document.getElementById('startup')&&!document.getElementById('root').inert",'Finished reveal');
       await sleep(150);
-      const finish=await evaluate(tab,'(startupSamplingDone=true,{frames:startupFrames,zoomCalls:startupZoomCalls})');
+      const finish=await evaluate(tab,'(async()=>{startupSamplingDone=true;return {frames:startupFrames,zoomCalls:startupZoomCalls,zoom:await chrome.tabs.getZoom()};})()');
       await fs.writeFile(path.join(out,'startup-'+label+'-frames.json'),JSON.stringify(finish,null,2));
-      assert.deepEqual(finish.zoomCalls,[],'Native 100% startup must not mutate browser zoom');
+      assert.deepEqual(finish.zoomCalls,[],'Startup must not mutate browser zoom');
+      assert.ok(Math.abs(finish.zoom-zoom)<.005,'Open and reload must preserve the initial browser zoom');
+      const marks=finish.frames.filter(frame=>frame.mark);
+      assert.ok(marks.length>1,'The loading symbol must be sampled before the workspace reveal');
+      for(const frame of marks){
+        assert.ok(Math.abs(frame.mark.x-marks[0].mark.x)<.5,'Loading symbol moved sideways');
+        assert.ok(Math.abs(frame.mark.width-marks[0].mark.width)<.5,'Loading symbol changed size');
+        assert.equal(frame.viewport,marks[0].viewport);
+        assert.equal(frame.pixelRatio,marks[0].pixelRatio);
+      }
       const visible=finish.frames.filter(frame=>frame.visible);
       for(const frame of visible){
         assert.ok(Math.abs(frame.x-visible[0].x)<.5,'Board moved sideways during startup');
@@ -80,7 +103,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       }
       const readyImage=await call('Page.captureScreenshot',{format:'png'},sessionId);
       await fs.writeFile(path.join(out,'startup-'+label+'-ready.png'),Buffer.from(readyImage.data,'base64'));
-      console.log(label+': stable native zoom, complete-board first reveal and '+(reduced?'reduced motion':'animation')+' passed.');
+      console.log(label+': stable loading symbol and '+zoom*100+'% zoom through '+(reduced?'reduced motion':'animation')+' passed.');
     }
   }
   console.log('Startup screenshots: '+out);

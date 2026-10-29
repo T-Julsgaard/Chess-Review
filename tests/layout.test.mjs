@@ -16,13 +16,16 @@ function layout(t,initialZoom=1,effectiveZoom=z=>z) {
 }
 
 for(const [width,height]of [[1920,1080],[1366,768],[1536,864],[1280,720],[2560,1440],[1536,960],[1280,800],[1470,956],[1440,900],[1600,900],[3840,2160],[3440,1440],[820,1180],[390,844],[320,568]]) {
-  test(width+' × '+height+' uses 100% browser zoom through open, resize and reset',async t=>{
+  test(width+' × '+height+' preserves zoom on open and uses 100% after explicit reset',async t=>{
     const a=layout(t,.87);
     for(const chromeHeight of [0,120,160]){
       a.viewport(width,height-chromeHeight);await a.call('initTabZoom');
-      assert.equal(a.zoom(),1);assert.deepEqual(structuredClone(a.run('_fittedDip')),{w:width,h:height-chromeHeight});
+      const zoom=a.zoom();
+      assert.equal(zoom,chromeHeight===0?.87:1);
+      assert.deepEqual(structuredClone(a.run('_fittedDip')),{w:Math.round(width/zoom),h:Math.round((height-chromeHeight)/zoom)});
       assert.equal(a.dom.window.document.querySelector('.stage').style.transform,'');
       a.call('fitViewport');await a.call('resetLayout');assert.equal(a.zoom(),1);
+      assert.deepEqual(structuredClone(a.run('_fittedDip')),{w:width,h:height-chromeHeight});
     }
     assert.deepEqual(a.changes,[1]);
   });
@@ -32,6 +35,8 @@ test('Firefox quantized zoom stays stable through refits, viewport changes and r
   const effectiveZoom=z=>60/Math.round(60/z);
   const a=layout(t,.59,effectiveZoom);
   a.viewport(1100,635);await a.call('initTabZoom');
+  assert.equal(a.zoom(),.59);assert.deepEqual(a.changes,[]);
+  await a.call('resetLayout');
   assert.equal(a.zoom(),1);assert.deepEqual(a.changes,[1]);
   await a.context.browserAPI.tabs.setZoom(7,.59);
   for(const [width,height]of [[1100,635],[1200,700]]){
@@ -51,10 +56,12 @@ test('Firefox quantized zoom stays stable through refits, viewport changes and r
   assert.deepEqual(structuredClone(a.run('_fittedDip')),{w:1200,h:700});
 });
 
-test('simultaneous startup shares zoom normalization and resizing respects manual zoom',async t=>{
+test('startup preserves zoom and simultaneous explicit resets share normalization',async t=>{
   const a=layout(t,.85);let scopes=0;
   a.context.browserAPI.tabs.setZoomSettings=async()=>{scopes++;await settle();};
   await Promise.all([a.call('initTabZoom'),a.call('initTabZoom'),a.call('initTabZoom')]);
+  assert.equal(scopes,0);assert.deepEqual(a.changes,[]);assert.equal(a.zoom(),.85);
+  await Promise.all([a.call('initTabZoom',{resetZoom:true}),a.call('initTabZoom',{resetZoom:true})]);
   assert.equal(scopes,1);assert.deepEqual(a.changes,[1]);
   await a.context.browserAPI.tabs.setZoom(7,1.25);
   a.viewport(1280,800);a.dom.window.dispatchEvent(new a.dom.window.Event('resize'));
@@ -62,31 +69,28 @@ test('simultaneous startup shares zoom normalization and resizing respects manua
   await a.call('resetLayout');assert.equal(a.zoom(),1);
 });
 
-test('opening or reloading at 100% does not reapply tab zoom settings',async t=>{
-  const a=layout(t);let scopes=0;
-  a.context.browserAPI.tabs.setZoomSettings=async()=>{
-    scopes++;
-    // Reapplying Chrome's zoom scope can reintroduce an inherited zoom before
-    // setZoom restores 100%, producing a notice and two viewport changes.
-    await a.context.browserAPI.tabs.setZoom(7,.87);
-  };
+for(const zoom of [.8,1,1.25])test(`opening or reloading at ${zoom*100}% leaves browser zoom untouched`,async t=>{
+  const a=layout(t,zoom),calls=[];
+  for(const key of ['getCurrent','getZoom','setZoomSettings','setZoom']){
+    a.context.browserAPI.tabs[key]=async()=>{calls.push(key);};
+  }
   for(let i=0;i<3;i++)await a.call('initTabZoom');
-  assert.equal(scopes,0,'A native-size tab needs no zoom settings mutation');
+  assert.deepEqual(calls,[],'Startup must not change or inspect browser zoom');
   assert.deepEqual(a.changes,[]);
-  assert.equal(a.zoom(),1);
+  assert.equal(a.zoom(),zoom);
 });
 
 test('missing or failed tab zoom APIs do not prevent responsive layout or later retries',async t=>{
   const a=layout(t,.87),tabs=a.context.browserAPI.tabs;
   const setZoom=tabs.setZoom;tabs.setZoom=async()=>{throw Error('Temporary error');};
-  await a.call('initTabZoom');assert.equal(a.dom.window.document.querySelector('.stage').style.minWidth,'');
-  tabs.setZoom=setZoom;await a.call('initTabZoom');assert.equal(a.zoom(),1);
+  await a.call('initTabZoom',{resetZoom:true});assert.equal(a.dom.window.document.querySelector('.stage').style.minWidth,'');
+  tabs.setZoom=setZoom;await a.call('initTabZoom',{resetZoom:true});assert.equal(a.zoom(),1);
   a.context.browserAPI.tabs=undefined;a.viewport(390,844);await a.call('initTabZoom');
   assert.deepEqual(structuredClone(a.run('_fittedDip')),{w:390,h:844});
 });
 
 test('custom geometry fits inside its own canvas while browser zoom remains 100%',async t=>{
-  const a=layout(t,.61);a.state.layoutMode='custom';const before=structuredClone(a.state.layout);
+  const a=layout(t);a.state.layoutMode='custom';const before=structuredClone(a.state.layout);
   for(const [width,height]of [[1920,920],[1366,648],[1280,560],[768,900],[390,844]]){
     a.viewport(width,height);a.call('applyLayoutMode');await a.call('initTabZoom');
     const size=a.call('layoutPageSize',a.state.layout),scale=a.run('canvasScale');
