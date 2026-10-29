@@ -30,7 +30,7 @@ import { createScreenPreviewContext, loadScreenPreviewController } from "./lib/s
 import { rememberAnalyzedGame, historyGame } from "./lib/player-history.js";
 import { leaderboardPreviewControls } from "./lib/learning/leaderboard-preview.js";
 import { createReviewEffects } from "./lib/review-effects.js";
-import { explainMove } from "./lib/move-explanation.js";
+import { explainMove, explanationPv } from "./lib/move-explanation.js";
 
 const reviewEffects = createReviewEffects(document);
 
@@ -4244,11 +4244,10 @@ function renderMoveComment() {
 
   // Pick the line once per (ply + coach): a fresh signature → choose + type; otherwise reuse the
   // shown text (so unrelated re-renders don't re-pick or re-animate, and a coach switch re-types).
-  const topPv = result => result?.lines?.find(line => (line.multipv ?? 1) === 1 && (!line.bound || line.bound === "exact"))?.pv || result?.pv || result?.bestmove;
   const explanation = dopamine ? explainMove({
     beforeFen: S.positions[S.idx - 1].fen, afterFen: S.positions[S.idx].fen, category: cls,
     beforeScore: S.evals[S.idx - 1], afterScore: S.evals[S.idx],
-    beforePv: topPv(S.bests[S.idx - 1]), afterPv: topPv(S.bests[S.idx]),
+    beforePv: explanationPv(S.bests[S.idx - 1]), afterPv: explanationPv(S.bests[S.idx]),
   }) : null;
   const sig = "m:" + S.idx + ":" + (S.settings.coach || "") + ":" + (cls || "") + ":" + (dopamine ? JSON.stringify(explanation) : "normal");
   const fresh = sig !== _ipSig;
@@ -5788,8 +5787,9 @@ function section(title, ...children) {
 function seg(label, key, options, info, fmt = (value) => value) {
   return el("div", { class: "set-row" },
     setLabel(label, info),
-    el("div", { class: "set-seg" },
-      ...options.map((o) => el("button", { type:"button", "data-setting":key, "data-value":String(o), class: S.settings[key] === o ? "on" : "", onclick: () => setSetting(key, o) }, fmt(o)))),
+    el("div", { class: "set-seg", role: "group", "aria-label": label || key },
+      ...options.map((o) => el("button", { type:"button", "data-setting":key, "data-value":String(o),
+        "aria-pressed": String(S.settings[key] === o), class: S.settings[key] === o ? "on" : "", onclick: () => setSetting(key, o) }, fmt(o)))),
   );
 }
 function settingDropdown(label, key, options) {

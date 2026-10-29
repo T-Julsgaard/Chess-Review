@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {Chess} from '../lib/chess.js';
-import {explainMove} from '../lib/move-explanation.js';
+import {explainMove, explanationPv} from '../lib/move-explanation.js';
 import {app, loadGame} from './helpers/app.mjs';
 
 function position(pgn, played) {
@@ -43,6 +43,43 @@ test('rejects illegal PV moves and invalid positions without inventing tactics',
   assert.equal(result.reply, null);
   assert.doesNotMatch(result.summary + result.detail, /captures|checkmate|rook|queen/);
   assert.equal(explainMove({beforeFen:'invalid',afterFen:'invalid'}), null);
+});
+
+test('missing analysis does not claim that a continuation is displayed', () => {
+  const result = explainMove({...position('1. e4', 'e5'), category:null});
+  assert.equal(result.summary, 'Waiting for analysis of this move.');
+  assert.equal(result.reply, null);
+});
+
+test('explains a checking reply without inventing a forced mate', () => {
+  const result = explainMove({...position('1. f3 e5', 'e3'), afterPv:'d8h4'});
+  assert.equal(result.summary, 'This allows Qh4+, putting the king in check.');
+  assert.doesNotMatch(result.summary + result.detail, /mate|wins/);
+});
+
+test('describes promotion and underpromotion without promising the new piece survives', () => {
+  const before=new Chess('4k3/8/8/8/8/8/p7/4K2R w - - 0 1'), beforeFen=before.fen();
+  before.move('Rh2');
+  const inputs={beforeFen,afterFen:before.fen(),category:'blunder'};
+  assert.equal(explainMove({...inputs,afterPv:'a2a1q'}).summary, 'Black can reply a1=Q+, promoting to a queen.');
+  assert.equal(explainMove({...inputs,afterPv:'a2a1n'}).summary, 'Black can reply a1=N, promoting to a knight.');
+});
+
+test('explanation evidence selects the exact top line and handles older results without lines', () => {
+  assert.equal(explanationPv({bestmove:'e2e4',lines:[]}), 'e2e4');
+  assert.equal(explanationPv({pv:'e2e4 e7e5'}), 'e2e4 e7e5');
+  assert.equal(explanationPv({pv:'d2d4',lines:[{multipv:2,pv:'d2d4'}, {multipv:1,bound:'exact',pv:'e2e4'}]}), 'e2e4');
+  assert.equal(explanationPv({bound:'upperbound',pv:'e2e4'}), null);
+});
+
+test('provisional lines cannot reappear through the root result fallback', t => {
+  const a = app(t), S = loadGame(a, '1. f3 e5 2. g4 Qh4#');
+  S.idx=3; S.classif[3]='mistake'; S.settings.reviewMode='dopamine';
+  S.evals[2]={cp:-30}; S.evals[3]={mate:-1};
+  S.bests[3]={bestmove:'d8h4',pv:'d8h4',lines:[{multipv:1,bound:'lowerbound',pv:'d8h4'}]};
+  const body=a.call('renderMoveComment');
+  assert.equal(body.querySelector('.dopamine-line'), null);
+  assert.doesNotMatch(body.querySelector('.ip-text').textContent, /Qh4/);
 });
 
 test('Dopamine explanations and exploration are opt-in and leave scores and Normal commentary intact', async t => {

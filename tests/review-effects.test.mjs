@@ -76,6 +76,36 @@ test('blunders have a full-board reaction and grade corrections cancel stale rea
   assert.equal(board.childElementCount, 0);
 });
 
+test('the first grade arriving at the selected move reacts once, without replaying on repaints or toggles', t => {
+  const {effects, board, move} = fixture(t);
+  effects.update(board, {...move, category:null});
+  assert.equal(board.childElementCount, 0);
+  effects.update(board, move);
+  const reaction = board.firstElementChild;
+  assert.ok(reaction);
+  effects.update(board, move);
+  assert.equal(board.firstElementChild, reaction);
+  effects.update(board, {...move, enabled:false});
+  effects.update(board, move);
+  assert.equal(board.childElementCount, 0);
+});
+
+test('mode choices expose the selected state and keep keyboard focus after changing mode', async t => {
+  const a = app(t); loadGame(a, '1. e4 e5');
+  a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
+  a.call('toggleSettings');
+  const doc = a.dom.window.document;
+  [...doc.querySelectorAll('.set-sect-head')].find(node=>node.textContent.includes('Review experience')).click();
+  const control = value => doc.querySelector('[data-setting="reviewMode"][data-value="'+value+'"]');
+  assert.equal(control('normal').getAttribute('aria-pressed'), 'true');
+  assert.equal(control('dopamine').getAttribute('aria-pressed'), 'false');
+  control('dopamine').focus(); control('dopamine').click();
+  await a.run('_settingsWriteQueue');
+  await Promise.resolve();
+  assert.equal(control('dopamine').getAttribute('aria-pressed'), 'true');
+  assert.equal(doc.activeElement, control('dopamine'));
+});
+
 test('effects contain no text or caption, and expired effects clean themselves up', t => {
   const {dom, effects, board, move} = fixture(t);
   let expire;
