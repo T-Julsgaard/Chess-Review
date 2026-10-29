@@ -72,6 +72,24 @@ test('explanation evidence selects the exact top line and handles older results 
   assert.equal(explanationPv({bound:'upperbound',pv:'e2e4'}), null);
 });
 
+test('a mating evaluation is not presented as proof that a separate reply line gives mate', () => {
+  const result=explainMove({...position('1. f3 e5','g4'),beforeScore:{cp:-30},afterScore:{mate:-1},afterPv:'d7d6'});
+  assert.equal(result.summary,'This allows a forced mate for Black.');
+  assert.equal(result.detail,'Stockfish reports mate in 1.');
+  assert.equal(result.reply.san,'2… d6');
+});
+
+test('a player already facing forced mate is not told this move introduced it', () => {
+  const result=explainMove({...position('1. f3 e5','g4'),beforeScore:{mate:-4},afterScore:{mate:-3}});
+  assert.equal(result.summary,'White is still facing a forced mate.');
+});
+
+test('unsigned mate zero cannot identify the wrong winner', () => {
+  const result=explainMove({...position('1. e4 f6 2. d4 g5','Qh5#'),beforeScore:{cp:300},afterScore:{mate:0}});
+  assert.match(result.summary,/Checkmate/);
+  assert.equal(result.evaluation,null);
+});
+
 test('provisional lines cannot reappear through the root result fallback', t => {
   const a = app(t), S = loadGame(a, '1. f3 e5 2. g4 Qh4#');
   S.idx=3; S.classif[3]='mistake'; S.settings.reviewMode='dopamine';
