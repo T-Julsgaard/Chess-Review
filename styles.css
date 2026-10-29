@@ -385,9 +385,15 @@
 .puzzle-mode-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin-top: 24px; }
 .puzzle-mode {
   --mode-stock: #bbd58c;
+  min-width: 0;
+}
+/* Keep the hover area still while the ticket moves inside it. */
+.puzzle-mode-surface {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  height: 100%;
+  box-sizing: border-box;
   border: 1px solid var(--line);
   padding: 0;
   overflow: hidden;
@@ -433,13 +439,13 @@
 .puzzle-mode:has(.puzzle-mode-button:focus-visible) { outline: 2px solid var(--ink); outline-offset: 4px; }
 .learning-workspace .puzzle-mode-button:focus-visible { outline: 2px solid #26291f; outline-offset: -5px; }
 @media (hover: hover) {
-  .puzzle-mode:has(.puzzle-mode-button:hover:not(:disabled)) { transform: translateY(-3px); box-shadow: 0 15px 24px #0002; }
+  .puzzle-mode:hover:has(.puzzle-mode-button:not(:disabled)) .puzzle-mode-surface { transform: translateY(-3px); box-shadow: 0 15px 24px #0002; }
   .puzzle-mode-button:hover:not(:disabled) .mode-piece { transform: translateY(-7px) rotate(8deg); }
   .puzzle-mode-button:hover:not(:disabled) .mode-timer { transform: rotate(14deg); }
   .puzzle-mode-button:hover:not(:disabled) .mode-speed-lines { transform: translateX(-5px); }
   .puzzle-mode-button:hover:not(:disabled) .mode-crown { transform: translateY(-4px) rotate(-9deg); }
 }
-.puzzle-mode:has(.puzzle-mode-button:active:not(:disabled)) { transform: translateY(1px); box-shadow: none; }
+.puzzle-mode:has(button:active:not(:disabled)) .puzzle-mode-surface { transform: translateY(1px); box-shadow: none; }
 @media (max-width: 420px) {
   .puzzle-mode-grid { gap: 7px; }
   .learning-workspace .puzzle-mode-button { padding: 10px 8px 12px; height: 148px; min-height: 148px; }
@@ -449,9 +455,9 @@
   .puzzle-mode-record { flex-direction: column-reverse; gap: 5px; text-align: center; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .puzzle-mode,.puzzle-mode .mode-piece,.puzzle-mode .mode-timer,.puzzle-mode .mode-crown,.puzzle-mode .mode-speed-lines { transition: none !important; transform: none !important; }
+  .puzzle-mode-surface,.puzzle-mode .mode-piece,.puzzle-mode .mode-timer,.puzzle-mode .mode-crown,.puzzle-mode .mode-speed-lines { transition: none !important; transform: none !important; }
 }
-.learning-workspace[data-motion="off"] .puzzle-mode,.learning-workspace[data-motion="off"] .puzzle-mode :is(.mode-piece,.mode-timer,.mode-crown,.mode-speed-lines) { transition: none !important; transform: none !important; }
+.learning-workspace[data-motion="off"] .puzzle-mode-surface,.learning-workspace[data-motion="off"] .puzzle-mode :is(.mode-piece,.mode-timer,.mode-crown,.mode-speed-lines) { transition: none !important; transform: none !important; }
 @media (forced-colors: active) {
   .learning-workspace .puzzle-mode-button { border: 1px solid ButtonText; background: ButtonFace; color: ButtonText; }
   .puzzle-mode-info { border-top: 1px dashed CanvasText; }
