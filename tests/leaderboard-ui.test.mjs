@@ -37,7 +37,7 @@ test('all modes have compact leaderboard entries; screens preserve filters, use 
 test('pagination, own-player emphasis, escaping remote names and network retry work',async t=>{
   const {w}=await setup(t);let fail=false;
   w.leaderboardClient={configured:true,credentials:async()=>({id:'me',name:'Knight-me'}),
-    async list(mode,page){if(fail)throw Error('Offline');return {rows:[{id:'me',name:'<img src=x onerror=alert(1)>',score:42}],hasNext:page===1};}};
+    async list(mode,page){if(fail)throw Error('Offline');return {rows:[{id:'me',name:'<img src=x onerror=x>',score:42}],hasNext:page===1};}};
   await w.showLeaderboard('knockout');assert.equal(w.root.querySelector('.leaderboard-table img'),null);
   assert.equal(w.root.querySelector('.is-you .leaderboard-score').textContent,'42');
   assert.equal(w.root.querySelector('[data-focus=leaderboard-previous]').disabled,true);

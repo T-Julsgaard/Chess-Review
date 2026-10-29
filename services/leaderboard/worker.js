@@ -1,4 +1,5 @@
 import {Chess} from '../../lib/chess.js';
+import {validLeaderboardName} from '../../lib/learning/leaderboard-name.js';
 import {flagCodeForCountryId,countryNameForId} from '../../flags.js';
 
 const MODES=new Set(['solve-puzzle','timeAttack','knockout']);
@@ -83,6 +84,7 @@ async function pickPuzzle(env,player,mode,seen,previous=0) {
 }
 async function enroll(request,env,now) {
   const body=await bodyOf(request);
+  if(Object.hasOwn(body,'name'))fail(400,'Player names are assigned by the service');
   if(typeof body.turnstile!=='string'||body.turnstile.length>2048)fail(400,'Verification required');
   // Expiring single-use widget tokens are checked on the service, never trusted from the client.
   const verification=await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify',{
@@ -92,6 +94,7 @@ async function enroll(request,env,now) {
   if(!result.success||result.hostname!==env.TURNSTILE_HOSTNAME||result.action!=='enroll')fail(403,'Verification failed');
   await reserve(env,now,6);
   const token=secret(),id=crypto.randomUUID(),name='Knight-'+id.replaceAll('-','').slice(0,10);
+  if(!validLeaderboardName(name))fail(503,'Invalid generated name');
   await env.DB.prepare('INSERT INTO players(id,token_hash,name,created_at) VALUES (?,?,?,?)').bind(id,await digest(token),name,now).run();
   return json({token,id,name},201);
 }
@@ -248,7 +251,9 @@ export default {
       if(request.method==='POST'&&path==='/v1/practice/attempts')return await submitPractice(request,env,player,now);
       if(request.method==='POST'&&path==='/v1/sessions')return await start(request,env,player,now);
       if(request.method==='POST'&&path==='/v1/me'){
-        const {country}=await bodyOf(request);
+        const body=await bodyOf(request);
+        if(Object.hasOwn(body,'name'))fail(400,'Player names are assigned by the service');
+        const {country}=body;
         if(typeof country!=='string'||country.length>12||!flagCodeForCountryId(country)||!countryNameForId(country))fail(400,'Invalid country');
         await reserve(env,now,8,player.id);
         await env.DB.prepare(`INSERT INTO player_countries(player_id,country) VALUES (?,?)

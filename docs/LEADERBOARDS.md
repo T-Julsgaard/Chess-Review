@@ -30,6 +30,13 @@ Country records are deleted with the player; public caches may take time to upda
 Players explicitly choose **Play ranked** after verifying once on the service's
 `/join` page and connecting a private player key. Names are generated (for example
 `Knight-0123456789`); no email, chess account, or user-supplied names are collected.
+Public names have a maximum of 25 ASCII characters: letters, digits, internal
+spaces, hyphens and underscores, beginning and ending with a letter or digit.
+Names remain server-assigned; local edits cannot rename an online player. The
+API rejects submitted name changes. Migration `0004_player_names.sql` repairs
+invalid imported names and enforces the rule on database inserts and updates.
+Links, markup and control/hidden characters are not permitted in public names;
+the UI also renders names as text rather than HTML or clickable links.
 The key is stored in extension local storage, never sync storage. It is a personal
 bearer credential: anyone holding it can play or delete that player's records.
 The service stores only its SHA-256 hash. Save it privately if you want to use the

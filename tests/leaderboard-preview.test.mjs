@@ -26,7 +26,7 @@ test('malformed, duplicate, oversized and untrusted CSV records are rejected wit
     'mode,player,solved\nknockout,Name,Infinity', 'mode,player,solved\nknockout,Name,1,extra',
     'x'.repeat(PREVIEW_MAX_BYTES+1)])assert.throws(()=>preview.load(invalid));
   assert.equal(preview.count,4);
-  const safe=parseLeaderboardCsv('mode,player,solved\nknockout,<img src=x onerror=alert(1)>,9');assert.equal(safe.count,1);
+  const safe=parseLeaderboardCsv('mode,player,solved\nknockout,<img src=x onerror=x>,9');assert.equal(safe.count,1);
 });
 test('preview mode never reads credentials, writes progress, requests consent or sends leaderboard traffic',async t=>{
   t.after(()=>leaderboardPreview.clear());let network=0,reads=0,writes=0;

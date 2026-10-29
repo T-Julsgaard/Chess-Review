@@ -127,6 +127,15 @@ test('enrollment verifies Turnstile hostname/action, returns a personal key and 
   const stored=s.db.prepare('SELECT * FROM players WHERE id=?').get(player.id);assert.equal(stored.token_hash,await digest(player.token));
   assert.doesNotMatch(JSON.stringify(stored),new RegExp(player.token));
 });
+
+test('public names stay server-assigned even when a modified client submits a name',async t=>{
+  const s=await setup(t);
+  for(const name of ['https://example.com','A'.repeat(26),'AnotherPlayer']){
+    assert.equal((await s.call('/v1/enroll',{turnstile:'proof',name},null)).status,400);
+    assert.equal((await s.call('/v1/me',{country:'DK',name})).status,400);
+  }
+  assert.equal(s.db.prepare("SELECT name FROM players WHERE id='player'").get().name,'Knight-test');
+});
 test('pagination is bounded and deterministic and never exposes authentication data',async t=>{
   const s=await setup(t);
   for(let i=0;i<15;i++){s.db.prepare('INSERT INTO players VALUES (?,?,?,?)').run('p'+i,'hash'+i,'Knight-'+i,1);s.db.prepare('INSERT INTO records VALUES (?,?,?,?)').run('knockout','p'+i,15-i,1);}
