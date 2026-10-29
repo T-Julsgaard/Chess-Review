@@ -158,3 +158,22 @@ for(const mode of ['solve-puzzle','timeAttack','knockout'])test(`${mode} keeps l
   await w.loadLeaderboard(3);assert.equal(reads,3);assert.equal(w.leaderboard.page,3);
   assert.equal(w.root.querySelector('.leaderboard-score').textContent,'39','Real leaderboard updates still render');
 });
+
+test('pagination captures scroll before moving the cached hero, including loading and failed reads',async t=>{
+  t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:library})}));
+  const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');await a.call('openLearning');
+  const w=a.run('learningWorkspace');t.after(()=>w.close());let fail=false;
+  w.leaderboardClient={configured:true,credentials:async()=>null,list:async(mode,page)=>{if(fail)throw Error('Offline');return {rows:[{name:'Player '+page,score:42}],hasNext:page<3};}};
+  await w.showLeaderboard('knockout');
+  const view=w.leaderboardView;
+  t.mock.method(w,'leaderboardView',function(){
+    const previous=this.shell.querySelector('.learn-main'),result=view.call(this);
+    // Model the browser clamping the old scroller when its hero moves out.
+    previous.scrollTop=0;this.root.scrollTop=0;this.shell.scrollTop=0;return result;
+  });
+  const scroll=()=>[w.shell.querySelector('.learn-main').scrollTop,w.root.scrollTop,w.shell.scrollTop];
+  w.shell.querySelector('.learn-main').scrollTop=180;w.root.scrollTop=32;w.shell.scrollTop=16;
+  await w.loadLeaderboard(2);assert.deepEqual(scroll(),[180,32,16]);
+  fail=true;await w.loadLeaderboard(3);assert.deepEqual(scroll(),[180,32,16]);
+  fail=false;await w.loadLeaderboard(1,{quiet:true});assert.deepEqual(scroll(),[180,32,16]);
+});
