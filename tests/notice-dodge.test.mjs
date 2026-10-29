@@ -87,7 +87,9 @@ test('the evasive button reacts before hover, respects a catch window, resets on
   const escaped=button.getBoundingClientRect();
   assert.ok(Math.hypot(Math.max(escaped.left-421,0,421-escaped.right),Math.max(escaped.top-220,0,220-escaped.bottom))>=64,'Choose a destination away from the latest pointer position');
   const now=button.getBoundingClientRect();
-  const near={x:now.left<270?now.right+70:now.left-70,y:now.top+20};
+  // Follow the escaped button itself. A fixed offset can randomly land in the
+  // protected dismiss-button zone and correctly cancel the pending dodge.
+  const near={x:now.left+now.width/2,y:now.top+now.height/2};
   move(near.x,near.y);flush();assert.equal(button.dataset.dodges,'1','A brief reaction window permits a real catch');
   assert.equal(timers.size,1);clock=120;for(const [id,fn] of timers){timers.delete(id);fn();}flush();
   assert.equal(button.dataset.dodges,'2','A pointer that stays close triggers another escape after the catch window');
