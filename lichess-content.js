@@ -13,18 +13,23 @@ const browserAPI = typeof browser !== "undefined" ? browser : chrome;
 const RESERVED = /^(training|analysis|practice|streamer|tournament|broadcast)$/i;
 
 // ---- Game id ----------------------------------------------------------------
-// The first path segment of a game URL is the 8-char id (sometimes 12 with a player token):
-// /CZmytj0X, /CZmytj0X/black, /CZmytj0X/black/analysis, /CZmytj0XNUnq (live).
-function firstPathId() {
-  const seg = location.pathname.replace(/^\/+/, "").split("/")[0] || "";
+// Current URLs use /game/<id>; older links use /<id>. Both may carry a player token
+// or a trailing /black, /white or /analysis segment. Keep in sync with lichess.js.
+function firstPathId(pathname = location.pathname) {
+  const seg = pathname.replace(/^\/+/, "").replace(/^game\//, "").split("/")[0] || "";
   if (/^[A-Za-z0-9]{8,12}$/.test(seg) && !RESERVED.test(seg)) return seg.slice(0, 8);
   return null;
 }
 function detectGameId() {
-  // 1) og:url is the most reliable on a game/analysis page: https://lichess.org/<id8>/<color>
+  // 1) og:url is the most reliable on a game/analysis page.
   const og = document.querySelector('meta[property="og:url"]')?.getAttribute("content");
-  const m = og && og.match(/lichess\.org\/([A-Za-z0-9]{8})\b/);
-  if (m) return m[1];
+  if (og) {
+    try {
+      const url = new URL(og);
+      const id = /^(www\.)?lichess\.org$/i.test(url.hostname) && firstPathId(url.pathname);
+      if (id) return id;
+    } catch { /* missing or malformed metadata: read the page URL below */ }
+  }
   // 2) Otherwise only treat the URL as a game when a board is actually present (round/analysis view).
   if (document.querySelector(".round__app, main.round, main.analyse, .analyse__board, cg-container")) {
     const id = firstPathId();
@@ -51,12 +56,17 @@ function detectFlip() {
 }
 
 // ---- Move list (DOM fallback if the API can't be reached) -------------------
-// Round view:   <l4x><i5z>1</i5z><kwdb>e4</kwdb><kwdb>e5</kwdb>…</l4x>
+// Round view uses changing custom tag names. The stable .round__app app container
+// holds move numbers, SAN tokens and the result; retain the older markup fallback.
 // Analysis view: <div class="tview2">… <move><san>e4</san></move> …</div>
 const RESULT_RE = /^(1-0|0-1|1\/2-1\/2|½-½|\*)$/;
+const SAN_RE = /^(?:O-O(?:-O)?|[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=[QRBN])?)[+#]?[!?]*$/;
 function readMovetext() {
   // Round view — a flat list of SAN tokens in document order.
-  let sans = [...document.querySelectorAll("l4x kwdb")]
+  let sans = [...document.querySelectorAll(".round__app app > *")]
+    .map((n) => (n.textContent || "").trim())
+    .filter((t) => SAN_RE.test(t));
+  if (sans.length < 2) sans = [...document.querySelectorAll("l4x kwdb")]
     .map((n) => (n.textContent || "").trim())
     .filter((t) => t && !RESULT_RE.test(t));
   // Analysis view — SAN sits in <san> (or directly in <move>).
@@ -168,6 +178,7 @@ function getLogoDataUrl() {
 
 function resetLiReviewButton(btn, label) {
   btn.disabled = false;
+  btn.removeAttribute("title");
   label.textContent = LI_REVIEW_LABEL;
 }
 
@@ -194,13 +205,20 @@ function injectLichessReviewButton(followUp) {
 
   btn.addEventListener("click", () => {
     btn.disabled = true;
+    btn.removeAttribute("title");
     // Stay busy until the bounded background operation settles.
     label.textContent = "Opening review…";
     try {
       // After an extension reload the old content script loses its context — sendMessage throws
       // (Chrome) or rejects (Firefox), depending on when the context is invalidated.
-      browserAPI.runtime.sendMessage({ type: "freeGameReview", gameKey: location.origin + location.pathname + location.search }).then(() => {
-        resetLiReviewButton(btn, label);
+      browserAPI.runtime.sendMessage({ type: "freeGameReview", gameKey: location.origin + location.pathname + location.search }).then((result) => {
+        if (result?.ok) resetLiReviewButton(btn, label);
+        else {
+          btn.disabled = false;
+          label.textContent = "Couldn't open review — retry";
+          btn.title = result?.error || "The extension didn't confirm opening the review. Reload the page and try again.";
+          console.warn("[Chess Review]", btn.title);
+        }
       }).catch(() => {
         btn.disabled = false;
         label.textContent = "Reload the page ↻";

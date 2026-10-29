@@ -42,6 +42,11 @@ for(const [file,url,html,selector] of [
   test(`${file}: review button remains busy until completion without a five-second reset`,async t=>{
     const {w,sent,jobs}=content(t),button=w.document.querySelector(selector);assert.ok(button);button.click();await settle();
     assert.equal(button.disabled,true);assert.equal(sent[0].gameKey,url);jobs[0].resolve({ok:false,error:'Offline'});await settle();assert.equal(button.disabled,false);
+    if(file==='lichess-content.js'){
+      assert.match(button.textContent,/Couldn't open review/);assert.equal(button.title,'Offline');
+      button.click();assert.equal(button.title,'');assert.equal(button.disabled,true);
+      jobs[1].resolve({ok:true});await settle();assert.equal(button.disabled,false);assert.match(button.textContent,/Analyze with Chess Review/);
+    }
   });
 }
 test('background joins same-game requests, cancels replaced games, and acknowledges shares only after tab handoff',async t=>{

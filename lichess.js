@@ -5,7 +5,8 @@
 //   Export one game:  GET https://lichess.org/game/export/{gameId}
 //     Accept: application/x-chess-pgn  → returns the full PGN (tags + moves).
 //
-// Lichess game IDs are 8 characters. A URL may carry a 12-char id (the 8-char id plus a
+// Game pages use /game/<id>; older links use /<id>. Lichess game IDs are 8 characters.
+// A URL may carry a 12-char id (the 8-char id plus a
 // 4-char player token, e.g. while/just after playing) and/or a trailing /white | /black |
 // /analysis segment — we always reduce to the canonical 8-char base id.
 
@@ -27,7 +28,7 @@ export function parseLichessGameId(urlOrPath) {
   } catch {
     path = String(urlOrPath);
   }
-  const seg = path.replace(/^\/+/, "").split(/[/?#]/)[0] || "";
+  const seg = path.replace(/^\/+/, "").replace(/^game\//, "").split(/[/?#]/)[0] || "";
   // Game ids are 8 chars; URLs sometimes append the 4-char player token (12 total).
   if (!/^[A-Za-z0-9]{8,12}$/.test(seg)) return null;
   if (RESERVED.test(seg)) return null;
@@ -59,12 +60,15 @@ export async function fetchGamePgn(gameId, {signal} = {}) {
   // Cache first: a finished game's PGN is immutable, so a re-analysis costs no API call.
   const cached = await getCachedGame("lichess", id);
   checkImport(signal);
-  if (typeof cached === "string" && cached.trim()) return cached;
+  if (typeof cached === "string" && cached.trim() && !/^\s*</.test(cached)) return cached;
   const url = `${SITE}/game/export/${encodeURIComponent(id)}?clocks=false&evals=false&literate=false`;
   const res = await fetchImport(url, { headers: { Accept: "application/x-chess-pgn" }, signal });
   if (!res.ok) throw new Error(`Lichess returned HTTP ${res.status} for game ${id}.`);
   const pgn = (await res.text()).trim();
   if (!pgn) throw new Error("Lichess returned an empty PGN.");
+  // A redirect to signup can succeed with HTTP 200. Let active-tab imports use
+  // their DOM fallback instead of caching the HTML and handing it to the parser.
+  if (/^</.test(pgn)) throw new Error("Lichess returned a web page instead of a PGN. Open the game page and try again.");
   // Only cache a finished game — an in-progress game exports a partial PGN with [Result "*"], which we
   // must not freeze (the next analysis should re-fetch the completed game).
   if (!/\[Result\s+"\*"\]/.test(pgn)) setCachedGame("lichess", id, pgn);

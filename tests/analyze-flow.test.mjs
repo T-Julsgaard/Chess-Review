@@ -44,7 +44,7 @@ test('Chess.com without a content script uses the saved username and URL', async
   assert.equal(Object.hasOwn(s.payload(), 'theme'), false);
 });
 
-for (const url of ['https://www.chess.com/game/live/12345678', 'https://lichess.org/AAAAAAAA']) {
+for (const url of ['https://www.chess.com/game/live/12345678', 'https://lichess.org/AAAAAAAA', 'https://lichess.org/game/AAAAAAAAabcd']) {
   test(`analysis opens immediately to the right of its source: ${url}`, async t => {
     const s = setup(t, url);
     await analyzeActiveTab('saved-user');
@@ -74,6 +74,17 @@ test('pasted analysis uses the active chess tab for placement', async t => {
   await openAnalysisTab({pgn:'1. e4 e5'});
   assert.equal(s.opened[0].index, 2);
   assert.equal(s.opened[0].windowId, 10);
+});
+
+test('a Lichess signup redirect uses visible moves to open the current game', async t => {
+  const s = setup(t, 'https://lichess.org/game/9pnmvxvAERfi');
+  t.mock.method(chrome.tabs, 'sendMessage', async () => ({site:'lichess', gameId:'9pnmvxvA', movetext:'1. e4 e5 2. Nf3 Nf6', flip:false}));
+  t.mock.method(globalThis, 'fetch', async () => ({ok:true, text:async()=> '<!DOCTYPE html><html>Sign up</html>'}));
+  await analyzeActiveTab();
+  assert.equal(s.opened.length, 1);
+  assert.equal(s.payload().pgn, '1. e4 e5 2. Nf3 Nf6');
+  assert.equal(s.payload().meta.gameId, '9pnmvxvA');
+  assert.equal(s.store['gamecache:lichess:9pnmvxvA'], undefined);
 });
 
 for (const fallback of ['unrelated site', 'closed source', 'unavailable position', 'failed lookup']) {
