@@ -158,6 +158,7 @@ for(const mode of ['solve-puzzle','timeAttack','knockout'])test(`${mode}: real w
   if(w.run){await w.finishChallenge('Ended early');assert.equal(w.result.ranked,true);}
   await w.navigate('puzzles');await w.showLeaderboard(mode);
   assert.equal(w.root.querySelector('.leaderboard-personal strong').textContent,'2','Personal best is immediate even when the cached board is older');
+  await w.leaderboardClient.practice.work;
   s.advance(61000);await w.loadLeaderboard(1,{fresh:true});
   assert.equal(w.root.querySelector('.leaderboard-score').textContent,'2');
 });

@@ -27,6 +27,7 @@ export async function auditLearning({review,call,evaluate,waitFor,out}) {
   const pending=await run("import('./browser-compat.js').then(({browserAPI:api})=>api.storage.local.get('leaderboard:practice:v1')).then(s=>s['leaderboard:practice:v1'].pending.length)");
   assert.equal(pending,1,'Pending proof is persisted using native storage under the origin lock');
   await run("import('./analysis.js').then(async({learningWorkspace:w})=>{await w.returnFromLeaderboard();await w.showLeaderboard('solve-puzzle');})");
+  await waitFor(review,"document.querySelector('.leaderboard-personal')?.textContent.includes('Saved')",'Background score sync');
   assert.equal(await run("window.syncCalls.filter(p=>p.endsWith('/attempts')).length"),1);
   assert.equal(await run("window.syncCalls.filter(p=>p.startsWith('/v1/boards/')).length"),1,'Reopening reuses the cached page');
   assert.match(await run("document.querySelector('.leaderboard-personal').textContent"),/Saved/);

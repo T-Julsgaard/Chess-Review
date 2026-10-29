@@ -49,6 +49,17 @@ test('pagination, own-player emphasis, escaping remote names and network retry w
   fail=false;await w.loadLeaderboard(2);assert.equal(w.root.querySelector('[role=alert]'),null);
   await w.navigate('concepts');assert.equal(w.leaderboardTimer,null);assert.equal(w.leaderboardRequest,null);
 });
+
+test('opening rankings shows pending personal progress without waiting for its upload',async t=>{
+  const {w}=await setup(t);let finishUpload,uploads=0;
+  const upload=new Promise(resolve=>{finishUpload=resolve;});
+  w.leaderboardClient={configured:true,credentials:async()=>({id:'me',name:'Knight-me'}),personal:async()=>({score:7,syncing:true}),
+    list:async()=>({rows:[],hasNext:false}),practice:{stop(){},flush(){uploads++;return upload;}}};
+  await w.showLeaderboard('solve-puzzle');
+  assert.equal(uploads,1);assert.equal(w.root.querySelector('.leaderboard-personal strong').textContent,'7');
+  assert.match(w.root.querySelector('.leaderboard-personal').textContent,/Syncing/);
+  assert.equal(w.leaderboardTimer,null);finishUpload();await drain();
+});
 test('leaving aborts reads and late responses cannot replace the current screen',async t=>{
   const {w}=await setup(t);let release,signal;
   w.leaderboardClient={configured:true,credentials:async()=>null,list:async(mode,page,input)=>{signal=input;return new Promise(resolve=>{release=resolve;});}};
