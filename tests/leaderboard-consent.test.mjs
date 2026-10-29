@@ -8,6 +8,7 @@ import {leaderboardSettingsControls} from '../lib/learning/leaderboard-settings.
 import {syncLeaderboardCountry} from '../lib/learning/leaderboard-country.js';
 import {leaderboardPreview} from '../lib/learning/leaderboard-preview.js';
 import {app,loadGame} from './helpers/app.mjs';
+import {leaderboardNationality,nationalityPicker} from '../lib/learning/leaderboard-nationality.js';
 
 const PREF='leaderboardPreferences:v1',KEY='leaderboard:v1',QUEUE='leaderboard:practice:v1';
 const player={id:'me',name:'Knight-me',token:'a'.repeat(64),scores:{knockout:12}};
@@ -41,6 +42,28 @@ test('consent is persisted separately from appearance; nationality defaults off 
   await assert.rejects(client.list('knockout',1),/Opt in/);assert.equal(requests.length,1,'Cached rows are also gated');
 });
 
+test('manual nationality survives reload and can only publish the player’s selected country',async()=>{
+  const {client,storage,requests}=fixture({[KEY]:player});
+  await client.optIn('DK');assert.equal((await client.preferences()).nationality,'DK');
+  await syncLeaderboardCountry(client,player);assert.equal(JSON.parse(requests[0].body).country,'DK');
+  await client.setNationality('US');await syncLeaderboardCountry(client,player);
+  assert.equal(JSON.parse(requests[1].body).country,'US');
+  assert.equal((await new LeaderboardClient(storage).preferences()).nationality,'US');
+  await assert.rejects(client.request('/v1/me',{token:player.token,body:{country:'DK'}}),/Choose this nationality/);
+  await assert.rejects(client.setNationality('ZZ'),/Choose a nationality/);
+  assert.equal(leaderboardNationality('none'),null);assert.throws(()=>leaderboardNationality(true),/Choose a nationality/);
+});
+
+test('nationality selector starts with a prompt and supports opting out, keyboard selection and flag previews',t=>{
+  const dom=new JSDOM('');t.after(()=>dom.window.close());let chosen;
+  const root=nationalityPicker({document:dom.window.document,onChange:value=>{chosen=value;}}),field=root.querySelector('select');
+  assert.equal(field.value,'');assert.equal(field.options[0].disabled,true);
+  assert.equal(field.options[1].textContent,'Don’t show nationality');
+  field.value='XE';field.dispatchEvent(new dom.window.Event('change'));assert.equal(chosen,'XE');
+  assert.match(root.querySelector('img').src,/flags\/GB_ENG.svg$/);
+  field.value='none';field.dispatchEvent(new dom.window.Event('change'));assert.equal(chosen,'none');assert.equal(root.querySelector('img'),null);
+});
+
 test('withdrawal aborts in-flight uploads, clears unsent proofs, and retains only the key needed for failed deletion',async()=>{
   let release,signal;
   const {client,data,requests}=fixture({[KEY]:player,[QUEUE]:{pending:[{puzzleId:'old'}]}},async(url,options)=>{
@@ -69,7 +92,7 @@ test('deletion is allowed while opted out; failures retain the key for retry and
 
 test('a late country-removal response cannot restore consent after opt-out',async()=>{
   const {client,storage,data}=fixture({[KEY]:player});
-  await client.optIn(true);await client.setNationality(false);
+  await client.optIn('DK');await client.setNationality(false);
   const set=storage.set;let release,reached=false;
   storage.set=async values=>{
     if(Object.hasOwn(values,'leaderboardCountry:v1')&&!Object.hasOwn(values,KEY)){
@@ -85,7 +108,7 @@ test('a late country-removal response cannot restore consent after opt-out',asyn
 test('turning nationality off removes the public flag without republishing; pending removals survive offline',async()=>{
   let offline=true;
   const {client,data,requests}=fixture({[KEY]:player},async()=>offline?Response.json({}, {status:503}):Response.json({country:null}));
-  await client.optIn(true);await client.setNationality(false);
+  await client.optIn('DK');await client.setNationality(false);
   await assert.rejects(syncLeaderboardCountry(client,player),/unavailable/);
   assert.equal(data[PREF].showNationality,false);assert.equal(data[PREF].pendingCountryRemoval,true);
   offline=false;
@@ -95,7 +118,7 @@ test('turning nationality off removes the public flag without republishing; pend
 });
 
 test('opting out deletes the shared player; rejoining starts with a new key and no nationality',async()=>{
-  const {client,data}=fixture({[KEY]:player});await client.optIn(true);await client.optOut();await client.optIn(false);
+  const {client,data}=fixture({[KEY]:player});await client.optIn('DK');await client.optOut();await client.optIn(false);
   assert.equal(data[PREF].showNationality,false);assert.equal(data[PREF].pendingCountryRemoval,false);assert.equal(data[KEY],null);
 });
 
@@ -112,7 +135,7 @@ test('Firefox nationality permission is separate and denied consent never enable
   t.after(()=>{if(original===undefined)delete globalThis.browser;else globalThis.browser=original;});
   const {client,data}=fixture();await assert.rejects(client.optIn(),/Allow online leaderboard/);assert.equal(data[PREF],undefined);
   allow=true;await client.optIn(false);assert.deepEqual(grants.at(-1),['authenticationInfo','technicalAndInteraction']);
-  await client.setNationality(true);assert.deepEqual(grants.at(-1),['locationInfo']);
+  await client.setNationality('DK');assert.deepEqual(grants.at(-1),['locationInfo']);
 });
 
 test('the opt-in box gates all modes and asks about nationality before saving any consent',async t=>{
@@ -126,7 +149,9 @@ test('the opt-in box gates all modes and asks about nationality before saving an
     assert.equal(w.root.querySelector('.leaderboard-table'),null);assert.equal(w.root.querySelector('.leaderboard-pagination'),null);
   }
   w.root.querySelector('[data-focus=leaderboard-opt-in]').click();
-  assert.equal(w.root.querySelector('[data-focus=leaderboard-nationality-choice]').checked,false);
+  assert.equal(w.root.querySelector('[data-focus=leaderboard-nationality-choice]').value,'');
+  assert.equal(w.root.querySelector('[data-focus=leaderboard-join]').disabled,true);
+  const nationality=w.root.querySelector('[data-focus=leaderboard-nationality-choice]');nationality.value='none';nationality.dispatchEvent(new dom.window.Event('change'));
   assert.equal(data[PREF],undefined);assert.equal(requests.length,0);
   w.root.querySelector('[data-focus=leaderboard-join]').click();await settle();
   assert.equal(data[PREF].enabled,true);assert.equal(data[PREF].showNationality,false);
@@ -139,12 +164,14 @@ test('General settings support opt-in, optional flags, opt-out, and confirmed de
   t.after(()=>dom.window.close());let changes=0;
   const root=leaderboardSettingsControls({document:dom.window.document,storage,client,onChange:()=>{changes++;}});dom.window.document.body.append(root);await settle();
   const click=key=>root.querySelector(`[data-leaderboard-setting=${key}]`).click();
-  click('enabled');assert.equal(root.querySelector('[data-leaderboard-setting=join-nationality]').checked,false);assert.equal(data[PREF],undefined);
+  const choose=value=>{const field=root.querySelector('[data-leaderboard-setting=join-nationality]');field.value=value;field.dispatchEvent(new dom.window.Event('change'));};
+  click('enabled');assert.equal(root.querySelector('[data-leaderboard-setting=join-nationality]').value,'');assert.equal(data[PREF],undefined);
+  assert.equal(root.querySelector('[data-leaderboard-setting=join]').disabled,true);choose('none');
   click('join');await settle();assert.equal(data[PREF].enabled,true);
   click('delete');assert.equal(requests.length,1);click('cancel-delete');assert.equal(requests.length,1);
   click('delete');click('confirm-delete');await settle();assert.equal(data[KEY],null);assert.equal(data[PREF].enabled,false);assert.equal(requests.length,2);
-  click('enabled');click('join');await settle();assert.equal(data[PREF].enabled,true);
-  click('enabled');await settle();assert.equal(data[PREF].enabled,false);assert.equal(changes,4);assert.equal(requests.length,2);
+  click('enabled');choose('US');click('join');await settle();assert.equal(data[PREF].enabled,true);assert.equal(data[PREF].nationality,'US');
+  click('delete');click('confirm-delete');await settle();assert.equal(data[PREF].enabled,false);assert.equal(changes,4);assert.equal(requests.length,2);
 });
 
 test('the renamed General tab and leaderboard settings shortcut open the correct section',async t=>{

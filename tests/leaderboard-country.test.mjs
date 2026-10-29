@@ -6,26 +6,26 @@ import {syncLeaderboardCountry} from '../lib/learning/leaderboard-country.js';
 import {PLAYER_HISTORY_KEY} from '../lib/player-history.js';
 import worker,{digest} from '../services/leaderboard/worker.js';
 
-test('only the inferred country is published, changes are synchronized once, and preview stays local',async()=>{
-  const store={"leaderboardPreferences:v1":{version:1,enabled:true,showNationality:true},[PLAYER_HISTORY_KEY]:{chesscom:[1,2,3].map(id=>({site:'chesscom',id:String(id),white:'Owner',black:'Opponent'+id,whiteCountry:'DK'}))}},requests=[];
+test('only the explicitly chosen country is published, changes synchronize once, and preview stays local',async()=>{
+  const store={"leaderboardPreferences:v1":{version:1,enabled:true,nationality:'DK'},[PLAYER_HISTORY_KEY]:{chesscom:[1,2,3].map(id=>({site:'chesscom',id:String(id),white:'Owner',black:'Opponent'+id,whiteCountry:'FR'}))}},requests=[];
   const player={id:'key-player',token:'private-key',name:'Knight-generated'};
-  const client={endpoint:'https://rank.example',storage:{async get(){return structuredClone(store);},async set(values){Object.assign(store,values);}},
+  const client={endpoint:'https://rank.example',storage:{async get(key){assert.notEqual(key,PLAYER_HISTORY_KEY);assert.notEqual(key,'library');return {[key]:structuredClone(store[key])};},async set(values){Object.assign(store,values);}},
     async request(path,options){requests.push({path,...options});}};
   await syncLeaderboardCountry(client,player);await syncLeaderboardCountry(client,player);
   assert.equal(requests.length,1);assert.deepEqual(requests[0].body,{country:'DK'});
   assert.equal(requests[0].token,'private-key');assert.doesNotMatch(JSON.stringify(requests),/Owner|Opponent/);
-  store[PLAYER_HISTORY_KEY].chesscom[0].whiteCountry='US';
+  store['leaderboardPreferences:v1'].nationality='US';
   await syncLeaderboardCountry(client,player);assert.equal(requests[1].body.country,'US');
   client.preview=true;client.storage.get=()=>{throw Error('Preview must not read history');};
   await syncLeaderboardCountry(client,player);assert.equal(requests.length,2);
 });
 
-test('ambiguous identities and inferred players without countries do not publish an opponent flag',async()=>{
-  let store={"leaderboardPreferences:v1":{version:1,enabled:true,showNationality:true},[PLAYER_HISTORY_KEY]:{chesscom:[{site:'chesscom',id:'1',white:'Owner',black:'Friend',blackCountry:'US'}]}};
-  const client={storage:{async get(){return store;}},request(){throw Error('No flag to upload');}};
-  await syncLeaderboardCountry(client,{id:'key-player'});
-  store={"leaderboardPreferences:v1":{version:1,enabled:true,showNationality:true},[PLAYER_HISTORY_KEY]:{chesscom:[1,2,3].map(id=>({site:'chesscom',id:String(id),white:'Owner',black:'Opponent'+id,blackCountry:'US'}))}};
-  await syncLeaderboardCountry(client,{id:'key-player'});
+test('legacy inferred-country sharing is removed until the user explicitly chooses a country',async()=>{
+  const store={'leaderboardPreferences:v1':{version:1,enabled:true,showNationality:true}},requests=[];
+  const client={storage:{async get(key){assert.equal(key,'leaderboardPreferences:v1');return {[key]:store[key]};},async set(value){Object.assign(store,value);}},
+    async request(path,options){requests.push(options.body);}};
+  await syncLeaderboardCountry(client,{id:'key-player'});await syncLeaderboardCountry(client,{id:'key-player'});
+  assert.deepEqual(requests,[{country:null}]);assert.equal(store['leaderboardPreferences:v1'].showNationality,false);
 });
 
 test('authenticated country updates reach public rows, reject invalid flags, and disappear on player deletion',async t=>{

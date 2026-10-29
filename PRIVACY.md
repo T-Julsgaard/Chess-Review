@@ -60,7 +60,8 @@ requests and ranked submissions are blocked while that preview is active.
 Leaderboards are disabled until an online service is configured in a release.
 Leaderboards are **off by default**, including for previously connected players.
 The leaderboard panel explains participation and asks you to opt in, with a
-separate, initially unchecked choice to show nationality. The extension stores
+separate choice of a nationality or **Don’t show nationality**. No country is
+preselected or inferred for leaderboard sharing. The extension stores
 your choice, notice version and acceptance time locally. Before opt-in, it does
 not fetch rankings, connect a player or upload results to the leaderboard service.
 After opt-in, opening a configured leaderboard fetches public rankings from a Cloudflare Worker;
@@ -80,13 +81,11 @@ Time attack and Knockout still verify attempts individually. Your games, PGNs, c
 identity, browsing history, settings and historical local progress are not sent.
 Your generated name and verified scores are public.
 
-Only if you also enable **Show nationality**, and your local game history
-identifies a recurring Chess.com player with a known country, opening a leaderboard
-with a connected player key sends that country
-token. Its bundled flag and country name are public alongside your generated name.
-The inferred Chess.com username remains on your device. Countries are saved with
-the matching usernames in local history and are not inferred from your IP address.
-Turn nationality off in **Settings → General → Leaderboard** to remove the
+If you choose a nationality, opening a leaderboard with a connected player key
+sends your selected country code. Its bundled flag and country name are public
+alongside your generated name. This is your own selection; leaderboard nationality
+does not use your Chess.com profile, local game history or IP address.
+Select **Don’t show nationality** in **Settings → General → Leaderboard** to remove the
 online flag. If the service is unavailable, removal stays pending and can be
 retried from settings. It is also retried when you next open rankings with your
 connected key. The flag is removed when you delete your online player as well.
@@ -107,7 +106,7 @@ results, and requests deletion of your online records. If deletion fails, the
 extension stays opted out and keeps the private key solely to retry deletion.
 Settings shows the pending deletion and a retry button; reopening the learning
 workspace also retries it. Joining again is blocked until deletion succeeds.
-**Delete all online leaderboard data**
+**Opt out & delete data**
 asks for confirmation, deletes your online player, scores, solve IDs, session and
 country, clears its local key, and opts you out. A failed deletion keeps the key
 so you can retry. Privacy removal requests still contact the service after opt-out.

@@ -518,13 +518,36 @@
 .learn-leaderboard .leaderboard-empty p { max-width: 280px; margin: 0; color: var(--ink-2); font-size: 12px; line-height: 1.6; }
 .learn-leaderboard .leaderboard-opt-in .leaderboard-empty { gap: 15px; padding: 28px 24px; }
 .learn-leaderboard .leaderboard-opt-in p { max-width: 440px; }
-.leaderboard-nationality-choice { display: grid; justify-items: center; gap: 12px; max-width: 440px; }
-.leaderboard-nationality-choice label,.set-leaderboard-settings label { display: flex; align-items: center; gap: 9px; font-size: 12px; line-height: 1.5; }
-.learning-workspace .leaderboard-nationality-choice input { min-height: 0; width: 16px; height: 16px; flex-shrink: 0; }
-.set-leaderboard-settings { display: flex; flex-direction: column; gap: 12px; }
+.leaderboard-nationality-choice { display: grid; justify-items: center; gap: 14px; width: 100%; max-width: 380px; }
+.leaderboard-nationality-picker { display: grid; gap: 8px; width: 100%; min-width: 0; text-align: left; }
+.leaderboard-field-label { color: var(--ink-2); font-size: 11px; font-weight: 600; }
+.leaderboard-nationality-field { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.leaderboard-nationality-field .set-select { min-width: 0; flex: 1; margin: 0; font-size: 12px; }
+.leaderboard-nationality-preview { display: grid; place-items: center; width: 30px; flex: 0 0 30px; }
+.leaderboard-nationality-preview img { display: block; width: 30px; height: 20px; object-fit: fill; }
+.leaderboard-nationality-preview .leaderboard-avatar { margin: 0; }
+.set-leaderboard-settings { display: grid; gap: 16px; padding-top: 2px; }
 .set-leaderboard-settings .set-note { margin: 0; font-size: 12px; line-height: 1.6; }
 .set-leaderboard-settings a { color: var(--ink-2); font-size: 12px; }
-.set-leaderboard-settings [role="switch"][aria-checked="true"] { color: var(--accent); }
+.leaderboard-settings-overview,.leaderboard-settings-profile,.leaderboard-settings-join { display: grid; gap: 10px; min-width: 0; }
+.leaderboard-settings-heading { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+.leaderboard-settings-heading strong { min-width: 0; overflow-wrap: anywhere; font-size: 13px; color: var(--ink); }
+.leaderboard-settings-badge { flex-shrink: 0; border: 1px solid var(--line); border-radius: 20px; padding: 3px 8px; color: var(--ink-2); font-size: 10px; font-weight: 600; }
+.set-leaderboard-settings[data-state="enabled"] .leaderboard-settings-badge { color: var(--accent); border-color: color-mix(in srgb,var(--accent) 30%,var(--line)); background: color-mix(in srgb,var(--accent) 9%,transparent); }
+.set-leaderboard-settings[data-state="pending"] .leaderboard-settings-badge { color: #e6c37c; }
+.leaderboard-settings-leave,.leaderboard-settings-footer { border-top: 1px solid var(--line); padding-top: 14px; }
+.set-leaderboard-settings .leaderboard-settings-button { margin: 0; padding: 9px 11px; min-height: 36px; font-size: 12px; }
+.set-leaderboard-settings .is-primary { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); font-weight: 650; }
+.set-leaderboard-settings .is-danger { color: #eeaa96; border-color: color-mix(in srgb,#eeaa96 28%,var(--line)); background: transparent; }
+.leaderboard-settings-confirm { display: grid; gap: 10px; padding: 12px; border: 1px solid color-mix(in srgb,#eeaa96 28%,var(--line)); border-radius: 9px; background: color-mix(in srgb,#eeaa96 4%,transparent); }
+.leaderboard-settings-confirm strong { font-size: 12px; color: var(--ink); }
+.leaderboard-settings-pending { display: grid; gap: 8px; }
+.leaderboard-settings-message { margin: 0; color: var(--accent); font-size: 12px; line-height: 1.5; }
+.leaderboard-settings-message[role="alert"] { color: #eeaa96; }
+.leaderboard-settings-footer { display: grid; gap: 12px; }
+.leaderboard-settings-footer summary { width: fit-content; cursor: pointer; color: var(--ink-2); font-size: 11px; }
+.leaderboard-settings-footer details[open] summary { margin-bottom: 10px; }
+.leaderboard-settings-footer details .set-note + .set-note { margin-top: 10px; }
 .leaderboard-pagination { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 14px; }
 .leaderboard-pagination span { font-size: 11px; color: var(--ink-2); }
 .leaderboard-pagination .learn-button { font-size: 11px; padding: 7px 10px; }

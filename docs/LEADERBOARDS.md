@@ -34,8 +34,9 @@ bundled with the extension. Normal puzzle progress remains separate.
 
 Leaderboards are off by default, including for legacy player keys. The opt-in
 panel replaces rankings and pagination and explains the public generated name,
-scores and Cloudflare hosting. Enabling its switch opens a second step with an
-initially unchecked nationality checkbox; **Join leaderboard** saves consent.
+scores and Cloudflare hosting. Enabling its switch opens a second step with a
+nationality selector with no preselected choice. Choose a country or **Don’t show
+nationality** before **Join leaderboard** saves consent.
 The versioned choice and acceptance time live in `leaderboardPreferences:v1`.
 The client independently gates reads (including cached pages), connection,
 ranked sessions and queued uploads. No historical offline results are submitted.
@@ -43,26 +44,25 @@ ranked sessions and queued uploads. No historical offline results are submitted.
 **Settings → General → Leaderboard** manages participation, nationality and
 deletion. Opting out immediately cancels requests, stops ranked participation and
 discards pending proofs, then deletes the online player and all score/profile
-records. The separate **Delete all online leaderboard data** button asks for
+records. The **Opt out & delete data** button asks for
 confirmation and performs the same withdrawal/deletion. Failed deletion leaves
 the extension opted out with a pending notice and the key retained for retry;
 settings offers a retry and reopening learning also retries. Rejoining is blocked
 until deletion succeeds. Removing local extension storage alone cannot erase
 online records. Public caches can take up to one minute to expire.
 
-Turning **Show nationality** off sends an authenticated `country: null` update,
+Choosing **Don’t show nationality** sends an authenticated `country: null` update,
 which removes only the online flag. Failed removal remains pending with a retry
 in settings. Privacy removal requests remain available while participation is off.
 Opt-out changes in another extension tab cancel current requests and hide rankings.
 
-Country flags use the bundled flag pack. The local player history keeps up to 50
-recent games per site, including each username's scraped country when available.
-The inferred Chess.com player must have several opponents and a clear frequency
-lead. Only when **Show nationality** is enabled, that player has a known country,
-and a leaderboard key is connected,
-opening a leaderboard publishes only the country token for that key. The inferred
-username stays local; public names remain generated `Knight-…` names. This is a
-display flag, not verified account ownership. Missing or unsupported countries
+Country flags use the bundled flag pack. Players choose their own nationality
+from the same country-code table, including England, Scotland and Wales. The
+selection is saved locally and synced for the connected leaderboard key. Local
+game history, detected usernames and Chess.com profile countries are never used
+for leaderboard nationality. Legacy inferred sharing defaults to hidden, with
+online flag removal pending until the service can be reached. Public names remain
+generated `Knight-…` names. This is a self-selected display flag. Missing or unsupported countries
 show a neutral player icon. Hover or keyboard focus on a flag shows the country name.
 Apply migration `0003_player_countries.sql` before deploying the updated Worker.
 Country records are deleted with the player; public caches may take time to update.
