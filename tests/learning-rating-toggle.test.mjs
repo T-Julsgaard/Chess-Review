@@ -37,7 +37,7 @@ test('the heading Elo switch persists across closing, reopening and resuming a p
   assert.equal(w.root.querySelector('.puzzle-solved-count'),null);
   const control=button();
   await w.togglePuzzleRating();
-  assert.equal(button(),control);assert.equal(button().textContent,'Rating');
+  assert.equal(button(),control);assert.equal(button().textContent,'Show rating');
   assert.equal(button().getAttribute('aria-checked'),'false');assert.equal(w.activity.rated,false);
   assert.equal(data['learning:v1'].puzzleRatingEnabled,false);assert.equal(data['learning:v1'].puzzleResume.rated,false);
   const resume=structuredClone(data['learning:v1'].puzzleResume);await w.close();
