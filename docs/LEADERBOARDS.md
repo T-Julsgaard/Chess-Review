@@ -60,8 +60,28 @@ request logging is disabled; do not enable logging of headers or request bodies.
 ## Deployment
 
 Deployment publishes a new service; these instructions do not run automatically.
-Use a dedicated Cloudflare account/project on the **Workers Free** plan if the
-service must stop at free limits rather than incur usage charges. No Cloudflare
+For this project, use a dedicated Cloudflare account on **Workers Free**, which
+provides D1's Free allowances, plus **Turnstile Free**. Exhausted quotas should stop the service; do
+not upgrade to paid usage to keep it running. A website's Cloudflare Free plan is
+separate from the Workers subscription: check **Workers & Pages → Plans** and
+the account's Billing subscriptions before deployment. Workers Free requires no
+credit card; leave this dedicated account without a payment method and do not
+activate paid trials or add-ons.
+Use the included `workers.dev` address; no purchased domain is needed.
+
+There is no Wrangler or extension setting that locks an account to Workers Free.
+The application limits, cache, and `ENABLED=false` switch do not impose a billing
+cap: requests reach Cloudflare before application code runs. If the account is
+changed to Workers Paid later, spam can generate charges even for rejected or
+disabled-service requests. Alerts and CPU limits do not make a paid deployment
+zero-cost. Do not enable paid services such as R2, AI APIs or paid logging for this
+leaderboard. The current service uses Workers, D1 and Turnstile only.
+
+With these Free plans, an attacker can temporarily exhaust the allowance and
+interrupt leaderboards. The free quota is the cost boundary, not the in-app rate
+limiter. This policy depends on keeping those account plans unchanged; review
+Cloudflare's current terms and account subscriptions before enabling the service.
+No Cloudflare
 API token, Turnstile secret, account credential or player key belongs in Git or
 the extension. Public Worker addresses, database IDs and Turnstile site keys are
 not secrets. The service directory is excluded from both extension packages.
@@ -75,6 +95,8 @@ not secrets. The service directory is excluded from both extension packages.
    Import **every** generated `scratch/leaderboard/puzzles-*.sql` file with
    `npx wrangler d1 execute chess-review-leaderboard --remote --file <absolute-file>`
    from the service directory. Keep the same puzzle catalog as the extension.
+   If the initial catalog import exhausts the Free write quota, resume after the
+   daily reset instead of upgrading the account to finish it sooner.
 3. Deploy the disabled Worker with `npx wrangler deploy` to obtain its HTTPS
    hostname. Create a managed Turnstile widget restricted to exactly that hostname.
    Set the public `TURNSTILE_SITE_KEY` and `TURNSTILE_HOSTNAME` variables in TOML.
@@ -132,8 +154,8 @@ counts, repeated credit and forged client timestamps; it cannot prove human play
 Do not market these rankings as cheat-proof or use them for valuable prizes.
 
 Monitor aggregate Cloudflare usage without logging credentials. `ENABLED=false`
-is the emergency off switch. A dedicated custom domain with edge WAF/rate-limit
-rules can reject traffic before it reaches the Worker; plan availability varies.
+is the application off switch. This project does not require a purchased domain
+or paid WAF/rate-limit products; keep the included Workers bindings and Turnstile.
 Worker-level limits run after a request has already reached the Worker, so they
 cannot guarantee availability under a sustained flood. Free-plan exhaustion is a
 service outage; on a paid plan the platform can bill additional usage. No promise
@@ -143,5 +165,10 @@ obfuscation or a shared secret shipped to clients to stop abuse.
 References: [Workers rate-limit accuracy](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/),
 [Turnstile verification](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/),
 [Workers limits](https://developers.cloudflare.com/workers/platform/limits/),
+[Workers pricing](https://developers.cloudflare.com/workers/platform/pricing/),
+[D1 pricing and free-limit behavior](https://developers.cloudflare.com/d1/platform/pricing/),
+[Turnstile Free plan](https://developers.cloudflare.com/turnstile/plans/),
+[Workers Free signup requires no credit card](https://www.cloudflare.com/products/workers/),
+[Budget alerts are informational](https://developers.cloudflare.com/billing/manage/budget-alerts/),
 [D1 free-limit enforcement](https://developers.cloudflare.com/changelog/post/2026-09-01-d1-free-tier-limit-enforcement/),
 [Firefox consent](https://extensionworkshop.com/documentation/develop/firefox-builtin-data-consent/).

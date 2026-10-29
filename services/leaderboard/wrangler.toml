@@ -1,4 +1,6 @@
 name = "chess-review-leaderboard"
+# Deploy only to Workers Free (including D1 Free allowances) and Turnstile Free.
+# Account billing plans cannot be enforced in this file. See docs/LEADERBOARDS.md.
 main = "worker.js"
 compatibility_date = "2026-10-01"
 workers_dev = true
