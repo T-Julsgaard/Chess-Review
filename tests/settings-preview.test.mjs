@@ -103,7 +103,7 @@ test('custom board picker keeps its button mounted and previews both square colo
   assert.equal(doc.querySelector('.board-cpick'), null);
 });
 
-test('Visual sections stay concise, remove the purple accent and offer Porcelain', async t => {
+test('General sections stay concise, remove the purple accent and offer Porcelain', async t => {
   const {a, doc, section, open} = settings(t);
   assert.equal(section('Interface presets').querySelector('.set-note'), null);
   assert.deepEqual([...section('Interface presets').querySelectorAll('[data-setting="uiSetup"]')].map(n => n.textContent), ['Old', 'Modern', 'Custom']);
@@ -113,7 +113,7 @@ test('Visual sections stay concise, remove the purple accent and offer Porcelain
   assert.equal(visualReset.previousElementSibling, section('Developer debugger'));
   [...doc.querySelectorAll('.set-tab')].find(n => n.textContent === 'Engine').click();
   assert.equal(doc.querySelector('#settings > div:last-child > button:last-child').textContent, 'Reset all engine settings');
-  [...doc.querySelectorAll('.set-tab')].find(n => n.textContent === 'Visual').click();
+  [...doc.querySelectorAll('.set-tab')].find(n => n.textContent === 'General').click();
   assert.equal(section('Theme').querySelectorAll('.set-chip').length, 4);
   assert.equal(section('Theme').querySelector('[title="#c77edb"]'), null);
   open('Board & Pieces');

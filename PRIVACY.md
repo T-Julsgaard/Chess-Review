@@ -58,7 +58,12 @@ data**. They are not written to browser storage or uploaded. Online leaderboard
 requests and ranked submissions are blocked while that preview is active.
 
 Leaderboards are disabled until an online service is configured in a release.
-Opening a configured leaderboard fetches public rankings from a Cloudflare Worker;
+Leaderboards are **off by default**, including for previously connected players.
+The leaderboard panel explains participation and asks you to opt in, with a
+separate, initially unchecked choice to show nationality. The extension stores
+your choice, notice version and acceptance time locally. Before opt-in, it does
+not fetch rankings, connect a player or upload results to the leaderboard service.
+After opt-in, opening a configured leaderboard fetches public rankings from a Cloudflare Worker;
 Cloudflare receives normal network information, including your IP address. The
 rankings load when opened, paged or manually refreshed; recent pages are cached
 for one minute. Viewing does not upload your local
@@ -75,12 +80,16 @@ Time attack and Knockout still verify attempts individually. Your games, PGNs, c
 identity, browsing history, settings and historical local progress are not sent.
 Your generated name and verified scores are public.
 
-If your local game history identifies a recurring Chess.com player with a known
-country, opening a leaderboard with a connected player key also sends that country
+Only if you also enable **Show nationality**, and your local game history
+identifies a recurring Chess.com player with a known country, opening a leaderboard
+with a connected player key sends that country
 token. Its bundled flag and country name are public alongside your generated name.
 The inferred Chess.com username remains on your device. Countries are saved with
 the matching usernames in local history and are not inferred from your IP address.
-The service's country record is removed when you delete your online player.
+Turn nationality off in **Settings → General → Leaderboard** to remove the
+online flag. If the service is unavailable, removal stays pending and can be
+retried from settings. It is also retried when you next open rankings with your
+connected key. The flag is removed when you delete your online player as well.
 
 The service stores a hash of your player key, generated name, creation time,
 unique solved puzzle IDs, scores and achievement times, and a short-lived session
@@ -92,9 +101,17 @@ addresses; it uses daily rotating keyed digests for short-lived rate limiting.
 Cloudflare processes network information for hosting, abuse prevention and
 Turnstile verification under its own policies. Worker request logging is disabled.
 
-Use **Player settings → Disconnect** to remove the key locally, or **Delete online
-records** to delete your player and scores from the service. Cached public records
-may remain visible for up to 30 seconds. Clearing extension storage alone does not
+Use **Settings → General → Leaderboard** to change nationality sharing or opt out.
+Opting out immediately stops new leaderboard reads and uploads, discards unsent
+results, and requests deletion of your online records. If deletion fails, the
+extension stays opted out and keeps the private key solely to retry deletion.
+Settings shows the pending deletion and a retry button; reopening the learning
+workspace also retries it. Joining again is blocked until deletion succeeds.
+**Delete all online leaderboard data**
+asks for confirmation, deletes your online player, scores, solve IDs, session and
+country, clears its local key, and opts you out. A failed deletion keeps the key
+so you can retry. Privacy removal requests still contact the service after opt-out.
+Cached public records may remain visible for up to one minute. Clearing extension storage alone does not
 delete public scores. Keep the player key private and save it if you need future
 access; the service does not collect an email address for recovery.
 
@@ -137,6 +154,7 @@ visits the chess platform named in the URL.
   These permissions do not add tracking or telemetry. Optional `authenticationInfo`
   consent covers the player key used for online rankings; optional
   `technicalAndInteraction` consent covers ranked puzzle moves and scores.
+  Separate optional `locationInfo` consent covers nationality sharing.
 
 ## Contact
 

@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import {LeaderboardClient} from '../lib/learning/leaderboard-client.js';
 import {leaderboardPreview} from '../lib/learning/leaderboard-preview.js';
 
-const storage=()=>{const data={};return {async get(key){return {[key]:structuredClone(data[key])};},async set(values){Object.assign(data,structuredClone(values));}};};
+const storage=()=>{const data={"leaderboardPreferences:v1":{version:1,enabled:true}};return {async get(key){return {[key]:structuredClone(data[key])};},async set(values){Object.assign(data,structuredClone(values));}};};
+const settle=async()=>{for(let i=0;i<30;i++)await Promise.resolve();};
 const board={rows:[{id:'me',name:'Knight-me',score:12}],hasNext:false};
 
 test('Chromium browser alias never receives Firefox-only consent fields',async t=>{
@@ -17,11 +18,11 @@ test('Chromium browser alias never receives Firefox-only consent fields',async t
 test('public pages reuse a minute of data, deduplicate in-flight reads and throttle manual refreshes',async t=>{
   let now=100000,calls=0,resolve;t.mock.method(Date,'now',()=>now);
   const client=new LeaderboardClient(storage(),{endpoint:'https://rank.example',fetcher:async()=>{calls++;return new Promise(r=>{resolve=r;});}});
-  const first=client.list('knockout',1),second=client.list('knockout',1);assert.equal(calls,1);resolve(Response.json(board));
+  const first=client.list('knockout',1),second=client.list('knockout',1);await settle();assert.equal(calls,1);resolve(Response.json(board));
   const [a,b]=await Promise.all([first,second]);a.rows[0].score=99;assert.equal(b.rows[0].score,12);
   await client.list('knockout',1);await client.list('knockout',1,undefined,{fresh:true});assert.equal(calls,1);
-  now+=11000;const fresh=client.list('knockout',1,undefined,{fresh:true});assert.equal(calls,2);resolve(Response.json(board));await fresh;
-  now+=61000;const expired=client.list('knockout',1);assert.equal(calls,3);resolve(Response.json(board));await expired;
+  now+=11000;const fresh=client.list('knockout',1,undefined,{fresh:true});await settle();assert.equal(calls,2);resolve(Response.json(board));await fresh;
+  now+=61000;const expired=client.list('knockout',1);await settle();assert.equal(calls,3);resolve(Response.json(board));await expired;
 });
 
 test('aborting one caller leaves the shared read available for another caller',async()=>{

@@ -7,7 +7,7 @@ rating. Local analysis needs no account or server, and no manual PGN copying.
 
 **Learn with Chess Review** opens from the button beneath Engine, beside the move
 controls. By default, the review panels morph into one learning workspace while
-the board and top bar stay in place. **Settings → Visual → Learning experience**
+the board and top bar stay in place. **Settings → General → Learning experience**
 offers **Morph in place**, **Morph in place 2**, **Morph in place 3**, **Studio Morph**, **Minimal morph**, **Board morph**, and
 the original **Separate page** layout. Each morph has its own design and timing. The transition
 also runs when returning to review and respects reduced-motion preferences.
@@ -24,7 +24,7 @@ game position and orientation. The [learning objective and progress tracker](doc
 preserves the full development brief for work on another computer; [content sources](data/learning/SOURCES.md)
 record licensing and validation scope.
 
-The right-hand Settings panel includes an optional **Concepts** tab after Visual
+The right-hand Settings panel includes an optional **Concepts** tab after General
 and Engine. A separate **Concepts** panel to the right of Accuracy and Engine
 uses those same findings,
 ordered by likely relevance and phrased from your playing side. It follows the
@@ -141,6 +141,9 @@ anyone you send it to can read that information. See [PRIVACY.md](PRIVACY.md).
 Optional puzzle leaderboards have a Cloudflare Workers + D1 service, server-verified
 ranked play and matching screens for all three modes. They are disabled until a
 deployment is configured. See [leaderboard setup and security](docs/LEADERBOARDS.md).
+Participation requires explicit opt-in before viewing or uploading. Nationality
+is optional; **Settings → General → Leaderboard** provides sharing, opt-out and
+online deletion controls. Ordinary offline progress stays local.
 
 ## Maintained-source checks
 

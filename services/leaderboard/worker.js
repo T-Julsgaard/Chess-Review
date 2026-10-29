@@ -41,11 +41,11 @@ async function personal(env,id) {
   const {results}=await env.DB.prepare('SELECT mode,score FROM records WHERE player_id=?').bind(id).all();
   return Object.fromEntries(results.map(r=>[r.mode,r.score]));
 }
-async function authenticate(request,env) {
+async function authenticate(request,env,allowMissing=false) {
   const value=request.headers.get('Authorization')||'';
   if(!/^Bearer [a-f0-9]{64}$/.test(value))fail(401,'Player key required');
   const player=await env.DB.prepare('SELECT id,name FROM players WHERE token_hash=?').bind(await digest(value.slice(7))).first();
-  if(!player)fail(401,'Player key required');return player;
+  if(!player&&!allowMissing)fail(401,'Player key required');return player;
 }
 // Canonical continuation, with the same legal alternative-checkmate rule as practice.
 // Every entry is a player move; opponent replies are reconstructed on the service.
@@ -240,7 +240,11 @@ export default {
       const now=Date.now();
       if(request.method==='POST'&&path==='/v1/enroll')return await enroll(request,env,now);
       if(!['/v1/me','/v1/sessions','/v1/ready','/v1/attempts','/v1/practice','/v1/practice/attempts','/v1/delete-player'].includes(path))fail(404,'Not found');
-      const player=await authenticate(request,env);
+      const deleting=request.method==='POST'&&path==='/v1/delete-player';
+      const player=await authenticate(request,env,deleting);
+      // A lost successful deletion response must be safely retryable. A validly
+      // formatted key with no matching player already has no records to erase.
+      if(deleting&&!player){await bodyOf(request);return json({deleted:true});}
       if(request.method==='POST'&&!(await env.PLAYER_LIMIT.limit({key:'player:'+player.id})).success)fail(429,'Slow down');
       // Failed proofs and repeated reads of a current assignment must also count
       // against the player's allowance, even when they make no score changes.
@@ -254,6 +258,11 @@ export default {
         const body=await bodyOf(request);
         if(Object.hasOwn(body,'name'))fail(400,'Player names are assigned by the service');
         const {country}=body;
+        if(country===null){
+          await reserve(env,now,8,player.id);
+          await env.DB.prepare('DELETE FROM player_countries WHERE player_id=?').bind(player.id).run();
+          return json({country:null});
+        }
         if(typeof country!=='string'||country.length>12||!flagCodeForCountryId(country)||!countryNameForId(country))fail(400,'Invalid country');
         await reserve(env,now,8,player.id);
         await env.DB.prepare(`INSERT INTO player_countries(player_id,country) VALUES (?,?)

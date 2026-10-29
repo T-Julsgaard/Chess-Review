@@ -34,7 +34,7 @@ test('database migration repairs invalid imports and blocks unsafe inserts and u
 });
 
 test('client rejects invalid names from online credentials and ranking responses',async()=>{
-  const data={},storage={async get(key){return {[key]:data[key]};},async set(values){Object.assign(data,values);}};
+  const data={"leaderboardPreferences:v1":{version:1,enabled:true}},storage={async get(key){return {[key]:data[key]};},async set(values){Object.assign(data,values);}};
   for(const name of ['https://example.com','A'.repeat(26),'<b>Name</b>']){
     const client=new LeaderboardClient(storage,{endpoint:'https://rank.example',fetcher:async url=>Response.json(url.endsWith('/v1/me')?{id:'me',name}:{rows:[{id:'me',name,score:10}],hasNext:false})});
     await assert.rejects(client.connect('a'.repeat(64)),/Invalid player name/);

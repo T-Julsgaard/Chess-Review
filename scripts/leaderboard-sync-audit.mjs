@@ -8,7 +8,7 @@ export async function auditLearning({review,call,evaluate,waitFor,out}) {
   await waitFor(review,"!!document.querySelector('.puzzle-mode-grid')&&!document.querySelector('.learn-transition-surface')",'Puzzle modes');
   await run(`Promise.all([import('./analysis.js'),import('./lib/learning/leaderboard-client.js'),import('./browser-compat.js')]).then(async([m,{LeaderboardClient},{browserAPI:api}])=>{
     const w=m.learningWorkspace,ids=w.puzzles.slice(0,15).map(p=>p.id);window.syncCalls=[];window.syncTotal=0;window.syncRevision=0;window.syncIds=ids.slice(0,5);
-    await api.storage.local.set({'leaderboard:v1':{id:'sync-player',name:'Knight-sync',token:'a'.repeat(64),scores:{}},'leaderboard:practice:v1':null});
+    await api.storage.local.set({'leaderboardPreferences:v1':{version:1,enabled:true},'leaderboard:v1':{id:'sync-player',name:'Knight-sync',token:'a'.repeat(64),scores:{}},'leaderboard:practice:v1':null});
     const fetcher=async(url,options)=>{const route=new URL(url).pathname;window.syncCalls.push(route);
       if(route.startsWith('/v1/boards/'))return Response.json({rows:[],hasNext:false});
       if(route==='/v1/practice/attempts'){const body=JSON.parse(options.body);window.syncTotal+=body.attempts.length;window.syncRevision++;window.syncIds=window.syncIds.slice(body.attempts.length);}

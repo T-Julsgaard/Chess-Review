@@ -66,9 +66,9 @@ test('preview mode never reads credentials, writes progress, requests consent or
 });
 test('activating preview aborts an in-flight live read and rejects its late result',async t=>{
   t.after(()=>leaderboardPreview.clear());let resolve,signal;
-  const client=new LeaderboardClient({},{endpoint:'https://rank.example',fetcher:async(url,options)=>{signal=options.signal;return new Promise(r=>{resolve=r;});}});
-  const pending=client.list('knockout',1);leaderboardPreview.load(csv);assert.equal(signal.aborted,true);
-  resolve(Response.json({rows:[{name:'Live',score:999}]}));await assert.rejects(pending,/source changed/);
+  const client=new LeaderboardClient({async get(){return {'leaderboardPreferences:v1':{version:1,enabled:true}};}},{endpoint:'https://rank.example',fetcher:async(url,options)=>{signal=options.signal;return new Promise(r=>{resolve=r;});}});
+  const pending=client.list('knockout',1);await settle();leaderboardPreview.load(csv);assert.equal(signal.aborted,true);
+  resolve(Response.json({rows:[{name:'Live',score:999}]}));await assert.rejects(pending,/source or privacy choice changed/);
 });
 test('Developer debugger imports and clears CSV without changing saved data',async t=>{
   t.after(()=>leaderboardPreview.clear());

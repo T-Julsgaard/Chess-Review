@@ -29,6 +29,7 @@ import { fullHdReferenceLayout, viewportGrowth } from "./lib/full-hd-layout.js";
 import { createScreenPreviewContext, loadScreenPreviewController } from "./lib/screen-previews.js";
 import { rememberAnalyzedGame, historyGame } from "./lib/player-history.js";
 import { leaderboardPreviewControls } from "./lib/learning/leaderboard-preview.js";
+import { leaderboardSettingsControls } from "./lib/learning/leaderboard-settings.js";
 
 const screenPreview = createScreenPreviewContext(location);
 const blankLaunch = new window.URLSearchParams(location.search).get("workspace") === "blank";
@@ -1730,6 +1731,11 @@ async function openLearning() {
   hideBoardBadgeTip();
   learningWorkspace = new LearningWorkspace({document, storage:browserAPI.storage.local, makePiece, url:_url,
     settings:()=>S.settings, flipped:S.flipped, book:()=>BOOK || {}, startDrag, onPuzzleWrong:playWrongSound, onPuzzleMove:playSanSound, onPuzzlePremove:playPremoveSound, onOpeningMove:playSanSound, onFreeMove:playSanSound, onPuzzleSuccess:playPuzzleSuccess,
+    onLeaderboardSettings:async()=>{
+      S.settingsTab='visual';if(UI.settings.hidden)await toggleSettings();else renderSettings();
+      const section=[...UI.settings.querySelectorAll('.set-section')].find(node=>node.querySelector('.set-sect-head span')?.textContent==='Leaderboard');
+      if(section){if(!section.classList.contains('open'))section.querySelector('.set-sect-head').click();section.scrollIntoView?.({block:'nearest'});}
+    },
     createAnalysisEngine:()=>createEngine({Hash:S.settings.engineHash, "Skill Level":S.settings.engineSkill}),
     navigationButton:document.getElementById("learningToggle"),
     embedded:{stage:UI.canvas, boardWrap:UI.boardWrap, fen:sourceFen, reviewFen:activePos().fen, startDrag,
@@ -6245,6 +6251,10 @@ function visualSettings() {
       el("div", { class: "set-fx", "data-sound-event": "runStart" },
         fxSlider("runStart", "volume", "Puzzle intro volume", 0, 100, 1, (v) => v + " %")),
     ),
+    section("Leaderboard",leaderboardSettingsControls({document,storage:browserAPI.storage.local,client:learningWorkspace?.leaderboardClient,url:_url,onError:toast,onChange:async()=>{
+      if(!learningWorkspace)return;
+      await learningWorkspace.refreshLeaderboardPreferences();
+    }})),
     section("Developer debugger",
       el("button", {class:"set-reset","data-debug":"screen-previews",onclick:openScreenSizePreview}, "Open screen-size preview"),
       el("div", {class:"set-row hint"},el("span",{class:"set-note"},"Preview layouts at different screen sizes. Changes are not saved.")),
@@ -6428,7 +6438,7 @@ function renderSettings() {
     kind:node.className.replace(/\bon\b/g, "").trim()});
   const activeButton = UI.settings.contains(document.activeElement) && document.activeElement.tagName === "BUTTON" ? focusContext(document.activeElement) : null;
   const tabs = el("div", { class: "set-tabs" },
-    el("button", { class: "set-tab" + (S.settingsTab === "visual" ? " on" : ""), onclick: () => { S.settingsTab = "visual"; renderSettings(); } }, "Visual"),
+    el("button", { class: "set-tab" + (S.settingsTab === "visual" ? " on" : ""), onclick: () => { S.settingsTab = "visual"; renderSettings(); } }, "General"),
     el("button", { class: "set-tab" + (S.settingsTab === "engine" ? " on" : ""), onclick: () => { S.settingsTab = "engine"; renderSettings(); } }, "Engine"),
   );
   UI.settings.replaceChildren(tabs, S.settingsTab === "engine" ? motorSettings() : visualSettings());

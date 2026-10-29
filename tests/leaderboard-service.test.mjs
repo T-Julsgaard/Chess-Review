@@ -114,6 +114,7 @@ test('daily mutation budget stops writes; deletion still removes all player data
   assert.equal(s.db.prepare("SELECT used FROM quotas WHERE key='players'").get(),undefined);
   assert.equal(s.db.prepare("SELECT used FROM quotas WHERE key='solves'").get(),undefined);
   assert.equal((await s.call('/v1/me')).status,401);
+  assert.equal((await s.call('/v1/delete-player',{})).status,200,'Deletion is idempotent after a lost response');
 });
 test('enrollment verifies Turnstile hostname/action, returns a personal key and stores only its hash',async t=>{
   const s=await setup(t);let result={success:true,hostname:'attacker.example',action:'enroll'};
@@ -145,7 +146,7 @@ test('pagination is bounded and deterministic and never exposes authentication d
 });
 
 for(const mode of ['solve-puzzle','timeAttack','knockout'])test(`${mode}: real workspace → client → Worker → SQLite ranks verified play`,async t=>{
-  const s=await setup(t),dom=new JSDOM('<div id="root"><div class="app"></div></div>',{url:'https://extension.test'}),data={};
+  const s=await setup(t),dom=new JSDOM('<div id="root"><div class="app"></div></div>',{url:'https://extension.test'}),data={"leaderboardPreferences:v1":{version:1,enabled:true}};
   const storage={async get(key){return {[key]:data[key]};},async set(values){Object.assign(data,values);}};
   const puzzles=Array.from({length:12},(_,i)=>({...mate,id:'p'+i,rating:450+i*40}));
   t.mock.method(globalThis,'fetch',async()=>Response.json({schema:1,puzzles}));
@@ -201,6 +202,7 @@ test('a bad proof rejects the whole practice batch; closing a partial batch keep
 });
 
 function clientFor(s,t,data={},transport) {
+  data['leaderboardPreferences:v1'] ||= {version:1,enabled:true};
   data['leaderboard:v1'] ||= {token,id:'player',name:'Knight-test',scores:{}};
   const storage={async get(key){return {[key]:structuredClone(data[key])};},async set(values){Object.assign(data,structuredClone(values));}};
   const fetcher=async(url,options)=>{const response=await s.call(new URL(url).pathname+new URL(url).search,options.body?JSON.parse(options.body):undefined);
@@ -237,7 +239,7 @@ test('durable practice retries a lost response after restart without losing or d
 test('the 60-second timer flushes a partial practice batch and stops when there is nothing pending',async t=>{
   const s=await setup(t);t.mock.timers.enable({apis:['setTimeout']});
   const {client}=clientFor(s,t),batch=await client.start('solve-puzzle');await client.practice.record(batch.puzzleIds[0],mate.solution);
-  assert.ok(client.practice.timer);t.mock.timers.tick(60000);await client.practice.work;
+  assert.ok(client.practice.timer);t.mock.timers.tick(60000);for(let i=0;i<20;i++)await Promise.resolve();await client.practice.work;
   assert.equal(s.db.prepare('SELECT COUNT(*) n FROM solves').get().n,1);assert.equal(client.practice.timer,null);
 });
 

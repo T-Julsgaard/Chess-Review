@@ -7,7 +7,7 @@ import {PLAYER_HISTORY_KEY} from '../lib/player-history.js';
 import worker,{digest} from '../services/leaderboard/worker.js';
 
 test('only the inferred country is published, changes are synchronized once, and preview stays local',async()=>{
-  const store={[PLAYER_HISTORY_KEY]:{chesscom:[1,2,3].map(id=>({site:'chesscom',id:String(id),white:'Owner',black:'Opponent'+id,whiteCountry:'DK'}))}},requests=[];
+  const store={"leaderboardPreferences:v1":{version:1,enabled:true,showNationality:true},[PLAYER_HISTORY_KEY]:{chesscom:[1,2,3].map(id=>({site:'chesscom',id:String(id),white:'Owner',black:'Opponent'+id,whiteCountry:'DK'}))}},requests=[];
   const player={id:'key-player',token:'private-key',name:'Knight-generated'};
   const client={endpoint:'https://rank.example',storage:{async get(){return structuredClone(store);},async set(values){Object.assign(store,values);}},
     async request(path,options){requests.push({path,...options});}};
@@ -21,10 +21,10 @@ test('only the inferred country is published, changes are synchronized once, and
 });
 
 test('ambiguous identities and inferred players without countries do not publish an opponent flag',async()=>{
-  let store={[PLAYER_HISTORY_KEY]:{chesscom:[{site:'chesscom',id:'1',white:'Owner',black:'Friend',blackCountry:'US'}]}};
+  let store={"leaderboardPreferences:v1":{version:1,enabled:true,showNationality:true},[PLAYER_HISTORY_KEY]:{chesscom:[{site:'chesscom',id:'1',white:'Owner',black:'Friend',blackCountry:'US'}]}};
   const client={storage:{async get(){return store;}},request(){throw Error('No flag to upload');}};
   await syncLeaderboardCountry(client,{id:'key-player'});
-  store={[PLAYER_HISTORY_KEY]:{chesscom:[1,2,3].map(id=>({site:'chesscom',id:String(id),white:'Owner',black:'Opponent'+id,blackCountry:'US'}))}};
+  store={"leaderboardPreferences:v1":{version:1,enabled:true,showNationality:true},[PLAYER_HISTORY_KEY]:{chesscom:[1,2,3].map(id=>({site:'chesscom',id:String(id),white:'Owner',black:'Opponent'+id,blackCountry:'US'}))}};
   await syncLeaderboardCountry(client,{id:'key-player'});
 });
 
@@ -42,6 +42,9 @@ test('authenticated country updates reach public rows, reject invalid flags, and
   assert.equal((await call('/v1/me',{country:'dk'})).status,200);
   const board=await (await call('/v1/boards/knockout')).json();
   assert.deepEqual(board.rows,[{id:'player',name:'Knight-test',score:42,country:'DK'}]);
+  assert.equal((await call('/v1/me',{country:null})).status,200);
+  assert.equal(db.prepare('SELECT COUNT(*) AS count FROM player_countries').get().count,0);
+  assert.equal(db.prepare('SELECT score FROM records').get().score,42,'Removing nationality keeps the player and score');
   assert.equal((await call('/v1/me',{country:'2'})).status,200);
   assert.equal(db.prepare('SELECT country FROM player_countries').get().country,'2');
   assert.equal((await call('/v1/delete-player',{})).status,200);

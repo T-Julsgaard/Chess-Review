@@ -9,7 +9,7 @@ import {app,loadGame} from './helpers/app.mjs';
 const library=JSON.parse(readFileSync(new URL('../data/learning/puzzles.json',import.meta.url))).puzzles.slice(0,20);
 const drain=async()=>{for(let i=0;i<30;i++)await Promise.resolve();};
 async function setup(t){
-  const dom=new JSDOM('<div id="root"><div class="app"></div></div>',{url:'https://extension.test'}),data={};
+  const dom=new JSDOM('<div id="root"><div class="app"></div></div>',{url:'https://extension.test'}),data={"leaderboardPreferences:v1":{version:1,enabled:true}};
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:library})}));
   const storage={async get(key){return {[key]:structuredClone(data[key])};},async set(values){Object.assign(data,structuredClone(values));}};
   const w=new LearningWorkspace({document:dom.window.document,storage,settings:()=>({moveAnim:false}),makePiece:()=>dom.window.document.createElement('span')});
@@ -96,7 +96,7 @@ test('flags use bundled art and country tooltips; missing or unknown countries s
 test('pagination captures scroll before moving the cached hero, including loading and failed reads',async t=>{
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:library})}));
   const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');await a.call('openLearning');
-  const w=a.run('learningWorkspace');t.after(()=>w.close());let fail=false;
+  const w=a.run('learningWorkspace');w.leaderboardPreferences={enabled:true};t.after(()=>w.close());let fail=false;
   w.leaderboardClient={configured:true,credentials:async()=>null,list:async(mode,page)=>{if(fail)throw Error('Offline');return {rows:[{name:'Player '+page,score:42}],hasNext:page<3};}};
   await w.showLeaderboard('knockout');
   const view=w.leaderboardView;
@@ -142,7 +142,7 @@ test('Firefox consent denial and later revocation prevent authenticated network 
   t.after(()=>{if(original===undefined)delete globalThis.browser;else globalThis.browser=original;});
   const client=new LeaderboardClient(storage,{endpoint:'https://rank.example',fetcher:async()=>{calls++;return Response.json({name:'Knight-me',id:'me'});}});
   await assert.rejects(client.connect('a'.repeat(64)),/Allow online player data/);assert.equal(calls,0);
-  assert.deepEqual(permissions.data_collection,['authenticationInfo','locationInfo','technicalAndInteraction']);
+  assert.deepEqual(permissions.data_collection,['authenticationInfo','technicalAndInteraction']);
   allowed=true;await client.connect('a'.repeat(64));assert.equal(calls,1);
   allowed=false;await assert.rejects(client.start('knockout'),/permission was removed/);assert.equal(calls,1);
 });
@@ -202,7 +202,7 @@ for(const mode of ['solve-puzzle','timeAttack','knockout'])test(`${mode} returns
 for(const mode of ['solve-puzzle','timeAttack','knockout'])test(`${mode} keeps leaderboard rows and input connected during free-board moves, history and flips`,async t=>{
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:library})}));
   const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');await a.call('openLearning');
-  const w=a.run('learningWorkspace');t.after(()=>w.close());let reads=0;
+  const w=a.run('learningWorkspace');w.leaderboardPreferences={enabled:true};t.after(()=>w.close());let reads=0;
   w.leaderboardClient={configured:true,credentials:async()=>null,list:async(mode,page)=>{reads++;return {rows:[{name:'Knight-'+page,score:42-page}],hasNext:page<3};}};
   await w.showLeaderboard(mode);await w.loadLeaderboard(2);
   const main=w.shell.querySelector('.learn-main'),panel=main.querySelector('.learn-leaderboard'),row=panel.querySelector('tbody tr'),key=panel.querySelector('input');

@@ -2,13 +2,15 @@
 
 The extension includes three matching leaderboard screens. The Cloudflare service
 is **disabled by default** and no production address or credentials are included.
-Until deployed, each screen says that online rankings are not connected. Ordinary
+Before opting in, each screen offers the participation notice. After opt-in,
+an unconfigured service shows that online rankings are not connected. Ordinary
 practice, filters, personal bests, and statistics continue to work offline.
 
 Developer debugger includes **Import leaderboard CSV** and **Clear test data**.
 It also includes **Load sample rankings**, a puzzle-mode selector, and a preview
 state selector. Choose a mode and state, then **Show preview** to open it directly.
 Available states include Coming soon, Loading, Empty, Score saved, Score syncing,
+Opted out, Choose nationality,
 Sync needs attention, Offline with saved rankings, Rankings unavailable,
 rate-limit/capacity errors, a rejected player key, and the
 disconnected/connecting/connected/deletion account screens. Imported CSV data can
@@ -30,10 +32,34 @@ bundled with the extension. Normal puzzle progress remains separate.
 
 ## Scoring and privacy
 
+Leaderboards are off by default, including for legacy player keys. The opt-in
+panel replaces rankings and pagination and explains the public generated name,
+scores and Cloudflare hosting. Enabling its switch opens a second step with an
+initially unchecked nationality checkbox; **Join leaderboard** saves consent.
+The versioned choice and acceptance time live in `leaderboardPreferences:v1`.
+The client independently gates reads (including cached pages), connection,
+ranked sessions and queued uploads. No historical offline results are submitted.
+
+**Settings → General → Leaderboard** manages participation, nationality and
+deletion. Opting out immediately cancels requests, stops ranked participation and
+discards pending proofs, then deletes the online player and all score/profile
+records. The separate **Delete all online leaderboard data** button asks for
+confirmation and performs the same withdrawal/deletion. Failed deletion leaves
+the extension opted out with a pending notice and the key retained for retry;
+settings offers a retry and reopening learning also retries. Rejoining is blocked
+until deletion succeeds. Removing local extension storage alone cannot erase
+online records. Public caches can take up to one minute to expire.
+
+Turning **Show nationality** off sends an authenticated `country: null` update,
+which removes only the online flag. Failed removal remains pending with a retry
+in settings. Privacy removal requests remain available while participation is off.
+Opt-out changes in another extension tab cancel current requests and hide rankings.
+
 Country flags use the bundled flag pack. The local player history keeps up to 50
 recent games per site, including each username's scraped country when available.
 The inferred Chess.com player must have several opponents and a clear frequency
-lead. When that player has a known country and a leaderboard key is connected,
+lead. Only when **Show nationality** is enabled, that player has a known country,
+and a leaderboard key is connected,
 opening a leaderboard publishes only the country token for that key. The inferred
 username stays local; public names remain generated `Knight-…` names. This is a
 display flag, not verified account ownership. Missing or unsupported countries
@@ -55,8 +81,9 @@ The key is stored in extension local storage, never sync storage. It is a person
 bearer credential: anyone holding it can play or delete that player's records.
 The service stores only its SHA-256 hash. Save it privately if you want to use the
 same player in another browser; clearing extension data loses access otherwise.
-Firefox requests optional authentication and puzzle-interaction consent when connecting and checks
-that consent before each authenticated request.
+Firefox requests optional authentication and puzzle-interaction permission when
+joining/connecting, and separate location permission for nationality sharing.
+It checks permissions before authenticated requests.
 
 - Solve a puzzle: distinct verified puzzles solved in ranked practice, counted once
   per player, across sessions. Hints, reveals, skips and retries end ranked scoring.
