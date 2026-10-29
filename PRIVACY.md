@@ -8,6 +8,17 @@ does with data. **Analysis runs locally. Game lookup requests go directly to the
 chess platforms. No analytics or advertising services are used.** Optional online
 puzzle rankings and sharing a game are explicit user actions described below.
 
+## Who is responsible for your data?
+
+**Thomas Julsgaard** operates Chess Review and is the **data controller** for the
+personal data processed to provide the extension and its optional leaderboard
+service. For privacy questions or to exercise your data protection rights, contact
+[Thomas@Julsgaard.dev](mailto:Thomas@Julsgaard.dev).
+
+Chess.com, Lichess and Cloudflare also process information when you contact their
+services, as described below. Their own privacy notices explain processing for
+which they are independently responsible.
+
 ## What the extension does
 
 - When you open the extension on a finished game, it reads the game (the moves /
@@ -114,6 +125,75 @@ Cached public records may remain visible for up to one minute. Clearing extensio
 delete public scores. Keep the player key private and save it if you need future
 access; the service does not collect an email address for recovery.
 
+## Legal bases for online leaderboard processing
+
+- **Your consent — GDPR Article 6(1)(a):** joining the leaderboards, verifying your
+  ranked attempts, storing your leaderboard player and results, and publishing
+  your generated name and scores. Publishing a nationality is a separate,
+  optional choice covered by your consent. Neither choice authorises uploading
+  historical offline puzzle progress.
+- **Legitimate interests — GDPR Article 6(1)(f):** the limited connection handling,
+  anti-bot verification checks, rate limits and abuse-prevention counters needed to keep
+  the service available and protect it and its users against automated abuse.
+  The interests pursued are network security and fair, reliable access to the
+  leaderboard service. This does not provide a replacement basis for keeping
+  your public player or scores after you withdraw consent.
+- **Legal obligations — GDPR Article 6(1)(c):** processing the information necessary
+  to respond to applicable data protection rights requests and meet GDPR duties.
+
+Participation and nationality sharing are voluntary. Declining or withdrawing
+consent leaves offline puzzles and local analysis available. You can withdraw
+leaderboard consent through **Settings → General → Leaderboard → Opt out & delete
+data**, or contact the privacy email above. You can withdraw nationality sharing
+alone by choosing **Don’t show nationality**. Withdrawal does not affect the
+lawfulness of processing that took place before it was withdrawn.
+
+The service automatically checks puzzle moves and calculates rankings. These
+checks do not make decisions with legal or similarly significant effects on you.
+
+## Your data protection rights
+
+Where the GDPR applies, you can contact
+[Thomas@Julsgaard.dev](mailto:Thomas@Julsgaard.dev) to:
+
+- request confirmation of processing, access to your personal data and a copy;
+- ask for inaccurate personal data to be corrected;
+- request erasure or restriction of processing, where the conditions apply;
+- request a portable, commonly used machine-readable copy of data you provided
+  where the right to data portability applies;
+- object, on grounds relating to your particular situation, to processing based
+  on legitimate interests. That processing must stop unless there are compelling
+  legitimate grounds that override your interests, rights and freedoms, or it is
+  needed for legal claims;
+- withdraw consent at any time, including separately for nationality sharing.
+
+These rights have conditions and exceptions under the GDPR. You do not need to
+use particular legal wording to make a request. Requests are normally free of
+charge and are answered without undue delay, within one month. If a complex
+request requires an extension of up to two further months, you will be told why
+within the first month. If a request cannot be fulfilled, you will receive an
+explanation and information about your options to challenge that decision.
+
+For an online leaderboard request, identify the player concerned, for example by
+its generated name. Only information reasonably needed to verify your authority
+over that player will be requested before disclosing or changing private data.
+**Do not email your private player key**; safe verification steps can be arranged
+if needed. No real-world identity details are collected solely to identify a
+player who otherwise cannot be identified. If a request cannot be matched to an
+online player, this will be explained. Local-only data stays on your device;
+Thomas does not have a remote copy of your local game library or offline progress.
+
+Privacy correspondence includes your email address, request and any necessary
+verification information. It is used to handle the request and document the
+response, and kept only for as long as necessary to fulfil and demonstrate the
+applicable legal duties or resolve a related complaint.
+
+You may complain to a competent data protection authority, in particular in the
+EEA country where you live or work or where an alleged infringement occurred.
+In Denmark, you can [complain to Datatilsynet](https://www.datatilsynet.dk/borger/klage/saadan-klager-du).
+You can also seek a judicial remedy. Contacting Thomas first may help resolve the
+issue, but does not remove your right to complain to an authority.
+
 ## Sharing a game
 
 Choosing **Share game** copies a link to your clipboard. Its URL fragment contains
@@ -157,6 +237,9 @@ visits the chess platform named in the URL.
 
 ## Contact
 
-Questions about this policy: **Thomas@Julsgaard.dev**
+Data controller: **Thomas Julsgaard**.
+
+Privacy questions and rights requests:
+[Thomas@Julsgaard.dev](mailto:Thomas@Julsgaard.dev).
 
 Source code: <https://github.com/T-Julsgaard/Chess-Review>

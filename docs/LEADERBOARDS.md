@@ -32,6 +32,23 @@ bundled with the extension. Normal puzzle progress remains separate.
 
 ## Scoring and privacy
 
+The first-layer notice identifies Thomas Julsgaard as the operator. Both the
+opt-in panel and General settings link to the bundled `PRIVACY.md`, which names
+the controller and privacy contact, explains legal bases, and describes rights,
+response times and the complaint route. This notice update does not add an export
+endpoint or verify a live Cloudflare processing agreement.
+
+Public participation and optional nationality rely on consent (Article 6(1)(a)).
+Limited service-security processing relies separately on legitimate interests
+(Article 6(1)(f)). For the current implementation, the interest is preventing
+automated abuse and preserving availability for users. Per-IP rate limits and
+per-player work counters are necessary because client-side restrictions can be
+bypassed. The balance is limited by daily rotating keyed IP digests, bounded
+counters, no Worker request logging and no cross-site tracking. These controls
+do not authorise continued publication after withdrawal, and users can object
+through the privacy contact. Reassess this balance before adding persistent logs,
+profiling or new purposes, and account for children's interests where applicable.
+
 Leaderboards are off by default, including for legacy player keys. The opt-in
 panel replaces rankings and pagination and explains the public generated name,
 scores and Cloudflare hosting. Enabling its switch opens a second step with a
