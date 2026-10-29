@@ -17,23 +17,35 @@ const RESERVED = /^(training|analysis|practice|streamer|tournament|broadcast)$/i
 // or a trailing /black, /white or /analysis segment. Keep in sync with lichess.js.
 function firstPathId(pathname = location.pathname) {
   const seg = pathname.replace(/^\/+/, "").replace(/^game\//, "").split("/")[0] || "";
-  if (/^[A-Za-z0-9]{8,12}$/.test(seg) && !RESERVED.test(seg)) return seg.slice(0, 8);
+  if (/^(?:[A-Za-z0-9]{8}|[A-Za-z0-9]{12})$/.test(seg) && !RESERVED.test(seg)) return seg.slice(0, 8);
   return null;
 }
+function readPageData() {
+  try {
+    return JSON.parse(document.getElementById("page-init-data")?.textContent || "null")?.cfg?.data;
+  } catch { return null; }
+}
 function detectGameId() {
-  // 1) og:url is the most reliable on a game/analysis page.
+  // Read the current path first: head metadata can lag behind SPA navigation.
+  const hasBoard = document.querySelector(".round__app, main.round, main.analyse, .analyse__board, cg-container");
+  if (hasBoard) {
+    const id = firstPathId();
+    if (id) return id;
+  }
+  // Metadata can identify the game when the page path is unavailable.
   const og = document.querySelector('meta[property="og:url"]')?.getAttribute("content");
   if (og) {
     try {
       const url = new URL(og);
       const id = /^(www\.)?lichess\.org$/i.test(url.hostname) && firstPathId(url.pathname);
       if (id) return id;
-    } catch { /* missing or malformed metadata: read the page URL below */ }
+    } catch { /* missing or malformed metadata: try embedded game data below */ }
   }
-  // 2) Otherwise only treat the URL as a game when a board is actually present (round/analysis view).
-  if (document.querySelector(".round__app, main.round, main.analyse, .analyse__board, cg-container")) {
-    const id = firstPathId();
-    if (id) return id;
+  // Lichess's JSON boot data is independent of its game-page URL scheme. Only
+  // read the actual round/replay game, never study chapters or puzzle links.
+  if (hasBoard) {
+    const id = readPageData()?.game?.id;
+    if (typeof id === "string" && /^[A-Za-z0-9]{8}$/.test(id) && !RESERVED.test(id)) return id;
   }
   return null;
 }
@@ -52,7 +64,18 @@ function detectFlip() {
   }
   if (/\/black(?:\/|$)/i.test(location.pathname)) return true;
   if (/\/white(?:\/|$)/i.test(location.pathname)) return false;
+  const orientation = readPageData()?.orientation;
+  if (orientation === "black") return true;
+  if (orientation === "white") return false;
   return null;
+}
+
+// Replay pages include a complete PGN even before their move-list JavaScript
+// renders. Prefer it over reconstructed SAN so ratings, result and setup survive
+// when the export endpoint redirects to signup or the move-list markup changes.
+function readPagePgn() {
+  const pgn = document.querySelector(".analyse__underboard .pgn")?.textContent?.trim();
+  return pgn && /^\[Event\s+"/.test(pgn) ? pgn : null;
 }
 
 // ---- Move list (DOM fallback if the API can't be reached) -------------------
@@ -286,6 +309,7 @@ browserAPI.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       url: location.href,
       gameId: detectGameId(),
       flip: detectFlip(),       // user's board perspective (true = Black at bottom)
+      pgn: readPagePgn(),       // full replay PGN, including player/setup metadata
       movetext: readMovetext(), // DOM fallback if the API lookup fails
     });
     return true;

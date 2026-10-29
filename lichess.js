@@ -24,13 +24,15 @@ export function parseLichessGameId(urlOrPath) {
   if (!urlOrPath) return null;
   let path;
   try {
-    path = new URL(urlOrPath, SITE).pathname;
+    const url = new URL(urlOrPath, SITE);
+    if (!/^https?:$/.test(url.protocol) || !/^(www\.)?lichess\.org$/i.test(url.hostname)) return null;
+    path = url.pathname;
   } catch {
     path = String(urlOrPath);
   }
   const seg = path.replace(/^\/+/, "").replace(/^game\//, "").split(/[/?#]/)[0] || "";
   // Game ids are 8 chars; URLs sometimes append the 4-char player token (12 total).
-  if (!/^[A-Za-z0-9]{8,12}$/.test(seg)) return null;
+  if (!/^(?:[A-Za-z0-9]{8}|[A-Za-z0-9]{12})$/.test(seg)) return null;
   if (RESERVED.test(seg)) return null;
   return { id: seg.slice(0, 8) };
 }
