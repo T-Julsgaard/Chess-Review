@@ -2,6 +2,41 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+// Run with: node scripts/learning-browser.mjs --working-tree --move-list-return
+export async function auditMoveListReturn({review,call,evaluate,sleep,out}) {
+  const run=expression=>evaluate(review,expression);
+  await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=true;})");
+  const cases=[
+    {width:1920,height:1080,deviceScaleFactor:1},
+    {width:1366,height:768,deviceScaleFactor:1},
+    {width:1920,height:1080,deviceScaleFactor:1.25},
+  ];
+  for(const metrics of cases){
+    await call('Emulation.setDeviceMetricsOverride',{...metrics,mobile:false},review.sessionId);
+    // Both columns and a second round trip must retain their original raster.
+    for(const ply of [1,2]){
+      await run(`import('./analysis.js').then(m=>m.go(${ply}))`);
+      await sleep(1000);
+      const clip=await run("(()=>{const r=document.querySelector('.moves-panel').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,scale:1};})()");
+      const name=`moves-${metrics.width}-${metrics.deviceScaleFactor}-${ply}`;
+      const shot=async suffix=>{
+        const image=await call('Page.captureScreenshot',{format:'png',clip,captureBeyondViewport:true},review.sessionId);
+        const png=Buffer.from(image.data,'base64');
+        await fs.writeFile(path.join(out,name+'-'+suffix+'.png'),png);
+        return png;
+      };
+      const before=await shot('before');
+      await run("import('./analysis.js').then(m=>m.openLearning())");
+      await run("import('./analysis.js').then(m=>m.learningWorkspace.close())");
+      await sleep(1000);
+      const after=await shot('after');
+      assert.ok(before.equals(after),'Returning from Learn must preserve move-list pixels: '+name+'; evidence: '+out);
+      assert.equal(await run("document.querySelectorAll('.learn-transition-surface, .learn-swoop-anchor').length"),0);
+    }
+  }
+  console.log('Move-list pixels unchanged across 6 animated returns, both columns, desktop/laptop and fractional display scaling. Evidence: '+out);
+}
+
 export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const run=expression=>evaluate(review,expression);
   const accuracyLayers=()=>run(`([...document.querySelectorAll('.stage .acc-nav-current, .stage .acc-nav-wake')].map(n=>getComputedStyle(n).visibility))`);

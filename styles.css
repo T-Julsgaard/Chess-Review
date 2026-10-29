@@ -300,7 +300,9 @@
 .learning-embedded .learn-main { flex: 1 1 auto; min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding-right: 8px; }
 .learn-footer { min-height: 0; margin-top: 16px; border-bottom: 0; border-top: 1px solid var(--line); }
 .learning-embedded .learn-footer { flex: none; min-height: 0; margin: 0; padding: 12px 0 0; border: 0; background: transparent; }
-.learn-transition-surface { will-change: transform, opacity; pointer-events: none !important; }
+/* Panel fades already animate translate; a transform hint can leave scaled move
+   text rasterized at the wrong resolution after returning to review. */
+.learn-transition-surface { will-change: opacity; pointer-events: none !important; }
 .learn-swoop-anchor { position: relative; z-index: 40 !important; will-change: transform; }
 .learn-swoop-anchor .board { z-index: 1; }
 .learning-workspace .learn-library { display: flex; flex-direction: column; margin: 12px 0 28px; }
