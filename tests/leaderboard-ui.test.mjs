@@ -23,6 +23,8 @@ test('all modes have compact leaderboard entries; screens preserve filters, use 
     await w.showLeaderboard(mode);
     assert.equal(w.page,'leaderboard');assert.equal(w.root.querySelector('.learn-leaderboard').dataset.mode,mode);
     assert.equal(w.root.querySelector('.learn-puzzle-options'),null);
+    assert.equal(w.root.querySelector('.leaderboard-toolbar h3'),null);
+    assert.doesNotMatch(w.root.textContent,/Unique puzzles solved|Puzzles in 3 minutes|Puzzles without a mistake/);
     assert.equal(w.root.querySelectorAll('.puzzle-mode').length,0);
     assert.equal(dom.window.document.activeElement.id,'leaderboard-title');
     assert.equal(w.nav.querySelector('[aria-current]').textContent,'Puzzles');
