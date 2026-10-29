@@ -63,6 +63,7 @@ try {
   else if(process.argv.includes('--run-history'))await (await import('./puzzle-run-layout-audit.mjs')).auditHistoryScrolling({review,call,evaluate,sleep});
   else if(process.argv.includes('--mode-tickets'))await (await import('./puzzle-mode-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--leaderboards'))await (await import('./leaderboard-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
+  else if(process.argv.includes('--leaderboard-sync'))await (await import('./leaderboard-sync-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--leaderboard-preview'))await (await import('./leaderboard-preview-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--startup'))await (await import('./startup-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--promotion'))await (await import('./promotion-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});

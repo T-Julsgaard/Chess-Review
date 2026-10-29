@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readFileSync,readdirSync} from 'node:fs';
 import {DatabaseSync} from 'node:sqlite';
 import worker,{digest,verifyAttempt} from '../services/leaderboard/worker.js';
 import {Chess} from '../lib/chess.js';
@@ -18,12 +18,12 @@ function adapter(db) {
 }
 async function setup(t) {
   const db=new DatabaseSync(':memory:');t.after(()=>db.close());
-  db.exec(readFileSync(new URL('../services/leaderboard/migrations/0001_leaderboards.sql',import.meta.url),'utf8'));
-  db.exec(readFileSync(new URL('../services/leaderboard/migrations/0003_player_countries.sql',import.meta.url),'utf8'));
+  const migrations=new URL('../services/leaderboard/migrations/',import.meta.url);
+  for(const file of readdirSync(migrations).filter(f=>f.endsWith('.sql')).sort())db.exec(readFileSync(new URL(file,migrations),'utf8'));
   db.prepare('INSERT INTO players VALUES (?,?,?,?)').run('player',await digest(token),'Knight-test',1);
   db.prepare('INSERT INTO players VALUES (?,?,?,?)').run('other',await digest(otherToken),'Knight-other',1);
   for(let i=0;i<12;i++)db.prepare('INSERT INTO puzzles VALUES (?,?,?,?)').run('p'+i,450+i*40,mate.fen,JSON.stringify(mate.solution));
-  const allow={async limit(){return {success:true};}},env={DB:adapter(db),ENABLED:'true',TURNSTILE_SECRET_KEY:'server-only-secret',IP_HASH_KEY:'private-random-hash-key',TURNSTILE_HOSTNAME:'rank.example',TURNSTILE_SITE_KEY:'public-site-key',READ_LIMIT:allow,WRITE_LIMIT:allow,JOIN_LIMIT:allow,GLOBAL_LIMIT:allow};
+  const allow={async limit(){return {success:true};}},env={DB:adapter(db),ENABLED:'true',TURNSTILE_SECRET_KEY:'server-only-secret',IP_HASH_KEY:'private-random-hash-key',TURNSTILE_HOSTNAME:'rank.example',TURNSTILE_SITE_KEY:'public-site-key',READ_LIMIT:allow,WRITE_LIMIT:allow,JOIN_LIMIT:allow,GLOBAL_LIMIT:allow,PLAYER_LIMIT:allow,START_LIMIT:allow};
   let time=1800000000000;t.mock.method(Date,'now',()=>time);
   const call=async(path,body,key=token,extra={})=>worker.fetch(new Request('https://rank.example'+path,{method:body===undefined?'GET':'POST',
     headers:{'CF-Connecting-IP':'192.0.2.1',...(key?{Authorization:'Bearer '+key}:{}),...(body!==undefined?{'Content-Type':'application/json'}:{}),...extra},
@@ -50,7 +50,7 @@ test('disabled/missing security bindings, rate limits and spoofed extension orig
   assert.equal((await s.call('/v1/sessions',{mode:'knockout'},null,{Origin:'chrome-extension://trusted'})).status,401);
   assert.equal((await s.call('/v1/me',undefined,'c'.repeat(64))).status,401);
   assert.equal((await s.call('/v1/sessions',{mode:'knockout'},token,{'CF-Connecting-IP':''})).status,403);
-  s.env.WRITE_LIMIT={async limit({key}){return {success:!key.startsWith('player:')};}};
+  s.env.PLAYER_LIMIT={async limit({key}){return {success:!key.startsWith('player:')};}};
   assert.equal((await s.call('/v1/sessions',{mode:'knockout'})).status,429);
   delete s.env.WRITE_LIMIT;assert.equal((await s.call('/v1/boards/knockout')).status,503);
 });
@@ -105,14 +105,14 @@ test('bounded bodies, pages and routes reject malicious input without exposing s
 });
 test('daily mutation budget stops writes; deletion still removes all player data atomically',async t=>{
   const s=await setup(t),session=await s.start('solve-puzzle');await s.attempt(session);
-  s.db.prepare('UPDATE quotas SET used=5000 WHERE key=?').run('mutations:'+Math.floor(s.now()/86400000));
+  s.db.prepare('UPDATE quotas SET used=80000 WHERE key=?').run('write-units:'+Math.floor(s.now()/86400000));
   assert.equal((await s.call('/v1/sessions',{mode:'knockout'})).status,503);
   assert.equal((await s.call('/v1/delete-player',{})).status,200);
   for(const table of ['players','sessions','solves','records']){
     const key=table==='players'?'id':'player_id';assert.equal(s.db.prepare(`SELECT COUNT(*) AS n FROM ${table} WHERE ${key}=?`).get('player').n,0);
   }
-  assert.equal(s.db.prepare("SELECT used FROM quotas WHERE key='players'").get().used,1);
-  assert.equal(s.db.prepare("SELECT used FROM quotas WHERE key='solves'").get().used,0);
+  assert.equal(s.db.prepare("SELECT used FROM quotas WHERE key='players'").get(),undefined);
+  assert.equal(s.db.prepare("SELECT used FROM quotas WHERE key='solves'").get(),undefined);
   assert.equal((await s.call('/v1/me')).status,401);
 });
 test('enrollment verifies Turnstile hostname/action, returns a personal key and stores only its hash',async t=>{
@@ -149,11 +149,110 @@ for(const mode of ['solve-puzzle','timeAttack','knockout'])test(`${mode}: real w
   await w.showLeaderboard(mode);await w.startRanked(mode);assert.ok(w.activity);assert.ok(w.ranked.started);
   const first=w.activity.id;
   await w.submitPuzzle(mate.solution[0]);
-  assert.equal(w.ranked.score,1);assert.equal(s.db.prepare('SELECT score FROM records WHERE mode=?').get(mode).score,1);
+  assert.equal(w.ranked.score,1);
+  if(mode==='solve-puzzle')assert.equal(s.db.prepare('SELECT score FROM records WHERE mode=?').get(mode),undefined);
+  else assert.equal(s.db.prepare('SELECT score FROM records WHERE mode=?').get(mode).score,1);
   if(mode==='solve-puzzle')await w.nextPuzzle();
   assert.notEqual(w.activity.id,first);assert.equal(w.activity.id,w.ranked.puzzleId);
   await w.submitPuzzle(mate.solution[0]);assert.equal(w.ranked.score,2);
   if(w.run){await w.finishChallenge('Ended early');assert.equal(w.result.ranked,true);}
   await w.navigate('puzzles');await w.showLeaderboard(mode);
+  assert.equal(w.root.querySelector('.leaderboard-personal strong').textContent,'2','Personal best is immediate even when the cached board is older');
+  s.advance(61000);await w.loadLeaderboard(1,{fresh:true});
   assert.equal(w.root.querySelector('.leaderboard-score').textContent,'2');
+});
+
+test('practice batches verify assigned solutions and commit a five-puzzle total once',async t=>{
+  const s=await setup(t),batch=await (await s.call('/v1/practice',{})).json();
+  assert.equal(batch.puzzleIds.length,5);assert.equal(new Set(batch.puzzleIds).size,5);
+  const body={session:batch.id,revision:batch.revision,attempts:batch.puzzleIds.map(puzzleId=>({puzzleId,moves:mate.solution}))};
+  const wrong=await s.call('/v1/practice/attempts',{...body,attempts:[{puzzleId:'p-unknown',moves:mate.solution}]});assert.equal(wrong.status,400);
+  assert.equal((await s.call('/v1/practice/attempts',body,otherToken)).status,409);
+  const responses=await Promise.all([s.call('/v1/practice/attempts',body),s.call('/v1/practice/attempts',body)]);
+  assert.ok(responses.every(r=>[200,409].includes(r.status)));
+  const result=await (await s.call('/v1/practice/attempts',body)).json();assert.equal(result.total,5);
+  assert.equal(s.db.prepare("SELECT score FROM records WHERE player_id='player' AND mode='solve-puzzle'").get().score,5);
+  assert.equal(s.db.prepare('SELECT COUNT(*) n FROM solves').get().n,5);
+  assert.equal(result.puzzleIds.some(id=>batch.puzzleIds.includes(id)),false);
+  assert.equal((await s.call('/v1/practice/attempts',{...body,attempts:Array(6).fill(body.attempts[0])})).status,400);
+  const fresh=await (await s.call('/v1/practice',{})).json();assert.deepEqual(fresh.puzzleIds,result.puzzleIds);
+});
+
+test('a bad proof rejects the whole practice batch; closing a partial batch keeps its verified prefix',async t=>{
+  const s=await setup(t),batch=await (await s.call('/v1/practice',{})).json();
+  const proofs=batch.puzzleIds.slice(0,2).map(puzzleId=>({puzzleId,moves:mate.solution}));
+  const wrong=new Chess(mate.fen).moves({verbose:true}).find(m=>m.lan!==mate.solution[0]&&!new Chess(m.after).isCheckmate()).lan;
+  assert.equal((await s.call('/v1/practice/attempts',{session:batch.id,revision:0,attempts:[proofs[0],{...proofs[1],moves:[wrong]}]})).status,400);
+  assert.equal(s.db.prepare('SELECT COUNT(*) n FROM solves').get().n,0);
+  const result=await (await s.call('/v1/practice/attempts',{session:batch.id,revision:0,attempts:proofs,end:true})).json();
+  assert.equal(result.total,2);assert.equal(result.ended,true);
+  const next=await (await s.call('/v1/practice',{})).json();assert.notEqual(next.id,batch.id);
+  assert.equal(next.puzzleIds.some(id=>proofs.some(p=>p.puzzleId===id)),false);
+});
+
+function clientFor(s,t,data={},transport) {
+  data['leaderboard:v1'] ||= {token,id:'player',name:'Knight-test',scores:{}};
+  const storage={async get(key){return {[key]:structuredClone(data[key])};},async set(values){Object.assign(data,structuredClone(values));}};
+  const fetcher=async(url,options)=>{const response=await s.call(new URL(url).pathname+new URL(url).search,options.body?JSON.parse(options.body):undefined);
+    return transport?transport(response,url,options):response;};
+  const client=new LeaderboardClient(storage,{endpoint:'https://rank.example',fetcher});t.after(()=>client.practice.stop());return {client,data,storage};
+}
+
+test('client practice buffers five proofs with immediate personal feedback, then sends one batch',async t=>{
+  const s=await setup(t),requests=[];
+  const {client}=clientFor(s,t,{},(response,url)=>{requests.push(url);return response;});
+  const batch=await client.start('solve-puzzle');
+  for(let i=0;i<4;i++)await client.practice.record(batch.puzzleIds[i],mate.solution);
+  assert.equal(requests.filter(url=>url.endsWith('/attempts')).length,0);
+  assert.deepEqual(await client.personal('solve-puzzle'),{score:4,confirmed:0,syncing:true,blocked:false,error:undefined});
+  const next=await client.practice.record(batch.puzzleIds[4],mate.solution);
+  assert.equal(requests.filter(url=>url.endsWith('/attempts')).length,1);assert.equal(next.score,5);assert.equal(next.syncing,false);
+  assert.equal((await client.personal('solve-puzzle')).confirmed,5);
+});
+
+test('durable practice retries a lost response after restart without losing or duplicating solves',async t=>{
+  const s=await setup(t),data={};let lose=true;
+  const {client}=clientFor(s,t,data,(response,url)=>{if(lose&&url.endsWith('/attempts'))throw Error('Response lost');return response;});
+  const batch=await client.start('solve-puzzle');await client.practice.record(batch.puzzleIds[0],mate.solution);
+  await client.practice.record(batch.puzzleIds[1],mate.solution);await client.practice.flush();client.practice.stop();
+  assert.equal(s.db.prepare('SELECT COUNT(*) n FROM solves').get().n,2);
+  assert.equal(data['leaderboard:practice:v1'].pending.length,2);
+  s.advance(61000);lose=false;
+  const restarted=clientFor(s,t,data).client;await restarted.practice.resume();
+  assert.equal(data['leaderboard:practice:v1'].pending.length,0);
+  assert.equal(s.db.prepare('SELECT COUNT(*) n FROM solves').get().n,2);
+  assert.equal((await restarted.personal('solve-puzzle')).confirmed,2);
+});
+
+test('the 60-second timer flushes a partial practice batch and stops when there is nothing pending',async t=>{
+  const s=await setup(t);t.mock.timers.enable({apis:['setTimeout']});
+  const {client}=clientFor(s,t),batch=await client.start('solve-puzzle');await client.practice.record(batch.puzzleIds[0],mate.solution);
+  assert.ok(client.practice.timer);t.mock.timers.tick(60000);await client.practice.work;
+  assert.equal(s.db.prepare('SELECT COUNT(*) n FROM solves').get().n,1);assert.equal(client.practice.timer,null);
+});
+
+test('signup has no 100-player daily ceiling and lifetime counters no longer reject valid data',async t=>{
+  const s=await setup(t);t.mock.method(globalThis,'fetch',async()=>Response.json({success:true,hostname:'rank.example',action:'enroll'}));
+  s.db.prepare('INSERT INTO quotas VALUES (?,?)').run('enroll:'+Math.floor(s.now()/86400000),100);
+  for(let i=0;i<101;i++)assert.equal((await s.call('/v1/enroll',{turnstile:'proof'},null)).status,201);
+  assert.equal(s.db.prepare("SELECT COUNT(*) n FROM sqlite_master WHERE type='trigger' AND name IN ('bound_players','bound_solves')").get().n,0);
+});
+
+test('one player reaching the daily work allowance does not block other players',async t=>{
+  const s=await setup(t),day=Math.floor(s.now()/86400000);
+  s.db.prepare('INSERT INTO quotas VALUES (?,?)').run('player-player:'+day,10000);
+  const blocked=await s.call('/v1/practice',{});assert.equal(blocked.status,503);assert.ok(Number(blocked.headers.get('Retry-After'))>0);
+  assert.equal((await s.call('/v1/practice',{},otherToken)).status,200);
+  s.advance(86400000);assert.equal((await s.call('/v1/practice',{})).status,200);
+});
+
+test('daily per-player requests include rejected proofs and repeated assignment requests',async t=>{
+  const s=await setup(t),day=Math.floor(s.now()/86400000),batch=await (await s.call('/v1/practice',{})).json();
+  const counter='requests-player:'+day,before=s.db.prepare('SELECT used FROM quotas WHERE key=?').get(counter).used;
+  assert.equal((await s.call('/v1/practice/attempts',{session:batch.id,revision:0,attempts:[{puzzleId:'unassigned',moves:mate.solution}]})).status,400);
+  assert.equal(s.db.prepare('SELECT used FROM quotas WHERE key=?').get(counter).used,before+1);
+  s.db.prepare('UPDATE quotas SET used=2500 WHERE key=?').run(counter);
+  assert.equal((await s.call('/v1/practice',{})).status,503);
+  assert.equal((await s.call('/v1/practice',{},otherToken)).status,200);
+  assert.equal((await s.call('/v1/delete-player',{})).status,200,'Deletion remains available at the app request ceiling');
 });

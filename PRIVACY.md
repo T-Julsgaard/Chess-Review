@@ -60,14 +60,18 @@ requests and ranked submissions are blocked while that preview is active.
 Leaderboards are disabled until an online service is configured in a release.
 Opening a configured leaderboard fetches public rankings from a Cloudflare Worker;
 Cloudflare receives normal network information, including your IP address. The
-rankings refresh every 30 seconds while open. Viewing does not upload your local
+rankings load when opened, paged or manually refreshed; recent pages are cached
+for one minute. Viewing does not upload your local
 progress or require a player key.
 
 To participate, you explicitly verify on the service's hosted Turnstile page,
 connect a private player key, then choose **Play ranked**. The key and generated
 player name are stored locally. Firefox requests optional authentication-data
 and puzzle-interaction consent before connecting. Ranked play sends the key, session identifiers and
-puzzle move sequences to the service to verify results. Your games, PGNs, chess-site
+puzzle move sequences to the service to verify results. Ranked practice keeps up
+to five pending solution proofs in local extension storage for batched submission
+and safe retry after a restart. Its server assignment expires after seven days.
+Time attack and Knockout still verify attempts individually. Your games, PGNs, chess-site
 identity, browsing history, settings and historical local progress are not sent.
 Your generated name and verified scores are public.
 

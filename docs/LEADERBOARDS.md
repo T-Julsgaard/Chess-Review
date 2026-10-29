@@ -52,9 +52,23 @@ deadline. Setup and the countdown happen before a separate, idempotent ready
 request starts the server clock. Later puzzle transitions and network time count
 toward the three minutes. The visible clock is synchronized at readiness.
 
-Verified scores update after each puzzle (so a partial run can set a record).
-Boards show ten players per page and refresh every 30 seconds while open, with
-30-second edge caching. Updates may take up to about a minute to appear. Ties use
+Time attack and Knockout verify each attempt, so a partial run can set a record.
+Ranked practice receives up to five server-assigned puzzles at once. Their move
+proofs are saved in extension local storage and submitted after five solves or
+60 seconds, or when leaving practice/opening rankings. The server verifies the
+assigned order and every solution; unique-solve constraints still prevent repeat
+credit. Partial batches can be acknowledged without abandoning unused puzzles.
+An opaque batch ID, monotonic revision, compare-and-swap update, and saved response
+make a lost-response retry idempotent. The assignment expires after seven days.
+The queue resumes on reopening Learn; it does not depend on a tab-close event.
+Cross-tab queue updates use the browser's Web Locks API where available.
+
+Boards show ten players per page and load only on opening, paging or Refresh;
+there is no polling. Public pages are cached locally for 60 seconds and at the
+edge for 30 seconds. Duplicate reads share a request; manual refresh has a
+10-second minimum interval per cached page. Personal totals/bests appear
+separately and immediately, with **Syncing** for unsent practice proofs. Global
+positions come from the shared snapshot, never an invented local rank. Ties use
 the first time the score was achieved, then player ID. Pagination shows at most
 the top 1,000 players. A connection failure stops further ranked scoring; verified
 earlier scores remain saved. Offline play is still available.
@@ -142,21 +156,41 @@ by the packager. Inspect build contents before distributing them.
 The service fails closed when disabled, missing required bindings/secrets, or at
 capacity. It enforces bounded JSON bodies (including streamed bodies), validated
 routes/pages/moves, bearer authentication, server-assigned puzzles, server timing,
-one active session per player, monotonic revisions, atomic score updates and
+one active timed session and one practice batch per player, monotonic revisions, atomic score updates and
 idempotent last-attempt replay. SQL values are bound parameters. Remote names are
 rendered as text. There is no public admin endpoint or arbitrary score endpoint.
 Enrollment uses server-side Turnstile verification with hostname/action checks.
 
-Rate-limit bindings cap reads (30/min/IP), writes (100/min/IP and per player), enrollment
-(3/min/IP), and overall traffic (800/min). The IP limiter key is a keyed digest
-rotated daily and is not stored in D1. SQL-enforced budgets allow at most 100
-enrollments and 5,000 session mutations per UTC day. These are **operation counts,
-not Cloudflare row-write accounting**; a mutation writes multiple indexed rows.
-Storage caps are 5,000 players and 100,000 distinct practice solves. Sessions cap
-at 1,000 puzzles and expire after six hours (three minutes for Time attack).
-Scheduled cleanup removes expired sessions and old daily budget rows. Deletion
+Rate-limit bindings cap reads (120/min/IP), writes (300/min/IP, 120/min/player),
+enrollment (10/min/IP), ranked starts (20/min/player), and burst traffic (3,000/min
+per Cloudflare location). Shared IPs have more room than individual players.
+The IP limiter key is a keyed digest rotated daily and is not stored in D1.
+The old 100-signups/day, 5,000-players, 100,000-lifetime-solves and
+5,000-mutations/day caps are removed by migration 0002. Do not skip that migration.
+Authenticated mutations also have a 2,500-request/player/day allowance, including
+failed proofs and requests that do not change a score. Deletion is exempt.
+SQL-enforced daily work budgets allow 10,000 estimated write units per player
+and 80,000 across the service. Costs vary by operation and batch size; these are
+**conservative work estimates, not measured D1 row-write counts or billing caps**.
+Profile changes share this budget instead of a separate signup-scale ceiling.
+Actual free allowance exhaustion can still happen first; measure D1 usage before
+changing budgets. A daily-capacity response sets Retry-After to midnight UTC.
+Client errors back off, respect Retry-After, retain cached rankings and keep
+pending proofs for retry; invalid/conflicting proofs require user action rather
+than endlessly retrying. Disconnect pauses sync; reconnecting the same player
+retains the queue. Deleting the player clears it. CSV preview blocks queue sync.
+Timed sessions cap at 1,000 puzzles and expire after six hours (three minutes for
+Time attack). Scheduled cleanup removes expired sessions/batches and old daily budget rows. Deletion
 remains available after application capacity is reached, unless Cloudflare itself
-has exhausted the account allowance. Raise caps only after checking storage/usage.
+has exhausted the account allowance. There is no periodic deletion of unique
+solve records, since that would allow repeat puzzle credit.
+
+Daily request/read/write allowance exhaustion normally recovers after midnight
+UTC, provided traffic has fallen. Reads, new accounts and ranked submissions may
+all fail during that outage; existing local progress remains available. A full
+storage allowance is different: it needs cleanup and does not reset overnight.
+A continuing attack can exhaust the next day's allowance again. Free-plan usage
+does not silently upgrade this service to paid usage.
 
 **No public service is spam-proof or bot-proof.** Cloudflare binding limits are
 approximate and per location, so distributed traffic can still exhaust Workers

@@ -24,11 +24,21 @@ async function bodyOf(request) {
   try {const body=JSON.parse(new TextDecoder().decode(bytes));if(!body||Array.isArray(body)||typeof body!=='object')throw Error();return body;}
   catch {fail(400,'Invalid JSON');}
 }
-async function budget(env,kind,limit,now) {
-  const row=await env.DB.prepare(`INSERT INTO quotas(key,used) VALUES (?,1)
-    ON CONFLICT(key) DO UPDATE SET used=used+1 WHERE used < ? RETURNING used`)
-    .bind(kind+':'+Math.floor(now/DAY),limit).first();
+async function budget(env,kind,limit,now,cost=1) {
+  const row=await env.DB.prepare(`INSERT INTO quotas(key,used) VALUES (?,?)
+    ON CONFLICT(key) DO UPDATE SET used=used+excluded.used WHERE used+excluded.used <= ? RETURNING used`)
+    .bind(kind+':'+Math.floor(now/DAY),cost,limit).first();
   if(!row)fail(503,'Daily service capacity reached');
+}
+// Conservative work estimates, not platform billing counters. Cloudflare Free
+// remains the hard boundary. Fixed counter work per mutation, none per board read.
+async function reserve(env,now,cost,player) {
+  if(player)await budget(env,'player-'+player,10000,now,cost);
+  await budget(env,'write-units',80000,now,cost);
+}
+async function personal(env,id) {
+  const {results}=await env.DB.prepare('SELECT mode,score FROM records WHERE player_id=?').bind(id).all();
+  return Object.fromEntries(results.map(r=>[r.mode,r.score]));
 }
 async function authenticate(request,env) {
   const value=request.headers.get('Authorization')||'';
@@ -80,14 +90,14 @@ async function enroll(request,env,now) {
       remoteip:request.headers.get('CF-Connecting-IP')||''}),signal:AbortSignal.timeout(8000)});
   const result=await verification.json();
   if(!result.success||result.hostname!==env.TURNSTILE_HOSTNAME||result.action!=='enroll')fail(403,'Verification failed');
-  await budget(env,'enroll',100,now);
+  await reserve(env,now,6);
   const token=secret(),id=crypto.randomUUID(),name='Knight-'+id.replaceAll('-','').slice(0,10);
   await env.DB.prepare('INSERT INTO players(id,token_hash,name,created_at) VALUES (?,?,?,?)').bind(id,await digest(token),name,now).run();
   return json({token,id,name},201);
 }
 async function start(request,env,player,now) {
   const {mode}=await bodyOf(request);if(!MODES.has(mode))fail(400,'Invalid mode');
-  await budget(env,'mutations',5000,now);
+  await reserve(env,now,10,player.id);
   const puzzleId=await pickPuzzle(env,player.id,mode,[]);if(!puzzleId)fail(409,'No puzzles available');
   const id=crypto.randomUUID(),deadline=now+600000,lives=mode==='timeAttack'?3:1;
   await env.DB.prepare(`INSERT INTO sessions(player_id,id,mode,puzzle_id,lives,started_at,updated_at,deadline) VALUES (?,?,?,?,?,?,?,?)
@@ -98,7 +108,7 @@ async function start(request,env,player,now) {
 }
 async function ready(request,env,player,now) {
   const {session}=await bodyOf(request);if(typeof session!=='string'||session.length>40)fail(400,'Invalid session');
-  await budget(env,'mutations',5000,now);
+  await reserve(env,now,8,player.id);
   const row=await env.DB.prepare(`UPDATE sessions SET started_at=?,updated_at=?,deadline=?+CASE WHEN mode='timeAttack' THEN 180000 ELSE 21600000 END
     WHERE player_id=? AND id=? AND started_at=0 AND deadline>? RETURNING deadline`).bind(now,now,now,player.id,session,now).first();
   if(row)return json({...row,remainingMs:row.deadline-now});
@@ -116,7 +126,7 @@ async function attempt(request,env,player,now) {
   if(now-session.updated_at<250)fail(429,'Slow down');
   const puzzle=await env.DB.prepare('SELECT fen,solution,rating FROM puzzles WHERE id=?').bind(session.puzzle_id).first();
   const correct=verifyAttempt(puzzle,body.moves);
-  await budget(env,'mutations',5000,now);
+  await reserve(env,now,12,player.id);
   const score=session.score+(correct?1:0),lives=session.lives-(correct?0:1),seen=[...JSON.parse(session.seen),session.puzzle_id];
   const next=lives>0&&seen.length<1000?await pickPuzzle(env,player.id,session.mode,seen,puzzle.rating):null;
   const result={id:session.id,revision:session.revision+1,puzzleId:next,score,ended:!next||lives<=0,deadline:session.deadline};
@@ -126,6 +136,60 @@ async function attempt(request,env,player,now) {
     updated_at=?,last_hash=?,last_response=? WHERE player_id=? AND id=? AND revision=? RETURNING revision`)
     .bind(score,lives,next,JSON.stringify(seen),now,hash,JSON.stringify(result),player.id,session.id,session.revision).first();
   if(!updated)fail(409,'Session changed');return json(result);
+}
+async function practicePuzzles(env,player,excluded=[]) {
+  const ids=[];
+  for(let i=0;i<5;i++){
+    const id=await pickPuzzle(env,player,'solve-puzzle',[...excluded,...ids]);
+    if(!id)break;ids.push(id);
+  }
+  return ids;
+}
+async function startPractice(env,player,now) {
+  let row=await env.DB.prepare('SELECT * FROM practice_batches WHERE player_id=?').bind(player.id).first();
+  if(!row||row.expires_at<=now||!JSON.parse(row.puzzles).length){
+    await reserve(env,now,10,player.id);
+    const ids=await practicePuzzles(env,player.id);if(!ids.length)fail(409,'No puzzles available');
+    // Do not replace another tab's newly issued batch in a race.
+    row=await env.DB.prepare(`INSERT INTO practice_batches(player_id,id,puzzles,expires_at) VALUES (?,?,?,?)
+      ON CONFLICT(player_id) DO UPDATE SET id=excluded.id,puzzles=excluded.puzzles,expires_at=excluded.expires_at,
+      revision=0,accepted='[]',last_hash=NULL,last_response=NULL
+      WHERE expires_at<=? OR puzzles='[]' RETURNING *`).bind(player.id,crypto.randomUUID(),JSON.stringify(ids),now+7*DAY,now).first()
+      ||await env.DB.prepare('SELECT * FROM practice_batches WHERE player_id=?').bind(player.id).first();
+  }
+  const scores=await personal(env,player.id);
+  return json({id:row.id,revision:row.revision,puzzleIds:JSON.parse(row.puzzles),expiresAt:row.expires_at,total:scores['solve-puzzle']||0});
+}
+async function submitPractice(request,env,player,now) {
+  const body=await bodyOf(request),attempts=body.attempts;
+  if(typeof body.session!=='string'||body.session.length>40||!Number.isSafeInteger(body.revision)||body.revision<0||
+    !Array.isArray(attempts)||attempts.length>5||(!attempts.length&&body.end!==true)||
+    (body.end!==undefined&&typeof body.end!=='boolean'))fail(400,'Invalid practice batch');
+  const hash=await digest(JSON.stringify({attempts,end:body.end===true}));
+  const row=await env.DB.prepare('SELECT * FROM practice_batches WHERE player_id=? AND id=?').bind(player.id,body.session).first();
+  if(!row)fail(409,'Practice batch ended');
+  if(body.revision===row.revision-1&&hash===row.last_hash)return json(JSON.parse(row.last_response));
+  if(body.revision!==row.revision||row.expires_at<=now)fail(409,'Practice batch ended');
+  const assigned=JSON.parse(row.puzzles),accepted=[];
+  for(let i=0;i<attempts.length;i++){
+    const proof=attempts[i];
+    if(!proof||proof.puzzleId!==assigned[i])fail(400,'Unassigned puzzle');
+    const puzzle=await env.DB.prepare('SELECT fen,solution FROM puzzles WHERE id=?').bind(proof.puzzleId).first();
+    if(!puzzle||!verifyAttempt(puzzle,proof.moves))fail(400,'Invalid practice solution');
+    accepted.push(proof.puzzleId);
+  }
+  await reserve(env,now,6+accepted.length*10,player.id);
+  let ids=body.end?[]:assigned.slice(accepted.length);
+  if(!body.end&&!ids.length)ids=await practicePuzzles(env,player.id,assigned);
+  const result={id:row.id,revision:row.revision+1,puzzleIds:ids,expiresAt:now+7*DAY,ended:!ids.length};
+  // The CAS, deduplication, score triggers and saved replay response commit as
+  // one statement. The total is computed before triggers from unique new IDs.
+  const updated=await env.DB.prepare(`UPDATE practice_batches SET revision=revision+1,puzzles=?,accepted=?,expires_at=?,last_hash=?,
+    last_response=json_set(?,'$.total',COALESCE((SELECT score FROM records WHERE player_id=? AND mode='solve-puzzle'),0)+
+      (SELECT COUNT(*) FROM json_each(?) a WHERE NOT EXISTS(SELECT 1 FROM solves WHERE player_id=? AND puzzle_id=a.value)))
+    WHERE player_id=? AND id=? AND revision=? RETURNING last_response`)
+    .bind(JSON.stringify(ids),JSON.stringify(accepted),result.expiresAt,hash,JSON.stringify(result),player.id,JSON.stringify(accepted),player.id,player.id,row.id,row.revision).first();
+  if(!updated)fail(409,'Practice batch changed');return json(JSON.parse(updated.last_response));
 }
 async function board(request,env,ctx,mode) {
   const url=new URL(request.url),raw=url.searchParams.get('page')||'1';
@@ -156,7 +220,7 @@ const JOIN_JS=`window.onVerified=async token=>{const status=document.getElementB
 export default {
   async fetch(request,env,ctx) {
     try {
-      if(env.ENABLED!=='true'||!env.DB||!env.TURNSTILE_SECRET_KEY||!env.TURNSTILE_SITE_KEY||!env.TURNSTILE_HOSTNAME||!env.IP_HASH_KEY||!env.GLOBAL_LIMIT||!env.READ_LIMIT||!env.WRITE_LIMIT||!env.JOIN_LIMIT)fail(503,'Leaderboards unavailable');
+      if(env.ENABLED!=='true'||!env.DB||!env.TURNSTILE_SECRET_KEY||!env.TURNSTILE_SITE_KEY||!env.TURNSTILE_HOSTNAME||!env.IP_HASH_KEY||!env.GLOBAL_LIMIT||!env.READ_LIMIT||!env.WRITE_LIMIT||!env.JOIN_LIMIT||!env.PLAYER_LIMIT||!env.START_LIMIT)fail(503,'Leaderboards unavailable');
       const url=new URL(request.url),path=url.pathname;
       if(request.method==='OPTIONS')return new Response(null,{status:204,headers:{'Access-Control-Allow-Origin':'*',
         'Access-Control-Allow-Methods':'GET, POST, OPTIONS','Access-Control-Allow-Headers':'Authorization, Content-Type','Access-Control-Max-Age':'86400'}});
@@ -172,15 +236,21 @@ export default {
       if(request.method==='GET'&&path.startsWith('/v1/boards/'))return await board(request,env,ctx,path.slice(11));
       const now=Date.now();
       if(request.method==='POST'&&path==='/v1/enroll')return await enroll(request,env,now);
-      if(!['/v1/me','/v1/sessions','/v1/ready','/v1/attempts','/v1/delete-player'].includes(path))fail(404,'Not found');
+      if(!['/v1/me','/v1/sessions','/v1/ready','/v1/attempts','/v1/practice','/v1/practice/attempts','/v1/delete-player'].includes(path))fail(404,'Not found');
       const player=await authenticate(request,env);
-      if(request.method==='POST'&&!(await env.WRITE_LIMIT.limit({key:'player:'+player.id})).success)fail(429,'Slow down');
-      if(request.method==='GET'&&path==='/v1/me')return json(player);
+      if(request.method==='POST'&&!(await env.PLAYER_LIMIT.limit({key:'player:'+player.id})).success)fail(429,'Slow down');
+      // Failed proofs and repeated reads of a current assignment must also count
+      // against the player's allowance, even when they make no score changes.
+      if(request.method==='POST'&&path!=='/v1/delete-player')await budget(env,'requests-'+player.id,2500,now);
+      if(request.method==='POST'&&['/v1/sessions','/v1/practice'].includes(path)&&!(await env.START_LIMIT.limit({key:player.id})).success)fail(429,'Slow down');
+      if(request.method==='GET'&&path==='/v1/me')return json({...player,scores:await personal(env,player.id)});
+      if(request.method==='POST'&&path==='/v1/practice'){await bodyOf(request);return await startPractice(env,player,now);}
+      if(request.method==='POST'&&path==='/v1/practice/attempts')return await submitPractice(request,env,player,now);
       if(request.method==='POST'&&path==='/v1/sessions')return await start(request,env,player,now);
       if(request.method==='POST'&&path==='/v1/me'){
         const {country}=await bodyOf(request);
         if(typeof country!=='string'||country.length>12||!flagCodeForCountryId(country)||!countryNameForId(country))fail(400,'Invalid country');
-        await budget(env,'country-updates',100,now);
+        await reserve(env,now,8,player.id);
         await env.DB.prepare(`INSERT INTO player_countries(player_id,country) VALUES (?,?)
           ON CONFLICT(player_id) DO UPDATE SET country=excluded.country`).bind(player.id,country.trim().toUpperCase()).run();
         return json({country:country.trim().toUpperCase()});
@@ -191,11 +261,16 @@ export default {
         await bodyOf(request);await env.DB.prepare('DELETE FROM players WHERE id=?').bind(player.id).run();return json({deleted:true});
       }
       fail(405,'Method not allowed');
-    } catch(error) {return json({error:error instanceof HttpError?error.message:'Service temporarily unavailable'},error.status||503);}
+    } catch(error) {
+      const response=json({error:error instanceof HttpError?error.message:'Service temporarily unavailable'},error.status||503);
+      if(error.message==='Daily service capacity reached')response.headers.set('Retry-After',String(Math.ceil((DAY-Date.now()%DAY)/1000)));
+      return response;
+    }
   },
   async scheduled(event,env) {
     // Sessions are bounded to one per player; old rows and daily counters are pruned.
     await env.DB.batch([env.DB.prepare('DELETE FROM sessions WHERE deadline < ?').bind(Date.now()-DAY),
+      env.DB.prepare('DELETE FROM practice_batches WHERE expires_at < ?').bind(Date.now()-DAY),
       env.DB.prepare("DELETE FROM quotas WHERE key LIKE '%:%' AND CAST(substr(key,instr(key,':')+1) AS INTEGER) < ?").bind(Math.floor(Date.now()/DAY)-2)]);
   }
 };

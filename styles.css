@@ -477,6 +477,9 @@
 .leaderboard-hero .puzzle-mode-art { width: 110px; flex: 0 0 110px; height: 96px; }
 .leaderboard-toolbar { display: flex; justify-content: flex-end; margin: 12px 0; }
 .leaderboard-live { flex-shrink: 0; font-size: 10px; color: var(--ink-2); }
+.learn-leaderboard .leaderboard-refresh { font-size: 11px; padding: 6px 10px; }
+.leaderboard-personal { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 14px; background: color-mix(in srgb, var(--mode-stock) 10%, transparent); border: 1px solid var(--line); border-radius: 10px; font-size: 12px; }
+.leaderboard-personal strong { font-size: 20px; margin-right: auto; font-variant-numeric: tabular-nums; }
 .leaderboard-table-wrap { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--panel); }
 .leaderboard-table { border-collapse: collapse; width: 100%; table-layout: fixed; font-variant-numeric: tabular-nums; }
 .leaderboard-table th,.leaderboard-table td { padding: 13px 16px; text-align: left; border-bottom: 1px solid var(--line); }
