@@ -23,7 +23,7 @@ lead. When that player has a known country and a leaderboard key is connected,
 opening a leaderboard publishes only the country token for that key. The inferred
 username stays local; public names remain generated `Knight-…` names. This is a
 display flag, not verified account ownership. Missing or unsupported countries
-keep the initial avatar. Hover or keyboard focus shows the country name.
+show a neutral player icon. Hover or keyboard focus on a flag shows the country name.
 Apply migration `0003_player_countries.sql` before deploying the updated Worker.
 Country records are deleted with the player; public caches may take time to update.
 

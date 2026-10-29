@@ -57,19 +57,21 @@ test('leaving aborts reads and late responses cannot replace the current screen'
   assert.equal(w.page,'puzzles');assert.equal(w.leaderboardTimer,null);assert.equal(w.root.querySelector('.learn-leaderboard'),null);
 });
 
-test('flags use bundled art and country tooltips; unknown countries retain the initial',async t=>{
+test('flags use bundled art and country tooltips; missing or unknown countries show a neutral player icon',async t=>{
   const {w,dom}=await setup(t);
   w.leaderboardClient={configured:true,credentials:async()=>null,list:async()=>({rows:[
     {id:'danish',name:'Danish player',country:'dk',score:42},
     {id:'american',name:'American player',country:'2',score:41},
     {id:'english',name:'English player',country:'xe',score:40},
-    {id:'unknown',name:'Unknown player',country:'../../DK',score:39}
+    {id:'unknown',name:'Unknown player',country:'../../DK',score:39},
+    {id:'missing',name:'Knight-generated',score:38}
   ]})};
   await w.showLeaderboard('knockout');
   const flags=w.root.querySelectorAll('.leaderboard-flag');assert.equal(flags.length,3);
   assert.match(flags[0].src,/flags\/DK.svg$/);assert.equal(flags[0].alt,'Denmark');
   assert.match(flags[1].src,/flags\/US.svg$/);assert.match(flags[2].src,/flags\/GB_ENG.svg$/);
-  assert.equal(w.root.querySelector('tbody tr:last-child .leaderboard-avatar').textContent,'U');
+  const placeholders=w.root.querySelectorAll('.leaderboard-placeholder');assert.equal(placeholders.length,2);
+  for(const placeholder of placeholders){assert.equal(placeholder.textContent,'');assert.equal(placeholder.getAttribute('aria-hidden'),'true');}
   flags[0].dispatchEvent(new dom.window.MouseEvent('mouseenter'));
   assert.equal(dom.window.document.querySelector('[role=tooltip]').textContent,'Denmark');
   flags[0].dispatchEvent(new dom.window.MouseEvent('mouseleave'));assert.equal(dom.window.document.querySelector('[role=tooltip]'),null);

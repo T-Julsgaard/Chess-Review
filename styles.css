@@ -491,6 +491,7 @@
 .leaderboard-rank [data-rank="2"] { background: color-mix(in srgb,var(--ink-2) 14%,var(--panel)); font-weight: 750; color: var(--ink); }
 .leaderboard-rank [data-rank="3"] { background: color-mix(in srgb,#eaa18e 28%,var(--panel)); font-weight: 750; color: var(--ink); }
 .leaderboard-avatar { display: inline-grid; place-items: center; width: 25px; height: 25px; margin-right: 9px; border: 1px solid color-mix(in srgb,var(--mode-stock) 25%,var(--line)); border-radius: 50%; background: color-mix(in srgb,var(--mode-stock) 12%,var(--panel)); color: var(--ink); font-size: 10px; }
+.leaderboard-placeholder::before { content: ''; width: 16px; height: 16px; background: currentColor; mask: url("icons/player.svg") center / contain no-repeat; }
 .leaderboard-avatar.leaderboard-flag { display: inline-block; object-fit: contain; vertical-align: middle; border: 0; border-radius: 0; background: none; }
 .leaderboard-flag:focus-visible { outline: 2px solid var(--mode-stock); outline-offset: 3px; }
 .leaderboard-country-tip { position: fixed; z-index: 10000; pointer-events: none; max-width: calc(100vw - 16px); box-sizing: border-box; padding: 7px 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); color: var(--ink); box-shadow: 0 4px 16px #0004; font: 600 12px/1.4 system-ui,sans-serif; }
