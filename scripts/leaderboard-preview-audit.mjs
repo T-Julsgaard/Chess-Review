@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import path from 'node:path';
+import fs from 'node:fs/promises';
 
-export async function auditLearning({review,call,evaluate,waitFor,sleep}) {
+export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const run=expression=>evaluate(review,expression);
   await run("import('./analysis.js').then(m=>m.openLearning())");
   await waitFor(review,"!!document.querySelector('.puzzle-mode-grid')&&!document.querySelector('.learn-transition-surface')",'Puzzle modes');
@@ -37,18 +38,40 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep}) {
     })`);
     assert.equal(unchanged,true,'Free-board moves, history and flips leave the leaderboard connected and still');
     const reverse=await run(`import('./analysis.js').then(({learningWorkspace:w})=>{window.previewReturning=w.returnFromLeaderboard();const hero=window.returningHero=document.querySelector('.leaderboard-returning .leaderboard-hero');
-      window.returningMotion=hero.getAnimations()[0];window.returningReveal=document.querySelector('.puzzle-mode-grid').getAnimations()[0];
+      window.returningMotion=hero.getAnimations()[0];window.returningFade=hero.parentElement.getAnimations()[0];window.returningReveal=document.querySelector('.puzzle-mode-grid').getAnimations()[0];
       window.returningReveal.pause();return window.returningMotion.effect.getKeyframes().map(f=>f.clipPath);})`);
     assert.match(reverse[0],/^inset\(0px 0%(?: 0px 0%)? round 13px\)$/);assert.notEqual(reverse[0],reverse.at(-1));
+    const contracting=await run(`(()=>{const animation=window.returningFade,time=animation.currentTime;animation.pause();animation.currentTime=240;
+      const opacity=getComputedStyle(window.returningHero.parentElement).opacity;animation.currentTime=time;animation.play();return opacity;})()`);
+    assert.equal(contracting,'1','The card stays solid through contraction instead of dissolving early');
     // Delay another participant so we can inspect the hero after its animation
     // finishes, before aggregate cleanup. This catches a full-header flash that
     // inspecting only the final DOM would miss.
-    await waitFor(review,"window.returningMotion.playState==='finished'",'Return animation final frame');
+    await waitFor(review,"window.returningMotion.playState==='finished'&&window.returningFade.playState==='finished'",'Return animation final frame');
     const ending=await run(`(()=>{const style=getComputedStyle(window.returningHero),card=document.querySelector('.puzzle-mode[data-mode="${mode}"]').getBoundingClientRect();
-      return {opacity:style.opacity,clip:style.clipPath,connected:window.returningHero.isConnected,card:[card.x,card.y,card.width,card.height]};})()`);
+      return {opacity:getComputedStyle(window.returningHero.parentElement).opacity,clip:style.clipPath,connected:window.returningHero.isConnected,card:[card.x,card.y,card.width,card.height]};})()`);
     assert.equal(ending.connected,true);assert.equal(ending.opacity,'0','Finished header stays invisible until removed');
     assert.equal(ending.clip,reverse.at(-1),'Finished header holds its collapsed shape');
-    await run('window.returningReveal.finish()');
+    const landing=await run(`(()=>{const hero=window.returningHero,r=hero.getBoundingClientRect(),button=document.querySelector('.puzzle-mode[data-mode="${mode}"] .puzzle-mode-button').getBoundingClientRect(),
+      clip=getComputedStyle(hero).clipPath.slice(6).split(' round')[0].split(' ').map(parseFloat);return {hero:{x:r.x,y:r.y,width:r.width,height:r.height},button:[button.x,button.y,button.width,button.height],clip};})()`);
+    const [top,right,bottom,left]=landing.clip;
+    const box=[landing.hero.x+landing.hero.width*left/100,landing.hero.y,
+      landing.hero.width*(1-(left+right)/100),landing.hero.height*(1-bottom/100)];
+    box.forEach((value,index)=>assert.ok(Math.abs(value-landing.button[index])<2,'The shrinking surface lands on the colored mode button'));
+    const contents=await run(`(()=>{const textRect=node=>{const range=document.createRange();range.selectNodeContents(node);return range.getBoundingClientRect();},
+      artRect=node=>{const r=node.getBoundingClientRect(),box=node.viewBox.baseVal,fit=Math.min(r.width/box.width,r.height/box.height);return {x:r.x+(r.width-box.width*fit)/2,y:r.y+(r.height-box.height*fit)/2,width:box.width*fit,height:box.height*fit};},
+      hero=window.returningHero,card=document.querySelector('.puzzle-mode[data-mode="${mode}"]');return [
+        [textRect(hero.querySelector('h3')),textRect(card.querySelector('.puzzle-mode-name'))],
+        [artRect(hero.querySelector('.puzzle-mode-art')),artRect(card.querySelector('.puzzle-mode-art'))]
+      ].map(pair=>pair.map(r=>[r.x,r.y,r.width,r.height]));})()`);
+    for(const [from,to] of contents)from.forEach((value,index)=>assert.ok(Math.abs(value-to[index])<2,'Title and artwork return to their original card positions'));
+    const clip=await run(`(()=>{const host=window.returningHero.closest('.learn-puzzles'),grid=host.querySelector('.puzzle-mode-grid');
+      window.returningFrames=[...window.returningHero.parentElement.getAnimations({subtree:true}),...grid.getAnimations(),...host.querySelector('.learn-puzzle-options').getAnimations()];
+      for(const animation of window.returningFrames){animation.pause();animation.currentTime=240;}
+      const r=grid.getBoundingClientRect();return {x:r.x-6,y:r.y-6,width:r.width+12,height:r.height+12,scale:1};})()`);
+    const {data}=await call('Page.captureScreenshot',{format:'png',clip},review.sessionId);
+    await fs.writeFile(path.join(out,`return-${mode}-midpoint.png`),Buffer.from(data,'base64'));
+    await run('window.returningFrames.forEach(animation=>animation.finish())');
     await run('window.previewReturning');assert.equal(await run("!!document.querySelector('.leaderboard-returning')"),false);
     const settledCard=await run(`(()=>{const r=document.querySelector('.puzzle-mode[data-mode="${mode}"]').getBoundingClientRect();return [r.x,r.y,r.width,r.height];})()`);
     settledCard.forEach((value,index)=>assert.ok(Math.abs(value-ending.card[index])<.5,'Cleanup does not shift the destination card'));

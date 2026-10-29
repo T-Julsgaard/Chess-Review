@@ -125,6 +125,7 @@ for(const mode of ['solve-puzzle','timeAttack','knockout'])test(`${mode} returns
   const frames=[];w.puzzleMotionEnabled=()=>true;
   const rect=(left,top,width,height)=>({left,right:left+width,top,bottom:top+height,width,height,x:left,y:top});
   t.mock.method(dom.window.HTMLElement.prototype,'getBoundingClientRect',function(){
+    if(this.matches('.puzzle-mode-button'))return rect(['solve-puzzle','timeAttack','knockout'].indexOf(mode)*210,100,180,158);
     if(this.matches('.puzzle-mode'))return rect(['solve-puzzle','timeAttack','knockout'].indexOf(mode)*210,100,180,254);
     if(this.matches('.leaderboard-hero'))return rect(0,100,600,164);
     if(this.matches('.puzzle-mode-grid'))return rect(0,100,600,254);return rect(0,0,600,700);
