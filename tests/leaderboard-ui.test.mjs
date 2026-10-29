@@ -24,6 +24,7 @@ test('all modes have compact leaderboard entries; screens preserve filters, use 
     assert.equal(w.page,'leaderboard');assert.equal(w.root.querySelector('.learn-leaderboard').dataset.mode,mode);
     assert.equal(w.root.querySelector('.learn-puzzle-options'),null);
     assert.equal(w.root.querySelector('.leaderboard-toolbar h3'),null);
+    assert.ok(w.root.querySelector('.leaderboard-toolbar'),'The banner-to-table gap exists without a configured service');
     assert.doesNotMatch(w.root.textContent,/Unique puzzles solved|Puzzles in 3 minutes|Puzzles without a mistake/);
     assert.equal(w.root.querySelectorAll('.puzzle-mode').length,0);
     assert.equal(dom.window.document.activeElement.id,'leaderboard-title');
