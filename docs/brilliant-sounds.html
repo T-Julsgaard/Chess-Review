@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brilliant move · Sound contenders</title>
+<style>
+  :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #101b22; color: #eef8f7; }
+  body { max-width: 720px; margin: 48px auto; padding: 0 24px 32px; }
+  .badge { color: #83ffe7; font-size: 32px; font-weight: 800; }
+  h1 { font-size: clamp(26px, 5vw, 38px); margin: 12px 0; }
+  p { color: #bdccce; line-height: 1.6; }
+  article { margin: 16px 0; padding: 20px; border: 1px solid #32454d; border-radius: 16px; background: #18272f; }
+  h2 { font-size: 18px; margin: 0; }
+  article p { margin: 8px 0 16px; }
+  audio { width: 100%; }
+  small { color: #91aaa9; font-weight: 400; white-space: nowrap; }
+</style>
+<main>
+  <span class="badge" aria-label="Brilliant">!!</span>
+  <h1>A sound for a brilliant move.</h1>
+  <p>Five original contenders. Play one at a time, at the same device volume.
+    These are audition assets; choosing one does not change the app.</p>
+  <article>
+    <h2>01 · Crystal revelation <small>1.45 s</small></h2>
+    <p>A quick, rising glass flourish with a bright final chime. Crisp and celebratory.</p>
+    <audio controls preload="none" aria-label="Crystal revelation" src="../sounds/brilliant/01-crystal-revelation.wav"></audio>
+  </article>
+  <article>
+    <h2>02 · Golden insight <small>1.10 s</small></h2>
+    <p>Three warm mallet notes with a small harmonic lift. A quieter, friendlier reward.</p>
+    <audio controls preload="none" aria-label="Golden insight" src="../sounds/brilliant/02-golden-insight.wav"></audio>
+  </article>
+  <article>
+    <h2>03 · Celestial bloom <small>1.80 s</small></h2>
+    <p>A soft, widening synth chord. The most spacious and understated option.</p>
+    <audio controls preload="none" aria-label="Celestial bloom" src="../sounds/brilliant/03-celestial-bloom.wav"></audio>
+  </article>
+  <article>
+    <h2>04 · Royal flourish <small>1.30 s</small></h2>
+    <p>A miniature rounded synth-brass fanfare. Confident, playful and more triumphant.</p>
+    <audio controls preload="none" aria-label="Royal flourish" src="../sounds/brilliant/04-royal-flourish.wav"></audio>
+  </article>
+  <article>
+    <h2>05 · Neon spark <small>0.95 s</small></h2>
+    <p>A fast, ascending digital sparkle. Compact and energetic, with an arcade flavor.</p>
+    <audio controls preload="none" aria-label="Neon spark" src="../sounds/brilliant/05-neon-spark.wav"></audio>
+  </article>
+  <p>48 kHz · Stereo · 16-bit PCM WAV · Approximate RMS matching with peak headroom.
+    Regenerate with <code>node scripts/generate-brilliant-sounds.mjs</code>.</p>
+</main>
+</html>

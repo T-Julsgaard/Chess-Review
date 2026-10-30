@@ -72,6 +72,14 @@ Distributed by Lichess (lila); high-quality vector SVGs.
   Soft Retro, and Airy Bloom.
 - **Source:** generated with ChatGPT and supplied by the maintainer for Chess Review.
 
+## Brilliant move sound contenders
+- **Files:** `sounds/brilliant/*.wav` — Crystal Revelation, Golden Insight,
+  Celestial Bloom, Royal Flourish, and Neon Spark.
+- **Source:** original deterministic synthesis for Chess Review with
+  `scripts/generate-brilliant-sounds.mjs`; no external samples.
+- **Audition:** open `docs/brilliant-sounds.html` locally to compare the five
+  candidates. They are not connected to move playback yet.
+
 ## Chess engine
 - **Files:** `engine/stockfish*.js`, `engine/stockfish*.wasm`
 - **Project:** Stockfish.js by Nathan Rugg (nmrugg), a JS/WASM port of Stockfish —
