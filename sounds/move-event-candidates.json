@@ -1,0 +1,965 @@
+{
+  "sampleRate": 48000,
+  "channels": 1,
+  "bits": 16,
+  "method": "Edits of bundled Lichess move/capture samples; no oscillators, new recordings or reverb.",
+  "sources": {
+    "move": {
+      "file": "sounds/move-self.mp3",
+      "sha256": "3dd52fa3657d876cf40194d2005eddef3364e3b65bc0c508288529ae7bde8485",
+      "decodedChannels": 1,
+      "decodedRate": 48000,
+      "duration": 0.088833,
+      "peak": 0.973033,
+      "rms": 0.089204
+    },
+    "capture": {
+      "file": "sounds/capture.mp3",
+      "sha256": "60c4c6066989a85089c68d8ea43a084044e2a2fa9b20ab786690b8e1f9e9205b",
+      "decodedChannels": 1,
+      "decodedRate": 48000,
+      "duration": 0.094667,
+      "peak": 0.956283,
+      "rms": 0.081656
+    }
+  },
+  "candidates": [
+    {
+      "event": "check",
+      "name": "01-firm-tap",
+      "family": "Single accents",
+      "description": "A firm move knock with a little capture weight.",
+      "file": "sounds/check/01-firm-tap.wav",
+      "duration": 0.083063,
+      "peak": 0.88,
+      "rms": 0.082255,
+      "max50msRms": 0.106007,
+      "sha256": "e9aad308ebb4cf0be0953a43d161d18af6be4eb122c35613897df5e0ebb50520",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.04,
+          "gain": 1
+        },
+        {
+          "source": "capture",
+          "at": 0.004,
+          "speed": 1.02,
+          "gain": 0.19
+        }
+      ],
+      "levelDb": 0.2
+    },
+    {
+      "event": "check",
+      "name": "02-bright-tap",
+      "family": "Single accents",
+      "description": "A shorter, slightly brighter knock.",
+      "file": "sounds/check/02-bright-tap.wav",
+      "duration": 0.078813,
+      "peak": 0.88,
+      "rms": 0.082217,
+      "max50msRms": 0.103218,
+      "sha256": "1d592f7329f91fdce08eeb51337ac3a3f071f92034ec95ae8491b88a52efb918",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.1,
+          "gain": 1,
+          "bright": 0.22
+        },
+        {
+          "source": "capture",
+          "at": 0.003,
+          "speed": 1.07,
+          "gain": 0.14
+        }
+      ],
+      "levelDb": 0.4
+    },
+    {
+      "event": "check",
+      "name": "03-deep-tap",
+      "family": "Single accents",
+      "description": "A lower placement with a warmer board body.",
+      "file": "sounds/check/03-deep-tap.wav",
+      "duration": 0.090917,
+      "peak": 0.88,
+      "rms": 0.083787,
+      "max50msRms": 0.112959,
+      "sha256": "b51f5c4053a25682463539ee60eb00353890743b249e0ec7cd63e9542050faed",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 0.94,
+          "gain": 0.9,
+          "body": 0.28
+        },
+        {
+          "source": "capture",
+          "at": 0.006,
+          "speed": 0.98,
+          "gain": 0.28
+        }
+      ],
+      "levelDb": -0.2
+    },
+    {
+      "event": "check",
+      "name": "04-dry-snap",
+      "family": "Single accents",
+      "description": "A compact accent with a shortened wooden tail.",
+      "file": "sounds/check/04-dry-snap.wav",
+      "duration": 0.079125,
+      "peak": 0.88,
+      "rms": 0.085505,
+      "max50msRms": 0.10756,
+      "sha256": "9eeeb9fc10ad9e1c13a399765a19c4a16f4bab991ff85eaf616980ddc2cb3159",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.07,
+          "gain": 1,
+          "decay": 4,
+          "bright": 0.16
+        },
+        {
+          "source": "capture",
+          "at": 0.002,
+          "speed": 1.08,
+          "gain": 0.26,
+          "decay": 7
+        }
+      ],
+      "levelDb": 0.5
+    },
+    {
+      "event": "check",
+      "name": "05-weighted-snap",
+      "family": "Single accents",
+      "description": "A capture-led accent, keeping the familiar move click.",
+      "file": "sounds/check/05-weighted-snap.wav",
+      "duration": 0.095438,
+      "peak": 0.738503,
+      "rms": 0.086075,
+      "max50msRms": 0.118894,
+      "sha256": "f23037022491e1ef50612559faac0e5d108aed21d45ae6880bbed97c3366f386",
+      "layers": [
+        {
+          "source": "capture",
+          "at": 0,
+          "speed": 1.06,
+          "gain": 0.7,
+          "decay": 3
+        },
+        {
+          "source": "move",
+          "at": 0.009,
+          "speed": 1.03,
+          "gain": 0.72
+        }
+      ],
+      "levelDb": 0
+    },
+    {
+      "event": "check",
+      "name": "06-tight-double",
+      "family": "Quick doubles",
+      "description": "A light knock followed 48 ms later by a firmer one.",
+      "file": "sounds/check/06-tight-double.wav",
+      "duration": 0.131313,
+      "peak": 0.88,
+      "rms": 0.070478,
+      "max50msRms": 0.106018,
+      "sha256": "fe54fdae805d2fd64499946fc279a46f10108377b05c61efbd9befc0a9d439d2",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.07,
+          "gain": 0.42
+        },
+        {
+          "source": "move",
+          "at": 0.048,
+          "speed": 1.03,
+          "gain": 1
+        }
+      ],
+      "levelDb": 0.2
+    },
+    {
+      "event": "check",
+      "name": "07-rising-double",
+      "family": "Quick doubles",
+      "description": "A low lead tap followed by a brighter warning accent.",
+      "file": "sounds/check/07-rising-double.wav",
+      "duration": 0.143438,
+      "peak": 0.88,
+      "rms": 0.067119,
+      "max50msRms": 0.102292,
+      "sha256": "60ce488b2a84bd500502ef278ae2dc670bf4b8a337d975ef7bb4507ea8c9616a",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 0.95,
+          "gain": 0.48
+        },
+        {
+          "source": "move",
+          "at": 0.065,
+          "speed": 1.1,
+          "gain": 1,
+          "bright": 0.12
+        }
+      ],
+      "levelDb": 0.4
+    },
+    {
+      "event": "check",
+      "name": "08-heavy-answer",
+      "family": "Quick doubles",
+      "description": "A soft move click answered by capture weight.",
+      "file": "sounds/check/08-heavy-answer.wav",
+      "duration": 0.146958,
+      "peak": 0.813522,
+      "rms": 0.079047,
+      "max50msRms": 0.118894,
+      "sha256": "64686b992829035959c5bf58c89e90c08cba5cf1ca3bf8da96639b1dd88b5cb2",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.03,
+          "gain": 0.5
+        },
+        {
+          "source": "capture",
+          "at": 0.057,
+          "speed": 1.06,
+          "gain": 0.78
+        },
+        {
+          "source": "move",
+          "at": 0.06,
+          "speed": 1.07,
+          "gain": 0.48
+        }
+      ],
+      "levelDb": 0
+    },
+    {
+      "event": "check",
+      "name": "09-clipped-double",
+      "family": "Quick doubles",
+      "description": "Two clipped knocks with an especially quick response.",
+      "file": "sounds/check/09-clipped-double.wav",
+      "duration": 0.117479,
+      "peak": 0.88,
+      "rms": 0.076798,
+      "max50msRms": 0.117524,
+      "sha256": "754503b97be5a31f5a548171c4e5ef012efbfad80c2fbcb04d53515a21ffac54",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.1,
+          "gain": 0.55,
+          "decay": 8
+        },
+        {
+          "source": "move",
+          "at": 0.037,
+          "speed": 1.05,
+          "gain": 1,
+          "decay": 4
+        }
+      ],
+      "levelDb": 0.5
+    },
+    {
+      "event": "check",
+      "name": "10-wide-warning",
+      "family": "Quick doubles",
+      "description": "A more separated pair, ending on a warm firm tap.",
+      "file": "sounds/check/10-wide-warning.wav",
+      "duration": 0.174083,
+      "peak": 0.88,
+      "rms": 0.063006,
+      "max50msRms": 0.112187,
+      "sha256": "d14fa49ce8d0d2315c9cd2f0b573e26a8002adcec93ffd6ea08f2f3fecc7ea0a",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.08,
+          "gain": 0.36
+        },
+        {
+          "source": "move",
+          "at": 0.087,
+          "speed": 0.97,
+          "gain": 0.95,
+          "body": 0.2
+        },
+        {
+          "source": "capture",
+          "at": 0.089,
+          "speed": 1.02,
+          "gain": 0.18
+        }
+      ],
+      "levelDb": -0.2
+    },
+    {
+      "event": "check",
+      "name": "11-snap-and-tick",
+      "family": "Trailing ticks",
+      "description": "A main knock with a small dry tick 92 ms later.",
+      "file": "sounds/check/11-snap-and-tick.wav",
+      "duration": 0.130542,
+      "peak": 0.88,
+      "rms": 0.067296,
+      "max50msRms": 0.105052,
+      "sha256": "5c532bc7262aea46a74aaaf05890e0b29b98d70deae60430440efcc66d2cc1e2",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.04,
+          "gain": 1
+        },
+        {
+          "source": "move",
+          "at": 0.092,
+          "speed": 1.12,
+          "gain": 0.26,
+          "decay": 18,
+          "bright": 0.3
+        }
+      ],
+      "levelDb": 0.2
+    },
+    {
+      "event": "check",
+      "name": "12-body-and-tick",
+      "family": "Trailing ticks",
+      "description": "A fuller board knock with a quiet high follow-through.",
+      "file": "sounds/check/12-body-and-tick.wav",
+      "duration": 0.156021,
+      "peak": 0.757352,
+      "rms": 0.068234,
+      "max50msRms": 0.117533,
+      "sha256": "a8b60fd3621d6193516f968b36876a758f3bf3993ef67d60091127897cc48ea1",
+      "layers": [
+        {
+          "source": "capture",
+          "at": 0,
+          "speed": 1.02,
+          "gain": 0.65
+        },
+        {
+          "source": "move",
+          "at": 0.002,
+          "speed": 1.02,
+          "gain": 0.75
+        },
+        {
+          "source": "move",
+          "at": 0.11,
+          "speed": 1.1,
+          "gain": 0.25,
+          "decay": 15
+        }
+      ],
+      "levelDb": -0.1
+    },
+    {
+      "event": "check",
+      "name": "13-close-tick",
+      "family": "Trailing ticks",
+      "description": "A crisp hit with a very close, light after-click.",
+      "file": "sounds/check/13-close-tick.wav",
+      "duration": 0.106563,
+      "peak": 0.88,
+      "rms": 0.073009,
+      "max50msRms": 0.10324,
+      "sha256": "0370a4830388c3268081cbda389c87cd06d7247ac1ec019c3555026eafcdde61",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.08,
+          "gain": 1,
+          "bright": 0.18
+        },
+        {
+          "source": "move",
+          "at": 0.068,
+          "speed": 1.12,
+          "gain": 0.31,
+          "decay": 16
+        }
+      ],
+      "levelDb": 0.4
+    },
+    {
+      "event": "check",
+      "name": "14-low-knock-tick",
+      "family": "Trailing ticks",
+      "description": "A low rounded knock with a brighter, softer release.",
+      "file": "sounds/check/14-low-knock-tick.wav",
+      "duration": 0.165438,
+      "peak": 0.88,
+      "rms": 0.062174,
+      "max50msRms": 0.111658,
+      "sha256": "aea0cc24c5c4708e9c2d607bef5448978ff8362e4bba7f5ee608f8a913e1c7a8",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 0.94,
+          "gain": 1,
+          "body": 0.3
+        },
+        {
+          "source": "capture",
+          "at": 0.004,
+          "speed": 0.98,
+          "gain": 0.15
+        },
+        {
+          "source": "move",
+          "at": 0.126,
+          "speed": 1.08,
+          "gain": 0.22,
+          "decay": 14
+        }
+      ],
+      "levelDb": -0.3
+    },
+    {
+      "event": "check",
+      "name": "15-capture-tick",
+      "family": "Trailing ticks",
+      "description": "A dry capture-textured accent and a short closing tick.",
+      "file": "sounds/check/15-capture-tick.wav",
+      "duration": 0.14625,
+      "peak": 0.88,
+      "rms": 0.073077,
+      "max50msRms": 0.118524,
+      "sha256": "cf3b45cc0bbc719d76733aa7d8a31ba39cc8628462a3bf5ce1ebf6cd9e6a7d1d",
+      "layers": [
+        {
+          "source": "capture",
+          "at": 0,
+          "speed": 1.09,
+          "gain": 0.8,
+          "decay": 5
+        },
+        {
+          "source": "move",
+          "at": 0.002,
+          "speed": 1.06,
+          "gain": 0.55
+        },
+        {
+          "source": "move",
+          "at": 0.1,
+          "speed": 1.13,
+          "gain": 0.3,
+          "decay": 20,
+          "bright": 0.2
+        }
+      ],
+      "levelDb": 0.2
+    },
+    {
+      "event": "castle",
+      "name": "01-classic-pair",
+      "family": "Two placements",
+      "description": "Two familiar move knocks, 100 ms apart.",
+      "file": "sounds/castle/01-classic-pair.wav",
+      "duration": 0.182667,
+      "peak": 0.88,
+      "rms": 0.073048,
+      "max50msRms": 0.105052,
+      "sha256": "845f8c91b73f3606fa0549c20c782468c513c4e6cc7f63afa8d746e7d8a33cdd",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 0.98,
+          "gain": 0.85
+        },
+        {
+          "source": "move",
+          "at": 0.1,
+          "speed": 1.04,
+          "gain": 1
+        }
+      ],
+      "levelDb": -0.4
+    },
+    {
+      "event": "castle",
+      "name": "02-quick-pair",
+      "family": "Two placements",
+      "description": "A brisk king-and-rook placement, 76 ms apart.",
+      "file": "sounds/castle/02-quick-pair.wav",
+      "duration": 0.156042,
+      "peak": 0.88,
+      "rms": 0.079359,
+      "max50msRms": 0.103107,
+      "sha256": "024e81a553d5175cc42ac0eaea91c85761ce41fc7da9b37383145049a6eb2a51",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.03,
+          "gain": 0.9
+        },
+        {
+          "source": "move",
+          "at": 0.076,
+          "speed": 1.08,
+          "gain": 1
+        }
+      ],
+      "levelDb": -0.2
+    },
+    {
+      "event": "castle",
+      "name": "03-weighted-rook",
+      "family": "Two placements",
+      "description": "A light king placement followed by a weightier rook.",
+      "file": "sounds/castle/03-weighted-rook.wav",
+      "duration": 0.202583,
+      "peak": 0.88,
+      "rms": 0.064899,
+      "max50msRms": 0.11072,
+      "sha256": "69f2a97b9835a8da268f1369d40c4838f4702a22ab527c83bdab47844e4cf2ed",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.06,
+          "gain": 0.75
+        },
+        {
+          "source": "move",
+          "at": 0.114,
+          "speed": 0.96,
+          "gain": 1,
+          "body": 0.22
+        },
+        {
+          "source": "capture",
+          "at": 0.118,
+          "speed": 1.01,
+          "gain": 0.15
+        }
+      ],
+      "levelDb": -0.5
+    },
+    {
+      "event": "castle",
+      "name": "04-soft-pair",
+      "family": "Two placements",
+      "description": "A gentler, warmer pair with slightly more space.",
+      "file": "sounds/castle/04-soft-pair.wav",
+      "duration": 0.217896,
+      "peak": 0.875475,
+      "rms": 0.07112,
+      "max50msRms": 0.105964,
+      "sha256": "a73100a5266a32d8020bc64351730b90b48fb7a0ffc4544a6ae8918220d29b1c",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 0.97,
+          "gain": 0.85,
+          "body": 0.18
+        },
+        {
+          "source": "move",
+          "at": 0.133,
+          "speed": 1.01,
+          "gain": 0.9,
+          "body": 0.15
+        }
+      ],
+      "levelDb": -1
+    },
+    {
+      "event": "castle",
+      "name": "05-long-step",
+      "family": "Two placements",
+      "description": "A distinctly separated pair with a low final placement.",
+      "file": "sounds/castle/05-long-step.wav",
+      "duration": 0.249833,
+      "peak": 0.88,
+      "rms": 0.061795,
+      "max50msRms": 0.111759,
+      "sha256": "9caa80b0bea5bdcb1ec54def510f7c12b98e4ffdc32ae2a03682acc7b0450af8",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.07,
+          "gain": 0.78
+        },
+        {
+          "source": "move",
+          "at": 0.161,
+          "speed": 0.94,
+          "gain": 1
+        },
+        {
+          "source": "capture",
+          "at": 0.164,
+          "speed": 0.98,
+          "gain": 0.16
+        }
+      ],
+      "levelDb": -0.5
+    },
+    {
+      "event": "castle",
+      "name": "06-close-lock",
+      "family": "Joined knocks",
+      "description": "A tightly joined two-piece clack, 43 ms apart.",
+      "file": "sounds/castle/06-close-lock.wav",
+      "duration": 0.124958,
+      "peak": 0.732088,
+      "rms": 0.07297,
+      "max50msRms": 0.114857,
+      "sha256": "48e689eea4b7454938b2d9259bd60138fbf6464936286aa8316940a85911f2c2",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 0.98,
+          "gain": 0.85
+        },
+        {
+          "source": "move",
+          "at": 0.043,
+          "speed": 1.05,
+          "gain": 1
+        }
+      ],
+      "levelDb": -0.3
+    },
+    {
+      "event": "castle",
+      "name": "07-capture-lock",
+      "family": "Joined knocks",
+      "description": "A move click settling into a fuller capture-textured knock.",
+      "file": "sounds/castle/07-capture-lock.wav",
+      "duration": 0.150396,
+      "peak": 0.826206,
+      "rms": 0.084106,
+      "max50msRms": 0.113543,
+      "sha256": "6ad6add6abc6ea90f86ce84d1f41b7b1b0c7de9c0778896aa4be661219ff9c62",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.06,
+          "gain": 0.72
+        },
+        {
+          "source": "capture",
+          "at": 0.057,
+          "speed": 1.04,
+          "gain": 0.6
+        },
+        {
+          "source": "move",
+          "at": 0.06,
+          "speed": 1.01,
+          "gain": 0.63
+        }
+      ],
+      "levelDb": -0.4
+    },
+    {
+      "event": "castle",
+      "name": "08-low-lock",
+      "family": "Joined knocks",
+      "description": "Two close, lower knocks with a little board resonance.",
+      "file": "sounds/castle/08-low-lock.wav",
+      "duration": 0.141146,
+      "peak": 0.88,
+      "rms": 0.090132,
+      "max50msRms": 0.108279,
+      "sha256": "2758640ea258ea6433d2207d75f2130bedc33efeefae5c31183a3dbba1d35c96",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 0.93,
+          "gain": 0.9,
+          "body": 0.25
+        },
+        {
+          "source": "move",
+          "at": 0.054,
+          "speed": 0.98,
+          "gain": 1,
+          "body": 0.15
+        }
+      ],
+      "levelDb": -0.6
+    },
+    {
+      "event": "castle",
+      "name": "09-dry-lock",
+      "family": "Joined knocks",
+      "description": "A compact dry pair with shortened tails.",
+      "file": "sounds/castle/09-dry-lock.wav",
+      "duration": 0.117208,
+      "peak": 0.753832,
+      "rms": 0.075984,
+      "max50msRms": 0.116187,
+      "sha256": "f2d789e6f92d9e8a3fe1e44d4a83429091a64183d4685268eb7455a21651b222",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.08,
+          "gain": 0.85,
+          "decay": 6
+        },
+        {
+          "source": "move",
+          "at": 0.036,
+          "speed": 1.04,
+          "gain": 1,
+          "decay": 4
+        }
+      ],
+      "levelDb": -0.2
+    },
+    {
+      "event": "castle",
+      "name": "10-reverse-weight",
+      "family": "Joined knocks",
+      "description": "A weightier first placement and a light bright answer.",
+      "file": "sounds/castle/10-reverse-weight.wav",
+      "duration": 0.145208,
+      "peak": 0.88,
+      "rms": 0.081191,
+      "max50msRms": 0.105772,
+      "sha256": "50b6a2840838d3ccafd2d386a20662c18dfb880493d4940d7b606a6de6f8bfc2",
+      "layers": [
+        {
+          "source": "capture",
+          "at": 0,
+          "speed": 1.06,
+          "gain": 0.4
+        },
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 0.98,
+          "gain": 0.85
+        },
+        {
+          "source": "move",
+          "at": 0.068,
+          "speed": 1.1,
+          "gain": 0.72,
+          "bright": 0.2
+        }
+      ],
+      "levelDb": -0.3
+    },
+    {
+      "event": "castle",
+      "name": "11-settle-pair",
+      "family": "Board settles",
+      "description": "Two placements with a quiet, low board settling underneath.",
+      "file": "sounds/castle/11-settle-pair.wav",
+      "duration": 0.193125,
+      "peak": 0.88,
+      "rms": 0.072054,
+      "max50msRms": 0.109041,
+      "sha256": "7c4a6c527bf08cfc03b9a12e078bbdfde9c99a29410daee746752731a9a7cb66",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.02,
+          "gain": 0.85
+        },
+        {
+          "source": "move",
+          "at": 0.106,
+          "speed": 0.98,
+          "gain": 1
+        },
+        {
+          "source": "capture",
+          "at": 0.077,
+          "speed": 0.96,
+          "gain": 0.18,
+          "body": 0.6,
+          "cutoff": 1500,
+          "soften": 0.015
+        }
+      ],
+      "levelDb": -0.5
+    },
+    {
+      "event": "castle",
+      "name": "12-brushed-pair",
+      "family": "Board settles",
+      "description": "A faint capture-tail brush beneath two clear move knocks.",
+      "file": "sounds/castle/12-brushed-pair.wav",
+      "duration": 0.216146,
+      "peak": 0.88,
+      "rms": 0.065018,
+      "max50msRms": 0.106066,
+      "sha256": "ef403f5a4b934ab805c646cc40fad075e4ceebeec08e7c478d8ab9115c057a09",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.05,
+          "gain": 0.8
+        },
+        {
+          "source": "capture",
+          "at": 0.045,
+          "speed": 1.02,
+          "gain": 0.19,
+          "offset": 0.023,
+          "cutoff": 3600,
+          "soften": 0.012
+        },
+        {
+          "source": "move",
+          "at": 0.132,
+          "speed": 1.02,
+          "gain": 1
+        }
+      ],
+      "levelDb": -0.5
+    },
+    {
+      "event": "castle",
+      "name": "13-compact-settle",
+      "family": "Board settles",
+      "description": "A brisk pair with a small warm resonance on the rook.",
+      "file": "sounds/castle/13-compact-settle.wav",
+      "duration": 0.168375,
+      "peak": 0.88,
+      "rms": 0.075655,
+      "max50msRms": 0.1073,
+      "sha256": "9fe9803506cea973eb4e2cd4594818b2aba2b0432b0a700b8a3e194ae783a7b9",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.07,
+          "gain": 0.85
+        },
+        {
+          "source": "move",
+          "at": 0.085,
+          "speed": 1.03,
+          "gain": 1
+        },
+        {
+          "source": "capture",
+          "at": 0.09,
+          "speed": 1.06,
+          "gain": 0.24,
+          "cutoff": 2600,
+          "soften": 0.008
+        }
+      ],
+      "levelDb": -0.4
+    },
+    {
+      "event": "castle",
+      "name": "14-deep-settle",
+      "family": "Board settles",
+      "description": "A lower, roomier pair with a subdued board tail.",
+      "file": "sounds/castle/14-deep-settle.wav",
+      "duration": 0.238396,
+      "peak": 0.87224,
+      "rms": 0.065024,
+      "max50msRms": 0.109688,
+      "sha256": "5098d2556d1e40de59ac72918541a763e1ee0c4647a9a0f0bcf1c09606c08cf4",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 0.96,
+          "gain": 0.85,
+          "body": 0.12
+        },
+        {
+          "source": "move",
+          "at": 0.148,
+          "speed": 0.94,
+          "gain": 1,
+          "body": 0.16
+        },
+        {
+          "source": "capture",
+          "at": 0.132,
+          "speed": 0.94,
+          "gain": 0.17,
+          "offset": 0.012,
+          "cutoff": 1800,
+          "soften": 0.016
+        }
+      ],
+      "levelDb": -0.7
+    },
+    {
+      "event": "castle",
+      "name": "15-firm-settle",
+      "family": "Board settles",
+      "description": "A crisp first placement and a full, decisive final clack.",
+      "file": "sounds/castle/15-firm-settle.wav",
+      "duration": 0.207542,
+      "peak": 0.88,
+      "rms": 0.069131,
+      "max50msRms": 0.11035,
+      "sha256": "8f94eed60ac87fc6e73091cdf1de7a633f88934edc49a928167bcbb95264635f",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.08,
+          "gain": 0.78,
+          "decay": 3
+        },
+        {
+          "source": "move",
+          "at": 0.118,
+          "speed": 0.99,
+          "gain": 0.9
+        },
+        {
+          "source": "capture",
+          "at": 0.121,
+          "speed": 1.04,
+          "gain": 0.35,
+          "decay": 3
+        }
+      ],
+      "levelDb": -0.3
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Check & castling · 30 sound candidates</title>
+<style>
+  :root{color-scheme:dark;font-family:system-ui,sans-serif;background:#151916;color:#f1f4ee}
+  *{box-sizing:border-box}body{max-width:1060px;margin:44px auto;padding:0 24px 60px}
+  .eyebrow{color:#acd083;letter-spacing:.13em;font-size:12px;font-weight:750;text-transform:uppercase}
+  h1{font-size:clamp(30px,5vw,46px);letter-spacing:-.035em;margin:12px 0}h2{font-size:23px;margin:0 0 12px}h3{font-size:16px;margin:0 0 7px}
+  p{color:#b9c4b6;line-height:1.6;margin:8px 0 16px}header>p{max-width:790px}.references,article,.columns{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+  .references{padding:22px;border:1px solid #44513e;background:#232c20;border-radius:16px;margin:26px 0 18px}
+  audio{width:100%;height:36px}button,a.download{font:inherit;color:#ecf5e6;background:#2b3826;border:1px solid #526349;border-radius:8px;padding:8px 12px;cursor:pointer;text-decoration:none}
+  button:hover{background:#3b4d33}nav{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 30px}nav a{color:#bddc9e;font-size:14px}
+  section{margin-top:38px;scroll-margin-top:20px}.sub{font-size:14px;margin-top:0}.columns{padding:0 20px 8px;color:#a7c58c;font-size:14px;font-weight:700}
+  article{padding:22px 20px;margin:12px 0;background:#20261f;border:1px solid #374232;border-radius:14px}article p{font-size:13px;min-height:42px;margin-bottom:12px}small{color:#91a18b;font-weight:400;font-size:12px;white-space:nowrap}footer{margin-top:36px;font-size:13px;color:#91a18b}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px}.status{font-size:13px;color:#bddc9e;min-height:21px}
+  @media(max-width:650px){body{padding:0 16px;margin-top:28px}.references,article{grid-template-columns:1fr;gap:22px}.columns{display:none}article p{min-height:0}article>div+div{border-top:1px solid #374232;padding-top:20px}h1{font-size:32px}}
+</style>
+<main><header><div class="eyebrow">Chess Review · Sound workshop</div><h1>Same board. New moves.</h1>
+<p>15 check sounds and 15 castling sounds made from our existing Lichess move and capture recordings. Three approaches, five variations each. Keep your volume fixed and compare with the originals.</p>
+<div class="references"><div><h3>Original · Move</h3><audio controls preload="none" aria-label="Original move" src="../sounds/move-self.mp3"></audio></div><div><h3>Original · Capture</h3><audio controls preload="none" aria-label="Original capture" src="../sounds/capture.mp3"></audio></div></div>
+<nav><a href="#group-1">01–05 · Direct</a><a href="#group-2">06–10 · Rhythm</a><a href="#group-3">11–15 · Detail</a><button id="stop" type="button">Stop playback</button></nav>
+<div class="status" role="status" aria-live="polite">Choose a sound, or play a group in sequence.</div></header>
+<section id="group-1"><h2>01–05 · Single accents / Two placements</h2>
+<p class="sub">Check: one stronger accent. Castling: two distinct piece placements.</p>
+<div class="actions"><button type="button" data-play="check" data-group="0">Play 5 checks</button><button type="button" data-play="castle" data-group="0">Play 5 castles</button><button type="button" data-play="compare" data-group="0">Compare with move</button></div>
+<div class="columns"><span>CHECK</span><span>CASTLING</span></div>
+<article><div><h3>01 · Firm tap <small>83 ms</small></h3><p>A firm move knock with a little capture weight.</p><audio controls preload="none" aria-label="check 01 Firm tap" src="../sounds/check/01-firm-tap.wav"></audio></div><div><h3>01 · Classic pair <small>183 ms</small></h3><p>Two familiar move knocks, 100 ms apart.</p><audio controls preload="none" aria-label="castle 01 Classic pair" src="../sounds/castle/01-classic-pair.wav"></audio></div></article>
+<article><div><h3>02 · Bright tap <small>79 ms</small></h3><p>A shorter, slightly brighter knock.</p><audio controls preload="none" aria-label="check 02 Bright tap" src="../sounds/check/02-bright-tap.wav"></audio></div><div><h3>02 · Quick pair <small>156 ms</small></h3><p>A brisk king-and-rook placement, 76 ms apart.</p><audio controls preload="none" aria-label="castle 02 Quick pair" src="../sounds/castle/02-quick-pair.wav"></audio></div></article>
+<article><div><h3>03 · Deep tap <small>91 ms</small></h3><p>A lower placement with a warmer board body.</p><audio controls preload="none" aria-label="check 03 Deep tap" src="../sounds/check/03-deep-tap.wav"></audio></div><div><h3>03 · Weighted rook <small>203 ms</small></h3><p>A light king placement followed by a weightier rook.</p><audio controls preload="none" aria-label="castle 03 Weighted rook" src="../sounds/castle/03-weighted-rook.wav"></audio></div></article>
+<article><div><h3>04 · Dry snap <small>79 ms</small></h3><p>A compact accent with a shortened wooden tail.</p><audio controls preload="none" aria-label="check 04 Dry snap" src="../sounds/check/04-dry-snap.wav"></audio></div><div><h3>04 · Soft pair <small>218 ms</small></h3><p>A gentler, warmer pair with slightly more space.</p><audio controls preload="none" aria-label="castle 04 Soft pair" src="../sounds/castle/04-soft-pair.wav"></audio></div></article>
+<article><div><h3>05 · Weighted snap <small>95 ms</small></h3><p>A capture-led accent, keeping the familiar move click.</p><audio controls preload="none" aria-label="check 05 Weighted snap" src="../sounds/check/05-weighted-snap.wav"></audio></div><div><h3>05 · Long step <small>250 ms</small></h3><p>A distinctly separated pair with a low final placement.</p><audio controls preload="none" aria-label="castle 05 Long step" src="../sounds/castle/05-long-step.wav"></audio></div></article></section>
+<section id="group-2"><h2>06–10 · Quick doubles / Joined knocks</h2>
+<p class="sub">Check: a light-to-firm warning pair. Castling: a compact joined clack.</p>
+<div class="actions"><button type="button" data-play="check" data-group="1">Play 5 checks</button><button type="button" data-play="castle" data-group="1">Play 5 castles</button><button type="button" data-play="compare" data-group="1">Compare with move</button></div>
+<div class="columns"><span>CHECK</span><span>CASTLING</span></div>
+<article><div><h3>06 · Tight double <small>131 ms</small></h3><p>A light knock followed 48 ms later by a firmer one.</p><audio controls preload="none" aria-label="check 06 Tight double" src="../sounds/check/06-tight-double.wav"></audio></div><div><h3>06 · Close lock <small>125 ms</small></h3><p>A tightly joined two-piece clack, 43 ms apart.</p><audio controls preload="none" aria-label="castle 06 Close lock" src="../sounds/castle/06-close-lock.wav"></audio></div></article>
+<article><div><h3>07 · Rising double <small>143 ms</small></h3><p>A low lead tap followed by a brighter warning accent.</p><audio controls preload="none" aria-label="check 07 Rising double" src="../sounds/check/07-rising-double.wav"></audio></div><div><h3>07 · Capture lock <small>150 ms</small></h3><p>A move click settling into a fuller capture-textured knock.</p><audio controls preload="none" aria-label="castle 07 Capture lock" src="../sounds/castle/07-capture-lock.wav"></audio></div></article>
+<article><div><h3>08 · Heavy answer <small>147 ms</small></h3><p>A soft move click answered by capture weight.</p><audio controls preload="none" aria-label="check 08 Heavy answer" src="../sounds/check/08-heavy-answer.wav"></audio></div><div><h3>08 · Low lock <small>141 ms</small></h3><p>Two close, lower knocks with a little board resonance.</p><audio controls preload="none" aria-label="castle 08 Low lock" src="../sounds/castle/08-low-lock.wav"></audio></div></article>
+<article><div><h3>09 · Clipped double <small>117 ms</small></h3><p>Two clipped knocks with an especially quick response.</p><audio controls preload="none" aria-label="check 09 Clipped double" src="../sounds/check/09-clipped-double.wav"></audio></div><div><h3>09 · Dry lock <small>117 ms</small></h3><p>A compact dry pair with shortened tails.</p><audio controls preload="none" aria-label="castle 09 Dry lock" src="../sounds/castle/09-dry-lock.wav"></audio></div></article>
+<article><div><h3>10 · Wide warning <small>174 ms</small></h3><p>A more separated pair, ending on a warm firm tap.</p><audio controls preload="none" aria-label="check 10 Wide warning" src="../sounds/check/10-wide-warning.wav"></audio></div><div><h3>10 · Reverse weight <small>145 ms</small></h3><p>A weightier first placement and a light bright answer.</p><audio controls preload="none" aria-label="castle 10 Reverse weight" src="../sounds/castle/10-reverse-weight.wav"></audio></div></article></section>
+<section id="group-3"><h2>11–15 · Trailing ticks / Board settles</h2>
+<p class="sub">Check: a main hit with a small trailing tick. Castling: two placements with a subtle board settling sound.</p>
+<div class="actions"><button type="button" data-play="check" data-group="2">Play 5 checks</button><button type="button" data-play="castle" data-group="2">Play 5 castles</button><button type="button" data-play="compare" data-group="2">Compare with move</button></div>
+<div class="columns"><span>CHECK</span><span>CASTLING</span></div>
+<article><div><h3>11 · Snap and tick <small>131 ms</small></h3><p>A main knock with a small dry tick 92 ms later.</p><audio controls preload="none" aria-label="check 11 Snap and tick" src="../sounds/check/11-snap-and-tick.wav"></audio></div><div><h3>11 · Settle pair <small>193 ms</small></h3><p>Two placements with a quiet, low board settling underneath.</p><audio controls preload="none" aria-label="castle 11 Settle pair" src="../sounds/castle/11-settle-pair.wav"></audio></div></article>
+<article><div><h3>12 · Body and tick <small>156 ms</small></h3><p>A fuller board knock with a quiet high follow-through.</p><audio controls preload="none" aria-label="check 12 Body and tick" src="../sounds/check/12-body-and-tick.wav"></audio></div><div><h3>12 · Brushed pair <small>216 ms</small></h3><p>A faint capture-tail brush beneath two clear move knocks.</p><audio controls preload="none" aria-label="castle 12 Brushed pair" src="../sounds/castle/12-brushed-pair.wav"></audio></div></article>
+<article><div><h3>13 · Close tick <small>107 ms</small></h3><p>A crisp hit with a very close, light after-click.</p><audio controls preload="none" aria-label="check 13 Close tick" src="../sounds/check/13-close-tick.wav"></audio></div><div><h3>13 · Compact settle <small>168 ms</small></h3><p>A brisk pair with a small warm resonance on the rook.</p><audio controls preload="none" aria-label="castle 13 Compact settle" src="../sounds/castle/13-compact-settle.wav"></audio></div></article>
+<article><div><h3>14 · Low knock tick <small>165 ms</small></h3><p>A low rounded knock with a brighter, softer release.</p><audio controls preload="none" aria-label="check 14 Low knock tick" src="../sounds/check/14-low-knock-tick.wav"></audio></div><div><h3>14 · Deep settle <small>238 ms</small></h3><p>A lower, roomier pair with a subdued board tail.</p><audio controls preload="none" aria-label="castle 14 Deep settle" src="../sounds/castle/14-deep-settle.wav"></audio></div></article>
+<article><div><h3>15 · Capture tick <small>146 ms</small></h3><p>A dry capture-textured accent and a short closing tick.</p><audio controls preload="none" aria-label="check 15 Capture tick" src="../sounds/check/15-capture-tick.wav"></audio></div><div><h3>15 · Firm settle <small>208 ms</small></h3><p>A crisp first placement and a full, decisive final clack.</p><audio controls preload="none" aria-label="castle 15 Firm settle" src="../sounds/castle/15-firm-settle.wav"></audio></div></article></section>
+<footer>48 kHz · Mono · 16-bit PCM WAV · Dry, centered playback with peak headroom.<br>These candidates are for listening; the app’s sound selection is unchanged. The existing check/castling MP3s are copies of the move recording.</footer>
+</main>
+<script>
+  const audios = [...document.querySelectorAll('audio')], status = document.querySelector('.status');
+  let generation = 0, queued = false;
+  function stop() { generation++; queued = false; audios.forEach(audio => { audio.pause(); audio.currentTime = 0; }); }
+  audios.forEach(audio => {
+    audio.addEventListener('play', () => {
+      if (!queued) generation++;
+      audios.forEach(other => { if (other !== audio) { other.pause(); other.currentTime = 0; } });
+      status.textContent = 'Playing · ' + audio.getAttribute('aria-label');
+    });
+    audio.addEventListener('error', () => { status.textContent = 'Could not load ' + audio.getAttribute('aria-label'); });
+  });
+  document.querySelector('#stop').onclick = () => { stop(); status.textContent = 'Playback stopped.'; };
+  document.querySelectorAll('[data-play]').forEach(button => button.onclick = async () => {
+    stop(); const token = generation, group = Number(button.dataset.group), mode = button.dataset.play;
+    const rows = [...document.querySelectorAll('article')].slice(group * 5, group * 5 + 5);
+    const list = mode === 'compare' ? rows.flatMap(row => [audios[0], ...row.querySelectorAll('audio')])
+      : rows.map(row => row.querySelectorAll('audio')[mode === 'check' ? 0 : 1]);
+    for (const audio of list) {
+      if (token !== generation) return;
+      queued = true;
+      try { await audio.play(); } catch {
+        if (token !== generation) return;
+        queued = false; status.textContent = 'Press a sound’s play button to start playback.'; return;
+      }
+      if (token !== generation) return;
+      queued = false;
+      const end = performance.now() + (audio.duration || .6) * 1000 + 650;
+      while (performance.now() < end) { if (token !== generation) return; await new Promise(resolve => setTimeout(resolve, 50)); }
+    }
+    if (token === generation) status.textContent = 'Group finished.';
+  });
+</script></html>

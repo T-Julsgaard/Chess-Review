@@ -51,6 +51,20 @@ Distributed by Lichess (lila); high-quality vector SVGs.
   "Copyright 2000, Sounddogs.com" (commercial royalty-free library, as redistributed
   by Lichess). Retained here for transparency.
 
+## Check and castling sound contenders
+- **Files:** `sounds/check/*.wav` and `sounds/castle/*.wav` — 15 candidates per event.
+- **Source:** edited derivatives of the bundled Lichess `move-self.mp3` and
+  `capture.mp3` recordings credited above; the underlying sample license applies.
+- **Processing:** modest playback-rate changes, filtering, envelope edits and
+  layered placement rhythms. No new recordings, musical tones or reverb.
+- **Reproduce:** `node scripts/generate-move-event-sounds.mjs` (requires FFmpeg on
+  `PATH` or `FFMPEG_PATH`). Add `--verify-page` for an isolated Chrome browser check
+  (`CHROME_PATH` can override the default Windows Chrome path).
+- **Audition:** `docs/move-event-sounds.html` compares all 30 candidates with the
+  original move and capture recordings. App playback defaults are unchanged.
+- **Details:** `sounds/move-event-candidates.json` records the source hashes,
+  processing parameters, durations and levels for each generated file.
+
 ## Incorrect puzzle sounds
 - **File:** `sounds/Wrong/Incorrect.mp3` — Try Again (display name).
 - **Source:** [Pixabay](https://pixabay.com/sound-effects/) — used under the
