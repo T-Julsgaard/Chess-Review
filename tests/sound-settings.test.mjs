@@ -48,12 +48,12 @@ test('generated incorrect cues are distinct playable PCM with headroom and silen
   assert.equal(seen.size, 3);
 });
 
-test('all six event volume sliders save independently, preview at their level and reset with countdown volume', async t => {
+test('all event volume sliders save independently, preview at their level and reset with countdown volume', async t => {
   const a = app(t), played = [];
   a.replace('triggerAudio', (...args) => played.push(args));
   a.call('buildUI');a.call('toggleSettings');
   const doc = a.dom.window.document;
-  const events = ['puzzleSuccess', 'puzzleIncorrect', 'move', 'capture', 'check', 'castle', 'runStart'];
+  const events = ['puzzleSuccess', 'puzzleIncorrect', 'move', 'capture', 'check', 'castle', 'brilliant', 'runStart'];
   for (const [i, event] of events.entries()) {
     const slider = doc.querySelector(`[data-sound-event="${event}"] input[type=range]`);
     assert.ok(slider.getAttribute('aria-label').includes('volume'));
@@ -69,6 +69,54 @@ test('all six event volume sliders save independently, preview at their level an
   for (const [i, event] of events.entries()) assert.equal(a.call('fxConfig', event).volume, 20 + i * 10);
   await a.call('resetSettingKeys', a.run('VISUAL_SETTING_KEYS'));
   for (const event of events) assert.equal(a.call('fxConfig', event).volume, 100);
+});
+
+test('all 30 move-event variants and 10 brilliant cues can be selected, saved and previewed', async t => {
+  const a = app(t), played = [];
+  a.replace('triggerAudio', (...args) => played.push(args));
+  a.call('buildUI');a.call('toggleSettings');
+  const doc = a.dom.window.document;
+  for (const [event, expected] of [['check', 15], ['castle', 15], ['brilliant', 10]]) {
+    const choices = a.run(`EVENT_SOUNDS.${event}`);
+    assert.equal(choices.length, expected);
+    const controls = () => doc.querySelector(`[data-sound-event="${event}"]`);
+    const options = () => [...controls().querySelectorAll('.lib-dd-opt')];
+    for (const [id, label, file] of choices) {
+      assert.ok(readFileSync(new URL('../' + file, import.meta.url)).length > 44);
+      options().find(option => option.textContent === label).click();
+      await settle();await a.run('_settingsWriteQueue');await settle();
+      assert.equal(a.store.settings.soundFx[event].snd, id);
+      assert.equal(played.at(-1)[0], 'https://extension.test/' + file);
+      assert.equal(controls().querySelector('.lib-dd-cur').textContent, label);
+    }
+    // Persisted tuning survives a sound change, including a legacy shared FX.
+    await a.call('setFx', event, 'pitch', -2);
+    await a.call('setFx', event, 'speed', 1.2);
+    await a.call('setFx', event, 'volume', 35);
+    options().find(option => option.textContent === 'Sound 02').click();
+    await settle();await a.run('_settingsWriteQueue');await settle();
+    assert.deepEqual(played.at(-1), ['https://extension.test/sounds/fx/chess_sound_02.wav', -2, 1.2, .35]);
+    options().find(option => option.textContent === 'Off').click();
+    await settle();await a.run('_settingsWriteQueue');await settle();
+    const count = played.length;
+    a.call('triggerFx', event);
+    controls().querySelector('input').dispatchEvent(new a.dom.window.Event('change'));
+    assert.equal(played.length, count);
+    assert.equal(a.store.settings.soundFx[event].snd, 'none');
+  }
+  // Reopen settings from saved data, then restore defaults through the real reset.
+  a.state.settings.soundFx = structuredClone(a.store.settings.soundFx);
+  a.call('renderSettings');
+  for (const event of ['check', 'castle', 'brilliant']) {
+    assert.equal(doc.querySelector(`[data-sound-event="${event}"] .lib-dd-cur`).textContent, 'Off');
+  }
+  await a.call('resetSettingKeys', a.run('VISUAL_SETTING_KEYS'));
+  for (const [event, file] of [['check', 'Check.mp3'], ['castle', 'Castling.mp3'], ['brilliant', 'brilliant/01-crystal-revelation.wav']]) {
+    assert.equal(a.call('fxConfig', event).snd, 'default');
+    assert.equal(a.call('fxUrl', event), 'https://extension.test/sounds/' + file);
+    a.state.settings.soundFx[event] = {snd: 'missing-cue'};
+    assert.equal(a.call('fxUrl', event), 'https://extension.test/sounds/' + file);
+  }
 });
 
 test('playback multiplies event and master levels, preserves Soft Retro calibration and mutes events independently', async t => {

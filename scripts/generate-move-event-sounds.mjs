@@ -299,7 +299,7 @@ ${groups.map((group, index) => `<section id="group-${index + 1}"><h2>${String(in
 <div class="actions"><button type="button" data-play="check" data-group="${index}">Play 5 checks</button><button type="button" data-play="castle" data-group="${index}">Play 5 castles</button><button type="button" data-play="compare" data-group="${index}">Compare with move</button></div>
 <div class="columns"><span>CHECK</span><span>CASTLING</span></div>
 ${checks.slice(index * 5, index * 5 + 5).map((cue, i) => `<article>${player(cue)}${player(castles[index * 5 + i])}</article>`).join('\n')}</section>`).join('\n')}
-<footer>48 kHz · Mono · 16-bit PCM WAV · Dry, centered playback with peak headroom.<br>These candidates are for listening; the app’s sound selection is unchanged. The existing check/castling MP3s are copies of the move recording.</footer>
+<footer>48 kHz · Mono · 16-bit PCM WAV · Dry, centered playback with peak headroom.<br>Choose your preferred check and castling sounds in the app’s Sound settings. The existing check/castling MP3s are copies of the move recording.</footer>
 </main>
 <script>
   const audios = [...document.querySelectorAll('audio')], status = document.querySelector('.status');

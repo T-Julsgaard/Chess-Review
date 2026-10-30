@@ -343,13 +343,14 @@ const DEFAULT_SETTINGS = {
   puzzleIncorrectSound: "default",
   // Custom board colours (used when boardTheme === "custom" — the colour-picker chip, shown first).
   boardCustomLight: "#f9f9f9", boardCustomDark: "#e1a652",
-  // Per-event sound mapping + knobs (see FX_SOUNDS / SOUND_EVENTS). snd = an FX_SOUNDS id or "default"
-  // (the original cue); pitch in semitones; speed is a duration multiplier (1 = unchanged), volume 0–100.
+  // Per-event sound mapping + knobs (see FX_SOUNDS / EVENT_SOUNDS / SOUND_EVENTS).
+  // snd is a choice id, "default" or "none"; pitch in semitones; speed multiplier; volume 0–100.
   soundFx: {
     move:    { snd: "default", pitch: 0, speed: 1, volume: 100 },
     capture: { snd: "default", pitch: 0, speed: 1, volume: 100 },
     check:   { snd: "default", pitch: 0, speed: 1, volume: 100 },
     castle:  { snd: "default", pitch: 0, speed: 1, volume: 100 },
+    brilliant: { snd: "default", pitch: 0, speed: 1, volume: 100 },
     puzzleSuccess: { pitch: 0, speed: 1, volume: 100 },
     puzzleIncorrect: { pitch: 0, speed: 1, volume: 100 },
     runStart: { volume: 100 },
@@ -551,9 +552,8 @@ function shareGame(ev) {
 
 /* ---------------- Sound ---------------- */
 const _url = (p) => (browserAPI?.runtime?.getURL ? browserAPI.runtime.getURL(p) : p);
-// The 9 base effects (test bank under sounds/fx). [id, label, file]. Each board event picks one of
-// these (or the extension's original cue) and shapes it live with pitch + speed knobs — so the old
-// sped-up duplicate files are gone: one source per sound, tuned per event. See SOUND_EVENTS / fxConfig.
+// Shared effects remain available alongside each event's dedicated candidates.
+// [id, label, file]; pitch, speed and volume are applied live to the chosen source.
 const FX_SOUNDS = [
   ["01", "Sound 01", "sounds/fx/chess_sound_01.wav"],
   ["02", "Sound 02", "sounds/fx/chess_sound_02.wav"],
@@ -565,6 +565,27 @@ const FX_SOUNDS = [
   ["08", "Sound 08", "sounds/fx/chess_sound_08.wav"],
   ["09", "Sound 09", "sounds/fx/chess_sound_09.wav"],
 ];
+const EVENT_SOUND_FILES = {
+  check: [
+    "01-firm-tap", "02-bright-tap", "03-deep-tap", "04-dry-snap", "05-weighted-snap",
+    "06-tight-double", "07-rising-double", "08-heavy-answer", "09-clipped-double", "10-wide-warning",
+    "11-snap-and-tick", "12-body-and-tick", "13-close-tick", "14-low-knock-tick", "15-capture-tick",
+  ],
+  castle: [
+    "01-classic-pair", "02-quick-pair", "03-weighted-rook", "04-soft-pair", "05-long-step",
+    "06-close-lock", "07-capture-lock", "08-low-lock", "09-dry-lock", "10-reverse-weight",
+    "11-settle-pair", "12-brushed-pair", "13-compact-settle", "14-deep-settle", "15-firm-settle",
+  ],
+  brilliant: [
+    "01-crystal-revelation", "02-golden-insight", "03-celestial-bloom", "04-royal-flourish", "05-neon-spark",
+    "06-harp-turn", "07-breathed-wonder", "08-silver-seal", "09-orbit-rise", "10-velvet-impact",
+  ],
+};
+const EVENT_SOUNDS = Object.fromEntries(Object.entries(EVENT_SOUND_FILES).map(([event, names]) => [event,
+  names.map((name, index) => [event === "brilliant" && index === 0 ? "default" : event + "-" + name,
+    name.slice(0, 2) + " · " + name.slice(3).split("-").map(word => word[0].toUpperCase() + word.slice(1)).join(" "),
+    `sounds/${event}/${name}.wav`]),
+]));
 const PUZZLE_SUCCESS_SOUNDS = [
   ["soft-retro", "Soft Retro", "sounds/success/04-soft-retro.wav", .25],
   ["warm-marimba", "Warm Marimba", "sounds/success/01-warm-marimba.wav"],
@@ -582,20 +603,21 @@ function puzzleSuccessChoice() {
   const id = S.settings.puzzleSuccessSound;
   return id === "none" ? null : PUZZLE_SUCCESS_SOUNDS.find(([key]) => key === id) || PUZZLE_SUCCESS_SOUNDS[0];
 }
-// Board events that get their own sound + knobs. [key, label, lichessFile]. "default" maps the event
-// to lichessFile (the stock Lichess cue, shown as "Lichess"), still pitch/speed-tunable so you can A/B it.
+// Board events with sound + knobs. [key, label, defaultFile]. Existing move events
+// retain their Lichess defaults; brilliant moves default to Crystal Revelation.
 const SOUND_EVENTS = [
   ["move", "Move", "sounds/move-self.mp3"],
   ["capture", "Capture", "sounds/capture.mp3"],
   ["check", "Check", "sounds/Check.mp3"],
   ["castle", "Castle", "sounds/Castling.mp3"],
+  ["brilliant", "Brilliant move", "sounds/brilliant/01-crystal-revelation.wav"],
 ];
-const _fxFileById = (id) => (FX_SOUNDS.find(([x]) => x === id) || [])[2] || null;
+const _fxFileById = (id, ev) => ([...(EVENT_SOUNDS[ev] || []), ...FX_SOUNDS].find(([x]) => x === id) || [])[2] || null;
 const _eventDef = (ev) => SOUND_EVENTS.find(([k]) => k === ev) || SOUND_EVENTS[0];
 // Per-event config { snd, pitch, speed, volume }, with safe fallbacks for old/missing stored settings.
 function fxConfig(ev) {
   const c = (S.settings.soundFx && S.settings.soundFx[ev]) || {};
-  let snd = c.snd === "default" || _fxFileById(c.snd) ? c.snd : "default";
+  let snd = c.snd === "default" || c.snd === "none" || _fxFileById(c.snd, ev) ? c.snd : "default";
   if (ev === "puzzleSuccess") snd = puzzleSuccessChoice()?.[0] || "none";
   if (ev === "puzzleIncorrect") {
     const id = S.settings.puzzleIncorrectSound;
@@ -626,7 +648,7 @@ function fxUrl(ev) {
   if (ev === "puzzleSuccess") return _url(puzzleSuccessChoice()[2]);
   if (ev === "puzzleIncorrect") return _url(PUZZLE_INCORRECT_SOUNDS.find(([id]) => id === cfg.snd)[2]);
   if (cfg.snd === "default") return _url(_eventDef(ev)[2]);
-  return _url(_fxFileById(cfg.snd) || _eventDef(ev)[2]);
+  return _url(_fxFileById(cfg.snd, ev) || _eventDef(ev)[2]);
 }
 // Master volume (0–1) for every sound the extension plays — driven by the "Volume" slider.
 function masterVol() {
@@ -757,10 +779,12 @@ function sanSound(san) {
   if (/^[O0]-[O0]/.test(san)) return "castle";
   return "move";
 }
-// Play the move sound for the position you land on (capture/check/castle/move, from its SAN).
-function playMoveSound(ply) {
+// A known brilliant move overrides its SAN cue on forward navigation. Off restores
+// the usual move/capture/check/castle sound; undoing a move never celebrates it.
+function playMoveSound(ply, forward = true) {
   if (!S.settings.sound || ply < 1 || !S.positions[ply]) return;
-  playEvent(sanSound(S.positions[ply].san));
+  const brilliant = forward && !S.practice && S.classif[ply] === "brilliant" && fxConfig("brilliant").snd !== "none";
+  playEvent(brilliant ? "brilliant" : sanSound(S.positions[ply].san));
 }
 // Puzzles and practice share the selected incorrect-puzzle effect and tuning.
 function playWrongSound() {
@@ -6357,6 +6381,7 @@ function visualSettings() {
       fxEventControls("puzzleSuccess", "Puzzle success"),
       fxEventControls("puzzleIncorrect", "Incorrect puzzle"),
       ...SOUND_EVENTS.map(([key, label]) => fxEventControls(key, label)),
+      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Brilliant move plays when you navigate forward to a move classified as brilliant. Off uses its usual move sound.")),
       el("div", { class: "set-fx", "data-sound-event": "runStart" },
         fxSlider("runStart", "volume", "Puzzle intro volume", 0, 100, 1, (v) => v + " %")),
     ),
@@ -6411,17 +6436,33 @@ function coachPicker() {
 // the sliders save + preview live without a rebuild (so the drag isn't interrupted).
 function fxEventControls(ev, label) {
   const cfg = fxConfig(ev);
-  let opts = [["default", "Lichess"], ...FX_SOUNDS.map(([id, l]) => [id, l])];
+  const dedicated = EVENT_SOUNDS[ev] || [];
+  let opts = [["default", ev === "brilliant" ? dedicated[0][1] : "Lichess"],
+    ...dedicated.filter(([id]) => id !== "default").map(([id, label]) => [id, label]),
+    ...FX_SOUNDS.map(([id, label]) => [id, label]), ["none", "Off"]];
   if (ev === "puzzleSuccess") opts = [...PUZZLE_SUCCESS_SOUNDS.map(([id, label]) => [id, label]), ["none", "Off"]];
   else if (ev === "puzzleIncorrect") opts = [...PUZZLE_INCORRECT_SOUNDS.map(([id, label]) => [id, label]), ["none", "Off"]];
   const cls = ev === "puzzleSuccess" ? " set-puzzle-success" : ev === "puzzleIncorrect" ? " set-puzzle-incorrect" : "";
+  const dropdown = ddField(cfg.snd, opts, async (value) => {
+    await setFx(ev, "snd", value);
+    triggerFx(ev);
+    if (UI.settings && !UI.settings.hidden) {
+      renderSettings();
+      UI.settings.querySelector(`[data-sound-event="${ev}"] .lib-dd-btn`)?.focus({preventScroll: true});
+    }
+  });
+  dropdown.classList.add("set-dropdown");
+  const button = dropdown.querySelector(".lib-dd-btn"), menu = dropdown.querySelector(".lib-dd-menu");
+  button.setAttribute("aria-label", label + " sound");
+  button.setAttribute("aria-haspopup", "listbox");
+  menu.setAttribute("role", "listbox");
+  menu.setAttribute("aria-label", label + " sound");
+  menu.querySelectorAll(".lib-dd-opt").forEach((option, index) => {
+    option.setAttribute("role", "option");
+    option.setAttribute("aria-selected", String(opts[index][0] === cfg.snd));
+  });
   return el("div", { class: "set-fx" + cls, "data-sound-event": ev },
-    el("div", { class: "set-row" }, el("span", { class: "set-lbl" }, label),
-      ddField(cfg.snd, opts, async (v) => {
-        await setFx(ev, "snd", v);
-        triggerFx(ev);
-        if (UI.settings && !UI.settings.hidden) renderSettings();
-      })),
+    el("div", { class: "set-row" }, el("span", { class: "set-lbl" }, label), dropdown),
     fxSlider(ev, "volume", "Volume", 0, 100, 1, (v) => v + " %"),
     fxSlider(ev, "pitch", "Pitch", -12, 12, 1, (v) => (v > 0 ? "+" : "") + v + " st"),
     fxSlider(ev, "speed", "Speed", 0.5, 2, 0.05, (v) => (+v).toFixed(2) + "×"),
@@ -7668,7 +7709,7 @@ function go(to) {
   // stepping BACK = the move being UNDONE (the one that left `prev`). Keying both on idx made
   // stepping back onto a quiet move play the capture sound of whatever move had created that
   // position (e.g. back off g5 onto fxe5 buzzed a capture though only a pawn slid back).
-  if (S.idx !== prev) { S.userArrows = []; S.userMarks = []; S.selectedSq = null; playMoveSound(S.idx > prev ? S.idx : prev); }
+  if (S.idx !== prev) { S.userArrows = []; S.userMarks = []; S.selectedSq = null; playMoveSound(S.idx > prev ? S.idx : prev, S.idx > prev); }
   paintBoard();
   // Smooth animation on single-step navigation (forward OR backward) — but snap instead of sliding
   // when the user is scrubbing fast, so the board keeps up with the keys instead of lagging behind.

@@ -61,7 +61,8 @@ Distributed by Lichess (lila); high-quality vector SVGs.
   `PATH` or `FFMPEG_PATH`). Add `--verify-page` for an isolated Chrome browser check
   (`CHROME_PATH` can override the default Windows Chrome path).
 - **Audition:** `docs/move-event-sounds.html` compares all 30 candidates with the
-  original move and capture recordings. App playback defaults are unchanged.
+  original move and capture recordings. All candidates are selectable in Sound
+  settings; the existing move-event defaults are unchanged.
 - **Details:** `sounds/move-event-candidates.json` records the source hashes,
   processing parameters, durations and levels for each generated file.
 
@@ -93,7 +94,8 @@ Distributed by Lichess (lila); high-quality vector SVGs.
 - **Source:** original deterministic synthesis for Chess Review with
   `scripts/generate-brilliant-sounds.mjs`; no external samples.
 - **Audition:** open `docs/brilliant-sounds.html` locally to compare the ten
-  candidates. They are not connected to move playback yet.
+  candidates. All ten are selectable under Brilliant move in Sound settings;
+  Crystal Revelation is the default for forward navigation to brilliant moves.
 
 ## Chess engine
 - **Files:** `engine/stockfish*.js`, `engine/stockfish*.wasm`

@@ -2012,6 +2012,7 @@ button { font-family: inherit; cursor: pointer; }
 /* Per-event sound group (dropdown + pitch/speed knobs), boxed so each event reads as one unit. */
 .set-fx { display: flex; flex-direction: column; gap: 10px; padding: 10px; border: 1px solid var(--line, rgba(255,255,255,.08)); border-radius: 8px; }
 .set-fx-knob { padding-left: 4px; }
+.set-fx .lib-dd-opt { flex: none; }
 
 /* ============================================================
    Movable modules (free canvas) + loader + toast
