@@ -111,6 +111,13 @@ custom arrangements stay intact. Reduced motion or disabling Animation keeps a
 static destination outline. No extra engine searches, network services, extension
 permissions, dependencies, or changes to classifications and accuracy are needed.
 
+For just the explanation text with your usual appearance, turn on
+**Settings → General → Coach → Engine explanations**. It works with any coach,
+including No coach, and saves your choice independently of the review mode.
+Engine explanations and Special replies are alternative reply styles: turning
+either on switches the other off. Dopamine keeps engine explanations by default
+until you explicitly choose a reply style in Coach settings.
+
 ## Scoring and reproducibility
 
 Chess Review is open source and uses local Stockfish analysis with documented

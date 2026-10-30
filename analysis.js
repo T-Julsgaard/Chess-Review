@@ -332,6 +332,8 @@ const DEFAULT_SETTINGS = {
   // coachPlain toggles only the reply VOICE: false = the coach's special phrasing,
   // true = neutral "plain" commentary (the coach still appears and reacts on the board).
   coach: "old_soviet", coachPlain: true,
+  // Until explicitly chosen, preserve Dopamine's explanations and Normal's plain replies.
+  coachEngineReplies: null,
   // Start with Honeywood (persisted as "maple") and bundled Cburnett pieces.
   boardTheme: "maple", pieceStyle: "image", sound: true,
   reviewMode: "normal",
@@ -3729,9 +3731,25 @@ async function setCoach(id) {
 // reactions) stay; only the narration switches between the coach's own voice and neutral plain lines.
 async function setCoachPlain(plain) {
   S.settings.coachPlain = plain;
-  await writeSettings({ coachPlain: plain });
+  const patch = { coachPlain: plain };
+  if (!plain) { S.settings.coachEngineReplies = false; patch.coachEngineReplies = false; }
+  await writeSettings(patch);
   S.coach = plain ? null : await loadCoach(S.settings.coach);
   _ipSig = null;                                   // re-pick + re-type in the new voice
+  if (S.practice) S.practice.coachTyped = false;
+  renderReview();
+  if (UI.settings && !UI.settings.hidden) renderSettings();
+}
+
+function engineExplanationsEnabled() {
+  return S.settings.coachEngineReplies ?? (S.settings.reviewMode === "dopamine");
+}
+async function setCoachEngineReplies(enabled) {
+  S.settings.coachEngineReplies = enabled;
+  const patch = { coachEngineReplies: enabled };
+  if (enabled) { S.settings.coachPlain = true; S.coach = null; patch.coachPlain = true; }
+  await writeSettings(patch);
+  _ipSig = null;
   if (S.practice) S.practice.coachTyped = false;
   renderReview();
   if (UI.settings && !UI.settings.hidden) renderSettings();
@@ -4256,15 +4274,16 @@ function renderMoveComment() {
 
   // Pick the line once per (ply + coach): a fresh signature → choose + type; otherwise reuse the
   // shown text (so unrelated re-renders don't re-pick or re-animate, and a coach switch re-types).
-  const explanation = dopamine ? explainMove({
+  const explanation = engineExplanationsEnabled() ? explainMove({
     beforeFen: S.positions[S.idx - 1].fen, afterFen: S.positions[S.idx].fen, category: cls,
     beforeScore: S.evals[S.idx - 1], afterScore: S.evals[S.idx],
     beforePv: explanationPv(S.bests[S.idx - 1]), afterPv: explanationPv(S.bests[S.idx]),
   }) : null;
-  const sig = "m:" + S.idx + ":" + (S.settings.coach || "") + ":" + (cls || "") + ":" + (dopamine ? JSON.stringify(explanation) : "normal");
+  const sig = "m:" + S.idx + ":" + (S.settings.coach || "") + ":" + (cls || "") + ":" + (dopamine ? "dopamine:" : "normal:") + JSON.stringify(explanation);
   const fresh = sig !== _ipSig;
   if (fresh) {
     let sentence = explanation?.summary || (S.coach ? coachMoveSentence(S.idx) : null);
+    if (!dopamine && explanation?.detail) sentence += " " + explanation.detail;
     if (sentence == null) {   // legacy generic line
       sentence = (cfg && COMMENT_PHRASE[cls]) ? categoryText(COMMENT_PHRASE[cls](san)) : `${san}.`;
     }
@@ -4274,11 +4293,11 @@ function renderMoveComment() {
   body.append(txt);
   if (fresh) {
     coachReactPly(S.idx);
-    // Read the explanation immediately; the board already supplies the motion.
-    if (dopamine) { clearTimeout(_typeT); coachTalk(false); txt.textContent = _ipText; }
+    // Keep engine explanations immediately readable in either review style.
+    if (dopamine || explanation) { clearTimeout(_typeT); coachTalk(false); txt.textContent = _ipText; }
     else typeWrite(txt, _ipText);
   } else txt.textContent = _ipText;
-  if (explanation) {
+  if (dopamine && explanation) {
     if (explanation.detail) body.append(el("p", { class: "dopamine-detail" }, explanation.detail));
     if (explanation.evaluation) body.append(el("span", { class: "dopamine-evaluation" }, "Evaluation · " + explanation.evaluation + " · White’s perspective"));
     const ply = S.idx;
@@ -6148,7 +6167,7 @@ const VISUAL_SETTING_KEYS = [
   "theme", "accent", "accentCustom", "density", "evalView", "mlStyle", "badgeStyle", "badgeScale",
   ...BADGE_SETTING_KEYS,
   "graphStyle", "barStyle", "insightFont", "showCoords", "coordSize", ...BACKGROUND_SETTING_KEYS,
-  "coach", "coachPlain", "boardTheme", "pieceStyle", "boardCustomLight", "boardCustomDark",
+  "coach", "coachPlain", "coachEngineReplies", "boardTheme", "pieceStyle", "boardCustomLight", "boardCustomDark",
   "sound", "soundVolume", "soundFx", "puzzleSuccessSound", "puzzleIncorrectSound", ...ARROW_SETTING_KEYS,
   "moveAnim", "animSpeed", "learningTransition", "reviewMode",
 ];
@@ -6209,6 +6228,7 @@ function bgControls() {
 }
 function visualSettings() {
   const canPreviewReviewEffects = !learningWorkspace && !S.practice && !S.reorganize;
+  const specialReplies = !S.settings.coachPlain && !engineExplanationsEnabled();
   const boardEntries = Object.entries(BOARD_THEMES).map(([k, [lt, dk]]) => ({
     value: k, title: BOARD_THEME_LABEL[k] || k,
     render: (chip) => chip.append(el("span", { class: "half l", style: { background: lt } }), el("span", { class: "half r", style: { background: dk } })),
@@ -6289,12 +6309,20 @@ function visualSettings() {
       el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Who appears and narrates. Choose No coach to remove the character and keep plain move commentary. Switch any time.")),
       coachPicker(),
       S.settings.coach ? el("div", { class: "set-row" },
-        setLabel("Special replies", "On = the coach narrates in their own voice. Off = neutral, plain commentary (the coach still appears and reacts on the board)."),
-        el("div", { class: "set-seg" },
-          el("button", { class: !S.settings.coachPlain ? "on" : "", onclick: () => setCoachPlain(false) }, "On"),
-          el("button", { class: S.settings.coachPlain ? "on" : "", onclick: () => setCoachPlain(true) }, "Off"),
+        setLabel("Special replies", "The coach narrates in their own voice. Turning this on switches off Engine explanations; the character still appears and reacts with either reply type."),
+        el("div", { class: "set-seg", role: "group", "aria-label": "Special replies" },
+          el("button", { type: "button", "data-setting": "coachPlain", "data-value": "false", "aria-pressed": String(specialReplies), class: specialReplies ? "on" : "", onclick: () => setCoachPlain(false) }, "On"),
+          el("button", { type: "button", "data-setting": "coachPlain", "data-value": "true", "aria-pressed": String(!specialReplies), class: !specialReplies ? "on" : "", onclick: () => setCoachPlain(true) }, "Off"),
         ),
       ) : null,
+      el("div", { class: "set-row" },
+        setLabel("Engine explanations", "Explain moves using the existing local Stockfish analysis. Works with any theme or without a coach. Turning this on switches off Special replies."),
+        el("div", { class: "set-seg", role: "group", "aria-label": "Engine explanations" },
+          ...[true, false].map(enabled => el("button", { type: "button", "data-setting": "coachEngineReplies", "data-value": String(enabled),
+            "aria-pressed": String(engineExplanationsEnabled() === enabled), class: engineExplanationsEnabled() === enabled ? "on" : "",
+            onclick: () => setCoachEngineReplies(enabled) }, enabled ? "On" : "Off")),
+        ),
+      ),
     ),
     section("Background", ...bgControls()),
     section("Insights",
