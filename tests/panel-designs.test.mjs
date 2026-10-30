@@ -61,7 +61,7 @@ test('removed panel choices migrate to supported designs on startup', async t =>
     a.store.settings = {accuracyDesign, graphDesign: 'timeline2', engineDesign: 'focus'};
     await a.start();
     assert.equal(a.store.settings.accuracyDesign, 'phases-modern');
-    assert.equal(a.store.settings.graphDesign, 'timeline');
+    assert.equal(a.store.settings.graphDesign, 'bars3');
     assert.equal(a.store.settings.engineDesign, 'original');
   }
 });

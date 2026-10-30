@@ -109,12 +109,12 @@ test('Timeline v2 badges show notable move grades, navigate directly and update 
   assert.equal(doc.querySelector('.evaluation-move-badge'),null);
 });
 
-test('retired Timeline v2 migrates to Timeline and shows honest empty states', async t => {
+test('retired Timeline v2 migrates to the default design and shows honest empty states', async t => {
   const a = app(t,{url:'https://extension.test/analysis.html?workspace=blank'}), doc = a.dom.window.document;
   a.replace('resetSettingsForRelease',async () => {});
   a.store.settings = {graphDesign:'timeline2'}; await a.start();
-  assert.equal(doc.querySelector('.evaluation-panel').dataset.design,'timeline');
-  assert.equal(a.store.settings.graphDesign,'timeline');
+  assert.equal(doc.querySelector('.evaluation-panel').dataset.design,'bars3');
+  assert.equal(a.store.settings.graphDesign,'bars3');
   assert.match(doc.querySelector('.evaluation-empty').textContent,/Load a game/);
   assert.equal(doc.querySelector('.evaluation-move-badge'),null);
 });

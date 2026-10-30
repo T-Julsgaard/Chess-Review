@@ -6791,7 +6791,7 @@ async function applyUiSetup(value) {
     return;
   }
   cancelPanelGesture?.();
-  const patch = {uiSetup:value, uiSetupBase:value, ...setup.designs, evalView:'both', ...(value === 'modern' ? {modernEngineVersion:1,modernMovesVersion:1,modernGraphVersion:1,modernQualityVersion:1} : {})};
+  const patch = {uiSetup:value, uiSetupBase:value, ...setup.designs, evalView:'both', ...(value === 'modern' ? {modernEngineVersion:1,modernMovesVersion:1,modernGraphVersion:2,modernQualityVersion:1} : {})};
   Object.assign(S.settings, patch);
   S.originalAccuracyExpanded = false; S.qbreakExpanded = false; S.accuracyPage = 0;
   statsRefs = null; hideQTip(); overviewReveal.stop();
@@ -8189,9 +8189,11 @@ async function showReadyWorkspace() {
       if (['original', 'full'].includes(S.settings.movesDesign)) S.settings.movesDesign = 'zoom20';
       S.settings.modernMovesVersion = 1;
     }
-    if (S.settings.uiSetup === 'modern' && !S.settings.modernGraphVersion) {
-      if (S.settings.graphDesign === 'original') S.settings.graphDesign = 'bars';
-      S.settings.modernGraphVersion = 1;
+    if (S.settings.uiSetup === 'modern' && (S.settings.modernGraphVersion || 0) < 2) {
+      if (S.settings.graphDesign === 'bars' || !S.settings.modernGraphVersion && S.settings.graphDesign === 'original') {
+        S.settings.graphDesign = UI_SETUPS.modern.designs.graphDesign;
+      }
+      S.settings.modernGraphVersion = 2;
     }
     if (S.settings.uiSetup === 'modern' && !S.settings.modernQualityVersion) {
       if (S.settings.accuracyQualityDesign === 'original') S.settings.accuracyQualityDesign = 'distribution';

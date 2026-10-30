@@ -10,7 +10,7 @@ The choices are local visual preferences and survive reopening the extension.
   down, and collapsing it restores their positions.
 - **Modern** uses the supplied arrangement, including its panel content scales.
   Accuracy uses Phase report Modern, Move list uses Zoom +20%, Engine uses Minimal,
-  Evaluation uses Move bars, and the remaining tabs use Original.
+  Evaluation uses Move bars v3, and the remaining tabs use Original.
   Its unedited arrangement adapts to the available browser viewport with the same
   readable component sizes as Old, including shorter laptop windows. Learning and
   Settings keep their usable width when switching between presets. Moving or
@@ -34,7 +34,7 @@ visual preferences.
 | --- | --- | --- |
 | Engine | Original, Focus, Minimal | Original (Minimal in Modern setup) |
 | Evaluation bar | Original, Balance | Balance |
-| Evaluation | Original, Timeline, Timeline v2, Move bars, Move bars v2, Move bars v3, Move bars v4, Minimal | Timeline (Move bars in Modern setup) |
+| Evaluation | Original, Timeline, Timeline v2, Move bars, Move bars v2, Move bars v3, Move bars v4, Minimal | Move bars v3 |
 | Accuracy overview | Original, Page tabs, Dials, Reveal, Phase report, Phase report 2, Phase report Modern, Phase report Modern v2 | Phase report |
 | Accuracy move quality | Original, Distribution | Distribution |
 | Accuracy advanced | Original | Original |
@@ -190,9 +190,10 @@ along the curve. Badges show each move's numerical grade, follow the badge font
 and size preferences, and can be clicked to jump directly to that move. The
 selected move's badge has an outline. Badges remain circular when the panel is
 resized and stay inside the plot at its ends. Choose it under **Settings → Visual
-→ Tabs → Evaluation → Timeline v2**; the original Timeline stays the default.
-Move bars is the Modern setup's default. Existing Modern setups using Original
-upgrade once; other saved designs and subsequent choices are retained. It gives
+→ Tabs → Evaluation → Timeline v2**.
+Move bars v3 is the default, including in the Modern setup. Existing Modern setups
+using the former Move bars default upgrade once; legacy setups that have not yet
+migrated from Original also adopt it. Custom designs and subsequent choices are retained. Move bars gives
 every analyzed position its own column: light above zero for White, gray below
 zero for Black. Move bars v2 adds category dots at the bar tips. Move bars v3
 keeps those dots and connects the current position's bottom marker to the selected
