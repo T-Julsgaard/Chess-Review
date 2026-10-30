@@ -1,13 +1,15 @@
 import {Engine} from '../../engine/uci.js';
 import {Chess} from '../../lib/chess.js';
 import {publicMoveQuality, publicGameAccuracy, sf19MoveQuality, sf19GameAccuracy} from '../../lib/public-scoring.js';
+import {runFastPreview} from './fast-preview-browser.mjs';
 
 async function post(type, value) {
   const response = await fetch('/record', {method: 'POST', body: JSON.stringify({type, ...value})});
   if (!response.ok) throw Error('Could not retain benchmark evidence: ' + await response.text());
 }
 
-export async function runBenchmark({games, calibration, pilot = false, longGames = false}) {
+export async function runBenchmark({games, calibration, pilot = false, longGames = false, fastPreview = false}) {
+  if (fastPreview) return runFastPreview({games, calibration});
   const jobs = [];
   if (pilot) {
     for (const build of ['nnue', 'sf19lite']) jobs.push({build, depth: 16, trial: 0, cold: true, game: games[0], limit: 8});

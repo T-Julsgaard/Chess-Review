@@ -10,10 +10,10 @@ import {openResearchData} from '../research/data-policy.mjs';
 import {replayPublic} from '../tools/calibration/reproduce-public.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const args = process.argv.slice(2), pilot = args.includes('--pilot'), longGames = args.includes('--long-games');
-if (pilot && longGames) throw Error('Choose either --pilot or --long-games');
+const args = process.argv.slice(2), pilot = args.includes('--pilot'), longGames = args.includes('--long-games'), fastPreview = args.includes('--fast-preview');
+if ([pilot, longGames, fastPreview].filter(Boolean).length > 1) throw Error('Choose one benchmark scenario');
 const outIndex = args.indexOf('--out');
-if (outIndex < 0 || !args[outIndex + 1]) throw Error('Usage: node scripts/benchmark-engine-depths.mjs --out DIRECTORY [--pilot | --long-games]');
+if (outIndex < 0 || !args[outIndex + 1]) throw Error('Usage: node scripts/benchmark-engine-depths.mjs --out DIRECTORY [--pilot | --long-games | --fast-preview]');
 const out = path.resolve(args[outIndex + 1]);
 await fs.mkdir(out, {recursive: true});
 try { await fs.access(path.join(out, 'manifest.json')); throw Error('Use a new output directory; evidence is immutable'); }
@@ -21,15 +21,17 @@ catch (error) { if (error.code !== 'ENOENT') throw error; }
 const data = await openResearchData(['D001'], {purpose: 'inspect', root});
 const dataset = await data.readJson('tools/calibration/public/dataset.json.gz');
 // Same three previously exposed training games as the initial feasibility check.
-const games = longGames ? [122, 160, 208].map(plies => {
+const longCases = longGames || fastPreview ? [122, 160, 208].map(plies => {
   const game = dataset.find(game => game.split === 'train' && game.moves.length === plies);
   if (!game) throw Error('Missing approved training game of ' + plies + ' half-moves');
   return game;
-}) : ['oneIHkm8', 'aQ903hcx', 'nhuWmN0z'].map(id => {
+}) : [];
+const shortCases = !longGames ? ['oneIHkm8', 'aQ903hcx', 'nhuWmN0z'].map(id => {
   const game = dataset.find(game => game.id === id && game.split === 'train');
   if (!game) throw Error('Missing approved training game ' + id);
   return game;
-});
+}) : [];
+const games = fastPreview ? [...shortCases, ...longCases] : longGames ? longCases : shortCases;
 // Reconstruct the published coefficients from admitted frozen evidence. The
 // deployed calibration JSON is not itself an artifact in the D001 registry.
 const published = replayPublic(await data.readJson('tools/calibration/public/sf18-evidence.json.gz'),
@@ -37,19 +39,21 @@ const published = replayPublic(await data.readJson('tools/calibration/public/sf1
 const calibration = {quality: {outcome: published.outcome, choice: published.choice}};
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const inputs = ['scripts/benchmark-engine-depths.mjs', 'scripts/bench/engine-depths-browser.mjs',
+  'scripts/bench/fast-preview-browser.mjs',
   'engine/uci.js', 'engine/progress.js', 'lib/chess.js', 'lib/public-scoring.js', 'browser-compat.js',
   'engine/stockfish-nnue.js', 'engine/stockfish-nnue.wasm',
   'engine/stockfish-19-lite-single.js', 'engine/stockfish-19-lite-single.wasm'];
 const inputHashes = Object.fromEntries(await Promise.all(inputs.map(async name => [name, hash(await fs.readFile(path.join(root, name)))])));
-const manifest = {schema: 'engine-depth-benchmark-v1', startedAt: new Date().toISOString(), pilot, longGames,
+const manifest = {schema: 'engine-depth-benchmark-v1', startedAt: new Date().toISOString(), pilot, longGames, fastPreview,
   revision: execFileSync('git', ['rev-parse', 'HEAD'], {cwd: root, encoding: 'utf8'}).trim(),
   cpu: os.cpus()[0].model, logicalCpus: os.cpus().length, platform: os.platform(), runtime: process.version,
-  settings: {Hash: 16, skill: 20, multiPV: 1, workers: 1, depths: longGames ? [6, 8] : [6, 8, 16], repeats: longGames ? {6: 3, 8: 3} : {6: 3, 8: 3, 16: 1}},
+  settings: {Hash: 16, skill: 20, multiPV: 1, workers: 1, depths: fastPreview ? [8] : longGames ? [6, 8] : [6, 8, 16], repeats: fastPreview ? {8: 3} : longGames ? {6: 3, 8: 3} : {6: 3, 8: 3, 16: 1}},
   qualityModel: calibration.quality,
   notes: ['True depth-limited best/played searches at each original root with complete mainline history.',
     'SF19 depth-based accuracy uses its display formula experimentally; production SF19 scoring instead fixes 20000 nodes and Hash32.',
     'Fresh browser worker for each game/run. Startup included; fetching site games and review UI excluded.',
     'Cold mode adds explicit Clear Hash. Historical retained keys omit that extra command; the wrapper still sends ucinewgame and resets the cache.',
+    'Fast-preview scenario validates the game once and sends ucinewgame only once per fresh worker, retaining engine state. This is an experimental estimate, not calibrated review evidence.',
     'Small convenience sample, not accuracy-model validation. Depth16, when collected, is a reference, not ground truth.'],
   games: games.map(game => ({id: game.id, source: game.source, band: game.band, players: game.players,
     plies: game.moves.length, movesSha256: hash(JSON.stringify(game.moves)), role: game.split})), inputHashes, receipt: data.receipt};
@@ -112,10 +116,10 @@ try {
     if (state.result.value === 'function') { ready = true; break; } await sleep(100);
   }
   if (!ready) throw Error('Benchmark module failed to load');
-  const result = await call('Runtime.evaluate', {expression: 'runBenchmark(' + JSON.stringify({games, calibration, pilot, longGames}) + ')', awaitPromise: true, returnByValue: true}, sessionId);
+  const result = await call('Runtime.evaluate', {expression: 'runBenchmark(' + JSON.stringify({games, calibration, pilot, longGames, fastPreview}) + ')', awaitPromise: true, returnByValue: true}, sessionId);
   if (result.exceptionDetails) throw Error(JSON.stringify(result.exceptionDetails));
   const report = {...result.result.value, finishedAt: new Date().toISOString()};
-  if (report.results.length !== (pilot ? 2 : longGames ? 18 : 60) || completed.length !== report.results.length) throw Error('Incomplete run matrix');
+  if (report.results.length !== (pilot ? 2 : longGames || fastPreview ? 18 : 60) || completed.length !== report.results.length) throw Error('Incomplete run matrix');
   await fs.writeFile(path.join(out, 'results.json'), JSON.stringify(report, null, 2));
   console.log('Completed benchmark: ' + out);
 } finally { ws?.close(); chrome?.kill(); server?.close(); }
