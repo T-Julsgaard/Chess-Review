@@ -12,7 +12,7 @@ const args = process.argv.slice(2), input = path.resolve(args[args.indexOf('--in
 if (!args.includes('--input') || !args.includes('--out')) throw Error('Usage: node scripts/summarize-engine-depths.mjs --input RUN --out REPORT');
 const manifest = JSON.parse(await fs.readFile(path.join(input, 'manifest.json')));
 const results = JSON.parse(await fs.readFile(path.join(input, 'results.json')));
-assert.equal(manifest.pilot, false); assert.equal(results.results.length, manifest.longGames ? 18 : 60);
+assert.equal(manifest.pilot, false); assert.equal(results.results.length, manifest.longGames || manifest.fastPreview ? 18 : 60);
 const root = fileURLToPath(new URL('../', import.meta.url));
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 for (const [name, expected] of Object.entries(manifest.inputHashes)) {
@@ -59,6 +59,7 @@ for (const row of rows) {
 const median = values => { const sorted = [...values].sort((a, b) => a - b), mid = Math.floor(sorted.length / 2); return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2; };
 const select = (build, depth, cold = true, game) => rows.filter(row => row.build === build && row.depth === depth && row.cold === cold && (!game || row.game === game));
 const engineName = build => build === 'nnue' ? 'Stockfish 18 NNUE' : 'Stockfish 19 Lite';
+if (manifest.fastPreview) { await summarizeFastPreview(); process.exit(0); }
 if (manifest.longGames) { await summarizeLongGames(); process.exit(0); }
 const timing = [], accuracy = [], errors = [], byGame = [], singleResetErrors = [];
 for (const build of ['nnue', 'sf19lite']) {
@@ -158,6 +159,60 @@ async function summarizeLongGames() {
   report += 'These are three measured examples, not a worst-case bound or an estimate of cost per additional move. Different position complexity, legal choices and browser/machine load also affect time. The wrapper replays root histories and resets the engine for each search, so a universal linear estimate is inappropriate. Fresh workers run in the same browser process, and browser/WASM caches may be warm. Production behavior has not been changed.\n\n';
   report += 'Collection: `node scripts/benchmark-engine-depths.mjs --out NEW_DIRECTORY --long-games`. Report/replay: `node scripts/summarize-engine-depths.mjs --input NEW_DIRECTORY --out REPORT_DIRECTORY`. Source revision: `' + manifest.revision + '`.\n\n';
   report += 'See [plan](PLAN.md), [input manifest and eligibility receipt](input-manifest.json), [all run timings](runs.json), [summary](summary.json), and [compressed raw observations](observations.json.gz).\n';
+  await fs.mkdir(out, {recursive: true});
+  await fs.writeFile(path.join(out, 'input-manifest.json'), JSON.stringify(manifest, null, 2));
+  await fs.writeFile(path.join(out, 'runs.json'), JSON.stringify(results, null, 2));
+  await fs.writeFile(path.join(out, 'observations.json.gz'), gzipSync(JSON.stringify(raw), {level: 9}));
+  await fs.writeFile(path.join(out, 'summary.json'), JSON.stringify(summary, null, 2));
+  await fs.writeFile(path.join(out, 'RESULT.md'), report);
+  console.log(JSON.stringify(summary, null, 2));
+}
+
+async function summarizeFastPreview() {
+  const previousDepths = JSON.parse(await fs.readFile(path.join(root, 'docs/benchmarks/2026-10-30-engine-depths/summary.json')));
+  const previousLong = JSON.parse(await fs.readFile(path.join(root, 'docs/benchmarks/2026-10-31-long-games/summary.json')));
+  const previousLongRuns = JSON.parse(await fs.readFile(path.join(root, 'docs/benchmarks/2026-10-31-long-games/runs.json')));
+  const timing = [], scores = [];
+  for (const game of manifest.games) {
+    const samples = rows.filter(row => row.game === game.id);
+    assert.equal(samples.length, 3);
+    assert.deepEqual(samples.map(row => row.trial).sort(), [0, 1, 2]);
+    assert.ok(samples.every(row => row.fastPreview && row.depth === 8 && row.build === 'nnue'));
+    const baseline = previousDepths.byGame.find(row => row.build === 'nnue' && row.game === game.id)?.times[8]
+      ?? previousLong.timing.find(row => row.game === game.id)?.depths[8].medianMs;
+    assert.ok(Number.isFinite(baseline));
+    const values = samples.map(row => row.totalMs), medianMs = median(values);
+    timing.push({game: game.id, source: game.source, plies: game.plies, fullMoves: game.plies / 2,
+      medianMs, minMs: Math.min(...values), maxMs: Math.max(...values), baselineDepth8Ms: baseline, speedup: baseline / medianMs});
+    for (const color of ['w', 'b']) {
+      const old = previousDepths.accuracy.find(row => row.build === 'nnue' && row.game === game.id && row.color === color);
+      const depth8 = old?.scores[8] ?? median(previousLongRuns.results.filter(row => row.game === game.id && row.depth === 8).map(row => row.accuracy[color]));
+      const accuracy = median(samples.map(row => row.accuracy[color]));
+      scores.push({game: game.id, color, accuracy, previousColdDepth8: depth8, delta8: accuracy - depth8,
+        previousColdDepth16: old?.scores[16] ?? null, delta16: old ? accuracy - old.scores[16] : null});
+    }
+  }
+  const comparisons = scores.map(row => Math.abs(row.delta8));
+  const deepComparisons = scores.filter(row => row.delta16 != null).map(row => Math.abs(row.delta16));
+  const summary = {sourceRevision: manifest.revision, cpu: manifest.cpu, browser: results.userAgent,
+    startedAt: manifest.startedAt, finishedAt: results.finishedAt, verifiedRuns: rows.length,
+    verifiedHalfMoves: raw.reduce((sum, row) => sum + row.plies, 0), timing, scores,
+    meanAbsoluteDifferenceFromCold8: comparisons.reduce((a, b) => a + b, 0) / comparisons.length,
+    maxAbsoluteDifferenceFromCold8: Math.max(...comparisons),
+    meanAbsoluteDifferenceFromCold16ShortGames: deepComparisons.reduce((a, b) => a + b, 0) / deepComparisons.length,
+    maxAbsoluteDifferenceFromCold16ShortGames: Math.max(...deepComparisons)};
+  const seconds = ms => (ms / 1000).toFixed(2);
+  let report = '# Batched fast-preview prototype\n\n';
+  report += 'Real Chrome workers on **' + manifest.cpu + '**, using SF18 at depth8, Hash16, maximum skill, one worker. Three fresh-worker runs per completed game. Include complete-game validation/preparation, worker startup, searches and scoring; exclude site fetching and UI. Every move is analysed with full history and exact original-root best/played observations.\n\n';
+  report += 'The isolated prototype validates the mainline once, admits only its matching immutable root histories, and sends ucinewgame once per game. It retains search state between positions. The production scorer and website buttons are unchanged.\n\n| Game | Full moves | Previous depth8 median | Preview median | Preview range | Speedup |\n|---|---:|---:|---:|---:|---:|\n';
+  for (const row of timing) report += '| [' + row.game + '](' + row.source + ') | ' + row.fullMoves + ' | ' + seconds(row.baselineDepth8Ms) + ' s | ' + seconds(row.medianMs) + ' s | ' + seconds(row.minMs) + '–' + seconds(row.maxMs) + ' s | ' + row.speedup.toFixed(1) + '× |\n';
+  report += '\nAll ' + rows.length + ' whole-game previews (' + summary.verifiedHalfMoves + ' half-moves) passed independent legal replay and score re-aggregation. Preparation tests also reject mismatched histories and malformed/illegal moves, and verify that exact-score checks remain enabled with only one game reset.\n\n';
+  report += 'Retaining state changes search results, so this remains an **estimated accuracy preview**, not calibrated full-review evidence. Across 12 player-sides, the mean absolute difference from the ordinary cold depth8 score was **' + summary.meanAbsoluteDifferenceFromCold8.toFixed(2) + ' points**, maximum **' + summary.maxAbsoluteDifferenceFromCold8.toFixed(2) + '**. On the three short games with existing depth16 references (six player-sides), the mean difference from cold depth16 was **' + summary.meanAbsoluteDifferenceFromCold16ShortGames.toFixed(2) + ' points**, maximum **' + summary.maxAbsoluteDifferenceFromCold16ShortGames.toFixed(2) + '**. No new depth16 references were collected for the long games.\n\n';
+  report += '| Game / side | Preview accuracy | Ordinary depth8 | Difference | Depth16 reference |\n|---|---:|---:|---:|---:|\n';
+  for (const row of scores) report += '| ' + row.game + ' / ' + row.color + ' | ' + row.accuracy.toFixed(1) + ' | ' + row.previousColdDepth8.toFixed(1) + ' | ' + (row.delta8 >= 0 ? '+' : '') + row.delta8.toFixed(1) + ' | ' + (row.previousColdDepth16 == null ? 'Not collected' : row.previousColdDepth16.toFixed(1)) + ' |\n';
+  report += '\nThis is six fixed previously exposed games on one older desktop, not a universal latency guarantee or new accuracy calibration. Browser/WASM caches may be warm; background load and fetching the finished game can add time. The prototype demonstrates a feasible separate preview path. A production feature still needs post-game triggering, score-cache messaging, cancellation/deadline handling and the compact button UI. Full-review calibration and stored exact-review evidence must remain separate.\n\n';
+  report += 'Collection: `node scripts/benchmark-engine-depths.mjs --out NEW_DIRECTORY --fast-preview`. Verification/report: `node scripts/summarize-engine-depths.mjs --input NEW_DIRECTORY --out REPORT_DIRECTORY`. Source revision: `' + manifest.revision + '`.\n\n';
+  report += 'See [plan](PLAN.md), [manifest](input-manifest.json), [run timings](runs.json), [summary](summary.json) and [all raw observations](observations.json.gz). Baseline measurements come from the two earlier depth/long-game reports.\n';
   await fs.mkdir(out, {recursive: true});
   await fs.writeFile(path.join(out, 'input-manifest.json'), JSON.stringify(manifest, null, 2));
   await fs.writeFile(path.join(out, 'runs.json'), JSON.stringify(results, null, 2));

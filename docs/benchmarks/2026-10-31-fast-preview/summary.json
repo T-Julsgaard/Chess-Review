@@ -1,0 +1,191 @@
+{
+  "sourceRevision": "a57d076a75117704b24137c50680ebf4cb49028c",
+  "cpu": "Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz",
+  "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+  "startedAt": "2026-10-30T23:41:33.374Z",
+  "finishedAt": "2026-10-30T23:41:59.190Z",
+  "verifiedRuns": 18,
+  "verifiedHalfMoves": 2223,
+  "timing": [
+    {
+      "game": "oneIHkm8",
+      "source": "https://lichess.org/oneIHkm8",
+      "plies": 88,
+      "fullMoves": 44,
+      "medianMs": 1191.2999999821186,
+      "minMs": 1121.0999999940395,
+      "maxMs": 1213.3999999761581,
+      "baselineDepth8Ms": 3603.5,
+      "speedup": 3.0248468060556437
+    },
+    {
+      "game": "aQ903hcx",
+      "source": "https://lichess.org/aQ903hcx",
+      "plies": 81,
+      "fullMoves": 40.5,
+      "medianMs": 1063.199999988079,
+      "minMs": 988,
+      "maxMs": 1065.3999999761581,
+      "baselineDepth8Ms": 3551.5999999940395,
+      "speedup": 3.3404815651183797
+    },
+    {
+      "game": "nhuWmN0z",
+      "source": "https://lichess.org/nhuWmN0z",
+      "plies": 82,
+      "fullMoves": 41,
+      "medianMs": 1039.9000000059605,
+      "minMs": 871.9000000059605,
+      "maxMs": 1144.5,
+      "baselineDepth8Ms": 3204.5999999940395,
+      "speedup": 3.0816424655982995
+    },
+    {
+      "game": "qQGPXMfq",
+      "source": "https://lichess.org/qQGPXMfq",
+      "plies": 122,
+      "fullMoves": 61,
+      "medianMs": 1489.0999999940395,
+      "minMs": 1261.699999988079,
+      "maxMs": 1648.0999999940395,
+      "baselineDepth8Ms": 6224.9000000059605,
+      "speedup": 4.180310254536886
+    },
+    {
+      "game": "6Rl2Exa5",
+      "source": "https://lichess.org/6Rl2Exa5",
+      "plies": 160,
+      "fullMoves": 80,
+      "medianMs": 1583.8999999761581,
+      "minMs": 1446.800000011921,
+      "maxMs": 1717.7999999821186,
+      "baselineDepth8Ms": 7908,
+      "speedup": 4.992739440696405
+    },
+    {
+      "game": "mCGCdRKM",
+      "source": "https://lichess.org/mCGCdRKM",
+      "plies": 208,
+      "fullMoves": 104,
+      "medianMs": 1712,
+      "minMs": 1627.199999988079,
+      "maxMs": 1785.5999999940395,
+      "baselineDepth8Ms": 11298,
+      "speedup": 6.599299065420561
+    }
+  ],
+  "scores": [
+    {
+      "game": "oneIHkm8",
+      "color": "w",
+      "accuracy": 51.42331563293479,
+      "previousColdDepth8": 51.3151748775997,
+      "delta8": 0.10814075533508571,
+      "previousColdDepth16": 47.50543635147951,
+      "delta16": 3.917879281455278
+    },
+    {
+      "game": "oneIHkm8",
+      "color": "b",
+      "accuracy": 56.89372102215555,
+      "previousColdDepth8": 58.40181079011898,
+      "delta8": -1.5080897679634262,
+      "previousColdDepth16": 57.12613803511841,
+      "delta16": -0.23241701296285555
+    },
+    {
+      "game": "aQ903hcx",
+      "color": "w",
+      "accuracy": 74.61987104080029,
+      "previousColdDepth8": 72.23412271375193,
+      "delta8": 2.3857483270483613,
+      "previousColdDepth16": 75.07754433339802,
+      "delta16": -0.4576732925977325
+    },
+    {
+      "game": "aQ903hcx",
+      "color": "b",
+      "accuracy": 64.530140459655,
+      "previousColdDepth8": 67.49583451722893,
+      "delta8": -2.965694057573927,
+      "previousColdDepth16": 72.44431335598571,
+      "delta16": -7.914172896330712
+    },
+    {
+      "game": "nhuWmN0z",
+      "color": "w",
+      "accuracy": 88.70574437282528,
+      "previousColdDepth8": 89.73286568843963,
+      "delta8": -1.0271213156143517,
+      "previousColdDepth16": 88.67468408586134,
+      "delta16": 0.03106028696393537
+    },
+    {
+      "game": "nhuWmN0z",
+      "color": "b",
+      "accuracy": 92.8183892208388,
+      "previousColdDepth8": 94.52625768114777,
+      "delta8": -1.7078684603089727,
+      "previousColdDepth16": 96.21295789116255,
+      "delta16": -3.39456867032375
+    },
+    {
+      "game": "qQGPXMfq",
+      "color": "w",
+      "accuracy": 80.45539117491347,
+      "previousColdDepth8": 81.23847693615141,
+      "delta8": -0.7830857612379418,
+      "previousColdDepth16": null,
+      "delta16": null
+    },
+    {
+      "game": "qQGPXMfq",
+      "color": "b",
+      "accuracy": 83.37187018524237,
+      "previousColdDepth8": 83.81076994865604,
+      "delta8": -0.43889976341367287,
+      "previousColdDepth16": null,
+      "delta16": null
+    },
+    {
+      "game": "6Rl2Exa5",
+      "color": "w",
+      "accuracy": 76.03951263886053,
+      "previousColdDepth8": 76.69986757513972,
+      "delta8": -0.660354936279191,
+      "previousColdDepth16": null,
+      "delta16": null
+    },
+    {
+      "game": "6Rl2Exa5",
+      "color": "b",
+      "accuracy": 80.06385511266969,
+      "previousColdDepth8": 81.87744707997109,
+      "delta8": -1.8135919673014058,
+      "previousColdDepth16": null,
+      "delta16": null
+    },
+    {
+      "game": "mCGCdRKM",
+      "color": "w",
+      "accuracy": 92.70478592834114,
+      "previousColdDepth8": 92.69660818103344,
+      "delta8": 0.008177747307698269,
+      "previousColdDepth16": null,
+      "delta16": null
+    },
+    {
+      "game": "mCGCdRKM",
+      "color": "b",
+      "accuracy": 93.56979824273925,
+      "previousColdDepth8": 93.23471151601824,
+      "delta8": 0.33508672672101625,
+      "previousColdDepth16": null,
+      "delta16": null
+    }
+  ],
+  "meanAbsoluteDifferenceFromCold8": 1.1451549655087543,
+  "maxAbsoluteDifferenceFromCold8": 2.965694057573927,
+  "meanAbsoluteDifferenceFromCold16ShortGames": 2.657961906772377,
+  "maxAbsoluteDifferenceFromCold16ShortGames": 7.914172896330712
+}

@@ -1,0 +1,457 @@
+{
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+  "hardwareConcurrency": 8,
+  "results": [
+    {
+      "key": "nnue-8-preview-oneIHkm8-0",
+      "build": "nnue",
+      "depth": 8,
+      "trial": 0,
+      "cold": false,
+      "fastPreview": true,
+      "game": "oneIHkm8",
+      "identity": "Stockfish 18 Lite WASM",
+      "plies": 88,
+      "searches": 157,
+      "recoveries": 0,
+      "preparationMs": 184.30000001192093,
+      "startupMs": 505.2000000178814,
+      "searchMs": 615.8999999761581,
+      "totalMs": 1121.0999999940395,
+      "accuracy": {
+        "w": 51.42331563293479,
+        "b": 56.89372102215555
+      },
+      "decisions": {
+        "w": 44,
+        "b": 44
+      }
+    },
+    {
+      "key": "nnue-8-preview-aQ903hcx-0",
+      "build": "nnue",
+      "depth": 8,
+      "trial": 0,
+      "cold": false,
+      "fastPreview": true,
+      "game": "aQ903hcx",
+      "identity": "Stockfish 18 Lite WASM",
+      "plies": 81,
+      "searches": 147,
+      "recoveries": 0,
+      "preparationMs": 77.09999999403954,
+      "startupMs": 334.90000000596046,
+      "searchMs": 653.0999999940395,
+      "totalMs": 988,
+      "accuracy": {
+        "w": 74.61987104080029,
+        "b": 64.530140459655
+      },
+      "decisions": {
+        "w": 41,
+        "b": 40
+      }
+    },
+    {
+      "key": "nnue-8-preview-nhuWmN0z-0",
+      "build": "nnue",
+      "depth": 8,
+      "trial": 0,
+      "cold": false,
+      "fastPreview": true,
+      "game": "nhuWmN0z",
+      "identity": "Stockfish 18 Lite WASM",
+      "plies": 82,
+      "searches": 119,
+      "recoveries": 0,
+      "preparationMs": 88.2000000178814,
+      "startupMs": 344.40000000596046,
+      "searchMs": 527.4000000059605,
+      "totalMs": 871.9000000059605,
+      "accuracy": {
+        "w": 88.70574437282528,
+        "b": 92.8183892208388
+      },
+      "decisions": {
+        "w": 41,
+        "b": 41
+      }
+    },
+    {
+      "key": "nnue-8-preview-qQGPXMfq-0",
+      "build": "nnue",
+      "depth": 8,
+      "trial": 0,
+      "cold": false,
+      "fastPreview": true,
+      "game": "qQGPXMfq",
+      "identity": "Stockfish 18 Lite WASM",
+      "plies": 122,
+      "searches": 183,
+      "recoveries": 0,
+      "preparationMs": 194.40000000596046,
+      "startupMs": 616.4000000059605,
+      "searchMs": 872.6999999880791,
+      "totalMs": 1489.0999999940395,
+      "accuracy": {
+        "w": 80.45539117491347,
+        "b": 83.37187018524237
+      },
+      "decisions": {
+        "w": 59,
+        "b": 61
+      }
+    },
+    {
+      "key": "nnue-8-preview-6Rl2Exa5-0",
+      "build": "nnue",
+      "depth": 8,
+      "trial": 0,
+      "cold": false,
+      "fastPreview": true,
+      "game": "6Rl2Exa5",
+      "identity": "Stockfish 18 Lite WASM",
+      "plies": 160,
+      "searches": 269,
+      "recoveries": 0,
+      "preparationMs": 391.89999997615814,
+      "startupMs": 766.3999999761581,
+      "searchMs": 951.4000000059605,
+      "totalMs": 1717.7999999821186,
+      "accuracy": {
+        "w": 76.03951263886053,
+        "b": 80.06385511266969
+      },
+      "decisions": {
+        "w": 77,
+        "b": 80
+      }
+    },
+    {
+      "key": "nnue-8-preview-mCGCdRKM-0",
+      "build": "nnue",
+      "depth": 8,
+      "trial": 0,
+      "cold": false,
+      "fastPreview": true,
+      "game": "mCGCdRKM",
+      "identity": "Stockfish 18 Lite WASM",
+      "plies": 208,
+      "searches": 358,
+      "recoveries": 0,
+      "preparationMs": 194.5,
+      "startupMs": 498.19999998807907,
+      "searchMs": 1287.4000000059605,
+      "totalMs": 1785.5999999940395,
+      "accuracy": {
+        "w": 92.70478592834114,
+        "b": 93.56979824273925
+      },
+      "decisions": {
+        "w": 104,
+        "b": 103
+      }
+    },
+    {
+      "key": "nnue-8-preview-oneIHkm8-1",
+      "build": "nnue",
+      "depth": 8,
+      "trial": 1,
+      "cold": false,
+      "fastPreview": true,
+      "game": "oneIHkm8",
+      "identity": "Stockfish 18 Lite WASM",
+      "plies": 88,
+      "searches": 157,
+      "recoveries": 0,
+      "preparationMs": 214,
+      "startupMs": 514.5999999940395,
+      "searchMs": 698.7999999821186,
+      "totalMs": 1213.3999999761581,
+      "accuracy": {
+        "w": 51.42331563293479,
+        "b": 56.89372102215555
+      },
+      "decisions": {
+        "w": 44,
+        "b": 44
+      }
+    },
+    {
+      "key": "nnue-8-preview-aQ903hcx-1",
+      "build": "nnue",
+      "depth": 8,
+      "trial": 1,
+      "cold": false,
+      "fastPreview": true,
+      "game": "aQ903hcx",
+      "identity": "Stockfish 18 Lite WASM",
+      "plies": 81,
+      "searches": 147,
+      "recoveries": 0,
+      "preparationMs": 144.59999999403954,
+      "startupMs": 415.7999999821186,
+      "searchMs": 649.5999999940395,
+      "totalMs": 1065.3999999761581,
+      "accuracy": {
+        "w": 74.61987104080029,
+        "b": 64.530140459655
+      },
+      "decisions": {
+        "w": 41,
+        "b": 40
+      }
+    },
+    {
+      "key": "nnue-8-preview-nhuWmN0z-1",
+      "build": "nnue",
+      "depth": 8,
+      "trial": 1,
+      "cold": false,
+      "fastPreview": true,
+      "game": "nhuWmN0z",
+      "identity": "Stockfish 18 Lite WASM",
+      "plies": 82,
+      "searches": 119,
+      "recoveries": 0,
+      "preparationMs": 176.40000000596046,
+      "startupMs": 448.60000002384186,
+      "searchMs": 695.8999999761581,
+      "totalMs": 1144.5,
+      "accuracy": {
+        "w": 88.70574437282528,
+        "b": 92.8183892208388
+      },
+      "decisions": {
+        "w": 41,
+        "b": 41
+      }
+    },
+    {
+      "key": "nnue-8-preview-qQGPXMfq-1",
+      "build": "nnue",
+      "depth": 8,
+      "trial": 1,
+      "cold": false,
+      "fastPreview": true,
+      "game": "qQGPXMfq",
+      "identity": "Stockfish 18 Lite WASM",
+      "plies": 122,
+      "searches": 183,
+      "recoveries": 0,
+      "preparationMs": 297.7999999821186,
+      "startupMs": 583.1999999880791,
+      "searchMs": 1064.9000000059605,
+      "totalMs": 1648.0999999940395,
+      "accuracy": {
+        "w": 80.45539117491347,
+        "b": 83.37187018524237
+      },
+      "decisions": {
+        "w": 59,
+        "b": 61
+      }
+    },
+    {
+      "key": "nnue-8-preview-6Rl2Exa5-1",
+      "build": "nnue",
+      "depth": 8,
+      "trial": 1,
+      "cold": false,
+      "fastPreview": true,
+      "game": "6Rl2Exa5",
+      "identity": "Stockfish 18 Lite WASM",
+      "plies": 160,
+      "searches": 269,
+      "recoveries": 0,
+      "preparationMs": 315.5,
+      "startupMs": 587.5,
+      "searchMs": 996.3999999761581,
+      "totalMs": 1583.8999999761581,
+      "accuracy": {
+        "w": 76.03951263886053,
+        "b": 80.06385511266969
+      },
+      "decisions": {
+        "w": 77,
+        "b": 80
+      }
+    },
+    {
+      "key": "nnue-8-preview-mCGCdRKM-1",
+      "build": "nnue",
+      "depth": 8,
+      "trial": 1,
+      "cold": false,
+      "fastPreview": true,
+      "game": "mCGCdRKM",
+      "identity": "Stockfish 18 Lite WASM",
+      "plies": 208,
+      "searches": 358,
+      "recoveries": 0,
+      "preparationMs": 203.90000000596046,
+      "startupMs": 481.90000000596046,
+      "searchMs": 1230.0999999940395,
+      "totalMs": 1712,
+      "accuracy": {
+        "w": 92.70478592834114,
+        "b": 93.56979824273925
+      },
+      "decisions": {
+        "w": 104,
+        "b": 103
+      }
+    },
+    {
+      "key": "nnue-8-preview-oneIHkm8-2",
+      "build": "nnue",
+      "depth": 8,
+      "trial": 2,
+      "cold": false,
+      "fastPreview": true,
+      "game": "oneIHkm8",
+      "identity": "Stockfish 18 Lite WASM",
+      "plies": 88,
+      "searches": 157,
+      "recoveries": 0,
+      "preparationMs": 234.7999999821186,
+      "startupMs": 526.6999999880791,
+      "searchMs": 664.5999999940395,
+      "totalMs": 1191.2999999821186,
+      "accuracy": {
+        "w": 51.42331563293479,
+        "b": 56.89372102215555
+      },
+      "decisions": {
+        "w": 44,
+        "b": 44
+      }
+    },
+    {
+      "key": "nnue-8-preview-aQ903hcx-2",
+      "build": "nnue",
+      "depth": 8,
+      "trial": 2,
+      "cold": false,
+      "fastPreview": true,
+      "game": "aQ903hcx",
+      "identity": "Stockfish 18 Lite WASM",
+      "plies": 81,
+      "searches": 147,
+      "recoveries": 0,
+      "preparationMs": 146.59999999403954,
+      "startupMs": 415.59999999403954,
+      "searchMs": 647.5999999940395,
+      "totalMs": 1063.199999988079,
+      "accuracy": {
+        "w": 74.61987104080029,
+        "b": 64.530140459655
+      },
+      "decisions": {
+        "w": 41,
+        "b": 40
+      }
+    },
+    {
+      "key": "nnue-8-preview-nhuWmN0z-2",
+      "build": "nnue",
+      "depth": 8,
+      "trial": 2,
+      "cold": false,
+      "fastPreview": true,
+      "game": "nhuWmN0z",
+      "identity": "Stockfish 18 Lite WASM",
+      "plies": 82,
+      "searches": 119,
+      "recoveries": 0,
+      "preparationMs": 169,
+      "startupMs": 455.7999999821186,
+      "searchMs": 584.1000000238419,
+      "totalMs": 1039.9000000059605,
+      "accuracy": {
+        "w": 88.70574437282528,
+        "b": 92.8183892208388
+      },
+      "decisions": {
+        "w": 41,
+        "b": 41
+      }
+    },
+    {
+      "key": "nnue-8-preview-qQGPXMfq-2",
+      "build": "nnue",
+      "depth": 8,
+      "trial": 2,
+      "cold": false,
+      "fastPreview": true,
+      "game": "qQGPXMfq",
+      "identity": "Stockfish 18 Lite WASM",
+      "plies": 122,
+      "searches": 183,
+      "recoveries": 0,
+      "preparationMs": 258.09999999403954,
+      "startupMs": 532.2999999821186,
+      "searchMs": 729.4000000059605,
+      "totalMs": 1261.699999988079,
+      "accuracy": {
+        "w": 80.45539117491347,
+        "b": 83.37187018524237
+      },
+      "decisions": {
+        "w": 59,
+        "b": 61
+      }
+    },
+    {
+      "key": "nnue-8-preview-6Rl2Exa5-2",
+      "build": "nnue",
+      "depth": 8,
+      "trial": 2,
+      "cold": false,
+      "fastPreview": true,
+      "game": "6Rl2Exa5",
+      "identity": "Stockfish 18 Lite WASM",
+      "plies": 160,
+      "searches": 269,
+      "recoveries": 0,
+      "preparationMs": 279.5,
+      "startupMs": 551.4000000059605,
+      "searchMs": 895.3000000119209,
+      "totalMs": 1446.800000011921,
+      "accuracy": {
+        "w": 76.03951263886053,
+        "b": 80.06385511266969
+      },
+      "decisions": {
+        "w": 77,
+        "b": 80
+      }
+    },
+    {
+      "key": "nnue-8-preview-mCGCdRKM-2",
+      "build": "nnue",
+      "depth": 8,
+      "trial": 2,
+      "cold": false,
+      "fastPreview": true,
+      "game": "mCGCdRKM",
+      "identity": "Stockfish 18 Lite WASM",
+      "plies": 208,
+      "searches": 358,
+      "recoveries": 0,
+      "preparationMs": 194.40000000596046,
+      "startupMs": 464.19999998807907,
+      "searchMs": 1163,
+      "totalMs": 1627.199999988079,
+      "accuracy": {
+        "w": 92.70478592834114,
+        "b": 93.56979824273925
+      },
+      "decisions": {
+        "w": 104,
+        "b": 103
+      }
+    }
+  ],
+  "finishedAt": "2026-10-30T23:41:59.190Z"
+}
