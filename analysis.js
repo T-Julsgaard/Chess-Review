@@ -6,7 +6,8 @@
 import { Chess } from "./lib/chess.js";
 import { Engine } from "./engine/uci.js";
 import { flagCodeForCountryId, countryNameForId } from "./flags.js";
-import { BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg } from "./move-grades.js";
+import { BADGE_APPEARANCES, BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg } from "./move-grades.js";
+import { CATEGORY_SYMBOLS, CATEGORY_SYMBOL_OPTIONS, categoryBadgeSymbol, cleanBadgeSymbols } from "./lib/category-badges.js";
 import { puzzleResultBadge } from "./lib/puzzle-badge.js";
 import { matedKingSquare, mateMark } from "./lib/mate-mark.js";
 import { moveAnimationDuration, MOVE_ANIMATION_EASING } from "./lib/move-animation.js";
@@ -126,7 +127,7 @@ const ACCENTS = {
 };
 // Display names are independent of stored classification keys and scoring rules.
 // Annotation names and colors stay independent of move grades.
-// Move glyphs are rendered per ply by the shared numerical SVG renderer.
+// Move glyphs share one renderer for numerical grades and category notation.
 const QUALITY = {
   brilliant: { name: "Brilliant",  color: "var(--q-brilliant)" },
   great:     { name: "Great",      color: "var(--q-great)" },
@@ -190,7 +191,7 @@ const ENGINE_INFO = {
 // Move-specific glyphs use the shared vector renderer; summary glyphs show an
 // illustrative midpoint and expose the full category range to assistive tools.
 function gradeBadge(cls, score, className, attrs = {}, example = false) {
-  const label = gradeLabel(cls, score, categoryName(cls), example);
+  const label = gradeLabel(cls, score, categoryName(cls), example, S.settings);
   return el("span", { class: className + " grade-badge", role: "img", "aria-label": label,
     "data-grade": cls === "book" ? "book" : gradeText(score, true),
     "data-badge-category": cls, "data-score": Number.isFinite(score) ? score : "",
@@ -199,7 +200,8 @@ function gradeBadge(cls, score, className, attrs = {}, example = false) {
   });
 }
 function badgeRenderKey(cls, score, example) {
-  return JSON.stringify([cls, score, example, categoryName(cls), S.settings.badgeFont]);
+  return JSON.stringify([cls, score, example, categoryName(cls), S.settings.badgeFont,
+    categoryBadgeSymbol(cls, S.settings), S.settings.badgeAppearance]);
 }
 function activeMoveGrade() {
   return S.analysisMode ? activePos().moveGrade : S.moveGrades[S.idx];
@@ -211,7 +213,7 @@ function updateGradeBadge(node, cls, score, example = false) {
   node.dataset.grade = next;
   node.dataset.score = Number.isFinite(score) ? score : "";
   node.dataset.renderKey = key;
-  const label = gradeLabel(cls, score, categoryName(cls), example);
+  const label = gradeLabel(cls, score, categoryName(cls), example, S.settings);
   node.setAttribute("aria-label", label);
   if (node.hasAttribute("title")) node.title = label;
   node.replaceChildren(gradeBadge(cls, score, "", {}, example).firstElementChild);
@@ -220,6 +222,7 @@ function refreshBadgeAppearance() {
   if (badgeLabelStyle() === "off") hideBoardBadgeTip();
   hideQTip();
   for (const node of document.querySelectorAll(".grade-badge")) {
+    if (!Object.hasOwn(QUALITY, node.dataset.badgeCategory)) continue;
     updateGradeBadge(node, node.dataset.badgeCategory,
       node.dataset.score === "" ? null : Number(node.dataset.score), node.dataset.example === "true");
     node.removeAttribute("title");
@@ -272,6 +275,13 @@ function migrateVisualAssetSettings(settings) {
     settings.badgeTooltip = labelStyle;
     changed = true;
   }
+  const symbols = cleanBadgeSymbols(settings.badgeSymbols);
+  if (JSON.stringify(settings.badgeSymbols) !== JSON.stringify(symbols)) {
+    settings.badgeSymbols = symbols; changed = true;
+  }
+  if (!Object.hasOwn(BADGE_APPEARANCES, settings.badgeAppearance)) {
+    settings.badgeAppearance = "solid"; changed = true;
+  }
   // Upgrade the former default once; explicit selections of other fonts survive.
   // badgeDecimals identifies legacy settings and is removed below.
   if (settings.badgeFont === "original" && Object.hasOwn(settings, "badgeDecimals")) {
@@ -317,7 +327,7 @@ const DEFAULT_SETTINGS = {
   uiSetup: "custom", uiSetupBase: "", // Custom retains its starting preset for resets.
   theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
-  badgeFont: "spacemono", badgeTooltip: "off",
+  badgeFont: "spacemono", badgeTooltip: "off", badgeSymbols: {}, badgeAppearance: "solid",
   // Eval-graph look (see renderGraph), eval-BAR look (see renderEvalBar) and the Insight-panel text size (px).
   graphStyle: "area", barStyle: "gradient", insightFont: 16, nativeSizingVersion: 1,
   // Board coordinate labels (the a–h / 1–8 ticks in the squares' corners): on/off + size in px.
@@ -6203,7 +6213,7 @@ async function resetEngineSettings() {
 }
 const ARROW_SETTING_KEYS = ["bestArrow", "showThreat", "bestArrowColor", "threatArrowColor", "arrowOpacity", "arrowShaft", "arrowHead"];
 const BACKGROUND_SETTING_KEYS = ["bg", "bgFit", "bgTile", "bgCustom", "bgHue", "bgSat", "bgLight"];
-const BADGE_SETTING_KEYS = ["badgeFont", "badgeTooltip"];
+const BADGE_SETTING_KEYS = ["badgeFont", "badgeTooltip", "badgeSymbols", "badgeAppearance"];
 const VISUAL_SETTING_KEYS = [
   ...PANEL_DESIGNS.map(design => design.setting),
   "theme", "accent", "accentCustom", "density", "evalView", "mlStyle", "badgeStyle", "badgeScale",
@@ -6346,7 +6356,7 @@ function visualSettings() {
       seg("Style", "mlStyle", ["rows", "cards", "compact"]),
       seg("Badges", "badgeStyle", ["icon", "dot", "label"]),
     ),
-    section("Category badges", badgeSettings()),
+    section("Badges", badgeSettings()),
     section("Coach",
       el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Who appears and narrates. Choose No coach to remove the character and keep plain move commentary. Switch any time.")),
       coachPicker(),
@@ -6527,27 +6537,49 @@ function motorSettings() {
   );
 }
 function badgeLabelPicker() {
-  const selected = badgeLabelStyle(), styles = Object.keys(BADGE_LABEL_STYLES);
-  return el("div", { class: "badge-label-options", role: "radiogroup", "aria-label": "Hover labels" },
-    ...styles.map((id, index) => {
-      const option = BADGE_LABEL_STYLES[id];
-      return el("button", { type: "button", class: "badge-label-option" + (selected === id ? " on" : ""),
-        role: "radio", "aria-checked": String(selected === id), "aria-label": option.name + ": " + option.description,
-        tabindex: selected === id ? "0" : "-1", "data-label-style": id,
-        onclick: () => setSetting("badgeTooltip", id),
-        onkeydown: e => {
-          const direction = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
-          if (!direction && e.key !== "Home" && e.key !== "End") return;
-          e.preventDefault(); e.stopPropagation();
-          const next = styles[e.key === "Home" ? 0 : e.key === "End" ? styles.length - 1 : (index + direction + styles.length) % styles.length];
-          setSetting("badgeTooltip", next).then(() => UI.settings.querySelector(`[data-label-style="${next}"]`)?.focus());
-        },
-      },
-      el("span", { class: "badge-label-preview", "aria-hidden": "true" },
-        id === "off" ? el("span", { class: "badge-label-off" }, "—") : categoryLabelArtwork("brilliant", id)),
-      el("span", { class: "badge-label-caption" },
-        el("span", { class: "badge-label-title" }, option.name, el("span", { class: "badge-label-check", "aria-hidden": "true" }, selected === id ? "✓" : ""))));
-    }));
+  return settingDropdown("Hover labels", "badgeTooltip",
+    Object.entries(BADGE_LABEL_STYLES).map(([id, option]) => [id, option.name]));
+}
+async function setCategoryBadgeSymbol(category, symbol) {
+  if (!Object.hasOwn(CATEGORY_SYMBOL_OPTIONS, category)) return;
+  const selected = cleanBadgeSymbols({ [category]: symbol })[category];
+  const symbols = { ...S.settings.badgeSymbols };
+  if (selected === undefined) delete symbols[category];
+  else symbols[category] = selected;
+  S.settings.badgeSymbols = symbols;
+  await writeSettings({ badgeSymbols: { [category]: selected } });
+  refreshBadgeAppearance();
+  if (UI.settings && !UI.settings.hidden) renderSettings();
+}
+function categoryBadgePicker(category) {
+  const selected = categoryBadgeSymbol(category, S.settings);
+  const options = [
+    ...(category === "book" ? [] : [["numbers", "Number notation (default)"]]),
+    ...CATEGORY_SYMBOL_OPTIONS[category].map(id => [id, CATEGORY_SYMBOLS[id].name + (category === "book" && id === "book" ? " (default)" : "")]),
+  ];
+  const field = ddField(selected, options, async symbol => {
+    await setCategoryBadgeSymbol(category, symbol);
+    UI.settings.querySelector(`[data-badge-picker="${category}"]`)?.focus({ preventScroll: true });
+  }, (id, label) => el("span", { class: "badge-symbol-choice" },
+    el("span", { class: "badge-symbol-sample", "aria-hidden": "true", html: gradeSvg(category, null, categoryName(category), true,
+      { ...S.settings, badgeSymbols: { [category]: id } }) }),
+    el("span", {}, label)));
+  field.classList.add("set-dropdown", "badge-symbol-dropdown");
+  const button = field.querySelector(".lib-dd-btn"), menu = field.querySelector(".lib-dd-menu");
+  button.dataset.badgePicker = category;
+  const currentName = options.find(([id]) => id === selected)[1];
+  button.setAttribute("aria-label", categoryName(category) + " badge: " + currentName);
+  button.title = currentName;
+  button.setAttribute("aria-haspopup", "listbox");
+  menu.setAttribute("role", "listbox");
+  menu.setAttribute("aria-label", categoryName(category) + " badge symbol");
+  menu.querySelectorAll(".lib-dd-opt").forEach((option, i) => {
+    option.dataset.symbol = options[i][0];
+    option.setAttribute("role", "option");
+    option.setAttribute("aria-selected", String(options[i][0] === selected));
+  });
+  return el("div", { class: "badge-symbol-row", "data-symbol-category": category },
+    el("span", { class: "badge-symbol-name" }, categoryName(category)), field);
 }
 function badgeSettings() {
   const fonts = el("div", { class: "badge-font-options", role: "group", "aria-label": "Number font", tabindex: "0" },
@@ -6559,18 +6591,19 @@ function badgeSettings() {
       el("span", { class: "badge-font-sample", "aria-hidden": "true",
         style: { fontFamily: font.family } }, "9.0 6.4"))));
   return el("div", { class: "badge-settings" },
-    el("p", { class: "set-note" }, "Choose how move scores look across the board, move list and accuracy breakdown."),
-    el("div", { class: "badge-preview", "aria-label": "Badge preview" },
-      gradeBadge("best", 9, "badge-preview-item"), gradeBadge("good", 6.4, "badge-preview-item"),
-      gradeBadge("brilliant", 10, "badge-preview-item"), gradeBadge("blunder", 0, "badge-preview-item"),
-      gradeBadge("book", null, "badge-preview-item")),
+    seg("Badge appearance", "badgeAppearance", Object.keys(BADGE_APPEARANCES), null, value => BADGE_APPEARANCES[value]),
+    el("div", { class: "badge-preview badge-category-grid", "aria-label": "Badge preview" },
+      ...QUALITY_ORDER.map(category => el("div", { class: "badge-category-preview" },
+        gradeBadge(category, null, "badge-preview-item", {}, true),
+        el("span", {}, categoryName(category))))),
     slider("Badge size", "badgeScale", 0.7, 1.6, 0.05, {
       fmt: (v) => Math.round(v * 100) + " %",
       onChange: (v) => document.documentElement.style.setProperty("--badge-scale", v),
     }),
-    el("div", { class: "set-lbl" }, "Number font"), fonts,
-    el("p", { class: "set-note" }, "Free, open-source fonts, bundled for offline use."),
-    el("div", { class: "badge-label-heading" }, el("span", { class: "set-lbl" }, "Hover labels")),
+    el("div", { class: "badge-symbol-editor" }, ...QUALITY_ORDER.map(categoryBadgePicker)),
+    QUALITY_ORDER.some(category => categoryBadgeSymbol(category, S.settings) === "numbers") ? el("div", { class: "badge-number-settings" },
+      el("div", { class: "set-lbl" }, "Number font"), fonts,
+      el("p", { class: "set-note" }, "Free, open-source fonts, bundled for offline use.")) : null,
     badgeLabelPicker(),
     el("p", { class: "set-note" }, "Show the category for two seconds after each move."));
 }
@@ -6579,7 +6612,7 @@ function renderSettings() {
   const scroll = UI.settings.scrollTop; // keep scroll position when a setting changes
   const fontScroll = UI.settings.querySelector(".badge-font-options")?.scrollTop;
   const focusedFont = UI.settings.contains(document.activeElement) && document.activeElement.closest(".badge-font-option")?.getAttribute("data-font");
-  const focusedLabelStyle = UI.settings.contains(document.activeElement) && document.activeElement.closest(".badge-label-option")?.getAttribute("data-label-style");
+  const focusedBadgePicker = UI.settings.contains(document.activeElement) && document.activeElement.closest(".badge-symbol-dropdown")?.querySelector("[data-badge-picker]")?.dataset.badgePicker;
   const focusedSection = UI.settings.contains(document.activeElement) && document.activeElement.closest(".set-sect-head")?.querySelector("span")?.textContent;
   const activeSetting = UI.settings.contains(document.activeElement) ? document.activeElement.dataset.setting : null;
   const activeValue = document.activeElement?.dataset.value;
@@ -6596,7 +6629,7 @@ function renderSettings() {
   const fonts = UI.settings.querySelector(".badge-font-options");
   if (fonts && fontScroll != null) fonts.scrollTop = fontScroll;
   if (focusedFont) UI.settings.querySelector(`[data-font="${focusedFont}"]`)?.focus({ preventScroll: true });
-  if (focusedLabelStyle) UI.settings.querySelector(`[data-label-style="${focusedLabelStyle}"]`)?.focus({ preventScroll: true });
+  if (focusedBadgePicker) UI.settings.querySelector(`[data-badge-picker="${focusedBadgePicker}"]`)?.focus({ preventScroll: true });
   if (focusedSection) [...UI.settings.querySelectorAll(".set-sect-head")].find(head => head.querySelector("span")?.textContent === focusedSection)?.focus({ preventScroll: true });
   if (activeSetting) {
     const candidates = [...UI.settings.querySelectorAll("[data-setting]")].filter(node => node.dataset.setting === activeSetting);
@@ -6801,9 +6834,11 @@ async function setSetting(key, value) {
   const design = PANEL_DESIGNS.find(item => item.setting === key);
   if (design) value = panelDesign(design.panel, {[key]: value});
   if (key === "badgeTooltip") value = badgeLabelStyle(value);
+  if (key === "badgeAppearance") value = Object.hasOwn(BADGE_APPEARANCES, value) ? value : "solid";
+  if (key === "badgeSymbols") value = cleanBadgeSymbols(value);
   const setupPatch = design && S.settings[key] !== value ? customUiSetupPatch() : {};
   S.settings[key] = value;
-  await writeSettings({ [key]: value, ...setupPatch });
+  await writeSettings({ [key]: value, ...setupPatch }, key === "badgeSymbols" ? ["badgeSymbols"] : []);
   applySettings();
   if (key === "reviewMode") { paintBoard(); renderReview(); fitViewport(); }
   if (design?.panel.startsWith('accuracy')) { statsRefs = null; hideQTip(); renderStats(); if(key==='accuracyDesign')reflowAccuracy(accuracyLayoutExpanded()); }

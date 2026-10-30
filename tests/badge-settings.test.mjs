@@ -88,25 +88,25 @@ test('hover setting automatically shows the current move and immediately dismiss
   assert.equal(doc.querySelector('.qb').hasAttribute('title'), false);
 });
 
-test('Visual exposes Category badges with previews and hover labels off by default', t => {
+test('Visual exposes Badges with previews and hover labels off by default', t => {
   const a = review(t), doc = a.dom.window.document; a.call('toggleSettings');
   assert.equal(doc.querySelector('.set-subtabs'), null);
-  [...doc.querySelectorAll('.set-sect-head')].find(b => b.textContent === 'Category badges').click();
+  [...doc.querySelectorAll('.set-sect-head')].find(b => b.textContent === 'Badges').click();
   assert.ok(doc.querySelector('.badge-settings').closest('.set-section').classList.contains('open'));
   assert.equal(doc.querySelectorAll('.badge-font-option').length, Object.keys(BADGE_FONTS).length);
-  assert.equal(doc.querySelectorAll('.badge-preview-item').length, 5);
+  assert.equal(doc.querySelectorAll('.badge-preview-item').length, 10);
   assert.doesNotMatch(doc.querySelector('.badge-settings').textContent, /Equal number size/);
   assert.equal(doc.querySelector('.badge-settings .set-reset'), null);
   assert.equal(a.state.settings.badgeFont, 'spacemono');
   assert.equal(a.state.settings.badgeTooltip, 'off');
-  const options = [...doc.querySelectorAll('.badge-label-option')];
-  assert.deepEqual(options.map(n => n.dataset.labelStyle), ['off', 'editorial', 'studio', 'soft', 'minimal', 'original']);
-  assert.equal(options[0].getAttribute('aria-checked'), 'true');
-  assert.equal(options.filter(n => n.tabIndex === 0).length, 1);
-  assert.equal(doc.querySelectorAll('.badge-label-preview .category-label').length, 4);
-  assert.ok(doc.querySelector('.badge-font-options').compareDocumentPosition(doc.querySelector('.badge-label-options')) & a.dom.window.Node.DOCUMENT_POSITION_FOLLOWING);
-  assert.equal(options.at(-1).querySelector('.badge-label-title').textContent, 'Expressive');
-  assert.equal(doc.querySelector('.badge-label-caption small'), null);
+  const options = [...doc.querySelectorAll('.lib-dd-opt[data-setting="badgeTooltip"]')];
+  assert.deepEqual(options.map(n => n.dataset.value), ['off', 'editorial', 'studio', 'soft', 'minimal', 'original']);
+  assert.equal(options[0].getAttribute('aria-selected'), 'true');
+  const button = doc.querySelector('.lib-dd-btn[data-setting="badgeTooltip"]');
+  assert.equal(button.getAttribute('aria-haspopup'), 'listbox');
+  assert.equal(button.getAttribute('aria-expanded'), 'false');
+  assert.ok(doc.querySelector('.badge-font-options').compareDocumentPosition(button) & a.dom.window.Node.DOCUMENT_POSITION_FOLLOWING);
+  assert.equal(options.at(-1).textContent, 'Expressive');
 });
 
 test('old on/off label preferences migrate once and explicit style choices survive', t => {
@@ -124,31 +124,38 @@ test('old on/off label preferences migrate once and explicit style choices survi
   }
 });
 
-test('style cards persist choices, preview the board and preserve scroll and keyboard focus', async t => {
+test('hover-label dropdown persists choices, updates the board and preserves scroll and keyboard focus', async t => {
   const a = review(t), doc = a.dom.window.document;
   a.call('toggleSettings');
-  [...doc.querySelectorAll('.set-sect-head')].find(b => b.textContent === 'Category badges').click();
+  [...doc.querySelectorAll('.set-sect-head')].find(b => b.textContent === 'Badges').click();
   const before = JSON.stringify({ grades: a.state.moveGrades, evals: a.state.evals, acc: a.state.acc });
   for (const style of ['editorial', 'studio', 'soft', 'minimal']) {
     doc.getElementById('settings').scrollTop = 390;
     doc.querySelector('.badge-font-options').scrollTop = 580;
-    const option = doc.querySelector(`[data-label-style="${style}"]`); option.focus(); option.click();
+    const option = doc.querySelector(`.lib-dd-opt[data-setting="badgeTooltip"][data-value="${style}"]`); option.focus(); option.click();
     await settle();
     assert.equal(a.store.settings.badgeTooltip, style);
     assert.equal(doc.getElementById('boardBadgeTip').dataset.style, style);
     assert.equal(doc.getElementById('boardBadgeTip').getAttribute('aria-hidden'), 'false');
-    assert.equal(doc.activeElement.dataset.labelStyle, style);
-    assert.equal(doc.activeElement.getAttribute('aria-checked'), 'true');
+    assert.equal(doc.activeElement.dataset.setting, 'badgeTooltip');
+    assert.equal(doc.activeElement.classList.contains('lib-dd-btn'), true);
+    assert.equal(doc.querySelector(`.lib-dd-opt[data-setting="badgeTooltip"][data-value="${style}"]`).getAttribute('aria-selected'), 'true');
     assert.equal(doc.getElementById('settings').scrollTop, 390);
     assert.equal(doc.querySelector('.badge-font-options').scrollTop, 580);
-    assert.equal(doc.querySelectorAll('.badge-label-option[tabindex="0"]').length, 1);
   }
-  doc.activeElement.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+  doc.activeElement.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+  assert.equal(doc.activeElement.dataset.value, 'minimal');
+  doc.activeElement.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+  assert.equal(doc.activeElement.dataset.value, 'original');
+  doc.activeElement.click();
   await settle();
-  assert.equal(doc.activeElement.dataset.labelStyle, 'original');
+  assert.equal(a.store.settings.badgeTooltip, 'original');
   doc.activeElement.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+  assert.equal(doc.activeElement.dataset.value, 'off');
+  doc.activeElement.click();
   await settle();
-  assert.equal(doc.activeElement.dataset.labelStyle, 'off');
+  assert.equal(a.store.settings.badgeTooltip, 'off');
+  assert.equal(doc.activeElement.dataset.setting, 'badgeTooltip');
   assert.equal(doc.getElementById('boardBadgeTip').getAttribute('aria-hidden'), 'true');
   assert.equal(JSON.stringify({ grades: a.state.moveGrades, evals: a.state.evals, acc: a.state.acc }), before);
 });
@@ -213,7 +220,7 @@ test('navigation immediately displays the final move score and keeps it stable',
 test('choosing fonts preserves the independent list scroll, outer scroll and keyboard focus', async t => {
   const a = review(t), doc = a.dom.window.document;
   a.call('toggleSettings');
-  [...doc.querySelectorAll('.set-sect-head')].find(b => b.textContent === 'Category badges').click();
+  [...doc.querySelectorAll('.set-sect-head')].find(b => b.textContent === 'Badges').click();
   doc.getElementById('settings').scrollTop = 110;
   doc.querySelector('.badge-font-options').scrollTop = 580;
   const option = doc.querySelector('[data-font="lora"]'); option.focus(); option.click();

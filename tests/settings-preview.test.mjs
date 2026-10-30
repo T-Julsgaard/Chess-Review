@@ -30,22 +30,22 @@ test('loading controls are removed and only active loading indicators remain', a
 test('opening a settings section collapses the previous one and keeps its header focused', t => {
   const { doc, section, open } = settings(t);
   open('Move animation');
-  const head = section('Category badges').querySelector('.set-sect-head');
+  const head = section('Badges').querySelector('.set-sect-head');
   head.focus(); head.click();
   assert.equal(section('Move animation').querySelector('.set-sect-head').getAttribute('aria-expanded'), 'false');
   assert.equal(doc.querySelectorAll('.set-section.open').length, 1);
-  assert.equal(doc.activeElement, section('Category badges').querySelector('.set-sect-head'));
-  section('Category badges').querySelector('.set-sect-head').click();
+  assert.equal(doc.activeElement, section('Badges').querySelector('.set-sect-head'));
+  section('Badges').querySelector('.set-sect-head').click();
   assert.equal(doc.querySelectorAll('.set-section.open').length, 0);
   open('Move list'); open('Theme');
   assert.equal(section('Move list').classList.contains('open'), false);
   assert.equal(section('Theme').classList.contains('open'), true);
 });
 
-test('badge size lives in Category badges and saves and applies the existing scale preference', async t => {
+test('badge size lives in Badges and saves and applies the existing scale preference', async t => {
   const { a, doc, section, open } = settings(t);
   assert.equal(section('Move list').querySelector('input[type="range"]'), null);
-  const slider = open('Category badges').querySelector('input[type="range"]');
+  const slider = open('Badges').querySelector('input[type="range"]');
   assert.equal(slider.closest('.set-ctrl').querySelector('.set-lbl').textContent, 'Badge size');
   slider.value = '1.25'; slider.dispatchEvent(new a.dom.window.Event('input'));
   await a.run('_settingsWriteQueue');

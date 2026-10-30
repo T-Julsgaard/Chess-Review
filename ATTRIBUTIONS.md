@@ -230,6 +230,22 @@ Each font's copyright notice and full license accompany it in `fonts/`:
 - [Bitter](https://github.com/google/fonts/tree/main/ofl/bitter) — `fonts/bitter-OFL.txt`
 - [Cabin](https://github.com/google/fonts/tree/main/ofl/cabin) — `fonts/cabin-OFL.txt`
 
+The question-mark body in `lib/category-badges.js` is an adapted vector outline
+from the bundled Inter Bold font. It is scaled for the round category badges and
+paired with the badge family's shared dot. Its font source and license are listed
+above; no font loading is needed to display these SVG symbols.
+
+The Simple and Detailed thumbs-up variants in `lib/category-badges.js` are original SVG artwork
+created for this project.
+
+The ten Emblems symbols in `lib/category-badges.js` (comet, bolt, crown, laurel,
+leaf, reference book, wave, drop, bypass and fractured shield) are original SVG
+artwork created for this project and distributed under GPL-3.0.
+
+The ten Tokens symbols in `lib/category-badges.js` (flame, key, summit, medal,
+anchor, scroll, offset, steps, hourglass and fallen king) are original SVG artwork
+created for this project and distributed under GPL-3.0.
+
 
 ## Research CI Python runtime
 

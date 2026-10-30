@@ -1,3 +1,5 @@
+import { CATEGORY_SYMBOLS, categoryBadgeSymbol } from './lib/category-badges.js';
+
 // Review grades describe a move within its annotation category. They are not
 // position evaluations, win probabilities, game accuracy, or rating-model inputs.
 export const MOVE_GRADE_CONFIG = Object.freeze({
@@ -12,13 +14,27 @@ export const MOVE_GRADE_CONFIG = Object.freeze({
   miss: { color: '#f5746a', min: 0, max: 4.9, opportunityDecay: 20, zeroLoss: 99 },
   blunder: { color: '#ee4a2f', min: 0, max: 1.9, lossBand: ['blunder', 'total'] },
 });
+export const BADGE_APPEARANCES = Object.freeze({
+  solid: 'Solid',
+  'ink-mineral': 'Ink & mineral',
+});
+const INK_MINERAL_COLORS = Object.freeze({
+  brilliant: '#ab9bf1', great: '#80b1e4', best: '#65c6a5', excellent: '#7fc7bb',
+  good: '#b0c496', book: '#c9b394', inacc: '#e5c478', mistake: '#e7a779',
+  miss: '#d799b5', blunder: '#e78781',
+});
+const inkTint = (color, amount) => '#' + [0, 1, 2].map(i => {
+  const base = [27, 37, 43][i];
+  const channel = parseInt(color.slice(1 + i * 2, 3 + i * 2), 16);
+  return Math.round(base + (channel - base) * amount).toString(16).padStart(2, '0');
+}).join('');
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 const finite = n => typeof n === 'number' && Number.isFinite(n);
 
 // Bundled, unmodified SIL OFL fonts. Only these trusted families enter SVG markup.
 export const BADGE_FONTS = Object.freeze({
   spacemono: { name: 'Space Mono', family: 'Badge Space Mono, monospace', style: 'Monospace', file: 'spacemono.ttf' },
-  original: { name: 'Original', family: 'Arial, Helvetica, sans-serif', style: 'Classic', file: null },
+  original: { name: 'Original', family: 'Arial, Helvetica, sans-serif', style: 'Plain', file: null },
   inter: { name: 'Inter', family: 'Badge Inter, Arial, sans-serif', style: 'Minimal', file: 'inter.ttf' },
   manrope: { name: 'Manrope', family: 'Badge Manrope, Arial, sans-serif', style: 'Soft geometric', file: 'manrope.ttf' },
   sora: { name: 'Sora', family: 'Badge Sora, Arial, sans-serif', style: 'Modern geometric', file: 'sora.ttf' },
@@ -31,7 +47,7 @@ export const BADGE_FONTS = Object.freeze({
   barlowcondensed: { name: 'Barlow Condensed', family: 'Badge Barlow Condensed, Arial, sans-serif', style: 'Narrow', file: 'barlowcondensed.ttf' },
   firasans: { name: 'Fira Sans', family: 'Badge Fira Sans, Arial, sans-serif', style: 'Clear humanist', file: 'firasans.ttf' },
   firamono: { name: 'Fira Mono', family: 'Badge Fira Mono, monospace', style: 'Monospace', file: 'firamono.ttf' },
-  lora: { name: 'Lora', family: 'Badge Lora, Arial, sans-serif', style: 'Classic serif', file: 'lora.ttf' },
+  lora: { name: 'Lora', family: 'Badge Lora, Arial, sans-serif', style: 'Traditional serif', file: 'lora.ttf' },
   bitter: { name: 'Bitter', family: 'Badge Bitter, Arial, sans-serif', style: 'Slab serif', file: 'bitter.ttf' },
   cabin: { name: 'Cabin', family: 'Badge Cabin, Arial, sans-serif', style: 'Friendly sans', file: 'cabin.ttf' },
 });
@@ -67,7 +83,8 @@ export function gradeText(score, fixedDecimals = false) {
 }
 
 const escape = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[c]);
-export function gradeLabel(category, score, name, example = false) {
+export function gradeLabel(category, score, name, example = false, options = {}) {
+  if (categoryBadgeSymbol(category, options) !== 'numbers') return name;
   if (category === 'book') return name;
   const cfg = MOVE_GRADE_CONFIG[category];
   if (example && cfg) return `${name}, score ${cfg.min === cfg.max ? cfg.min : `range ${cfg.min} to ${cfg.max}`}`;
@@ -79,12 +96,22 @@ export function gradeLabel(category, score, name, example = false) {
 export function gradeSvg(category, score, name, example = false, options = {}) {
   const cfg = MOVE_GRADE_CONFIG[category];
   if (!cfg) return '';
-  const label = escape(gradeLabel(category, score, name, example));
+  const label = escape(gradeLabel(category, score, name, example, options));
   const text = gradeText(example ? (cfg.min + cfg.max) / 2 : score, true);
   const size = 40;
   const font = Object.hasOwn(BADGE_FONTS, options.badgeFont) ? BADGE_FONTS[options.badgeFont] : BADGE_FONTS.spacemono;
-  const symbol = category === 'book'
-    ? '<g fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M50 35C43 30 32 29 25 32V70C33 67 43 68 50 73 57 68 67 67 75 70V32C68 29 57 30 50 35Z M50 35V73"/></g>'
+  const mark = categoryBadgeSymbol(category, options);
+  let symbol = mark !== 'numbers'
+    ? `<g class="category-symbol" data-symbol="${mark}">${CATEGORY_SYMBOLS[mark].svg}</g>`
+    : category === 'book' ? CATEGORY_SYMBOLS.book.svg
     : `<text class="grade-numeral" x="50" y="51" dy=".35em" text-anchor="middle" fill="#fff" font-family="${font.family}" font-size="${size}" font-weight="700" letter-spacing="-1.5">${text}</text>`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="${label}"><circle cx="50" cy="50" r="49" fill="${cfg.color}"/>${symbol}</svg>`;
+  if (options.badgeAppearance === 'ink-mineral') {
+    const ink = INK_MINERAL_COLORS[category];
+    symbol = symbol.replaceAll('#fff', ink);
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="${label}"><circle cx="50" cy="50" r="48.5" fill="${inkTint(ink, 0.13)}" stroke="${inkTint(ink, 0.48)}" stroke-width="2.5"/>${symbol}</svg>`;
+  }
+  // Keep category circles distinct from similarly colored board squares. The
+  // two-unit edge fits inside the viewBox even at the smallest badge sizes.
+  const edge = mark === 'numbers' ? '' : ' stroke="#10251c" stroke-opacity=".18" stroke-width="2"';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="${label}"><circle cx="50" cy="50" r="49" fill="${cfg.color}"${edge}/>${symbol}</svg>`;
 }

@@ -3,7 +3,8 @@ import vm from 'node:vm';
 import { JSDOM } from 'jsdom';
 import { Chess } from '../../lib/chess.js';
 import { flagCodeForCountryId, countryNameForId } from '../../flags.js';
-import { BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg } from '../../move-grades.js';
+import { BADGE_APPEARANCES, BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg } from '../../move-grades.js';
+import { CATEGORY_SYMBOLS, CATEGORY_SYMBOL_OPTIONS, categoryBadgeSymbol, cleanBadgeSymbols } from '../../lib/category-badges.js';
 import { CATEGORY_LABEL_FONT, categoryLabelPng } from '../../lib/category-label.js';
 import {expectedPoints, SF19_OUTCOME} from '../../lib/public-scoring.js';
 import {calibratedReview,scoringEvidenceComplete} from '../../lib/calibrated-review.js';
@@ -62,7 +63,8 @@ export function app(t, {hardware,url='https://extension.test/analysis.html#test-
     rememberAnalyzedGame,historyGame,leaderboardPreviewControls,leaderboardSettingsControls,
     createReviewEffects,
     explainMove, explanationPv,
-    BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg, puzzleResultBadge, matedKingSquare, mateMark,
+    BADGE_APPEARANCES, BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg, puzzleResultBadge, matedKingSquare, mateMark,
+    CATEGORY_SYMBOLS, CATEGORY_SYMBOL_OPTIONS, categoryBadgeSymbol, cleanBadgeSymbols,
     moveAnimationDuration, MOVE_ANIMATION_EASING,
     CATEGORY_LABEL_FONT, categoryLabelPng,
     expectedPoints, SF19_OUTCOME, calibratedReview, scoringEvidenceComplete, gameStatistics, GAME_PHASES, PANEL_DESIGNS, panelDesign, normalizePanelDesigns, createOverviewReveal, createAccuracyNavigation, phasePerformance, analyseCalibratedPosition,

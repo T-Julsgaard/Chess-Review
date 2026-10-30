@@ -78,8 +78,14 @@ detected, enter it once; it is remembered locally. Chess Review is intended for
 review after play.
 
 Settings let you choose an engine, rating mode, board, pieces, sounds, coach and
-category-badge appearance. Badge numbers describe move categories; they are
-separate from position evaluation and game accuracy.
+badge appearance. Under **Badges**, each scored category starts with number
+notation; Book uses its book icon. Each dropdown offers symbols matched to that
+category, including the illustrated designs. Excellent offers Simple and Detailed
+thumbs-up choices. Choose **Solid** for white marks on colored circles or
+**Ink & mineral** for colored marks on softly tinted discs with fine rims.
+The **Hover labels** dropdown controls the category labels shown after a move.
+Badge numbers describe move categories; they are separate from position
+evaluation and game accuracy.
 
 Both engines offer **Use recorded rating** and **Moves only**. The first compares
 your performance with public players near the rating saved in the game; the
