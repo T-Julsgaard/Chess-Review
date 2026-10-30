@@ -74,10 +74,11 @@ Distributed by Lichess (lila); high-quality vector SVGs.
 
 ## Brilliant move sound contenders
 - **Files:** `sounds/brilliant/*.wav` — Crystal Revelation, Golden Insight,
-  Celestial Bloom, Royal Flourish, and Neon Spark.
+  Celestial Bloom, Royal Flourish, Neon Spark, Harp Turn, Breathed Wonder,
+  Silver Seal, Orbit Rise, and Velvet Impact.
 - **Source:** original deterministic synthesis for Chess Review with
   `scripts/generate-brilliant-sounds.mjs`; no external samples.
-- **Audition:** open `docs/brilliant-sounds.html` locally to compare the five
+- **Audition:** open `docs/brilliant-sounds.html` locally to compare the ten
   candidates. They are not connected to move playback yet.
 
 ## Chess engine

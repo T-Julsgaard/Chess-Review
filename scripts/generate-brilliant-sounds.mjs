@@ -1,17 +1,27 @@
 import {mkdir, writeFile} from 'node:fs/promises';
 
-// Original brilliant-move candidates; no recordings, dependencies or random input.
+// Original brilliant-move candidates; no recordings, dependencies or unseeded randomness.
 // Regenerate with: node scripts/generate-brilliant-sounds.mjs
 const rate = 48000, tau = 2 * Math.PI;
 const output = new URL('../sounds/brilliant/', import.meta.url);
 const sin = phase => Math.sin(tau * phase);
 const hz = midi => 440 * 2 ** ((midi - 69) / 12);
 
+// Seeded, filtered noise adds breath and movement without harsh white-noise edges.
+const air = new Float64Array(rate * 3);
+let seed = 0x51a7c0de, low = 0, slow = 0;
+for (let i = 0; i < air.length; i++) {
+  seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+  low += .3 * (seed / 2147483648 - 1 - low);
+  slow += .035 * (low - slow);
+  air[i] = low - slow;
+}
+
 function voice(t, note, kind) {
   const age = t - note.start;
   if (age <= 0 || age >= note.length) return 0;
   const f = hz(note.pitch), phase = f * age;
-  const attack = kind === 'pad' ? .12 : kind === 'brass' ? .025 : .006;
+  const attack = kind === 'pad' || kind === 'breath' ? .12 : kind === 'brass' ? .025 : .006;
   const fade = Math.min(1, (note.length - age) / .1);
   const envelope = (1 - Math.exp(-age / attack)) * fade * fade;
   let wave;
@@ -37,6 +47,40 @@ function voice(t, note, kind) {
     case 'spark':
       wave = (sin(phase + 1.1 * Math.exp(-age * 18) * sin(phase * 2))
         + .1 * sin(phase * 3)) * Math.exp(-age * 9);
+      break;
+    case 'string':
+      // A plucked string: brighter partials fade more quickly than the fundamental.
+      wave = 0;
+      for (let harmonic = 1; harmonic <= 9; harmonic++) {
+        wave += sin(phase * harmonic) * Math.cos(harmonic * .37)
+          / harmonic ** 1.3 * Math.exp(-age * (3 + harmonic * 1.7));
+      }
+      break;
+    case 'breath': {
+      const swell = Math.sin(Math.PI * age / note.length) ** 1.3;
+      wave = swell * (.6 * sin(phase + .025 * sin(3 * age))
+        + .12 * sin(phase * 2.002) + .65 * air[Math.floor(age * rate)]);
+      break;
+    }
+    case 'metal':
+      // Inharmonic resonances suggest a small singing bowl rather than a chime melody.
+      wave = sin(phase) * Math.exp(-age * 3.2)
+        + .42 * sin(phase * 2.71) * Math.exp(-age * 5.5)
+        + .22 * sin(phase * 4.13) * Math.exp(-age * 9)
+        + .12 * sin(phase * 6.37) * Math.exp(-age * 18);
+      break;
+    case 'whoosh': {
+      const swell = Math.exp(-(((age - .19) / .095) ** 2));
+      wave = swell * (1.8 * air[Math.floor(age * rate)]
+        + .3 * sin(phase + 850 * age * age));
+      break;
+    }
+    case 'impact':
+      // A rounded, descending body with a short brushed transient.
+      wave = .85 * sin(f * .55 * age + f * .8 * .025 * (1 - Math.exp(-age / .025)))
+        * Math.exp(-age * 16)
+        + .45 * air[Math.floor(age * rate)] * Math.exp(-age * 55)
+        + .18 * sin(phase * 2.01) * Math.exp(-age * 12);
       break;
     default: throw Error(`Unknown voice: ${kind}`);
   }
@@ -67,6 +111,28 @@ const cues = [
     note(.11, 81, .42, .65, -.15), note(.18, 88, .6, .8, .15),
     note(.18, 62, .55, .32, 0),
   ]},
+  {name: '06-harp-turn', duration: 1.35, kind: 'string', notes: [
+    note(0, 62, 1.05, .9, -.35), note(.055, 69, 1, .75, -.15),
+    note(.11, 73, .95, .65, .1), note(.17, 78, 1, .9, .35),
+  ]},
+  {name: '07-breathed-wonder', duration: 1.65, kind: 'breath', notes: [
+    note(0, 69, 1.4, .65, -.3), note(.03, 76, 1.4, .45, .3),
+    note(.09, 80, 1.3, .42, -.1), note(.15, 83, 1.25, .3, .15),
+  ]},
+  {name: '08-silver-seal', duration: 1.55, kind: 'metal', notes: [
+    note(0, 69, 1.35, 1, -.1),
+    {...note(.035, 81, 1.15, .18, .25), kind: 'bell'},
+  ]},
+  {name: '09-orbit-rise', duration: 1.15, kind: 'whoosh', notes: [
+    note(0, 60, .45, .8, -.3),
+    {...note(.28, 81, .65, .5, .15), kind: 'string'},
+    {...note(.30, 74, .65, .35, -.15), kind: 'string'},
+  ]},
+  {name: '10-velvet-impact', duration: 1.1, kind: 'impact', notes: [
+    note(0, 45, .55, 1, 0),
+    {...note(.035, 76, .8, .32, -.2), kind: 'bell'},
+    {...note(.07, 81, .8, .25, .2), kind: 'bell'},
+  ]},
 ];
 
 await mkdir(output, {recursive: true});
@@ -76,7 +142,7 @@ for (const cue of cues) {
   for (let i = 0; i < length; i++) {
     const t = i / rate;
     for (const n of cue.notes) {
-      const sample = voice(t, n, cue.kind);
+      const sample = voice(t, n, n.kind || cue.kind);
       left[i] += sample * Math.cos((n.pan + 1) * Math.PI / 4);
       right[i] += sample * Math.sin((n.pan + 1) * Math.PI / 4);
     }
