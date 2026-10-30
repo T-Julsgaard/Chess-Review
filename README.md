@@ -87,6 +87,30 @@ second ignores that rating and estimates a blitz rating level from your choices.
 Without a saved rating, the review falls back to Moves only, which needs at least
 ten nonforced decisions. Each engine uses its own models.
 
+### Optional Dopamine mode
+
+Choose **Settings → General → Interface presets → Review experience → Dopamine**
+for a more expressive review: purple board and interface, move-colored accents, and reactions centered
+on the move's destination. Brilliant moves send teal waves across the squares;
+blunders produce a red shockwave and shards. Other categories have smaller
+reactions. Effects never cover the board with a text box or intercept input.
+The same settings section offers **Preview Brilliant effect** and **Preview
+Blunder effect** buttons, without changing your move's actual classification.
+
+The commentary explains available engine evidence: immediate mate, a mating
+evaluation, a legal capture, material changes in the shown line, or the evaluation
+loss when no specific tactic is established. You can explore the reply and the
+engine's better alternative. Explanations use existing local analysis; a shown
+continuation is not a promise that every future move is forced. Missing or invalid
+lines never produce invented tactical claims.
+
+Normal remains the default. The mode and original visual preferences are saved
+separately; switching back restores the original appearance and commentary. The
+default Modern layout gives the explanation panel more room only in Dopamine mode;
+custom arrangements stay intact. Reduced motion or disabling Animation keeps a
+static destination outline. No extra engine searches, network services, extension
+permissions, dependencies, or changes to classifications and accuracy are needed.
+
 ## Scoring and reproducibility
 
 Chess Review is open source and uses local Stockfish analysis with documented

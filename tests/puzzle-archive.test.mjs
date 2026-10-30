@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {Readable} from 'node:stream';
-import {zstdCompressSync} from 'node:zlib';
+import {constants, zstdCompressSync} from 'node:zlib';
 import {readPuzzleArchive} from '../scripts/puzzle-archive.mjs';
 
 const frame = text => zstdCompressSync(Buffer.from(text));
@@ -36,4 +36,20 @@ test('corrupt frames and oversized metadata fail rather than being treated as va
   const header = metadata(''); header.writeUInt32LE(1024 * 1024, 4);
   const oversized = await readPuzzleArchive(Readable.from([header]), 64);
   assert.throws(() => [...oversized.frames()], /metadata size/);
+});
+
+test('bounded downloads retain all completed rows at different trailing-frame cutoffs', async () => {
+  const complete=frame('complete,row\n'), trailing=frame('another,row\nfinal,row\n');
+  for (let cutoff=1;cutoff<trailing.length;cutoff++) {
+    const input=Buffer.concat([complete,trailing.subarray(0,cutoff)]);
+    const archive=await readPuzzleArchive(Readable.from([input]),input.length);
+    assert.ok([...archive.frames()].map(chunk=>chunk.toString()).join('').startsWith('complete,row\n'), 'cutoff '+cutoff);
+  }
+});
+
+test('prefix decoding still rejects a corrupt checksum in a complete frame', async () => {
+  const corrupt=zstdCompressSync(Buffer.from('complete,row\n'), {params:{[constants.ZSTD_c_checksumFlag]:1}});
+  corrupt[corrupt.length-1]^=0xff;
+  const archive=await readPuzzleArchive(Readable.from([corrupt]),corrupt.length);
+  assert.throws(()=>[...archive.frames()]);
 });

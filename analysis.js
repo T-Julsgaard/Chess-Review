@@ -30,6 +30,10 @@ import { createScreenPreviewContext, loadScreenPreviewController } from "./lib/s
 import { rememberAnalyzedGame, historyGame } from "./lib/player-history.js";
 import { leaderboardPreviewControls } from "./lib/learning/leaderboard-preview.js";
 import { leaderboardSettingsControls } from "./lib/learning/leaderboard-settings.js";
+import { createReviewEffects } from "./lib/review-effects.js";
+import { explainMove, explanationPv } from "./lib/move-explanation.js";
+
+const reviewEffects = createReviewEffects(document);
 
 const screenPreview = createScreenPreviewContext(location);
 const blankLaunch = new window.URLSearchParams(location.search).get("workspace") === "blank";
@@ -258,6 +262,7 @@ const REMOVED_BOARD_THEMES = {
 };
 function migrateVisualAssetSettings(settings) {
   let changed = false;
+  if (settings.reviewMode === "encore") { settings.reviewMode = "dopamine"; changed = true; }
   if (settings.accent === "#c77edb") {
     settings.accent = "#7fb45f";
     changed = true;
@@ -329,6 +334,7 @@ const DEFAULT_SETTINGS = {
   coach: "old_soviet", coachPlain: true,
   // Start with Honeywood (persisted as "maple") and bundled Cburnett pieces.
   boardTheme: "maple", pieceStyle: "image", sound: true,
+  reviewMode: "normal",
   // Master volume (0–100) applied to every sound the extension plays.
   soundVolume: 50,
   puzzleSuccessSound: "soft-retro",
@@ -1729,6 +1735,9 @@ async function openLearning() {
   if(wasAnalysis)exitAnalysis(undefined,{render:false});
   UI.settings.hidden = true;
   hideBoardBadgeTip();
+  // Learning snapshots the board's children for restoration. Transient review
+  // reactions must not become part of that saved board.
+  reviewEffects.clear();
   learningWorkspace = new LearningWorkspace({document, storage:browserAPI.storage.local, makePiece, url:_url,
     settings:()=>S.settings, flipped:S.flipped, book:()=>BOOK || {}, startDrag, onPuzzleWrong:playWrongSound, onPuzzleMove:playSanSound, onPuzzlePremove:playPremoveSound, onOpeningMove:playSanSound, onFreeMove:playSanSound, onPuzzleSuccess:playPuzzleSuccess,
     onLeaderboardSettings:async()=>{
@@ -1750,6 +1759,7 @@ async function openLearning() {
       learningWorkspace = null;
       syncLearningToggle();
       alignPlayers();
+      if (UI.settings && !UI.settings.hidden) renderSettings();
       if(wasBlank){document.getElementById("learningToggle")?.focus();return;}
       S.idx=snapshot.idx; S.flipped=snapshot.flipped; S.selectedSq=snapshot.selectedSq;
       if(!S.practice){paintBoard();}
@@ -1830,8 +1840,17 @@ function isResponsiveModern() {
 }
 function referenceLayout() {
   const modern = isResponsiveModern();
-  return fullHdReferenceLayout(modern ? MODERN_LAYOUT : DEFAULT_LAYOUT,
+  const layout = fullHdReferenceLayout(modern ? MODERN_LAYOUT : DEFAULT_LAYOUT,
     window.innerWidth, window.innerHeight, accuracyLayoutExpanded(), modern);
+  if (layout && modern && S.settings.reviewMode === "dopamine") {
+    // Give explanations room in the default arrangement, without saving over
+    // the user's Normal layout or changing a manually arranged canvas.
+    const extra = Math.min(150, layout.moves.h * .4);
+    layout.review.h += extra;
+    for (const key of ["graph", "moves", "accuracy"]) layout[key].y += extra;
+    for (const key of ["moves", "accuracy"]) layout[key].h -= extra;
+  }
+  return layout;
 }
 const selectedPanels = new Set();
 let cancelPanelGesture = null;
@@ -2119,6 +2138,7 @@ function toggleReorganize() {
   }
   cancelPanelGesture?.();
   S.reorganize = !S.reorganize;
+  if (S.reorganize) reviewEffects.clear();
   if(!S.reorganize)selectedPanels.clear();
   UI.canvas.classList.toggle("reorganizing", S.reorganize);
   if (S.reorganize && UI.settings) UI.settings.hidden = true; // move the settings panel out of the way
@@ -2342,6 +2362,7 @@ function makePiece(type, side) {
 function buildBoard() {
   _cancelBoardDrag?.();
   if (learningWorkspace?.embedded) return;
+  reviewEffects.clear();
   const files = ["a","b","c","d","e","f","g","h"];
   const ranks = [8,7,6,5,4,3,2,1];
   const rowOrder = S.flipped ? [...ranks].reverse() : ranks;
@@ -2439,6 +2460,12 @@ function paintBoard({restoring=false}={}) {
     }
   }
   if (boardEl) mateMark(boardEl, sqByName[mated], mated, S.flipped);
+  reviewEffects.update(boardEl, {
+    key: JSON.stringify([S.pgn, S.idx, S.analysisMode, S.variation?.idx, pos.fen]),
+    category: cls, square: pos.to, flipped: S.flipped,
+    enabled: S.settings.reviewMode === "dopamine" && !learningWorkspace && !S.practice && !S.reorganize && !S.blank,
+    motion: S.settings.moveAnim !== false,
+  });
   if (clean && S.practice.resultBadge?.solvePos === solvePly) {
     const result = S.practice.resultBadge, square = sqByName[result.square];
     square?.classList.add("has-badge");
@@ -4196,7 +4223,9 @@ function renderReview() {
 }
 // Commentary for the move on the mainline at S.idx.
 function renderMoveComment() {
-  const body = el("div", { class: "ip-body" });
+  const dopamine = S.settings.reviewMode === "dopamine";
+  const body = el("div", { class: "ip-body" + (dopamine ? " dopamine-comment" : "") });
+  if (dopamine) body.dataset.moveCategory = S.classif[S.idx] || "";
   if (S.idx === 0) {
     body.append(el("div", { class: "ip-head" },
       el("button", { type: "button", class: "practice-btn", title: "Replay the game and re-solve every mistake you made", onclick: startPractice }, "Practice your mistakes")));
@@ -4219,17 +4248,23 @@ function renderMoveComment() {
   const head = el("div", { class: "ip-head" });
   if (cfg) head.append(gradeBadge(cls, S.moveGrades[S.idx], "ip-badge"));
   // Special coach phrasing can omit the category, so name it beside the move.
-  const sanDisplay = S.settings.coach && !S.settings.coachPlain && cfg ? `${san} ${categoryName(cls)}` : san;
+  const sanDisplay = dopamine && cfg ? `${san} · ${categoryName(cls)}`
+    : S.settings.coach && !S.settings.coachPlain && cfg ? `${san} ${categoryName(cls)}` : san;
   head.append(el("span", { class: "ip-move" }, sanDisplay));
   if (evTxt && baseUiSetup() !== 'modern') head.append(el("span", { class: "ip-eval " + (evCp >= 0 ? "pos" : "neg") }, evTxt));
   body.append(head);
 
   // Pick the line once per (ply + coach): a fresh signature → choose + type; otherwise reuse the
   // shown text (so unrelated re-renders don't re-pick or re-animate, and a coach switch re-types).
-  const sig = "m:" + S.idx + ":" + (S.settings.coach || "") + ":" + (cls || "");
+  const explanation = dopamine ? explainMove({
+    beforeFen: S.positions[S.idx - 1].fen, afterFen: S.positions[S.idx].fen, category: cls,
+    beforeScore: S.evals[S.idx - 1], afterScore: S.evals[S.idx],
+    beforePv: explanationPv(S.bests[S.idx - 1]), afterPv: explanationPv(S.bests[S.idx]),
+  }) : null;
+  const sig = "m:" + S.idx + ":" + (S.settings.coach || "") + ":" + (cls || "") + ":" + (dopamine ? JSON.stringify(explanation) : "normal");
   const fresh = sig !== _ipSig;
   if (fresh) {
-    let sentence = S.coach ? coachMoveSentence(S.idx) : null;
+    let sentence = explanation?.summary || (S.coach ? coachMoveSentence(S.idx) : null);
     if (sentence == null) {   // legacy generic line
       sentence = (cfg && COMMENT_PHRASE[cls]) ? categoryText(COMMENT_PHRASE[cls](san)) : `${san}.`;
     }
@@ -4237,7 +4272,25 @@ function renderMoveComment() {
   }
   const txt = el("div", { class: "ip-text" });
   body.append(txt);
-  if (fresh) { coachReactPly(S.idx); typeWrite(txt, _ipText); } else txt.textContent = _ipText;
+  if (fresh) {
+    coachReactPly(S.idx);
+    // Read the explanation immediately; the board already supplies the motion.
+    if (dopamine) { clearTimeout(_typeT); coachTalk(false); txt.textContent = _ipText; }
+    else typeWrite(txt, _ipText);
+  } else txt.textContent = _ipText;
+  if (explanation) {
+    if (explanation.detail) body.append(el("p", { class: "dopamine-detail" }, explanation.detail));
+    if (explanation.evaluation) body.append(el("span", { class: "dopamine-evaluation" }, "Evaluation · " + explanation.evaluation + " · White’s perspective"));
+    const ply = S.idx;
+    const lines = el("div", { class: "dopamine-lines" });
+    if (explanation.reply) lines.append(el("button", { type: "button", class: "dopamine-line",
+      onclick: () => { gotoMainline(ply); playLine(explanation.reply.uci); } },
+      el("strong", {}, "Explore the reply →"), el("span", {}, explanation.reply.san)));
+    if (explanation.alternative) lines.append(el("button", { type: "button", class: "dopamine-line",
+      onclick: () => { gotoMainline(ply - 1); playLine(explanation.alternative.uci); } },
+      el("strong", {}, "Better: " + explanation.alternative.move + " →"), el("span", {}, explanation.alternative.san)));
+    if (lines.childElementCount) body.append(lines);
+  }
   return body;
 }
 // Practice coaching: what to do, with an inline Hint button after the first failed try.
@@ -5746,8 +5799,9 @@ function section(title, ...children) {
 function seg(label, key, options, info, fmt = (value) => value) {
   return el("div", { class: "set-row" },
     setLabel(label, info),
-    el("div", { class: "set-seg" },
-      ...options.map((o) => el("button", { type:"button", "data-setting":key, "data-value":String(o), class: S.settings[key] === o ? "on" : "", onclick: () => setSetting(key, o) }, fmt(o)))),
+    el("div", { class: "set-seg", role: "group", "aria-label": label || key },
+      ...options.map((o) => el("button", { type:"button", "data-setting":key, "data-value":String(o),
+        "aria-pressed": String(S.settings[key] === o), class: S.settings[key] === o ? "on" : "", onclick: () => setSetting(key, o) }, fmt(o)))),
   );
 }
 function settingDropdown(label, key, options) {
@@ -6096,7 +6150,7 @@ const VISUAL_SETTING_KEYS = [
   "graphStyle", "barStyle", "insightFont", "showCoords", "coordSize", ...BACKGROUND_SETTING_KEYS,
   "coach", "coachPlain", "boardTheme", "pieceStyle", "boardCustomLight", "boardCustomDark",
   "sound", "soundVolume", "soundFx", "puzzleSuccessSound", "puzzleIncorrectSound", ...ARROW_SETTING_KEYS,
-  "moveAnim", "animSpeed", "learningTransition",
+  "moveAnim", "animSpeed", "learningTransition", "reviewMode",
 ];
 function resetSettingKeys(keys) {
   for (const key of keys) S.settings[key] = structuredClone(DEFAULT_SETTINGS[key]);
@@ -6154,6 +6208,7 @@ function bgControls() {
   ];
 }
 function visualSettings() {
+  const canPreviewReviewEffects = !learningWorkspace && !S.practice && !S.reorganize;
   const boardEntries = Object.entries(BOARD_THEMES).map(([k, [lt, dk]]) => ({
     value: k, title: BOARD_THEME_LABEL[k] || k,
     render: (chip) => chip.append(el("span", { class: "half l", style: { background: lt } }), el("span", { class: "half r", style: { background: dk } })),
@@ -6178,6 +6233,14 @@ function visualSettings() {
   return el("div", {},
     section("Interface presets",
       seg("Setup", "uiSetup", Object.keys(UI_SETUPS), null, value => UI_SETUPS[value].label),
+      seg("Review experience", "reviewMode", ["normal", "dopamine"], null, value => value === "dopamine" ? "Dopamine" : "Normal"),
+      el("p", { class: "set-note" }, "Dopamine mode adds vivid move reactions, a purple review theme and explanations from the engine’s available continuation. Brilliant moves light up the board; blunders send a red shockwave. Reduced motion keeps a static square outline."),
+      el("div", { class: "dopamine-preview-buttons" }, ...["brilliant", "blunder"].map(category =>
+        el("button", { type: "button", class: "set-reset", disabled: S.settings.reviewMode !== "dopamine" || !canPreviewReviewEffects,
+          onclick: () => reviewEffects.show(UI.boardWrap.querySelector(".board"), {
+            category, square: activePos().to, flipped: S.flipped, motion: S.settings.moveAnim !== false,
+          }) }, "Preview " + categoryName(category) + " effect"))),
+      !canPreviewReviewEffects ? el("p", { class: "set-note" }, "Return to game review to preview these effects.") : null,
     ),
     section("Tabs",
       ...PANEL_DESIGNS.filter(design => design.panel === "evalbar" || design.versions.length > 1).map(design =>
@@ -6654,6 +6717,7 @@ async function setSetting(key, value) {
   S.settings[key] = value;
   await writeSettings({ [key]: value, ...setupPatch });
   applySettings();
+  if (key === "reviewMode") { paintBoard(); renderReview(); fitViewport(); }
   if (design?.panel.startsWith('accuracy')) { statsRefs = null; hideQTip(); renderStats(); if(key==='accuracyDesign')reflowAccuracy(accuracyLayoutExpanded()); }
   if (key === 'movesDesign') updateMovesDesign();
   if (key === 'engineDesign') renderEngineCurrent();
@@ -6791,11 +6855,14 @@ async function setEngineSetting(key, value) {
 }
 function applySettings() {
   const r = document.documentElement;
+  const dopamine = S.settings.reviewMode === "dopamine";
+  r.dataset.reviewMode = dopamine ? "dopamine" : "normal";
+  if (!dopamine || S.settings.moveAnim === false) reviewEffects.clear();
   // Only the dark theme is supported now — force it (also for old saved "light").
   S.settings.theme = "dark";
   r.setAttribute("data-theme", "dark");
   r.setAttribute("data-density", S.settings.density);
-  const a = S.settings.accent === "custom"
+  const a = dopamine ? accentFromHex("#a78bfa") : S.settings.accent === "custom"
     ? accentFromHex(S.settings.accentCustom)
     : (ACCENTS[S.settings.accent] || ACCENTS["#7fb45f"]);
   r.style.setProperty("--accent", a.accent);
@@ -6827,6 +6894,11 @@ const BG_TILE_PX = { small: 240, medium: 440, large: 760 };
 function applyBackground() {
   const app = document.querySelector(".app");
   if (!app) return;
+  if (S.settings.reviewMode === "dopamine") {
+    app.style.backgroundImage = "radial-gradient(ellipse at 30% 0%, #221735, #0e0e16 70%)";
+    app.style.backgroundSize = "cover";
+    return;
+  }
   if (S.settings.bg === "color") {
     const h = S.settings.bgHue ?? DEFAULT_SETTINGS.bgHue, s = S.settings.bgSat ?? DEFAULT_SETTINGS.bgSat, l = S.settings.bgLight ?? DEFAULT_SETTINGS.bgLight;
     // base tone at the bottom, ~5% lighter toward the top edge for a subtle sense of depth

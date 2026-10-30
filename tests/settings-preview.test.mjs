@@ -105,8 +105,10 @@ test('custom board picker keeps its button mounted and previews both square colo
 
 test('General sections stay concise, remove the purple accent and offer Porcelain', async t => {
   const {a, doc, section, open} = settings(t);
-  assert.equal(section('Interface presets').querySelector('.set-note'), null);
+  assert.equal(section('Review experience'), undefined);
+  assert.match(section('Interface presets').querySelector('.set-note').textContent, /Dopamine mode/);
   assert.deepEqual([...section('Interface presets').querySelectorAll('[data-setting="uiSetup"]')].map(n => n.textContent), ['Old', 'Modern', 'Custom']);
+  assert.deepEqual([...section('Interface presets').querySelectorAll('[data-setting="reviewMode"]')].map(n => n.textContent), ['Normal', 'Dopamine']);
   assert.equal([...doc.querySelectorAll('.set-sect-head')].at(-1).querySelector('span').textContent, 'Developer debugger');
   const visualReset = doc.querySelector('#settings > div:last-child > button:last-child');
   assert.equal(visualReset.textContent, 'Reset all visual settings');
