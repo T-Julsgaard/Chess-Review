@@ -50,7 +50,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
         assert.ok(!choices.graphDesign.includes('Timeline v2'));
         assert.equal(choices.accuracyAdvancedDesign,undefined);
         assert.equal(choices.evalbarDesign,undefined);
-        assert.deepEqual(choices.barStyle,['Gradient','Solid','Mono','Accent']);
+        assert.deepEqual(choices.barStyle,['Gradient','Solid','Mono','Accent','Flat']);
         const nextTop=await run("document.querySelector('.lib-dd-btn[data-setting=accuracyQualityDesign]').getBoundingClientRect().top");
         await run("document.querySelector('.lib-dd-btn[data-setting=accuracyDesign]').click()");
         assert.equal(await run("document.querySelector('.lib-dd-btn[data-setting=accuracyQualityDesign]').getBoundingClientRect().top"),nextTop,'Opening a dropdown must overlay later settings without moving them');

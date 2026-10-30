@@ -1,3 +1,19 @@
+/* Flat uses the existing score font and orientation, with a wider, square rail. */
+.evalbar.eb-flat {
+  width: 30px; border: 0; border-radius: 0; clip-path: none;
+  background: #3d3d42;
+}
+.mod[data-mod="evalbar"] .evalbar.eb-flat {
+  width: calc(100% + 4px); margin-inline: -2px;
+}
+.evalbar.eb-flat .white-fill { background: #fff; }
+.evalbar.eb-flat .score {
+  font-size: min(14px, calc((100cqw - 4px) / (var(--score-chars, 4) * .6)));
+  letter-spacing: 0;
+}
+.evalbar.eb-flat .score.top { color: #fff; }
+.evalbar.eb-flat .score.bot { color: #202024; }
+
 /* Balance keeps the board's orientation and the existing module's dimensions. */
 .evalbar.eval-balance {
   --balance-white: 50%;

@@ -19,14 +19,15 @@ test('Tabs offers only Evaluation bar styles and saves without changing analysis
   section.querySelector('.set-sect-head').click();
   assert.equal(section.querySelector('[data-setting="evalbarDesign"]'), null);
   assert.equal(section.querySelector('[data-setting="barStyle"]').getAttribute('aria-label'), 'Evaluation bar');
-  assert.deepEqual([...section.querySelectorAll('.lib-dd-opt[data-setting="barStyle"]')].map(n => n.textContent), ['Gradient', 'Solid', 'Mono', 'Accent']);
+  assert.deepEqual([...section.querySelectorAll('.lib-dd-opt[data-setting="barStyle"]')].map(n => n.textContent), ['Gradient', 'Solid', 'Mono', 'Accent', 'Flat']);
   const before = JSON.stringify({evals: a.state.evals, bests: a.state.bests, idx: a.state.idx, layout: a.state.layout});
   a.replace('scheduleReanalyze', () => { throw Error('Design choices must not start analysis'); });
-  for (const value of ['classic', 'mono', 'accent', 'gradient']) {
+  for (const value of ['classic', 'mono', 'accent', 'flat', 'gradient']) {
     doc.querySelector('[data-setting="barStyle"][data-value="'+value+'"]').click();
     await settle(); await a.run('_settingsWriteQueue');
     assert.equal(a.store.settings.barStyle, value);
     assert.equal(doc.querySelector('.evalbar').dataset.design, 'original');
+    assert.ok(doc.querySelector('.evalbar').classList.contains('eb-' + value));
     assert.equal(JSON.stringify({evals: a.state.evals, bests: a.state.bests, idx: a.state.idx, layout: a.state.layout}), before);
   }
   const restored = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
@@ -34,6 +35,37 @@ test('Tabs offers only Evaluation bar styles and saves without changing analysis
   restored.store.settings = {evalbarDesign: 'balance'};
   await restored.start();
   assert.equal(restored.store.settings.evalbarDesign, 'original');
+});
+
+test('Flat keeps scores, mates and board orientation live and restores the saved style', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  await a.call('setSetting', 'evalbarDesign', 'original');
+  await a.call('setSetting', 'barStyle', 'flat');
+  const bar = doc.querySelector('.evalbar'), fill = bar.querySelector('.white-fill');
+  for (const [evaluation, text, share, side] of [
+    [{cp: 0}, '0.0', 50, 'bot'],
+    [{cp: 120}, '1.2', 59.2, 'bot'],
+    [{cp: -230}, '2.3', 32.36666666666667, 'top'],
+    [{cp: 1800}, '18.0', 96, 'bot'],
+    [{mate: 3}, '#3', 100, 'bot'],
+    [{mate: -2}, '#2', 0, 'top'],
+  ]) {
+    a.state.evals[0] = evaluation;
+    for (const flipped of [false, true]) {
+      a.state.flipped = flipped; a.call('renderEvalBar');
+      assert.equal(doc.querySelector('.evalbar'), bar);
+      assert.equal(bar.querySelector('.white-fill'), fill);
+      assert.equal(bar.classList.contains('flipped'), flipped);
+      assert.equal(bar.querySelector('.score.' + side).textContent, text);
+      assert.equal(bar.querySelector('.score.' + (side === 'bot' ? 'top' : 'bot')).textContent, '');
+      assert.ok(Math.abs(parseFloat(fill.style.height) - share) < .001);
+    }
+  }
+  const restored = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
+  restored.replace('resetSettingsForRelease', async () => {});
+  restored.store.settings = {barStyle: a.store.settings.barStyle};
+  await restored.start();
+  assert.ok(restored.dom.window.document.querySelector('.evalbar.eb-flat'));
 });
 
 test('Balance explains signs and mates, follows flips, and keeps live nodes mounted', t => {
