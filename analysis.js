@@ -6307,7 +6307,7 @@ function visualSettings() {
     section("Tabs",
       ...PANEL_DESIGNS.filter(design => design.panel === "evalbar" || design.versions.length > 1).map(design =>
         design.panel === "evalbar" ? settingDropdown("Evaluation bar", "barStyle",
-          [["gradient", "Gradient"], ["classic", "Solid"], ["mono", "Mono"], ["accent", "Accent"], ["flat", "Flat"]])
+          [["gradient", "Gradient"], ["classic", "Solid"], ["mono", "Mono"], ["accent", "Accent"], ["flat", "Flat"], ["flat2", "Flat v2"]])
           : settingDropdown(design.label, design.setting, design.versions.map(version => [version.id, version.label]))),
     ),
     section("Theme",

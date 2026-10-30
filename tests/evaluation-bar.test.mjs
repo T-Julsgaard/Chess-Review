@@ -19,10 +19,10 @@ test('Tabs offers only Evaluation bar styles and saves without changing analysis
   section.querySelector('.set-sect-head').click();
   assert.equal(section.querySelector('[data-setting="evalbarDesign"]'), null);
   assert.equal(section.querySelector('[data-setting="barStyle"]').getAttribute('aria-label'), 'Evaluation bar');
-  assert.deepEqual([...section.querySelectorAll('.lib-dd-opt[data-setting="barStyle"]')].map(n => n.textContent), ['Gradient', 'Solid', 'Mono', 'Accent', 'Flat']);
+  assert.deepEqual([...section.querySelectorAll('.lib-dd-opt[data-setting="barStyle"]')].map(n => n.textContent), ['Gradient', 'Solid', 'Mono', 'Accent', 'Flat', 'Flat v2']);
   const before = JSON.stringify({evals: a.state.evals, bests: a.state.bests, idx: a.state.idx, layout: a.state.layout});
   a.replace('scheduleReanalyze', () => { throw Error('Design choices must not start analysis'); });
-  for (const value of ['classic', 'mono', 'accent', 'flat', 'gradient']) {
+  for (const value of ['classic', 'mono', 'accent', 'flat', 'flat2', 'gradient']) {
     doc.querySelector('[data-setting="barStyle"][data-value="'+value+'"]').click();
     await settle(); await a.run('_settingsWriteQueue');
     assert.equal(a.store.settings.barStyle, value);
@@ -37,10 +37,10 @@ test('Tabs offers only Evaluation bar styles and saves without changing analysis
   assert.equal(restored.store.settings.evalbarDesign, 'original');
 });
 
-test('Flat keeps scores, mates and board orientation live and restores the saved style', async t => {
+for (const style of ['flat', 'flat2']) test(`${style} keeps scores, mates and board orientation live and restores the saved style`, async t => {
   const a = review(t), doc = a.dom.window.document;
   await a.call('setSetting', 'evalbarDesign', 'original');
-  await a.call('setSetting', 'barStyle', 'flat');
+  await a.call('setSetting', 'barStyle', style);
   const bar = doc.querySelector('.evalbar'), fill = bar.querySelector('.white-fill');
   for (const [evaluation, text, share, side] of [
     [{cp: 0}, '0.0', 50, 'bot'],
@@ -65,7 +65,7 @@ test('Flat keeps scores, mates and board orientation live and restores the saved
   restored.replace('resetSettingsForRelease', async () => {});
   restored.store.settings = {barStyle: a.store.settings.barStyle};
   await restored.start();
-  assert.ok(restored.dom.window.document.querySelector('.evalbar.eb-flat'));
+  assert.ok(restored.dom.window.document.querySelector('.evalbar.eb-' + style));
 });
 
 test('Balance explains signs and mates, follows flips, and keeps live nodes mounted', t => {

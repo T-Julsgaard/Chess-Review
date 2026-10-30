@@ -1,13 +1,13 @@
 /* Flat uses the existing score font and orientation, with a wider, square rail. */
-.evalbar.eb-flat {
+.evalbar:is(.eb-flat, .eb-flat2) {
   width: 30px; border: 0; border-radius: 0; clip-path: none;
-  background: #3d3d42;
 }
-.mod[data-mod="evalbar"] .evalbar.eb-flat {
+.mod[data-mod="evalbar"] .evalbar:is(.eb-flat, .eb-flat2) {
   width: calc(100% + 4px); margin-inline: -2px;
 }
+.evalbar.eb-flat { background: #3d3d42; }
 .evalbar.eb-flat .white-fill { background: #fff; }
-.evalbar.eb-flat .score {
+.evalbar:is(.eb-flat, .eb-flat2) .score {
   font-size: min(14px, calc((100cqw - 4px) / (var(--score-chars, 4) * .6)));
   letter-spacing: 0;
 }

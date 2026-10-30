@@ -1258,8 +1258,8 @@ button { font-family: inherit; cursor: pointer; }
 
 /* ---- eval-bar look variants (Settings → Visual → Layout → "Bar") ---- */
 /* classic = the base rules above. gradient: a soft glossy sheen on each half. */
-.evalbar.eb-gradient { background: linear-gradient(180deg, #343434, #232323); }
-.evalbar.eb-gradient .white-fill { background: linear-gradient(180deg, #ffffff, #e6e3d8); }
+.evalbar.eb-gradient, .evalbar.eb-flat2 { background: linear-gradient(180deg, #343434, #232323); }
+.evalbar.eb-gradient .white-fill, .evalbar.eb-flat2 .white-fill { background: linear-gradient(180deg, #ffffff, #e6e3d8); }
 /* mono: maximum contrast, crisp pure white over near-black. */
 .evalbar.eb-mono { background: #111; }
 .evalbar.eb-mono .white-fill { background: #fff; }
