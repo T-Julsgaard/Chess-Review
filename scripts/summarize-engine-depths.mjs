@@ -12,7 +12,7 @@ const args = process.argv.slice(2), input = path.resolve(args[args.indexOf('--in
 if (!args.includes('--input') || !args.includes('--out')) throw Error('Usage: node scripts/summarize-engine-depths.mjs --input RUN --out REPORT');
 const manifest = JSON.parse(await fs.readFile(path.join(input, 'manifest.json')));
 const results = JSON.parse(await fs.readFile(path.join(input, 'results.json')));
-assert.equal(manifest.pilot, false); assert.equal(results.results.length, 60);
+assert.equal(manifest.pilot, false); assert.equal(results.results.length, manifest.longGames ? 18 : 60);
 const root = fileURLToPath(new URL('../', import.meta.url));
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 for (const [name, expected] of Object.entries(manifest.inputHashes)) {
@@ -59,6 +59,7 @@ for (const row of rows) {
 const median = values => { const sorted = [...values].sort((a, b) => a - b), mid = Math.floor(sorted.length / 2); return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2; };
 const select = (build, depth, cold = true, game) => rows.filter(row => row.build === build && row.depth === depth && row.cold === cold && (!game || row.game === game));
 const engineName = build => build === 'nnue' ? 'Stockfish 18 NNUE' : 'Stockfish 19 Lite';
+if (manifest.longGames) { await summarizeLongGames(); process.exit(0); }
 const timing = [], accuracy = [], errors = [], byGame = [], singleResetErrors = [];
 for (const build of ['nnue', 'sf19lite']) {
   for (const [depth, cold] of [[6, true], [8, true], [16, true], [8, false]]) {
@@ -129,3 +130,39 @@ await fs.writeFile(path.join(out, 'observations.json.gz'), gzipSync(JSON.stringi
 await fs.writeFile(path.join(out, 'summary.json'), JSON.stringify(summary, null, 2));
 await fs.writeFile(path.join(out, 'RESULT.md'), report);
 console.log(JSON.stringify(summary, null, 2));
+
+async function summarizeLongGames() {
+  const timing = manifest.games.map(game => {
+    const depths = Object.fromEntries([6, 8].map(depth => {
+      const samples = select('nnue', depth, true, game.id);
+      assert.equal(samples.length, 3);
+      assert.deepEqual(samples.map(row => row.trial).sort(), [0, 1, 2]);
+      const values = samples.map(row => row.totalMs);
+      return [depth, {medianMs: median(values), minMs: Math.min(...values), maxMs: Math.max(...values), samplesMs: values}];
+    }));
+    return {game: game.id, source: game.source, plies: game.plies, fullMoves: game.plies / 2, depths,
+      savedMs: depths[8].medianMs - depths[6].medianMs, reductionPercent: 100 * (1 - depths[6].medianMs / depths[8].medianMs)};
+  });
+  const summary = {sourceRevision: manifest.revision, startedAt: manifest.startedAt, finishedAt: results.finishedAt,
+    cpu: manifest.cpu, browser: results.userAgent, verifiedRuns: rows.length,
+    verifiedHalfMoves: raw.reduce((sum, row) => sum + row.plies, 0), timing};
+  const seconds = ms => (ms / 1000).toFixed(2);
+  let report = '# Stockfish 18 on longer games\n\n';
+  report += 'Measured on 31 October 2026 with **' + manifest.cpu + '** in real Chrome workers, using the same configuration as the earlier comparison: one worker, Hash16, maximum skill, MultiPV1, full mainline histories, and exact best/played searches at each original root. Times include worker startup, validation, search and scoring, excluding site fetching and UI. Each game/depth has three independent fresh-worker runs.\n\n';
+  report += 'A full move means one White move plus one Black move. These examples contain 122, 160 and 208 half-moves.\n\n| Completed game | Full moves | Depth6 median (range), seconds | Depth8 median (range), seconds | Depth6 saves |\n|---|---:|---:|---:|---:|\n';
+  for (const row of timing) {
+    const cell = depth => seconds(row.depths[depth].medianMs) + ' (' + seconds(row.depths[depth].minMs) + '–' + seconds(row.depths[depth].maxMs) + ')';
+    report += '| [' + row.game + '](' + row.source + ') | ' + row.fullMoves + ' | ' + cell(6) + ' | ' + cell(8) + ' | ' + seconds(row.savedMs) + ' s / ' + row.reductionPercent.toFixed(1) + '% |\n';
+  }
+  report += '\nAll ' + rows.length + ' complete-game analyses (' + summary.verifiedHalfMoves + ' half-moves) passed independent legal replay and score re-aggregation. No incomplete runs were substituted or dropped.\n\n';
+  report += 'These are three measured examples, not a worst-case bound or an estimate of cost per additional move. Different position complexity, legal choices and browser/machine load also affect time. The wrapper replays root histories and resets the engine for each search, so a universal linear estimate is inappropriate. Fresh workers run in the same browser process, and browser/WASM caches may be warm. Production behavior has not been changed.\n\n';
+  report += 'Collection: `node scripts/benchmark-engine-depths.mjs --out NEW_DIRECTORY --long-games`. Report/replay: `node scripts/summarize-engine-depths.mjs --input NEW_DIRECTORY --out REPORT_DIRECTORY`. Source revision: `' + manifest.revision + '`.\n\n';
+  report += 'See [plan](PLAN.md), [input manifest and eligibility receipt](input-manifest.json), [all run timings](runs.json), [summary](summary.json), and [compressed raw observations](observations.json.gz).\n';
+  await fs.mkdir(out, {recursive: true});
+  await fs.writeFile(path.join(out, 'input-manifest.json'), JSON.stringify(manifest, null, 2));
+  await fs.writeFile(path.join(out, 'runs.json'), JSON.stringify(results, null, 2));
+  await fs.writeFile(path.join(out, 'observations.json.gz'), gzipSync(JSON.stringify(raw), {level: 9}));
+  await fs.writeFile(path.join(out, 'summary.json'), JSON.stringify(summary, null, 2));
+  await fs.writeFile(path.join(out, 'RESULT.md'), report);
+  console.log(JSON.stringify(summary, null, 2));
+}

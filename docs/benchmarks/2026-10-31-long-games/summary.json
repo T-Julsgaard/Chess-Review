@@ -1,0 +1,101 @@
+{
+  "sourceRevision": "93ab66336bf1c280e6234201211490f453aa19a5",
+  "startedAt": "2026-10-30T23:25:42.576Z",
+  "finishedAt": "2026-10-30T23:28:21.026Z",
+  "cpu": "Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz",
+  "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+  "verifiedRuns": 18,
+  "verifiedHalfMoves": 2940,
+  "timing": [
+    {
+      "game": "qQGPXMfq",
+      "source": "https://lichess.org/qQGPXMfq",
+      "plies": 122,
+      "fullMoves": 61,
+      "depths": {
+        "6": {
+          "medianMs": 5611.199999988079,
+          "minMs": 5355.699999988079,
+          "maxMs": 5823,
+          "samplesMs": [
+            5355.699999988079,
+            5611.199999988079,
+            5823
+          ]
+        },
+        "8": {
+          "medianMs": 6224.9000000059605,
+          "minMs": 5603.199999988079,
+          "maxMs": 6744.699999988079,
+          "samplesMs": [
+            5603.199999988079,
+            6224.9000000059605,
+            6744.699999988079
+          ]
+        }
+      },
+      "savedMs": 613.7000000178814,
+      "reductionPercent": 9.858792912613756
+    },
+    {
+      "game": "6Rl2Exa5",
+      "source": "https://lichess.org/6Rl2Exa5",
+      "plies": 160,
+      "fullMoves": 80,
+      "depths": {
+        "6": {
+          "medianMs": 7774.299999982119,
+          "minMs": 6901.299999982119,
+          "maxMs": 9183.5,
+          "samplesMs": [
+            7774.299999982119,
+            6901.299999982119,
+            9183.5
+          ]
+        },
+        "8": {
+          "medianMs": 7908,
+          "minMs": 7407.300000011921,
+          "maxMs": 9807.199999988079,
+          "samplesMs": [
+            7407.300000011921,
+            7908,
+            9807.199999988079
+          ]
+        }
+      },
+      "savedMs": 133.7000000178814,
+      "reductionPercent": 1.690692969371288
+    },
+    {
+      "game": "mCGCdRKM",
+      "source": "https://lichess.org/mCGCdRKM",
+      "plies": 208,
+      "fullMoves": 104,
+      "depths": {
+        "6": {
+          "medianMs": 8930.40000000596,
+          "minMs": 8859,
+          "maxMs": 16433.40000000596,
+          "samplesMs": [
+            8859,
+            8930.40000000596,
+            16433.40000000596
+          ]
+        },
+        "8": {
+          "medianMs": 11298,
+          "minMs": 9555.09999999404,
+          "maxMs": 17148,
+          "samplesMs": [
+            11298,
+            9555.09999999404,
+            17148
+          ]
+        }
+      },
+      "savedMs": 2367.5999999940395,
+      "reductionPercent": 20.955921401965295
+    }
+  ]
+}
