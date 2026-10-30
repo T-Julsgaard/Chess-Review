@@ -28,6 +28,9 @@
   transform: translate(-50%, -100%); background: var(--ink);
   clip-path: polygon(50% 0, 100% 100%, 0 100%); pointer-events: none;
 }
+.evaluation-position-guide {
+  stroke: var(--ink-3); stroke-width: 1; opacity: .45; pointer-events: none;
+}
 .evaluation-bars .eval-hover-dot, .evaluation-bars2 .eval-hover-dot { fill: var(--ink); stroke: var(--panel); }
 .evaluation-bars .evalgraph { position: relative; }
 .evaluation-move-dot {

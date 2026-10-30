@@ -26,7 +26,7 @@ test('keyboard and move-list cross gaps but stop at the furthest result', t => {
   assert.equal(doc.querySelector('#controls [aria-label="Next"]').disabled, true);
 });
 
-for (const design of ['original', 'timeline', 'timeline2', 'bars', 'bars2', 'minimal']) {
+for (const design of ['original', 'timeline', 'timeline2', 'bars', 'bars2', 'bars3', 'bars4', 'minimal']) {
   test(`${design} graph navigation crosses gaps but cannot pass the last score`, t => {
     const a = pendingReview(t), S = a.state, doc = a.dom.window.document;
     S.settings.graphDesign = design; a.call('renderGraph');

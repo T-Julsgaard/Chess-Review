@@ -5036,7 +5036,7 @@ function updateGraphReadout(refs) {
   }
   const description = e == null ? label : e.mate != null ? `${side} has mate in ${Math.abs(e.mate)}`
     : rounded === '0.0' ? label : `${side} is ahead by ${rounded} pawns`;
-  const category = ['timeline2', 'bars', 'bars2'].includes(panelDesign('graph', S.settings)) && S.idx > 0 && e && S.classif[S.idx]
+  const category = ['timeline2', 'bars', 'bars2', 'bars3', 'bars4'].includes(panelDesign('graph', S.settings)) && S.idx > 0 && e && S.classif[S.idx]
     ? ` ${gradeLabel(S.classif[S.idx], S.moveGrades[S.idx], categoryName(S.classif[S.idx]))}.` : '';
   refs.chart.setAttribute('aria-valuenow', Math.min(S.idx, refs.lastPly));
   refs.chart.setAttribute('aria-valuetext', `${graphPositionText(S.idx)}. ${description}.${category} Positive scores favor White; negative scores favor Black.`);
@@ -5052,7 +5052,7 @@ function renderGraph() {
   if (mod) mod.hidden = !show;   // hidden, not just emptied, so the layout closes the gap
   if (!show) { UI.graph.replaceChildren(); UI.graphRefs = null; return; }
   const design = panelDesign('graph', S.settings), modern = design !== 'original', compact = design === 'minimal';
-  const bars = design === 'bars' || design === 'bars2';
+  const bars = ['bars', 'bars2', 'bars3', 'bars4'].includes(design);
   const W = 384, H = 120, mid = H / 2;
   const maxPly = Math.max(1, S.total);
   const toX = (p) => bars ? ((p + .5) / (maxPly + 1)) * W : (p / maxPly) * W;
@@ -5096,12 +5096,23 @@ function renderGraph() {
   const graphKey = JSON.stringify([design,S.total,S.settings.graphStyle || "area",pts,S.classif,S.blank,
     design === 'timeline2' ? S.moveGrades : null, bars ? barLimit : null, lastPly]);
   const markerVisible = modern ? !!S.evals[S.idx] : S.idx > 0 && S.idx < S.total;
+  // Stop the v3 guide at the bar's tip, including the minimum-height equal bar.
+  const barTip = cp => cp >= 0 ? Math.min(mid - .8, toY(cp)) : Math.max(mid + .8, toY(cp));
+  const updateBarGuide = chart => {
+    const guide = chart.querySelector('.evaluation-position-guide');
+    if (!guide) return;
+    const x = toX(Math.min(S.idx, maxPly));
+    guide.setAttribute('x1', x); guide.setAttribute('x2', x);
+    if (markerVisible) guide.setAttribute('y1', barTip(scoreToCp(S.evals[S.idx])));
+    guide.style.display = markerVisible ? '' : 'none';
+  };
   const retained = UI.graphRefs;
   if (retained?.key === graphKey && retained.marker.isConnected) {
     const x = toX(Math.min(S.idx,maxPly));
     if (bars) retained.marker.style.left = `${x / W * 100}%`;
     else if (retained.marker.getAttribute("x1") !== String(x)) { retained.marker.setAttribute("x1",x); retained.marker.setAttribute("x2",x); }
     retained.marker.style.display = markerVisible ? "" : "none";
+    if (design === 'bars3') updateBarGuide(retained.chart);
     updateGraphReadout(retained);
     return;
   }
@@ -5169,8 +5180,11 @@ function renderGraph() {
       const unit = W / (maxPly + 1), width = Math.max(.25, unit * .72);
       inner = pts.map(p => {
         const y = toY(p.cp), height = Math.max(.8, Math.abs(y - mid));
-        return `<rect class="evaluation-column ${p.cp >= 0 ? 'white' : 'black'}" x="${p.ply * unit + (unit - width) / 2}" y="${p.cp >= 0 ? mid - height : mid}" width="${width}" height="${height}" rx="${Math.min(1.5,width/3)}"/>`;
+        const category = design === 'bars4' && p.ply > 0 && QUALITY[S.classif[p.ply]] ? S.classif[p.ply] : null;
+        const color = category ? ` data-category="${category}" style="fill:${QUALITY[category].color}"` : '';
+        return `<rect class="evaluation-column ${p.cp >= 0 ? 'white' : 'black'}"${color} x="${p.ply * unit + (unit - width) / 2}" y="${p.cp >= 0 ? mid - height : mid}" width="${width}" height="${height}" rx="${Math.min(1.5,width/3)}"/>`;
       }).join('') + guides;
+      if (design === 'bars3') inner += `<line class="evaluation-position-guide" y1="${mid}" y2="${H}" vector-effect="non-scaling-stroke"/>`;
     }
   }
   const hoverY = compact || !modern && style === "color" ? toYc : toY;
@@ -5235,13 +5249,14 @@ function renderGraph() {
       chart.append(el('span', {class: 'eval-position evaluation-position-marker', 'aria-hidden': 'true',
         style: {left: `${markerX / W * 100}%`, display: markerVisible ? '' : 'none'}}));
       // Fixed-size HTML circles stay round even when the underlying SVG is stretched.
-      for (const p of dots.filter(p => p.ply > 0 && (design === 'bars2' || S.classif[p.ply] !== 'mistake'))) {
+      for (const p of dots.filter(p => design !== 'bars4' && p.ply > 0 && (design !== 'bars' || S.classif[p.ply] !== 'mistake'))) {
         chart.append(el('span', {class: 'evaluation-move-dot', 'data-ply': p.ply,
           'data-category': S.classif[p.ply], 'aria-hidden': 'true',
           style: {left: `clamp(3.5px, ${toX(p.ply) / W * 100}%, calc(100% - 3.5px))`,
             top: `clamp(3.5px, ${toY(p.cp) / H * 100}%, calc(100% - 3.5px))`,
             background: QUALITY[S.classif[p.ply]].color}}));
       }
+      if (design === 'bars3') updateBarGuide(chart);
     }
     if (design === 'timeline2') {
       // HTML overlays keep the shared badges circular when the SVG stretches to fit the panel.
@@ -5263,7 +5278,7 @@ function renderGraph() {
       return;
     }
     const readout = el('strong', {class: 'evaluation-score', title: 'Positive favors White; negative favors Black. M means mate.'});
-    UI.graph.replaceChildren(el('div', {class: 'panel eval-side evaluation-panel evaluation-' + design + (design === 'bars2' ? ' evaluation-bars' : ''), 'data-design': design, 'aria-label': 'Evaluation'},
+    UI.graph.replaceChildren(el('div', {class: 'panel eval-side evaluation-panel evaluation-' + design + (bars && design !== 'bars' ? ' evaluation-bars' : ''), 'data-design': design, 'aria-label': 'Evaluation'},
       readout,
       el('div', {class: 'evaluation-plot'}, chart,
         !pts.length ? el('span', {class: 'evaluation-empty'}, S.blank ? 'Load a game to see its evaluation' : 'Waiting for analysis…') : null)));

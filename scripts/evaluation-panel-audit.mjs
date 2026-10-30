@@ -4,6 +4,8 @@ import assert from 'node:assert/strict';
 
 export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const run = expression => evaluate(review,expression);
+  // Coach annotation searches may finish in the background; compare scored results.
+  const snapshot = () => run("import('./analysis.js').then(m=>JSON.stringify({idx:m.S.idx,evals:m.S.evals,bests:m.S.bests.map(b=>b&&({bestmove:b.bestmove,score:b.score,playedScore:b.playedScore})),layout:m.S.layout}))");
   const settings = async () => {
     await run("document.querySelector('#settings').hidden&&document.querySelector('[aria-label=Settings]').click();(()=>{const n=[...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Tabs');if(n.getAttribute('aria-expanded')!=='true')n.click()})()");
   };
@@ -22,10 +24,10 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const evidence=[];
   for (const [width,height] of [[1920,1080],[1366,768],[1280,600],[390,844],[320,640]]) {
     await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId); await sleep(160);
-    for (const design of ['timeline','timeline2','bars','minimal','original']) {
-      const before = await run("import('./analysis.js').then(m=>JSON.stringify({idx:m.S.idx,evals:m.S.evals,bests:m.S.bests,layout:m.S.layout}))");
+    for (const design of ['timeline','bars','bars2','bars3','bars4','minimal','original']) {
+      const before = await snapshot();
       await choose(design);
-      assert.equal(await run("import('./analysis.js').then(m=>JSON.stringify({idx:m.S.idx,evals:m.S.evals,bests:m.S.bests,layout:m.S.layout}))"),before);
+      assert.equal(await snapshot(),before);
       if (design === 'original') continue;
       const fit = await run("(()=>{const p=document.querySelector('.evaluation-panel'),q=p.getBoundingClientRect(),f=p.querySelector('.evaluation-footer')?.getBoundingClientRect(),s=p.querySelector('.evalgraph').getBoundingClientRect();return {overflow:p.scrollWidth-p.clientWidth,vertical:p.scrollHeight-p.clientHeight,footer:!f||f.bottom<=q.bottom+1,plot:s.height,height:p.offsetHeight,page:document.documentElement.scrollWidth-innerWidth,columns:p.querySelectorAll('.evaluation-column').length}})()");
       assert.ok(fit.overflow<=1&&fit.vertical<=1&&fit.footer&&fit.plot>=19&&fit.page<=1,JSON.stringify({width,height,design,fit}));
@@ -46,6 +48,27 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
           ['brilliant','great','miss','blunder'].includes(dot.category)&&dot.text===''&&dot.round&&dot.inside),
         JSON.stringify({width,height,markers}));
       }
+      if (design === 'bars3') {
+        const guide = await run(`(()=>{
+          const chart=document.querySelector('.evaluation-bars3 .evalgraph'),g=chart.querySelector('.evaluation-position-guide'),
+            marker=chart.querySelector('.evaluation-position-marker'),r=chart.getBoundingClientRect(),
+            svg=chart.querySelector('svg').getBoundingClientRect(),s=getComputedStyle(g);
+          return {visible:s.display!=='none',width:parseFloat(s.strokeWidth),opacity:+s.opacity,
+            aligned:Math.abs(svg.left+(+g.getAttribute('x1')/384)*svg.width-(r.left+parseFloat(marker.style.left)/100*r.width))<1,
+            end:+g.getAttribute('y2'),start:+g.getAttribute('y1')};
+        })()`);
+        assert.ok(guide.visible&&guide.aligned&&guide.width===1&&guide.opacity<.6&&guide.end===120&&guide.start<120,JSON.stringify(guide));
+      }
+      if (design === 'bars4') {
+        const colors = await run(`import('./analysis.js').then(m=>{
+          const p=document.querySelector('.evaluation-bars4'),bars=[...p.querySelectorAll('.evaluation-column')];
+          return {dots:p.querySelectorAll('.evaluation-move-dot').length,
+            classified:bars.filter(b=>b.dataset.category).length,
+            correct:bars.filter(b=>b.dataset.category).every(b=>b.style.fill==='var(--q-'+b.dataset.category+')'),
+            count:bars.length,expected:m.S.evals.filter(Boolean).length};
+        })`);
+        assert.ok(colors.dots===0&&colors.classified>0&&colors.correct&&colors.count===colors.expected,JSON.stringify(colors));
+      }
       if (design==='minimal') {
         assert.ok(fit.height<=96,JSON.stringify(fit));
         assert.equal(await run("document.querySelector('.evaluation-minimal').textContent"),'');
@@ -65,7 +88,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   }
   await call('Emulation.setDeviceMetricsOverride',{width:1920,height:1080,deviceScaleFactor:1,mobile:false},review.sessionId);
   await sleep(200);
-  for (const design of ['timeline','timeline2','bars','bars2','minimal']) {
+  for (const design of ['timeline','bars','bars2','bars3','bars4','minimal']) {
     await choose(design);
     await run("document.querySelector('.evaluation-panel [role=slider]').focus()");
     await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Home',code:'Home'},review.sessionId);

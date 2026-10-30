@@ -34,7 +34,7 @@ visual preferences.
 | --- | --- | --- |
 | Engine | Original, Focus, Minimal | Original (Minimal in Modern setup) |
 | Evaluation bar | Original, Balance | Balance |
-| Evaluation | Original, Timeline, Timeline v2, Move bars, Move bars v2, Minimal | Timeline (Move bars in Modern setup) |
+| Evaluation | Original, Timeline, Timeline v2, Move bars, Move bars v2, Move bars v3, Move bars v4, Minimal | Timeline (Move bars in Modern setup) |
 | Accuracy overview | Original, Page tabs, Dials, Reveal, Phase report, Phase report 2, Phase report Modern, Phase report Modern v2 | Phase report |
 | Accuracy move quality | Original, Distribution | Distribution |
 | Accuracy advanced | Original | Original |
@@ -194,7 +194,12 @@ resized and stay inside the plot at its ends. Choose it under **Settings → Vis
 Move bars is the Modern setup's default. Existing Modern setups using Original
 upgrade once; other saved designs and subsequent choices are retained. It gives
 every analyzed position its own column: light above zero for White, gray below
-zero for Black. Move bars and Move bars v2 use an ivory position/hover guide in
+zero for Black. Move bars v2 adds category dots at the bar tips. Move bars v3
+keeps those dots and connects the current position's bottom marker to the selected
+bar tip with a thin, muted guide. Move bars v4 replaces the dots with full-bar
+colors for every move category (including red for blunders); the starting position
+and unclassified moves keep their neutral White/Black colors.
+The Move bars designs use an ivory position/hover marker in
 dark themes and charcoal in light themes. These designs support
 click-to-jump, hover scores and keyboard navigation (arrows, Home, End), preserve
 focus and chart nodes while navigating. Empty

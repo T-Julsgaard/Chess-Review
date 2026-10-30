@@ -14,10 +14,10 @@ test('Tabs exposes Evaluation designs, saves them and preserves all analysis', a
   await a.call('toggleSettings');
   const section = [...doc.querySelectorAll('.set-section')].find(n => n.querySelector('.set-sect-head').textContent === 'Tabs');
   section.querySelector('.set-sect-head').click();
-  assert.deepEqual([...section.querySelectorAll('.lib-dd-opt[data-setting="graphDesign"]')].map(n => n.textContent), ['Original','Timeline','Move bars','Move bars v2','Minimal']);
+  assert.deepEqual([...section.querySelectorAll('.lib-dd-opt[data-setting="graphDesign"]')].map(n => n.textContent), ['Original','Timeline','Move bars','Move bars v2','Move bars v3','Move bars v4','Minimal']);
   const before = JSON.stringify({evals:a.state.evals,bests:a.state.bests,idx:a.state.idx,layout:a.state.layout});
   a.replace('scheduleReanalyze', () => { throw Error('Design changes must not analyze'); });
-  for (const design of ['bars','bars2','original','timeline','minimal']) {
+  for (const design of ['bars','bars2','bars3','bars4','original','timeline','minimal']) {
     doc.querySelector(`[data-setting="graphDesign"][data-value="${design}"]`).click();
     await settle(); await a.run('_settingsWriteQueue');
     assert.equal(a.store.settings.graphDesign, design);
@@ -26,7 +26,7 @@ test('Tabs exposes Evaluation designs, saves them and preserves all analysis', a
   }
 });
 
-for (const design of ['timeline','timeline2','bars','bars2','minimal']) {
+for (const design of ['timeline','timeline2','bars','bars2','bars3','bars4','minimal']) {
   test(`${design} retains chart and keyboard focus while updating score and accessible position descriptions`, async t => {
     const a = review(t), doc = a.dom.window.document;
     await a.call('setSetting','graphDesign',design);
@@ -158,7 +158,7 @@ test('Move bars marks only brilliant, great, miss and blunder moves with colored
   assert.deepEqual([...doc.querySelectorAll('.evaluation-move-dot')].map(dot => dot.dataset.ply), ['1','2','3']);
 });
 
-for (const design of ['bars', 'bars2']) {
+for (const design of ['bars', 'bars2', 'bars3', 'bars4']) {
   test(`${design} reveals small changes and growing advantages through ten pawns on both sides`, async t => {
     const a = review(t), doc = a.dom.window.document;
     for (const sign of [1, -1]) {
@@ -182,7 +182,7 @@ for (const design of ['bars', 'bars2']) {
         chart.dispatchEvent(new a.dom.window.MouseEvent('mousemove', {clientX:(ply + .5) / scores.length * 384, bubbles:true}));
         assert.ok(Math.abs(+chart.querySelector('.eval-hover-dot').getAttribute('cy') - tip) < 1e-8);
         assert.equal(doc.querySelector('.eval-tip').textContent, a.call('evalText', scores[ply]));
-        if (design === 'bars2') {
+        if (design === 'bars2' || design === 'bars3') {
           const dot = chart.querySelector(`.evaluation-move-dot[data-ply="${ply}"]`);
           assert.ok(Math.abs(Number(dot.style.top.match(/, ([\d.]+)%/)[1]) - tip / 120 * 100) < 1e-8);
         }
@@ -243,14 +243,66 @@ test('Move bars v2 adds Timeline dots at the bar tips and updates them with clas
   assert.deepEqual(dots().map(dot => dot.dataset.category), ['miss','blunder']);
 });
 
-test('Move bars v2 restores its saved choice in a blank workspace without dots', async t => {
-  const a = app(t,{url:'https://extension.test/analysis.html?workspace=blank'}), doc = a.dom.window.document;
-  a.replace('resetSettingsForRelease',async () => {});
-  a.store.settings = {graphDesign:'bars2'}; await a.start();
-  assert.equal(doc.querySelector('.evaluation-panel').dataset.design,'bars2');
-  assert.match(doc.querySelector('.evaluation-empty').textContent,/Load a game/);
-  assert.equal(doc.querySelector('.evaluation-move-dot'),null);
+test('Move bars v3 guide follows the selected bar through navigation, flips and pending results', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  await a.call('setSetting','graphDesign','bars3');
+  const chart = doc.querySelector('.evaluation-bars3 [role=slider]');
+  const guide = chart.querySelector('.evaluation-position-guide'), svg = chart.querySelector('svg');
+  assert.equal(chart.querySelectorAll('.evaluation-move-dot').length,
+    a.state.classif.filter((cat, ply) => ply > 0 && ['mistake','great','brilliant','blunder','miss'].includes(cat)).length);
+  for (const ply of [0,1,3,4]) {
+    a.call('go',ply);
+    const bar = chart.querySelectorAll('.evaluation-column')[ply];
+    assert.equal(chart.querySelector('svg'),svg);
+    assert.equal(chart.querySelector('.evaluation-position-guide'),guide);
+    assert.equal(+guide.getAttribute('x1'), (ply + .5) / 5 * 384);
+    assert.equal(guide.getAttribute('x1'),guide.getAttribute('x2'));
+    assert.equal(+guide.getAttribute('y1'), +bar.getAttribute('y') + (ply === 3 ? +bar.getAttribute('height') : 0));
+    assert.equal(+guide.getAttribute('y2'),120);
+    assert.equal(guide.style.display,'');
+  }
+  a.state.flipped = true; a.call('renderGraph');
+  assert.equal(chart.querySelector('.evaluation-position-guide'),guide);
+  a.state.evals[2] = null; a.call('go',2);
+  assert.equal(doc.querySelector('.evaluation-position-guide').style.display,'none');
+  assert.equal(doc.querySelector('.evaluation-position-marker').style.display,'none');
+  a.state.evals[2] = {cp:-300}; a.call('renderGraph');
+  const updated = doc.querySelector('.evaluation-position-guide');
+  assert.equal(updated.style.display,'');
+  assert.ok(+updated.getAttribute('y1') > 60);
 });
+
+test('Move bars v4 colors every classified bar, omits category dots and refreshes classification colors', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  loadGame(a, '1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7',
+    Array.from({length:11}, (_, ply) => ({cp:ply % 2 ? -100 : 100})));
+  const categories = ['brilliant','great','best','excellent','good','book','inacc','mistake','miss','blunder'];
+  a.state.classif = ['blunder', ...categories];
+  await a.call('setSetting','graphDesign','bars4');
+  const columns = () => [...doc.querySelectorAll('.evaluation-column')];
+  assert.equal(doc.querySelector('.evaluation-move-dot,.evaluation-position-guide'),null);
+  assert.equal(columns()[0].style.fill,'', 'Starting position has no move classification');
+  assert.deepEqual(columns().slice(1).map(bar => bar.dataset.category),categories);
+  assert.deepEqual(columns().slice(1).map(bar => bar.style.fill),categories.map(cat => `var(--q-${cat})`));
+  a.call('go',10);
+  assert.match(doc.querySelector('[role=slider]').getAttribute('aria-valuetext'),/Blunder/);
+  a.state.classif[1] = 'blunder'; a.state.classif[2] = null; a.call('renderGraph');
+  assert.equal(columns()[1].style.fill,'var(--q-blunder)');
+  assert.equal(columns()[2].style.fill,'');
+  a.state.evals[3] = null; a.call('renderGraph');
+  assert.equal(columns().length,10, 'Pending positions have no colored bar');
+});
+
+for (const design of ['bars2','bars3','bars4']) {
+  test(`${design} restores its saved choice in a blank workspace without dots`, async t => {
+    const a = app(t,{url:'https://extension.test/analysis.html?workspace=blank'}), doc = a.dom.window.document;
+    a.replace('resetSettingsForRelease',async () => {});
+    a.store.settings = {graphDesign:design}; await a.start();
+    assert.equal(doc.querySelector('.evaluation-panel').dataset.design,design);
+    assert.match(doc.querySelector('.evaluation-empty').textContent,/Load a game/);
+    assert.equal(doc.querySelector('.evaluation-move-dot'),null);
+  });
+}
 
 test('Minimal shows only black and white fields, with hover on the boundary and no labels or colored annotations', async t => {
   const a = review(t), doc = a.dom.window.document;
@@ -303,7 +355,7 @@ test('empty and missing evaluations have honest states; saved designs restore af
 });
 
 for (const [design, style] of [
-  ['timeline','area'], ['timeline2','area'], ['bars','area'], ['bars2','area'], ['minimal','area'],
+  ['timeline','area'], ['timeline2','area'], ['bars','area'], ['bars2','area'], ['bars3','area'], ['bars4','area'], ['minimal','area'],
   ...['area','line','minimal','color'].map(style => ['original',style]),
 ]) {
   test(`${design}/${style} renders out-of-order results without bridging pending positions`, t => {
