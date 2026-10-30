@@ -20,7 +20,7 @@
   "devDependencies": {
     "@types/react": "19.3.0",
     "playwright-core": "1.63.0",
-    "typescript": "5.9.3"
+    "typescript": "7.0.2"
   },
   "overrides": {
     "zod": "^4.6.7"
