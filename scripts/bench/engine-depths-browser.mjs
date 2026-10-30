@@ -7,10 +7,14 @@ async function post(type, value) {
   if (!response.ok) throw Error('Could not retain benchmark evidence: ' + await response.text());
 }
 
-export async function runBenchmark({games, calibration, pilot = false}) {
+export async function runBenchmark({games, calibration, pilot = false, longGames = false}) {
   const jobs = [];
   if (pilot) {
     for (const build of ['nnue', 'sf19lite']) jobs.push({build, depth: 16, trial: 0, cold: true, game: games[0], limit: 8});
+  } else if (longGames) {
+    for (let trial = 0; trial < 3; trial++) for (const game of games) {
+      for (const depth of trial % 2 ? [8, 6] : [6, 8]) jobs.push({build: 'nnue', depth, trial, cold: true, game});
+    }
   } else {
     // Alternate engine order to reduce systematic warmup/order bias. No overlapping searches.
     for (const depth of [6, 8, 16]) for (let trial = 0; trial < (depth === 16 ? 1 : 3); trial++) {
