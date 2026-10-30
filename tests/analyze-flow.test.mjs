@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 globalThis.chrome = {};
 const { analyzeActiveTab, reloadActiveAndAnalyze, openAnalysisTab, openBlankWorkspaceTab, analyzeChesscomUrl } = await import('../analyze-flow.js');
 import {createImportRequest} from '../lib/import-request.js';
-import {app,deferred,settle} from './helpers/app.mjs';
+const {app,deferred,settle} = await import('./helpers/app.mjs');
 
 function setup(t, url = 'https://www.chess.com/game/live/12345678') {
   const store = {}, opened = [], listeners = new Set();

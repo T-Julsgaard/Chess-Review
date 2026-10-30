@@ -1,6 +1,5 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { app, deferred, settle } from './helpers/app.mjs';
 import { UI_SETUPS, MODERN_LAYOUT } from '../lib/ui-setups.js';
 import { LEARNING_ANNOUNCEMENT_SEEN as seen, LEARNING_ANNOUNCEMENT_DISABLED as disabled } from '../lib/learning-announcement.js';
 
@@ -12,6 +11,8 @@ globalThis.chrome = {
   },
   commands: { onCommand: { addListener() {} } },
 };
+// Initialize the browser facade only after the extension API mock exists.
+const { app, deferred, settle } = await import('./helpers/app.mjs');
 const { resetSettingsForRelease } = await import('../release-settings.js');
 await import('../background.js');
 
