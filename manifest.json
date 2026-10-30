@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Chess Review",
+  "name": "| CHESS REVIEW | The open-source alternative",
   "version": "0.4.0",
   "description": "Free, open-source chess analysis, puzzles and opening lessons.",
   "minimum_chrome_version": "121",
