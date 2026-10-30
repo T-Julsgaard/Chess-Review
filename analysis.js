@@ -4242,6 +4242,7 @@ function renderReview() {
 // Commentary for the move on the mainline at S.idx.
 function renderMoveComment() {
   const dopamine = S.settings.reviewMode === "dopamine";
+  const engineReplies = engineExplanationsEnabled();
   const body = el("div", { class: "ip-body" + (dopamine ? " dopamine-comment" : "") });
   if (dopamine) body.dataset.moveCategory = S.classif[S.idx] || "";
   if (S.idx === 0) {
@@ -4263,18 +4264,20 @@ function renderMoveComment() {
   const evCp = ev ? scoreToCp(ev) : null;
   const evTxt = ev ? evalText(ev) : "";
 
-  const head = el("div", { class: "ip-head" });
-  if (cfg) head.append(gradeBadge(cls, S.moveGrades[S.idx], "ip-badge"));
-  // Special coach phrasing can omit the category, so name it beside the move.
-  const sanDisplay = dopamine && cfg ? `${san} · ${categoryName(cls)}`
-    : S.settings.coach && !S.settings.coachPlain && cfg ? `${san} ${categoryName(cls)}` : san;
-  head.append(el("span", { class: "ip-move" }, sanDisplay));
-  if (evTxt && baseUiSetup() !== 'modern') head.append(el("span", { class: "ip-eval " + (evCp >= 0 ? "pos" : "neg") }, evTxt));
-  body.append(head);
+  if (!engineReplies) {
+    const head = el("div", { class: "ip-head" });
+    if (cfg) head.append(gradeBadge(cls, S.moveGrades[S.idx], "ip-badge"));
+    // Special coach phrasing can omit the category, so name it beside the move.
+    const sanDisplay = dopamine && cfg ? `${san} · ${categoryName(cls)}`
+      : S.settings.coach && !S.settings.coachPlain && cfg ? `${san} ${categoryName(cls)}` : san;
+    head.append(el("span", { class: "ip-move" }, sanDisplay));
+    if (evTxt && baseUiSetup() !== 'modern') head.append(el("span", { class: "ip-eval " + (evCp >= 0 ? "pos" : "neg") }, evTxt));
+    body.append(head);
+  }
 
   // Pick the line once per (ply + coach): a fresh signature → choose + type; otherwise reuse the
   // shown text (so unrelated re-renders don't re-pick or re-animate, and a coach switch re-types).
-  const explanation = engineExplanationsEnabled() ? explainMove({
+  const explanation = engineReplies ? explainMove({
     beforeFen: S.positions[S.idx - 1].fen, afterFen: S.positions[S.idx].fen, category: cls,
     beforeScore: S.evals[S.idx - 1], afterScore: S.evals[S.idx],
     beforePv: explanationPv(S.bests[S.idx - 1]), afterPv: explanationPv(S.bests[S.idx]),

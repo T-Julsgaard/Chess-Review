@@ -27,12 +27,14 @@ test('Coach offers text-only Engine explanations without changing Normal visuals
   assert.equal(control(true).getAttribute('aria-pressed'),'true');
   assert.equal(doc.activeElement,control(true));
   const body=a.call('renderMoveComment');
+  assert.equal(body.querySelector('.ip-head,.ip-badge,.ip-move'),null);
   assert.equal(body.querySelector('.ip-text').textContent,'This allows Qh4#, checkmate. Black can end the game immediately; White has no legal answer to the check.');
   assert.equal(body.querySelector('.dopamine-line,.dopamine-evaluation,.dopamine-detail'),null);
   assert.equal(doc.querySelector('.dopamine-comment,.dopamine-effect'),null);
   assert.equal(snapshot(),unchanged);
   await a.call('setCoachEngineReplies',false);
   assert.equal(a.run('_ipText'),plain);
+  assert.equal(a.call('renderMoveComment').querySelector('.ip-move').textContent,'g4');
   assert.equal(snapshot(),unchanged);
 });
 
@@ -76,6 +78,7 @@ test('Dopamine keeps its existing explanations until an explicit Coach choice ov
   await a.call('setSetting','reviewMode','dopamine');
   assert.equal(a.call('engineExplanationsEnabled'),true);
   assert.ok(a.call('renderMoveComment').querySelector('.dopamine-line'));
+  assert.equal(a.call('renderMoveComment').querySelector('.ip-head'),null);
   await a.call('setCoachEngineReplies',false);
   assert.equal(a.call('engineExplanationsEnabled'),false);
   assert.equal(a.call('renderMoveComment').querySelector('.dopamine-line'),null);
