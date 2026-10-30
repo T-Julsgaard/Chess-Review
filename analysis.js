@@ -175,8 +175,8 @@ const QUALITY_DESC = {
   blunder:   "A loss of at least 20 percentage points in estimated winning chances, or a severe forced-mate error. Special cases such as a missed opportunity can receive another label.",
 };
 // Explanations for the accuracy and elo numbers (shown as a tooltip like the categories).
-const ACCURACY_INFO = "SF18 uses the published public-data move-quality model. SF19 estimates accuracy from centipawn evaluations using a public winning-chance curve and combines ordinary and harmonic move averages to give mistakes more weight. Forced moves are excluded and opening moves are included. Annotations do not alter accuracy. Scores are estimates, not official platform scores.";
-const ELO_INFO = "Both engines support both rating modes using their own models. Use recorded rating compares this game's performance with players around the rating saved in the game. Stockfish 18 uses calibrated accuracy; Stockfish 19 uses its own expected-point losses, separately from displayed accuracy. Moves only ignores the saved rating and estimates a blitz rating level from the moves themselves; it needs at least 10 moves with more than one legal choice. Neither estimate changes your account rating.";
+const ACCURACY_INFO = "SF18 uses the published public-data move-quality model, calibrated at depth 16, hash 16 MB and maximum strength. Custom settings still produce accuracy estimates, with less validation. SF19 estimates accuracy from centipawn evaluations using a public winning-chance curve and combines ordinary and harmonic move averages to give mistakes more weight. Forced moves are excluded and opening moves are included. Annotations do not alter accuracy. Scores are estimates, not official platform scores.";
+const ELO_INFO = "Both engines support both rating modes using their own models. Use recorded rating compares this game's performance with players around the rating saved in the game. Stockfish 18 uses its accuracy model, with less validation at custom search settings; Stockfish 19 uses its own expected-point losses, separately from displayed accuracy. Moves only ignores the saved rating and estimates a blitz rating level from the moves themselves; it needs at least 10 moves with more than one legal choice. Neither estimate changes your account rating.";
 // Explanations for the engine settings (shown on hover, same tooltip as the accuracy panel).
 const ENGINE_INFO = {
   classifyLines: "How many candidate moves the engine analyzes and shows in the panel. You can remove displayed lines in the panel. Results appear after the first analysis line. Additional lines run in the background to check move categories, including Great. Background work uses one worker, pauses between positions and yields while you interact. Accuracy and rating scores stay unchanged.",
@@ -6500,7 +6500,7 @@ function motorSettings() {
         "Stockfish 19 compares expected-point losses with its own public peers. This rating comparison is separate from displayed accuracy.")) : null,
       el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Moves only: ignores the saved rating and estimates a blitz rating level from your move choices. Needs at least 10 moves with more than one legal choice. These estimates do not change your account rating.")),
       (S.settings.enginePath === "nnue" && (S.settings.engineDepth !== 16 || S.settings.engineHash !== 16 || S.settings.engineSkill !== 20))
-        ? el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Use depth 16, hash 16 MB and maximum strength for calibrated SF18 numerical scores.")) : null,
+        ? el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Custom search settings still show estimated accuracy and ratings. Use depth 16, hash 16 MB and maximum strength for calibrated SF18 numerical scores.")) : null,
     ),
     section("Engine",
       el("div", { class: "set-row" },

@@ -80,7 +80,10 @@ Hash16, MultiPV1, maximum skill, one thread, full initial-position history, and
 `ucinewgame + Clear Hash + isready` before every search. Non-top played moves are
 searched with `searchmoves` at the same root. `data/calibration.json` records loader
 and WASM hashes. Custom SF18 search settings do not produce calibrated numerical
-scores. Setup-FEN positions remain available for annotation, outside the fitted
+scores; they still show accuracy and contextual-rating estimates using the same
+public model. Phase accuracy and advanced statistics use those scored decisions
+as well. These estimates have less validation than the default search protocol.
+Setup-FEN positions remain available for annotation, outside the fitted
 standard-start accuracy domain.
 
 Move labels use expected-point loss bands and separately documented board/context
