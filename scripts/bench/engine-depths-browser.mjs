@@ -18,7 +18,9 @@ export async function runBenchmark({games, calibration, pilot = false}) {
         jobs.push({build, depth, trial, cold: true, game});
       }
     }
-    // A separate preview configuration: same roots and depth, but retain the hash.
+    // Historical "retained" keys mean no additional explicit Clear Hash. The
+    // wrapper still sends ucinewgame, so this measures single-reset overhead,
+    // not actual hash retention. See the report's post-collection correction.
     for (let trial = 0; trial < 3; trial++) for (const game of games) {
       for (const build of trial % 2 ? ['sf19lite', 'nnue'] : ['nnue', 'sf19lite']) jobs.push({build, depth: 8, trial, cold: false, game});
     }

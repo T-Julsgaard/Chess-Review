@@ -1,0 +1,340 @@
+{
+  "sourceRevision": "caeae03d4f5075c507697353c582d904ece3dfca",
+  "startedAt": "2026-10-30T23:00:14.466Z",
+  "finishedAt": "2026-10-30T23:08:21.951Z",
+  "cpu": "Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz",
+  "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+  "verifiedRuns": 60,
+  "verifiedHalfMoves": 5020,
+  "maxRepeatedScoreRange": 0,
+  "maxResetModeScoreDifference": 0,
+  "timing": [
+    {
+      "build": "nnue",
+      "depth": 6,
+      "cold": true,
+      "n": 9,
+      "medianMs": 3068.100000023842,
+      "minMs": 2557.199999988079,
+      "maxMs": 4600.5999999940395,
+      "startupMedianMs": 275.40000000596046
+    },
+    {
+      "build": "nnue",
+      "depth": 8,
+      "cold": true,
+      "n": 9,
+      "medianMs": 3551.5999999940395,
+      "minMs": 3014.600000023842,
+      "maxMs": 3642.5999999940395,
+      "startupMedianMs": 273
+    },
+    {
+      "build": "nnue",
+      "depth": 16,
+      "cold": true,
+      "n": 3,
+      "medianMs": 40368.09999999404,
+      "minMs": 33880.20000001788,
+      "maxMs": 58129.59999999404,
+      "startupMedianMs": 286.09999999403954
+    },
+    {
+      "build": "nnue",
+      "depth": 8,
+      "cold": false,
+      "n": 9,
+      "medianMs": 2563.199999988079,
+      "minMs": 2324.5,
+      "maxMs": 2899.5999999940395,
+      "startupMedianMs": 287
+    },
+    {
+      "build": "sf19lite",
+      "depth": 6,
+      "cold": true,
+      "n": 9,
+      "medianMs": 2887.7999999821186,
+      "minMs": 2581,
+      "maxMs": 3462.7000000178814,
+      "startupMedianMs": 170
+    },
+    {
+      "build": "sf19lite",
+      "depth": 8,
+      "cold": true,
+      "n": 9,
+      "medianMs": 3558.899999976158,
+      "minMs": 3078.2999999821186,
+      "maxMs": 4094.9000000059605,
+      "startupMedianMs": 175.7000000178814
+    },
+    {
+      "build": "sf19lite",
+      "depth": 16,
+      "cold": true,
+      "n": 3,
+      "medianMs": 58847.59999999404,
+      "minMs": 51592.29999998212,
+      "maxMs": 75696.19999998808,
+      "startupMedianMs": 170.69999998807907
+    },
+    {
+      "build": "sf19lite",
+      "depth": 8,
+      "cold": false,
+      "n": 9,
+      "medianMs": 2730.300000011921,
+      "minMs": 2429.0999999940395,
+      "maxMs": 3131.4000000059605,
+      "startupMedianMs": 179.69999998807907
+    }
+  ],
+  "accuracy": [
+    {
+      "build": "nnue",
+      "game": "oneIHkm8",
+      "color": "w",
+      "scores": {
+        "6": 55.543036169258606,
+        "8": 51.3151748775997,
+        "16": 47.50543635147951
+      },
+      "delta6": 8.037599817779096,
+      "delta8": 3.809738526120192
+    },
+    {
+      "build": "nnue",
+      "game": "oneIHkm8",
+      "color": "b",
+      "scores": {
+        "6": 57.204375782438554,
+        "8": 58.40181079011898,
+        "16": 57.12613803511841
+      },
+      "delta6": 0.07823774732014499,
+      "delta8": 1.2756727550005706
+    },
+    {
+      "build": "nnue",
+      "game": "aQ903hcx",
+      "color": "w",
+      "scores": {
+        "6": 73.66258741042866,
+        "8": 72.23412271375193,
+        "16": 75.07754433339802
+      },
+      "delta6": -1.4149569229693668,
+      "delta8": -2.8434216196460937
+    },
+    {
+      "build": "nnue",
+      "game": "aQ903hcx",
+      "color": "b",
+      "scores": {
+        "6": 68.80034475681245,
+        "8": 67.49583451722893,
+        "16": 72.44431335598571
+      },
+      "delta6": -3.643968599173263,
+      "delta8": -4.948478838756785
+    },
+    {
+      "build": "nnue",
+      "game": "nhuWmN0z",
+      "color": "w",
+      "scores": {
+        "6": 85.79956160862443,
+        "8": 89.73286568843963,
+        "16": 88.67468408586134
+      },
+      "delta6": -2.875122477236914,
+      "delta8": 1.058181602578287
+    },
+    {
+      "build": "nnue",
+      "game": "nhuWmN0z",
+      "color": "b",
+      "scores": {
+        "6": 92.08551367187466,
+        "8": 94.52625768114777,
+        "16": 96.21295789116255
+      },
+      "delta6": -4.127444219287881,
+      "delta8": -1.6867002100147772
+    },
+    {
+      "build": "sf19lite",
+      "game": "oneIHkm8",
+      "color": "w",
+      "scores": {
+        "6": 75.28317118298074,
+        "8": 71.8078582918733,
+        "16": 73.69053541789967
+      },
+      "delta6": 1.59263576508107,
+      "delta8": -1.8826771260263655
+    },
+    {
+      "build": "sf19lite",
+      "game": "oneIHkm8",
+      "color": "b",
+      "scores": {
+        "6": 70.90933501983572,
+        "8": 71.39690571557011,
+        "16": 76.01525846518405
+      },
+      "delta6": -5.105923445348324,
+      "delta8": -4.618352749613933
+    },
+    {
+      "build": "sf19lite",
+      "game": "aQ903hcx",
+      "color": "w",
+      "scores": {
+        "6": 89.64667054116751,
+        "8": 91.69673225352092,
+        "16": 92.43451684384316
+      },
+      "delta6": -2.7878463026756464,
+      "delta8": -0.7377845903222351
+    },
+    {
+      "build": "sf19lite",
+      "game": "aQ903hcx",
+      "color": "b",
+      "scores": {
+        "6": 85.08539078717611,
+        "8": 84.70138291759447,
+        "16": 86.70948219728842
+      },
+      "delta6": -1.6240914101123138,
+      "delta8": -2.008099279693951
+    },
+    {
+      "build": "sf19lite",
+      "game": "nhuWmN0z",
+      "color": "w",
+      "scores": {
+        "6": 92.69774338180366,
+        "8": 94.15404662443873,
+        "16": 94.53165996677745
+      },
+      "delta6": -1.8339165849737924,
+      "delta8": -0.37761334233871935
+    },
+    {
+      "build": "sf19lite",
+      "game": "nhuWmN0z",
+      "color": "b",
+      "scores": {
+        "6": 93.71186053600162,
+        "8": 96.55441170150249,
+        "16": 98.89820223608561
+      },
+      "delta6": -5.186341700083986,
+      "delta8": -2.343790534583121
+    }
+  ],
+  "errors": [
+    {
+      "build": "nnue",
+      "depth": 6,
+      "meanAbsolutePoints": 3.3628882972944445,
+      "maxAbsolutePoints": 8.037599817779096
+    },
+    {
+      "build": "nnue",
+      "depth": 8,
+      "meanAbsolutePoints": 2.6036989253527842,
+      "maxAbsolutePoints": 4.948478838756785
+    },
+    {
+      "build": "sf19lite",
+      "depth": 6,
+      "meanAbsolutePoints": 3.0217925347125223,
+      "maxAbsolutePoints": 5.186341700083986
+    },
+    {
+      "build": "sf19lite",
+      "depth": 8,
+      "meanAbsolutePoints": 1.9947196037630543,
+      "maxAbsolutePoints": 4.618352749613933
+    }
+  ],
+  "byGame": [
+    {
+      "build": "nnue",
+      "game": "oneIHkm8",
+      "times": {
+        "6": 3796.4000000059605,
+        "8": 3603.5,
+        "16": 58129.59999999404
+      },
+      "singleReset8Ms": 2791.4000000059605
+    },
+    {
+      "build": "nnue",
+      "game": "aQ903hcx",
+      "times": {
+        "6": 3068.100000023842,
+        "8": 3551.5999999940395,
+        "16": 33880.20000001788
+      },
+      "singleReset8Ms": 2637.7000000178814
+    },
+    {
+      "build": "nnue",
+      "game": "nhuWmN0z",
+      "times": {
+        "6": 2640.9000000059605,
+        "8": 3204.5999999940395,
+        "16": 40368.09999999404
+      },
+      "singleReset8Ms": 2348.600000023842
+    },
+    {
+      "build": "sf19lite",
+      "game": "oneIHkm8",
+      "times": {
+        "6": 3216.7999999821186,
+        "8": 3575.2999999821186,
+        "16": 75696.19999998808
+      },
+      "singleReset8Ms": 2730.300000011921
+    },
+    {
+      "build": "sf19lite",
+      "game": "aQ903hcx",
+      "times": {
+        "6": 2887.7999999821186,
+        "8": 3705.0999999940395,
+        "16": 58847.59999999404
+      },
+      "singleReset8Ms": 2836.600000023842
+    },
+    {
+      "build": "sf19lite",
+      "game": "nhuWmN0z",
+      "times": {
+        "6": 2587.5999999940395,
+        "8": 3295.399999976158,
+        "16": 51592.29999998212
+      },
+      "singleReset8Ms": 2470.5999999940395
+    }
+  ],
+  "singleResetErrors": [
+    {
+      "build": "nnue",
+      "meanAbsolutePoints": 2.6036989253527842,
+      "maxAbsolutePoints": 4.948478838756785
+    },
+    {
+      "build": "sf19lite",
+      "meanAbsolutePoints": 1.9947196037630543,
+      "maxAbsolutePoints": 4.618352749613933
+    }
+  ],
+  "protocolCorrection": "Historical retained keys mean no extra Clear Hash command. The production wrapper still sends ucinewgame before each search, so these are single-reset runs, not retained-cache runs."
+}

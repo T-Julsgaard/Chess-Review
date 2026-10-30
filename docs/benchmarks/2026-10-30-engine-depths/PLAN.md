@@ -57,3 +57,14 @@ Pilot evidence: `web-ext-artifacts/depth-pilot-20261030-2/`. Earlier setup check
 identified an unregistered deployed-model input and a mixed-case filename
 validation error; the successful pilot reconstructs the published coefficients
 from admitted frozen evidence and preserves mixed-case game IDs.
+
+## Post-collection protocol correction, 2026-10-31
+
+The complete planned matrix ran without missing scores. Subsequent inspection
+identified a labeling error in the optional retained-hash condition: setting
+`cold:false` removes the explicit `Clear Hash` command, but the production wrapper
+still sends `ucinewgame` before every search, which clears Stockfish's search
+state. Preserve all raw observations and their historical keys. Report those
+18 runs as a single-reset comparison, not a true cache-retention experiment.
+This correction does not affect the 42 main depth/accuracy runs or their scores.
+No production changes or fast-preview implementation are part of this task.

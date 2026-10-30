@@ -44,7 +44,7 @@ const manifest = {schema: 'engine-depth-benchmark-v1', startedAt: new Date().toI
   notes: ['True depth-limited best/played searches at each original root with complete mainline history.',
     'SF19 depth-based accuracy uses its display formula experimentally; production SF19 scoring instead fixes 20000 nodes and Hash32.',
     'Fresh browser worker for each game/run. Startup included; fetching site games and review UI excluded.',
-    'Cold mode clears hash for every search. Retained mode at depth8 keeps the hash across searches.',
+    'Cold mode adds explicit Clear Hash. Historical retained keys omit that extra command; the wrapper still sends ucinewgame and resets the cache.',
     'Small previously exposed convenience sample, not accuracy-model validation. Depth16 is a reference, not ground truth.'],
   games: games.map(game => ({id: game.id, source: game.source, band: game.band, players: game.players,
     plies: game.moves.length, movesSha256: hash(JSON.stringify(game.moves)), role: game.split})), inputHashes, receipt: data.receipt};
