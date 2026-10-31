@@ -499,6 +499,7 @@ for(const ending of ['close','deadline'])test(`an early Time attack drop cannot 
   a.dom.window.dispatchEvent(event('pointermove','d5'));up('d5');
   if(ending==='close')await w.close();
   await starting;await drain();
-  assert.equal(w.result.solved,0);assert.equal(running.correctMoves,0);assert.equal(w.result.results.length,0);
+  assert.equal(w.result.solved,0);assert.equal(running.correctMoves,0);
+  assert.deepEqual(w.result.results,ending==='deadline'?[{id:w.puzzles[0].id,number:1,correct:false,rating:450}]:[]);
   assert.equal(doc.querySelector('.drag-piece'),null);assert.equal(w.pendingOpponent,null);
 });
