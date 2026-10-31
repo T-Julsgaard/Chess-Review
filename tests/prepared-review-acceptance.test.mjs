@@ -78,10 +78,16 @@ class WorkerStub {
   terminate() {this.dead = true;}
   line(data) {this.onmessage({data});}
 }
+const originalWorkers = new WeakMap();
 function engine(t, prepared, options) {
-  const previous = globalThis.Worker; globalThis.Worker = WorkerStub;
+  if (!originalWorkers.has(t)) {
+    const previous = globalThis.Worker;
+    originalWorkers.set(t, previous);
+    t.after(() => {if (previous === undefined) delete globalThis.Worker; else globalThis.Worker = previous;});
+  }
+  globalThis.Worker = WorkerStub;
   const instance = prepared ? new PreparedReviewEngine('engine/stockfish-nnue.js', prepared, options) : new Engine();
-  t.after(() => {instance.terminate(); globalThis.Worker = previous;});
+  t.after(() => instance.terminate());
   instance.worker.line('uciok'); instance.worker.line('readyok');
   return instance;
 }
