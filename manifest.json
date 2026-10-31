@@ -60,7 +60,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "icons/icon.png"
+        "icons/icon.png",
+        "fonts/inter.ttf"
       ],
       "matches": [
         "https://www.chess.com/*",

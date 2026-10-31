@@ -12,7 +12,7 @@ const modal='<div class="game-over-modal-shell-buttons">'+native+'<div class="ga
 const profile='<div class="sidebar-content">'+row+'<div class="game-buttons-container-component">Replay</div></div>';
 const follow='<div class="rcontrols"><div class="follow-up"><a class="fbt" href="/12345678/analysis">Analysis board</a><button class="rematch">Rematch</button></div></div>';
 
-function page(t,html,{site='chess',path,reply}={}) {
+function page(t,html,{site='chess',path,reply,prepare}={}) {
   const origin=site==='chess'?'https://www.chess.com':'https://lichess.org';
   const dom=new JSDOM(html,{url:origin+(path || (site==='chess'?'/game/live/12345678':'/12345678')),runScripts:'outside-only',pretendToBeVisual:true});
   const w=dom.window,sent=[],frames=[],timeouts=new Map(),intervals=new Map(),changes=[];let sequence=0;
@@ -26,6 +26,7 @@ function page(t,html,{site='chess',path,reply}={}) {
     if(reply && message.type==='buttonPreview')return Promise.resolve(reply(message));
     return new Promise((resolve,reject)=>pending.push({message,resolve,reject}));
   }},storage:{onChanged:{addListener:fn=>changes.push(fn)}}};
+  prepare?.(w);
   w.eval(controller);w.eval(site==='chess'?chess:lichess);
   return {w,sent,pending,changes,timeouts,intervals,
     buttons:()=>[...w.document.querySelectorAll('.chess-analyzer-free-review,.chess-analyzer-review')],
@@ -35,6 +36,25 @@ function page(t,html,{site='chess',path,reply}={}) {
   };
 }
 const result=(key='chesscom:12345678')=>({ok:true,key,estimated:true,accuracy:{w:91.24,b:72.06},players:{w:'Alice',b:'Bob'},counts:{w:{brilliant:2,great:1},b:{brilliant:0,great:3}}});
+
+test('all placements share one local Inter load and register font bytes rather than a page font URL',async t=>{
+  const requests=[],faces=[];const bytes=new ArrayBuffer(8);
+  const p=page(t,modal+profile,{prepare(w){
+    Object.defineProperty(w.document,'fonts',{value:{add(face){faces.push(face);}}});
+    w.fetch=async url=>{requests.push(url);return {ok:true,arrayBuffer:async()=>bytes};};
+    w.FontFace=class {constructor(family,source,options){Object.assign(this,{family,source,options});}async load(){return this;}};
+  }});await p.flush();
+  assert.deepEqual(requests,['fonts/inter.ttf']);assert.equal(faces.length,1);
+  assert.equal(faces[0].source,bytes);assert.equal(faces[0].family,'Chess Review Inter');assert.equal(faces[0].options.weight,'100 900');
+  p.refresh();await p.flush();assert.equal(requests.length,1);assert.equal(p.buttons().length,2);
+});
+test('an unavailable font never prevents button injection or accuracy from arriving',async t=>{
+  const p=page(t,'<wc-chess-board></wc-chess-board>'+profile,{prepare(w){
+    Object.defineProperty(w.document,'fonts',{value:{add(){throw Error('No font should be added');}}});
+    w.FontFace=class {};w.fetch=async()=>({ok:false});
+  }});await p.flush();p.resolve(result());await p.flush();
+  assert.equal(p.buttons().length,1);assert.match(p.buttons()[0].textContent,/91.2% accuracy/);
+});
 
 const fixtures=[
   ['previous / other player game',profile],

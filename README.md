@@ -12,6 +12,7 @@ accuracy instead. Previews only analyse completed
 standard games, use one bounded worker, and never change full-review settings.
 The compact website buttons use restrained hover and press feedback, and respect
 reduced motion and the **Interface animations** preference.
+Their Inter font is bundled locally under the SIL Open Font License 1.1.
 
 **Learn with Chess Review** opens from the button beneath Engine, beside the move
 controls. By default, the review panels morph into one learning workspace while

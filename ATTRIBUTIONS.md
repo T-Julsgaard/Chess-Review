@@ -210,7 +210,10 @@ Distributed by Lichess (lila); high-quality vector SVGs.
 
 These original assets are separate from the four Lichess move / board MP3 recordings
 listed above. Retain original recordings/design files as supporting provenance.
-## Badge number fonts
+## Fonts
+
+The website review buttons also use the bundled, unmodified Inter font. It is
+loaded locally from the extension.
 
 The extension bundles unmodified fonts from the Google Fonts repository under
 the SIL Open Font License 1.1. They permit use and redistribution, including

@@ -3,7 +3,18 @@
 (() => {
   const entries = new Set();
   const failures = new Map();
+  let fontPromise = null;
   let current = null, generation = 0, timer = null, retryTimer = null, api = null, storageListener = false, motion = true;
+  function loadButtonFont() {
+    if (fontPromise || typeof FontFace !== 'function' || !document.fonts) return;
+    // Load our unmodified OFL font once per page. FontFace accepts bytes, so
+    // Lichess's page font-src policy need not allow extension/data font URLs.
+    fontPromise = fetch(api.runtime.getURL('fonts/inter.ttf')).then(response => {
+      if (!response.ok) throw Error('Button font unavailable');
+      return response.arrayBuffer();
+    }).then(bytes => new FontFace('Chess Review Inter',bytes,{weight:'100 900',style:'normal',display:'swap'}).load())
+      .then(face => document.fonts.add(face)).catch(() => {});
+  }
   function cancel() {
     generation++;
     clearTimeout(retryTimer); retryTimer = null;
@@ -84,6 +95,7 @@
   }
   function register(button,label,getContext,browserApi) {
     api ||= browserApi;
+    loadButtonFont();
     const copy = document.createElement('span'); copy.className = 'chess-review-button-copy';
     const summary = document.createElement('span'); summary.className = 'chess-review-button-summary';
     summary.setAttribute('aria-live','polite'); summary.setAttribute('aria-atomic','true'); summary.textContent = 'Estimating your game’s accuracy…';
