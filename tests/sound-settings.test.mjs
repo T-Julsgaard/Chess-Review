@@ -113,12 +113,40 @@ test('all 45 move-event variants and 10 brilliant cues can be selected, saved an
   }
   await a.call('resetSettingKeys', a.run('VISUAL_SETTING_KEYS'));
   a.call('renderSettings');
-  assert.equal(doc.querySelector('[data-sound-event="check"] .lib-dd-cur').textContent, '16 · Firm Alert');
-  for (const [event, file] of [['check', 'check/16-firm-alert.wav'], ['castle', 'Castling.mp3'], ['brilliant', 'brilliant/01-crystal-revelation.wav']]) {
+  assert.equal(doc.querySelector('[data-sound-event="check"] .lib-dd-cur').textContent, '01 · Firm Tap');
+  assert.equal(doc.querySelector('[data-sound-event="castle"] .lib-dd-cur').textContent, '02 · Quick Pair');
+  for (const [event, file] of [['check', 'check/01-firm-tap.wav'], ['castle', 'castle/02-quick-pair.wav'], ['brilliant', 'brilliant/01-crystal-revelation.wav']]) {
     assert.equal(a.call('fxConfig', event).snd, 'default');
     assert.equal(a.call('fxUrl', event), 'https://extension.test/sounds/' + file);
     a.state.settings.soundFx[event] = {snd: 'missing-cue'};
     assert.equal(a.call('fxUrl', event), 'https://extension.test/sounds/' + file);
+  }
+});
+
+test('Lichess check and castling sounds can be selected, previewed and restored from storage', async t => {
+  const a = app(t), played = [];
+  a.replace('triggerAudio', (...args) => played.push(args));
+  a.call('buildUI');a.call('toggleSettings');
+  const doc = a.dom.window.document;
+  for (const [event, file] of [['check', 'Check.mp3'], ['castle', 'Castling.mp3']]) {
+    assert.ok(readFileSync(new URL('../sounds/' + file, import.meta.url)).length > 44);
+    await a.call('setFx', event, 'pitch', -2);
+    await a.call('setFx', event, 'speed', 1.2);
+    await a.call('setFx', event, 'volume', 35);
+    const controls = () => doc.querySelector(`[data-sound-event="${event}"]`);
+    const options = [...controls().querySelectorAll('.lib-dd-opt')];
+    assert.equal(options.filter(option => option.textContent === 'Lichess').length, 1);
+    options.find(option => option.textContent === 'Lichess').click();
+    await settle();await a.run('_settingsWriteQueue');await settle();
+    assert.equal(a.store.settings.soundFx[event].snd, 'lichess');
+    assert.deepEqual(played.at(-1), ['https://extension.test/sounds/' + file, -2, 1.2, .35]);
+    a.state.settings.soundFx = structuredClone(a.store.settings.soundFx);
+    a.call('renderSettings');
+    assert.equal(controls().querySelector('.lib-dd-cur').textContent, 'Lichess');
+    const count = played.length;
+    a.call('triggerFx', event);
+    assert.equal(played.length, count + 1);
+    assert.equal(played.at(-1)[0], 'https://extension.test/sounds/' + file);
   }
 });
 
@@ -155,7 +183,7 @@ test('new check cues contain one short impact with simultaneous layers and no la
     assert.equal(wav.readInt16LE(44), 0);assert.equal(wav.readInt16LE(wav.length - 2), 0);
   }
   assert.equal(hashes.size, 15);
-  assert.equal(a.call('fxUrl', 'check'), 'https://extension.test/sounds/check/16-firm-alert.wav');
+  assert.equal(a.call('fxUrl', 'check'), 'https://extension.test/sounds/check/01-firm-tap.wav');
 });
 
 test('playback multiplies event and master levels, preserves Soft Retro calibration and mutes events independently', async t => {

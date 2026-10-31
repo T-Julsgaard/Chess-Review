@@ -607,10 +607,14 @@ const EVENT_SOUND_FILES = {
   ],
 };
 const EVENT_SOUNDS = Object.fromEntries(Object.entries(EVENT_SOUND_FILES).map(([event, names]) => [event,
-  names.map((name, index) => [(event === "brilliant" && index === 0) || (event === "check" && name === "16-firm-alert") ? "default" : event + "-" + name,
+  names.map((name, index) => [(event === "brilliant" && index === 0) || (event === "check" && name === "01-firm-tap") || (event === "castle" && name === "02-quick-pair") ? "default" : event + "-" + name,
     name.slice(0, 2) + " · " + name.slice(3).split("-").map(word => word[0].toUpperCase() + word.slice(1)).join(" "),
     `sounds/${event}/${name}.wav`]),
 ]));
+const LICHESS_SOUNDS = {
+  check: [["lichess", "Lichess", "sounds/Check.mp3"]],
+  castle: [["lichess", "Lichess", "sounds/Castling.mp3"]],
+};
 const PUZZLE_SUCCESS_SOUNDS = [
   ["soft-retro", "Soft Retro", "sounds/success/04-soft-retro.wav", .25],
   ["warm-marimba", "Warm Marimba", "sounds/success/01-warm-marimba.wav"],
@@ -629,15 +633,15 @@ function puzzleSuccessChoice() {
   return id === "none" ? null : PUZZLE_SUCCESS_SOUNDS.find(([key]) => key === id) || PUZZLE_SUCCESS_SOUNDS[0];
 }
 // Board events with sound + knobs. [key, label, defaultFile]. Check defaults to
-// one fused Firm Alert impact; brilliant moves default to Crystal Revelation.
+// Firm Tap, castling to Quick Pair, and brilliant moves to Crystal Revelation.
 const SOUND_EVENTS = [
   ["move", "Move", "sounds/move-self.mp3"],
   ["capture", "Capture", "sounds/capture.mp3"],
-  ["check", "Check", "sounds/check/16-firm-alert.wav"],
-  ["castle", "Castle", "sounds/Castling.mp3"],
+  ["check", "Check", "sounds/check/01-firm-tap.wav"],
+  ["castle", "Castle", "sounds/castle/02-quick-pair.wav"],
   ["brilliant", "Brilliant move", "sounds/brilliant/01-crystal-revelation.wav"],
 ];
-const _fxFileById = (id, ev) => ([...(EVENT_SOUNDS[ev] || []), ...FX_SOUNDS].find(([x]) => x === id) || [])[2] || null;
+const _fxFileById = (id, ev) => ([...(EVENT_SOUNDS[ev] || []), ...(LICHESS_SOUNDS[ev] || []), ...FX_SOUNDS].find(([x]) => x === id) || [])[2] || null;
 const _eventDef = (ev) => SOUND_EVENTS.find(([k]) => k === ev) || SOUND_EVENTS[0];
 // Per-event config { snd, pitch, speed, volume }, with safe fallbacks for old/missing stored settings.
 function fxConfig(ev) {
@@ -6474,6 +6478,7 @@ function fxEventControls(ev, label) {
   const cfg = fxConfig(ev);
   const dedicated = EVENT_SOUNDS[ev] || [];
   let opts = [["default", dedicated.find(([id]) => id === "default")?.[1] || "Lichess"],
+    ...(LICHESS_SOUNDS[ev] || []).map(([id, label]) => [id, label]),
     ...dedicated.filter(([id]) => id !== "default").map(([id, label]) => [id, label]),
     ...FX_SOUNDS.map(([id, label]) => [id, label]), ["none", "Off"]];
   if (ev === "puzzleSuccess") opts = [...PUZZLE_SUCCESS_SOUNDS.map(([id, label]) => [id, label]), ["none", "Off"]];
