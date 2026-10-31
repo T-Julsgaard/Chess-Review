@@ -1,4 +1,5 @@
 import { CATEGORY_SYMBOLS, categoryBadgeSymbol } from './lib/category-badges.js';
+import { ENAMEL_PALETTE, enamelBadgeDisc } from './lib/badge-enamel.js';
 
 // Review grades describe a move within its annotation category. They are not
 // position evaluations, win probabilities, game accuracy, or rating-model inputs.
@@ -17,6 +18,7 @@ export const MOVE_GRADE_CONFIG = Object.freeze({
 export const BADGE_APPEARANCES = Object.freeze({
   solid: 'Solid',
   'ink-mineral': 'Ink & mineral',
+  enamel: 'Enamel',
 });
 const INK_MINERAL_COLORS = Object.freeze({
   brilliant: '#ab9bf1', great: '#80b1e4', best: '#65c6a5', excellent: '#7fc7bb',
@@ -105,6 +107,10 @@ export function gradeSvg(category, score, name, example = false, options = {}) {
     ? `<g class="category-symbol" data-symbol="${mark}">${CATEGORY_SYMBOLS[mark].svg}</g>`
     : category === 'book' ? CATEGORY_SYMBOLS.book.svg
     : `<text class="grade-numeral" x="50" y="51" dy=".35em" text-anchor="middle" fill="#fff" font-family="${font.family}" font-size="${size}" font-weight="700" letter-spacing="-1.5">${text}</text>`;
+  if (options.badgeAppearance === 'enamel') {
+    symbol = symbol.replaceAll('#fff', ENAMEL_PALETTE[category].ink);
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="${label}">${enamelBadgeDisc(category)}${symbol}</svg>`;
+  }
   if (options.badgeAppearance === 'ink-mineral') {
     const ink = INK_MINERAL_COLORS[category];
     symbol = symbol.replaceAll('#fff', ink);

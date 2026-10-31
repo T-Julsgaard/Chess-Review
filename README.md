@@ -83,6 +83,8 @@ notation; Book uses its book icon. Each dropdown offers symbols matched to that
 category, including the illustrated designs. Excellent offers Simple and Detailed
 thumbs-up choices. Choose **Solid** for white marks on colored circles or
 **Ink & mineral** for colored marks on softly tinted discs with fine rims.
+**Enamel** pairs pale faces with colored rims and deep blue, green, yellow,
+orange and red inks, including the checkmate badge.
 The **Hover labels** dropdown controls the category labels shown after a move.
 Badge numbers describe move categories; they are separate from position
 evaluation and game accuracy.
