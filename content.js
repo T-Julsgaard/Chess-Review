@@ -259,7 +259,7 @@ function reviewPreviewContext() {
 
 // Appearance and placement-specific sizing come from the extension's content-button.css.
 // Platform class names are used only for locating insertion points, never for styling our button.
-function buildReviewButton(placement, mt = 14, mb = 3) {
+function buildReviewButton(placement, mt = 16, mb = 3) {
   const btn = document.createElement("button");
   btn.type = "button";
   btn.className = `chess-analyzer-free-review chess-analyzer-free-review--${placement}`;
@@ -323,9 +323,9 @@ function fitModalReviewButton(btn, buttonsContainer) {
 
 function injectModalReviewButton(buttonsContainer) {
   let btn = buttonsContainer.querySelector(".chess-analyzer-free-review");
-  // Smaller top margin than the sidebar so our button + the New/Rematch row sit higher in the modal.
+  // Match sidebar spacing below the native Game Review action.
   const fresh = !btn;
-  btn ||= buildReviewButton("modal", 6, 3);
+  btn ||= buildReviewButton("modal", 16, 3);
   const secondaryRow = firstEl(buttonsContainer, CC.modalSecondaryRow);
   // Use the secondary row's actual parent: some modal versions nest the actions.
   // Recheck placement after Vue updates without rebuilding a busy control.
@@ -349,7 +349,7 @@ function injectSidebarReviewButton(section) {
   if (!entry) {
     const host = document.createElement("div");
     host.className = "chess-analyzer-review-slot";
-    const btn = buildReviewButton("sidebar", 6, 8);
+    const btn = buildReviewButton("sidebar", 16, 8);
     host.append(btn);
     entry = { host, btn };
     sidebarReviews.set(reviewBtns, entry);

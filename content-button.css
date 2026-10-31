@@ -31,7 +31,7 @@ button.chess-analyzer-review {
   transition: background .14s, border-color .14s, opacity .14s, transform .1s !important;
 }
 button.chess-analyzer-free-review {
-  margin: var(--chess-review-margin-top, 6px) auto var(--chess-review-margin-bottom, 8px) !important;
+  margin: var(--chess-review-margin-top, 16px) auto var(--chess-review-margin-bottom, 8px) !important;
 }
 button.chess-analyzer-review { margin: 0 !important; }
 button.chess-analyzer-free-review--modal {
