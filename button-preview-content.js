@@ -88,7 +88,6 @@
     const summary = document.createElement('span'); summary.className = 'chess-review-button-summary';
     summary.setAttribute('aria-live','polite'); summary.setAttribute('aria-atomic','true'); summary.textContent = 'Estimating your game’s accuracy…';
     label.replaceWith(copy); copy.append(label,summary);
-    const arrow = document.createElement('span'); arrow.className = 'chess-review-button-arrow'; arrow.setAttribute('aria-hidden','true'); button.append(arrow);
     button.dataset.motion = motion ? 'on' : 'off';
     entries.add({button,summary,getContext});
     button.addEventListener('click',() => {summary.hidden = true; button.classList.add('is-opening'); button.setAttribute('aria-busy','true');});

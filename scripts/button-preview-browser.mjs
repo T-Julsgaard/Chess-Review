@@ -55,11 +55,15 @@ try {
   await evaluate(audit,`api.storage.local.set(${JSON.stringify(seed)})`);
   const native='<a class="cc-button-component" href="/analysis/game/live/12345678?tab=review">Game Review</a>';
   const row='<div class="game-review-buttons-component">'+native+'</div>';
+  const newGame='<div class="new-game-buttons-component"><div class="new-game-buttons-buttons"><button>New 1 min</button><button>Rematch</button></div></div>';
   const fixtures=[
     ['profile','<div class="sidebar-content">'+row+'<p>Replay controls</p></div>'],
+    ['archive-actions','<div class="sidebar-content">'+row+newGame+'<p>Replay controls</p></div>'],
     ['emphasis','<div class="game-review-emphasis-component"><div class="game-review-emphasis-content">'+row+'</div></div>'],
+    ['completed-emphasis','<div class="sidebar-content"><div class="game-review-emphasis-component game-review-emphasis-short" style="overflow:hidden"><div class="game-review-emphasis-content"><div class="quick-analysis-component">6 Great · 9 Best · 10 Excellent</div>'+row+newGame+'</div></div></div>'],
     ['coach','<div class="sidebar-content"><div class="coach-nudge-game-review-component"><div style="max-height:20dvh;overflow:hidden">'+row+'</div></div><p>Replay controls</p></div>'],
     ['modal','<div class="game-over-modal-shell-buttons">'+native+'<div class="game-over-secondary-actions-row-component">New game · Rematch</div></div>'],
+    ['nested-modal','<div class="game-over-modal-shell-buttons"><div class="nested-modal-actions">'+native+newGame+'</div></div>'],
     ['both','<div class="sidebar-content">'+row+'</div><div class="game-over-modal-shell-buttons">'+native+'</div>'],
     ['lichess','<div class="rcontrols"><div class="follow-up"><a class="fbt" href="/abcdefgh/analysis">Analysis board</a><button class="rematch">Rematch</button></div></div>'],
   ];
@@ -77,6 +81,8 @@ try {
       body{background:#262421;color:#fff;font:15px Arial;padding:18px;margin:0}.fixture{width:var(--width,288px)}
       .cc-button-component,.fbt{display:block;box-sizing:border-box;width:100%;padding:14px 8px;border-radius:6px;background:#81b64c;color:white;text-decoration:none;text-align:center;border:0}
       .game-over-secondary-actions-row-component{padding:15px;text-align:center}.follow-up{display:flex;flex-direction:column;gap:8px}
+      .quick-analysis-component{font-size:12px;color:#a3bd7c;text-align:center;margin-bottom:14px}
+      .new-game-buttons-buttons{display:flex;gap:8px;margin-top:8px}.new-game-buttons-buttons>button{flex:1;border:0;border-radius:4px;background:#ffffff12;color:#ddd;padding:12px;font:600 13px Arial}
       wc-chess-board,cg-container{display:block}</style><div class="fixture">${isLi?'<cg-container></cg-container><div class="cg-wrap orientation-black"></div>':'<wc-chess-board></wc-chess-board><div class="player-bottom"><a href="/member/Alice">Alice</a></div>'}${markup}</div>`;
     events.set(t.sessionId,m=>{if(m.method==='Fetch.requestPaused')void call('Fetch.fulfillRequest',{requestId:m.params.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'text/html'}],body:Buffer.from(html).toString('base64')},t.sessionId);});
     await call('Fetch.enable',{patterns:[{urlPattern:'*',resourceType:'Document'}]},t.sessionId);
@@ -87,38 +93,48 @@ try {
     const text=await evaluate(t,"document.querySelector('.chess-review-button-summary').textContent");
     assert.match(text,isLi?/Bob played with ~/ : /Alice played with ~/);
     await sleep(350); // Let the one-shot accuracy reveal settle before measuring.
-    for(const width of [220,288,360]) {
+    const widths=name==='completed-emphasis'?[220,288,585]:[220,288,360];
+    for(const width of widths) {
       await evaluate(t,`document.querySelector('.fixture').style.setProperty('--width','${width}px');dispatchEvent(new Event('resize'))`);await sleep(60);
       const boxes=await evaluate(t,`[...document.querySelectorAll('.chess-analyzer-free-review,.chess-analyzer-review')].map(b=>{const r=b.getBoundingClientRect(),s=b.querySelector('.chess-review-button-summary').getBoundingClientRect();return {width:r.width,height:r.height,summaryFits:s.left>=r.left&&s.right<=r.right&&s.bottom<=r.bottom,overflow:b.scrollWidth>b.clientWidth+1};})`);
-      for(const b of boxes){assert.ok(b.height>=66);assert.ok(b.width<=width+1);assert.ok(b.summaryFits);assert.equal(b.overflow,false);}
-      await call('Emulation.setDeviceMetricsOverride',{width:430,height:650,deviceScaleFactor:1,mobile:false},t.sessionId);
-      const shot=await call('Page.captureScreenshot',{format:'png'},t.sessionId);await fs.writeFile(path.join(out,`${name}-${width}.png`),Buffer.from(shot.data,'base64'));
+      for(const b of boxes){assert.ok(b.height>=62);assert.ok(b.width<=width+1);assert.ok(b.summaryFits);assert.equal(b.overflow,false);}
+      if(['completed-emphasis','nested-modal','archive-actions'].includes(name)) {
+        const order=await evaluate(t,"(()=>{const c=document.querySelector('.cc-button-component').getBoundingClientRect(),b=document.querySelector('.chess-analyzer-free-review').getBoundingClientRect(),n=document.querySelector('.new-game-buttons-component').getBoundingClientRect();return {between:c.bottom<=b.top&&b.bottom<=n.top,one:document.querySelectorAll('.chess-analyzer-free-review').length===1};})()");
+        assert.deepEqual(order,{between:true,one:true});
+      }
+      await call('Emulation.setDeviceMetricsOverride',{width:Math.max(430,width+40),height:650,deviceScaleFactor:1,mobile:false},t.sessionId);
+      const clip=await evaluate(t,"(()=>{const r=document.querySelector('.fixture').getBoundingClientRect();return {x:Math.max(0,r.x-8),y:Math.max(0,r.y-8),width:r.width+16,height:r.height+16,scale:1};})()");
+      const shot=await call('Page.captureScreenshot',{format:'png',clip},t.sessionId);await fs.writeFile(path.join(out,`${name}-${width}.png`),Buffer.from(shot.data,'base64'));
     }
     await call('DOM.enable',{},t.sessionId);await call('CSS.enable',{},t.sessionId);
     const {root:documentRoot}=await call('DOM.getDocument',{},t.sessionId);
     const {nodeId}=await call('DOM.querySelector',{nodeId:documentRoot.nodeId,selector:'.chess-analyzer-free-review,.chess-analyzer-review'},t.sessionId);
-    await call('CSS.forcePseudoState',{nodeId,forcedPseudoClasses:['hover']},t.sessionId);
-    assert.equal(await evaluate(t,"getComputedStyle(document.querySelector('.chess-analyzer-free-review,.chess-analyzer-review'),'::after').animationName"),'chess-review-shine');
-    assert.equal(await evaluate(t,"getComputedStyle(document.querySelector('.chess-analyzer-free-review-logo,.chess-analyzer-review-logo')).animationName"),'chess-review-knight');
+    const restingBackground=await evaluate(t,"getComputedStyle(document.querySelector('.chess-analyzer-free-review,.chess-analyzer-review')).backgroundColor");
+    await call('CSS.forcePseudoState',{nodeId,forcedPseudoClasses:['hover']},t.sessionId);await sleep(180);
+    assert.notEqual(await evaluate(t,"getComputedStyle(document.querySelector('.chess-analyzer-free-review,.chess-analyzer-review')).backgroundColor"),restingBackground);
+    assert.equal(await evaluate(t,"getComputedStyle(document.querySelector('.chess-analyzer-free-review,.chess-analyzer-review')).backgroundImage"),'none');
+    assert.equal(await evaluate(t,"getComputedStyle(document.querySelector('.chess-analyzer-free-review-logo,.chess-analyzer-review-logo')).animationName"),'none');
     await call('CSS.forcePseudoState',{nodeId,forcedPseudoClasses:['focus-visible']},t.sessionId);
     assert.equal(await evaluate(t,"getComputedStyle(document.querySelector('.chess-analyzer-free-review,.chess-analyzer-review')).outlineStyle"),'solid');
     await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]},t.sessionId);
     assert.equal(await evaluate(t,"getComputedStyle(document.querySelector('.chess-analyzer-free-review,.chess-analyzer-review'),'::after').animationName"),'none');
     assert.equal(await evaluate(t,"getComputedStyle(document.querySelector('.chess-review-button-accuracy')).animationName"),'none');
+    assert.equal(await evaluate(t,"getComputedStyle(document.querySelector('.chess-analyzer-free-review,.chess-analyzer-review')).transitionDuration"),'0s');
     await call('Emulation.setEmulatedMedia',{features:[]},t.sessionId);
     await call('CSS.forcePseudoState',{nodeId,forcedPseudoClasses:[]},t.sessionId);
-    results.push({browser:'chrome',fixture:name,elapsedMs,text,widths:[220,288,360]});
+    results.push({browser:'chrome',fixture:name,elapsedMs,text,widths});
     if(name==='profile')clickTab=t;else await call('Target.closeTarget',{targetId:t.targetId});
   }
   assert.deepEqual(await evaluate(audit,"api.storage.local.get('settings').then(x=>x.settings)"),settings);
   await evaluate(audit,`api.storage.local.set({settings:${JSON.stringify({...settings,uiAnim:false})}})`);
   await wait(clickTab,"document.querySelector('.chess-analyzer-free-review').dataset.motion==='off'",'Interface motion preference');
   assert.equal(await evaluate(clickTab,"getComputedStyle(document.querySelector('.chess-review-button-accuracy')).animationName"),'none');
+  assert.equal(await evaluate(clickTab,"getComputedStyle(document.querySelector('.chess-analyzer-free-review')).transitionDuration"),'0s');
   await evaluate(audit,`api.storage.local.set({settings:${JSON.stringify(settings)}})`);
   await wait(clickTab,"document.querySelector('.chess-analyzer-free-review').dataset.motion==='on'",'Interface motion restored');
   const before=await call('Target.getTargets');
   const opening=await evaluate(clickTab,"(()=>{const b=document.querySelector('.chess-analyzer-free-review');b.click();return {busy:b.getAttribute('aria-busy'),opening:b.classList.contains('is-opening'),animation:getComputedStyle(b).animationName};})()");
-  assert.deepEqual(opening,{busy:'true',opening:true,animation:'chess-review-press'});
+  assert.deepEqual(opening,{busy:'true',opening:true,animation:'none'});
   let opened;
   for(let i=0;i<100;i++){const now=await call('Target.getTargets');opened=now.targetInfos.find(t=>t.url.includes(id+'/analysis.html#')&&!before.targetInfos.some(old=>old.targetId===t.targetId));if(opened)break;await sleep(100);}
   assert.ok(opened,'Review click opens the original full-review flow');

@@ -52,7 +52,7 @@ for(const [name,html] of fixtures) test(`${name}: existing review placement gain
   assert.equal(p.buttons()[0].querySelector('.chess-review-button-summary').textContent,'Alice played with ~91.2% accuracy');
   assert.equal(p.buttons()[0].querySelector('.chess-review-button-accuracy').textContent,'~91.2%');
   assert.doesNotMatch(p.buttons()[0].textContent,/Brilliant|Great/);
-  assert.ok(p.buttons()[0].querySelector('.chess-review-button-arrow'));
+  assert.equal(p.buttons()[0].querySelector('.chess-review-button-arrow'),null);
   assert.match(p.buttons()[0].querySelector('.chess-review-button-summary').title,/depth 8/);
   const original=p.w.document.querySelector('.cc-button-component');assert.equal(original.textContent,'Game Review');
 });

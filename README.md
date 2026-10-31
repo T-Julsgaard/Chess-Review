@@ -10,8 +10,8 @@ accuracy estimate before you open the extension. The estimate is separate from
 the full review and may differ from its score. Saved full reviews supply their
 accuracy instead. Previews only analyse completed
 standard games, use one bounded worker, and never change full-review settings.
-The website buttons echo the shine and press effects of **Learn with Chess Review**,
-and respect reduced motion and the **Interface animations** preference.
+The compact website buttons use restrained hover and press feedback, and respect
+reduced motion and the **Interface animations** preference.
 
 **Learn with Chess Review** opens from the button beneath Engine, beside the move
 controls. By default, the review panels morph into one learning workspace while
