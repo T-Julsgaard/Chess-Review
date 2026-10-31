@@ -1451,10 +1451,10 @@ button { font-family: inherit; cursor: pointer; }
 
 /* ---------- ANALYSIS MODE ---------- */
 /* the whole board is made lighter/desaturated as an indicator */
-.board.analysis { filter: saturate(.72) brightness(1.07); }
+.board.analysis { filter: saturate(.85) brightness(1.04); }
 .board.analysis::after {
   content: ""; position: absolute; inset: 0; z-index: 6; pointer-events: none;
-  background: rgba(255,255,255,.10); border-radius: inherit;
+  background: rgba(255,255,255,.06); border-radius: inherit;
 }
 /* Exit-analysis button: sits in the central Play slot, styled like the green Play button but
    red, so it reads as the clear way out of analysis mode. */
