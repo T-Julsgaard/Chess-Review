@@ -793,20 +793,21 @@ function navFastScrub() {
   _lastNavStep = now;
   return fast;
 }
-// Pick the event for a SAN string. Priority: capture > check/mate > castle > plain move.
+// Pick one event per move. Check/mate takes priority over captures and castling.
 function sanSound(san) {
   san = san || "";
-  if (/x/.test(san)) return "capture";
   if (/[+#]/.test(san)) return "check";
+  if (/x/.test(san)) return "capture";
   if (/^[O0]-[O0]/.test(san)) return "castle";
   return "move";
 }
-// A known brilliant move overrides its SAN cue on forward navigation. Off restores
-// the usual move/capture/check/castle sound; undoing a move never celebrates it.
+// Check also takes priority over brilliant celebrations. Other known brilliant
+// moves celebrate on forward navigation; Off restores their usual SAN sound.
 function playMoveSound(ply, forward = true) {
   if (!S.settings.sound || ply < 1 || !S.positions[ply]) return;
+  const event = sanSound(S.positions[ply].san);
   const brilliant = forward && !S.practice && S.classif[ply] === "brilliant" && fxConfig("brilliant").snd !== "none";
-  playEvent(brilliant ? "brilliant" : sanSound(S.positions[ply].san));
+  playEvent(event === "check" ? event : brilliant ? "brilliant" : event);
 }
 // Puzzles and practice share the selected incorrect-puzzle effect and tuning.
 function playWrongSound() {
