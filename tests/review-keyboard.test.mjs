@@ -65,14 +65,43 @@ test('review has no typed move field and Tab does not traverse review sections',
 });
 test('promotion picker supports cancellation and explicit rook selection',t=>{
   const a=review(t,'[SetUp "1"]\n[FEN "8/k1P5/2K5/8/8/8/8/8 w - - 0 1"]\n\n1. Kb5'),doc=a.dom.window.document;
-  a.call('applyUserMove','c7','c8',false);assert.ok(doc.querySelector('.promotion-picker'));assert.equal(doc.querySelector('.app').inert,true);
+  a.call('applyUserMove','c7','c8',false);assert.ok(doc.querySelector('.promotion-picker'));assert.equal(doc.querySelector('.sq').inert,true);
+  assert.equal(doc.querySelector('.board-promotion').parentElement,doc.querySelector('.board'));
+  assert.equal(doc.querySelector('.promotion-picker').style.left,'25%');assert.equal(doc.querySelector('.board-promotion h3'),null);
   doc.querySelector('.promotion-cancel').click();assert.equal(a.state.analysisMode,false);assert.equal(doc.querySelector('.promotion-picker'),null);
   a.call('applyUserMove','c7','c8',false);
   assert.equal(doc.querySelector('.promotion-picker').dataset.color,'w');
   const options=[...doc.querySelectorAll('.promotion-options button')];assert.equal(options.length,4);
   assert.deepEqual(options.map(n=>n.querySelector('img').dataset.piece),['wQ','wR','wB','wN']);assert.ok(options.every(n=>n.textContent===''));
   options[0].dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'ArrowDown',bubbles:true,cancelable:true}));assert.equal(doc.activeElement,options[1]);
-  doc.querySelector('[aria-label="Promote to rook"]').click();assert.equal(a.state.variation.positions[1].promotion,'r');assert.equal(doc.querySelector('.app').inert,false);
+  doc.querySelector('[aria-label="Promote to rook"]').click();assert.equal(a.state.variation.positions[1].promotion,'r');assert.equal(doc.querySelector('.sq').inert,false);
+});
+
+for(const color of ['w','b'])for(const flipped of [false,true])test(`review promotion follows the destination and keyboard direction for ${color}, flipped=${flipped}`,t=>{
+  const fen=color==='w'?'7k/1P6/8/8/8/8/8/7K w - - 0 1':'7k/8/8/8/8/8/1p6/7K b - - 0 1';
+  const a=review(t,`[SetUp "1"]\n[FEN "${fen}"]\n\n${color==='w'?'1. b8=Q':'1... b1=Q'}`),doc=a.dom.window.document;
+  a.state.flipped=flipped;a.call('buildBoard');
+  const from=color==='w'?'b7':'b2',to=color==='w'?'b8':'b1',bottom=(color==='b')!==flipped;
+  const previous=doc.querySelector('#learningToggle');previous.focus();
+  const outside=doc.querySelector('#controls');outside.inert=true;
+  a.call('applyUserMove',from,to,false);
+  const overlay=doc.querySelector('.board-promotion'),picker=doc.querySelector('.promotion-picker'),options=[...picker.querySelectorAll('button')];
+  assert.equal(overlay.dataset.edge,bottom?'bottom':'top');assert.equal(picker.style.left,flipped?'75%':'12.5%');
+  assert.equal(doc.activeElement,options[0]);assert.equal(doc.querySelector('.sq').inert,true);
+  for(let node=overlay;node;node=node.parentElement)assert.equal(!!node.inert,false);
+  const key=key=>doc.activeElement.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key,bubbles:true,cancelable:true}));
+  key(bottom?'ArrowUp':'ArrowDown');assert.equal(doc.activeElement,options[1]);
+  options.at(-1).focus();key('Tab');assert.equal(doc.activeElement,options[0]);
+  key('Escape');assert.equal(doc.querySelector('.board-promotion'),null);assert.equal(doc.activeElement,previous);
+  assert.equal(doc.querySelector('.sq').inert,false);assert.equal(outside.inert,true);assert.equal(a.state.analysisMode,false);
+});
+
+test('rebuilding the board cancels promotion and restores the surrounding controls',t=>{
+  const a=review(t,'[SetUp "1"]\n[FEN "7k/P7/8/8/8/8/8/7K w - - 0 1"]\n\n1. a8=N'),doc=a.dom.window.document;
+  a.call('applyUserMove','a7','a8',false);a.call('toggleFlip');
+  assert.equal(doc.querySelector('.board-promotion'),null);
+  for(let node=doc.querySelector('#controls');node;node=node.parentElement)assert.equal(!!node.inert,false);
+  assert.equal(a.run('_cancelPromotion'),null);
 });
 test('different promotion does not silently replay the recorded mainline',t=>{
   const a=review(t,'[SetUp "1"]\n[FEN "7k/P7/8/8/8/8/8/7K w - - 0 1"]\n\n1. a8=N');

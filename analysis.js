@@ -2407,6 +2407,7 @@ function makePiece(type, side) {
 }
 function buildBoard() {
   _cancelBoardDrag?.();
+  _cancelPromotion?.();
   if (learningWorkspace?.embedded) return;
   reviewEffects.clear();
   const files = ["a","b","c","d","e","f","g","h"];
@@ -2862,22 +2863,29 @@ let _cancelPromotion = null;
 function requestPromotion(from, to, animate) {
   _cancelPromotion?.();
   const fen = activePos().fen, pgn = S.pgn, practice = S.practice, previous = document.activeElement;
-  const app = document.querySelector(".app"), wasInert = !!app.inert;
-  const close = () => { overlay.remove(); app.inert = wasInert; document.removeEventListener("keydown", key, true); _cancelPromotion = null; previous?.focus(); };
+  const file = to.charCodeAt(0) - 97, bottom = (to[1] === "1") !== !!S.flipped;
+  const inertNodes = [];
+  const close = () => { overlay.remove(); for (const [node, wasInert] of inertNodes) node.inert = wasInert; document.removeEventListener("keydown", key, true); _cancelPromotion = null; previous?.focus({preventScroll:true}); };
   const key = e => {
     if(e.key === "Escape"){e.preventDefault();e.stopImmediatePropagation();close();}
     else if(e.key === "Tab") {const nodes=[...card.querySelectorAll("button")];if(e.shiftKey&&document.activeElement===nodes[0]){e.preventDefault();nodes[nodes.length-1].focus();}else if(!e.shiftKey&&document.activeElement===nodes[nodes.length-1]){e.preventDefault();nodes[0].focus();}}
-    else if(e.key === 'ArrowUp' || e.key === 'ArrowDown') {e.preventDefault();e.stopImmediatePropagation();const nodes=[...card.querySelectorAll('.promotion-options button')],index=nodes.indexOf(document.activeElement);nodes[(index+(e.key==='ArrowUp'?-1:1)+nodes.length)%nodes.length].focus();}
+    else if(e.key === 'ArrowUp' || e.key === 'ArrowDown') {e.preventDefault();e.stopImmediatePropagation();const nodes=[...card.querySelectorAll('.promotion-options button')],index=nodes.indexOf(document.activeElement),direction=bottom?-1:1;nodes[(index+(e.key==='ArrowUp'?-direction:direction)+nodes.length)%nodes.length].focus();}
     else if(e.key.startsWith("Arrow")||["Home","End","f"].includes(e.key))e.stopImmediatePropagation();
   };
-  const card = el("div", {class:"promotion-picker", 'data-color':sideToMove(fen), role:"dialog", "aria-modal":"true", "aria-label":"Choose promotion piece"},
-    el("h3", {}, "Promote to"),
+  const card = el("div", {class:"promotion-picker", 'data-color':sideToMove(fen), style:"left:"+((S.flipped?7-file:file)*12.5)+"%"},
     el("div", {class:"promotion-options"}, ...[["q","Queen"],["r","Rook"],["b","Bishop"],["n","Knight"]].map(([piece,label]) =>
       el("button", {type:"button", 'aria-label':'Promote to '+label.toLowerCase(), title:label, onclick:()=>{close();if(S.pgn===pgn&&activePos().fen===fen&&S.practice===practice)applyUserMove(from,to,animate,piece);}}, makePiece(piece,sideToMove(fen))))),
     el("button", {type:"button", class:"promotion-cancel", onclick:close}, "Cancel"));
-  const overlay = el("div", {class:"promotion-overlay"}, card);
-  document.body.append(overlay); app.inert = true; _cancelPromotion = close;
-  document.addEventListener("keydown",key,true);card.querySelector("button").focus();
+  const overlay = el("div", {class:"board-promotion", 'data-edge':bottom?"bottom":"top", role:"dialog", "aria-modal":"true", "aria-label":"Choose promotion piece", onpointerdown:e=>e.stopPropagation()}, card);
+  UI.boardWrap.querySelector(".board").append(overlay);
+  // Keep the board-mounted dialog interactive while making the surrounding UI inert.
+  for (let node = overlay; node.parentElement && node !== document.body; node = node.parentElement) {
+    for (const sibling of node.parentElement.children) if (sibling !== node) {
+      inertNodes.push([sibling, !!sibling.inert]); sibling.inert = true;
+    }
+  }
+  _cancelPromotion = close;
+  document.addEventListener("keydown",key,true);card.querySelector("button").focus({preventScroll:true});
 }
 function initBoardInput() {
   const wrap = UI.boardWrap;

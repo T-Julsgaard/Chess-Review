@@ -4,18 +4,26 @@ import assert from 'node:assert/strict';
 
 export async function auditLearning({review,call,evaluate,sleep,out}) {
   const run=expression=>evaluate(review,expression);
-  const check=async(color,label)=>{
+  const check=async(color,label,flipped)=>{
     const state=await run(`(async()=>{
       const picker=document.querySelector('.promotion-picker'),buttons=[...picker.querySelectorAll('.promotion-options button')];
       await Promise.all(buttons.map(n=>n.querySelector('img').decode()));
-      const css=getComputedStyle(buttons[0]),rect=picker.getBoundingClientRect();
+      const css=getComputedStyle(buttons[0]),rect=picker.getBoundingClientRect(),overlay=picker.closest('.board-promotion');
+      const board=overlay.parentElement.getBoundingClientRect(),queen=buttons[0].getBoundingClientRect();
       return {color:picker.dataset.color,pieces:buttons.map(n=>n.querySelector('img').dataset.piece),
+        edge:overlay.dataset.edge,queen:{x:queen.left-board.left,y:queen.top-board.top,width:queen.width,height:queen.height},board:{width:board.width,height:board.height},
         background:css.backgroundColor,ink:css.color,focused:picker.contains(document.activeElement),
         inside:rect.left>=-1&&rect.right<=innerWidth+1&&rect.top>=-1&&rect.bottom<=innerHeight+1};
     })()`);
     assert.equal(state.color,color,label);
     assert.deepEqual(state.pieces,['Q','R','B','N'].map(piece=>color+piece),label);
     assert.equal(state.focused,true,label);assert.equal(state.inside,true,label);
+    const bottom=(color==='b')!==flipped;
+    assert.equal(state.edge,bottom?'bottom':'top',label);
+    assert.ok(Math.abs(state.queen.width-state.board.width/8)<1,label+' square width');
+    assert.ok(Math.abs(state.queen.height-state.board.height/8)<1,label+' square height');
+    assert.ok(Math.abs(state.queen.x-(flipped?state.board.width*7/8:0))<1,label+' destination file');
+    assert.ok(Math.abs(state.queen.y-(bottom?state.board.height*7/8:0))<1,label+' destination rank');
     if(color==='b') {
       assert.equal(state.background,'rgb(222, 218, 205)',label);
       assert.equal(state.ink,'rgb(37, 38, 41)',label);
@@ -35,14 +43,16 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
       const from=color==='w'?'a7':'a2',to=color==='w'?'a8':'a1',label=`${width}-${theme}-${color}-${flipped}`;
       await run(`import('./analysis.js').then(m=>{
         document.querySelector('[data-theme]').setAttribute('data-theme','${theme}');
-        m.S.flipped=${flipped};m.S.analysisMode=true;
+        if(m.S.flipped!==${flipped})m.toggleFlip();m.S.analysisMode=true;
         m.S.variation={branchIdx:m.S.idx,idx:0,positions:[{...m.S.positions[m.S.idx],fen:'${fen}'}]};
         m.paintBoard();m.applyUserMove('${from}','${to}',false);
       })`);
       // Move focus away to inspect the resting option, then check keyboard focus separately.
       await run("document.querySelector('.promotion-cancel').focus()");
-      await check(color,'review-'+label);
-      await run("document.querySelector('[aria-label=\"Promote to knight\"]').click()");
+      await check(color,'review-'+label,flipped);
+      const point=await run("(()=>{const r=document.querySelector('[aria-label=\"Promote to knight\"]').getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}})()");
+      await call('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',clickCount:1},review.sessionId);
+      await call('Input.dispatchMouseEvent',{type:'mouseReleased',...point,button:'left',clickCount:1},review.sessionId);
       assert.equal(await run("import('./analysis.js').then(m=>m.S.variation.positions[1].promotion)"),'n');
       await run("import('./analysis.js').then(m=>m.openLearning())");
       for(const mode of ['free','puzzle']) {
@@ -54,7 +64,7 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
           document.querySelector('[data-square=${from}]').click();document.querySelector('[data-square=${to}]').click();
         })`);
         await run("document.querySelector('.promotion-cancel').focus()");
-        await check(color,mode+'-'+label);
+        await check(color,mode+'-'+label,flipped);
         await run("document.querySelector('[aria-label=\"Promote to knight\"]').click()");
         assert.equal(await run(`document.querySelector('[data-square=${to}] img').dataset.piece`),color+'N');
       }

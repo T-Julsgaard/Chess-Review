@@ -137,7 +137,7 @@
 .learn-square .piece-img { width: 88%; height: 88%; object-fit: contain; position: static; z-index: 1; pointer-events: auto; user-select: none; animation: learn-piece .16s ease-out; }
 .learn-square { touch-action: none; cursor: default; }
 .learning-embedded .learn-square .piece-img { width: 94%; height: 94%; animation: none; }
-.learn-promotion { position: absolute; inset: 0; z-index: 210; pointer-events: auto; }
+.board-promotion { position: absolute; inset: 0; z-index: 210; pointer-events: auto; }
 .learn-entry-button:active { transform: translateY(1px) scale(.97); }
 .learn-coordinate { position: absolute; font-size: clamp(9px,1.1vw,13px); font-weight: 700; line-height: 1; z-index: 2; pointer-events: none; }
 .learn-coordinate.rank { top: 4px; left: 4px; }
@@ -2641,7 +2641,6 @@ button { font-family: inherit; cursor: pointer; }
 .lib-tab { font:inherit; cursor:pointer; }
 .lc-open { display:block; width:100%; text-align:left; font:inherit; color:inherit; background:transparent; padding:0; border:0; cursor:pointer; }
 .lc-open:focus-visible, .lc-fav:focus-visible, .lib-tab:focus-visible, .engine-line:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
-.promotion-overlay { position:fixed; inset:0; z-index:200; display:grid; place-items:center; background:rgba(0,0,0,.45); padding:16px; }
 .promotion-picker { max-width:100%; padding:12px; background:var(--panel); border:1px solid var(--line); border-radius:12px; color:var(--ink); box-shadow:0 16px 48px #0006; }
 /* Every board uses a light picker for Black so dark piece artwork stays visible. */
 .promotion-picker[data-color="b"] {
@@ -2658,13 +2657,13 @@ button { font-family: inherit; cursor: pointer; }
 .promotion-picker .promotion-cancel { width:100%; margin-top:10px; font-size:12px; }
 @media (max-height:480px) { .promotion-options button { width:56px; height:56px; } .promotion-options .piece-img { width:44px; height:44px; } }
 /* Keep the queen on the destination square and extend the choices into the board. */
-.learn-promotion .promotion-picker { position: absolute; top: 0; width: 12.5%; display: flex; flex-direction: column; padding: 0; border: 0; border-radius: 0; box-shadow: none; }
-.learn-promotion .promotion-options { gap: 0; }
-.learn-promotion .promotion-options button { width: 100%; height: auto; aspect-ratio: 1; padding: 0; border-radius: 0; }
-.learn-promotion .promotion-options .piece-img { position: static; width: 88%; height: 88%; pointer-events: none; }
-.learn-promotion .promotion-cancel { margin: 0; padding: 6px 0; min-height: 0; border-radius: 0; font-size: clamp(9px,1.5vw,12px); }
-.learn-promotion[data-edge="bottom"] .promotion-picker { top: auto; bottom: 0; flex-direction: column-reverse; }
-.learn-promotion[data-edge="bottom"] .promotion-options { flex-direction: column-reverse; }
+.board-promotion .promotion-picker { position: absolute; top: 0; width: 12.5%; display: flex; flex-direction: column; padding: 0; border: 0; border-radius: 0; box-shadow: none; }
+.board-promotion .promotion-options { gap: 0; }
+.board-promotion .promotion-options button { width: 100%; height: auto; aspect-ratio: 1; padding: 0; border-radius: 0; }
+.board-promotion .promotion-options .piece-img { position: static; width: 88%; height: 88%; pointer-events: none; }
+.board-promotion .promotion-cancel { margin: 0; padding: 6px 0; min-height: 0; border-radius: 0; font-size: clamp(9px,1.5vw,12px); }
+.board-promotion[data-edge="bottom"] .promotion-picker { top: auto; bottom: 0; flex-direction: column-reverse; }
+.board-promotion[data-edge="bottom"] .promotion-options { flex-direction: column-reverse; }
 
 .puzzle-run-notice-overlay { position: fixed; inset: 0; z-index: 210; display: grid; place-items: center; box-sizing: border-box; padding: 16px; background: #0004; pointer-events: auto; }
 .learning-workspace:has(.puzzle-run-notice-overlay) { z-index: 2200; }
