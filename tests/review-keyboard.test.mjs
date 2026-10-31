@@ -63,6 +63,48 @@ test('review has no typed move field and Tab does not traverse review sections',
   await a.call('toggleSettings');const settingsTab=event();doc.querySelector('.set-tab').dispatchEvent(settingsTab);assert.equal(settingsTab.defaultPrevented,false);
   assert.ok([...doc.querySelectorAll('.lib-tab,.lc-open,.lc-fav,.engine-line.clickable')].every(n=>n.tabIndex===-1));
 });
+
+test('review arrows leave settings selections and browse moves without changing the selected appearance',async t=>{
+  const a=review(t,'1. e4 e5 2. Nf3 Nc6'),doc=a.dom.window.document;
+  await a.call('toggleSettings');
+  [...doc.querySelectorAll('.set-sect-head')].find(node=>node.textContent==='Badges').click();
+  for(const appearance of ['enamel','ink-mineral','solid']) {
+    const option=doc.querySelector(`[data-setting="badgeAppearance"][data-value="${appearance}"]`);
+    option.focus();option.click();await settle();
+    assert.equal(doc.activeElement.dataset.value,appearance);
+    const selected=()=>doc.querySelector(`[data-setting="badgeAppearance"][data-value="${appearance}"]`);
+    for(const [key,idx] of [['ArrowRight',1],['ArrowLeft',0],['End',4],['Home',0]]) {
+      selected().focus();
+      const event=new a.dom.window.KeyboardEvent('keydown',{key,bubbles:true,cancelable:true});
+      doc.activeElement.dispatchEvent(event);
+      assert.equal(a.state.idx,idx);
+      assert.equal(doc.activeElement,doc.body);
+      assert.equal(event.defaultPrevented,true);
+      assert.equal(a.state.settings.badgeAppearance,appearance);
+      assert.equal(doc.getElementById('settings').hidden,false);
+    }
+  }
+});
+
+test('open settings lists and sliders keep their keyboard behavior while closed dropdowns allow review arrows',async t=>{
+  const a=review(t),doc=a.dom.window.document;
+  await a.call('toggleSettings');
+  [...doc.querySelectorAll('.set-sect-head')].find(node=>node.textContent==='Badges').click();
+  const picker=doc.querySelector('[data-badge-picker="best"]');picker.focus();picker.click();
+  const star=doc.querySelector('[data-symbol-category="best"] .lib-dd-opt[data-symbol="star"]');star.focus();
+  star.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true,cancelable:true}));
+  assert.equal(a.state.idx,0);assert.equal(doc.activeElement,star);
+  star.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'End',bubbles:true,cancelable:true}));
+  assert.equal(a.state.idx,0);assert.equal(doc.activeElement.dataset.symbol,'summit');
+  doc.activeElement.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}));
+  assert.equal(doc.activeElement,picker);
+  picker.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true,cancelable:true}));
+  assert.equal(a.state.idx,1);assert.equal(doc.activeElement,doc.body);
+  const slider=doc.querySelector('.badge-settings input[type="range"]');slider.focus();
+  const event=new a.dom.window.KeyboardEvent('keydown',{key:'ArrowLeft',bubbles:true,cancelable:true});
+  slider.dispatchEvent(event);
+  assert.equal(a.state.idx,1);assert.equal(doc.activeElement,slider);assert.equal(event.defaultPrevented,false);
+});
 test('promotion picker supports cancellation and explicit rook selection',t=>{
   const a=review(t,'[SetUp "1"]\n[FEN "8/k1P5/2K5/8/8/8/8/8 w - - 0 1"]\n\n1. Kb5'),doc=a.dom.window.document;
   a.call('applyUserMove','c7','c8',false);assert.ok(doc.querySelector('.promotion-picker'));assert.equal(doc.querySelector('.sq').inert,true);

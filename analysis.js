@@ -7868,7 +7868,14 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Tab" && !e.target?.closest?.('#settings,.accuracy-panel,.engine-focus,[role="dialog"],[role="alertdialog"]')) {
     e.preventDefault(); return;
   }
-  if (UI.settings?.contains(e.target) || UI.libRail?.contains(e.target)) return;
+  if (UI.libRail?.contains(e.target)) return;
+  if (UI.settings?.contains(e.target)) {
+    const reviewKey = ["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key);
+    // A selected settings button should not capture the next review shortcut.
+    // Open lists and editable controls keep their own keyboard interaction.
+    if (!reviewKey || !e.target?.closest?.("button") || e.target.closest(".lib-dd-field.open")
+        || e.ctrlKey || e.metaKey || e.altKey) return;
+  }
   if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
   // During practice the only shortcut is Escape to exit; nav keys are disabled.
   if (S.practice) { if (e.key === "Escape") exitPractice(); return; }
