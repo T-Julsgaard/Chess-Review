@@ -319,13 +319,27 @@ function fitModalReviewButton(btn, buttonsContainer) {
       btn.style.setProperty("--chess-review-modal-width", width);
     }
   }
+  if (!primary?.offsetHeight || !btn.offsetHeight || !btn.offsetWidth) return;
+  const rect = btn.getBoundingClientRect(), scale = rect.width / btn.offsetWidth;
+  if (!(scale > 0)) return;
+  const style = getComputedStyle(btn), top = parseFloat(style.marginTop) || 0, bottom = parseFloat(style.marginBottom) || 0;
+  // Chess.com sometimes adds its own flex gap or action margins. Count those
+  // toward the 16px separation rather than stacking another full margin on top.
+  // Undo the modal's entrance scale before comparing visual layout distances.
+  const topMargin = Math.max(0,16 - ((rect.top - primary.getBoundingClientRect().bottom) / scale - top));
+  const secondary = firstEl(buttonsContainer,CC.modalSecondaryRow);
+  const nextAction = secondary && ([...secondary.querySelectorAll('button,a[href]')].find(action => action.offsetHeight) || secondary);
+  const bottomMargin = nextAction?.offsetHeight
+    ? Math.max(0,16 - ((nextAction.getBoundingClientRect().top - rect.bottom) / scale - bottom)) : bottom;
+  if (Math.abs(topMargin - top) > .25) btn.style.setProperty('--chess-review-margin-top',topMargin.toFixed(2) + 'px');
+  if (Math.abs(bottomMargin - bottom) > .25) btn.style.setProperty('--chess-review-margin-bottom',bottomMargin.toFixed(2) + 'px');
 }
 
 function injectModalReviewButton(buttonsContainer) {
   let btn = buttonsContainer.querySelector(".chess-analyzer-free-review");
   // Match sidebar spacing below the native Game Review action.
   const fresh = !btn;
-  btn ||= buildReviewButton("modal", 16, 3);
+  btn ||= buildReviewButton("modal", 16, 16);
   const secondaryRow = firstEl(buttonsContainer, CC.modalSecondaryRow);
   // Use the secondary row's actual parent: some modal versions nest the actions.
   // Recheck placement after Vue updates without rebuilding a busy control.

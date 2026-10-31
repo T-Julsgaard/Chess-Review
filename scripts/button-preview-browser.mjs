@@ -18,10 +18,16 @@ const seed={settingsResetFor040:true,settings,library:[],username:'Alice',
   'gamecache:chesscom:12345678':{data:{url:'https://www.chess.com/game/live/12345678',pgn,white:{username:'Alice'},black:{username:'Bob'}}},
   'gamecache:lichess:abcdefgh':{data:pgn}};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms)),results=[];
-let firefoxReport;
+let firefoxReport,firefoxFontReport;
 const server=http.createServer(async(req,res)=>{
   let body='';for await(const chunk of req)body+=chunk;
-  if(body)firefoxReport=JSON.parse(body);res.setHeader('Access-Control-Allow-Origin','*');res.end('ok');
+  if(req.method==='GET' && req.url==='/abcdefgh') {
+    res.setHeader('Content-Type','text/html');
+    res.setHeader('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; img-src data:; font-src 'none'; connect-src 'none'");
+    res.end('<!doctype html><cg-container></cg-container><div class="cg-wrap orientation-white"></div><div class="rcontrols"><div class="follow-up"><a class="fbt">Analysis board</a></div></div>');return;
+  }
+  if(body){const report=JSON.parse(body);if(report.kind==='font')firefoxFontReport=report;else firefoxReport=report;}
+  res.setHeader('Access-Control-Allow-Origin','*');res.end('ok');
 });
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const endpoint='http://127.0.0.1:'+server.address().port;
@@ -63,6 +69,8 @@ try {
     ['completed-emphasis','<div class="sidebar-content"><div class="game-review-emphasis-component game-review-emphasis-short" style="overflow:hidden"><div class="game-review-emphasis-content"><div class="quick-analysis-component">6 Great · 9 Best · 10 Excellent</div>'+row+newGame+'</div></div></div>'],
     ['coach','<div class="sidebar-content"><div class="coach-nudge-game-review-component"><div style="max-height:20dvh;overflow:hidden">'+row+'</div></div><p>Replay controls</p></div>'],
     ['modal','<div class="game-over-modal-shell-buttons">'+native+'<div class="game-over-secondary-actions-row-component">New game · Rematch</div></div>'],
+    ['modal-native-gap','<div class="game-over-modal-shell-buttons" style="display:flex;flex-direction:column;gap:8px">'+native+'<div class="game-over-secondary-actions-row-component" style="padding:0">'+newGame+'</div></div>'],
+    ['modal-scaled','<div class="game-over-modal-shell-buttons" style="display:flex;flex-direction:column;gap:8px;transform:scale(.85);transform-origin:top left">'+native+'<div class="game-over-secondary-actions-row-component">New game · Rematch</div></div>'],
     ['nested-modal','<div class="game-over-modal-shell-buttons"><div class="nested-modal-actions">'+native+newGame+'</div></div>'],
     ['both','<div class="sidebar-content">'+row+'</div><div class="game-over-modal-shell-buttons">'+native+'</div>'],
     ['lichess','<div class="rcontrols"><div class="follow-up"><a class="fbt" href="/abcdefgh/analysis">Analysis board</a><button class="rematch">Rematch</button></div></div>'],
@@ -84,10 +92,14 @@ try {
       .quick-analysis-component{font-size:12px;color:#a3bd7c;text-align:center;margin-bottom:14px}
       .new-game-buttons-buttons{display:flex;gap:8px;margin-top:8px}.new-game-buttons-buttons>button{flex:1;border:0;border-radius:4px;background:#ffffff12;color:#ddd;padding:12px;font:600 13px Arial}
       wc-chess-board,cg-container{display:block}</style><div class="fixture">${isLi?'<cg-container></cg-container><div class="cg-wrap orientation-black"></div>':'<wc-chess-board></wc-chess-board><div class="player-bottom"><a href="/member/Alice">Alice</a></div>'}${markup}</div>`;
-    events.set(t.sessionId,m=>{if(m.method==='Fetch.requestPaused')void call('Fetch.fulfillRequest',{requestId:m.params.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'text/html'}],body:Buffer.from(html).toString('base64')},t.sessionId);});
+    const headers=[{name:'Content-Type',value:'text/html'}];
+    if(isLi)headers.push({name:'Content-Security-Policy',value:"default-src 'none'; style-src 'unsafe-inline'; img-src data:; font-src 'none'; connect-src 'none'"});
+    events.set(t.sessionId,m=>{if(m.method==='Fetch.requestPaused')void call('Fetch.fulfillRequest',{requestId:m.params.requestId,responseCode:200,responseHeaders:headers,body:Buffer.from(html).toString('base64')},t.sessionId);});
     await call('Fetch.enable',{patterns:[{urlPattern:'*',resourceType:'Document'}]},t.sessionId);
     const started=Date.now();await call('Page.navigate',{url:isLi?'https://lichess.org/'+(name==='lichess-metadata'?'future/game/':'')+'abcdefgh':'https://www.chess.com/game/live/12345678'},t.sessionId);
     await wait(t,"!!document.querySelector('.chess-review-button-summary')",name+' injection');
+    await wait(t,"[...document.fonts].some(f=>f.family==='Chess Review Inter'&&f.status==='loaded')",name+' local Inter font');
+    assert.match(await evaluate(t,"getComputedStyle(document.querySelector('.chess-review-button-summary')).fontFamily"),/Chess Review Inter/);
     await wait(t,"/\\d+\\.\\d% accuracy/.test(document.querySelector('.chess-review-button-summary').textContent)",name+' engine preview');
     const elapsedMs=Date.now()-started;
     const text=await evaluate(t,"document.querySelector('.chess-review-button-summary').textContent");
@@ -96,11 +108,15 @@ try {
     const widths=name==='completed-emphasis'?[220,288,585]:[220,288,360];
     for(const width of widths) {
       await evaluate(t,`document.querySelector('.fixture').style.setProperty('--width','${width}px');dispatchEvent(new Event('resize'))`);await sleep(60);
-      const boxes=await evaluate(t,`[...document.querySelectorAll('.chess-analyzer-free-review,.chess-analyzer-review')].map(b=>{const r=b.getBoundingClientRect(),s=b.querySelector('.chess-review-button-summary').getBoundingClientRect();return {width:r.width,height:r.height,summaryFits:s.left>=r.left&&s.right<=r.right&&s.bottom<=r.bottom,overflow:b.scrollWidth>b.clientWidth+1};})`);
+      const boxes=await evaluate(t,`[...document.querySelectorAll('.chess-analyzer-free-review,.chess-analyzer-review')].map(b=>{const r=b.getBoundingClientRect(),s=b.querySelector('.chess-review-button-summary').getBoundingClientRect();return {width:r.width,height:b.offsetHeight,summaryFits:s.left>=r.left&&s.right<=r.right&&s.bottom<=r.bottom,overflow:b.scrollWidth>b.clientWidth+1};})`);
       for(const b of boxes){assert.ok(b.height>=62);assert.ok(b.width<=width+1);assert.ok(b.summaryFits);assert.equal(b.overflow,false);}
       if(['completed-emphasis','nested-modal','archive-actions'].includes(name)) {
         const order=await evaluate(t,"(()=>{const c=document.querySelector('.cc-button-component').getBoundingClientRect(),b=document.querySelector('.chess-analyzer-free-review').getBoundingClientRect(),n=document.querySelector('.new-game-buttons-component').getBoundingClientRect();return {between:c.bottom<=b.top&&b.bottom<=n.top,one:document.querySelectorAll('.chess-analyzer-free-review').length===1,gap:b.top-c.bottom};})()");
         assert.equal(order.between,true);assert.equal(order.one,true);assert.ok(order.gap>=15.9,'Keep a full 16px gap below native Game Review');
+      }
+      if(name.startsWith('modal')||name==='nested-modal') {
+        const gaps=await evaluate(t,"(()=>{const button=document.querySelector('.chess-analyzer-free-review'),c=document.querySelector('.cc-button-component').getBoundingClientRect(),b=button.getBoundingClientRect(),row=document.querySelector('.game-over-secondary-actions-row-component,.new-game-buttons-component'),n=(row.querySelector('button,a[href]')||row).getBoundingClientRect(),scale=b.width/button.offsetWidth;return [(b.top-c.bottom)/scale,(n.top-b.bottom)/scale];})()");
+        for(const gap of gaps)assert.ok(Math.abs(gap-16)<=1,'Popup separates both native action rows by 16px, including during entrance scaling');
       }
       await call('Emulation.setDeviceMetricsOverride',{width:Math.max(430,width+40),height:650,deviceScaleFactor:1,mobile:false},t.sessionId);
       const clip=await evaluate(t,"(()=>{const r=document.querySelector('.fixture').getBoundingClientRect();return {x:Math.max(0,r.x-8),y:Math.max(0,r.y-8),width:r.width+16,height:r.height+16,scale:1};})()");
@@ -157,17 +173,22 @@ try {
   // Firefox supports workers directly in its background document. The test-only
   // hook exercises that real context; it is never present in source or packages.
   const ff=structuredClone(original);delete ff.background.service_worker;
-  ff.permissions=ff.permissions.filter(p=>p!=='offscreen');ff.host_permissions.push(endpoint+'/*');
+  ff.permissions=ff.permissions.filter(p=>p!=='offscreen');ff.host_permissions.push('http://127.0.0.1/*');
+  ff.web_accessible_resources[0].matches.push('http://127.0.0.1/*');
+  ff.content_scripts.push({matches:['http://127.0.0.1/*'],js:['button-preview-content.js','lichess-content.js','font-audit.js'],css:['content-button.css'],run_at:'document_idle'});
   await fs.writeFile(path.join(source,'manifest.json'),JSON.stringify(ff));
   await fs.appendFile(path.join(source,'background.js'),`\nbrowserAPI.runtime.onInstalled.addListener(()=>browserAPI.tabs.create({url:browserAPI.runtime.getURL('firefox-audit.html')}));
 browserAPI.runtime.onMessage.addListener((m,s,reply)=>{if(m?.type!=='preview-native-audit')return;createPreviewRunner(browserAPI)(m.pgn).then(summary=>reply({ok:true,summary}),e=>reply({ok:false,error:e.message}));return true;});\n`);
+  await fs.appendFile(path.join(source,'background.js'),`\nbrowserAPI.runtime.onMessage.addListener((m,s,reply)=>{if(m?.type!=='preview-font-audit')return;fetch(${JSON.stringify(endpoint)},{method:'POST',body:JSON.stringify({kind:'font',...m.report})}).then(()=>reply({ok:true}));return true;});\n`);
+  await fs.writeFile(path.join(source,'font-audit.js'),`(async()=>{for(let i=0;i<200;i++){const loaded=[...document.fonts].some(f=>f.family==='Chess Review Inter'&&f.status==='loaded');if(loaded){await browserAPI.runtime.sendMessage({type:'preview-font-audit',report:{ok:true,font:getComputedStyle(document.querySelector('.chess-review-button-summary')).fontFamily}});return;}await new Promise(r=>setTimeout(r,50));}await browserAPI.runtime.sendMessage({type:'preview-font-audit',report:{ok:false,error:'Inter did not load under strict page CSP'}});})();`);
   await fs.writeFile(path.join(source,'firefox-audit.html'),'<!doctype html><script type="module" src="firefox-audit.js"></script>');
   await fs.writeFile(path.join(source,'firefox-audit.js'),`import {browserAPI as api} from './browser-compat.js';
 try{for(let i=0;i<200;i++){if((await api.storage.local.get('settingsResetFor040')).settingsResetFor040)break;await new Promise(r=>setTimeout(r,25));}await api.storage.local.set(${JSON.stringify({settingsResetFor040:true,settings})});const start=performance.now();const result=await api.runtime.sendMessage({type:'preview-native-audit',pgn:${JSON.stringify(pgn)}});const after=await api.storage.local.get('settings');await fetch(${JSON.stringify(endpoint)},{method:'POST',body:JSON.stringify({...result,browser:'firefox',elapsedMs:performance.now()-start,settings:after.settings})});}catch(e){await fetch(${JSON.stringify(endpoint)},{method:'POST',body:JSON.stringify({ok:false,error:e.message})});}`);
   firefox=await cmd.run({sourceDir:source,artifactsDir:out,firefox:process.env.FIREFOX_PATH||'C:\\Program Files\\Mozilla Firefox\\firefox.exe',
-    firefoxProfile:await fs.mkdtemp(path.join(out,'firefox-profile-')),keepProfileChanges:true,target:['firefox-desktop'],args:['-headless'],noReload:true,noInput:true,startUrl:['about:blank']});
-  for(let i=0;i<300&&!firefoxReport;i++)await sleep(100);
+    firefoxProfile:await fs.mkdtemp(path.join(out,'firefox-profile-')),keepProfileChanges:true,target:['firefox-desktop'],args:['-headless'],noReload:true,noInput:true,startUrl:[endpoint+'/abcdefgh']});
+  for(let i=0;i<300&&(!firefoxReport||!firefoxFontReport);i++)await sleep(100);
   assert.ok(firefoxReport?.ok,JSON.stringify(firefoxReport));assert.equal(firefoxReport.summary.estimated,true);
   assert.ok(firefoxReport.summary.accuracy.w>0);assert.deepEqual(firefoxReport.settings,settings);results.push(firefoxReport);
+  assert.ok(firefoxFontReport?.ok,JSON.stringify(firefoxFontReport));assert.match(firefoxFontReport.font,/Chess Review Inter/);results.push({browser:'firefox',...firefoxFontReport});
   await fs.writeFile(path.join(out,'results.json'),JSON.stringify(results,null,2));console.log(JSON.stringify({out,results},null,2));
 } finally {ws?.close();chrome?.kill();if(firefox)await firefox.exit();server.close();}
