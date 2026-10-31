@@ -218,18 +218,16 @@ function injectLichessReviewButton(followUp) {
 
   const btn = document.createElement("button");
   btn.type = "button";
-  btn.className = "fbt chess-analyzer-review"; // fbt = Lichess's button style, so it fits in
+  btn.className = "fbt chess-analyzer-review";
   const analysisLink = firstEl(followUp, LI.analysisLink);
-  // Read before insertion: adding a sibling can change Lichess's last-child styling.
-  btn.style.borderRadius = analysisLink ? getComputedStyle(analysisLink).borderRadius : "6px";
   const logo = document.createElement("img");
   logo.className = "chess-analyzer-review-logo";
   logo.alt = "";
-  logo.style.cssText = "width:16px;height:16px;margin-right:6px;vertical-align:middle;position:relative;top:-1px;";
+  const mark = document.createElement('span'); mark.className = 'chess-analyzer-review-mark'; mark.setAttribute('aria-hidden','true'); mark.append(logo);
   const label = document.createElement("span");
   label.className = "chess-analyzer-review-label";
   label.textContent = LI_REVIEW_LABEL;
-  btn.append(logo, " ", label);
+  btn.append(mark, label);
   globalThis.ChessReviewButtonPreview?.register(btn,label,reviewPreviewContext,browserAPI);
   getLogoDataUrl().then((url) => { if (url) logo.src = url; });
 
@@ -252,13 +250,14 @@ function injectLichessReviewButton(followUp) {
       }).catch(() => {
         btn.disabled = false;
         label.textContent = "Reload the page ↻";
-      });
+      }).finally(() => globalThis.ChessReviewButtonPreview?.refresh());
     } catch (e) {
       btn.disabled = false;
       label.textContent = "Reload the page ↻";
       // An existing content script is detached when the extension is reloaded. It cannot
       // reconnect itself; the tab must load once more to receive the new script.
       console.info("[Chess Analyzer] The extension was updated. Reload this tab to reconnect the review button.");
+      globalThis.ChessReviewButtonPreview?.refresh();
     }
   });
 

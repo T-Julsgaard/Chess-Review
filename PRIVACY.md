@@ -29,7 +29,7 @@ which they are independently responsible.
   game, it automatically looks up that game and calculates a local estimated
   accuracy preview. This does not require opening the extension. It uses one
   bundled engine worker with a bounded runtime, and does not analyse an ongoing
-  game. A saved full review can supply its accuracy and Brilliant/Great counts.
+  game. A saved full review can supply its accuracy.
   Chrome uses a hidden extension document (`offscreen` permission) to host the
   worker; Firefox uses its extension background page. No new visible tab opens.
 - Game lookup for full reviews and automatic post-game previews calls the
@@ -59,7 +59,7 @@ browser's `chrome.storage.local`:
   may still be used as archive lookup candidates.
 - A cache of public game/API responses, PGNs, and computed analysis, so
   re-opening a game does not require re-downloading or re-analyzing it.
-- Small Brilliant/Great count summaries alongside completed saved reviews.
+- Small accuracy summaries alongside completed saved reviews.
   Automatic accuracy estimates are held in a bounded in-memory cache and are
   separate from full-review evidence and engine preferences.
 - Chess.com monthly archive responses can contain other games and optional

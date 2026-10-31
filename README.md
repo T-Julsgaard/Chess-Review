@@ -8,8 +8,10 @@ rating. Local analysis needs no account or server, and no manual PGN copying.
 Post-game review buttons on Chess.com and Lichess also show a local, depth-8
 accuracy estimate before you open the extension. The estimate is separate from
 the full review and may differ from its score. Saved full reviews supply their
-accuracy and Brilliant/Great counts instead. Previews only analyse completed
+accuracy instead. Previews only analyse completed
 standard games, use one bounded worker, and never change full-review settings.
+The website buttons echo the shine and press effects of **Learn with Chess Review**,
+and respect reduced motion and the **Interface animations** preference.
 
 **Learn with Chess Review** opens from the button beneath Engine, beside the move
 controls. By default, the review panels morph into one learning workspace while

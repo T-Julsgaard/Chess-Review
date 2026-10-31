@@ -34,7 +34,7 @@ function page(t,html,{site='chess',path,reply}={}) {
     async flush(){for(let i=0;i<10;i++){await Promise.resolve();frames.splice(0).forEach(fn=>fn());}}
   };
 }
-const result=(key='chesscom:12345678')=>({ok:true,key,estimated:true,accuracy:{w:91.24,b:72.06},players:{w:'Alice',b:'Bob'}});
+const result=(key='chesscom:12345678')=>({ok:true,key,estimated:true,accuracy:{w:91.24,b:72.06},players:{w:'Alice',b:'Bob'},counts:{w:{brilliant:2,great:1},b:{brilliant:0,great:3}}});
 
 const fixtures=[
   ['previous / other player game',profile],
@@ -49,7 +49,10 @@ for(const [name,html] of fixtures) test(`${name}: existing review placement gain
   const p=page(t,'<wc-chess-board></wc-chess-board>'+html);await p.flush();
   assert.equal(p.buttons().length,1);assert.equal(p.sent.filter(m=>m.type==='buttonPreview').length,1);
   p.resolve(result());await p.flush();
-  assert.equal(p.buttons()[0].querySelector('.chess-review-button-summary').textContent,'Alice · ~91.2% accuracy');
+  assert.equal(p.buttons()[0].querySelector('.chess-review-button-summary').textContent,'Alice played with ~91.2% accuracy');
+  assert.equal(p.buttons()[0].querySelector('.chess-review-button-accuracy').textContent,'~91.2%');
+  assert.doesNotMatch(p.buttons()[0].textContent,/Brilliant|Great/);
+  assert.ok(p.buttons()[0].querySelector('.chess-review-button-arrow'));
   assert.match(p.buttons()[0].querySelector('.chess-review-button-summary').title,/depth 8/);
   const original=p.w.document.querySelector('.cc-button-component');assert.equal(original.textContent,'Game Review');
 });
@@ -60,20 +63,22 @@ test('modal and multiple sidebars share one job and preserve busy states during 
   const button=p.buttons()[0];button.click();await p.flush();
   p.resolve(result());p.w.document.querySelector('.game-over-modal-shell-buttons a').textContent='Updated review';await p.flush();
   assert.equal(button.disabled,true);assert.equal(button.querySelector('.chess-review-button-summary').hidden,true);
+  assert.equal(button.getAttribute('aria-busy'),'true');assert.equal(button.classList.contains('is-opening'),true);
   assert.equal(button.querySelector('.chess-analyzer-free-review-label').textContent,'Opening review…');
   p.pending.find(x=>x.message.type==='freeGameReview').resolve({ok:true});await p.flush();
   assert.equal(button.disabled,false);assert.equal(button.querySelector('.chess-review-button-summary').hidden,false);
+  assert.equal(button.getAttribute('aria-busy'),'false');assert.equal(button.classList.contains('is-opening'),false);
   assert.equal(p.buttons()[0],button);assert.equal(p.buttons().length,3);
 });
 
 for(const path of ['/game/daily/12345678?flip=true','/analysis/game/live/12345678/review?flip=1']) test(`black perspective survives ${path}`,async t=>{
   const p=page(t,profile,{path});await p.flush();p.resolve(result());await p.flush();
-  assert.equal(p.buttons()[0].querySelector('.chess-review-button-summary').textContent,'Bob · ~72.1% accuracy');
+  assert.equal(p.buttons()[0].querySelector('.chess-review-button-summary').textContent,'Bob played with ~72.1% accuracy');
 });
 test('board flip updates the named score without starting another engine',async t=>{
   const p=page(t,'<wc-chess-board></wc-chess-board>'+profile);await p.flush();p.resolve(result());await p.flush();
   p.w.document.querySelector('wc-chess-board').classList.add('flipped');p.refresh();await p.flush();
-  assert.match(p.buttons()[0].textContent,/Bob · ~72.1%/);assert.equal(p.sent.filter(m=>m.type==='buttonPreview').length,1);
+  assert.match(p.buttons()[0].textContent,/Bob played with ~72.1%/);assert.equal(p.sent.filter(m=>m.type==='buttonPreview').length,1);
 });
 test('unknown perspective shows both colours instead of claiming account ownership',async t=>{
   const p=page(t,profile);await p.flush();p.resolve(result());await p.flush();
@@ -103,12 +108,12 @@ test('failed preview leaves review clickable and retries a delayed archive with 
   assert.equal(p.sent.filter(m=>m.type==='buttonPreview').length,4);
   p.buttons()[0].click();assert.equal(p.sent.at(-1).type,'freeGameReview');
 });
-test('a saved full review replaces estimates and adds Brilliant/Great counts on every placement',async t=>{
+test('saved accuracy replaces estimates and legacy move counts are never displayed on any placement',async t=>{
   const p=page(t,'<wc-chess-board></wc-chess-board>'+modal+profile);await p.flush();p.resolve(result());await p.flush();
   p.changes[0]({library:{newValue:[]}},'local');await p.flush();
   p.resolve({...result(),estimated:false,counts:{w:{brilliant:1,great:3},b:{brilliant:0,great:0}}},1);await p.flush();
   for(const button of p.buttons()) {
-    assert.match(button.textContent,/Alice · 91.2% accuracy · 1 Brilliant · 3 Great/);assert.doesNotMatch(button.textContent,/~|Estimating/);
+    assert.match(button.textContent,/Alice played with 91.2% accuracy/);assert.doesNotMatch(button.textContent,/~|Estimating|Brilliant|Great/);
   }
 });
 test('a retry paused in a hidden tab resumes when that tab becomes visible',async t=>{
@@ -128,12 +133,40 @@ test('Vue replacement preserves the finished preview without duplicate requests'
   assert.equal(p.sent.filter(m=>m.type==='buttonPreview').length,1);
 });
 
+for(const site of ['chess','lichess']) {
+  const html=site==='chess'?'<wc-chess-board></wc-chess-board>'+profile:'<cg-container></cg-container><div class="cg-wrap orientation-white"></div>'+follow;
+  test(`${site}: interface motion follows its own setting without restarting the preview`,async t=>{
+    const p=page(t,html,{site});await p.flush();const button=p.buttons()[0];
+    assert.equal(button.dataset.motion,'on');
+    p.changes[0]({settings:{newValue:{moveAnim:false,uiAnim:true}}},'local');assert.equal(button.dataset.motion,'on');
+    p.changes[0]({settings:{newValue:{uiAnim:false}}},'local');assert.equal(button.dataset.motion,'off');
+    p.changes[0]({settings:{newValue:{uiAnim:true}}},'sync');assert.equal(button.dataset.motion,'off');
+    p.changes[0]({settings:{newValue:{uiAnim:true}}},'local');assert.equal(button.dataset.motion,'on');
+    assert.equal(p.sent.filter(m=>m.type==='buttonPreview').length,1);
+  });
+  test(`${site}: unchanged accuracy keeps its markup and does not replay the reveal or live announcement`,async t=>{
+    const p=page(t,html,{site});await p.flush();p.resolve(result(site==='chess'?'chesscom:12345678':'lichess:12345678'));await p.flush();
+    const summary=p.buttons()[0].querySelector('.chess-review-button-summary'),value=summary.querySelector('strong');let mutations=0;
+    const observer=new p.w.MutationObserver(records=>{mutations+=records.length;});observer.observe(summary,{childList:true,subtree:true});
+    for(let i=0;i<5;i++)p.refresh();await p.flush();observer.disconnect();
+    assert.equal(summary.querySelector('strong'),value);assert.equal(mutations,0);
+  });
+  test(`${site}: failed review opens immediately restore the resting animation state`,async t=>{
+    const p=page(t,html,{site});await p.flush();const button=p.buttons()[0];button.click();
+    assert.equal(button.classList.contains('is-opening'),true);assert.equal(button.getAttribute('aria-busy'),'true');
+    p.pending.find(x=>x.message.type==='freeGameReview').resolve({ok:false,error:'Offline'});await p.flush();
+    assert.equal(button.disabled,false);assert.equal(button.classList.contains('is-opening'),false);assert.equal(button.getAttribute('aria-busy'),'false');
+    assert.match(button.textContent,/Couldn't open review/);
+  });
+}
+
 for(const [name,html] of [['round',follow],['legacy',follow.replace('rcontrols','old-controls')],
   ['selector fallback',follow.replace('follow-up','future-follow-up')],['no analysis link',follow.replace(/<a.*?<\/a>/,'')]]) {
   test(`Lichess ${name}: summary and original review click work beneath the native action`,async t=>{
     const p=page(t,'<cg-container></cg-container><div class="cg-wrap orientation-black"></div>'+html,{site:'lichess',path:'/game/12345678abcd/black'});await p.flush();
     assert.equal(p.buttons().length,1);p.resolve(result('lichess:12345678'));await p.flush();
-    const button=p.buttons()[0];assert.match(button.textContent,/Bob · ~72.1% accuracy/);button.click();await p.flush();
+    const button=p.buttons()[0];assert.match(button.textContent,/Bob played with ~72.1% accuracy/);
+    assert.ok(button.querySelector('.chess-analyzer-review-mark img'));button.click();await p.flush();
     assert.equal(button.disabled,true);assert.equal(button.querySelector('.chess-review-button-summary').hidden,true);
     assert.equal(p.sent.at(-1).type,'freeGameReview');assert.equal(p.sent.at(-1).gameKey,'https://lichess.org/game/12345678abcd/black');
     p.pending.find(x=>x.message.type==='freeGameReview').resolve({ok:true});await p.flush();assert.equal(button.disabled,false);

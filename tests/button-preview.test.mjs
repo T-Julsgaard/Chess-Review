@@ -90,15 +90,14 @@ test('preview rejects live games and already canceled requests before creating a
   assert.equal(workers,0);
 });
 
-test('saved summaries require the exact game, PGN and valid scores; legacy records omit counts', () => {
+test('saved summaries require the exact game, PGN and valid scores and omit all legacy move counts', () => {
   const record={url,pgn,meSide:'b',myAcc:80,opAcc:90};
-  assert.deepEqual(savedButtonSummary(record,payload,key),{version:1,key,estimated:false,accuracy:{b:80,w:90},counts:null});
+  assert.deepEqual(savedButtonSummary(record,payload,key),{version:1,key,estimated:false,accuracy:{b:80,w:90}});
   assert.equal(savedButtonSummary({...record,pgn:pgn+' '},payload,key),null);
   assert.equal(savedButtonSummary({...record,url:'https://lichess.org/12345678'},payload,key),null);
   assert.equal(savedButtonSummary({...record,myAcc:NaN},payload,key),null);
   const counts={w:{brilliant:1,great:2},b:{brilliant:0,great:1}};
-  assert.deepEqual(savedButtonSummary({...record,buttonSummary:{version:1,accuracy:{w:90,b:80},counts}},payload,key).counts,counts);
-  assert.equal(savedButtonSummary({...record,buttonSummary:{version:1,accuracy:{w:90,b:80},counts:{...counts,w:{brilliant:-1,great:2}}}},payload,key).counts,null);
+  assert.equal(Object.hasOwn(savedButtonSummary({...record,buttonSummary:{version:1,accuracy:{w:90,b:80},counts}},payload,key),'counts'),false);
 });
 
 function service(overrides={}) {
@@ -119,7 +118,7 @@ test('saved full-review summaries bypass the preview worker',async () => {
   const counts={w:{brilliant:1,great:2},b:{brilliant:0,great:0}};
   const s=service({api:{storage:{local:{get:async()=>({library:[{url,pgn,buttonSummary:{version:1,accuracy:summary.accuracy,counts}}]})}}}});
   const result=await s.get(1,key);
-  assert.equal(result.estimated,false);assert.deepEqual(result.counts,counts);assert.equal(s.runs.length,0);
+  assert.equal(result.estimated,false);assert.equal(Object.hasOwn(result,'counts'),false);assert.equal(s.runs.length,0);
 });
 test('live PGNs and game-identity mismatches never start a preview worker',async () => {
   for(const loaded of [{...payload,pgn:pgn.replaceAll('1-0','*')},{...payload,meta:{url:'https://lichess.org/12345678'}}]) {

@@ -3,7 +3,7 @@
 (() => {
   const entries = new Set();
   const failures = new Map();
-  let current = null, generation = 0, timer = null, retryTimer = null, api = null, storageListener = false;
+  let current = null, generation = 0, timer = null, retryTimer = null, api = null, storageListener = false, motion = true;
   function cancel() {
     generation++;
     clearTimeout(retryTimer); retryTimer = null;
@@ -13,27 +13,39 @@
     current = null;
   }
   function number(value) {return Number.isFinite(value) && value >= 0 && value <= 100 ? value.toFixed(1) + '%' : null;}
+  function setSummary(entry, text, score = '', tail = '') {
+    const value = text + score + tail;
+    if (entry.summary.textContent === value) return;
+    if (!score) {entry.summary.textContent = text; return;}
+    const highlight = document.createElement('strong'); highlight.className = 'chess-review-button-accuracy'; highlight.textContent = score;
+    entry.summary.replaceChildren(document.createTextNode(text),highlight,document.createTextNode(tail));
+  }
+  function setMotion(settings) {
+    motion = settings?.uiAnim !== false;
+    for (const {button} of entries) button.dataset.motion = motion ? 'on' : 'off';
+  }
   function render(entry, context) {
     const {button,summary} = entry;
     summary.hidden = button.disabled;
+    button.setAttribute('aria-busy',button.disabled ? 'true' : 'false');
+    if (!button.disabled) button.classList.remove('is-opening');
     summary.removeAttribute('title');
-    if (!context?.key) {summary.textContent = 'Open your full game review'; return;}
+    if (!context?.key) {button.dataset.preview = 'idle'; setSummary(entry,'Open your full game review'); return;}
     const result = current?.key === context.key ? current.result : null;
     if (!result?.ok) {
-      summary.textContent = current?.done ? 'Accuracy preview unavailable' : 'Estimating accuracy…';
+      button.dataset.preview = current?.done ? 'unavailable' : 'pending';
+      setSummary(entry,current?.done ? 'Accuracy preview unavailable' : 'Estimating your game’s accuracy…');
       return;
     }
+    button.dataset.preview = 'ready';
     const side = context.flip === true ? 'b' : context.flip === false ? 'w' : null;
     const prefix = result.estimated ? '~' : '';
     if (!side) {
-      summary.textContent = ['w','b'].map(color => (color === 'w' ? 'White ' : 'Black ') + prefix + (number(result.accuracy?.[color]) || '—')).join(' · ');
+      setSummary(entry,['w','b'].map(color => (color === 'w' ? 'White ' : 'Black ') + (number(result.accuracy?.[color]) ? prefix + number(result.accuracy[color]) : '—')).join(' · '));
     } else {
       const score = number(result.accuracy?.[side]);
-      summary.textContent = (result.players?.[side] || (side === 'w' ? 'White' : 'Black')) + ' · ' + (score ? prefix + score + ' accuracy' : 'No scored decisions');
-      const counts = result.counts?.[side];
-      if (counts && ['brilliant','great'].every(key => Number.isSafeInteger(counts[key]) && counts[key] >= 0)) {
-        summary.textContent += ' · ' + counts.brilliant + ' Brilliant · ' + counts.great + ' Great';
-      }
+      const player = result.players?.[side] || (side === 'w' ? 'White' : 'Black');
+      setSummary(entry,player + (score ? ' played with ' : ' · No scored decisions'),score ? prefix + score : '',score ? ' accuracy' : '');
     }
     summary.title = result.estimated ? 'Estimated locally at depth 8. The full review may give a different score.' : 'From your saved full review.';
   }
@@ -74,14 +86,21 @@
     api ||= browserApi;
     const copy = document.createElement('span'); copy.className = 'chess-review-button-copy';
     const summary = document.createElement('span'); summary.className = 'chess-review-button-summary';
-    summary.setAttribute('aria-live','polite'); summary.textContent = 'Estimating accuracy…';
+    summary.setAttribute('aria-live','polite'); summary.setAttribute('aria-atomic','true'); summary.textContent = 'Estimating your game’s accuracy…';
     label.replaceWith(copy); copy.append(label,summary);
+    const arrow = document.createElement('span'); arrow.className = 'chess-review-button-arrow'; arrow.setAttribute('aria-hidden','true'); button.append(arrow);
+    button.dataset.motion = motion ? 'on' : 'off';
     entries.add({button,summary,getContext});
-    button.addEventListener('click',() => {summary.hidden = true;});
+    button.addEventListener('click',() => {summary.hidden = true; button.classList.add('is-opening'); button.setAttribute('aria-busy','true');});
     if (!timer) timer = setInterval(refresh,1000);
     if (!storageListener && api.storage?.onChanged) {
       storageListener = true;
-      api.storage.onChanged.addListener((changes,area) => {if (area === 'local' && changes.library) refresh(true);});
+      api.storage.onChanged.addListener((changes,area) => {
+        if (area !== 'local') return;
+        if (changes.settings) setMotion(changes.settings.newValue);
+        if (changes.library) refresh(true);
+      });
+      try {Promise.resolve(api.storage.local?.get('settings')).then(stored => {if (stored) setMotion(stored.settings);}).catch(() => {});} catch {}
     }
   }
   addEventListener('pagehide',() => {cancel(); clearInterval(timer); timer = null;});

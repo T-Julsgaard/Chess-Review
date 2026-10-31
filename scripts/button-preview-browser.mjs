@@ -85,40 +85,53 @@ try {
     await wait(t,"/\\d+\\.\\d% accuracy/.test(document.querySelector('.chess-review-button-summary').textContent)",name+' engine preview');
     const elapsedMs=Date.now()-started;
     const text=await evaluate(t,"document.querySelector('.chess-review-button-summary').textContent");
-    assert.match(text,isLi?/Bob · ~/ : /Alice · ~/);
+    assert.match(text,isLi?/Bob played with ~/ : /Alice played with ~/);
+    await sleep(350); // Let the one-shot accuracy reveal settle before measuring.
     for(const width of [220,288,360]) {
       await evaluate(t,`document.querySelector('.fixture').style.setProperty('--width','${width}px');dispatchEvent(new Event('resize'))`);await sleep(60);
       const boxes=await evaluate(t,`[...document.querySelectorAll('.chess-analyzer-free-review,.chess-analyzer-review')].map(b=>{const r=b.getBoundingClientRect(),s=b.querySelector('.chess-review-button-summary').getBoundingClientRect();return {width:r.width,height:r.height,summaryFits:s.left>=r.left&&s.right<=r.right&&s.bottom<=r.bottom,overflow:b.scrollWidth>b.clientWidth+1};})`);
       for(const b of boxes){assert.ok(b.height>=66);assert.ok(b.width<=width+1);assert.ok(b.summaryFits);assert.equal(b.overflow,false);}
       await call('Emulation.setDeviceMetricsOverride',{width:430,height:650,deviceScaleFactor:1,mobile:false},t.sessionId);
       const shot=await call('Page.captureScreenshot',{format:'png'},t.sessionId);await fs.writeFile(path.join(out,`${name}-${width}.png`),Buffer.from(shot.data,'base64'));
-      if(!isLi && width===288) {
-        // Reconstruct the former single-line button for a visual before image;
-        // restore the actual control, including its event listeners, afterward.
-        await evaluate(t,`(()=>{const button=document.querySelector('.chess-analyzer-free-review'),copy=button.querySelector('.chess-review-button-copy');globalThis.__originalCopy=copy;copy.replaceWith(copy.firstElementChild);button.classList.add('before-preview');const style=document.createElement('style');style.id='before-preview-style';style.textContent='button.before-preview{min-height:52px!important}';document.head.append(style);})()`);
-        const before=await call('Page.captureScreenshot',{format:'png'},t.sessionId);await fs.writeFile(path.join(out,`${name}-before.png`),Buffer.from(before.data,'base64'));
-        await evaluate(t,"(()=>{const button=document.querySelector('.before-preview'),label=button.querySelector('.chess-analyzer-free-review-label'),copy=globalThis.__originalCopy;label.replaceWith(copy);copy.prepend(label);button.classList.remove('before-preview');document.getElementById('before-preview-style').remove();delete globalThis.__originalCopy;})()");
-      }
     }
+    await call('DOM.enable',{},t.sessionId);await call('CSS.enable',{},t.sessionId);
+    const {root:documentRoot}=await call('DOM.getDocument',{},t.sessionId);
+    const {nodeId}=await call('DOM.querySelector',{nodeId:documentRoot.nodeId,selector:'.chess-analyzer-free-review,.chess-analyzer-review'},t.sessionId);
+    await call('CSS.forcePseudoState',{nodeId,forcedPseudoClasses:['hover']},t.sessionId);
+    assert.equal(await evaluate(t,"getComputedStyle(document.querySelector('.chess-analyzer-free-review,.chess-analyzer-review'),'::after').animationName"),'chess-review-shine');
+    assert.equal(await evaluate(t,"getComputedStyle(document.querySelector('.chess-analyzer-free-review-logo,.chess-analyzer-review-logo')).animationName"),'chess-review-knight');
+    await call('CSS.forcePseudoState',{nodeId,forcedPseudoClasses:['focus-visible']},t.sessionId);
+    assert.equal(await evaluate(t,"getComputedStyle(document.querySelector('.chess-analyzer-free-review,.chess-analyzer-review')).outlineStyle"),'solid');
+    await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]},t.sessionId);
+    assert.equal(await evaluate(t,"getComputedStyle(document.querySelector('.chess-analyzer-free-review,.chess-analyzer-review'),'::after').animationName"),'none');
+    assert.equal(await evaluate(t,"getComputedStyle(document.querySelector('.chess-review-button-accuracy')).animationName"),'none');
+    await call('Emulation.setEmulatedMedia',{features:[]},t.sessionId);
+    await call('CSS.forcePseudoState',{nodeId,forcedPseudoClasses:[]},t.sessionId);
     results.push({browser:'chrome',fixture:name,elapsedMs,text,widths:[220,288,360]});
     if(name==='profile')clickTab=t;else await call('Target.closeTarget',{targetId:t.targetId});
   }
   assert.deepEqual(await evaluate(audit,"api.storage.local.get('settings').then(x=>x.settings)"),settings);
+  await evaluate(audit,`api.storage.local.set({settings:${JSON.stringify({...settings,uiAnim:false})}})`);
+  await wait(clickTab,"document.querySelector('.chess-analyzer-free-review').dataset.motion==='off'",'Interface motion preference');
+  assert.equal(await evaluate(clickTab,"getComputedStyle(document.querySelector('.chess-review-button-accuracy')).animationName"),'none');
+  await evaluate(audit,`api.storage.local.set({settings:${JSON.stringify(settings)}})`);
+  await wait(clickTab,"document.querySelector('.chess-analyzer-free-review').dataset.motion==='on'",'Interface motion restored');
   const before=await call('Target.getTargets');
-  await evaluate(clickTab,"document.querySelector('.chess-analyzer-free-review').click()");
+  const opening=await evaluate(clickTab,"(()=>{const b=document.querySelector('.chess-analyzer-free-review');b.click();return {busy:b.getAttribute('aria-busy'),opening:b.classList.contains('is-opening'),animation:getComputedStyle(b).animationName};})()");
+  assert.deepEqual(opening,{busy:'true',opening:true,animation:'chess-review-press'});
   let opened;
   for(let i=0;i<100;i++){const now=await call('Target.getTargets');opened=now.targetInfos.find(t=>t.url.includes(id+'/analysis.html#')&&!before.targetInfos.some(old=>old.targetId===t.targetId));if(opened)break;await sleep(100);}
   assert.ok(opened,'Review click opens the original full-review flow');
   const jobs=await evaluate(audit,"api.storage.local.get(null).then(x=>Object.entries(x).filter(([k])=>k.startsWith('job:')).map(([,v])=>v))");
   assert.ok(jobs.some(job=>job.pgn===pgn && !job.estimated && !job.accuracy));
   await call('Target.closeTarget',{targetId:opened.targetId});
-  // Saving a full review updates the still-open website without rerunning the engine.
+  // Legacy saved counts must be ignored: only the completed accuracy is displayed.
   await evaluate(audit,`api.storage.local.set({library:[{url:'https://www.chess.com/game/live/12345678',pgn:${JSON.stringify(pgn)},buttonSummary:{version:1,accuracy:{w:98.1,b:73.2},counts:{w:{brilliant:2,great:1},b:{brilliant:0,great:0}}}}]})`);
-  await wait(clickTab,"document.querySelector('.chess-review-button-summary').textContent.includes('2 Brilliant · 1 Great')",'Saved review refresh');
+  await wait(clickTab,"document.querySelector('.chess-review-button-summary').textContent==='Alice played with 98.1% accuracy'",'Saved review refresh');
   for(const width of [220,360]) {
     await evaluate(clickTab,`document.querySelector('.fixture').style.setProperty('--width','${width}px');dispatchEvent(new Event('resize'))`);await sleep(60);
     assert.ok(await evaluate(clickTab,"(()=>{const b=document.querySelector('.chess-analyzer-free-review'),s=b.querySelector('.chess-review-button-summary'),r=b.getBoundingClientRect(),sr=s.getBoundingClientRect();return sr.bottom<=r.bottom&&b.scrollWidth<=b.clientWidth+1;})()"));
-    const saved=await call('Page.captureScreenshot',{format:'png'},clickTab.sessionId);await fs.writeFile(path.join(out,`saved-counts-${width}.png`),Buffer.from(saved.data,'base64'));
+    const saved=await call('Page.captureScreenshot',{format:'png'},clickTab.sessionId);await fs.writeFile(path.join(out,`saved-accuracy-${width}.png`),Buffer.from(saved.data,'base64'));
   }
   await call('Target.closeTarget',{targetId:clickTab.targetId});
   await sleep(300);

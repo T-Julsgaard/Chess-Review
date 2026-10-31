@@ -293,13 +293,14 @@ function buildReviewButton(placement, mt = 14, mb = 3) {
       }).catch(() => {
         btn.disabled = false;
         label.textContent = "Reload the page ↻";
-      });
+      }).finally(() => globalThis.ChessReviewButtonPreview?.refresh());
     } catch (e) {
       btn.disabled = false;
       label.textContent = "Reload the page ↻";
       // An existing content script is detached when the extension is reloaded. It cannot
       // reconnect itself; the tab must load once more to receive the new script.
       console.info("[Chess Analyzer] The extension was updated. Reload this tab to reconnect the review button.");
+      globalThis.ChessReviewButtonPreview?.refresh();
     }
   });
   return btn;
