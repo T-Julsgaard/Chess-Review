@@ -61,6 +61,19 @@ test('category transitions respect interface motion, preserve category scroll an
   assert.equal(doc.querySelector('.set-category').dataset.motion,'off');
 });
 
+test('leaving a category collapses its sections while edits and reselecting it preserve expansion',async t=>{
+  const {a,doc,choose}=settings(t);
+  const open=title=>[...doc.querySelectorAll('.set-sect-head')].find(n=>n.textContent===title).click();
+  open('Tabs');assert.equal(doc.querySelector('.set-section.open .set-sect-head').textContent,'Tabs');
+  choose('visual');assert.equal(doc.querySelector('.set-section.open .set-sect-head').textContent,'Tabs');
+  await a.call('setSetting','barStyle','classic');
+  assert.equal(doc.querySelector('.set-section.open .set-sect-head').textContent,'Tabs');
+  choose('engine');open('Search');choose('visual');assert.equal(doc.querySelector('.set-section.open'),null);
+  choose('engine');assert.equal(doc.querySelector('.set-section.open'),null);
+  choose('sound');assert.ok(doc.querySelector('.set-section.open'));
+  choose('visual');choose('sound');assert.equal(doc.querySelector('.set-section.open'),null);
+});
+
 test('visual and sound resets leave the other categories intact',async t=>{
   const {a,doc,choose}=settings(t);
   Object.assign(a.state.settings,{sound:false,soundVolume:22,reviewMode:'dopamine',coach:'',coachEngineReplies:true,engineDepth:12});

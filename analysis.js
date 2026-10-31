@@ -1692,6 +1692,10 @@ function buildUI() {
   );
 
   const settings = el("div", { class: "settings-pop", id: "settings", hidden: true });
+  settings.addEventListener('scroll', () => {
+    const picker = settings.querySelector('.set-category.open');
+    if (picker) positionSettingsDropdown(picker);
+  }, {passive:true});
 
   // Library sidebar — a thin strip on the far left, opened by hover or its native button.
   // Hidden panel controls are inert. Lives outside the canvas
@@ -6698,6 +6702,7 @@ function selectSettingsCategory(id) {
   if (!SETTINGS_CATEGORIES.some(category => category.id === id)) return;
   const changed = S.settingsTab !== id;
   settingsScroll.set(S.settingsTab, UI.settings.scrollTop);
+  if (changed) for (const title of Object.keys(S.setOpen)) S.setOpen[title] = false;
   S.settingsTab = id;
   // Single-purpose categories reveal their controls immediately on first visit.
   const first = {review:"Review experience", sound:"Sound", leaderboard:"Leaderboard", developer:"Developer debugger"}[id];
@@ -6722,6 +6727,8 @@ function settingsCategoryPicker() {
   button.setAttribute('aria-haspopup', 'menu');
   button.setAttribute('aria-controls', 'settingsCategoryMenu');
   menu.id = 'settingsCategoryMenu'; menu.setAttribute('role', 'menu'); menu.setAttribute('aria-label', 'Settings categories');
+  // The top layer keeps this overlay outside the scrolling panel's clipping bounds.
+  if (menu.showPopover) menu.setAttribute('popover', 'manual');
   [...menu.children].forEach((option, index) => {
     const category = SETTINGS_CATEGORIES[index];
     option.dataset.category = category.id;
@@ -6736,6 +6743,7 @@ function settingsCategoryPicker() {
     // relatedTarget keeps the menu open while focus moves to one of its items.
     if (field.contains(event.relatedTarget)) return;
     field.classList.remove('open'); button.setAttribute('aria-expanded', 'false');
+    field.querySelector('.lib-dd-menu[popover]')?.hidePopover();
   });
   return field;
 }
@@ -6796,9 +6804,12 @@ function positionSettings() {
   UI.settings.style.setProperty('--settings-scale',scale);
   // Fixed offsets are in the popover's zoomed coordinates; keep the screen inset constant.
   UI.settings.style.right = window.innerWidth <= 520 ? "" : 24/scale+"px";
+  const picker = UI.settings.querySelector('.set-category.open');
+  if (picker) positionSettingsDropdown(picker);
 }
 async function toggleSettings() {
   closeArrowColorPicker();
+  closeDropdowns();
   UI.settings.hidden = !UI.settings.hidden;
   if (!UI.settings.hidden) renderSettings();
   learningWorkspace?.settingsLayoutChanged();
@@ -7741,12 +7752,25 @@ function closeDropdowns() {
   document.querySelectorAll(".lib-dd-field.open").forEach(field => {
     field.classList.remove("open");
     field.querySelector(".lib-dd-btn").setAttribute("aria-expanded", "false");
+    field.querySelector('.lib-dd-menu[popover]')?.hidePopover();
   });
 }
 function positionSettingsDropdown(field) {
   const settings = field.closest('#settings');
-  if (!settings || field.classList.contains('set-category')) return;
+  if (!settings) return;
   const menu = field.querySelector('.lib-dd-menu');
+  if (field.classList.contains('set-category')) {
+    menu.showPopover?.();
+    const rect = field.getBoundingClientRect();
+    // Top-layer fixed coordinates still follow CSS zoom. Measure that scale so
+    // the menu aligns with the existing independently scaled desktop popover.
+    const scale = menu.getBoundingClientRect().width / parseFloat(getComputedStyle(menu).width) || 1;
+    menu.style.left = rect.left / scale + 'px';
+    menu.style.top = rect.bottom / scale + 6 + 'px';
+    menu.style.width = rect.width / scale + 'px';
+    menu.style.maxHeight = Math.max(40, Math.min(360, (window.innerHeight - rect.bottom - 12) / scale)) + 'px';
+    return;
+  }
   menu.classList.remove('above'); menu.style.maxHeight = '';
   const bounds = settings.getBoundingClientRect(), rect = field.getBoundingClientRect();
   const below = Math.min(bounds.bottom, window.innerHeight) - rect.bottom - 8;

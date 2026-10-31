@@ -1920,9 +1920,9 @@ button { font-family: inherit; cursor: pointer; }
   text-transform: uppercase; color: var(--ink-3);
 }
 .set-category > .lib-dd-btn .set-category-description { display: none; }
-/* In-flow expansion avoids clipping or a portal that would lose the panel's zoom. */
+/* A top-layer overlay leaves the panel and its settings in place. */
 .set-category > .lib-dd-menu {
-  position: static; margin-top: 6px; padding: 5px; gap: 3px; border-radius: 11px;
+  position: fixed; inset: auto; margin: 0; padding: 5px; gap: 3px; border-radius: 11px;
   max-height: min(360px, 50dvh); overflow-y: auto; overscroll-behavior: contain;
   box-shadow: 0 8px 20px #0002; background: var(--panel-2);
 }

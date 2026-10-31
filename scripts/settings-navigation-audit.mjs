@@ -21,8 +21,13 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(100);
       let originalWidth;
       for(const category of ['visual','review','engine','sound','leaderboard','developer']){
+        const before=await run("(()=>{const p=document.querySelector('#settings').getBoundingClientRect();return {height:p.height,contentTop:document.querySelector('.set-category-content').getBoundingClientRect().top};})()");
         await click('.set-category > .lib-dd-btn');
         assert.equal(await run("document.querySelector('.set-category > .lib-dd-btn').getAttribute('aria-expanded')"),'true');
+        const overlay=await run("(()=>{const p=document.querySelector('#settings').getBoundingClientRect(),b=document.querySelector('.set-category > .lib-dd-btn').getBoundingClientRect(),m=document.querySelector('#settingsCategoryMenu').getBoundingClientRect();return {height:p.height,contentTop:document.querySelector('.set-category-content').getBoundingClientRect().top,left:m.left,right:m.right,bottom:m.bottom,width:m.width,buttonLeft:b.left,buttonWidth:b.width,topLayer:document.querySelector('#settingsCategoryMenu').matches(':popover-open')};})()");
+        assert.equal(overlay.topLayer,true);
+        assert.ok(Math.abs(overlay.height-before.height)<1&&Math.abs(overlay.contentTop-before.contentTop)<1,'Opening the menu must not resize the panel or push its settings down');
+        assert.ok(Math.abs(overlay.left-overlay.buttonLeft)<1&&Math.abs(overlay.width-overlay.buttonWidth)<1&&overlay.right<=width+1&&overlay.bottom<=height+1,JSON.stringify({setup,width,height,category,overlay}));
         if(category==='visual'&&[1920,390,320].includes(width)){
           await sleep(220);await capture(`${setup}-menu-${width}x${height}`);
         }
@@ -41,6 +46,14 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     }
   }
   await call('Emulation.setDeviceMetricsOverride',{width:1920,height:919,deviceScaleFactor:1,mobile:false},review.sessionId);
+  const choose=async id=>{await click('.set-category > .lib-dd-btn');await click(`.set-category [data-category="${id}"]`);};
+  await choose('visual');
+  await run("[...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Tabs').click()");
+  assert.equal(await run("document.querySelector('.set-section.open .set-sect-head').textContent"),'Tabs');
+  await choose('engine');
+  await run("[...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Search').click()");
+  await choose('visual');assert.equal(await run("document.querySelectorAll('.set-section.open').length"),0);
+  await choose('engine');assert.equal(await run("document.querySelectorAll('.set-section.open').length"),0);
   // Motion preferences apply to both the picker and the incoming settings.
   for(const [motion,reduced] of [[true,false],[false,false],[true,true]]){
     await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:reduced?'reduce':'no-preference'}]},review.sessionId);
@@ -56,6 +69,8 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]},review.sessionId);
   await run("import('./analysis.js').then(m=>{m.S.settings.uiAnim=true;m.selectSettingsCategory('visual');})");
   await click('.set-category > .lib-dd-btn');await sleep(250);await capture('settings-category-menu-final');
+  await click('[aria-label=Settings]');
+  assert.equal(await run("document.querySelector('#settings').hidden&&!document.querySelector('#settingsCategoryMenu').matches(':popover-open')"),true);
   await fs.writeFile(path.join(out,'settings-navigation.json'),JSON.stringify(results,null,2));
   console.log(`Settings navigation: ${results.length} category/viewport checks; real pointer input, keyboard dismissal and motion preferences passed. Evidence: ${out}`);
 }
