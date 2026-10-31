@@ -78,6 +78,63 @@ test('post-game emphasis keeps native action children intact through coach and C
   actions.replaceChildren();await p.flush();assert.equal(doc.querySelector('.chess-analyzer-review-slot'),null,'Remove stale action when native review is dismissed');
 });
 
+// Observed on the live completed-game page from the reported screenshot. The
+// rematch row is INSIDE the emphasis panel, not a sibling after that panel.
+const completedEmphasis = `<div class="sidebar-content"><div class="game-review-emphasis-component game-review-emphasis-short" style="overflow:hidden">
+  <div class="game-review-emphasis-content"><div class="quick-analysis-component"><a href="/analysis?tab=review" aria-label="Game Review">6 Great · 9 Best · 10 Excellent</a></div>
+    <div class="game-review-buttons-component"><a href="/analysis?tab=review" aria-label="Game Review">Game Review</a><!--Vue anchor--></div>
+    <div class="new-game-buttons-component"><div class="new-game-buttons-buttons"><button aria-label="New 1 min">New 1 min</button><button aria-label="Rematch">Rematch</button></div></div>
+  </div></div><div class="game-buttons-container-component">Replay</div></div>`;
+
+test('completed-game emphasis puts the extension between Game Review and New/Rematch',async t=>{
+  const p=page(t,completedEmphasis),doc=p.w.document,row=doc.querySelector('.game-review-buttons-component'),secondary=doc.querySelector('.new-game-buttons-component');
+  const nativeActions=row.innerHTML,nativeSecondary=secondary.innerHTML,slot=row.nextElementSibling,button=slot.querySelector('button');
+  assert.equal(slot.className,'chess-analyzer-review-slot');assert.equal(slot.nextElementSibling,secondary);
+  assert.equal(slot.parentElement.className,'game-review-emphasis-content');
+  assert.equal(row.innerHTML,nativeActions);assert.equal(secondary.innerHTML,nativeSecondary);
+  assert.equal(doc.querySelectorAll('.chess-analyzer-free-review').length,1);
+  let nativeClicks=0;row.parentElement.addEventListener('click',()=>nativeClicks++);
+  button.click();await p.flush();assert.equal(nativeClicks,0);
+  secondary.outerHTML=secondary.outerHTML;await p.flush();
+  assert.equal(row.nextElementSibling,slot);assert.equal(slot.nextElementSibling.className,'new-game-buttons-component');
+  assert.equal(slot.querySelector('button'),button);assert.equal(button.disabled,true);
+  slot.remove();await p.flush();assert.equal(row.nextElementSibling,slot);
+  assert.equal(slot.nextElementSibling.className,'new-game-buttons-component');
+});
+
+test('late rematch row moves the same busy button into the action gap and Vue replacement recovers',async t=>{
+  const p=page(t,completedEmphasis),doc=p.w.document,secondary=doc.querySelector('.new-game-buttons-component');
+  secondary.remove();await p.flush();const button=doc.querySelector('.chess-analyzer-free-review');button.click();
+  const row=doc.querySelector('.game-review-buttons-component');row.after(secondary);await p.flush();
+  assert.equal(row.nextElementSibling.querySelector('button'),button);assert.equal(button.disabled,true);
+  assert.equal(row.nextElementSibling.nextElementSibling,secondary);
+  doc.querySelector('.game-review-emphasis-component').outerHTML=completedEmphasis;await p.flush();
+  const newRow=doc.querySelector('.game-review-buttons-component');
+  assert.equal(doc.querySelectorAll('.chess-analyzer-free-review').length,1);
+  assert.equal(newRow.nextElementSibling.className,'chess-analyzer-review-slot');
+  assert.equal(newRow.nextElementSibling.nextElementSibling.className,'new-game-buttons-component');
+});
+
+test('archive sidebar notices a late New/Rematch sibling outside its review row',async t=>{
+  const p=page(t,profileSidebar),doc=p.w.document,row=doc.querySelector('.game-review-buttons-component');
+  const button=row.nextElementSibling.querySelector('button');button.click();
+  const secondary=doc.createElement('div');secondary.className='new-game-buttons-component';secondary.textContent='New 1 min · Rematch';row.after(secondary);
+  await p.flush();assert.equal(row.nextElementSibling.querySelector('button'),button);
+  assert.equal(row.nextElementSibling.nextElementSibling,secondary);assert.equal(button.disabled,true);
+});
+
+for(const secondaryClass of ['game-over-secondary-actions-row-component','new-game-buttons-component']) {
+  test(`nested modal ${secondaryClass} keeps the button above New/Rematch through row replacement`,async t=>{
+    const p=page(t,`<div class="game-over-modal-shell-buttons"><div class="nested-modal-actions"><a href="/analysis?tab=review">Game Review</a><div class="${secondaryClass}">New 1 min · Rematch</div></div></div>`),doc=p.w.document;
+    const secondary=doc.querySelector('.'+secondaryClass),button=doc.querySelector('.chess-analyzer-free-review');
+    assert.equal(button.previousElementSibling.tagName,'A');assert.equal(button.nextElementSibling,secondary);
+    button.click();secondary.parentElement.append(button);await p.flush();
+    assert.equal(button.nextElementSibling,secondary);assert.equal(button.disabled,true);
+    secondary.outerHTML=secondary.outerHTML;await p.flush();assert.equal(button.nextElementSibling.className,secondaryClass);
+    assert.equal(doc.querySelectorAll('.chess-analyzer-free-review').length,1);
+  });
+}
+
 test('post-game coach action stays outside the capped animation and native click handler',async t=>{
   const p=page(t,`<div class="sidebar-content"><div class="coach-nudge-game-review-component">
     <div class="coach-nudge-game-review-content-animation" style="max-height:20dvh;overflow:hidden">

@@ -231,7 +231,8 @@ function injectLichessReviewButton(followUp) {
   globalThis.ChessReviewButtonPreview?.register(btn,label,reviewPreviewContext,browserAPI);
   getLogoDataUrl().then((url) => { if (url) logo.src = url; });
 
-  btn.addEventListener("click", () => {
+  btn.addEventListener("click", (event) => {
+    event.stopPropagation();
     btn.disabled = true;
     btn.removeAttribute("title");
     // Stay busy until the bounded background operation settles.

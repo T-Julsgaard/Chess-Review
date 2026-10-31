@@ -210,16 +210,17 @@ const FREE_REVIEW_LABEL = "Analyze with Chess Review";
 const CC = {
   // Game-over modal.
   modalContainer: [".game-over-modal-shell-buttons", "[class*='modal-shell-buttons']"],
-  modalSecondaryRow: [".game-over-secondary-actions-row-component", "[class*='secondary-actions-row']"],
+  modalSecondaryRow: [".game-over-secondary-actions-row-component", "[class*='secondary-actions-row']", ".new-game-buttons-component"],
   modalPrimaryCta: ['a[href*="review"]', '[class*="game-over-primary-cta"]', 'a.cc-button-component', 'button.cc-button-component'],
   modalContext: [".game-over-modal-component", "[class*='game-over-modal']"], // "is a game-over modal on screen?"
   // Own games wrap the actions in an emphasis section; profile/archive games place
   // them directly in .sidebar-content. Keep the latter scoped to the sidebar.
   sidebarSections: [".game-review-emphasis-content", "[class*='game-review-emphasis']", ".sidebar-content .game-review-buttons-component", ".sidebar-content [class*='game-review-buttons']"],
   sidebarReviewButtons: [".game-review-buttons-component", "[class*='game-review-buttons']"],
-  // Post-game coach actions have a 20dvh animated height limit. Keep our slot
-  // outside that whole panel, and outside the emphasis panel's overflow clip.
+  // Fallback boundaries for capped coach animations and emphasis layouts that
+  // do not expose separate review and new-game rows.
   sidebarPanels: [".coach-nudge-game-review-component", ".game-review-emphasis-component"],
+  sidebarSecondaryRow: [".new-game-buttons-component"],
   // The Game Review CTA inside the sidebar buttons container. href first: durable + locale-proof.
   sidebarCta: ['a[href*="tab=review"]', 'a[aria-label="Game Review"]', "a.cc-button-component", "button.cc-button-component"],
 };
@@ -280,7 +281,8 @@ function buildReviewButton(placement, mt = 14, mb = 3) {
   btn.append(mark, label);
   globalThis.ChessReviewButtonPreview?.register(btn,label,reviewPreviewContext,browserAPI);
 
-  btn.addEventListener("click", () => {
+  btn.addEventListener("click", (event) => {
+    event.stopPropagation();
     btn.disabled = true;
     // Stay busy until the bounded background operation settles.
     label.textContent = "Opening review…";
@@ -320,23 +322,23 @@ function fitModalReviewButton(btn, buttonsContainer) {
 }
 
 function injectModalReviewButton(buttonsContainer) {
-  const existing = buttonsContainer.querySelector(".chess-analyzer-free-review");
-  if (existing) {
-    fitModalReviewButton(existing, buttonsContainer);
-    return;
-  }
+  let btn = buttonsContainer.querySelector(".chess-analyzer-free-review");
   // Smaller top margin than the sidebar so our button + the New/Rematch row sit higher in the modal.
-  const btn = buildReviewButton("modal", 6, 3);
+  const fresh = !btn;
+  btn ||= buildReviewButton("modal", 6, 3);
   const secondaryRow = firstEl(buttonsContainer, CC.modalSecondaryRow);
-  if (secondaryRow) buttonsContainer.insertBefore(btn, secondaryRow);
-  else buttonsContainer.appendChild(btn);
+  // Use the secondary row's actual parent: some modal versions nest the actions.
+  // Recheck placement after Vue updates without rebuilding a busy control.
+  if (secondaryRow) {
+    if (secondaryRow.previousElementSibling !== btn) secondaryRow.before(btn);
+  } else if (btn.parentElement !== buttonsContainer) buttonsContainer.appendChild(btn);
   fitModalReviewButton(btn, buttonsContainer);
-  console.log("[Chess Analyzer] injected review button (modal)");
+  if (fresh) console.log("[Chess Analyzer] injected review button (modal)");
 }
 
 // (2) Game-page sidebar. Keep Chess.com's action row intact: its layout and Vue
-// updates expect only native actions there. A separate, non-shrinking sibling
-// outside the native panel avoids its animated max-height and overflow clipping.
+// updates expect only native actions there. Use an extension-owned sibling in
+// the review/rematch gap; capped coach layouts retain the outside-panel fallback.
 const sidebarReviews = new Map();
 function injectSidebarReviewButton(section) {
   const reviewBtns = section.matches(CC.sidebarReviewButtons.join(",")) ? section : firstEl(section, CC.sidebarReviewButtons);
@@ -355,7 +357,13 @@ function injectSidebarReviewButton(section) {
   const { host, btn } = entry;
   // Reuse the same control if Vue replaces the CTA or drops our sibling. In
   // particular, do not reset an in-flight review when the coach/tally animates.
-  const anchor = reviewBtns.closest(CC.sidebarPanels.join(",")) || reviewBtns;
+  // Chess.com's completed-game emphasis contains review + new-game as separate
+  // siblings. Insert in their gap, rather than after the whole emphasis panel.
+  // Keep the outside-panel fallback for capped coach animations and older layouts.
+  const next = reviewBtns.nextElementSibling === host ? host.nextElementSibling : reviewBtns.nextElementSibling;
+  const betweenActions = next?.matches(CC.sidebarSecondaryRow.join(","))
+    && !reviewBtns.closest('.coach-nudge-game-review-component');
+  const anchor = betweenActions ? reviewBtns : reviewBtns.closest(CC.sidebarPanels.join(",")) || reviewBtns;
   if (anchor.nextElementSibling !== host) anchor.after(host);
   if (btn.parentElement !== host) host.append(btn);
   if (cta.offsetWidth > 0) {
@@ -418,7 +426,7 @@ function injectSidebarReviewButton(section) {
     }
     globalThis.ChessReviewButtonPreview?.refresh();
   };
-  const relevantSelector = [...CC.modalContainer, ...CC.modalContext, ...CC.sidebarSections].join(",");
+  const relevantSelector = [...CC.modalContainer, ...CC.modalContext, ...CC.sidebarSections, ...CC.sidebarSecondaryRow].join(",");
   const schedule = () => {
     if (scheduled) return;
     scheduled = true;
