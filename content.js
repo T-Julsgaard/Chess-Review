@@ -248,6 +248,12 @@ function warnMarkupChanged(key, what) {
 function resetFreeReviewButton(btn, label) {
   btn.disabled = false;
   label.textContent = FREE_REVIEW_LABEL;
+  globalThis.ChessReviewButtonPreview?.refresh();
+}
+
+function reviewPreviewContext() {
+  const parsed = parseGameId(location.pathname);
+  return {key:parsed ? 'chesscom:' + parsed.id : null,flip:detectFlip()};
 }
 
 // Appearance and placement-specific sizing come from the extension's content-button.css.
@@ -272,6 +278,7 @@ function buildReviewButton(placement, mt = 14, mb = 3) {
   label.className = "chess-analyzer-free-review-label";
   label.textContent = FREE_REVIEW_LABEL;
   btn.append(mark, label);
+  globalThis.ChessReviewButtonPreview?.register(btn,label,reviewPreviewContext,browserAPI);
 
   btn.addEventListener("click", () => {
     btn.disabled = true;
@@ -280,8 +287,9 @@ function buildReviewButton(placement, mt = 14, mb = 3) {
     try {
       // After an extension reload the old content script loses its context — sendMessage throws
       // (Chrome) or rejects (Firefox), depending on when the context is invalidated.
-      browserAPI.runtime.sendMessage({ type: "freeGameReview", gameKey: location.origin + location.pathname + location.search }).then(() => {
-        resetFreeReviewButton(btn, label);
+      browserAPI.runtime.sendMessage({ type: "freeGameReview", gameKey: location.origin + location.pathname + location.search }).then((result) => {
+        if (result?.ok) resetFreeReviewButton(btn, label);
+        else {btn.disabled = false; label.textContent = "Couldn't open review — retry";}
       }).catch(() => {
         btn.disabled = false;
         label.textContent = "Reload the page ↻";
@@ -407,6 +415,7 @@ function injectSidebarReviewButton(section) {
         sidebarReviews.delete(row);
       }
     }
+    globalThis.ChessReviewButtonPreview?.refresh();
   };
   const relevantSelector = [...CC.modalContainer, ...CC.modalContext, ...CC.sidebarSections].join(",");
   const schedule = () => {

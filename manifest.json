@@ -12,7 +12,8 @@
   "permissions": [
     "storage",
     "unlimitedStorage",
-    "activeTab"
+    "activeTab",
+    "offscreen"
   ],
   "host_permissions": [
     "https://api.chess.com/*",
@@ -75,6 +76,7 @@
         "https://chess.com/*"
       ],
       "js": [
+        "button-preview-content.js",
         "content.js"
       ],
       "css": [
@@ -87,8 +89,10 @@
         "https://lichess.org/*"
       ],
       "js": [
+        "button-preview-content.js",
         "lichess-content.js"
       ],
+      "css": ["content-button.css"],
       "run_at": "document_idle"
     }
   ],

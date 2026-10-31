@@ -147,7 +147,8 @@ export async function analyzeActiveTab(username, tabId = null, {signal} = {}) {
     const tab = await waitImport(tabId == null ? getActiveTab() : browserAPI.tabs.get(tabId), request.signal);
     if (!tab) throw new Error("Could not find the active tab.");
     try {
-      await waitImport(analyzeTab(tab, username, request.signal), request.signal);
+      const payload = await waitImport(loadTabGamePayload(tab, username, request.signal), request.signal);
+      await openAnalysisTab(payload, {signal:request.signal, sourceTabId:tab.id});
     } catch (err) {
       // Keep retries attached to this game even if the user changes the active tab.
       err.tabId = tab.id;
@@ -156,7 +157,16 @@ export async function analyzeActiveTab(username, tabId = null, {signal} = {}) {
   } finally {request.dispose();}
 }
 
-async function analyzeTab(tab, username, signal) {
+// Read-only import shared with the post-game button preview. Never opens a tab,
+// reloads the source, or changes review settings.
+export async function loadGameFromTab(tabId, {signal} = {}) {
+  checkImport(signal);
+  const tab = await waitImport(browserAPI.tabs.get(tabId), signal);
+  if (!isSupportedChessUrl(tab?.url)) throw Error('Unsupported game page');
+  return loadTabGamePayload(tab, undefined, signal);
+}
+
+async function loadTabGamePayload(tab, username, signal) {
   checkImport(signal);
   const info = (await getGameInfoFromTab(tab.id, signal)) || {};
 
@@ -236,7 +246,7 @@ async function analyzeTab(tab, username, signal) {
   // Country flags: the API knows WHO is white/black; the page knows each player's country id. Match
   // them by username so the right flag lands on the right side (analysis.js resolves id → flag art).
   attachCountries(meta, info && info.countries);
-  await openAnalysisTab({ pgn: game.pgn, meta, source: "active-tab" }, {signal, sourceTabId:tab.id});
+  return { pgn: game.pgn, meta, source: "active-tab" };
 }
 
 /** Pasted Chess.com URLs use the named player and local evidence for public archive lookup. */
@@ -306,9 +316,9 @@ async function analyzeLichessTab(info, tab, signal) {
   // opponent at the bottom. Take the board orientation the content script read (chessground's
   // orientation-black/-white), falling back to a /black|/white segment in the URL.
   const flip = (info && info.flip != null) ? info.flip : parseLichessFlip(tabUrl);
-  await openAnalysisTab({
+  return {
     pgn,
     meta: { url: `https://lichess.org/${gameId}`, gameId, flip },
     source: "active-tab-lichess",
-  }, {signal, sourceTabId:tab.id});
+  };
 }

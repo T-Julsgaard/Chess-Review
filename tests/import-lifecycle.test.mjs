@@ -54,6 +54,7 @@ test('background joins same-game requests, cancels replaced games, and acknowled
   const context=vm.createContext({console,createImportRequest,waitImport,checkImport:signal=>{if(signal.aborted)throw signal.reason;},setTimeout,clearTimeout,
     browserAPI:{runtime:{onInstalled:{addListener(){}},onMessage:{addListener(fn){listener=fn;}}},commands:{onCommand:{addListener(){}}},storage:{local:{async get(){return {};},async set(value){errors.push(value);}}}},
     resetSettingsForRelease:async()=>{},reloadActiveAndAnalyze:async()=>{},
+    createButtonPreviewService:()=>({cancel(){},get:async()=>({ok:false})}),createPreviewRunner:()=>()=>{},loadGameFromTab:()=>{},isSupportedChessUrl:()=>false,
     analyzeActiveTab:(_user,tab,{signal})=>{const work=deferred();calls.push({tab,signal,work});return waitImport(work.promise,signal);},
     openAnalysisTab:(payload,options)=>{const work=deferred();shares.push({payload,options,work});return work.promise;},
   });
@@ -65,4 +66,23 @@ test('background joins same-game requests, cancels replaced games, and acknowled
   let acknowledged=false;const share=send({type:'openShared',payload:{pgn:'1. e4'}}).then(value=>{acknowledged=true;return value;});await settle();assert.equal(acknowledged,false);
   assert.equal(shares[0].options.sourceTabId,7);
   shares[0].work.resolve();assert.equal((await share).ok,true);
+});
+
+test('preview messages require a supported top-level page, including Lichess metadata fallback routes',async()=>{
+  let listener;const calls=[];
+  const context=vm.createContext({console,
+    browserAPI:{runtime:{onInstalled:{addListener(){}},onMessage:{addListener(fn){listener=fn;}}},commands:{onCommand:{addListener(){}}}},
+    createButtonPreviewService:()=>({cancel(...args){calls.push(['cancel',...args]);},async get(...args){calls.push(['get',...args]);return {ok:true};}}),
+    createPreviewRunner:()=>()=>{},loadGameFromTab:()=>{},isSupportedChessUrl:url=>/^https:\/\/(?:www\.)?(?:chess\.com|lichess\.org)\//.test(url),
+  });
+  vm.runInContext(fs.readFileSync(new URL('../background.js',import.meta.url),'utf8').replace(/^import .*;\r?\n/gm,''),context);
+  const message={type:'buttonPreview',key:'lichess:AAAAAAAA'};
+  for(const sender of [{frameId:1,tab:{id:7},url:'https://lichess.org/AAAAAAAA'},
+    {frameId:0,tab:{id:7},url:'https://lichess.org.example.com/AAAAAAAA'},
+    {frameId:0,url:'https://lichess.org/AAAAAAAA'}]) {
+    assert.equal(listener(message,sender,()=>{}),undefined);
+  }
+  assert.equal(calls.length,0);
+  const result=await new Promise(resolve=>assert.equal(listener(message,{frameId:0,tab:{id:7},url:'https://lichess.org/future/game/AAAAAAAA'},resolve),true));
+  assert.equal(result.ok,true);assert.deepEqual(calls,[['get',7,'lichess:AAAAAAAA']]);
 });

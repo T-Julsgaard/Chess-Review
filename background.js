@@ -7,10 +7,16 @@
 // from there. (openPopup() can't anchor a popup for an unpinned action, which is why we don't drive
 // the click from here anymore.)
 
-import { analyzeActiveTab, openAnalysisTab, reloadActiveAndAnalyze } from "./analyze-flow.js";
+import { analyzeActiveTab, openAnalysisTab, reloadActiveAndAnalyze, loadGameFromTab, isSupportedChessUrl } from "./analyze-flow.js";
 import { browserAPI } from "./browser-compat.js";
 import { resetSettingsForRelease } from "./release-settings.js";
 import {createImportRequest, checkImport} from "./lib/import-request.js";
+import {createButtonPreviewService} from './lib/button-preview-service.js';
+import {createPreviewRunner} from './lib/preview-runner.js';
+
+const buttonPreviews = createButtonPreviewService({api:browserAPI,loadGame:loadGameFromTab,runPreview:createPreviewRunner(browserAPI)});
+browserAPI.tabs?.onRemoved?.addListener(tabId => buttonPreviews.cancel(tabId));
+browserAPI.tabs?.onUpdated?.addListener((tabId,change) => {if (change.url || change.status === 'loading') buttonPreviews.cancel(tabId);});
 
 const pendingReviews = new Map();
 function reviewForTab(tabId, gameKey) {
@@ -35,6 +41,12 @@ browserAPI.runtime.onInstalled.addListener(details =>
 // Shared game (from a share link caught by content.js) → open the analysis.
 // "Free game review" button injected into the chess.com game-over modal → same flow as the popup.
 browserAPI.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg?.type === 'buttonPreview' || msg?.type === 'cancelButtonPreview') {
+    if (sender.frameId !== 0 || !sender.tab || !isSupportedChessUrl(sender.url || sender.tab.url)) return;
+    if (msg.type === 'cancelButtonPreview') {buttonPreviews.cancel(sender.tab.id,msg.key); return;}
+    buttonPreviews.get(sender.tab.id,msg.key).then(sendResponse);
+    return true;
+  }
   if (msg && msg.type === "openShared" && msg.payload && msg.payload.pgn) {
     openAnalysisTab(msg.payload, {sourceTabId:sender.tab?.id}).then(() => sendResponse({ok:true}), error => {
       stashError(error);sendResponse({ok:false,error:error.message});
@@ -42,6 +54,7 @@ browserAPI.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return true;
   }
   if (msg && msg.type === "freeGameReview") {
+    buttonPreviews.cancel(sender.tab?.id);
     reviewForTab(sender.tab?.id, msg.gameKey || sender.tab?.url || "").then(result => {
       try {sendResponse(result);} catch {}
     });

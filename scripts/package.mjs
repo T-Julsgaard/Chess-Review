@@ -86,6 +86,7 @@ for (const browser of ['chrome', 'firefox']) {
     delete target.browser_specific_settings;
     delete target.background.scripts;
   } else {
+    target.permissions = target.permissions.filter(permission => permission !== 'offscreen');
     delete target.minimum_chrome_version;
     delete target.background.service_worker;
   }

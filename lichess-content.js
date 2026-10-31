@@ -203,6 +203,12 @@ function resetLiReviewButton(btn, label) {
   btn.disabled = false;
   btn.removeAttribute("title");
   label.textContent = LI_REVIEW_LABEL;
+  globalThis.ChessReviewButtonPreview?.refresh();
+}
+
+function reviewPreviewContext() {
+  const id = detectGameId();
+  return {key:id ? 'lichess:' + id : null,flip:detectFlip()};
 }
 
 function injectLichessReviewButton(followUp) {
@@ -224,6 +230,7 @@ function injectLichessReviewButton(followUp) {
   label.className = "chess-analyzer-review-label";
   label.textContent = LI_REVIEW_LABEL;
   btn.append(logo, " ", label);
+  globalThis.ChessReviewButtonPreview?.register(btn,label,reviewPreviewContext,browserAPI);
   getLogoDataUrl().then((url) => { if (url) logo.src = url; });
 
   btn.addEventListener("click", () => {
@@ -270,7 +277,8 @@ function injectLichessReviewButton(followUp) {
   const tryInject = () => {
     const followUp = firstEl(document, LI.followUp);
     followUpRoot = followUp;
-    if (followUp) { injectLichessReviewButton(followUp); return; }
+    if (followUp) { injectLichessReviewButton(followUp); globalThis.ChessReviewButtonPreview?.refresh(); return; }
+    globalThis.ChessReviewButtonPreview?.refresh();
     // No follow-up row found. If clear post-game controls are on screen, the markup likely changed —
     // recheck shortly (the row can lag the rest of the post-game UI), then warn once.
     if (firstEl(document, LI.postGame) && !warnTimer) {

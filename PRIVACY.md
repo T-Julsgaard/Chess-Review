@@ -1,6 +1,6 @@
 # Privacy Policy — Chess Review
 
-_Last updated: 2026-10-29_
+_Last updated: 2026-10-31_
 
 Chess Review is a browser extension that reviews the chess games you play on
 **Chess.com** and **Lichess**. This policy explains exactly what the extension
@@ -25,8 +25,15 @@ which they are independently responsible.
   PGN) and analyzes it locally using a **Stockfish chess engine that is bundled
   inside the extension** and runs in your browser. It then shows accuracy scores,
   move classifications, an evaluation graph, and an estimated rating.
-- To fetch a game you ask it to review, it calls the **public Chess.com and
-  Lichess APIs** (for example to retrieve the PGN of the game by its id, or the
+- When an extension review button appears on a completed Chess.com or Lichess
+  game, it automatically looks up that game and calculates a local estimated
+  accuracy preview. This does not require opening the extension. It uses one
+  bundled engine worker with a bounded runtime, and does not analyse an ongoing
+  game. A saved full review can supply its accuracy and Brilliant/Great counts.
+  Chrome uses a hidden extension document (`offscreen` permission) to host the
+  worker; Firefox uses its extension background page. No new visible tab opens.
+- Game lookup for full reviews and automatic post-game previews calls the
+  **public Chess.com and Lichess APIs** (for example to retrieve the PGN by its id, or the
   games of players detected on the page or in local game history). These requests go directly from your
   browser to those chess platforms — the same services you are already using.
 - The content scripts read game identifiers, public player information, board
@@ -52,6 +59,9 @@ browser's `chrome.storage.local`:
   may still be used as archive lookup candidates.
 - A cache of public game/API responses, PGNs, and computed analysis, so
   re-opening a game does not require re-downloading or re-analyzing it.
+- Small Brilliant/Great count summaries alongside completed saved reviews.
+  Automatic accuracy estimates are held in a bounded in-memory cache and are
+  separate from full-review evidence and engine preferences.
 - Chess.com monthly archive responses can contain other games and optional
   platform-provided accuracy fields. Those responses may be cached locally;
   displayed review scores are calculated by the extension, not read from those fields.

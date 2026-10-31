@@ -5,6 +5,12 @@ locally in your browser. One click turns any **Chess.com** or **Lichess** game i
 review — accuracy scores, move-by-move classifications, an evaluation graph, and an estimated
 rating. Local analysis needs no account or server, and no manual PGN copying.
 
+Post-game review buttons on Chess.com and Lichess also show a local, depth-8
+accuracy estimate before you open the extension. The estimate is separate from
+the full review and may differ from its score. Saved full reviews supply their
+accuracy and Brilliant/Great counts instead. Previews only analyse completed
+standard games, use one bounded worker, and never change full-review settings.
+
 **Learn with Chess Review** opens from the button beneath Engine, beside the move
 controls. By default, the review panels morph into one learning workspace while
 the board and top bar stay in place. **Settings → General → Learning experience**

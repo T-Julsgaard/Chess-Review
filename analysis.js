@@ -7579,6 +7579,8 @@ function saveToLibrary() {
       meSide: S.meSide, playerKnown: S.playerKnown === true,
       myName: S.players[S.meSide].name, opName: S.players[opSide].name,
       myAcc: S.acc[S.meSide], opAcc: S.acc[opSide],
+      buttonSummary: {version:1,accuracy:{...S.acc},counts:Object.fromEntries(['w','b'].map(side =>
+        [side,{brilliant:S.counts[side].brilliant || 0,great:S.counts[side].great || 0}]))},
       myRating: parseInt(S.players[S.meSide].rating, 10) || null,
       opRating: parseInt(S.players[opSide].rating, 10) || null,
       result: myResult(), type: gameType(),

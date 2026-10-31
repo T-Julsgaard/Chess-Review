@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 
 // The API facade is captured at import time, just as it is in an extension page.
 globalThis.chrome = {};
-const { analyzeActiveTab, reloadActiveAndAnalyze, openAnalysisTab, openBlankWorkspaceTab, analyzeChesscomUrl } = await import('../analyze-flow.js');
+const { analyzeActiveTab, reloadActiveAndAnalyze, openAnalysisTab, openBlankWorkspaceTab, analyzeChesscomUrl, loadGameFromTab } = await import('../analyze-flow.js');
 import {createImportRequest} from '../lib/import-request.js';
 const {app,deferred,settle} = await import('./helpers/app.mjs');
 
@@ -43,6 +43,16 @@ test('Chess.com without a content script uses the saved username and URL', async
   assert.equal(s.payload().meta.gameId, '12345678');
   assert.equal(Object.hasOwn(s.payload(), 'theme'), false);
 });
+
+for (const url of ['https://www.chess.com/game/live/12345678','https://lichess.org/AAAAAAAA']) {
+  test(`button preview imports ${url} without opening or reloading a tab or changing settings`,async t=>{
+    const s=setup(t,url);s.store.username='Alice';s.store.settings={engineDepth:16,enginePath:'nnue'};
+    let reloads=0;t.mock.method(chrome.tabs,'reload',async()=>{reloads++;});
+    const payload=await loadGameFromTab(1);
+    assert.ok(payload.pgn);assert.equal(s.opened.length,0);assert.equal(reloads,0);
+    assert.equal(s.payload(),undefined);assert.deepEqual(s.store.settings,{engineDepth:16,enginePath:'nnue'});
+  });
+}
 
 for (const url of ['https://www.chess.com/game/live/12345678', 'https://lichess.org/AAAAAAAA', 'https://lichess.org/game/AAAAAAAAabcd']) {
   test(`analysis opens immediately to the right of its source: ${url}`, async t => {
