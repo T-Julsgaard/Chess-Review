@@ -73,6 +73,7 @@ test('activating preview aborts an in-flight live read and rejects its late resu
 test('Developer debugger imports and clears CSV without changing saved data',async t=>{
   t.after(()=>leaderboardPreview.clear());
   const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');a.call('toggleSettings');
+  a.call('selectSettingsCategory','developer');
   const doc=a.dom.window.document,input=doc.querySelector('[data-debug=leaderboard-csv-file]'),saved=structuredClone(a.store),writes=a.writes.length;
   Object.defineProperty(input,'files',{value:[{name:'test.csv',size:csv.length,text:async()=>csv}]});
   input.dispatchEvent(new a.dom.window.Event('change'));await settle();
@@ -95,6 +96,7 @@ test('Developer debugger opens chosen states and exercises sync and account acti
   const click=async selector=>{assert.ok(doc.querySelector(selector),selector);doc.querySelector(selector).click();await drain();};
   const preview=async state=>{
     if(doc.querySelector('#settings').hidden)await a.call('toggleSettings');
+    a.call('selectSettingsCategory','developer');
     doc.querySelector('[data-debug=leaderboard-preview-mode]').value='timeAttack';
     doc.querySelector('[data-debug=leaderboard-preview-state]').value=state;
     await click('[data-debug=leaderboard-preview-show]');

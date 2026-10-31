@@ -476,6 +476,10 @@ const MOD_MINW = { evalbar: 16 };
 const modMinW = (key) => MOD_MINW[key] ?? MINW;
 
 const ICONS = {
+  chat: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11a8 8 0 0 1-8 8H5l-3 3V11a9.5 9.5 0 0 1 19 0Z"/><path d="M8 9h8M8 13h5"/></svg>`,
+  cpu: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="3"/><path d="M9 2v4m6-4v4M9 18v4m6-4v4M2 9h4m-4 6h4m12-6h4m-4 6h4"/><rect x="10" y="10" width="4" height="4" rx="1"/></svg>`,
+  sound: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m11 4-5 4H3v8h3l5 4V4Zm4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></svg>`,
+  code: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m7 7-5 5 5 5m10-10 5 5-5 5M14 4l-4 16"/></svg>`,
   sun: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>`,
   moon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>`,
   flip: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3l4 4-4 4M21 7H7M7 21l-4-4 4-4M3 17h14"/></svg>`,
@@ -1797,7 +1801,7 @@ async function openLearning() {
   learningWorkspace = new LearningWorkspace({document, storage:browserAPI.storage.local, makePiece, url:_url,
     settings:()=>S.settings, flipped:S.flipped, book:()=>BOOK || {}, startDrag, onPuzzleWrong:playWrongSound, onPuzzleMove:playSanSound, onPuzzlePremove:playPremoveSound, onOpeningMove:playSanSound, onFreeMove:playSanSound, onPuzzleSuccess:playPuzzleSuccess,
     onLeaderboardSettings:async()=>{
-      S.settingsTab='visual';if(UI.settings.hidden)await toggleSettings();else renderSettings();
+      S.settingsTab='leaderboard';if(UI.settings.hidden)await toggleSettings();else renderSettings();
       const section=[...UI.settings.querySelectorAll('.set-section')].find(node=>node.querySelector('.set-sect-head span')?.textContent==='Leaderboard');
       if(section){if(!section.classList.contains('open'))section.querySelector('.set-sect-head').click();section.scrollIntoView?.({block:'nearest'});}
     },
@@ -6242,14 +6246,15 @@ async function resetEngineSettings() {
 const ARROW_SETTING_KEYS = ["bestArrow", "showThreat", "bestArrowColor", "threatArrowColor", "arrowOpacity", "arrowShaft", "arrowHead"];
 const BACKGROUND_SETTING_KEYS = ["bg", "bgFit", "bgTile", "bgCustom", "bgHue", "bgSat", "bgLight"];
 const BADGE_SETTING_KEYS = ["badgeFont", "badgeTooltip", "badgeSymbols", "badgeAppearance", "checkmateBadge"];
+const SOUND_SETTING_KEYS = ["sound", "soundVolume", "soundFx", "puzzleSuccessSound", "puzzleIncorrectSound"];
 const VISUAL_SETTING_KEYS = [
   ...PANEL_DESIGNS.map(design => design.setting),
   "theme", "accent", "accentCustom", "density", "evalView", "mlStyle", "badgeStyle", "badgeScale",
   ...BADGE_SETTING_KEYS,
   "graphStyle", "barStyle", "insightFont", "showCoords", "coordSize", ...BACKGROUND_SETTING_KEYS,
-  "coach", "coachPlain", "coachEngineReplies", "boardTheme", "pieceStyle", "boardCustomLight", "boardCustomDark",
-  "sound", "soundVolume", "soundFx", "puzzleSuccessSound", "puzzleIncorrectSound", ...ARROW_SETTING_KEYS,
-  "moveAnim", "uiAnim", "animSpeed", "learningTransition", "reviewMode",
+  "boardTheme", "pieceStyle", "boardCustomLight", "boardCustomDark",
+  ...ARROW_SETTING_KEYS,
+  "moveAnim", "uiAnim", "animSpeed", "learningTransition",
 ];
 function resetSettingKeys(keys) {
   for (const key of keys) S.settings[key] = structuredClone(DEFAULT_SETTINGS[key]);
@@ -6270,7 +6275,6 @@ async function resetVisualSettings() {
   closeBoardColorPicker();
   delete S.settings.wrongSound; // remove obsolete saved choices from older versions
   await resetSettingKeys(VISUAL_SETTING_KEYS);
-  S.coach = null;
   _ipSig = null;
   if (S.practice) S.practice.coachTyped = false;
   await applyUiSetup('modern');
@@ -6307,8 +6311,6 @@ function bgControls() {
   ];
 }
 function visualSettings() {
-  const canPreviewReviewEffects = !learningWorkspace && !S.practice && !S.reorganize;
-  const specialReplies = !S.settings.coachPlain && !engineExplanationsEnabled();
   const boardEntries = Object.entries(BOARD_THEMES).map(([k, [lt, dk]]) => ({
     value: k, title: BOARD_THEME_LABEL[k] || k,
     render: (chip) => chip.append(el("span", { class: "half l", style: { background: lt } }), el("span", { class: "half r", style: { background: dk } })),
@@ -6333,14 +6335,6 @@ function visualSettings() {
   return el("div", {},
     section("Interface presets",
       seg("Setup", "uiSetup", Object.keys(UI_SETUPS), null, value => UI_SETUPS[value].label),
-      seg("Review experience", "reviewMode", ["normal", "dopamine"], null, value => value === "dopamine" ? "Dopamine" : "Normal"),
-      el("p", { class: "set-note" }, "Dopamine mode adds vivid move reactions, a purple review theme and explanations from the engine’s available continuation. Brilliant moves light up the board; blunders send a red shockwave. Reduced motion keeps a static square outline."),
-      el("div", { class: "dopamine-preview-buttons" }, ...["brilliant", "blunder"].map(category =>
-        el("button", { type: "button", class: "set-reset", disabled: S.settings.reviewMode !== "dopamine" || !canPreviewReviewEffects,
-          onclick: () => reviewEffects.show(UI.boardWrap.querySelector(".board"), {
-            category, square: activePos().to, flipped: S.flipped, motion: S.settings.uiAnim !== false,
-          }) }, "Preview " + categoryName(category) + " effect"))),
-      !canPreviewReviewEffects ? el("p", { class: "set-note" }, "Return to game review to preview these effects.") : null,
     ),
     section("Tabs",
       ...PANEL_DESIGNS.filter(design => design.panel === "evalbar" || design.versions.length > 1).map(design =>
@@ -6387,6 +6381,31 @@ function visualSettings() {
       seg("Badges", "badgeStyle", ["icon", "dot", "label"]),
     ),
     section("Badges", badgeSettings()),
+    section("Background", ...bgControls()),
+    section("Insights",
+      slider("Text size", "insightFont", 11, 25, 1, {
+        fmt: (v) => v + " px",
+        onChange: (v) => document.documentElement.style.setProperty("--ip-font", v + "px"),
+      }),
+      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Font size of the move commentary in the Insight panel.")),
+    ),
+    el("button", { class: "set-reset", onclick: resetVisualSettings }, "Reset all visual settings"),
+  );
+}
+function reviewSettings() {
+  const canPreviewReviewEffects = !learningWorkspace && !S.practice && !S.reorganize;
+  const specialReplies = !S.settings.coachPlain && !engineExplanationsEnabled();
+  return el("div", {},
+    section("Review experience",
+      seg("Review experience", "reviewMode", ["normal", "dopamine"], null, value => value === "dopamine" ? "Dopamine" : "Normal"),
+      el("p", { class: "set-note" }, "Dopamine mode adds vivid move reactions, a purple review theme and explanations from the engine’s available continuation. Brilliant moves light up the board; blunders send a red shockwave. Reduced motion keeps a static square outline."),
+      el("div", { class: "dopamine-preview-buttons" }, ...["brilliant", "blunder"].map(category =>
+        el("button", { type: "button", class: "set-reset", disabled: S.settings.reviewMode !== "dopamine" || !canPreviewReviewEffects,
+          onclick: () => reviewEffects.show(UI.boardWrap.querySelector(".board"), {
+            category, square: activePos().to, flipped: S.flipped, motion: S.settings.uiAnim !== false,
+          }) }, "Preview " + categoryName(category) + " effect"))),
+      !canPreviewReviewEffects ? el("p", { class: "set-note" }, "Return to game review to preview these effects.") : null,
+    ),
     section("Coach",
       el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Who appears and narrates. Choose No coach to remove the character and keep plain move commentary. Switch any time.")),
       coachPicker(),
@@ -6406,14 +6425,10 @@ function visualSettings() {
         ),
       ),
     ),
-    section("Background", ...bgControls()),
-    section("Insights",
-      slider("Text size", "insightFont", 11, 25, 1, {
-        fmt: (v) => v + " px",
-        onChange: (v) => document.documentElement.style.setProperty("--ip-font", v + "px"),
-      }),
-      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Font size of the move commentary in the Insight panel.")),
-    ),
+  );
+}
+function soundSettings() {
+  return el("div", {},
     section("Sound",
       toggleRow("Sound effects", "sound"),
       slider("Master volume", "soundVolume", 0, 100, 1, { fmt: (v) => v + " %" }),
@@ -6425,10 +6440,21 @@ function visualSettings() {
       el("div", { class: "set-fx", "data-sound-event": "runStart" },
         fxSlider("runStart", "volume", "Puzzle intro volume", 0, 100, 1, (v) => v + " %")),
     ),
+    el("button", {class:"set-reset", onclick:async () => {
+      await resetSettingKeys(SOUND_SETTING_KEYS); renderSettings();
+    }}, "Reset all sound settings"),
+  );
+}
+function leaderboardSettings() {
+  return el("div", {},
     section("Leaderboard",leaderboardSettingsControls({document,storage:browserAPI.storage.local,client:learningWorkspace?.leaderboardClient,url:_url,onError:toast,onChange:async()=>{
       if(!learningWorkspace)return;
       await learningWorkspace.refreshLeaderboardPreferences();
     }})),
+  );
+}
+function developerSettings() {
+  return el("div", {},
     section("Developer debugger",
       el("button", {class:"set-reset","data-debug":"screen-previews",onclick:openScreenSizePreview}, "Open screen-size preview"),
       el("div", {class:"set-row hint"},el("span",{class:"set-note"},"Preview layouts at different screen sizes. Changes are not saved.")),
@@ -6448,9 +6474,9 @@ function visualSettings() {
         renderSettings();
       }}),
     ),
-    el("button", { class: "set-reset", onclick: resetVisualSettings }, "Reset all visual settings"),
   );
 }
+
 function arrowColorSetting(label, key) {
   return colorChips(label, key, [{
     value: S.settings[key] || DEFAULT_SETTINGS[key], title: "Choose " + label.toLowerCase(),
@@ -6659,7 +6685,63 @@ function badgeSettings() {
     badgeLabelPicker(),
     el("p", { class: "set-note" }, "Show the category for two seconds after each move."));
 }
-function renderSettings() {
+const SETTINGS_CATEGORIES = [
+  {id:"visual", label:"Visual", description:"Make the workspace yours", icon:"palette", render:visualSettings},
+  {id:"review", label:"Review & Coach", description:"Commentary, character & reactions", icon:"chat", render:reviewSettings},
+  {id:"engine", label:"Engine", description:"Analysis power & rating estimates", icon:"cpu", render:motorSettings},
+  {id:"sound", label:"Sound", description:"Every move, your sound", icon:"sound", render:soundSettings},
+  {id:"leaderboard", label:"Leaderboard", description:"Your profile & online records", icon:"trophy", render:leaderboardSettings},
+  {id:"developer", label:"Developer tools", description:"Screen previews & test data", icon:"code", render:developerSettings},
+];
+const settingsScroll = new Map();
+function selectSettingsCategory(id) {
+  if (!SETTINGS_CATEGORIES.some(category => category.id === id)) return;
+  const changed = S.settingsTab !== id;
+  settingsScroll.set(S.settingsTab, UI.settings.scrollTop);
+  S.settingsTab = id;
+  // Single-purpose categories reveal their controls immediately on first visit.
+  const first = {review:"Review experience", sound:"Sound", leaderboard:"Leaderboard", developer:"Developer debugger"}[id];
+  if (first && S.setOpen[first] == null) S.setOpen[first] = true;
+  renderSettings(changed);
+  UI.settings.scrollTop = settingsScroll.get(id) || 0;
+  UI.settings.querySelector('.set-category .lib-dd-btn').focus({preventScroll:true});
+}
+function settingsCategoryPicker() {
+  const field = ddField(S.settingsTab, SETTINGS_CATEGORIES.map(({id,label}) => [id,label]), selectSettingsCategory,
+    (id, label) => {
+      const category = SETTINGS_CATEGORIES.find(item => item.id === id);
+      return el("span", {class:"set-category-choice"},
+        el("span", {class:"set-category-icon", "aria-hidden":"true"}, icon(category.icon)),
+        el("span", {class:"set-category-copy"}, el("span", {class:"set-category-name"}, label),
+          el("span", {class:"set-category-description"}, category.description)));
+    });
+  field.classList.add('set-category');
+  field.dataset.motion = S.settings.uiAnim === false ? 'off' : 'on';
+  const button = field.querySelector('.lib-dd-btn'), menu = field.querySelector('.lib-dd-menu');
+  button.setAttribute('aria-label', 'Settings category: ' + SETTINGS_CATEGORIES.find(category => category.id === S.settingsTab).label);
+  button.setAttribute('aria-haspopup', 'menu');
+  button.setAttribute('aria-controls', 'settingsCategoryMenu');
+  menu.id = 'settingsCategoryMenu'; menu.setAttribute('role', 'menu'); menu.setAttribute('aria-label', 'Settings categories');
+  [...menu.children].forEach((option, index) => {
+    const category = SETTINGS_CATEGORIES[index];
+    option.dataset.category = category.id;
+    option.setAttribute('role', 'menuitemradio');
+    option.setAttribute('aria-checked', String(category.id === S.settingsTab));
+    option.setAttribute('tabindex', '-1');
+    option.setAttribute('aria-controls', 'settingsCategoryContent');
+    option.append(el('span', {class:'set-category-check', 'aria-hidden':'true'}, category.id === S.settingsTab ? '✓' : ''));
+  });
+  field.addEventListener('focusout', event => {
+    // During native pointer focus changes activeElement can briefly be body.
+    // relatedTarget keeps the menu open while focus moves to one of its items.
+    if (field.contains(event.relatedTarget)) return;
+    field.classList.remove('open'); button.setAttribute('aria-expanded', 'false');
+  });
+  return field;
+}
+function renderSettings(animate = false) {
+  const category = SETTINGS_CATEGORIES.find(item => item.id === S.settingsTab) || SETTINGS_CATEGORIES[0];
+  S.settingsTab = category.id;
   closeArrowColorPicker();
   const scroll = UI.settings.scrollTop; // keep scroll position when a setting changes
   const fontScroll = UI.settings.querySelector(".badge-font-options")?.scrollTop;
@@ -6672,11 +6754,13 @@ function renderSettings() {
     row:node.closest(".set-row,.set-ctrl")?.querySelector(".set-lbl")?.textContent, text:node.textContent,
     kind:node.className.replace(/\bon\b/g, "").trim()});
   const activeButton = UI.settings.contains(document.activeElement) && document.activeElement.tagName === "BUTTON" ? focusContext(document.activeElement) : null;
-  const tabs = el("div", { class: "set-tabs" },
-    el("button", { class: "set-tab" + (S.settingsTab === "visual" ? " on" : ""), onclick: () => { S.settingsTab = "visual"; renderSettings(); } }, "General"),
-    el("button", { class: "set-tab" + (S.settingsTab === "engine" ? " on" : ""), onclick: () => { S.settingsTab = "engine"; renderSettings(); } }, "Engine"),
-  );
-  UI.settings.replaceChildren(tabs, S.settingsTab === "engine" ? motorSettings() : visualSettings());
+  const content = category.render();
+  content.id = 'settingsCategoryContent';
+  content.classList.add('set-category-content');
+  content.setAttribute('role', 'region'); content.setAttribute('aria-label', category.label + ' settings');
+  content.dataset.enter = String(animate && S.settings.uiAnim !== false);
+  [...content.children].forEach((child, index) => child.style.setProperty('--set-order', Math.min(index, 5)));
+  UI.settings.replaceChildren(settingsCategoryPicker(), content);
   UI.settings.scrollTop = scroll;
   const fonts = UI.settings.querySelector(".badge-font-options");
   if (fonts && fontScroll != null) fonts.scrollTop = fontScroll;
@@ -7661,7 +7745,7 @@ function closeDropdowns() {
 }
 function positionSettingsDropdown(field) {
   const settings = field.closest('#settings');
-  if (!settings) return;
+  if (!settings || field.classList.contains('set-category')) return;
   const menu = field.querySelector('.lib-dd-menu');
   menu.classList.remove('above'); menu.style.maxHeight = '';
   const bounds = settings.getBoundingClientRect(), rect = field.getBoundingClientRect();

@@ -16,7 +16,7 @@ test('Coach offers text-only Engine explanations without changing Normal visuals
   const snapshot=()=>JSON.stringify({pgn:S.pgn,idx:S.idx,evals:S.evals,classif:S.classif,grades:S.moveGrades,
     layout:S.layout,layoutMode:S.layoutMode,theme:S.settings.boardTheme,accent:S.settings.accent,mode:S.settings.reviewMode});
   const unchanged=snapshot(),plain=a.run('_ipText');
-  await a.call('toggleSettings');
+  await a.call('toggleSettings');a.call('selectSettingsCategory','review');
   [...doc.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Coach').click();
   const control=enabled=>doc.querySelector(`[data-setting="coachEngineReplies"][data-value="${enabled}"]`);
   assert.equal(control(false).getAttribute('aria-pressed'),'true');
@@ -57,7 +57,7 @@ test('Engine explanations and Special replies switch one another off while retai
   assert.doesNotMatch(a.run('_ipText'),/This allows Qh4#/);
 });
 
-test('Engine explanations persist without a coach and visual reset returns to the default reply style',async t=>{
+test('Engine explanations persist without a coach and survive a visual reset',async t=>{
   const a=review(t);
   await a.call('setCoach','');await a.call('setCoachEngineReplies',true);
   const restored=app(t,{url:'https://extension.test/analysis.html?workspace=blank'});
@@ -69,8 +69,8 @@ test('Engine explanations persist without a coach and visual reset returns to th
   assert.equal(restored.call('engineExplanationsEnabled'),true);
   assert.equal(restored.dom.window.document.documentElement.dataset.reviewMode,'normal');
   await restored.call('resetVisualSettings');
-  assert.equal(restored.state.settings.coachEngineReplies,null);
-  assert.equal(restored.call('engineExplanationsEnabled'),false);
+  assert.equal(restored.state.settings.coachEngineReplies,true);
+  assert.equal(restored.call('engineExplanationsEnabled'),true);
 });
 
 test('Dopamine keeps its existing explanations until an explicit Coach choice overrides them',async t=>{

@@ -7,7 +7,7 @@ import {app, settle} from './helpers/app.mjs';
 test('incorrect choices contain only four dedicated cues and Off, and each choice persists and previews', async t => {
   const a = app(t), played = [];
   a.replace('triggerAudio', (...args) => played.push(args));
-  a.call('buildUI');a.call('toggleSettings');
+  a.call('buildUI');a.call('toggleSettings');a.call('selectSettingsCategory','sound');
   const doc = a.dom.window.document;
   const choices = a.run('PUZZLE_INCORRECT_SOUNDS');
   const options = () => [...doc.querySelectorAll('.set-puzzle-incorrect .lib-dd-opt')];
@@ -52,7 +52,7 @@ test('generated incorrect cues are distinct playable PCM with headroom and silen
 test('all event volume sliders save independently, preview at their level and reset with countdown volume', async t => {
   const a = app(t), played = [];
   a.replace('triggerAudio', (...args) => played.push(args));
-  a.call('buildUI');a.call('toggleSettings');
+  a.call('buildUI');a.call('toggleSettings');a.call('selectSettingsCategory','sound');
   const doc = a.dom.window.document;
   const events = ['puzzleSuccess', 'puzzleIncorrect', 'move', 'capture', 'check', 'castle', 'brilliant', 'runStart'];
   for (const [i, event] of events.entries()) {
@@ -68,14 +68,14 @@ test('all event volume sliders save independently, preview at their level and re
   }
   assert.equal(a.state.settings.soundVolume, 50);
   for (const [i, event] of events.entries()) assert.equal(a.call('fxConfig', event).volume, 20 + i * 10);
-  await a.call('resetSettingKeys', a.run('VISUAL_SETTING_KEYS'));
+  await a.call('resetSettingKeys', a.run('SOUND_SETTING_KEYS'));
   for (const event of events) assert.equal(a.call('fxConfig', event).volume, 100);
 });
 
 test('all 45 move-event variants and 10 brilliant cues can be selected, saved and previewed', async t => {
   const a = app(t), played = [];
   a.replace('triggerAudio', (...args) => played.push(args));
-  a.call('buildUI');a.call('toggleSettings');
+  a.call('buildUI');a.call('toggleSettings');a.call('selectSettingsCategory','sound');
   const doc = a.dom.window.document;
   for (const [event, expected] of [['check', 30], ['castle', 15], ['brilliant', 10]]) {
     const choices = a.run(`EVENT_SOUNDS.${event}`);
@@ -111,7 +111,7 @@ test('all 45 move-event variants and 10 brilliant cues can be selected, saved an
   for (const event of ['check', 'castle', 'brilliant']) {
     assert.equal(doc.querySelector(`[data-sound-event="${event}"] .lib-dd-cur`).textContent, 'Off');
   }
-  await a.call('resetSettingKeys', a.run('VISUAL_SETTING_KEYS'));
+  await a.call('resetSettingKeys', a.run('SOUND_SETTING_KEYS'));
   a.call('renderSettings');
   assert.equal(doc.querySelector('[data-sound-event="check"] .lib-dd-cur').textContent, '01 · Firm Tap');
   assert.equal(doc.querySelector('[data-sound-event="castle"] .lib-dd-cur').textContent, '02 · Quick Pair');
@@ -126,7 +126,7 @@ test('all 45 move-event variants and 10 brilliant cues can be selected, saved an
 test('Lichess check and castling sounds can be selected, previewed and restored from storage', async t => {
   const a = app(t), played = [];
   a.replace('triggerAudio', (...args) => played.push(args));
-  a.call('buildUI');a.call('toggleSettings');
+  a.call('buildUI');a.call('toggleSettings');a.call('selectSettingsCategory','sound');
   const doc = a.dom.window.document;
   for (const [event, file] of [['check', 'Check.mp3'], ['castle', 'Castling.mp3']]) {
     assert.ok(readFileSync(new URL('../sounds/' + file, import.meta.url)).length > 44);

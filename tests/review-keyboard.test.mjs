@@ -60,7 +60,7 @@ test('review has no typed move field and Tab does not traverse review sections',
   a.state.practice={spots:[1],i:0,solving:true};a.call('renderEngineCurrent');assert.equal(doc.querySelector('.review-move-entry'),null);a.state.practice=null;
   const event=()=>new a.dom.window.KeyboardEvent('keydown',{key:'Tab',bubbles:true,cancelable:true});
   const mainTab=event();doc.body.dispatchEvent(mainTab);assert.equal(mainTab.defaultPrevented,true);
-  await a.call('toggleSettings');const settingsTab=event();doc.querySelector('.set-tab').dispatchEvent(settingsTab);assert.equal(settingsTab.defaultPrevented,false);
+  await a.call('toggleSettings');const settingsTab=event();doc.querySelector('.set-category > .lib-dd-btn').dispatchEvent(settingsTab);assert.equal(settingsTab.defaultPrevented,false);
   assert.ok([...doc.querySelectorAll('.lib-tab,.lc-open,.lc-fav,.engine-line.clickable')].every(n=>n.tabIndex===-1));
 });
 
@@ -184,7 +184,7 @@ test('leaving the library collapses it after opening a game even while its card 
   assert.equal(a.state.libraryOpen,true);assert.equal(panel.inert,false);
 });
 test('settings toggle updates retain control identity and Credits owns keyboard focus',async t=>{
-  const a=review(t),doc=a.dom.window.document;await a.call('toggleSettings');[...doc.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Sound').click();
+  const a=review(t),doc=a.dom.window.document;await a.call('toggleSettings');a.call('selectSettingsCategory','sound');
   const on=doc.querySelector('[data-setting="sound"][data-value="true"]');on.focus();on.click();await a.run('_settingsWriteQueue');await settle();assert.equal(doc.activeElement.dataset.setting,'sound');assert.equal(doc.activeElement.dataset.value,'true');
   const credits=doc.querySelector('[aria-label="Credits & attributions"]');credits.focus();a.call('openCredits');const card=doc.querySelector('.credits-card');assert.equal(card.getAttribute('aria-modal'),'true');assert.equal(card.contains(doc.activeElement),true);
   doc.activeElement.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}));assert.equal(a.state.idx,0);

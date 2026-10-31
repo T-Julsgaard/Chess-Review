@@ -141,11 +141,11 @@ try {
     await report({step:'numeric-glyph',key,label:glyph.getAttribute('aria-label'),reference:numeral.textContent});
     await report({step:'completed-review',key,positions:saved.evals.length,engineBuild:saved.engineBuild});
     doc.querySelector('[aria-label="Settings"]').click();
-    [...doc.querySelectorAll('.set-tab')].find(button=>button.textContent==='Engine').click();
+    [...doc.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].find(button=>button.textContent==='Engine').click();
     const ratingSection=()=>[...doc.querySelectorAll('.set-section')].find(section=>section.textContent.includes('Estimated rating'));
     const labels=[...ratingSection().querySelectorAll('.lib-dd-opt')].map(button=>button.textContent);
     if(JSON.stringify(labels)!==JSON.stringify(['Use recorded rating','Moves only']))throw Error('Rating options missing for '+key);
-    if(JSON.stringify([...doc.querySelectorAll('.set-tab')].map(tab=>tab.textContent))!==JSON.stringify(['Visual','Engine']))throw Error('Settings tabs changed');
+    if(JSON.stringify([...doc.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].map(tab=>tab.textContent))!==JSON.stringify(['Visual','Review & Coach','Engine','Sound','Leaderboard','Developer tools']))throw Error('Settings tabs changed');
     if(doc.querySelector('#conceptsMount'))throw Error('Retired concept panel present');
     const calibration=await (await fetch('./data/calibration.json')).json();
     const chess=new Chess(),game=new Chess(),positions=[{fen:chess.fen()}];

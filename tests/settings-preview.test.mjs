@@ -103,19 +103,24 @@ test('custom board picker keeps its button mounted and previews both square colo
   assert.equal(doc.querySelector('.board-cpick'), null);
 });
 
-test('General sections stay concise, remove the purple accent and offer Porcelain', async t => {
+test('Visual stays focused on appearance and review experience lives with the coach', async t => {
   const {a, doc, section, open} = settings(t);
   assert.equal(section('Review experience'), undefined);
-  assert.match(section('Interface presets').querySelector('.set-note').textContent, /Dopamine mode/);
   assert.deepEqual([...section('Interface presets').querySelectorAll('[data-setting="uiSetup"]')].map(n => n.textContent), ['Old', 'Modern', 'Custom']);
-  assert.deepEqual([...section('Interface presets').querySelectorAll('[data-setting="reviewMode"]')].map(n => n.textContent), ['Normal', 'Dopamine']);
-  assert.equal([...doc.querySelectorAll('.set-sect-head')].at(-1).querySelector('span').textContent, 'Developer debugger');
+  assert.equal(section('Coach'), undefined);
+  assert.equal(section('Sound'), undefined);
+  assert.equal(section('Leaderboard'), undefined);
+  assert.equal(section('Developer debugger'), undefined);
   const visualReset = doc.querySelector('#settings > div:last-child > button:last-child');
   assert.equal(visualReset.textContent, 'Reset all visual settings');
-  assert.equal(visualReset.previousElementSibling, section('Developer debugger'));
-  [...doc.querySelectorAll('.set-tab')].find(n => n.textContent === 'Engine').click();
+  assert.equal(visualReset.previousElementSibling, section('Insights'));
+  a.call('selectSettingsCategory', 'review');
+  assert.match(section('Review experience').querySelector('.set-note').textContent, /Dopamine mode/);
+  assert.deepEqual([...section('Review experience').querySelectorAll('[data-setting="reviewMode"]')].map(n => n.textContent), ['Normal', 'Dopamine']);
+  assert.ok(section('Coach'));
+  [...doc.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].find(n => n.textContent === 'Engine').click();
   assert.equal(doc.querySelector('#settings > div:last-child > button:last-child').textContent, 'Reset all engine settings');
-  [...doc.querySelectorAll('.set-tab')].find(n => n.textContent === 'General').click();
+  [...doc.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].find(n => n.textContent === 'Visual').click();
   assert.equal(section('Theme').querySelectorAll('.set-chip').length, 4);
   assert.equal(section('Theme').querySelector('[title="#c77edb"]'), null);
   open('Board & Pieces');

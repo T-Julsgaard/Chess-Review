@@ -12,8 +12,8 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     for(const [width,height] of [[1920,919],[1920,949],[1920,979],[1920,919],[2560,1280],[1366,648],[390,844]]){
       await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);
       await sleep(200);
-      for(const tab of ['Visual','Engine']){
-        await run(`[...document.querySelectorAll('.set-tab')].find(n=>n.textContent==='${tab}').click()`);
+      for(const tab of ['Visual','Review & Coach','Engine','Sound','Leaderboard','Developer tools']){
+        await run(`[...document.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].find(n=>n.textContent==='${tab}').click()`);
         const data=await run(`(()=>{
           const rect=n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width};};
           const settings=document.querySelector('#settings'),r=settings.getBoundingClientRect();
@@ -36,7 +36,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     }
     await run("document.querySelector('[aria-label=Settings]').click()");
   }
-  await run("document.querySelector('[aria-label=Settings]').click();[...document.querySelectorAll('.set-tab')].find(n=>n.textContent==='Visual').click()");
+  await run("document.querySelector('[aria-label=Settings]').click();[...document.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].find(n=>n.textContent==='Visual').click()");
   for (const [width,height] of [[1920,919],[390,844]]) {
     await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);
     await sleep(200);
@@ -63,5 +63,5 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       await fs.writeFile(path.join(out,`cleanup-${section.replace(/[^a-z]/gi,'-')}-${width}.png`),Buffer.from(shot.data,'base64'));
     }
   }
-  console.log('Settings gutter fits through live bookmarks-bar changes in both setups and both tabs. Evidence: '+out);
+  console.log('Settings gutter fits through live bookmarks-bar changes in both setups and all categories. Evidence: '+out);
 }

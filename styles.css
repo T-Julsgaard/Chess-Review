@@ -1819,7 +1819,7 @@ button { font-family: inherit; cursor: pointer; }
   box-shadow: var(--shadow); padding: 14px 16px 16px;
   display: flex; flex-direction: column; gap: 12px;
   max-height: calc(100vh - 80px); overflow-y: auto;
-  /* Keep the controls at one fixed width when a long tab starts scrolling. */
+  /* Keep the controls at one fixed width when a long category starts scrolling. */
   scrollbar-gutter: stable;
 }
 .settings-pop[hidden] { display: none; }
@@ -1897,12 +1897,56 @@ button { font-family: inherit; cursor: pointer; }
 .credits-foot a { color: var(--accent); text-decoration: none; white-space: nowrap; }
 .credits-foot a:hover { text-decoration: underline; }
 
-/* tabs: Visual / Engine */
-.set-tabs { display: flex; gap: 4px; padding: 3px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; }
-.set-tab { flex: 1; border: 0; background: none; color: var(--ink-2); padding: 7px; border-radius: 7px;
-  font-size: 12px; font-weight: 700; cursor: pointer; transition: .12s; }
-.set-tab.on { background: color-mix(in oklab, var(--accent) 22%, var(--panel)); color: var(--ink); }
-.set-tabs + div:not(.set-tabs) { display: flex; flex-direction: column; gap: 6px; }
+/* Category navigation stays inside the established popover width and scroll bounds. */
+.set-category.lib-dd-field { flex: none; position: sticky; top: -14px; z-index: 31; background: var(--panel); }
+.set-category > .lib-dd-btn {
+  padding: 9px 10px; border-radius: 11px; text-align: left;
+  background: linear-gradient(120deg, color-mix(in oklab, var(--accent) 12%, var(--panel-2)), var(--panel-2));
+  border-color: color-mix(in oklab, var(--accent) 28%, var(--line));
+}
+.set-category .lib-dd-cur { flex: 1; min-width: 0; }
+.set-category-choice { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.set-category-icon {
+  display: grid; place-items: center; flex: none; width: 29px; height: 29px; border-radius: 9px;
+  color: var(--accent); background: color-mix(in oklab, var(--accent) 10%, var(--panel));
+  border: 1px solid color-mix(in oklab, var(--accent) 15%, var(--line-soft));
+}
+.set-category-icon svg { width: 17px; height: 17px; }
+.set-category-copy { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.set-category-name { font-size: 12px; font-weight: 750; line-height: 1.25; color: var(--ink); }
+.set-category-description { font-size: 10px; font-weight: 450; line-height: 1.35; color: var(--ink-3); white-space: normal; }
+.set-category > .lib-dd-btn .set-category-copy::before {
+  content: "Settings"; font-size: 8px; line-height: 1; font-weight: 700; letter-spacing: .13em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.set-category > .lib-dd-btn .set-category-description { display: none; }
+/* In-flow expansion avoids clipping or a portal that would lose the panel's zoom. */
+.set-category > .lib-dd-menu {
+  position: static; margin-top: 6px; padding: 5px; gap: 3px; border-radius: 11px;
+  max-height: min(360px, 50dvh); overflow-y: auto; overscroll-behavior: contain;
+  box-shadow: 0 8px 20px #0002; background: var(--panel-2);
+}
+.set-category .lib-dd-opt { display: flex; align-items: center; gap: 5px; padding: 8px 6px; border-radius: 7px; }
+.set-category .lib-dd-opt > .set-category-choice { flex: 1; }
+.set-category .lib-dd-opt.sel { background: color-mix(in oklab, var(--accent) 11%, var(--panel)); }
+.set-category-check { flex: none; width: 12px; font-size: 12px; color: var(--accent); }
+.set-category .lib-dd-opt[data-category="developer"] { border-top: 1px solid var(--line); border-radius: 0 0 7px 7px; margin-top: 3px; padding-top: 11px; }
+.set-category .lib-dd-opt[data-category="developer"] .set-category-icon { color: var(--ink-3); background: var(--panel); border-color: var(--line); }
+.set-category :is(.lib-dd-btn,.lib-dd-opt):focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.set-category[data-motion="off"] .lib-dd-chev { transition: none; }
+.set-category-content { display: flex; flex: none; flex-direction: column; gap: 6px; min-width: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .set-category .lib-dd-chev { transition: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .set-category[data-motion="on"].open > .lib-dd-menu { animation: settings-menu-in .18s ease-out both; transform-origin: top; }
+  .set-category-content[data-enter="true"] > * {
+    animation: settings-category-in .28s cubic-bezier(.2,.75,.25,1) both;
+    animation-delay: calc(var(--set-order, 0) * 24ms);
+  }
+}
+@keyframes settings-menu-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@keyframes settings-category-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 /* collapsible sections */
 .set-section { border-top: 1px solid var(--line-soft); }
 .set-section:first-child { border-top: 0; }

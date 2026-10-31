@@ -20,8 +20,8 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
    await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(150);await run('scrollTo(0,0)');
    await inspect('review-'+label,width,height);
    await run("document.querySelector('[aria-label=Settings]').click()");
-   for(const tab of ['Visual','Engine']){
-    await run(`[...document.querySelectorAll('.set-tab')].find(n=>n.textContent==='${tab}').click()`);
+   for(const tab of ['Visual','Review & Coach','Engine','Sound','Leaderboard','Developer tools']){
+    await run(`[...document.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].find(n=>n.textContent==='${tab}').click()`);
     const overflow=await run("(()=>{const n=document.querySelector('#settings');return n.scrollWidth-n.clientWidth;})()");if(overflow>1)failures.push({label,msg:'settings '+tab+' overflow',overflow});
    }
    const settings=await run("(()=>{const n=document.querySelector('#settings'),r=n.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,overflow:n.scrollWidth-n.clientWidth};})()");if(settings.x<0||settings.right>width+1||settings.bottom>height+1||settings.overflow>1)failures.push({label,msg:'settings bounds',settings});

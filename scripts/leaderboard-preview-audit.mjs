@@ -10,7 +10,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await run(`window.previewRemoteRequests=0;window.previewOriginalFetch=window.fetch.bind(window);window.fetch=(url,...args)=>{
     if(!String(url?.url||url).startsWith('chrome-extension://')){window.previewRemoteRequests++;throw Error('Unexpected preview network request');}return window.previewOriginalFetch(url,...args);
   };import('./analysis.js').then(m=>{m.learningWorkspace.leaderboardClient.endpoint='https://preview-must-stay-local.example';return m.toggleSettings();})`);
-  await run("[...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent.includes('Developer debugger')).click()");
+  await run("document.querySelector('[data-category=developer]').click()");
   const upload=async()=>{
     const {root}=await call('DOM.getDocument',{},review.sessionId);
     const {nodeId}=await call('DOM.querySelector',{nodeId:root.nodeId,selector:'[data-debug=leaderboard-csv-file]'},review.sessionId);

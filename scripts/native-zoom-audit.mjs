@@ -84,8 +84,8 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await inspect('review-zoom-explicitly-reset',1919,919);
   for(const [width,height]of [[1919,919],[1366,648],[320,568]]){
     await resize(width,height);await run("document.querySelector('[aria-label=Settings]').click()");
-    for(const tab of ['General','Engine']){
-      await run(`[...document.querySelectorAll('.set-tab')].find(n=>n.textContent==='${tab}').click()`);
+    for(const tab of ['Visual','Review & Coach','Engine','Sound','Leaderboard','Developer tools']){
+      await run(`[...document.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].find(n=>n.textContent==='${tab}').click()`);
       const fits=await run("(()=>{const n=document.querySelector('#settings');return n.scrollWidth<=n.clientWidth+1;})()");
       assert.ok(fits,`Settings ${tab} at ${width}`);
       await inspect(`settings-${tab.toLowerCase()}-${width}x${height}`,width,height);

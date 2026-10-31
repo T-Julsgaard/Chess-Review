@@ -174,13 +174,13 @@ test('General settings support opt-in, optional flags, opt-out, and confirmed de
   click('delete');click('confirm-delete');await settle();assert.equal(data[PREF].enabled,false);assert.equal(changes,4);assert.equal(requests.length,2);
 });
 
-test('the renamed General tab and leaderboard settings shortcut open the correct section',async t=>{
+test('the leaderboard settings shortcut selects its category and opens the correct section',async t=>{
   const puzzles=JSON.parse(readFileSync(new URL('../data/learning/puzzles.json',import.meta.url))).puzzles.slice(0,10);
   t.mock.method(globalThis,'fetch',async()=>Response.json({schema:1,puzzles}));
   const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');await a.call('openLearning');
   const w=a.run('learningWorkspace');t.after(()=>w.close());await w.showLeaderboard('knockout');
   w.root.querySelector('[data-focus=leaderboard-settings]').click();await settle();
-  const doc=a.dom.window.document;assert.equal(doc.querySelector('.set-tab.on').textContent,'General');
+  const doc=a.dom.window.document;assert.equal(doc.querySelector('.set-category > .lib-dd-btn .set-category-name').textContent,'Leaderboard');
   assert.ok([...doc.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Leaderboard')?.closest('.set-section').classList.contains('open'));
 });
 

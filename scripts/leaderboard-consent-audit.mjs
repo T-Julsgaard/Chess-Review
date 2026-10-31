@@ -40,7 +40,7 @@ export async function auditLearning({review,call,evaluate,waitFor,out}) {
   await waitFor(review,"!!document.querySelector('[data-focus=leaderboard-settings]')&&!document.querySelector('.leaderboard-entering')",'Connected player controls');
   await run("document.querySelector('[data-focus=leaderboard-settings]').click()");
   await waitFor(review,"!document.querySelector('#settings').hidden&&document.querySelector('.set-leaderboard-settings')?.dataset.state==='enabled'",'Leaderboard settings');
-  assert.equal(await run("document.querySelector('.set-tab.on').textContent"),'General');
+  assert.equal(await run("document.querySelector('.set-category > .lib-dd-btn .set-category-name').textContent"),'General');
   await screenshot('leaderboard-general-settings','.set-leaderboard-settings');
   const choose=async value=>{
     await run("(()=>{const field=document.querySelector('[data-leaderboard-setting=nationality]');field.value='"+value+"';field.dispatchEvent(new Event('change'));})()");

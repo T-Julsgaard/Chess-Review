@@ -117,7 +117,7 @@ try {
   await evaluate(review,"import('./analysis.js').then(m=>m.resetLayout())");await sleep(500);
   await capture('reset-layout');
   await evaluate(review,"document.querySelector('[aria-label=Settings]').click()");
-  assert.deepEqual(await evaluate(review,"[...document.querySelectorAll('.set-tab')].map(n=>n.textContent)"),['Visual','Engine']);
+  assert.deepEqual(await evaluate(review,"[...document.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].map(n=>n.textContent)"),['Visual','Review & Coach','Engine','Sound','Leaderboard','Developer tools']);
   assert.equal(await evaluate(review,"document.querySelector('[data-mod=concepts]')"),null);
   await evaluate(review,"document.querySelector('[aria-label=Settings]').click()");
   const popup=await create(`chrome-extension://${loaded.id}/popup.html`);

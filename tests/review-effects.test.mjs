@@ -93,9 +93,9 @@ test('the first grade arriving at the selected move reacts once, without replayi
 test('mode choices expose the selected state and keep keyboard focus after changing mode', async t => {
   const a = app(t); loadGame(a, '1. e4 e5');
   a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
-  a.call('toggleSettings');
+  a.call('toggleSettings');a.call('selectSettingsCategory','review');
   const doc = a.dom.window.document;
-  [...doc.querySelectorAll('.set-sect-head')].find(node=>node.textContent.includes('Interface presets')).click();
+  [...doc.querySelectorAll('.set-sect-head')].find(node=>node.textContent.includes('Review experience')).click();
   const control = value => doc.querySelector('[data-setting="reviewMode"][data-value="'+value+'"]');
   assert.equal(control('normal').getAttribute('aria-pressed'), 'true');
   assert.equal(control('dopamine').getAttribute('aria-pressed'), 'false');
@@ -174,10 +174,10 @@ test('review reactions are not saved into learning or replayed when returning to
   await a.call('openLearning'); const workspace=a.run('learningWorkspace');
   t.after(async()=>{await workspace.close();});
   assert.equal(workspace.boardChildren.some(node=>node.classList?.contains('dopamine-effect')),false);
-  const previews=[...a.call('visualSettings').querySelectorAll('button')].filter(button=>button.textContent.startsWith('Preview '));
+  const previews=[...a.call('reviewSettings').querySelectorAll('button')].filter(button=>button.textContent.startsWith('Preview '));
   assert.ok(previews.length===2 && previews.every(button=>button.disabled));
-  a.state.setOpen['Interface presets']=true;
-  a.call('toggleSettings');
+  a.state.setOpen['Review experience']=true;
+  a.call('toggleSettings');a.call('selectSettingsCategory','review');
   const livePreview=()=>[...doc.querySelectorAll('#settings button')].find(button=>button.textContent==='Preview Brilliant effect');
   assert.equal(livePreview().disabled,true);
   await workspace.close();

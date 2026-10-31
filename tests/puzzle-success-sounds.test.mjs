@@ -70,11 +70,11 @@ test('success audio respects master volume and Soft Retro plays at 25% of its or
 
 test('Sound settings save and preview each choice, support Off without a preview button, and reset to default', async t => {
   const {a, played} = setup(t);
-  a.call('toggleSettings');
+  a.call('toggleSettings');a.call('selectSettingsCategory','sound');
   const doc = a.dom.window.document;
   const controls = () => doc.querySelector('.set-puzzle-success');
   const sound = [...doc.querySelectorAll('.set-section')].find(s => s.querySelector('.set-sect-head').textContent === 'Sound');
-  sound.querySelector('.set-sect-head').click();
+  if (!sound.classList.contains('open')) sound.querySelector('.set-sect-head').click();
   assert.ok(controls().closest('.set-section').classList.contains('open'));
   assert.equal(controls().querySelectorAll('.lib-dd-opt').length, 6);
   for (const [id, label] of a.run('PUZZLE_SUCCESS_SOUNDS')) {
@@ -90,7 +90,7 @@ test('Sound settings save and preview each choice, support Off without a preview
   await settle();await a.run('_settingsWriteQueue');await settle();
   assert.equal(a.store.settings.puzzleSuccessSound, 'none');
   assert.deepEqual(played, []);
-  await a.call('resetSettingKeys', a.run('VISUAL_SETTING_KEYS'));
+  await a.call('resetSettingKeys', a.run('SOUND_SETTING_KEYS'));
   assert.equal(a.store.settings.puzzleSuccessSound, 'soft-retro');
 });
 
@@ -101,7 +101,7 @@ test('incorrect sounds can be muted independently in puzzles and practice and re
   a.state.bests[0] = {bestmove:'e2e4',score:{cp:40},lines:[]};
   a.call('computeDerived');a.call('buildUI');a.call('renderAll');
   a.state.settings.sound = true;
-  a.call('toggleSettings');
+  a.call('toggleSettings');a.call('selectSettingsCategory','sound');
   const doc = a.dom.window.document;
   const select = async value => {
     const label = value ? 'Try Again' : 'Off';
@@ -129,14 +129,14 @@ test('incorrect sounds can be muted independently in puzzles and practice and re
   a.state.settings.sound = false;
   await w.submitPuzzle('d2d4');assert.equal(played.length, 2);
   await a.call('setSetting', 'puzzleIncorrectSound', false);
-  await a.call('resetSettingKeys', a.run('VISUAL_SETTING_KEYS'));
+  await a.call('resetSettingKeys', a.run('SOUND_SETTING_KEYS'));
   assert.equal(a.store.settings.puzzleIncorrectSound, 'default');
 });
 
 test('both puzzle sounds share the event dropdown, volume, pitch and speed layout and save live tuning', async t => {
   const {a} = setup(t), played = [];
   a.replace('triggerAudio', (...args) => played.push(args));
-  a.call('toggleSettings');
+  a.call('toggleSettings');a.call('selectSettingsCategory','sound');
   const doc = a.dom.window.document;
   for (const [event, label] of [['puzzleSuccess', 'Puzzle success'], ['puzzleIncorrect', 'Incorrect puzzle']]) {
     const controls = doc.querySelector(`[data-sound-event="${event}"]`);
@@ -163,7 +163,7 @@ test('both puzzle sounds share the event dropdown, volume, pitch and speed layou
   const count = played.length;
   controls().querySelector('input').dispatchEvent(new a.dom.window.Event('change'));
   assert.equal(played.length, count);
-  await a.call('resetSettingKeys', a.run('VISUAL_SETTING_KEYS'));
+  await a.call('resetSettingKeys', a.run('SOUND_SETTING_KEYS'));
   for (const event of ['puzzleSuccess', 'puzzleIncorrect']) {
     assert.equal(a.call('fxConfig', event).pitch, 0);
     assert.equal(a.call('fxConfig', event).speed, 1);
