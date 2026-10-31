@@ -52,17 +52,21 @@ Distributed by Lichess (lila); high-quality vector SVGs.
   by Lichess). Retained here for transparency.
 
 ## Check and castling sound contenders
-- **Files:** `sounds/check/*.wav` and `sounds/castle/*.wav` — 15 candidates per event.
+- **Files:** `sounds/check/*.wav` (30 candidates) and `sounds/castle/*.wav`
+  (15 candidates).
 - **Source:** edited derivatives of the bundled Lichess `move-self.mp3` and
   `capture.mp3` recordings credited above; the underlying sample license applies.
 - **Processing:** modest playback-rate changes, filtering, envelope edits and
-  layered placement rhythms. No new recordings, musical tones or reverb.
+  layered placement rhythms. Checks 16–30 mix all layers at the same onset for
+  one impact, without delayed taps or trailing ticks. No new recordings,
+  musical tones or reverb.
 - **Reproduce:** `node scripts/generate-move-event-sounds.mjs` (requires FFmpeg on
   `PATH` or `FFMPEG_PATH`). Add `--verify-page` for an isolated Chrome browser check
   (`CHROME_PATH` can override the default Windows Chrome path).
-- **Audition:** `docs/move-event-sounds.html` compares all 30 candidates with the
+- **Audition:** `docs/move-event-sounds.html` compares all 45 candidates with the
   original move and capture recordings. All candidates are selectable in Sound
-  settings; the existing move-event defaults are unchanged.
+  settings. Check now defaults to 16 · Firm Alert; earlier saved choices remain
+  available, and the move/capture/castling defaults are unchanged.
 - **Details:** `sounds/move-event-candidates.json` records the source hashes,
   processing parameters, durations and levels for each generated file.
 

@@ -82,8 +82,8 @@ try {
   console.log('Decoded references:', JSON.stringify(Object.fromEntries(Object.entries(sources)
     .map(([key, {samples: _samples, ...details}]) => [key, details])), null, 2));
 
-  // Three different gestures per event, five deliberately varied takes per gesture.
-  // Parameters change source, spacing, attack/body balance and modest playback rate.
+  // Retain the original candidates for saved choices. New checks (16–30) use
+  // simultaneous layers only: one attack, no delayed knock or trailing tick.
   const definitions = {
     check: [
       ['01-firm-tap', 'Single accents', 'A firm move knock with a little capture weight.', [hit('move', 0, 1.04), hit('capture', .004, 1.02, .19)], .2],
@@ -101,6 +101,21 @@ try {
       ['13-close-tick', 'Trailing ticks', 'A crisp hit with a very close, light after-click.', [hit('move', 0, 1.08, 1, {bright: .18}), hit('move', .068, 1.12, .31, {decay: 16})], .4],
       ['14-low-knock-tick', 'Trailing ticks', 'A low rounded knock with a brighter, softer release.', [hit('move', 0, .94, 1, {body: .3}), hit('capture', .004, .98, .15), hit('move', .126, 1.08, .22, {decay: 14})], -.3],
       ['15-capture-tick', 'Trailing ticks', 'A dry capture-textured accent and a short closing tick.', [hit('capture', 0, 1.09, .80, {decay: 5}), hit('move', .002, 1.06, .55), hit('move', .100, 1.13, .3, {decay: 20, bright: .2})], .2],
+      ['16-firm-alert', 'Fused snaps', 'A decisive wooden snap with capture weight fused into the same hit.', [hit('move', 0, 1.05, .78, {bright: .18, decay: 4}), hit('capture', 0, 1.13, .60, {decay: 8})], .3],
+      ['17-bright-clack', 'Fused snaps', 'A bright, tight clack with one clean attack.', [hit('move', 0, 1.20, .85, {bright: .38, decay: 10}), hit('capture', 0, 1.24, .45, {decay: 12})], .4],
+      ['18-solid-strike', 'Fused snaps', 'A full, solid strike with both textures landing together.', [hit('capture', 0, .98, .85, {body: .35, decay: 5}), hit('move', 0, 1.03, .50, {decay: 7})], .1],
+      ['19-dry-crack', 'Fused snaps', 'A clipped, dry crack with a very short tail.', [hit('move', 0, 1.14, .65, {bright: .45, decay: 24}), hit('capture', 0, 1.18, .70, {decay: 28})], .4],
+      ['20-dense-snap', 'Fused snaps', 'A dense capture-led snap with a crisp wooden edge.', [hit('capture', 0, 1.12, 1, {decay: 12, bright: .20}), hit('move', 0, .97, .30, {decay: 16})], .2],
+      ['21-warm-knock', 'Warm impacts', 'A rounded board knock with a warm low body.', [hit('move', 0, .87, 1, {body: .9, cutoff: 4300, decay: 5}), hit('capture', 0, .91, .25, {cutoff: 2800, decay: 8})], -.2],
+      ['22-deep-clack', 'Warm impacts', 'A deep, weighty clack with one firm landing.', [hit('capture', 0, .83, .85, {body: .70, cutoff: 3800, decay: 6}), hit('move', 0, .90, .60, {body: .45, decay: 8})], -.3],
+      ['23-muted-thump', 'Warm impacts', 'A softer, muted impact for a less sharp check cue.', [hit('move', 0, .96, .70, {body: 1.2, cutoff: 2100, decay: 12}), hit('capture', 0, 1.02, .40, {cutoff: 1800, decay: 16})], -1.5],
+      ['24-heavy-tap', 'Warm impacts', 'A compact, heavy tap with a clear top edge.', [hit('capture', 0, .91, .75, {body: .50, decay: 15}), hit('move', 0, 1.09, .45, {bright: .15, decay: 18})], -.1],
+      ['25-rounded-strike', 'Warm impacts', 'A smooth wooden strike with a little board resonance.', [hit('move', 0, .93, .90, {body: .65, cutoff: 5600, decay: 3}), hit('capture', 0, 1.06, .35, {cutoff: 3200, decay: 6})], -.5],
+      ['26-clear-accent', 'Bright accents', 'A clear, high wooden accent with a single shared attack.', [hit('move', 0, 1.27, .95, {bright: .55, decay: 7}), hit('capture', 0, 1.18, .20, {decay: 10})], .4],
+      ['27-sharp-knock', 'Bright accents', 'A sharp capture-textured knock, dry and immediate.', [hit('capture', 0, 1.28, .90, {bright: .50, decay: 14}), hit('move', 0, 1.15, .30, {decay: 12})], .3],
+      ['28-crisp-impact', 'Bright accents', 'A crisp balanced impact with a shortened release.', [hit('move', 0, 1.16, .70, {bright: .28, decay: 20}), hit('capture', 0, 1.02, .65, {bright: .15, decay: 22})], .2],
+      ['29-light-snap', 'Bright accents', 'A lighter, brighter snap for a restrained check cue.', [hit('move', 0, 1.30, 1, {bright: .22, decay: 16}), hit('capture', 0, 1.25, .12, {decay: 24})], -1.2],
+      ['30-bold-clack', 'Bright accents', 'A bold high clack over a warm body, sounding as one placement.', [hit('capture', 0, 1.20, .65, {bright: .4, decay: 10}), hit('move', 0, .92, .65, {body: .6, cutoff: 4300, decay: 14})], .3],
     ],
     castle: [
       ['01-classic-pair', 'Two placements', 'Two familiar move knocks, 100 ms apart.', [hit('move', 0, .98, .85), hit('move', .100, 1.04, 1)], -.4],
@@ -127,6 +142,10 @@ try {
   for (const [event, cues] of Object.entries(definitions)) {
     await fs.mkdir(path.join(root, 'sounds', event), {recursive: true});
     for (const [name, family, description, layers, levelDb] of cues) {
+      const singleImpact = event === 'check' && Number(name.slice(0, 2)) >= 16;
+      if (singleImpact && layers.some(layer => layer.at !== 0)) {
+        throw Error(`Check ${name} must have one simultaneous attack`);
+      }
       const rendered = layers.map(layer => ({...layer, audio: processLayer(sources[layer.source].samples, layer)}));
       const length = Math.max(...rendered.map(layer => Math.round(layer.at * rate) + layer.audio.length));
       const mix = new Float64Array(length + Math.round(.012 * rate));
@@ -142,14 +161,14 @@ try {
       const file = `sounds/${event}/${name}.wav`;
       await fs.writeFile(path.join(root, file), bytes);
       const details = stats(audio);
-      if (details.peak > .881 || details.duration > .65 || details.duration < .07 || details.rms < .005) {
+      if (details.peak > .881 || details.duration > (singleImpact ? .13 : .65) || details.duration < (singleImpact ? .045 : .07) || details.rms < .005) {
         throw Error(`Invalid audio levels/duration for ${file}: ${JSON.stringify(details)}`);
       }
       manifest.candidates.push({event, name, family, description, file, ...details,
         max50msRms: round(windowRms(audio)), sha256: hash(bytes), layers, levelDb});
     }
   }
-  if (new Set(manifest.candidates.map(cue => cue.sha256)).size !== 30) throw Error('Duplicate candidate audio');
+  if (new Set(manifest.candidates.map(cue => cue.sha256)).size !== manifest.candidates.length) throw Error('Duplicate candidate audio');
   await fs.writeFile(path.join(root, 'sounds/move-event-candidates.json'), JSON.stringify(manifest, null, 2) + '\n');
   await fs.writeFile(path.join(root, 'docs/move-event-sounds.html'), auditionPage(manifest));
   console.log(`Generated ${manifest.candidates.length} unique candidates. No clipping; all under 650 ms.`);
@@ -159,12 +178,12 @@ try {
     await call('Emulation.setDeviceMetricsOverride', {width: 1200, height: 1100, deviceScaleFactor: 1, mobile: false}, sessionId);
     await call('Page.navigate', {url: pathToFileURL(path.join(root, 'docs/move-event-sounds.html')).href}, sessionId);
     for (let i = 0; i < 100; i++) {
-      if (await evaluate('document.querySelectorAll("audio").length === 32')) break;
+      if (await evaluate(`document.querySelectorAll("audio").length === ${manifest.candidates.length + 2}`)) break;
       await sleep(50);
     }
     const report = await evaluate(`(async () => {
       const audios = [...document.querySelectorAll('audio')];
-      if (audios.length !== 32) throw Error('Expected 30 candidates and 2 references');
+      if (audios.length !== ${manifest.candidates.length + 2}) throw Error('Expected all candidates and 2 references');
       for (const audio of audios) {
         audio.preload = 'auto';
         await new Promise((resolve, reject) => {
@@ -268,13 +287,23 @@ function wav(audio) {
 }
 function auditionPage(manifest) {
   const title = cue => cue.name.slice(3).replaceAll('-', ' ').replace(/^./, letter => letter.toUpperCase());
-  const groups = ['Single accents / Two placements', 'Quick doubles / Joined knocks', 'Trailing ticks / Board settles'];
   const checks = manifest.candidates.filter(cue => cue.event === 'check');
   const castles = manifest.candidates.filter(cue => cue.event === 'castle');
+  const groups = [
+    ...['Fused snaps', 'Warm impacts', 'Bright accents'].map((title, i) => ({
+      title: `${16 + i * 5}–${20 + i * 5} · ${title}`, checks: checks.slice(15 + i * 5, 20 + i * 5),
+      description: 'New checks: one impact, with all layers starting together. No delayed taps or closing ticks.',
+    })),
+    ...['Single accents / Two placements', 'Quick doubles / Joined knocks', 'Trailing ticks / Board settles'].map((title, i) => ({
+      title: `Earlier ${String(1 + i * 5).padStart(2, '0')}–${String(5 + i * 5).padStart(2, '0')} · ${title}`,
+      checks: checks.slice(i * 5, i * 5 + 5), castles: castles.slice(i * 5, i * 5 + 5),
+      description: 'Original candidates retained for comparison and saved sound choices. Some earlier checks intentionally contain two taps.',
+    })),
+  ];
   const player = cue => `<div><h3>${cue.name.slice(0, 2)} · ${title(cue)} <small>${Math.round(cue.duration * 1000)} ms</small></h3><p>${cue.description}</p><audio controls preload="none" aria-label="${cue.event} ${cue.name.slice(0, 2)} ${title(cue)}" src="../${cue.file}"></audio></div>`;
   return `<!doctype html>
 <html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Check & castling · 30 sound candidates</title>
+<title>Check & castling · ${manifest.candidates.length} sound candidates</title>
 <style>
   :root{color-scheme:dark;font-family:system-ui,sans-serif;background:#151916;color:#f1f4ee}
   *{box-sizing:border-box}body{max-width:1060px;margin:44px auto;padding:0 24px 60px}
@@ -287,19 +316,20 @@ function auditionPage(manifest) {
   section{margin-top:38px;scroll-margin-top:20px}.sub{font-size:14px;margin-top:0}.columns{padding:0 20px 8px;color:#a7c58c;font-size:14px;font-weight:700}
   article{padding:22px 20px;margin:12px 0;background:#20261f;border:1px solid #374232;border-radius:14px}article p{font-size:13px;min-height:42px;margin-bottom:12px}small{color:#91a18b;font-weight:400;font-size:12px;white-space:nowrap}footer{margin-top:36px;font-size:13px;color:#91a18b}
   .actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px}.status{font-size:13px;color:#bddc9e;min-height:21px}
+  article.single{grid-template-columns:1fr}article.single p{min-height:0}
   @media(max-width:650px){body{padding:0 16px;margin-top:28px}.references,article{grid-template-columns:1fr;gap:22px}.columns{display:none}article p{min-height:0}article>div+div{border-top:1px solid #374232;padding-top:20px}h1{font-size:32px}}
 </style>
 <main><header><div class="eyebrow">Chess Review · Sound workshop</div><h1>Same board. New moves.</h1>
-<p>15 check sounds and 15 castling sounds made from our existing Lichess move and capture recordings. Three approaches, five variations each. Keep your volume fixed and compare with the originals.</p>
+<p>15 new check sounds, each a single impact with simultaneous layers. No second knock or trailing tick. Check overrides capture, castling and brilliant sounds. Firm Alert is the new default. Keep your volume fixed and compare with the originals; the 30 earlier candidates are below.</p>
 <div class="references"><div><h3>Original · Move</h3><audio controls preload="none" aria-label="Original move" src="../sounds/move-self.mp3"></audio></div><div><h3>Original · Capture</h3><audio controls preload="none" aria-label="Original capture" src="../sounds/capture.mp3"></audio></div></div>
-<nav><a href="#group-1">01–05 · Direct</a><a href="#group-2">06–10 · Rhythm</a><a href="#group-3">11–15 · Detail</a><button id="stop" type="button">Stop playback</button></nav>
+<nav>${groups.map((group, i) => `<a href="#group-${i + 1}">${group.title}</a>`).join('')}<button id="stop" type="button">Stop playback</button></nav>
 <div class="status" role="status" aria-live="polite">Choose a sound, or play a group in sequence.</div></header>
-${groups.map((group, index) => `<section id="group-${index + 1}"><h2>${String(index * 5 + 1).padStart(2, '0')}–${String(index * 5 + 5).padStart(2, '0')} · ${group}</h2>
-<p class="sub">${['Check: one stronger accent. Castling: two distinct piece placements.', 'Check: a light-to-firm warning pair. Castling: a compact joined clack.', 'Check: a main hit with a small trailing tick. Castling: two placements with a subtle board settling sound.'][index]}</p>
-<div class="actions"><button type="button" data-play="check" data-group="${index}">Play 5 checks</button><button type="button" data-play="castle" data-group="${index}">Play 5 castles</button><button type="button" data-play="compare" data-group="${index}">Compare with move</button></div>
-<div class="columns"><span>CHECK</span><span>CASTLING</span></div>
-${checks.slice(index * 5, index * 5 + 5).map((cue, i) => `<article>${player(cue)}${player(castles[index * 5 + i])}</article>`).join('\n')}</section>`).join('\n')}
-<footer>48 kHz · Mono · 16-bit PCM WAV · Dry, centered playback with peak headroom.<br>Choose your preferred check and castling sounds in the app’s Sound settings. The existing check/castling MP3s are copies of the move recording.</footer>
+${groups.map((group, index) => `<section id="group-${index + 1}"><h2>${group.title}</h2>
+<p class="sub">${group.description}</p>
+<div class="actions"><button type="button" data-play="check">Play 5 checks</button>${group.castles ? '<button type="button" data-play="castle">Play 5 castles</button>' : ''}<button type="button" data-play="compare">Compare with move</button></div>
+${group.castles ? '<div class="columns"><span>CHECK</span><span>CASTLING</span></div>' : ''}
+${group.checks.map((cue, i) => `<article${group.castles ? '' : ' class="single"'}>${player(cue)}${group.castles ? player(group.castles[i]) : ''}</article>`).join('\n')}</section>`).join('\n')}
+<footer>48 kHz · Mono · 16-bit PCM WAV · Dry, centered playback with peak headroom.<br>Choose your preferred check and castling sounds in the app’s Sound settings. Earlier saved choices remain available.</footer>
 </main>
 <script>
   const audios = [...document.querySelectorAll('audio')], status = document.querySelector('.status');
@@ -315,8 +345,8 @@ ${checks.slice(index * 5, index * 5 + 5).map((cue, i) => `<article>${player(cue)
   });
   document.querySelector('#stop').onclick = () => { stop(); status.textContent = 'Playback stopped.'; };
   document.querySelectorAll('[data-play]').forEach(button => button.onclick = async () => {
-    stop(); const token = generation, group = Number(button.dataset.group), mode = button.dataset.play;
-    const rows = [...document.querySelectorAll('article')].slice(group * 5, group * 5 + 5);
+    stop(); const token = generation, mode = button.dataset.play;
+    const rows = [...button.closest('section').querySelectorAll('article')];
     const list = mode === 'compare' ? rows.flatMap(row => [audios[0], ...row.querySelectorAll('audio')])
       : rows.map(row => row.querySelectorAll('audio')[mode === 'check' ? 0 : 1]);
     for (const audio of list) {

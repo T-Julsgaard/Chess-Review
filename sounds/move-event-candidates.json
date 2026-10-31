@@ -480,6 +480,468 @@
       "levelDb": 0.2
     },
     {
+      "event": "check",
+      "name": "16-firm-alert",
+      "family": "Fused snaps",
+      "description": "A decisive wooden snap with capture weight fused into the same hit.",
+      "file": "sounds/check/16-firm-alert.wav",
+      "duration": 0.082188,
+      "peak": 0.88,
+      "rms": 0.085956,
+      "max50msRms": 0.110197,
+      "sha256": "d0fd1db88d39f72cf78f3ec748f5ff57dca7f5fcc9e3e3b14bfda172164b716e",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.05,
+          "gain": 0.78,
+          "bright": 0.18,
+          "decay": 4
+        },
+        {
+          "source": "capture",
+          "at": 0,
+          "speed": 1.13,
+          "gain": 0.6,
+          "decay": 8
+        }
+      ],
+      "levelDb": 0.3
+    },
+    {
+      "event": "check",
+      "name": "17-bright-clack",
+      "family": "Fused snaps",
+      "description": "A bright, tight clack with one clean attack.",
+      "file": "sounds/check/17-bright-clack.wav",
+      "duration": 0.0645,
+      "peak": 0.88,
+      "rms": 0.078487,
+      "max50msRms": 0.089144,
+      "sha256": "84bedf6b264c884d88c621f0cc7b7c267787d7b936f801414398125719f9902a",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.2,
+          "gain": 0.85,
+          "bright": 0.38,
+          "decay": 10
+        },
+        {
+          "source": "capture",
+          "at": 0,
+          "speed": 1.24,
+          "gain": 0.45,
+          "decay": 12
+        }
+      ],
+      "levelDb": 0.4
+    },
+    {
+      "event": "check",
+      "name": "18-solid-strike",
+      "family": "Fused snaps",
+      "description": "A full, solid strike with both textures landing together.",
+      "file": "sounds/check/18-solid-strike.wav",
+      "duration": 0.081792,
+      "peak": 0.88,
+      "rms": 0.066431,
+      "max50msRms": 0.084909,
+      "sha256": "1574b551eafa0d44b66414e837e4b30108f6354f9a51b5011b5fa161499a492b",
+      "layers": [
+        {
+          "source": "capture",
+          "at": 0,
+          "speed": 0.98,
+          "gain": 0.85,
+          "body": 0.35,
+          "decay": 5
+        },
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.03,
+          "gain": 0.5,
+          "decay": 7
+        }
+      ],
+      "levelDb": 0.1
+    },
+    {
+      "event": "check",
+      "name": "19-dry-crack",
+      "family": "Fused snaps",
+      "description": "A clipped, dry crack with a very short tail.",
+      "file": "sounds/check/19-dry-crack.wav",
+      "duration": 0.061708,
+      "peak": 0.88,
+      "rms": 0.081919,
+      "max50msRms": 0.091006,
+      "sha256": "0c56ee99f34e6d104266db83fd6e6a0f5f5b67d97ed0d5583b5b142c4cdb40b1",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.14,
+          "gain": 0.65,
+          "bright": 0.45,
+          "decay": 24
+        },
+        {
+          "source": "capture",
+          "at": 0,
+          "speed": 1.18,
+          "gain": 0.7,
+          "decay": 28
+        }
+      ],
+      "levelDb": 0.4
+    },
+    {
+      "event": "check",
+      "name": "20-dense-snap",
+      "family": "Fused snaps",
+      "description": "A dense capture-led snap with a crisp wooden edge.",
+      "file": "sounds/check/20-dense-snap.wav",
+      "duration": 0.071292,
+      "peak": 0.88,
+      "rms": 0.087457,
+      "max50msRms": 0.104424,
+      "sha256": "fbcb2df4bbe79aecc0421b82a977e34feea9132ff91614eac4ad268db160014c",
+      "layers": [
+        {
+          "source": "capture",
+          "at": 0,
+          "speed": 1.12,
+          "gain": 1,
+          "decay": 12,
+          "bright": 0.2
+        },
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 0.97,
+          "gain": 0.3,
+          "decay": 16
+        }
+      ],
+      "levelDb": 0.2
+    },
+    {
+      "event": "check",
+      "name": "21-warm-knock",
+      "family": "Warm impacts",
+      "description": "A rounded board knock with a warm low body.",
+      "file": "sounds/check/21-warm-knock.wav",
+      "duration": 0.094875,
+      "peak": 0.88,
+      "rms": 0.081932,
+      "max50msRms": 0.112849,
+      "sha256": "fadfa2dbf3285b888527faa1399c90ca8f2a5bd6295e485b2eaa25461f0cd36a",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 0.87,
+          "gain": 1,
+          "body": 0.9,
+          "cutoff": 4300,
+          "decay": 5
+        },
+        {
+          "source": "capture",
+          "at": 0,
+          "speed": 0.91,
+          "gain": 0.25,
+          "cutoff": 2800,
+          "decay": 8
+        }
+      ],
+      "levelDb": -0.2
+    },
+    {
+      "event": "check",
+      "name": "22-deep-clack",
+      "family": "Warm impacts",
+      "description": "A deep, weighty clack with one firm landing.",
+      "file": "sounds/check/22-deep-clack.wav",
+      "duration": 0.092417,
+      "peak": 0.88,
+      "rms": 0.070111,
+      "max50msRms": 0.095243,
+      "sha256": "cb4edd8e43f79946bf8cad1e59eec67787b9c86696f2b117f983d090a2a4822a",
+      "layers": [
+        {
+          "source": "capture",
+          "at": 0,
+          "speed": 0.83,
+          "gain": 0.85,
+          "body": 0.7,
+          "cutoff": 3800,
+          "decay": 6
+        },
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 0.9,
+          "gain": 0.6,
+          "body": 0.45,
+          "decay": 8
+        }
+      ],
+      "levelDb": -0.3
+    },
+    {
+      "event": "check",
+      "name": "23-muted-thump",
+      "family": "Warm impacts",
+      "description": "A softer, muted impact for a less sharp check cue.",
+      "file": "sounds/check/23-muted-thump.wav",
+      "duration": 0.069125,
+      "peak": 0.808064,
+      "rms": 0.085083,
+      "max50msRms": 0.100037,
+      "sha256": "9f2efb8add5093e529f2a00d6a3d6a64d895f855a1611bface88bc796499ef61",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 0.96,
+          "gain": 0.7,
+          "body": 1.2,
+          "cutoff": 2100,
+          "decay": 12
+        },
+        {
+          "source": "capture",
+          "at": 0,
+          "speed": 1.02,
+          "gain": 0.4,
+          "cutoff": 1800,
+          "decay": 16
+        }
+      ],
+      "levelDb": -1.5
+    },
+    {
+      "event": "check",
+      "name": "24-heavy-tap",
+      "family": "Warm impacts",
+      "description": "A compact, heavy tap with a clear top edge.",
+      "file": "sounds/check/24-heavy-tap.wav",
+      "duration": 0.085458,
+      "peak": 0.752184,
+      "rms": 0.089957,
+      "max50msRms": 0.117533,
+      "sha256": "3976b24d45caa7fb897f06e52559afa9cccbcf013a34c9186a8dd8bb3fc1d592",
+      "layers": [
+        {
+          "source": "capture",
+          "at": 0,
+          "speed": 0.91,
+          "gain": 0.75,
+          "body": 0.5,
+          "decay": 15
+        },
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.09,
+          "gain": 0.45,
+          "bright": 0.15,
+          "decay": 18
+        }
+      ],
+      "levelDb": -0.1
+    },
+    {
+      "event": "check",
+      "name": "25-rounded-strike",
+      "family": "Warm impacts",
+      "description": "A smooth wooden strike with a little board resonance.",
+      "file": "sounds/check/25-rounded-strike.wav",
+      "duration": 0.089458,
+      "peak": 0.88,
+      "rms": 0.082983,
+      "max50msRms": 0.11099,
+      "sha256": "8668d7689eb1e91eeb7eec12155f9ee6eabb08e7a5d31317ea346b40bb4cb084",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 0.93,
+          "gain": 0.9,
+          "body": 0.65,
+          "cutoff": 5600,
+          "decay": 3
+        },
+        {
+          "source": "capture",
+          "at": 0,
+          "speed": 1.06,
+          "gain": 0.35,
+          "cutoff": 3200,
+          "decay": 6
+        }
+      ],
+      "levelDb": -0.5
+    },
+    {
+      "event": "check",
+      "name": "26-clear-accent",
+      "family": "Bright accents",
+      "description": "A clear, high wooden accent with a single shared attack.",
+      "file": "sounds/check/26-clear-accent.wav",
+      "duration": 0.061833,
+      "peak": 0.88,
+      "rms": 0.081579,
+      "max50msRms": 0.09072,
+      "sha256": "7fb28f94caf56d0ebbbe85ced9f0123cdf44275a4292a3382ecf8796483fa312",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.27,
+          "gain": 0.95,
+          "bright": 0.55,
+          "decay": 7
+        },
+        {
+          "source": "capture",
+          "at": 0,
+          "speed": 1.18,
+          "gain": 0.2,
+          "decay": 10
+        }
+      ],
+      "levelDb": 0.4
+    },
+    {
+      "event": "check",
+      "name": "27-sharp-knock",
+      "family": "Bright accents",
+      "description": "A sharp capture-textured knock, dry and immediate.",
+      "file": "sounds/check/27-sharp-knock.wav",
+      "duration": 0.069021,
+      "peak": 0.88,
+      "rms": 0.091006,
+      "max50msRms": 0.106922,
+      "sha256": "6e822247683f150ecad06d41024a975504d6499ab2da409a502cd6565466f511",
+      "layers": [
+        {
+          "source": "capture",
+          "at": 0,
+          "speed": 1.28,
+          "gain": 0.9,
+          "bright": 0.5,
+          "decay": 14
+        },
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.15,
+          "gain": 0.3,
+          "decay": 12
+        }
+      ],
+      "levelDb": 0.3
+    },
+    {
+      "event": "check",
+      "name": "28-crisp-impact",
+      "family": "Bright accents",
+      "description": "A crisp balanced impact with a shortened release.",
+      "file": "sounds/check/28-crisp-impact.wav",
+      "duration": 0.069896,
+      "peak": 0.88,
+      "rms": 0.100937,
+      "max50msRms": 0.119334,
+      "sha256": "e93300e869365fc9a7b9873fcfc2a02879d2d789dea4a3c8329c46e9cc9e620b",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.16,
+          "gain": 0.7,
+          "bright": 0.28,
+          "decay": 20
+        },
+        {
+          "source": "capture",
+          "at": 0,
+          "speed": 1.02,
+          "gain": 0.65,
+          "bright": 0.15,
+          "decay": 22
+        }
+      ],
+      "levelDb": 0.2
+    },
+    {
+      "event": "check",
+      "name": "29-light-snap",
+      "family": "Bright accents",
+      "description": "A lighter, brighter snap for a restrained check cue.",
+      "file": "sounds/check/29-light-snap.wav",
+      "duration": 0.052625,
+      "peak": 0.88,
+      "rms": 0.088193,
+      "max50msRms": 0.090478,
+      "sha256": "b6461a56afd69c542e51b0ca3b6c176ac4e65bc64eb1d751c5b7129078078a4f",
+      "layers": [
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 1.3,
+          "gain": 1,
+          "bright": 0.22,
+          "decay": 16
+        },
+        {
+          "source": "capture",
+          "at": 0,
+          "speed": 1.25,
+          "gain": 0.12,
+          "decay": 24
+        }
+      ],
+      "levelDb": -1.2
+    },
+    {
+      "event": "check",
+      "name": "30-bold-clack",
+      "family": "Bright accents",
+      "description": "A bold high clack over a warm body, sounding as one placement.",
+      "file": "sounds/check/30-bold-clack.wav",
+      "duration": 0.067208,
+      "peak": 0.88,
+      "rms": 0.088253,
+      "max50msRms": 0.102317,
+      "sha256": "fa801ea8d827c099438a1de8e2749576a44d5bf06542f72f0be8fe45ebf00cce",
+      "layers": [
+        {
+          "source": "capture",
+          "at": 0,
+          "speed": 1.2,
+          "gain": 0.65,
+          "bright": 0.4,
+          "decay": 10
+        },
+        {
+          "source": "move",
+          "at": 0,
+          "speed": 0.92,
+          "gain": 0.65,
+          "body": 0.6,
+          "cutoff": 4300,
+          "decay": 14
+        }
+      ],
+      "levelDb": 0.3
+    },
+    {
       "event": "castle",
       "name": "01-classic-pair",
       "family": "Two placements",

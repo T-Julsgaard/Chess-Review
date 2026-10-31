@@ -26,13 +26,13 @@ test('opening buttons, keyboard and move list play move and castling sounds in b
   assert.deepEqual(sounds,['move','move','castle','castle','move']);
 });
 
-test('opening captures use capture sounds, including when undoing a checking capture',async t=>{
+test('opening checks override captures, including when undoing a checking capture',async t=>{
   const {w,sounds}=await setup(t);await w.startOpening('nimzo',{line:1,ply:7,color:'b'});
   assert.deepEqual(sounds,[]);
   w.stepOpening(8); // Bxc3+
   w.stepOpening(7); // Undo Bxc3+, rather than sounding the quiet a3.
   w.stepOpening(9); // bxc3
-  assert.deepEqual(sounds,['capture','capture','capture']);
+  assert.deepEqual(sounds,['check','check','capture']);
 });
 
 test('opening sounds respect mute changes while navigation still advances',async t=>{

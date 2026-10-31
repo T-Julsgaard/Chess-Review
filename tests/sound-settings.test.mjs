@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
 import {app, settle} from './helpers/app.mjs';
 
 test('incorrect choices contain only four dedicated cues and Off, and each choice persists and previews', async t => {
@@ -71,12 +72,12 @@ test('all event volume sliders save independently, preview at their level and re
   for (const event of events) assert.equal(a.call('fxConfig', event).volume, 100);
 });
 
-test('all 30 move-event variants and 10 brilliant cues can be selected, saved and previewed', async t => {
+test('all 45 move-event variants and 10 brilliant cues can be selected, saved and previewed', async t => {
   const a = app(t), played = [];
   a.replace('triggerAudio', (...args) => played.push(args));
   a.call('buildUI');a.call('toggleSettings');
   const doc = a.dom.window.document;
-  for (const [event, expected] of [['check', 15], ['castle', 15], ['brilliant', 10]]) {
+  for (const [event, expected] of [['check', 30], ['castle', 15], ['brilliant', 10]]) {
     const choices = a.run(`EVENT_SOUNDS.${event}`);
     assert.equal(choices.length, expected);
     const controls = () => doc.querySelector(`[data-sound-event="${event}"]`);
@@ -111,12 +112,50 @@ test('all 30 move-event variants and 10 brilliant cues can be selected, saved an
     assert.equal(doc.querySelector(`[data-sound-event="${event}"] .lib-dd-cur`).textContent, 'Off');
   }
   await a.call('resetSettingKeys', a.run('VISUAL_SETTING_KEYS'));
-  for (const [event, file] of [['check', 'Check.mp3'], ['castle', 'Castling.mp3'], ['brilliant', 'brilliant/01-crystal-revelation.wav']]) {
+  a.call('renderSettings');
+  assert.equal(doc.querySelector('[data-sound-event="check"] .lib-dd-cur').textContent, '16 · Firm Alert');
+  for (const [event, file] of [['check', 'check/16-firm-alert.wav'], ['castle', 'Castling.mp3'], ['brilliant', 'brilliant/01-crystal-revelation.wav']]) {
     assert.equal(a.call('fxConfig', event).snd, 'default');
     assert.equal(a.call('fxUrl', event), 'https://extension.test/sounds/' + file);
     a.state.settings.soundFx[event] = {snd: 'missing-cue'};
     assert.equal(a.call('fxUrl', event), 'https://extension.test/sounds/' + file);
   }
+});
+
+test('new check cues contain one short impact with simultaneous layers and no late hit', t => {
+  const a = app(t);
+  const manifest = JSON.parse(readFileSync(new URL('../sounds/move-event-candidates.json', import.meta.url)));
+  const cues = manifest.candidates.filter(cue => cue.event === 'check' && Number(cue.name.slice(0, 2)) >= 16);
+  assert.equal(cues.length, 15);
+  const hashes = new Set();
+  for (const cue of cues) {
+    assert.ok(cue.layers.every(layer => layer.at === 0), cue.name);
+    assert.ok(a.run('EVENT_SOUNDS.check').some(([, , file]) => file === cue.file));
+    const wav = readFileSync(new URL('../' + cue.file, import.meta.url));
+    const hash = createHash('sha256').update(wav).digest('hex');
+    assert.equal(hash, cue.sha256);hashes.add(hash);
+    assert.equal(wav.toString('ascii', 0, 4), 'RIFF');
+    assert.equal(wav.toString('ascii', 8, 16), 'WAVEfmt ');
+    assert.equal(wav.readUInt32LE(4), wav.length - 8);
+    assert.equal(wav.readUInt16LE(20), 1);assert.equal(wav.readUInt16LE(22), 1);
+    assert.equal(wav.readUInt32LE(24), 48000);assert.equal(wav.readUInt16LE(34), 16);
+    assert.equal(wav.readUInt32LE(40), wav.length - 44);
+    const length = (wav.length - 44) / 2;
+    assert.ok(length / 48000 >= .045 && length / 48000 <= .13, cue.name);
+    let peak = 0, peakAt = 0, energy = 0, lateEnergy = 0;
+    for (let i = 0; i < length; i++) {
+      const sample = wav.readInt16LE(44 + i * 2);
+      if (Math.abs(sample) > peak) {peak = Math.abs(sample);peakAt = i;}
+      energy += sample * sample;
+      if (i >= .03 * 48000) lateEnergy += sample * sample;
+    }
+    assert.ok(peak > 16000 && peak <= .881 * 32767, cue.name);
+    assert.ok(peakAt < .01 * 48000, `${cue.name}: impact in the first 10 ms`);
+    assert.ok(lateEnergy / energy < .05, `${cue.name}: no second hit after 30 ms`);
+    assert.equal(wav.readInt16LE(44), 0);assert.equal(wav.readInt16LE(wav.length - 2), 0);
+  }
+  assert.equal(hashes.size, 15);
+  assert.equal(a.call('fxUrl', 'check'), 'https://extension.test/sounds/check/16-firm-alert.wav');
 });
 
 test('playback multiplies event and master levels, preserves Soft Retro calibration and mutes events independently', async t => {

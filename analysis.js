@@ -592,6 +592,9 @@ const EVENT_SOUND_FILES = {
     "01-firm-tap", "02-bright-tap", "03-deep-tap", "04-dry-snap", "05-weighted-snap",
     "06-tight-double", "07-rising-double", "08-heavy-answer", "09-clipped-double", "10-wide-warning",
     "11-snap-and-tick", "12-body-and-tick", "13-close-tick", "14-low-knock-tick", "15-capture-tick",
+    "16-firm-alert", "17-bright-clack", "18-solid-strike", "19-dry-crack", "20-dense-snap",
+    "21-warm-knock", "22-deep-clack", "23-muted-thump", "24-heavy-tap", "25-rounded-strike",
+    "26-clear-accent", "27-sharp-knock", "28-crisp-impact", "29-light-snap", "30-bold-clack",
   ],
   castle: [
     "01-classic-pair", "02-quick-pair", "03-weighted-rook", "04-soft-pair", "05-long-step",
@@ -604,7 +607,7 @@ const EVENT_SOUND_FILES = {
   ],
 };
 const EVENT_SOUNDS = Object.fromEntries(Object.entries(EVENT_SOUND_FILES).map(([event, names]) => [event,
-  names.map((name, index) => [event === "brilliant" && index === 0 ? "default" : event + "-" + name,
+  names.map((name, index) => [(event === "brilliant" && index === 0) || (event === "check" && name === "16-firm-alert") ? "default" : event + "-" + name,
     name.slice(0, 2) + " · " + name.slice(3).split("-").map(word => word[0].toUpperCase() + word.slice(1)).join(" "),
     `sounds/${event}/${name}.wav`]),
 ]));
@@ -625,12 +628,12 @@ function puzzleSuccessChoice() {
   const id = S.settings.puzzleSuccessSound;
   return id === "none" ? null : PUZZLE_SUCCESS_SOUNDS.find(([key]) => key === id) || PUZZLE_SUCCESS_SOUNDS[0];
 }
-// Board events with sound + knobs. [key, label, defaultFile]. Existing move events
-// retain their Lichess defaults; brilliant moves default to Crystal Revelation.
+// Board events with sound + knobs. [key, label, defaultFile]. Check defaults to
+// one fused Firm Alert impact; brilliant moves default to Crystal Revelation.
 const SOUND_EVENTS = [
   ["move", "Move", "sounds/move-self.mp3"],
   ["capture", "Capture", "sounds/capture.mp3"],
-  ["check", "Check", "sounds/Check.mp3"],
+  ["check", "Check", "sounds/check/16-firm-alert.wav"],
   ["castle", "Castle", "sounds/Castling.mp3"],
   ["brilliant", "Brilliant move", "sounds/brilliant/01-crystal-revelation.wav"],
 ];
@@ -6470,7 +6473,7 @@ function coachPicker() {
 function fxEventControls(ev, label) {
   const cfg = fxConfig(ev);
   const dedicated = EVENT_SOUNDS[ev] || [];
-  let opts = [["default", ev === "brilliant" ? dedicated[0][1] : "Lichess"],
+  let opts = [["default", dedicated.find(([id]) => id === "default")?.[1] || "Lichess"],
     ...dedicated.filter(([id]) => id !== "default").map(([id, label]) => [id, label]),
     ...FX_SOUNDS.map(([id, label]) => [id, label]), ["none", "Off"]];
   if (ev === "puzzleSuccess") opts = [...PUZZLE_SUCCESS_SOUNDS.map(([id, label]) => [id, label]), ["none", "Off"]];
