@@ -238,6 +238,9 @@ above; no font loading is needed to display these SVG symbols.
 The Simple and Detailed thumbs-up variants in `lib/category-badges.js` are original SVG artwork
 created for this project.
 
+The Rounded, Upright, Slanted and Slab checkmate hash badges in `lib/mate-mark.js`
+are original SVG artwork created for this project and distributed under GPL-3.0.
+
 The ten Emblems symbols in `lib/category-badges.js` (comet, bolt, crown, laurel,
 leaf, reference book, wave, drop, bypass and fractured shield) are original SVG
 artwork created for this project and distributed under GPL-3.0.

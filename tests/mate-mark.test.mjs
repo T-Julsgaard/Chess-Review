@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { app, loadGame, branch } from './helpers/app.mjs';
+import { app, loadGame, branch, settle } from './helpers/app.mjs';
+import { CHECKMATE_BADGES, checkmateBadgeSvg } from '../lib/mate-mark.js';
+import { JSDOM } from 'jsdom';
 
 const FOOLS_MATE = '1. f3 e5 2. g4 Qh4#';
 function review(t, pgn = FOOLS_MATE) {
@@ -82,4 +84,55 @@ test('the learning board marks a mate played on the free board', async t => {
   assert.equal(marked?.dataset.square, 'e1');
   assert.ok(marked.querySelector('.mate-glow')); assert.equal(marked.classList.contains('has-badge'), false);
   assert.ok(doc.querySelector('.learn-board > .mate-badge-layer .mate-badge'));
+  await a.call('setSetting','checkmateBadge','slab');
+  assert.equal(doc.querySelector('.learn-board .mate-badge svg').dataset.checkmateStyle,'slab');
+  w.render();
+  assert.equal(doc.querySelector('.learn-board .mate-badge svg').dataset.checkmateStyle,'slab');
+});
+
+test('all four checkmate options are self-contained round hash badges in both appearances', () => {
+  const paths = new Set();
+  for (const [style, glyph] of Object.entries(CHECKMATE_BADGES)) {
+    paths.add(glyph.path);
+    for (const badgeAppearance of ['solid','ink-mineral']) {
+      const dom = new JSDOM(checkmateBadgeSvg({checkmateBadge:style,badgeAppearance}),{contentType:'image/svg+xml'});
+      const doc = dom.window.document;
+      assert.equal(doc.querySelector('svg').dataset.checkmateStyle,style);
+      assert.equal(doc.querySelectorAll('circle').length,1);
+      assert.equal(doc.querySelectorAll('path').length,1);
+      assert.equal(doc.querySelector('text,image,use,script'),null);
+      assert.equal(doc.querySelector('path').getAttribute('stroke'),badgeAppearance === 'solid' ? '#fff' : '#e78781');
+      dom.window.close();
+    }
+  }
+  assert.equal(paths.size,4);
+  assert.match(checkmateBadgeSvg({checkmateBadge:'constructor'}),/data-checkmate-style="rounded"/);
+});
+
+test('checkmate picker saves designs, updates mounted marks and retains them through navigation and flipping', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  a.state.idx = a.state.total; a.call('paintBoard');
+  a.call('toggleSettings');
+  [...doc.querySelectorAll('.set-sect-head')].find(node=>node.textContent==='Badges').click();
+  assert.equal(doc.querySelectorAll('[data-checkmate-picker] .lib-dd-opt').length,4);
+  const layer=doc.querySelector('.mate-badge-layer');
+  for(const style of Object.keys(CHECKMATE_BADGES)) {
+    doc.querySelector(`.lib-dd-opt[data-setting="checkmateBadge"][data-value="${style}"]`).click(); await settle();
+    assert.equal(a.store.settings.checkmateBadge,style);
+    assert.equal(doc.querySelector('.mate-badge-layer'),layer);
+    assert.equal(doc.querySelector('.mate-badge svg').dataset.checkmateStyle,style);
+    assert.equal(doc.activeElement.dataset.setting,'checkmateBadge');
+    a.call('paintBoard'); assert.equal(doc.querySelector('.mate-badge-layer'),layer);
+  }
+  await a.call('setSetting','badgeAppearance','ink-mineral');
+  assert.equal(doc.querySelector('.mate-badge path').getAttribute('stroke'),'#e78781');
+  a.state.flipped=true; a.call('buildBoard');
+  assert.equal(doc.querySelector('.mate-badge svg').dataset.checkmateStyle,'slab');
+  a.state.idx--; a.call('paintBoard'); assert.equal(doc.querySelector('.mate-badge'),null);
+  a.state.idx++; a.call('paintBoard');
+  assert.equal(doc.querySelector('.mate-badge svg').dataset.checkmateStyle,'slab');
+  await a.call('setSetting','checkmateBadge','<svg>');
+  assert.equal(a.store.settings.checkmateBadge,'rounded');
+  a.state.settings.checkmateBadge='constructor'; a.call('migrateVisualAssetSettings',a.state.settings);
+  assert.equal(a.state.settings.checkmateBadge,'rounded');
 });

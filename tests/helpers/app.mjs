@@ -22,7 +22,7 @@ import {panelScale,panelGroupBounds,scalePanelGroup,movePanelGroup} from '../../
 import {fullHdReferenceLayout,viewportGrowth} from '../../lib/full-hd-layout.js';
 import {createScreenPreviewContext,loadScreenPreviewController} from '../../lib/screen-previews.js';
 import {puzzleResultBadge} from '../../lib/puzzle-badge.js';
-import {matedKingSquare,mateMark} from '../../lib/mate-mark.js';
+import {CHECKMATE_BADGES,checkmateBadgeSvg,matedKingSquare,mateMark} from '../../lib/mate-mark.js';
 import {moveAnimationDuration, MOVE_ANIMATION_EASING} from '../../lib/move-animation.js';
 import {rememberAnalyzedGame,historyGame} from '../../lib/player-history.js';
 import {leaderboardPreviewControls} from '../../lib/learning/leaderboard-preview.js';
@@ -63,7 +63,7 @@ export function app(t, {hardware,url='https://extension.test/analysis.html#test-
     rememberAnalyzedGame,historyGame,leaderboardPreviewControls,leaderboardSettingsControls,
     createReviewEffects,
     explainMove, explanationPv,
-    BADGE_APPEARANCES, BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg, puzzleResultBadge, matedKingSquare, mateMark,
+    BADGE_APPEARANCES, BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg, puzzleResultBadge, CHECKMATE_BADGES, checkmateBadgeSvg, matedKingSquare, mateMark,
     CATEGORY_SYMBOLS, CATEGORY_SYMBOL_OPTIONS, categoryBadgeSymbol, cleanBadgeSymbols,
     moveAnimationDuration, MOVE_ANIMATION_EASING,
     CATEGORY_LABEL_FONT, categoryLabelPng,

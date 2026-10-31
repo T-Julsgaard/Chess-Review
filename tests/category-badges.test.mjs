@@ -60,7 +60,7 @@ test('Badges exposes category-specific choices with numbers first and the primar
   const a = review(t), doc = a.dom.window.document; openSettings(a);
   const primary = {brilliant:'brilliant',great:'great',best:'star',excellent:'thumbSimple',good:'check',book:'book',inacc:'dubious',mistake:'mistake',miss:'miss',blunder:'blunder'};
   const exposed = new Set();
-  assert.equal(doc.querySelectorAll('.badge-symbol-row').length, 10);
+  assert.equal(doc.querySelectorAll('.badge-symbol-row[data-symbol-category]').length, 10);
   assert.equal(doc.querySelectorAll('.badge-preview-item').length, 10);
   for (const [category, symbols] of Object.entries(CATEGORY_SYMBOL_OPTIONS)) {
     const choices = [...doc.querySelectorAll(`[data-symbol-category="${category}"] .lib-dd-opt`)];

@@ -9,7 +9,7 @@ import { flagCodeForCountryId, countryNameForId } from "./flags.js";
 import { BADGE_APPEARANCES, BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg } from "./move-grades.js";
 import { CATEGORY_SYMBOLS, CATEGORY_SYMBOL_OPTIONS, categoryBadgeSymbol, cleanBadgeSymbols } from "./lib/category-badges.js";
 import { puzzleResultBadge } from "./lib/puzzle-badge.js";
-import { matedKingSquare, mateMark } from "./lib/mate-mark.js";
+import { CHECKMATE_BADGES, checkmateBadgeSvg, matedKingSquare, mateMark } from "./lib/mate-mark.js";
 import { moveAnimationDuration, MOVE_ANIMATION_EASING } from "./lib/move-animation.js";
 import { CATEGORY_LABEL_FONT, categoryLabelPng } from "./lib/category-label.js";
 import { browserAPI as platformAPI } from "./browser-compat.js";
@@ -221,6 +221,13 @@ function updateGradeBadge(node, cls, score, example = false) {
 function refreshBadgeAppearance() {
   if (badgeLabelStyle() === "off") hideBoardBadgeTip();
   hideQTip();
+  for (const layer of document.querySelectorAll(".mate-badge-layer")) {
+    const badge = layer.querySelector(".mate-badge");
+    if (badge) {
+      layer.dataset.badgeKey = checkmateBadgeSvg(S.settings);
+      badge.replaceChildren(document.createRange().createContextualFragment(layer.dataset.badgeKey));
+    }
+  }
   for (const node of document.querySelectorAll(".grade-badge")) {
     if (!Object.hasOwn(QUALITY, node.dataset.badgeCategory)) continue;
     updateGradeBadge(node, node.dataset.badgeCategory,
@@ -282,6 +289,9 @@ function migrateVisualAssetSettings(settings) {
   if (!Object.hasOwn(BADGE_APPEARANCES, settings.badgeAppearance)) {
     settings.badgeAppearance = "solid"; changed = true;
   }
+  if (!Object.hasOwn(CHECKMATE_BADGES, settings.checkmateBadge)) {
+    settings.checkmateBadge = "rounded"; changed = true;
+  }
   // Upgrade the former default once; explicit selections of other fonts survive.
   // badgeDecimals identifies legacy settings and is removed below.
   if (settings.badgeFont === "original" && Object.hasOwn(settings, "badgeDecimals")) {
@@ -327,7 +337,7 @@ const DEFAULT_SETTINGS = {
   uiSetup: "custom", uiSetupBase: "", // Custom retains its starting preset for resets.
   theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
-  badgeFont: "spacemono", badgeTooltip: "off", badgeSymbols: {}, badgeAppearance: "solid",
+  badgeFont: "spacemono", badgeTooltip: "off", badgeSymbols: {}, badgeAppearance: "solid", checkmateBadge: "rounded",
   // Eval-graph look (see renderGraph), eval-BAR look (see renderEvalBar) and the Insight-panel text size (px).
   graphStyle: "area", barStyle: "gradient", insightFont: 16, nativeSizingVersion: 1,
   // Board coordinate labels (the a–h / 1–8 ticks in the squares' corners): on/off + size in px.
@@ -2495,7 +2505,7 @@ function paintBoard({restoring=false}={}) {
       }
     }
   }
-  if (boardEl) mateMark(boardEl, sqByName[mated], mated, S.flipped);
+  if (boardEl) mateMark(boardEl, sqByName[mated], mated, S.flipped, S.settings);
   reviewEffects.update(boardEl, {
     key: JSON.stringify([S.pgn, S.idx, S.analysisMode, S.variation?.idx, pos.fen]),
     category: cls, square: pos.to, flipped: S.flipped,
@@ -6213,7 +6223,7 @@ async function resetEngineSettings() {
 }
 const ARROW_SETTING_KEYS = ["bestArrow", "showThreat", "bestArrowColor", "threatArrowColor", "arrowOpacity", "arrowShaft", "arrowHead"];
 const BACKGROUND_SETTING_KEYS = ["bg", "bgFit", "bgTile", "bgCustom", "bgHue", "bgSat", "bgLight"];
-const BADGE_SETTING_KEYS = ["badgeFont", "badgeTooltip", "badgeSymbols", "badgeAppearance"];
+const BADGE_SETTING_KEYS = ["badgeFont", "badgeTooltip", "badgeSymbols", "badgeAppearance", "checkmateBadge"];
 const VISUAL_SETTING_KEYS = [
   ...PANEL_DESIGNS.map(design => design.setting),
   "theme", "accent", "accentCustom", "density", "evalView", "mlStyle", "badgeStyle", "badgeScale",
@@ -6581,6 +6591,27 @@ function categoryBadgePicker(category) {
   return el("div", { class: "badge-symbol-row", "data-symbol-category": category },
     el("span", { class: "badge-symbol-name" }, categoryName(category)), field);
 }
+function checkmateBadgePicker() {
+  const options = Object.entries(CHECKMATE_BADGES).map(([id, badge]) => [id, badge.name]);
+  const field = ddField(S.settings.checkmateBadge, options, async value => {
+    await setSetting("checkmateBadge", value);
+    UI.settings.querySelector('[data-setting="checkmateBadge"].lib-dd-btn')?.focus({preventScroll:true});
+  }, (id, label) => el("span", {class:"badge-symbol-choice"},
+    el("span", {class:"badge-symbol-sample", "aria-hidden":"true", html:checkmateBadgeSvg({...S.settings,checkmateBadge:id})}),
+    el("span", {}, label)));
+  field.classList.add("set-dropdown", "badge-symbol-dropdown");
+  const button = field.querySelector(".lib-dd-btn"), menu = field.querySelector(".lib-dd-menu");
+  button.dataset.setting = "checkmateBadge";
+  button.setAttribute("aria-label", "Checkmate badge"); button.setAttribute("aria-haspopup", "listbox");
+  menu.setAttribute("role", "listbox"); menu.setAttribute("aria-label", "Checkmate badge");
+  menu.querySelectorAll(".lib-dd-opt").forEach((option, index) => {
+    option.dataset.setting = "checkmateBadge"; option.dataset.value = options[index][0];
+    option.setAttribute("role", "option");
+    option.setAttribute("aria-selected", String(options[index][0] === S.settings.checkmateBadge));
+  });
+  return el("div", {class:"badge-symbol-row", "data-checkmate-picker":""},
+    el("span", {class:"badge-symbol-name"}, "Checkmate"), field);
+}
 function badgeSettings() {
   const fonts = el("div", { class: "badge-font-options", role: "group", "aria-label": "Number font", tabindex: "0" },
     ...Object.entries(BADGE_FONTS).map(([id, font]) => el("button", {
@@ -6600,7 +6631,7 @@ function badgeSettings() {
       fmt: (v) => Math.round(v * 100) + " %",
       onChange: (v) => document.documentElement.style.setProperty("--badge-scale", v),
     }),
-    el("div", { class: "badge-symbol-editor" }, ...QUALITY_ORDER.map(categoryBadgePicker)),
+    el("div", { class: "badge-symbol-editor" }, ...QUALITY_ORDER.map(categoryBadgePicker), checkmateBadgePicker()),
     QUALITY_ORDER.some(category => categoryBadgeSymbol(category, S.settings) === "numbers") ? el("div", { class: "badge-number-settings" },
       el("div", { class: "set-lbl" }, "Number font"), fonts,
       el("p", { class: "set-note" }, "Free, open-source fonts, bundled for offline use.")) : null,
@@ -6835,6 +6866,7 @@ async function setSetting(key, value) {
   if (design) value = panelDesign(design.panel, {[key]: value});
   if (key === "badgeTooltip") value = badgeLabelStyle(value);
   if (key === "badgeAppearance") value = Object.hasOwn(BADGE_APPEARANCES, value) ? value : "solid";
+  if (key === "checkmateBadge") value = Object.hasOwn(CHECKMATE_BADGES, value) ? value : "rounded";
   if (key === "badgeSymbols") value = cleanBadgeSymbols(value);
   const setupPatch = design && S.settings[key] !== value ? customUiSetupPatch() : {};
   S.settings[key] = value;
