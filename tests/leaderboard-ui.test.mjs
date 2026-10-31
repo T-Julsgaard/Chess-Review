@@ -149,7 +149,7 @@ test('Firefox consent denial and later revocation prevent authenticated network 
 
 for(const leave of [false,true])test(`leaderboard entrance keeps its clicked footer and survives an immediate response${leave?' then navigation':''}`,async t=>{
   const {w,dom}=await setup(t),animations=[];let finishHero;
-  w.puzzleMotionEnabled=()=>true;
+  w.interfaceMotionEnabled=()=>true;
   const rect=(left,top,width,height)=>({left,right:left+width,top,bottom:top+height,width,height,x:left,y:top});
   t.mock.method(dom.window.HTMLElement.prototype,'getBoundingClientRect',function(){
     if(this.matches('.puzzle-mode-button'))return rect(421,104,178,158);
@@ -182,7 +182,7 @@ for(const leave of [false,true])test(`leaderboard entrance keeps its clicked foo
 
 for(const mode of ['solve-puzzle','timeAttack','knockout'])test(`${mode} returns through the inverse reveal and cancels cleanly on navigation`,async t=>{
   const {w,dom}=await setup(t);await w.showLeaderboard(mode);let finishHero;
-  const frames=[];w.puzzleMotionEnabled=()=>true;
+  const frames=[];w.interfaceMotionEnabled=()=>true;
   const rect=(left,top,width,height)=>({left,right:left+width,top,bottom:top+height,width,height,x:left,y:top});
   t.mock.method(dom.window.HTMLElement.prototype,'getBoundingClientRect',function(){
     if(this.matches('.puzzle-mode-button'))return rect(['solve-puzzle','timeAttack','knockout'].indexOf(mode)*210,100,180,158);

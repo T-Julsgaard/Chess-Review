@@ -79,7 +79,7 @@ test('phase scores retain the reveal animation and finish with the exact score a
   a.context.requestAnimationFrame = callback => {frames.set(++id,callback);return id;};
   a.context.cancelAnimationFrame = key => frames.delete(key);
   const tick = time => {const calls=[...frames.values()];frames.clear();calls.forEach(fn=>fn(time));};
-  a.state.settings.moveAnim = true; a.state.batchGen++; a.call('renderStats');
+  a.state.settings.uiAnim = true; a.state.batchGen++; a.call('renderStats');
   const cell = doc.querySelector('[data-phase="middlegame"] .phase-report-cell');
   assert.equal(cell.dataset.phaseCategory, 'blunder');
   assert.equal(cell.querySelector('.phase-report-score .acc-reveal-ink').textContent, '0.0');

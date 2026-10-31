@@ -19,7 +19,7 @@ function navigation(t) {
     animations.push(animation); return animation;
   };
   a.call('renderStats');
-  a.state.settings.moveAnim = true;
+  a.state.settings.uiAnim = true;
   return {a, rail, surface, animations, paint: value => {painted = value;}};
 }
 
@@ -44,10 +44,10 @@ test('liquid reversals continue from the painted shape in a scaled panel and can
 test('disabled and reduced motion settle selection immediately and cancel any previous flow', t => {
   const {a, surface, animations} = navigation(t);
   a.call('setAccuracyPage', 2);
-  a.state.settings.moveAnim = false; a.call('setAccuracyPage', 1);
+  a.state.settings.uiAnim = false; a.call('setAccuracyPage', 1);
   assert.equal(animations.length, 2); assert.ok(animations.every(item => item.cancelled));
   assert.equal(surface.style.transform, 'translateX(84px) scale(1,1)');
-  a.state.settings.moveAnim = true; a.dom.window.matchMedia = () => ({matches: true});
+  a.state.settings.uiAnim = true; a.dom.window.matchMedia = () => ({matches: true});
   a.call('setAccuracyPage', 0);
   assert.equal(animations.length, 2);
   assert.equal(surface.style.transform, 'translateX(4px) scale(1,1)');

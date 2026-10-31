@@ -30,7 +30,7 @@ function setup(version = '0.4.0') {
       enginePath: 'sf19lite', engineLines: 1, classifyLines: 3, coach: 'professor', categoryNames: { best: 'Top' },
       sound: false, soundVolume: 0, soundFx: { move: { snd: 'default', volume: 21 } },
       puzzleSuccessSound: 'soft-retro', puzzleIncorrectSound: 'default',
-      moveAnim: false, animSpeed: 3, learningTransition: 'morph3' },
+      moveAnim: false, uiAnim: false, animSpeed: 3, learningTransition: 'morph3' },
     layout: { board: { x: 20, y: 30, w: 400, h: 400 } }, layoutMode: 'custom', layoutVersion: 8,
     username: 'saved-user',
     library: [{ id: 'game-one', pgn: '1. e4 e5 *', fav: true, solved: true }],
@@ -82,7 +82,7 @@ for (const previousVersion of ['0.1.0', '0.2.0', '0.3.0']) {
     assert.equal(store.layoutMode, 'custom');
     assert.equal(store.layoutVersion, 0);
     assert.equal(store.settingsResetFor040, true);
-    for (const key of ['sound', 'soundVolume', 'soundFx', 'puzzleSuccessSound', 'puzzleIncorrectSound', 'moveAnim', 'animSpeed', 'learningTransition']) {
+    for (const key of ['sound', 'soundVolume', 'soundFx', 'puzzleSuccessSound', 'puzzleIncorrectSound', 'moveAnim', 'uiAnim', 'animSpeed', 'learningTransition']) {
       assert.deepEqual(store.settings[key], original.settings[key], `Preserve preference ${key}`);
     }
     assert.equal(store.settings.boardTheme, undefined);

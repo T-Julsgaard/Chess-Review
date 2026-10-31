@@ -103,7 +103,7 @@ test('rerenders preserve a running overview and page changes do not replay it or
   a.state.settings.accuracyDesign = 'reveal';
   a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
   const frames = clock(); a.context.requestAnimationFrame = frames.requestFrame; a.context.cancelAnimationFrame = frames.cancelFrame;
-  a.state.acc = {w: 94.5, b: 82}; a.state.settings.moveAnim = true;
+  a.state.acc = {w: 94.5, b: 82}; a.state.settings.uiAnim = true;
   const before = JSON.stringify({acc: a.state.acc, evals: a.state.evals, bests: a.state.bests, idx: a.state.idx});
   a.call('renderStats'); const panel = a.dom.window.document.querySelector('.accuracy-reveal');
   assert.equal(panel.dataset.revealing, 'true');

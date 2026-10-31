@@ -16,7 +16,7 @@ async function setup(t,{motion=true,reduced=false,style}={}) {
   dom.window.matchMedia=()=>({matches:reduced});
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[puzzle]})}));
   const storage={async get(key){return {[key]:structuredClone(data[key])};},async set(values){Object.assign(data,structuredClone(values));}};
-  const settings={moveAnim:motion,puzzleStartAnimation:style};
+  const settings={moveAnim:motion,uiAnim:motion,puzzleStartAnimation:style};
   const w=new LearningWorkspace({document:dom.window.document,storage,settings:()=>settings,makePiece:()=>dom.window.document.createElement('span')});
   w.runStartSound={prime(){},play(step,mode){sounds.push(step);cues.push([step,mode]);},stop(){},close(){}};
   t.mock.method(w,'waitForPuzzleReply',async()=>true);
@@ -172,7 +172,7 @@ for(const mode of ['timeAttack','knockout'])for(const style of [undefined,'class
   assert.equal(overlay.querySelector('.puzzle-flip-in').dataset.value,'12');
   assert.equal(overlay.querySelector('.puzzle-flip-out').dataset.value,'—');
   assert.ok(overlay.querySelector('.puzzle-run-end-best'));
-  settings.moveAnim=false;w.refreshSettings();assert.equal(overlay.dataset.motion,'off');
+  settings.uiAnim=false;w.refreshSettings();assert.equal(overlay.dataset.motion,'off');
   assert.equal(timers.size,0,'The final screen has no expiry timer');
   w.render();assert.equal(w.root.querySelector('.puzzle-run-end'),overlay);
   await w.navigate('puzzles');assert.equal(overlay.isConnected,false);

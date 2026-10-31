@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 
 export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const run=expression=>evaluate(review,expression);
-  await run("import('./analysis.js').then(m=>m.openLearning())");
+  await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=false;m.S.settings.uiAnim=true;return m.openLearning();})");
   await waitFor(review,"!!document.querySelector('.puzzle-mode-grid')&&!document.querySelector('.learn-transition-surface')",'Puzzle modes');
   // Deliberate test data lives only in this isolated profile, never the product.
   await run(`import('./analysis.js').then(({learningWorkspace:w})=>{w.leaderboardPreferences={enabled:true};w.leaderboardClient={configured:true,endpoint:'https://leaderboard.example',credentials:async()=>({id:'you',name:'Knight-a13f08c5d2'}),
@@ -77,7 +77,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await run("import('./analysis.js').then(m=>m.learningWorkspace.showLeaderboard('knockout'))");
   assert.equal(await run("document.querySelector('.leaderboard-hero').getAnimations().length"),0);
   await run("document.querySelector('[data-focus=leaderboard-return]').click()");
-  await run("import('./analysis.js').then(m=>{m.learningWorkspace.root.dataset.motion='off';m.learningWorkspace.settings=()=>({moveAnim:false});return m.learningWorkspace.showLeaderboard('timeAttack');})");
+  await run("import('./analysis.js').then(m=>{m.learningWorkspace.root.dataset.motion='off';m.learningWorkspace.settings=()=>({uiAnim:false});return m.learningWorkspace.showLeaderboard('timeAttack');})");
   assert.equal(await run("document.querySelector('.leaderboard-hero').getAnimations().length"),0);
   await run("document.querySelector('[data-focus=leaderboard-return]').click()");
   await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]},review.sessionId);

@@ -28,7 +28,7 @@ async function setup(t,{flipped=false,analysis=false}={}) {
 function track(a,w,board) {
   const pending=[],motions=[];
   board.getBoundingClientRect=()=>({x:0,y:0,left:0,top:0,width:800,height:800});
-  a.state.settings.moveAnim=true;
+  a.state.settings.uiAnim=true;
   a.dom.window.Element.prototype.animate=function(frames,options){
     let resolve;const animation={finished:new Promise(r=>{resolve=r;}),cancel(){resolve();}};
     const sample={node:this,frames,options,resolve};motions.push(sample);
@@ -93,10 +93,10 @@ for(const interruption of ['resize','reduced'])test(`${interruption} cancels a r
   assert.equal(board.inert,false);assert.equal(a.run('learningWorkspace'),null);
 });
 
-for(const reduced of [false,true])test(`review returns respect ${reduced?'reduced motion':'disabled move animation'}`,async t=>{
+for(const reduced of [false,true])test(`review returns respect ${reduced?'reduced motion':'disabled interface animation'}`,async t=>{
   const {a,w,board,target}=await setup(t);w.homePosition=new Chess(sparse);w.render();
   const {pending}=track(a,w,board);
-  if(reduced)a.dom.window.matchMedia=()=>({matches:true});else a.state.settings.moveAnim=false;
+  if(reduced)a.dom.window.matchMedia=()=>({matches:true});else a.state.settings.uiAnim=false;
   await w.close();assert.equal(pending.length,0);assert.equal(board.querySelector('.puzzle-piece-transition'),null);
   assert.equal(a.call('activePos').fen,target.fen);
 });

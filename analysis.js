@@ -381,6 +381,8 @@ const DEFAULT_SETTINGS = {
   showThreat: false, threatArrowColor: "#E89B3C",
   // Move animation (sliding piece on single-step navigation). 1 = slow, 10 = fast.
   moveAnim: true, animSpeed: 7,
+  // Interface transitions stay enabled when individual piece slides are off.
+  uiAnim: true,
   learningTransition: "morph3",
   // Display the selected analysis lines unless the user adds or removes lines in the panel.
   // Extra candidates are searched after scoring or on demand without re-analyzing the game.
@@ -1658,7 +1660,7 @@ function buildUI() {
   const statsMount = el("div", { id: "statsMount" });
   const engineMount = el("div", { id: "engineMount" });
   const learnMount = el("div", { class: "learn-entry" },
-    el("button", { class: "learn-entry-button", "data-motion": S.settings.moveAnim===false?"off":"on", onclick: openPuzzles },
+    el("button", { class: "learn-entry-button", "data-motion": S.settings.uiAnim===false?"off":"on", onclick: openPuzzles },
       icon("book"), el("span", {class:"learn-entry-label"}, "Solve Puzzles")));
 
   // The stage holds every module. In the automatic layout the side wrappers group the panels into
@@ -1748,7 +1750,7 @@ function syncLearningToggle() {
   const button=document.getElementById("learningToggle");
   if(!button)return;
   const learning=!!learningWorkspace&&!learningWorkspace.closing, mode=learning?"learning":"review";
-  button.dataset.motion=S.settings.moveAnim===false?"off":"on";
+  button.dataset.motion=S.settings.uiAnim===false?"off":"on";
   if(button.dataset.mode===mode)return;
   button.querySelector(".learning-toggle-label").textContent=learning?"Return to Game review":"Learn with Chess review";
   button.querySelector(".learning-toggle-icon").replaceChildren(icon(learning?"prev":"book"));
@@ -2511,7 +2513,7 @@ function paintBoard({restoring=false}={}) {
     key: JSON.stringify([S.pgn, S.idx, S.analysisMode, S.variation?.idx, pos.fen]),
     category: cls, square: pos.to, flipped: S.flipped,
     enabled: S.settings.reviewMode === "dopamine" && !learningWorkspace && !S.practice && !S.reorganize && !S.blank,
-    motion: S.settings.moveAnim !== false,
+    motion: S.settings.uiAnim !== false,
   });
   if (clean && S.practice.resultBadge?.solvePos === solvePly) {
     const result = S.practice.resultBadge, square = sqByName[result.square];
@@ -3422,7 +3424,7 @@ function renderBalanceBar(bar, e) {
         el('span', {class: 'eval-balance-score'}, '…')));
   }
   bar.className = 'evalbar eval-balance eb-' + (S.settings.barStyle || 'classic') + (S.flipped ? ' flipped' : '');
-  bar.dataset.motion = S.settings.moveAnim === false ? 'off' : 'on';
+  bar.dataset.motion = S.settings.uiAnim === false ? 'off' : 'on';
   bar.dataset.pending = String(e == null);
   bar.setAttribute('role', 'img');
   bar.setAttribute('tabindex', '0');
@@ -4517,7 +4519,7 @@ function setAccuracyPage(page, focus = false) {
   const previous = S.accuracyPage || 0;
   const next = (page + ACCURACY_PAGES.length) % ACCURACY_PAGES.length;
   const oldPage = UI.stats.querySelector('.acc-page');
-  const motion = S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const motion = S.settings.uiAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   overviewReveal.stop();
   Object.values(phaseReveals).forEach(reveal => reveal.stop());
   const leaf = motion && previous !== next && oldPage?.animate ? oldPage.cloneNode(true) : null;
@@ -4558,7 +4560,7 @@ let accuracyNavigation = null;
 function accuracyPager() {
   accuracyNavigation ||= createAccuracyNavigation({doc: document, el, names: ACCURACY_PAGES,
     select: (page, focus = false) => setAccuracyPage(page, focus),
-    motion: () => S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches});
+    motion: () => S.settings.uiAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches});
   return accuracyNavigation.element;
 }
 function accuracyDial(value, busy) {
@@ -4680,7 +4682,7 @@ function updateAccuracyPhases(sides, busy, design) {
     phaseReveals[phase].stop();
     oldRow.replaceWith(row);
     if (reveal) phaseReveals[phase].mount(row, {game: S.positions, key: JSON.stringify([design, S.batchGen, phase, key]),
-      enabled: S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches});
+      enabled: S.settings.uiAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches});
   }
 }
 function renderModernAdvanced(sides, busy) {
@@ -4779,7 +4781,7 @@ function renderStats() {
   const phaseReport = design === 'phases' || phaseReport2 || phaseModern;
   const reveal = design === 'reveal' || phaseReport;
   const revealKey = JSON.stringify([design, S.batchGen, S.meSide, S.acc, S.calibrated?.w.rating, S.calibrated?.b.rating, S.gameStats]);
-  const animate = S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const animate = S.settings.uiAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   if (reveal && !S.analyzing && !S.accuracyPage && animate
       && overviewReveal.matches(UI.stats.firstChild, S.positions, revealKey)) return;
   overviewReveal.stop();
@@ -6239,7 +6241,7 @@ const VISUAL_SETTING_KEYS = [
   "graphStyle", "barStyle", "insightFont", "showCoords", "coordSize", ...BACKGROUND_SETTING_KEYS,
   "coach", "coachPlain", "coachEngineReplies", "boardTheme", "pieceStyle", "boardCustomLight", "boardCustomDark",
   "sound", "soundVolume", "soundFx", "puzzleSuccessSound", "puzzleIncorrectSound", ...ARROW_SETTING_KEYS,
-  "moveAnim", "animSpeed", "learningTransition", "reviewMode",
+  "moveAnim", "uiAnim", "animSpeed", "learningTransition", "reviewMode",
 ];
 function resetSettingKeys(keys) {
   for (const key of keys) S.settings[key] = structuredClone(DEFAULT_SETTINGS[key]);
@@ -6328,7 +6330,7 @@ function visualSettings() {
       el("div", { class: "dopamine-preview-buttons" }, ...["brilliant", "blunder"].map(category =>
         el("button", { type: "button", class: "set-reset", disabled: S.settings.reviewMode !== "dopamine" || !canPreviewReviewEffects,
           onclick: () => reviewEffects.show(UI.boardWrap.querySelector(".board"), {
-            category, square: activePos().to, flipped: S.flipped, motion: S.settings.moveAnim !== false,
+            category, square: activePos().to, flipped: S.flipped, motion: S.settings.uiAnim !== false,
           }) }, "Preview " + categoryName(category) + " effect"))),
       !canPreviewReviewEffects ? el("p", { class: "set-note" }, "Return to game review to preview these effects.") : null,
     ),
@@ -6360,9 +6362,11 @@ function visualSettings() {
       slider("Head size", "arrowHead", 0.22, 0.55, 0.01, { onChange: refreshArrows }),
       el("button", { class: "set-reset", onclick: resetArrowSettings }, "Reset to default"),
     ),
-    section("Move animation",
-      toggleRow("Animation", "moveAnim"),
-      slider("Speed", "animSpeed", 1, 10, 1, { fmt: (v) => (440 - v * 40) + " ms" }),
+    section("Animations",
+      toggleRow("Interface animations", "uiAnim"),
+      el("p", { class: "set-note" }, "Animate learning transitions, leaderboards, puzzle changes and interface effects. Reduced motion follows your system preference."),
+      toggleRow("Piece moves", "moveAnim"),
+      slider("Piece speed", "animSpeed", 1, 10, 1, { fmt: (v) => (440 - v * 40) + " ms" }),
     ),
     section("Layout",
       el("button", { class: "set-reset reorg-toggle-btn", onclick: toggleReorganize }, S.reorganize ? "Done reorganizing" : "Reorganize panels"),
@@ -6884,13 +6888,13 @@ async function setSetting(key, value) {
   if (design?.panel.startsWith('accuracy')) { statsRefs = null; hideQTip(); renderStats(); if(key==='accuracyDesign')reflowAccuracy(accuracyLayoutExpanded()); }
   if (key === 'movesDesign') updateMovesDesign();
   if (key === 'engineDesign') renderEngineCurrent();
-  if (key === 'moveAnim' && S.settings.moveAnim === false) {
+  if (key === 'uiAnim' && S.settings.uiAnim === false) {
     overviewReveal.stop();
     Object.values(phaseReveals).forEach(reveal => reveal.stop());
   }
   if (key === "pieceStyle") buildBoard();
   if (key === "mlStyle" || key === "badgeStyle") renderMoves();
-  if (key === "evalView" || key === "graphStyle" || key === "barStyle" || key === "evalbarDesign" || key === "graphDesign" || key === "moveAnim") { renderEvalBar(); renderGraph(); }
+  if (key === "evalView" || key === "graphStyle" || key === "barStyle" || key === "evalbarDesign" || key === "graphDesign" || key === "uiAnim") { renderEvalBar(); renderGraph(); }
   if (key === "bestArrow") renderBestArrow();
   if (key === "showThreat") renderThreatArrow();
   if (key === "bestArrowColor" || key === "threatArrowColor") refreshArrows();
@@ -7020,7 +7024,7 @@ function applySettings() {
   const r = document.documentElement;
   const dopamine = S.settings.reviewMode === "dopamine";
   r.dataset.reviewMode = dopamine ? "dopamine" : "normal";
-  if (!dopamine || S.settings.moveAnim === false) reviewEffects.clear();
+  if (!dopamine || S.settings.uiAnim === false) reviewEffects.clear();
   // Only the dark theme is supported now — force it (also for old saved "light").
   S.settings.theme = "dark";
   r.setAttribute("data-theme", "dark");
@@ -7042,10 +7046,10 @@ function applySettings() {
   r.classList.toggle("hide-coords", S.settings.showCoords === false);
   clearBoardArt(UI.boardWrap && UI.boardWrap.querySelector(".board"));
   const learnEntry=document.querySelector(".learn-entry-button");
-  if(learnEntry)learnEntry.dataset.motion=S.settings.moveAnim===false?"off":"on";
+  if(learnEntry)learnEntry.dataset.motion=S.settings.uiAnim===false?"off":"on";
   applyBackground();
   const learningToggle=document.getElementById("learningToggle");
-  if(learningToggle)learningToggle.dataset.motion=S.settings.moveAnim===false?"off":"on";
+  if(learningToggle)learningToggle.dataset.motion=S.settings.uiAnim===false?"off":"on";
   learningWorkspace?.refreshSettings();
 }
 // Bundled background presets (relative to the extension's analysis page).
@@ -8259,7 +8263,7 @@ async function showReadyWorkspace() {
     resolve();
   }));
   const startup = document.getElementById("startup");
-  if (startup && S.settings.moveAnim !== false && !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+  if (startup && S.settings.uiAnim !== false && !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
     // Paint the closed shutters before changing their transforms, even on a warm launch.
     // Keep the workspace inert until the reveal finishes. A fallback also handles
     // background tabs or a motion preference changing during the transition.
@@ -8399,7 +8403,7 @@ async function showReadyWorkspace() {
       await browserAPI.storage.local.remove(`job:${jobId}`);
     }
     if (!screenPreview) learningAnnouncement = mountLearningAnnouncement({document, storage:browserAPI.storage.local,
-      motion:()=>S.settings.moveAnim!==false});
+      motion:()=>S.settings.uiAnim!==false});
     if(screenPreview?.viewport){
       if(!S.blank&&Number.isInteger(screenPreview.idx))go(screenPreview.idx);
       document.body.dataset.previewReady="true";

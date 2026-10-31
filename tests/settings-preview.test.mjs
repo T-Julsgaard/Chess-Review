@@ -29,10 +29,10 @@ test('loading controls are removed and only active loading indicators remain', a
 
 test('opening a settings section collapses the previous one and keeps its header focused', t => {
   const { doc, section, open } = settings(t);
-  open('Move animation');
+  open('Animations');
   const head = section('Badges').querySelector('.set-sect-head');
   head.focus(); head.click();
-  assert.equal(section('Move animation').querySelector('.set-sect-head').getAttribute('aria-expanded'), 'false');
+  assert.equal(section('Animations').querySelector('.set-sect-head').getAttribute('aria-expanded'), 'false');
   assert.equal(doc.querySelectorAll('.set-section.open').length, 1);
   assert.equal(doc.activeElement, section('Badges').querySelector('.set-sect-head'));
   section('Badges').querySelector('.set-sect-head').click();

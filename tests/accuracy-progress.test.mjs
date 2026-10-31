@@ -22,7 +22,7 @@ for (const design of ['dials', 'phases-modern', 'phases-modern-v2']) {
     a.context.cancelAnimationFrame = id => callbacks.delete(id);
     const tick = now => { const work = [...callbacks.values()]; callbacks.clear(); work.forEach(fn => fn(now)); };
     Object.assign(a.state, {analyzing: true, progressiveAccuracy: true, gameStats: scores([])});
-    Object.assign(a.state.settings, {accuracyDesign: design, moveAnim: true});
+    Object.assign(a.state.settings, {accuracyDesign: design, uiAnim: true});
     a.call('renderStats');
     const doc = a.dom.window.document, loader = doc.querySelector('.acc-val');
     a.state.gameStats = scores([1, 2]); a.call('renderStats');
@@ -54,10 +54,10 @@ test('turning animations off settles an in-progress phase reveal', async t => {
   const a = app(t); loadGame(a, '1. e4 e5');
   a.call('computeDerived'); a.call('buildUI');
   Object.assign(a.state, {analyzing: true, progressiveAccuracy: true, gameStats: scores([])});
-  Object.assign(a.state.settings, {accuracyDesign: 'phases-modern', moveAnim: true});
+  Object.assign(a.state.settings, {accuracyDesign: 'phases-modern', uiAnim: true});
   a.call('renderStats'); a.state.gameStats = scores([1, 2]); a.call('renderStats');
   assert.ok(a.dom.window.document.querySelector('[data-phase="opening"] .acc-reveal-slot'));
-  await a.call('setSetting', 'moveAnim', false);
+  await a.call('setSetting', 'uiAnim', false);
   assert.equal(a.dom.window.document.querySelector('[data-phase] .acc-reveal-slot'), null);
   assert.equal(a.dom.window.document.querySelector('[data-phase="opening"] strong').textContent, '90.0');
 });
@@ -99,7 +99,7 @@ for (const design of ['pages', 'dials', 'reveal', 'phases', 'phases2', 'phases-m
       assert.equal(doc.querySelector('.acc-phase-bars i').style.width, '90%');
     }
     a.state.analyzing = false; a.state.acc = {w: 90, b: 90};
-    a.state.settings.moveAnim = true; a.call('renderStats');
+    a.state.settings.uiAnim = true; a.call('renderStats');
     assert.equal(doc.querySelector('[data-phase] .acc-reveal-slot'), null, 'Completed phases must not restart at zero');
     assert.ok(GAME_PHASES.every(phase => text(phase).includes('90.0')));
     assert.equal(doc.querySelector('.acc-elo .ld'), null);
@@ -115,7 +115,7 @@ for (const source of ['library', 'cached import']) {
     a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
     const saved = {pgn: a.state.pgn, settingsKey: a.call('analysisSettingsKey'),
       bests: structuredClone(a.state.bests), evals: structuredClone(a.state.evals)};
-    a.state.settings.moveAnim = true;
+    a.state.settings.uiAnim = true;
     a.replace('startAnalysis', () => {throw Error('Restored reviews must not start analysis');});
     const meta = {gameId: 'saved-review'};
     if (source === 'library') await a.call('applyGame', {pgn: saved.pgn, meta, analysis: saved});

@@ -17,6 +17,10 @@ the board and top bar stay in place. **Settings → General → Learning experie
 offers **Morph in place**, **Morph in place 2**, **Morph in place 3**, **Studio Morph**, **Minimal morph**, **Board morph**, and
 the original **Separate page** layout. Each morph has its own design and timing. The transition
 also runs when returning to review and respects reduced-motion preferences.
+**Settings → General → Animations** controls interface transitions separately
+from individual piece moves. Turning off **Piece moves** keeps learning entry,
+leaderboard reveals and puzzle changes animated; **Interface animations** turns
+those effects off independently and still respects the system's reduced-motion preference.
 **Morph in place 2** glides the intact board into a centered study layout and keeps
 Settings available alongside learning, with reserved space on desktop windows.
 **Morph in place 3** keeps the review board size and familiar piece handling while

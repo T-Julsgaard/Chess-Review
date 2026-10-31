@@ -7,7 +7,7 @@ const RESET_RELEASE = "0.4.0";
 const RESET_MARKER = "settingsResetFor040";
 const PRESERVED_SETTINGS = [
   "sound", "soundVolume", "soundFx", "puzzleSuccessSound", "puzzleIncorrectSound",
-  "moveAnim", "animSpeed", "learningTransition",
+  "moveAnim", "uiAnim", "animSpeed", "learningTransition",
 ];
 
 function versionAtLeast(actual, minimum) {

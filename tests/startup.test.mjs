@@ -11,7 +11,7 @@ function startup(t,blank=false) {
   a.context.requestAnimationFrame=fn=>{queueMicrotask(fn);return 0;};
   for(const name of ['resetSettingsForRelease','loadBook','loadCalibration'])a.replace(name,async()=>{});
   a.replace('startAnalysis',()=>{});
-  a.store.settings={moveAnim:false};
+  a.store.settings={uiAnim:false};
   a.store['job:test-game']={pgn:'1. e4 e5',meta:{flip:true},source:'pgn',analysis:null};
   return a;
 }
@@ -31,7 +31,7 @@ for(const blank of [false,true])test(`${blank?'blank':'review'} startup never ch
 
 test('startup hides the partial shell through identity loading and piece decoding, then reveals the ready board',async t=>{
   const a=startup(t),doc=a.dom.window.document,identity=deferred(),pieces=deferred();
-  a.store.settings.moveAnim=true;
+  a.store.settings.uiAnim=true;
   a.replace('rememberAnalyzedGame',()=>identity.promise);
   a.dom.window.HTMLImageElement.prototype.decode=()=>pieces.promise;
   const loading=a.start();await settle();await settle();
@@ -63,7 +63,7 @@ test('startup hides the partial shell through identity loading and piece decodin
 
 test('reduced motion skips the shutter reveal',async t=>{
   const a=startup(t,true),doc=a.dom.window.document;
-  a.store.settings.moveAnim=true;
+  a.store.settings.uiAnim=true;
   a.dom.window.matchMedia=query=>({matches:query==='(prefers-reduced-motion: reduce)'});
   await a.start();
   assert.equal(doc.getElementById('startup'),null);
@@ -72,7 +72,7 @@ test('reduced motion skips the shutter reveal',async t=>{
 
 test('a missing transitionend cannot leave the ready board covered',async t=>{
   const a=startup(t,true),doc=a.dom.window.document;
-  a.store.settings.moveAnim=true;
+  a.store.settings.uiAnim=true;
   const loading=a.start();await new Promise(resolve=>setImmediate(resolve));
   assert.ok(doc.querySelector('#startup.opening'));
   await loading;

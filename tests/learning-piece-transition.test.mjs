@@ -53,7 +53,7 @@ async function returningWorkspace(t,mode) {
   if(mode)await w.startPuzzleRun(mode);else await w.startRatedPuzzles();
   const from={...w.displayedBoard},pending=[],board=w.boardElement;
   board.getBoundingClientRect=()=>({left:0,top:0,width:800,height:800});
-  a.state.settings.moveAnim=true;
+  a.state.settings.uiAnim=true;
   a.dom.window.HTMLElement.prototype.animate=function(frames,options){
     let resolve;const animation={finished:new Promise(r=>{resolve=r;}),cancel(){resolve();}};
     if(this.classList.contains('puzzle-transition-piece')&&!w.closing)pending.push({frames,options,resolve});else resolve();
@@ -158,27 +158,27 @@ for(const mode of ['timeAttack','knockout'])test(`${mode} result selections asse
   assert.equal(board.classList.contains('puzzle-arranging'),false);
 });
 
-for(const mode of ['timeAttack','knockout'])for(const reduced of [false,true])test(`${mode} result selections respect ${reduced?'system reduced motion':'disabled move animations'}`,async t=>{
+for(const mode of ['timeAttack','knockout'])for(const reduced of [false,true])test(`${mode} result selections respect ${reduced?'system reduced motion':'disabled interface animations'}`,async t=>{
   const {a,w,board,pending}=await replayWorkspace(t,mode);
-  if(reduced)a.dom.window.matchMedia=()=>({matches:true});else a.state.settings.moveAnim=false;
+  if(reduced)a.dom.window.matchMedia=()=>({matches:true});else a.state.settings.uiAnim=false;
   await w.replayRunPuzzle('replay-transition');
   await w.replayRunPuzzle('return-transition');
   assert.equal(pending.length,0);assert.equal(board.querySelector('.puzzle-piece-transition'),null);
   assert.equal(w.currentFen(),w.puzzleById('return-transition').fen);
 });
 
-for(const mode of ['timeAttack','knockout'])for(const reduced of [false,true])test(`leaving ${mode} results respects ${reduced?'system reduced motion':'disabled move animations'}`,async t=>{
+for(const mode of ['timeAttack','knockout'])for(const reduced of [false,true])test(`leaving ${mode} results respects ${reduced?'system reduced motion':'disabled interface animations'}`,async t=>{
   const {a,w,board,pending}=await replayWorkspace(t,mode);
-  if(reduced)a.dom.window.matchMedia=()=>({matches:true});else a.state.settings.moveAnim=false;
+  if(reduced)a.dom.window.matchMedia=()=>({matches:true});else a.state.settings.uiAnim=false;
   await w.navigate('puzzles');
   assert.equal(pending.length,0);assert.equal(board.querySelector('.puzzle-piece-transition'),null);
   assert.equal(board.querySelector('.puzzle-run-end'),null);
   assert.equal(w.currentFen(),w.homePosition.fen());
 });
 
-for(const reduced of [false,true])test(`returning from a puzzle respects ${reduced?'system reduced motion':'disabled move animations'}`,async t=>{
+for(const reduced of [false,true])test(`returning from a puzzle respects ${reduced?'system reduced motion':'disabled interface animations'}`,async t=>{
   const {a,w,board,pending}=await returningWorkspace(t);
-  if(reduced)a.dom.window.matchMedia=()=>({matches:true});else a.state.settings.moveAnim=false;
+  if(reduced)a.dom.window.matchMedia=()=>({matches:true});else a.state.settings.uiAnim=false;
   await w.navigate('concepts');
   assert.equal(pending.length,0);assert.equal(board.querySelector('.puzzle-piece-transition'),null);
   assert.equal(w.currentFen(),w.homePosition.fen());
@@ -246,7 +246,7 @@ test('opening assemblies cancel when stepping, switching openings or closing',as
 
 for(const setting of ['disabled','reduced','unchanged'])test(`opening entry skips assembly when motion is ${setting}`,async t=>{
   const {a,w,board,pending}=await openingWorkspace(t);
-  if(setting==='disabled')a.state.settings.moveAnim=false;
+  if(setting==='disabled')a.state.settings.uiAnim=false;
   else if(setting==='reduced')a.dom.window.matchMedia=()=>({matches:true});
   else {w.homePosition=new Chess();w.homeBoardFlipped=false;w.render();}
   await w.startOpening('italian');

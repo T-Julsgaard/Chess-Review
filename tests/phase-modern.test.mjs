@@ -54,7 +54,7 @@ test('Modern Phase report saves independently, reuses arcs and phase evidence, a
 
 test('Modern v2 saves separately and keeps Modern arcs, phase evidence and all three pages', async t => {
   const a = review(t), doc = a.dom.window.document;
-  a.state.settings.moveAnim = false;
+  a.state.settings.uiAnim = false;
   await a.call('setSetting', 'accuracyDesign', 'phases-modern');
   const original = doc.querySelector('.phase-overview').textContent;
   const before = JSON.stringify({acc:a.state.acc, stats:a.state.gameStats, layout:a.state.layout, idx:a.state.idx});
@@ -114,7 +114,7 @@ test('page dissolve is decorative, cleans up, and respects disabled and reduced 
   const animations = [];
   a.dom.window.HTMLElement.prototype.animate = function() { const result = {}; animations.push(result); return result; };
   a.state.settings.accuracyDesign = 'phases2'; a.call('renderStats');
-  a.state.settings.moveAnim = true;
+  a.state.settings.uiAnim = true;
   a.call('setAccuracyPage', 1);
   const leaf = doc.querySelector('.acc-turn-leaf');
   assert.ok(leaf); assert.equal(leaf.getAttribute('aria-hidden'), 'true'); assert.equal(leaf.inert, true);
@@ -122,7 +122,7 @@ test('page dissolve is decorative, cleans up, and respects disabled and reduced 
   assert.equal(leaf.querySelector('[id]'), null);
   assert.equal(doc.querySelectorAll('#accuracy-page').length, 1);
   animations[0].onfinish(); assert.equal(doc.querySelector('.acc-turn-leaf'), null);
-  a.state.settings.moveAnim = false; a.call('setAccuracyPage', 2); assert.equal(animations.length, 2);
-  a.state.settings.moveAnim = true; a.dom.window.matchMedia = () => ({matches: true});
+  a.state.settings.uiAnim = false; a.call('setAccuracyPage', 2); assert.equal(animations.length, 2);
+  a.state.settings.uiAnim = true; a.dom.window.matchMedia = () => ({matches: true});
   a.call('setAccuracyPage', 0); assert.equal(animations.length, 2);
 });

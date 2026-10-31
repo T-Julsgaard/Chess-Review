@@ -77,7 +77,7 @@ export function app(t, {hardware,url='https://extension.test/analysis.html#test-
   vm.runInContext(source, context, { filename: 'analysis.js' });
   const run = code => vm.runInContext(code, context);
   const state = run('S');
-  Object.assign(state.settings, { sound: false, moveAnim: false, coach: '', showThreat: false, engineDepth: 4 });
+  Object.assign(state.settings, { sound: false, moveAnim: false, uiAnim: false, coach: '', showThreat: false, engineDepth: 4 });
   context.__publicCalibration = JSON.parse(fs.readFileSync(new URL('../../data/calibration.json', import.meta.url), 'utf8'));
   run('BOOK = {}; CALIB = { ...__publicCalibration, quality: { ...__publicCalibration.quality, outcome: { ...__publicCalibration.quality.outcome, slopePerPawn: 0.3 } } };');
   const replace = (name, fn) => { context.__replacement = fn; run(`${name} = __replacement`); delete context.__replacement; };

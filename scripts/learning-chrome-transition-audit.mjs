@@ -39,6 +39,7 @@ export async function auditMoveListReturn({review,call,evaluate,sleep,out}) {
 
 export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const run=expression=>evaluate(review,expression);
+  await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=false;m.S.settings.uiAnim=true;})");
   const accuracyLayers=()=>run(`([...document.querySelectorAll('.stage .acc-nav-current, .stage .acc-nav-wake')].map(n=>getComputedStyle(n).visibility))`);
   await sleep(600); // Allow startup zoom and font fitting to settle.
   assert.deepEqual(await accuracyLayers(),['visible','visible'],'Accuracy highlights must be initialized in Game Review');
@@ -96,7 +97,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   assert.equal(await run("!!document.querySelector('.learn-transition-surface, .learn-swoop-anchor')"),false);
   for(const reduced of [false,true]){
     await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:reduced?'reduce':'no-preference'}]},review.sessionId);
-    await run(`import('./analysis.js').then(m=>{m.S.settings.moveAnim=${reduced};return m.openLearning();})`);
+    await run(`import('./analysis.js').then(m=>{m.S.settings.uiAnim=${reduced};return m.openLearning();})`);
     assert.equal(await run("getComputedStyle(document.querySelector('.library-rail')).transitionDuration"),'0s');
     assert.equal(await run("getComputedStyle(document.querySelector('.library-rail')).visibility"),'hidden');
     assert.deepEqual(await accuracyLayers(),['hidden','hidden'],'Accuracy highlights must stay hidden without animations');
@@ -114,7 +115,7 @@ export async function auditReviewReturn({review,call,evaluate,waitFor,sleep,out}
   // Piece assembly can outlast the panel/board morph. Once Puzzles fades out,
   // releasing its opacity animation must not reveal it again over Game Review.
   await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]},review.sessionId);
-  await run("import('./analysis.js').then(async m=>{m.S.settings.moveAnim=true;m.go(2);await m.openLearning();const w=m.learningWorkspace;w.homePosition.load('7k/8/8/8/8/8/8/K7 w - - 0 1');w.render();})");
+  await run("import('./analysis.js').then(async m=>{m.S.settings.uiAnim=true;m.go(2);await m.openLearning();const w=m.learningWorkspace;w.homePosition.load('7k/8/8/8/8/8/8/K7 w - - 0 1');w.render();})");
   await run(`window.returnFrames=[];window.samplingReturn=true;
     window.sampleReturnFrame=()=>{
       const shell=document.querySelector('.learn-shell'),s=shell&&getComputedStyle(shell);

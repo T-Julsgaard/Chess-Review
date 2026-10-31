@@ -139,7 +139,7 @@ test('visibility and animation settings apply to Balance and saved choices resto
   await a.call('setSetting', 'evalView', 'graph');
   assert.equal(doc.querySelector('.mod[data-mod="evalbar"]').style.display, 'none');
   await a.call('setSetting', 'evalView', 'both');
-  await a.call('setSetting', 'moveAnim', false);
+  await a.call('setSetting', 'uiAnim', false);
   assert.equal(doc.querySelector('.eval-balance').dataset.motion, 'off');
   const b = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
   b.replace('resetSettingsForRelease', async () => {});
