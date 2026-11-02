@@ -216,6 +216,11 @@ are normally not included in HTTP requests, but the complete link is visible to
 its recipient and any messaging service you use to share it. Opening the link
 visits the chess platform named in the URL.
 
+## Board screenshots
+
+If you import a screenshot into the position editor, it is read on your device by a
+bundled recognition model. The image is not uploaded, saved or sent to anyone.
+
 ## What we do NOT do
 
 - We do **not** upload your games, analysis or local learning history to a

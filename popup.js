@@ -15,14 +15,14 @@ window.addEventListener("pagehide",disposeFluidActions,{once:true});
 function beginImport() {
   activeImport?.request.cancel();
   const operation = {request:createImportRequest()}; activeImport = operation;
-  for(const id of ["analyzeCurrent","analyzeManual","openWorkspace"])$(id).disabled=true;
+  for(const id of ["analyzeCurrent","analyzeManual","openWorkspace","openPosition"])$(id).disabled=true;
   $("cancelImport").hidden=false;
   return operation;
 }
 function finishImport(operation) {
   operation.request.dispose();
   if(activeImport!==operation)return;
-  activeImport=null;for(const id of ["analyzeCurrent","analyzeManual","openWorkspace"])$(id).disabled=false;
+  activeImport=null;for(const id of ["analyzeCurrent","analyzeManual","openWorkspace","openPosition"])$(id).disabled=false;
   $("cancelImport").hidden=true;
 }
 const importCurrent = operation => activeImport === operation && !operation.request.signal.aborted;
@@ -110,6 +110,15 @@ $("openWorkspace").addEventListener("click",async()=>{
 });
 
 $("analyzeCurrent").addEventListener("click", runCurrentAnalysis);
+$("openPosition").addEventListener("click",async()=>{
+  if(screenPreview)return setStatus("Preview actions are disabled.");
+  const operation=beginImport();setStatus("Opening position editor …");
+  try {
+    await browserAPI.tabs.create({url:browserAPI.runtime.getURL("analysis.html?workspace=position")});
+    if(importCurrent(operation)){finishImport(operation);window.close();}
+  } catch(error) {if(importCurrent(operation))setStatus(error.message,true);}
+  finally {finishImport(operation);}
+});
 $("cancelImport").addEventListener("click",()=>{
   if(!activeImport)return;
   const operation=activeImport;operation.request.cancel();finishImport(operation);
