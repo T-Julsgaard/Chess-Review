@@ -56,7 +56,9 @@ test('a solved hint stays cleared throughout the roll and demo for the next prac
   a.state.practice.spots=[1,2];
   a.call('showPracticeHint');
   a.call('practiceAttempt','e2','e4');
-  for(const elapsed of [680,620,240,95,650,760,780]){
+  t.mock.timers.tick(1300);assert.equal(a.state.practice.i,0);
+  a.call('practiceNext');
+  for(const elapsed of [240,95,650,760,780]){
     t.mock.timers.tick(elapsed);
     assert.equal(board.querySelector('.hint-from'),null);
     assert.equal(a.state.practiceHint,null);

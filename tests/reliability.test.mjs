@@ -7,21 +7,21 @@ function quiet(a) {
     'renderReview','renderStats','renderEngineCurrent','renderBestArrow','renderGraph','renderLibrary']) a.replace(name,()=>{});
 }
 
-test('a delayed practice success cannot advance a different practice session', t => {
+test('a practice success waits for the player and cannot advance a different practice session', t => {
   const a = app(t); loadGame(a, '1. e4 e5');
   a.call('computeDerived'); a.call('buildUI');
   for (const name of ['flashSquares', 'playSanSound', 'renderControls', 'renderReview']) a.replace(name, () => {});
   a.replace('judgePass', () => true);
-  let advance, advanced = 0;
-  a.context.setTimeout = callback => { advance = callback; return 0; };
+  let advanced = 0;
   a.replace('practiceAdvance', () => { advanced++; });
   a.state.practice = {solving: true, spots: [1], i: 0};
   a.call('practiceAttempt', 'e2', 'e4');
   const original = a.state.practice;
+  assert.equal(advanced, 0);
   a.state.practice = {solving: true, spots: [2], i: 0};
-  advance(); assert.equal(advanced, 0);
+  a.call('practiceNext'); assert.equal(advanced, 0);
   a.state.practice = original;
-  advance(); assert.equal(advanced, 1);
+  a.call('practiceNext'); assert.equal(advanced, 1);
 });
 
 test('cached navigation invalidates a pending live result', async t=>{

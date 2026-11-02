@@ -1521,6 +1521,21 @@ button { font-family: inherit; cursor: pointer; }
 }
 .insight-panel .practice-btn:hover { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 24%, var(--panel-2)); }
 .insight-panel .practice-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.ip-opening .practice-btn { flex: none; margin-left: auto; padding: 3px 10px; font-size: 11.5px; white-space: nowrap; }
+/* The answer needs more room than a compact review panel has. Open over the graph, and keep the layout still. */
+.stage .mod:has(.practice-solved), .stage .mod:has(.practice-solved) > .mod-inner { overflow: visible; z-index: 40; }
+.stage .mod .insight-panel:has(.practice-solved) { flex: none; height: auto; min-height: 100%; overflow: visible; }
+.stage.stage .insight-panel .ip-body.practice-solved { overflow: visible; flex: none; gap: 6px; }
+.practice-solved-head { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; }
+.practice-solved-head .ip-text { flex: 1 1 120px; min-width: 0; }
+.practice-actions { display: flex; flex: none; gap: 6px; }
+.practice-action { padding: 5px 11px; border: 1px solid color-mix(in oklab, var(--accent) 45%, var(--line)); border-radius: 8px; background: var(--panel-2); color: var(--ink); font: 700 12px/1.4 var(--font-ui); cursor: pointer; white-space: nowrap; transition: border-color .12s, background .12s; }
+.practice-action:hover { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 20%, var(--panel-2)); }
+.practice-action:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.practice-action.practice-next { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
+.practice-action.practice-next:hover { background: var(--accent-strong); border-color: var(--accent-strong); }
+.practice-why { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
+.practice-line { margin: 0; font: 12px/1.5 var(--font-mono); color: var(--ink-3); overflow-wrap: anywhere; }
 
 /* ---------- REVIEW SUMMARY ---------- */
 .review {

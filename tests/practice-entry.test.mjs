@@ -10,17 +10,18 @@ function review(t) {
   return a;
 }
 
-test('practice appears above the starting hint, follows navigation, and stays out of every Accuracy design', t => {
+test('practice stays in the review panel on every move and out of every Accuracy design', t => {
   const a = review(t), doc = a.dom.window.document;
   const button = doc.querySelector('.insight-panel .practice-btn');
   assert.equal(button.textContent, 'Practice your mistakes');
-  assert.equal(button.closest('.ip-head').nextElementSibling.textContent, 'Use ← and → to step through the game.');
+  assert.ok(button.closest('.ip-opening'));
+  assert.equal(doc.querySelector('.insight-panel .ip-text').textContent, 'Use ← and → to step through the game.');
   for (const design of ['original', 'reveal']) {
     a.state.settings.accuracyDesign = design; a.call('renderStats');
     assert.equal(doc.querySelector('.accuracy-panel .practice-btn'), null);
   }
   a.call('go', 1);
-  assert.equal(doc.querySelector('.practice-btn'), null);
+  assert.equal(doc.querySelectorAll('.insight-panel .practice-btn').length, 1);
   a.call('go', 0);
   assert.equal(doc.querySelectorAll('.insight-panel .practice-btn').length, 1);
 });
