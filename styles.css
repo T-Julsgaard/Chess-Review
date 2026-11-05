@@ -438,8 +438,8 @@
 .mode-piece,.mode-timer,.mode-crown,.mode-speed-lines { transform-box: fill-box; transform-origin: center; transition: transform .35s cubic-bezier(.2,.8,.2,1); }
 .puzzle-mode:has(.puzzle-mode-button:focus-visible) { outline: 2px solid var(--ink); outline-offset: 4px; }
 .learning-workspace .puzzle-mode-button:focus-visible { outline: 2px solid #26291f; outline-offset: -5px; }
+/* The ticket itself stays put on hover; only its drawing reacts. */
 @media (hover: hover) {
-  .puzzle-mode:hover:has(.puzzle-mode-button:not(:disabled)) .puzzle-mode-surface { transform: translateY(-3px); box-shadow: 0 15px 24px #0002; }
   .puzzle-mode-button:hover:not(:disabled) .mode-piece { transform: translateY(-7px) rotate(8deg); }
   .puzzle-mode-button:hover:not(:disabled) .mode-timer { transform: rotate(14deg); }
   .puzzle-mode-button:hover:not(:disabled) .mode-speed-lines { transform: translateX(-5px); }

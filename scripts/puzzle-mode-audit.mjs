@@ -35,10 +35,8 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await run("document.querySelector('.puzzle-mode-grid').scrollIntoView({block:'center'})");await sleep(500);
   const pointer=await run("(()=>{const r=document.querySelector('[data-focus=timeAttack]').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()");
   await call('Input.dispatchMouseEvent',{type:'mouseMoved',...pointer},review.sessionId);await sleep(450);
-  const lift=await run("(()=>{const m=new DOMMatrixReadOnly(getComputedStyle(document.querySelector('[data-mode=timeAttack] .puzzle-mode-surface')).transform);return [m.a,m.b,m.c,m.d,m.e,m.f]})()");
-  assert.deepEqual(lift.slice(0,5),[1,0,0,1,0],'Hover keeps the ticket upright with no sideways movement');
-  assert.ok(lift[5]<0&&lift[5]>=-3,'Hover lifts the ticket only slightly');
-  assert.notEqual(await run("getComputedStyle(document.querySelector('.mode-timer')).transform"),'none','Artwork animates inside the upright ticket');
+  assert.equal(await run("getComputedStyle(document.querySelector('[data-mode=timeAttack] .puzzle-mode-surface')).transform"),'none','Hover leaves the ticket itself completely still');
+  assert.notEqual(await run("getComputedStyle(document.querySelector('.mode-timer')).transform"),'none','Artwork still animates inside the motionless ticket');
   for(const mode of ['solve-puzzle','timeAttack','knockout']) {
     await call('Input.dispatchMouseEvent',{type:'mouseMoved',x:0,y:0},review.sessionId);await sleep(300);
     const edge=await run(`(()=>{const r=document.querySelector('.puzzle-mode[data-mode="${mode}"] .puzzle-mode-button').getBoundingClientRect();return {x:r.x+r.width/2,y:r.bottom-1};})()`);
