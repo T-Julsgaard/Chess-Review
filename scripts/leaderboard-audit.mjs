@@ -24,13 +24,31 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
         const entrance=await run(`import('./analysis.js').then(({learningWorkspace:w})=>{
           const source=document.querySelector('.puzzle-mode[data-mode="${mode}"] .puzzle-mode-button').getBoundingClientRect(),expected=[source.x,source.y,source.width,source.height];
           window.leaderboardOpening=w.showLeaderboard('${mode}');const hero=window.openingHero=document.querySelector('.leaderboard-hero'),backdrop=document.querySelector('.leaderboard-backdrop'),button=backdrop?.querySelector('[data-focus=leaderboard-${mode}]');
-          const animation=hero.getAnimations()[0];animation.pause();animation.currentTime=0;
+          // Hold the whole reveal, hero and travelling content alike, at its
+          // first frame: the title and drawing must still be on the ticket.
+          const title=hero.querySelector('h3'),art=hero.querySelector('.puzzle-mode-art');
+          const held=[hero,title,art].flatMap(node=>node.getAnimations());held.forEach(a=>{a.pause();a.currentTime=0;});
           const r=hero.getBoundingClientRect(),clip=getComputedStyle(hero).clipPath.slice(6).split(' round')[0].split(' ').map(parseFloat),[top,right,bottom,left]=clip;
           const actual=[r.x+r.width*left/100,r.y,r.width*(1-(left+right)/100),r.height*(1-bottom/100)];
           const original=backdrop.querySelector('.puzzle-mode[data-mode="${mode}"] .puzzle-mode-button').getBoundingClientRect(),fading=[original.x,original.y,original.width,original.height];
-          animation.play();return {expected,actual,fading,frames:hero.getAnimations().map(a=>a.effect.getKeyframes().map(f=>({clipPath:f.clipPath,transform:f.transform}))),footerFits:!backdrop||button.getBoundingClientRect().bottom<=backdrop.getBoundingClientRect().bottom+2};})`);
+          // Visual bounds: a title's ink, and a drawing's rendered viewBox.
+          const visual=node=>{const box=node.viewBox?.baseVal;
+            if(box?.width&&box.height){const b=node.getBoundingClientRect(),fit=Math.min(b.width/box.width,b.height/box.height);
+              return {left:b.left+(b.width-box.width*fit)/2,top:b.top+(b.height-box.height*fit)/2,width:box.width*fit};}
+            const range=document.createRange();range.selectNodeContents(node);const b=range.getBoundingClientRect();return {left:b.left,top:b.top,width:b.width};};
+          const ticket=backdrop.querySelector('.puzzle-mode[data-mode="${mode}"]');
+          const carried=[[title,ticket.querySelector('.puzzle-mode-name')],[art,ticket.querySelector('.puzzle-mode-art')]]
+            .map(([node,home])=>({from:visual(node),home:visual(home),hidden:getComputedStyle(home).opacity}));
+          held.forEach(a=>a.play());return {expected,actual,fading,carried,frames:hero.getAnimations().map(a=>a.effect.getKeyframes().map(f=>({clipPath:f.clipPath,transform:f.transform}))),footerFits:!backdrop||button.getBoundingClientRect().bottom<=backdrop.getBoundingClientRect().bottom+2};})`);
         await call('Input.dispatchMouseEvent',{type:'mouseReleased',button:'left',clickCount:1,...pointer},review.sessionId);
         for(const key of ['actual','fading'])entrance[key].forEach((value,index)=>assert.ok(Math.abs(value-entrance.expected[index])<.5,`${mode}/${width}/${theme}: ${key} starts at the pressed colored button`));
+        // The hero's title and drawing travel out of the ticket's own, which
+        // is why the overview's copies are hidden rather than left behind.
+        entrance.carried.forEach(({from,home,hidden},index)=>{
+          for(const edge of ['left','top','width'])assert.ok(Math.abs(from[edge]-home[edge])<1.5,
+            `${mode}/${width}/${theme}: carried ${index?'drawing':'title'} starts at the ticket's own (${edge} ${from[edge]} vs ${home[edge]})`);
+          assert.equal(hidden,'0',`${mode}/${width}/${theme}: the ticket's own ${index?'drawing':'title'} does not linger behind the travelling copy`);
+        });
         if(width===1920&&theme==='dark') {
           const frames=entrance.frames;
           assert.ok(frames.length,'Expansion is animated');const first=frames[0][0],last=frames[0].at(-1);
@@ -45,6 +63,8 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
         }
         await waitFor(review,"!!document.querySelector('.leaderboard-empty')&&!document.querySelector('.leaderboard-entering')",'Loading leaderboard');
         await sleep(100);
+        assert.deepEqual(await run("[...document.querySelectorAll('.leaderboard-hero h3,.leaderboard-hero .puzzle-mode-art')].map(n=>getComputedStyle(n).transform)"),['none','none'],
+          `${mode}/${width}/${theme}: the travelled title and drawing settle with no transform left on them`);
         const loadingHeight=await run("document.querySelector('.leaderboard-table-wrap').getBoundingClientRect().height");
         await run('window.finishLeaderboardRead();window.leaderboardOpening');await sleep(100);
         const loadedHeight=await run("document.querySelector('.leaderboard-table-wrap').getBoundingClientRect().height");
