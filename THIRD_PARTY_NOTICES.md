@@ -6,6 +6,9 @@ notice requirement. Other components and assets are listed in `ATTRIBUTIONS.md`.
 
 Upstream: https://github.com/wdeloo/Brilliant-Chess
 
+The board recognition in `lib/fenshot/` keeps its MIT notice in
+`lib/fenshot/LICENSE`.
+
 ## Brilliant-Chess — MIT License
 
 Copyright (c) 2025 Delo <https://github.com/wdeloo>

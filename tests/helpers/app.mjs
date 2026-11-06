@@ -28,6 +28,8 @@ import {rememberAnalyzedGame,historyGame} from '../../lib/player-history.js';
 import {leaderboardPreviewControls} from '../../lib/learning/leaderboard-preview.js';
 import {leaderboardSettingsControls} from '../../lib/learning/leaderboard-settings.js';
 import {createReviewEffects} from '../../lib/review-effects.js';
+import {PositionEditor} from '../../lib/position-editor.js';
+import {importPosition,setupFen} from '../../lib/position-setup.js';
 import {explainMove, explanationPv} from '../../lib/move-explanation.js';
 
 // Execute the real application in a DOM, stubbing only browser/engine boundaries.
@@ -61,7 +63,7 @@ export function app(t, {hardware,url='https://extension.test/analysis.html#test-
     URL, TextEncoder, btoa, console, Chess, flagCodeForCountryId, countryNameForId, browserAPI,platformAPI:browserAPI,
     createScreenPreviewContext,loadScreenPreviewController,
     rememberAnalyzedGame,historyGame,leaderboardPreviewControls,leaderboardSettingsControls,
-    createReviewEffects,
+    createReviewEffects,PositionEditor,importPosition,setupFen,
     explainMove, explanationPv,
     BADGE_APPEARANCES, BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg, puzzleResultBadge, CHECKMATE_BADGES, checkmateBadgeSvg, matedKingSquare, mateMark,
     CATEGORY_SYMBOLS, CATEGORY_SYMBOL_OPTIONS, categoryBadgeSymbol, cleanBadgeSymbols,

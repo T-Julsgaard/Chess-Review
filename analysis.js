@@ -33,11 +33,15 @@ import { leaderboardPreviewControls } from "./lib/learning/leaderboard-preview.j
 import { leaderboardSettingsControls } from "./lib/learning/leaderboard-settings.js";
 import { createReviewEffects } from "./lib/review-effects.js";
 import { explainMove, explanationPv } from "./lib/move-explanation.js";
+import { PositionEditor } from "./lib/position-editor.js";
+import { importPosition, setupFen } from "./lib/position-setup.js";
 
 const reviewEffects = createReviewEffects(document);
 
 const screenPreview = createScreenPreviewContext(location);
-const blankLaunch = new window.URLSearchParams(location.search).get("workspace") === "blank";
+const launchParams = new window.URLSearchParams(location.search);
+const blankLaunch = launchParams.get("workspace") === "blank";
+const positionLaunch = launchParams.get("workspace") === "position";
 // Previews use isolated storage and their actual iframe viewport at 100%.
 const browserAPI = screenPreview ? {...platformAPI,storage:{...platformAPI.storage,local:screenPreview.storage}} : platformAPI;
 
@@ -476,6 +480,7 @@ const MOD_MINW = { evalbar: 16 };
 const modMinW = (key) => MOD_MINW[key] ?? MINW;
 
 const ICONS = {
+  board: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg>`,
   chat: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11a8 8 0 0 1-8 8H5l-3 3V11a9.5 9.5 0 0 1 19 0Z"/><path d="M8 9h8M8 13h5"/></svg>`,
   cpu: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="3"/><path d="M9 2v4m6-4v4M9 18v4m6-4v4M2 9h4m-4 6h4m12-6h4m-4 6h4"/><rect x="10" y="10" width="4" height="4" rx="1"/></svg>`,
   sound: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m11 4-5 4H3v8h3l5 4V4Zm4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></svg>`,
@@ -897,6 +902,7 @@ function activeBest() {
 /* ---------------- Loading + PGN ---------------- */
 async function loadJob() {
   if(screenPreview)return structuredClone(screenPreview.job);
+  if(positionLaunch&&!location.hash)return {source:"position",fen:launchParams.get("fen"),flipped:launchParams.get("flipped")==="1",analyze:launchParams.get("analyze")==="1"};
   const hash = location.hash.replace(/^#/, "");
   const jobId = hash || (blankLaunch ? "blank-workspace" : "");
   if (!jobId) throw new Error("No analysis job specified.");
@@ -1641,13 +1647,14 @@ function buildUI() {
     ),
     el("div", { class: "topbar-meta", id: "meta" }),
     el("div", { class: "topbar-right" },
+      el("button", { type:"button", class:"icon-btn", "aria-label":"Set up position", onclick:openPositionTool }, icon("board")),
       el("button", { type:"button", id:"learningToggle", class:"icon-btn learning-toggle", onclick:toggleLearning },
         el("span", {class:"learning-toggle-icon", "aria-hidden":"true"}, icon("book")),
         el("span", {class:"learning-toggle-label"}, "Learn with Chess review")),
       // aria-label (not title) → keeps the buttons labelled for screen readers without the native
       // hover tooltip the user found unnecessary.
       el("button", { class: "icon-btn", "data-game-action":"", "aria-label": "Flip board", onclick: toggleFlip }, icon("flip")),
-      el("button", { class: "icon-btn", "data-game-action":"", "aria-label": "Share game (copy link)", onclick: shareGame }, icon("share")),
+      el("button", { class: "icon-btn", "data-game-action":"", "data-review-action":"", "aria-label": "Share game (copy link)", onclick: shareGame }, icon("share")),
       el("button", { class: "icon-btn", "aria-label": "Credits & attributions", onclick: openCredits }, icon("info")),
       el("button", { class: "icon-btn", "aria-label": "Settings", onclick: toggleSettings }, icon("gear")),
     ),
@@ -1796,7 +1803,7 @@ async function openLearning() {
   const snapshot = {idx:S.idx, flipped:S.flipped, selectedSq:wasAnalysis?null:S.selectedSq,
     lineWalking:!wasAnalysis&&S.lineWalking, bestWalking:!wasAnalysis&&S.bestWalking};
   stopLineWalk();
-  if(wasAnalysis)exitAnalysis(undefined,{render:false});
+  if(wasAnalysis&&!S.position)exitAnalysis(undefined,{render:false});
   UI.settings.hidden = true;
   hideBoardBadgeTip();
   // Learning snapshots the board's children for restoration. Transient review
@@ -2188,7 +2195,7 @@ async function resetLayout() {
 // they're locked and hover shows nothing. The arranged layout auto-saves and persists. Entering it
 // from the automatic layout freezes what is on screen into a custom canvas first.
 function toggleReorganize() {
-  if(S.blank){toast("Open a game to reorganize review panels.");return;}
+  if(S.blank||S.position){toast("Open a game to reorganize review panels.");return;}
   if (!S.reorganize && !isCustomLayout()) {
     S.layout = snapshotLayout();
     // The snapshot holds the breakdown as it is shown; record the collapse offset so the saved
@@ -2911,6 +2918,7 @@ function initBoardInput() {
   // Never let the browser start its own image/element drag on the board (the stray ghost image).
   wrap.addEventListener("dragstart", (e) => {if (!learningWorkspace?.embedded) e.preventDefault();});
   wrap.addEventListener("pointerdown", (e) => {
+    if (positionEditor && !learningWorkspace) { positionEditor.boardPointer(e); return; }
     if (learningWorkspace || S.blank) return;
     if (e.button === 2) { rightPointerDown(e); return; }
     if (e.button !== 0) return;
@@ -3638,7 +3646,7 @@ function alignPlayers() {
 
 /* ---------------- Controls ---------------- */
 function renderControls() {
-  const mode = S.practice ? "practice" : S.analysisMode && S.variation ? "variation" : "mainline";
+  const mode = S.practice ? "practice" : S.position && !S.blank ? "position" : S.analysisMode && S.variation ? "variation" : "mainline";
   let refs = UI.controlRefs;
   // Progress updates can arrive between mouse-down and mouse-up. Keep the buttons
   // (and their icons) mounted so clicks, focus and hover survive those updates.
@@ -3650,11 +3658,13 @@ function renderControls() {
       UI.controls.replaceChildren(refs.position, refs.status,
         el("button", { class: "exit-analysis", title: "Exit practice (Esc)", onclick: exitPractice }, el("span", { class: "ea-x" }, "✕"), "Exit"));
     } else {
-      const variation = mode === "variation";
+      const variation = mode !== "mainline";
       refs.first = el("button", { "aria-label": variation ? "Variation start" : "Start",
         onclick: variation ? () => gotoVar(0) : () => go(0) }, icon("first"));
       refs.previous = el("button", { "aria-label": variation ? "Previous move" : "Previous", onclick: navPrev }, icon("prev"));
-      refs.center = variation
+      refs.center = mode === "position"
+        ? el("button", { class: "play position-edit", title: "Edit this position", onclick: editPosition }, "Edit")
+        : variation
         ? el("button", { class: "exit-analysis", title: "Exit analysis (Esc)", onclick: () => exitAnalysis(S.variation.branchIdx) }, el("span", { class: "ea-x" }, "✕"), "Exit")
         : el("button", { class: "play", onclick: toggleAuto });
       refs.next = el("button", { "aria-label": variation ? "Next move" : "Next", onclick: navNext }, icon("next"));
@@ -4261,7 +4271,7 @@ function renderReview() {
   // In-place progress text during analysis (so the loader animation doesn't restart each move).
   if (S.analyzing && revRefs) { revRefs.head.textContent = analysisProgressText(); return; }
 
-  const panel = el("div", { class: "panel insight-panel" }, openingStrip());
+  const panel = el("div", { class: "panel insight-panel" }, S.position ? null : openingStrip());
 
   if (S.analyzing) {
     const headEl = el("span", {}, analysisProgressText());
@@ -4299,8 +4309,8 @@ function renderReview() {
     // Mirror a move comment's layout exactly (empty .ip-head for the same top spacing + the note in
     // .ip-text) so the font, colour and vertical position match the mainline commentary.
     const body = el("div", { class: "ip-body" });
-    body.append(el("div", { class: "ip-head" }));
-    body.append(el("div", { class: "ip-text" }, "Exploring a variation."));
+    body.append(S.position ? positionHead() : el("div", { class: "ip-head" }));
+    body.append(el("div", { class: "ip-text" }, S.position ? positionNote() : "Exploring a variation."));
     panel.append(body);
     UI.review.replaceChildren(panel);
     return;
@@ -4791,6 +4801,7 @@ function renderModernAdvanced(sides, busy) {
   return root;
 }
 function renderStats() {
+  if (S.position && !S.blank) { statsRefs = null; overviewReveal.stop(); UI.stats.replaceChildren(positionSummary()); return; }
   const design = panelDesign('accuracy', S.settings);
   const phaseReport2 = design === 'phases2';
   const phaseModern = design === 'phases-modern' || design === 'phases-modern-v2';
@@ -5056,7 +5067,7 @@ function renderPagedStats() {
         estimateElo(S.accElo[side], S.players[side]?.rating, side) == null ? '—'
           : '≈ ' + estimateElo(S.accElo[side], S.players[side]?.rating, side))))),
       renderAccuracyPhases(sides, busy, false),
-      el('p', {class: 'acc-note'}, S.blank ? 'Load a game to see its accuracy.'
+      el('p', {class: 'acc-note'}, S.position ? 'A standalone position has no game accuracy.' : S.blank ? 'Load a game to see its accuracy.'
         : busy ? 'Phase scores appear as analysis progresses.' : '— Phase not reached or no scored decisions.'));
   } else if (page === 1) {
     content = renderMoveQuality(sides, rows);
@@ -5098,7 +5109,7 @@ function updateGraphReadout(refs) {
   const e = S.evals[S.idx], cp = e == null ? null : scoreToCp(e);
   const rounded = cp == null ? null : Math.abs(cp / 100).toFixed(1);
   const side = cp > 0 ? 'White' : 'Black';
-  const label = e == null ? (S.blank ? 'Load a game' : 'Calculating…')
+  const label = e == null ? (S.position ? 'No game' : S.blank ? 'Load a game' : 'Calculating…')
     : e.mate != null ? `${side} mates` : rounded === '0.0' ? 'Equal position' : `${side} ahead`;
   if (refs.readout) {
     refs.readout.textContent = e == null ? '—' : e.mate != null ? 'M' + Math.abs(e.mate) : rounded === '0.0' ? '0.0' : evalText(e);
@@ -5307,7 +5318,7 @@ function renderGraph() {
     const onkey = e => {
       if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key)) return;
       e.preventDefault(); e.stopPropagation();
-      if (S.practice || S.blank) return;
+      if (S.practice || S.blank || S.position) return;
       const target = e.key === 'Home' ? 0 : e.key === 'End' ? lastPly
         : S.idx + (['ArrowLeft','ArrowDown'].includes(e.key) ? -1 : 1);
       gotoMainline(Math.max(0, Math.min(lastPly, target)));
@@ -5341,7 +5352,7 @@ function renderGraph() {
     }
     if (compact) {
       UI.graph.replaceChildren(el('div', {class: 'panel eval-side evaluation-panel evaluation-minimal', 'data-design': design, 'aria-label': 'Evaluation'},
-        chart, !pts.length ? el('span', {class: 'evaluation-empty'}, S.blank ? 'Load a game to see its evaluation' : 'Waiting for analysis…') : null));
+        chart, !pts.length ? el('span', {class: 'evaluation-empty'}, S.position ? 'A standalone position has no game graph' : S.blank ? 'Load a game to see its evaluation' : 'Waiting for analysis…') : null));
       UI.graphRefs = {key:graphKey, marker:chart.querySelector('.eval-position'), chart, lastPly};
       updateGraphReadout(UI.graphRefs);
       if (restoreFocus) chart.focus({preventScroll: true});
@@ -5351,7 +5362,7 @@ function renderGraph() {
     UI.graph.replaceChildren(el('div', {class: 'panel eval-side evaluation-panel evaluation-' + design + (bars && design !== 'bars' ? ' evaluation-bars' : ''), 'data-design': design, 'aria-label': 'Evaluation'},
       readout,
       el('div', {class: 'evaluation-plot'}, chart,
-        !pts.length ? el('span', {class: 'evaluation-empty'}, S.blank ? 'Load a game to see its evaluation' : 'Waiting for analysis…') : null)));
+        !pts.length ? el('span', {class: 'evaluation-empty'}, S.position ? 'A standalone position has no game graph' : S.blank ? 'Load a game to see its evaluation' : 'Waiting for analysis…') : null)));
     UI.graphRefs = {key:graphKey, marker:chart.querySelector('.eval-position'), readout, chart, lastPly};
     updateGraphReadout(UI.graphRefs);
     if (restoreFocus) chart.focus({preventScroll: true});
@@ -5366,17 +5377,20 @@ function renderGraph() {
 }
 
 /* ---------------- Move list ---------------- */
+const moveNodes = () => S.position ? S.variation?.positions || [] : S.positions;
+const moveClass = ply => S.position ? moveNodes()[ply]?.classif : S.classif[ply];
+const moveScore = ply => S.position ? moveNodes()[ply]?.moveGrade : S.moveGrades[ply];
 function moveCell(ply) {
-  if (ply > S.total || ply < 1) return el("span");
-  const pos = S.positions[ply];
-  const cls = S.classif[ply];
+  if (ply >= moveNodes().length || ply < 1) return el("span");
+  const pos = moveNodes()[ply];
+  const cls = moveClass(ply);
   const showBadge = cls && (NOTEWORTHY.has(cls) || S.settings.badgeStyle === "dot");
   const glyph = GLYPH[pos.san && /^[KQRBN]/.test(pos.san) ? pos.san[0] : "P"];
-  return el("span", { class: "ml-move" + (!S.analysisMode && ply === S.idx ? " current" : ""), "data-ply": ply,
-    "data-class": cls || "", onclick: () => gotoMainline(ply) },
+  return el("span", { class: "ml-move" + ((S.position ? ply === S.variation?.idx : !S.analysisMode && ply === S.idx) ? " current" : ""), "data-ply": ply,
+    "data-class": cls || "", onclick: () => S.position ? gotoVar(ply) : gotoMainline(ply) },
     el("span", { class: "pc", style: { color: pos.color === "w" ? "var(--ink)" : "var(--ink-2)" } }, glyph),
     el("span", { title: pos.san }, pos.san),
-    showBadge ? qBadge(cls, S.moveGrades[ply]) : null,
+    showBadge ? qBadge(cls, moveScore(ply)) : null,
   );
 }
 function qBadge(k, score = null) {
@@ -5394,7 +5408,7 @@ function highlightCurrentMove(forceScroll = false) {
   const previousPly = prev?.dataset.ply;
   if (prev) prev.classList.remove("current");
   // In analysis mode no mainline cell is "current" (the original render never marked one).
-  const cur = S.analysisMode ? null : UI.movesBody.querySelector('.ml-move[data-ply="' + S.idx + '"]');
+  const cur = S.analysisMode && !S.position ? null : UI.movesBody.querySelector('.ml-move[data-ply="' + (S.position ? S.variation?.idx : S.idx) + '"]');
   if (cur) {
     cur.classList.add("current");
     if (forceScroll || previousPly !== cur.dataset.ply) {
@@ -5430,21 +5444,21 @@ function renderMoves() {
   const ml = S.settings.mlStyle;
   // Keep move cells mounted while classifications arrive. Replacing the list during analysis
   // drops the hovered element and makes its hover state flicker; only changed badges need updates.
-  const sig = ml + "|" + S.settings.badgeStyle + "|" + S.total + "|" + (S.analysisMode ? 1 : 0) + "|" + S.pgn;
-  const classSig = JSON.stringify([S.classif, S.moveGrades]);
+  const sig = ml + "|" + S.settings.badgeStyle + "|" + S.total + "|" + (S.analysisMode ? 1 : 0) + "|" + S.pgn + "|" + (S.position ? moveNodes().map(node => node.san).join(" ") : "");
+  const classSig = JSON.stringify(S.position ? moveNodes().map(node => [node.classif, node.moveGrade]) : [S.classif, S.moveGrades]);
   if (sig === _movesSig && UI.movesBody.firstChild) {
     if (classSig !== _movesClassSig) {
       for (const cell of UI.movesBody.querySelectorAll(".ml-move[data-ply]")) {
-        const cls = S.classif[+cell.dataset.ply];
+        const cls = moveClass(+cell.dataset.ply);
         if (cell.dataset.class === (cls || "")) {
           const badge = cell.querySelector(".grade-badge");
-          if (badge) updateGradeBadge(badge, cls, S.moveGrades[+cell.dataset.ply]);
+          if (badge) updateGradeBadge(badge, cls, moveScore(+cell.dataset.ply));
           continue;
         }
         cell.dataset.class = cls || "";
         const old = cell.querySelector(".qb");
         if (old) old.remove();
-        if (cls && (NOTEWORTHY.has(cls) || S.settings.badgeStyle === "dot")) cell.append(qBadge(cls, S.moveGrades[+cell.dataset.ply]));
+        if (cls && (NOTEWORTHY.has(cls) || S.settings.badgeStyle === "dot")) cell.append(qBadge(cls, moveScore(+cell.dataset.ply)));
       }
       _movesClassSig = classSig;
     }
@@ -5452,11 +5466,11 @@ function renderMoves() {
   }
   _movesSig = sig;
   _movesClassSig = classSig;
-  const rows = [];
-  for (let ply = 1; ply <= S.total; ply++) {
-    const number = Number(S.positions[ply - 1].fen.split(" ")[5]);
+  const rows = [], nodes = moveNodes();
+  for (let ply = 1; ply < nodes.length; ply++) {
+    const number = Number(nodes[ply - 1].fen.split(" ")[5]);
     if (!rows.length || rows[rows.length - 1].number !== number) rows.push({number, w:0, b:0});
-    rows[rows.length - 1][S.positions[ply].color] = ply;
+    rows[rows.length - 1][nodes[ply].color] = ply;
   }
   let list;
   if (ml === "compact") {
@@ -5466,6 +5480,7 @@ function renderMoves() {
     list = el("div", { class: "movelist " + (ml === "cards" ? "ml-cards" : "ml-rows") + " ml-scroll" });
     for (const row of rows) list.append(el("div", { class: "ml-pair" }, el("span", { class: "ml-num" }, row.number), moveCell(row.w), moveCell(row.b)));
   }
+  if (S.position && !rows.length) list.append(el("p", { class: "position-moves-empty" }, "Play a move on the board to explore it."));
   UI.movesBody.style.padding = ml === "rows" ? "0" : "var(--pad)";
   UI.movesBody.replaceChildren(list);
   // auto-scroll to the current move
@@ -6996,7 +7011,7 @@ async function setSetting(key, value) {
     overviewReveal.stop();
     Object.values(phaseReveals).forEach(reveal => reveal.stop());
   }
-  if (key === "pieceStyle") buildBoard();
+  if (key === "pieceStyle") { buildBoard(); positionEditor?.refresh(); positionEditor?.render(); }
   if (key === "mlStyle" || key === "badgeStyle") renderMoves();
   if (key === "evalView" || key === "graphStyle" || key === "barStyle" || key === "evalbarDesign" || key === "graphDesign" || key === "uiAnim") { renderEvalBar(); renderGraph(); }
   if (key === "bestArrow") renderBestArrow();
@@ -7654,8 +7669,8 @@ function persistReviewSnapshot(snapshot) {
 }
 function openScreenSizePreview() {
   if(screenPreview?.viewport){window.parent.focus();return;}
-  const job=S.blank?{source:"blank",analysis:null}:{pgn:S.pgn,meta:S.meta||{},source:"pgn"};
-  if(!S.blank&&!S.analyzing&&!S.analysisError&&completeAnalysis(S,S.total+1))job.analysis={
+  const job=S.blank||S.position?{source:"blank",analysis:null}:{pgn:S.pgn,meta:S.meta||{},source:"pgn"};
+  if(!S.blank&&!S.position&&!S.analyzing&&!S.analysisError&&completeAnalysis(S,S.total+1))job.analysis={
     pgn:S.pgn,settingsKey:analysisSettingsKey(),engineBuild:S.activeEngineBuild,
     panelNeedsLive:!!S._panelNeedsLive,evals:S.evals,bests:S.bests,multipv:S.analyzedMultipv,
   };
@@ -7942,8 +7957,8 @@ function gotoVar(idx) {
 function variationStep(delta) {
   const v = S.variation; if (!v) return;
   const ni = v.idx + delta;
-  if (ni <= 0) { exitAnalysis(v.branchIdx); return; }   // back before the branch → exit mode
-  if (ni >= v.positions.length) return;                  // no more variation moves
+  if (ni <= 0 && !S.position) { exitAnalysis(v.branchIdx); return; }   // back before the branch → exit mode
+  if (ni < 0 || ni >= v.positions.length) return;                  // no more variation moves
   v.idx = ni;
   S.selectedSq = null;
   paintBoard();
@@ -8010,7 +8025,7 @@ document.addEventListener("keydown", (e) => {
   else if (e.key === "ArrowRight") navNext();
   else if (e.key === "Home") { if (S.analysisMode) gotoVar(0); else gotoMainline(0); }
   else if (e.key === "End") { if (S.analysisMode) gotoVar(S.variation.positions.length - 1); else gotoMainline(S.total); }
-  else if (e.key === "Escape") { if (S.analysisMode) exitAnalysis(); }
+  else if (e.key === "Escape") { if (S.analysisMode && !S.position) exitAnalysis(); }
   else if (e.key === "f" && !e.ctrlKey && !e.metaKey) toggleFlip(); // Ctrl+F must not flip the board
 });
 
@@ -8025,6 +8040,7 @@ document.addEventListener("keydown", (e) => {
 let _reanalyzeT = null;
 function scheduleReanalyze(preserveCompleted = false) {
   clearTimeout(_reanalyzeT);
+  if(S.position){void requestLiveEval();return;}
   if(S.blank)return;
   _reanalyzeT = setTimeout(() => {
     startAnalysis({preserveCompleted});
@@ -8049,7 +8065,7 @@ function requestProgress(gen) {
   setTimeout(() => flushProgress(gen), Math.max(0, 140 - (Date.now() - _progLast)));
 }
 async function startAnalysis({preserveCompleted = false} = {}) {
-  if(S.blank)return;
+  if(S.blank||S.position)return;
   stopPanelPrecalculation();
   S.progressiveAccuracy = true;
   if (S.practice) exitPractice();
@@ -8196,7 +8212,7 @@ async function startAnalysis({preserveCompleted = false} = {}) {
 
 /* ---------------- Render everything ---------------- */
 function renderAll() {
-  UI.meta.replaceChildren(...(S.blank?[]:metaChips()));
+  UI.meta.replaceChildren(...(S.blank||S.position?[]:metaChips()));
   buildBoard();
   renderEvalBar();
   renderPlayers();
@@ -8212,6 +8228,7 @@ function renderAll() {
 function setBlankWorkspace(blank) {
   S.blank=blank;
   for(const button of document.querySelectorAll('[data-game-action]'))button.hidden=blank;
+  for(const button of document.querySelectorAll('[data-review-action]'))button.hidden=blank||!!S.position;
 }
 function showBlankWorkspace() {
   S.analyzing=false;S.pgn="";S.total=0;S.idx=0;
@@ -8224,6 +8241,137 @@ function showBlankWorkspace() {
   renderAll();
 }
 
+/* ---------------- Standalone positions ----------------
+   A position is a game without moves. The editor rests on the blank workspace, and analyzing
+   hands the position to the variation path, which already drives the board, engine panel,
+   arrows, sounds, move badges and live evaluation. */
+let positionEditor = null;
+function stopPositionAnalysis() {
+  stopLineWalk();
+  S.analysisMode = false; S.variation = null; S.selectedSq = null; S.userArrows = []; S.userMarks = []; S.liveToken++;
+  S.liveEngine?.cancelPending(); S.liveEngine?.stop();
+}
+function closePositionTool() {
+  positionEditor?.dispose(); positionEditor = null;
+  S.position = null;
+  UI.canvas.classList.remove("position-stacked");
+}
+function positionEditorBox() {
+  const base = UI.canvas.getBoundingClientRect(), board = UI.boardWrap.getBoundingClientRect();
+  const all = [...UI.canvas.querySelectorAll(".mod")].filter(mod => !["board", "evalbar", "coach"].includes(mod.dataset.mod))
+    .map(mod => mod.getBoundingClientRect()).filter(rect => rect.width > 1 && rect.height > 1);
+  // Beside the board on desktops; below it where the layout stacks.
+  const beside = all.filter(rect => rect.left >= board.right - 1), stacked = !beside.length;
+  const rects = stacked ? all.filter(rect => rect.top >= board.bottom - 1) : beside;
+  UI.canvas.classList.toggle("position-stacked", stacked);
+  if (!rects.length) return null;
+  const left = Math.min(...rects.map(rect => rect.left)), top = Math.min(...rects.map(rect => rect.top));
+  const width = Math.max(...rects.map(rect => rect.right)) - left, height = Math.max(...rects.map(rect => rect.bottom)) - top;
+  return { left: left - base.left, top: top - base.top, width, height, fit: stacked || height > board.height * 1.4 };
+}
+function openPositionEditor(fen, flipped = S.flipped) {
+  closePositionTool();
+  stopPositionAnalysis();
+  S.position = { editing: true };
+  S.flipped = flipped;
+  showBlankWorkspace();
+  document.title = "Set up position — Chess Review";
+  positionEditor = new PositionEditor({ document, stage: UI.canvas, fen, makePiece, squareAt: squareFromEvent,
+    squares: () => sqByName, board: () => UI.boardWrap.querySelector(".board"),
+    flipped: () => S.flipped, pieceStyle: () => S.settings.pieceStyle, motion: () => S.settings.uiAnim !== false,
+    setFlipped: value => { S.flipped = value; buildBoard(); renderPlayers(); positionEditor?.render(); },
+    paint: next => { S.positions = [{ fen: next }]; paintBoard(); },
+    sound: playSanSound, blocked: () => !!learningWorkspace, box: positionEditorBox,
+    analyze: analyzePosition, openGame: openPositionGame,
+    close: () => { closePositionTool(); showBlankWorkspace(); },
+  });
+}
+function analyzePosition(fen) {
+  closePositionTool();
+  S.position = { editing: false };
+  setBlankWorkspace(false);
+  Object.assign(S, { pgn: "", total: 0, idx: 0, analyzing: false, liveError: null, selectedSq: null,
+    positions: [{ fen, san: null }], evals: [null], bests: [null], searchPreviews: [null], analysisMode: true,
+    variation: { branchIdx: 0, positions: [{ fen, san: null, eval: null, best: null }], idx: 0 } });
+  document.title = "Position — Chess Review";
+  window.history.replaceState(null, "", "?" + new window.URLSearchParams({ workspace: "position", fen, flipped: S.flipped ? "1" : "0", analyze: "1" }));
+  renderAll();
+  void requestLiveEval();
+  revealPositionPanels();
+  // Move badges need the review's book and calibration. The editor never does.
+  void Promise.all([loadBook(), loadCalibration().catch(() => null)]).then(() => { if (S.position && !S.blank) refreshVariation(); });
+}
+function revealPositionPanels() {
+  if (S.settings.uiAnim === false || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+  for (const [index, mod] of [...UI.canvas.querySelectorAll('.mod:not([data-mod="board"], [data-mod="evalbar"])')].entries())
+    mod.animate?.([{ opacity: 0, translate: "0 8px" }, { opacity: 1, translate: "0 0" }],
+      { duration: 440, delay: Math.min(index * 24, 144), easing: "cubic-bezier(.16, 1, .3, 1)", fill: "backwards" });
+}
+async function openPositionGame(pgn) {
+  try { await applyGame({ pgn, meta: {}, analysis: null }); }
+  catch (error) { toast(error.message); }
+}
+function editPosition() { openPositionEditor(activePos().fen); }
+function openPositionTool() {
+  if (positionEditor) return;
+  if (S.position) { editPosition(); return; }
+  if (S.blank) { openPositionEditor(new Chess().fen()); return; }
+  const params = new window.URLSearchParams({ workspace: "position", fen: activePos().fen, flipped: S.flipped ? "1" : "0" });
+  void browserAPI.tabs.create({ url: _url("analysis.html") + "?" + params });
+}
+function showPositionWorkspace({ fen, flipped, analyze }) {
+  let start = new Chess().fen();
+  try { if (fen) start = setupFen(importPosition(fen).setup); } catch (error) { toast("Could not open that position: " + error.message); analyze = false; }
+  S.flipped = !!flipped;
+  S.blank = true;
+  showBlankWorkspace();
+  if (analyze) analyzePosition(start);
+  else openPositionEditor(start);
+}
+document.addEventListener("paste", event => {
+  if (!S.position || S.blank || learningWorkspace) return;
+  const image = [...event.clipboardData?.items || []].find(item => item.type.startsWith("image/"));
+  if (!image) return;
+  event.preventDefault();
+  const file = image.getAsFile();
+  editPosition();
+  void positionEditor.importImage(file);
+});
+function positionNote() {
+  const chess = new Chess(activePos().fen), side = chess.turn() === "w" ? "White" : "Black";
+  if (chess.isCheckmate()) return `Checkmate. ${side === "White" ? "Black" : "White"} wins.`;
+  if (chess.isStalemate()) return "Stalemate.";
+  if (chess.isInsufficientMaterial()) return "Draw by insufficient material.";
+  return S.variation?.idx ? `Exploring a line. ${side} to move.` : `${side} to move. Play a move to explore it.`;
+}
+function downloadPositionPgn() {
+  const chess = new Chess(S.variation.positions[0].fen);
+  for (const node of S.variation.positions.slice(1, S.variation.idx + 1)) chess.move({ from: node.from, to: node.to, promotion: node.promotion || undefined });
+  const url = URL.createObjectURL(new window.Blob([chess.pgn()], { type: "text/plain" }));
+  el("a", { href: url, download: "position.pgn" }).click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function positionHead() {
+  const node = activePos(), cfg = node.classif && QUALITY[node.classif], head = el("div", { class: "ip-head" });
+  if (cfg) head.append(gradeBadge(node.classif, activeMoveGrade(), "ip-badge"), el("span", { class: "ip-move" }, `${node.san} · ${categoryName(node.classif)}`));
+  return head;
+}
+function positionSummary() {
+  return el("div", { class: "panel position-summary" },
+    el("div", { class: "panel-head" }, el("h3", {}, "Position")),
+    el("div", { class: "position-summary-body" },
+      el("p", { class: "position-summary-fen" }, activePos().fen),
+      positionActions(),
+      el("p", { class: "position-summary-hint" }, "Paste a new screenshot with Ctrl+V to read another board.")));
+}
+function positionActions() {
+  return el("div", { class: "position-review-actions" },
+    el("button", { type: "button", class: "engine-bestwalk", onclick: async ev => {
+      await navigator.clipboard.writeText(activePos().fen).then(() => toast("FEN copied.", ev.currentTarget), () => toast("Could not reach the clipboard."));
+    } }, "Copy FEN"),
+    el("button", { type: "button", class: "engine-bestwalk", onclick: downloadPositionPgn }, "Save PGN"));
+}
+
 /* ---------------- Load / switch a game ----------------
    Loads a game's data into the already-built UI and renders it. Used both for the first load
    and for switching to another library game in place — no page reload, so there's no black flash
@@ -8231,7 +8379,7 @@ function showBlankWorkspace() {
 async function applyGame(payload) {
   const positions = buildPositions(payload.pgn);
   if (positions.length < 2) throw new Error("Load a game with moves to review. Standalone positions are not supported.");
-  const wasBlank=S.blank, selection=++_librarySelection;
+  const wasBlank=S.blank||!!S.position, selection=++_librarySelection;
   const inferredName = await rememberAnalyzedGame(payload, browserAPI.storage.local);
   if(selection!==_librarySelection)return;
   const automaticIdentity = !!historyGame(payload) || payload.meta?.identityMode === "automatic" || (!payload.meta?.myName && payload.meta?.playerKnown == null);
@@ -8240,7 +8388,7 @@ async function applyGame(payload) {
     await Promise.all([loadBook(),loadCalibration().catch(error=>{console.warn(error);return null;})]);
     if(selection!==_librarySelection)return;
   }
-  if(wasBlank){setBlankWorkspace(false);renderCoachAvatar();}
+  if(wasBlank){closePositionTool();setBlankWorkspace(false);renderCoachAvatar();}
   _cancelPromotion?.();
   _cancelBoardDrag?.();
 
@@ -8408,7 +8556,7 @@ async function showReadyWorkspace() {
     }
     else await resetSettingsForRelease({ reason: "startup" });
     // Load review data alongside the job and preferences while the startup mark is visible.
-    const dataReady = blankLaunch&&!location.hash&&!screenPreview ? Promise.resolve()
+    const dataReady = (blankLaunch||positionLaunch)&&!location.hash&&!screenPreview ? Promise.resolve()
       : Promise.all([loadBook(), loadCalibration().catch(error => {console.warn(error);return null;})]);
     const [payload, store] = await Promise.all([loadJob(), browserAPI.storage.local.get(["settings", "username", "layout", "layoutMode", "layoutVersion", "library"])]);
     S.library = Array.isArray(store.library) ? store.library : [];
@@ -8497,7 +8645,7 @@ async function showReadyWorkspace() {
       await Promise.all([loadBook(),loadCalibration().catch(error=>{console.warn(error);return null;})]);
     // Resolve any stored analysis for this game by id (same derivation as currentGameId(), but from
     // the payload since S isn't populated yet) so applyGame() needs no lookup await of its own.
-    if (payload.source!=="blank"&&!("analysis" in payload)) {
+    if (payload.source!=="blank"&&payload.source!=="position"&&!("analysis" in payload)) {
       let saved = null;
       try {
         const k = "analysis:" + ((payload.meta && (payload.meta.gameId || payload.meta.libraryId)) || ("pgn:" + simpleHash(payload.pgn || "")));
@@ -8508,7 +8656,8 @@ async function showReadyWorkspace() {
     }
     S.blank=payload.source==="blank"&&((blankLaunch&&!location.hash)||screenPreview?.id==="workspace-blank"||screenPreview?.viewport===true);
     buildUI();               // built once; switching games re-uses it (no full page reload)
-    if(S.blank)showBlankWorkspace();
+    if(payload.source==="position")showPositionWorkspace(payload);
+    else if(S.blank)showBlankWorkspace();
     else await applyGame(payload);
     // Fit and reveal the board as soon as it can paint; engine analysis continues normally.
     await initTabZoom();
@@ -8518,7 +8667,7 @@ async function showReadyWorkspace() {
     if (jobId && rememberReviewJob()) {
       await browserAPI.storage.local.remove(`job:${jobId}`);
     }
-    if (!screenPreview) learningAnnouncement = mountLearningAnnouncement({document, storage:browserAPI.storage.local,
+    if (!screenPreview&&!positionEditor) learningAnnouncement = mountLearningAnnouncement({document, storage:browserAPI.storage.local,
       motion:()=>S.settings.uiAnim!==false});
     if(screenPreview?.viewport){
       if(!S.blank&&Number.isInteger(screenPreview.idx))go(screenPreview.idx);

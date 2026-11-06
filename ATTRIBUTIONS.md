@@ -128,6 +128,17 @@ Distributed by Lichess (lila); high-quality vector SVGs.
 - **Source:** `lichess-org/chess-openings`
 - **License:** CC0 (public domain) — https://github.com/lichess-org/chess-openings
 
+## Board screenshot recognition
+
+The board finder (`lib/fenshot/`), the tile classifier weights
+(`lib/board-model.bin`) and the rescan logic in `lib/board-scan.js` come from
+[fenshot](https://github.com/scoriiu/fenshot) 0.1.5 by Sortino Labs S.R.L., MIT
+License. Its board finder is a port of `chessboard_finder.py` from
+[Elucidation/tensorflow_chessbot](https://github.com/Elucidation/tensorflow_chessbot)
+(MIT). The weights are unchanged and were extracted from `chess-tiles-v2.onnx`.
+`lib/board-model.js` is a dependency-free reimplementation of that network, checked
+against the official ONNX runtime in `tests/board-scan.test.mjs`.
+
 ## Chess logic library
 - **File:** `lib/chess.js`
 - **Author:** Jeff Hlywa — **License:** BSD 2-Clause

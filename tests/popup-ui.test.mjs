@@ -48,18 +48,25 @@ test('Cancel import immediately enables retry and ignores the canceled operation
   requests[1].job.resolve();await settle();assert.equal(closed,1);assert.equal(start.disabled,false);
 });
 
-function popup(t,{supported=false,preview=false,open=async()=>{},current=async()=>{},manual=async()=>{},save=async()=>{}}={}) {
+function popup(t,{supported=false,preview=false,open=async()=>{},current=async()=>{},manual=async()=>{},save=async()=>{},position=async()=>{}}={}) {
   const html=fs.readFileSync(new URL('../popup.html',import.meta.url),'utf8');
   const source=fs.readFileSync(new URL('../popup.js',import.meta.url),'utf8').replace(/^import .*;\r?\n/gm,'');
   const dom=new JSDOM(html,{url:'https://extension.test/popup.html'+(preview?'?screen-preview=popup':'')});
   let closed=0;t.after(()=>dom.window.close());dom.window.close=()=>{closed++;};
   const context=vm.createContext({document:dom.window.document,window:dom.window,console,createImportRequest,mountFluidActions,
-    browserAPI:{storage:{local:{async get(){return {};},set:save}},tabs:{async query(){return [{url:supported?'https://lichess.org/AAAAAAAA':'https://example.test'}];}}},
+    browserAPI:{runtime:{getURL:path=>'https://extension.test/'+path},storage:{local:{async get(){return {};},set:save}},tabs:{create:position,async query(){return [{url:supported?'https://lichess.org/AAAAAAAA':'https://example.test'}];}}},
     isSupportedChessUrl:()=>supported,openBlankWorkspaceTab:open,analyzeActiveTab:current,
     parseGameId:value=>value.includes('/game/')?{id:'12345678'}:null,analyzeChesscomUrl:manual});
   vm.runInContext(source,context);
   return {dom,doc:dom.window.document,closed:()=>closed};
 }
+
+test('position editor opens from the popup and is disabled during other imports',async t=>{
+  const tabs=[],pending=deferred(),p=popup(t,{position:async options=>{tabs.push(options);},open:()=>pending.promise});await settle();
+  p.doc.getElementById('openWorkspace').click();assert.equal(p.doc.getElementById('openPosition').disabled,true);
+  p.doc.getElementById('cancelImport').click();p.doc.getElementById('openPosition').click();await settle();
+  assert.equal(tabs.length,1);assert.equal(tabs[0].url,'https://extension.test/analysis.html?workspace=position');assert.equal(p.closed(),1);pending.resolve();await settle();
+});
 
 test('a supported chess page keeps both actions available until the user chooses',async t=>{
   let reviews=0,workspaces=0;const p=popup(t,{supported:true,current:async()=>{reviews++;},open:async()=>{workspaces++;}});await settle();

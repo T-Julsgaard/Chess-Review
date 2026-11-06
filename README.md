@@ -139,6 +139,32 @@ Engine explanations and Special replies are alternative reply styles: turning
 either on switches the other off. Dopamine keeps engine explanations by default
 until you explicitly choose a reply style in Coach settings.
 
+## Set up and analyze a position
+
+Choose **Set up position** in the extension popup, or use the board button in the
+top bar, to open the position editor in the review workspace. A review tab opens
+the current position in a new tab, so its game stays where it is. Drag pieces on
+the board, drag or click them from the palette, right-click to erase, and set the
+side to move, castling rights and en-passant square. Paste or open a FEN to fill
+the board. A PGN with moves opens as a normal game review.
+
+To read a board from a stream or website, paste a screenshot with Ctrl+V, drop it
+on the page, or choose a file (PNG, JPEG or WebP). The board is found anywhere in
+the image and read by a small neural network trained on many chess.com and
+Lichess piece sets, including under highlights, arrows and stream compression.
+Doubtful squares are marked for you to check. If the last move is highlighted, it
+also shows whose turn it is. Otherwise, set the turn yourself: an image cannot
+show the side to move, castling history or en passant for certain. In sparse
+endgames **Swap sides** corrects a board read from the wrong side, and **Adjust
+frame** lets you frame the board by hand. Images never leave your device and are
+not stored, and the recognition files only load when you import a screenshot.
+
+**Analyze position** moves into the normal workspace: local Stockfish, engine
+lines, best-move arrow, evaluation bar, move sounds, animations and move grades in
+both Normal and Dopamine modes. Play moves for either side to explore a line, and
+paste another screenshot at any time to read a new board. A standalone position
+has no game accuracy or estimated ratings.
+
 ## Scoring and reproducibility
 
 Chess Review is open source and uses local Stockfish analysis with documented
