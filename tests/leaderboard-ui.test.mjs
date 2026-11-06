@@ -153,9 +153,12 @@ for(const leave of [false,true])test(`leaderboard entrance keeps its clicked foo
   const rect=(left,top,width,height)=>({left,right:left+width,top,bottom:top+height,width,height,x:left,y:top});
   t.mock.method(dom.window.HTMLElement.prototype,'getBoundingClientRect',function(){
     if(this.matches('.puzzle-mode-button'))return rect(421,104,178,158);
+    if(this.matches('.puzzle-mode-surface'))return rect(420,100,180,254);
     if(this.matches('.puzzle-mode'))return rect(420,100,180,254);
     if(this.matches('.puzzle-mode-grid'))return rect(0,100,600,254);
-    if(this.matches('.leaderboard-hero'))return rect(0,100,600,164);
+    // The banner lands above the grid it grew from: the leaderboard's heading
+    // is shorter than the overview's, as it is in the real layout.
+    if(this.matches('.leaderboard-hero'))return rect(0,88,600,164);
     return rect(0,0,600,700);
   });
   dom.window.Element.prototype.animate=function(frames,options){
@@ -171,8 +174,11 @@ for(const leave of [false,true])test(`leaderboard entrance keeps its clicked foo
   assert.equal(section.querySelectorAll('tbody tr').length,0,'A fast result does not detach an animating hero');
   for(const {frames} of animations)for(const frame of frames){assert.equal('width' in frame,false);assert.equal('marginLeft' in frame,false);}
   const first=animations.find(a=>a.node===hero).frames[0];
-  assert.equal(first.clipPath,`inset(0 ${1/600*100}% ${6/164*100}% ${421/600*100}% round 13px)`);
-  assert.equal(first.transform,'translateY(4px)','Reveal starts at the visible colored button, including its pressed offset and border');
+  assert.equal(first.clipPath,`inset(0 0% ${2/164*100}% ${420/600*100}% round 13px)`);
+  assert.equal(first.transform,'translateY(12px)','Reveal starts at the pressed ticket’s colored head, hairline rule included');
+  const backdrop=section.querySelector('.leaderboard-backdrop');
+  assert.deepEqual(animations.filter(a=>a.node===backdrop).map(a=>a.frames.at(-1).transform).filter(Boolean),['translateY(-12px)'],
+    'The fading overview rides up with the banner, so no ticket head is left showing beneath it');
   if(leave)w.returnFromLeaderboard();else finishHero();
   await pending;
   assert.equal(w.root.querySelector('.leaderboard-backdrop'),null);

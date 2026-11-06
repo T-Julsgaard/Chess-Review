@@ -22,15 +22,30 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
         await call('Input.dispatchMouseEvent',{type:'mouseMoved',...pointer},review.sessionId);await sleep(300);
         await call('Input.dispatchMouseEvent',{type:'mousePressed',button:'left',clickCount:1,...pointer},review.sessionId);await sleep(80);
         const entrance=await run(`import('./analysis.js').then(({learningWorkspace:w})=>{
-          const source=document.querySelector('.puzzle-mode[data-mode="${mode}"] .puzzle-mode-button').getBoundingClientRect(),expected=[source.x,source.y,source.width,source.height];
+          // The reveal starts at the ticket's colored head: the button plus the
+          // surface's own hairline rule around it.
+          const head=m=>{const b=m.querySelector('.puzzle-mode-button').getBoundingClientRect(),s=m.querySelector('.puzzle-mode-surface').getBoundingClientRect();
+            return [s.x,s.y,s.width,b.bottom-s.y];};
+          const expected=head(document.querySelector('.puzzle-mode[data-mode="${mode}"]'));
           window.leaderboardOpening=w.showLeaderboard('${mode}');const hero=window.openingHero=document.querySelector('.leaderboard-hero'),backdrop=document.querySelector('.leaderboard-backdrop'),button=backdrop?.querySelector('[data-focus=leaderboard-${mode}]');
           // Hold the whole reveal, hero and travelling content alike, at its
           // first frame: the title and drawing must still be on the ticket.
           const title=hero.querySelector('h3'),art=hero.querySelector('.puzzle-mode-art');
-          const held=[hero,title,art].flatMap(node=>node.getAnimations());held.forEach(a=>{a.pause();a.currentTime=0;});
+          const held=[hero,title,art,backdrop].flatMap(node=>node.getAnimations());held.forEach(a=>{a.pause();a.currentTime=0;});
           const r=hero.getBoundingClientRect(),clip=getComputedStyle(hero).clipPath.slice(6).split(' round')[0].split(' ').map(parseFloat),[top,right,bottom,left]=clip;
           const actual=[r.x+r.width*left/100,r.y,r.width*(1-(left+right)/100),r.height*(1-bottom/100)];
-          const original=backdrop.querySelector('.puzzle-mode[data-mode="${mode}"] .puzzle-mode-button').getBoundingClientRect(),fading=[original.x,original.y,original.width,original.height];
+          const fading=head(backdrop.querySelector('.puzzle-mode[data-mode="${mode}"]'));
+          // Step the whole reveal: no ticket head may surface from under the
+          // rising banner, and no ticket edge may show above it.
+          // The pressed ticket sits a pixel lower than its neighbours while the
+          // button is held, so only it can say where the banner's top belongs.
+          const pressed=backdrop.querySelector('.puzzle-mode[data-mode="${mode}"] .puzzle-mode-surface');
+          const seam=[0,40,110,180,300].map(ms=>{held.forEach(a=>{a.currentTime=ms;});
+            const h=hero.getBoundingClientRect(),inset=getComputedStyle(hero).clipPath.slice(6).split(' round')[0].split(' ').map(parseFloat);
+            const lower=h.top+h.height*(1-inset[2]/100);let below=-Infinity;
+            for(const m of backdrop.querySelectorAll('.puzzle-mode'))below=Math.max(below,m.querySelector('.puzzle-mode-button').getBoundingClientRect().bottom-lower);
+            return [ms,+below.toFixed(2),+(h.top-pressed.getBoundingClientRect().top).toFixed(2)];});
+          held.forEach(a=>{a.currentTime=0;});
           // Visual bounds: a title's ink, and a drawing's rendered viewBox.
           const visual=node=>{const box=node.viewBox?.baseVal;
             if(box?.width&&box.height){const b=node.getBoundingClientRect(),fit=Math.min(b.width/box.width,b.height/box.height);
@@ -39,9 +54,13 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
           const ticket=backdrop.querySelector('.puzzle-mode[data-mode="${mode}"]');
           const carried=[[title,ticket.querySelector('.puzzle-mode-name')],[art,ticket.querySelector('.puzzle-mode-art')]]
             .map(([node,home])=>({from:visual(node),home:visual(home),hidden:getComputedStyle(home).opacity}));
-          held.forEach(a=>a.play());return {expected,actual,fading,carried,frames:hero.getAnimations().map(a=>a.effect.getKeyframes().map(f=>({clipPath:f.clipPath,transform:f.transform}))),footerFits:!backdrop||button.getBoundingClientRect().bottom<=backdrop.getBoundingClientRect().bottom+2};})`);
+          held.forEach(a=>a.play());return {expected,actual,fading,carried,seam,frames:hero.getAnimations().map(a=>a.effect.getKeyframes().map(f=>({clipPath:f.clipPath,transform:f.transform}))),footerFits:!backdrop||button.getBoundingClientRect().bottom<=backdrop.getBoundingClientRect().bottom+2};})`);
         await call('Input.dispatchMouseEvent',{type:'mouseReleased',button:'left',clickCount:1,...pointer},review.sessionId);
-        for(const key of ['actual','fading'])entrance[key].forEach((value,index)=>assert.ok(Math.abs(value-entrance.expected[index])<.5,`${mode}/${width}/${theme}: ${key} starts at the pressed colored button`));
+        for(const key of ['actual','fading'])entrance[key].forEach((value,index)=>assert.ok(Math.abs(value-entrance.expected[index])<.5,`${mode}/${width}/${theme}: ${key} starts at the pressed ticket's colored head`));
+        for(const [ms,below,above] of entrance.seam) {
+          assert.ok(below<=.5,`${mode}/${width}/${theme}: a ticket head shows ${below}px beneath the banner at ${ms}ms`);
+          assert.ok(above<=.5,`${mode}/${width}/${theme}: a ticket edge shows ${above}px above the banner at ${ms}ms`);
+        }
         // The hero's title and drawing travel out of the ticket's own, which
         // is why the overview's copies are hidden rather than left behind.
         entrance.carried.forEach(({from,home,hidden},index)=>{
