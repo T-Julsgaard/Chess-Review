@@ -139,6 +139,14 @@ Engine explanations and Special replies are alternative reply styles: turning
 either on switches the other off. Dopamine keeps engine explanations by default
 until you explicitly choose a reply style in Coach settings.
 
+## Practice your mistakes
+
+**Practice your mistakes** stays in the review panel on every move. The board jumps
+to each mistake quickly, even in a long game, replays what you played, and asks you
+to find something better. After a correct answer it stays there and explains why
+the move is stronger and what your move allowed. **Show line** plays the engine's
+follow-up on the board, and **Next mistake** (or Enter) moves on when you are ready.
+
 ## Scoring and reproducibility
 
 Chess Review is open source and uses local Stockfish analysis with documented
