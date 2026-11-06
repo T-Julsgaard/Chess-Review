@@ -27,6 +27,9 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
           const head=m=>{const b=m.querySelector('.puzzle-mode-button').getBoundingClientRect(),s=m.querySelector('.puzzle-mode-surface').getBoundingClientRect();
             return [s.x,s.y,s.width,b.bottom-s.y];};
           const expected=head(document.querySelector('.puzzle-mode[data-mode="${mode}"]'));
+          // Where the head sits inside the overview page, so the banner's own
+          // place inside the leaderboard page can be compared free of scroll.
+          const band=[expected[1]-document.querySelector('.learn-puzzles').getBoundingClientRect().top,expected[3]];
           window.leaderboardOpening=w.showLeaderboard('${mode}');const hero=window.openingHero=document.querySelector('.leaderboard-hero'),backdrop=document.querySelector('.leaderboard-backdrop'),button=backdrop?.querySelector('[data-focus=leaderboard-${mode}]');
           // Hold the whole reveal, hero and travelling content alike, at its
           // first frame: the title and drawing must still be on the ticket.
@@ -54,7 +57,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
           const ticket=backdrop.querySelector('.puzzle-mode[data-mode="${mode}"]');
           const carried=[[title,ticket.querySelector('.puzzle-mode-name')],[art,ticket.querySelector('.puzzle-mode-art')]]
             .map(([node,home])=>({from:visual(node),home:visual(home),hidden:getComputedStyle(home).opacity}));
-          held.forEach(a=>a.play());return {expected,actual,fading,carried,seam,frames:hero.getAnimations().map(a=>a.effect.getKeyframes().map(f=>({clipPath:f.clipPath,transform:f.transform}))),footerFits:!backdrop||button.getBoundingClientRect().bottom<=backdrop.getBoundingClientRect().bottom+2};})`);
+          held.forEach(a=>a.play());return {expected,actual,fading,carried,seam,band,frames:hero.getAnimations().map(a=>a.effect.getKeyframes().map(f=>({clipPath:f.clipPath,transform:f.transform}))),footerFits:!backdrop||button.getBoundingClientRect().bottom<=backdrop.getBoundingClientRect().bottom+2};})`);
         await call('Input.dispatchMouseEvent',{type:'mouseReleased',button:'left',clickCount:1,...pointer},review.sessionId);
         for(const key of ['actual','fading'])entrance[key].forEach((value,index)=>assert.ok(Math.abs(value-entrance.expected[index])<.5,`${mode}/${width}/${theme}: ${key} starts at the pressed ticket's colored head`));
         for(const [ms,below,above] of entrance.seam) {
@@ -84,6 +87,12 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
         await sleep(100);
         assert.deepEqual(await run("[...document.querySelectorAll('.leaderboard-hero h3,.leaderboard-hero .puzzle-mode-art')].map(n=>getComputedStyle(n).transform)"),['none','none'],
           `${mode}/${width}/${theme}: the travelled title and drawing settle with no transform left on them`);
+        // The banner is the row of ticket heads, widened: it must come to rest
+        // on their own top and bottom lines, differing only in width.
+        const settled=await run("(()=>{const s=document.querySelector('.learn-leaderboard').getBoundingClientRect(),b=document.querySelector('.leaderboard-hero').getBoundingClientRect();return [b.top-s.top,b.height,b.width];})()");
+        for(const [index,edge] of [[0,'top line'],[1,'height']])assert.ok(Math.abs(settled[index]-entrance.band[index])<1.5,
+          `${mode}/${width}/${theme}: the banner settles off the ticket head's ${edge} (${settled[index]} vs ${entrance.band[index]})`);
+        assert.ok(settled[2]>entrance.expected[2]*1.5,`${mode}/${width}/${theme}: the banner is wider than the ticket head it grew from`);
         const loadingHeight=await run("document.querySelector('.leaderboard-table-wrap').getBoundingClientRect().height");
         await run('window.finishLeaderboardRead();window.leaderboardOpening');await sleep(100);
         const loadedHeight=await run("document.querySelector('.leaderboard-table-wrap').getBoundingClientRect().height");

@@ -53,7 +53,7 @@
 .learn-entry-button.is-activating svg { animation: learning-toggle-book .46s both; }
 .learn-entry-button.is-activating .learn-entry-label { animation: learning-toggle-label-back .3s cubic-bezier(.16, 1, .3, 1); }
 .learn-entry-button.is-activating::after { animation: learning-toggle-shine-back .46s both; }
-.learning-workspace { position: fixed; inset: 0; z-index: 2000; overflow-y: auto; background: var(--bg); color: var(--ink); animation: learn-enter .22s ease-out; }
+.learning-workspace { position: fixed; inset: 0; z-index: 2000; overflow-y: auto; background: var(--bg); color: var(--ink); animation: learn-enter .22s ease-out; --mode-head: 158px; }
 .learn-header { min-height: 76px; display: flex; gap: 16px; align-items: center; justify-content: space-between; padding: 16px clamp(16px,4vw,64px); border-bottom: 1px solid var(--line); background: var(--panel); }
 .learn-brand { display: flex; gap: 12px; align-items: center; font-size: clamp(16px,2vw,22px); font-weight: 750; letter-spacing: -.4px; }
 .learn-brand img { width: 38px; height: 38px; }
@@ -316,7 +316,7 @@
 .learning-workspace .learn-category { margin: 28px 0; }
 .learning-workspace .learn-category > h3 { margin: 0; color: var(--ink-2); font-size: 18px; font-weight: 600; }
 .learn-puzzle-start { padding: 8px 0 28px; border-bottom: 1px solid var(--line); }
-.learning-workspace .learn-puzzle-start h2 { font-size: 32px; margin: 0; }
+.learning-workspace :is(.learn-puzzle-start,.learn-leaderboard) h2 { font-size: 32px; margin: 0; }
 .learning-workspace .learn-puzzle-start > .primary { min-width: 200px; padding: 14px 24px; }
 .learn-puzzle-heading { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 12px 16px; }
 .learn-puzzle-heading > h2 { grid-column: 1; grid-row: 1; }
@@ -413,8 +413,8 @@
   width: 100%;
   min-width: 0;
   white-space: normal;
-  height: 158px;
-  min-height: 158px;
+  height: var(--mode-head,158px);
+  min-height: var(--mode-head,158px);
   flex-shrink: 0;
   padding: 12px 12px 14px;
   overflow: hidden;
@@ -448,7 +448,8 @@
 .puzzle-mode:has(button:active:not(:disabled)) .puzzle-mode-surface { transform: translateY(1px); box-shadow: none; }
 @media (max-width: 420px) {
   .puzzle-mode-grid { gap: 7px; }
-  .learning-workspace .puzzle-mode-button { padding: 10px 8px 12px; height: 148px; min-height: 148px; }
+  .learning-workspace { --mode-head: 148px; }
+  .learning-workspace .puzzle-mode-button { padding: 10px 8px 12px; }
   .mode-ticket-label { font-size: 7px; letter-spacing: .6px; }
   .puzzle-mode-name { min-height: 30px; font-size: 12px; }
   .puzzle-mode-info { padding-inline: 8px; }
@@ -466,7 +467,7 @@
 /* Shared online rankings, with the same stock colors as the arcade tickets. */
 .learning-workspace .puzzle-leaderboard-button { width: 100%; border: 0; border-top: 1px solid var(--line); border-radius: 0 0 12px 12px; padding: 8px 4px; min-height: 32px; font-size: 11px; font-weight: 650; background: color-mix(in srgb,var(--mode-stock) 10%,var(--panel)); color: var(--ink); }
 .learning-workspace .puzzle-leaderboard-button:hover { background: color-mix(in srgb,var(--mode-stock) 23%,var(--panel)); }
-.learn-leaderboard { --mode-stock: #bbd58c; min-width: 0; position: relative; }
+.learn-leaderboard { --mode-stock: #bbd58c; min-width: 0; position: relative; padding-top: 8px; }
 .learn-leaderboard .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .learning-workspace .learn-leaderboard #leaderboard-title { margin: 0; outline: none; }
 .leaderboard-backdrop { position: absolute; left: 0; width: 100%; margin-top: 0; pointer-events: none; overflow: hidden; z-index: 0; }
@@ -477,7 +478,7 @@
 .leaderboard-returning .learn-puzzle-heading h2 { margin: 0; }
 .learn-leaderboard[data-mode="timeAttack"] { --mode-stock: #edc278; }
 .learn-leaderboard[data-mode="knockout"] { --mode-stock: #eaa18e; }
-.leaderboard-hero { display: flex; align-items: center; justify-content: space-between; gap: 16px; box-sizing: border-box; width: 100%; min-height: 164px; margin-top: 24px; padding: 24px 28px; border-radius: 13px; background: var(--mode-stock); color: #26291f; overflow: hidden; box-shadow: inset 0 1px 0 #fff5; }
+.leaderboard-hero { display: flex; align-items: center; justify-content: space-between; gap: 16px; box-sizing: border-box; width: 100%; min-height: calc(var(--mode-head,158px) + 1px); margin-top: 24px; padding: 24px 28px; border-radius: 13px; background: var(--mode-stock); color: #26291f; overflow: hidden; box-shadow: inset 0 1px 0 #fff5; }
 .leaderboard-hero-copy { min-width: 0; }
 .leaderboard-eyebrow { font-size: 9px; font-weight: 750; letter-spacing: 1.5px; }
 .learn-leaderboard .leaderboard-hero h3 { margin: 8px 0; font-size: clamp(23px,3vw,30px); font-weight: 750; letter-spacing: -.8px; white-space: nowrap; }
@@ -571,7 +572,7 @@
 .learn-leaderboard.leaderboard-entering :is(.leaderboard-table-wrap,.leaderboard-toolbar,.leaderboard-pagination,.leaderboard-player,.leaderboard-connect) { animation: leaderboard-arrive .32s .22s both; }
 @keyframes leaderboard-arrive { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 420px) {
-  .leaderboard-hero { padding: 20px; gap: 8px; min-height: 150px; }
+  .leaderboard-hero { padding: 20px; gap: 8px; }
   .leaderboard-hero .puzzle-mode-art { flex-basis: 74px; width: 74px; }
   .leaderboard-table th,.leaderboard-table td { padding: 12px 9px; }
   .leaderboard-table-wrap { --leaderboard-row-height: 52px; }
