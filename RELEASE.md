@@ -1,6 +1,8 @@
-# Release 0.5.0
+# Release 0.5.1
 
-0.5.0 follows 0.4.0 (released October 27, 2026). It returns every tab style in
+0.5.1 is the release after 0.4.0 (released October 27, 2026). The one-time steps
+below keep 0.5.0 as their minimum version, so they run for 0.5.1 and for anyone
+who installed an earlier 0.5.0 build. It returns every tab style in
 **Settings → Visual → Tabs** to its default once (Evaluation, Engine, Accuracy
 overview, Accuracy move quality, Move list and the Flat v2 Evaluation bar), using
 the `tabStylesResetFor050` marker in `release-settings.js`. Nothing else changes:
@@ -8,8 +10,10 @@ panel placements, layout mode, the board, badges, sounds, engine settings and al
 stored data are kept. A setup whose designs then differ from its preset (such as
 Old) keeps its arrangement and is labelled Custom. The one exception to "nothing
 else changes": a layout that is still exactly the untouched 0.4.0 Modern
-arrangement gets the 0.5.0 Modern eval bar position, so it keeps matching Modern
-and its responsive fit. Edited layouts are never touched. Keep the 0.5.0 minimum version
+arrangement gets the new Modern eval bar position, so it keeps matching Modern
+and its responsive fit. Edited layouts are never touched. This check does not depend
+on the tab-reset marker, so a 0.5.0 build that already reset the tab styles still
+gets it once. Keep the 0.5.0 minimum version
 and marker fixed: the step runs once, including for users who skip 0.5.0, and later
 tab choices are never reset again. Users still on 0.3.0 or older receive the 0.4.0
 reset and this step in a single write. The developer note keeps its once-only
@@ -57,9 +61,9 @@ Compatibility** and remove any Android compatibility override on the currently
 listed version. A local manifest change does not edit an already published listing.
 
 Run `npm ci`, `npm test`, `npm run verify:engines`, and `npm run build`.
-Each build creates a new `web-ext-artifacts/release-0.5.0-<unique>/` directory.
-It preserves `chess-review-0.5.0-chrome.zip`, `chess-review-0.5.0-firefox.zip`, and
-`chess-review-0.5.0-source.zip`, alongside staged copies. Existing packages are
+Each build creates a new `web-ext-artifacts/release-0.5.1-<unique>/` directory.
+It preserves `chess-review-0.5.1-chrome.zip`, `chess-review-0.5.1-firefox.zip`, and
+`chess-review-0.5.1-source.zip`, alongside staged copies. Existing packages are
 never overwritten. `release-record.json` records SHA-256 checksums, source-file
 hashes, the Git HEAD and working-tree status, Node version, and build time.
 `web-ext-artifacts/latest-release.json` points to the newest completed record;
@@ -115,16 +119,16 @@ reviews with both engines.
 Validate the actual Firefox ZIP with:
 
 ```sh
-npx web-ext lint --source-dir=web-ext-artifacts/release-0.5.0-<unique>/chess-review-0.5.0-firefox.zip
+npx web-ext lint --source-dir=web-ext-artifacts/release-0.5.1-<unique>/chess-review-0.5.1-firefox.zip
 ```
 
 Chrome uses an MV3 module service worker. Firefox uses an MV3 module event page.
 Store packages omit the other browser's background declaration. The development
 manifest includes both so the project can be loaded directly in either browser.
 
-Before uploading, confirm 0.5.0 is greater than the latest uploaded version in both
+Before uploading, confirm 0.5.1 is greater than the latest uploaded version in both
 store dashboards. Upload through the existing Chrome and Firefox listings and keep
-the Firefox extension ID from `manifest.json`; 0.5.0 does not change it or the
+the Firefox extension ID from `manifest.json`; 0.5.1 does not change it or the
 extension permissions. Keeping the existing extension identity preserves installed
 users' storage across updates. This repository does not authenticate to or publish
 to either store during build. Check that current screenshots match the two engine
@@ -143,7 +147,7 @@ to third-party assets. ATTRIBUTIONS.md records current asset provenance and limi
 a generated ZIP is not legal clearance. The Chrome store download checked on
 October 3, 2026 was version 0.2.0; the Firefox public listing was unavailable at
 that check. The maintainer reports 0.4.0 is currently released (October 27, 2026).
-Version 0.5.0 is prepared for the maintainer's store upload.
+Version 0.5.1 is prepared for the maintainer's store upload.
 
 ## Reviewer notes
 
