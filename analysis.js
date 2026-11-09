@@ -289,7 +289,7 @@ function migrateVisualAssetSettings(settings) {
     settings.badgeAppearance = "solid"; changed = true;
   }
   if (!Object.hasOwn(CHECKMATE_BADGES, settings.checkmateBadge)) {
-    settings.checkmateBadge = "rounded"; changed = true;
+    settings.checkmateBadge = "slab"; changed = true;
   }
   // Upgrade the former default once; explicit selections of other fonts survive.
   // badgeDecimals identifies legacy settings and is removed below.
@@ -336,7 +336,7 @@ const DEFAULT_SETTINGS = {
   uiSetup: "custom", uiSetupBase: "", // Custom retains its starting preset for resets.
   theme: "dark", accent: "#7fb45f", accentCustom: "#9b72d0", density: "compact",
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
-  badgeFont: "spacemono", badgeTooltip: "off", badgeSymbols: {}, badgeAppearance: "solid", checkmateBadge: "rounded",
+  badgeFont: "spacemono", badgeTooltip: "off", badgeSymbols: {}, badgeAppearance: "solid", checkmateBadge: "slab",
   // Eval-graph look (see renderGraph), eval-BAR look (see renderEvalBar) and the Insight-panel text size (px).
   graphStyle: "area", barStyle: "gradient", insightFont: 16, nativeSizingVersion: 1,
   // Board coordinate labels (the a–h / 1–8 ticks in the squares' corners): on/off + size in px.
@@ -6632,15 +6632,29 @@ function checkmateBadgePicker() {
   return el("div", {class:"badge-symbol-row", "data-checkmate-picker":""},
     el("span", {class:"badge-symbol-name"}, "Checkmate"), field);
 }
+// Number font dropdown: each choice shows its name, style and a sample in that font.
+function badgeFontPicker() {
+  const options = Object.entries(BADGE_FONTS).map(([id, font]) => [id, font.name]);
+  const field = ddField(S.settings.badgeFont, options, async id => {
+    await setSetting("badgeFont", id);
+    UI.settings.querySelector('.lib-dd-btn[data-setting="badgeFont"]')?.focus({ preventScroll: true });
+  }, (id, label) => el("span", { class: "badge-font-choice" },
+    el("span", { class: "badge-font-name" }, label, el("small", {}, BADGE_FONTS[id].style)),
+    el("span", { class: "badge-font-sample", "aria-hidden": "true", style: { fontFamily: BADGE_FONTS[id].family } }, "9.0 6.4")));
+  field.classList.add("set-dropdown", "set-dropdown-down", "badge-font-dropdown");
+  const button = field.querySelector(".lib-dd-btn"), menu = field.querySelector(".lib-dd-menu");
+  button.dataset.setting = "badgeFont";
+  button.setAttribute("aria-label", "Number font: " + (BADGE_FONTS[S.settings.badgeFont]?.name || options[0][1]));
+  button.setAttribute("aria-haspopup", "listbox");
+  menu.setAttribute("role", "listbox"); menu.setAttribute("aria-label", "Number font");
+  menu.querySelectorAll(".lib-dd-opt").forEach((option, index) => {
+    Object.assign(option.dataset, { setting: "badgeFont", value: options[index][0], font: options[index][0] });
+    option.setAttribute("role", "option");
+    option.setAttribute("aria-selected", String(options[index][0] === S.settings.badgeFont));
+  });
+  return field;
+}
 function badgeSettings() {
-  const fonts = el("div", { class: "badge-font-options", role: "group", "aria-label": "Number font", tabindex: "0" },
-    ...Object.entries(BADGE_FONTS).map(([id, font]) => el("button", {
-      class: "badge-font-option" + (S.settings.badgeFont === id ? " on" : ""),
-      "data-font": id,
-      "aria-pressed": String(S.settings.badgeFont === id), onclick: () => setSetting("badgeFont", id),
-    }, el("span", { class: "badge-font-name" }, font.name, el("small", {}, font.style)),
-      el("span", { class: "badge-font-sample", "aria-hidden": "true",
-        style: { fontFamily: font.family } }, "9.0 6.4"))));
   return el("div", { class: "badge-settings" },
     seg("Badge appearance", "badgeAppearance", Object.keys(BADGE_APPEARANCES), null, value => BADGE_APPEARANCES[value]),
     el("div", { class: "badge-preview badge-category-grid", "aria-label": "Badge preview" },
@@ -6653,7 +6667,7 @@ function badgeSettings() {
     }),
     el("div", { class: "badge-symbol-editor" }, ...QUALITY_ORDER.map(categoryBadgePicker), checkmateBadgePicker()),
     QUALITY_ORDER.some(category => categoryBadgeSymbol(category, S.settings) === "numbers") ? el("div", { class: "badge-number-settings" },
-      el("div", { class: "set-lbl" }, "Number font"), fonts,
+      el("div", { class: "set-lbl" }, "Number font"), badgeFontPicker(),
       el("p", { class: "set-note" }, "Free, open-source fonts, bundled for offline use.")) : null,
     badgeLabelPicker(),
     el("p", { class: "set-note" }, "Show the category for two seconds after each move."));
@@ -6720,8 +6734,6 @@ function renderSettings(animate = false) {
   S.settingsTab = category.id;
   closeArrowColorPicker();
   const scroll = UI.settings.scrollTop; // keep scroll position when a setting changes
-  const fontScroll = UI.settings.querySelector(".badge-font-options")?.scrollTop;
-  const focusedFont = UI.settings.contains(document.activeElement) && document.activeElement.closest(".badge-font-option")?.getAttribute("data-font");
   const focusedBadgePicker = UI.settings.contains(document.activeElement) && document.activeElement.closest(".badge-symbol-dropdown")?.querySelector("[data-badge-picker]")?.dataset.badgePicker;
   const focusedSection = UI.settings.contains(document.activeElement) && document.activeElement.closest(".set-sect-head")?.querySelector("span")?.textContent;
   const activeSetting = UI.settings.contains(document.activeElement) ? document.activeElement.dataset.setting : null;
@@ -6738,9 +6750,6 @@ function renderSettings(animate = false) {
   [...content.children].forEach((child, index) => child.style.setProperty('--set-order', Math.min(index, 5)));
   UI.settings.replaceChildren(settingsCategoryPicker(), content);
   UI.settings.scrollTop = scroll;
-  const fonts = UI.settings.querySelector(".badge-font-options");
-  if (fonts && fontScroll != null) fonts.scrollTop = fontScroll;
-  if (focusedFont) UI.settings.querySelector(`[data-font="${focusedFont}"]`)?.focus({ preventScroll: true });
   if (focusedBadgePicker) UI.settings.querySelector(`[data-badge-picker="${focusedBadgePicker}"]`)?.focus({ preventScroll: true });
   if (focusedSection) [...UI.settings.querySelectorAll(".set-sect-head")].find(head => head.querySelector("span")?.textContent === focusedSection)?.focus({ preventScroll: true });
   if (activeSetting) {
@@ -6950,7 +6959,7 @@ async function setSetting(key, value) {
   if (design) value = panelDesign(design.panel, {[key]: value});
   if (key === "badgeTooltip") value = badgeLabelStyle(value);
   if (key === "badgeAppearance") value = Object.hasOwn(BADGE_APPEARANCES, value) ? value : "solid";
-  if (key === "checkmateBadge") value = Object.hasOwn(CHECKMATE_BADGES, value) ? value : "rounded";
+  if (key === "checkmateBadge") value = Object.hasOwn(CHECKMATE_BADGES, value) ? value : "slab";
   if (key === "badgeSymbols") value = cleanBadgeSymbols(value);
   const setupPatch = design && S.settings[key] !== value ? customUiSetupPatch() : {};
   S.settings[key] = value;

@@ -71,7 +71,9 @@ test('Badges exposes category-specific choices with numbers first and the primar
     for (const symbol of symbols) exposed.add(symbol);
   }
   assert.deepEqual([...exposed].sort(), Object.keys(CATEGORY_SYMBOLS).sort());
-  assert.deepEqual(Object.keys(CATEGORY_SYMBOLS).filter(id => id.startsWith('thumb')), ['thumbSimple','thumbDetailed']);
+  assert.deepEqual(Object.keys(CATEGORY_SYMBOLS).filter(id => id.startsWith('thumb')), ['thumbSimple']);
+  for (const removed of ['thumbDetailed','interesting','only']) assert.equal(Object.hasOwn(CATEGORY_SYMBOLS, removed), false);
+  for (const {name} of Object.values(CATEGORY_SYMBOLS)) assert.doesNotMatch(name, /· (Brilliant|Great|Best|Excellent|Good|Book|Inaccuracy|Mistake|Miss|Blunder)$/);
 });
 
 test('individual selections refresh mounted badges, preserve focus and persist without changing analysis', async t => {
@@ -95,18 +97,16 @@ test('individual selections refresh mounted badges, preserve focus and persist w
   assert.equal(snapshot(a), before);
 });
 
-test('Simple and Detailed thumbs are selectable only for Excellent and persist through appearance changes', async t => {
+test('the thumb is selectable only for Excellent and persists through appearance changes', async t => {
   const a = review(t), doc = a.dom.window.document;
   a.state.classif[1] = 'excellent'; a.state.moveGrades[1] = 8; a.call('renderAll'); openSettings(a);
-  for (const symbol of ['thumbSimple','thumbDetailed']) {
-    doc.querySelector(`[data-symbol-category="excellent"] .lib-dd-opt[data-symbol="${symbol}"]`).click(); await settle();
-    assert.equal(mark(doc.querySelector('.sq-badge')), symbol);
-    assert.equal(a.store.settings.badgeSymbols.excellent, symbol);
-  }
+  doc.querySelector('[data-symbol-category="excellent"] .lib-dd-opt[data-symbol="thumbSimple"]').click(); await settle();
+  assert.equal(mark(doc.querySelector('.sq-badge')), 'thumbSimple');
+  assert.equal(a.store.settings.badgeSymbols.excellent, 'thumbSimple');
   await a.call('setSetting','badgeAppearance','ink-mineral');
-  assert.equal(mark(doc.querySelector('.sq-badge')), 'thumbDetailed');
+  assert.equal(mark(doc.querySelector('.sq-badge')), 'thumbSimple');
   await a.call('setSetting','badgeAppearance','solid');
-  assert.equal(mark(doc.querySelector('.sq-badge')), 'thumbDetailed');
+  assert.equal(mark(doc.querySelector('.sq-badge')), 'thumbSimple');
   await a.call('setCategoryBadgeSymbol','excellent','numbers');
   assert.equal(doc.querySelector('.sq-badge text').textContent, '8.0');
 });
@@ -138,10 +138,10 @@ test('number fonts remain available for mixed selections and symbols can be chos
   const a = review(t), doc = a.dom.window.document; openSettings(a);
   const symbols = Object.fromEntries(Object.entries(CATEGORY_SYMBOL_OPTIONS).map(([category, choices]) => [category, choices[0]]));
   await a.call('setSetting','badgeSymbols',symbols);
-  assert.equal(doc.querySelector('.badge-font-options'), null);
+  assert.equal(doc.querySelector('.badge-font-dropdown'), null);
   for (const [category, symbol] of Object.entries(symbols)) assert.equal(mark(doc.querySelector(`.badge-preview-item[data-badge-category="${category}"]`)), symbol);
   await a.call('setCategoryBadgeSymbol','good','numbers');
-  assert.ok(doc.querySelector('.badge-font-options'));
+  assert.ok(doc.querySelector('.badge-font-dropdown'));
   assert.equal(a.store.settings.badgeSymbols.mistake, 'mistake');
 });
 

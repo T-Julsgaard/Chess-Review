@@ -84,10 +84,11 @@ test('the learning board marks a mate played on the free board', async t => {
   assert.equal(marked?.dataset.square, 'e1');
   assert.ok(marked.querySelector('.mate-glow')); assert.equal(marked.classList.contains('has-badge'), false);
   assert.ok(doc.querySelector('.learn-board > .mate-badge-layer .mate-badge'));
-  await a.call('setSetting','checkmateBadge','slab');
   assert.equal(doc.querySelector('.learn-board .mate-badge svg').dataset.checkmateStyle,'slab');
+  await a.call('setSetting','checkmateBadge','rounded');
+  assert.equal(doc.querySelector('.learn-board .mate-badge svg').dataset.checkmateStyle,'rounded');
   w.render();
-  assert.equal(doc.querySelector('.learn-board .mate-badge svg').dataset.checkmateStyle,'slab');
+  assert.equal(doc.querySelector('.learn-board .mate-badge svg').dataset.checkmateStyle,'rounded');
 });
 
 test('all four checkmate options are self-contained round hash badges in both appearances', () => {
@@ -106,7 +107,10 @@ test('all four checkmate options are self-contained round hash badges in both ap
     }
   }
   assert.equal(paths.size,4);
-  assert.match(checkmateBadgeSvg({checkmateBadge:'constructor'}),/data-checkmate-style="rounded"/);
+  assert.match(checkmateBadgeSvg({checkmateBadge:'constructor'}),/data-checkmate-style="slab"/);
+  assert.match(checkmateBadgeSvg(),/data-checkmate-style="slab"/);
+  assert.equal(Object.keys(CHECKMATE_BADGES)[0],'slab');
+  assert.equal(CHECKMATE_BADGES.slab.name,'Slab (default)');
 });
 
 test('checkmate picker saves designs, updates mounted marks and retains them through navigation and flipping', async t => {
@@ -127,12 +131,12 @@ test('checkmate picker saves designs, updates mounted marks and retains them thr
   await a.call('setSetting','badgeAppearance','ink-mineral');
   assert.equal(doc.querySelector('.mate-badge path').getAttribute('stroke'),'#e78781');
   a.state.flipped=true; a.call('buildBoard');
-  assert.equal(doc.querySelector('.mate-badge svg').dataset.checkmateStyle,'slab');
+  assert.equal(doc.querySelector('.mate-badge svg').dataset.checkmateStyle,'slanted');
   a.state.idx--; a.call('paintBoard'); assert.equal(doc.querySelector('.mate-badge'),null);
   a.state.idx++; a.call('paintBoard');
-  assert.equal(doc.querySelector('.mate-badge svg').dataset.checkmateStyle,'slab');
+  assert.equal(doc.querySelector('.mate-badge svg').dataset.checkmateStyle,'slanted');
   await a.call('setSetting','checkmateBadge','<svg>');
-  assert.equal(a.store.settings.checkmateBadge,'rounded');
+  assert.equal(a.store.settings.checkmateBadge,'slab');
   a.state.settings.checkmateBadge='constructor'; a.call('migrateVisualAssetSettings',a.state.settings);
-  assert.equal(a.state.settings.checkmateBadge,'rounded');
+  assert.equal(a.state.settings.checkmateBadge,'slab');
 });

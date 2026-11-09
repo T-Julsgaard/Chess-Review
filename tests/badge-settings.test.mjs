@@ -93,7 +93,15 @@ test('Visual exposes Badges with previews and hover labels off by default', t =>
   assert.equal(doc.querySelector('.set-subtabs'), null);
   [...doc.querySelectorAll('.set-sect-head')].find(b => b.textContent === 'Badges').click();
   assert.ok(doc.querySelector('.badge-settings').closest('.set-section').classList.contains('open'));
-  assert.equal(doc.querySelectorAll('.badge-font-option').length, Object.keys(BADGE_FONTS).length);
+  const fontOptions = [...doc.querySelectorAll('.lib-dd-opt[data-setting="badgeFont"]')];
+  assert.equal(fontOptions.length, Object.keys(BADGE_FONTS).length);
+  for (const option of fontOptions) {
+    const font = BADGE_FONTS[option.dataset.value];
+    assert.equal(option.querySelector('.badge-font-sample').textContent, '9.0 6.4', 'each choice shows an example');
+    assert.equal(option.querySelector('.badge-font-sample').style.fontFamily.replace(/"/g, ''), font.family.replace(/"/g, ''));
+    assert.match(option.querySelector('.badge-font-name').textContent, new RegExp(font.name));
+  }
+  assert.ok(doc.querySelector('.badge-font-dropdown .lib-dd-cur .badge-font-sample'), 'the closed dropdown shows the chosen font sample');
   assert.equal(doc.querySelectorAll('.badge-preview-item').length, 10);
   assert.doesNotMatch(doc.querySelector('.badge-settings').textContent, /Equal number size/);
   assert.equal(doc.querySelector('.badge-settings .set-reset'), null);
@@ -105,7 +113,7 @@ test('Visual exposes Badges with previews and hover labels off by default', t =>
   const button = doc.querySelector('.lib-dd-btn[data-setting="badgeTooltip"]');
   assert.equal(button.getAttribute('aria-haspopup'), 'listbox');
   assert.equal(button.getAttribute('aria-expanded'), 'false');
-  assert.ok(doc.querySelector('.badge-font-options').compareDocumentPosition(button) & a.dom.window.Node.DOCUMENT_POSITION_FOLLOWING);
+  assert.ok(doc.querySelector('.badge-font-dropdown').compareDocumentPosition(button) & a.dom.window.Node.DOCUMENT_POSITION_FOLLOWING);
   assert.equal(options.at(-1).textContent, 'Expressive');
 });
 
@@ -131,7 +139,6 @@ test('hover-label dropdown persists choices, updates the board and preserves scr
   const before = JSON.stringify({ grades: a.state.moveGrades, evals: a.state.evals, acc: a.state.acc });
   for (const style of ['editorial', 'studio', 'soft', 'minimal']) {
     doc.getElementById('settings').scrollTop = 390;
-    doc.querySelector('.badge-font-options').scrollTop = 580;
     const option = doc.querySelector(`.lib-dd-opt[data-setting="badgeTooltip"][data-value="${style}"]`); option.focus(); option.click();
     await settle();
     assert.equal(a.store.settings.badgeTooltip, style);
@@ -141,7 +148,6 @@ test('hover-label dropdown persists choices, updates the board and preserves scr
     assert.equal(doc.activeElement.classList.contains('lib-dd-btn'), true);
     assert.equal(doc.querySelector(`.lib-dd-opt[data-setting="badgeTooltip"][data-value="${style}"]`).getAttribute('aria-selected'), 'true');
     assert.equal(doc.getElementById('settings').scrollTop, 390);
-    assert.equal(doc.querySelector('.badge-font-options').scrollTop, 580);
   }
   doc.activeElement.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
   assert.equal(doc.activeElement.dataset.value, 'minimal');
@@ -217,17 +223,18 @@ test('navigation immediately displays the final move score and keeps it stable',
   assert.equal(JSON.stringify({grades: S.moveGrades, evals: S.evals, acc: S.acc}), before);
 });
 
-test('choosing fonts preserves the independent list scroll, outer scroll and keyboard focus', async t => {
+test('choosing a font from the dropdown preserves the outer scroll and returns focus to the dropdown', async t => {
   const a = review(t), doc = a.dom.window.document;
   a.call('toggleSettings');
   [...doc.querySelectorAll('.set-sect-head')].find(b => b.textContent === 'Badges').click();
   doc.getElementById('settings').scrollTop = 110;
-  doc.querySelector('.badge-font-options').scrollTop = 580;
-  const option = doc.querySelector('[data-font="lora"]'); option.focus(); option.click();
+  const option = doc.querySelector('.lib-dd-opt[data-font="lora"]'); option.focus(); option.click();
   await settle();
-  assert.equal(doc.querySelector('.badge-font-options').scrollTop, 580);
+  assert.equal(a.store.settings.badgeFont, 'lora');
   assert.equal(doc.getElementById('settings').scrollTop, 110);
-  assert.equal(doc.activeElement.dataset.font, 'lora');
-  assert.equal(doc.activeElement.getAttribute('aria-pressed'), 'true');
+  assert.equal(doc.activeElement.dataset.setting, 'badgeFont');
+  assert.ok(doc.activeElement.classList.contains('lib-dd-btn'));
+  assert.equal(doc.querySelector('.lib-dd-opt[data-font="lora"]').getAttribute('aria-selected'), 'true');
+  assert.match(doc.querySelector('.badge-font-dropdown .lib-dd-cur').textContent, /Lora/);
   assert.match(doc.querySelector('.badge-preview-item text').getAttribute('font-family'), /Badge Lora/);
 });
