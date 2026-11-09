@@ -18,8 +18,8 @@ const PRESERVED_SETTINGS = [
 ];
 // 0.4.0 saved the Modern arrangement on the first review. 0.5.0 moved its eval bar,
 // so an untouched 0.4.0 arrangement would no longer count as Modern and would lose
-// its responsive fit. The tab reset updates only that exact arrangement; a layout
-// the user edited is left as it is.
+// its responsive fit. Only that exact arrangement is updated; a layout the user
+// edited is left as it is.
 const MODERN_EVALBAR_040 = { x: 254.04, y: 52.42405289710294, w: 27.115889429536, h: 737.5521924833793, scale: 0.9038629809845334 };
 function sameBox(box, expected) {
   return ["x", "y", "w", "h", "scale"].every(prop =>
@@ -49,15 +49,19 @@ export async function resetSettingsForRelease(details) {
   return navigator.locks.request("chess-review-release-settings", async () => {
     const stored = await browserAPI.storage.local.get([RESET_MARKER, TAB_RESET_MARKER, "settings", "layout", "layoutVersion"]);
     if (stored[RESET_MARKER]) {
-      if (!resetTabs || stored[TAB_RESET_MARKER]) return;
-      // Only the tab styles change. A setup whose designs no longer match
-      // (for example Old) is labelled Custom on the next review startup.
-      const tabReset = {
-        settings: { ...(stored.settings || {}), ...DEFAULT_TAB_STYLES },
-        [TAB_RESET_MARKER]: true,
-      };
-      if (untouchedModern040(stored.layout)) tabReset.layout = { ...stored.layout, evalbar: { ...MODERN_LAYOUT.evalbar } };
-      await browserAPI.storage.local.set(tabReset);
+      if (!resetTabs) return;
+      const update = {};
+      if (!stored[TAB_RESET_MARKER]) {
+        // Only the tab styles change. A setup whose designs no longer match
+        // (for example Old) is labelled Custom on the next review startup.
+        update.settings = { ...(stored.settings || {}), ...DEFAULT_TAB_STYLES };
+        update[TAB_RESET_MARKER] = true;
+      }
+      // Not tied to the tab-reset marker: an early 0.5.0 build completed that step
+      // before the eval bar moved. An updated layout no longer matches, so this
+      // still happens only once.
+      if (untouchedModern040(stored.layout)) update.layout = { ...stored.layout, evalbar: { ...MODERN_LAYOUT.evalbar } };
+      if (Object.keys(update).length) await browserAPI.storage.local.set(update);
       return;
     }
 

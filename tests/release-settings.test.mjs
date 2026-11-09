@@ -291,6 +291,21 @@ test('an untouched 0.4.0 Modern arrangement adopts the 0.5.0 eval bar and stays 
   assert.equal(a.call('isResponsiveModern'), true);
 });
 
+test('an early 0.5.0 install that already reset tab styles still adopts the new eval bar once', async () => {
+  const { store, writes } = migratedUser('0.5.1');
+  Object.assign(store.settings, { uiSetup: 'modern', uiSetupBase: 'modern', graphDesign: 'bars4' });
+  store.tabStylesResetFor050 = true;
+  store.layout = structuredClone(MODERN_040);
+  const settings = structuredClone(store.settings);
+  await resetSettingsForRelease({ reason: 'startup' });
+  assert.deepEqual(store.layout, MODERN_LAYOUT);
+  assert.deepEqual(store.settings, settings, 'Later tab choices are not reset again');
+  assert.equal(writes.length, 1);
+  await resetSettingsForRelease({ reason: 'startup' });
+  await installed({ reason: 'update', previousVersion: '0.5.0' });
+  assert.equal(writes.length, 1);
+});
+
 test('an edited 0.4.0 Modern arrangement keeps every panel where the user put it', async () => {
   const { store } = migratedUser('0.5.0');
   const edited = structuredClone(MODERN_040); edited.board.x += 40;
