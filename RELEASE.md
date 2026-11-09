@@ -1,10 +1,18 @@
 # Release 0.5.0
 
-0.5.0 follows 0.4.0 (released October 27, 2026). It does not add a settings reset:
-the one-time 0.4.0 migration below stays as it is, so users who already migrated
-keep their preferences, and the developer note keeps its once-only markers.
-Retired choices migrate individually on startup (for example, the Flat evaluation
-bar becomes Flat v2, and Move bars/Minimal Evaluation designs become Default).
+0.5.0 follows 0.4.0 (released October 27, 2026). It returns every tab style in
+**Settings → Visual → Tabs** to its default once (Evaluation, Engine, Accuracy
+overview, Accuracy move quality, Move list and the Flat v2 Evaluation bar), using
+the `tabStylesResetFor050` marker in `release-settings.js`. Nothing else changes:
+panel placements, layout mode, the board, badges, sounds, engine settings and all
+stored data are kept. A setup whose designs then differ from its preset (such as
+Old) keeps its arrangement and is labelled Custom. Keep the 0.5.0 minimum version
+and marker fixed: the step runs once, including for users who skip 0.5.0, and later
+tab choices are never reset again. Users still on 0.3.0 or older receive the 0.4.0
+reset and this step in a single write. The developer note keeps its once-only
+markers and does not reappear. Retired choices also migrate on startup (the Flat
+evaluation bar becomes Flat v2, and Move bars/Minimal Evaluation designs become
+Default).
 
 ## The 0.4.0 settings migration
 

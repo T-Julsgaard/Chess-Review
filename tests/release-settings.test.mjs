@@ -228,6 +228,66 @@ test('review startup waits for an in-progress update before loading or painting 
   assert.equal(a.state.username, 'saved-user'); assert.equal(a.state.library[0].fav, true);
 });
 
+const DEFAULT_TABS = { ...UI_SETUPS.modern.designs, barStyle: 'flat2' };
+function migratedUser(version) {
+  const context = setup(version);
+  Object.assign(context.store, { settingsResetFor040: true, layoutMode: 'custom', layoutVersion: 9,
+    layout: { board: { x: 11, y: 12, w: 400, h: 400 } } });
+  context.store.settings = { uiSetup: 'custom', uiSetupBase: 'modern', graphDesign: 'bars2', engineDesign: 'original',
+    accuracyDesign: 'original', accuracyQualityDesign: 'original', movesDesign: 'full', barStyle: 'gradient',
+    boardTheme: 'coral', soundVolume: 23, engineLines: 3, badgeAppearance: 'enamel' };
+  return { ...context, before: structuredClone(context.store) };
+}
+
+for (const version of ['0.5.0', '0.5.1', '1.0.0']) {
+  test(`${version} returns tab styles to their defaults once, keeping placements and other preferences`, async () => {
+    const { store, before, writes } = migratedUser(version);
+    await installed({ reason: 'update', previousVersion: '0.4.0' });
+    assert.equal(store.tabStylesResetFor050, true);
+    assert.deepEqual(store.settings, { ...before.settings, ...DEFAULT_TABS });
+    for (const key of Object.keys(before).filter(key => key !== 'settings')) {
+      assert.deepEqual(store[key], before[key], `Preserve ${key}`);
+    }
+    assert.equal(writes.length, 1);
+    store.settings.graphDesign = 'bars4'; store.settings.barStyle = 'mono';
+    const customized = structuredClone(store);
+    await resetSettingsForRelease({ reason: 'startup' });
+    await installed({ reason: 'update', previousVersion: '0.5.0' });
+    assert.deepEqual(store, customized); assert.equal(writes.length, 1);
+  });
+}
+
+for (const version of ['0.4.0', '0.4.1', '0.4.9']) {
+  test(`${version} leaves migrated tab styles unchanged`, async () => {
+    const { store, before, writes } = migratedUser(version);
+    await installed({ reason: 'update', previousVersion: '0.4.0' });
+    await resetSettingsForRelease({ reason: 'startup' });
+    assert.deepEqual(store, before); assert.equal(writes.length, 0);
+  });
+}
+
+test('0.5.0 users who skipped 0.4.0 complete both resets in one write', async () => {
+  const { store, writes } = setup('0.5.0');
+  await installed({ reason: 'update', previousVersion: '0.3.0' });
+  assertModern(store.settings);
+  assert.equal(store.settings.barStyle, 'flat2');
+  assert.equal(store.settingsResetFor040, true); assert.equal(store.tabStylesResetFor050, true);
+  assert.equal(writes.length, 1);
+});
+
+test('an Old setup keeps its arrangement and opens as Custom with the default tab styles', async t => {
+  const { store } = migratedUser('0.5.0');
+  Object.assign(store.settings, { uiSetup: 'old', uiSetupBase: 'old' });
+  store.layout = null; store.layoutMode = 'auto';
+  await installed({ reason: 'update', previousVersion: '0.4.0' });
+  const a = await workspace(t);
+  for (const [key, value] of Object.entries(DEFAULT_TABS)) assert.equal(a.state.settings[key], value, key);
+  assert.equal(a.state.settings.uiSetup, 'custom');
+  assert.equal(a.state.settings.uiSetupBase, 'old');
+  assert.equal(a.state.layoutMode, 'auto');
+  assert.equal(a.state.settings.boardTheme, 'coral');
+});
+
 test('a new module context and a late update event retain later customization', async () => {
   const { store, writes } = setup();
   await resetSettingsForRelease({ reason: 'startup' });

@@ -5,6 +5,12 @@ import { UI_SETUPS } from "./lib/ui-setups.js";
 // 0.4.0 still receive Modern; users who have migrated keep their later edits.
 const RESET_RELEASE = "0.4.0";
 const RESET_MARKER = "settingsResetFor040";
+// 0.5.0 returns every tab style (Settings → Visual → Tabs) to its default once.
+// Panel placements, layout and all other preferences are untouched. Keep this
+// minimum version and marker fixed too, so later choices are never reset again.
+const TAB_RESET_RELEASE = "0.5.0";
+const TAB_RESET_MARKER = "tabStylesResetFor050";
+const DEFAULT_TAB_STYLES = { ...UI_SETUPS.modern.designs, barStyle: "flat2" };
 const PRESERVED_SETTINGS = [
   "sound", "soundVolume", "soundFx", "puzzleSuccessSound", "puzzleIncorrectSound",
   "moveAnim", "uiAnim", "animSpeed", "learningTransition",
@@ -24,9 +30,19 @@ export async function resetSettingsForRelease(details) {
   if (!["install", "update", "startup"].includes(details.reason)) return;
   // Background update handling and review startup share an origin-scoped lock.
   // A review must wait for the reset before loading or saving any preferences.
+  const resetTabs = versionAtLeast(browserAPI.runtime.getManifest().version, TAB_RESET_RELEASE);
   return navigator.locks.request("chess-review-release-settings", async () => {
-    const stored = await browserAPI.storage.local.get([RESET_MARKER, "settings", "layout", "layoutVersion"]);
-    if (stored[RESET_MARKER]) return;
+    const stored = await browserAPI.storage.local.get([RESET_MARKER, TAB_RESET_MARKER, "settings", "layout", "layoutVersion"]);
+    if (stored[RESET_MARKER]) {
+      if (!resetTabs || stored[TAB_RESET_MARKER]) return;
+      // Only the tab styles change. A setup whose designs no longer match
+      // (for example Old) is labelled Custom on the next review startup.
+      await browserAPI.storage.local.set({
+        settings: { ...(stored.settings || {}), ...DEFAULT_TAB_STYLES },
+        [TAB_RESET_MARKER]: true,
+      });
+      return;
+    }
 
     // Seed the same durable defaults for upgrades and new installations. Startup
     // retries a missed update before reading preferences or painting the workspace.
@@ -44,6 +60,8 @@ export async function resetSettingsForRelease(details) {
     // Write preferences and completion together. Never clear storage: username,
     // library entries (including favorites), analyses, caches, player history,
     // learning progress and the independent announcement markers survive.
-    await browserAPI.storage.local.set({ ...reset, [RESET_MARKER]: true });
+    // The full reset already saves the default tab styles, so it completes both steps.
+    if (resetTabs) Object.assign(reset.settings, DEFAULT_TAB_STYLES);
+    await browserAPI.storage.local.set({ ...reset, [RESET_MARKER]: true, ...(resetTabs ? { [TAB_RESET_MARKER]: true } : {}) });
   });
 }
