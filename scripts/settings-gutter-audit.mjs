@@ -5,6 +5,17 @@ import assert from 'node:assert/strict';
 // Keep Settings open while browser chrome changes the available panel gutter.
 export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const run=expression=>evaluate(review,expression),results=[];
+  // Pass values as debugger arguments instead of splicing them into evaluated source.
+  const invoke=async(fn,...values)=>{
+    const {result,exceptionDetails}=await call('Runtime.evaluate',{expression:'globalThis'},review.sessionId);
+    if(exceptionDetails)throw Error(JSON.stringify(exceptionDetails));
+    try {
+      const response=await call('Runtime.callFunctionOn',{objectId:result.objectId,functionDeclaration:fn.toString(),
+        arguments:values.map(value=>({value})),awaitPromise:true,returnByValue:true},review.sessionId);
+      if(response.exceptionDetails)throw Error(JSON.stringify(response.exceptionDetails));
+      return response.result.value;
+    } finally {await call('Runtime.releaseObject',{objectId:result.objectId},review.sessionId);}
+  };
   await run("document.querySelector('.learning-announcement-disable')?.click()");
   for(const setup of ['old','modern']){
     await run(`import('./analysis.js').then(m=>m.applyUiSetup('${setup}'))`);
@@ -41,7 +52,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);
     await sleep(200);
     for (const section of ['Tabs','Board & Pieces','Best-move/Threat arrow']) {
-      await run(`(()=>{const head=[...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent===${JSON.stringify(section)});if(head.getAttribute('aria-expanded')!=='true')head.click();head.scrollIntoView({block:'start'});})()`);
+      await invoke(function(section){const head=[...this.document.querySelectorAll('.set-sect-head')].find(n=>n.textContent===section);if(head.getAttribute('aria-expanded')!=='true')head.click();head.scrollIntoView({block:'start'});},section);
       if (section==='Tabs') {
         const choices=await run(`Object.fromEntries([...document.querySelectorAll('.set-section.open .set-dropdown')].map(field=>[field.querySelector('.lib-dd-btn').dataset.setting,[...field.querySelectorAll('.lib-dd-opt')].map(n=>n.textContent)]))`);
         assert.deepEqual(choices.accuracyDesign,['Default','Original']);

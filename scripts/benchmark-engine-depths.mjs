@@ -87,7 +87,11 @@ try {
       if (!files.has(name)) { response.writeHead(404); response.end(); return; }
       response.setHeader('Content-Type', name.endsWith('.wasm') ? 'application/wasm' : name.endsWith('.json') ? 'application/json' : 'text/javascript');
       response.end(await fs.readFile(path.join(root, name)));
-    } catch (error) { response.writeHead(500); response.end(error.message); }
+    } catch (error) {
+      // Keep exception text out of the response body; the details stay in this terminal.
+      console.error('Benchmark server error:', error);
+      response.writeHead(500, {'Content-Type': 'text/plain; charset=utf-8'}); response.end('Benchmark server error (details in the benchmark terminal)');
+    }
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const profile = await fs.mkdtemp(path.join(os.tmpdir(), 'chess-depth-profile-'));

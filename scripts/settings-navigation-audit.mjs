@@ -4,8 +4,19 @@ import path from 'node:path';
 
 export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const run=expression=>evaluate(review,expression),results=[];
+  // Pass values as debugger arguments instead of splicing them into evaluated source.
+  const invoke=async(fn,...values)=>{
+    const {result,exceptionDetails}=await call('Runtime.evaluate',{expression:'globalThis'},review.sessionId);
+    if(exceptionDetails)throw Error(JSON.stringify(exceptionDetails));
+    try {
+      const response=await call('Runtime.callFunctionOn',{objectId:result.objectId,functionDeclaration:fn.toString(),
+        arguments:values.map(value=>({value})),awaitPromise:true,returnByValue:true},review.sessionId);
+      if(response.exceptionDetails)throw Error(JSON.stringify(response.exceptionDetails));
+      return response.result.value;
+    } finally {await call('Runtime.releaseObject',{objectId:result.objectId},review.sessionId);}
+  };
   const click=async selector=>{
-    const point=await run(`(()=>{const n=document.querySelector(${JSON.stringify(selector)});n.scrollIntoView({block:'nearest'});const r=n.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
+    const point=await invoke(function(selector){const n=this.document.querySelector(selector);n.scrollIntoView({block:'nearest'});const r=n.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};},selector);
     await call('Input.dispatchMouseEvent',{type:'mousePressed',button:'left',clickCount:1,...point},review.sessionId);
     await call('Input.dispatchMouseEvent',{type:'mouseReleased',button:'left',clickCount:1,...point},review.sessionId);
   };
