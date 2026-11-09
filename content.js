@@ -70,13 +70,17 @@ function cleanUsername(text) {
   if (/^(player|opponent|anonymous|guest|computer|stockfish)$/i.test(t)) return null;
   return t;
 }
+// A malformed %-escape in a link must not abort the whole page read.
+function decodePathPart(part) {
+  try { return decodeURIComponent(part); } catch { return part; }
+}
 function usernameFromContainer(root) {
   if (!root) return null;
   // a) Most reliable: a link to the member profile (/member/<user>).
   const link = root.querySelector("a[href*='/member/']");
   const hm = link?.getAttribute("href")?.match(/\/member\/([^/?#]+)/i);
   if (hm) {
-    const name = cleanUsername(decodeURIComponent(hm[1]));
+    const name = cleanUsername(decodePathPart(hm[1]));
     if (name) return name;
   }
   // b) Otherwise the dedicated username element in the container.
@@ -107,7 +111,7 @@ function detectUsernames() {
   add(firstUsernameFrom([".player-component.player-bottom", ".player-bottom", ".board-layout-bottom", "[class*='player-bottom']"]));
   add(firstUsernameFrom([".player-component.player-top", ".player-top", ".board-layout-top", "[class*='player-top']"]));
   const m = location.pathname.match(/\/member\/([^/?#]+)/i);
-  if (m) add(cleanUsername(decodeURIComponent(m[1])));
+  if (m) add(cleanUsername(decodePathPart(m[1])));
   // Fallback: sweep the page for player-tagline username elements. Covers the newer cc-* layouts
   // (e.g. data-test-element="user-tagline-username") where the player containers above aren't
   // present — without it the bypass falls back to your stored handle and can't find an opponent's
@@ -250,7 +254,8 @@ function countryIdFromClass(el) {
   // and trailing (?:\s|$) keep us off the sibling `cc-country-flag-component`/`...-small` tokens
   // (their "country" is hyphen-prefixed, and "flag"/"small" fail the boundary). flags.js resolves
   // whichever token shape we return.
-  const m = (el.className || "").match(/(?:^|\s)country-([a-z]{2,3}|\d+)(?:\s|$)/i);
+  // getAttribute, not className: an SVG flag's className is an object without match().
+  const m = (el.getAttribute("class") || "").match(/(?:^|\s)country-([a-z]{2,3}|\d+)(?:\s|$)/i);
   return m ? m[1] : null;
 }
 function detectCountries() {
