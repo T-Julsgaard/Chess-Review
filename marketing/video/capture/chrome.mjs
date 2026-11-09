@@ -7,21 +7,17 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
+import { extensionEntries, privatePackagePath } from '../../../scripts/package-inputs.mjs';
 
 export const REPO = fileURLToPath(new URL('../../../', import.meta.url));
 export const CHROME = process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 
-// Mirrors the allowlist in scripts/package.mjs, so captures show what the store build ships.
-const FILES = ['analysis.html', 'analysis.js', 'analyze-flow.js', 'background.js',
-  'browser-compat.js', 'chesscom.js', 'content.js', 'content-button.css', 'flags.js', 'gamecache.js',
-  'lichess-content.js', 'lichess.js', 'move-grades.js', 'popup.html', 'popup.js', 'styles.css',
-  'LICENSE', 'ATTRIBUTIONS.md', 'THIRD_PARTY_NOTICES.md', 'PRIVACY.md', 'README.md', 'RELEASE.md', 'manifest.json'];
-const DIRS = ['backgrounds', 'data', 'engine', 'flags', 'fonts', 'icons', 'lib', 'sounds',
-  'pieces-img/cburnett', 'pieces-img/merida'];
-
+// Copies the allowlist scripts/package.mjs uses, so captures show what the store build ships
+// and new extension files are picked up without editing this script.
 export async function copyExtension(dest) {
-  for (const entry of [...FILES, ...DIRS]) {
-    await fs.cp(path.join(REPO, entry), path.join(dest, entry), { recursive: true });
+  for (const entry of extensionEntries) {
+    await fs.cp(path.join(REPO, entry), path.join(dest, entry), {
+      recursive: true, filter: (src) => !privatePackagePath(path.relative(REPO, src)) });
   }
   return dest;
 }
