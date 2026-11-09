@@ -63,14 +63,16 @@ test('Modern reproduces every supplied box and scale, including the collapsed Ac
 });
 
 const sameBoxes=(actual,expected)=>{for(const [key,box]of Object.entries(expected))for(const prop of ['x','y','w','h','scale'])near(actual[key][prop],box[prop]);};
-test('Import panel layout sits under Export and restores an exported file from disk',async t=>{
+test('Layout file groups Export with Import and restores an exported file from disk',async t=>{
   const a=review(t),doc=a.dom.window.document;
   await a.call('applyUiSetup','modern');
   a.call('toggleSettings');
-  const buttons=[...doc.querySelectorAll('.set-reset')].map(n=>n.textContent);
-  assert.equal(buttons.indexOf('Import panel layout'),buttons.indexOf('Export panel layout')+1);
+  const group=doc.querySelector('.layout-file');
+  assert.equal(group.querySelector('.set-lbl').textContent,'Layout file');
+  assert.deepEqual([...group.querySelectorAll('.set-reset')].map(n=>n.textContent),['Export','Import']);
+  assert.ok(!doc.body.textContent.includes('Drag to move panels'));
   const moved=structuredClone(supplied);moved.layout.moves.x+=40;
-  [...doc.querySelectorAll('.set-reset')].find(n=>n.textContent==='Import panel layout').click();
+  [...group.querySelectorAll('.set-reset')].find(n=>n.textContent==='Import').click();
   const input=doc.querySelector('input[type=file]');
   assert.match(input.accept,/json/);
   Object.defineProperty(input,'files',{value:[{size:2000,text:async()=>JSON.stringify(moved)}]});

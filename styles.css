@@ -2259,6 +2259,8 @@ button { font-family: inherit; cursor: pointer; }
 .set-reset { margin-top: 2px; padding: 8px; border: 1px solid var(--line); background: var(--panel-2);
   color: var(--ink-2); border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
 .set-reset:hover { color: var(--ink); border-color: color-mix(in oklab, var(--accent) 45%, var(--line)); }
+.set-button-pair { display: flex; gap: 8px; }
+.set-button-pair .set-reset { flex: 1; margin-top: 0; }
 
 /* toast */
 .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(10px);
