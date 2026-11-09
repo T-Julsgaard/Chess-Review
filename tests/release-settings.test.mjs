@@ -275,6 +275,31 @@ test('0.5.0 users who skipped 0.4.0 complete both resets in one write', async ()
   assert.equal(writes.length, 1);
 });
 
+const MODERN_040 = { ...structuredClone(MODERN_LAYOUT),
+  evalbar: { x: 254.04, y: 52.42405289710294, w: 27.115889429536, h: 737.5521924833793, scale: 0.9038629809845334 } };
+
+test('an untouched 0.4.0 Modern arrangement adopts the 0.5.0 eval bar and stays responsive Modern', async t => {
+  const { store, before, writes } = migratedUser('0.5.0');
+  Object.assign(store.settings, { uiSetup: 'modern', uiSetupBase: 'modern' });
+  store.layout = structuredClone(MODERN_040);
+  await installed({ reason: 'update', previousVersion: '0.4.0' });
+  assert.deepEqual(store.layout, MODERN_LAYOUT);
+  assert.equal(store.layoutMode, before.layoutMode); assert.equal(store.layoutVersion, before.layoutVersion);
+  assert.equal(writes.length, 1);
+  const a = await workspace(t);
+  assert.equal(a.state.settings.uiSetup, 'modern');
+  assert.equal(a.call('isResponsiveModern'), true);
+});
+
+test('an edited 0.4.0 Modern arrangement keeps every panel where the user put it', async () => {
+  const { store } = migratedUser('0.5.0');
+  const edited = structuredClone(MODERN_040); edited.board.x += 40;
+  store.layout = structuredClone(edited);
+  await installed({ reason: 'update', previousVersion: '0.4.0' });
+  assert.deepEqual(store.layout, edited);
+  assert.equal(store.tabStylesResetFor050, true);
+});
+
 test('an Old setup keeps its arrangement and opens as Custom with the default tab styles', async t => {
   const { store } = migratedUser('0.5.0');
   Object.assign(store.settings, { uiSetup: 'old', uiSetupBase: 'old' });

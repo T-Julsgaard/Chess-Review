@@ -1,12 +1,13 @@
 import { browserAPI } from "./browser-compat.js";
-import { UI_SETUPS } from "./lib/ui-setups.js";
+import { UI_SETUPS, MODERN_LAYOUT } from "./lib/ui-setups.js";
 
 // Keep this minimum version and marker fixed in future releases. Users who skip
 // 0.4.0 still receive Modern; users who have migrated keep their later edits.
 const RESET_RELEASE = "0.4.0";
 const RESET_MARKER = "settingsResetFor040";
 // 0.5.0 returns every tab style (Settings → Visual → Tabs) to its default once.
-// Panel placements, layout and all other preferences are untouched. Keep this
+// Panel placements, layout and all other preferences are untouched, apart from
+// the untouched 0.4.0 Modern eval bar described below. Keep this
 // minimum version and marker fixed too, so later choices are never reset again.
 const TAB_RESET_RELEASE = "0.5.0";
 const TAB_RESET_MARKER = "tabStylesResetFor050";
@@ -15,6 +16,20 @@ const PRESERVED_SETTINGS = [
   "sound", "soundVolume", "soundFx", "puzzleSuccessSound", "puzzleIncorrectSound",
   "moveAnim", "uiAnim", "animSpeed", "learningTransition",
 ];
+// 0.4.0 saved the Modern arrangement on the first review. 0.5.0 moved its eval bar,
+// so an untouched 0.4.0 arrangement would no longer count as Modern and would lose
+// its responsive fit. The tab reset updates only that exact arrangement; a layout
+// the user edited is left as it is.
+const MODERN_EVALBAR_040 = { x: 254.04, y: 52.42405289710294, w: 27.115889429536, h: 737.5521924833793, scale: 0.9038629809845334 };
+function sameBox(box, expected) {
+  return ["x", "y", "w", "h", "scale"].every(prop =>
+    Math.abs((box?.[prop] ?? (prop === "scale" ? 1 : NaN)) - (expected[prop] ?? 1)) < 1e-6);
+}
+function untouchedModern040(layout) {
+  if (!layout || typeof layout !== "object") return false;
+  return Object.keys(layout).every(key => Object.hasOwn(MODERN_LAYOUT, key))
+    && Object.entries(MODERN_LAYOUT).every(([key, box]) => sameBox(layout[key], key === "evalbar" ? MODERN_EVALBAR_040 : box));
+}
 
 function versionAtLeast(actual, minimum) {
   const current = actual.split(".").map(Number), required = minimum.split(".").map(Number);
@@ -37,10 +52,12 @@ export async function resetSettingsForRelease(details) {
       if (!resetTabs || stored[TAB_RESET_MARKER]) return;
       // Only the tab styles change. A setup whose designs no longer match
       // (for example Old) is labelled Custom on the next review startup.
-      await browserAPI.storage.local.set({
+      const tabReset = {
         settings: { ...(stored.settings || {}), ...DEFAULT_TAB_STYLES },
         [TAB_RESET_MARKER]: true,
-      });
+      };
+      if (untouchedModern040(stored.layout)) tabReset.layout = { ...stored.layout, evalbar: { ...MODERN_LAYOUT.evalbar } };
+      await browserAPI.storage.local.set(tabReset);
       return;
     }
 

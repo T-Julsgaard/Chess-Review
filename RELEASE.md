@@ -6,7 +6,10 @@ overview, Accuracy move quality, Move list and the Flat v2 Evaluation bar), usin
 the `tabStylesResetFor050` marker in `release-settings.js`. Nothing else changes:
 panel placements, layout mode, the board, badges, sounds, engine settings and all
 stored data are kept. A setup whose designs then differ from its preset (such as
-Old) keeps its arrangement and is labelled Custom. Keep the 0.5.0 minimum version
+Old) keeps its arrangement and is labelled Custom. The one exception to "nothing
+else changes": a layout that is still exactly the untouched 0.4.0 Modern
+arrangement gets the 0.5.0 Modern eval bar position, so it keeps matching Modern
+and its responsive fit. Edited layouts are never touched. Keep the 0.5.0 minimum version
 and marker fixed: the step runs once, including for users who skip 0.5.0, and later
 tab choices are never reset again. Users still on 0.3.0 or older receive the 0.4.0
 reset and this step in a single write. The developer note keeps its once-only
