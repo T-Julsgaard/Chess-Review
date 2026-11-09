@@ -44,10 +44,10 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       await run(`(()=>{const head=[...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent===${JSON.stringify(section)});if(head.getAttribute('aria-expanded')!=='true')head.click();head.scrollIntoView({block:'start'});})()`);
       if (section==='Tabs') {
         const choices=await run(`Object.fromEntries([...document.querySelectorAll('.set-section.open .set-dropdown')].map(field=>[field.querySelector('.lib-dd-btn').dataset.setting,[...field.querySelectorAll('.lib-dd-opt')].map(n=>n.textContent)]))`);
-        assert.deepEqual(choices.accuracyDesign,['Original','Default']);
-        assert.deepEqual(choices.accuracyQualityDesign,['Original','Default']);
-        assert.deepEqual(choices.engineDesign,['Original','Default']);
-        assert.deepEqual(choices.graphDesign,['Original','Timeline','Default','Dotted bars','Colored bars']);
+        assert.deepEqual(choices.accuracyDesign,['Default','Original']);
+        assert.deepEqual(choices.accuracyQualityDesign,['Default','Original']);
+        assert.deepEqual(choices.engineDesign,['Default','Original']);
+        assert.deepEqual(choices.graphDesign,['Default','Original','Timeline','Dotted bars','Colored bars']);
         assert.equal(choices.accuracyAdvancedDesign,undefined);
         assert.equal(choices.evalbarDesign,undefined);
         assert.deepEqual(choices.barStyle,['Default','Gradient','Solid','Mono','Accent']);

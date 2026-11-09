@@ -18,10 +18,10 @@ test('Visual > Tabs offers compact dropdowns for Accuracy and Move list designs'
   assert.equal(section().querySelectorAll('.set-dropdown').length, 6);
   const labels = [...section().querySelectorAll('.set-lbl')].map(node => node.textContent);
   for (const label of ['Accuracy overview', 'Accuracy move quality']) assert.ok(labels.includes(label), label);
-  assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="accuracyDesign"]')].map(node => node.textContent), ['Original', 'Default']);
-  assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="accuracyQualityDesign"]')].map(node => node.textContent), ['Original', 'Default']);
+  assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="accuracyDesign"]')].map(node => node.textContent), ['Default', 'Original']);
+  assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="accuracyQualityDesign"]')].map(node => node.textContent), ['Default', 'Original']);
   assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="accuracyAdvancedDesign"]')].map(node => node.textContent), []);
-  assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="movesDesign"]')].map(node => node.textContent), ['Original', 'Edge-to-edge', 'Default', 'Large text']);
+  assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="movesDesign"]')].map(node => node.textContent), ['Default', 'Original', 'Edge-to-edge', 'Large text']);
   const option = section().querySelector('[data-setting="accuracyDesign"][data-value="original"]');
   option.focus(); option.click(); await settle(); await a.run('_settingsWriteQueue');
   assert.equal(a.store.settings.accuracyDesign, 'original');
@@ -40,6 +40,8 @@ test('Tabs dropdowns support keyboard navigation, selection and outside dismissa
   assert.equal(trigger().getAttribute('aria-expanded'), 'true');
   assert.equal(doc.activeElement.getAttribute('aria-selected'), 'true');
   doc.activeElement.dispatchEvent(new win.KeyboardEvent('keydown', {key: 'Home', bubbles: true}));
+  assert.equal(doc.activeElement.textContent, 'Default');
+  doc.activeElement.dispatchEvent(new win.KeyboardEvent('keydown', {key: 'End', bubbles: true}));
   assert.equal(doc.activeElement.textContent, 'Original');
   doc.activeElement.click(); await settle(); await a.run('_settingsWriteQueue');
   assert.equal(a.store.settings.accuracyDesign, 'original');

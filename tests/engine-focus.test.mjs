@@ -22,7 +22,7 @@ test(`${design} is selectable under Visual > Tabs, saves, and switches without c
   a.replace('scheduleReanalyze', () => { throw Error('Design changes must not reanalyze'); });
   await a.call('toggleSettings');
   [...doc.querySelectorAll('.set-sect-head')].find(n => n.textContent === 'Tabs').click();
-  assert.deepEqual([...doc.querySelectorAll('.lib-dd-opt[data-setting="engineDesign"]')].map(n => n.textContent), ['Original', 'Default']);
+  assert.deepEqual([...doc.querySelectorAll('.lib-dd-opt[data-setting="engineDesign"]')].map(n => n.textContent), ['Default', 'Original']);
   await a.call('setSetting', 'engineDesign', 'original');
   assert.equal(doc.querySelector('.engine-focus'), null);
   await a.call('setSetting', 'engineDesign', design);

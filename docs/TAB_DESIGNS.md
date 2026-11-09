@@ -41,7 +41,7 @@ visual preferences.
 | Move list | Original, Full height, Zoomed in, Zoom +20% | Full height |
 
 In **Settings → Visual → Tabs**, each tab's Modern choice is labelled **Default**
-(Evaluation: Move bars v3, Engine: Minimal, Accuracy overview: Phase report Modern,
+and listed first (Evaluation: Move bars v3, Engine: Minimal, Accuracy overview: Phase report Modern,
 Accuracy move quality: Distribution, Move list: Zoom +20%). The Evaluation bar
 dropdown lists Default (Flat v2), Gradient, Solid, Mono and Accent; Flat v2 is the
 default bar style and saved Flat choices migrate to it. Move bars and Minimal are
