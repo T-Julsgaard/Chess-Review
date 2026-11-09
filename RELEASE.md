@@ -1,6 +1,14 @@
-# Release 0.4.0
+# Release 0.5.0
 
-This release introduces the Modern interface, 50,000 puzzles and opening lessons.
+0.5.0 follows 0.4.0 (released October 27, 2026). It does not add a settings reset:
+the one-time 0.4.0 migration below stays as it is, so users who already migrated
+keep their preferences, and the developer note keeps its once-only markers.
+Retired choices migrate individually on startup (for example, the Flat evaluation
+bar becomes Flat v2, and Move bars/Minimal Evaluation designs become Default).
+
+## The 0.4.0 settings migration
+
+0.4.0 introduced the Modern interface, 50,000 puzzles and opening lessons.
 Modern is the saved default for new installations and upgrades from 0.3.0 or older,
 with the complete preset panel arrangement/designs and two engine panel lines.
 Users can customise the interface afterward; later openings and updates retain
@@ -38,9 +46,9 @@ Compatibility** and remove any Android compatibility override on the currently
 listed version. A local manifest change does not edit an already published listing.
 
 Run `npm ci`, `npm test`, `npm run verify:engines`, and `npm run build`.
-Each build creates a new `web-ext-artifacts/release-0.4.0-<unique>/` directory.
-It preserves `chess-review-0.4.0-chrome.zip`, `chess-review-0.4.0-firefox.zip`, and
-`chess-review-0.4.0-source.zip`, alongside staged copies. Existing packages are
+Each build creates a new `web-ext-artifacts/release-0.5.0-<unique>/` directory.
+It preserves `chess-review-0.5.0-chrome.zip`, `chess-review-0.5.0-firefox.zip`, and
+`chess-review-0.5.0-source.zip`, alongside staged copies. Existing packages are
 never overwritten. `release-record.json` records SHA-256 checksums, source-file
 hashes, the Git HEAD and working-tree status, Node version, and build time.
 `web-ext-artifacts/latest-release.json` points to the newest completed record;
@@ -96,16 +104,16 @@ reviews with both engines.
 Validate the actual Firefox ZIP with:
 
 ```sh
-npx web-ext lint --source-dir=web-ext-artifacts/release-0.4.0-<unique>/chess-review-0.4.0-firefox.zip
+npx web-ext lint --source-dir=web-ext-artifacts/release-0.5.0-<unique>/chess-review-0.5.0-firefox.zip
 ```
 
 Chrome uses an MV3 module service worker. Firefox uses an MV3 module event page.
 Store packages omit the other browser's background declaration. The development
 manifest includes both so the project can be loaded directly in either browser.
 
-Before uploading, confirm 0.4.0 is greater than the latest uploaded version in both
+Before uploading, confirm 0.5.0 is greater than the latest uploaded version in both
 store dashboards. Upload through the existing Chrome and Firefox listings and keep
-the Firefox extension ID from `manifest.json`; 0.4.0 does not change it or the
+the Firefox extension ID from `manifest.json`; 0.5.0 does not change it or the
 extension permissions. Keeping the existing extension identity preserves installed
 users' storage across updates. This repository does not authenticate to or publish
 to either store during build. Check that current screenshots match the two engine
@@ -123,8 +131,8 @@ evidence, not platform permission, independently validated move labels or rights
 to third-party assets. ATTRIBUTIONS.md records current asset provenance and limitations. Platform integration and applicable terms still need review;
 a generated ZIP is not legal clearance. The Chrome store download checked on
 October 3, 2026 was version 0.2.0; the Firefox public listing was unavailable at
-that check. The maintainer reports 0.3.0 is currently released. Version 0.4.0 is
-prepared for the maintainer's store upload.
+that check. The maintainer reports 0.4.0 is currently released (October 27, 2026).
+Version 0.5.0 is prepared for the maintainer's store upload.
 
 ## Reviewer notes
 
