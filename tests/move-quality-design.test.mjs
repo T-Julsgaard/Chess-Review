@@ -123,7 +123,7 @@ test('repeated category count clicks cycle through each player’s moves and wra
   S.counts.b.blunder = 2; S.counts.w.blunder = 2;
   for (const design of ['original', 'distribution']) {
     S.settings.accuracyQualityDesign = design; a.call('renderStats');
-    const row = doc.querySelector('[data-category="blunder"]').closest('.qbreak-row');
+    const row = doc.querySelector('.qbreak-row [data-category="blunder"]').closest('.qbreak-row');
     for (const [selector, plies] of [['.ct.left', [2, 6, 2]], ['.ct:not(.left)', [3, 5, 3]]]) {
       a.call('go', 0);
       for (const ply of plies) { row.querySelector(selector).click(); assert.equal(S.idx, ply); }
@@ -137,7 +137,7 @@ test('category cycling restarts after other navigation, changing category or loa
   count().click(); assert.equal(S.idx, 2);
   a.call('go', 4); count().click(); assert.equal(S.idx, 2);
   count().click(); assert.equal(S.idx, 4);
-  doc.querySelector('[data-category="blunder"]').closest('.qbreak-row').querySelector('.ct.left').click();
+  doc.querySelector('.qbreak-row [data-category="blunder"]').closest('.qbreak-row').querySelector('.ct.left').click();
   count().click(); assert.equal(S.idx, 2);
   loadGame(a, '1. d4 d5 2. c4 e6');
   S.classif = [null, 'best', 'best', 'best', 'best'];
