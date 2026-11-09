@@ -320,7 +320,7 @@ function auditionPage(manifest) {
   @media(max-width:650px){body{padding:0 16px;margin-top:28px}.references,article{grid-template-columns:1fr;gap:22px}.columns{display:none}article p{min-height:0}article>div+div{border-top:1px solid #374232;padding-top:20px}h1{font-size:32px}}
 </style>
 <main><header><div class="eyebrow">Chess Review · Sound workshop</div><h1>Same board. New moves.</h1>
-<p>15 new check sounds, each a single impact with simultaneous layers. No second knock or trailing tick. Check overrides capture, castling and brilliant sounds. The defaults are 01 · Firm Tap for check and 02 · Quick Pair for castling. Original Lichess sounds remain available in settings. Keep your volume fixed and compare with the originals; the 30 earlier candidates are below.</p>
+<p>15 new check sounds, each a single impact with simultaneous layers. No second knock or trailing tick. Check overrides capture and castling sounds. The original Lichess sounds are the defaults for check and castling; these candidates remain selectable in settings. Keep your volume fixed and compare with the originals; the 30 earlier candidates are below.</p>
 <div class="references"><div><h3>Original · Move</h3><audio controls preload="none" aria-label="Original move" src="../sounds/move-self.mp3"></audio></div><div><h3>Original · Capture</h3><audio controls preload="none" aria-label="Original capture" src="../sounds/capture.mp3"></audio></div></div>
 <nav>${groups.map((group, i) => `<a href="#group-${i + 1}">${group.title}</a>`).join('')}<button id="stop" type="button">Stop playback</button></nav>
 <div class="status" role="status" aria-live="polite">Choose a sound, or play a group in sequence.</div></header>

@@ -27,36 +27,23 @@ test('quiet moves, captures, checks, mates and castling retain their sounds', t 
   }
 });
 
-test('brilliant cues override SAN sounds only for known forward review moves', async t => {
+test('brilliant moves play their ordinary move sound', t => {
   const a = app(t), played = [];
   a.state.settings.sound = true;
   a.replace('playEvent', event => played.push(event));
-  a.state.positions = [{}, {san: 'Bxf7'}];
   a.state.classif = [null, 'brilliant'];
-  a.call('playMoveSound', 1);
-  a.call('playMoveSound', 1, false);
-  a.call('playSanSound', 'Bxf7');
-  assert.deepEqual(played, ['brilliant', 'capture', 'capture']);
-
-  await a.call('setFx', 'brilliant', 'snd', 'none');
-  a.call('playMoveSound', 1);
-  assert.equal(played.at(-1), 'capture');
-  await a.call('setFx', 'brilliant', 'snd', 'default');
-  a.state.practice = {};
-  a.call('playMoveSound', 1);
-  assert.equal(played.at(-1), 'capture');
-  a.state.practice = null;
-  a.state.classif[1] = 'great';
-  a.call('playMoveSound', 1);
-  assert.equal(played.at(-1), 'capture');
-  a.state.classif[1] = 'brilliant';
+  for (const san of ['Bxf7', 'Nf3', 'O-O']) {
+    a.state.positions = [{}, {san}];
+    a.call('playMoveSound', 1);
+  }
+  assert.deepEqual(played, ['capture', 'move', 'castle']);
+  assert.equal(a.run('SOUND_EVENTS').some(([event]) => event === 'brilliant'), false);
   a.state.settings.sound = false;
-  const count = played.length;
   a.call('playMoveSound', 1);
-  assert.equal(played.length, count);
+  assert.equal(played.length, 3);
 });
 
-test('check overrides brilliant and castling cues, including when the check sound is off', async t => {
+test('check overrides castling cues on brilliant moves, including when the check sound is off', async t => {
   const a = app(t), played = [];
   const triggerFx = a.run('triggerFx');
   a.state.settings.sound = true;
@@ -64,9 +51,9 @@ test('check overrides brilliant and castling cues, including when the check soun
   a.state.classif = [null, 'brilliant'];
   for (const san of ['Bxf7+', 'Qxh7#', 'O-O+', 'O-O-O#']) {
     a.state.positions = [{}, {san}];
-    for (const forward of [true, false]) {
+    for (let repeat = 0; repeat < 2; repeat++) {
       a.run('_lastNavSound = -Infinity');
-      a.call('playMoveSound', 1, forward);
+      a.call('playMoveSound', 1);
     }
   }
   assert.deepEqual(played, Array(8).fill('check'));
@@ -81,7 +68,7 @@ test('check overrides brilliant and castling cues, including when the check soun
   assert.equal(audio.length, 0);
 });
 
-test('review navigation celebrates a brilliant move once on entry and uses normal audio when undoing it', t => {
+test('review navigation plays normal audio for a brilliant move in both directions', t => {
   const a = app(t), played = [];
   loadGame(a, '1. e4 e5');a.call('computeDerived');a.call('buildUI');
   a.state.classif[1] = 'brilliant';
@@ -92,5 +79,5 @@ test('review navigation celebrates a brilliant move once on entry and uses norma
   a.call('renderAll');
   a.call('go', 0);
   a.call('go', 1);
-  assert.deepEqual(played, ['brilliant', 'move', 'brilliant']);
+  assert.deepEqual(played, ['move', 'move', 'move']);
 });

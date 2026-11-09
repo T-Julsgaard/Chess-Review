@@ -369,7 +369,6 @@ const DEFAULT_SETTINGS = {
     capture: { snd: "default", pitch: 0, speed: 1, volume: 100 },
     check:   { snd: "default", pitch: 0, speed: 1, volume: 100 },
     castle:  { snd: "default", pitch: 0, speed: 1, volume: 100 },
-    brilliant: { snd: "default", pitch: 0, speed: 1, volume: 100 },
     puzzleSuccess: { pitch: 0, speed: 1, volume: 100 },
     puzzleIncorrect: { pitch: 0, speed: 1, volume: 100 },
     runStart: { volume: 100 },
@@ -606,16 +605,14 @@ const EVENT_SOUND_FILES = {
     "06-close-lock", "07-capture-lock", "08-low-lock", "09-dry-lock", "10-reverse-weight",
     "11-settle-pair", "12-brushed-pair", "13-compact-settle", "14-deep-settle", "15-firm-settle",
   ],
-  brilliant: [
-    "01-crystal-revelation", "02-golden-insight", "03-celestial-bloom", "04-royal-flourish", "05-neon-spark",
-    "06-harp-turn", "07-breathed-wonder", "08-silver-seal", "09-orbit-rise", "10-velvet-impact",
-  ],
 };
 const EVENT_SOUNDS = Object.fromEntries(Object.entries(EVENT_SOUND_FILES).map(([event, names]) => [event,
-  names.map((name, index) => [(event === "brilliant" && index === 0) || (event === "check" && name === "01-firm-tap") || (event === "castle" && name === "02-quick-pair") ? "default" : event + "-" + name,
+  names.map(name => [event + "-" + name,
     name.slice(0, 2) + " · " + name.slice(3).split("-").map(word => word[0].toUpperCase() + word.slice(1)).join(" "),
     `sounds/${event}/${name}.wav`]),
 ]));
+// Check and castling default to the Lichess recordings; "lichess" was their explicit id before
+// they became the default and still resolves to the same file.
 const LICHESS_SOUNDS = {
   check: [["lichess", "Lichess", "sounds/Check.mp3"]],
   castle: [["lichess", "Lichess", "sounds/Castling.mp3"]],
@@ -637,21 +634,19 @@ function puzzleSuccessChoice() {
   const id = S.settings.puzzleSuccessSound;
   return id === "none" ? null : PUZZLE_SUCCESS_SOUNDS.find(([key]) => key === id) || PUZZLE_SUCCESS_SOUNDS[0];
 }
-// Board events with sound + knobs. [key, label, defaultFile]. Check defaults to
-// Firm Tap, castling to Quick Pair, and brilliant moves to Crystal Revelation.
+// Board events with sound + knobs. [key, label, defaultFile]. Every default is the Lichess sound.
 const SOUND_EVENTS = [
   ["move", "Move", "sounds/move-self.mp3"],
   ["capture", "Capture", "sounds/capture.mp3"],
-  ["check", "Check", "sounds/check/01-firm-tap.wav"],
-  ["castle", "Castle", "sounds/castle/02-quick-pair.wav"],
-  ["brilliant", "Brilliant move", "sounds/brilliant/01-crystal-revelation.wav"],
+  ["check", "Check", "sounds/Check.mp3"],
+  ["castle", "Castle", "sounds/Castling.mp3"],
 ];
 const _fxFileById = (id, ev) => ([...(EVENT_SOUNDS[ev] || []), ...(LICHESS_SOUNDS[ev] || []), ...FX_SOUNDS].find(([x]) => x === id) || [])[2] || null;
 const _eventDef = (ev) => SOUND_EVENTS.find(([k]) => k === ev) || SOUND_EVENTS[0];
 // Per-event config { snd, pitch, speed, volume }, with safe fallbacks for old/missing stored settings.
 function fxConfig(ev) {
   const c = (S.settings.soundFx && S.settings.soundFx[ev]) || {};
-  let snd = c.snd === "default" || c.snd === "none" || _fxFileById(c.snd, ev) ? c.snd : "default";
+  let snd = c.snd !== "lichess" && (c.snd === "none" || _fxFileById(c.snd, ev)) ? c.snd : "default";
   if (ev === "puzzleSuccess") snd = puzzleSuccessChoice()?.[0] || "none";
   if (ev === "puzzleIncorrect") {
     const id = S.settings.puzzleIncorrectSound;
@@ -813,13 +808,9 @@ function sanSound(san) {
   if (/^[O0]-[O0]/.test(san)) return "castle";
   return "move";
 }
-// Check also takes priority over brilliant celebrations. Other known brilliant
-// moves celebrate on forward navigation; Off restores their usual SAN sound.
-function playMoveSound(ply, forward = true) {
+function playMoveSound(ply) {
   if (!S.settings.sound || ply < 1 || !S.positions[ply]) return;
-  const event = sanSound(S.positions[ply].san);
-  const brilliant = forward && !S.practice && S.classif[ply] === "brilliant" && fxConfig("brilliant").snd !== "none";
-  playEvent(event === "check" ? event : brilliant ? "brilliant" : event);
+  playEvent(sanSound(S.positions[ply].san));
 }
 // Puzzles and practice share the selected incorrect-puzzle effect and tuning.
 function playWrongSound() {
@@ -6481,7 +6472,6 @@ function fxEventControls(ev, label) {
   const cfg = fxConfig(ev);
   const dedicated = EVENT_SOUNDS[ev] || [];
   let opts = [["default", dedicated.find(([id]) => id === "default")?.[1] || "Lichess"],
-    ...(LICHESS_SOUNDS[ev] || []).map(([id, label]) => [id, label]),
     ...dedicated.filter(([id]) => id !== "default").map(([id, label]) => [id, label]),
     ...FX_SOUNDS.map(([id, label]) => [id, label]), ["none", "Off"]];
   if (ev === "puzzleSuccess") opts = [...PUZZLE_SUCCESS_SOUNDS.map(([id, label]) => [id, label]), ["none", "Off"]];
@@ -7878,7 +7868,7 @@ function go(to) {
   // stepping BACK = the move being UNDONE (the one that left `prev`). Keying both on idx made
   // stepping back onto a quiet move play the capture sound of whatever move had created that
   // position (e.g. back off g5 onto fxe5 buzzed a capture though only a pawn slid back).
-  if (S.idx !== prev) { S.userArrows = []; S.userMarks = []; S.selectedSq = null; playMoveSound(S.idx > prev ? S.idx : prev, S.idx > prev); }
+  if (S.idx !== prev) { S.userArrows = []; S.userMarks = []; S.selectedSq = null; playMoveSound(S.idx > prev ? S.idx : prev); }
   paintBoard();
   // Smooth animation on single-step navigation (forward OR backward) — but snap instead of sliding
   // when the user is scrubbing fast, so the board keeps up with the keys instead of lagging behind.

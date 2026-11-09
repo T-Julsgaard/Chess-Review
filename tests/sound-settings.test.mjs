@@ -54,7 +54,7 @@ test('all event volume sliders save independently, preview at their level and re
   a.replace('triggerAudio', (...args) => played.push(args));
   a.call('buildUI');a.call('toggleSettings');a.call('selectSettingsCategory','sound');
   const doc = a.dom.window.document;
-  const events = ['puzzleSuccess', 'puzzleIncorrect', 'move', 'capture', 'check', 'castle', 'brilliant', 'runStart'];
+  const events = ['puzzleSuccess', 'puzzleIncorrect', 'move', 'capture', 'check', 'castle', 'runStart'];
   for (const [i, event] of events.entries()) {
     const slider = doc.querySelector(`[data-sound-event="${event}"] input[type=range]`);
     assert.ok(slider.getAttribute('aria-label').includes('volume'));
@@ -72,12 +72,12 @@ test('all event volume sliders save independently, preview at their level and re
   for (const event of events) assert.equal(a.call('fxConfig', event).volume, 100);
 });
 
-test('all 45 move-event variants and 10 brilliant cues can be selected, saved and previewed', async t => {
+test('all 45 move-event variants can be selected, saved and previewed', async t => {
   const a = app(t), played = [];
   a.replace('triggerAudio', (...args) => played.push(args));
   a.call('buildUI');a.call('toggleSettings');a.call('selectSettingsCategory','sound');
   const doc = a.dom.window.document;
-  for (const [event, expected] of [['check', 30], ['castle', 15], ['brilliant', 10]]) {
+  for (const [event, expected] of [['check', 30], ['castle', 15]]) {
     const choices = a.run(`EVENT_SOUNDS.${event}`);
     assert.equal(choices.length, expected);
     const controls = () => doc.querySelector(`[data-sound-event="${event}"]`);
@@ -108,14 +108,14 @@ test('all 45 move-event variants and 10 brilliant cues can be selected, saved an
   // Reopen settings from saved data, then restore defaults through the real reset.
   a.state.settings.soundFx = structuredClone(a.store.settings.soundFx);
   a.call('renderSettings');
-  for (const event of ['check', 'castle', 'brilliant']) {
+  for (const event of ['check', 'castle']) {
     assert.equal(doc.querySelector(`[data-sound-event="${event}"] .lib-dd-cur`).textContent, 'Off');
   }
   await a.call('resetSettingKeys', a.run('SOUND_SETTING_KEYS'));
   a.call('renderSettings');
-  assert.equal(doc.querySelector('[data-sound-event="check"] .lib-dd-cur').textContent, '01 · Firm Tap');
-  assert.equal(doc.querySelector('[data-sound-event="castle"] .lib-dd-cur').textContent, '02 · Quick Pair');
-  for (const [event, file] of [['check', 'check/01-firm-tap.wav'], ['castle', 'castle/02-quick-pair.wav'], ['brilliant', 'brilliant/01-crystal-revelation.wav']]) {
+  assert.equal(doc.querySelector('[data-sound-event="check"] .lib-dd-cur').textContent, 'Lichess');
+  assert.equal(doc.querySelector('[data-sound-event="castle"] .lib-dd-cur').textContent, 'Lichess');
+  for (const [event, file] of [['check', 'Check.mp3'], ['castle', 'Castling.mp3']]) {
     assert.equal(a.call('fxConfig', event).snd, 'default');
     assert.equal(a.call('fxUrl', event), 'https://extension.test/sounds/' + file);
     a.state.settings.soundFx[event] = {snd: 'missing-cue'};
@@ -123,25 +123,30 @@ test('all 45 move-event variants and 10 brilliant cues can be selected, saved an
   }
 });
 
-test('Lichess check and castling sounds can be selected, previewed and restored from storage', async t => {
+test('Lichess is the default check and castling sound and older explicit Lichess choices still resolve', async t => {
   const a = app(t), played = [];
   a.replace('triggerAudio', (...args) => played.push(args));
   a.call('buildUI');a.call('toggleSettings');a.call('selectSettingsCategory','sound');
   const doc = a.dom.window.document;
   for (const [event, file] of [['check', 'Check.mp3'], ['castle', 'Castling.mp3']]) {
     assert.ok(readFileSync(new URL('../sounds/' + file, import.meta.url)).length > 44);
+    await a.call('setFx', event, 'snd', event + (event === 'check' ? '-01-firm-tap' : '-02-quick-pair'));
     await a.call('setFx', event, 'pitch', -2);
     await a.call('setFx', event, 'speed', 1.2);
     await a.call('setFx', event, 'volume', 35);
+    a.call('renderSettings');
     const controls = () => doc.querySelector(`[data-sound-event="${event}"]`);
     const options = [...controls().querySelectorAll('.lib-dd-opt')];
     assert.equal(options.filter(option => option.textContent === 'Lichess').length, 1);
+    assert.equal(options[0].textContent, 'Lichess');
     options.find(option => option.textContent === 'Lichess').click();
     await settle();await a.run('_settingsWriteQueue');await settle();
-    assert.equal(a.store.settings.soundFx[event].snd, 'lichess');
+    assert.equal(a.store.settings.soundFx[event].snd, 'default');
     assert.deepEqual(played.at(-1), ['https://extension.test/sounds/' + file, -2, 1.2, .35]);
-    a.state.settings.soundFx = structuredClone(a.store.settings.soundFx);
+    // "lichess" was the explicit id before Lichess became the default.
+    a.state.settings.soundFx = {...structuredClone(a.store.settings.soundFx), [event]: {snd: 'lichess'}};
     a.call('renderSettings');
+    assert.equal(a.call('fxConfig', event).snd, 'default');
     assert.equal(controls().querySelector('.lib-dd-cur').textContent, 'Lichess');
     const count = played.length;
     a.call('triggerFx', event);
@@ -183,7 +188,7 @@ test('new check cues contain one short impact with simultaneous layers and no la
     assert.equal(wav.readInt16LE(44), 0);assert.equal(wav.readInt16LE(wav.length - 2), 0);
   }
   assert.equal(hashes.size, 15);
-  assert.equal(a.call('fxUrl', 'check'), 'https://extension.test/sounds/check/01-firm-tap.wav');
+  assert.equal(a.call('fxUrl', 'check'), 'https://extension.test/sounds/Check.mp3');
 });
 
 test('playback multiplies event and master levels, preserves Soft Retro calibration and mutes events independently', async t => {
