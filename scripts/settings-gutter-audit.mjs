@@ -44,13 +44,13 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       await run(`(()=>{const head=[...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent===${JSON.stringify(section)});if(head.getAttribute('aria-expanded')!=='true')head.click();head.scrollIntoView({block:'start'});})()`);
       if (section==='Tabs') {
         const choices=await run(`Object.fromEntries([...document.querySelectorAll('.set-section.open .set-dropdown')].map(field=>[field.querySelector('.lib-dd-btn').dataset.setting,[...field.querySelectorAll('.lib-dd-opt')].map(n=>n.textContent)]))`);
-        assert.deepEqual(choices.accuracyDesign,['Original','Game phases']);
-        assert.deepEqual(choices.accuracyQualityDesign,['Original','Category bars']);
-        assert.deepEqual(choices.engineDesign,['Original','Minimal']);
-        assert.ok(!choices.graphDesign.includes('Timeline v2'));
+        assert.deepEqual(choices.accuracyDesign,['Original','Default']);
+        assert.deepEqual(choices.accuracyQualityDesign,['Original','Default']);
+        assert.deepEqual(choices.engineDesign,['Original','Default']);
+        assert.deepEqual(choices.graphDesign,['Original','Timeline','Default','Dotted bars','Colored bars']);
         assert.equal(choices.accuracyAdvancedDesign,undefined);
         assert.equal(choices.evalbarDesign,undefined);
-        assert.deepEqual(choices.barStyle,['Gradient','Solid','Mono','Accent','Flat','Flat v2']);
+        assert.deepEqual(choices.barStyle,['Default','Gradient','Solid','Mono','Accent']);
         const nextTop=await run("document.querySelector('.lib-dd-btn[data-setting=accuracyQualityDesign]').getBoundingClientRect().top");
         await run("document.querySelector('.lib-dd-btn[data-setting=accuracyDesign]').click()");
         assert.equal(await run("document.querySelector('.lib-dd-btn[data-setting=accuracyQualityDesign]').getBoundingClientRect().top"),nextTop,'Opening a dropdown must overlay later settings without moving them');

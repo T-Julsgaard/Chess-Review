@@ -34,11 +34,19 @@ visual preferences.
 | --- | --- | --- |
 | Engine | Original, Focus, Minimal | Original (Minimal in Modern setup) |
 | Evaluation bar | Original, Balance | Balance |
-| Evaluation | Original, Timeline, Timeline v2, Move bars, Move bars v2, Move bars v3, Move bars v4, Minimal | Move bars v3 |
+| Evaluation | Original, Timeline, Default (Move bars v3), Dotted bars (Move bars v2), Colored bars (Move bars v4) | Default (Move bars v3) |
 | Accuracy overview | Original, Page tabs, Dials, Reveal, Phase report, Phase report 2, Phase report Modern, Phase report Modern v2 | Phase report |
 | Accuracy move quality | Original, Distribution | Distribution |
 | Accuracy advanced | Original | Original |
 | Move list | Original, Full height, Zoomed in, Zoom +20% | Full height |
+
+In **Settings → Visual → Tabs**, each tab's Modern choice is labelled **Default**
+(Evaluation: Move bars v3, Engine: Minimal, Accuracy overview: Phase report Modern,
+Accuracy move quality: Distribution, Move list: Zoom +20%). The Evaluation bar
+dropdown lists Default (Flat v2), Gradient, Solid, Mono and Accent; Flat v2 is the
+default bar style and saved Flat choices migrate to it. Move bars and Minimal are
+retired from the Evaluation dropdown: saved choices migrate to Default on startup,
+while their renderers stay available to layout previews.
 
 Original Accuracy restores the combined score/category panel, its seven-row
 summary, expandable full category list, explanations and practice button. Page

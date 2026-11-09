@@ -338,7 +338,7 @@ const DEFAULT_SETTINGS = {
   evalView: "both", mlStyle: "rows", badgeStyle: "icon", badgeScale: 1,
   badgeFont: "spacemono", badgeTooltip: "off", badgeSymbols: {}, badgeAppearance: "solid", checkmateBadge: "slab",
   // Eval-graph look (see renderGraph), eval-BAR look (see renderEvalBar) and the Insight-panel text size (px).
-  graphStyle: "area", barStyle: "gradient", insightFont: 16, nativeSizingVersion: 1,
+  graphStyle: "area", barStyle: "flat2", insightFont: 16, nativeSizingVersion: 1,
   // Board coordinate labels (the a–h / 1–8 ticks in the squares' corners): on/off + size in px.
   showCoords: true, coordSize: 12,
   // App background: "color" (a tone picked with the HSL sliders), a bundled preset (slate / olive
@@ -6329,7 +6329,7 @@ function visualSettings() {
     section("Tabs",
       ...PANEL_DESIGNS.filter(design => design.panel === "evalbar" || design.versions.length > 1).map(design =>
         design.panel === "evalbar" ? settingDropdown("Evaluation bar", "barStyle",
-          [["gradient", "Gradient"], ["classic", "Solid"], ["mono", "Mono"], ["accent", "Accent"], ["flat", "Flat"], ["flat2", "Flat v2"]])
+          [["flat2", "Default"], ["gradient", "Gradient"], ["classic", "Solid"], ["mono", "Mono"], ["accent", "Accent"]])
           : settingDropdown(design.label, design.setting, design.versions.map(version => [version.id, version.label]))),
     ),
     section("Theme",
@@ -8480,6 +8480,7 @@ async function showReadyWorkspace() {
     migrateEngineSettings(S.settings);
     delete S.settings.wrongSound; // older selectable mistake cues were removed
     delete S.settings.loaderStyle;
+    if (S.settings.barStyle === "flat") S.settings.barStyle = "flat2"; // Flat was retired in favour of Flat v2
     if (S.settings.bg === "default" || S.settings.bg === "ember") S.settings.bg = "color";
     if (S.settings.coach === "old_soviet_rework") S.settings.coach = "old_soviet"; // the rework became the canonical "Old Soviet"
     S.settings.density = "compact"; // density picker removed — compact is the only layout now

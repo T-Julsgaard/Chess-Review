@@ -19,10 +19,11 @@ test('Tabs offers only Evaluation bar styles and saves without changing analysis
   section.querySelector('.set-sect-head').click();
   assert.equal(section.querySelector('[data-setting="evalbarDesign"]'), null);
   assert.equal(section.querySelector('[data-setting="barStyle"]').getAttribute('aria-label'), 'Evaluation bar');
-  assert.deepEqual([...section.querySelectorAll('.lib-dd-opt[data-setting="barStyle"]')].map(n => n.textContent), ['Gradient', 'Solid', 'Mono', 'Accent', 'Flat', 'Flat v2']);
+  assert.deepEqual([...section.querySelectorAll('.lib-dd-opt[data-setting="barStyle"]')].map(n => n.textContent), ['Default', 'Gradient', 'Solid', 'Mono', 'Accent']);
+  assert.equal(section.querySelector('.lib-dd-opt[data-setting="barStyle"][data-value="flat"]'), null);
   const before = JSON.stringify({evals: a.state.evals, bests: a.state.bests, idx: a.state.idx, layout: a.state.layout});
   a.replace('scheduleReanalyze', () => { throw Error('Design choices must not start analysis'); });
-  for (const value of ['classic', 'mono', 'accent', 'flat', 'flat2', 'gradient']) {
+  for (const value of ['classic', 'mono', 'accent', 'gradient', 'flat2']) {
     doc.querySelector('[data-setting="barStyle"][data-value="'+value+'"]').click();
     await settle(); await a.run('_settingsWriteQueue');
     assert.equal(a.store.settings.barStyle, value);
@@ -37,7 +38,23 @@ test('Tabs offers only Evaluation bar styles and saves without changing analysis
   assert.equal(restored.store.settings.evalbarDesign, 'original');
 });
 
-for (const style of ['flat', 'flat2']) test(`${style} keeps scores, mates and board orientation live and restores the saved style`, async t => {
+test('Flat v2 is the default bar style and saved Flat choices migrate to it', async t => {
+  for (const settings of [{}, {barStyle: 'flat'}]) {
+    const a = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
+    a.replace('resetSettingsForRelease', async () => {});
+    a.store.settings = settings;
+    await a.start();
+    assert.equal(a.state.settings.barStyle, 'flat2');
+    assert.ok(a.dom.window.document.querySelector('.evalbar.eb-flat2'));
+  }
+  const kept = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
+  kept.replace('resetSettingsForRelease', async () => {});
+  kept.store.settings = {barStyle: 'gradient'};
+  await kept.start();
+  assert.equal(kept.state.settings.barStyle, 'gradient');
+});
+
+for (const style of ['flat2']) test(`${style} keeps scores, mates and board orientation live and restores the saved style`, async t => {
   const a = review(t), doc = a.dom.window.document;
   await a.call('setSetting', 'evalbarDesign', 'original');
   await a.call('setSetting', 'barStyle', style);
