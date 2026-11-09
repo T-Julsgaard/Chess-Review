@@ -287,7 +287,7 @@ test('completed panel moves and resizes select Custom; clicks and cancelled gest
 test('Custom survives reload and reset keeps the starting Modern layout and panel behavior',async t=>{
   const original=review(t);await original.call('applyUiSetup','modern');
   original.state.layout.moves.x+=32;await original.call('saveLayout',true);
-  await original.call('setSetting','graphDesign','bars2');
+  await original.call('setSetting','graphDesign','bars4');
   const a=app(t,{url:'https://extension.test/analysis.html?workspace=blank'});
   a.replace('resetSettingsForRelease',async()=>{});
   Object.assign(a.store,structuredClone(original.store));await a.start();
@@ -295,7 +295,7 @@ test('Custom survives reload and reset keeps the starting Modern layout and pane
   near(a.state.layout.moves.x,MODERN_LAYOUT.moves.x+32);
   await a.call('resetLayout');assert.equal(a.state.settings.uiSetup,'custom');
   near(a.state.layout.moves.x,MODERN_LAYOUT.moves.x);
-  assert.equal(a.state.settings.graphDesign,'bars2');
+  assert.equal(a.state.settings.graphDesign,'bars4');
   await a.call('resetVisualSettings');assert.equal(a.state.settings.uiSetup,'modern');
   for(const [key,value]of Object.entries(UI_SETUPS.modern.designs))assert.equal(a.state.settings[key],value);
 });

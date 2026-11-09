@@ -14,10 +14,10 @@ test('Tabs exposes Evaluation designs, saves them and preserves all analysis', a
   await a.call('toggleSettings');
   const section = [...doc.querySelectorAll('.set-section')].find(n => n.querySelector('.set-sect-head').textContent === 'Tabs');
   section.querySelector('.set-sect-head').click();
-  assert.deepEqual([...section.querySelectorAll('.lib-dd-opt[data-setting="graphDesign"]')].map(n => n.textContent), ['Default','Original','Timeline','Dotted bars','Colored bars']);
+  assert.deepEqual([...section.querySelectorAll('.lib-dd-opt[data-setting="graphDesign"]')].map(n => n.textContent), ['Default','Original','Timeline','Colored bars']);
   const before = JSON.stringify({evals:a.state.evals,bests:a.state.bests,idx:a.state.idx,layout:a.state.layout});
   a.replace('scheduleReanalyze', () => { throw Error('Design changes must not analyze'); });
-  for (const design of ['bars2','bars3','bars4','original','timeline']) {
+  for (const design of ['bars3','bars4','original','timeline']) {
     doc.querySelector(`[data-setting="graphDesign"][data-value="${design}"]`).click();
     await settle(); await a.run('_settingsWriteQueue');
     assert.equal(a.store.settings.graphDesign, design);
@@ -293,7 +293,7 @@ test('Move bars v4 colors every classified bar, omits category dots and refreshe
   assert.equal(columns().length,10, 'Pending positions have no colored bar');
 });
 
-for (const design of ['bars2','bars3','bars4']) {
+for (const design of ['bars3','bars4']) {
   test(`${design} restores its saved choice in a blank workspace without dots`, async t => {
     const a = app(t,{url:'https://extension.test/analysis.html?workspace=blank'}), doc = a.dom.window.document;
     a.replace('resetSettingsForRelease',async () => {});
@@ -324,7 +324,7 @@ test('Minimal shows only black and white fields, with hover on the boundary and 
   assert.equal(doc.querySelector('.evalbar'),bar);
 });
 
-for (const graphDesign of ['bars', 'minimal']) test(`retired ${graphDesign} Evaluation design migrates to Default at startup`, async t => {
+for (const graphDesign of ['bars', 'bars2', 'minimal']) test(`retired ${graphDesign} Evaluation design migrates to Default at startup`, async t => {
   const a = app(t,{url:'https://extension.test/analysis.html?workspace=blank'});
   a.replace('resetSettingsForRelease',async () => {});
   a.store.settings={uiSetup:'custom',graphDesign}; await a.start();
@@ -357,8 +357,8 @@ test('empty and missing evaluations have honest states; saved designs restore af
   assert.match(doc.querySelector('.evaluation-empty').textContent,/Waiting for analysis/);
   await a.call('setSetting','evalView','bar'); assert.equal(doc.querySelector('#graphMount svg'),null);
   const b = app(t,{url:'https://extension.test/analysis.html?workspace=blank'});
-  b.replace('resetSettingsForRelease',async () => {}); b.store.settings={graphDesign:'bars2'}; await b.start();
-  assert.equal(b.dom.window.document.querySelector('.evaluation-panel').dataset.design,'bars2');
+  b.replace('resetSettingsForRelease',async () => {}); b.store.settings={graphDesign:'bars4'}; await b.start();
+  assert.equal(b.dom.window.document.querySelector('.evaluation-panel').dataset.design,'bars4');
   assert.match(b.dom.window.document.querySelector('.evaluation-empty').textContent,/Load a game/);
   assert.equal(b.dom.window.document.querySelector('.evaluation-score').textContent,'—');
 });

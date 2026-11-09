@@ -58,7 +58,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
         assert.deepEqual(choices.accuracyDesign,['Default','Original']);
         assert.deepEqual(choices.accuracyQualityDesign,['Default','Original']);
         assert.deepEqual(choices.engineDesign,['Default','Original']);
-        assert.deepEqual(choices.graphDesign,['Default','Original','Timeline','Dotted bars','Colored bars']);
+        assert.deepEqual(choices.graphDesign,['Default','Original','Timeline','Colored bars']);
         assert.equal(choices.accuracyAdvancedDesign,undefined);
         assert.equal(choices.evalbarDesign,undefined);
         assert.deepEqual(choices.barStyle,['Default','Gradient','Solid','Mono','Accent']);
