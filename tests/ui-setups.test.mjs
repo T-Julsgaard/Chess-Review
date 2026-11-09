@@ -62,6 +62,47 @@ test('Modern reproduces every supplied box and scale, including the collapsed Ac
   assert.equal(a.dom.window.document.querySelectorAll('.quality-distribution .qbreak-row').length,10);
 });
 
+const sameBoxes=(actual,expected)=>{for(const [key,box]of Object.entries(expected))for(const prop of ['x','y','w','h','scale'])near(actual[key][prop],box[prop]);};
+test('Import panel layout sits under Export and restores an exported file from disk',async t=>{
+  const a=review(t),doc=a.dom.window.document;
+  await a.call('applyUiSetup','modern');
+  a.call('toggleSettings');
+  const buttons=[...doc.querySelectorAll('.set-reset')].map(n=>n.textContent);
+  assert.equal(buttons.indexOf('Import panel layout'),buttons.indexOf('Export panel layout')+1);
+  const moved=structuredClone(supplied);moved.layout.moves.x+=40;
+  [...doc.querySelectorAll('.set-reset')].find(n=>n.textContent==='Import panel layout').click();
+  const input=doc.querySelector('input[type=file]');
+  assert.match(input.accept,/json/);
+  Object.defineProperty(input,'files',{value:[{size:2000,text:async()=>JSON.stringify(moved)}]});
+  input.dispatchEvent(new a.dom.window.Event('change'));
+  await new Promise(resolve=>setTimeout(resolve,50));
+  assert.equal(doc.querySelector('input[type=file]'),null);
+  sameBoxes(a.call('layoutForSave'),moved.layout);sameBoxes(a.store.layout,moved.layout);
+  assert.equal(a.state.layoutMode,'custom');assert.equal(a.store.layoutMode,'custom');
+  assert.equal(a.state.settings.uiSetup,'custom');assert.equal(a.store.settings.uiSetup,'custom');
+  assert.equal(a.store.settings.uiSetupBase,'modern');
+});
+
+test('importing the setup layout keeps the preset and invalid files change nothing',async t=>{
+  const a=review(t);
+  await a.call('applyUiSetup','old');
+  assert.equal(await a.call('applyPanelLayout',structuredClone(supplied)),true);
+  sameBoxes(a.store.layout,supplied.layout);assert.equal(a.state.settings.uiSetup,'custom');
+  assert.equal(a.state.settings.uiSetupBase,'old');
+  await a.call('applyUiSetup','modern');
+  assert.equal(await a.call('applyPanelLayout',structuredClone(supplied)),true);
+  assert.equal(a.state.settings.uiSetup,'modern');
+  const before=JSON.stringify(a.store.layout),broken=structuredClone(supplied);broken.layout.board.w=-5;
+  for(const data of [null,{},{...supplied,schema:'other'},{schema:'chess-review-layout-v1',layout:{}},broken]){
+    assert.equal(await a.call('applyPanelLayout',data),false);
+    assert.equal(JSON.stringify(a.store.layout),before);
+  }
+  const partial={schema:'chess-review-layout-v1',layoutMode:'custom',layout:{moves:{...supplied.layout.moves,x:1100},extra:{x:0,y:0,w:1,h:1}}};
+  assert.equal(await a.call('applyPanelLayout',partial),true);
+  near(a.store.layout.moves.x,1100);assert.ok(!('extra' in a.store.layout));
+  sameBoxes(a.store.layout,{board:supplied.layout.board,engine:supplied.layout.engine});
+});
+
 test('saved Modern adopts Category bars while an individually selected Original remains Custom',async t=>{
   for(const setup of ['modern','custom']) {
     const a=app(t,{url:'https://extension.test/analysis.html?workspace=blank'});

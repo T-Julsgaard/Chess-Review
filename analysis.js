@@ -1942,6 +1942,58 @@ function exportPanelLayout() {
   const url=window.URL.createObjectURL(blob),link=el("a",{href:url,download:"chess-review-layout.json"});
   document.body.append(link);link.click();link.remove();setTimeout(()=>window.URL.revokeObjectURL(url),1000);
 }
+// Read a file written by exportPanelLayout(). Its `layout` holds the expanded Accuracy baseline,
+// the same form saveLayout() stores. Panels missing from the file keep the current setup's box.
+function parsePanelLayout(data) {
+  if (!data || data.schema !== "chess-review-layout-v1" || !data.layout || typeof data.layout !== "object") return null;
+  const baseline = setupLayout(), layout = {};
+  let found = 0;
+  for (const key of Object.keys(baseline)) {
+    const box = data.layout[key];
+    if (box === undefined) { layout[key] = baseline[key]; continue; }
+    const valid = box && ["x", "y", "w", "h"].every(p => Number.isFinite(box[p])) && box.w > 0 && box.h > 0
+      && (box.scale === undefined || (Number.isFinite(box.scale) && box.scale > 0));
+    if (!valid) return null;
+    layout[key] = { x: box.x, y: box.y, w: box.w, h: box.h, ...(box.scale === undefined ? {} : { scale: box.scale }) };
+    found++;
+  }
+  return found ? { layout, layoutMode: data.layoutMode === "custom" ? "custom" : "auto" } : null;
+}
+async function applyPanelLayout(data) {
+  const imported = parsePanelLayout(data);
+  if (!imported) { toast("That file isn't a Chess Review panel layout."); return false; }
+  cancelPanelGesture?.();
+  S._accReflow = null;
+  S.layout = imported.layout;
+  S.layoutMode = imported.layoutMode;
+  if (S.reorganize) toggleReorganize();
+  if (!accuracyLayoutExpanded()) reflowAccuracy(false);
+  applyLayoutMode();
+  const setup = baseUiSetup();
+  const patch = setupDesignsMatch() && setupLayoutMatches(layoutForSave(), S.layoutMode)
+    ? { uiSetup: setup, uiSetupBase: setup } : customUiSetupPatch();
+  Object.assign(S.settings, patch);
+  await Promise.all([saveLayout(true), writeSettings(patch)]);
+  requestAnimationFrame(alignPlayers);
+  if (UI.settings && !UI.settings.hidden) renderSettings();
+  toast("Panel layout imported.");
+  return true;
+}
+function importPanelLayout() {
+  const inp = el("input", { type: "file", accept: "application/json,.json", style: { display: "none" } });
+  inp.addEventListener("cancel", () => inp.remove());
+  inp.addEventListener("change", async () => {
+    const file = inp.files && inp.files[0];
+    inp.remove();
+    if (!file) return;
+    if (file.size > 1024 * 1024) { toast("That file is too large to be a panel layout."); return; }
+    let data = null;
+    try { data = JSON.parse(await file.text()); } catch {}
+    await applyPanelLayout(data);
+  });
+  document.body.append(inp);
+  inp.click();
+}
 function applyPanelBox(mod,b) {
   mod.style.left=b?b.x+"px":"";mod.style.top=b?b.y+"px":"";
   mod.style.width=b?b.w+"px":"";mod.style.height=b?b.h+"px":"";
@@ -6364,6 +6416,7 @@ function visualSettings() {
       el("button", { class: "set-reset reorg-toggle-btn", onclick: toggleReorganize }, S.reorganize ? "Done reorganizing" : "Reorganize panels"),
       el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Drag to move panels; use their edges to resize.")),
       el("button", { class: "set-reset", onclick: exportPanelLayout }, "Export panel layout"),
+      el("button", { class: "set-reset", onclick: importPanelLayout }, "Import panel layout"),
       el("button", { class: "set-reset", onclick: resetLayout }, "Reset layout"),
     ),
     section("Move list",
