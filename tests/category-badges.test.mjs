@@ -33,7 +33,7 @@ test('every scored category defaults to numbers and Book defaults to its book ic
     doc.defaultView.close();
   }
   const book = parse(fs.readFileSync(new URL('../icons/book.svg', import.meta.url), 'utf8'));
-  assert.equal(CATEGORY_SYMBOLS.book.svg, book.querySelector('g').outerHTML.replace(' xmlns="http://www.w3.org/2000/svg"', ''));
+  assert.equal(CATEGORY_SYMBOLS.book.svg, book.querySelector('.category-symbol[data-symbol="book"] > g').outerHTML.replace(' xmlns="http://www.w3.org/2000/svg"', ''));
   book.defaultView.close();
 });
 
