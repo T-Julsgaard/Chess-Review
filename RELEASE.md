@@ -128,8 +128,10 @@ manifest includes both so the project can be loaded directly in either browser.
 
 Before uploading, confirm 0.5.1 is greater than the latest uploaded version in both
 store dashboards. Upload through the existing Chrome and Firefox listings and keep
-the Firefox extension ID from `manifest.json`; 0.5.1 does not change it or the
-extension permissions. Keeping the existing extension identity preserves installed
+the Firefox extension ID from `manifest.json`; 0.5.1 does not change it. Since 0.4.0
+the Chrome package adds the `offscreen` permission (Firefox does not need it), so the
+Chrome dashboard asks for a justification on the Privacy practices tab; see
+Reviewer notes. Keeping the existing extension identity preserves installed
 users' storage across updates. This repository does not authenticate to or publish
 to either store during build. Check that current screenshots match the two engine
 choices, and use PRIVACY.md as the basis for the hosted privacy-policy URL.
@@ -161,7 +163,11 @@ claiming Android support in the listing.
 
 Permissions: storage and unlimitedStorage hold settings and game/analysis caches;
 activeTab reads the selected game URL; host permissions add the review controls
-and fetch public games. Update the Chrome privacy form to match PRIVACY.md; do not
+and fetch public games. offscreen (Chrome only) opens a hidden extension page,
+preview.html, with the WORKERS reason to run the bundled engine for the accuracy
+preview on the review button of a finished game. A Chrome service worker cannot
+start that WebAssembly worker itself. The page shows nothing, sends nothing, and
+closes when no preview is queued. Update the Chrome privacy form to match PRIVACY.md; do not
 claim that no lookup identifiers ever leave the device.
 
 ### Bundled libraries
