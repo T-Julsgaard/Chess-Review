@@ -7066,9 +7066,10 @@ async function setEngineSetting(key, value) {
   }
   const lineKey = key === "engineLines" || key === "fastLines" || key === "fastAnalysis";
   const scoringBuild = S.analyzing ? S.evalEngines[0]?.buildKey : previous.engineBuild;
-  const fixedProtocol = ["engineDepth","engineHash","engineSkill","classifyLines","ratingMode"].includes(key)
+  const fixedProtocol = (["engineDepth","engineHash","engineSkill","classifyLines","ratingMode"].includes(key)
     && S.settings.enginePath === "sf19lite" && scoringBuild === "sf19lite"
-    && (S.analyzing || reusableSf19Analysis(previous));
+    && (S.analyzing || reusableSf19Analysis(previous)))
+    || (key === "ratingMode" && !S.analyzing && reusableRatingAnalysis(previous));
   if (!lineKey && !fixedProtocol) { S.engineFallbackBuild = null; S.activeEngineBuild = null; }
   resetLiveEngine();
   invalidateVariationEvals();
@@ -7519,6 +7520,23 @@ function reusableSf19Analysis(saved) {
     && root.ratingEvidence.bestmove === root.bestmove && wdl(root.ratingEvidence.best) && wdl(root.ratingEvidence.played));
 }
 
+// The rating mode only changes how a finished review's evidence is summarized, so switching
+// recalculates instead of re-analyzing. The exception is Moves only on Stockfish 18: games with
+// recorded ratings skip its extra per-move rating search, which must then still be run.
+function reusableRatingAnalysis(saved) {
+  if (saved?.pgn !== S.pgn || !completeAnalysis(saved, S.total + 1)
+    || !scoringEvidenceComplete(saved.bests, S.total, CALIB)) return false;
+  let previous, current;
+  try { previous = JSON.parse(saved.settingsKey); current = JSON.parse(analysisSettingsKey()); } catch { return false; }
+  // Index 3 of the settings key is the rating mode; everything else must match.
+  if (!Array.isArray(previous) || previous.length !== current.length
+    || previous.some((value, i) => i !== 3 && value !== current[i])) return false;
+  if (S.settings.ratingMode !== "moves") return true;
+  return saved.bests.slice(0, S.total).every(root => {
+    const engine = root.calibration?.build === "sf19lite" ? "sf19" : "sf18";
+    return root.ratingEvidence?.candidateVersion === CALIB.movesOnly?.[engine]?.candidateVersion;
+  });
+}
 function completeAnalysis(saved, count) {
   return !!saved && Array.isArray(saved.bests) && saved.bests.length === count
     && saved.bests.every(Boolean) && Array.isArray(saved.evals) && saved.evals.length === count
