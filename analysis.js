@@ -5898,7 +5898,7 @@ function seg(label, key, options, info, fmt = (value) => value) {
         "aria-pressed": String(S.settings[key] === o), class: S.settings[key] === o ? "on" : "", onclick: () => setSetting(key, o) }, fmt(o)))),
   );
 }
-function settingDropdown(label, key, options) {
+function settingDropdown(label, key, options, info) {
   const field = ddField(S.settings[key], options, async value => {
     await setSetting(key, value);
     UI.settings.querySelector('.lib-dd-btn[data-setting="' + key + '"]')?.focus({preventScroll: true});
@@ -5916,7 +5916,7 @@ function settingDropdown(label, key, options) {
     option.setAttribute("role", "option");
     option.setAttribute("aria-selected", String(options[index][0] === S.settings[key]));
   });
-  return el("div", {class: "set-row"}, setLabel(label), field);
+  return el("div", {class: "set-row"}, setLabel(label, info), field);
 }
 // Generic slider. opts: { fmt(v)→text, onChange(v) }. Updates + saves live
 // without rebuilding the whole panel (so you can drag smoothly without losing the slider).
@@ -6355,8 +6355,8 @@ function visualSettings() {
       el("button", { class: "set-reset", onclick: resetArrowSettings }, "Reset to default"),
     ),
     section("Animations",
-      toggleRow("Interface animations", "uiAnim"),
-      el("p", { class: "set-note" }, "Animate learning transitions, statistics, puzzle changes and interface effects. Reduced motion follows your system preference."),
+      toggleRow("Interface animations", "uiAnim", setSetting,
+        "Adds motion to lesson transitions, stats, puzzle changes and other interface effects. If your device is set to reduce motion, that setting is respected."),
       toggleRow("Piece moves", "moveAnim"),
       slider("Piece speed", "animSpeed", 1, 10, 1, { fmt: (v) => (440 - v * 40) + " ms" }),
     ),
@@ -6568,7 +6568,8 @@ function motorSettings() {
 }
 function badgeLabelPicker() {
   return settingDropdown("Hover labels", "badgeTooltip",
-    Object.entries(BADGE_LABEL_STYLES).map(([id, option]) => [id, option.name]));
+    Object.entries(BADGE_LABEL_STYLES).map(([id, option]) => [id, option.name]),
+    "Show the category for two seconds after each move.");
 }
 async function setCategoryBadgeSymbol(category, symbol) {
   if (!Object.hasOwn(CATEGORY_SYMBOL_OPTIONS, category)) return;
@@ -6667,10 +6668,8 @@ function badgeSettings() {
     }),
     el("div", { class: "badge-symbol-editor" }, ...QUALITY_ORDER.map(categoryBadgePicker), checkmateBadgePicker()),
     QUALITY_ORDER.some(category => categoryBadgeSymbol(category, S.settings) === "numbers") ? el("div", { class: "badge-number-settings" },
-      el("div", { class: "set-lbl" }, "Number font"), badgeFontPicker(),
-      el("p", { class: "set-note" }, "Free, open-source fonts, bundled for offline use.")) : null,
-    badgeLabelPicker(),
-    el("p", { class: "set-note" }, "Show the category for two seconds after each move."));
+      el("div", { class: "set-lbl" }, "Number font"), badgeFontPicker()) : null,
+    badgeLabelPicker());
 }
 const SETTINGS_CATEGORIES = [
   {id:"visual", label:"Visual", description:"Make the workspace yours", icon:"palette", render:visualSettings},
@@ -6686,9 +6685,6 @@ function selectSettingsCategory(id) {
   settingsScroll.set(S.settingsTab, UI.settings.scrollTop);
   if (changed) for (const title of Object.keys(S.setOpen)) S.setOpen[title] = false;
   S.settingsTab = id;
-  // Single-purpose categories reveal their controls immediately on first visit.
-  const first = {review:"Review experience", sound:"General", developer:"Developer debugger"}[id];
-  if (first && S.setOpen[first] == null) S.setOpen[first] = true;
   renderSettings(changed);
   UI.settings.scrollTop = settingsScroll.get(id) || 0;
   UI.settings.querySelector('.set-category .lib-dd-btn').focus({preventScroll:true});

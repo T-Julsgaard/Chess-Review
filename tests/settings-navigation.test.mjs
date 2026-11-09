@@ -70,8 +70,9 @@ test('leaving a category collapses its sections while edits and reselecting it p
   assert.equal(doc.querySelector('.set-section.open .set-sect-head').textContent,'Tabs');
   choose('engine');open('Search');choose('visual');assert.equal(doc.querySelector('.set-section.open'),null);
   choose('engine');assert.equal(doc.querySelector('.set-section.open'),null);
-  choose('sound');assert.ok(doc.querySelector('.set-section.open'));
-  choose('visual');choose('sound');assert.equal(doc.querySelector('.set-section.open'),null);
+  // Every category opens collapsed, including the first visit after a page load.
+  for(const id of ['review','sound','developer']){choose(id);assert.equal(doc.querySelector('.set-section.open'),null);}
+  choose('review');open('Review experience');choose('visual');choose('review');assert.equal(doc.querySelector('.set-section.open'),null);
 });
 
 test('visual and sound resets leave the other categories intact',async t=>{
