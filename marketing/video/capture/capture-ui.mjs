@@ -97,7 +97,8 @@ async function layout() {
       ipAnalyzing: text(document.querySelector('.ip-analyzing')),
       currentMove: box(document.querySelector('.ml-move.current')),
       accVals: [...document.querySelectorAll('.acc-val')].map(text),
-      estRatings: [...document.querySelectorAll('.est-rating')].map(text),
+      // .acc-elo in the default accuracy design, .est-rating in the Original one.
+      estRatings: [...document.querySelectorAll('.acc-elo, .est-rating')].map(text),
     });
     return out;
   });
@@ -165,7 +166,9 @@ async function vt(method, value) {
 }
 
 // Records `frames` frames at FPS. actions[i] (functions) run just before frame i.
-async function record(name, frames, actions = {}, { quality = 95, probe } = {}) {
+// onFrame(i), if given, runs first and may add later actions or return a new frame count,
+// for shots whose timing depends on the page.
+async function record(name, frames, actions = {}, { quality = 95, probe, onFrame, extra } = {}) {
   const dir = path.join(OUT, name);
   fs.rmSync(dir, { recursive: true, force: true });
   fs.mkdirSync(dir, { recursive: true });
@@ -173,6 +176,7 @@ async function record(name, frames, actions = {}, { quality = 95, probe } = {}) 
   const startLayout = await layout();
   await vt('enter');
   for (let i = 0; i < frames; i++) {
+    if (onFrame) frames = (await onFrame(i)) ?? frames;
     for (const fn of actions[i] || []) await fn();
     await vt(i ? 'step' : 'sync', 1000 / FPS);
     await grab(path.join(dir, `${String(i).padStart(4, '0')}.jpg`), { format: 'jpeg', quality });
@@ -180,7 +184,8 @@ async function record(name, frames, actions = {}, { quality = 95, probe } = {}) 
     if (probe) probes.push(await page.evaluate(probe));
   }
   await vt('exit');
-  manifest.sequences[name] = { dir: `captures/${name}`, frames, fps: FPS, cursor, layout: startLayout, ...(probe ? { probes } : {}) };
+  manifest.sequences[name] = { dir: `captures/${name}`, frames, fps: FPS, cursor, layout: startLayout,
+    ...(probe ? { probes } : {}), ...(extra ? extra() : {}) };
   save();
   console.log('sequence', name, frames);
 }
@@ -247,9 +252,18 @@ try {
     await openGame();
     for (const p of [0, 33, 54, 55, 56]) { await goPly(p); await still(`review-${p}`); }
     await goPly(55);
-    await page.click('.qbreak-toggle');
-    await mouse.park(); // a row under the pointer would show its tooltip
-    await sleep(900);
+    // The default accuracy panel keeps the move classes on its Quality tab, all listed;
+    // the Original design shows a short list with a toggle instead.
+    if (await page.$('#accuracy-tab-1')) {
+      await page.click('#accuracy-tab-1');
+      await mouse.park();
+      await sleep(900);
+    }
+    if (await page.$('.qbreak-toggle')) {
+      await page.click('.qbreak-toggle');
+      await mouse.park(); // a row under the pointer would show its tooltip
+      await sleep(900);
+    }
     await still('review-55-allcats');
   }
 
@@ -291,25 +305,42 @@ try {
   }
 
   // 6. Practice: replay to the mistake, watch it replayed, then find 28.Rg1.
+  // "Practice your mistakes" sits in the review panel at the starting position, so the roll
+  // runs from move 1 (about 7.5 s to Qxd4 and its replay). The drag starts once the page
+  // asks for a move; marks records the frames of the click, that moment, pick-up and drop.
   if (want('practice')) {
     await openGame();
-    await goPly(50);
+    await goPly(0);
     const lay = await layout();
+    if (!lay.practiceBtn) throw Error('no "Practice your mistakes" button at the starting position');
     const btn = { x: lay.practiceBtn.x + lay.practiceBtn.w / 2, y: lay.practiceBtn.y + lay.practiceBtn.h / 2 };
     const start = { x: btn.x - 120, y: btn.y + 260 };
     const rook = square(lay, 'd1'), g1 = square(lay, 'g1');
     const actions = {};
+    const marks = { click: 46, ready: null, pick: null, drop: null };
     at(actions, 0, () => mouse.move(start.x, start.y));
     glide(actions, 4, 36, start, btn);
     at(actions, 46, () => mouse.press());
     at(actions, 51, () => mouse.release());
-    // About 2.8 s of roll + replay after the click; the board accepts moves from ~frame 220.
-    glide(actions, 226, 44, btn, rook);
-    at(actions, 280, () => mouse.press());
-    glide(actions, 283, 40, rook, g1);
-    at(actions, 330, () => mouse.release());
-    glide(actions, 340, 50, g1, { x: g1.x + 150, y: g1.y + 60 });
-    await record('practice', 520, actions);
+    const LIMIT = 60 * FPS;
+    await record('practice', LIMIT, actions, {
+      extra: () => ({ marks }),
+      async onFrame(i) {
+        if (marks.ready != null || i <= 51) return;
+        const status = await page.evaluate(() => document.querySelector('.practice-status')?.textContent || '');
+        if (!status.startsWith('Find')) { if (i > LIMIT - 400) throw Error(`practice never asked for a move: "${status}"`); return; }
+        // The same beats as before relative to the board taking moves: 6 frames' pause,
+        // 54 to reach the rook, a 50-frame drag, then the board resets about 40 frames later.
+        const r = marks.ready = i;
+        marks.pick = r + 60; marks.drop = r + 110;
+        glide(actions, r + 6, 44, btn, rook);
+        at(actions, marks.pick, () => mouse.press());
+        glide(actions, r + 63, 40, rook, g1);
+        at(actions, marks.drop, () => mouse.release());
+        glide(actions, r + 120, 50, g1, { x: g1.x + 150, y: g1.y + 60 });
+        return r + 300;
+      },
+    });
     await mouse.park();
   }
 
