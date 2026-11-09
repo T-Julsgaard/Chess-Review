@@ -72,7 +72,8 @@ for (const engine of ['nnue', 'sf19lite']) {
     a.call('renderSettings');
     const section = () => [...a.dom.window.document.querySelectorAll('.set-section')].find(node => node.textContent.includes('Estimated rating'));
     assert.deepEqual([...section().querySelectorAll('.lib-dd-opt')].map(node => node.textContent), ['Use recorded rating', 'Moves only']);
-    assert.match(section().textContent, /selected engine's own model/);
+    assert.match(section().textContent, /Moves only estimates a blitz rating from your moves alone/);
+    assert.doesNotMatch(section().textContent, /If no rating is saved/);
     for (const [mode, label] of [['moves', 'Moves only'], ['context', 'Use recorded rating']]) {
       [...section().querySelectorAll('.lib-dd-opt')].find(node => node.textContent === label).click();
       await settle();

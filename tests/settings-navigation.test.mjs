@@ -14,7 +14,7 @@ test('category selection mounts only the intended controls without saving or cha
   const sections=()=>[...doc.querySelectorAll('.set-sect-head > span:first-child')].map(n=>n.textContent);
   for(const [id,expected] of [
     ['review',['Review experience','Coach']],['engine',['Search','Estimated rating','Engine']],
-    ['sound',['Sound']],['leaderboard',['Leaderboard']],['developer',['Developer debugger']],
+    ['sound',['General','Move','Capture','Check','Castle','Puzzle success','Incorrect puzzle','Puzzle intro']],['developer',['Developer debugger']],
   ]){
     trigger().click();choose(id);
     assert.deepEqual(sections(),expected);
@@ -24,7 +24,7 @@ test('category selection mounts only the intended controls without saving or cha
     assert.equal(doc.activeElement,trigger());
   }
   choose('visual');
-  assert.ok(sections().includes('Board & Pieces'));assert.ok(!sections().includes('Sound'));
+  assert.ok(sections().includes('Board & Pieces'));assert.ok(!sections().includes('Incorrect puzzle'));
   assert.deepEqual(structuredClone(a.state.settings),before);assert.equal(a.writes.length,writes);
   assert.equal(a.state.idx,0);
 });

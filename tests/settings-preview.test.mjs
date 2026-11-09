@@ -106,18 +106,20 @@ test('custom board picker keeps its button mounted and previews both square colo
 test('Visual stays focused on appearance and review experience lives with the coach', async t => {
   const {a, doc, section, open} = settings(t);
   assert.equal(section('Review experience'), undefined);
-  assert.deepEqual([...section('Interface presets').querySelectorAll('[data-setting="uiSetup"]')].map(n => n.textContent), ['Old', 'Modern', 'Custom']);
+  assert.deepEqual([...section('Interface presets').querySelectorAll('[data-setting="uiSetup"]')].map(n => n.textContent), ['Modern', 'Old', 'Custom']);
   assert.equal(section('Coach'), undefined);
-  assert.equal(section('Sound'), undefined);
+  assert.equal(section('General'), undefined);
   assert.equal(section('Leaderboard'), undefined);
+  assert.equal(section('Insights'), undefined);
   assert.equal(section('Developer debugger'), undefined);
   const visualReset = doc.querySelector('#settings > div:last-child > button:last-child');
   assert.equal(visualReset.textContent, 'Reset all visual settings');
-  assert.equal(visualReset.previousElementSibling, section('Insights'));
+  assert.equal(visualReset.previousElementSibling, section('Background'));
   a.call('selectSettingsCategory', 'review');
-  assert.match(section('Review experience').querySelector('.set-note').textContent, /Dopamine mode/);
+  assert.equal(section('Review experience').querySelector('.set-note'), null);
   assert.deepEqual([...section('Review experience').querySelectorAll('[data-setting="reviewMode"]')].map(n => n.textContent), ['Normal', 'Dopamine']);
   assert.ok(section('Coach'));
+  assert.ok([...section('Coach').querySelectorAll('.set-lbl')].some(n => n.textContent === 'Text size'));
   [...doc.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].find(n => n.textContent === 'Engine').click();
   assert.equal(doc.querySelector('#settings > div:last-child > button:last-child').textContent, 'Reset all engine settings');
   [...doc.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].find(n => n.textContent === 'Visual').click();

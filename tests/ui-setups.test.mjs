@@ -25,7 +25,7 @@ function review(t) {
   return a;
 }
 
-test('Visual offers Old, Modern and Custom and selecting a setup preserves the review and other preferences',async t=>{
+test('Visual offers Modern, Old and Custom and selecting a setup preserves the review and other preferences',async t=>{
   const a=review(t),doc=a.dom.window.document;
   a.state.idx=3;a.state.settings.accent='#5a8bef';a.state.settings.engineDepth=18;
   a.replace('scheduleReanalyze',()=>{throw Error('UI setups must not reanalyze');});
@@ -33,7 +33,7 @@ test('Visual offers Old, Modern and Custom and selecting a setup preserves the r
   a.call('toggleSettings');
   const section=()=>[...doc.querySelectorAll('.set-section')].find(n=>n.querySelector('.set-sect-head').textContent==='Interface presets');
   section().querySelector('.set-sect-head').click();
-  assert.deepEqual([...section().querySelectorAll('[data-setting="uiSetup"]')].map(n=>n.textContent),['Old','Modern','Custom']);
+  assert.deepEqual([...section().querySelectorAll('[data-setting="uiSetup"]')].map(n=>n.textContent),['Modern','Old','Custom']);
   assert.equal(section().querySelector('.on').dataset.value,'custom');
   for(const value of ['old','modern','old']) {
     section().querySelector('[data-value="'+value+'"]').click();await settle();await a.run('_settingsWriteQueue');

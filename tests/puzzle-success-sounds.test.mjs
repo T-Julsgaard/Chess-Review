@@ -73,7 +73,7 @@ test('Sound settings save and preview each choice, support Off without a preview
   a.call('toggleSettings');a.call('selectSettingsCategory','sound');
   const doc = a.dom.window.document;
   const controls = () => doc.querySelector('.set-puzzle-success');
-  const sound = [...doc.querySelectorAll('.set-section')].find(s => s.querySelector('.set-sect-head').textContent === 'Sound');
+  const sound = [...doc.querySelectorAll('.set-section')].find(s => s.querySelector('.set-sect-head').textContent === 'Puzzle success');
   if (!sound.classList.contains('open')) sound.querySelector('.set-sect-head').click();
   assert.ok(controls().closest('.set-section').classList.contains('open'));
   assert.equal(controls().querySelectorAll('.lib-dd-opt').length, 6);
@@ -141,7 +141,8 @@ test('both puzzle sounds share the event dropdown, volume, pitch and speed layou
   for (const [event, label] of [['puzzleSuccess', 'Puzzle success'], ['puzzleIncorrect', 'Incorrect puzzle']]) {
     const controls = doc.querySelector(`[data-sound-event="${event}"]`);
     assert.ok(controls.classList.contains('set-fx'));
-    assert.equal(controls.querySelector('.set-row > .set-lbl').textContent, label);
+    assert.equal(controls.closest('.set-section').querySelector('.set-sect-head').textContent, label);
+    assert.equal(controls.querySelector('.set-row > .set-lbl').textContent, 'Sound');
     assert.ok(controls.querySelector('.lib-dd-field'));
     assert.equal(controls.querySelector('.set-seg'), null);
     assert.deepEqual([...controls.querySelectorAll('.set-fx-knob .set-lbl')].map(n => n.textContent), ['Volume', 'Pitch', 'Speed']);

@@ -1685,8 +1685,8 @@ function buildUI() {
 
   const settings = el("div", { class: "settings-pop", id: "settings", hidden: true });
   settings.addEventListener('scroll', () => {
-    const picker = settings.querySelector('.set-category.open');
-    if (picker) positionSettingsDropdown(picker);
+    const picker = settings.querySelector('.set-category.open, .set-dropdown-down.open');
+    if (picker) positionSettingsDropdown(picker, {reposition: true});
   }, {passive:true});
 
   // Library sidebar — a thin strip on the far left, opened by hover or its native button.
@@ -6242,7 +6242,7 @@ const VISUAL_SETTING_KEYS = [
   ...PANEL_DESIGNS.map(design => design.setting),
   "theme", "accent", "accentCustom", "density", "evalView", "mlStyle", "badgeStyle", "badgeScale",
   ...BADGE_SETTING_KEYS,
-  "graphStyle", "barStyle", "insightFont", "showCoords", "coordSize", ...BACKGROUND_SETTING_KEYS,
+  "graphStyle", "barStyle", "showCoords", "coordSize", ...BACKGROUND_SETTING_KEYS,
   "boardTheme", "pieceStyle", "boardCustomLight", "boardCustomDark",
   ...ARROW_SETTING_KEYS,
   "moveAnim", "uiAnim", "animSpeed", "learningTransition",
@@ -6296,8 +6296,7 @@ function bgControls() {
     (!isColor && S.settings.bgFit === "tile") ? seg("Tile size", "bgTile", ["small", "medium", "large"]) : null,
     el("div", { class: "set-row" },
       el("span", { class: "set-lbl" }, "Custom"),
-      el("button", { class: "set-reset", style: { margin: 0 }, onclick: uploadBackground }, "Upload image…")),
-    el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "PNG, JPEG, WebP, GIF or AVIF.")),
+      el("button", { class: "set-reset", style: { margin: 0 }, onclick: uploadBackground }, "Upload image")),
     el("button", { class: "set-reset", onclick: resetBackgroundSettings }, "Reset to default"),
   ];
 }
@@ -6325,7 +6324,7 @@ function visualSettings() {
     render: (chip) => colorPickerChip(chip, [S.settings.accentCustom]) });
   return el("div", {},
     section("Interface presets",
-      seg("Setup", "uiSetup", Object.keys(UI_SETUPS), null, value => UI_SETUPS[value].label),
+      seg("Setup", "uiSetup", ["modern", "old", "custom"].filter(id => UI_SETUPS[id]), null, value => UI_SETUPS[value].label),
     ),
     section("Tabs",
       ...PANEL_DESIGNS.filter(design => design.panel === "evalbar" || design.versions.length > 1).map(design =>
@@ -6373,32 +6372,39 @@ function visualSettings() {
     ),
     section("Badges", badgeSettings()),
     section("Background", ...bgControls()),
-    section("Insights",
-      slider("Text size", "insightFont", 11, 25, 1, {
-        fmt: (v) => v + " px",
-        onChange: (v) => document.documentElement.style.setProperty("--ip-font", v + "px"),
-      }),
-      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Font size of the move commentary in the Insight panel.")),
-    ),
     el("button", { class: "set-reset", onclick: resetVisualSettings }, "Reset all visual settings"),
   );
 }
+// Preview a Dopamine reaction on whichever board is showing: the review board, or the
+// learning workspace's board (centred there, since its position isn't the game's).
+function previewReviewEffect(category) {
+  const learning = learningWorkspace?.boardElement;
+  const board = learning || UI.boardWrap.querySelector(".board");
+  reviewEffects.show(board, {
+    category, square: learning ? null : activePos().to, flipped: S.flipped, motion: S.settings.uiAnim !== false,
+  });
+}
+const REVIEW_SETTING_KEYS = ["reviewMode", "coach", "coachPlain", "coachEngineReplies", "insightFont"];
+// Restore the Review & Coach defaults, then reload the coach and repaint everything they affect.
+async function resetReviewSettings() {
+  await resetSettingKeys(REVIEW_SETTING_KEYS);
+  S.coach = S.settings.coachPlain ? null : await loadCoach(S.settings.coach);
+  _ipSig = null;
+  if (S.practice) S.practice.coachTyped = false;
+  applySettings();
+  paintBoard(); renderCoachAvatar(); renderReview(); fitViewport();
+  if (UI.settings && !UI.settings.hidden) renderSettings();
+}
 function reviewSettings() {
-  const canPreviewReviewEffects = !learningWorkspace && !S.practice && !S.reorganize;
   const specialReplies = !S.settings.coachPlain && !engineExplanationsEnabled();
   return el("div", {},
     section("Review experience",
       seg("Review experience", "reviewMode", ["normal", "dopamine"], null, value => value === "dopamine" ? "Dopamine" : "Normal"),
-      el("p", { class: "set-note" }, "Dopamine mode adds vivid move reactions, a purple review theme and explanations from the engine’s available continuation. Brilliant moves light up the board; blunders send a red shockwave. Reduced motion keeps a static square outline."),
-      el("div", { class: "dopamine-preview-buttons" }, ...["brilliant", "blunder"].map(category =>
-        el("button", { type: "button", class: "set-reset", disabled: S.settings.reviewMode !== "dopamine" || !canPreviewReviewEffects,
-          onclick: () => reviewEffects.show(UI.boardWrap.querySelector(".board"), {
-            category, square: activePos().to, flipped: S.flipped, motion: S.settings.uiAnim !== false,
-          }) }, "Preview " + categoryName(category) + " effect"))),
-      !canPreviewReviewEffects ? el("p", { class: "set-note" }, "Return to game review to preview these effects.") : null,
+      S.settings.reviewMode === "dopamine" ? el("div", { class: "dopamine-preview-buttons" }, ...["brilliant", "blunder"].map(category =>
+        el("button", { type: "button", class: "set-reset", disabled: S.reorganize,
+          onclick: () => previewReviewEffect(category) }, "Preview " + categoryName(category) + " effect"))) : null,
     ),
     section("Coach",
-      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Who appears and narrates. Choose No coach to remove the character and keep plain move commentary. Switch any time.")),
       coachPicker(),
       S.settings.coach ? el("div", { class: "set-row" },
         setLabel("Special replies", "The coach narrates in their own voice. Turning this on switches off Engine explanations; the character still appears and reacts with either reply type."),
@@ -6415,22 +6421,27 @@ function reviewSettings() {
             onclick: () => setCoachEngineReplies(enabled) }, enabled ? "On" : "Off")),
         ),
       ),
+      slider("Text size", "insightFont", 11, 25, 1, {
+        fmt: (v) => v + " px",
+        onChange: (v) => document.documentElement.style.setProperty("--ip-font", v + "px"),
+      }),
     ),
+    el("button", { class: "set-reset", onclick: resetReviewSettings }, "Reset all Review & Coach settings"),
   );
 }
+// Each sound event is its own collapsible section.
 function soundSettings() {
   return el("div", {},
-    section("Sound",
+    section("General",
       toggleRow("Sound effects", "sound"),
       slider("Master volume", "soundVolume", 0, 100, 1, { fmt: (v) => v + " %" }),
-      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Pick a sound for each event, then adjust its volume, pitch and speed. Each volume is relative to the master volume. Changes preview as you make them.")),
-      fxEventControls("puzzleSuccess", "Puzzle success"),
-      fxEventControls("puzzleIncorrect", "Incorrect puzzle"),
-      ...SOUND_EVENTS.map(([key, label]) => fxEventControls(key, label)),
-      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Brilliant move plays when you navigate forward to a move classified as brilliant. Off uses its usual move sound.")),
-      el("div", { class: "set-fx", "data-sound-event": "runStart" },
-        fxSlider("runStart", "volume", "Puzzle intro volume", 0, 100, 1, (v) => v + " %")),
     ),
+    ...SOUND_EVENTS.map(([key, label]) => section(label, fxEventControls(key, label))),
+    section("Puzzle success", fxEventControls("puzzleSuccess", "Puzzle success")),
+    section("Incorrect puzzle", fxEventControls("puzzleIncorrect", "Incorrect puzzle")),
+    section("Puzzle intro",
+      el("div", { class: "set-fx", "data-sound-event": "runStart" },
+        fxSlider("runStart", "volume", "Volume", 0, 100, 1, (v) => v + " %"))),
     el("button", {class:"set-reset", onclick:async () => {
       await resetSettingKeys(SOUND_SETTING_KEYS); renderSettings();
     }}, "Reset all sound settings"),
@@ -6454,7 +6465,7 @@ function arrowColorSetting(label, key) {
 }
 // Coach dropdown — only coaches that have a built animated character. Uses the
 // library's custom dropdown (ddField) rather than a native <select> so the option hover matches the
-// app theme instead of the OS's blue highlight.
+// app theme instead of the OS's blue highlight. It always opens downwards.
 function coachPicker() {
   const cur = S.settings.coach || "";
   const opts = [["", "No coach"], ...COACH_LIST.filter(([id]) => COACH_RIGS[id])];
@@ -6462,7 +6473,7 @@ function coachPicker() {
     id ? el("img", { class: "coach-thumbnail", src: browserAPI.runtime.getURL("data/coaches-anim/thumbnails/" + id + ".svg"), alt: "", width: 28, height: 32 }) : null,
     el("span", {}, label));
   const dropdown = ddField(cur, opts, (v) => setCoach(v), portrait);
-  dropdown.classList.add("coach-dropdown");
+  dropdown.classList.add("coach-dropdown", "set-dropdown-down");
   return el("div", { class: "set-row" }, el("span", { class: "set-lbl" }, "Coach"), dropdown);
 }
 // Controls for one event: a sound dropdown plus volume, pitch and speed knobs.
@@ -6496,7 +6507,7 @@ function fxEventControls(ev, label) {
     option.setAttribute("aria-selected", String(opts[index][0] === cfg.snd));
   });
   return el("div", { class: "set-fx" + cls, "data-sound-event": ev },
-    el("div", { class: "set-row" }, el("span", { class: "set-lbl" }, label), dropdown),
+    el("div", { class: "set-row" }, el("span", { class: "set-lbl" }, "Sound"), dropdown),
     fxSlider(ev, "volume", "Volume", 0, 100, 1, (v) => v + " %"),
     fxSlider(ev, "pitch", "Pitch", -12, 12, 1, (v) => (v > 0 ? "+" : "") + v + " st"),
     fxSlider(ev, "speed", "Speed", 0.5, 2, 0.05, (v) => (+v).toFixed(2) + "×"),
@@ -6522,17 +6533,14 @@ function motorSettings() {
       engineSeg("Analysis lines", "classifyLines", [1, 2, 3], null, ENGINE_INFO.classifyLines),
       engineSlider("Depth", "engineDepth", 8, 22, 1, { info: ENGINE_INFO.engineDepth }),
       engineSlider("Workers", "engineWorkers", 1, 8, 1, { fmt: (v) => v + (v === 1 ? " (single)" : " parallel"), info: ENGINE_INFO.engineWorkers }),
-      el("div", { class: "set-row hint" },
-        el("span", { class: "set-note" }, "Results appear after the first line. Extra analysis lines check move quality in the background and update categories such as Great. One background worker pauses between positions and yields while you interact. Accuracy and rating scores stay unchanged.")),
     ),
     section("Estimated rating",
       el("div", { class: "set-row" }, setLabel("Rating mode", ELO_INFO),
         ddField(S.settings.ratingMode || "context", [["context", "Use recorded rating"], ["moves", "Moves only"]], value => setEngineSetting("ratingMode", value))),
       el("div", { class: "set-row hint" }, el("span", { class: "set-note" },
-        "Use recorded rating: shows how well you played compared with players around the rating saved in this game, using the selected engine's own model. If no rating is saved, we use Moves only instead.")),
-      S.settings.enginePath === "sf19lite" ? el("div", { class: "set-row hint" }, el("span", { class: "set-note" },
-        "Stockfish 19 compares expected-point losses with its own public peers. This rating comparison is separate from displayed accuracy.")) : null,
-      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Moves only: ignores the saved rating and estimates a blitz rating level from your move choices. Needs at least 10 moves with more than one legal choice. These estimates do not change your account rating.")),
+        "Use recorded rating compares your play with players near the rating shown in the game.")),
+      el("div", { class: "set-row hint" }, el("span", { class: "set-note" },
+        "Moves only estimates a blitz rating from your moves alone and needs at least 10 non-forced moves.")),
       (S.settings.enginePath === "nnue" && (S.settings.engineDepth !== 16 || S.settings.engineHash !== 16 || S.settings.engineSkill !== 20))
         ? el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Custom search settings still show estimated accuracy and ratings. Use depth 16, hash 16 MB and maximum strength for calibrated SF18 numerical scores.")) : null,
     ),
@@ -6554,8 +6562,6 @@ function motorSettings() {
         el("span", { class: "set-note" }, "SF19 reviews use fixed calibration settings at full strength. Depth and hash controls affect the live engine panel.")) : null,
       engineSlider("Strength (Skill)", "engineSkill", 0, 20, 1, { fmt: (v) => (v >= 20 ? "Max (20)" : String(v)), info: ENGINE_INFO.engineSkill }),
       engineSlider("Hash (MB)", "engineHash", 16, 256, 16, { fmt: (v) => v + " MB", info: ENGINE_INFO.engineHash }),
-      el("div", { class: "set-row hint" },
-        el("span", { class: "set-note" }, "Engine build & search options. Changes here re-analyze the game.")),
     ),
     el("button", { class: "set-reset", onclick: resetEngineSettings }, "Reset all engine settings"),
   );
@@ -6667,7 +6673,7 @@ function selectSettingsCategory(id) {
   if (changed) for (const title of Object.keys(S.setOpen)) S.setOpen[title] = false;
   S.settingsTab = id;
   // Single-purpose categories reveal their controls immediately on first visit.
-  const first = {review:"Review experience", sound:"Sound", leaderboard:"Leaderboard", developer:"Developer debugger"}[id];
+  const first = {review:"Review experience", sound:"General", developer:"Developer debugger"}[id];
   if (first && S.setOpen[first] == null) S.setOpen[first] = true;
   renderSettings(changed);
   UI.settings.scrollTop = settingsScroll.get(id) || 0;
@@ -7717,10 +7723,28 @@ function closeDropdowns() {
     field.querySelector('.lib-dd-menu[popover]')?.hidePopover();
   });
 }
-function positionSettingsDropdown(field) {
+function positionSettingsDropdown(field, {reposition = false} = {}) {
   const settings = field.closest('#settings');
   if (!settings) return;
   const menu = field.querySelector('.lib-dd-menu');
+  if (field.classList.contains('set-dropdown-down') && menu.showPopover) {
+    // Downward lists open in the top layer, so they can extend past the settings panel to the
+    // bottom of the window. Only scroll the panel when the window itself has too little room.
+    if (!menu.hasAttribute('popover')) menu.setAttribute('popover', 'manual');
+    if (!menu.matches(':popover-open')) menu.showPopover();
+    let rect = field.getBoundingClientRect();
+    const wanted = Math.min(240, menu.scrollHeight);
+    if (!reposition && window.innerHeight - rect.bottom - 12 < wanted) {
+      settings.scrollTop += wanted - (window.innerHeight - rect.bottom - 12);
+      rect = field.getBoundingClientRect();
+    }
+    const scale = menu.getBoundingClientRect().width / parseFloat(getComputedStyle(menu).width) || 1;
+    menu.style.left = rect.left / scale + 'px';
+    menu.style.top = rect.bottom / scale + 4 + 'px';
+    menu.style.width = rect.width / scale + 'px';
+    menu.style.maxHeight = Math.max(40, Math.min(360, (window.innerHeight - rect.bottom - 12) / scale)) + 'px';
+    return;
+  }
   if (field.classList.contains('set-category')) {
     menu.showPopover?.();
     const rect = field.getBoundingClientRect();
@@ -7734,7 +7758,15 @@ function positionSettingsDropdown(field) {
     return;
   }
   menu.classList.remove('above'); menu.style.maxHeight = '';
-  const bounds = settings.getBoundingClientRect(), rect = field.getBoundingClientRect();
+  let bounds = settings.getBoundingClientRect(), rect = field.getBoundingClientRect();
+  if (field.classList.contains('set-dropdown-down')) {
+    // These lists always open downwards; scroll the panel to make room when needed.
+    const wanted = Math.min(300, window.innerHeight * .4, menu.scrollHeight);
+    const room = Math.min(bounds.bottom, window.innerHeight) - rect.bottom - 8;
+    if (room < wanted) { settings.scrollTop += wanted - room; rect = field.getBoundingClientRect(); bounds = settings.getBoundingClientRect(); }
+    menu.style.maxHeight = Math.max(40, Math.min(wanted, Math.min(bounds.bottom, window.innerHeight) - rect.bottom - 8)) + 'px';
+    return;
+  }
   const below = Math.min(bounds.bottom, window.innerHeight) - rect.bottom - 8;
   const above = rect.top - Math.max(0, bounds.top) - 8;
   const flip = below < menu.getBoundingClientRect().height && above > below;

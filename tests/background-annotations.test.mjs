@@ -38,13 +38,14 @@ function fastBackground(a) {
   a.replace('backgroundAnalysisBusy', () => false);
 }
 
-test('two lines are the default, the Engine tab explains background updates, and the old default migrates once', t => {
+test('two lines are the default, the Engine tab keeps its explanation in the tooltip, and the old default migrates once', t => {
   const a = review(t), S = a.state;
   assert.equal(S.settings.classifyLines, 2);
   S.settingsTab = 'engine'; a.run('UI.settings.hidden = false'); a.call('renderSettings');
   const doc = a.dom.window.document;
   assert.equal(doc.querySelector('[data-setting="classifyLines"].on').dataset.value, '2');
-  assert.match(doc.querySelector('#settings').textContent, /Results appear after the first line/);
+  assert.doesNotMatch(doc.querySelector('#settings').textContent, /Results appear after the first/);
+  assert.match(a.run('ENGINE_INFO.classifyLines'), /Results appear after the first analysis line/);
   assert.doesNotMatch(doc.querySelector('#settings').textContent, /require 1 analysis line/);
   const legacy = {enginePath: 'nnue', classifyLines: 1};
   a.call('migrateEngineSettings', legacy); assert.equal(legacy.classifyLines, 2);

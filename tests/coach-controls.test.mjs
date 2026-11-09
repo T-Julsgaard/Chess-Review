@@ -45,6 +45,8 @@ test('No coach removes the character, saves the choice and keeps plain commentar
   a.call('renderCoachAvatar');
   assert.ok(ui.coach.querySelector('iframe'));
   const picker = a.call('coachPicker');
+  assert.ok(picker.querySelector('.lib-dd-field.coach-dropdown.set-dropdown-down'), 'coaches use a dropdown that opens downwards');
+  assert.match(picker.querySelector('.lib-dd-cur').textContent, /Old Soviet/);
   const off = [...picker.querySelectorAll('.lib-dd-opt')].find(b => b.textContent === 'No coach');
   assert.ok(off);
   assert.equal(off.querySelector('img'), null);
@@ -280,4 +282,25 @@ test('pressing the painted coach shakes once and consumes the click; empty space
   assert.equal(beneath, 11, 'a settings panel over the coach receives normal input');
   assert.equal(messages.filter(m => m.coachCmd === 'shake').length, shakes);
   assert.equal(frame.style.pointerEvents, '');
+});
+
+test('Reset all Review & Coach settings restores defaults and reloads the coach', async t => {
+  const a = app(t), S = loadGame(a, '1. e4 e5');
+  a.replace('loadCoach', async () => ({restored: true}));
+  a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
+  Object.assign(S.settings, {reviewMode: 'dopamine', coach: 'mentor', coachPlain: false, coachEngineReplies: false, insightFont: 22});
+  a.call('applySettings');
+  a.call('toggleSettings'); a.call('selectSettingsCategory', 'review');
+  const doc = a.dom.window.document;
+  const content = doc.querySelector('#settingsCategoryContent');
+  const reset = content.lastElementChild;
+  assert.equal(reset.textContent, 'Reset all Review & Coach settings');
+  reset.click(); await settle(); await a.run('_settingsWriteQueue'); await settle();
+  const defaults = a.run('DEFAULT_SETTINGS');
+  for (const key of a.run('REVIEW_SETTING_KEYS')) assert.equal(S.settings[key], defaults[key], key);
+  for (const key of ['reviewMode', 'coach', 'coachPlain', 'insightFont']) assert.equal(a.store.settings[key], defaults[key], key);
+  assert.equal(S.coach, null, 'default plain replies do not load a reply bank');
+  assert.equal(doc.documentElement.dataset.reviewMode, 'normal');
+  assert.equal(doc.documentElement.style.getPropertyValue('--ip-font'), defaults.insightFont + 'px');
+  assert.match(doc.querySelector('.coach-dropdown .lib-dd-cur').textContent, /Old Soviet/);
 });

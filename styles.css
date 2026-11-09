@@ -1974,8 +1974,8 @@ button { font-family: inherit; cursor: pointer; }
 .set-ctrl-top b { font-family: var(--font-mono); color: var(--ink); font-weight: 700; }
 .set-ctrl input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
 /* Per-event sound group (dropdown + pitch/speed knobs), boxed so each event reads as one unit. */
-.set-fx { display: flex; flex-direction: column; gap: 10px; padding: 10px; border: 1px solid var(--line, rgba(255,255,255,.08)); border-radius: 8px; }
-.set-fx-knob { padding-left: 4px; }
+/* Each sound already sits in its own section, so its controls flow like any other settings. */
+.set-fx { display: flex; flex-direction: column; gap: 12px; }
 .set-fx .lib-dd-opt { flex: none; }
 
 /* ============================================================
@@ -2457,6 +2457,8 @@ button { font-family: inherit; cursor: pointer; }
 .coach-dropdown .lib-dd-menu, .set-dropdown .lib-dd-menu { max-height: min(300px, 40vh);
   overflow-y: auto; overscroll-behavior: contain; }
 .lib-dd-field.open { z-index: 30; }
+/* Downward settings lists render in the top layer so they can extend past the settings panel. */
+.set-dropdown-down > .lib-dd-menu[popover] { position: fixed; inset: auto; margin: 0; color: var(--ink); overflow-y: auto; overscroll-behavior: contain; }
 .lib-dd-menu.above { top: auto; bottom: calc(100% + 4px); }
 .lib-list { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 10px 14px 16px; display: flex; flex-direction: column; gap: 8px; }
 .lib-empty { color: var(--ink-3); font-size: 13px; line-height: 1.5; text-align: center; padding: 30px 16px; text-wrap: pretty; }
