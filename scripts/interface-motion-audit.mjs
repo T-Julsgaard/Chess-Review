@@ -11,16 +11,16 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep}) {
   assert.ok(await run("document.querySelector('.learn-board').getAnimations().length"),'The real board expands');
   await waitFor(review,"import('./analysis.js').then(m=>m.learningWorkspace?.ready&&!m.learningWorkspace.transitioning)",'Learning entry complete');
 
-  await run("import('./analysis.js').then(m=>{void m.learningWorkspace.showLeaderboard('timeAttack');})");
-  await waitFor(review,"!!document.querySelector('.leaderboard-backdrop')",'Leaderboard expansion');
+  await run("import('./analysis.js').then(m=>{void m.learningWorkspace.showStatistics('timeAttack');})");
+  await waitFor(review,"!!document.querySelector('.mode-stats-backdrop')",'Statistics expansion');
   await run("new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))");
-  const initial=await run("document.querySelector('.leaderboard-hero').getAnimations()[0].currentTime");
+  const initial=await run("document.querySelector('.mode-stats-hero').getAnimations()[0].currentTime");
   await sleep(80);
-  assert.ok(await run("document.querySelector('.leaderboard-hero').getAnimations()[0].currentTime")>initial,'The reveal timeline advances');
-  await waitFor(review,"!document.querySelector('.leaderboard-entering')",'Leaderboard revealed');
-  await run("import('./analysis.js').then(m=>{void m.learningWorkspace.returnFromLeaderboard();})");
-  await waitFor(review,"!!document.querySelector('.leaderboard-returning')",'Leaderboard contraction');
-  await waitFor(review,"!document.querySelector('.leaderboard-returning')",'Overview restored');
+  assert.ok(await run("document.querySelector('.mode-stats-hero').getAnimations()[0].currentTime")>initial,'The reveal timeline advances');
+  await waitFor(review,"!document.querySelector('.mode-stats-entering')",'Statistics revealed');
+  await run("import('./analysis.js').then(m=>{void m.learningWorkspace.returnFromStatistics();})");
+  await waitFor(review,"!!document.querySelector('.mode-stats-returning')",'Statistics contraction');
+  await waitFor(review,"!document.querySelector('.mode-stats-returning')",'Overview restored');
 
   // A deterministic board change exercises the actual puzzle assembly path.
   await run(`import('./analysis.js').then(m=>{
@@ -35,16 +35,16 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep}) {
   await waitFor(review,"!document.querySelector('.puzzle-arranging')",'Puzzle return complete');
 
   await run("import('./analysis.js').then(m=>m.setSetting('uiAnim',false))");
-  await run("import('./analysis.js').then(m=>m.learningWorkspace.showLeaderboard('timeAttack'))");
-  assert.equal(await run("document.querySelector('.leaderboard-hero').getAnimations().length"),0,'Interface preference disables reveals');
-  await run("import('./analysis.js').then(m=>m.learningWorkspace.returnFromLeaderboard())");
+  await run("import('./analysis.js').then(m=>m.learningWorkspace.showStatistics('timeAttack'))");
+  assert.equal(await run("document.querySelector('.mode-stats-hero').getAnimations().length"),0,'Interface preference disables reveals');
+  await run("import('./analysis.js').then(m=>m.learningWorkspace.returnFromStatistics())");
   await run("import('./analysis.js').then(m=>m.setSetting('uiAnim',true))");
   await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]},review.sessionId);
-  await run("import('./analysis.js').then(m=>m.learningWorkspace.showLeaderboard('timeAttack'))");
-  assert.equal(await run("document.querySelector('.leaderboard-hero').getAnimations().length"),0,'System reduced motion still wins');
+  await run("import('./analysis.js').then(m=>m.learningWorkspace.showStatistics('timeAttack'))");
+  assert.equal(await run("document.querySelector('.mode-stats-hero').getAnimations().length"),0,'System reduced motion still wins');
   await run("import('./analysis.js').then(m=>m.learningWorkspace.close())");
   await call('Page.reload',{},review.sessionId);
   await waitFor(review,"!!document.querySelector('.board')&&import('./analysis.js').then(m=>!m.S.analyzing)",'Reloaded preferences');
   assert.deepEqual(await run("import('./analysis.js').then(m=>[m.S.settings.moveAnim,m.S.settings.uiAnim])"),[false,true]);
-  console.log('Independent motion: learning entry, leaderboard expansion/return, puzzle changes, interface opt-out, reduced motion and persisted preferences passed.');
+  console.log('Independent motion: learning entry, statistics expansion/return, puzzle changes, interface opt-out, reduced motion and persisted preferences passed.');
 }

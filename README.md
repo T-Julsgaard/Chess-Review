@@ -22,7 +22,7 @@ the original **Separate page** layout. Each morph has its own design and timing.
 also runs when returning to review and respects reduced-motion preferences.
 **Settings → General → Animations** controls interface transitions separately
 from individual piece moves. Turning off **Piece moves** keeps learning entry,
-leaderboard reveals and puzzle changes animated; **Interface animations** turns
+statistics reveals and puzzle changes animated; **Interface animations** turns
 those effects off independently and still respects the system's reduced-motion preference.
 **Morph in place 2** glides the intact board into a centered study layout and keeps
 Settings available alongside learning, with reserved space on desktop windows.
@@ -189,13 +189,6 @@ usernames or game IDs. No games or analysis are sent to the developer or analyti
 Firefox discloses the browsing activity and website content used for these requests.
 Sharing a game copies an encoded, unencrypted PGN/metadata link to your clipboard;
 anyone you send it to can read that information. See [PRIVACY.md](PRIVACY.md).
-
-Optional puzzle leaderboards have a Cloudflare Workers + D1 service, server-verified
-ranked play and matching screens for all three modes. They are disabled until a
-deployment is configured. See [leaderboard setup and security](docs/LEADERBOARDS.md).
-Participation requires explicit opt-in before viewing or uploading. Nationality
-is optional; **Settings → General → Leaderboard** provides sharing, opt-out and
-online deletion controls. Ordinary offline progress stays local.
 
 ## Maintained-source checks
 

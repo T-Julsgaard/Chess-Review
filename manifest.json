@@ -48,11 +48,6 @@
         "required": [
           "browsingActivity",
           "websiteContent"
-        ],
-        "optional": [
-          "authenticationInfo",
-          "locationInfo",
-          "technicalAndInteraction"
         ]
       }
     }

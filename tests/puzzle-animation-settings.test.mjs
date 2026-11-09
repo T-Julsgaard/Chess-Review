@@ -5,7 +5,7 @@ import {app,loadGame} from './helpers/app.mjs';
 test('settings offer all categories without puzzle animation controls',async t=>{
   const a=app(t);loadGame(a,'1. e4 e5');a.call('buildUI');await a.call('toggleSettings');
   const doc=a.dom.window.document;
-  assert.deepEqual([...doc.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].map(n=>n.textContent),['Visual','Review & Coach','Engine','Sound','Leaderboard','Developer tools']);
+  assert.deepEqual([...doc.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].map(n=>n.textContent),['Visual','Review & Coach','Engine','Sound','Developer tools']);
   assert.equal(Object.hasOwn(a.state.settings,'puzzleStartAnimation'),false);
   assert.equal(Object.hasOwn(a.state.settings,'puzzleEndAnimation'),false);
   for(const tab of doc.querySelectorAll('.set-category .lib-dd-opt .set-category-name')){

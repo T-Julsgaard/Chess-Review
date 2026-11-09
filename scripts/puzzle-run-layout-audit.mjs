@@ -8,7 +8,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await run("import('./analysis.js').then(async m=>{m.S.settings.moveAnim=false;await m.openLearning();})");
   // Navigation shares its top/right anchor across the overview and every mode.
   const navigation=()=>run(`(()=>{
-    const button=document.querySelector('[data-focus=puzzle-overview], [data-focus=puzzle-statistics]'),
+    const button=document.querySelector('[data-focus=puzzle-overview], [data-focus=statistics-return]'),
       rect=button.getBoundingClientRect(),main=document.querySelector('.learn-main').getBoundingClientRect(),
       title=document.querySelector('.learn-main h2').getBoundingClientRect();
     return {top:rect.top-main.top,right:main.right-rect.right,height:rect.height,
@@ -25,9 +25,13 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   for(const [width,height] of [[1920,1080],[1280,800],[390,844],[320,640]]) {
     await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(1000);
     await run("import('./analysis.js').then(m=>m.learningWorkspace.navigate('puzzles'))");
-    const overview=await navigation();
-    assert.equal(overview.overlap,false);assert.equal(overview.overflow,false);
     await capture(`navigation-overview-${width}`);
+    // The statistics page's return button is the reference every mode aligns to.
+    await run("import('./analysis.js').then(m=>m.learningWorkspace.showStatistics('solve-puzzle'))");await sleep(600);
+    const overview=await navigation();
+    assert.equal(overview.label,'Return to puzzle overview');
+    assert.equal(overview.overlap,false);assert.equal(overview.overflow,false);
+    await capture(`navigation-statistics-${width}`);
     const aligned=async name=>{
       await sleep(100);
       const current=await navigation();
@@ -40,7 +44,6 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       assert.equal(current.overlap,false);assert.equal(current.overflow,false);
       await capture(`navigation-${name}-${width}`);
     };
-    await run("import('./analysis.js').then(m=>m.learningWorkspace.showPuzzleStatistics(true))");await aligned('statistics');
     await run("import('./analysis.js').then(m=>m.learningWorkspace.navigate('puzzles'))");
     await run("import('./analysis.js').then(m=>m.learningWorkspace.startRatedPuzzles())");await aligned('practice');
     await run("import('./analysis.js').then(m=>m.learningWorkspace.navigate('puzzles'))");

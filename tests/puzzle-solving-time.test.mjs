@@ -26,10 +26,11 @@ test('puzzle time counts thinking, hints and retries, excluding storage, complet
   assert.equal(data['learning:v1'].puzzleTimeMs,2000);
   advance(1000);await w.submitPuzzle('e2e4');
   assert.equal(data['learning:v1'].puzzleTimeMs,3000);
-  advance(60000);await w.navigate('puzzles');w.showPuzzleStatistics(true);
+  advance(60000);await w.navigate('puzzles');w.showStatistics('solve-puzzle');
   const timeCard=w.root.querySelector('.learn-stat-overview > div:last-child');
   assert.equal(timeCard.querySelector('dt').textContent,'Time spent');
-  assert.equal(timeCard.querySelector('dd').textContent,'3s');
+  assert.equal(timeCard.querySelector('dd strong').textContent,'3s');
+  assert.equal(timeCard.querySelector('.learn-stat-detail').textContent,'≈ 3s per attempt');
   advance(60000);await w.close();
   const reopened=new ProgressStore(storage);await reopened.load();
   assert.equal(reopened.value.puzzleTimeMs,3000);

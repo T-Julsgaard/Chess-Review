@@ -73,9 +73,9 @@ test('learning tabs and scrollable content fill the side panel across libraries 
     assert.equal(w.root.querySelector('.learn-footer, [data-focus=review]'),null);
     assert.equal(a.dom.window.document.querySelector('#learningToggle').textContent,'Return to Game review');
   };
-  check();assert.ok(w.root.querySelector('[data-focus=puzzle-statistics]'));
-  w.showPuzzleStatistics(true);check();
-  w.root.querySelector('[data-focus=puzzle-statistics]').click();check();assert.equal(w.page,'puzzles');
+  check();assert.equal(w.root.querySelector('[data-focus=puzzle-statistics]'),null);
+  w.root.querySelector('[data-focus=statistics-knockout]').click();check();assert.equal(w.page,'statistics');
+  w.root.querySelector('[data-focus=statistics-return]').click();check();assert.equal(w.page,'puzzles');
   await w.navigate('concepts');check();await w.navigate('openings');check();
   // On a short viewport the former opening-only 64px reservation shrank the board.
   Object.defineProperty(a.dom.window,'innerHeight',{value:700,configurable:true});

@@ -29,8 +29,6 @@ import { panelScale, panelGroupBounds, scalePanelGroup, movePanelGroup } from ".
 import { fullHdReferenceLayout, viewportGrowth } from "./lib/full-hd-layout.js";
 import { createScreenPreviewContext, loadScreenPreviewController } from "./lib/screen-previews.js";
 import { rememberAnalyzedGame, historyGame } from "./lib/player-history.js";
-import { leaderboardPreviewControls } from "./lib/learning/leaderboard-preview.js";
-import { leaderboardSettingsControls } from "./lib/learning/leaderboard-settings.js";
 import { createReviewEffects } from "./lib/review-effects.js";
 import { explainMove, explanationPv } from "./lib/move-explanation.js";
 
@@ -1804,11 +1802,6 @@ async function openLearning() {
   reviewEffects.clear();
   learningWorkspace = new LearningWorkspace({document, storage:browserAPI.storage.local, makePiece, url:_url,
     settings:()=>S.settings, flipped:S.flipped, book:()=>BOOK || {}, startDrag, onPuzzleWrong:playWrongSound, onPuzzleMove:playSanSound, onPuzzlePremove:playPremoveSound, onOpeningMove:playSanSound, onFreeMove:playSanSound, onPuzzleSuccess:playPuzzleSuccess,
-    onLeaderboardSettings:async()=>{
-      S.settingsTab='leaderboard';if(UI.settings.hidden)await toggleSettings();else renderSettings();
-      const section=[...UI.settings.querySelectorAll('.set-section')].find(node=>node.querySelector('.set-sect-head span')?.textContent==='Leaderboard');
-      if(section){if(!section.classList.contains('open'))section.querySelector('.set-sect-head').click();section.scrollIntoView?.({block:'nearest'});}
-    },
     createAnalysisEngine:()=>createEngine({Hash:S.settings.engineHash, "Skill Level":S.settings.engineSkill}),
     navigationButton:document.getElementById("learningToggle"),
     embedded:{stage:UI.canvas, boardWrap:UI.boardWrap, fen:sourceFen, reviewFen:activePos().fen, startDrag,
@@ -6370,7 +6363,7 @@ function visualSettings() {
     ),
     section("Animations",
       toggleRow("Interface animations", "uiAnim"),
-      el("p", { class: "set-note" }, "Animate learning transitions, leaderboards, puzzle changes and interface effects. Reduced motion follows your system preference."),
+      el("p", { class: "set-note" }, "Animate learning transitions, statistics, puzzle changes and interface effects. Reduced motion follows your system preference."),
       toggleRow("Piece moves", "moveAnim"),
       slider("Piece speed", "animSpeed", 1, 10, 1, { fmt: (v) => (440 - v * 40) + " ms" }),
     ),
@@ -6449,34 +6442,11 @@ function soundSettings() {
     }}, "Reset all sound settings"),
   );
 }
-function leaderboardSettings() {
-  return el("div", {},
-    section("Leaderboard",leaderboardSettingsControls({document,storage:browserAPI.storage.local,client:learningWorkspace?.leaderboardClient,url:_url,onError:toast,onChange:async()=>{
-      if(!learningWorkspace)return;
-      await learningWorkspace.refreshLeaderboardPreferences();
-    }})),
-  );
-}
 function developerSettings() {
   return el("div", {},
     section("Developer debugger",
       el("button", {class:"set-reset","data-debug":"screen-previews",onclick:openScreenSizePreview}, "Open screen-size preview"),
       el("div", {class:"set-row hint"},el("span",{class:"set-note"},"Preview layouts at different screen sizes. Changes are not saved.")),
-      leaderboardPreviewControls({document,onError:toast,onChange:async({mode,open=false}={})=>{
-        if(learningWorkspace?.ranked){learningWorkspace.ranked=null;learningWorkspace.rankedNotice='Ranked play stopped while test data is active.';}
-        if(open){
-          if(!learningWorkspace)await openLearning();
-          if(!learningWorkspace){renderSettings();return;}
-          if(learningWorkspace.activity||learningWorkspace.run||learningWorkspace.busy){
-            toast('Return to the puzzle overview before opening a leaderboard preview.');renderSettings();return;
-          }
-          if(UI.settings&&!UI.settings.hidden)await toggleSettings();
-          await learningWorkspace.showLeaderboard(mode);
-        }
-        else if(learningWorkspace?.page==='leaderboard')await learningWorkspace.showLeaderboard(learningWorkspace.leaderboard.mode);
-        else if(learningWorkspace){learningWorkspace.leaderboard=null;learningWorkspace.render();}
-        renderSettings();
-      }}),
     ),
   );
 }
@@ -6694,7 +6664,6 @@ const SETTINGS_CATEGORIES = [
   {id:"review", label:"Review & Coach", description:"Commentary, character & reactions", icon:"chat", render:reviewSettings},
   {id:"engine", label:"Engine", description:"Analysis power & rating estimates", icon:"cpu", render:motorSettings},
   {id:"sound", label:"Sound", description:"Every move, your sound", icon:"sound", render:soundSettings},
-  {id:"leaderboard", label:"Leaderboard", description:"Your profile & online records", icon:"trophy", render:leaderboardSettings},
   {id:"developer", label:"Developer tools", description:"Screen previews & test data", icon:"code", render:developerSettings},
 ];
 const settingsScroll = new Map();

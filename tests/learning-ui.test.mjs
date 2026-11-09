@@ -32,52 +32,92 @@ test('puzzle entry, loading errors, filtered empty states and focus restoration 
   globalThis.fetch=old;await w.load();assert.equal(w.ready,true);await w.close();assert.equal(doc.querySelector('.app').inert,false);
 });
 
-test('puzzle statistics show saved patterns, preserve settings and resume, and return focus without leaving learning',async t=>{
+test('Solve a puzzle statistics show saved patterns, preserve settings and resume, and return focus without leaving learning',async t=>{
   const {w,dom,data}=await workspace(t),doc=dom.window.document;
-  const button=()=>w.root.querySelector('[data-focus="puzzle-statistics"]');
+  assert.equal(w.root.querySelector('[data-focus="puzzle-statistics"]'),null,'The overview no longer has a separate statistics button');
+  assert.deepEqual([...w.root.querySelectorAll('.puzzle-stats-button')].map(n=>n.textContent),['Statistics','Statistics','Statistics']);
+  const button=()=>w.root.querySelector('[data-focus="statistics-solve-puzzle"]'),back=()=>w.root.querySelector('[data-focus="statistics-return"]');
+  assert.equal(button().getAttribute('aria-label'),'Solve a puzzle statistics');
   button().focus();button().click();
-  assert.equal(w.page,'statistics');
+  assert.equal(w.page,'statistics');assert.equal(w.root.querySelector('.learn-mode-stats').dataset.mode,'solve-puzzle');
+  assert.equal(w.root.querySelector('#mode-stats-title').textContent,'Statistics');
+  assert.equal(w.root.querySelector('.mode-stats-hero h3').textContent,'Solve a puzzle');
   assert.equal(w.root.querySelectorAll('.learn-stat-row').length,Object.keys(THEME_NAMES).length);
   assert.ok([...w.root.querySelectorAll('.learn-stat-row')].every(row=>row.textContent.includes('0 correct · 0 incorrect')&&row.textContent.endsWith('0%')));
-  assert.equal(w.root.querySelector('.learn-stat-untried'),null);
-  assert.equal(w.root.querySelectorAll('.learn-stat-track').length,Object.keys(THEME_NAMES).length);
   assert.ok([...w.root.querySelectorAll('.learn-stat-track > span')].every(n=>n.style.width==='0%'));
-  assert.equal(button().textContent,'Return to puzzle overview');
+  assert.deepEqual([...w.root.querySelectorAll('.learn-stat-overview > div')].map(n=>n.textContent),
+    ['Rating1,200No rated puzzles yet','Peak rating1,200','Correct0','Incorrect0','Accuracy—0 attempts','Time spent0s']);
+  assert.equal(back().textContent,'Return to puzzle overview');
   assert.equal(w.root.querySelector('[data-focus="review"]').textContent,'← Back to review');
-  assert.equal(doc.activeElement.id,'learn-statistics-title');
+  assert.equal(doc.activeElement.id,'mode-stats-title');
   assert.equal(w.root.querySelector('.learn-nav [aria-current]').textContent,'Puzzles');
-  button().click();assert.equal(w.page,'puzzles');assert.equal(doc.activeElement,button());
+  back().click();assert.equal(w.page,'puzzles');assert.equal(doc.activeElement,button());
   const fork=w.puzzles.find(p=>p.themes.includes('fork')&&p.themes.filter(t=>t in THEME_NAMES).length===1),mate=w.puzzles.find(p=>p.themes.includes('mateIn1')&&!p.themes.includes('fork'));
   await w.persist(progress=>{
-    progress.puzzles[fork.id]={attempts:8,clean:2,assisted:2,recovered:3,mistakes:9};
+    progress.puzzles[fork.id]={attempts:8,clean:2,assisted:2,recovered:3,mistakes:9,ratingResult:{after:1290}};
     progress.puzzles[mate.id]={attempts:10,clean:9,assisted:0,mistakes:1};
+    progress.puzzleRating={elo:1250,wins:3,losses:2};
     progress.puzzleResume={kind:'puzzle',id:fork.id,step:0};
-    progress.puzzleTimeMs=3723000;
+    progress.puzzleTimeMs=3723000+60000;progress.runStats.knockout.timeMs=60000;
   });
   const saved=structuredClone(data['learning:v1']);
   w.puzzleThemes.add('sacrifice');w.puzzleRange=[2000,2200];
   button().click();
   assert.equal(w.root.querySelector('.learn-stat-highlights, .learn-stat-note, .learn-stat-intro'),null);
-  assert.doesNotMatch(w.root.querySelector('.learn-puzzle-statistics').textContent,/clean|need work|Early results|Highlights appear/i);
+  assert.doesNotMatch(w.root.querySelector('.learn-mode-stats').textContent,/clean|need work|Early results|Highlights appear|leaderboard|ranked/i);
   assert.match(w.root.querySelector('[data-theme="fork"]').textContent,/2 correct · 6 incorrect/);
-  assert.deepEqual([...w.root.querySelectorAll('.learn-stat-overview > div')].map(n=>n.textContent),['Correct11','Incorrect7','Attempts18','Time spent1h 2m 3s']);
+  assert.deepEqual([...w.root.querySelectorAll('.learn-stat-overview > div')].map(n=>n.textContent),
+    ['Rating1,2503 won · 2 lost','Peak rating1,290','Correct11','Incorrect7','Accuracy61%18 attempts','Time spent1h 2m 3s≈ 3m 26s per attempt'],
+    'Run time is excluded from Solve a puzzle');
   const forkTrack=w.root.querySelector('[data-theme="fork"] .learn-stat-track');
   assert.equal(forkTrack.getAttribute('aria-label'),'2 correct, 6 incorrect');
   assert.equal(forkTrack.querySelector('.learn-stat-correct').style.width,'25%');
   assert.equal(forkTrack.querySelector('.learn-stat-incorrect').style.width,'75%');
-  assert.equal(w.root.querySelector('.learn-stat-untried'),null);
-  assert.equal(w.root.querySelectorAll('.learn-stat-row').length,Object.keys(THEME_NAMES).length);
   doc.activeElement.dispatchEvent(new dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
   assert.equal(w.closed,false);assert.equal(w.page,'puzzles');assert.equal(doc.activeElement,button());
   assert.deepEqual([...w.puzzleThemes],['sacrifice']);assert.deepEqual(w.puzzleRange,[2000,2200]);
   assert.deepEqual(data['learning:v1'],saved);
-  button().click();button().click();await settle();
+  await w.togglePuzzleRating();button().click();
+  assert.deepEqual([...w.root.querySelectorAll('.learn-stat-overview dt')].map(n=>n.textContent),['Correct','Incorrect','Accuracy','Time spent'],'A hidden rating stays hidden');
+  back().click();await settle();
   assert.equal(w.page,'puzzles');assert.equal(w.closed,false);assert.equal(doc.activeElement,button());
   button().click();await w.navigate('concepts');assert.ok(w.root.querySelector('.learn-library'));
 });
 
+test('Time attack and Knockout statistics show lifetime totals, accuracy and recent runs',async t=>{
+  const {w,dom}=await workspace(t),doc=dom.window.document;
+  w.root.querySelector('[data-focus="statistics-timeAttack"]').click();
+  assert.equal(w.root.querySelector('.learn-mode-stats').dataset.mode,'timeAttack');
+  assert.deepEqual([...w.root.querySelectorAll('.learn-stat-overview > div')].map(n=>n.textContent),
+    ['Personal best0','Runs played0','Average score—','Accuracy—','Hardest solve—','Time spent0s']);
+  assert.equal(w.root.querySelector('.learn-stat-runs'),null);
+  assert.match(w.root.querySelector('.learn-stat-empty').textContent,/Finish a run/);
+  const run=(solved,missed,rating=900)=>({mode:'timeAttack',solved,at:Date.UTC(2026,10,1),
+    results:[...Array(solved).fill(0).map((_,i)=>({id:'s'+i,correct:true,rating:rating+i})),...Array(missed).fill(0).map((_,i)=>({id:'m'+i,correct:false,rating:700}))]});
+  await w.persist(p=>{
+    for(const result of [run(8,3),run(12,3,1400),run(10,2)]){p.challenges.push(result);p.runStats.timeAttack.runs++;p.runStats.timeAttack.solved+=result.solved;p.runStats.timeAttack.attempted+=result.results.length;}
+    p.runStats.timeAttack.topRating=1411;p.runStats.timeAttack.timeMs=540000;p.bests.timeAttack=12;
+    p.challenges.push({...run(4,1),mode:'knockout'});
+  });
+  w.render();
+  assert.deepEqual([...w.root.querySelectorAll('.learn-stat-overview > div')].map(n=>n.textContent),
+    ['Personal best12','Runs played3','Average score10puzzles per run','Accuracy79%30 of 38 puzzles','Hardest solve1,411puzzle rating','Time spent9m 0s≈ 3m 0s per run']);
+  const bars=[...w.root.querySelectorAll('.learn-stat-run')];
+  assert.deepEqual(bars.map(n=>n.querySelector('.learn-stat-run-value').textContent),['8','12','10'],'Only this mode’s runs, oldest first');
+  assert.deepEqual(bars.map(n=>n.querySelector('.learn-stat-run-bar').style.height),[`${8/12*100}%`,'100%',`${10/12*100}%`]);
+  assert.deepEqual(bars.map(n=>n.classList.contains('is-best')),[false,true,false]);
+  assert.match(bars[1].getAttribute('aria-label'),/^Run 2: 12 solved/);
+  doc.dispatchEvent(new dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
+  assert.equal(doc.activeElement.dataset.focus,'statistics-timeAttack');
+  w.root.querySelector('[data-focus="statistics-knockout"]').click();
+  assert.deepEqual([...w.root.querySelectorAll('.learn-stat-overview dt')].map(n=>n.textContent),
+    ['Best streak','Runs played','Average streak','Puzzles solved','Hardest solve','Time spent']);
+  assert.equal(w.root.querySelectorAll('.learn-stat-run').length,1);
+  assert.match(w.root.querySelector('.learn-stat-run').getAttribute('aria-label'),/4 in a row/);
+});
+
 test('the statistics footer returns directly to review',async t=>{
-  const {w}=await workspace(t);w.showPuzzleStatistics(true);
+  const {w}=await workspace(t);w.showStatistics('solve-puzzle');
   w.root.querySelector('[data-focus="review"]').click();await settle();
   assert.equal(w.closed,true);
 });
@@ -90,11 +130,11 @@ test('the navigation indicator stays still within Puzzles and animates between d
   w.navIndicator.getBoundingClientRect=()=>({left:parseFloat(w.navIndicator.style.left)||0,top:0,width:90,height:40});
   let animations=0;w.navIndicator.animate=()=>{animations++;return {cancel(){}};};
   w.syncNavigation();assert.equal(animations,0);
-  w.showPuzzleStatistics(true);w.render();w.showPuzzleStatistics(false);w.render();
+  w.showStatistics('knockout');w.render();w.returnFromStatistics();w.render();
   assert.equal(animations,0);assert.equal(w.navPage,'puzzles');
   await w.navigate('openings');assert.equal(animations,1);
   await w.navigate('puzzles');assert.equal(animations,2);
-  w.showPuzzleStatistics(true);w.showPuzzleStatistics(false);assert.equal(animations,2);
+  w.showStatistics('timeAttack');w.returnFromStatistics();assert.equal(animations,2);
 });
 
 for(const scale of [.92,4/3,2])test(`navigation starts from its painted tab at ${scale} content scale`,async t=>{
@@ -116,11 +156,11 @@ for(const scale of [.92,4/3,2])test(`navigation starts from its painted tab at $
 test('Escape closes Settings before leaving puzzle statistics on the embedded learning board',async t=>{
   const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
   await a.call('openLearning');const w=a.run('learningWorkspace'),doc=a.dom.window.document;
-  w.showPuzzleStatistics(true);await a.call('toggleSettings');
+  w.showStatistics('solve-puzzle');await a.call('toggleSettings');
   doc.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
   assert.equal(doc.querySelector('#settings').hidden,true);assert.equal(w.page,'statistics');
   doc.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
-  assert.equal(w.page,'puzzles');assert.equal(w.closed,false);assert.equal(doc.activeElement.dataset.focus,'puzzle-statistics');
+  assert.equal(w.page,'puzzles');assert.equal(w.closed,false);assert.equal(doc.activeElement.dataset.focus,'statistics-solve-puzzle');
   await w.close();
 });
 test('square exercise uses selection, alternative answers, lesson completion and durable difficult-exercise tracking',async t=>{

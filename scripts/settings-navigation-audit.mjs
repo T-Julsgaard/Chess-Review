@@ -20,7 +20,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     for(const [width,height] of [[1920,919],[1920,979],[2560,1280],[1366,648],[1024,768],[390,844],[320,568],[844,390],[568,320]]){
       await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(100);
       let originalWidth;
-      for(const category of ['visual','review','engine','sound','leaderboard','developer']){
+      for(const category of ['visual','review','engine','sound','developer']){
         const before=await run("(()=>{const p=document.querySelector('#settings').getBoundingClientRect();return {height:p.height,contentTop:document.querySelector('.set-category-content').getBoundingClientRect().top};})()");
         await click('.set-category > .lib-dd-btn');
         assert.equal(await run("document.querySelector('.set-category > .lib-dd-btn').getAttribute('aria-expanded')"),'true');

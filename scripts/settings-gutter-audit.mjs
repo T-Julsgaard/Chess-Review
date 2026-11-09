@@ -12,7 +12,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     for(const [width,height] of [[1920,919],[1920,949],[1920,979],[1920,919],[2560,1280],[1366,648],[390,844]]){
       await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);
       await sleep(200);
-      for(const tab of ['Visual','Review & Coach','Engine','Sound','Leaderboard','Developer tools']){
+      for(const tab of ['Visual','Review & Coach','Engine','Sound','Developer tools']){
         await run(`[...document.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].find(n=>n.textContent==='${tab}').click()`);
         const data=await run(`(()=>{
           const rect=n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width};};

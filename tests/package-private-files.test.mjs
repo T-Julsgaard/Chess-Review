@@ -15,5 +15,5 @@ test('recursive archive copies exclude local credentials inside allowlisted dire
   await cp(source,target,{recursive:true,filter:input=>!privatePackagePath(path.relative(source,input))});
   assert.deepEqual(await readdir(path.join(target,'lib')),['client.js']);
   assert.equal(privatePackagePath('lib\\.env.production'),true);
-  assert.equal(privatePackagePath('services/leaderboard/wrangler.toml'),false);
+  assert.equal(privatePackagePath('lib/learning/workspace.js'),false);
 });

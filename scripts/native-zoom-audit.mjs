@@ -84,7 +84,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await inspect('review-zoom-explicitly-reset',1919,919);
   for(const [width,height]of [[1919,919],[1366,648],[320,568]]){
     await resize(width,height);await run("document.querySelector('[aria-label=Settings]').click()");
-    for(const tab of ['Visual','Review & Coach','Engine','Sound','Leaderboard','Developer tools']){
+    for(const tab of ['Visual','Review & Coach','Engine','Sound','Developer tools']){
       await run(`[...document.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].find(n=>n.textContent==='${tab}').click()`);
       const fits=await run("(()=>{const n=document.querySelector('#settings');return n.scrollWidth<=n.clientWidth+1;})()");
       assert.ok(fits,`Settings ${tab} at ${width}`);
@@ -98,7 +98,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await run("import('./analysis.js').then(m=>m.openLearning())");
     await waitFor(review,"import('./analysis.js').then(m=>m.learningWorkspace?.ready&&!m.learningWorkspace.transitioning)",'Learning');
     for(const page of ['puzzles','openings','statistics']){
-      await run(`import('./analysis.js').then(m=>m.learningWorkspace.navigate('${page}'))`);
+      await run(`import('./analysis.js').then(async m=>{const w=m.learningWorkspace;await w.navigate('${page}');if('${page}'==='statistics')w.showStatistics('solve-puzzle');})`);
       await inspect(`learning-${page}-${width}x${height}`,width,height,{learning:true});
     }
     await run("import('./analysis.js').then(async m=>{const w=m.learningWorkspace;const p={id:'native-zoom',fen:'7k/5Q2/6K1/8/8/8/8/8 w - - 0 1',solution:['f7f8'],rating:1200,themes:['mateIn1']};w.puzzles=[p];await w.startPuzzleSelection([p]);})");

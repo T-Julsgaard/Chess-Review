@@ -11,7 +11,7 @@ export async function auditLearning(context) {
     await fs.writeFile(path.join(out,name+'.png'),Buffer.from(shot.data,'base64'));
   };
   await run(`document.querySelector('[aria-label=Settings]').click()`);
-  assert.deepEqual(await run(`[...document.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].map(n=>n.textContent)`),['Visual','Review & Coach','Engine','Sound','Leaderboard','Developer tools']);
+  assert.deepEqual(await run(`[...document.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].map(n=>n.textContent)`),['Visual','Review & Coach','Engine','Sound','Developer tools']);
   await capture('settings-without-puzzles');
   await run(`document.querySelector('[aria-label=Settings]').click()`);
   for(const [width,height] of [[1280,800],[390,844],[320,640]]){

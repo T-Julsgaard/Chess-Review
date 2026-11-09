@@ -29,9 +29,8 @@ Get a complete move-by-move review with accuracy scores, move classifications, e
 • Every feature is available to everyone.
 
 PRIVACY
-Analysis runs locally. Game lookups go directly to the chess platforms. Optional
-online leaderboards, when enabled, publish generated player names and verified
-ranked puzzle scores only after you choose to participate. No analytics or ads.
+Analysis runs locally. Game lookups go directly to the chess platforms. Puzzle
+progress and statistics stay on your device. No analytics or ads.
 
 OPEN SOURCE
 Chess Review is open source and licensed under GPLv3.

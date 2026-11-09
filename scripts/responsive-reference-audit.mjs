@@ -20,7 +20,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
    await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(150);await run('scrollTo(0,0)');
    await inspect('review-'+label,width,height);
    await run("document.querySelector('[aria-label=Settings]').click()");
-   for(const tab of ['Visual','Review & Coach','Engine','Sound','Leaderboard','Developer tools']){
+   for(const tab of ['Visual','Review & Coach','Engine','Sound','Developer tools']){
     await run(`[...document.querySelectorAll('.set-category .lib-dd-opt .set-category-name')].find(n=>n.textContent==='${tab}').click()`);
     const overflow=await run("(()=>{const n=document.querySelector('#settings');return n.scrollWidth-n.clientWidth;})()");if(overflow>1)failures.push({label,msg:'settings '+tab+' overflow',overflow});
    }
@@ -29,7 +29,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
    await inspect('learning-'+label,width,height,true);
    if([3840,1366,1024,390].includes(width)&&chromeHeight===0){
     for(const page of ['openings','concepts','statistics']){
-     await run(`import('./analysis.js').then(m=>m.learningWorkspace.navigate('${page}'))`);
+     await run(`import('./analysis.js').then(async m=>{const w=m.learningWorkspace;await w.navigate('${page}');if('${page}'==='statistics')w.showStatistics('solve-puzzle');})`);
      await inspect('learning-'+page+'-'+label,width,height,true);
     }
     await run("import('./analysis.js').then(m=>m.learningWorkspace.navigate('puzzles'))");

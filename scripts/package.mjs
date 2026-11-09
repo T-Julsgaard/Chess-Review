@@ -8,7 +8,6 @@ import './verify-engines.mjs';
 import {verifySource} from './verify-source.mjs';
 import {files, directories, pieceSets,privatePackagePath} from './package-inputs.mjs';
 import {packagePuzzles} from './package-puzzles.mjs';
-import {LEADERBOARD_URL} from '../lib/learning/leaderboard-config.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 await verifySource(root);
@@ -47,10 +46,7 @@ const releaseDir = await mkdtemp(path.join(artifactsDir, `release-${manifest.ver
 const snapshotDir = path.join(releaseDir, 'source');
 await mkdir(snapshotDir);
 const sourceFiles = [...files, 'manifest.json', 'package.json', 'package-lock.json',
-  'marketing/STORE_LISTING.md', 'CONTRIBUTING.md', 'SECURITY.md',
-  // Explicit allowlist: private Wrangler state and .dev.vars must never enter archives.
-  'services/leaderboard/worker.js', 'services/leaderboard/wrangler.toml',
-  'services/leaderboard/export-puzzles.mjs', 'services/leaderboard/migrations/0001_leaderboards.sql'];
+  'marketing/STORE_LISTING.md', 'CONTRIBUTING.md', 'SECURITY.md'];
 await copyInputs(root, snapshotDir, [...sourceFiles, ...directories, 'docs', 'scripts', 'tests', 'tools']);
 const sha256 = async file => createHash('sha256').update(await readFile(file)).digest('hex');
 async function fileHashes(dir, base = dir) {
@@ -77,11 +73,6 @@ for (const browser of ['chrome', 'firefox']) {
   await copyInputs(snapshotDir, sourceDir, [...files, ...directories]);
   const puzzleLibrary = await packagePuzzles(sourceDir);
   const target = structuredClone(manifest);
-  if(LEADERBOARD_URL){
-    const endpoint=new URL(LEADERBOARD_URL);
-    if(endpoint.protocol!=='https:'||endpoint.origin!==LEADERBOARD_URL)throw Error('Leaderboard URL must be an HTTPS origin');
-    target.host_permissions.push(endpoint.origin+'/*');
-  }
   if (browser === 'chrome') {
     delete target.browser_specific_settings;
     delete target.background.scripts;

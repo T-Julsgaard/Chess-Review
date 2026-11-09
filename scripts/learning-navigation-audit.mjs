@@ -21,7 +21,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await run("document.querySelector('#learningToggle').click()");
   await waitFor(review,"import('./analysis.js').then(m=>m.learningWorkspace?.ready&&!m.learningWorkspace.transitioning)",'Learning');
   for(const page of ['puzzles','openings','concepts','statistics']){
-    await run(`import('./analysis.js').then(m=>m.learningWorkspace.navigate('${page}'))`);
+    await run(`import('./analysis.js').then(async m=>{const w=m.learningWorkspace;await w.navigate('${page}');if('${page}'==='statistics')w.showStatistics('solve-puzzle');})`);
     assert.equal(await run("document.querySelector('.learn-footer, [data-focus=review]')"),null);
     assert.equal(await run("document.querySelector('#learningToggle').textContent"),'Return to Game review');
     assert.equal(await run("(()=>{const m=document.querySelector('.learn-main').getBoundingClientRect(),s=document.querySelector('.learn-shell').getBoundingClientRect();return Math.abs(m.bottom-s.bottom)<1;})()"),true,'Content must fill the panel through the bottom');

@@ -32,11 +32,18 @@ function reviewForTab(tabId, gameKey) {
   return entry.promise;
 }
 
-browserAPI.runtime.onInstalled.addListener(details =>
-  resetSettingsForRelease(details).catch(err => {
+// Leaderboards were removed. Drop their local opt-in, player key, country and
+// queued practice scores; learning progress and statistics are untouched.
+const RETIRED_LEADERBOARD_KEYS = ["leaderboard:v1", "leaderboard:practice:v1", "leaderboardPreferences:v1", "leaderboardCountry:v1"];
+
+browserAPI.runtime.onInstalled.addListener(details => {
+  if (details?.reason === "update") Promise.resolve(browserAPI.storage.local.remove?.(RETIRED_LEADERBOARD_KEYS)).catch(err => {
+    console.warn("[Chess Review] retired leaderboard data could not be removed:", err);
+  });
+  return resetSettingsForRelease(details).catch(err => {
     console.error("[Chess Review] release settings reset failed:", err);
-  })
-);
+  });
+});
 
 // Shared game (from a share link caught by content.js) → open the analysis.
 // "Free game review" button injected into the chess.com game-over modal → same flow as the popup.
