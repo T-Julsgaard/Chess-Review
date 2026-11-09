@@ -37,16 +37,35 @@ function page(t,html,{site='chess',path,reply,prepare}={}) {
 }
 const result=(key='chesscom:12345678')=>({ok:true,key,estimated:true,accuracy:{w:91.24,b:72.06},players:{w:'Alice',b:'Bob'},counts:{w:{brilliant:2,great:1},b:{brilliant:0,great:3}}});
 
-test('all placements share one local Inter load and register font bytes rather than a page font URL',async t=>{
+test('all Chess.com placements share one local Manrope load and register font bytes rather than a page font URL',async t=>{
   const requests=[],faces=[];const bytes=new ArrayBuffer(8);
   const p=page(t,modal+profile,{prepare(w){
     Object.defineProperty(w.document,'fonts',{value:{add(face){faces.push(face);}}});
     w.fetch=async url=>{requests.push(url);return {ok:true,arrayBuffer:async()=>bytes};};
     w.FontFace=class {constructor(family,source,options){Object.assign(this,{family,source,options});}async load(){return this;}};
   }});await p.flush();
-  assert.deepEqual(requests,['fonts/inter.ttf']);assert.equal(faces.length,1);
-  assert.equal(faces[0].source,bytes);assert.equal(faces[0].family,'Chess Review Inter');assert.equal(faces[0].options.weight,'100 900');
+  assert.deepEqual(requests,['fonts/manrope.ttf']);assert.equal(faces.length,1);
+  assert.equal(faces[0].source,bytes);assert.equal(faces[0].family,'Chess Review Manrope');assert.equal(faces[0].options.weight,'200 800');
   p.refresh();await p.flush();assert.equal(requests.length,1);assert.equal(p.buttons().length,2);
+});
+test('Lichess uses the page font and loads no bundled font',async t=>{
+  const requests=[];
+  const p=page(t,follow,{site:'lichess',prepare(w){
+    Object.defineProperty(w.document,'fonts',{value:{add(){throw Error('No font should be added');}}});
+    w.fetch=async url=>{requests.push(url);throw Error('no logo in DOM fixture');};
+    w.FontFace=class {async load(){return this;}};
+  }});await p.flush();
+  assert.equal(p.buttons().length,1);assert.ok(!requests.some(url=>/fonts\//.test(url)));
+});
+test('a game played by the learned account says "You" and shows that side even against board orientation',async t=>{
+  const p=page(t,'<wc-chess-board></wc-chess-board>'+profile);await p.flush();
+  p.resolve({...result(),me:'b'});await p.flush();
+  assert.equal(p.buttons()[0].querySelector('.chess-review-button-summary').textContent,'You played with ~72.1% accuracy');
+});
+test('without a learned account the bottom player is still named',async t=>{
+  const p=page(t,'<wc-chess-board></wc-chess-board>'+profile);await p.flush();
+  p.resolve({...result(),me:null});await p.flush();
+  assert.equal(p.buttons()[0].querySelector('.chess-review-button-summary').textContent,'Alice played with ~91.2% accuracy');
 });
 test('an unavailable font never prevents button injection or accuracy from arriving',async t=>{
   const p=page(t,'<wc-chess-board></wc-chess-board>'+profile,{prepare(w){

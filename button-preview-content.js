@@ -6,13 +6,14 @@
   let fontPromise = null;
   let current = null, generation = 0, timer = null, retryTimer = null, api = null, storageListener = false, motion = true;
   function loadButtonFont() {
-    if (fontPromise || typeof FontFace !== 'function' || !document.fonts) return;
-    // Load our unmodified OFL font once per page. FontFace accepts bytes, so
-    // Lichess's page font-src policy need not allow extension/data font URLs.
-    fontPromise = fetch(api.runtime.getURL('fonts/inter.ttf')).then(response => {
+    // Lichess buttons use the page's own Noto Sans, so only Chess.com needs a bundled font.
+    if (fontPromise || /(^|\.)lichess\.org$/i.test(location.hostname) || typeof FontFace !== 'function' || !document.fonts) return;
+    // Load our unmodified OFL font once per page. FontFace accepts bytes, so a
+    // page font-src policy need not allow extension/data font URLs.
+    fontPromise = fetch(api.runtime.getURL('fonts/manrope.ttf')).then(response => {
       if (!response.ok) throw Error('Button font unavailable');
       return response.arrayBuffer();
-    }).then(bytes => new FontFace('Chess Review Inter',bytes,{weight:'100 900',style:'normal',display:'swap'}).load())
+    }).then(bytes => new FontFace('Chess Review Manrope',bytes,{weight:'200 800',style:'normal',display:'swap'}).load())
       .then(face => document.fonts.add(face)).catch(() => {});
   }
   function cancel() {

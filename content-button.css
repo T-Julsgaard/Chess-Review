@@ -22,7 +22,7 @@ button.chess-analyzer-review {
   background: #302e2b !important;
   color: #efeeeb !important;
   box-shadow: none !important;
-  font: 600 13px/1.35 "Chess Review Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif !important;
+  font: var(--chess-review-label-weight) 13px/1.35 var(--chess-review-font) !important;
   letter-spacing: 0 !important;
   text-align: left !important;
   text-transform: none !important;
@@ -30,9 +30,22 @@ button.chess-analyzer-review {
   cursor: pointer !important;
   transition: background .14s, border-color .14s, opacity .14s, transform .1s !important;
 }
+/* Per-site type. Chess.com gets the bundled Manrope (loaded by button-preview-content.js);
+   Lichess uses the page's own Noto Sans so the button reads like its neighbouring .fbt actions. */
 button.chess-analyzer-free-review {
+  --chess-review-font: "Chess Review Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --chess-review-label-weight: 700;
+  --chess-review-summary-weight: 500;
+  --chess-review-accuracy-weight: 800;
   margin: var(--chess-review-margin-top, 16px) auto var(--chess-review-margin-bottom, 8px) !important;
 }
+button.chess-analyzer-review {
+  --chess-review-font: "Noto Sans",sans-serif;
+  --chess-review-label-weight: 400;
+  --chess-review-summary-weight: 400;
+  --chess-review-accuracy-weight: 600;
+}
+button.chess-analyzer-review .chess-analyzer-review-label { text-transform: uppercase !important; }
 button.chess-analyzer-review { margin: 0 !important; }
 button.chess-analyzer-free-review--modal {
   width: var(--chess-review-modal-width, calc(100% - 32px)) !important;
@@ -103,7 +116,7 @@ button.chess-analyzer-free-review .chess-review-button-summary,
 button.chess-analyzer-review .chess-review-button-summary {
   display: block !important;
   color: #bcbab5 !important;
-  font: 400 11px/1.4 "Chess Review Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif !important;
+  font: var(--chess-review-summary-weight) 11px/1.4 var(--chess-review-font) !important;
   text-align: left !important;
   white-space: normal !important;
   overflow-wrap: anywhere !important;
@@ -113,7 +126,7 @@ button.chess-analyzer-free-review .chess-review-button-accuracy,
 button.chess-analyzer-review .chess-review-button-accuracy {
   display: inline-block !important;
   color: #efeeeb !important;
-  font: 600 11px/1.4 "Chess Review Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif !important;
+  font: var(--chess-review-accuracy-weight) 11px/1.4 var(--chess-review-font) !important;
   white-space: nowrap !important;
 }
 button.chess-analyzer-free-review .chess-review-button-summary[hidden],

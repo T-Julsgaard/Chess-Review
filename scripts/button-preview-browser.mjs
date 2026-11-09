@@ -98,8 +98,9 @@ try {
     await call('Fetch.enable',{patterns:[{urlPattern:'*',resourceType:'Document'}]},t.sessionId);
     const started=Date.now();await call('Page.navigate',{url:isLi?'https://lichess.org/'+(name==='lichess-metadata'?'future/game/':'')+'abcdefgh':'https://www.chess.com/game/live/12345678'},t.sessionId);
     await wait(t,"!!document.querySelector('.chess-review-button-summary')",name+' injection');
-    await wait(t,"[...document.fonts].some(f=>f.family==='Chess Review Inter'&&f.status==='loaded')",name+' local Inter font');
-    assert.match(await evaluate(t,"getComputedStyle(document.querySelector('.chess-review-button-summary')).fontFamily"),/Chess Review Inter/);
+    // Chess.com loads the bundled Manrope; Lichess reuses the page's own Noto Sans.
+    if(!isLi)await wait(t,"[...document.fonts].some(f=>f.family==='Chess Review Manrope'&&f.status==='loaded')",name+' local Manrope font');
+    assert.match(await evaluate(t,"getComputedStyle(document.querySelector('.chess-review-button-summary')).fontFamily"),isLi?/Noto Sans/:/Chess Review Manrope/);
     await wait(t,"/\\d+\\.\\d% accuracy/.test(document.querySelector('.chess-review-button-summary').textContent)",name+' engine preview');
     const elapsedMs=Date.now()-started;
     const text=await evaluate(t,"document.querySelector('.chess-review-button-summary').textContent");
@@ -180,7 +181,7 @@ try {
   await fs.appendFile(path.join(source,'background.js'),`\nbrowserAPI.runtime.onInstalled.addListener(()=>browserAPI.tabs.create({url:browserAPI.runtime.getURL('firefox-audit.html')}));
 browserAPI.runtime.onMessage.addListener((m,s,reply)=>{if(m?.type!=='preview-native-audit')return;createPreviewRunner(browserAPI)(m.pgn).then(summary=>reply({ok:true,summary}),e=>reply({ok:false,error:e.message}));return true;});\n`);
   await fs.appendFile(path.join(source,'background.js'),`\nbrowserAPI.runtime.onMessage.addListener((m,s,reply)=>{if(m?.type!=='preview-font-audit')return;fetch(${JSON.stringify(endpoint)},{method:'POST',body:JSON.stringify({kind:'font',...m.report})}).then(()=>reply({ok:true}));return true;});\n`);
-  await fs.writeFile(path.join(source,'font-audit.js'),`(async()=>{for(let i=0;i<200;i++){const loaded=[...document.fonts].some(f=>f.family==='Chess Review Inter'&&f.status==='loaded');if(loaded){await browserAPI.runtime.sendMessage({type:'preview-font-audit',report:{ok:true,font:getComputedStyle(document.querySelector('.chess-review-button-summary')).fontFamily}});return;}await new Promise(r=>setTimeout(r,50));}await browserAPI.runtime.sendMessage({type:'preview-font-audit',report:{ok:false,error:'Inter did not load under strict page CSP'}});})();`);
+  await fs.writeFile(path.join(source,'font-audit.js'),`(async()=>{for(let i=0;i<200;i++){const loaded=[...document.fonts].some(f=>f.family==='Chess Review Manrope'&&f.status==='loaded');if(loaded){await browserAPI.runtime.sendMessage({type:'preview-font-audit',report:{ok:true,font:getComputedStyle(document.querySelector('.chess-review-button-summary')).fontFamily}});return;}await new Promise(r=>setTimeout(r,50));}await browserAPI.runtime.sendMessage({type:'preview-font-audit',report:{ok:false,error:'Manrope did not load under strict page CSP'}});})();`);
   await fs.writeFile(path.join(source,'firefox-audit.html'),'<!doctype html><script type="module" src="firefox-audit.js"></script>');
   await fs.writeFile(path.join(source,'firefox-audit.js'),`import {browserAPI as api} from './browser-compat.js';
 try{for(let i=0;i<200;i++){if((await api.storage.local.get('settingsResetFor040')).settingsResetFor040)break;await new Promise(r=>setTimeout(r,25));}await api.storage.local.set(${JSON.stringify({settingsResetFor040:true,settings})});const start=performance.now();const result=await api.runtime.sendMessage({type:'preview-native-audit',pgn:${JSON.stringify(pgn)}});const after=await api.storage.local.get('settings');await fetch(${JSON.stringify(endpoint)},{method:'POST',body:JSON.stringify({...result,browser:'firefox',elapsedMs:performance.now()-start,settings:after.settings})});}catch(e){await fetch(${JSON.stringify(endpoint)},{method:'POST',body:JSON.stringify({ok:false,error:e.message})});}`);
@@ -189,6 +190,6 @@ try{for(let i=0;i<200;i++){if((await api.storage.local.get('settingsResetFor040'
   for(let i=0;i<300&&(!firefoxReport||!firefoxFontReport);i++)await sleep(100);
   assert.ok(firefoxReport?.ok,JSON.stringify(firefoxReport));assert.equal(firefoxReport.summary.estimated,true);
   assert.ok(firefoxReport.summary.accuracy.w>0);assert.deepEqual(firefoxReport.settings,settings);results.push(firefoxReport);
-  assert.ok(firefoxFontReport?.ok,JSON.stringify(firefoxFontReport));assert.match(firefoxFontReport.font,/Chess Review Inter/);results.push({browser:'firefox',...firefoxFontReport});
+  assert.ok(firefoxFontReport?.ok,JSON.stringify(firefoxFontReport));assert.match(firefoxFontReport.font,/Noto Sans/);results.push({browser:'firefox',...firefoxFontReport});
   await fs.writeFile(path.join(out,'results.json'),JSON.stringify(results,null,2));console.log(JSON.stringify({out,results},null,2));
 } finally {ws?.close();chrome?.kill();if(firefox)await firefox.exit();server.close();}
