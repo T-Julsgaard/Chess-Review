@@ -224,12 +224,23 @@ test('a cached active-tab game needs no detected player or saved username',async
   await analyzeActiveTab();assert.equal(s.opened.length,1);
 });
 
+test('a Lichess page without a game reports it without asking for a reload', async t => {
+  const s = setup(t, 'https://lichess.org/');
+  t.mock.method(chrome.tabs, 'reload', async () => { throw Error('Lichess pages should not reload'); });
+  await assert.rejects(analyzeActiveTab(''), error => {
+    assert.notEqual(error.code, 'NO_GAME');
+    assert.match(error.message, /No Lichess game found here/);
+    return true;
+  });
+  assert.equal(s.opened.length, 0);
+});
+
 test('retry retains the original tab before and during the reload', async t => {
   const s = setup(t, 'https://lichess.org/');
   s.tabs.set(2, { id: 2, url: 'https://lichess.org/BBBBBBBB' });
   let originalError;
   try { await analyzeActiveTab(''); } catch (err) { originalError = err; }
-  assert.equal(originalError.code, 'NO_GAME');
+  assert.equal(originalError.code, 'NO_LICHESS_GAME');
   s.activeId = 2;
   let reloaded;
   t.mock.method(chrome.tabs, 'reload', async id => {

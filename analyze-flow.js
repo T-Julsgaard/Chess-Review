@@ -301,8 +301,10 @@ async function analyzeLichessTab(info, tab, signal) {
   const gameId = (info && info.gameId) || (fromUrl && fromUrl.id) || null;
   if (!gameId) {
     // No game id in the URL or on the page → let the popup take over (paste a URL/PGN).
+    // Not "NO_GAME": that code reloads the tab and retries, which helps Chess.com's SPA but
+    // can't help here (the id comes from the URL) and would cancel a seek in the lobby.
     const e = new Error("No Lichess game found here. Open a game page, or paste its URL/PGN.");
-    e.code = "NO_GAME";
+    e.code = "NO_LICHESS_GAME";
     throw e;
   }
   let pgn = null;
