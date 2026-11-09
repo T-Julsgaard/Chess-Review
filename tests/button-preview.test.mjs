@@ -112,7 +112,23 @@ test('all button placements in a tab share one import; completed previews are ca
   const s=service();const results=await Promise.all([s.get(1,key),s.get(1,key)]);
   assert.deepEqual(results[0],results[1]); assert.equal(s.loads.length,1); assert.equal(s.runs.length,1);
   assert.equal((await s.get(2,key)).ok,true);assert.equal(s.runs.length,1);
-  assert.deepEqual(s.reads,['library','library']);
+  assert.deepEqual(s.reads,[['identity:v1','playerHistory:v1','library'],['identity:v1','playerHistory:v1','library']]);
+});
+test('the resolved identity marks its own side on fresh, cached and saved previews',async () => {
+  // Alice faced three different opponents with a two-game lead, so she is the learned account.
+  const history={'playerHistory:v1':{chesscom:['Bob','Carol','Dave'].map((opponent,i)=>({site:'chesscom',id:String(i+1),white:'Alice',black:opponent}))}};
+  let library=[];
+  const s=service({api:{storage:{local:{get:async()=>({...history,library})}}}});
+  assert.deepEqual([(await s.get(1,key)).me,(await s.get(1,key)).meSource],['w','history']);
+  assert.equal((await s.get(2,key)).me,'w','cached result still carries identity');
+  library=[{url,pgn,buttonSummary:{version:1,accuracy:summary.accuracy}}];
+  assert.equal((await s.get(3,key)).me,'w','saved summary carries identity');
+});
+test('the page-reported signed-in account outranks history in the preview',async () => {
+  const history={'playerHistory:v1':{chesscom:['Bob','Carol','Dave'].map((opponent,i)=>({site:'chesscom',id:String(i+1),white:'Alice',black:opponent}))}};
+  const loaded={...payload,meta:{...payload.meta,perspective:{account:'Bob'}}};
+  const s=service({loadGame:async()=>loaded,api:{storage:{local:{get:async()=>history}}}});
+  const result=await s.get(1,key);assert.equal(result.me,'b');assert.equal(result.meSource,'account');
 });
 test('saved full-review summaries bypass the preview worker',async () => {
   const counts={w:{brilliant:1,great:2},b:{brilliant:0,great:0}};

@@ -29,6 +29,7 @@ import { panelScale, panelGroupBounds, scalePanelGroup, movePanelGroup } from ".
 import { fullHdReferenceLayout, viewportGrowth } from "./lib/full-hd-layout.js";
 import { createScreenPreviewContext, loadScreenPreviewController } from "./lib/screen-previews.js";
 import { rememberAnalyzedGame, historyGame } from "./lib/player-history.js";
+import { identityForGame } from "./lib/identity.js";
 import { createReviewEffects } from "./lib/review-effects.js";
 import { explainMove, explanationPv } from "./lib/move-explanation.js";
 
@@ -562,7 +563,9 @@ function shareGame(ev) {
   try {
     // Preserve board orientation and only an identified playing side. A flipped
     // anonymous import must remain anonymous when reopened through a share link.
-    const meta = { ...S.meta, flip: S.flipped, myName: S.playerKnown === false ? "" : (S.players?.[S.meSide]?.name) || S.username || "" };
+    // The recipient resolves their own identity: never forward the sender's signed-in account.
+    const { perspective: _viewer, identitySource: _source, ...shared } = S.meta || {};
+    const meta = { ...shared, flip: S.flipped, myName: S.playerKnown === false ? "" : (S.players?.[S.meSide]?.name) || S.username || "" };
     const data = encodeURIComponent(b64encode(JSON.stringify({ pgn: S.pgn, meta })));
     const carrier = ((S.meta && S.meta.url) ? S.meta.url : "https://www.chess.com/").split("#")[0];
     const url = carrier + "#gambit=" + data;
@@ -8203,8 +8206,20 @@ async function applyGame(payload) {
   const wasBlank=S.blank, selection=++_librarySelection;
   const inferredName = await rememberAnalyzedGame(payload, browserAPI.storage.local);
   if(selection!==_librarySelection)return;
-  const automaticIdentity = !!historyGame(payload) || payload.meta?.identityMode === "automatic" || (!payload.meta?.myName && payload.meta?.playerKnown == null);
-  if(automaticIdentity)payload={...payload,meta:{...payload.meta,identityMode:"automatic",myName:inferredName,playerKnown:!!inferredName}};
+  const platformGame = historyGame(payload);
+  const automaticIdentity = !!platformGame || payload.meta?.identityMode === "automatic" || (!payload.meta?.myName && payload.meta?.playerKnown == null);
+  if(automaticIdentity){
+    // Platform games use the layered resolver (signed-in account → remembered account →
+    // game history → verified bottom player); anything else keeps the history inference.
+    let myName=inferredName, identitySource=inferredName?"history":null;
+    if(platformGame){
+      const identity=await identityForGame(browserAPI.storage.local,{site:platformGame.site,
+        players:{w:platformGame.white,b:platformGame.black},perspective:payload.meta?.perspective});
+      myName=identity.name;identitySource=identity.source;
+    }
+    payload={...payload,meta:{...payload.meta,identityMode:"automatic",myName,playerKnown:!!myName,identitySource}};
+  }
+  if(selection!==_librarySelection)return;
   if(wasBlank){
     await Promise.all([loadBook(),loadCalibration().catch(error=>{console.warn(error);return null;})]);
     if(selection!==_librarySelection)return;

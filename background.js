@@ -13,6 +13,7 @@ import { resetSettingsForRelease } from "./release-settings.js";
 import {createImportRequest, checkImport} from "./lib/import-request.js";
 import {createButtonPreviewService} from './lib/button-preview-service.js';
 import {createPreviewRunner} from './lib/preview-runner.js';
+import {rememberAccount, siteForUrl} from './lib/identity.js';
 
 const buttonPreviews = createButtonPreviewService({api:browserAPI,loadGame:loadGameFromTab,runPreview:createPreviewRunner(browserAPI)});
 browserAPI.tabs?.onRemoved?.addListener(tabId => buttonPreviews.cancel(tabId));
@@ -54,8 +55,19 @@ browserAPI.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     buttonPreviews.get(sender.tab.id,msg.key).then(sendResponse);
     return true;
   }
+  // A content script saw who is signed in. Only the site's own top frame may report its account.
+  if (msg?.type === 'accountSeen') {
+    const site = siteForUrl(sender.url || sender.tab?.url);
+    if (sender.frameId === 0 && sender.tab && site && site === msg.site) {
+      rememberAccount(browserAPI.storage.local, site, msg.name, msg.via).catch(() => {});
+    }
+    return;
+  }
   if (msg && msg.type === "openShared" && msg.payload && msg.payload.pgn) {
-    openAnalysisTab(msg.payload, {sourceTabId:sender.tab?.id}).then(() => sendResponse({ok:true}), error => {
+    // A shared link carries the sender's game, never the sender's viewing identity.
+    const payload = {...msg.payload, meta:{...(msg.payload.meta || {})}};
+    delete payload.meta.perspective;
+    openAnalysisTab(payload, {sourceTabId:sender.tab?.id}).then(() => sendResponse({ok:true}), error => {
       stashError(error);sendResponse({ok:false,error:error.message});
     });
     return true;

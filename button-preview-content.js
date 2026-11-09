@@ -49,13 +49,15 @@
       return;
     }
     button.dataset.preview = 'ready';
-    const side = context.flip === true ? 'b' : context.flip === false ? 'w' : null;
+    // A side the extension has learned is the user's own account wins over board orientation.
+    const own = result.me === 'w' || result.me === 'b' ? result.me : null;
+    const side = own || (context.flip === true ? 'b' : context.flip === false ? 'w' : null);
     const prefix = result.estimated ? '~' : '';
     if (!side) {
       setSummary(entry,['w','b'].map(color => (color === 'w' ? 'White ' : 'Black ') + (number(result.accuracy?.[color]) ? prefix + number(result.accuracy[color]) : '—')).join(' · '));
     } else {
       const score = number(result.accuracy?.[side]);
-      const player = result.players?.[side] || (side === 'w' ? 'White' : 'Black');
+      const player = own ? 'You' : result.players?.[side] || (side === 'w' ? 'White' : 'Black');
       setSummary(entry,player + (score ? ' played with ' : ' · No scored decisions'),score ? prefix + score : '',score ? ' accuracy' : '');
     }
     summary.title = result.estimated ? 'Estimated locally at depth 8. The full review may give a different score.' : 'From your saved full review.';

@@ -6,6 +6,7 @@ import { parseLichessGameId, parseLichessFlip, fetchGamePgn as fetchLichessPgn }
 import { browserAPI } from "./browser-compat.js";
 import {createImportRequest, checkImport, importDelay, waitImport} from "./lib/import-request.js";
 import {archivePlayers} from "./lib/player-history.js";
+import {cleanPerspective} from "./lib/identity.js";
 import {getCachedGame} from "./gamecache.js";
 
 /** Save the analysis payload and open analysis.html in a new tab. */
@@ -243,6 +244,9 @@ async function loadTabGamePayload(tab, username, signal) {
   // install has no identity history, so links with only ?username= must resolve here.
   const flip = parseFlip(tab.url) ?? info.flip ?? gameFlip(game, tab.url);
   const meta = { ...gameMeta(game), flip };
+  // Signed-in account and bottom player as read from the page, for identity resolution.
+  const perspective = cleanPerspective(info.perspective);
+  if (perspective) meta.perspective = perspective;
   // Country flags: the API knows WHO is white/black; the page knows each player's country id. Match
   // them by username so the right flag lands on the right side (analysis.js resolves id → flag art).
   attachCountries(meta, info && info.countries);
@@ -316,9 +320,8 @@ async function analyzeLichessTab(info, tab, signal) {
   // opponent at the bottom. Take the board orientation the content script read (chessground's
   // orientation-black/-white), falling back to a /black|/white segment in the URL.
   const flip = (info && info.flip != null) ? info.flip : parseLichessFlip(tabUrl);
-  return {
-    pgn,
-    meta: { url: `https://lichess.org/${gameId}`, gameId, flip },
-    source: "active-tab-lichess",
-  };
+  const meta = { url: `https://lichess.org/${gameId}`, gameId, flip };
+  const perspective = cleanPerspective(info?.perspective);
+  if (perspective) meta.perspective = perspective;
+  return { pgn, meta, source: "active-tab-lichess" };
 }

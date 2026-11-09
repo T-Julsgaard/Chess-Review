@@ -49,6 +49,11 @@ browser's `chrome.storage.local`:
   games), these support automatic player and board perspective detection.
   Chess.com and Lichess evidence are kept separate. Previously saved usernames
   may still be used as archive lookup candidates.
+- The username you are signed in with on Chess.com or Lichess, read from those sites'
+  pages while you browse them (up to 5 per platform, each kept for 90 days after it was
+  last seen). It is used only to recognise your own games and is never sent anywhere.
+  A saved review also keeps the account that was signed in when it was opened, for as long
+  as that review stays in your library. Share links do not include it.
 - A cache of public game/API responses, PGNs, and computed analysis, so
   re-opening a game does not require re-downloading or re-analyzing it.
 - Small accuracy summaries alongside completed saved reviews.

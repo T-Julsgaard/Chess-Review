@@ -27,8 +27,7 @@ function detectFlip() {
     if (/^(true|1|yes|on)$/.test(v)) return true;
     if (/^(false|0|no|off)$/.test(v)) return false;
   } catch {}
-  const board = document.querySelector("wc-chess-board, chess-board");
-  return board ? board.classList.contains("flipped") : null;
+  return detectBoardFlip();
 }
 
 // Best-effort: try to collect SAN moves from the DOM move list if the API
@@ -66,8 +65,9 @@ function cleanUsername(text) {
   // Remove any trailing rating in parentheses ("name (1500)") and whitespace.
   const t = String(text).replace(/\s*\(\d+\)\s*$/, "").trim();
   if (!t) return null;
-  // Filter out obvious non-usernames (anonymous/guests/computer).
-  if (/^(opponent|anonymous|guest|computer|stockfish)$/i.test(t)) return null;
+  // Filter out obvious non-usernames (anonymous/guests/computer). Chess.com shows "Player" and
+  // "Opponent" placeholders in the player blocks until the real names load.
+  if (/^(player|opponent|anonymous|guest|computer|stockfish)$/i.test(t)) return null;
   return t;
 }
 function usernameFromContainer(root) {
@@ -120,6 +120,118 @@ function detectUsernames() {
 function detectUsername() {
   return detectUsernames()[0] || null;
 }
+
+// ---- Identity: who is signed in, and who sits at the bottom -------------------
+// Each read is an ordered list of independent sources. The background combines them with
+// recorded game history (lib/identity.js), so a Chess.com markup change falls back gracefully.
+// KEEP the name rule in sync with accountName() in lib/identity.js.
+function cleanAccount(value) {
+  const name = cleanUsername(value) || "";
+  return /^[\w-]{2,30}$/.test(name) && !/^(white|black)$/i.test(name) ? name : "";
+}
+function memberFromHref(href) {
+  const m = String(href || "").match(/\/member\/([\w-]{2,30})(?:[/?#]|$)/i);
+  return m ? cleanAccount(m[1]) : "";
+}
+// The JSON object literal starting at text[start] === "{", honouring strings and escapes.
+function objectLiteralAt(text, start) {
+  let depth = 0, inString = false;
+  for (let i = start; i < text.length && i - start < 2e6; i++) {
+    const c = text[i];
+    if (inString) { if (c === "\\") i++; else if (c === '"') inString = false; continue; }
+    if (c === '"') inString = true;
+    else if (c === "{") depth++;
+    else if (c === "}" && --depth === 0) return text.slice(start, i + 1);
+  }
+  return "";
+}
+// Source 1: Chess.com's inline `context = {...}` boot object, which carries the signed-in user.
+function accountFromContext() {
+  for (const script of document.querySelectorAll("script:not([src])")) {
+    const text = script.textContent || "";
+    const at = text.search(/\bcontext\s*=\s*\{/);
+    if (at < 0) continue;
+    try {
+      const context = JSON.parse(objectLiteralAt(text, text.indexOf("{", at)));
+      for (const user of [context?.user, context?.currentUser, context?.me]) {
+        const name = cleanAccount(user?.username || user?.login);
+        if (name) return name;
+      }
+    } catch { /* not plain JSON: try the next source */ }
+  }
+  return "";
+}
+// Source 2: the site navigation's own profile link. Never the board, players, chat or page
+// content (a profile page has its own <nav> of tabs inside <main> linking to that member), never
+// the member whose profile is open, and only when every remaining link agrees on one name.
+function accountFromNavigation() {
+  const names = new Map();
+  const pageOwner = memberFromHref(location.pathname).toLowerCase();
+  for (const root of document.querySelectorAll("nav, #sb, [class*='nav-component'], [class*='sidebar-nav'], header")) {
+    if (root.closest("main, [role='main'], .board-layout-main, .board-layout-player, .player-component, [class*='chat'], [class*='board-layout-sidebar']")) continue;
+    for (const link of root.querySelectorAll("a[href*='/member/']")) {
+      const name = memberFromHref(link.getAttribute("href"));
+      if (name && name.toLowerCase() !== pageOwner && !names.has(name.toLowerCase())) names.set(name.toLowerCase(), name);
+    }
+  }
+  return names.size === 1 ? [...names.values()][0] : "";
+}
+let accountCache = null;
+function detectAccount() {
+  if (accountCache && Date.now() - accountCache.at < 5000) return accountCache.value;
+  let value = null;
+  // Chess.com marks a signed-out page <html class="user-logged-out">: never read a name there.
+  if (!document.documentElement.classList.contains("user-logged-out")) {
+    for (const [via, read] of [["context", accountFromContext], ["navigation", accountFromNavigation]]) {
+      const name = read();
+      if (name) { value = {name, via}; break; }
+    }
+  }
+  accountCache = {at:Date.now(), value};
+  return value;
+}
+// true / false when the page clearly shows either state, null when it can't be told.
+function detectSignedIn() {
+  const classes = document.documentElement.classList;
+  if (classes.contains("user-logged-out")) return false;
+  if (detectAccount() || classes.contains("user-logged-in")) return true;
+  return null;
+}
+// The player in the bottom seat as shown on the page. The background cross-checks it against
+// the board orientation and the PGN players, so a placeholder or wrong read is discarded.
+function detectBottomPlayer() {
+  return cleanAccount(firstUsernameFrom([".player-component.player-bottom", ".player-bottom", ".board-layout-bottom", "[class*='player-bottom']"]));
+}
+// Orientation of the board element itself, ignoring URL hints (true = Black at the bottom).
+// Prefer the game's main board over any preview board elsewhere on the page.
+function detectBoardFlip() {
+  const board = document.querySelector(".board-layout-chessboard wc-chess-board, .board-layout-chessboard chess-board, #board-single, #board-play-computer")
+    || document.querySelector("wc-chess-board, chess-board");
+  return board ? board.classList.contains("flipped") : null;
+}
+function detectPerspective() {
+  const account = detectAccount();
+  return {account: account?.name || "", signedIn: detectSignedIn(), bottom: detectBottomPlayer(), boardFlip: detectBoardFlip()};
+}
+// Report the signed-in account once per page so the extension still knows you if this markup
+// changes later. Retried once because the navigation can render after document_idle.
+let accountReported = false, accountWarned = false;
+function reportAccount() {
+  if (accountReported) return;
+  accountCache = null;
+  const account = detectAccount();
+  if (!account) {
+    if (detectSignedIn() && !accountWarned) {
+      accountWarned = true;
+      console.warn("[Chess Review] Chess.com shows a signed-in user but the username couldn't be read — update detectAccount() in content.js. Game history still identifies you.");
+    }
+    return;
+  }
+  accountReported = true;
+  try { Promise.resolve(browserAPI.runtime.sendMessage({type:"accountSeen", site:"chesscom", name:account.name, via:account.via})).catch(() => {}); } catch {}
+}
+reportAccount();
+setTimeout(reportAccount, 3000);
 
 // ---- Country detection: chess.com tags each player's nationality only as a CSS class on the
 // player block, e.g. <div class="cc-country-flag-component country-2 ...">  (country-2 = USA).
@@ -479,6 +591,7 @@ browserAPI.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       usernames: detectUsernames(), // every readable player, best → worst archive to search
       countries: detectCountries(), // { usernameLower: countryId } scraped from the player flags
       flip: detectFlip(),         // explicit URL hint or displayed board (true=Black at bottom)
+      perspective: detectPerspective(), // signed-in account + bottom player, for identity
       moveListText: parsed ? null : null, // only filled on explicit fallback below
     });
     return true;

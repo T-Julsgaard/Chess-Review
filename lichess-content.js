@@ -57,11 +57,8 @@ function detectGameId() {
 // fixes opening a game you played as Black and finding the opponent seated at the bottom.
 // Tri-state: true (Black at bottom) / false (White) / null (unknown → defer to the username match).
 function detectFlip() {
-  const wrap = document.querySelector(".cg-wrap");
-  if (wrap) {
-    if (wrap.classList.contains("orientation-black")) return true;
-    if (wrap.classList.contains("orientation-white")) return false;
-  }
+  const board = detectBoardFlip();
+  if (board != null) return board;
   if (/\/black(?:\/|$)/i.test(location.pathname)) return true;
   if (/\/white(?:\/|$)/i.test(location.pathname)) return false;
   const orientation = readPageData()?.orientation;
@@ -69,6 +66,92 @@ function detectFlip() {
   if (orientation === "white") return false;
   return null;
 }
+
+// ---- Identity: who is signed in, and who sits at the bottom -------------------
+// Each read is an ordered list of independent sources. The background combines them with
+// recorded game history (lib/identity.js), so a Lichess markup change falls back gracefully.
+// KEEP the name rule in sync with accountName() in lib/identity.js.
+const ACCOUNT_RE = /^[\w-]{2,30}$/;
+const NOT_A_NAME = /^(white|black|anonymous|guest|computer|stockfish|player|opponent)$/i;
+function cleanAccount(value) {
+  const name = String(value ?? "").trim();
+  return ACCOUNT_RE.test(name) && !NOT_A_NAME.test(name) ? name : "";
+}
+function nameFromProfileHref(href) {
+  const m = String(href || "").match(/\/@\/([\w-]{2,30})(?:[/?#]|$)/);
+  return m ? cleanAccount(m[1]) : "";
+}
+// Lichess renders <body data-username="Name" data-user="name"> for a signed-in user, plus the
+// #user_tag header button holding the same name.
+function detectAccount() {
+  const body = document.body;
+  const sources = [
+    ["body-username", body?.dataset?.username],
+    ["user-tag", document.querySelector("#user_tag")?.textContent],
+    ["body-user", body?.dataset?.user],
+  ];
+  for (const [via, value] of sources) {
+    const name = cleanAccount(value);
+    if (name) return {name, via};
+  }
+  return null;
+}
+// true / false when the page clearly shows either state, null when it can't be told.
+function detectSignedIn() {
+  // (.dasher alone is not proof: signed-out visitors get an anonymous dasher too.)
+  if (detectAccount() || document.querySelector("#user_tag")) return true;
+  if (document.querySelector("a.signin, .signin.button")) return false;
+  return null;
+}
+// The player in the bottom seat: the bottom player block (round and replay views), then
+// Lichess's own boot data for the viewer's side. The background cross-checks this name against
+// the board orientation and the PGN players, so a wrong read is discarded, not believed.
+function detectBottomPlayer() {
+  for (const sel of [".ruser-bottom", ".analyse__player_bottom", "[class*='ruser-bottom']", "[class*='player_bottom']"]) {
+    let el = null;
+    try { el = document.querySelector(sel); } catch { continue; }
+    if (!el) continue;
+    const link = el.matches("a[href*='/@/']") ? el : el.querySelector("a[href*='/@/']");
+    const name = nameFromProfileHref(link?.getAttribute("href"));
+    if (name) return name;
+  }
+  const player = readPageData()?.player;
+  const orientation = detectBoardFlip();
+  const color = player?.color === "black" ? true : player?.color === "white" ? false : null;
+  if (color != null && color === orientation) return cleanAccount(player?.user?.username || player?.user?.name);
+  return "";
+}
+// Orientation of the rendered board itself, ignoring URL hints (true = Black at the bottom).
+// Finished games open in the analysis view, which has no bottom player block: there this
+// orientation is the only bottom-player read. Prefer the main board over any mini-boards.
+function detectBoardFlip() {
+  const wrap = document.querySelector(".round__app .cg-wrap, .analyse__board .cg-wrap, main .cg-wrap") || document.querySelector(".cg-wrap");
+  if (wrap?.classList.contains("orientation-black")) return true;
+  if (wrap?.classList.contains("orientation-white")) return false;
+  return null;
+}
+function detectPerspective() {
+  const account = detectAccount();
+  return {account: account?.name || "", signedIn: detectSignedIn(), bottom: detectBottomPlayer(), boardFlip: detectBoardFlip()};
+}
+// Report the signed-in account once per page so the extension still knows you if this markup
+// changes later. Retried once in case the header renders late.
+let accountReported = false, accountWarned = false;
+function reportAccount() {
+  if (accountReported) return;
+  const account = detectAccount();
+  if (!account) {
+    if (detectSignedIn() && !accountWarned) {
+      accountWarned = true;
+      console.warn("[Chess Review] Lichess shows a signed-in user but the username couldn't be read — update detectAccount() in lichess-content.js. Game history still identifies you.");
+    }
+    return;
+  }
+  accountReported = true;
+  try { Promise.resolve(browserAPI.runtime.sendMessage({type:"accountSeen", site:"lichess", name:account.name, via:account.via})).catch(() => {}); } catch {}
+}
+reportAccount();
+setTimeout(reportAccount, 3000);
 
 // Replay pages include a complete PGN even before their move-list JavaScript
 // renders. Prefer it over reconstructed SAN so ratings, result and setup survive
@@ -317,6 +400,7 @@ browserAPI.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       url: location.href,
       gameId: detectGameId(),
       flip: detectFlip(),       // user's board perspective (true = Black at bottom)
+      perspective: detectPerspective(), // signed-in account + bottom player, for identity
       pgn: readPagePgn(),       // full replay PGN, including player/setup metadata
       movetext: readMovetext(), // DOM fallback if the API lookup fails
     });

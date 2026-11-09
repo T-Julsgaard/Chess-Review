@@ -106,7 +106,15 @@ test('review uses inferred site identity while preserving page orientation and i
   await a.call('applyGame',{...game(4,'Friend','Owner'),meta:{...game(4).meta,flip:false},analysis:null});
   assert.equal(a.state.meSide,'b');assert.equal(a.state.playerKnown,true);assert.equal(a.state.flipped,false);
   await a.call('applyGame',{...game(1,'LichessOwner','Friend','lichess'),meta:{...game(1,'LichessOwner','Friend','lichess').meta,flip:true},analysis:null});
+  // A bare orientation hint is not proof of who is viewing.
   assert.equal(a.state.playerKnown,false);assert.equal(a.state.flipped,true);
+  // The board the page actually rendered is: with nothing known on Lichess, its bottom player is you.
+  const seen={...game(2,'LichessOwner','Friend','lichess')};
+  await a.call('applyGame',{...seen,meta:{...seen.meta,flip:true,perspective:{bottom:'Friend',boardFlip:true}},analysis:null});
+  assert.equal(a.state.playerKnown,true);assert.equal(a.state.meSide,'b');assert.equal(a.state.meta.identitySource,'bottom');
+  // A signed-in account read from the page outranks Chess.com history and the board.
+  await a.call('applyGame',{...game(5,'Owner','Friend'),meta:{...game(5).meta,perspective:{account:'Friend',bottom:'Owner',boardFlip:false}},analysis:null});
+  assert.equal(a.state.meSide,'b');assert.equal(a.state.meta.identitySource,'account');
   await settle();
 });
 
