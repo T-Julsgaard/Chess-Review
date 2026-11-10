@@ -31,7 +31,7 @@ import { createScreenPreviewContext, loadScreenPreviewController } from "./lib/s
 import { rememberAnalyzedGame, historyGame } from "./lib/player-history.js";
 import { identityForGame } from "./lib/identity.js";
 import { createReviewEffects } from "./lib/review-effects.js";
-import { explainMove, explanationPv } from "./lib/move-explanation.js";
+import { explainMove, explainBetterMove, explanationPv } from "./lib/move-explanation.js";
 
 const reviewEffects = createReviewEffects(document);
 
@@ -874,6 +874,7 @@ const phaseReveals = Object.fromEntries(GAME_PHASES.map(phase => [phase,
    otherwise from the mainline's caches. The renderers use these accessors, so they
    work the same in both modes. */
 function activePos() {
+  if (S.practice?.preview) return S.practice.preview;
   return S.analysisMode && S.variation ? S.variation.positions[S.variation.idx] : S.positions[S.idx];
 }
 function activeEval() {
@@ -2516,7 +2517,7 @@ function paintBoard({restoring=false}={}) {
   const solvePly = S.practice ? S.practice.spots[S.practice.i] - 1 : -1;
   const clean = !!S.practice && S.idx === solvePly;
   const showCat = !S.practice || S.idx === solvePly + 1;
-  const hl = clean ? new Set() : new Set([pos.from, pos.to].filter(Boolean));
+  const hl = clean && !S.practice.preview ? new Set() : new Set([pos.from, pos.to].filter(Boolean));
   // Get classification for the current position (mainline or variation)
   let cls = null;
   if (showCat) {
@@ -2573,7 +2574,7 @@ function paintBoard({restoring=false}={}) {
   if (clean && S.practice.resultBadge?.solvePos === solvePly) {
     const result = S.practice.resultBadge, square = sqByName[result.square];
     square?.classList.add("has-badge");
-    square?.append(puzzleResultBadge(document, result.status));
+    if (!square?.querySelector(".puzzle-result-badge")) square?.append(puzzleResultBadge(document, result.status));
   }
   syncBoardBadgeLabel();
   renderBestArrow();
@@ -4346,6 +4347,7 @@ function renderReview() {
   }
 
   panel.append(renderMoveComment());
+  panel.querySelector(".ip-opening")?.append(el("button", { type: "button", class: "practice-btn", title: "Replay the game and re-solve every mistake you made", onclick: startPractice }, "Practice your mistakes"));
   UI.review.replaceChildren(panel);
 }
 // Commentary for the move on the mainline at S.idx.
@@ -4355,8 +4357,7 @@ function renderMoveComment() {
   const body = el("div", { class: "ip-body" + (dopamine ? " dopamine-comment" : "") });
   if (dopamine) body.dataset.moveCategory = S.classif[S.idx] || "";
   if (S.idx === 0) {
-    body.append(el("div", { class: "ip-head" },
-      el("button", { type: "button", class: "practice-btn", title: "Replay the game and re-solve every mistake you made", onclick: startPractice }, "Practice your mistakes")));
+    body.append(el("div", { class: "ip-head" }));
     const sig = "start:" + (S.settings.coach || "");
     const fresh = sig !== _ipSig;
     if (fresh) { _ipText = (S.coach && coachLine("non_move_states", "starting_position", {})) || "Use ← and → to step through the game."; _ipSig = sig; }
@@ -4425,27 +4426,35 @@ function renderMoveComment() {
   return body;
 }
 // Practice coaching: what to do, with an inline Hint button after the first failed try.
+// A solved mistake waits for the player: the reasons first, then Next when they're done reading.
+function renderPracticeSolution(body, p) {
+  const { praise, summary, mistake, evaluation, line, moves } = p.solved, last = p.i >= p.spots.length - 1;
+  body.classList.add("practice-solved");
+  body.append(el("div", { class: "practice-solved-head" },
+    el("div", { class: "ip-text ip-good" }, praise),
+    el("div", { class: "practice-actions" },
+      moves?.length ? el("button", { type: "button", class: "practice-action", onclick: practiceShowLine }, "Show line") : null,
+      el("button", { type: "button", class: "practice-action practice-next", onclick: practiceNext }, last ? "Finish" : "Next mistake →"))),
+    summary ? el("div", { class: "ip-text" }, summary) : null,
+    mistake ? el("p", { class: "practice-why" }, mistake) : null,
+    evaluation ? el("p", { class: "practice-why" }, evaluation) : null,
+    line ? el("p", { class: "practice-line" }, line) : null);
+}
 function renderPracticeCoach() {
   const p = S.practice;
   const body = el("div", { class: "ip-body practice-coach" });
+  // Coach phrase (or null) → otherwise the built-in default for each practice state.
+  const cl = (key, tok) => S.coach ? coachLine("practice", key, tok) : null;
+  if (p.solved) { renderPracticeSolution(body, p); return body; }
   body.append(el("div", { class: "ip-head" },
     el("span", { class: "ip-tag practice" }, "Practice")));
 
-  // Coach phrase (or null) → otherwise the built-in default for each practice state.
-  const cl = (key, tok) => S.coach ? coachLine("practice", key, tok) : null;
   if (p.rolling) {
     // After a correct answer keep the success message during the roll; only the very first
     // roll (before any solve) shows a neutral "getting ready" line.
     body.append(p.advancing
-      ? el("div", { class: "ip-text ip-good" }, cl("correct_continue", {}) || "✓ Correct! Moving on…")
+      ? el("div", { class: "ip-text ip-good" }, "Moving on…")
       : el("div", { class: "ip-text" }, cl("loading_first", {}) || "Getting your first mistake ready…"));
-    return body;
-  }
-  if (!p.solving && !p.demoing) {
-    const last = p.i >= p.spots.length - 1;   // just solved the final mistake → nothing to move on to
-    body.append(el("div", { class: "ip-text ip-good" },
-      last ? (cl("correct_final", {}) || "✓ Correct — last one. Well done!")
-           : (cl("correct_continue", {}) || "✓ Correct! Moving on…")));
     return body;
   }
   if (p.solving && (p.fails >= 1 || p.hinted)) {
@@ -5598,8 +5607,8 @@ function renderEngineCurrent() {
     if (panel && (!lines || panel.lines.length > lines.length)) lines = panel.lines;
     // Keep this position's known candidates visible while a newly requested rank is pending.
     const padFromCache = want > 1 && !panelReady && !!lines && lines.length < want;
-    renderEngine(lines, padFromCache);
-    requestPanelLines();
+    renderEngine(lines, padFromCache && !S.practice);
+    if (!S.practice) requestPanelLines();
   }
 }
 // Panel evidence is separate from calibrated scoring. Keep the richest result for each
@@ -7282,6 +7291,7 @@ function startPractice() {
   const spots = practiceSpots();
   if (!spots.length) { toast("No mistakes to practice — clean game!"); return; }
   S.practice = { spots, i: 0, solving: false, busy: false, rolling: false, rollT: null, advancing: false };
+  UI.boardWrap.scrollIntoView?.({ block: "nearest" });
   S.selectedSq = null;
   renderStats();
   // Replay from wherever the user currently is to the first mistake — forward if it's ahead,
@@ -7326,23 +7336,26 @@ function markCurrentSolved() {
   const id = currentGameId();
   return updateLibrary(library => library.map(rec => rec.id === id ? { ...rec, solved: true } : rec));
 }
-// Replay roll: step from the CURRENT position to `target`, forward or backward, playing the
-// move tick each step (lightweight renders only, so it stays snappy). Calls done() on arrival.
+// Replay roll: step from the CURRENT position to `target`, forward or backward (lightweight
+// renders only, so it stays snappy). Short trips play every move; longer ones take bigger
+// strides, so the whole trip lasts about half a second however long the game is. Calls done() on arrival.
+const PRACTICE_ROLL_FRAMES = 6;
 function practiceRoll(target, done) {
   const p = S.practice; if (!p) return;
   p.solving = false; p.rolling = true;
   target = Math.max(0, Math.min(S.total, target));
-  paintBoard(); renderEvalBar(); renderMoves(); renderGraph(); renderControls(); renderReview();
+  paintBoard(); renderEvalBar(); renderMoves(); renderGraph(); renderControls(); renderReview(); renderEngineCurrent();
+  const stride = Math.max(1, Math.ceil(Math.abs(target - S.idx) / PRACTICE_ROLL_FRAMES));
   const step = () => {
     if (!S.practice) return;
     if (S.idx === target) { S.practice.rolling = false; done(); return; }
-    S.idx += S.idx < target ? 1 : -1;
+    S.idx += (S.idx < target ? 1 : -1) * Math.min(stride, Math.abs(target - S.idx));
     paintBoard(); renderEvalBar(); renderMoves(); renderGraph();
-    playMoveSound(S.idx);
-    S.practice.rollT = setTimeout(step, 95);
+    if (stride === 1 || S.idx === target) playMoveSound(S.idx);
+    S.practice.rollT = setTimeout(step, stride > 1 ? 70 : 95);
   };
   if (S.idx === target) { p.rolling = false; done(); }
-  else p.rollT = setTimeout(step, 240);
+  else p.rollT = setTimeout(step, stride > 1 ? 120 : 240);
 }
 // We've rolled to the position right before the mistake. Reset per-spot state and replay the
 // actual wrong move (so the player remembers what they did) before handing control over.
@@ -7352,6 +7365,7 @@ function practiceEnterSolve() {
   clearDemoTimers(); removeMoveCallout();
   S.idx = solvePos;
   p.solving = false; p.busy = false; p.fails = 0; p.hinted = false; p.coachTyped = false; p.advancing = false; p.demoing = true;
+  p.solved = null; p.preview = null;
   p.demoT = [];
   S.selectedSq = null;
   S.practiceHint = null;
@@ -7456,6 +7470,35 @@ function renderPracticeHint() {
   const h = S.practiceHint; if (!h) return;
   if (sqByName[h.from]) sqByName[h.from].classList.add("hint-from");
 }
+// The explanation for a solved spot, from the review's own search results.
+function practiceSolution(solvePos, answer) {
+  const spot = solvePos + 1, played = S.positions[spot];
+  return explainBetterMove({ fen: S.positions[solvePos].fen, answer, played: played.san, playedFen: played.fen,
+    category: S.classif[spot], bestScore: S.evals[solvePos], playedScore: S.evals[spot],
+    bestPv: explanationPv(S.bests[solvePos]), replyPv: explanationPv(S.bests[spot]) }) || {};
+}
+// Plays the engine's follow-up on the board, so the point of the move can be seen.
+function practiceShowLine() {
+  const p = S.practice; if (!p?.solved?.moves?.length) return;
+  clearDemoTimers(); clearPracticeResult();
+  const { fen, san, from, to, moves } = p.solved, chess = new Chess(fen);
+  p.preview = { fen, san, from, to };
+  paintBoard();
+  moves.forEach((uci, index) => p.demoT.push(setTimeout(() => {
+    if (S.practice !== p || !p.solved) return;
+    const move = chess.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] });
+    p.preview = { fen: chess.fen(), san: move.san, from: move.from, to: move.to };
+    paintBoard();
+    if (S.settings.moveAnim) animateMove(move.from, move.to);
+    playSanSound(move.san);
+  }, 300 + index * 800)));
+}
+function practiceNext() {
+  const p = S.practice; if (!p?.solved) return;
+  clearDemoTimers();
+  p.solved = null; p.preview = null; p.resultBadge = null;
+  practiceAdvance();
+}
 // Compare the complete move, including promotion, with the stored answer.
 function judgePass(solvePos, userUci) {
   return S.bests[solvePos]?.bestmove === userUci;
@@ -7505,8 +7548,12 @@ async function practiceAttempt(from, to, promotion = "q") {
     flashSquares([mv.from, mv.to], "good");
     playSanSound(mv.san);
     playPuzzleSuccess();
-    renderControls(); renderReview();
-    setTimeout(() => { if (S.practice === p) practiceAdvance(); }, 1300);
+    const last = p.i >= p.spots.length - 1, coach = key => S.coach ? coachLine("practice", key, {}) : null;
+    p.solved = { ...practiceSolution(solvePos, userUci), fen: c.fen(), san: mv.san, from: mv.from, to: mv.to,
+      praise: last ? coach("correct_final") || "✓ Correct — last one. Well done!" : coach("correct_continue") || "✓ Correct!" };
+    p.preview = { fen: c.fen(), san: mv.san, from: mv.from, to: mv.to };
+    p.resultBadge = { solvePos, square: mv.to, status: "correct" };
+    renderControls(); renderReview(); renderEngineCurrent();
   } else {
     const result = p.resultBadge = {solvePos, square:mv.from, status:"incorrect"};
     setTimeout(() => {
@@ -8072,7 +8119,11 @@ document.addEventListener("keydown", (e) => {
   }
   if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
   // During practice the only shortcut is Escape to exit; nav keys are disabled.
-  if (S.practice) { if (e.key === "Escape") exitPractice(); return; }
+  if (S.practice) {
+    if (e.key === "Escape") exitPractice();
+    else if (S.practice.solved && (e.key === "ArrowRight" || e.key === "Enter" && !e.target?.closest?.("button"))) practiceNext();
+    return;
+  }
   if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) {
     // Navigation takes focus away from the last clicked control (e.g. Feedback).
     document.activeElement?.blur();

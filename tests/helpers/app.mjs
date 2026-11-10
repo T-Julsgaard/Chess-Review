@@ -27,7 +27,7 @@ import {moveAnimationDuration, MOVE_ANIMATION_EASING} from '../../lib/move-anima
 import {rememberAnalyzedGame,historyGame} from '../../lib/player-history.js';
 import {identityForGame} from '../../lib/identity.js';
 import {createReviewEffects} from '../../lib/review-effects.js';
-import {explainMove, explanationPv} from '../../lib/move-explanation.js';
+import {explainMove, explainBetterMove, explanationPv} from '../../lib/move-explanation.js';
 
 // Execute the real application in a DOM, stubbing only browser/engine boundaries.
 // Automatic startup and imports are omitted; production needs no test exports.
@@ -61,7 +61,7 @@ export function app(t, {hardware,url='https://extension.test/analysis.html#test-
     createScreenPreviewContext,loadScreenPreviewController,
     rememberAnalyzedGame,historyGame,identityForGame,
     createReviewEffects,
-    explainMove, explanationPv,
+    explainMove, explainBetterMove, explanationPv,
     BADGE_APPEARANCES, BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg, puzzleResultBadge, CHECKMATE_BADGES, checkmateBadgeSvg, matedKingSquare, mateMark,
     CATEGORY_SYMBOLS, CATEGORY_SYMBOL_OPTIONS, categoryBadgeSymbol, cleanBadgeSymbols,
     moveAnimationDuration, MOVE_ANIMATION_EASING,
