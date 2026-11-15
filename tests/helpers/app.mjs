@@ -1,3 +1,4 @@
+import {localizeSettings, settingsTranslator} from '../../lib/settings-locale.js';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { JSDOM } from 'jsdom';
@@ -36,8 +37,9 @@ const startup = raw.indexOf('(async function main()');
 if (startup < 0) throw Error('Application startup marker missing');
 const source = raw.slice(0, startup).replace(/^import .*;\r?\n/gm, '');
 
-export function app(t, {hardware,url='https://extension.test/analysis.html#test-game',html='<!doctype html><div id="root"></div>'} = {}) {
+export function app(t, {hardware,language='en-US',url='https://extension.test/analysis.html#test-game',html='<!doctype html><div id="root"></div>'} = {}) {
   const dom = new JSDOM(html, { url, pretendToBeVisual: true });
+  Object.defineProperty(dom.window.navigator, 'language', {value:language});
   if (hardware) Object.defineProperties(dom.window.navigator, {
     hardwareConcurrency: {configurable:true,value:hardware.hardwareConcurrency},
     deviceMemory: {configurable:true,value:hardware.deviceMemory},
@@ -52,6 +54,7 @@ export function app(t, {hardware,url='https://extension.test/analysis.html#test-
     } },
   };
   const context = vm.createContext({
+    localizeSettings, settingsTranslator,
     window: dom.window, document: dom.window.document, navigator: dom.window.navigator, LearningWorkspace,
     loadLearningWorkspace:async () => ({LearningWorkspace}), presentationFor, mountLearningAnnouncement,
     panelScale,panelGroupBounds,scalePanelGroup,movePanelGroup,fullHdReferenceLayout,viewportGrowth,UI_SETUPS,MODERN_LAYOUT,
