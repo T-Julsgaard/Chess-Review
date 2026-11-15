@@ -3,55 +3,7 @@
 Free, open-source game review for your online chess games, powered by Stockfish NNUE running
 locally in your browser. One click turns any **Chess.com** or **Lichess** game into a full
 review — accuracy scores, move-by-move classifications, an evaluation graph, and an estimated
-rating. Local analysis needs no account or server, and no manual PGN copying.
-
-Post-game review buttons on Chess.com and Lichess also show a local, depth-8
-accuracy estimate before you open the extension. The estimate is separate from
-the full review and may differ from its score. Saved full reviews supply their
-accuracy instead. Previews only analyse completed
-standard games, use one bounded worker, and never change full-review settings.
-The compact website buttons use restrained hover and press feedback, and respect
-reduced motion and the **Interface animations** preference.
-Their Inter font is bundled locally under the SIL Open Font License 1.1.
-
-**Learn with Chess Review** opens from the button beneath Engine, beside the move
-controls. By default, the review panels morph into one learning workspace while
-the board and top bar stay in place. **Settings → General → Learning experience**
-offers **Morph in place**, **Morph in place 2**, **Morph in place 3**, **Studio Morph**, **Minimal morph**, **Board morph**, and
-the original **Separate page** layout. Each morph has its own design and timing. The transition
-also runs when returning to review and respects reduced-motion preferences.
-**Settings → General → Animations** controls interface transitions separately
-from individual piece moves. Turning off **Piece moves** keeps learning entry,
-statistics reveals and puzzle changes animated; **Interface animations** turns
-those effects off independently and still respects the system's reduced-motion preference.
-**Morph in place 2** glides the intact board into a centered study layout and keeps
-Settings available alongside learning, with reserved space on desktop windows.
-**Morph in place 3** keeps the review board size and familiar piece handling while
-the surrounding panels transition into learning.
-The learning workspace includes 23 concept lessons with 47
-exercises, 25,000 offline puzzles, 1/5/10-minute challenges, and 12 opening courses
-with 24 annotated lines. Lessons use move, square-selection and position-reading
-exercises. Opening practice supports both colors and automatic opponent replies.
-Progress and bookmarks stay in your browser, and **Back to review** restores your
-game position and orientation. The [learning objective and progress tracker](docs/LEARN_WITH_CHESS_REVIEW.md)
-preserves the full development brief for work on another computer; [content sources](data/learning/SOURCES.md)
-record licensing and validation scope.
-
-The right-hand Settings panel includes an optional **Concepts** tab after General
-and Engine. A separate **Concepts** panel to the right of Accuracy and Engine
-uses those same findings,
-ordered by likely relevance and phrased from your playing side. It follows the
-selected move, includes every match, and separates insights with space. Its top
-aligns with the coach commentary panel; its bottom aligns with Engine. Expand
-an insight's evidence to inspect the original explanation and exact scope.
-Accuracy and the existing move commentary retain their scoring and behavior.
-
-The Settings Concepts panel remains the raw inspection and game-debug view.
-Check **Enable concept analysis** to list supported findings for the
-selected move, with exact verified scopes and game-wide debug metrics. It defaults
-off and stops its worker immediately when disabled. Findings use completed E080
-research's bounded mechanics; broader strategic benefits and coaching usefulness
-remain unproven. Existing scores and coach comments are unchanged.
+rating. No account, no server, no manual PGN copying.
 
 **Source:** https://github.com/T-Julsgaard/Chess-Review
 
@@ -91,53 +43,14 @@ detected, enter it once; it is remembered locally. Chess Review is intended for
 review after play.
 
 Settings let you choose an engine, rating mode, board, pieces, sounds, coach and
-badge appearance. Under **Badges**, each scored category starts with number
-notation; Book uses its book icon. Each dropdown offers symbols matched to that
-category, including the illustrated designs. Excellent offers Simple and Detailed
-thumbs-up choices. Choose **Solid** for white marks on colored circles or
-**Ink & mineral** for colored marks on softly tinted discs with fine rims.
-**Enamel** pairs pale faces with colored rims and deep blue, green, yellow,
-orange and red inks, including the checkmate badge.
-The **Hover labels** dropdown controls the category labels shown after a move.
-Badge numbers describe move categories; they are separate from position
-evaluation and game accuracy.
+category-badge appearance. Badge numbers describe move categories; they are
+separate from position evaluation and game accuracy.
 
 Both engines offer **Use recorded rating** and **Moves only**. The first compares
 your performance with public players near the rating saved in the game; the
 second ignores that rating and estimates a blitz rating level from your choices.
 Without a saved rating, the review falls back to Moves only, which needs at least
 ten nonforced decisions. Each engine uses its own models.
-
-### Optional Dopamine mode
-
-Choose **Settings → General → Interface presets → Review experience → Dopamine**
-for a more expressive review: purple board and interface, move-colored accents, and reactions centered
-on the move's destination. Brilliant moves send teal waves across the squares;
-blunders produce a red shockwave and shards. Other categories have smaller
-reactions. Effects never cover the board with a text box or intercept input.
-The same settings section offers **Preview Brilliant effect** and **Preview
-Blunder effect** buttons, without changing your move's actual classification.
-
-The commentary explains available engine evidence: immediate mate, a mating
-evaluation, a legal capture, material changes in the shown line, or the evaluation
-loss when no specific tactic is established. You can explore the reply and the
-engine's better alternative. Explanations use existing local analysis; a shown
-continuation is not a promise that every future move is forced. Missing or invalid
-lines never produce invented tactical claims.
-
-Normal remains the default. The mode and original visual preferences are saved
-separately; switching back restores the original appearance and commentary. The
-default Modern layout gives the explanation panel more room only in Dopamine mode;
-custom arrangements stay intact. Reduced motion or disabling Animation keeps a
-static destination outline. No extra engine searches, network services, extension
-permissions, dependencies, or changes to classifications and accuracy are needed.
-
-For just the explanation text with your usual appearance, turn on
-**Settings → General → Coach → Engine explanations**. It works with any coach,
-including No coach, and saves your choice independently of the review mode.
-Engine explanations and Special replies are alternative reply styles: turning
-either on switches the other off. Dopamine keeps engine explanations by default
-until you explicitly choose a reply style in Coach settings.
 
 ## Scoring and reproducibility
 
@@ -189,17 +102,6 @@ usernames or game IDs. No games or analysis are sent to the developer or analyti
 Firefox discloses the browsing activity and website content used for these requests.
 Sharing a game copies an encoded, unencrypted PGN/metadata link to your clipboard;
 anyone you send it to can read that information. See [PRIVACY.md](PRIVACY.md).
-
-## Maintained-source checks
-
-CI runs only the extension's test suite (`npm test`) on pushes and pull requests,
-plus a weekly live [Lichess compatibility check](docs/REPOSITORY.md). The remaining
-checks run locally when needed: `npm run verify:source` (also part of packaging),
-`npm run verify:history`, and `node tools/calibration/reproduce-public.mjs`.
-
-The complete research suite (`npm run test:research`) is local-only. It needs the
-original Python runtime bound by the E211 saved observations and full git history.
-See [runtime setup](tools/research-python/README.md).
 
 ## Release packages
 
