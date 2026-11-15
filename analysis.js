@@ -1,3 +1,4 @@
+import {localizeSettings, settingsTranslator} from "./lib/settings-locale.js";
 // analysis.js — Chess Review analysis page.
 // Parses the PGN, runs Stockfish through the game and fills every panel with real
 // data: eval bar/graph, accuracy, mistake classification, engine lines (MultiPV),
@@ -175,6 +176,9 @@ const QUALITY_DESC = {
   blunder:   "A loss of at least 20 percentage points in estimated winning chances, or a severe forced-mate error. Special cases such as a missed opportunity can receive another label.",
 };
 // Explanations for the accuracy and elo numbers (shown as a tooltip like the categories).
+const settingsLocale = globalThis.navigator?.language || "en";
+const settingsText = settingsTranslator(settingsLocale);
+const settingsLanguage = settingsText("Settings") === "Settings" ? "en" : "zh-Hans";
 const ACCURACY_INFO = "SF18 uses the published public-data move-quality model, calibrated at depth 16, hash 16 MB and maximum strength. Custom settings still produce accuracy estimates, with less validation. SF19 estimates accuracy from centipawn evaluations using a public winning-chance curve and combines ordinary and harmonic move averages to give mistakes more weight. Forced moves are excluded and opening moves are included. Annotations do not alter accuracy. Scores are estimates, not official platform scores.";
 const ELO_INFO = "Both engines support both rating modes using their own models. Use recorded rating compares this game's performance with players around the rating saved in the game. Stockfish 18 uses its accuracy model, with less validation at custom search settings; Stockfish 19 uses its own expected-point losses, separately from displayed accuracy. Moves only ignores the saved rating and estimates a blitz rating level from the moves themselves; it needs at least 10 moves with more than one legal choice. Neither estimate changes your account rating.";
 // Explanations for the engine settings (shown on hover, same tooltip as the accuracy panel).
@@ -1641,7 +1645,7 @@ function buildUI() {
       el("button", { class: "icon-btn", "data-game-action":"", "aria-label": "Flip board", onclick: toggleFlip }, icon("flip")),
       el("button", { class: "icon-btn", "data-game-action":"", "aria-label": "Share game (copy link)", onclick: shareGame }, icon("share")),
       el("button", { class: "icon-btn", "aria-label": "Credits & attributions", onclick: openCredits }, icon("info")),
-      el("button", { class: "icon-btn", "aria-label": "Settings", onclick: toggleSettings }, icon("gear")),
+      el("button", { class: "icon-btn", "aria-label": settingsText("Settings"), onclick: toggleSettings }, icon("gear")),
     ),
   );
 
@@ -5919,7 +5923,7 @@ function metaChips() {
 function setLabel(label, info) {
   const props = { class: "set-lbl" + (info ? " has-info" : "") };
   if (info) {
-    props.onmouseenter = (e) => showInfoTip(e.currentTarget, label, info);
+    props.onmouseenter = (e) => showInfoTip(e.currentTarget, settingsText(label), settingsText(info));
     props.onmouseleave = hideQTip;
   }
   return el("span", props, label);
@@ -6457,7 +6461,7 @@ function reviewSettings() {
       seg("Review experience", "reviewMode", ["normal", "dopamine"], null, value => value === "dopamine" ? "Dopamine" : "Normal"),
       S.settings.reviewMode === "dopamine" ? el("div", { class: "dopamine-preview-buttons" }, ...["brilliant", "blunder"].map(category =>
         el("button", { type: "button", class: "set-reset", disabled: S.reorganize,
-          onclick: () => previewReviewEffect(category) }, "Preview " + categoryName(category) + " effect"))) : null,
+          onclick: () => previewReviewEffect(category) }, settingsText("Preview {0} effect").replace("{0}", categoryName(category))))) : null,
     ),
     section("Coach",
       coachPicker(),
@@ -6756,7 +6760,7 @@ function settingsCategoryPicker() {
   field.classList.add('set-category');
   field.dataset.motion = S.settings.uiAnim === false ? 'off' : 'on';
   const button = field.querySelector('.lib-dd-btn'), menu = field.querySelector('.lib-dd-menu');
-  button.setAttribute('aria-label', 'Settings category: ' + SETTINGS_CATEGORIES.find(category => category.id === S.settingsTab).label);
+  button.setAttribute('aria-label', settingsText("Settings category: {0}").replace("{0}", settingsText(SETTINGS_CATEGORIES.find(category => category.id === S.settingsTab).label)));
   button.setAttribute('aria-haspopup', 'menu');
   button.setAttribute('aria-controls', 'settingsCategoryMenu');
   menu.id = 'settingsCategoryMenu'; menu.setAttribute('role', 'menu'); menu.setAttribute('aria-label', 'Settings categories');
@@ -6796,10 +6800,14 @@ function renderSettings(animate = false) {
   const content = category.render();
   content.id = 'settingsCategoryContent';
   content.classList.add('set-category-content');
-  content.setAttribute('role', 'region'); content.setAttribute('aria-label', category.label + ' settings');
+  content.setAttribute('role', 'region'); content.setAttribute('aria-label', settingsText("{0} settings").replace("{0}", settingsText(category.label)));
   content.dataset.enter = String(animate && S.settings.uiAnim !== false);
   [...content.children].forEach((child, index) => child.style.setProperty('--set-order', Math.min(index, 5)));
-  UI.settings.replaceChildren(settingsCategoryPicker(), content);
+  const picker = settingsCategoryPicker();
+  UI.settings.lang = settingsLanguage;
+  localizeSettings(picker, settingsText);
+  localizeSettings(content, settingsText);
+  UI.settings.replaceChildren(picker, content);
   UI.settings.scrollTop = scroll;
   if (focusedBadgePicker) UI.settings.querySelector(`[data-badge-picker="${focusedBadgePicker}"]`)?.focus({ preventScroll: true });
   if (focusedSection) [...UI.settings.querySelectorAll(".set-sect-head")].find(head => head.querySelector("span")?.textContent === focusedSection)?.focus({ preventScroll: true });
