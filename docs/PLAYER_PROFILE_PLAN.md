@@ -3,9 +3,9 @@
 This file is written to be pasted into a fresh Claude Code conversation as the task
 prompt. It also travels with the repository as the feature tracker, in the same way
 `docs/LEARN_WITH_CHESS_REVIEW.md` tracks the learning workspace. Keep the
-"Implementation tracker" section updated as stages land. Sections marked
-**Decision needed** are open questions for the maintainer; answer them before or
-during the work, and record the answer in place.
+"Implementation tracker" section updated as stages land. The maintainer settled the
+ten design decisions on 2026-11-15; they are recorded under **Decisions (resolved)**
+and already folded into the text. Do not reopen them without asking.
 
 ---
 
@@ -49,8 +49,9 @@ same way the learning workspace does today.
 4. **Nothing fabricated.** Every number has a sample size; every insight carries
    the games (and plies) it rests on so the board can show them and the user can
    open them in the normal review. Insights with too small a sample are hidden,
-   never padded. Borrowed figures (Chess.com's own `accuracies`, Lichess server
-   evals) are never mixed into our accuracy numbers (see Decision needed, D4).
+   never padded. Chess.com's own `accuracies` field and Lichess server evals are
+   **not used at all**: every accuracy figure comes from this extension's own
+   engine passes (decision D4).
 5. **Reuse, don't duplicate.** Use `lib/chess.js` for replay, `Chess` opening
    book lookup from `data/book.json` for opening names, `lib/identity.js` and
    `lib/player-history.js` for "who is the user", `lib/game-statistics.js` for
@@ -219,9 +220,10 @@ small baseline from public Lichess data or use fixed thresholds; document which)
 - `profile:v1:report:<site>:<account>:<period>` — the computed slide payload (what
   the share link encodes), so reopening is instant.
 
-Settings: a **Player profile** section with period default, engine budget preset,
-"include games I played against bots" toggle, and **Delete profile data**. Document
-all of it in `PRIVACY.md`.
+Settings: a **Player profile** section with period default (Past 12 months), engine
+budget preset (Standard), "include games against bots" toggle (off: bot and
+computer opponents are excluded from every figure by default, decision D9), and
+**Delete profile data**. Document all of it in `PRIVACY.md`.
 
 ---
 
@@ -240,29 +242,56 @@ all of it in `PRIVACY.md`.
   `drawArrow`/`makePiece` hooks the learning workspace uses, and restores with
   `restoreBoard` on exit.
 - Slide chrome: title, body, evidence row, prev/next, dots (`role="tablist"`),
-  keyboard Left/Right/Home/End, optional autoplay (8 s) with pause on hover/focus.
+  keyboard Left/Right/Home/End. **No autoplay** (decision D7): the user steps
+  through manually, so each board animation can be watched in full.
   Progress: a slim bar showing "Reading your games… 412/1,230" then "Engine check
   3/150 (≈6 min left)". Tier-0 slides render while the engine runs; engine
   figures fill in place with the reveal animation when ready.
 - States: no identity (ask for a username), empty (fewer than 10 games), fetch
   error (retry, keep cached months), partial (engine not run), narrow widths down
   to 320 px, both themes, reduced motion.
-- Viewer mode: opening a `#profile=` link shows the recipient the deck read-only
-  from the payload with a banner "Shared by {name}. Build your own →"; no refetch.
+- Viewer mode: opening a shared profile link with the extension installed shows
+  the recipient the full board deck read-only from the payload with a banner
+  "Shared by {name}. Build your own →"; no refetch.
+- Whose profile (decision D2): default is the resolved identity for the current
+  site. The user may type any username to build another player's **tier-0**
+  profile from public data; the engine sample and the library tier run only for
+  the user's own accounts.
 
 ## Share (slide 14)
 
-- Link: `carrierUrl#profile=<base64url(deflate-raw(JSON))>` using
-  `CompressionStream` (Chrome and Firefox both support it); keep the payload under
-  about 8 KB by including only the numbers, labels, a handful of FENs/short move
-  lists for the board, and game URLs. No account tokens, no perspective data (same
-  rule as `shareGame`). Read it in `content.js`/`lichess-content.js` next to the
-  existing `#gambit=` handler.
-- Card: render a 1200×630 PNG with `<canvas>` (headline numbers, twin, top
-  opening, rival) and offer **Download card**. No external fonts; use bundled
-  fonts from `fonts/`.
-- Privacy note on the slide: what the link reveals (username, aggregate stats,
-  linked games), and that the recipient needs the extension to view it.
+Decision D6: a link **and** a PNG card, and people without the extension must still
+see something and learn where it came from.
+
+- **Payload**: `base64url(deflate-raw(JSON))` using `CompressionStream` (Chrome
+  and Firefox both support it); keep it under about 8 KB by including only the
+  numbers, labels, a handful of FENs/short move lists for the board, and game URLs.
+  No account tokens, no perspective data (same rule as `shareGame`).
+- **Link carrier**: a static viewer page in this repository served by GitHub
+  Pages (the README already serves the intro video from
+  `https://t-julsgaard.github.io/Chess-Review/`), e.g.
+  `https://t-julsgaard.github.io/Chess-Review/profile/#p=<payload>`. The page is
+  plain HTML/CSS/JS with no analytics and no network calls beyond loading itself:
+  it decodes the fragment in the browser (fragments are never sent to any server)
+  and renders a lightweight read-only deck of the same slides with a static
+  2D board, plus **Install Chess Review** buttons for the Chrome Web Store and
+  Firefox Add-ons and a "Build your own" line. Keep its source under
+  `marketing/profile-viewer/` (or wherever the Pages root lives) with its own
+  tiny test. When the extension is installed, `content.js`-style handling on that
+  page (add the Pages origin to `content_scripts` matches, not to
+  `host_permissions`) opens the full board deck in the review tab instead; the
+  same `#p=` payload is also accepted on chess.com/lichess carrier URLs next to
+  the existing `#gambit=` handler, for backwards compatibility with how game share
+  links work.
+- **Card**: render a 1200×630 PNG with `<canvas>` (headline numbers, twin, top
+  opening, rival) and offer **Download card**. The card always carries the Chess
+  Review name and icon, the line "Made with Chess Review, the free local game
+  review extension", and the short store/Pages URL, so anyone seeing the image
+  knows where it came from. Bundled fonts from `fonts/` only.
+- **Privacy note** on the slide: what the link reveals (username, aggregate
+  stats, linked games), that the deck is rendered locally in the recipient's
+  browser, and that GitHub serves the viewer page (GitHub sees the page request,
+  never the fragment). Record the same in `PRIVACY.md`.
 
 ---
 
@@ -295,8 +324,9 @@ all of it in `PRIVACY.md`.
    states, keyboard, reduced motion; jsdom tests plus
    `scripts/player-profile-audit.mjs` (screenshots at eight viewports, both
    themes, Old/Modern/Custom setups, return-to-review geometry).
-6. **Share**: `#profile=` link, viewer mode, PNG card, privacy copy;
-   `PRIVACY.md` and `README.md` updates.
+6. **Share**: payload encoding, GitHub Pages viewer page with install buttons,
+   extension viewer mode, PNG card with attribution, privacy copy; `PRIVACY.md`
+   and `README.md` updates.
 7. **Settings and housekeeping**: Player profile settings section, delete data,
    storage caps verified, `docs/PLAYER_PROFILE.md` tracker complete, lint, full
    test suite, Chrome and Firefox smoke (`npm run test:browsers`).
@@ -307,33 +337,20 @@ rather than approximating silently.
 
 ---
 
-## Decision needed (answer these; defaults apply if unanswered)
+## Decisions (resolved 2026-11-15)
 
-- **D1. Period.** Default **past 12 months**, with a picker offering This year,
-  Past 12 months, All time, Last 100 games. Confirm the default.
-- **D2. Whose profile.** Default: the resolved identity for the current site, with
-  a username field when unknown. Should the user be able to type *any* username to
-  build someone else's tier-0 profile (cheap, fun, but it is another person's
-  public data)? Default: yes for tier 0, engine tier only for the user's own
-  account.
-- **D3. Engine budget default.** Default **Standard (about 10 min)** with Quick and
-  Deep available, and an explicit **Run engine check** button rather than starting
-  automatically. Confirm or choose auto-start.
-- **D4. Borrowed data.** Chess.com's `accuracies` and Lichess server evals exist
-  for a subset of games for free. Default: show them only as a clearly separate
-  "Chess.com says / Lichess says" footnote, never merged into our figures, and
-  not in the first release. Confirm.
-- **D5. Tone.** Default: playful Spotify-style headlines with factual sub-lines;
-  negatives framed kindly. Confirm, or ask for neutral copy.
-- **D6. Share format.** Default: both the `#profile=` link (needs the extension)
-  and a PNG card download. Confirm.
-- **D7. Autoplay.** Default: off, with an optional play button. Confirm.
-- **D8. Lichess in the first release?** Default: yes for tier 0 and 2 (the export
-  is one request); the library tier works for both already. Confirm or defer.
-- **D9. Bot games.** Default: excluded from all figures, with a settings toggle.
-- **D10. Where the engine tier runs.** Default: the offscreen document on Chrome
-  and the background page on Firefox (same as previews), so it survives the review
-  tab being closed and resumes from the cache. Alternative: in the review tab only.
+| # | Decision | Answer |
+| --- | --- | --- |
+| D1 | Default period | **Past 12 months.** Picker also offers This calendar year, All time, Last 100 games. |
+| D2 | Whose profile | Resolved identity by default; **any username allowed for tier 0** (public data). Engine sample and library tier only for the user's own accounts. |
+| D3 | Engine sample start and budget | **Explicit "Run engine check" button**, default preset **Standard (about 10 min)**; Quick and Deep available. Never auto-starts. |
+| D4 | Chess.com `accuracies` / Lichess server evals | **Not used anywhere.** All accuracy numbers come from our own engine passes. |
+| D5 | Tone | **Playful, kind on negatives.** Spotify-style headlines, factual sub-lines, no teasing. |
+| D6 | Share format | **Link and PNG card.** The link opens a GitHub Pages viewer for people without the extension, with install buttons; the extension opens the full board deck. The card always carries the Chess Review name, icon and store link. |
+| D7 | Autoplay | **None.** Manual navigation only. |
+| D8 | Lichess in first release | **Yes**, both sites from the start. |
+| D9 | Bot games | **Excluded by default**, settings toggle to include them. |
+| D10 | Engine host | **Offscreen document (Chrome) / background page (Firefox)**, same as review-button previews; resumes from cache if the tab closes. |
 
 ---
 
