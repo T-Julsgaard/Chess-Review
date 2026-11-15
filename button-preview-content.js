@@ -106,7 +106,7 @@
     button.dataset.motion = motion ? 'on' : 'off';
     entries.add({button,summary,getContext});
     button.addEventListener('click',() => {summary.hidden = true; button.classList.add('is-opening'); button.setAttribute('aria-busy','true');});
-    if (!timer) timer = setInterval(refresh,1000);
+    startPolling();
     if (!storageListener && api.storage?.onChanged) {
       storageListener = true;
       api.storage.onChanged.addListener((changes,area) => {
@@ -117,8 +117,13 @@
       try {Promise.resolve(api.storage.local?.get('settings')).then(stored => {if (stored) setMotion(stored.settings);}).catch(() => {});} catch {}
     }
   }
+  // Refreshes are event-driven: the site adapters call refresh() whenever they re-check their
+  // injection points, and navigation/visibility changes are handled below. The slow poll is only
+  // a safety net for a URL change that reaches the page without any of those signals.
+  const POLL_MS = 10000;
+  function startPolling() {if (!timer) timer = setInterval(refresh,POLL_MS);}
   addEventListener('pagehide',() => {cancel(); clearInterval(timer); timer = null;});
-  addEventListener('pageshow',() => {if (entries.size && !timer) timer = setInterval(refresh,1000); refresh();});
+  addEventListener('pageshow',() => {if (entries.size) startPolling(); refresh();});
   addEventListener('popstate',() => refresh());
   document.addEventListener('visibilitychange',() => refresh());
   globalThis.ChessReviewButtonPreview = {register,refresh};

@@ -18,7 +18,7 @@ function page(t,html,{site='chess',path,reply,prepare}={}) {
   const w=dom.window,sent=[],frames=[],timeouts=new Map(),intervals=new Map(),changes=[];let sequence=0;
   t.after(()=>w.close());w.console={log(){},info(){},warn(){}};w.fetch=async()=>{throw Error('no logo in DOM fixture');};
   w.setTimeout=(fn,delay)=>{const id=++sequence;timeouts.set(id,{fn,delay});return id;};w.clearTimeout=id=>timeouts.delete(id);
-  w.setInterval=fn=>{const id=++sequence;intervals.set(id,fn);return id;};w.clearInterval=id=>intervals.delete(id);
+  w.setInterval=(fn,delay)=>{const id=++sequence;intervals.set(id,{fn,delay});return id;};w.clearInterval=id=>intervals.delete(id);
   w.requestAnimationFrame=fn=>{frames.push(fn);return frames.length;};
   const pending=[];
   w.chrome={runtime:{getURL:p=>p,onMessage:{addListener(){}},sendMessage:message=>{
@@ -214,4 +214,19 @@ for(const [name,html] of [['round',follow],['legacy',follow.replace('rcontrols',
 for(const site of ['chess','lichess']) test(`${site}: an ongoing board without post-game controls never requests an analysis`,async t=>{
   const p=page(t,site==='chess'?'<wc-chess-board></wc-chess-board>':'<cg-container></cg-container>',{site});await p.flush();
   assert.equal(p.buttons().length,0);assert.equal(p.sent.length,0);
+});
+
+test('refreshes are driven by site re-checks and navigation; the poll is only a slow safety net',async t=>{
+  const p=page(t,'<wc-chess-board></wc-chess-board>'+profile);await p.flush();
+  assert.deepEqual([...p.intervals.values()].map(x=>x.delay),[10000],'one slow fallback poll, no per-second timer');
+  p.resolve(result());await p.flush();assert.match(p.buttons()[0].textContent,/91.2/);
+  // A site adapter re-check after an SPA navigation refreshes the preview without any poll tick.
+  p.w.history.pushState({},'','/game/live/99999999');
+  p.w.document.querySelector('.game-review-buttons-component').append(p.w.document.createElement('span'));await p.flush();
+  assert.equal(p.sent.filter(m=>m.type==='buttonPreview').at(-1).key,'chesscom:99999999');
+  assert.doesNotMatch(p.buttons()[0].textContent,/91.2/);
+  // The fallback poll itself still works when it fires.
+  p.w.history.pushState({},'','/game/live/55555555');
+  [...p.intervals.values()][0].fn();await p.flush();
+  assert.equal(p.sent.filter(m=>m.type==='buttonPreview').at(-1).key,'chesscom:55555555');
 });
