@@ -140,7 +140,7 @@ not follow an exploratory variation or change the accuracy/rating models.
 
 No eligible sample or incomplete/mixed evidence produces an em dash, not zero.
 
-Modern's Advanced page is a larger, scrollable post-game report with 13
+Modern's Advanced page is a larger, scrollable post-game report with 19
 comparisons in two groups with centered section headings. Its player cards use
 the overview's exact markup, position and typography, and stay pinned while the body scrolls. Navigation
 stays visible. There are no percentage bars, hover explanations or comeback
@@ -150,9 +150,17 @@ opens at a time; clicking again or pressing
 Escape closes it. Escape restores focus to the info button. Opening a card
 brings it into view, and changing pages dismisses explanations.
 
+Each card also has a **star** in its top-left corner, mirroring the info button.
+Starring a metric saves its id in the `starredStats` setting and gathers it in
+a **Starred** group at the top of the report, in report order; the metric leaves
+its home group so it appears once. The Starred group exists only while at least
+one metric is starred. Toggling keeps focus on the star and brings the moved
+card into view. Unknown ids in the setting are ignored.
+
 **Decision quality** includes the original three metrics, Longest clean streak,
 Clean decisions, Best five-decision stretch, Accuracy in balanced positions,
-Accuracy while defending, and Accuracy while ahead.
+Accuracy while defending, Accuracy while ahead, Punished opponent mistakes,
+Bounce-back accuracy and Only moves found.
 
 - Clean streak/share use completed classifications rated Good or better,
   including Book. Inaccuracy, Mistake, Miss and Blunder are errors. Forced
@@ -166,9 +174,24 @@ Accuracy while defending, and Accuracy while ahead.
   root search's mover-relative score before the decision: absolute cp <100,
   cp <=−100, and cp >=100 respectively. Mate scores are omitted from these
   subsets. Sample counts appear below each accuracy.
+- Punished opponent mistakes is the share of the opponent's Mistake, Miss and
+  Blunder moves answered by an eligible reply rated Brilliant, Great, Best or
+  Excellent. Forced replies leave the sample. The card shows the percentage
+  with "found of total" beneath it; no clear opponent error reads "No mistakes".
+- Bounce-back accuracy aggregates the player's next eligible decision after
+  each of their own Inaccuracy, Mistake, Miss or Blunder moves, using the
+  engine-specific accuracy aggregator. A missing classification on a relevant
+  move makes either reply figure unavailable rather than zero.
+- Only moves found counts eligible decisions whose multi-line annotation root
+  (the same search that decides Great) has two lines with finite centipawn
+  scores and a first-line lead of at least 100 cp, and how many of them played
+  the first line's move. Any eligible decision without both lines (a
+  single-line review, or background searches still running) leaves the metric
+  unavailable.
 
 **On the clock** includes Clock advantage, Biggest clock lead, Average thinking
-time and Longest think.
+time, Longest think, Accuracy in time trouble, Accuracy on snap moves and
+Accuracy on long thinks.
 
 - Clock advantage is the percentage of recorded checkpoints where a player's
   remaining clock was strictly higher. A checkpoint follows each pair of turns,
@@ -188,13 +211,20 @@ time and Longest think.
   increment controls are supported. Custom starts require real prior samples.
   Unsupported controls show an em dash for thinking times while clock
   comparisons remain available. Longest think links to its original move.
+- Time trouble samples eligible decisions whose own clock before the move was
+  below a tenth of the base time, or ten seconds if that is more. It needs a
+  simple base-time control; staged or missing controls leave it unavailable.
+  Snap moves are decisions with under five seconds of thinking; long thinks
+  are decisions at or above twice the player's average think. Both need the
+  thinking-time evidence above and a positive average for long thinks. Each
+  shows its decision count; an empty sample reads "No such decisions".
 
 The report uses the original mainline, including cached reviews. It does not
 follow variations or change accuracy, annotations or rating models. The same
 report appears under both Modern overview designs; other designs retain their
 existing Advanced layout. Run
 `node scripts/learning-browser.mjs --working-tree --modern-advanced` for eight
-viewports, pinned header and info-button geometry, genuine wheel/keyboard input, all 13
+viewports, pinned header and info-button geometry, genuine wheel/keyboard input, all 19
 explainers, clock data, cached reload and dark/light screenshots.
 
 ## Verification

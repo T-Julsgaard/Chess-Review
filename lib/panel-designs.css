@@ -148,6 +148,14 @@
   font: 600 14px/1.3 var(--font-ui); color: var(--ink-2); margin-bottom: 9px; }
 .advanced-label > span { grid-column: 2; padding-top: 3px; }
 .advanced-label > .advanced-info { grid-column: 3; }
+/* Favorite star in the card's top-left corner, mirroring the info button. */
+.advanced-label > .advanced-star { grid-column: 1; }
+.advanced-star { display: inline-grid; place-items: center; width: 24px; height: 24px; padding: 0; border: 0; background: transparent;
+  font-size: 16px; line-height: 1; color: var(--ink-3); cursor: pointer; border-radius: 50%; transition: color .12s, transform .08s; }
+.advanced-star:hover { color: #f3c14a; transform: scale(1.15); }
+.advanced-star.on { color: #f3c14a; }
+.advanced-star:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.advanced-group-starred .advanced-row { border-color: color-mix(in srgb,#f3c14a 35%,var(--line-soft)); }
 .advanced-pair { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; }
 .advanced-value { --metric-color: var(--ink-2); display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 5px; min-width: 0; padding: 3px; color: var(--metric-color); text-align: center; }

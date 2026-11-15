@@ -26,7 +26,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     await run("document.querySelector('#accuracy-tab-2').click()");
     assert.deepEqual(await header(),overviewHeader,'Advanced header matches overview at '+width+'x'+height);
     const fit = await run("(()=>{const b=document.querySelector('.acc-page'),p=document.querySelector('.accuracy-panel');return {width:innerWidth,height:innerHeight,body:b.clientHeight,content:b.scrollHeight,overflow:b.scrollWidth-b.clientWidth,pageOverflow:document.documentElement.scrollWidth-innerWidth,rows:p.querySelectorAll('.advanced-row').length,infos:p.querySelectorAll('.advanced-info').length,hover:p.querySelectorAll('[title]').length,meters:p.querySelectorAll('.advanced-meter').length,font:getComputedStyle(p.querySelector('.acc-stat-value')).fontSize,panel:p.getBoundingClientRect().toJSON()}})()");
-    assert.equal(fit.rows,13); assert.equal(fit.infos,13); assert.equal(fit.hover,0); assert.equal(fit.meters,0);
+    assert.equal(fit.rows,19); assert.equal(fit.infos,19); assert.equal(fit.hover,0); assert.equal(fit.meters,0);
     assert.ok(fit.overflow<=1&&fit.pageOverflow<=1,JSON.stringify(fit));
     assert.ok(fit.content>fit.body+500,'Advanced is generously spaced and scrollable');
     assert.equal(fit.font,'29px');
@@ -37,7 +37,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     await shot('modern-advanced-'+width+'x'+height);
     await run("document.querySelector('.acc-page').scrollTop=10000"); await sleep(100);
     assert.deepEqual(await header(),overviewHeader,'Player names stay anchored while scrolling');
-    assert.equal(await run("(()=>{const row=document.querySelector('[data-metric=think-longest]').getBoundingClientRect(),body=document.querySelector('.acc-page').getBoundingClientRect();return row.bottom<=body.bottom+1&&row.top>=body.top})()"),true,'Last metric is reachable');
+    assert.equal(await run("(()=>{const row=document.querySelector('[data-metric=deep]').getBoundingClientRect(),body=document.querySelector('.acc-page').getBoundingClientRect();return row.bottom<=body.bottom+1&&row.top>=body.top})()"),true,'Last metric is reachable');
     await shot('modern-advanced-bottom-'+width+'x'+height);
     assert.equal(await run("import('./analysis.js').then(m=>JSON.stringify({layout:m.S.layout,stats:m.S.gameStats,idx:m.S.idx}))"),before);
     evidence.push(fit);

@@ -405,6 +405,8 @@ const DEFAULT_SETTINGS = {
   clsMistakeLoss: 1.2, // minimum eval lost for a move to count as a Mistake / a punishable slip
   clsMissTol: 0.5,     // how close to giving back the whole advantage still counts as a Miss
   ratingMode: "context",
+  // Metric ids starred on the Advanced page; they gather in a Starred group at the top.
+  starredStats: [],
 };
 // Keys reset by "Reset engine defaults" (everything in the Engine tab), and their default values.
 const ENGINE_SETTING_KEYS = [
@@ -1560,8 +1562,7 @@ function computeDerived() {
   }
   const N = S.total;
   const eloAccs = sideAccuracies();
-  S.gameStats = gameStatistics(S.positions, S.bests, S.calibrated,
-    {classifications: completedClasses, clocks: S.clocks, headers: S.headers});
+  refreshGameStatistics(completedClasses);
   for (const side of ["w", "b"]) {
     const counts = {}; QUALITY_ORDER.forEach((k) => (counts[k] = 0));
     for (let i = 1; i <= N; i++) {
@@ -1574,6 +1575,13 @@ function computeDerived() {
     S.counts[side] = counts;
   }
   buildVerdict();
+}
+// Game statistics reuse the scored decisions and completed classifications.
+// Only-move evidence comes from the multi-line annotation searches, like Great.
+function refreshGameStatistics(classifications = S.classif) {
+  S.gameStats = gameStatistics(S.positions, S.bests, S.calibrated,
+    {classifications, clocks: S.clocks, headers: S.headers,
+      annotations: S.positions.map((position, index) => index < S.total ? annotationRoot(index) : null)});
 }
 function buildVerdict() {
   const me = S.acc[S.meSide];
@@ -4740,6 +4748,20 @@ function updateAccuracyPhases(sides, busy, design) {
       enabled: S.settings.uiAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches});
   }
 }
+function starredStats() {
+  return Array.isArray(S.settings.starredStats) ? S.settings.starredStats.filter(id => typeof id === 'string') : [];
+}
+function toggleStarredStat(id) {
+  const current = starredStats();
+  const next = current.includes(id) ? current.filter(key => key !== id) : [...current, id];
+  S.settings.starredStats = next;
+  writeSettings({starredStats: next});
+  statsRefs = null;
+  renderStats();
+  const row = UI.stats.querySelector('.advanced-row[data-metric="' + id + '"]');
+  row?.querySelector('.advanced-star')?.focus({preventScroll: true});
+  row?.scrollIntoView?.({block: 'nearest'});
+}
 function renderModernAdvanced(sides, busy) {
   const stats = sides.map(side => S.gameStats?.[side]);
   const decimal = value => value == null ? null : value.toFixed(1);
@@ -4765,6 +4787,7 @@ function renderModernAdvanced(sides, busy) {
       root.querySelector('#' + button.getAttribute('aria-controls')).hidden = true;
     });
   };
+  const starred = starredStats();
   const row = (id, label, explanation, cells) => {
     const description = el('p', {class: 'advanced-explainer', id: 'advanced-info-' + id, hidden: true}, explanation);
     const info = el('button', {class: 'advanced-info', type: 'button', 'aria-label': 'About ' + label,
@@ -4773,8 +4796,11 @@ function renderModernAdvanced(sides, busy) {
         closeInfo(); info.setAttribute('aria-expanded', String(open)); description.hidden = !open;
         if (open) section.scrollIntoView?.({block: 'nearest'});
       }}, el('span', {'aria-hidden': 'true'}, 'i'));
-    const section = el('section', {class: 'advanced-row', 'data-metric': id, 'aria-label': label},
-      el('div', {class: 'advanced-label'}, el('span', {}, label), info),
+    const on = starred.includes(id);
+    const star = el('button', {class: 'advanced-star' + (on ? ' on' : ''), type: 'button', 'aria-pressed': String(on),
+      'aria-label': (on ? 'Unstar ' : 'Star ') + label, onclick: () => toggleStarredStat(id)}, on ? '★' : '☆');
+    const section = el('section', {class: 'advanced-row' + (on ? ' starred' : ''), 'data-metric': id, 'aria-label': label},
+      el('div', {class: 'advanced-label'}, star, el('span', {}, label), info),
       el('div', {class: 'advanced-pair'}, ...cells), description);
     return section;
   };
@@ -4783,11 +4809,30 @@ function renderModernAdvanced(sides, busy) {
     const info = root.querySelector('.advanced-info[aria-expanded="true"]');
     if (info) { event.stopPropagation(); closeInfo(); info.focus(); }
   });
-  const group = (name, rows) => root.append(el('div', {class: 'advanced-group'},
-    el('h4', {class: 'advanced-group-label'}, name), ...rows));
-  const sampleCells = key => stats.map((stat, i) => {
-    const sample = stat?.insights?.[key];
-    return cell(i, decimal(sample?.accuracy), {detail: sample?.count ? sample.count + ' decisions' : 'No scored decisions'});
+  // Starred rows gather in their own group at the top, in report order, and
+  // leave their home group so each metric appears once.
+  const groups = [];
+  const group = (name, rows) => groups.push({name, rows});
+  const mount = () => {
+    const isStarred = row => row.classList.contains('starred');
+    const pinned = groups.flatMap(({rows}) => rows.filter(isStarred));
+    const sections = pinned.length ? [{name: 'Starred', rows: pinned, starred: true}] : [];
+    for (const {name, rows} of groups) {
+      const rest = rows.filter(row => !isStarred(row));
+      if (rest.length) sections.push({name, rows: rest});
+    }
+    root.append(...sections.map(({name, rows, starred}) => el('div', {class: 'advanced-group' + (starred ? ' advanced-group-starred' : '')},
+      el('h4', {class: 'advanced-group-label'}, name), ...rows)));
+    return root;
+  };
+  const sampleCells = (key, {source = 'insights', missing = 'No scored decisions'} = {}) => stats.map((stat, i) => {
+    const sample = stat?.[source]?.[key];
+    return cell(i, decimal(sample?.accuracy), {detail: sample == null && stat?.[source] ? missing : sample?.count ? sample.count + ' decisions' : sample ? 'No such decisions' : missing});
+  });
+  const ratioCells = (read, {noun, missing}) => stats.map((stat, i) => {
+    const ratio = read(stat);
+    return cell(i, ratio?.total ? percent(100 * ratio.found / ratio.total) : null,
+      {detail: ratio?.total ? ratio.found + ' of ' + ratio.total + ' ' + noun : ratio ? 'No ' + noun : missing});
   });
   group('Decision quality', [
     row('loss', 'Average centipawn loss', 'How much your moves gave away on average compared with the engine’s best move. Lower is better. 100 centipawns is roughly one pawn. Forced moves and mate scores are left out.', stats.map((stat, i) =>
@@ -4810,6 +4855,12 @@ function renderModernAdvanced(sides, busy) {
     row('balanced', 'Accuracy in balanced positions', 'How accurately you played when the engine’s evaluation before your move was less than one pawn in either direction. A useful look at your decisions when neither side had a clear advantage. Mate scores and forced replies are left out.', sampleCells('balanced')),
     row('defending', 'Accuracy while defending', 'How accurately you played when you started your turn at least one pawn behind in the engine’s evaluation. It shows the quality of your resistance, even if you eventually lost. Mate scores and forced replies are left out.', sampleCells('defending')),
     row('winning', 'Accuracy while ahead', 'How accurately you played when you started your turn at least one pawn ahead in the engine’s evaluation. It helps you see how well you handled an advantage. Mate scores and forced replies are left out.', sampleCells('winning')),
+    row('punish', 'Punished opponent mistakes', 'How often you found a strong reply right after your opponent’s Mistake, Miss or Blunder. A reply rated Excellent or better counts as punished. Mistakes where your reply was forced are left out.',
+      ratioCells(stat => stat?.replies?.punished, {noun: 'mistakes', missing: 'Needs classified moves'})),
+    row('bounce-back', 'Bounce-back accuracy', 'How accurately you played the decision straight after each of your own errors: Inaccuracy, Mistake, Miss or Blunder. It shows whether a slip rattled you or you steadied yourself right away. Forced replies are skipped.',
+      sampleCells('recovery', {source: 'replies', missing: 'Needs classified moves'})),
+    row('only-moves', 'Only moves found', 'How often you found the move in positions where the engine’s first choice was at least one pawn better than its second. These are the moments where a single move mattered most. Needs two analysis lines; mate scores are left out.',
+      ratioCells(stat => stat?.critical, {noun: 'critical decisions', missing: 'Needs two analysis lines'})),
   ]);
   group('On the clock', [
     row('clock', 'Clock advantage', 'How often you had more time left than your opponent. We compare after each full move: one turn by each player. For example, 70% means you were ahead after 7 of 10 compared moves. Ties count for neither player; moves with missing clock data are skipped.', stats.map((stat, i) => {
@@ -4826,8 +4877,14 @@ function renderModernAdvanced(sides, busy) {
       const think = stat?.clock?.longestThink;
       return cell(i, duration(think?.seconds), {detail: think ? moveName(think.ply) + ' ↗' : 'Clock data needed', jump: think?.ply});
     })),
+    row('pressure', 'Accuracy in time trouble', 'How accurately you played with little time left: under a tenth of the starting time, or under ten seconds if that is more. We look at your clock before each move. Needs clock data and a simple time control with a base time.',
+      sampleCells('pressure', {source: 'timing', missing: 'Needs clocks and time control'})),
+    row('quick', 'Accuracy on snap moves', 'How accurately you played the moves you spent under five seconds on, with any increment removed. It shows whether your instincts hold up when you move fast.',
+      sampleCells('quick', {source: 'timing', missing: 'Clock data needed'})),
+    row('deep', 'Accuracy on long thinks', 'How accurately you played the moves where you spent at least twice your average thinking time, with the increment removed. It shows whether your deepest thinks paid off.',
+      sampleCells('deep', {source: 'timing', missing: 'Clock data needed'})),
   ]);
-  return root;
+  return mount();
 }
 function renderStats() {
   const design = panelDesign('accuracy', S.settings);
@@ -5668,14 +5725,19 @@ function rememberAnnotationSearch(i, key, count, result) {
     || (line.score?.mate != null ? !Number.isInteger(line.score.mate) || line.score.mate === 0 : !Number.isFinite(line.score?.cp)))
     || new Set(lines.map(line => line.pv.split(' ')[0])).size !== lines.length) return false;
   root.annotationSearch = {key, count, result: {...result, lines}};
-  if (!['best', 'excellent', 'great', 'brilliant'].includes(S.classif[i + 1])) return true;
-  const before = JSON.stringify({classif: S.classif, grades: S.moveGrades});
-  computeDerived();
-  if (before !== JSON.stringify({classif: S.classif, grades: S.moveGrades})) {
-    if (S.analysisMode) classifyVariationMoves();
-    paintBoard(); renderBestArrow(); renderReview(); renderStats(); renderGraph(); renderMoves();
-    saveToLibrary();
-  }
+  const criticalBefore = JSON.stringify(['w', 'b'].map(side => S.gameStats?.[side]?.critical));
+  if (['best', 'excellent', 'great', 'brilliant'].includes(S.classif[i + 1])) {
+    const before = JSON.stringify({classif: S.classif, grades: S.moveGrades});
+    computeDerived();
+    if (before !== JSON.stringify({classif: S.classif, grades: S.moveGrades})) {
+      if (S.analysisMode) classifyVariationMoves();
+      paintBoard(); renderBestArrow(); renderReview(); renderStats(); renderGraph(); renderMoves();
+      saveToLibrary();
+      return true;
+    }
+  } else refreshGameStatistics();
+  // The Advanced page's only-move figure waits for every decision's second line.
+  if (criticalBefore !== JSON.stringify(['w', 'b'].map(side => S.gameStats?.[side]?.critical))) renderStats();
   return true;
 }
 function stopPanelPrecalculation() {

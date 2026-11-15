@@ -98,6 +98,24 @@ test('background results upgrade Best to Great, update the visible Quality tab a
   assert.equal(searches.length, S.positions.length + 1, 'only the unannotated final position needs candidates');
 });
 
+test('background searches complete the Advanced only-move figure and refresh the open page once', async t => {
+  const a = review(t), S = a.state, doc = a.dom.window.document;
+  Object.assign(S.settings, {accuracyDesign: 'phases-modern'});
+  a.call('renderAll'); a.call('setAccuracyPage', 2);
+  const values = () => [...doc.querySelectorAll('[data-metric=only-moves] .advanced-value')]
+    .map(n => [n.querySelector('.acc-stat-value').textContent, n.querySelector('.advanced-detail').textContent]);
+  assert.equal(S.gameStats.w.critical, null);
+  assert.deepEqual(values(), [['—', 'Needs two analysis lines'], ['—', 'Needs two analysis lines']]);
+  fastBackground(a);
+  a.replace('createEngine', async () => fakeEngine(async (fen, depth, count) => result(a, S.positions.findIndex(p => p.fen === fen), count)));
+  let renders = 0; const renderStats = a.run('renderStats'); a.replace('renderStats', (...args) => { renders++; return renderStats(...args); });
+  a.call('schedulePanelPrecalculation'); await begin(a); await a.run('panelWarmJob.promise');
+  assert.deepEqual(S.gameStats.w.critical, {found: 1, total: 1}, 'Nf3 was the only move by four pawns');
+  assert.deepEqual(S.gameStats.b.critical, {found: 0, total: 0});
+  assert.deepEqual(values(), [['100%', '1 of 1 critical decisions'], ['—', 'No critical decisions']]);
+  assert.ok(renders >= 1 && renders <= 2, 'The page refreshes for the figure, not for every search: ' + renders);
+});
+
 test('analysis-line changes keep scoring evidence and results available without restarting the batch', async t => {
   const a = review(t), S = a.state, key = a.call('analysisSettingsKey'), before = numbers(S);
   let restarts = 0; a.replace('scheduleReanalyze', () => restarts++);
