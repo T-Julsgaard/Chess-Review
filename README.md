@@ -1,4 +1,4 @@
-# ♟ Chess Review
+# Chess Review
 
 Free, open-source game review for your online chess games, powered by Stockfish NNUE running
 locally in your browser. One click turns any **Chess.com** or **Lichess** game into a full
