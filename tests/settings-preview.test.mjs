@@ -165,3 +165,22 @@ test('threat color previews, saves and resets independently of best-move and use
   assert.equal(a.store.settings.bestArrowColor, bestColor);
   assert.equal(doc.querySelector('.threat-arrow'), null);
 });
+
+test('Simplified Chinese settings keep move grades and setting values intact', t => {
+  const a = app(t, {language: 'zh-CN'});
+  loadGame(a, '1. e4 e5');
+  a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
+  a.call('toggleSettings');
+  const doc = a.dom.window.document;
+  assert.equal(doc.querySelector('.set-category').closest('[lang]').lang, 'zh-Hans');
+  assert.equal(doc.querySelector('.set-category-name').textContent, '外观');
+  const badges = [...doc.querySelectorAll('.set-sect-head')].find(head => head.textContent === '评价徽标');
+  badges.focus(); badges.click();
+  assert.equal(doc.activeElement.textContent, '评价徽标');
+  assert.equal(doc.activeElement.getAttribute('aria-expanded'), 'true');
+  assert.match(doc.querySelector('[data-symbol-category="brilliant"]').textContent, /Brilliant/);
+  assert.match(doc.querySelector('[data-symbol-category="good"]').textContent, /Good/);
+  doc.querySelector('[data-category="engine"]').click();
+  assert.equal(doc.querySelector('.set-category-name').textContent, '引擎');
+  assert.equal(doc.querySelector('[data-setting="engineDepth"]').closest('.set-ctrl').querySelector('.set-lbl').textContent, '搜索深度');
+});
