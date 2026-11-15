@@ -201,6 +201,9 @@ test('modal action follows primary-action width through resize without replacing
   assert.equal(sent[0].type, 'freeGameReview');
   width = 224;
   w.dispatchEvent(new w.Event('resize'));
+  // Resize work is batched into the next frame, which falls back to a 32 ms timer here.
+  assert.equal(modal.style.getPropertyValue('--chess-review-modal-width'), '288px');
+  timers.filter(timer => timer.delay === 32).forEach(timer => timer.callback());
   assert.equal(w.document.querySelector('.chess-analyzer-free-review--modal'), modal);
   assert.equal(w.document.querySelectorAll('.chess-analyzer-free-review').length, 2);
   assert.equal(modal.style.getPropertyValue('--chess-review-modal-width'), '224px');

@@ -579,7 +579,9 @@ function injectSidebarReviewButton(section) {
     }
   });
   observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "style", "hidden"] });
-  window.addEventListener("resize", tryInject);
+  // Resize events stream while a window edge is dragged; one batched pass per frame reaches the
+  // same final layout without measuring the page on every event.
+  window.addEventListener("resize", schedule);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) tryInject(); });
   tryInject();
 })();

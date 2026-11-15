@@ -30,3 +30,23 @@ for(const [file,html,rootSelector,buttonSelector] of [
   assert.equal(timers.filter(t=>t.ms===32).length,1);timers.filter(t=>t.ms===32).forEach(t=>t.fn());await settle();
   assert.equal(w.document.querySelectorAll(buttonSelector).length,1);
 });
+
+test('content.js: a resize storm schedules one frame-batched pass instead of measuring the page per event',async t=>{
+  const html='<div class="sidebar-content"><div class="game-review-buttons-component"><a href="/analysis?tab=review">Game Review</a></div></div>';
+  const dom=new JSDOM(html,{url:'https://example.test/abcdefgh',runScripts:'outside-only',pretendToBeVisual:true});
+  t.after(()=>dom.window.close());const w=dom.window,frames=[];
+  w.console={log(){},info(){},warn(){}};w.requestAnimationFrame=fn=>{frames.push(fn);return frames.length;};
+  w.setTimeout=()=>0;
+  w.fetch=async()=>({blob:async()=>new w.Blob(['logo'])});
+  w.chrome={runtime:{getURL:p=>p,onMessage:{addListener(){}},sendMessage:()=>new Promise(()=>{})}};
+  Object.defineProperty(w.HTMLElement.prototype,'offsetWidth',{get:()=>288});
+  w.eval(fs.readFileSync(new URL('../content.js',import.meta.url),'utf8'));
+  const settle=async()=>{await Promise.resolve();await Promise.resolve();};
+  const flush=async()=>{await settle();for(let i=0;i<4&&frames.length;i++){frames.splice(0).forEach(fn=>fn());await settle();}};
+  await flush();const button=w.document.querySelector('.chess-analyzer-free-review');assert.ok(button);
+  let scans=0;const query=w.document.querySelectorAll.bind(w.document);w.document.querySelectorAll=(...args)=>{scans++;return query(...args);};
+  for(let i=0;i<40;i++)w.dispatchEvent(new w.Event('resize'));
+  assert.equal(scans,0,'resize events alone must not scan the page');assert.equal(frames.length,1,'one batched pass is queued');
+  await flush();assert.ok(scans>0);assert.equal(w.document.querySelector('.chess-analyzer-free-review'),button);
+  assert.equal(w.document.querySelectorAll('.chess-analyzer-free-review').length,1);
+});
