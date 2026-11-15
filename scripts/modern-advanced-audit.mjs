@@ -26,7 +26,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     await run("document.querySelector('#accuracy-tab-2').click()");
     assert.deepEqual(await header(),overviewHeader,'Advanced header matches overview at '+width+'x'+height);
     const fit = await run("(()=>{const b=document.querySelector('.acc-page'),p=document.querySelector('.accuracy-panel');return {width:innerWidth,height:innerHeight,body:b.clientHeight,content:b.scrollHeight,overflow:b.scrollWidth-b.clientWidth,pageOverflow:document.documentElement.scrollWidth-innerWidth,rows:p.querySelectorAll('.advanced-row').length,infos:p.querySelectorAll('.advanced-info').length,hover:p.querySelectorAll('[title]').length,meters:p.querySelectorAll('.advanced-meter').length,font:getComputedStyle(p.querySelector('.acc-stat-value')).fontSize,panel:p.getBoundingClientRect().toJSON()}})()");
-    assert.equal(fit.rows,19); assert.equal(fit.infos,19); assert.equal(fit.hover,0); assert.equal(fit.meters,0);
+    assert.equal(fit.rows,16); assert.equal(fit.infos,16); assert.equal(fit.hover,0); assert.equal(fit.meters,0);
     assert.ok(fit.overflow<=1&&fit.pageOverflow<=1,JSON.stringify(fit));
     assert.ok(fit.content>fit.body+500,'Advanced is generously spaced and scrollable');
     assert.equal(fit.font,'29px');

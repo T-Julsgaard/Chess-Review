@@ -140,7 +140,7 @@ not follow an exploratory variation or change the accuracy/rating models.
 
 No eligible sample or incomplete/mixed evidence produces an em dash, not zero.
 
-Modern's Advanced page is a larger, scrollable post-game report with 19
+Modern's Advanced page is a larger, scrollable post-game report with 16
 comparisons in two groups with centered section headings. Its player cards use
 the overview's exact markup, position and typography, and stay pinned while the body scrolls. Navigation
 stays visible. There are no percentage bars, hover explanations or comeback
@@ -157,19 +157,26 @@ its home group so it appears once. The Starred group exists only while at least
 one metric is starred. Toggling keeps focus on the star and brings the moved
 card into view. Unknown ids in the setting are ignored.
 
-**Decision quality** includes the original three metrics, Longest clean streak,
-Clean decisions, Best five-decision stretch, Accuracy in balanced positions,
-Accuracy while defending, Accuracy while ahead, Punished opponent mistakes,
-Bounce-back accuracy and Only moves found.
+Values built from several decisions (the balanced/defending/ahead accuracies,
+Punished opponent mistakes, Bounce-back accuracy, Only moves found and the three
+clock accuracies) are keyboard buttons whose detail reads "N decisions ·
+revisit ↗". The first activation revisits the first included decision in game
+order; each further activation from that position moves on to the next one and
+wraps around, per player and per metric, like the Quality page's count buttons.
+Empty samples and pending values are plain text. Largest evaluation loss,
+Longest clean streak and Longest think keep their single-move links.
 
-- Clean streak/share use completed classifications rated Good or better,
+**Decision quality** includes the original three metrics, Longest clean streak,
+Accuracy in balanced positions, Accuracy while defending, Accuracy while ahead,
+Punished opponent mistakes, Bounce-back accuracy and Only moves found. Clean
+decisions and Best five-decision stretch were removed: the share restated the
+Quality page and the five-decision window hardly varied between games.
+
+- Clean streaks use completed classifications rated Good or better,
   including Book. Inaccuracy, Mistake, Miss and Blunder are errors. Forced
-  replies neither extend nor break a streak and do not enter the share.
+  replies neither extend nor break a streak.
   Missing eligible classifications leave the result unavailable. Tied longest
   streaks retain the earliest run; selecting a streak revisits its first move.
-- Best stretch uses five consecutive eligible decisions with the existing
-  engine-specific accuracy aggregator. At least five decisions are required;
-  tied stretches retain the earliest. The value links to its first decision.
 - Balanced/defending/ahead accuracy select eligible decisions by the paired
   root search's mover-relative score before the decision: absolute cp <100,
   cp <=−100, and cp >=100 respectively. Mate scores are omitted from these
@@ -189,9 +196,10 @@ Bounce-back accuracy and Only moves found.
   single-line review, or background searches still running) leaves the metric
   unavailable.
 
-**On the clock** includes Clock advantage, Biggest clock lead, Average thinking
-time, Longest think, Accuracy in time trouble, Accuracy on snap moves and
-Accuracy on long thinks.
+**On the clock** includes Clock advantage, Average thinking time, Longest
+think, Accuracy in time trouble, Accuracy on snap moves and Accuracy on long
+thinks. Biggest clock lead was removed as a bare number that Clock advantage
+already covers.
 
 - Clock advantage is the percentage of recorded checkpoints where a player's
   remaining clock was strictly higher. A checkpoint follows each pair of turns,
@@ -202,9 +210,6 @@ Accuracy on long thinks.
   This is a share of checkpoints, not an estimate
   of elapsed wall-clock seconds. It works without a TimeControl header and
   with staged controls because remaining clocks can be compared directly.
-- Biggest clock lead is the largest positive difference at those checkpoints,
-  linked to the corresponding position. Never ahead is zero; no sample is
-  unavailable. Ties retain the earliest checkpoint.
 - Thinking times use previous own clock + increment − current own clock,
   retaining fractional seconds and zero-second moves. Missing tags invalidate
   dependent intervals; they are never bridged. Simple base time and optional

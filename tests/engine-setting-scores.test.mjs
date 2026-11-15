@@ -62,7 +62,6 @@ for (const build of ['nnue', 'sf19lite']) for (const mode of ['context', 'moves'
         assert.ok(stats[color].largestLoss);
         assert.ok(stats[color].cleanStreak);
         for (const key of ['balanced', 'winning', 'defending']) assert.ok(Number.isFinite(stats[color].insights[key].accuracy));
-        assert.ok(Number.isFinite(stats[color].insights.bestStretch.accuracy));
       }
     });
   });
@@ -147,7 +146,7 @@ for (const design of ['original', 'pages', 'dials', 'phases', 'phases2', 'phases
       assert.ok([...doc.querySelectorAll('[data-phase]')].every(node => !node.textContent.includes('—')));
       a.call('setAccuracyPage', 2);
       assert.doesNotMatch(doc.querySelector('.acc-advanced').textContent, /No scored decisions/);
-      if (design.startsWith('phases-modern')) for (const metric of ['loss', 'match', 'largest', 'best-five', 'balanced', 'winning', 'defending']) {
+      if (design.startsWith('phases-modern')) for (const metric of ['loss', 'match', 'largest', 'balanced', 'winning', 'defending']) {
         assert.ok([...doc.querySelectorAll(`[data-metric="${metric}"] .acc-stat-value`)].every(node => /\d/.test(node.textContent)), metric);
       }
     }

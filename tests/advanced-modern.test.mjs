@@ -9,28 +9,55 @@ function review(t) {
   return a;
 }
 
-test('Modern Advanced shares the overview header and provides nineteen comparisons without cut stats, meters or hover explanations', t => {
+test('Modern Advanced shares the overview header and provides sixteen comparisons without cut stats, meters or hover explanations', t => {
   const a = review(t), doc = a.dom.window.document;
   const header = doc.querySelector('.acc-players').outerHTML;
   const layout = JSON.stringify(a.state.layout);
   a.call('setAccuracyPage', 2);
   assert.equal(doc.querySelector('.acc-players').outerHTML, header);
   assert.ok(doc.querySelector('.acc-page-advanced'));
-  assert.equal(doc.querySelectorAll('.advanced-row').length, 19);
+  assert.equal(doc.querySelectorAll('.advanced-row').length, 16);
   assert.deepEqual([...doc.querySelectorAll('.advanced-group-label')].map(n => n.textContent), ['Decision quality', 'On the clock']);
   assert.deepEqual([...doc.querySelectorAll('.advanced-row')].map(n => n.dataset.metric),
-    ['loss', 'match', 'largest', 'streak', 'clean', 'best-five', 'balanced', 'defending', 'winning', 'punish', 'bounce-back', 'only-moves',
-      'clock', 'clock-lead', 'think-average', 'think-longest', 'pressure', 'quick', 'deep']);
-  assert.equal(doc.querySelector('[data-metric=finish],[data-metric=active-piece],[data-metric=castling],[data-metric=captures],[data-metric=checks]'), null);
+    ['loss', 'match', 'largest', 'streak', 'balanced', 'defending', 'winning', 'punish', 'bounce-back', 'only-moves',
+      'clock', 'think-average', 'think-longest', 'pressure', 'quick', 'deep']);
+  assert.equal(doc.querySelector('[data-metric=finish],[data-metric=active-piece],[data-metric=castling],[data-metric=captures],[data-metric=checks],[data-metric=clean],[data-metric=best-five],[data-metric=clock-lead]'), null);
   assert.ok([...doc.querySelectorAll('.advanced-pair')].every(n => n.children.length === 2));
   assert.equal(doc.querySelectorAll('.advanced-meter,[data-metric=comeback],.advanced-report [title]').length, 0);
-  assert.equal(doc.querySelectorAll('.advanced-info').length, 19);
-  assert.equal(doc.querySelectorAll('.advanced-star').length, 19);
+  assert.equal(doc.querySelectorAll('.advanced-info').length, 16);
+  assert.equal(doc.querySelectorAll('.advanced-star').length, 16);
   assert.equal(doc.querySelectorAll('.advanced-star.on,.advanced-group-starred').length, 0);
   assert.equal(doc.querySelectorAll('.advanced-explainer:not([hidden])').length, 0);
   assert.equal(JSON.stringify(a.state.layout), layout);
   assert.equal(doc.querySelector('[data-metric=clock] .advanced-detail'), null);
-  assert.equal(doc.querySelector('[data-metric=best-five] .acc-stat-value').textContent, '—');
+});
+
+test('sample values step through their decisions on repeated clicks, per player, and wrap around', t => {
+  const a = review(t), doc = a.dom.window.document;
+  const empty = {accuracy: null, count: 0, plies: []};
+  a.state.gameStats.w.insights = {balanced: {accuracy: 88, count: 3, plies: [1, 3, 5]}, winning: empty, defending: empty};
+  a.state.gameStats.b.insights = {balanced: {accuracy: 70, count: 2, plies: [2, 4]}, winning: empty, defending: empty};
+  a.state.gameStats.w.replies = {punished: {found: 1, total: 2, plies: [3, 5]}, recovery: {accuracy: 50, count: 1, plies: [5]}};
+  a.state.gameStats.w.timing = {pressure: null, quick: {accuracy: 90, count: 2, plies: [1, 5]}, deep: {accuracy: null, count: 0, plies: []}};
+  a.call('setAccuracyPage', 2);
+  const visited = []; a.replace('gotoMainline', ply => { visited.push(ply); a.state.idx = ply; });
+  const [white, black] = doc.querySelectorAll('[data-metric=balanced] .advanced-value');
+  assert.equal(white.tagName, 'BUTTON'); assert.equal(black.tagName, 'BUTTON');
+  assert.equal(white.querySelector('.advanced-detail').textContent, '3 decisions · revisit ↗');
+  assert.match(white.getAttribute('aria-label'), /Cycle through moves.$/);
+  white.click(); white.click(); white.click(); white.click();
+  assert.deepEqual(visited, [1, 3, 5, 1], 'Each click moves on and wraps around');
+  black.click(); black.click(); white.click();
+  assert.deepEqual(visited.slice(4), [2, 4, 1], 'The other player and a different metric restart from their first decision');
+  const punish = doc.querySelector('[data-metric=punish] .advanced-value');
+  assert.equal(punish.tagName, 'BUTTON');
+  assert.equal(punish.querySelector('.advanced-detail').textContent, '1 of 2 mistakes · revisit ↗');
+  punish.click(); punish.click(); assert.deepEqual(visited.slice(7), [3, 5]);
+  assert.equal(doc.querySelector('[data-metric=bounce-back] .advanced-detail').textContent, '1 decision · revisit ↗');
+  assert.equal(doc.querySelector('[data-metric=deep] .advanced-value').tagName, 'DIV', 'An empty sample is not a link');
+  assert.equal(doc.querySelector('[data-metric=deep] .advanced-detail').textContent, 'No such decisions');
+  a.state.analyzing = true; a.call('renderStats');
+  assert.equal(doc.querySelector('[data-metric=balanced] button.advanced-value'), null, 'Pending values are not links');
 });
 
 test('Modern streak and loss links use their own player evidence and remain keyboard buttons', t => {
@@ -74,8 +101,8 @@ test('starring a metric moves it into a Starred group at the top, persists the c
   star('quick').click();
   assert.deepEqual([...doc.querySelectorAll('.advanced-group-starred .advanced-row')].map(n => n.dataset.metric), ['streak', 'quick'],
     'Starred rows keep report order, not click order');
-  assert.equal(doc.querySelectorAll('.advanced-row').length, 19);
-  assert.equal(doc.querySelectorAll('.advanced-info').length, 19);
+  assert.equal(doc.querySelectorAll('.advanced-row').length, 16);
+  assert.equal(doc.querySelectorAll('.advanced-info').length, 16);
   await new Promise(resolve => setTimeout(resolve, 0));
   assert.deepEqual([...a.store.settings.starredStats], ['streak', 'quick']);
   star('streak').click();
@@ -92,7 +119,7 @@ test('starred metrics load from settings, ignore unknown ids, and survive the an
   a.state.settings.starredStats = ['deep', 'bogus', 'loss'];
   a.call('setAccuracyPage', 2);
   assert.deepEqual([...doc.querySelectorAll('.advanced-group-starred .advanced-row')].map(n => n.dataset.metric), ['loss', 'deep']);
-  assert.equal(doc.querySelectorAll('.advanced-row').length, 19);
+  assert.equal(doc.querySelectorAll('.advanced-row').length, 16);
   a.state.analyzing = true; a.call('renderStats');
   assert.deepEqual([...doc.querySelectorAll('.advanced-group-starred .advanced-row')].map(n => n.dataset.metric), ['loss', 'deep']);
   doc.querySelector('[data-metric=loss] .advanced-star').click();
@@ -115,6 +142,7 @@ test('new reply, critical and timing rows read their own evidence with honest un
   assert.deepEqual(values('only-moves'), [['100%', '1 of 1 critical decisions'], ['—', 'Needs two analysis lines']]);
   assert.deepEqual(values('pressure'), [['—', 'Needs clocks and time control'], ['—', 'Needs clocks and time control']]);
   assert.deepEqual(values('quick'), [['91.3', '6 decisions'], ['—', 'Clock data needed']]);
+  assert.equal(doc.querySelector('[data-metric=punish] button.advanced-value'), null, 'Samples without plies stay plain values');
   assert.deepEqual(values('deep'), [['—', 'No such decisions'], ['—', 'Clock data needed']]);
   a.state.gameStats.w.replies.punished = {found: 0, total: 0};
   a.call('renderStats');

@@ -110,9 +110,9 @@ test('background searches complete the Advanced only-move figure and refresh the
   a.replace('createEngine', async () => fakeEngine(async (fen, depth, count) => result(a, S.positions.findIndex(p => p.fen === fen), count)));
   let renders = 0; const renderStats = a.run('renderStats'); a.replace('renderStats', (...args) => { renders++; return renderStats(...args); });
   a.call('schedulePanelPrecalculation'); await begin(a); await a.run('panelWarmJob.promise');
-  assert.deepEqual(S.gameStats.w.critical, {found: 1, total: 1}, 'Nf3 was the only move by four pawns');
-  assert.deepEqual(S.gameStats.b.critical, {found: 0, total: 0});
-  assert.deepEqual(values(), [['100%', '1 of 1 critical decisions'], ['—', 'No critical decisions']]);
+  assert.deepEqual(S.gameStats.w.critical, {found: 1, total: 1, plies: [3]}, 'Nf3 was the only move by four pawns');
+  assert.deepEqual(S.gameStats.b.critical, {found: 0, total: 0, plies: []});
+  assert.deepEqual(values(), [['100%', '1 of 1 critical decisions · revisit ↗'], ['—', 'No critical decisions']]);
   assert.ok(renders >= 1 && renders <= 2, 'The page refreshes for the figure, not for every search: ' + renders);
 });
 

@@ -4538,6 +4538,16 @@ function hideQTip() {
 // Repeated category clicks cycle chronologically, wrapping after the last match.
 // Other navigation starts a fresh cycle at the first match.
 let _categoryJump = null;
+// Advanced report samples: the first click revisits the first included
+// decision, each further click moves on to the next one and wraps around.
+let _statJump = null;
+function jumpToStatDecision(key, plies) {
+  if (S.blank || S.practice || !plies?.length) return;
+  const repeat = !S.analysisMode && _statJump?.positions === S.positions && _statJump.key === key && _statJump.ply === S.idx;
+  const ply = plies[repeat ? (plies.indexOf(S.idx) + 1) % plies.length : 0];
+  gotoMainline(ply);
+  _statJump = {positions: S.positions, key, ply};
+}
 function jumpToCategory(side, k) {
   if (S.blank || S.practice) return;
   const plies = [];
@@ -4773,11 +4783,12 @@ function renderModernAdvanced(sides, busy) {
     return Number(S.positions[ply - 1].fen.split(' ')[5]) + (S.positions[ply].color === 'w' ? '. ' : '… ') + S.positions[ply].san;
   };
   const root = el('div', {class: 'acc-advanced advanced-report'});
-  const cell = (index, value, {detail = '', jump = null, className = ''} = {}) => {
-    const available = value != null && !busy;
-    return el(jump != null && available ? 'button' : 'div', {class: 'advanced-value ' + className,
-      ...(jump != null && available ? {type: 'button', onclick: () => gotoMainline(jump)} : {}),
-      'aria-label': S.players[sides[index]].name + ': ' + (busy ? 'Analyzing' : value ?? 'Not enough data') + (available && detail ? '. ' + detail : '')},
+  const cell = (index, value, {detail = '', jump = null, plies = null, className = ''} = {}) => {
+    const available = value != null && !busy, cycles = available && plies?.length > 0, link = cycles || (jump != null && available);
+    return el(link ? 'button' : 'div', {class: 'advanced-value ' + className,
+      ...(link ? {type: 'button', onclick: cycles ? () => jumpToStatDecision(sides[index] + ':' + plies.join(','), plies) : () => gotoMainline(jump)} : {}),
+      'aria-label': S.players[sides[index]].name + ': ' + (busy ? 'Analyzing' : value ?? 'Not enough data') + (available && detail ? '. ' + detail : '')
+        + (cycles ? ' Cycle through moves.' : '')},
       el('strong', {class: 'acc-stat-value'}, busy ? accuracyPendingValue() : value ?? '—'),
       detail ? el('span', {class: 'advanced-detail'}, busy ? ' ' : detail) : null);
   };
@@ -4827,12 +4838,13 @@ function renderModernAdvanced(sides, busy) {
   };
   const sampleCells = (key, {source = 'insights', missing = 'No scored decisions'} = {}) => stats.map((stat, i) => {
     const sample = stat?.[source]?.[key];
-    return cell(i, decimal(sample?.accuracy), {detail: sample == null && stat?.[source] ? missing : sample?.count ? sample.count + ' decisions' : sample ? 'No such decisions' : missing});
+    return cell(i, decimal(sample?.accuracy), {plies: sample?.plies,
+      detail: sample == null && stat?.[source] ? missing : sample?.count ? sample.count + (sample.count === 1 ? ' decision' : ' decisions') + (sample.plies?.length ? ' · revisit ↗' : '') : sample ? 'No such decisions' : missing});
   });
   const ratioCells = (read, {noun, missing}) => stats.map((stat, i) => {
     const ratio = read(stat);
-    return cell(i, ratio?.total ? percent(100 * ratio.found / ratio.total) : null,
-      {detail: ratio?.total ? ratio.found + ' of ' + ratio.total + ' ' + noun : ratio ? 'No ' + noun : missing});
+    return cell(i, ratio?.total ? percent(100 * ratio.found / ratio.total) : null, {plies: ratio?.plies,
+      detail: ratio?.total ? ratio.found + ' of ' + ratio.total + ' ' + noun + (ratio.plies?.length ? ' · revisit ↗' : '') : ratio ? 'No ' + noun : missing});
   });
   group('Decision quality', [
     row('loss', 'Average centipawn loss', 'How much your moves gave away on average compared with the engine’s best move. Lower is better. 100 centipawns is roughly one pawn. Forced moves and mate scores are left out.', stats.map((stat, i) =>
@@ -4847,19 +4859,14 @@ function renderModernAdvanced(sides, busy) {
       const streak = stat?.cleanStreak;
       return cell(i, streak ? String(streak.count) : null, {detail: streak?.count > 0 ? 'decisions · revisit ↗' : 'No clean decisions', jump: streak?.count > 0 ? streak.startPly : null});
     })),
-    row('clean', 'Clean decisions', 'The percentage of your non-forced decisions rated Good or better, including Book. This shows how often you avoided a move rated as an error.', stats.map((stat, i) => cell(i, percent(stat?.insights?.cleanShare)))),
-    row('best-five', 'Best five-decision stretch', 'Your highest accuracy across five consecutive non-forced decisions. It highlights a sustained stretch of strong play. You need at least five scored decisions. Select a value to revisit that stretch.', stats.map((stat, i) => {
-      const best = stat?.insights?.bestStretch;
-      return cell(i, decimal(best?.accuracy), {detail: best ? 'accuracy · revisit ↗' : 'Needs five decisions', jump: best?.startPly});
-    })),
-    row('balanced', 'Accuracy in balanced positions', 'How accurately you played when the engine’s evaluation before your move was less than one pawn in either direction. A useful look at your decisions when neither side had a clear advantage. Mate scores and forced replies are left out.', sampleCells('balanced')),
-    row('defending', 'Accuracy while defending', 'How accurately you played when you started your turn at least one pawn behind in the engine’s evaluation. It shows the quality of your resistance, even if you eventually lost. Mate scores and forced replies are left out.', sampleCells('defending')),
-    row('winning', 'Accuracy while ahead', 'How accurately you played when you started your turn at least one pawn ahead in the engine’s evaluation. It helps you see how well you handled an advantage. Mate scores and forced replies are left out.', sampleCells('winning')),
-    row('punish', 'Punished opponent mistakes', 'How often you found a strong reply right after your opponent’s Mistake, Miss or Blunder. A reply rated Excellent or better counts as punished. Mistakes where your reply was forced are left out.',
+    row('balanced', 'Accuracy in balanced positions', 'How accurately you played when the engine’s evaluation before your move was less than one pawn in either direction. A useful look at your decisions when neither side had a clear advantage. Mate scores and forced replies are left out. Select a value to step through those decisions.', sampleCells('balanced')),
+    row('defending', 'Accuracy while defending', 'How accurately you played when you started your turn at least one pawn behind in the engine’s evaluation. It shows the quality of your resistance, even if you eventually lost. Mate scores and forced replies are left out. Select a value to step through those decisions.', sampleCells('defending')),
+    row('winning', 'Accuracy while ahead', 'How accurately you played when you started your turn at least one pawn ahead in the engine’s evaluation. It helps you see how well you handled an advantage. Mate scores and forced replies are left out. Select a value to step through those decisions.', sampleCells('winning')),
+    row('punish', 'Punished opponent mistakes', 'How often you found a strong reply right after your opponent’s Mistake, Miss or Blunder. A reply rated Excellent or better counts as punished. Mistakes where your reply was forced are left out. Select a value to step through your replies.',
       ratioCells(stat => stat?.replies?.punished, {noun: 'mistakes', missing: 'Needs classified moves'})),
-    row('bounce-back', 'Bounce-back accuracy', 'How accurately you played the decision straight after each of your own errors: Inaccuracy, Mistake, Miss or Blunder. It shows whether a slip rattled you or you steadied yourself right away. Forced replies are skipped.',
+    row('bounce-back', 'Bounce-back accuracy', 'How accurately you played the decision straight after each of your own errors: Inaccuracy, Mistake, Miss or Blunder. It shows whether a slip rattled you or you steadied yourself right away. Forced replies are skipped. Select a value to step through those decisions.',
       sampleCells('recovery', {source: 'replies', missing: 'Needs classified moves'})),
-    row('only-moves', 'Only moves found', 'How often you found the move in positions where the engine’s first choice was at least one pawn better than its second. These are the moments where a single move mattered most. Needs two analysis lines; mate scores are left out.',
+    row('only-moves', 'Only moves found', 'How often you found the move in positions where the engine’s first choice was at least one pawn better than its second. These are the moments where a single move mattered most. Select a value to step through them. Needs two analysis lines; mate scores are left out.',
       ratioCells(stat => stat?.critical, {noun: 'critical decisions', missing: 'Needs two analysis lines'})),
   ]);
   group('On the clock', [
@@ -4867,21 +4874,17 @@ function renderModernAdvanced(sides, busy) {
       const clock = stat?.clock?.advantage;
       return cell(i, percent(clock?.percent));
     })),
-    row('clock-lead', 'Biggest clock lead', 'The most extra time you had compared with your opponent after any full move, once both players had moved. Select a value to see the position. Zero means you were never ahead at those points.', stats.map((stat, i) => {
-      const lead = stat?.clock?.largestLead;
-      return cell(i, duration(lead?.seconds), {detail: lead?.seconds > 0 ? moveName(lead.ply) + ' ↗' : lead ? 'Never ahead' : 'Clock data needed', jump: lead?.seconds > 0 ? lead.ply : null});
-    })),
     row('think-average', 'Average thinking time', 'How long you spent on a move on average. We subtract the increment so bonus seconds are not mistaken for thinking time. Only moves with usable before-and-after clocks are included. Some time controls do not provide enough information.', stats.map((stat, i) =>
       cell(i, duration(stat?.clock?.averageThink), {detail: stat?.clock?.thinkMoves ? stat.clock.thinkMoves + ' clocked moves' : 'Clock data needed'}))),
     row('think-longest', 'Longest think', 'The most time you spent on a single recorded move, with any increment removed. Select the value to revisit the decision that made you pause.', stats.map((stat, i) => {
       const think = stat?.clock?.longestThink;
       return cell(i, duration(think?.seconds), {detail: think ? moveName(think.ply) + ' ↗' : 'Clock data needed', jump: think?.ply});
     })),
-    row('pressure', 'Accuracy in time trouble', 'How accurately you played with little time left: under a tenth of the starting time, or under ten seconds if that is more. We look at your clock before each move. Needs clock data and a simple time control with a base time.',
+    row('pressure', 'Accuracy in time trouble', 'How accurately you played with little time left: under a tenth of the starting time, or under ten seconds if that is more. We look at your clock before each move. Select a value to step through those decisions. Needs clock data and a simple time control with a base time.',
       sampleCells('pressure', {source: 'timing', missing: 'Needs clocks and time control'})),
-    row('quick', 'Accuracy on snap moves', 'How accurately you played the moves you spent under five seconds on, with any increment removed. It shows whether your instincts hold up when you move fast.',
+    row('quick', 'Accuracy on snap moves', 'How accurately you played the moves you spent under five seconds on, with any increment removed. It shows whether your instincts hold up when you move fast. Select a value to step through those moves.',
       sampleCells('quick', {source: 'timing', missing: 'Clock data needed'})),
-    row('deep', 'Accuracy on long thinks', 'How accurately you played the moves where you spent at least twice your average thinking time, with the increment removed. It shows whether your deepest thinks paid off.',
+    row('deep', 'Accuracy on long thinks', 'How accurately you played the moves where you spent at least twice your average thinking time, with the increment removed. It shows whether your deepest thinks paid off. Select a value to step through those moves.',
       sampleCells('deep', {source: 'timing', missing: 'Clock data needed'})),
   ]);
   return mount();

@@ -111,7 +111,6 @@ test('clock advantage compares paired turns with ties in the denominator, indepe
   const stats = gameStatistics(f.positions, f.bests, f.calibrated, options);
   assert.deepEqual(stats.w.clock.advantage, {percent: 50, ahead: 1, samples: 2, total: 2});
   assert.equal(stats.b.clock.advantage.percent, 0);
-  assert.deepEqual(stats.w.clock.largestLead, {seconds: 10, ply: 2});
   assert.equal(stats.w.clock.averageThink, null, 'Unknown increment must not produce thinking times');
   const staged = gameStatistics(f.positions, f.bests, f.calibrated, {...options, headers: {TimeControl: '40/7200:3600'}});
   assert.equal(staged.w.clock.advantage.percent, 50, 'Remaining clocks can still be compared with staged controls');
@@ -125,7 +124,6 @@ test('clock pairs never bridge gaps, handle black-to-move starts, and preserve f
     ...['b', 'w', 'b', 'w'].map(color => ({fen: ending, color, from: 'a1', to: 'a2'}))];
   const clock = gameStatistics(excerpt, [], null, {clocks: [null, '1:35.5', '1:35.25', '1:20', '1:30']}).b.clock;
   assert.equal(clock.advantage.percent, 50);
-  assert.equal(clock.largestLead.seconds, .25);
   assert.equal(gameStatistics(f.positions, f.bests, f.calibrated).w.clock.advantage, null);
   assert.equal(gameStatistics(f.positions, f.bests, f.calibrated, {clocks: [null, '1:99', '1:00']}).w.clock.advantage, null);
 });
@@ -150,12 +148,12 @@ test('decision insights use mover-relative starting positions and only eligible 
   f.bests[0].score.cp = 0; f.bests[2].score.cp = -100; f.bests[4].score.cp = 100;
   const stats = gameStatistics(f.positions, f.bests, f.calibrated,
     {classifications: [null, 'book', 'good', 'mistake', 'inaccuracy', 'excellent']});
-  assert.equal(stats.w.insights.balanced.accuracy, 90);
+  assert.deepEqual(stats.w.insights.balanced, {accuracy: 90, count: 1, plies: [1]});
   assert.equal(stats.w.insights.defending.accuracy, 70);
-  assert.equal(stats.w.insights.winning.accuracy, 50);
-  assert.equal(stats.w.insights.cleanShare, 200 / 3);
-  assert.equal(stats.w.insights.bestStretch, null);
-  assert.equal(stats.b.insights.defending.accuracy, null, 'No matching sample is unavailable, not zero');
+  assert.deepEqual(stats.w.insights.winning.plies, [5]);
+  assert.equal(stats.w.insights.cleanShare, undefined);
+  assert.equal(stats.w.insights.bestStretch, undefined);
+  assert.deepEqual(stats.b.insights.defending, {accuracy: null, count: 0, plies: []}, 'No matching sample is unavailable, not zero');
   f.calibrated.w.moves[1].eligible = false;
   assert.equal(gameStatistics(f.positions, f.bests, f.calibrated).w.insights.defending.count, 0);
   f.calibrated.w.complete = false;
@@ -167,16 +165,15 @@ test('reply insights count punished opponent mistakes and recovery after own err
   // Plies: 1 w book, 2 b blunder, 3 w best (punished), 4 b mistake, 5 w inacc (not punished).
   let classifications = [null, 'book', 'blunder', 'best', 'mistake', 'inacc'];
   let stats = gameStatistics(f.positions, f.bests, f.calibrated, {classifications});
-  assert.deepEqual(stats.w.replies.punished, {found: 1, total: 2});
-  assert.deepEqual(stats.b.replies.punished, {found: 0, total: 0}, 'White made no clear errors to punish');
+  assert.deepEqual(stats.w.replies.punished, {found: 1, total: 2, plies: [3, 5]});
+  assert.deepEqual(stats.b.replies.punished, {found: 0, total: 0, plies: []}, 'White made no clear errors to punish');
   assert.equal(stats.w.replies.recovery.count, 0, 'The last-move inaccuracy has no later decision');
   // Black's blunder on ply 2 is followed by the ply 4 decision; ply 5 forced reply does not count.
   classifications = [null, 'good', 'blunder', 'best', 'mistake', 'best'];
   f.calibrated.w.moves[2].eligible = false;
   stats = gameStatistics(f.positions, f.bests, f.calibrated, {classifications});
-  assert.deepEqual(stats.w.replies.punished, {found: 1, total: 1}, 'The forced reply to the ply 4 mistake leaves the sample');
-  assert.equal(stats.b.replies.recovery.count, 1);
-  assert.equal(stats.b.replies.recovery.accuracy, 60);
+  assert.deepEqual(stats.w.replies.punished, {found: 1, total: 1, plies: [3]}, 'The forced reply to the ply 4 mistake leaves the sample');
+  assert.deepEqual(stats.b.replies.recovery, {accuracy: 60, count: 1, plies: [4]});
   classifications[2] = null;
   stats = gameStatistics(f.positions, f.bests, f.calibrated, {classifications});
   assert.equal(stats.w.replies.punished, null, 'An unclassified opponent move leaves punishment unavailable');
@@ -190,17 +187,17 @@ test('critical decisions need two centipawn lines for every scored decision and 
   assert.equal(gameStatistics(f.positions, f.bests, f.calibrated).w.critical, null, 'Single-line evidence is unavailable');
   f.bests.forEach((root, i) => { root.lines = [{multipv: 1, score: {cp: 100}}, {multipv: 2, score: {cp: i === 0 || i === 2 ? -50 : 80}}]; });
   const stats = gameStatistics(f.positions, f.bests, f.calibrated);
-  assert.deepEqual(stats.w.critical, {found: 1, total: 2});
-  assert.deepEqual(stats.b.critical, {found: 0, total: 0});
+  assert.deepEqual(stats.w.critical, {found: 1, total: 2, plies: [1, 3]});
+  assert.deepEqual(stats.b.critical, {found: 0, total: 0, plies: []});
   f.bests[2].lines[1].score = {mate: -2};
-  assert.deepEqual(gameStatistics(f.positions, f.bests, f.calibrated).w.critical, {found: 1, total: 1}, 'Mate scores leave the sample');
+  assert.deepEqual(gameStatistics(f.positions, f.bests, f.calibrated).w.critical, {found: 1, total: 1, plies: [1]}, 'Mate scores leave the sample');
   f.calibrated.w.moves[0].eligible = false;
-  assert.deepEqual(gameStatistics(f.positions, f.bests, f.calibrated).w.critical, {found: 0, total: 0});
+  assert.deepEqual(gameStatistics(f.positions, f.bests, f.calibrated).w.critical, {found: 0, total: 0, plies: []});
   // Multi-line annotation roots take precedence over the scoring roots and name the top move by their first line.
   const bare = fixture(), annotations = bare.bests.map((root, i) => ({bestmove: 'stale',
     lines: [{multipv: 1, pv: i === 0 ? 'e2e4 e7e5' : 'a1a2', score: {cp: 150}}, {multipv: 2, pv: 'h2h3', score: {cp: 0}}]}));
   assert.equal(gameStatistics(bare.positions, bare.bests, bare.calibrated).w.critical, null);
-  assert.deepEqual(gameStatistics(bare.positions, bare.bests, bare.calibrated, {annotations}).w.critical, {found: 1, total: 3});
+  assert.deepEqual(gameStatistics(bare.positions, bare.bests, bare.calibrated, {annotations}).w.critical, {found: 1, total: 3, plies: [1, 3, 5]});
 });
 
 test('timing insights sample time trouble, snap moves and long thinks from the player’s own clocks', () => {
@@ -208,11 +205,11 @@ test('timing insights sample time trouble, snap moves and long thinks from the p
   // White thinks: ply 1 → 4s, ply 3 → 6s, ply 5 → 20s (average 10s). Clocks before: 100, 96, 90.
   const clocks = [null, '1:36', '1:30', '1:30', '1:20', '1:10'];
   const stats = gameStatistics(f.positions, f.bests, f.calibrated, {clocks, headers});
-  assert.deepEqual(stats.w.timing.quick, {accuracy: 90, count: 1});
-  assert.deepEqual(stats.w.timing.deep, {accuracy: 50, count: 1});
-  assert.deepEqual(stats.w.timing.pressure, {accuracy: null, count: 0}, 'Nobody dropped below ten seconds');
+  assert.deepEqual(stats.w.timing.quick, {accuracy: 90, count: 1, plies: [1]});
+  assert.deepEqual(stats.w.timing.deep, {accuracy: 50, count: 1, plies: [5]});
+  assert.deepEqual(stats.w.timing.pressure, {accuracy: null, count: 0, plies: []}, 'Nobody dropped below ten seconds');
   const trouble = gameStatistics(f.positions, f.bests, f.calibrated, {clocks: [null, '0:09', '1:30', '0:08', '1:20', '0:05'], headers});
-  assert.equal(trouble.w.timing.pressure.count, 2, 'Decisions on plies 3 and 5 began under ten seconds');
+  assert.deepEqual(trouble.w.timing.pressure.plies, [3, 5], 'Decisions on plies 3 and 5 began under ten seconds');
   assert.ok(Number.isFinite(trouble.w.timing.pressure.accuracy));
   const noControl = gameStatistics(f.positions, f.bests, f.calibrated, {clocks});
   assert.equal(noControl.w.timing.pressure, null, 'Time trouble needs a base time');
@@ -220,15 +217,14 @@ test('timing insights sample time trouble, snap moves and long thinks from the p
   assert.equal(gameStatistics(f.positions, f.bests, f.calibrated).w.timing.deep, null);
 });
 
-test('best five-decision stretch keeps the earliest tie and uses the engine’s actual accuracy aggregator', () => {
+test('samples list their decision plies in game order for the report to walk through', () => {
   const positions = [{fen: opening}], moves = [];
   for (let i = 1; i <= 12; i++) {
     positions.push({fen: opening, color: i % 2 ? 'w' : 'b', from: 'a1', to: 'a2'});
-    if (i % 2) moves.push({ply: i, eligible: true, quality: 90, engine: 'sf19lite'});
+    if (i % 2) moves.push({ply: i, eligible: i !== 7, quality: 90, engine: 'sf19lite'});
   }
-  const calibrated = {w: {complete: true, moves}};
-  const stats = gameStatistics(positions, [], calibrated);
-  assert.equal(stats.w.insights.bestStretch.startPly, 1);
-  assert.equal(stats.w.insights.bestStretch.endPly, 9);
-  assert.equal(stats.w.insights.bestStretch.accuracy, sf19GameAccuracy(moves.slice(0, 5)));
+  const bests = positions.slice(1).map(() => ({score: {cp: 0}}));
+  const stats = gameStatistics(positions, bests, {w: {complete: true, moves: [...moves].reverse()}});
+  assert.deepEqual(stats.w.insights.balanced.plies, [1, 3, 5, 9, 11]);
+  assert.equal(stats.w.insights.balanced.accuracy, sf19GameAccuracy(moves.filter(move => move.eligible)));
 });
