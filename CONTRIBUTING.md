@@ -104,7 +104,7 @@ Reviews happen as maintainer time allows.
 
 Start from current `main`; port
 reviewed changes from older clones individually instead of merging their entire
-history. The source check runs during packaging and in CI. Changes to the maintained
-model or reproduction tools must include their documented public inputs and pass
-the offline reproduction check. CI also checks reachable history, so a merge
-cannot quietly restore retired material through old parent commits.
+history. The source check runs during packaging; CI runs `npm test`. Changes to the
+maintained model or reproduction tools must include their documented public inputs
+and pass the offline reproduction check. Before merging older history, run
+`npm run verify:history` so retired material does not return through old parent commits.

@@ -64,10 +64,11 @@ legal moves through both the live export and a forced DOM fallback.
 It uses a browser API test facade for the analysis-tab handoff; it does
 not install the extension or exercise the toolbar UI.
 
-The `Lichess compatibility` GitHub workflow runs this check daily, on relevant pull
-requests, or manually. Failures can mean changed URLs/markup, a removed public
-game, a network problem, or a site challenge; inspect the run before changing the
-integration. The daily check starts once its workflow reaches the default branch.
+The `Lichess compatibility` GitHub workflow runs this check weekly (Mondays), on
+relevant pull requests, or manually. When Lichess answers headless Chrome with a
+Cloudflare bot check, the rendered-page checks are skipped with a warning and only
+the live export is checked. Failures can mean changed URLs/markup, a removed public
+game, or a network problem; inspect the run before changing the integration.
 Offline URL, metadata, button and import regressions remain part of `npm test`.
 
 The content script also reads Lichess's embedded `page-init-data` game ID when a

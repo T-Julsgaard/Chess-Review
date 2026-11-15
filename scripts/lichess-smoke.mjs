@@ -32,9 +32,14 @@ globalThis.chrome = {
   },
 };
 const {analyzeActiveTab} = await import('../analyze-flow.js');
-const {parseLichessGameId} = await import('../lichess.js');
+const {parseLichessGameId, parseLichessFlip, fetchGamePgn} = await import('../lichess.js');
 const runFile = promisify(execFile);
 const liveFetch = globalThis.fetch;
+// Lichess may answer headless Chrome with a Cloudflare bot check instead of the game.
+// That says nothing about Lichess compatibility, so it must not fail the run.
+const isBotChallenge = doc => /^just a moment/i.test(doc.title.trim())
+  || !!doc.querySelector('[src*="/cdn-cgi/challenge-platform/"], [src*="challenges.cloudflare.com"], [id^="cf-chl-"]');
+const blocked = [];
 try {
   for (const pathname of [`/${gameId}`, `/game/${gameId}/black`]) {
     const url = 'https://lichess.org' + pathname;
@@ -46,6 +51,7 @@ try {
       {windowsHide:true, timeout:60000, maxBuffer:8 * 1024 * 1024});
       dom = new JSDOM(html, {url, runScripts:'outside-only'});
       const w = dom.window;
+      if (isBotChallenge(w.document)) {blocked.push(url); continue;}
       // Also validate the site's actual canonical URL, so a future route change
       // is flagged even when the embedded-data fallback keeps reviews working.
       const canonical = w.document.querySelector('meta[property="og:url"]')?.content;
@@ -82,3 +88,19 @@ try {
     }
   }
 } finally {globalThis.fetch = liveFetch;}
+
+if (blocked.length) {
+  // The rendered-page checks could not run; still check the live export API the
+  // import depends on, plus the URL forms the content script would report.
+  for (const url of blocked) {
+    assert.equal(parseLichessGameId(url)?.id, gameId, `Unrecognized Lichess URL: ${url}`);
+    assert.equal(parseLichessFlip(url), url.endsWith('/black') ? true : null, `Wrong perspective for ${url}`);
+  }
+  const chess = new Chess();
+  chess.loadPgn(await fetchGamePgn(gameId), {strict:true});
+  assert.equal(chess.history().length, 87, 'Live export must retain the full game, including its final move');
+  console.log(`PASS https://lichess.org/game/export/${gameId}: live export, 87 legal moves`);
+  const note = `Lichess served a Cloudflare bot check instead of ${blocked.join(' and ')}, `
+    + 'so the rendered-page checks were skipped. The live PGN export still passed.';
+  console.log(process.env.GITHUB_ACTIONS ? `::warning title=Lichess page checks skipped::${note}` : `SKIP ${note}`);
+}

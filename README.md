@@ -192,15 +192,14 @@ anyone you send it to can read that information. See [PRIVACY.md](PRIVACY.md).
 
 ## Maintained-source checks
 
-The Maintained source workflow runs `npm run verify:source` and `npm run verify:history`
-before the test suites. The history check inspects reachable commits and historical text
-blobs in batches targeting 16 MiB, so growing research history does not overflow one
-combined subprocess output buffer. All existing content and path checks remain active.
+CI runs only the extension's test suite (`npm test`) on pushes and pull requests,
+plus a weekly live [Lichess compatibility check](docs/REPOSITORY.md). The remaining
+checks run locally when needed: `npm run verify:source` (also part of packaging),
+`npm run verify:history`, and `node tools/calibration/reproduce-public.mjs`.
 
-The complete research suite runs in a separate Windows CI job with the original
-Python runtime bound by the E211 saved observations. Setup verifies the pinned
-archive, retained executable hash, and full build version; existing research
-evidence and checks remain unchanged. See [runtime setup](tools/research-python/README.md).
+The complete research suite (`npm run test:research`) is local-only. It needs the
+original Python runtime bound by the E211 saved observations and full git history.
+See [runtime setup](tools/research-python/README.md).
 
 ## Release packages
 

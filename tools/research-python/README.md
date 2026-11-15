@@ -21,7 +21,7 @@ CI runner. It refuses to overwrite an existing runtime. Optional `Destination`
 and `ArchivePath` arguments support isolated setup validation with a previously
 downloaded, identically hashed archive.
 
-The research CI job runs the complete existing `npm run test:research` suite.
+The research suite no longer runs in CI; run `npm run test:research` locally.
 Its explicit `research-test-outputs.mjs` preload handles frozen tests that try
 to create already-tracked example files with `flag: 'wx'`: it checks the generated
 bytes against the retained file and fails on any difference or missing file.

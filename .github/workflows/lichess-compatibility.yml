@@ -2,7 +2,7 @@ name: Lichess compatibility
 on:
   workflow_dispatch:
   schedule:
-    - cron: '23 7 * * *'
+    - cron: '23 7 * * 1' # Mondays
   pull_request:
     paths:
       - 'lichess*.js'
