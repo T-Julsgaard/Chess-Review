@@ -57,8 +57,10 @@ browser's `chrome.storage.local`:
 - A cache of public game/API responses, PGNs, and computed analysis, so
   re-opening a game does not require re-downloading or re-analyzing it.
 - Small accuracy summaries alongside completed saved reviews.
-  Automatic accuracy estimates are held in a bounded in-memory cache and are
-  separate from full-review evidence and engine preferences.
+  Automatic accuracy estimates for the 50 most recently previewed finished games
+  are also kept locally (game id, PGN and the two accuracy numbers), so revisiting
+  a game page does not rerun the preview engine. They are separate from
+  full-review evidence and engine preferences.
 - Chess.com monthly archive responses can contain other games and optional
   platform-provided accuracy fields. Those responses may be cached locally;
   displayed review scores are calculated by the extension, not read from those fields.

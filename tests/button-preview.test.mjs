@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {previewGameKey, savedButtonSummary} from '../lib/button-preview.js';
 import {finishedPreviewGame, PreviewPositions, analyseButtonPreview} from '../lib/preview-analysis.js';
-import {createButtonPreviewService} from '../lib/button-preview-service.js';
+import {createButtonPreviewService, storedPreview, rememberedPreviews, BUTTON_PREVIEW_CACHE_KEY} from '../lib/button-preview-service.js';
 import {createPreviewRunner} from '../lib/preview-runner.js';
 
 const pgn = '[White "Alice"]\n[Black "Bob"]\n[Result "1-0"]\n\n1. e4 e5 2. Nf3 Nc6 1-0';
@@ -112,7 +112,7 @@ test('all button placements in a tab share one import; completed previews are ca
   const s=service();const results=await Promise.all([s.get(1,key),s.get(1,key)]);
   assert.deepEqual(results[0],results[1]); assert.equal(s.loads.length,1); assert.equal(s.runs.length,1);
   assert.equal((await s.get(2,key)).ok,true);assert.equal(s.runs.length,1);
-  assert.deepEqual(s.reads,[['identity:v1','playerHistory:v1','library'],['identity:v1','playerHistory:v1','library']]);
+  assert.deepEqual(s.reads,[['identity:v1','playerHistory:v1','library','buttonPreviewCache:v1'],['identity:v1','playerHistory:v1','library','buttonPreviewCache:v1']]);
 });
 test('the resolved identity marks its own side on fresh, cached and saved previews',async () => {
   // Alice faced three different opponents with a two-game lead, so she is the learned account.
@@ -178,4 +178,41 @@ test('a canceled queued Chrome preview cannot create an offscreen worker',async 
   const run=createPreviewRunner(api),controller=new AbortController();
   const first=run(pgn),second=run(pgn,controller.signal);controller.abort();
   gate.resolve({ok:true,summary});await first;await assert.rejects(second);assert.equal(analysed,1);
+});
+
+test('a completed estimate is remembered locally and reused after the background worker restarts',async () => {
+  const store={library:[]},writes=[];
+  const api={storage:{local:{get:async()=>({...store}),set:async values=>{writes.push(structuredClone(values));Object.assign(store,values);}}}};
+  const first=service({api});
+  const result=await first.get(1,key);
+  assert.equal(result.ok,true);assert.equal(first.runs.length,1);
+  assert.deepEqual(writes,[{[BUTTON_PREVIEW_CACHE_KEY]:[{key,pgn,summary:{...summary,key,players:{w:'Alice',b:'Bob'}}}]}]);
+  // A fresh service (new worker lifetime) finds the stored estimate without running the engine.
+  const second=service({api});
+  const reused=await second.get(2,key);
+  assert.equal(second.runs.length,0);assert.equal(reused.ok,true);assert.equal(reused.estimated,true);
+  assert.deepEqual(reused.accuracy,summary.accuracy);assert.deepEqual(reused.players,{w:'Alice',b:'Bob'});
+  assert.equal(writes.length,1,'reusing a stored estimate writes nothing');
+});
+test('stored estimates require the exact game, PGN, version and valid scores',() => {
+  const entry={key,pgn,summary:{...summary,key}};
+  assert.deepEqual(storedPreview([entry],key,pgn),entry.summary);
+  assert.equal(storedPreview([entry],'chesscom:99999999',pgn),null);
+  assert.equal(storedPreview([entry],key,pgn+' '),null);
+  assert.equal(storedPreview([{...entry,summary:{...entry.summary,version:0}}],key,pgn),null);
+  assert.equal(storedPreview([{...entry,summary:{...entry.summary,estimated:false}}],key,pgn),null);
+  assert.equal(storedPreview([{...entry,summary:{...entry.summary,accuracy:{w:101,b:50}}}],key,pgn),null);
+  assert.equal(storedPreview('corrupt',key,pgn),null);assert.equal(storedPreview([null,undefined,{}],key,pgn),null);
+});
+test('the stored estimate list is bounded and replaces an older entry for the same game',() => {
+  const many=Array.from({length:60},(_,i)=>({key:'chesscom:'+(10000+i),pgn,summary}));
+  const next=rememberedPreviews(many,{key:'chesscom:10005',pgn:pgn+'x',summary});
+  assert.equal(next.length,50);assert.equal(next.at(-1).key,'chesscom:10005');
+  assert.equal(next.filter(e=>e.key==='chesscom:10005').length,1);
+  assert.deepEqual(rememberedPreviews(undefined,{key,pgn,summary}),[{key,pgn,summary}]);
+  assert.deepEqual(rememberedPreviews([{nope:true}],{key,pgn,summary}),[{key,pgn,summary}]);
+});
+test('a storage failure never fails the preview result',async () => {
+  const api={storage:{local:{get:async()=>({library:[]}),set:async()=>{throw Error('quota');}}}};
+  const s=service({api});assert.equal((await s.get(1,key)).ok,true);
 });
