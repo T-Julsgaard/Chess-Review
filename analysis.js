@@ -8107,19 +8107,38 @@ function terminateEngines() {
   S.evalEngines = [];
 }
 // Throttled progress render (~7 fps) so the worker pool isn't starved by O(N) recompute/render.
-let _progScheduled = false, _progLast = 0;
+// The interval adapts to the machine: when one refresh costs more than the interval itself, the
+// next waits twice that cost (capped at a second) so input and the engine messages still get the
+// main thread. Hidden tabs defer refreshes entirely and catch up once when they become visible.
+const PROGRESS_INTERVAL_MS = 140, PROGRESS_INTERVAL_MAX_MS = 1000;
+let _progScheduled = false, _progLast = 0, _progCost = 0, _progDeferred = null;
 function flushProgress(gen) {
-  _progScheduled = false; _progLast = Date.now();
+  _progScheduled = false; _progDeferred = null;
+  const started = Date.now();
+  _progLast = started;
   if (gen !== S.batchGen) return;
   computeDerived();
   if (!S.analysisMode) { paintBoard(); renderEvalBar(); renderBestArrow(); renderEngineCurrent(); }
   renderControls(); renderReview(); renderStats(); renderGraph(); renderMoves();
+  _progCost = Date.now() - started;
+}
+function progressDelay(now = Date.now()) {
+  const interval = Math.min(PROGRESS_INTERVAL_MAX_MS, Math.max(PROGRESS_INTERVAL_MS, 2 * _progCost));
+  return Math.max(0, interval - (now - _progLast));
 }
 function requestProgress(gen) {
+  // Nobody can see a hidden tab. Completion still renders directly through flushProgress().
+  if (document.hidden) { _progDeferred = gen; return; }
   if (_progScheduled) return;
   _progScheduled = true;
-  setTimeout(() => flushProgress(gen), Math.max(0, 140 - (Date.now() - _progLast)));
+  setTimeout(() => flushProgress(gen), progressDelay());
 }
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden || _progDeferred === null) return;
+  const gen = _progDeferred;
+  _progDeferred = null;
+  requestProgress(gen);
+});
 async function startAnalysis({preserveCompleted = false} = {}) {
   if(S.blank)return;
   stopPanelPrecalculation();
