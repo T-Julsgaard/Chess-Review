@@ -841,7 +841,7 @@ button { font-family: inherit; cursor: pointer; }
 .icon-btn svg { width: 17px; height: 17px; }
 .learning-toggle {
   width: 200px; min-width: 0; padding: 0 12px;
-  grid-template-columns: 17px 1fr; gap: 8px;
+  grid-template-columns: 17px minmax(0, max-content); justify-content: center; gap: 8px;
   font: inherit; font-size: 12px; line-height: 1.25;
 }
 .learning-toggle, .learn-entry-button {

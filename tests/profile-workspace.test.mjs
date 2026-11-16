@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {app, loadGame, settle} from './helpers/app.mjs';
+import {app, loadGame, settle, deferred} from './helpers/app.mjs';
 import {season} from './helpers/profile-season.mjs';
 import {rowsKey, JOB_KEY} from '../lib/profile/store.js';
 import {IDENTITY_KEY} from '../lib/identity.js';
@@ -11,18 +11,22 @@ import {buildReport, buildDeck} from '../lib/profile/deck.js';
 function review(t) {
   const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5');
   a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
+  t.after(() => a.run('profileWorkspace')?.close());
   return a;
 }
 async function open(a) { await a.call('openProfile'); for (let i = 0; i < 6; i++) await settle(); }
+// Opening asks first; nothing loads until the player presses Build profile.
+async function build(a) { a.dom.window.document.querySelector('.profile-build').click(); for (let i = 0; i < 6; i++) await settle(); }
+async function openDeck(a) { await open(a); await build(a); }
 function seed(a, rows = season(), account = 'tester') {
   const seeded = rows.map(r => ({...r, opp: r.opp === 'tester' ? 'someone' : r.opp}));
   a.store[rowsKey('chesscom', account)] = {rows: seeded, months: [], since: 0, updatedAt: Date.now()};
   a.store[IDENTITY_KEY] = {chesscom: {accounts: [{name: account, seenAt: Date.now(), via: 'test'}]}};
 }
 
-test('profile: the toggle opens a chooser when nobody is known, hides the review panels and restores on close', async t => {
+test('profile: the toggle opens the setup, hides the review panels, keeps the review board and restores on close', async t => {
   const a = review(t), doc = a.dom.window.document;
-  const toggle = doc.querySelector('#profileToggle');
+  const toggle = doc.querySelector('#profileToggle'), reviewBoard = doc.querySelector('.board');
   assert.equal(toggle.textContent, 'Player profile');
   await open(a);
   assert.equal(toggle.textContent, 'Return to Game review');
@@ -30,8 +34,10 @@ test('profile: the toggle opens a chooser when nobody is known, hides the review
   assert.ok(doc.querySelector('.mod[data-mod="accuracy"]').inert);
   assert.ok(!doc.querySelector('.mod[data-mod="board"]').inert);
   const shell = doc.querySelector('.profile-shell');
-  assert.ok(shell && shell.querySelector('.profile-chooser input'));
-  assert.ok(doc.querySelector('.board').classList.contains('profile-board'));
+  assert.ok(shell && shell.querySelector('.profile-setup input'));
+  assert.equal(doc.querySelector('.board'), reviewBoard, 'the review board stays as it is while choosing');
+  assert.ok(!reviewBoard.classList.contains('profile-board'));
+  assert.equal(reviewBoard.querySelectorAll('.piece-img').length, 32);
   a.call('toggleProfile'); for (let i = 0; i < 4; i++) await settle();
   assert.equal(doc.querySelector('.profile-shell'), null);
   assert.ok(!doc.querySelector('#canvas').classList.contains('profile-active'));
@@ -47,7 +53,10 @@ test('profile: seeded games render the deck on the board with navigation, stats 
   await open(a);
   const shell = doc.querySelector('.profile-shell');
   assert.ok(shell, 'shell mounted');
-  assert.equal(shell.querySelector('.profile-select').value, 'tester');
+  assert.equal(shell.querySelector('.profile-setup input').value, 'tester', 'the known account is prefilled');
+  assert.equal(shell.querySelector('.profile-slide'), null, 'nothing loads before Build profile');
+  await build(a);
+  assert.equal(shell.querySelector('.profile-head-title').textContent, 'tester');
   assert.equal(shell.querySelector('.profile-slide').dataset.slide, 'cover');
   assert.equal(shell.querySelector('.profile-title').textContent, 'tester');
   const dots = shell.querySelectorAll('.profile-dot');
@@ -94,6 +103,29 @@ test('profile: learning and profile are mutually exclusive', async t => {
   assert.ok(a.run('learningWorkspace'));
 });
 
+test('profile setup: both sites merge their games and a missing username is refused', async t => {
+  const a = review(t), doc = a.dom.window.document, rows = season();
+  a.store[rowsKey('chesscom', 'tester')] = {rows: rows.slice(0, 120).map(r => ({...r, site: 'chesscom'})), months: [], since: 0, updatedAt: Date.now()};
+  a.store[rowsKey('lichess', 'tester-li')] = {rows: rows.slice(120).map(r => ({...r, id: 'li' + r.id, site: 'lichess', url: 'https://lichess.org/' + r.id})), months: [], since: 0, updatedAt: Date.now()};
+  await open(a);
+  const shell = doc.querySelector('.profile-shell');
+  [...shell.querySelectorAll('.profile-setup [role="radio"]')].find(b => b.textContent === 'Both').click();
+  const inputs = shell.querySelectorAll('.profile-setup input[type="text"]');
+  assert.equal(inputs.length, 2, 'one username per site');
+  inputs[0].value = 'tester'; inputs[0].dispatchEvent(new a.dom.window.Event('input'));
+  inputs[1].value = ''; inputs[1].dispatchEvent(new a.dom.window.Event('input'));
+  shell.querySelector('.profile-build').click(); await settle();
+  assert.ok(!shell.querySelector('.profile-setup-error').hidden, 'a missing Lichess username is refused');
+  assert.equal(shell.querySelector('.profile-slide'), null);
+  inputs[1].value = 'tester-li'; inputs[1].dispatchEvent(new a.dom.window.Event('input'));
+  await build(a);
+  const w = a.run('profileWorkspace');
+  assert.equal(w.rows.length, rows.length, 'games from both sites are combined');
+  assert.ok(shell.querySelector('.profile-lead').textContent.includes('Chess.com and Lichess'));
+  assert.equal(a.state.settings.profileSite, 'both');
+  assert.deepEqual(a.state.settings.profileAccounts, {chesscom: 'tester', lichess: 'tester-li'});
+});
+
 test('profile: share payload round-trips, sanitises links and opens read-only from a shared job', async t => {
   const rows = season();
   const report = buildReport(rows, buildInsights(rows), {account: 'tester', site: 'chesscom', period: 'year', periodLabel: 'Past 12 months'});
@@ -133,4 +165,96 @@ test('profile settings: category renders the period, budget, bot toggle and dele
   const text = doc.querySelector('#settings').textContent;
   for (const label of ['Default period', 'Engine check', 'Count games against bots', 'Delete all profile data']) assert.ok(text.includes(label), label);
   assert.equal(a.state.settings.profilePeriod, 'year'); assert.equal(a.state.settings.profileBudget, 'standard'); assert.equal(a.state.settings.profileIncludeBots, false);
+});
+
+test('profile owns a clean board and shortcuts without changing the reviewed game', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  seed(a); a.call('go', 3);
+  const original = doc.querySelector('.board'), idx = a.state.idx;
+  await open(a);
+  assert.equal(doc.querySelector('.board'), original, 'opening alone leaves the review board in place');
+  await build(a);
+  const board = doc.querySelector('.board'), pieces = [...board.querySelectorAll('.profile-piece')];
+  assert.notEqual(board, original);
+  assert.equal(pieces.length, 32);
+  assert.equal(board.querySelectorAll('.piece-img:not(.profile-piece),.sq-badge,.best-arrow,.mate-badge-layer').length, 0);
+  assert.ok([...board.querySelectorAll('.sq')].every(sq => sq.querySelectorAll('.piece-img').length <= 1));
+  a.call('paintBoard'); a.call('buildBoard'); a.call('renderBestArrow'); a.call('toggleFlip'); a.call('toggleAuto');
+  assert.equal(doc.querySelector('.board'), board);
+  assert.equal(board.querySelector('.profile-piece'), pieces[0]);
+  assert.equal(a.state.autoTimer, null);
+  for (const key of ['ArrowRight', 'End', 'Home']) {
+    doc.body.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key, bubbles: true}));
+    assert.equal(a.state.idx, idx, 'profile shortcuts leave the review position intact');
+  }
+  assert.equal(doc.querySelector('.profile-slide').dataset.slide, 'cover');
+  a.run('profileWorkspace').close();
+  assert.equal(a.state.idx, idx);
+  assert.equal(doc.querySelectorAll('.board .profile-piece').length, 0);
+  assert.equal(doc.querySelectorAll('.board .piece-img').length, 32);
+});
+
+test('choosing another player aborts pending storage reads and clears the previous report', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  seed(a); await openDeck(a);
+  const w = a.run('profileWorkspace'), pending = deferred(), loadRows = w.store.loadRows;
+  w.store.loadRows = () => pending.promise;
+  w.account = 'other'; const loading = w.load();
+  assert.equal(w.report, null); assert.equal(w.rows.length, 0);
+  assert.equal(doc.querySelector('.profile-nav').children.length, 0);
+  w.renderChooser();
+  pending.resolve({rows: season(), updatedAt: Date.now(), since: 0});
+  await loading;
+  assert.ok(doc.querySelector('.profile-setup'));
+  assert.equal(w.report, null);
+  w.store.loadRows = loadRows;
+});
+
+test('an old engine read cannot replace a new account or repaint after closing', async t => {
+  const a = review(t); seed(a); await openDeck(a);
+  const w = a.run('profileWorkspace'), pending = deferred();
+  w.store.loadEngine = () => pending.promise;
+  const load = w.loadEngine();
+  w.account = 'other'; w.engine = {current: {acc: 90}};
+  pending.resolve({old: {v: 1, acc: 20}}); await load;
+  assert.deepEqual(w.engine, {current: {acc: 90}});
+  await w.close();
+  await w.onJobChange({site: w.site, account: w.account, status: 'done'});
+  assert.equal(a.dom.window.document.querySelector('.profile-shell'), null);
+});
+
+test('engine progress preserves the current slide and does not restart its board playback', async t => {
+  const a = review(t); seed(a); await openDeck(a);
+  const w = a.run('profileWorkspace');
+  w.go(w.deck.findIndex(s => s.board?.kind === 'moves'));
+  const piece = w.boardEl.querySelector('.profile-piece'), id = w.deck[w.index].id;
+  await w.onJobChange({site: w.site, account: w.account, status: 'running', done: 10, total: 40, updatedAt: Date.now()});
+  assert.equal(w.deck[w.index].id, id);
+  assert.equal(w.boardEl.querySelector('.profile-piece'), piece);
+});
+
+test('closing with motion releases the board before opening another workspace', async t => {
+  const a = review(t); seed(a); await openDeck(a);
+  const old = a.run('profileWorkspace'); a.state.settings.uiAnim = true;
+  const closing = old.close();
+  assert.equal(a.run('profileWorkspace'), null);
+  await openDeck(a);
+  const next = a.run('profileWorkspace'), board = next.boardEl;
+  assert.ok(board);
+  await closing;
+  assert.equal(a.run('profileWorkspace'), next);
+  assert.equal(a.dom.window.document.querySelector('.board'), board);
+  a.state.settings.uiAnim = false;
+});
+
+test('a delayed share preview cannot repaint a new slide or player', async t => {
+  const a = review(t); seed(a); await openDeck(a);
+  const w = a.run('profileWorkspace'), pending = deferred(); let previews = 0;
+  w.cardCanvas = () => pending.promise;
+  w.board.card = () => { previews++; };
+  w.go(w.deck.findIndex(s => s.id === 'share'));
+  w.renderChooser();
+  pending.resolve({}); await settle();
+  assert.equal(previews, 0);
+  assert.ok(a.dom.window.document.querySelector('.profile-setup'));
 });

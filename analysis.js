@@ -495,7 +495,7 @@ const ICONS = {
   play: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l12 7-12 7z"/></svg>`,
   pause: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>`,
   bolt: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L4 14h6l-1 8 9-12h-6z"/></svg>`,
-  trophy: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 4h12v3a6 6 0 0 1-12 0V4ZM6 5H3v2a3 3 0 0 0 3 3M18 5h3v2a3 3 0 0 1-3 3M9 19h6M12 13v6"/></svg>`,
+  trophy: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10v6a5 5 0 0 1-10 0V3ZM7 5H4v2a4 4 0 0 0 4 4M17 5h3v2a4 4 0 0 1-4 4M8 21h8M12 14v7"/></svg>`,
   chevron: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>`,
   book: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h6v16H6a2 2 0 0 0-2 2zM20 5a2 2 0 0 0-2-2h-6v16h6a2 2 0 0 1 2 2z"/></svg>`,
   library: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16M9 4v16M14 5l4 15M18.5 4.2 14 5"/></svg>`,
@@ -1770,6 +1770,7 @@ function toggleLearning() {
 }
 let profileWorkspace = null;
 let openingProfile = false;
+function profileOwnsBoard() { return !!profileWorkspace && !profileWorkspace.closed; }
 function toggleProfile() {
   if (profileWorkspace) return profileWorkspace.close();
   return openProfile();
@@ -1797,8 +1798,11 @@ async function profileIdentity(site) {
   return {site, accounts, accountsBySite, country};
 }
 async function openProfile({shared = null} = {}) {
-  if (profileWorkspace || openingProfile) return;
+  if (profileWorkspace || openingProfile || openingLearning) return;
   if (learningWorkspace) { await learningWorkspace.close(); if (learningWorkspace) return; }
+  if (S.practice && (S.practice.rolling || S.practice.demoing || S.practice.busy)) {
+    toast("Let the current practice move finish, then open the profile."); return;
+  }
   openingProfile = true;
   let ProfileWorkspace;
   try { ({ProfileWorkspace} = await loadProfileWorkspace()); }
@@ -1817,9 +1821,10 @@ async function openProfile({shared = null} = {}) {
     settings:()=>S.settings, writeSettings:patch=>{Object.assign(S.settings,patch);return writeSettings(patch);}, identity, shared, toast,
     icon:name=>ICONS[name]||"", flag, url:_url,
     requestClose:()=>profileWorkspace?.close(),
-    buildOwn:()=>{const current=profileWorkspace;profileWorkspace=null;current.close();openProfile();},
+    buildOwn:async()=>{await profileWorkspace.close();openProfile();},
     restoreBoard:()=>{ if(!UI.boardWrap.querySelector(".board"))return; buildBoard(); renderPlayers(); },
-    onClose:()=>{ if(profileWorkspace&&profileWorkspace.closed)profileWorkspace=null; syncProfileToggle(); if (UI.settings && !UI.settings.hidden) renderSettings(); document.getElementById("profileToggle")?.focus({preventScroll:true}); }});
+    onClose:()=>{ if(profileWorkspace&&profileWorkspace.closed)profileWorkspace=null; syncProfileToggle(); if (UI.settings && !UI.settings.hidden) renderSettings(); document.getElementById("profileToggle")?.focus({preventScroll:true});
+      if(deferredPracticeAdvance){deferredPracticeAdvance=false;const practice=S.practice;setTimeout(()=>{if(S.practice===practice&&!profileOwnsBoard())practiceAdvance();},1300);} }});
   openingProfile = false;
   syncProfileToggle();
   try { await profileWorkspace.open(); }
@@ -1838,8 +1843,8 @@ function syncLearningToggle() {
 }
 async function openLearning() {
   pauseBackgroundAnalysis();
-  if (learningWorkspace || openingLearning) return;
-  if (profileWorkspace) { profileWorkspace.close(); profileWorkspace = null; }
+  if (learningWorkspace || openingLearning || openingProfile) return;
+  if (profileWorkspace) await profileWorkspace.close();
   learningAnnouncement?.close();
   openingLearning = true;
   const positions = S.positions;
@@ -2538,7 +2543,7 @@ function makePiece(type, side) {
 function buildBoard() {
   _cancelBoardDrag?.();
   _cancelPromotion?.();
-  if (learningWorkspace?.embedded) return;
+  if (learningWorkspace?.embedded || profileOwnsBoard()) return;
   reviewEffects.clear();
   const files = ["a","b","c","d","e","f","g","h"];
   const ranks = [8,7,6,5,4,3,2,1];
@@ -2573,6 +2578,7 @@ function matedSquare(fen) {
   return mateMarkSquare;
 }
 function paintBoard({restoring=false}={}) {
+  if (profileOwnsBoard()) return;
   if (learningWorkspace?.embedded&&!restoring) return;
   const pos = activePos();
   const boardEl = UI.boardWrap.querySelector(".board");
@@ -2702,7 +2708,7 @@ function arrowBuild(pts, headLen, headHalf) {
 }
 const arrowFmt = (p) => `${+p.x.toFixed(4)},${+p.y.toFixed(4)}`;
 function renderBestArrow() {
-  if (learningWorkspace?.embedded) return;
+  if (learningWorkspace?.embedded || profileOwnsBoard()) return;
   const board = UI.boardWrap.querySelector(".board");
   if (!board) return;
   let svg = board.querySelector("svg.best-arrow");
@@ -2790,7 +2796,7 @@ function toggleUserArrow(from, to) {
 }
 // preview: temporary arrow during dragging (drawn on top of the saved ones).
 function renderUserArrows(preview) {
-  if (learningWorkspace?.embedded) return;
+  if (learningWorkspace?.embedded || profileOwnsBoard()) return;
   const board = UI.boardWrap.querySelector(".board");
   if (!board) return;
   let svg = board.querySelector("svg.user-arrows");
@@ -2907,7 +2913,7 @@ let _threatToken = 0;
 async function renderThreatArrow() {
   if (S.helperEngine?.dead) resetHelperEngine();
   const token = ++_threatToken;
-  if (learningWorkspace?.embedded) return;
+  if (learningWorkspace?.embedded || profileOwnsBoard()) return;
   const board = UI.boardWrap.querySelector(".board");
   if (!board) return;
   let svg = board.querySelector("svg.threat-arrow");
@@ -2920,11 +2926,11 @@ async function renderThreatArrow() {
   let uci = S.threatCache.get(cacheKey);
   if (uci === undefined) {
     let eng; try { eng = await getHelperEngine(); } catch { return; }
-    if (token !== _threatToken || learningWorkspace?.embedded || !S.settings.showThreat) return;
+    if (token !== _threatToken || learningWorkspace?.embedded || profileOwnsBoard() || !S.settings.showThreat) return;
     eng.stop();
     const targetFen = threatFen(fen);
     let res; try { res = await eng.analyse(targetFen, Math.min(14, S.settings.engineDepth), 1, targetFen === fen ? history : null); } catch { return; }
-    if (token !== _threatToken || learningWorkspace?.embedded || !S.settings.showThreat) return;
+    if (token !== _threatToken || learningWorkspace?.embedded || profileOwnsBoard() || !S.settings.showThreat) return;
     uci = res && res.bestmove ? res.bestmove : null;
     S.threatCache.set(cacheKey, uci);
     if (activePos().fen !== fen || JSON.stringify(activeSearchHistory()) !== historyKey || UI.boardWrap.querySelector(".board") !== board) return;
@@ -3023,7 +3029,7 @@ function initBoardInput() {
   // Never let the browser start its own image/element drag on the board (the stray ghost image).
   wrap.addEventListener("dragstart", (e) => {if (!learningWorkspace?.embedded) e.preventDefault();});
   wrap.addEventListener("pointerdown", (e) => {
-    if (learningWorkspace || S.blank) return;
+    if (learningWorkspace || profileOwnsBoard() || S.blank) return;
     if (e.button === 2) { rightPointerDown(e); return; }
     if (e.button !== 0) return;
     // During practice the board only accepts moves while you're actively solving (not while it's
@@ -3509,6 +3515,7 @@ function exitAnalysis(mainIdx,{render=true}={}) {
    slide into place via a transform transition. animSpeed 1..10 → duration 400..40 ms. */
 function animDuration() { return moveAnimationDuration(S.settings); }
 function animateMove(fromName, toName, ms) {
+  if (profileOwnsBoard()) return;
   const fromSq = sqByName[fromName], toSq = sqByName[toName];
   if (!fromSq || !toSq) return;
   const piece = toSq.querySelector(".piece, .piece-svg, .piece-img");
@@ -3737,7 +3744,7 @@ function renderPlayers() {
 // centered in its module, so we measure instead of guessing a fixed offset).
 function alignPlayers() {
   // The learning board has its own geometry; keep the saved review labels still.
-  if (learningWorkspace?.embedded) return;
+  if (learningWorkspace?.embedded || profileOwnsBoard()) return;
   const board = UI.boardWrap && UI.boardWrap.querySelector(".board");
   const top = UI.playerTop && UI.playerTop.querySelector(".player-strip");
   if (!board || !top) return;
@@ -5777,7 +5784,7 @@ function waitForBackgroundAnalysis(job, delay) {
   });
 }
 function backgroundAnalysisBusy() {
-  return document.hidden || learningWorkspace?.embedded || S.analysisMode || !!S.practice || S.bestWalking || S.lineWalking
+  return document.hidden || learningWorkspace?.embedded || profileOwnsBoard() || S.analysisMode || !!S.practice || S.bestWalking || S.lineWalking
     || !!S._panelRequest || !!S.liveEngine?.current || !!S.helperEngine?.current
     || Date.now() - backgroundInteractionAt < 500;
 }
@@ -7624,7 +7631,7 @@ function practiceBeginSolve(solvePos) {
   renderControls(); renderReview(); renderEngineCurrent();
 }
 function practiceAdvance() {
-  if (learningWorkspace) { deferredPracticeAdvance = true; return; }
+  if (learningWorkspace || profileOwnsBoard()) { deferredPracticeAdvance = true; return; }
   const p = S.practice; if (!p) return;
   p.i++;
   p.solving = false;
@@ -8260,6 +8267,7 @@ function variationStep(delta) {
   requestLiveEval();
 }
 function toggleFlip() {
+  if (profileOwnsBoard()) return;
   if (learningWorkspace?.embedded) {
     learningWorkspace.flipBoard();
     return;
@@ -8267,6 +8275,7 @@ function toggleFlip() {
   S.flipped = !S.flipped; buildBoard(); renderPlayers(); renderEvalBar();
 }
 function toggleAuto() {
+  if (profileOwnsBoard()) return;
   if (S.autoTimer) { clearInterval(S.autoTimer); S.autoTimer = null; }
   else S.autoTimer = setInterval(() => {
     if (S.analysisMode || S.idx >= S.total) { clearInterval(S.autoTimer); S.autoTimer = null; renderControls(); return; }
@@ -8287,7 +8296,7 @@ document.addEventListener("keydown", (e) => {
     // The return animation must not restore button focus after navigation starts.
     learningWorkspace.previousFocus = null;
   }
-  if (learningWorkspace || S.blank) return;
+  if (learningWorkspace || profileOwnsBoard() || S.blank) return;
   if (e.key === "Tab" && !e.target?.closest?.('#settings,.accuracy-panel,.engine-focus,[role="dialog"],[role="alertdialog"]')) {
     e.preventDefault(); return;
   }

@@ -122,7 +122,7 @@ body:has(.full-hd-reference) .learning-embedded .learn-shell {
 .app:has(.full-hd-reference) .topbar-right {gap:6.96px;}
 .app:has(.full-hd-reference) .icon-btn {width:31.32px;height:31.32px;border-radius:7.83px;}
 .app:has(.full-hd-reference) .icon-btn svg {width:14.79px;height:14.79px;}
-.app:has(.full-hd-reference) .learning-toggle {width:174px;padding:0 10.44px;grid-template-columns:14.79px 1fr;gap:6.96px;font-size:10.44px;}
+.app:has(.full-hd-reference) .learning-toggle {width:174px;padding:0 10.44px;grid-template-columns:14.79px minmax(0,max-content);gap:6.96px;font-size:10.44px;}
 .app:has(.full-hd-reference):not(.has-learning) .library-rail {height:calc((100dvh - var(--topbar-h)) / (.87 * var(--reference-chrome-scale,1)));bottom:auto;transform:scale(calc(.87 * var(--reference-chrome-scale,1)));transform-origin:top left;}
 .app:has(.full-hd-reference).has-learning .library-rail {height:calc((100dvh - var(--topbar-h)) / (.87 * var(--reference-chrome-scale,1)));bottom:auto;transform:translateX(calc(var(--learning-library-offset, -40px) * var(--reference-chrome-scale,1))) scale(calc(.87 * var(--reference-chrome-scale,1)));transform-origin:top left;}
 .app:has(.full-hd-reference) .feedback-floating {transform:scale(calc(.87 * var(--reference-chrome-scale,1)));transform-origin:bottom right;right:calc(15.66px * var(--reference-chrome-scale,1));bottom:calc(15.66px * var(--reference-chrome-scale,1));}

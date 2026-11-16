@@ -1,0 +1,47 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import {season} from '../tests/helpers/profile-season.mjs';
+import {rowsKey} from '../lib/profile/store.js';
+
+export async function auditLearning({review, call, evaluate, waitFor, sleep, out}) {
+  const run = code => evaluate(review, code);
+  const rows = season();
+  await run(`import('./browser-compat.js').then(({browserAPI})=>browserAPI.storage.local.set(${JSON.stringify({[rowsKey('chesscom', 'tester')]: {rows, months: [], since: 0, updatedAt: Date.now()}})}))`);
+  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  const evidence = [];
+  for (const [width, height] of [[1920,1080], [1366,768], [1280,600], [800,900], [600,800]]) {
+    await call('Emulation.setDeviceMetricsOverride', {width,height,deviceScaleFactor:1,mobile:false}, review.sessionId);
+    await sleep(150);
+    await run(`import('./analysis.js').then(async m=>{m.S.settings.uiAnim=true;m.S.settings.pieceStyle='merida';window.profileReviewIdx=m.S.idx;await m.openProfile();const w=m.profileWorkspace;w.account='tester';w.renderHead();await w.load();})`);
+    await waitFor(review, "!!document.querySelector('.profile-slide[data-slide=cover]')", 'Profile cover');
+    await sleep(350);
+    const cover = await run(`(()=>{const board=document.querySelector('.profile-board'),p=document.querySelector('.profile-shell'),r=p.getBoundingClientRect();return {pieces:board.querySelectorAll('.piece-img').length,duplicates:[...board.querySelectorAll('.sq')].some(s=>s.querySelectorAll('.piece-img').length>1),status:getComputedStyle(p.querySelector('.profile-status')).display,rect:{left:r.left,right:r.right,top:r.top,bottom:r.bottom,height:r.height},sets:[...new Set([...board.querySelectorAll('.piece-img')].map(i=>i.dataset.set))]};})()`);
+    assert.equal(cover.pieces,32); assert.equal(cover.duplicates,false); assert.equal(cover.status,'none'); assert.deepEqual(cover.sets,['merida']);
+    assert.ok(cover.rect.left >= 0 && cover.rect.right <= width+1 && cover.rect.top >= 0 && cover.rect.bottom <= height+1 && cover.rect.height > 180, JSON.stringify(cover.rect));
+    const shot = await call('Page.captureScreenshot',{format:'png'},review.sessionId);
+    await fs.writeFile(path.join(out,`profile-${width}x${height}.png`),Buffer.from(shot.data,'base64'));
+    const stable = await run(`import('./analysis.js').then(async m=>{const w=m.profileWorkspace,b=w.boardEl;const img=b.querySelector('.profile-piece');m.paintBoard();m.buildBoard();const samePiece=img===b.querySelector('.profile-piece');await new Promise(r=>setTimeout(r,1100));const stableCover=img===b.querySelector('.profile-piece');document.body.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}));const index=m.S.idx;const id=w.deck[w.index].id;return {sameBoard:b===document.querySelector('.board'),samePiece,stableCover,index,original:profileReviewIdx,slide:id};})`);
+    assert.ok(stable.sameBoard); assert.ok(stable.samePiece); assert.ok(stable.stableCover); assert.equal(stable.index,stable.original); assert.equal(stable.slide,'numbers');
+    const slides = await run(`import('./analysis.js').then(async m=>{const w=m.profileWorkspace,out=[];for(let i=0;i<w.deck.length;i++){w.go(i);await new Promise(r=>setTimeout(r,30));out.push({id:w.deck[i].id,duplicates:[...w.boardEl.querySelectorAll('.sq')].some(s=>s.querySelectorAll('.piece-img').length>1)});}return out;})`);
+    assert.ok(slides.length>=12); assert.ok(slides.every(s=>!s.duplicates));
+    await waitFor(review, "!!document.querySelector('.profile-card-preview')", 'Share card preview');
+    const card = await run(`import('./analysis.js').then(async m=>{const w=m.profileWorkspace,first=w.boardEl.querySelector('.profile-card-preview').src;w.go(w.deck.findIndex(s=>s.board?.kind==='heat'));w.go(w.deck.findIndex(s=>s.id==='share'));const canvas=await w.cardCanvas();return {same:first===canvas.toDataURL('image/png'),width:canvas.width,height:canvas.height};})`);
+    assert.ok(card.same, 'Share card must be independent of the previous board'); assert.equal(card.width,1200); assert.equal(card.height,630);
+    // Exercise resizing while open in both directions, including reattaching
+    // the compact board to the review module before restoring the game.
+    await call('Emulation.setDeviceMetricsOverride', {width:width>900?800:1280,height,deviceScaleFactor:1,mobile:false}, review.sessionId);
+    await sleep(100);
+    assert.equal(await run("document.querySelectorAll('.profile-board .sq').length"),64);
+    await call('Emulation.setDeviceMetricsOverride', {width,height,deviceScaleFactor:1,mobile:false}, review.sessionId);
+    await sleep(100);
+    await run("import('./analysis.js').then(async m=>{await m.profileWorkspace.close();await m.openLearning();})");
+    await waitFor(review, "import('./analysis.js').then(m=>!!m.learningWorkspace?.ready)", 'Learning after profile');
+    await run("import('./analysis.js').then(m=>m.learningWorkspace.close())");
+    await waitFor(review, "import('./analysis.js').then(m=>!m.learningWorkspace)", 'Review restored');
+    assert.equal(await run("document.querySelectorAll('.profile-piece').length"),0);
+    evidence.push({width,height,cover,slides:slides.length});
+  }
+  await fs.writeFile(path.join(out,'profile-results.json'),JSON.stringify(evidence,null,2));
+  console.log('Profile browser audit passed: '+out);
+}
