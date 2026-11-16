@@ -258,3 +258,64 @@ test('a delayed share preview cannot repaint a new slide or player', async t => 
   assert.equal(previews, 0);
   assert.ok(a.dom.window.document.querySelector('.profile-setup'));
 });
+
+test('setup choices preserve the form, typed names and bot selection', async t => {
+  const a = review(t); await open(a);
+  const doc = a.dom.window.document, form = doc.querySelector('.profile-setup'), title = form.querySelector('h2');
+  const input = form.querySelector('input[type="text"]'), bots = form.querySelector('input[type="checkbox"]');
+  input.value = 'new-player'; input.dispatchEvent(new a.dom.window.Event('input')); bots.checked = true;
+  [...form.querySelectorAll('[role="radio"]')].find(button => button.textContent === 'Both').click();
+  [...form.querySelectorAll('[role="radio"]')].find(button => button.textContent === 'All time').click();
+  assert.equal(doc.querySelector('.profile-setup'), form);
+  assert.equal(form.querySelector('h2'), title, 'choosing a setting cannot replay the form entry fade');
+  assert.equal(form.querySelector('input[type="text"]').value, 'new-player');
+  assert.equal(form.querySelector('input[type="checkbox"]'), bots); assert.equal(bots.checked, true);
+  assert.ok(!form.textContent.includes('Games come from'));
+});
+
+test('rating mode changes the headline, chart, evidence and board together; chart points can be inspected', async t => {
+  const a = review(t); seed(a); await openDeck(a);
+  const w = a.run('profileWorkspace'), doc = a.dom.window.document;
+  w.go(w.deck.findIndex(slide => slide.id === 'rating'));
+  [...doc.querySelectorAll('.profile-rating-modes button')].find(button => button.textContent === 'Bullet').click();
+  assert.equal(w.deck[w.index].ratingClass, 'bullet');
+  assert.ok(doc.querySelector('.profile-title').textContent.startsWith('Bullet:'));
+  assert.equal(doc.querySelector('.profile-series-line').dataset.class, 'bullet');
+  assert.equal(doc.querySelector('.profile-evidence').href, w.report.ratings.bullet.peak.url);
+  const chart = doc.querySelector('.profile-series');
+  chart.getBoundingClientRect = () => ({left: 0, width: 480});
+  chart.dispatchEvent(new a.dom.window.MouseEvent('pointermove', {clientX: 42}));
+  assert.ok(doc.querySelector('.profile-series-detail').textContent.includes(`${w.report.ratings.bullet.series[0].r} rating`));
+  const slide = w.index;
+  chart.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'ArrowRight', bubbles: true, cancelable: true}));
+  assert.equal(w.index, slide, 'chart inspection cannot turn a page or replay a game');
+  assert.equal(doc.querySelector('[aria-label="Refresh games"]'), null);
+});
+
+test('arrow keys navigate illustrated games while PageDown advances the profile', async t => {
+  const a = review(t); seed(a); await openDeck(a);
+  const w = a.run('profileWorkspace'), doc = a.dom.window.document;
+  w.go(w.deck.findIndex(slide => slide.id === 'openings'));
+  const index = w.index, original = a.state.idx;
+  doc.body.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'ArrowLeft', bubbles: true, cancelable: true}));
+  assert.equal(w.index, index); assert.ok(doc.querySelector('.profile-caption-move').textContent);
+  doc.body.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'ArrowRight', bubbles: true, cancelable: true}));
+  assert.equal(w.index, index); assert.equal(a.state.idx, original);
+  doc.body.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'PageDown', bubbles: true, cancelable: true}));
+  assert.equal(w.index, index + 1);
+});
+
+test('a final position loads its full game for arrow navigation and ignores a stale load', async t => {
+  const a = review(t); seed(a); await openDeck(a);
+  const w = a.run('profileWorkspace'), doc = a.dom.window.document;
+  const rating = w.deck.findIndex(slide => slide.id === 'rating');
+  w.o.loadPgn = async () => '1. e4 e5 2. Nf3 Nc6 *'; w.go(rating);
+  await w.stepGame(-1);
+  assert.ok(doc.querySelector('.profile-caption-move').textContent.includes('Nf3'));
+  await w.stepGame(-1); assert.ok(doc.querySelector('.profile-caption-move').textContent.includes('e5'));
+  w.go(0); w.go(rating);
+  const pending = deferred(); w.o.loadPgn = () => pending.promise;
+  const load = w.stepGame(-1); w.go(1);
+  pending.resolve('1. e4 e5 *'); await load;
+  assert.equal(doc.querySelectorAll('.profile-piece').length, 0, 'late game moves cannot replace the results board');
+});

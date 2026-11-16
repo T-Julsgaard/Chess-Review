@@ -43,8 +43,8 @@ another computer; the design decisions are recorded in [PLAYER_PROFILE_PLAN.md](
 ## Fully usable now
 
 Open any review, press **Player profile**. The panels fade into one profile panel; the board
-plays the cover. With a known account (signed-in, remembered or recurring in your reviewed games)
-the profile loads from the local store, refreshes the current month, and shows the deck at once.
+plays the cover after **Build profile**. Known accounts (signed-in, remembered or recurring in
+your reviewed games) are prefilled. Saved games load immediately and newer games refresh in the background.
 The slides are: cover, the numbers, rating journey, your openings, your historical twin, signature
 moves, your rival, greatest hits, comebacks and the one that got away, chess habits, on the clock,
 then and now, how your games end, share. Each slide drives the board: first moves, progressive
@@ -54,12 +54,20 @@ from its low point, your week as a weekday-by-hour heat-map, the longest think, 
 your latest checkmate and the share card. Every number has a sample and, where a game is involved,
 an **Open** link to the platform.
 
+Section headings identify each chapter at a glance. The results board preserves fractional
+win/draw/loss squares. Rating journey has a game-mode selector; hovering over the chart or
+focusing it and using arrows reveals each plotted date and rating. On game slides, Left/Right
+step through moves (full games load on first use); Page Up/Page Down and the navigation buttons
+change slides. Pieces assemble and disassemble through the board edges.
+
 The engine check never starts by itself. The Then-and-now slide offers **Run engine check** with
 Quick (about 40 games, 2 min), Standard (about 150, 10 min) or Deep (about 400, 30 min). The job
 runs in the extension's offscreen document (Chrome) or background page (Firefox), so the review
 tab can be closed; results are cached per game and a stale job can be resumed. Engine figures
 fill the Then-and-now and On-the-clock slides and verify the comeback and choke with winning
 chances.
+Chrome's offscreen host uses runtime messages for profile storage and cached PGN lookups;
+the background process performs those operations because offscreen documents cannot use storage APIs.
 
 Share copies a link to `https://t-julsgaard.github.io/Chess-Review/profile/#p=…`. Without the
 extension the page decodes the fragment in the browser and shows a read-only deck with install

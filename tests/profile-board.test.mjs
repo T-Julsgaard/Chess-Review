@@ -64,3 +64,28 @@ test('flipped profile boards place pieces and coordinates on the same squares', 
   assert.equal(board.querySelector('.coord.rank').textContent, '8');
   assert.equal(board.querySelector('.coord.file').textContent, 'a');
 });
+
+test('results preserve half and sixth squares instead of rounding away draws', t => {
+  const {api, board} = surface(t, false);
+  api.fill(128, 32, 3);
+  assert.equal(board.children[17].style.getPropertyValue('--fill-color'), 'linear-gradient(to right, var(--q-best) 0% 0%, var(--ink-2) 0% 50%, var(--q-miss) 50% 100%)');
+  api.fill(384, 99, 1);
+  const stops = [...board.children[16].style.getPropertyValue('--fill-color').matchAll(/([\d.]+)%/g)].map(match => Number(match[1]));
+  assert.equal(stops[1], 50, 'half of the boundary square is a win');
+  assert.ok(Math.abs(stops[3] - stops[1] - 100 / 6) < .000001, 'one sixth is a draw');
+});
+
+test('manual arrows take over autoplay, respect endpoints and release on another slide', t => {
+  t.mock.timers.enable({apis: ['setTimeout']});
+  const {api, at} = surface(t); const steps = [];
+  api.moves(['e4', 'e5', 'Nf3'], {onStep: (move, i) => steps.push([move?.san, i])});
+  assert.equal(api.step(1), true); assert.ok(at('e4'));
+  t.mock.timers.tick(20000);
+  assert.equal(at('e5'), null, 'autoplay stops when the user takes over');
+  api.step(1); assert.ok(at('e5'));
+  api.step(-1); assert.ok(at('e7')); assert.equal(at('e5'), null);
+  api.step(-1); api.step(-1); assert.ok(at('e2'));
+  assert.deepEqual(steps.at(-1), [undefined, 0]);
+  api.heat(Array(64).fill(0));
+  assert.equal(api.step(1), false, 'old moves cannot replace another visualization');
+});

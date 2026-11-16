@@ -55,9 +55,16 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-slide-host { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 18px 20px 12px; }
 .profile-slide { display: flex; flex-direction: column; gap: 12px; animation: profile-slide-in .28s cubic-bezier(.2,.8,.2,1) both; }
 .profile-slide[data-direction="prev"] { animation-name: profile-slide-in-back; }
+.profile-slide[data-animate="off"] { animation: none; }
+.profile-section-title { margin: 0 0 2px; font-size: clamp(28px, 3.2vw, 44px); line-height: 1.05; font-weight: 850; letter-spacing: -1px; text-wrap: balance; }
+.profile-section-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.profile-slide[data-slide="rating"] .profile-section-title { font-size: clamp(28px, 2.6vw, 36px); }
+.profile-slide[data-slide="rating"] .profile-stat { padding: 8px 10px; }
+.profile-slide[data-slide="rating"] .profile-stat-value { font-size: 20px; }
+.profile-slide[data-slide="rival"] .profile-stat-value { font-size: 16px; line-height: 1.5; }
 @keyframes profile-slide-in { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
 @keyframes profile-slide-in-back { from { opacity: 0; transform: translateX(-18px); } to { opacity: 1; transform: none; } }
-.profile-title { margin: 0; font-size: clamp(24px, 2.6vw, 36px); line-height: 1.08; letter-spacing: -.8px; font-weight: 800; overflow-wrap: anywhere; display: flex; align-items: center; gap: 10px; }
+.profile-title { margin: 0; font-size: clamp(23px, 2.4vw, 32px); line-height: 1.12; letter-spacing: -.6px; font-weight: 800; overflow-wrap: anywhere; display: flex; align-items: center; gap: 10px; }
 .profile-title img { width: 28px; height: 20px; border-radius: 3px; }
 .profile-lead { margin: 0; font-size: 15px; line-height: 1.55; color: var(--ink-2); }
 .profile-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
@@ -75,8 +82,15 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-evidence { align-self: flex-start; font-size: 13px; font-weight: 650; color: var(--accent); text-decoration: none; padding: 6px 0; }
 .profile-evidence:hover { text-decoration: underline; }
 
-.profile-series-wrap { display: flex; flex-direction: column; gap: 4px; }
-.profile-series { width: 100%; height: 90px; display: block; }
+.profile-rating-modes { max-width: 100%; flex-wrap: wrap; margin-left: auto; }
+.profile-series-wrap { display: flex; flex-direction: column; gap: 6px; padding: 12px 10px 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); }
+.profile-series { width: 100%; height: auto; aspect-ratio: 480 / 178; display: block; overflow: visible; touch-action: pan-y; }
+.profile-series-grid { stroke: var(--line); stroke-width: 1; stroke-dasharray: 3 5; }
+.profile-series-label { fill: var(--ink-2); font-size: 10px; font-family: inherit; }
+.profile-series-area { fill: var(--accent); opacity: .1; }
+.profile-series-guide { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 3 4; pointer-events: none; }
+.profile-series-point { fill: var(--accent); stroke: var(--panel); stroke-width: 2; pointer-events: none; }
+.profile-series-detail { min-height: 1.5em; color: var(--ink-2); font-size: 12px; text-align: center; font-variant-numeric: tabular-nums; }
 .profile-series-line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
 .profile-series-line.series-0, .profile-series-legend .series-0 { stroke: var(--accent); color: var(--accent); }
 .profile-series-line.series-1, .profile-series-legend .series-1 { stroke: var(--q-great); color: var(--q-great); }
@@ -141,7 +155,9 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-split-box strong { font-size: clamp(22px, 3vw, 40px); font-weight: 800; letter-spacing: -.6px; }
 .profile-split-box span { font-size: 12px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--ink-2); }
 .profile-card-preview { grid-column: 1 / -1; width: 86%; height: auto; border-radius: 10px; box-shadow: 0 10px 30px #0006; border: 1px solid var(--line); }
-.profile-board { position: relative; }
+.profile-board { position: relative; overflow: hidden; }
+.profile-game-controls { display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.profile-move-hint { font-size: 11px; }
 .profile-board-surface { position: fixed; z-index: 54; }
 .profile-board-surface .board { width: 100%; height: 100%; }
 .profile-stacked .profile-head, .profile-stacked .profile-nav { flex-shrink: 0; }
@@ -159,6 +175,7 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 /* Setup — whose games, which site, how far back */
 .profile-setup { display: flex; flex-direction: column; justify-content: center; gap: 18px; max-width: 560px; min-height: 100%; box-sizing: border-box; padding: 4px 2px 8px; animation: profile-fade .36s ease-out both; }
 .profile-setup-intro { display: flex; flex-direction: column; gap: 8px; }
+.profile-account-fields { display: flex; flex-direction: column; gap: 18px; }
 .profile-setup-title { margin: 0; font-size: clamp(22px, 2.1vw, 30px); line-height: 1.1; letter-spacing: -.7px; font-weight: 800; }
 .profile-setup .profile-lead { font-size: 14px; }
 .profile-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
@@ -209,8 +226,8 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-loader .profile-button.ghost { margin-top: 6px; font-size: 12px; min-height: 30px; padding: 5px 12px; color: var(--ink-2); }
 @keyframes profile-fade { from { opacity: 0; } to { opacity: 1; } }
 
-/* Pieces gliding between positions: leaving pieces dissolve as ghosts */
-.profile-glide { position: absolute; inset: 0; pointer-events: none; z-index: 8; }
+/* Pieces travel through the board edges as positions assemble/disassemble. */
+.profile-glide { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 8; }
 .profile-glide-piece { position: absolute; width: 12.5%; height: 12.5%; display: grid; place-items: center; }
 .profile-glide-piece .piece-img { position: static; inset: auto; width: 94%; height: 94%; object-fit: contain; animation: none; }
 
