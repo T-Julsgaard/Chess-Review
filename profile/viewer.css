@@ -65,3 +65,18 @@ main { width: min(1180px, 100%); margin: 0 auto; padding: clamp(16px, 3vw, 36px)
 .about p { margin: 8px 0; }
 code { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .9em; }
 @media (prefers-reduced-motion: reduce) { .slide { animation: none; } }
+
+/* Historical twin: the board's pieces swirl up and settle into the twin's face (lib/profile/portrait.js). */
+#board { position: relative; }
+.sq img { transition: opacity .6s ease, transform .6s ease; }
+.board.profile-portrait-burst .sq img { opacity: 0; transform: scale(.35) rotate(25deg); transition: opacity .8s ease, transform .9s cubic-bezier(.5, 0, .75, .3); }
+.profile-board-overlay { position: absolute; inset: 0; z-index: 4; pointer-events: none; transition: opacity .5s ease; }
+.profile-portrait > * { position: absolute; inset: 0; width: 100%; height: 100%; }
+.profile-portrait-plate { background: radial-gradient(ellipse at 50% 44%, #241c15 0%, #130f0c 60%, #0a0807 100%); box-shadow: inset 0 0 70px rgba(0, 0, 0, .65); opacity: var(--portrait-plate, 1); }
+.profile-portrait-glow { filter: blur(3px); opacity: calc(var(--portrait-glow, 1) * .42); }
+.profile-portrait.profile-portrait-leaving { opacity: 0; }
+.caption-button { font: inherit; font-weight: 650; padding: 3px 10px; margin: 2px; border-radius: 7px; border: 1px solid var(--line); background: var(--panel-2); color: var(--ink); cursor: pointer; }
+.caption-button:hover { border-color: var(--accent); }
+.portrait-credit { display: block; margin-top: 4px; font-size: 11px; opacity: .75; }
+.portrait-credit a { color: inherit; }
+@media (prefers-reduced-motion: reduce) { .sq img, .profile-board-overlay { transition: none; } }

@@ -41,6 +41,26 @@ Distributed by Lichess (lila); high-quality vector SVGs.
 - The Chess.com country id → flag mapping in `flags.js` was compiled by hand and
   is original to this project.
 
+## Historical twin portraits
+- **Files:** `lib/profile/portraits.js` — 64×64 tone maps (cropped, greyscale, contrast-adjusted,
+  vignetted) that the Player profile's historical-twin slide assembles out of chess pieces.
+  Built by `scripts/build-twin-portraits.mjs` from photographs on Wikimedia Commons; the photos
+  themselves are not shipped. Each entry also carries its credit and source page, shown under the board.
+- Mikhail Tal (1982) — Rob C. Croes / Anefo, **CC0** — https://commons.wikimedia.org/wiki/File:Mikhail_Tal_1982or.jpg
+- Paul Morphy — unknown author, **public domain** — https://commons.wikimedia.org/wiki/File:Paul_Morphy.jpg
+- Adolf Anderssen — unknown author, **public domain** — https://commons.wikimedia.org/wiki/File:Anderssen_Adolf.jpg
+- Emanuel Lasker — unknown author, **public domain** — https://commons.wikimedia.org/wiki/File:Emanuel_Lasker_1.jpg
+- José Raúl Capablanca (1920) — unknown author, **public domain** — https://commons.wikimedia.org/wiki/File:Jos%C3%A9_Ra%C3%BAl_Capablanca_1920.jpg
+- Tigran Petrosian (1962) — Harry Pot / Anefo, **CC0** — https://commons.wikimedia.org/wiki/File:Tigran_Petrosian_1962.2.jpg
+- Anatoly Karpov (1979) — Rob C. Croes / Anefo, **CC0** — https://commons.wikimedia.org/wiki/File:Anatoly_Karpov_1979.jpg
+- Garry Kasparov (2023) — Lukasz Kobus / European Union, **CC BY 4.0** — https://commons.wikimedia.org/wiki/File:Garry_Kasparov_European_Union_2023_(cropped).jpg
+- Bobby Fischer (1966) — John Lent / AP, **public domain** — https://commons.wikimedia.org/wiki/File:Bobby_Fischer_1966_portrait.jpg
+- Richard Réti — unknown photographer (Austrian National Library), **public domain** — https://commons.wikimedia.org/wiki/File:Richard_R%C3%A9ti_(1889%E2%80%931929)_OeNB_9471305.jpg
+- Magnus Carlsen (2025) — Miroslav Vajdić, **CC BY 4.0** — https://commons.wikimedia.org/wiki/File:Magnus_Carlsen_in_2025.jpg
+- Hikaru Nakamura (2026) — ChessKelly, **CC BY 4.0** — https://commons.wikimedia.org/wiki/File:Hikaru_Nakamura_at_the_2026_Naroditsky_Memorial_Rapid_and_Blitz_(v2).jpg
+- CC BY 4.0 entries: https://creativecommons.org/licenses/by/4.0/ — changes made: cropped, converted
+  to greyscale, contrast-adjusted, vignetted and reduced to 64×64.
+
 ## Move sounds
 - **Files:** `sounds/move-self.mp3`, `sounds/capture.mp3`, `sounds/Check.mp3`,
   `sounds/Castling.mp3`

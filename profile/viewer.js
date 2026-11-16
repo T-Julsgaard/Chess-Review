@@ -6,6 +6,7 @@ import {buildDeck} from '../lib/profile/deck.js';
 import {Chess} from '../lib/chess.js';
 import {WEEKDAYS, BANDS} from '../lib/profile/insights.js';
 import {SQUARES} from '../lib/profile/features.js';
+import {createPortrait, hasPortrait, portraitCredit} from '../lib/profile/portrait.js';
 
 const $ = id => document.getElementById(id);
 const FILES = 'abcdefgh';
@@ -21,8 +22,8 @@ function buildBoard() {
   for (let rank = 8; rank >= 1; rank--) for (let f = 0; f < 8; f++) { const sq = h('div', {class: 'sq' + ((rank + f) % 2 ? '' : ' dark'), 'data-name': FILES[f] + rank}); squares.push(sq); board.append(sq); }
 }
 const byName = name => squares.find(sq => sq.dataset.name === name);
-let timers = [];
-function clearBoard() { for (const t of timers) clearTimeout(t); timers = []; for (const sq of squares) { sq.replaceChildren(); sq.className = sq.className.replace(/\b(hl|heat|fill|dim|split-l|split-r)\b/g, '').trim(); sq.style.removeProperty('--heat'); sq.style.removeProperty('--fill'); sq.removeAttribute('title'); } }
+let timers = [], portrait = null;
+function clearBoard() { portrait?.cancel(); portrait = null; $('board').querySelector('.profile-board-overlay')?.remove(); for (const t of timers) clearTimeout(t); timers = []; for (const sq of squares) { sq.replaceChildren(); sq.className = sq.className.replace(/\b(hl|heat|fill|dim|split-l|split-r)\b/g, '').trim(); sq.style.removeProperty('--heat'); sq.style.removeProperty('--fill'); sq.removeAttribute('title'); } }
 function piece(ch) { const code = (ch === ch.toUpperCase() ? 'w' : 'b') + ch.toUpperCase(); return h('img', {src: '../pieces-img/cburnett/' + code + '.svg', alt: ''}); }
 function placeFen(fen) {
   for (const sq of squares) sq.querySelectorAll('img').forEach(n => n.remove());
@@ -45,9 +46,26 @@ function playMoves(moves, from = 0, onStep) {
   };
   timers.push(setTimeout(step, 800));
 }
-function showBoard(spec) {
+/** Historical twin: the position appears, then its pieces assemble into the twin's face (portrait.js). */
+function showPortrait(spec) {
+  const chess = new Chess();
+  if (spec.kind === 'moves') for (const san of spec.moves.slice(0, spec.from || 0)) { try { chess.move(san); } catch { break; } }
+  placeFen(spec.kind === 'fen' ? spec.fen : chess.fen());
+  const board = $('board'), overlay = h('div', {class: 'profile-board-overlay'}), still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  board.append(overlay);
+  portrait = createPortrait({board, overlay, id: spec.portrait, makePiece: (type, color) => piece(color === 'w' ? type.toUpperCase() : type), pieces: '.sq img',
+    motion: () => !still, delay: 1600, label: `Portrait of ${spec.name}, made of chess pieces`});
+  const leave = () => { const face = portrait; portrait = null; face?.dismiss().then(() => { if (deck[index]?.board === spec) showBoard(spec, {face: false}); }); };
+  const credit = portraitCredit(spec.portrait);
+  $('caption').replaceChildren(`${spec.name}, assembled from the pieces on the board. `,
+    h('button', {type: 'button', class: 'caption-button', onclick: () => portrait?.replay()}, 'Replay'), ' ',
+    h('button', {type: 'button', class: 'caption-button', onclick: leave}, spec.kind === 'moves' ? 'Play the game' : 'Show the position'),
+    h('small', {class: 'portrait-credit'}, 'Photo: ', h('a', {href: credit.source, target: '_blank', rel: 'noopener noreferrer'}, credit.credit)));
+}
+function showBoard(spec, {face = true} = {}) {
   clearBoard(); $('caption').textContent = spec?.caption || '';
   if (!spec) return;
+  if (face && hasPortrait(spec.portrait)) { showPortrait(spec); return; }
   switch (spec.kind) {
     case 'cover': { const moves = [spec.white, spec.black].filter(Boolean); if (moves.length) playMoves(moves); else placeFen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'); break; }
     case 'fen': placeFen(spec.fen); break;
