@@ -105,3 +105,10 @@
 }
 .engine-minimal .engine-focus-pending { min-height:22px; padding:0; font-size:12px; line-height:22px; }
 .engine-minimal .engine-empty { padding:0; font-size:12px; line-height:1.4; }
+
+/* Modern hands Engine's unused height to Accuracy above it. While that fit changes,
+   glide Accuracy's bottom edge and Engine's top edge together (the gap stays fixed). */
+.stage.engine-fit-motion .mod:is([data-mod="accuracy"],[data-mod="engine"]),
+.stage.engine-fit-motion .mod:is([data-mod="accuracy"],[data-mod="engine"]) > .mod-inner {
+  transition:top .28s cubic-bezier(.22,.8,.24,1), height .28s cubic-bezier(.22,.8,.24,1);
+}

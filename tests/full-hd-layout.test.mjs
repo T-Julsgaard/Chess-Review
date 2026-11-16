@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {fullHdReferenceLayout,FULL_HD_SCALE} from '../lib/full-hd-layout.js';
+import {fullHdReferenceLayout,fitEngineToContent,FULL_HD_SCALE} from '../lib/full-hd-layout.js';
 import {MODERN_LAYOUT} from '../lib/ui-setups.js';
 
 const reference=JSON.parse(fs.readFileSync(new URL('./fixtures/default-panel-layout.json',import.meta.url)));
@@ -92,4 +92,36 @@ test('short laptop windows retain readable move and accuracy bodies with visible
       assert.ok(layout[key].h>=40,'Navigation retains its click target size');
     }
   }
+});
+
+test('Modern gives Engine height its lines do not need to Accuracy, keeping the gap and Engine bottom',()=>{
+  const before=structuredClone(MODERN_LAYOUT);
+  for(const [width,height]of [[1920,1080],[1920,919],[2560,1440],[1536,864],[1366,768],[1280,720],[1100,480]])for(const expanded of [false,true]){
+    const base=fullHdReferenceLayout(MODERN_LAYOUT,width,height,expanded,true);
+    const allotment=base.engine.h/base.engine.scale;
+    let previous=base;
+    for(const content of [allotment-1,allotment-40,allotment-80]){
+      const fit=fullHdReferenceLayout(MODERN_LAYOUT,width,height,expanded,true,content),grown=fit.accuracy.h-base.accuracy.h;
+      const at=`${width}x${height} ${expanded} ${content}`;
+      near(fit.engine.h,content*fit.engine.scale);
+      near(grown,base.engine.h-fit.engine.h);
+      near(fit.engine.y-(fit.accuracy.y+fit.accuracy.h),base.engine.y-(base.accuracy.y+base.accuracy.h));
+      near(fit.engine.y+fit.engine.h,base.engine.y+base.engine.h);
+      near(fit.accuracy.y,base.accuracy.y);
+      assert.ok(fit.accuracy.h>previous.accuracy.h,`${at}: fewer lines leave Accuracy more room`);
+      for(const key of Object.keys(base))if(key!=='engine'&&key!=='accuracy')assert.deepEqual(fit[key],base[key],`${at}: ${key} stays put`);
+      previous=fit;
+    }
+    for(const content of [0,NaN,undefined,allotment,allotment+60])
+      assert.deepEqual(fullHdReferenceLayout(MODERN_LAYOUT,width,height,expanded,true,content),base,'Engine never grows past its allotment');
+  }
+  assert.deepEqual(MODERN_LAYOUT,before,'Fitting never rewrites the saved preset');
+});
+test('the Engine fit applies only to Modern, and only when Accuracy sits directly above Engine',()=>{
+  const old=fullHdReferenceLayout(reference.layout,1920,919,false);
+  assert.deepEqual(fullHdReferenceLayout(reference.layout,1920,919,false,false,20),old);
+  const apart={accuracy:{x:0,y:0,w:100,h:100},engine:{x:200,y:120,w:100,h:100}};
+  assert.deepEqual(fitEngineToContent(structuredClone(apart),20),apart,'Side-by-side panels are left alone');
+  const below={engine:{x:0,y:0,w:100,h:100},accuracy:{x:0,y:120,w:100,h:100}};
+  assert.deepEqual(fitEngineToContent(structuredClone(below),20),below,'Accuracy below Engine is left alone');
 });

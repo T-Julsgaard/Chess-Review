@@ -1747,7 +1747,7 @@ function buildUI() {
   renderLibrary();
   setLibraryOpen(false);
   renderReviewSaveStatus();
-  window.addEventListener("resize", () => { fitEnginePanel(); growCanvas(); alignPlayers(); positionSettings(); });
+  window.addEventListener("resize", () => { fitEnginePanel({animate:false}); growCanvas(); alignPlayers(); positionSettings(); });
   if (window.ResizeObserver) {
     UI.boardObserver = new window.ResizeObserver(alignPlayers);
     UI.boardObserver.observe(boardWrap);
@@ -1965,7 +1965,7 @@ function isResponsiveModern() {
 function referenceLayout() {
   const modern = isResponsiveModern();
   const layout = fullHdReferenceLayout(modern ? MODERN_LAYOUT : DEFAULT_LAYOUT,
-    window.innerWidth, window.innerHeight, accuracyLayoutExpanded(), modern);
+    window.innerWidth, window.innerHeight, accuracyLayoutExpanded(), modern, modern ? S._engineFit : 0);
   if (layout && modern && S.settings.reviewMode === "dopamine") {
     // Give explanations room in the default arrangement, without saving over
     // the user's Normal layout or changing a manually arranged canvas.
@@ -2097,7 +2097,7 @@ function applyLayout() {
   UI.canvas.closest('.app').style.setProperty('--reference-chrome-scale',reference?Math.max(1,reference.review.scale/(DEFAULT_LAYOUT.review.scale*.87)):1);
   const boxes=custom?S.layout:reference;
   for (const mod of UI.canvas.querySelectorAll(".mod")) applyPanelBox(mod,boxes?.[mod.dataset.mod]);
-  fitEnginePanel();
+  fitEnginePanel({animate:false});
   scheduleAccuracyFit();
   requestAnimationFrame(positionSettings);
 }
@@ -5921,16 +5921,88 @@ async function requestPanelLines() {
   return entry.promise;
 }
 const ENGINE_NAME = { nnue: "Stockfish 18 NNUE", sf19lite: "Stockfish 19 Lite" };
+// Unscaled height reserved for each candidate row: Minimal's and Original's fixed
+// rows, and Focus's tallest (two-line) variation, so a wrapping line never resizes it.
+const ENGINE_ROW_HEIGHT = {minimal: 22, focus: 50, original: 46};
+const ENGINE_FIT_MS = 280;
+// What the rendered Engine panel needs (unscaled CSS px) for the selected line count.
+// Rows are reserved by count, not by what the search has returned so far, so pending,
+// final or forced positions never resize the panel between moves. Only a longer
+// message (practice, an engine error) can ask for more. 0 when nothing is laid out.
+function engineContentHeight() {
+  const panel = UI.engine?.firstElementChild, body = panel?.querySelector(':scope > .engine-body');
+  if (!body || !panel.offsetHeight) return 0;
+  const sum = (style, ...props) => props.reduce((total, prop) => total + (parseFloat(style[prop]) || 0), 0);
+  const outer = node => node.offsetHeight + sum(getComputedStyle(node), 'marginTop', 'marginBottom');
+  const rows = enginePanelLineCount() * (ENGINE_ROW_HEIGHT[panelDesign('engine', S.settings)] ?? ENGINE_ROW_HEIGHT.original);
+  const bodyStyle = getComputedStyle(body), items = [...body.children];
+  let height = sum(getComputedStyle(panel), 'borderTopWidth', 'borderBottomWidth', 'paddingTop', 'paddingBottom')
+    + sum(bodyStyle, 'borderTopWidth', 'borderBottomWidth', 'paddingTop', 'paddingBottom')
+    + (parseFloat(bodyStyle.rowGap) || 0) * Math.max(0, items.length - 1);
+  for (const child of panel.children) if (child !== body) height += outer(child);
+  items.forEach((child, i) => { height += i ? outer(child) : Math.max(rows, outer(child)); });
+  return Math.ceil(height);
+}
+// Glide Accuracy's bottom edge and Engine's top edge together while the content
+// fit changes. Accuracy refits its contents every frame so nothing clips mid-way.
+function startEngineFitMotion() {
+  if (S.settings.uiAnim === false || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    || document.body.hasAttribute('data-starting')) return;
+  const canvas = UI.canvas, end = performance.now() + ENGINE_FIT_MS;
+  canvas.classList.add('engine-fit-motion');
+  clearTimeout(S._engineFitMotionT); cancelAnimationFrame(S._engineFitFrame);
+  const follow = () => { scheduleAccuracyFit(); if (performance.now() < end) S._engineFitFrame = requestAnimationFrame(follow); };
+  S._engineFitFrame = requestAnimationFrame(follow);
+  S._engineFitMotionT = setTimeout(() => { canvas.classList.remove('engine-fit-motion'); scheduleAccuracyFit(); }, ENGINE_FIT_MS + 40);
+}
+// Modern gives Engine's unused height to Accuracy (fitEngineToContent). Re-fit when
+// the rendered content needs a different height. Changes the user causes (adding or
+// removing a line, practice, another Engine design) animate; window resizes, layout
+// passes and the first measurement after startup or a setup switch apply at once.
+function syncEngineFit(animate) {
+  if (S._engineFitting) return;
+  if (!isResponsiveModern() || !UI.canvas?.classList.contains('full-hd-reference')) { S._engineFit = 0; S._engineFitKey = null; return; }
+  // Live analysis re-renders Engine many times a second with the same shape;
+  // measure only when something that can change its height did.
+  const mod = UI.engine.closest('.mod'), body = UI.engine.querySelector('.engine-body');
+  const lead = body?.firstElementChild;
+  const key = JSON.stringify([panelDesign('engine', S.settings), enginePanelLineCount(), mod.style.width,
+    mod.querySelector('.mod-inner')?.style.width, document.fonts?.status, UI.engine.querySelector('.panel-head')?.textContent,
+    lead?.className, lead?.classList.contains('engine-candidates') ? '' : lead?.textContent, body?.childElementCount]);
+  if (key === S._engineFitKey && S._engineFit) return;
+  const height = engineContentHeight();
+  S._engineFitKey = height ? key : null;
+  if (!height || Math.abs(height - (S._engineFit || 0)) < 1) return;
+  if (animate && S._engineFit) startEngineFitMotion();
+  S._engineFit = height;
+  S._engineFitting = true;
+  try { applyLayout(); } finally { S._engineFitting = false; }
+}
 // Keep Engine in its allotted panel. Candidate lines scroll instead of pushing
 // playback or learning controls outside the viewport when more lines are shown.
-function fitEnginePanel() {
+function fitEnginePanel({animate = true} = {}) {
   const mod=UI.engine?.closest('.mod');if(!mod)return;
+  syncEngineFit(animate);
   if(!isCustomLayout()||isResponsiveModern()){mod.style.minHeight="";return;}
-  if(!S.layout.engine){mod.style.minHeight="";return;}
-  const height=(panelDesign('engine', S.settings) === 'minimal' ? 128 : 120)*panelScale(S.layout.engine);
+  const engine=S.layout.engine;
+  // Nothing to size before the first render; that render fits the panel.
+  if(!engine||!UI.engine.firstElementChild){mod.style.minHeight="";return;}
+  // Room for every line, or less when fewer are shown: an arrangement frozen from
+  // Modern's fitted boxes keeps its geometry instead of jumping on the first edit.
+  const scale=panelScale(engine),need=engineContentHeight();
+  const height=Math.min(panelDesign('engine', S.settings) === 'minimal' ? 128 : 120,need||Infinity)*scale;
   mod.style.minHeight=height+'px';
-  S.layout.engine.h=Math.max(S.layout.engine.h,height);
-  applyPanelBox(mod,S.layout.engine);growCanvas();
+  const grow=height-engine.h,acc=S.layout.accuracy;
+  if(grow>.5){
+    // Directly under Accuracy, take the extra height from it, keeping the gap and
+    // Engine's bottom edge, rather than pushing Engine over the panel below.
+    const gap=acc?engine.y-(acc.y+acc.h):Infinity;
+    const stacked=acc&&acc.x<engine.x+engine.w&&acc.x+acc.w>engine.x&&gap>=-1&&gap<=32*scale;
+    const up=stacked?Math.min(grow,Math.max(0,acc.h-MINH*panelScale(acc))):0;
+    if(up>0){acc.h-=up;engine.y-=up;applyPanelBox(UI.canvas.querySelector('.mod[data-mod="accuracy"]'),acc);}
+    engine.h+=grow;
+  }
+  applyPanelBox(mod,engine);growCanvas();
 }
 function renderEngine(lines, padFromCache = false) {
   const design = panelDesign('engine', S.settings), focus = design !== 'original';

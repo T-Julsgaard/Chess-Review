@@ -21,7 +21,7 @@ if (process.argv.includes('--working-tree')) {
 await fs.appendFile(path.join(source,'analysis.js'),'\nexport {S, learningWorkspace, openLearning, go, toggleFlip, applyLayoutMode, applyUserMove, paintBoard, exitAnalysis};\n');
 if(process.argv.includes('--interface-motion'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {setSetting};\n');
 if(process.argv.includes('--move-list-layout'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {renderMoves};\n');
-if(process.argv.includes('--engine-minimal'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {applyUiSetup, renderEngine, renderEngineCurrent, renderEnginePractice};\n');
+if(process.argv.includes('--engine-minimal')||process.argv.includes('--engine-fit'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {applyUiSetup, renderEngine, renderEngineCurrent, renderEnginePractice};\n');
 if(process.argv.includes('--phase-modern')||process.argv.includes('--modern-quality')||process.argv.includes('--modern-advanced')||process.argv.includes('--accuracy-fit'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {applyUiSetup, renderStats, setAccuracyPage};\n');
 if(process.argv.includes('--accuracy-motion'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {applyUiSetup, renderStats, setAccuracyPage, renderGraph};\n');
 if(process.argv.includes('--phase-report-2')||process.argv.includes('--overview-reveal')||process.argv.includes('--phase-overview')||process.argv.includes('--move-quality'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {renderStats};\n');
@@ -92,6 +92,7 @@ try {
   else if(process.argv.includes('--evaluation-bar'))await (await import('./evaluation-bar-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--ui-setups'))await (await import('./ui-setups-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--engine-minimal'))await (await import('./engine-minimal-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
+  else if(process.argv.includes('--engine-fit'))await (await import('./engine-fit-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--tab-designs'))await (await import('./tab-designs-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--full-hd-reference'))await (await import('./full-hd-reference-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out,source});
   else await (process.argv.includes('--puzzle-animations')?(await import('./puzzle-animation-audit.mjs')).auditLearning:runAudit)({review,call,evaluate,waitFor,sleep,out});

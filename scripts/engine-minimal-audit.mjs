@@ -9,7 +9,8 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await waitFor(review, "!!document.querySelector('.engine-minimal')", 'Modern minimal Engine');
   const initial = await run("import('./analysis.js').then(m=>JSON.stringify(m.S.layout))");
   const evidence = [];
-  const measure = () => run(`(()=>{
+  // Modern refits Engine (and Accuracy above it) with a short motion; measure the settled panel.
+  const measure = async () => (await waitFor(review, "!document.querySelector('.stage.engine-fit-motion')", 'Engine fit motion'), run(`(()=>{
     const panel=document.querySelector('.engine-minimal'), body=panel.querySelector('.engine-body');
     const r=body.getBoundingClientRect(), p=panel.getBoundingClientRect();
     const rows=[...panel.querySelectorAll('.engine-focus-candidate,.engine-focus-pending,.engine-empty')];
@@ -27,7 +28,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
       playColor:playStyle.color,playBackground:playStyle.backgroundColor,
       visible:rows.every(n=>{const b=n.getBoundingClientRect();return b.top>=r.top-.5&&b.bottom<=r.bottom+.5}),
       playVisible:(()=>{const b=panel.querySelector('.engine-focus-play').getBoundingClientRect();return b.top>=p.top&&b.bottom<=p.bottom})()};
-  })()`);
+  })()`));
   const shot = async label => {
     const clip = await run("(()=>{const r=document.querySelector('.engine-minimal').getBoundingClientRect();return {x:r.x+scrollX,y:r.y+scrollY,width:r.width,height:r.height,scale:2}})()");
     const result = await call('Page.captureScreenshot', {format:'png', clip, captureBeyondViewport:true}, review.sessionId);
