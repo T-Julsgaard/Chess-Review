@@ -28,6 +28,7 @@ import {rememberAnalyzedGame,historyGame} from '../../lib/player-history.js';
 import {identityForGame, knownAccounts, IDENTITY_KEY} from '../../lib/identity.js';
 import {inferredPlayer, inferredPlayerProfile, PLAYER_HISTORY_KEY} from '../../lib/player-history.js';
 import {ProfileWorkspace} from '../../lib/profile/workspace.js';
+import {profileWorkspaceClass} from '../../lib/profile/designs/index.js';
 import {createReviewEffects} from '../../lib/review-effects.js';
 import {explainMove, explanationPv} from '../../lib/move-explanation.js';
 
@@ -63,6 +64,7 @@ export function app(t, {hardware,url='https://extension.test/analysis.html#test-
     createScreenPreviewContext,loadScreenPreviewController,
     rememberAnalyzedGame,historyGame,identityForGame,knownAccounts,IDENTITY_KEY,inferredPlayer,inferredPlayerProfile,PLAYER_HISTORY_KEY,
     loadProfileWorkspace:async () => ({ProfileWorkspace, deleteProfileData:async () => 0, profileStorageUsage:async () => ({bytes:0,accounts:0,engine:0})}),
+    loadProfileDesigns:async () => ({profileWorkspaceClass}),
     createReviewEffects,
     explainMove, explanationPv,
     BADGE_APPEARANCES, BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg, puzzleResultBadge, CHECKMATE_BADGES, checkmateBadgeSvg, matedKingSquare, mateMark,
