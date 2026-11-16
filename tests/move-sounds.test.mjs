@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { app, loadGame } from './helpers/app.mjs';
 
-test('check and mate override captures with exactly one cue in review and practice', t => {
+test('captures override check and mate with exactly one cue in review and practice', t => {
   const a = app(t), played = [];
   a.state.settings.sound = true;
   a.replace('playEvent', event => played.push(event));
@@ -13,7 +13,7 @@ test('check and mate override captures with exactly one cue in review and practi
     a.call('playSanSound', san);
   }
 
-  assert.deepEqual(played, Array(8).fill('check'));
+  assert.deepEqual(played, Array(8).fill('capture'));
 });
 
 test('quiet moves, captures, checks, mates and castling retain their sounds', t => {
@@ -56,9 +56,9 @@ test('check overrides castling cues on brilliant moves, including when the check
       a.call('playMoveSound', 1);
     }
   }
-  assert.deepEqual(played, Array(8).fill('check'));
+  assert.deepEqual(played, ['capture', 'capture', 'capture', 'capture', 'check', 'check', 'check', 'check']);
 
-  // Turning check off must not fall back to an unrelated move/capture/celebration.
+  // Turning check off silences quiet checks while checking captures keep their cue.
   a.replace('triggerFx', triggerFx);
   const audio = [];
   a.replace('triggerAudio', (...args) => audio.push(args));
@@ -66,6 +66,11 @@ test('check overrides castling cues on brilliant moves, including when the check
   a.run('_lastNavSound = -Infinity');
   a.call('playMoveSound', 1);
   assert.equal(audio.length, 0);
+  a.state.positions = [{}, {san: 'Bxf7+'}];
+  a.run('_lastNavSound = -Infinity');
+  a.call('playMoveSound', 1);
+  assert.equal(audio.length, 1);
+  assert.equal(audio[0][0], a.call('fxUrl', 'capture'));
 });
 
 test('review navigation plays normal audio for a brilliant move in both directions', t => {

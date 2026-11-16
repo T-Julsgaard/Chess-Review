@@ -807,11 +807,11 @@ function navFastScrub() {
   _lastNavStep = now;
   return fast;
 }
-// Pick one event per move. Check/mate takes priority over captures and castling.
+// Pick one event per move. Captures take priority over check/mate, then castling.
 function sanSound(san) {
   san = san || "";
-  if (/[+#]/.test(san)) return "check";
   if (/x/.test(san)) return "capture";
+  if (/[+#]/.test(san)) return "check";
   if (/^[O0]-[O0]/.test(san)) return "castle";
   return "move";
 }
