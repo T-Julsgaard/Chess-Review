@@ -39,6 +39,14 @@ async function profileEngineRequest(msg) {
   await previewRunner.ensureDocument?.();
   return browserAPI.runtime.sendMessage({target:'profile-engine-host', action, job:msg.job});
 }
+// Offscreen documents only expose chrome.runtime. Keep storage and cached PGN
+// access here, where the normal profile store also supplies its write locks.
+async function profileHostData(msg) {
+  const args = Array.isArray(msg.args) ? msg.args : [];
+  if (msg.action === 'loadPgn') return loadProfilePgn(args[0], args[1], undefined, args[2]);
+  if (!['loadEngine', 'saveEngine', 'saveJob'].includes(msg.action)) throw Error('Unknown profile data request');
+  return createProfileStore(browserAPI.storage.local)[msg.action](...args);
+}
 browserAPI.tabs?.onRemoved?.addListener(tabId => buttonPreviews.cancel(tabId));
 browserAPI.tabs?.onUpdated?.addListener((tabId,change) => {if (change.url || change.status === 'loading') buttonPreviews.cancel(tabId);});
 
@@ -87,8 +95,15 @@ browserAPI.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return;
   }
   if (msg?.type === 'profileEngine') {
-    if (sender.id !== browserAPI.runtime.id || sender.tab) return;
+    // Extension pages opened in a tab also have sender.tab. Content scripts
+    // share our id, so check the page URL before accepting an engine request.
+    if (sender.id !== browserAPI.runtime.id || sender.url?.split(/[?#]/)[0] !== browserAPI.runtime.getURL('analysis.html')) return;
     profileEngineRequest(msg).then(sendResponse, error => sendResponse({ok:false, reason:error?.message || 'unavailable'}));
+    return true;
+  }
+  if (msg?.type === 'profileHostData') {
+    if (sender.id !== browserAPI.runtime.id || sender.tab || sender.url !== browserAPI.runtime.getURL('preview.html')) return;
+    profileHostData(msg).then(value => sendResponse({ok:true, value}), error => sendResponse({ok:false, reason:error?.message || 'Profile data unavailable'}));
     return true;
   }
   if (msg?.type === 'profileEngineBusy') {

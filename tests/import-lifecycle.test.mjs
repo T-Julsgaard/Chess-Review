@@ -86,3 +86,40 @@ test('preview messages require a supported top-level page, including Lichess met
   const result=await new Promise(resolve=>assert.equal(listener(message,{frameId:0,tab:{id:7},url:'https://lichess.org/future/game/AAAAAAAA'},resolve),true));
   assert.equal(result.ok,true);assert.deepEqual(calls,[['get',7,'lichess:AAAAAAAA']]);
 });
+
+for (const offscreen of [false, true]) test(`profile engine accepts the extension review tab and rejects content scripts (${offscreen ? 'Chrome offscreen' : 'Firefox background'})`, async () => {
+  let listener; const jobs = [], forwarded = [];
+  const runtime = {id: 'review-extension', getURL: path => 'chrome-extension://review-extension/' + path,
+    onInstalled: {addListener() {}}, onMessage: {addListener(fn) { listener = fn; }},
+    async sendMessage(message) { forwarded.push(message); return {ok: true}; }};
+  const context = vm.createContext({console,
+    browserAPI: {runtime, ...(offscreen ? {offscreen: {createDocument() {}}} : {}), commands: {onCommand: {addListener() {}}}, storage: {local: {}}},
+    createButtonPreviewService: () => ({}), createPreviewRunner: () => Object.assign(() => {}, {async ensureDocument() {}}),
+    createProfileStore: () => ({}), createProfileEngineHost: () => ({async start(job) {jobs.push(job); return {ok: true};}}), loadProfilePgn() {}, loadGameFromTab() {},
+  });
+  vm.runInContext(fs.readFileSync(new URL('../background.js', import.meta.url), 'utf8').replace(/^import .*;\r?\n/gm, ''), context);
+  const message = {type: 'profileEngine', action: 'start', job: {rows: [{id: '1'}]}};
+  for (const sender of [{id: runtime.id, tab: {id: 1}, url: 'https://www.chess.com/game/live/1'},
+    {id: 'other-extension', tab: {id: 1}, url: runtime.getURL('analysis.html')},
+    {id: runtime.id, url: runtime.getURL('analysis.html.fake')}]) assert.equal(listener(message, sender, () => {}), undefined);
+  const response = await new Promise(resolve => assert.equal(listener(message, {id: runtime.id, tab: {id: 7}, url: runtime.getURL('analysis.html') + '#game'}, resolve), true));
+  assert.equal(response.ok, true);
+  if (offscreen) {assert.equal(forwarded.length, 1); assert.equal(forwarded[0].target, 'profile-engine-host');}
+  else assert.deepEqual(jobs, [message.job]);
+});
+
+test('only the offscreen host can use the profile data bridge', async () => {
+  let listener; const calls = [];
+  const runtime = {id: 'review', getURL: path => 'chrome-extension://review/' + path, onInstalled: {addListener() {}}, onMessage: {addListener(fn) {listener = fn;}}};
+  const context = vm.createContext({console, browserAPI: {runtime, storage: {local: {}}, commands: {onCommand: {addListener() {}}}},
+    createButtonPreviewService: () => ({}), createPreviewRunner: () => () => {}, loadGameFromTab() {},
+    createProfileStore: () => ({async saveJob(job) {calls.push(job); return 'saved';}}), loadProfilePgn: async () => 'PGN',
+  });
+  vm.runInContext(fs.readFileSync(new URL('../background.js', import.meta.url), 'utf8').replace(/^import .*;\r?\n/gm, ''), context);
+  const message = {type: 'profileHostData', action: 'saveJob', args: [{status: 'done'}]};
+  for (const sender of [{id: runtime.id, url: 'https://chess.com/'}, {id: runtime.id, url: runtime.getURL('preview.html'), tab: {id: 1}}]) assert.equal(listener(message, sender, () => {}), undefined);
+  const sender = {id: runtime.id, url: runtime.getURL('preview.html')};
+  const send = message => new Promise(resolve => assert.equal(listener(message, sender, resolve), true));
+  assert.equal((await send(message)).value, 'saved'); assert.deepEqual(calls, message.args);
+  assert.equal((await send({...message, action: 'deleteAll'})).ok, false, 'the bridge only exposes the host operations');
+});

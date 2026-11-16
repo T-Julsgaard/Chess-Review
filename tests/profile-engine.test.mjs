@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import vm from 'node:vm';
 import {selectSample, analyseProfileGame, createProfileEngineHost, BUDGETS, budgetById, ENGINE_ENTRY_VERSION} from '../lib/profile/engine-sample.js';
 import {createProfileStore, JOB_KEY} from '../lib/profile/store.js';
 import {season} from './helpers/profile-season.mjs';
@@ -92,4 +93,23 @@ test('host: runs a job with workers, caches entries, reports progress, skips cac
   const cancelled = await slow.finished();
   assert.equal(cancelled.status, 'cancelled');
   assert.equal((await host.start({site: 'chesscom', account: 'me', rows: []})).reason, 'empty');
+});
+
+test('Chrome offscreen host initializes with runtime only and proxies storage and PGN access', async () => {
+  const messages = []; let options; let fail = false;
+  const context = vm.createContext({
+    browserAPI: {runtime: {id: 'review', onMessage: {addListener() {}}, async sendMessage(message) {
+      messages.push(message); return fail ? {ok: false, reason: 'Storage unavailable'} : {ok: true, value: message.action === 'loadPgn' ? PGN : {cached: {acc: 90}}};
+    }}},
+    createProfileEngineHost: opts => {options = opts; return {};},
+  });
+  vm.runInContext(fs.readFileSync(new URL('../preview.js', import.meta.url), 'utf8').replace(/^import .*;\r?\n/gm, ''), context);
+  const loaded = await options.store.loadEngine('chesscom', ['cached']);
+  assert.equal(loaded.cached.acc, 90);
+  await options.store.saveEngine('chesscom', 'new', {acc: 80});
+  await options.store.saveJob({status: 'running'});
+  assert.equal(await options.loadPgn('chesscom', {id: '1'}, null, 'tester'), PGN);
+  assert.deepEqual(messages.map(message => message.action), ['loadEngine', 'saveEngine', 'saveJob', 'loadPgn']);
+  assert.equal(messages.at(-1).args[2], 'tester');
+  fail = true; await assert.rejects(options.store.loadEngine('chesscom', []), /Storage unavailable/);
 });
