@@ -31,6 +31,7 @@ Click the image below to watch the introduction video.
 - **Recoverable analysis errors** with a Retry button; unfinished reviews are not
   saved as completed games.
 - **Analysis runs on your machine** — game lookup requests go directly to the chess platforms; no developer backend or analytics.
+- **Player profile** — a shareable recap of your games beside the Learn button: results, hours, rating journey, openings, your historical twin, signature moves, rival, streaks, comebacks, habits by hour and weekday, clock habits and how your games end, each drawn on the board. Built from the public game archive in seconds; an optional 2–30 minute local engine check adds accuracy figures. Share as a link or a card.
 
 ## Usage
 

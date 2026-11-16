@@ -33,6 +33,14 @@ services, as described below. Their own privacy notices explain that processing.
   review controls and game detection. This page access is separate from API requests.
 - Lookup requests disclose the requested username/game identifier to the relevant
   platform, which also receives normal network information such as your IP address.
+- **Player profile** (the button beside Learn with Chess review) builds a recap of a player's
+  games. It fetches that player's public game archive (Chess.com monthly archives, or the
+  Lichess game export) directly from the platform, replays the games locally and keeps a
+  compact per-game summary on your device. Finished months are never fetched twice. The
+  optional **engine check** analyses a sample of those games with the bundled Stockfish at
+  depth 8, only when you start it, in the same hidden extension document (Chrome) or
+  background page (Firefox) used for previews. You can build a profile for any public username;
+  the request discloses that username to the platform exactly like a game lookup.
 
 ## What is stored, and where
 
@@ -65,6 +73,12 @@ browser's `chrome.storage.local`:
   platform-provided accuracy fields. Those responses may be cached locally;
   displayed review scores are calculated by the extension, not read from those fields.
 
+- Player profile data under `profile:v1:` keys: one summary row per game for each player you
+  built a profile for (results, ratings, opponent name, opening, clocks, material swings,
+  replay-derived habits, final position), engine-check estimates for up to 2,000 games, and the
+  engine job status. **Settings → Player profile → Delete all profile data** removes every one
+  of these keys.
+
 The cache, preferences, and computed analysis stay on your device. A public username
 or game ID is sent to the relevant chess platform when needed for a game lookup,
 as described above. You can clear local data by removing the extension or clearing
@@ -81,6 +95,17 @@ The extension does not upload that payload to a developer server. URL fragments
 are normally not included in HTTP requests, but the complete link is visible to
 its recipient and any messaging service you use to share it. Opening the link
 visits the chess platform named in the URL.
+
+## Sharing a player profile
+
+Choosing **Copy share link** on the last profile slide copies a link to
+`https://t-julsgaard.github.io/Chess-Review/profile/`. Its URL fragment (after `#`) contains
+the profile: the username, the numbers shown on the slides, and links to the games they
+mention. A fragment is never sent to a server: the viewer page, served by GitHub Pages,
+decodes it in the reader's browser. GitHub therefore sees the request for the page itself
+(including the reader's IP address, under GitHub's own privacy terms) but not the profile.
+Anyone you send the link to can read it; with the extension installed the same link opens
+the profile on the review board. **Download card** saves a PNG on your device and sends nothing.
 
 ## What we do NOT do
 

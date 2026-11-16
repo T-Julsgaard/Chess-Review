@@ -14,8 +14,31 @@ import {createImportRequest, checkImport} from "./lib/import-request.js";
 import {createButtonPreviewService} from './lib/button-preview-service.js';
 import {createPreviewRunner} from './lib/preview-runner.js';
 import {rememberAccount, siteForUrl} from './lib/identity.js';
+import {createProfileEngineHost} from './lib/profile/engine-sample.js';
+import {createProfileStore} from './lib/profile/store.js';
+import {loadProfilePgn} from './lib/profile/pgn-source.js';
+import {decodeProfile} from './lib/profile/share.js';
 
-const buttonPreviews = createButtonPreviewService({api:browserAPI,loadGame:loadGameFromTab,runPreview:createPreviewRunner(browserAPI)});
+// Player profile engine jobs share the offscreen document with review-button previews on
+// Chrome; Firefox runs them in this background page. The document stays open while a job runs.
+let profileBusy = false;
+const previewRunner = createPreviewRunner(browserAPI, undefined, {keepOpen:() => profileBusy});
+const buttonPreviews = createButtonPreviewService({api:browserAPI,loadGame:loadGameFromTab,runPreview:previewRunner});
+// Created on first use so importing this module touches no storage (Firefox only; Chrome uses the offscreen host).
+let localProfileHost = null;
+function profileHost() {
+  if (localProfileHost === null) localProfileHost = browserAPI.offscreen?.createDocument ? false
+    : createProfileEngineHost({store:createProfileStore(browserAPI.storage.local), loadPgn:loadProfilePgn, onBusy:busy => {profileBusy = busy;}});
+  return localProfileHost;
+}
+async function profileEngineRequest(msg) {
+  const action = msg.action === 'start' || msg.action === 'cancel' ? msg.action : 'status';
+  const host = profileHost();
+  if (host) return action === 'start' ? host.start(msg.job) : action === 'cancel' ? host.cancel() : host.status();
+  if (action === 'status' && !profileBusy) return {active:false};
+  await previewRunner.ensureDocument?.();
+  return browserAPI.runtime.sendMessage({target:'profile-engine-host', action, job:msg.job});
+}
 browserAPI.tabs?.onRemoved?.addListener(tabId => buttonPreviews.cancel(tabId));
 browserAPI.tabs?.onUpdated?.addListener((tabId,change) => {if (change.url || change.status === 'loading') buttonPreviews.cancel(tabId);});
 
@@ -62,6 +85,23 @@ browserAPI.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       rememberAccount(browserAPI.storage.local, site, msg.name, msg.via).catch(() => {});
     }
     return;
+  }
+  if (msg?.type === 'profileEngine') {
+    if (sender.id !== browserAPI.runtime.id || sender.tab) return;
+    profileEngineRequest(msg).then(sendResponse, error => sendResponse({ok:false, reason:error?.message || 'unavailable'}));
+    return true;
+  }
+  if (msg?.type === 'profileEngineBusy') {
+    if (sender.id !== browserAPI.runtime.id || sender.tab) return;
+    profileBusy = !!msg.busy;
+    if (!profileBusy && previewRunner.idle?.() && browserAPI.offscreen?.closeDocument) browserAPI.offscreen.closeDocument().catch(() => {});
+    return;
+  }
+  // A shared player profile link (#p=…): decoded here, never fetched, then shown read-only on the board.
+  if (msg?.type === 'openProfile' && typeof msg.encoded === 'string') {
+    decodeProfile(msg.encoded).then(profile => openAnalysisTab({source:'profile', profile}, {sourceTabId:sender.tab?.id}))
+      .then(() => sendResponse({ok:true}), error => {stashError(error); sendResponse({ok:false, error:error.message});});
+    return true;
   }
   if (msg && msg.type === "openShared" && msg.payload && msg.payload.pgn) {
     // A shared link carries the sender's game, never the sender's viewing identity.

@@ -356,11 +356,13 @@ rather than approximating silently.
 
 ## Implementation tracker
 
-- [ ] Stage 0: measurements recorded in `docs/PLAYER_PROFILE.md`
-- [ ] Stage 1: data layer and collector with tests
-- [ ] Stage 2: aggregators with golden tests
-- [ ] Stage 3: library tier
-- [ ] Stage 4: engine tier with budgets and cache
-- [ ] Stage 5: UI, transition, board visualizations, audit script
-- [ ] Stage 6: share link, viewer mode, PNG card, privacy docs
-- [ ] Stage 7: settings, housekeeping, full verification
+All stages landed on 2026-11-16; the living tracker, the deviations from this plan and the documented assumptions are in [PLAYER_PROFILE.md](PLAYER_PROFILE.md).
+
+- [x] Stage 0: measurements recorded in `docs/PLAYER_PROFILE.md`
+- [x] Stage 1: data layer and collector with tests
+- [x] Stage 2: aggregators with golden tests
+- [x] Stage 3: library tier
+- [x] Stage 4: engine tier with budgets and cache
+- [x] Stage 5: UI, transition, board visualizations, audit script
+- [x] Stage 6: share link, viewer mode, PNG card, privacy docs
+- [x] Stage 7: settings, housekeeping, full verification

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Chess Review · Player profile</title>
+    <meta name="description" content="A shared Chess Review player profile, rendered entirely in your browser from the link." />
+    <link rel="icon" type="image/png" sizes="48x48" href="../icons/icon48.png" />
+    <link rel="stylesheet" href="viewer.css" />
+  </head>
+  <body>
+    <header class="top">
+      <a class="brand" href="https://github.com/T-Julsgaard/Chess-Review"><img src="../pieces-img/cburnett/wN.svg" alt="" /><span>Chess <em>/ Review</em></span></a>
+      <nav class="install" aria-label="Get the extension">
+        <a class="button" href="https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenkadndbdbigfam" rel="noopener">Install for Chrome</a>
+        <a class="button" href="https://addons.mozilla.org/en-US/firefox/addon/chess-review/" rel="noopener">Install for Firefox</a>
+      </nav>
+    </header>
+    <main id="main">
+      <section id="state" class="state" aria-live="polite">
+        <h1>Player profile</h1>
+        <p>Reading the profile from the link…</p>
+      </section>
+      <section id="deck" class="deck" hidden>
+        <div class="board-column">
+          <div class="board" id="board" aria-hidden="true"></div>
+          <p class="caption" id="caption"></p>
+        </div>
+        <article class="panel">
+          <div id="slide" class="slide"></div>
+          <nav class="nav" aria-label="Slides">
+            <button type="button" id="prev" class="navbtn" aria-label="Previous slide">‹</button>
+            <div id="dots" class="dots" role="tablist"></div>
+            <span id="counter" class="counter"></span>
+            <button type="button" id="next" class="navbtn" aria-label="Next slide">›</button>
+          </nav>
+        </article>
+      </section>
+      <section class="about">
+        <h2>How this page works</h2>
+        <p>Everything on this page came from the link itself. The part after <code>#</code> is never sent to a server: your browser decodes it and draws the slides. GitHub serves this page and sees the page request, nothing else.</p>
+        <p>Install <strong>Chess Review</strong>, the free open-source game review extension, to see the same profile on a live board, build your own from your Chess.com or Lichess games, and review any game with a locally bundled Stockfish.</p>
+      </section>
+    </main>
+    <script type="module" src="viewer.js"></script>
+  </body>
+</html>

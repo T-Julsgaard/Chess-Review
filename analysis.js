@@ -28,8 +28,9 @@ import { mountLearningAnnouncement } from "./lib/learning-announcement.js";
 import { panelScale, panelGroupBounds, scalePanelGroup, movePanelGroup } from "./lib/panel-layout.js";
 import { fullHdReferenceLayout, viewportGrowth } from "./lib/full-hd-layout.js";
 import { createScreenPreviewContext, loadScreenPreviewController } from "./lib/screen-previews.js";
-import { rememberAnalyzedGame, historyGame } from "./lib/player-history.js";
-import { identityForGame } from "./lib/identity.js";
+import { rememberAnalyzedGame, historyGame, inferredPlayer, inferredPlayerProfile, PLAYER_HISTORY_KEY } from "./lib/player-history.js";
+import { identityForGame, knownAccounts, IDENTITY_KEY } from "./lib/identity.js";
+import { loadProfileWorkspace } from "./lib/profile-loader.js";
 import { createReviewEffects } from "./lib/review-effects.js";
 import { explainMove, explanationPv } from "./lib/move-explanation.js";
 
@@ -382,6 +383,8 @@ const DEFAULT_SETTINGS = {
   // Interface transitions stay enabled when individual piece slides are off.
   uiAnim: true,
   learningTransition: "morph3",
+  // Player profile: default period, engine-sample budget and whether games against bots count.
+  profilePeriod: "year", profileBudget: "standard", profileIncludeBots: false,
   // Display the selected analysis lines unless the user adds or removes lines in the panel.
   // Extra candidates are searched after scoring or on demand without re-analyzing the game.
   // Default SF18 searches match the published depth16/Hash16 quality model.
@@ -1644,6 +1647,9 @@ function buildUI() {
       el("button", { type:"button", id:"learningToggle", class:"icon-btn learning-toggle", onclick:toggleLearning },
         el("span", {class:"learning-toggle-icon", "aria-hidden":"true"}, icon("book")),
         el("span", {class:"learning-toggle-label"}, "Learn with Chess review")),
+      el("button", { type:"button", id:"profileToggle", class:"icon-btn learning-toggle profile-toggle", onclick:toggleProfile },
+        el("span", {class:"learning-toggle-icon", "aria-hidden":"true"}, icon("trophy")),
+        el("span", {class:"learning-toggle-label"}, "Player profile")),
       // aria-label (not title) → keeps the buttons labelled for screen readers without the native
       // hover tooltip the user found unnecessary.
       el("button", { class: "icon-btn", "data-game-action":"", "aria-label": "Flip board", onclick: toggleFlip }, icon("flip")),
@@ -1762,6 +1768,64 @@ function toggleLearning() {
   if (learningWorkspace) return learningWorkspace.close();
   return openLearning();
 }
+let profileWorkspace = null;
+let openingProfile = false;
+function toggleProfile() {
+  if (profileWorkspace) return profileWorkspace.close();
+  return openProfile();
+}
+function syncProfileToggle() {
+  const button=document.getElementById("profileToggle");
+  if(!button)return;
+  const open=!!profileWorkspace, mode=open?"learning":"review";
+  button.dataset.motion=S.settings.uiAnim===false?"off":"on";
+  if(button.dataset.mode===mode)return;
+  button.querySelector(".learning-toggle-label").textContent=open?"Return to Game review":"Player profile";
+  button.querySelector(".learning-toggle-icon").replaceChildren(icon(open?"prev":"trophy"));
+  button.dataset.mode=mode;
+}
+// Who could this profile be about? Signed-in and remembered accounts for the site first, then the
+// player who recurs across reviewed games, then the legacy saved username (Chess.com only).
+async function profileIdentity(site) {
+  let store = {};
+  try { store = await browserAPI.storage.local.get([IDENTITY_KEY, PLAYER_HISTORY_KEY, "library", "username"]) || {}; } catch {}
+  const accountsFor = s => [...new Set([...knownAccounts(store, s), inferredPlayer(store, s), s === "chesscom" ? store.username : ""].filter(Boolean))];
+  const accountsBySite = {chesscom: accountsFor("chesscom"), lichess: accountsFor("lichess")};
+  const accounts = accountsBySite[site];
+  const profile = inferredPlayerProfile(store, site);
+  const country = profile && accounts[0] && profile.name.toLowerCase() === accounts[0].toLowerCase() ? flagCodeForCountryId(profile.country) : null;
+  return {site, accounts, accountsBySite, country};
+}
+async function openProfile({shared = null} = {}) {
+  if (profileWorkspace || openingProfile) return;
+  if (learningWorkspace) { await learningWorkspace.close(); if (learningWorkspace) return; }
+  openingProfile = true;
+  let ProfileWorkspace;
+  try { ({ProfileWorkspace} = await loadProfileWorkspace()); }
+  catch (error) { console.warn(error); toast("The player profile could not load. Try again."); openingProfile = false; return; }
+  if (profileWorkspace) { openingProfile = false; return; }
+  pauseBackgroundAnalysis();
+  _cancelPromotion?.(); _cancelBoardDrag?.();
+  if (S.autoTimer) { clearInterval(S.autoTimer); S.autoTimer = null; renderControls(); }
+  stopLineWalk(); hideBoardBadgeTip(); reviewEffects.clear();
+  UI.settings.hidden = true;
+  const site = shared?.site || (S.meta?.url && /lichess\.org/i.test(S.meta.url) ? "lichess" : "chesscom");
+  const identity = await profileIdentity(site);
+  const flag = code => code ? el("img", { class: "avatar avatar-flag", src: _url(`flags/${code}.svg`), alt: countryNameForId(code) || "", draggable: "false" }) : null;
+  profileWorkspace = new ProfileWorkspace({document, storage:browserAPI.storage.local, storageEvents:browserAPI.storage.onChanged,
+    sendMessage:message=>browserAPI.runtime.sendMessage(message), stage:UI.canvas, boardWrap:UI.boardWrap, makePiece, flipped:S.flipped,
+    settings:()=>S.settings, writeSettings:patch=>{Object.assign(S.settings,patch);return writeSettings(patch);}, identity, shared, toast,
+    icon:name=>ICONS[name]||"", flag, url:_url,
+    requestClose:()=>profileWorkspace?.close(),
+    buildOwn:()=>{const current=profileWorkspace;profileWorkspace=null;current.close();openProfile();},
+    restoreBoard:()=>{ if(!UI.boardWrap.querySelector(".board"))return; buildBoard(); renderPlayers(); },
+    onClose:()=>{ if(profileWorkspace&&profileWorkspace.closed)profileWorkspace=null; syncProfileToggle(); if (UI.settings && !UI.settings.hidden) renderSettings(); document.getElementById("profileToggle")?.focus({preventScroll:true}); }});
+  openingProfile = false;
+  syncProfileToggle();
+  try { await profileWorkspace.open(); }
+  catch (error) { console.warn(error); toast("The player profile could not open."); profileWorkspace?.close(); }
+}
+
 function syncLearningToggle() {
   const button=document.getElementById("learningToggle");
   if(!button)return;
@@ -1775,6 +1839,7 @@ function syncLearningToggle() {
 async function openLearning() {
   pauseBackgroundAnalysis();
   if (learningWorkspace || openingLearning) return;
+  if (profileWorkspace) { profileWorkspace.close(); profileWorkspace = null; }
   learningAnnouncement?.close();
   openingLearning = true;
   const positions = S.positions;
@@ -6567,6 +6632,31 @@ function soundSettings() {
     }}, "Reset all sound settings"),
   );
 }
+function profileSettings() {
+  const periods = [["year", "Past 12 months"], ["calendar", "This year"], ["all", "All time"], ["last100", "Last 100 games"]];
+  const budgets = [["quick", "Quick (about 2 min)"], ["standard", "Standard (about 10 min)"], ["deep", "Deep (about 30 min)"]];
+  const usage = el("span", { class: "set-note" }, "Measuring…");
+  loadProfileWorkspace().then(({profileStorageUsage}) => profileStorageUsage(browserAPI.storage.local)).then(info => {
+    usage.textContent = info.accounts ? `${info.accounts} ${info.accounts === 1 ? "player" : "players"}, ${info.engine} engine-checked games, about ${Math.max(1, Math.round(info.bytes / 1024))} KB stored locally.` : "No profile data stored yet.";
+  }).catch(() => { usage.textContent = "Could not read storage."; });
+  return el("div", {},
+    section("Recap",
+      el("div", { class: "set-row" }, setLabel("Default period", "The period the Player profile opens with. The picker inside the profile changes it for the session and remembers your choice."),
+        ddField(S.settings.profilePeriod || "year", periods, value => setSetting("profilePeriod", value))),
+      el("div", { class: "set-row" }, setLabel("Engine check", "How many games the optional depth-8 engine pass looks at. It only starts when you press Run engine check inside the profile."),
+        ddField(S.settings.profileBudget || "standard", budgets, value => setSetting("profileBudget", value))),
+      toggleRow("Count games against bots", "profileIncludeBots", setSetting, "Off keeps every figure to human opponents. On includes computer opponents where the platform marks them."),
+    ),
+    section("Data",
+      el("div", { class: "set-row hint" }, usage),
+      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Games are fetched from the public Chess.com and Lichess APIs straight into this browser and kept only here. Finished months are never fetched twice.")),
+      el("button", { class: "set-reset", onclick: async () => {
+        try { const {deleteProfileData} = await loadProfileWorkspace(); const removed = await deleteProfileData(browserAPI.storage.local); toast(removed ? "Profile data deleted" : "Nothing to delete"); if (profileWorkspace) profileWorkspace.close(); renderSettings(); }
+        catch { toast("Could not delete profile data"); }
+      } }, "Delete all profile data"),
+    ),
+  );
+}
 function developerSettings() {
   return el("div", {},
     section("Developer debugger",
@@ -6796,6 +6886,7 @@ const SETTINGS_CATEGORIES = [
   {id:"review", label:"Review & Coach", description:"Commentary, character & reactions", icon:"chat", render:reviewSettings},
   {id:"engine", label:"Engine", description:"Analysis power & rating estimates", icon:"cpu", render:motorSettings},
   {id:"sound", label:"Sound", description:"Every move, your sound", icon:"sound", render:soundSettings},
+  {id:"profile", label:"Player profile", description:"Your recap, its data & engine budget", icon:"trophy", render:profileSettings},
   {id:"developer", label:"Developer tools", description:"Screen previews & test data", icon:"code", render:developerSettings},
 ];
 const settingsScroll = new Map();
@@ -7249,6 +7340,7 @@ function applySettings() {
   const learningToggle=document.getElementById("learningToggle");
   if(learningToggle)learningToggle.dataset.motion=S.settings.uiAnim===false?"off":"on";
   learningWorkspace?.refreshSettings();
+  syncProfileToggle();
 }
 // Bundled background presets (relative to the extension's analysis page).
 const BG_PRESETS = { slate: "backgrounds/bg-slate.webp" };
@@ -8666,7 +8758,7 @@ async function showReadyWorkspace() {
       await Promise.all([loadBook(),loadCalibration().catch(error=>{console.warn(error);return null;})]);
     // Resolve any stored analysis for this game by id (same derivation as currentGameId(), but from
     // the payload since S isn't populated yet) so applyGame() needs no lookup await of its own.
-    if (payload.source!=="blank"&&!("analysis" in payload)) {
+    if (payload.source!=="blank"&&payload.source!=="profile"&&!("analysis" in payload)) {
       let saved = null;
       try {
         const k = "analysis:" + ((payload.meta && (payload.meta.gameId || payload.meta.libraryId)) || ("pgn:" + simpleHash(payload.pgn || "")));
@@ -8675,13 +8767,15 @@ async function showReadyWorkspace() {
       } catch {}
       payload.analysis = saved;
     }
-    S.blank=payload.source==="blank"&&((blankLaunch&&!location.hash)||screenPreview?.id==="workspace-blank"||screenPreview?.viewport===true);
+    const sharedProfile = payload.source==="profile" && payload.profile && typeof payload.profile === "object" ? payload.profile : null;
+    S.blank=!!sharedProfile||(payload.source==="blank"&&((blankLaunch&&!location.hash)||screenPreview?.id==="workspace-blank"||screenPreview?.viewport===true));
     buildUI();               // built once; switching games re-uses it (no full page reload)
     if(S.blank)showBlankWorkspace();
     else await applyGame(payload);
     // Fit and reveal the board as soon as it can paint; engine analysis continues normally.
     await initTabZoom();
     await showReadyWorkspace();
+    if (sharedProfile) { const sharedJob = location.hash.replace(/^#/, ""); if (sharedJob) await browserAPI.storage.local.remove(`job:${sharedJob}`); openProfile({shared: sharedProfile}); }
     // Two-phase load: now that initialization succeeded, remove the job data so it doesn't accumulate.
     const jobId = location.hash.replace(/^#/, "");
     if (jobId && rememberReviewJob()) {

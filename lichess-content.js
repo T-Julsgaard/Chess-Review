@@ -215,6 +215,22 @@ async function handleShareFragment() {
     console.warn("[Chess Review] share link retained; retry by reloading the page", e);
   } finally { sharedInFlight.delete(m[1]); }
 }
+// ---- Shared player profile: #p=<compressed profile>. Handed to the background to decode locally.
+const profileInFlight = new Set();
+async function handleProfileFragment() {
+  const m = location.hash.match(/[#&]p=([^&]+)/);
+  if (!m || profileInFlight.has(m[1])) return;
+  const fragment = location.hash;
+  profileInFlight.add(m[1]);
+  try {
+    const result = await browserAPI.runtime.sendMessage({ type: "openProfile", encoded: m[1] });
+    if (result?.ok && location.hash === fragment) history.replaceState(history.state, "", location.pathname + location.search);
+  } catch (e) {
+    console.warn("[Chess Review] profile link retained; retry by reloading the page", e);
+  } finally { profileInFlight.delete(m[1]); }
+}
+handleProfileFragment();
+window.addEventListener("hashchange", handleProfileFragment);
 handleShareFragment();
 window.addEventListener("hashchange", handleShareFragment);
 setTimeout(handleShareFragment, 1200);
