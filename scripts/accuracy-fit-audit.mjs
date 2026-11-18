@@ -25,13 +25,23 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
             zoom:Number(content.style.zoom),overflowY:getComputedStyle(body).overflowY,
             dials:content.querySelectorAll('.acc-dial').length,phases:content.querySelectorAll('.phase-report-row').length,
             rows:content.querySelectorAll('.qbreak-row').length,
+            row:parseFloat(content.style.getPropertyValue('--q-row'))||null,
+            labelFont:Math.min(...[...content.querySelectorAll('.qlabel .nm')].map(n=>parseFloat(getComputedStyle(n).fontSize))),
             visible:[...content.querySelectorAll('.phase-rating,.phase-report-row,.qbreak-row')].every(n=>n.getBoundingClientRect().bottom<=r.bottom+.5),
             columns:new Set([...content.querySelectorAll('.qbreak-row')].map(n=>Math.round(n.getBoundingClientRect().left))).size,
             boxes:JSON.stringify([...document.querySelectorAll('.mod')].map(n=>n.getBoundingClientRect().toJSON()))};})()`);
         evidence.push({width,height,page,busy,...fit});
         await fs.writeFile(path.join(out,'accuracy-fit.json'),JSON.stringify(evidence,null,2));
-        assert.equal(fit.content,fit.body,'No scrolling: '+JSON.stringify(evidence.at(-1)));
-        assert.equal(fit.horizontal,0);assert.equal(fit.visible,true);
+        assert.equal(fit.horizontal,0);
+        if(page===0){assert.equal(fit.content,fit.body,'No scrolling: '+JSON.stringify(evidence.at(-1)));assert.equal(fit.visible,true);}
+        else {
+          // Quality tightens its rows instead of zooming, keeping text readable;
+          // it scrolls only once rows reach their 13px minimum.
+          assert.equal(fit.zoom,1,'Never zoom the Quality list');
+          assert.ok(fit.labelFont>=12,'Readable category labels: '+JSON.stringify(evidence.at(-1)));
+          if(fit.content>fit.body)assert.equal(fit.row,13,'Scroll only at the minimum row height: '+JSON.stringify(evidence.at(-1)));
+          else assert.equal(fit.visible,true);
+        }
         if(width===1920&&height===919)assert.equal(fit.zoom,1,'Restore the original size when it fits');
         assert.ok(!['hidden','clip'].includes(fit.overflowY),'Fit the data without clipping it');
         assert.equal(fit.boxes,boxes,'Keep the surrounding panels and page dimensions unchanged');
@@ -44,5 +54,5 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   }
   await run("import('./analysis.js').then(m=>{m.S.analyzing=false;m.renderStats()})");
   assert.equal(await snapshot(),original,'Preserve the saved layout and review');
-  console.log('Accuracy and Quality fit at twelve viewport sizes, with the existing dials, phase cards, single Quality list and unchanged panel geometry. Evidence: '+out);
+  console.log('Accuracy fits and Quality stays readable (tightened rows, scrolling only below 13px rows) at twelve viewport sizes, with the existing dials, phase cards, single Quality list and unchanged panel geometry. Evidence: '+out);
 }

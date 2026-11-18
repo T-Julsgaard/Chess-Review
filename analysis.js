@@ -5091,7 +5091,10 @@ function scheduleAccuracyFit() {
     // Keep the original design and fit its contents proportionally. Reset before
     // measuring so a larger window restores the full size; never enlarge it.
     content.style.zoom = '1';
+    content.classList.remove('acc-dense');
+    content.style.removeProperty('--q-row');
     if (page.scrollHeight <= page.clientHeight) return;
+    if (page.classList.contains('acc-page-quality') && fitQualityRows(page, content)) return;
     for (let i = 0; i < 3; i++) {
       const scale = Math.min(1, available / content.scrollHeight);
       if (!Number.isFinite(scale) || scale <= 0) break;
@@ -5099,6 +5102,25 @@ function scheduleAccuracyFit() {
       if (page.scrollHeight <= page.clientHeight) break;
     }
   });
+}
+// Zooming the whole Quality list made its text unreadable in short panels
+// (6–8px at a 1080p screen with 150% scaling). Instead, tighten the rows so they
+// share the free height, keeping the text at 12px or larger. Below that minimum
+// the page scrolls rather than shrinking further.
+const QUALITY_ROW_MIN = 13;
+function fitQualityRows(page, content) {
+  const rows = content.querySelectorAll('.qbreak-row');
+  if (!rows.length) return false;
+  let row = Math.max(QUALITY_ROW_MIN, rows[0].offsetHeight || QUALITY_ROW_MIN);
+  content.style.setProperty('--q-row', row + 'px');
+  content.classList.add('acc-dense');
+  for (let i = 0; i < 4; i++) {
+    const overflow = page.scrollHeight - page.clientHeight;
+    if (overflow <= 0 || row === QUALITY_ROW_MIN) break;
+    row = Math.max(QUALITY_ROW_MIN, Math.floor(row - overflow / rows.length));
+    content.style.setProperty('--q-row', row + 'px');
+  }
+  return true;
 }
 
 function renderPhaseOverview2(sides, busy) {

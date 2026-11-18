@@ -81,6 +81,10 @@ and labels align in shared columns, with the whole block centered between
 the two count columns, without category bars.
 Hovering or focusing a category enlarges only its badge; the text and rows stay
 in place. Reduced motion disables the transition. Count links still jump to moves.
+When the panel is too short for the full list (for example a 1080p screen at
+150% scaling, a ~1280×590 viewport), rows tighten to share the free height
+instead of zooming the whole list, keeping labels at 12px or larger. Only once
+rows reach their 13px minimum does the page scroll.
 Run `node scripts/learning-browser.mjs --working-tree --modern-quality` to verify
 header alignment, fit at eight viewports, badge-only enlargement and read-only labels.
 

@@ -39,6 +39,8 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
         return {width:innerWidth,height:innerHeight,panel:p.getBoundingClientRect().toJSON(),body:b.clientHeight,content:b.scrollHeight,
           overflow:b.scrollWidth-b.clientWidth,windowOverflow:document.documentElement.scrollWidth-innerWidth,rows:p.querySelectorAll('.qbreak-row').length,
           topGap:list.top-names.bottom,bottomGap:body.bottom-list.bottom,
+          zoom:Number(p.querySelector('.acc-fit-content')?.style.zoom||1),row:parseFloat(p.querySelector('.acc-fit-content')?.style.getPropertyValue('--q-row'))||null,
+          labelFont:Math.min(...[...p.querySelectorAll('.qlabel .nm')].map(n=>parseFloat(getComputedStyle(n).fontSize))),
           bars:[...p.querySelectorAll('.ct')].some(n=>getComputedStyle(n,'::before').content!=='none'),
           aligned:['.qsym','.nm'].every(selector=>{
             const xs=[...p.querySelectorAll('.qlabel '+selector)].map(n=>n.getBoundingClientRect().left);
@@ -54,8 +56,10 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
       assert.equal(fit.aligned,true,'Badges and text align in shared columns');
       assert.equal(fit.bars,false);
       assert.ok(fit.overflow<=1&&fit.windowOverflow<=1,JSON.stringify(fit));
-      assert.ok(fit.content<=fit.body+1,'All categories fit: '+JSON.stringify(fit));
-      assert.ok(Math.abs(fit.topGap-fit.bottomGap)<8,'List is vertically balanced: '+JSON.stringify(fit));
+      // Short panels tighten rows (never below 13px, 12px text) and scroll beyond that.
+      assert.ok(fit.labelFont>=12&&fit.zoom===1,'Labels stay readable: '+JSON.stringify(fit));
+      if(fit.content>fit.body+1)assert.equal(fit.row,13,'Scroll only at the minimum row height: '+JSON.stringify(fit));
+      else assert.ok(Math.abs(fit.topGap-fit.bottomGap)<8,'List is vertically balanced: '+JSON.stringify(fit));
       evidence.push({design,...fit});
     }
   }
