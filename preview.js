@@ -30,6 +30,6 @@ const profileHost = createProfileEngineHost({store:{
 browserAPI.runtime.onMessage.addListener((message,sender,respond) => {
   if (sender.id !== browserAPI.runtime.id || sender.tab || message?.target !== 'profile-engine-host') return;
   if (message.action === 'start') {profileHost.start(message.job).then(respond,error => respond({ok:false,reason:error?.message})); return true;}
-  if (message.action === 'cancel') {respond(profileHost.cancel()); return;}
+  if (message.action === 'cancel') {respond(profileHost.cancel(message.id)); return;}
   respond(profileHost.status());
 });

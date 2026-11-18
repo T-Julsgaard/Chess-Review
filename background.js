@@ -34,10 +34,10 @@ function profileHost() {
 async function profileEngineRequest(msg) {
   const action = msg.action === 'start' || msg.action === 'cancel' ? msg.action : 'status';
   const host = profileHost();
-  if (host) return action === 'start' ? host.start(msg.job) : action === 'cancel' ? host.cancel() : host.status();
+  if (host) return action === 'start' ? host.start(msg.job) : action === 'cancel' ? host.cancel(msg.id) : host.status();
   if (action === 'status' && !profileBusy) return {active:false};
   await previewRunner.ensureDocument?.();
-  return browserAPI.runtime.sendMessage({target:'profile-engine-host', action, job:msg.job});
+  return browserAPI.runtime.sendMessage({target:'profile-engine-host', action, job:msg.job, id:msg.id});
 }
 // Offscreen documents only expose chrome.runtime. Keep storage and cached PGN
 // access here, where the normal profile store also supplies its write locks.

@@ -81,6 +81,19 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-engine-line { margin: 0; font-size: 13px; color: var(--ink-2); }
 .profile-evidence { align-self: flex-start; font-size: 13px; font-weight: 650; color: var(--accent); text-decoration: none; padding: 6px 0; }
 .profile-evidence:hover { text-decoration: underline; }
+.profile-evidence, button.pv-link { background: none; border: 0; padding: 6px 0; text-align: left; cursor: pointer; font-family: inherit; }
+
+.profile-game-chrome { position: fixed; z-index: 54; pointer-events: none; color: var(--ink); }
+.profile-game-player { position: absolute; left: 0; right: 0; height: 24px; display: flex; align-items: center; gap: 9px; font-size: 13px; }
+.profile-game-player strong { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.profile-game-player span { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.profile-game-player-top { bottom: 100%; }
+.profile-game-player-bottom { top: 100%; }
+.profile-game-chrome .profile-game-eval { position: absolute; left: -30px; top: 0; width: 22px; height: 100%; min-height: 0; animation: profile-eval-out .38s cubic-bezier(.2,.8,.2,1) both; }
+.profile-game-eval .score { font-size: 10px; }
+.profile-game-chrome[data-motion="off"], .profile-game-chrome[data-motion="off"] * { animation: none !important; transition: none !important; }
+@keyframes profile-eval-out { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+@media (max-width: 900px) { .profile-game-chrome .profile-game-eval { left: -24px; width: 18px; } }
 
 .profile-rating-modes { max-width: 100%; flex-wrap: wrap; margin-left: auto; }
 .profile-series-wrap { display: flex; flex-direction: column; gap: 6px; padding: 12px 10px 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); }
@@ -225,9 +238,13 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-loader-phase { margin: 2px 0 0; font-size: 13px; color: var(--ink); min-height: 1.4em; }
 .profile-loader-meter { width: min(232px, 62%); height: 3px; border-radius: 2px; background: var(--panel-3); overflow: hidden; }
 .profile-loader-meter i { display: block; height: 100%; width: 0; border-radius: 2px; background: var(--accent); transition: width .5s cubic-bezier(.16,1,.3,1); }
-.profile-loader-quip { margin: 4px 0 0; font-size: 12.5px; color: var(--ink-2); min-height: 1.4em; transition: opacity .26s ease, transform .26s ease; }
-.profile-loader-quip.out { opacity: 0; transform: translateY(-3px); }
 .profile-loader .profile-button.ghost { margin-top: 6px; font-size: 12px; min-height: 30px; padding: 5px 12px; color: var(--ink-2); }
+.profile-stacked .profile-loader { display: grid; grid-template-columns: clamp(64px, 22vw, 120px) minmax(0, 1fr); gap: 8px 16px; align-content: center; justify-items: center; }
+.profile-stacked .profile-tour { grid-column: 1; grid-row: 1 / span 5; width: 100%; margin: 0; }
+.profile-stacked .profile-loader > :not(.profile-tour) { grid-column: 2; }
+.profile-stacked .profile-loader-tally { flex-wrap: wrap; justify-content: center; gap: 4px; }
+.profile-stacked .profile-loader-unit, .profile-stacked .profile-loader-phase { font-size: 12px; }
+.profile-stacked .profile-loader-meter { width: 100%; }
 @keyframes profile-fade { from { opacity: 0; } to { opacity: 1; } }
 
 /* Pieces travel through the board edges as positions assemble/disassemble. */
@@ -255,6 +272,23 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-accuracy { display: flex; flex-direction: column; gap: 10px; }
 .profile-accuracy .profile-accuracy-games .profile-seg-lg button { font-size: 12px; }
 .profile-accuracy-note { line-height: 1.45; }
+
+/* The whole game history, streamed onto the board during preparation. */
+.profile-game-map { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; box-sizing: border-box; padding: 3%; background: color-mix(in srgb, var(--panel) 92%, transparent); cursor: pointer; }
+.profile-game-map:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
+.profile-map-w { fill: var(--q-best, #81b58b); }
+.profile-map-d { fill: var(--ink-2, #b6b9b2); }
+.profile-map-l { fill: var(--q-miss, #db8c7a); }
+.profile-map-cursor { fill: none; stroke: var(--ink, #fff); stroke-width: .4; pointer-events: none; }
+.profile-map-caption { display: grid; justify-items: center; gap: 3px; width: 100%; font-size: 11px; line-height: 16px; color: var(--ink-2); }
+.profile-map-legend, .profile-map-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; }
+.profile-map-summary { color: var(--ink); font-weight: 650; font-variant-numeric: tabular-nums; }
+.profile-map-key::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 4px; border-radius: 2px; background: var(--ink-2); }
+.profile-map-key.w::before { background: var(--q-best); } .profile-map-key.l::before { background: var(--q-miss); }
+.profile-map-detail { max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.profile-map-actions a { font: inherit; text-decoration: none; }
+.profile-map-actions:empty { display: none; }
+.profile-loader-eta { margin: 0; color: var(--ink-2); font-size: 12px; }
 
 /* Win/draw/loss squares leaving the board */
 .profile-fill-ghost { position: absolute; inset: 0; z-index: 3; pointer-events: none; }

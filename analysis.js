@@ -1835,6 +1835,7 @@ async function openProfile({shared = null, resume = null} = {}) {
     sendMessage:message=>browserAPI.runtime.sendMessage(message), stage:UI.canvas, boardWrap:UI.boardWrap, makePiece, flipped:S.flipped,
     settings:()=>S.settings, writeSettings:patch=>{Object.assign(S.settings,patch);return writeSettings(patch);}, identity, shared, resume, toast,
     icon:name=>ICONS[name]||"", flag, url:_url,
+    createAnalysisEngine:()=>createEngine({Threads:1, Hash:16, "Skill Level":20}),
     requestClose:()=>profileWorkspace?.close(),
     buildOwn:async()=>{await profileWorkspace.close();openProfile();},
     restoreBoard:()=>{ if(!UI.boardWrap.querySelector(".board"))return; buildBoard(); renderPlayers(); },

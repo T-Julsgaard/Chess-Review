@@ -89,7 +89,7 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.match(shell.querySelector('.pv-points').textContent, /hours? at the board/);
   assert.ok(!shell.querySelector('.profile-head').textContent.includes('wrapped'));
   assert.ok(shell.querySelector('.profile-head .pv-back'), 'the header goes back to the start');
-  assert.equal(shell.querySelectorAll('.profile-nav .pv-round').length, 1, 'one round button in the nav: back');
+  assert.equal(shell.querySelectorAll('.profile-nav .pv-prev').length, 1, 'a full-width previous chapter button');
   shell.querySelector('.pv-next').click();
   assert.equal(shell.querySelector('.pv-story').dataset.slide, 'numbers');
   assert.equal(shell.querySelector('.pv-story-figure').textContent, String(w.report.totals.games));
@@ -99,9 +99,18 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.equal(shell.querySelectorAll('.pv-fact').length, 4, 'four facts, two by two');
   // The time-control switch narrows the chapter to one format.
   const filter = shell.querySelector('.pv-filter');
+  const thumb = filter.querySelector('.pv-filter-thumb'), bar = shell.querySelector('.pv-wdl');
+  const chapter = w.index;
+  shell.querySelector('.pv-story-hero').click();
+  assert.equal(w.index, chapter, 'only explicit navigation changes the chapter');
+  const transform = thumb.style.transform;
+  filter.querySelector('button:last-child').dispatchEvent(new a.dom.window.MouseEvent('pointerover', {bubbles: true}));
+  assert.equal(thumb.style.transform, transform, 'hover leaves the selection marker alone');
   assert.ok(filter, 'a time-control switch');
   [...filter.querySelectorAll('button')].find(b => b.textContent === 'Bullet').click();
   assert.equal(w.cls, 'bullet');
+  assert.equal(shell.querySelector('.pv-filter'), filter, 'the selected marker is retained across a click');
+  assert.equal(shell.querySelector('.pv-wdl'), bar, 'the results bar transitions in place');
   assert.equal(shell.querySelector('.pv-story-figure').textContent, String(w.report.totals.games));
   assert.ok(w.report.totals.games < 300 && w.report.classOptions.includes('blitz'), 'the options stay while filtered');
   [...shell.querySelectorAll('.pv-filter button')].find(b => b.textContent === 'All').click();
@@ -140,7 +149,7 @@ test('profile designs: dashboard opens on a grid, previews and opens chapters, E
   assert.ok(!w.deck.some(s => s.id === 'cover'), 'the grid replaces the cover');
   const tiles = shell.querySelectorAll('.pv-tile-card');
   assert.ok(tiles.length >= 10, 'tiles: ' + tiles.length);
-  assert.equal(doc.querySelectorAll('.board .pv-days .pv-tile').length, 64, 'the board shows the last 64 days');
+  assert.ok(doc.querySelector('.board .profile-game-map'), 'the board shows the entire game history');
   shell.querySelector('.pv-tile-card[data-chapter="rating"]').click();
   assert.equal(shell.querySelector('.pv-detail').dataset.slide, 'rating');
   assert.ok(doc.querySelector('.board .pv-line-path'));

@@ -64,7 +64,8 @@ test('profile: seeded games render the deck on the board with navigation, stats 
   assert.equal(shell.querySelector('.profile-title').textContent, 'tester');
   const dots = shell.querySelectorAll('.profile-dot');
   assert.ok(dots.length >= 12, 'most slides are available: ' + dots.length);
-  assert.ok(doc.querySelectorAll('.board .profile-piece').length >= 32, 'cover shows the first moves on the board');
+  assert.ok(doc.querySelector('.board .profile-game-map'), 'cover shows every game on the board');
+  assert.equal(doc.querySelector('.profile-map-summary').textContent, `${a.run('profileWorkspace').periodRows().length} games`);
   shell.querySelector('.profile-nav-button:last-child').click();
   assert.equal(shell.querySelector('.profile-slide').dataset.slide, 'numbers');
   assert.ok(shell.querySelectorAll('.profile-stat').length >= 5);
@@ -223,12 +224,13 @@ test('profile owns a clean board and shortcuts without changing the reviewed gam
   await build(a);
   const board = doc.querySelector('.board'), pieces = [...board.querySelectorAll('.profile-piece')];
   assert.notEqual(board, original);
-  assert.equal(pieces.length, 32);
+  assert.equal(pieces.length, 0);
+  const map = board.querySelector('.profile-game-map'); assert.ok(map);
   assert.equal(board.querySelectorAll('.piece-img:not(.profile-piece),.sq-badge,.best-arrow,.mate-badge-layer').length, 0);
   assert.ok([...board.querySelectorAll('.sq')].every(sq => sq.querySelectorAll('.piece-img').length <= 1));
   a.call('paintBoard'); a.call('buildBoard'); a.call('renderBestArrow'); a.call('toggleFlip'); a.call('toggleAuto');
   assert.equal(doc.querySelector('.board'), board);
-  assert.equal(board.querySelector('.profile-piece'), pieces[0]);
+  assert.equal(board.querySelector('.profile-game-map'), map);
   assert.equal(a.state.autoTimer, null);
   for (const key of ['ArrowRight', 'End', 'Home']) {
     doc.body.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key, bubbles: true}));
@@ -328,7 +330,7 @@ test('rating mode changes the headline, chart, evidence and board together; char
   assert.equal(w.deck[w.index].ratingClass, 'bullet');
   assert.ok(doc.querySelector('.profile-title').textContent.startsWith('Bullet:'));
   assert.equal(doc.querySelector('.profile-series-line').dataset.class, 'bullet');
-  assert.equal(doc.querySelector('.profile-evidence').href, w.report.ratings.bullet.peak.url);
+  assert.equal(doc.querySelector('.profile-evidence').dataset.gameUrl, w.report.ratings.bullet.peak.url);
   const chart = doc.querySelector('.profile-series');
   chart.getBoundingClientRect = () => ({left: 0, width: 480});
   chart.dispatchEvent(new a.dom.window.MouseEvent('pointermove', {clientX: 42}));
@@ -394,7 +396,7 @@ test('a final position loads its full game for arrow navigation and ignores a st
   assert.equal(doc.querySelectorAll('.profile-piece').length, 0, 'late game moves cannot replace the results board');
 });
 
-test('profile: the accuracy check starts by itself after Build, with the chosen depth, and reviewed library games count', async t => {
+test('profile: the accuracy check finishes before the deck opens, with the chosen depth, and reviewed library games count', async t => {
   const a = review(t), doc = a.dom.window.document;
   seed(a);
   const rows = season();
@@ -403,15 +405,26 @@ test('profile: the accuracy check starts by itself after Build, with the chosen 
   Object.assign(a.state.settings, {profileDepth: 'fast', profileSample: 'auto'});
   await open(a);
   const sent = [], w = a.run('profileWorkspace');
-  w.o.sendMessage = async message => { sent.push(message); return {ok: true}; };
+  w.o.sendMessage = async message => {
+    sent.push(message);
+    if (message.action === 'start') {
+      assert.equal(w.phase, 'loading'); assert.equal(w.report, null);
+      for (const row of message.job.rows) await w.store.saveEngine(message.job.site, row.id, {v: 1, acc: 80, t: row.t});
+      await w.store.saveJob({...message.job, status: 'done', done: message.job.rows.length, total: message.job.rows.length, failed: 0, startedAt: Date.now(), finishedAt: Date.now()});
+    }
+    return {ok: true};
+  };
   await build(a);
   const start = sent.find(m => m.type === 'profileEngine' && m.action === 'start');
   assert.ok(start, 'the check starts without a button');
   assert.equal(start.job.depth, 6);
   assert.ok(start.job.deadlineMs > 0, 'auto has a time budget');
   assert.ok(!start.job.rows.some(r => r.id === rows.at(-2).id), 'the reviewed library game is not checked again');
+  for (let i = 0; i < 1000 && w.phase === 'loading'; i++) await settle();
   assert.equal(w.report.engine.libraryGames, 1, 'only the same player\'s reviewed games count');
   assert.equal(doc.querySelector('.profile-engine .profile-button.primary'), null, 'nothing to press');
   // Building again for the same selection does not start a second check.
-  w.reveal(); assert.equal(sent.filter(m => m.action === 'start').length, 1);
+  const starts = sent.filter(m => m.action === 'start').length;
+  assert.equal(w.phase, 'deck'); assert.ok(w.report.engine.games > 1);
+  w.reveal(); assert.equal(sent.filter(m => m.action === 'start').length, starts);
 });

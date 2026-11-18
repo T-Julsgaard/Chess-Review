@@ -150,3 +150,16 @@ test('host: passes the chosen depth to the analysis and stops at an auto deadlin
   assert.ok(depths.every(d => d === 6));
   assert.equal(final.total, final.done, 'the finished count becomes the total');
 });
+
+test('host: reuses streamed PGN without another API request and only cancels the matching job', async () => {
+  const store = createProfileStore(memoryStorage()); let release;
+  const hold = new Promise(resolve => { release = resolve; });
+  const host = createProfileEngineHost({store,
+    loadPgn: async () => { throw Error('Downloaded moves should be reused'); },
+    analyse: async pgn => { assert.equal(pgn, PGN); await hold; return {v: 1, acc: 80}; }});
+  await host.start({id: 'owned', site: 'lichess', account: 'me', workers: 4, rows: [{id: '1', me: 'w', pgn: PGN}]});
+  assert.equal(host.cancel('another-job').ok, false);
+  release(); const result = await host.finished();
+  assert.equal(result.id, 'owned'); assert.equal(result.failed, 0); assert.equal(result.workers, 1);
+  assert.equal((await store.loadEngine('lichess', ['1']))['1'].acc, 80);
+});

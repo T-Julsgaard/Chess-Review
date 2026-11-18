@@ -1,0 +1,64 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import {season} from '../tests/helpers/profile-season.mjs';
+import {rowsKey} from '../lib/profile/store.js';
+
+export async function auditLearning({review, call, evaluate, waitFor, sleep, out}) {
+  const run = code => evaluate(review, code);
+  const rows = season();
+  await run("document.querySelector('.lang-confirm')?.click();document.querySelector('.learning-announcement-disable')?.click()");
+  await run(`import('./browser-compat.js').then(({browserAPI})=>browserAPI.storage.local.set(${JSON.stringify({[rowsKey('chesscom', 'tester')]: {rows, months: [], since: 0, updatedAt: Date.now()}})}))`);
+  await run(`import('./analysis.js').then(async m=>{m.S.settings.profileDesign='story';m.S.settings.profileDepth='off';m.S.settings.uiAnim=true;await m.openProfile();window.w=m.profileWorkspace;w.account='tester';await w.load();})`);
+  await waitFor(review, "document.querySelector('.pv-story')?.dataset.slide==='cover'", 'Story cover');
+  await sleep(800);
+  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  const evidence = [];
+  for (const [width, height] of [[1920, 1080], [1366, 768], [600, 800]]) {
+    await call('Emulation.setDeviceMetricsOverride', {width, height, deviceScaleFactor: 1, mobile: false}, review.sessionId);
+    await run("w.cls='all';w.rebuild();w.go(w.deck.findIndex(s=>s.id==='numbers'))");
+    await sleep(1200);
+    const initial = await run(`(()=>{window.f=document.querySelector('.pv-filter');window.b=document.querySelector('.pv-wdl');window.thumb=f.firstChild;const a=document.querySelector('.pv-story'),h=document.querySelector('.pv-story-host'),n=document.querySelector('.pv-next').getBoundingClientRect(),p=document.querySelector('.pv-prev').getBoundingClientRect();return {top:a.getBoundingClientRect().top-h.getBoundingClientRect().top,widths:[n.width,p.width],transform:thumb.style.transform};})()`);
+    assert.ok(initial.top < 24, 'Chapters start at the top');
+    assert.ok(Math.abs(initial.widths[0] - initial.widths[1]) < 1, 'Equal navigation widths');
+    await run("f.lastChild.dispatchEvent(new PointerEvent('pointerover',{bubbles:true}));document.querySelector('.pv-story-hero').click()");
+    assert.equal(await run('thumb.style.transform'), initial.transform);
+    assert.equal(await run('w.deck[w.index].id'), 'numbers');
+    const transition = await run(`(()=>{const old=document.querySelector('.pv-story-figure').textContent;[...f.querySelectorAll('button')].find(b=>b.textContent==='Bullet').click();return {old,current:document.querySelector('.pv-story-figure').textContent,filter:f===document.querySelector('.pv-filter'),bar:b===document.querySelector('.pv-wdl'),target:w.report.totals.games};})()`);
+    assert.ok(transition.filter && transition.bar, 'Filter and bar retain their nodes');
+    assert.equal(transition.current, transition.old, 'The count starts at the displayed value');
+    await sleep(120);
+    const markerDuring = await run("new DOMMatrixReadOnly(getComputedStyle(thumb).transform).m41");
+    await sleep(380);
+    const markerAfter = await run("new DOMMatrixReadOnly(getComputedStyle(thumb).transform).m41");
+    assert.ok(markerDuring > 0 && markerDuring < markerAfter, 'The marker makes one smooth trip to the clicked choice');
+    assert.equal(await run("document.querySelector('.pv-story-figure').textContent"), String(transition.target));
+    await run("[...f.querySelectorAll('button')].find(b=>b.textContent==='Blitz').click()");
+    await sleep(80);
+    await run("f.querySelector('button').click()");
+    await sleep(500);
+    assert.equal(await run("document.querySelector('.pv-story-figure').textContent"), String(rows.filter(r => r.t <= Date.now()/1000).length));
+    const numbers = await call('Page.captureScreenshot', {format: 'png'}, review.sessionId);
+    await fs.writeFile(path.join(out, `profile-story-numbers-${width}.png`), Buffer.from(numbers.data, 'base64'));
+    await run("w.go(w.deck.findIndex(s=>s.id==='openings'))");
+    assert.equal(await run("!!document.querySelector('.pv-reasons')"), false);
+    await run("w.go(w.deck.findIndex(s=>s.id==='season'))");
+    assert.equal(await run("document.querySelector('.pv-col-label').style.height"), '5%');
+    await run(`w.o.loadPgn=async()=> '[White "White player"]\\n[Black "Black player"]\\n[WhiteElo "1540"]\\n[BlackElo "1620"]\\n\\n1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 *';w.go(w.deck.findIndex(s=>s.id==='numbers'));document.querySelector('.pv-link').click();`);
+    await waitFor(review, "document.querySelector('.profile-game-chrome')?.textContent.includes('1540')", 'Game metadata');
+    await sleep(9500);
+    await waitFor(review, "document.querySelector('.profile-game-eval')?.getAttribute('aria-label').startsWith('Evaluation:')", 'Game evaluation');
+    const game = await run(`(()=>{const bar=document.querySelector('.profile-game-eval').getBoundingClientRect(),board=w.liveBoard.getBoundingClientRect(),chrome=document.querySelector('.profile-game-chrome');return {names:chrome.textContent,bar:{left:bar.left,right:bar.right,top:bar.top,height:bar.height},board:{left:board.left,top:board.top,height:board.height},eval:document.querySelector('.profile-game-eval').getAttribute('aria-label')};})()`);
+    assert.ok(game.names.includes('White player') && game.names.includes('Black player') && game.names.includes('1620'));
+    assert.ok(game.bar.left >= 0 && game.bar.right < game.board.left, JSON.stringify(game));
+    assert.ok(Math.abs(game.bar.top - game.board.top) < 2 && Math.abs(game.bar.height - game.board.height) < 3);
+    const screenshot = await call('Page.captureScreenshot', {format: 'png'}, review.sessionId);
+    await fs.writeFile(path.join(out, `profile-story-game-${width}.png`), Buffer.from(screenshot.data, 'base64'));
+    await run("w.go(w.deck.findIndex(s=>s.id==='numbers')+1)");
+    assert.equal(await run("!!document.querySelector('.profile-game-chrome')"), false);
+    evidence.push({width, height, initial, transition, game});
+  }
+  await run('w.close()');
+  await fs.writeFile(path.join(out, 'profile-story-evidence.json'), JSON.stringify(evidence, null, 2));
+  console.log(JSON.stringify({ok: true, out, viewports: evidence.length}));
+}
