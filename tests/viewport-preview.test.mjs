@@ -33,8 +33,8 @@ test('presets, custom sizes, rotation keep native dimensions and resize the same
   assert.equal(frame.style.transform,'scale(0.75)','1440p fits completely on a 1080p display by default');
   change('preview-scale','fit');change('screen-preset','2');assert.equal(frame.style.width,'3840px');assert.equal(frame.style.transform,'scale(0.5)');
   change('preview-scale','1');assert.equal(frame.style.transform,'scale(1)');
-  click('Phone');assert.equal(frame.style.width,'320px');assert.equal(frame.style.height,'568px');
-  $('rotate-screen').click();assert.equal(frame.style.width,'568px');assert.equal(frame.style.height,'320px');
+  click('Tablet');assert.equal(frame.style.width,'768px');assert.equal(frame.style.height,'1024px');
+  $('rotate-screen').click();assert.equal(frame.style.width,'1024px');assert.equal(frame.style.height,'768px');
   change('screen-width','900');change('screen-height','700');
   assert.equal(frame.style.width,'900px');assert.equal(frame.style.height,'700px');
   change('screen-width','0');assert.equal(frame.style.width,'900px');
@@ -93,7 +93,7 @@ test('monitor presets subtract browser and taskbar space after applying OS displ
   assert.deepEqual(monitorViewport(1920,1080,{pixelRatio:0,insetWidth:-2,insetHeight:-1}),[1920,1080]);
 });
 
-test('current window matches the launching viewport and monitor settings leave mobile/custom dimensions alone',t=>{
+test('current window matches the launching viewport and monitor settings leave tablet/custom dimensions alone',t=>{
   const dom=previewDOM(t,{width:1536,height:744,pixelRatio:1.25,insetWidth:0,insetHeight:120});
   const doc=dom.window.document,$=id=>doc.getElementById(id);
   Object.defineProperties($('preview-stage'),{clientWidth:{value:1536},clientHeight:{value:744}});
@@ -101,9 +101,9 @@ test('current window matches the launching viewport and monitor settings leave m
   const click=name=>[...doc.querySelectorAll('#device-tabs button')].find(b=>b.textContent===name).click();
   assert.equal(frame.style.width,'1536px');assert.equal(frame.style.height,'744px');assert.equal(frame.style.transform,'scale(1)');
   click('Desktop');assert.equal(frame.style.width,'1536px');assert.equal(frame.style.height,'744px');
-  click('Phone');assert.equal(frame.style.width,'320px');assert.equal(frame.style.height,'568px');
+  click('Tablet');assert.equal(frame.style.width,'768px');assert.equal(frame.style.height,'1024px');
   $('screen-width').value='900';$('screen-width').dispatchEvent(new dom.window.Event('change'));
-  assert.equal(frame.style.width,'900px');assert.equal(frame.style.height,'568px');
+  assert.equal(frame.style.width,'900px');assert.equal(frame.style.height,'1024px');
   click('Current');assert.equal(frame.style.width,'1536px');assert.equal(frame.style.height,'744px');
   assert.equal(frame.src,source);
 });

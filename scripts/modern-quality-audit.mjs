@@ -24,7 +24,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   const evidence = [];
   for (const design of ['original','distribution']) {
     await run(`import('./analysis.js').then(m=>{m.S.settings.accuracyQualityDesign='${design}';m.renderStats()})`);
-    for (const [width,height] of [[1920,1080],[1920,919],[1366,768],[1280,600],[1100,480],[820,900],[390,844],[320,640]]) {
+    for (const [width,height] of [[1920,1080],[1920,919],[1366,768],[1280,600],[1100,480],[820,900],[1366,657],[1280,590]]) {
       await resize(width,height);
       await run("import('./analysis.js').then(m=>m.setAccuracyPage(0))");
       const overview = await header();

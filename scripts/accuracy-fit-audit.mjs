@@ -11,7 +11,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   const original=await snapshot(),evidence=[];
   for(const busy of [false,true]) {
     await run(`import('./analysis.js').then(m=>{m.S.analyzing=${busy};m.renderStats()})`);
-    for(const [width,height]of [[1920,1080],[1920,919],[1920,880],[1920,800],[1536,704],[1366,768],[1280,600],[1280,560],[1100,480],[820,900],[390,844],[320,640]]) {
+    for(const [width,height]of [[1920,1080],[1920,919],[1920,880],[1920,800],[1536,704],[1366,768],[1280,600],[1280,560],[1100,480],[820,900],[1366,657],[1280,590]]) {
       await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);
       await sleep(250);
       await run('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');
