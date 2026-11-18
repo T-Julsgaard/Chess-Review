@@ -40,6 +40,8 @@ function setup(version = '0.4.0') {
     'playerHistory:v1': { chesscom: [{ id: 'game-one', white: 'saved-user', black: 'opponent' }] },
     'learning:v1': { schema: 1, lessons: { fork: { status: 'completed' } }, bests: { sprint: 12 } },
     'unknown:future-data': { keep: true },
+    // The interface language lives outside `settings`, so every reset keeps it.
+    language: 'zh-Hans',
   };
   const original = structuredClone(store), writes = [];
   chrome.runtime.getManifest = () => ({ version });
@@ -153,6 +155,11 @@ for (const version of ['0.4.0', '0.4.1', '1.0.0']) {
     await installed({ reason: 'install' });
     assertModern(store.settings); assert.equal(store[seen], undefined);
     const first = await workspace(t);
+    // A new installation chooses its language first; the note follows.
+    assert.equal(first.dom.window.document.querySelector('.learning-announcement'), null);
+    first.dom.window.document.querySelector('.lang-confirm').click();
+    await settle(); await first.run('learningAnnouncement?.ready');
+    assert.equal(store.language, 'en');
     assertModern(first.state.settings);
     assert.equal(first.state.settings.soundVolume, 50);
     assert.equal(first.dom.window.document.querySelectorAll('.learning-announcement-target').length, 2);

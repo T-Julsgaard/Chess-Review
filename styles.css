@@ -1754,6 +1754,65 @@ button { font-family: inherit; cursor: pointer; }
 .concepts-panel details p { font-size: 11px; margin-top: 6px; color: var(--ink-3); }
 
 
+/* ---------- LANGUAGE ---------- */
+/* Chinese text keeps the Latin UI font for Latin runs and a CJK face for the rest. */
+/* Only elements that carry the attribute; descendants inherit it, and their own fonts (.mono, badge samples) still win. */
+[lang="zh-Hans"] { --font-ui: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", sans-serif; font-family: var(--font-ui); }
+/* First-use picker: same surface as the credits dialog, above every workspace layer. */
+.lang-overlay {
+  position: fixed; inset: 0; z-index: 2500;
+  display: grid; place-items: center; padding: 16px; overflow-y: auto;
+  background: color-mix(in oklab, var(--bg) 62%, transparent);
+  backdrop-filter: blur(4px);
+  animation: credits-fade .14s ease;
+}
+.lang-card {
+  width: 100%; max-width: 360px; max-height: calc(100vh - 32px); overflow-y: auto;
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 18px; color: var(--ink);
+  animation: credits-rise .16s ease;
+}
+.lang-head { display: flex; align-items: center; gap: 11px; margin-bottom: 8px; }
+.lang-mark { display: grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: 9px; background: var(--accent); box-shadow: inset 0 1px 0 #ffffff30; }
+.lang-mark img { width: 24px; height: 24px; }
+.lang-title { margin: 0; font-size: 16px; font-weight: 800; letter-spacing: .01em; line-height: 1.3; }
+.lang-intro { margin: 0 0 14px; font-size: 12px; line-height: 1.55; color: var(--ink-2); }
+.lang-options, .set-language-list { display: grid; gap: 6px; }
+.lang-option, .set-language-option {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: 50px; padding: 9px 12px;
+  border: 1px solid var(--line); border-radius: 11px; background: var(--panel-2); color: var(--ink);
+  text-align: left; cursor: pointer; transition: border-color .14s, background .14s;
+}
+.lang-option:hover, .set-language-option:hover { border-color: color-mix(in oklab, var(--accent) 50%, var(--line)); }
+.lang-option[aria-checked="true"], .set-language-option[aria-checked="true"] {
+  border-color: var(--accent); background: color-mix(in oklab, var(--accent) 14%, var(--panel-2));
+}
+.lang-option:focus-visible, .set-language-option:focus-visible, .lang-later:focus-visible, .lang-confirm:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lang-flag, .set-language-flag { flex: none; width: 28px; height: 21px; border-radius: 4px; object-fit: cover; box-shadow: 0 0 0 1px color-mix(in oklab, var(--ink) 14%, transparent); }
+.set-language-flag { width: 24px; height: 18px; }
+.lang-names, .set-language-names { display: grid; gap: 1px; flex: 1; min-width: 0; }
+.lang-native, .set-language-native { font-size: 14px; font-weight: 750; line-height: 1.3; overflow-wrap: anywhere; }
+.set-language-native { font-size: 13px; }
+.lang-alt, .set-language-alt { font-size: 11px; color: var(--ink-3); line-height: 1.35; overflow-wrap: anywhere; }
+.lang-badge { flex: none; padding: 2px 7px; border-radius: 999px; font-size: 10px; font-weight: 700; letter-spacing: .02em;
+  color: var(--accent); background: color-mix(in oklab, var(--accent) 14%, transparent); }
+.lang-check { flex: none; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--line); }
+.lang-option[aria-checked="true"] .lang-check { border: 5px solid var(--accent); }
+.set-language-check { flex: none; width: 16px; text-align: center; color: var(--accent); font-weight: 800; }
+.lang-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.lang-later, .lang-confirm { min-height: 36px; padding: 8px 14px; border-radius: 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+.lang-later { border: 1px solid var(--line); background: transparent; color: var(--ink-2); }
+.lang-later:hover { color: var(--ink); border-color: color-mix(in oklab, var(--accent) 45%, var(--line)); }
+.lang-confirm { min-width: 96px; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); }
+.lang-confirm:hover { background: var(--accent-strong, var(--accent)); }
+.set-language { display: grid; gap: 10px; }
+.set-language .set-note { margin: 0; }
+@media (max-width: 380px) {
+  .lang-card { padding: 16px 14px; }
+  .lang-actions > * { flex: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .lang-overlay, .lang-card { animation: none; } }
+
 /* ---------- CREDITS & ATTRIBUTIONS ---------- */
 .credits-overlay {
   position: fixed; inset: 0; z-index: 80;
@@ -1836,7 +1895,7 @@ button { font-family: inherit; cursor: pointer; }
 .set-category-name { font-size: 12px; font-weight: 750; line-height: 1.25; color: var(--ink); }
 .set-category-description { font-size: 10px; font-weight: 450; line-height: 1.35; color: var(--ink-3); white-space: normal; }
 .set-category > .lib-dd-btn .set-category-copy::before {
-  content: "Settings"; font-size: 8px; line-height: 1; font-weight: 700; letter-spacing: .13em;
+  content: attr(data-eyebrow); font-size: 8px; line-height: 1; font-weight: 700; letter-spacing: .13em;
   text-transform: uppercase; color: var(--ink-3);
 }
 .set-category > .lib-dd-btn .set-category-description { display: none; }

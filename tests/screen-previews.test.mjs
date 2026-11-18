@@ -49,7 +49,7 @@ test('viewport previews copy real library and progress into memory and accept a 
 });
 
 test('viewport startup uses the current game without mounting a scenario toolbar or writing real storage',async t=>{
-  const a=app(t,{url:'https://extension.test/analysis.html?viewport-preview=1'});
+  const a=app(t,{url:'https://extension.test/analysis.html?viewport-preview=1',savedLanguage:null});
   const original={settings:{accent:'#123456'},library:[{id:'keep'}]};Object.assign(a.store,structuredClone(original));
   a.dom.window.sessionStorage.setItem('screen-size-preview',JSON.stringify({job:{pgn:'1. d4 d5',meta:{},source:'pgn'},idx:1}));
   a.replace('loadBook',async()=>{});a.replace('loadCalibration',async()=>{});
@@ -68,7 +68,7 @@ test('viewport previews never expose tab zoom APIs to the host',async t=>{
 });
 
 test('preview startup reads display preferences but never migrates or saves real account data',async t=>{
-  const a=app(t,{url:'https://extension.test/analysis.html?screen-preview=review#keep'}),original={settings:{accent:'#123456'},username:'real user',library:[{id:'keep'}]};
+  const a=app(t,{url:'https://extension.test/analysis.html?screen-preview=review#keep',savedLanguage:null}),original={settings:{accent:'#123456'},username:'real user',library:[{id:'keep'}]};
   Object.assign(a.store,structuredClone(original));let releaseCalls=0,mounted=0;
   a.replace('resetSettingsForRelease',async()=>{releaseCalls++;});
   a.replace('loadBook',async()=>{});a.replace('loadCalibration',async()=>{});

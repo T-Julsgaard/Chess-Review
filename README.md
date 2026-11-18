@@ -44,8 +44,11 @@ detected, enter it once; it is remembered locally. Chess Review is intended for
 review after play.
 
 Settings let you choose an engine, rating mode, board, pieces, sounds, coach and
-category-badge appearance. Badge numbers describe move categories; they are
-separate from position evaluation and game accuracy.
+category-badge appearance. The interface language (English or 简体中文) is chosen
+on first use and can be changed under Settings → Language; so far only Settings
+and the language choice are translated, and the rest of Chess Review is in English.
+Badge numbers describe move categories; they are separate from position evaluation
+and game accuracy.
 
 Both engines offer **Use recorded rating** and **Moves only**. The first compares
 your performance with public players near the rating saved in the game; the

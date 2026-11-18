@@ -167,9 +167,10 @@ test('threat color previews, saves and resets independently of best-move and use
 });
 
 test('Simplified Chinese settings keep move grades and setting values intact', t => {
-  const a = app(t, {language: 'zh-CN'});
+  const a = app(t);
   loadGame(a, '1. e4 e5');
   a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
+  a.call('applyUiLanguage', 'zh-Hans');
   a.call('toggleSettings');
   const doc = a.dom.window.document;
   assert.equal(doc.querySelector('.set-category').closest('[lang]').lang, 'zh-Hans');

@@ -1,4 +1,3 @@
-import {localizeSettings, settingsTranslator} from "./lib/settings-locale.js";
 // analysis.js — Chess Review analysis page.
 // Parses the PGN, runs Stockfish through the game and fills every panel with real
 // data: eval bar/graph, accuracy, mistake classification, engine lines (MultiPV),
@@ -34,6 +33,8 @@ import { identityForGame, knownAccounts, IDENTITY_KEY } from "./lib/identity.js"
 import { loadProfileWorkspace, loadProfileDesigns } from "./lib/profile-loader.js";
 import { createReviewEffects } from "./lib/review-effects.js";
 import { explainMove, explanationPv } from "./lib/move-explanation.js";
+import { createTranslator, LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, isSupportedLanguage, suggestLanguage, browserLanguages } from "./lib/i18n/index.js";
+import { openLanguagePicker } from "./lib/i18n/language-picker.js";
 
 const reviewEffects = createReviewEffects(document);
 
@@ -176,10 +177,13 @@ const QUALITY_DESC = {
   miss:      "Missed chance: the opponent erred and you failed to punish it — or you let a forced mate slip.",
   blunder:   "A loss of at least 20 percentage points in estimated winning chances, or a severe forced-mate error. Special cases such as a missed opportunity can receive another label.",
 };
+// Interface language (Settings → Language). Only the settings panel and the language
+// picker are translated so far; the rest of the workspace stays English. English is
+// used until the user confirms a choice, which is saved under its own storage key.
+let i18n = createTranslator(DEFAULT_LANGUAGE);
+const settingsText = (text, context) => i18n.text(text, context);
+const settingsFormat = (template, ...args) => i18n.format(template, ...args);
 // Explanations for the accuracy and elo numbers (shown as a tooltip like the categories).
-const settingsLocale = globalThis.navigator?.language || "en";
-const settingsText = settingsTranslator(settingsLocale);
-const settingsLanguage = settingsText("Settings") === "Settings" ? "en" : "zh-Hans";
 const ACCURACY_INFO = "SF18 uses the published public-data move-quality model, calibrated at depth 16, hash 16 MB and maximum strength. Custom settings still produce accuracy estimates, with less validation. SF19 estimates accuracy from centipawn evaluations using a public winning-chance curve and combines ordinary and harmonic move averages to give mistakes more weight. Forced moves are excluded and opening moves are included. Annotations do not alter accuracy. Scores are estimates, not official platform scores.";
 const ELO_INFO = "Both engines support both rating modes using their own models. Use recorded rating compares this game's performance with players around the rating saved in the game. Stockfish 18 uses its accuracy model, with less validation at custom search settings; Stockfish 19 uses its own expected-point losses, separately from displayed accuracy. Moves only ignores the saved rating and estimates a blitz rating level from the moves themselves; it needs at least 10 moves with more than one legal choice. Neither estimate changes your account rating.";
 // Explanations for the engine settings (shown on hover, same tooltip as the accuracy panel).
@@ -485,6 +489,7 @@ const MOD_MINW = { evalbar: 16 };
 const modMinW = (key) => MOD_MINW[key] ?? MINW;
 
 const ICONS = {
+  globe: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/></svg>`,
   chat: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11a8 8 0 0 1-8 8H5l-3 3V11a9.5 9.5 0 0 1 19 0Z"/><path d="M8 9h8M8 13h5"/></svg>`,
   cpu: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="3"/><path d="M9 2v4m6-4v4M9 18v4m6-4v4M2 9h4m-4 6h4m12-6h4m-4 6h4"/><rect x="10" y="10" width="4" height="4" rx="1"/></svg>`,
   sound: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m11 4-5 4H3v8h3l5 4V4Zm4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></svg>`,
@@ -1661,7 +1666,7 @@ function buildUI() {
       el("button", { class: "icon-btn", "data-game-action":"", "aria-label": "Flip board", onclick: toggleFlip }, icon("flip")),
       el("button", { class: "icon-btn", "data-game-action":"", "aria-label": "Share game (copy link)", onclick: shareGame }, icon("share")),
       el("button", { class: "icon-btn", "aria-label": "Credits & attributions", onclick: openCredits }, icon("info")),
-      el("button", { class: "icon-btn", "aria-label": settingsText("Settings"), onclick: toggleSettings }, icon("gear")),
+      el("button", { class: "icon-btn", "data-settings-toggle": "", "aria-label": settingsText("Settings"), onclick: toggleSettings }, icon("gear")),
     ),
   );
 
@@ -6229,7 +6234,7 @@ function slider(label, key, min, max, step, opts = {}) {
       type: "range", "data-setting":key, min, max, step, value: S.settings[key],
       oninput: (e) => {
         const v = +e.target.value;
-        out.textContent = fmt(v);
+        out.textContent = settingsText(fmt(v));
         S.settings[key] = v;
         writeSettings({ [key]: v });
         opts.onChange?.(v);
@@ -6265,6 +6270,11 @@ function paintColorPickerChip(chip, colors) {
   swatch.style.background = colors[0];
   swatch.replaceChildren(...(colors.length > 1 ? [el("span", { class: "half r", style: { background: colors[1] } })] : []));
 }
+// Colour popovers open outside the settings panel, so they are translated separately.
+function localizedSettingsPopup(pop) {
+  pop.lang = i18n.language;
+  return i18n.localize(pop);
+}
 let _accentPickCleanup = null;
 function openAccentColorPicker(anchor) {
   if (_accentPickCleanup) _accentPickCleanup();
@@ -6279,7 +6289,7 @@ function openAccentColorPicker(anchor) {
   );
   const pop = el("div", { class: "board-cpick", role: "dialog", "aria-label": "Custom accent color" },
     el("div", { class: "cpick-title" }, "Custom accent"), picker.el);
-  document.body.append(pop);
+  document.body.append(localizedSettingsPopup(pop));
   const r = anchor.getBoundingClientRect(), pr = pop.getBoundingClientRect();
   pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - pr.width - 8)) + "px";
   pop.style.top = Math.max(8, r.bottom + pr.height + 6 > window.innerHeight ? r.top - pr.height - 6 : r.bottom + 6) + "px";
@@ -6397,7 +6407,7 @@ function openArrowColorPicker(anchor, key = "bestArrowColor") {
   const picker = buildColorPicker(S.settings[key] || DEFAULT_SETTINGS[key], update, save);
   const pop = el("div", { class: "board-cpick", role: "dialog", "aria-label": title + " color" },
     el("div", { class: "cpick-title" }, title), picker.el);
-  document.body.append(pop);
+  document.body.append(localizedSettingsPopup(pop));
   const r = anchor.getBoundingClientRect(), pr = pop.getBoundingClientRect();
   pop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - pr.width - 8)) + "px";
   pop.style.top = Math.max(8, r.bottom + pr.height + 6 > window.innerHeight - 8
@@ -6434,8 +6444,8 @@ function openBoardColorPicker(anchor) {
   const paint = () => {
     const [lt, dk] = customBoardColors();
     paintColorPickerChip(anchor, [lt, dk]);
-    swL.replaceChildren(el("span", { class: "cpick-tsw", style: { background: lt } }), el("span", {}, "Light"));
-    swD.replaceChildren(el("span", { class: "cpick-tsw", style: { background: dk } }), el("span", {}, "Dark"));
+    swL.replaceChildren(el("span", { class: "cpick-tsw", style: { background: lt } }), el("span", {}, settingsText("Light", "board-squares")));
+    swD.replaceChildren(el("span", { class: "cpick-tsw", style: { background: dk } }), el("span", {}, settingsText("Dark", "board-squares")));
   };
   const picker = buildColorPicker(S.settings[target],
     (hex) => { S.settings[target] = hex; applySettings(); paint(); },         // live
@@ -6451,10 +6461,10 @@ function openBoardColorPicker(anchor) {
   paint();
   const pop = el("div", { class: "board-cpick", role: "dialog", "aria-label": "Custom board colors" },
     el("div", { class: "cpick-title" }, "Custom board"),
-    el("div", { class: "cpick-targets" }, swL, swD),
+    el("div", { class: "cpick-targets", "data-i18n-context": "board-squares" }, swL, swD),
     picker.el,
   );
-  document.body.append(pop);
+  document.body.append(localizedSettingsPopup(pop));
   // Anchor under the chip, kept inside the viewport.
   const r = anchor.getBoundingClientRect(), pr = pop.getBoundingClientRect();
   let left = r.left, top = r.bottom + 6;
@@ -6502,7 +6512,7 @@ function engineSlider(label, key, min, max, step, opts = {}) {
       type: "range", "data-setting":key, min, max, step, value: S.settings[key],
       oninput: (e) => {
         const v = +e.target.value;
-        out.textContent = fmt(v);
+        out.textContent = settingsText(fmt(v));
         if (key === "engineDepth") return; // preview while dragging; confirm once on release
         S.settings[key] = v;
         writeSettings({ [key]: v });
@@ -6516,7 +6526,7 @@ function engineSlider(label, key, min, max, step, opts = {}) {
       onchange: async e => {
         if (key !== "engineDepth") return;
         await setEngineSetting(key, +e.target.value);
-        e.target.value = S.settings[key]; out.textContent = fmt(+S.settings[key]);
+        e.target.value = S.settings[key]; out.textContent = settingsText(fmt(+S.settings[key]));
       },
     }),
   );
@@ -6709,7 +6719,7 @@ function reviewSettings() {
       seg("Review experience", "reviewMode", ["normal", "dopamine"], null, value => value === "dopamine" ? "Dopamine" : "Normal"),
       S.settings.reviewMode === "dopamine" ? el("div", { class: "dopamine-preview-buttons" }, ...["brilliant", "blunder"].map(category =>
         el("button", { type: "button", class: "set-reset", disabled: S.reorganize,
-          onclick: () => previewReviewEffect(category) }, settingsText("Preview {0} effect").replace("{0}", categoryName(category))))) : null,
+          onclick: () => previewReviewEffect(category) }, settingsFormat("Preview {0} effect", categoryName(category))))) : null,
     ),
     section("Coach",
       coachPicker(),
@@ -6759,8 +6769,11 @@ function profileSettings() {
   const budgets = [["quick", "Quick (about 2 min)"], ["standard", "Standard (about 10 min)"], ["deep", "Deep (about 30 min)"]];
   const usage = el("span", { class: "set-note" }, "Measuring…");
   loadProfileWorkspace().then(({profileStorageUsage}) => profileStorageUsage(browserAPI.storage.local)).then(info => {
-    usage.textContent = info.accounts ? `${info.accounts} ${info.accounts === 1 ? "player" : "players"}, ${info.engine} engine-checked games, about ${Math.max(1, Math.round(info.bytes / 1024))} KB stored locally.` : "No profile data stored yet.";
-  }).catch(() => { usage.textContent = "Could not read storage."; });
+    usage.textContent = info.accounts
+      ? settingsFormat(info.accounts === 1 ? "{0} player, {1} engine-checked games, about {2} KB stored locally." : "{0} players, {1} engine-checked games, about {2} KB stored locally.",
+        info.accounts, info.engine, Math.max(1, Math.round(info.bytes / 1024)))
+      : settingsText("No profile data stored yet.");
+  }).catch(() => { usage.textContent = settingsText("Could not read storage."); });
   return el("div", {},
     section("Recap",
       el("div", { class: "set-row" }, setLabel("Default period", "The period the Player profile opens with. The picker inside the profile changes it for the session and remembers your choice."),
@@ -6773,8 +6786,8 @@ function profileSettings() {
       el("div", { class: "set-row hint" }, usage),
       el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Games are fetched from the public Chess.com and Lichess APIs straight into this browser and kept only here. Finished months are never fetched twice.")),
       el("button", { class: "set-reset", onclick: async () => {
-        try { const {deleteProfileData} = await loadProfileWorkspace(); const removed = await deleteProfileData(browserAPI.storage.local); toast(removed ? "Profile data deleted" : "Nothing to delete"); if (profileWorkspace) profileWorkspace.close(); renderSettings(); }
-        catch { toast("Could not delete profile data"); }
+        try { const {deleteProfileData} = await loadProfileWorkspace(); const removed = await deleteProfileData(browserAPI.storage.local); toast(settingsText(removed ? "Profile data deleted" : "Nothing to delete")); if (profileWorkspace) profileWorkspace.close(); renderSettings(); }
+        catch { toast(settingsText("Could not delete profile data")); }
       } }, "Delete all profile data"),
     ),
   );
@@ -6854,7 +6867,7 @@ function fxSlider(ev, field, label, min, max, step, fmt) {
     el("div", { class: "set-ctrl-top" }, el("span", { class: "set-lbl" }, label), out),
     el("input", {
       type: "range", min, max, step, value: fxConfig(ev)[field], "aria-label": eventLabel + " " + field,
-      oninput: (e) => { const v = +e.target.value; out.textContent = fmt(v); setFx(ev, field, v); },
+      oninput: (e) => { const v = +e.target.value; out.textContent = settingsText(fmt(v)); setFx(ev, field, v); },
       onchange: () => { if (ev !== "runStart") triggerFx(ev); },
     }),
   );
@@ -6888,7 +6901,8 @@ function motorSettings() {
       (S.engineFallbackBuild && S.engineFallbackBuild !== S.settings.enginePath)
         ? el("div", { class: "set-row hint" },
             el("span", { class: "set-note" },
-              `⚠ At least one worker couldn't start "${ENGINE_NAME[S.settings.enginePath] || S.settings.enginePath}" and used ${ENGINE_NAME[S.engineFallbackBuild] || S.engineFallbackBuild} instead.`))
+              settingsFormat("⚠ At least one worker couldn't start \"{0}\" and used {1} instead.",
+                ENGINE_NAME[S.settings.enginePath] || S.settings.enginePath, ENGINE_NAME[S.engineFallbackBuild] || S.engineFallbackBuild)))
         : null,
       S.settings.enginePath === "sf19lite" ? el("div", { class: "set-row hint" },
         el("span", { class: "set-note" }, "SF19 reviews use fixed calibration settings at full strength. Depth and hash controls affect the live engine panel.")) : null,
@@ -6928,6 +6942,7 @@ function categoryBadgePicker(category) {
       { ...S.settings, badgeSymbols: { [category]: id } }) }),
     el("span", {}, label)));
   field.classList.add("set-dropdown", "badge-symbol-dropdown");
+  field.dataset.i18nContext = "badge-symbol"; // "Check" here is a check mark, not a chess check
   const button = field.querySelector(".lib-dd-btn"), menu = field.querySelector(".lib-dd-menu");
   button.dataset.badgePicker = category;
   const currentName = options.find(([id]) => id === selected)[1];
@@ -7003,7 +7018,85 @@ function badgeSettings() {
       el("div", { class: "set-lbl" }, "Number font"), badgeFontPicker()) : null,
     badgeLabelPicker());
 }
+// Settings → Language. Choosing applies at once, keeps the game and workspace as they
+// are, and saves the choice under its own key (see LANGUAGE_STORAGE_KEY).
+function languageSettings() {
+  const options = LANGUAGES.map(language => {
+    const checked = language.id === i18n.language, alt = i18n.t("language.name." + language.id);
+    return el("button", { type: "button", class: "set-language-option" + (checked ? " on" : ""), role: "radio",
+      "aria-checked": String(checked), tabindex: checked ? "0" : "-1", "data-language": language.id,
+      onclick: () => chooseUiLanguage(language.id), onkeydown: languageOptionKey },
+      el("img", { class: "set-language-flag", src: "flags/" + language.flag + ".svg", alt: "", width: 24, height: 18, draggable: "false" }),
+      el("span", { class: "set-language-names" },
+        el("span", { class: "set-language-native", lang: language.id, translate: "no" }, language.nativeName),
+        alt !== language.nativeName ? el("span", { class: "set-language-alt", translate: "no" }, alt) : null),
+      el("span", { class: "set-language-check", "aria-hidden": "true" }, checked ? "✓" : ""));
+  });
+  return el("div", { class: "set-language" },
+    el("div", { class: "set-language-list", role: "radiogroup", "aria-label": i18n.t("language.settings.title") }, ...options),
+    el("p", { class: "set-note", translate: "no" }, i18n.t("language.settings.intro")),
+    el("p", { class: "set-note", translate: "no" }, i18n.t("language.settings.coverage")));
+}
+function languageOptionKey(event) {
+  const keys = ["ArrowDown", "ArrowRight", "ArrowUp", "ArrowLeft", "Home", "End"];
+  if (!keys.includes(event.key)) return;
+  event.preventDefault(); event.stopPropagation();
+  const ids = LANGUAGES.map(language => language.id), current = ids.indexOf(event.currentTarget.dataset.language), last = ids.length - 1;
+  const next = event.key === "Home" ? 0 : event.key === "End" ? last
+    : ["ArrowDown", "ArrowRight"].includes(event.key) ? (current === last ? 0 : current + 1) : (current === 0 ? last : current - 1);
+  chooseUiLanguage(ids[next]);
+}
+// Switch the interface language in place. Nothing is reloaded, so the current
+// game, analysis, layout and open panels stay exactly as they are.
+function applyUiLanguage(id) {
+  const next = isSupportedLanguage(id) ? id : DEFAULT_LANGUAGE;
+  if (next === i18n.language) return false;
+  const focusedLanguage = document.activeElement?.closest?.(".set-language-option");
+  i18n = createTranslator(next);
+  document.querySelector("[data-settings-toggle]")?.setAttribute("aria-label", settingsText("Settings"));
+  hideQTip();
+  if (UI.settings && !UI.settings.hidden) {
+    renderSettings();
+    if (focusedLanguage) UI.settings.querySelector(`[data-language="${next}"]`)?.focus({ preventScroll: true });
+  }
+  return true;
+}
+async function chooseUiLanguage(id) {
+  if (!isSupportedLanguage(id)) return;
+  applyUiLanguage(id);
+  try { await browserAPI.storage.local.set({ [LANGUAGE_STORAGE_KEY]: id }); }
+  catch (error) { console.warn("[Chess Review] language choice could not be saved:", error); }
+}
+// First use (no saved choice): ask once per visit until the user confirms. The
+// workspace underneath — and whatever game it was opening — stays loaded.
+let languagePicker = null, afterLanguagePicker = null;
+function offerLanguageChoice(after = () => {}) {
+  if (languagePicker?.open) return languagePicker;
+  afterLanguagePicker = after;
+  const finish = () => { languagePicker = null; const next = afterLanguagePicker; afterLanguagePicker = null; next?.(); };
+  languagePicker = openLanguagePicker({
+    document,
+    suggested: suggestLanguage(browserLanguages(navigator)),
+    inertTarget: () => document.querySelector(".app"),
+    onConfirm: async id => { await chooseUiLanguage(id); finish(); },
+    onDismiss: finish,
+  });
+  return languagePicker;
+}
+// Another tab saved a language: follow it here and drop a pending picker.
+function languageStorageChanged(changes, area) {
+  if (area && area !== "local") return;
+  const change = changes?.[LANGUAGE_STORAGE_KEY];
+  if (!change || !isSupportedLanguage(change.newValue)) return;
+  applyUiLanguage(change.newValue);
+  if (languagePicker?.open) {
+    languagePicker.close();
+    languagePicker = null;
+    const next = afterLanguagePicker; afterLanguagePicker = null; next?.();
+  }
+}
 const SETTINGS_CATEGORIES = [
+  {id:"language", label:"Language", description:LANGUAGES.map(language => language.nativeName).join(" · "), icon:"globe", render:languageSettings},
   {id:"visual", label:"Visual", description:"Make the workspace yours", icon:"palette", render:visualSettings},
   {id:"review", label:"Review & Coach", description:"Commentary, character & reactions", icon:"chat", render:reviewSettings},
   {id:"engine", label:"Engine", description:"Analysis power & rating estimates", icon:"cpu", render:motorSettings},
@@ -7034,7 +7127,8 @@ function settingsCategoryPicker() {
   field.classList.add('set-category');
   field.dataset.motion = S.settings.uiAnim === false ? 'off' : 'on';
   const button = field.querySelector('.lib-dd-btn'), menu = field.querySelector('.lib-dd-menu');
-  button.setAttribute('aria-label', settingsText("Settings category: {0}").replace("{0}", settingsText(SETTINGS_CATEGORIES.find(category => category.id === S.settingsTab).label)));
+  button.querySelector('.set-category-copy')?.setAttribute('data-eyebrow', settingsText("Settings")); // CSS ::before label
+  button.setAttribute('aria-label', settingsFormat("Settings category: {0}", settingsText(SETTINGS_CATEGORIES.find(category => category.id === S.settingsTab).label)));
   button.setAttribute('aria-haspopup', 'menu');
   button.setAttribute('aria-controls', 'settingsCategoryMenu');
   menu.id = 'settingsCategoryMenu'; menu.setAttribute('role', 'menu'); menu.setAttribute('aria-label', 'Settings categories');
@@ -7074,13 +7168,13 @@ function renderSettings(animate = false) {
   const content = category.render();
   content.id = 'settingsCategoryContent';
   content.classList.add('set-category-content');
-  content.setAttribute('role', 'region'); content.setAttribute('aria-label', settingsText("{0} settings").replace("{0}", settingsText(category.label)));
+  content.setAttribute('role', 'region'); content.setAttribute('aria-label', settingsFormat("{0} settings", settingsText(category.label)));
   content.dataset.enter = String(animate && S.settings.uiAnim !== false);
   [...content.children].forEach((child, index) => child.style.setProperty('--set-order', Math.min(index, 5)));
   const picker = settingsCategoryPicker();
-  UI.settings.lang = settingsLanguage;
-  localizeSettings(picker, settingsText);
-  localizeSettings(content, settingsText);
+  UI.settings.lang = i18n.language;
+  i18n.localize(picker);
+  i18n.localize(content);
   UI.settings.replaceChildren(picker, content);
   UI.settings.scrollTop = scroll;
   if (focusedBadgePicker) UI.settings.querySelector(`[data-badge-picker="${focusedBadgePicker}"]`)?.focus({ preventScroll: true });
@@ -8799,7 +8893,11 @@ async function showReadyWorkspace() {
     // Load review data alongside the job and preferences while the startup mark is visible.
     const dataReady = blankLaunch&&!location.hash&&!screenPreview ? Promise.resolve()
       : Promise.all([loadBook(), loadCalibration().catch(error => {console.warn(error);return null;})]);
-    const [payload, store] = await Promise.all([loadJob(), browserAPI.storage.local.get(["settings", "username", "layout", "layoutMode", "layoutVersion", "library"])]);
+    const [payload, store] = await Promise.all([loadJob(), browserAPI.storage.local.get(["settings", "username", "layout", "layoutMode", "layoutVersion", "library", LANGUAGE_STORAGE_KEY])]);
+    // Screen previews show the saved language but never ask for one.
+    const savedLanguage = isSupportedLanguage(store[LANGUAGE_STORAGE_KEY]) ? store[LANGUAGE_STORAGE_KEY] : null;
+    if (savedLanguage) applyUiLanguage(savedLanguage);
+    if (!screenPreview) browserAPI.storage.onChanged?.addListener(languageStorageChanged);
     S.library = Array.isArray(store.library) ? store.library : [];
     S.settings = { ...DEFAULT_SETTINGS, ...(store.settings || {}) };
     const loadedSettings = structuredClone(S.settings);
@@ -8910,8 +9008,13 @@ async function showReadyWorkspace() {
     if (jobId && rememberReviewJob()) {
       await browserAPI.storage.local.remove(`job:${jobId}`);
     }
-    if (!screenPreview) learningAnnouncement = mountLearningAnnouncement({document, storage:browserAPI.storage.local,
-      motion:()=>S.settings.uiAnim!==false});
+    if (!screenPreview) {
+      // The puzzles announcement waits until the language picker has closed.
+      const announce = () => { learningAnnouncement = mountLearningAnnouncement({document, storage:browserAPI.storage.local,
+        motion:()=>S.settings.uiAnim!==false}); };
+      if (savedLanguage) announce();
+      else offerLanguageChoice(announce);
+    }
     if(screenPreview?.viewport){
       if(!S.blank&&Number.isInteger(screenPreview.idx))go(screenPreview.idx);
       document.body.dataset.previewReady="true";

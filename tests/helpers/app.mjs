@@ -1,4 +1,3 @@
-import {localizeSettings, settingsTranslator} from '../../lib/settings-locale.js';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { JSDOM } from 'jsdom';
@@ -32,6 +31,8 @@ import {ProfileWorkspace} from '../../lib/profile/workspace.js';
 import {profileWorkspaceClass} from '../../lib/profile/designs/index.js';
 import {createReviewEffects} from '../../lib/review-effects.js';
 import {explainMove, explanationPv} from '../../lib/move-explanation.js';
+import {createTranslator, LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, isSupportedLanguage, suggestLanguage, browserLanguages} from '../../lib/i18n/index.js';
+import {openLanguagePicker} from '../../lib/i18n/language-picker.js';
 
 // Execute the real application in a DOM, stubbing only browser/engine boundaries.
 // Automatic startup and imports are omitted; production needs no test exports.
@@ -40,14 +41,19 @@ const startup = raw.indexOf('(async function main()');
 if (startup < 0) throw Error('Application startup marker missing');
 const source = raw.slice(0, startup).replace(/^import .*;\r?\n/gm, '');
 
-export function app(t, {hardware,language='en-US',url='https://extension.test/analysis.html#test-game',html='<!doctype html><div id="root"></div>'} = {}) {
+// languages: the browser's ordered preferences. savedLanguage: the stored choice;
+// null leaves it unset, as for a new or existing user who has not chosen yet.
+export function app(t, {hardware,languages=['en-US'],savedLanguage='en',url='https://extension.test/analysis.html#test-game',html='<!doctype html><div id="root"></div>'} = {}) {
   const dom = new JSDOM(html, { url, pretendToBeVisual: true });
-  Object.defineProperty(dom.window.navigator, 'language', {value:language});
+  Object.defineProperties(dom.window.navigator, {
+    language: {configurable:true,value:languages[0]},
+    languages: {configurable:true,value:Object.freeze([...languages])},
+  });
   if (hardware) Object.defineProperties(dom.window.navigator, {
     hardwareConcurrency: {configurable:true,value:hardware.hardwareConcurrency},
     deviceMemory: {configurable:true,value:hardware.deviceMemory},
   });
-  const store = {}, writes = [], timers = new Set();
+  const store = savedLanguage == null ? {} : {language: savedLanguage}, writes = [], timers = new Set();
   const browserAPI = {
     runtime: { getURL: p => `https://extension.test/${p}` },
     storage: { local: {
@@ -57,7 +63,7 @@ export function app(t, {hardware,language='en-US',url='https://extension.test/an
     } },
   };
   const context = vm.createContext({
-    localizeSettings, settingsTranslator,
+    createTranslator, LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, isSupportedLanguage, suggestLanguage, browserLanguages, openLanguagePicker,
     window: dom.window, document: dom.window.document, navigator: dom.window.navigator, LearningWorkspace,
     loadLearningWorkspace:async () => ({LearningWorkspace}), presentationFor, mountLearningAnnouncement,
     panelScale,panelGroupBounds,scalePanelGroup,movePanelGroup,fullHdReferenceLayout,viewportGrowth,UI_SETUPS,MODERN_LAYOUT,

@@ -39,9 +39,9 @@ test('category menu supports arrow navigation, boundaries, Escape, Tab and focus
   trigger().focus();key('ArrowDown');
   assert.equal(trigger().getAttribute('aria-expanded'),'true');assert.equal(doc.activeElement.dataset.category,'visual');
   key('End');assert.equal(doc.activeElement.dataset.category,'developer');
-  key('ArrowDown');assert.equal(doc.activeElement.dataset.category,'visual');
+  key('ArrowDown');assert.equal(doc.activeElement.dataset.category,'language');
   key('ArrowUp');assert.equal(doc.activeElement.dataset.category,'developer');
-  key('Home');assert.equal(doc.activeElement.dataset.category,'visual');
+  key('Home');assert.equal(doc.activeElement.dataset.category,'language');
   key('Escape');assert.equal(doc.activeElement,trigger());assert.equal(trigger().getAttribute('aria-expanded'),'false');
   key('ArrowDown');key('Tab');assert.equal(trigger().getAttribute('aria-expanded'),'false');
   trigger().focus();key('ArrowDown');doc.querySelector('.set-sect-head').focus();await settle();

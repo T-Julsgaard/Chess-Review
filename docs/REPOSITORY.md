@@ -15,6 +15,7 @@ Many small asset files are intentional; removing them can break optional setting
 | `chesscom.js`, `lichess.js`, `content.js`, `lichess-content.js`, `content-button.css` | Fetch public games and add the review controls to supported sites. |
 | `flags.js`, `flags/` | Country mapping and player flag images, selected dynamically. |
 | `lib/` | Chess rules, numerical scoring, calibrated search/review logic and the transparent category-label renderer. |
+| `lib/i18n/` | Interface languages, bundled translation catalogs and the first-use language picker. See [TRANSLATIONS.md](TRANSLATIONS.md). |
 | `engine/` | Two bundled Stockfish builds, the UCI client, checksums and source/license references. Large WASM files are required. |
 | `data/book.json`, `data/calibration.json` | Offline opening dictionary and the current numerical model/settings. |
 | `data/coaches/`, `data/coaches-anim/rigs/` | Coach phrase banks and animation pages/scripts. The HTML rigs are loaded by the review screen; they are not temporary previews. |
