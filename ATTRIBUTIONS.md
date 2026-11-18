@@ -14,6 +14,7 @@ redistribution permission.
 - **[Thomas Murray](https://github.com/MurrayThomas)** — Contributor
 - **[lautpuspa](https://github.com/lautpuspa)** — Contributor
 - **[lightskip](https://github.com/lightskip)** — Contributor
+- **[titiyi](https://github.com/titiyi)** — Contributor
 - **[T-Julsgaard](https://github.com/T-Julsgaard)** — Creator & lead developer
 
 ## Chess pieces (bundled SVG sets)

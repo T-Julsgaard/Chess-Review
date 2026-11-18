@@ -7281,6 +7281,7 @@ const CONTRIBUTORS = [
   { name: "Thomas Murray", username: "MurrayThomas", role: "Contributor" },
   { name: "lautpuspa", username: "lautpuspa", role: "Contributor" },
   { name: "lightskip", username: "lightskip", role: "Contributor" },
+  { name: "titiyi", username: "titiyi", role: "Contributor" },
   { name: "T-Julsgaard", username: "T-Julsgaard", role: "Creator & lead developer" },
 ];
 const REPO_URL = "https://github.com/T-Julsgaard/Chess-Review";
