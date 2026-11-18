@@ -28,7 +28,7 @@ export async function auditLearning({review, call, evaluate, sleep, waitFor, out
       const r = n => { const b = n.getBoundingClientRect(); return {left:b.left, right:b.right, top:b.top, bottom:b.bottom}; };
       return {map:r(map), caption:r(caption), shell:r(shell), etaRect:r(document.querySelector('.profile-loader-eta')), cancel:r(document.querySelector('.profile-loader button')), children:map.querySelectorAll('*').length, count:document.querySelector('.profile-map-summary').textContent, eta:document.querySelector('.profile-loader-eta').textContent, overflow:shell.scrollWidth-shell.clientWidth};
     })()`);
-    assert.equal(measure.children, 4); assert.equal(measure.count, '190 games');
+    assert.equal(measure.children, 1); assert.equal(measure.count, '190 games');
     assert.match(measure.eta, /About 2 min/);
     assert.ok(measure.map.left >= 0 && measure.map.right <= width + 1);
     assert.ok(measure.shell.bottom <= height + 1); assert.ok(measure.caption.bottom <= measure.shell.top || measure.caption.right <= measure.shell.left, JSON.stringify({width, height, ...measure}));
@@ -39,10 +39,7 @@ export async function auditLearning({review, call, evaluate, sleep, waitFor, out
     await fs.writeFile(path.join(out, `profile-streaming-${width}x${height}.png`), Buffer.from(shot.data, 'base64'));
     await run(`import('./analysis.js').then(m => { const w = m.profileWorkspace, base = w.rows;
       w.rows = Array.from({length: 10000}, (_, i) => ({...base[i % base.length], id: String(i), t: 1767225600 + i * 60})); w.updateGameMap();
-      const map = document.querySelector('.profile-game-map'); map.focus(); map.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter', bubbles: true}));
     })`);
-    assert.match(await run("document.querySelector('.profile-game-map').getAttribute('aria-label')"), /^10 games/);
-    await run("document.querySelector('.profile-game-map').dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}))");
     assert.match(await run("document.querySelector('.profile-game-map').getAttribute('aria-label')"), /^10[,.]000 games/);
     await run("import('./analysis.js').then(m => m.profileWorkspace.close())");
   }

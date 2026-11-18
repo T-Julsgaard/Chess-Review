@@ -274,12 +274,24 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-accuracy-note { line-height: 1.45; }
 
 /* The whole game history, streamed onto the board during preparation. */
-.profile-game-map { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; box-sizing: border-box; padding: 3%; background: color-mix(in srgb, var(--panel) 92%, transparent); cursor: pointer; }
-.profile-game-map:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
-.profile-map-w { fill: var(--q-best, #81b58b); }
-.profile-map-d { fill: var(--ink-2, #b6b9b2); }
-.profile-map-l { fill: var(--q-miss, #db8c7a); }
-.profile-map-cursor { fill: none; stroke: var(--ink, #fff); stroke-width: .4; pointer-events: none; }
+.profile-game-map { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; cursor: pointer; outline: none; }
+.profile-game-map canvas { display: block; width: 100%; height: 100%; }
+.profile-game-map:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
+/* Film roll: one frame per game while the games are found. */
+.profile-reel { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+.profile-reel > canvas { display: block; width: 100%; height: 100%; }
+.profile-reel-chrome { position: fixed; z-index: 54; pointer-events: none; color: var(--ink); }
+.profile-reel-player { position: absolute; left: 0; right: 0; height: 24px; display: flex; align-items: center; gap: 8px; font-size: 13px; white-space: nowrap; }
+.profile-reel-top { bottom: calc(100% + 2px); }
+.profile-reel-bottom { top: calc(100% + 2px); }
+.profile-reel-player strong { min-width: 0; max-width: 46%; overflow: hidden; text-overflow: ellipsis; font-weight: 700; }
+.profile-reel-rating { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.profile-reel-aside { display: flex; align-items: center; gap: 8px; margin-left: auto; font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.profile-reel-result { font-weight: 700; color: var(--ink-2); }
+.profile-reel-result.w { color: var(--q-best); } .profile-reel-result.l { color: var(--q-miss); }
+.profile-reel-caption { display: grid; justify-items: center; gap: 2px; width: 100%; }
+.profile-reel-strip { display: block; width: 100%; height: 44px; }
+.profile-reel-count { color: var(--ink); font-weight: 650; }
 .profile-map-caption { display: grid; justify-items: center; gap: 3px; width: 100%; font-size: 11px; line-height: 16px; color: var(--ink-2); }
 .profile-map-legend, .profile-map-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; }
 .profile-map-summary { color: var(--ink); font-weight: 650; font-variant-numeric: tabular-nums; }

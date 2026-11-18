@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {JSDOM} from 'jsdom';
-import {mapLayout, createGameMap, gameUrl, MAP_CELLS} from '../lib/profile/game-map.js';
+import {shellCell, shellIndex, mapSide, createGameMap, gameUrl} from '../lib/profile/game-map.js';
+import {createGameReel, reelFen, reelRate} from '../lib/profile/game-reel.js';
 import {createPreparation} from '../lib/profile/preparation.js';
 import {collectLichess} from '../lib/profile/sources.js';
 import {fetchImport} from '../lib/import-request.js';
@@ -33,30 +34,56 @@ function dom(t) {
   return {doc, h, win: d.window};
 }
 
-test('game map: 100,000 games are represented exactly with bounded cells and constant DOM', t => {
-  const games = rows(100000), {cells} = mapLayout(games);
-  assert.ok(cells.length <= MAP_CELLS);
-  assert.equal(cells.reduce((n, c) => n + c.end - c.start, 0), games.length);
-  assert.equal(cells.reduce((n, c) => n + c.counts.w, 0), 33334);
-  const d = dom(t), map = createGameMap(d); map.update(games);
-  assert.equal(map.element.querySelectorAll('*').length, 4);
-  assert.equal(map.element.querySelectorAll('path').length, 3);
-  assert.ok(map.element.getAttribute('aria-label').startsWith((100000).toLocaleString() + ' games'));
+test('game map: one square per game, growing in shells so a new game never moves an old one', t => {
+  for (let i = 0; i < 20000; i++) { const {x, y} = shellCell(i); assert.equal(shellIndex(x, y), i); }
+  // The first k² games always fill the top-left k × k block.
+  for (const k of [1, 8, 9, 50]) for (let i = 0; i < k * k; i++) { const {x, y} = shellCell(i); assert.ok(x < k && y < k); }
+  assert.equal(mapSide(0), 8); assert.equal(mapSide(64), 8); assert.equal(mapSide(65), 9); assert.equal(mapSide(100000), 317);
+  const d = dom(t), map = createGameMap(d), games = rows(100000); map.update(games);
+  assert.equal(map.element.querySelectorAll('*').length, 1, 'one canvas, no per-game DOM');
+  assert.ok(map.element.getAttribute('aria-label').startsWith((100000).toLocaleString() + ' games, one square each'));
   assert.equal(map.caption.querySelector('.profile-map-summary').textContent, (100000).toLocaleString() + ' games');
 });
 
-test('game map: keyboard zoom, selection, opening, streaming updates and returning to all games', t => {
+test('game map: keyboard selection, opening, streaming updates and the date-order re-sort', t => {
   const d = dom(t), opened = [], games = rows(3000), map = createGameMap({...d, onOpen: url => opened.push(url)});
   d.doc.body.append(map.element, map.caption); map.update(games);
   const key = value => map.element.dispatchEvent(new d.win.KeyboardEvent('keydown', {key: value, bubbles: true}));
-  key('Enter'); assert.match(map.element.getAttribute('aria-label'), /^3 games/);
-  key('ArrowRight'); assert.match(map.caption.textContent, /Player 1/);
+  key('ArrowRight'); assert.match(map.caption.textContent, /Player 1\b/);
+  key('ArrowDown'); assert.match(map.caption.textContent, /Player 3\b/, 'square (1, 1) is the fourth game');
   key('Enter'); assert.deepEqual(opened, ['https://lichess.org/abcd1234']);
-  map.caption.querySelector('.profile-map-actions button:last-child').click();
-  assert.deepEqual(opened, ['https://lichess.org/abcd1234', 'https://lichess.org/abcd1234']);
-  map.update([...games, ...rows(10).map(r => ({...r, id: 'new' + r.id}))]);
-  key('Escape'); assert.ok(map.element.getAttribute('aria-label').startsWith((3010).toLocaleString() + ' games'));
+  map.caption.querySelector('.profile-map-actions button').click();
+  assert.equal(opened.length, 2);
+  // Older games streamed later join the edge; the final update puts every game in date order.
+  const older = rows(10).map(r => ({...r, id: 'old' + r.id, opp: 'Older ' + r.id, t: -100 + Number(r.id)}));
+  map.update([...older, ...games]);
+  assert.ok(map.element.getAttribute('aria-label').startsWith((3010).toLocaleString() + ' games'));
+  key('Home'); assert.match(map.caption.textContent, /Player 0\b/, 'streamed games keep their squares');
+  map.update([...older, ...games], {final: true});
+  key('Home'); assert.match(map.caption.textContent, /Older 0\b/, 'the oldest game takes the first square');
+  map.update(rows(5));
+  assert.ok(map.element.getAttribute('aria-label').startsWith('5 games'), 'a different set of games starts over');
   for (const url of ['javascript:alert(1)', 'https://lichess.org.evil.test/a', 'http://lichess.org/a']) assert.equal(gameUrl({url}), null);
+});
+
+test('film roll: frames from the middle or end, paced to show every game, names on both sides', t => {
+  const end = '6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 40', mid = 'r4rk1/1pp2ppp/p1np1q2/4p3/2B1P1b1/2NP1N2/PPP2PPP/R2QR1K1 w - - 0 25';
+  assert.equal(reelFen({id: '1', site: 'lichess', n: 20, fenEnd: end, fenMid: mid}), end, 'short games show their end');
+  const picks = new Set(Array.from({length: 40}, (_, i) => reelFen({id: String(i), site: 'lichess', n: 80, fenEnd: end, fenMid: mid})));
+  assert.deepEqual([...picks].sort(), [end, mid].sort(), 'long games show the middle or the end');
+  assert.equal(reelFen({id: '1', site: 'lichess', n: 80, fenEnd: end, fenMid: 'r4rk1/8/8/8/8/8/8/R5K1 w - - 0 3'}).includes('6k1'), true, 'an opening position never stands in for the middle');
+  assert.equal(reelRate(0), 2.5); assert.equal(reelRate(100000), 30); assert.ok(reelRate(40) > 15 && reelRate(40) < 20, 'a batch is spread over about two seconds');
+  const d = dom(t), turned = [];
+  const reel = createGameReel({...d, makePiece: () => d.doc.createElement('img'), motion: () => false, account: () => 'tester', orient: flipped => turned.push(flipped)});
+  t.after(() => reel.destroy());
+  d.doc.body.append(reel.element, reel.caption);
+  reel.update(rows(3).map(r => ({...r, fenEnd: end, me: r.id === '2' ? 'b' : 'w', oppRating: 1500, myRating: 1450})));
+  const chrome = d.doc.querySelector('.profile-reel-chrome');
+  assert.match(chrome.querySelector('.profile-reel-top').textContent, /Player 2.*1500.*#3 of 3/);
+  assert.match(chrome.querySelector('.profile-reel-bottom').textContent, /tester.*1450.*Lost/);
+  assert.deepEqual(turned, [true], 'the player sits at the bottom with their own colour');
+  assert.match(reel.element.getAttribute('aria-label'), /^3 games found/);
+  reel.destroy(); assert.equal(d.doc.querySelector('.profile-reel-chrome'), null);
 });
 
 test('preparation: analysis starts before collection finishes, waits for the host and handles both sites', async () => {
@@ -202,4 +229,27 @@ test('workspace: games stream onto the main board beside the animation; deck wai
   finishHost.resolve(); await loading;
   assert.equal(w.phase, 'deck'); assert.equal(w.report.engine.games, 20);
   assert.equal(doc.querySelector('.profile-loader'), null); assert.ok(doc.querySelector('.board .profile-game-map'));
+});
+
+test('workspace: Settings can swap the mosaic for the film roll while loading; the deck goes back to the mosaic', async t => {
+  const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6'); a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
+  assert.equal(a.state.settings.profileStream, 'mosaic', 'the mosaic is the default');
+  a.state.settings.profileStream = 'film';
+  await a.call('openProfile'); await settle();
+  const w = a.run('profileWorkspace'), doc = a.dom.window.document;
+  t.after(() => w.close());
+  w.site = 'lichess'; w.account = 'tester'; w.period = 'all';
+  const signal = w.reset(); w.phase = 'loading'; w.renderHead(); w.renderLoading(signal);
+  w.rows = rows(12).map(r => ({...r, fenEnd: '6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 40'}));
+  assert.equal(w.useReel(), false, 'without motion the film roll falls back to the mosaic');
+  w.updateGameMap(); assert.ok(doc.querySelector('.board .profile-game-map'));
+  // Just enough Web Animations for the transitions around the board.
+  a.dom.window.Element.prototype.animate = () => ({finished: Promise.resolve(), cancel() {}, finish() {}});
+  w.motion = () => true;
+  w.updateGameMap(); await settle();
+  assert.ok(doc.querySelector('.board .profile-reel')); assert.equal(doc.querySelector('.board .profile-game-map'), null);
+  assert.ok(doc.querySelector('.profile-reel-chrome')); assert.ok(doc.querySelector('.profile-board-caption .profile-reel-strip'));
+  w.phase = 'deck'; w.showBoard({kind: 'games'});
+  assert.equal(doc.querySelector('.profile-reel'), null); assert.equal(doc.querySelector('.profile-reel-chrome'), null);
+  assert.ok(doc.querySelector('.board .profile-game-map'));
 });
