@@ -113,3 +113,40 @@ test('Chrome offscreen host initializes with runtime only and proxies storage an
   assert.equal(messages.at(-1).args[2], 'tester');
   fail = true; await assert.rejects(options.store.loadEngine('chesscom', []), /Storage unavailable/);
 });
+
+test('sample: spread order covers the period early; every n-th and auto selections', async () => {
+  const {spreadOrder, SAMPLES, DEPTHS, depthById, estimateMinutes, AUTO_MINUTES} = await import('../lib/profile/engine-sample.js');
+  assert.deepEqual(spreadOrder(8), [0, 4, 2, 6, 1, 3, 5, 7]);
+  assert.deepEqual([...spreadOrder(13)].sort((a, b) => a - b), [...Array(13).keys()], 'every index exactly once');
+  const rows = season();
+  const usable = rows.filter(r => !r.bot && r.n >= 10).sort((a, b) => a.t - b.t);
+  const every5 = selectSample(rows, {every: 5, games: 2000});
+  assert.equal(every5.length, Math.ceil(usable.length / 5));
+  assert.ok(every5.every(id => usable.findIndex(r => r.id === id) % 5 === 0), 'only every fifth game');
+  const auto = selectSample(rows, {every: null, games: 1000, cached: new Set([usable[0].id])});
+  assert.equal(new Set(auto).size, auto.length);
+  assert.ok(!auto.includes(usable[0].id), 'cached and library games are skipped');
+  // The first quarter of the queue already spans the whole period.
+  const quarter = auto.slice(0, Math.ceil(auto.length / 4)).map(id => usable.find(r => r.id === id).t);
+  const span = usable.at(-1).t - usable[0].t;
+  assert.ok(Math.max(...quarter) - Math.min(...quarter) > span * .9);
+  assert.equal(SAMPLES[0].id, 'auto'); assert.equal(depthById('fast').depth, 6); assert.equal(depthById('nope').depth, 8);
+  assert.equal(DEPTHS.length, 3);
+  assert.equal(estimateMinutes(1000, 6000, {workers: 2}), AUTO_MINUTES, 'auto is capped');
+  assert.equal(estimateMinutes(100, 6000, {workers: 2, every: 1}), 5);
+});
+
+test('host: passes the chosen depth to the analysis and stops at an auto deadline', async () => {
+  const store = createProfileStore(memoryStorage());
+  let clock = 0;
+  const depths = [];
+  const host = createProfileEngineHost({store, workers: 1, now: () => clock, loadPgn: async () => PGN,
+    analyse: async (pgn, me, {depth}) => { depths.push(depth); clock += 60000; return {v: ENGINE_ENTRY_VERSION, acc: 80}; }});
+  const rows = Array.from({length: 10}, (_, i) => ({id: String(i), me: 'w', t: i}));
+  await host.start({site: 'chesscom', account: 'me', depth: 6, deadlineMs: 3 * 60000, rows});
+  const final = await host.finished();
+  assert.equal(final.status, 'done');
+  assert.ok(depths.length >= 3 && depths.length < 10, 'stopped at the deadline: ' + depths.length);
+  assert.ok(depths.every(d => d === 6));
+  assert.equal(final.total, final.done, 'the finished count becomes the total');
+});

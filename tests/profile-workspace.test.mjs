@@ -7,10 +7,13 @@ import {IDENTITY_KEY} from '../lib/identity.js';
 import {encodeProfile, decodeProfile, trimReport, profileLink} from '../lib/profile/share.js';
 import {buildInsights} from '../lib/profile/insights.js';
 import {buildReport, buildDeck} from '../lib/profile/deck.js';
+import {ProfileWorkspace} from '../lib/profile/workspace.js';
 
 function review(t) {
   const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5');
   a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
+  // These tests read the classic deck's markup; the Story design (the default) has its own tests.
+  Object.assign(a.state.settings, {profileDesign: 'classic', profileDepth: 'off'});
   t.after(() => a.run('profileWorkspace')?.close());
   return a;
 }
@@ -66,7 +69,7 @@ test('profile: seeded games render the deck on the board with navigation, stats 
   assert.equal(shell.querySelector('.profile-slide').dataset.slide, 'numbers');
   assert.ok(shell.querySelectorAll('.profile-stat').length >= 5);
   assert.ok(doc.querySelectorAll('.board .sq.profile-fill').length === 64, 'the fill shows every game on the board');
-  assert.ok(doc.querySelector('.profile-board-caption').textContent.includes('Green squares'));
+  assert.equal(doc.querySelector('.profile-board-caption').textContent, '', 'no explanatory text under the board');
   shell.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'ArrowRight', bubbles: true}));
   assert.equal(shell.querySelector('.profile-slide').dataset.slide, 'rating');
   assert.ok(shell.querySelector('.profile-series'));
@@ -81,11 +84,11 @@ test('profile: seeded games render the deck on the board with navigation, stats 
   if (slide.dataset.slide === 'signature') assert.ok(doc.querySelectorAll('.board .sq.profile-heat').length > 0);
   const evidence = [...shell.querySelectorAll('.profile-evidence')];
   for (const link of evidence) assert.ok(link.href.startsWith('https://www.chess.com/'));
-  // Engine block offers the budgeted check on the trend slide and nothing runs by itself.
+  // With the accuracy check off nothing runs, and there is no button to press on the trend slide.
   dots[dots.length - 3].click();
   const trend = [...dots].findIndex(d => d.title === 'Then and now');
   dots[trend].click();
-  assert.ok(shell.querySelector('.profile-engine .profile-button.primary').textContent.includes('Run engine check'));
+  assert.equal(shell.querySelector('.profile-engine .profile-button.primary'), null);
   assert.equal(a.store[JOB_KEY], undefined);
   // A running job for this account shows progress instead of the button.
   a.store[JOB_KEY] = {status: 'running', site: 'chesscom', account: 'tester', done: 3, total: 40, updatedAt: Date.now(), perGameMs: 5000};
@@ -126,6 +129,49 @@ test('profile setup: both sites merge their games and a missing username is refu
   assert.deepEqual(a.state.settings.profileAccounts, {chesscom: 'tester', lichess: 'tester-li'});
 });
 
+test('profile setup: custom dates validate, filter the report and survive reopening', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  seed(a); await open(a);
+  const w = a.run('profileWorkspace'), shell = doc.querySelector('.profile-shell');
+  const choose = text => [...shell.querySelectorAll('[role="radio"]')].find(b => b.textContent === text).click();
+  choose('Custom period');
+  const panel = shell.querySelector('.profile-custom-period'), inputs = panel.querySelectorAll('input');
+  assert.equal(panel.hidden, false);
+  assert.equal(shell.querySelector('[aria-controls="profile-custom-period"]').getAttribute('aria-expanded'), 'true');
+  const date = (i, value) => { inputs[i].value = value; inputs[i].dispatchEvent(new a.dom.window.Event('input')); };
+  date(0, '2026-03-01'); date(1, '2026-02-28');
+  shell.querySelector('.profile-build').click(); await settle();
+  assert.match(shell.querySelector('[role="alert"]').textContent, /end date must be on or after/);
+  assert.equal(w.phase, 'setup');
+  date(1, ''); shell.querySelector('.profile-build').click();
+  assert.match(shell.querySelector('[role="alert"]').textContent, /Choose a start and end date/);
+  date(1, '2026-03-31');
+  choose('This year'); assert.equal(panel.hidden, true);
+  choose('Custom period'); assert.equal(inputs[0].value, '2026-03-01');
+  await build(a);
+  const expected = season().filter(r => r.t >= Date.UTC(2026, 2, 1) / 1000 && r.t < Date.UTC(2026, 3, 1) / 1000);
+  assert.equal(w.report.period, 'custom');
+  assert.equal(w.report.totals.games, expected.length);
+  assert.deepEqual(a.state.settings.profileCustomPeriod, {start: '2026-03-01', end: '2026-03-31'});
+  assert.ok(shell.querySelector('.profile-head-meta').textContent.includes(w.report.periodLabel));
+  await w.close(); await open(a);
+  assert.equal(doc.querySelector('.profile-custom-period').hidden, false);
+  assert.deepEqual([...doc.querySelectorAll('input[type="date"]')].map(i => i.value), ['2026-03-01', '2026-03-31']);
+});
+
+test('profile setup: changing a custom range invalidates pending reads', async t => {
+  const a = review(t); seed(a); await open(a);
+  const w = a.run('profileWorkspace'), pending = deferred();
+  w.period = 'custom'; w.customPeriod = {start: '2026-01-01', end: '2026-02-01'};
+  w.store.loadRows = () => pending.promise;
+  const loading = w.load();
+  w.customPeriod = {start: '2026-03-01', end: '2026-03-31'};
+  pending.resolve({rows: season(), updatedAt: Date.now(), since: 0});
+  await loading;
+  assert.equal(w.report, null);
+  assert.deepEqual(w.rows, []);
+});
+
 test('profile: share payload round-trips, sanitises links and opens read-only from a shared job', async t => {
   const rows = season();
   const report = buildReport(rows, buildInsights(rows), {account: 'tester', site: 'chesscom', period: 'year', periodLabel: 'Past 12 months'});
@@ -153,7 +199,7 @@ test('profile: share payload round-trips, sanitises links and opens read-only fr
   const shell = doc.querySelector('.profile-shell');
   assert.ok(shell, 'the shared deck is shown');
   assert.ok(shell.querySelector('.profile-head').textContent.includes('Shared player profile'));
-  assert.equal(shell.querySelector('.profile-title').textContent, 'tester');
+  assert.equal(shell.querySelector('.profile-title, .pv-story-figure').textContent, 'tester');
   assert.equal(shell.querySelector('.profile-engine'), null, 'no engine controls for a shared profile');
   assert.equal(a.store['job:shared-job'], undefined, 'the one-shot job is removed');
   a.run('profileWorkspace').close(); for (let i = 0; i < 4; i++) await settle();
@@ -163,7 +209,8 @@ test('profile settings: category renders the period, budget, bot toggle and dele
   const a = review(t), doc = a.dom.window.document;
   a.call('toggleSettings'); a.call('selectSettingsCategory', 'profile');
   const text = doc.querySelector('#settings').textContent;
-  for (const label of ['Default period', 'Engine check', 'Count games against bots', 'Delete all profile data']) assert.ok(text.includes(label), label);
+  for (const label of ['Default period', 'Accuracy check', 'Games to check', 'Count games against bots', 'Delete all profile data']) assert.ok(text.includes(label), label);
+  assert.equal(a.state.settings.profileDepth, 'off'); assert.equal(a.state.settings.profileSample, 'auto');
   assert.equal(a.state.settings.profilePeriod, 'year'); assert.equal(a.state.settings.profileBudget, 'standard'); assert.equal(a.state.settings.profileIncludeBots, false);
 });
 
@@ -305,6 +352,33 @@ test('arrow keys navigate illustrated games while PageDown advances the profile'
   assert.equal(w.index, index + 1);
 });
 
+test('profile game navigation identifies Lichess by its HTTPS hostname', async () => {
+  const cases = [
+    ['https://lichess.org/abcdefgh', 'lichess'],
+    ['https://www.lichess.org/abcdefgh', 'lichess'],
+    ['https://LICHESS.ORG/abcdefgh', 'lichess'],
+    ['https://www.chess.com/game/live/123?ref=lichess.org', 'chesscom'],
+    ['https://lichess.org.evil.example/abcdefgh', 'chesscom'],
+    ['https://evil.example/lichess.org/abcdefgh', 'chesscom'],
+    ['https://lichess.org@evil.example/abcdefgh', 'chesscom'],
+    ['http://lichess.org/abcdefgh', 'chesscom'],
+    ['not a URL', 'chesscom'],
+    [undefined, 'chesscom'],
+  ];
+  for (const [url, expected] of cases) {
+    const calls = [], evidence = {id: 'abcdefgh', url};
+    const workspace = {
+      board: {step: () => false, moves: () => {}}, boardView: {}, gameCounter: {},
+      deck: [{evidence}], index: 0, rows: [], shared: true, account: 'chess-player / li-player',
+      o: {loadPgn: async (...args) => { calls.push(args); return '1. e4 e5 *'; }},
+    };
+    await ProfileWorkspace.prototype.stepGame.call(workspace, -1);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0][0], expected, String(url));
+    assert.equal(calls[0][3], expected === 'lichess' ? 'li-player' : 'chess-player', String(url));
+  }
+});
+
 test('a final position loads its full game for arrow navigation and ignores a stale load', async t => {
   const a = review(t); seed(a); await openDeck(a);
   const w = a.run('profileWorkspace'), doc = a.dom.window.document;
@@ -318,4 +392,26 @@ test('a final position loads its full game for arrow navigation and ignores a st
   const load = w.stepGame(-1); w.go(1);
   pending.resolve('1. e4 e5 *'); await load;
   assert.equal(doc.querySelectorAll('.profile-piece').length, 0, 'late game moves cannot replace the results board');
+});
+
+test('profile: the accuracy check starts by itself after Build, with the chosen depth, and reviewed library games count', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  seed(a);
+  const rows = season();
+  a.store.library = [{id: 'lib1', myName: 'Tester', myAcc: 88.5, date: new Date(rows.at(-2).t * 1000).toISOString().slice(0, 10).replace(/-/g, '.'), meta: {gameId: rows.at(-2).id}},
+    {id: 'lib2', myName: 'someone-else', myAcc: 50, date: '2026.03.01', meta: {}}];
+  Object.assign(a.state.settings, {profileDepth: 'fast', profileSample: 'auto'});
+  await open(a);
+  const sent = [], w = a.run('profileWorkspace');
+  w.o.sendMessage = async message => { sent.push(message); return {ok: true}; };
+  await build(a);
+  const start = sent.find(m => m.type === 'profileEngine' && m.action === 'start');
+  assert.ok(start, 'the check starts without a button');
+  assert.equal(start.job.depth, 6);
+  assert.ok(start.job.deadlineMs > 0, 'auto has a time budget');
+  assert.ok(!start.job.rows.some(r => r.id === rows.at(-2).id), 'the reviewed library game is not checked again');
+  assert.equal(w.report.engine.libraryGames, 1, 'only the same player\'s reviewed games count');
+  assert.equal(doc.querySelector('.profile-engine .profile-button.primary'), null, 'nothing to press');
+  // Building again for the same selection does not start a second check.
+  w.reveal(); assert.equal(sent.filter(m => m.action === 'start').length, 1);
 });

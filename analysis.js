@@ -393,8 +393,12 @@ const DEFAULT_SETTINGS = {
   learningTransition: "morph3",
   // Player profile: default period, engine-sample budget and whether games against bots count.
   profilePeriod: "year", profileBudget: "standard", profileIncludeBots: false,
-  // Player profile design (Settings → Visual → Player profile): classic, story, bento or editorial.
-  profileDesign: "classic",
+  // Accuracy check that runs by itself after a profile is built: depth (off/fast/balanced/deep) and which games.
+  profileDepth: "balanced", profileSample: "auto",
+  // Player profile design (Settings → Visual → Player profile): story (default), classic, bento or editorial.
+  profileDesign: "story",
+  // How the historical twin's face appears, and what the Signature moves board shows.
+  profilePortraitStyle: "assemble", profileSignatureBoard: "compare",
   // Display the selected analysis lines unless the user adds or removes lines in the panel.
   // Extra candidates are searched after scoring or on demand without re-analyzing the game.
   // Default SF18 searches match the published depth16/Hash16 quality model.
@@ -6667,6 +6671,10 @@ function visualSettings() {
     section("Player profile",
       settingDropdown("Design", "profileDesign", [["classic", "Classic"], ["story", "Story"], ["bento", "Dashboard"], ["editorial", "Editorial"]],
         "How the Player profile recap looks. Classic is the original slide deck; Story shows one big figure per chapter with charts drawn on the board; Dashboard puts every chapter on one screen as tiles; Editorial is one scrolling page the board follows. An open profile switches straight away."),
+      settingDropdown("Portrait animation", "profilePortraitStyle", [["assemble", "Assemble"], ["swarm", "Swarm"]],
+        "How the historical twin's face appears on the board. Assemble moves the pieces on the board into the face; Swarm is the original swirl of pieces."),
+      settingDropdown("Signature moves board", "profileSignatureBoard", [["compare", "You v. typical"], ["heat", "Heat map"]],
+        "What the board shows in the Signature moves chapter: your rates next to a typical player's, or a heat map of the squares your pieces land on."),
     ),
     section("Animations",
       toggleRow("Interface animations", "uiAnim", setSetting,
@@ -6765,8 +6773,9 @@ function soundSettings() {
   );
 }
 function profileSettings() {
-  const periods = [["year", "Past 12 months"], ["calendar", "This year"], ["all", "All time"], ["last100", "Last 100 games"]];
-  const budgets = [["quick", "Quick (about 2 min)"], ["standard", "Standard (about 10 min)"], ["deep", "Deep (about 30 min)"]];
+  const periods = [["year", "Past 12 months"], ["calendar", "This year"], ["all", "All time"], ["custom", "Custom period"]];
+  const depths = [["off", "Off"], ["fast", "Fast"], ["balanced", "Balanced"], ["deep", "Deep"]];
+  const samples = [["auto", "Auto"], ["all", "Every game"], ["2", "1 in 2"], ["5", "1 in 5"], ["10", "1 in 10"]];
   const usage = el("span", { class: "set-note" }, "Measuring…");
   loadProfileWorkspace().then(({profileStorageUsage}) => profileStorageUsage(browserAPI.storage.local)).then(info => {
     usage.textContent = info.accounts
@@ -6777,9 +6786,11 @@ function profileSettings() {
   return el("div", {},
     section("Recap",
       el("div", { class: "set-row" }, setLabel("Default period", "The period the Player profile opens with. The picker inside the profile changes it for the session and remembers your choice."),
-        ddField(S.settings.profilePeriod || "year", periods, value => setSetting("profilePeriod", value))),
-      el("div", { class: "set-row" }, setLabel("Engine check", "How many games the optional depth-8 engine pass looks at. It only starts when you press Run engine check inside the profile."),
-        ddField(S.settings.profileBudget || "standard", budgets, value => setSetting("profileBudget", value))),
+        ddField(periods.some(([id]) => id === S.settings.profilePeriod) ? S.settings.profilePeriod : "year", periods, value => setSetting("profilePeriod", value))),
+      el("div", { class: "set-row" }, setLabel("Accuracy check", "Engine depth for the accuracy check that runs in the background after a profile is built. Deeper is more exact but slower; Off uses only the reviewed games in your library."),
+        ddField(S.settings.profileDepth || "balanced", depths, value => setSetting("profileDepth", value))),
+      el("div", { class: "set-row" }, setLabel("Games to check", "Which games the accuracy check looks at. Auto checks as many as fit in about six minutes, spread over the whole period."),
+        ddField(S.settings.profileSample || "auto", samples, value => setSetting("profileSample", value))),
       toggleRow("Count games against bots", "profileIncludeBots", setSetting, "Off keeps every figure to human opponents. On includes computer opponents where the platform marks them."),
     ),
     section("Data",

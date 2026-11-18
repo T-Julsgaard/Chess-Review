@@ -43,7 +43,8 @@ test('insights: streaks, habits, terminations, material and signatures', () => {
   assert.ok(M.choke && M.choke.surplus === 6);
   assert.ok(M.conversion != null && M.resilience != null);
   const G = signature(rows);
-  assert.equal(G.habits.length, 3); assert.equal(G.favouriteSquares[0].square, 'e4');
+  assert.ok(G.habits.length >= 3 && G.habits.length <= 6, 'three to six signatures'); assert.equal(G.favouriteSquares[0].square, 'e4');
+  assert.ok(G.all.length > G.habits.length && G.all.every((h, i) => !i || G.all[i - 1].score >= h.score), 'every metric, most unusual first');
   assert.ok(G.habits.every(h => /\d/.test(h.text)));
   assert.equal(signature(rows.slice(0, 5)).habits.length, 0);
 });
@@ -95,10 +96,11 @@ test('deck: a full season builds every slide with evidence and boards; a thin on
   const thin = buildDeck(buildReport(rows.slice(0, 4), buildInsights(rows.slice(0, 4)), {account: 'x', site: 'chesscom'}), {account: 'x'});
   assert.equal(thin.length, 1);
   // Engine figures replace the pending state.
-  const engine = Object.fromEntries(rows.slice(0, 60).map((r, i) => [r.id, {acc: 70 + (i % 20), minWin: 12, minPly: 31, maxWin: 95, maxPly: 20, blunders: 1}]));
+  // Every game checked, so the comeback (which must end by mate or resignation) is among them.
+  const engine = Object.fromEntries(rows.map((r, i) => [r.id, {acc: 70 + (i % 20), minWin: 12, minPly: 31, maxWin: 95, maxPly: 20, blunders: 1}]));
   const withEngine = buildDeck(buildReport(rows, buildInsights(rows, {engine}), {account: 'tester', site: 'chesscom'}), {account: 'tester', engineStatus: 'done'});
   const trend = withEngine.find(s => s.id === 'trend');
-  assert.equal(trend.pending, null); assert.ok(trend.stats.length >= 2); assert.equal(trend.board.kind, 'split');
+  assert.equal(trend.pending, null); assert.ok(trend.stats.length >= 2); assert.equal(trend.board.scene.type, 'line', 'accuracy over time on the board');
   assert.ok(withEngine.find(s => s.id === 'swings').lead.includes('12%'));
   assert.equal(fmt.hours(0.5), '30 min'); assert.equal(fmt.seconds(95), '1 min 35 s'); assert.equal(fmt.signed(12), '+12');
 });

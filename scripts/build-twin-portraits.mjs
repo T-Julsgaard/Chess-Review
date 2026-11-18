@@ -16,20 +16,22 @@ import {join, resolve} from 'node:path';
 const SIZE = 64;
 // id: Commons file, square crop centre (x, y) and side in pixels of the
 // downloaded rendition (960 px wide, or the original when it is narrower),
+// framing the whole head with some neck and shoulders, face in the upper middle
+// (the mosaic and the vignette both need room around the face), inside the image,
 // an optional gamma for mid-tones, and the credit line.
 const SOURCES = {
-  tal: {file: 'Mikhail Tal 1982or.jpg', crop: [452, 515, 450], author: 'Rob C. Croes / Anefo', license: 'CC0'},
-  morphy: {file: 'Paul Morphy.jpg', crop: [557, 250, 400], author: 'Unknown author', license: 'Public domain'},
-  anderssen: {file: 'Anderssen Adolf.jpg', crop: [430, 408, 560], author: 'Unknown author', license: 'Public domain'},
-  lasker: {file: 'Emanuel Lasker 1.jpg', crop: [480, 360, 660], author: 'Unknown author', license: 'Public domain'},
-  capablanca: {file: 'José Raúl Capablanca 1920.jpg', crop: [400, 381, 600], author: 'Unknown author', license: 'Public domain'},
-  petrosian: {file: 'Tigran Petrosian 1962.2.jpg', crop: [509, 396, 520], author: 'Harry Pot / Anefo', license: 'CC0'},
-  karpov: {file: 'Anatoly Karpov 1979.jpg', crop: [480, 468, 360], author: 'Rob C. Croes / Anefo', license: 'CC0'},
-  kasparov: {file: 'Garry Kasparov European Union 2023 (cropped).jpg', crop: [480, 336, 600], author: 'Lukasz Kobus / European Union', license: 'CC BY 4.0'},
-  fischer: {file: 'Bobby Fischer 1966 portrait.jpg', crop: [480, 307, 540], author: 'John Lent / AP', license: 'Public domain'},
-  reti: {file: 'Richard Réti (1889–1929) OeNB 9471305.jpg', crop: [300, 264, 440], author: 'Unknown photographer (ÖNB)', license: 'Public domain'},
-  carlsen: {file: 'Magnus Carlsen in 2025.jpg', crop: [480, 410, 340], gamma: .72, author: 'Miroslav Vajdić', license: 'CC BY 4.0'},
-  nakamura: {file: 'Hikaru Nakamura at the 2026 Naroditsky Memorial Rapid and Blitz (v2).jpg', crop: [528, 330, 440], gamma: .8, author: 'ChessKelly', license: 'CC BY 4.0'},
+  tal: {file: 'Mikhail Tal 1982or.jpg', crop: [452, 596, 675], author: 'Rob C. Croes / Anefo', license: 'CC0'},
+  morphy: {file: 'Paul Morphy.jpg', crop: [557, 322, 600], author: 'Unknown author', license: 'Public domain'},
+  anderssen: {file: 'Anderssen Adolf.jpg', crop: [430, 509, 840], author: 'Unknown author', license: 'Public domain'},
+  lasker: {file: 'Emanuel Lasker 1.jpg', crop: [480, 450, 890], author: 'Unknown author', license: 'Public domain'},
+  capablanca: {file: 'José Raúl Capablanca 1920.jpg', crop: [365, 468, 729], author: 'Unknown author', license: 'Public domain'},
+  petrosian: {file: 'Tigran Petrosian 1962.2.jpg', crop: [509, 490, 780], author: 'Harry Pot / Anefo', license: 'CC0'},
+  karpov: {file: 'Anatoly Karpov 1979.jpg', crop: [480, 533, 540], author: 'Rob C. Croes / Anefo', license: 'CC0'},
+  kasparov: {file: 'Garry Kasparov European Union 2023 (cropped).jpg', crop: [480, 450, 900], author: 'Lukasz Kobus / European Union', license: 'CC BY 4.0'},
+  fischer: {file: 'Bobby Fischer 1966 portrait.jpg', crop: [480, 405, 810], author: 'John Lent / AP', license: 'Public domain'},
+  reti: {file: 'Richard Réti (1889–1929) OeNB 9471305.jpg', crop: [289, 333, 577], author: 'Unknown photographer (ÖNB)', license: 'Public domain'},
+  carlsen: {file: 'Magnus Carlsen in 2025.jpg', crop: [480, 430, 620], gamma: .72, author: 'Miroslav Vajdić', license: 'CC BY 4.0'},
+  nakamura: {file: 'Hikaru Nakamura at the 2026 Naroditsky Memorial Rapid and Blitz (v2).jpg', crop: [528, 430, 760], gamma: .8, author: 'ChessKelly', license: 'CC BY 4.0'},
 };
 
 const args = process.argv.slice(2);

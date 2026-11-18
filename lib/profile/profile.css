@@ -176,6 +176,10 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-setup { display: flex; flex-direction: column; justify-content: center; gap: 18px; max-width: 560px; min-height: 100%; box-sizing: border-box; padding: 4px 2px 8px; animation: profile-fade .36s ease-out both; }
 .profile-setup-intro { display: flex; flex-direction: column; gap: 8px; }
 .profile-account-fields { display: flex; flex-direction: column; gap: 18px; }
+.profile-custom-period { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; padding: 14px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel-2); }
+.profile-custom-period .profile-input { min-width: 0; width: 100%; box-sizing: border-box; }
+[data-theme="dark"] .profile-custom-period .profile-input { color-scheme: dark; }
+.profile-period-note { grid-column: 1 / -1; margin: 0; font-size: 12px; color: var(--ink-2); }
 .profile-setup-title { margin: 0; font-size: clamp(22px, 2.1vw, 30px); line-height: 1.1; letter-spacing: -.7px; font-weight: 800; }
 .profile-setup .profile-lead { font-size: 14px; }
 .profile-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
@@ -237,6 +241,32 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-portrait-plate { background: radial-gradient(ellipse at 50% 44%, #241c15 0%, #130f0c 60%, #0a0807 100%); box-shadow: inset 0 0 70px rgba(0, 0, 0, .65); opacity: var(--portrait-plate, 1); }
 .profile-portrait-glow { filter: blur(3px); opacity: calc(var(--portrait-glow, 1) * .42); }
 .profile-portrait.profile-portrait-leaving { opacity: 0; }
+/* 'assemble': the board stays; it only dims late, with a vignette, and the squares still show through. */
+.profile-portrait-assemble .profile-portrait-plate { background: radial-gradient(ellipse at 50% 46%, rgba(18, 14, 10, .7) 0%, rgba(14, 11, 8, .8) 55%, rgba(8, 6, 5, .9) 100%); box-shadow: inset 0 0 60px rgba(0, 0, 0, .45); }
+.profile-portrait-assemble > .profile-portrait-glow { inset: 6%; width: 88%; height: 88%; opacity: calc(var(--portrait-glow, 1) * .3); }
 .profile-board.profile-portrait-burst .sq .profile-piece { opacity: 0; transform: scale(.35) rotate(25deg); transition: opacity .8s ease, transform .9s cubic-bezier(.5, 0, .75, .3); }
 .profile-portrait-credit { font-size: 11px; opacity: .7; }
 .profile-portrait-credit a { color: inherit; }
+
+/* An empty nav (setup, loading) leaves no stray rule at the bottom of the panel. */
+.profile-nav:empty { display: none; }
+.profile-setup-actions { justify-content: space-between; flex-wrap: wrap; row-gap: 12px; }
+.profile-setup-actions .profile-switch { align-self: center; }
+.profile-accuracy { display: flex; flex-direction: column; gap: 10px; }
+.profile-accuracy .profile-accuracy-games .profile-seg-lg button { font-size: 12px; }
+.profile-accuracy-note { line-height: 1.45; }
+
+/* Win/draw/loss squares leaving the board */
+.profile-fill-ghost { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.profile-fill-ghost span { position: absolute; box-sizing: border-box; padding: 10%; }
+.profile-fill-ghost span::before { content: ""; display: block; width: 100%; height: 100%; border-radius: 22%; background: var(--fill-color); }
+
+/* "You versus them" before a replayed game */
+.profile-intro { position: absolute; inset: 0; z-index: 7; overflow: hidden; pointer-events: none; }
+.profile-intro-half { position: absolute; left: 0; right: 0; height: 50%; display: flex; align-items: center; justify-content: center; }
+.profile-intro-top { top: 0; background: color-mix(in srgb, #2a2a27 94%, transparent); }
+.profile-intro-bottom { bottom: 0; background: color-mix(in srgb, #474741 94%, transparent); }
+.profile-intro-half span { max-width: 86%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: clamp(20px, 3vw, 40px); font-weight: 850; letter-spacing: -.02em; color: #f2f0ea; animation: profile-intro-name .5s cubic-bezier(.2,.8,.2,1) both; }
+.profile-intro-top span { animation-delay: .05s; } .profile-intro-bottom span { animation-delay: .15s; }
+.profile-intro-vs { position: absolute; left: 50%; top: 50%; translate: -50% -50%; padding: 5px 12px; border-radius: 999px; background: #151513; color: #d8d5cc; font-style: normal; font-size: 12px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase; box-shadow: 0 6px 18px #0008; }
+@keyframes profile-intro-name { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }

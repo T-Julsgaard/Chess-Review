@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {gameFeatures, parseTimeControl, decodeHeat, squareIndex, matePattern, validRow} from '../lib/profile/features.js';
 import {normalizeChesscom, normalizeLichess, parseMovetext} from '../lib/profile/sources.js';
 import {createProfileStore, rowsKey, ENGINE_INDEX_KEY, MAX_ENGINE_ENTRIES} from '../lib/profile/store.js';
-import {periodRows, periodStart, PERIODS} from '../lib/profile/collector.js';
+import {periodRows, periodStart, periodLabel, customPeriodBounds, PERIODS} from '../lib/profile/collector.js';
 import {Chess} from '../lib/chess.js';
 
 const OPERA = ['e4','e5','Nf3','d6','d4','Bg4','dxe5','Bxf3','Qxf3','dxe5','Bc4','Nf6','Qb3','Qe7','Nc3','c6','Bg5','b5','Nxb5','cxb5','Bxb5+','Nbd7','O-O-O','Rd8','Rxd7','Rxd7','Rd1','Qe6','Bxd7+','Nxd7','Qb8+','Nxb8','Rd8#'];
@@ -148,11 +148,27 @@ test('collector: period filters', () => {
   const now = new Date(Date.UTC(2026, 10, 16));
   const rows = [];
   for (let i = 0; i < 400; i++) rows.push({id: String(i), t: now.getTime() / 1000 - i * 86400 * 2});
-  assert.equal(periodRows(rows, 'last100', now).length, 100);
   assert.equal(periodRows(rows, 'all', now).length, 400);
   assert.ok(periodRows(rows, 'year', now).length > 180 && periodRows(rows, 'year', now).length < 200);
   assert.equal(periodStart('calendar', now), Date.UTC(2026, 0, 1) / 1000);
   assert.equal(PERIODS[0].id, 'year');
+  assert.ok(PERIODS.some(p => p.id === 'custom'));
+  assert.ok(!PERIODS.some(p => p.id === 'last100'));
   assert.deepEqual(parseTimeControl('1/86400'), null);
   assert.deepEqual(parseTimeControl('180+2'), {base: 180, inc: 2});
+});
+
+test('collector: custom periods include both UTC dates, sort games and reject invalid ranges', () => {
+  const now = new Date('2026-11-18T12:00:00Z'), range = {start: '2026-02-28', end: '2026-03-01'};
+  const stamp = iso => Date.parse(iso) / 1000;
+  const rows = ['2026-03-02T00:00:00Z', '2026-03-01T23:59:59Z', '2026-02-28T00:00:00Z', '2026-02-27T23:59:59Z'].map(t => ({t: stamp(t)}));
+  assert.deepEqual(periodRows(rows, 'custom', now, range), [rows[2], rows[1]]);
+  assert.equal(periodStart('custom', now, range), rows[2].t);
+  assert.equal(periodRows(rows, 'custom', now, {...range, end: range.start}).length, 1, 'a single day is allowed');
+  assert.ok(periodLabel('custom', range).includes('2026'));
+  for (const bad of [undefined, {}, {start: '', end: range.end}, {start: '2026-02-30', end: range.end}, {start: range.end, end: range.start}]) {
+    assert.equal(customPeriodBounds(bad), null);
+    assert.deepEqual(periodRows(rows, 'custom', now, bad), []);
+    assert.ok(Number.isNaN(periodStart('custom', now, bad)));
+  }
 });
