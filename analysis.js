@@ -390,6 +390,8 @@ const DEFAULT_SETTINGS = {
   moveAnim: true, animSpeed: 7,
   // Interface transitions stay enabled when individual piece slides are off.
   uiAnim: true,
+  // Keep Engine's original height unless content fitting is explicitly enabled.
+  engineAutoHeight: false,
   learningTransition: "morph3",
   // Player profile: default period, engine-sample budget and whether games against bots count.
   profilePeriod: "year", profileBudget: "standard", profileIncludeBots: false,
@@ -1999,7 +2001,7 @@ function isResponsiveModern() {
 function referenceLayout() {
   const modern = isResponsiveModern();
   const layout = fullHdReferenceLayout(modern ? MODERN_LAYOUT : DEFAULT_LAYOUT,
-    window.innerWidth, window.innerHeight, accuracyLayoutExpanded(), modern, modern ? S._engineFit : 0);
+    window.innerWidth, window.innerHeight, accuracyLayoutExpanded(), modern, modern && S.settings.engineAutoHeight === true ? S._engineFit : 0);
   if (layout && modern && S.settings.reviewMode === "dopamine") {
     // Give explanations room in the default arrangement, without saving over
     // the user's Normal layout or changing a manually arranged canvas.
@@ -6019,7 +6021,12 @@ function startEngineFitMotion() {
 // passes and the first measurement after startup or a setup switch apply at once.
 function syncEngineFit(animate) {
   if (S._engineFitting) return;
-  if (!isResponsiveModern() || !UI.canvas?.classList.contains('full-hd-reference')) { S._engineFit = 0; S._engineFitKey = null; return; }
+  if (S.settings.engineAutoHeight !== true || !isResponsiveModern() || !UI.canvas?.classList.contains('full-hd-reference')) {
+    S._engineFit = 0; S._engineFitKey = null;
+    clearTimeout(S._engineFitMotionT); cancelAnimationFrame(S._engineFitFrame);
+    UI.canvas?.classList.remove('engine-fit-motion');
+    return;
+  }
   // Live analysis re-renders Engine many times a second with the same shape;
   // measure only when something that can change its height did.
   const mod = UI.engine.closest('.mod'), body = UI.engine.querySelector('.engine-body');
@@ -6045,6 +6052,11 @@ function fitEnginePanel({animate = true} = {}) {
   const engine=S.layout.engine;
   // Nothing to size before the first render; that render fits the panel.
   if(!engine||!UI.engine.firstElementChild){mod.style.minHeight="";return;}
+  if(S.settings.engineAutoHeight !== true){
+    const height=(panelDesign('engine', S.settings) === 'minimal' ? 128 : 120)*panelScale(engine);
+    mod.style.minHeight=height+'px';engine.h=Math.max(engine.h,height);
+    applyPanelBox(mod,engine);growCanvas();return;
+  }
   // Room for every line, or less when fewer are shown: an arrangement frozen from
   // Modern's fitted boxes keeps its geometry instead of jumping on the first edit.
   const scale=panelScale(engine),need=engineContentHeight();
@@ -6562,7 +6574,7 @@ const VISUAL_SETTING_KEYS = [
   "graphStyle", "barStyle", "showCoords", "coordSize", ...BACKGROUND_SETTING_KEYS,
   "boardTheme", "pieceStyle", "boardCustomLight", "boardCustomDark",
   ...ARROW_SETTING_KEYS,
-  "moveAnim", "uiAnim", "animSpeed", "learningTransition", "profileDesign",
+  "moveAnim", "uiAnim", "animSpeed", "learningTransition", "profileDesign", "engineAutoHeight",
 ];
 function resetSettingKeys(keys) {
   for (const key of keys) S.settings[key] = structuredClone(DEFAULT_SETTINGS[key]);
@@ -6644,10 +6656,13 @@ function visualSettings() {
       seg("Setup", "uiSetup", ["modern", "old", "custom"].filter(id => UI_SETUPS[id]), null, value => UI_SETUPS[value].label),
     ),
     section("Tabs",
-      ...PANEL_DESIGNS.filter(design => design.panel === "evalbar" || design.versions.length > 1).map(design =>
+      ...PANEL_DESIGNS.filter(design => design.panel === "evalbar" || design.versions.length > 1).flatMap(design => [
         design.panel === "evalbar" ? settingDropdown("Evaluation bar", "barStyle",
           [["flat2", "Default"], ["gradient", "Gradient"], ["classic", "Solid"], ["mono", "Mono"], ["accent", "Accent"]])
-          : settingDropdown(design.label, design.setting, design.versions.map(version => [version.id, version.label]))),
+          : settingDropdown(design.label, design.setting, design.versions.map(version => [version.id, version.label])),
+        design.panel === "engine" ? toggleRow("Resize to fit lines", "engineAutoHeight", setSetting,
+          "Adjusts Engine's height to the displayed lines. In the Modern layout, Accuracy takes the freed space. Off keeps the original fixed height.") : null,
+      ]),
     ),
     section("Theme",
       colorChips("Accent", "accent", accentEntries),
@@ -7413,6 +7428,7 @@ async function setSetting(key, value) {
   if (design?.panel.startsWith('accuracy')) { statsRefs = null; hideQTip(); renderStats(); if(key==='accuracyDesign')reflowAccuracy(accuracyLayoutExpanded()); }
   if (key === 'movesDesign') updateMovesDesign();
   if (key === 'engineDesign') renderEngineCurrent();
+  if (key === 'engineAutoHeight') applyLayout();
   if (key === 'profileDesign') switchProfileDesign();
   if (key === 'uiAnim' && S.settings.uiAnim === false) {
     overviewReveal.stop();

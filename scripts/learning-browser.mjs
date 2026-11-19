@@ -21,6 +21,7 @@ if (process.argv.includes('--working-tree')) {
 await fs.appendFile(path.join(source,'analysis.js'),'\nexport {S, learningWorkspace, openLearning, go, toggleFlip, applyLayoutMode, applyUserMove, paintBoard, exitAnalysis};\n');
 if(process.argv.includes('--profile')||process.argv.includes('--profile-story')||process.argv.includes('--profile-setup')||process.argv.includes('--profile-streaming'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {openProfile, profileWorkspace, buildBoard, renderAll};\n');
 if(process.argv.includes('--interface-motion'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {setSetting};\n');
+if(process.argv.includes('--engine-fit'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {setSetting};\n');
 if(process.argv.includes('--move-list-layout'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {renderMoves};\n');
 if(process.argv.includes('--engine-minimal')||process.argv.includes('--engine-fit'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {applyUiSetup, renderEngine, renderEngineCurrent, renderEnginePractice};\n');
 if(process.argv.includes('--phase-modern')||process.argv.includes('--modern-quality')||process.argv.includes('--modern-advanced')||process.argv.includes('--accuracy-fit'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {applyUiSetup, renderStats, setAccuracyPage};\n');

@@ -7,6 +7,8 @@ import assert from 'node:assert/strict';
 // edge fixed, never clip Engine, and animate only the changes the user makes.
 export async function auditLearning({review, call, evaluate, waitFor, sleep, out}) {
   const run = expression => evaluate(review, expression);
+  await run("document.querySelector('.lang-confirm')?.click()");
+  await waitFor(review, "!document.querySelector('.lang-overlay')", 'Language choice');
   await run("document.querySelector('.learning-announcement-disable')?.click()");
   await run("import('./analysis.js').then(async m=>{await m.applyUiSetup('modern');m.go(0);})");
   await waitFor(review, "!!document.querySelector('.engine-minimal')", 'Modern minimal Engine');
@@ -30,6 +32,23 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     .then(([m,l,u])=>l.fullHdReferenceLayout(u.MODERN_LAYOUT,innerWidth,innerHeight,!!m.S.qbreakExpanded,true).engine.h)`);
   const settle = () => sleep(420);
   const evidence = [];
+  assert.equal(await run("import('./analysis.js').then(m=>m.S.settings.engineAutoHeight)"), false, 'Fixed height is the default');
+  const fixed = [];
+  for (const count of [1, 2, 3]) {
+    await render(count); await settle();
+    fixed.push(await measure());
+  }
+  for (const size of fixed) {
+    assert.deepEqual(size.engine, fixed[0].engine, 'Default Engine geometry does not follow line count');
+    assert.deepEqual(size.accuracy, fixed[0].accuracy, 'Default Accuracy geometry does not follow line count');
+  }
+  await run("import('./analysis.js').then(m=>m.setSetting('engineAutoHeight',true))");
+  await render(1); await settle();
+  assert.ok((await measure()).engine.height < fixed[0].engine.height, 'Opting in shrinks Engine');
+  await run("import('./analysis.js').then(m=>m.setSetting('engineAutoHeight',false))");
+  await settle();
+  assert.deepEqual((await measure()).engine, fixed[0].engine, 'Switching off restores the original slot');
+  await run("import('./analysis.js').then(m=>m.setSetting('engineAutoHeight',true))");
   for (const design of ['minimal', 'focus', 'original']) {
     await run(`import('./analysis.js').then(m=>{m.S.settings.engineDesign='${design}';m.applyLayoutMode();})`);
     for (const [width, height] of [[1920,1080],[1920,919],[2560,1440],[1600,900],[1536,864],[1440,900],[1366,768],[1280,800],[1280,720],[1100,620]]) {
@@ -129,7 +148,8 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await render(1); await settle();
   const fitted = await measure();
   await run("document.querySelector('[aria-label=Settings]').click();document.querySelector('.reorg-toggle-btn').click()");
-  const handle = await run("(()=>{const r=document.querySelector('[data-mod=moves] .mod-handle').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()");
+  await sleep(150);
+  const handle = await run("(()=>{const n=document.querySelector('[data-mod=moves] .mod-handle'),r=n.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2; if(!n.contains(document.elementFromPoint(x,y)))throw Error('Move handle obscured by '+document.elementFromPoint(x,y)?.outerHTML);return {x,y}})()");
   await call('Input.dispatchMouseEvent', {type:'mousePressed', ...handle, button:'left', clickCount:1}, review.sessionId);
   await call('Input.dispatchMouseEvent', {type:'mouseMoved', x:handle.x+24, y:handle.y, button:'left', buttons:1}, review.sessionId);
   await call('Input.dispatchMouseEvent', {type:'mouseReleased', x:handle.x+24, y:handle.y, button:'left', clickCount:1}, review.sessionId);

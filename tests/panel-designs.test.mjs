@@ -14,7 +14,9 @@ test('Visual > Tabs offers compact dropdowns for Accuracy and Move list designs'
   await a.call('toggleSettings');
   const section = () => [...doc.querySelectorAll('.set-section')].find(node => node.querySelector('.set-sect-head').textContent === 'Tabs');
   section().querySelector('.set-sect-head').click();
-  assert.equal(section().querySelector('.set-seg'), null);
+  const toggles = section().querySelectorAll('.set-seg');
+  assert.equal(toggles.length, 1, 'Only Engine height uses an On/Off toggle');
+  assert.ok([...toggles[0].children].every(button => button.dataset.setting === 'engineAutoHeight'));
   assert.equal(section().querySelectorAll('.set-dropdown').length, 6);
   const labels = [...section().querySelectorAll('.set-lbl')].map(node => node.textContent);
   for (const label of ['Accuracy overview', 'Accuracy move quality']) assert.ok(labels.includes(label), label);
