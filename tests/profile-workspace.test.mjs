@@ -347,7 +347,7 @@ test('arrow keys navigate illustrated games while PageDown advances the profile'
   w.go(w.deck.findIndex(slide => slide.id === 'openings'));
   const index = w.index, original = a.state.idx;
   doc.body.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'ArrowLeft', bubbles: true, cancelable: true}));
-  assert.equal(w.index, index); assert.ok(doc.querySelector('.profile-caption-move').textContent);
+  assert.equal(w.index, index); assert.ok(doc.querySelector('.profile-game-status').textContent);
   doc.body.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'ArrowRight', bubbles: true, cancelable: true}));
   assert.equal(w.index, index); assert.equal(a.state.idx, original);
   doc.body.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'PageDown', bubbles: true, cancelable: true}));
@@ -387,8 +387,8 @@ test('a final position loads its full game for arrow navigation and ignores a st
   const rating = w.deck.findIndex(slide => slide.id === 'rating');
   w.o.loadPgn = async () => '1. e4 e5 2. Nf3 Nc6 *'; w.go(rating);
   await w.stepGame(-1);
-  assert.ok(doc.querySelector('.profile-caption-move').textContent.includes('Nf3'));
-  await w.stepGame(-1); assert.ok(doc.querySelector('.profile-caption-move').textContent.includes('e5'));
+  assert.ok(doc.querySelector('.profile-game-status').textContent.includes('Nf3'));
+  await w.stepGame(-1); assert.ok(doc.querySelector('.profile-game-status').textContent.includes('e5'));
   w.go(0); w.go(rating);
   const pending = deferred(); w.o.loadPgn = () => pending.promise;
   const load = w.stepGame(-1); w.go(1);

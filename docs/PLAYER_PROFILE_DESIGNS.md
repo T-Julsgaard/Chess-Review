@@ -9,7 +9,7 @@ straight away and reopens on the chapter you were reading (`switchProfileDesign`
 | Design | Setting id | Idea | Where it lives |
 | --- | --- | --- | --- |
 | Classic | `classic` | The original slide deck, unchanged. | `workspace.js`, `profile.css` (through `DesignWorkspace`) |
-| Story | `story` | Spotify-Wrapped pacing: progress segments, one huge figure per chapter, a "Next: …" button that names what comes next, optional autoplay, a hue per chapter, the last chapter recaps the year next to the share buttons. Click the card to advance (left edge goes back). | `designs/story.js` |
+| Story | `story` | Progress segments, one huge figure per chapter, explicit previous/next buttons, a hue per chapter, and a Share button that copies the profile link. The last chapter recaps the year next to the share buttons. | `designs/story.js` |
 | Dashboard | `bento` | Everything at a glance: a grid of tiles (one number, one label, one micro chart). Hovering a tile previews its chapter on the board; clicking opens a calm detail page with previous/next and **All stats**; Escape returns to the grid. While the grid is showing, the board shows your last 64 days. | `designs/bento.js` |
 | Editorial | `editorial` | One scrolling magazine page with a chapter rail. The board follows the chapter you are reading. Each chapter gets a real chart in the column. | `designs/editorial.js` |
 
@@ -28,7 +28,7 @@ Each piece is a method or a small module, so a favourite can be moved into anoth
   (`static extraSlides = ['season']`). Classic does not add it.
 - **Story**: `hero()` (the one figure per chapter), hairline facts (`.pv-fact`), the results bar
   (`wdlBar`), the ranked openings list (`openingsMini`), the year recap (`recap`), the "Next" button
-  and progress segments (`renderNav`, `renderProgress`), autoplay (`togglePlay`, `schedule`).
+  and progress segments (`renderNav`, `renderProgress`), and the header Share button (`copyLink`).
 - **Dashboard**: tiles and micro charts (`grid`, `spark`, `monthBars`, `ring`, `heat`, `wdl`,
   `formatRows`), hover preview (`preview`, `previewBoard`), the detail page (`detail`).
 - **Editorial**: the scroll-synced page and rail (`renderPage`, `onScroll`, `activate`), and the
@@ -44,3 +44,24 @@ Each piece is a method or a small module, so a favourite can be moved into anoth
 - Styles are in `lib/profile/designs/designs.css`, scoped by `.profile-shell[data-design="…"]` and
   `.pv-*` classes; Editorial uses the bundled Lora font for its headings.
 - Tests: `tests/profile-designs.test.mjs`.
+
+## Profile games and sharing
+
+- Mosaic squares open the original Chess.com or Lichess game. Only the game count and result
+  legend appear beneath the mosaic; individual game details remain available on hover.
+- Evidence buttons open games on the profile board. The review's player-strip renderer supplies
+  names, ratings and captured pieces; evaluation follows the selected review bar design and its
+  spacing. The same sound-event handler respects the review's sound setting and selected effects.
+  The five review-style controls include Exit (also Escape), which returns to the current chapter.
+- Results squares retain their nodes when switching time controls. Registered percentage properties
+  animate the win/draw/loss boundaries; reduced motion applies the new result immediately.
+- Rating charts include every local rating point, reach both board edges, and support hover,
+  touch and keyboard inspection. Their mode selector uses the full period's rating data.
+- The share URL still contains a compressed snapshot in its fragment. A third-party shortener can
+  redirect a short URL to that full link; first-party short IDs require a hosted snapshot store or
+  generated static pages. No shortening service is contacted automatically.
+- `profile/index.html` includes Open Graph and Twitter metadata for a common Chess Review banner
+  (`profile/share-preview.png`). Deploy these files to GitHub Pages before testing live previews.
+  Personalized preview images require a server-readable profile ID and per-profile metadata:
+  social crawlers cannot see URL fragments or run the client-side profile renderer. The existing
+  Download card button supplies a personalized image for sharing as an attachment.

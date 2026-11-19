@@ -1839,6 +1839,26 @@ async function openProfile({shared = null, resume = null} = {}) {
     sendMessage:message=>browserAPI.runtime.sendMessage(message), stage:UI.canvas, boardWrap:UI.boardWrap, makePiece, flipped:S.flipped,
     settings:()=>S.settings, writeSettings:patch=>{Object.assign(S.settings,patch);return writeSettings(patch);}, identity, shared, resume, toast,
     icon:name=>ICONS[name]||"", flag, url:_url,
+    playGameMove:move=>{if(move)playEvent(sanSound(move.san));},
+    renderGamePlayer:(side,player,fen)=>playerStrip(side,capturedInfo(fen),{player,fen}),
+    renderGameEvaluation:(bar,score,flipped)=>{
+      bar.className='profile-game-eval evalbar eb-'+(S.settings.barStyle||'classic')+(flipped?' flipped':'');
+      if(panelDesign('evalbar',S.settings)!=='original') {
+        renderBalanceBar(bar,score);
+        bar.classList.add('profile-game-eval');bar.classList.toggle('flipped',flipped);
+      }
+      else {
+        if(score==null)return;
+        const cp=scoreToCp(score),text=evalBarText(score);
+        bar.style.setProperty('--score-chars',text.length);
+        bar.querySelector('.white-fill').style.height=(score.mate!=null?(score.mate>0?100:0):50+Math.max(-600,Math.min(600,cp))/600*46)+'%';
+        bar.querySelector('.score.top').textContent=cp<0?text:'';bar.querySelector('.score.bot').textContent=cp>=0?text:'';
+      }
+    },
+    gameGeometry:()=>{
+      const board=UI.boardWrap.querySelector('.board')?.getBoundingClientRect(),bar=UI.evalbar?.querySelector('.evalbar')?.getBoundingClientRect();
+      return board&&bar?.width?{width:bar.width,gap:Math.max(8,board.left-bar.right)}:null;
+    },
     createAnalysisEngine:()=>createEngine({Threads:1, Hash:16, "Skill Level":20}),
     requestClose:()=>profileWorkspace?.close(),
     buildOwn:async()=>{await profileWorkspace.close();openProfile();},
@@ -3688,8 +3708,8 @@ function clockFor(side) {
 // Captured material at the currently-viewed position, read off the FEN board. For a side it returns
 // the opponent pieces that side has captured (as cburnett image codes like "bP"), plus the running
 // material difference (white − black, in pawns) that drives the "+N" advantage label.
-function capturedInfo() {
-  const board = activePos().fen.split(" ")[0];
+function capturedInfo(fen = activePos().fen) {
+  const board = fen.split(" ")[0];
   const start = { P: 8, N: 2, B: 2, R: 2, Q: 1 };
   const value = { P: 1, N: 3, B: 3, R: 5, Q: 9 };
   const cnt = { w: {}, b: {} };
@@ -3708,10 +3728,10 @@ function capturedInfo() {
   for (const t in value) diff += ((cnt.w[t] || 0) - (cnt.b[t] || 0)) * value[t];
   return { capturedBy, diff };
 }
-function playerStrip(side, material = capturedInfo()) {
-  const p = S.players[side];
-  const toMove = activePos().fen.split(" ")[1] === side;
-  const clock = clockFor(side);
+function playerStrip(side, material = capturedInfo(), context = null) {
+  const p = context?.player || S.players[side];
+  const toMove = (context?.fen || activePos().fen).split(" ")[1] === side;
+  const clock = context ? '' : clockFor(side);
   const { capturedBy, diff } = material;
   const caps = capturedBy(side);
   // The "+N" sits next to whichever side is ahead; nothing when equal or on the trailing side.

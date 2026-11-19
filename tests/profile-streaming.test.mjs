@@ -49,18 +49,18 @@ test('game map: keyboard selection, opening, streaming updates and the date-orde
   const d = dom(t), opened = [], games = rows(3000), map = createGameMap({...d, onOpen: url => opened.push(url)});
   d.doc.body.append(map.element, map.caption); map.update(games);
   const key = value => map.element.dispatchEvent(new d.win.KeyboardEvent('keydown', {key: value, bubbles: true}));
-  key('ArrowRight'); assert.match(map.caption.textContent, /Player 1\b/);
-  key('ArrowDown'); assert.match(map.caption.textContent, /Player 3\b/, 'square (1, 1) is the fourth game');
+  key('ArrowRight'); assert.match(map.element.title, /Player 1\b/);
+  key('ArrowDown'); assert.match(map.element.title, /Player 3\b/, 'square (1, 1) is the fourth game');
   key('Enter'); assert.deepEqual(opened, ['https://lichess.org/abcd1234']);
-  map.caption.querySelector('.profile-map-actions button').click();
-  assert.equal(opened.length, 2);
+  assert.equal(map.caption.querySelector('.profile-map-actions'), null);
+  assert.equal(map.caption.querySelector('.profile-map-detail'), null);
   // Older games streamed later join the edge; the final update puts every game in date order.
   const older = rows(10).map(r => ({...r, id: 'old' + r.id, opp: 'Older ' + r.id, t: -100 + Number(r.id)}));
   map.update([...older, ...games]);
   assert.ok(map.element.getAttribute('aria-label').startsWith((3010).toLocaleString() + ' games'));
-  key('Home'); assert.match(map.caption.textContent, /Player 0\b/, 'streamed games keep their squares');
+  key('Home'); assert.match(map.element.title, /Player 0\b/, 'streamed games keep their squares');
   map.update([...older, ...games], {final: true});
-  key('Home'); assert.match(map.caption.textContent, /Older 0\b/, 'the oldest game takes the first square');
+  key('Home'); assert.match(map.element.title, /Older 0\b/, 'the oldest game takes the first square');
   map.update(rows(5));
   assert.ok(map.element.getAttribute('aria-label').startsWith('5 games'), 'a different set of games starts over');
   for (const url of ['javascript:alert(1)', 'https://lichess.org.evil.test/a', 'http://lichess.org/a']) assert.equal(gameUrl({url}), null);

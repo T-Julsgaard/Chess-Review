@@ -15,7 +15,8 @@ test('insights: totals, ratings, openings and opponents from a synthetic season'
   const R = ratings(rows);
   assert.ok(R.blitz.games > 200 && R.bullet.games > 60);
   assert.equal(R.blitz.peak.rating, Math.max(...rows.filter(r => r.cls === 'blitz').map(r => r.myRating)));
-  assert.ok(R.blitz.series.length <= 60 && R.blitz.bestMonth);
+  assert.equal(R.blitz.series.length, R.blitz.games, 'every rating can be inspected');
+  assert.ok(R.blitz.bestMonth);
   const Op = openings(rows);
   assert.equal(Op.w.top[0].name, 'Italian Game'); assert.equal(Op.b.top[0].name, 'Sicilian Defense');
   assert.equal(Op.firstMoves.white.move, 'e4'); assert.equal(Op.firstMoves.vsE4.move, 'c5');

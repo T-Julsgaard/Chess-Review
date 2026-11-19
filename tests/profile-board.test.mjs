@@ -3,11 +3,11 @@ import assert from 'node:assert/strict';
 import {JSDOM} from 'jsdom';
 import {createProfileBoard, squareNames} from '../lib/profile/board.js';
 
-function surface(t, motion = true) {
+function surface(t, motion = true, onMove = null) {
   const dom = new JSDOM('<div class="board">'+ '<div class="sq"></div>'.repeat(64) +'</div>');
   t.after(() => { api.clear(); dom.window.close(); });
   const board = dom.window.document.querySelector('.board');
-  const api = createProfileBoard({board, motion: () => motion, makePiece: () => dom.window.document.createElement('img')});
+  const api = createProfileBoard({board, motion: () => motion, makePiece: () => dom.window.document.createElement('img'), onMove});
   const at = name => board.children[squareNames(false).indexOf(name)].querySelector('.profile-piece');
   return {api, board, at};
 }
@@ -68,11 +68,26 @@ test('flipped profile boards place pieces and coordinates on the same squares', 
 test('results preserve half and sixth squares instead of rounding away draws', t => {
   const {api, board} = surface(t, false);
   api.fill(128, 32, 3);
-  assert.equal(board.children[17].style.getPropertyValue('--fill-color'), 'linear-gradient(to right, var(--q-best) 0% 0%, var(--ink-2) 0% 50%, var(--q-miss) 50% 100%)');
+  assert.equal(board.children[17].style.getPropertyValue('--fill-win'), '0%');
+  assert.equal(board.children[17].style.getPropertyValue('--fill-draw'), '50%');
   api.fill(384, 99, 1);
-  const stops = [...board.children[16].style.getPropertyValue('--fill-color').matchAll(/([\d.]+)%/g)].map(match => Number(match[1]));
-  assert.equal(stops[1], 50, 'half of the boundary square is a win');
-  assert.ok(Math.abs(stops[3] - stops[1] - 100 / 6) < .000001, 'one sixth is a draw');
+  const win = parseFloat(board.children[16].style.getPropertyValue('--fill-win'));
+  const draw = parseFloat(board.children[16].style.getPropertyValue('--fill-draw'));
+  assert.equal(win, 50, 'half of the boundary square is a win');
+  assert.ok(Math.abs(draw - win - 100 / 6) < .000001, 'one sixth is a draw');
+});
+
+test('profile playback emits the review move cue once per move, including undo', t => {
+  t.mock.timers.enable({apis: ['setTimeout']});
+  const sounds = [], {api} = surface(t, true, move => sounds.push(move?.san));
+  api.moves(['e4', 'd5', 'exd5']);
+  t.mock.timers.tick(900); t.mock.timers.tick(700); t.mock.timers.tick(700);
+  assert.deepEqual(sounds, ['e4', 'd5', 'exd5']);
+  api.step(-1); assert.equal(sounds.at(-1), 'exd5', 'undo uses the move being undone');
+  api.step(1); assert.equal(sounds.at(-1), 'exd5');
+  const n = sounds.length; api.step(1); assert.equal(sounds.length, n, 'endpoint is silent');
+  api.moves(['e4', 'd5'], {from: 2, autoplay: false});
+  assert.equal(sounds.length, n, 'initial positions are silent');
 });
 
 test('manual arrows take over autoplay, respect endpoints and release on another slide', t => {
