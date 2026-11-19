@@ -84,11 +84,10 @@
 .pv-story[data-animate="on"] > * { animation: pv-rise-in .6s cubic-bezier(.2,.8,.2,1) both; }
 .pv-story[data-animate="on"] > :nth-child(2) { animation-delay: 70ms; } .pv-story[data-animate="on"] > :nth-child(3) { animation-delay: 140ms; }
 .pv-story[data-animate="on"] > :nth-child(4) { animation-delay: 210ms; } .pv-story[data-animate="on"] > :nth-child(5) { animation-delay: 280ms; } .pv-story[data-animate="on"] > :nth-child(n+6) { animation-delay: 340ms; }
-.pv-story-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: nowrap; }
-.pv-story-chapter { flex-shrink: 0; white-space: nowrap; }
-.pv-story-top :is(.pv-filter, .pv-modes) { flex-shrink: 1; min-width: 0; max-width: 100%; overflow-x: auto; }
+.pv-story-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.pv-story-chapter { flex-shrink: 1; min-width: 0; }
+.pv-story-top :is(.pv-filter, .pv-modes) { flex-shrink: 0; min-width: 0; max-width: 100%; overflow-x: auto; }
 .pv-story-top :is(.pv-filter, .pv-modes) button { flex-shrink: 0; white-space: nowrap; }
-.pv-story-top:has(.pv-filter button:nth-of-type(5)) .pv-story-chapter { font-size: 10px; letter-spacing: .8px; gap: 6px; }
 .pv-story-chapter { display: inline-flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 800; letter-spacing: 1.8px; text-transform: uppercase; color: var(--pv-tint); }
 .pv-story-no { font-style: normal; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0; padding: 2px 7px; border-radius: 999px; border: 1px solid currentColor; opacity: .85; }
 .pv-story-hero { display: flex; flex-direction: column; gap: 8px; }

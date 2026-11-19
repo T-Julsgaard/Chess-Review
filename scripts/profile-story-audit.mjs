@@ -13,6 +13,20 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await waitFor(review, "document.querySelector('.pv-story')?.dataset.slide==='cover'", 'Story cover');
   await sleep(800);
   await run("document.querySelector('.learning-announcement-disable')?.click()");
+  // Panel width follows the user's saved review layout, independently of the
+  // viewport. Keep mode switches usable beside long titles in narrow panels.
+  const filterLayout = [];
+  const panelStyle = await run('w.shell.style.cssText');
+  for (const panelWidth of [280, 360, 480]) {
+    for (const id of ['numbers', 'season', 'openings', 'signature', 'rival', 'hits', 'habits', 'clock', 'endings', 'rating']) {
+      await run(`w.go(w.deck.findIndex(s=>s.id===${JSON.stringify(id)}));w.report.classOptions=['bullet','blitz','rapid','daily'];w.renderSlide({animate:false});Object.assign(w.shell.style,{left:'12px',width:'${panelWidth}px'})`);
+      const layout = await run(`(()=>{const a=document.querySelector('.pv-story'),g=a.querySelector('.pv-filter,.pv-modes'),r=g.getBoundingClientRect();g.scrollLeft=0;const b=g.querySelector('button').getBoundingClientRect();g.scrollLeft=g.scrollWidth;const last=g.querySelector('button:last-child').getBoundingClientRect();g.scrollLeft=0;return {panelWidth:w.shell.getBoundingClientRect().width,chapter:a.dataset.slide,width:r.width,contentWidth:g.scrollWidth,available:a.clientWidth,visible:b.right>r.left&&b.left<r.right,lastVisible:last.right>r.left&&last.left<r.right,overflow:a.scrollWidth>a.clientWidth+1}})()`);
+      filterLayout.push({panelWidth, ...layout});
+      assert.ok(Math.abs(layout.panelWidth-panelWidth)<1 && layout.visible && layout.lastVisible && layout.width >= Math.min(layout.contentWidth, layout.available) - 1 && !layout.overflow, JSON.stringify(filterLayout.at(-1)));
+    }
+  }
+  await run(`w.shell.style.cssText=${JSON.stringify(panelStyle)};w.rebuild()`);
+  await fs.writeFile(path.join(out, 'profile-filter-layout.json'), JSON.stringify(filterLayout, null, 2));
   const evidence = [];
   for (const [width, height] of [[1920, 1080], [1366, 768], [600, 800]]) {
     await call('Emulation.setDeviceMetricsOverride', {width, height, deviceScaleFactor: 1, mobile: false}, review.sessionId);
@@ -48,8 +62,8 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     assert.notEqual(fill.during, fill.before); assert.notEqual(fill.during, fill.target, 'the boundary is between its old and new positions');
     await run("f.querySelector('button').click()"); await sleep(650);
     await run("w.report.classOptions=['blitz','rapid','daily','bullet'];w.renderSlide({animate:false})");
-    const header = await run("(()=>{const t=document.querySelector('.pv-story-chapter').getBoundingClientRect(),f=document.querySelector('.pv-filter').getBoundingClientRect();return {aligned:Math.abs((t.top+t.bottom-f.top-f.bottom)/2)<2,overflow:document.querySelector('.pv-story').scrollWidth>document.querySelector('.pv-story').clientWidth+1}})()");
-    assert.ok(header.aligned && !header.overflow, JSON.stringify(header));
+    const header = await run("(()=>{const a=document.querySelector('.pv-story'),f=document.querySelector('.pv-filter');return {width:f.getBoundingClientRect().width,expected:Math.min(f.scrollWidth,a.clientWidth),overflow:a.scrollWidth>a.clientWidth+1}})()");
+    assert.ok(header.width >= header.expected - 1 && !header.overflow, JSON.stringify(header));
     await run('w.rebuild()');
     // Every available time control keeps the progress rail's geometry, including
     // chapters whose data disappears in that mode. Navigation starts fresh on All.

@@ -181,6 +181,22 @@ test('story filters keep chapters stable and each chapter opens on All', async t
   assert.equal(doc.querySelector('.pv-filter button.on').textContent, 'All', 'returning to the rival also starts on All');
 });
 
+test('story keeps game mode buttons when only one time control is available', async t => {
+  const a = review(t, 'story'), doc = a.dom.window.document;
+  seed(a);
+  const stored = a.store[rowsKey('chesscom', 'tester')];
+  stored.rows = stored.rows.map(row => ({...row, cls: 'blitz'}));
+  const w = await openDeck(a);
+  for (const id of ['numbers', 'season', 'openings', 'signature', 'rival', 'hits', 'habits', 'clock', 'endings']) {
+    w.go(w.deck.findIndex(slide => slide.id === id));
+    assert.deepEqual([...doc.querySelectorAll('.pv-filter button')].map(button => button.textContent), ['All', 'Blitz'], id);
+    doc.querySelector('.pv-filter button[data-value="blitz"]').click();
+    assert.equal(doc.querySelector('.pv-filter button.on').textContent, 'Blitz', id);
+  }
+  w.go(w.deck.findIndex(slide => slide.id === 'rating'));
+  assert.deepEqual([...doc.querySelectorAll('.pv-modes button')].map(button => button.textContent), ['Blitz']);
+});
+
 test('story time controls read Bullet, Blitz, Daily; habit dots and clock columns morph in place', async t => {
   const a = review(t, 'story'), doc = a.dom.window.document;
   seed(a);
