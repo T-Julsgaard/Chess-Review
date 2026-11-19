@@ -181,6 +181,41 @@ test('story filters keep chapters stable and each chapter opens on All', async t
   assert.equal(doc.querySelector('.pv-filter button.on').textContent, 'All', 'returning to the rival also starts on All');
 });
 
+test('story time controls read Bullet, Blitz, Daily; habit dots and clock columns morph in place', async t => {
+  const a = review(t, 'story'), doc = a.dom.window.document;
+  seed(a);
+  const stored = a.store[rowsKey('chesscom', 'tester')];
+  // Blitz is played most, yet the switch keeps the usual order.
+  stored.rows = stored.rows.map((row, i) => ({...row, cls: ['blitz', 'blitz', 'daily', 'bullet'][i % 4]}));
+  const w = await openDeck(a);
+  const labels = () => [...doc.querySelectorAll('.pv-filter button')].map(b => b.textContent);
+  const pick = label => [...doc.querySelectorAll('.pv-filter button')].find(button => button.textContent === label).click();
+  w.go(w.deck.findIndex(s => s.id === 'habits'));
+  assert.deepEqual(labels(), ['All', 'Bullet', 'Blitz', 'Daily']);
+  const layer = doc.querySelector('.board .pv-layer'), dot = layer.querySelector('.pv-bubble');
+  assert.match(doc.querySelector('.profile-board-caption .pv-legend').textContent, /Bigger dot: more games.*Greener: higher win rate/);
+  assert.equal(doc.querySelector('.pv-story .pv-legend'), null, 'the key sits under the board, not in the panel');
+  const size = dot.style.getPropertyValue('--s');
+  pick('Bullet');
+  assert.equal(w.cls, 'bullet');
+  assert.equal(doc.querySelector('.board .pv-layer'), layer, 'the dots stay on the board');
+  assert.equal(layer.querySelector('.pv-bubble'), dot);
+  assert.equal(doc.querySelectorAll('.board .pv-layer').length, 1, 'no second chart fades in');
+  assert.ok(doc.querySelector('.profile-board-caption .pv-legend'), 'the key stays under the board');
+  pick('All');
+  assert.equal(dot.style.getPropertyValue('--s'), size, 'back on All the dots return to their sizes');
+  w.go(w.deck.findIndex(s => s.id === 'clock'));
+  assert.notEqual(doc.querySelector('.board .pv-layer'), layer, 'entering another chapter draws a new chart');
+  assert.deepEqual(labels(), ['All', 'Bullet', 'Blitz'], 'no Daily on the move-time chapter');
+  const clock = doc.querySelector('.board .pv-layer');
+  assert.equal(clock.dataset.scene, 'columns');
+  assert.deepEqual([...clock.querySelectorAll('.pv-col-label')].map(n => n.textContent), ['0–1s', '1–2s', '2–3s', '3–5s', '5–10s', '10–20s', '20–30s', '30s+'], 'move times in intervals, not "under"');
+  pick('Blitz');
+  assert.equal(doc.querySelector('.board .pv-layer'), clock, 'the columns grow and shrink in place');
+  w.go(w.deck.findIndex(s => s.id === 'rating'));
+  if (doc.querySelectorAll('.pv-modes button').length > 1) assert.deepEqual([...doc.querySelectorAll('.pv-modes button')].map(b => b.textContent), ['Bullet', 'Blitz', 'Daily'].filter(l => [...doc.querySelectorAll('.pv-modes button')].some(b => b.textContent === l)));
+});
+
 test('profile designs: dashboard opens on a grid, previews and opens chapters, Escape returns', async t => {
   const a = review(t, 'bento'), doc = a.dom.window.document;
   seed(a);

@@ -202,6 +202,13 @@
 .pv-bubble::before { content: ""; width: calc(var(--s, 0) * 82%); aspect-ratio: 1; border-radius: 50%; background: var(--c); box-shadow: 0 0 18px -6px var(--c); animation: pv-pop .45s cubic-bezier(.2,.9,.25,1.2) var(--d, 0ms) both; }
 .pv-bubble-day { display: flex; align-items: center; padding-left: 10%; font-size: clamp(10px, 1vw, 14px); font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: var(--ink-2); }
 .pv-layer.pv-leaving { z-index: 4; }
+/* A new time control morphs the chart that is already there: dots and columns glide to their new size and colour. */
+.pv-bubble::before { transition: width .55s cubic-bezier(.3,.8,.3,1), background-color .55s ease, box-shadow .55s ease; }
+.pv-tile::before { transition: height .11s linear var(--md, 0ms), background-color .55s ease, border-radius .2s ease var(--md, 0ms); }
+.pv-layer > .pv-col-value { transition: top .5s cubic-bezier(.3,.8,.3,1); }
+.pv-tile-empty { pointer-events: none; }
+.pv-col-label.pv-col-plain { text-transform: none; letter-spacing: .2px; }
+.profile-board-caption .pv-legend { justify-content: center; }
 @media (prefers-reduced-motion: reduce) { .profile-shell[data-design] * , .pv-layer *, .pv-layer *::before { animation: none !important; transition: none !important; } .pv-line-path { stroke-dashoffset: 0; } .pv-line-area { opacity: 1; } }
 
 /* ---------- Dashboard (bento) ---------- */
