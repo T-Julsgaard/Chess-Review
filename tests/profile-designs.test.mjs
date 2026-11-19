@@ -120,6 +120,10 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.equal(shell.querySelectorAll('.pv-points li').length, 2);
   w.go(w.deck.findIndex(s => s.id === 'signature'));
   assert.ok(shell.querySelectorAll('.pv-cmp').length >= 6, 'every metric against a typical player');
+  const signature = w.currentSlide();
+  assert.equal(shell.querySelector('.pv-cmp-label').firstChild.textContent, signature.signatures[0].label, 'the strongest signature is first in the comparison');
+  assert.equal(shell.querySelectorAll('.pv-cmp').length, signature.compare.length, 'the comparison includes every metric');
+  assert.match(shell.querySelector('.pv-story-chapter').textContent, /You compared to a typical player/);
   assert.ok(doc.querySelector('.board .pv-pairs'), 'the board compares you with a typical player');
   w.go(w.deck.findIndex(s => s.id === 'rival'));
   assert.equal(doc.querySelector('.board .pv-badge'), null);
@@ -143,6 +147,38 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.equal(shell.querySelector('.pv-story').dataset.slide, 'share', 'sharing keeps the current chapter');
   w.close(); for (let i = 0; i < 4; i++) await settle();
   assert.equal(doc.querySelectorAll('.board .pv-layer').length, 0, 'closing removes the board charts');
+});
+
+test('story filters keep chapters stable and each chapter opens on All', async t => {
+  const a = review(t, 'story'), doc = a.dom.window.document;
+  seed(a);
+  const stored = a.store[rowsKey('chesscom', 'tester')];
+  stored.rows = stored.rows.map((row, i) => ({...row, cls: i < 5 ? 'bullet' : 'blitz'}));
+  const w = await openDeck(a);
+  const chapters = w.deck.map(slide => slide.id);
+  const pick = label => [...doc.querySelectorAll('.pv-filter button')].find(button => button.textContent === label).click();
+  w.go(chapters.indexOf('season'));
+  pick('Bullet');
+  assert.equal(w.cls, 'bullet');
+  assert.deepEqual(w.deck.map(slide => slide.id), chapters, 'sparse modes preserve chapter order and count');
+  assert.equal(doc.querySelectorAll('.pv-seg').length, chapters.length);
+  assert.equal(w.currentSlide().id, 'season');
+  assert.equal(w.currentSlide().title, 'Not enough games', 'missing filtered chapters never reuse all-mode statistics');
+  assert.equal(doc.querySelector('.pv-col-value'), null);
+  w.go(chapters.indexOf('signature'));
+  assert.equal(w.cls, 'all');
+  assert.equal(w.report.cls, 'all');
+  assert.equal(doc.querySelector('.pv-filter button.on').textContent, 'All');
+  assert.ok(doc.querySelector('.pv-cmp'));
+  pick('Blitz');
+  doc.querySelectorAll('.pv-seg')[chapters.indexOf('rival')].click();
+  assert.equal(w.cls, 'all', 'progress navigation also clears the chapter filter');
+  pick('Blitz');
+  assert.equal(w.rivalCls, 'blitz');
+  doc.querySelector('.pv-next').click();
+  doc.querySelector('.pv-prev').click();
+  assert.equal(w.rivalCls, 'all');
+  assert.equal(doc.querySelector('.pv-filter button.on').textContent, 'All', 'returning to the rival also starts on All');
 });
 
 test('profile designs: dashboard opens on a grid, previews and opens chapters, Escape returns', async t => {

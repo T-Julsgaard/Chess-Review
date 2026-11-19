@@ -68,6 +68,7 @@ test('flipped profile boards place pieces and coordinates on the same squares', 
 test('results preserve half and sixth squares instead of rounding away draws', t => {
   const {api, board} = surface(t, false);
   api.fill(128, 32, 3);
+  assert.equal(board.children[17].title, 'Each square represents 2.00 games.', 'result hover only explains the game count');
   assert.equal(board.children[17].style.getPropertyValue('--fill-win'), '0%');
   assert.equal(board.children[17].style.getPropertyValue('--fill-draw'), '50%');
   api.fill(384, 99, 1);

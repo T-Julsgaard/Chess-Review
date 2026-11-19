@@ -51,6 +51,32 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     const header = await run("(()=>{const t=document.querySelector('.pv-story-chapter').getBoundingClientRect(),f=document.querySelector('.pv-filter').getBoundingClientRect();return {aligned:Math.abs((t.top+t.bottom-f.top-f.bottom)/2)<2,overflow:document.querySelector('.pv-story').scrollWidth>document.querySelector('.pv-story').clientWidth+1}})()");
     assert.ok(header.aligned && !header.overflow, JSON.stringify(header));
     await run('w.rebuild()');
+    // Every available time control keeps the progress rail's geometry, including
+    // chapters whose data disappears in that mode. Navigation starts fresh on All.
+    for (const id of ['numbers', 'season', 'signature', 'rival', 'hits', 'habits']) {
+      await run(`w.go(w.deck.findIndex(s=>s.id===${JSON.stringify(id)}))`);
+      const geometry = () => run("[...document.querySelectorAll('.pv-seg')].map(n=>{const r=n.getBoundingClientRect();return [r.x,r.y,r.width,r.height]})");
+      const before = await geometry();
+      const modes = await run("[...document.querySelectorAll('.pv-filter button')].map(n=>n.dataset.value)");
+      for (const mode of modes.filter(m => m !== 'all')) {
+        await run(`document.querySelector('.pv-filter button[data-value="${mode}"]').click()`);
+        await sleep(100);
+        const after = await geometry();
+        assert.equal(after.length, before.length, `${id}/${mode}: chapter count stays fixed`);
+        assert.ok(after.every((rect, i) => rect.every((v, k) => Math.abs(v - before[i][k]) < .1)), `${id}/${mode}: progress rail stays fixed`);
+      }
+      await run("document.querySelector('.pv-next').click()");
+      assert.equal(await run("w.cls==='all'&&w.rivalCls==='all'"), true);
+    }
+    await run("w.go(w.deck.findIndex(s=>s.id==='signature'))");
+    await sleep(700);
+    const comparison = await run("(()=>{const a=document.querySelector('.pv-story'),l=document.querySelector('.pv-cmp-list'),r=l.getBoundingClientRect(),n=document.querySelector('.pv-next').getBoundingClientRect();return {height:r.height,bottom:r.bottom,navTop:n.top,overflow:a.scrollWidth>a.clientWidth+1,count:l.children.length,expected:w.currentSlide().compare.length,first:l.querySelector('.pv-cmp-label').firstChild.textContent,lead:w.currentSlide().signatures[0].label}})()");
+    assert.equal(comparison.count, comparison.expected);
+    assert.equal(comparison.first, comparison.lead);
+    assert.ok(comparison.height > 190 && !comparison.overflow && (width < 700 || comparison.bottom <= comparison.navTop), JSON.stringify(comparison));
+    const signature = await call('Page.captureScreenshot', {format: 'png'}, review.sessionId);
+    await fs.writeFile(path.join(out, `profile-story-comparison-${width}.png`), Buffer.from(signature.data, 'base64'));
+    await run("w.go(w.deck.findIndex(s=>s.id==='numbers'))");
     const numbers = await call('Page.captureScreenshot', {format: 'png'}, review.sessionId);
     await fs.writeFile(path.join(out, `profile-story-numbers-${width}.png`), Buffer.from(numbers.data, 'base64'));
     await run("w.go(w.deck.findIndex(s=>s.id==='openings'))");
