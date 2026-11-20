@@ -22,7 +22,7 @@ export function season(count = 300, seed = 7) {
       res, term, eco: op[0], op: op[1], bot: false, n, myMoves: Math.ceil(n / 2), knights4: rand() < 0.7, castle: rand() < 0.6 ? 6 : 0, castleSide: 'k', oppCastleSide: 'k', fian: me === 'b' && rand() < 0.2, qtrade: rand() < 0.1 ? 15 : 0,
       qEarly: false, gambit: false, storm: rand() < 0.4, pair25: false, ep: 0, promo: 0, under: 0, checks: 2 + Math.floor(rand() * 4), caps: 8, mateBy: res === 'w' && term === 'mate' ? 'q' : null, matePattern: res === 'w' && term === 'mate' ? 'back-rank' : null, matedBy: res === 'l' && term === 'mate' ? 'q' : null,
       matMin: res === 'w' && i % 17 === 0 ? -5 : -1, matMax: res !== 'w' && i % 19 === 0 ? 6 : res === 'w' && i % 6 === 0 ? 4 : 2, matFinal: 0, lowPly: 30, highPly: 20, swings: 0, endgame: n > 90 ? 70 : 0,
-      think: 6, thinkN: 20, snap: 8, tb: [2, 2, 2, 2, 5, 4, 2, 1], longThink: 20 + Math.floor(rand() * 60), longPly: 23, trouble: rand() < 0.3, ahead: 0.6, dur: 300, line: op[2], first: me === 'w' ? op[2].split(' ')[0] + ' ' + op[2].split(' ')[2] : op[2].split(' ')[1] + ' ' + op[2].split(' ')[3],
+      think: 6, thinkN: 20, snap: 8, tb: [2, 2, 2, 2, 5, 4, 2, 1], tf: i % 4 === 0 ? [3, 3, 4, 4, 2, 2, 1, 1] : null, longThink: 20 + Math.floor(rand() * 60), longPly: 23, trouble: rand() < 0.3, ahead: 0.6, dur: 300, line: op[2], first: me === 'w' ? op[2].split(' ')[0] + ' ' + op[2].split(' ')[2] : op[2].split(' ')[1] + ' ' + op[2].split(' ')[3],
       fenEnd: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1', fenLow: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1', fenHigh: '', heat: '0'.repeat(28) + '5' + '0'.repeat(35)});
   }
   return rows;

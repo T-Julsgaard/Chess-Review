@@ -105,3 +105,14 @@ test('deck: a full season builds every slide with evidence and boards; a thin on
   assert.ok(withEngine.find(s => s.id === 'swings').lead.includes('12%'));
   assert.equal(fmt.hours(0.5), '30 min'); assert.equal(fmt.seconds(95), '1 min 35 s'); assert.equal(fmt.signed(12), '+12');
 });
+
+test('deck: bullet alone gets premove and sub-second move-time columns; mixed controls keep the usual ones', () => {
+  const deckFor = rows => buildDeck(buildReport(rows, buildInsights(rows), {account: 'tester', site: 'chesscom', period: 'year', periodLabel: 'Past 12 months'}), {account: 'tester'}).find(s => s.id === 'clock');
+  const bullet = deckFor(season().filter(r => r.cls === 'bullet'));
+  assert.deepEqual(bullet.board.scene.columns.map(c => c.label), ['Premove', '.1–.5s', '.5–1s', '1–2s', '2–3s', '3–5s', '5–10s', '10s+']);
+  assert.match(bullet.points[0], /^15% of your moves were premoves$/);
+  assert.match(bullet.board.scene.columns[0].detail, /premoves \(0\.1 s or less/);
+  const mixed = deckFor(season());
+  assert.equal(mixed.board.scene.columns[0].label, '0–1s');
+  assert.match(mixed.points[2], /30 seconds or more/);
+});

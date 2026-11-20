@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {gameFeatures, parseTimeControl, decodeHeat, squareIndex, matePattern, validRow} from '../lib/profile/features.js';
+import {gameFeatures, parseTimeControl, decodeHeat, squareIndex, matePattern, validRow, needsThinkBuckets} from '../lib/profile/features.js';
 import {normalizeChesscom, normalizeLichess, parseMovetext} from '../lib/profile/sources.js';
 import {createProfileStore, rowsKey, ENGINE_INDEX_KEY, MAX_ENGINE_ENTRIES} from '../lib/profile/store.js';
 import {periodRows, periodStart, periodLabel, customPeriodBounds, PERIODS} from '../lib/profile/collector.js';
@@ -171,4 +171,17 @@ test('collector: custom periods include both UTC dates, sort games and reject in
     assert.deepEqual(periodRows(rows, 'custom', now, bad), []);
     assert.ok(Number.isNaN(periodStart('custom', now, bad)));
   }
+});
+
+test('features: bullet games split move times into premoves, half seconds and up to ten seconds', () => {
+  const moves = ['e4','e5','Nf3','Nc6','Bb5','a6','Ba4','Nf6','O-O','Be7','Re1','b5'];
+  // White's own moves take 0 (premove), 0.1 (premove), 0.4, 0.8, 2.5 and 12 seconds.
+  const clocks = [60, 60, 59.9, 59, 59.5, 58, 58.7, 57, 56.2, 56, 44.2, 55];
+  const row = gameFeatures(game({moves, clocks, timeClass: 'bullet', timeControl: '60+0', result: 'd', termination: 'agree'}), 'morphy');
+  assert.deepEqual(row.tf, [2, 1, 1, 0, 1, 0, 0, 1]);
+  assert.equal(row.tb.length, 8);
+  const blitz = gameFeatures(game({moves, clocks}), 'morphy');
+  assert.equal(blitz.tf, null, 'only bullet keeps the finer split');
+  assert.equal(needsThinkBuckets({...row, tf: undefined}), true, 'old bullet rows are replayed once');
+  assert.equal(needsThinkBuckets(blitz), false);
 });

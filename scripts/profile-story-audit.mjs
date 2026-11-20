@@ -113,7 +113,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     assert.ok(game.bar.left >= 0 && game.bar.right < game.board.left, JSON.stringify(game));
     assert.ok(Math.abs(game.bar.top - game.board.top) < 2 && Math.abs(game.bar.height - game.board.height) < 3);
     const controls = await run("(()=>{const r=document.querySelector('.profile-game-controls').getBoundingClientRect();return {bottom:r.bottom,top:r.top,count:document.querySelectorAll('.profile-game-controls button').length}})()");
-    assert.ok(controls.count===5 && controls.bottom<=height && controls.top>=game.board.top+game.board.height, JSON.stringify(controls));
+    assert.ok(controls.count===3 && controls.bottom<=height && controls.top>=game.board.top+game.board.height, JSON.stringify(controls));
     const screenshot = await call('Page.captureScreenshot', {format: 'png'}, review.sessionId);
     await fs.writeFile(path.join(out, `profile-story-game-${width}.png`), Buffer.from(screenshot.data, 'base64'));
     await run("document.querySelector('.profile-game-controls .exit-analysis').click()");

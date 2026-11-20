@@ -417,5 +417,3 @@
 }
 .profile-shell[data-design="story"] .pv-recap > div { padding: 8px 0; }
 .profile-shell[data-design="story"] .pv-col-label { text-transform: none; }
-.profile-intro-top { background: color-mix(in srgb, #2a2a27 97%, transparent); }
-.profile-intro-bottom { background: color-mix(in srgb, #474741 97%, transparent); }
