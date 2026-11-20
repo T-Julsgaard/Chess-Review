@@ -4,7 +4,7 @@ import {JSDOM} from 'jsdom';
 import {ARCHETYPES} from '../lib/profile/archetypes.js';
 import {PORTRAITS, PORTRAIT_SIZE} from '../lib/profile/portraits.js';
 import {hasPortrait, portraitCredit, portraitTones, planMosaic, cellState, inkColor, TIMELINE, PORTRAIT_DURATION, PORTRAIT_STYLES, PORTRAIT_DELAY,
-  planFace, faceState, plateAt, cubicBezier, glideEase, parseColor, faceGrid, FACE, SHADE_RANKS, PIECE_FILL, GLIDE} from '../lib/profile/portrait.js';
+  planFace, faceState, developAt, plateAt, cubicBezier, glideEase, parseColor, faceGrid, FACE, SHADE_RANKS, PIECE_FILL, GLIDE} from '../lib/profile/portrait.js';
 import {nearestBoardEdge} from '../lib/learning/piece-transition.js';
 import {createProfileBoard, squareNames} from '../lib/profile/board.js';
 import {buildDeck, buildReport} from '../lib/profile/deck.js';
@@ -126,7 +126,7 @@ test('mosaic: pieces move like every other position change on the board', () => 
   const n = 40, sources = opening(), plan = planFace(portraitTones('fischer', n), n, {sources, seed: 11});
   const {cells, leaves, landed, duration} = plan;
   assert.ok(landed > 1800 && landed < 2800, `landed ${landed}`);
-  assert.equal(duration, landed + 120);
+  assert.equal(duration, landed + FACE.develop - FACE.lead + 120);
   // Each black piece glides to a face cell of its own kind; the white ones leave through the nearest edge.
   const moved = cells.filter(c => c.kind === 'move');
   assert.equal(moved.length, 16);
@@ -176,6 +176,22 @@ test('mosaic: pieces move like every other position change on the board', () => 
   const empty = planFace(portraitTones('fischer', n), n);
   assert.equal(empty.leaves.length, 0); assert.equal(empty.cells.filter(c => c.kind === 'move').length, 0);
   assert.equal(plateAt(0, landed), 0); assert.ok(Math.abs(plateAt(landed, landed) - GLIDE.plate) < 1e-9);
+});
+
+test('mosaic: the photograph develops under the pieces as they land, outside in', () => {
+  const n = 40, plan = planFace(portraitTones('kasparov', n), n, {sources: opening(), seed: 3});
+  assert.equal(plan.n, n); assert.equal(plan.develop.length, n * n);
+  // Under a piece, the shading develops as that piece lands.
+  for (const c of plan.cells) assert.equal(plan.develop[c.gy * n + c.gx], Math.fround(c.start + c.dur));
+  // Empty cells follow the same outside-in order.
+  const at = (gx, gy) => plan.develop[gy * n + gx];
+  assert.ok(at(0, 20) < at(10, 20) && at(10, 20) < at(19, 20));
+  // Nothing before the start, everything by the end; and it plays backwards just the same.
+  assert.ok(developAt(plan, 0).every(a => a === 0));
+  assert.ok(developAt(plan, plan.duration).every(a => a === 1));
+  const mid = developAt(plan, plan.landed * .5);
+  assert.ok(mid.some(a => a === 0) && mid.some(a => a === 1), 'part developed half way');
+  assert.ok(FACE.shade > .3 && FACE.shade < .8);
 });
 
 test('portrait square colours parse from computed styles', () => {
