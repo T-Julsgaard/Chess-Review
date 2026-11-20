@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {JSDOM} from 'jsdom';
 import {PORTRAITS} from '../lib/profile/portraits.js';
 import {portraitContours, traceContours, sampleContour} from '../lib/profile/portrait-contours.js';
+import {inlayContours, INLAY} from '../lib/profile/portrait-inlay.js';
 import {createPortrait, planSculpture, sculptureState, portraitTones, PIECE_FILL, glideEase, GLIDE, MORPH} from '../lib/profile/portrait.js';
 import {nearestBoardEdge} from '../lib/learning/piece-transition.js';
 
@@ -91,6 +92,41 @@ test('contours keep real holes, separate islands and a consistent winding for mo
   assert.deepEqual(portraitContours(new Float32Array(n), n), []);
 });
 
+test('Inlay makes a complete, fitted image out of pieces, including every background tone', () => {
+  const inside = (x, y, ring) => {
+    let hit = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const a = ring[i], b = ring[j];
+      if ((a.y > y) !== (b.y > y) && x < (b.x - a.x) * (y - a.y) / (b.y - a.y) + a.x) hit = !hit;
+    }
+    return hit;
+  };
+  for (const id of Object.keys(PORTRAITS)) {
+    const sources = opening(), tones = portraitTones(id, 64), plan = planSculpture(tones, 64, {sources, inlay: true});
+    assert.ok(plan.cells.length >= 32 && plan.cells.length <= 72, id + ': a bounded number of individual pieces');
+    assert.equal(plan.cells.filter(c => c.kind === 'move').length, sources.length);
+    assert.equal(new Set(plan.cells.filter(c => c.kind === 'move').map(c => c.source)).size, sources.length);
+    assert.equal(plan.leaves.length, 0);
+    assert.ok(plan.cells.filter(c => c.tone === 0).length >= 3, 'several actual pieces make the dark material');
+    assert.ok(plan.cells.every(c => c.area <= 64 * INLAY.maxArea + .01), 'a single piece cannot become the whole backdrop');
+    let missing = 0, overlaps = 0, error = 0;
+    for (let y = 0; y < 40; y++) for (let x = 0; x < 40; x++) {
+      const owners = plan.cells.filter(c => c.rings.reduce((hit, ring) => hit !== inside((x + .5) / 5, (y + .5) / 5, ring), false));
+      if (!owners.length) missing++;
+      if (owners.length > 1) overlaps++;
+      const source = tones[Math.floor((y + .5) * 64 / 40) * 64 + Math.floor((x + .5) * 64 / 40)];
+      error += Math.abs((owners.at(-1)?.tone || 0) - source);
+    }
+    assert.ok(missing < 16 && overlaps < 16, `${id}: fitted coverage, ${missing} holes and ${overlaps} overlaps / 1600`);
+    assert.ok(error / 1600 < .085, `${id}: the pieces retain the likeness`);
+    for (const c of plan.cells) {
+      assert.equal(sculptureState(c, 0).morph, 0);
+      assert.equal(sculptureState(c, plan.duration).morph, 1);
+    }
+  }
+  assert.deepEqual(inlayContours(null, 64), []);
+});
+
 // Minimal canvas recorder: verifies lifecycle and actual filled geometry without
 // making a native canvas package a dependency of the extension's unit tests.
 function fixture(t, {animated = false, decode = () => Promise.resolve(), style = 'assemble'} = {}) {
@@ -118,12 +154,12 @@ function fixture(t, {animated = false, decode = () => Promise.resolve(), style =
   }
   win.HTMLCanvasElement.prototype.getContext = function() {
     if (contexts.has(this)) return contexts.get(this);
-    const context = {fills: [], images: [], points: [],
-      setTransform() {}, clearRect() { this.fills = []; this.images = []; },
+    const context = {fills: [], images: [], rectangles: [], points: [],
+      setTransform() {}, clearRect() { this.fills = []; this.images = []; this.rectangles = []; },
       drawImage(...args) { this.images.push(args); }, beginPath() { this.points = []; },
       moveTo(x, y) { this.points.push([x, y]); }, lineTo(x, y) { this.points.push([x, y]); }, closePath() {},
-      fill(rule) { this.fills.push({rule, points: this.points.slice()}); }, fillRect() {}, save() {}, restore() {}, translate() {}, rotate() {},
-      clip() {}, transform() {},
+      fill(rule) { this.fills.push({rule, points: this.points.slice()}); }, fillRect(...args) { this.rectangles.push(args); }, save() {}, restore() {}, translate() {}, rotate() {},
+      clip() {}, transform() {}, stroke() {},
       getImageData: () => ({data: Uint8ClampedArray.from({length: 96 * 96 * 4}, (_, i) => {
         const pixel = Math.floor(i / 4), x = pixel % 96, y = Math.floor(pixel / 96);
         return i % 4 === 3 && x > 20 && x < 76 && y > 8 && y < 88 ? 255 : 0;
@@ -201,6 +237,35 @@ test('Morph respects reduced motion and draws the same completed contour face im
   assert.equal(ctx.images.length, 0); assert.ok(ctx.fills.length >= 32);
   await f.portrait.dismiss();
   assert.ok([...f.board.querySelectorAll('.profile-piece')].every(img => img.style.visibility === ''));
+});
+
+test('Inlay never paints a plate, rectangle or photograph underneath its pieces', async t => {
+  const f = fixture(t, {animated: true, style: 'inlay'});
+  await f.flush(); await f.flush();
+  assert.equal(f.overlay.children.length, 1, 'only the piece canvas is mounted');
+  assert.equal(f.overlay.querySelector('.profile-portrait-plate'), null);
+  const ctx = f.contexts.get(f.overlay.querySelector('.profile-portrait-pieces'));
+  assert.equal(ctx.images.length, 32, 'the initial canvas carries the actual board pieces');
+  for (const time of [0, 900, 1600, 2500, 5000]) {
+    f.tick(time);
+    assert.equal(ctx.rectangles.length, 0, `no backing fill at ${time} ms`);
+    assert.ok(ctx.fills.every(fill => fill.points.every(point => point.every(Number.isFinite))));
+  }
+  assert.equal(f.portrait.revealed, true);
+  assert.ok(ctx.fills.length >= 32); assert.equal(ctx.images.length, 0, 'the entire finished image consists of piece geometry');
+  const dismissed = f.portrait.dismiss(); f.tick(9000); await dismissed;
+  assert.ok([...f.board.querySelectorAll('.profile-piece')].every(img => img.style.visibility === ''));
+  assert.equal(f.frames.size, 0);
+});
+
+test('Inlay respects reduced motion without adding a backing plate', async t => {
+  const f = fixture(t, {style: 'inlay'});
+  await f.flush();
+  assert.equal(f.portrait.revealed, true); assert.equal(f.frames.size, 0);
+  assert.equal(f.overlay.querySelector('.profile-portrait-plate'), null);
+  const ctx = f.contexts.get(f.overlay.querySelector('.profile-portrait-pieces'));
+  assert.equal(ctx.images.length, 0); assert.equal(ctx.rectangles.length, 0); assert.ok(ctx.fills.length >= 32);
+  await f.portrait.dismiss();
 });
 
 test('cancelling before sprites decode leaves no late portrait or hidden pieces', async t => {

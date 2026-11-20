@@ -27,6 +27,13 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   const timing = await run("({elapsed:performance.now()-morphStart,frames:morphFrames.length,p95:morphFrames.slice().sort((a,b)=>a-b)[Math.floor(morphFrames.length*.95)]})");
   assert.ok(timing.elapsed > 3700 && timing.elapsed < 7000, JSON.stringify(timing));
   await shot('morph-assembled');
+  await run("import('./analysis.js').then(m=>{m.S.settings.profilePortraitStyle='inlay';const w=m.profileWorkspace;w.showPortrait(w.deck.find(s=>s.id==='twin').board);})");
+  await waitFor(review, "!!document.querySelector('.profile-portrait-pieces')", 'Inlay mounted');
+  assert.equal(await run("document.querySelectorAll('.profile-portrait-plate').length"), 0, 'Inlay has no backing plate');
+  await sleep(2600); await shot('inlay-building');
+  await sleep(700); await shot('inlay-fitting');
+  await waitFor(review, "import('./analysis.js').then(m=>m.profileWorkspace.portrait?.revealed)", 'Entire image made from pieces');
+  await shot('inlay-assembled');
   await run("import('./analysis.js').then(m=>{m.S.settings.uiAnim=false;m.S.settings.profilePortraitStyle='halftone';const w=m.profileWorkspace;w.showPortrait(w.deck.find(s=>s.id==='twin').board);})");
   await waitFor(review, "import('./analysis.js').then(m=>m.profileWorkspace.portrait?.revealed)", 'Original mosaic style');
   await shot('portrait-original-mosaic');
@@ -36,16 +43,20 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     await call('Emulation.setDeviceMetricsOverride', {width, height, deviceScaleFactor: 1, mobile: false}, review.sessionId);
     await run(`import('./analysis.js').then(m=>{m.S.settings.uiAnim=false;m.S.settings.pieceStyle='${set}';})`);
     const ids = await run("import('./lib/profile/portraits.js').then(m=>Object.keys(m.PORTRAITS))");
-    for (const style of ['assemble', 'morph']) for (const id of ids) {
+    for (const style of ['assemble', 'morph', 'inlay']) for (const id of ids) {
       await run(`import('./analysis.js').then(m=>{m.S.settings.profilePortraitStyle='${style}';})`);
       await run(`import('./analysis.js').then(m=>{const w=m.profileWorkspace;w.showPortrait({...w.deck.find(s=>s.id==='twin').board,portrait:'${id}',name:'${id}'});})`);
       await waitFor(review, "import('./analysis.js').then(m=>m.profileWorkspace.portrait?.revealed)", id + ' reduced motion');
-      const state = await run(`(()=>{const b=document.querySelector('.profile-board'),c=b.querySelector('.profile-portrait-pieces'),ctx=c.getContext('2d'),pixels=ctx.getImageData(0,0,c.width,c.height).data;let filled=0;const tones=new Set();for(let i=0;i<pixels.length;i+=4)if(pixels[i+3]>250){filled++;tones.add(pixels[i]);}return {width:c.width,height:c.height,filled,tones:tones.size,hidden:[...b.querySelectorAll('.profile-piece')].every(p=>p.style.visibility==='hidden'),label:b.querySelector('[role=img]')?.getAttribute('aria-label'),sets:[...new Set([...b.querySelectorAll('.profile-piece')].map(p=>p.dataset.set))]};})()`);
+      const state = await run(`(()=>{const b=document.querySelector('.profile-board'),c=b.querySelector('.profile-portrait-pieces'),ctx=c.getContext('2d'),pixels=ctx.getImageData(0,0,c.width,c.height).data;let filled=0,solid=0;const tones=new Set();for(let i=0;i<pixels.length;i+=4){if(pixels[i+3]>250){filled++;tones.add(pixels[i]);}if(pixels[i+3]>200)solid++;}return {width:c.width,height:c.height,filled,solid,plate:!!b.querySelector('.profile-portrait-plate'),tones:tones.size,hidden:[...b.querySelectorAll('.profile-piece')].every(p=>p.style.visibility==='hidden'),label:b.querySelector('[role=img]')?.getAttribute('aria-label'),sets:[...new Set([...b.querySelectorAll('.profile-piece')].map(p=>p.dataset.set))]};})()`);
       assert.ok(state.width > 100 && state.height === state.width, JSON.stringify(state));
       assert.ok(state.filled > state.width * state.height * .05, id + ': a readable face');
       assert.ok(state.tones >= 6, id + ': material contours rendered');
       assert.equal(state.hidden, true); assert.deepEqual(state.sets, [set]);
       assert.ok(state.label.includes(id));
+      if (style === 'inlay') {
+        assert.equal(state.plate, false);
+        assert.ok(state.solid > state.width * state.height * .999, `${id}: the pieces must cover the full image, including its background: ${state.solid / state.width / state.height}`);
+      }
       evidence.push({id, style, viewport: [width, height], set, ...state});
       if (['tal', 'fischer', 'carlsen'].includes(id)) await shot(`${style}-${id}-${width}`);
     }
