@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import {JSDOM} from 'jsdom';
 import {ARCHETYPES} from '../lib/profile/archetypes.js';
 import {PORTRAITS, PORTRAIT_SIZE} from '../lib/profile/portraits.js';
-import {hasPortrait, portraitCredit, portraitTones, planMosaic, cellState, inkColor, TIMELINE, PORTRAIT_DURATION, planAssemble, assembleState, ASSEMBLE, ASSEMBLE_DURATION, PORTRAIT_STYLES, PORTRAIT_DELAY} from '../lib/profile/portrait.js';
+import {hasPortrait, portraitCredit, portraitTones, planMosaic, cellState, inkColor, TIMELINE, PORTRAIT_DURATION, PORTRAIT_STYLES, PORTRAIT_DELAY,
+  planFace, faceState, plateAt, cubicBezier, glideEase, parseColor, pieceTone, DEFAULT_PIECES, PIECE_CODES, PIECE_FILL, GLIDE} from '../lib/profile/portrait.js';
+import {nearestBoardEdge} from '../lib/learning/piece-transition.js';
 import {createProfileBoard, squareNames} from '../lib/profile/board.js';
 import {buildDeck, buildReport} from '../lib/profile/deck.js';
 import {buildInsights} from '../lib/profile/insights.js';
@@ -73,72 +75,107 @@ test('portrait styles: assemble is the default, swarm stays selectable', () => {
   assert.ok(PORTRAIT_DELAY >= 600 && PORTRAIT_DELAY <= 1600);
 });
 
-test('assemble: the board pieces fly into the face, the rest slide in from the edges, in about four seconds', () => {
-  const n = 44, tones = portraitTones('fischer', n);
-  const sources = [];
-  for (const rank of [0, 1, 6, 7]) for (let file = 0; file < 8; file++) sources.push({x: (file + .5) / 8, y: (rank + .5) / 8, w: .1175, h: .1175, type: 'rnbqkbnr'[file]});
-  const {cells, landed, duration} = planAssemble(tones, n, {sources, seed: 11});
-  assert.equal(cells.length, n * n);
-  assert.ok(landed >= 2500 && landed < duration, `landed ${landed}`);
-  assert.ok(duration >= 3500 && duration <= 4500, `duration ${duration}`);
-  assert.equal(duration, ASSEMBLE_DURATION);
-  // The face is framed inside the board.
-  const lo = (1 - ASSEMBLE.frame) / 2;
-  assert.ok(cells.every(c => c.x > lo && c.x < 1 - lo && c.y > lo && c.y < 1 - lo));
-  // Every board piece gets its own bright cell, keeps its shape and starts on its square, full size.
-  const flown = cells.filter(c => c.board);
-  assert.equal(flown.length, sources.length);
-  assert.equal(new Set(flown.map(c => c.source)).size, sources.length);
-  for (const c of flown) {
-    const s = sources[c.source];
-    assert.ok(c.t > .35, 'lands in the light');
-    assert.equal(c.piece, ['p', 'n', 'b', 'r', 'q', 'k'].indexOf(s.type));
-    const begin = assembleState(c, 0);
-    assert.ok(Math.abs(begin.x - s.x) < 1e-9 && Math.abs(begin.y - s.y) < 1e-9);
-    assert.ok(Math.abs(begin.scale * ASSEMBLE.frame / n - s.w) < 1e-9, 'starts at its own size');
-    assert.equal(begin.ink, 0); assert.equal(begin.alpha, 1);
-    assert.ok(c.start + c.dur <= ASSEMBLE.lift + ASSEMBLE.fly + 1e-9);
+// The starting position, as the board reports it: codes and square centres, in squares.
+const opening = () => {
+  const out = [], back = 'RNBQKBNR';
+  for (let f = 0; f < 8; f++) {
+    out.push({code: 'b' + back[f], x: f + .5, y: .5, size: PIECE_FILL}, {code: 'bP', x: f + .5, y: 1.5, size: PIECE_FILL});
+    out.push({code: 'wP', x: f + .5, y: 6.5, size: PIECE_FILL}, {code: 'w' + back[f], x: f + .5, y: 7.5, size: PIECE_FILL});
   }
-  // The pieces from the top ranks take the top of the face.
-  const top = flown.filter(c => sources[c.source].y < .5), bottom = flown.filter(c => sources[c.source].y > .5);
-  const meanY = list => list.reduce((s, c) => s + c.y, 0) / list.length;
-  assert.ok(meanY(top) < meanY(bottom));
-  // Everything else enters from the nearer side edge, on its own row, invisible until it moves.
-  for (const c of cells.filter(c => !c.board)) {
-    assert.equal(c.from.x, c.gx < n / 2 ? -.04 : 1.04);
-    assert.equal(c.from.y, c.y);
-    assert.equal(assembleState(c, c.start).alpha, 0);
-    assert.ok(c.start >= ASSEMBLE.waves[0]);
-  }
-  // Interlaced waves: row 0 before row 2 before row 1 before row 3.
-  const rowStart = y => Math.min(...cells.filter(c => !c.board && c.gy === y).map(c => c.start));
-  assert.ok(rowStart(0) < rowStart(2) && rowStart(2) < rowStart(1) && rowStart(1) < rowStart(3));
-  // All settle exactly on their cells, in ink, at full opacity.
-  for (const c of cells) {
-    const end = assembleState(c, landed);
-    assert.ok(Math.abs(end.x - c.x) < 1e-9 && Math.abs(end.y - c.y) < 1e-9);
-    assert.ok(Math.abs(end.scale - c.size) < 1e-9);
-    assert.equal(end.ink, 1); assert.equal(end.alpha, 1); assert.equal(end.moving, false);
-  }
-  // Deterministic, and fine without any board pieces.
-  assert.deepEqual(planAssemble(tones, n, {sources, seed: 11}).cells.map(c => c.start), cells.map(c => c.start));
-  const empty = planAssemble(tones, n);
-  assert.equal(empty.cells.filter(c => c.board).length, 0);
-  assert.ok(empty.duration <= 4500);
+  return out;
+};
+
+test('the glide easing is the board\'s cubic-bezier(.4, 0, .2, 1)', () => {
+  assert.deepEqual(GLIDE.ease, [.4, 0, .2, 1]);
+  assert.equal(glideEase(0), 0); assert.equal(glideEase(1), 1);
+  const linear = cubicBezier(0, 0, 1, 1);
+  for (const p of [.1, .25, .5, .9]) assert.ok(Math.abs(linear(p) - p) < 1e-6);
+  let prev = 0;
+  for (let p = .01; p <= 1; p += .01) { const v = glideEase(p); assert.ok(v >= prev - 1e-9, 'monotonic'); prev = v; }
+  // Slow out of the start, decisive through the middle, gentle into the square.
+  assert.ok(glideEase(.25) < .4 && glideEase(.5) > .7 && glideEase(.75) > .93);
 });
 
-test('assemble: flight paths are smooth curves with no jumps', () => {
-  const n = 40, tones = portraitTones('tal', n);
-  const {cells, landed} = planAssemble(tones, n, {sources: [{x: .0625, y: .0625, w: .1, h: .1, type: 'r'}, {x: .5625, y: .9375, w: .1, h: .1}]});
-  for (const c of cells.filter((c, i) => c.board || i % 97 === 0)) {
-    let prev = assembleState(c, 0);
+test('assemble: the face is real pieces on a square-aligned grid, white in the light and black in the shadow', () => {
+  for (const id of ['tal', 'capablanca', 'carlsen']) {
+    const n = 32, tones = portraitTones(id, n), {cells, k, size} = planFace(tones, n, {background: .42});
+    assert.equal(k, 4); assert.ok(Math.abs(size - PIECE_FILL / 4) < 1e-12);
+    assert.ok(cells.length > n * n * .3 && cells.length < n * n, `${id}: ${cells.length} pieces`);
+    assert.ok(cells.every(c => PIECE_CODES.includes(c.code)));
+    assert.equal(new Set(cells.map(c => c.gy * n + c.gx)).size, cells.length, 'one piece per cell');
+    for (const c of cells) { assert.equal(c.x, (c.gx + .5) / k); assert.equal(c.y, (c.gy + .5) / k); }
+    const mean = list => list.reduce((s, c) => s + tones[c.gy * n + c.gx], 0) / list.length;
+    const white = cells.filter(c => c.code[0] === 'w'), black = cells.filter(c => c.code[0] === 'b');
+    assert.ok(white.length > 40 && black.length > 40, `${id} uses both armies`);
+    assert.ok(mean(white) > mean(black) + .25, `${id}: white pieces carry the light`);
+  }
+  // The ladder runs from the biggest black piece, through the empty plate, to the biggest white one.
+  const tone = code => pieceTone(DEFAULT_PIECES.find(p => p.code === code), .42);
+  assert.ok(tone('bQ') < tone('bP') && tone('bP') < .42 && .42 < tone('wP') && tone('wP') < tone('wQ'));
+});
+
+test('assemble: pieces move like every other position change on the board', () => {
+  const n = 32, sources = opening(), plan = planFace(portraitTones('fischer', n), n, {sources, seed: 11});
+  const {cells, leaves, landed, duration} = plan;
+  assert.ok(landed > 1800 && landed < 2800, `landed ${landed}`);
+  assert.equal(duration, landed + 120);
+  // Each of the board's pieces glides to a face cell of its own kind, or leaves through the nearest edge.
+  const moved = cells.filter(c => c.kind === 'move');
+  assert.equal(moved.length + leaves.length, sources.length);
+  assert.equal(new Set([...moved, ...leaves].map(c => c.source)).size, sources.length);
+  for (const c of moved) {
+    const s = sources[c.source], d = Math.hypot(s.x - c.x, s.y - c.y);
+    assert.equal(c.code, s.code);
+    assert.equal(c.start, 0); assert.equal(c.dur, 520 + Math.min(d * 34, 240));
+    const begin = faceState(c, 0), end = faceState(c, c.dur);
+    assert.deepEqual([begin.x, begin.y, begin.size], [s.x, s.y, PIECE_FILL]);
+    assert.ok(Math.abs(end.x - c.x) < 1e-9 && Math.abs(end.y - c.y) < 1e-9 && Math.abs(end.size - plan.size) < 1e-9);
+  }
+  for (const l of leaves) {
+    assert.deepEqual(l.to, nearestBoardEdge(l.from));
+    assert.ok(l.start <= 192 && l.dur === 680 + Math.min(Math.hypot(l.to.x - l.from.x, l.to.y - l.from.y) * 24, 220));
+    assert.equal(faceState(l, l.start + l.dur).p, 1);
+  }
+  // The rest enter through the nearest edge, unseen until they set off.
+  const entering = cells.filter(c => c.kind === 'enter');
+  for (const c of entering) {
+    assert.deepEqual(c.from, nearestBoardEdge({x: c.x, y: c.y}));
+    assert.ok(c.from.x < 0 || c.from.x > 8 || c.from.y < 0 || c.from.y > 8, 'starts off the board');
+    assert.equal(c.dur, 680 + Math.min(Math.hypot(c.x - c.from.x, c.y - c.from.y) * 24, 220));
+    assert.equal(faceState(c, c.start - 1).visible, false);
+    assert.equal(faceState(c, c.start).visible, true);
+  }
+  // Outside in: the pieces nearest the edge set off first, the middle of the face last.
+  const depth = c => Math.min(c.x, 8 - c.x, c.y, 8 - c.y), avg = list => list.reduce((s, c) => s + c.start, 0) / list.length;
+  assert.ok(avg(entering.filter(c => depth(c) < 1)) + 900 < avg(entering.filter(c => depth(c) > 3)));
+  // Straight routes, no jumps, and everything lands exactly on its cell.
+  for (const c of cells.filter((c, i) => c.kind === 'move' || i % 23 === 0)) {
+    let prev = faceState(c, 0);
     for (let ms = 16; ms <= landed; ms += 16) {
-      const s = assembleState(c, ms);
-      assert.ok(Math.hypot(s.x - prev.x, s.y - prev.y) < .04, 'no jumps');
+      const s = faceState(c, ms);
+      assert.ok(Math.hypot(s.x - prev.x, s.y - prev.y) < .3, 'no jumps');
+      const cross = (s.x - c.from.x) * (c.to.y - c.from.y) - (s.y - c.from.y) * (c.to.x - c.from.x);
+      assert.ok(Math.abs(cross) < 1e-9, 'on the straight line');
       prev = s;
     }
+    const end = faceState(c, landed);
+    assert.ok(Math.abs(end.x - c.x) < 1e-9 && Math.abs(end.y - c.y) < 1e-9 && end.p === 1 && !end.moving);
   }
-  assert.equal(cells.find(c => c.source === 1).piece, -1, 'an unknown piece takes the shape its tone ranks');
+  // Deterministic; works without board pieces; the plate comes up under the face.
+  assert.deepEqual(planFace(portraitTones('fischer', n), n, {sources, seed: 11}).cells.map(c => [c.code, c.start]), cells.map(c => [c.code, c.start]));
+  const empty = planFace(portraitTones('fischer', n), n);
+  assert.equal(empty.leaves.length, 0); assert.equal(empty.cells.filter(c => c.kind === 'move').length, 0);
+  assert.equal(plateAt(0, landed), 0); assert.ok(Math.abs(plateAt(landed, landed) - GLIDE.plate) < 1e-9);
+});
+
+test('assemble: square colours parse from computed styles', () => {
+  assert.deepEqual(parseColor('rgb(240, 217, 181)'), [240, 217, 181]);
+  assert.deepEqual(parseColor('rgba(181, 136, 99, 0.8)'), [181, 136, 99]);
+  assert.deepEqual(parseColor('rgb(10 20 30)'), [10, 20, 30]);
+  assert.deepEqual(parseColor('color(srgb 1 0.5 0)'), [255, 128, 0]);
+  assert.equal(parseColor('rgba(0, 0, 0, 0)'), null);
+  assert.equal(parseColor('transparent'), null);
+  assert.equal(parseColor(''), null);
 });
 
 test('the board degrades to its position without a canvas and clears the portrait', t => {
