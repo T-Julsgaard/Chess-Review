@@ -18,6 +18,7 @@
 .pv-line-area { opacity: 0; animation: pv-fade .8s ease .9s forwards; }
 .pv-line-path { fill: none; stroke: var(--pv-c, var(--accent)); stroke-width: .7; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: pv-draw 1.5s cubic-bezier(.45,.05,.25,1) .15s forwards; }
 .pv-line-glow { stroke-width: 2.6; opacity: .22; }
+.pv-line-raw { stroke-width: .3; opacity: .24; }
 .pv-stop { stop-color: var(--pv-c, var(--accent)); }
 .pv-line-dot { width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: var(--pv-c, var(--accent)); box-shadow: 0 0 0 5px color-mix(in srgb, var(--pv-c, var(--accent)) 28%, transparent); animation: pv-pop .4s cubic-bezier(.2,.9,.25,1.3) 1.45s both; }
 .pv-line-dot.pv-peak { background: var(--q-inacc); box-shadow: 0 0 0 5px color-mix(in srgb, var(--q-inacc) 30%, transparent), 0 0 24px var(--q-inacc); }
@@ -198,11 +199,15 @@
 .pv-columns-dense .pv-tile::before { left: 7%; right: 7%; border-radius: 4px; }
 .pv-pair-label { letter-spacing: .3px; }
 .pv-bubble { display: grid; place-items: center; pointer-events: auto; }
-.pv-bubble::before { content: ""; width: calc(var(--s, 0) * 82%); aspect-ratio: 1; border-radius: 50%; background: var(--c); box-shadow: 0 0 18px -6px var(--c); animation: pv-pop .45s cubic-bezier(.2,.9,.25,1.2) var(--d, 0ms) both; }
-.pv-bubble-day { display: flex; align-items: center; padding-left: 10%; font-size: clamp(10px, 1vw, 14px); font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: var(--ink-2); }
+/* A fixed-size disc scaled by --s: scaling is composited, so resizing never re-lays out (no shimmer). */
+.pv-bubble::before { content: ""; width: 82%; aspect-ratio: 1; scale: var(--s, 0); border-radius: 50%; background: var(--c); box-shadow: 0 0 18px -6px var(--c); animation: pv-pop .45s cubic-bezier(.2,.9,.25,1.2) var(--d, 0ms) both; }
+.pv-bubble-day { display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1vw, 14px); font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: var(--ink-2); }
 .pv-layer.pv-leaving { z-index: 4; }
 /* A new time control morphs the chart that is already there: dots and columns glide to their new size and colour. */
-.pv-bubble::before { transition: width .55s cubic-bezier(.3,.8,.3,1), background-color .55s ease, box-shadow .55s ease; }
+.pv-bubble::before { transition: scale .6s cubic-bezier(.33,1,.68,1), background-color .55s ease, box-shadow .55s ease; will-change: scale; }
+.pv-bubble-band { align-content: center; gap: 1px; line-height: 1.1; letter-spacing: 0; }
+.pv-bubble-band b { font-weight: 750; }
+.pv-bubble-band small { font-size: .82em; font-weight: 600; opacity: .8; }
 .pv-tile::before { transition: height .11s linear var(--md, 0ms), background-color .55s ease, border-radius .2s ease var(--md, 0ms); }
 .pv-layer > .pv-col-value { transition: top .5s cubic-bezier(.3,.8,.3,1); }
 .pv-tile-empty { pointer-events: none; }

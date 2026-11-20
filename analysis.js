@@ -1857,7 +1857,7 @@ async function openProfile({shared = null, resume = null} = {}) {
     },
     gameGeometry:()=>{
       const board=UI.boardWrap.querySelector('.board')?.getBoundingClientRect(),bar=UI.evalbar?.querySelector('.evalbar')?.getBoundingClientRect();
-      return board&&bar?.width?{width:bar.width,gap:Math.max(8,board.left-bar.right)}:null;
+      return board?.width&&bar?.width?{width:bar.width,gap:Math.max(8,board.left-bar.right),board:board.width}:null;
     },
     createAnalysisEngine:()=>createEngine({Threads:1, Hash:16, "Skill Level":20}),
     requestClose:()=>profileWorkspace?.close(),

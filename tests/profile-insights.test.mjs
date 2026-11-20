@@ -34,6 +34,10 @@ test('insights: streaks, habits, terminations, material and signatures', () => {
   const H = habits(rows);
   assert.equal(H.matrix.length, 7); assert.equal(H.matrix[0].length, 8);
   assert.equal(H.matrix.flat().reduce((s, c) => s + c.g, 0), 300);
+  // The habits chart: 06–09 … 21–24, then 00–06 merged at the end, every game kept.
+  assert.equal(H.habitMatrix[0].length, 7);
+  assert.equal(H.habitMatrix.flat().reduce((s, c) => s + c.g, 0), 300);
+  for (let d = 0; d < 7; d++) { assert.deepEqual(H.habitMatrix[d][0], H.matrix[d][2]); assert.equal(H.habitMatrix[d][6].g, H.matrix[d][0].g + H.matrix[d][1].g); }
   assert.ok(H.busiestWeekday && H.activeDays > 200);
   assert.ok(H.afterLoss.games + H.afterWin.games <= 300);
   const X = terminations(rows);
@@ -102,6 +106,15 @@ test('deck: a full season builds every slide with evidence and boards; a thin on
   const withEngine = buildDeck(buildReport(rows, buildInsights(rows, {engine}), {account: 'tester', site: 'chesscom'}), {account: 'tester', engineStatus: 'done'});
   const trend = withEngine.find(s => s.id === 'trend');
   assert.equal(trend.pending, null); assert.ok(trend.stats.length >= 2); assert.equal(trend.board.scene.type, 'line', 'accuracy over time on the board');
+  // One point per day with checked games, not one per month.
+  const days = new Set(rows.map(r => new Date(r.t * 1000).toDateString())).size;
+  assert.equal(trend.board.scene.series.length, days); assert.ok(days > 12); assert.equal(trend.board.scene.smooth, true);
+  assert.equal(trend.board.scene.series.reduce((s, p) => s + p.n, 0), rows.length);
+  assert.match(trend.lead, /^Your first \d+ checked games against your last \d+\.$/);
+  const endings = withEngine.find(s => s.id === 'endings');
+  assert.match(endings.lead, /^Wins by [a-z]+ [\d.]+%, [a-z]+ [\d.]+%, [a-z]+ [\d.]+%\.$/);
+  assert.equal(endings.stats.length, 4, 'four boxes, not an odd three');
+  assert.deepEqual(endings.stats[3], {label: 'Favourite finisher', value: 'Queen', sub: endings.stats[3].sub}); assert.match(endings.stats[3].sub, /^[\d.]+% of your mates$/);
   assert.ok(withEngine.find(s => s.id === 'swings').lead.includes('12%'));
   assert.equal(fmt.hours(0.5), '30 min'); assert.equal(fmt.seconds(95), '1 min 35 s'); assert.equal(fmt.signed(12), '+12');
 });
@@ -115,4 +128,12 @@ test('deck: bullet alone gets premove and sub-second move-time columns; mixed co
   const mixed = deckFor(season());
   assert.equal(mixed.board.scene.columns[0].label, '0–1s');
   assert.match(mixed.points[2], /30 seconds or more/);
+});
+
+test('smoothed accuracy line weighs each day by its games and keeps every point', async () => {
+  const {smoothed} = await import('../lib/profile/designs/board-viz.js');
+  const series = Array.from({length: 60}, (_, i) => ({t: i * 86400, r: i % 2 ? 90 : 70, n: i % 2 ? 3 : 1}));
+  const line = smoothed(series);
+  assert.equal(line.length, 60); assert.deepEqual(line.map(p => p.t), series.map(p => p.t));
+  assert.ok(line.slice(5, -5).every(p => p.r > 83 && p.r < 87), 'busy days count for more');
 });

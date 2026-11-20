@@ -53,3 +53,32 @@ test('profile evaluation converts Black scores and handles checkmate without an 
   assert.equal(calls, 1); assert.equal(doc.querySelector('.profile-game-eval').getAttribute('aria-label'), 'Checkmate');
   assert.equal(doc.querySelector('.white-fill').style.height, '0%');
 });
+
+test('profile evaluation bar takes the review bar size, keeps its proportions when unmeasurable, and slides back under the board', async t => {
+  const dom = new JSDOM('<!doctype html>'); t.after(() => dom.window.close());
+  const doc = dom.window.document;
+  const h = (tag, attrs = {}, ...children) => { const node = doc.createElement(tag); for (const [key, value] of Object.entries(attrs)) if (key === 'class') node.className = value; else if (key !== 'style') node.setAttribute(key, value); node.append(...children.filter(c => c != null)); return node; };
+  let layout = {width: 30, gap: 20, board: 600};
+  const animations = [];
+  const make = motion => createProfileGameView({h, doc, settings: () => ({}), motion: () => motion, geometry: () => layout});
+  const view = make(true);
+  const bar = doc.querySelector('.profile-game-eval'), rail = doc.querySelector('.profile-game-rail');
+  bar.animate = (frames, options) => { const a = {frames, options, onfinish: null, oncancel: null}; animations.push(a); return a; };
+  for (const node of doc.querySelectorAll('.profile-game-player, .profile-game-dock')) node.animate = () => ({});
+  assert.ok(!rail.classList.contains('is-shown'), 'no bar before it has its size');
+  view.position({left: 100, top: 50, width: 600, height: 600});
+  assert.equal(bar.style.width, '30px'); assert.equal(rail.style.width, '50px');
+  assert.ok(rail.classList.contains('is-shown'));
+  assert.deepEqual(animations[0].frames.map(f => f.translate), ['50px 0', '0 0'], 'the bar slides out from under the board');
+  // The review bar cannot be measured: same proportions of a smaller board, never the old fixed 26 px.
+  layout = null;
+  view.position({left: 0, top: 0, width: 300, height: 300});
+  assert.equal(bar.style.width, '15px'); assert.equal(rail.style.width, '25px');
+  view.destroy({animate: true});
+  assert.ok(doc.querySelector('.profile-game-chrome'), 'stays while the bar slides back');
+  assert.deepEqual(animations[1].frames.map(f => f.translate), ['0 0', '25px 0']);
+  animations[1].onfinish();
+  assert.equal(doc.querySelector('.profile-game-chrome'), null);
+  const still = make(false); still.position({left: 0, top: 0, width: 300, height: 300}); still.destroy({animate: true});
+  assert.equal(doc.querySelector('.profile-game-chrome'), null, 'without motion it goes at once');
+});

@@ -95,9 +95,11 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-game-dock .profile-game-controls button { height: min(38px, calc(var(--strip-h, 48px) - 8px)); min-width: min(38px, calc(var(--strip-h, 48px) - 8px)); border-radius: 9px; }
 .profile-game-player-top { bottom: 100%; }
 .profile-game-player-bottom { top: 100%; }
-.profile-game-chrome .profile-game-eval { position: absolute; left: -38px; top: 0; width: 26px; height: 100%; min-height: 0; }
+/* The rail ends at the board's left edge and clips there: the bar slides out from under the board. */
+.profile-game-rail { position: absolute; right: 100%; top: 0; height: 100%; overflow: hidden; visibility: hidden; }
+.profile-game-rail.is-shown { visibility: visible; }
+.profile-game-chrome .profile-game-eval { position: absolute; left: 0; top: 0; height: 100%; min-height: 0; }
 .profile-game-chrome[data-motion="off"], .profile-game-chrome[data-motion="off"] * { animation: none !important; transition: none !important; }
-@keyframes profile-eval-out { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
 
 .profile-rating-modes { max-width: 100%; flex-wrap: wrap; margin-left: auto; }
 .profile-series-wrap { display: flex; flex-direction: column; gap: 6px; padding: 12px 10px 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); }
