@@ -107,6 +107,35 @@ test('profile: learning and profile are mutually exclusive', async t => {
   assert.ok(a.run('learningWorkspace'));
 });
 
+test('profile setup: earlier usernames open as suggestions on click, and Both puts the boxes side by side', async t => {
+  const a = review(t), doc = a.dom.window.document, win = a.dom.window;
+  a.store[IDENTITY_KEY] = {chesscom: {accounts: [{name: 'tester', seenAt: Date.now(), via: 'test'}, {name: 'other-me', seenAt: Date.now() - 1e3, via: 'test'}]}};
+  await open(a);
+  const shell = doc.querySelector('.profile-shell'), input = shell.querySelector('.profile-setup input[type="text"]');
+  const list = shell.querySelector('.profile-suggest');
+  assert.ok(list.hidden, 'no list until the box is clicked');
+  assert.equal(shell.querySelector('.profile-chip'), null, 'no chips under the box');
+  input.focus(); input.click();
+  assert.ok(!list.hidden);
+  assert.deepEqual([...list.querySelectorAll('[role="option"]')].map(o => o.textContent), ['tester', 'other-me']);
+  list.querySelectorAll('[role="option"]')[1].click();
+  assert.equal(input.value, 'other-me');
+  assert.ok(list.hidden, 'choosing closes the list');
+  input.value = 'tes'; input.dispatchEvent(new win.Event('input'));
+  assert.deepEqual([...list.querySelectorAll('[role="option"]')].map(o => o.textContent), ['tester'], 'typing narrows the list');
+  input.dispatchEvent(new win.KeyboardEvent('keydown', {key: 'ArrowDown', bubbles: true}));
+  input.dispatchEvent(new win.KeyboardEvent('keydown', {key: 'Enter', bubbles: true}));
+  assert.equal(input.value, 'tester');
+  assert.equal(shell.querySelector('.profile-slide'), null, 'Enter on a suggestion picks it instead of building');
+  const fields = shell.querySelector('.profile-account-fields');
+  [...shell.querySelectorAll('.profile-setup [role="radio"]')].find(b => b.textContent === 'Lichess').click();
+  assert.deepEqual([...fields.children].map(f => f.dataset.site), ['lichess']);
+  [...shell.querySelectorAll('.profile-setup [role="radio"]')].find(b => b.textContent === 'Both').click();
+  assert.ok(fields.hasAttribute('data-both'));
+  assert.deepEqual([...fields.children].map(f => f.dataset.site), ['chesscom', 'lichess'], 'Chess.com and Lichess sit in one row');
+  assert.equal(fields.querySelector('[data-site="chesscom"] input').value, 'tester', 'each box keeps its username');
+});
+
 test('profile setup: both sites merge their games and a missing username is refused', async t => {
   const a = review(t), doc = a.dom.window.document, rows = season();
   a.store[rowsKey('chesscom', 'tester')] = {rows: rows.slice(0, 120).map(r => ({...r, site: 'chesscom'})), months: [], since: 0, updatedAt: Date.now()};

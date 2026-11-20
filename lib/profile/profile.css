@@ -199,7 +199,18 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 /* Setup — whose games, which site, how far back */
 .profile-setup { display: flex; flex-direction: column; justify-content: center; gap: 18px; max-width: 560px; min-height: 100%; box-sizing: border-box; padding: 4px 2px 8px; animation: profile-fade .36s ease-out both; }
 .profile-setup-intro { display: flex; flex-direction: column; gap: 8px; }
-.profile-account-fields { display: flex; flex-direction: column; gap: 18px; }
+/* One username box, or Chess.com and Lichess side by side in one row. */
+.profile-account-fields { display: grid; grid-template-columns: minmax(0, 1fr); }
+.profile-account-fields[data-both] { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 14px; }
+.profile-account-field .profile-field-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.profile-input-wrap { position: relative; display: flex; min-width: 0; }
+.profile-input-wrap .profile-input { min-width: 0; width: 100%; box-sizing: border-box; }
+.profile-suggest { position: absolute; z-index: 5; top: calc(100% + 6px); left: 0; right: 0; margin: 0; padding: 4px; list-style: none; max-height: 220px; overflow-y: auto;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 10px 28px color-mix(in oklab, #000 28%, transparent); animation: profile-suggest-in .14s ease-out; }
+.profile-suggest[hidden] { display: none; }
+.profile-suggest-option { padding: 8px 10px; border-radius: 7px; font-size: 13.5px; color: var(--ink); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.profile-suggest-option:hover, .profile-suggest-option.on { background: color-mix(in oklab, var(--accent) 16%, transparent); }
+@keyframes profile-suggest-in { from { opacity: 0; transform: translateY(-3px); } }
 .profile-custom-period { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; padding: 14px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel-2); }
 .profile-custom-period .profile-input { min-width: 0; width: 100%; box-sizing: border-box; }
 [data-theme="dark"] .profile-custom-period .profile-input { color-scheme: dark; }
@@ -215,9 +226,6 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-setup .profile-input { max-width: none; min-height: 42px; padding: 9px 12px; font-size: 14px; border-radius: 10px; transition: border-color .15s, box-shadow .15s; }
 .profile-setup .profile-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent); }
 .profile-setup .profile-input.invalid { border-color: var(--q-blunder); box-shadow: 0 0 0 3px color-mix(in oklab, var(--q-blunder) 18%, transparent); }
-.profile-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.profile-chip { font: inherit; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--ink-2); cursor: pointer; transition: border-color .15s, color .15s; }
-.profile-chip:hover { border-color: var(--accent); color: var(--ink); }
 .profile-switch { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; color: var(--ink-2); cursor: pointer; align-self: flex-start; }
 .profile-switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .profile-switch-track { position: relative; width: 34px; height: 20px; border-radius: 999px; background: var(--panel-3); border: 1px solid var(--line); transition: background .2s, border-color .2s; flex: none; }
