@@ -401,8 +401,8 @@ const DEFAULT_SETTINGS = {
   profileDesign: "story",
   // How the historical twin's face appears, and what the Signature moves board shows.
   profilePortraitStyle: "assemble", profileSignatureBoard: "compare",
-  // How games appear on the board while a profile is built: mosaic (default) or film.
-  profileStream: "mosaic",
+  // How games appear on the board while a profile is built: film (default) or mosaic.
+  profileStream: "film",
   // Display the selected analysis lines unless the user adds or removes lines in the panel.
   // Extra candidates are searched after scoring or on demand without re-analyzing the game.
   // Default SF18 searches match the published depth16/Hash16 quality model.
@@ -6709,8 +6709,8 @@ function visualSettings() {
     section("Player profile",
       settingDropdown("Design", "profileDesign", [["classic", "Classic"], ["story", "Story"], ["bento", "Dashboard"], ["editorial", "Editorial"]],
         "How the Player profile recap looks. Classic is the original slide deck; Story shows one big figure per chapter with charts drawn on the board; Dashboard puts every chapter on one screen as tiles; Editorial is one scrolling page the board follows. An open profile switches straight away."),
-      settingDropdown("Games while loading", "profileStream", [["mosaic", "Mosaic"], ["film", "Film roll"]],
-        "What the board shows while your games are found. Mosaic adds a square for every game until the whole history fits on the board; Film roll flashes through each game with both players' names, like a reel of your chess life."),
+      settingDropdown("Games while loading", "profileStream", [["film", "Film roll"], ["mosaic", "Mosaic"]],
+        "What the board shows while your games are found. Film roll flashes through each game with both players' names, like a reel of your chess life, then turns into the mosaic while the accuracy check finishes; Mosaic adds a square for every game until the whole history fits on the board."),
       settingDropdown("Portrait animation", "profilePortraitStyle", [["assemble", "Assemble"], ["swarm", "Swarm"]],
         "How the historical twin's face appears on the board. Assemble moves the pieces on the board into the face; Swarm is the original swirl of pieces."),
       settingDropdown("Signature moves board", "profileSignatureBoard", [["compare", "You v. typical"], ["heat", "Heat map"]],

@@ -303,6 +303,10 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-reel-caption { display: grid; justify-items: center; gap: 2px; width: 100%; }
 .profile-reel-strip { display: block; width: 100%; height: 44px; }
 .profile-reel-count { color: var(--ink); font-weight: 650; }
+/* Film roll to mosaic: the board and caption glide to the mosaic's layout and its legend fades in. */
+.profile-layout-easing { transition: top .5s cubic-bezier(.2,.8,.2,1), left .5s cubic-bezier(.2,.8,.2,1), width .5s cubic-bezier(.2,.8,.2,1), height .5s cubic-bezier(.2,.8,.2,1); }
+.profile-layout-easing .profile-map-caption { animation: profile-legend-in .38s cubic-bezier(.2,.8,.2,1) .14s both; }
+@keyframes profile-legend-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 .profile-map-caption { display: grid; justify-items: center; gap: 3px; width: 100%; font-size: 11px; line-height: 16px; color: var(--ink-2); }
 .profile-map-legend, .profile-map-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; }
 .profile-map-summary { color: var(--ink); font-weight: 650; font-variant-numeric: tabular-nums; }

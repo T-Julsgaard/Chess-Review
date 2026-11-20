@@ -86,6 +86,28 @@ test('film roll: frames from the middle or end, paced to show every game, names 
   reel.destroy(); assert.equal(d.doc.querySelector('.profile-reel-chrome'), null);
 });
 
+test('film roll: once every game is found it plays out the queue and hands over instead of idling', async t => {
+  const d = dom(t), end = '6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 40';
+  let handed = 0;
+  const reel = createGameReel({...d, makePiece: () => d.doc.createElement('img'), motion: () => true, onFinished: () => handed++});
+  t.after(() => reel.destroy());
+  d.doc.body.append(reel.element, reel.caption);
+  reel.update(rows(1).map(r => ({...r, fenEnd: end})));
+  reel.finish();
+  await new Promise(resolve => d.win.setTimeout(resolve, 200));
+  assert.equal(handed, 0, 'the last frame holds for a moment first');
+  await new Promise(resolve => d.win.setTimeout(resolve, 900));
+  assert.equal(handed, 1, 'hands over once the last game has been seen');
+  assert.match(d.doc.querySelector('.profile-reel-top').textContent, /#1 of 1/, 'no idle loop back through the history');
+  // Leaving fades the names, frame and strip, then removes them.
+  d.win.Element.prototype.animate = () => ({finished: Promise.resolve(), cancel() {}});
+  reel.leave();
+  assert.ok(d.doc.querySelector('.profile-reel-chrome'), 'still fading');
+  await new Promise(resolve => d.win.setTimeout(resolve, 520));
+  assert.equal(d.doc.querySelector('.profile-reel-chrome'), null); assert.equal(d.doc.querySelector('.profile-reel'), null);
+  assert.equal(handed, 1);
+});
+
 test('preparation: analysis starts before collection finishes, waits for the host and handles both sites', async () => {
   const store = memory(), first = deferred(), started = deferred(), events = [], games = rows(5), sent = [];
   let clock = 1000;
@@ -231,10 +253,9 @@ test('workspace: games stream onto the main board beside the animation; deck wai
   assert.equal(doc.querySelector('.profile-loader'), null); assert.ok(doc.querySelector('.board .profile-game-map'));
 });
 
-test('workspace: Settings can swap the mosaic for the film roll while loading; the deck goes back to the mosaic', async t => {
+test('workspace: the film roll shows while loading, then the mosaic once every game has played; the deck keeps the mosaic', async t => {
   const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6'); a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
-  assert.equal(a.state.settings.profileStream, 'mosaic', 'the mosaic is the default');
-  a.state.settings.profileStream = 'film';
+  assert.equal(a.state.settings.profileStream, 'film', 'the film roll is the default');
   await a.call('openProfile'); await settle();
   const w = a.run('profileWorkspace'), doc = a.dom.window.document;
   t.after(() => w.close());
@@ -249,7 +270,17 @@ test('workspace: Settings can swap the mosaic for the film roll while loading; t
   w.updateGameMap(); await settle();
   assert.ok(doc.querySelector('.board .profile-reel')); assert.equal(doc.querySelector('.board .profile-game-map'), null);
   assert.ok(doc.querySelector('.profile-reel-chrome')); assert.ok(doc.querySelector('.profile-board-caption .profile-reel-strip'));
-  w.phase = 'deck'; w.showBoard({kind: 'games'});
+  // The stream ended and the reel has played every game: the mosaic takes over while the accuracy check runs.
+  w.reelFinished();
+  assert.equal(w.phase, 'loading'); assert.equal(w.useReel(), false);
+  assert.ok(doc.querySelector('.board .profile-game-map'), 'the mosaic appears straight away');
+  assert.ok(doc.querySelector('.profile-board-caption .profile-map-caption'));
+  assert.equal(doc.querySelector('.profile-board-caption .profile-reel-strip'), null, 'the strip has left the caption');
+  w.updateGameMap(); assert.equal(doc.querySelector('.board .profile-reel'), w.leavingReel?.element || null, 'no new reel while loading continues');
+  await new Promise(resolve => a.dom.window.setTimeout(resolve, 520));
   assert.equal(doc.querySelector('.profile-reel'), null); assert.equal(doc.querySelector('.profile-reel-chrome'), null);
-  assert.ok(doc.querySelector('.board .profile-game-map'));
+  assert.equal(doc.querySelector('.profile-reel-strip'), null, 'the faded strip is gone too');
+  const map = doc.querySelector('.board .profile-game-map');
+  w.phase = 'deck'; w.showBoard({kind: 'games'});
+  assert.equal(doc.querySelector('.board .profile-game-map'), map, 'the deck keeps the same mosaic');
 });
