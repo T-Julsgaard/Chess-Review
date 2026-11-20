@@ -4,7 +4,7 @@ import {JSDOM} from 'jsdom';
 import {ARCHETYPES} from '../lib/profile/archetypes.js';
 import {PORTRAITS, PORTRAIT_SIZE} from '../lib/profile/portraits.js';
 import {hasPortrait, portraitCredit, portraitTones, planMosaic, cellState, inkColor, TIMELINE, PORTRAIT_DURATION, PORTRAIT_STYLES, PORTRAIT_DELAY,
-  planFace, faceState, plateAt, cubicBezier, glideEase, parseColor, pieceTone, DEFAULT_PIECES, PIECE_CODES, PIECE_FILL, GLIDE} from '../lib/profile/portrait.js';
+  planFace, faceState, plateAt, cubicBezier, glideEase, parseColor, faceGrid, FACE, SHADE_RANKS, PIECE_FILL, GLIDE} from '../lib/profile/portrait.js';
 import {nearestBoardEdge} from '../lib/learning/piece-transition.js';
 import {createProfileBoard, squareNames} from '../lib/profile/board.js';
 import {buildDeck, buildReport} from '../lib/profile/deck.js';
@@ -96,31 +96,41 @@ test('the glide easing is the board\'s cubic-bezier(.4, 0, .2, 1)', () => {
   assert.ok(glideEase(.25) < .4 && glideEase(.5) > .7 && glideEase(.75) > .93);
 });
 
-test('assemble: the face is real pieces on a square-aligned grid, white in the light and black in the shadow', () => {
-  for (const id of ['tal', 'capablanca', 'carlsen']) {
-    const n = 32, tones = portraitTones(id, n), {cells, k, size} = planFace(tones, n, {background: .42});
-    assert.equal(k, 4); assert.ok(Math.abs(size - PIECE_FILL / 4) < 1e-12);
+test('assemble: the face is a halftone of black pieces, grown and ranked by the shadow', () => {
+  for (const id of ['tal', 'capablanca', 'carlsen', 'kasparov']) {
+    const n = 40, tones = portraitTones(id, n), {cells, k, size} = planFace(tones, n, {sharpen: 0, equalize: 0});
+    assert.equal(k, 5); assert.ok(Math.abs(size - FACE.max / 5) < 1e-12);
     assert.ok(cells.length > n * n * .3 && cells.length < n * n, `${id}: ${cells.length} pieces`);
-    assert.ok(cells.every(c => PIECE_CODES.includes(c.code)));
+    assert.ok(cells.every(c => /^b[PBNRQK]$/.test(c.code)), 'black pieces only');
     assert.equal(new Set(cells.map(c => c.gy * n + c.gx)).size, cells.length, 'one piece per cell');
-    for (const c of cells) { assert.equal(c.x, (c.gx + .5) / k); assert.equal(c.y, (c.gy + .5) / k); }
-    const mean = list => list.reduce((s, c) => s + tones[c.gy * n + c.gx], 0) / list.length;
-    const white = cells.filter(c => c.code[0] === 'w'), black = cells.filter(c => c.code[0] === 'b');
-    assert.ok(white.length > 40 && black.length > 40, `${id} uses both armies`);
-    assert.ok(mean(white) > mean(black) + .25, `${id}: white pieces carry the light`);
+    for (const c of cells) {
+      assert.equal(c.x, (c.gx + .5) / k); assert.equal(c.y, (c.gy + .5) / k);
+      const shade = 1 - tones[c.gy * n + c.gx];
+      // Grows with the square root of the shadow, so its ink follows the shadow.
+      assert.ok(Math.abs(c.sizeTo - FACE.max * Math.sqrt((shade - FACE.floor) / (1 - FACE.floor)) / k) < 1e-6);
+      assert.ok(c.sizeTo >= FACE.min / k - 1e-9 && c.sizeTo <= size + 1e-9);
+      const ink = (shade - FACE.floor) / (1 - FACE.floor), lowest = (FACE.min / FACE.max) ** 2;
+      assert.equal(c.code[1], SHADE_RANKS[Math.min(5, Math.floor((ink - lowest) / (1 - lowest) * 6))]);
+    }
+    // The light of the face stays empty board; the darkest cells hold the kings and queens.
+    const empty = [];
+    for (let i = 0; i < n * n; i++) if (!cells.some(c => c.gy * n + c.gx === i)) empty.push(1 - tones[i]);
+    assert.ok(empty.every(sh => sh < FACE.floor + (1 - FACE.floor) * (FACE.min / FACE.max) ** 2 + 1e-6));
+    const meanShade = code => { const l = cells.filter(c => c.code === code); return l.reduce((s, c) => s + c.shade, 0) / l.length; };
+    assert.ok(meanShade('bP') < meanShade('bR') && meanShade('bR') < meanShade('bK'), id);
   }
-  // The ladder runs from the biggest black piece, through the empty plate, to the biggest white one.
-  const tone = code => pieceTone(DEFAULT_PIECES.find(p => p.code === code), .42);
-  assert.ok(tone('bQ') < tone('bP') && tone('bP') < .42 && .42 < tone('wP') && tone('wP') < tone('wQ'));
+  assert.deepEqual([faceGrid(400), faceGrid(560), faceGrid(720), faceGrid(1200)], [32, 40, 48, 48]);
 });
 
 test('assemble: pieces move like every other position change on the board', () => {
-  const n = 32, sources = opening(), plan = planFace(portraitTones('fischer', n), n, {sources, seed: 11});
+  const n = 40, sources = opening(), plan = planFace(portraitTones('fischer', n), n, {sources, seed: 11});
   const {cells, leaves, landed, duration} = plan;
   assert.ok(landed > 1800 && landed < 2800, `landed ${landed}`);
   assert.equal(duration, landed + 120);
-  // Each of the board's pieces glides to a face cell of its own kind, or leaves through the nearest edge.
+  // Each black piece glides to a face cell of its own kind; the white ones leave through the nearest edge.
   const moved = cells.filter(c => c.kind === 'move');
+  assert.equal(moved.length, 16);
+  assert.ok(leaves.every(l => l.code[0] === 'w') && leaves.length === 16);
   assert.equal(moved.length + leaves.length, sources.length);
   assert.equal(new Set([...moved, ...leaves].map(c => c.source)).size, sources.length);
   for (const c of moved) {
@@ -129,7 +139,7 @@ test('assemble: pieces move like every other position change on the board', () =
     assert.equal(c.start, 0); assert.equal(c.dur, 520 + Math.min(d * 34, 240));
     const begin = faceState(c, 0), end = faceState(c, c.dur);
     assert.deepEqual([begin.x, begin.y, begin.size], [s.x, s.y, PIECE_FILL]);
-    assert.ok(Math.abs(end.x - c.x) < 1e-9 && Math.abs(end.y - c.y) < 1e-9 && Math.abs(end.size - plan.size) < 1e-9);
+    assert.ok(Math.abs(end.x - c.x) < 1e-9 && Math.abs(end.y - c.y) < 1e-9 && Math.abs(end.size - c.sizeTo) < 1e-9);
   }
   for (const l of leaves) {
     assert.deepEqual(l.to, nearestBoardEdge(l.from));
