@@ -271,8 +271,8 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-glide-piece { position: absolute; width: 12.5%; height: 12.5%; display: grid; place-items: center; }
 .profile-glide-piece .piece-img { position: static; inset: auto; width: 94%; height: 94%; object-fit: contain; animation: none; }
 
-/* Historical twin: the twin's face assembled from chess pieces (portrait.js). 'assemble' styles its
-   plate inline (the board's own hue); the rules below dress the 'swarm' style. */
+/* Historical twin: pieces unfold into a sculpted face (portrait.js). Assemble
+   and Mosaic style their plates inline; the rules below dress Swarm. */
 .profile-board-overlay.profile-portrait { display: block; z-index: 5; transition: opacity .5s ease; }
 .profile-portrait > * { position: absolute; inset: 0; width: 100%; height: 100%; }
 .profile-portrait-plate { background: radial-gradient(ellipse at 50% 44%, #241c15 0%, #130f0c 60%, #0a0807 100%); box-shadow: inset 0 0 70px rgba(0, 0, 0, .65); opacity: var(--portrait-plate, 1); }

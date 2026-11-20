@@ -70,8 +70,8 @@ test('the mosaic lands outside-in and every piece ends exactly on its cell', () 
   assert.deepEqual(planMosaic(tones, n, {sources}).map(c => c.land), cells.map(c => c.land));
 });
 
-test('portrait styles: assemble is the default, swarm stays selectable', () => {
-  assert.deepEqual(PORTRAIT_STYLES, [{id: 'assemble', label: 'Assemble'}, {id: 'swarm', label: 'Swarm'}]);
+test('portrait styles: assemble is the default, mosaic and swarm stay selectable', () => {
+  assert.deepEqual(PORTRAIT_STYLES, [{id: 'assemble', label: 'Assemble'}, {id: 'halftone', label: 'Mosaic'}, {id: 'swarm', label: 'Swarm'}]);
   assert.ok(PORTRAIT_DELAY >= 600 && PORTRAIT_DELAY <= 1600);
 });
 
@@ -96,7 +96,7 @@ test('the glide easing is the board\'s cubic-bezier(.4, 0, .2, 1)', () => {
   assert.ok(glideEase(.25) < .4 && glideEase(.5) > .7 && glideEase(.75) > .93);
 });
 
-test('assemble: the face is a halftone of black pieces, grown and ranked by the shadow', () => {
+test('mosaic: the face is a halftone of black pieces, grown and ranked by the shadow', () => {
   for (const id of ['tal', 'capablanca', 'carlsen', 'kasparov']) {
     const n = 40, tones = portraitTones(id, n), {cells, k, size} = planFace(tones, n, {sharpen: 0, equalize: 0});
     assert.equal(k, 5); assert.ok(Math.abs(size - FACE.max / 5) < 1e-12);
@@ -122,7 +122,7 @@ test('assemble: the face is a halftone of black pieces, grown and ranked by the 
   assert.deepEqual([faceGrid(400), faceGrid(560), faceGrid(720), faceGrid(1200)], [32, 40, 48, 48]);
 });
 
-test('assemble: pieces move like every other position change on the board', () => {
+test('mosaic: pieces move like every other position change on the board', () => {
   const n = 40, sources = opening(), plan = planFace(portraitTones('fischer', n), n, {sources, seed: 11});
   const {cells, leaves, landed, duration} = plan;
   assert.ok(landed > 1800 && landed < 2800, `landed ${landed}`);
@@ -178,7 +178,7 @@ test('assemble: pieces move like every other position change on the board', () =
   assert.equal(plateAt(0, landed), 0); assert.ok(Math.abs(plateAt(landed, landed) - GLIDE.plate) < 1e-9);
 });
 
-test('assemble: square colours parse from computed styles', () => {
+test('portrait square colours parse from computed styles', () => {
   assert.deepEqual(parseColor('rgb(240, 217, 181)'), [240, 217, 181]);
   assert.deepEqual(parseColor('rgba(181, 136, 99, 0.8)'), [181, 136, 99]);
   assert.deepEqual(parseColor('rgb(10 20 30)'), [10, 20, 30]);
