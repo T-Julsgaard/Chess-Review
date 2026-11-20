@@ -124,6 +124,8 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.equal(shell.querySelector('.pv-cmp-label').firstChild.textContent, signature.signatures[0].label, 'the strongest signature is first in the comparison');
   assert.equal(shell.querySelectorAll('.pv-cmp').length, signature.compare.length, 'the comparison includes every metric');
   assert.match(shell.querySelector('.pv-story-chapter').textContent, /You compared to a typical player/);
+  assert.equal(shell.querySelector('.pv-story-hero'), null, 'no headline repeats the first habit; the list starts higher');
+  assert.equal(shell.querySelector('.pv-story-lead'), null);
   assert.ok(doc.querySelector('.board .pv-pairs'), 'the board compares you with a typical player');
   w.go(w.deck.findIndex(s => s.id === 'rival'));
   assert.equal(doc.querySelector('.board .pv-badge'), null);
@@ -353,4 +355,28 @@ test('profile designs: Settings → Visual offers the designs and switching reop
   assert.equal(next.design, 'classic');
   assert.equal(next.deck[next.index]?.id, 'rival', 'the new design opens on the chapter you were reading');
   assert.equal(doc.querySelectorAll('.profile-shell').length, 1);
+});
+
+test('leaving the profile and coming back reopens the deck on the same chapter and filter, without loading', async t => {
+  const a = review(t, 'story'), doc = a.dom.window.document;
+  seed(a);
+  const w = await openDeck(a);
+  w.go(w.deck.findIndex(s => s.id === 'habits'));
+  doc.querySelector('.pv-filter button[data-value="blitz"]')?.click();
+  const cls = w.cls; assert.equal(cls, 'blitz');
+  await a.call('toggleProfile'); for (let i = 0; i < 6; i++) await settle();
+  assert.equal(a.run('profileWorkspace'), null, 'back on the game review');
+  await a.call('openProfile');
+  const next = a.run('profileWorkspace');
+  assert.notEqual(next, w);
+  assert.equal(next.phase, 'deck', 'no setup and no loader');
+  assert.equal(next.deck[next.index]?.id, 'habits');
+  assert.equal(next.cls, cls);
+  assert.equal(doc.querySelector('.pv-story').dataset.slide, 'habits');
+  assert.equal(doc.querySelector('.profile-setup'), null);
+  // Back to the start, then leaving: the next visit starts at the setup again.
+  next.renderSetup();
+  await a.call('toggleProfile'); for (let i = 0; i < 6; i++) await settle();
+  await a.call('openProfile'); for (let i = 0; i < 6; i++) await settle();
+  assert.equal(a.run('profileWorkspace').phase, 'setup');
 });

@@ -185,6 +185,10 @@ test('profile setup: custom dates validate, filter the report and survive reopen
   assert.deepEqual(a.state.settings.profileCustomPeriod, {start: '2026-03-01', end: '2026-03-31'});
   assert.ok(shell.querySelector('.profile-head-meta').textContent.includes(w.report.periodLabel));
   await w.close(); await open(a);
+  const back = a.run('profileWorkspace');
+  assert.equal(back.phase, 'deck', 'reopening carries on with the same deck');
+  assert.equal(back.report.totals.games, expected.length);
+  back.renderSetup();
   assert.equal(doc.querySelector('.profile-custom-period').hidden, false);
   assert.deepEqual([...doc.querySelectorAll('input[type="date"]')].map(i => i.value), ['2026-03-01', '2026-03-31']);
 });
@@ -316,8 +320,10 @@ test('closing with motion releases the board before opening another workspace', 
   const old = a.run('profileWorkspace'); a.state.settings.uiAnim = true;
   const closing = old.close();
   assert.equal(a.run('profileWorkspace'), null);
-  await openDeck(a);
+  // Reopening restores the remembered deck straight away, board included.
+  await open(a);
   const next = a.run('profileWorkspace'), board = next.boardEl;
+  assert.equal(next.phase, 'deck');
   assert.ok(board);
   await closing;
   assert.equal(a.run('profileWorkspace'), next);

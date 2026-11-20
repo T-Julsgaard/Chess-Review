@@ -1789,6 +1789,8 @@ function toggleLearning() {
 }
 let profileWorkspace = null;
 let openingProfile = false;
+// The deck the player left (chapter, filter and data), so returning to the profile carries on there.
+let profileMemory = null;
 function profileOwnsBoard() { return !!profileWorkspace && !profileWorkspace.closed; }
 function toggleProfile() {
   if (profileWorkspace) return profileWorkspace.close();
@@ -1835,6 +1837,7 @@ async function openProfile({shared = null, resume = null} = {}) {
   const site = shared?.site || (S.meta?.url && /lichess\.org/i.test(S.meta.url) ? "lichess" : "chesscom");
   const identity = await profileIdentity(site);
   const flag = code => code ? el("img", { class: "avatar avatar-flag", src: _url(`flags/${code}.svg`), alt: countryNameForId(code) || "", draggable: "false" }) : null;
+  if (!shared && !resume && profileMemory) resume = {slideId: profileMemory.slideId, state: profileMemory};
   profileWorkspace = new ProfileWorkspace({document, storage:browserAPI.storage.local, storageEvents:browserAPI.storage.onChanged,
     sendMessage:message=>browserAPI.runtime.sendMessage(message), stage:UI.canvas, boardWrap:UI.boardWrap, makePiece, flipped:S.flipped,
     settings:()=>S.settings, writeSettings:patch=>{Object.assign(S.settings,patch);return writeSettings(patch);}, identity, shared, resume, toast,
@@ -1861,7 +1864,8 @@ async function openProfile({shared = null, resume = null} = {}) {
     },
     createAnalysisEngine:()=>createEngine({Threads:1, Hash:16, "Skill Level":20}),
     requestClose:()=>profileWorkspace?.close(),
-    buildOwn:async()=>{await profileWorkspace.close();openProfile();},
+    remember:state=>{profileMemory=state;},
+    buildOwn:async()=>{await profileWorkspace.close();profileMemory=null;openProfile();},
     restoreBoard:()=>{ if(!UI.boardWrap.querySelector(".board"))return; buildBoard(); renderPlayers(); },
     onClose:()=>{ if(profileWorkspace&&profileWorkspace.closed)profileWorkspace=null; syncProfileToggle(); if (UI.settings && !UI.settings.hidden) renderSettings(); document.getElementById("profileToggle")?.focus({preventScroll:true});
       if(deferredPracticeAdvance){deferredPracticeAdvance=false;const practice=S.practice;setTimeout(()=>{if(S.practice===practice&&!profileOwnsBoard())practiceAdvance();},1300);} }});
@@ -1876,9 +1880,9 @@ let switchingProfileDesign = false;
 async function switchProfileDesign() {
   const workspace = profileWorkspace;
   if (!workspace || workspace.closed || workspace.shared || switchingProfileDesign) return;
-  const slideId = workspace.phase === "deck" ? workspace.deck[workspace.index]?.id || null : null;
   switchingProfileDesign = true;
-  try { await workspace.close(); await openProfile({resume: slideId ? {slideId} : null}); }
+  // Closing remembers the deck; the new design reopens it on the same chapter.
+  try { await workspace.close(); await openProfile(); }
   finally { switchingProfileDesign = false; }
 }
 
@@ -6837,7 +6841,7 @@ function profileSettings() {
       el("div", { class: "set-row hint" }, usage),
       el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Games are fetched from the public Chess.com and Lichess APIs straight into this browser and kept only here. Finished months are never fetched twice.")),
       el("button", { class: "set-reset", onclick: async () => {
-        try { const {deleteProfileData} = await loadProfileWorkspace(); const removed = await deleteProfileData(browserAPI.storage.local); toast(settingsText(removed ? "Profile data deleted" : "Nothing to delete")); if (profileWorkspace) profileWorkspace.close(); renderSettings(); }
+        try { const {deleteProfileData} = await loadProfileWorkspace(); const removed = await deleteProfileData(browserAPI.storage.local); toast(settingsText(removed ? "Profile data deleted" : "Nothing to delete")); if (profileWorkspace) profileWorkspace.close(); profileMemory = null; renderSettings(); }
         catch { toast(settingsText("Could not delete profile data")); }
       } }, "Delete all profile data"),
     ),
