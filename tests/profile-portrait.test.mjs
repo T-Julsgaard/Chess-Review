@@ -70,8 +70,8 @@ test('the mosaic lands outside-in and every piece ends exactly on its cell', () 
   assert.deepEqual(planMosaic(tones, n, {sources}).map(c => c.land), cells.map(c => c.land));
 });
 
-test('portrait styles: assemble is the default, mosaic and swarm stay selectable', () => {
-  assert.deepEqual(PORTRAIT_STYLES, [{id: 'assemble', label: 'Assemble'}, {id: 'halftone', label: 'Mosaic'}, {id: 'swarm', label: 'Swarm'}]);
+test('portrait styles: morph is an additional option and assemble remains the default', () => {
+  assert.deepEqual(PORTRAIT_STYLES, [{id: 'assemble', label: 'Assemble'}, {id: 'morph', label: 'Morph'}, {id: 'halftone', label: 'Mosaic'}, {id: 'swarm', label: 'Swarm'}]);
   assert.ok(PORTRAIT_DELAY >= 600 && PORTRAIT_DELAY <= 1600);
 });
 

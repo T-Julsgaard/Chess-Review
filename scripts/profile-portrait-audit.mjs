@@ -20,6 +20,13 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await shot('portrait-position');
   await waitFor(review, "import('./analysis.js').then(m=>m.profileWorkspace.portrait?.revealed)", 'Assembled face');
   await shot('portrait-assembled');
+  await run("import('./analysis.js').then(m=>{m.S.settings.profilePortraitStyle='morph';const w=m.profileWorkspace;window.morphStart=performance.now();window.morphFrames=[];let previous=performance.now();function frame(now){morphFrames.push(now-previous);previous=now;if(!w.portrait?.revealed)requestAnimationFrame(frame);}w.showPortrait(w.deck.find(s=>s.id==='twin').board);requestAnimationFrame(frame);})");
+  await sleep(1950); await shot('morph-pieces');
+  await sleep(600); await shot('morph-stretching');
+  await waitFor(review, "import('./analysis.js').then(m=>m.profileWorkspace.portrait?.revealed)", 'Morphed face');
+  const timing = await run("({elapsed:performance.now()-morphStart,frames:morphFrames.length,p95:morphFrames.slice().sort((a,b)=>a-b)[Math.floor(morphFrames.length*.95)]})");
+  assert.ok(timing.elapsed > 3700 && timing.elapsed < 7000, JSON.stringify(timing));
+  await shot('morph-assembled');
   await run("import('./analysis.js').then(m=>{m.S.settings.uiAnim=false;m.S.settings.profilePortraitStyle='halftone';const w=m.profileWorkspace;w.showPortrait(w.deck.find(s=>s.id==='twin').board);})");
   await waitFor(review, "import('./analysis.js').then(m=>m.profileWorkspace.portrait?.revealed)", 'Original mosaic style');
   await shot('portrait-original-mosaic');
@@ -29,7 +36,8 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     await call('Emulation.setDeviceMetricsOverride', {width, height, deviceScaleFactor: 1, mobile: false}, review.sessionId);
     await run(`import('./analysis.js').then(m=>{m.S.settings.uiAnim=false;m.S.settings.pieceStyle='${set}';})`);
     const ids = await run("import('./lib/profile/portraits.js').then(m=>Object.keys(m.PORTRAITS))");
-    for (const id of ids) {
+    for (const style of ['assemble', 'morph']) for (const id of ids) {
+      await run(`import('./analysis.js').then(m=>{m.S.settings.profilePortraitStyle='${style}';})`);
       await run(`import('./analysis.js').then(m=>{const w=m.profileWorkspace;w.showPortrait({...w.deck.find(s=>s.id==='twin').board,portrait:'${id}',name:'${id}'});})`);
       await waitFor(review, "import('./analysis.js').then(m=>m.profileWorkspace.portrait?.revealed)", id + ' reduced motion');
       const state = await run(`(()=>{const b=document.querySelector('.profile-board'),c=b.querySelector('.profile-portrait-pieces'),ctx=c.getContext('2d'),pixels=ctx.getImageData(0,0,c.width,c.height).data;let filled=0;const tones=new Set();for(let i=0;i<pixels.length;i+=4)if(pixels[i+3]>250){filled++;tones.add(pixels[i]);}return {width:c.width,height:c.height,filled,tones:tones.size,hidden:[...b.querySelectorAll('.profile-piece')].every(p=>p.style.visibility==='hidden'),label:b.querySelector('[role=img]')?.getAttribute('aria-label'),sets:[...new Set([...b.querySelectorAll('.profile-piece')].map(p=>p.dataset.set))]};})()`);
@@ -38,8 +46,8 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
       assert.ok(state.tones >= 6, id + ': material contours rendered');
       assert.equal(state.hidden, true); assert.deepEqual(state.sets, [set]);
       assert.ok(state.label.includes(id));
-      evidence.push({id, viewport: [width, height], set, ...state});
-      if (['tal', 'fischer', 'carlsen'].includes(id)) await shot(`portrait-${id}-${width}`);
+      evidence.push({id, style, viewport: [width, height], set, ...state});
+      if (['tal', 'fischer', 'carlsen'].includes(id)) await shot(`${style}-${id}-${width}`);
     }
     await run("import('./analysis.js').then(m=>m.profileWorkspace.leavePortrait())");
     await waitFor(review, "!document.querySelector('.profile-portrait-pieces')", 'Original position restored');
@@ -56,6 +64,6 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   assert.equal(await run("document.querySelectorAll('.profile-piece[style*=hidden]').length"), 0);
   await run("import('./analysis.js').then(m=>m.profileWorkspace.close())");
   assert.equal(await run("document.querySelectorAll('.profile-portrait').length"), 0);
-  await fs.writeFile(path.join(out, 'portrait-results.json'), JSON.stringify(evidence, null, 2));
+  await fs.writeFile(path.join(out, 'portrait-results.json'), JSON.stringify({timing, portraits: evidence}, null, 2));
   console.log('Profile portrait browser audit passed: ' + out);
 }

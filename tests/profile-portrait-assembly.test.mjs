@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {JSDOM} from 'jsdom';
 import {PORTRAITS} from '../lib/profile/portraits.js';
 import {portraitContours, traceContours, sampleContour} from '../lib/profile/portrait-contours.js';
-import {createPortrait, planSculpture, sculptureState, portraitTones, PIECE_FILL, glideEase, GLIDE} from '../lib/profile/portrait.js';
+import {createPortrait, planSculpture, sculptureState, portraitTones, PIECE_FILL, glideEase, GLIDE, MORPH} from '../lib/profile/portrait.js';
 import {nearestBoardEdge} from '../lib/learning/piece-transition.js';
 
 const opening = () => Array.from({length: 32}, (_, i) => {
@@ -57,6 +57,25 @@ test('the sculpture preserves the board glide while each silhouette unfolds cont
   }
 });
 
+test('Morph keeps each piece recognizable through its glide and takes longer to form the same portrait', () => {
+  for (const id of Object.keys(PORTRAITS)) {
+    const tones = portraitTones(id, 64), sources = opening();
+    const original = planSculpture(tones, 64, {sources}), morph = planSculpture(tones, 64, {sources, morph: true});
+    assert.ok(morph.duration > original.duration * 1.3 && morph.duration < original.duration * 1.65, `${id}: deliberately slower`);
+    assert.deepEqual(morph.cells.map(c => [c.code, c.source, c.rings, c.tone]), original.cells.map(c => [c.code, c.source, c.rings, c.tone]), 'existing geometry and every source piece are retained');
+    for (const [i, c] of morph.cells.entries()) {
+      close(c.dur, original.cells[i].dur * MORPH.travel);
+      const carried = sculptureState(c, c.start + c.dur * .8);
+      assert.equal(carried.morph, 0, 'the chess piece survives almost the entire glide');
+      assert.ok(Math.abs(carried.turn) > .1, 'the recognizable piece tips into place');
+      close(sculptureState(c, c.start + c.unfoldDelay).morph, 0);
+      const stretching = sculptureState(c, c.start + c.unfoldDelay + c.unfoldDuration * .4);
+      assert.ok(stretching.morph > .2 && stretching.morph < MORPH.texture, 'linework remains during the actual deformation');
+      assert.equal(sculptureState(c, c.end).morph, 1);
+    }
+  }
+});
+
 test('contours keep real holes, separate islands and a consistent winding for morphing', () => {
   const n = 10, mask = new Uint8Array(n * n);
   for (let y = 1; y < 7; y++) for (let x = 1; x < 7; x++) if (!(x >= 3 && x <= 4 && y >= 3 && y <= 4)) mask[y * n + x] = 1;
@@ -74,7 +93,7 @@ test('contours keep real holes, separate islands and a consistent winding for mo
 
 // Minimal canvas recorder: verifies lifecycle and actual filled geometry without
 // making a native canvas package a dependency of the extension's unit tests.
-function fixture(t, {animated = false, decode = () => Promise.resolve()} = {}) {
+function fixture(t, {animated = false, decode = () => Promise.resolve(), style = 'assemble'} = {}) {
   const dom = new JSDOM('<div id="board" style="position:relative"></div>', {pretendToBeVisual: true});
   t.after(() => dom.window.close());
   const {window: win} = dom, doc = win.document, board = doc.querySelector('#board');
@@ -104,6 +123,7 @@ function fixture(t, {animated = false, decode = () => Promise.resolve()} = {}) {
       drawImage(...args) { this.images.push(args); }, beginPath() { this.points = []; },
       moveTo(x, y) { this.points.push([x, y]); }, lineTo(x, y) { this.points.push([x, y]); }, closePath() {},
       fill(rule) { this.fills.push({rule, points: this.points.slice()}); }, fillRect() {}, save() {}, restore() {}, translate() {}, rotate() {},
+      clip() {}, transform() {},
       getImageData: () => ({data: Uint8ClampedArray.from({length: 96 * 96 * 4}, (_, i) => {
         const pixel = Math.floor(i / 4), x = pixel % 96, y = Math.floor(pixel / 96);
         return i % 4 === 3 && x > 20 && x < 76 && y > 8 && y < 88 ? 255 : 0;
@@ -116,7 +136,7 @@ function fixture(t, {animated = false, decode = () => Promise.resolve()} = {}) {
   Object.defineProperty(overlay, 'offsetWidth', {get: () => rect.width});
   Object.defineProperty(overlay, 'offsetHeight', {get: () => rect.height});
   let reveals = 0;
-  const portrait = createPortrait({board, overlay, id: 'tal', makePiece, win, motion: () => animated, delay: 0, onReveal: () => reveals++});
+  const portrait = createPortrait({board, overlay, id: 'tal', makePiece, win, style, motion: () => animated, delay: 0, onReveal: () => reveals++});
   return {win, board, overlay, portrait, frames, contexts, get reveals() { return reveals; },
     flush: () => new Promise(resolve => win.setTimeout(resolve, 0)),
     tick(ms) { clock = ms; const callbacks = [...frames.values()]; frames.clear(); callbacks.forEach(cb => cb(ms)); },
@@ -153,6 +173,34 @@ test('animated assembly starts from visible original sprites, settles, and rever
   assert.equal(f.board.querySelectorAll('.profile-piece').length, 32);
   assert.ok([...f.board.querySelectorAll('.profile-piece')].every(img => img.style.visibility === ''));
   assert.equal(f.frames.size, 0);
+});
+
+test('Morph carries sprite details into the deformation and still finishes with geometry alone', async t => {
+  const f = fixture(t, {animated: true, style: 'morph'});
+  await f.flush(); await f.flush();
+  const ctx = f.contexts.get(f.overlay.querySelector('.profile-portrait-pieces'));
+  assert.equal(ctx.images.length, 32, 'the original board pieces start intact');
+  f.tick(650);
+  assert.ok(ctx.images.length >= 32, 'recognizable piece drawings survive the journey');
+  f.tick(1300);
+  assert.ok(ctx.images.some(args => args.length === 3), 'the piece texture is being drawn through a deforming mesh');
+  assert.equal(f.portrait.revealed, false);
+  f.tick(4000);
+  assert.equal(ctx.images.length, 0, 'no bitmap supplies the finished portrait');
+  assert.ok(ctx.fills.length >= 32); assert.equal(f.portrait.revealed, true);
+  const dismissed = f.portrait.dismiss(); f.tick(7000); await dismissed;
+  assert.equal(f.frames.size, 0);
+  assert.ok([...f.board.querySelectorAll('.profile-piece')].every(img => img.style.visibility === ''));
+});
+
+test('Morph respects reduced motion and draws the same completed contour face immediately', async t => {
+  const f = fixture(t, {style: 'morph'});
+  await f.flush();
+  const ctx = f.contexts.get(f.overlay.querySelector('.profile-portrait-pieces'));
+  assert.equal(f.portrait.revealed, true); assert.equal(f.frames.size, 0);
+  assert.equal(ctx.images.length, 0); assert.ok(ctx.fills.length >= 32);
+  await f.portrait.dismiss();
+  assert.ok([...f.board.querySelectorAll('.profile-piece')].every(img => img.style.visibility === ''));
 });
 
 test('cancelling before sprites decode leaves no late portrait or hidden pieces', async t => {
