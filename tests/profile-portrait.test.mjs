@@ -10,6 +10,8 @@ import {createProfileBoard, squareNames} from '../lib/profile/board.js';
 import {buildDeck, buildReport} from '../lib/profile/deck.js';
 import {buildInsights} from '../lib/profile/insights.js';
 import {season} from './helpers/profile-season.mjs';
+import {ProfileWorkspace} from '../lib/profile/workspace.js';
+import {Chess, DEFAULT_POSITION} from '../lib/chess.js';
 
 test('every historical twin has a credited portrait of the expected size', () => {
   for (const archetype of ARCHETYPES) {
@@ -229,4 +231,33 @@ test('the twin slide asks the board for the winner portrait', () => {
   assert.equal(twin.board.name, report.twin.winner.name);
   assert.ok(hasPortrait(twin.board.portrait));
   assert.ok(['moves', 'fen', 'cover'].includes(twin.board.kind));
+});
+
+test('historical twin portraits always start from all 32 opening pieces and retain the game for later', async t => {
+  const dom = new JSDOM('<div class="board">' + '<div class="sq"></div>'.repeat(64) + '</div>');
+  dom.window.HTMLCanvasElement.prototype.getContext = () => null;
+  t.after(() => dom.window.close());
+  const board = dom.window.document.querySelector('.board');
+  const api = createProfileBoard({board, motion: () => false, makePiece: (type, color) => {
+    const img = dom.window.document.createElement('img'); img.dataset.piece = color + type.toUpperCase(); return img;
+  }});
+  const expected = new Chess(DEFAULT_POSITION).board().flat().map(p => p ? p.color + p.type.toUpperCase() : null);
+  const specs = [
+    {kind: 'moves', moves: ['e4', 'd5', 'exd5'], from: 3},
+    {kind: 'fen', fen: '8/8/8/8/8/8/4k3/7K w - - 0 1'},
+    {kind: 'cover', white: 'd4', black: 'e5'},
+  ];
+  for (const target of specs) {
+    const spec = {...target, portrait: 'carlsen', name: 'Magnus Carlsen'}, saved = structuredClone(spec);
+    const workspace = {board: api, o: {settings: () => ({profilePortraitStyle: 'relief'})}, index: 0, deck: [{board: spec}]};
+    ProfileWorkspace.prototype.showPortrait.call(workspace, spec);
+    assert.equal(board.querySelectorAll('.profile-piece').length, 32);
+    assert.deepEqual([...board.querySelectorAll('.sq')].map(sq => sq.querySelector('.profile-piece')?.dataset.piece || null), expected);
+    assert.equal(workspace.portraitSpec, spec); assert.deepEqual(spec, saved, 'the referenced game and its position are untouched');
+    let opened;
+    workspace.showBoard = (game, options) => { opened = {game, options}; };
+    ProfileWorkspace.prototype.leavePortrait.call(workspace); await Promise.resolve();
+    assert.deepEqual(opened, {game: spec, options: {portrait: false}}, 'leaving the portrait still opens the original game view');
+  }
+  api.clear();
 });

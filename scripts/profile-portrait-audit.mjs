@@ -17,6 +17,12 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await run(`import('./browser-compat.js').then(({browserAPI})=>browserAPI.storage.local.set(${JSON.stringify({[rowsKey('chesscom', 'tester')]: {rows, months: [], since: 0, updatedAt: Date.now()}})}))`);
   await run(`import('./analysis.js').then(async m=>{m.S.settings.uiAnim=true;m.S.settings.pieceStyle='merida';m.S.settings.profileDepth='off';m.S.settings.profilePortraitStyle='assemble';document.querySelector('.learning-announcement-disable')?.click();await m.openProfile();const w=m.profileWorkspace;w.account='tester';w.renderHead();await w.load();w.go(w.deck.findIndex(s=>s.id==='twin'));})`);
   await waitFor(review, "!!document.querySelector('.profile-portrait-pieces')", 'Portrait mounted');
+  const opening = await run("[...document.querySelectorAll('.profile-board > .sq')].map(sq=>sq.querySelector('.profile-piece')?.dataset.piece||null)");
+  const backRank = [...'RNBQKBNR'];
+  const expectedOpening = [...backRank.map(p => 'b' + p), ...Array(8).fill('bP'), ...Array(32).fill(null), ...Array(8).fill('wP'), ...backRank.map(p => 'w' + p)];
+  assert.ok(JSON.stringify(opening) === JSON.stringify(expectedOpening) || JSON.stringify(opening) === JSON.stringify(expectedOpening.slice().reverse()), 'The twin reveal starts from the complete standard opening position');
+  await waitFor(review, "document.querySelector('.profile-board').getAnimations({subtree:true}).every(a=>a.playState!=='running')", 'Opening pieces settled');
+  assert.equal(await run("[...document.querySelectorAll('.profile-board .profile-piece')].filter(p=>p.style.visibility!=='hidden').length"), 32, 'The full army settles visibly before the portrait starts');
   await shot('portrait-position');
   await waitFor(review, "import('./analysis.js').then(m=>m.profileWorkspace.portrait?.revealed)", 'Assembled face');
   await shot('portrait-assembled');
