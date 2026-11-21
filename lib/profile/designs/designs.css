@@ -231,6 +231,31 @@
 .pv-tile-empty { pointer-events: none; }
 .pv-col-label.pv-col-plain { text-transform: none; letter-spacing: .2px; }
 .profile-board-caption .pv-legend { justify-content: center; }
+/* Increase granularity (clock): columns split into slivers that slide apart, then fill to their own level (board-viz.js regroupFrom). */
+.pv-regrouping.pv-dim { animation: none; }
+.pv-regrouping .pv-tile::before { animation: none; }
+.pv-regroup-moving > .pv-tile { transition: left .46s cubic-bezier(.3,.8,.25,1) var(--gd, 0ms), width .46s cubic-bezier(.3,.8,.25,1) var(--gd, 0ms); }
+.pv-layer.pv-regroup-old { z-index: 6; background: transparent; animation: none; }
+.pv-regroup-old:not(.pv-regroup-moving) > .pv-tile { visibility: hidden; }
+.pv-regroup-wait > * { opacity: 0 !important; }
+
+/* The clock's "Increase granularity" switch: the puzzle Rating switch, in the chapter's colour. */
+/* The chapter name lines up with the time-control pills, not with the middle of the stack. */
+.pv-story-top:has(> .pv-filter-stack) { align-items: flex-start; }
+.pv-story-top:has(> .pv-filter-stack) > .pv-story-chapter { padding-top: 5px; }
+.pv-filter-stack { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-left: auto; min-width: 0; max-width: 100%; }
+.pv-grain { position: relative; display: flex; flex: none; flex-direction: column; align-items: center; gap: 7px; min-width: 44px; min-height: 44px; padding: 4px 2px; border: 0; border-radius: 6px; background: transparent; font: inherit; color: var(--ink-2); cursor: pointer; transition: color .25s; }
+.pv-grain:hover { color: var(--ink); }
+.pv-grain[aria-checked="true"] { color: var(--pv-tint); }
+.pv-grain:focus-visible { outline: 2px solid var(--pv-tint); outline-offset: 2px; }
+.pv-grain-label { font-size: 12px; font-weight: 650; line-height: 1; letter-spacing: .2px; white-space: nowrap; }
+.pv-grain-track { position: relative; display: block; width: 44px; height: 23px; border-radius: 20px; background: color-mix(in oklab, var(--ink-3, var(--ink-2)) 22%, var(--panel)); box-shadow: inset 0 1px 3px #0003, inset 0 0 0 1px color-mix(in oklab, var(--ink-3, var(--ink-2)) 20%, transparent); transition: background .32s, box-shadow .32s; }
+.pv-grain[aria-checked="true"] .pv-grain-track { background: color-mix(in oklab, var(--pv-vivid) 44%, var(--panel)); box-shadow: inset 0 1px 3px #0002, inset 0 0 0 1px color-mix(in oklab, var(--pv-vivid) 32%, transparent); }
+.pv-grain-thumb { position: absolute; left: 3px; top: 3px; display: grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; background: linear-gradient(145deg, color-mix(in oklab, var(--ink-3, var(--ink-2)) 60%, var(--panel)), var(--ink-3, var(--ink-2))); box-shadow: inset 0 1px 0 #ffffff40, 0 2px 4px #0003; color: var(--panel); transform: translateX(0); transition: transform .38s cubic-bezier(.22,1.5,.36,1), background .3s; }
+.pv-grain[aria-checked="true"] .pv-grain-thumb { transform: translateX(21px); background: linear-gradient(145deg, oklch(.9 .08 var(--pv-hue)), var(--pv-vivid)); color: oklch(.3 .08 var(--pv-hue)); }
+.pv-grain-tick { width: 8px; height: 2px; border-left: 2px solid currentColor; border-bottom: 2px solid currentColor; border-radius: 1px; transform: rotate(0); transition: height .25s, transform .32s cubic-bezier(.22,1.5,.36,1); }
+.pv-grain[aria-checked="true"] .pv-grain-tick { height: 5px; transform: translateY(-1px) rotate(-45deg); }
+@media (prefers-reduced-motion: reduce) { .pv-grain, .pv-grain * { transition: none !important; } }
 @media (prefers-reduced-motion: reduce) { .profile-shell[data-design] * , .pv-layer *, .pv-layer *::before, .pv-outside * { animation: none !important; transition: none !important; } .pv-line-path { stroke-dashoffset: 0; } .pv-line-area { opacity: 1; } }
 
 /* ---------- Dashboard (bento) ---------- */

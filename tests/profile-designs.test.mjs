@@ -240,6 +240,20 @@ test('story time controls read Bullet, Blitz, Daily; habit dots and clock column
   assert.deepEqual([...clock.querySelectorAll('.pv-col-label')].map(n => n.textContent), ['0–1s', '1–2s', '2–3s', '3–5s', '5–10s', '10–20s', '20–30s', '30s+'], 'move times in intervals, not "under"');
   pick('Blitz');
   assert.equal(doc.querySelector('.board .pv-layer'), clock, 'the columns grow and shrink in place');
+  // Increase granularity sits under the time controls and splits the chart into narrow intervals.
+  const grain = doc.querySelector('.pv-filter-stack .pv-grain');
+  assert.ok(grain && doc.querySelector('.pv-filter-stack .pv-filter'), 'the switch sits under the time-control pills');
+  assert.equal(grain.getAttribute('role'), 'switch'); assert.equal(grain.getAttribute('aria-checked'), 'false');
+  const columnLabels = () => [...doc.querySelectorAll('.board .pv-layer .pv-col-label')].map(n => n.textContent);
+  grain.click();
+  assert.equal(grain.getAttribute('aria-checked'), 'true');
+  assert.equal(columnLabels().length, 20); assert.equal(columnLabels()[4], '4s');
+  assert.equal(doc.querySelectorAll('.board .pv-layer').length, 1, 'the usual chart gives way to the split one');
+  pick('All');
+  assert.equal(doc.querySelector('.pv-grain'), grain, 'the same switch stays on across time controls');
+  assert.equal(grain.getAttribute('aria-checked'), 'true'); assert.equal(columnLabels().length, 20);
+  grain.click();
+  assert.deepEqual(columnLabels(), ['0–1s', '1–2s', '2–3s', '3–5s', '5–10s', '10–20s', '20–30s', '30s+']);
   w.go(w.deck.findIndex(s => s.id === 'rating'));
   if (doc.querySelectorAll('.pv-modes button').length > 1) assert.deepEqual([...doc.querySelectorAll('.pv-modes button')].map(b => b.textContent), ['Bullet', 'Blitz', 'Daily'].filter(l => [...doc.querySelectorAll('.pv-modes button')].some(b => b.textContent === l)));
 });
