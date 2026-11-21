@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {buildInsights, totals, habits, opponents, streaks, signature, ratings, openings, material, terminations} from '../lib/profile/insights.js';
+import {buildInsights, totals, habits, opponents, streaks, signature, ratings, openings, material, terminations, byOpponentRating} from '../lib/profile/insights.js';
 import {classify, ARCHETYPES, tendencies} from '../lib/profile/archetypes.js';
-import {buildDeck, buildReport, fmt} from '../lib/profile/deck.js';
+import {buildDeck, buildReport, fmt, resultsByRating} from '../lib/profile/deck.js';
 import {Chess} from '../lib/chess.js';
 
 import {season} from './helpers/profile-season.mjs';
@@ -24,6 +24,26 @@ test('insights: totals, ratings, openings and opponents from a synthetic season'
   const O = opponents(rows);
   assert.equal(O.rival.name, 'rival_rick'); assert.equal(O.nemesis.name, 'nemesis_nina'); assert.equal(O.victim.name, 'victim_vic');
   assert.ok(O.strongestBeaten.rating >= 1550); assert.ok(O.distinct === 13);
+  // Results by opponent rating: contiguous bands, every rated game counted once.
+  const {step, bands} = O.byRating, rated = rows.filter(r => !r.bot && r.oppRating);
+  assert.ok(bands.length >= 2 && bands.length <= 16);
+  assert.equal(bands.reduce((s, b) => s + b.games, 0), rated.length);
+  bands.forEach((b, i) => { assert.equal(b.to - b.from + 1, step); assert.equal(b.w + b.d + b.l, b.games); if (i) assert.equal(b.from, bands[i - 1].to + 1); });
+  assert.ok(bands[0].from <= Math.min(...rated.map(r => r.oppRating)) && bands.at(-1).to >= Math.max(...rated.map(r => r.oppRating)));
+});
+
+test('insights: results by opponent rating pick a band width that fits the board', () => {
+  const row = (oppRating, res) => ({oppRating, res});
+  assert.equal(byOpponentRating([row(1500, 'w')]), null, 'too few games');
+  assert.equal(byOpponentRating(Array.from({length: 12}, () => row(1510, 'w'))), null, 'one band says nothing');
+  const narrow = byOpponentRating(Array.from({length: 20}, (_, i) => row(1200 + i * 30, ['w', 'd', 'l'][i % 3])));
+  assert.equal(narrow.step, 50); assert.deepEqual([narrow.bands[0].from, narrow.bands.at(-1).to], [1200, 1799]);
+  const wide = byOpponentRating(Array.from({length: 20}, (_, i) => row(400 + i * 140, 'l')));
+  assert.equal(wide.step, 200); assert.ok(wide.bands.length <= 16);
+  const deck = resultsByRating(narrow);
+  assert.equal(deck.scene.type, 'results');
+  assert.equal(deck.scene.columns.filter(c => c.label).length, 6, 'twelve bands, every other one labelled');
+  assert.ok(deck.scene.columns.every(c => !c.games || Math.abs(c.w + c.d + c.l - 1) < 1e-9));
 });
 
 test('insights: streaks, habits, terminations, material and signatures', () => {
