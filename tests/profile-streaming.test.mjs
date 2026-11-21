@@ -103,7 +103,7 @@ test('film roll: once every game is found it plays out the queue and hands over 
   d.win.Element.prototype.animate = () => ({finished: Promise.resolve(), cancel() {}});
   reel.leave();
   assert.ok(d.doc.querySelector('.profile-reel-chrome'), 'still fading');
-  await new Promise(resolve => d.win.setTimeout(resolve, 520));
+  await new Promise(resolve => d.win.setTimeout(resolve, 660));
   assert.equal(d.doc.querySelector('.profile-reel-chrome'), null); assert.equal(d.doc.querySelector('.profile-reel'), null);
   assert.equal(handed, 1);
 });
@@ -277,7 +277,7 @@ test('workspace: the film roll shows while loading, then the mosaic once every g
   assert.ok(doc.querySelector('.profile-board-caption .profile-map-caption'));
   assert.equal(doc.querySelector('.profile-board-caption .profile-reel-strip'), null, 'the strip has left the caption');
   w.updateGameMap(); assert.equal(doc.querySelector('.board .profile-reel'), w.leavingReel?.element || null, 'no new reel while loading continues');
-  await new Promise(resolve => a.dom.window.setTimeout(resolve, 520));
+  await new Promise(resolve => a.dom.window.setTimeout(resolve, 660));
   assert.equal(doc.querySelector('.profile-reel'), null); assert.equal(doc.querySelector('.profile-reel-chrome'), null);
   assert.equal(doc.querySelector('.profile-reel-strip'), null, 'the faded strip is gone too');
   const map = doc.querySelector('.board .profile-game-map');

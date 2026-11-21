@@ -266,10 +266,6 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-stacked .profile-loader-meter { width: 100%; }
 @keyframes profile-fade { from { opacity: 0; } to { opacity: 1; } }
 
-/* Pieces travel through the board edges as positions assemble/disassemble. */
-.profile-glide { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 8; }
-.profile-glide-piece { position: absolute; width: 12.5%; height: 12.5%; display: grid; place-items: center; }
-.profile-glide-piece .piece-img { position: static; inset: auto; width: 94%; height: 94%; object-fit: contain; animation: none; }
 
 /* Historical twin: pieces unfold into a sculpted face (portrait.js). Assemble
    and Mosaic style their plates inline; the rules below dress Swarm. */
@@ -313,10 +309,10 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-layout-easing { transition: top .5s cubic-bezier(.2,.8,.2,1), left .5s cubic-bezier(.2,.8,.2,1), width .5s cubic-bezier(.2,.8,.2,1), height .5s cubic-bezier(.2,.8,.2,1); }
 .profile-layout-easing .profile-map-caption { animation: profile-legend-in .38s cubic-bezier(.2,.8,.2,1) .14s both; }
 @keyframes profile-legend-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-.profile-map-caption { display: grid; justify-items: center; gap: 3px; width: 100%; font-size: 11px; line-height: 16px; color: var(--ink-2); }
-.profile-map-legend, .profile-map-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; }
+.profile-map-caption { display: grid; justify-items: center; gap: 3px; width: 100%; font-size: 13px; line-height: 18px; color: var(--ink-2); }
+.profile-map-legend, .profile-map-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 14px; }
 .profile-map-summary { color: var(--ink); font-weight: 650; font-variant-numeric: tabular-nums; }
-.profile-map-key::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 4px; border-radius: 2px; background: var(--ink-2); }
+.profile-map-key::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 2px; background: var(--ink-2); }
 .profile-map-key.w::before { background: var(--q-best); } .profile-map-key.l::before { background: var(--q-miss); }
 .profile-map-detail { max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .profile-map-actions a { font: inherit; text-decoration: none; }
