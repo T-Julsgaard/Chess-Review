@@ -1,4 +1,15 @@
+import {GRAIN_EDGES, grainBucket} from '../../lib/profile/features.js';
+
 // Deterministic synthetic season: 300 games over a year with a built-in rival, night games and habits.
+/** Twenty move times for game i, as the fine histogram (no random draws, so the season's other values stay put). */
+function grainOf(i, bullet) {
+  const tg = new Array(GRAIN_EDGES.length + 1).fill(0);
+  for (let k = 0; k < 20; k++) {
+    const u = ((k * 7 + i * 3) % 20) / 20;
+    tg[grainBucket(bullet ? (k % 6 === 0 ? 0.1 : 0.15 + 2.2 * u * u + (k % 5 === 0 ? 4 : 0)) : 0.4 + 40 * u * u * u + (k % 4) * 1.3)]++;
+  }
+  return tg;
+}
 function rng(seed) { let s = seed; return () => { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }; }
 export function season(count = 300, seed = 7) {
   const rand = rng(seed), rows = [], start = Date.UTC(2026, 0, 5, 18) / 1000;
@@ -22,7 +33,7 @@ export function season(count = 300, seed = 7) {
       res, term, eco: op[0], op: op[1], bot: false, n, myMoves: Math.ceil(n / 2), knights4: rand() < 0.7, castle: rand() < 0.6 ? 6 : 0, castleSide: 'k', oppCastleSide: 'k', fian: me === 'b' && rand() < 0.2, qtrade: rand() < 0.1 ? 15 : 0,
       qEarly: false, gambit: false, storm: rand() < 0.4, pair25: false, ep: 0, promo: 0, under: 0, checks: 2 + Math.floor(rand() * 4), caps: 8, mateBy: res === 'w' && term === 'mate' ? 'q' : null, matePattern: res === 'w' && term === 'mate' ? 'back-rank' : null, matedBy: res === 'l' && term === 'mate' ? 'q' : null,
       matMin: res === 'w' && i % 17 === 0 ? -5 : -1, matMax: res !== 'w' && i % 19 === 0 ? 6 : res === 'w' && i % 6 === 0 ? 4 : 2, matFinal: 0, lowPly: 30, highPly: 20, swings: 0, endgame: n > 90 ? 70 : 0,
-      think: 6, thinkN: 20, snap: 8, tb: [2, 2, 2, 2, 5, 4, 2, 1], tf: i % 4 === 0 ? [3, 3, 4, 4, 2, 2, 1, 1] : null, longThink: 20 + Math.floor(rand() * 60), longPly: 23, trouble: rand() < 0.3, ahead: 0.6, dur: 300, line: op[2], first: me === 'w' ? op[2].split(' ')[0] + ' ' + op[2].split(' ')[2] : op[2].split(' ')[1] + ' ' + op[2].split(' ')[3],
+      think: 6, thinkN: 20, snap: 8, tb: [2, 2, 2, 2, 5, 4, 2, 1], tf: i % 4 === 0 ? [3, 3, 4, 4, 2, 2, 1, 1] : null, tg: grainOf(i, i % 4 === 0), longThink: 20 + Math.floor(rand() * 60), longPly: 23, trouble: rand() < 0.3, ahead: 0.6, dur: 300, line: op[2], first: me === 'w' ? op[2].split(' ')[0] + ' ' + op[2].split(' ')[2] : op[2].split(' ')[1] + ' ' + op[2].split(' ')[3],
       fenEnd: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1', fenLow: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1', fenHigh: '', heat: '0'.repeat(28) + '5' + '0'.repeat(35)});
   }
   return rows;

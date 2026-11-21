@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {gameFeatures, parseTimeControl, decodeHeat, squareIndex, matePattern, validRow, needsThinkBuckets} from '../lib/profile/features.js';
+import {gameFeatures, parseTimeControl, decodeHeat, squareIndex, matePattern, validRow, needsThinkBuckets, grainBucket} from '../lib/profile/features.js';
 import {normalizeChesscom, normalizeLichess, parseMovetext} from '../lib/profile/sources.js';
 import {createProfileStore, rowsKey, ENGINE_INDEX_KEY, MAX_ENGINE_ENTRIES} from '../lib/profile/store.js';
 import {periodRows, periodStart, periodLabel, customPeriodBounds, PERIODS} from '../lib/profile/collector.js';
@@ -179,9 +179,15 @@ test('features: bullet games split move times into premoves, half seconds and up
   const clocks = [60, 60, 59.9, 59, 59.5, 58, 58.7, 57, 56.2, 56, 44.2, 55];
   const row = gameFeatures(game({moves, clocks, timeClass: 'bullet', timeControl: '60+0', result: 'd', termination: 'agree'}), 'morphy');
   assert.deepEqual(row.tf, [2, 1, 1, 0, 1, 0, 0, 1]);
+  // The fine histogram: two premoves, 0.4 s, 0.8 s, 2.5 s and 12 s, trimmed after the slowest move.
+  const tg = new Array(29).fill(0); tg[0] = 2; tg[4] = 1; tg[8] = 1; tg[20] = 1; tg[28] = 1;
+  assert.deepEqual(row.tg, tg);
+  assert.deepEqual([0.1, 60 - 59.8, 0.2 - 1e-9, 1, 119.99, 600].map(grainBucket), [0, 2, 2, 10, 36, 37], 'clock float noise lands in the right tenth');
   assert.equal(row.tb.length, 8);
   const blitz = gameFeatures(game({moves, clocks}), 'morphy');
   assert.equal(blitz.tf, null, 'only bullet keeps the finer split');
   assert.equal(needsThinkBuckets({...row, tf: undefined}), true, 'old bullet rows are replayed once');
+  assert.equal(needsThinkBuckets({...blitz, tg: undefined}), true, 'rows without the fine histogram are replayed once');
+  assert.ok(Array.isArray(blitz.tg), 'every time control keeps the fine histogram');
   assert.equal(needsThinkBuckets(blitz), false);
 });

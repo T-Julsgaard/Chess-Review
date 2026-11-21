@@ -122,11 +122,25 @@ test('deck: a full season builds every slide with evidence and boards; a thin on
 test('deck: bullet alone gets premove and sub-second move-time columns; mixed controls keep the usual ones', () => {
   const deckFor = rows => buildDeck(buildReport(rows, buildInsights(rows), {account: 'tester', site: 'chesscom', period: 'year', periodLabel: 'Past 12 months'}), {account: 'tester'}).find(s => s.id === 'clock');
   const bullet = deckFor(season().filter(r => r.cls === 'bullet'));
-  assert.deepEqual(bullet.board.scene.columns.map(c => c.label), ['Premove', '.1–.5s', '.5–1s', '1–2s', '2–3s', '3–5s', '5–10s', '10s+']);
+  assert.deepEqual(bullet.board.scene.columns.map(c => c.label), ['Premove', '0.1–0.5s', '0.5–1s', '1–2s', '2–3s', '3–5s', '5–10s', '10s+']);
+  assert.equal(bullet.board.scene.floor, true, 'the bullet chart stands on the bottom edge of the board');
+  // Increase granularity: tenths of a second, each column inside the usual column it splits from.
+  const fine = bullet.fineBoard.scene.columns;
+  assert.equal(fine.length, 24);
+  assert.deepEqual(fine.slice(0, 4).map(c => c.label), ['Pre', '0.1s', '0.2s', '0.3s']);
+  assert.deepEqual(fine.slice(-4).map(c => c.label), ['2s', '3s', '5s', '10s+']);
+  assert.deepEqual([...new Set(fine.map(c => c.group))], [0, 1, 2, 3, 4, 5, 6, 7], 'every usual column splits into at least one');
+  assert.ok(Math.abs(fine.reduce((s, c) => s + c.value, 0) - 100) < 1e-6, 'every move is in one column');
+  assert.match(fine[1].detail, /took 0.1 to 0.2 seconds$/);
   assert.match(bullet.points[0], /^15% of your moves were premoves$/);
   assert.match(bullet.board.scene.columns[0].detail, /premoves \(0\.1 s or less/);
   const mixed = deckFor(season());
   assert.equal(mixed.board.scene.columns[0].label, '0–1s');
+  assert.ok(!mixed.board.scene.floor);
+  assert.deepEqual(mixed.fineBoard.scene.columns.map(c => c.label).slice(0, 12), ['0s', '1s', '2s', '3s', '4s', '5s', '6s', '7s', '8s', '9s', '10s', '15s']);
+  assert.equal(mixed.fineBoard.scene.columns.at(-1).label, '120s+');
+  // Rows saved before the fine histogram existed show no switch until they are replayed.
+  assert.equal(deckFor(season().map(r => ({...r, tg: undefined}))).fineBoard, null);
   assert.match(mixed.points[2], /30 seconds or more/);
 });
 
