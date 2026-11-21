@@ -3,8 +3,10 @@ import assert from 'node:assert/strict';
 import {JSDOM} from 'jsdom';
 import {PORTRAITS} from '../lib/profile/portraits.js';
 import {portraitContours, traceContours, sampleContour} from '../lib/profile/portrait-contours.js';
-import {inlayContours, INLAY} from '../lib/profile/portrait-inlay.js';
-import {createPortrait, planSculpture, sculptureState, portraitTones, PIECE_FILL, glideEase, GLIDE, MORPH} from '../lib/profile/portrait.js';
+import {inlayContours, INLAY, RELIEF} from '../lib/profile/portrait-inlay.js';
+import {PORTRAIT_DETAILS, PORTRAIT_DETAIL_SIZE} from '../lib/profile/portrait-details.js';
+import {silk, reliefExitState, RELIEF_EXIT} from '../lib/profile/portrait-relief.js';
+import {createPortrait, planSculpture, sculptureState, portraitTones, reliefTones, PIECE_FILL, glideEase, GLIDE, MORPH} from '../lib/profile/portrait.js';
 import {nearestBoardEdge} from '../lib/learning/piece-transition.js';
 
 const opening = () => Array.from({length: 32}, (_, i) => {
@@ -129,7 +131,7 @@ test('Inlay makes a complete, fitted image out of pieces, including every backgr
 
 // Minimal canvas recorder: verifies lifecycle and actual filled geometry without
 // making a native canvas package a dependency of the extension's unit tests.
-function fixture(t, {animated = false, decode = () => Promise.resolve(), style = 'assemble'} = {}) {
+function fixture(t, {animated = false, decode = () => Promise.resolve(), style = 'assemble', id = 'tal'} = {}) {
   const dom = new JSDOM('<div id="board" style="position:relative"></div>', {pretendToBeVisual: true});
   t.after(() => dom.window.close());
   const {window: win} = dom, doc = win.document, board = doc.querySelector('#board');
@@ -172,7 +174,7 @@ function fixture(t, {animated = false, decode = () => Promise.resolve(), style =
   Object.defineProperty(overlay, 'offsetWidth', {get: () => rect.width});
   Object.defineProperty(overlay, 'offsetHeight', {get: () => rect.height});
   let reveals = 0;
-  const portrait = createPortrait({board, overlay, id: 'tal', makePiece, win, style, motion: () => animated, delay: 0, onReveal: () => reveals++});
+  const portrait = createPortrait({board, overlay, id, makePiece, win, style, motion: () => animated, delay: 0, onReveal: () => reveals++});
   return {win, board, overlay, portrait, frames, contexts, get reveals() { return reveals; },
     flush: () => new Promise(resolve => win.setTimeout(resolve, 0)),
     tick(ms) { clock = ms; const callbacks = [...frames.values()]; frames.clear(); callbacks.forEach(cb => cb(ms)); },
@@ -275,4 +277,80 @@ test('cancelling before sprites decode leaves no late portrait or hidden pieces'
   f.portrait.cancel(); decode(); await f.flush();
   assert.equal(f.reveals, 0); assert.equal(f.frames.size, 0); assert.equal(f.overlay.children.length, 0);
   assert.ok([...f.board.querySelectorAll('.profile-piece')].every(img => img.style.visibility === ''));
+});
+
+test('Relief has finer, credited maps for every player and retains more of Magnus’s facial detail', () => {
+  for (const id of Object.keys(PORTRAITS)) {
+    assert.equal(Buffer.from(PORTRAIT_DETAILS[id].data, 'base64').length, 128 * 128);
+    assert.equal(PORTRAIT_DETAILS[id].credit, PORTRAITS[id].credit);
+    assert.equal(PORTRAIT_DETAILS[id].source, PORTRAITS[id].source);
+  }
+  assert.equal(PORTRAIT_DETAIL_SIZE, 128); assert.equal(reliefTones('unknown'), null);
+  const tones = reliefTones('carlsen'), coarse = new Float32Array(64 * 64);
+  for (let y = 0; y < 64; y++) for (let x = 0; x < 64; x++) coarse[y * 64 + x] = (tones[y * 2 * 128 + x * 2] + tones[y * 2 * 128 + x * 2 + 1] + tones[(y * 2 + 1) * 128 + x * 2] + tones[(y * 2 + 1) * 128 + x * 2 + 1]) / 4;
+  const old = inlayContours(coarse, 64), refined = inlayContours(tones, 128, RELIEF);
+  const inside = (x, y, ring) => {
+    let hit = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const a = ring[i], b = ring[j];
+      if ((a.y > y) !== (b.y > y) && x < (b.x - a.x) * (y - a.y) / (b.y - a.y) + a.x) hit = !hit;
+    }
+    return hit;
+  };
+  const error = cells => {
+    let total = 0;
+    // Eyes, nose, lips and beard, rather than the easy flat background.
+    for (let y = 42; y < 105; y += 2) for (let x = 40; x < 100; x += 2) {
+      const piece = cells.find(c => c.rings.reduce((hit, r) => hit !== inside((x + .5) / 16, (y + .5) / 16, r), false));
+      total += Math.abs((piece?.tone || 0) - tones[y * 128 + x]);
+    }
+    return total;
+  };
+  assert.ok(refined.length > old.length && new Set(refined.map(c => c.tone)).size === RELIEF.levels);
+  assert.ok(error(refined) < error(old) * .8, 'finer pieces improve facial fidelity by at least 20%');
+});
+
+test('Relief departure is continuous, first reforms pieces and then glides them away', () => {
+  const item = {start: 0, from: {x: 4, y: 4}, to: {x: -.6, y: 4}, sizeFrom: .94, morphFrom: 1, turnFrom: .7};
+  assert.deepEqual(reliefExitState(item, 0), {x: 4, y: 4, size: .94, morph: 1, turn: .7, p: 0, visible: true, moving: true});
+  assert.equal(silk(0), 0); assert.equal(silk(1), 1);
+  assert.ok(silk(.001) < 1e-7 && 1 - silk(.999) < 1e-7, 'acceleration eases into and out of motion');
+  const shrink = reliefExitState(item, 400);
+  assert.equal(shrink.x, 4); assert.ok(shrink.morph > .3 && shrink.morph < .7);
+  const end = reliefExitState(item, RELIEF_EXIT.overlap + RELIEF_EXIT.travel);
+  close(end.x, -.6); assert.equal(end.morph, 0); assert.equal(end.turn, 0); assert.equal(end.moving, false);
+  let previous = reliefExitState(item, 0);
+  for (let ms = 16; ms <= 1500; ms += 16) {
+    const state = reliefExitState(item, ms);
+    assert.ok(Math.hypot(state.x - previous.x, state.y - previous.y) < .2 && Math.abs(state.morph - previous.morph) < .04);
+    previous = state;
+  }
+});
+
+test('Relief preserves its painted frame when leaving a removed board and cleans up the departure', async t => {
+  const f = fixture(t, {style: 'relief', id: 'carlsen', animated: true});
+  await f.flush(); await f.flush(); f.tick(6000);
+  assert.equal(f.portrait.revealed, true);
+  const canvas = f.overlay.querySelector('canvas'), before = f.contexts.get(canvas).fills.map(c => c.points.slice(0, 5));
+  f.portrait.cancel();
+  const ghost = f.win.document.querySelector('.profile-portrait-relief-exit');
+  assert.ok(ghost && ghost.parentNode === f.win.document.body);
+  assert.deepEqual(f.contexts.get(ghost).fills.map(c => c.points.slice(0, 5)), before, 'no jump in the first departure frame');
+  f.board.remove(); f.tick(6400);
+  assert.ok(ghost.isConnected, 'leaving remains visible after the profile board is detached');
+  assert.equal(f.contexts.get(ghost).rectangles.length, 0, 'no backing fill on exit');
+  f.tick(8000); assert.equal(ghost.isConnected, false); assert.equal(f.frames.size, 0);
+});
+
+test('Relief returns home smoothly, tolerates duplicate dismissals, and settles reduced motion', async t => {
+  const f = fixture(t, {style: 'relief', id: 'carlsen', animated: true});
+  await f.flush(); await f.flush(); f.tick(6000);
+  const result = f.portrait.dismiss(); assert.equal(f.portrait.dismiss(), result);
+  f.tick(6400); assert.ok([...f.board.querySelectorAll('.profile-piece')].every(img => img.style.visibility === 'hidden'));
+  f.tick(8000); await result;
+  assert.ok([...f.board.querySelectorAll('.profile-piece')].every(img => img.style.visibility === ''));
+  assert.equal(f.frames.size, 0);
+  const still = fixture(t, {style: 'relief', id: 'carlsen'}); await still.flush();
+  assert.equal(still.portrait.revealed, true); assert.equal(still.frames.size, 0); assert.equal(still.overlay.querySelector('.profile-portrait-plate'), null);
+  await still.portrait.dismiss();
 });

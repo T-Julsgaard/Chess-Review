@@ -71,7 +71,7 @@ test('the mosaic lands outside-in and every piece ends exactly on its cell', () 
 });
 
 test('portrait styles: new piece portraits remain additional options and assemble stays the default', () => {
-  assert.deepEqual(PORTRAIT_STYLES, [{id: 'assemble', label: 'Assemble'}, {id: 'morph', label: 'Morph'}, {id: 'inlay', label: 'Inlay'}, {id: 'halftone', label: 'Mosaic'}, {id: 'swarm', label: 'Swarm'}]);
+  assert.deepEqual(PORTRAIT_STYLES, [{id: 'assemble', label: 'Assemble'}, {id: 'morph', label: 'Morph'}, {id: 'inlay', label: 'Inlay'}, {id: 'relief', label: 'Relief'}, {id: 'halftone', label: 'Mosaic'}, {id: 'swarm', label: 'Swarm'}]);
   assert.ok(PORTRAIT_DELAY >= 600 && PORTRAIT_DELAY <= 1600);
 });
 

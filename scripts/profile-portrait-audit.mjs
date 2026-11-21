@@ -34,6 +34,17 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await sleep(700); await shot('inlay-fitting');
   await waitFor(review, "import('./analysis.js').then(m=>m.profileWorkspace.portrait?.revealed)", 'Entire image made from pieces');
   await shot('inlay-assembled');
+  await run("import('./analysis.js').then(m=>{m.S.settings.profilePortraitStyle='relief';const w=m.profileWorkspace;window.reliefFrames=[];let previous=performance.now();function frame(now){reliefFrames.push(now-previous);previous=now;if(!w.portrait?.revealed)requestAnimationFrame(frame);}w.showPortrait({...w.deck.find(s=>s.id==='twin').board,portrait:'carlsen',name:'Magnus Carlsen'});requestAnimationFrame(frame);})");
+  await waitFor(review, "import('./analysis.js').then(m=>m.profileWorkspace.portrait?.revealed)", 'Detailed Magnus portrait');
+  const reliefTiming = await run("({frames:reliefFrames.length,p95:reliefFrames.slice(2).sort((a,b)=>a-b)[Math.floor((reliefFrames.length-2)*.95)]})");
+  console.log('Relief frame timing: ' + JSON.stringify(reliefTiming));
+  const portraitImage = await run("document.querySelector('.profile-portrait-pieces').toDataURL('image/png').split(',')[1]");
+  await fs.writeFile(path.join(out, 'relief-magnus.png'), Buffer.from(portraitImage, 'base64'));
+  const departure = await run("import('./analysis.js').then(m=>{const w=m.profileWorkspace,canvas=document.querySelector('.profile-portrait-pieces'),before=canvas.toDataURL();w.go(w.deck.findIndex(s=>s.id==='cover'));const ghost=document.querySelector('.profile-portrait-relief-exit');return {connected:ghost?.parentNode===document.body,same:ghost?.toDataURL()===before};})");
+  assert.ok(departure.connected && departure.same, 'The departure starts on the exact displayed frame');
+  await sleep(450); await shot('relief-departure');
+  await waitFor(review, "!document.querySelector('.profile-portrait-relief-exit')", 'Smooth departure completed');
+  await run("import('./analysis.js').then(m=>{const w=m.profileWorkspace;w.go(w.deck.findIndex(s=>s.id==='twin'));})");
   await run("import('./analysis.js').then(m=>{m.S.settings.uiAnim=false;m.S.settings.profilePortraitStyle='halftone';const w=m.profileWorkspace;w.showPortrait(w.deck.find(s=>s.id==='twin').board);})");
   await waitFor(review, "import('./analysis.js').then(m=>m.profileWorkspace.portrait?.revealed)", 'Original mosaic style');
   await shot('portrait-original-mosaic');
@@ -43,7 +54,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     await call('Emulation.setDeviceMetricsOverride', {width, height, deviceScaleFactor: 1, mobile: false}, review.sessionId);
     await run(`import('./analysis.js').then(m=>{m.S.settings.uiAnim=false;m.S.settings.pieceStyle='${set}';})`);
     const ids = await run("import('./lib/profile/portraits.js').then(m=>Object.keys(m.PORTRAITS))");
-    for (const style of ['assemble', 'morph', 'inlay']) for (const id of ids) {
+    for (const style of ['assemble', 'morph', 'inlay', 'relief']) for (const id of ids) {
       await run(`import('./analysis.js').then(m=>{m.S.settings.profilePortraitStyle='${style}';})`);
       await run(`import('./analysis.js').then(m=>{const w=m.profileWorkspace;w.showPortrait({...w.deck.find(s=>s.id==='twin').board,portrait:'${id}',name:'${id}'});})`);
       await waitFor(review, "import('./analysis.js').then(m=>m.profileWorkspace.portrait?.revealed)", id + ' reduced motion');
@@ -53,7 +64,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
       assert.ok(state.tones >= 6, id + ': material contours rendered');
       assert.equal(state.hidden, true); assert.deepEqual(state.sets, [set]);
       assert.ok(state.label.includes(id));
-      if (style === 'inlay') {
+      if (['inlay', 'relief'].includes(style)) {
         assert.equal(state.plate, false);
         assert.ok(state.solid > state.width * state.height * .999, `${id}: the pieces must cover the full image, including its background: ${state.solid / state.width / state.height}`);
       }
@@ -73,8 +84,15 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await sleep(1500);
   assert.equal(await run("document.querySelectorAll('.profile-portrait-pieces').length"), 0);
   assert.equal(await run("document.querySelectorAll('.profile-piece[style*=hidden]').length"), 0);
-  await run("import('./analysis.js').then(m=>m.profileWorkspace.close())");
+  // Closing the whole profile detaches its board immediately. The departure
+  // must retain the painted face in the document, then remove itself cleanly.
+  await run("import('./analysis.js').then(m=>{m.S.settings.profilePortraitStyle='relief';const w=m.profileWorkspace;w.go(w.deck.findIndex(s=>s.id==='twin'));})");
+  await waitFor(review, "import('./analysis.js').then(m=>m.profileWorkspace.portrait?.revealed)", 'Relief before close');
+  const closing = await run("import('./analysis.js').then(m=>{const before=document.querySelector('.profile-portrait-pieces').toDataURL();m.profileWorkspace.close();const ghost=document.querySelector('.profile-portrait-relief-exit');return {connected:ghost?.parentNode===document.body,same:ghost?.toDataURL()===before};})");
+  assert.ok(closing.connected && closing.same, 'Closing retains the exact portrait while the review board returns');
+  await sleep(450); await shot('relief-closing-profile');
+  await waitFor(review, "!document.querySelector('.profile-portrait-relief-exit')", 'Close departure cleanup');
   assert.equal(await run("document.querySelectorAll('.profile-portrait').length"), 0);
-  await fs.writeFile(path.join(out, 'portrait-results.json'), JSON.stringify({timing, portraits: evidence}, null, 2));
+  await fs.writeFile(path.join(out, 'portrait-results.json'), JSON.stringify({timing, reliefTiming, portraits: evidence}, null, 2));
   console.log('Profile portrait browser audit passed: ' + out);
 }
