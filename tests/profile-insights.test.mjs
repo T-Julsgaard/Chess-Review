@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {buildInsights, totals, habits, opponents, streaks, signature, ratings, openings, material, terminations, byOpponentRating} from '../lib/profile/insights.js';
 import {classify, ARCHETYPES, tendencies} from '../lib/profile/archetypes.js';
-import {buildDeck, buildReport, fmt, resultsByRating} from '../lib/profile/deck.js';
+import {buildDeck, buildReport, fmt, resultsByRating, resultsOverTime} from '../lib/profile/deck.js';
 import {Chess} from '../lib/chess.js';
 
 import {season} from './helpers/profile-season.mjs';
@@ -44,6 +44,42 @@ test('insights: results by opponent rating pick a band width that fits the board
   assert.equal(deck.scene.type, 'results');
   assert.equal(deck.scene.columns.filter(c => c.label).length, 6, 'twelve bands, every other one labelled');
   assert.ok(deck.scene.columns.every(c => !c.games || Math.abs(c.w + c.d + c.l - 1) < 1e-9));
+});
+
+test('insights: results by opponent rating never leave an empty column', () => {
+  const row = (oppRating, res) => ({oppRating, res});
+  // Most games around 1200–1400 and one opponent far above: narrow bands would leave holes.
+  const rated = [...Array.from({length: 14}, (_, i) => row(1200 + i * 15, ['w', 'l'][i % 2])), row(1900, 'w')];
+  const R = byOpponentRating(rated);
+  assert.ok(R.bands.every(b => b.games), 'every column has games');
+  assert.equal(R.bands.reduce((s, b) => s + b.games, 0), rated.length);
+  R.bands.forEach((b, i) => { if (i) assert.equal(b.from, R.bands[i - 1].to + 1, 'bands stay contiguous'); });
+  assert.ok(R.bands.at(-1).to >= 1900 && R.bands.at(-1).from < 1900);
+  // Evenly spread games keep even bands.
+  const even = byOpponentRating(Array.from({length: 20}, (_, i) => row(1200 + i * 30, 'w')));
+  assert.ok(even.bands.every(b => b.to - b.from + 1 === even.step));
+});
+
+test('insights: the one that got away is a loss on the board from ahead; the rival keeps its games in order', () => {
+  const base = {res: 'l', matMin: 0, matMax: 5, t: 1};
+  const M = material([{...base, id: 'draw', res: 'd', term: 'repetition', matMax: 9}, {...base, id: 'flag', term: 'time', matMax: 8}, {...base, id: 'resigned', term: 'resign'}]);
+  assert.equal(M.choke.id, 'resigned', 'draws and losses on time do not count');
+  assert.equal(material([{...base, res: 'd', term: 'agree'}]).choke, null);
+  const rows = season(), O = opponents(rows);
+  assert.equal(O.rival.history.length, O.rival.games);
+  assert.ok(O.rival.history.every((g, i) => !i || O.rival.history[i - 1][0] <= g[0]), 'oldest first');
+  const chart = resultsOverTime(O.rival.history, O.rival.name);
+  assert.equal(chart.scene.type, 'results');
+  assert.equal(chart.scene.columns.reduce((s, c) => s + c.games, 0), O.rival.games, 'every game in one column');
+  assert.ok(chart.scene.columns.every(c => c.games >= 5), 'runs of at least five games when there are enough');
+  assert.ok(chart.scene.columns.every(c => Math.abs(c.w + c.d + c.l - 1) < 1e-9));
+  const deck = buildDeck(buildReport(rows, buildInsights(rows), {account: 'tester', site: 'chesscom'}), {account: 'tester'});
+  const swings = deck.find(s => s.id === 'swings');
+  assert.equal(swings.alsoEvidence.label, 'View the one that got away', 'the comeback chapter also links the lost game');
+  assert.ok(swings.stats.find(s => s.label === 'The one that got away').sub.endsWith('lost'));
+  const habitStats = deck.find(s => s.id === 'habits').stats;
+  assert.equal(habitStats.length, 4, 'four boxes');
+  assert.match(habitStats[3].value, /^\d\d:00–\d\d:00$/);
 });
 
 test('insights: streaks, habits, terminations, material and signatures', () => {
@@ -156,7 +192,8 @@ test('deck: bullet alone gets premove and sub-second move-time columns; mixed co
   assert.match(bullet.board.scene.columns[0].detail, /premoves \(0\.1 s or less/);
   const mixed = deckFor(season());
   assert.equal(mixed.board.scene.columns[0].label, '0–1s');
-  assert.ok(!mixed.board.scene.floor);
+  assert.equal(mixed.board.scene.floor, true, 'every move-time chart stands on the bottom edge');
+  assert.equal(mixed.fineBoard.scene.floor, true);
   assert.deepEqual(mixed.fineBoard.scene.columns.map(c => c.label).slice(0, 12), ['0s', '1s', '2s', '3s', '4s', '5s', '6s', '7s', '8s', '9s', '10s', '15s']);
   assert.equal(mixed.fineBoard.scene.columns.at(-1).label, '120s+');
   // Rows saved before the fine histogram existed show no switch until they are replayed.

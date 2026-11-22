@@ -144,6 +144,28 @@ test('store: merges rows by id, bounds the engine index and deletes everything',
   assert.deepEqual(Object.keys(storage.data), []);
 });
 
+test('store: the Compare list reads small summaries, not every saved game', async () => {
+  const storage = memoryStorage(), store = createProfileStore(storage);
+  const row = gameFeatures(game(), 'morphy');
+  await store.mergeRows('chesscom', 'Morphy', [row, {...row, id: '2', t: row.t + 10}]);
+  // A player saved before summaries existed (rows only).
+  storage.data[rowsKey('lichess', 'old_one')] = {rows: [row], months: [], since: 0, updatedAt: 5};
+  const reads = [];
+  storage.getKeys = async () => Object.keys(storage.data);
+  const get = storage.get; storage.get = async key => { reads.push(key); return get(key); };
+  const list = await store.listAccounts();
+  assert.deepEqual(list.map(e => [e.site, e.account, e.games]), [['chesscom', 'morphy', 2], ['lichess', 'old_one', 1]]);
+  assert.ok(reads.every(key => key !== null), 'never the whole storage');
+  assert.ok(!reads.flat().includes(rowsKey('chesscom', 'morphy')), 'a summarised player is not read in full');
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.equal(storage.data['profile:v1:summary:lichess:old_one'].games, 1, 'the missing summary is saved for next time');
+  await store.forgetAccount('chesscom', 'morphy');
+  assert.ok(!('profile:v1:summary:chesscom:morphy' in storage.data));
+  // Without getKeys (older browsers) the full read still works.
+  delete storage.getKeys;
+  assert.deepEqual((await store.listAccounts()).map(e => e.account), ['old_one']);
+});
+
 test('collector: period filters', () => {
   const now = new Date(Date.UTC(2026, 10, 16));
   const rows = [];

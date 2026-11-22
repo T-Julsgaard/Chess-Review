@@ -130,12 +130,21 @@ test('profile designs: story shows one figure per chapter, progress segments and
   w.go(w.deck.findIndex(s => s.id === 'rival'));
   assert.equal(doc.querySelector('.board .pv-badge'), null);
   assert.match(shell.querySelector('.pv-story-lead').textContent, /^You played \d+ games against rival_rick: won \d+, lost \d+, drew \d+\.$/);
-  assert.equal(shell.querySelector('.pv-link'), null, 'no link to the latest decisive game');
+  assert.equal(shell.querySelector('.pv-link[data-game-url]'), null, 'no link to the latest decisive game');
+  // View your results over time: the head-to-head in runs of games, drawn like Greatest hits.
+  const overTime = shell.querySelector('.pv-link[aria-pressed]');
+  assert.equal(overTime?.textContent, 'View your results over time');
+  overTime.click();
+  assert.ok(doc.querySelectorAll('.board .pv-results .pv-tile').length >= 16, 'the board charts the rivalry over time');
+  assert.match(doc.querySelector('.profile-board-caption .pv-legend').textContent, /Results over time:.*Won.*Drew.*Lost/);
+  assert.equal(shell.querySelector('.pv-link[aria-pressed]').textContent, 'Back to the overall record');
+  shell.querySelector('.pv-link[aria-pressed]').click();
+  assert.equal(doc.querySelector('.board .pv-results'), null, 'back to the overall record');
   w.go(w.deck.findIndex(s => s.id === 'hits'));
   assert.ok(doc.querySelectorAll('.board .pv-results .pv-tile').length >= 16, 'the board charts results by opponent rating');
   assert.match(doc.querySelector('.profile-board-caption .pv-legend').textContent, /Results by opponent rating:.*Won.*Drew.*Lost/);
   const replay = shell.querySelector('.pv-link');
-  assert.equal(replay?.textContent, 'Replay your best win');
+  assert.equal(replay?.textContent, 'View your best win');
   assert.match(replay.title, /^Your win against .+ \(\d+\), /);
   replay.click();
   assert.equal(doc.querySelector('.board .pv-results'), null, 'the best win replaces the chart');
@@ -241,14 +250,14 @@ test('story time controls read Bullet, Blitz, Daily; habit dots and clock column
   assert.deepEqual(labels(), ['All', 'Bullet', 'Blitz'], 'no Daily on the move-time chapter');
   const clock = doc.querySelector('.board .pv-layer');
   assert.equal(clock.dataset.scene, 'columns');
-  assert.deepEqual([...clock.querySelectorAll('.pv-col-label')].map(n => n.textContent), ['0–1s', '1–2s', '2–3s', '3–5s', '5–10s', '10–20s', '20–30s', '30s+'], 'move times in intervals, not "under"');
+  assert.deepEqual([...clock.outside.querySelectorAll('.pv-col-label')].map(n => n.textContent), ['0–1s', '1–2s', '2–3s', '3–5s', '5–10s', '10–20s', '20–30s', '30s+'], 'move times in intervals, not "under"');
   pick('Blitz');
   assert.equal(doc.querySelector('.board .pv-layer'), clock, 'the columns grow and shrink in place');
-  // Increase granularity sits under the time controls and splits the chart into narrow intervals.
-  const grain = doc.querySelector('.pv-filter-stack .pv-grain');
-  assert.ok(grain && doc.querySelector('.pv-filter-stack .pv-filter'), 'the switch sits under the time-control pills');
+  // Increase granularity sits beside the big figure (so the chapter keeps its height) and splits the chart into narrow intervals.
+  const grain = doc.querySelector('.pv-story-hero .pv-grain');
+  assert.ok(grain && !grain.closest('.pv-story-top'), 'the switch sits beside the figure, not under the time-control pills');
   assert.equal(grain.getAttribute('role'), 'switch'); assert.equal(grain.getAttribute('aria-checked'), 'false');
-  const columnLabels = () => [...doc.querySelectorAll('.board .pv-layer .pv-col-label')].map(n => n.textContent);
+  const columnLabels = () => [...doc.querySelector('.board .pv-layer:not(.pv-leaving)').outside.querySelectorAll('.pv-col-label')].map(n => n.textContent);
   grain.click();
   assert.equal(grain.getAttribute('aria-checked'), 'true');
   assert.equal(columnLabels().length, 20); assert.equal(columnLabels()[4], '4s');

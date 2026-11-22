@@ -197,8 +197,9 @@
 .pv-cmp-key i { width: 10px; height: 4px; margin-left: 6px; }
 .pv-cmp-key i.you, .pv-cmp-bars i.you { background: var(--pv-vivid); }
 .pv-cmp-key i.typical, .pv-cmp-bars i.typical { background: color-mix(in srgb, var(--ink) 30%, transparent); }
-.pv-cmp-list { list-style: none; margin: 0; padding: 0 6px 0 0; max-height: 196px; overflow-y: auto; overscroll-behavior: contain; scroll-snap-type: y proximity; border-top: 1px solid var(--line);
-  mask-image: linear-gradient(180deg, #000 82%, transparent); scrollbar-width: thin; }
+.pv-cmp-list { list-style: none; margin: 0; padding: 0 6px 0 0; max-height: 196px; overflow-y: auto; overscroll-behavior: contain; scroll-snap-type: y proximity; border-top: 1px solid var(--line); scrollbar-width: thin; }
+/* Only a short fade at the bottom edge, and only while more rows wait below (story.js signatureView). */
+.pv-cmp-list.pv-more { mask-image: linear-gradient(180deg, #000 calc(100% - 26px), transparent); }
 .pv-cmp { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(70px, 1fr) 58px; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line-soft); scroll-snap-align: start; }
 .pv-cmp-label { font-size: 13px; font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pv-cmp-bars { display: flex; flex-direction: column; gap: 3px; }
@@ -473,3 +474,21 @@
 }
 .profile-shell[data-design="story"] .pv-recap > div { padding: 8px 0; }
 .profile-shell[data-design="story"] .pv-col-label { text-transform: none; }
+
+/* Story: the comparison's heading and its You / Typical key read at a glance. */
+.pv-story[data-slide="signature"] .pv-cmp-head { font-size: 12.5px; letter-spacing: 1.1px; color: var(--ink); }
+.pv-story[data-slide="signature"] .pv-cmp-key { gap: 7px; font-size: 14px; font-weight: 750; letter-spacing: .2px; color: var(--ink-2); }
+.pv-story[data-slide="signature"] .pv-cmp-key i { width: 16px; height: 7px; margin-left: 8px; }
+/* A new time control moves the bars that are already there (story.js carrySignature), never grows them again from zero. */
+.pv-cmp-kept .pv-cmp-bars i { animation: none; }
+/* Labels under the board, the habit dots' days and hours: a size up, so they read from a normal distance. */
+.pv-outside > .pv-col-below { font-size: clamp(10.5px, 1.1vw, 15px); }
+.pv-outside.pv-columns-dense > .pv-col-below { font-size: clamp(9px, .8vw, 12px); }
+.pv-bubble-day { font-size: clamp(12px, 1.2vw, 16px); }
+.pv-bubble-band { font-size: clamp(10.5px, 1.1vw, 15px); }
+/* "Increase granularity" in the room right of the clock's big figure, so the chapter keeps its height. */
+.pv-story-hero.has-side { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; row-gap: 6px; align-items: start; }
+.pv-story-hero.has-side > .pv-story-figure, .pv-story-hero.has-side > .pv-story-label { grid-column: 1; }
+.pv-story-hero.has-side > .pv-grain { grid-column: 2; grid-row: 1 / span 2; align-self: start; margin-top: 2px; }
+/* Two game links side by side (Comebacks: the comeback and the one that got away). */
+.pv-links { display: flex; flex-wrap: wrap; gap: 8px 22px; }
