@@ -215,6 +215,19 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.equal(doc.querySelectorAll('.board .pv-layer').length, 0, 'closing removes the board charts');
 });
 
+test('closing the profile on a line chart takes its tags outside the board with it', async t => {
+  const a = review(t, 'story'), doc = a.dom.window.document;
+  // jsdom lays nothing out: give elements the offset parent a browser would, so the tags find their place beside the board.
+  Object.defineProperty(a.dom.window.HTMLElement.prototype, 'offsetParent', {configurable: true, get() { return this.isConnected ? this.parentElement : null; }});
+  seed(a);
+  const w = await openDeck(a);
+  w.go(w.deck.findIndex(s => s.id === 'rating'));
+  assert.ok(doc.querySelector('.pv-outside .pv-line-tag'), 'the start and end tags sit outside the board');
+  w.close(); for (let i = 0; i < 4; i++) await settle();
+  await new Promise(resolve => a.dom.window.setTimeout(resolve, 500));
+  assert.equal(doc.querySelectorAll('.pv-outside').length, 0, 'no tags are left over the review board or the next profile');
+});
+
 test('story filters keep chapters stable and each chapter opens on All', async t => {
   const a = review(t, 'story'), doc = a.dom.window.document;
   seed(a);
