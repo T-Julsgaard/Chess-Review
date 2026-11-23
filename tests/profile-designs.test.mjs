@@ -190,7 +190,7 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.match(doc.querySelector('.profile-board-caption .pv-legend').textContent, /Results by opponent rating:.*Won.*Drew.*Lost/);
   assert.deepEqual([...w.viz.layer.outside.querySelectorAll('.pv-axis-tick')].map(n => n.textContent), ['0%', '25%', '50%', '75%', '100%'], 'a share axis beside the board');
   const replay = shell.querySelector('.pv-link');
-  assert.equal(replay?.textContent, 'View your best win');
+  assert.equal(replay?.textContent, 'View your highest rated win');
   assert.match(replay.title, /^Your win against .+ \(\d+\), /);
   replay.click();
   assert.equal(doc.querySelector('.board .pv-results'), null, 'the best win replaces the chart');
@@ -199,7 +199,7 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.equal(back?.textContent, 'Back to the chart');
   back.click();
   assert.ok(doc.querySelector('.board .pv-results'), 'going back brings the chart back');
-  assert.equal(shell.querySelector('.pv-link')?.textContent, 'View your best win', 'and the link again');
+  assert.equal(shell.querySelector('.pv-link')?.textContent, 'View your highest rated win', 'and the link again');
   shell.querySelector('.pv-link').click();
   w.exitGame();
   assert.ok(doc.querySelector('.board .pv-results'), 'exiting the game brings the chart back');
@@ -564,24 +564,50 @@ test('story chapters without enough games in a time control all say the same, an
   }
 });
 
-test('a profile of both sites draws the other site\'s rating as a second line, each end tag naming its site', async () => {
+test('a profile of both sites draws the other site\'s rating as a second line, named in a key under the board', async () => {
   const {JSDOM} = await import('jsdom');
   const {createViz} = await import('../lib/profile/designs/board-viz.js');
   const series = (shift, base) => Array.from({length: 8}, (_, i) => ({t: 1.7e9 + (i + shift) * 86400 * 7, r: base + i * 12}));
-  const report = {ratingSite: 'chesscom', otherRatingSite: 'lichess', ratings: {blitz: {series: series(2, 1500), peak: {t: 1.7e9 + 9 * 86400 * 7, rating: 1584}}}, otherRatings: {blitz: {series: series(0, 1700)}}};
+  // The Lichess line peaks before its end, so it carries a peak of its own.
+  const lichess = series(0, 1700).map((p, i) => i === 7 ? {...p, r: 1760} : p);
+  const report = {ratingSite: 'chesscom', otherRatingSite: 'lichess', ratings: {blitz: {series: series(2, 1500), peak: {t: 1.7e9 + 9 * 86400 * 7, rating: 1584}}}, otherRatings: {blitz: {series: lichess}}};
   const spec = DesignWorkspace.prototype.ratingScene.call({report}, {ratingClass: 'blitz'});
-  assert.equal(spec.scene.name, 'Chess.com');
   assert.deepEqual(spec.scene.extra.map(e => e.name), ['Lichess']);
+  assert.deepEqual(spec.scene.legend.map(([cls, text]) => [cls, text]), [['pv-legend-line', 'Chess.com'], ['pv-legend-line', 'Lichess']], 'the key names both lines');
+  assert.equal(spec.scene.axes, true);
   assert.match(spec.caption, /^Blitz rating on Chess\.com and Lichess across the board/);
-  // Without the other site's line, nothing changes.
+  // Without the other site's line there is no key; the axes stay.
   const one = DesignWorkspace.prototype.ratingScene.call({report: {...report, otherRatings: {}}}, {ratingClass: 'blitz'});
-  assert.deepEqual([one.scene.name, one.scene.extra], ['', []]);
+  assert.deepEqual([one.scene.legend, one.scene.extra, one.scene.axes], [null, [], true]);
   const dom = new JSDOM('<div class="wrap"><div class="board"></div></div>'), board = dom.window.document.querySelector('.board');
   const viz = createViz(board, {motion: () => false});
   const layer = viz.line(spec.scene.series, spec.scene);
-  assert.equal(layer.querySelectorAll('.pv-line-alt').length, 1, 'the second line');
+  // Drawn like the main line: its own area, glow and line.
+  assert.equal(layer.querySelectorAll('.pv-line-alt').length, 2, 'the second line and its glow');
+  assert.equal(layer.querySelectorAll('.pv-line-area').length, 2, 'each line shades its own area');
+  // The end tags are plain ratings now that the key names the sites.
   const tags = [...layer.outside.querySelectorAll('.pv-end .pv-line-tag')].map(n => n.textContent);
-  assert.deepEqual(tags, ['Chess.com 1584', 'Lichess 1784']);
+  assert.deepEqual(tags, ['1584', '1760']);
+  assert.deepEqual([...layer.outside.querySelectorAll('.pv-peak .pv-line-tag')].map(n => n.textContent), ['Peak 1772'], 'the Lichess line\'s own peak');
   // The axes span both lines: the earlier Lichess line starts at the left edge.
   assert.match(layer.querySelector('.pv-line-alt').getAttribute('d'), /^M0\.00 /);
+  // Round ratings left of the board, months under it.
+  const ticks = [...layer.outside.querySelectorAll('.pv-axis-tick')].map(n => Number(n.textContent));
+  assert.ok(ticks.length >= 2 && ticks.every(v => v % 50 === 0), 'round values: ' + ticks);
+  assert.ok(layer.outside.querySelectorAll('.pv-axis-x').length >= 1, 'months under the board');
+  assert.ok(layer.outside.classList.contains('pv-columns-below'), 'so the key sits below the month names');
+});
+
+test('the rating chart\'s axes: round values, and months or years but never both', async () => {
+  const {ratingTicks, timeTicks} = await import('../lib/profile/designs/board-viz.js');
+  assert.deepEqual(ratingTicks(1480, 1720), [1500, 1550, 1600, 1650, 1700]);
+  assert.deepEqual(ratingTicks(1210, 1240), [1210, 1220, 1230, 1240]);
+  assert.ok(ratingTicks(400, 2900).length <= 5);
+  const at = (y, m, d = 15) => new Date(y, m, d).getTime() / 1000;
+  const months = timeTicks(at(2025, 10), at(2026, 9));
+  assert.ok(months.length >= 2 && months.length <= 7, 'a year of play: ' + months.map(t => t.label));
+  assert.ok(months.every(t => /^[A-Z][a-z]{2}$/.test(t.label)), 'month names only');
+  assert.deepEqual(timeTicks(at(2026, 0), at(2026, 3)).map(t => t.label), ['Feb', 'Mar', 'Apr'], 'every month of a short line');
+  const years = timeTicks(at(2019, 4), at(2026, 9));
+  assert.ok(years.length >= 2 && years.length <= 7 && years.every(t => /^\d{4}$/.test(t.label)), 'years only: ' + years.map(t => t.label));
 });

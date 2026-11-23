@@ -253,7 +253,9 @@ test('insights: mates in one played and missed, and their chapter', () => {
   assert.equal(deck.indexOf(slide), deck.findIndex(s => s.id === 'share') - 1, 'just before the recap');
   assert.equal(slide.board.kind, 'puzzle', 'the board holds the missed mates to solve');
   assert.equal(slide.board.puzzles.length, report.mateInOne.misses.length); assert.ok(slide.board.puzzles.length > 0);
-  assert.deepEqual(slide.evidence, slide.board.puzzles[0].link, 'the game link starts on the first puzzle');
-  assert.match(slide.lead, /You played it \d+% of the time/);
+  assert.equal(slide.evidence, undefined, 'no game link: the board is for solving');
+  assert.match(slide.lead, /You found it \d+% of the time\. Now find the ones you missed, right here on the board\.$/);
+  assert.deepEqual(slide.bullets, [], 'the lead says it all');
+  assert.deepEqual(slide.stats.map(s => s.label).slice(0, 2), ['Mates found', 'Mates missed']);
   assert.equal(buildDeck(buildReport(season(), buildInsights(season()), {account: 'me'}), {account: 'me'}).some(s => s.id === 'mate1'), false, 'no chapter without the count');
 });

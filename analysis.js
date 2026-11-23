@@ -1845,7 +1845,7 @@ async function openProfile({shared = null, resume = null} = {}) {
     sendMessage:message=>browserAPI.runtime.sendMessage(message), stage:UI.canvas, boardWrap:UI.boardWrap, makePiece, flipped:S.flipped,
     settings:()=>S.settings, writeSettings:patch=>{Object.assign(S.settings,patch);return writeSettings(patch);}, identity, shared, resume, toast,
     icon:name=>ICONS[name]||"", flag, url:_url, uiScale:profileUiScale,
-    playGameMove:move=>{if(move)playEvent(sanSound(move.san));},
+    playGameMove:move=>{if(move)playEvent(sanSound(move.san));}, playPuzzleWrong:playWrongSound,
     renderGamePlayer:(side,player,fen)=>playerStrip(side,capturedInfo(fen),{player,fen}),
     renderGameEvaluation:(bar,score,flipped)=>{
       bar.className='profile-game-eval evalbar eb-'+(S.settings.barStyle||'classic')+(flipped?' flipped':'');

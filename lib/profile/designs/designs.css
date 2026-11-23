@@ -23,15 +23,20 @@
 .pv-line-area { opacity: 0; animation: pv-fade .7s ease 1.55s forwards; }
 .pv-line-path { fill: none; stroke: var(--pv-c, var(--accent)); stroke-width: .7; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: pv-draw 1.5s cubic-bezier(.45,.05,.25,1) .15s forwards; }
 .pv-line-glow { stroke-width: 2.6; opacity: .22; }
-/* A second line on the same axes (the other site's rating, board-viz.js line `extra`): its own colour, a touch thinner. */
-.pv-line-alt { stroke-width: .6; }
+/* A second line on the same axes (the other site's rating, board-viz.js line `extra`): drawn like the first, in its own colour. */
+.pv-line-glow.pv-line-alt { opacity: .18; }
+/* The rating line's axes (board-viz.js line `axes`): faint guides at the values left of the board, months or years under it. */
+.pv-layer > .pv-line-grid { left: 0; right: 0; height: 0; border-top: 1px dashed color-mix(in srgb, var(--ink) 16%, transparent); pointer-events: none; animation: pv-fade .5s ease .1s both; }
+.pv-outside > .pv-axis-x { top: calc(100% + 9px); transform: translateX(-50%); font-size: clamp(9.5px, .95vw, calc(13px * var(--pv-s, 1))); font-weight: 700; line-height: 1; white-space: nowrap; color: var(--ink-2); animation: pv-fade .4s ease var(--d, 0ms) both; }
+.pv-outside > .pv-axis-x::before { content: ""; position: absolute; left: 50%; top: -7px; width: 1px; height: 4px; background: color-mix(in srgb, var(--ink) 35%, transparent); }
 .pv-line-dot.pv-below .pv-line-tag { bottom: auto; top: calc(100% + 8px); }
 .pv-line-raw { stroke-width: .3; opacity: .24; }
 /* While the accuracy check runs: every checked day as one thin line, redrawn in place as games finish (no draw-in). */
 .pv-line-live .pv-line-path.pv-line-raw { stroke-width: .4; opacity: .8; stroke-dasharray: none; stroke-dashoffset: 0; animation: none; }
 .pv-stop { stop-color: var(--pv-c, var(--accent)); }
 .pv-line-dot { width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: var(--pv-c, var(--accent)); box-shadow: 0 0 0 5px color-mix(in srgb, var(--pv-c, var(--accent)) 28%, transparent); animation: pv-pop .4s cubic-bezier(.2,.9,.25,1.3) 1.45s both; }
-.pv-line-dot.pv-peak { background: var(--q-inacc); box-shadow: 0 0 0 5px color-mix(in srgb, var(--q-inacc) 30%, transparent), 0 0 24px var(--q-inacc); }
+/* Every line's peak is green, whatever the line's own colour. */
+.pv-line-dot.pv-peak { background: var(--q-best); box-shadow: 0 0 0 5px color-mix(in srgb, var(--q-best) 30%, transparent), 0 0 24px var(--q-best); }
 .pv-line-dot.pv-start { animation-delay: .2s; width: 10px; height: 10px; margin: -5px 0 0 -5px; }
 .pv-line-tag { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); white-space: nowrap; padding: 4px 10px; border-radius: 999px; font-size: clamp(11px, 1vw, calc(14px * var(--pv-s, 1))); font-weight: 800; font-variant-numeric: tabular-nums;
   color: var(--ink); background: color-mix(in srgb, var(--panel) 88%, transparent); border: 1px solid var(--line); box-shadow: 0 6px 18px color-mix(in srgb, #000 30%, transparent); }
@@ -284,6 +289,10 @@
 .pv-legend-dot.pv-legend-loss { background: var(--q-miss); }
 .pv-legend-dot.pv-legend-faint { background: color-mix(in srgb, var(--q-best) 45%, transparent); }
 .pv-legend-head { font-weight: 650; color: var(--ink); }
+/* The rating chart's key: one dot per line, in that line's colour (the first takes the chart's). */
+.pv-legend-dot.pv-legend-line { background: var(--pv-c, var(--accent)); }
+.pv-legend:has(.pv-legend-line) { gap: 6px 10px; font-size: 13px; font-weight: 650; color: var(--ink); }
+.pv-legend-line ~ .pv-legend-line { margin-left: 14px; }
 /* The results charts' share axis, just left of the board (board-viz.js results): 0% on the bottom edge, 100% on the top. */
 .pv-outside > .pv-axis-tick { position: absolute; left: -8px; transform: translate(-100%, -50%); font-size: clamp(9px, .9vw, calc(12.5px * var(--pv-s, 1))); font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; white-space: nowrap; color: var(--ink-2); animation: pv-fade .4s ease var(--d, 0ms) both; }
 .pv-outside > .pv-axis-tick::after { content: ""; position: absolute; left: calc(100% + 3px); top: 50%; width: 4px; height: 1px; background: color-mix(in srgb, var(--ink) 35%, transparent); }
