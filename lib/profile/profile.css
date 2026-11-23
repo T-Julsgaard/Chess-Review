@@ -339,3 +339,18 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-fill-ghost span { position: absolute; box-sizing: border-box; padding: 10%; }
 .profile-fill-ghost span::before { content: ""; display: block; width: 100%; height: 100%; border-radius: 22%; background: var(--fill-color); }
 
+
+/* Mate in one: the missed mates as puzzles on the board (workspace.js showPuzzle, board.js play). */
+.profile-board-play .sq { cursor: pointer; touch-action: none; }
+.profile-board .sq.profile-sel::before, .profile-board .sq.profile-hint::before { content: ""; position: absolute; inset: 0; z-index: 1; background: rgba(255,230,88,.52); pointer-events: none; }
+.profile-board .sq.profile-target::after { content: ""; position: absolute; left: 39%; top: 39%; width: 22%; height: 22%; z-index: 3; border-radius: 50%; background: #0004; pointer-events: none; }
+.profile-board .profile-hint-arrow path { fill: var(--accent); opacity: .8; }
+.profile-puzzle { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px 12px; width: 100%; }
+.profile-puzzle-count { font-weight: 750; color: var(--ink); font-variant-numeric: tabular-nums; }
+.profile-puzzle-count.is-solved::after { content: " ✓"; color: var(--q-best); }
+.profile-puzzle-note { min-width: 0; }
+.profile-puzzle-note.tone-good { color: var(--q-best); font-weight: 700; }
+.profile-puzzle-note.tone-miss { color: var(--q-miss); font-weight: 700; }
+.profile-puzzle-note.tone-info { color: var(--ink); font-weight: 650; }
+.profile-puzzle-actions { display: inline-flex; gap: 6px; }
+.profile-caption-button:disabled { opacity: .45; cursor: default; }

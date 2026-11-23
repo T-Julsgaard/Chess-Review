@@ -224,6 +224,8 @@ test('features: mates in one on the board, played and missed', () => {
   assert.equal(hasMateInOne(chess), false, 'Qxf7+ is no longer mate');
   const missed = gameFeatures(g([...scholar, 'Qf3', 'Nd4']), 'a');
   assert.deepEqual([missed.m1, missed.m1Missed, missed.m1Ply], [1, 1, 7]);
+  assert.equal(missed.m1Fen, (() => { const c = new Chess(); for (const san of scholar) c.move(san); return c.fen(); })(), 'the missed position is kept for the puzzles');
+  assert.equal(needsReplay({...missed, m1Fen: ''}), true, 'a miss without its position is replayed once');
   const found = gameFeatures(g([...scholar, 'Qxf7#'], {result: 'w', termination: 'mate'}), 'a');
   assert.deepEqual([found.m1, found.m1Missed], [1, 0]);
   assert.deepEqual([gameFeatures(g(scholar), 'a').m1Missed, gameFeatures(g(scholar), 'b').m1], [1, 0], 'a game that stops with the mate on the board missed it; the other side had none');

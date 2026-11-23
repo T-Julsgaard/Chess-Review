@@ -78,14 +78,15 @@ test('insights: the one that got away is a loss on the board from ahead; your re
   assert.equal(chart.scene.label, 'Your results over time, oldest on the left.');
   assert.ok(chart.scene.columns.every(c => !c.games || Math.abs(c.w + c.d + c.l - 1) < 1e-9));
   assert.match(chart.scene.columns[0].detail, /^[A-Z][a-z]+ \d{4}: \d+ games\. Won \d+, drew \d+, lost \d+\.$/, 'a column says which month it is');
-  assert.match(chart.scene.columns[0].label, /^[A-Z][a-z]{2} ’\d\d$/, 'the first month label names its year');
+  assert.ok(chart.scene.columns.every(c => /^[A-Z][a-z]{2}$/.test(c.label)), 'every column is named by its month alone');
   assert.equal(totals(rows.slice(0, 1)).runs, null, 'one game is not a trend');
-  // Shorter spans count by week, then by day; longer ones by year.
+  // Months or years, nothing finer: a short span is still counted by month, a long one by year.
   const at = (y, m, d) => new Date(y, m, d, 12).getTime() / 1000;
-  assert.deepEqual(resultRuns([[at(2026, 2, 2), 'w'], [at(2026, 2, 5), 'l']]).map(r => [r.unit, r.games]), [['day', 1], ['day', 0], ['day', 0], ['day', 1]]);
-  const weeks = resultRuns([[at(2026, 2, 4), 'w'], [at(2026, 2, 25), 'd']]);
-  assert.ok(weeks.every(r => r.unit === 'week' && new Date(r.from * 1000).getDay() === 1), 'weeks start on Monday');
-  assert.deepEqual(resultRuns([[at(2021, 5, 1), 'w'], [at(2026, 1, 1), 'l']]).map(r => r.unit + new Date(r.from * 1000).getFullYear()), ['year2021', 'year2022', 'year2023', 'year2024', 'year2025', 'year2026']);
+  assert.deepEqual(resultRuns([[at(2026, 2, 2), 'w'], [at(2026, 2, 5), 'l']]).map(r => [r.unit, r.games]), [['month', 2]]);
+  assert.deepEqual(resultRuns([[at(2026, 2, 4), 'w'], [at(2026, 3, 25), 'd']]).map(r => [r.unit, r.games]), [['month', 1], ['month', 1]]);
+  const years = resultRuns([[at(2021, 5, 1), 'w'], [at(2026, 1, 1), 'l']]);
+  assert.deepEqual(years.map(r => r.unit + new Date(r.from * 1000).getFullYear()), ['year2021', 'year2022', 'year2023', 'year2024', 'year2025', 'year2026']);
+  assert.deepEqual(resultsOverTime(years).scene.columns.map(c => c.label), ['2021', '2022', '2023', '2024', '2025', '2026']);
   const deck = buildDeck(buildReport(rows, buildInsights(rows), {account: 'tester', site: 'chesscom'}), {account: 'tester'});
   const swings = deck.find(s => s.id === 'swings');
   assert.equal(swings.alsoEvidence.label, 'View the one that got away', 'the comeback chapter also links the lost game');
@@ -235,21 +236,24 @@ test('smoothed accuracy line weighs each day by its games and keeps every point'
 });
 
 test('insights: mates in one played and missed, and their chapter', () => {
-  const row = (id, m1, m1Missed, t = 100) => ({id, t, m1, m1Missed, m1Ply: m1Missed ? 21 : 0, res: 'w', opp: 'X', me: 'w', fenEnd: '8/8/8/8/8/8/8/8 w - - 0 1', n: 40});
+  const row = (id, m1, m1Missed, t = 100) => ({id, t, m1, m1Missed, m1Ply: m1Missed ? 21 : 0, m1Fen: m1Missed ? 'fen-' + id : '', res: 'w', opp: 'X', me: 'w', fenEnd: '8/8/8/8/8/8/8/8 w - - 0 1', n: 40});
   assert.equal(mateInOne([{id: 'old', t: 1}]), null, 'rows from before the count say nothing');
   const M = mateInOne([row('a', 2, 1, 50), row('b', 1, 0), row('c', 0, 0), row('d', 3, 2, 300), {id: 'old', t: 5}]);
   assert.deepEqual([M.games, M.chances, M.found, M.missed, M.withChance, M.withMiss], [4, 6, 3, 3, 3, 2]);
   assert.equal(M.lastMiss.id, 'd'); assert.equal(M.lastMiss.ply, 21);
+  assert.deepEqual(M.misses.map(m => [m.id, m.fen]), [['d', 'fen-d'], ['a', 'fen-a']], 'the puzzles: each missed position, newest first');
   assert.deepEqual(mateInOneShares(M), {found: 50, missed: 50});
   assert.deepEqual(mateInOneShares({chances: 3, found: 2, missed: 1}), {found: 67, missed: 33});
   assert.deepEqual(mateInOneShares({chances: 8, found: 5, missed: 3}), {found: 62, missed: 38}, 'whole percents that add up to 100');
-  const rows = season().map((r, i) => ({...r, m1: i % 10 === 0 ? 2 : 0, m1Missed: i % 30 === 0 ? 1 : 0}));
+  const rows = season().map((r, i) => ({...r, m1: i % 10 === 0 ? 2 : 0, m1Missed: i % 30 === 0 ? 1 : 0, m1Fen: i % 30 === 0 ? '6k1/5ppp/8/8/8/8/1Q3PPP/6K1 w - - 0 30' : ''}));
   const report = buildReport(rows, buildInsights(rows), {account: 'me', site: 'chesscom', period: 'year', periodLabel: 'Past 12 months'});
   const deck = buildDeck(report, {account: 'me'});
   const slide = deck.find(s => s.id === 'mate1');
   assert.ok(slide, 'the chapter is there');
   assert.equal(deck.indexOf(slide), deck.findIndex(s => s.id === 'share') - 1, 'just before the recap');
-  assert.equal(slide.board.kind, 'fill'); assert.equal(slide.board.total, report.mateInOne.chances); assert.equal(slide.board.wins, report.mateInOne.found);
+  assert.equal(slide.board.kind, 'puzzle', 'the board holds the missed mates to solve');
+  assert.equal(slide.board.puzzles.length, report.mateInOne.misses.length); assert.ok(slide.board.puzzles.length > 0);
+  assert.deepEqual(slide.evidence, slide.board.puzzles[0].link, 'the game link starts on the first puzzle');
   assert.match(slide.lead, /You played it \d+% of the time/);
   assert.equal(buildDeck(buildReport(season(), buildInsights(season()), {account: 'me'}), {account: 'me'}).some(s => s.id === 'mate1'), false, 'no chapter without the count');
 });
