@@ -7,6 +7,7 @@ import {Chess} from '../lib/chess.js';
 import {WEEKDAYS, BANDS} from '../lib/profile/insights.js';
 import {SQUARES} from '../lib/profile/features.js';
 import {createPortrait, hasPortrait, portraitCredit} from '../lib/profile/portrait.js';
+import {renderOverview} from '../lib/profile/overview.js';
 
 const $ = id => document.getElementById(id);
 const FILES = 'abcdefgh';
@@ -23,7 +24,7 @@ function buildBoard() {
 }
 const byName = name => squares.find(sq => sq.dataset.name === name);
 let timers = [], portrait = null;
-function clearBoard() { portrait?.cancel(); portrait = null; $('board').querySelector('.profile-board-overlay')?.remove(); for (const t of timers) clearTimeout(t); timers = []; for (const sq of squares) { sq.replaceChildren(); sq.className = sq.className.replace(/\b(hl|heat|fill|dim|split-l|split-r)\b/g, '').trim(); sq.style.removeProperty('--heat'); sq.style.removeProperty('--fill'); sq.removeAttribute('title'); } }
+function clearBoard() { portrait?.cancel(); portrait = null; $('board').querySelector('.profile-board-overlay, .profile-overview')?.remove(); for (const t of timers) clearTimeout(t); timers = []; for (const sq of squares) { sq.replaceChildren(); sq.className = sq.className.replace(/\b(hl|heat|fill|dim|split-l|split-r)\b/g, '').trim(); sq.style.removeProperty('--heat'); sq.style.removeProperty('--fill'); sq.removeAttribute('title'); } }
 function piece(ch) { const code = (ch === ch.toUpperCase() ? 'w' : 'b') + ch.toUpperCase(); return h('img', {src: '../pieces-img/cburnett/' + code + '.svg', alt: ''}); }
 function placeFen(fen) {
   for (const sq of squares) sq.querySelectorAll('img').forEach(n => n.remove());
@@ -64,9 +65,14 @@ function showPortrait(spec) {
 }
 function showBoard(spec, {face = true} = {}) {
   clearBoard(); $('caption').textContent = spec?.caption || '';
+  $('board').setAttribute('aria-hidden', String(spec?.kind !== 'overview'));
   if (!spec) return;
   if (face && hasPortrait(spec.portrait)) { showPortrait(spec); return; }
   switch (spec.kind) {
+    case 'overview': $('board').append(renderOverview({h, deck, report, onOpen: i => {
+      go(i);
+      $('slide').querySelector('h2').focus({preventScroll: true});
+    }})); break;
     case 'cover': { const moves = [spec.white, spec.black].filter(Boolean); if (moves.length) playMoves(moves); else placeFen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'); break; }
     case 'fen': placeFen(spec.fen); break;
     case 'moves': playMoves(spec.moves, spec.from || 0, (move, i) => { $('caption').textContent = `${spec.caption || ''} · ${Math.ceil(i / 2)}${i % 2 ? '.' : '…'} ${move.san}`; }); break;
@@ -79,10 +85,10 @@ function showBoard(spec, {face = true} = {}) {
   }
 }
 
-let deck = [], index = 0;
+let report, deck = [], index = 0;
 function render() {
   const slide = deck[index], host = $('slide'); host.replaceChildren();
-  host.append(h('span', {class: 'eyebrow'}, slide.eyebrow), h('h2', {}, slide.title), h('p', {class: 'lead'}, slide.lead || ''));
+  host.append(h('span', {class: 'eyebrow'}, slide.eyebrow), h('h2', {tabindex: '-1'}, slide.title), h('p', {class: 'lead'}, slide.lead || ''));
   if (slide.stats?.length) host.append(h('div', {class: 'stats'}, ...slide.stats.map(s => h('div', {class: 'stat' + (s.tone ? ' ' + s.tone : '')}, h('strong', {}, s.value), h('span', {}, s.label), s.sub ? h('small', {}, s.sub) : null))));
   if (slide.openings) host.append(h('div', {class: 'openings'}, ...[['As White', slide.openings.w], ['As Black', slide.openings.b]].map(([label, list]) => h('div', {}, h('h3', {}, label), ...list.map(o => h('div', {class: 'opening'}, h('span', {}, o.name), h('span', {}, `${o.games} · ${o.winRate ?? '–'}%`)))))));
   if (slide.twin) host.append(h('p', {class: 'muted'}, `${slide.twin.era}. Runner-up: ${slide.twin.runnerUp}.`));
@@ -100,7 +106,7 @@ async function main() {
   const state = $('state');
   if (!m) { state.querySelector('p').textContent = 'This page shows a player profile shared from the Chess Review extension. Open it through a share link, or install the extension to build your own.'; return; }
   try {
-    const report = await decodeProfile(m[1]);
+    report = await decodeProfile(m[1]);
     deck = buildDeck(report, {account: report.account, site: report.site, periodLabel: report.periodLabel, engineStatus: 'unavailable'});
     buildBoard();
     state.hidden = true; $('deck').hidden = false;

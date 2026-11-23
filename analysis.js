@@ -30,7 +30,7 @@ import { fullHdReferenceLayout, viewportGrowth } from "./lib/full-hd-layout.js";
 import { createScreenPreviewContext, loadScreenPreviewController } from "./lib/screen-previews.js";
 import { rememberAnalyzedGame, historyGame, inferredPlayer, inferredPlayerProfile, PLAYER_HISTORY_KEY } from "./lib/player-history.js";
 import { identityForGame, knownAccounts, IDENTITY_KEY } from "./lib/identity.js";
-import { loadProfileWorkspace, loadProfileDesigns } from "./lib/profile-loader.js";
+import { loadProfileWorkspace, loadProfileStory } from "./lib/profile-loader.js";
 import { createReviewEffects } from "./lib/review-effects.js";
 import { explainMove, explanationPv } from "./lib/move-explanation.js";
 import { createTranslator, LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, isSupportedLanguage, suggestLanguage, browserLanguages } from "./lib/i18n/index.js";
@@ -400,8 +400,6 @@ const DEFAULT_SETTINGS = {
   profileColor: "all", profileRatedOnly: false, profileSkipShort: false, profileExcludedOpponents: {},
   // Accuracy check that runs by itself after a profile is built: depth (off/fast/balanced/deep) and which games.
   profileDepth: "balanced", profileSample: "all",
-  // Player profile design (Settings → Visual → Player profile): story (default), classic, bento or editorial.
-  profileDesign: "story",
   // How the historical twin's face appears, and what the Signature moves board shows.
   profilePortraitStyle: "relief", profileSignatureBoard: "compare", profileAccuracyAnimation: "games",
   // How games appear on the board while a profile is built: film (default) or mosaic.
@@ -1828,8 +1826,8 @@ async function openProfile({shared = null, resume = null} = {}) {
     toast("Let the current practice move finish, then open the profile."); return;
   }
   openingProfile = true;
-  let ProfileWorkspace;
-  try { ({ProfileWorkspace} = await loadProfileWorkspace()); ProfileWorkspace = (await loadProfileDesigns()).profileWorkspaceClass(S.settings.profileDesign); }
+  let StoryWorkspace;
+  try { ({StoryWorkspace} = await loadProfileStory()); }
   catch (error) { console.warn(error); toast("The player profile could not load. Try again."); openingProfile = false; return; }
   if (profileWorkspace) { openingProfile = false; return; }
   pauseBackgroundAnalysis();
@@ -1841,7 +1839,7 @@ async function openProfile({shared = null, resume = null} = {}) {
   const identity = await profileIdentity(site);
   const flag = code => code ? el("img", { class: "avatar avatar-flag", src: _url(`flags/${code}.svg`), alt: countryNameForId(code) || "", draggable: "false" }) : null;
   if (!shared && !resume && profileMemory) resume = {slideId: profileMemory.slideId, state: profileMemory};
-  profileWorkspace = new ProfileWorkspace({document, storage:browserAPI.storage.local, storageEvents:browserAPI.storage.onChanged,
+  profileWorkspace = new StoryWorkspace({document, storage:browserAPI.storage.local, storageEvents:browserAPI.storage.onChanged,
     sendMessage:message=>browserAPI.runtime.sendMessage(message), stage:UI.canvas, boardWrap:UI.boardWrap, makePiece, flipped:S.flipped,
     settings:()=>S.settings, writeSettings:patch=>{Object.assign(S.settings,patch);return writeSettings(patch);}, identity, shared, resume, toast,
     icon:name=>ICONS[name]||"", flag, url:_url, uiScale:profileUiScale,
@@ -1876,17 +1874,6 @@ async function openProfile({shared = null, resume = null} = {}) {
   syncProfileToggle();
   try { await profileWorkspace.open(); }
   catch (error) { console.warn(error); toast("The player profile could not open."); profileWorkspace?.close(); }
-}
-
-// Settings → Visual → Player profile: an open profile reopens in the new design on the same chapter.
-let switchingProfileDesign = false;
-async function switchProfileDesign() {
-  const workspace = profileWorkspace;
-  if (!workspace || workspace.closed || workspace.shared || switchingProfileDesign) return;
-  switchingProfileDesign = true;
-  // Closing remembers the deck; the new design reopens it on the same chapter.
-  try { await workspace.close(); await openProfile(); }
-  finally { switchingProfileDesign = false; }
 }
 
 function syncLearningToggle() {
@@ -6614,7 +6601,7 @@ const VISUAL_SETTING_KEYS = [
   "graphStyle", "barStyle", "showCoords", "coordSize", ...BACKGROUND_SETTING_KEYS,
   "boardTheme", "pieceStyle", "boardCustomLight", "boardCustomDark",
   ...ARROW_SETTING_KEYS,
-  "moveAnim", "uiAnim", "animSpeed", "learningTransition", "profileDesign", "engineAutoHeight",
+  "moveAnim", "uiAnim", "animSpeed", "learningTransition", "engineAutoHeight",
 ];
 function resetSettingKeys(keys) {
   for (const key of keys) S.settings[key] = structuredClone(DEFAULT_SETTINGS[key]);
@@ -6727,8 +6714,6 @@ function visualSettings() {
       el("button", { class: "set-reset", onclick: resetArrowSettings }, "Reset to default"),
     ),
     section("Player profile",
-      settingDropdown("Design", "profileDesign", [["classic", "Classic"], ["story", "Story"], ["bento", "Dashboard"], ["editorial", "Editorial"]],
-        "How the Player profile recap looks. Classic is the original slide deck; Story shows one big figure per chapter with charts drawn on the board; Dashboard puts every chapter on one screen as tiles; Editorial is one scrolling page the board follows. An open profile switches straight away."),
       settingDropdown("Games while loading", "profileStream", [["film", "Film roll"], ["mosaic", "Mosaic"]],
         "What the board shows while your games are found. Film roll flashes through each game with both players' names, like a reel of your chess life, then turns into the mosaic while the accuracy check finishes; Mosaic adds a square for every game until the whole history fits on the board."),
       settingDropdown("Portrait animation", "profilePortraitStyle", [["assemble", "Assemble"], ["morph", "Morph"], ["inlay", "Inlay"], ["relief", "Relief"], ["halftone", "Mosaic"], ["swarm", "Swarm"]],
@@ -7471,7 +7456,6 @@ async function setSetting(key, value) {
   if (key === 'movesDesign') updateMovesDesign();
   if (key === 'engineDesign') renderEngineCurrent();
   if (key === 'engineAutoHeight') applyLayout();
-  if (key === 'profileDesign') switchProfileDesign();
   if (key === 'uiAnim' && S.settings.uiAnim === false) {
     overviewReveal.stop();
     Object.values(phaseReveals).forEach(reveal => reveal.stop());

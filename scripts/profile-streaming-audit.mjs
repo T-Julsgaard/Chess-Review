@@ -12,7 +12,7 @@ export async function auditLearning({review, call, evaluate, sleep, waitFor, out
   for (const [width, height] of [[1920, 1080], [1366, 768], [600, 800], [360, 800]]) {
     await call('Emulation.setDeviceMetricsOverride', {width, height, deviceScaleFactor: 1, mobile: false}, review.sessionId);
     await run(`import('./analysis.js').then(async m => {
-      m.S.settings.uiAnim = true; m.S.settings.profileDepth = 'off'; m.S.settings.profileDesign = 'story';
+      m.S.settings.uiAnim = true; m.S.settings.profileDepth = 'off';
       await m.openProfile(); const w = m.profileWorkspace; w.site = 'lichess'; w.account = 'tester'; w.period = 'all';
       const signal = w.reset(); w.phase = 'loading'; w.renderHead(); w.renderLoading(signal); w.beginPreparation(signal);
       w.rows = Array.from({length: 40}, (_, i) => ({id: String(i), site: 'lichess', t: 1767225600 + i * 3600, me: 'w', opp: 'Opponent ' + i, n: 30, myMoves: 15, cls: 'blitz', res: ['w', 'l', 'd'][i % 3], url: 'https://lichess.org/abcd1234'}));

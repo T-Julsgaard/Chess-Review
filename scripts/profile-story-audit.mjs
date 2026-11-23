@@ -9,7 +9,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   const rows = season();
   await run("document.querySelector('.lang-confirm')?.click();document.querySelector('.learning-announcement-disable')?.click()");
   await run(`import('./browser-compat.js').then(({browserAPI})=>browserAPI.storage.local.set(${JSON.stringify({[rowsKey('chesscom', 'tester')]: {rows, months: [], since: 0, updatedAt: Date.now()}})}))`);
-  await run(`import('./analysis.js').then(async m=>{m.S.settings.profileDesign='story';m.S.settings.profileDepth='off';m.S.settings.uiAnim=true;await m.openProfile();window.w=m.profileWorkspace;w.account='tester';await w.load();})`);
+  await run(`import('./analysis.js').then(async m=>{m.S.settings.profileDepth='off';m.S.settings.uiAnim=true;await m.openProfile();window.w=m.profileWorkspace;w.account='tester';await w.load();})`);
   await waitFor(review, "document.querySelector('.pv-story')?.dataset.slide==='cover'", 'Story cover');
   await sleep(800);
   await run("document.querySelector('.learning-announcement-disable')?.click()");
@@ -121,6 +121,29 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     assert.equal(await run("w.deck[w.index].id"), 'numbers');
     await sleep(1500);
     assert.equal(await run("document.querySelectorAll('.board .profile-fill').length"), 64);
+    await run('w.go(w.deck.length - 1)');
+    const overview = await run(`(() => {
+      const board = w.boardEl.getBoundingClientRect(), tiles = [...w.boardEl.querySelectorAll('.profile-overview button')];
+      return {
+        ids: tiles.map(tile => tile.dataset.chapter),
+        expected: w.deck.slice(0, -1).map(slide => slide.id),
+        fits: tiles.every(tile => {
+          const r = tile.getBoundingClientRect();
+          return r.top >= board.top && r.left >= board.left && r.bottom <= board.bottom && r.right <= board.right && tile.scrollHeight <= tile.clientHeight + 1;
+        }),
+        share: document.querySelector('.profile-share').textContent.trim(),
+      };
+    })()`);
+    assert.deepEqual(overview.ids, overview.expected);
+    assert.ok(overview.fits);
+    assert.equal(overview.share, 'Copy share link');
+    const recap = await call('Page.captureScreenshot', {format: 'png'}, review.sessionId);
+    await fs.writeFile(path.join(out, `profile-story-overview-${width}.png`), Buffer.from(recap.data, 'base64'));
+    await run("w.boardEl.querySelector('.profile-overview [data-chapter=rating]').focus()");
+    await call('Input.dispatchKeyEvent', {type: 'keyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13, text: '\r', unmodifiedText: '\r'}, review.sessionId);
+    await call('Input.dispatchKeyEvent', {type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13}, review.sessionId);
+    assert.equal(await run('w.currentSlide().id'), 'rating');
+    assert.equal(await run('document.activeElement === w.slideHost.firstElementChild'), true);
     evidence.push({width, height, initial, transition, game});
   }
   await run('w.close()');

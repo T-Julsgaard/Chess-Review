@@ -34,7 +34,7 @@ test('profile filters: opponents are counted per site, latest spelling first', (
 async function storyDeck(t) {
   const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6');
   a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
-  a.state.settings.profileDesign = 'story'; a.state.settings.profileDepth = 'off';
+  a.state.settings.profileDepth = 'off';
   t.after(() => a.run('profileWorkspace')?.close());
   const rows = season().map((r, i) => ({...r, opp: r.opp === 'tester' ? 'someone' : r.opp, rated: i % 5 !== 0}));
   a.store[rowsKey('chesscom', 'tester')] = {rows, months: [], since: 0, updatedAt: Date.now()};

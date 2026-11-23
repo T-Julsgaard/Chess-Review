@@ -34,8 +34,8 @@ another computer; the design decisions are recorded in [PLAYER_PROFILE_PLAN.md](
   category and shared-profile startup in `analysis.js`. Keyboard (arrows, Home, End, Escape),
   count-ups, slide transitions, reduced motion, chooser/empty/error/partial states, mutual
   exclusion with learning. `tests/profile-workspace.test.mjs`.
-- [x] Stage 6: share — `lib/profile/share.js` (deflated base64url payload, sanitised on decode,
-  1200×630 card with attribution), the GitHub Pages viewer in `profile/`, `#p=` handling in both
+- [x] Stage 6: share — `lib/profile/share.js` (deflated base64url payload, sanitised on decode),
+  the GitHub Pages viewer in `profile/`, `#p=` handling in both
   content scripts and `profile-viewer-content.js`, `openProfile` in the background.
 - [x] Stage 7: settings (default period, engine budget, bots toggle, storage usage, delete),
   `PRIVACY.md`, `README.md`, this tracker, full test suite, lint and package build.
@@ -47,11 +47,11 @@ plays the cover after **Build profile**. Known accounts (signed-in, remembered o
 your reviewed games) are prefilled. Saved games load immediately and newer games refresh in the background.
 The slides are: cover, the numbers, rating journey, your openings, your historical twin, signature
 moves, your rival, greatest hits, comebacks and the one that got away, chess habits, on the clock,
-then and now, how your games end, share. Each slide drives the board: first moves, progressive
+then and now, how your games end, and the overview. Each slide drives the board: first moves, progressive
 win/draw/loss fill, peak-rating position, favourite line playback, the twin's famous game or your
 most twin-like game, a destination heat-map, the rival's latest decisive position, the comeback
 from its low point, your week as a weekday-by-hour heat-map, the longest think, a then/now split,
-your latest checkmate and the share card. Every number has a sample and, where a game is involved,
+your latest checkmate and the overview tiles. Select a tile to revisit its chapter. Every number has a sample and, where a game is involved,
 an **Open** link to the platform.
 
 Section headings identify each chapter at a glance. The results board preserves fractional
@@ -71,8 +71,7 @@ the background process performs those operations because offscreen documents can
 
 Share copies a link to `https://t-julsgaard.github.io/Chess-Review/profile/#p=…`. Without the
 extension the page decodes the fragment in the browser and shows a read-only deck with install
-buttons; with the extension the same link opens the full deck on the board. **Download card**
-saves a PNG that names Chess Review and the viewer address.
+buttons. With the extension the same link opens the full deck on the board.
 
 ## Changes from the plan, and why
 

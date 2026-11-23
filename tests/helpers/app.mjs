@@ -28,7 +28,7 @@ import {rememberAnalyzedGame,historyGame} from '../../lib/player-history.js';
 import {identityForGame, knownAccounts, IDENTITY_KEY} from '../../lib/identity.js';
 import {inferredPlayer, inferredPlayerProfile, PLAYER_HISTORY_KEY} from '../../lib/player-history.js';
 import {ProfileWorkspace} from '../../lib/profile/workspace.js';
-import {profileWorkspaceClass} from '../../lib/profile/designs/index.js';
+import {StoryWorkspace} from '../../lib/profile/designs/story.js';
 import {createReviewEffects} from '../../lib/review-effects.js';
 import {explainMove, explanationPv} from '../../lib/move-explanation.js';
 import {createTranslator, LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, isSupportedLanguage, suggestLanguage, browserLanguages} from '../../lib/i18n/index.js';
@@ -73,7 +73,7 @@ export function app(t, {hardware,languages=['en-US'],savedLanguage='en',url='htt
     createScreenPreviewContext,loadScreenPreviewController,
     rememberAnalyzedGame,historyGame,identityForGame,knownAccounts,IDENTITY_KEY,inferredPlayer,inferredPlayerProfile,PLAYER_HISTORY_KEY,
     loadProfileWorkspace:async () => ({ProfileWorkspace, deleteProfileData:async () => 0, profileStorageUsage:async () => ({bytes:0,accounts:0,engine:0})}),
-    loadProfileDesigns:async () => ({profileWorkspaceClass}),
+    loadProfileStory:async () => ({StoryWorkspace}),
     createReviewEffects,
     explainMove, explanationPv,
     BADGE_APPEARANCES, BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg, puzzleResultBadge, CHECKMATE_BADGES, checkmateBadgeSvg, matedKingSquare, mateMark,

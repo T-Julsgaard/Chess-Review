@@ -13,8 +13,7 @@ import {gameFeatures} from '../lib/profile/features.js';
 function review(t) {
   const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5');
   a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
-  // These tests read the classic deck's markup; the Story design (the default) has its own tests.
-  Object.assign(a.state.settings, {profileDesign: 'classic', profileDepth: 'off'});
+  a.state.settings.profileDepth = 'off';
   t.after(() => a.run('profileWorkspace')?.close());
   return a;
 }
@@ -58,38 +57,35 @@ test('profile: seeded games render the deck on the board with navigation, stats 
   const shell = doc.querySelector('.profile-shell');
   assert.ok(shell, 'shell mounted');
   assert.equal(shell.querySelector('.profile-setup input').value, 'tester', 'the known account is prefilled');
-  assert.equal(shell.querySelector('.profile-slide'), null, 'nothing loads before Build profile');
+  assert.equal(shell.querySelector('.pv-story'), null, 'nothing loads before Build profile');
   await build(a);
   assert.equal(shell.querySelector('.profile-head-title').textContent, 'tester');
-  assert.equal(shell.querySelector('.profile-slide').dataset.slide, 'cover');
-  assert.equal(shell.querySelector('.profile-title').textContent, 'tester');
-  const dots = shell.querySelectorAll('.profile-dot');
+  assert.equal(shell.querySelector('.pv-story').dataset.slide, 'cover');
+  assert.equal(shell.querySelector('.pv-story-figure').textContent, 'tester');
+  const dots = shell.querySelectorAll('.pv-seg');
   assert.ok(dots.length >= 12, 'most slides are available: ' + dots.length);
   assert.ok(doc.querySelector('.board .profile-game-map'), 'cover shows every game on the board');
   assert.equal(doc.querySelector('.profile-map-summary').textContent, `${a.run('profileWorkspace').periodRows().length} games`);
-  shell.querySelector('.profile-nav-button:last-child').click();
-  assert.equal(shell.querySelector('.profile-slide').dataset.slide, 'numbers');
-  assert.ok(shell.querySelectorAll('.profile-stat').length >= 5);
+  shell.querySelector('.pv-next').click();
+  assert.equal(shell.querySelector('.pv-story').dataset.slide, 'numbers');
+  assert.ok(shell.querySelectorAll('.pv-fact').length >= 4);
   assert.ok(doc.querySelectorAll('.board .sq.profile-fill').length === 64, 'the fill shows every game on the board');
   assert.equal(doc.querySelector('.profile-board-caption').textContent, '', 'no explanatory text under the board');
-  shell.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'ArrowRight', bubbles: true}));
-  assert.equal(shell.querySelector('.profile-slide').dataset.slide, 'rating');
-  assert.ok(shell.querySelector('.profile-series'));
+  [...shell.querySelectorAll('.pv-seg')].find(dot => dot.title.startsWith('Rating journey')).click();
+  assert.equal(shell.querySelector('.pv-story').dataset.slide, 'rating');
+  assert.ok(doc.querySelector('.board .pv-line'));
   shell.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'End', bubbles: true}));
-  assert.equal(shell.querySelector('.profile-slide').dataset.slide, 'share');
+  assert.equal(shell.querySelector('.pv-story').dataset.slide, 'share');
   assert.ok(shell.querySelector('.profile-share button.primary').textContent.includes('Copy share link'));
   shell.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'Home', bubbles: true}));
-  assert.equal(shell.querySelector('.profile-slide').dataset.slide, 'cover');
-  dots[5].click();
-  const slide = shell.querySelector('.profile-slide');
-  assert.ok(['signature', 'twin'].includes(slide.dataset.slide));
-  if (slide.dataset.slide === 'signature') assert.ok(doc.querySelectorAll('.board .sq.profile-heat').length > 0);
-  const evidence = [...shell.querySelectorAll('.profile-evidence')];
-  for (const link of evidence) assert.ok(link.href.startsWith('https://www.chess.com/'));
+  assert.equal(shell.querySelector('.pv-story').dataset.slide, 'cover');
+  const goTo = title => [...shell.querySelectorAll('.pv-seg')].find(dot => dot.title === title).click();
+  goTo('You compared to a typical player');
+  assert.equal(shell.querySelector('.pv-story').dataset.slide, 'signature');
+  assert.ok(doc.querySelector('.board .pv-pairs'));
+  for (const link of shell.querySelectorAll('.pv-link[data-game-url]')) assert.match(link.dataset.gameUrl, /^https:\/\/www\.chess\.com\//);
   // Nothing runs by itself: the trend slide offers the check, with an estimate, until it is started.
-  dots[dots.length - 3].click();
-  const trend = [...dots].findIndex(d => d.title === 'Then and now');
-  dots[trend].click();
+  goTo('Then and now');
   assert.equal(shell.querySelector('.profile-engine .profile-button.primary').textContent, 'Check accuracy');
   assert.match(shell.querySelector('.profile-engine-estimate').textContent, /^Estimated time(Under 1 min|About .+) · \d+ games?$/);
   assert.equal(a.store[JOB_KEY], undefined);
@@ -128,7 +124,7 @@ test('profile setup: earlier usernames open as suggestions on click, and Both pu
   input.dispatchEvent(new win.KeyboardEvent('keydown', {key: 'ArrowDown', bubbles: true}));
   input.dispatchEvent(new win.KeyboardEvent('keydown', {key: 'Enter', bubbles: true}));
   assert.equal(input.value, 'tester');
-  assert.equal(shell.querySelector('.profile-slide'), null, 'Enter on a suggestion picks it instead of building');
+  assert.equal(shell.querySelector('.pv-story'), null, 'Enter on a suggestion picks it instead of building');
   const fields = shell.querySelector('.profile-account-fields');
   [...shell.querySelectorAll('.profile-setup [role="radio"]')].find(b => b.textContent === 'Lichess').click();
   assert.deepEqual([...fields.children].map(f => f.dataset.site), ['lichess']);
@@ -151,12 +147,12 @@ test('profile setup: both sites merge their games and a missing username is refu
   inputs[1].value = ''; inputs[1].dispatchEvent(new a.dom.window.Event('input'));
   shell.querySelector('.profile-build').click(); await settle();
   assert.ok(!shell.querySelector('.profile-setup-error').hidden, 'a missing Lichess username is refused');
-  assert.equal(shell.querySelector('.profile-slide'), null);
+  assert.equal(shell.querySelector('.pv-story'), null);
   inputs[1].value = 'tester-li'; inputs[1].dispatchEvent(new a.dom.window.Event('input'));
   await build(a);
   const w = a.run('profileWorkspace');
   assert.equal(w.rows.length, rows.length, 'games from both sites are combined');
-  assert.ok(shell.querySelector('.profile-lead').textContent.includes('Chess.com and Lichess'));
+  assert.ok(shell.querySelector('.pv-points').textContent.includes('Chess.com and Lichess'));
   assert.equal(a.state.settings.profileSite, 'both');
   assert.deepEqual(a.state.settings.profileAccounts, {chesscom: 'tester', lichess: 'tester-li'});
 });
@@ -185,7 +181,7 @@ test('profile setup: custom dates validate, filter the report and survive reopen
   assert.equal(w.report.period, 'custom');
   assert.equal(w.report.totals.games, expected.length);
   assert.deepEqual(a.state.settings.profileCustomPeriod, {start: '2026-03-01', end: '2026-03-31'});
-  assert.ok(shell.querySelector('.profile-head-meta').textContent.includes(w.report.periodLabel));
+  assert.ok(shell.querySelector('.pv-points').textContent.includes(w.report.periodLabel));
   await w.close(); await open(a);
   const back = a.run('profileWorkspace');
   assert.equal(back.phase, 'deck', 'reopening carries on with the same deck');
@@ -271,7 +267,7 @@ test('profile owns a clean board and shortcuts without changing the reviewed gam
     doc.body.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key, bubbles: true}));
     assert.equal(a.state.idx, idx, 'profile shortcuts leave the review position intact');
   }
-  assert.equal(doc.querySelector('.profile-slide').dataset.slide, 'cover');
+  assert.equal(doc.querySelector('.pv-story').dataset.slide, 'cover');
   a.run('profileWorkspace').close();
   assert.equal(a.state.idx, idx);
   assert.equal(doc.querySelectorAll('.board .profile-piece').length, 0);
@@ -333,18 +329,6 @@ test('closing with motion releases the board before opening another workspace', 
   a.state.settings.uiAnim = false;
 });
 
-test('a delayed share preview cannot repaint a new slide or player', async t => {
-  const a = review(t); seed(a); await openDeck(a);
-  const w = a.run('profileWorkspace'), pending = deferred(); let previews = 0;
-  w.cardCanvas = () => pending.promise;
-  w.board.card = () => { previews++; };
-  w.go(w.deck.findIndex(s => s.id === 'share'));
-  w.renderChooser();
-  pending.resolve({}); await settle();
-  assert.equal(previews, 0);
-  assert.ok(a.dom.window.document.querySelector('.profile-setup'));
-});
-
 test('setup choices preserve the form and typed names; bot games are chosen in the gear, not here', async t => {
   const a = review(t); await open(a);
   const doc = a.dom.window.document, form = doc.querySelector('.profile-setup'), title = form.querySelector('h2');
@@ -363,15 +347,13 @@ test('rating mode changes the headline, chart, evidence and board together; char
   const a = review(t); seed(a); await openDeck(a);
   const w = a.run('profileWorkspace'), doc = a.dom.window.document;
   w.go(w.deck.findIndex(slide => slide.id === 'rating'));
-  [...doc.querySelectorAll('.profile-rating-modes button')].find(button => button.textContent === 'Bullet').click();
+  [...doc.querySelectorAll('.pv-modes button')].find(button => button.textContent === 'Bullet').click();
   assert.equal(w.deck[w.index].ratingClass, 'bullet');
-  assert.ok(doc.querySelector('.profile-title').textContent.startsWith('Bullet:'));
-  assert.equal(doc.querySelector('.profile-series-line').dataset.class, 'bullet');
-  assert.equal(doc.querySelector('.profile-evidence').dataset.gameUrl, w.report.ratings.bullet.peak.url);
-  const chart = doc.querySelector('.profile-series');
-  chart.getBoundingClientRect = () => ({left: 0, width: 480});
-  chart.dispatchEvent(new a.dom.window.MouseEvent('pointermove', {clientX: 42}));
-  assert.ok(doc.querySelector('.profile-series-detail').textContent.includes(`${w.report.ratings.bullet.series[0].r} rating`));
+  assert.match(doc.querySelector('.pv-story-label').textContent, /Bullet rating/);
+  assert.equal(doc.querySelector('.pv-link').dataset.gameUrl, w.report.ratings.bullet.peak.url);
+  const chart = doc.querySelector('.board .pv-line');
+  chart.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'Home', bubbles: true, cancelable: true}));
+  assert.match(chart.getAttribute('aria-label'), new RegExp(String(w.report.ratings.bullet.series[0].r)));
   const slide = w.index;
   chart.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'ArrowRight', bubbles: true, cancelable: true}));
   assert.equal(w.index, slide, 'chart inspection cannot turn a page or replay a game');
@@ -418,16 +400,18 @@ test('profile game navigation identifies Lichess by its HTTPS hostname', async (
   }
 });
 
-test('a final position loads its full game for arrow navigation and ignores a stale load', async t => {
+test('a rating game loads for arrow navigation and ignores a stale load', async t => {
   const a = review(t); seed(a); await openDeck(a);
   const w = a.run('profileWorkspace'), doc = a.dom.window.document;
   const rating = w.deck.findIndex(slide => slide.id === 'rating');
   w.o.loadPgn = async () => '1. e4 e5 2. Nf3 Nc6 *'; w.go(rating);
+  doc.querySelector('.pv-link').click();
   await w.stepGame(-1);
   assert.ok(doc.querySelector('.profile-game-status').textContent.includes('Nf3'));
   await w.stepGame(-1); assert.ok(doc.querySelector('.profile-game-status').textContent.includes('e5'));
   w.go(0); w.go(rating);
   const pending = deferred(); w.o.loadPgn = () => pending.promise;
+  doc.querySelector('.pv-link').click();
   const load = w.stepGame(-1); w.go(1);
   pending.resolve('1. e4 e5 *'); await load;
   assert.equal(doc.querySelectorAll('.profile-piece').length, 0, 'late game moves cannot replace the results board');

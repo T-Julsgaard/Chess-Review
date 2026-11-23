@@ -4,15 +4,13 @@ import {app, loadGame, settle} from './helpers/app.mjs';
 import {season} from './helpers/profile-season.mjs';
 import {rowsKey} from '../lib/profile/store.js';
 import {IDENTITY_KEY} from '../lib/identity.js';
-import {PROFILE_DESIGNS, profileWorkspaceClass} from '../lib/profile/designs/index.js';
 import {DesignWorkspace} from '../lib/profile/designs/base.js';
 import {StoryWorkspace} from '../lib/profile/designs/story.js';
 import {seasonStats, seasonSlide} from '../lib/profile/designs/season.js';
 
-function review(t, design) {
+function review(t) {
   const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5');
   a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
-  if (design) a.state.settings.profileDesign = design;
   a.state.settings.profileDepth = 'off';
   t.after(() => a.run('profileWorkspace')?.close());
   return a;
@@ -41,14 +39,6 @@ test('profile count animations accept numeric signs and leave nonnumeric prefixe
   assert.deepEqual(nodes.map(node => node.textContent), ['+1080.2 wins', '-37', '−37', '37%', 'A42', '/42', '=42']);
 });
 
-test('profile designs: four designs, story by default and for unknown ids', () => {
-  assert.deepEqual(PROFILE_DESIGNS.map(d => d.id), ['classic', 'story', 'bento', 'editorial']);
-  assert.equal(profileWorkspaceClass('classic'), DesignWorkspace);
-  assert.equal(profileWorkspaceClass('nope'), StoryWorkspace);
-  assert.equal(profileWorkspaceClass(undefined), StoryWorkspace);
-  for (const d of PROFILE_DESIGNS) assert.equal(profileWorkspaceClass(d.id).design, d.id);
-});
-
 test('profile designs: the season counts months, fills gaps and finds the longest run of days', () => {
   const day = (y, m, d, h = 18) => new Date(y, m - 1, d, h).getTime() / 1000;
   const rows = [day(2026, 1, 3), day(2026, 1, 4), day(2026, 1, 5), day(2026, 1, 5, 20), day(2026, 3, 9)].map((t, i) => ({t, res: i % 2 ? 'l' : 'w'}));
@@ -66,17 +56,8 @@ test('profile designs: the season counts months, fills gaps and finds the longes
   assert.equal(seasonSlide(seasonStats(rows.slice(0, 2))), null, 'one month is not a season');
 });
 
-test('profile designs: classic keeps the original deck', async t => {
-  const a = review(t, 'classic'), doc = a.dom.window.document;
-  seed(a);
-  const w = await openDeck(a);
-  assert.equal(doc.querySelector('.profile-shell').dataset.design, 'classic');
-  assert.ok(!w.deck.some(s => s.id === 'season'), 'classic adds no chapters');
-  assert.equal(doc.querySelector('.profile-slide').dataset.slide, 'cover');
-});
-
 test('profile designs: story shows one figure per chapter, progress segments and charts on the board', async t => {
-  const a = review(t, 'story'), doc = a.dom.window.document;
+  const a = review(t), doc = a.dom.window.document;
   seed(a);
   const w = await openDeck(a);
   const shell = doc.querySelector('.profile-shell');
@@ -217,12 +198,13 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.ok(doc.querySelector('.board .pv-layer .pv-line-path'), 'the rating line is drawn on the board');
   assert.match(shell.querySelector('.pv-story-figure').textContent, /^[+-]?\d+$/);
   w.go(w.deck.length - 1);
-  assert.ok(shell.querySelector('.pv-recap'), 'the last chapter recaps the year');
+  assert.ok(w.boardEl.querySelector('.profile-overview'), 'the last chapter recaps the profile on the board');
   assert.ok(shell.querySelector('.profile-share button.primary'));
   assert.equal(shell.querySelector('.pv-autoplay'), null);
   let copied;
   Object.defineProperty(a.dom.window.navigator, 'clipboard', {value: {writeText: async text => { copied = text; }}, configurable: true});
   let sharing; const copy = w.copyLink.bind(w); w.copyLink = button => sharing = copy(button);
+  assert.equal(shell.querySelectorAll('.profile-share button').length, 1, 'the overview offers a share link');
   assert.equal(shell.querySelector('.pv-share'), null, 'Share lives on the last chapter, not in the header');
   shell.querySelector('.profile-share button.primary').click();
   await sharing;
@@ -233,7 +215,7 @@ test('profile designs: story shows one figure per chapter, progress segments and
 });
 
 test('closing the profile on a line chart takes its tags outside the board with it', async t => {
-  const a = review(t, 'story'), doc = a.dom.window.document;
+  const a = review(t), doc = a.dom.window.document;
   // jsdom lays nothing out: give elements the offset parent a browser would, so the tags find their place beside the board.
   Object.defineProperty(a.dom.window.HTMLElement.prototype, 'offsetParent', {configurable: true, get() { return this.isConnected ? this.parentElement : null; }});
   seed(a);
@@ -246,7 +228,7 @@ test('closing the profile on a line chart takes its tags outside the board with 
 });
 
 test('story filters keep chapters stable and each chapter opens on All', async t => {
-  const a = review(t, 'story'), doc = a.dom.window.document;
+  const a = review(t), doc = a.dom.window.document;
   seed(a);
   const stored = a.store[rowsKey('chesscom', 'tester')];
   stored.rows = stored.rows.map((row, i) => ({...row, cls: i < 5 ? 'bullet' : 'blitz'}));
@@ -278,7 +260,7 @@ test('story filters keep chapters stable and each chapter opens on All', async t
 });
 
 test('story keeps game mode buttons when only one time control is available', async t => {
-  const a = review(t, 'story'), doc = a.dom.window.document;
+  const a = review(t), doc = a.dom.window.document;
   seed(a);
   const stored = a.store[rowsKey('chesscom', 'tester')];
   stored.rows = stored.rows.map(row => ({...row, cls: 'blitz'}));
@@ -297,7 +279,7 @@ test('story keeps game mode buttons when only one time control is available', as
 });
 
 test('story time controls read Bullet, Blitz, Daily; habit dots and clock columns morph in place', async t => {
-  const a = review(t, 'story'), doc = a.dom.window.document;
+  const a = review(t), doc = a.dom.window.document;
   seed(a);
   const stored = a.store[rowsKey('chesscom', 'tester')];
   // Blitz is played most, yet the switch keeps the usual order.
@@ -367,27 +349,8 @@ test('story time controls read Bullet, Blitz, Daily; habit dots and clock column
   if (doc.querySelectorAll('.pv-modes button').length > 1) assert.deepEqual([...doc.querySelectorAll('.pv-modes button')].map(b => b.textContent), ['Bullet', 'Blitz', 'Daily'].filter(l => [...doc.querySelectorAll('.pv-modes button')].some(b => b.textContent === l)));
 });
 
-test('profile designs: dashboard opens on a grid, previews and opens chapters, Escape returns', async t => {
-  const a = review(t, 'bento'), doc = a.dom.window.document;
-  seed(a);
-  const w = await openDeck(a);
-  const shell = doc.querySelector('.profile-shell');
-  assert.equal(w.deck[0].id, 'overview');
-  assert.ok(!w.deck.some(s => s.id === 'cover'), 'the grid replaces the cover');
-  const tiles = shell.querySelectorAll('.pv-tile-card');
-  assert.ok(tiles.length >= 10, 'tiles: ' + tiles.length);
-  assert.ok(doc.querySelector('.board .profile-game-map'), 'the board shows the entire game history');
-  shell.querySelector('.pv-tile-card[data-chapter="rating"]').click();
-  assert.equal(shell.querySelector('.pv-detail').dataset.slide, 'rating');
-  assert.ok(doc.querySelector('.board .pv-line-path'));
-  assert.ok(!w.nav.hidden);
-  key(a, 'Escape');
-  assert.ok(shell.querySelector('.pv-bento'), 'Escape goes back to the grid');
-  assert.ok(a.run('profileWorkspace'), 'and keeps the profile open');
-});
-
 test('story rating inspection survives filtering and game Exit restores the selected chart', async t => {
-  const a = review(t, 'story'), doc = a.dom.window.document;
+  const a = review(t), doc = a.dom.window.document;
   seed(a); const w = await openDeck(a), reviewFen = a.state.positions[a.state.idx].fen;
   w.go(w.deck.findIndex(s => s.id === 'numbers'));
   [...doc.querySelectorAll('.pv-filter button')].find(b => b.textContent === 'Bullet').click();
@@ -440,48 +403,45 @@ test('story rating inspection survives filtering and game Exit restores the sele
   assert.equal(doc.querySelector('.profile-game-chrome'), null, 'mosaic games open on their platform');
 });
 
-test('profile designs: editorial is one page whose rail and board follow the chapter', async t => {
-  const a = review(t, 'editorial'), doc = a.dom.window.document;
-  seed(a);
-  const w = await openDeck(a);
-  const shell = doc.querySelector('.profile-shell');
-  const sections = shell.querySelectorAll('.pv-ed-chapter');
-  assert.equal(sections.length, w.deck.length, 'every chapter is on the page');
-  assert.equal(shell.querySelectorAll('.pv-ed-rail button').length, w.deck.length);
-  assert.ok(shell.querySelector('.pv-ed-vs'), 'habits are compared with a typical club player');
-  const rival = w.deck.findIndex(s => s.id === 'rival');
-  shell.querySelectorAll('.pv-ed-rail button')[rival].click();
-  assert.equal(w.index, rival);
-  assert.ok(shell.querySelectorAll('.pv-ed-rail button')[rival].classList.contains('on'));
-  const endings = w.deck.findIndex(s => s.id === 'endings');
-  key(a, 'End');
-  assert.equal(w.index, w.deck.length - 1);
-  w.go(endings);
-  assert.ok(doc.querySelectorAll('.board .pv-layer .pv-tile').length > 4, 'endings are columns on the board');
-  w.renderSetup();
-  assert.equal(shell.querySelector('.pv-ed-rail'), null, 'the rail leaves with the deck');
-});
-
-test('profile designs: Settings → Visual offers the designs and switching reopens on the same chapter', async t => {
+test('profile settings keep Story even with a saved legacy design', async t => {
   const a = review(t), doc = a.dom.window.document;
   seed(a);
   a.call('toggleSettings'); a.call('selectSettingsCategory', 'visual');
   const text = doc.querySelector('#settings').textContent;
   assert.ok(text.includes('Player profile'));
-  for (const setting of ['profileDesign', 'profilePortraitStyle', 'profileSignatureBoard']) assert.ok(doc.querySelector(`#settings .lib-dd-btn[data-setting="${setting}"]`), setting);
-  assert.equal(a.state.settings.profileDesign, 'story');
+  assert.equal(doc.querySelector('#settings [data-setting="profileDesign"]'), null);
+  for (const setting of ['profilePortraitStyle', 'profileSignatureBoard']) assert.ok(doc.querySelector(`#settings .lib-dd-btn[data-setting="${setting}"]`), setting);
+  a.state.settings.profileDesign = 'bento';
   const w = await openDeck(a);
-  w.go(w.deck.findIndex(s => s.id === 'rival'));
-  await a.call('setSetting', 'profileDesign', 'classic'); for (let i = 0; i < 10; i++) await settle();
-  const next = a.run('profileWorkspace');
-  assert.notEqual(next, w);
-  assert.equal(next.design, 'classic');
-  assert.equal(next.deck[next.index]?.id, 'rival', 'the new design opens on the chapter you were reading');
-  assert.equal(doc.querySelectorAll('.profile-shell').length, 1);
+  assert.ok(w instanceof StoryWorkspace);
+  assert.equal(w.currentSlide().id, 'cover');
+});
+
+test('the final Story board summarizes the available chapters and opens them directly', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  seed(a);
+  const w = await openDeck(a);
+  const ids = w.deck.slice(0, -1).map(slide => slide.id);
+  const tiles = () => [...w.boardEl.querySelectorAll('.profile-overview button')];
+  key(a, 'End');
+  assert.equal(w.currentSlide().eyebrow, 'Overview');
+  assert.deepEqual(tiles().map(button => button.dataset.chapter), ids);
+  assert.match(tiles().find(button => button.dataset.chapter === 'numbers').textContent, new RegExp(String(w.report.totals.games)));
+  assert.ok(tiles().every(button => button.type === 'button' && button.tabIndex === 0));
+  for (const id of ids) {
+    w.go(w.deck.length - 1);
+    tiles().find(button => button.dataset.chapter === id).click();
+    assert.equal(w.currentSlide().id, id);
+    assert.equal(tiles().length, 0);
+    assert.equal(doc.activeElement, w.slideHost.firstElementChild);
+  }
+  w.go(w.deck.length - 1);
+  w.renderSetup();
+  assert.equal(doc.querySelector('.profile-overview'), null);
 });
 
 test('leaving the profile and coming back reopens the deck on the same chapter and filter, without loading', async t => {
-  const a = review(t, 'story'), doc = a.dom.window.document;
+  const a = review(t), doc = a.dom.window.document;
   seed(a);
   const w = await openDeck(a);
   w.go(w.deck.findIndex(s => s.id === 'habits'));
@@ -505,7 +465,7 @@ test('leaving the profile and coming back reopens the deck on the same chapter a
 });
 
 test('story Compare keeps the chosen time control, on the rival chapter too', async t => {
-  const a = review(t, 'story'), doc = a.dom.window.document;
+  const a = review(t), doc = a.dom.window.document;
   seed(a);
   a.store[rowsKey('chesscom', 'other')] = {...a.store[rowsKey('chesscom', 'tester')], updatedAt: Date.now()};
   const w = await openDeck(a);
@@ -521,7 +481,7 @@ test('story Compare keeps the chosen time control, on the rival chapter too', as
 });
 
 test('story Compare turns into Switch: press to swap players, × to stop', async t => {
-  const a = review(t, 'story'), doc = a.dom.window.document;
+  const a = review(t), doc = a.dom.window.document;
   seed(a);
   a.store[rowsKey('chesscom', 'other')] = {...a.store[rowsKey('chesscom', 'tester')], updatedAt: Date.now()};
   const w = await openDeck(a);
@@ -550,7 +510,7 @@ test('story Compare turns into Switch: press to swap players, × to stop', async
 });
 
 test('story chapters without enough games in a time control all say the same, and only that', async t => {
-  const a = review(t, 'story'), doc = a.dom.window.document;
+  const a = review(t), doc = a.dom.window.document;
   seed(a);
   const stored = a.store[rowsKey('chesscom', 'tester')];
   // Six rapid games: the switch offers Rapid, but no chapter has enough of them.
