@@ -255,8 +255,8 @@ test('story keeps game mode buttons when only one time control is available', as
   const w = await openDeck(a);
   for (const id of ['numbers', 'season', 'openings', 'signature', 'rival', 'hits', 'habits', 'clock', 'endings']) {
     w.go(w.deck.findIndex(slide => slide.id === id));
-    // Greatest hits and comebacks show one time control at a time: no All.
-    const single = ['hits', 'swings'].includes(id);
+    // Comebacks show one time control at a time: no All. Greatest hits has All again.
+    const single = ['swings'].includes(id);
     assert.deepEqual([...doc.querySelectorAll('.pv-filter button')].map(button => button.textContent), single ? ['Blitz'] : ['All', 'Blitz'], id);
     if (single) assert.equal(w.cls, 'blitz', id);
     doc.querySelector('.pv-filter button[data-value="blitz"]').click();
@@ -321,11 +321,15 @@ test('story time controls read Bullet, Blitz, Daily; habit dots and clock column
   w.go(w.deck.findIndex(s => s.id === 'habits'));
   assert.equal(w.cls, 'all', 'habits opens on All again');
   w.go(w.deck.findIndex(s => s.id === 'hits'));
-  assert.equal(w.cls, 'blitz', 'greatest hits opens on the time control played most');
-  pick('Bullet');
+  assert.equal(w.cls, 'all', 'greatest hits opens on All');
+  assert.deepEqual(labels(), ['All', 'Bullet', 'Blitz', 'Daily'], 'greatest hits offers All again');
   if (w.deck.some(s => s.id === 'swings')) {
     w.go(w.deck.findIndex(s => s.id === 'swings'));
-    assert.equal(w.cls, 'bullet', 'moving between one-time-control chapters keeps the pick');
+    assert.equal(w.cls, 'blitz', 'comebacks open on the time control played most');
+    pick('Bullet');
+    w.go(w.deck.findIndex(s => s.id === 'swings') + 1);
+    w.go(w.deck.findIndex(s => s.id === 'swings'));
+    assert.equal(w.cls, 'blitz', 'and again when entered from an All chapter');
   }
   w.go(w.deck.findIndex(s => s.id === 'trend'));
   assert.equal(w.cls, 'all', 'other chapters still open on All');
@@ -483,5 +487,53 @@ test('story Compare keeps the chosen time control, on the rival chapter too', as
     assert.equal(w.deck[w.index].id, id);
     assert.equal(doc.querySelector('.pv-filter button.on').textContent, 'Blitz', id);
     assert.ok(await w.switchPlayer({site: 'chesscom', account: 'tester'}));
+  }
+});
+
+test('story Compare turns into the other player\'s name: press to swap, × to stop', async t => {
+  const a = review(t, 'story'), doc = a.dom.window.document;
+  seed(a);
+  a.store[rowsKey('chesscom', 'other')] = {...a.store[rowsKey('chesscom', 'tester')], updatedAt: Date.now()};
+  const w = await openDeck(a);
+  w.go(w.deck.findIndex(slide => slide.id === 'clock'));
+  const title = () => doc.querySelector('.pv-head-name .profile-head-title').textContent;
+  const swap = () => doc.querySelector('.pv-compare-swap');
+  assert.equal(doc.querySelector('.pv-compare').textContent, 'Compare');
+  const [other] = await w.comparablePlayers();
+  const layer = doc.querySelector('.board .pv-layer');
+  assert.ok(await w.pickCompare(other));
+  assert.equal(title(), 'other');
+  assert.equal(swap().textContent, 'tester', 'the button names the player the comparison started from');
+  assert.ok(doc.querySelector('.pv-compare-stop'), 'with a × to stop');
+  assert.equal(w.deck[w.index].id, 'clock', 'the same chapter stays');
+  assert.equal(doc.querySelector('.board .pv-layer'), layer, 'the columns change in place instead of drawing again');
+  swap().click(); for (let i = 0; i < 6; i++) await settle();
+  assert.equal(title(), 'tester');
+  assert.equal(swap().textContent, 'other', 'after the swap it names the other player');
+  swap().click(); for (let i = 0; i < 6; i++) await settle();
+  assert.equal(title(), 'other');
+  doc.querySelector('.pv-compare-stop').click(); for (let i = 0; i < 6; i++) await settle();
+  assert.equal(title(), 'tester', 'stopping goes back to the player the comparison started from');
+  assert.equal(doc.querySelector('.pv-compare-swap'), null);
+  assert.equal(doc.querySelector('.pv-compare').textContent, 'Compare');
+});
+
+test('story chapters without enough games in a time control all say the same, and only that', async t => {
+  const a = review(t, 'story'), doc = a.dom.window.document;
+  seed(a);
+  const stored = a.store[rowsKey('chesscom', 'tester')];
+  // Six rapid games: the switch offers Rapid, but no chapter has enough of them.
+  stored.rows = stored.rows.map((row, i) => ({...row, cls: i < 6 ? 'rapid' : 'blitz'}));
+  const w = await openDeck(a);
+  for (const id of ['numbers', 'openings', 'signature', 'hits', 'habits', 'clock', 'trend', 'endings']) {
+    const at = w.deck.findIndex(slide => slide.id === id); if (at < 0) continue;
+    w.go(at);
+    const rapid = doc.querySelector('.pv-filter button[data-value="rapid"]'); if (!rapid) continue;
+    rapid.click();
+    const story = doc.querySelector('.pv-story');
+    assert.equal(story.querySelector('.pv-story-figure').textContent, 'Not enough games', id);
+    assert.equal(story.querySelector('.pv-story-label'), null, id + ': no figure label');
+    for (const extra of ['.pv-tabs', '.pv-wdl', '.pv-endings', '.pv-link', '.profile-engine', '.pv-grain', '.pv-fact']) assert.equal(story.querySelector(extra), null, `${id}: ${extra}`);
+    assert.equal(doc.querySelector('.board .pv-layer:not(.pv-leaving)'), null, id + ': no chart on the board');
   }
 });

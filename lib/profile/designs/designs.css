@@ -174,6 +174,14 @@
 /* Compare: switch the deck to another player read before, on the same chapter (story.js toggleCompare). */
 .pv-head-actions { position: relative; display: flex; align-items: center; gap: 6px; flex: none; }
 .pv-compare.on { color: var(--ink); border-color: var(--pv-tint); }
+/* Comparing: the other player's name (press to show them) and a × that ends the comparison. */
+.pv-compare.is-pair { display: inline-flex; align-items: stretch; padding: 0; max-width: 190px; cursor: default; color: var(--ink); border-color: color-mix(in srgb, var(--pv-tint, var(--accent)) 55%, transparent); background: color-mix(in srgb, var(--pv-vivid, var(--accent)) 9%, transparent); }
+.pv-compare-swap, .pv-compare-stop { border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; transition: color .15s, background .15s; }
+.pv-compare-swap { min-width: 0; padding: 6px 6px 6px 12px; border-radius: 999px 0 0 999px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pv-compare-stop { flex: none; display: grid; place-items: center; width: 24px; padding: 0 4px 0 0; border-radius: 0 999px 999px 0; color: var(--ink-2); font-size: 15px; line-height: 1; }
+.pv-compare-swap:hover { background: color-mix(in srgb, var(--pv-vivid, var(--accent)) 12%, transparent); }
+.pv-compare-stop:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 9%, transparent); }
+.pv-compare-swap:focus-visible, .pv-compare-stop:focus-visible { outline: 2px solid var(--pv-tint, var(--accent)); outline-offset: -2px; }
 .pv-compare-menu { position: absolute; top: calc(100% + 6px); right: 0; z-index: 20; min-width: 220px; max-width: 280px; max-height: 320px; overflow: auto; display: grid; gap: 2px; padding: 6px; border-radius: 12px; outline: none;
   background: color-mix(in srgb, var(--panel) 92%, var(--ink) 4%); border: 1px solid var(--line); box-shadow: 0 18px 44px -14px color-mix(in srgb, #000 60%, transparent); transform-origin: top right; }
 .pv-compare-head { padding: 4px 10px 2px; font-size: 10px; font-weight: 800; letter-spacing: 1.3px; text-transform: uppercase; color: var(--ink-2); }
@@ -182,12 +190,11 @@
 .pv-compare-item small { font-size: 11px; color: var(--ink-2); }
 .pv-compare-item:hover, .pv-compare-item:focus-visible { outline: none; background: color-mix(in srgb, var(--pv-vivid, var(--accent)) 14%, transparent); }
 .pv-compare-empty { margin: 0; padding: 8px 10px; font-size: 12px; line-height: 1.45; color: var(--ink-2); }
-/* Settings: the gear left of Compare, which games count (workspace.js fillSettings, filters.js). */
+/* Settings: the gear right of Share, which games count (workspace.js fillSettings, filters.js). */
 .profile-head-actions { position: relative; }
 .pv-head-name { display: grid; gap: 1px; min-width: 0; }
 .pv-head-name .profile-head-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pv-head-note { font-size: 11px; font-weight: 650; color: var(--pv-tint, var(--accent)); white-space: nowrap; }
-.pv-head-note[hidden] { display: none; }
+.pv-set-note { margin: 0; padding: 2px 10px 4px; font-size: 12px; font-weight: 650; color: var(--pv-tint, var(--accent)); }
 .pv-settings { position: relative; width: 30px; height: 30px; flex: none; display: grid; place-items: center; padding: 0; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); background: transparent; color: var(--ink-2); cursor: pointer; transition: color .15s, border-color .15s, transform .3s cubic-bezier(.2,.8,.2,1); }
 .pv-settings svg { width: 15px; height: 15px; display: block; }
 .pv-settings:hover, .pv-settings.on { color: var(--ink); border-color: var(--pv-tint, var(--accent)); }

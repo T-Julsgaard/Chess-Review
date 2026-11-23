@@ -44,38 +44,45 @@ async function storyDeck(t) {
   return {a, doc: a.dom.window.document, w: a.run('profileWorkspace')};
 }
 
-test('profile gear: leaves a player out, notes it under the name and brings them back', async t => {
+test('profile gear: leaves a player out, says so in the menu and brings them back', async t => {
   const {a, doc, w} = await storyDeck(t);
   const gear = doc.querySelector('.pv-head-actions .pv-settings');
   assert.ok(gear, 'the gear sits with Compare and Share');
-  assert.deepEqual([...doc.querySelector('.pv-head-actions').children].map(n => n.className.split(' ')[0]), ['pv-settings', 'pv-compare', 'pv-share']);
+  assert.deepEqual([...doc.querySelector('.pv-head-actions').children].map(n => n.className.split(' ')[0]), ['pv-compare', 'pv-share', 'pv-settings'], 'the gear is right of Share');
+  assert.equal(doc.querySelector('.pv-head-note'), null, 'nothing under the name');
   const total = w.periodRows().length;
   w.go(w.deck.findIndex(slide => slide.id === 'rival'));
   assert.equal(w.currentSlide().rival?.name, 'rival_rick');
   gear.click();
   const menu = doc.querySelector('.pv-settings-menu');
   assert.ok(menu && gear.getAttribute('aria-expanded') === 'true');
-  assert.equal(doc.querySelector('.pv-head-note').hidden, true);
+  assert.equal(menu.querySelector('.pv-set-note'), null, 'no games left out yet');
   const rick = [...menu.querySelectorAll('.pv-set-opp')].find(b => b.querySelector('strong').textContent === 'rival_rick');
   assert.ok(rick, 'the most-played opponents are listed');
   const games = total - w.periodRows().filter(r => r.opp !== 'rival_rick').length;
-  rick.click();
+  rick.focus(); rick.click();
   assert.equal(w.periodRows().length, total - games);
   assert.equal(w.deck[w.index].id, 'rival', 'the same chapter stays on screen');
   assert.notEqual(w.currentSlide().rival?.name, 'rival_rick', 'the rival is the next most-played opponent');
   assert.deepEqual(a.state.settings.profileExcludedOpponents, {'chesscom:tester': ['rival_rick']});
   assert.ok(gear.classList.contains('active'));
-  assert.equal(doc.querySelector('.pv-head-note').textContent, `${games} games left out`);
+  const note = doc.querySelector('.pv-settings-menu .pv-set-note');
+  assert.equal(note.textContent, `${games} games left out`);
+  assert.equal(note.previousElementSibling.textContent, 'Games to count', 'the note sits under the heading');
+  assert.ok(note.nextElementSibling.classList.contains('pv-set-row'), 'and above Colour');
   assert.ok(doc.querySelector('.pv-settings-menu'), 'the menu stays open after a choice');
+  assert.ok(doc.activeElement.classList.contains('pv-set-opp'), 'the next player in the list takes the focus, not the search');
   const chip = doc.querySelector('.pv-set-chip');
   assert.equal(chip.textContent.replace('×', ''), 'rival_rick');
   // The search finds opponents beyond the first few.
   const search = doc.querySelector('.pv-set-search');
   search.value = 'nina'; search.dispatchEvent(new a.dom.window.Event('input'));
   assert.deepEqual([...doc.querySelectorAll('.pv-set-opp strong')].map(n => n.textContent), ['nemesis_nina']);
-  chip.click();
+  search.value = ''; search.dispatchEvent(new a.dom.window.Event('input'));
+  chip.focus(); chip.click();
   assert.equal(w.periodRows().length, total);
-  assert.equal(doc.querySelector('.pv-head-note').hidden, true);
+  assert.equal(doc.querySelector('.pv-settings-menu .pv-set-note'), null);
+  assert.notEqual(doc.activeElement, doc.querySelector('.pv-set-search'), 'bringing a player back does not focus the search');
   assert.ok(!gear.classList.contains('active'));
   doc.querySelector('.pv-settings-menu').dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
   assert.equal(doc.querySelector('.pv-settings-menu'), null);

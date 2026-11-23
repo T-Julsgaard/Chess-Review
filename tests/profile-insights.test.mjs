@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {buildInsights, totals, habits, opponents, streaks, signature, ratings, openings, material, terminations, byOpponentRating, smoothed} from '../lib/profile/insights.js';
+import {buildInsights, totals, habits, opponents, streaks, signature, ratings, openings, material, terminations, byOpponentRating, smoothed, resultRuns} from '../lib/profile/insights.js';
 import {classify, ARCHETYPES, tendencies} from '../lib/profile/archetypes.js';
 import {buildDeck, buildReport, fmt, resultsByRating, resultsOverTime} from '../lib/profile/deck.js';
 import {Chess} from '../lib/chess.js';
@@ -60,23 +60,32 @@ test('insights: results by opponent rating never leave an empty column', () => {
   assert.ok(even.bands.every(b => b.to - b.from + 1 === even.step));
 });
 
-test('insights: the one that got away is a loss on the board from ahead; your results over time come in runs of games', () => {
+test('insights: the one that got away is a loss on the board from ahead; your results over time come by calendar month', () => {
   const base = {res: 'l', matMin: 0, matMax: 5, t: 1};
   const M = material([{...base, id: 'draw', res: 'd', term: 'repetition', matMax: 9}, {...base, id: 'flag', term: 'time', matMax: 8}, {...base, id: 'resigned', term: 'resign'}]);
   assert.equal(M.choke.id, 'resigned', 'draws and losses on time do not count');
   assert.equal(material([{...base, res: 'd', term: 'agree'}]).choke, null);
   const rows = season(), T = totals(rows);
-  assert.equal(T.runs.length, 12, 'twelve runs of consecutive games');
-  assert.equal(T.runs.reduce((s, r) => s + r.games, 0), T.games, 'every game in one run');
+  const span = new Date(T.runs.at(-1).from * 1000), start = new Date(T.runs[0].from * 1000);
+  assert.ok(T.runs.every(r => r.unit === 'month'), 'a season of games is counted by calendar month');
+  assert.equal(T.runs.length, (span.getFullYear() - start.getFullYear()) * 12 + span.getMonth() - start.getMonth() + 1, 'one column per month, none skipped');
+  assert.ok(T.runs.every(r => new Date(r.from * 1000).getDate() === 1 && new Date((r.to + 1) * 1000).getDate() === 1), 'each column is a whole month');
+  assert.equal(T.runs.reduce((s, r) => s + r.games, 0), T.games, 'every game in one month');
   assert.deepEqual(['w', 'd', 'l'].map(k => T.runs.reduce((s, r) => s + r[k], 0)), [T.w, T.d, T.l]);
-  assert.ok(T.runs.every((r, i) => r.from <= r.to && (!i || T.runs[i - 1].to <= r.from)), 'oldest first');
+  assert.ok(T.runs.every((r, i) => r.from <= r.to && (!i || T.runs[i - 1].to < r.from)), 'oldest first');
   const chart = resultsOverTime(T.runs);
   assert.equal(chart.scene.type, 'results');
   assert.equal(chart.scene.label, 'Your results over time, oldest on the left.');
-  assert.ok(chart.scene.columns.every(c => c.games >= 5), 'runs of at least five games when there are enough');
-  assert.ok(chart.scene.columns.every(c => Math.abs(c.w + c.d + c.l - 1) < 1e-9));
-  assert.match(chart.scene.columns[0].detail, /: \d+ games\. Won \d+, drew \d+, lost \d+\.$/);
+  assert.ok(chart.scene.columns.every(c => !c.games || Math.abs(c.w + c.d + c.l - 1) < 1e-9));
+  assert.match(chart.scene.columns[0].detail, /^[A-Z][a-z]+ \d{4}: \d+ games\. Won \d+, drew \d+, lost \d+\.$/, 'a column says which month it is');
+  assert.match(chart.scene.columns[0].label, /^[A-Z][a-z]{2} ’\d\d$/, 'the first month label names its year');
   assert.equal(totals(rows.slice(0, 1)).runs, null, 'one game is not a trend');
+  // Shorter spans count by week, then by day; longer ones by year.
+  const at = (y, m, d) => new Date(y, m, d, 12).getTime() / 1000;
+  assert.deepEqual(resultRuns([[at(2026, 2, 2), 'w'], [at(2026, 2, 5), 'l']]).map(r => [r.unit, r.games]), [['day', 1], ['day', 0], ['day', 0], ['day', 1]]);
+  const weeks = resultRuns([[at(2026, 2, 4), 'w'], [at(2026, 2, 25), 'd']]);
+  assert.ok(weeks.every(r => r.unit === 'week' && new Date(r.from * 1000).getDay() === 1), 'weeks start on Monday');
+  assert.deepEqual(resultRuns([[at(2021, 5, 1), 'w'], [at(2026, 1, 1), 'l']]).map(r => r.unit + new Date(r.from * 1000).getFullYear()), ['year2021', 'year2022', 'year2023', 'year2024', 'year2025', 'year2026']);
   const deck = buildDeck(buildReport(rows, buildInsights(rows), {account: 'tester', site: 'chesscom'}), {account: 'tester'});
   const swings = deck.find(s => s.id === 'swings');
   assert.equal(swings.alsoEvidence.label, 'View the one that got away', 'the comeback chapter also links the lost game');
@@ -130,6 +139,14 @@ test('archetypes: every roster entry is well formed, famous lines are legal, and
   const twin = classify(rows);
   assert.ok(twin.winner.name && twin.runnerUp.name !== twin.winner.name);
   assert.ok(twin.winner.reasons.length >= 2 && twin.winner.reasons.every(r => /%|\d/.test(r)));
+  // A figure that is normal for the rating ("you win 50%, against about 51%") is never offered as a reason.
+  const average = rows.map((r, i) => ({...r, res: ['w', 'l', 'w', 'l', 'd'][i % 5]}));
+  for (const set of [rows, average]) for (const archetype of classify(set).ranking) for (const line of archetype.reasons) {
+    const [mine, theirs] = line.split(', against about ');
+    if (theirs == null) continue;
+    const a = Number(mine.match(/\d+(\.\d+)?/g).at(-1)), b = Number(theirs.match(/\d+(\.\d+)?/)[0]);
+    assert.ok(Math.abs(a - b) >= (/\d\.\d/.test(theirs) ? .1 : 3), `${archetype.name}: ${line}`);
+  }
   assert.ok(twin.exemplar && twin.exemplar.fen);
   assert.equal(classify(rows.slice(0, 5)), null);
   const t = tendencies(rows);
