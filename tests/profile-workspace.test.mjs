@@ -85,11 +85,12 @@ test('profile: seeded games render the deck on the board with navigation, stats 
   if (slide.dataset.slide === 'signature') assert.ok(doc.querySelectorAll('.board .sq.profile-heat').length > 0);
   const evidence = [...shell.querySelectorAll('.profile-evidence')];
   for (const link of evidence) assert.ok(link.href.startsWith('https://www.chess.com/'));
-  // With the accuracy check off nothing runs, and there is no button to press on the trend slide.
+  // Nothing runs by itself: the trend slide offers the check, with an estimate, until it is started.
   dots[dots.length - 3].click();
   const trend = [...dots].findIndex(d => d.title === 'Then and now');
   dots[trend].click();
-  assert.equal(shell.querySelector('.profile-engine .profile-button.primary'), null);
+  assert.equal(shell.querySelector('.profile-engine .profile-button.primary').textContent, 'Check accuracy');
+  assert.match(shell.querySelector('.profile-engine-estimate').textContent, /^Estimated time: /);
   assert.equal(a.store[JOB_KEY], undefined);
   // A running job for this account shows progress instead of the button.
   a.store[JOB_KEY] = {status: 'running', site: 'chesscom', account: 'tester', done: 3, total: 40, updatedAt: Date.now(), perGameMs: 5000};
@@ -431,7 +432,7 @@ test('a final position loads its full game for arrow navigation and ignores a st
   assert.equal(doc.querySelectorAll('.profile-piece').length, 0, 'late game moves cannot replace the results board');
 });
 
-test('profile: the accuracy check finishes before the deck opens, with the chosen depth, and reviewed library games count', async t => {
+test('profile: the accuracy check starts from the accuracy chapter, with the chosen depth and games, and reviewed library games count', async t => {
   const a = review(t), doc = a.dom.window.document;
   seed(a);
   const rows = season();
@@ -439,27 +440,42 @@ test('profile: the accuracy check finishes before the deck opens, with the chose
     {id: 'lib2', myName: 'someone-else', myAcc: 50, date: '2026.03.01', meta: {}}];
   Object.assign(a.state.settings, {profileDepth: 'fast', profileSample: 'auto'});
   await open(a);
+  assert.equal(doc.querySelector('.profile-setup').textContent.includes('Accuracy check'), false, 'the setup no longer asks about accuracy');
   const sent = [], w = a.run('profileWorkspace');
   w.o.sendMessage = async message => {
     sent.push(message);
     if (message.action === 'start') {
-      assert.equal(w.phase, 'loading'); assert.equal(w.report, null);
+      assert.equal(w.phase, 'deck', 'the deck is already open');
       for (const row of message.job.rows) await w.store.saveEngine(message.job.site, row.id, {v: 1, acc: 80, t: row.t});
       await w.store.saveJob({...message.job, status: 'done', done: message.job.rows.length, total: message.job.rows.length, failed: 0, startedAt: Date.now(), finishedAt: Date.now()});
     }
     return {ok: true};
   };
   await build(a);
-  const start = sent.find(m => m.type === 'profileEngine' && m.action === 'start');
-  assert.ok(start, 'the check starts without a button');
-  assert.equal(start.job.depth, 6);
-  assert.ok(start.job.deadlineMs > 0, 'auto has a time budget');
-  assert.ok(!start.job.rows.some(r => r.id === rows.at(-2).id), 'the reviewed library game is not checked again');
-  for (let i = 0; i < 1000 && w.phase === 'loading'; i++) await settle();
+  assert.equal(w.phase, 'deck');
+  assert.equal(sent.filter(m => m.action === 'start').length, 0, 'building the profile runs no engine');
   assert.equal(w.report.engine.libraryGames, 1, 'only the same player\'s reviewed games count');
-  assert.equal(doc.querySelector('.profile-engine .profile-button.primary'), null, 'nothing to press');
-  // Building again for the same selection does not start a second check.
-  const starts = sent.filter(m => m.action === 'start').length;
-  assert.equal(w.phase, 'deck'); assert.ok(w.report.engine.games > 1);
-  w.reveal(); assert.equal(sent.filter(m => m.action === 'start').length, starts);
+  w.go(w.deck.findIndex(slide => slide.id === 'trend'));
+  const engine = () => doc.querySelector('.profile-engine');
+  // The remembered depth and games are preselected; changing them updates the estimate.
+  assert.equal(engine().querySelector('[data-engine="depth:fast"]').getAttribute('aria-checked'), 'true');
+  const before = engine().querySelector('.profile-engine-estimate').textContent;
+  engine().querySelector('[data-engine="depth:deep"]').click();
+  engine().querySelector('[data-engine="sample:all"]').click();
+  assert.notEqual(engine().querySelector('.profile-engine-estimate').textContent, before);
+  assert.match(engine().querySelector('.profile-engine-estimate').textContent, /^Estimated time: .+ · \d+ games\.$/);
+  engine().querySelector('[data-engine="start"]').click();
+  for (let i = 0; i < 6; i++) await settle();
+  const start = sent.find(m => m.type === 'profileEngine' && m.action === 'start');
+  assert.ok(start, 'the button starts the check');
+  assert.equal(start.job.depth, 12);
+  assert.equal(start.job.deadlineMs, null, 'every game has no time budget');
+  assert.ok(!start.job.rows.some(r => r.id === rows.at(-2).id), 'the reviewed library game is not checked again');
+  assert.equal(a.state.settings.profileDepth, 'deep', 'the choice is remembered');
+  let savedJob = null;
+  for (let i = 0; i < 1000 && savedJob?.status !== 'done'; i++) { await settle(); savedJob = await w.store.loadJob(); }
+  await w.onJobChange(savedJob);
+  assert.ok(w.report.engine.games > 1);
+  assert.equal(engine().querySelector('[data-engine="start"]').textContent, 'Check more games');
+  assert.ok(engine().querySelector('[data-engine="start"]').disabled, 'every chosen game is already checked');
 });

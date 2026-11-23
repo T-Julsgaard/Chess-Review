@@ -214,42 +214,28 @@ test('loader displays a measured ETA and honest unknown-total state', t => {
   loader.update({etaMs: null}); assert.match(loader.element.textContent, /Estimating time remaining/);
 });
 
-test('workspace: games stream onto the main board beside the animation; deck waits for analysis after EOF', async t => {
+test('workspace: games stream onto the main board beside the animation; the deck opens at EOF without an engine pass', async t => {
   const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6'); a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
   Object.assign(a.state.settings, {profileDepth: 'fast', profileSample: 'all'});
   await a.call('openProfile'); await settle();
-  const w = a.run('profileWorkspace'), doc = a.dom.window.document, started = deferred(), finishHost = deferred();
+  const w = a.run('profileWorkspace'), doc = a.dom.window.document, sent = [];
   t.after(() => w.close());
   w.site = 'lichess'; w.account = 'tester'; w.period = 'all';
   let controller;
   t.mock.method(globalThis, 'fetch', async () => new Response(new ReadableStream({start(c) { controller = c; }})));
-  w.o.sendMessage = async message => {
-    if (message.action !== 'start') return {ok: true};
-    const job = message.job;
-    assert.ok(job.rows.every(row => row.pgn?.includes('[Result "1-0"]')), 'the engine reuses downloaded moves');
-    assert.equal(finishedPreviewGame(job.rows[0].pgn).moves.length, 10);
-    await w.store.saveJob({...job, status: 'running', done: 0, total: job.rows.length, startedAt: Date.now(), updatedAt: Date.now()});
-    started.resolve();
-    (async () => {
-      await finishHost.promise;
-      for (const row of job.rows) await w.store.saveEngine('lichess', row.id, {v: 1, acc: 80, t: row.t});
-      await w.store.saveJob({...job, status: 'done', done: job.rows.length, total: job.rows.length, failed: 0, startedAt: Date.now(), finishedAt: Date.now()});
-    })();
-    return {ok: true};
-  };
+  w.o.sendMessage = async message => { sent.push(message); return {ok: true}; };
   const loading = w.load();
   for (let i = 0; i < 100 && !controller; i++) await settle();
   controller.enqueue(new TextEncoder().encode(Array.from({length: 20}, (_, i) => JSON.stringify({id: 'game' + i, status: 'mate', winner: 'white', speed: 'blitz',
     lastMoveAt: Date.UTC(2026, 0, 2), moves: 'e4 e5 Nf3 Nc6 Bc4 Bc5 d3 d6 Nc3 Nf6',
     players: {white: {user: {name: 'tester'}}, black: {user: {name: 'opponent'}}}}) + '\n').join('')));
-  await started.promise;
-  await new Promise(resolve => setTimeout(resolve, 250));
+  for (let i = 0; i < 100 && doc.querySelector('.profile-map-summary')?.textContent !== '20 games'; i++) await new Promise(resolve => setTimeout(resolve, 10));
   assert.equal(w.phase, 'loading'); assert.equal(w.report, null);
-  assert.ok(doc.querySelector('.profile-loader')); assert.ok(doc.querySelector('.board .profile-game-map'));
+  assert.ok(doc.querySelector('.board .profile-game-map'));
   assert.equal(doc.querySelector('.profile-map-summary').textContent, '20 games');
-  controller.close(); await settle(); assert.equal(w.phase, 'loading');
-  finishHost.resolve(); await loading;
-  assert.equal(w.phase, 'deck'); assert.equal(w.report.engine.games, 20);
+  controller.close(); await loading;
+  assert.equal(w.phase, 'deck');
+  assert.equal(sent.filter(m => m.type === 'profileEngine' && m.action === 'start').length, 0, 'the accuracy check waits for its chapter');
   assert.equal(doc.querySelector('.profile-loader'), null); assert.ok(doc.querySelector('.board .profile-game-map'));
 });
 

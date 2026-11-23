@@ -6818,7 +6818,7 @@ function soundSettings() {
 }
 function profileSettings() {
   const periods = [["year", "Past 12 months"], ["calendar", "This year"], ["all", "All time"], ["custom", "Custom period"]];
-  const depths = [["off", "Off"], ["fast", "Fast"], ["balanced", "Balanced"], ["deep", "Deep"]];
+  const depths = [["fast", "Fast"], ["balanced", "Balanced"], ["deep", "Deep"]];
   const samples = [["auto", "Auto"], ["all", "Every game"], ["2", "1 in 2"], ["5", "1 in 5"], ["10", "1 in 10"]];
   const usage = el("span", { class: "set-note" }, "Measuring…");
   loadProfileWorkspace().then(({profileStorageUsage}) => profileStorageUsage(browserAPI.storage.local)).then(info => {
@@ -6831,8 +6831,8 @@ function profileSettings() {
     section("Recap",
       el("div", { class: "set-row" }, setLabel("Default period", "The period the Player profile opens with. The picker inside the profile changes it for the session and remembers your choice."),
         ddField(periods.some(([id]) => id === S.settings.profilePeriod) ? S.settings.profilePeriod : "year", periods, value => setSetting("profilePeriod", value))),
-      el("div", { class: "set-row" }, setLabel("Accuracy check", "Engine depth for the accuracy check that runs in the background after a profile is built. Deeper is more exact but slower; Off uses only the reviewed games in your library."),
-        ddField(S.settings.profileDepth || "balanced", depths, value => setSetting("profileDepth", value))),
+      el("div", { class: "set-row" }, setLabel("Accuracy check", "The engine depth the accuracy check starts with. You start the check in the profile's accuracy over time chapter; deeper is more exact but slower."),
+        ddField(depths.some(([id]) => id === S.settings.profileDepth) ? S.settings.profileDepth : "balanced", depths, value => setSetting("profileDepth", value))),
       el("div", { class: "set-row" }, setLabel("Games to check", "Which games the accuracy check looks at. Auto checks as many as fit in about six minutes, spread over the whole period."),
         ddField(S.settings.profileSample || "auto", samples, value => setSetting("profileSample", value))),
       toggleRow("Count games against bots", "profileIncludeBots", setSetting, "Off keeps every figure to human opponents. On includes computer opponents where the platform marks them."),

@@ -407,3 +407,19 @@ test('leaving the profile and coming back reopens the deck on the same chapter a
   await a.call('openProfile'); for (let i = 0; i < 6; i++) await settle();
   assert.equal(a.run('profileWorkspace').phase, 'setup');
 });
+
+test('story Compare keeps the chosen time control, on the rival chapter too', async t => {
+  const a = review(t, 'story'), doc = a.dom.window.document;
+  seed(a);
+  a.store[rowsKey('chesscom', 'other')] = {...a.store[rowsKey('chesscom', 'tester')], updatedAt: Date.now()};
+  const w = await openDeck(a);
+  for (const id of ['season', 'rival']) {
+    w.go(w.deck.findIndex(slide => slide.id === id));
+    doc.querySelector('.pv-filter button[data-value="blitz"]').click();
+    const [other] = await w.comparablePlayers();
+    assert.ok(await w.switchPlayer(other));
+    assert.equal(w.deck[w.index].id, id);
+    assert.equal(doc.querySelector('.pv-filter button.on').textContent, 'Blitz', id);
+    assert.ok(await w.switchPlayer({site: 'chesscom', account: 'tester'}));
+  }
+});
