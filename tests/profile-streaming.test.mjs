@@ -72,7 +72,7 @@ test('film roll: frames from the middle or end, paced to show every game, names 
   const picks = new Set(Array.from({length: 40}, (_, i) => reelFen({id: String(i), site: 'lichess', n: 80, fenEnd: end, fenMid: mid})));
   assert.deepEqual([...picks].sort(), [end, mid].sort(), 'long games show the middle or the end');
   assert.equal(reelFen({id: '1', site: 'lichess', n: 80, fenEnd: end, fenMid: 'r4rk1/8/8/8/8/8/8/R5K1 w - - 0 3'}).includes('6k1'), true, 'an opening position never stands in for the middle');
-  assert.equal(reelRate(0), 2.5); assert.equal(reelRate(100000), 30); assert.ok(reelRate(40) > 15 && reelRate(40) < 20, 'a batch is spread over about two seconds');
+  assert.equal(reelRate(0), 2.5); assert.equal(reelRate(100000), 60); assert.ok(reelRate(40) > 15 && reelRate(40) < 20, 'a batch is spread over about two seconds');
   const d = dom(t), turned = [];
   const reel = createGameReel({...d, makePiece: () => d.doc.createElement('img'), motion: () => false, account: () => 'tester', orient: flipped => turned.push(flipped)});
   t.after(() => reel.destroy());
