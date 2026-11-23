@@ -1662,7 +1662,6 @@ function buildUI() {
       el("div", { class: "brand-mark" }, el("img", { class: "brand-img", src: _url("pieces-img/cburnett/wN.svg"), alt: "" })),
       el("div", { class: "brand-name", html: 'Chess <span>/ Review</span>' }),
     ),
-    el("div", { class: "topbar-meta", id: "meta" }),
     el("div", { class: "topbar-right" },
       el("button", { type:"button", id:"learningToggle", class:"icon-btn learning-toggle", onclick:toggleLearning },
         el("span", {class:"learning-toggle-icon", "aria-hidden":"true"}, icon("book")),
@@ -1753,7 +1752,7 @@ function buildUI() {
     feedbackLink("feedback-floating", el("span", {}, "Feedback"))));
 
   UI = {
-    meta: document.getElementById("meta"), settings, canvas, boardWrap,
+    settings, canvas, boardWrap,
     playerTop, playerBot, controls, coach: coachMount, evalbar: evalbarMount,
     review: reviewMount, movesBody,
     graph: graphMount, stats: statsMount, engine: engineMount,
@@ -6196,22 +6195,6 @@ function renderEngine(lines, padFromCache = false) {
   fitEnginePanel();
 }
 
-/* ---------------- Topbar meta ---------------- */
-function metaChips() {
-  const res = S.players[S.meSide].result;
-  let outcome = "Result unknown";
-  if (res === "1-0") outcome = S.meSide === "w" ? "Victory" : "Loss";
-  else if (res === "0-1") outcome = S.meSide === "b" ? "Victory" : "Loss";
-  else if (res && res.includes("1/2")) outcome = "Draw";
-  const tcRaw = S.meta.timeClass || S.headers.TimeControl || "";
-  const tc = tcRaw ? tcRaw.charAt(0).toUpperCase() + tcRaw.slice(1) : "";
-  const date = S.headers.UTCDate || S.headers.Date || "";
-  const chips = [el("span", { class: "meta-chip" }, el("b", {}, outcome))];
-  if (tc) chips.push(el("span", { class: "meta-dot" }), el("span", { class: "meta-chip" }, icon("bolt"), el("b", {}, tc)));
-  if (date) chips.push(el("span", { class: "meta-dot" }), el("span", { class: "meta-chip" }, el("b", {}, date.replace(/\./g, "-"))));
-  return chips;
-}
-
 /* ---------------- Settings ---------------- */
 // A setting label. If `info` is given, hovering it shows the same explanation tooltip as the
 // accuracy panel (with a subtle dotted underline to hint it's there).
@@ -8726,7 +8709,6 @@ async function startAnalysis({preserveCompleted = false} = {}) {
 
 /* ---------------- Render everything ---------------- */
 function renderAll() {
-  UI.meta.replaceChildren(...(S.blank?[]:metaChips()));
   buildBoard();
   renderEvalBar();
   renderPlayers();

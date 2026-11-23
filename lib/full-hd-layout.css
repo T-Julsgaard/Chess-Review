@@ -117,8 +117,6 @@ body:has(.full-hd-reference) .learning-embedded .learn-shell {
 .app:has(.full-hd-reference) .brand-mark {width:26.1px;height:26.1px;border-radius:6.96px;font-size:15.66px;}
 .app:has(.full-hd-reference) .brand-mark .brand-img {width:19.14px;height:19.14px;}
 .app:has(.full-hd-reference) .brand-name {font-size:12.18px;}
-.app:has(.full-hd-reference) .topbar-meta {gap:15.66px;margin-left:5.22px;}
-.app:has(.full-hd-reference) .meta-chip {gap:6.09px;font-size:10.875px;}
 .app:has(.full-hd-reference) .topbar-right {gap:6.96px;}
 .app:has(.full-hd-reference) .icon-btn {width:31.32px;height:31.32px;border-radius:7.83px;}
 .app:has(.full-hd-reference) .icon-btn svg {width:14.79px;height:14.79px;}

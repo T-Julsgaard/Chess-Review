@@ -69,22 +69,8 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     }
     assert.ok(frames.some(f=>f.libraryX<0&&f.libraryX>-39&&f.libraryVisible),'Library must slide visibly before hiding');
     assert.equal(frames.at(-1).libraryVisible,false);
-    assert.equal(await run("getComputedStyle(document.querySelector('.topbar-meta')).visibility"),'hidden');
     assert.deepEqual(await accuracyLayers(),['hidden','hidden'],'Accuracy highlights must not show through learning mode');
     await run("document.querySelector('#learningToggle').click()");
-    await waitFor(review,"document.querySelector('.topbar-meta').classList.contains('meta-return')",'Metadata return');
-    const slide=await run(`(()=>{
-      const n=document.querySelector('.topbar-meta'),a=n.getAnimations().find(a=>a.animationName==='meta-slide-down');
-      if(!a)return null;a.pause();
-      const frames=[0,70,140,210,280].map(time=>{a.currentTime=time;const m=new DOMMatrix(getComputedStyle(n).transform);return {x:m.m41,y:m.m42,scaleX:m.m11,scaleY:m.m22,skewX:m.m12,skewY:m.m21};});
-      a.finish();return {frames,hidden:n.hasAttribute('aria-hidden')};
-    })()`);
-    assert.ok(slide&&!slide.hidden,'Review metadata must slide back into view');
-    for(const [i,frame] of slide.frames.entries()){
-      assert.equal(frame.x,0);assert.equal(frame.scaleX,1);assert.equal(frame.scaleY,1);assert.equal(frame.skewX,0);assert.equal(frame.skewY,0);
-      assert.ok(frame.y>=-60&&frame.y<=0,'Metadata must stay on its straight return path');
-      if(i)assert.ok(frame.y>=slide.frames[i-1].y,'Metadata must return without bouncing');
-    }
     await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace)",'Review restored');
     assert.equal(await run("getComputedStyle(document.querySelector('.library-rail')).visibility"),'visible');
     assert.deepEqual(await accuracyLayers(),['visible','visible'],'Accuracy highlights must return with Game Review');

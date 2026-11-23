@@ -377,13 +377,10 @@ test('review game, move, board orientation and keyboard state survive learning o
   const a=app(t);loadGame(a,'1. e4 e5 2. Nf3 Nc6');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
   a.call('go',2);a.state.flipped=true;a.call('buildBoard');const before={idx:a.state.idx,flipped:a.state.flipped,pgn:a.state.pgn,positions:a.state.positions};
   await a.call('openLearning');const w=a.run('learningWorkspace');assert.ok(w.ready);
-  const meta=a.dom.window.document.querySelector('.topbar-meta');
-  assert.equal(meta.getAttribute('aria-hidden'),'true');assert.equal(meta.dataset.motion,'off');
   assert.equal(w.currentFen(),new Chess().fen());assert.equal(w.activity,null);
   a.dom.window.document.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}));
   assert.equal(a.state.idx,before.idx);await w.startOpening('italian');w.stepOpening(1);await w.close();
   assert.equal(a.state.idx,before.idx);assert.equal(a.state.flipped,before.flipped);assert.equal(a.state.pgn,before.pgn);assert.equal(a.state.positions,before.positions);
-  assert.equal(meta.hasAttribute('aria-hidden'),false);assert.equal(meta.classList.contains('meta-return'),true);
   a.dom.window.document.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}));assert.equal(a.state.idx,before.idx+1);
 });
 

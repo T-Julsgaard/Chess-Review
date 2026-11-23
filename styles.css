@@ -808,27 +808,6 @@ button { font-family: inherit; cursor: pointer; }
 .brand-name { font-weight: 800; letter-spacing: .14em; font-size: 14px; text-transform: uppercase; }
 .brand-name span { color: var(--ink-3); font-weight: 600; }
 
-.topbar-meta { display: flex; align-items: center; gap: 18px; margin-left: 6px; }
-.has-learning .topbar-meta { pointer-events: none; animation: meta-swoop-up .28s ease-out both; }
-.topbar-meta.meta-return { animation: meta-slide-down .28s ease-out both; }
-@keyframes meta-swoop-up {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-60px); visibility: hidden; }
-}
-@keyframes meta-slide-down {
-  from { transform: translateY(-60px); }
-  to { transform: translateY(0); }
-}
-.topbar-meta[data-motion="off"] { animation: none; }
-.has-learning .topbar-meta[data-motion="off"] { visibility: hidden; }
-@media (prefers-reduced-motion: reduce) {
-  .has-learning .topbar-meta, .topbar-meta.meta-return { animation: none; }
-  .has-learning .topbar-meta { visibility: hidden; }
-}
-.meta-chip { display: flex; align-items: center; gap: 7px; color: var(--ink-2); font-size: 12.5px; }
-.meta-chip b { color: var(--ink); font-weight: 600; }
-.meta-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-3); }
-
 .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 .icon-btn {
   width: 36px; height: 36px; border-radius: 9px;
@@ -936,7 +915,6 @@ button { font-family: inherit; cursor: pointer; }
 @media (max-width: 520px) { .learning-announcement { right: 12px; } }
 @media (prefers-reduced-motion: reduce) { .learning-announcement, .learning-announcement-arrow { animation: none; } }
 .learning-with-topbar { top: var(--topbar-h); }
-@media (min-width: 761px) and (max-width: 1100px) { .topbar-meta { gap: 8px; margin-left: 0; } .meta-chip { font-size: 11px; gap: 4px; } }
 @media (max-width: 520px) { .learning-toggle { max-width: 112px; padding-inline: 6px; } }
 .feedback-floating {
   position: fixed; right: max(18px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom)); z-index: 30;
@@ -2277,7 +2255,6 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 /* top bar and settings on small windows */
-@media (max-width: 760px) { .topbar-meta { display: none; } }
 @media (max-width: 520px) {
   .topbar { padding: 0 12px; gap: 10px; }
   .brand-name { display: none; }
