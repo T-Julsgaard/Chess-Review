@@ -163,7 +163,9 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.equal(ring.querySelectorAll('.pv-pie-slice').length, legend().length, 'one slice per legend row');
   assert.equal(sum(legend()), 100);
   assert.equal(ring.querySelector('.pv-pie-center strong').textContent, String(w.report.totals.w));
-  assert.match(shell.querySelector('.pv-endings-foot').textContent, new RegExp(`^${w.report.totals.w} wins, \\d+% of all your games\\.$`), 'no favourite finisher after it');
+  assert.equal(shell.querySelector('.pv-story-figure').textContent, String(w.report.totals.w), 'the big figure is the wins, not the checkmates');
+  assert.match(shell.querySelector('.pv-story-label').textContent, /^wins, \d+% of all your games$/);
+  assert.equal(shell.querySelector('.pv-endings-foot'), null, 'no line under the legend');
   const pieLabels = () => [...ring.outside.querySelectorAll('.pv-pie-label')].map(n => parseInt(n.querySelector('b').textContent, 10));
   if (legend().length > 1) assert.deepEqual(pieLabels(), legend().map(([, v]) => v), 'every slice, however thin, is named on the board');
   // Another time control turns the ring to that control's endings, even when the chapter's own board stays the same.
@@ -180,6 +182,7 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.equal(shell.querySelector('.pv-tabs [aria-selected="true"]').textContent, 'Losses');
   assert.match(shell.querySelector('.pv-story-lead').textContent, /^Your losses most often /);
   assert.equal(ring.querySelector('.pv-pie-center strong').textContent, String(w.report.totals.l));
+  assert.match(shell.querySelector('.pv-story-label').textContent, /^loss(es)?, \d+% of all your games$/, 'the big figure follows the tab');
   assert.equal(sum(legend()), 100);
   shell.querySelectorAll('.pv-tabs [role="tab"]')[2].click();
   assert.match(shell.querySelector('.pv-story-lead').textContent, w.report.totals.d ? /^Your draws most often / : /^No draws in this period\.$/);
@@ -220,7 +223,8 @@ test('profile designs: story shows one figure per chapter, progress segments and
   let copied;
   Object.defineProperty(a.dom.window.navigator, 'clipboard', {value: {writeText: async text => { copied = text; }}, configurable: true});
   let sharing; const copy = w.copyLink.bind(w); w.copyLink = button => sharing = copy(button);
-  shell.querySelector('.pv-share').click();
+  assert.equal(shell.querySelector('.pv-share'), null, 'Share lives on the last chapter, not in the header');
+  shell.querySelector('.profile-share button.primary').click();
   await sharing;
   assert.match(copied, /^https:\/\/t-julsgaard\.github\.io\/Chess-Review\/profile\/#p=/);
   assert.equal(shell.querySelector('.pv-story').dataset.slide, 'share', 'sharing keeps the current chapter');
@@ -516,7 +520,7 @@ test('story Compare keeps the chosen time control, on the rival chapter too', as
   }
 });
 
-test('story Compare turns into the other player\'s name: press to swap, × to stop', async t => {
+test('story Compare turns into Switch: press to swap players, × to stop', async t => {
   const a = review(t, 'story'), doc = a.dom.window.document;
   seed(a);
   a.store[rowsKey('chesscom', 'other')] = {...a.store[rowsKey('chesscom', 'tester')], updatedAt: Date.now()};
@@ -529,13 +533,14 @@ test('story Compare turns into the other player\'s name: press to swap, × to st
   const layer = doc.querySelector('.board .pv-layer');
   assert.ok(await w.pickCompare(other));
   assert.equal(title(), 'other');
-  assert.equal(swap().textContent, 'tester', 'the button names the player the comparison started from');
+  assert.equal(swap().textContent, 'Switch');
+  assert.equal(swap().title, 'Switch to tester', 'it switches to the player the comparison started from');
   assert.ok(doc.querySelector('.pv-compare-stop'), 'with a × to stop');
   assert.equal(w.deck[w.index].id, 'clock', 'the same chapter stays');
   assert.equal(doc.querySelector('.board .pv-layer'), layer, 'the columns change in place instead of drawing again');
   swap().click(); for (let i = 0; i < 6; i++) await settle();
   assert.equal(title(), 'tester');
-  assert.equal(swap().textContent, 'other', 'after the swap it names the other player');
+  assert.equal(swap().title, 'Switch to other', 'after the swap it switches back');
   swap().click(); for (let i = 0; i < 6; i++) await settle();
   assert.equal(title(), 'other');
   doc.querySelector('.pv-compare-stop').click(); for (let i = 0; i < 6; i++) await settle();

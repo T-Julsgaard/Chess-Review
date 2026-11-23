@@ -601,4 +601,3 @@
 .pv-endings-name { font-weight: 650; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pv-endings-count { font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .pv-endings-share { min-width: 3em; text-align: right; font-size: 16px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--ink); }
-.pv-endings-foot { margin: 0; font-size: 13px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }

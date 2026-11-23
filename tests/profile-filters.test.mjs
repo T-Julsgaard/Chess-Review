@@ -47,8 +47,8 @@ async function storyDeck(t) {
 test('profile gear: leaves a player out, says so in the menu and brings them back', async t => {
   const {a, doc, w} = await storyDeck(t);
   const gear = doc.querySelector('.pv-head-actions .pv-settings');
-  assert.ok(gear, 'the gear sits with Compare and Share');
-  assert.deepEqual([...doc.querySelector('.pv-head-actions').children].map(n => n.className.split(' ')[0]), ['pv-compare', 'pv-share', 'pv-settings'], 'the gear is right of Share');
+  assert.ok(gear, 'the gear sits with Compare');
+  assert.deepEqual([...doc.querySelector('.pv-head-actions').children].map(n => n.className.split(' ')[0]), ['pv-compare', 'pv-settings'], 'the gear is right of Compare; Share is the last chapter\'s');
   assert.equal(doc.querySelector('.pv-head-note'), null, 'nothing under the name');
   const total = w.periodRows().length;
   w.go(w.deck.findIndex(slide => slide.id === 'rival'));
