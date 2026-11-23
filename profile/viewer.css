@@ -1,7 +1,7 @@
 /* Shared player profile on the web. The deck itself is styled by the extension's own
    stylesheets (styles.css, lib/profile/*.css); this file lays out the board stage that
-   stands in for the review, and the page around the deck: the top bar's install button,
-   the install dialog, the nudge under the deck and the web's last chapter. */
+   stands in for the review, and the page around the deck: the top bar's store links,
+   the panel's "Build your own", the install dialog and the web's last chapter. */
 
 body.web-viewer { overflow: hidden; }
 .web-viewer .app { height: 100dvh; overflow: hidden; }
@@ -20,7 +20,25 @@ body.web-viewer { overflow: hidden; }
 .web-installed { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel-2); color: var(--ink-2); font-size: 12px; font-weight: 650; }
 .web-installed[hidden] { display: none; }
 .web-installed-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent); }
-.web-has-extension .web-cta, .web-has-extension .web-nudge, .web-has-extension .web-share-card { display: none !important; }
+.web-has-extension .web-stores, .web-has-extension .web-share-card { display: none !important; }
+/* The two store links: this browser's in green (above), the other plain beside it. */
+.web-stores { display: flex; align-items: center; gap: 8px; }
+.topbar .web-cta.is-other { background: var(--panel-2); border-color: var(--line); color: var(--ink-2); box-shadow: none; }
+.topbar .web-cta.is-other .learning-toggle-icon { color: var(--ink-3); }
+.topbar .web-cta.is-other::after { content: none; }
+.topbar .web-cta.is-other:hover { color: var(--ink); border-color: color-mix(in oklab, var(--accent) 55%, var(--line)); box-shadow: none; }
+.topbar .web-cta.is-other:hover .learning-toggle-icon { color: var(--accent); }
+
+/* ---------- the panel's "Build your own" ---------- */
+.profile-head > .profile-button.web-build { position: relative; overflow: hidden; isolation: isolate; display: inline-flex; align-items: center; gap: 7px; padding-left: 6px;
+  background: linear-gradient(160deg, var(--accent), var(--accent-strong)); border-color: var(--accent); color: var(--accent-ink); font-weight: 800;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 6px 18px -8px color-mix(in oklab, var(--accent) 80%, transparent); transition: transform .15s, box-shadow .15s; }
+.profile-head > .profile-button.web-build:hover { color: var(--accent-ink); border-color: var(--accent-strong); transform: translateY(-1px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 10px 24px -8px color-mix(in oklab, var(--accent) 90%, transparent); }
+.profile-head > .profile-button.web-build:active { transform: scale(.97); }
+.profile-head > .profile-button.web-build::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, .35) 50%, transparent 65%); transform: translateX(-120%); animation: web-cta-shine 5.5s 4.2s ease-in-out infinite; }
+.web-build-mark { display: grid; place-items: center; flex: none; width: 22px; height: 22px; border-radius: 7px; background: color-mix(in oklab, var(--accent-ink) 22%, transparent); }
+.web-build-mark img { width: 17px; height: 17px; }
 
 /* ---------- board stage (the review layout's board and panel column) ---------- */
 .web-stage { --strip: 48px; --b: max(300px, min(calc(100dvh - var(--topbar-h, 52px) - 2 * var(--strip) - 64px), calc((100vw - 150px) / 1.74)));
@@ -68,33 +86,9 @@ body.web-viewer { overflow: hidden; }
 .web-copy { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; }
 .web-copy.is-done { border-color: var(--accent); color: var(--accent); }
 
-/* ---------- nudge under the deck ---------- */
-/* Placed by script in the room under the deck's panel (viewer.js positionNudge), so it never covers the deck. */
-.web-nudge { position: fixed; z-index: 56; display: flex; justify-content: flex-end; align-items: flex-start; pointer-events: none; }
-.web-nudge[hidden] { display: none; }
-.web-nudge > * { pointer-events: auto; }
-.web-nudge-pill { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px 0 6px; border-radius: 999px; border: 1px solid var(--line);
-  background: color-mix(in oklab, var(--panel-2) 92%, transparent); color: var(--ink-2); font: inherit; font-size: 12px; font-weight: 700;
-  transition: color .15s, border-color .15s, transform .15s; animation: web-rise .5s 1.6s cubic-bezier(.16, 1, .3, 1) both; }
-.web-nudge-pill:hover { color: var(--ink); border-color: color-mix(in oklab, var(--accent) 55%, var(--line)); }
-.web-nudge-pill:active { transform: scale(.97); }
-.web-nudge-mark { display: grid; place-items: center; flex: none; width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(160deg, var(--accent), var(--accent-strong)); }
-.web-nudge-mark img { width: 16px; height: 16px; }
-.web-nudge-card { display: none; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; padding: 9px 9px 9px 12px;
-  background: radial-gradient(120% 160% at 0% 0%, color-mix(in oklab, var(--accent) 14%, transparent), transparent 55%), var(--panel);
-  border: 1px solid color-mix(in oklab, var(--accent) 35%, var(--line)); border-radius: var(--radius); box-shadow: 0 14px 34px color-mix(in oklab, #000 38%, transparent); }
-.web-nudge.is-open .web-nudge-card { display: flex; animation: web-rise .45s cubic-bezier(.16, 1, .3, 1) both; }
-.web-nudge.is-open .web-nudge-pill { display: none; }
-.web-nudge-card .web-nudge-mark { width: 32px; height: 32px; border-radius: 9px; }
-.web-nudge-card .web-nudge-mark img { width: 24px; height: 24px; }
-.web-nudge-text { display: flex; flex-direction: column; min-width: 0; flex: 1; gap: 1px; }
-.web-nudge-text strong { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.web-nudge-text span { color: var(--ink-2); font-size: 11.5px; line-height: 1.35; }
-.web-nudge-card .profile-button { flex: none; padding: 7px 12px; min-height: 32px; font-size: 12.5px; }
-.web-nudge-close { flex: none; display: grid; place-items: center; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 7px; background: transparent; color: var(--ink-3); }
 .web-dialog-close { position: absolute; top: 9px; right: 9px; display: grid; place-items: center; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 7px; background: transparent; color: var(--ink-3); }
-.web-nudge-close:hover, .web-dialog-close:hover { background: var(--panel-3); color: var(--ink); }
-.web-nudge-close svg, .web-dialog-close svg { width: 15px; height: 15px; }
+.web-dialog-close:hover { background: var(--panel-3); color: var(--ink); }
+.web-dialog-close svg { width: 15px; height: 15px; }
 
 /* ---------- install dialog ---------- */
 .web-dialog-backdrop { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: color-mix(in oklab, #000 58%, transparent); backdrop-filter: blur(3px); opacity: 0; transition: opacity .18s; }
@@ -140,11 +134,11 @@ body.web-viewer { overflow: hidden; }
   .web-panel-mod { width: var(--b); height: auto; min-height: 320px; margin-top: 0; }
   .web-viewer:not(.web-has-profile) .app { overflow: auto; height: auto; }
   body.web-viewer:not(.web-has-profile) { overflow: auto; }
-  .web-nudge-card { width: min(300px, calc(100vw - 32px)); }
   .topbar .web-cta .learning-toggle-label { font-size: 12px; }
 }
-@media (max-width: 560px) { .web-cta-free { display: none; } .topbar { padding: 0 12px; } .topbar .web-cta { padding: 0 12px; } .web-nudge-pill { display: none; } }
+@media (max-width: 760px) { .web-cta-verb { display: none; } }
+@media (max-width: 560px) { .web-cta-tail { display: none; } .topbar { padding: 0 12px; } .topbar .web-cta { padding: 0 12px; } }
 @media (prefers-reduced-motion: reduce) {
-  .topbar .web-cta::after, .web-landing, .web-nudge-pill { animation: none; }
-  .web-nudge-card, .web-dialog, .web-dialog-backdrop, .web-toast { transition: none; }
+  .topbar .web-cta::after, .web-landing, .web-build::after { animation: none; }
+  .web-dialog, .web-dialog-backdrop, .web-toast { transition: none; }
 }

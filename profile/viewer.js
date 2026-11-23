@@ -2,8 +2,8 @@
 // profile in its fragment (#p=…), which never reaches a server: this page decodes it in the
 // browser and opens the extension's own Story workspace on it (lib/profile/designs/story.js),
 // with the extension's stylesheets, so the deck, its board charts and its animations are the
-// ones Chess Review shows. Only the page around it is web-specific: the top bar, the install
-// nudges and a small board stage standing in for the review layout.
+// ones Chess Review shows. Only the page around it is web-specific: the top bar's store links,
+// the install dialog, board sounds and a small board stage standing in for the review layout.
 // Network: this page's own files; opening a game on the board fetches its moves directly from
 // Chess.com or Lichess (lib/profile/pgn-source.js), and Stockfish loads only for a viewed game.
 import {StoryWorkspace} from '../lib/profile/designs/story.js';
@@ -22,7 +22,6 @@ const BROWSER = /firefox|fxios/i.test(UA) ? 'firefox' : /edg\//i.test(UA) ? 'edg
 const primaryStore = () => BROWSER === 'firefox' ? STORE.firefox : STORE.chrome;
 const otherStore = () => BROWSER === 'firefox' ? STORE.chrome : STORE.firefox;
 const primaryLabel = () => BROWSER === 'firefox' ? 'Add to Firefox' : BROWSER === 'edge' ? 'Add to Edge' : 'Add to Chrome';
-const NUDGE_KEY = 'chess-review-viewer-nudge';
 
 const h = (tag, attrs = {}, ...children) => {
   const node = document.createElement(tag);
@@ -124,6 +123,28 @@ async function createEngine() {
   await engine.setOptions({Threads: 1, Hash: 16});
   return engine;
 }
+/* Board sounds: the files and volume Chess Review plays by default (analysis.js), through Web Audio.
+   Browsers keep audio silent until the reader first clicks or presses a key on the page. */
+const SOUNDS = {move: 'sounds/move-self.mp3', capture: 'sounds/capture.mp3', check: 'sounds/Check.mp3', castle: 'sounds/Castling.mp3', wrong: 'sounds/Wrong/Incorrect.mp3'};
+const SOUND_VOLUME = .5, SOUND_GAP = 55;
+/** The sound a move makes, by its notation, as in the review. */
+const moveSound = (san = '') => /x/.test(san) ? 'capture' : /[+#]/.test(san) ? 'check' : /^[O0]-[O0]/.test(san) ? 'castle' : 'move';
+let audio = null, lastSound = 0;
+const soundBuffers = new Map();
+function playSound(name) {
+  const now = performance.now();
+  // Held arrow keys repeat fast; one click per step is enough.
+  if (!SOUNDS[name] || now - lastSound < SOUND_GAP) return;
+  lastSound = now;
+  try { audio ||= new (window.AudioContext || window.webkitAudioContext)(); } catch { return; }
+  if (audio.state === 'suspended') audio.resume().catch(() => {});
+  if (!soundBuffers.has(name)) soundBuffers.set(name, fetch(asset(SOUNDS[name])).then(r => r.arrayBuffer()).then(data => audio.decodeAudioData(data)));
+  soundBuffers.get(name).then(buffer => {
+    const source = audio.createBufferSource(), gain = audio.createGain();
+    source.buffer = buffer; gain.gain.value = SOUND_VOLUME;
+    source.connect(gain).connect(audio.destination); source.start();
+  }).catch(() => soundBuffers.delete(name));
+}
 async function copyLink(button) {
   try { await navigator.clipboard.writeText(location.href); toast('Link copied'); button?.classList.add('is-done'); setTimeout(() => button?.classList.remove('is-done'), 1600); }
   catch { toast('Could not copy the link'); }
@@ -163,7 +184,6 @@ function openInstall(account) {
   dialogReturn = document.activeElement;
   dialog.hidden = false; requestAnimationFrame(() => dialog.classList.add('is-open'));
   dialog.querySelector('.web-install').focus({preventScroll: true});
-  collapseNudge();
 }
 function closeInstall() {
   if (!dialog || dialog.hidden) return;
@@ -198,45 +218,6 @@ function togglePopover() {
 }
 function closePopover() { if (popover) popover.hidden = true; $('infoButton').setAttribute('aria-expanded', 'false'); }
 
-/**
- * Under the deck's panel: a small pill that opens the install dialog, which widens into
- * a one-line card once the reader is a few chapters in. It sits in the room below the
- * panel, so it never covers the deck or its Next button.
- */
-let nudge = null;
-function mountNudge(account) {
-  const card = h('div', {class: 'web-nudge-card'},
-    h('span', {class: 'web-nudge-mark', html: ICONS.knight}),
-    h('div', {class: 'web-nudge-text'}, h('strong', {}, `Enjoying ${account}'s story?`), h('span', {}, 'Build yours from your own Chess.com or Lichess games.')),
-    installButton({where: 'nudge'}),
-    h('button', {type: 'button', class: 'web-nudge-close', 'aria-label': 'Hide', html: ICONS.close, onclick: () => collapseNudge()}));
-  const pill = h('button', {type: 'button', class: 'web-nudge-pill', onclick: () => openInstall(account)},
-    h('span', {class: 'web-nudge-mark', html: ICONS.knight}), 'Build your own profile');
-  nudge = h('aside', {class: 'web-nudge', 'aria-label': 'Get Chess Review'}, card, pill);
-  document.body.append(nudge);
-  const shell = document.querySelector('.profile-shell');
-  new MutationObserver(positionNudge).observe(shell, {attributes: true, attributeFilter: ['style', 'class']});
-  window.addEventListener('resize', positionNudge);
-  positionNudge();
-}
-function positionNudge() {
-  const shell = document.querySelector('.profile-shell');
-  if (!nudge || !shell) return;
-  const r = shell.getBoundingClientRect(), room = window.innerHeight - r.bottom;
-  nudge.hidden = shell.classList.contains('profile-stacked') || room < 56;
-  Object.assign(nudge.style, {left: r.left + 'px', width: r.width + 'px', top: r.bottom + 12 + 'px'});
-}
-const seen = new Set();
-function onChapter(id) {
-  if (!nudge || !id) return;
-  seen.add(id);
-  let shown = false; try { shown = sessionStorage.getItem(NUDGE_KEY) === 'shown'; } catch {}
-  if (shown || (seen.size < 5 && id !== 'share')) return;
-  try { sessionStorage.setItem(NUDGE_KEY, 'shown'); } catch {}
-  nudge.classList.add('is-open');
-}
-function collapseNudge() { nudge?.classList.remove('is-open'); }
-
 /* ---------- the extension's Story deck, with the web's last chapter ---------- */
 class WebStoryWorkspace extends StoryWorkspace {
   /** A shared link carries the report, not the games, so a time control could only ever show "Not enough games". */
@@ -257,14 +238,28 @@ class WebStoryWorkspace extends StoryWorkspace {
         h('div', {class: 'web-share-actions'}, installButton({where: 'share'}), h('button', {type: 'button', class: 'profile-button ghost', onclick: () => openInstall(account)}, 'What you get'))),
       h('div', {class: 'profile-chooser-row web-share-row'}, copy));
   }
-  go(index) { super.go(index); this.o.onChapter?.(this.deck[this.index]?.id); }
+  /** The panel's "Build your own" gets the knight and the accent, so it reads as the page's way in. */
+  renderHead() {
+    super.renderHead();
+    const build = this.shared && [...this.head.querySelectorAll(':scope > .profile-button')].find(b => /build your own/i.test(b.textContent));
+    if (build) { build.classList.add('web-build'); build.prepend(this.h('span', {class: 'web-build-mark', html: ICONS.knight})); }
+  }
+  /** On the web the arrows only step through a game on the board; chapters turn with Next and Previous (or Page Up and Page Down). */
+  onKey(event) {
+    if ((event.key === 'ArrowLeft' || event.key === 'ArrowRight') && !this.arrowsStepGame()) return;
+    super.onKey(event);
+  }
 }
 
 /* ---------- page ---------- */
-function syncInstallLinks() {
-  for (const link of document.querySelectorAll('#topInstall')) link.href = primaryStore().href;
-  const label = document.querySelector('[data-install-label]');
-  if (label) label.textContent = primaryLabel();
+/** The top bar's two store links: this browser's store first and in green, the other beside it in plain. */
+function syncStoreLinks() {
+  const stores = $('stores'), mine = BROWSER === 'firefox' ? 'firefox' : 'chrome';
+  for (const link of stores.querySelectorAll('[data-store]')) {
+    link.href = STORE[link.dataset.store].href;
+    link.classList.toggle('is-other', link.dataset.store !== mine);
+  }
+  stores.prepend(stores.querySelector(`[data-store="${mine}"]`));
 }
 function watchExtension() {
   const root = document.documentElement;
@@ -298,7 +293,7 @@ function showLanding({title, text, error = false}) {
 }
 
 async function main() {
-  syncInstallLinks(); watchExtension();
+  syncStoreLinks(); watchExtension();
   $('infoButton').addEventListener('click', togglePopover);
   buildBoard($('board'));
   const m = location.hash.match(/[#&]p=([^&]+)/);
@@ -330,11 +325,10 @@ async function main() {
     renderGameEvaluation: (bar, score, flipped) => { bar.className = 'profile-game-eval evalbar eb-' + SETTINGS.barStyle + (flipped ? ' flipped' : ''); },
     createAnalysisEngine: createEngine,
     buildOwn: () => document.body.classList.contains('web-has-extension') ? toast('Open Chess Review and choose Player profile to build your own') : openInstall(account), requestClose: () => {}, remember: () => {}, restoreBoard: () => {}, onClose: () => {},
-    onChapter,
+    playGameMove: move => { if (move) playSound(moveSound(move.san)); }, playPuzzleWrong: () => playSound('wrong'),
   });
   document.body.classList.add('web-has-profile');
   await workspace.open();
-  mountNudge(account);
   reveal();
 }
 main();

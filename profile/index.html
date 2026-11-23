@@ -62,10 +62,17 @@
             <button type="button" class="icon-btn" id="infoButton" aria-label="How this page works" aria-haspopup="dialog" aria-expanded="false">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
             </button>
-            <a class="icon-btn learning-toggle web-cta" id="topInstall" href="https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenkadndbdbigfam" target="_blank" rel="noopener" data-install>
-              <span class="learning-toggle-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></span>
-              <span class="learning-toggle-label"><span data-install-label>Add to Chrome</span><span class="web-cta-free"> · free</span></span>
-            </a>
+            <!-- Both stores, the visitor's own browser first and in green (viewer.js syncStoreLinks). -->
+            <div class="web-stores" id="stores">
+              <a class="icon-btn learning-toggle web-cta" data-store="chrome" href="https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenkadndbdbigfam" target="_blank" rel="noopener" data-install="top-chrome">
+                <span class="learning-toggle-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></span>
+                <span class="learning-toggle-label"><span class="web-cta-verb">Visit </span>Chrome<span class="web-cta-tail"> Web Store</span></span>
+              </a>
+              <a class="icon-btn learning-toggle web-cta" data-store="firefox" href="https://addons.mozilla.org/en-US/firefox/addon/chess-review/" target="_blank" rel="noopener" data-install="top-firefox">
+                <span class="learning-toggle-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></span>
+                <span class="learning-toggle-label"><span class="web-cta-verb">Visit </span>Firefox<span class="web-cta-tail"> Add-ons</span></span>
+              </a>
+            </div>
           </div>
         </header>
         <div class="review-viewport">

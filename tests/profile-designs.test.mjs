@@ -56,6 +56,22 @@ test('profile designs: the season counts months, fills gaps and finds the longes
   assert.equal(seasonSlide(seasonStats(rows.slice(0, 2))), null, 'one month is not a season');
 });
 
+test('profile designs: a shared link brings the season back through JSON, and drops one that does not hold together', async () => {
+  const {encodeProfile, decodeProfile} = await import('../lib/profile/share.js');
+  const {sharedSeason} = await import('../lib/profile/designs/season.js');
+  const day = (y, m, d, h = 18) => new Date(y, m - 1, d, h).getTime() / 1000;
+  const rows = [day(2026, 1, 3), day(2026, 1, 4), day(2026, 1, 5), day(2026, 3, 9)].map((t, i) => ({t, res: i % 2 ? 'l' : 'w'}));
+  const s = seasonStats(rows);
+  const shared = (await decodeProfile((await encodeProfile({account: 'x', site: 'chesscom', season: s})))).season;
+  const back = sharedSeason(shared);
+  assert.deepEqual(back.months.map(m => [m.key, m.games, m.label]), s.months.map(m => [m.key, m.games, m.label]));
+  assert.deepEqual(seasonSlide(back).board.scene.columns.map(c => c.value), seasonSlide(s).board.scene.columns.map(c => c.value));
+  assert.equal(seasonSlide(back).title, seasonSlide(s).title);
+  assert.equal(sharedSeason(null), null);
+  assert.equal(sharedSeason({months: [{key: '<img>', games: 3}]}), null);
+  assert.equal(sharedSeason({months: 'Jan'}), null);
+});
+
 test('profile designs: story shows one figure per chapter, progress segments and charts on the board', async t => {
   const a = review(t), doc = a.dom.window.document;
   seed(a);
