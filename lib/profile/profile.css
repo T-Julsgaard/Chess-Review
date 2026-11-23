@@ -337,14 +337,17 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-board .sq.profile-sel::before, .profile-board .sq.profile-hint::before { content: ""; position: absolute; inset: 0; z-index: 1; background: rgba(255,230,88,.52); pointer-events: none; }
 .profile-board .sq.profile-target::after { content: ""; position: absolute; left: 39%; top: 39%; width: 22%; height: 22%; z-index: 3; border-radius: 50%; background: #0004; pointer-events: none; }
 .profile-board .profile-hint-arrow path { fill: var(--accent); opacity: .8; }
-/* Mate in one under the board (workspace.js puzzleCaption): the count, a word when a move lands, Hint and Next. */
+.profile-board .sq.profile-puzzle-wrong::before, .profile-board .sq.profile-puzzle-correct::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.profile-board .sq.profile-puzzle-wrong::before { background: rgba(239,50,65,.22); }
+.profile-board .sq.profile-puzzle-correct::before { background: rgba(129,182,76,.3); }
+.profile-board .sq .puzzle-result-badge { pointer-events: none; }
+.profile-open-puzzle-game { align-self: flex-start; display: inline-flex; align-items: center; text-decoration: none; }
+.profile-open-puzzle-game[hidden] { display: none; }
+/* Mate-in-one controls under the player strips. */
 .profile-puzzle { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px 14px; width: 100%; }
 .profile-puzzle-count { font-size: 14px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: .3px; }
 .profile-puzzle-count.is-solved::after { content: " ✓"; color: var(--q-best); }
-.profile-puzzle-note { min-width: 0; font-size: 13px; }
-.profile-puzzle-note:empty { display: none; }
-.profile-puzzle-note.tone-good { color: var(--q-best); font-weight: 750; }
-.profile-puzzle-note.tone-miss { color: var(--q-miss); font-weight: 750; }
+.profile-puzzle-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .profile-puzzle-actions { display: inline-flex; gap: 8px; }
 .profile-puzzle-button { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 13px; font-weight: 750; line-height: 1; padding: 8px 15px; border-radius: 999px; cursor: pointer;
   color: var(--ink); background: color-mix(in srgb, var(--ink) 7%, var(--panel)); border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
@@ -352,6 +355,10 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-puzzle-button:hover:not(:disabled) { background: color-mix(in srgb, var(--accent) 14%, var(--panel)); border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
 .profile-puzzle-button:active:not(:disabled) { transform: translateY(1px); }
 .profile-puzzle-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.profile-game-dock .profile-puzzle { width: auto; flex-wrap: nowrap; gap: 8px; }
+.profile-game-dock .profile-puzzle-count { white-space: nowrap; }
+.profile-game-dock .profile-puzzle-actions { gap: 5px; }
+.profile-game-dock .profile-puzzle-button { padding: 7px 10px; }
 .profile-puzzle-button:disabled { opacity: .4; cursor: default; }
 .profile-puzzle-button.is-next { color: #0b130e; background: var(--accent); border-color: transparent; box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--accent) 70%, transparent); }
 .profile-puzzle-button.is-next:hover { background: var(--accent); filter: brightness(1.08); }
@@ -359,5 +366,6 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-puzzle.is-tinted .profile-puzzle-button:hover:not(:disabled):not(.is-next) { background: oklch(.6 .12 var(--pv-hue) / .16); border-color: oklch(.75 .12 var(--pv-hue) / .6); }
 [data-theme="light"] .profile-puzzle.is-tinted .profile-puzzle-button.is-next { background: oklch(.62 .16 var(--pv-hue)); color: #fff; }
 .profile-puzzle-icon { display: inline-flex; }
+.profile-puzzle-icon.is-previous { transform: scaleX(-1); }
 .profile-puzzle-icon svg { width: 15px; height: 15px; }
 .profile-caption-button:disabled { opacity: .45; cursor: default; }

@@ -8,6 +8,7 @@ import {encodeProfile, decodeProfile, trimReport, profileLink} from '../lib/prof
 import {buildInsights} from '../lib/profile/insights.js';
 import {buildReport, buildDeck} from '../lib/profile/deck.js';
 import {ProfileWorkspace} from '../lib/profile/workspace.js';
+import {gameFeatures} from '../lib/profile/features.js';
 
 function review(t) {
   const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5');
@@ -489,4 +490,64 @@ test('mate in one: the chapter opens on the newest puzzle not solved yet, and Ne
   assert.equal(from(0), 1); assert.equal(from(2), 3); assert.equal(from(4), 1, 'wraps round');
   solved.add('chesscom:b'); solved.add('chesscom:d');
   assert.equal(from(2), 2, 'with every one solved, Next simply moves on');
+});
+
+test('mate in one shows game information and badges, and Previous replays a solved puzzle', async t => {
+  const a = review(t), {document: doc, PointerEvent} = a.dom.window;
+  Object.assign(a.state.settings, {profileDesign: 'story', uiAnim: false});
+  const scholar = ['e4', 'e5', 'Bc4', 'Nc6', 'Qh5', 'Nf6', 'Qf3'];
+  const newer = gameFeatures({site: 'chesscom', id: '901', url: 'https://www.chess.com/game/live/901', endTime: 3, moves: scholar,
+    white: {name: 'tester', rating: 1500}, black: {name: 'Defender', rating: 1600}}, 'tester');
+  const older = gameFeatures({site: 'lichess', id: 'PVmate01', url: 'https://lichess.org/PVmate01', endTime: 1, moves: ['f3', 'e5', 'g4', 'Nc6'],
+    white: {name: 'Challenger', rating: 1700}, black: {name: 'tester-li', rating: 1800}}, 'tester-li');
+  const saved = {...newer, id: '902', url: 'https://www.chess.com/game/live/902', t: 2};
+  delete older.m1Setup;
+  const rows = [...season(), newer, saved, older];
+  const account = 'tester / tester-li', site = 'both';
+  const report = buildReport(rows, buildInsights(rows), {account, site});
+  await a.call('openProfile', {shared: report});
+  const w = a.run('profileWorkspace');
+  w.o.loadPgn = async () => '1. f3 e5 2. g4 Nc6 *';
+  w.o.createAnalysisEngine = null;
+  w.solvedMates = new Set(['chesscom:902']);
+  w.go(w.deck.findIndex(slide => slide.id === 'mate1'));
+
+  const button = label => [...doc.querySelectorAll('.profile-puzzle-button')].find(node => node.textContent === label);
+  const link = () => doc.querySelector('.pv-story .profile-open-puzzle-game');
+  const evalBar = () => doc.querySelector('.profile-game-eval');
+  const square = name => [...w.boardEl.querySelectorAll('.sq')].find(node => w.board.nameOf(node) === name);
+  const clickSquare = name => {
+    for (const type of ['pointerdown', 'pointerup']) square(name).dispatchEvent(new PointerEvent(type, {bubbles: true, pointerId: 1}));
+  };
+  assert.equal(link().textContent, 'Open game');
+  assert.equal(link().href, newer.url);
+  assert.equal(link().target, '_blank');
+  assert.match(doc.querySelector('.profile-game-player-top').textContent, /Defender.*1600/);
+  assert.match(doc.querySelector('.profile-game-player-bottom').textContent, /tester.*1500/);
+  assert.match(evalBar().getAttribute('aria-label'), /White.*mate.*1/i);
+  assert.ok(square('f6').classList.contains('profile-hl'));
+  assert.ok(button('Previous').disabled);
+
+  clickSquare('h5'); clickSquare('f3');
+  assert.ok(square('h5').querySelector('[data-result="incorrect"]'));
+  assert.equal(doc.querySelector('.profile-puzzle').textContent.includes('Not mate. Try again.'), false);
+  await new Promise(resolve => setTimeout(resolve, 750));
+  assert.ok(square('h5').querySelector('.profile-piece'));
+  clickSquare('h5'); clickSquare('f7');
+  assert.ok(square('f7').querySelector('[data-result="correct"]'));
+  assert.ok(w.boardEl.querySelector('[data-mated-square="e8"] .mate-badge'));
+  assert.equal(evalBar().getAttribute('aria-label'), 'Checkmate');
+
+  button('Next').click();
+  assert.equal(link().href, older.url, 'Next skips the solved game in between');
+  for (let i = 0; i < 4; i++) await settle();
+  assert.ok(square('g4').classList.contains('profile-hl'), 'older cached positions recover the previous move from the PGN');
+  assert.ok(evalBar().classList.contains('flipped'));
+  assert.match(doc.querySelector('.profile-game-player-top').textContent, /Challenger.*1700/);
+  assert.match(doc.querySelector('.profile-game-player-bottom').textContent, /tester-li.*1800/);
+  button('Previous').click();
+  assert.equal(link().href, newer.url);
+  assert.equal(w.boardEl.querySelector('.puzzle-result-badge, .mate-badge'), null);
+  clickSquare('h5'); clickSquare('f7');
+  assert.ok(square('f7').querySelector('[data-result="correct"]'), 'Previous lets the user solve the same puzzle again');
 });

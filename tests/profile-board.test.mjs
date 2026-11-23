@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {JSDOM} from 'jsdom';
+import {Chess} from '../lib/chess.js';
 import {createProfileBoard, squareNames} from '../lib/profile/board.js';
 
 function surface(t, motion = true, onMove = null) {
@@ -130,4 +131,43 @@ test('rewind without motion lands on the starting position at once', t => {
   let last = null;
   api.moves(['e4', 'e5'], {from: 2, rewind: true, onStep: (move, i) => { last = i; }});
   assert.equal(last, 0); assert.ok(at('e2') && at('e7'));
+});
+
+test('profile puzzles replay the previous move and right-click resets a picked-up piece', async t => {
+  t.mock.timers.enable({apis: ['setTimeout']});
+  const {api, board, at} = surface(t, true);
+  const doc = board.ownerDocument, win = doc.defaultView, submitted = [];
+  const square = name => board.children[squareNames(false).indexOf(name)];
+  const pointer = (target, type, props = {}) => target.dispatchEvent(new win.PointerEvent(type, {bubbles: true, pointerId: 1, ...props}));
+  const chess = new Chess();
+  for (const san of ['e4', 'e5', 'Bc4', 'Nc6', 'Qh5']) chess.move(san);
+  const previous = chess.move('Nf6');
+  let ready = false;
+  api.play(chess.fen(), {previous, intro: true, onReady: () => { ready = true; }, onMove: move => submitted.push(move)});
+  assert.ok(at('g8') && !at('f6'));
+  pointer(square('h5'), 'pointerdown');
+  assert.equal(board.querySelector('.profile-sel'), null, 'input is locked during the lead-in');
+  t.mock.timers.tick(450); await Promise.resolve();
+  assert.ok(!at('g8') && at('f6') && ready);
+  assert.ok(square('g8').classList.contains('profile-hl') && square('f6').classList.contains('profile-hl'));
+
+  doc.elementFromPoint = () => square('f7');
+  pointer(square('h5'), 'pointerdown', {buttons: 1});
+  pointer(doc, 'pointermove', {buttons: 1, clientX: 20});
+  assert.match(at('h5').style.transform, /translate/);
+  pointer(doc, 'pointermove', {buttons: 3, clientX: 20});
+  pointer(square('f7'), 'pointerup');
+  assert.equal(at('h5').style.transform, '');
+  assert.equal(board.querySelector('.profile-sel, .profile-target, .profile-moving'), null);
+  assert.deepEqual(submitted, []);
+
+  pointer(square('h5'), 'pointerdown', {buttons: 1});
+  pointer(doc, 'pointermove', {buttons: 1, clientX: 20});
+  assert.equal(square('f7').dispatchEvent(new win.MouseEvent('contextmenu', {bubbles: true, cancelable: true, button: 2})), false);
+  assert.equal(at('h5').style.transform, '');
+  assert.equal(board.querySelector('.profile-sel, .profile-target, .profile-moving'), null);
+
+  pointer(square('h5'), 'pointerdown'); pointer(square('h5'), 'pointerup');
+  pointer(square('f7'), 'pointerdown');
+  assert.deepEqual(submitted.map(({from, to}) => [from, to]), [['h5', 'f7']]);
 });

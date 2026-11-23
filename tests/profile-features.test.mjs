@@ -225,10 +225,14 @@ test('features: mates in one on the board, played and missed', () => {
   const missed = gameFeatures(g([...scholar, 'Qf3', 'Nd4']), 'a');
   assert.deepEqual([missed.m1, missed.m1Missed, missed.m1Ply], [1, 1, 7]);
   assert.equal(missed.m1Fen, (() => { const c = new Chess(); for (const san of scholar) c.move(san); return c.fen(); })(), 'the missed position is kept for the puzzles');
+  assert.equal(missed.m1Setup.move, 'g8f6');
+  assert.equal(new Chess(missed.m1Setup.fen).move(missed.m1Setup.move).after, missed.m1Fen, 'the previous move leads to the stored puzzle');
   assert.equal(needsReplay({...missed, m1Fen: ''}), true, 'a miss without its position is replayed once');
   const found = gameFeatures(g([...scholar, 'Qxf7#'], {result: 'w', termination: 'mate'}), 'a');
   assert.deepEqual([found.m1, found.m1Missed], [1, 0]);
-  assert.deepEqual([gameFeatures(g(scholar), 'a').m1Missed, gameFeatures(g(scholar), 'b').m1], [1, 0], 'a game that stops with the mate on the board missed it; the other side had none');
+  const stopped = gameFeatures(g(scholar), 'a');
+  assert.deepEqual([stopped.m1Missed, gameFeatures(g(scholar), 'b').m1], [1, 0], 'a game that stops with the mate on the board missed it; the other side had none');
+  assert.deepEqual(stopped.m1Setup, missed.m1Setup);
   const opera = gameFeatures(game(), 'morphy');
   assert.ok(opera.m1 >= 1 && opera.m1Missed === 0, 'Morphy played his mate');
   assert.equal(needsReplay({...found, m1: undefined}), true, 'rows from before the count are replayed once');
