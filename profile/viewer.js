@@ -160,7 +160,6 @@ function installButton({cls = 'profile-button primary web-install', store = prim
 const installButtons = where => [installButton({where}), installButton({cls: 'profile-button web-install web-install-other', store: otherStore(), where: where + '-other'})];
 let dialog = null, dialogReturn = null;
 function openInstall(account) {
-  closePopover();
   if (!dialog) {
     const features = [
       [ICONS.twin, 'Your own profile', 'Your historical twin, rating journey, openings, rivals and habits, drawn on the board like this one.'],
@@ -198,26 +197,6 @@ function trapFocus(event) {
   if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
   else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
 }
-let popover = null;
-function togglePopover() {
-  const button = $('infoButton');
-  if (popover && !popover.hidden) { closePopover(); return; }
-  if (!popover) {
-    popover = h('div', {class: 'web-popover', role: 'dialog', 'aria-label': 'How this page works', hidden: true,
-      onkeydown: e => { if (e.key === 'Escape') { e.preventDefault(); closePopover(); button.focus(); } }},
-      h('strong', {}, 'How this page works'),
-      h('p', {}, 'The whole profile travels inside the link. The part after # never reaches a server: your browser decodes it and draws every chapter here. GitHub serves this page and sees only the page request.'),
-      h('p', {}, 'Opening a game on the board fetches its moves directly from Chess.com or Lichess.'),
-      h('p', {}, h('a', {href: 'https://github.com/T-Julsgaard/Chess-Review', target: '_blank', rel: 'noopener'}, 'Chess Review is open source ↗')));
-    document.body.append(popover);
-    document.addEventListener('pointerdown', e => { if (popover && !popover.hidden && !popover.contains(e.target) && !button.contains(e.target)) closePopover(); });
-  }
-  const r = button.getBoundingClientRect();
-  Object.assign(popover.style, {top: r.bottom + 10 + 'px', right: Math.max(12, window.innerWidth - r.right) + 'px'});
-  popover.hidden = false; button.setAttribute('aria-expanded', 'true');
-  popover.querySelector('a').focus({preventScroll: true});
-}
-function closePopover() { if (popover) popover.hidden = true; $('infoButton').setAttribute('aria-expanded', 'false'); }
 
 /* ---------- the extension's Story deck, with the web's last chapter ---------- */
 class WebStoryWorkspace extends StoryWorkspace {
@@ -293,7 +272,6 @@ function showLanding({title, text, error = false}) {
 
 async function main() {
   syncStoreLinks(); watchExtension();
-  $('infoButton').addEventListener('click', togglePopover);
   buildBoard($('board'));
   const m = location.hash.match(/[#&]p=([^&]+)/);
   if (!m) {
