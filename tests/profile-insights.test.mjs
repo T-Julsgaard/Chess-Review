@@ -60,19 +60,23 @@ test('insights: results by opponent rating never leave an empty column', () => {
   assert.ok(even.bands.every(b => b.to - b.from + 1 === even.step));
 });
 
-test('insights: the one that got away is a loss on the board from ahead; the rival keeps its games in order', () => {
+test('insights: the one that got away is a loss on the board from ahead; your results over time come in runs of games', () => {
   const base = {res: 'l', matMin: 0, matMax: 5, t: 1};
   const M = material([{...base, id: 'draw', res: 'd', term: 'repetition', matMax: 9}, {...base, id: 'flag', term: 'time', matMax: 8}, {...base, id: 'resigned', term: 'resign'}]);
   assert.equal(M.choke.id, 'resigned', 'draws and losses on time do not count');
   assert.equal(material([{...base, res: 'd', term: 'agree'}]).choke, null);
-  const rows = season(), O = opponents(rows);
-  assert.equal(O.rival.history.length, O.rival.games);
-  assert.ok(O.rival.history.every((g, i) => !i || O.rival.history[i - 1][0] <= g[0]), 'oldest first');
-  const chart = resultsOverTime(O.rival.history, O.rival.name);
+  const rows = season(), T = totals(rows);
+  assert.equal(T.runs.length, 12, 'twelve runs of consecutive games');
+  assert.equal(T.runs.reduce((s, r) => s + r.games, 0), T.games, 'every game in one run');
+  assert.deepEqual(['w', 'd', 'l'].map(k => T.runs.reduce((s, r) => s + r[k], 0)), [T.w, T.d, T.l]);
+  assert.ok(T.runs.every((r, i) => r.from <= r.to && (!i || T.runs[i - 1].to <= r.from)), 'oldest first');
+  const chart = resultsOverTime(T.runs);
   assert.equal(chart.scene.type, 'results');
-  assert.equal(chart.scene.columns.reduce((s, c) => s + c.games, 0), O.rival.games, 'every game in one column');
+  assert.equal(chart.scene.label, 'Your results over time, oldest on the left.');
   assert.ok(chart.scene.columns.every(c => c.games >= 5), 'runs of at least five games when there are enough');
   assert.ok(chart.scene.columns.every(c => Math.abs(c.w + c.d + c.l - 1) < 1e-9));
+  assert.match(chart.scene.columns[0].detail, /: \d+ games\. Won \d+, drew \d+, lost \d+\.$/);
+  assert.equal(totals(rows.slice(0, 1)).runs, null, 'one game is not a trend');
   const deck = buildDeck(buildReport(rows, buildInsights(rows), {account: 'tester', site: 'chesscom'}), {account: 'tester'});
   const swings = deck.find(s => s.id === 'swings');
   assert.equal(swings.alsoEvidence.label, 'View the one that got away', 'the comeback chapter also links the lost game');

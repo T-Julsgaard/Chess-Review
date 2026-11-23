@@ -209,8 +209,9 @@
 .pv-legend { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 12.5px; color: var(--ink-2); }
 .pv-legend-dot { width: 10px; height: 10px; border-radius: 50%; background: color-mix(in srgb, var(--ink) 40%, transparent); margin-left: 4px; }
 .pv-legend-dot.pv-legend-good { background: var(--q-best); }
-/* Greatest hits: results by opponent rating, each square painted with its slice of loss, draw and win (board-viz.js results). */
-.pv-results, .pv-legend { --pv-draw: color-mix(in srgb, var(--ink-2) 75%, var(--panel)); }
+/* Greatest hits: results by opponent rating, each square painted with its slice of loss, draw and win (board-viz.js results).
+   The endings chapter's Draws columns use the same silver. */
+.pv-results, .pv-columns, .pv-legend { --pv-draw: color-mix(in srgb, var(--ink-2) 75%, var(--panel)); }
 .pv-results .pv-tile::before { background: var(--g, var(--c)); }
 .pv-legend-dot.pv-legend-draw { background: var(--pv-draw); }
 .pv-legend-dot.pv-legend-loss { background: var(--q-miss); }

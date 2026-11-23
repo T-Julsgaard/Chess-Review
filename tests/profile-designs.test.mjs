@@ -97,6 +97,17 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.equal(doc.querySelector('.board .pv-badge'), null, 'nothing covers the result squares');
   assert.equal(doc.querySelectorAll('.board .sq.profile-fill').length, 64);
   assert.equal(shell.querySelectorAll('.pv-fact').length, 4, 'four facts, two by two');
+  // View your results over time, in place of a link to the longest game: every game in runs, drawn like Greatest hits.
+  assert.equal(shell.querySelector('.pv-link[data-game-url]'), null, 'no link to the longest game');
+  const overTime = shell.querySelector('.pv-link[aria-pressed]');
+  assert.equal(overTime?.textContent, 'View your results over time');
+  overTime.click();
+  assert.ok(doc.querySelectorAll('.board .pv-results .pv-tile').length >= 16, 'the board charts your results over time');
+  assert.match(doc.querySelector('.profile-board-caption .pv-legend').textContent, /Results over time:.*Won.*Drew.*Lost/);
+  assert.equal(shell.querySelector('.pv-link[aria-pressed]').textContent, 'Back to your overall results');
+  shell.querySelector('.pv-link[aria-pressed]').click();
+  assert.equal(doc.querySelector('.board .pv-results'), null, 'back to the results squares');
+  assert.equal(doc.querySelectorAll('.board .sq.profile-fill').length, 64);
   // The time-control switch narrows the chapter to one format.
   const filter = shell.querySelector('.pv-filter');
   const thumb = filter.querySelector('.pv-filter-thumb'), bar = shell.querySelector('.pv-wdl');
@@ -131,15 +142,27 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.equal(doc.querySelector('.board .pv-badge'), null);
   assert.match(shell.querySelector('.pv-story-lead').textContent, /^You played \d+ games against rival_rick: won \d+, lost \d+, drew \d+\.$/);
   assert.equal(shell.querySelector('.pv-link[data-game-url]'), null, 'no link to the latest decisive game');
-  // View your results over time: the head-to-head in runs of games, drawn like Greatest hits.
-  const overTime = shell.querySelector('.pv-link[aria-pressed]');
-  assert.equal(overTime?.textContent, 'View your results over time');
-  overTime.click();
-  assert.ok(doc.querySelectorAll('.board .pv-results .pv-tile').length >= 16, 'the board charts the rivalry over time');
-  assert.match(doc.querySelector('.profile-board-caption .pv-legend').textContent, /Results over time:.*Won.*Drew.*Lost/);
-  assert.equal(shell.querySelector('.pv-link[aria-pressed]').textContent, 'Back to the overall record');
-  shell.querySelector('.pv-link[aria-pressed]').click();
-  assert.equal(doc.querySelector('.board .pv-results'), null, 'back to the overall record');
+  assert.equal(shell.querySelector('.pv-link[aria-pressed]'), null, 'results over time live on the numbers chapter');
+  w.go(w.deck.findIndex(s => s.id === 'endings'));
+  // Wins · Losses · Draws, like the openings sort: each charts how those games ended.
+  const endingTabs = [...shell.querySelectorAll('.pv-tabs [role="tab"]')];
+  assert.deepEqual(endingTabs.map(b => b.textContent), ['Wins', 'Losses', 'Draws']);
+  assert.equal(shell.querySelector('.pv-tabs [aria-selected="true"]').textContent, 'Wins');
+  assert.match(shell.querySelector('.pv-story-lead').textContent, /^Wins by /);
+  assert.equal(shell.querySelector('.pv-reasons'), null, 'the tabs say how losses and draws end');
+  // Labels standing under the board live in the layer's twin outside it.
+  const columnLabels = () => [...(w.viz.layer.outside || w.viz.layer).querySelectorAll('.pv-col-label')].map(n => n.textContent);
+  assert.deepEqual(columnLabels(), ['Mate', 'Resign', 'Time', 'Other'], 'the board charts how your wins ended');
+  endingTabs[1].click();
+  assert.deepEqual(columnLabels(), ['Mate', 'Resign', 'Time', 'Other'], 'and then how your losses ended');
+  assert.equal(shell.querySelector('.pv-tabs [aria-selected="true"]').textContent, 'Losses');
+  assert.match(shell.querySelector('.pv-story-lead').textContent, /^Losses by /);
+  assert.deepEqual([...shell.querySelectorAll('.pv-fact dt')].map(n => n.firstChild.textContent), ['Losses by checkmate', 'Losses by resignation', 'Losses on time', 'Losses']);
+  assert.equal(shell.querySelectorAll('.pv-fact dd')[3].textContent, String(w.report.totals.l));
+  shell.querySelectorAll('.pv-tabs [role="tab"]')[2].click();
+  assert.match(shell.querySelector('.pv-story-lead').textContent, w.report.totals.d ? /^Draws by / : /^No draws in this period\.$/);
+  assert.equal(shell.querySelectorAll('.pv-fact').length, w.report.totals.d ? Math.min(3, Object.keys(w.report.terminations.draws).length) + 1 : 0);
+  shell.querySelectorAll('.pv-tabs [role="tab"]')[0].click();
   w.go(w.deck.findIndex(s => s.id === 'hits'));
   assert.ok(doc.querySelectorAll('.board .pv-results .pv-tile').length >= 16, 'the board charts results by opponent rating');
   assert.match(doc.querySelector('.profile-board-caption .pv-legend').textContent, /Results by opponent rating:.*Won.*Drew.*Lost/);
