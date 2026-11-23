@@ -14,8 +14,8 @@
 .pv-tile.pv-tile-top::before { border-radius: 16% 16% 5px 5px; }
 .pv-tile-share::before { bottom: 9%; height: calc(var(--f, 1) * 82%); border-radius: 22% !important; }
 .pv-col-value, .pv-col-label { display: grid; justify-items: center; font-variant-numeric: tabular-nums; pointer-events: auto; }
-.pv-col-value { align-items: end; padding-bottom: 8%; font-size: clamp(11px, 1.15vw, 17px); font-weight: 800; color: var(--ink); text-shadow: 0 1px 8px var(--bg); animation: pv-fade .4s ease var(--d, 0ms) both; }
-.pv-col-label { align-items: center; font-size: clamp(9px, .95vw, 13px); font-weight: 750; letter-spacing: .6px; text-transform: uppercase; color: var(--ink-2); }
+.pv-col-value { align-items: end; padding-bottom: 8%; font-size: clamp(11px, 1.15vw, calc(17px * var(--pv-s, 1))); font-weight: 800; color: var(--ink); text-shadow: 0 1px 8px var(--bg); animation: pv-fade .4s ease var(--d, 0ms) both; }
+.pv-col-label { align-items: center; font-size: clamp(9px, .95vw, calc(13px * var(--pv-s, 1))); font-weight: 750; letter-spacing: .6px; text-transform: uppercase; color: var(--ink-2); }
 /* Labels under a chart that stands on the board's bottom edge (columns with `floor`). */
 .pv-outside > .pv-col-below { top: calc(100% + 7px); height: auto; line-height: 1.2; white-space: nowrap; animation: pv-fade .4s ease var(--d, 0ms) both; }
 .pv-line-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
@@ -30,11 +30,11 @@
 .pv-line-dot { width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: var(--pv-c, var(--accent)); box-shadow: 0 0 0 5px color-mix(in srgb, var(--pv-c, var(--accent)) 28%, transparent); animation: pv-pop .4s cubic-bezier(.2,.9,.25,1.3) 1.45s both; }
 .pv-line-dot.pv-peak { background: var(--q-inacc); box-shadow: 0 0 0 5px color-mix(in srgb, var(--q-inacc) 30%, transparent), 0 0 24px var(--q-inacc); }
 .pv-line-dot.pv-start { animation-delay: .2s; width: 10px; height: 10px; margin: -5px 0 0 -5px; }
-.pv-line-tag { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); white-space: nowrap; padding: 4px 10px; border-radius: 999px; font-size: clamp(11px, 1vw, 14px); font-weight: 800; font-variant-numeric: tabular-nums;
+.pv-line-tag { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); white-space: nowrap; padding: 4px 10px; border-radius: 999px; font-size: clamp(11px, 1vw, calc(14px * var(--pv-s, 1))); font-weight: 800; font-variant-numeric: tabular-nums;
   color: var(--ink); background: color-mix(in srgb, var(--panel) 88%, transparent); border: 1px solid var(--line); box-shadow: 0 6px 18px color-mix(in srgb, #000 30%, transparent); }
 .pv-line-dot.pv-left .pv-line-tag { left: auto; right: 8px; transform: none; }
 .pv-line-dot.pv-start .pv-line-tag { bottom: auto; top: calc(100% + 8px); left: 0; transform: none; }
-.pv-line-label { left: 4%; top: 4%; font-size: clamp(12px, 1.4vw, 20px); font-weight: 850; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-2); }
+.pv-line-label { left: 4%; top: 4%; font-size: clamp(12px, 1.4vw, calc(20px * var(--pv-s, 1))); font-weight: 850; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-2); }
 .pv-line { pointer-events: auto; overflow: hidden; outline-offset: -2px; }
 .pv-line-cursor { top: 0; bottom: 0; width: 1px; background: color-mix(in srgb, var(--ink) 45%, transparent); pointer-events: none; }
 .pv-line-dot.pv-inspect { z-index: 2; animation: none; pointer-events: none; }
@@ -44,11 +44,11 @@
   .pv-story-top { gap: 6px; }
   .pv-story-top :is(.pv-filter, .pv-modes) button { padding-inline: 7px; font-size: 10px; }
 }
-.pv-badge { left: 50%; top: 50%; translate: -50% -50%; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: clamp(14px, 1.6vw, 24px) clamp(20px, 2.4vw, 36px); border-radius: 22px; text-align: center; white-space: nowrap;
+.pv-badge { left: 50%; top: 50%; translate: -50% -50%; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: clamp(14px, 1.6vw, calc(24px * var(--pv-s, 1))) clamp(20px, 2.4vw, calc(36px * var(--pv-s, 1))); border-radius: 22px; text-align: center; white-space: nowrap;
   background: color-mix(in srgb, var(--panel) 74%, transparent); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4);
   border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); box-shadow: 0 24px 70px color-mix(in srgb, #000 45%, transparent); animation: pv-badge-in .7s cubic-bezier(.2,.9,.25,1.1) 1.1s both; }
-.pv-badge-value { font-size: clamp(34px, 4.6vw, 78px); font-weight: 850; letter-spacing: -.04em; line-height: 1; font-variant-numeric: tabular-nums; }
-.pv-badge-label { font-size: clamp(11px, 1vw, 14px); font-weight: 750; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-2); }
+.pv-badge-value { font-size: clamp(34px, 4.6vw, calc(78px * var(--pv-s, 1))); font-weight: 850; letter-spacing: -.04em; line-height: 1; font-variant-numeric: tabular-nums; }
+.pv-badge-label { font-size: clamp(11px, 1vw, calc(14px * var(--pv-s, 1))); font-weight: 750; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-2); }
 .pv-badge-sub { font-size: 12px; color: var(--ink-2); }
 .pv-layer[data-motion="off"], .pv-layer[data-motion="off"] *, .pv-layer[data-motion="off"] *::before, .pv-outside[data-motion="off"] * { animation: none !important; }
 .pv-layer[data-motion="off"] .pv-line-path { stroke-dashoffset: 0; }
@@ -201,7 +201,7 @@
 .pv-settings.on { transform: rotate(30deg); }
 .pv-settings:focus-visible { outline: 2px solid var(--pv-tint, var(--accent)); outline-offset: 2px; }
 .pv-settings.active::after { content: ''; position: absolute; top: 1px; right: 1px; width: 7px; height: 7px; border-radius: 50%; background: var(--pv-vivid, var(--accent)); box-shadow: 0 0 0 2px var(--panel); }
-.pv-settings-menu { position: absolute; top: calc(100% + 6px); right: 0; z-index: 20; width: 272px; max-height: min(600px, calc(100vh - 140px)); overflow: auto; display: grid; gap: 2px; padding: 6px; border-radius: 12px; outline: none;
+.pv-settings-menu { position: absolute; top: calc(100% + 6px); right: 0; z-index: 20; width: 272px; max-height: min(600px, calc((100vh - 140px) / var(--pv-s, 1))); overflow: auto; display: grid; gap: 2px; padding: 6px; border-radius: 12px; outline: none;
   background: color-mix(in srgb, var(--panel) 92%, var(--ink) 4%); border: 1px solid var(--line); box-shadow: 0 18px 44px -14px color-mix(in srgb, #000 60%, transparent); transform-origin: top right; }
 .pv-settings-menu .pv-compare-head:not(:first-child) { margin-top: 8px; }
 .pv-set-row, .pv-set-switch { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 34px; padding: 4px 10px; border-radius: 8px; }
@@ -281,14 +281,14 @@
 /* Charts: values on the bars, dense columns, pairs, habit dots */
 .pv-layer > .pv-col-value { display: block; text-align: center; padding: 0 0 4px; transform: translateY(-100%); line-height: 1.1; white-space: nowrap; }
 .pv-col-value.pv-muted { color: var(--ink-2); font-weight: 700; }
-.pv-columns-dense .pv-col-value { font-size: clamp(9px, .85vw, 13px); }
-.pv-columns-dense .pv-col-label { font-size: clamp(8px, .72vw, 11px); letter-spacing: .2px; }
+.pv-columns-dense .pv-col-value { font-size: clamp(9px, .85vw, calc(13px * var(--pv-s, 1))); }
+.pv-columns-dense .pv-col-label { font-size: clamp(8px, .72vw, calc(11px * var(--pv-s, 1))); letter-spacing: .2px; }
 .pv-columns-dense .pv-tile::before { left: 7%; right: 7%; border-radius: 4px; }
 .pv-pair-label { letter-spacing: .3px; }
 .pv-bubble { display: grid; place-items: center; pointer-events: auto; }
 /* A fixed-size disc scaled by --s: scaling is composited, so resizing never re-lays out (no shimmer). */
 .pv-bubble::before { content: ""; width: 82%; aspect-ratio: 1; scale: var(--s, 0); border-radius: 50%; background: var(--c); box-shadow: 0 0 18px -6px var(--c); animation: pv-pop .45s cubic-bezier(.2,.9,.25,1.2) var(--d, 0ms) both; }
-.pv-bubble-day { display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1vw, 14px); font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: var(--ink-2); }
+.pv-bubble-day { display: flex; align-items: center; justify-content: center; font-size: clamp(10px, 1vw, calc(14px * var(--pv-s, 1))); font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: var(--ink-2); }
 .pv-layer.pv-leaving { z-index: 4; }
 /* A new time control morphs the chart that is already there: dots and columns glide to their new size and colour. */
 .pv-bubble::before { transition: scale .6s cubic-bezier(.33,1,.68,1), background-color .55s ease, box-shadow .55s ease; will-change: scale; }
@@ -501,7 +501,7 @@
   .pv-ed-host { padding: 0 16px !important; }
   .pv-ed-row { grid-template-columns: minmax(0, 1fr) 54px auto; } .pv-ed-row-bar, .pv-ed-row-wdl { display: none; }
 }
-.pv-day-no { position: absolute; left: 16%; top: 13%; z-index: 1; font-size: clamp(8px, .75vw, 11px); font-weight: 800; color: color-mix(in srgb, var(--ink) 55%, transparent); pointer-events: none; }
+.pv-day-no { position: absolute; left: 16%; top: 13%; z-index: 1; font-size: clamp(8px, .75vw, calc(11px * var(--pv-s, 1))); font-weight: 800; color: color-mix(in srgb, var(--ink) 55%, transparent); pointer-events: none; }
 .pv-days .pv-tile[data-lit] .pv-day-no { color: rgb(0 0 0 / .5); }
 
 /* Story: tighter rhythm so a chapter fits a laptop screen without scrolling */
@@ -545,10 +545,10 @@
 /* A new time control moves the bars that are already there (story.js carrySignature), never grows them again from zero. */
 .pv-cmp-kept .pv-cmp-bars i { animation: none; }
 /* Labels under the board, the habit dots' days and hours: a size up, so they read from a normal distance. */
-.pv-outside > .pv-col-below { font-size: clamp(10.5px, 1.1vw, 15px); }
-.pv-outside.pv-columns-dense > .pv-col-below { font-size: clamp(9px, .8vw, 12px); }
-.pv-bubble-day { font-size: clamp(12px, 1.2vw, 16px); }
-.pv-bubble-band { font-size: clamp(10.5px, 1.1vw, 15px); }
+.pv-outside > .pv-col-below { font-size: clamp(10.5px, 1.1vw, calc(15px * var(--pv-s, 1))); }
+.pv-outside.pv-columns-dense > .pv-col-below { font-size: clamp(9px, .8vw, calc(12px * var(--pv-s, 1))); }
+.pv-bubble-day { font-size: clamp(12px, 1.2vw, calc(16px * var(--pv-s, 1))); }
+.pv-bubble-band { font-size: clamp(10.5px, 1.1vw, calc(15px * var(--pv-s, 1))); }
 /* "Increase granularity" in the room right of the clock's big figure, so the chapter keeps its height. */
 .pv-story-hero.has-side { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; row-gap: 6px; align-items: start; }
 .pv-story-hero.has-side > .pv-story-figure, .pv-story-hero.has-side > .pv-story-label { grid-column: 1; }
@@ -563,11 +563,11 @@
 .pv-pie-slice:hover { stroke-width: 12.5; }
 .pv-layer[data-motion="off"] .pv-pie-slice { transition: none; }
 .pv-pie-center { left: 50%; top: 50%; translate: -50% -50%; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; animation: pv-fade .5s ease var(--d, 0ms) both; }
-.pv-pie-center strong { font-size: clamp(30px, 3.6vw, 60px); font-weight: 850; letter-spacing: -.035em; line-height: 1; font-variant-numeric: tabular-nums; color: var(--ink); }
-.pv-pie-center span { font-size: clamp(10.5px, .95vw, 14px); font-weight: 750; letter-spacing: 1.4px; text-transform: uppercase; color: var(--ink-2); }
+.pv-pie-center strong { font-size: clamp(30px, 3.6vw, calc(60px * var(--pv-s, 1))); font-weight: 850; letter-spacing: -.035em; line-height: 1; font-variant-numeric: tabular-nums; color: var(--ink); }
+.pv-pie-center span { font-size: clamp(10.5px, .95vw, calc(14px * var(--pv-s, 1))); font-weight: 750; letter-spacing: 1.4px; text-transform: uppercase; color: var(--ink-2); }
 .pv-outside > .pv-pie-label { display: flex; flex-direction: column; gap: 2px; line-height: 1.05; white-space: nowrap; pointer-events: auto; animation: pv-fade .45s ease var(--d, 0ms) both; }
-.pv-pie-label b { font-size: clamp(15px, 1.55vw, 24px); font-weight: 850; letter-spacing: -.02em; font-variant-numeric: tabular-nums; color: var(--ink); }
-.pv-pie-label small { font-size: clamp(10px, .9vw, 13px); font-weight: 700; letter-spacing: .3px; color: var(--ink-2); }
+.pv-pie-label b { font-size: clamp(15px, 1.55vw, calc(24px * var(--pv-s, 1))); font-weight: 850; letter-spacing: -.02em; font-variant-numeric: tabular-nums; color: var(--ink); }
+.pv-pie-label small { font-size: clamp(10px, .9vw, calc(13px * var(--pv-s, 1))); font-weight: 700; letter-spacing: .3px; color: var(--ink-2); }
 .pv-pie-label.is-right { align-items: flex-start; translate: 0 -50%; }
 .pv-pie-label.is-left { align-items: flex-end; translate: -100% -50%; }
 .pv-pie-label.is-mid { align-items: center; translate: -50% -50%; }

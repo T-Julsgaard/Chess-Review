@@ -87,8 +87,8 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-game-player { position: absolute; left: 0; right: 0; }
 /* Same size as the review's own name strips, which the review always leaves room for. */
 .profile-game-player .player-strip { height: var(--strip-h, 48px); padding: 4px 0; gap: 8px; box-sizing: border-box; min-width: 0; }
-.profile-game-player .avatar { width: 34px; height: 34px; border-radius: 8px; }
-.profile-game-player .player-strip .name { font-size: 14px; overflow: hidden; text-overflow: ellipsis; }
+.profile-game-player .avatar { width: calc(34px * var(--pv-s, 1)); height: calc(34px * var(--pv-s, 1)); border-radius: calc(8px * var(--pv-s, 1)); }
+.profile-game-player .player-strip .name { font-size: calc(14px * var(--pv-s, 1)); overflow: hidden; text-overflow: ellipsis; }
 .profile-game-player-bottom { padding-right: calc(var(--dock-w, 0px) + 10px); }
 .profile-game-dock { position: absolute; top: 100%; right: 0; height: var(--strip-h, 48px); display: flex; align-items: center; gap: 10px; pointer-events: auto; }
 .profile-game-dock .profile-game-controls { gap: 6px; }
@@ -188,11 +188,11 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-board .sq.profile-split-l::before { background: var(--q-great); }
 .profile-board .sq.profile-split-r::before { background: var(--accent); }
 @keyframes profile-pop { from { transform: scale(.3); opacity: 0; } to { transform: none; opacity: .85; } }
-.profile-board .profile-label { position: absolute; z-index: 3; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: clamp(9px, 1.1vw, 13px); font-weight: 800; color: var(--ink); text-shadow: 0 0 4px var(--bg), 0 0 8px var(--bg); pointer-events: none; }
+.profile-board .profile-label { position: absolute; z-index: 3; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: clamp(9px, 1.1vw, calc(13px * var(--pv-s, 1))); font-weight: 800; color: var(--ink); text-shadow: 0 0 4px var(--bg), 0 0 8px var(--bg); pointer-events: none; }
 .profile-board .profile-label-left { left: 6%; transform: translate(0, -50%); }
 .profile-board-overlay { position: absolute; inset: 0; z-index: 4; display: grid; grid-template-columns: 1fr 1fr; place-items: center; pointer-events: none; }
 .profile-split-box { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 14px; border-radius: 14px; background: color-mix(in srgb, var(--panel) 88%, transparent); border: 1px solid var(--line); box-shadow: 0 6px 20px #0004; }
-.profile-split-box strong { font-size: clamp(22px, 3vw, 40px); font-weight: 800; letter-spacing: -.6px; }
+.profile-split-box strong { font-size: clamp(22px, 3vw, calc(40px * var(--pv-s, 1))); font-weight: 800; letter-spacing: -.6px; }
 .profile-split-box span { font-size: 12px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--ink-2); }
 .profile-card-preview { grid-column: 1 / -1; width: 86%; height: auto; border-radius: 10px; box-shadow: 0 10px 30px #0006; border: 1px solid var(--line); }
 .profile-board { position: relative; overflow: hidden; }
@@ -308,12 +308,13 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-reel { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
 .profile-reel > canvas { display: block; width: 100%; height: 100%; }
 .profile-reel-chrome { position: fixed; z-index: 54; pointer-events: none; color: var(--ink); }
-.profile-reel-player { position: absolute; left: 0; right: 0; height: 24px; display: flex; align-items: center; gap: 8px; font-size: 13px; white-space: nowrap; }
+/* Sized with the review: --pv-s is how much larger than at 1080p it is drawn (workspace.js uiScale). */
+.profile-reel-player { position: absolute; left: 0; right: 0; height: calc(24px * var(--pv-s, 1)); display: flex; align-items: center; gap: calc(8px * var(--pv-s, 1)); font-size: calc(13px * var(--pv-s, 1)); white-space: nowrap; }
 .profile-reel-top { bottom: calc(100% + 2px); }
 .profile-reel-bottom { top: calc(100% + 2px); }
 .profile-reel-player strong { min-width: 0; max-width: 46%; overflow: hidden; text-overflow: ellipsis; font-weight: 700; }
 .profile-reel-rating { color: var(--ink-2); font-variant-numeric: tabular-nums; }
-.profile-reel-aside { display: flex; align-items: center; gap: 8px; margin-left: auto; font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.profile-reel-aside { display: flex; align-items: center; gap: calc(8px * var(--pv-s, 1)); margin-left: auto; font-size: calc(12px * var(--pv-s, 1)); color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .profile-reel-result { font-weight: 700; color: var(--ink-2); }
 .profile-reel-result.w { color: var(--q-best); } .profile-reel-result.l { color: var(--q-miss); }
 .profile-reel-caption { display: grid; justify-items: center; gap: 2px; width: 100%; }

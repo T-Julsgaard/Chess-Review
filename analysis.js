@@ -1844,7 +1844,7 @@ async function openProfile({shared = null, resume = null} = {}) {
   profileWorkspace = new ProfileWorkspace({document, storage:browserAPI.storage.local, storageEvents:browserAPI.storage.onChanged,
     sendMessage:message=>browserAPI.runtime.sendMessage(message), stage:UI.canvas, boardWrap:UI.boardWrap, makePiece, flipped:S.flipped,
     settings:()=>S.settings, writeSettings:patch=>{Object.assign(S.settings,patch);return writeSettings(patch);}, identity, shared, resume, toast,
-    icon:name=>ICONS[name]||"", flag, url:_url,
+    icon:name=>ICONS[name]||"", flag, url:_url, uiScale:profileUiScale,
     playGameMove:move=>{if(move)playEvent(sanSound(move.san));},
     renderGamePlayer:(side,player,fen)=>playerStrip(side,capturedInfo(fen),{player,fen}),
     renderGameEvaluation:(bar,score,flipped)=>{
@@ -2038,6 +2038,19 @@ function referenceLayout() {
     for (const key of ["moves", "accuracy"]) layout[key].h -= extra;
   }
   return layout;
+}
+/**
+ * How much larger than at 1920x1080 the review is drawn right now (1440p, 4K):
+ * the player profile grows with it, so its text keeps the same size next to the
+ * board and the top bar. Smaller screens and free canvases keep 1.
+ */
+function profileUiScale() {
+  const now = isCustomLayout() && !isResponsiveModern() ? null : referenceLayout();
+  if (!now) return 1;
+  const modern = isResponsiveModern();
+  const base = fullHdReferenceLayout(modern ? MODERN_LAYOUT : DEFAULT_LAYOUT, 1920, 1080, accuracyLayoutExpanded(), modern, 0);
+  const scale = base ? panelScale(now.review) / panelScale(base.review) : 1;
+  return Number.isFinite(scale) ? Math.max(1, scale) : 1;
 }
 const selectedPanels = new Set();
 let cancelPanelGesture = null;
