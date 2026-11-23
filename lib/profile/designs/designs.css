@@ -3,7 +3,8 @@
 
 /* ---------- Charts drawn on the board ---------- */
 .pv-layer { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
-.pv-layer.pv-dim { background: color-mix(in srgb, var(--bg) 72%, transparent); animation: pv-fade .45s ease both; }
+.profile-board:has(> .pv-dim) { --board-rim: color-mix(in srgb, var(--bg) 72%, var(--line)); }
+.pv-layer.pv-dim::before { content: ""; position: absolute; inset: -1px; z-index: -1; background: color-mix(in srgb, var(--bg) 72%, transparent); animation: pv-fade .45s ease both; }
 .pv-layer > *, .pv-outside > * { position: absolute; box-sizing: border-box; }
 /* The unclipped twin of a chart layer (board-viz.js outside): labels may reach past the board. */
 .pv-outside { position: absolute; z-index: 6; pointer-events: none; }
@@ -47,16 +48,20 @@
 .pv-line-dot.pv-left .pv-line-tag { left: auto; right: 8px; transform: none; }
 .pv-line-dot.pv-start .pv-line-tag { bottom: auto; top: calc(100% + 8px); left: 0; transform: none; }
 .pv-line-label { left: 4%; top: 4%; font-size: clamp(12px, 1.4vw, calc(20px * var(--pv-s, 1))); font-weight: 850; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-2); }
-.pv-line { pointer-events: auto; overflow: hidden; outline-offset: -2px; }
+.pv-line { pointer-events: auto; outline-offset: -2px; }
 .pv-line-cursor { top: 0; bottom: 0; width: 1px; background: color-mix(in srgb, var(--ink) 45%, transparent); pointer-events: none; }
 .pv-line-dot.pv-inspect { z-index: 2; animation: none; pointer-events: none; }
 .pv-line-dot.pv-inspect[hidden], .pv-line-cursor[hidden] { display: none; }
 .pv-inspect.pv-right .pv-line-tag { left: 0; transform: none; }
+.pv-line-readout { z-index: 3; top: 3%; left: 50%; transform: translateX(-50%); display: grid; gap: 5px; padding: 7px 11px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: clamp(10px, 1.1vw, 14px); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pv-line-readout[hidden] { display: none; }
+.pv-line-readout-row { display: grid; grid-template-columns: 8px minmax(4.5em, auto) minmax(2.5em, auto) 1fr; align-items: center; gap: 6px; }
+.pv-line-readout-row small { color: var(--ink-2); font-size: .86em; }
 @media (max-width: 1100px) {
   .pv-story-top { gap: 6px; }
   .pv-story-top :is(.pv-filter, .pv-modes) button { padding-inline: 7px; font-size: 10px; }
 }
-.pv-layer[data-motion="off"], .pv-layer[data-motion="off"] *, .pv-layer[data-motion="off"] *::before, .pv-outside[data-motion="off"] * { animation: none !important; }
+.pv-layer[data-motion="off"], .pv-layer[data-motion="off"]::before, .pv-layer[data-motion="off"] *, .pv-layer[data-motion="off"] *::before, .pv-outside[data-motion="off"] * { animation: none !important; }
 .pv-layer[data-motion="off"] .pv-line-path { stroke-dashoffset: 0; }
 .pv-layer[data-motion="off"] .pv-line-area { opacity: 1; }
 @keyframes pv-rise { from { transform: scaleY(0); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -297,6 +302,28 @@
 .pv-outside.pv-columns-dense.pv-has-axis > .pv-col-label { letter-spacing: 0; font-size: clamp(7.5px, .64vw, calc(10px * var(--pv-s, 1))); }
 .pv-columns-dense .pv-tile::before { left: 7%; right: 7%; border-radius: 4px; }
 .pv-pair-label { letter-spacing: .3px; }
+/* The space between the two markers shows the gap for each habit. */
+.pv-differences { container-type: inline-size; --typical-dot: var(--ink-2); }
+.pv-diff-key, .pv-diff-list { inset-inline: 9%; }
+.pv-diff-key { top: 5%; display: flex; justify-content: center; gap: 1.4em; color: var(--ink-2); font-size: clamp(9px, 2.9cqw, 15px); font-weight: 700; }
+.pv-diff-list { inset-block: 13% 7%; display: grid; grid-auto-rows: 1fr; gap: 2cqw; margin: 0; padding: 0; list-style: none; }
+.pv-diff-row { display: grid; align-content: center; gap: clamp(2px, 1cqw, 7px); min-width: 0; padding-inline: 4%; border-radius: 8px; background: color-mix(in srgb, var(--panel) 78%, transparent); font-size: clamp(9px, 3.05cqw, 18px); font-variant-numeric: tabular-nums; }
+.pv-diff-heading, .pv-diff-values { display: flex; justify-content: space-between; align-items: baseline; gap: 5px; line-height: 1.13; }
+.pv-diff-gap { color: var(--pv-c, var(--accent)); font-weight: 800; white-space: nowrap; }
+[data-theme="light"] .pv-diff-gap { color: color-mix(in srgb, var(--pv-c, var(--accent)) 50%, var(--ink)); }
+.pv-diff-values { justify-content: flex-start; gap: 1em; color: var(--ink-2); font-size: .88em; }
+.pv-diff-key span, .pv-diff-values span { display: inline-flex; align-items: center; gap: .4em; }
+:is(.pv-diff-key, .pv-diff-values) > span::before { content: ""; width: .6em; aspect-ratio: 1; border-radius: 50%; background: var(--marker); }
+.pv-diff-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.pv-diff-you { --marker: var(--pv-c, var(--accent)); }
+[data-theme="light"] .pv-diff-you { --marker: color-mix(in srgb, var(--pv-c, var(--accent)) 73%, var(--ink)); }
+.pv-diff-typical { --marker: var(--typical-dot); }
+.pv-diff-track { position: relative; height: clamp(3px, 1cqw, 6px); margin-inline: .35em; border-radius: 999px; background: color-mix(in srgb, var(--ink) 16%, transparent); }
+.pv-diff-track i { position: absolute; top: 50%; translate: -50% -50%; }
+.pv-diff-track :is(.pv-diff-you, .pv-diff-typical) { width: .67em; aspect-ratio: 1; border-radius: 50%; background: var(--marker); }
+.pv-diff-track .pv-diff-you { left: var(--you); }
+.pv-diff-track .pv-diff-typical { left: var(--typical); }
+.pv-diff-track .pv-diff-link { left: min(var(--you), var(--typical)); width: calc(max(var(--you), var(--typical)) - min(var(--you), var(--typical))); height: 100%; translate: 0 -50%; background: color-mix(in srgb, var(--pv-c, var(--accent)) 55%, var(--typical-dot)); }
 .pv-bubble { display: grid; place-items: center; pointer-events: auto; }
 /* A fixed-size disc scaled by --s: scaling is composited, so resizing never re-lays out (no shimmer). */
 .pv-bubble::before { content: ""; width: 82%; aspect-ratio: 1; scale: var(--s, 0); border-radius: 50%; background: var(--c); box-shadow: 0 0 18px -6px var(--c); animation: pv-pop .45s cubic-bezier(.2,.9,.25,1.2) var(--d, 0ms) both; }
@@ -314,7 +341,7 @@
 .profile-board-caption .pv-legend { justify-content: center; }
 .profile-board-caption .pv-legend.pv-legend-below { margin-top: 20px; }
 /* Increase granularity (clock): columns split into slivers that slide apart, then fill to their own level (board-viz.js regroupFrom). */
-.pv-regrouping.pv-dim { animation: none; }
+.pv-regrouping.pv-dim::before { animation: none; }
 .pv-regrouping .pv-tile::before { animation: none; }
 .pv-regroup-moving > .pv-tile { transition: left .46s cubic-bezier(.3,.8,.25,1) var(--gd, 0ms), width .46s cubic-bezier(.3,.8,.25,1) var(--gd, 0ms); }
 .pv-layer.pv-regroup-old { z-index: 6; background: transparent; animation: none; }

@@ -1197,7 +1197,7 @@ button { font-family: inherit; cursor: pointer; }
   flex: 1; aspect-ratio: 1; display: grid;
   grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr);
   border-radius: 10px; overflow: hidden;
-  box-shadow: 0 0 0 1px var(--line), 0 26px 50px -30px rgba(0,0,0,.6);
+  box-shadow: 0 0 0 1px var(--board-rim, var(--line)), 0 26px 50px -30px rgba(0,0,0,.6);
   position: relative;
 }
 /* One opaque base and a full-board mask avoid both square and repeated-tile seams. */

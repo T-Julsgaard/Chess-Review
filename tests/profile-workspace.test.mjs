@@ -82,7 +82,7 @@ test('profile: seeded games render the deck on the board with navigation, stats 
   const goTo = title => [...shell.querySelectorAll('.pv-seg')].find(dot => dot.title === title).click();
   goTo('You compared to a typical player');
   assert.equal(shell.querySelector('.pv-story').dataset.slide, 'signature');
-  assert.ok(doc.querySelector('.board .pv-pairs'));
+  assert.ok(doc.querySelector('.board .pv-differences'));
   for (const link of shell.querySelectorAll('.pv-link[data-game-url]')) assert.match(link.dataset.gameUrl, /^https:\/\/www\.chess\.com\//);
   // Nothing runs by itself: the trend slide offers the check, with an estimate, until it is started.
   goTo('Then and now');
