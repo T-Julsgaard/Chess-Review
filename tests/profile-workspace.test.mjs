@@ -90,7 +90,7 @@ test('profile: seeded games render the deck on the board with navigation, stats 
   const trend = [...dots].findIndex(d => d.title === 'Then and now');
   dots[trend].click();
   assert.equal(shell.querySelector('.profile-engine .profile-button.primary').textContent, 'Check accuracy');
-  assert.match(shell.querySelector('.profile-engine-estimate').textContent, /^Estimated time: /);
+  assert.match(shell.querySelector('.profile-engine-estimate').textContent, /^Estimated time(Under 1 min|About .+) · \d+ games?$/);
   assert.equal(a.store[JOB_KEY], undefined);
   // A running job for this account shows progress instead of the button.
   a.store[JOB_KEY] = {status: 'running', site: 'chesscom', account: 'tester', done: 3, total: 40, updatedAt: Date.now(), perGameMs: 5000};
@@ -463,7 +463,7 @@ test('profile: the accuracy check starts from the accuracy chapter, with the cho
   engine().querySelector('[data-engine="depth:deep"]').click();
   engine().querySelector('[data-engine="sample:all"]').click();
   assert.notEqual(engine().querySelector('.profile-engine-estimate').textContent, before);
-  assert.match(engine().querySelector('.profile-engine-estimate').textContent, /^Estimated time: .+ · \d+ games\.$/);
+  assert.match(engine().querySelector('.profile-engine-estimate').textContent, /^Estimated time(Under 1 min|About \d+ (min|h)( \d+ min)?) · \d+ games$/);
   engine().querySelector('[data-engine="start"]').click();
   for (let i = 0; i < 6; i++) await settle();
   const start = sent.find(m => m.type === 'profileEngine' && m.action === 'start');

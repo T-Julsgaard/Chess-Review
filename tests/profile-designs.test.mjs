@@ -143,25 +143,35 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.match(shell.querySelector('.pv-story-lead').textContent, /^You played \d+ games against rival_rick: won \d+, lost \d+, drew \d+\.$/);
   assert.equal(shell.querySelector('.pv-link[data-game-url]'), null, 'no link to the latest decisive game');
   assert.equal(shell.querySelector('.pv-link[aria-pressed]'), null, 'results over time live on the numbers chapter');
+  // The rival's record as a bar of shares that add up to 100.
+  const shares = [...shell.querySelectorAll('.pv-wdl-seg b')].map(n => n.textContent);
+  assert.ok(shares.every(s => /^\d+%$/.test(s)), shares.join());
+  assert.equal(shares.reduce((s, v) => s + parseInt(v, 10), 0), 100);
   w.go(w.deck.findIndex(s => s.id === 'endings'));
-  // Wins · Losses · Draws, like the openings sort: each charts how those games ended.
+  // Wins · Losses · Draws, like the openings sort: each draws a ring of how those games ended.
   const endingTabs = [...shell.querySelectorAll('.pv-tabs [role="tab"]')];
   assert.deepEqual(endingTabs.map(b => b.textContent), ['Wins', 'Losses', 'Draws']);
   assert.equal(shell.querySelector('.pv-tabs [aria-selected="true"]').textContent, 'Wins');
-  assert.match(shell.querySelector('.pv-story-lead').textContent, /^Wins by /);
+  assert.match(shell.querySelector('.pv-story-lead').textContent, /^Your wins most often (come by [a-z -]+|come on time|end in other ways): \d+% of them\.$/);
   assert.equal(shell.querySelector('.pv-reasons'), null, 'the tabs say how losses and draws end');
-  // Labels standing under the board live in the layer's twin outside it.
-  const columnLabels = () => [...(w.viz.layer.outside || w.viz.layer).querySelectorAll('.pv-col-label')].map(n => n.textContent);
-  assert.deepEqual(columnLabels(), ['Mate', 'Resign', 'Time', 'Other'], 'the board charts how your wins ended');
+  assert.equal(shell.querySelector('.pv-fact'), null, 'the legend takes the place of the facts');
+  const ring = w.viz.layer;
+  assert.equal(ring.dataset.scene, 'pie', 'the board draws a ring of how your wins ended');
+  const legend = () => [...shell.querySelectorAll('.pv-endings li')].map(li => [li.querySelector('.pv-endings-name').textContent, parseInt(li.querySelector('.pv-endings-share').textContent, 10)]);
+  const sum = rows => rows.reduce((s, [, v]) => s + v, 0);
+  assert.equal(ring.querySelectorAll('.pv-pie-slice').length, legend().length, 'one slice per legend row');
+  assert.equal(sum(legend()), 100);
+  assert.equal(ring.querySelector('.pv-pie-center strong').textContent, String(w.report.totals.w));
+  assert.match(shell.querySelector('.pv-endings-foot').textContent, new RegExp(`^${w.report.totals.w} wins, \\d+% of all your games\\.`));
   endingTabs[1].click();
-  assert.deepEqual(columnLabels(), ['Mate', 'Resign', 'Time', 'Other'], 'and then how your losses ended');
+  assert.equal(w.viz.layer, ring, 'the same ring turns to how your losses ended');
   assert.equal(shell.querySelector('.pv-tabs [aria-selected="true"]').textContent, 'Losses');
-  assert.match(shell.querySelector('.pv-story-lead').textContent, /^Losses by /);
-  assert.deepEqual([...shell.querySelectorAll('.pv-fact dt')].map(n => n.firstChild.textContent), ['Losses by checkmate', 'Losses by resignation', 'Losses on time', 'Losses']);
-  assert.equal(shell.querySelectorAll('.pv-fact dd')[3].textContent, String(w.report.totals.l));
+  assert.match(shell.querySelector('.pv-story-lead').textContent, /^Your losses most often /);
+  assert.equal(ring.querySelector('.pv-pie-center strong').textContent, String(w.report.totals.l));
+  assert.equal(sum(legend()), 100);
   shell.querySelectorAll('.pv-tabs [role="tab"]')[2].click();
-  assert.match(shell.querySelector('.pv-story-lead').textContent, w.report.totals.d ? /^Draws by / : /^No draws in this period\.$/);
-  assert.equal(shell.querySelectorAll('.pv-fact').length, w.report.totals.d ? Math.min(3, Object.keys(w.report.terminations.draws).length) + 1 : 0);
+  assert.match(shell.querySelector('.pv-story-lead').textContent, w.report.totals.d ? /^Your draws most often / : /^No draws in this period\.$/);
+  assert.equal(shell.querySelectorAll('.pv-endings li').length > 0, !!w.report.totals.d);
   shell.querySelectorAll('.pv-tabs [role="tab"]')[0].click();
   w.go(w.deck.findIndex(s => s.id === 'hits'));
   assert.ok(doc.querySelectorAll('.board .pv-results .pv-tile').length >= 16, 'the board charts results by opponent rating');
@@ -171,8 +181,16 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.match(replay.title, /^Your win against .+ \(\d+\), /);
   replay.click();
   assert.equal(doc.querySelector('.board .pv-results'), null, 'the best win replaces the chart');
+  // While the game is up, its link is the way back to the chart.
+  const back = shell.querySelector('.pv-link-back');
+  assert.equal(back?.textContent, 'Back to the chart');
+  back.click();
+  assert.ok(doc.querySelector('.board .pv-results'), 'going back brings the chart back');
+  assert.equal(shell.querySelector('.pv-link')?.textContent, 'View your best win', 'and the link again');
+  shell.querySelector('.pv-link').click();
   w.exitGame();
   assert.ok(doc.querySelector('.board .pv-results'), 'exiting the game brings the chart back');
+  assert.equal(shell.querySelector('.pv-link-back'), null);
   w.go(w.deck.findIndex(s => s.id === 'habits'));
   assert.equal(doc.querySelectorAll('.board .pv-bubble').length, 49, 'seven days by seven blocks');
   assert.deepEqual([...doc.querySelectorAll('.board .pv-bubble-day')].map(n => n.textContent), ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], 'weekdays down the a-file');
@@ -237,8 +255,8 @@ test('story keeps game mode buttons when only one time control is available', as
   const w = await openDeck(a);
   for (const id of ['numbers', 'season', 'openings', 'signature', 'rival', 'hits', 'habits', 'clock', 'endings']) {
     w.go(w.deck.findIndex(slide => slide.id === id));
-    // Greatest hits, comebacks, habits and the clock show one time control at a time: no All.
-    const single = ['hits', 'swings', 'habits', 'clock'].includes(id);
+    // Greatest hits and comebacks show one time control at a time: no All.
+    const single = ['hits', 'swings'].includes(id);
     assert.deepEqual([...doc.querySelectorAll('.pv-filter button')].map(button => button.textContent), single ? ['Blitz'] : ['All', 'Blitz'], id);
     if (single) assert.equal(w.cls, 'blitz', id);
     doc.querySelector('.pv-filter button[data-value="blitz"]').click();
@@ -258,8 +276,9 @@ test('story time controls read Bullet, Blitz, Daily; habit dots and clock column
   const labels = () => [...doc.querySelectorAll('.pv-filter button')].map(b => b.textContent);
   const pick = label => [...doc.querySelectorAll('.pv-filter button')].find(button => button.textContent === label).click();
   w.go(w.deck.findIndex(s => s.id === 'habits'));
-  assert.deepEqual(labels(), ['Bullet', 'Blitz', 'Daily'], 'no All on the habits chapter');
-  assert.equal(w.cls, 'blitz', 'it opens on the time control played most');
+  assert.deepEqual(labels(), ['All', 'Bullet', 'Blitz', 'Daily'], 'the habits chapter offers All again');
+  assert.equal(w.cls, 'all', 'it opens on All');
+  pick('Blitz');
   assert.equal(doc.querySelector('.pv-filter button.on').textContent, 'Blitz');
   const layer = doc.querySelector('.board .pv-layer'), dot = layer.querySelector('.pv-bubble');
   assert.match(doc.querySelector('.profile-board-caption .pv-legend').textContent, /Bigger dot: more games.*Greener: higher win rate/);
@@ -276,8 +295,9 @@ test('story time controls read Bullet, Blitz, Daily; habit dots and clock column
   pick('Daily');
   w.go(w.deck.findIndex(s => s.id === 'clock'));
   assert.notEqual(doc.querySelector('.board .pv-layer'), layer, 'entering another chapter draws a new chart');
-  assert.deepEqual(labels(), ['Bullet', 'Blitz'], 'no Daily and no All on the move-time chapter');
-  assert.equal(w.cls, 'blitz', 'Daily is not offered here, so the clock opens on the time control played most');
+  assert.deepEqual(labels(), ['All', 'Bullet', 'Blitz'], 'All, but no Daily, on the move-time chapter');
+  assert.equal(w.cls, 'all', 'the clock opens on All');
+  pick('Blitz');
   const clock = doc.querySelector('.board .pv-layer');
   assert.equal(clock.dataset.scene, 'columns');
   assert.deepEqual([...clock.outside.querySelectorAll('.pv-col-label')].map(n => n.textContent), ['0–1s', '1–2s', '2–3s', '3–5s', '5–10s', '10–20s', '20–30s', '30s+'], 'move times in intervals, not "under"');
@@ -299,7 +319,14 @@ test('story time controls read Bullet, Blitz, Daily; habit dots and clock column
   assert.deepEqual(columnLabels(), ['0–1s', '1–2s', '2–3s', '3–5s', '5–10s', '10–20s', '20–30s', '30s+']);
   pick('Bullet');
   w.go(w.deck.findIndex(s => s.id === 'habits'));
-  assert.equal(w.cls, 'bullet', 'moving between one-time-control chapters keeps the pick');
+  assert.equal(w.cls, 'all', 'habits opens on All again');
+  w.go(w.deck.findIndex(s => s.id === 'hits'));
+  assert.equal(w.cls, 'blitz', 'greatest hits opens on the time control played most');
+  pick('Bullet');
+  if (w.deck.some(s => s.id === 'swings')) {
+    w.go(w.deck.findIndex(s => s.id === 'swings'));
+    assert.equal(w.cls, 'bullet', 'moving between one-time-control chapters keeps the pick');
+  }
   w.go(w.deck.findIndex(s => s.id === 'trend'));
   assert.equal(w.cls, 'all', 'other chapters still open on All');
   w.go(w.deck.findIndex(s => s.id === 'rating'));
