@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {buildInsights, totals, habits, opponents, streaks, signature, ratings, openings, material, terminations, byOpponentRating, smoothed, resultRuns} from '../lib/profile/insights.js';
+import {buildInsights, totals, habits, opponents, streaks, signature, ratings, openings, material, terminations, mateInOne, byOpponentRating, smoothed, resultRuns} from '../lib/profile/insights.js';
 import {classify, ARCHETYPES, tendencies} from '../lib/profile/archetypes.js';
-import {buildDeck, buildReport, fmt, resultsByRating, resultsOverTime} from '../lib/profile/deck.js';
+import {buildDeck, buildReport, fmt, resultsByRating, resultsOverTime, mateInOneShares} from '../lib/profile/deck.js';
 import {Chess} from '../lib/chess.js';
 
 import {season} from './helpers/profile-season.mjs';
@@ -232,4 +232,24 @@ test('smoothed accuracy line weighs each day by its games and keeps every point'
   const line = smoothed(series);
   assert.equal(line.length, 60); assert.deepEqual(line.map(p => p.t), series.map(p => p.t));
   assert.ok(line.slice(5, -5).every(p => p.r > 83 && p.r < 87), 'busy days count for more');
+});
+
+test('insights: mates in one played and missed, and their chapter', () => {
+  const row = (id, m1, m1Missed, t = 100) => ({id, t, m1, m1Missed, m1Ply: m1Missed ? 21 : 0, res: 'w', opp: 'X', me: 'w', fenEnd: '8/8/8/8/8/8/8/8 w - - 0 1', n: 40});
+  assert.equal(mateInOne([{id: 'old', t: 1}]), null, 'rows from before the count say nothing');
+  const M = mateInOne([row('a', 2, 1, 50), row('b', 1, 0), row('c', 0, 0), row('d', 3, 2, 300), {id: 'old', t: 5}]);
+  assert.deepEqual([M.games, M.chances, M.found, M.missed, M.withChance, M.withMiss], [4, 6, 3, 3, 3, 2]);
+  assert.equal(M.lastMiss.id, 'd'); assert.equal(M.lastMiss.ply, 21);
+  assert.deepEqual(mateInOneShares(M), {found: 50, missed: 50});
+  assert.deepEqual(mateInOneShares({chances: 3, found: 2, missed: 1}), {found: 67, missed: 33});
+  assert.deepEqual(mateInOneShares({chances: 8, found: 5, missed: 3}), {found: 62, missed: 38}, 'whole percents that add up to 100');
+  const rows = season().map((r, i) => ({...r, m1: i % 10 === 0 ? 2 : 0, m1Missed: i % 30 === 0 ? 1 : 0}));
+  const report = buildReport(rows, buildInsights(rows), {account: 'me', site: 'chesscom', period: 'year', periodLabel: 'Past 12 months'});
+  const deck = buildDeck(report, {account: 'me'});
+  const slide = deck.find(s => s.id === 'mate1');
+  assert.ok(slide, 'the chapter is there');
+  assert.equal(deck.indexOf(slide), deck.findIndex(s => s.id === 'share') - 1, 'just before the recap');
+  assert.equal(slide.board.kind, 'fill'); assert.equal(slide.board.total, report.mateInOne.chances); assert.equal(slide.board.wins, report.mateInOne.found);
+  assert.match(slide.lead, /You played it \d+% of the time/);
+  assert.equal(buildDeck(buildReport(season(), buildInsights(season()), {account: 'me'}), {account: 'me'}).some(s => s.id === 'mate1'), false, 'no chapter without the count');
 });

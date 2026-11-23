@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {gameFeatures, parseTimeControl, decodeHeat, squareIndex, matePattern, validRow, needsThinkBuckets, grainBucket} from '../lib/profile/features.js';
+import {gameFeatures, parseTimeControl, decodeHeat, squareIndex, matePattern, validRow, needsThinkBuckets, needsReplay, hasMateInOne, grainBucket} from '../lib/profile/features.js';
 import {normalizeChesscom, normalizeLichess, parseMovetext} from '../lib/profile/sources.js';
 import {createProfileStore, rowsKey, ENGINE_INDEX_KEY, MAX_ENGINE_ENTRIES} from '../lib/profile/store.js';
 import {periodRows, periodStart, periodLabel, customPeriodBounds, PERIODS} from '../lib/profile/collector.js';
@@ -212,4 +212,23 @@ test('features: bullet games split move times into premoves, half seconds and up
   assert.equal(needsThinkBuckets({...blitz, tg: undefined}), true, 'rows without the fine histogram are replayed once');
   assert.ok(Array.isArray(blitz.tg), 'every time control keeps the fine histogram');
   assert.equal(needsThinkBuckets(blitz), false);
+});
+
+test('features: mates in one on the board, played and missed', () => {
+  const scholar = ['e4', 'e5', 'Bc4', 'Nc6', 'Qh5', 'Nf6'];
+  const g = (moves, over = {}) => game({moves, white: {name: 'A'}, black: {name: 'B'}, result: 'b', termination: 'resign', ...over});
+  const chess = new Chess(); for (const san of scholar) chess.move(san);
+  assert.equal(hasMateInOne(chess), true, 'Qxf7# is there');
+  assert.equal(chess.fen(), (() => { const c = new Chess(); for (const san of scholar) c.move(san); return c.fen(); })(), 'the search leaves the position as it was');
+  chess.move('Qf3'); chess.move('Nd4');
+  assert.equal(hasMateInOne(chess), false, 'Qxf7+ is no longer mate');
+  const missed = gameFeatures(g([...scholar, 'Qf3', 'Nd4']), 'a');
+  assert.deepEqual([missed.m1, missed.m1Missed, missed.m1Ply], [1, 1, 7]);
+  const found = gameFeatures(g([...scholar, 'Qxf7#'], {result: 'w', termination: 'mate'}), 'a');
+  assert.deepEqual([found.m1, found.m1Missed], [1, 0]);
+  assert.deepEqual([gameFeatures(g(scholar), 'a').m1Missed, gameFeatures(g(scholar), 'b').m1], [1, 0], 'a game that stops with the mate on the board missed it; the other side had none');
+  const opera = gameFeatures(game(), 'morphy');
+  assert.ok(opera.m1 >= 1 && opera.m1Missed === 0, 'Morphy played his mate');
+  assert.equal(needsReplay({...found, m1: undefined}), true, 'rows from before the count are replayed once');
+  assert.equal(needsReplay(found), false);
 });
