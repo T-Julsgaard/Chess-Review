@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {buildInsights, totals, habits, opponents, streaks, signature, ratings, openings, material, terminations, byOpponentRating} from '../lib/profile/insights.js';
+import {buildInsights, totals, habits, opponents, streaks, signature, ratings, openings, material, terminations, byOpponentRating, smoothed} from '../lib/profile/insights.js';
 import {classify, ARCHETYPES, tendencies} from '../lib/profile/archetypes.js';
 import {buildDeck, buildReport, fmt, resultsByRating, resultsOverTime} from '../lib/profile/deck.js';
 import {Chess} from '../lib/chess.js';
@@ -170,7 +170,11 @@ test('deck: a full season builds every slide with evidence and boards; a thin on
   const days = new Set(rows.map(r => new Date(r.t * 1000).toDateString())).size;
   assert.equal(trend.board.scene.series.length, days); assert.ok(days > 12); assert.equal(trend.board.scene.smooth, true);
   assert.equal(trend.board.scene.series.reduce((s, p) => s + p.n, 0), rows.length);
-  assert.match(trend.lead, /^Your first \d+ checked games against your last \d+\.$/);
+  // The headline reads the two ends of the averaged line drawn on the board.
+  const line = smoothed(trend.board.scene.series);
+  assert.equal(trend.title, `${fmt.pct(line[0].r)} → ${fmt.pct(line.at(-1).r)}`);
+  assert.match(trend.lead, /^Your average accuracy at the start of the period and at its end, across \d+ checked games\.$/);
+  assert.equal(trend.board.scene.live, false, 'a finished check draws the average');
   const endings = withEngine.find(s => s.id === 'endings');
   assert.match(endings.lead, /^Wins by [a-z]+ [\d.]+%, [a-z]+ [\d.]+%, [a-z]+ [\d.]+%\.$/);
   assert.equal(endings.stats.length, 4, 'four boxes, not an odd three');

@@ -24,6 +24,8 @@
 .pv-line-path { fill: none; stroke: var(--pv-c, var(--accent)); stroke-width: .7; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: pv-draw 1.5s cubic-bezier(.45,.05,.25,1) .15s forwards; }
 .pv-line-glow { stroke-width: 2.6; opacity: .22; }
 .pv-line-raw { stroke-width: .3; opacity: .24; }
+/* While the accuracy check runs: every checked day as one thin line, redrawn in place as games finish (no draw-in). */
+.pv-line-live .pv-line-path.pv-line-raw { stroke-width: .4; opacity: .8; stroke-dasharray: none; stroke-dashoffset: 0; animation: none; }
 .pv-stop { stop-color: var(--pv-c, var(--accent)); }
 .pv-line-dot { width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: var(--pv-c, var(--accent)); box-shadow: 0 0 0 5px color-mix(in srgb, var(--pv-c, var(--accent)) 28%, transparent); animation: pv-pop .4s cubic-bezier(.2,.9,.25,1.3) 1.45s both; }
 .pv-line-dot.pv-peak { background: var(--q-inacc); box-shadow: 0 0 0 5px color-mix(in srgb, var(--q-inacc) 30%, transparent), 0 0 24px var(--q-inacc); }

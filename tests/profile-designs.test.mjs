@@ -237,7 +237,10 @@ test('story keeps game mode buttons when only one time control is available', as
   const w = await openDeck(a);
   for (const id of ['numbers', 'season', 'openings', 'signature', 'rival', 'hits', 'habits', 'clock', 'endings']) {
     w.go(w.deck.findIndex(slide => slide.id === id));
-    assert.deepEqual([...doc.querySelectorAll('.pv-filter button')].map(button => button.textContent), ['All', 'Blitz'], id);
+    // Greatest hits, comebacks, habits and the clock show one time control at a time: no All.
+    const single = ['hits', 'swings', 'habits', 'clock'].includes(id);
+    assert.deepEqual([...doc.querySelectorAll('.pv-filter button')].map(button => button.textContent), single ? ['Blitz'] : ['All', 'Blitz'], id);
+    if (single) assert.equal(w.cls, 'blitz', id);
     doc.querySelector('.pv-filter button[data-value="blitz"]').click();
     assert.equal(doc.querySelector('.pv-filter button.on').textContent, 'Blitz', id);
   }
@@ -255,7 +258,9 @@ test('story time controls read Bullet, Blitz, Daily; habit dots and clock column
   const labels = () => [...doc.querySelectorAll('.pv-filter button')].map(b => b.textContent);
   const pick = label => [...doc.querySelectorAll('.pv-filter button')].find(button => button.textContent === label).click();
   w.go(w.deck.findIndex(s => s.id === 'habits'));
-  assert.deepEqual(labels(), ['All', 'Bullet', 'Blitz', 'Daily']);
+  assert.deepEqual(labels(), ['Bullet', 'Blitz', 'Daily'], 'no All on the habits chapter');
+  assert.equal(w.cls, 'blitz', 'it opens on the time control played most');
+  assert.equal(doc.querySelector('.pv-filter button.on').textContent, 'Blitz');
   const layer = doc.querySelector('.board .pv-layer'), dot = layer.querySelector('.pv-bubble');
   assert.match(doc.querySelector('.profile-board-caption .pv-legend').textContent, /Bigger dot: more games.*Greener: higher win rate/);
   assert.equal(doc.querySelector('.pv-story .pv-legend'), null, 'the key sits under the board, not in the panel');
@@ -266,15 +271,17 @@ test('story time controls read Bullet, Blitz, Daily; habit dots and clock column
   assert.equal(layer.querySelector('.pv-bubble'), dot);
   assert.equal(doc.querySelectorAll('.board .pv-layer').length, 1, 'no second chart fades in');
   assert.ok(doc.querySelector('.profile-board-caption .pv-legend'), 'the key stays under the board');
-  pick('All');
-  assert.equal(dot.style.getPropertyValue('--s'), size, 'back on All the dots return to their sizes');
+  pick('Blitz');
+  assert.equal(dot.style.getPropertyValue('--s'), size, 'back on Blitz the dots return to their sizes');
+  pick('Daily');
   w.go(w.deck.findIndex(s => s.id === 'clock'));
   assert.notEqual(doc.querySelector('.board .pv-layer'), layer, 'entering another chapter draws a new chart');
-  assert.deepEqual(labels(), ['All', 'Bullet', 'Blitz'], 'no Daily on the move-time chapter');
+  assert.deepEqual(labels(), ['Bullet', 'Blitz'], 'no Daily and no All on the move-time chapter');
+  assert.equal(w.cls, 'blitz', 'Daily is not offered here, so the clock opens on the time control played most');
   const clock = doc.querySelector('.board .pv-layer');
   assert.equal(clock.dataset.scene, 'columns');
   assert.deepEqual([...clock.outside.querySelectorAll('.pv-col-label')].map(n => n.textContent), ['0–1s', '1–2s', '2–3s', '3–5s', '5–10s', '10–20s', '20–30s', '30s+'], 'move times in intervals, not "under"');
-  pick('Blitz');
+  pick('Bullet');
   assert.equal(doc.querySelector('.board .pv-layer'), clock, 'the columns grow and shrink in place');
   // Increase granularity sits beside the big figure (so the chapter keeps its height) and splits the chart into narrow intervals.
   const grain = doc.querySelector('.pv-story-hero .pv-grain');
@@ -285,11 +292,16 @@ test('story time controls read Bullet, Blitz, Daily; habit dots and clock column
   assert.equal(grain.getAttribute('aria-checked'), 'true');
   assert.equal(columnLabels().length, 20); assert.equal(columnLabels()[4], '4s');
   assert.equal(doc.querySelectorAll('.board .pv-layer').length, 1, 'the usual chart gives way to the split one');
-  pick('All');
+  pick('Blitz');
   assert.equal(doc.querySelector('.pv-grain'), grain, 'the same switch stays on across time controls');
   assert.equal(grain.getAttribute('aria-checked'), 'true'); assert.equal(columnLabels().length, 20);
   grain.click();
   assert.deepEqual(columnLabels(), ['0–1s', '1–2s', '2–3s', '3–5s', '5–10s', '10–20s', '20–30s', '30s+']);
+  pick('Bullet');
+  w.go(w.deck.findIndex(s => s.id === 'habits'));
+  assert.equal(w.cls, 'bullet', 'moving between one-time-control chapters keeps the pick');
+  w.go(w.deck.findIndex(s => s.id === 'trend'));
+  assert.equal(w.cls, 'all', 'other chapters still open on All');
   w.go(w.deck.findIndex(s => s.id === 'rating'));
   if (doc.querySelectorAll('.pv-modes button').length > 1) assert.deepEqual([...doc.querySelectorAll('.pv-modes button')].map(b => b.textContent), ['Bullet', 'Blitz', 'Daily'].filter(l => [...doc.querySelectorAll('.pv-modes button')].some(b => b.textContent === l)));
 });

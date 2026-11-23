@@ -396,7 +396,7 @@ const DEFAULT_SETTINGS = {
   // Player profile: default period, engine-sample budget and whether games against bots count.
   profilePeriod: "year", profileBudget: "standard", profileIncludeBots: false,
   // Accuracy check that runs by itself after a profile is built: depth (off/fast/balanced/deep) and which games.
-  profileDepth: "balanced", profileSample: "auto",
+  profileDepth: "balanced", profileSample: "all",
   // Player profile design (Settings → Visual → Player profile): story (default), classic, bento or editorial.
   profileDesign: "story",
   // How the historical twin's face appears, and what the Signature moves board shows.
@@ -6819,7 +6819,7 @@ function soundSettings() {
 function profileSettings() {
   const periods = [["year", "Past 12 months"], ["calendar", "This year"], ["all", "All time"], ["custom", "Custom period"]];
   const depths = [["fast", "Fast"], ["balanced", "Balanced"], ["deep", "Deep"]];
-  const samples = [["auto", "Auto"], ["all", "Every game"], ["2", "1 in 2"], ["5", "1 in 5"], ["10", "1 in 10"]];
+  const samples = [["all", "Every game"], ["2", "1 in 2"], ["5", "1 in 5"], ["10", "1 in 10"]];
   const usage = el("span", { class: "set-note" }, "Measuring…");
   loadProfileWorkspace().then(({profileStorageUsage}) => profileStorageUsage(browserAPI.storage.local)).then(info => {
     usage.textContent = info.accounts
@@ -6833,8 +6833,8 @@ function profileSettings() {
         ddField(periods.some(([id]) => id === S.settings.profilePeriod) ? S.settings.profilePeriod : "year", periods, value => setSetting("profilePeriod", value))),
       el("div", { class: "set-row" }, setLabel("Accuracy check", "The engine depth the accuracy check starts with. You start the check in the profile's accuracy over time chapter; deeper is more exact but slower."),
         ddField(depths.some(([id]) => id === S.settings.profileDepth) ? S.settings.profileDepth : "balanced", depths, value => setSetting("profileDepth", value))),
-      el("div", { class: "set-row" }, setLabel("Games to check", "Which games the accuracy check looks at. Auto checks as many as fit in about six minutes, spread over the whole period."),
-        ddField(S.settings.profileSample || "auto", samples, value => setSetting("profileSample", value))),
+      el("div", { class: "set-row" }, setLabel("Games to check", "Which games the accuracy check looks at: every game of the period, or one in every 2, 5 or 10, spread over the whole period."),
+        ddField(samples.some(([id]) => id === S.settings.profileSample) ? S.settings.profileSample : "all", samples, value => setSetting("profileSample", value))),
       toggleRow("Count games against bots", "profileIncludeBots", setSetting, "Off keeps every figure to human opponents. On includes computer opponents where the platform marks them."),
     ),
     section("Data",

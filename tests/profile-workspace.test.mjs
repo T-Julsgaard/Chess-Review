@@ -245,7 +245,7 @@ test('profile settings: category renders the period, budget, bot toggle and dele
   a.call('toggleSettings'); a.call('selectSettingsCategory', 'profile');
   const text = doc.querySelector('#settings').textContent;
   for (const label of ['Default period', 'Accuracy check', 'Games to check', 'Count games against bots', 'Delete all profile data']) assert.ok(text.includes(label), label);
-  assert.equal(a.state.settings.profileDepth, 'off'); assert.equal(a.state.settings.profileSample, 'auto');
+  assert.equal(a.state.settings.profileDepth, 'off'); assert.equal(a.state.settings.profileSample, 'all');
   assert.equal(a.state.settings.profilePeriod, 'year'); assert.equal(a.state.settings.profileBudget, 'standard'); assert.equal(a.state.settings.profileIncludeBots, false);
 });
 
@@ -438,7 +438,7 @@ test('profile: the accuracy check starts from the accuracy chapter, with the cho
   const rows = season();
   a.store.library = [{id: 'lib1', myName: 'Tester', myAcc: 88.5, date: new Date(rows.at(-2).t * 1000).toISOString().slice(0, 10).replace(/-/g, '.'), meta: {gameId: rows.at(-2).id}},
     {id: 'lib2', myName: 'someone-else', myAcc: 50, date: '2026.03.01', meta: {}}];
-  Object.assign(a.state.settings, {profileDepth: 'fast', profileSample: 'auto'});
+  Object.assign(a.state.settings, {profileDepth: 'fast', profileSample: '5'});
   await open(a);
   assert.equal(doc.querySelector('.profile-setup').textContent.includes('Accuracy check'), false, 'the setup no longer asks about accuracy');
   const sent = [], w = a.run('profileWorkspace');

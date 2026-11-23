@@ -130,7 +130,7 @@ test('sample: spread order covers the period early; every n-th and auto selectio
   const quarter = auto.slice(0, Math.ceil(auto.length / 4)).map(id => usable.find(r => r.id === id).t);
   const span = usable.at(-1).t - usable[0].t;
   assert.ok(Math.max(...quarter) - Math.min(...quarter) > span * .9);
-  assert.equal(SAMPLES[0].id, 'auto'); assert.equal(depthById('fast').depth, 6); assert.equal(depthById('nope').depth, 8);
+  assert.equal(SAMPLES[0].id, 'all'); assert.ok(!SAMPLES.some(s => s.id === 'auto'), 'Auto is no longer offered'); assert.equal(depthById('fast').depth, 6); assert.equal(depthById('nope').depth, 8);
   assert.equal(DEPTHS.length, 3);
   assert.equal(estimateMinutes(1000, 6000, {workers: 2}), AUTO_MINUTES, 'auto is capped');
   assert.equal(estimateMinutes(100, 6000, {workers: 2, every: 1}), 5);
