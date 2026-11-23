@@ -80,9 +80,10 @@ browser in green), an install dialog behind the panel's green "Build your own", 
 card on the last chapter. On the web the Left/Right arrows only step through a game on the board;
 chapters turn with Next/Previous or Page Up/Down. The time-control switch is hidden there, since the
 link carries the report and not the games. The month-by-month chapter is counted from the games, so
-the link carries its totals (`report.season`, checked by `sharedSeason`); the intro's mosaic of
-every game and an accuracy chapter without a finished accuracy check have nothing to draw from a
-link and stay off. When the extension is installed (`profile-viewer-content.js` marks the page) the
+the link carries its totals (`report.season`, checked by `sharedSeason`). The intro's mosaic travels
+as one result, day and time control per game (`report.mosaic`, `mosaicPayload`/`mosaicRows` in
+`game-map.js`), so shared squares describe a game but do not open one. An accuracy chapter without a
+finished accuracy check has nothing to draw from a link and stays off. When the extension is installed (`profile-viewer-content.js` marks the page) the
 nudges hide and the same link opens the full deck on the board.
 
 ## Changes from the plan, and why

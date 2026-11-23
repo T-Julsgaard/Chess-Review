@@ -271,3 +271,35 @@ test('workspace: the film roll shows while loading, then the mosaic once every g
   w.phase = 'deck'; w.showBoard({kind: 'games'});
   assert.equal(doc.querySelector('.board .profile-game-map'), map, 'the deck keeps the same mosaic');
 });
+
+test('profile mosaic: a share link carries each game as a result, a day and a time control', async () => {
+  const {mosaicPayload, mosaicRows} = await import('../lib/profile/game-map.js');
+  const {encodeProfile, decodeProfile} = await import('../lib/profile/share.js');
+  const day = 86400, start = 20000 * day;
+  const games = Array.from({length: 900}, (_, i) => ({id: 'g' + i, site: i % 4 ? 'chesscom' : 'lichess', t: start + Math.floor(i / 3) * day + 3600 * (i % 3),
+    res: ['w', 'd', 'l'][i % 3], cls: ['blitz', 'rapid', 'bullet', 'daily', 'classical', 'unknown'][i % 6], opp: 'Someone', url: 'https://www.chess.com/game/live/1'}));
+  const payload = mosaicPayload(games, 'both');
+  const report = await decodeProfile(await encodeProfile({account: 'x', site: 'both', mosaic: payload}));
+  const back = mosaicRows(report.mosaic, 'both');
+  assert.equal(back.length, 900, 'long strings survive the decoder');
+  assert.deepEqual(back.map(r => [r.res, r.cls, r.site, Math.floor(r.t / day)]), games.map(r => [r.res, r.cls, r.site, Math.floor(r.t / day)]));
+  assert.ok(back.every(r => !r.opp && !r.url), 'no opponents or game links travel');
+  assert.equal(new Set(back.map(r => r.id)).size, 900);
+  assert.equal(mosaicPayload([]), null);
+  assert.deepEqual(mosaicRows(null), []);
+  assert.deepEqual(mosaicRows({start: 1, days: '0,1', res: 'w'}), [], 'counts must agree');
+  assert.deepEqual(mosaicRows({start: 1, days: '0', res: '<'}), []);
+});
+
+test('profile mosaic: a shared mosaic describes a game but does not open one', () => {
+  const dom = new JSDOM('<!doctype html><body></body>', {pretendToBeVisual: true});
+  const doc = dom.window.document;
+  const h = (tag, attrs = {}, ...children) => { const n = doc.createElement(tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); n.append(...children); return n; };
+  const map = createGameMap({h, doc, onOpen: null, motion: () => false});
+  doc.body.append(map.element);
+  map.update(rows(3), {final: true});
+  assert.ok(map.element.classList.contains('is-static'));
+  assert.doesNotMatch(map.element.getAttribute('aria-label'), /Enter/);
+  map.element.dispatchEvent(new dom.window.KeyboardEvent('keydown', {key: 'Enter', bubbles: true}));
+  map.destroy?.();
+});
