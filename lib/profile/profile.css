@@ -257,8 +257,8 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-tour-cell { display: block; transition: background-color .55s ease; }
 .profile-tour-cell.light { background: color-mix(in oklab, var(--sq-light) 30%, var(--panel-2)); }
 .profile-tour-cell.dark { background: color-mix(in oklab, var(--sq-dark) 34%, var(--panel-2)); }
-.profile-tour-cell.on.light { background: color-mix(in oklab, var(--accent) 78%, color-mix(in oklab, var(--sq-light) 30%, var(--panel-2))); }
-.profile-tour-cell.on.dark { background: color-mix(in oklab, var(--accent) 84%, color-mix(in oklab, var(--sq-dark) 34%, var(--panel-2))); }
+.profile-tour-cell.on.light { background: color-mix(in oklab, var(--accent) 42%, color-mix(in oklab, var(--sq-light) 30%, var(--panel-2))); }
+.profile-tour-cell.on.dark { background: color-mix(in oklab, var(--accent) 48%, color-mix(in oklab, var(--sq-dark) 34%, var(--panel-2))); }
 .profile-tour-knight { position: absolute; left: 0; top: 0; width: 12.5%; height: 12.5%; display: grid; place-items: center; z-index: 2; will-change: transform; }
 .profile-tour-knight .piece-img { width: 92%; height: 92%; position: static; filter: drop-shadow(0 3px 4px color-mix(in oklab, #000 45%, transparent)); }
 .profile-loader-tally { display: flex; align-items: baseline; gap: 8px; }

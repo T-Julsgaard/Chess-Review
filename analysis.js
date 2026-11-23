@@ -403,7 +403,7 @@ const DEFAULT_SETTINGS = {
   // Player profile design (Settings → Visual → Player profile): story (default), classic, bento or editorial.
   profileDesign: "story",
   // How the historical twin's face appears, and what the Signature moves board shows.
-  profilePortraitStyle: "relief", profileSignatureBoard: "compare",
+  profilePortraitStyle: "relief", profileSignatureBoard: "compare", profileAccuracyAnimation: "games",
   // How games appear on the board while a profile is built: film (default) or mosaic.
   profileStream: "film",
   // Display the selected analysis lines unless the user adds or removes lines in the panel.
@@ -6735,6 +6735,8 @@ function visualSettings() {
         "How the historical twin's face appears on the board. Assemble glides and shapes the pieces into a sculpted portrait; Morph slows the transformation and keeps the chess pieces recognizable longer; Inlay builds the entire image, including its background, from pieces; Relief adds finer facial detail and a softer return to the board; Mosaic uses tiny chess pieces; Swarm is the original swirl of pieces."),
       settingDropdown("Signature moves board", "profileSignatureBoard", [["compare", "You v. typical"], ["heat", "Heat map"]],
         "What the board shows in the Signature moves chapter: your rates next to a typical player's, or a heat map of the squares your pieces land on."),
+      settingDropdown("Accuracy over time", "profileAccuracyAnimation", [["games", "Every game"], ["average", "Average line"]],
+        "How the accuracy chart draws in the Then and now chapter. Every game draws a line through each checked game, hundreds or thousands of them, then pulls them all together into your average; Average line draws only the average."),
     ),
     section("Animations",
       toggleRow("Interface animations", "uiAnim", setSetting,
