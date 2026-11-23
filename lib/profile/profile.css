@@ -346,3 +346,4 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-puzzle-note.tone-info { color: var(--ink); font-weight: 650; }
 .profile-puzzle-actions { display: inline-flex; gap: 6px; }
 .profile-caption-button:disabled { opacity: .45; cursor: default; }
+.profile-puzzle-tally { color: var(--q-best); font-weight: 650; font-variant-numeric: tabular-nums; }

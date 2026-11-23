@@ -234,3 +234,13 @@ test('features: mates in one on the board, played and missed', () => {
   assert.equal(needsReplay({...found, m1: undefined}), true, 'rows from before the count are replayed once');
   assert.equal(needsReplay(found), false);
 });
+
+test('store: solved mate-in-one puzzles are remembered, once each, and deleted with the rest', async () => {
+  const storage = memoryStorage(), store = createProfileStore(storage);
+  assert.deepEqual(await store.loadSolvedMates(), []);
+  await Promise.all([store.addSolvedMate('chesscom:1'), store.addSolvedMate('lichess:a')]);
+  await store.addSolvedMate('chesscom:1');
+  assert.deepEqual((await store.loadSolvedMates()).sort(), ['chesscom:1', 'lichess:a']);
+  await store.deleteAll();
+  assert.deepEqual(await store.loadSolvedMates(), []);
+});

@@ -479,3 +479,14 @@ test('profile: the accuracy check starts from the accuracy chapter, with the cho
   assert.equal(engine().querySelector('[data-engine="start"]').textContent, 'Check more games');
   assert.ok(engine().querySelector('[data-engine="start"]').disabled, 'every chosen game is already checked');
 });
+
+test('mate in one: the chapter opens on the newest puzzle not solved yet, and Next skips solved ones', async () => {
+  const {ProfileWorkspace} = await import('../lib/profile/workspace.js');
+  const solved = new Set(['chesscom:a', 'chesscom:c']);
+  const w = {site: 'chesscom', solvedMates: solved, solvedKey: ProfileWorkspace.prototype.solvedKey, isSolved: ProfileWorkspace.prototype.isSolved};
+  const list = ['a', 'b', 'c', 'd'].map(id => ({id, site: 'chesscom'}));
+  const from = start => ProfileWorkspace.prototype.unsolvedFrom.call(w, list, start);
+  assert.equal(from(0), 1); assert.equal(from(2), 3); assert.equal(from(4), 1, 'wraps round');
+  solved.add('chesscom:b'); solved.add('chesscom:d');
+  assert.equal(from(2), 2, 'with every one solved, Next simply moves on');
+});
