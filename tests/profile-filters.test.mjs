@@ -68,8 +68,8 @@ test('profile gear: leaves a player out, says so in the menu and brings them bac
   assert.ok(gear.classList.contains('active'));
   const note = doc.querySelector('.pv-settings-menu .pv-set-note');
   assert.equal(note.textContent, `${games} games left out`);
-  assert.equal(note.previousElementSibling.textContent, 'Games to count', 'the note sits under the heading');
-  assert.ok(note.nextElementSibling.classList.contains('pv-set-row'), 'and above Colour');
+  assert.equal(note.previousElementSibling.textContent, 'Games to count', 'the note sits on the heading line, after it');
+  assert.ok(note.parentElement.classList.contains('pv-set-top') && note.parentElement.nextElementSibling.classList.contains('pv-set-row'), 'and that line is above Colour');
   assert.ok(doc.querySelector('.pv-settings-menu'), 'the menu stays open after a choice');
   assert.ok(doc.activeElement.classList.contains('pv-set-opp'), 'the next player in the list takes the focus, not the search');
   const chip = doc.querySelector('.pv-set-chip');

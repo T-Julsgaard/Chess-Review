@@ -344,17 +344,17 @@ test('a delayed share preview cannot repaint a new slide or player', async t => 
   assert.ok(a.dom.window.document.querySelector('.profile-setup'));
 });
 
-test('setup choices preserve the form, typed names and bot selection', async t => {
+test('setup choices preserve the form and typed names; bot games are chosen in the gear, not here', async t => {
   const a = review(t); await open(a);
   const doc = a.dom.window.document, form = doc.querySelector('.profile-setup'), title = form.querySelector('h2');
-  const input = form.querySelector('input[type="text"]'), bots = form.querySelector('input[type="checkbox"]');
-  input.value = 'new-player'; input.dispatchEvent(new a.dom.window.Event('input')); bots.checked = true;
+  const input = form.querySelector('input[type="text"]');
+  assert.equal(form.querySelector('input[type="checkbox"]'), null, 'no bot switch on the start screen');
+  input.value = 'new-player'; input.dispatchEvent(new a.dom.window.Event('input'));
   [...form.querySelectorAll('[role="radio"]')].find(button => button.textContent === 'Both').click();
   [...form.querySelectorAll('[role="radio"]')].find(button => button.textContent === 'All time').click();
   assert.equal(doc.querySelector('.profile-setup'), form);
   assert.equal(form.querySelector('h2'), title, 'choosing a setting cannot replay the form entry fade');
   assert.equal(form.querySelector('input[type="text"]').value, 'new-player');
-  assert.equal(form.querySelector('input[type="checkbox"]'), bots); assert.equal(bots.checked, true);
   assert.ok(!form.textContent.includes('Games come from'));
 });
 

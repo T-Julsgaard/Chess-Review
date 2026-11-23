@@ -135,6 +135,7 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.equal(shell.querySelector('.pv-cmp-label').firstChild.textContent, signature.signatures[0].label, 'the strongest signature is first in the comparison');
   assert.equal(shell.querySelectorAll('.pv-cmp').length, signature.compare.length, 'the comparison includes every metric');
   assert.match(shell.querySelector('.pv-story-chapter').textContent, /You compared to a typical player/);
+  assert.equal(shell.querySelector('.pv-story-chapter .pv-story-no').textContent, String(w.index + 1).padStart(2, '0'), 'the comparison keeps its chapter number');
   assert.equal(shell.querySelector('.pv-story-hero'), null, 'no headline repeats the first habit; the list starts higher');
   assert.equal(shell.querySelector('.pv-story-lead'), null);
   assert.ok(doc.querySelector('.board .pv-pairs'), 'the board compares you with a typical player');
@@ -162,7 +163,18 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.equal(ring.querySelectorAll('.pv-pie-slice').length, legend().length, 'one slice per legend row');
   assert.equal(sum(legend()), 100);
   assert.equal(ring.querySelector('.pv-pie-center strong').textContent, String(w.report.totals.w));
-  assert.match(shell.querySelector('.pv-endings-foot').textContent, new RegExp(`^${w.report.totals.w} wins, \\d+% of all your games\\.`));
+  assert.match(shell.querySelector('.pv-endings-foot').textContent, new RegExp(`^${w.report.totals.w} wins, \\d+% of all your games\\.$`), 'no favourite finisher after it');
+  const pieLabels = () => [...ring.outside.querySelectorAll('.pv-pie-label')].map(n => parseInt(n.querySelector('b').textContent, 10));
+  if (legend().length > 1) assert.deepEqual(pieLabels(), legend().map(([, v]) => v), 'every slice, however thin, is named on the board');
+  // Another time control turns the ring to that control's endings, even when the chapter's own board stays the same.
+  const control = shell.querySelector('.pv-filter button:not([data-value="all"])');
+  if (control) {
+    control.click();
+    assert.equal(w.viz.layer.querySelector('.pv-pie-center strong').textContent, String(w.report.totals.w), 'the ring follows the time control');
+    assert.deepEqual(pieLabels().length > 1 ? pieLabels() : legend().map(([, v]) => v), legend().map(([, v]) => v));
+    shell.querySelector('.pv-filter button[data-value="all"]').click();
+    assert.equal(w.viz.layer.querySelector('.pv-pie-center strong').textContent, String(w.report.totals.w), 'and back to All');
+  }
   endingTabs[1].click();
   assert.equal(w.viz.layer, ring, 'the same ring turns to how your losses ended');
   assert.equal(shell.querySelector('.pv-tabs [aria-selected="true"]').textContent, 'Losses');
@@ -176,6 +188,7 @@ test('profile designs: story shows one figure per chapter, progress segments and
   w.go(w.deck.findIndex(s => s.id === 'hits'));
   assert.ok(doc.querySelectorAll('.board .pv-results .pv-tile').length >= 16, 'the board charts results by opponent rating');
   assert.match(doc.querySelector('.profile-board-caption .pv-legend').textContent, /Results by opponent rating:.*Won.*Drew.*Lost/);
+  assert.deepEqual([...w.viz.layer.outside.querySelectorAll('.pv-axis-tick')].map(n => n.textContent), ['0%', '25%', '50%', '75%', '100%'], 'a share axis beside the board');
   const replay = shell.querySelector('.pv-link');
   assert.equal(replay?.textContent, 'View your best win');
   assert.match(replay.title, /^Your win against .+ \(\d+\), /);
@@ -549,4 +562,26 @@ test('story chapters without enough games in a time control all say the same, an
     for (const extra of ['.pv-tabs', '.pv-wdl', '.pv-endings', '.pv-link', '.profile-engine', '.pv-grain', '.pv-fact']) assert.equal(story.querySelector(extra), null, `${id}: ${extra}`);
     assert.equal(doc.querySelector('.board .pv-layer:not(.pv-leaving)'), null, id + ': no chart on the board');
   }
+});
+
+test('a profile of both sites draws the other site\'s rating as a second line, each end tag naming its site', async () => {
+  const {JSDOM} = await import('jsdom');
+  const {createViz} = await import('../lib/profile/designs/board-viz.js');
+  const series = (shift, base) => Array.from({length: 8}, (_, i) => ({t: 1.7e9 + (i + shift) * 86400 * 7, r: base + i * 12}));
+  const report = {ratingSite: 'chesscom', otherRatingSite: 'lichess', ratings: {blitz: {series: series(2, 1500), peak: {t: 1.7e9 + 9 * 86400 * 7, rating: 1584}}}, otherRatings: {blitz: {series: series(0, 1700)}}};
+  const spec = DesignWorkspace.prototype.ratingScene.call({report}, {ratingClass: 'blitz'});
+  assert.equal(spec.scene.name, 'Chess.com');
+  assert.deepEqual(spec.scene.extra.map(e => e.name), ['Lichess']);
+  assert.match(spec.caption, /^Blitz rating on Chess\.com and Lichess across the board/);
+  // Without the other site's line, nothing changes.
+  const one = DesignWorkspace.prototype.ratingScene.call({report: {...report, otherRatings: {}}}, {ratingClass: 'blitz'});
+  assert.deepEqual([one.scene.name, one.scene.extra], ['', []]);
+  const dom = new JSDOM('<div class="wrap"><div class="board"></div></div>'), board = dom.window.document.querySelector('.board');
+  const viz = createViz(board, {motion: () => false});
+  const layer = viz.line(spec.scene.series, spec.scene);
+  assert.equal(layer.querySelectorAll('.pv-line-alt').length, 1, 'the second line');
+  const tags = [...layer.outside.querySelectorAll('.pv-end .pv-line-tag')].map(n => n.textContent);
+  assert.deepEqual(tags, ['Chess.com 1584', 'Lichess 1784']);
+  // The axes span both lines: the earlier Lichess line starts at the left edge.
+  assert.match(layer.querySelector('.pv-line-alt').getAttribute('d'), /^M0\.00 /);
 });

@@ -403,7 +403,7 @@ const DEFAULT_SETTINGS = {
   // Player profile design (Settings → Visual → Player profile): story (default), classic, bento or editorial.
   profileDesign: "story",
   // How the historical twin's face appears, and what the Signature moves board shows.
-  profilePortraitStyle: "assemble", profileSignatureBoard: "compare",
+  profilePortraitStyle: "relief", profileSignatureBoard: "compare",
   // How games appear on the board while a profile is built: film (default) or mosaic.
   profileStream: "film",
   // Display the selected analysis lines unless the user adds or removes lines in the panel.

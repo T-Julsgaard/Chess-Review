@@ -23,6 +23,9 @@
 .pv-line-area { opacity: 0; animation: pv-fade .7s ease 1.55s forwards; }
 .pv-line-path { fill: none; stroke: var(--pv-c, var(--accent)); stroke-width: .7; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: pv-draw 1.5s cubic-bezier(.45,.05,.25,1) .15s forwards; }
 .pv-line-glow { stroke-width: 2.6; opacity: .22; }
+/* A second line on the same axes (the other site's rating, board-viz.js line `extra`): its own colour, a touch thinner. */
+.pv-line-alt { stroke-width: .6; }
+.pv-line-dot.pv-below .pv-line-tag { bottom: auto; top: calc(100% + 8px); }
 .pv-line-raw { stroke-width: .3; opacity: .24; }
 /* While the accuracy check runs: every checked day as one thin line, redrawn in place as games finish (no draw-in). */
 .pv-line-live .pv-line-path.pv-line-raw { stroke-width: .4; opacity: .8; stroke-dasharray: none; stroke-dashoffset: 0; animation: none; }
@@ -194,7 +197,9 @@
 .profile-head-actions { position: relative; }
 .pv-head-name { display: grid; gap: 1px; min-width: 0; }
 .pv-head-name .profile-head-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pv-set-note { margin: 0; padding: 2px 10px 4px; font-size: 12px; font-weight: 650; color: var(--pv-tint, var(--accent)); }
+.pv-set-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; min-width: 0; }
+.pv-set-top .pv-compare-head { flex: none; }
+.pv-set-note { margin: 0; padding: 4px 10px 2px 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 650; color: var(--pv-tint, var(--accent)); }
 .pv-settings { position: relative; width: 30px; height: 30px; flex: none; display: grid; place-items: center; padding: 0; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); background: transparent; color: var(--ink-2); cursor: pointer; transition: color .15s, border-color .15s, transform .3s cubic-bezier(.2,.8,.2,1); }
 .pv-settings svg { width: 15px; height: 15px; display: block; }
 .pv-settings:hover, .pv-settings.on { color: var(--ink); border-color: var(--pv-tint, var(--accent)); }
@@ -223,6 +228,8 @@
 .pv-set-chip:hover i, .pv-set-chip:focus-visible i { color: var(--ink); }
 .pv-set-search { margin: 2px 8px 2px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--line); background: color-mix(in srgb, var(--ink) 4%, transparent); color: var(--ink); font: inherit; font-size: 12.5px; outline: none; }
 .pv-set-search:focus { border-color: var(--pv-tint, var(--accent)); }
+/* One ring only: the tinted border. The shell's accent outline (profile.css) would draw a second, green one around it. */
+.profile-shell .pv-set-search:focus-visible { outline: none; }
 .pv-set-opps { display: grid; gap: 1px; }
 .pv-set-opp { display: grid; grid-template-columns: 1fr auto; column-gap: 8px; align-items: center; width: 100%; padding: 6px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--ink); font: inherit; text-align: left; cursor: pointer; transition: background .12s; }
 .pv-set-opp strong { font-size: 12.5px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -277,12 +284,17 @@
 .pv-legend-dot.pv-legend-loss { background: var(--q-miss); }
 .pv-legend-dot.pv-legend-faint { background: color-mix(in srgb, var(--q-best) 45%, transparent); }
 .pv-legend-head { font-weight: 650; color: var(--ink); }
+/* The results charts' share axis, just left of the board (board-viz.js results): 0% on the bottom edge, 100% on the top. */
+.pv-outside > .pv-axis-tick { position: absolute; left: -8px; transform: translate(-100%, -50%); font-size: clamp(9px, .9vw, calc(12.5px * var(--pv-s, 1))); font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; white-space: nowrap; color: var(--ink-2); animation: pv-fade .4s ease var(--d, 0ms) both; }
+.pv-outside > .pv-axis-tick::after { content: ""; position: absolute; left: calc(100% + 3px); top: 50%; width: 4px; height: 1px; background: color-mix(in srgb, var(--ink) 35%, transparent); }
 
 /* Charts: values on the bars, dense columns, pairs, habit dots */
 .pv-layer > .pv-col-value { display: block; text-align: center; padding: 0 0 4px; transform: translateY(-100%); line-height: 1.1; white-space: nowrap; }
 .pv-col-value.pv-muted { color: var(--ink-2); font-weight: 700; }
 .pv-columns-dense .pv-col-value { font-size: clamp(9px, .85vw, calc(13px * var(--pv-s, 1))); }
 .pv-columns-dense .pv-col-label { font-size: clamp(8px, .72vw, calc(11px * var(--pv-s, 1))); letter-spacing: .2px; }
+/* Results over time names every column ("NOV", "DEC"): with up to 24 of them, the names close up so each stays under its own column. */
+.pv-outside.pv-columns-dense.pv-has-axis > .pv-col-label { letter-spacing: 0; font-size: clamp(7.5px, .64vw, calc(10px * var(--pv-s, 1))); }
 .pv-columns-dense .pv-tile::before { left: 7%; right: 7%; border-radius: 4px; }
 .pv-pair-label { letter-spacing: .3px; }
 .pv-bubble { display: grid; place-items: center; pointer-events: auto; }
@@ -518,8 +530,9 @@
 .profile-shell[data-design="story"] .pv-story[data-slide="signature"] { height: 100%; }
 .pv-story[data-slide="signature"] > :not(.pv-cmp-wrap) { flex-shrink: 0; }
 /* Heading and time-control switch share one line; a narrow panel wraps the heading's words, never the switch. */
-.pv-story[data-slide="signature"] .pv-story-top { flex-wrap: nowrap; }
-.pv-story[data-slide="signature"] .pv-story-chapter { letter-spacing: 1.2px; white-space: normal; line-height: 1.25; }
+.pv-story[data-slide="signature"] .pv-story-top { flex-wrap: nowrap; gap: 8px; }
+.pv-story[data-slide="signature"] .pv-story-chapter { gap: 8px; font-size: 11.5px; letter-spacing: .4px; white-space: normal; line-height: 1.25; }
+.pv-story-no { flex: none; }
 .pv-story[data-slide="signature"] .pv-cmp-wrap { flex: 1; min-height: 200px; }
 .pv-story[data-slide="signature"] .pv-cmp-list { flex: 1; min-height: 0; max-height: none; }
 .pv-story[data-slide="signature"] .pv-cmp { padding: 12px 0; }

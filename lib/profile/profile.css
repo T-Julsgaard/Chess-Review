@@ -243,13 +243,6 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-setup .profile-input { max-width: none; min-height: 42px; padding: 9px 12px; font-size: 14px; border-radius: 10px; transition: border-color .15s, box-shadow .15s; }
 .profile-setup .profile-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent); }
 .profile-setup .profile-input.invalid { border-color: var(--q-blunder); box-shadow: 0 0 0 3px color-mix(in oklab, var(--q-blunder) 18%, transparent); }
-.profile-switch { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; color: var(--ink-2); cursor: pointer; align-self: flex-start; }
-.profile-switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-.profile-switch-track { position: relative; width: 34px; height: 20px; border-radius: 999px; background: var(--panel-3); border: 1px solid var(--line); transition: background .2s, border-color .2s; flex: none; }
-.profile-switch-track::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--ink-2); transition: transform .22s cubic-bezier(.16,1,.3,1), background .2s; }
-.profile-switch input:checked + .profile-switch-track { background: color-mix(in oklab, var(--accent) 35%, var(--panel-3)); border-color: var(--accent); }
-.profile-switch input:checked + .profile-switch-track::after { transform: translateX(14px); background: var(--accent); }
-.profile-switch input:focus-visible + .profile-switch-track { outline: 3px solid var(--accent); outline-offset: 2px; }
 .profile-setup-error { margin: -6px 0 0; font-size: 12.5px; color: var(--q-blunder); }
 .profile-setup-actions { display: flex; gap: 10px; align-items: center; }
 .profile-build { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 10px 20px; font-size: 14px; border-radius: 11px; }
@@ -298,7 +291,6 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 /* An empty nav (setup, loading) leaves no stray rule at the bottom of the panel. */
 .profile-nav:empty { display: none; }
 .profile-setup-actions { justify-content: space-between; flex-wrap: wrap; row-gap: 12px; }
-.profile-setup-actions .profile-switch { align-self: center; }
 
 /* The whole game history, streamed onto the board during preparation. */
 .profile-game-map { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; cursor: pointer; outline: none; }
