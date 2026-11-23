@@ -39,7 +39,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     const shot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
     await fs.writeFile(path.join(out,name+'.png'),Buffer.from(shot.data,'base64'));
   };
-  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   await resize(1920,919);
   const unchanged=await evidence();
   await choose('old');await close();

@@ -1824,6 +1824,7 @@ async function openProfile({shared = null, resume = null} = {}) {
   if (S.practice && (S.practice.rolling || S.practice.demoing || S.practice.busy)) {
     toast("Let the current practice move finish, then open the profile."); return;
   }
+  learningAnnouncement?.close();
   openingProfile = true;
   let StoryWorkspace;
   try { ({StoryWorkspace} = await loadProfileStory()); }

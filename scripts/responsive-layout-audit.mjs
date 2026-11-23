@@ -24,7 +24,7 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
     await fs.writeFile(path.join(out,label+'.png'),Buffer.from(shot.data,'base64'));
     results.push({label,...data});return data;
   };
-  await run("document.querySelector('.learning-announcement-disable')?.click();import('./analysis.js').then(m=>{m.S.settings.moveAnim=false;m.S.settings.sound=false;})");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));import('./analysis.js').then(m=>{m.S.settings.moveAnim=false;m.S.settings.sound=false;})");
   await resize(1920,960);
   await run("import('./analysis.js').then(m=>m.openLearning())");
   await run("import('./analysis.js').then(m=>{const w=m.learningWorkspace;globalThis.resizeAudit={workspace:w,board:w.boardElement,layout:JSON.stringify(m.S.layout),reviewIndex:m.S.idx};})");

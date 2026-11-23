@@ -9,7 +9,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);
     await sleep(150);
   };
-  await run("document.querySelector('.learning-announcement-disable')?.click();import('./analysis.js').then(m=>{m.S.settings.moveAnim=false;m.S.settings.sound=false;})");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));import('./analysis.js').then(m=>{m.S.settings.moveAnim=false;m.S.settings.sound=false;})");
   for(const setup of ['old','modern']){
     await resize(1920,919);
     await run(`import('./analysis.js').then(m=>m.applyUiSetup('${setup}'))`);

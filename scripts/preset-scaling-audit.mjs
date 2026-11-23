@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 
 export async function auditLearning({review, call, evaluate, waitFor, sleep, out}) {
   const run = expression => evaluate(review, expression), results = [];
-  await run("document.querySelector('.learning-announcement-disable')?.click();import('./analysis.js').then(m=>{m.S.settings.moveAnim=false;m.S.settings.sound=false;})");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));import('./analysis.js').then(m=>{m.S.settings.moveAnim=false;m.S.settings.sound=false;})");
   for (const [width,height,pixelRatio] of [[1920,919,1],[1920,880,1],[1920,800,1],[1536,704,1.25],[1280,560,1.5],[960,600,2]]) {
     await call('Emulation.setDeviceMetricsOverride', {width,height,deviceScaleFactor:pixelRatio,mobile:false}, review.sessionId);
     await sleep(180);

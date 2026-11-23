@@ -6,7 +6,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const run=code=>evaluate(review,code),evidence=[];
   const shot=async name=>{const r=await call('Page.captureScreenshot',{format:'png'},review.sessionId);await fs.writeFile(path.join(out,name+'.png'),Buffer.from(r.data,'base64'));};
   const resize=async(width,height)=>{await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(120);};
-  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=true;m.S.settings.sound=false;})");
   for(const [width,height]of [[1920,1080],[1920,920],[3840,2160],[3440,1280],[2560,1280],[1536,704],[1366,608],[1280,600]]){
     await resize(width,height);

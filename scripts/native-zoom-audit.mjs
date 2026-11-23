@@ -6,7 +6,7 @@ import {SCREEN_SIZES} from '../lib/viewport-preview.js';
 export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const run=expression=>evaluate(review,expression),results=[];
   await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=false;m.S.settings.sound=false;})");
-  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   const resize=async(width,height)=>{
     await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);
     await sleep(100);

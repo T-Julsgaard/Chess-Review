@@ -9,7 +9,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   const run = expression => evaluate(review, expression);
   await run("document.querySelector('.lang-confirm')?.click()");
   await waitFor(review, "!document.querySelector('.lang-overlay')", 'Language choice');
-  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   await run("import('./analysis.js').then(async m=>{await m.applyUiSetup('modern');m.go(0);})");
   await waitFor(review, "!!document.querySelector('.engine-minimal')", 'Modern minimal Engine');
   const lines = `[{score:{cp:42},pv:'e2e4 e7e5 g1f3 b8c6 f1b5 a7a6'},{score:{cp:21},pv:'d2d4 d7d5 c2c4 e7e6 b1c3 g8f6'},

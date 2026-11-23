@@ -17,7 +17,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   const header = () => run(`(()=>{const p=document.querySelector('.accuracy-panel'),b=p.getBoundingClientRect();
     return [...p.querySelectorAll('.acc-player,.acc-name')].map(n=>{const r=n.getBoundingClientRect(),s=getComputedStyle(n);
       return {x:r.x-b.x,y:r.y-b.y,width:r.width,height:r.height,font:s.font,bg:s.backgroundColor,border:s.border,text:n.textContent}})})()`);
-  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   await waitFor(review, "!document.querySelector('#startup')", 'Review ready');
   await run("import('./analysis.js').then(async m=>{await m.applyUiSetup('modern');m.S.settings.moveAnim=false;m.renderStats()})");
   const original = await run("import('./analysis.js').then(m=>JSON.stringify({acc:m.S.acc,stats:m.S.gameStats,idx:m.S.idx,counts:m.S.counts,layout:m.S.layout}))");

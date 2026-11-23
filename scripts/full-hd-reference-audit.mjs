@@ -21,7 +21,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out,sour
   const reference=await create(`chrome-extension://${loaded.id}/analysis.html#reference`);
   await waitFor(reference,"!!document.querySelector('.board')&&import('./analysis.js').then(m=>!m.S.analyzing)",'Reference review');
   for(const tab of [reference,review]){
-    await evaluate(tab,"document.querySelector('.learning-announcement-disable')?.click()");
+    await evaluate(tab,"document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
     await evaluate(tab,"import('./analysis.js').then(m=>{m.S.settings.moveAnim=false;})");
   }
   await evaluate(review,"document.documentElement.style.setProperty('--ip-font','20px')");

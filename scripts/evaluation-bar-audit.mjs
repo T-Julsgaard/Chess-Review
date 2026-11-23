@@ -10,7 +10,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     const result = await call('Page.captureScreenshot', {format: 'png'}, review.sessionId);
     await fs.writeFile(path.join(out, name + '.png'), Buffer.from(result.data, 'base64'));
   };
-  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=false;m.go(2)})");
   await run("document.querySelector('[aria-label=Settings]').click();[...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Tabs').click()");
   await run("document.querySelector('[data-setting=barStyle][data-value=gradient]').click()");

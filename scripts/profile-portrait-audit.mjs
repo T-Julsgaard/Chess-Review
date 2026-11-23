@@ -15,7 +15,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   assert.equal(await run("!!document.querySelector('.lang-overlay')"), false, 'First-use dialog is dismissed for visual QA');
   const rows = season();
   await run(`import('./browser-compat.js').then(({browserAPI})=>browserAPI.storage.local.set(${JSON.stringify({[rowsKey('chesscom', 'tester')]: {rows, months: [], since: 0, updatedAt: Date.now()}})}))`);
-  await run(`import('./analysis.js').then(async m=>{m.S.settings.uiAnim=true;m.S.settings.pieceStyle='merida';m.S.settings.profileDepth='off';m.S.settings.profilePortraitStyle='assemble';document.querySelector('.learning-announcement-disable')?.click();await m.openProfile();const w=m.profileWorkspace;w.account='tester';w.renderHead();await w.load();w.go(w.deck.findIndex(s=>s.id==='twin'));})`);
+  await run(`import('./analysis.js').then(async m=>{m.S.settings.uiAnim=true;m.S.settings.pieceStyle='merida';m.S.settings.profileDepth='off';m.S.settings.profilePortraitStyle='assemble';document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));await m.openProfile();const w=m.profileWorkspace;w.account='tester';w.renderHead();await w.load();w.go(w.deck.findIndex(s=>s.id==='twin'));})`);
   await waitFor(review, "!!document.querySelector('.profile-portrait-pieces')", 'Portrait mounted');
   const opening = await run("[...document.querySelectorAll('.profile-board > .sq')].map(sq=>sq.querySelector('.profile-piece')?.dataset.piece||null)");
   const backRank = [...'RNBQKBNR'];

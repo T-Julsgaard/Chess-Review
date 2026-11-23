@@ -7,7 +7,7 @@ export async function auditLearning({review, call, evaluate, sleep, out}) {
   const run = code => evaluate(review, code), evidence = [];
   await run("document.querySelector('.lang-confirm')?.click()");
   await sleep(400);
-  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   for (const [width, height] of [[1920, 1080], [1366, 768], [800, 900], [600, 800], [360, 800]]) {
     await call('Emulation.setDeviceMetricsOverride', {width, height, deviceScaleFactor: 1, mobile: false}, review.sessionId);
     await run(`import('./analysis.js').then(async m => {

@@ -25,7 +25,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   };
   const numericState = () => run("import('./analysis.js').then(m=>JSON.stringify({pgn:m.S.pgn,idx:m.S.idx,evals:m.S.evals,bests:m.S.bests,accuracy:m.S.acc,classif:m.S.classif,batch:m.S.batchGen,key:m.S.analyzedSettingsKey}))");
   const boxes = () => run("JSON.stringify([...document.querySelectorAll('.mod')].map(n=>{const r=n.getBoundingClientRect();return [n.dataset.mod,r.x,r.y,r.width,r.height]}))");
-  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   const before = await numericState(), evidence = [];
   for (const [width, height] of [[1920,1080], [1366,768], [1280,600], [390,844], [320,640]]) {
     await resize(width, height); await close();

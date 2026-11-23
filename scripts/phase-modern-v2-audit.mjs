@@ -13,7 +13,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     const image = await call('Page.captureScreenshot', {format:'png',clip,captureBeyondViewport:true}, review.sessionId);
     await fs.writeFile(path.join(out,name+'.png'),Buffer.from(image.data,'base64'));
   };
-  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   await waitFor(review,"!document.querySelector('#startup')",'Startup finished');
   await run("import('./analysis.js').then(async m=>{await m.applyUiSetup('modern');m.S.settings.moveAnim=false})");
   await resize(1920,919);

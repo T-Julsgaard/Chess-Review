@@ -3,7 +3,7 @@ import path from 'node:path';
 import {SCREEN_SIZES} from '../lib/viewport-preview.js';
 export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
  const run=s=>evaluate(review,s),results=[],failures=[];
- await run("document.querySelector('.learning-announcement-disable')?.click();import('./analysis.js').then(m=>{m.S.settings.moveAnim=false;m.S.settings.sound=false;})");
+ await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));import('./analysis.js').then(m=>{m.S.settings.moveAnim=false;m.S.settings.sound=false;})");
  const inspect=async(label,width,height,learning=false)=>{
   const data=await run(`(async()=>{const rect=n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom}};const b=document.querySelector('${learning?'.learning-embedded .board':'.stage .board'}');return {zoom:await chrome.tabs.getZoom(),scrollW:document.documentElement.scrollWidth,scrollH:document.documentElement.scrollHeight,board:rect(b),modules:[...document.querySelectorAll('.stage .mod')].filter(n=>!n.hidden&&getComputedStyle(n).display!=='none').map(n=>({key:n.dataset.mod,...rect(n)})),shell:document.querySelector('.learn-shell')?rect(document.querySelector('.learn-shell')):null,nav:document.querySelector('.learn-nav')?rect(document.querySelector('.learn-nav')):null,stacked:!!document.querySelector('.learn-stacked'),error:document.querySelector('#error').textContent};})()`);
   const check=(ok,msg)=>{if(!ok)failures.push({label,msg});};

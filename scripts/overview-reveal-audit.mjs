@@ -9,7 +9,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     const result = await call('Page.captureScreenshot', {format: 'png', ...(clip ? {clip, captureBeyondViewport: true} : {})}, review.sessionId);
     await fs.writeFile(path.join(out, name + '.png'), Buffer.from(result.data, 'base64'));
   };
-  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   await waitFor(review, "!document.querySelector('#startup')", 'Startup complete');
   const snapshot = () => run("import('./analysis.js').then(m=>JSON.stringify({acc:m.S.acc,calibrated:m.S.calibrated,evals:m.S.evals,bests:m.S.bests,idx:m.S.idx,layout:m.S.layout}))");
   const before = await snapshot();

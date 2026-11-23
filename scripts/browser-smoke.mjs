@@ -94,14 +94,14 @@ try {
   };
   const waitNote=async frame=>{
     for(let i=0;i<100;i++){if(frame.contentDocument.querySelector('.learning-announcement'))return;await wait(100);}
-    throw Error('Developer note missing');
+    throw Error('Intro tour missing');
   };
   // A brand-new isolated profile must get both Modern and the once-only note.
   await resetSettingsForRelease({reason:'startup'});
   const fresh=document.createElement('iframe');fresh.style='width:1680px;height:1000px';
   fresh.src='analysis.html?workspace=blank';document.body.append(fresh);
   assertModern(await waitWorkspace(fresh));await waitNote(fresh);
-  if(fresh.contentDocument.querySelectorAll('.learning-announcement-target').length!==2)throw Error('Developer note must highlight both learning buttons');
+  if(fresh.contentDocument.querySelector('.learning-announcement-target')?.id!=='profileToggle')throw Error('Intro must start on the Player profile button');
   fresh.contentDocument.querySelector('.learning-announcement-dismiss').click();
   const firstDocument=fresh.contentDocument;
   fresh.src='analysis.html?workspace=blank';
@@ -279,8 +279,8 @@ try {
   }
   // Simulate upgrading a 0.3.0 user to 0.4.0 against real browser storage and render the
   // resulting defaults. Existing engine tests above also populate saved games.
-  await browserAPI.storage.local.remove(['settingsResetFor040','learningAnnouncement:puzzles:seen','learningAnnouncement:puzzles:disabled']);
-  localStorage.removeItem('learningAnnouncement:puzzles:seen');localStorage.removeItem('learningAnnouncement:puzzles:disabled');
+  await browserAPI.storage.local.remove(['settingsResetFor040','introTour:seen','learningAnnouncement:puzzles:seen','learningAnnouncement:puzzles:disabled']);
+  localStorage.removeItem('introTour:seen');localStorage.removeItem('learningAnnouncement:puzzles:seen');localStorage.removeItem('learningAnnouncement:puzzles:disabled');
   const resetJob={pgn:'1. e4 e5 *',meta:{gameId:'reset-smoke'},source:'pgn'};
   const library=(await browserAPI.storage.local.get('library')).library;
   library[0].fav=true;

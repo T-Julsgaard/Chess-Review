@@ -15,7 +15,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     const image=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true,clip},review.sessionId);
     await fs.writeFile(path.join(out,name+'.png'),Buffer.from(image.data,'base64'));
   };
-  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   await waitFor(review,"!document.querySelector('#startup')",'Visible review');
   await run(`import('./analysis.js').then(m=>{m.S.settings.accuracyDesign=${JSON.stringify(phaseDesign)};m.S.settings.moveAnim=false;m.S.accuracyPage=0;m.renderStats()})`);
   const original = await run("import('./analysis.js').then(m=>JSON.stringify({acc:m.S.acc,evals:m.S.evals,bests:m.S.bests,stats:m.S.gameStats,classif:m.S.classif,idx:m.S.idx}))");

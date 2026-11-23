@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 
 export async function auditLearning({review, call, evaluate, waitFor, sleep, out}) {
   const run = expression => evaluate(review, expression);
-  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   await waitFor(review,"!document.querySelector('#startup')&&import('./analysis.js').then(m=>m.S.positions.length>4&&!m.S.analyzing)",'Completed review');
   await run("import('./analysis.js').then(async m=>{await m.applyUiSetup('modern');m.S.settings.moveAnim=false;m.renderStats()})");
   const snapshot=()=>run("import('./analysis.js').then(m=>JSON.stringify({layout:m.S.layout,idx:m.S.idx,acc:m.S.acc,stats:m.S.gameStats}))");

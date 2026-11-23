@@ -13,7 +13,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     const image = await call('Page.captureScreenshot', {format: 'png'}, review.sessionId);
     await fs.writeFile(path.join(out, name + '.png'), Buffer.from(image.data, 'base64'));
   };
-  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   const scores=await run("import('./analysis.js').then(m=>({accuracy:m.S.acc,stats:m.S.gameStats}))");
   for(const side of ['w','b']){
     assert.ok(Number.isFinite(scores.accuracy[side]));

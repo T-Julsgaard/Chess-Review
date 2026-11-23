@@ -35,7 +35,7 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
     const shot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
     await fs.writeFile(path.join(out,label+'.png'),Buffer.from(shot.data,'base64'));
   };
-  await run("document.querySelector('.learning-announcement-disable')?.click();import('./analysis.js').then(m=>{m.S.settings.moveAnim=false;m.S.settings.learningTransition='fade';})");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));import('./analysis.js').then(m=>{m.S.settings.moveAnim=false;m.S.settings.learningTransition='fade';})");
   for(const [width,height] of [[1920,1080],[390,844]]) {
     await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);await sleep(150);
     for(const theme of ['dark','light'])for(const color of ['w','b'])for(const flipped of [false,true]) {

@@ -24,7 +24,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     const shot=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
     await fs.writeFile(path.join(out,name+'.png'),Buffer.from(shot.data,'base64'));
   };
-  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   for(const setup of ['old','modern']){
     await run(`import('./analysis.js').then(m=>m.applyUiSetup('${setup}'))`);
     if(await run("document.querySelector('#settings').hidden"))await click('[aria-label=Settings]');

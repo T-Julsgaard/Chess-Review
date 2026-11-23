@@ -7,7 +7,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await call('Page.bringToFront', {}, review.sessionId);
   await call('Emulation.setDeviceMetricsOverride', {width: 1920, height: 919, deviceScaleFactor: 1, mobile: false}, review.sessionId);
   await waitFor(review, "!document.querySelector('#startup')", 'Startup finished');
-  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   await run("import('./analysis.js').then(async m=>{await m.applyUiSetup('modern');m.S.settings.moveAnim=true;m.renderStats();})");
   await waitFor(review, "!document.querySelector('[data-revealing]')", 'Initial reveal finished');
   const evidence = [];

@@ -6,7 +6,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep}) {
   await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]},review.sessionId);
   assert.deepEqual(await run("import('./analysis.js').then(m=>[m.S.settings.moveAnim,m.S.settings.uiAnim])"),[false,true],
     'Existing piece-motion opt-out must keep interface motion enabled by default');
-  await run("document.querySelector('.learning-announcement-disable')?.click();import('./analysis.js').then(m=>{void m.openLearning();})");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));import('./analysis.js').then(m=>{void m.openLearning();})");
   await waitFor(review,"!!document.querySelector('.learn-transition-surface')",'Animated learning entry with piece moves off');
   assert.ok(await run("document.querySelector('.learn-board').getAnimations().length"),'The real board expands');
   await waitFor(review,"import('./analysis.js').then(m=>m.learningWorkspace?.ready&&!m.learningWorkspace.transitioning)",'Learning entry complete');

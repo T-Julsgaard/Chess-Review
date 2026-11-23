@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { UI_SETUPS, MODERN_LAYOUT } from '../lib/ui-setups.js';
-import { LEARNING_ANNOUNCEMENT_SEEN as seen, LEARNING_ANNOUNCEMENT_DISABLED as disabled } from '../lib/learning-announcement.js';
+import { INTRO_TOUR_SEEN as seen, LEGACY_ANNOUNCEMENT_KEYS as legacy } from '../lib/learning-announcement.js';
 
 let installed;
 globalThis.chrome = {
@@ -149,20 +149,20 @@ for (const version of ['0.2.0', '0.3.0', '0.3.9']) {
 }
 
 for (const version of ['0.4.0', '0.4.1', '1.0.0']) {
-  test(`fresh installation of ${version} keeps Modern and shows the developer note exactly once`, async t => {
+  test(`fresh installation of ${version} keeps Modern and shows the intro tour exactly once`, async t => {
     const { store } = setup(version);
     for (const key of Object.keys(store)) delete store[key];
     await installed({ reason: 'install' });
     assertModern(store.settings); assert.equal(store[seen], undefined);
     const first = await workspace(t);
-    // A new installation chooses its language first; the note follows.
+    // A new installation chooses its language first; the intro tour follows.
     assert.equal(first.dom.window.document.querySelector('.learning-announcement'), null);
     first.dom.window.document.querySelector('.lang-confirm').click();
     await settle(); await first.run('learningAnnouncement?.ready');
     assert.equal(store.language, 'en');
     assertModern(first.state.settings);
     assert.equal(first.state.settings.soundVolume, 50);
-    assert.equal(first.dom.window.document.querySelectorAll('.learning-announcement-target').length, 2);
+    assert.equal(first.dom.window.document.querySelector('.learning-announcement-target').id, 'profileToggle');
     assert.ok(first.dom.window.document.querySelector('.learning-announcement'));
     assert.equal(store[seen], true);
     first.dom.window.document.querySelector('.learning-announcement-dismiss').click();
@@ -172,7 +172,7 @@ for (const version of ['0.4.0', '0.4.1', '1.0.0']) {
   });
 }
 
-test('an existing 0.3.0 user sees the note after migration without losing Modern on dismissal', async t => {
+test('an existing 0.3.0 user sees the intro tour after migration without losing Modern on dismissal', async t => {
   const { store } = setup();
   const first = await workspace(t);
   assertModern(first.state.settings);
@@ -183,7 +183,7 @@ test('an existing 0.3.0 user sees the note after migration without losing Modern
   assert.equal(reopened.dom.window.document.querySelector('.learning-announcement'), null);
 });
 
-for (const marker of [seen, disabled]) {
+for (const marker of [seen, ...legacy]) {
   test(`migration respects an existing ${marker} marker`, async t => {
     const { store } = setup(); store[marker] = true;
     const a = await workspace(t);

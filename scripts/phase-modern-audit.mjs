@@ -15,7 +15,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     await fs.writeFile(path.join(out, name + '.png'), Buffer.from(image.data, 'base64'));
   };
   const snapshot = () => run("import('./analysis.js').then(m=>JSON.stringify({acc:m.S.acc,stats:m.S.gameStats,idx:m.S.idx,evals:m.S.evals,layout:m.S.layout}))");
-  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   await waitFor(review, "!document.querySelector('#startup')", 'Startup finished');
   await resize(1920, 919);
   await run("import('./analysis.js').then(async m=>{await m.applyUiSetup('modern');m.S.settings.moveAnim=false})");

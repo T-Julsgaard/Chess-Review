@@ -16,7 +16,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       return response.result.value;
     } finally {await call('Runtime.releaseObject',{objectId:result.objectId},review.sessionId);}
   };
-  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   for(const setup of ['old','modern']){
     await run(`import('./analysis.js').then(m=>m.applyUiSetup('${setup}'))`);
     await run("document.querySelector('[aria-label=Settings]').click()");

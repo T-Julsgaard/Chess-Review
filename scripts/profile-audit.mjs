@@ -24,7 +24,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     const {browserAPI} = await import('./browser-compat.js');
     await browserAPI.storage.local.set(items);
   }, {[rowsKey('chesscom', 'tester')]: {rows, months: [], since: 0, updatedAt: Date.now()}});
-  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   // Exercise the real review-tab -> background -> offscreen -> Stockfish route.
   // A cached archived game keeps this check deterministic and offline.
   const engineGame = rows[0];
@@ -48,7 +48,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     await sleep(150);
     await run(`import('./analysis.js').then(async m=>{m.S.settings.uiAnim=true;m.S.settings.pieceStyle='merida';window.profileReviewIdx=m.S.idx;await m.openProfile();const w=m.profileWorkspace;w.account='tester';w.renderHead();await w.load();})`);
     await waitFor(review, "!!document.querySelector('.pv-story[data-slide=cover]')", 'Profile cover');
-    await run("document.querySelector('.learning-announcement-disable')?.click()");
+    await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
     await sleep(750);
     const cover = await run(`(()=>{const board=document.querySelector('.profile-board'),p=document.querySelector('.profile-shell'),r=p.getBoundingClientRect();return {mosaic:!!board.querySelector('.profile-game-map'),pieces:board.querySelectorAll('.piece-img').length,status:getComputedStyle(p.querySelector('.profile-status')).display,rect:{left:r.left,right:r.right,top:r.top,bottom:r.bottom,height:r.height}};})()`);
     assert.equal(cover.mosaic,true); assert.equal(cover.pieces,0); assert.equal(cover.status,'none');

@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 
 export async function auditLearning({review, call, evaluate, waitFor, sleep, out}) {
   const run = expression => evaluate(review, expression);
-  await run("document.querySelector('.learning-announcement-disable')?.click()");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   await run("import('./analysis.js').then(async m=>{await m.applyUiSetup('modern');m.go(0);})");
   await waitFor(review, "!!document.querySelector('.engine-minimal')", 'Modern minimal Engine');
   const initial = await run("import('./analysis.js').then(m=>JSON.stringify(m.S.layout))");
