@@ -71,7 +71,7 @@ test('profile: seeded games render the deck on the board with navigation, stats 
   assert.ok(shell.querySelectorAll('.pv-fact').length >= 4);
   assert.ok(doc.querySelectorAll('.board .sq.profile-fill').length === 64, 'the fill shows every game on the board');
   assert.equal(doc.querySelector('.profile-board-caption').textContent, '', 'no explanatory text under the board');
-  [...shell.querySelectorAll('.pv-seg')].find(dot => dot.title.startsWith('Rating journey')).click();
+  [...shell.querySelectorAll('.pv-seg')].find(dot => dot.title.startsWith('Rating over time')).click();
   assert.equal(shell.querySelector('.pv-story').dataset.slide, 'rating');
   assert.ok(doc.querySelector('.board .pv-line'));
   shell.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'End', bubbles: true}));
@@ -80,12 +80,12 @@ test('profile: seeded games render the deck on the board with navigation, stats 
   shell.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'Home', bubbles: true}));
   assert.equal(shell.querySelector('.pv-story').dataset.slide, 'cover');
   const goTo = title => [...shell.querySelectorAll('.pv-seg')].find(dot => dot.title === title).click();
-  goTo('You compared to a typical player');
+  goTo('You vs. a typical player');
   assert.equal(shell.querySelector('.pv-story').dataset.slide, 'signature');
   assert.ok(doc.querySelector('.board .pv-differences'));
   for (const link of shell.querySelectorAll('.pv-link[data-game-url]')) assert.match(link.dataset.gameUrl, /^https:\/\/www\.chess\.com\//);
   // Nothing runs by itself: the trend slide offers the check, with an estimate, until it is started.
-  goTo('Then and now');
+  goTo('Accuracy over time');
   assert.equal(shell.querySelector('.profile-engine .profile-button.primary').textContent, 'Check accuracy');
   assert.match(shell.querySelector('.profile-engine-estimate').textContent, /^Estimated time(Under 1 min|About .+) · \d+ games?$/);
   assert.equal(a.store[JOB_KEY], undefined);
@@ -93,6 +93,15 @@ test('profile: seeded games render the deck on the board with navigation, stats 
   a.store[JOB_KEY] = {status: 'running', site: 'chesscom', account: 'tester', done: 3, total: 40, updatedAt: Date.now(), perGameMs: 5000};
   await a.run('profileWorkspace').onJobChange(a.store[JOB_KEY]);
   assert.ok(shell.querySelector('.profile-engine-progress').textContent.includes('3 of 40'));
+  // Progress and live redraws change the chapter in place: Stop and the time-control switch stay the same nodes, never re-inserted.
+  const w = a.run('profileWorkspace'), stop = shell.querySelector('[data-engine="stop"]'), filter = shell.querySelector('.pv-story .pv-filter');
+  a.store[JOB_KEY] = {...a.store[JOB_KEY], done: 4, updatedAt: Date.now()};
+  await w.onJobChange(a.store[JOB_KEY]);
+  assert.ok(shell.querySelector('.profile-engine-progress').textContent.includes('4 of 40'));
+  assert.equal(shell.querySelector('[data-engine="stop"]'), stop, 'a progress update keeps the Stop button');
+  w.rebuild();
+  assert.equal(shell.querySelector('[data-engine="stop"]'), stop, 'a live redraw keeps the Stop button');
+  if (filter) assert.equal(shell.querySelector('.pv-story .pv-filter'), filter, 'and the time-control switch');
 });
 
 test('profile: learning and profile are mutually exclusive', async t => {
@@ -152,7 +161,7 @@ test('profile setup: both sites merge their games and a missing username is refu
   await build(a);
   const w = a.run('profileWorkspace');
   assert.equal(w.rows.length, rows.length, 'games from both sites are combined');
-  assert.ok(shell.querySelector('.pv-points').textContent.includes('Chess.com and Lichess'));
+  assert.ok(shell.querySelector('.pv-intro-period').textContent.includes('Chess.com and Lichess'));
   assert.equal(a.state.settings.profileSite, 'both');
   assert.deepEqual(a.state.settings.profileAccounts, {chesscom: 'tester', lichess: 'tester-li'});
 });
@@ -181,7 +190,7 @@ test('profile setup: custom dates validate, filter the report and survive reopen
   assert.equal(w.report.period, 'custom');
   assert.equal(w.report.totals.games, expected.length);
   assert.deepEqual(a.state.settings.profileCustomPeriod, {start: '2026-03-01', end: '2026-03-31'});
-  assert.ok(shell.querySelector('.pv-points').textContent.includes(w.report.periodLabel));
+  assert.ok(shell.querySelector('.pv-intro-period').textContent.includes(w.report.periodLabel));
   await w.close(); await open(a);
   const back = a.run('profileWorkspace');
   assert.equal(back.phase, 'deck', 'reopening carries on with the same deck');
@@ -463,6 +472,14 @@ test('profile: the accuracy check starts from the accuracy chapter, with the cho
   assert.ok(w.report.engine.games > 1);
   assert.equal(engine().querySelector('[data-engine="start"]').textContent, 'Check more games');
   assert.ok(engine().querySelector('[data-engine="start"]').disabled, 'every chosen game is already checked');
+  // Games checked at a shallower depth can be checked again deeper, never shallower.
+  for (const id of Object.keys(w.engine)) w.engine[id] = {...w.engine[id], depth: 6};
+  engine().querySelector('[data-engine="depth:balanced"]').click();
+  assert.equal(engine().querySelector('[data-engine="start"]').disabled, false, 'a deeper check is offered');
+  assert.equal(engine().querySelector('[data-engine="start"]').textContent, 'Check again, deeper');
+  engine().querySelector('[data-engine="depth:fast"]').click();
+  assert.ok(engine().querySelector('[data-engine="start"]').disabled, 'the same depth has nothing new to check');
+  assert.match(engine().querySelector('.profile-engine-estimate').textContent, /at this depth or deeper/);
 });
 
 test('mate in one: the chapter opens on the newest puzzle not solved yet, and Next skips solved ones', async () => {
@@ -503,7 +520,8 @@ test('mate in one shows game information and badges, and Previous replays a solv
   const clickSquare = name => {
     for (const type of ['pointerdown', 'pointerup']) square(name).dispatchEvent(new PointerEvent(type, {bubbles: true, pointerId: 1}));
   };
-  assert.equal(link().textContent, 'Open game');
+  assert.equal(link().textContent, 'View this game');
+  assert.ok(link().classList.contains('pv-link'), 'styled like the game links on other chapters');
   assert.equal(link().href, newer.url);
   assert.equal(link().target, '_blank');
   assert.match(doc.querySelector('.profile-game-player-top').textContent, /Defender.*1600/);

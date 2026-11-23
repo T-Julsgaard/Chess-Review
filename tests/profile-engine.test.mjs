@@ -70,18 +70,21 @@ test('host: runs a job with workers, caches entries, reports progress, skips cac
     loadPgn: async (site, row) => { loads.push(row.id); return row.id === 'bad' ? null : PGN; },
     analyse: async (pgn, me, {signal}) => { await new Promise(r => setTimeout(r, 5)); if (signal.aborted) throw Error('aborted'); return {v: ENGINE_ENTRY_VERSION, acc: 80, estimated: true}; }});
   await store.saveEngine('chesscom', 'cached', {v: ENGINE_ENTRY_VERSION, acc: 70});
-  const rows = [{id: '1', me: 'w', t: 1}, {id: 'cached', me: 'b', t: 2}, {id: 'bad', me: 'w', t: 3}, {id: '4', me: 'b', t: 4}];
+  // Checked before at a shallower depth than this job's (8): checked again.
+  await store.saveEngine('chesscom', 'shallow', {v: ENGINE_ENTRY_VERSION, acc: 60, depth: 6});
+  const rows = [{id: '1', me: 'w', t: 1}, {id: 'cached', me: 'b', t: 2}, {id: 'bad', me: 'w', t: 3}, {id: '4', me: 'b', t: 4}, {id: 'shallow', me: 'w', t: 5}];
   const started = await host.start({site: 'chesscom', account: 'me', budget: 'quick', rows});
-  assert.deepEqual(started, {ok: true, total: 4});
+  assert.deepEqual(started, {ok: true, total: 5});
   assert.equal((await host.start({site: 'chesscom', account: 'me', rows})).reason, 'busy');
   assert.equal(host.status().active, true);
   const final = await host.finished();
-  assert.equal(final.status, 'done'); assert.equal(final.done, 4); assert.equal(final.skipped, 1); assert.equal(final.failed, 1);
+  assert.equal(final.status, 'done'); assert.equal(final.done, 5); assert.equal(final.skipped, 1); assert.equal(final.failed, 1);
   assert.ok(final.perGameMs >= 0);
   assert.deepEqual(busy, [true, false]);
   assert.ok(!loads.includes('cached'));
+  assert.ok(loads.includes('shallow'), 'a shallower result is checked again');
   const job = storage.data[JOB_KEY];
-  assert.equal(job.status, 'done'); assert.equal(job.total, 4);
+  assert.equal(job.status, 'done'); assert.equal(job.total, 5);
   const entries = await store.loadEngine('chesscom', ['1', '4', 'bad']);
   assert.equal(Object.keys(entries).length, 2); assert.equal(entries['1'].t, 1);
   // Cancel mid-run.

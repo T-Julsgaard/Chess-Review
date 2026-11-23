@@ -66,8 +66,9 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.equal(shell.querySelectorAll('.pv-seg').length, w.deck.length);
   assert.equal(shell.querySelector('.pv-story').dataset.slide, 'cover');
   assert.equal(shell.querySelector('.pv-story-chapter'), null, 'the cover has no chapter label');
-  assert.equal(shell.querySelectorAll('.pv-points li').length, 3, 'period, games and hours as separate lines');
-  assert.match(shell.querySelector('.pv-points').textContent, /hours? at the board/);
+  assert.match(shell.querySelector('.pv-intro-period').textContent, /Past 12 months.*on Chess.com/, 'the period and site on one line');
+  assert.deepEqual([...shell.querySelectorAll('.pv-intro-stat dt')].map(n => n.textContent), ['games', 'hours at the board'], 'games and hours as two figures');
+  assert.equal(shell.querySelector('.pv-points'), null);
   assert.ok(!shell.querySelector('.profile-head').textContent.includes('wrapped'));
   assert.ok(shell.querySelector('.profile-head .pv-back'), 'the header goes back to the start');
   assert.equal(shell.querySelectorAll('.profile-nav .pv-prev').length, 1, 'a full-width previous chapter button');
@@ -78,7 +79,7 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.equal(doc.querySelector('.board .pv-badge'), null, 'nothing covers the result squares');
   assert.equal(doc.querySelectorAll('.board .sq.profile-fill').length, 64);
   assert.equal(shell.querySelectorAll('.pv-fact').length, 4, 'four facts, two by two');
-  // View your results over time, in place of a link to the longest game: every game in runs, drawn like Greatest hits.
+  // View your results over time, in place of a link to the longest game: every game in runs, drawn like the best-wins chart.
   assert.equal(shell.querySelector('.pv-link[data-game-url]'), null, 'no link to the longest game');
   const overTime = shell.querySelector('.pv-link[aria-pressed]');
   assert.equal(overTime?.textContent, 'View your results over time');
@@ -115,8 +116,7 @@ test('profile designs: story shows one figure per chapter, progress segments and
   const signature = w.currentSlide();
   assert.equal(shell.querySelector('.pv-cmp-label').firstChild.textContent, signature.signatures[0].label, 'the strongest signature is first in the comparison');
   assert.equal(shell.querySelectorAll('.pv-cmp').length, signature.compare.length, 'the comparison includes every metric');
-  assert.match(shell.querySelector('.pv-story-chapter').textContent, /You compared to a typical player/);
-  assert.equal(shell.querySelector('.pv-story-chapter .pv-story-no').textContent, String(w.index + 1).padStart(2, '0'), 'the comparison keeps its chapter number');
+  assert.equal(shell.querySelector('.pv-story-chapter').textContent, 'You vs. a typical player', 'the chapter name alone, with no number');
   assert.equal(shell.querySelector('.pv-story-hero'), null, 'no headline repeats the first habit; the list starts higher');
   assert.equal(shell.querySelector('.pv-story-lead'), null);
   assert.deepEqual([...w.viz.layer.querySelectorAll('.pv-diff-row strong')].map(n => n.textContent), signature.signatures.slice(0, 4).map(s => s.label), 'the board highlights the strongest habits');
@@ -629,4 +629,17 @@ test('the rating chart\'s axes: round values, and months or years but never both
   assert.deepEqual(timeTicks(at(2026, 0), at(2026, 3)).map(t => t.label), ['Feb', 'Mar', 'Apr'], 'every month of a short line');
   const years = timeTicks(at(2019, 4), at(2026, 9));
   assert.ok(years.length >= 2 && years.length <= 7 && years.every(t => /^\d{4}$/.test(t.label)), 'years only: ' + years.map(t => t.label));
+});
+
+test('profile designs: the "When you play" headline names what stands out about the time of play', async () => {
+  const {playTime} = await import('../lib/profile/deck.js');
+  const H = (over = {}) => ({night: {games: 5}, early: {games: 5}, morning: {games: 20}, day: {games: 25}, evening: {games: 50},
+    busiestWeekday: {day: 'Tue', games: 18}, weekdayGames: {Sun: 14, Mon: 14, Tue: 18, Wed: 14, Thu: 14, Fri: 14, Sat: 12}, ...over});
+  assert.equal(playTime(H({night: {games: 40}}), 100).title, 'Night owl');
+  assert.match(playTime(H({night: {games: 40}}), 100).label, /40% of your games between 23:00 and 05:00/);
+  assert.equal(playTime(H({early: {games: 25}}), 100).title, 'Early bird');
+  assert.equal(playTime(H({busiestWeekday: {day: 'Tue', games: 30}}), 100).title, 'Tuesday player');
+  assert.equal(playTime(H({busiestWeekday: {day: 'Sat', games: 30}, weekdayGames: {Sat: 30, Sun: 20}}), 100).title, 'Weekend player');
+  assert.equal(playTime(H(), 100).title, 'Evening player', 'otherwise the part of the day with the most games');
+  assert.equal(playTime(H({day: {games: 60}}), 100).title, 'Afternoon player');
 });
