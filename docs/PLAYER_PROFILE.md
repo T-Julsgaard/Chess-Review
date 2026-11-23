@@ -70,8 +70,16 @@ Chrome's offscreen host uses runtime messages for profile storage and cached PGN
 the background process performs those operations because offscreen documents cannot use storage APIs.
 
 Share copies a link to `https://t-julsgaard.github.io/Chess-Review/profile/#p=…`. Without the
-extension the page decodes the fragment in the browser and shows a read-only deck with install
-buttons. With the extension the same link opens the full deck on the board.
+extension the page decodes the fragment in the browser and opens the extension's own Story
+workspace on it in shared mode (`profile/viewer.js` subclasses `StoryWorkspace` and loads the
+extension's stylesheets), so the chapters, board charts, twin portrait and game replays look as
+they do in Chess Review. A viewed game fetches its moves directly from Chess.com or Lichess and
+evaluates with the bundled Stockfish 19 Lite. The page adds install nudges: an "Add to Chrome" (or
+Firefox/Edge) button in the top bar, an install dialog behind "Build your own", a one-line card
+under the deck after five chapters, and a "Your turn" card on the last chapter. The time-control
+switch is hidden there, since the link carries the report and not the games. When the extension is
+installed (`profile-viewer-content.js` marks the page) the nudges hide and the same link opens the
+full deck on the board.
 
 ## Changes from the plan, and why
 

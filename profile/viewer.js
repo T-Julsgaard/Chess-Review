@@ -1,123 +1,341 @@
-// Static viewer for shared Chess Review player profiles. Decodes #p=… in the browser,
-// builds the same slide deck the extension uses and draws it with a static board.
-// No network requests beyond this page's own files; nothing is sent anywhere.
+// Shared Chess Review player profiles on the web (GitHub Pages). The link carries the whole
+// profile in its fragment (#p=…), which never reaches a server: this page decodes it in the
+// browser and opens the extension's own Story workspace on it (lib/profile/designs/story.js),
+// with the extension's stylesheets, so the deck, its board charts and its animations are the
+// ones Chess Review shows. Only the page around it is web-specific: the top bar, the install
+// nudges and a small board stage standing in for the review layout.
+// Network: this page's own files; opening a game on the board fetches its moves directly from
+// Chess.com or Lichess (lib/profile/pgn-source.js), and Stockfish loads only for a viewed game.
+import {StoryWorkspace} from '../lib/profile/designs/story.js';
 import {decodeProfile} from '../lib/profile/share.js';
-import {buildDeck} from '../lib/profile/deck.js';
-import {Chess} from '../lib/chess.js';
-import {WEEKDAYS, BANDS} from '../lib/profile/insights.js';
-import {SQUARES} from '../lib/profile/features.js';
-import {createPortrait, hasPortrait, portraitCredit} from '../lib/profile/portrait.js';
-import {renderOverview} from '../lib/profile/overview.js';
 
+const ASSETS = new URL('../', import.meta.url);
+const asset = path => new URL(path, ASSETS).href;
 const $ = id => document.getElementById(id);
-const FILES = 'abcdefgh';
+const STORE = {
+  chrome: {href: 'https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenkadndbdbigfam', name: 'Chrome'},
+  firefox: {href: 'https://addons.mozilla.org/en-US/firefox/addon/chess-review/', name: 'Firefox'},
+};
+const UA = navigator.userAgent || '';
+const BROWSER = /firefox|fxios/i.test(UA) ? 'firefox' : /edg\//i.test(UA) ? 'edge' : 'chrome';
+/** The store this browser installs from (Edge, Brave and Opera install from the Chrome Web Store). */
+const primaryStore = () => BROWSER === 'firefox' ? STORE.firefox : STORE.chrome;
+const otherStore = () => BROWSER === 'firefox' ? STORE.chrome : STORE.firefox;
+const primaryLabel = () => BROWSER === 'firefox' ? 'Add to Firefox' : BROWSER === 'edge' ? 'Add to Edge' : 'Add to Chrome';
+const NUDGE_KEY = 'chess-review-viewer-nudge';
+
 const h = (tag, attrs = {}, ...children) => {
   const node = document.createElement(tag);
-  for (const [key, value] of Object.entries(attrs)) { if (value == null || value === false) continue; if (key === 'class') node.className = value; else if (key.startsWith('on')) node.addEventListener(key.slice(2), value); else node.setAttribute(key, value === true ? '' : String(value)); }
+  for (const [key, value] of Object.entries(attrs)) {
+    if (value == null || value === false) continue;
+    if (key === 'class') node.className = value; else if (key === 'html') node.innerHTML = value;
+    else if (key.startsWith('on')) node.addEventListener(key.slice(2), value);
+    else if (key === 'style' && typeof value === 'object') Object.assign(node.style, value);
+    else node.setAttribute(key, value === true ? '' : String(value));
+  }
   for (const child of children.flat()) if (child != null && child !== false) node.append(child.nodeType ? child : document.createTextNode(String(child)));
   return node;
 };
-const squares = [];
-function buildBoard() {
-  const board = $('board'); board.replaceChildren(); squares.length = 0;
-  for (let rank = 8; rank >= 1; rank--) for (let f = 0; f < 8; f++) { const sq = h('div', {class: 'sq' + ((rank + f) % 2 ? '' : ' dark'), 'data-name': FILES[f] + rank}); squares.push(sq); board.append(sq); }
-}
-const byName = name => squares.find(sq => sq.dataset.name === name);
-let timers = [], portrait = null;
-function clearBoard() { portrait?.cancel(); portrait = null; $('board').querySelector('.profile-board-overlay, .profile-overview')?.remove(); for (const t of timers) clearTimeout(t); timers = []; for (const sq of squares) { sq.replaceChildren(); sq.className = sq.className.replace(/\b(hl|heat|fill|dim|split-l|split-r)\b/g, '').trim(); sq.style.removeProperty('--heat'); sq.style.removeProperty('--fill'); sq.removeAttribute('title'); } }
-function piece(ch) { const code = (ch === ch.toUpperCase() ? 'w' : 'b') + ch.toUpperCase(); return h('img', {src: '../pieces-img/cburnett/' + code + '.svg', alt: ''}); }
-function placeFen(fen) {
-  for (const sq of squares) sq.querySelectorAll('img').forEach(n => n.remove());
-  const rows = String(fen || '').split(' ')[0].split('/'); if (rows.length !== 8) return;
-  rows.forEach((row, r) => { let c = 0; for (const ch of row) { if (/\d/.test(ch)) c += Number(ch); else { byName(FILES[c] + (8 - r))?.append(piece(ch)); c++; } } });
-}
-function playMoves(moves, from = 0, onStep) {
-  clearBoard();
-  const chess = new Chess(); let i = 0;
-  for (; i < Math.min(from, moves.length); i++) { try { chess.move(moves[i]); } catch { break; } }
-  placeFen(chess.fen());
-  const step = () => {
-    if (i >= moves.length) return;
-    let move; try { move = chess.move(moves[i]); } catch { return; }
-    if (!move) return; i++;
-    for (const sq of squares) sq.classList.remove('hl');
-    placeFen(chess.fen()); byName(move.from)?.classList.add('hl'); byName(move.to)?.classList.add('hl');
-    onStep?.(move, i, moves.length);
-    timers.push(setTimeout(step, 700));
+const svg = paths => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+const ICONS = {
+  gear: svg('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'),
+  prev: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 5l-9 7 9 7z"/></svg>',
+  next: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5l9 7-9 7z"/></svg>',
+  download: svg('<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'),
+  close: svg('<path d="M6 6l12 12M18 6 6 18"/>'),
+  twin: svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>'),
+  review: svg('<path d="M3 17l5-5 4 4 8-8"/><path d="M15 8h5v5"/>'),
+  puzzle: svg('<path d="M8 3h3v3a2 2 0 1 0 4 0V3h3a2 2 0 0 1 2 2v3h-3a2 2 0 1 0 0 4h3v7a2 2 0 0 1-2 2h-3v-3a2 2 0 1 0-4 0v3H8a2 2 0 0 1-2-2v-7h3a2 2 0 1 0 0-4H6V5a2 2 0 0 1 2-2z"/>'),
+  link: svg('<path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/>'),
+  knight: `<img src="${asset('pieces-img/cburnett/wN.svg')}" alt="" />`,
+};
+
+/* ---------- the extension's surroundings, for the web ---------- */
+// What Chess Review's settings hold by default for everything the profile reads.
+const SETTINGS = {uiAnim: true, moveAnim: true, animSpeed: 7, pieceStyle: 'image', barStyle: 'flat2', engineDepth: 12,
+  profilePortraitStyle: 'relief', profileSignatureBoard: 'differences', profileAccuracyAnimation: 'games', profileStream: 'film',
+  profileIncludeBots: false, profileColor: 'all', profileRatedOnly: false, profileSkipShort: false, profileExcludedOpponents: {},
+  profilePeriod: 'year', profileBudget: 'standard', profileDepth: 'off', profileSample: 'all'};
+/** In-memory stand-in for extension storage: a shared profile keeps nothing between visits. */
+function memoryStorage() {
+  const data = new Map();
+  return {
+    async get(keys) {
+      const out = {};
+      if (keys == null) { for (const [k, v] of data) out[k] = structuredClone(v); return out; }
+      const list = typeof keys === 'string' ? [keys] : Array.isArray(keys) ? keys : Object.keys(keys);
+      for (const k of list) if (data.has(k)) out[k] = structuredClone(data.get(k)); else if (keys && typeof keys === 'object' && !Array.isArray(keys)) out[k] = keys[k];
+      return out;
+    },
+    async set(items) { for (const [k, v] of Object.entries(items)) data.set(k, structuredClone(v)); },
+    async remove(keys) { for (const k of [].concat(keys)) data.delete(k); },
   };
-  timers.push(setTimeout(step, 800));
 }
-/** Historical twin: the position appears, then its pieces assemble into the twin's face (portrait.js). */
-function showPortrait(spec) {
-  const chess = new Chess();
-  if (spec.kind === 'moves') for (const san of spec.moves.slice(0, spec.from || 0)) { try { chess.move(san); } catch { break; } }
-  placeFen(spec.kind === 'fen' ? spec.fen : chess.fen());
-  const board = $('board'), overlay = h('div', {class: 'profile-board-overlay'}), still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  board.append(overlay);
-  portrait = createPortrait({board, overlay, id: spec.portrait, makePiece: (type, color) => piece(color === 'w' ? type.toUpperCase() : type), pieces: '.sq img',
-    motion: () => !still, delay: 1600, label: `Portrait of ${spec.name}, made of chess pieces`});
-  const leave = () => { const face = portrait; portrait = null; face?.dismiss().then(() => { if (deck[index]?.board === spec) showBoard(spec, {face: false}); }); };
-  const credit = portraitCredit(spec.portrait);
-  $('caption').replaceChildren(`${spec.name}, assembled from the pieces on the board. `,
-    h('button', {type: 'button', class: 'caption-button', onclick: () => portrait?.replay()}, 'Replay'), ' ',
-    h('button', {type: 'button', class: 'caption-button', onclick: leave}, spec.kind === 'moves' ? 'Play the game' : 'Show the position'),
-    h('small', {class: 'portrait-credit'}, 'Photo: ', h('a', {href: credit.source, target: '_blank', rel: 'noopener noreferrer'}, credit.credit)));
+function makePiece(type, side) {
+  const code = (side === 'w' ? 'w' : 'b') + String(type).toUpperCase();
+  return h('img', {class: 'piece-img', 'data-piece': code, 'data-set': 'cburnett', src: asset(`pieces-img/cburnett/${code}.svg`), alt: '', draggable: 'false'});
 }
-function showBoard(spec, {face = true} = {}) {
-  clearBoard(); $('caption').textContent = spec?.caption || '';
-  $('board').setAttribute('aria-hidden', String(spec?.kind !== 'overview'));
-  if (!spec) return;
-  if (face && hasPortrait(spec.portrait)) { showPortrait(spec); return; }
-  switch (spec.kind) {
-    case 'overview': $('board').append(renderOverview({h, deck, report, onOpen: i => {
-      go(i);
-      $('slide').querySelector('h2').focus({preventScroll: true});
-    }})); break;
-    case 'cover': { const moves = [spec.white, spec.black].filter(Boolean); if (moves.length) playMoves(moves); else placeFen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'); break; }
-    case 'fen': placeFen(spec.fen); break;
-    case 'moves': playMoves(spec.moves, spec.from || 0, (move, i) => { $('caption').textContent = `${spec.caption || ''} · ${Math.ceil(i / 2)}${i % 2 ? '.' : '…'} ${move.san}`; }); break;
-    case 'journey': placeFen(spec.fenFrom || spec.fenTo); if (spec.fenFrom && spec.fenTo) timers.push(setTimeout(() => placeFen(spec.fenTo), 1900)); break;
-    case 'heat': { const max = Math.max(1, ...spec.counts); spec.counts.forEach((count, i) => { const sq = byName(SQUARES[i]); if (!sq) return; sq.classList.add('heat'); sq.style.setProperty('--heat', Math.sqrt(count / max).toFixed(3)); sq.title = SQUARES[i] + ': ' + count; }); break; }
-    case 'fill': { const win = Math.round(64 * spec.wins / Math.max(1, spec.total)), draw = Math.round(64 * spec.draws / Math.max(1, spec.total)); squares.forEach((sq, i) => { sq.classList.add('fill'); sq.style.setProperty('--fill', i < win ? 'var(--good)' : i < win + draw ? 'var(--ink-2)' : '#f5746a'); }); break; }
-    case 'schedule': { const order = [1, 2, 3, 4, 5, 6, 0], max = Math.max(1, ...spec.matrix.flat().map(c => c.g)); order.forEach((day, row) => spec.matrix[day].forEach((cell, band) => { const sq = byName(FILES[band] + (8 - row)); if (!sq) return; sq.classList.add('heat'); sq.style.setProperty('--heat', Math.sqrt(cell.g / max).toFixed(3)); sq.title = `${WEEKDAYS[day]} ${BANDS[band]}: ${cell.g} games`; if (!band) sq.append(h('span', {class: 'label left'}, WEEKDAYS[day])); })); for (let band = 0; band < 8; band++) { const sq = byName(FILES[band] + '1'); sq?.classList.add('dim'); sq?.append(h('span', {class: 'label'}, BANDS[band].split('–')[0])); } break; }
-    case 'split': squares.forEach(sq => sq.classList.add(FILES.indexOf(sq.dataset.name[0]) < 4 ? 'split-l' : 'split-r')); byName('b5')?.append(h('span', {class: 'label'}, spec.left.value)); byName('g5')?.append(h('span', {class: 'label'}, spec.right.value)); byName('b4')?.append(h('span', {class: 'label'}, spec.left.label)); byName('g4')?.append(h('span', {class: 'label'}, spec.right.label)); break;
-    default: placeFen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
+const FILES = 'abcdefgh';
+const START = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
+/** The review board's squares, as analysis.js builds them: the profile clones them when it takes the board. */
+function buildBoard(board, fen = START) {
+  board.replaceChildren();
+  const rows = fen.split(' ')[0].split('/'), at = {};
+  rows.forEach((row, r) => { let c = 0; for (const ch of row) { if (/\d/.test(ch)) c += Number(ch); else { at[FILES[c] + (8 - r)] = ch; c++; } } });
+  for (let rank = 8, ri = 0; rank >= 1; rank--, ri++) for (let ci = 0; ci < 8; ci++) {
+    const light = (ri + ci) % 2 === 0, name = FILES[ci] + rank;
+    const sq = h('div', {class: 'sq ' + (light ? 'light' : 'dark') + (ri === 0 ? ' top-row' : '') + (ci === 7 ? ' right-col' : '')});
+    if (ci === 0) sq.append(h('span', {class: 'coord rank'}, rank));
+    if (ri === 7) sq.append(h('span', {class: 'coord file'}, FILES[ci]));
+    const ch = at[name];
+    if (ch) sq.append(makePiece(ch.toLowerCase(), ch === ch.toUpperCase() ? 'w' : 'b'));
+    board.append(sq);
   }
+}
+const VALUES = {p: 1, n: 3, b: 3, r: 5, q: 9}, FULL = {p: 8, n: 2, b: 2, r: 2, q: 1};
+/** The review's name strip for a viewed game: avatar, name and rating, and the pieces each side has taken. */
+function playerStrip(side, player, fen) {
+  const board = String(fen || START).split(' ')[0], count = ch => [...board].filter(c => c === ch).length;
+  const lost = color => Object.keys(FULL).flatMap(t => Array(Math.max(0, FULL[t] - count(color === 'w' ? t.toUpperCase() : t))).fill(color + t.toUpperCase()));
+  const material = color => Object.keys(VALUES).reduce((sum, t) => sum + VALUES[t] * count(color === 'w' ? t.toUpperCase() : t), 0);
+  const caps = lost(side === 'w' ? 'b' : 'w'), diff = material('w') - material('b');
+  const ahead = side === 'w' ? diff > 0 : diff < 0;
+  const toMove = String(fen || '').split(' ')[1] === side;
+  const name = player?.name || 'Unknown player';
+  return h('div', {class: 'player-strip' + (toMove ? ' active' : '')},
+    h('span', {class: 'avatar', style: {background: side === 'w' ? '#3f7d3a' : '#5a5a5a'}}, (name[0] || '?').toUpperCase()),
+    h('div', {class: 'who'},
+      h('span', {class: 'name'}, name, player?.rating ? h('span', {class: 'elo'}, ` (${player.rating})`) : null),
+      h('div', {class: 'captured'},
+        h('div', {class: 'cap-tray cap-tray-' + (side === 'w' ? 'light' : 'dark') + (caps.length ? '' : ' is-empty')}, ...caps.map(code => h('img', {class: 'cap-pc', src: asset(`pieces-img/cburnett/${code}.svg`), alt: ''}))),
+        ahead ? h('span', {class: 'adv'}, '+' + Math.abs(diff)) : null)));
+}
+let toastTimer = 0;
+function toast(text) {
+  let node = document.querySelector('.web-toast');
+  if (!node) { node = h('div', {class: 'web-toast', role: 'status', 'aria-live': 'polite'}); document.body.append(node); }
+  node.textContent = text; node.classList.add('is-shown');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => node.classList.remove('is-shown'), 2200);
+}
+const scale = () => window.innerWidth <= 900 ? 1 : Math.max(1, Math.min(3, window.innerWidth / 1920, window.innerHeight / 1080));
+async function createEngine() {
+  const {Engine} = await import('../engine/uci.js');
+  const engine = new Engine(asset('engine/stockfish-19-lite-single.js'), asset('engine/stockfish-19-lite-single.wasm'));
+  await engine.setOptions({Threads: 1, Hash: 16});
+  return engine;
+}
+async function copyLink(button) {
+  try { await navigator.clipboard.writeText(location.href); toast('Link copied'); button?.classList.add('is-done'); setTimeout(() => button?.classList.remove('is-done'), 1600); }
+  catch { toast('Could not copy the link'); }
 }
 
-let report, deck = [], index = 0;
-function render() {
-  const slide = deck[index], host = $('slide'); host.replaceChildren();
-  host.append(h('span', {class: 'eyebrow'}, slide.eyebrow), h('h2', {tabindex: '-1'}, slide.title), h('p', {class: 'lead'}, slide.lead || ''));
-  if (slide.stats?.length) host.append(h('div', {class: 'stats'}, ...slide.stats.map(s => h('div', {class: 'stat' + (s.tone ? ' ' + s.tone : '')}, h('strong', {}, s.value), h('span', {}, s.label), s.sub ? h('small', {}, s.sub) : null))));
-  if (slide.openings) host.append(h('div', {class: 'openings'}, ...[['As White', slide.openings.w], ['As Black', slide.openings.b]].map(([label, list]) => h('div', {}, h('h3', {}, label), ...list.map(o => h('div', {class: 'opening'}, h('span', {}, o.name), h('span', {}, `${o.games} · ${o.winRate ?? '–'}%`)))))));
-  if (slide.twin) host.append(h('p', {class: 'muted'}, `${slide.twin.era}. Runner-up: ${slide.twin.runnerUp}.`));
-  if (slide.bullets?.length) host.append(h('ul', {class: 'bullets'}, ...slide.bullets.map(t => h('li', {}, t))));
-  if (slide.id === 'share') host.append(h('p', {class: 'muted'}, 'This is a shared, read-only profile. Install Chess Review to build your own from your games.'), h('a', {class: 'button primary', href: 'https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenkadndbdbigfam', rel: 'noopener'}, 'Get Chess Review'));
-  else if (slide.pending === 'engine') host.append(h('p', {class: 'muted'}, 'Engine-based figures appear when the profile owner runs the engine check in the extension.'));
-  if (slide.evidence?.url) host.append(h('a', {class: 'evidence', href: slide.evidence.url, target: '_blank', rel: 'noopener noreferrer'}, slide.evidence.label + ' ↗'));
-  $('prev').disabled = index === 0; $('next').disabled = index === deck.length - 1; $('counter').textContent = `${index + 1} / ${deck.length}`;
-  $('dots').replaceChildren(...deck.map((s, i) => h('button', {type: 'button', class: 'dot' + (i === index ? ' on' : ''), role: 'tab', 'aria-selected': String(i === index), 'aria-label': s.eyebrow, onclick: () => go(i)})));
-  showBoard(slide.board);
+/* ---------- install nudges ---------- */
+function installButton({cls = 'profile-button primary web-install', store = primaryStore(), label = primaryLabel(), where = ''} = {}) {
+  return h('a', {class: cls, href: store.href, target: '_blank', rel: 'noopener', 'data-install': where},
+    h('span', {class: 'web-install-icon', html: ICONS.download}), h('span', {}, label), h('small', {}, 'free'));
 }
-function go(i) { index = Math.max(0, Math.min(deck.length - 1, i)); render(); window.scrollTo({top: 0, behavior: 'smooth'}); }
-async function main() {
-  const m = location.hash.match(/[#&]p=([^&]+)/);
-  const state = $('state');
-  if (!m) { state.querySelector('p').textContent = 'This page shows a player profile shared from the Chess Review extension. Open it through a share link, or install the extension to build your own.'; return; }
-  try {
-    report = await decodeProfile(m[1]);
-    deck = buildDeck(report, {account: report.account, site: report.site, periodLabel: report.periodLabel, engineStatus: 'unavailable'});
-    buildBoard();
-    state.hidden = true; $('deck').hidden = false;
-    document.title = `${report.account} · Chess Review player profile`;
-    $('prev').addEventListener('click', () => go(index - 1)); $('next').addEventListener('click', () => go(index + 1));
-    document.addEventListener('keydown', e => { if (e.target.tagName === 'INPUT') return; if (e.key === 'ArrowRight') go(index + 1); else if (e.key === 'ArrowLeft') go(index - 1); });
-    render();
-  } catch (error) {
-    state.querySelector('h1').textContent = 'Could not read this profile';
-    state.querySelector('p').textContent = error.message || 'The link seems incomplete.';
+let dialog = null, dialogReturn = null;
+function openInstall(account) {
+  closePopover();
+  if (!dialog) {
+    const features = [
+      [ICONS.twin, 'Your own profile', 'Your historical twin, rating journey, openings, rivals and habits, drawn on the board like this one.'],
+      [ICONS.review, 'One-click game review', 'Every Chess.com or Lichess game reviewed move by move, with Stockfish running on your own computer.'],
+      [ICONS.puzzle, 'Learn as you play', 'Puzzles and opening lessons built in.'],
+    ];
+    dialog = h('div', {class: 'web-dialog-backdrop', hidden: true, onclick: e => { if (e.target === dialog) closeInstall(); }},
+      h('div', {class: 'web-dialog', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'installTitle', tabindex: '-1',
+        onkeydown: e => { if (e.key === 'Escape') { e.preventDefault(); closeInstall(); } else if (e.key === 'Tab') trapFocus(e); }},
+        h('button', {type: 'button', class: 'web-dialog-close', 'aria-label': 'Close', html: ICONS.close, onclick: () => closeInstall()}),
+        h('span', {class: 'brand-mark web-dialog-mark', html: ICONS.knight}),
+        h('span', {class: 'web-dialog-eyebrow'}, 'Chess Review'),
+        h('h2', {id: 'installTitle'}, 'Build your own player profile'),
+        h('p', {class: 'web-dialog-lead', id: 'installLead'}),
+        h('ul', {class: 'web-features'}, ...features.map(([icon, title, text]) => h('li', {}, h('span', {class: 'web-feature-icon', html: icon}), h('div', {}, h('strong', {}, title), h('span', {}, text))))),
+        h('div', {class: 'web-dialog-actions'}, installButton({where: 'dialog'}),
+          installButton({cls: 'profile-button web-install web-install-other', store: otherStore(), label: 'Get it for ' + otherStore().name, where: 'dialog-other'})),
+        h('p', {class: 'web-dialog-foot'}, 'Free and open source · No account, no sign-up · Analysis runs on your machine')));
+    document.body.append(dialog);
   }
+  $('installLead').textContent = account
+    ? `Type your Chess.com or Lichess username and Chess Review turns your games into a story like ${account}'s.`
+    : 'Type your Chess.com or Lichess username and Chess Review turns your games into a story you can share.';
+  dialogReturn = document.activeElement;
+  dialog.hidden = false; requestAnimationFrame(() => dialog.classList.add('is-open'));
+  dialog.querySelector('.web-install').focus({preventScroll: true});
+  collapseNudge();
+}
+function closeInstall() {
+  if (!dialog || dialog.hidden) return;
+  dialog.classList.remove('is-open');
+  setTimeout(() => { if (!dialog.classList.contains('is-open')) dialog.hidden = true; }, 180);
+  dialogReturn?.focus?.({preventScroll: true});
+}
+function trapFocus(event) {
+  const items = [...dialog.querySelectorAll('a[href], button')].filter(n => !n.disabled);
+  const first = items[0], last = items.at(-1);
+  if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+  else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+}
+let popover = null;
+function togglePopover() {
+  const button = $('infoButton');
+  if (popover && !popover.hidden) { closePopover(); return; }
+  if (!popover) {
+    popover = h('div', {class: 'web-popover', role: 'dialog', 'aria-label': 'How this page works', hidden: true,
+      onkeydown: e => { if (e.key === 'Escape') { e.preventDefault(); closePopover(); button.focus(); } }},
+      h('strong', {}, 'How this page works'),
+      h('p', {}, 'The whole profile travels inside the link. The part after # never reaches a server: your browser decodes it and draws every chapter here. GitHub serves this page and sees only the page request.'),
+      h('p', {}, 'Opening a game on the board fetches its moves directly from Chess.com or Lichess.'),
+      h('p', {}, h('a', {href: 'https://github.com/T-Julsgaard/Chess-Review', target: '_blank', rel: 'noopener'}, 'Chess Review is open source ↗')));
+    document.body.append(popover);
+    document.addEventListener('pointerdown', e => { if (popover && !popover.hidden && !popover.contains(e.target) && !button.contains(e.target)) closePopover(); });
+  }
+  const r = button.getBoundingClientRect();
+  Object.assign(popover.style, {top: r.bottom + 10 + 'px', right: Math.max(12, window.innerWidth - r.right) + 'px'});
+  popover.hidden = false; button.setAttribute('aria-expanded', 'true');
+  popover.querySelector('a').focus({preventScroll: true});
+}
+function closePopover() { if (popover) popover.hidden = true; $('infoButton').setAttribute('aria-expanded', 'false'); }
+
+/**
+ * Under the deck's panel: a small pill that opens the install dialog, which widens into
+ * a one-line card once the reader is a few chapters in. It sits in the room below the
+ * panel, so it never covers the deck or its Next button.
+ */
+let nudge = null;
+function mountNudge(account) {
+  const card = h('div', {class: 'web-nudge-card'},
+    h('span', {class: 'web-nudge-mark', html: ICONS.knight}),
+    h('div', {class: 'web-nudge-text'}, h('strong', {}, `Enjoying ${account}'s story?`), h('span', {}, 'Build yours from your own Chess.com or Lichess games.')),
+    installButton({where: 'nudge'}),
+    h('button', {type: 'button', class: 'web-nudge-close', 'aria-label': 'Hide', html: ICONS.close, onclick: () => collapseNudge()}));
+  const pill = h('button', {type: 'button', class: 'web-nudge-pill', onclick: () => openInstall(account)},
+    h('span', {class: 'web-nudge-mark', html: ICONS.knight}), 'Build your own profile');
+  nudge = h('aside', {class: 'web-nudge', 'aria-label': 'Get Chess Review'}, card, pill);
+  document.body.append(nudge);
+  const shell = document.querySelector('.profile-shell');
+  new MutationObserver(positionNudge).observe(shell, {attributes: true, attributeFilter: ['style', 'class']});
+  window.addEventListener('resize', positionNudge);
+  positionNudge();
+}
+function positionNudge() {
+  const shell = document.querySelector('.profile-shell');
+  if (!nudge || !shell) return;
+  const r = shell.getBoundingClientRect(), room = window.innerHeight - r.bottom;
+  nudge.hidden = shell.classList.contains('profile-stacked') || room < 56;
+  Object.assign(nudge.style, {left: r.left + 'px', width: r.width + 'px', top: r.bottom + 12 + 'px'});
+}
+const seen = new Set();
+function onChapter(id) {
+  if (!nudge || !id) return;
+  seen.add(id);
+  let shown = false; try { shown = sessionStorage.getItem(NUDGE_KEY) === 'shown'; } catch {}
+  if (shown || (seen.size < 5 && id !== 'share')) return;
+  try { sessionStorage.setItem(NUDGE_KEY, 'shown'); } catch {}
+  nudge.classList.add('is-open');
+}
+function collapseNudge() { nudge?.classList.remove('is-open'); }
+
+/* ---------- the extension's Story deck, with the web's last chapter ---------- */
+class WebStoryWorkspace extends StoryWorkspace {
+  /** A shared link carries the report, not the games, so a time control could only ever show "Not enough games". */
+  classFilter() { return null; }
+  hero(slide) {
+    const hero = super.hero(slide);
+    return slide.id === 'share' && !slide.empty ? {...hero, value: 'The whole story at a glance'} : hero;
+  }
+  /** The last chapter: where the extension offers its share link, the web offers a profile of your own. */
+  renderShare() {
+    const {h} = this, account = this.shared?.account || '';
+    const copy = h('button', {type: 'button', class: 'profile-button ghost web-copy', onclick: () => copyLink(copy)}, h('span', {class: 'profile-button-icon', html: ICONS.link}), 'Copy this link');
+    return h('div', {class: 'profile-share web-share'},
+      h('div', {class: 'web-share-card'},
+        h('span', {class: 'web-share-eyebrow'}, 'Your turn'),
+        h('strong', {class: 'web-share-title'}, 'What would your games say?'),
+        h('p', {}, `Chess Review builds this story from any Chess.com or Lichess account in your browser: your own twin, rating journey, openings and habits${account ? `, ready to compare with ${account}'s` : ''}.`),
+        h('div', {class: 'web-share-actions'}, installButton({where: 'share'}), h('button', {type: 'button', class: 'profile-button ghost', onclick: () => openInstall(account)}, 'What you get'))),
+      h('div', {class: 'profile-chooser-row web-share-row'}, copy));
+  }
+  go(index) { super.go(index); this.o.onChapter?.(this.deck[this.index]?.id); }
+}
+
+/* ---------- page ---------- */
+function syncInstallLinks() {
+  for (const link of document.querySelectorAll('#topInstall')) link.href = primaryStore().href;
+  const label = document.querySelector('[data-install-label]');
+  if (label) label.textContent = primaryLabel();
+}
+function watchExtension() {
+  const root = document.documentElement;
+  const sync = () => {
+    const installed = root.dataset.chessReview === 'installed';
+    document.body.classList.toggle('web-has-extension', installed);
+    $('installed').hidden = !installed;
+    $('installed').lastChild.textContent = root.dataset.chessReviewOpened === 'true' ? 'Opened in Chess Review' : 'Chess Review is installed';
+  };
+  new MutationObserver(sync).observe(root, {attributes: true, attributeFilter: ['data-chess-review', 'data-chess-review-opened']});
+  sync();
+}
+function reveal() {
+  document.body.removeAttribute('data-starting');
+  // The shutters part once the deck has laid out (a timer, not animation frames: a link opened in a background tab still reveals).
+  const startup = $('startup');
+  setTimeout(() => { startup.classList.add('opening'); setTimeout(() => startup.remove(), 700); }, 40);
+}
+/** No profile in the link (or a broken one): the page introduces player profiles instead. */
+function showLanding({title, text, error = false}) {
+  const landing = $('landing');
+  landing.hidden = false; landing.classList.toggle('is-error', error);
+  landing.replaceChildren(
+    h('span', {class: 'profile-eyebrow'}, error ? 'Shared player profile' : 'Player profile'),
+    h('h1', {id: 'landingTitle'}, title),
+    h('p', {class: 'web-landing-lead'}, text),
+    h('ul', {class: 'web-landing-list'}, ...['Your historical twin, and why', 'Rating journey, openings and rivals', 'Habits by hour, weekday and clock', 'One link to share it all'].map(t => h('li', {}, t))),
+    h('div', {class: 'web-share-actions'}, installButton({where: 'landing'}), installButton({cls: 'profile-button web-install web-install-other', store: otherStore(), label: 'Get it for ' + otherStore().name, where: 'landing-other'})),
+    h('p', {class: 'web-dialog-foot'}, 'Free and open source · No account, no sign-up'));
+  reveal();
+}
+
+async function main() {
+  syncInstallLinks(); watchExtension();
+  $('infoButton').addEventListener('click', togglePopover);
+  buildBoard($('board'));
+  const m = location.hash.match(/[#&]p=([^&]+)/);
+  if (!m) {
+    showLanding({title: 'Your chess games, told as a story', text: 'Chess Review turns any Chess.com or Lichess account into a player profile drawn on the board. Profiles shared from the extension open on this page.'});
+    return;
+  }
+  let report;
+  try { report = await decodeProfile(m[1]); }
+  catch (error) {
+    // decodeProfile's own messages read well; anything else (a cut-off stream, bad JSON) gets the plain explanation.
+    const known = /different version/i.test(error?.message || '');
+    showLanding({error: true, title: known ? 'This profile link is from another version' : 'This profile link looks incomplete',
+      text: known ? 'It was made by a different version of Chess Review. Ask for a fresh link, or build your own profile in the extension.'
+        : 'The link could not be read. It may have been cut short when it was pasted, so ask for the link again.'});
+    return;
+  }
+  const account = report.account || 'This player';
+  document.title = `${account} · Chess Review player profile`;
+  $('tagline').textContent = `${account}'s player profile`;
+  const workspace = new WebStoryWorkspace({
+    document, storage: memoryStorage(), storageEvents: null, sendMessage: async () => ({ok: false}),
+    stage: $('canvas'), boardWrap: $('boardWrap'), makePiece, flipped: false,
+    settings: () => SETTINGS, writeSettings: patch => { Object.assign(SETTINGS, patch); },
+    identity: {}, shared: report, toast, icon: name => ICONS[name] || '',
+    flag: code => /^[A-Z]{2}$/i.test(code || '') ? h('img', {class: 'avatar avatar-flag', src: asset(`flags/${code.toUpperCase()}.svg`), alt: '', draggable: 'false', onerror: e => e.target.remove()}) : null,
+    url: asset, uiScale: scale,
+    renderGamePlayer: (side, player, fen) => playerStrip(side, player, fen),
+    renderGameEvaluation: (bar, score, flipped) => { bar.className = 'profile-game-eval evalbar eb-' + SETTINGS.barStyle + (flipped ? ' flipped' : ''); },
+    createAnalysisEngine: createEngine,
+    buildOwn: () => document.body.classList.contains('web-has-extension') ? toast('Open Chess Review and choose Player profile to build your own') : openInstall(account), requestClose: () => {}, remember: () => {}, restoreBoard: () => {}, onClose: () => {},
+    onChapter,
+  });
+  document.body.classList.add('web-has-profile');
+  await workspace.open();
+  mountNudge(account);
+  reveal();
 }
 main();
 window.addEventListener('hashchange', () => location.reload());

@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark" data-density="compact" style="--accent: #7fb45f; --accent-strong: #6aa14a; --accent-ink: #11210a; --sq-light: #e8cfa0; --sq-dark: #a4703c; --badge-scale: 1; --ip-font: 16px; --coord-size: 12px;">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
     <title>Chess Review · Player profile</title>
-    <meta name="description" content="A shared Chess Review player profile, rendered entirely in your browser from the link." />
+    <meta name="description" content="A shared Chess Review player profile: results, rating, openings, a historical twin and more, drawn on the board in your browser." />
+    <meta name="theme-color" content="#15140f" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Chess Review · Player profile" />
-    <meta property="og:description" content="Explore a player's chess journey: results, ratings, openings and more." />
+    <meta property="og:description" content="Explore a player's chess story: results, rating, openings, their historical twin and more, drawn on the board." />
     <meta property="og:url" content="https://t-julsgaard.github.io/Chess-Review/profile/" />
     <meta property="og:image" content="https://t-julsgaard.github.io/Chess-Review/profile/share-preview.png" />
     <meta property="og:image:width" content="1400" />
@@ -16,46 +17,74 @@
     <meta property="og:image:alt" content="Chess Review — Analyze your game. Move by move." />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Chess Review · Player profile" />
-    <meta name="twitter:description" content="Explore a player's chess journey: results, ratings, openings and more." />
+    <meta name="twitter:description" content="Explore a player's chess story: results, rating, openings, their historical twin and more, drawn on the board." />
     <meta name="twitter:image" content="https://t-julsgaard.github.io/Chess-Review/profile/share-preview.png" />
+    <link rel="icon" type="image/png" sizes="128x128" href="../icons/icon128.png" />
     <link rel="icon" type="image/png" sizes="48x48" href="../icons/icon48.png" />
-    <link rel="stylesheet" href="viewer.css" />
+    <!-- The extension's own stylesheets: the shared deck looks exactly as it does in Chess Review. -->
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../lib/evaluation-bar.css" />
+    <link rel="stylesheet" href="../lib/profile/profile.css" />
+    <link rel="stylesheet" href="../lib/profile/designs/designs.css" />
     <link rel="stylesheet" href="../lib/profile/overview.css" />
+    <link rel="stylesheet" href="viewer.css" />
+    <link rel="modulepreload" href="viewer.js" />
+    <link rel="modulepreload" href="../lib/profile/designs/story.js" />
+    <link rel="preload" as="image" href="../pieces-img/cburnett/wK.svg" />
+    <link rel="preload" as="image" href="../pieces-img/cburnett/wQ.svg" />
+    <link rel="preload" as="image" href="../pieces-img/cburnett/wR.svg" />
+    <link rel="preload" as="image" href="../pieces-img/cburnett/wB.svg" />
+    <link rel="preload" as="image" href="../pieces-img/cburnett/wN.svg" />
+    <link rel="preload" as="image" href="../pieces-img/cburnett/wP.svg" />
+    <link rel="preload" as="image" href="../pieces-img/cburnett/bK.svg" />
+    <link rel="preload" as="image" href="../pieces-img/cburnett/bQ.svg" />
+    <link rel="preload" as="image" href="../pieces-img/cburnett/bR.svg" />
+    <link rel="preload" as="image" href="../pieces-img/cburnett/bB.svg" />
+    <link rel="preload" as="image" href="../pieces-img/cburnett/bN.svg" />
+    <link rel="preload" as="image" href="../pieces-img/cburnett/bP.svg" />
   </head>
-  <body>
-    <header class="top">
-      <a class="brand" href="https://github.com/T-Julsgaard/Chess-Review"><img src="../pieces-img/cburnett/wN.svg" alt="" /><span>Chess <em>/ Review</em></span></a>
-      <nav class="install" aria-label="Get the extension">
-        <a class="button" href="https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenkadndbdbigfam" rel="noopener">Install for Chrome</a>
-        <a class="button" href="https://addons.mozilla.org/en-US/firefox/addon/chess-review/" rel="noopener">Install for Firefox</a>
-      </nav>
-    </header>
-    <main id="main">
-      <section id="state" class="state" aria-live="polite">
-        <h1>Player profile</h1>
-        <p>Reading the profile from the link…</p>
-      </section>
-      <section id="deck" class="deck" hidden>
-        <div class="board-column">
-          <div class="board" id="board" aria-hidden="true"></div>
-          <p class="caption" id="caption"></p>
+  <body data-starting class="web-viewer">
+    <div id="startup" role="status" aria-label="Loading the player profile">
+      <span class="startup-shutter startup-top" aria-hidden="true"></span>
+      <span class="startup-shutter startup-bottom" aria-hidden="true"></span>
+      <span class="startup-center" aria-hidden="true"><span class="startup-mark"><i></i><i></i><i></i><i></i></span></span>
+    </div>
+    <div id="root">
+      <div class="app">
+        <header class="topbar">
+          <a class="brand web-brand" href="https://github.com/T-Julsgaard/Chess-Review" target="_blank" rel="noopener">
+            <span class="brand-mark"><img class="brand-img" src="../pieces-img/cburnett/wN.svg" alt="" /></span>
+            <span class="brand-name">Chess <span>/ Review</span></span>
+          </a>
+          <span class="web-tagline" id="tagline">Free chess review and player profiles, right in your browser</span>
+          <div class="topbar-right">
+            <span class="web-installed" id="installed" hidden><span class="web-installed-dot" aria-hidden="true"></span>Opened in Chess Review</span>
+            <button type="button" class="icon-btn" id="infoButton" aria-label="How this page works" aria-haspopup="dialog" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+            </button>
+            <a class="icon-btn learning-toggle web-cta" id="topInstall" href="https://chromewebstore.google.com/detail/chess-review/pdbffcjdmcadihmnmenkadndbdbigfam" target="_blank" rel="noopener" data-install>
+              <span class="learning-toggle-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></span>
+              <span class="learning-toggle-label"><span data-install-label>Add to Chrome</span><span class="web-cta-free"> · free</span></span>
+            </a>
+          </div>
+        </header>
+        <div class="review-viewport">
+          <div class="stage web-stage" id="canvas">
+            <div class="mod web-board-mod" data-mod="board">
+              <div class="mod-inner">
+                <div class="web-strip" id="playerTop"></div>
+                <div class="board-wrap" id="boardWrap"><div class="board ps-image" id="board" aria-hidden="true"></div></div>
+                <div class="web-strip" id="playerBot"></div>
+              </div>
+            </div>
+            <div class="mod web-panel-mod" data-mod="review">
+              <section class="web-landing" id="landing" hidden aria-labelledby="landingTitle"></section>
+            </div>
+          </div>
         </div>
-        <article class="panel">
-          <div id="slide" class="slide"></div>
-          <nav class="nav" aria-label="Slides">
-            <button type="button" id="prev" class="navbtn" aria-label="Previous slide">‹</button>
-            <div id="dots" class="dots" role="tablist"></div>
-            <span id="counter" class="counter"></span>
-            <button type="button" id="next" class="navbtn" aria-label="Next slide">›</button>
-          </nav>
-        </article>
-      </section>
-      <section class="about">
-        <h2>How this page works</h2>
-        <p>Everything on this page came from the link itself. The part after <code>#</code> is never sent to a server: your browser decodes it and draws the slides. GitHub serves this page and sees the page request, nothing else.</p>
-        <p>Install <strong>Chess Review</strong>, the free open-source game review extension, to see the same profile on a live board, build your own from your Chess.com or Lichess games, and review any game with a locally bundled Stockfish.</p>
-      </section>
-    </main>
+      </div>
+    </div>
+    <noscript><p class="web-noscript">This shared player profile needs JavaScript to draw its chapters on the board.</p></noscript>
     <script type="module" src="viewer.js"></script>
   </body>
 </html>
