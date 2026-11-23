@@ -207,11 +207,12 @@ test('cancelled partial imports are marked incomplete and retry the full history
   assert.equal(result.rows.length, 200); assert.equal(result.complete, true);
 });
 
-test('loader displays a measured ETA and honest unknown-total state', t => {
-  const d = dom(t), loader = createTourLoader({...d, makePiece: () => d.doc.createElement('img'), motion: () => false}); t.after(() => loader.stop());
-  loader.update({games: 190, text: 'Checking accuracy', etaMs: 64000, fraction: .5});
-  assert.match(loader.element.textContent, /190/); assert.match(loader.element.textContent, /About 2 min remaining/);
-  loader.update({etaMs: null}); assert.match(loader.element.textContent, /Estimating time remaining/);
+test('loader shows the games found and Cancel, with no status line, bar or time estimate', t => {
+  const d = dom(t), loader = createTourLoader({...d, makePiece: () => d.doc.createElement('img'), motion: () => false, onCancel: () => {}}); t.after(() => loader.stop());
+  loader.update({games: 190, text: 'Reading your games…', etaMs: 64000, fraction: .5});
+  assert.match(loader.element.textContent, /190\s*games found/); assert.match(loader.element.textContent, /Cancel/);
+  assert.doesNotMatch(loader.element.textContent, /Reading|remaining|Estimating/);
+  assert.equal(loader.element.querySelector('[role="progressbar"]'), null);
 });
 
 test('workspace: games stream onto the main board beside the animation; the deck opens at EOF without an engine pass', async t => {

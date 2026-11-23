@@ -26,14 +26,13 @@ export async function auditLearning({review, call, evaluate, sleep, waitFor, out
     await sleep(500);
     const measure = await run(`(() => { const map = document.querySelector('.profile-game-map'), caption = document.querySelector('.profile-map-caption'), shell = document.querySelector('.profile-shell');
       const r = n => { const b = n.getBoundingClientRect(); return {left:b.left, right:b.right, top:b.top, bottom:b.bottom}; };
-      return {map:r(map), caption:r(caption), shell:r(shell), etaRect:r(document.querySelector('.profile-loader-eta')), cancel:r(document.querySelector('.profile-loader button')), children:map.querySelectorAll('*').length, count:document.querySelector('.profile-map-summary').textContent, eta:document.querySelector('.profile-loader-eta').textContent, overflow:shell.scrollWidth-shell.clientWidth};
+      return {map:r(map), caption:r(caption), shell:r(shell), cancel:r(document.querySelector('.profile-loader button')), children:map.querySelectorAll('*').length, count:document.querySelector('.profile-map-summary').textContent, overflow:shell.scrollWidth-shell.clientWidth};
     })()`);
     assert.equal(measure.children, 1); assert.equal(measure.count, '190 games');
-    assert.match(measure.eta, /About 2 min/);
     assert.ok(measure.map.left >= 0 && measure.map.right <= width + 1);
     assert.ok(measure.shell.bottom <= height + 1); assert.ok(measure.caption.bottom <= measure.shell.top || measure.caption.right <= measure.shell.left, JSON.stringify({width, height, ...measure}));
     assert.ok(measure.overflow <= 1);
-    assert.ok(measure.etaRect.bottom <= measure.shell.bottom && measure.cancel.bottom <= measure.shell.bottom, 'ETA and cancellation stay visible: ' + JSON.stringify(measure));
+    assert.ok(measure.cancel.bottom <= measure.shell.bottom, 'Cancellation stays visible: ' + JSON.stringify(measure));
     evidence.push({width, height, ...measure});
     const shot = await call('Page.captureScreenshot', {format: 'png'}, review.sessionId);
     await fs.writeFile(path.join(out, `profile-streaming-${width}x${height}.png`), Buffer.from(shot.data, 'base64'));
