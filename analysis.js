@@ -395,6 +395,9 @@ const DEFAULT_SETTINGS = {
   learningTransition: "morph3",
   // Player profile: default period, engine-sample budget and whether games against bots count.
   profilePeriod: "year", profileBudget: "standard", profileIncludeBots: false,
+  // Which games the profile counts (the gear in its header, lib/profile/filters.js): one colour, rated only,
+  // no games under 10 moves, and opponents left out per account ({"chesscom:name": ["friend"]}).
+  profileColor: "all", profileRatedOnly: false, profileSkipShort: false, profileExcludedOpponents: {},
   // Accuracy check that runs by itself after a profile is built: depth (off/fast/balanced/deep) and which games.
   profileDepth: "balanced", profileSample: "all",
   // Player profile design (Settings → Visual → Player profile): story (default), classic, bento or editorial.
