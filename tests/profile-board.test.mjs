@@ -107,7 +107,7 @@ test('manual arrows take over autoplay, respect endpoints and release on another
   assert.equal(api.step(1), false, 'old moves cannot replace another visualization');
 });
 
-test('rewind starts at the final position and runs back to move one, silently; a step takes over', t => {
+test('rewind starts at the final position and runs back to move one, each take-back with its sound; a step takes over', t => {
   t.mock.timers.enable({apis: ['setTimeout']});
   const cues = [], steps = [];
   const {api, board, at} = surface(t, true, move => cues.push(move));
@@ -119,7 +119,7 @@ test('rewind starts at the final position and runs back to move one, silently; a
   assert.deepEqual(steps, [4, 3, 2, 1, 0]);
   assert.ok(at('e2') && at('d7') && at('d8'), 'back at the start, captures restored');
   assert.ok(!board.classList.contains('profile-board-busy'));
-  assert.equal(cues.length, 0, 'no move sounds while rewinding');
+  assert.deepEqual(cues.map(move => move.san), ['Qxd5', 'exd5', 'd5', 'e4'], 'each move taken back makes its own sound');
   assert.equal(api.step(1), true); assert.ok(at('e4'), 'stepping forward works from the start');
   api.moves(moves, {from: moves.length, rewind: true, delay: 100, timing: () => 20});
   t.mock.timers.tick(100); t.mock.timers.tick(20); api.step(-1); for (let i = 0; i < 10; i++) t.mock.timers.tick(100);

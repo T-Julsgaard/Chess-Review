@@ -21,7 +21,8 @@ const BROWSER = /firefox|fxios/i.test(UA) ? 'firefox' : /edg\//i.test(UA) ? 'edg
 /** The store this browser installs from (Edge, Brave and Opera install from the Chrome Web Store). */
 const primaryStore = () => BROWSER === 'firefox' ? STORE.firefox : STORE.chrome;
 const otherStore = () => BROWSER === 'firefox' ? STORE.chrome : STORE.firefox;
-const primaryLabel = () => BROWSER === 'firefox' ? 'Add to Firefox' : BROWSER === 'edge' ? 'Add to Edge' : 'Add to Chrome';
+/** Install links name the store they open, as the top bar's do. */
+const storeLabel = store => store === STORE.firefox ? 'Visit Firefox Add-ons' : 'Visit Chrome Web Store';
 
 const h = (tag, attrs = {}, ...children) => {
   const node = document.createElement(tag);
@@ -40,7 +41,7 @@ const ICONS = {
   gear: svg('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'),
   prev: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 5l-9 7 9 7z"/></svg>',
   next: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5l9 7-9 7z"/></svg>',
-  download: svg('<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'),
+  external: svg('<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>'),
   close: svg('<path d="M6 6l12 12M18 6 6 18"/>'),
   twin: svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>'),
   review: svg('<path d="M3 17l5-5 4 4 8-8"/><path d="M15 8h5v5"/>'),
@@ -151,10 +152,12 @@ async function copyLink(button) {
 }
 
 /* ---------- install nudges ---------- */
-function installButton({cls = 'profile-button primary web-install', store = primaryStore(), label = primaryLabel(), where = ''} = {}) {
+function installButton({cls = 'profile-button primary web-install', store = primaryStore(), where = ''} = {}) {
   return h('a', {class: cls, href: store.href, target: '_blank', rel: 'noopener', 'data-install': where},
-    h('span', {class: 'web-install-icon', html: ICONS.download}), h('span', {}, label), h('small', {}, 'free'));
+    h('span', {class: 'web-install-icon', html: ICONS.external}), h('span', {}, storeLabel(store)));
 }
+/** This browser's store in green, the other beside it in plain. */
+const installButtons = where => [installButton({where}), installButton({cls: 'profile-button web-install web-install-other', store: otherStore(), where: where + '-other'})];
 let dialog = null, dialogReturn = null;
 function openInstall(account) {
   closePopover();
@@ -162,7 +165,7 @@ function openInstall(account) {
     const features = [
       [ICONS.twin, 'Your own profile', 'Your historical twin, rating journey, openings, rivals and habits, drawn on the board like this one.'],
       [ICONS.review, 'One-click game review', 'Every Chess.com or Lichess game reviewed move by move, with Stockfish running on your own computer.'],
-      [ICONS.puzzle, 'Learn as you play', 'Puzzles and opening lessons built in.'],
+      [ICONS.puzzle, 'Learn as you play', 'Over 50,000 puzzles and opening lessons built in.'],
     ];
     dialog = h('div', {class: 'web-dialog-backdrop', hidden: true, onclick: e => { if (e.target === dialog) closeInstall(); }},
       h('div', {class: 'web-dialog', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'installTitle', tabindex: '-1',
@@ -173,14 +176,12 @@ function openInstall(account) {
         h('h2', {id: 'installTitle'}, 'Build your own player profile'),
         h('p', {class: 'web-dialog-lead', id: 'installLead'}),
         h('ul', {class: 'web-features'}, ...features.map(([icon, title, text]) => h('li', {}, h('span', {class: 'web-feature-icon', html: icon}), h('div', {}, h('strong', {}, title), h('span', {}, text))))),
-        h('div', {class: 'web-dialog-actions'}, installButton({where: 'dialog'}),
-          installButton({cls: 'profile-button web-install web-install-other', store: otherStore(), label: 'Get it for ' + otherStore().name, where: 'dialog-other'})),
-        h('p', {class: 'web-dialog-foot'}, 'Free and open source · No account, no sign-up · Analysis runs on your machine')));
+        h('div', {class: 'web-dialog-actions'}, ...installButtons('dialog'))));
     document.body.append(dialog);
   }
   $('installLead').textContent = account
-    ? `Type your Chess.com or Lichess username and Chess Review turns your games into a story like ${account}'s.`
-    : 'Type your Chess.com or Lichess username and Chess Review turns your games into a story you can share.';
+    ? `Free and open source. Type your Chess.com or Lichess username and get a story like ${account}'s.`
+    : 'Free and open source. Type your Chess.com or Lichess username and get a story you can share.';
   dialogReturn = document.activeElement;
   dialog.hidden = false; requestAnimationFrame(() => dialog.classList.add('is-open'));
   dialog.querySelector('.web-install').focus({preventScroll: true});
@@ -220,8 +221,6 @@ function closePopover() { if (popover) popover.hidden = true; $('infoButton').se
 
 /* ---------- the extension's Story deck, with the web's last chapter ---------- */
 class WebStoryWorkspace extends StoryWorkspace {
-  /** A shared link carries the report, not the games, so a time control could only ever show "Not enough games". */
-  classFilter() { return null; }
   hero(slide) {
     const hero = super.hero(slide);
     return slide.id === 'share' && !slide.empty ? {...hero, value: 'The whole story at a glance'} : hero;
@@ -287,7 +286,7 @@ function showLanding({title, text, error = false}) {
     h('h1', {id: 'landingTitle'}, title),
     h('p', {class: 'web-landing-lead'}, text),
     h('ul', {class: 'web-landing-list'}, ...['Your historical twin, and why', 'Rating journey, openings and rivals', 'Habits by hour, weekday and clock', 'One link to share it all'].map(t => h('li', {}, t))),
-    h('div', {class: 'web-share-actions'}, installButton({where: 'landing'}), installButton({cls: 'profile-button web-install web-install-other', store: otherStore(), label: 'Get it for ' + otherStore().name, where: 'landing-other'})),
+    h('div', {class: 'web-share-actions'}, ...installButtons('landing')),
     h('p', {class: 'web-dialog-foot'}, 'Free and open source · No account, no sign-up'));
   reveal();
 }

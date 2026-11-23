@@ -281,6 +281,53 @@ test('story filters keep chapters stable and each chapter opens on All', async t
   assert.equal(doc.querySelector('.pv-filter button.on').textContent, 'All', 'returning to the rival also starts on All');
 });
 
+test('a share link carries each time control, and the shared profile switches between them', async t => {
+  const {decodeProfile} = await import('../lib/profile/share.js');
+  const a = review(t), doc = a.dom.window.document;
+  seed(a);
+  const w = await openDeck(a);
+  const pick = label => [...doc.querySelectorAll('.pv-filter button')].find(button => button.textContent === label).click();
+  const numbers = () => w.deck.findIndex(slide => slide.id === 'numbers');
+  w.go(numbers()); pick('Blitz');
+  const blitz = {title: w.currentSlide().title, months: w.season.months.reduce((n, m) => n + m.games, 0)};
+  w.cls = 'all'; w.rebuild();
+  const all = {title: w.currentSlide().title, options: w.report.classOptions};
+  pick('Blitz');
+  let copied;
+  Object.defineProperty(a.dom.window.navigator, 'clipboard', {value: {writeText: async text => { copied = text; }}, configurable: true});
+  await w.copyLink();
+  const report = await decodeProfile(copied.split('#p=')[1]);
+  assert.deepEqual(report.classOptions, all.options);
+  assert.deepEqual(Object.keys(report.byClass).sort(), [...all.options].sort());
+  assert.equal(report.cls, 'all', 'a link copied with Blitz picked still starts on every game');
+  w.close(); for (let i = 0; i < 4; i++) await settle();
+
+  await a.call('openProfile', {shared: report});
+  const s = a.run('profileWorkspace');
+  s.go(numbers());
+  assert.deepEqual([...doc.querySelectorAll('.pv-filter button')].map(b => b.textContent), ['All', 'Bullet', 'Blitz']);
+  assert.equal(s.currentSlide().title, all.title);
+  pick('Blitz');
+  assert.equal(s.cls, 'blitz');
+  assert.equal(s.currentSlide().title, blitz.title, 'the chapter shows what the extension showed for Blitz');
+  assert.equal(s.season.months.reduce((n, m) => n + m.games, 0), blitz.months, 'the months follow the time control');
+  assert.equal(s.report.account, 'tester');
+  pick('All');
+  assert.equal(s.currentSlide().title, all.title);
+  s.close(); for (let i = 0; i < 4; i++) await settle();
+
+  // A link from before the switch travelled has no slices: no switch, the whole profile as before.
+  const {encodeProfile} = await import('../lib/profile/share.js');
+  const {byClass: _byClass, ...older} = report;
+  const legacy = await decodeProfile(await encodeProfile(older));
+  assert.deepEqual(legacy.classOptions, [], 'without slices the link offers no time controls');
+  await a.call('openProfile', {shared: legacy});
+  const o = a.run('profileWorkspace');
+  o.go(numbers());
+  assert.equal(doc.querySelector('.pv-filter'), null);
+  assert.equal(o.currentSlide().title, all.title);
+});
+
 test('story keeps game mode buttons when only one time control is available', async t => {
   const a = review(t), doc = a.dom.window.document;
   seed(a);
