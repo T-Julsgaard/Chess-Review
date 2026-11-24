@@ -769,25 +769,33 @@ test('a profile of both sites draws the other site\'s rating as a second line, n
   assert.ok(layer.outside.querySelectorAll('.pv-axis-x').length >= 1, 'months under the board');
   assert.ok(layer.outside.classList.contains('pv-columns-below'), 'so the key sits below the month names');
   layer.getBoundingClientRect = () => ({left: 0, width: 90});
-  const readout = layer.outside.querySelector('.pv-line-readout');
-  const ratingsShown = () => [...readout.querySelectorAll('b')].map(n => n.textContent);
+  // No shared readout box: each line's hover dot carries its own tag.
+  assert.equal(layer.outside.querySelector('.pv-line-readout'), null);
   const dots = [...layer.outside.querySelectorAll('.pv-inspect')];
-  assert.equal(readout.hidden, true);
+  const tagText = () => dots.map(dot => dot.querySelector('.pv-line-tag').textContent);
+  const ratingsShown = () => tagText().map(text => text.split(' · ').at(-1));
+  assert.ok(dots.every(dot => dot.hidden));
   layer.dispatchEvent(new dom.window.MouseEvent('pointermove', {clientX: 10}));
+  assert.ok(dots.every(dot => !dot.hidden));
   assert.deepEqual(ratingsShown(), ['1500', '1712'], 'each site uses its nearest point, including before the first Chess.com game');
-  assert.match(readout.textContent, /Chess\.com.*Lichess/);
   assert.notEqual(dots[0].style.left, dots[1].style.left, 'each dot sits on its own date');
-  assert.notEqual(...[...readout.querySelectorAll('small')].map(n => n.textContent), 'the dates of the two games are shown separately');
+  assert.notEqual(...tagText().map(text => text.split(' · ')[0]), 'the dates of the two games are shown separately');
   assert.match(layer.getAttribute('aria-label'), /Chess\.com: 1500.*Lichess: 1712/);
+  assert.ok(dots.every(dot => !dot.classList.contains('pv-below')), 'lines far apart both keep their tags above');
   layer.dispatchEvent(new dom.window.MouseEvent('pointerleave'));
-  assert.equal(readout.hidden, true);
+  assert.ok(dots.every(dot => dot.hidden));
   layer.focus();
   layer.dispatchEvent(new dom.window.KeyboardEvent('keydown', {key: 'Home'}));
   assert.deepEqual(ratingsShown(), ['1500', '1700'], 'the keyboard can reach the first game on either site');
   layer.dispatchEvent(new dom.window.KeyboardEvent('keydown', {key: 'End'}));
   assert.deepEqual(ratingsShown(), ['1584', '1760']);
   layer.blur();
-  assert.equal(readout.hidden, true);
+  assert.ok(dots.every(dot => dot.hidden));
+  // Lines close enough that their tags would cover each other: the lower line's tag goes under its dot.
+  const close = viz.line(series(0, 1500), {name: 'Chess.com', extra: [{series: series(0, 1506), name: 'Lichess', color: '#e8913a'}]});
+  close.getBoundingClientRect = () => ({left: 0, width: 90});
+  close.dispatchEvent(new dom.window.MouseEvent('pointermove', {clientX: 45}));
+  assert.deepEqual([...close.outside.querySelectorAll('.pv-inspect')].map(dot => dot.classList.contains('pv-below')), [true, false]);
 });
 
 test('accuracy opens with the game animation and time-control changes show the average immediately', async t => {

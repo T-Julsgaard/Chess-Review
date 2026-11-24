@@ -46,17 +46,15 @@
 .pv-line-tag { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); white-space: nowrap; padding: 4px 10px; border-radius: 999px; font-size: clamp(11px, 1vw, calc(14px * var(--pv-s, 1))); font-weight: 800; font-variant-numeric: tabular-nums;
   color: var(--ink); background: color-mix(in srgb, var(--panel) 88%, transparent); border: 1px solid var(--line); box-shadow: 0 6px 18px color-mix(in srgb, #000 30%, transparent); }
 .pv-line-dot.pv-left .pv-line-tag { left: auto; right: 8px; transform: none; }
-.pv-line-dot.pv-start .pv-line-tag { bottom: auto; top: calc(100% + 8px); left: 0; transform: none; }
+.pv-line-dot.pv-start .pv-line-tag { bottom: auto; top: calc(100% + 8px); left: 0; right: auto; transform: none; }
+/* A start near the right edge (the other site's line began late) hangs its tag leftwards, still under the dot. */
+.pv-line-dot.pv-start.pv-left .pv-line-tag { left: auto; right: 0; }
 .pv-line-label { left: 4%; top: 4%; font-size: clamp(12px, 1.4vw, calc(20px * var(--pv-s, 1))); font-weight: 850; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-2); }
 .pv-line { pointer-events: auto; outline-offset: -2px; }
 .pv-line-cursor { top: 0; bottom: 0; width: 1px; background: color-mix(in srgb, var(--ink) 45%, transparent); pointer-events: none; }
 .pv-line-dot.pv-inspect { z-index: 2; animation: none; pointer-events: none; }
 .pv-line-dot.pv-inspect[hidden], .pv-line-cursor[hidden] { display: none; }
 .pv-inspect.pv-right .pv-line-tag { left: 0; transform: none; }
-.pv-line-readout { z-index: 3; top: 3%; left: 50%; transform: translateX(-50%); display: grid; gap: 5px; padding: 7px 11px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: clamp(10px, 1.1vw, 14px); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.pv-line-readout[hidden] { display: none; }
-.pv-line-readout-row { display: grid; grid-template-columns: 8px minmax(4.5em, auto) minmax(2.5em, auto) 1fr; align-items: center; gap: 6px; }
-.pv-line-readout-row small { color: var(--ink-2); font-size: .86em; }
 .pv-layer[data-motion="off"], .pv-layer[data-motion="off"]::before, .pv-layer[data-motion="off"] *, .pv-layer[data-motion="off"] *::before, .pv-outside[data-motion="off"] * { animation: none !important; }
 .pv-layer[data-motion="off"] .pv-line-path { stroke-dashoffset: 0; }
 .pv-layer[data-motion="off"] .pv-line-area { opacity: 1; }
