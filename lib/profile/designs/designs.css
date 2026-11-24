@@ -198,7 +198,7 @@
 .profile-head-actions { position: relative; }
 .pv-head-name { display: grid; gap: 1px; min-width: 0; }
 .pv-head-name .profile-head-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pv-set-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; min-width: 0; }
+.pv-set-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; line-height: 18px; }
 .pv-set-top .pv-compare-head { flex: none; }
 .pv-set-note { margin: 0; padding: 4px 10px 2px 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 650; color: var(--pv-tint, var(--accent)); }
 .pv-settings { position: relative; width: 30px; height: 30px; flex: none; display: grid; place-items: center; padding: 0; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); background: transparent; color: var(--ink-2); cursor: pointer; transition: color .15s, border-color .15s, transform .3s cubic-bezier(.2,.8,.2,1); }
@@ -208,7 +208,7 @@
 .pv-settings:focus-visible { outline: 2px solid var(--pv-tint, var(--accent)); outline-offset: 2px; }
 .pv-settings.active::after { content: ''; position: absolute; top: 1px; right: 1px; width: 7px; height: 7px; border-radius: 50%; background: var(--pv-vivid, var(--accent)); box-shadow: 0 0 0 2px var(--panel); }
 .pv-settings-menu { position: absolute; top: calc(100% + 6px); right: 0; z-index: 20; width: 272px; max-height: min(600px, calc((100vh - 140px) / var(--pv-s, 1))); overflow: auto; display: grid; gap: 2px; padding: 6px; border-radius: 12px; outline: none;
-  background: color-mix(in srgb, var(--panel) 92%, var(--ink) 4%); border: 1px solid var(--line); box-shadow: 0 18px 44px -14px color-mix(in srgb, #000 60%, transparent); transform-origin: top right; }
+  background: color-mix(in srgb, var(--panel), var(--ink) 4%); border: 1px solid var(--line); box-shadow: 0 18px 44px -14px color-mix(in srgb, #000 60%, transparent); transform-origin: top right; }
 .pv-settings-menu .pv-compare-head:not(:first-child) { margin-top: 8px; }
 .pv-set-row, .pv-set-switch { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 34px; padding: 4px 10px; border-radius: 8px; }
 .pv-set-label { font-size: 12.5px; font-weight: 650; color: var(--ink); text-align: left; }
@@ -238,7 +238,8 @@
 .pv-set-opp i { grid-column: 2; grid-row: 1 / span 2; font-style: normal; font-size: 11px; font-weight: 700; color: var(--pv-tint, var(--accent)); opacity: 0; transition: opacity .12s; }
 .pv-set-opp:hover, .pv-set-opp:focus-visible { outline: none; background: color-mix(in srgb, var(--pv-vivid, var(--accent)) 12%, transparent); }
 .pv-set-opp:hover i, .pv-set-opp:focus-visible i { opacity: 1; }
-.pv-set-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; padding: 8px 10px 4px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--ink-2); }
+/* Reserve the Reset button's padding and border as well as its line height. */
+.pv-set-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; padding: 8px 10px 4px; border-top: 1px solid var(--line); box-sizing: border-box; min-height: calc(1lh + 21px); font-size: 11.5px; color: var(--ink-2); }
 .pv-set-reset { padding: 3px 10px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); background: transparent; color: var(--ink); font: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer; }
 .pv-set-reset:hover { border-color: var(--pv-tint, var(--accent)); }
 @media (prefers-reduced-motion: reduce) { .pv-settings, .pv-set-thumb, .pv-set-track { transition: none; } }

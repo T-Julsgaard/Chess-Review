@@ -4,15 +4,16 @@ import assert from 'node:assert/strict';
 import {season} from '../tests/helpers/profile-season.mjs';
 import {rowsKey} from '../lib/profile/store.js';
 
-export async function auditLearning({review, call, evaluate, waitFor, sleep, out}) {
+export async function auditLearning({review, call, evaluate, waitFor, sleep, out, settingsOnly = false}) {
   const run = code => evaluate(review, code);
-  const rows = season();
+  const rows = season().map((row, i) => ({...row, rated: i % 5 !== 0}));
   await run("document.querySelector('.lang-confirm')?.click();document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   await run(`import('./browser-compat.js').then(({browserAPI})=>browserAPI.storage.local.set(${JSON.stringify({[rowsKey('chesscom', 'tester')]: {rows, months: [], since: 0, updatedAt: Date.now()}})}))`);
   await run(`import('./analysis.js').then(async m=>{m.S.settings.profileDepth='off';m.S.settings.uiAnim=true;await m.openProfile();window.w=m.profileWorkspace;w.account='tester';await w.load();})`);
   await waitFor(review, "document.querySelector('.pv-story')?.dataset.slide==='cover'", 'Story cover');
   await sleep(800);
   await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
+  if (settingsOnly) return auditSettings({review, call, run, sleep, out});
   // Panel width follows the user's saved review layout, independently of the
   // viewport. Keep mode switches usable beside long titles in narrow panels.
   const filterLayout = [];
@@ -149,4 +150,41 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await run('w.close()');
   await fs.writeFile(path.join(out, 'profile-story-evidence.json'), JSON.stringify(evidence, null, 2));
   console.log(JSON.stringify({ok: true, out, viewports: evidence.length}));
+}
+
+async function auditSettings({review, call, run, sleep, out}) {
+  const settingsLayout = [];
+  for (const [width, height] of [[1920, 1080], [600, 800]]) {
+    await call('Emulation.setDeviceMetricsOverride', {width, height, deviceScaleFactor: 1, mobile: false}, review.sessionId);
+    await run("document.querySelector('.pv-settings').click()");
+    await sleep(250);
+    const measure = () => run(`(() => {
+      const menu = document.querySelector('.pv-settings-menu');
+      const pixel = document.createElement('canvas').getContext('2d');
+      pixel.fillStyle = getComputedStyle(menu).backgroundColor;
+      pixel.fillRect(0, 0, 1, 1);
+      const rects = [menu, ...menu.querySelectorAll('.pv-set-top, .pv-set-row, .pv-set-switch, .pv-set-search, .pv-set-opp, .pv-set-foot')].map(node => {
+        const {x, y, width, height} = node.getBoundingClientRect();
+        return [x, y, width, height];
+      });
+      return {alpha: pixel.getImageData(0, 0, 1, 1).data[3], rects, note: menu.querySelector('.pv-set-note')?.textContent ?? null};
+    })()`);
+    const before = await measure();
+    await run("document.querySelector('[data-focus=profileRatedOnly]').click()");
+    const filtered = await measure();
+    const screenshot = await call('Page.captureScreenshot', {format: 'png'}, review.sessionId);
+    await fs.writeFile(path.join(out, `profile-story-settings-${width}.png`), Buffer.from(screenshot.data, 'base64'));
+    await run("document.querySelector('.pv-set-reset').click()");
+    const reset = await measure();
+    await run("document.querySelector('.pv-settings').click()");
+    settingsLayout.push({width, before, filtered, reset});
+  }
+  for (const {width, before, filtered, reset} of settingsLayout) {
+    assert.equal(before.alpha, 255, `${width}px: settings background is opaque`);
+    assert.equal(before.note, null);
+    assert.match(filtered.note, /^[1-9]\d* games? left out$/);
+    assert.deepEqual(filtered.rects, before.rects, `${width}px: settings stay in place when the count appears`);
+    assert.deepEqual(reset, before, `${width}px: settings stay in place after reset`);
+  }
+  console.log(JSON.stringify({ok: true, out, settingsViewports: settingsLayout.map(({width}) => width)}));
 }
