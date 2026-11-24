@@ -47,7 +47,15 @@ body.web-viewer { overflow: hidden; }
 .web-strip { height: var(--strip); flex: none; }
 .web-stage #boardWrap { width: var(--b); height: var(--b); flex: none; }
 .web-stage #boardWrap .board { width: 100%; height: 100%; }
-.web-panel-mod { width: calc(var(--b) * .735); height: var(--b); margin-top: var(--strip); flex: none; }
+/* Short laptop screens make the board small; the panel keeps a readable width from the room beside it. */
+.web-panel-mod { width: max(calc(var(--b) * .735), min(440px, calc(100vw - var(--b) - 94px))); height: var(--b); margin-top: var(--strip); flex: none; }
+
+/* The extension draws its board at about 812px and scales it up on large screens, so the last chapter's
+   overview (overview.css) caps its text and padding in px. Here the board is laid out at full size (--b),
+   so on 1440p and 4K the caps grow with it and the tiles keep the extension's proportions. */
+.web-stage .profile-overview { --ov-gap: clamp(3px, .9cqw, max(7px, var(--b, 0px) * .0086)); }
+.web-stage .profile-overview-tile { padding: clamp(5px, 1.5cqw, max(12px, var(--b, 0px) * .0148)); border-radius: clamp(5px, 1.5cqw, max(11px, var(--b, 0px) * .0135));
+  font-size: clamp(8px, 2.25cqw, max(16px, var(--b, 0px) * .0197)); }
 
 /* ---------- landing (no profile in the link, or a broken one) ---------- */
 .web-landing { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 14px; padding: 28px 30px; box-sizing: border-box; overflow: auto;
