@@ -238,14 +238,14 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.match(shell.querySelector('.pv-story-figure').textContent, /^[+-]?\d+$/);
   w.go(w.deck.length - 1);
   assert.ok(w.boardEl.querySelector('.profile-overview'), 'the last chapter recaps the profile on the board');
-  assert.ok(shell.querySelector('.profile-share button.primary'));
+  assert.match(shell.querySelector('.profile-share a.profile-button.primary').href, /^https:\/\/chromewebstore\.google\.com\//, 'Share with a friend opens the store page');
   assert.equal(shell.querySelector('.pv-autoplay'), null);
   let copied;
   Object.defineProperty(a.dom.window.navigator, 'clipboard', {value: {writeText: async text => { copied = text; }}, configurable: true});
   let sharing; const copy = w.copyLink.bind(w); w.copyLink = button => sharing = copy(button);
-  assert.equal(shell.querySelectorAll('.profile-share button').length, 1, 'the overview offers a share link');
+  assert.equal(shell.querySelectorAll('.profile-share button').length, 1, 'the overview offers one link to share the results');
   assert.equal(shell.querySelector('.pv-share'), null, 'Share lives on the last chapter, not in the header');
-  shell.querySelector('.profile-share button.primary').click();
+  shell.querySelector('.profile-share-results').click();
   await sharing;
   assert.match(copied, /^https:\/\/t-julsgaard\.github\.io\/Chess-Review\/profile\/#p=/);
   assert.equal(shell.querySelector('.pv-story').dataset.slide, 'share', 'sharing keeps the current chapter');

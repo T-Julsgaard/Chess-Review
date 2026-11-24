@@ -28,7 +28,7 @@ test('mini-me: a page without canvas drawing still gets a labelled, focusable fi
   window.document.body.append(mini.element);
   assert.equal(mini.element.tagName, 'CANVAS');
   assert.equal(mini.element.getAttribute('role'), 'img');
-  assert.match(mini.element.getAttribute('aria-label'), /Thomas/);
+  assert.match(mini.element.getAttribute('aria-label'), /developer.*zoom/);
   assert.equal(mini.element.tabIndex, 0);
   assert.doesNotThrow(() => mini.start());
 });
@@ -52,6 +52,24 @@ test('typewriter: types a line in its final place, erases it, then types the nex
   assert.ok(seen.includes('Hi|.'), 'the untyped rest keeps its place');
   assert.ok(seen.includes('Sec|ond line.'));
   assert.equal(typed() + '|' + rest(), 'Last one.|', 'the last line stays typed');
+});
+
+test('mini-me: the wheel zooms him instead of scrolling the panel', () => {
+  const {window} = new JSDOM('<body></body>');
+  const mini = createMiniMe({doc: window.document, win: window});
+  window.document.body.append(mini.element);
+  const wheel = new window.WheelEvent('wheel', {deltaY: -100, bubbles: true, cancelable: true});
+  mini.element.dispatchEvent(wheel);
+  assert.ok(wheel.defaultPrevented);
+});
+
+test('typewriter: a line break in a line is kept on screen, and read as a space', () => {
+  const {window} = new JSDOM('<body></body>');
+  const note = createTypewriter({doc: window.document, win: window, lines: ['Hi.', 'One half,\nthe other.'], motion: () => false});
+  window.document.body.append(note.element);
+  note.start();
+  assert.equal(note.element.querySelector('.profile-type-sr').textContent, 'Hi. One half, the other.');
+  assert.equal(note.element.querySelectorAll('.profile-type-all > *')[1].textContent, 'One half,\nthe other.');
 });
 
 test('typewriter: without motion every line simply stands', () => {

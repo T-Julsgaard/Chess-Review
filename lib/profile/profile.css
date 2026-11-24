@@ -154,22 +154,25 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 /* The developer's note, in the portfolio's IBM Plex Mono (an ASCII subset; licence in fonts/). */
 @font-face { font-family: "Dev Plex Mono"; src: url("../../fonts/ibmplexmono.ttf") format("truetype"); font-weight: 400; font-style: normal; font-display: swap; }
 /* The note is typed above the mini-me, who stands centred on the full width with room to turn; the buttons sit under him. */
-.profile-share:has(.profile-dev) { flex: 1 1 auto; }
-.profile-dev { flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.profile-dev + .profile-chooser-row { justify-content: center; padding-top: 12px; border-top: 1px solid var(--line); }
+/* Both may shrink below the canvas's own size, so the figure gives way to the heading and the buttons never spill out of the panel. */
+.profile-share:has(.profile-dev) { flex: 1 1 auto; min-height: 0; }
+.profile-share-results { align-self: flex-start; padding: 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: var(--pv-tint, var(--accent)); cursor: pointer; }
+.profile-share-results:hover { text-decoration: underline; }
+.profile-dev { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.profile-dev + .profile-chooser-row { justify-content: center; padding-top: 10px; border-top: 1px solid var(--line); }
 .profile-type { align-self: stretch; font-family: "Dev Plex Mono", "IBM Plex Mono", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; text-align: center; }
-/* Three lines are kept free, so the figure below never moves while a line is typed. */
-.profile-type-screen { min-height: calc(3 * 1.55em); display: flex; align-items: center; justify-content: center; flex-wrap: wrap; font-size: 13px; line-height: 1.55; color: var(--ink-2); text-wrap: balance; }
-.profile-type.is-greeting .profile-type-screen { font-size: 17px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
+/* Three lines are kept free, so the figure below never moves while a line is typed. The lines break where the note says (white-space: pre-wrap). */
+.profile-type-screen { min-height: calc(3 * 1.55em); display: flex; align-items: center; justify-content: center; flex-wrap: wrap; font-size: 15.5px; line-height: 1.55; color: var(--ink-2); text-wrap: balance; }
 .profile-type-text { white-space: pre-wrap; }
 /* The untyped rest holds the line's final place without showing. */
 .profile-type-rest { visibility: hidden; }
 /* The block cursor takes no room of its own (a plain inline, so it adds no place to wrap), so the text never moves under it. */
 .profile-type-caret { position: relative; }
-.profile-type-caret::after { content: ""; position: absolute; left: 1px; top: 0; width: .58em; height: 1.15em; background: var(--accent); animation: profile-caret 1.05s steps(1) infinite; }
+.profile-type-caret::after { content: ""; position: absolute; left: 1px; top: 0; width: .58em; height: 1.15em; background: #bbbcb4; animation: profile-caret 1.05s steps(1) infinite; }
+/* That pale grey would vanish on a light panel: there the cursor takes the text's colour. */
+[data-theme="light"] .profile-type-caret::after { background: var(--ink-2); }
 .profile-type.is-typing .profile-type-caret::after { animation: none; }
 .profile-type-all { display: flex; flex-direction: column; gap: 6px; }
-.profile-type.is-still strong { font-weight: 400; font-size: 15px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
 @keyframes profile-caret { 50% { opacity: 0; } }
 .profile-type-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 /* He takes the height left in the panel (never less than 190px); the canvas's own pixel size must not feed back into it. */
