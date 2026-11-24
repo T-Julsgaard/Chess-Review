@@ -154,20 +154,47 @@ test('profile puzzles replay the previous move and right-click resets a picked-u
   doc.elementFromPoint = () => square('f7');
   pointer(square('h5'), 'pointerdown', {buttons: 1});
   pointer(doc, 'pointermove', {buttons: 1, clientX: 20});
-  assert.match(at('h5').style.transform, /translate/);
+  assert.ok(doc.querySelector('.drag-piece .profile-piece'), 'a copy of the piece floats above the board');
+  assert.equal(at('h5').style.visibility, 'hidden');
   pointer(doc, 'pointermove', {buttons: 3, clientX: 20});
   pointer(square('f7'), 'pointerup');
-  assert.equal(at('h5').style.transform, '');
+  assert.equal(doc.querySelector('.drag-piece'), null); assert.equal(at('h5').style.visibility, '');
   assert.equal(board.querySelector('.profile-sel, .profile-target, .profile-moving'), null);
   assert.deepEqual(submitted, []);
 
   pointer(square('h5'), 'pointerdown', {buttons: 1});
   pointer(doc, 'pointermove', {buttons: 1, clientX: 20});
   assert.equal(square('f7').dispatchEvent(new win.MouseEvent('contextmenu', {bubbles: true, cancelable: true, button: 2})), false);
-  assert.equal(at('h5').style.transform, '');
+  assert.equal(doc.querySelector('.drag-piece'), null); assert.equal(at('h5').style.visibility, '');
   assert.equal(board.querySelector('.profile-sel, .profile-target, .profile-moving'), null);
 
   pointer(square('h5'), 'pointerdown'); pointer(square('h5'), 'pointerup');
   pointer(square('f7'), 'pointerdown');
   assert.deepEqual(submitted.map(({from, to}) => [from, to]), [['h5', 'f7']]);
+});
+
+test('profile puzzle drags stop with the piece halfway outside every board edge', t => {
+  const {api, board, at} = surface(t, false);
+  const doc = board.ownerDocument, win = doc.defaultView, submitted = [], names = squareNames(false);
+  let left = 100, top = 50, size = 480;
+  board.getBoundingClientRect = () => ({left, top, width: size, height: size});
+  [...board.children].forEach((sq, i) => {
+    sq.getBoundingClientRect = () => ({left: left + i % 8 * size / 8, top: top + Math.floor(i / 8) * size / 8, width: size / 8, height: size / 8});
+  });
+  api.play(new Chess().fen(), {onMove: move => submitted.push(move)});
+  const pointer = (target, type, x, y) => target.dispatchEvent(new win.PointerEvent(type, {bubbles: true, pointerId: 1, button: 0, buttons: type === 'pointerup' ? 0 : 1, clientX: x, clientY: y}));
+  const centre = () => { const ghost = doc.querySelector('.drag-piece'); return [parseFloat(ghost.style.left), parseFloat(ghost.style.top)]; };
+  pointer(board.children[names.indexOf('e2')], 'pointerdown', 375, 445); // 5 px off the square's centre (370, 440)
+  for (const [x, y, cx, cy] of [
+    [-1000, 445, 100, 440], [5000, 445, 580, 440], [375, -1000, 370, 50], [375, 5000, 370, 530],
+    [-1000, -1000, 100, 50], [5000, 5000, 580, 530], [405, 305, 400, 300],
+  ]) { pointer(doc, 'pointermove', x, y); assert.deepEqual(centre(), [cx, cy], `pointer at ${x},${y}`); }
+  assert.equal(doc.querySelector('.drag-piece').style.width, '60px', 'the floating piece is one square wide');
+  assert.equal(at('e2').style.visibility, 'hidden');
+  left = 0; top = 0; size = 320; // a moved or resized board moves the bounds with it
+  pointer(doc, 'pointermove', -1000, 5000); assert.deepEqual(centre(), [0, 320]);
+  doc.elementFromPoint = () => null;
+  pointer(doc, 'pointerup', -1000, 5000);
+  assert.equal(doc.querySelector('.drag-piece'), null); assert.equal(at('e2').style.visibility, '');
+  assert.deepEqual(submitted, [], 'releasing outside plays nothing');
 });

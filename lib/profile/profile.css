@@ -175,6 +175,7 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-board .sq { position: relative; }
 .profile-board .sq .profile-piece { position: absolute; inset: 3%; width: 94%; height: 94%; object-fit: contain; z-index: 2; pointer-events: none; }
 .profile-board .sq.profile-moving { z-index: 6; }
+.profile-drag-piece .profile-piece { width: 94%; height: 94%; object-fit: contain; }
 .profile-board .sq.profile-hl::before { content: ""; position: absolute; inset: 0; background: color-mix(in srgb, var(--sq-light-hl) 55%, transparent); z-index: 1; }
 .profile-board .sq.profile-mate::after { content: ""; position: absolute; inset: 8%; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--q-blunder) 70%, transparent), transparent 70%); z-index: 1; }
 .profile-board .sq.profile-heat::before { content: ""; position: absolute; inset: 0; background: var(--accent); opacity: calc(var(--heat, 0) * .9); z-index: 1; transition: opacity .5s ease; }
