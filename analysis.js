@@ -859,7 +859,7 @@ const S = {
   layout: structuredClone(DEFAULT_LAYOUT), layoutMode: "auto",
   evalEngines: [], autoTimer: null,
   // Re-analysis + analysis mode
-  batchGen: 0, settingsTab: "language", analyzedMultipv: null,
+  batchGen: 0, settingsTab: "visual", analyzedMultipv: null,
   analysisMode: false, variation: null, liveEngine: null, liveEnginePromise: null, liveEngineGeneration: 0, liveError: null, liveToken: 0, panelToken: 0, _panelCache: null, selectedSq: null,
   // The build that is ACTUALLY running (set by createEngine; may differ from settings.enginePath if
   // the chosen build failed to load and we fell back). The Engine tab shows this, not the selection.
@@ -7024,9 +7024,7 @@ function languageSettings() {
       el("span", { class: "set-language-check", "aria-hidden": "true" }, checked ? "✓" : ""));
   });
   return el("div", { class: "set-language" },
-    el("div", { class: "set-language-list", role: "radiogroup", "aria-label": i18n.t("language.settings.title") }, ...options),
-    el("p", { class: "set-note", translate: "no" }, i18n.t("language.settings.intro")),
-    el("p", { class: "set-note", translate: "no" }, i18n.t("language.settings.coverage")));
+    el("div", { class: "set-language-list", role: "radiogroup", "aria-label": i18n.t("language.settings.title") }, ...options));
 }
 function languageOptionKey(event) {
   const keys = ["ArrowDown", "ArrowRight", "ArrowUp", "ArrowLeft", "Home", "End"];
@@ -7076,11 +7074,11 @@ function languageStorageChanged(changes, area) {
   if (!change || !isSupportedLanguage(change.newValue)) return;
   return loadUiLanguage(change.newValue);
 }
-// Language comes first and is where Settings opens each time the workspace loads,
-// so someone who does not read English finds it straight away.
+// Visual comes first and is where Settings opens each time the workspace loads;
+// Language sits right beneath it.
 const SETTINGS_CATEGORIES = [
-  {id:"language", label:"Language", description:"Choose your language", icon:"globe", render:languageSettings},
   {id:"visual", label:"Visual", description:"Make the workspace yours", icon:"palette", render:visualSettings},
+  {id:"language", label:"Language", description:"Choose your language", icon:"globe", render:languageSettings},
   {id:"review", label:"Review & Coach", description:"Commentary, character & reactions", icon:"chat", render:reviewSettings},
   {id:"engine", label:"Engine", description:"Analysis power & rating estimates", icon:"cpu", render:motorSettings},
   {id:"sound", label:"Sound", description:"Every move, your sound", icon:"sound", render:soundSettings},

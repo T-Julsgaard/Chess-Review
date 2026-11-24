@@ -42,8 +42,8 @@ Arabic text is shown in the normal left-to-right Settings layout; the panel is n
 
 - **English is always the default.** The browser's language is never used to guess
   one, and there is no first-use prompt.
-- **Settings opens on Language** each time the workspace loads, so someone who does
-  not read English finds it straight away. If they pick another category, Settings
+- **Settings opens on Visual** each time the workspace loads, with Language as the
+  next category right beneath it. If they pick another category, Settings
   stays on it until the workspace is closed and opened again.
 - Choosing a language applies at once, without reloading the workspace, and saves it
   in extension local storage under the `language` key. That key is separate from

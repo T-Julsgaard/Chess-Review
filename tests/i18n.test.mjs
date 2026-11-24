@@ -185,7 +185,7 @@ test('Simplified Chinese settings are complete apart from names, move grades and
   }
 });
 
-test('first use is English with no prompt, whatever the browser language, and Settings opens on Language', async t => {
+test('first use is English with no prompt, whatever the browser language, and Settings opens on Visual with Language beneath it', async t => {
   for (const languages of [['zh-CN', 'en'], ['fr-FR'], ['de-DE', 'pt-BR'], ['en-US']]) {
     const a = startup(t, {languages}), doc = a.dom.window.document;
     await a.start(); await settle();
@@ -196,18 +196,22 @@ test('first use is English with no prompt, whatever the browser language, and Se
     assert.equal(Object.hasOwn(a.store, LANGUAGE_STORAGE_KEY), false, 'Nothing is guessed or saved');
     assert.ok(!a.writes.some(write => Object.hasOwn(write, LANGUAGE_STORAGE_KEY)));
     a.call('toggleSettings');
-    assert.equal(a.state.settingsTab, 'language');
+    assert.equal(a.state.settingsTab, 'visual');
+    assert.equal(categoryName(a), 'Visual');
+    assert.deepEqual([...doc.querySelectorAll('[data-category]')].slice(0, 2).map(option => option.dataset.category), ['visual', 'language']);
+    doc.querySelector('[data-category="language"]').click();
     assert.equal(categoryName(a), 'Language');
+    assert.equal(doc.querySelector('.set-language .set-note'), null, 'No notes under the language list');
     assert.equal(doc.querySelectorAll('.set-language-option').length, LANGUAGES.length);
     assert.equal(doc.querySelector('.set-language-option[aria-checked="true"]').dataset.language, 'en');
   }
 });
 
-test('Settings keeps the category chosen during a visit and opens on Language again after a reload', async t => {
+test('Settings keeps the category chosen during a visit and opens on Visual again after a reload', async t => {
   const a = startup(t, {savedLanguage: 'en'}), doc = a.dom.window.document;
   await a.start();
   a.call('toggleSettings');
-  assert.equal(categoryName(a), 'Language');
+  assert.equal(categoryName(a), 'Visual');
   doc.querySelector('[data-category="engine"]').click();
   a.call('toggleSettings'); a.call('toggleSettings');
   assert.equal(doc.getElementById('settings').hidden, false);
@@ -215,11 +219,11 @@ test('Settings keeps the category chosen during a visit and opens on Language ag
   const reloaded = startup(t, {savedLanguage: 'en'});
   await reloaded.start();
   reloaded.call('toggleSettings');
-  assert.equal(categoryName(reloaded), 'Language');
+  assert.equal(categoryName(reloaded), 'Visual');
 });
 
 test('a saved language applies at startup without asking', async t => {
-  for (const [id, settings, language] of [['zh-Hans', '设置', '语言'], ['de', 'Einstellungen', 'Sprache'], ['ar', 'الإعدادات', 'اللغة']]) {
+  for (const [id, settings, language] of [['zh-Hans', '设置', '外观'], ['de', 'Einstellungen', 'Darstellung'], ['ar', 'الإعدادات', 'المظهر']]) {
     const a = startup(t, {savedLanguage: id}), doc = a.dom.window.document;
     await a.start();
     assert.equal(doc.querySelector('.lang-overlay'), null);
@@ -244,6 +248,8 @@ test('an unknown saved value, or a catalog that fails to load, starts in English
   assert.equal(broken.announcements, 1, 'Startup carries on');
   assert.equal(broken.state.pgn, '1. e4 e5 2. Nf3');
   broken.call('toggleSettings');
+  assert.equal(categoryName(broken), 'Visual');
+  broken.dom.window.document.querySelector('[data-category="language"]').click();
   assert.equal(categoryName(broken), 'Language');
   // Choosing a language whose catalog cannot load keeps English and saves nothing.
   broken.dom.window.document.querySelector('.set-language-option[data-language="de"]').click();
@@ -271,8 +277,10 @@ test('Settings → Language switches immediately, keeps the game and remembers t
   const positions = a.state.positions, idx = a.state.idx;
   a.call('toggleSettings');
   const menu = [...doc.querySelectorAll('.set-category .lib-dd-opt')];
-  assert.equal(menu[0].dataset.category, 'language', 'Language is listed first');
-  assert.match(menu[0].textContent, /Language.*Choose your language/);
+  assert.equal(menu[0].dataset.category, 'visual', 'Visual is listed first');
+  assert.equal(menu[1].dataset.category, 'language', 'Language is listed right beneath it');
+  assert.match(menu[1].textContent, /Language.*Choose your language/);
+  menu[1].click();
   const list = doc.querySelector('.set-language-list');
   assert.equal(list.getAttribute('role'), 'radiogroup');
   const choice = id => doc.querySelector(`.set-language-option[data-language="${id}"]`);
@@ -282,7 +290,7 @@ test('Settings → Language switches immediately, keeps the game and remembers t
   assert.equal(choice('pt-BR').querySelector('img').getAttribute('src'), 'flags/BR.svg');
   assert.equal(choice('da').querySelector('.set-language-native').textContent, 'Dansk');
   assert.equal(choice('da').querySelector('.set-language-alt').textContent, 'Danish');
-  assert.match(doc.querySelector('.set-language').textContent, /rest of Chess Review is still in English/);
+  assert.doesNotMatch(doc.querySelector('.set-language').textContent, /still in English|saved in this browser/, 'No notes under the language list');
 
   choice('zh-Hans').focus(); choice('zh-Hans').click();
   await settle();

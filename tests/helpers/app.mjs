@@ -42,8 +42,8 @@ const source = raw.slice(0, startup).replace(/^import .*;\r?\n/gm, '');
 
 // languages: the browser's ordered preferences (never used to pick a language).
 // savedLanguage: the stored choice; null leaves it unset, as for a new user.
-// settingsTab: the category Settings opens on. The app opens on Language; most
-// suites exercise the Visual controls, so they start there. null keeps the app's own.
+// settingsTab: the category Settings opens on. The app itself opens on Visual,
+// which most suites exercise. null keeps the app's own.
 export function app(t, {hardware,languages=['en-US'],savedLanguage='en',settingsTab='visual',url='https://extension.test/analysis.html#test-game',html='<!doctype html><div id="root"></div>'} = {}) {
   const dom = new JSDOM(html, { url, pretendToBeVisual: true });
   Object.defineProperties(dom.window.navigator, {
