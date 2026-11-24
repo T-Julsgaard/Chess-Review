@@ -160,8 +160,9 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-share-results { margin-left: auto; padding-inline: 10px; }
 /* It hangs over the heading's row instead of making it taller, so the line under Overview stays where it was. */
 .pv-story-top > .profile-share-results { margin-block: -9px; }
-/* The note and the figure move up only a little into the room the button left. */
-.profile-share > .profile-dev:first-child { margin-top: 34px; }
+/* A line under the heading and its sentence sets the note and the figure apart, as the line over the buttons does below them;
+   the note starts well clear of it. */
+.profile-share:has(> .profile-dev:first-child) { margin-top: 3px; padding-top: 36px; border-top: 1px solid var(--line); }
 .profile-dev { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .profile-dev + .profile-chooser-row { justify-content: center; padding-top: 10px; border-top: 1px solid var(--line); }
 .profile-type { align-self: stretch; font-family: "Dev Plex Mono", "IBM Plex Mono", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; text-align: center; }
