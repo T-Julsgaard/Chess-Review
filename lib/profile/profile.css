@@ -2,6 +2,9 @@
 .stage.profile-active > .mod:not([data-mod="board"]), .profile-active > .side .mod, .profile-active .mod[data-mod="evalbar"] { visibility: hidden; }
 .profile-active #playerTop, .profile-active #playerBot { visibility: hidden; }
 .has-profile .library-rail { visibility: hidden; }
+/* Hidden review chrome never transitions: a `transition: all` (the move buttons, the move list) would
+   otherwise hold `visibility: visible` a beat after the fade-out ends, flashing back at full opacity. */
+.stage.profile-active .mod:not([data-mod="board"]) *, .profile-active :is(#playerTop, #playerBot) *, .has-profile .library-rail * { transition: none !important; }
 html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .has-profile .topbar [data-game-action] { opacity: .35; pointer-events: none; }
 
