@@ -401,7 +401,7 @@ const DEFAULT_SETTINGS = {
   // Accuracy check that runs by itself after a profile is built: depth (off/fast/balanced/deep) and which games.
   profileDepth: "balanced", profileSample: "all",
   // How the historical twin's face appears, and what the Signature moves board shows.
-  profilePortraitStyle: "relief", profileSignatureBoard: "differences", profileAccuracyAnimation: "games",
+  profilePortraitStyle: "relief", profileSignatureBoard: "differences",
   // How games appear on the board while a profile is built: film (default) or mosaic.
   profileStream: "film",
   // Display the selected analysis lines unless the user adds or removes lines in the panel.
@@ -6701,8 +6701,6 @@ function visualSettings() {
         ["differences", "Habit differences"], ["centered", "Centered difference chart"], ["pieces", "Piece markers on ranks"],
         ["cards", "Four habit cards"], ["compare", "Paired columns"], ["heat", "Heat map"],
       ], "Choose how the board shows your habits in You vs. a typical player. Centered differences show how far each habit is from typical, piece markers plot both values on ranks, and habit cards highlight four comparisons. The heat map shows where your pieces land."),
-      settingDropdown("Accuracy over time", "profileAccuracyAnimation", [["games", "Every game"], ["average", "Average line"]],
-        "How the accuracy chart draws in the Then and now chapter. Every game draws a line through each checked game, hundreds or thousands of them, then pulls them all together into your average; Average line draws only the average."),
     ),
     section("Animations",
       toggleRow("Interface animations", "uiAnim", setSetting,

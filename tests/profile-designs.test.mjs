@@ -813,9 +813,52 @@ test('accuracy opens with the game animation and time-control changes show the a
   assert.ok(chart.querySelector('.pv-line-path'));
   assert.ok(chart.classList.contains('pv-line-settled'));
   filter('bullet');
-  assert.equal(w.viz.layer, null, 'bullet has no checked games');
+  assert.equal(w.viz.layer?.dataset.empty, 'on', 'bullet has no checked games: the level line stands for none');
   filter('all');
   assert.ok(w.viz.layer.classList.contains('pv-line-settled'), 'filtering from an empty chart also skips the animation');
+});
+
+test('accuracy before any check is a level line that the check\'s first games replace in place', async t => {
+  const a = review(t);
+  seed(a);
+  const w = await openDeck(a);
+  w.go(w.deck.findIndex(s => s.id === 'trend'));
+  const slide = w.deck[w.index];
+  assert.equal(slide.board.scene.empty, true, 'no checked games: no starting position');
+  const flat = w.viz.layer;
+  assert.equal(flat.dataset.empty, 'on');
+  assert.ok(flat.classList.contains('pv-dim'), 'the board darkens as for a running check');
+  assert.deepEqual([...flat.querySelectorAll('.pv-line-path')].map(p => p.getAttribute('d')), ['M0 52 L100 52', 'M0 52 L100 52']);
+  assert.equal(flat.querySelector('.pv-line-cursor'), null, 'nothing to inspect yet');
+  // The same chapter redrawn while the check starts keeps the line, then the first checked games draw on it.
+  w.showBoard({...slide.board, scene: {...slide.board.scene, live: true}});
+  assert.equal(w.viz.layer, flat, 'starting the check keeps the line');
+  const day = 86400, series = Array.from({length: 4}, (_, i) => ({t: 1.7e9 + i * day, r: 70 + i, n: 1}));
+  w.showBoard({kind: 'blank', me: 'w', caption: '', scene: {type: 'line', series, label: 'Accuracy', tag: false, unit: '%', smooth: true, live: true}});
+  assert.equal(w.viz.layer, flat, 'the first games replace the level line in place');
+  assert.equal(flat.dataset.empty, undefined);
+  assert.ok(flat.querySelector('.pv-line-raw'));
+});
+
+test('a live accuracy line keeps the hovered point shown while new games redraw it', async () => {
+  const {JSDOM} = await import('jsdom');
+  const {createViz} = await import('../lib/profile/designs/board-viz.js');
+  const dom = new JSDOM('<div class="wrap"><div class="board"></div></div>'), board = dom.window.document.querySelector('.board');
+  const viz = createViz(board, {motion: () => false});
+  const day = 86400, series = n => Array.from({length: n}, (_, i) => ({t: 1.7e9 + i * day, r: 60 + i, n: 1}));
+  const options = {label: 'Accuracy', tag: false, unit: '%', smooth: true, live: true};
+  const layer = viz.line(series(5), options);
+  layer.getBoundingClientRect = () => ({left: 0, width: 100});
+  layer.dispatchEvent(new dom.window.MouseEvent('pointermove', {clientX: 0}));
+  const tip = () => layer.outside.querySelector('.pv-inspect');
+  assert.equal(tip().hidden, false);
+  assert.ok(viz.line(series(6), {...options, morph: true}) === layer, 'redrawn in place');
+  assert.equal(tip().hidden, false, 'the point under the pointer stays inspected');
+  assert.match(tip().textContent, /60%/);
+  layer.dispatchEvent(new dom.window.MouseEvent('pointerleave'));
+  viz.line(series(7), {...options, morph: true});
+  assert.equal(tip().hidden, true, 'once the pointer has left, a redraw shows nothing');
+  dom.window.close();
 });
 
 test('the rating chart shows round ratings and calendar ticks for longer histories', async () => {
