@@ -81,7 +81,6 @@ test('profile: seeded games render the deck on the board with navigation, stats 
   assert.ok(shell.querySelector('.profile-share-results').classList.contains('primary'), 'it is filled like Share with a friend');
   assert.match(shell.querySelector('.profile-share a.profile-button.primary').href, /^https:\/\/chromewebstore\.google\.com\/detail\/chess-review\//, 'Share with a friend opens the store page');
   assert.ok(shell.querySelector('.profile-dev canvas.profile-minime'), 'the developer note has the mini-me');
-  assert.ok(!shell.querySelector('.profile-share').classList.contains('is-cued'), 'the buttons under him wait for the note to ask for them');
   assert.deepEqual([...shell.querySelectorAll('.profile-share a.profile-button')].map(a => a.textContent), ['Review on Chrome', 'Share with a friend', 'Review on Firefox']);
   shell.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'Home', bubbles: true}));
   assert.equal(shell.querySelector('.pv-story').dataset.slide, 'cover');

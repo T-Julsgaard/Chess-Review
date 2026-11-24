@@ -73,22 +73,6 @@ test('typewriter: a line break in a line is kept on screen, and read as a space'
   assert.equal(note.element.querySelectorAll('.profile-type-all > *')[1].textContent, 'One half,\nthe other.');
 });
 
-test('typewriter: the cue fires once, the moment its words are typed (at once without motion)', async () => {
-  const {window} = new JSDOM('<body></body>');
-  const win = {setTimeout: fn => { queueMicrotask(fn); return 1; }, clearTimeout() {}};
-  let at = [];
-  const note = createTypewriter({doc: window.document, win, lines: ['Hi.', 'Share it with\na friend, please.'], cue: 'a friend',
-    onCue: () => at.push(note.element.querySelector('.profile-type-typed').textContent)});
-  window.document.body.append(note.element);
-  note.start();
-  for (let i = 0; i < 400; i++) await new Promise(resolve => setTimeout(resolve, 0));
-  assert.deepEqual(at, ['Share it with\na friend']);
-  at = [];
-  const still = createTypewriter({doc: window.document, win: window, lines: ['Hi.'], motion: () => false, cue: 'Hi', onCue: () => at.push('now')});
-  still.start();
-  assert.deepEqual(at, ['now']);
-});
-
 test('typewriter: without motion every line simply stands', () => {
   const {window} = new JSDOM('<body></body>');
   const note = createTypewriter({doc: window.document, win: window, lines: ['Hi.', 'There.'], motion: () => false});

@@ -215,8 +215,6 @@ class WebStoryWorkspace extends StoryWorkspace {
     return share;
   }
   devNoteLines() { return WEB_DEV_NOTE; }
-  /** The stores under the figure come in as the note invites visitors to build their own. */
-  devNoteCue() { return 'Build your own'; }
   /** No "Share your results" here: this page's own link already is the shared profile. */
   shareResultsButton() { return null; }
   /** The panel's "Build your own" gets the knight and the accent, so it reads as the page's way in. */
