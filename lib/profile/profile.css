@@ -148,15 +148,33 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
   background: color-mix(in oklab, var(--pv-tint, var(--accent)) 16%, transparent); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--pv-tint, var(--accent)) 34%, transparent); }
 .profile-engine .profile-button[disabled] { opacity: .5; cursor: default; }
 .profile-share { display: flex; flex-direction: column; gap: 10px; }
-/* The developer's note: the mini-me (no background, drawn in the ink colour) beside a few words. */
-.profile-dev { display: flex; align-items: center; gap: 4px 14px; padding-top: 12px; border-top: 1px solid var(--line); }
-.profile-minime { flex: none; width: clamp(96px, 36%, 156px); aspect-ratio: 3 / 4.4; color: var(--ink); cursor: grab; touch-action: none; border-radius: 10px; outline-offset: 2px; }
+/* The developer's note, in the portfolio's IBM Plex Mono (an ASCII subset; licence in fonts/). */
+@font-face { font-family: "Dev Plex Mono"; src: url("../../fonts/ibmplexmono.ttf") format("truetype"); font-weight: 400; font-style: normal; font-display: swap; }
+/* The note is typed above the mini-me, who stands centred on the full width with room to turn. */
+.profile-share:has(.profile-dev) { flex: 1 1 auto; }
+.profile-dev { flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: 4px; padding-top: 12px; border-top: 1px solid var(--line); }
+.profile-type { align-self: stretch; font-family: "Dev Plex Mono", "IBM Plex Mono", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; text-align: center; }
+/* Three lines are kept free, so the figure below never moves while a line is typed. */
+.profile-type-screen { min-height: calc(3 * 1.55em); display: flex; align-items: center; justify-content: center; flex-wrap: wrap; font-size: 13px; line-height: 1.55; color: var(--ink-2); text-wrap: balance; }
+.profile-type.is-greeting .profile-type-screen { font-size: 17px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
+.profile-type-text { white-space: pre-wrap; }
+/* The untyped rest holds the line's final place without showing. */
+.profile-type-rest { visibility: hidden; }
+/* The block cursor takes no room of its own (a plain inline, so it adds no place to wrap), so the text never moves under it. */
+.profile-type-caret { position: relative; }
+.profile-type-caret::after { content: ""; position: absolute; left: 1px; top: 0; width: .58em; height: 1.15em; background: var(--accent); animation: profile-caret 1.05s steps(1) infinite; }
+.profile-type.is-typing .profile-type-caret::after { animation: none; }
+.profile-type-all { display: flex; flex-direction: column; gap: 6px; }
+.profile-type.is-still strong { font-weight: 400; font-size: 15px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
+@keyframes profile-caret { 50% { opacity: 0; } }
+.profile-type-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* He takes the height left in the panel (never less than 190px); the canvas's own pixel size must not feed back into it. */
+.profile-minime { display: block; width: 100%; flex: 1 1 0; min-height: 190px; max-height: 340px; color: var(--ink); cursor: grab; touch-action: none; border-radius: 10px; outline-offset: 2px; }
 .profile-minime:active { cursor: grabbing; }
 .profile-minime:focus-visible { outline: 2px solid var(--accent); }
-.profile-dev-note { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.profile-dev-hello { margin: 0; font-size: 15px; font-weight: 800; letter-spacing: .4px; text-transform: uppercase; color: var(--ink); }
-.profile-dev-note p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
 .profile-share a.profile-button { display: inline-flex; align-items: center; text-decoration: none; }
+/* Slimmer sides so Share and both review buttons fit one row on a laptop panel. */
+.profile-share .profile-chooser-row .profile-button { padding-inline: 10px; }
 .profile-chooser-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 
 .profile-empty { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; justify-content: center; min-height: 100%; padding: 8px 4px; }

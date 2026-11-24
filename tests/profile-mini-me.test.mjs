@@ -1,18 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {JSDOM} from 'jsdom';
-import {figurePoints, waveLift, waveSwing, createMiniMe} from '../lib/profile/mini-me.js';
+import {figurePoints, waveLift, waveSwing, createMiniMe, createTypewriter} from '../lib/profile/mini-me.js';
 
-test('mini-me: every character has a front and a back point, and the arm is marked', () => {
+test('mini-me: one flat sheet of characters, centred, with the waving arm marked', () => {
   const points = figurePoints();
-  assert.equal(points.length % 2, 0);
-  assert.ok(points.length > 1500, 'the figure keeps its detail: ' + points.length);
+  assert.ok(points.length > 800, 'the figure keeps its detail: ' + points.length);
+  assert.ok(points.every(p => !('z' in p)), 'flat, like the portfolio sheet');
   assert.ok(points.some(p => p.arm === 1) && points.some(p => p.arm === 2), 'upper arm and forearm both wave');
-  for (let i = 0; i < points.length; i += 2) {
-    assert.ok(points[i].z >= 0 && points[i + 1].z <= 0, 'front then back');
-    assert.ok(points[i].nz >= 0 && points[i + 1].nz <= 0, 'each faces its own way');
-  }
-  // Centred, so he turns about his own middle.
+  assert.ok(points.every(p => p.glyph >= 1 && p.glyph <= 9));
+  // Centred on his middle, so he turns about it and sits in the middle of the canvas.
   const xs = points.map(p => p.x);
   assert.ok(Math.abs(Math.max(...xs) + Math.min(...xs)) < .2);
 });
@@ -34,4 +31,34 @@ test('mini-me: a page without canvas drawing still gets a labelled, focusable fi
   assert.match(mini.element.getAttribute('aria-label'), /Thomas/);
   assert.equal(mini.element.tabIndex, 0);
   assert.doesNotThrow(() => mini.start());
+});
+
+test('typewriter: types a line in its final place, erases it, then types the next; the last stays', async () => {
+  const {window} = new JSDOM('<body></body>');
+  // Every key and pause runs at once; Math.random only varies the pace.
+  const win = {setTimeout: fn => { queueMicrotask(fn); return 1; }, clearTimeout() {}};
+  const lines = ['Hi.', 'Second line.', 'Last one.'];
+  const note = createTypewriter({doc: window.document, win, lines});
+  window.document.body.append(note.element);
+  assert.equal(note.element.querySelector('.profile-type-sr').textContent, lines.join(' '), 'screen readers get it all at once');
+  assert.equal(note.element.querySelector('.profile-type-screen').getAttribute('aria-hidden'), 'true');
+  const typed = () => note.element.querySelector('.profile-type-typed').textContent;
+  const rest = () => note.element.querySelector('.profile-type-rest').textContent;
+  const seen = [];
+  const watch = new window.MutationObserver(() => seen.push(typed() + '|' + rest()));
+  watch.observe(note.element, {subtree: true, childList: true, characterData: true});
+  note.start();
+  for (let i = 0; i < 400; i++) await new Promise(resolve => setTimeout(resolve, 0));
+  assert.ok(seen.includes('Hi|.'), 'the untyped rest keeps its place');
+  assert.ok(seen.includes('Sec|ond line.'));
+  assert.equal(typed() + '|' + rest(), 'Last one.|', 'the last line stays typed');
+});
+
+test('typewriter: without motion every line simply stands', () => {
+  const {window} = new JSDOM('<body></body>');
+  const note = createTypewriter({doc: window.document, win: window, lines: ['Hi.', 'There.'], motion: () => false});
+  window.document.body.append(note.element);
+  note.start();
+  assert.ok(note.element.classList.contains('is-still'));
+  assert.deepEqual([...note.element.querySelectorAll('.profile-type-all > *')].map(n => n.textContent), ['Hi.', 'There.']);
 });
