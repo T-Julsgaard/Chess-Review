@@ -881,8 +881,11 @@ test('the rating chart shows round ratings and calendar ticks for longer histori
   assert.ok(ratingTicks(400, 2900).length <= 5);
   const at = (y, m, d = 15) => new Date(y, m, d).getTime() / 1000;
   const months = timeTicks(at(2025, 10), at(2026, 9));
-  assert.ok(months.length >= 2 && months.length <= 7, 'a year of play: ' + months.map(t => t.label));
-  assert.ok(months.every(t => /^[A-Z][a-z]{2}$/.test(t.label)), 'month names only');
+  assert.deepEqual(months.map(t => t.label), ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'], 'a year of play names every month');
+  const pastYear = timeTicks(at(2025, 10, 1), at(2026, 10, 24));
+  assert.equal(pastYear.length, 12, 'past 12 months: ' + pastYear.map(t => t.label));
+  const twoYears = timeTicks(at(2024, 10), at(2026, 9));
+  assert.ok(twoYears.length >= 2 && twoYears.length <= 7 && twoYears.every(t => /^[A-Z][a-z]{2}$/.test(t.label)), 'longer spans thin out: ' + twoYears.map(t => t.label));
   assert.deepEqual(timeTicks(at(2026, 0), at(2026, 3)).map(t => t.label), ['Feb', 'Mar', 'Apr'], 'every month of a short line');
   const years = timeTicks(at(2019, 4), at(2026, 9));
   assert.ok(years.length >= 2 && years.length <= 7 && years.every(t => /^\d{4}$/.test(t.label)), 'years only: ' + years.map(t => t.label));
