@@ -831,6 +831,58 @@ test('accuracy opens with the game animation and time-control changes show the a
   assert.ok(w.viz.layer.classList.contains('pv-line-settled'), 'filtering from an empty chart also skips the animation');
 });
 
+test('accuracy: a new time control bends the line on the board into the new one, and into the level line', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  seed(a);
+  const rows = a.store[rowsKey('chesscom', 'tester')].rows;
+  rows.slice(0, 10).forEach(row => { row.cls = 'rapid'; });
+  const w = await openDeck(a);
+  w.win.Element.prototype.animate = () => ({cancel() {}, finished: Promise.resolve()});
+  w.motion = () => true;
+  // No canvas: the chapter opens on the finished average, so there is a line to glide from.
+  w.win.HTMLCanvasElement.prototype.getContext = () => null;
+  // Frames run when the test says, at the time it gives.
+  let frames = [];
+  w.win.requestAnimationFrame = tick => frames.push(tick);
+  w.win.cancelAnimationFrame = id => { frames[id - 1] = null; };
+  const runFrames = now => { const due = frames; frames = []; due.forEach(tick => tick?.(now)); };
+  w.engine = Object.fromEntries(w.rows.filter(row => row.cls !== 'bullet').map((row, i) => [row.id, {acc: 65 + i % 27}]));
+  w.rebuild();
+  w.go(w.deck.findIndex(s => s.id === 'trend'));
+  const chart = w.viz.layer, line = () => chart.querySelector('.pv-line-path:not(.pv-line-glow)');
+  const before = chart.lineShape, oldD = line().getAttribute('d');
+  assert.ok(before?.length >= 2, 'the drawn line remembers its shape');
+  const filter = mode => doc.querySelector(`.pv-filter [data-value="${mode}"]`).click();
+  filter('blitz');
+  assert.equal(w.viz.layer, chart, 'the same chart stays on the board');
+  assert.equal(typeof chart.cancelLineGlide, 'function', 'the line glides to the new time control');
+  const heights = d => d.match(/-?\d+(\.\d+)?/g).map(Number).filter((_, i) => i % 2);
+  const first = line().getAttribute('d');
+  assert.notEqual(first, oldD.replace(/ /g, ''), 'the glide is under way');
+  assert.ok(Math.abs(Math.max(...heights(first)) - Math.max(...heights(oldD))) < .02 && Math.abs(Math.min(...heights(first)) - Math.min(...heights(oldD))) < .02, 'its first frame is the old line');
+  assert.equal(chart.querySelector('.pv-line-area').style.opacity, '1', 'the fill is there from the start');
+  runFrames(0); runFrames(800);
+  assert.equal(chart.cancelLineGlide, undefined, 'the glide is over');
+  assert.equal(line().getAttribute('d'), chart.lineShape.map(([x, y], i) => (i ? 'L' : 'M') + x.toFixed(2) + ' ' + y.toFixed(2)).join(' '), 'it ends exactly on the new line');
+  filter('bullet');
+  assert.equal(w.viz.layer, chart, 'no checked games: the same chart levels out');
+  assert.equal(chart.dataset.empty, 'on');
+  assert.equal(typeof chart.cancelLineGlide, 'function');
+  assert.ok(chart.querySelector('.pv-line-area'), 'the old fill fades as the line levels');
+  runFrames(1000); runFrames(1800);
+  assert.equal(chart.querySelector('.pv-line-area'), null, 'and is gone once it has');
+  assert.equal(line().getAttribute('d'), 'M0 52 L100 52');
+  filter('all');
+  assert.equal(w.viz.layer, chart);
+  assert.equal(typeof chart.cancelLineGlide, 'function', 'the level line rises into the line');
+  runFrames(2000); runFrames(2300);
+  const midway = chart.lineShape.map(([, y]) => y);
+  filter('blitz');
+  assert.equal(typeof chart.cancelLineGlide, 'function', 'switching again mid-glide glides on');
+  const again = heights(line().getAttribute('d'));
+  assert.ok(Math.abs(Math.max(...again) - Math.max(...midway)) < .02 && Math.abs(Math.min(...again) - Math.min(...midway)) < .02, 'from where the line stood, not from the start');
+});
+
 test('accuracy before any check is a level line that the check\'s first games replace in place', async t => {
   const a = review(t);
   seed(a);
