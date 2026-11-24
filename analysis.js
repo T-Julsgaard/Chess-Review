@@ -6702,8 +6702,10 @@ function visualSettings() {
         "What the board shows while your games are found. Film roll flashes through each game with both players' names, like a reel of your chess life, then turns into the mosaic while the accuracy check finishes; Mosaic adds a square for every game until the whole history fits on the board."),
       settingDropdown("Portrait animation", "profilePortraitStyle", [["assemble", "Assemble"], ["morph", "Morph"], ["inlay", "Inlay"], ["relief", "Relief"], ["halftone", "Mosaic"], ["swarm", "Swarm"]],
         "How the historical twin's face appears on the board. Assemble glides and shapes the pieces into a sculpted portrait; Morph slows the transformation and keeps the chess pieces recognizable longer; Inlay builds the entire image, including its background, from pieces; Relief adds finer facial detail and a softer return to the board; Mosaic uses tiny chess pieces; Swarm is the original swirl of pieces."),
-      settingDropdown("Playstyle comparison board", "profileSignatureBoard", [["differences", "Habit differences"], ["compare", "Paired columns"], ["heat", "Heat map"]],
-        "Choose how the board shows your playing habits in You compared to a typical player. Habit differences connects your value to the typical value for each habit. Paired columns stacks both values on the board. Heat map shows where your pieces land."),
+      settingDropdown("Playstyle comparison board", "profileSignatureBoard", [
+        ["differences", "Habit differences"], ["centered", "Centered difference chart"], ["pieces", "Piece markers on ranks"],
+        ["cards", "Four habit cards"], ["compare", "Paired columns"], ["heat", "Heat map"],
+      ], "Choose how the board shows your habits in You vs. a typical player. Centered differences show how far each habit is from typical, piece markers plot both values on ranks, and habit cards highlight four comparisons. The heat map shows where your pieces land."),
       settingDropdown("Accuracy over time", "profileAccuracyAnimation", [["games", "Every game"], ["average", "Average line"]],
         "How the accuracy chart draws in the Then and now chapter. Every game draws a line through each checked game, hundreds or thousands of them, then pulls them all together into your average; Average line draws only the average."),
     ),
@@ -7435,6 +7437,7 @@ async function setSetting(key, value) {
   S.settings[key] = value;
   await writeSettings({ [key]: value, ...setupPatch }, key === "badgeSymbols" ? ["badgeSymbols"] : []);
   applySettings();
+  if (key === "profileSignatureBoard" && profileWorkspace?.currentSlide()?.id === "signature") profileWorkspace.renderSlide({animate: false});
   if (key === "reviewMode") { paintBoard(); renderReview(); fitViewport(); }
   if (design?.panel.startsWith('accuracy')) { statsRefs = null; hideQTip(); renderStats(); if(key==='accuracyDesign')reflowAccuracy(accuracyLayoutExpanded()); }
   if (key === 'movesDesign') updateMovesDesign();

@@ -334,6 +334,102 @@
 .pv-diff-track .pv-diff-you { left: var(--you); }
 .pv-diff-track .pv-diff-typical { left: var(--typical); }
 .pv-diff-track .pv-diff-link { left: min(var(--you), var(--typical)); width: calc(max(var(--you), var(--typical)) - min(var(--you), var(--typical))); height: 100%; translate: 0 -50%; background: color-mix(in srgb, var(--pv-c, var(--accent)) 55%, var(--typical-dot)); }
+
+/* Playstyle comparisons on the board's files, ranks and quadrants. */
+.pv-signature-chart {
+  container-type: inline-size;
+  --sig-you: color-mix(in oklab, var(--pv-c, var(--accent)) 68%, var(--ink));
+  --sig-rule: color-mix(in srgb, var(--ink) 27%, transparent);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+.pv-signature-chart.pv-dim::before { background: color-mix(in srgb, var(--bg) 83%, transparent); }
+.pv-sig-you { color: var(--sig-you); }
+.pv-sig-typical { color: var(--ink-2); }
+.pv-sig-key {
+  inset: 0 0 auto;
+  height: 12.5%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding-inline: 7%;
+  border-bottom: 1px solid var(--sig-rule);
+  color: var(--ink-2);
+  font-size: clamp(7px, 2.62cqw, 16px);
+  font-weight: 700;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+}
+.pv-sig-key b { color: var(--ink); }
+.pv-signature-centered .pv-sig-key span:last-child { justify-self: end; }
+.pv-sig-centerline { inset: 12.5% auto 0 50%; border-left: 1px dashed var(--sig-rule); }
+.pv-sig-rows, .pv-sig-cards { margin: 0; padding: 0; list-style: none; display: grid; font-size: clamp(9px, 3.45cqw, 21px); }
+.pv-sig-rows { inset: 12.5% 0 0; grid-auto-rows: 1fr; }
+.pv-sig-row {
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  gap: .55em;
+  padding-inline: 7%;
+  border-bottom: 1px solid var(--sig-rule);
+}
+.pv-sig-row:last-child { border-bottom: 0; }
+.pv-sig-heading { display: flex; align-items: baseline; justify-content: space-between; gap: .45em; }
+.pv-sig-heading strong { font-weight: 750; }
+.pv-sig-gap { font-size: .89em; font-weight: 800; white-space: nowrap; }
+.pv-sig-track { position: relative; height: .52em; background: var(--sig-rule); border-radius: 1em; }
+.pv-sig-link {
+  position: absolute;
+  inset: 0 auto 0 min(var(--you), var(--typical));
+  width: calc(max(var(--you), var(--typical)) - min(var(--you), var(--typical)));
+  border-radius: inherit;
+  background: var(--sig-you);
+}
+.pv-sig-dot {
+  position: absolute;
+  top: 50%; left: var(--you);
+  width: .72em; aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: var(--sig-you);
+  box-shadow: 0 0 0 2px var(--panel);
+}
+.pv-sig-values { display: flex; gap: 1em; font-size: .84em; }
+.pv-sig-values > span { white-space: nowrap; }
+.pv-sig-value-label { font-weight: 650; }
+
+.pv-signature-pieces .pv-sig-key { display: flex; justify-content: center; gap: 2em; }
+.pv-signature-pieces .pv-sig-key span { display: flex; align-items: center; gap: .3em; }
+.pv-sig-knight { font: normal 1.7em/1 'Segoe UI Symbol', 'DejaVu Sans', sans-serif; }
+.pv-signature-pieces .pv-sig-row { gap: .2em; }
+.pv-signature-pieces .pv-sig-track { height: 2.2em; background: none; margin-inline: .55em; }
+.pv-signature-pieces .pv-sig-track::before, .pv-signature-pieces .pv-sig-link {
+  position: absolute; top: 50%; bottom: auto; height: 2px; border-radius: 2px; translate: 0 -50%;
+}
+.pv-signature-pieces .pv-sig-track::before { content: ''; inset-inline: 0; background: var(--sig-rule); }
+.pv-signature-pieces .pv-sig-track .pv-sig-knight { position: absolute; translate: -50% -50%; }
+.pv-sig-track .pv-sig-knight.pv-sig-typical { top: 25%; left: var(--typical); }
+.pv-sig-track .pv-sig-knight.pv-sig-you { top: 75%; left: var(--you); }
+
+.pv-sig-cards { inset: 0; grid-template: repeat(2, minmax(0, 1fr)) / repeat(2, minmax(0, 1fr)); gap: 3%; padding: 4%; }
+.pv-sig-card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  justify-items: start;
+  gap: .4em;
+  padding: 9%;
+  border: 1px solid var(--sig-rule);
+  border-radius: .65em;
+  background: linear-gradient(145deg, color-mix(in oklab, var(--panel) 89%, var(--sig-you)), color-mix(in srgb, var(--panel) 85%, transparent));
+}
+.pv-sig-card-piece { width: clamp(20px, 9.2cqw, 58px); aspect-ratio: 1; object-fit: contain; }
+.pv-sig-card strong { align-self: center; font-size: 1.16em; font-weight: 750; text-wrap: balance; }
+.pv-sig-card .pv-sig-values { width: 100%; gap: .8em; padding-top: .5em; border-top: 1px solid var(--sig-rule); }
+.pv-sig-card .pv-sig-values > span { display: grid; gap: .15em; }
+.pv-sig-card .pv-sig-value-label { font-size: .86em; }
+.pv-sig-card .pv-sig-values b { font-size: 1.22em; }
+
 .pv-bubble { display: grid; place-items: center; pointer-events: auto; }
 /* A fixed-size disc scaled by --s: scaling is composited, so resizing never re-lays out (no shimmer). */
 .pv-bubble::before { content: ""; width: 82%; aspect-ratio: 1; scale: var(--s, 0); border-radius: 50%; background: var(--c); box-shadow: 0 0 18px -6px var(--c); animation: pv-pop .45s cubic-bezier(.2,.9,.25,1.2) var(--d, 0ms) both; }

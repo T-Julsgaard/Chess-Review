@@ -138,6 +138,16 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.deepEqual([...w.viz.layer.querySelectorAll('.pv-diff-row strong')].map(n => n.textContent), signature.signatures.slice(0, 4).map(s => s.label), 'the board highlights the strongest habits');
   assert.equal(w.viz.layer.querySelectorAll('.pv-diff-row').length, 4);
   assert.ok(w.viz.layer.querySelector('.pv-diff-gap'));
+  const labels = signature.signatures.slice(0, 4).map(s => s.label);
+  for (const [setting, mark] of [['centered', '.pv-sig-dot'], ['pieces', '.pv-sig-track .pv-sig-knight.pv-sig-you'], ['cards', '.pv-sig-card-piece']]) {
+    await a.call('setSetting', 'profileSignatureBoard', setting);
+    assert.equal(a.store.settings.profileSignatureBoard, setting, 'the chart choice is saved');
+    const layer = w.viz.layer;
+    assert.equal(layer.dataset.scene, `signature-${setting}`, 'the active chapter redraws immediately');
+    assert.equal(layer.querySelectorAll(mark).length, 4);
+    assert.deepEqual([...layer.querySelectorAll('li strong')].map(n => n.textContent), labels);
+    assert.equal(layer.querySelectorAll('.pv-sig-values b').length, 8, 'both values are shown for every habit');
+  }
   a.state.settings.profileSignatureBoard = 'compare'; w.renderSlide({animate: false});
   assert.ok(doc.querySelector('.board .pv-pairs'), 'the original paired columns are still available');
   a.state.settings.profileSignatureBoard = 'heat'; w.renderSlide({animate: false});
@@ -480,6 +490,8 @@ test('profile settings keep Story even with a saved legacy design', async t => {
   assert.ok(text.includes('Player profile'));
   assert.equal(doc.querySelector('#settings [data-setting="profileDesign"]'), null);
   for (const setting of ['profilePortraitStyle', 'profileSignatureBoard']) assert.ok(doc.querySelector(`#settings .lib-dd-btn[data-setting="${setting}"]`), setting);
+  const charts = [...doc.querySelectorAll('#settings [role="option"][data-setting="profileSignatureBoard"]')];
+  assert.deepEqual(charts.map(chart => chart.dataset.value), ['differences', 'centered', 'pieces', 'cards', 'compare', 'heat']);
   a.state.settings.profileDesign = 'bento';
   const w = await openDeck(a);
   assert.ok(w instanceof StoryWorkspace);
