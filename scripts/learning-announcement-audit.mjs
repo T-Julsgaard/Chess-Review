@@ -69,9 +69,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     assert.equal(await run("!!document.querySelector('.learning-announcement')"), false, message);
   };
 
-  // A new installation picks its language first; the intro follows.
-  await waitFor(review, "!!document.querySelector('.lang-confirm, .learning-announcement')", 'Language picker');
-  await run("document.querySelector('.lang-confirm')?.click()");
+  // A new installation opens in English with no language prompt; the intro shows first.
   await waitFor(review, "!!document.querySelector('.learning-announcement')", 'First-open intro');
   await call('Emulation.setEmulatedMedia', {features:[{name:'prefers-reduced-motion',value:'no-preference'}]}, review.sessionId);
   // Laptop and desktop viewports, plus a narrow ~500 px window.

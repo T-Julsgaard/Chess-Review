@@ -33,8 +33,7 @@ import { identityForGame, knownAccounts, IDENTITY_KEY } from "./lib/identity.js"
 import { loadProfileWorkspace, loadProfileStory } from "./lib/profile-loader.js";
 import { createReviewEffects } from "./lib/review-effects.js";
 import { explainMove, explanationPv } from "./lib/move-explanation.js";
-import { createTranslator, LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, isSupportedLanguage, suggestLanguage, browserLanguages } from "./lib/i18n/index.js";
-import { openLanguagePicker } from "./lib/i18n/language-picker.js";
+import { createTranslator, loadLanguage, LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, isSupportedLanguage } from "./lib/i18n/index.js";
 
 const reviewEffects = createReviewEffects(document);
 
@@ -860,7 +859,7 @@ const S = {
   layout: structuredClone(DEFAULT_LAYOUT), layoutMode: "auto",
   evalEngines: [], autoTimer: null,
   // Re-analysis + analysis mode
-  batchGen: 0, settingsTab: "visual", analyzedMultipv: null,
+  batchGen: 0, settingsTab: "language", analyzedMultipv: null,
   analysisMode: false, variation: null, liveEngine: null, liveEnginePromise: null, liveEngineGeneration: 0, liveError: null, liveToken: 0, panelToken: 0, _panelCache: null, selectedSq: null,
   // The build that is ACTUALLY running (set by createEngine; may differ from settings.enginePath if
   // the chosen build failed to load and we fell back). The Engine tab shows this, not the selection.
@@ -7039,9 +7038,10 @@ function languageOptionKey(event) {
   chooseUiLanguage(ids[next]);
 }
 // Switch the interface language in place. Nothing is reloaded, so the current
-// game, analysis, layout and open panels stay exactly as they are.
+// game, analysis, layout and open panels stay exactly as they are. A language
+// whose catalog is not loaded (see loadUiLanguage) shows English.
 function applyUiLanguage(id) {
-  const next = isSupportedLanguage(id) ? id : DEFAULT_LANGUAGE;
+  const next = isSupportedLanguage(id) ? createTranslator(id).language : DEFAULT_LANGUAGE;
   if (next === i18n.language) return false;
   const focusedLanguage = document.activeElement?.closest?.(".set-language-option");
   i18n = createTranslator(next);
@@ -7053,42 +7053,33 @@ function applyUiLanguage(id) {
   }
   return true;
 }
+// Loads the catalog, then switches. Resolves false (and stays English) when the
+// catalog cannot be loaded; it never throws, so startup always continues.
+// Only the latest request applies when choices arrive faster than catalogs load.
+let uiLanguageRequest = 0;
+async function loadUiLanguage(id) {
+  const request = ++uiLanguageRequest;
+  const loaded = isSupportedLanguage(id) && await loadLanguage(id);
+  if (request === uiLanguageRequest) applyUiLanguage(loaded ? id : DEFAULT_LANGUAGE);
+  return loaded;
+}
 async function chooseUiLanguage(id) {
   if (!isSupportedLanguage(id)) return;
-  applyUiLanguage(id);
+  if (!await loadUiLanguage(id)) return;
   try { await browserAPI.storage.local.set({ [LANGUAGE_STORAGE_KEY]: id }); }
   catch (error) { console.warn("[Chess Review] language choice could not be saved:", error); }
 }
-// First use (no saved choice): ask once per visit until the user confirms. The
-// workspace underneath — and whatever game it was opening — stays loaded.
-let languagePicker = null, afterLanguagePicker = null;
-function offerLanguageChoice(after = () => {}) {
-  if (languagePicker?.open) return languagePicker;
-  afterLanguagePicker = after;
-  const finish = () => { languagePicker = null; const next = afterLanguagePicker; afterLanguagePicker = null; next?.(); };
-  languagePicker = openLanguagePicker({
-    document,
-    suggested: suggestLanguage(browserLanguages(navigator)),
-    inertTarget: () => document.querySelector(".app"),
-    onConfirm: async id => { await chooseUiLanguage(id); finish(); },
-    onDismiss: finish,
-  });
-  return languagePicker;
-}
-// Another tab saved a language: follow it here and drop a pending picker.
+// Another tab saved a language: follow it here.
 function languageStorageChanged(changes, area) {
   if (area && area !== "local") return;
   const change = changes?.[LANGUAGE_STORAGE_KEY];
   if (!change || !isSupportedLanguage(change.newValue)) return;
-  applyUiLanguage(change.newValue);
-  if (languagePicker?.open) {
-    languagePicker.close();
-    languagePicker = null;
-    const next = afterLanguagePicker; afterLanguagePicker = null; next?.();
-  }
+  return loadUiLanguage(change.newValue);
 }
+// Language comes first and is where Settings opens each time the workspace loads,
+// so someone who does not read English finds it straight away.
 const SETTINGS_CATEGORIES = [
-  {id:"language", label:"Language", description:LANGUAGES.map(language => language.nativeName).join(" · "), icon:"globe", render:languageSettings},
+  {id:"language", label:"Language", description:"Choose your language", icon:"globe", render:languageSettings},
   {id:"visual", label:"Visual", description:"Make the workspace yours", icon:"palette", render:visualSettings},
   {id:"review", label:"Review & Coach", description:"Commentary, character & reactions", icon:"chat", render:reviewSettings},
   {id:"engine", label:"Engine", description:"Analysis power & rating estimates", icon:"cpu", render:motorSettings},
@@ -8885,9 +8876,10 @@ async function showReadyWorkspace() {
     const dataReady = blankLaunch&&!location.hash&&!screenPreview ? Promise.resolve()
       : Promise.all([loadBook(), loadCalibration().catch(error => {console.warn(error);return null;})]);
     const [payload, store] = await Promise.all([loadJob(), browserAPI.storage.local.get(["settings", "username", "layout", "layoutMode", "layoutVersion", "library", LANGUAGE_STORAGE_KEY])]);
-    // Screen previews show the saved language but never ask for one.
+    // English unless the person chose another language in Settings → Language.
+    // The browser's language is never used to guess one.
     const savedLanguage = isSupportedLanguage(store[LANGUAGE_STORAGE_KEY]) ? store[LANGUAGE_STORAGE_KEY] : null;
-    if (savedLanguage) applyUiLanguage(savedLanguage);
+    if (savedLanguage && savedLanguage !== DEFAULT_LANGUAGE) await loadUiLanguage(savedLanguage);
     if (!screenPreview) browserAPI.storage.onChanged?.addListener(languageStorageChanged);
     S.library = Array.isArray(store.library) ? store.library : [];
     S.settings = { ...DEFAULT_SETTINGS, ...(store.settings || {}) };
@@ -8999,13 +8991,8 @@ async function showReadyWorkspace() {
     if (jobId && rememberReviewJob()) {
       await browserAPI.storage.local.remove(`job:${jobId}`);
     }
-    if (!screenPreview) {
-      // The puzzles announcement waits until the language picker has closed.
-      const announce = () => { learningAnnouncement = mountLearningAnnouncement({document, storage:browserAPI.storage.local,
-        motion:()=>S.settings.uiAnim!==false}); };
-      if (savedLanguage) announce();
-      else offerLanguageChoice(announce);
-    }
+    if (!screenPreview) learningAnnouncement = mountLearningAnnouncement({document, storage:browserAPI.storage.local,
+      motion:()=>S.settings.uiAnim!==false});
     if(screenPreview?.viewport){
       if(!S.blank&&Number.isInteger(screenPreview.idx))go(screenPreview.idx);
       document.body.dataset.previewReady="true";

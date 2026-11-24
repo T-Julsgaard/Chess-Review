@@ -11,8 +11,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     const {data} = await call('Page.captureScreenshot', {format: 'png'}, review.sessionId);
     await fs.writeFile(path.join(out, name + '.png'), Buffer.from(data, 'base64'));
   };
-  await run("document.querySelector('.lang-later')?.click()");
-  assert.equal(await run("!!document.querySelector('.lang-overlay')"), false, 'First-use dialog is dismissed for visual QA');
+  assert.equal(await run("!!document.querySelector('.lang-overlay')"), false, 'No first-use language prompt');
   const rows = season();
   await run(`import('./browser-compat.js').then(({browserAPI})=>browserAPI.storage.local.set(${JSON.stringify({[rowsKey('chesscom', 'tester')]: {rows, months: [], since: 0, updatedAt: Date.now()}})}))`);
   await run(`import('./analysis.js').then(async m=>{m.S.settings.uiAnim=true;m.S.settings.pieceStyle='merida';m.S.settings.profileDepth='off';m.S.settings.profilePortraitStyle='assemble';document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));await m.openProfile();const w=m.profileWorkspace;w.account='tester';w.renderHead();await w.load();w.go(w.deck.findIndex(s=>s.id==='twin'));})`);

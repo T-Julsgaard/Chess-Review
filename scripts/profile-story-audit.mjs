@@ -7,7 +7,7 @@ import {rowsKey} from '../lib/profile/store.js';
 export async function auditLearning({review, call, evaluate, waitFor, sleep, out, settingsOnly = false}) {
   const run = code => evaluate(review, code);
   const rows = season().map((row, i) => ({...row, rated: i % 5 !== 0}));
-  await run("document.querySelector('.lang-confirm')?.click();document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
+  await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   await run(`import('./browser-compat.js').then(({browserAPI})=>browserAPI.storage.local.set(${JSON.stringify({[rowsKey('chesscom', 'tester')]: {rows, months: [], since: 0, updatedAt: Date.now()}})}))`);
   await run(`import('./analysis.js').then(async m=>{m.S.settings.profileDepth='off';m.S.settings.uiAnim=true;await m.openProfile();window.w=m.profileWorkspace;w.account='tester';await w.load();})`);
   await waitFor(review, "document.querySelector('.pv-story')?.dataset.slide==='cover'", 'Story cover');

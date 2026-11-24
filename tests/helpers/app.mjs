@@ -31,8 +31,7 @@ import {ProfileWorkspace} from '../../lib/profile/workspace.js';
 import {StoryWorkspace} from '../../lib/profile/designs/story.js';
 import {createReviewEffects} from '../../lib/review-effects.js';
 import {explainMove, explanationPv} from '../../lib/move-explanation.js';
-import {createTranslator, LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, isSupportedLanguage, suggestLanguage, browserLanguages} from '../../lib/i18n/index.js';
-import {openLanguagePicker} from '../../lib/i18n/language-picker.js';
+import {createTranslator, loadLanguage, LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, isSupportedLanguage} from '../../lib/i18n/index.js';
 
 // Execute the real application in a DOM, stubbing only browser/engine boundaries.
 // Automatic startup and imports are omitted; production needs no test exports.
@@ -41,9 +40,11 @@ const startup = raw.indexOf('(async function main()');
 if (startup < 0) throw Error('Application startup marker missing');
 const source = raw.slice(0, startup).replace(/^import .*;\r?\n/gm, '');
 
-// languages: the browser's ordered preferences. savedLanguage: the stored choice;
-// null leaves it unset, as for a new or existing user who has not chosen yet.
-export function app(t, {hardware,languages=['en-US'],savedLanguage='en',url='https://extension.test/analysis.html#test-game',html='<!doctype html><div id="root"></div>'} = {}) {
+// languages: the browser's ordered preferences (never used to pick a language).
+// savedLanguage: the stored choice; null leaves it unset, as for a new user.
+// settingsTab: the category Settings opens on. The app opens on Language; most
+// suites exercise the Visual controls, so they start there. null keeps the app's own.
+export function app(t, {hardware,languages=['en-US'],savedLanguage='en',settingsTab='visual',url='https://extension.test/analysis.html#test-game',html='<!doctype html><div id="root"></div>'} = {}) {
   const dom = new JSDOM(html, { url, pretendToBeVisual: true });
   Object.defineProperties(dom.window.navigator, {
     language: {configurable:true,value:languages[0]},
@@ -63,7 +64,7 @@ export function app(t, {hardware,languages=['en-US'],savedLanguage='en',url='htt
     } },
   };
   const context = vm.createContext({
-    createTranslator, LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, isSupportedLanguage, suggestLanguage, browserLanguages, openLanguagePicker,
+    createTranslator, loadLanguage, LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, isSupportedLanguage,
     window: dom.window, document: dom.window.document, navigator: dom.window.navigator, LearningWorkspace,
     loadLearningWorkspace:async () => ({LearningWorkspace}), presentationFor, mountLearningAnnouncement,
     panelScale,panelGroupBounds,scalePanelGroup,movePanelGroup,fullHdReferenceLayout,viewportGrowth,UI_SETUPS,MODERN_LAYOUT,
@@ -90,6 +91,7 @@ export function app(t, {hardware,languages=['en-US'],savedLanguage='en',url='htt
   vm.runInContext(source, context, { filename: 'analysis.js' });
   const run = code => vm.runInContext(code, context);
   const state = run('S');
+  if (settingsTab) state.settingsTab = settingsTab;
   Object.assign(state.settings, { sound: false, moveAnim: false, uiAnim: false, coach: '', showThreat: false, engineDepth: 4 });
   context.__publicCalibration = JSON.parse(fs.readFileSync(new URL('../../data/calibration.json', import.meta.url), 'utf8'));
   run('BOOK = {}; CALIB = { ...__publicCalibration, quality: { ...__publicCalibration.quality, outcome: { ...__publicCalibration.quality.outcome, slopePerPawn: 0.3 } } };');

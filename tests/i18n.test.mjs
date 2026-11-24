@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {app, loadGame, settle} from './helpers/app.mjs';
 import {settingsStrings} from './helpers/settings-text.mjs';
-import {LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, createTranslator, matchLanguage, suggestLanguage, browserLanguages} from '../lib/i18n/index.js';
+import {LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, createTranslator, loadLanguage, isLanguageLoaded} from '../lib/i18n/index.js';
 import en from '../lib/i18n/messages/en.js';
 import zhHans from '../lib/i18n/messages/zh-Hans.js';
 import {MOVE_GRADE_CONFIG} from '../move-grades.js';
@@ -11,10 +11,14 @@ import {MOVE_GRADE_CONFIG} from '../move-grades.js';
 const html = fs.readFileSync(new URL('../analysis.html', import.meta.url), 'utf8');
 const css = fs.readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
 const GRADE_NAMES = ['Brilliant', 'Great', 'Best', 'Excellent', 'Good', 'Book', 'Inaccuracy', 'Mistake', 'Miss', 'Blunder'];
+const OTHERS = LANGUAGES.filter(language => language.id !== DEFAULT_LANGUAGE);
+const catalogOf = async id => (await import(`../lib/i18n/messages/${id}.js`)).default;
+const placeholders = text => [...text.matchAll(/\{\d+\}/g)].map(match => match[0]).sort().join();
 
 // Real startup through main(), as the toolbar, in-page button and shortcut all open it.
+// settingsTab: null keeps the category the app itself opens Settings on.
 function startup(t, {languages = ['en-US'], savedLanguage = null, url = 'https://extension.test/analysis.html#test-game'} = {}) {
-  const a = app(t, {html, url, languages, savedLanguage});
+  const a = app(t, {html, url, languages, savedLanguage, settingsTab: null});
   const style = a.dom.window.document.createElement('style'); style.textContent = css; a.dom.window.document.head.append(style);
   a.context.requestAnimationFrame = fn => { queueMicrotask(fn); return 0; };
   for (const name of ['resetSettingsForRelease', 'loadBook', 'loadCalibration', 'initTabZoom']) a.replace(name, async () => {});
@@ -25,61 +29,88 @@ function startup(t, {languages = ['en-US'], savedLanguage = null, url = 'https:/
   a.context.mountLearningAnnouncement = () => { a.announcements++; return {close() {}, dispose() {}}; };
   return a;
 }
-const key = (a, name, init = {}) => {
-  const event = new a.dom.window.KeyboardEvent('keydown', {key: name, bubbles: true, cancelable: true, ...init});
-  (a.dom.window.document.activeElement || a.dom.window.document.body).dispatchEvent(event);
-  return event;
-};
-const picker = a => a.dom.window.document.querySelector('.lang-card');
-const option = (a, id) => a.dom.window.document.querySelector(`.lang-option[data-language="${id}"]`);
+const toggleLabel = a => a.dom.window.document.querySelector('[data-settings-toggle]').getAttribute('aria-label');
+const categoryName = a => a.dom.window.document.querySelector('.set-category-name').textContent;
 
-test('browser languages resolve by language and script, in preference order, with English as fallback', () => {
-  for (const tag of ['en', 'en-US', 'en-GB', 'EN_au']) assert.equal(matchLanguage(tag), 'en', tag);
-  for (const tag of ['zh', 'zh-CN', 'zh-SG', 'zh-Hans', 'zh-Hans-HK', 'zh_CN', 'zh-hans-cn']) assert.equal(matchLanguage(tag), 'zh-Hans', tag);
-  for (const tag of ['zh-TW', 'zh-HK', 'zh-MO', 'zh-Hant', 'zh-Hant-CN', 'fr', 'ja-JP', '', ' ', '!!', null, undefined, 42])
-    assert.equal(matchLanguage(tag), null, String(tag));
-  assert.equal(suggestLanguage(['fr-FR', 'zh-CN', 'en']), 'zh-Hans');
-  assert.equal(suggestLanguage(['en-US', 'zh-CN']), 'en');
-  assert.equal(suggestLanguage(['zh-TW', 'zh-CN']), 'zh-Hans', 'Traditional is skipped, not mapped to Simplified');
-  assert.equal(suggestLanguage(['zh-TW', 'fr']), 'en');
-  assert.equal(suggestLanguage([]), 'en');
-  assert.deepEqual(browserLanguages({languages: ['de', 'zh-CN'], language: 'de'}), ['de', 'zh-CN']);
-  assert.deepEqual(browserLanguages({languages: [], language: 'zh-SG'}), ['zh-SG']);
-  assert.deepEqual(browserLanguages({}), []);
-});
-
-test('script matching still works where Intl.Locale is unavailable', t => {
-  const Locale = Intl.Locale;
-  Intl.Locale = class { constructor() { throw TypeError('unsupported'); } };
-  t.after(() => { Intl.Locale = Locale; });
-  assert.equal(matchLanguage('zh'), 'zh-Hans');
-  assert.equal(matchLanguage('zh-SG'), 'zh-Hans');
-  assert.equal(matchLanguage('zh_Hans_HK'), 'zh-Hans');
-  for (const tag of ['zh-TW', 'zh-HK', 'zh-Hant', 'zh-Hant-CN']) assert.equal(matchLanguage(tag), null, tag);
-  assert.equal(matchLanguage('en-US'), 'en');
-});
-
-test('every language has a native name, a bundled flag and every stable message', () => {
+test('English and the fifteen other languages each have a native name, a bundled flag and English fallbacks', async () => {
   assert.equal(DEFAULT_LANGUAGE, 'en');
   assert.equal(LANGUAGE_STORAGE_KEY, 'language');
-  assert.equal(new Set(LANGUAGES.map(language => language.id)).size, LANGUAGES.length);
+  assert.deepEqual(LANGUAGES.map(language => language.id),
+    ['en', 'pt-BR', 'es', 'ru', 'tr', 'id', 'fr', 'it', 'vi', 'de', 'pl', 'uk', 'ar', 'hi', 'zh-Hans', 'da']);
+  assert.deepEqual(LANGUAGES.map(language => language.flag),
+    ['GB', 'BR', 'ES', 'RU', 'TR', 'ID', 'FR', 'IT', 'VN', 'DE', 'PL', 'UA', 'SA', 'IN', 'CN', 'DK']);
   for (const language of LANGUAGES) {
     assert.ok(language.nativeName.trim(), language.id);
     assert.ok(fs.existsSync(new URL(`../flags/${language.flag}.svg`, import.meta.url)), language.flag);
+    assert.ok(en.messages['language.name.' + language.id], `English name for ${language.id}`);
+    assert.equal(await loadLanguage(language.id), true, language.id);
     const translator = createTranslator(language.id);
     assert.equal(translator.language, language.id);
     for (const id of Object.keys(en.messages)) assert.notEqual(translator.t(id), id, `${language.id} ${id}`);
   }
-  for (const id of Object.keys(en.messages)) assert.ok(Object.hasOwn(zhHans.messages, id), `zh-Hans lacks ${id}`);
-  for (const id of Object.keys(zhHans.messages)) assert.ok(Object.hasOwn(en.messages, id), `zh-Hans has unknown ${id}`);
+});
+
+test('every catalog translates the same entries as Simplified Chinese, with matching placeholders and no move grades', async () => {
+  // zh-Hans is checked against the live settings panel below, so the same keys
+  // mean every other language covers the whole panel too.
+  const textKeys = Object.keys(zhHans.text).sort();
+  for (const {id} of OTHERS) {
+    const catalog = await catalogOf(id);
+    assert.deepEqual(Object.keys(catalog.messages).sort(), Object.keys(en.messages).sort(), `${id} messages`);
+    assert.deepEqual(Object.keys(catalog.text).sort(), textKeys, `${id} text`);
+    assert.deepEqual(Object.keys(catalog.context), Object.keys(zhHans.context), `${id} contexts`);
+    for (const [name, table] of Object.entries(zhHans.context))
+      assert.deepEqual(Object.keys(catalog.context[name]).sort(), Object.keys(table).sort(), `${id} ${name}`);
+    const entries = [...Object.entries(catalog.messages).map(([key, value]) => [en.messages[key], value]),
+      ...Object.entries(catalog.text), ...Object.values(catalog.context).flatMap(table => Object.entries(table))];
+    for (const [source, value] of entries) {
+      assert.equal(typeof value, 'string', `${id}: ${source}`);
+      assert.ok(value.trim(), `${id}: ${source} is empty`);
+      assert.equal(placeholders(value), placeholders(source), `${id}: ${source} → ${value}`);
+    }
+    for (const grade of GRADE_NAMES) assert.ok(!Object.hasOwn(catalog.text, grade), `${id} translates ${grade}`);
+  }
   // Common Traditional-only forms must not slip into the Simplified catalog.
   for (const value of [...Object.values(zhHans.messages), ...Object.values(zhHans.text)])
     assert.doesNotMatch(value, /[發後點與學說這們會開關設語選擇對]/, value);
 });
 
-test('missing translations fall back to English and placeholders, context and whitespace are handled', () => {
-  const zh = createTranslator('zh-Hans'), english = createTranslator('en'), unsupported = createTranslator('fr');
-  assert.equal(unsupported.language, 'en');
+test('a catalog that is missing or broken leaves the interface in English and never throws', async t => {
+  const warn = console.warn, warnings = [];
+  console.warn = (...args) => warnings.push(args);
+  t.after(() => { console.warn = warn; });
+  assert.equal(await loadLanguage('xx'), false, 'Unknown languages are refused');
+  assert.equal(createTranslator('xx').language, 'en');
+  const english = createTranslator('en');
+  assert.equal(english.text('Reset layout'), 'Reset layout');
+  assert.equal(english.localize(null), null);
+  // Simulate failures through the loader's importer, for a fresh module instance
+  // so no catalog is loaded yet.
+  const fresh = await import(`../lib/i18n/index.js?broken=${Date.now()}`);
+  for (const importer of [() => Promise.reject(Error('file missing')), () => { throw SyntaxError('bad file'); },
+    async () => ({}), async () => ({default: 'nonsense'})]) {
+    assert.equal(await fresh.loadLanguage('fr', importer), false);
+    assert.equal(fresh.isLanguageLoaded('fr'), false);
+    const translator = fresh.createTranslator('fr');
+    assert.equal(translator.language, 'en');
+    assert.equal(translator.text('Reset layout'), 'Reset layout');
+    assert.equal(translator.t('language.settings.title'), 'Language');
+  }
+  assert.equal(warnings.length, 4, 'Each failure is reported once');
+  // Malformed entries are dropped; the rest of the catalog still works.
+  assert.equal(await fresh.loadLanguage('de', async () => ({default: {messages: {'language.settings.title': 7},
+    text: {'Reset layout': 'Layout zurücksetzen', 'Export': '', 'Import': null}, context: 'x'}})), true);
+  const de = fresh.createTranslator('de');
+  assert.equal(de.text('Reset layout'), 'Layout zurücksetzen');
+  assert.equal(de.text('Export'), 'Export');
+  assert.equal(de.text('Import'), 'Import');
+  assert.equal(de.t('language.settings.title'), 'Language');
+  assert.equal(isLanguageLoaded('en'), true);
+});
+
+test('missing translations fall back to English and placeholders, context and whitespace are handled', async () => {
+  await loadLanguage('zh-Hans');
+  const zh = createTranslator('zh-Hans'), english = createTranslator('en');
   assert.equal(zh.text('A sentence nobody translated'), 'A sentence nobody translated');
   assert.equal(zh.t('no.such.message'), 'no.such.message');
   assert.equal(english.text('Reset layout'), 'Reset layout');
@@ -91,25 +122,30 @@ test('missing translations fall back to English and placeholders, context and wh
   assert.equal(zh.text('Best, score 9'), 'Best，评分 9');
   assert.equal(zh.text('Blunder badge: Check'), 'Blunder 徽标：将军');
   assert.equal(zh.text('Blunder badge: Check', 'badge-symbol'), 'Blunder 徽标：对勾');
-  assert.equal(zh.text('Check'), '将军');
   assert.equal(zh.text('Check', 'badge-symbol'), '对勾');
   assert.equal(zh.text('05 · Weighted Snap'), '05 · 厚重咔嗒');
-  assert.equal(zh.text('?! · Dubious'), '?! · 存疑');
   assert.equal(zh.text('Sound 04'), '音效 04');
   assert.equal(zh.text('+3 st'), '+3 半音');
   assert.equal(zh.format('Preview {0} effect', 'Brilliant'), '预览 Brilliant 特效');
+  await loadLanguage('fr');
+  const fr = createTranslator('fr');
+  assert.equal(fr.text('Move sound'), 'Son : Coup');
+  assert.equal(fr.text('Check'), 'Échec');
+  assert.equal(fr.text('Check', 'badge-symbol'), 'Coche');
+  assert.equal(fr.text('Dark', 'board-squares'), 'Cases foncées');
 });
 
-test('move grade names are never translated', () => {
-  const zh = createTranslator('zh-Hans');
+test('move grade names are never translated', async () => {
   const names = new Set([...GRADE_NAMES, ...Object.values(MOVE_GRADE_CONFIG).map(config => config.label).filter(Boolean)]);
-  for (const name of names) {
-    assert.equal(zh.text(name), name, name);
-    assert.ok(!Object.hasOwn(zhHans.text, name), `${name} must stay English`);
+  for (const {id} of OTHERS) {
+    await loadLanguage(id);
+    const translator = createTranslator(id);
+    for (const name of names) assert.equal(translator.text(name), name, `${id} ${name}`);
   }
 });
 
-test('localize translates text and labels but leaves translate="no" content alone', t => {
+test('localize translates text and labels but leaves translate="no" content alone', async t => {
+  await loadLanguage('zh-Hans');
   const a = app(t), doc = a.dom.window.document, zh = createTranslator('zh-Hans');
   const root = doc.createElement('div');
   root.innerHTML = '<button title="Reset layout" aria-label="Move sound">Reset layout</button>'
@@ -127,6 +163,7 @@ test('localize translates text and labels but leaves translate="no" content alon
 });
 
 test('Simplified Chinese settings are complete apart from names, move grades and units', async t => {
+  await loadLanguage('zh-Hans');
   const coachNames = app(t).run('COACH_LIST').map(([, name]) => name);
   const fontNames = Object.values(app(t).run('BADGE_FONTS')).map(font => font.name);
   const english = new Set([...GRADE_NAMES, ...coachNames, ...fontNames, 'Cburnett', 'Merida', 'Lichess', 'Stockfish 18 NNUE', 'Stockfish 19 Lite']);
@@ -148,133 +185,83 @@ test('Simplified Chinese settings are complete apart from names, move grades and
   }
 });
 
-test('first use shows the picker over the opened game, suggests the browser language and saves only a confirmed choice', async t => {
-  const a = startup(t, {languages: ['fr-FR', 'zh-CN', 'en-US']}), doc = a.dom.window.document;
-  await a.start();
-  const card = picker(a);
-  assert.ok(card, 'Picker shown on first use');
-  assert.equal(card.getAttribute('role'), 'dialog');
-  assert.equal(card.getAttribute('aria-modal'), 'true');
-  assert.equal(card.lang, 'zh-Hans');
-  assert.equal(card.querySelector('.lang-title').textContent, '选择语言');
-  assert.equal(option(a, 'zh-Hans').getAttribute('aria-checked'), 'true');
-  assert.equal(option(a, 'zh-Hans').querySelector('.lang-badge').textContent, '推荐');
-  assert.equal(option(a, 'en').querySelector('.lang-badge').hidden, true);
-  assert.equal(option(a, 'en').querySelector('.lang-native').textContent, 'English');
-  assert.equal(option(a, 'en').querySelector('.lang-native').lang, 'en');
-  assert.equal(option(a, 'zh-Hans').querySelector('.lang-flag').getAttribute('src'), 'flags/CN.svg');
-  assert.equal(option(a, 'en').querySelector('.lang-flag').getAttribute('src'), 'flags/GB.svg');
-  assert.equal(option(a, 'en').querySelector('.lang-flag').alt, '', 'The flag is decoration; the name identifies the language');
-  assert.equal(doc.activeElement, option(a, 'zh-Hans'));
-  assert.equal(doc.querySelector('.app').inert, true);
-  assert.equal(a.announcements, 0, 'The puzzles announcement waits for the picker');
-  assert.equal(a.state.pgn, '1. e4 e5 2. Nf3', 'The game being opened is loaded underneath');
-  assert.equal(a.store[LANGUAGE_STORAGE_KEY], undefined, 'Nothing is saved before confirming');
-
-  // Highlighting English previews the picker in English; confirming saves it.
-  option(a, 'en').click();
-  assert.equal(card.lang, 'en');
-  assert.equal(card.querySelector('.lang-title').textContent, 'Choose your language');
-  assert.equal(option(a, 'zh-Hans').querySelector('.lang-alt').textContent, 'Simplified Chinese');
-  option(a, 'zh-Hans').click();
-  card.querySelector('.lang-confirm').click();
-  await settle();
-  assert.equal(a.store[LANGUAGE_STORAGE_KEY], 'zh-Hans');
-  assert.equal(picker(a), null);
-  assert.equal(doc.querySelector('.app').inert, false);
-  assert.equal(a.announcements, 1);
-  assert.equal(doc.querySelector('[data-settings-toggle]').getAttribute('aria-label'), '设置');
-  assert.equal(a.state.pgn, '1. e4 e5 2. Nf3');
-  a.call('toggleSettings');
-  assert.equal(doc.getElementById('settings').lang, 'zh-Hans');
-  assert.equal(doc.querySelector('.set-category-name').textContent, '外观');
-});
-
-test('closing without confirming saves nothing and the picker returns on the next visit', async t => {
-  const store = {};
-  for (const close of ['escape', 'later']) {
-    const a = startup(t, {languages: ['zh-TW', 'de-DE']}), doc = a.dom.window.document;
-    Object.assign(a.store, store);
-    await a.start();
-    assert.ok(picker(a), `Picker offered again (${close})`);
-    assert.equal(option(a, 'en').getAttribute('aria-checked'), 'true', 'Unsupported and Traditional locales suggest English');
-    assert.equal(option(a, 'en').querySelector('.lang-badge').textContent, 'Suggested');
-    if (close === 'escape') key(a, 'Escape'); else doc.querySelector('.lang-later').click();
-    await settle();
-    assert.equal(picker(a), null);
-    assert.equal(doc.querySelector('.app').inert, false);
-    assert.equal(a.announcements, 1);
-    assert.equal(Object.hasOwn(a.store, LANGUAGE_STORAGE_KEY), false);
+test('first use is English with no prompt, whatever the browser language, and Settings opens on Language', async t => {
+  for (const languages of [['zh-CN', 'en'], ['fr-FR'], ['de-DE', 'pt-BR'], ['en-US']]) {
+    const a = startup(t, {languages}), doc = a.dom.window.document;
+    await a.start(); await settle();
+    assert.equal(doc.querySelector('.lang-overlay, [role="dialog"][aria-modal="true"]'), null, `No prompt for ${languages}`);
+    assert.equal(a.announcements, 1, 'The intro tour is not held back');
+    assert.equal(a.state.pgn, '1. e4 e5 2. Nf3');
+    assert.equal(toggleLabel(a), 'Settings');
+    assert.equal(Object.hasOwn(a.store, LANGUAGE_STORAGE_KEY), false, 'Nothing is guessed or saved');
     assert.ok(!a.writes.some(write => Object.hasOwn(write, LANGUAGE_STORAGE_KEY)));
-    assert.equal(doc.querySelector('[data-settings-toggle]').getAttribute('aria-label'), 'Settings');
-    Object.assign(store, a.store);
+    a.call('toggleSettings');
+    assert.equal(a.state.settingsTab, 'language');
+    assert.equal(categoryName(a), 'Language');
+    assert.equal(doc.querySelectorAll('.set-language-option').length, LANGUAGES.length);
+    assert.equal(doc.querySelector('.set-language-option[aria-checked="true"]').dataset.language, 'en');
   }
 });
 
-test('picker keyboard: arrows choose, Tab stays inside, Enter confirms and keys never reach the board', async t => {
-  const a = startup(t, {languages: ['en-GB']}), doc = a.dom.window.document;
+test('Settings keeps the category chosen during a visit and opens on Language again after a reload', async t => {
+  const a = startup(t, {savedLanguage: 'en'}), doc = a.dom.window.document;
   await a.start();
-  const before = a.state.idx;
-  assert.equal(doc.activeElement, option(a, 'en'));
-  key(a, 'ArrowDown');
-  assert.equal(doc.activeElement, option(a, 'zh-Hans'));
-  assert.equal(picker(a).lang, 'zh-Hans');
-  key(a, 'ArrowDown');
-  assert.equal(doc.activeElement, option(a, 'en'), 'Arrows wrap');
-  key(a, 'End'); assert.equal(doc.activeElement, option(a, 'zh-Hans'));
-  key(a, 'Home'); assert.equal(doc.activeElement, option(a, 'en'));
-  key(a, 'ArrowLeft'); assert.equal(doc.activeElement, option(a, 'zh-Hans'));
-  assert.equal(a.state.idx, before, 'Arrow keys do not step through the game');
-  key(a, 'Tab'); assert.equal(doc.activeElement, doc.querySelector('.lang-later'));
-  key(a, 'Tab'); assert.equal(doc.activeElement, doc.querySelector('.lang-confirm'));
-  key(a, 'Tab'); assert.equal(doc.activeElement, option(a, 'zh-Hans'), 'Focus wraps to the chosen language');
-  key(a, 'Tab', {shiftKey: true}); assert.equal(doc.activeElement, doc.querySelector('.lang-confirm'));
-  option(a, 'zh-Hans').focus();
-  assert.equal(option(a, 'en').tabIndex, -1, 'One tab stop for the group');
-  key(a, 'Enter');
-  await settle();
-  assert.equal(picker(a), null);
-  assert.equal(a.store[LANGUAGE_STORAGE_KEY], 'zh-Hans');
-});
-
-test('a saved language applies at startup without asking again', async t => {
-  const a = startup(t, {languages: ['en-US'], savedLanguage: 'zh-Hans'}), doc = a.dom.window.document;
-  await a.start();
-  assert.equal(picker(a), null);
-  assert.equal(a.announcements, 1);
-  assert.equal(doc.querySelector('[data-settings-toggle]').getAttribute('aria-label'), '设置');
   a.call('toggleSettings');
-  assert.equal(doc.querySelector('.set-category-name').textContent, '外观');
+  assert.equal(categoryName(a), 'Language');
+  doc.querySelector('[data-category="engine"]').click();
+  a.call('toggleSettings'); a.call('toggleSettings');
+  assert.equal(doc.getElementById('settings').hidden, false);
+  assert.equal(categoryName(a), 'Engine', 'Closing and reopening Settings keeps the category');
+  const reloaded = startup(t, {savedLanguage: 'en'});
+  await reloaded.start();
+  reloaded.call('toggleSettings');
+  assert.equal(categoryName(reloaded), 'Language');
 });
 
-test('an unknown saved value counts as no choice', async t => {
-  const a = startup(t, {languages: ['zh-SG'], savedLanguage: 'zh-Hant'});
+test('a saved language applies at startup without asking', async t => {
+  for (const [id, settings, language] of [['zh-Hans', '设置', '语言'], ['de', 'Einstellungen', 'Sprache'], ['ar', 'الإعدادات', 'اللغة']]) {
+    const a = startup(t, {savedLanguage: id}), doc = a.dom.window.document;
+    await a.start();
+    assert.equal(doc.querySelector('.lang-overlay'), null);
+    assert.equal(a.announcements, 1);
+    assert.equal(toggleLabel(a), settings);
+    a.call('toggleSettings');
+    assert.equal(doc.getElementById('settings').lang, id);
+    assert.equal(categoryName(a), language);
+  }
+});
+
+test('an unknown saved value, or a catalog that fails to load, starts in English', async t => {
+  const unknown = startup(t, {savedLanguage: 'zh-Hant'});
+  await unknown.start();
+  assert.equal(toggleLabel(unknown), 'Settings');
+  assert.equal(unknown.announcements, 1);
+
+  const broken = startup(t, {savedLanguage: 'fr'});
+  broken.context.loadLanguage = async () => false;
+  await broken.start();
+  assert.equal(toggleLabel(broken), 'Settings');
+  assert.equal(broken.announcements, 1, 'Startup carries on');
+  assert.equal(broken.state.pgn, '1. e4 e5 2. Nf3');
+  broken.call('toggleSettings');
+  assert.equal(categoryName(broken), 'Language');
+  // Choosing a language whose catalog cannot load keeps English and saves nothing.
+  broken.dom.window.document.querySelector('.set-language-option[data-language="de"]').click();
+  await settle();
+  assert.equal(broken.store[LANGUAGE_STORAGE_KEY], 'fr', 'The earlier choice is kept as it was');
+  assert.equal(categoryName(broken), 'Language');
+});
+
+test('a choice saved in another tab applies here', async t => {
+  const a = startup(t, {savedLanguage: 'en'});
   await a.start();
-  assert.ok(picker(a));
-  assert.equal(option(a, 'zh-Hans').getAttribute('aria-checked'), 'true');
-});
-
-test('the blank workspace asks too, and screen previews never ask', async t => {
-  const blank = startup(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
-  await blank.start();
-  assert.ok(picker(blank));
-  const preview = app(t, {url: 'https://extension.test/analysis.html?screen-preview=workspace-blank', savedLanguage: null});
-  preview.store.settingsResetFor040 = true;
-  await preview.start();
-  assert.equal(picker(preview), null);
-});
-
-test('a choice saved in another tab closes this picker and applies here', async t => {
-  const a = startup(t, {languages: ['en-US']});
-  await a.start();
-  assert.ok(picker(a));
-  a.call('languageStorageChanged', {[LANGUAGE_STORAGE_KEY]: {newValue: 'zh-Hans'}}, 'local');
-  assert.equal(picker(a), null);
-  assert.equal(a.announcements, 1);
-  assert.equal(a.dom.window.document.querySelector('[data-settings-toggle]').getAttribute('aria-label'), '设置');
-  a.call('languageStorageChanged', {[LANGUAGE_STORAGE_KEY]: {newValue: 'xx'}}, 'local');
-  a.call('languageStorageChanged', {settings: {newValue: {}}}, 'local');
-  assert.equal(a.dom.window.document.querySelector('[data-settings-toggle]').getAttribute('aria-label'), '设置');
+  await a.call('languageStorageChanged', {[LANGUAGE_STORAGE_KEY]: {newValue: 'zh-Hans'}}, 'local');
+  assert.equal(toggleLabel(a), '设置');
+  await a.call('languageStorageChanged', {[LANGUAGE_STORAGE_KEY]: {newValue: 'xx'}}, 'local');
+  await a.call('languageStorageChanged', {settings: {newValue: {}}}, 'local');
+  assert.equal(toggleLabel(a), '设置');
+  await a.call('languageStorageChanged', {[LANGUAGE_STORAGE_KEY]: {newValue: 'es'}}, 'local');
+  assert.equal(toggleLabel(a), 'Ajustes');
 });
 
 test('Settings → Language switches immediately, keeps the game and remembers the choice', async t => {
@@ -285,15 +272,16 @@ test('Settings → Language switches immediately, keeps the game and remembers t
   a.call('toggleSettings');
   const menu = [...doc.querySelectorAll('.set-category .lib-dd-opt')];
   assert.equal(menu[0].dataset.category, 'language', 'Language is listed first');
-  assert.match(menu[0].textContent, /Language.*English · 简体中文/);
-  assert.equal(a.state.settingsTab, 'visual', 'Visual stays the default category');
-  doc.querySelector('[data-category="language"]').click();
+  assert.match(menu[0].textContent, /Language.*Choose your language/);
   const list = doc.querySelector('.set-language-list');
   assert.equal(list.getAttribute('role'), 'radiogroup');
   const choice = id => doc.querySelector(`.set-language-option[data-language="${id}"]`);
   assert.equal(choice('en').getAttribute('aria-checked'), 'true');
   assert.equal(choice('zh-Hans').querySelector('.set-language-native').lang, 'zh-Hans');
   assert.equal(choice('zh-Hans').querySelector('img').getAttribute('src'), 'flags/CN.svg');
+  assert.equal(choice('pt-BR').querySelector('img').getAttribute('src'), 'flags/BR.svg');
+  assert.equal(choice('da').querySelector('.set-language-native').textContent, 'Dansk');
+  assert.equal(choice('da').querySelector('.set-language-alt').textContent, 'Danish');
   assert.match(doc.querySelector('.set-language').textContent, /rest of Chess Review is still in English/);
 
   choice('zh-Hans').focus(); choice('zh-Hans').click();
@@ -301,7 +289,7 @@ test('Settings → Language switches immediately, keeps the game and remembers t
   assert.equal(a.store[LANGUAGE_STORAGE_KEY], 'zh-Hans');
   assert.equal(doc.getElementById('settings').hidden, false, 'Settings stay open');
   assert.equal(doc.getElementById('settings').lang, 'zh-Hans');
-  assert.equal(doc.querySelector('.set-category-name').textContent, '语言');
+  assert.equal(categoryName(a), '语言');
   assert.equal(doc.querySelector('.set-category .lib-dd-btn .set-category-copy').dataset.eyebrow, '设置', 'The CSS eyebrow label is translated too');
   assert.doesNotMatch(css, /content:\s*["'][A-Za-z]/, 'Visible CSS text must come from translatable markup');
   assert.equal(choice('zh-Hans').getAttribute('aria-checked'), 'true');
@@ -310,10 +298,17 @@ test('Settings → Language switches immediately, keeps the game and remembers t
   assert.equal(a.state.positions, positions); assert.equal(a.state.idx, idx);
   assert.equal(a.state.settings.language, undefined, 'Kept apart from resettable settings');
 
-  choice('zh-Hans').dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'ArrowUp', bubbles: true}));
+  choice('fr').click();
+  await settle();
+  assert.equal(a.store[LANGUAGE_STORAGE_KEY], 'fr');
+  assert.equal(categoryName(a), 'Langue');
+  assert.equal(choice('en').querySelector('.set-language-alt').textContent, 'Anglais');
+
+  choice('pt-BR').focus();
+  choice('pt-BR').dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'ArrowUp', bubbles: true}));
   await settle();
   assert.equal(a.store[LANGUAGE_STORAGE_KEY], 'en');
-  assert.equal(doc.querySelector('.set-category-name').textContent, 'Language');
+  assert.equal(categoryName(a), 'Language');
   assert.equal(doc.activeElement, choice('en'));
   assert.equal(a.state.idx, idx, 'Arrow keys in the list do not move through the game');
 });

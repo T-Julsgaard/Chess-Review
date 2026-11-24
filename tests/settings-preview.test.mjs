@@ -166,11 +166,11 @@ test('threat color previews, saves and resets independently of best-move and use
   assert.equal(doc.querySelector('.threat-arrow'), null);
 });
 
-test('Simplified Chinese settings keep move grades and setting values intact', t => {
+test('Simplified Chinese settings keep move grades and setting values intact', async t => {
   const a = app(t);
   loadGame(a, '1. e4 e5');
   a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
-  a.call('applyUiLanguage', 'zh-Hans');
+  await a.call('loadUiLanguage', 'zh-Hans');
   a.call('toggleSettings');
   const doc = a.dom.window.document;
   assert.equal(doc.querySelector('.set-category').closest('[lang]').lang, 'zh-Hans');

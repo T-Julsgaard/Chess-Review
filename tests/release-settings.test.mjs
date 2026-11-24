@@ -156,11 +156,10 @@ for (const version of ['0.4.0', '0.4.1', '1.0.0']) {
     await installed({ reason: 'install' });
     assertModern(store.settings); assert.equal(store[seen], undefined);
     const first = await workspace(t);
-    // A new installation chooses its language first; the intro tour follows.
-    assert.equal(first.dom.window.document.querySelector('.learning-announcement'), null);
-    first.dom.window.document.querySelector('.lang-confirm').click();
+    // A new installation starts in English with no language prompt; the intro tour shows straight away.
     await settle(); await first.run('learningAnnouncement?.ready');
-    assert.equal(store.language, 'en');
+    assert.equal(first.dom.window.document.querySelector('.lang-overlay'), null);
+    assert.equal(store.language, undefined, 'Nothing is guessed or saved for the language');
     assertModern(first.state.settings);
     assert.equal(first.state.settings.soundVolume, 50);
     assert.equal(first.dom.window.document.querySelector('.learning-announcement-target').id, 'profileToggle');

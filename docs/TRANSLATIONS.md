@@ -1,74 +1,93 @@
 # Interface languages
 
-Chess Review supports **English** and **简体中文 (Simplified Chinese)**.
+Chess Review is in **English** by default. Settings can also be shown in 15 other
+languages:
+
+| Language | id | Flag |
+| --- | --- | --- |
+| English (default) | `en` | GB |
+| Português (Brasil) | `pt-BR` | BR |
+| Español | `es` | ES |
+| Русский | `ru` | RU |
+| Türkçe | `tr` | TR |
+| Bahasa Indonesia | `id` | ID |
+| Français | `fr` | FR |
+| Italiano | `it` | IT |
+| Tiếng Việt | `vi` | VN |
+| Deutsch | `de` | DE |
+| Polski | `pl` | PL |
+| Українська | `uk` | UA |
+| العربية | `ar` | SA |
+| हिन्दी | `hi` | IN |
+| 简体中文 | `zh-Hans` | CN |
+| Dansk | `da` | DK |
 
 ## What is translated
 
-| Area | English | 简体中文 |
-| --- | --- | --- |
-| First-use language picker | ✓ | ✓ |
-| Settings → Language | ✓ | ✓ |
-| Settings (every category, tooltip, colour popover and readout) | ✓ | ✓ |
-| Everything else: popup, review panels, coach commentary, Learn/puzzles, player profile, toasts outside Settings, the in-page review buttons | ✓ | English for now |
+- **Settings**: every category, tooltip, colour popover and readout, plus Settings → Language.
+- **Everything else** (popup, review panels, coach commentary, Learn/puzzles, player
+  profile, toasts outside Settings, the in-page review buttons) is English for now.
 
 Some text inside Settings stays English on purpose:
 
 - **Move grades** (Brilliant, Great, Best, Excellent, Good, Book, Inaccuracy, Mistake,
-  Miss, Blunder). They appear across the untranslated review panels and keep the
-  wording from PR #39. `tests/i18n.test.mjs` fails if one is added to a catalog.
-- **Names**: coach characters (they are named the same way in the English coach
-  panel), piece sets, font families, Lichess and the Stockfish builds.
+  Miss, Blunder). They appear across the untranslated review panels.
+  `tests/i18n.test.mjs` fails if one is added to a catalog.
+- **Names**: coach characters, piece sets, font families, Lichess and the Stockfish builds.
 - **Numbers with units** (px, ms, MB, %).
+
+Arabic text is shown in the normal left-to-right Settings layout; the panel is not mirrored.
 
 ## How the language is chosen
 
-- The workspace (`analysis.html`) asks on first use. The toolbar popup, the in-page
-  review button and the keyboard shortcut all open the workspace, so the picker
-  appears whichever way someone arrives. The game they were opening loads
-  underneath and stays as it is.
-- The suggestion comes from the browser's ordered languages (`navigator.languages`).
-  Tags are matched by language **and script**: `zh`, `zh-CN`, `zh-SG` and `zh-Hans-*`
-  are Simplified; `zh-TW`, `zh-HK`, `zh-MO` and `zh-Hant-*` are Traditional and are not
-  offered Simplified. If nothing matches, English is suggested.
-- Only **Continue** saves. Escape or **Decide later** closes the picker and it is
-  offered again on the next visit. Screen-size previews never ask.
-- The choice is stored in extension local storage under the `language` key
-  (`"en"` or `"zh-Hans"`). That key is separate from `settings`, so release
-  resets and the "Reset all … settings" buttons keep it, and it survives updates.
-- Settings → Language (listed first) changes it immediately without reloading the
-  workspace. Other open review tabs follow through `storage.onChanged`.
+- **English is always the default.** The browser's language is never used to guess
+  one, and there is no first-use prompt.
+- **Settings opens on Language** each time the workspace loads, so someone who does
+  not read English finds it straight away. If they pick another category, Settings
+  stays on it until the workspace is closed and opened again.
+- Choosing a language applies at once, without reloading the workspace, and saves it
+  in extension local storage under the `language` key. That key is separate from
+  `settings`, so release resets and the "Reset all … settings" buttons keep it, and it
+  survives updates. Other open review tabs follow through `storage.onChanged`.
+
+## Why a translation can never break English
+
+- English is built in (`lib/i18n/messages/en.js`) and never loads a catalog.
+- Every other catalog is a separate file, imported only when someone chooses that
+  language (`loadLanguage`). A catalog that is missing, has a syntax error or has the
+  wrong shape makes `loadLanguage` resolve `false`: the interface stays English, the
+  choice is not saved, and startup carries on.
+- Entries that are not non-empty strings are dropped, and any error while translating
+  shows the English text. Anything missing from a catalog shows in English.
 
 ## Files
 
 | File | Purpose |
 | --- | --- |
-| `lib/i18n/languages.js` | Supported languages: id, native name, flag (`flags/<code>.svg`) and the matching rules. |
-| `lib/i18n/messages/en.js` | English source for strings with **stable identifiers** (`language.picker.title`, …). |
+| `lib/i18n/languages.js` | Supported languages: id, native name and flag (`flags/<code>.svg`). |
+| `lib/i18n/messages/en.js` | English source for strings with **stable identifiers** (`language.settings.title`, `language.name.<id>`, …). |
 | `lib/i18n/messages/<id>.js` | A catalog: `messages` (stable ids), `text` (settings text keyed by its English source) and `context`. |
-| `lib/i18n/index.js` | `createTranslator(id)` with `t`, `text`, `format` and `localize`; registers the catalogs. |
-| `lib/i18n/language-picker.js` | The first-use dialog. |
-| `tests/i18n.test.mjs` | Matching, fallback, picker, settings switching and a completeness check of every settings string. |
+| `lib/i18n/index.js` | `loadLanguage(id)` and `createTranslator(id)` with `t`, `text`, `format` and `localize`. |
+| `tests/i18n.test.mjs` | Defaults, fallback, broken catalogs, settings switching, and a completeness check of every catalog. |
 
 New interface text should use a stable identifier in `messages`. The existing
 settings panel is written with English literals in `analysis.js`, so it is
 translated after rendering by its English text (`text`), like a gettext msgid.
 `{0}`, `{1}` mark placeholders; their values are translated again, so
-`"{0} sound": "{0}音效"` also covers "Move sound" and "Capture sound".
+`"{0} sound": "Son : {0}"` also covers "Move sound" and "Capture sound".
 When the same English has two meanings, add it under `context` and put
 `data-i18n-context="<name>"` on an ancestor element (badge symbols use it for
 "Check", the check mark, as opposed to the chess check). Elements with
 `translate="no"` are never translated.
 
-Anything missing from a catalog shows in English.
+## Adding a language or a string
 
-## Adding a language
-
-1. Add an entry to `LANGUAGES` in `lib/i18n/languages.js`. Use a BCP 47 id and give
-   `script` when the language is written in more than one (`zh-Hant` would be
-   `{id: "zh-Hant", language: "zh", script: "Hant", nativeName: "繁體中文", flag: "TW"}`).
-   Pick a flag that already exists in `flags/`. The native name is the identifier.
-2. Copy `lib/i18n/messages/zh-Hans.js` to `lib/i18n/messages/<id>.js`, translate the
-   values and import it in the `CATALOGS` map in `lib/i18n/index.js`.
-3. Add `language.name.<id>` to every catalog.
-4. Run `node --test tests/i18n.test.mjs`. The completeness test lists every settings
-   string that is still English; extend it to the new language.
+1. A new language: add an entry to `LANGUAGES` in `lib/i18n/languages.js` (a BCP 47 id;
+   give the script when the language has more than one, e.g. `zh-Hant`), pick a flag
+   that exists in `flags/`, add `language.name.<id>` to `en.js` and every catalog, and
+   create `lib/i18n/messages/<id>.js` by copying `zh-Hans.js` and translating the values.
+2. A new settings string: add it to `zh-Hans.js` and to every other catalog. The tests
+   require every catalog to have exactly the same entries as `zh-Hans.js`, with the
+   same placeholders.
+3. Run `node --test tests/i18n.test.mjs`. The completeness test lists every settings
+   string that is still English in Simplified Chinese.
