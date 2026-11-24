@@ -303,7 +303,7 @@ async function main() {
     renderGamePlayer: (side, player, fen) => playerStrip(side, player, fen),
     renderGameEvaluation: (bar, score, flipped) => { bar.className = 'profile-game-eval evalbar eb-' + SETTINGS.barStyle + (flipped ? ' flipped' : ''); },
     createAnalysisEngine: createEngine,
-    buildOwn: () => document.body.classList.contains('web-has-extension') ? toast('Open Chess Review and choose Player profile to build your own') : openInstall(account), requestClose: () => {}, remember: () => {}, restoreBoard: () => {}, onClose: () => {},
+    buildOwn: () => document.body.classList.contains('web-has-extension') ? toast('Open Chess Review and choose Player profile to build your own') : openInstall(account), requestClose: () => {}, restoreBoard: () => {}, onClose: () => {},
     playGameMove: move => { if (move) playSound(moveSound(move.san)); }, playPuzzleWrong: () => playSound('wrong'),
   });
   document.body.classList.add('web-has-profile');

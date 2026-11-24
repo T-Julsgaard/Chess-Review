@@ -193,11 +193,11 @@ test('profile setup: custom dates validate, filter the report and survive reopen
   assert.ok(shell.querySelector('.pv-intro-period').textContent.includes(w.report.periodLabel));
   await w.close(); await open(a);
   const back = a.run('profileWorkspace');
-  assert.equal(back.phase, 'deck', 'reopening carries on with the same deck');
-  assert.equal(back.report.totals.games, expected.length);
-  back.renderSetup();
+  assert.equal(back.phase, 'setup');
   assert.equal(doc.querySelector('.profile-custom-period').hidden, false);
   assert.deepEqual([...doc.querySelectorAll('input[type="date"]')].map(i => i.value), ['2026-03-01', '2026-03-31']);
+  await build(a);
+  assert.equal(back.report.totals.games, expected.length);
 });
 
 test('profile setup: changing a custom range invalidates pending reads', async t => {
@@ -323,18 +323,24 @@ test('engine progress preserves the current slide and does not restart its board
 });
 
 test('closing with motion releases the board before opening another workspace', async t => {
-  const a = review(t); seed(a); await openDeck(a);
-  const old = a.run('profileWorkspace'); a.state.settings.uiAnim = true;
+  const a = review(t), {document: doc} = a.dom.window;
+  seed(a); await openDeck(a);
+  const old = a.run('profileWorkspace'), fade = deferred();
+  a.state.settings.uiAnim = true;
+  a.dom.window.Element.prototype.animate = () => ({finished: Promise.resolve(), cancel() {}});
+  old.shell.animate = () => ({finished: fade.promise, cancel() {}});
   const closing = old.close();
   assert.equal(a.run('profileWorkspace'), null);
-  // Reopening restores the remembered deck straight away, board included.
+  assert.ok(old.shell.isConnected, 'the old shell is still fading');
+  const board = doc.querySelector('.board');
   await open(a);
-  const next = a.run('profileWorkspace'), board = next.boardEl;
-  assert.equal(next.phase, 'deck');
-  assert.ok(board);
+  const next = a.run('profileWorkspace');
+  fade.resolve();
   await closing;
+  assert.equal(next.phase, 'setup');
   assert.equal(a.run('profileWorkspace'), next);
-  assert.equal(a.dom.window.document.querySelector('.board'), board);
+  assert.equal(doc.querySelector('.profile-shell'), next.shell);
+  assert.equal(doc.querySelector('.board'), board);
   a.state.settings.uiAnim = false;
 });
 

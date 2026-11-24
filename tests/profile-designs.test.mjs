@@ -539,28 +539,32 @@ test('the final Story board summarizes the available chapters and opens them dir
   assert.equal(doc.querySelector('.profile-overview'), null);
 });
 
-test('leaving the profile and coming back reopens the deck on the same chapter and filter, without loading', async t => {
+test('returning to Game review resets Player Profile to username entry', async t => {
   const a = review(t), doc = a.dom.window.document;
   seed(a);
+  a.store[rowsKey('chesscom', 'other')] = {...a.store[rowsKey('chesscom', 'tester')]};
   const w = await openDeck(a);
   w.go(w.deck.findIndex(s => s.id === 'habits'));
-  doc.querySelector('.pv-filter button[data-value="blitz"]')?.click();
-  const cls = w.cls; assert.equal(cls, 'blitz');
-  await a.call('toggleProfile'); for (let i = 0; i < 6; i++) await settle();
+  doc.querySelector('.pv-filter button[data-value="blitz"]').click();
+  assert.equal(w.cls, 'blitz');
+  const toggle = doc.querySelector('#profileToggle');
+  toggle.click();
   assert.equal(a.run('profileWorkspace'), null, 'back on the game review');
-  await a.call('openProfile');
+  toggle.click(); await settle();
   const next = a.run('profileWorkspace');
   assert.notEqual(next, w);
-  assert.equal(next.phase, 'deck', 'no setup and no loader');
-  assert.equal(next.deck[next.index]?.id, 'habits');
-  assert.equal(next.cls, cls);
-  assert.equal(doc.querySelector('.pv-story').dataset.slide, 'habits');
-  assert.equal(doc.querySelector('.profile-setup'), null);
-  // Back to the start, then leaving: the next visit starts at the setup again.
-  next.renderSetup();
-  await a.call('toggleProfile'); for (let i = 0; i < 6; i++) await settle();
-  await a.call('openProfile'); for (let i = 0; i < 6; i++) await settle();
-  assert.equal(a.run('profileWorkspace').phase, 'setup');
+  assert.equal(next.phase, 'setup');
+  assert.equal(doc.querySelector('.pv-story'), null);
+  const username = doc.querySelector('.profile-setup input[type="text"]');
+  assert.equal(username.value, 'tester');
+  assert.equal(doc.activeElement, username);
+  username.value = 'other';
+  username.dispatchEvent(new a.dom.window.Event('input'));
+  doc.querySelector('.profile-build').click(); for (let i = 0; i < 6; i++) await settle();
+  assert.equal(next.phase, 'deck');
+  assert.equal(next.account, 'other');
+  assert.equal(next.deck[next.index]?.id, 'cover');
+  assert.equal(next.cls, 'all');
 });
 
 test('story Compare keeps the chosen time control, on the rival chapter too', async t => {
