@@ -137,7 +137,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     })()`);
     assert.deepEqual(overview.ids, overview.expected);
     assert.ok(overview.fits);
-    assert.equal(overview.share, 'Copy share link');
+    assert.equal(overview.share, 'Share with a friend');
     const recap = await call('Page.captureScreenshot', {format: 'png'}, review.sessionId);
     await fs.writeFile(path.join(out, `profile-story-overview-${width}.png`), Buffer.from(recap.data, 'base64'));
     await run("w.boardEl.querySelector('.profile-overview [data-chapter=rating]').focus()");

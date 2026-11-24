@@ -98,7 +98,7 @@ visits the chess platform named in the URL.
 
 ## Sharing a player profile
 
-Choosing **Copy share link** on the last profile slide copies a link to
+Choosing **Share with a friend** on the last profile slide copies a link to
 `https://t-julsgaard.github.io/Chess-Review/profile/`. Its URL fragment (after `#`) contains
 the profile: the username, the numbers shown on the slides, and links to the games they
 mention. A fragment is never sent to a server: the viewer page, served by GitHub Pages,

@@ -2,7 +2,7 @@
 
 The player profile opens as a chapter-by-chapter story with a progress strip and charts drawn
 on the chessboard. The final **Overview** shows a tile for each available chapter, ordered as
-in the story. Each tile shows a highlight and opens the chapter when selected. **Copy share link**
+in the story. Each tile shows a highlight and opens the chapter when selected. **Share with a friend**
 sits alongside the board.
 
 - `lib/profile/designs/story.js` renders the chapters, progress strip, and chapter navigation.

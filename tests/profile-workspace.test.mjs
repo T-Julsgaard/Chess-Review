@@ -76,7 +76,7 @@ test('profile: seeded games render the deck on the board with navigation, stats 
   assert.ok(doc.querySelector('.board .pv-line'));
   shell.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'End', bubbles: true}));
   assert.equal(shell.querySelector('.pv-story').dataset.slide, 'share');
-  assert.ok(shell.querySelector('.profile-share button.primary').textContent.includes('Copy share link'));
+  assert.ok(shell.querySelector('.profile-share button.primary').textContent.includes('Share with a friend'));
   shell.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'Home', bubbles: true}));
   assert.equal(shell.querySelector('.pv-story').dataset.slide, 'cover');
   const goTo = title => [...shell.querySelectorAll('.pv-seg')].find(dot => dot.title === title).click();
