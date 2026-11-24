@@ -399,7 +399,7 @@ const DEFAULT_SETTINGS = {
   // no games under 10 moves, and opponents left out per account ({"chesscom:name": ["friend"]}).
   profileColor: "all", profileRatedOnly: false, profileSkipShort: false, profileExcludedOpponents: {},
   // Accuracy check that runs by itself after a profile is built: depth (off/fast/balanced/deep) and which games.
-  profileDepth: "balanced", profileSample: "all",
+  profileDepth: "fast", profileSample: "all",
   // Display the selected analysis lines unless the user adds or removes lines in the panel.
   // Extra candidates are searched after scoring or on demand without re-analyzing the game.
   // Default SF18 searches match the published depth16/Hash16 quality model.

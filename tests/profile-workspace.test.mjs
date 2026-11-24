@@ -452,7 +452,7 @@ test('profile: the accuracy check starts from the accuracy chapter, with the cho
   const rows = season();
   a.store.library = [{id: 'lib1', myName: 'Tester', myAcc: 88.5, date: new Date(rows.at(-2).t * 1000).toISOString().slice(0, 10).replace(/-/g, '.'), meta: {gameId: rows.at(-2).id}},
     {id: 'lib2', myName: 'someone-else', myAcc: 50, date: '2026.03.01', meta: {}}];
-  Object.assign(a.state.settings, {profileDepth: 'fast', profileSample: '5'});
+  Object.assign(a.state.settings, {profileDepth: 'deep', profileSample: '5'});
   await open(a);
   assert.equal(doc.querySelector('.profile-setup').textContent.includes('Accuracy check'), false, 'the setup no longer asks about accuracy');
   const sent = [], w = a.run('profileWorkspace');
@@ -471,11 +471,11 @@ test('profile: the accuracy check starts from the accuracy chapter, with the cho
   assert.equal(w.report.engine.libraryGames, 1, 'only the same player\'s reviewed games count');
   w.go(w.deck.findIndex(slide => slide.id === 'trend'));
   const engine = () => doc.querySelector('.profile-engine');
-  // The remembered depth and games are preselected; changing them updates the estimate.
+  // It opens on Fast and Every game, whatever was saved before; changing them updates the estimate.
   assert.equal(engine().querySelector('[data-engine="depth:fast"]').getAttribute('aria-checked'), 'true');
+  assert.equal(engine().querySelector('[data-engine="sample:all"]').getAttribute('aria-checked'), 'true');
   const before = engine().querySelector('.profile-engine-estimate').textContent;
   engine().querySelector('[data-engine="depth:deep"]').click();
-  engine().querySelector('[data-engine="sample:all"]').click();
   assert.notEqual(engine().querySelector('.profile-engine-estimate').textContent, before);
   assert.match(engine().querySelector('.profile-engine-estimate').textContent, /^Estimated time(Under 1 min|About \d+ (min|h)( \d+ min)?) · \d+ games$/);
   engine().querySelector('[data-engine="start"]').click();
@@ -485,7 +485,6 @@ test('profile: the accuracy check starts from the accuracy chapter, with the cho
   assert.equal(start.job.depth, 12);
   assert.equal(start.job.deadlineMs, null, 'every game has no time budget');
   assert.ok(!start.job.rows.some(r => r.id === rows.at(-2).id), 'the reviewed library game is not checked again');
-  assert.equal(a.state.settings.profileDepth, 'deep', 'the choice is remembered');
   let savedJob = null;
   for (let i = 0; i < 1000 && savedJob?.status !== 'done'; i++) { await settle(); savedJob = await w.store.loadJob(); }
   await w.onJobChange(savedJob);
