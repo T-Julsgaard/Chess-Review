@@ -404,6 +404,8 @@ const DEFAULT_SETTINGS = {
   profilePortraitStyle: "relief", profileSignatureBoard: "differences",
   // How games appear on the board while a profile is built: film (default) or mosaic.
   profileStream: "film",
+  // How the developer's figure on the profile's last chapter is drawn: thin (default) or bold.
+  profileMiniMe: "thin",
   // Display the selected analysis lines unless the user adds or removes lines in the panel.
   // Extra candidates are searched after scoring or on demand without re-analyzing the game.
   // Default SF18 searches match the published depth16/Hash16 quality model.
@@ -6701,6 +6703,8 @@ function visualSettings() {
         ["differences", "Habit differences"], ["centered", "Centered difference chart"], ["pieces", "Piece markers on ranks"],
         ["cards", "Four habit cards"], ["compare", "Paired columns"], ["heat", "Heat map"],
       ], "Choose how the board shows your habits in You vs. a typical player. Centered differences show how far each habit is from typical, piece markers plot both values on ranks, and habit cards highlight four comparisons. The heat map shows where your pieces land."),
+      settingDropdown("Developer figure", "profileMiniMe", [["thin", "Thin"], ["bold", "Bold"]],
+        "How the developer's waving figure is drawn on the profile's last chapter. Thin is a light sheet of small characters; Bold uses heavier, larger characters that are easier to see."),
     ),
     section("Animations",
       toggleRow("Interface animations", "uiAnim", setSetting,
@@ -7431,6 +7435,7 @@ async function setSetting(key, value) {
   await writeSettings({ [key]: value, ...setupPatch }, key === "badgeSymbols" ? ["badgeSymbols"] : []);
   applySettings();
   if (key === "profileSignatureBoard" && profileWorkspace?.currentSlide()?.id === "signature") profileWorkspace.renderSlide({animate: false});
+  if (key === "profileMiniMe") profileWorkspace?.miniMe?.redraw();
   if (key === "reviewMode") { paintBoard(); renderReview(); fitViewport(); }
   if (design?.panel.startsWith('accuracy')) { statsRefs = null; hideQTip(); renderStats(); if(key==='accuracyDesign')reflowAccuracy(accuracyLayoutExpanded()); }
   if (key === 'movesDesign') updateMovesDesign();

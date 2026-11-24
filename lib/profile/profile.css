@@ -150,9 +150,10 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-share { display: flex; flex-direction: column; gap: 10px; }
 /* The developer's note, in the portfolio's IBM Plex Mono (an ASCII subset; licence in fonts/). */
 @font-face { font-family: "Dev Plex Mono"; src: url("../../fonts/ibmplexmono.ttf") format("truetype"); font-weight: 400; font-style: normal; font-display: swap; }
-/* The note is typed above the mini-me, who stands centred on the full width with room to turn. */
+/* The note is typed above the mini-me, who stands centred on the full width with room to turn; the buttons sit under him. */
 .profile-share:has(.profile-dev) { flex: 1 1 auto; }
-.profile-dev { flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: 4px; padding-top: 12px; border-top: 1px solid var(--line); }
+.profile-dev { flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.profile-dev + .profile-chooser-row { justify-content: center; padding-top: 12px; border-top: 1px solid var(--line); }
 .profile-type { align-self: stretch; font-family: "Dev Plex Mono", "IBM Plex Mono", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; text-align: center; }
 /* Three lines are kept free, so the figure below never moves while a line is typed. */
 .profile-type-screen { min-height: calc(3 * 1.55em); display: flex; align-items: center; justify-content: center; flex-wrap: wrap; font-size: 13px; line-height: 1.55; color: var(--ink-2); text-wrap: balance; }

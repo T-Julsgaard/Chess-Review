@@ -203,7 +203,7 @@ function trapFocus(event) {
 class WebStoryWorkspace extends StoryWorkspace {
   hero(slide) {
     const hero = super.hero(slide);
-    return slide.id === 'share' && !slide.empty ? {...hero, value: 'The whole story at a glance'} : hero;
+    return slide.id === 'share' && !slide.empty ? {value: 'The whole story at a glance', text: true, label: null} : hero;
   }
   /** The last chapter: where the extension offers its share link, the web offers a profile of your own. */
   renderShare() {
