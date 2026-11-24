@@ -128,6 +128,9 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.ok(w.report.totals.games < 300 && w.report.classOptions.includes('blitz'), 'the options stay while filtered');
   [...shell.querySelectorAll('.pv-filter button')].find(b => b.textContent === 'All').click();
   key(a, 'ArrowRight');
+  key(a, 'ArrowLeft');
+  assert.equal(shell.querySelector('.pv-story').dataset.slide, 'numbers');
+  key(a, 'PageDown');
   assert.equal(shell.querySelector('.pv-story').dataset.slide, 'season');
   assert.ok(doc.querySelectorAll('.board .pv-layer .pv-tile').length > 8, 'months are columns of squares');
   assert.equal(shell.querySelectorAll('.pv-points li').length, 2);
@@ -518,7 +521,9 @@ test('story rating inspection survives filtering and game Exit restores the sele
   assert.equal(doc.querySelector('.profile-game-controls'), null, 'Exit also dismisses an inline opening replay');
   const opening = w.index;
   doc.body.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'ArrowRight', bubbles: true, cancelable: true}));
-  assert.equal(w.index, opening + 1, 'chapter navigation resumes after Exit');
+  assert.equal(w.index, opening, 'the arrow stays on the chapter after Exit');
+  doc.body.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'PageDown', bubbles: true, cancelable: true}));
+  assert.equal(w.index, opening + 1, 'Page Down still changes chapters after Exit');
   w.go(0);
   const opened = []; w.win.open = (...args) => opened.push(args);
   const mosaic = doc.querySelector('.profile-game-map');

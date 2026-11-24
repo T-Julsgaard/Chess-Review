@@ -499,7 +499,7 @@ test('mate in one: the chapter opens on the newest puzzle not solved yet, and Ne
   assert.equal(from(2), 2, 'with every one solved, Next simply moves on');
 });
 
-test('mate in one shows game information and badges, and Previous replays a solved puzzle', async t => {
+test('mate in one opens at the puzzle, replays the recorded game, and lets the player solve it', async t => {
   const a = review(t), {document: doc, PointerEvent} = a.dom.window;
   Object.assign(a.state.settings, {profileDesign: 'story', uiAnim: false});
   const scholar = ['e4', 'e5', 'Bc4', 'Nc6', 'Qh5', 'Nf6', 'Qf3'];
@@ -514,12 +514,18 @@ test('mate in one shows game information and badges, and Previous replays a solv
   const report = buildReport(rows, buildInsights(rows), {account, site});
   await a.call('openProfile', {shared: report});
   const w = a.run('profileWorkspace');
-  w.o.loadPgn = async () => '1. f3 e5 2. g4 Nc6 *';
+  const loaded = [];
+  w.o.loadPgn = async (site, row) => {
+    loaded.push(row.id);
+    return site === 'lichess' ? '1. f3 e5 2. g4 Nc6 *' : '1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qf3 Be7 *';
+  };
   w.o.createAnalysisEngine = null;
   w.solvedMates = new Set(['chesscom:902']);
   w.go(w.deck.findIndex(slide => slide.id === 'mate1'));
 
   const button = label => [...doc.querySelectorAll('.profile-puzzle-button')].find(node => node.textContent === label);
+  const moveButton = label => doc.querySelector(`.profile-puzzle [aria-label="${label}"]`);
+  const key = key => doc.body.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key, bubbles: true, cancelable: true}));
   const link = () => doc.querySelector('.pv-story .profile-open-puzzle-game');
   const evalBar = () => doc.querySelector('.profile-game-eval');
   const square = name => [...w.boardEl.querySelectorAll('.sq')].find(node => w.board.nameOf(node) === name);
@@ -535,6 +541,34 @@ test('mate in one shows game information and badges, and Previous replays a solv
   assert.match(evalBar().getAttribute('aria-label'), /White.*mate.*1/i);
   assert.ok(square('f6').classList.contains('profile-hl'));
   assert.ok(button('Previous').disabled);
+  assert.deepEqual(loaded, [], 'the saved setup opens without fetching the game');
+
+  const chapter = w.index;
+  key('ArrowRight');
+  await settle();
+  assert.equal(w.index, chapter);
+  assert.ok(square('f3').classList.contains('profile-hl'), 'the first forward step plays the actual missed move');
+  assert.ok(button('Hint').disabled);
+  clickSquare('f3'); clickSquare('f7');
+  assert.equal(square('f7').querySelector('[data-result="correct"]'), null, 'review positions are read-only');
+  moveButton('Next move').click();
+  assert.ok(square('e7').classList.contains('profile-hl'), 'can also play moves after the miss');
+  assert.ok(moveButton('Next move').disabled);
+  key('ArrowRight');
+  assert.equal(w.index, chapter);
+  key('ArrowLeft'); key('ArrowLeft');
+  assert.ok(square('h5').querySelector('.profile-piece'));
+  assert.match(evalBar().getAttribute('aria-label'), /White.*mate.*1/i);
+  assert.equal(button('Hint').disabled, false, 'returning to the puzzle makes it playable');
+  moveButton('Previous move').click();
+  assert.ok(square('g8').querySelector('.profile-piece'), 'move controls can also rewind before the puzzle');
+  for (let i = 0; i < 5; i++) key('ArrowLeft');
+  assert.ok(moveButton('Previous move').disabled);
+  key('ArrowLeft');
+  assert.equal(w.index, chapter);
+  for (let i = 0; i < 6; i++) key('ArrowRight');
+  assert.ok(square('f6').classList.contains('profile-hl'));
+  assert.deepEqual(loaded, ['901'], 'stepping reuses the game already loaded');
 
   clickSquare('h5'); clickSquare('f3');
   assert.ok(square('h5').querySelector('[data-result="incorrect"]'));
@@ -553,6 +587,9 @@ test('mate in one shows game information and badges, and Previous replays a solv
   assert.ok(evalBar().classList.contains('flipped'));
   assert.match(doc.querySelector('.profile-game-player-top').textContent, /Challenger.*1700/);
   assert.match(doc.querySelector('.profile-game-player-bottom').textContent, /tester-li.*1800/);
+  key('ArrowLeft'); key('ArrowRight');
+  assert.ok(square('g4').classList.contains('profile-hl'));
+  assert.deepEqual(loaded, ['901', 'PVmate01'], 'the legacy intro and its replay share one load');
   button('Previous').click();
   assert.equal(link().href, newer.url);
   assert.equal(w.boardEl.querySelector('.puzzle-result-badge, .mate-badge'), null);

@@ -223,11 +223,6 @@ class WebStoryWorkspace extends StoryWorkspace {
     const build = this.shared && [...this.head.querySelectorAll(':scope > .profile-button')].find(b => /build your own/i.test(b.textContent));
     if (build) { build.classList.add('web-build'); build.prepend(this.h('span', {class: 'web-build-mark', html: ICONS.knight})); }
   }
-  /** On the web the arrows only step through a game on the board; chapters turn with Next and Previous (or Page Up and Page Down). */
-  onKey(event) {
-    if ((event.key === 'ArrowLeft' || event.key === 'ArrowRight') && !this.arrowsStepGame()) return;
-    super.onKey(event);
-  }
 }
 
 /* ---------- page ---------- */
