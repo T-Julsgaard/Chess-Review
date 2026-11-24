@@ -11,6 +11,7 @@ import {finishedPreviewGame} from '../lib/preview-analysis.js';
 import {collectProfile} from '../lib/profile/collector.js';
 import {createProfileStore} from '../lib/profile/store.js';
 import {app, loadGame, deferred, settle} from './helpers/app.mjs';
+import {season} from './helpers/profile-season.mjs';
 
 const rows = n => Array.from({length: n}, (_, i) => ({id: String(i), site: 'lichess', t: i + 1, me: 'w', opp: `Player ${i}`, n: 30, res: ['w', 'd', 'l'][i % 3], url: 'https://lichess.org/abcd1234'}));
 const settings = {depth: {depth: 6}, sample: {id: 'all', every: 1}, ms: 1400, workers: 2};
@@ -289,6 +290,34 @@ test('profile mosaic: a share link carries each game as a result, a day and a ti
   assert.deepEqual(mosaicRows(null), []);
   assert.deepEqual(mosaicRows({start: 1, days: '0,1', res: 'w'}), [], 'counts must agree');
   assert.deepEqual(mosaicRows({start: 1, days: '0', res: '<'}), []);
+});
+
+test('workspace: a shared cover reveals its mosaic from an empty board', async t => {
+  const {mosaicPayload} = await import('../lib/profile/game-map.js');
+  const {buildInsights} = await import('../lib/profile/insights.js');
+  const a = app(t), win = a.dom.window, doc = win.document;
+  loadGame(a, '1. e4 e5 2. Nf3 Nc6'); a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
+  a.state.settings.uiAnim = true;
+  win.Element.prototype.animate = () => ({finished: Promise.resolve(), cancel() {}, finish() {}});
+  win.HTMLCanvasElement.prototype.getContext = () => null;
+  Object.defineProperty(win.HTMLElement.prototype, 'clientWidth', {configurable: true, get() { return this.isConnected ? 400 : 0; }});
+  t.mock.method(win.Element.prototype, 'getClientRects', function() { return this.matches('.board .piece-img') ? [this.getBoundingClientRect()] : []; });
+  const frames = [];
+  t.mock.method(win, 'requestAnimationFrame', callback => frames.push(callback));
+  const games = season().slice(0, 24);
+  await a.call('openProfile', {shared: {...buildInsights(games), account: 'tester', site: 'lichess', mosaic: mosaicPayload(games, 'lichess')}});
+  const w = a.run('profileWorkspace');
+  t.after(() => w.close());
+  const map = doc.querySelector('.board .profile-game-map');
+  assert.ok(map);
+  assert.equal(doc.querySelectorAll('.board .piece-img').length, 0, 'there are no departing pieces');
+  const selectFirst = () => map.dispatchEvent(new win.KeyboardEvent('keydown', {key: 'Home', bubbles: true}));
+  selectFirst();
+  assert.equal(map.title, '', 'the first square is still queued when the cover opens');
+  const start = win.performance.now();
+  for (let i = 1; i <= 24; i++) for (const frame of frames.splice(0)) frame(start + i * 16);
+  selectFirst();
+  assert.match(map.title, /Won|Drew|Lost/, 'the animation reveals the first square');
 });
 
 test('profile mosaic: a shared mosaic describes a game but does not open one', () => {

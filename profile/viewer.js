@@ -56,6 +56,8 @@ const SETTINGS = {uiAnim: true, moveAnim: true, animSpeed: 7, pieceStyle: 'image
   profilePortraitStyle: 'relief', profileSignatureBoard: 'differences', profileAccuracyAnimation: 'games', profileStream: 'film',
   profileIncludeBots: false, profileColor: 'all', profileRatedOnly: false, profileSkipShort: false, profileExcludedOpponents: {},
   profilePeriod: 'year', profileBudget: 'standard', profileDepth: 'off', profileSample: 'all'};
+const STARTUP_OPEN_DELAY = 40;
+const MOSAIC_INTRO_DELAY = STARTUP_OPEN_DELAY + 550; // The shutter transition in styles.css.
 /** In-memory stand-in for extension storage: a shared profile keeps nothing between visits. */
 function memoryStorage() {
   const data = new Map();
@@ -254,7 +256,7 @@ function reveal() {
   document.body.removeAttribute('data-starting');
   // The shutters part once the deck has laid out (a timer, not animation frames: a link opened in a background tab still reveals).
   const startup = $('startup');
-  setTimeout(() => { startup.classList.add('opening'); setTimeout(() => startup.remove(), 700); }, 40);
+  setTimeout(() => { startup.classList.add('opening'); setTimeout(() => startup.remove(), 700); }, STARTUP_OPEN_DELAY);
 }
 /** No profile in the link (or a broken one): the page introduces player profiles instead. */
 function showLanding({title, text, error = false}) {
@@ -293,7 +295,7 @@ async function main() {
   $('tagline').textContent = `${account}'s player profile`;
   const workspace = new WebStoryWorkspace({
     document, storage: memoryStorage(), storageEvents: null, sendMessage: async () => ({ok: false}),
-    stage: $('canvas'), boardWrap: $('boardWrap'), makePiece, flipped: false,
+    stage: $('canvas'), boardWrap: $('boardWrap'), makePiece, flipped: false, gameMapIntroDelay: MOSAIC_INTRO_DELAY,
     settings: () => SETTINGS, writeSettings: patch => { Object.assign(SETTINGS, patch); },
     identity: {}, shared: report, toast, icon: name => ICONS[name] || '',
     flag: code => /^[A-Z]{2}$/i.test(code || '') ? h('img', {class: 'avatar avatar-flag', src: asset(`flags/${code.toUpperCase()}.svg`), alt: '', draggable: 'false', onerror: e => e.target.remove()}) : null,
