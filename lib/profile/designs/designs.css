@@ -25,10 +25,10 @@
 .pv-line-glow { stroke-width: 2.6; opacity: .22; }
 /* A second line on the same axes (the other site's rating, board-viz.js line `extra`): drawn like the first, in its own colour. */
 .pv-line-glow.pv-line-alt { opacity: .18; }
-/* The rating line's axes (board-viz.js line `axes`): faint guides at the values left of the board, months or years under it. */
+/* The rating line's axes (board-viz.js line `axes`): faint guides at the values left of the board, dates under it. */
 .pv-layer > .pv-line-grid { left: 0; right: 0; height: 0; border-top: 1px dashed color-mix(in srgb, var(--ink) 16%, transparent); pointer-events: none; animation: pv-fade .5s ease .1s both; }
-.pv-outside > .pv-axis-x { top: calc(100% + 9px); transform: translateX(-50%); font-size: clamp(9.5px, .95vw, calc(13px * var(--pv-s, 1))); font-weight: 700; line-height: 1; white-space: nowrap; color: var(--ink-2); animation: pv-fade .4s ease var(--d, 0ms) both; }
-.pv-outside > .pv-axis-x::before { content: ""; position: absolute; left: 50%; top: -7px; width: 1px; height: 4px; background: color-mix(in srgb, var(--ink) 35%, transparent); }
+.pv-outside > .pv-axis-x { top: calc(100% + 9px); transform: translateX(calc(-1 * var(--pv-axis-anchor, 50%))); font-size: clamp(9.5px, .95vw, calc(13px * var(--pv-s, 1))); font-weight: 700; line-height: 1; white-space: nowrap; color: var(--ink-2); animation: pv-fade .4s ease var(--d, 0ms) both; }
+.pv-outside > .pv-axis-x::before { content: ""; position: absolute; left: var(--pv-axis-anchor, 50%); top: -7px; width: 1px; height: 4px; background: color-mix(in srgb, var(--ink) 35%, transparent); }
 .pv-line-dot.pv-below .pv-line-tag { bottom: auto; top: calc(100% + 8px); }
 .pv-line-raw { stroke-width: .3; opacity: .24; }
 /* Accuracy over time, every game (board-viz.js buildFromGames): a canvas of the games' lines, then the line they merge into, already drawn. */

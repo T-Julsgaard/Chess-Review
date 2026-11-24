@@ -767,7 +767,7 @@ test('accuracy opens with the game animation and time-control changes show the a
   assert.ok(w.viz.layer.classList.contains('pv-line-settled'), 'filtering from an empty chart also skips the animation');
 });
 
-test('the rating chart\'s axes: round values, and months or years but never both', async () => {
+test('the rating chart shows round ratings and calendar ticks for longer histories', async () => {
   const {ratingTicks, timeTicks} = await import('../lib/profile/designs/board-viz.js');
   assert.deepEqual(ratingTicks(1480, 1720), [1500, 1550, 1600, 1650, 1700]);
   assert.deepEqual(ratingTicks(1210, 1240), [1210, 1220, 1230, 1240]);
@@ -779,6 +779,27 @@ test('the rating chart\'s axes: round values, and months or years but never both
   assert.deepEqual(timeTicks(at(2026, 0), at(2026, 3)).map(t => t.label), ['Feb', 'Mar', 'Apr'], 'every month of a short line');
   const years = timeTicks(at(2019, 4), at(2026, 9));
   assert.ok(years.length >= 2 && years.length <= 7 && years.every(t => /^\d{4}$/.test(t.label)), 'years only: ' + years.map(t => t.label));
+});
+
+test('the rating chart labels both ends when fewer than two calendar ticks fit', async () => {
+  const {JSDOM} = await import('jsdom');
+  const {createViz, timeTicks} = await import('../lib/profile/designs/board-viz.js');
+  const at = (m, d, h = 12) => new Date(2026, m - 1, d, h).getTime() / 1000;
+  const labels = (t0, t1) => timeTicks(t0, t1).map(tick => tick.label);
+  assert.deepEqual(labels(at(11, 2), at(11, 24)), ['Nov 2', 'Nov 24']);
+  assert.deepEqual(labels(at(10, 31), at(12, 1)), ['Oct 31', 'Dec 1'], 'calendar ticks too close to the edges are skipped');
+  assert.deepEqual(labels(at(11, 24), at(11, 24, 13)), ['Nov 24, 12:00', 'Nov 24, 13:00']);
+  assert.deepEqual(labels(at(11, 24), at(11, 24) + 20), ['Nov 24, 12:00:00', 'Nov 24, 12:00:20']);
+  assert.deepEqual(labels(at(11, 24), at(11, 24)), ['Nov 24']);
+
+  const dom = new JSDOM('<div class="board"></div>');
+  const viz = createViz(dom.window.document.querySelector('.board'), {motion: () => false});
+  const chart = viz.line([{t: at(10, 27), r: 1500}, {t: at(11, 16), r: 1570}], {axes: true});
+  const ticks = [...chart.outside.querySelectorAll('.pv-axis-x')];
+  assert.deepEqual(ticks.map(tick => [tick.textContent, tick.style.left, tick.style.getPropertyValue('--pv-axis-anchor')]), [
+    ['Oct 27', '0%', '0%'], ['Nov 16', '100%', '100%'],
+  ]);
+  dom.window.close();
 });
 
 test('profile designs: the "When you play" headline names what stands out about the time of play', async () => {
