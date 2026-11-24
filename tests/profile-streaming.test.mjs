@@ -295,7 +295,13 @@ test('profile mosaic: a share link carries each game as a result, a day and a ti
 test('workspace: a shared cover reveals its mosaic from an empty board', async t => {
   const {mosaicPayload} = await import('../lib/profile/game-map.js');
   const {buildInsights} = await import('../lib/profile/insights.js');
+  const {StoryWorkspace} = await import('../lib/profile/designs/story.js');
   const a = app(t), win = a.dom.window, doc = win.document;
+  const reveal = deferred();
+  class ViewerWorkspace extends StoryWorkspace {
+    constructor(options) { super({...options, gameMapReady: reveal.promise}); }
+  }
+  a.replace('loadProfileStory', async () => ({StoryWorkspace: ViewerWorkspace}));
   loadGame(a, '1. e4 e5 2. Nf3 Nc6'); a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
   a.state.settings.uiAnim = true;
   win.Element.prototype.animate = () => ({finished: Promise.resolve(), cancel() {}, finish() {}});
@@ -312,10 +318,18 @@ test('workspace: a shared cover reveals its mosaic from an empty board', async t
   assert.ok(map);
   assert.equal(doc.querySelectorAll('.board .piece-img').length, 0, 'there are no departing pieces');
   const selectFirst = () => map.dispatchEvent(new win.KeyboardEvent('keydown', {key: 'Home', bubbles: true}));
+  const advance = () => {
+    const start = win.performance.now();
+    for (let i = 1; i <= 24; i++) for (const frame of frames.splice(0)) frame(start + i * 16);
+  };
+  advance();
   selectFirst();
-  assert.equal(map.title, '', 'the first square is still queued when the cover opens');
-  const start = win.performance.now();
-  for (let i = 1; i <= 24; i++) for (const frame of frames.splice(0)) frame(start + i * 16);
+  assert.equal(map.title, '', 'the mosaic stays empty while the page is covered');
+  reveal.resolve();
+  await reveal.promise;
+  selectFirst();
+  assert.equal(map.title, '', 'the squares animate after the page is revealed');
+  advance();
   selectFirst();
   assert.match(map.title, /Won|Drew|Lost/, 'the animation reveals the first square');
 });

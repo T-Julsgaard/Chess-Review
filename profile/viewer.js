@@ -57,7 +57,6 @@ const SETTINGS = {uiAnim: true, moveAnim: true, animSpeed: 7, pieceStyle: 'image
   profileIncludeBots: false, profileColor: 'all', profileRatedOnly: false, profileSkipShort: false, profileExcludedOpponents: {},
   profilePeriod: 'year', profileBudget: 'standard', profileDepth: 'off', profileSample: 'all'};
 const STARTUP_OPEN_DELAY = 40;
-const MOSAIC_INTRO_DELAY = STARTUP_OPEN_DELAY + 550; // The shutter transition in styles.css.
 /** In-memory stand-in for extension storage: a shared profile keeps nothing between visits. */
 function memoryStorage() {
   const data = new Map();
@@ -254,12 +253,25 @@ function watchExtension() {
 }
 function reveal() {
   document.body.removeAttribute('data-starting');
-  // The shutters part once the deck has laid out (a timer, not animation frames: a link opened in a background tab still reveals).
   const startup = $('startup');
-  setTimeout(() => { startup.classList.add('opening'); setTimeout(() => startup.remove(), 700); }, STARTUP_OPEN_DELAY);
+  // The timer lets the closed shutters paint and also runs when the tab is in the background.
+  return new Promise(resolve => setTimeout(() => {
+    const shutter = startup.querySelector('.startup-top');
+    const finish = event => {
+      if (event && (event.target !== shutter || event.propertyName !== 'transform')) return;
+      clearTimeout(timer);
+      startup.remove();
+      resolve();
+    };
+    const timer = setTimeout(finish, 650);
+    shutter.addEventListener('transitionend', finish);
+    startup.classList.add('opening');
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) finish();
+  }, STARTUP_OPEN_DELAY));
 }
 /** No profile in the link (or a broken one): the page introduces player profiles instead. */
 function showLanding({title, text, error = false}) {
+  buildBoard($('board'));
   const landing = $('landing');
   landing.hidden = false; landing.classList.toggle('is-error', error);
   landing.replaceChildren(
@@ -274,7 +286,6 @@ function showLanding({title, text, error = false}) {
 
 async function main() {
   syncStoreLinks(); watchExtension();
-  buildBoard($('board'));
   const m = location.hash.match(/[#&]p=([^&]+)/);
   if (!m) {
     showLanding({title: 'Your chess games, told as a story', text: 'Chess Review turns any Chess.com or Lichess account into a player profile drawn on the board. Profiles shared from the extension open on this page.'});
@@ -293,9 +304,10 @@ async function main() {
   const account = report.account || 'This player';
   document.title = `${account} · Chess Review player profile`;
   $('tagline').textContent = `${account}'s player profile`;
+  buildBoard($('board'), '8/8/8/8/8/8/8/8');
   const workspace = new WebStoryWorkspace({
     document, storage: memoryStorage(), storageEvents: null, sendMessage: async () => ({ok: false}),
-    stage: $('canvas'), boardWrap: $('boardWrap'), makePiece, flipped: false, gameMapIntroDelay: MOSAIC_INTRO_DELAY,
+    stage: $('canvas'), boardWrap: $('boardWrap'), makePiece, flipped: false, gameMapReady: reveal(),
     settings: () => SETTINGS, writeSettings: patch => { Object.assign(SETTINGS, patch); },
     identity: {}, shared: report, toast, icon: name => ICONS[name] || '',
     flag: code => /^[A-Z]{2}$/i.test(code || '') ? h('img', {class: 'avatar avatar-flag', src: asset(`flags/${code.toUpperCase()}.svg`), alt: '', draggable: 'false', onerror: e => e.target.remove()}) : null,
@@ -308,7 +320,6 @@ async function main() {
   });
   document.body.classList.add('web-has-profile');
   await workspace.open();
-  reveal();
 }
 main();
 window.addEventListener('hashchange', () => location.reload());
