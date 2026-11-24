@@ -76,8 +76,8 @@ browser's `chrome.storage.local`:
 - Player profile data under `profile:v1:` keys: one summary row per game for each player you
   built a profile for (results, ratings, opponent name, opening, clocks, material swings,
   replay-derived habits, final position), engine-check estimates for up to 2,000 games, and the
-  engine job status. Clearing the extension's storage, or removing the extension, removes
-  every one of these keys.
+  engine job status. **Delete profile data** in the gear menu of an open profile removes every
+  one of these keys.
 
 The cache, preferences, and computed analysis stay on your device. A public username
 or game ID is sent to the relevant chess platform when needed for a game lookup,

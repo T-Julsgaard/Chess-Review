@@ -111,3 +111,25 @@ test('profile gear: colour, rated and short-game switches narrow every chapter, 
   assert.equal(w.periodRows().length, total);
   assert.equal(pick('.pv-set-reset'), null, 'nothing left to reset');
 });
+
+test('profile gear: Delete profile data asks once more, then removes every profile key and goes back to the setup', async t => {
+  const {a, doc, w} = await storyDeck(t);
+  const toasts = []; w.o.toast = message => toasts.push(message);
+  a.store['profile:v1:engine:chesscom:tester'] = {}; a.store.unrelated = 1;
+  doc.querySelector('.pv-settings').click();
+  const menu = () => doc.querySelector('.pv-settings-menu');
+  menu().querySelector('[data-focus="delete"]').click();
+  assert.match(menu().querySelector('.pv-set-delete-confirm p').textContent, /can’t be undone/);
+  assert.equal(doc.activeElement.dataset.focus, 'delete-cancel', 'Cancel takes the focus');
+  assert.ok(Object.keys(a.store).some(key => key.startsWith('profile:v1:')), 'nothing is deleted before confirming');
+  menu().querySelector('[data-focus="delete-cancel"]').click();
+  assert.equal(menu().querySelector('.pv-set-delete-confirm'), null, 'Cancel goes back to the button');
+  assert.equal(doc.activeElement.dataset.focus, 'delete');
+  menu().querySelector('[data-focus="delete"]').click();
+  menu().querySelector('[data-focus="delete-confirm"]').click();
+  for (let i = 0; i < 6; i++) await settle();
+  assert.deepEqual(Object.keys(a.store).filter(key => key.startsWith('profile:v1:')), [], 'every profile key is gone');
+  assert.equal(a.store.unrelated, 1, 'other storage stays');
+  assert.equal(w.phase, 'setup'); assert.equal(menu(), null);
+  assert.deepEqual(toasts, ['Profile data deleted']);
+});

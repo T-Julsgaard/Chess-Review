@@ -236,6 +236,14 @@
 .pv-set-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; padding: 8px 10px 4px; border-top: 1px solid var(--line); box-sizing: border-box; min-height: calc(1lh + 21px); font-size: 11.5px; color: var(--ink-2); }
 .pv-set-reset { padding: 3px 10px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); background: transparent; color: var(--ink); font: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer; }
 .pv-set-reset:hover { border-color: var(--pv-tint, var(--accent)); }
+/* Delete profile data: a quiet last line that turns red on hover, then asks once more in place. */
+.pv-set-delete { margin-top: 4px; padding: 7px 10px; border: 0; border-top: 1px solid var(--line); border-radius: 0 0 8px 8px; background: transparent; color: var(--ink-2); font: inherit; font-size: 11.5px; font-weight: 700; text-align: left; cursor: pointer; transition: color .12s, background .12s; }
+.pv-set-delete:hover, .pv-set-delete:focus-visible { outline: none; color: var(--q-blunder); background: color-mix(in srgb, var(--q-blunder) 9%, transparent); }
+.pv-set-delete-confirm { display: grid; gap: 8px; margin-top: 4px; padding: 9px 10px 6px; border-top: 1px solid var(--line); }
+.pv-set-delete-confirm p { margin: 0; font-size: 11.5px; line-height: 1.35; color: var(--ink); }
+.pv-set-delete-actions { display: flex; justify-content: flex-end; gap: 6px; }
+.pv-set-reset.pv-set-danger { border-color: transparent; background: var(--q-blunder); color: #fff; }
+.pv-set-reset.pv-set-danger:hover, .pv-set-reset.pv-set-danger:focus-visible { border-color: transparent; background: color-mix(in srgb, var(--q-blunder) 85%, #000); }
 @media (prefers-reduced-motion: reduce) { .pv-settings, .pv-set-thumb, .pv-set-track { transition: none; } }
 .pv-filter { position: relative; display: inline-flex; gap: 2px; padding: 3px; margin-left: auto; border-radius: 999px; background: color-mix(in srgb, var(--ink) 7%, transparent); }
 .pv-filter button { position: relative; z-index: 1; font: inherit; font-size: 11.5px; font-weight: 700; padding: 5px 11px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); cursor: pointer; transition: color .2s; }
