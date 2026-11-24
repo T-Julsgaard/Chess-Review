@@ -156,8 +156,12 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 /* The note is typed above the mini-me, who stands centred on the full width with room to turn; the buttons sit under him. */
 /* Both may shrink below the canvas's own size, so the figure gives way to the heading and the buttons never spill out of the panel. */
 .profile-share:has(.profile-dev) { flex: 1 1 auto; min-height: 0; }
-/* Share your results is a filled button, the same as Share with a friend under the figure. */
-.profile-share-results { align-self: flex-start; padding-inline: 10px; }
+/* Share your results is a filled button, the same as Share with a friend under the figure, beside the Overview heading. */
+.profile-share-results { margin-left: auto; padding-inline: 10px; }
+/* It hangs over the heading's row instead of making it taller, so the line under Overview stays where it was. */
+.pv-story-top > .profile-share-results { margin-block: -9px; }
+/* The note and the figure move up only a little into the room the button left. */
+.profile-share > .profile-dev:first-child { margin-top: 34px; }
 .profile-dev { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .profile-dev + .profile-chooser-row { justify-content: center; padding-top: 10px; border-top: 1px solid var(--line); }
 .profile-type { align-self: stretch; font-family: "Dev Plex Mono", "IBM Plex Mono", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; text-align: center; }

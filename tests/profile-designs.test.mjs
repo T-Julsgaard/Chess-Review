@@ -243,7 +243,8 @@ test('profile designs: story shows one figure per chapter, progress segments and
   let copied;
   Object.defineProperty(a.dom.window.navigator, 'clipboard', {value: {writeText: async text => { copied = text; }}, configurable: true});
   let sharing; const copy = w.copyLink.bind(w); w.copyLink = button => sharing = copy(button);
-  assert.equal(shell.querySelectorAll('.profile-share button').length, 1, 'the overview offers one link to share the results');
+  assert.equal(shell.querySelectorAll('.pv-story button.profile-share-results').length, 1, 'the overview offers one link to share the results');
+  assert.ok(shell.querySelector('.pv-story-top > .profile-share-results'), 'beside the Overview heading');
   assert.equal(shell.querySelector('.pv-share'), null, 'Share lives on the last chapter, not in the header');
   shell.querySelector('.profile-share-results').click();
   await sharing;

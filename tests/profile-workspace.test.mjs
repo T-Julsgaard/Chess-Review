@@ -77,7 +77,7 @@ test('profile: seeded games render the deck on the board with navigation, stats 
   shell.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'End', bubbles: true}));
   assert.equal(shell.querySelector('.pv-story').dataset.slide, 'share');
   assert.equal(shell.querySelector('.pv-story-chapter').textContent, 'Overview');
-  assert.equal(shell.querySelector('.profile-share-results').textContent, 'Share your results', 'the results button sits under the heading');
+  assert.equal(shell.querySelector('.pv-story-top > .profile-share-results').textContent, 'Share your results', 'the results button sits beside the heading');
   assert.ok(shell.querySelector('.profile-share-results').classList.contains('primary'), 'it is filled like Share with a friend');
   assert.match(shell.querySelector('.profile-share a.profile-button.primary').href, /^https:\/\/chromewebstore\.google\.com\/detail\/chess-review\//, 'Share with a friend opens the store page');
   assert.ok(shell.querySelector('.profile-dev canvas.profile-minime'), 'the developer note has the mini-me');

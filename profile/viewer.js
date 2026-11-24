@@ -147,11 +147,6 @@ function playSound(name) {
     source.connect(gain).connect(audio.destination); source.start();
   }).catch(() => soundBuffers.delete(name));
 }
-async function copyPageLink() {
-  try { await navigator.clipboard.writeText(location.href); toast('Link copied'); }
-  catch { toast('Could not copy the link'); }
-}
-
 /* ---------- install nudges ---------- */
 function installButton({cls = 'profile-button primary web-install', store = primaryStore(), where = ''} = {}) {
   return h('a', {class: cls, href: store.href, target: '_blank', rel: 'noopener', 'data-install': where},
@@ -209,7 +204,7 @@ const WEB_DEV_NOTE = [
 ];
 class WebStoryWorkspace extends StoryWorkspace {
   /**
-   * The last chapter is the extension's: Overview, Share your results, the developer's note and the mini-me.
+   * The last chapter is the extension's: Overview, the developer's note and the mini-me.
    * Under him, visitors without Chess Review get the two stores; with it installed, the extension's own
    * review and share buttons come back instead (viewer.css).
    */
@@ -220,8 +215,8 @@ class WebStoryWorkspace extends StoryWorkspace {
     return share;
   }
   devNoteLines() { return WEB_DEV_NOTE; }
-  /** Share your results copies this page's own link, which already carries the profile. */
-  copyLink() { return copyPageLink(); }
+  /** No "Share your results" here: this page's own link already is the shared profile. */
+  shareResultsButton() { return null; }
   /** The panel's "Build your own" gets the knight and the accent, so it reads as the page's way in. */
   renderHead() {
     super.renderHead();
