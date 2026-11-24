@@ -247,6 +247,29 @@
 .pv-filter button.on, .pv-filter button:hover { color: var(--ink); }
 .pv-filter-thumb { position: absolute; z-index: 0; left: 3px; top: 3px; bottom: 3px; width: 0; border-radius: 999px; background: var(--panel); box-shadow: 0 2px 8px color-mix(in srgb, #000 25%, transparent), 0 0 0 1px color-mix(in srgb, var(--pv-tint) 35%, transparent); transition: transform .32s cubic-bezier(.2,.8,.2,1), width .32s cubic-bezier(.2,.8,.2,1); }
 .pv-story-top:not(:has(.pv-story-chapter)) { justify-content: flex-end; }
+
+/* Fit the opponent title and time controls to the panel, which can be narrow on desktop too. */
+.pv-story[data-slide="rival"] { container-type: inline-size; }
+.pv-story[data-slide="rival"] > .pv-story-top {
+  --rival-header-gap: clamp(4px, 1.5cqi, 10px);
+  flex-wrap: nowrap; gap: var(--rival-header-gap);
+  margin-inline: clamp(-22px, calc((100cqi - 360px) / 2), 0px);
+}
+.pv-story[data-slide="rival"] .pv-story-chapter {
+  display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: clamp(11px, 3.25cqi, 17px); letter-spacing: clamp(0px, calc(.4cqi - 1.1px), .9px);
+}
+.pv-story[data-slide="rival"] .pv-story-top:has(> .pv-filter) > .pv-story-chapter {
+  /* Reserve room for All through Rapid when the time controls need to scroll. */
+  flex: none; max-width: calc(100% - 124px - var(--rival-header-gap));
+}
+.pv-story[data-slide="rival"] .pv-story-top > .pv-filter { flex-shrink: 1; }
+.pv-story[data-slide="rival"] .pv-story-top > .pv-filter button {
+  font-size: clamp(10px, 2.45cqi, 11.5px); padding-inline: clamp(2px, calc(4cqi - 9px), 11px);
+}
+@container (width < 235px) {
+  .pv-story[data-slide="rival"] .pv-story-chapter { font-size: 10px; }
+}
 .pv-points { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .pv-points li { position: relative; padding-left: 18px; font-size: 16px; line-height: 1.45; color: var(--ink-2); }
 .pv-points li::before { content: ""; position: absolute; left: 2px; top: .6em; width: 7px; height: 7px; border-radius: 50%; background: var(--pv-vivid); }
@@ -412,23 +435,69 @@
 .pv-sig-track .pv-sig-knight.pv-sig-typical { top: 25%; left: var(--typical); }
 .pv-sig-track .pv-sig-knight.pv-sig-you { top: 75%; left: var(--you); }
 
-.pv-sig-cards { inset: 0; grid-template: repeat(2, minmax(0, 1fr)) / repeat(2, minmax(0, 1fr)); gap: 3%; padding: 4%; }
+.pv-sig-cards { inset: 0; grid-template: repeat(2, minmax(0, 1fr)) / repeat(2, minmax(0, 1fr)); gap: 2.5%; padding: 3%; }
 .pv-sig-card {
   display: grid;
-  grid-template-rows: auto 1fr auto;
-  justify-items: start;
-  gap: .4em;
-  padding: 9%;
+  grid-template-rows: 2.3em minmax(0, 1fr) auto;
+  place-items: center;
+  gap: .24em;
+  min-width: 0;
+  padding: 5% 7%;
   border: 1px solid var(--sig-rule);
-  border-radius: .65em;
-  background: linear-gradient(145deg, color-mix(in oklab, var(--panel) 89%, var(--sig-you)), color-mix(in srgb, var(--panel) 85%, transparent));
+  border-radius: .78em;
+  background: radial-gradient(ellipse at 50% 22%, color-mix(in oklab, var(--panel) 88%, var(--sig-you)), var(--panel) 82%);
+  text-align: center;
 }
-.pv-sig-card-piece { width: clamp(20px, 9.2cqw, 58px); aspect-ratio: 1; object-fit: contain; }
-.pv-sig-card strong { align-self: center; font-size: 1.16em; font-weight: 750; text-wrap: balance; }
-.pv-sig-card .pv-sig-values { width: 100%; gap: .8em; padding-top: .5em; border-top: 1px solid var(--sig-rule); }
-.pv-sig-card .pv-sig-values > span { display: grid; gap: .15em; }
+.pv-sig-card:not(:has(.pv-sig-illustration)) { grid-template-rows: 1fr auto; }
+.pv-sig-card strong { font-size: 1.12em; font-weight: 750; line-height: 1.08; text-wrap: balance; }
+.pv-sig-illustration { width: 100%; margin: 0; display: grid; justify-items: center; gap: .34em; }
+.pv-sig-illustration figcaption { color: var(--ink-2); font-size: clamp(7px, 2.34cqw, 14px); line-height: 1.1; font-weight: 650; }
+.pv-sig-diagram { width: 100%; display: flex; justify-content: center; gap: .35em; }
+.pv-sig-diagram-board {
+  --cell: clamp(10px, calc(7.2cqw - 5px), 40px);
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--files), minmax(0, 1fr));
+  width: min(100%, calc(var(--files) * var(--cell)));
+  align-self: center;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: .22em;
+  box-shadow: 0 0 0 1px var(--sig-rule), 0 .22em .65em #0004;
+}
+.pv-sig-diagram-board[data-ranks="4"] { --cell: clamp(10px, calc(6.5cqw - 6px), 35px); }
+.pv-sig-diagram-board > span { display: grid; place-items: center; aspect-ratio: 1; }
+.pv-sig-diagram-board .is-light { background: var(--sq-light); }
+.pv-sig-diagram-board .is-dark { background: var(--sq-dark); }
+.pv-sig-diagram-board .is-highlight { background: color-mix(in oklab, var(--sig-you) 72%, var(--sq-dark)); box-shadow: inset 0 0 0 1px var(--sig-you); }
+.pv-sig-diagram-board img { width: 96%; height: 96%; object-fit: contain; }
+.pv-sig-diagram-board svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: #165646;
+  stroke: #165646;
+  stroke-width: .095;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 .65px #caefdd);
+}
+.pv-sig-diagram pre {
+  margin: 0;
+  padding: .4em .8em;
+  background: color-mix(in oklab, var(--panel) 74%, var(--ink));
+  border: 1px solid var(--sig-rule);
+  border-radius: .4em;
+  color: var(--ink);
+  font: 600 .77em/1.35 ui-monospace, monospace;
+  text-align: left;
+}
+.pv-sig-card .pv-sig-values { display: grid; width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; padding-top: .35em; border-top: 1px solid var(--sig-rule); }
+.pv-sig-card .pv-sig-values > span { display: grid; justify-items: center; gap: .12em; }
+.pv-sig-card .pv-sig-values > span + span { border-left: 1px solid var(--sig-rule); }
 .pv-sig-card .pv-sig-value-label { font-size: .86em; }
-.pv-sig-card .pv-sig-values b { font-size: 1.22em; }
+.pv-sig-card .pv-sig-values b { font-size: 1.3em; }
 
 .pv-bubble { display: grid; place-items: center; pointer-events: auto; }
 /* A fixed-size disc scaled by --s: scaling is composited, so resizing never re-lays out (no shimmer). */

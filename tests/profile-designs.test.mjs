@@ -6,6 +6,8 @@ import {rowsKey} from '../lib/profile/store.js';
 import {IDENTITY_KEY} from '../lib/identity.js';
 import {DesignWorkspace} from '../lib/profile/designs/base.js';
 import {StoryWorkspace} from '../lib/profile/designs/story.js';
+import {signatureDiagram} from '../lib/profile/designs/signature-diagrams.js';
+import {SIGNATURES} from '../lib/profile/insights.js';
 import {seasonStats, seasonSlide} from '../lib/profile/designs/season.js';
 
 function review(t) {
@@ -139,7 +141,7 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.equal(w.viz.layer.querySelectorAll('.pv-diff-row').length, 4);
   assert.ok(w.viz.layer.querySelector('.pv-diff-gap'));
   const labels = signature.signatures.slice(0, 4).map(s => s.label);
-  for (const [setting, mark] of [['centered', '.pv-sig-dot'], ['pieces', '.pv-sig-track .pv-sig-knight.pv-sig-you'], ['cards', '.pv-sig-card-piece']]) {
+  for (const [setting, mark] of [['centered', '.pv-sig-dot'], ['pieces', '.pv-sig-track .pv-sig-knight.pv-sig-you'], ['cards', '.pv-sig-illustration']]) {
     await a.call('setSetting', 'profileSignatureBoard', setting);
     assert.equal(a.store.settings.profileSignatureBoard, setting, 'the chart choice is saved');
     const layer = w.viz.layer;
@@ -480,6 +482,22 @@ test('story rating inspection survives filtering and game Exit restores the sele
   for (const key of ['Home', 'Enter']) mosaic.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key, bubbles: true, cancelable: true}));
   assert.equal(opened.length, 1); assert.match(opened[0][0], /^https:\/\/(www\.)?(chess\.com|lichess\.org)\//);
   assert.equal(doc.querySelector('.profile-game-chrome'), null, 'mosaic games open on their platform');
+});
+
+test('every habit card has an illustration with a caption and accessible description', t => {
+  const {document} = app(t).dom.window;
+  for (const {id} of SIGNATURES) {
+    const diagram = signatureDiagram(document, id);
+    assert.ok(diagram?.querySelector('figcaption').textContent, id);
+    assert.ok(diagram.querySelector('[role="img"]').getAttribute('aria-label'), id);
+    assert.ok(diagram.querySelector('img, pre'), id);
+  }
+  const storm = signatureDiagram(document, 'storm');
+  assert.equal(storm.querySelectorAll('img[src$="/wP.svg"]').length, 2);
+  assert.ok(storm.querySelector('img[src$="/bK.svg"]'));
+  assert.equal(storm.querySelectorAll('svg path').length, 2);
+  assert.equal(signatureDiagram(document, 'opposite').querySelectorAll('.pv-sig-diagram-board').length, 2);
+  assert.ok(signatureDiagram(document, 'length').querySelector('pre'));
 });
 
 test('profile settings keep Story even with a saved legacy design', async t => {
