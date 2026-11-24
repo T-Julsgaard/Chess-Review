@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {app, loadGame, settle} from './helpers/app.mjs';
+import {app, loadGame, settle, deferred} from './helpers/app.mjs';
 import {season} from './helpers/profile-season.mjs';
 import {rowsKey} from '../lib/profile/store.js';
 import {IDENTITY_KEY} from '../lib/identity.js';
@@ -9,6 +9,8 @@ import {StoryWorkspace} from '../lib/profile/designs/story.js';
 import {signatureDiagram} from '../lib/profile/designs/signature-diagrams.js';
 import {SIGNATURES} from '../lib/profile/insights.js';
 import {seasonStats, seasonSlide} from '../lib/profile/designs/season.js';
+import {Chess, DEFAULT_POSITION} from '../lib/chess.js';
+import {squareNames} from '../lib/profile/board.js';
 
 function review(t) {
   const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5');
@@ -428,6 +430,47 @@ test('story time controls read Bullet, Blitz, Daily; habit dots and clock column
   assert.equal(w.cls, 'all', 'other chapters still open on All');
   w.go(w.deck.findIndex(s => s.id === 'rating'));
   if (doc.querySelectorAll('.pv-modes button').length > 1) assert.deepEqual([...doc.querySelectorAll('.pv-modes button')].map(b => b.textContent), ['Bullet', 'Blitz', 'Daily'].filter(l => [...doc.querySelectorAll('.pv-modes button')].some(b => b.textContent === l)));
+});
+
+test('View game shows the final position before rewinding, with or without a saved final position', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  seed(a);
+  const w = await openDeck(a);
+  w.go(w.deck.findIndex(s => s.id === 'rating'));
+  const evidence = w.currentSlide().evidence, row = w.rows.find(r => r.id === evidence.id);
+  const pgn = '1. e4 d5 2. exd5 Qxd5 *', chess = new Chess();
+  chess.loadPgn(pgn);
+  const finalFen = chess.fen(), squares = squareNames(row.me === 'b');
+  const pieceAt = square => w.boardEl.children[squares.indexOf(square)].querySelector('img')?.dataset.piece;
+  a.state.settings.uiAnim = true;
+  w.win.Element.prototype.animate = () => ({cancel() {}, finished: Promise.resolve()});
+  t.mock.method(w.win.HTMLImageElement.prototype, 'getClientRects', () => [{}]);
+  t.mock.timers.enable({apis: ['setTimeout']});
+
+  for (const end of [finalFen, '']) {
+    row.fenEnd = end;
+    w.board.setOrientation(row.me === 'b');
+    w.board.fen(DEFAULT_POSITION);
+    const loading = deferred();
+    w.o.loadPgn = () => loading.promise;
+    doc.querySelector('.pv-link[data-game-url]').click();
+    assert.equal(w.boardEl.querySelector('.puzzle-piece-transition'), null, 'no glide from the previous position');
+    assert.equal(pieceAt('e2'), undefined, 'the starting position never appears while loading');
+    assert.equal(pieceAt('d5'), end ? 'bQ' : undefined);
+
+    loading.resolve(pgn);
+    await settle();
+    assert.equal(pieceAt('d5'), 'bQ');
+    assert.match(w.gameCounter.textContent, /Qxd5 · 4\/4/);
+    t.mock.timers.tick(119);
+    assert.equal(pieceAt('d5'), 'bQ');
+    t.mock.timers.tick(1);
+    assert.equal(pieceAt('d5'), 'wP', 'the first animated move undoes the final capture');
+    for (let i = 0; i < 3; i++) t.mock.timers.tick(90);
+    assert.equal(pieceAt('e2'), 'wP');
+    assert.equal(w.gameCounter.textContent, 'Starting position');
+    w.exitGame();
+  }
 });
 
 test('story rating inspection survives filtering and game Exit restores the selected chart', async t => {
