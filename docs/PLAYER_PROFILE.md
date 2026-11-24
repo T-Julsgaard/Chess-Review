@@ -78,7 +78,7 @@ evaluates with the bundled Stockfish 19 Lite, with the review's move sounds. The
 nudges: "Visit Chrome Web Store" and "Visit Firefox Add-ons" in the top bar (the visitor's own
 browser in green), an install dialog behind the panel's green "Build your own", and the two
 stores under the mini-me on the last chapter. That chapter is otherwise the extension's (Overview,
-Share results, the typed developer's note and the mini-me), with a note written for visitors
+Share your results, the typed developer's note and the mini-me), with a note written for visitors
 (`WEB_DEV_NOTE`); with the extension installed, its review and share buttons replace the stores. On the web the Left/Right arrows only step through a game on the board;
 chapters turn with Next/Previous or Page Up/Down. The link carries the report and not the games, so
 the time-control switch works from each time control's chapters counted when the link was made

@@ -156,8 +156,8 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 /* The note is typed above the mini-me, who stands centred on the full width with room to turn; the buttons sit under him. */
 /* Both may shrink below the canvas's own size, so the figure gives way to the heading and the buttons never spill out of the panel. */
 .profile-share:has(.profile-dev) { flex: 1 1 auto; min-height: 0; }
-.profile-share-results { align-self: flex-start; padding: 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: var(--pv-tint, var(--accent)); cursor: pointer; }
-.profile-share-results:hover { text-decoration: underline; }
+/* Share your results is a filled button, the same as Share with a friend under the figure. */
+.profile-share-results { align-self: flex-start; padding-inline: 10px; }
 .profile-dev { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .profile-dev + .profile-chooser-row { justify-content: center; padding-top: 10px; border-top: 1px solid var(--line); }
 .profile-type { align-self: stretch; font-family: "Dev Plex Mono", "IBM Plex Mono", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; text-align: center; }

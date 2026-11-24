@@ -209,7 +209,7 @@ const WEB_DEV_NOTE = [
 ];
 class WebStoryWorkspace extends StoryWorkspace {
   /**
-   * The last chapter is the extension's: Overview, Share results, the developer's note and the mini-me.
+   * The last chapter is the extension's: Overview, Share your results, the developer's note and the mini-me.
    * Under him, visitors without Chess Review get the two stores; with it installed, the extension's own
    * review and share buttons come back instead (viewer.css).
    */
@@ -220,7 +220,7 @@ class WebStoryWorkspace extends StoryWorkspace {
     return share;
   }
   devNoteLines() { return WEB_DEV_NOTE; }
-  /** Share results copies this page's own link, which already carries the profile. */
+  /** Share your results copies this page's own link, which already carries the profile. */
   copyLink() { return copyPageLink(); }
   /** The panel's "Build your own" gets the knight and the accent, so it reads as the page's way in. */
   renderHead() {
