@@ -148,6 +148,15 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
   background: color-mix(in oklab, var(--pv-tint, var(--accent)) 16%, transparent); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--pv-tint, var(--accent)) 34%, transparent); }
 .profile-engine .profile-button[disabled] { opacity: .5; cursor: default; }
 .profile-share { display: flex; flex-direction: column; gap: 10px; }
+/* The developer's note: the mini-me (no background, drawn in the ink colour) beside a few words. */
+.profile-dev { display: flex; align-items: center; gap: 4px 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.profile-minime { flex: none; width: clamp(96px, 36%, 156px); aspect-ratio: 3 / 4.4; color: var(--ink); cursor: grab; touch-action: none; border-radius: 10px; outline-offset: 2px; }
+.profile-minime:active { cursor: grabbing; }
+.profile-minime:focus-visible { outline: 2px solid var(--accent); }
+.profile-dev-note { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.profile-dev-hello { margin: 0; font-size: 15px; font-weight: 800; letter-spacing: .4px; text-transform: uppercase; color: var(--ink); }
+.profile-dev-note p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
+.profile-share a.profile-button { display: inline-flex; align-items: center; text-decoration: none; }
 .profile-chooser-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 
 .profile-empty { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; justify-content: center; min-height: 100%; padding: 8px 4px; }

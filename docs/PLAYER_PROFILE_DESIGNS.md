@@ -2,14 +2,17 @@
 
 The player profile opens as a chapter-by-chapter story with a progress strip and charts drawn
 on the chessboard. The final **Overview** shows a tile for each available chapter, ordered as
-in the story. Each tile shows a highlight and opens the chapter when selected. **Share with a friend**
-sits alongside the board.
+in the story. Each tile shows a highlight and opens the chapter when selected. Beside the board, a
+short note from the developer (the waving ASCII mini-me from julsgaard.dev, which can be dragged to
+turn it in 3D) sits above **Share with a friend** and the Chrome and Firefox review links.
 
 - `lib/profile/designs/story.js` renders the chapters, progress strip, and chapter navigation.
 - `lib/profile/designs/board-viz.js` draws the board charts and manages their transitions.
 - `lib/profile/overview.js` builds the chapter tiles for the extension and the shared profile viewer.
 - `lib/profile/designs/season.js` adds the monthly activity chapter when enough local game data
   exists. Shared profiles include the chapters available from the report in the link.
+- `lib/profile/mini-me.js` draws the developer's mini-me on a transparent canvas: the portfolio's
+  ASCII grid and wave, with each character given a front and back point so it turns like a solid.
 - `tests/profile-designs.test.mjs` covers chapter navigation and board interactions.
 
 ## Profile games and sharing

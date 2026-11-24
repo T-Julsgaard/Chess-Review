@@ -77,6 +77,8 @@ test('profile: seeded games render the deck on the board with navigation, stats 
   shell.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'End', bubbles: true}));
   assert.equal(shell.querySelector('.pv-story').dataset.slide, 'share');
   assert.ok(shell.querySelector('.profile-share button.primary').textContent.includes('Share with a friend'));
+  assert.ok(shell.querySelector('.profile-dev canvas.profile-minime'), 'the developer note has the mini-me');
+  assert.deepEqual([...shell.querySelectorAll('.profile-share a.profile-button')].map(a => a.textContent), ['Review on Chrome', 'Review on Firefox']);
   shell.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'Home', bubbles: true}));
   assert.equal(shell.querySelector('.pv-story').dataset.slide, 'cover');
   const goTo = title => [...shell.querySelectorAll('.pv-seg')].find(dot => dot.title === title).click();
