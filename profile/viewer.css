@@ -20,7 +20,7 @@ body.web-viewer { overflow: hidden; }
 .web-installed { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel-2); color: var(--ink-2); font-size: 12px; font-weight: 650; }
 .web-installed[hidden] { display: none; }
 .web-installed-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 25%, transparent); }
-.web-has-extension .web-stores, .web-has-extension .web-share-card { display: none !important; }
+.web-has-extension .web-stores { display: none !important; }
 /* The two store links: this browser's in green (above), the other plain beside it. */
 .web-stores { display: flex; align-items: center; gap: 8px; }
 .topbar .web-cta.is-other { background: var(--panel-2); border-color: var(--line); color: var(--ink-2); box-shadow: none; }
@@ -78,18 +78,14 @@ body.web-viewer { overflow: hidden; }
 .profile-button.primary.web-install { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 8px 20px -10px color-mix(in oklab, var(--accent) 80%, transparent); }
 .profile-button.primary.web-install:hover { color: var(--accent-ink); }
 
-/* ---------- the last chapter: a profile of your own ---------- */
-.web-share { gap: 10px; }
-.web-share-card { display: flex; flex-direction: column; gap: 8px; padding: 16px 16px 15px; border-radius: 12px;
-  border: 1px solid color-mix(in oklab, var(--pv-c, var(--accent)) 38%, var(--line));
-  background: radial-gradient(130% 120% at 100% 0%, color-mix(in oklab, var(--pv-c, var(--accent)) 16%, transparent), transparent 60%), var(--panel-2); }
-.web-share-eyebrow { color: var(--pv-c, var(--accent)); font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-.web-share-title { font-size: 19px; line-height: 1.15; font-weight: 800; letter-spacing: -.02em; }
-.web-share-card p { margin: 0; color: var(--ink-2); font-size: 13px; line-height: 1.5; }
+/* ---------- the last chapter: the extension's, with the stores under the mini-me ---------- */
+/* Without Chess Review the row under him is the two stores; with it installed, the extension's review and share buttons. */
+.web-install-row { justify-content: center; padding-top: 10px; border-top: 1px solid var(--line); }
+.web-install-row .profile-button { gap: 7px; }
+body:not(.web-has-extension) .web-review-row, .web-has-extension .web-install-row { display: none; }
+/* The page lays the panel out at full size, so on short laptop windows the mini-me gives up more height than in the extension and the stores stay in view. */
+.web-viewer .profile-minime { min-height: 96px; }
 .web-share-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
-.web-share-row { display: flex; }
-.web-copy { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; }
-.web-copy.is-done { border-color: var(--accent); color: var(--accent); }
 
 .web-dialog-close { position: absolute; top: 9px; right: 9px; display: grid; place-items: center; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 7px; background: transparent; color: var(--ink-3); }
 .web-dialog-close:hover { background: var(--panel-3); color: var(--ink); }

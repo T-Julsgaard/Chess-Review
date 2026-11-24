@@ -55,7 +55,7 @@ const ICONS = {
 const SETTINGS = {uiAnim: true, moveAnim: true, animSpeed: 7, pieceStyle: 'image', barStyle: 'flat2', engineDepth: 12,
   profilePortraitStyle: 'relief', profileSignatureBoard: 'differences', profileStream: 'film',
   profileIncludeBots: false, profileColor: 'all', profileRatedOnly: false, profileSkipShort: false, profileExcludedOpponents: {},
-  profilePeriod: 'year', profileBudget: 'standard', profileDepth: 'off', profileSample: 'all'};
+  profileMiniMe: 'thin', profilePeriod: 'year', profileBudget: 'standard', profileDepth: 'off', profileSample: 'all'};
 const STARTUP_OPEN_DELAY = 40;
 /** In-memory stand-in for extension storage: a shared profile keeps nothing between visits. */
 function memoryStorage() {
@@ -147,8 +147,8 @@ function playSound(name) {
     source.connect(gain).connect(audio.destination); source.start();
   }).catch(() => soundBuffers.delete(name));
 }
-async function copyLink(button) {
-  try { await navigator.clipboard.writeText(location.href); toast('Link copied'); button?.classList.add('is-done'); setTimeout(() => button?.classList.remove('is-done'), 1600); }
+async function copyPageLink() {
+  try { await navigator.clipboard.writeText(location.href); toast('Link copied'); }
   catch { toast('Could not copy the link'); }
 }
 
@@ -200,23 +200,28 @@ function trapFocus(event) {
 }
 
 /* ---------- the extension's Story deck, with the web's last chapter ---------- */
+/** The developer's note for visitors: most have not installed Chess Review yet, so it says what drew this profile. */
+const WEB_DEV_NOTE = [
+  "Hi, I'm the dev.",
+  "I made Chess Review, the free extension\nthat drew this profile on the board.",
+  "It's open source, and it grows\nby word of mouth.",
+  "Build your own from any Chess.com or\nLichess account, then pass it on."
+];
 class WebStoryWorkspace extends StoryWorkspace {
-  hero(slide) {
-    const hero = super.hero(slide);
-    return slide.id === 'share' && !slide.empty ? {value: 'The whole story at a glance', text: true, label: null} : hero;
+  /**
+   * The last chapter is the extension's: Overview, Share results, the developer's note and the mini-me.
+   * Under him, visitors without Chess Review get the two stores; with it installed, the extension's own
+   * review and share buttons come back instead (viewer.css).
+   */
+  renderShare(options) {
+    const share = super.renderShare(options);
+    share.querySelector(':scope > .profile-chooser-row')?.classList.add('web-review-row');
+    share.append(this.h('div', {class: 'profile-chooser-row web-install-row'}, ...installButtons('share')));
+    return share;
   }
-  /** The last chapter: where the extension offers its share link, the web offers a profile of your own. */
-  renderShare() {
-    const {h} = this, account = this.shared?.account || '';
-    const copy = h('button', {type: 'button', class: 'profile-button ghost web-copy', onclick: () => copyLink(copy)}, h('span', {class: 'profile-button-icon', html: ICONS.link}), 'Copy this link');
-    return h('div', {class: 'profile-share web-share'},
-      h('div', {class: 'web-share-card'},
-        h('span', {class: 'web-share-eyebrow'}, 'Your turn'),
-        h('strong', {class: 'web-share-title'}, 'What would your games say?'),
-        h('p', {}, `Chess Review builds this story from any Chess.com or Lichess account in your browser: your own twin, rating journey, openings and habits${account ? `, ready to compare with ${account}'s` : ''}.`),
-        h('div', {class: 'web-share-actions'}, installButton({where: 'share'}), h('button', {type: 'button', class: 'profile-button ghost', onclick: () => openInstall(account)}, 'What you get'))),
-      h('div', {class: 'profile-chooser-row web-share-row'}, copy));
-  }
+  devNoteLines() { return WEB_DEV_NOTE; }
+  /** Share results copies this page's own link, which already carries the profile. */
+  copyLink() { return copyPageLink(); }
   /** The panel's "Build your own" gets the knight and the accent, so it reads as the page's way in. */
   renderHead() {
     super.renderHead();
