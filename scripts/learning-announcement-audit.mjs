@@ -61,7 +61,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     await run(`chrome.storage.local.remove(${KEYS}).then(()=>{${KEYS}.forEach(k=>localStorage.removeItem(k));${legacy ? `return chrome.storage.local.set({'${legacy}':true});` : ''}})`);
     await call('Page.reload', {}, review.sessionId);
     await waitFor(review, "!!document.querySelector('#profileToggle')", 'Reloaded review');
-    if (!legacy) { await waitFor(review, "!!document.querySelector('.learning-announcement')", 'Fresh intro'); await sleep(500); }
+    await waitFor(review, "!!document.querySelector('.learning-announcement')", 'Fresh intro'); await sleep(500);
   };
   const reloadShowsNothing = async message => {
     await call('Page.reload', {}, review.sessionId); await sleep(1200);
@@ -137,8 +137,9 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await reloadShowsNothing('Using a button must not show the tour again');
 
   await fresh({legacy: 'learningAnnouncement:puzzles:seen'});
-  await sleep(1000);
-  assert.equal(await run("!!document.querySelector('.learning-announcement')"), false, 'Users who saw the old note are not first-time users');
+  assert.equal(await run('!!document.querySelector(".learning-announcement")'), true, 'Users who saw the old note get the tour too');
+  await run("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape'}))");
+  await reloadShowsNothing('The tour shows only once for users who saw the old note');
 
   await call('Emulation.setEmulatedMedia', {features:[{name:'prefers-reduced-motion',value:'reduce'}]}, review.sessionId);
   await fresh();

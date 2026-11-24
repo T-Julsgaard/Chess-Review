@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { UI_SETUPS, MODERN_LAYOUT } from '../lib/ui-setups.js';
-import { INTRO_TOUR_SEEN as seen, LEGACY_ANNOUNCEMENT_KEYS as legacy } from '../lib/learning-announcement.js';
+import { INTRO_TOUR_SEEN as seen } from '../lib/learning-announcement.js';
+const legacy = ['learningAnnouncement:puzzles:seen', 'learningAnnouncement:puzzles:disabled'];
 
 let installed;
 globalThis.chrome = {
@@ -183,12 +184,23 @@ test('an existing 0.3.0 user sees the intro tour after migration without losing 
   assert.equal(reopened.dom.window.document.querySelector('.learning-announcement'), null);
 });
 
-for (const marker of [seen, ...legacy]) {
-  test(`migration respects an existing ${marker} marker`, async t => {
+test('migration respects an existing intro tour marker', async t => {
+  const { store } = setup(); store[seen] = true;
+  const a = await workspace(t);
+  assertModern(a.state.settings); assert.equal(store[seen], true);
+  assert.equal(a.dom.window.document.querySelector('.learning-announcement'), null);
+});
+
+for (const marker of legacy) {
+  test(`an updating user with the old ${marker} marker still sees the intro tour once`, async t => {
     const { store } = setup(); store[marker] = true;
     const a = await workspace(t);
-    assertModern(a.state.settings); assert.equal(store[marker], true);
-    assert.equal(a.dom.window.document.querySelector('.learning-announcement'), null);
+    assertModern(a.state.settings);
+    assert.ok(a.dom.window.document.querySelector('.learning-announcement'));
+    assert.equal(store[seen], true);
+    a.dom.window.document.querySelector('.learning-announcement-dismiss').click();
+    const reopened = await workspace(t);
+    assert.equal(reopened.dom.window.document.querySelector('.learning-announcement'), null);
   });
 }
 

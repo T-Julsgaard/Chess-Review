@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {JSDOM} from 'jsdom';
 import {claimLearningAnnouncement, mountLearningAnnouncement, INTRO_STEPS,
-  INTRO_TOUR_SEEN as seen, LEGACY_ANNOUNCEMENT_KEYS as legacy} from '../lib/learning-announcement.js';
+  INTRO_TOUR_SEEN as seen} from '../lib/learning-announcement.js';
+const legacy = ['learningAnnouncement:puzzles:seen', 'learningAnnouncement:puzzles:disabled'];
 import {app, loadGame, settle} from './helpers/app.mjs';
 
 function persistence() {
@@ -43,12 +44,13 @@ test('the independent local backup suppresses a lost extension marker', async ()
   assert.equal(await claimLearningAnnouncement(p), false);
 });
 
-test('users who saw or opted out of the earlier puzzles note are not first-time users', async () => {
+test('users updating past the earlier puzzles note (seen or opted out) still get the intro once', async () => {
   for (const key of legacy) for (const backend of ['extension', 'backup']) {
     const p = persistence();
     if (backend === 'extension') p.data[key] = true; else p.backup.set(key, 'true');
-    assert.equal(await claimLearningAnnouncement(p), false, `${key} in ${backend}`);
-    assert.equal(p.data[seen], undefined);
+    assert.equal(await claimLearningAnnouncement(p), true, `${key} in ${backend}`);
+    assert.equal(p.data[seen], true);
+    assert.equal(await claimLearningAnnouncement(p), false);
   }
 });
 
