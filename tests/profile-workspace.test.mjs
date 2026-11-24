@@ -224,6 +224,15 @@ test('profile: share payload round-trips, sanitises links and opens from a share
   const decoded = await decodeProfile(encoded);
   assert.equal(decoded.account, 'tester');
   assert.deepEqual(buildDeck(decoded, {account: 'tester', engineStatus: 'unavailable'}).map(s => s.id), buildDeck(trimReport(report), {account: 'tester', engineStatus: 'unavailable'}).map(s => s.id));
+  // A long rating line is thinned across its whole span, so the shared chart still runs from start to end through the peak.
+  for (const [cls, r] of Object.entries(report.ratings)) {
+    const shared = trimReport(report).ratings[cls].series;
+    assert.ok(shared.length <= 40, cls + ': ' + shared.length);
+    assert.deepEqual([shared[0], shared.at(-1)], [r.series[0], r.series.at(-1)], cls + ': first and last game kept');
+    assert.ok(shared.some(p => p.t === r.peak.t && p.r === r.peak.rating), cls + ': the peak stays on the line');
+    assert.ok(shared.every((p, i) => !i || p.t >= shared[i - 1].t), cls + ': still in date order');
+  }
+  assert.ok(Object.values(report.ratings).some(r => r.series.length > 40), 'the sample has a line long enough to thin');
   const hostile = structuredClone(trimReport(report));
   hostile.opponents.rival.decisive.url = 'javascript:alert(1)';
   hostile.account = 'x'.repeat(500);
