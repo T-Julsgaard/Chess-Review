@@ -213,7 +213,7 @@ test('profile setup: changing a custom range invalidates pending reads', async t
   assert.deepEqual(w.rows, []);
 });
 
-test('profile: share payload round-trips, sanitises links and opens read-only from a shared job', async t => {
+test('profile: share payload round-trips, sanitises links and opens from a shared job', async t => {
   const rows = season();
   const report = buildReport(rows, buildInsights(rows), {account: 'tester', site: 'chesscom', period: 'year', periodLabel: 'Past 12 months'});
   const encoded = await encodeProfile(report);
@@ -239,7 +239,10 @@ test('profile: share payload round-trips, sanitises links and opens read-only fr
   assert.ok(a.state.blank, 'a shared profile opens the blank workspace');
   const shell = doc.querySelector('.profile-shell');
   assert.ok(shell, 'the shared deck is shown');
-  assert.ok(shell.querySelector('.profile-head').textContent.includes('Shared player profile'));
+  assert.equal(shell.querySelector('.profile-head-title').textContent, 'tester');
+  assert.equal(shell.querySelector('.pv-compare').textContent, 'Compare');
+  assert.equal(shell.querySelector('.pv-settings').getAttribute('aria-label'), 'Settings');
+  assert.doesNotMatch(shell.querySelector('.profile-head').textContent, /Build your own/);
   assert.equal(shell.querySelector('.profile-title, .pv-story-figure').textContent, 'tester');
   assert.equal(shell.querySelector('.profile-engine'), null, 'no engine controls for a shared profile');
   assert.equal(a.store['job:shared-job'], undefined, 'the one-shot job is removed');

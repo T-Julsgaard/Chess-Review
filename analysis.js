@@ -1862,7 +1862,6 @@ async function openProfile({shared = null} = {}) {
     },
     createAnalysisEngine:()=>createEngine({Threads:1, Hash:16, "Skill Level":20}),
     requestClose:()=>profileWorkspace?.close(),
-    buildOwn:async()=>{await profileWorkspace.close();openProfile();},
     restoreBoard:()=>{ if(!UI.boardWrap.querySelector(".board"))return; buildBoard(); renderPlayers(); },
     onClose:()=>{ if(profileWorkspace&&profileWorkspace.closed)profileWorkspace=null; syncProfileToggle(); if (UI.settings && !UI.settings.hidden) renderSettings(); document.getElementById("profileToggle")?.focus({preventScroll:true});
       if(deferredPracticeAdvance){deferredPracticeAdvance=false;const practice=S.practice;setTimeout(()=>{if(S.practice===practice&&!profileOwnsBoard())practiceAdvance();},1300);} }});

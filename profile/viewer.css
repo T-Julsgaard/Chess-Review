@@ -33,6 +33,7 @@ body.web-viewer { overflow: hidden; }
 .profile-head > .profile-button.web-build { display: inline-flex; align-items: center; gap: 7px; padding-left: 6px;
   background: linear-gradient(160deg, var(--accent), var(--accent-strong)); border-color: var(--accent); color: var(--accent-ink); font-weight: 800;
   box-shadow: none; transition: transform .15s; }
+:root[data-chess-review="installed"] .profile-head > .profile-button.web-build { display: none; }
 .profile-head > .profile-button.web-build:hover { color: var(--accent-ink); border-color: var(--accent-strong); transform: translateY(-1px); }
 .profile-head > .profile-button.web-build:active { transform: scale(.97); }
 .web-build-mark { display: grid; place-items: center; flex: none; width: 22px; height: 22px; border-radius: 7px; background: color-mix(in oklab, var(--accent-ink) 22%, transparent); }

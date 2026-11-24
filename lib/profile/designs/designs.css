@@ -169,8 +169,8 @@
 .pv-back:hover { border-color: var(--pv-tint); background: color-mix(in srgb, var(--pv-vivid) 10%, transparent); transform: translateX(-2px); }
 .pv-back svg { width: 14px; height: 14px; }
 .profile-shell[data-design="story"] .profile-head-title { font-size: 16px; }
-:is(.pv-share, .pv-compare) { padding: 6px 12px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); background: transparent; color: var(--ink-2); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
-:is(.pv-share, .pv-compare):hover { color: var(--ink); border-color: var(--pv-tint); }
+.pv-compare { padding: 6px 12px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); background: transparent; color: var(--ink-2); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.pv-compare:hover { color: var(--ink); border-color: var(--pv-tint); }
 /* Compare: switch the deck to another player read before, on the same chapter (story.js toggleCompare). */
 .pv-head-actions { position: relative; display: flex; align-items: center; gap: 6px; flex: none; }
 .pv-compare.on { color: var(--ink); border-color: var(--pv-tint); }
@@ -190,7 +190,7 @@
 .pv-compare-item small { font-size: 11px; color: var(--ink-2); }
 .pv-compare-item:hover, .pv-compare-item:focus-visible { outline: none; background: color-mix(in srgb, var(--pv-vivid, var(--accent)) 14%, transparent); }
 .pv-compare-empty { margin: 0; padding: 8px 10px; font-size: 12px; line-height: 1.45; color: var(--ink-2); }
-/* Settings: the gear right of Share, which games count (workspace.js fillSettings, filters.js). */
+/* Settings: the gear next to Compare, which games count (workspace.js fillSettings, filters.js). */
 .profile-head-actions { position: relative; }
 .pv-head-name { display: grid; gap: 1px; min-width: 0; }
 .pv-head-name .profile-head-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -88,7 +88,9 @@ the link carries its totals (`report.season`, checked by `sharedSeason`). The in
 as one result, day and time control per game (`report.mosaic`, `mosaicPayload`/`mosaicRows` in
 `game-map.js`), so shared squares describe a game but do not open one. An accuracy chapter without a
 finished accuracy check has nothing to draw from a link and stays off. When the extension is installed (`profile-viewer-content.js` marks the page) the
-nudges hide and the same link opens the full deck on the board.
+nudges hide and the same link opens the deck with Compare and Settings on the review board.
+Compare switches between the shared report and a saved player. Settings can load the shared
+player's games to apply filters.
 
 ## Changes from the plan, and why
 

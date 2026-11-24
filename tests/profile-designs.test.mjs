@@ -665,6 +665,57 @@ test('story Compare turns into Switch: press to swap players, × to stop', async
   assert.equal(doc.querySelector('.pv-compare').textContent, 'Compare');
 });
 
+test('an extension share link compares with a saved player and switches back to the shared report', async t => {
+  const {buildInsights} = await import('../lib/profile/insights.js');
+  const a = review(t), doc = a.dom.window.document;
+  seed(a);
+  const report = {...buildInsights(season(60)), account: 'SharedCom / SharedLi', site: 'both', period: 'all', periodLabel: 'All time'};
+  await a.call('openProfile', {shared: report});
+  const w = a.run('profileWorkspace');
+  const title = () => doc.querySelector('.pv-head-name .profile-head-title').textContent;
+  assert.equal(title(), report.account);
+  assert.doesNotMatch(w.head.textContent, /Build your own/);
+  assert.ok(doc.querySelector('.pv-head-actions .pv-settings[aria-label="Settings"]'));
+  w.go(w.deck.findIndex(slide => slide.id === 'clock'));
+  doc.querySelector('.pv-compare').click();
+  await settle();
+  doc.querySelector('.pv-compare-item').click();
+  for (let i = 0; i < 6; i++) await settle();
+  assert.equal(title(), 'tester');
+  assert.equal(w.currentSlide().id, 'clock');
+  assert.equal(w.shared, null);
+  doc.querySelector('.pv-compare-swap').click();
+  await settle();
+  assert.equal(title(), report.account);
+  assert.equal(w.currentSlide().id, 'clock');
+  assert.equal(w.shared, report);
+  assert.deepEqual(w.accounts, {chesscom: 'SharedCom', lichess: 'SharedLi'});
+  assert.equal(w.report.games, report.games);
+});
+
+test('settings on an extension share link loads games for the shared period and filters the current chapter', async t => {
+  const {buildInsights} = await import('../lib/profile/insights.js');
+  const {decodeProfile, encodeProfile} = await import('../lib/profile/share.js');
+  const a = review(t), doc = a.dom.window.document;
+  seed(a);
+  const customPeriod = {start: '2026-01-01', end: '2026-02-01'};
+  const report = await decodeProfile(await encodeProfile({...buildInsights(season(20)), account: 'tester', site: 'chesscom', period: 'custom', customPeriod}));
+  await a.call('openProfile', {shared: report});
+  const w = a.run('profileWorkspace');
+  w.go(w.deck.findIndex(slide => slide.id === 'numbers'));
+  doc.querySelector('.pv-settings').click();
+  assert.equal(w.rows.length, 0);
+  doc.querySelector('[data-focus="load-games"]').click();
+  for (let i = 0; i < 6; i++) await settle();
+  assert.equal(w.shared, null);
+  assert.equal(w.currentSlide().id, 'numbers');
+  assert.deepEqual(w.customPeriod, customPeriod);
+  const total = w.report.games;
+  doc.querySelector('[data-focus="colour-b"]').click();
+  assert.ok(w.report.games > 0 && w.report.games < total);
+  assert.ok(w.periodRows().every(row => row.me === 'b'));
+});
+
 test('story chapters without enough games in a time control all say the same, and only that', async t => {
   const a = review(t), doc = a.dom.window.document;
   seed(a);
