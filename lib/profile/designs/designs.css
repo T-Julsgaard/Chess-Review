@@ -18,6 +18,14 @@
 .pv-col-label { align-items: center; font-size: clamp(9px, .95vw, calc(13px * var(--pv-s, 1))); font-weight: 750; letter-spacing: .6px; text-transform: uppercase; color: var(--ink-2); }
 /* Labels under a chart that stands on the board's bottom edge (columns with `floor`). */
 .pv-outside > .pv-col-below { top: calc(100% + 7px); height: auto; line-height: 1.2; white-space: nowrap; animation: pv-fade .4s ease var(--d, 0ms) both; }
+/* A rating range on one line when its column has room, else "1200–" over "1249". */
+.pv-outside > .pv-col-below.pv-col-range { display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-start; letter-spacing: 0; font-size: clamp(9px, .8vw, calc(12px * var(--pv-s, 1))); }
+/* More than twelve columns on a narrow board: each names only where its range starts; its tooltip still gives the range. */
+.pv-outside.pv-columns-below { container: pv-below / inline-size; }
+@container pv-below (width < 400px) {
+  .pv-columns-crowded > .pv-col-range { font-size: 7.5px; }
+  .pv-columns-crowded > .pv-col-range > .pv-range-to { display: none; }
+}
 .pv-line-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 /* The fill under the line waits until the line has been drawn, so it never gives away where it goes. */
 .pv-line-area { opacity: 0; animation: pv-fade .7s ease 1.55s forwards; }
@@ -432,6 +440,8 @@
 .pv-col-label.pv-col-plain { text-transform: none; letter-spacing: .2px; }
 .profile-board-caption .pv-legend { justify-content: center; }
 .profile-board-caption .pv-legend.pv-legend-below { margin-top: 20px; }
+/* Rating ranges may wrap onto two lines under narrow columns. */
+.profile-board-caption .pv-legend.pv-legend-below.pv-legend-ranges { margin-top: 32px; }
 /* Increase granularity (clock): columns split into slivers that slide apart, then fill to their own level (board-viz.js regroupFrom). */
 .pv-regrouping.pv-dim::before { animation: none; }
 .pv-regrouping .pv-tile::before { animation: none; }

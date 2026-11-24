@@ -42,7 +42,8 @@ test('insights: results by opponent rating pick a band width that fits the board
   assert.equal(wide.step, 200); assert.ok(wide.bands.length <= 16);
   const deck = resultsByRating(narrow);
   assert.equal(deck.scene.type, 'results');
-  assert.equal(deck.scene.columns.filter(c => c.label).length, 6, 'twelve bands, every other one labelled');
+  assert.deepEqual(deck.scene.columns.map(c => c.label), narrow.bands.map(b => `${b.from}–${b.to}`), 'every band named by its rating range');
+  assert.equal(deck.scene.columns[0].label, '1200–1249');
   assert.ok(deck.scene.columns.every(c => !c.games || Math.abs(c.w + c.d + c.l - 1) < 1e-9));
 });
 
