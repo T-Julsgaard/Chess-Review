@@ -80,7 +80,7 @@ body.web-viewer { overflow: hidden; }
 
 /* ---------- the last chapter: the extension's, with the stores under the mini-me ---------- */
 /* Without Chess Review the row under him is the two stores; with it installed, the extension's review and share buttons. */
-.web-install-row { justify-content: center; padding-top: 10px; border-top: 1px solid var(--line); }
+.web-install-row { justify-content: center; padding-top: 18px; border-top: 1px solid var(--line); }
 .web-install-row .profile-button { gap: 7px; }
 body:not(.web-has-extension) .web-review-row, .web-has-extension .web-install-row { display: none; }
 /* The page lays the panel out at full size, so on short laptop windows the mini-me gives up more height than in the extension and the stores stay in view. */
