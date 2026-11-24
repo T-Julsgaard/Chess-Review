@@ -260,7 +260,6 @@ test('workspace: games stream onto the main board beside the animation; the deck
 
 test('workspace: the film roll shows while loading, then the mosaic once every game has played; the deck keeps the mosaic', async t => {
   const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6'); a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
-  assert.equal(a.state.settings.profileStream, 'film', 'the film roll is the default');
   await a.call('openProfile'); await settle();
   const w = a.run('profileWorkspace'), win = a.dom.window, doc = win.document;
   t.after(() => w.close());

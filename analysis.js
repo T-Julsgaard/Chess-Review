@@ -400,12 +400,6 @@ const DEFAULT_SETTINGS = {
   profileColor: "all", profileRatedOnly: false, profileSkipShort: false, profileExcludedOpponents: {},
   // Accuracy check that runs by itself after a profile is built: depth (off/fast/balanced/deep) and which games.
   profileDepth: "balanced", profileSample: "all",
-  // How the historical twin's face appears, and what the Signature moves board shows.
-  profilePortraitStyle: "relief", profileSignatureBoard: "differences",
-  // How games appear on the board while a profile is built: film (default) or mosaic.
-  profileStream: "film",
-  // How the developer's figure on the profile's last chapter is drawn: thin (default) or bold.
-  profileMiniMe: "thin",
   // Display the selected analysis lines unless the user adds or removes lines in the panel.
   // Extra candidates are searched after scoring or on demand without re-analyzing the game.
   // Default SF18 searches match the published depth16/Hash16 quality model.
@@ -6694,18 +6688,6 @@ function visualSettings() {
       slider("Head size", "arrowHead", 0.22, 0.55, 0.01, { onChange: refreshArrows }),
       el("button", { class: "set-reset", onclick: resetArrowSettings }, "Reset to default"),
     ),
-    section("Player profile",
-      settingDropdown("Games while loading", "profileStream", [["film", "Film roll"], ["mosaic", "Mosaic"]],
-        "What the board shows while your games are found. Film roll flashes through each game with both players' names, like a reel of your chess life, then turns into the mosaic while the accuracy check finishes; Mosaic adds a square for every game until the whole history fits on the board."),
-      settingDropdown("Portrait animation", "profilePortraitStyle", [["assemble", "Assemble"], ["morph", "Morph"], ["inlay", "Inlay"], ["relief", "Relief"], ["halftone", "Mosaic"], ["swarm", "Swarm"]],
-        "How the historical twin's face appears on the board. Assemble glides and shapes the pieces into a sculpted portrait; Morph slows the transformation and keeps the chess pieces recognizable longer; Inlay builds the entire image, including its background, from pieces; Relief adds finer facial detail and a softer return to the board; Mosaic uses tiny chess pieces; Swarm is the original swirl of pieces."),
-      settingDropdown("Playstyle comparison board", "profileSignatureBoard", [
-        ["differences", "Habit differences"], ["centered", "Centered difference chart"], ["pieces", "Piece markers on ranks"],
-        ["cards", "Four habit cards"], ["compare", "Paired columns"], ["heat", "Heat map"],
-      ], "Choose how the board shows your habits in You vs. a typical player. Centered differences show how far each habit is from typical, piece markers plot both values on ranks, and habit cards highlight four comparisons. The heat map shows where your pieces land."),
-      settingDropdown("Developer figure", "profileMiniMe", [["thin", "Thin"], ["bold", "Bold"]],
-        "How the developer's waving figure is drawn on the profile's last chapter. Thin is a light sheet of small characters; Bold uses heavier, larger characters that are easier to see."),
-    ),
     section("Animations",
       toggleRow("Interface animations", "uiAnim", setSetting,
         "Adds motion to lesson transitions, stats, puzzle changes and other interface effects. If your device is set to reduce motion, that setting is respected."),
@@ -6800,37 +6782,6 @@ function soundSettings() {
     el("button", {class:"set-reset", onclick:async () => {
       await resetSettingKeys(SOUND_SETTING_KEYS); renderSettings();
     }}, "Reset all sound settings"),
-  );
-}
-function profileSettings() {
-  const periods = [["year", "Past 12 months"], ["calendar", "This year"], ["all", "All time"], ["custom", "Custom period"]];
-  const depths = [["fast", "Fast"], ["balanced", "Balanced"], ["deep", "Deep"]];
-  const samples = [["all", "Every game"], ["2", "1 in 2"], ["5", "1 in 5"], ["10", "1 in 10"]];
-  const usage = el("span", { class: "set-note" }, "Measuring…");
-  loadProfileWorkspace().then(({profileStorageUsage}) => profileStorageUsage(browserAPI.storage.local)).then(info => {
-    usage.textContent = info.accounts
-      ? settingsFormat(info.accounts === 1 ? "{0} player, {1} engine-checked games, about {2} KB stored locally." : "{0} players, {1} engine-checked games, about {2} KB stored locally.",
-        info.accounts, info.engine, Math.max(1, Math.round(info.bytes / 1024)))
-      : settingsText("No profile data stored yet.");
-  }).catch(() => { usage.textContent = settingsText("Could not read storage."); });
-  return el("div", {},
-    section("Recap",
-      el("div", { class: "set-row" }, setLabel("Default period", "The period the Player profile opens with. The picker inside the profile changes it for the session and remembers your choice."),
-        ddField(periods.some(([id]) => id === S.settings.profilePeriod) ? S.settings.profilePeriod : "year", periods, value => setSetting("profilePeriod", value))),
-      el("div", { class: "set-row" }, setLabel("Accuracy check", "The engine depth the accuracy check starts with. You start the check in the profile's accuracy over time chapter; deeper is more exact but slower."),
-        ddField(depths.some(([id]) => id === S.settings.profileDepth) ? S.settings.profileDepth : "balanced", depths, value => setSetting("profileDepth", value))),
-      el("div", { class: "set-row" }, setLabel("Games to check", "Which games the accuracy check looks at: every game of the period, or one in every 2, 5 or 10, spread over the whole period."),
-        ddField(samples.some(([id]) => id === S.settings.profileSample) ? S.settings.profileSample : "all", samples, value => setSetting("profileSample", value))),
-      toggleRow("Count games against bots", "profileIncludeBots", setSetting, "Off keeps every figure to human opponents. On includes computer opponents where the platform marks them."),
-    ),
-    section("Data",
-      el("div", { class: "set-row hint" }, usage),
-      el("div", { class: "set-row hint" }, el("span", { class: "set-note" }, "Games are fetched from the public Chess.com and Lichess APIs straight into this browser and kept only here. Finished months are never fetched twice.")),
-      el("button", { class: "set-reset", onclick: async () => {
-        try { const {deleteProfileData} = await loadProfileWorkspace(); const removed = await deleteProfileData(browserAPI.storage.local); toast(settingsText(removed ? "Profile data deleted" : "Nothing to delete")); if (profileWorkspace) profileWorkspace.close(); renderSettings(); }
-        catch { toast(settingsText("Could not delete profile data")); }
-      } }, "Delete all profile data"),
-    ),
   );
 }
 function developerSettings() {
@@ -7142,7 +7093,6 @@ const SETTINGS_CATEGORIES = [
   {id:"review", label:"Review & Coach", description:"Commentary, character & reactions", icon:"chat", render:reviewSettings},
   {id:"engine", label:"Engine", description:"Analysis power & rating estimates", icon:"cpu", render:motorSettings},
   {id:"sound", label:"Sound", description:"Every move, your sound", icon:"sound", render:soundSettings},
-  {id:"profile", label:"Player profile", description:"Your recap, its data & engine budget", icon:"trophy", render:profileSettings},
   {id:"developer", label:"Developer tools", description:"Screen previews & test data", icon:"code", render:developerSettings},
 ];
 const settingsScroll = new Map();
@@ -7434,8 +7384,6 @@ async function setSetting(key, value) {
   S.settings[key] = value;
   await writeSettings({ [key]: value, ...setupPatch }, key === "badgeSymbols" ? ["badgeSymbols"] : []);
   applySettings();
-  if (key === "profileSignatureBoard" && profileWorkspace?.currentSlide()?.id === "signature") profileWorkspace.renderSlide({animate: false});
-  if (key === "profileMiniMe") profileWorkspace?.miniMe?.redraw();
   if (key === "reviewMode") { paintBoard(); renderReview(); fitViewport(); }
   if (design?.panel.startsWith('accuracy')) { statsRefs = null; hideQTip(); renderStats(); if(key==='accuracyDesign')reflowAccuracy(accuracyLayoutExpanded()); }
   if (key === 'movesDesign') updateMovesDesign();

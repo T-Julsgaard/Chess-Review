@@ -319,7 +319,7 @@
 .pv-outside > .pv-axis-tick { position: absolute; left: -8px; transform: translate(-100%, -50%); font-size: clamp(9px, .9vw, calc(12.5px * var(--pv-s, 1))); font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; white-space: nowrap; color: var(--ink-2); animation: pv-fade .4s ease var(--d, 0ms) both; }
 .pv-outside > .pv-axis-tick::after { content: ""; position: absolute; left: calc(100% + 3px); top: 50%; width: 4px; height: 1px; background: color-mix(in srgb, var(--ink) 35%, transparent); }
 
-/* Charts: values on the bars, dense columns, pairs, habit dots */
+/* Charts: values on the bars, dense columns, habit dots */
 .pv-layer > .pv-col-value { display: block; text-align: center; padding: 0 0 4px; transform: translateY(-100%); line-height: 1.1; white-space: nowrap; }
 .pv-col-value.pv-muted { color: var(--ink-2); font-weight: 700; }
 .pv-columns-dense .pv-col-value { font-size: clamp(9px, .85vw, calc(13px * var(--pv-s, 1))); }
@@ -327,31 +327,8 @@
 /* Results over time names every column ("NOV", "DEC"): with up to 24 of them, the names close up so each stays under its own column. */
 .pv-outside.pv-columns-dense.pv-has-axis > .pv-col-label { letter-spacing: 0; font-size: clamp(7.5px, .64vw, calc(10px * var(--pv-s, 1))); }
 .pv-columns-dense .pv-tile::before { left: 7%; right: 7%; border-radius: 4px; }
-.pv-pair-label { letter-spacing: .3px; }
-/* The space between the two markers shows the gap for each habit. */
-.pv-differences { container-type: inline-size; --typical-dot: var(--ink-2); }
-.pv-diff-key, .pv-diff-list { inset-inline: 9%; }
-.pv-diff-key { top: 5%; display: flex; justify-content: center; gap: 1.4em; color: var(--ink-2); font-size: clamp(9px, 2.9cqw, 15px); font-weight: 700; }
-.pv-diff-list { inset-block: 13% 7%; display: grid; grid-auto-rows: 1fr; gap: 2cqw; margin: 0; padding: 0; list-style: none; }
-.pv-diff-row { display: grid; align-content: center; gap: clamp(2px, 1cqw, 7px); min-width: 0; padding-inline: 4%; border-radius: 8px; background: color-mix(in srgb, var(--panel) 78%, transparent); font-size: clamp(9px, 3.05cqw, 18px); font-variant-numeric: tabular-nums; }
-.pv-diff-heading, .pv-diff-values { display: flex; justify-content: space-between; align-items: baseline; gap: 5px; line-height: 1.13; }
-.pv-diff-gap { color: var(--pv-c, var(--accent)); font-weight: 800; white-space: nowrap; }
-[data-theme="light"] .pv-diff-gap { color: color-mix(in srgb, var(--pv-c, var(--accent)) 50%, var(--ink)); }
-.pv-diff-values { justify-content: flex-start; gap: 1em; color: var(--ink-2); font-size: .88em; }
-.pv-diff-key span, .pv-diff-values span { display: inline-flex; align-items: center; gap: .4em; }
-:is(.pv-diff-key, .pv-diff-values) > span::before { content: ""; width: .6em; aspect-ratio: 1; border-radius: 50%; background: var(--marker); }
-.pv-diff-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-.pv-diff-you { --marker: var(--pv-c, var(--accent)); }
-[data-theme="light"] .pv-diff-you { --marker: color-mix(in srgb, var(--pv-c, var(--accent)) 73%, var(--ink)); }
-.pv-diff-typical { --marker: var(--typical-dot); }
-.pv-diff-track { position: relative; height: clamp(3px, 1cqw, 6px); margin-inline: .35em; border-radius: 999px; background: color-mix(in srgb, var(--ink) 16%, transparent); }
-.pv-diff-track i { position: absolute; top: 50%; translate: -50% -50%; }
-.pv-diff-track :is(.pv-diff-you, .pv-diff-typical) { width: .67em; aspect-ratio: 1; border-radius: 50%; background: var(--marker); }
-.pv-diff-track .pv-diff-you { left: var(--you); }
-.pv-diff-track .pv-diff-typical { left: var(--typical); }
-.pv-diff-track .pv-diff-link { left: min(var(--you), var(--typical)); width: calc(max(var(--you), var(--typical)) - min(var(--you), var(--typical))); height: 100%; translate: 0 -50%; background: color-mix(in srgb, var(--pv-c, var(--accent)) 55%, var(--typical-dot)); }
 
-/* Playstyle comparisons on the board's files, ranks and quadrants. */
+/* Playstyle comparison: four habit cards, one on each quarter of the board. */
 .pv-signature-chart {
   container-type: inline-size;
   --sig-you: color-mix(in oklab, var(--pv-c, var(--accent)) 68%, var(--ink));
@@ -363,72 +340,11 @@
 .pv-signature-chart.pv-dim::before { background: color-mix(in srgb, var(--bg) 83%, transparent); }
 .pv-sig-you { color: var(--sig-you); }
 .pv-sig-typical { color: var(--ink-2); }
-.pv-sig-key {
-  inset: 0 0 auto;
-  height: 12.5%;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  padding-inline: 7%;
-  border-bottom: 1px solid var(--sig-rule);
-  color: var(--ink-2);
-  font-size: clamp(7px, 2.62cqw, 16px);
-  font-weight: 700;
-  letter-spacing: .055em;
-  text-transform: uppercase;
-}
-.pv-sig-key b { color: var(--ink); }
-.pv-signature-centered .pv-sig-key span:last-child { justify-self: end; }
-.pv-sig-centerline { inset: 12.5% auto 0 50%; border-left: 1px dashed var(--sig-rule); }
-.pv-sig-rows, .pv-sig-cards { margin: 0; padding: 0; list-style: none; display: grid; font-size: clamp(9px, 3.45cqw, 21px); }
-.pv-sig-rows { inset: 12.5% 0 0; grid-auto-rows: 1fr; }
-.pv-sig-row {
-  min-width: 0;
-  display: grid;
-  align-content: center;
-  gap: .55em;
-  padding-inline: 7%;
-  border-bottom: 1px solid var(--sig-rule);
-}
-.pv-sig-row:last-child { border-bottom: 0; }
-.pv-sig-heading { display: flex; align-items: baseline; justify-content: space-between; gap: .45em; }
-.pv-sig-heading strong { font-weight: 750; }
-.pv-sig-gap { font-size: .89em; font-weight: 800; white-space: nowrap; }
-.pv-sig-track { position: relative; height: .52em; background: var(--sig-rule); border-radius: 1em; }
-.pv-sig-link {
-  position: absolute;
-  inset: 0 auto 0 min(var(--you), var(--typical));
-  width: calc(max(var(--you), var(--typical)) - min(var(--you), var(--typical)));
-  border-radius: inherit;
-  background: var(--sig-you);
-}
-.pv-sig-dot {
-  position: absolute;
-  top: 50%; left: var(--you);
-  width: .72em; aspect-ratio: 1;
-  translate: -50% -50%;
-  border-radius: 50%;
-  background: var(--sig-you);
-  box-shadow: 0 0 0 2px var(--panel);
-}
 .pv-sig-values { display: flex; gap: 1em; font-size: .84em; }
 .pv-sig-values > span { white-space: nowrap; }
 .pv-sig-value-label { font-weight: 650; }
 
-.pv-signature-pieces .pv-sig-key { display: flex; justify-content: center; gap: 2em; }
-.pv-signature-pieces .pv-sig-key span { display: flex; align-items: center; gap: .3em; }
-.pv-sig-knight { font: normal 1.7em/1 'Segoe UI Symbol', 'DejaVu Sans', sans-serif; }
-.pv-signature-pieces .pv-sig-row { gap: .2em; }
-.pv-signature-pieces .pv-sig-track { height: 2.2em; background: none; margin-inline: .55em; }
-.pv-signature-pieces .pv-sig-track::before, .pv-signature-pieces .pv-sig-link {
-  position: absolute; top: 50%; bottom: auto; height: 2px; border-radius: 2px; translate: 0 -50%;
-}
-.pv-signature-pieces .pv-sig-track::before { content: ''; inset-inline: 0; background: var(--sig-rule); }
-.pv-signature-pieces .pv-sig-track .pv-sig-knight { position: absolute; translate: -50% -50%; }
-.pv-sig-track .pv-sig-knight.pv-sig-typical { top: 25%; left: var(--typical); }
-.pv-sig-track .pv-sig-knight.pv-sig-you { top: 75%; left: var(--you); }
-
-.pv-sig-cards { inset: 0; grid-template: repeat(2, minmax(0, 1fr)) / repeat(2, minmax(0, 1fr)); gap: 2.5%; padding: 3%; }
+.pv-sig-cards { inset: 0; margin: 0; padding: 3%; list-style: none; display: grid; grid-template: repeat(2, minmax(0, 1fr)) / repeat(2, minmax(0, 1fr)); gap: 2.5%; font-size: clamp(9px, 3.45cqw, 21px); }
 .pv-sig-card {
   display: grid;
   grid-template-rows: 2.3em minmax(0, 1fr) auto;

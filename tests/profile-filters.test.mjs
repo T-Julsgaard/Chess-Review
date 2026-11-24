@@ -102,7 +102,7 @@ test('profile gear: colour, rated and short-game switches narrow every chapter, 
   assert.equal(pick('[data-focus="profileRatedOnly"]').getAttribute('aria-checked'), 'true');
   assert.ok(w.periodRows().every(r => r.me === 'b' && r.rated));
   pick('[data-focus="profileIncludeBots"]').click();
-  assert.equal(a.state.settings.profileIncludeBots, true, 'the bots switch is the one from Settings → Recap');
+  assert.equal(a.state.settings.profileIncludeBots, true, 'the bots switch is saved with the settings');
   const kept = w.periodRows().length;
   assert.match(pick('.pv-set-foot span').textContent, new RegExp(`^${kept} of ${total} games count$`));
   pick('.pv-set-reset').click();

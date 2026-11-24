@@ -142,23 +142,12 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.equal(shell.querySelector('.pv-story-chapter').textContent, 'You vs. a typical player', 'the chapter name alone, with no number');
   assert.equal(shell.querySelector('.pv-story-hero'), null, 'no headline repeats the first habit; the list starts higher');
   assert.equal(shell.querySelector('.pv-story-lead'), null);
-  assert.deepEqual([...w.viz.layer.querySelectorAll('.pv-diff-row strong')].map(n => n.textContent), signature.signatures.slice(0, 4).map(s => s.label), 'the board highlights the strongest habits');
-  assert.equal(w.viz.layer.querySelectorAll('.pv-diff-row').length, 4);
-  assert.ok(w.viz.layer.querySelector('.pv-diff-gap'));
-  const labels = signature.signatures.slice(0, 4).map(s => s.label);
-  for (const [setting, mark] of [['centered', '.pv-sig-dot'], ['pieces', '.pv-sig-track .pv-sig-knight.pv-sig-you'], ['cards', '.pv-sig-illustration']]) {
-    await a.call('setSetting', 'profileSignatureBoard', setting);
-    assert.equal(a.store.settings.profileSignatureBoard, setting, 'the chart choice is saved');
-    const layer = w.viz.layer;
-    assert.equal(layer.dataset.scene, `signature-${setting}`, 'the active chapter redraws immediately');
-    assert.equal(layer.querySelectorAll(mark).length, 4);
-    assert.deepEqual([...layer.querySelectorAll('li strong')].map(n => n.textContent), labels);
-    assert.equal(layer.querySelectorAll('.pv-sig-values b').length, 8, 'both values are shown for every habit');
-  }
-  a.state.settings.profileSignatureBoard = 'compare'; w.renderSlide({animate: false});
-  assert.ok(doc.querySelector('.board .pv-pairs'), 'the original paired columns are still available');
-  a.state.settings.profileSignatureBoard = 'heat'; w.renderSlide({animate: false});
-  assert.ok(doc.querySelector('.board .profile-heat'), 'the heat map is still available');
+  const layer = w.viz.layer;
+  assert.equal(layer.dataset.scene, 'signature-cards', 'the board shows the four habit cards');
+  assert.equal(layer.querySelectorAll('.pv-sig-card').length, 4);
+  assert.equal(layer.querySelectorAll('.pv-sig-illustration').length, 4);
+  assert.deepEqual([...layer.querySelectorAll('li strong')].map(n => n.textContent), signature.signatures.slice(0, 4).map(s => s.label), 'the board highlights the strongest habits');
+  assert.equal(layer.querySelectorAll('.pv-sig-values b').length, 8, 'both values are shown for every habit');
   w.go(w.deck.findIndex(s => s.id === 'rival'));
   assert.equal(doc.querySelector('.board .pv-badge'), null);
   assert.match(shell.querySelector('.pv-story-lead').textContent, /^You played \d+ games against rival_rick: won \d+, lost \d+, drew \d+\.$/);
@@ -554,16 +543,14 @@ test('every habit card has an illustration with a caption and accessible descrip
   assert.ok(signatureDiagram(document, 'length').querySelector('pre'));
 });
 
-test('profile settings keep Story even with a saved legacy design', async t => {
+test('Settings has no Player profile section, and the profile keeps Story even with a saved legacy design', async t => {
   const a = review(t), doc = a.dom.window.document;
   seed(a);
   a.call('toggleSettings'); a.call('selectSettingsCategory', 'visual');
-  const text = doc.querySelector('#settings').textContent;
-  assert.ok(text.includes('Player profile'));
-  assert.equal(doc.querySelector('#settings [data-setting="profileDesign"]'), null);
-  for (const setting of ['profilePortraitStyle', 'profileSignatureBoard']) assert.ok(doc.querySelector(`#settings .lib-dd-btn[data-setting="${setting}"]`), setting);
-  const charts = [...doc.querySelectorAll('#settings [role="option"][data-setting="profileSignatureBoard"]')];
-  assert.deepEqual(charts.map(chart => chart.dataset.value), ['differences', 'centered', 'pieces', 'cards', 'compare', 'heat']);
+  assert.ok(!doc.querySelector('#settings').textContent.includes('Player profile'));
+  for (const setting of ['profileDesign', 'profileStream', 'profilePortraitStyle', 'profileSignatureBoard', 'profileMiniMe']) assert.equal(doc.querySelector(`#settings [data-setting="${setting}"]`), null, setting);
+  a.call('selectSettingsCategory', 'profile');
+  assert.equal(a.state.settingsTab, 'visual', 'there is no Player profile category');
   a.state.settings.profileDesign = 'bento';
   const w = await openDeck(a);
   assert.ok(w instanceof StoryWorkspace);

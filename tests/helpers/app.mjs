@@ -72,7 +72,7 @@ export function app(t, {hardware,languages=['en-US'],savedLanguage='en',url='htt
     URL, TextEncoder, btoa, console, Chess, flagCodeForCountryId, countryNameForId, browserAPI,platformAPI:browserAPI,
     createScreenPreviewContext,loadScreenPreviewController,
     rememberAnalyzedGame,historyGame,identityForGame,knownAccounts,IDENTITY_KEY,inferredPlayer,inferredPlayerProfile,PLAYER_HISTORY_KEY,
-    loadProfileWorkspace:async () => ({ProfileWorkspace, deleteProfileData:async () => 0, profileStorageUsage:async () => ({bytes:0,accounts:0,engine:0})}),
+    loadProfileWorkspace:async () => ({ProfileWorkspace}),
     loadProfileStory:async () => ({StoryWorkspace}),
     createReviewEffects,
     explainMove, explanationPv,

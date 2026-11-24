@@ -135,7 +135,7 @@ twenty minutes apart. Tilt check: the next game within two hours. Night: 23:00â€
 - Data and aggregation: `lib/profile/features.js`, `sources.js`, `store.js`, `collector.js`, `insights.js`
 - Twin and copy: `lib/profile/archetypes.js`, `deck.js`
 - Engine sample and hosting: `lib/profile/engine-sample.js`, `pgn-source.js`, `preview.js`, `background.js`, `lib/preview-runner.js`
-- Workspace and board: `lib/profile/workspace.js`, `board.js`, `profile.css`; entry and settings in `analysis.js` (`openProfile`, `profileSettings`)
+- Workspace and board: `lib/profile/workspace.js`, `board.js`, `profile.css`; entry in `analysis.js` (`openProfile`)
 - Share: `lib/profile/share.js`, `profile/` (GitHub Pages viewer), `profile-viewer-content.js`, `content.js`, `lichess-content.js`
 - Tests: `tests/profile-*.test.mjs`, synthetic season in `tests/helpers/profile-season.mjs`
 - Verify: `npm test`, `npm run lint`, `npm run verify:source`, `npm run build`

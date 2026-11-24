@@ -87,7 +87,7 @@ test('profile: seeded games render the deck on the board with navigation, stats 
   const goTo = title => [...shell.querySelectorAll('.pv-seg')].find(dot => dot.title === title).click();
   goTo('You vs. a typical player');
   assert.equal(shell.querySelector('.pv-story').dataset.slide, 'signature');
-  assert.ok(doc.querySelector('.board .pv-differences'));
+  assert.ok(doc.querySelector('.board .pv-signature-cards .pv-sig-card'), 'the board shows the four habit cards');
   for (const link of shell.querySelectorAll('.pv-link[data-game-url]')) assert.match(link.dataset.gameUrl, /^https:\/\/www\.chess\.com\//);
   // Nothing runs by itself: the trend slide offers the check, with an estimate, until it is started.
   goTo('Accuracy over time');
@@ -263,11 +263,8 @@ test('profile: share payload round-trips, sanitises links and opens from a share
   a.run('profileWorkspace').close(); for (let i = 0; i < 4; i++) await settle();
 });
 
-test('profile settings: category renders the period, budget, bot toggle and delete action', t => {
-  const a = review(t), doc = a.dom.window.document;
-  a.call('toggleSettings'); a.call('selectSettingsCategory', 'profile');
-  const text = doc.querySelector('#settings').textContent;
-  for (const label of ['Default period', 'Accuracy check', 'Games to check', 'Count games against bots', 'Delete all profile data']) assert.ok(text.includes(label), label);
+test('profile settings: the recap keeps its defaults with no Settings category', t => {
+  const a = review(t);
   assert.equal(a.state.settings.profileDepth, 'off'); assert.equal(a.state.settings.profileSample, 'all');
   assert.equal(a.state.settings.profilePeriod, 'year'); assert.equal(a.state.settings.profileBudget, 'standard'); assert.equal(a.state.settings.profileIncludeBots, false);
 });

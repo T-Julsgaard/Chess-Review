@@ -53,9 +53,8 @@ const ICONS = {
 /* ---------- the extension's surroundings, for the web ---------- */
 // What Chess Review's settings hold by default for everything the profile reads.
 const SETTINGS = {uiAnim: true, moveAnim: true, animSpeed: 7, pieceStyle: 'image', barStyle: 'flat2', engineDepth: 12,
-  profilePortraitStyle: 'relief', profileSignatureBoard: 'differences', profileStream: 'film',
   profileIncludeBots: false, profileColor: 'all', profileRatedOnly: false, profileSkipShort: false, profileExcludedOpponents: {},
-  profileMiniMe: 'thin', profilePeriod: 'year', profileBudget: 'standard', profileDepth: 'off', profileSample: 'all'};
+  profilePeriod: 'year', profileBudget: 'standard', profileDepth: 'off', profileSample: 'all'};
 const STARTUP_OPEN_DELAY = 40;
 /** In-memory stand-in for extension storage: a shared profile keeps nothing between visits. */
 function memoryStorage() {
