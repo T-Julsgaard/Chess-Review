@@ -261,3 +261,13 @@ test('historical twin portraits always start from all 32 opening pieces and reta
   }
   api.clear();
 });
+
+test('arrow keys leave the twin face alone while it assembles and move on once it has settled', async () => {
+  let left = 0;
+  const workspace = {portrait: {settled: false}, leavePortrait() { left++; }, deck: [], index: 0};
+  await ProfileWorkspace.prototype.stepGame.call(workspace, 1);
+  assert.equal(left, 0, 'a key pressed mid-assembly does not interrupt the face');
+  workspace.portrait.settled = true;
+  await ProfileWorkspace.prototype.stepGame.call(workspace, 1);
+  assert.equal(left, 1, 'the settled face gives way to the game');
+});

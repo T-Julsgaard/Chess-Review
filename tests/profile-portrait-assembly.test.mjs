@@ -185,6 +185,7 @@ test('reduced motion draws a face entirely from filled piece contours and return
   const f = fixture(t);
   await f.flush();
   assert.equal(f.portrait.revealed, true); assert.equal(f.reveals, 1); assert.equal(f.frames.size, 0);
+  assert.equal(f.portrait.settled, true);
   const ctx = f.contexts.get(f.overlay.querySelector('.profile-portrait-pieces'));
   assert.ok(ctx.fills.length >= 32 && ctx.fills.every(fill => fill.rule === 'evenodd' && fill.points.length >= 3));
   assert.equal(ctx.images.length, 0, 'the final face contains no bitmap image');
@@ -201,10 +202,11 @@ test('animated assembly starts from visible original sprites, settles, and rever
   const ctx = f.contexts.get(f.overlay.querySelector('.profile-portrait-pieces'));
   assert.equal(ctx.images.length, 32, 'the same 32 sprites are visible at frame zero');
   f.tick(1100);
-  assert.equal(f.portrait.revealed, false);
+  assert.equal(f.portrait.revealed, false); assert.equal(f.portrait.settled, false, 'still assembling');
   assert.ok(ctx.fills.length >= 32, 'pieces are becoming material contours');
   f.tick(3000);
   assert.equal(f.portrait.revealed, true); assert.equal(f.reveals, 1); assert.equal(ctx.images.length, 0);
+  assert.equal(f.portrait.settled, true, 'the finished face is settled');
   assert.equal(f.frames.size, 0, 'no idle render loop');
   const dismissed = f.portrait.dismiss();
   f.tick(5000); await dismissed;

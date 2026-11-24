@@ -491,6 +491,11 @@ test('story rating inspection survives filtering and game Exit restores the sele
   chart.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'End', bubbles: true, cancelable: true}));
   assert.match(chart.getAttribute('aria-label'), new RegExp(`Point ${w.report.ratings.bullet.games} of`));
   assert.equal(chart.querySelector('.pv-line-path').getAttribute('d').split(' ')[0], 'M0.00');
+  let loads = 0; w.o.loadPgn = async () => { loads++; return '1. e4 e5 *'; };
+  for (const key of ['ArrowRight', 'ArrowLeft']) doc.body.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key, bubbles: true, cancelable: true}));
+  for (let i = 0; i < 4; i++) await settle();
+  assert.equal(loads, 0, 'arrows away from the chart do not load the peak game under it');
+  assert.ok(doc.querySelector('.pv-line')); assert.equal(doc.querySelector('.profile-game-chrome'), null);
   w.o.loadPgn = async () => '[White "Alice"]\n[Black "Bob"]\n[WhiteElo "1600"]\n[BlackElo "1700"]\n\n1. e4 d5 2. exd5 Qxd5 *';
   doc.querySelector('.pv-link').click();
   for (let i = 0; i < 8; i++) await settle();
