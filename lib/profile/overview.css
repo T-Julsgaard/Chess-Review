@@ -162,7 +162,14 @@
 .profile-overview-waffle .w { fill: var(--q-best, #81b64c); }
 .profile-overview-waffle .d { fill: color-mix(in srgb, var(--ink-2) 75%, var(--panel)); }
 .profile-overview-waffle .l { fill: var(--q-miss, #f5746a); }
+.profile-overview-viz:has(> .profile-overview-waffle) { flex-direction: row; align-items: center; gap: .6em; }
+.profile-overview-viz > .profile-overview-waffle { min-width: 0; }
+.profile-overview-heat text { fill: var(--ink-2); font-size: .74px; font-weight: 600; }
 .profile-overview-heat rect { fill: currentColor; fill-opacity: var(--a); animation-delay: calc(var(--i, 0) * 32ms + 160ms + var(--k, 0) * 28ms); }
+@container ovviz (max-height: 70px) or (max-width: 90px) {
+  .profile-overview-heat text { display: none; }
+  .profile-overview-heat g { transform: translateX(calc(-.5 * var(--label-width))); }
+}
 
 /* Rings */
 .profile-overview-ring { overflow: visible; }
@@ -196,6 +203,10 @@
 .profile-overview-wdl b.w { color: color-mix(in oklab, var(--q-best, #81b64c) 75%, var(--ink)); }
 .profile-overview-wdl b.l { color: color-mix(in oklab, var(--q-miss, #f5746a) 75%, var(--ink)); }
 .profile-overview-wdl b:not(:first-child) { margin-left: .45em; }
+.profile-overview-wdl.is-stacked { display: flex; flex-direction: column; gap: .42em; }
+@container ovviz (max-width: 92px) {
+  .profile-overview-wdl.is-stacked { font-size: .7em; }
+}
 .profile-overview-meters, .profile-overview-pairs { display: flex; flex-direction: column; justify-content: flex-end; gap: .4em; flex: none; }
 .profile-overview-meters .m { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: .25em .5em; font-size: .84em; }
 .profile-overview-meters .m i { grid-column: 1 / -1; }
@@ -225,18 +236,24 @@
 .profile-overview-moves .side.w { background: #f1efe7; }
 .profile-overview-moves .side.b { background: #2a2925; }
 
-/* Intro: the player's name as the headline, with the period's two numbers */
+/* Intro: the player's name and period above the summary figures */
 .profile-overview-tile.is-hero {
-  justify-content: flex-end;
   background:
     radial-gradient(120% 110% at 0% 100%, color-mix(in oklab, var(--chapter-accent) 26%, transparent), transparent 65%),
     linear-gradient(160deg, color-mix(in oklab, var(--chapter-accent) 14%, var(--panel)), var(--panel));
 }
 .profile-overview-tile.is-hero .profile-overview-text { gap: .35em; }
-.profile-overview-tile.is-hero .profile-overview-value { font-size: clamp(1.3em, calc(170cqi / (var(--len, 10) + 2)), 2.7em); -webkit-line-clamp: 2; overflow-wrap: normal; word-break: normal; letter-spacing: -.025em; }
+.profile-overview-tile.is-hero .profile-overview-value { font-size: clamp(1.3em, calc(170cqi / (var(--len, 10) + 2)), 2.7em); -webkit-line-clamp: 2; overflow-wrap: anywhere; letter-spacing: -.025em; }
 .profile-overview-tile.is-hero .profile-overview-value img, .profile-overview-tile.is-hero .profile-overview-value svg { height: .62em; width: auto; margin-right: .3em; vertical-align: .06em; border-radius: 2px; }
-.profile-overview-figures { display: flex; flex-wrap: nowrap; white-space: nowrap; gap: .2em 1em; margin-top: .2em; color: var(--ink-2); font-size: .95em; }
+.profile-overview-intro-stats { position: relative; z-index: 1; color: var(--ink-2); }
+.profile-overview-figures { display: flex; flex-wrap: wrap; gap: .15em 1em; font-size: .95em; }
 .profile-overview-figures b { color: var(--ink); font-size: 1.45em; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.profile-overview-most-played { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .15em .6em; margin-top: .7em; padding-top: .6em; border-top: 1px solid color-mix(in oklab, var(--ink-2) 28%, transparent); font-size: .85em; }
+.profile-overview-most-played b { color: var(--ink); }
+@container ovtile (min-height: 140px) {
+  .profile-overview-figures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .profile-overview-figures b { display: block; font-size: 1.7em; line-height: 1.1; }
+}
 .profile-overview-checks {
   position: absolute;
   top: -1px;
@@ -300,6 +317,9 @@
 @container ovtile (max-height: 110px) {
   .profile-overview-tile.is-hero .profile-overview-detail { display: none; }
   .profile-overview-figures b { font-size: 1.2em; }
+}
+@container ovtile (max-height: 64px) {
+  .profile-overview-most-played { display: none; }
 }
 @container ovtile (max-height: 62px) and (aspect-ratio < 1.65) {
   .profile-overview-viz:not(:has(.profile-overview-results)) { display: none; }

@@ -525,7 +525,12 @@ test('the final Story board summarizes the available chapters and opens them dir
   key(a, 'End');
   assert.equal(w.currentSlide().eyebrow, 'Overview');
   assert.deepEqual(tiles().map(button => button.dataset.chapter), ids);
-  assert.match(tiles().find(button => button.dataset.chapter === 'numbers').textContent, new RegExp(String(w.report.totals.games)));
+  const recap = id => tiles().find(button => button.dataset.chapter === id);
+  const {games, w: wins, d: draws, l: losses} = w.report.totals;
+  assert.match(recap('cover').querySelector('.profile-overview-most-played').textContent, /Most played Blitz/);
+  assert.match(recap('numbers').textContent, new RegExp(String(games)));
+  assert.deepEqual([...recap('numbers').querySelectorAll('.profile-overview-wdl b')].map(n => Number(n.textContent)), [wins, draws, losses]);
+  assert.deepEqual([...recap('habits').querySelectorAll('svg text')].map(n => n.textContent), ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']);
   assert.ok(tiles().every(button => button.type === 'button' && button.tabIndex === 0));
   for (const id of ids) {
     w.go(w.deck.length - 1);
