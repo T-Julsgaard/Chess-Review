@@ -57,10 +57,6 @@
 .pv-line-readout[hidden] { display: none; }
 .pv-line-readout-row { display: grid; grid-template-columns: 8px minmax(4.5em, auto) minmax(2.5em, auto) 1fr; align-items: center; gap: 6px; }
 .pv-line-readout-row small { color: var(--ink-2); font-size: .86em; }
-@media (max-width: 1100px) {
-  .pv-story-top { gap: 6px; }
-  .pv-story-top :is(.pv-filter, .pv-modes) button { padding-inline: 7px; font-size: 10px; }
-}
 .pv-layer[data-motion="off"], .pv-layer[data-motion="off"]::before, .pv-layer[data-motion="off"] *, .pv-layer[data-motion="off"] *::before, .pv-outside[data-motion="off"] * { animation: none !important; }
 .pv-layer[data-motion="off"] .pv-line-path { stroke-dashoffset: 0; }
 .pv-layer[data-motion="off"] .pv-line-area { opacity: 1; }
@@ -99,14 +95,14 @@
 .pv-seg.on i { width: 100%; background: var(--pv-vivid); }
 .pv-story-progress[data-playing="on"] .pv-seg.on i { animation: pv-progress linear both; }
 @keyframes pv-progress { from { width: 0; } to { width: 100%; } }
-.pv-story-host { padding: 10px 26px 12px !important; cursor: default; }
+.pv-story-host { container: story-panel / inline-size; padding: 10px 26px 12px !important; cursor: default; }
 .pv-story { display: flex; flex-direction: column; justify-content: flex-start; gap: 16px; min-height: 100%; box-sizing: border-box; padding: 6px 0 10px; }
 .pv-story[data-animate="on"] > * { animation: pv-rise-in .6s cubic-bezier(.2,.8,.2,1) both; }
 .pv-story[data-animate="on"] > :nth-child(2) { animation-delay: 70ms; } .pv-story[data-animate="on"] > :nth-child(3) { animation-delay: 140ms; }
 .pv-story[data-animate="on"] > :nth-child(4) { animation-delay: 210ms; } .pv-story[data-animate="on"] > :nth-child(5) { animation-delay: 280ms; } .pv-story[data-animate="on"] > :nth-child(n+6) { animation-delay: 340ms; }
 .pv-story-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 .pv-story-chapter { flex-shrink: 1; min-width: 0; }
-.pv-story-top :is(.pv-filter, .pv-modes) { flex-shrink: 0; min-width: 0; max-width: 100%; overflow-x: auto; }
+.pv-story-top :is(.pv-filter, .pv-modes) { min-width: 0; max-width: 100%; overflow-x: auto; }
 .pv-story-top :is(.pv-filter, .pv-modes) button { flex-shrink: 0; white-space: nowrap; }
 /* The chapter's name: large enough to read as the chapter's title, still in the chapter's colour. */
 .pv-story-chapter { display: inline-flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 800; letter-spacing: .9px; line-height: 1.2; text-transform: uppercase; color: var(--pv-tint); }
@@ -249,27 +245,25 @@
 .pv-filter-thumb { position: absolute; z-index: 0; left: 3px; top: 3px; bottom: 3px; width: 0; border-radius: 999px; background: var(--panel); box-shadow: 0 2px 8px color-mix(in srgb, #000 25%, transparent), 0 0 0 1px color-mix(in srgb, var(--pv-tint) 35%, transparent); transition: transform .32s cubic-bezier(.2,.8,.2,1), width .32s cubic-bezier(.2,.8,.2,1); }
 .pv-story-top:not(:has(.pv-story-chapter)) { justify-content: flex-end; }
 
-/* Fit the opponent title and time controls to the panel, which can be narrow on desktop too. */
-.pv-story[data-slide="rival"] { container-type: inline-size; }
-.pv-story[data-slide="rival"] > .pv-story-top {
-  --rival-header-gap: clamp(4px, 1.5cqi, 10px);
-  flex-wrap: nowrap; gap: var(--rival-header-gap);
-  margin-inline: clamp(-22px, calc((100cqi - 360px) / 2), 0px);
+/* Fit chapter titles and their time controls to the panel, including narrow desktop panels. */
+.pv-story-top:has(> :is(.pv-filter, .pv-modes)) {
+  --story-header-gap: clamp(4px, 1.5cqi, 10px);
+  --story-filter-room: 100px;
+  flex-wrap: nowrap; gap: var(--story-header-gap);
+  margin-inline: clamp(-23px, calc((100cqi - 360px) / 2), 0px);
 }
-.pv-story[data-slide="rival"] .pv-story-chapter {
+/* Reserve enough room for All through Rapid before extra choices scroll. */
+.pv-story-top:has(> .pv-filter > [data-value="all"] ~ button:nth-of-type(4)) { --story-filter-room: 124px; }
+.pv-story-top:has(> :is(.pv-filter, .pv-modes)) > .pv-story-chapter {
   display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  flex: none; max-width: calc(100% - var(--story-filter-room) - var(--story-header-gap));
   font-size: clamp(11px, 3.25cqi, 17px); letter-spacing: clamp(0px, calc(.4cqi - 1.1px), .9px);
 }
-.pv-story[data-slide="rival"] .pv-story-top:has(> .pv-filter) > .pv-story-chapter {
-  /* Reserve room for All through Rapid when the time controls need to scroll. */
-  flex: none; max-width: calc(100% - 124px - var(--rival-header-gap));
-}
-.pv-story[data-slide="rival"] .pv-story-top > .pv-filter { flex-shrink: 1; }
-.pv-story[data-slide="rival"] .pv-story-top > .pv-filter button {
+.pv-story-top > :is(.pv-filter, .pv-modes) button {
   font-size: clamp(10px, 2.45cqi, 11.5px); padding-inline: clamp(2px, calc(4cqi - 9px), 11px);
 }
-@container (width < 235px) {
-  .pv-story[data-slide="rival"] .pv-story-chapter { font-size: 10px; }
+@container story-panel (width < 235px) {
+  .pv-story-top:has(> :is(.pv-filter, .pv-modes)) > .pv-story-chapter { font-size: 10px; letter-spacing: -.25px; }
 }
 .pv-points { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .pv-points li { position: relative; padding-left: 18px; font-size: 16px; line-height: 1.45; color: var(--ink-2); }
@@ -556,9 +550,6 @@
 .profile-shell[data-design="story"] .pv-story { gap: 12px; }
 .profile-shell[data-design="story"] .pv-story[data-slide="signature"] { height: 100%; }
 .pv-story[data-slide="signature"] > :not(.pv-cmp-wrap) { flex-shrink: 0; }
-/* Heading and time-control switch share one line; a narrow panel wraps the heading's words, never the switch. */
-.pv-story[data-slide="signature"] .pv-story-top { flex-wrap: nowrap; gap: 8px; }
-.pv-story[data-slide="signature"] .pv-story-chapter { gap: 8px; font-size: 15px; letter-spacing: .5px; white-space: normal; line-height: 1.25; }
 .pv-story[data-slide="signature"] .pv-cmp-wrap { flex: 1; min-height: 200px; }
 .pv-story[data-slide="signature"] .pv-cmp-list { flex: 1; min-height: 0; max-height: none; }
 .pv-story[data-slide="signature"] .pv-cmp { padding: 12px 0; }
@@ -570,7 +561,6 @@
 .pv-story[data-slide="signature"] .pv-cmp-values small { font-size: 12px; }
 @media (max-width: 700px) {
   .profile-shell[data-design="story"] .pv-story[data-slide="signature"] { height: auto; }
-  .pv-story[data-slide="signature"] .pv-story-chapter { white-space: normal; }
   .pv-story[data-slide="signature"] .pv-cmp-wrap { flex: none; }
   .pv-story[data-slide="signature"] .pv-cmp-list { flex: none; max-height: 45vh; }
 }
