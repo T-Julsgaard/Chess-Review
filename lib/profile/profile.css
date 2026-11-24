@@ -186,6 +186,17 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-share a.profile-button { display: inline-flex; align-items: center; text-decoration: none; }
 /* Slimmer sides so Share and both review buttons fit one row on a laptop panel. */
 .profile-share .profile-chooser-row .profile-button { padding-inline: 10px; }
+/* The buttons under the figure keep their place but wait, unseen, until the note asks for them ("leaving a quick review");
+   then they rise in one after another, and the filled one glows once to draw the eye. Tabbing to them shows them at once. */
+.profile-share .profile-chooser-row > .profile-button { transition: background .15s, border-color .15s, opacity .45s ease, transform .6s cubic-bezier(.34,1.56,.64,1); }
+.profile-share .profile-chooser-row > .profile-button:nth-child(2) { transition-delay: 0s, 0s, .12s, .12s; }
+.profile-share .profile-chooser-row > .profile-button:nth-child(3) { transition-delay: 0s, 0s, .24s, .24s; }
+.profile-share:not(.is-cued) .profile-chooser-row:not(:focus-within) > .profile-button { opacity: 0; transform: translateY(14px) scale(.9); pointer-events: none; }
+.profile-share.is-cueing .profile-chooser-row > .profile-button.primary { animation: profile-ask-glow 1.5s .55s ease-out 2; }
+@keyframes profile-ask-glow {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 65%, transparent); }
+  100% { box-shadow: 0 0 0 12px color-mix(in srgb, var(--accent) 0%, transparent); }
+}
 .profile-chooser-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 
 .profile-empty { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; justify-content: center; min-height: 100%; padding: 8px 4px; }
