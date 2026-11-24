@@ -539,6 +539,9 @@
 .profile-shell[data-design="story"] .pv-story { gap: 13px; padding: 4px 0 6px; }
 .profile-shell[data-design="story"] .pv-story-hero:not(.is-text) .pv-story-figure { font-size: clamp(54px, 6.2vw, 112px); }
 .profile-shell[data-design="story"] .pv-story-hero.is-text .pv-story-figure { font-size: clamp(30px, 3vw, 50px); }
+/* A long word (a username) shrinks to the panel's width rather than breaking mid-word: about .62em per character in this face. */
+.pv-story-hero.is-text:has(> .pv-story-figure[style*="--pv-word"]) { container-type: inline-size; }
+.profile-shell[data-design="story"] .pv-story-hero.is-text .pv-story-figure[style*="--pv-word"] { font-size: max(22px, min(clamp(30px, 3vw, 50px), 100cqi / (var(--pv-word) * .62))); }
 .profile-shell[data-design="story"] .pv-story-hero { gap: 6px; }
 .profile-shell[data-design="story"] .pv-fact { padding: 9px 0; }
 .profile-shell[data-design="story"] .pv-story-lead { font-size: 15px; }
