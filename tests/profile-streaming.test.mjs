@@ -216,6 +216,23 @@ test('loader shows the games found and Cancel, with no status line, bar or time 
   assert.equal(loader.element.querySelector('[role="progressbar"]'), null);
 });
 
+test('loader waits for the first game before starting the knight’s tour', async t => {
+  const d = dom(t), loader = createTourLoader({...d, makePiece: () => d.doc.createElement('img')});
+  t.after(() => loader.stop());
+  const visited = () => loader.element.querySelectorAll('.profile-tour-cell.on').length;
+  const wait = ms => new Promise(resolve => d.win.setTimeout(resolve, ms));
+  await wait(550);
+  assert.equal(visited(), 1, 'waiting for data leaves the knight at its starting square');
+  loader.update({games: 0, fraction: .5}); await wait(20);
+  assert.equal(visited(), 1, 'archive progress alone does not start the tour');
+  await loader.finish();
+  assert.equal(visited(), 1, 'a search with no games skips the finishing tour');
+  loader.update({games: 1});
+  assert.match(loader.element.textContent, /1\s*game found/);
+  await wait(20);
+  assert.equal(visited(), 2, 'the first game starts the tour even without a known total');
+});
+
 test('workspace: games stream onto the main board beside the animation; the deck opens at EOF without an engine pass', async t => {
   const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6'); a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
   Object.assign(a.state.settings, {profileDepth: 'fast', profileSample: 'all'});
@@ -245,19 +262,30 @@ test('workspace: the film roll shows while loading, then the mosaic once every g
   const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6'); a.call('computeDerived'); a.call('buildUI'); a.call('renderAll');
   assert.equal(a.state.settings.profileStream, 'film', 'the film roll is the default');
   await a.call('openProfile'); await settle();
-  const w = a.run('profileWorkspace'), doc = a.dom.window.document;
+  const w = a.run('profileWorkspace'), win = a.dom.window, doc = win.document;
   t.after(() => w.close());
   w.site = 'lichess'; w.account = 'tester'; w.period = 'all';
   const signal = w.reset(); w.phase = 'loading'; w.renderHead(); w.renderLoading(signal);
+  await new Promise(resolve => win.setTimeout(resolve, 250));
   w.rows = rows(12).map(r => ({...r, fenEnd: '6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 40'}));
   assert.equal(w.useReel(), false, 'without motion the film roll falls back to the mosaic');
   w.updateGameMap(); assert.ok(doc.querySelector('.board .profile-game-map'));
   // Just enough Web Animations for the transitions around the board.
-  a.dom.window.Element.prototype.animate = () => ({finished: Promise.resolve(), cancel() {}, finish() {}});
+  win.Element.prototype.animate = () => ({finished: Promise.resolve(), cancel() {}, finish() {}});
   w.motion = () => true;
+  w.updateLoadingProgress();
+  const count = () => Number(doc.querySelector('.profile-loader-count').textContent);
+  const visited = () => doc.querySelectorAll('.profile-tour-cell.on').length;
+  assert.equal(count(), 0, 'collected games wait for the first film frame');
   w.updateGameMap(); await settle();
   assert.ok(doc.querySelector('.board .profile-reel')); assert.equal(doc.querySelector('.board .profile-game-map'), null);
   assert.ok(doc.querySelector('.profile-reel-chrome')); assert.ok(doc.querySelector('.profile-board-caption .profile-reel-strip'));
+  assert.equal(visited(), 1, 'queueing games on the reel is not the same as showing them');
+  await new Promise(resolve => win.requestAnimationFrame(resolve));
+  assert.match(doc.querySelector('.profile-reel-top').textContent, /Player .* of 12/);
+  assert.ok(count() > 0, 'the loader starts counting with the first film frame');
+  await new Promise(resolve => win.setTimeout(resolve, 20));
+  assert.ok(visited() > 1, 'the first film frame releases the knight');
   // The stream ended and the reel has played every game: the mosaic takes over while the accuracy check runs.
   w.reelFinished();
   assert.equal(w.phase, 'loading'); assert.equal(w.useReel(), false);
