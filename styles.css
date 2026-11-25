@@ -932,9 +932,6 @@ button { font-family: inherit; cursor: pointer; }
   border: 1.5px solid var(--accent); opacity: 0;
 }
 .section-btn-disc svg { width: calc(23px * var(--rail-s)); height: calc(23px * var(--rail-s)); display: block; }
-.section-btn[data-section="review"]:not(.is-current) .section-btn-disc path[stroke="none"] {
-  fill-opacity: .48;
-}
 .section-btn-label {
   font-size: calc(11.5px * var(--rail-s)); line-height: calc(14px * var(--rail-s)); font-weight: 650; letter-spacing: .02em;
   white-space: nowrap; transition: color .3s ease;
