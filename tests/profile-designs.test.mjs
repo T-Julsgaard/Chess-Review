@@ -201,11 +201,18 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.ok(doc.querySelectorAll('.board .pv-results .pv-tile').length >= 16, 'the board charts results by opponent rating');
   assert.match(doc.querySelector('.profile-board-caption .pv-legend').textContent, /Results by opponent rating:.*Won.*Drew.*Lost/);
   assert.deepEqual([...w.viz.layer.outside.querySelectorAll('.pv-axis-tick')].map(n => n.textContent), ['0%', '25%', '50%', '75%', '100%'], 'a share axis beside the board');
+  const quickest = shell.querySelector('.pv-fact-link');
+  assert.equal(quickest?.textContent, 'Quickest checkmate');
+  assert.equal(quickest.dataset.gameUrl, w.report.totals.quickestMate.url);
+  quickest.click();
+  assert.equal(w.activeGame.url, quickest.dataset.gameUrl);
+  assert.equal(shell.querySelector('.pv-link-back')?.textContent, 'Back to the chart');
   const replay = shell.querySelector('.pv-link');
   assert.equal(replay?.textContent, 'View your highest rated win');
   assert.match(replay.title, /^Your win against .+ \(\d+\), /);
   replay.click();
   assert.equal(doc.querySelector('.board .pv-results'), null, 'the best win replaces the chart');
+  assert.equal(shell.querySelectorAll('.pv-link-back').length, 1, 'switching games leaves one way back');
   // While the game is up, its link is the way back to the chart.
   const back = shell.querySelector('.pv-link-back');
   assert.equal(back?.textContent, 'Back to the chart');

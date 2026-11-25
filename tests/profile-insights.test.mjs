@@ -32,6 +32,27 @@ test('insights: totals, ratings, openings and opponents from a synthetic season'
   assert.ok(bands[0].from <= Math.min(...rated.map(r => r.oppRating)) && bands.at(-1).to >= Math.max(...rated.map(r => r.oppRating)));
 });
 
+test('best wins: quickest checkmate counts only games the player won by mate', () => {
+  const rows = season(20);
+  Object.assign(rows[0], {n: 4, res: 'w', term: 'resign'});
+  Object.assign(rows[1], {n: 5, res: 'l', term: 'mate'});
+  Object.assign(rows[2], {n: 7, res: 'w', term: 'mate'});
+  const report = buildReport(rows, buildInsights(rows), {account: 'tester', site: 'chesscom'});
+  const bestWins = () => buildDeck(report, {account: 'tester'}).find(s => s.id === 'hits');
+  const fact = bestWins().stats.find(s => s.label === 'Quickest checkmate');
+  assert.equal(fact.value, '4 moves');
+  assert.equal(fact.game, 'also');
+  assert.equal(bestWins().alsoEvidence.url, rows[2].url);
+  assert.equal(totals(rows.slice(0, 2)).quickestMate, null);
+
+  // A report shared by the old version can only show the game it carried.
+  report.totals.quickestWin = report.totals.quickestMate;
+  delete report.totals.quickestMate;
+  assert.equal(bestWins().alsoEvidence.url, rows[2].url);
+  report.totals.quickestWin = {...report.totals.quickestWin, term: 'resign'};
+  assert.equal(bestWins().alsoEvidence, null);
+});
+
 test('insights: results by opponent rating pick a band width that fits the board', () => {
   const row = (oppRating, res) => ({oppRating, res});
   assert.equal(byOpponentRating([row(1500, 'w')]), null, 'too few games');
