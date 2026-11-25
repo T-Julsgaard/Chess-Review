@@ -1831,15 +1831,26 @@ function syncSectionRail({animate = true} = {}) {
 // Between Learn and Playstyle the review stays out of sight: its panels are held hidden while one
 // section hands over to the other. The returned release() lets CSS take over again (fading the
 // review back in if the switch was refused and the review is what's left).
+let reviewHolds = 0;
+let reviewReveal = [];
 function holdReviewHidden() {
   const nodes = [...UI.canvas.querySelectorAll('.mod:not([data-mod="board"]) > .mod-inner'),
     document.querySelector("#playerTop"), document.querySelector("#playerBot"), document.querySelector(".library-rail")]
     .filter(node => node?.animate);
-  const holds = nodes.map(node => node.animate([{opacity:0, visibility:"hidden"}], {duration:1, fill:"forwards"}));
+  // Hidden at both ends: a one-keyframe hold paints the underlying (visible) style on its first
+  // frame, and the section being left drops its own hiding in that same frame.
+  const hidden = {opacity:0, visibility:"hidden"};
+  reviewReveal.forEach(animation => animation.cancel()); reviewReveal = [];
+  const holds = nodes.map(node => node.animate([hidden, hidden], {duration:1, fill:"both"}));
+  reviewHolds++;
+  let released = false;
   return () => {
-    const reveal = currentSection() === "review" && S.settings.uiAnim !== false;
+    if (released) return;
+    released = true; reviewHolds--;
+    // A later switch may still be under way and holding the review; only the last release counts.
+    const reveal = !reviewHolds && !sectionRailPending && currentSection() === "review" && S.settings.uiAnim !== false;
     holds.forEach(hold => hold.cancel());
-    if (reveal) nodes.forEach(node => node.animate([{opacity:0}, {opacity:1}], {duration:320, easing:"ease-out"}));
+    if (reveal) reviewReveal = nodes.map(node => node.animate([{opacity:0}, {opacity:1}], {duration:320, easing:"ease-out"}));
   };
 }
 // One way into every section, for the rail and the older toolbar buttons alike. While a switch is
@@ -1856,14 +1867,17 @@ async function selectSection(section) {
       if (learningWorkspace) await learningWorkspace.close();
       return;
     }
-    // Learn <-> Playstyle goes straight across, without showing the review in between.
+    // Learn <-> Playstyle goes straight across, without showing the review in between, and the two
+    // overlap: the profile stays up while learning loads and leaves as it arrives (openLearning), and
+    // the profile arrives as soon as learning's panels leave, while the board is still easing back.
     const leaving = section === "learn" ? profileWorkspace : learningWorkspace;
-    if (leaving && !openingLearning && !openingProfile) {
-      release = holdReviewHidden();
-      await leaving.close({handoff:true});
-    }
+    const handoff = !!leaving && !openingLearning && !openingProfile;
+    if (handoff) release = holdReviewHidden();
     if (section === "learn") await openLearning();
-    else await openProfile();
+    else {
+      if (handoff) { const closing = leaving.close({handoff:true}); await (leaving.released || closing); }
+      await openProfile({handoff});
+    }
   } finally {
     release?.();
     if (sectionRailPending === section) sectionRailPending = null;
@@ -1913,9 +1927,10 @@ async function profileIdentity(site) {
   const country = profile && accounts[0] && profile.name.toLowerCase() === accounts[0].toLowerCase() ? flagCodeForCountryId(profile.country) : null;
   return {site, accounts, accountsBySite, country};
 }
-async function openProfile({shared = null} = {}) {
+// `handoff`: learning is already on its way out (it has given the stage back), so don't wait for it.
+async function openProfile({shared = null, handoff = false} = {}) {
   if (profileWorkspace || openingProfile || openingLearning) return;
-  if (learningWorkspace) { await learningWorkspace.close(); if (learningWorkspace) return; }
+  if (learningWorkspace && !(handoff && learningWorkspace.closing)) { await learningWorkspace.close(); if (learningWorkspace) return; }
   if (S.practice && (S.practice.rolling || S.practice.demoing || S.practice.busy)) {
     toast("Let the current practice move finish, then open the profile."); return;
   }
@@ -1982,7 +1997,8 @@ function syncLearningToggle() {
 async function openLearning() {
   pauseBackgroundAnalysis();
   if (learningWorkspace || openingLearning || openingProfile) return;
-  if (profileWorkspace) await profileWorkspace.close();
+  // From the profile: it stays on screen while learning loads, and hands over as learning mounts.
+  const fromProfile = !!profileWorkspace;
   learningAnnouncement?.close();
   openingLearning = true;
   const positions = S.positions;
@@ -2015,6 +2031,7 @@ async function openLearning() {
     createAnalysisEngine:()=>createEngine({Hash:S.settings.engineHash, "Skill Level":S.settings.engineSkill}),
     navigationButton:document.getElementById("learningToggle"),
     embedded:{stage:UI.canvas, boardWrap:UI.boardWrap, fen:sourceFen, reviewFen:activePos().fen, startDrag,
+      beforeMount:fromProfile?()=>profileWorkspace?.close({handoff:true}):null,
       restoreBoard:()=>{
         paintBoard({restoring:true});
         if(wasAnalysis){renderEvalBar();renderPlayers();renderControls();renderReview();renderEngineCurrent();}
@@ -2027,10 +2044,13 @@ async function openLearning() {
       syncLearningToggle();
       alignPlayers();
       if (UI.settings && !UI.settings.hidden) renderSettings();
-      if(wasBlank){document.getElementById("learningToggle")?.focus();return;}
+      // Handed over to the profile: it has the focus, and nothing resumes on the review behind it.
+      const handedOver=profileOwnsBoard();
+      if(wasBlank){if(!handedOver)document.getElementById("learningToggle")?.focus();return;}
       S.idx=snapshot.idx; S.flipped=snapshot.flipped; S.selectedSq=snapshot.selectedSq;
       if(!S.practice){paintBoard();}
       renderControls();
+      if(handedOver)return;
       if(deferredPracticeAdvance){
         deferredPracticeAdvance=false;
         const practice=S.practice;

@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import {JSDOM} from 'jsdom';
 import {app, loadGame, settle} from './helpers/app.mjs';
 import {createSectionRail, SECTIONS} from '../lib/section-rail.js';
+import {ProfileWorkspace} from '../lib/profile/workspace.js';
+import {settledRect} from '../lib/profile/transition.js';
 
 function review(t) {
   const a = app(t); loadGame(a, '1. e4 e5 2. Nf3 Nc6');
@@ -40,10 +42,13 @@ test('section rail: Playstyle and Learn hand over directly, without fading the r
   const a = review(t), doc = a.dom.window.document;
   const click = id => doc.querySelector(`.section-btn[data-section="${id}"]`).click();
   click('playstyle'); for (let i = 0; i < 6; i++) await settle();
-  const profile = a.run('profileWorkspace'), closes = [];
-  const close = profile.close.bind(profile);
-  profile.close = options => { closes.push(options); return close(options); };
-  click('learn'); for (let i = 0; i < 20; i++) await settle();
+  // Spy on the base class, so every design subclass has to pass the option on.
+  const closes = [], close = ProfileWorkspace.prototype.close;
+  ProfileWorkspace.prototype.close = function (options) { closes.push(options); return close.call(this, options); };
+  t.after(() => { ProfileWorkspace.prototype.close = close; });
+  // The profile stays up while learning loads, then hands over as learning mounts.
+  click('learn');
+  for (let i = 0; i < 200 && a.run('profileWorkspace'); i++) { await settle(); await new Promise(resolve => setTimeout(resolve, 5)); }
   assert.deepEqual(closes.map(options => options?.handoff), [true]);
   assert.equal(a.run('profileWorkspace'), null);
   assert.ok(a.run('learningWorkspace'));
@@ -83,4 +88,14 @@ test('section rail: stands beside the panel column and hides without room', () =
   rail.buttons.get('playstyle').click();
   assert.deepEqual(picked, ['playstyle']);
   assert.deepEqual(SECTIONS.map(s => s.id), ['review', 'learn', 'playstyle']);
+});
+
+test('settledRect measures where an animated node comes to rest and leaves the animation as it was', () => {
+  const at = {value: 0};
+  const animation = {playState: 'running', get currentTime() { return at.value; }, set currentTime(v) { at.value = v; }, effect: {getComputedTiming: () => ({endTime: 720})}};
+  const node = {getAnimations: () => [animation], getBoundingClientRect: () => ({top: at.value === 720 ? 101 : 91})};
+  at.value = 300;
+  assert.equal(settledRect(node).top, 101);
+  assert.equal(at.value, 300);
+  assert.equal(settledRect({getBoundingClientRect: () => ({top: 5})}).top, 5);
 });
