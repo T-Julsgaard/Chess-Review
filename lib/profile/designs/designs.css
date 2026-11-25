@@ -446,7 +446,7 @@
 /* Rating ranges may wrap onto two lines under narrow columns. */
 .profile-board-caption .pv-legend.pv-legend-below.pv-legend-ranges { margin-top: 32px; }
 /* Increase granularity (clock): columns split into slivers that slide apart, then fill to their own level (board-viz.js regroupFrom). */
-.pv-regrouping.pv-dim::before { animation: none; }
+.pv-regrouping.pv-dim::before, .pv-dim-steady.pv-dim::before { animation: none; }
 .pv-regrouping .pv-tile::before { animation: none; }
 .pv-regroup-moving > .pv-tile { transition: left .46s cubic-bezier(.3,.8,.25,1) var(--gd, 0ms), width .46s cubic-bezier(.3,.8,.25,1) var(--gd, 0ms); }
 .pv-layer.pv-regroup-old { z-index: 6; background: transparent; animation: none; }

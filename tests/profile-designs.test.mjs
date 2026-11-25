@@ -492,8 +492,8 @@ test('story rating inspection survives filtering and game Exit restores the sele
   assert.equal(doc.querySelectorAll('.profile-game-chrome .player-strip').length, 2);
   assert.match(doc.querySelector('.profile-game-chrome').textContent, /Alice.*1600/);
   assert.equal(doc.querySelector('.profile-intro'), null, 'no names cover the board: the strips carry them');
-  assert.ok(doc.querySelector('.profile-game-dock .profile-game-controls'), 'move controls sit in the bottom name strip');
-  assert.equal(doc.querySelectorAll('.profile-game-controls button').length, 3, 'previous, exit and next only');
+  assert.ok(doc.querySelector('.profile-game-center .profile-game-controls'), 'move controls sit in the middle of the bottom name strip');
+  assert.equal(doc.querySelectorAll('.profile-game-controls button').length, 2, 'previous and next only');
   assert.equal(doc.querySelector('.profile-game-controls [aria-label="Previous move"]').disabled, true, 'the game is rewound to the start');
   assert.equal(doc.querySelector('.profile-game-controls [aria-label="Next move"]').disabled, false);
   doc.body.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'End', bubbles: true, cancelable: true}));
@@ -502,7 +502,7 @@ test('story rating inspection survives filtering and game Exit restores the sele
   assert.equal(doc.querySelector('.profile-game-controls [aria-label="Previous move"]').disabled, false);
   assert.equal(doc.querySelectorAll('.profile-game-chrome .cap-pc').length, 2);
   assert.equal(a.state.positions[a.state.idx].fen, reviewFen, 'profile navigation leaves the review intact');
-  doc.querySelector('.profile-game-controls .exit-analysis').click();
+  doc.querySelector('.pv-link-back').click();
   assert.equal(w.index, chapter); assert.equal(w.currentSlide().ratingClass, 'bullet');
   assert.ok(doc.querySelector('.pv-line')); assert.equal(doc.querySelector('.profile-game-chrome'), null);
   let finish;
@@ -512,8 +512,9 @@ test('story rating inspection survives filtering and game Exit restores the sele
   finish('1. e4 e5 *'); for (let i = 0; i < 8; i++) await settle();
   assert.ok(doc.querySelector('.pv-line')); assert.equal(doc.querySelector('.profile-game-chrome'), null);
   w.go(w.deck.findIndex(s => s.id === 'openings'));
-  doc.querySelector('.profile-game-controls .exit-analysis').click();
-  assert.equal(doc.querySelector('.profile-game-controls'), null, 'Exit also dismisses an inline opening replay');
+  assert.equal(doc.querySelectorAll('.profile-game-controls button').length, 2, 'the opening replay also has previous and next only');
+  doc.body.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'Escape', bubbles: true, cancelable: true}));
+  assert.equal(doc.querySelector('.profile-game-controls'), null, 'Esc also dismisses an inline opening replay');
   const opening = w.index;
   doc.body.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'ArrowRight', bubbles: true, cancelable: true}));
   assert.equal(w.index, opening, 'the arrow stays on the chapter after Exit');

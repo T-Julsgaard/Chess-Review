@@ -64,7 +64,7 @@ test('profile evaluation bar takes the review bar size, keeps its proportions wh
   const view = make(true);
   const bar = doc.querySelector('.profile-game-eval'), rail = doc.querySelector('.profile-game-rail');
   bar.animate = (frames, options) => { const a = {frames, options, onfinish: null, oncancel: null}; animations.push(a); return a; };
-  for (const node of doc.querySelectorAll('.profile-game-player, .profile-game-dock')) node.animate = () => ({});
+  for (const node of doc.querySelectorAll('.profile-game-player, .profile-game-center, .profile-game-dock')) node.animate = () => ({});
   assert.ok(!rail.classList.contains('is-shown'), 'no bar before it has its size');
   view.position({left: 100, top: 50, width: 600, height: 600});
   assert.equal(bar.style.width, '30px'); assert.equal(rail.style.width, '50px');

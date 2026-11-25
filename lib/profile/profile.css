@@ -94,8 +94,10 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-game-player .player-strip .name { font-size: calc(14px * var(--pv-s, 1)); overflow: hidden; text-overflow: ellipsis; }
 .profile-game-player-bottom { padding-right: calc(var(--dock-w, 0px) + 10px); }
 .profile-game-dock { position: absolute; top: 100%; right: 0; height: var(--strip-h, 48px); display: flex; align-items: center; gap: 10px; pointer-events: auto; }
-.profile-game-dock .profile-game-controls { gap: 6px; }
-.profile-game-dock .profile-game-controls button { height: min(38px, calc(var(--strip-h, 48px) - 8px)); min-width: min(38px, calc(var(--strip-h, 48px) - 8px)); border-radius: 9px; }
+.profile-game-center { position: absolute; top: 100%; left: 50%; translate: -50% 0; height: var(--strip-h, 48px); display: flex; align-items: center; pointer-events: auto; }
+.profile-game-center:empty { display: none; }
+.profile-game-center .profile-game-controls, .profile-game-dock .profile-game-controls { gap: 6px; }
+.profile-game-center .profile-game-controls button, .profile-game-dock .profile-game-controls button { height: min(38px, calc(var(--strip-h, 48px) - 8px)); min-width: min(38px, calc(var(--strip-h, 48px) - 8px)); border-radius: 9px; }
 .profile-game-player-top { bottom: 100%; }
 .profile-game-player-bottom { top: 100%; }
 /* The rail ends at the board's left edge and clips there: the bar slides out from under the board. */
