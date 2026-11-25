@@ -21,6 +21,7 @@ import { PANEL_DESIGNS, panelDesign, normalizePanelDesigns } from "./lib/panel-d
 import { UI_SETUPS, MODERN_LAYOUT } from "./lib/ui-setups.js";
 import { createOverviewReveal } from "./lib/overview-reveal.js";
 import { createAccuracyNavigation } from "./lib/accuracy-navigation.js";
+import { createReviewArchive } from "./lib/review-archive.js";
 import { phasePerformance } from "./lib/phase-performance.js";
 import { analyseCalibratedPosition } from "./lib/calibrated-search.js";
 import { loadLearningWorkspace, presentationFor } from "./lib/learning-loader.js";
@@ -39,7 +40,7 @@ import { createTranslator, loadLanguage, LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_S
 const reviewEffects = createReviewEffects(document);
 
 const screenPreview = createScreenPreviewContext(location);
-const blankLaunch = new window.URLSearchParams(location.search).get("workspace") === "blank";
+const blankLaunch = !location.hash;
 // Previews use isolated storage and their actual iframe viewport at 100%.
 const browserAPI = screenPreview ? {...platformAPI,storage:{...platformAPI.storage,local:screenPreview.storage}} : platformAPI;
 
@@ -911,8 +912,7 @@ function activeBest() {
 async function loadJob() {
   if(screenPreview)return structuredClone(screenPreview.job);
   const hash = location.hash.replace(/^#/, "");
-  const jobId = hash || (blankLaunch ? "blank-workspace" : "");
-  if (!jobId) throw new Error("No analysis job specified.");
+  const jobId = hash || "blank-workspace";
 
   const key = `job:${jobId}`;
   // The one-shot storage handoff is removed after startup. Keep the current
@@ -922,7 +922,7 @@ async function loadJob() {
     const session = JSON.parse(window.sessionStorage.getItem(key));
     if (session && typeof session.pgn === "string") return session;
   } catch { /* Unavailable or corrupt session storage: use the launch handoff. */ }
-  if(blankLaunch&&!hash)return {source:"blank",analysis:null};
+  if (!hash) return {source:"blank",analysis:null};
   const data = await browserAPI.storage.local.get(key);
   const payload = data[key];
   if (!payload) throw new Error("Analysis data not found (open via the popup).");
@@ -932,8 +932,8 @@ async function loadJob() {
 }
 function rememberReviewJob() {
   if(screenPreview)return false;
-  const jobId = location.hash.replace(/^#/, "") || (blankLaunch ? "blank-workspace" : "");
-  if (!jobId || !S.pgn) return false;
+  const jobId = location.hash.replace(/^#/, "") || "blank-workspace";
+  if (!S.pgn) return false;
   try {
     // Analysis is looked up separately using the current scoring/settings key.
     window.sessionStorage.setItem(`job:${jobId}`, JSON.stringify({ pgn: S.pgn, meta: S.meta }));
@@ -3947,6 +3947,7 @@ function alignPlayers() {
 
 /* ---------------- Controls ---------------- */
 function renderControls() {
+  if (S.blank && UI.archive?.syncControls()) return;
   const mode = S.practice ? "practice" : S.analysisMode && S.variation ? "variation" : "mainline";
   let refs = UI.controlRefs;
   // Progress updates can arrive between mouse-down and mouse-up. Keep the buttons
@@ -4563,8 +4564,10 @@ function analysisProgressText() {
 }
 function renderReview() {
   if(S.blank){
+    const form = UI.archive?.form;
+    if (form && UI.review.contains(form)) return;
     UI.review.replaceChildren(el("div",{class:"panel insight-panel"},
-      el("div",{class:"ip-body"},el("div",{class:"ip-text"},"No game loaded."))));
+      form || el("div",{class:"ip-body"},el("div",{class:"ip-text"},"No game loaded."))));
     return;
   }
   // In-place progress text during analysis (so the loader animation doesn't restart each move).
@@ -5810,6 +5813,7 @@ function updateMovesDesign() {
 }
 function renderMoves() {
   updateMovesDesign();
+  if (S.blank && UI.archive) return;
   const ml = S.settings.mlStyle;
   // Keep move cells mounted while classifications arrive. Replacing the list during analysis
   // drops the hovered element and makes its hover state flicker; only changed badges need updates.
@@ -7654,6 +7658,7 @@ async function setEngineSetting(key, value) {
   if (UI.settings && !UI.settings.hidden) renderSettings();
 }
 function applySettings() {
+  if (UI.canvas) UI.canvas.dataset.archiveMotion = S.settings.uiAnim === false ? "off" : "on";
   const r = document.documentElement;
   const dopamine = S.settings.reviewMode === "dopamine";
   r.dataset.reviewMode = dopamine ? "dopamine" : "normal";
@@ -8802,6 +8807,12 @@ function renderAll() {
 /* A blank launch has no game or engine work; learning and saved games stay available. */
 function setBlankWorkspace(blank) {
   S.blank=blank;
+  if (blank && !UI.archive) {
+    UI.archive = createReviewArchive({ui: UI, el, icon, openGame: applyGame, renderControls, settings: S.settings});
+  } else if (!blank && UI.archive) {
+    UI.archive.dispose();
+    UI.archive = null;
+  }
   for(const button of document.querySelectorAll('[data-game-action]'))button.hidden=blank;
 }
 function showBlankWorkspace() {
@@ -9011,7 +9022,7 @@ async function showReadyWorkspace() {
     }
     else await resetSettingsForRelease({ reason: "startup" });
     // Load review data alongside the job and preferences while the startup mark is visible.
-    const dataReady = blankLaunch&&!location.hash&&!screenPreview ? Promise.resolve()
+    const dataReady = blankLaunch&&!screenPreview ? Promise.resolve()
       : Promise.all([loadBook(), loadCalibration().catch(error => {console.warn(error);return null;})]);
     const [payload, store] = await Promise.all([loadJob(), browserAPI.storage.local.get(["settings", "username", "layout", "layoutMode", "layoutVersion", "library", LANGUAGE_STORAGE_KEY])]);
     // English unless the person chose another language in Settings → Language.
@@ -9102,7 +9113,7 @@ async function showReadyWorkspace() {
     // Resolve review data before mounting. The startup screen also covers async work inside
     // applyGame(), such as remembering the player's identity, so the empty shell never paints.
     await dataReady;         // book + calibration (downloaded in parallel; usually already resolved)
-    if(blankLaunch&&!location.hash&&payload.source!=="blank"&&!screenPreview)
+    if(blankLaunch&&payload.source!=="blank"&&!screenPreview)
       await Promise.all([loadBook(),loadCalibration().catch(error=>{console.warn(error);return null;})]);
     // Resolve any stored analysis for this game by id (same derivation as currentGameId(), but from
     // the payload since S isn't populated yet) so applyGame() needs no lookup await of its own.
@@ -9116,7 +9127,7 @@ async function showReadyWorkspace() {
       payload.analysis = saved;
     }
     const sharedProfile = payload.source==="profile" && payload.profile && typeof payload.profile === "object" ? payload.profile : null;
-    S.blank=!!sharedProfile||(payload.source==="blank"&&((blankLaunch&&!location.hash)||screenPreview?.id==="workspace-blank"||screenPreview?.viewport===true));
+    S.blank=!!sharedProfile||(payload.source==="blank"&&(blankLaunch||screenPreview?.id==="workspace-blank"||screenPreview?.viewport===true));
     buildUI();               // built once; switching games re-uses it (no full page reload)
     if(S.blank)showBlankWorkspace();
     else await applyGame(payload);

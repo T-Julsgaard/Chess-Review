@@ -33,6 +33,8 @@ services, as described below. Their own privacy notices explain that processing.
   review controls and game detection. This page access is separate from API requests.
 - Lookup requests disclose the requested username/game identifier to the relevant
   platform, which also receives normal network information such as your IP address.
+- Searching by username from an empty review requests the selected month's public games
+  from that platform.
 - **Player profile** (the button beside Learn with Chess review) builds a recap of a player's
   games. It fetches that player's public game archive (Chess.com monthly archives, or the
   Lichess game export) directly from the platform, replays the games locally and keeps a

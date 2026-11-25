@@ -13,6 +13,7 @@ import {PANEL_DESIGNS,panelDesign,normalizePanelDesigns} from '../../lib/panel-d
 import {UI_SETUPS,MODERN_LAYOUT} from '../../lib/ui-setups.js';
 import {createOverviewReveal} from '../../lib/overview-reveal.js';
 import {createAccuracyNavigation} from '../../lib/accuracy-navigation.js';
+import {createReviewArchive} from '../../lib/review-archive.js';
 import {phasePerformance} from '../../lib/phase-performance.js';
 import {analyseCalibratedPosition} from '../../lib/calibrated-search.js';
 import {LearningWorkspace} from '../../lib/learning/workspace.js';
@@ -76,7 +77,7 @@ export function app(t, {hardware,languages=['en-US'],savedLanguage='en',settings
     rememberAnalyzedGame,historyGame,identityForGame,knownAccounts,IDENTITY_KEY,inferredPlayer,inferredPlayerProfile,PLAYER_HISTORY_KEY,
     loadProfileWorkspace:async () => ({ProfileWorkspace}),
     loadProfileStory:async () => ({StoryWorkspace}),
-    createReviewEffects, createSectionRail,
+    createReviewEffects, createSectionRail, createReviewArchive,
     explainMove, explanationPv,
     BADGE_APPEARANCES, BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg, puzzleResultBadge, CHECKMATE_BADGES, checkmateBadgeSvg, matedKingSquare, mateMark,
     CATEGORY_SYMBOLS, CATEGORY_SYMBOL_OPTIONS, categoryBadgeSymbol, cleanBadgeSymbols,

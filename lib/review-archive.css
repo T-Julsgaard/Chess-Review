@@ -1,0 +1,74 @@
+/* These styles apply only to the contents of the three existing review panels. */
+.insight-panel .archive-form {
+  display: flex; flex: 1; flex-direction: column; justify-content: safe center;
+  gap: 8px; min-height: 0; margin: 0; padding: 10px var(--pad); overflow: auto;
+  scrollbar-width: thin; animation: archive-arrive .22s ease-out;
+}
+.archive-form-head, .archive-input-row, .archive-head {
+  display: flex; align-items: center; gap: 8px; min-width: 0; flex: none;
+}
+.archive-form-head { justify-content: space-between; flex-wrap: wrap; gap: 4px 8px; }
+.archive-title { font-size: 16px; line-height: 1.15; font-weight: 700; color: var(--ink); }
+.archive-sites.profile-seg-lg {
+  width: auto; position: relative; isolation: isolate; padding: 2px; gap: 2px; border-radius: 8px;
+}
+.archive-sites::before {
+  content: ''; position: absolute; inset: 2px auto 2px 2px; width: calc(50% - 3px); z-index: -1;
+  border-radius: 6px; background: var(--panel); box-shadow: inset 0 0 0 1px var(--line);
+  transition: transform .22s cubic-bezier(.16,1,.3,1);
+}
+.archive-sites[data-site="lichess"]::before { transform: translateX(calc(100% + 2px)); }
+.archive-sites button { padding: 3px 10px; min-height: 26px; border-radius: 6px; }
+.archive-sites button[aria-pressed="true"] { color: var(--ink); font-weight: 700; }
+.archive-form .profile-input {
+  width: 0; min-width: 0; min-height: 36px; padding: 6px 10px; font-size: 14px;
+  transition: border-color .15s, box-shadow .15s;
+}
+.archive-form .profile-input:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb,var(--accent) 22%,transparent); }
+.archive-form .profile-setup-error { margin: 0; font-size: 12px; }
+.archive-submit, .archive-retry {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 36px;
+  border: 1px solid transparent; border-radius: 8px; padding: 5px 12px;
+  cursor: pointer; white-space: nowrap; font: inherit; font-size: 13px; font-weight: 700;
+}
+.archive-submit { background: var(--accent); color: var(--accent-ink); }
+.archive-submit svg { width: 12px; height: 12px; }
+.stage .moves-panel > #movesBody.archive-list { padding: 0; overflow-y: auto; }
+.archive-head {
+  position: sticky; top: 0; z-index: 1; justify-content: space-between;
+  padding: 8px 10px; background: var(--panel); border-bottom: 1px solid var(--line);
+}
+.archive-head h3 { margin: 0; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.archive-count, .archive-time { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--ink-2); font-size: 11px; }
+.archive-status { padding: 9px 10px; color: var(--ink-2); line-height: 1.4; font-size: 13px; }
+.archive-status:empty { display: none; }
+.archive-day { margin: 0; padding: 10px 10px 4px; font-size: 10px; font-weight: 700; color: var(--ink-2); text-transform: uppercase; letter-spacing: .06em; }
+.archive-game {
+  width: 100%; display: grid; grid-template-columns: 34px minmax(0,1fr) auto;
+  align-items: center; gap: 8px; text-align: start; padding: 7px 10px;
+  background: transparent; color: var(--ink); border: 0; border-bottom: 1px solid var(--line-soft); cursor: pointer; font: inherit;
+}
+.archive-game[data-enter] { animation: archive-arrive .25s cubic-bezier(.16,1,.3,1) var(--delay) backwards; }
+.archive-game:is(:hover,:focus-visible) { background: var(--panel-2); }
+.archive-result {
+  color: var(--ink-2); background: color-mix(in srgb,currentColor 10%,var(--panel));
+  border-radius: 5px; text-align: center; padding: 4px 0; font-size: 11px; font-weight: 700;
+}
+.archive-game[data-outcome="Win"] .archive-result { color: var(--accent); }
+.archive-game[data-outcome="Loss"] .archive-result { color: var(--q-mistake); }
+.archive-match { min-width: 0; display: grid; gap: 2px; }
+.archive-match strong { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.archive-match small { color: var(--ink-2); font-size: 11px; }
+.archive-match small::first-letter { text-transform: uppercase; }
+.archive-period { color: var(--ink); text-align: center; font-size: 13px; font-weight: 650; }
+.archive-form button:focus-visible, .archive-game:focus-visible, .archive-retry:focus-visible, .controls:has(.archive-period) button:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: -2px;
+}
+.archive-retry { background: var(--panel-2); border-color: var(--line); color: var(--ink); min-height: 28px; margin: 0 10px 8px; }
+.archive-list [hidden], .archive-form [hidden] { display: none; }
+@keyframes archive-arrive { from { opacity: 0; transform: translateY(3px); } }
+@media (prefers-reduced-motion: reduce) {
+  .insight-panel .archive-form, .archive-form *, .archive-sites::before, .archive-game[data-enter] { animation: none; transition: none; }
+}
+[data-archive-motion="off"] :is(.archive-form,.archive-form *,.archive-game[data-enter]),
+[data-archive-motion="off"] .archive-sites::before { animation: none; transition: none; }

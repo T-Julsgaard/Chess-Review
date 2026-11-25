@@ -39,6 +39,10 @@ Click the image below to watch the introduction video.
 2. Click the extension icon → **Analyze this game**, or press `Ctrl+Shift+Y`.
 3. Stockfish reviews the game in an analysis tab.
 
+Opening Chess Review without a game lets you search by Chess.com or Lichess username in the Insights panel.
+The Moves panel shows the player's games for the current UTC month, newest first.
+Use the arrows to browse other months, then select a game to start its review.
+
 You can also paste a game URL or PGN into the popup. If your username cannot be
 detected, enter it once; it is remembered locally. Chess Review is intended for
 review after play.

@@ -23,8 +23,10 @@ test('blank startup creates no game, engine, opening-book or calibration work',a
   doc.querySelector('.lib-tab').click();assert.equal(a.state.libraryOpen,true);assert.ok(doc.querySelector('.lc-open'));
 });
 
-test('ordinary missing jobs and arbitrary position-only PGNs remain rejected',async t=>{
-  const a=app(t,{url:'https://extension.test/analysis.html'});await assert.rejects(a.call('loadJob'),/No analysis job/);
+test('direct entry opens the archive while missing job ids and position-only PGNs remain rejected',async t=>{
+  const direct=app(t,{url:'https://extension.test/analysis.html'});direct.replace('resetSettingsForRelease',async()=>{});await direct.start();
+  assert.ok(direct.dom.window.document.querySelector('#archive-username'));
+  const a=app(t);await assert.rejects(a.call('loadJob'),/Analysis data not found/);
   const b=blank(t);await b.start();await assert.rejects(b.call('applyGame',{pgn:'*'}),/Load a game with moves/);
   assert.equal(b.state.blank,true);assert.equal(b.dom.window.document.querySelector('#canvas').hidden,false);
 });
