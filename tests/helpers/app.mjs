@@ -30,6 +30,7 @@ import {inferredPlayer, inferredPlayerProfile, PLAYER_HISTORY_KEY} from '../../l
 import {ProfileWorkspace} from '../../lib/profile/workspace.js';
 import {StoryWorkspace} from '../../lib/profile/designs/story.js';
 import {createReviewEffects} from '../../lib/review-effects.js';
+import {createSectionRail} from '../../lib/section-rail.js';
 import {explainMove, explanationPv} from '../../lib/move-explanation.js';
 import {createTranslator, loadLanguage, LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, isSupportedLanguage} from '../../lib/i18n/index.js';
 
@@ -75,7 +76,7 @@ export function app(t, {hardware,languages=['en-US'],savedLanguage='en',settings
     rememberAnalyzedGame,historyGame,identityForGame,knownAccounts,IDENTITY_KEY,inferredPlayer,inferredPlayerProfile,PLAYER_HISTORY_KEY,
     loadProfileWorkspace:async () => ({ProfileWorkspace}),
     loadProfileStory:async () => ({StoryWorkspace}),
-    createReviewEffects,
+    createReviewEffects, createSectionRail,
     explainMove, explanationPv,
     BADGE_APPEARANCES, BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg, puzzleResultBadge, CHECKMATE_BADGES, checkmateBadgeSvg, matedKingSquare, mateMark,
     CATEGORY_SYMBOLS, CATEGORY_SYMBOL_OPTIONS, categoryBadgeSymbol, cleanBadgeSymbols,

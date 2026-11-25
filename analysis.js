@@ -32,6 +32,7 @@ import { rememberAnalyzedGame, historyGame, inferredPlayer, inferredPlayerProfil
 import { identityForGame, knownAccounts, IDENTITY_KEY } from "./lib/identity.js";
 import { loadProfileWorkspace, loadProfileStory } from "./lib/profile-loader.js";
 import { createReviewEffects } from "./lib/review-effects.js";
+import { createSectionRail } from "./lib/section-rail.js";
 import { explainMove, explanationPv } from "./lib/move-explanation.js";
 import { createTranslator, loadLanguage, LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, isSupportedLanguage } from "./lib/i18n/index.js";
 
@@ -1743,8 +1744,9 @@ function buildUI() {
   });
 
   const saveStatus = el("div", {class:"review-save-status", hidden:true, "aria-live":"polite"});
+  sectionRail = createSectionRail({document, onSelect:selectSection, motion:()=>S.settings.uiAnim!==false});
   root.append(el("div", { class: "app" }, topbar, el("div", {class:"review-viewport"}, canvas), settings, libRail, saveStatus,
-    feedbackLink("feedback-floating", el("span", {}, "Feedback"))));
+    sectionRail.element, feedbackLink("feedback-floating", el("span", {}, "Feedback"))));
 
   UI = {
     settings, canvas, boardWrap,
@@ -1766,6 +1768,107 @@ function buildUI() {
     UI.boardObserver = new window.ResizeObserver(alignPlayers);
     UI.boardObserver.observe(boardWrap);
   }
+  watchSectionRail();
+  syncSectionRail({animate:false});
+}
+
+/* ---------------- Section rail (Review / Learn / Playstyle) ---------------- */
+let sectionRail = null;
+let sectionRailPending = null;
+let sectionRailFrame = 0;
+let sectionRailObserver = null;
+let sectionRailWatching = false;
+function currentSection() {
+  if (profileWorkspace && !profileWorkspace.closed) return "playstyle";
+  if (learningWorkspace && !learningWorkspace.closing) return "learn";
+  return "review";
+}
+// The review's panel column, which the rail stands beside in every section. Learning and the profile
+// only hide those panels (they keep their layout), so the rail never moves or stretches on a switch.
+function sectionRailTarget() {
+  if (!UI.canvas) return null;
+  const rects = [...UI.canvas.querySelectorAll(".mod")]
+    .filter(mod => !["evalbar", "board", "coach"].includes(mod.dataset.mod) && !mod.hidden && getComputedStyle(mod).display !== "none")
+    .map(mod => mod.getBoundingClientRect()).filter(rect => rect.width && rect.height);
+  if (!rects.length) return null;
+  const left = Math.min(...rects.map(r => r.left)), top = Math.min(...rects.map(r => r.top));
+  const right = Math.max(...rects.map(r => r.right)), bottom = Math.max(...rects.map(r => r.bottom));
+  return {left, top, right, bottom, width:right-left, height:bottom-top};
+}
+function placeSectionRail() {
+  sectionRailFrame = 0;
+  if (!sectionRail?.element.isConnected) return;
+  const topbar = document.querySelector(".topbar")?.getBoundingClientRect();
+  const shown = sectionRail.place(S.reorganize ? null : sectionRailTarget(), {top:(topbar?.bottom || 0) + 8});
+  // The floating Feedback pill tucks down to its icon when the rail's last label would touch it.
+  const feedback = document.querySelector(".app > .feedback-floating");
+  if (!feedback) return;
+  feedback.classList.remove("rail-tucked");
+  if (!shown) return;
+  const pill = feedback.getBoundingClientRect(), rail = sectionRail.element.getBoundingClientRect();
+  const touches = pill.width && pill.left < rail.right + 8 && pill.right > rail.left - 8 && pill.top < rail.bottom + 8 && pill.bottom > rail.top - 8;
+  feedback.classList.toggle("rail-tucked", touches);
+}
+function scheduleSectionRail() {
+  if (!sectionRailFrame) sectionRailFrame = window.requestAnimationFrame ? window.requestAnimationFrame(placeSectionRail) : setTimeout(placeSectionRail, 16);
+}
+function watchSectionRail() {
+  if (window.ResizeObserver) {
+    sectionRailObserver?.disconnect();
+    sectionRailObserver = new window.ResizeObserver(scheduleSectionRail);
+    sectionRailObserver.observe(UI.canvas);
+  }
+  if (sectionRailWatching) return;
+  sectionRailWatching = true;
+  window.addEventListener("resize", scheduleSectionRail);
+  window.addEventListener("scroll", scheduleSectionRail, {capture:true, passive:true});
+}
+function syncSectionRail({animate = true} = {}) {
+  if (!sectionRail) return;
+  sectionRail.set(sectionRailPending || currentSection(), {animate});
+  scheduleSectionRail();
+}
+// Between Learn and Playstyle the review stays out of sight: its panels are held hidden while one
+// section hands over to the other. The returned release() lets CSS take over again (fading the
+// review back in if the switch was refused and the review is what's left).
+function holdReviewHidden() {
+  const nodes = [...UI.canvas.querySelectorAll('.mod:not([data-mod="board"]) > .mod-inner'),
+    document.querySelector("#playerTop"), document.querySelector("#playerBot"), document.querySelector(".library-rail")]
+    .filter(node => node?.animate);
+  const holds = nodes.map(node => node.animate([{opacity:0, visibility:"hidden"}], {duration:1, fill:"forwards"}));
+  return () => {
+    const reveal = currentSection() === "review" && S.settings.uiAnim !== false;
+    holds.forEach(hold => hold.cancel());
+    if (reveal) nodes.forEach(node => node.animate([{opacity:0}, {opacity:1}], {duration:320, easing:"ease-out"}));
+  };
+}
+// One way into every section, for the rail and the older toolbar buttons alike. While a switch is
+// under way the rail keeps showing its destination, so closing one section on the way to another
+// doesn't flash the Review button.
+async function selectSection(section) {
+  if (!sectionRailPending && section === currentSection()) { sectionRail?.acknowledge(section); return; }
+  sectionRailPending = section;
+  syncSectionRail();
+  let release = null;
+  try {
+    if (section === "review") {
+      if (profileWorkspace) await profileWorkspace.close();
+      if (learningWorkspace) await learningWorkspace.close();
+      return;
+    }
+    // Learn <-> Playstyle goes straight across, without showing the review in between.
+    const leaving = section === "learn" ? profileWorkspace : learningWorkspace;
+    if (leaving && !openingLearning && !openingProfile) {
+      release = holdReviewHidden();
+      await leaving.close({handoff:true});
+    }
+    if (section === "learn") await openLearning();
+    else await openProfile();
+  } finally {
+    release?.();
+    if (sectionRailPending === section) sectionRailPending = null;
+    syncSectionRail();
+  }
 }
 
 let learningWorkspace = null;
@@ -1776,20 +1879,19 @@ function openPuzzles(event) {
   const button=event.currentTarget;
   button.classList.add("is-activating");
   setTimeout(()=>button.classList.remove("is-activating"),460);
-  return openLearning();
+  return selectSection("learn");
 }
 function toggleLearning() {
-  if (learningWorkspace) return learningWorkspace.close();
-  return openLearning();
+  return selectSection(learningWorkspace ? "review" : "learn");
 }
 let profileWorkspace = null;
 let openingProfile = false;
 function profileOwnsBoard() { return !!profileWorkspace && !profileWorkspace.closed; }
 function toggleProfile() {
-  if (profileWorkspace) return profileWorkspace.close();
-  return openProfile();
+  return selectSection(profileWorkspace ? "review" : "playstyle");
 }
 function syncProfileToggle() {
+  syncSectionRail();
   const button=document.getElementById("profileToggle");
   if(!button)return;
   const open=!!profileWorkspace, mode=open?"learning":"review";
@@ -1867,6 +1969,7 @@ async function openProfile({shared = null} = {}) {
 }
 
 function syncLearningToggle() {
+  syncSectionRail();
   const button=document.getElementById("learningToggle");
   if(!button)return;
   const learning=!!learningWorkspace&&!learningWorkspace.closing, mode=learning?"learning":"review";
@@ -2370,6 +2473,7 @@ function toggleReorganize() {
   if (S.reorganize) reviewEffects.clear();
   if(!S.reorganize)selectedPanels.clear();
   UI.canvas.classList.toggle("reorganizing", S.reorganize);
+  scheduleSectionRail();
   if (S.reorganize && UI.settings) UI.settings.hidden = true; // move the settings panel out of the way
   syncPanelSelection();
   if (UI.settings && !UI.settings.hidden) renderSettings();   // refresh the button label if open
