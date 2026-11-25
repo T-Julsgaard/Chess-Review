@@ -50,6 +50,21 @@ test('profile: the toggle opens the setup, hides the review panels, keeps the re
   assert.ok(doc.querySelectorAll('.board .piece-img').length >= 32, 'the review board is painted again');
 });
 
+test('profile: the setup panel fades and rises without changing its horizontal position', async t => {
+  const a = review(t), win = a.dom.window;
+  let entry;
+  a.state.settings.uiAnim = true;
+  win.Element.prototype.animate = function(frames) {
+    if (this.matches('.profile-shell')) entry = frames;
+    return {finished: Promise.resolve(), cancel() {}};
+  };
+  await open(a);
+  assert.deepEqual(entry, [
+    {opacity: 0, translate: '0 12px'},
+    {opacity: 1, translate: '0 0'},
+  ]);
+});
+
 test('profile: seeded games render the deck on the board with navigation, stats and evidence', async t => {
   const a = review(t), doc = a.dom.window.document;
   seed(a);
