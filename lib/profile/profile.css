@@ -167,9 +167,11 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-dev { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .profile-dev + .profile-chooser-row { justify-content: center; padding-top: 18px; border-top: 1px solid var(--line); }
 .profile-type { align-self: stretch; font-family: "Dev Plex Mono", "IBM Plex Mono", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace; text-align: center; }
-/* Three lines are kept free, so the figure below never moves while a line is typed. The lines break where the note says (white-space: pre-wrap). */
-.profile-type-screen { min-height: calc(3 * 1.55em); display: flex; align-items: center; justify-content: center; flex-wrap: wrap; font-size: 15.5px; line-height: 1.55; color: var(--ink-2); text-wrap: balance; }
-.profile-type-text { white-space: pre-wrap; }
+/* Reserve space for the tallest paragraph at the current width so the figure stays still as the note changes. */
+.profile-type-screen { min-height: calc(3 * 1.55em); display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; font-size: 15.5px; line-height: 1.55; color: var(--ink-2); text-wrap: balance; }
+.profile-type-screen > * { grid-area: 1 / 1; white-space: pre-wrap; }
+.profile-type-measure { visibility: hidden; }
+.profile-type.is-still .profile-type-measure { display: none; }
 /* The untyped rest holds the line's final place without showing. */
 .profile-type-rest { visibility: hidden; }
 /* The block cursor takes no room of its own (a plain inline, so it adds no place to wrap), so the text never moves under it. */
