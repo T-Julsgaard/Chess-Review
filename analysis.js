@@ -1965,7 +1965,7 @@ async function openProfile({shared = null, handoff = false} = {}) {
     sendMessage:message=>browserAPI.runtime.sendMessage(message), stage:UI.canvas, boardWrap:UI.boardWrap, makePiece, flipped:S.flipped,
     settings:()=>S.settings, writeSettings:patch=>{Object.assign(S.settings,patch);return writeSettings(patch);}, identity, shared, toast,
     icon:name=>ICONS[name]||"", flag, url:_url, uiScale:profileUiScale,
-    playGameMove:move=>{if(move)playEvent(sanSound(move.san));}, playPuzzleWrong:playWrongSound,
+    playGameMove:move=>{if(move)playEvent(sanSound(move.san));}, playPuzzleWrong:playWrongSound, drawBestArrow,
     renderGamePlayer:(side,player,fen)=>playerStrip(side,capturedInfo(fen),{player,fen}),
     renderGameEvaluation:(bar,score,flipped)=>{
       bar.className='profile-game-eval evalbar eb-'+(S.settings.barStyle||'classic')+(flipped?' flipped':'');
@@ -2050,7 +2050,7 @@ async function openLearning() {
         if(wasAnalysis){renderEvalBar();renderPlayers();renderControls();renderReview();renderEngineCurrent();}
       },
       drawArrow:(from,to,flipped)=>learningArrow(from,to,flipped,USER_ARROW_COLOR),
-      drawBestArrow:(from,to,flipped)=>learningArrow(from,to,flipped,/^#[0-9a-f]{6}$/i.test(S.settings.bestArrowColor || "")?S.settings.bestArrowColor:ARROW_COLOR)},
+      drawBestArrow},
     onClosing:syncLearningToggle,
     onClose:()=>{
       learningWorkspace = null;
@@ -2927,6 +2927,11 @@ function renderBestArrow() {
   const arrowColor = /^#[0-9a-f]{6}$/i.test(S.settings.bestArrowColor || "")
     ? S.settings.bestArrowColor : ARROW_COLOR;
   svg.replaceChildren(arrowNode(shaft, head, arrowColor));
+}
+
+function drawBestArrow(from, to, flipped) {
+  const color = /^#[0-9a-f]{6}$/i.test(S.settings.bestArrowColor || "") ? S.settings.bestArrowColor : ARROW_COLOR;
+  return learningArrow(from, to, flipped, color);
 }
 
 function learningArrow(from, to, flipped, color) {

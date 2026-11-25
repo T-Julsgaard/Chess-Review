@@ -377,7 +377,6 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-board-play .sq { cursor: pointer; touch-action: none; }
 .profile-board .sq.profile-sel::before, .profile-board .sq.profile-hint::before { content: ""; position: absolute; inset: 0; z-index: 1; background: rgba(255,230,88,.52); pointer-events: none; }
 .profile-board .sq.profile-target::after { content: ""; position: absolute; left: 39%; top: 39%; width: 22%; height: 22%; z-index: 3; border-radius: 50%; background: #0004; pointer-events: none; }
-.profile-board .profile-hint-arrow path { fill: var(--accent); opacity: .8; }
 .profile-board .sq.profile-puzzle-wrong::before, .profile-board .sq.profile-puzzle-correct::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 .profile-board .sq.profile-puzzle-wrong::before { background: rgba(239,50,65,.22); }
 .profile-board .sq.profile-puzzle-correct::before { background: rgba(129,182,76,.3); }
@@ -390,6 +389,8 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-puzzle-count.is-solved::after { content: " ✓"; color: var(--q-best); }
 .profile-puzzle-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .profile-puzzle-actions { display: inline-flex; gap: 8px; }
+.profile-puzzle-actions .puzzle-hint { min-height: 34px; padding: 6px 12px; cursor: pointer; }
+.profile-puzzle-actions .puzzle-hint:disabled { opacity: .4; cursor: default; }
 .profile-puzzle-button { display: inline-flex; align-items: center; gap: 7px; font: inherit; font-size: 13px; font-weight: 750; line-height: 1; padding: 8px 15px; border-radius: 999px; cursor: pointer;
   color: var(--ink); background: color-mix(in srgb, var(--ink) 7%, var(--panel)); border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
   box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 8%, transparent); transition: background .15s ease, border-color .15s ease, transform .12s ease, filter .15s ease; }

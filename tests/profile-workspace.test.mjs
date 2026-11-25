@@ -536,7 +536,7 @@ test('mate in one: the chapter opens on the newest puzzle not solved yet, and Ne
 
 test('mate in one opens at the puzzle, replays the recorded game, and lets the player solve it', async t => {
   const a = review(t), {document: doc, PointerEvent} = a.dom.window;
-  Object.assign(a.state.settings, {profileDesign: 'story', uiAnim: false});
+  Object.assign(a.state.settings, {profileDesign: 'story', uiAnim: false, bestArrowColor: '#3399aa', arrowOpacity: .53, arrowShaft: .24});
   const scholar = ['e4', 'e5', 'Bc4', 'Nc6', 'Qh5', 'Nf6', 'Qf3'];
   const newer = gameFeatures({site: 'chesscom', id: '901', url: 'https://www.chess.com/game/live/901', endTime: 3, moves: scholar,
     white: {name: 'tester', rating: 1500}, black: {name: 'Defender', rating: 1600}}, 'tester');
@@ -558,7 +558,8 @@ test('mate in one opens at the puzzle, replays the recorded game, and lets the p
   w.solvedMates = new Set(['chesscom:902']);
   w.go(w.deck.findIndex(slide => slide.id === 'mate1'));
 
-  const button = label => [...doc.querySelectorAll('.profile-puzzle-button')].find(node => node.textContent === label);
+  const button = label => [...doc.querySelectorAll('.profile-puzzle-actions button')].find(node => node.textContent === label);
+  const hintArrow = () => w.boardEl.querySelector('.puzzle-hint-arrow');
   const key = key => doc.body.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key, bubbles: true, cancelable: true}));
   const link = () => doc.querySelector('.pv-story .profile-open-puzzle-game');
   const evalBar = () => doc.querySelector('.profile-game-eval');
@@ -579,12 +580,24 @@ test('mate in one opens at the puzzle, replays the recorded game, and lets the p
   assert.deepEqual([...doc.querySelectorAll('.profile-puzzle button')].map(node => node.textContent), ['Hint', 'Previous', 'Next']);
   assert.deepEqual(loaded, [], 'the saved setup opens without fetching the game');
 
+  const hint = button('Hint');
+  assert.ok(hint.matches('.learn-button.puzzle-hint'));
+  hint.click();
+  assert.ok(square('h5').classList.contains('profile-hint'));
+  assert.equal(hintArrow(), null, 'the first hint only highlights the piece');
+  hint.click();
+  assert.equal(hintArrow().getAttribute('aria-label'), 'Hint: h5 to f7');
+  assert.equal(hintArrow().firstElementChild.getAttribute('fill'), '#3399aa');
+  assert.equal(hintArrow().firstElementChild.getAttribute('opacity'), '0.53');
+  assert.equal(hintArrow().querySelector('polyline').getAttribute('stroke-width'), '0.24');
+
   const chapter = w.index;
   key('ArrowRight');
   await settle();
   assert.equal(w.index, chapter);
   assert.ok(square('f3').classList.contains('profile-hl'), 'the first forward step plays the actual missed move');
   assert.ok(button('Hint').disabled);
+  assert.equal(hintArrow(), null, 'the hint is hidden during replay');
   clickSquare('f3'); clickSquare('f7');
   assert.equal(square('f7').querySelector('[data-result="correct"]'), null, 'review positions are read-only');
   key('ArrowRight');
@@ -595,7 +608,7 @@ test('mate in one opens at the puzzle, replays the recorded game, and lets the p
   key('ArrowLeft'); key('ArrowLeft');
   assert.ok(square('h5').querySelector('.profile-piece'));
   assert.match(evalBar().getAttribute('aria-label'), /White.*mate.*1/i);
-  assert.equal(button('Hint').disabled, false, 'returning to the puzzle makes it playable');
+  assert.equal(hintArrow().getAttribute('aria-label'), 'Hint: h5 to f7', 'returning to the puzzle restores the hint');
   key('ArrowLeft');
   assert.ok(square('g8').querySelector('.profile-piece'), 'the left arrow can also rewind before the puzzle');
   for (let i = 0; i < 5; i++) key('ArrowLeft');
@@ -611,8 +624,10 @@ test('mate in one opens at the puzzle, replays the recorded game, and lets the p
   assert.equal(doc.querySelector('.profile-puzzle').textContent.includes('Not mate. Try again.'), false);
   await new Promise(resolve => setTimeout(resolve, 750));
   assert.ok(square('h5').querySelector('.profile-piece'));
+  assert.ok(hintArrow(), 'the hint comes back after an incorrect move');
   clickSquare('h5'); clickSquare('f7');
   assert.ok(square('f7').querySelector('[data-result="correct"]'));
+  assert.equal(hintArrow(), null, 'solving the puzzle clears the hint');
   assert.ok(w.boardEl.querySelector('[data-mated-square="e8"] .mate-badge'));
   assert.equal(evalBar().getAttribute('aria-label'), 'Checkmate');
 
@@ -626,8 +641,12 @@ test('mate in one opens at the puzzle, replays the recorded game, and lets the p
   key('ArrowLeft'); key('ArrowRight');
   assert.ok(square('g4').classList.contains('profile-hl'));
   assert.deepEqual(loaded, ['901', 'PVmate01'], 'the legacy intro and its replay share one load');
+  button('Hint').click(); button('Hint').click();
+  assert.equal(hintArrow().getAttribute('aria-label'), 'Hint: d8 to h4');
+  assert.equal(hintArrow().querySelector('polygon').getAttribute('points').split(' ').at(-1), '0.5,3.5');
   button('Previous').click();
   assert.equal(link().href, newer.url);
+  assert.equal(hintArrow(), null);
   assert.equal(w.boardEl.querySelector('.puzzle-result-badge, .mate-badge'), null);
   clickSquare('h5'); clickSquare('f7');
   assert.ok(square('f7').querySelector('[data-result="correct"]'), 'Previous lets the user solve the same puzzle again');
