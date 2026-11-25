@@ -1692,9 +1692,7 @@ function buildUI() {
   const graphMount = el("div", { id: "graphMount" });
   const statsMount = el("div", { id: "statsMount" });
   const engineMount = el("div", { id: "engineMount" });
-  const learnMount = el("div", { class: "learn-entry" },
-    el("button", { class: "learn-entry-button", "data-motion": S.settings.uiAnim===false?"off":"on", onclick: openPuzzles },
-      icon("book"), el("span", {class:"learn-entry-label"}, "Solve Puzzles")));
+  const learnMount = el("div", { class: "learn-entry" }, solvePuzzlesButton());
 
   // The stage holds every module. In the automatic layout the side wrappers group the panels into
   // columns (styles.css picks wide / medium / narrow by window size); in the custom layout they are
@@ -1902,6 +1900,10 @@ let learningWorkspace = null;
 let learningAnnouncement = null;
 let openingLearning = false;
 let deferredPracticeAdvance = false;
+function solvePuzzlesButton() {
+  return el("button", { type: "button", class: "learn-entry-button", "data-motion": S.settings.uiAnim === false ? "off" : "on", onclick: openPuzzles },
+    icon("book"), el("span", { class: "learn-entry-label" }, "Solve Puzzles"));
+}
 function openPuzzles(event) {
   const button=event.currentTarget;
   button.classList.add("is-activating");
@@ -4631,8 +4633,7 @@ function renderMoveComment() {
   const body = el("div", { class: "ip-body" + (dopamine ? " dopamine-comment" : "") });
   if (dopamine) body.dataset.moveCategory = S.classif[S.idx] || "";
   if (S.idx === 0) {
-    body.append(el("div", { class: "ip-head" },
-      el("button", { type: "button", class: "practice-btn", title: "Replay the game and re-solve every mistake you made", onclick: startPractice }, "Practice your mistakes")));
+    body.append(el("div", { class: "ip-head" }, solvePuzzlesButton()));
     const sig = "start:" + (S.settings.coach || "");
     const fresh = sig !== _ipSig;
     if (fresh) { _ipText = (S.coach && coachLine("non_move_states", "starting_position", {})) || "Use ← and → to step through the game."; _ipSig = sig; }
@@ -7686,8 +7687,9 @@ function applySettings() {
   r.style.setProperty("--coord-size", (S.settings.coordSize ?? 12) + "px");
   r.classList.toggle("hide-coords", S.settings.showCoords === false);
   clearBoardArt(UI.boardWrap && UI.boardWrap.querySelector(".board"));
-  const learnEntry=document.querySelector(".learn-entry-button");
-  if(learnEntry)learnEntry.dataset.motion=S.settings.uiAnim===false?"off":"on";
+  for (const button of document.querySelectorAll(".learn-entry-button")) {
+    button.dataset.motion = S.settings.uiAnim === false ? "off" : "on";
+  }
   applyBackground();
   const learningToggle=document.getElementById("learningToggle");
   if(learningToggle)learningToggle.dataset.motion=S.settings.uiAnim===false?"off":"on";
@@ -8560,7 +8562,7 @@ function toggleAuto() {
   renderControls();
 }
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Tab" && e.target?.closest?.(".ip-close-game")) return;
+  if (e.key === "Tab" && e.target?.closest?.(".ip-close-game,.learn-entry-button")) return;
   if (learningWorkspace?.closing && e.target?.closest?.('#learningToggle,.learn-entry-button')
       && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) {
     e.preventDefault();

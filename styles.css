@@ -1519,16 +1519,7 @@ button { font-family: inherit; cursor: pointer; }
 /* mistake-practice status text in the controls bar */
 .controls .practice-pos { color: var(--ink-2); font-weight: 700; font-family: var(--font-ui); }
 .controls .practice-status { color: var(--ink-3); font-size: 13px; margin-right: 4px; }
-/* Starting-position action, above the navigation hint in Insights. */
-.insight-panel .practice-btn {
-  border: 1px solid color-mix(in oklab, var(--accent) 45%, var(--line));
-  background: color-mix(in oklab, var(--accent) 14%, var(--panel-2)); color: var(--ink);
-  border-radius: 8px; padding: 6px 12px; font-family: var(--font-ui); font-size: 12px; font-weight: 700; line-height: 1.4; cursor: pointer;
-  max-width: 100%; text-align: left;
-  transition: border-color .12s, background .12s;
-}
-.insight-panel .practice-btn:hover { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 24%, var(--panel-2)); }
-.insight-panel .practice-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.insight-panel .learn-entry-button { max-width: max-content; padding-inline: 12px; }
 
 /* ---------- REVIEW SUMMARY ---------- */
 .review {
