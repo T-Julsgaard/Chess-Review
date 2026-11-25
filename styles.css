@@ -97,7 +97,7 @@
 .learn-card p { font-size: 14px; }
 .learn-panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: clamp(18px,3vw,32px); margin: 20px 0; }
 .learn-panel > .learn-button { margin: 4px 6px 4px 0; }
-.learn-filters { display: flex; align-items: end; flex-wrap: wrap; gap: 14px; margin: 24px 0; }
+.learn-filters { display: flex; align-items: end; flex-wrap: wrap; gap: 14px; margin: 0 0 24px; }
 .learn-filters input { flex: 1 1 210px; }
 .learn-filter { display: grid; gap: 5px; min-width: 0; font-size: 12px; color: var(--ink-2); }
 .learn-dropdown .lib-dd-btn { min-height: 42px; padding: 10px 12px; font-size: 14px; }
@@ -246,7 +246,7 @@
 .learning-embedded .learn-study { display: block; }
 .learning-embedded .learn-study > .learn-panel { margin: 0; }
 .learning-embedded .learn-activity-head { margin-bottom: 16px; }
-.learning-embedded .learn-filters { gap: 10px; margin: 16px 0; }
+.learning-embedded .learn-filters { gap: 10px; margin-bottom: 16px; }
 .learning-embedded .learn-filter { flex: 1 1 110px; }
 .learning-embedded .learn-results { margin: 0; }
 .learning-embedded .learn-empty { padding: 30px 16px; margin: 0; }
@@ -316,8 +316,8 @@
 .learn-library-row > .learn-button { flex: none; background: transparent; border-color: transparent; padding: 8px 4px; color: var(--accent); }
 .learning-workspace .learn-category { margin: 28px 0; }
 .learning-workspace .learn-category > h3 { margin: 0; color: var(--ink-2); font-size: 18px; font-weight: 600; }
-.learn-puzzle-start { padding: 8px 0 28px; border-bottom: 1px solid var(--line); }
-.learning-workspace :is(.learn-puzzle-start,.learn-mode-stats) h2 { font-size: 32px; margin: 0; }
+.learn-puzzle-start { padding-bottom: 28px; border-bottom: 1px solid var(--line); }
+.learning-workspace .learn-mode-stats h2 { font-size: 32px; margin: 0; }
 .learning-workspace .learn-puzzle-start > .primary { min-width: 200px; padding: 14px 24px; }
 .learn-puzzle-heading { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 12px 16px; }
 .learn-puzzle-heading > h2 { grid-column: 1; grid-row: 1; }
@@ -381,7 +381,7 @@
 .learning-workspace[data-motion="off"] .puzzle-rating-region,.learning-workspace[data-motion="off"] .puzzle-rating-toggle,.learning-workspace[data-motion="off"] .puzzle-rating-toggle * { transition: none; }
 @media (forced-colors: active) { .puzzle-rating-track { border: 1px solid ButtonText; } .puzzle-rating-thumb { background: ButtonText; color: ButtonFace; } [aria-checked="true"] .puzzle-rating-thumb { background: Highlight; color: HighlightText; } }
 /* Three pocket-sized arcade tickets. The ink stays dark on the colored stock. */
-.puzzle-mode-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin-top: 24px; }
+.puzzle-mode-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
 .puzzle-mode {
   --mode-stock: #bbd58c;
   min-width: 0;
