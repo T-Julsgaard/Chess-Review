@@ -1907,9 +1907,9 @@ function reviewEntryButton(className, label, glyph, activate) {
   return el("button", {
     type: "button", class: "review-entry-button " + className, "data-motion": S.settings.uiAnim === false ? "off" : "on",
     onclick: ({currentTarget: button}) => {
+      if (activate() === false) return;
       button.classList.add("is-activating");
       setTimeout(() => button.classList.remove("is-activating"), 460);
-      activate();
     },
   }, icon(glyph), el("span", { class: "review-entry-label" }, label));
 }
@@ -7796,12 +7796,12 @@ function practiceSpots() {
   return out;
 }
 function startPractice() {
+  if (S.analyzing || S.practice) return false;
+  const spots = practiceSpots();
+  if (!spots.length) return false;
   pauseBackgroundAnalysis();
-  if (S.analyzing || S.practice) return;
   if (S.analysisMode) exitAnalysis();
   if (S.autoTimer) { clearInterval(S.autoTimer); S.autoTimer = null; }
-  const spots = practiceSpots();
-  if (!spots.length) { toast("No mistakes to practice — clean game!"); return; }
   S.practice = { spots, i: 0, solving: false, busy: false, rolling: false, rollT: null, advancing: false };
   S.selectedSq = null;
   renderStats();

@@ -48,6 +48,20 @@ test('the standalone entry offers puzzles in the blank workspace and practice af
   assert.equal(practice().disabled, false);
 });
 
+test('clicking practice with no eligible mistakes leaves the game playing without feedback', t => {
+  const a = review(t), S = a.state, doc = a.dom.window.document;
+  S.classif.fill('best');
+  a.call('toggleAuto');
+  const timer = S.autoTimer;
+  t.after(() => clearInterval(timer));
+  const button = doc.querySelector('[data-mod="learn"] .practice-btn');
+  button.click();
+  assert.equal(S.practice, null);
+  assert.equal(S.autoTimer, timer);
+  assert.equal(doc.querySelector('.toast'), null);
+  assert.equal(button.classList.contains('is-activating'), false);
+});
+
 test('the standalone practice button replays to the first mistake from a later move', t => {
   const a = review(t), S = a.state, doc = a.dom.window.document;
   S.classif[1] = 'mistake';
@@ -55,7 +69,9 @@ test('the standalone practice button replays to the first mistake from a later m
   a.call('go', 2);
   let target;
   a.replace('practiceRoll', ply => { target = ply; a.call('renderReview'); });
-  doc.querySelector('[data-mod="learn"] .practice-btn').click();
+  const button = doc.querySelector('[data-mod="learn"] .practice-btn');
+  button.click();
+  assert.equal(button.classList.contains('is-activating'), true);
   assert.deepEqual(Array.from(S.practice.spots), [1]);
   assert.equal(target, 0);
   assert.ok(doc.querySelector('.practice-coach'));
