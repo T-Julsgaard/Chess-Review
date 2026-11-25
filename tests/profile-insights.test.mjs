@@ -184,6 +184,7 @@ test('archetypes: every roster entry is well formed, famous lines are legal, and
 test('deck: a full season builds every slide with evidence and boards; a thin one stops at the cover', () => {
   const rows = season();
   const insights = buildInsights(rows);
+  insights.streaks.bestDay = {date: '2026-11-17', w: 21, games: 27};
   const report = buildReport(rows, insights, {account: 'tester', site: 'chesscom', period: 'year', periodLabel: 'Past 12 months'});
   const deck = buildDeck(report, {account: 'tester', periodLabel: 'Past 12 months', engineStatus: 'idle', engineBudgetLabel: 'About 10 minutes.'});
   const ids = deck.map(s => s.id);
@@ -196,6 +197,9 @@ test('deck: a full season builds every slide with evidence and boards; a thin on
   }
   assert.equal(deck.find(s => s.id === 'trend').pending, 'engine');
   assert.equal(deck.find(s => s.id === 'openings').board.kind, 'moves');
+  const bestWins = deck.find(s => s.id === 'hits');
+  assert.equal(bestWins.stats.some(stat => stat.label === 'Best day'), false);
+  assert.deepEqual(bestWins.bullets ?? [], []);
   assert.equal(deck.find(s => s.id === 'habits').board.kind, 'schedule');
   assert.ok(deck.find(s => s.id === 'swings').title.startsWith('Down 5'));
   const thin = buildDeck(buildReport(rows.slice(0, 4), buildInsights(rows.slice(0, 4)), {account: 'x', site: 'chesscom'}), {account: 'x'});

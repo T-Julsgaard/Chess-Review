@@ -101,7 +101,14 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.ok(shell.querySelector('.pv-wdl'));
   assert.equal(doc.querySelector('.board .pv-badge'), null, 'nothing covers the result squares');
   assert.equal(doc.querySelectorAll('.board .sq.profile-fill').length, 64);
-  assert.equal(shell.querySelectorAll('.pv-fact').length, 4, 'four facts, two by two');
+  const facts = () => [...shell.querySelectorAll('.pv-fact')].map(fact => [fact.querySelector('dt').firstChild.textContent, fact.querySelector('dd').textContent]);
+  const winRates = () => [
+    ['Win rate as White', w.report.totals.byColor.w.winRate],
+    ['Win rate as Black', w.report.totals.byColor.b.winRate]
+  ].filter(([, rate]) => rate != null).map(([label, rate]) => [label, `${rate}%`]);
+  assert.equal(facts().length, 6);
+  assert.deepEqual(facts().slice(4), winRates(), 'the win rates each have a fact under the other four');
+  assert.equal(shell.querySelector('.pv-reasons'), null);
   // View your results over time, in place of a link to the longest game: every game in runs, drawn like the best-wins chart.
   assert.equal(shell.querySelector('.pv-link[data-game-url]'), null, 'no link to the longest game');
   const overTime = shell.querySelector('.pv-link[aria-pressed]');
@@ -128,6 +135,7 @@ test('profile designs: story shows one figure per chapter, progress segments and
   assert.equal(shell.querySelector('.pv-filter'), filter, 'the selected marker is retained across a click');
   assert.equal(shell.querySelector('.pv-wdl'), bar, 'the results bar transitions in place');
   assert.equal(shell.querySelector('.pv-story-figure').textContent, String(w.report.totals.games));
+  assert.deepEqual(facts().slice(4), winRates(), 'the win rates follow the time control and omit a side with no games');
   assert.ok(w.report.totals.games < 300 && w.report.classOptions.includes('blitz'), 'the options stay while filtered');
   [...shell.querySelectorAll('.pv-filter button')].find(b => b.textContent === 'All').click();
   key(a, 'ArrowRight');
@@ -136,7 +144,8 @@ test('profile designs: story shows one figure per chapter, progress segments and
   key(a, 'PageDown');
   assert.equal(shell.querySelector('.pv-story').dataset.slide, 'season');
   assert.ok(doc.querySelectorAll('.board .pv-layer .pv-tile').length > 8, 'months are columns of squares');
-  assert.equal(shell.querySelectorAll('.pv-points li').length, 2);
+  assert.equal(shell.querySelector('.pv-points, .pv-story-lead'), null);
+  assert.deepEqual(facts().find(([label]) => label === 'Active days'), ['Active days', String(w.season.activeDays)]);
   w.go(w.deck.findIndex(s => s.id === 'signature'));
   assert.ok(shell.querySelectorAll('.pv-cmp').length >= 6, 'every metric against a typical player');
   const signature = w.currentSlide();
@@ -483,7 +492,9 @@ test('story rating inspection survives filtering and game Exit restores the sele
   [...doc.querySelectorAll('.pv-filter button')].find(b => b.textContent === 'Bullet').click();
   w.go(w.deck.findIndex(s => s.id === 'rating'));
   assert.equal(doc.querySelectorAll('.pv-modes button').length, 2, 'rating modes survive the chapter filter');
+  assert.doesNotMatch(w.slideHost.textContent, /Best month:/);
   [...doc.querySelectorAll('.pv-modes button')].find(b => b.textContent === 'Bullet').click();
+  assert.doesNotMatch(w.slideHost.textContent, /Best month:/);
   const chapter = w.index, chart = doc.querySelector('.pv-line');
   chart.focus();
   chart.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'ArrowRight', bubbles: true, cancelable: true}));
