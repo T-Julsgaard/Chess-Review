@@ -15,6 +15,7 @@ test('Insights shows the starting hint and practice appears in the standalone sl
   const practice = doc.querySelector('[data-mod="learn"] .practice-btn');
   assert.equal(practice.textContent, 'Practice your mistakes');
   assert.equal(doc.querySelector('.insight-panel .ip-text').textContent, 'Use ← and → to step through the game.');
+  assert.ok(doc.querySelector('.insight-panel .ip-head-spacer + .ip-text'));
   assert.equal(doc.querySelector('.learn-entry-button'), null);
   for (const enabled of [true, false]) {
     a.state.settings.uiAnim = enabled;
@@ -26,6 +27,7 @@ test('Insights shows the starting hint and practice appears in the standalone sl
   assert.equal(tab.defaultPrevented, false);
   a.call('go', 1);
   assert.equal(practice.isConnected, true);
+  assert.ok(doc.querySelector('.insight-panel .ip-head + .ip-text'));
   a.call('go', 0);
   assert.equal(doc.querySelector('.learn-entry-button'), null);
 });

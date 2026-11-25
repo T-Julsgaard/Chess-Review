@@ -4642,7 +4642,10 @@ function renderMoveComment() {
   const engineReplies = engineExplanationsEnabled();
   const body = el("div", { class: "ip-body" + (dopamine ? " dopamine-comment" : "") });
   if (dopamine) body.dataset.moveCategory = S.classif[S.idx] || "";
+  const head = engineReplies ? null : el("div", { class: "ip-head" });
+  if (head) body.append(head);
   if (S.idx === 0) {
+    if (head) head.classList.add("ip-head-spacer");
     const sig = "start:" + (S.settings.coach || "");
     const fresh = sig !== _ipSig;
     if (fresh) { _ipText = (S.coach && coachLine("non_move_states", "starting_position", {})) || "Use ← and → to step through the game."; _ipSig = sig; }
@@ -4659,15 +4662,13 @@ function renderMoveComment() {
   const evCp = ev ? scoreToCp(ev) : null;
   const evTxt = ev ? evalText(ev) : "";
 
-  if (!engineReplies) {
-    const head = el("div", { class: "ip-head" });
+  if (head) {
     if (cfg) head.append(gradeBadge(cls, S.moveGrades[S.idx], "ip-badge"));
     // Special coach phrasing can omit the category, so name it beside the move.
     const sanDisplay = dopamine && cfg ? `${san} · ${categoryName(cls)}`
       : S.settings.coach && !S.settings.coachPlain && cfg ? `${san} ${categoryName(cls)}` : san;
     head.append(el("span", { class: "ip-move" }, sanDisplay));
     if (evTxt && baseUiSetup() !== 'modern') head.append(el("span", { class: "ip-eval " + (evCp >= 0 ? "pos" : "neg") }, evTxt));
-    body.append(head);
   }
 
   // Pick the line once per (ply + coach): a fresh signature → choose + type; otherwise reuse the

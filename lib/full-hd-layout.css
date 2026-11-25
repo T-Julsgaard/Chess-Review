@@ -144,4 +144,4 @@ body:has(.full-hd-reference) .learning-embedded .learn-shell {
   max-height:calc((100dvh - var(--topbar-h) - 28px) / var(--settings-scale,var(--reference-chrome-scale,1)));
 }
 .stage.auto.reference-components:not(.full-hd-reference) {--review-h:180px;}
-.stage.auto.reference-components:not(.full-hd-reference) .ip-head:empty {display:none;}
+.stage.auto.reference-components:not(.full-hd-reference) .ip-head:empty:where(:not(.ip-head-spacer)) {display:none;}

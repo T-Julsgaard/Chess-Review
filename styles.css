@@ -2242,7 +2242,7 @@ button { font-family: inherit; cursor: pointer; }
 .stage.auto.has-coach .ip-opening { padding-right:108px; }
 .stage.auto.has-coach .ip-head { padding-right:108px; }
 .stage .ip-body { min-height:0; overflow:auto; padding:8px 10px; gap:6px; }
-.stage .ip-head:empty { display:none; }
+.stage .ip-head:empty:where(:not(.ip-head-spacer)) { display:none; }
 .stage .ip-head { min-height:24px; }
 
 /* Board and two panel columns fit a desktop or laptop viewport. Only panel bodies scroll. */
