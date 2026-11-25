@@ -80,9 +80,9 @@
 .pv-modes button.on { background: var(--panel); color: var(--ink); box-shadow: 0 2px 8px color-mix(in srgb, #000 25%, transparent); }
 .pv-link { align-self: flex-start; font-size: 13px; font-weight: 700; color: var(--pv-tint, var(--accent)); text-decoration: none; }
 .pv-link:hover { text-decoration: underline; }
-/* A fact's name that opens its game (Comebacks: the one that got away), coloured like the game links. */
-.pv-fact-link { align-self: flex-start; padding: 0; border: 0; background: none; font: inherit; font-weight: 700; color: var(--pv-tint, var(--accent)); text-align: left; cursor: pointer; }
-.pv-fact-link:hover { text-decoration: underline; }
+/* A fact's name that opens its game. */
+.pv-fact-link { align-self: flex-start; padding: 0; border: 0; background: none; font: inherit; font-weight: 700; color: inherit; text-align: left; text-decoration: underline; cursor: pointer; }
+.pv-fact-link:hover { text-decoration-thickness: 2px; }
 /* A game link while its game is on the board: the way back to the chapter's own board. */
 .pv-link-back::before { content: "←"; display: inline-block; margin-right: 6px; transition: transform .2s cubic-bezier(.16,1,.3,1); }
 .pv-link-back:hover::before { transform: translateX(-3px); }
@@ -123,11 +123,10 @@
 .pv-story-label { font-size: 16px; font-weight: 700; color: var(--pv-tint); }
 .pv-story-lead { margin: 0; font-size: 16px; line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
 .pv-facts { margin: 4px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); column-gap: 28px; border-top: 1px solid var(--line); }
-.pv-fact { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line-soft); min-width: 0; }
-.pv-fact dt { display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: var(--ink-2); min-width: 0; }
+.pv-fact { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line-soft); min-width: 0; color: var(--ink-2); }
+.pv-fact dt { display: flex; flex-direction: column; gap: 2px; font-size: 13px; min-width: 0; }
 .pv-fact dt small { font-size: 11.5px; color: var(--ink-3, var(--ink-2)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pv-fact dd { margin: 0; font-size: 19px; font-weight: 780; letter-spacing: -.3px; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
-.pv-fact.tone-good dd { color: var(--q-best); } .pv-fact.tone-gentle dd { color: var(--q-inacc); }
 .pv-wdl { display: flex; gap: 3px; height: 58px; border-radius: 16px; overflow: hidden; }
 .pv-wdl-seg { flex: 1 1 0; min-width: max-content; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; padding: 0 14px; color: #0f0f0d; transition: flex-grow .42s cubic-bezier(.2,.8,.2,1), padding .42s; }
 .pv-wdl-seg.is-empty { min-width: 0; padding: 0; overflow: hidden; }

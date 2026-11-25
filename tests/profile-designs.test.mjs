@@ -55,6 +55,9 @@ test('profile designs: the season counts months, fills gaps and finds the longes
   assert.equal(seasonStats([]), null);
   const slide = seasonSlide(s);
   assert.equal(slide.id, 'season');
+  assert.deepEqual(slide.stats.map(({label, value}) => [label, value]), [
+    ['Active days in a row', '3'], ['Active days', '4'], ['Most games in one day', '2']
+  ]);
   assert.equal(slide.board.scene.type, 'columns');
   assert.equal(slide.board.scene.columns.length, 3);
   assert.equal(seasonSlide(seasonStats(rows.slice(0, 2))), null, 'one month is not a season');
@@ -823,8 +826,20 @@ test('accuracy opens with the game animation and time-control changes show the a
   assert.ok(chart.classList.contains('pv-line-settled'));
   filter('bullet');
   assert.equal(w.viz.layer?.dataset.empty, 'on', 'bullet has no checked games: the level line stands for none');
+  assert.equal(doc.querySelector('.pv-fact-link'), null);
   filter('all');
   assert.ok(w.viz.layer.classList.contains('pv-line-settled'), 'filtering from an empty chart also skips the animation');
+  const best = doc.querySelector('.pv-fact-link');
+  assert.equal(best?.textContent, 'Most accurate game');
+  assert.equal(best.dataset.gameUrl, w.report.engine.best.url);
+  assert.equal(doc.querySelector('.pv-story .pv-link'), null, 'the stat is the only game link');
+  best.click();
+  assert.equal(w.activeGame?.id, w.report.engine.best.id);
+  const back = doc.querySelector('.pv-link-back');
+  assert.equal(back?.textContent, 'Back to the chart');
+  back.click();
+  assert.ok(w.viz.layer.querySelector('.pv-line-build, .pv-line-path'));
+  assert.equal(doc.querySelector('.pv-link-back'), null);
 });
 
 test('accuracy: a new time control bends the line on the board into the new one, and into the level line', async t => {
