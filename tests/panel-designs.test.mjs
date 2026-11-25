@@ -102,7 +102,7 @@ test('Original Accuracy restores the summary, expander and explainer; current de
   assert.equal(a.state.accuracyPage, 1);
 });
 
-test('Original Accuracy expansion moves Engine and Solve puzzles down and restores their positions', async t => {
+test('Original Accuracy expansion moves Engine and the practice button down and restores their positions', async t => {
   const a = review(t), doc = a.dom.window.document;
   Object.defineProperties(a.dom.window, {innerWidth: {value:1920,configurable:true}, innerHeight: {value:1080,configurable:true}});
   a.call('applyLayoutMode');
@@ -125,7 +125,7 @@ test('Original Accuracy expansion moves Engine and Solve puzzles down and restor
       const expanded = geometry(), delta = expanded.accuracy.height-before.accuracy.height;
       assert.ok(delta>70);
       assert.ok(Math.abs(expanded.engine.top-before.engine.top-delta)<1e-8);
-      // The automatic desktop layout may trim Engine to keep the puzzle button on screen.
+      // The automatic desktop layout may trim Engine to keep the practice button on screen.
       const gap = boxes => boxes.learn.top-boxes.engine.top-boxes.engine.height;
       assert.ok(Math.abs(gap(expanded)-gap(before))<1e-8);
       assert.deepEqual(expanded.controls,before.controls);

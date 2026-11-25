@@ -79,7 +79,7 @@ body:has(.full-hd-reference) .learning-embedded .learn-shell {
   box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
 }
 
-.stage.reference-components .learn-entry-button { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: 10px; background: var(--panel-2); color: var(--ink); font-weight: 700; font-size: 13px; }
+.stage.reference-components .review-entry-button { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: 10px; background: var(--panel-2); color: var(--ink); font-weight: 700; font-size: 13px; }
 
 .stage.reference-components .ip-body { position: relative; z-index: 20; padding: 13px var(--pad) 15px; display: flex; flex-direction: column; gap: 8px; flex: 1; min-height: 0; overflow-y: auto;
   scrollbar-width: none; }

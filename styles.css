@@ -46,13 +46,14 @@
 
 /* Learning shares the review's colors, fonts, board palette and SVG piece sets. */
 .learn-entry { justify-content: center; }
-.learn-entry-button { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: 10px; background: var(--panel-2); color: var(--ink); font-weight: 700; font-size: 13px; }
-.learn-entry-button:hover { background: color-mix(in srgb, var(--accent) 15%, var(--panel)); }
-.learn-entry-button svg { width: 20px; height: 20px; }
-.learn-entry-button.is-activating { animation: learning-toggle-out .46s; }
-.learn-entry-button.is-activating svg { animation: learning-toggle-book .46s both; }
-.learn-entry-button.is-activating .learn-entry-label { animation: learning-toggle-label-back .3s cubic-bezier(.16, 1, .3, 1); }
-.learn-entry-button.is-activating::after { animation: learning-toggle-shine-back .46s both; }
+.review-entry-button { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: 10px; background: var(--panel-2); color: var(--ink); font-weight: 700; font-size: 13px; }
+.review-entry-button:enabled:hover { background: color-mix(in srgb, var(--accent) 15%, var(--panel)); }
+.review-entry-button:disabled { opacity: .5; cursor: default; }
+.review-entry-button svg { width: 20px; height: 20px; }
+.review-entry-button.is-activating { animation: learning-toggle-out .46s; }
+.review-entry-button.is-activating svg { animation: learning-toggle-book .46s both; }
+.review-entry-button.is-activating .review-entry-label { animation: learning-toggle-label-back .3s cubic-bezier(.16, 1, .3, 1); }
+.review-entry-button.is-activating::after { animation: learning-toggle-shine-back .46s both; }
 .learning-workspace { position: fixed; inset: 0; z-index: 2000; overflow-y: auto; background: var(--bg); color: var(--ink); animation: learn-enter .22s ease-out; --mode-head: 158px; }
 .learn-header { min-height: 76px; display: flex; gap: 16px; align-items: center; justify-content: space-between; padding: 16px clamp(16px,4vw,64px); border-bottom: 1px solid var(--line); background: var(--panel); }
 .learn-brand { display: flex; gap: 12px; align-items: center; font-size: clamp(16px,2vw,22px); font-weight: 750; letter-spacing: -.4px; }
@@ -81,7 +82,7 @@
 .learn-button:hover { background: var(--panel-3); border-color: var(--accent); }
 .learn-button.primary { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
 .learn-button:disabled { opacity: .45; cursor: default; }
-.learning-workspace :focus-visible, .learn-entry-button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.learning-workspace :focus-visible, .review-entry-button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 .learning-workspace:focus { outline: none; }
 .learning-workspace .learn-square:focus-visible { outline: none; }
 /* Move checks keep navigation locked without flashing its disabled appearance. */
@@ -138,7 +139,7 @@
 .learn-square { touch-action: none; cursor: default; }
 .learning-embedded .learn-square .piece-img { width: 94%; height: 94%; animation: none; }
 .board-promotion { position: absolute; inset: 0; z-index: 210; pointer-events: auto; }
-.learn-entry-button:active { transform: translateY(1px) scale(.97); }
+.review-entry-button:enabled:active { transform: translateY(1px) scale(.97); }
 .learn-coordinate { position: absolute; font-size: clamp(9px,1.1vw,13px); font-weight: 700; line-height: 1; z-index: 2; pointer-events: none; }
 .learn-coordinate.rank { top: 4px; left: 4px; }
 .learn-coordinate.file { bottom: 3px; right: 4px; }
@@ -823,13 +824,13 @@ button { font-family: inherit; cursor: pointer; }
   grid-template-columns: 17px minmax(0, max-content); justify-content: center; gap: 8px;
   font: inherit; font-size: 12px; line-height: 1.25;
 }
-.learning-toggle, .learn-entry-button {
+.learning-toggle, .review-entry-button {
   position: relative; isolation: isolate; overflow: hidden;
   transition: background .18s, border-color .18s, color .18s, box-shadow .18s, transform .18s;
 }
 .learning-toggle-icon { display: grid; place-items: center; color: var(--accent); }
 .learning-toggle-label { position: relative; }
-.learning-toggle::after, .learn-entry-button::after {
+.learning-toggle::after, .review-entry-button::after {
   content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   background: linear-gradient(110deg, transparent 20%, color-mix(in oklab, var(--accent) 24%, transparent) 50%, transparent 80%);
   opacity: 0;
@@ -882,9 +883,9 @@ button { font-family: inherit; cursor: pointer; }
   30% { opacity: 1; }
   100% { transform: translateX(100%); opacity: 0; }
 }
-:is(.learning-toggle,.learn-entry-button)[data-motion="off"], :is(.learning-toggle,.learn-entry-button)[data-motion="off"] *, :is(.learning-toggle,.learn-entry-button)[data-motion="off"]::after { animation: none !important; transition: none !important; transform: none !important; }
+:is(.learning-toggle,.review-entry-button)[data-motion="off"], :is(.learning-toggle,.review-entry-button)[data-motion="off"] *, :is(.learning-toggle,.review-entry-button)[data-motion="off"]::after { animation: none !important; transition: none !important; transform: none !important; }
 @media (prefers-reduced-motion: reduce) {
-  :is(.learning-toggle,.learn-entry-button), :is(.learning-toggle,.learn-entry-button) *, :is(.learning-toggle,.learn-entry-button)::after { animation: none !important; transition: none !important; transform: none !important; }
+  :is(.learning-toggle,.review-entry-button), :is(.learning-toggle,.review-entry-button) *, :is(.learning-toggle,.review-entry-button)::after { animation: none !important; transition: none !important; transform: none !important; }
 }
 .learning-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 
@@ -1519,7 +1520,7 @@ button { font-family: inherit; cursor: pointer; }
 /* mistake-practice status text in the controls bar */
 .controls .practice-pos { color: var(--ink-2); font-weight: 700; font-family: var(--font-ui); }
 .controls .practice-status { color: var(--ink-3); font-size: 13px; margin-right: 4px; }
-.insight-panel .learn-entry-button { max-width: max-content; padding-inline: 12px; }
+.insight-panel .review-entry-button { max-width: max-content; padding-inline: 12px; }
 
 /* ---------- REVIEW SUMMARY ---------- */
 .review {
@@ -2231,7 +2232,7 @@ button { font-family: inherit; cursor: pointer; }
 .stage .controls { gap:6px; }
 .stage .controls button { height:40px; min-width:36px; border-radius:9px; }
 .stage .controls button.play { min-width:52px; }
-.stage .learn-entry-button { min-height:40px; font-size:12px; }
+.stage .review-entry-button { min-height:40px; font-size:12px; }
 .stage.auto .evalgraph svg { height:clamp(76px,11vh,120px); }
 .stage.auto .mod[data-mod="engine"] { height:clamp(122px,17vh,172px); }
 .stage.auto .mod[data-mod="engine"] .panel .engine-body { flex:1; min-height:0; overflow:auto; }

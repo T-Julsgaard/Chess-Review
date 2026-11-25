@@ -14,7 +14,6 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   };
   await run("import('./analysis.js').then(m=>{m.go(2);m.toggleFlip();})");
   const before=await run("import('./analysis.js').then(m=>({idx:m.S.idx,flipped:m.S.flipped,pgn:m.S.pgn}))");
-  assert.equal(await run("document.querySelector('.learn-entry-button').textContent"),'Solve Puzzles');
   assert.equal(await run("document.querySelector('#learningToggle').textContent"),'Learn with Chess review');
   for(const width of [1920,1366,1100,960,761,760,520,390,320]){await resize(width);await checkTopbar();}
   await resize(1920);
@@ -34,7 +33,9 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   assert.deepEqual(await run("import('./analysis.js').then(m=>({idx:m.S.idx,flipped:m.S.flipped,pgn:m.S.pgn}))"),before);
   assert.equal(await run("document.querySelector('#learningToggle').textContent"),'Learn with Chess review');
   await resize(1920);
-  await run("document.querySelector('.learn-entry-button').click()");
+  await run("import('./analysis.js').then(m=>m.go(0))");
+  assert.equal(await run("document.querySelector('.insight-panel .learn-entry-button').textContent"),'Solve Puzzles');
+  await run("document.querySelector('.insight-panel .learn-entry-button').click()");
   await waitFor(review,"import('./analysis.js').then(m=>m.learningWorkspace?.ready&&!m.learningWorkspace.transitioning)",'Solve Puzzles entry');
   assert.equal(await run("import('./analysis.js').then(m=>m.learningWorkspace.page)"),'puzzles');
   await run("document.querySelector('#learningToggle').click()");

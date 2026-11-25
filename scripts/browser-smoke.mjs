@@ -238,7 +238,7 @@ try {
         if(!button)throw Error('Learning control missing: '+text);button.click();
       };
       const waitLearning=async(predicate,label)=>{for(let i=0;i<150;i++){if(predicate())return;await wait(100);}throw Error('Learning timed out: '+label);};
-      doc.querySelector('.learn-entry-button').click();
+      (doc.querySelector('.learn-entry-button') || doc.querySelector('[data-section=learn]')).click();
       await waitLearning(()=>doc.querySelector('.destinations'),'Home');
       clickLearning('Chess Concepts');await waitLearning(()=>doc.querySelector('.learn-category'),'Concept library');
       const forkCard=[...doc.querySelectorAll('.learn-card')].find(card=>card.querySelector('h3').textContent==='Forks and double attacks');

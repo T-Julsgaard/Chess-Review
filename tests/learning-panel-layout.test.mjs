@@ -93,7 +93,8 @@ test('learning tabs and scrollable content fill the side panel across libraries 
   assert.equal(a.run('learningWorkspace'),null);assert.equal(a.state.idx,1);
   assert.equal(a.state.positions[a.state.idx].fen,fen);
   assert.equal(toggle.textContent,'Learn with Chess review');
-  assert.equal(doc.querySelector('.learn-entry-button').textContent,'Solve Puzzles');
+  assert.equal(doc.querySelector('.learn-entry-button'),null);
+  assert.equal(doc.querySelector('[data-mod="learn"] .practice-btn').textContent,'Practice your mistakes');
 });
 
 for(const exit of ['button','Escape'])test(`learning toggle updates immediately on ${exit}, before the exit animation finishes`,async t=>{

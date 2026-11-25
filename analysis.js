@@ -1692,7 +1692,7 @@ function buildUI() {
   const graphMount = el("div", { id: "graphMount" });
   const statsMount = el("div", { id: "statsMount" });
   const engineMount = el("div", { id: "engineMount" });
-  const learnMount = el("div", { class: "learn-entry" }, solvePuzzlesButton());
+  const reviewEntry = el("div", { class: "learn-entry" });
 
   // The stage holds every module. In the automatic layout the side wrappers group the panels into
   // columns (styles.css picks wide / medium / narrow by window size); in the custom layout they are
@@ -1704,7 +1704,7 @@ function buildUI() {
       makeMod("review", reviewMount),
       el("div", { class: "side-cols" },
         el("div", { class: "side-a" }, makeMod("moves", movesPanel), makeMod("graph", graphMount), makeMod("controls", controls)),
-        el("div", { class: "side-b" }, makeMod("accuracy", statsMount), makeMod("engine", engineMount), makeMod("learn", learnMount)),
+        el("div", { class: "side-b" }, makeMod("accuracy", statsMount), makeMod("engine", engineMount), makeMod("learn", reviewEntry)),
       ),
       makeMod("coach", coachMount),
     ),
@@ -1749,7 +1749,7 @@ function buildUI() {
   UI = {
     settings, canvas, boardWrap,
     playerTop, playerBot, controls, coach: coachMount, evalbar: evalbarMount,
-    review: reviewMount, movesBody,
+    review: reviewMount, reviewEntry, movesBody,
     graph: graphMount, stats: statsMount, engine: engineMount,
     libRail, libControls, libList, libCount, libPanel:libRail.querySelector(".lib-panel"), saveStatus,
   };
@@ -1901,14 +1901,17 @@ let learningAnnouncement = null;
 let openingLearning = false;
 let deferredPracticeAdvance = false;
 function solvePuzzlesButton() {
-  return el("button", { type: "button", class: "learn-entry-button", "data-motion": S.settings.uiAnim === false ? "off" : "on", onclick: openPuzzles },
-    icon("book"), el("span", { class: "learn-entry-label" }, "Solve Puzzles"));
+  return reviewEntryButton("learn-entry-button", "Solve Puzzles", "book", () => selectSection("learn"));
 }
-function openPuzzles(event) {
-  const button=event.currentTarget;
-  button.classList.add("is-activating");
-  setTimeout(()=>button.classList.remove("is-activating"),460);
-  return selectSection("learn");
+function reviewEntryButton(className, label, glyph, activate) {
+  return el("button", {
+    type: "button", class: "review-entry-button " + className, "data-motion": S.settings.uiAnim === false ? "off" : "on",
+    onclick: ({currentTarget: button}) => {
+      button.classList.add("is-activating");
+      setTimeout(() => button.classList.remove("is-activating"), 460);
+      activate();
+    },
+  }, icon(glyph), el("span", { class: "review-entry-label" }, label));
 }
 function toggleLearning() {
   return selectSection(learningWorkspace ? "review" : "learn");
@@ -4568,13 +4571,20 @@ function analysisProgressText() {
   return `Analyzing … ${done}/${S.total}`;
 }
 function renderReview() {
+  let entry = UI.reviewEntry.firstElementChild;
   if(S.blank){
+    if (!entry?.matches(".learn-entry-button")) UI.reviewEntry.replaceChildren(solvePuzzlesButton());
     const form = UI.archive?.form;
     if (form && UI.review.contains(form)) return;
     UI.review.replaceChildren(el("div",{class:"panel insight-panel"},
       form || el("div",{class:"ip-body"},el("div",{class:"ip-text"},"No game loaded."))));
     return;
   }
+  if (!entry?.matches(".practice-btn")) {
+    entry = reviewEntryButton("practice-btn", "Practice your mistakes", "first", startPractice);
+    UI.reviewEntry.replaceChildren(entry);
+  }
+  entry.disabled = S.analyzing || !!S.analysisError || !!S.practice;
   // In-place progress text during analysis (so the loader animation doesn't restart each move).
   if (S.analyzing && revRefs) { revRefs.head.textContent = analysisProgressText(); return; }
 
@@ -7687,7 +7697,7 @@ function applySettings() {
   r.style.setProperty("--coord-size", (S.settings.coordSize ?? 12) + "px");
   r.classList.toggle("hide-coords", S.settings.showCoords === false);
   clearBoardArt(UI.boardWrap && UI.boardWrap.querySelector(".board"));
-  for (const button of document.querySelectorAll(".learn-entry-button")) {
+  for (const button of document.querySelectorAll(".review-entry-button")) {
     button.dataset.motion = S.settings.uiAnim === false ? "off" : "on";
   }
   applyBackground();
@@ -8562,7 +8572,7 @@ function toggleAuto() {
   renderControls();
 }
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Tab" && e.target?.closest?.(".ip-close-game,.learn-entry-button")) return;
+  if (e.key === "Tab" && e.target?.closest?.(".ip-close-game,.review-entry-button")) return;
   if (learningWorkspace?.closing && e.target?.closest?.('#learningToggle,.learn-entry-button')
       && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) {
     e.preventDefault();

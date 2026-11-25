@@ -49,7 +49,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const expanded=await boxes(),delta=expanded.accuracy.h-collapsed.accuracy.h;
   assert.ok(delta>70);
   assert.ok(Math.abs(expanded.engine.y-collapsed.engine.y-delta)<1);
-  assert.ok(expanded.learn.y>collapsed.learn.y,'Solve puzzles moves down while Engine can compact to fit the window');
+  assert.ok(expanded.learn.y>collapsed.learn.y,'The practice button moves down while Engine can compact to fit the window');
   assert.deepEqual(expanded.controls,collapsed.controls);
   await screenshot('old-expanded');
   await run("document.querySelector('.qbreak-toggle').click()");assert.deepEqual(await boxes(),collapsed);

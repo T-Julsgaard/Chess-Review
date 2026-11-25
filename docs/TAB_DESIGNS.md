@@ -6,8 +6,8 @@ The choices are local visual preferences and survive reopening the extension.
 **Settings → Visual → Premade UI setups** also offers complete starting setups:
 
 - **Old** restores the automatic arrangement used by Reset layout, with every
-  tab design set to Original. Expanding Accuracy moves Engine and Solve puzzles
-  down, and collapsing it restores their positions.
+  tab design set to Original. Expanding Accuracy moves Engine and the practice
+  button down, and collapsing it restores their positions.
 - **Modern** uses the supplied arrangement, including its panel content scales.
   Accuracy uses Phase report Modern, Move list uses Zoom +20%, Engine uses Minimal,
   Evaluation uses Move bars v3, and the remaining tabs use Original.
@@ -49,10 +49,11 @@ retired from the Evaluation dropdown: saved choices migrate to Default on startu
 while their renderers stay available to layout previews.
 
 Original Accuracy restores the combined score/category panel, its seven-row
-summary, expandable full category list, explanations and practice button. Page
+summary, expandable full category list and explanations. Page
 tabs restores the first three-page design with named buttons. Dials retains the
 current compact overview, phase bars and carousel. Expanding the original category
-list grows the panel and moves Engine and Solve puzzles down in the same column.
+list grows the panel and moves Engine and **Practice your mistakes** down in the
+same column.
 
 Accuracy's three pages have separate rows in Tabs. The existing `accuracyDesign`
 preference and saved overview choices remain intact. Move quality has its own
