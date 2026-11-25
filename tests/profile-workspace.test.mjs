@@ -559,7 +559,6 @@ test('mate in one opens at the puzzle, replays the recorded game, and lets the p
   w.go(w.deck.findIndex(slide => slide.id === 'mate1'));
 
   const button = label => [...doc.querySelectorAll('.profile-puzzle-button')].find(node => node.textContent === label);
-  const moveButton = label => doc.querySelector(`.profile-puzzle [aria-label="${label}"]`);
   const key = key => doc.body.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key, bubbles: true, cancelable: true}));
   const link = () => doc.querySelector('.pv-story .profile-open-puzzle-game');
   const evalBar = () => doc.querySelector('.profile-game-eval');
@@ -577,6 +576,7 @@ test('mate in one opens at the puzzle, replays the recorded game, and lets the p
   assert.match(evalBar().getAttribute('aria-label'), /White.*mate.*1/i);
   assert.ok(square('f6').classList.contains('profile-hl'));
   assert.ok(button('Previous').disabled);
+  assert.deepEqual([...doc.querySelectorAll('.profile-puzzle button')].map(node => node.textContent), ['Hint', 'Previous', 'Next']);
   assert.deepEqual(loaded, [], 'the saved setup opens without fetching the game');
 
   const chapter = w.index;
@@ -587,20 +587,20 @@ test('mate in one opens at the puzzle, replays the recorded game, and lets the p
   assert.ok(button('Hint').disabled);
   clickSquare('f3'); clickSquare('f7');
   assert.equal(square('f7').querySelector('[data-result="correct"]'), null, 'review positions are read-only');
-  moveButton('Next move').click();
-  assert.ok(square('e7').classList.contains('profile-hl'), 'can also play moves after the miss');
-  assert.ok(moveButton('Next move').disabled);
   key('ArrowRight');
+  assert.ok(square('e7').classList.contains('profile-hl'), 'can also play moves after the miss');
+  key('ArrowRight');
+  assert.ok(square('e7').classList.contains('profile-hl'), 'forward stops at the end of the game');
   assert.equal(w.index, chapter);
   key('ArrowLeft'); key('ArrowLeft');
   assert.ok(square('h5').querySelector('.profile-piece'));
   assert.match(evalBar().getAttribute('aria-label'), /White.*mate.*1/i);
   assert.equal(button('Hint').disabled, false, 'returning to the puzzle makes it playable');
-  moveButton('Previous move').click();
-  assert.ok(square('g8').querySelector('.profile-piece'), 'move controls can also rewind before the puzzle');
-  for (let i = 0; i < 5; i++) key('ArrowLeft');
-  assert.ok(moveButton('Previous move').disabled);
   key('ArrowLeft');
+  assert.ok(square('g8').querySelector('.profile-piece'), 'the left arrow can also rewind before the puzzle');
+  for (let i = 0; i < 5; i++) key('ArrowLeft');
+  key('ArrowLeft');
+  assert.equal(doc.querySelector('.profile-puzzle-status').textContent, 'Starting position');
   assert.equal(w.index, chapter);
   for (let i = 0; i < 6; i++) key('ArrowRight');
   assert.ok(square('f6').classList.contains('profile-hl'));

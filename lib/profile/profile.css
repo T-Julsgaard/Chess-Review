@@ -400,7 +400,6 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-game-dock .profile-puzzle-count { white-space: nowrap; }
 .profile-game-dock .profile-puzzle-actions { gap: 5px; }
 .profile-game-dock .profile-puzzle-button { padding: 7px 10px; }
-.profile-puzzle-button.is-move { padding-inline: 7px; }
 .profile-puzzle-button:disabled { opacity: .4; cursor: default; }
 .profile-puzzle-button.is-next { color: #0b130e; background: var(--accent); border-color: transparent; box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--accent) 70%, transparent); }
 .profile-puzzle-button.is-next:hover { background: var(--accent); filter: brightness(1.08); }
