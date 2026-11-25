@@ -8067,9 +8067,7 @@ function openScreenSizePreview() {
   // window.open copies this tab's session storage synchronously. The preview
   // receives a snapshot without writing a handoff into persistent account data.
   const key="screen-size-preview",previous=window.sessionStorage.getItem(key);
-  const display={width:window.innerWidth,height:window.innerHeight,pixelRatio:window.devicePixelRatio||1,
-    insetWidth:Math.max(0,window.outerWidth-window.innerWidth)+Math.max(0,window.screen.width-window.screen.availWidth),
-    insetHeight:Math.max(0,window.outerHeight-window.innerHeight)+Math.max(0,window.screen.height-window.screen.availHeight)};
+  const display={width:window.innerWidth,height:window.innerHeight};
   try {
     window.sessionStorage.setItem(key,JSON.stringify({job,idx:S.idx,display,preferences:{settings:S.settings,
       layout:layoutForSave(),layoutMode:S.layoutMode,layoutVersion:LAYOUT_VERSION}}));

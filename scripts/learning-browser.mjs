@@ -36,6 +36,8 @@ await fs.writeFile(path.join(source,'audit.js'),"import {browserAPI} from './bro
 const profile=await fs.mkdtemp(path.join(artifacts,'learning-profile-'));
 const chrome=spawn(process.env.CHROME_PATH||'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',[
   '--headless=new','--no-first-run','--no-default-browser-check','--remote-debugging-port=0',
+  // Exercise monitor presets on a host with non-default display scaling.
+  ...(process.argv.includes('--viewport-preview')?['--force-device-scale-factor=1.5']:[]),
   '--enable-unsafe-extension-debugging',`--user-data-dir=${profile}`,'about:blank'],{windowsHide:true,stdio:'ignore'});
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 let ws;const keepAlive=setInterval(()=>{},1000);

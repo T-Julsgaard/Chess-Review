@@ -15,14 +15,25 @@
       <div class="preview-heading"><div><strong>Screen setup</strong><span>Chess Review</span></div><button id="close-settings" type="button" aria-label="Close screen setup">Done</button></div>
       <nav id="device-tabs" aria-label="Screen type"></nav>
       <div class="preview-controls">
-        <label class="preset-label">Screen <select id="screen-preset"></select></label>
-        <label>Width <input id="screen-width" type="number" min="240" max="7680" step="1" inputmode="numeric"></label>
+        <label class="preset-label">Preset <select id="screen-preset"></select></label>
+        <label>Viewport width <input id="screen-width" type="number" min="1" max="7680" step="1" inputmode="numeric" required></label>
         <span aria-hidden="true">×</span>
-        <label>Height <input id="screen-height" type="number" min="240" max="7680" step="1" inputmode="numeric"></label>
+        <label>Height <input id="screen-height" type="number" min="1" max="7680" step="1" inputmode="numeric" required></label>
         <button id="rotate-screen" type="button" title="Swap width and height">Rotate</button>
-        <label>View <select id="preview-scale"><option value="fit">Fit whole screen</option><option value="1">Actual size (scroll)</option></select></label>
+        <label>View <select id="preview-scale"><option value="fit">Fit viewport</option><option value="1">Actual size (scroll)</option></select></label>
       </div>
-      <p>The app runs at 100% zoom for the selected screen. Fit whole screen shrinks larger screens to show their complete layout in your window. Actual size may require scrolling. Current matches the window you opened this preview from. Desktop and laptop presets use your display scaling, browser toolbar and taskbar space. Width and height show the app viewport. Tablet and custom sizes use viewport pixels. Switching sizes keeps your place. Changes stay in this tab.</p>
+      <div id="monitor-settings" class="preview-controls" hidden>
+        <label>Display scale <select id="display-scale">
+          <option value="1">100%</option><option value="1.25">125%</option><option value="1.5">150%</option>
+          <option value="1.75">175%</option><option value="2">200%</option><option value="2.25">225%</option>
+          <option value="2.5">250%</option><option value="3">300%</option><option value="current">This display</option>
+        </select></label>
+        <label>Target window <select id="target-window">
+          <option value="maximized">Maximized browser</option><option value="fullscreen">Full-screen browser</option>
+        </select></label>
+        <p>Presets assume 100% browser zoom. Maximized mode uses this window to estimate space for browser controls and the taskbar.</p>
+      </div>
+      <p>Current copies the viewport from the window that opened this preview. For an exact layout match, enter the target browser’s viewport dimensions in CSS pixels.</p>
     </section>
     <footer id="preview-toolbar" aria-label="Preview controls">
       <button id="toggle-settings" type="button" aria-controls="preview-settings" aria-expanded="false">Screen setup</button>
