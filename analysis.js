@@ -1825,7 +1825,7 @@ function watchSectionRail() {
 }
 function syncSectionRail({animate = true} = {}) {
   if (!sectionRail) return;
-  sectionRail.set(sectionRailPending || currentSection(), {animate});
+  sectionRail.set(sectionRailPending?.section || currentSection(), {animate});
   scheduleSectionRail();
 }
 // Between Learn and Playstyle the review stays out of sight: its panels are held hidden while one
@@ -1853,35 +1853,48 @@ function holdReviewHidden() {
     if (reveal) reviewReveal = nodes.map(node => node.animate([{opacity:0}, {opacity:1}], {duration:320, easing:"ease-out"}));
   };
 }
-// One way into every section, for the rail and the older toolbar buttons alike. While a switch is
-// under way the rail keeps showing its destination, so closing one section on the way to another
-// doesn't flash the Review button.
-async function selectSection(section) {
-  if (!sectionRailPending && section === currentSection()) { sectionRail?.acknowledge(section); return; }
-  sectionRailPending = section;
+// Each workspace borrows the same board. Finish its current handoff before acting on the latest
+// selection, and highlight that selection as soon as it is made.
+async function selectSection(section, {shared = null} = {}) {
+  const pending = sectionRailPending;
+  if (pending?.section === section && !shared) return;
+  if (!pending && section === currentSection()) { sectionRail?.acknowledge(section); return; }
+  sectionRailPending = {section, shared};
   syncSectionRail();
-  let release = null;
-  try {
-    if (section === "review") {
-      if (profileWorkspace) await profileWorkspace.close();
-      if (learningWorkspace) await learningWorkspace.close();
-      return;
+  if (pending) return;
+
+  while (sectionRailPending) {
+    const target = sectionRailPending;
+    let release = null;
+    try {
+      if (target.section === "review") {
+        if (profileWorkspace) await profileWorkspace.close();
+        if (learningWorkspace) await learningWorkspace.close();
+      } else {
+        // Playstyle can mount while Learn is still leaving. Wait for that Learn instance to
+        // finish before reopening it, since its close callback would clear the new instance.
+        if (target.section === "learn" && learningWorkspace?.closing) await learningWorkspace.close();
+        if (sectionRailPending !== target) continue;
+        if (target.section === currentSection()) continue;
+
+        // The profile stays up while Learn loads. In the other direction it can mount as soon
+        // as Learn releases the stage, while the board is still easing back.
+        const leaving = target.section === "learn" ? profileWorkspace : learningWorkspace;
+        const handoff = !!leaving && !openingLearning && !openingProfile;
+        if (handoff) release = holdReviewHidden();
+        if (target.section === "learn") await openLearning();
+        else {
+          if (handoff) { const closing = leaving.close({handoff:true}); await (leaving.released || closing); }
+          await openProfile({handoff, shared:target.shared});
+        }
+      }
+    } catch (error) {
+      console.warn(error);
+    } finally {
+      if (sectionRailPending === target) sectionRailPending = null;
+      release?.();
+      syncSectionRail();
     }
-    // Learn <-> Playstyle goes straight across, without showing the review in between, and the two
-    // overlap: the profile stays up while learning loads and leaves as it arrives (openLearning), and
-    // the profile arrives as soon as learning's panels leave, while the board is still easing back.
-    const leaving = section === "learn" ? profileWorkspace : learningWorkspace;
-    const handoff = !!leaving && !openingLearning && !openingProfile;
-    if (handoff) release = holdReviewHidden();
-    if (section === "learn") await openLearning();
-    else {
-      if (handoff) { const closing = leaving.close({handoff:true}); await (leaving.released || closing); }
-      await openProfile({handoff});
-    }
-  } finally {
-    release?.();
-    if (sectionRailPending === section) sectionRailPending = null;
-    syncSectionRail();
   }
 }
 
@@ -9105,7 +9118,7 @@ async function showReadyWorkspace() {
     // Fit and reveal the board as soon as it can paint; engine analysis continues normally.
     await initTabZoom();
     await showReadyWorkspace();
-    if (sharedProfile) { const sharedJob = location.hash.replace(/^#/, ""); if (sharedJob) await browserAPI.storage.local.remove(`job:${sharedJob}`); openProfile({shared: sharedProfile}); }
+    if (sharedProfile) { const sharedJob = location.hash.replace(/^#/, ""); if (sharedJob) await browserAPI.storage.local.remove(`job:${sharedJob}`); selectSection("playstyle", {shared:sharedProfile}); }
     // Two-phase load: now that initialization succeeded, remove the job data so it doesn't accumulate.
     const jobId = location.hash.replace(/^#/, "");
     if (jobId && rememberReviewJob()) {

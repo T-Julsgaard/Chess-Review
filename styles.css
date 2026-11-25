@@ -961,7 +961,6 @@ button { font-family: inherit; cursor: pointer; }
 .section-btn.is-arriving .section-btn-disc path:nth-of-type(3) { animation-delay: .34s; }
 .section-btn.is-arriving .section-btn-disc path:nth-of-type(4) { animation-delay: .41s; }
 .section-btn.is-arriving .section-btn-disc path:nth-of-type(5) { animation-delay: .48s; }
-.section-btn.is-arriving .section-btn-disc circle { animation: section-dot .3s .7s ease-out both; }
 .section-btn.is-arriving .section-btn-label { animation: section-label-arrive .45s .18s var(--rail-ease) both; }
 .section-btn.is-here .section-btn-disc { animation: section-disc-nod .5s cubic-bezier(.34, 1.3, .64, 1); }
 .section-btn.is-here .section-btn-disc::after { animation: section-ripple .65s ease-out; }
@@ -985,7 +984,6 @@ button { font-family: inherit; cursor: pointer; }
   12% { opacity: 1; }
   to { stroke-dasharray: 1 1; stroke-dashoffset: 0; }
 }
-@keyframes section-dot { from { opacity: 0; transform: scale(0); transform-origin: 19.5px 5.5px; } to { opacity: 1; transform: none; transform-origin: 19.5px 5.5px; } }
 @keyframes section-label-arrive { from { translate: 0 3px; opacity: .4; } to { translate: 0 0; opacity: 1; } }
 
 .section-rail.section-rail-instant, .section-rail.section-rail-instant *, .section-rail.section-rail-instant *::before { transition: none !important; }

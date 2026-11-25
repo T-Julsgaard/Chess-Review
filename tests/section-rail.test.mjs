@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {JSDOM} from 'jsdom';
-import {app, loadGame, settle} from './helpers/app.mjs';
+import {app, deferred, loadGame, settle} from './helpers/app.mjs';
 import {createSectionRail, SECTIONS} from '../lib/section-rail.js';
 import {ProfileWorkspace} from '../lib/profile/workspace.js';
 import {settledRect} from '../lib/profile/transition.js';
@@ -35,6 +35,43 @@ test('section rail: each button opens its section and marks it current; Review r
   assert.equal(current(doc), 'review');
   // The old toolbar button drives the same rail.
   doc.querySelector('#profileToggle').click(); for (let i = 0; i < 6; i++) await settle();
+  assert.equal(current(doc), 'playstyle');
+});
+
+test('section rail: the latest click wins while Playstyle is opening', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  const identity = deferred(), started = deferred();
+  const storage = a.context.browserAPI.storage.local, get = storage.get;
+  storage.get = async key => {
+    if (Array.isArray(key)) { started.resolve(); await identity.promise; }
+    return get(key);
+  };
+  const click = id => doc.querySelector(`.section-btn[data-section="${id}"]`).click();
+  click('playstyle');
+  await started.promise;
+  click('learn');
+  click('review');
+  assert.equal(current(doc), 'review');
+  identity.resolve();
+  for (let i = 0; i < 6; i++) await settle();
+  assert.equal(a.run('profileWorkspace === null && learningWorkspace === null'), true);
+  assert.equal(current(doc), 'review');
+});
+
+test('section rail: Playstyle opens after a click while Learn is loading', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  const learning = deferred(), started = deferred();
+  const load = a.context.loadLearningWorkspace;
+  a.replace('loadLearningWorkspace', async () => { started.resolve(); await learning.promise; return load(); });
+  const click = id => doc.querySelector(`.section-btn[data-section="${id}"]`).click();
+  click('learn');
+  await started.promise;
+  click('playstyle');
+  assert.equal(current(doc), 'playstyle');
+  learning.resolve();
+  const arrived = () => a.run('profileWorkspace !== null && learningWorkspace === null');
+  for (let i = 0; i < 200 && !arrived(); i++) await new Promise(resolve => setTimeout(resolve, 5));
+  assert.equal(arrived(), true);
   assert.equal(current(doc), 'playstyle');
 });
 
