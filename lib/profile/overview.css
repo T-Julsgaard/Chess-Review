@@ -243,8 +243,20 @@
     linear-gradient(160deg, color-mix(in oklab, var(--chapter-accent) 14%, var(--panel)), var(--panel));
 }
 .profile-overview-tile.is-hero .profile-overview-text { gap: .35em; }
-.profile-overview-tile.is-hero .profile-overview-value { font-size: clamp(1.3em, calc(170cqi / (var(--len, 10) + 2)), 2.7em); -webkit-line-clamp: 2; overflow-wrap: anywhere; letter-spacing: -.025em; }
-.profile-overview-tile.is-hero .profile-overview-value img, .profile-overview-tile.is-hero .profile-overview-value svg { display: inline-block; height: .62em; width: auto; margin-inline-start: .3em; vertical-align: .06em; border-radius: 2px; }
+.profile-overview-tile.is-hero .profile-overview-value { font-size: clamp(var(--ov-name-min, 1.3em), calc(170cqi / (var(--len, 10) + 2)), 2.7em); -webkit-line-clamp: 2; overflow-wrap: anywhere; letter-spacing: -.025em; }
+.profile-overview-identity { display: flex; align-items: center; gap: clamp(5px, 4cqi, 12px); }
+.profile-overview-identity > .profile-overview-value { min-width: 0; }
+.profile-overview-flag {
+  flex: none;
+  width: clamp(22px, 23cqi, 60px);
+  max-width: 30%;
+  border-radius: clamp(3px, 3cqi, 8px);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--ink) 24%, transparent), 0 2px 6px #0003;
+}
+.profile-overview-flag > :is(img, svg) { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: contain; border-radius: inherit; }
+@container ovtile (max-width: 110px) {
+  .profile-overview-identity > .profile-overview-value { --ov-name-min: 1.1em; word-break: break-all; }
+}
 .profile-overview-intro-stats { position: relative; z-index: 1; color: var(--ink-2); }
 .profile-overview-figures { display: flex; flex-wrap: wrap; gap: .15em 1em; font-size: .95em; }
 .profile-overview-figures b { color: var(--ink); font-size: 1.45em; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }

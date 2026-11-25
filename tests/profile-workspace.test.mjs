@@ -334,14 +334,15 @@ test('profile: the Lichess country flag follows the username on the cover and ov
   a.replace('profileIdentity', async () => ({site: 'lichess', accounts: ['tester'], country: 'DK'}));
   await openDeck(a);
   const w = a.run('profileWorkspace');
-  const assertFlagAfterName = selector => {
-    const heading = doc.querySelector(selector);
-    assert.equal(heading.firstChild.textContent, 'tester');
-    assert.equal(heading.lastChild.alt, 'Denmark');
-  };
-  assertFlagAfterName('.pv-story-figure');
+  const heading = doc.querySelector('.pv-story-figure');
+  assert.equal(heading.firstChild.textContent, 'tester');
+  assert.equal(heading.lastChild.alt, 'Denmark');
   w.go(w.deck.length - 1);
-  assertFlagAfterName('[data-chapter="cover"] .profile-overview-value');
+  const username = doc.querySelector('[data-chapter="cover"] .profile-overview-identity > .profile-overview-value');
+  assert.equal(username.textContent, 'tester');
+  const flag = username.nextElementSibling;
+  assert.ok(flag.matches('.profile-overview-flag'));
+  assert.equal(flag.querySelector('img').alt, 'Denmark');
 });
 
 test('profile settings: the recap keeps its defaults with no Settings category', t => {
