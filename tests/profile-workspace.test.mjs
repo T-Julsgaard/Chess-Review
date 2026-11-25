@@ -185,6 +185,7 @@ test('profile setup: custom dates validate, filter the report and survive reopen
   choose('Custom period');
   const panel = shell.querySelector('.profile-custom-period'), inputs = panel.querySelectorAll('input');
   assert.equal(panel.hidden, false);
+  assert.equal(panel.textContent, 'FromTo', 'the panel only shows the date field labels');
   assert.equal(shell.querySelector('[aria-controls="profile-custom-period"]').getAttribute('aria-expanded'), 'true');
   const date = (i, value) => { inputs[i].value = value; inputs[i].dispatchEvent(new a.dom.window.Event('input')); };
   date(0, '2026-03-01'); date(1, '2026-02-28');

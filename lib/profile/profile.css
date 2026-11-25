@@ -274,10 +274,9 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-suggest-option { padding: 8px 10px; border-radius: 7px; font-size: 13.5px; color: var(--ink); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .profile-suggest-option:hover, .profile-suggest-option.on { background: color-mix(in oklab, var(--accent) 16%, transparent); }
 @keyframes profile-suggest-in { from { opacity: 0; transform: translateY(-3px); } }
-.profile-custom-period { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; padding: 14px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel-2); }
+.profile-custom-period { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 14px; padding: 14px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel-2); }
 .profile-custom-period .profile-input { min-width: 0; width: 100%; box-sizing: border-box; }
 [data-theme="dark"] .profile-custom-period .profile-input { color-scheme: dark; }
-.profile-period-note { grid-column: 1 / -1; margin: 0; font-size: 12px; color: var(--ink-2); }
 .profile-setup-title { margin: 0; font-size: clamp(22px, 2.1vw, 30px); line-height: 1.1; letter-spacing: -.7px; font-weight: 800; }
 .profile-setup .profile-lead { font-size: 14px; }
 .profile-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
