@@ -76,6 +76,55 @@ test('Chess.com lookup stays inside Insights, Moves and the move controls until 
   assert.equal(a.state.pgn, pgn);
 });
 
+for (const motion of ['on', 'off', 'reduced']) {
+  test(`opening a game from the archive with interface motion ${motion}`, async t => {
+    const {a, select, search} = await launch(t);
+    const {window} = a.dom;
+    const preparation = deferred(), exit = deferred(), animations = [];
+    a.state.settings.uiAnim = motion !== 'off';
+    window.matchMedia = () => ({matches: motion === 'reduced'});
+    window.Element.prototype.animate = function (frames) {
+      const animation = {finished: exit.promise, cancel() { this.canceled = true; }};
+      animations.push({node: this, frames, animation});
+      return animation;
+    };
+    t.mock.method(globalThis, 'fetch', async () => Response.json({games: [game('12345', 1700000000)]}));
+    a.replace('loadBook', () => preparation.promise);
+    a.replace('loadCalibration', async () => {});
+    let analysisStarted = false;
+    a.replace('startAnalysis', () => { analysisStarted = true; });
+    search('River'); await tick();
+    const row = select('.archive-game');
+    row.click(); await tick();
+    assert.equal(row.getAttribute('aria-busy'), 'true');
+    assert.equal(a.state.blank, true);
+    assert.equal(animations.length, 0);
+
+    preparation.resolve(); await tick();
+    if (motion === 'on') {
+      const outgoing = animations.slice();
+      assert.ok(row.isConnected);
+      assert.equal(a.state.blank, true);
+      assert.equal(analysisStarted, false);
+      assert.ok(outgoing.some(({node}) => node.id === 'boardWrap'));
+      assert.ok(outgoing.some(({node}) => node.id === 'movesBody'));
+      exit.resolve(); await tick();
+      assert.deepEqual(animations.slice(outgoing.length).map(({node}) => node), outgoing.map(({node}) => node));
+      for (const [index, {frames, animation}] of outgoing.entries()) {
+        assert.equal(animation.canceled, true);
+        assert.equal(animations[outgoing.length + index].frames[0].opacity, frames[1].opacity);
+      }
+    } else {
+      assert.equal(animations.length, 0);
+    }
+    assert.equal(a.state.blank, false);
+    assert.equal(a.state.pgn, pgn);
+    assert.equal(row.isConnected, false);
+    assert.equal(analysisStarted, true);
+    assert.ok(select('.ml-move[data-ply="1"]'));
+  });
+}
+
 test('closing a game from a direct link cancels review work and clears the reload handoff', async t => {
   const a = app(t);
   const {document, location, sessionStorage} = a.dom.window;

@@ -8865,6 +8865,12 @@ function closeReviewGame() {
   UI.archive.focus();
 }
 
+function archiveReviewMotionEnabled() {
+  return S.settings.uiAnim !== false && typeof UI.review.animate === "function" && !document.hidden
+    && !sectionRailPending && !learningWorkspace && !profileOwnsBoard()
+    && !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+}
+
 /* ---------------- Load / switch a game ----------------
    Loads a game's data into the already-built UI and renders it. Used both for the first load
    and for switching to another library game in place — no page reload, so there's no black flash
@@ -8900,6 +8906,32 @@ async function applyGame(payload) {
     try { saved = (await browserAPI.storage.local.get(key))[key]; } catch {}
     if (selection !== _librarySelection) return;
   }
+  if (wasBlank && payload.source === "archive" && archiveReviewMotionEnabled()) {
+    // Keep the panel layout in place and only dim the board if its position or orientation changes.
+    const panels = [UI.review, UI.movesBody, UI.controls, UI.playerTop, UI.playerBot];
+    const changesBoard = payload.meta?.flip !== S.flipped || positions[0].fen !== S.positions[0]?.fen;
+    const surfaces = panels.map(node => ({node, dimmed: .25}));
+    if (changesBoard) surfaces.push({node: UI.boardWrap, dimmed: .6});
+    const outgoing = surfaces.map(({node, dimmed}) => node.animate([{opacity: 1}, {opacity: dimmed}],
+      {duration: 110, easing: "ease-in", fill: "forwards"}));
+    try {
+      await Promise.allSettled(outgoing.map(animation => animation.finished));
+      if (selection !== _librarySelection) return;
+      mountReviewGame(payload, positions, saved, wasBlank);
+      if (archiveReviewMotionEnabled()) {
+        for (const {node, dimmed} of surfaces) {
+          node.animate([{opacity: dimmed}, {opacity: 1}], {duration: 240, easing: "ease-out"});
+        }
+      }
+    } finally {
+      outgoing.forEach(animation => animation.cancel());
+    }
+    return;
+  }
+  mountReviewGame(payload, positions, saved, wasBlank);
+}
+
+function mountReviewGame(payload, positions, saved, wasBlank) {
   if(wasBlank){setBlankWorkspace(false);renderCoachAvatar();}
   resetReviewGame();
 
