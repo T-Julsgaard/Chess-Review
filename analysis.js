@@ -7840,7 +7840,6 @@ function exitPractice() {
 function finishPractice() {
   markCurrentSolved();   // every mistake re-solved → this game is now "solved"
   exitPractice();
-  toast("Practice complete — well done!");
 }
 // Mark the current game as solved in the library (after completing its practice).
 function markCurrentSolved() {

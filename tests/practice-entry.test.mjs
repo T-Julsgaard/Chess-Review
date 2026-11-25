@@ -76,3 +76,24 @@ test('the standalone practice button replays to the first mistake from a later m
   assert.equal(target, 0);
   assert.ok(doc.querySelector('.practice-coach'));
 });
+
+test('solving the final mistake returns to review without a completion toast', async t => {
+  const a = review(t), S = a.state, doc = a.dom.window.document;
+  S.classif[1] = 'mistake';
+  S.bests[0].bestmove = 'd2d4';
+  S.bests[0].lines = [{moves: ['d2d4'], score: {cp: 20}}];
+  a.store.library = [{id: a.call('currentGameId'), solved: false}];
+  a.replace('practiceDemo', ply => a.call('practiceBeginSolve', ply));
+
+  doc.querySelector('[data-mod="learn"] .practice-btn').click();
+  assert.equal(S.practice.solving, true);
+  await a.call('practiceAttempt', 'd2', 'd4');
+  assert.equal(S.practice.solving, false);
+  a.call('practiceAdvance');
+  await a.run('_libraryWriteQueue');
+
+  assert.equal(S.practice, null);
+  assert.equal(doc.querySelector('.practice-coach'), null);
+  assert.equal(doc.querySelector('.toast'), null);
+  assert.equal(a.store.library[0].solved, true);
+});
