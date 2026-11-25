@@ -127,6 +127,7 @@ test('the animated morph ignores repeated clicks and never skips step two', asyn
   const p = setup(t, {motion: true}), win = p.dom.window;
   const pending = [];
   win.Element.prototype.animate = function () {
+    assert.equal(INTRO_STEPS.some(step => this.matches(step.target)), false, 'Tour animations stay on the callout');
     let resolve; const finished = new Promise(r => {resolve = r;});
     const animation = {finished, playState: 'running', cancel() {this.playState = 'idle'; resolve();}, finish: () => resolve()};
     pending.push(animation); return animation;

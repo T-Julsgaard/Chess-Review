@@ -1019,7 +1019,6 @@ button { font-family: inherit; cursor: pointer; }
 .learning-announcement-arrow { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 7 7; animation: learning-announcement-flow 1.8s linear infinite; }
 /* Moving to the next step glides the arrow from one button to the other. */
 .learning-announcement-morph .learning-announcement-arrow { transition: d .42s cubic-bezier(.65,0,.35,1); }
-.learning-announcement-target { outline: 2px solid var(--accent); outline-offset: 4px; box-shadow: 0 0 0 7px color-mix(in oklab,var(--accent) 12%,transparent); }
 @keyframes learning-announcement-enter { from { opacity: 0; translate: 0 -8px; } to { opacity: 1; translate: 0 0; } }
 @keyframes learning-announcement-flow { to { stroke-dashoffset: -28; } }
 .learning-announcement[data-motion="off"], .learning-announcement[data-motion="off"] *, .learning-announcement-arrows[data-motion="off"] .learning-announcement-arrow { animation: none; transition: none; }
