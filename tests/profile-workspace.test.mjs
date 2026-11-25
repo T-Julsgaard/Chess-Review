@@ -181,7 +181,7 @@ test('profile setup: both sites merge their games and a missing username is refu
   inputs[0].value = 'tester'; inputs[0].dispatchEvent(new a.dom.window.Event('input'));
   inputs[1].value = ''; inputs[1].dispatchEvent(new a.dom.window.Event('input'));
   shell.querySelector('.profile-build').click(); await settle();
-  assert.ok(!shell.querySelector('.profile-setup-error').hidden, 'a missing Lichess username is refused');
+  assert.ok(!inputs[1].closest('.profile-account-field').querySelector('.profile-setup-error').hidden, 'a missing Lichess username is refused');
   assert.equal(shell.querySelector('.pv-story'), null);
   inputs[1].value = 'tester-li'; inputs[1].dispatchEvent(new a.dom.window.Event('input'));
   await build(a);
@@ -190,6 +190,48 @@ test('profile setup: both sites merge their games and a missing username is refu
   assert.ok(shell.querySelector('.pv-intro-period').textContent.includes('Chess.com and Lichess'));
   assert.equal(a.state.settings.profileSite, 'both');
   assert.deepEqual(a.state.settings.profileAccounts, {chesscom: 'tester', lichess: 'tester-li'});
+});
+
+test('profile setup: an unknown account can be corrected below its username field', async t => {
+  for (const [site, label, host] of [['chesscom', 'Chess.com', 'api.chess.com'], ['lichess', 'Lichess', 'lichess.org']]) {
+    await t.test(label, async t => {
+      const a = review(t), doc = a.dom.window.document, rows = season();
+      const url = doc.location.href;
+      a.state.settings.profileSite = site;
+      a.store[rowsKey(site, 'tester')] = {rows, months: [], since: 0, updatedAt: Date.now()};
+      const fetch = t.mock.method(globalThis, 'fetch', async () => ({ok: false, status: 404}));
+      await open(a);
+      const shell = doc.querySelector('.profile-shell');
+      const choose = text => [...shell.querySelectorAll('[role="radio"]')].find(b => b.textContent === text);
+      choose('All time').click();
+      const field = () => shell.querySelector(`[data-site="${site}"]`);
+      const type = value => {
+        const input = field().querySelector('input');
+        input.value = value;
+        input.dispatchEvent(new a.dom.window.Event('input'));
+      };
+      type('UnknownPlayer');
+      await build(a);
+      assert.equal(new URL(fetch.mock.calls[0].arguments[0]).hostname, host);
+      assert.equal(doc.location.href, url);
+      assert.equal(shell.querySelector('.profile-empty'), null);
+      assert.equal(choose('All time').getAttribute('aria-checked'), 'true');
+      assert.equal(choose(label).getAttribute('aria-checked'), 'true');
+      const input = field().querySelector('input'), error = field().querySelector('[role="alert"]');
+      assert.equal(input.value, 'UnknownPlayer');
+      assert.equal(doc.activeElement, input);
+      assert.equal(input.getAttribute('aria-invalid'), 'true');
+      assert.equal(input.getAttribute('aria-describedby'), error.id);
+      assert.equal(error.textContent, `${label} has no player called UnknownPlayer.`);
+      assert.equal(error.hidden, false);
+      type('tester');
+      assert.equal(error.hidden, true);
+      assert.equal(input.hasAttribute('aria-invalid'), false);
+      await build(a);
+      assert.equal(shell.querySelector('.pv-story').dataset.slide, 'cover');
+      assert.equal(fetch.mock.callCount(), 1);
+    });
+  }
 });
 
 test('profile setup: custom dates validate, filter the report and survive reopening', async t => {
@@ -205,10 +247,10 @@ test('profile setup: custom dates validate, filter the report and survive reopen
   const date = (i, value) => { inputs[i].value = value; inputs[i].dispatchEvent(new a.dom.window.Event('input')); };
   date(0, '2026-03-01'); date(1, '2026-02-28');
   shell.querySelector('.profile-build').click(); await settle();
-  assert.match(shell.querySelector('[role="alert"]').textContent, /end date must be on or after/);
+  assert.match(shell.querySelector('[role="alert"]:not([hidden])').textContent, /end date must be on or after/);
   assert.equal(w.phase, 'setup');
   date(1, ''); shell.querySelector('.profile-build').click();
-  assert.match(shell.querySelector('[role="alert"]').textContent, /Choose a start and end date/);
+  assert.match(shell.querySelector('[role="alert"]:not([hidden])').textContent, /Choose a start and end date/);
   date(1, '2026-03-31');
   choose('This year'); assert.equal(panel.hidden, true);
   choose('Custom period'); assert.equal(inputs[0].value, '2026-03-01');

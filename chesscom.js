@@ -90,7 +90,7 @@ async function fetchWithRetry(url, { retries = 2, treat404asError = true, signal
       continue;
     }
     if (res.status === 404 && !treat404asError) return { games: [] };
-    throw new Error(`HTTP ${res.status} at ${url}`);
+    throw Object.assign(new Error(`HTTP ${res.status} at ${url}`), {status: res.status});
   }
 }
 
