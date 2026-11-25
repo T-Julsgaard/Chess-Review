@@ -4064,9 +4064,12 @@ function typeWrite(node, text) {
 function openingStrip() {
   const o = (S.analysisMode && S.variation ? variationOpening() : S.opening);
   const line = o ? `${o.eco}${o.eco && o.name ? " · " : ""}${o.name}` : "Opening unknown";
-  return el("div", { class: "ip-opening", title: line },
-    el("span", { class: "ip-op-ic", html: ICONS.book || "" }),
-    el("span", { class: "ip-op-txt" }, line));
+  return el("div", { class: "ip-heading" },
+    el("div", { class: "ip-opening", title: line },
+      el("span", { class: "ip-op-ic", html: ICONS.book || "" }),
+      el("span", { class: "ip-op-txt" }, line)),
+    !screenPreview && el("button", {type: "button", class: "ip-close-game", title: "Close game",
+      "aria-label": "Close game", onclick: closeReviewGame}, icon("close")));
 }
 /* ---------------- Coach personalities ----------------
    Each coach is a phrase bank (data/coaches/<id>.json) keyed to game events. We resolve the most
@@ -4261,7 +4264,7 @@ function bindCoachPointer() {
 function renderCoachAvatar() {
   if (!UI || !UI.coach) return;
   const id = S.settings.coach || "";
-  const rig = COACH_RIGS[id] || null;
+  const rig = S.blank ? null : COACH_RIGS[id];
   const mod = UI.coach.closest(".mod");
   UI.canvas.classList.toggle("has-coach", !!rig);   // the insight text leaves room for the portrait
   if (!rig) {                                   // "Off" or no rig built yet → hide the module entirely
@@ -8057,8 +8060,8 @@ function gameType() {
   }
   return "";
 }
-function currentGameId() {
-  return (S.meta && (S.meta.gameId || S.meta.libraryId)) || ("pgn:" + simpleHash(S.pgn || ""));
+function currentGameId({pgn, meta} = S) {
+  return (meta && (meta.gameId || meta.libraryId)) || ("pgn:" + simpleHash(pgn || ""));
 }
 
 function scoringSettingsSnapshot() {
@@ -8557,6 +8560,7 @@ function toggleAuto() {
   renderControls();
 }
 document.addEventListener("keydown", (e) => {
+  if (e.key === "Tab" && e.target?.closest?.(".ip-close-game")) return;
   if (learningWorkspace?.closing && e.target?.closest?.('#learningToggle,.learn-entry-button')
       && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) {
     e.preventDefault();
@@ -8807,12 +8811,10 @@ function renderAll() {
 /* A blank launch has no game or engine work; learning and saved games stay available. */
 function setBlankWorkspace(blank) {
   S.blank=blank;
-  if (blank && !UI.archive) {
-    UI.archive = createReviewArchive({ui: UI, el, icon, openGame: applyGame, renderControls, settings: S.settings});
-  } else if (!blank && UI.archive) {
-    UI.archive.dispose();
-    UI.archive = null;
-  }
+  if (blank) {
+    UI.archive ||= createReviewArchive({ui: UI, el, icon, openGame: applyGame, renderControls, settings: S.settings});
+    UI.archive.mount();
+  } else UI.archive?.unmount();
   for(const button of document.querySelectorAll('[data-game-action]'))button.hidden=blank;
 }
 function showBlankWorkspace() {
@@ -8823,7 +8825,32 @@ function showBlankWorkspace() {
   document.title="Chess Review";
   applySettings();
   setBlankWorkspace(true);
+  computeDerived();
   renderAll();
+}
+
+function closeReviewGame() {
+  if (S.blank) return;
+  ++_librarySelection;
+  if (S.reorganize) toggleReorganize();
+  resetReviewGame();
+  const hash = location.hash.slice(1);
+  try {
+    window.sessionStorage.removeItem("job:blank-workspace");
+    if (hash) window.sessionStorage.removeItem("job:" + hash);
+  } catch { /* The page still switches to the search if session storage is unavailable. */ }
+  if (hash) window.history.replaceState(null, "", location.pathname + location.search);
+  Object.assign(S, {
+    flipped: false, meSide: "w", playerKnown: false, clocks: [], searchPreviews: [],
+    openingHeader: null, progress: 0, completed: 0, analysisError: null,
+    restoredAnalysis: false, progressiveAccuracy: false, _panelNeedsLive: false,
+    _sacCache: [], _forcedCache: [],
+  });
+  UI.evalbar.replaceChildren();
+  showBlankWorkspace();
+  renderCoachAvatar();
+  renderLibrary();
+  UI.archive.focus();
 }
 
 /* ---------------- Load / switch a game ----------------
@@ -8854,29 +8881,15 @@ async function applyGame(payload) {
     await Promise.all([loadBook(),loadCalibration().catch(error=>{console.warn(error);return null;})]);
     if(selection!==_librarySelection)return;
   }
+  // Resolve the cache before replacing the current review so a close or another choice can win.
+  let saved = payload.analysis;
+  if (!("analysis" in payload)) {
+    const key = "analysis:" + currentGameId(payload);
+    try { saved = (await browserAPI.storage.local.get(key))[key]; } catch {}
+    if (selection !== _librarySelection) return;
+  }
   if(wasBlank){setBlankWorkspace(false);renderCoachAvatar();}
-  _cancelPromotion?.();
-  _cancelBoardDrag?.();
-
-  // Tear down anything tied to the previous game.
-  clearTimeout(_reanalyzeT);
-  resetLiveEngine();
-  S.batchGen++;                 // invalidate any in-flight analysis workers
-  S.engineFallbackBuild = null;
-  S.activeEngineBuild = null;
-  terminateEngines();
-  resetHelperEngine();
-  S.threatCache.clear();
-  if (S.autoTimer) { clearInterval(S.autoTimer); S.autoTimer = null; }
-  stopLineWalk();
-  if (S.practice && S.practice.rollT) clearTimeout(S.practice.rollT);
-  clearDemoTimers(); removeMoveCallout();
-  S.practice = null; S.practiceHint = null;
-  S.analysisMode = false; S.variation = null; S.liveToken++;
-  S.selectedSq = null; S.userArrows = []; S.userMarks = []; S.lineWalking = false;
-  revRefs = null; statsRefs = null; _lastCommentKey = -1; _ipSig = null; S._turnPly = null;
-  S._lastEngineLines = null;
-  _movesSig = null; _movesClassSig = null;
+  resetReviewGame();
 
   applySettings();
 
@@ -8902,11 +8915,6 @@ async function applyGame(payload) {
   const side = flip === true ? "b" : flip === false ? "w" : meSide;
   S.meSide = meSide; S.playerKnown = playerKnown; S.flipped = side === "b"; S.idx = 0;
 
-  // Restore saved game analysis or start fresh
-  let saved = payload.analysis;
-  if (saved == null && !("analysis" in payload)) {
-    try { const k = "analysis:" + currentGameId(); const s = await browserAPI.storage.local.get(k); saved = s[k] || null; } catch {}
-  }
   const restored = canRestoreAnalysis(saved);
   S.restoredAnalysis = restored;
   S.progressiveAccuracy = false;
@@ -8933,6 +8941,30 @@ async function applyGame(payload) {
   rememberReviewJob();
   if (!restored) startAnalysis();
   if(wasBlank)initTabZoom();
+}
+
+function resetReviewGame() {
+  _cancelPromotion?.();
+  _cancelBoardDrag?.();
+  clearTimeout(_reanalyzeT);
+  clearTimeout(_typeT);
+  coachTalk(false);
+  resetLiveEngine();
+  S.batchGen++;
+  S.engineFallbackBuild = null;
+  S.activeEngineBuild = null;
+  terminateEngines();
+  resetHelperEngine();
+  S.threatCache.clear();
+  if (S.autoTimer) { clearInterval(S.autoTimer); S.autoTimer = null; }
+  stopLineWalk();
+  clearTimeout(S.practice?.rollT);
+  clearDemoTimers(); removeMoveCallout();
+  S.practice = null; S.practiceHint = null;
+  S.analysisMode = false; S.variation = null;
+  S.selectedSq = null; S.userArrows = []; S.userMarks = [];
+  revRefs = null; statsRefs = null; _lastCommentKey = -1; _ipSig = null; S._turnPly = null;
+  _movesSig = null; _movesClassSig = null;
 }
 
 /* ---------------- Start ---------------- */
@@ -9115,12 +9147,11 @@ async function showReadyWorkspace() {
     await dataReady;         // book + calibration (downloaded in parallel; usually already resolved)
     if(blankLaunch&&payload.source!=="blank"&&!screenPreview)
       await Promise.all([loadBook(),loadCalibration().catch(error=>{console.warn(error);return null;})]);
-    // Resolve any stored analysis for this game by id (same derivation as currentGameId(), but from
-    // the payload since S isn't populated yet) so applyGame() needs no lookup await of its own.
+    // Resolve stored analysis from the payload before mounting.
     if (payload.source!=="blank"&&payload.source!=="profile"&&!("analysis" in payload)) {
       let saved = null;
       try {
-        const k = "analysis:" + ((payload.meta && (payload.meta.gameId || payload.meta.libraryId)) || ("pgn:" + simpleHash(payload.pgn || "")));
+        const k = "analysis:" + currentGameId(payload);
         const s = await browserAPI.storage.local.get(k);
         saved = s[k] || null;
       } catch {}

@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {app, deferred} from './helpers/app.mjs';
+import {Chess} from '../lib/chess.js';
 import {monthStart, playerArchive} from '../lib/review-archive-source.js';
 
 const pgn = '[White "Opponent"]\n[Black "River"]\n[Result "0-1"]\n\n1. e4 e5 2. Nf3 Nc6 0-1';
@@ -24,6 +25,9 @@ test('Chess.com lookup stays inside Insights, Moves and the move controls until 
   const controls = select('#controls'), board = select('#boardWrap').innerHTML;
   const modules = [...doc.querySelectorAll('#canvas .mod')];
   assert.ok(insights.contains(select('.archive-form')));
+  assert.equal(select('.archive-form').firstElementChild, select('.archive-sites'));
+  assert.doesNotMatch(select('.archive-form').textContent, /Find a game/);
+  assert.equal(select('.ip-close-game'), null);
   assert.equal(select('#boardWrap input, #boardWrap form'), null);
   const urls = [];
   t.mock.method(globalThis, 'fetch', async url => {
@@ -59,6 +63,50 @@ test('Chess.com lookup stays inside Insights, Moves and the move controls until 
   assert.equal(select('.archive-form, .archive-period, .archive-game'), null);
   assert.equal(doc.querySelectorAll('.ml-move').length, 4); assert.ok(select('[aria-label="Play"]'));
   assert.equal((await a.call('loadJob')).pgn, pgn);
+  const close = select('#reviewMount .ip-close-game');
+  close.click();
+  assert.equal(doc.activeElement, select('#archive-username'));
+  assert.equal(select('#archive-username').value, 'River');
+  assert.ok(moves.contains(select('.archive-game')));
+  assert.ok(controls.contains(select('[aria-label="Previous month"]')));
+  assert.equal(urls.length, 3);
+  assert.equal(select('.ip-close-game'), null);
+  assert.equal((await a.call('loadJob')).source, 'blank');
+  select('.archive-game').click(); await tick();
+  assert.equal(a.state.pgn, pgn);
+});
+
+test('closing a game from a direct link cancels review work and clears the reload handoff', async t => {
+  const a = app(t);
+  const {document, location, sessionStorage} = a.dom.window;
+  a.replace('loadBook', async () => {}); a.replace('loadCalibration', async () => {}); a.replace('startAnalysis', () => {});
+  a.call('buildUI');
+  await a.call('applyGame', {pgn, meta: {flip: true}, analysis: null});
+  assert.equal((await a.call('loadJob')).pgn, pgn);
+  a.state.evals[0] = {cp: 300};
+  a.call('renderEvalBar');
+  assert.equal(document.querySelector('#evalbarMount .score.bot').textContent, '3.0');
+  const pending = deferred();
+  const read = a.context.browserAPI.storage.local.get;
+  a.context.browserAPI.storage.local.get = key => typeof key === 'string' && key.startsWith('analysis:') ? pending.promise : read(key);
+  const nextGame = a.call('applyGame', {pgn: '1. d4 d5'});
+  let terminated = false;
+  a.state.evalEngines = [{terminate() { terminated = true; }}];
+  a.state.progress = 2;
+  document.querySelector('#reviewMount .ip-close-game').click();
+  pending.resolve({});
+  await nextGame;
+  assert.equal(terminated, true);
+  assert.equal(a.state.blank, true);
+  assert.equal(a.state.analyzing, false);
+  assert.equal(a.state.flipped, false);
+  assert.equal(a.state.progress, 0);
+  assert.equal(a.call('activePos').fen, new Chess().fen());
+  assert.equal(document.querySelector('#evalbarMount .white-fill').style.height, '50%');
+  assert.equal(document.querySelector('#evalbarMount .score.bot').textContent, '');
+  assert.equal(location.hash, '');
+  assert.equal(sessionStorage.getItem('job:test-game'), null);
+  assert.equal((await a.call('loadJob')).source, 'blank');
 });
 
 test('a replacement search cancels the first and an empty month can be retried after a network failure', async t => {
