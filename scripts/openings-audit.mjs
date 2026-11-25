@@ -7,7 +7,7 @@ import {OPENINGS} from '../lib/learning/content.js';
 export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const run=expression=>evaluate(review,expression),results=[];
   const press=async(key,value)=>{for(const type of ['keyDown','keyUp'])await call('Input.dispatchKeyEvent',{type,key,code:key,windowsVirtualKeyCode:value,nativeVirtualKeyCode:value},review.sessionId);};
-  await run("document.querySelector('.learn-entry-button').click()");
+  await run("document.querySelector('[data-section=learn]').click()");
   await waitFor(review,"import('./analysis.js').then(m=>m.learningWorkspace?.ready&&!m.learningWorkspace.transitioning)",'Learning workspace');
   // Exercise library entry, not just startOpening with an explicit perspective.
   const defaults=await run(`import('./analysis.js').then(async m=>{

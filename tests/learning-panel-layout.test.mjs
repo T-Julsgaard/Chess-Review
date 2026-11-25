@@ -63,7 +63,7 @@ test('learning tabs and scrollable content fill the side panel across libraries 
   assert.equal(toggle.textContent,'Learn with Chess review');
   assert.equal(toggle.nextElementSibling.id,'profileToggle');assert.equal(toggle.nextElementSibling.textContent,'Player profile');
   assert.equal(toggle.nextElementSibling.nextElementSibling.getAttribute('aria-label'),'Flip board');
-  assert.equal(doc.querySelector('.learn-entry-button').textContent,'Solve Puzzles');
+  assert.equal(doc.querySelector('.learn-entry-button'),null);
   a.call('go',1);const fen=a.state.positions[1].fen;
   const puzzles=[{id:'layout',fen:new Chess().fen(),solution:['e2e4'],rating:1200,themes:['fork'],source:{url:'https://lichess.org/training'}}];
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles})}));

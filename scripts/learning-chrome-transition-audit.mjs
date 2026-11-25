@@ -52,29 +52,27 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     const library=getComputedStyle(document.querySelector('.library-rail'));
     return {players,libraryX:new DOMMatrix(library.transform).m41,libraryVisible:library.visibility==='visible'};
   }`);
-  for(const entry of ['#learningToggle','.learn-entry-button']){
-    await run(`window.chromeFrames=[sampleReviewChrome()];window.samplingChrome=true;
-      function sample(){chromeFrames.push(sampleReviewChrome());if(samplingChrome)requestAnimationFrame(sample);}requestAnimationFrame(sample);
-      document.querySelector('${entry}').click();`);
-    await waitFor(review,"import('./analysis.js').then(m=>m.learningWorkspace?.ready&&!m.learningWorkspace.transitioning)",'Learning entry');
-    const frames=await run('samplingChrome=false;chromeFrames');
-    await fs.writeFile(path.join(out,entry==='#learningToggle'?'learn-entry-frames.json':'puzzle-entry-frames.json'),JSON.stringify(frames,null,2));
-    assert.ok(frames.length>10,'Entry must be sampled across frames');
-    assert.ok(frames.some(f=>f.players.some(p=>p.visible&&p.opacity>0&&p.opacity<1)),'Player labels must fade visibly');
-    for(const frame of frames)for(const [i,player] of frame.players.entries()){
-      if(!player.visible||player.opacity===0)continue;
-      for(const part of ['box','name','avatar'])for(const key of ['x','y','width','height']){
-        assert.ok(Math.abs(player[part][key]-frames[0].players[i][part][key])<1,'Player labels must stay still while fading: '+JSON.stringify({entry,part,key,player,original:frames[0].players[i]}));
-      }
+  await run(`window.chromeFrames=[sampleReviewChrome()];window.samplingChrome=true;
+    function sample(){chromeFrames.push(sampleReviewChrome());if(samplingChrome)requestAnimationFrame(sample);}requestAnimationFrame(sample);
+    document.querySelector('[data-section=learn]').click();`);
+  await waitFor(review,"import('./analysis.js').then(m=>m.learningWorkspace?.ready&&!m.learningWorkspace.transitioning)",'Learning entry');
+  const frames=await run('samplingChrome=false;chromeFrames');
+  await fs.writeFile(path.join(out,'learn-entry-frames.json'),JSON.stringify(frames,null,2));
+  assert.ok(frames.length>10,'Entry must be sampled across frames');
+  assert.ok(frames.some(f=>f.players.some(p=>p.visible&&p.opacity>0&&p.opacity<1)),'Player labels must fade visibly');
+  for(const frame of frames)for(const [i,player] of frame.players.entries()){
+    if(!player.visible||player.opacity===0)continue;
+    for(const part of ['box','name','avatar'])for(const key of ['x','y','width','height']){
+      assert.ok(Math.abs(player[part][key]-frames[0].players[i][part][key])<1,'Player labels must stay still while fading: '+JSON.stringify({part,key,player,original:frames[0].players[i]}));
     }
-    assert.ok(frames.some(f=>f.libraryX<0&&f.libraryX>-39&&f.libraryVisible),'Library must slide visibly before hiding');
-    assert.equal(frames.at(-1).libraryVisible,false);
-    assert.deepEqual(await accuracyLayers(),['hidden','hidden'],'Accuracy highlights must not show through learning mode');
-    await run("document.querySelector('#learningToggle').click()");
-    await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace)",'Review restored');
-    assert.equal(await run("getComputedStyle(document.querySelector('.library-rail')).visibility"),'visible');
-    assert.deepEqual(await accuracyLayers(),['visible','visible'],'Accuracy highlights must return with Game Review');
   }
+  assert.ok(frames.some(f=>f.libraryX<0&&f.libraryX>-39&&f.libraryVisible),'Library must slide visibly before hiding');
+  assert.equal(frames.at(-1).libraryVisible,false);
+  assert.deepEqual(await accuracyLayers(),['hidden','hidden'],'Accuracy highlights must not show through learning mode');
+  await run("document.querySelector('#learningToggle').click()");
+  await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace)",'Review restored');
+  assert.equal(await run("getComputedStyle(document.querySelector('.library-rail')).visibility"),'visible');
+  assert.deepEqual(await accuracyLayers(),['visible','visible'],'Accuracy highlights must return with Game Review');
   // Close while entry is still moving, then reopen to catch stale animation state.
   await run("import('./analysis.js').then(m=>{void m.openLearning();})");
   await waitFor(review,"import('./analysis.js').then(m=>!!m.learningWorkspace?.shell)",'Quick entry');
@@ -92,7 +90,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     assert.deepEqual(await accuracyLayers(),['visible','visible']);
   }
   await auditReviewReturn({review,call,evaluate,waitFor,sleep,out});
-  console.log('Both learning entries: stationary player fades, Library slide, smooth metadata return, interrupted entry and reduced motion passed. Evidence: '+out);
+  console.log('Learning entry: stationary player fades, Library slide, smooth metadata return, interrupted entry and reduced motion passed. Evidence: '+out);
 }
 
 export async function auditReviewReturn({review,call,evaluate,waitFor,sleep,out}) {

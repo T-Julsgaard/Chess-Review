@@ -4643,7 +4643,6 @@ function renderMoveComment() {
   const body = el("div", { class: "ip-body" + (dopamine ? " dopamine-comment" : "") });
   if (dopamine) body.dataset.moveCategory = S.classif[S.idx] || "";
   if (S.idx === 0) {
-    body.append(el("div", { class: "ip-head" }, solvePuzzlesButton()));
     const sig = "start:" + (S.settings.coach || "");
     const fresh = sig !== _ipSig;
     if (fresh) { _ipText = (S.coach && coachLine("non_move_states", "starting_position", {})) || "Use ← and → to step through the game."; _ipSig = sig; }

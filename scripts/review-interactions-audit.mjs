@@ -17,50 +17,46 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
       assert.deepEqual({w:state.w,h:state.h},initial);assert.equal(state.scrollH,height);assert.equal(state.scrollW,width);assert.equal(state.y,0);
       if(n===0)await shot(`expanded-accuracy-${width}x${height}`);
     }
-    for(const entry of ['#learningToggle','.learn-entry-button']){
-      const reviewRight=await run("Math.max(...[...document.querySelectorAll('.mod[data-mod=accuracy] > .mod-inner,.mod[data-mod=engine] > .mod-inner,.mod[data-mod=learn] > .mod-inner')].map(n=>n.getBoundingClientRect().right))");
-      await run(`window.samples=[];window.sampleActive=true;
-        window.sampleScene=()=>{const rect=n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height};};
-          const board=document.querySelector('.board');
-          return {board:rect(board),players:[...document.querySelectorAll('#playerTop,#playerBot')].map(n=>({rect:rect(n),opacity:+getComputedStyle(n).opacity,visibility:getComputedStyle(n).visibility})),
-            panels:[...document.querySelectorAll('.stage .mod:not([data-mod=board]) > .mod-inner')].map(n=>({rect:rect(n),opacity:+getComputedStyle(n).opacity,visibility:getComputedStyle(n).visibility})),
-            library:rect(document.querySelector('.lib-tab'))};};
-        window.sampleLoop=()=>{samples.push(sampleScene());if(sampleActive)requestAnimationFrame(sampleLoop);};sampleLoop();
-        document.querySelector('${entry}').click();`);
-      await waitFor(review,"import('./analysis.js').then(m=>!!m.learningWorkspace?.shell)",'Learning mounted');
-      await sleep(220);await shot(`learning-enter-${height}-${entry==='#learningToggle'?'top':'panel'}`);
-      await waitFor(review,"import('./analysis.js').then(m=>m.learningWorkspace?.ready&&!m.learningWorkspace.transitioning)",'Learning entered');
-      const frames=await run('sampleActive=false;samples');
-      assert.ok(frames.length>10);
-      for(const frame of frames)for(const [i,panel]of frame.panels.entries())if(panel.visibility==='visible'&&panel.opacity>.02){
-        assert.ok(Math.abs(panel.rect.w-frames[0].panels[i].rect.w)<1,'Panel width jumps during entry');
-      }
-      for(const frame of frames)for(const [i,player]of frame.players.entries())if(player.visibility==='visible'&&player.opacity>.02){
-        for(const key of ['x','y','w','h'])assert.ok(Math.abs(player.rect[key]-frames[0].players[i].rect[key])<1,'Player label moves while fading '+key);
-      }
-      const start=frames[0].board,end=frames.at(-1).board;
-      const margins=await run("(()=>{const board=document.querySelector('.learning-embedded .board').getBoundingClientRect(),header=document.querySelector('.topbar').getBoundingClientRect(),panel=document.querySelector('.learn-shell').getBoundingClientRect();return {above:board.top-header.bottom,below:innerHeight-board.bottom,boardY:board.y,panelY:panel.y,boardHeight:board.height,panelHeight:panel.height};})()");
-      assert.ok(Math.abs(margins.above-margins.below)<1,'Learning margins should balance '+JSON.stringify(margins));
-      assert.ok(Math.abs(margins.boardY-margins.panelY)<1&&Math.abs(margins.boardHeight-margins.panelHeight)<1,'Board and learning UI should stay aligned');
-      assert.ok(Math.abs(await run("document.querySelector('.learn-shell').getBoundingClientRect().right")-reviewRight)<1,'Learning panel should reach the review column right edge');
-      assert.ok(Math.abs(await run("document.querySelector('.learn-nav').getBoundingClientRect().right")-reviewRight)<1,'Visible learning tabs should reach the review column right edge');
-      for(const frame of frames)for(const key of ['x','y','w','h'])assert.ok(frame.board[key]>=Math.min(start[key],end[key])-1&&frame.board[key]<=Math.max(start[key],end[key])+1,'Board overshoot on entry '+JSON.stringify({key,frame,start,end}));
-      await shot(`learning-entered-${height}`);
-      if(entry==='#learningToggle'){
-        await run("import('./analysis.js').then(m=>{const w=m.learningWorkspace,p={id:'centered-layout',fen:'7k/5Q2/6K1/8/8/8/8/8 w - - 0 1',solution:['f7f8'],rating:1200,themes:['mateIn1']};w.puzzles=[p];return w.startPuzzleSelection([p]);})");
-        const puzzle=await run("(()=>{const b=document.querySelector('.learning-embedded .board').getBoundingClientRect(),p=document.querySelector('.learn-shell').getBoundingClientRect(),t=document.querySelector('.topbar').getBoundingClientRect().bottom;return {above:b.top-t,below:innerHeight-b.bottom,panelY:p.y,boardY:b.y};})()");
-        assert.ok(Math.abs(puzzle.above-puzzle.below)<1&&Math.abs(puzzle.panelY-puzzle.boardY)<1,'Puzzle activity should retain balanced alignment');
-        assert.ok(Math.abs(await run("document.querySelector('.learn-shell').getBoundingClientRect().right")-reviewRight)<1,'Active puzzle should retain the review column right edge');
-        await shot(`puzzle-centered-${height}`);
-      }
-      await run("samples=[];sampleActive=true;sampleLoop();document.querySelector('#learningToggle').click()");
-      await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace)",'Review restored');
-      const returning=await run('sampleActive=false;samples');
-      const from=returning[0].board,to=returning.at(-1).board;
-      for(const frame of returning)for(const key of ['x','y','w','h'])assert.ok(frame.board[key]>=Math.min(from[key],to[key])-1&&frame.board[key]<=Math.max(from[key],to[key])+1,'Board overshoot on return '+key);
-      for(const key of ['x','y','w','h'])assert.ok(Math.abs(to[key]-start[key])<1,'Review geometry changed '+JSON.stringify({width,height,entry,key,to,start}));
-      evidence.push({width,height,entry,frames,returning});
+    const reviewRight=await run("Math.max(...[...document.querySelectorAll('.mod[data-mod=accuracy] > .mod-inner,.mod[data-mod=engine] > .mod-inner,.mod[data-mod=learn] > .mod-inner')].map(n=>n.getBoundingClientRect().right))");
+    await run(`window.samples=[];window.sampleActive=true;
+      window.sampleScene=()=>{const rect=n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height};};
+        const board=document.querySelector('.board');
+        return {board:rect(board),players:[...document.querySelectorAll('#playerTop,#playerBot')].map(n=>({rect:rect(n),opacity:+getComputedStyle(n).opacity,visibility:getComputedStyle(n).visibility})),
+          panels:[...document.querySelectorAll('.stage .mod:not([data-mod=board]) > .mod-inner')].map(n=>({rect:rect(n),opacity:+getComputedStyle(n).opacity,visibility:getComputedStyle(n).visibility})),
+          library:rect(document.querySelector('.lib-tab'))};};
+      window.sampleLoop=()=>{samples.push(sampleScene());if(sampleActive)requestAnimationFrame(sampleLoop);};sampleLoop();
+      document.querySelector('[data-section=learn]').click();`);
+    await waitFor(review,"import('./analysis.js').then(m=>!!m.learningWorkspace?.shell)",'Learning mounted');
+    await sleep(220);await shot(`learning-enter-${height}-rail`);
+    await waitFor(review,"import('./analysis.js').then(m=>m.learningWorkspace?.ready&&!m.learningWorkspace.transitioning)",'Learning entered');
+    const frames=await run('sampleActive=false;samples');
+    assert.ok(frames.length>10);
+    for(const frame of frames)for(const [i,panel]of frame.panels.entries())if(panel.visibility==='visible'&&panel.opacity>.02){
+      assert.ok(Math.abs(panel.rect.w-frames[0].panels[i].rect.w)<1,'Panel width jumps during entry');
     }
+    for(const frame of frames)for(const [i,player]of frame.players.entries())if(player.visibility==='visible'&&player.opacity>.02){
+      for(const key of ['x','y','w','h'])assert.ok(Math.abs(player.rect[key]-frames[0].players[i].rect[key])<1,'Player label moves while fading '+key);
+    }
+    const start=frames[0].board,end=frames.at(-1).board;
+    const margins=await run("(()=>{const board=document.querySelector('.learning-embedded .board').getBoundingClientRect(),header=document.querySelector('.topbar').getBoundingClientRect(),panel=document.querySelector('.learn-shell').getBoundingClientRect();return {above:board.top-header.bottom,below:innerHeight-board.bottom,boardY:board.y,panelY:panel.y,boardHeight:board.height,panelHeight:panel.height};})()");
+    assert.ok(Math.abs(margins.above-margins.below)<1,'Learning margins should balance '+JSON.stringify(margins));
+    assert.ok(Math.abs(margins.boardY-margins.panelY)<1&&Math.abs(margins.boardHeight-margins.panelHeight)<1,'Board and learning UI should stay aligned');
+    assert.ok(Math.abs(await run("document.querySelector('.learn-shell').getBoundingClientRect().right")-reviewRight)<1,'Learning panel should reach the review column right edge');
+    assert.ok(Math.abs(await run("document.querySelector('.learn-nav').getBoundingClientRect().right")-reviewRight)<1,'Visible learning tabs should reach the review column right edge');
+    for(const frame of frames)for(const key of ['x','y','w','h'])assert.ok(frame.board[key]>=Math.min(start[key],end[key])-1&&frame.board[key]<=Math.max(start[key],end[key])+1,'Board overshoot on entry '+JSON.stringify({key,frame,start,end}));
+    await shot(`learning-entered-${height}`);
+    await run("import('./analysis.js').then(m=>{const w=m.learningWorkspace,p={id:'centered-layout',fen:'7k/5Q2/6K1/8/8/8/8/8 w - - 0 1',solution:['f7f8'],rating:1200,themes:['mateIn1']};w.puzzles=[p];return w.startPuzzleSelection([p]);})");
+    const puzzle=await run("(()=>{const b=document.querySelector('.learning-embedded .board').getBoundingClientRect(),p=document.querySelector('.learn-shell').getBoundingClientRect(),t=document.querySelector('.topbar').getBoundingClientRect().bottom;return {above:b.top-t,below:innerHeight-b.bottom,panelY:p.y,boardY:b.y};})()");
+    assert.ok(Math.abs(puzzle.above-puzzle.below)<1&&Math.abs(puzzle.panelY-puzzle.boardY)<1,'Puzzle activity should retain balanced alignment');
+    assert.ok(Math.abs(await run("document.querySelector('.learn-shell').getBoundingClientRect().right")-reviewRight)<1,'Active puzzle should retain the review column right edge');
+    await shot(`puzzle-centered-${height}`);
+    await run("samples=[];sampleActive=true;sampleLoop();document.querySelector('#learningToggle').click()");
+    await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace)",'Review restored');
+    const returning=await run('sampleActive=false;samples');
+    const from=returning[0].board,to=returning.at(-1).board;
+    for(const frame of returning)for(const key of ['x','y','w','h'])assert.ok(frame.board[key]>=Math.min(from[key],to[key])-1&&frame.board[key]<=Math.max(from[key],to[key])+1,'Board overshoot on return '+key);
+    for(const key of ['x','y','w','h'])assert.ok(Math.abs(to[key]-start[key])<1,'Review geometry changed '+JSON.stringify({width,height,key,to,start}));
+    evidence.push({width,height,entry:'[data-section=learn]',frames,returning});
   }
   // Interrupt the entry before its board expansion completes, then reopen.
   await run("import('./analysis.js').then(m=>{void m.openLearning();})");

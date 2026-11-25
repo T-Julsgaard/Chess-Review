@@ -1520,7 +1520,6 @@ button { font-family: inherit; cursor: pointer; }
 /* mistake-practice status text in the controls bar */
 .controls .practice-pos { color: var(--ink-2); font-weight: 700; font-family: var(--font-ui); }
 .controls .practice-status { color: var(--ink-3); font-size: 13px; margin-right: 4px; }
-.insight-panel .review-entry-button { max-width: max-content; padding-inline: 12px; }
 
 /* ---------- REVIEW SUMMARY ---------- */
 .review {

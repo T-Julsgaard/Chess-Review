@@ -34,16 +34,11 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   assert.equal(await run("document.querySelector('#learningToggle').textContent"),'Learn with Chess review');
   await resize(1920);
   await run("import('./analysis.js').then(m=>m.go(0))");
-  assert.equal(await run("document.querySelector('.insight-panel .learn-entry-button').textContent"),'Solve Puzzles');
-  await run("document.querySelector('.insight-panel .learn-entry-button').click()");
-  await waitFor(review,"import('./analysis.js').then(m=>m.learningWorkspace?.ready&&!m.learningWorkspace.transitioning)",'Solve Puzzles entry');
-  assert.equal(await run("import('./analysis.js').then(m=>m.learningWorkspace.page)"),'puzzles');
-  await run("document.querySelector('#learningToggle').click()");
-  await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace)",'Return from Solve Puzzles');
+  assert.equal(await run("document.querySelector('.insight-panel .learn-entry-button')"),null);
 
   await call('Page.navigate',{url:await run("location.origin+'/analysis.html?workspace=blank'")},review.sessionId);
   await waitFor(review,"!!document.querySelector('.board')&&import('./analysis.js').then(m=>m.S.blank)",'Blank workspace');
-  await run("document.querySelector('#learningToggle').click()");
+  await run("document.querySelector('.learn-entry-button').click()");
   await waitFor(review,"!!document.querySelector('.learn-theme-list')",'Learning without a game');
   for(const width of [1280,390,320]){await resize(width);await checkTopbar();}
   assert.equal(await run("document.querySelector('.learn-footer, [data-focus=review]')"),null);
