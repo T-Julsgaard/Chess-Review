@@ -327,6 +327,23 @@ test('profile: share payload round-trips, sanitises links and opens from a share
   a.run('profileWorkspace').close(); for (let i = 0; i < 4; i++) await settle();
 });
 
+test('profile: the Lichess country flag follows the username on the cover and overview', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  const rows = season().map(r => ({...r, site: 'lichess'}));
+  a.store[rowsKey('lichess', 'tester')] = {rows, months: [], since: 0, updatedAt: Date.now()};
+  a.replace('profileIdentity', async () => ({site: 'lichess', accounts: ['tester'], country: 'DK'}));
+  await openDeck(a);
+  const w = a.run('profileWorkspace');
+  const assertFlagAfterName = selector => {
+    const heading = doc.querySelector(selector);
+    assert.equal(heading.firstChild.textContent, 'tester');
+    assert.equal(heading.lastChild.alt, 'Denmark');
+  };
+  assertFlagAfterName('.pv-story-figure');
+  w.go(w.deck.length - 1);
+  assertFlagAfterName('[data-chapter="cover"] .profile-overview-value');
+});
+
 test('profile settings: the recap keeps its defaults with no Settings category', t => {
   const a = review(t);
   assert.equal(a.state.settings.profileDepth, 'off'); assert.equal(a.state.settings.profileSample, 'all');

@@ -116,7 +116,8 @@
 /* The chapter's name: large enough to read as the chapter's title, still in the chapter's colour. */
 .pv-story-chapter { display: inline-flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 800; letter-spacing: .9px; line-height: 1.2; text-transform: uppercase; color: var(--pv-tint); }
 .pv-story-hero { display: flex; flex-direction: column; gap: 8px; }
-.pv-story-hero img { width: 34px; height: 24px; border-radius: 4px; }
+.pv-story-figure:has(> img) { --pv-flag-space: 44px; display: flex; align-items: center; gap: 10px; }
+.pv-story-figure > img { width: 34px; height: 24px; border-radius: 4px; }
 .pv-story-figure { font-size: clamp(66px, 7.4vw, 128px); font-weight: 850; line-height: .88; letter-spacing: -.045em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere;
   background: linear-gradient(175deg, var(--ink) 35%, var(--pv-tint) 130%); -webkit-background-clip: text; background-clip: text; color: transparent; padding-bottom: .04em; }
 .pv-story-hero.is-text .pv-story-figure { font-size: clamp(34px, 3.5vw, 58px); line-height: 1.02; letter-spacing: -.025em; text-wrap: balance; }
@@ -490,7 +491,7 @@
 .profile-shell[data-design="story"] .pv-story-hero.is-text .pv-story-figure { font-size: clamp(30px, 3vw, 50px); }
 /* A long word (a username) shrinks to the panel's width rather than breaking mid-word: about .62em per character in this face. */
 .pv-story-hero.is-text:has(> .pv-story-figure[style*="--pv-word"]) { container-type: inline-size; }
-.profile-shell[data-design="story"] .pv-story-hero.is-text .pv-story-figure[style*="--pv-word"] { font-size: max(22px, min(clamp(30px, 3vw, 50px), 100cqi / (var(--pv-word) * .62))); }
+.profile-shell[data-design="story"] .pv-story-hero.is-text .pv-story-figure[style*="--pv-word"] { font-size: max(22px, min(clamp(30px, 3vw, 50px), (100cqi - var(--pv-flag-space, 0px)) / (var(--pv-word) * .62))); }
 .profile-shell[data-design="story"] .pv-story-hero { gap: 6px; }
 .profile-shell[data-design="story"] .pv-fact { padding: 9px 0; }
 .profile-shell[data-design="story"] .pv-story-lead { font-size: 15px; }
