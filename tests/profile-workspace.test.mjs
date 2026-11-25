@@ -343,6 +343,7 @@ test('profile: the Lichess country flag follows the username on the cover and ov
   const flag = username.nextElementSibling;
   assert.ok(flag.matches('.profile-overview-flag'));
   assert.equal(flag.querySelector('img').alt, 'Denmark');
+  assert.ok(!flag.querySelector('img').matches('.avatar, .avatar-flag'));
 });
 
 test('profile settings: the recap keeps its defaults with no Settings category', t => {
