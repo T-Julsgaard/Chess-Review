@@ -80,6 +80,9 @@
 .pv-modes button.on { background: var(--panel); color: var(--ink); box-shadow: 0 2px 8px color-mix(in srgb, #000 25%, transparent); }
 .pv-link { align-self: flex-start; font-size: 13px; font-weight: 700; color: var(--pv-tint, var(--accent)); text-decoration: none; }
 .pv-link:hover { text-decoration: underline; }
+/* A fact's name that opens its game (Comebacks: the one that got away), coloured like the game links. */
+.pv-fact-link { align-self: flex-start; padding: 0; border: 0; background: none; font: inherit; font-weight: 700; color: var(--pv-tint, var(--accent)); text-align: left; cursor: pointer; }
+.pv-fact-link:hover { text-decoration: underline; }
 /* A game link while its game is on the board: the way back to the chapter's own board. */
 .pv-link-back::before { content: "←"; display: inline-block; margin-right: 6px; transition: transform .2s cubic-bezier(.16,1,.3,1); }
 .pv-link-back:hover::before { transform: translateX(-3px); }
