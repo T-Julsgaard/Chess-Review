@@ -76,8 +76,14 @@ test('profile: seeded games render the deck on the board with navigation, stats 
   assert.ok(doc.querySelector('.board .pv-line'));
   shell.dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: 'End', bubbles: true}));
   assert.equal(shell.querySelector('.pv-story').dataset.slide, 'share');
-  assert.equal(shell.querySelector('.pv-story-chapter').textContent, 'Overview');
-  assert.equal(shell.querySelector('.pv-story-top > .profile-share-results').textContent, 'Share your results', 'the results button sits beside the heading');
+  assert.equal(shell.querySelector('.pv-story-chapter'), null, 'the overview has no heading');
+  assert.equal(shell.querySelector('.pv-story-lead'), null, 'and no sentence');
+  assert.equal(shell.querySelector('.pv-story > .pv-share-results > .profile-share-results').textContent, 'Share your results', 'the results button stands on its own row at the top');
+  const nav = shell.querySelector('.pv-story-nav');
+  assert.ok(nav.classList.contains('is-last'), 'the next button folds away on the last chapter');
+  assert.ok(nav.querySelector('.pv-next').disabled && nav.querySelector('.pv-next').hasAttribute('inert'));
+  assert.doesNotMatch(nav.textContent, /Start again|Back to the cover/);
+  assert.match(nav.querySelector('.pv-prev').textContent, /^Previous/);
   assert.ok(shell.querySelector('.profile-share-results').classList.contains('primary'), 'it is filled like Share with a friend');
   assert.match(shell.querySelector('.profile-share a.profile-button.primary').href, /^https:\/\/chromewebstore\.google\.com\/detail\/chess-review\//, 'Share with a friend opens the store page');
   assert.ok(shell.querySelector('.profile-dev canvas.profile-minime'), 'the developer note has the mini-me');
@@ -547,6 +553,7 @@ test('mate in one opens at the puzzle, replays the recorded game, and lets the p
   };
   assert.equal(link().textContent, 'View this game');
   assert.ok(link().classList.contains('pv-link'), 'styled like the game links on other chapters');
+  assert.equal(link().parentNode.textContent, "Don't believe you missed that? Check for yourself: View this game", 'a nudge on the same line');
   assert.equal(link().href, newer.url);
   assert.equal(link().target, '_blank');
   assert.match(doc.querySelector('.profile-game-player-top').textContent, /Defender.*1600/);

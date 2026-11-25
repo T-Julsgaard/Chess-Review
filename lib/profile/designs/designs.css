@@ -167,6 +167,20 @@
 .pv-prev { background: color-mix(in srgb, var(--ink) 8%, var(--panel)); color: var(--ink-2); box-shadow: none; }
 .pv-prev:disabled { opacity: .35; cursor: default; }
 .pv-prev:hover .pv-next-arrow { transform: translateX(-3px); }
+/* On the last chapter the next button folds away to nothing and the previous one slides over to fill the row;
+   back on an earlier chapter it opens out again. Its words never wrap while it narrows, they fade first. */
+.pv-story-nav > .pv-next { overflow: hidden; white-space: nowrap;
+  transition: transform .18s cubic-bezier(.2,.8,.2,1), filter .15s, flex-grow .55s cubic-bezier(.65,0,.35,1), padding .55s cubic-bezier(.65,0,.35,1), margin .55s cubic-bezier(.65,0,.35,1), box-shadow .3s, opacity .3s .2s, visibility 0s; }
+.pv-story-nav > .pv-prev { transition: transform .18s cubic-bezier(.2,.8,.2,1), filter .15s, flex-grow .55s cubic-bezier(.65,0,.35,1); }
+.pv-story-nav.is-last > .pv-next { flex-grow: 0; padding-inline: 0; margin-left: -10px; opacity: 0; visibility: hidden; box-shadow: none; pointer-events: none;
+  transition: transform .18s cubic-bezier(.2,.8,.2,1), filter .15s, flex-grow .55s cubic-bezier(.65,0,.35,1), padding .55s cubic-bezier(.65,0,.35,1), margin .55s cubic-bezier(.65,0,.35,1), box-shadow .2s, opacity .18s, visibility 0s .55s; }
+/* Mate in one: "Don't believe you missed that? Check for yourself:" and the game's link on one line. */
+.pv-link-line { margin: 0; font-size: 13px; color: var(--ink-2); }
+.pv-link-line > .pv-link { display: inline; }
+.pv-link-line:has(> .pv-link[hidden]) { display: none; }
+/* The overview's one heading-free control: Share your results, larger and centred a little way down the panel. */
+.pv-share-results { display: flex; justify-content: center; padding-top: 22px; }
+.pv-share-results > .profile-share-results { margin: 0; font-size: 16px; font-weight: 750; min-height: 48px; padding: 12px 34px; border-radius: 12px; }
 .pv-play-icon { width: 12px; height: 14px; display: block; }
 .pv-play-icon[data-state="play"] { clip-path: polygon(10% 0, 100% 50%, 10% 100%); background: currentColor; margin-left: 3px; }
 .pv-play-icon[data-state="pause"] { border-left: 4px solid currentColor; border-right: 4px solid currentColor; box-sizing: border-box; width: 12px; }
