@@ -4792,7 +4792,8 @@ function renderMoveComment() {
     if (S.idx !== ply || S.positions[ply]?.fen !== positionFen || S.analysisMode || S.practice
         || S.analyzing || S.autoTimer || S.reorganize || learningWorkspace || profileOwnsBoard()) return;
     explanationPreview.show({board: UI.boardWrap.querySelector('.board'), squares: sqByName, makePiece,
-      makeBadge: () => gradeBadge(move.category, move.origin === 'played' ? S.moveGrades[ply] : null, 'sq-badge'),
+      makeBadge: () => gradeBadge(move.category,
+        move.origin === 'played' ? S.moveGrades[ply] : moveGrade(move.category, 0), 'sq-badge'),
       currentFen: positionFen, baseFen: S.positions[ply + move.plyOffset]?.fen,
       played: S.positions[ply], uci: move.uci, owner, hold: true, duration: animDuration(),
       motion: S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches});

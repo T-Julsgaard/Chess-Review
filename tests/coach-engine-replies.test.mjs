@@ -226,6 +226,8 @@ test('explanation moves preview only on hover with their category badge; assessm
   assert.equal(previewPiece('h4'),'bQ');
   const badge=()=>a.dom.window.document.querySelector('.move-preview .sq-badge');
   assert.equal(badge().dataset.badgeCategory,'best');
+  assert.equal(badge().querySelector('.grade-numeral').textContent,'9.0');
+  assert.equal(badge().getAttribute('aria-label'),'Best, score 9');
   assert.equal(badge().parentElement.querySelector('.piece-img').dataset.piece,'bQ');
   const layer=a.dom.window.document.querySelector('.move-preview');
   links[0].click();assert.equal(a.dom.window.document.querySelector('.move-preview'),layer);
@@ -234,6 +236,7 @@ test('explanation moves preview only on hover with their category badge; assessm
   links[1].dispatchEvent(new a.dom.window.Event('pointerenter'));
   assert.equal(previewPiece('g3'),'wP');assert.equal(S.idx,3);
   assert.equal(badge().dataset.badgeCategory,'best');
+  assert.equal(badge().querySelector('.grade-numeral').textContent,'9.0');
   assert.equal(badge().parentElement.querySelector('.piece-img').dataset.piece,'wP');
   links[1].dispatchEvent(new a.dom.window.Event('pointerleave'));
   assert.equal(a.dom.window.document.querySelector('.move-preview'),null);
@@ -245,6 +248,30 @@ test('explanation moves preview only on hover with their category badge; assessm
     const heading=a.call('renderMoveComment').querySelector('.ip-assessment');
     assert.equal(heading.textContent,text);
     assert.equal(heading.childElementCount,0);
+  }
+});
+
+test('explanation hover badges follow selected symbols, fonts and appearances',async t=>{
+  const a=review(t),doc=a.dom.window.document;
+  await a.call('setCoachEngineReplies',true);
+  const hover=()=>doc.querySelector('.ip-move-link').dispatchEvent(new a.dom.window.Event('pointerenter'));
+  const badge=()=>doc.querySelector('.move-preview .sq-badge');
+  const expected=()=>a.call('gradeBadge','best',9,'sq-badge');
+  hover();
+  for (const appearance of ['solid','ink-mineral','enamel']) {
+    await a.call('setSetting','badgeAppearance',appearance);
+    await a.call('setCategoryBadgeSymbol','best','crown');
+    assert.equal(badge().querySelector('.category-symbol').dataset.symbol,'crown');
+    assert.equal(badge().innerHTML,expected().innerHTML);
+    hover();
+    assert.equal(badge().innerHTML,expected().innerHTML);
+    await a.call('setCategoryBadgeSymbol','best','numbers');
+    await a.call('setSetting','badgeFont','lora');
+    assert.equal(badge().querySelector('.grade-numeral').textContent,'9.0');
+    assert.match(badge().querySelector('.grade-numeral').getAttribute('font-family'),/Badge Lora/);
+    assert.equal(badge().innerHTML,expected().innerHTML);
+    hover();
+    assert.equal(badge().innerHTML,expected().innerHTML);
   }
 });
 
