@@ -5936,7 +5936,7 @@ function moveCell(ply) {
   return el("span", { class: "ml-move" + (!S.analysisMode && ply === S.idx ? " current" : ""), "data-ply": ply,
     "data-class": cls || "", onclick: () => gotoMainline(ply) },
     el("span", { class: "pc", style: { color: pos.color === "w" ? "var(--ink)" : "var(--ink-2)" } }, glyph),
-    el("span", { title: pos.san }, pos.san),
+    el("span", {}, pos.san),
     showBadge ? qBadge(cls, S.moveGrades[ply]) : null,
   );
 }
