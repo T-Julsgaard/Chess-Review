@@ -33,6 +33,7 @@ import {StoryWorkspace} from '../../lib/profile/designs/story.js';
 import {createReviewEffects} from '../../lib/review-effects.js';
 import {createSectionRail} from '../../lib/section-rail.js';
 import {explainMove, explanationPv} from '../../lib/move-explanation.js';
+import {createMovePreview} from '../../lib/move-preview.js';
 import {createTranslator, loadLanguage, LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, isSupportedLanguage} from '../../lib/i18n/index.js';
 
 // Execute the real application in a DOM, stubbing only browser/engine boundaries.
@@ -78,7 +79,7 @@ export function app(t, {hardware,languages=['en-US'],savedLanguage='en',settings
     loadProfileWorkspace:async () => ({ProfileWorkspace}),
     loadProfileStory:async () => ({StoryWorkspace}),
     createReviewEffects, createSectionRail, createReviewArchive,
-    explainMove, explanationPv,
+    explainMove, explanationPv, createMovePreview,
     BADGE_APPEARANCES, BADGE_FONTS, MOVE_GRADE_CONFIG, moveGrade, gradeText, gradeLabel, gradeSvg, puzzleResultBadge, CHECKMATE_BADGES, checkmateBadgeSvg, matedKingSquare, mateMark,
     CATEGORY_SYMBOLS, CATEGORY_SYMBOL_OPTIONS, categoryBadgeSymbol, cleanBadgeSymbols,
     moveAnimationDuration, MOVE_ANIMATION_EASING,
@@ -98,7 +99,7 @@ export function app(t, {hardware,languages=['en-US'],savedLanguage='en',settings
   context.__publicCalibration = JSON.parse(fs.readFileSync(new URL('../../data/calibration.json', import.meta.url), 'utf8'));
   run('BOOK = {}; CALIB = { ...__publicCalibration, quality: { ...__publicCalibration.quality, outcome: { ...__publicCalibration.quality.outcome, slopePerPawn: 0.3 } } };');
   const replace = (name, fn) => { context.__replacement = fn; run(`${name} = __replacement`); delete context.__replacement; };
-  t.after(() => { for (const id of timers) clearTimeout(id); dom.window.close(); });
+  t.after(() => { run('explanationPreview.cancel()'); for (const id of timers) clearTimeout(id); dom.window.close(); });
   return { run, state, context, dom, store, writes, replace,
     start: () => vm.runInContext(raw.slice(startup), context, { filename: 'analysis.js' }),
     call: (name, ...args) => run(name)(...args) };

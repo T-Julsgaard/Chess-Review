@@ -213,21 +213,48 @@ test('only explanation moves are linked; assessment headings retain plain SAN',a
   const a=review(t),S=a.state;
   await a.call('setCoachEngineReplies',true);
   const before=JSON.stringify([S.evals,S.bests,S.classif,S.moveGrades]);
-  const opened=[];
-  a.replace('playLine',uci=>opened.push({uci,ply:S.idx}));
-  const body=a.call('renderMoveComment');
+  a.replace('playLine',()=>assert.fail('An explanation preview must not open analysis'));
+  const body=a.dom.window.document.querySelector('.insight-panel');
   const links=[...body.querySelectorAll('.ip-text .ip-move-link')];
   assert.deepEqual(links.map(link=>link.textContent),['Queen h4','Pawn g3']);
-  links[0].click();assert.deepEqual(opened.pop(),{uci:'d8h4',ply:3});
-  // The alternative starts one ply earlier; a stale detached link cannot jump.
-  links[1].click();assert.deepEqual(opened.pop(),{uci:'g2g3',ply:2});
-  links[0].click();assert.equal(opened.length,0);
+  const previewPiece=square=>a.dom.window.document.querySelector('.move-preview')?.children[
+    [...a.run('UI.boardWrap').querySelector('.board').children].indexOf(a.run('sqByName')[square])
+  ]?.querySelector('.piece-img')?.dataset.piece;
+  links[0].click();assert.equal(previewPiece('h4'),'bQ');
+  assert.equal(S.idx,3);assert.equal(S.analysisMode,false);assert.equal(S.variation,null);
+  // Hovering the alternative first undoes the played move, then previews it.
+  links[1].dispatchEvent(new a.dom.window.Event('pointerenter'));
+  assert.equal(previewPiece('g3'),'wP');assert.equal(S.idx,3);
+  links[1].dispatchEvent(new a.dom.window.Event('pointerleave'));
+  assert.equal(a.dom.window.document.querySelector('.move-preview'),null);
   assert.equal(JSON.stringify([S.evals,S.bests,S.classif,S.moveGrades]),before);
   a.call('go',3);
+  links[0].click();assert.equal(a.dom.window.document.querySelector('.move-preview'),null);
   for(const [category,text] of [['blunder','g4 is a blunder.'],['best','g4 is the best move.']]) {
     S.classif[3]=category;
     const heading=a.call('renderMoveComment').querySelector('.ip-assessment');
     assert.equal(heading.textContent,text);
     assert.equal(heading.childElementCount,0);
   }
+});
+
+test('move previews clean up on navigation, board input, Escape and window blur',async t=>{
+  const a=review(t),doc=a.dom.window.document;
+  await a.call('setCoachEngineReplies',true);
+  const hover=()=>doc.querySelector('.ip-move-link').dispatchEvent(new a.dom.window.Event('pointerenter'));
+  const shown=()=>!!doc.querySelector('.move-preview');
+  for (const stop of [
+    ()=>a.call('go',2),
+    ()=>a.run('UI.boardWrap').dispatchEvent(new a.dom.window.Event('pointerdown')),
+    ()=>doc.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true})),
+    ()=>a.dom.window.dispatchEvent(new a.dom.window.Event('blur')),
+    ()=>a.call('buildBoard'),
+  ]) {
+    a.call('go',3);hover();assert.equal(shown(),true);
+    stop();assert.equal(shown(),false);
+  }
+  const link=doc.querySelector('.ip-move-link'),touch=new a.dom.window.Event('pointerenter');
+  Object.defineProperty(touch,'pointerType',{value:'touch'});
+  link.dispatchEvent(touch);assert.equal(shown(),false);
+  link.click();assert.equal(shown(),true);
 });

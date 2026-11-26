@@ -4,7 +4,7 @@ import path from 'node:path';
 
 // Authored synthetic move sequence; no external games or extra engine searches.
 // node scripts/learning-browser.mjs --working-tree --engine-explanations
-export async function auditLearning({review,call,evaluate,sleep,out}) {
+export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   const run=code=>evaluate(review,code),results=[];
   const shot=async name=>{
     const result=await call('Page.captureScreenshot',{format:'png'},review.sessionId);
@@ -26,7 +26,8 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
     await sleep(150);
     await run("import('./analysis.js').then(m=>m.setCoachEngineReplies(false))");
     await shot(`coach-${width}`);
-    await run("document.querySelector('.ip-explanations-toggle').click()");await sleep(100);
+    await run("document.querySelector('.ip-explanations-toggle').click()");
+    await waitFor(review,"!document.querySelector('.coach-frame')",'Coach exit animation');
     const state=await run(`(()=>{
       const toggle=document.querySelector('.ip-explanations-toggle'),close=document.querySelector('.ip-close-game');
       const t=toggle.getBoundingClientRect(),x=close.getBoundingClientRect();
@@ -130,15 +131,62 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
   await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]},review.sessionId);
   await run("import('./analysis.js').then(m=>{m.go(2);m.go(3);})");
   assert.equal(await run("!!document.querySelector('.ip-written-char')"),false);
-  for(const [label,branchIdx,square,piece] of [['Queen h4',3,'h4','q'],['Pawn g3',2,'g3','p']]) {
-    await run("import('./analysis.js').then(m=>{m.exitAnalysis();m.go(3);})");
+  await run(`window.previewPiece=square=>{
+    const index=(8-Number(square[1]))*8+square.charCodeAt(0)-97;
+    return document.querySelector('.move-preview')?.children[index]?.querySelector('.piece-img')?.dataset.piece;
+  }`);
+  const reviewState=()=>run("import('./analysis.js').then(m=>JSON.stringify([m.S.idx,m.S.analysisMode,m.S.variation,m.S.evals,m.S.bests,m.S.classif,m.S.moveGrades]))");
+  const beforePreview=await reviewState();
+  for(const [label,square,piece] of [['Queen h4','h4','bQ'],['Pawn g3','g3','wP']]) {
+    await run("import('./analysis.js').then(m=>m.go(3))");
     await run(`([...document.querySelectorAll('.insight-panel .ip-move-link')].find(n=>n.textContent===${JSON.stringify(label)})).click()`);
-    const opened=await run(`import('./analysis.js').then(async m=>{
-      const {Chess}=await import('./lib/chess.js');
-      return {branchIdx:m.S.variation?.branchIdx,piece:new Chess(m.S.variation.positions[m.S.variation.idx].fen).get('${square}')?.type};
-    })`);
-    assert.deepEqual(opened,{branchIdx,piece});
+    assert.equal(await run(`previewPiece('${square}')`),piece);
+    assert.equal(await run("document.querySelector('.move-preview').getAnimations({subtree:true}).length"),0);
+    assert.equal(await reviewState(),beforePreview);
+    await sleep(950);
+    assert.equal(await run("!!document.querySelector('.move-preview')"),false);
   }
+  // Real pointer input: hover holds, leaving reverses, clicking returns even
+  // when the pointer remains over the mention. No review/engine state changes.
+  await call('Emulation.setDeviceMetricsOverride',{width:1366,height:768,deviceScaleFactor:1,mobile:false},review.sessionId);
+  await call('Emulation.setEmulatedMedia',{features:[]},review.sessionId);
+  await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=true;m.go(3);})");
+  const point=await run("(()=>{const r=document.querySelector('.ip-move-link').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()");
+  await call('Input.dispatchMouseEvent',{type:'mouseMoved',...point},review.sessionId);
+  const slideAtScale=await run(`(()=>{
+    const layer=document.querySelector('.move-preview'),animation=layer.getAnimations({subtree:true})[0];
+    const transform=new DOMMatrix(animation.effect.getKeyframes()[0].transform);
+    const from=layer.children[3].getBoundingClientRect(),to=layer.children[39].getBoundingClientRect();
+    const scale=layer.getBoundingClientRect().width/layer.offsetWidth;
+    return Math.abs(transform.m41*scale-(from.x-to.x))<1&&Math.abs(transform.m42*scale-(from.y-to.y))<1;
+  })()`);
+  assert.equal(slideAtScale,true,'Piece animation must start at the origin square in a scaled panel');
+  await sleep(240);
+  assert.equal(await run("previewPiece('h4')"),'bQ');
+  assert.equal(await run("getComputedStyle(document.querySelector('.board > .sq')).visibility"),'hidden');
+  assert.equal(await run("getComputedStyle(document.querySelector('.move-preview > .sq')).visibility"),'visible');
+  const aligned=await run("(()=>{const a=document.querySelector('.board').getBoundingClientRect(),b=document.querySelector('.move-preview').getBoundingClientRect();return Math.abs(a.x-b.x)<1&&Math.abs(a.y-b.y)<1&&Math.abs(a.width-b.width)<1&&Math.abs(a.height-b.height)<1;})()");
+  assert.equal(aligned,true,'Preview layer must cover the board at the current panel scale');
+  await sleep(1300);assert.equal(await run("previewPiece('h4')"),'bQ');
+  await shot('move-preview-hover');
+  await call('Input.dispatchMouseEvent',{type:'mouseMoved',x:0,y:0},review.sessionId);
+  await sleep(260);assert.equal(await run("!!document.querySelector('.move-preview')"),false);
+  await call('Input.dispatchMouseEvent',{type:'mouseMoved',...point},review.sessionId);
+  await call('Input.dispatchMouseEvent',{type:'mousePressed',button:'left',clickCount:1,...point},review.sessionId);
+  await call('Input.dispatchMouseEvent',{type:'mouseReleased',button:'left',clickCount:1,...point},review.sessionId);
+  await sleep(240);assert.equal(await run("previewPiece('h4')"),'bQ');
+  await shot('move-preview-click');
+  await sleep(1100);assert.equal(await run("!!document.querySelector('.move-preview')"),false);
+  assert.equal(await reviewState(),beforePreview);
+  // Keyboard activation also gets a single preview; navigating cancels its timers.
+  await run("document.querySelector('.ip-move-link').focus()");
+  await call('Input.dispatchKeyEvent',{type:'keyDown',key:' ',code:'Space',windowsVirtualKeyCode:32},review.sessionId);
+  await call('Input.dispatchKeyEvent',{type:'keyUp',key:' ',code:'Space',windowsVirtualKeyCode:32},review.sessionId);
+  await sleep(240);assert.equal(await run("previewPiece('h4')"),'bQ');
+  await run("import('./analysis.js').then(m=>m.go(2))");
+  await sleep(1300);
+  assert.equal(await run("!!document.querySelector('.move-preview')"),false);
+  assert.equal(await run("import('./analysis.js').then(m=>m.S.idx)"),2);
   // Count natural wrapping for an actual generated explanation, including the
   // previous SAN wording, to answer whether two line breaks were already possible.
   await run(`import('./analysis.js').then(async m=>{

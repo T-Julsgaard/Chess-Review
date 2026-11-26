@@ -1270,6 +1270,10 @@ button { font-family: inherit; cursor: pointer; }
    square markers AND the classification badge (has-badge=7), so the arrow is never hidden */
 .board > svg.best-arrow { position: absolute; inset: 0; width: 100%; height: 100%;
   pointer-events: none; z-index: 8; }
+.board.previewing-move > :not(.move-preview) { visibility: hidden; }
+.move-preview { position: absolute; inset: 0; z-index: 200; pointer-events: none;
+  display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr);
+  background: var(--sq-light); border-radius: inherit; overflow: hidden; }
 /* user-drawn arrows (yellow/orange) — placed above the best-move arrow */
 .board > svg.user-arrows { position: absolute; inset: 0; width: 100%; height: 100%;
   pointer-events: none; z-index: 9; }

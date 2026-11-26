@@ -35,9 +35,11 @@ import { loadProfileWorkspace, loadProfileStory } from "./lib/profile-loader.js"
 import { createReviewEffects } from "./lib/review-effects.js";
 import { createSectionRail } from "./lib/section-rail.js";
 import { explainMove, explanationPv } from "./lib/move-explanation.js";
+import { createMovePreview } from "./lib/move-preview.js";
 import { createTranslator, loadLanguage, LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, isSupportedLanguage } from "./lib/i18n/index.js";
 
 const reviewEffects = createReviewEffects(document);
+const explanationPreview = createMovePreview();
 
 const screenPreview = createScreenPreviewContext(location);
 const blankLaunch = !location.hash;
@@ -1935,6 +1937,7 @@ async function profileIdentity(site) {
 // `handoff`: learning is already on its way out (it has given the stage back), so don't wait for it.
 async function openProfile({shared = null, handoff = false} = {}) {
   if (profileWorkspace || openingProfile || openingLearning) return;
+  explanationPreview.cancel();
   if (learningWorkspace && !(handoff && learningWorkspace.closing)) { await learningWorkspace.close(); if (learningWorkspace) return; }
   if (S.practice && (S.practice.rolling || S.practice.demoing || S.practice.busy)) {
     toast("Let the current practice move finish, then open the profile."); return;
@@ -1993,6 +1996,7 @@ async function openProfile({shared = null, handoff = false} = {}) {
 async function openLearning() {
   pauseBackgroundAnalysis();
   if (learningWorkspace || openingLearning || openingProfile) return;
+  explanationPreview.cancel();
   // From the profile: it stays on screen while learning loads, and hands over as learning mounts.
   const fromProfile = !!profileWorkspace;
   learningAnnouncement?.close();
@@ -2709,6 +2713,7 @@ function makePiece(type, side) {
     src: _url(`pieces-img/${setFolder}/${code}.svg`), alt: "", draggable: "false" });
 }
 function buildBoard() {
+  explanationPreview.cancel();
   _cancelBoardDrag?.();
   _cancelPromotion?.();
   if (learningWorkspace?.embedded || profileOwnsBoard()) return;
@@ -2746,6 +2751,7 @@ function matedSquare(fen) {
   return mateMarkSquare;
 }
 function paintBoard({restoring=false}={}) {
+  explanationPreview.cancel();
   if (profileOwnsBoard()) return;
   if (learningWorkspace?.embedded&&!restoring) return;
   const pos = activePos();
@@ -3203,6 +3209,10 @@ function requestPromotion(from, to, animate) {
 }
 function initBoardInput() {
   const wrap = UI.boardWrap;
+  wrap.addEventListener("pointerdown", () => explanationPreview.cancel(), true);
+  window.addEventListener("blur", () => explanationPreview.cancel());
+  document.addEventListener("visibilitychange", () => { if (document.hidden) explanationPreview.cancel(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") explanationPreview.cancel(); });
   wrap.addEventListener("contextmenu", (e) => e.preventDefault());
   // Never let the browser start its own image/element drag on the board (the stray ghost image).
   wrap.addEventListener("dragstart", (e) => {if (!learningWorkspace?.embedded) e.preventDefault();});
@@ -4051,8 +4061,12 @@ function typeWrite(node, text) {
 }
 let _explanationWriting = null;
 function explanationMoveLink(move, onMove, ...content) {
-  return el('button', {type: 'button', class: 'ip-move-link', title: move.san,
-    onclick: () => onMove(move)}, ...content);
+  return el('button', {type: 'button', class: 'ip-move-link', title: 'Preview ' + move.san,
+    onclick: e => onMove(move, e.currentTarget, false),
+    onpointerenter: e => { if (e.pointerType !== 'touch') onMove(move, e.currentTarget, true); },
+    onpointerleave: e => explanationPreview.release(e.currentTarget),
+    onpointercancel: () => explanationPreview.cancel(),
+    onblur: e => explanationPreview.release(e.currentTarget)}, ...content);
 }
 // Lay out the complete sentence first, then type each character in reading order.
 // Keeping the glyphs in normal text flow prevents wrapping and alignment
@@ -4682,6 +4696,7 @@ function analysisProgressText() {
   return `Analyzing … ${done}/${S.total}`;
 }
 function renderReview() {
+  explanationPreview.cancel();
   let entry = UI.reviewEntry.firstElementChild;
   if(S.blank){
     if (!entry?.matches(".learn-entry-button")) UI.reviewEntry.replaceChildren(solvePuzzlesButton());
@@ -4774,10 +4789,13 @@ function renderMoveComment() {
     beforePv: explanationPv(S.bests[S.idx - 1]), afterPv: explanationPv(S.bests[S.idx]),
   }) : null;
   const ply = S.idx, positionFen = S.positions[ply].fen;
-  const showMove = move => {
-    if (S.idx !== ply || S.positions[ply]?.fen !== positionFen || S.analysisMode || S.practice) return;
-    gotoMainline(ply + move.plyOffset);
-    playLine(move.uci);
+  const showMove = (move, owner, hold) => {
+    if (S.idx !== ply || S.positions[ply]?.fen !== positionFen || S.analysisMode || S.practice
+        || S.analyzing || S.autoTimer || S.reorganize || learningWorkspace || profileOwnsBoard()) return;
+    explanationPreview.show({board: UI.boardWrap.querySelector('.board'), squares: sqByName, makePiece,
+      currentFen: positionFen, baseFen: S.positions[ply + move.plyOffset]?.fen,
+      played: S.positions[ply], uci: move.uci, owner, hold, duration: animDuration(),
+      motion: S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches});
   };
   const assessment = el('div', {class: 'ip-assessment'},
     categoryText(cfg && COMMENT_PHRASE[cls] ? COMMENT_PHRASE[cls](san) : `${san}.`));
@@ -9133,6 +9151,7 @@ function mountReviewGame(payload, positions, saved, wasBlank) {
 }
 
 function resetReviewGame() {
+  explanationPreview.cancel();
   _cancelPromotion?.();
   _cancelBoardDrag?.();
   clearTimeout(_reanalyzeT);
