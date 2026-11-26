@@ -77,15 +77,15 @@ test('Chess.com lookup stays inside Insights, Moves and the move controls until 
 });
 
 for (const motion of ['on', 'off', 'reduced']) {
-  test(`opening an archive game switches directly to review with interface motion ${motion}`, async t => {
+  test(`opening an archive game reveals its moves with interface motion ${motion}`, async t => {
     const {a, select, search} = await launch(t);
     const {window} = a.dom;
     const preparation = deferred(), animations = [];
     a.state.settings.uiAnim = motion !== 'off';
     window.matchMedia = () => ({matches: motion === 'reduced'});
-    window.Element.prototype.animate = function (frames) {
+    window.Element.prototype.animate = function (frames, options) {
       const animation = {finished: Promise.resolve(), cancel() {}};
-      animations.push({node: this, frames, animation});
+      animations.push({node: this, frames, options, animation});
       return animation;
     };
     t.mock.method(globalThis, 'fetch', async () => Response.json({games: [game('12345', 1700000000)]}));
@@ -101,12 +101,55 @@ for (const motion of ['on', 'off', 'reduced']) {
     assert.equal(animations.length, 0);
 
     preparation.resolve(); await tick();
-    assert.equal(animations.length, 0);
+    assert.equal(animations.length, motion === 'on' ? 2 : 0);
+    for (const [index, {node, frames, options}] of animations.entries()) {
+      assert.ok(node.matches('#movesBody .ml-pair'));
+      assert.equal(frames[0].opacity, 0);
+      assert.equal(frames.at(-1).opacity, 1);
+      assert.equal(options.delay, index * 16);
+      assert.equal(options.duration, 180);
+      assert.equal(options.fill, 'backwards');
+    }
     assert.equal(a.state.blank, false);
     assert.equal(a.state.pgn, pgn);
     assert.equal(row.isConnected, false);
     assert.equal(analysisStarted, true);
     assert.ok(select('.ml-move[data-ply="1"]'));
+    a.call('renderMoves');
+    a.call('go', 1);
+    assert.equal(animations.length, motion === 'on' ? 2 : 0, 'progress and navigation do not replay the entrance');
+  });
+}
+
+for (const style of ['rows', 'cards', 'compact']) {
+  test(`long ${style} move lists finish their entrance quickly and library switches do not replay it`, async t => {
+    const {a, select} = await launch(t);
+    const chess = new Chess();
+    for (let cycle = 0; cycle < 24; cycle++) {
+      for (const san of ['Nf3', 'Nf6', 'Ng1', 'Ng8']) chess.move(san);
+    }
+    a.state.settings.mlStyle = style;
+    a.replace('loadBook', async () => {});
+    a.replace('loadCalibration', async () => {});
+    a.replace('startAnalysis', () => {});
+    const animations = [];
+    a.dom.window.Element.prototype.animate = function (frames, options) {
+      animations.push({node: this, options});
+    };
+    await a.call('applyGame', {pgn: chess.pgn(), source: 'archive'});
+    assert.equal(animations.length, style === 'compact' ? 96 : 48);
+    assert.ok(animations.every(({node}) => node.matches(style === 'compact' ? '.ml-move' : '.ml-pair')));
+    assert.ok(animations.every(({options}) => options.delay + options.duration <= 420));
+    assert.equal(animations[1].options.delay, 16);
+    const count = animations.length;
+    a.state.evals[2] = {cp: 0};
+    select('.ml-move[data-ply="2"]').click();
+    assert.equal(a.state.idx, 2, 'moves remain interactive during the reveal');
+    await a.call('applyGame', {pgn, source: 'library'});
+    assert.equal(animations.length, count);
+    a.call('closeReviewGame');
+    await a.call('applyGame', {pgn, source: 'library'});
+    assert.equal(animations.length, count, 'other ways of loading from the blank workspace stay unchanged');
   });
 }
 

@@ -6081,6 +6081,21 @@ function renderMoves() {
   highlightCurrentMove(true);
 }
 
+function revealLoadedMoves() {
+  if (S.settings.uiAnim === false || document.hidden || sectionRailPending || learningWorkspace || profileOwnsBoard()
+      || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+  // Rows land in a quick cascade. Compact notation gets the same rhythm per move.
+  // Bound the stagger so even a long game is fully revealed in under half a second.
+  const rows = UI.movesBody.querySelectorAll(".ml-pair");
+  const entries = rows.length ? rows : UI.movesBody.querySelectorAll(".ml-move");
+  for (const [index, node] of entries.entries()) {
+    node.animate?.([
+      {opacity: 0, transform: "perspective(500px) translateY(8px) rotateX(-12deg)", transformOrigin: "center top"},
+      {opacity: 1, transform: "none", transformOrigin: "center top"},
+    ], {duration: 180, delay: Math.min(index * 16, 240), easing: "cubic-bezier(.16,1,.3,1)", fill: "backwards"});
+  }
+}
+
 /* ---------------- Engine lines ---------------- */
 function enginePanelLineLimit() {
   return ENGINE_MAX_LINES;
@@ -9111,6 +9126,7 @@ async function applyGame(payload) {
     if (selection !== _librarySelection) return;
   }
   mountReviewGame(payload, positions, saved, wasBlank);
+  if (wasBlank && payload.source === "archive") revealLoadedMoves();
 }
 
 function mountReviewGame(payload, positions, saved, wasBlank) {
