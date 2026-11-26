@@ -97,10 +97,14 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
       hidden:[...node.querySelectorAll('.ip-written-char')].some(n=>+getComputedStyle(n).opacity<1)};
   })()`);
   assert.equal(writing.hidden,true,'Explanation should write out progressively');
-  await sleep(200);await shot('writing-explanation');
+  await sleep(200);
+  const ink=await run("[...document.querySelectorAll('.ip-text .ip-written-char')].map(n=>+getComputedStyle(n).opacity)");
+  assert.ok(ink.includes(0)&&ink.includes(1),'Text should be partway through typing');
+  assert.ok(ink.every(opacity=>opacity===0||opacity===1),'Characters appear crisply, without fading');
+  await shot('typing-explanation');
   await run("import('./analysis.js').then(m=>m.go(3))");
   assert.equal(await run("parseFloat(document.querySelector('.ip-written-char').style.getPropertyValue('--ink-delay'))<0"),true);
-  await sleep(1100);
+  await sleep(1800);
   const finished=await run(`(()=>{
     const node=document.querySelector('.insight-panel .ip-text'),r=node.getBoundingClientRect();
     return {text:node.textContent,rect:{x:r.x,y:r.y,width:r.width,height:r.height},

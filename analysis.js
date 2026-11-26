@@ -4054,7 +4054,7 @@ function explanationMoveLink(move, onMove, ...content) {
   return el('button', {type: 'button', class: 'ip-move-link', title: move.san,
     onclick: () => onMove(move)}, ...content);
 }
-// Lay out the complete sentence first, then let the ink appear in reading order.
+// Lay out the complete sentence first, then type each character in reading order.
 // Keeping the glyphs in normal text flow prevents wrapping and alignment
 // from moving while a sentence is written. No caret, sound or recurring timer.
 function writeExplanation(node, text, {key, fresh = false, offset = 0, length = text.length, parts = [{text}], onMove}) {
@@ -4062,8 +4062,8 @@ function writeExplanation(node, text, {key, fresh = false, offset = 0, length = 
   if (fresh) _explanationWriting = {key, started: now};
   const elapsed = _explanationWriting?.key === key ? now - _explanationWriting.started : Infinity;
   const motion = S.settings.uiAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  const step = Math.min(14, 1000 / Math.max(1, length));
-  const animate = motion && elapsed < length * step + 100;
+  const step = Math.min(24, 1800 / Math.max(1, length));
+  const animate = motion && elapsed < length * step + 1;
   let index = offset;
   node.replaceChildren(...parts.flatMap(part => {
     const glyphs = !animate ? [] : typeof Intl.Segmenter === 'function'
