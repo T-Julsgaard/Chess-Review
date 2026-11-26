@@ -2413,6 +2413,13 @@ button { font-family: inherit; cursor: pointer; }
 .practice-coach .ip-head .ip-move { margin-left: auto; font-size: 13px; color: var(--ink-2); font-weight: 700; }
 .ip-text { font-family: var(--font-mono); font-size: var(--ip-font, 13px); line-height: 1.5; color: var(--ink); min-height: 1.5em; text-wrap: pretty; }
 .ip-text.ip-good { color: var(--q-best); }
+.ip-assessment { font: 750 var(--ip-font, 13px)/1.35 var(--font-mono); color: var(--ink); overflow-wrap: anywhere; }
+.ip-assessment-row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; }
+.engine-explanation-detail { margin: 0; font: var(--ip-font, 13px)/1.45 var(--font-mono); color: var(--ink-2); }
+.ip-show-threat { flex: none; padding: 3px 8px; border: 1px solid var(--line);
+  border-radius: 3px; background: var(--panel-2); color: var(--ink-2); font: 600 11px/1.5 var(--font-ui); cursor: pointer; }
+.ip-show-threat:hover, .ip-show-threat[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
+.ip-show-threat:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .ip-sub { font-size: 12px; color: var(--ink-3); font-family: var(--font-mono); }
 .ip-note { font-family: var(--font-mono); font-size: var(--ip-font, 13px); line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
 /* same typography as the panel headers (e.g. "Accuracy") */

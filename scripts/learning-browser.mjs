@@ -22,6 +22,7 @@ await fs.appendFile(path.join(source,'analysis.js'),'\nexport {S, learningWorksp
 const profileSettingsOnly=process.argv.includes('--profile-settings');
 if(process.argv.includes('--profile')||process.argv.includes('--profile-story')||profileSettingsOnly||process.argv.includes('--profile-setup')||process.argv.includes('--profile-streaming')||process.argv.includes('--profile-portrait'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {openProfile, profileWorkspace, buildBoard, renderAll};\n');
 if(process.argv.includes('--interface-motion'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {setSetting};\n');
+if(process.argv.includes('--engine-explanations'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {setCoach, setCoachEngineReplies};\n');
 if(process.argv.includes('--engine-fit'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {setSetting};\n');
 if(process.argv.includes('--move-list-layout'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {renderMoves};\n');
 if(process.argv.includes('--engine-minimal')||process.argv.includes('--engine-fit'))await fs.appendFile(path.join(source,'analysis.js'),'\nexport {applyUiSetup, renderEngine, renderEngineCurrent, renderEnginePractice};\n');
@@ -85,6 +86,7 @@ try {
   else if(process.argv.includes('--viewport-growth'))await (await import('./viewport-growth-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--responsive-reference'))await (await import('./responsive-reference-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--responsive-layout'))await (await import('./responsive-layout-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
+  else if(process.argv.includes('--engine-explanations'))await (await import('./engine-explanations-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--review-interactions'))await (await import('./review-interactions-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--accuracy-motion'))await (await import('./accuracy-motion-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});
   else if(process.argv.includes('--accuracy-fit'))await (await import('./accuracy-fit-audit.mjs')).auditLearning({review,call,evaluate,waitFor,sleep,out});

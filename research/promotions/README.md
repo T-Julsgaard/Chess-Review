@@ -9,6 +9,11 @@ Acceptance is a maintainer decision; implementation and release are separate
 states. An experiment never edits the active calibration automatically.
 Retain decision records even when the candidate is rejected or superseded.
 
+[P010: Lightweight engine explanations](P010-lightweight-engine-explanations.md)
+curates selected static board facts and existing saved-PV tactics into concise
+Insights explanations, with a portrait-free switch and selected-move threat arrow.
+No additional engine searches or research-acceptance changes.
+
 [P009: Coherent annotation evidence](P009-brilliant-evidence-coherence.md) adopts
 the selected Brilliant source guard and fresh MultiPV progress groups. Numerical
 formulas and completed engine results stay unchanged; integration limits are recorded.

@@ -11,7 +11,7 @@ function review(t) {
   return a;
 }
 
-test('Coach offers text-only Engine explanations without changing Normal visuals or analysis',async t=>{
+test('Coach offers concise Engine explanations with an assessment and unchanged analysis',async t=>{
   const a=review(t),S=a.state,doc=a.dom.window.document;
   const snapshot=()=>JSON.stringify({pgn:S.pgn,idx:S.idx,evals:S.evals,classif:S.classif,grades:S.moveGrades,
     layout:S.layout,layoutMode:S.layoutMode,theme:S.settings.boardTheme,accent:S.settings.accent,mode:S.settings.reviewMode});
@@ -28,7 +28,8 @@ test('Coach offers text-only Engine explanations without changing Normal visuals
   assert.equal(doc.activeElement,control(true));
   const body=a.call('renderMoveComment');
   assert.equal(body.querySelector('.ip-head,.ip-badge,.ip-move'),null);
-  assert.equal(body.querySelector('.ip-text').textContent,'This allows Qh4#, checkmate. Black can end the game immediately; White has no legal answer to the check.');
+  assert.equal(body.querySelector('.ip-assessment').textContent,'g4 is a mistake.');
+  assert.equal(body.querySelector('.ip-text').textContent,'This allows Qh4#, checkmate. Better was g3.');
   assert.equal(body.querySelector('.dopamine-line,.dopamine-evaluation,.dopamine-detail'),null);
   assert.equal(doc.querySelector('.dopamine-comment,.dopamine-effect'),null);
   assert.equal(snapshot(),unchanged);
@@ -92,4 +93,76 @@ test('Dopamine keeps its existing explanations until an explicit Coach choice ov
   await a.call('setSetting','reviewMode','normal');
   assert.match(a.call('renderMoveComment').querySelector('.ip-text').textContent,/This allows Qh4#/);
   assert.equal(a.call('renderMoveComment').querySelector('.dopamine-line'),null);
+});
+
+test('Insights switch persists, restores the portrait and keeps keyboard focus',async t=>{
+  const a=review(t),S=a.state,doc=a.dom.window.document;
+  await a.call('setCoach','old_soviet');
+  const canvas=a.run('UI.canvas'),mod=a.run('UI.coach.closest(".mod")');
+  assert.equal(canvas.classList.contains('has-coach'),true);
+  const toggle=()=>doc.querySelector('.ip-explanations-toggle');
+  const close=doc.querySelector('.ip-close-game');
+  assert.ok(toggle().compareDocumentPosition(close)&doc.defaultView.Node.DOCUMENT_POSITION_FOLLOWING);
+  toggle().focus();toggle().click();await a.run('_settingsWriteQueue');await settle();
+  assert.equal(a.store.settings.coachEngineReplies,true);
+  assert.equal(toggle().getAttribute('aria-checked'),'true');
+  assert.equal(doc.activeElement,toggle());
+  assert.equal(mod.hidden,true);
+  assert.equal(canvas.classList.contains('has-coach'),false);
+  assert.equal(a.run('_coachFrame'),null);
+  assert.equal(S.settings.coach,'old_soviet');
+  toggle().click();await a.run('_settingsWriteQueue');await settle();
+  assert.equal(toggle().getAttribute('aria-checked'),'false');
+  assert.equal(mod.hidden,false);
+  assert.equal(canvas.classList.contains('has-coach'),true);
+  assert.ok(a.run('_coachFrame'));
+});
+
+test('Show threat previews the saved reply for either player without a search or score changes',async t=>{
+  const a=review(t),S=a.state,doc=a.dom.window.document;
+  await a.call('setCoachEngineReplies',true);
+  const snapshot=JSON.stringify([S.evals,S.bests,S.classif,S.moveGrades]);
+  const button=()=>doc.querySelector('.ip-show-threat');
+  button().click();await settle();
+  assert.equal(button().getAttribute('aria-pressed'),'true');
+  assert.equal(a.run('_reviewThreat.uci'),'d8h4');
+  assert.ok(doc.querySelector('svg.threat-arrow'));
+  assert.equal(S.helperEngine,null);
+  assert.equal(S.settings.showThreat,false);
+  S.flipped=!S.flipped;a.call('paintBoard');
+  assert.ok(doc.querySelector('svg.threat-arrow'));
+  button().click();await settle();
+  assert.equal(doc.querySelector('svg.threat-arrow'),null);
+  assert.equal(doc.activeElement,button());
+  button().click();await settle();
+  a.call('go',2);
+  assert.equal(doc.querySelector('svg.threat-arrow'),null);
+  assert.equal(a.run('_reviewThreat'),null);
+  a.call('go',3);
+  assert.equal(button().getAttribute('aria-pressed'),'false');
+  assert.equal(JSON.stringify([S.evals,S.bests,S.classif,S.moveGrades]),snapshot);
+
+  // Now the bad move belongs to Black: the preview must show White's reply.
+  loadGame(a,'1. e4 f6 2. d4 g5 3. Qh5#');S.idx=4;S.meSide='w';
+  S.classif[4]='blunder';S.evals[4]={mate:1};S.bests[4]={pv:'d1h5'};
+  a.call('paintBoard');a.call('renderReview');
+  button().click();await settle();
+  assert.equal(a.run('_reviewThreat.uci'),'d1h5');
+  assert.ok(doc.querySelector('svg.threat-arrow'));
+  assert.equal(S.helperEngine,null);
+  await a.call('setCoachEngineReplies',false);
+  assert.equal(doc.querySelector('svg.threat-arrow'),null);
+});
+
+test('threat previews abstain for good, terminal, illegal and provisional replies',async t=>{
+  const a=review(t),S=a.state;
+  await a.call('setCoachEngineReplies',true);
+  S.bests[3]={pv:'d8h4',lines:[{multipv:1,pv:'d8h4',bound:'lowerbound'}]};
+  assert.equal(a.call('renderMoveComment').querySelector('.ip-show-threat'),null);
+  S.bests[3]={pv:'a8a1'};
+  assert.equal(a.call('renderMoveComment').querySelector('.ip-show-threat'),null);
+  S.bests[3]={pv:'d8h4'};S.classif[3]='best';
+  assert.equal(a.call('renderMoveComment').querySelector('.ip-show-threat'),null);
+  S.idx=4;S.classif[4]='blunder';S.bests[4]={pv:'e1f2'};
+  assert.equal(a.call('renderMoveComment').querySelector('.ip-show-threat'),null);
 });

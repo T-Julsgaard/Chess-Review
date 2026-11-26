@@ -1,6 +1,6 @@
 # Research index
 
-Updated: 2026-10-18. Numerical research is paused; P009 records the separately
+Updated: 2026-11-26. Numerical research is paused; P009 records the separately
 authorized production implementation. The usage-monitor schedule is cancelled.
 The [numerical review checkpoints](NUMERICAL-REVIEW.md) track the new batch and
 reflection decisions. Coach expansion retains its separate approved queue.
@@ -13,6 +13,7 @@ records. Update a row and the active experiment's resume state when work stops.
 
 | ID | Question / record | State | Outcome / evidence | Next action |
 | --- | --- | --- | --- | --- |
+| P010 | [Lightweight engine explanations](promotions/P010-lightweight-engine-explanations.md) | implemented locally | 2,024 production tests, source verification and three Chrome layouts pass; saved-PV threats and selected static board facts; research acceptance unchanged | Gather feedback on concise Insights explanations; no extra explanation searches |
 | P009 | [Coherent Brilliant evidence](promotions/P009-brilliant-evidence-coherence.md) | implemented locally |495/495 tests;252 fixture rows/54 final results/924 progress snapshots preserved; four real-Chrome case/build checks and exact public replay pass | No model/threshold changes or automatic research; unchanged baseline lint errors recorded |
 | P008 | [Current, complete scoring evidence](promotions/P008-scoring-evidence-integrity.md) | implemented locally | Missing decisions cannot inflate full-game accuracy; stale ratings and malformed caches refused; 162 scoring/category/engine/cache checks and exact public replay pass; new predictive models not validated | Fresh opportunity-aware rating study and independent category reviews; browser/full-worktree limits recorded |
 | P007 | [Focused coach lessons and smaller default profile](promotions/P007-focused-coach-lessons.md) | implemented locally | One supported lesson with a thinking prompt; diagnostics collapsed, route/tempo proofs optional, short exchange and mate checks retained; 385 production tests, 42 packaged layout cases and real-engine Firefox smoke pass; research acceptance unchanged | Gather user feedback on lesson relevance; preserve original source scopes |

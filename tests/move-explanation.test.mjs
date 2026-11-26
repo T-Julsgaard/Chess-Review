@@ -14,7 +14,8 @@ test('explains an immediate mating consequence with a legal, playable alternativ
   const result = explainMove({...position('1. f3 e5', 'g4'),
     beforeScore:{cp:-30}, afterScore:{mate:-1}, beforePv:'g2g3 d7d5', afterPv:'d8h4'});
   assert.equal(result.summary, 'This allows Qh4#, checkmate.');
-  assert.match(result.detail, /Black can end the game/);
+  assert.equal(result.detail, 'Better was g3.');
+  assert.equal(result.threat.uci, 'd8h4');
   assert.equal(result.reply.san, '2… Qh4#');
   assert.equal(result.alternative.move, 'g3');
   assert.equal(result.evaluation, '-0.3 → mate for Black');
@@ -24,9 +25,9 @@ test('uses the correct perspective when Black allows mate or loses evaluation', 
   const mate = explainMove({...position('1. e4 f6 2. d4', 'g5'),
     beforeScore:{cp:50}, afterScore:{mate:1}, afterPv:'d1h5'});
   assert.equal(mate.summary, 'This allows Qh5#, checkmate.');
-  assert.match(mate.detail, /White can end the game/);
+  assert.equal(mate.threat.uci, 'd1h5');
   const cp = explainMove({...position('1. e4', 'e5'), beforeScore:{cp:20}, afterScore:{cp:220}});
-  assert.equal(cp.summary, 'This gives up 2.0 pawns of engine evaluation.');
+  assert.equal(cp.summary, 'This gives the opponent a much stronger position.');
 });
 
 test('describes en passant at the captured pawn’s square and does not call an even trade a material win', () => {
@@ -74,7 +75,7 @@ test('names forks allowed by the reply, including pawn forks and forks with chec
   const knight = fromFen('r3k3/8/8/8/1n6/8/7P/R3K3 w Qq - 0 1', 'h3',
     {category:'blunder', beforeScore:{cp:0}, afterScore:{cp:-500}, afterPv:'b4c2 e1d2 c2a1'});
   assert.equal(knight.summary, 'Black can reply Nc2+, forking the king and the rook on a1.');
-  assert.equal(knight.detail, 'The check must be answered first, leaving the rook on a1 exposed. In the shown engine line, White loses a net 5 points of material.');
+  assert.equal(knight.detail, 'The check must be answered first, leaving the rook on a1 exposed.');
   const pawn = fromFen('4k3/8/8/2n1b3/8/8/3P4/3QK3 b - - 0 1', 'Kd7', {category:'mistake', afterPv:'d2d4'});
   assert.equal(pawn.summary, 'White can reply d4, forking the knight on c5 and the bishop on e5.');
   assert.equal(pawn.detail, "Black can't move both pieces at once.");
@@ -107,7 +108,7 @@ test('explains loose pieces, removed defenders and captures with a cheaper piece
   assert.match(cheap.summary, /capturing the pawn on e5/);
   const pawnTakes = fromFen('4k3/8/8/3n4/4P3/8/8/4K3 b - - 0 1', 'Ke7', {category:'blunder', afterPv:'e4d5'});
   assert.equal(pawnTakes.summary, 'White can reply exd5, capturing the undefended knight on d5.');
-  assert.equal(pawnTakes.detail, 'The knight on d5 was loose: nothing defended it.');
+  assert.equal(pawnTakes.detail, '');
 });
 
 test('a capture that also checks mentions both, and discovered and double checks are named', () => {
@@ -123,38 +124,42 @@ test('a capture that also checks mentions both, and discovered and double checks
 test('quotes a mating line only when the board confirms it mates in the reported distance', () => {
   const inputs = {category:'blunder', beforeScore:{cp:-200}, afterScore:{mate:-2}};
   const shown = fromFen('k2q4/pp6/8/8/8/8/4RPPP/R5K1 w - - 0 1', 'Ra3', {...inputs, afterPv:'d8d1 e2e1 d1e1'});
-  assert.equal(shown.detail, 'Stockfish reports mate in 2: 1… Qd1+ 2. Re1 Qxe1#.');
+  assert.equal(shown.detail, 'Mating line: 1… Qd1+ 2. Re1 Qxe1#.');
   const short = fromFen('k2q4/pp6/8/8/8/8/4RPPP/R5K1 w - - 0 1', 'Ra3', {...inputs, afterPv:'d8d1 e2e1'});
-  assert.equal(short.detail, 'Stockfish reports mate in 2.');
+  assert.equal(short.summary, 'This allows mate in 2 for Black.');
+  assert.equal(short.detail, '');
+  assert.equal(short.threat, null);
   const wrongLength = fromFen('k2q4/pp6/8/8/8/8/4RPPP/R5K1 w - - 0 1', 'Ra3', {...inputs, afterScore:{mate:-3}, afterPv:'d8d1 e2e1 d1e1'});
-  assert.equal(wrongLength.detail, 'Stockfish reports mate in 3.');
+  assert.equal(wrongLength.summary, 'This allows mate in 3 for Black.');
+  assert.equal(wrongLength.detail, '');
+  assert.equal(wrongLength.threat, null);
   const lost = fromFen('6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1', 'h3', {category:'blunder', beforeScore:{mate:1}, afterScore:{cp:300}, beforePv:'e1e8'});
-  assert.equal(lost.detail, 'Before this move, Stockfish reported mate in 1 for White: 1. Re8#.');
+  assert.equal(lost.detail, 'Better was Re8#.');
 });
 
 test('a miss leads with the tactic that was available, and weak moves name a better tactic', () => {
   const miss = fromFen('r3k3/8/8/8/1n6/8/8/R3K3 b Qq - 0 1', 'Ke7',
     {category:'miss', beforeScore:{cp:-500}, afterScore:{cp:0}, beforePv:'b4c2 e1d2 c2a1'});
   assert.equal(miss.summary, 'This misses Nc2+, forking the king and the rook on a1.');
-  assert.equal(miss.detail, 'This gives up 5.0 pawns of engine evaluation.');
+  assert.equal(miss.detail, '');
   const better = explainMove({...position('1. e4 e5 2. Nf3 Nc6 3. Nxe5', 'a6'),
     beforeScore:{cp:0}, afterScore:{cp:300}, beforePv:'c6e5', afterPv:'d2d4'});
-  assert.equal(better.detail, "White's strongest reply is d4. Better was Nxe5, capturing the undefended knight on e5.");
+  assert.equal(better.detail, 'Better was Nxe5.');
 });
 
 test('weak moves without scores still name the strongest reply instead of a vague line', () => {
   const result = explainMove({...position('1. e4', 'e5'), category:'mistake', afterPv:'g1f3'});
-  assert.equal(result.summary, 'Stockfish prefers a different move here.');
-  assert.equal(result.detail, "White's strongest reply is Nf3.");
+  assert.equal(result.summary, 'A stronger move was available.');
+  assert.equal(result.detail, "White's best reply is Nf3.");
 });
 
 test('good moves describe what they do on the board', () => {
   const fork = fromFen('r3k3/8/8/8/1n6/8/8/R3K3 b Qq - 0 1', 'Nc2+', {category:'best'});
-  assert.equal(fork.detail, 'It forks the king and the rook on a1.');
+  assert.equal(fork.summary, 'It forks the king and the rook on a1.');
   const skewer = fromFen('K7/8/7r/8/5k2/8/8/2B5 w - - 0 1', 'Bd2+', {category:'excellent'});
-  assert.equal(skewer.detail, 'It skewers the king and the rook on h6 behind it.');
+  assert.equal(skewer.summary, 'It skewers the king and the rook on h6 behind it.');
   const mate = fromFen('6k1/5ppp/8/8/8/8/5PPP/3QR1K1 w - - 0 1', 'Qd7', {category:'best', afterScore:{mate:1}, afterPv:'g8f8 d7e8'});
-  assert.equal(mate.detail, 'Stockfish reports mate in 1 for White: 1… Kf8 2. Qe8#.');
+  assert.equal(mate.summary, 'This keeps a forced mate in 1: 1… Kf8 2. Qe8#.');
   const book = explainMove({...position('1. e4 e5 2. Nf3', 'Nc6'), category:'book'});
   assert.equal(book.detail, '');
 });
@@ -162,7 +167,8 @@ test('good moves describe what they do on the board', () => {
 test('a brilliant sacrifice names the piece given up', () => {
   const result = explainMove({...position('1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. Ng5 d5 5. exd5 Nxd5', 'Nxf7'),
     category:'brilliant', beforeScore:{cp:30}, afterScore:{cp:60}});
-  assert.equal(result.detail, "It gives up the knight for a pawn. After the sacrifice, the engine evaluation is +0.6 (White's perspective).");
+  assert.equal(result.summary, 'It gives up the knight for a pawn.');
+  assert.equal(result.detail, '');
 });
 
 test('explanation evidence selects the exact top line and handles older results without lines', () => {
@@ -174,8 +180,9 @@ test('explanation evidence selects the exact top line and handles older results 
 
 test('a mating evaluation is not presented as proof that a separate reply line gives mate', () => {
   const result=explainMove({...position('1. f3 e5','g4'),beforeScore:{cp:-30},afterScore:{mate:-1},afterPv:'d7d6'});
-  assert.equal(result.summary,'This allows a forced mate for Black.');
-  assert.equal(result.detail,'Stockfish reports mate in 1.');
+  assert.equal(result.summary,'This allows mate in 1 for Black.');
+  assert.equal(result.detail,'');
+  assert.equal(result.threat,null);
   assert.equal(result.reply.san,'2… d6');
 });
 
@@ -198,6 +205,44 @@ test('provisional lines cannot reappear through the root result fallback', t => 
   const body=a.call('renderMoveComment');
   assert.equal(body.querySelector('.dopamine-line'), null);
   assert.doesNotMatch(body.querySelector('.ip-text').textContent, /Qh4/);
+});
+
+test('quiet explanations select a changed, concrete fact for either side', () => {
+  const develop=explainMove({...position('1. e4 e5','Nf3'),category:'best'});
+  assert.match(develop.summary,/knight develops and controls d4 and e5/);
+  const black=explainMove({...position('1. e4 e5 2. Nf3','Nc6'),category:'excellent'});
+  assert.equal(black.summary,'This defends the pawn on e5, which was under attack.');
+  const opening=explainMove({...position('1. Nf3 Nf6','e3'),category:'best'});
+  assert.equal(opening.summary,'This opens a diagonal for the bishop on f1.');
+  const castle=explainMove({...position('1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5','O-O'),category:'good'});
+  assert.match(castle.summary,/Castling/);
+  const file=fromFen('4k3/7p/8/8/8/8/7P/R3K3 w - - 0 1','Rc1',{category:'best'});
+  assert.match(file.summary,/open c-file/);
+  const blocked=fromFen('4k3/7p/8/8/2P5/8/7P/R3K3 w - - 0 1','Rc1',{category:'best'});
+  assert.doesNotMatch(blocked.summary,/open c-file/);
+  const semi=fromFen('4k3/2p4p/8/8/8/8/7P/R3K3 w - - 0 1','Rc1',{category:'best'});
+  assert.match(semi.summary,/semi-open c-file/);
+  const passer=fromFen('4k3/8/8/8/3P4/8/8/4K3 w - - 0 1','d5',{category:'best'});
+  assert.match(passer.summary,/passed pawn/);
+  const enemy=fromFen('4k3/2p5/8/8/3P4/8/8/4K3 w - - 0 1','d5',{category:'best'});
+  assert.doesNotMatch(enemy.summary,/passed pawn/);
+  const connect=fromFen('4k3/7p/8/8/8/8/7P/R2Q1RK1 w - - 0 1','Qd2',{category:'best'});
+  assert.match(connect.summary,/connects the rooks/);
+  const defend=fromFen('4k3/1b6/8/8/4P3/8/5P2/3QK3 w - - 0 1','f3',{category:'best'});
+  assert.match(defend.summary,/defends the pawn on e4/);
+});
+
+test('weak moves prioritize the reply and name quiet alternatives without praising the bad move', () => {
+  const result=explainMove({...position('1. f3 e5','g4'),beforePv:'e2e3',afterPv:'d8h4',afterScore:{mate:-1}});
+  assert.match(result.summary,/Qh4#/);
+  assert.equal(result.detail,'Better was e3.');
+  assert.doesNotMatch(result.summary+result.detail,/diagonal|develop/);
+  const quiet=explainMove({...position('1. e4 e5','a3'),beforePv:'g1f3',category:'inacc'});
+  assert.equal(quiet.summary,'Better was Nf3.');
+  assert.match(quiet.detail,/knight develops/);
+  // A matching played move is never offered as its own improvement.
+  const same=explainMove({...position('1. e4 e5','Nf3'),beforePv:'g1f3',category:'inacc'});
+  assert.equal(same.alternative,null);
 });
 
 test('Dopamine explanations and exploration are opt-in and leave scores and Normal commentary intact', async t => {

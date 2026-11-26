@@ -3083,20 +3083,25 @@ function threatFen(fen) {
 }
 // Draw the opponent's best move as if it were their turn.
 let _threatToken = 0;
+// A selected-move preview uses the saved legal reply, regardless of player side.
+// It never invokes the helper engine or changes the global threat-arrow setting.
+let _reviewThreat = null;
 async function renderThreatArrow() {
   if (S.helperEngine?.dead) resetHelperEngine();
   const token = ++_threatToken;
   if (learningWorkspace?.embedded || profileOwnsBoard()) return;
-  const board = UI.boardWrap.querySelector(".board");
+  const board = UI.boardWrap?.querySelector(".board");
   if (!board) return;
   let svg = board.querySelector("svg.threat-arrow");
   const clear = () => { if (svg) svg.remove(); };
+  if (_reviewThreat && (!engineExplanationsEnabled() || S.analysisMode || S.analyzing || S.practice
+    || S.lineWalking || S.idx !== _reviewThreat.ply || activePos().fen !== _reviewThreat.fen)) _reviewThreat = null;
   // Off, mid-analysis, during a line walk or practice → no threat arrow.
-  if (!S.settings.showThreat || S.analyzing || S.lineWalking || S.practice) { clear(); return; }
+  if ((!S.settings.showThreat && !_reviewThreat) || S.analyzing || S.lineWalking || S.practice) { clear(); return; }
   const fen = activePos().fen;
   if (terminalScore(fen)) { clear(); return; }
   const history = activeSearchHistory(), historyKey = JSON.stringify(history), cacheKey = fen + historyKey;
-  let uci = S.threatCache.get(cacheKey);
+  let uci = _reviewThreat ? _reviewThreat.uci : S.threatCache.get(cacheKey);
   if (uci === undefined) {
     let eng; try { eng = await getHelperEngine(); } catch { return; }
     if (token !== _threatToken || learningWorkspace?.embedded || profileOwnsBoard() || !S.settings.showThreat) return;
@@ -4051,6 +4056,14 @@ function openingStrip() {
     el("div", { class: "ip-opening", title: line },
       el("span", { class: "ip-op-ic", html: ICONS.book || "" }),
       el("span", { class: "ip-op-txt" }, line)),
+    el("button", { type: "button", class: "ip-explanations-toggle", role: "switch",
+      "aria-label": settingsText("Engine explanations"), "aria-checked": String(engineExplanationsEnabled()),
+      title: settingsText("Engine explanations"),
+      onclick: async () => {
+        await setCoachEngineReplies(!engineExplanationsEnabled());
+        UI.review.querySelector(".ip-explanations-toggle")?.focus();
+      } }, el("span", { class: "ip-toggle-track", "aria-hidden": "true" },
+        el("span", { class: "ip-toggle-thumb" }, el("span", { class: "ip-toggle-tick" })))),
     !screenPreview && el("button", {type: "button", class: "ip-close-game", title: "Close game",
       "aria-label": "Close game", onclick: closeReviewGame}, icon("close")));
 }
@@ -4103,6 +4116,8 @@ async function setCoachPlain(plain) {
   S.coach = plain ? null : await loadCoach(S.settings.coach);
   _ipSig = null;                                   // re-pick + re-type in the new voice
   if (S.practice) S.practice.coachTyped = false;
+  renderCoachAvatar();
+  renderThreatArrow();
   renderReview();
   if (UI.settings && !UI.settings.hidden) renderSettings();
 }
@@ -4117,6 +4132,9 @@ async function setCoachEngineReplies(enabled) {
   await writeSettings(patch);
   _ipSig = null;
   if (S.practice) S.practice.coachTyped = false;
+  _reviewThreat = null;
+  renderThreatArrow();
+  renderCoachAvatar();
   renderReview();
   if (UI.settings && !UI.settings.hidden) renderSettings();
 }
@@ -4247,7 +4265,7 @@ function bindCoachPointer() {
 function renderCoachAvatar() {
   if (!UI || !UI.coach) return;
   const id = S.settings.coach || "";
-  const rig = S.blank ? null : COACH_RIGS[id];
+  const rig = S.blank || engineExplanationsEnabled() ? null : COACH_RIGS[id];
   const mod = UI.coach.closest(".mod");
   UI.canvas.classList.toggle("has-coach", !!rig);   // the insight text leaves room for the portrait
   if (!rig) {                                   // "Off" or no rig built yet → hide the module entirely
@@ -4635,6 +4653,10 @@ function renderMoveComment() {
   const cls = S.classif[S.idx];
   const san = S.positions[S.idx].san || "";
   const cfg = cls && QUALITY[cls];
+  const assessmentRow = engineReplies ? el("div", { class: "ip-assessment-row" },
+    el("div", { class: "ip-assessment" },
+      categoryText(cfg && COMMENT_PHRASE[cls] ? COMMENT_PHRASE[cls](san) : `${san}.`))) : null;
+  if (assessmentRow) body.append(assessmentRow);
   // Modern already shows the evaluation in its evaluation panel.
   const ev = S.evals[S.idx];
   const evCp = ev ? scoreToCp(ev) : null;
@@ -4674,8 +4696,20 @@ function renderMoveComment() {
     if (dopamine || explanation) { clearTimeout(_typeT); coachTalk(false); txt.textContent = _ipText; }
     else typeWrite(txt, _ipText);
   } else txt.textContent = _ipText;
+  if (dopamine && explanation?.detail) body.append(el("p", { class: "engine-explanation-detail" }, explanation.detail));
+  if (explanation?.threat) {
+    const ply = S.idx, fen = S.positions[ply].fen, uci = explanation.threat.uci;
+    const showing = _reviewThreat?.ply === ply && _reviewThreat.fen === fen && _reviewThreat.uci === uci;
+    assessmentRow.append(el("button", { type: "button", class: "ip-show-threat", "aria-pressed": String(showing),
+      title: explanation.threat.san,
+      onclick: () => {
+        if (S.idx !== ply || S.positions[ply]?.fen !== fen || S.analysisMode || S.practice) return;
+        _reviewThreat = {ply, fen, uci: showing ? null : uci};
+        renderThreatArrow(); renderReview();
+        UI.review.querySelector(".ip-show-threat")?.focus();
+      } }, settingsText(showing ? "Hide threat" : "Show threat")));
+  }
   if (dopamine && explanation) {
-    if (explanation.detail) body.append(el("p", { class: "dopamine-detail" }, explanation.detail));
     if (explanation.evaluation) body.append(el("span", { class: "dopamine-evaluation" }, "Evaluation · " + explanation.evaluation + " · White’s perspective"));
     const ply = S.idx;
     const lines = el("div", { class: "dopamine-lines" });
@@ -6881,14 +6915,14 @@ function reviewSettings() {
     section("Coach",
       coachPicker(),
       S.settings.coach ? el("div", { class: "set-row" },
-        setLabel("Special replies", "The coach narrates in their own voice. Turning this on switches off Engine explanations; the character still appears and reacts with either reply type."),
+        setLabel("Special replies", "The coach narrates in their own voice. Turning this on switches off Engine explanations and restores the coach portrait."),
         el("div", { class: "set-seg", role: "group", "aria-label": "Special replies" },
           el("button", { type: "button", "data-setting": "coachPlain", "data-value": "false", "aria-pressed": String(specialReplies), class: specialReplies ? "on" : "", onclick: () => setCoachPlain(false) }, "On"),
           el("button", { type: "button", "data-setting": "coachPlain", "data-value": "true", "aria-pressed": String(!specialReplies), class: !specialReplies ? "on" : "", onclick: () => setCoachPlain(true) }, "Off"),
         ),
       ) : null,
       el("div", { class: "set-row" },
-        setLabel("Engine explanations", "Explain moves using the existing local Stockfish analysis. Works with any theme or without a coach. Turning this on switches off Special replies."),
+        setLabel("Engine explanations", "Short explanations from the existing local Stockfish analysis. Hides the coach portrait to make room for the explanation. Also available in Insights."),
         el("div", { class: "set-seg", role: "group", "aria-label": "Engine explanations" },
           ...[true, false].map(enabled => el("button", { type: "button", "data-setting": "coachEngineReplies", "data-value": String(enabled),
             "aria-pressed": String(engineExplanationsEnabled() === enabled), class: engineExplanationsEnabled() === enabled ? "on" : "",
@@ -7511,7 +7545,7 @@ async function setSetting(key, value) {
   S.settings[key] = value;
   await writeSettings({ [key]: value, ...setupPatch }, key === "badgeSymbols" ? ["badgeSymbols"] : []);
   applySettings();
-  if (key === "reviewMode") { paintBoard(); renderReview(); fitViewport(); }
+  if (key === "reviewMode") { renderCoachAvatar(); paintBoard(); renderReview(); fitViewport(); }
   if (design?.panel.startsWith('accuracy')) { statsRefs = null; hideQTip(); renderStats(); if(key==='accuracyDesign')reflowAccuracy(accuracyLayoutExpanded()); }
   if (key === 'movesDesign') updateMovesDesign();
   if (key === 'engineDesign') renderEngineCurrent();
