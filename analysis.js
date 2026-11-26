@@ -4076,7 +4076,7 @@ function writeExplanation(node, text, {key, fresh = false, offset = 0, length = 
   if (fresh) _explanationWriting = {key, started: now};
   const elapsed = _explanationWriting?.key === key ? now - _explanationWriting.started : Infinity;
   const motion = S.settings.uiAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  const step = Math.min(18, 1350 / Math.max(1, length));
+  const step = Math.min(9, 675 / Math.max(1, length));
   const animate = motion && elapsed < length * step + 1;
   let index = offset;
   node.replaceChildren(...parts.flatMap(part => {
@@ -4772,6 +4772,7 @@ function renderMoveComment() {
   if (head) body.append(head);
   if (S.idx === 0) {
     if (head) head.classList.add("ip-head-spacer");
+    if (engineReplies) body.append(el("div", { class: "ip-assessment-row", "aria-hidden": "true" }));
     const sig = "start:" + (S.settings.coach || "");
     const fresh = sig !== _ipSig;
     if (fresh) { _ipText = (S.coach && coachLine("non_move_states", "starting_position", {})) || "Use ← and → to step through the game."; _ipSig = sig; }

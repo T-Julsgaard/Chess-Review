@@ -28,6 +28,16 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     await shot(`coach-${width}`);
     await run("document.querySelector('.ip-explanations-toggle').click()");
     await waitFor(review,"!document.querySelector('.coach-frame')",'Coach exit animation');
+    await run("import('./analysis.js').then(m=>m.go(0))");
+    await waitFor(review,"document.querySelector('.insight-panel .ip-text').textContent==='Use ← and → to step through the game.'",'Starting hint');
+    const hintTop=await run("document.querySelector('.insight-panel .ip-text').getBoundingClientRect().top");
+    await shot(`starting-hint-${width}`);
+    await run("import('./analysis.js').then(m=>m.go(1))");
+    const explanationTop=await run("document.querySelector('.insight-panel .ip-text').getBoundingClientRect().top");
+    assert.ok(Math.abs(hintTop-explanationTop)<1,'Starting hint aligns with the first explanation');
+    await run("Promise.all(document.querySelector('.insight-panel .ip-text').getAnimations({subtree:true}).map(animation=>animation.finished.catch(()=>{}))).then(()=>true)");
+    await shot(`first-explanation-${width}`);
+    await run("import('./analysis.js').then(m=>m.go(3))");
     const state=await run(`(()=>{
       const toggle=document.querySelector('.ip-explanations-toggle'),close=document.querySelector('.ip-close-game');
       const t=toggle.getBoundingClientRect(),x=close.getBoundingClientRect();

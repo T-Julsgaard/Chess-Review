@@ -184,7 +184,7 @@ test('explanations write out without changing their text or restarting on a repa
   now=200;a.call('renderReview');
   assert.equal(text().querySelector('.ip-written-char').style.getPropertyValue('--ink-delay'),'-200ms');
   assert.equal(text().textContent,full);
-  now=2000;a.call('renderReview');
+  now=700;a.call('renderReview');
   assert.equal(text().querySelector('.ip-written-char'),null);
   assert.equal(text().textContent,full);
   a.call('go',2);a.call('go',3);

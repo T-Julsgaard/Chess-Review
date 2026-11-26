@@ -2435,6 +2435,7 @@ button { font-family: inherit; cursor: pointer; }
 [data-archive-motion="off"] .ip-written-char { animation: none; }
 .ip-assessment { font: 750 var(--ip-font, 13px)/1.35 var(--font-mono); color: var(--ink); overflow-wrap: anywhere; }
 .ip-assessment-row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; }
+.ip-assessment-row:empty { min-height: max(24px, calc(var(--ip-font, 13px) * 1.35)); }
 /* Keep ordinary move comments at the top, without a
    small scroll range when the explanation wraps. Rich exploration stays scrollable. */
 .stage .ip-body.move-comment:not(.dopamine-comment) {
