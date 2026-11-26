@@ -1659,12 +1659,6 @@ function buildUI() {
       el("div", { class: "brand-name", html: 'Chess <span>/ Review</span>' }),
     ),
     el("div", { class: "topbar-right" },
-      el("button", { type:"button", id:"learningToggle", class:"icon-btn learning-toggle", onclick:toggleLearning },
-        el("span", {class:"learning-toggle-icon", "aria-hidden":"true"}, icon("book")),
-        el("span", {class:"learning-toggle-label"}, "Learn with Chess review")),
-      el("button", { type:"button", id:"profileToggle", class:"icon-btn learning-toggle profile-toggle", onclick:toggleProfile },
-        el("span", {class:"learning-toggle-icon", "aria-hidden":"true"}, icon("trophy")),
-        el("span", {class:"learning-toggle-label"}, "Player profile")),
       // aria-label (not title) → keeps the buttons labelled for screen readers without the native
       // hover tooltip the user found unnecessary.
       el("button", { class: "icon-btn", "data-game-action":"", "aria-label": "Flip board", onclick: toggleFlip }, icon("flip")),
@@ -1743,8 +1737,9 @@ function buildUI() {
 
   const saveStatus = el("div", {class:"review-save-status", hidden:true, "aria-live":"polite"});
   sectionRail = createSectionRail({document, onSelect:selectSection, motion:()=>S.settings.uiAnim!==false});
-  root.append(el("div", { class: "app" }, topbar, el("div", {class:"review-viewport"}, canvas), settings, libRail, saveStatus,
-    sectionRail.element, feedbackLink("feedback-floating", el("span", {}, "Feedback"))));
+  root.append(el("div", { class: "app" }, topbar, sectionRail.element,
+    el("div", {class:"review-viewport"}, canvas), settings, libRail, saveStatus,
+    feedbackLink("feedback-floating", el("span", {}, "Feedback"))));
 
   UI = {
     settings, canvas, boardWrap,
@@ -1767,7 +1762,8 @@ function buildUI() {
     UI.boardObserver.observe(boardWrap);
   }
   watchSectionRail();
-  syncSectionRail({animate:false});
+  sectionRail.set(currentSection(), {animate:false});
+  placeSectionRail();
 }
 
 /* ---------------- Section rail (Review / Learn / Playstyle) ---------------- */
@@ -1797,12 +1793,17 @@ function placeSectionRail() {
   sectionRailFrame = 0;
   if (!sectionRail?.element.isConnected) return;
   const topbar = document.querySelector(".topbar")?.getBoundingClientRect();
-  const shown = sectionRail.place(S.reorganize ? null : sectionRailTarget(), {top:(topbar?.bottom || 0) + 8});
+  const compact = sectionRail.element.matches(".is-compact:not([hidden])");
+  const besidePanels = sectionRail.place(sectionRailTarget(), {top:topbar?.bottom || 0, hidden:S.reorganize});
+  if (compact !== sectionRail.element.matches(".is-compact:not([hidden])")) {
+    learningWorkspace?.positionEmbedded?.();
+    if (profileOwnsBoard()) profileWorkspace.reposition?.();
+  }
   // The floating Feedback pill tucks down to its icon when the rail's last label would touch it.
   const feedback = document.querySelector(".app > .feedback-floating");
   if (!feedback) return;
   feedback.classList.remove("rail-tucked");
-  if (!shown) return;
+  if (!besidePanels) return;
   const pill = feedback.getBoundingClientRect(), rail = sectionRail.element.getBoundingClientRect();
   const touches = pill.width && pill.left < rail.right + 8 && pill.right > rail.left - 8 && pill.top < rail.bottom + 8 && pill.bottom > rail.top - 8;
   feedback.classList.toggle("rail-tucked", touches);
@@ -1867,7 +1868,10 @@ async function selectSection(section, {shared = null} = {}) {
     try {
       if (target.section === "review") {
         if (profileWorkspace) await profileWorkspace.close();
-        if (learningWorkspace) await learningWorkspace.close();
+        if (learningWorkspace) {
+          if (!learningWorkspace.closing) learningWorkspace.previousFocus = sectionRail?.buttons.get("review");
+          await learningWorkspace.close();
+        }
       } else {
         // Playstyle can mount while Learn is still leaving. Wait for that Learn instance to
         // finish before reopening it, since its close callback would clear the new instance.
@@ -1913,26 +1917,9 @@ function reviewEntryButton(className, label, glyph, activate) {
     },
   }, icon(glyph), el("span", { class: "review-entry-label" }, label));
 }
-function toggleLearning() {
-  return selectSection(learningWorkspace ? "review" : "learn");
-}
 let profileWorkspace = null;
 let openingProfile = false;
 function profileOwnsBoard() { return !!profileWorkspace && !profileWorkspace.closed; }
-function toggleProfile() {
-  return selectSection(profileWorkspace ? "review" : "playstyle");
-}
-function syncProfileToggle() {
-  syncSectionRail();
-  const button=document.getElementById("profileToggle");
-  if(!button)return;
-  const open=!!profileWorkspace, mode=open?"learning":"review";
-  button.dataset.motion=S.settings.uiAnim===false?"off":"on";
-  if(button.dataset.mode===mode)return;
-  button.querySelector(".learning-toggle-label").textContent=open?"Return to Game review":"Player profile";
-  button.querySelector(".learning-toggle-icon").replaceChildren(icon(open?"prev":"trophy"));
-  button.dataset.mode=mode;
-}
 // Who could this profile be about? Signed-in and remembered accounts for the site first, then the
 // player who recurs across reviewed games, then the legacy saved username (Chess.com only).
 async function profileIdentity(site) {
@@ -1993,25 +1980,16 @@ async function openProfile({shared = null, handoff = false} = {}) {
     createAnalysisEngine:()=>createEngine({Threads:1, Hash:16, "Skill Level":20}),
     requestClose:()=>profileWorkspace?.close(),
     restoreBoard:()=>{ if(!UI.boardWrap.querySelector(".board"))return; buildBoard(); renderPlayers(); },
-    onClose:()=>{ if(profileWorkspace&&profileWorkspace.closed)profileWorkspace=null; syncProfileToggle(); if (UI.settings && !UI.settings.hidden) renderSettings(); document.getElementById("profileToggle")?.focus({preventScroll:true});
+    onClose:()=>{ if(profileWorkspace&&profileWorkspace.closed)profileWorkspace=null; syncSectionRail(); if (UI.settings && !UI.settings.hidden) renderSettings();
+      const next = sectionRailPending?.section;
+      if (next !== "learn") sectionRail?.buttons.get(next || "playstyle")?.focus({preventScroll:true});
       if(deferredPracticeAdvance){deferredPracticeAdvance=false;const practice=S.practice;setTimeout(()=>{if(S.practice===practice&&!profileOwnsBoard())practiceAdvance();},1300);} }});
   openingProfile = false;
-  syncProfileToggle();
+  syncSectionRail();
   try { await profileWorkspace.open(); }
   catch (error) { console.warn(error); toast("The player profile could not open."); profileWorkspace?.close(); }
 }
 
-function syncLearningToggle() {
-  syncSectionRail();
-  const button=document.getElementById("learningToggle");
-  if(!button)return;
-  const learning=!!learningWorkspace&&!learningWorkspace.closing, mode=learning?"learning":"review";
-  button.dataset.motion=S.settings.uiAnim===false?"off":"on";
-  if(button.dataset.mode===mode)return;
-  button.querySelector(".learning-toggle-label").textContent=learning?"Return to Game review":"Learn with Chess review";
-  button.querySelector(".learning-toggle-icon").replaceChildren(icon(learning?"prev":"book"));
-  button.dataset.mode=mode;
-}
 async function openLearning() {
   pauseBackgroundAnalysis();
   if (learningWorkspace || openingLearning || openingProfile) return;
@@ -2047,7 +2025,7 @@ async function openLearning() {
   learningWorkspace = new LearningWorkspace({document, storage:browserAPI.storage.local, makePiece, url:_url,
     settings:()=>S.settings, flipped:S.flipped, book:()=>BOOK || {}, startDrag, onPuzzleWrong:playWrongSound, onPuzzleMove:playSanSound, onPuzzlePremove:playPremoveSound, onOpeningMove:playSanSound, onFreeMove:playSanSound, onPuzzleSuccess:playPuzzleSuccess,
     createAnalysisEngine:()=>createEngine({Hash:S.settings.engineHash, "Skill Level":S.settings.engineSkill}),
-    navigationButton:document.getElementById("learningToggle"),
+    navigationButton:sectionRail?.buttons.get("review"),
     embedded:{stage:UI.canvas, boardWrap:UI.boardWrap, fen:sourceFen, reviewFen:activePos().fen, startDrag,
       beforeMount:fromProfile?()=>profileWorkspace?.close({handoff:true}):null,
       restoreBoard:()=>{
@@ -2056,15 +2034,15 @@ async function openLearning() {
       },
       drawArrow:(from,to,flipped)=>learningArrow(from,to,flipped,USER_ARROW_COLOR),
       drawBestArrow},
-    onClosing:syncLearningToggle,
+    onClosing:syncSectionRail,
     onClose:()=>{
       learningWorkspace = null;
-      syncLearningToggle();
+      syncSectionRail();
       alignPlayers();
       if (UI.settings && !UI.settings.hidden) renderSettings();
       // Handed over to the profile: it has the focus, and nothing resumes on the review behind it.
       const handedOver=profileOwnsBoard();
-      if(wasBlank){if(!handedOver)document.getElementById("learningToggle")?.focus();return;}
+      if(wasBlank)return;
       S.idx=snapshot.idx; S.flipped=snapshot.flipped; S.selectedSq=snapshot.selectedSq;
       if(!S.practice){paintBoard();}
       renderControls();
@@ -2078,7 +2056,7 @@ async function openLearning() {
       if(snapshot.bestWalking)playBestMoves();
       else if(snapshot.lineWalking)startLineWalk();
     }});
-  syncLearningToggle();
+  syncSectionRail();
   await learningWorkspace.open();
 }
 
@@ -7593,7 +7571,7 @@ function calibrationWarning(title, message, remainLabel, recommended = false) {
       el("div", { class: "calibration-warning-actions" }, revert, proceed)));
     const onKey = e => {
       if (e.key === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); finish(false); }
-      else if (e.key === "Tab") { e.preventDefault(); (document.activeElement === revert ? proceed : revert).focus(); }
+      else if (e.key === "Tab") { e.preventDefault(); e.stopImmediatePropagation(); (document.activeElement === revert ? proceed : revert).focus(); }
       else if (e.key.startsWith("Arrow") || ["Home", "End", "f"].includes(e.key)) e.stopImmediatePropagation();
     };
     document.body.append(overlay); document.addEventListener("keydown", onKey, true); revert.focus();
@@ -7701,10 +7679,8 @@ function applySettings() {
     button.dataset.motion = S.settings.uiAnim === false ? "off" : "on";
   }
   applyBackground();
-  const learningToggle=document.getElementById("learningToggle");
-  if(learningToggle)learningToggle.dataset.motion=S.settings.uiAnim===false?"off":"on";
   learningWorkspace?.refreshSettings();
-  syncProfileToggle();
+  syncSectionRail();
 }
 // Bundled background presets (relative to the extension's analysis page).
 const BG_PRESETS = { slate: "backgrounds/bg-slate.webp" };
@@ -8572,7 +8548,7 @@ function toggleAuto() {
 }
 document.addEventListener("keydown", (e) => {
   if (e.key === "Tab" && e.target?.closest?.(".ip-close-game,.review-entry-button")) return;
-  if (learningWorkspace?.closing && e.target?.closest?.('#learningToggle,.learn-entry-button')
+  if (learningWorkspace?.closing && e.target?.closest?.('.section-btn,.learn-entry-button')
       && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)) {
     e.preventDefault();
     document.activeElement?.blur();
@@ -8580,8 +8556,12 @@ document.addEventListener("keydown", (e) => {
     learningWorkspace.previousFocus = null;
   }
   if (learningWorkspace || profileOwnsBoard() || S.blank) return;
-  if (e.key === "Tab" && !e.target?.closest?.('#settings,.accuracy-panel,.engine-focus,[role="dialog"],[role="alertdialog"]')) {
-    e.preventDefault(); return;
+  if (e.key === "Tab" && !e.target?.closest?.('.section-rail,#settings,.accuracy-panel,.engine-focus,[role="dialog"],[role="alertdialog"]')) {
+    e.preventDefault();
+    if ((e.target === document.body || e.target === document) && sectionRail && !sectionRail.element.hidden) {
+      sectionRail.buttons.get(e.shiftKey ? "playstyle" : "review")?.focus({preventScroll:true});
+    }
+    return;
   }
   if (UI.libRail?.contains(e.target)) return;
   if (UI.settings?.contains(e.target)) {

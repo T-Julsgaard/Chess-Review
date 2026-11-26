@@ -20,8 +20,8 @@ test('section rail: Review, Learn and Playstyle in that order, Review current on
   const buttons = [...doc.querySelectorAll('.section-rail .section-btn')];
   assert.deepEqual(buttons.map(b => b.textContent), ['Review', 'Learn', 'Playstyle']);
   assert.equal(current(doc), 'review');
-  // The older toolbar buttons stay.
-  assert.ok(doc.querySelector('#learningToggle') && doc.querySelector('#profileToggle'));
+  assert.deepEqual([...doc.querySelectorAll('.topbar-right button')].map(b => b.getAttribute('aria-label')),
+    ['Flip board', 'Share game (copy link)', 'Credits & attributions', 'Settings']);
 });
 
 test('section rail: each button opens its section and marks it current; Review returns', async t => {
@@ -33,9 +33,12 @@ test('section rail: each button opens its section and marks it current; Review r
   click('review'); for (let i = 0; i < 6; i++) await settle();
   assert.equal(a.run('profileWorkspace'), null);
   assert.equal(current(doc), 'review');
-  // The old toolbar button drives the same rail.
-  doc.querySelector('#profileToggle').click(); for (let i = 0; i < 6; i++) await settle();
-  assert.equal(current(doc), 'playstyle');
+  click('learn'); for (let i = 0; i < 6; i++) await settle();
+  assert.ok(a.run('learningWorkspace'));
+  assert.equal(current(doc), 'learn');
+  click('review'); await a.run('learningWorkspace')?.close();
+  assert.equal(current(doc), 'review');
+  assert.equal(doc.activeElement, doc.querySelector('[data-section="review"]'));
 });
 
 test('section rail: the latest click wins while Playstyle is opening', async t => {
@@ -101,7 +104,7 @@ test('section rail: clicking the current section only acknowledges it', async t 
   assert.equal(current(doc), 'review');
 });
 
-test('section rail: stands beside the panel column and hides without room', () => {
+test('section rail: moves below the header without room and returns beside the panels', () => {
   const dom = new JSDOM('<!doctype html><body></body>', {pretendToBeVisual: true});
   const {document} = dom.window;
   Object.defineProperty(dom.window, 'innerWidth', {value: 1366, configurable: true});
@@ -118,12 +121,20 @@ test('section rail: stands beside the panel column and hides without room', () =
   assert.equal(rail.element.style.top, '101px');
   assert.equal(rail.element.style.height, '532px');
   assert.ok(parseFloat(rail.element.style.left) > 1210);
-  // No room to the right of the column (narrow window): the rail steps aside.
   Object.defineProperty(dom.window, 'innerWidth', {value: 1000, configurable: true});
-  assert.equal(rail.place({left: 57, top: 64, right: 953, bottom: 650, width: 896, height: 586}), false);
-  assert.equal(rail.element.hidden, true);
+  const narrow = {left: 57, top: 64, right: 953, bottom: 650, width: 896, height: 586};
+  assert.equal(rail.place(narrow, {top: 52}), false);
+  assert.equal(rail.element.hidden, false);
+  assert.equal(rail.element.classList.contains('is-compact'), true);
+  assert.equal(rail.element.style.top, '52px');
+  assert.equal(rail.current, 'learn');
   rail.buttons.get('playstyle').click();
   assert.deepEqual(picked, ['playstyle']);
+  assert.equal(rail.place(narrow, {hidden: true}), false);
+  assert.equal(rail.element.hidden, true);
+  Object.defineProperty(dom.window, 'innerWidth', {value: 1366, configurable: true});
+  assert.equal(rail.place({left: 714, top: 101, right: 1210, bottom: 633, width: 496, height: 532}), true);
+  assert.equal(rail.element.classList.contains('is-compact'), false);
   assert.deepEqual(SECTIONS.map(s => s.id), ['review', 'learn', 'playstyle']);
 });
 

@@ -81,7 +81,7 @@ test('a hidden or closed page cannot claim while waiting for the origin lock', a
 });
 
 function setup(t, {hidden = false, motion = false} = {}) {
-  const dom = new JSDOM('<header class="topbar"><button id="learningToggle">Learn with Chess review</button><button id="profileToggle">Player profile</button></header><div id="canvas"><button class="learn-entry-button">Solve Puzzles</button></div>',
+  const dom = new JSDOM('<header class="topbar"></header><nav class="section-rail"><button class="section-btn" data-section="learn">Learn</button><button class="section-btn" data-section="playstyle">Playstyle</button></nav><div id="canvas"><button class="learn-entry-button">Solve Puzzles</button></div>',
     {url: 'https://extension.test', pretendToBeVisual: true});
   const p = persistence();
   Object.defineProperty(dom.window.navigator, 'locks', {value: p.locks});
@@ -92,7 +92,7 @@ function setup(t, {hidden = false, motion = false} = {}) {
   const document = dom.window.document;
   return {...p, dom, document, mount,
     card: () => document.querySelector('.learning-announcement'),
-    highlighted: () => [...document.querySelectorAll('.learning-announcement-target')].map(button => button.id),
+    highlighted: () => [...document.querySelectorAll('.learning-announcement-target')].map(button => button.dataset.section),
     visible() { visibility = 'visible'; document.dispatchEvent(new dom.window.Event('visibilitychange')); }};
 }
 
@@ -100,7 +100,7 @@ test('the tour starts on Player profile and Got it moves the same card to Learn 
   const p = setup(t), controller = p.mount(); await controller.ready;
   const card = p.card();
   assert.ok(card);
-  assert.deepEqual(p.highlighted(), ['profileToggle']);
+  assert.deepEqual(p.highlighted(), ['playstyle']);
   assert.equal(card.querySelector('h2').textContent, INTRO_STEPS[0].title);
   assert.equal(card.querySelector('.learning-announcement-eyebrow').textContent, 'Welcome to Chess Review');
   assert.deepEqual([...card.querySelectorAll('button')].map(button => button.textContent), ['Got it'], 'No opt-out button');
@@ -110,7 +110,7 @@ test('the tour starts on Player profile and Got it moves the same card to Learn 
   card.querySelector('.learning-announcement-dismiss').click();
   assert.equal(p.card(), card, 'The card morphs instead of being replaced');
   assert.equal(controller.step, 1);
-  assert.deepEqual(p.highlighted(), ['learningToggle']);
+  assert.deepEqual(p.highlighted(), ['learn']);
   assert.equal(card.querySelector('h2').textContent, 'Learn with Chess Review');
   assert.match(card.querySelector('p').textContent, /50,000 puzzles/);
   assert.equal(card.querySelector('.learning-announcement-steps').getAttribute('aria-label'), 'Step 2 of 2');
@@ -139,7 +139,7 @@ test('the animated morph ignores repeated clicks and never skips step two', asyn
   pending.splice(0).forEach(animation => animation.finish()); await settle();
   assert.equal(controller.step, 1);
   assert.ok(p.card(), 'Extra clicks during the morph must not dismiss the card');
-  assert.deepEqual(p.highlighted(), ['learningToggle']);
+  assert.deepEqual(p.highlighted(), ['learn']);
   pending.splice(0).forEach(animation => animation.finish()); await settle();
   await new Promise(resolve => win.setTimeout(resolve, 200));
   assert.equal(p.document.querySelector('.learning-announcement-morph'), null);
@@ -161,7 +161,7 @@ test('closing the tab mid-morph cleans up without a late swap', async t => {
 });
 
 for (const step of [0, 1]) {
-  for (const dismissal of ['#profileToggle', '#learningToggle', '.learn-entry-button', 'Escape', 'pagehide']) {
+  for (const dismissal of ['[data-section=playstyle]', '[data-section=learn]', '.learn-entry-button', 'Escape', 'pagehide']) {
     test(`closing step ${step + 1} with ${dismissal} cleans up and never repeats on reopen`, async t => {
       const p = setup(t), controller = p.mount(); await controller.ready;
       if (step) p.card().querySelector('.learning-announcement-dismiss').click();
@@ -188,8 +188,8 @@ test('opening in a background tab waits for visibility without consuming the int
   assert.ok(p.card()); controller.dispose();
 });
 
-test('a missing toolbar button means no tour and no consumed marker', async t => {
-  const p = setup(t); p.document.querySelector('#profileToggle').remove();
+test('a missing section button means no tour and no consumed marker', async t => {
+  const p = setup(t); p.document.querySelector('[data-section=playstyle]').remove();
   const controller = p.mount(); await controller.ready;
   assert.equal(p.card(), null); assert.equal(p.data[seen], undefined);
 });
@@ -200,8 +200,8 @@ test('the card moves off the highlighted button in a narrow window', async t => 
   const rect = (left, top, width, height) => ({left, top, width, height, right: left + width, bottom: top + height});
   win.HTMLElement.prototype.getBoundingClientRect = function () {
     if (this.classList.contains('topbar')) return rect(0, 0, 500, 52);
-    if (this.id === 'profileToggle') return rect(300, 80, 100, 34); // wrapped under the toolbar
-    if (this.id === 'learningToggle') return rect(190, 8, 100, 34);
+    if (this.dataset.section === 'playstyle') return rect(300, 80, 100, 34);
+    if (this.dataset.section === 'learn') return rect(190, 8, 100, 34);
     if (this.classList.contains('learning-announcement')) return rect(204, parseFloat(this.style.top) || 0, 280, 200);
     return rect(0, 0, 0, 0);
   };
@@ -224,7 +224,7 @@ test('preview workspaces never consume or display the intro', async t => {
   a.store.settingsResetFor040 = true;
   // Preview startup may read bundled data; none of it uses live intro storage.
   await a.start();
-  assert.ok(a.dom.window.document.querySelector('#learningToggle'));
+  assert.ok(a.dom.window.document.querySelector('[data-section=learn]'));
   assert.equal(a.store[seen], undefined);
   assert.equal(a.dom.window.document.querySelector('.learning-announcement'), null);
 });

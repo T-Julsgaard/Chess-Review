@@ -65,7 +65,7 @@ test('game shortcuts and engine setting changes do not start work on a blank wor
   assert.equal(a.state.analyzing,false);assert.equal(a.state.evalEngines.length,0);assert.equal(a.state.flipped,false);assert.equal(a.state.autoTimer,null);
 });
 
-for(const entrySelector of ['#learningToggle','.learn-entry-button'])test(`${entrySelector} opens normal learning with the blank review board and restores it on return`,async t=>{
+for(const entrySelector of ['[data-section=learn]','.learn-entry-button'])test(`${entrySelector} opens normal learning with the blank review board and restores it on return`,async t=>{
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[{id:'sample',fen:'7k/5Q2/6K1/8/8/8/8/8 w - - 0 1',solution:['f7f8'],rating:1200,themes:['mateIn1']}]})}));
   const a=blank(t);await a.start();const entry=a.dom.window.document.querySelector(entrySelector);entry.focus();
   const board=a.dom.window.document.querySelector('.board');entry.click();await settle();
@@ -74,16 +74,17 @@ for(const entrySelector of ['#learningToggle','.learn-entry-button'])test(`${ent
   assert.equal(w.boardElement,board);assert.ok(w.root.querySelector('.learn-board-dock .learn-board'));
   assert.equal(board.querySelectorAll('.learn-square').length,64);assert.equal(board.querySelectorAll('.piece-img').length,32);
   assert.ok(w.root.querySelector('.learn-theme-list'));assert.equal(w.root.querySelector('[data-focus=review]'),null);
-  const toggle=a.dom.window.document.querySelector('#learningToggle');
-  assert.equal(toggle.textContent,'Return to Game review');assert.notEqual(toggle.closest('.app').inert,true);
+  const review=a.dom.window.document.querySelector('[data-section=review]');
+  assert.equal(a.dom.window.document.querySelector('.section-btn[aria-current=page]').dataset.section,'learn');
+  assert.notEqual(review.closest('.app').inert,true);
   assert.equal(a.dom.window.document.querySelector('.mod[data-mod="board"]').inert,true);
   assert.ok(w.root.classList.contains('learning-embedded'));
-  let keyReached=false;toggle.addEventListener('keydown',()=>{keyReached=true;},{once:true});
-  toggle.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'Enter',bubbles:true}));
-  assert.equal(keyReached,true,'learning must allow keyboard activation of the top-bar button');
+  let keyReached=false;review.addEventListener('keydown',()=>{keyReached=true;},{once:true});
+  review.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'Enter',bubbles:true}));
+  assert.equal(keyReached,true,'learning must allow keyboard activation of Review');
   await w.navigate('openings');assert.equal(w.page,'openings');assert.match(w.root.textContent,/Italian Game/);
-  toggle.click();await w.close();assert.equal(a.run('learningWorkspace'),null);assert.equal(a.dom.window.document.activeElement,toggle);
-  assert.equal(toggle.textContent,'Learn with Chess review');assert.notEqual(a.dom.window.document.querySelector('#canvas').inert,true);
+  review.click();await w.close();assert.equal(a.run('learningWorkspace'),null);assert.equal(a.dom.window.document.activeElement,review);
+  assert.equal(review.getAttribute('aria-current'),'page');assert.notEqual(a.dom.window.document.querySelector('#canvas').inert,true);
   assert.equal(a.dom.window.document.querySelector('#canvas').hidden,false);
   assert.equal(a.call('activePos').fen,new Chess().fen());assert.equal(a.state.evalEngines.length,0);
   assert.equal(a.dom.window.document.querySelector('#boardWrap .board'),board);assert.equal(board.classList.contains('learn-board'),false);

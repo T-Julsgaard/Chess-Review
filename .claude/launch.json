@@ -1,0 +1,7 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {"name": "chess-review-static", "runtimeExecutable": "node", "runtimeArgs": ["scratch/serve.mjs"], "port": 5178},
+    {"name": "chess-review-static-2", "runtimeExecutable": "node", "runtimeArgs": ["scratch/serve.mjs"], "env": {"PORT": "5179"}, "port": 5179}
+  ]
+}

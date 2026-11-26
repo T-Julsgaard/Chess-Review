@@ -27,12 +27,12 @@ function seed(a, rows = season(), account = 'tester') {
   a.store[IDENTITY_KEY] = {chesscom: {accounts: [{name: account, seenAt: Date.now(), via: 'test'}]}};
 }
 
-test('profile: the toggle opens the setup, hides the review panels, keeps the review board and restores on close', async t => {
+test('profile: Playstyle opens the setup, hides the review panels, and Review restores the board', async t => {
   const a = review(t), doc = a.dom.window.document;
-  const toggle = doc.querySelector('#profileToggle'), reviewBoard = doc.querySelector('.board');
-  assert.equal(toggle.textContent, 'Player profile');
-  await open(a);
-  assert.equal(toggle.textContent, 'Return to Game review');
+  const playstyle = doc.querySelector('[data-section=playstyle]'), reviewBoard = doc.querySelector('.board');
+  const reviewButton = doc.querySelector('[data-section=review]');
+  playstyle.click(); for (let i = 0; i < 6; i++) await settle();
+  assert.equal(playstyle.getAttribute('aria-current'), 'page');
   assert.ok(doc.querySelector('#canvas').classList.contains('profile-active'));
   assert.ok(doc.querySelector('.mod[data-mod="accuracy"]').inert);
   assert.ok(!doc.querySelector('.mod[data-mod="board"]').inert);
@@ -41,11 +41,12 @@ test('profile: the toggle opens the setup, hides the review panels, keeps the re
   assert.equal(doc.querySelector('.board'), reviewBoard, 'the review board stays as it is while choosing');
   assert.ok(!reviewBoard.classList.contains('profile-board'));
   assert.equal(reviewBoard.querySelectorAll('.piece-img').length, 32);
-  a.call('toggleProfile'); for (let i = 0; i < 4; i++) await settle();
+  reviewButton.click(); for (let i = 0; i < 4; i++) await settle();
   assert.equal(doc.querySelector('.profile-shell'), null);
   assert.ok(!doc.querySelector('#canvas').classList.contains('profile-active'));
   assert.ok(!doc.querySelector('.mod[data-mod="accuracy"]').inert);
-  assert.equal(toggle.textContent, 'Player profile');
+  assert.equal(reviewButton.getAttribute('aria-current'), 'page');
+  assert.equal(doc.activeElement, reviewButton);
   assert.equal(doc.querySelectorAll('.board .profile-piece').length, 0);
   assert.ok(doc.querySelectorAll('.board .piece-img').length >= 32, 'the review board is painted again');
 });

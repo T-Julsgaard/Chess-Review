@@ -819,75 +819,36 @@ button { font-family: inherit; cursor: pointer; }
 }
 .icon-btn:hover { color: var(--ink); border-color: color-mix(in oklab, var(--accent) 50%, var(--line)); }
 .icon-btn svg { width: 17px; height: 17px; }
-.learning-toggle {
-  width: 200px; min-width: 0; padding: 0 12px;
-  grid-template-columns: 17px minmax(0, max-content); justify-content: center; gap: 8px;
-  font: inherit; font-size: 12px; line-height: 1.25;
-}
-.learning-toggle, .review-entry-button {
+.review-entry-button {
   position: relative; isolation: isolate; overflow: hidden;
   transition: background .18s, border-color .18s, color .18s, box-shadow .18s, transform .18s;
 }
-.learning-toggle-icon { display: grid; place-items: center; color: var(--accent); }
-.learning-toggle-label { position: relative; }
-.learning-toggle::after, .review-entry-button::after {
+.review-entry-button::after {
   content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   background: linear-gradient(110deg, transparent 20%, color-mix(in oklab, var(--accent) 24%, transparent) 50%, transparent 80%);
   opacity: 0;
 }
-.learning-toggle[data-mode="learning"] {
-  color: var(--ink); border-color: color-mix(in oklab, var(--accent) 55%, var(--line));
-  background: color-mix(in oklab, var(--accent) 9%, var(--panel-2));
-  animation: learning-toggle-out .46s;
-}
-.learning-toggle[data-mode="review"] { animation: learning-toggle-back .46s; }
-.learning-toggle[data-mode="learning"] .learning-toggle-label { animation: learning-toggle-label-out .3s cubic-bezier(.16, 1, .3, 1); }
-.learning-toggle[data-mode="review"] .learning-toggle-label { animation: learning-toggle-label-back .3s cubic-bezier(.16, 1, .3, 1); }
-.learning-toggle[data-mode="learning"] .learning-toggle-icon { animation: learning-toggle-arrow .46s both; }
-.learning-toggle[data-mode="review"] .learning-toggle-icon { animation: learning-toggle-book .46s both; }
-.learning-toggle[data-mode="learning"]::after { animation: learning-toggle-shine-out .46s both; }
-.learning-toggle[data-mode="review"]::after { animation: learning-toggle-shine-back .46s both; }
-.learning-toggle:hover { box-shadow: 0 4px 14px color-mix(in oklab, var(--accent) 14%, transparent); }
-.learning-toggle:active { transform: translateY(1px) scale(.97); }
 @keyframes learning-toggle-out {
   0% { transform: scale(.96); }
   45% { transform: translateX(-3px) scale(1.035); }
   72% { transform: translateX(1px) scale(.99); }
   100% { transform: none; }
 }
-@keyframes learning-toggle-back {
-  0% { transform: scale(.96); }
-  45% { transform: translateX(3px) scale(1.035); }
-  72% { transform: translateX(-1px) scale(.99); }
-  100% { transform: none; }
-}
-@keyframes learning-toggle-label-out { from { translate: 0 4px; } to { translate: 0 0; } }
 @keyframes learning-toggle-label-back { from { translate: 0 -4px; } to { translate: 0 0; } }
-@keyframes learning-toggle-arrow {
-  0% { transform: translateX(5px) rotate(12deg) scale(.8); }
-  48% { transform: translateX(-3px) rotate(-8deg) scale(1.15); }
-  100% { transform: none; }
-}
 @keyframes learning-toggle-book {
   0% { transform: rotate(-18deg) scale(.8); }
   48% { transform: rotate(10deg) scale(1.15); }
   100% { transform: none; }
-}
-@keyframes learning-toggle-shine-out {
-  0% { transform: translateX(100%); opacity: 0; }
-  30% { opacity: 1; }
-  100% { transform: translateX(-100%); opacity: 0; }
 }
 @keyframes learning-toggle-shine-back {
   0% { transform: translateX(-100%); opacity: 0; }
   30% { opacity: 1; }
   100% { transform: translateX(100%); opacity: 0; }
 }
-:is(.learning-toggle,.review-entry-button)[data-motion="off"], :is(.learning-toggle,.review-entry-button)[data-motion="off"] *, :is(.learning-toggle,.review-entry-button)[data-motion="off"]::after { animation: none !important; transition: none !important; transform: none !important; }
+.review-entry-button[data-motion="off"], .review-entry-button[data-motion="off"] *, .review-entry-button[data-motion="off"]::after { animation: none !important; transition: none !important; transform: none !important; }
 @media (prefers-reduced-motion: reduce) {
-  :is(.learning-toggle,.review-entry-button), :is(.learning-toggle,.review-entry-button) *, :is(.learning-toggle,.review-entry-button)::after { animation: none !important; transition: none !important; transform: none !important; }
+  .review-entry-button, .review-entry-button *, .review-entry-button::after { animation: none !important; transition: none !important; transform: none !important; }
 }
-.learning-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 
 /* ---- Section rail: Review / Learn / Playstyle, standing to the right of the panel column ----
    lib/section-rail.js sets left/top/height to the column beside it and --rail-s to its scale. */
@@ -898,6 +859,16 @@ button { font-family: inherit; cursor: pointer; }
   transition: left .5s var(--rail-ease), top .5s var(--rail-ease), height .5s var(--rail-ease);
 }
 .section-rail[hidden] { display: none; }
+.app:has(> .section-rail.is-compact:not([hidden])) { --section-nav-h: 48px; }
+.section-rail.is-compact {
+  position: sticky; width: 100%; height: var(--section-nav-h); box-sizing: border-box;
+  flex-direction: row; justify-content: center; gap: 12px;
+  padding: 0 8px; border-bottom: 1px solid var(--line);
+  background: var(--panel); transition: none;
+}
+.section-rail.is-compact .section-btn { flex-direction: row; gap: 6px; min-height: 40px; padding: 0 4px; }
+.section-rail.is-compact .section-btn-label { font-size: 11px; line-height: 14px; }
+.section-rail.is-compact :is(.section-rail-thread, .section-rail-spark) { display: none; }
 .section-rail-thread {
   flex: 1; width: 1px; min-height: 12px; margin: calc(10px * var(--rail-s)) 0;
   background: linear-gradient(to bottom, transparent, color-mix(in oklab, var(--ink-3) 32%, transparent) 35%, color-mix(in oklab, var(--ink-3) 32%, transparent) 65%, transparent);
@@ -1026,7 +997,6 @@ button { font-family: inherit; cursor: pointer; }
 @media (max-width: 520px) { .learning-announcement { right: 12px; } }
 @media (prefers-reduced-motion: reduce) { .learning-announcement, .learning-announcement *, .learning-announcement-arrow { animation: none; transition: none; } }
 .learning-with-topbar { top: var(--topbar-h); }
-@media (max-width: 520px) { .learning-toggle { max-width: 112px; padding-inline: 6px; } }
 .feedback-floating {
   position: fixed; right: max(18px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom)); z-index: 30;
   display: flex; align-items: center; gap: 8px; padding: 10px 15px;
@@ -2206,7 +2176,7 @@ button { font-family: inherit; cursor: pointer; }
 .stage.auto {
   --gap:12px; --pad:10px; --board-min:0px; --review-h:112px;
   --board-wmax:calc(100vw - 72px - var(--eb-w));
-  --board-hmax:calc(100dvh - var(--topbar-h) - 2 * var(--gap) - 2 * var(--strip-h));
+  --board-hmax:calc(100dvh - var(--topbar-h) - var(--section-nav-h, 0px) - 2 * var(--gap) - 2 * var(--strip-h));
   --board:min(var(--board-wmax),var(--board-hmax),1100px);
   display:grid; gap:var(--gap); align-items:start; justify-content:center;
   padding:var(--gap) 12px var(--gap) 32px; max-width:2240px; margin-inline:auto;
@@ -2295,7 +2265,7 @@ button { font-family: inherit; cursor: pointer; }
   .stage.auto {
     --strip-h:44px; --eb-w:20px; --gap:10px; --review-h:150px;
     --board-wmax:calc(100vw - 40px - var(--eb-w) - var(--gap));
-    --board-hmax:calc(100dvh - var(--topbar-h) - 2 * var(--strip-h) - var(--controls-h) - 4 * var(--gap));
+    --board-hmax:calc(100dvh - var(--topbar-h) - var(--section-nav-h, 0px) - 2 * var(--strip-h) - var(--controls-h) - 4 * var(--gap));
     --board:min(var(--board-wmax),max(200px,var(--board-hmax)));
     padding:10px 10px 24px 30px;
     grid-template-columns:var(--eb-w) var(--board);
@@ -2766,7 +2736,6 @@ button { font-family: inherit; cursor: pointer; }
   .topbar { padding-inline:10px; gap:8px; }
   .topbar-right { gap:4px; }
   .topbar .icon-btn { width:30px; height:34px; flex:none; }
-  .topbar .learning-toggle { width:100px; max-width:100px; padding-inline:5px; flex:0 1 100px; font-size:10px; }
   .topbar .brand-mark { width:26px; height:28px; }
   .feedback-floating { padding:9px; right:10px; bottom:10px; }
   .feedback-floating span { display:none; }

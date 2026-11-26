@@ -162,7 +162,7 @@ for (const version of ['0.4.0', '0.4.1', '1.0.0']) {
     assert.equal(store.language, undefined, 'Nothing is guessed or saved for the language');
     assertModern(first.state.settings);
     assert.equal(first.state.settings.soundVolume, 50);
-    assert.equal(first.dom.window.document.querySelector('.learning-announcement-target').id, 'profileToggle');
+    assert.equal(first.dom.window.document.querySelector('.learning-announcement-target').dataset.section, 'playstyle');
     assert.ok(first.dom.window.document.querySelector('.learning-announcement'));
     assert.equal(store[seen], true);
     first.dom.window.document.querySelector('.learning-announcement-dismiss').click();

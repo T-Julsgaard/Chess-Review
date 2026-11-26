@@ -101,7 +101,7 @@ try {
   const fresh=document.createElement('iframe');fresh.style='width:1680px;height:1000px';
   fresh.src='analysis.html?workspace=blank';document.body.append(fresh);
   assertModern(await waitWorkspace(fresh));await waitNote(fresh);
-  if(fresh.contentDocument.querySelector('.learning-announcement-target')?.id!=='profileToggle')throw Error('Intro must start on the Player profile button');
+  if(fresh.contentDocument.querySelector('.learning-announcement-target')?.dataset.section!=='playstyle')throw Error('Intro must start on the Player profile button');
   fresh.contentDocument.querySelector('.learning-announcement-dismiss').click();
   const firstDocument=fresh.contentDocument;
   fresh.src='analysis.html?workspace=blank';
@@ -257,7 +257,7 @@ try {
       clickLearning('Mixed practice');await waitLearning(()=>doc.querySelector('.learn-move-input'),'Puzzle');
       if(doc.querySelector('.learn-board .annotated')||doc.querySelector('.learn-copy').textContent.includes('Why the solution works'))throw Error('Puzzle leaked solution');
       clickLearning('Reveal solution');await waitLearning(()=>doc.querySelector('.learn-feedback.revealed'),'Solution reveal');
-      doc.querySelector('#learningToggle').click();await waitLearning(()=>!doc.querySelector('.learning-workspace'),'Return to review');
+      doc.querySelector('[data-section=review]').click();await waitLearning(()=>!doc.querySelector('.learning-workspace'),'Return to review');
       if(JSON.stringify(frame.contentWindow.__smokeLearningReview())!==reviewBefore)throw Error('Learning changed the review state');
       const learning=(await browserAPI.storage.local.get('learning:v1'))['learning:v1'];
       if(!learning?.lessons.fork.exercises[0]?.passed||!Object.values(learning.puzzles).some(p=>p.assisted>0))throw Error('Learning progress not persisted');

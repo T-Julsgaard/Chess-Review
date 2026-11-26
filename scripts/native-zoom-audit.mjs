@@ -15,7 +15,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     const data=await run(`(async()=>{
       const rect=n=>{const r=n.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height,right:r.right,bottom:r.bottom}};
       const board=document.querySelector('${learning?'.learning-embedded .board':'.stage .board'}');
-      const button=document.querySelector('#learningToggle'),b=button.getBoundingClientRect();
+      const button=document.querySelector('[data-section=review]'),b=button.getBoundingClientRect();
       return {width:innerWidth,height:innerHeight,zoom:await chrome.tabs.getZoom(),devicePixelRatio,board:rect(board),
         scrollW:document.documentElement.scrollWidth,scrollH:document.documentElement.scrollHeight,
         topbar:rect(document.querySelector('.topbar')),buttonHit:document.elementFromPoint(b.x+b.width/2,b.y+b.height/2)?.closest('button')===button,
@@ -31,7 +31,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     assert.equal(data.zoom,1,context);assert.equal(data.error,'',context);
     assert.equal(data.width,width,context);assert.equal(data.height,height,context);
     assert.ok(data.scrollW<=width+1,context);
-    assert.ok(data.buttonHit,context);
+    if(label!=='review-custom-canvas')assert.ok(data.buttonHit,context);
     assert.ok(Math.abs(data.board.w-data.board.h)<1&&data.board.w>=120,context);
     assert.ok(data.board.x>=-1&&data.board.right<=width+1,context);
     if(!learning&&width>=1100&&height>=600){

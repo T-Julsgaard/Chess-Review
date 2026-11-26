@@ -59,20 +59,17 @@ test('compact puzzle status mirrors the live countdown and score without duplica
 
 test('learning tabs and scrollable content fill the side panel across libraries and Statistics',async t=>{
   const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
-  const doc=a.dom.window.document,toggle=doc.querySelector('#learningToggle');
-  assert.equal(toggle.textContent,'Learn with Chess review');
-  assert.equal(toggle.nextElementSibling.id,'profileToggle');assert.equal(toggle.nextElementSibling.textContent,'Player profile');
-  assert.equal(toggle.nextElementSibling.nextElementSibling.getAttribute('aria-label'),'Flip board');
+  const doc=a.dom.window.document,review=doc.querySelector('[data-section=review]');
   assert.equal(doc.querySelector('.learn-entry-button'),null);
   a.call('go',1);const fen=a.state.positions[1].fen;
   const puzzles=[{id:'layout',fen:new Chess().fen(),solution:['e2e4'],rating:1200,themes:['fork'],source:{url:'https://lichess.org/training'}}];
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles})}));
-  await a.call('toggleLearning');const w=a.run('learningWorkspace');t.after(()=>w.close());
+  await a.call('selectSection','learn');const w=a.run('learningWorkspace');t.after(()=>w.close());
   const check=()=>{
     assert.equal(w.shell.firstElementChild,w.root.querySelector('.learn-nav'));
     assert.ok(w.shell.lastElementChild.matches('main.learn-main'));
     assert.equal(w.root.querySelector('.learn-footer, [data-focus=review]'),null);
-    assert.equal(a.dom.window.document.querySelector('#learningToggle').textContent,'Return to Game review');
+    assert.equal(doc.querySelector('.section-btn[aria-current=page]').dataset.section,'learn');
   };
   check();assert.equal(w.root.querySelector('[data-focus=puzzle-statistics]'),null);
   w.root.querySelector('[data-focus=statistics-knockout]').click();check();assert.equal(w.page,'statistics');
@@ -89,29 +86,28 @@ test('learning tabs and scrollable content fill the side panel across libraries 
   await w.navigate('openings');
   const main=w.shell.querySelector('.learn-main');main.scrollTop=100;w.render();
   assert.equal(w.shell.querySelector('.learn-main').scrollTop,100);
-  toggle.click();await w.close();
+  review.click();await w.close();
   assert.equal(a.run('learningWorkspace'),null);assert.equal(a.state.idx,1);
   assert.equal(a.state.positions[a.state.idx].fen,fen);
-  assert.equal(toggle.textContent,'Learn with Chess review');
+  assert.equal(review.getAttribute('aria-current'),'page');
   assert.equal(doc.querySelector('.learn-entry-button'),null);
   assert.equal(doc.querySelector('[data-mod="learn"] .practice-btn').textContent,'Practice your mistakes');
 });
 
-for(const exit of ['button','Escape'])test(`learning toggle updates immediately on ${exit}, before the exit animation finishes`,async t=>{
+for(const exit of ['button','Escape'])test(`Review is marked current immediately on ${exit}, before the exit animation finishes`,async t=>{
   const a=app(t);loadGame(a,'1. e4 e5');a.call('computeDerived');a.call('buildUI');a.call('renderAll');
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[{id:'toggle',fen:new Chess().fen(),solution:['e2e4'],rating:1200,themes:['fork']}]})}));
   await a.call('openLearning');
-  const w=a.run('learningWorkspace'),doc=a.dom.window.document,toggle=doc.querySelector('#learningToggle'),animation=deferred();
+  const w=a.run('learningWorkspace'),doc=a.dom.window.document,review=doc.querySelector('[data-section=review]'),animation=deferred();
   t.mock.method(w,'transitionPanels',()=>animation.promise);
-  assert.equal(toggle.dataset.mode,'learning');
-  if(exit==='button')toggle.click();
+  assert.equal(doc.querySelector('.section-btn[aria-current=page]').dataset.section,'learn');
+  if(exit==='button')review.click();
   else doc.dispatchEvent(new a.dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
   assert.equal(w.closing,true);
-  assert.equal(toggle.textContent,'Learn with Chess review');
-  assert.equal(toggle.dataset.mode,'review');
+  assert.equal(review.getAttribute('aria-current'),'page');
   await settle();
   assert.equal(a.run('learningWorkspace'),w,'Workspace remains mounted until the animation finishes');
-  toggle.click(); // A second activation during exit must not open another workspace.
+  review.click();
   assert.equal(a.run('learningWorkspace'),w);
   animation.resolve();await w.close();
   assert.equal(a.run('learningWorkspace'),null);

@@ -26,11 +26,11 @@ test('interface animation and piece moves can be changed and saved independently
   assert.equal(a.state.settings.uiAnim,true);
   assert.equal(a.store.settings.uiAnim,true);
   assert.equal(a.store.settings.moveAnim,false);
-  assert.equal(doc.querySelector('#learningToggle').dataset.motion,'on');
+  assert.equal(doc.querySelector('.section-rail').dataset.motion,'on');
   await a.call('setSetting','uiAnim',false);
   await a.call('setSetting','moveAnim',true);
   assert.equal(a.state.settings.uiAnim,false);
   assert.equal(a.store.settings.uiAnim,false);
   assert.equal(a.store.settings.moveAnim,true);
-  assert.equal(doc.querySelector('#learningToggle').dataset.motion,'off');
+  assert.equal(doc.querySelector('.section-rail').dataset.motion,'off');
 });

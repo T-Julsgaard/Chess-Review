@@ -50,7 +50,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
     assert.ok(Math.abs(puzzle.above-puzzle.below)<1&&Math.abs(puzzle.panelY-puzzle.boardY)<1,'Puzzle activity should retain balanced alignment');
     assert.ok(Math.abs(await run("document.querySelector('.learn-shell').getBoundingClientRect().right")-reviewRight)<1,'Active puzzle should retain the review column right edge');
     await shot(`puzzle-centered-${height}`);
-    await run("samples=[];sampleActive=true;sampleLoop();document.querySelector('#learningToggle').click()");
+    await run("samples=[];sampleActive=true;sampleLoop();document.querySelector('[data-section=review]').click()");
     await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace)",'Review restored');
     const returning=await run('sampleActive=false;samples');
     const from=returning[0].board,to=returning.at(-1).board;
@@ -61,7 +61,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   // Interrupt the entry before its board expansion completes, then reopen.
   await run("import('./analysis.js').then(m=>{void m.openLearning();})");
   await waitFor(review,"import('./analysis.js').then(m=>!!m.learningWorkspace?.shell)",'Interrupted entry');
-  await run("document.querySelector('#learningToggle').click()");
+  await run("document.querySelector('[data-section=review]').click()");
   await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace)",'Interrupted return');
   assert.equal(await run("!!document.querySelector('.learn-transition-surface,.learn-swoop-anchor')"),false);
   await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]},review.sessionId);

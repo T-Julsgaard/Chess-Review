@@ -12,9 +12,9 @@ test('review navigation clears leftover Feedback focus after returning from its 
   }
 });
 
-test('all arrow keys clear the learning button focus after returning to game review',async t=>{
+test('all arrow keys clear the section button focus after returning to game review',async t=>{
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[]})}));
-  const a=review(t),doc=a.dom.window.document,toggle=doc.querySelector('#learningToggle');
+  const a=review(t),doc=a.dom.window.document,toggle=doc.querySelector('[data-section=learn]');
   for(const [key,idx] of [['ArrowRight',1],['ArrowLeft',0],['ArrowUp',0],['ArrowDown',0],['End',2],['Home',0]]){
     toggle.focus();await a.call('openLearning');await a.run('learningWorkspace').close();
     assert.equal(doc.activeElement,toggle);
@@ -24,9 +24,9 @@ test('all arrow keys clear the learning button focus after returning to game rev
   }
 });
 
-test('arrows during the return animation do not restore learning button focus',async t=>{
+test('arrows during the return animation do not restore section button focus',async t=>{
   t.mock.method(globalThis,'fetch',async()=>({ok:true,json:async()=>({schema:1,puzzles:[]})}));
-  const a=review(t),doc=a.dom.window.document,toggle=doc.querySelector('#learningToggle');
+  const a=review(t),doc=a.dom.window.document,toggle=doc.querySelector('[data-section=review]');
   for(const key of ['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End']){
     toggle.focus();await a.call('openLearning');const w=a.run('learningWorkspace');
     let finishReturn;
@@ -59,7 +59,10 @@ test('review has no typed move field and Tab does not traverse review sections',
   assert.equal(doc.querySelector('.review-move-entry'),null);
   a.state.practice={spots:[1],i:0,solving:true};a.call('renderEngineCurrent');assert.equal(doc.querySelector('.review-move-entry'),null);a.state.practice=null;
   const event=()=>new a.dom.window.KeyboardEvent('keydown',{key:'Tab',bubbles:true,cancelable:true});
+  a.call('placeSectionRail');
   const mainTab=event();doc.body.dispatchEvent(mainTab);assert.equal(mainTab.defaultPrevented,true);
+  assert.equal(doc.activeElement,doc.querySelector('[data-section=review]'));
+  const sectionTab=event();doc.activeElement.dispatchEvent(sectionTab);assert.equal(sectionTab.defaultPrevented,false);
   await a.call('toggleSettings');const settingsTab=event();doc.querySelector('.set-category > .lib-dd-btn').dispatchEvent(settingsTab);assert.equal(settingsTab.defaultPrevented,false);
   assert.ok([...doc.querySelectorAll('.lib-tab,.lc-open,.lc-fav,.engine-line.clickable')].every(n=>n.tabIndex===-1));
 });
@@ -124,7 +127,7 @@ for(const color of ['w','b'])for(const flipped of [false,true])test(`review prom
   const a=review(t,`[SetUp "1"]\n[FEN "${fen}"]\n\n${color==='w'?'1. b8=Q':'1... b1=Q'}`),doc=a.dom.window.document;
   a.state.flipped=flipped;a.call('buildBoard');
   const from=color==='w'?'b7':'b2',to=color==='w'?'b8':'b1',bottom=(color==='b')!==flipped;
-  const previous=doc.querySelector('#learningToggle');previous.focus();
+  const previous=doc.querySelector('[data-section=learn]');previous.focus();
   const outside=doc.querySelector('#controls');outside.inert=true;
   a.call('applyUserMove',from,to,false);
   const overlay=doc.querySelector('.board-promotion'),picker=doc.querySelector('.promotion-picker'),options=[...picker.querySelectorAll('button')];

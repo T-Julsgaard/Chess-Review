@@ -35,7 +35,7 @@ services, as described below. Their own privacy notices explain that processing.
   platform, which also receives normal network information such as your IP address.
 - Searching by username from an empty review requests the selected month's public games
   from that platform.
-- **Player profile** (the button beside Learn with Chess review) builds a recap of a player's
+- **Player profile** (opened with **Playstyle**) builds a recap of a player's
   games. It fetches that player's public game archive (Chess.com monthly archives, or the
   Lichess game export) directly from the platform, replays the games locally and keeps a
   compact per-game summary on your device. Finished months are never fetched twice. The

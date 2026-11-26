@@ -34,7 +34,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out,sour
     return evaluate(tab,`(async()=>{
     const currentTab=await chrome.tabs.getCurrent(),zoom=await chrome.tabs.getZoom(currentTab.id);
     const rect=n=>{const r=n.getBoundingClientRect();return {x:r.x*zoom,y:r.y*zoom,w:r.width*zoom,h:r.height*zoom};};
-    const selectors=['.topbar','.brand-mark','.learning-toggle','.board','.controls button.play','.engine-bestwalk','.lib-tab','.feedback-floating'];
+    const selectors=['.topbar','.brand-mark','.section-rail','.board','.controls button.play','.engine-bestwalk','.lib-tab','.feedback-floating'];
     return {zoom,width:Math.round(innerWidth*zoom),height:Math.round(innerHeight*zoom),
       panels:Object.fromEntries([...document.querySelectorAll('.mod')].map(n=>[n.dataset.mod,rect(n)])),
       contents:Object.fromEntries(selectors.map(s=>[s,rect(document.querySelector(s))]))};

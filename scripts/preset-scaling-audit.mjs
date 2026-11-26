@@ -21,7 +21,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
           settings:rect(settings),settingsScale:parseFloat(getComputedStyle(settings).zoom)||1,
           panelsRight:Math.max(...[...canvas.querySelectorAll('.mod')].filter(n=>!n.hidden).map(n=>n.getBoundingClientRect().right)),
           saved:JSON.stringify({layout:m.S.layout,settings:m.S.settings,idx:m.S.idx})};})`);
-      await run("document.querySelector('[aria-label=Settings]').click();document.querySelector('#learningToggle').click()");
+      await run("document.querySelector('[aria-label=Settings]').click();document.querySelector('[data-section=learn]').click()");
       await waitFor(review,"import('./analysis.js').then(m=>m.learningWorkspace?.ready&&!m.learningWorkspace.transitioning)",'Learning');
       await sleep(100);
       const learning = await run(`(()=>{

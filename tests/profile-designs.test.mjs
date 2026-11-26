@@ -628,10 +628,9 @@ test('returning to Game review resets Player Profile to username entry', async t
   w.go(w.deck.findIndex(s => s.id === 'habits'));
   doc.querySelector('.pv-filter button[data-value="blitz"]').click();
   assert.equal(w.cls, 'blitz');
-  const toggle = doc.querySelector('#profileToggle');
-  toggle.click();
+  doc.querySelector('[data-section=review]').click();
   assert.equal(a.run('profileWorkspace'), null, 'back on the game review');
-  toggle.click(); await settle();
+  doc.querySelector('[data-section=playstyle]').click(); await settle();
   const next = a.run('profileWorkspace');
   assert.notEqual(next, w);
   assert.equal(next.phase, 'setup');

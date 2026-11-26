@@ -69,14 +69,14 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   assert.ok(frames.some(f=>f.libraryX<0&&f.libraryX>-39&&f.libraryVisible),'Library must slide visibly before hiding');
   assert.equal(frames.at(-1).libraryVisible,false);
   assert.deepEqual(await accuracyLayers(),['hidden','hidden'],'Accuracy highlights must not show through learning mode');
-  await run("document.querySelector('#learningToggle').click()");
+  await run("document.querySelector('[data-section=review]').click()");
   await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace)",'Review restored');
   assert.equal(await run("getComputedStyle(document.querySelector('.library-rail')).visibility"),'visible');
   assert.deepEqual(await accuracyLayers(),['visible','visible'],'Accuracy highlights must return with Game Review');
   // Close while entry is still moving, then reopen to catch stale animation state.
   await run("import('./analysis.js').then(m=>{void m.openLearning();})");
   await waitFor(review,"import('./analysis.js').then(m=>!!m.learningWorkspace?.shell)",'Quick entry');
-  await run("document.querySelector('#learningToggle').click()");
+  await run("document.querySelector('[data-section=review]').click()");
   await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace)",'Quick return');
   assert.equal(await run("!!document.querySelector('.learn-transition-surface, .learn-swoop-anchor')"),false);
   for(const reduced of [false,true]){
@@ -106,7 +106,7 @@ export async function auditReviewReturn({review,call,evaluate,waitFor,sleep,out}
       returnFrames.push({time:performance.now(),visible:!!s&&s.visibility==='visible'&&+s.opacity>.001,
         opacity:s?+s.opacity:0,assembling:!!document.querySelector('.puzzle-arranging'),connected:!!shell});
       if(samplingReturn)requestAnimationFrame(sampleReturnFrame);
-    };sampleReturnFrame();document.querySelector('#learningToggle').click();`);
+    };sampleReturnFrame();document.querySelector('[data-section=review]').click();`);
   await waitFor(review,"import('./analysis.js').then(m=>!m.learningWorkspace)",'Review return with longer piece assembly');
   const returnFrames=await run('samplingReturn=false;returnFrames');
   await fs.writeFile(path.join(out,'review-return-visibility.json'),JSON.stringify(returnFrames,null,2));
