@@ -9,13 +9,17 @@ body.web-viewer { overflow: hidden; }
 /* ---------- top bar ---------- */
 .web-brand { color: inherit; text-decoration: none; flex: none; }
 .web-tagline { min-width: 0; padding-left: 18px; border-left: 1px solid var(--line); color: var(--ink-3); font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.topbar .web-cta { width: auto; padding: 0 16px 0 13px; text-decoration: none; font-weight: 750; font-size: 12.5px;
+/* Own the button layout and shine containment independently of the extension's navigation. */
+.topbar .web-cta { position: relative; isolation: isolate; overflow: hidden;
+  width: auto; min-width: 0; padding: 0 16px 0 13px; grid-template-columns: 17px minmax(0, max-content); justify-content: center; gap: 8px;
+  text-decoration: none; font-weight: 750; font-size: 12.5px; line-height: 1.25;
   background: linear-gradient(160deg, var(--accent), var(--accent-strong)); border-color: var(--accent); color: var(--accent-ink);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 6px 18px -8px color-mix(in oklab, var(--accent) 70%, transparent); }
-.topbar .web-cta .learning-toggle-icon { color: var(--accent-ink); }
-.topbar .web-cta .learning-toggle-label { white-space: nowrap; }
+.web-cta-icon { display: grid; place-items: center; color: var(--accent-ink); }
+.web-cta-label { position: relative; white-space: nowrap; }
 .topbar .web-cta:hover { color: var(--accent-ink); border-color: var(--accent-strong); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 8px 24px -8px color-mix(in oklab, var(--accent) 85%, transparent); }
-.topbar .web-cta::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, .35) 50%, transparent 65%); transform: translateX(-120%); animation: web-cta-shine 5.5s 2.4s ease-in-out infinite; }
+.topbar .web-cta:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.topbar .web-cta::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, .35) 50%, transparent 65%); transform: translateX(-120%); animation: web-cta-shine 5.5s 2.4s ease-in-out infinite; }
 @keyframes web-cta-shine { 0%, 78% { transform: translateX(-120%); } 92%, 100% { transform: translateX(120%); } }
 .web-installed { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel-2); color: var(--ink-2); font-size: 12px; font-weight: 650; }
 .web-installed[hidden] { display: none; }
@@ -24,10 +28,10 @@ body.web-viewer { overflow: hidden; }
 /* The two store links: this browser's in green (above), the other plain beside it. */
 .web-stores { display: flex; align-items: center; gap: 8px; }
 .topbar .web-cta.is-other { background: var(--panel-2); border-color: var(--line); color: var(--ink-2); box-shadow: none; }
-.topbar .web-cta.is-other .learning-toggle-icon { color: var(--ink-3); }
+.topbar .web-cta.is-other .web-cta-icon { color: var(--ink-3); }
 .topbar .web-cta.is-other::after { content: none; }
 .topbar .web-cta.is-other:hover { color: var(--ink); border-color: color-mix(in oklab, var(--accent) 55%, var(--line)); box-shadow: none; }
-.topbar .web-cta.is-other:hover .learning-toggle-icon { color: var(--accent); }
+.topbar .web-cta.is-other:hover .web-cta-icon { color: var(--accent); }
 
 /* ---------- the panel's "Build your own" ---------- */
 .profile-head > .profile-button.web-build { display: inline-flex; align-items: center; gap: 7px; padding-left: 6px;
@@ -128,10 +132,11 @@ body:not(.web-has-extension) .web-review-row, .web-has-extension .web-install-ro
   .web-panel-mod { width: var(--b); height: auto; min-height: 320px; margin-top: 0; }
   .web-viewer:not(.web-has-profile) .app { overflow: auto; height: auto; }
   body.web-viewer:not(.web-has-profile) { overflow: auto; }
-  .topbar .web-cta .learning-toggle-label { font-size: 12px; }
+  .topbar .web-cta .web-cta-label { font-size: 12px; }
 }
 @media (max-width: 760px) { .web-cta-verb { display: none; } }
 @media (max-width: 560px) { .web-cta-tail { display: none; } .topbar { padding: 0 12px; } .topbar .web-cta { padding: 0 12px; } }
+@media (max-width: 440px) { .web-brand .brand-name { display: none; } }
 @media (prefers-reduced-motion: reduce) {
   .topbar .web-cta::after, .web-landing { animation: none; }
   .web-dialog, .web-dialog-backdrop, .web-toast { transition: none; }
