@@ -169,3 +169,41 @@ test('threat previews abstain for good, terminal, illegal and provisional replie
   S.idx=4;S.classif[4]='blunder';S.bests[4]={pv:'e1f2'};
   assert.equal(a.call('renderMoveComment').querySelector('.ip-show-threat'),null);
 });
+
+test('explanations write out without changing their text or restarting on a repaint',async t=>{
+  const a=review(t),S=a.state,doc=a.dom.window.document;
+  let now=0;a.context.performance={now:()=>now};
+  S.settings.uiAnim=true;
+  await a.call('setCoachEngineReplies',true);
+  const text=()=>doc.querySelector('.insight-panel .ip-text');
+  const full=text().textContent,first=text().querySelector('.ip-written-char');
+  assert.ok(first);
+  assert.equal(first.style.getPropertyValue('--ink-delay'),'0ms');
+  assert.equal(text().textContent,full);
+  now=200;a.call('renderReview');
+  assert.equal(text().querySelector('.ip-written-char').style.getPropertyValue('--ink-delay'),'-200ms');
+  assert.equal(text().textContent,full);
+  now=2000;a.call('renderReview');
+  assert.equal(text().querySelector('.ip-written-char'),null);
+  assert.equal(text().textContent,full);
+  a.call('go',2);a.call('go',3);
+  assert.equal(text().querySelector('.ip-written-char').style.getPropertyValue('--ink-delay'),'0ms');
+  assert.equal(first.isConnected,false);
+});
+
+test('written explanations respect reduced motion and sequence Dopamine detail after the summary',async t=>{
+  const a=review(t),S=a.state;
+  a.context.performance={now:()=>0};S.settings.uiAnim=true;
+  a.dom.window.matchMedia=()=>({matches:true});
+  await a.call('setCoachEngineReplies',true);
+  assert.equal(a.call('renderMoveComment').querySelector('.ip-written-char'),null);
+  a.dom.window.matchMedia=()=>({matches:false});S.settings.uiAnim=false;
+  assert.equal(a.call('renderMoveComment').querySelector('.ip-written-char'),null);
+  S.settings.uiAnim=true;
+  await a.call('setSetting','reviewMode','dopamine');
+  const body=a.call('renderMoveComment');
+  const summary=body.querySelector('.ip-text'),detail=body.querySelector('.engine-explanation-detail');
+  assert.ok(detail);
+  const delay=node=>parseFloat(node.style.getPropertyValue('--ink-delay'));
+  assert.ok(delay(detail.firstElementChild)>delay(summary.lastElementChild));
+});

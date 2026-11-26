@@ -82,6 +82,34 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
   await sleep(100);
   assert.equal(await run("document.activeElement.matches('.ip-explanations-toggle[aria-checked=false]')"),true);
   assert.equal(await run("!!document.querySelector('.coach-frame')"),true);
+  await run("import('./analysis.js').then(async m=>{m.S.settings.uiAnim=true;await m.setCoachEngineReplies(true);m.go(2);m.go(3);})");
+  const writing=await run(`(()=>{
+    const node=document.querySelector('.insight-panel .ip-text'),r=node.getBoundingClientRect();
+    return {text:node.textContent,rect:{x:r.x,y:r.y,width:r.width,height:r.height},
+      hidden:[...node.querySelectorAll('.ip-written-char')].some(n=>+getComputedStyle(n).opacity<1)};
+  })()`);
+  assert.equal(writing.hidden,true,'Explanation should write out progressively');
+  await sleep(200);await shot('writing-explanation');
+  await run("import('./analysis.js').then(m=>m.go(3))");
+  assert.equal(await run("parseFloat(document.querySelector('.ip-written-char').style.getPropertyValue('--ink-delay'))<0"),true);
+  await sleep(1100);
+  const finished=await run(`(()=>{
+    const node=document.querySelector('.insight-panel .ip-text'),r=node.getBoundingClientRect();
+    return {text:node.textContent,rect:{x:r.x,y:r.y,width:r.width,height:r.height},
+      visible:[...node.querySelectorAll('.ip-written-char')].every(n=>+getComputedStyle(n).opacity===1)};
+  })()`);
+  assert.equal(finished.visible,true);assert.equal(finished.text,writing.text);
+  assert.deepEqual(finished.rect,writing.rect,'Writing must preserve line wrapping and bottom alignment');
+  await run("import('./analysis.js').then(m=>m.go(3))");
+  const settled=await run(`(()=>{
+    const node=document.querySelector('.insight-panel .ip-text'),r=node.getBoundingClientRect();
+    return {x:r.x,y:r.y,width:r.width,height:r.height};
+  })()`);
+  assert.deepEqual(settled,writing.rect,'Settled plain text must keep the same layout');
+  assert.equal(await run("!!document.querySelector('.ip-written-char')"),false);
+  await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]},review.sessionId);
+  await run("import('./analysis.js').then(m=>{m.go(2);m.go(3);})");
+  assert.equal(await run("!!document.querySelector('.ip-written-char')"),false);
   await fs.writeFile(path.join(out,'engine-explanations.json'),JSON.stringify(results,null,2));
   console.log(JSON.stringify({out,cases:results.length,keyboard:'passed'}));
 }

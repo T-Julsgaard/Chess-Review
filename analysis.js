@@ -4049,6 +4049,24 @@ function typeWrite(node, text) {
   };
   step();
 }
+let _explanationWriting = null;
+// Lay out the complete sentence first, then let the ink appear in reading order.
+// Keeping the glyphs in normal text flow prevents wrapping and bottom alignment
+// from moving while a sentence is written. No caret, sound or recurring timer.
+function writeExplanation(node, text, {key, fresh = false, offset = 0, length = text.length}) {
+  const now = performance.now();
+  if (fresh) _explanationWriting = {key, started: now};
+  const elapsed = _explanationWriting?.key === key ? now - _explanationWriting.started : Infinity;
+  const motion = S.settings.uiAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const step = Math.min(14, 1000 / Math.max(1, length));
+  if (!motion || elapsed >= length * step + 100) { node.textContent = text; return; }
+  const glyphs = typeof Intl.Segmenter === 'function'
+    ? [...new Intl.Segmenter(undefined, {granularity: 'grapheme'}).segment(text)].map(part => part.segment)
+    : Array.from(text);
+  node.replaceChildren(...glyphs.map((glyph, index) => el('span', {
+    class: 'ip-written-char', style: {'--ink-delay': ((offset + index) * step - elapsed) + 'ms'},
+  }, glyph)));
+}
 function openingStrip() {
   const o = (S.analysisMode && S.variation ? variationOpening() : S.opening);
   const line = o ? `${o.eco}${o.eco && o.name ? " · " : ""}${o.name}` : "Opening unknown";
@@ -4691,13 +4709,18 @@ function renderMoveComment() {
   }
   const txt = el("div", { class: "ip-text" });
   body.append(txt);
-  if (fresh) {
-    coachReactPly(S.idx);
-    // Keep engine explanations immediately readable in either review style.
-    if (dopamine || explanation) { clearTimeout(_typeT); coachTalk(false); txt.textContent = _ipText; }
-    else typeWrite(txt, _ipText);
-  } else txt.textContent = _ipText;
-  if (dopamine && explanation?.detail) body.append(el("p", { class: "engine-explanation-detail" }, explanation.detail));
+  if (fresh) coachReactPly(S.idx);
+  const writingLength = _ipText.length + (dopamine && explanation?.detail ? explanation.detail.length + 1 : 0);
+  if (explanation) {
+    clearTimeout(_typeT); coachTalk(false);
+    writeExplanation(txt, _ipText, {key: sig, fresh, length: writingLength});
+  } else if (fresh && !dopamine) typeWrite(txt, _ipText);
+  else { clearTimeout(_typeT); coachTalk(false); txt.textContent = _ipText; }
+  if (dopamine && explanation?.detail) {
+    const detail = el("p", { class: "engine-explanation-detail" });
+    writeExplanation(detail, explanation.detail, {key: sig, offset: _ipText.length + 1, length: writingLength});
+    body.append(detail);
+  }
   if (explanation?.threat) {
     const ply = S.idx, fen = S.positions[ply].fen, uci = explanation.threat.uci;
     const showing = _reviewThreat?.ply === ply && _reviewThreat.fen === fen && _reviewThreat.uci === uci;
