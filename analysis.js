@@ -4784,6 +4784,7 @@ function renderMoveComment() {
   const cfg = cls && QUALITY[cls];
   const explanation = engineReplies ? explainMove({
     beforeFen: S.positions[S.idx - 1].fen, afterFen: S.positions[S.idx].fen, category: cls,
+    viewerSide: S.playerKnown === true ? S.meSide : null,
     beforeScore: S.evals[S.idx - 1], afterScore: S.evals[S.idx],
     beforePv: explanationPv(S.bests[S.idx - 1]), afterPv: explanationPv(S.bests[S.idx]),
   }) : null;
@@ -4798,8 +4799,10 @@ function renderMoveComment() {
       played: S.positions[ply], uci: move.uci, owner, hold: true, duration: animDuration(),
       motion: S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches});
   };
+  const moveOwner = engineReplies && S.playerKnown === true
+    ? (sideToMove(S.positions[S.idx - 1].fen) === S.meSide ? 'Your ' : "Your opponent's ") : '';
   const assessment = el('div', {class: 'ip-assessment'},
-    categoryText(cfg && COMMENT_PHRASE[cls] ? COMMENT_PHRASE[cls](san) : `${san}.`));
+    moveOwner + categoryText(cfg && COMMENT_PHRASE[cls] ? COMMENT_PHRASE[cls](san) : `${san}.`));
   const assessmentRow = engineReplies ? el("div", { class: "ip-assessment-row" },
     cfg ? gradeBadge(cls, S.moveGrades[S.idx], "ip-badge") : null,
     assessment) : null;

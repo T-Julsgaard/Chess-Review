@@ -27,7 +27,82 @@ test('uses the correct perspective when Black allows mate or loses evaluation', 
   assert.equal(mate.summary, 'This allows Queen h5, checkmate.');
   assert.equal(mate.threat.uci, 'd1h5');
   const cp = explainMove({...position('1. e4', 'e5'), beforeScore:{cp:20}, afterScore:{cp:220}});
-  assert.equal(cp.summary, 'This gives the opponent a much stronger position.');
+  assert.equal(cp.summary, 'This gives White a much stronger position.');
+});
+
+test('evaluation losses and alternatives distinguish your move from your opponent’s for either color', () => {
+  for (const side of ['w', 'b']) {
+    const input = side === 'w' ? {...position('', 'e4'), beforePv:'a2a3'}
+      : {...position('1. e4', 'e5'), beforePv:'c7c5'};
+    const direction = side === 'w' ? -1 : 1;
+    for (const loss of [50, 250]) {
+      const evidence = {...input, beforeScore:{cp:0}, afterScore:{cp:direction * loss}};
+      const own = explainMove({...evidence, viewerSide:side});
+      const enemy = explainMove({...evidence, viewerSide:side === 'w' ? 'b' : 'w'});
+      const strength = loss >= 200 ? 'much stronger' : 'better';
+      assert.equal(own.summary, `Your move gives your opponent a ${strength} position.`);
+      assert.equal(enemy.summary, `Your opponent's move gives you a ${strength} position.`);
+      assert.match(own.detail, /^You could have played /);
+      assert.match(enemy.detail, /^Your opponent could have played /);
+      assert.deepEqual(enemy.detailParts.filter(part=>part.move), own.detailParts.filter(part=>part.move));
+      assert.deepEqual(enemy.alternative, own.alternative);
+      assert.deepEqual(enemy.evaluation, own.evaluation);
+      const neutral = explainMove(evidence);
+      assert.equal(neutral.summary, `This gives ${side === 'w' ? 'Black' : 'White'} a ${strength} position.`);
+      assert.doesNotMatch(neutral.summary + neutral.detail, /you|opponent/i);
+    }
+  }
+});
+
+test('reply tactics, best replies, missed chances and sound moves use the viewer’s identity', () => {
+  const tactic = {...position('1. e4 e5 2. Nf3 d6 3. d4', 'Nc6'), category:'inacc', afterPv:'f1b5'};
+  assert.match(explainMove({...tactic, viewerSide:'w'}).summary, /^You can reply Bishop b5, pinning/);
+  assert.match(explainMove({...tactic, viewerSide:'b'}).summary, /^Your opponent can reply Bishop b5, pinning/);
+  const quiet = {...position('1. e4', 'e5'), afterPv:'g1f3'};
+  assert.equal(explainMove({...quiet, viewerSide:'w'}).detail, 'Your best reply is Knight f3.');
+  assert.equal(explainMove({...quiet, viewerSide:'b'}).detail, "Your opponent's best reply is Knight f3.");
+  const miss = fromFen('r3k3/8/8/8/1n6/8/8/R3K3 b Qq - 0 1', 'Ke7',
+    {category:'miss', beforePv:'b4c2', viewerSide:'w'});
+  assert.match(miss.summary, /^Your opponent's move misses Knight c2/);
+  const fork = fromFen('r3k3/8/8/8/1n6/8/8/R3K3 b Qq - 0 1', 'Nc2+', {category:'best', viewerSide:'w'});
+  assert.match(fork.summary, /^Your opponent's move forks/);
+});
+
+test('forced mate explanations identify who benefits and address the correct player', () => {
+  const evidence = {...position('1. f3 e5', 'g4'), beforeScore:{cp:0}, afterScore:{mate:-3}};
+  assert.equal(explainMove({...evidence, viewerSide:'w'}).summary, 'Your move allows mate in 3 for your opponent.');
+  assert.equal(explainMove({...evidence, viewerSide:'b'}).summary, "Your opponent's move allows mate in 3 for you.");
+  const continuing = {...evidence, beforeScore:{mate:-4}};
+  assert.equal(explainMove({...continuing, viewerSide:'w'}).summary, 'You are still facing a forced mate.');
+  assert.equal(explainMove({...continuing, viewerSide:'b'}).summary, 'Your opponent is still facing a forced mate.');
+});
+
+test('rendered explanations follow the known player independently of board orientation and review mode', t => {
+  const a = app(t), S = loadGame(a, '1. e4 e5');
+  a.call('computeDerived');
+  S.idx=2; S.classif[2]='inacc'; S.evals[1]={cp:0}; S.evals[2]={cp:50};
+  S.bests[1]={pv:'c7c5'}; S.bests[2]=null;
+  S.settings.coachEngineReplies=true;
+  S.playerKnown=true; S.meSide='w';
+  for (const mode of ['normal', 'dopamine']) {
+    S.settings.reviewMode=mode;
+    for (const flipped of [false, true]) {
+      S.flipped=flipped;
+      const body=a.call('renderMoveComment');
+      assert.equal(body.querySelector('.ip-assessment').textContent, "Your opponent's e5 is an inaccuracy.");
+      assert.equal(body.querySelector('.ip-text').textContent,
+        "Your opponent's move gives you a better position." + (mode==='normal' ? ' Your opponent could have played Pawn c5.' : ''));
+      assert.match(body.textContent, /Your opponent could have played Pawn c5/);
+    }
+  }
+  S.meSide='b';
+  const own=a.call('renderMoveComment');
+  assert.equal(own.querySelector('.ip-assessment').textContent, 'Your e5 is an inaccuracy.');
+  assert.equal(own.querySelector('.ip-text').textContent, 'Your move gives your opponent a better position.');
+  S.playerKnown=false;
+  const spectator=a.call('renderMoveComment');
+  assert.equal(spectator.querySelector('.ip-assessment').textContent, 'e5 is an inaccuracy.');
+  assert.equal(spectator.querySelector('.ip-text').textContent, 'This gives White a better position.');
 });
 
 test('describes en passant at the captured pawn’s square and does not call an even trade a material win', () => {
