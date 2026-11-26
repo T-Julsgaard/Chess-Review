@@ -155,9 +155,9 @@ test('weak moves without scores still name the strongest reply instead of a vagu
 
 test('good moves describe what they do on the board', () => {
   const fork = fromFen('r3k3/8/8/8/1n6/8/8/R3K3 b Qq - 0 1', 'Nc2+', {category:'best'});
-  assert.equal(fork.summary, 'It forks the king and the rook on a1.');
+  assert.equal(fork.summary, 'This forks the king and the rook on a1.');
   const skewer = fromFen('K7/8/7r/8/5k2/8/8/2B5 w - - 0 1', 'Bd2+', {category:'excellent'});
-  assert.equal(skewer.summary, 'It skewers the king and the rook on h6 behind it.');
+  assert.equal(skewer.summary, 'This skewers the king and the rook on h6 behind it.');
   const mate = fromFen('6k1/5ppp/8/8/8/8/5PPP/3QR1K1 w - - 0 1', 'Qd7', {category:'best', afterScore:{mate:1}, afterPv:'g8f8 d7e8'});
   assert.equal(mate.summary, 'This keeps a forced mate in 1: 1… King f8 2. Queen e8.');
   const book = explainMove({...position('1. e4 e5 2. Nf3', 'Nc6'), category:'book'});
@@ -167,7 +167,7 @@ test('good moves describe what they do on the board', () => {
 test('a brilliant sacrifice names the piece given up', () => {
   const result = explainMove({...position('1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. Ng5 d5 5. exd5 Nxd5', 'Nxf7'),
     category:'brilliant', beforeScore:{cp:30}, afterScore:{cp:60}});
-  assert.equal(result.summary, 'It gives up the knight for a pawn.');
+  assert.equal(result.summary, 'This gives up the knight for a pawn.');
   assert.equal(result.detail, '');
 });
 
