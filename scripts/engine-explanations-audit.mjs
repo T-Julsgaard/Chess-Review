@@ -230,6 +230,45 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   assert.ok(wrapping.some(row=>row.previousSanLines>=3),'Existing explanations can naturally wrap beyond two lines');
   assert.equal(wrapping.find(row=>row.width===390).fullyVisible,true,'Narrow layout must show all three lines without an inner scrollbar');
   assert.equal(wrapping.find(row=>row.width===390).movesBelow,true,'The following panel must move down with the taller explanation');
+  // Force an actual explanation beyond the limit, then resize without a repaint.
+  // Use the same move evidence and links as the natural-wrapping case above.
+  for (const [width,height] of [[1366,768],[390,844]]) {
+    await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},review.sessionId);
+    const expected=await run(`import('./analysis.js').then(async m=>{
+      m.S.settings.uiAnim=false;m.go(6);
+      const text=document.querySelector('.insight-panel .ip-text');
+      text.style.width='1000px';text.style.fontSize='16px';
+      const {explainMove}=await import('./lib/move-explanation.js'),S=m.S;
+      const result=explainMove({beforeFen:S.positions[5].fen,afterFen:S.positions[6].fen,
+        category:S.classif[6],beforeScore:S.evals[5],afterScore:S.evals[6],
+        beforePv:'g8f6',afterPv:'c4f7 e8f7',viewerSide:S.playerKnown===true?S.meSide:null});
+      return {summary:result.summary,full:result.summary+' '+result.detail};
+    })`);
+    await waitFor(review,`document.querySelector('.insight-panel .ip-text').textContent===${JSON.stringify(expected.full)}`,'Wide explanation restores detail');
+    await run("document.querySelector('.insight-panel .ip-text').style.width='200px'");
+    await waitFor(review,`document.querySelector('.insight-panel .ip-text').textContent===${JSON.stringify(expected.summary)}`,'Overflow keeps first sentence');
+    const limited=await run(`(()=>{
+      const text=document.querySelector('.insight-panel .ip-text'),style=getComputedStyle(text);
+      return {lines:text.clientHeight/parseFloat(style.lineHeight),clamp:style.webkitLineClamp,
+        visible:text.getBoundingClientRect().bottom<=text.parentElement.getBoundingClientRect().bottom+1,
+        moves:[...text.querySelectorAll('.ip-move-link')].map(node=>node.textContent)};
+    })()`);
+    assert.ok(limited.lines<=3.05,JSON.stringify({width,...limited}));
+    assert.equal(limited.visible,true,'The limited explanation stays inside its panel');
+    assert.ok(+limited.clamp>=1&&+limited.clamp<=3);assert.deepEqual(limited.moves,['Bishop f7']);
+    // Show the unclipped full text in a clone for a before screenshot.
+    await run(`(()=>{
+      const text=document.querySelector('.insight-panel .ip-text'),clone=text.cloneNode(true);
+      clone.classList.remove('ip-explanation-limited');clone.textContent=${JSON.stringify(expected.full)};
+      text.style.display='none';text.after(clone);window.__overflowBefore=clone;
+    })()`);
+    await shot(`explanation-overflow-before-${width}`);
+    await run("window.__overflowBefore.remove();document.querySelector('.insight-panel .ip-text').style.removeProperty('display')");
+    await sleep(100);await shot(`explanation-overflow-after-${width}`);
+    await run("document.querySelector('.insight-panel .ip-text').style.width='1000px'");
+    await waitFor(review,`document.querySelector('.insight-panel .ip-text').textContent===${JSON.stringify(expected.full)}`,'Resize restores detail and links');
+    assert.equal(await run("document.querySelectorAll('.insight-panel .ip-text .ip-move-link').length"),2);
+  }
   await fs.writeFile(path.join(out,'explanation-wrapping.json'),JSON.stringify(wrapping,null,2));
   await fs.writeFile(path.join(out,'engine-explanations.json'),JSON.stringify(results,null,2));
   console.log(JSON.stringify({out,cases:results.length,keyboard:'passed',moveLinks:'passed',wrapping}));

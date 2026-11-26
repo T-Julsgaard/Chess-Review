@@ -209,6 +209,54 @@ test('written explanations respect reduced motion and sequence Dopamine detail a
   assert.ok(delay(detail.firstElementChild)>delay(summary.lastElementChild));
 });
 
+test('explanations over three rendered lines keep the first sentence and refit on resize',async t=>{
+  const a=review(t),win=a.dom.window,doc=win.document;
+  let fullLines=3,width=300,now=0;
+  const observers=[];
+  win.ResizeObserver=class {
+    constructor(callback){this.callback=callback;observers.push(this);}
+    observe(node){(this.nodes ||= []).push(node);}
+    disconnect(){this.disconnected=true;}
+  };
+  const style=a.context.getComputedStyle;
+  a.context.getComputedStyle=node=>node.matches('.ip-text')?{lineHeight:'20px'}:style(node);
+  const rect=win.HTMLElement.prototype.getBoundingClientRect;
+  win.HTMLElement.prototype.getBoundingClientRect=function(){
+    return this.matches('.ip-text')?{width}:rect.call(this);
+  };
+  const summary='This allows Queen h4, checkmate.';
+  const full=summary+' Better was Pawn g3.';
+  Object.defineProperty(win.HTMLElement.prototype,'scrollHeight',{get(){
+    return this.textContent===full?fullLines*20:40;
+  }});
+  a.context.performance={now:()=>now};a.state.settings.uiAnim=true;
+  await a.call('setCoachEngineReplies',true);
+  const text=()=>doc.querySelector('.insight-panel .ip-text');
+  assert.equal(text().textContent,full,'Exactly three lines stay intact');
+  const observer=observers.at(-1);
+  assert.equal(observer.nodes[0],text());
+  assert.equal(observer.nodes[1],text().parentElement);
+  now=200;fullLines=4;observer.callback();
+  assert.equal(text().textContent,summary);
+  assert.equal(text().querySelector('.ip-move-link').textContent,'Queen h4');
+  assert.equal(text().querySelectorAll('.ip-move-link').length,1);
+  assert.equal(text().querySelector('.ip-written-char').style.getPropertyValue('--ink-delay'),'-200ms');
+  assert.ok(text().classList.contains('ip-explanation-limited'));
+  width=0;fullLines=2;observer.callback();
+  assert.equal(text().textContent,summary,'Wait until hidden panels have a measurable width');
+  width=600;observer.callback();
+  assert.equal(text().textContent,full,'Widening restores the original explanation');
+  assert.equal(text().querySelectorAll('.ip-move-link').length,2);
+  Object.defineProperty(text().parentElement,'clientHeight',{configurable:true,value:20});
+  observer.callback();
+  assert.equal(text().textContent,summary,'Short panels also discard the extra sentence');
+  assert.equal(text().style.getPropertyValue('--ip-explanation-lines'),'1');
+  a.call('renderReview');
+  assert.equal(observer.disconnected,true,'Repaints stop observing the replaced node');
+  await a.call('setSetting','reviewMode','dopamine');
+  assert.equal(text().classList.contains('ip-explanation-limited'),false,'Rich exploration remains scrollable');
+});
+
 test('explanation moves preview only on hover with their category badge; assessment headings retain plain SAN',async t=>{
   const a=review(t),S=a.state;
   await a.call('setCoachEngineReplies',true);

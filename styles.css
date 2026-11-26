@@ -2429,6 +2429,7 @@ button { font-family: inherit; cursor: pointer; }
 .practice-coach .ip-head .ip-move { margin-left: auto; font-size: 13px; color: var(--ink-2); font-weight: 700; }
 .ip-text { font-family: var(--font-mono); font-size: var(--ip-font, 13px); line-height: 1.5; color: var(--ink); min-height: 1.5em; text-wrap: pretty; }
 .ip-text.ip-good { color: var(--q-best); }
+.ip-explanation-limited { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: var(--ip-explanation-lines, 3); overflow: hidden; }
 /* Step at the start so fractional end-time rounding cannot leave letters hidden. */
 .ip-written-char { animation: explanation-type 1ms steps(1, start) both; animation-delay: var(--ink-delay); }
 @keyframes explanation-type { from { opacity: 0; } to { opacity: 1; } }

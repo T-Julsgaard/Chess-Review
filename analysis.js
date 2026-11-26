@@ -4087,6 +4087,35 @@ function writeExplanation(node, text, {key, fresh = false, offset = 0, length = 
     return part.move ? [explanationMoveLink(part.move, onMove, ...content)] : content;
   }));
 }
+const _moveExplanationFits = new WeakMap();
+let _moveExplanationObserver = null;
+// Measure the complete, laid-out explanation, including its inline move links.
+// Keep the first sentence when it exceeds three lines or the panel's space.
+function fitMoveExplanation(node, text, options) {
+  if (!node.isConnected || !node.getBoundingClientRect().width) return;
+  node.classList.remove('ip-explanation-limited');
+  writeExplanation(node, text, options);
+  const lineHeight = parseFloat(getComputedStyle(node).lineHeight);
+  const body = node.parentElement;
+  const available = body.clientHeight - node.offsetTop - (parseFloat(getComputedStyle(body).paddingBottom) || 0);
+  const lines = available > 0 ? Math.max(1, Math.min(3, Math.floor((available + 1) / lineHeight))) : 3;
+  if (node.scrollHeight > lineHeight * lines + 1) {
+    const end = text.indexOf('.') + 1;
+    if (end > 0 && end < text.length) {
+      let remaining = end;
+      const parts = options.parts.flatMap(part => {
+        if (remaining <= 0) return [];
+        const text = part.text.slice(0, remaining);
+        remaining -= text.length;
+        return [{...part, text}];
+      });
+      writeExplanation(node, text.slice(0, end), {...options, parts});
+    }
+  }
+  // A single sentence may itself exceed the visible space in a fixed panel.
+  node.style.setProperty('--ip-explanation-lines', lines);
+  node.classList.add('ip-explanation-limited');
+}
 function openingStrip() {
   const o = (S.analysisMode && S.variation ? variationOpening() : S.opening);
   const line = o ? `${o.eco}${o.eco && o.name ? " · " : ""}${o.name}` : "Opening unknown";
@@ -4695,6 +4724,7 @@ function analysisProgressText() {
 }
 function renderReview() {
   explanationPreview.cancel();
+  _moveExplanationObserver?.disconnect();
   let entry = UI.reviewEntry.firstElementChild;
   if(S.blank){
     if (!entry?.matches(".learn-entry-button")) UI.reviewEntry.replaceChildren(solvePuzzlesButton());
@@ -4759,6 +4789,16 @@ function renderReview() {
 
   panel.append(renderMoveComment());
   UI.review.replaceChildren(panel);
+  const txt = panel.querySelector('.move-comment > .ip-text');
+  const fit = _moveExplanationFits.get(txt);
+  if (fit) {
+    fit();
+    if (window.ResizeObserver) {
+      _moveExplanationObserver = new window.ResizeObserver(fit);
+      _moveExplanationObserver.observe(txt);
+      _moveExplanationObserver.observe(txt.parentElement);
+    }
+  }
 }
 // Commentary for the move on the mainline at S.idx.
 function renderMoveComment() {
@@ -4842,6 +4882,10 @@ function renderMoveComment() {
     const parts = [...explanation.summaryParts];
     if (!dopamine && explanation.detail) parts.push({text: ' '}, ...explanation.detailParts);
     writeExplanation(txt, _ipText, {key: sig, fresh, length: writingLength, parts, onMove: showMove});
+    if (!dopamine) {
+      const text = _ipText, options = {key: sig, length: writingLength, parts, onMove: showMove};
+      _moveExplanationFits.set(txt, () => fitMoveExplanation(txt, text, options));
+    }
   } else if (fresh && !dopamine) typeWrite(txt, _ipText);
   else { clearTimeout(_typeT); coachTalk(false); txt.textContent = _ipText; }
   if (dopamine && explanation?.detail) {
