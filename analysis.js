@@ -4091,7 +4091,7 @@ function openingStrip() {
   const o = (S.analysisMode && S.variation ? variationOpening() : S.opening);
   const line = o ? `${o.eco}${o.eco && o.name ? " · " : ""}${o.name}` : "Opening unknown";
   return el("div", { class: "ip-heading" },
-    el("div", { class: "ip-opening", title: line },
+    el("div", { class: "ip-opening" },
       el("span", { class: "ip-op-ic", html: ICONS.book || "" }),
       el("span", { class: "ip-op-txt" }, line)),
     el("button", { type: "button", class: "ip-explanations-toggle", role: "switch",
