@@ -393,8 +393,8 @@ const DEFAULT_SETTINGS = {
   moveAnim: true, animSpeed: 7,
   // Interface transitions stay enabled when individual piece slides are off.
   uiAnim: true,
-  // Keep Engine's original height unless content fitting is explicitly enabled.
-  engineAutoHeight: false,
+  // Fit Engine to its lines by default, sharing spare height with Accuracy.
+  engineAutoHeight: true,
   learningTransition: "morph3",
   // Player profile: default period, engine-sample budget and whether games against bots count.
   profilePeriod: "year", profileBudget: "standard", profileIncludeBots: false,
@@ -6982,13 +6982,12 @@ function visualSettings() {
       seg("Setup", "uiSetup", ["modern", "old", "custom"].filter(id => UI_SETUPS[id]), null, value => UI_SETUPS[value].label),
     ),
     section("Tabs",
-      ...PANEL_DESIGNS.filter(design => design.panel === "evalbar" || design.versions.length > 1).flatMap(design => [
+      ...PANEL_DESIGNS.filter(design => design.panel === "evalbar" || design.versions.length > 1).map(design =>
         design.panel === "evalbar" ? settingDropdown("Evaluation bar", "barStyle",
           [["flat2", "Default"], ["gradient", "Gradient"], ["classic", "Solid"], ["mono", "Mono"], ["accent", "Accent"]])
-          : settingDropdown(design.label, design.setting, design.versions.map(version => [version.id, version.label])),
-        design.panel === "engine" ? toggleRow("Resize to fit lines", "engineAutoHeight", setSetting,
-          "Adjusts Engine's height to the displayed lines. In the Modern layout, Accuracy takes the freed space. Off keeps the original fixed height.") : null,
-      ]),
+          : settingDropdown(design.label, design.setting, design.versions.map(version => [version.id, version.label]))),
+      toggleRow("Resize to fit lines", "engineAutoHeight", setSetting,
+        "Adjusts Engine's height to the displayed lines. In the Modern layout, Accuracy takes the freed space. Off keeps the original fixed height."),
     ),
     section("Theme",
       colorChips("Accent", "accent", accentEntries),

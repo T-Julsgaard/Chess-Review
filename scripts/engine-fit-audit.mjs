@@ -36,7 +36,8 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     .then(([m,l,u])=>l.fullHdReferenceLayout(u.MODERN_LAYOUT,innerWidth,innerHeight,!!m.S.qbreakExpanded,true).engine.h)`);
   const settle = () => sleep(420);
   const evidence = [];
-  assert.equal(await run("import('./analysis.js').then(m=>m.S.settings.engineAutoHeight)"), false, 'Fixed height is the default');
+  assert.equal(await run("import('./analysis.js').then(m=>m.S.settings.engineAutoHeight)"), true, 'Content fitting is the default');
+  await run("import('./analysis.js').then(m=>m.setSetting('engineAutoHeight',false))");
   const fixed = [];
   for (const count of [1, 2, 3]) {
     await render(count); await settle();
