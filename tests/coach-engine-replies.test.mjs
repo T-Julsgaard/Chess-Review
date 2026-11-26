@@ -31,8 +31,8 @@ test('Coach offers concise Engine explanations with an assessment and unchanged 
   const badge=body.querySelector('.ip-assessment-row > .ip-badge');
   assert.ok(badge);
   assert.equal(badge.src,a.call('gradeBadge','mistake',S.moveGrades[S.idx],'ip-badge').src);
-  assert.equal(body.querySelector('.ip-assessment').textContent,'g4 is a mistake.');
-  assert.equal(body.querySelector('.ip-text').textContent,'This allows Qh4#, checkmate. Better was g3.');
+  assert.equal(body.querySelector('.ip-assessment').textContent,'Pawn g4 is a mistake.');
+  assert.equal(body.querySelector('.ip-text').textContent,'This allows Queen h4, checkmate. Better was Pawn g3.');
   assert.equal(body.querySelector('.dopamine-line,.dopamine-evaluation,.dopamine-detail'),null);
   assert.equal(doc.querySelector('.dopamine-comment,.dopamine-effect'),null);
   assert.equal(snapshot(),unchanged);
@@ -53,12 +53,12 @@ test('Engine explanations and Special replies switch one another off while retai
   assert.equal(S.settings.coach,'old_soviet');
   assert.equal(S.settings.coachPlain,true);
   assert.equal(S.coach,null);
-  assert.match(a.call('renderMoveComment').querySelector('.ip-text').textContent,/This allows Qh4#/);
+  assert.match(a.call('renderMoveComment').querySelector('.ip-text').textContent,/This allows Queen h4/);
   await a.call('setCoachPlain',false);
   assert.equal(S.settings.coachEngineReplies,false);
   assert.equal(a.store.settings.coachEngineReplies,false);
   assert.equal(S.coach,bank);
-  assert.doesNotMatch(a.run('_ipText'),/This allows Qh4#/);
+  assert.doesNotMatch(a.run('_ipText'),/This allows Queen h4/);
 });
 
 test('Engine explanations persist without a coach and survive a visual reset',async t=>{
@@ -94,7 +94,7 @@ test('Dopamine keeps its existing explanations until an explicit Coach choice ov
   assert.equal(restored.call('engineExplanationsEnabled'),false);
   await a.call('setCoachEngineReplies',true);
   await a.call('setSetting','reviewMode','normal');
-  assert.match(a.call('renderMoveComment').querySelector('.ip-text').textContent,/This allows Qh4#/);
+  assert.match(a.call('renderMoveComment').querySelector('.ip-text').textContent,/This allows Queen h4/);
   assert.equal(a.call('renderMoveComment').querySelector('.dopamine-line'),null);
 });
 
@@ -206,4 +206,23 @@ test('written explanations respect reduced motion and sequence Dopamine detail a
   assert.ok(detail);
   const delay=node=>parseFloat(node.style.getPropertyValue('--ink-delay'));
   assert.ok(delay(detail.firstElementChild)>delay(summary.lastElementChild));
+});
+
+test('underlined move links open replies, alternatives and played moves from their own positions',async t=>{
+  const a=review(t),S=a.state;
+  await a.call('setCoachEngineReplies',true);
+  const before=JSON.stringify([S.evals,S.bests,S.classif,S.moveGrades]);
+  const opened=[];
+  a.replace('playLine',uci=>opened.push({uci,ply:S.idx}));
+  const body=a.call('renderMoveComment');
+  const links=[...body.querySelectorAll('.ip-text .ip-move-link')];
+  assert.deepEqual(links.map(link=>link.textContent),['Queen h4','Pawn g3']);
+  links[0].click();assert.deepEqual(opened.pop(),{uci:'d8h4',ply:3});
+  // The alternative starts one ply earlier; a stale detached link cannot jump.
+  links[1].click();assert.deepEqual(opened.pop(),{uci:'g2g3',ply:2});
+  links[0].click();assert.equal(opened.length,0);
+  a.call('go',3);
+  a.call('renderMoveComment').querySelector('.ip-assessment .ip-move-link').click();
+  assert.deepEqual(opened.pop(),{uci:'g2g4',ply:2});
+  assert.equal(JSON.stringify([S.evals,S.bests,S.classif,S.moveGrades]),before);
 });

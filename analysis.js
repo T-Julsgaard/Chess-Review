@@ -4050,22 +4050,30 @@ function typeWrite(node, text) {
   step();
 }
 let _explanationWriting = null;
+function explanationMoveLink(move, onMove, ...content) {
+  return el('button', {type: 'button', class: 'ip-move-link', title: move.san,
+    onclick: () => onMove(move)}, ...content);
+}
 // Lay out the complete sentence first, then let the ink appear in reading order.
-// Keeping the glyphs in normal text flow prevents wrapping and bottom alignment
+// Keeping the glyphs in normal text flow prevents wrapping and alignment
 // from moving while a sentence is written. No caret, sound or recurring timer.
-function writeExplanation(node, text, {key, fresh = false, offset = 0, length = text.length}) {
+function writeExplanation(node, text, {key, fresh = false, offset = 0, length = text.length, parts = [{text}], onMove}) {
   const now = performance.now();
   if (fresh) _explanationWriting = {key, started: now};
   const elapsed = _explanationWriting?.key === key ? now - _explanationWriting.started : Infinity;
   const motion = S.settings.uiAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const step = Math.min(14, 1000 / Math.max(1, length));
-  if (!motion || elapsed >= length * step + 100) { node.textContent = text; return; }
-  const glyphs = typeof Intl.Segmenter === 'function'
-    ? [...new Intl.Segmenter(undefined, {granularity: 'grapheme'}).segment(text)].map(part => part.segment)
-    : Array.from(text);
-  node.replaceChildren(...glyphs.map((glyph, index) => el('span', {
-    class: 'ip-written-char', style: {'--ink-delay': ((offset + index) * step - elapsed) + 'ms'},
-  }, glyph)));
+  const animate = motion && elapsed < length * step + 100;
+  let index = offset;
+  node.replaceChildren(...parts.flatMap(part => {
+    const glyphs = !animate ? [] : typeof Intl.Segmenter === 'function'
+      ? [...new Intl.Segmenter(undefined, {granularity: 'grapheme'}).segment(part.text)].map(item => item.segment)
+      : Array.from(part.text);
+    const content = animate ? glyphs.map(glyph => el('span', {
+      class: 'ip-written-char', style: {'--ink-delay': (index++ * step - elapsed) + 'ms'},
+    }, glyph)) : [document.createTextNode(part.text)];
+    return part.move ? [explanationMoveLink(part.move, onMove, ...content)] : content;
+  }));
 }
 function openingStrip() {
   const o = (S.analysisMode && S.variation ? variationOpening() : S.opening);
@@ -4671,10 +4679,26 @@ function renderMoveComment() {
   const cls = S.classif[S.idx];
   const san = S.positions[S.idx].san || "";
   const cfg = cls && QUALITY[cls];
+  const explanation = engineReplies ? explainMove({
+    beforeFen: S.positions[S.idx - 1].fen, afterFen: S.positions[S.idx].fen, category: cls,
+    beforeScore: S.evals[S.idx - 1], afterScore: S.evals[S.idx],
+    beforePv: explanationPv(S.bests[S.idx - 1]), afterPv: explanationPv(S.bests[S.idx]),
+  }) : null;
+  const ply = S.idx, positionFen = S.positions[ply].fen;
+  const showMove = move => {
+    if (S.idx !== ply || S.positions[ply]?.fen !== positionFen || S.analysisMode || S.practice) return;
+    gotoMainline(ply + move.plyOffset);
+    playLine(move.uci);
+  };
+  const assessment = el('div', {class: 'ip-assessment'});
+  const assessmentText = categoryText(cfg && COMMENT_PHRASE[cls] ? COMMENT_PHRASE[cls](explanation?.played?.text || san) : `${explanation?.played?.text || san}.`);
+  if (explanation?.played && assessmentText.startsWith(explanation.played.text)) {
+    assessment.append(explanationMoveLink(explanation.played, showMove, explanation.played.text),
+      document.createTextNode(assessmentText.slice(explanation.played.text.length)));
+  } else assessment.textContent = assessmentText;
   const assessmentRow = engineReplies ? el("div", { class: "ip-assessment-row" },
     cfg ? gradeBadge(cls, S.moveGrades[S.idx], "ip-badge") : null,
-    el("div", { class: "ip-assessment" },
-      categoryText(cfg && COMMENT_PHRASE[cls] ? COMMENT_PHRASE[cls](san) : `${san}.`))) : null;
+    assessment) : null;
   if (assessmentRow) body.append(assessmentRow);
   // Modern already shows the evaluation in its evaluation panel.
   const ev = S.evals[S.idx];
@@ -4692,11 +4716,6 @@ function renderMoveComment() {
 
   // Pick the line once per (ply + coach): a fresh signature → choose + type; otherwise reuse the
   // shown text (so unrelated re-renders don't re-pick or re-animate, and a coach switch re-types).
-  const explanation = engineReplies ? explainMove({
-    beforeFen: S.positions[S.idx - 1].fen, afterFen: S.positions[S.idx].fen, category: cls,
-    beforeScore: S.evals[S.idx - 1], afterScore: S.evals[S.idx],
-    beforePv: explanationPv(S.bests[S.idx - 1]), afterPv: explanationPv(S.bests[S.idx]),
-  }) : null;
   const sig = "m:" + S.idx + ":" + (S.settings.coach || "") + ":" + (cls || "") + ":" + (dopamine ? "dopamine:" : "normal:") + JSON.stringify(explanation);
   const fresh = sig !== _ipSig;
   if (fresh) {
@@ -4713,19 +4732,22 @@ function renderMoveComment() {
   const writingLength = _ipText.length + (dopamine && explanation?.detail ? explanation.detail.length + 1 : 0);
   if (explanation) {
     clearTimeout(_typeT); coachTalk(false);
-    writeExplanation(txt, _ipText, {key: sig, fresh, length: writingLength});
+    const parts = [...explanation.summaryParts];
+    if (!dopamine && explanation.detail) parts.push({text: ' '}, ...explanation.detailParts);
+    writeExplanation(txt, _ipText, {key: sig, fresh, length: writingLength, parts, onMove: showMove});
   } else if (fresh && !dopamine) typeWrite(txt, _ipText);
   else { clearTimeout(_typeT); coachTalk(false); txt.textContent = _ipText; }
   if (dopamine && explanation?.detail) {
     const detail = el("p", { class: "engine-explanation-detail" });
-    writeExplanation(detail, explanation.detail, {key: sig, offset: _ipText.length + 1, length: writingLength});
+    writeExplanation(detail, explanation.detail, {key: sig, offset: _ipText.length + 1, length: writingLength,
+      parts: explanation.detailParts, onMove: showMove});
     body.append(detail);
   }
   if (explanation?.threat) {
     const ply = S.idx, fen = S.positions[ply].fen, uci = explanation.threat.uci;
     const showing = _reviewThreat?.ply === ply && _reviewThreat.fen === fen && _reviewThreat.uci === uci;
     assessmentRow.append(el("button", { type: "button", class: "ip-show-threat", "aria-pressed": String(showing),
-      title: explanation.threat.san,
+      title: explanation.threat.text,
       onclick: () => {
         if (S.idx !== ply || S.positions[ply]?.fen !== fen || S.analysisMode || S.practice) return;
         _reviewThreat = {ply, fen, uci: showing ? null : uci};
@@ -4739,10 +4761,10 @@ function renderMoveComment() {
     const lines = el("div", { class: "dopamine-lines" });
     if (explanation.reply) lines.append(el("button", { type: "button", class: "dopamine-line",
       onclick: () => { gotoMainline(ply); playLine(explanation.reply.uci); } },
-      el("strong", {}, "Explore the reply →"), el("span", {}, explanation.reply.san)));
+      el("strong", {}, "Explore the reply →"), el("span", {}, explanation.reply.text)));
     if (explanation.alternative) lines.append(el("button", { type: "button", class: "dopamine-line",
       onclick: () => { gotoMainline(ply - 1); playLine(explanation.alternative.uci); } },
-      el("strong", {}, "Better: " + explanation.alternative.move + " →"), el("span", {}, explanation.alternative.san)));
+      el("strong", {}, "Better: " + explanation.alternative.moveText + " →"), el("span", {}, explanation.alternative.text)));
     if (lines.childElementCount) body.append(lines);
   }
   return body;
