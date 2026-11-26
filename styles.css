@@ -2440,10 +2440,11 @@ button { font-family: inherit; cursor: pointer; }
 .ip-move-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .ip-move-link:has(.ip-written-char) { text-decoration: none; }
 .ip-move-link .ip-written-char { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-.ip-show-threat { flex: none; padding: 3px 8px; border: 1px solid var(--line);
-  border-radius: 3px; background: var(--panel-2); color: var(--ink-2); font: 600 11px/1.5 var(--font-ui); cursor: pointer; }
-.ip-show-threat:hover, .ip-show-threat[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
-.ip-show-threat:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ip-show-threat { flex: none; padding: 3px 8px; border: 1px solid color-mix(in oklab, var(--q-blunder) 42%, var(--line));
+  border-radius: 3px; background: var(--panel-2); color: color-mix(in oklab, var(--q-blunder) 60%, var(--ink)); font: 600 11px/1.5 var(--font-ui); cursor: pointer; }
+.ip-show-threat:hover, .ip-show-threat[aria-pressed="true"] { color: color-mix(in oklab, var(--q-blunder) 78%, var(--ink));
+  border-color: color-mix(in oklab, var(--q-blunder) 75%, var(--line)); background: color-mix(in oklab, var(--q-blunder) 8%, var(--panel-2)); }
+.ip-show-threat:focus-visible { outline: 2px solid color-mix(in oklab, var(--q-blunder) 65%, var(--ink)); outline-offset: 2px; }
 .ip-sub { font-size: 12px; color: var(--ink-3); font-family: var(--font-mono); }
 .ip-note { font-family: var(--font-mono); font-size: var(--ip-font, 13px); line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
 /* same typography as the panel headers (e.g. "Accuracy") */
