@@ -1139,7 +1139,13 @@ button { font-family: inherit; cursor: pointer; }
 }
 /* name+elo on one line, captured-piece tray beneath — the whole block stays within the
    avatar square's height (≈40px): name row ~17px + captured row ~22px. */
-.player-strip .who { display: flex; flex-direction: column; justify-content: center; line-height: 1.15; min-width: 0; transform: translateY(-2px); }
+.player-strip .who { display: flex; flex-direction: column; justify-content: center; line-height: 1.15; min-width: 0; transform: translateY(-2px);
+  transition: transform .3s cubic-bezier(.22, .61, .36, 1); }
+/* Offset half the reserved capture row (22px + 2px gap) to center an unaccompanied name
+   beside its avatar. Keep the existing raised position when material is displayed. */
+.player-strip .who:has(.cap-tray.is-empty):not(:has(.adv)) { transform: translateY(12px); }
+[data-archive-motion="off"] .player-strip .who { transition: none; }
+@media (prefers-reduced-motion: reduce) { .player-strip .who { transition: none; } }
 .player-strip .name { font-weight: 700; font-size: 15px; display: flex; align-items: baseline; gap: 4px; white-space: nowrap; }
 .player-strip .name .elo { font-family: var(--font-mono); font-weight: 500; font-size: 12px; color: var(--ink-3); }
 .player-strip .name .flag { font-size: 13px; }
@@ -1147,7 +1153,7 @@ button { font-family: inherit; cursor: pointer; }
 /* Captured pieces ride on a rounded backing tray whose tone contrasts the pieces (light tray under
    black pieces, dark tray under white) so the dark icons stay legible against the dark board. The
    tray hugs the row and grows smoothly as pieces are added; it collapses to nothing when empty, but
-   the row keeps its height so the name above never shifts. */
+   the row keeps its height so moving the name never changes the board layout. */
 .player-strip .cap-tray {
   display: flex; align-items: center; height: 22px; padding: 0 6px; gap: 1px;
   border-radius: 7px;

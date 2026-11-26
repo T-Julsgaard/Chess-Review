@@ -3877,8 +3877,8 @@ function playerStrip(side, material = capturedInfo(), context = null) {
   // Captured pieces sit on a rounded backing tray that gives the dark icons a legible backdrop
   // (black pieces vanished against the dark board). The tray's tone CONTRASTS its pieces — a light
   // tray under captured black pieces, a dark tray under captured white ones — and it hugs the row,
-  // growing as more pieces come off the board. The captured row is ALWAYS rendered (even empty) so
-  // the name above it keeps its place whether or not anything has been captured yet.
+  // growing as more pieces come off the board. Keep the captured row mounted even when empty;
+  // CSS centers the name beside the avatar until material appears, then smoothly raises it.
   const capTone = side === "w" ? "light" : "dark"; // white captures black pieces → light tray
   const captured = el("div", { class: "captured" },
     el("div", { class: "cap-tray cap-tray-" + capTone + (caps.length ? "" : " is-empty") },
