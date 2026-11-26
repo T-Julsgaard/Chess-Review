@@ -4061,7 +4061,7 @@ function typeWrite(node, text) {
 }
 let _explanationWriting = null;
 function explanationMoveLink(move, onMove, ...content) {
-  return el('span', {class: 'ip-move-link', title: 'Hover to preview ' + move.san,
+  return el('span', {class: 'ip-move-link',
     onpointerenter: e => { if (e.pointerType !== 'touch') onMove(move, e.currentTarget); },
     onpointerleave: e => explanationPreview.release(e.currentTarget),
     onpointercancel: () => explanationPreview.cancel()}, ...content);
@@ -4850,7 +4850,6 @@ function renderMoveComment() {
     const ply = S.idx, fen = S.positions[ply].fen, uci = explanation.threat.uci;
     const showing = _reviewThreat?.ply === ply && _reviewThreat.fen === fen && _reviewThreat.uci === uci;
     assessmentRow.append(el("button", { type: "button", class: "ip-show-threat", "aria-pressed": String(showing),
-      title: explanation.threat.text,
       onclick: () => {
         if (S.idx !== ply || S.positions[ply]?.fen !== fen || S.analysisMode || S.practice) return;
         _reviewThreat = {ply, fen, uci: showing ? null : uci};
