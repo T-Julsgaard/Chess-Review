@@ -27,7 +27,10 @@ test('Coach offers concise Engine explanations with an assessment and unchanged 
   assert.equal(control(true).getAttribute('aria-pressed'),'true');
   assert.equal(doc.activeElement,control(true));
   const body=a.call('renderMoveComment');
-  assert.equal(body.querySelector('.ip-head,.ip-badge,.ip-move'),null);
+  assert.equal(body.querySelector('.ip-head,.ip-move'),null);
+  const badge=body.querySelector('.ip-assessment-row > .ip-badge');
+  assert.ok(badge);
+  assert.equal(badge.src,a.call('gradeBadge','mistake',S.moveGrades[S.idx],'ip-badge').src);
   assert.equal(body.querySelector('.ip-assessment').textContent,'g4 is a mistake.');
   assert.equal(body.querySelector('.ip-text').textContent,'This allows Qh4#, checkmate. Better was g3.');
   assert.equal(body.querySelector('.dopamine-line,.dopamine-evaluation,.dopamine-detail'),null);

@@ -4636,7 +4636,7 @@ function renderReview() {
 function renderMoveComment() {
   const dopamine = S.settings.reviewMode === "dopamine";
   const engineReplies = engineExplanationsEnabled();
-  const body = el("div", { class: "ip-body" + (dopamine ? " dopamine-comment" : "") });
+  const body = el("div", { class: "ip-body move-comment" + (dopamine ? " dopamine-comment" : "") });
   if (dopamine) body.dataset.moveCategory = S.classif[S.idx] || "";
   const head = engineReplies ? null : el("div", { class: "ip-head" });
   if (head) body.append(head);
@@ -4654,6 +4654,7 @@ function renderMoveComment() {
   const san = S.positions[S.idx].san || "";
   const cfg = cls && QUALITY[cls];
   const assessmentRow = engineReplies ? el("div", { class: "ip-assessment-row" },
+    cfg ? gradeBadge(cls, S.moveGrades[S.idx], "ip-badge") : null,
     el("div", { class: "ip-assessment" },
       categoryText(cfg && COMMENT_PHRASE[cls] ? COMMENT_PHRASE[cls](san) : `${san}.`))) : null;
   if (assessmentRow) body.append(assessmentRow);

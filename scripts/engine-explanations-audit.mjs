@@ -38,6 +38,7 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
     assert.equal(state.on,'true');assert.equal(state.beforeClose,true);
     assert.equal(state.assessment,'g4 is a blunder.');assert.equal(state.portrait,false);
     assert.equal(state.overflow,false);
+    assert.equal(await run("!!document.querySelector('.ip-assessment-row > .ip-badge')"),true);
     await run("document.querySelector('.ip-show-threat').click()");await sleep(50);
     assert.equal(await run("!!document.querySelector('svg.threat-arrow')"),true);
     const visible=await run(`(()=>{
@@ -48,10 +49,31 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
     })()`);
     if(width>=1366)assert.equal(visible,true,'Assessment and explanation should fit together');
     await shot(`explanation-threat-${width}`);
+    // A deliberate line break reproduces the small vertical scroll range.
+    await run(`(()=>{
+      const text=document.querySelector('.insight-panel .ip-text');
+      text.replaceChildren('Qxd6 takes the bishop.',document.createElement('br'),'Better was Bf4.');
+    })()`);
+    const fixedComment=await run(`(()=>{
+      const body=document.querySelector('.insight-panel .ip-body');
+      const b=body.getBoundingClientRect(),badge=body.querySelector('.ip-badge').getBoundingClientRect();
+      const text=body.querySelector('.ip-text').getBoundingClientRect();
+      body.scrollTop=100;body.scrollTop=-100;
+      return {scrollTop:body.scrollTop,overflow:getComputedStyle(body).overflowY,
+        unmoved:text.top===body.querySelector('.ip-text').getBoundingClientRect().top,
+        badgeVisible:badge.top>=b.top&&badge.bottom<=b.bottom,
+        bodyHeight:b.height,badgeTop:badge.top-b.top,badgeHeight:badge.height,textHeight:text.height,
+        bottomGap:b.bottom-text.bottom,paddingBottom:parseFloat(getComputedStyle(body).paddingBottom)*b.height/body.offsetHeight};
+    })()`);
+    assert.equal(fixedComment.overflow,'clip');assert.equal(fixedComment.scrollTop,0);
+    assert.equal(fixedComment.unmoved,true);
+    assert.equal(fixedComment.badgeVisible,true,'Badge should stay visible with a two-line comment: '+JSON.stringify({width,...fixedComment}));
+    assert.ok(Math.abs(fixedComment.bottomGap-fixedComment.paddingBottom)<1,'Comment stays aligned to the bottom');
+    await shot(`two-line-locked-${width}`);
     await run("import('./analysis.js').then(m=>m.go(2))");
     assert.equal(await run("!!document.querySelector('svg.threat-arrow')"),false);
     await run("import('./analysis.js').then(m=>m.go(3))");
-    results.push({width,height,...state,threatCleared:true});
+    results.push({width,height,...state,fixedComment,threatCleared:true});
   }
   // Use native keyboard input to verify the switch's Space activation and focus.
   await run("document.querySelector('.ip-explanations-toggle').focus()");

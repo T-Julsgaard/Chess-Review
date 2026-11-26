@@ -2415,6 +2415,12 @@ button { font-family: inherit; cursor: pointer; }
 .ip-text.ip-good { color: var(--q-best); }
 .ip-assessment { font: 750 var(--ip-font, 13px)/1.35 var(--font-mono); color: var(--ink); overflow-wrap: anywhere; }
 .ip-assessment-row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; }
+/* Keep ordinary move comments in their bottom-aligned position, without a
+   small scroll range when the explanation wraps. Rich exploration stays scrollable. */
+.stage .ip-body.move-comment:not(.dopamine-comment) {
+  overflow: clip; justify-content: flex-end; padding-block: 0 6px; gap: 6px;
+}
+.ip-body.move-comment:not(.dopamine-comment) > * { flex-shrink: 0; }
 .engine-explanation-detail { margin: 0; font: var(--ip-font, 13px)/1.45 var(--font-mono); color: var(--ink-2); }
 .ip-show-threat { flex: none; padding: 3px 8px; border: 1px solid var(--line);
   border-radius: 3px; background: var(--panel-2); color: var(--ink-2); font: 600 11px/1.5 var(--font-ui); cursor: pointer; }
