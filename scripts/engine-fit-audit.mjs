@@ -19,8 +19,11 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     const items=[...panel.querySelectorAll('.engine-focus-candidate,.engine-focus-pending,.engine-line,.engine-empty,.engine-minimal-controls,.engine-focus-play,.engine-bestwalk')];
     const page=document.querySelector('[data-mod="accuracy"] .acc-fit-page');
     const sections=[...page.querySelector('.phase-overview').children].map(n=>n.getBoundingClientRect());
+    const players=page.querySelector('.acc-players').getBoundingClientRect(), nav=document.querySelector('.acc-navigation').getBoundingClientRect();
     return {accuracy:rect('accuracy'),engine:rect('engine'),learn:rect('learn'),
       sectionGaps:sections.slice(1).map((r,i)=>r.top-sections[i].bottom),
+      allGaps:[players.top-nav.bottom,sections[0].top-players.bottom,...sections.slice(1).map((r,i)=>r.top-sections[i].bottom)],
+      accuracyZoom:Number(page.querySelector('.acc-fit-content').style.zoom||1),
       overflow:body.scrollHeight-body.clientHeight,
       clipped:items.filter(n=>{const r=n.getBoundingClientRect();const p=panel.getBoundingClientRect();return r.top<p.top-.5||r.bottom>p.bottom+.5;}).length,
       accuracyOverflow:page?page.scrollHeight-page.clientHeight:0,
@@ -71,6 +74,12 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
         sizes.push({count, ...fit});
       }
       const [three, two, one] = sizes, gap = three.engine.top-three.accuracy.bottom;
+      const fullSize=sizes.filter(s=>s.accuracyZoom===1);
+      for (const fit of fullSize) {
+        const extra=fit.allGaps.map((value,i)=>value-fullSize[0].allGaps[i]);
+        assert.ok(Math.max(...extra)-Math.min(...extra)<.5,
+          'Spare Accuracy height is shared below navigation, below names and between score sections '+JSON.stringify({design,width,height,extra}));
+      }
       for (const fit of sizes) {
         const context = JSON.stringify({design, width, height, gap, fit});
         assert.ok(Math.abs(fit.engine.top-fit.accuracy.bottom-gap)<.5, 'Accuracy→Engine gap never changes '+context);
