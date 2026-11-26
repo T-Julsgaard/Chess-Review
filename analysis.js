@@ -4062,7 +4062,7 @@ function writeExplanation(node, text, {key, fresh = false, offset = 0, length = 
   if (fresh) _explanationWriting = {key, started: now};
   const elapsed = _explanationWriting?.key === key ? now - _explanationWriting.started : Infinity;
   const motion = S.settings.uiAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  const step = Math.min(24, 1800 / Math.max(1, length));
+  const step = Math.min(18, 1350 / Math.max(1, length));
   const animate = motion && elapsed < length * step + 1;
   let index = offset;
   node.replaceChildren(...parts.flatMap(part => {

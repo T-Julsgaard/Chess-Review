@@ -2413,7 +2413,8 @@ button { font-family: inherit; cursor: pointer; }
 .practice-coach .ip-head .ip-move { margin-left: auto; font-size: 13px; color: var(--ink-2); font-weight: 700; }
 .ip-text { font-family: var(--font-mono); font-size: var(--ip-font, 13px); line-height: 1.5; color: var(--ink); min-height: 1.5em; text-wrap: pretty; }
 .ip-text.ip-good { color: var(--q-best); }
-.ip-written-char { animation: explanation-type 1ms steps(1, end) both; animation-delay: var(--ink-delay); }
+/* Step at the start so fractional end-time rounding cannot leave letters hidden. */
+.ip-written-char { animation: explanation-type 1ms steps(1, start) both; animation-delay: var(--ink-delay); }
 @keyframes explanation-type { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .ip-written-char { animation: none; } }
 [data-archive-motion="off"] .ip-written-char { animation: none; }

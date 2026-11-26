@@ -105,14 +105,21 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
   await shot('typing-explanation');
   await run("import('./analysis.js').then(m=>m.go(3))");
   assert.equal(await run("parseFloat(document.querySelector('.ip-written-char').style.getPropertyValue('--ink-delay'))<0"),true);
-  await sleep(1800);
+  // Wait for Chrome's actual animation timeline after the repaint, rather than
+  // assuming wall-clock sleep also guarantees all delayed animations have run.
+  await run("Promise.all(document.querySelector('.insight-panel .ip-text').getAnimations({subtree:true}).map(animation=>animation.finished.catch(()=>{}))).then(()=>true)");
   const finished=await run(`(()=>{
     const node=document.querySelector('.insight-panel .ip-text'),r=node.getBoundingClientRect();
     return {text:node.textContent,rect:{x:r.x,y:r.y,width:r.width,height:r.height},
-      visible:[...node.querySelectorAll('.ip-written-char')].every(n=>+getComputedStyle(n).opacity===1)};
+      visible:[...node.querySelectorAll('.ip-written-char')].every(n=>+getComputedStyle(n).opacity===1),
+      pending:[...node.querySelectorAll('.ip-written-char')].filter(n=>+getComputedStyle(n).opacity<1).slice(-3).map(n=>({
+        text:n.textContent,delay:n.style.getPropertyValue('--ink-delay'),animations:n.getAnimations().map(a=>({time:a.currentTime,state:a.playState,timing:a.effect.getComputedTiming()}))}))};
   })()`);
-  assert.equal(finished.visible,true);assert.equal(finished.text,writing.text);
+  assert.equal(finished.visible,true,JSON.stringify(finished));assert.equal(finished.text,writing.text);
   assert.deepEqual(finished.rect,writing.rect,'Writing must preserve line wrapping and alignment');
+  // The render budget includes one final character interval after the last
+  // glyph appears; allow it to elapse before checking plain-text cleanup.
+  await sleep(50);
   await run("import('./analysis.js').then(m=>m.go(3))");
   const settled=await run(`(()=>{
     const node=document.querySelector('.insight-panel .ip-text'),r=node.getBoundingClientRect();
