@@ -4268,7 +4268,6 @@ function animateCoachPresence(shown) {
     { transform: current && current !== "none" ? current : below, offset: 0, easing: "cubic-bezier(.2,.7,.3,1)" },
     { transform: peek, offset: .23 },
     { transform: peek, offset: .70, easing: "cubic-bezier(.2,.7,.3,1)" },
-    { transform: "translateY(-3px)", offset: .94 },
     { transform: "translateY(0)", offset: 1 },
   ] : [
     { transform: current && current !== "none" ? current : "translateY(0)", easing: "cubic-bezier(.55,.02,.9,.45)" },
