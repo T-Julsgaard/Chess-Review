@@ -260,8 +260,29 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 }
 
 /* Setup — whose games, which site, how far back */
-.profile-setup { display: flex; flex-direction: column; justify-content: center; gap: 18px; max-width: 560px; min-height: 100%; box-sizing: border-box; padding: 4px 2px 8px; animation: profile-fade .36s ease-out both; }
-.profile-setup-intro { display: flex; flex-direction: column; gap: 8px; }
+.profile-slide-host:has(> .profile-setup) { padding: 28px; scrollbar-gutter: stable both-edges; container: profile-setup / size; }
+.profile-setup { display: flex; flex-direction: column; justify-content: center; gap: 28px; width: 100%; max-width: 560px; min-height: 100%; margin-inline: auto; box-sizing: border-box; animation: profile-fade .36s ease-out both; }
+.profile-setup-intro { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.profile-setup-intro::before { content: ''; width: 44px; height: 44px; margin-bottom: 8px; border: 1px solid color-mix(in oklab, var(--accent) 24%, var(--line)); border-radius: 12px;
+  background: repeating-conic-gradient(color-mix(in oklab, var(--accent) 35%, var(--panel)) 0% 25%, color-mix(in oklab, var(--accent) 7%, var(--panel)) 0% 50%) 50% / 22px 22px; box-shadow: 0 6px 18px color-mix(in oklab, #000 10%, transparent); }
+.profile-setup-card { display: flex; flex-direction: column; gap: 22px; padding: 26px; min-width: 0; border: 1px solid var(--line); border-radius: 18px;
+  background: linear-gradient(145deg, color-mix(in oklab, var(--accent) 3%, var(--panel-2)), var(--panel)); box-shadow: 0 10px 30px color-mix(in oklab, #000 8%, transparent); }
+.profile-setup-card .profile-build { width: 100%; justify-content: center; min-height: 48px; }
+.profile-stacked .profile-slide-host:has(> .profile-setup) { padding: 18px 12px; }
+.profile-stacked .profile-setup { gap: 20px; }
+.profile-stacked .profile-setup-card { gap: 18px; padding: 18px 14px; border-radius: 14px; }
+@container profile-setup (max-height: 620px) {
+  .profile-setup { gap: 20px; }
+  .profile-setup-intro::before { width: 32px; height: 32px; margin-bottom: 2px; border-radius: 9px; background-size: 16px 16px; }
+  .profile-setup-card { gap: 18px; padding: 20px; }
+}
+@container profile-setup (max-height: 400px) {
+  .profile-setup { gap: 18px; }
+  .profile-setup-intro::before { display: none; }
+}
+@container profile-setup (max-width: 359px) {
+  .profile-setup-card [aria-label="Period"] { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 /* One username box, or Chess.com and Lichess side by side in one row. */
 .profile-account-fields { display: grid; grid-template-columns: minmax(0, 1fr); }
 .profile-account-fields[data-both] { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 14px; }
@@ -277,7 +298,7 @@ html:has(body.has-profile), body.has-profile { overflow: hidden; }
 .profile-custom-period { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 14px; padding: 14px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel-2); }
 .profile-custom-period .profile-input { min-width: 0; width: 100%; box-sizing: border-box; }
 [data-theme="dark"] .profile-custom-period .profile-input { color-scheme: dark; }
-.profile-setup-title { margin: 0; font-size: clamp(22px, 2.1vw, 30px); line-height: 1.1; letter-spacing: -.7px; font-weight: 800; }
+.profile-setup-title { margin: 0; font-size: clamp(26px, 2.1vw, 34px); line-height: 1.1; letter-spacing: -.7px; font-weight: 800; text-wrap: balance; }
 .profile-setup .profile-lead { font-size: 14px; }
 .profile-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .profile-field-label { font-size: 11px; font-weight: 800; letter-spacing: .9px; text-transform: uppercase; color: var(--ink-2); }
