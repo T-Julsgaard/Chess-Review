@@ -93,7 +93,7 @@
 /* Modern's narrow portrait panel: Reveal arcs above the first report's cards. */
 .accuracy-phase-modern .acc-players { margin-bottom: 8px; }
 .accuracy-phase-modern .acc-name { font-size: 12px; }
-.accuracy-phase-modern .phase-overview { gap: 10px; }
+.accuracy-phase-modern .phase-overview { gap: 10px; justify-content: space-between; }
 .accuracy-phase-modern .phase-summary-label { font-size: 10px; letter-spacing: .12em; }
 .accuracy-phase-modern .phase-overall-values { margin: 4px 0 0; gap: 12px; }
 .accuracy-phase-modern .acc-dial { --score-color: var(--accent); max-width: 100px; margin: 0 auto; }
@@ -106,7 +106,7 @@
 .accuracy-phase-modern .phase-report-name { font-size: 11px; }
 .accuracy-phase-modern .phase-report-cell { padding: 7px 3px; border-radius: 7px; }
 .accuracy-phase-modern .phase-report-score { font-size: 20px; }
-.accuracy-phase-modern .phase-rating { padding-top: 8px; gap: 6px; }
+.accuracy-phase-modern .phase-rating { margin-top: 0; padding-top: 8px; gap: 6px; }
 .accuracy-phase-modern .phase-rating-values .acc-elo { font-size: 21px; }
 /* Modern v2: a little light and weight, within the original arc geometry. */
 .accuracy-phase-modern-v2 .acc-dial { isolation: isolate;

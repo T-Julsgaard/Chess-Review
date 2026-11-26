@@ -18,7 +18,9 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     const panel=document.querySelector('[data-mod="engine"] .panel'), body=panel.querySelector('.engine-body'), b=body.getBoundingClientRect();
     const items=[...panel.querySelectorAll('.engine-focus-candidate,.engine-focus-pending,.engine-line,.engine-empty,.engine-minimal-controls,.engine-focus-play,.engine-bestwalk')];
     const page=document.querySelector('[data-mod="accuracy"] .acc-fit-page');
+    const sections=[...page.querySelector('.phase-overview').children].map(n=>n.getBoundingClientRect());
     return {accuracy:rect('accuracy'),engine:rect('engine'),learn:rect('learn'),
+      sectionGaps:sections.slice(1).map((r,i)=>r.top-sections[i].bottom),
       overflow:body.scrollHeight-body.clientHeight,
       clipped:items.filter(n=>{const r=n.getBoundingClientRect();const p=panel.getBoundingClientRect();return r.top<p.top-.5||r.bottom>p.bottom+.5;}).length,
       accuracyOverflow:page?page.scrollHeight-page.clientHeight:0,
@@ -63,6 +65,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
         const slot = await allotment();
         assert.ok(fit.overflow<=1&&fit.clipped===0||Math.abs(fit.engine.height-slot)<.5, 'Engine never clips content it shrank for '+context);
         assert.ok(fit.accuracyOverflow<=1, 'Accuracy content fits its panel '+context);
+        assert.ok(Math.abs(fit.sectionGaps[0]-fit.sectionGaps[1])<.5, 'Accuracy shares spare height equally between its three sections '+context);
         assert.ok(fit.engine.bottom<=fit.learn.top-1, 'Engine stays above the puzzle entry '+context);
         sizes.push({count, ...fit});
       }
