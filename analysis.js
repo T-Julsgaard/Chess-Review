@@ -4160,7 +4160,7 @@ async function setCoachEngineReplies(enabled) {
   if (S.practice) S.practice.coachTyped = false;
   _reviewThreat = null;
   renderThreatArrow();
-  renderCoachAvatar();
+  renderCoachAvatar({ animate: true });
   renderReview();
   if (UI.settings && !UI.settings.hidden) renderSettings();
 }
@@ -4200,6 +4200,93 @@ let _coachPointerBound = false;
 const COACH_SETTLE_MS = 250, COACH_REACTION_HOLD_MS = 1200;
 let _coachReactionT = null, _coachReactAt = -Infinity, _coachEmotion = null;
 let _coachSovietHeadAt = -Infinity;
+let _coachPresence = null;
+
+function cancelCoachPresence() {
+  if (!_coachPresence) return;
+  const { animation, timers } = _coachPresence;
+  _coachPresence = null;
+  animation?.cancel();
+  timers.forEach(clearTimeout);
+  UI.coach.classList.remove("coach-transition");
+  UI.coach.style.removeProperty("--coach-clip-bottom");
+}
+
+function removeCoachAvatar() {
+  cancelCoachPresence();
+  resetCoachAnimation();
+  _coachFrame = null; _coachReady = false; _coachId = null;
+  UI.coach.replaceChildren();
+  const mod = UI.coach.closest(".mod");
+  if (mod) mod.hidden = true;
+}
+
+function finishCoachPresence() {
+  if (!_coachPresence) return;
+  const { shown } = _coachPresence;
+  cancelCoachPresence();
+  if (!shown) removeCoachAvatar();
+  else {
+    coachSend({ coachCmd: "talk", value: _coachTalking });
+    coachReactPly(S.idx); startCoachIdle();
+  }
+}
+
+// The portrait has its own movable/scaled module. Clip at the Insights floor,
+// converting screen coordinates back to the portrait's local CSS pixels.
+function animateCoachPresence(shown) {
+  const frame = _coachFrame;
+  const current = frame && getComputedStyle(frame).transform;
+  cancelCoachPresence();
+  resetCoachAnimation();
+  coachSend({ coachCmd: "talk", value: false });
+  const box = UI.coach.getBoundingClientRect(), height = UI.coach.clientHeight;
+  const floor = UI.review?.getBoundingClientRect().bottom;
+  const scale = height > 0 ? box.height / height : 0;
+  if (!frame || !_coachReady || S.settings.uiAnim === false || S.reorganize || document.hidden
+      || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+      || typeof frame.animate !== "function" || !scale) {
+    if (!shown) removeCoachAvatar();
+    else { coachReactPly(S.idx); startCoachIdle(); }
+    return;
+  }
+  const edge = Number.isFinite(floor) ? Math.max(height * .25, (floor - box.top) / scale) : height;
+  let eyeY = height * .5;
+  try {
+    const eye = frame.contentDocument?.querySelector("#eyeL circle");
+    if (eye) eyeY = eye.getBoundingClientRect().top + eye.getBoundingClientRect().height / 2;
+  } catch { /* The middle of the portrait is a safe fallback while its SVG loads. */ }
+  const below = `translateY(${edge + 12}px) rotate(5deg)`;
+  const peek = `translateY(${Math.max(0, edge - eyeY - height * .045)}px)`;
+  UI.coach.style.setProperty("--coach-clip-bottom", (height - edge) + "px");
+  UI.coach.classList.add("coach-transition");
+  const presence = { frame, shown, animation: null, timers: [] };
+  _coachPresence = presence;
+  coachSend({ coachCmd: "emotion", value: shown ? "skeptical" : "surprised" });
+  coachSend({ coachCmd: "look", value: "center" });
+  const keyframes = shown ? [
+    { transform: current && current !== "none" ? current : below, offset: 0, easing: "cubic-bezier(.2,.7,.3,1)" },
+    { transform: peek, offset: .23 },
+    { transform: peek, offset: .70, easing: "cubic-bezier(.2,.7,.3,1)" },
+    { transform: "translateY(-3px)", offset: .94 },
+    { transform: "translateY(0)", offset: 1 },
+  ] : [
+    { transform: current && current !== "none" ? current : "translateY(0)", easing: "cubic-bezier(.55,.02,.9,.45)" },
+    { transform: below },
+  ];
+  presence.animation = frame.animate(keyframes, { duration: shown ? 2400 : 520, fill: "both" });
+  if (shown) {
+    for (const [delay, direction] of [[620, "left"], [1120, "right"], [1590, "center"]]) {
+      presence.timers.push(setTimeout(() => {
+        if (_coachPresence === presence) coachSend({ coachCmd: "look", value: direction });
+      }, delay));
+    }
+  }
+  presence.animation.onfinish = () => {
+    if (_coachPresence !== presence) return;
+    finishCoachPresence();
+  };
+}
 
 function resetCoachAnimation() {
   clearCoachPointer();
@@ -4224,7 +4311,7 @@ function clearCoachPointer() {
   _coachPointerActive = false;
 }
 function coachHitTest(x, y) {
-  if (!_coachReady || !_coachFrame || S.reorganize) return false;
+  if (!_coachReady || !_coachFrame || _coachPresence || S.reorganize) return false;
   const rect = _coachFrame.getBoundingClientRect();
   if (!rect.width || !rect.height || x < rect.left || x >= rect.right || y < rect.top || y >= rect.bottom) return false;
   try {
@@ -4266,7 +4353,7 @@ function bindCoachPointer() {
   document.addEventListener("pointercancel", cancelPress);
   window.addEventListener("blur", cancelPress);
   document.addEventListener("pointermove", ev => {
-    if (ev.pointerType === "touch" || !_coachReady || document.hidden) return;
+    if (ev.pointerType === "touch" || !_coachReady || _coachPresence || document.hidden) return;
     _coachPointerPoint = { x: ev.clientX, y: ev.clientY };
     if (_coachPointerRAF !== null) return;
     _coachPointerRAF = requestAnimationFrame(() => {
@@ -4286,24 +4373,27 @@ function bindCoachPointer() {
   document.addEventListener("visibilitychange", clearCoachPointer);
   window.addEventListener("blur", clearCoachPointer);
   window.addEventListener("resize", clearCoachPointer);
+  window.addEventListener("resize", finishCoachPresence);
 }
 // (Re)mount the iframe for the active personality. Reuses the frame if the coach hasn't changed.
-function renderCoachAvatar() {
+function renderCoachAvatar({ animate = false } = {}) {
   if (!UI || !UI.coach) return;
   const id = S.settings.coach || "";
   const rig = S.blank || engineExplanationsEnabled() ? null : COACH_RIGS[id];
   const mod = UI.coach.closest(".mod");
   UI.canvas.classList.toggle("has-coach", !!rig);   // the insight text leaves room for the portrait
   if (!rig) {                                   // "Off" or no rig built yet → hide the module entirely
-    resetCoachAnimation();
-    _coachFrame = null; _coachReady = false; _coachId = null;
-    UI.coach.replaceChildren();
-    if (mod) mod.hidden = true;
+    if (animate && !S.blank && COACH_RIGS[id] && _coachFrame && id === _coachId) animateCoachPresence(false);
+    else removeCoachAvatar();
     return;
   }
   if (mod) mod.hidden = false;
   bindCoachPointer();
-  if (id === _coachId && _coachFrame) return;   // same coach already mounted → keep it (no fl/reset)
+  if (id === _coachId && _coachFrame) {
+    if (_coachPresence && !_coachPresence.shown) animateCoachPresence(true);
+    return;
+  }
+  cancelCoachPresence();
   resetCoachAnimation();
   _coachId = id; _coachReady = false;
   const frame = el("iframe", {
@@ -4317,8 +4407,8 @@ function renderCoachAvatar() {
 
     coachSend({ coachCmd: "look", value: "center" });
     coachSend({ coachCmd: "talk", value: _coachTalking });
-    coachReactPly(S.idx);          // react to wherever we currently are in the game
-    startCoachIdle();
+    if (animate) animateCoachPresence(true);
+    else { coachReactPly(S.idx); startCoachIdle(); }
   });
   _coachFrame = frame;
   UI.coach.replaceChildren(frame);
@@ -4328,7 +4418,7 @@ function coachTalk(on) {
   on = !!on;
   if (on === _coachTalking) return;
   _coachTalking = on;
-  coachSend({ coachCmd: "talk", value: on });
+  if (!_coachPresence) coachSend({ coachCmd: "talk", value: on });
 }
 // Each rig's signature ability. One-shots play once (sip/photo/thread/pawn-toss); toggle props are
 // lifted then lowered again so the gesture reads as a discrete action; ambient-special coaches
@@ -4400,7 +4490,7 @@ function coachSpecial() {
 // Wait for navigation to settle and hold each reaction long enough to read naturally.
 // Replace pending moves instead of replaying the expressions of skipped positions.
 function coachReactPly(idx) {
-  if (!_coachReady) return;
+  if (!_coachReady || _coachPresence) return;
   clearTimeout(_coachReactionT);
   const now = performance.now();
   const delay = Math.max(COACH_SETTLE_MS, _coachReactAt + COACH_REACTION_HOLD_MS - now);
@@ -7593,6 +7683,7 @@ async function setSetting(key, value) {
   if (key === 'engineDesign') renderEngineCurrent();
   if (key === 'engineAutoHeight') applyLayout();
   if (key === 'uiAnim' && S.settings.uiAnim === false) {
+    finishCoachPresence();
     overviewReveal.stop();
     Object.values(phaseReveals).forEach(reveal => reveal.stop());
   }

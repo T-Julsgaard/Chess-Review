@@ -2126,6 +2126,11 @@ button { font-family: inherit; cursor: pointer; }
    rest of the panels. Fade it in on load instead of letting it pop in. */
 .coach-frame { width: 100%; height: 100%; border: 0; background: transparent; display: block; opacity: 0; transition: opacity .22s ease; }
 .coach-frame.ready { opacity: 1; }
+/* During the drop/peek, the Insights floor owns the clipping instead of the
+   smaller portrait box. The iframe itself still clips the rig's demo controls. */
+.mod[data-mod="coach"] .mod-inner:has(.coach-transition) { overflow: visible; }
+.coach-mount.coach-transition { overflow: visible; clip-path: inset(0 0 var(--coach-clip-bottom, 0px) 0); }
+.coach-transition .coach-frame { transition: none; will-change: transform; }
 .stage.reorganizing .mod[data-mod="coach"] .mod-inner { outline: 1px dashed color-mix(in oklab, var(--accent) 45%, transparent); outline-offset: -1px; }
 
 /* eval-bar module — the bar fills the whole module so it grows/shrinks as you resize it. */

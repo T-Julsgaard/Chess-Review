@@ -37,6 +37,108 @@ function mountedCoach(a, ui, id = 'old_soviet') {
   return {frame, messages};
 }
 
+function presenceUI(a, ui) {
+  a.state.settings.uiAnim = true;
+  const animations = [];
+  ui.coach.getBoundingClientRect = () => ({top:100, height:100});
+  Object.defineProperty(ui.coach, 'clientHeight', {value:200});
+  ui.review = a.dom.window.document.createElement('div');
+  ui.review.getBoundingClientRect = () => ({bottom:270});
+  a.dom.window.HTMLElement.prototype.animate = function(keyframes, options) {
+    const animation = {keyframes, options, cancelled:false, cancel() { this.cancelled = true; }};
+    animations.push(animation); return animation;
+  };
+  const toggle = enabled => {
+    a.state.settings.coachEngineReplies = enabled;
+    a.call('renderCoachAvatar', {animate:true});
+  };
+  return {animations, toggle};
+}
+
+test('Insights coach falls through the scaled panel floor, then peeks and checks both sides before rising', t => {
+  const a = app(t), ui = coachUI(a), advance = animationClock(a);
+  loadGame(a, '1. e4 e5');
+  const {frame, messages} = mountedCoach(a, ui);
+  const {animations, toggle} = presenceUI(a, ui);
+  toggle(true);
+  const fall = animations.at(-1);
+  assert.equal(fall.options.duration, 520);
+  assert.match(fall.keyframes.at(-1).transform, /translateY\(352px\)/);
+  assert.equal(ui.coach.style.getPropertyValue('--coach-clip-bottom'), '-140px');
+  assert.equal(ui.coach.closest('.mod').hidden, false, 'stay mounted until the fall ends');
+  assert.equal(a.call('coachHitTest', 0, 0), false);
+  fall.onfinish();
+  assert.equal(ui.coach.closest('.mod').hidden, true);
+  assert.equal(frame.isConnected, false);
+  assert.equal(a.run('_coachFrame'), null);
+
+  toggle(false);
+  const entrance = ui.coach.querySelector('iframe'), looks = [];
+  Object.defineProperty(entrance, 'contentWindow', {value:{postMessage: m => looks.push(m)}});
+  entrance.dispatchEvent(new a.dom.window.Event('load'));
+  const rise = animations.at(-1);
+  assert.equal(rise.options.duration, 2400);
+  assert.equal(rise.keyframes[1].transform, rise.keyframes[2].transform, 'hold at eye level');
+  assert.ok(looks.some(m => m.coachCmd === 'emotion' && m.value === 'skeptical'));
+  looks.length = 0;
+  a.call('coachReactPly', 1); advance(619);
+  assert.deepEqual(looks, [], 'move reactions cannot interrupt the entrance');
+  advance(1); assert.equal(looks.at(-1).value, 'left');
+  advance(500); assert.equal(looks.at(-1).value, 'right');
+  advance(470); assert.equal(looks.at(-1).value, 'center');
+  rise.onfinish(); advance(250);
+  assert.ok(looks.some(m => m.coachCmd === 'emotion' && m.value === 'neutral'));
+  assert.equal(ui.coach.classList.contains('coach-transition'), false);
+  assert.equal(ui.coach.closest('.mod').hidden, false);
+  assert.ok(messages.some(m => m.coachCmd === 'emotion' && m.value === 'surprised'));
+});
+
+test('rapid Insights toggles reverse the same portrait and cancel stale finishes and sideways glances', t => {
+  const a = app(t), ui = coachUI(a), advance = animationClock(a);
+  loadGame(a, '1. e4 e5');
+  const {frame, messages} = mountedCoach(a, ui);
+  const {animations, toggle} = presenceUI(a, ui);
+  toggle(true); const fall = animations.at(-1);
+  toggle(false); const rise = animations.at(-1);
+  assert.equal(fall.cancelled, true);
+  assert.equal(ui.coach.querySelector('iframe'), frame);
+  fall.onfinish();
+  assert.equal(ui.coach.closest('.mod').hidden, false);
+  advance(620);
+  assert.equal(messages.at(-1).value, 'left');
+  toggle(true); const final = animations.at(-1);
+  assert.equal(rise.cancelled, true);
+  const count = messages.length;
+  advance(2000); rise.onfinish();
+  assert.equal(messages.length, count, 'no stale glances or reactions reach the exiting rig');
+  final.onfinish();
+  assert.equal(a.run('_coachFrame'), null);
+  assert.equal(ui.coach.closest('.mod').hidden, true);
+});
+
+test('coach changes, resize and reduced motion settle or cancel presence animations', t => {
+  const a = app(t), ui = coachUI(a), advance = animationClock(a);
+  loadGame(a, '1. e4 e5'); mountedCoach(a, ui);
+  const {animations, toggle} = presenceUI(a, ui);
+  toggle(true); toggle(false); const rise = animations.at(-1);
+  const replacement = mountedCoach(a, ui, 'mentor');
+  assert.equal(rise.cancelled, true);
+  advance(2500); rise.onfinish();
+  assert.equal(replacement.messages.some(m => m.coachCmd === 'look' && m.value === 'right'), false);
+  toggle(true);
+  a.dom.window.dispatchEvent(new a.dom.window.Event('resize'));
+  assert.equal(a.run('_coachFrame'), null);
+  a.dom.window.matchMedia = () => ({matches:true});
+  toggle(false);
+  const frame = ui.coach.querySelector('iframe');
+  Object.defineProperty(frame, 'contentWindow', {value:{postMessage() {}}});
+  const count = animations.length;
+  frame.dispatchEvent(new a.dom.window.Event('load'));
+  toggle(true);
+  assert.equal(animations.length, count, 'reduced motion skips both animations');
+  assert.equal(ui.coach.closest('.mod').hidden, true);
+});
+
 test('No coach removes the character, saves the choice and keeps plain commentary', async t => {
   const a = app(t), S = loadGame(a, '1. e4 e5'), ui = coachUI(a);
   S.settings.coach = 'old_soviet'; S.settings.coachPlain = false;
