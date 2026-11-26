@@ -77,14 +77,14 @@ test('Chess.com lookup stays inside Insights, Moves and the move controls until 
 });
 
 for (const motion of ['on', 'off', 'reduced']) {
-  test(`opening a game from the archive with interface motion ${motion}`, async t => {
+  test(`opening an archive game switches directly to review with interface motion ${motion}`, async t => {
     const {a, select, search} = await launch(t);
     const {window} = a.dom;
-    const preparation = deferred(), exit = deferred(), animations = [];
+    const preparation = deferred(), animations = [];
     a.state.settings.uiAnim = motion !== 'off';
     window.matchMedia = () => ({matches: motion === 'reduced'});
     window.Element.prototype.animate = function (frames) {
-      const animation = {finished: exit.promise, cancel() { this.canceled = true; }};
+      const animation = {finished: Promise.resolve(), cancel() {}};
       animations.push({node: this, frames, animation});
       return animation;
     };
@@ -101,22 +101,7 @@ for (const motion of ['on', 'off', 'reduced']) {
     assert.equal(animations.length, 0);
 
     preparation.resolve(); await tick();
-    if (motion === 'on') {
-      const outgoing = animations.slice();
-      assert.ok(row.isConnected);
-      assert.equal(a.state.blank, true);
-      assert.equal(analysisStarted, false);
-      assert.ok(outgoing.some(({node}) => node.id === 'boardWrap'));
-      assert.ok(outgoing.some(({node}) => node.id === 'movesBody'));
-      exit.resolve(); await tick();
-      assert.deepEqual(animations.slice(outgoing.length).map(({node}) => node), outgoing.map(({node}) => node));
-      for (const [index, {frames, animation}] of outgoing.entries()) {
-        assert.equal(animation.canceled, true);
-        assert.equal(animations[outgoing.length + index].frames[0].opacity, frames[1].opacity);
-      }
-    } else {
-      assert.equal(animations.length, 0);
-    }
+    assert.equal(animations.length, 0);
     assert.equal(a.state.blank, false);
     assert.equal(a.state.pgn, pgn);
     assert.equal(row.isConnected, false);
