@@ -128,6 +128,35 @@ test('later mentions play their legal prefix once and reverse it on leave', t =>
   f.tick(660); assert.equal(f.board.querySelector('.move-preview'), null);
 });
 
+test('move cues follow each visible step and stop when a preview is cancelled', t => {
+  const f = fixture(t), played = [], onMove = san => played.push(san);
+  f.show('e2e4 d7d5 e4d5', {hold: true, onMove});
+  assert.deepEqual(played, ['e4']);
+  f.tick(320); assert.deepEqual(played, ['e4', 'd5']);
+  f.tick(320); assert.deepEqual(played, ['e4', 'd5', 'exd5']);
+  f.preview.release(f.owner);
+  assert.deepEqual(played, ['e4', 'd5', 'exd5', 'exd5']);
+  f.tick(440);
+  assert.deepEqual(played, ['e4', 'd5', 'exd5', 'exd5', 'd5', 'e4']);
+  f.tick(220);
+  f.show('g1f3 g8f6', {hold: true, onMove});
+  f.preview.cancel(); f.tick(10000);
+  assert.equal(played.at(-1), 'Nf3');
+  assert.equal(played.length, 7);
+});
+
+test('reduced-motion previews cue only the final move and invalid previews stay silent', t => {
+  const f = fixture(t), played = [], onMove = san => played.push(san);
+  for (const uci of ['g1g8', 'e2e4 nope', '']) f.show(uci, {onMove});
+  assert.deepEqual(played, []);
+  f.show('e2e4 d7d5 e4d5', {motion: false, hold: true, onMove});
+  assert.deepEqual(played, ['exd5']);
+  f.preview.release(f.owner); f.tick(10000);
+  assert.deepEqual(played, ['exd5']);
+  f.owner.remove(); f.show('e2e4', {onMove});
+  assert.deepEqual(played, ['exd5']);
+});
+
 test('captures, en passant, castling and promotions restore every original piece', t => {
   for (const [fen, uci, expected, empty] of [
     ['4k3/8/8/8/8/2n5/8/1N2K3 w - - 0 1', 'b1c3', {c3:'wN'}, ['b1']],

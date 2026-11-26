@@ -4836,7 +4836,7 @@ function renderMoveComment() {
       makeBadge: () => gradeBadge(move.category,
         move.origin === 'played' ? S.moveGrades[ply] : moveGrade(move.category, 0), 'sq-badge'),
       currentFen: positionFen, baseFen: S.positions[ply + move.plyOffset]?.fen,
-      played: S.positions[ply], uci: move.uci, owner, hold: true, duration: animDuration(),
+      played: S.positions[ply], uci: move.uci, owner, onMove: playSanSound, hold: true, duration: animDuration(),
       motion: S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches});
   };
   const moveOwner = engineReplies && S.playerKnown === true

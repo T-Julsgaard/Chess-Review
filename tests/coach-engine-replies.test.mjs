@@ -299,6 +299,22 @@ test('explanation moves preview only on hover with their category badge; assessm
   }
 });
 
+test('explanation hovers use move sounds and respect the sound setting',async t=>{
+  const a=review(t),S=a.state,played=[];
+  await a.call('setCoachEngineReplies',true);
+  a.replace('playEvent',event=>played.push(event));
+  const links=[...a.dom.window.document.querySelectorAll('.ip-text .ip-move-link')];
+  const hover=link=>link.dispatchEvent(new a.dom.window.Event('pointerenter'));
+  S.settings.sound=true;
+  links[0].click();assert.deepEqual(played,[]);
+  hover(links[0]);assert.deepEqual(played,['check']);
+  hover(links[1]);assert.deepEqual(played,['check','move']);
+  S.settings.sound=false;
+  hover(links[0]);assert.deepEqual(played,['check','move']);
+  S.settings.sound=true;S.practice=true;
+  hover(links[0]);assert.deepEqual(played,['check','move']);
+});
+
 test('explanation hover badges follow selected symbols, fonts and appearances',async t=>{
   const a=review(t),doc=a.dom.window.document;
   await a.call('setCoachEngineReplies',true);
