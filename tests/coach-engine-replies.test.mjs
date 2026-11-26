@@ -31,7 +31,8 @@ test('Coach offers concise Engine explanations with an assessment and unchanged 
   const badge=body.querySelector('.ip-assessment-row > .ip-badge');
   assert.ok(badge);
   assert.equal(badge.src,a.call('gradeBadge','mistake',S.moveGrades[S.idx],'ip-badge').src);
-  assert.equal(body.querySelector('.ip-assessment').textContent,'Pawn g4 is a mistake.');
+  assert.equal(body.querySelector('.ip-assessment').textContent,'g4 is a mistake.');
+  assert.equal(body.querySelector('.ip-assessment .ip-move-link'),null);
   assert.equal(body.querySelector('.ip-text').textContent,'This allows Queen h4, checkmate. Better was Pawn g3.');
   assert.equal(body.querySelector('.dopamine-line,.dopamine-evaluation,.dopamine-detail'),null);
   assert.equal(doc.querySelector('.dopamine-comment,.dopamine-effect'),null);
@@ -208,7 +209,7 @@ test('written explanations respect reduced motion and sequence Dopamine detail a
   assert.ok(delay(detail.firstElementChild)>delay(summary.lastElementChild));
 });
 
-test('underlined move links open replies, alternatives and played moves from their own positions',async t=>{
+test('only explanation moves are linked; assessment headings retain plain SAN',async t=>{
   const a=review(t),S=a.state;
   await a.call('setCoachEngineReplies',true);
   const before=JSON.stringify([S.evals,S.bests,S.classif,S.moveGrades]);
@@ -221,8 +222,12 @@ test('underlined move links open replies, alternatives and played moves from the
   // The alternative starts one ply earlier; a stale detached link cannot jump.
   links[1].click();assert.deepEqual(opened.pop(),{uci:'g2g3',ply:2});
   links[0].click();assert.equal(opened.length,0);
-  a.call('go',3);
-  a.call('renderMoveComment').querySelector('.ip-assessment .ip-move-link').click();
-  assert.deepEqual(opened.pop(),{uci:'g2g4',ply:2});
   assert.equal(JSON.stringify([S.evals,S.bests,S.classif,S.moveGrades]),before);
+  a.call('go',3);
+  for(const [category,text] of [['blunder','g4 is a blunder.'],['best','g4 is the best move.']]) {
+    S.classif[3]=category;
+    const heading=a.call('renderMoveComment').querySelector('.ip-assessment');
+    assert.equal(heading.textContent,text);
+    assert.equal(heading.childElementCount,0);
+  }
 });

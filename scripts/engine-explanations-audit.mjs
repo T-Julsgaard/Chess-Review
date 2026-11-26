@@ -36,7 +36,8 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
         overflow:document.documentElement.scrollWidth>innerWidth};
     })()`);
     assert.equal(state.on,'true');assert.equal(state.beforeClose,true);
-    assert.equal(state.assessment,'Pawn g4 is a blunder.');assert.equal(state.portrait,false);
+    assert.equal(state.assessment,'g4 is a blunder.');assert.equal(state.portrait,false);
+    assert.equal(await run("document.querySelector('.ip-assessment').childElementCount"),0);
     assert.equal(state.overflow,false);
     assert.equal(await run("!!document.querySelector('.ip-assessment-row > .ip-badge')"),true);
     await run("document.querySelector('.ip-show-threat').click()");await sleep(50);
@@ -122,7 +123,7 @@ export async function auditLearning({review,call,evaluate,sleep,out}) {
   await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]},review.sessionId);
   await run("import('./analysis.js').then(m=>{m.go(2);m.go(3);})");
   assert.equal(await run("!!document.querySelector('.ip-written-char')"),false);
-  for(const [label,branchIdx,square,piece] of [['Queen h4',3,'h4','q'],['Pawn g3',2,'g3','p'],['Pawn g4',2,'g4','p']]) {
+  for(const [label,branchIdx,square,piece] of [['Queen h4',3,'h4','q'],['Pawn g3',2,'g3','p']]) {
     await run("import('./analysis.js').then(m=>{m.exitAnalysis();m.go(3);})");
     await run(`([...document.querySelectorAll('.insight-panel .ip-move-link')].find(n=>n.textContent===${JSON.stringify(label)})).click()`);
     const opened=await run(`import('./analysis.js').then(async m=>{

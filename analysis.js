@@ -4690,12 +4690,8 @@ function renderMoveComment() {
     gotoMainline(ply + move.plyOffset);
     playLine(move.uci);
   };
-  const assessment = el('div', {class: 'ip-assessment'});
-  const assessmentText = categoryText(cfg && COMMENT_PHRASE[cls] ? COMMENT_PHRASE[cls](explanation?.played?.text || san) : `${explanation?.played?.text || san}.`);
-  if (explanation?.played && assessmentText.startsWith(explanation.played.text)) {
-    assessment.append(explanationMoveLink(explanation.played, showMove, explanation.played.text),
-      document.createTextNode(assessmentText.slice(explanation.played.text.length)));
-  } else assessment.textContent = assessmentText;
+  const assessment = el('div', {class: 'ip-assessment'},
+    categoryText(cfg && COMMENT_PHRASE[cls] ? COMMENT_PHRASE[cls](san) : `${san}.`));
   const assessmentRow = engineReplies ? el("div", { class: "ip-assessment-row" },
     cfg ? gradeBadge(cls, S.moveGrades[S.idx], "ip-badge") : null,
     assessment) : null;
