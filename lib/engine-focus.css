@@ -83,6 +83,7 @@
 .stage .mod[data-mod="engine"] .engine-minimal .engine-body {
   height:auto; padding:2px 8px; justify-content:flex-start; gap:2px; overflow:hidden;
 }
+.stage .mod[data-mod="engine"].engine-auto-height .engine-minimal .engine-body { padding-bottom:5px; }
 .engine-minimal-controls { display:flex; flex:none; gap:6px; height:22px; }
 .engine-minimal-add, .engine-minimal-remove {
   display:flex; align-items:center; justify-content:center;

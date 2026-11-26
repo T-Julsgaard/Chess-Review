@@ -6384,6 +6384,7 @@ function syncEngineFit(animate) {
 // playback or learning controls outside the viewport when more lines are shown.
 function fitEnginePanel({animate = true} = {}) {
   const mod=UI.engine?.closest('.mod');if(!mod)return;
+  mod.classList.toggle('engine-auto-height', S.settings.engineAutoHeight === true);
   syncEngineFit(animate);
   if(!isCustomLayout()||isResponsiveModern()){mod.style.minHeight="";return;}
   const engine=S.layout.engine;

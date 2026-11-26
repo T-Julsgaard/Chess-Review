@@ -25,6 +25,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
       clipped:items.filter(n=>{const r=n.getBoundingClientRect();const p=panel.getBoundingClientRect();return r.top<p.top-.5||r.bottom>p.bottom+.5;}).length,
       accuracyOverflow:page?page.scrollHeight-page.clientHeight:0,
       spare:b.bottom-Math.max(...[...body.children].map(n=>n.getBoundingClientRect().bottom)),
+      bottomPadding:parseFloat(getComputedStyle(body).paddingBottom)*b.height/body.offsetHeight,
       motion:document.querySelector('.stage').classList.contains('engine-fit-motion')};
   })()`);
   // Engine's slot before the fit; content taller than it scrolls exactly as it did before.
@@ -79,7 +80,8 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
       if (design === 'minimal') {
         assert.ok(two.accuracy.height>three.accuracy.height+10&&one.accuracy.height>two.accuracy.height+10,
           'Removing lines gives Accuracy more room '+JSON.stringify({width,height,sizes}));
-        assert.ok(one.spare<=6&&two.spare<=6&&three.spare<=6, 'Engine has no unused height '+JSON.stringify({width,height,sizes}));
+        assert.ok(sizes.every(s=>s.bottomPadding>=3&&Math.abs(s.spare-s.bottomPadding)<1.5),
+          'Engine keeps a comfortable bottom inset without unused height '+JSON.stringify({width,height,sizes}));
       }
       assert.ok(one.accuracy.height>=three.accuracy.height, 'Fewer lines never shrink Accuracy');
       evidence.push({design, width, height, gap, accuracy:sizes.map(s=>+s.accuracy.height.toFixed(1)), engine:sizes.map(s=>+s.engine.height.toFixed(1))});
