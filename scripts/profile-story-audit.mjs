@@ -4,9 +4,11 @@ import assert from 'node:assert/strict';
 import {season} from '../tests/helpers/profile-season.mjs';
 import {rowsKey} from '../lib/profile/store.js';
 
-export async function auditLearning({review, call, evaluate, waitFor, sleep, out, settingsOnly = false}) {
+export async function auditLearning({review, call, evaluate, waitFor, sleep, out, settingsOnly = false, motionOnly = false}) {
   const run = code => evaluate(review, code);
-  const rows = season().map((row, i) => ({...row, rated: i % 5 !== 0}));
+  const rows = season().map((row, i) => ({...row, rated: i % 5 !== 0,
+    ...(motionOnly ? {m1: 2, m1Missed: row.cls === 'bullet' ? 2 : 0, think: row.cls === 'bullet' ? 2 : 75,
+      myRating: row.cls === 'bullet' ? 1700 - i : 1200 + i, oppRating: row.cls === 'bullet' ? 1800 : 1400} : {})}));
   await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   await run(`import('./browser-compat.js').then(({browserAPI})=>browserAPI.storage.local.set(${JSON.stringify({[rowsKey('chesscom', 'tester')]: {rows, months: [], since: 0, updatedAt: Date.now()}})}))`);
   await run(`import('./analysis.js').then(async m=>{m.S.settings.profileDepth='off';m.S.settings.uiAnim=true;await m.openProfile();window.w=m.profileWorkspace;w.account='tester';await w.load();})`);
@@ -14,6 +16,10 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await sleep(800);
   await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   if (settingsOnly) return auditSettings({review, call, run, sleep, out});
+  if (motionOnly) {
+    await call('Page.bringToFront', {}, review.sessionId);
+    return auditPanelMotion({run, sleep, waitFor: expression => waitFor(review, expression, 'Panel motion')});
+  }
   // Panel width follows the user's saved review layout, independently of the
   // viewport. Keep mode switches usable beside long titles in narrow panels.
   const filterLayout = [];
@@ -150,6 +156,70 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await run('w.close()');
   await fs.writeFile(path.join(out, 'profile-story-evidence.json'), JSON.stringify(evidence, null, 2));
   console.log(JSON.stringify({ok: true, out, viewports: evidence.length}));
+}
+
+/** Real layout and WAAPI coverage for the playstyle panel's mode/sort transitions. */
+async function auditPanelMotion({run, sleep, waitFor}) {
+  await run("w.engine=Object.fromEntries(w.rows.map((r,i)=>[r.id,{acc:(r.cls==='bullet'?60:80)+i%8}]));w.rebuild()");
+  for (const id of ['numbers', 'rating', 'hits', 'clock', 'trend', 'endings', 'mate1']) {
+    await run(`w.go(w.deck.findIndex(s=>s.id==='${id}'));${id === 'rating' ? "w.ratingClass='blitz';w.renderSlide({animate:false})" : "w.cls='blitz';w.rebuild()"}`);
+    await sleep(1100);
+    const change = await run(`(()=>{
+      const figure=()=>document.querySelector('.pv-story-figure').textContent,before=figure();
+      ${id === 'rating' ? "[...document.querySelectorAll('.pv-modes button')].find(b=>b.textContent==='Bullet').click()" : "document.querySelector('.pv-filter [data-value=bullet]').click()"};
+      return {before,shown:figure(),target:w.hero(w.currentSlide()).value};
+    })()`);
+    assert.notEqual(change.before, change.target, `${id}: fixture values differ`);
+    assert.equal(change.shown, change.before, `${id}: starts at the displayed value`);
+    await sleep(120);
+    const during = await run("document.querySelector('.pv-story-figure').textContent");
+    assert.notEqual(during, change.before, `${id}: counts toward the target`);
+    assert.notEqual(during, change.target, `${id}: shows intermediate values`);
+    await waitFor(`document.querySelector('.pv-story-figure').textContent===${JSON.stringify(change.target)}`);
+  }
+  await run("w.go(w.deck.findIndex(s=>s.id==='openings'))");
+  await sleep(1100);
+  const opening = await run(`(()=>{
+    const rates=()=>[...document.querySelectorAll('.pv-rank-value')].map(n=>n.textContent);
+    const before=rates();document.querySelectorAll('.pv-tabs button')[1].click();
+    return {before,shown:rates(),bars:[...document.querySelectorAll('.pv-rank-meter i')].filter(b=>b.getAnimations().length).length};
+  })()`);
+  assert.deepEqual(opening.shown, opening.before);
+  assert.ok(opening.bars > 0, 'opening meters animate to the newly sorted win rates');
+  await sleep(120);
+  const middle = await run("[...document.querySelectorAll('.pv-rank-value')].map(n=>n.textContent)");
+  assert.notDeepEqual(middle, opening.before, 'opening percentages count while the bars travel');
+  await sleep(450);
+  assert.equal(await run("[...document.querySelectorAll('.pv-rank-row')].every(r=>Math.abs(parseFloat(r.querySelector('.pv-rank-value').textContent)-parseFloat(r.querySelector('.pv-rank-meter i').style.width))<.01)"), true);
+  await run("w.go(w.deck.findIndex(s=>s.id==='signature'))");
+  await sleep(1100);
+  const comparison = await run(`(()=>{
+    window.motionList=document.querySelector('.pv-cmp-list');window.motionTop=document.querySelector('.pv-story-top');
+    const first=motionList.firstElementChild;window.motionFirst=first;
+    const before=first.getBoundingClientRect().top;
+    document.querySelector('.pv-filter [data-value="bullet"]').click();
+    return {list:motionList===document.querySelector('.pv-cmp-list'),top:motionTop===document.querySelector('.pv-story-top'),
+      row:motionFirst===motionList.firstElementChild,before,after:motionFirst.getBoundingClientRect().top,
+      translated:motionList.getAnimations({subtree:true}).some(a=>a.effect.getKeyframes().some(k=>k.transform&&k.transform!=='none'))};
+  })()`);
+  assert.ok(comparison.list && comparison.top && comparison.row, JSON.stringify(comparison));
+  assert.ok(Math.abs(comparison.before-comparison.after)<1, 'the first unchanged row stays put');
+  assert.equal(comparison.translated, false, 'no staggered movement of the list');
+  await sleep(500);
+  const panelStyle = await run('w.shell.style.cssText');
+  for (const width of [280, 360, 480]) for (const points of [11, 17]) {
+    const wrap = await run(`(()=>{
+      w.go(w.deck.findIndex(s=>s.id==='swings'));w.deck[w.index]={...w.currentSlide(),title:'Down ${points} points, still won'};
+      w.renderSlide({animate:false});Object.assign(w.shell.style,{left:'12px',width:'${width}px'});
+      const figure=document.querySelector('.pv-story-figure'),phrase=figure.querySelector('.pv-story-phrase'),range=document.createRange();range.selectNodeContents(phrase);
+      return {lines:range.getClientRects().length,overflow:figure.scrollWidth>figure.clientWidth+1,text:phrase.textContent};
+    })()`);
+    assert.equal(wrap.lines, 1, JSON.stringify({width,points,...wrap}));
+    assert.equal(wrap.overflow, false, JSON.stringify({width,points,...wrap}));
+    assert.equal(wrap.text, `Down ${points} points,`);
+  }
+  await run(`w.shell.style.cssText=${JSON.stringify(panelStyle)};w.cls='all';w.rebuild()`);
+  console.log('Playstyle motion: all seven headline counters, opening meters/counts, stable comparison rows and comeback wrapping passed.');
 }
 
 async function auditSettings({review, call, run, sleep, out}) {

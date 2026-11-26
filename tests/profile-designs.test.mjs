@@ -31,6 +31,123 @@ async function openDeck(a) {
 }
 const key = (a, k) => a.dom.window.document.querySelector('.profile-shell').dispatchEvent(new a.dom.window.KeyboardEvent('keydown', {key: k, bubbles: true}));
 
+function animationClock(w) {
+  let now = 0, id = 0;
+  const frames = new Map();
+  Object.defineProperty(w.win.performance, 'now', {configurable: true, value: () => now});
+  w.win.requestAnimationFrame = tick => { frames.set(++id, tick); return id; };
+  w.win.cancelAnimationFrame = frame => frames.delete(frame);
+  w.win.Element.prototype.animate = () => ({cancel() {}, finished: Promise.resolve()});
+  // These checks exercise panel motion; board animations have their own coverage.
+  w.syncBoard = () => {};
+  return milliseconds => {
+    now += milliseconds;
+    const pending = [...frames.values()]; frames.clear();
+    for (const tick of pending) tick(now);
+  };
+}
+
+test('story mode switches count only the main figures, including signed ratings, move times and both accuracy endpoints', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  seed(a);
+  a.store[rowsKey('chesscom', 'tester')].rows.forEach((row, i) => {
+    const bullet = row.cls === 'bullet';
+    Object.assign(row, {myRating: bullet ? 1700 - i : 1200 + i, oppRating: bullet ? 1800 : 1400,
+      think: bullet ? 2 : 75, m1: 2, m1Missed: bullet ? 2 : 0});
+  });
+  const w = await openDeck(a), advance = animationClock(w);
+  w.engine = Object.fromEntries(w.rows.map((row, i) => [row.id, {acc: (row.cls === 'bullet' ? 60 : 80) + i % 8}]));
+  w.rebuild();
+  for (const id of ['numbers', 'rating', 'hits', 'clock', 'trend', 'endings', 'mate1']) {
+    w.motion = () => false;
+    w.go(w.deck.findIndex(s => s.id === id));
+    if (id === 'rating') w.ratingClass = 'blitz';
+    else { w.cls = 'blitz'; w.rebuild(); }
+    w.renderSlide({animate: false});
+    const before = doc.querySelector('.pv-story-figure').textContent;
+    w.motion = () => true;
+    const button = id === 'rating' ? [...doc.querySelectorAll('.pv-modes button')].find(b => b.textContent === 'Bullet')
+      : doc.querySelector('.pv-filter [data-value="bullet"]');
+    button.click();
+    const target = w.hero(w.currentSlide()).value;
+    assert.notEqual(before, target, id + ' has distinct values');
+    assert.equal(doc.querySelector('.pv-story-figure').textContent, before, id + ' starts at its displayed value');
+    const facts = [...doc.querySelectorAll('.pv-fact dd')].map(node => node.textContent);
+    advance(160);
+    const during = doc.querySelector('.pv-story-figure').textContent;
+    assert.notEqual(during, before, id + ' counts');
+    assert.notEqual(during, target, id + ' shows an intermediate value');
+    assert.deepEqual([...doc.querySelectorAll('.pv-fact dd')].map(node => node.textContent), facts, id + ' leaves the facts settled');
+    advance(300);
+    assert.equal(doc.querySelector('.pv-story-figure').textContent, target, id + ' lands exactly');
+    if (id === 'rating') assert.match(target, /^-/);
+    if (id === 'clock') assert.equal(target, '2 s', 'minutes convert through total seconds');
+    if (id === 'trend') assert.match(during, /% → .*%/, 'both accuracy endpoints retain their format');
+    // A second change begins at the in-flight value rather than the previous destination.
+    const back = id === 'rating' ? [...doc.querySelectorAll('.pv-modes button')].find(b => b.textContent === 'Blitz')
+      : doc.querySelector('.pv-filter [data-value="all"]');
+    back.click(); advance(100);
+    const interrupted = doc.querySelector('.pv-story-figure').textContent;
+    if (id === 'rating') [...doc.querySelectorAll('.pv-modes button')].find(b => b.textContent === 'Bullet').click();
+    else doc.querySelector('.pv-filter [data-value="bullet"]').click();
+    assert.equal(doc.querySelector('.pv-story-figure').textContent, interrupted, id + ' preserves an interrupted count');
+    w.motion = () => false;
+    w.renderSlide({animate: false});
+    assert.equal(doc.querySelector('.pv-story-figure').textContent, w.hero(w.currentSlide()).value, id + ' respects disabled motion');
+  }
+});
+
+test('openings sorts glide each rank and count its win rate, including an interrupted switch', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  seed(a);
+  const w = await openDeck(a), advance = animationClock(w);
+  w.go(w.deck.findIndex(s => s.id === 'openings'));
+  const rates = () => [...doc.querySelectorAll('.pv-rank-value')].map(node => node.textContent);
+  const before = rates(), animated = [];
+  w.win.Element.prototype.animate = function(frames) { animated.push({node: this, frames}); return {cancel() {}}; };
+  w.motion = () => true;
+  doc.querySelectorAll('.pv-tabs button')[1].click();
+  const targets = [...doc.querySelectorAll('.pv-rank-meter i')].map(bar => Number(bar.style.width.replace('%', '')));
+  assert.deepEqual(rates(), before, 'the new sort begins at the previous percentages');
+  assert.ok(animated.some(a => a.node.matches('.pv-rank-meter i')), 'the meters travel');
+  assert.equal(doc.activeElement, doc.querySelector('.pv-tabs [aria-selected="true"]'));
+  advance(120);
+  const interrupted = rates();
+  doc.querySelectorAll('.pv-tabs button')[2].click();
+  assert.deepEqual(rates(), interrupted, 'quick sorting continues the visible counts');
+  advance(500);
+  assert.deepEqual(rates(), [...doc.querySelectorAll('.pv-rank-meter i')].map(bar => `${Number(bar.style.width.replace('%', ''))}%`));
+  assert.ok(targets.some((n, i) => n !== Number(before[i].replace('%', ''))), 'the fixture actually changes rank rates');
+});
+
+test('comparison mode changes retain the article, heading, focused list, rows and bars', async t => {
+  const a = review(t), doc = a.dom.window.document;
+  seed(a);
+  const w = await openDeck(a);
+  animationClock(w);
+  w.go(w.deck.findIndex(s => s.id === 'signature'));
+  const article = doc.querySelector('.pv-story'), top = doc.querySelector('.pv-story-top'), list = doc.querySelector('.pv-cmp-list');
+  const rows = new Map([...list.children].map(row => [row.dataset.id, {row, bar: row.querySelector('.pv-cmp-bars i')} ]));
+  const animated = [];
+  w.win.Element.prototype.animate = function(frames) { animated.push({node: this, frames}); return {cancel() {}}; };
+  w.motion = () => true;
+  list.focus(); list.scrollTop = 77;
+  doc.querySelector('.pv-filter [data-value="bullet"]').click();
+  assert.equal(doc.querySelector('.pv-story'), article);
+  assert.equal(doc.querySelector('.pv-story-top'), top);
+  assert.equal(doc.querySelector('.pv-cmp-list'), list);
+  assert.equal(list.scrollTop, 77);
+  assert.equal(doc.activeElement, list);
+  for (const row of list.children) {
+    const old = rows.get(row.dataset.id);
+    if (old) { assert.equal(row, old.row); assert.equal(row.querySelector('.pv-cmp-bars i'), old.bar); }
+  }
+  assert.ok(animated.every(a => a.frames.every(frame => !('transform' in frame))), 'no row translates or staggered cascade');
+  animated.length = 0;
+  w.renderSlide({animate: false});
+  assert.equal(animated.length, 0, 'unchanged rows and values do not animate again');
+});
+
 test('profile count animations accept numeric signs and leave nonnumeric prefixes alone', () => {
   const frames = [], nodes = ['+1,234.5 wins', '-42', '−42', '42%', 'A42', '/42', '=42'].map(textContent => ({textContent}));
   const workspace = {
