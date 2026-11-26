@@ -2,10 +2,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-// The first-run intro tour: Player profile first, then Learn with Chess Review.
+// The first-run intro tour ends with the live engine explanations transition.
 const STEPS = [
-  {target: 'profileToggle', title: 'Your player profile'},
-  {target: 'learningToggle', title: 'Learn with Chess Review'},
+  {target: 'playstyle', title: 'Your player profile'},
+  {target: 'learn', title: 'Learn with Chess Review'},
+  {target: 'engine-explanations', title: 'Engine explanations'},
 ];
 const KEYS = "['introTour:seen','learningAnnouncement:puzzles:seen','learningAnnouncement:puzzles:disabled']";
 
@@ -20,11 +21,11 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     const card = document.querySelector('.learning-announcement'), r = card.getBoundingClientRect();
     const heading = card.querySelector('h2'), copy = card.querySelector('.learning-announcement-copy');
     const targets = [...document.querySelectorAll('.learning-announcement-target')].map(b => {
-      const r = b.getBoundingClientRect(); return {id:b.id,top:r.top,bottom:r.bottom,left:r.left,right:r.right,
+      const r = b.getBoundingClientRect(); return {id:b.dataset.section||'engine-explanations',top:r.top,bottom:r.bottom,left:r.left,right:r.right,
         hit:document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('button')===b};
     });
     const path = document.querySelector('.learning-announcement-arrow'), shown = getComputedStyle(path).display !== 'none';
-    const button = targets[0] && document.getElementById(targets[0].id).getBoundingClientRect();
+    const button = document.querySelector('.learning-announcement-target')?.getBoundingClientRect();
     const end = shown && path.getPointAtLength(path.getTotalLength()), start = shown && path.getPointAtLength(0);
     return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:innerWidth,height:innerHeight,
       overflow:card.scrollWidth>card.clientWidth+1||card.scrollHeight>card.clientHeight+1,targets,
@@ -35,7 +36,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
       headingSize:parseFloat(getComputedStyle(heading).fontSize),copySize:parseFloat(getComputedStyle(card.querySelector('p')).fontSize),
       centered:getComputedStyle(card).textAlign==='center'&&getComputedStyle(card.querySelector('.learning-announcement-actions')).justifyContent==='center',
       arrow:shown,start:start&&{x:start.x,y:start.y},end:end&&{x:end.x,y:end.y},
-      expectedEnd:button&&{x:button.left+button.width/2,y:button.bottom+9}};
+      expectedEnd:button&&(button.bottom<=r.top?{x:button.left+button.width/2,y:button.bottom+9}:{x:button.right+2,y:button.top+button.height/2})};
   })()`);
   const checkStep = (g, index) => {
     const label = JSON.stringify(g);
@@ -54,18 +55,18 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     assert.equal(g.centered, true, 'Copy and actions should be centered');
     assert.equal(g.arrow, true, 'The arrow points at the button: ' + label);
     assert.ok(Math.hypot(g.end.x - g.expectedEnd.x, g.end.y - g.expectedEnd.y) < 1.5, 'The arrow reaches the button: ' + label);
-    assert.ok(Math.abs(g.start.y - (g.top - 5)) < 1.5, 'The arrow leaves the card edge: ' + label);
+    assert.ok(Math.min(Math.abs(g.start.y - (g.top - 5)), Math.abs(g.start.y - (g.bottom + 5))) < 1.5, 'The arrow leaves the card edge: ' + label);
   };
   const fresh = async ({legacy} = {}) => {
     // Reset only this disposable audit profile to exercise another first open.
     await run(`chrome.storage.local.remove(${KEYS}).then(()=>{${KEYS}.forEach(k=>localStorage.removeItem(k));${legacy ? `return chrome.storage.local.set({'${legacy}':true});` : ''}})`);
     await call('Page.reload', {}, review.sessionId);
-    await waitFor(review, "!!document.querySelector('#profileToggle')", 'Reloaded review');
+    await waitFor(review, "!!document.querySelector('.section-btn[data-section=playstyle]')", 'Reloaded review');
     await waitFor(review, "!!document.querySelector('.learning-announcement')", 'Fresh intro'); await sleep(500);
   };
   const reloadShowsNothing = async message => {
     await call('Page.reload', {}, review.sessionId); await sleep(1200);
-    await waitFor(review, "!!document.querySelector('#profileToggle')", 'Reloaded review');
+    await waitFor(review, "!!document.querySelector('.section-btn[data-section=playstyle]')", 'Reloaded review');
     assert.equal(await run("!!document.querySelector('.learning-announcement')"), false, message);
   };
 
@@ -83,6 +84,8 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await sleep(500);
   const step1 = await geometry();
   assert.ok(step1.text.includes('accuracy'), JSON.stringify(step1));
+  assert.equal(await run("document.querySelector('.ip-explanations-toggle').getAttribute('aria-checked')"), 'false');
+  await waitFor(review, "document.querySelector('.coach-frame')?.classList.contains('ready')", 'Intro coach');
 
   // Got it: the same card morphs to the second button.
   const morph = await run(`(() => {
@@ -110,15 +113,31 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await call('Emulation.setDeviceMetricsOverride', {width:1920,height:1080,deviceScaleFactor:1,mobile:false}, review.sessionId);
   await sleep(400);
 
+  // The final step switches on explanations through the real animated setting path.
+  await run("document.querySelector('.learning-announcement-dismiss').click()");
+  await waitFor(review, "document.querySelector('.coach-transition')!==null", 'Intro coach exit animation');
+  await screenshot('intro-coach-exit');
+  await sleep(1100);
+  checkStep(await geometry(), 2);
+  assert.equal(await run("document.querySelector('.ip-explanations-toggle').getAttribute('aria-checked')"), 'true');
+  assert.equal(await run("!!document.querySelector('.coach-frame')"), false);
+  for (const [width,height] of [[1920,1080],[1366,900],[500,800]]) {
+    await call('Emulation.setDeviceMetricsOverride', {width,height,deviceScaleFactor:1,mobile:false}, review.sessionId);
+    await sleep(700);
+    checkStep(await geometry(), 2);
+    await screenshot(`intro-step3-${width}`);
+  }
+
   // The final Got it pops the card away and hands focus to the button it showed.
   const popping = await run(`(() => {
     const button=document.querySelector('.learning-announcement-dismiss');button.click();button.click();
     const card=document.querySelector('.learning-announcement');
-    return {present:!!card,inert:card?.inert,animated:card?.getAnimations().some(a=>a.playState==='running'),focus:document.activeElement.id};
+    return {present:!!card,inert:card?.inert,animated:card?.getAnimations().some(a=>a.playState==='running'),focus:document.activeElement.matches('.ip-explanations-toggle')};
   })()`);
-  assert.deepEqual(popping, {present:true,inert:true,animated:true,focus:'learningToggle'});
+  assert.deepEqual(popping, {present:true,inert:true,animated:true,focus:true});
   await waitFor(review, absent, 'Pop dismissal cleanup');
   await reloadShowsNothing('Finishing the tour must not show it again');
+  assert.equal(await run("document.querySelector('.ip-explanations-toggle').getAttribute('aria-checked')"), 'true', 'The enabled setting survives reopening');
 
   // Closing or reloading without pressing Got it must already suppress it.
   await fresh();
@@ -130,7 +149,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await reloadShowsNothing('Escape must not show the tour again');
 
   await fresh();
-  await run("document.querySelector('#profileToggle').click()");
+  await run("document.querySelector('.section-btn[data-section=playstyle]').click()");
   assert.equal(await run(absent), true, 'Opening the profile ends the tour');
   await reloadShowsNothing('Using a button must not show the tour again');
 
@@ -144,7 +163,10 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   assert.equal(await run("document.querySelector('.learning-announcement').getAnimations().length"), 0);
   assert.equal(await run("document.querySelector('.learning-announcement-dismiss').click();document.querySelector('.learning-announcement').dataset.step"), '2', 'Reduced motion swaps steps at once');
   checkStep(await geometry(), 1);
+  assert.equal(await run("document.querySelector('.learning-announcement-dismiss').click();document.querySelector('.learning-announcement').dataset.step"), '3');
+  await sleep(100);
+  checkStep(await geometry(), 2);
   assert.equal(await run(`document.querySelector('.learning-announcement-dismiss').click();${absent}`), true, 'Reduced motion dismisses immediately');
   await reloadShowsNothing('Reduced-motion tour must not show again');
-  console.log('Intro tour: both steps, morph, arrows, viewports, pop dismissal, Escape, button use, legacy users, reduced motion and reload passed. Screenshots: ' + out);
+  console.log('Intro tour: all three steps, coach exit, saved explanations, morph, arrows, viewports, dismissal, legacy users and reduced motion passed. Screenshots: ' + out);
 }

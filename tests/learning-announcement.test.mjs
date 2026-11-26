@@ -81,22 +81,24 @@ test('a hidden or closed page cannot claim while waiting for the origin lock', a
 });
 
 function setup(t, {hidden = false, motion = false} = {}) {
-  const dom = new JSDOM('<header class="topbar"></header><nav class="section-rail"><button class="section-btn" data-section="learn">Learn</button><button class="section-btn" data-section="playstyle">Playstyle</button></nav><div id="canvas"><button class="learn-entry-button">Solve Puzzles</button></div>',
+  const dom = new JSDOM('<header class="topbar"></header><nav class="section-rail"><button class="section-btn" data-section="learn">Learn</button><button class="section-btn" data-section="playstyle">Playstyle</button></nav><div id="canvas"><button class="learn-entry-button">Solve Puzzles</button><div class="insight-panel"><button class="ip-explanations-toggle" data-section="explanations"></button></div></div>',
     {url: 'https://extension.test', pretendToBeVisual: true});
   const p = persistence();
   Object.defineProperty(dom.window.navigator, 'locks', {value: p.locks});
   let visibility = hidden ? 'hidden' : 'visible';
   Object.defineProperty(dom.window.document, 'visibilityState', {get: () => visibility});
-  const mount = () => mountLearningAnnouncement({document: dom.window.document, storage: p.storage, motion: () => motion});
+  const settingsChanges = [];
+  const mount = () => mountLearningAnnouncement({document: dom.window.document, storage: p.storage, motion: () => motion,
+    setEngineExplanations: enabled => { settingsChanges.push(enabled); }});
   t.after(() => dom.window.close());
   const document = dom.window.document;
-  return {...p, dom, document, mount,
+  return {...p, dom, document, mount, settingsChanges,
     card: () => document.querySelector('.learning-announcement'),
     highlighted: () => [...document.querySelectorAll('.learning-announcement-target')].map(button => button.dataset.section),
     visible() { visibility = 'visible'; document.dispatchEvent(new dom.window.Event('visibilitychange')); }};
 }
 
-test('the tour starts on Player profile and Got it moves the same card to Learn with Chess Review', async t => {
+test('the same card introduces Player profile, Learn and finally engine explanations', async t => {
   const p = setup(t), controller = p.mount(); await controller.ready;
   const card = p.card();
   assert.ok(card);
@@ -104,7 +106,8 @@ test('the tour starts on Player profile and Got it moves the same card to Learn 
   assert.equal(card.querySelector('h2').textContent, INTRO_STEPS[0].title);
   assert.equal(card.querySelector('.learning-announcement-eyebrow').textContent, 'Welcome to Chess Review');
   assert.deepEqual([...card.querySelectorAll('button')].map(button => button.textContent), ['Got it'], 'No opt-out button');
-  assert.equal(card.querySelector('.learning-announcement-steps').getAttribute('aria-label'), 'Step 1 of 2');
+  assert.equal(card.querySelector('.learning-announcement-steps').getAttribute('aria-label'), 'Step 1 of 3');
+  assert.deepEqual(p.settingsChanges, [false], 'The intro starts with explanations off');
   assert.equal(p.document.querySelectorAll('.learning-announcement-arrow').length, 1);
   assert.equal(p.document.activeElement, p.document.body, 'Non-modal intro must not steal focus');
   card.querySelector('.learning-announcement-dismiss').click();
@@ -113,14 +116,23 @@ test('the tour starts on Player profile and Got it moves the same card to Learn 
   assert.deepEqual(p.highlighted(), ['learn']);
   assert.equal(card.querySelector('h2').textContent, 'Learn with Chess Review');
   assert.match(card.querySelector('p').textContent, /50,000 puzzles/);
-  assert.equal(card.querySelector('.learning-announcement-steps').getAttribute('aria-label'), 'Step 2 of 2');
-  assert.deepEqual([...card.querySelectorAll('.learning-announcement-steps i')].map(dot => dot.classList.contains('active')), [false, true]);
+  assert.equal(card.querySelector('.learning-announcement-steps').getAttribute('aria-label'), 'Step 2 of 3');
+  assert.deepEqual([...card.querySelectorAll('.learning-announcement-steps i')].map(dot => dot.classList.contains('active')), [false, true, false]);
+  assert.deepEqual(p.settingsChanges, [false]);
+  card.querySelector('.learning-announcement-dismiss').click(); await settle();
+  assert.equal(p.card(), card);
+  assert.equal(controller.step, 2);
+  assert.equal(card.querySelector('h2').textContent, 'Engine explanations');
+  assert.equal(card.querySelector('.learning-announcement-steps').getAttribute('aria-label'), 'Step 3 of 3');
+  assert.deepEqual(p.highlighted(), ['explanations']);
+  assert.deepEqual(p.settingsChanges, [false, true]);
   card.querySelector('.learning-announcement-dismiss').click();
   assert.equal(p.card(), null);
   assert.equal(p.document.querySelector('.learning-announcement-arrows'), null);
   assert.deepEqual(p.highlighted(), []);
   const reopened = p.mount(); await reopened.ready;
   assert.equal(p.card(), null, 'Finishing the tour never shows it again');
+  assert.deepEqual(p.settingsChanges, [false, true], 'Reopening does not reset the preference');
 });
 
 test('the animated morph ignores repeated clicks and never skips step two', async t => {
@@ -143,10 +155,54 @@ test('the animated morph ignores repeated clicks and never skips step two', asyn
   pending.splice(0).forEach(animation => animation.finish()); await settle();
   await new Promise(resolve => win.setTimeout(resolve, 200));
   assert.equal(p.document.querySelector('.learning-announcement-morph'), null);
+  gotIt.click(); gotIt.click();
+  pending.splice(0).forEach(animation => animation.finish()); await settle();
+  assert.equal(controller.step, 2, 'The next morph reaches explanations without skipping it');
+  pending.splice(0).forEach(animation => animation.finish()); await settle();
+  await new Promise(resolve => win.setTimeout(resolve, 200));
   gotIt.click();
   assert.equal(p.card().inert, true, 'The final Got it pops the card away');
   pending.splice(0).forEach(animation => animation.finish()); await settle();
   assert.equal(p.card(), null);
+});
+
+test('the second morph timeout still advances to engine explanations', async t => {
+  const p = setup(t, {motion: true}), win = p.dom.window;
+  const controller = p.mount(); await controller.ready;
+  p.card().querySelector('button').click();
+  win.Element.prototype.animate = () => ({finished: new Promise(() => {}), cancel() {}});
+  p.card().querySelector('button').click();
+  await new Promise(resolve => win.setTimeout(resolve, 950));
+  assert.equal(controller.step, 2);
+  assert.deepEqual(p.settingsChanges, [false, true]);
+});
+
+test('engine explanations target follows the live switch after Insights rerenders', async t => {
+  const a = app(t), p = persistence(), doc = a.dom.window.document;
+  loadGame(a, '1. e4 e5'); a.state.settings.coach = 'old_soviet';
+  a.call('computeDerived'); a.call('buildUI'); a.call('renderAll'); a.call('applySettings');
+  Object.defineProperty(a.dom.window.navigator, 'locks', {value: {request: (name, callback) =>
+    name === 'chess-review-settings' ? callback() : p.locks.request(name, callback)}});
+  const changes = [];
+  const controller = mountLearningAnnouncement({document: doc, storage: p.storage, motion: () => false,
+    setEngineExplanations: async enabled => { changes.push(enabled); await a.call('setCoachEngineReplies', enabled); }});
+  t.after(() => controller.dispose()); await controller.ready;
+  assert.ok(doc.querySelector('.learning-announcement'));
+  assert.equal(a.call('engineExplanationsEnabled'), false);
+  assert.ok(doc.querySelector('.coach-frame'));
+  const oldSwitch = doc.querySelector('.ip-explanations-toggle');
+  const gotIt = doc.querySelector('.learning-announcement-dismiss'); gotIt.focus();
+  doc.querySelector('.learning-announcement-dismiss').click();
+  doc.querySelector('.learning-announcement-dismiss').click(); await settle();
+  assert.equal(doc.activeElement, gotIt, 'Saving the preference keeps keyboard focus on Got it');
+  assert.equal(oldSwitch.isConnected, false);
+  assert.equal(doc.querySelector('.ip-explanations-toggle').getAttribute('aria-checked'), 'true');
+  assert.ok(doc.querySelector('.ip-explanations-toggle.learning-announcement-target'));
+  assert.equal(doc.querySelector('.coach-frame'), null);
+  assert.equal(a.store.settings.coachEngineReplies, true);
+  doc.querySelector('.learning-announcement-dismiss').click();
+  assert.deepEqual(changes, [false, true]);
+  assert.equal(a.call('engineExplanationsEnabled'), true);
 });
 
 test('closing the tab mid-morph cleans up without a late swap', async t => {
@@ -160,11 +216,11 @@ test('closing the tab mid-morph cleans up without a late swap', async t => {
   assert.equal(p.card(), null); assert.deepEqual(p.highlighted(), []);
 });
 
-for (const step of [0, 1]) {
+for (const step of [0, 1, 2]) {
   for (const dismissal of ['[data-section=playstyle]', '[data-section=learn]', '.learn-entry-button', 'Escape', 'pagehide']) {
     test(`closing step ${step + 1} with ${dismissal} cleans up and never repeats on reopen`, async t => {
       const p = setup(t), controller = p.mount(); await controller.ready;
-      if (step) p.card().querySelector('.learning-announcement-dismiss').click();
+      for (let i = 0; i < step; i++) { p.card().querySelector('.learning-announcement-dismiss').click(); await settle(); }
       assert.equal(controller.step, step);
       if (dismissal === 'Escape') p.document.dispatchEvent(new p.dom.window.KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
       else if (dismissal === 'pagehide') p.dom.window.dispatchEvent(new p.dom.window.Event('pagehide'));
@@ -174,6 +230,8 @@ for (const step of [0, 1]) {
       assert.equal(p.document.querySelector('.learning-announcement-arrows'), null);
       assert.deepEqual(p.highlighted(), []);
       assert.equal(p.data[seen], true);
+      await settle();
+      assert.deepEqual(p.settingsChanges, [false, true], 'Completing or skipping leaves explanations on');
       const reopened = p.mount(); await reopened.ready;
       assert.equal(p.card(), null);
       reopened.dispose();

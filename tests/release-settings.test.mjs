@@ -190,6 +190,27 @@ test('migration respects an existing intro tour marker', async t => {
   assert.equal(a.dom.window.document.querySelector('.learning-announcement'), null);
 });
 
+for (const updating of [false, true]) test(`${updating ? 'updating' : 'new'} users finish the three-step intro with explanations saved on`, async t => {
+  const {store} = setup();
+  if (updating) store[legacy[0]] = true;
+  else for (const key of Object.keys(store)) delete store[key];
+  const a = await workspace(t), doc = a.dom.window.document;
+  const next = () => doc.querySelector('.learning-announcement-dismiss').click();
+  assert.equal(a.state.settings.coachEngineReplies, false);
+  assert.equal(store.settings.coachEngineReplies, false);
+  next(); await settle();
+  assert.equal(a.state.settings.coachEngineReplies, false);
+  next(); await a.run('_settingsWriteQueue'); await settle();
+  assert.equal(doc.querySelector('.learning-announcement h2').textContent, 'Engine explanations');
+  assert.equal(store.settings.coachEngineReplies, true);
+  assert.ok(doc.querySelector('.insight-panel.learning-announcement-target'), 'An empty workspace points to Insights');
+  next();
+  assert.equal(doc.querySelector('.learning-announcement'), null);
+  const reopened = await workspace(t);
+  assert.equal(reopened.state.settings.coachEngineReplies, true);
+  assert.equal(reopened.dom.window.document.querySelector('.learning-announcement'), null);
+});
+
 for (const marker of legacy) {
   test(`an updating user with the old ${marker} marker still sees the intro tour once`, async t => {
     const { store } = setup(); store[marker] = true;

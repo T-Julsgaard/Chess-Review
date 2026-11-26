@@ -9380,7 +9380,7 @@ async function showReadyWorkspace() {
       await browserAPI.storage.local.remove(`job:${jobId}`);
     }
     if (!screenPreview) learningAnnouncement = mountLearningAnnouncement({document, storage:browserAPI.storage.local,
-      motion:()=>S.settings.uiAnim!==false});
+      motion:()=>S.settings.uiAnim!==false, setEngineExplanations:setCoachEngineReplies});
     if(screenPreview?.viewport){
       if(!S.blank&&Number.isInteger(screenPreview.idx))go(screenPreview.idx);
       document.body.dataset.previewReady="true";
