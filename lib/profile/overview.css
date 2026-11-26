@@ -248,7 +248,7 @@
 .profile-overview-identity > .profile-overview-value { min-width: 0; }
 .profile-overview-flag {
   flex: none;
-  width: clamp(22px, 23cqi, 60px);
+  width: clamp(18px, 12cqi, 28px);
   max-width: 30%;
   border-radius: clamp(3px, 2cqi, 5px);
   box-shadow: 0 0 0 1px color-mix(in oklab, var(--ink) 18%, transparent);
@@ -257,8 +257,8 @@
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 1;
-  object-fit: contain;
+  aspect-ratio: 3 / 2;
+  object-fit: fill;
   border-radius: inherit;
   background: transparent;
   box-shadow: none;
