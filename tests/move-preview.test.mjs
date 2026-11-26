@@ -53,7 +53,7 @@ function fixture(t, fen = new Chess().fen()) {
     flip: () => { flipped = !flipped; }};
 }
 
-test('click previews once, animates back, and reveals the unchanged board', t => {
+test('bounded previews animate back and reveal the unchanged board', t => {
   const f = fixture(t), original = f.board.innerHTML;
   f.show('g1f3');
   assert.equal(f.pieceAt('f3'), 'wN'); assert.equal(f.pieceAt('g1'), undefined);
@@ -67,7 +67,7 @@ test('click previews once, animates back, and reveals the unchanged board', t =>
   assert.equal(f.board.innerHTML, original); assert.equal(f.pending.size, 0);
 });
 
-test('hover holds until released; clicking a hovered move makes a bounded preview', t => {
+test('hover holds until released; a new bounded preview replaces it', t => {
   const f = fixture(t);
   f.show('g1f3', {hold: true}); f.tick(10000);
   assert.equal(f.pieceAt('f3'), 'wN');
@@ -76,6 +76,28 @@ test('hover holds until released; clicking a hovered move makes a bounded previe
   f.show('g1f3', {hold: true}); f.show('g1f3');
   f.preview.release(f.owner); assert.equal(f.pieceAt('f3'), 'wN');
   f.tick(1230); assert.equal(f.board.querySelector('.move-preview'), null);
+});
+
+test('badges appear on the mentioned destination after its prefix and leave before reversing', t => {
+  const f = fixture(t), original = f.board.innerHTML;
+  const makeBadge = () => {
+    const node = f.doc.createElement('span'); node.className = 'sq-badge'; return node;
+  };
+  f.squares.d5.classList.add('top-row','right-col');
+  f.show('e2e4 d7d5', {hold:true, makeBadge});
+  assert.equal(f.board.querySelector('.move-preview .sq-badge'), null);
+  f.tick(320);
+  const badge = f.board.querySelector('.move-preview .sq-badge');
+  assert.equal(badge.parentElement.dataset.square, 'd5');
+  for (const cls of ['has-badge','top-row','right-col']) assert.equal(badge.parentElement.classList.contains(cls),true);
+  f.preview.release(f.owner);
+  assert.equal(f.board.querySelector('.move-preview .sq-badge'), null);
+  f.tick(440); assert.equal(f.board.querySelector('.move-preview'), null);
+  f.squares.d5.classList.remove('top-row','right-col');
+  assert.equal(f.board.innerHTML, original);
+  f.show('g1f3', {hold:true, motion:false, makeBadge});
+  assert.equal(f.board.querySelector('.move-preview .sq-badge').parentElement.dataset.square,'f3');
+  f.preview.release(f.owner); assert.equal(f.board.querySelector('.move-preview'), null);
 });
 
 test('new mentions replace previews and ignore releases from the previous link', t => {

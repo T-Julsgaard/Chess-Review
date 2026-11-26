@@ -209,7 +209,7 @@ test('written explanations respect reduced motion and sequence Dopamine detail a
   assert.ok(delay(detail.firstElementChild)>delay(summary.lastElementChild));
 });
 
-test('only explanation moves are linked; assessment headings retain plain SAN',async t=>{
+test('explanation moves preview only on hover with their category badge; assessment headings retain plain SAN',async t=>{
   const a=review(t),S=a.state;
   await a.call('setCoachEngineReplies',true);
   const before=JSON.stringify([S.evals,S.bests,S.classif,S.moveGrades]);
@@ -220,11 +220,21 @@ test('only explanation moves are linked; assessment headings retain plain SAN',a
   const previewPiece=square=>a.dom.window.document.querySelector('.move-preview')?.children[
     [...a.run('UI.boardWrap').querySelector('.board').children].indexOf(a.run('sqByName')[square])
   ]?.querySelector('.piece-img')?.dataset.piece;
-  links[0].click();assert.equal(previewPiece('h4'),'bQ');
+  assert.equal(links[0].tagName,'SPAN');
+  links[0].click();assert.equal(previewPiece('h4'),undefined);
+  links[0].dispatchEvent(new a.dom.window.Event('pointerenter'));
+  assert.equal(previewPiece('h4'),'bQ');
+  const badge=()=>a.dom.window.document.querySelector('.move-preview .sq-badge');
+  assert.equal(badge().dataset.badgeCategory,'best');
+  assert.equal(badge().parentElement.querySelector('.piece-img').dataset.piece,'bQ');
+  const layer=a.dom.window.document.querySelector('.move-preview');
+  links[0].click();assert.equal(a.dom.window.document.querySelector('.move-preview'),layer);
   assert.equal(S.idx,3);assert.equal(S.analysisMode,false);assert.equal(S.variation,null);
   // Hovering the alternative first undoes the played move, then previews it.
   links[1].dispatchEvent(new a.dom.window.Event('pointerenter'));
   assert.equal(previewPiece('g3'),'wP');assert.equal(S.idx,3);
+  assert.equal(badge().dataset.badgeCategory,'best');
+  assert.equal(badge().parentElement.querySelector('.piece-img').dataset.piece,'wP');
   links[1].dispatchEvent(new a.dom.window.Event('pointerleave'));
   assert.equal(a.dom.window.document.querySelector('.move-preview'),null);
   assert.equal(JSON.stringify([S.evals,S.bests,S.classif,S.moveGrades]),before);
@@ -256,5 +266,5 @@ test('move previews clean up on navigation, board input, Escape and window blur'
   const link=doc.querySelector('.ip-move-link'),touch=new a.dom.window.Event('pointerenter');
   Object.defineProperty(touch,'pointerType',{value:'touch'});
   link.dispatchEvent(touch);assert.equal(shown(),false);
-  link.click();assert.equal(shown(),true);
+  link.click();assert.equal(shown(),false);
 });

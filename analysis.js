@@ -4061,12 +4061,10 @@ function typeWrite(node, text) {
 }
 let _explanationWriting = null;
 function explanationMoveLink(move, onMove, ...content) {
-  return el('button', {type: 'button', class: 'ip-move-link', title: 'Preview ' + move.san,
-    onclick: e => onMove(move, e.currentTarget, false),
-    onpointerenter: e => { if (e.pointerType !== 'touch') onMove(move, e.currentTarget, true); },
+  return el('span', {class: 'ip-move-link', title: 'Hover to preview ' + move.san,
+    onpointerenter: e => { if (e.pointerType !== 'touch') onMove(move, e.currentTarget); },
     onpointerleave: e => explanationPreview.release(e.currentTarget),
-    onpointercancel: () => explanationPreview.cancel(),
-    onblur: e => explanationPreview.release(e.currentTarget)}, ...content);
+    onpointercancel: () => explanationPreview.cancel()}, ...content);
 }
 // Lay out the complete sentence first, then type each character in reading order.
 // Keeping the glyphs in normal text flow prevents wrapping and alignment
@@ -4790,12 +4788,13 @@ function renderMoveComment() {
     beforePv: explanationPv(S.bests[S.idx - 1]), afterPv: explanationPv(S.bests[S.idx]),
   }) : null;
   const ply = S.idx, positionFen = S.positions[ply].fen;
-  const showMove = (move, owner, hold) => {
+  const showMove = (move, owner) => {
     if (S.idx !== ply || S.positions[ply]?.fen !== positionFen || S.analysisMode || S.practice
         || S.analyzing || S.autoTimer || S.reorganize || learningWorkspace || profileOwnsBoard()) return;
     explanationPreview.show({board: UI.boardWrap.querySelector('.board'), squares: sqByName, makePiece,
+      makeBadge: () => gradeBadge(move.category, move.origin === 'played' ? S.moveGrades[ply] : null, 'sq-badge'),
       currentFen: positionFen, baseFen: S.positions[ply + move.plyOffset]?.fen,
-      played: S.positions[ply], uci: move.uci, owner, hold, duration: animDuration(),
+      played: S.positions[ply], uci: move.uci, owner, hold: true, duration: animDuration(),
       motion: S.settings.moveAnim !== false && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches});
   };
   const assessment = el('div', {class: 'ip-assessment'},

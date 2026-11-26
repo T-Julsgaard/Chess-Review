@@ -150,14 +150,18 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   for(const [label,square,piece] of [['Queen h4','h4','bQ'],['Pawn g3','g3','wP']]) {
     await run("import('./analysis.js').then(m=>m.go(3))");
     await run(`([...document.querySelectorAll('.insight-panel .ip-move-link')].find(n=>n.textContent===${JSON.stringify(label)})).click()`);
+    assert.equal(await run("!!document.querySelector('.move-preview')"),false,'Clicking does not start a preview');
+    await run(`([...document.querySelectorAll('.insight-panel .ip-move-link')].find(n=>n.textContent===${JSON.stringify(label)})).dispatchEvent(new PointerEvent('pointerenter',{pointerType:'mouse'}))`);
     assert.equal(await run(`previewPiece('${square}')`),piece);
+    assert.equal(await run("document.querySelector('.move-preview .sq-badge').dataset.badgeCategory"),'best');
+    assert.equal(await run(`document.querySelector('.move-preview .sq-badge').parentElement.querySelector('.piece-img').dataset.piece`),piece);
     assert.equal(await run("document.querySelector('.move-preview').getAnimations({subtree:true}).length"),0);
     assert.equal(await reviewState(),beforePreview);
-    await sleep(950);
+    await run(`([...document.querySelectorAll('.insight-panel .ip-move-link')].find(n=>n.textContent===${JSON.stringify(label)})).dispatchEvent(new PointerEvent('pointerleave'))`);
     assert.equal(await run("!!document.querySelector('.move-preview')"),false);
   }
-  // Real pointer input: hover holds, leaving reverses, clicking returns even
-  // when the pointer remains over the mention. No review/engine state changes.
+  // Real pointer input: hover holds and leaving reverses. Clicking does not
+  // restart or shorten the hover preview. No review/engine state changes.
   await call('Emulation.setDeviceMetricsOverride',{width:1366,height:768,deviceScaleFactor:1,mobile:false},review.sessionId);
   await call('Emulation.setEmulatedMedia',{features:[]},review.sessionId);
   await run("import('./analysis.js').then(m=>{m.S.settings.moveAnim=true;m.go(3);})");
@@ -185,13 +189,13 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   await call('Input.dispatchMouseEvent',{type:'mousePressed',button:'left',clickCount:1,...point},review.sessionId);
   await call('Input.dispatchMouseEvent',{type:'mouseReleased',button:'left',clickCount:1,...point},review.sessionId);
   await sleep(240);assert.equal(await run("previewPiece('h4')"),'bQ');
-  await shot('move-preview-click');
-  await sleep(1100);assert.equal(await run("!!document.querySelector('.move-preview')"),false);
+  await sleep(1100);assert.equal(await run("previewPiece('h4')"),'bQ');
+  await call('Input.dispatchMouseEvent',{type:'mouseMoved',x:0,y:0},review.sessionId);
+  await sleep(260);assert.equal(await run("!!document.querySelector('.move-preview')"),false);
   assert.equal(await reviewState(),beforePreview);
-  // Keyboard activation also gets a single preview; navigating cancels its timers.
-  await run("document.querySelector('.ip-move-link').focus()");
-  await call('Input.dispatchKeyEvent',{type:'keyDown',key:' ',code:'Space',windowsVirtualKeyCode:32},review.sessionId);
-  await call('Input.dispatchKeyEvent',{type:'keyUp',key:' ',code:'Space',windowsVirtualKeyCode:32},review.sessionId);
+  assert.equal(await run("document.querySelector('.ip-move-link').tagName"),'SPAN');
+  assert.equal(await run("document.querySelector('.ip-move-link').tabIndex"),-1);
+  await call('Input.dispatchMouseEvent',{type:'mouseMoved',...point},review.sessionId);
   await sleep(240);assert.equal(await run("previewPiece('h4')"),'bQ');
   await run("import('./analysis.js').then(m=>m.go(2))");
   await sleep(1300);

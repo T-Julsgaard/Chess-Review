@@ -279,12 +279,15 @@ test('readable move mentions retain legal prefixes and never turn board squares 
   assert.deepEqual(shown.detailParts.filter(part=>part.move).map(part=>[part.text,part.move.uci,part.move.plyOffset]),[
     ['Queen d1','d8d1',0],['Rook e1','d8d1 e2e1',0],['Queen e1','d8d1 e2e1 d1e1',0],
   ]);
+  assert.ok(shown.detailParts.filter(part=>part.move).every(part=>part.move.category==='best'));
   const pin=explainMove({...position('1. e4 e5 2. Nf3 d6 3. d4','Nc6'),category:'inacc',afterPv:'f1b5'});
   assert.deepEqual(pin.summaryParts.filter(part=>part.move).map(part=>part.text),['Bishop b5']);
   assert.match(pin.summary,/knight on c6/);
   const castle=explainMove({...position('1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5','O-O'),category:'good'});
   assert.equal(castle.played.text,'Castle kingside');
   assert.equal(castle.played.uci,'e1g1');
+  assert.equal(castle.played.category,'good');
+  assert.equal(castle.played.origin,'played');
   const ep=explainMove({...position('1. e4 a6 2. e5','d5'),afterPv:'e5d6'});
   assert.equal(ep.summaryParts.find(part=>part.move).text,'Pawn d6');
   assert.match(ep.summary,/pawn on d5/);
