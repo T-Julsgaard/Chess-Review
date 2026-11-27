@@ -28,7 +28,9 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   const frames = () => run('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');
   const failures = [], evidence = [];
   const fail = (label, msg, data) => failures.push({label, msg, data});
-  const shot = async name => { const s = await call('Page.captureScreenshot', {format: 'png'}, review.sessionId); await fs.writeFile(path.join(out, name + '.png'), Buffer.from(s.data, 'base64')); };
+  const shot = async (name, clip) => { const s = await call('Page.captureScreenshot', {format: 'png', ...(clip && {clip: {...clip, scale: 1}})}, review.sessionId); await fs.writeFile(path.join(out, name + '.png'), Buffer.from(s.data, 'base64')); };
+  // LAPTOP_FIT_ONLY=review or =profile runs one half (for quicker design iteration).
+  const only = process.env.LAPTOP_FIT_ONLY;
   const size = async (width, height, deviceScaleFactor) => { await call('Emulation.setDeviceMetricsOverride', {width, height, deviceScaleFactor, mobile: false}, review.sessionId); await sleep(250); await frames(); };
   await run("document.querySelector('.learning-announcement')&&document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))");
   await waitFor(review, "!document.querySelector('#startup')&&import('./analysis.js').then(m=>m.S.positions.length>4&&!m.S.analyzing)", 'Completed review');
@@ -38,7 +40,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await size(1920, 945, 1);
   const desktop = await run(`(()=>{const R=${rect},c=R(document.querySelector('[data-mod=coach]')),v=R(document.querySelector('[data-mod=review]'));
     return {inset:(v.r-c.r)/v.w,width:c.w/v.w};})()`);
-  for (const [width, height] of LAPTOP_VIEWPORTS) for (const scale of SCALES) {
+  if (only !== 'profile') for (const [width, height] of LAPTOP_VIEWPORTS) for (const scale of SCALES) {
     const label = `${width}x${height}@${scale}`;
     await size(width, height, scale);
     for (const lines of [3, 2, 1]) {
@@ -53,12 +55,20 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
           const font=n=>n?parseFloat(getComputedStyle(n).fontSize)*(content?Number(content.style.zoom||1):1)*(R(q('[data-mod=accuracy]')).w/q('[data-mod=accuracy]').offsetWidth):0;
           return {coach:R(q('[data-mod=coach]:not([hidden])')),review:R(q('[data-mod=review]')),toggle:R(q('.ip-explanations-toggle')),close:R(q('.ip-close-game')),
             accuracy:R(q('[data-mod=accuracy]')),stage:q('.stage').classList.contains('full-hd-reference'),
-            zoom:content?Number(content.style.zoom||1):1,names:Math.max(0,...names),
+            zoom:content?Number(content.style.zoom||1):1,names:Math.max(0,...names),compact:!!content?.classList.contains('acc-compact'),
+            cells:[...document.querySelectorAll('[data-mod=accuracy] .phase-report-cell')].map(n=>n.getBoundingClientRect().width),
+            dials:[...document.querySelectorAll('[data-mod=accuracy] .acc-dial')].map(n=>{const r=n.getBoundingClientRect();return r.x+r.width/2;}),
+            columns:[...document.querySelectorAll('[data-mod=accuracy] .phase-report-row:first-child .phase-report-cell')].map(n=>{const r=n.getBoundingClientRect();return r.x+r.width/2;}),
             nameFont:font(q('[data-mod=accuracy] .acc-name')),labelFont:font(q('[data-mod=accuracy] .qlabel .nm')),
             scrollbars:${SCROLLBARS}(q('.stage')).filter(s=>!/moves|ml-|panel-body$/.test(s.cls)||/acc-|engine/.test(s.cls))};})()`);
         const context = {label, lines, page};
         for (const bar of data.scrollbars) if (/acc-|engine/.test(bar.cls)) fail(label, `scroll bar in ${bar.cls}`, {...context, bar});
         if (data.names > 1) fail(label, 'player name truncated in Accuracy', context);
+        // Compact overview: every score box has one size, and each dial sits over its column.
+        if (page === 0 && data.compact && data.cells.length) {
+          if (Math.max(...data.cells) - Math.min(...data.cells) > 1) fail(label, 'compact score boxes differ in width', {...context, cells: data.cells});
+          if (data.dials.some((x, i) => Math.abs(x - data.columns[i]) > 1.5)) fail(label, 'compact dials off their columns', {...context, dials: data.dials, columns: data.columns});
+        }
         if (page === 1 && data.labelFont && data.labelFont < 8) fail(label, `Quality labels too small (${data.labelFont.toFixed(1)}px)`, context);
         // 9px floor: the shortest window (1280x550, 1080p at 150% with bookmarks) with three lines lands near 9.3px.
         if (data.nameFont < 9) fail(label, `Accuracy text too small (${data.nameFont.toFixed(1)}px names)`, {...context, zoom: data.zoom});
@@ -69,6 +79,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
         }
         if (page === 0 && lines === 2) evidence.push({label, zoom: data.zoom, nameFont: +data.nameFont.toFixed(1)});
         if (page === 0 && lines === 2 && scale === 1.25) await shot(`overview-${label}`);
+        if (page === 0 && lines !== 2) await shot(`accuracy-${label}-${lines}`, {x: data.accuracy.x, y: data.accuracy.y, width: data.accuracy.w, height: data.accuracy.h});
       }
     }
     // Rail buttons stay clear of the floating Feedback button (after the rail's glide settles).
@@ -81,7 +92,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   // Stacked layouts (tablets, narrow windows, phones) place a smaller coach in the
   // same corner; it must leave the explanations switch and close button uncovered
   // as much as the desktop portrait does (at most its transparent right fifth).
-  for (const [width, height] of [[1024, 768], [1080, 1800], [820, 1180], [768, 1024], [430, 932], [390, 844], [1280, 470]]) {
+  if (only !== 'profile') for (const [width, height] of [[1024, 768], [1080, 1800], [820, 1180], [768, 1024], [430, 932], [390, 844], [1280, 470]]) {
     const label = `${width}x${height}`;
     await size(width, height, 1);
     await run("import('./analysis.js').then(m=>{m.S.settings.engineLines=2;m.renderEngineCurrent();m.setAccuracyPage(0);scrollTo(0,0);})");
@@ -96,7 +107,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     await shot(`stacked-${label}`);
   }
   // Removing lines through the panel animates the fit; it must settle without a scroll bar.
-  for (const [width, height] of [[1536, 730], [1366, 640], [1280, 680], [1920, 945]]) for (const scale of [1.25, 1.5]) {
+  if (only !== 'profile') for (const [width, height] of [[1536, 730], [1366, 640], [1280, 680], [1920, 945]]) for (const scale of [1.25, 1.5]) {
     const label = `${width}x${height}@${scale}`;
     await size(width, height, scale);
     await run(`import('./analysis.js').then(m=>{m.S.settings.engineLines=3;m.renderEngineCurrent();m.setAccuracyPage(0);})`);
@@ -109,6 +120,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
     }
   }
   // Playstyle
+  if (only === 'review') return finish();
   const rows = season();
   await run(`import('./browser-compat.js').then(({browserAPI})=>browserAPI.storage.local.set(${JSON.stringify({[rowsKey('chesscom', 'tester')]: {rows, months: [], since: 0, updatedAt: Date.now()}})}))`);
   await size(1920, 945, 1);
@@ -126,19 +138,24 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
       const data = await run(`(()=>{const R=${rect},shell=document.querySelector('.profile-shell'),host=shell.querySelector('.profile-slide-host'),story=host.querySelector('.pv-story');
         const lead=story?.querySelector('.pv-story-lead,.pv-points li,.pv-fact dt,.pv-reasons li');
         const zoom=Number(story?.style.zoom||1),s=R(shell).w/shell.offsetWidth;
-        return {shell:R(shell),zoom,font:lead?parseFloat(getComputedStyle(lead).fontSize)*zoom*s:null,
+        return {shell:R(shell),board:R(w.liveBoard),zoom,font:lead?parseFloat(getComputedStyle(lead).fontSize)*zoom*s:null,
           scrollbars:${SCROLLBARS}(shell).filter(b=>!/pv-cmp-list|pv-filter|pv-modes|pv-compare-menu|pv-settings-menu|profile-suggest/.test(b.cls))};})()`);
       for (const bar of data.scrollbars) fail(label, `Playstyle ${id}: scroll bar in ${bar.cls}`, bar);
       if (data.shell.x < -1 || data.shell.r > width + 1 || data.shell.y < 0 || data.shell.b > height + 1) fail(label, `Playstyle ${id}: panel outside the window`, data.shell);
+      // Beside the board, the deck spans exactly the squares' height, at every size.
+      if (data.shell.x > data.board.r && (data.shell.y < data.board.y - 1 || data.shell.b > data.board.b + 1)) fail(label, `Playstyle ${id}: panel taller than the board`, data);
       if (data.font != null && data.font < 9) fail(label, `Playstyle ${id}: text too small (${data.font.toFixed(1)}px)`, data);
       profileEvidence.push({label, id, zoom: +data.zoom.toFixed(2), font: data.font && +data.font.toFixed(1)});
       if (scale === 1.5 && ['numbers', 'openings', 'signature', 'rating', 'share'].includes(id)) await shot(`profile-${label}-${id}`);
     }
   }
-  await fs.writeFile(path.join(out, 'laptop-fit.json'), JSON.stringify({failures, evidence, profileEvidence}, null, 1));
-  const summary = {};
-  for (const f of failures) summary[f.msg.replace(/\(.*\)/, '()')] = (summary[f.msg.replace(/\(.*\)/, '()')] || 0) + 1;
-  console.log(JSON.stringify({out, failures: failures.length, summary, sample: failures.slice(0, 25)}, null, 1));
-  if (failures.length) throw Error('Laptop fit audit failed: ' + failures.length + ' checks');
-  console.log(`Laptop fit: ${LAPTOP_VIEWPORTS.length} viewports at ${SCALES.length} display scales. Screenshots: ${out}`);
+  return finish(profileEvidence);
+  async function finish(profileEvidence = []) {
+    await fs.writeFile(path.join(out, 'laptop-fit.json'), JSON.stringify({failures, evidence, profileEvidence}, null, 1));
+    const summary = {};
+    for (const f of failures) summary[f.msg.replace(/\(.*\)/, '()')] = (summary[f.msg.replace(/\(.*\)/, '()')] || 0) + 1;
+    console.log(JSON.stringify({out, failures: failures.length, summary, sample: failures.slice(0, 25)}, null, 1));
+    if (failures.length) throw Error('Laptop fit audit failed: ' + failures.length + ' checks');
+    console.log(`Laptop fit: ${LAPTOP_VIEWPORTS.length} viewports at ${SCALES.length} display scales. Screenshots: ${out}`);
+  }
 }

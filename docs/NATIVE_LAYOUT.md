@@ -26,13 +26,16 @@ Laptop arrangements keep the desktop proportions where it matters: the coach kee
 the same inset from the review panel's right edge, so it never covers the Engine
 explanations switch or the close button. Accuracy and Quality never scroll at any
 viewport or display scale (100%, 125%, 150%): a short panel first switches the
-overview to a compact arrangement of the same figures (phases and ratings on one
-line, smaller dials), Quality tightens its rows, and only a small remainder is
-zoomed. Sub-pixel remainders at fractional scaling are hidden rather than drawing a
-scroll bar. Advanced is a long list and keeps its own scrolling. Playstyle chapters
-are fitted to their panel rather than scrolled; on boards shorter than the desktop
-one the deck also grows into the empty player-strip margins and tightens its header
-and chapter buttons. When the floating Feedback button would still touch the
+overview to a compact arrangement of the same figures. Every row (accuracy dials,
+phases, rating) reads score, label, score in the same three columns, so all score
+boxes share one size; the dials take the height left over, from the desktop size
+down to a minimum, below which only their figures remain. Quality tightens its
+rows, and only a small remainder is zoomed. Sub-pixel remainders at fractional
+scaling are hidden rather than drawing a scroll bar. Advanced is a long list and
+keeps its own scrolling. Playstyle chapters are fitted to their panel rather than
+scrolled. Beside the board the panel always spans exactly the squares' height;
+short panels tighten the header, chapter rows and buttons (two steps) before the
+chapter is scaled. When the floating Feedback button would still touch the
 section rail after tucking to its icon, the rail ends just above it.
 
 Desktop page bounds stay fixed when Accuracy expands; content extending beyond
@@ -84,9 +87,11 @@ Run these against the working tree in an isolated Chrome extension profile:
 - `node scripts/learning-browser.mjs --working-tree --laptop-fit` checks 22
   laptop/desktop viewports at 100%, 125% and 150% display scaling: no scroll bar
   in Accuracy, Quality or Engine for one to three lines (including after the
-  panel's add/remove buttons), readable Accuracy text, coach clear of the
-  explanations switch (also in stacked layouts), rail clear of Feedback, and every
-  Playstyle chapter shown without scrolling.
+  panel's add/remove buttons), readable Accuracy text, equal compact score boxes
+  with dials over their columns, coach clear of the explanations switch (also in
+  stacked layouts), rail clear of Feedback, and every Playstyle chapter shown
+  without scrolling, within the board's height. It saves an Accuracy panel crop
+  per viewport. `LAPTOP_FIT_ONLY=review` or `=profile` runs one half.
 - `--viewport-preview` checks the live Screen sizes viewer, rotation, fullscreen,
   and isolation from saved user data.
 

@@ -5519,6 +5519,7 @@ function scheduleAccuracyFit() {
     content.classList.remove('acc-dense', 'acc-compact', 'acc-compact-tight');
     page.classList.remove('acc-fit-scroll');
     content.style.removeProperty('--q-row');
+    content.style.removeProperty('--acc-dial');
     if (page.scrollHeight <= page.clientHeight) return;
     // Short panels (laptops, scaled displays) first switch to a compact
     // arrangement of the same figures, so they stay readable at full size.
@@ -5526,7 +5527,7 @@ function scheduleAccuracyFit() {
       && page.scrollHeight <= page.clientHeight) return;
     if (page.classList.contains('acc-page-overview') && content.querySelector('.phase-overview')) {
       content.classList.add('acc-compact');
-      if (page.scrollHeight <= page.clientHeight) return;
+      if (fitAccuracyDials(page, content)) return;
       content.classList.add('acc-compact-tight');
       if (page.scrollHeight <= page.clientHeight) return;
     }
@@ -5541,6 +5542,21 @@ function scheduleAccuracyFit() {
     }
     page.classList.toggle('acc-fit-scroll', page.scrollHeight > page.clientHeight);
   });
+}
+// The compact overview's dials take the height its rows leave, from the desktop
+// size down to ACC_DIAL_MIN (a dial's height equals its width). Below that the
+// rings give way to plain figures (acc-compact-tight).
+const ACC_DIAL_MAX = 100, ACC_DIAL_MIN = 54;
+function fitAccuracyDials(page, content) {
+  const dial = content.querySelector('.acc-dial');
+  let size = ACC_DIAL_MAX;
+  for (let i = 0; dial && i < 4; i++) {
+    content.style.setProperty('--acc-dial', size + 'px');
+    const over = page.scrollHeight - page.clientHeight;
+    if (over <= 0 || size === ACC_DIAL_MIN) break;
+    size = Math.max(ACC_DIAL_MIN, Math.floor(Math.min(size, dial.offsetHeight) - over));
+  }
+  return page.scrollHeight <= page.clientHeight;
 }
 // Zooming the whole Quality list made its text unreadable in short panels
 // (6–8px at a 1080p screen with 150% scaling). Instead, tighten the rows so they

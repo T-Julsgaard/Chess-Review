@@ -288,39 +288,44 @@
    at fractional display scaling (125%, 150%) must not draw a scroll bar either. */
 .stage .mod .accuracy-panel .acc-fit-page { overflow-y: hidden; }
 /* Short panels (laptops, scaled displays): the same figures in a tighter
-   arrangement, before any zoom. Phases and ratings read across one line. */
+   arrangement, before any zoom. Every row reads across one line with the same
+   three columns (score, label, score), so all score boxes share one size and the
+   dials sit over their columns. scheduleAccuracyFit sizes the dials (--acc-dial)
+   to the height left over. */
+.stage .accuracy-phase-modern .acc-compact { --phase-name-w: 72px; --phase-cols: minmax(0,1fr) var(--phase-name-w) minmax(0,1fr); }
 .stage .accuracy-phase-modern .acc-compact .acc-players { margin-bottom: 4px; }
-.stage .accuracy-phase-modern .acc-compact .phase-overview { gap: 4px; }
-.stage .accuracy-phase-modern .acc-compact .phase-overall-values { margin-top: 1px; }
-.stage .accuracy-phase-modern .acc-compact .acc-dial { max-width: 62px; }
-.stage .accuracy-phase-modern .acc-compact .phase-overall-values .acc-val { font-size: 19px; letter-spacing: -.8px; }
-.stage .accuracy-phase-modern .acc-compact .phase-report { gap: 4px; }
-.stage .accuracy-phase-modern .acc-compact :is(.phase-report-row, .phase-rating) {
-  display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 6px; }
-.stage .accuracy-phase-modern .acc-compact :is(.phase-report-cells, .phase-rating-values) { display: contents; }
-.stage .accuracy-phase-modern .acc-compact :is(.phase-report-cell, .acc-elo):first-child { order: -1; }
-.stage .accuracy-phase-modern .acc-compact .phase-report-name { min-width: 52px; }
+.stage .accuracy-phase-modern .acc-compact .phase-overview { gap: 6px; }
+.stage .accuracy-phase-modern .acc-compact :is(.phase-summary, .phase-report-row, .phase-rating) {
+  display: grid; grid-template-columns: var(--phase-cols); align-items: center; column-gap: 6px; }
+.stage .accuracy-phase-modern .acc-compact :is(.phase-overall-values, .phase-report-cells, .phase-rating-values) { display: contents; }
+.stage .accuracy-phase-modern .acc-compact :is(.acc-dial, .phase-report-cell, .acc-elo):first-child { order: -1; }
+.stage .accuracy-phase-modern .acc-compact :is(.phase-summary-label, .phase-report-name, .phase-rating > .acc-elo-label) {
+  width: var(--phase-name-w); text-align: center; justify-content: center; }
+.stage .accuracy-phase-modern .acc-compact .phase-summary-label { top: 0; font-size: 9.5px; }
+.stage .accuracy-phase-modern .acc-compact .acc-dial { width: min(100%, var(--acc-dial, 64px)); max-width: none; margin: 0 auto; }
+.stage .accuracy-phase-modern .acc-compact .phase-overall-values .acc-val {
+  font-size: calc(var(--acc-dial, 64px) * .265); letter-spacing: -.05em; }
+.stage .accuracy-phase-modern .acc-compact .phase-report { gap: 5px; }
 .stage .accuracy-phase-modern .acc-compact .phase-report-name::before,
 .stage .accuracy-phase-modern .acc-compact .phase-report-name::after { content: none; }
-.stage .accuracy-phase-modern .acc-compact .phase-report-cell { padding: 4px 3px; }
-.stage .accuracy-phase-modern .acc-compact .phase-report-score { font-size: 17px; }
-.stage .accuracy-phase-modern .acc-compact .phase-rating { padding-top: 5px; }
-.stage .accuracy-phase-modern .acc-compact .phase-rating > .acc-elo-label { max-width: 62px; font-size: 10px; line-height: 1.15; }
-.stage .accuracy-phase-modern .acc-compact .phase-rating-values .acc-elo { font-size: 17px; text-align: center; }
-/* The shortest windows (1080p at 150% with bookmarks): drop the dial rings and
-   tighten every row; the figures keep their size relative to the names. */
+.stage .accuracy-phase-modern .acc-compact .phase-report-cell { padding: 5px 3px; }
+.stage .accuracy-phase-modern .acc-compact .phase-report-score { font-size: 18px; }
+.stage .accuracy-phase-modern .acc-compact .phase-rating { padding-top: 6px; }
+.stage .accuracy-phase-modern .acc-compact .phase-rating > .acc-elo-label { font-size: 10px; line-height: 1.15; }
+.stage .accuracy-phase-modern .acc-compact .phase-rating-values .acc-elo { font-size: 18px; text-align: center; }
+/* The shortest windows (1080p at 150% with bookmarks): the dials keep their
+   figures without rings, and every row tightens. */
 .stage .accuracy-phase-modern .acc-compact-tight .acc-players { margin-bottom: 2px; }
 .stage .accuracy-phase-modern .acc-compact-tight .acc-player { padding-block: 3px; }
-.stage .accuracy-phase-modern .acc-compact-tight .phase-overview { gap: 2px; }
-.stage .accuracy-phase-modern .acc-compact-tight .phase-summary-label { display: none; }
-.stage .accuracy-phase-modern .acc-compact-tight .acc-dial { max-width: none; aspect-ratio: auto; height: 26px; margin: 0; }
+.stage .accuracy-phase-modern .acc-compact-tight .phase-overview { gap: 3px; }
+.stage .accuracy-phase-modern .acc-compact-tight .acc-dial { width: auto; aspect-ratio: auto; height: 26px; }
 .stage .accuracy-phase-modern .acc-compact-tight .acc-dial svg { display: none; }
 .stage .accuracy-phase-modern .acc-compact-tight .phase-overall-values .acc-val { font-size: 21px; }
-.stage .accuracy-phase-modern .acc-compact-tight .phase-report { gap: 2px; }
+.stage .accuracy-phase-modern .acc-compact-tight .phase-report { gap: 3px; }
 .stage .accuracy-phase-modern .acc-compact-tight .phase-report-cell { padding: 2px 3px; border-radius: 6px; }
-.stage .accuracy-phase-modern .acc-compact-tight .phase-report-score { font-size: 15px; }
+.stage .accuracy-phase-modern .acc-compact-tight .phase-report-score { font-size: 16px; }
 .stage .accuracy-phase-modern .acc-compact-tight .phase-rating { padding-top: 3px; }
-.stage .accuracy-phase-modern .acc-compact-tight .phase-rating-values .acc-elo { font-size: 15px; }
+.stage .accuracy-phase-modern .acc-compact-tight .phase-rating-values .acc-elo { font-size: 16px; }
 /* Past its legible minimum (the shortest windows only), Quality scrolls quietly:
    no scroll bar, a fade where the list continues. */
 .stage .mod .accuracy-panel .acc-fit-page.acc-fit-scroll { overflow-y: auto; scrollbar-width: none;

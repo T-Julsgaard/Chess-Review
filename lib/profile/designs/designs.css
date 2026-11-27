@@ -568,3 +568,20 @@
 .profile-shell.profile-short .pv-story-host { padding: 6px 22px 8px !important; }
 .profile-shell.profile-short .profile-nav.pv-story-nav { padding: 6px 14px 10px; }
 .profile-shell.profile-short .pv-story-nav > :is(.pv-next, .pv-prev) { min-height: 40px; padding-block: 5px; }
+/* The hero figure follows the window width (vw); a short panel caps it and
+   tightens the chapter's rows, so less of the chapter needs fitting. */
+.profile-shell.profile-short[data-design="story"] .pv-story { gap: 9px; padding-block: 2px 4px; }
+.profile-shell.profile-short[data-design="story"] .pv-story-hero:not(.is-text) .pv-story-figure { font-size: clamp(46px, 5vw, 80px); }
+.profile-shell.profile-short[data-design="story"] .pv-story-hero.is-text .pv-story-figure { font-size: clamp(26px, 2.6vw, 44px); }
+.profile-shell.profile-short[data-design="story"] .pv-story-hero { gap: 4px; }
+.profile-shell.profile-short[data-design="story"] .pv-fact { padding: 6px 0; }
+.profile-shell.profile-short .pv-wdl { height: 48px; }
+/* The shortest boards (a 1080p laptop at 150% with the bookmarks bar). */
+.profile-shell.profile-tiny[data-design="story"] .profile-head { padding: 5px 14px 2px; }
+.profile-shell.profile-tiny .pv-story-host { padding: 4px 20px 6px !important; }
+.profile-shell.profile-tiny[data-design="story"] .pv-story { gap: 7px; }
+.profile-shell.profile-tiny[data-design="story"] .pv-story-hero:not(.is-text) .pv-story-figure { font-size: clamp(40px, 4.2vw, 64px); }
+.profile-shell.profile-tiny[data-design="story"] .pv-fact { padding: 4px 0; }
+.profile-shell.profile-tiny .pv-wdl { height: 42px; }
+.profile-shell.profile-tiny .profile-nav.pv-story-nav { padding: 4px 12px 8px; }
+.profile-shell.profile-tiny .pv-story-nav > :is(.pv-next, .pv-prev) { min-height: 36px; padding-block: 3px; }
