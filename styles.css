@@ -1361,9 +1361,10 @@ button { font-family: inherit; cursor: pointer; }
   content: ""; position: absolute; inset: 0; z-index: 0;
   background: var(--hl-color, rgba(255, 224, 64, .46));
 }
-.sq.sel::before, .sq.puzzle-hint-square::before, .sq.last-move::before { content: ''; position: absolute; inset: 0; z-index: 0; background: rgba(255,230,88,.52); pointer-events: none; }
-/* the user's single-square marker (red, translucent) — sits behind the piece */
-.sq.marked::after, .sq.premove::after {
+.sq.sel::before, .sq.last-move::before { content: ''; position: absolute; inset: 0; z-index: 0; background: rgba(255,230,88,.52); pointer-events: none; }
+/* the user's single-square marker (red, translucent) — sits behind the piece. A puzzle hint
+   marks the piece to move with the same red, as the game-review practice hint does. */
+.sq.marked::after, .sq.premove::after, .sq.puzzle-hint-square::after {
   content: ""; position: absolute; inset: 0; z-index: 0;
   background: color-mix(in srgb, var(--mc-marked) 45%, transparent);
 }
