@@ -5435,10 +5435,11 @@ function renderModernAdvanced(sides, busy) {
   ]);
   return mount();
 }
-// Modern overviews share their Quality and Advanced pages. "Default version 2"
-// (phases-compact) always uses the compact overview that short panels get.
-// "Default version 3" (phases-gauge) is Default with restyled overall scores;
-// "Default version 4" (phases-band) also colours them by performance band.
+// Modern overviews share their Quality and Advanced pages. "Default" (phases-band)
+// sets each overall score as a large whole number with a smaller decimal and
+// colours it, its ring and the rating by performance band. "Default v2"
+// (phases-modern) is the earlier Default. Retired: phases-compact always used the
+// compact overview; phases-gauge was phases-band without the colours.
 const MODERN_ACCURACY_DESIGNS = ['phases-modern', 'phases-modern-v2', 'phases-compact', 'phases-gauge', 'phases-band'];
 const SPLIT_SCORE_DESIGNS = ['phases-gauge', 'phases-band'];
 function renderStats() {
@@ -7921,7 +7922,7 @@ async function applyUiSetup(value) {
     return;
   }
   cancelPanelGesture?.();
-  const patch = {uiSetup:value, uiSetupBase:value, ...setup.designs, evalView:'both', ...(value === 'modern' ? {modernEngineVersion:1,modernMovesVersion:1,modernGraphVersion:2,modernQualityVersion:1} : {})};
+  const patch = {uiSetup:value, uiSetupBase:value, ...setup.designs, evalView:'both', ...(value === 'modern' ? {modernEngineVersion:1,modernMovesVersion:1,modernGraphVersion:2,modernQualityVersion:1,modernAccuracyVersion:1} : {})};
   Object.assign(S.settings, patch);
   S.originalAccuracyExpanded = false; S.qbreakExpanded = false; S.accuracyPage = 0;
   statsRefs = null; hideQTip(); overviewReveal.stop();
@@ -9511,6 +9512,11 @@ async function showReadyWorkspace() {
     if (S.settings.uiSetup === 'modern' && !S.settings.modernQualityVersion) {
       if (S.settings.accuracyQualityDesign === 'original') S.settings.accuracyQualityDesign = 'distribution';
       S.settings.modernQualityVersion = 1;
+    }
+    // The band-coloured overview (phases-band) replaced phases-modern, now "Default v2", as Modern's default.
+    if (S.settings.uiSetup === 'modern' && !S.settings.modernAccuracyVersion) {
+      if (S.settings.accuracyDesign === 'phases-modern') S.settings.accuracyDesign = UI_SETUPS.modern.designs.accuracyDesign;
+      S.settings.modernAccuracyVersion = 1;
     }
     migrateEngineSettings(S.settings);
     delete S.settings.wrongSound; // older selectable mistake cues were removed

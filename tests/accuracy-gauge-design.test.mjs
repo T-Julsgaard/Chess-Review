@@ -11,27 +11,53 @@ function review(t) {
   return a;
 }
 
-test('Default version 3 is offered after Default version 2 and survives a reload', async t => {
+test('Accuracy overview offers Default (band colours), Default v2 and Original; Default is the default', async t => {
   const accuracy = PANEL_DESIGNS.find(design => design.panel === 'accuracy');
-  assert.deepEqual(accuracy.versions.map(version => version.label), ['Default', 'Default version 2', 'Default version 3', 'Default version 4', 'Original']);
-  assert.equal(accuracy.versions[2].id, 'phases-gauge');
-  const settings = {accuracyDesign: 'phases-gauge'};
-  normalizePanelDesigns(settings);
-  assert.equal(settings.accuracyDesign, 'phases-gauge');
-  assert.equal(panelDesign('accuracy', settings), 'phases-gauge');
-
+  assert.deepEqual(accuracy.versions.map(version => [version.id, version.label]),
+    [['phases-band', 'Default'], ['phases-modern', 'Default v2'], ['original', 'Original']]);
+  assert.equal(accuracy.default, 'phases-band');
+  assert.equal(panelDesign('accuracy', {}), 'phases-band');
+  // Retired versions still render but migrate to Default on load.
+  for (const accuracyDesign of ['phases-gauge', 'phases-compact']) {
+    assert.equal(panelDesign('accuracy', {accuracyDesign}), accuracyDesign);
+    const settings = {accuracyDesign}; normalizePanelDesigns(settings);
+    assert.equal(settings.accuracyDesign, 'phases-band');
+  }
+  // Default v2 is a choice that sticks.
   const a = review(t);
   await a.call('applyUiSetup', 'modern');
-  await a.call('setSetting', 'accuracyDesign', 'phases-gauge');
-  assert.equal(a.store.settings.accuracyDesign, 'phases-gauge');
+  assert.equal(a.state.settings.accuracyDesign, 'phases-band');
+  await a.call('setSetting', 'accuracyDesign', 'phases-modern');
   const restored = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
   restored.replace('resetSettingsForRelease', async () => {});
   restored.store.settings = {...a.store.settings};
   await restored.start();
-  assert.equal(restored.state.settings.accuracyDesign, 'phases-gauge');
+  assert.equal(restored.state.settings.accuracyDesign, 'phases-modern');
 });
 
-test('Default version 3 changes only the overall scores: a whole number with a smaller decimal', async t => {
+test('Modern users on the former Default move to the new Default once; Custom choices are kept', async t => {
+  const start = async settings => {
+    const a = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
+    a.replace('resetSettingsForRelease', async () => {});
+    a.store.settings = settings;
+    await a.start();
+    return a;
+  };
+  let a = await start({uiSetup: 'modern', uiSetupBase: 'modern', accuracyDesign: 'phases-modern'});
+  assert.equal(a.store.settings.accuracyDesign, 'phases-band');
+  assert.equal(a.store.settings.modernAccuracyVersion, 1);
+  // Choosing Default v2 afterwards sticks across restarts.
+  a = await start({...a.store.settings, accuracyDesign: 'phases-modern', uiSetup: 'custom'});
+  assert.equal(a.store.settings.accuracyDesign, 'phases-modern');
+  a = await start({uiSetup: 'modern', uiSetupBase: 'modern', accuracyDesign: 'phases-modern', modernAccuracyVersion: 1});
+  assert.equal(a.store.settings.accuracyDesign, 'phases-modern');
+  a = await start({uiSetup: 'custom', uiSetupBase: 'modern', accuracyDesign: 'phases-modern'});
+  assert.equal(a.store.settings.accuracyDesign, 'phases-modern', 'A Custom setup keeps its design');
+  a = await start({uiSetup: 'modern', uiSetupBase: 'modern', accuracyDesign: 'original'});
+  assert.equal(a.store.settings.accuracyDesign, 'original');
+});
+
+test('retired Default version 3 changes only the overall scores: a whole number with a smaller decimal', async t => {
   const a = review(t), doc = a.dom.window.document;
   await a.call('applyUiSetup', 'modern');
   await a.call('setSetting', 'accuracyDesign', 'phases-modern');
@@ -86,10 +112,7 @@ test('the overview reveal counts a split score up in its own two sizes', () => {
   assert.equal(panel.hasAttribute('data-revealing'), false);
 });
 
-test('Default version 4 colours each overall score and rating by its performance band, like the phase cards', async t => {
-  const accuracy = PANEL_DESIGNS.find(design => design.panel === 'accuracy');
-  assert.equal(accuracy.versions[3].id, 'phases-band');
-  assert.equal(accuracy.versions[3].label, 'Default version 4');
+test('Default colours each overall score and rating by its performance band, like the phase cards', async t => {
   const a = review(t), doc = a.dom.window.document;
   await a.call('applyUiSetup', 'modern');
   await a.call('setSetting', 'accuracyDesign', 'phases-gauge');

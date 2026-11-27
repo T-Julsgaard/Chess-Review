@@ -22,14 +22,13 @@ function measure(doc, height, {base = 300, growth = 60} = {}) {
   return {page, content};
 }
 
-test('Default version 2 is offered between Default and Original and survives a reload', async t => {
+test('retired Default version 2 still renders, and migrates to Default on reload', async t => {
   const accuracy = PANEL_DESIGNS.find(design => design.panel === 'accuracy');
-  assert.deepEqual(accuracy.versions.map(version => version.label), ['Default', 'Default version 2', 'Default version 3', 'Default version 4', 'Original']);
-  assert.equal(accuracy.versions[1].id, 'phases-compact');
+  assert.equal(accuracy.versions.some(version => version.id === 'phases-compact'), false, 'No longer offered');
+  assert.equal(panelDesign('accuracy', {accuracyDesign: 'phases-compact'}), 'phases-compact');
   const settings = {accuracyDesign: 'phases-compact'};
   normalizePanelDesigns(settings);
-  assert.equal(settings.accuracyDesign, 'phases-compact');
-  assert.equal(panelDesign('accuracy', settings), 'phases-compact');
+  assert.equal(settings.accuracyDesign, 'phases-band');
 
   const a = review(t), doc = a.dom.window.document;
   await a.call('applyUiSetup', 'modern');
@@ -55,10 +54,10 @@ test('Default version 2 is offered between Default and Original and survives a r
   restored.replace('resetSettingsForRelease', async () => {});
   restored.store.settings = {...a.store.settings};
   await restored.start();
-  assert.equal(restored.state.settings.accuracyDesign, 'phases-compact');
+  assert.equal(restored.state.settings.accuracyDesign, 'phases-band');
 });
 
-test('Default version 2 stays compact at every height and grows its rows into spare room', async t => {
+test('retired Default version 2 stays compact at every height and grows its rows into spare room', async t => {
   const a = review(t), doc = a.dom.window.document;
   await a.call('applyUiSetup', 'modern');
   await a.call('setSetting', 'accuracyDesign', 'phases-compact');

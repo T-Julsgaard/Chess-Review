@@ -21,7 +21,7 @@ test('Visual > Tabs offers compact dropdowns for Accuracy and Move list designs'
   const labels = [...section().querySelectorAll('.set-lbl')].map(node => node.textContent);
   assert.ok(labels.includes('Accuracy overview'));
   assert.ok(!labels.includes('Accuracy move quality'), 'Move quality has a single design and no setting');
-  assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="accuracyDesign"]')].map(node => node.textContent), ['Default', 'Default version 2', 'Default version 3', 'Default version 4', 'Original']);
+  assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="accuracyDesign"]')].map(node => node.textContent), ['Default', 'Default v2', 'Original']);
   assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="accuracyAdvancedDesign"]')].map(node => node.textContent), []);
   assert.deepEqual([...section().querySelectorAll('.lib-dd-opt[data-setting="movesDesign"]')].map(node => node.textContent), ['Default', 'Original', 'Edge-to-edge', 'Large text']);
   const option = section().querySelector('[data-setting="accuracyDesign"][data-value="original"]');
@@ -59,12 +59,12 @@ test('Tabs dropdowns support keyboard navigation, selection and outside dismissa
 });
 
 test('removed panel choices migrate to supported designs on startup', async t => {
-  for (const accuracyDesign of ['pages', 'dials', 'reveal', 'phases', 'phases2', 'phases-modern-v2']) {
+  for (const accuracyDesign of ['pages', 'dials', 'reveal', 'phases', 'phases2', 'phases-modern-v2', 'phases-compact', 'phases-gauge']) {
     const a = app(t, {url: 'https://extension.test/analysis.html?workspace=blank'});
     a.replace('resetSettingsForRelease', async () => {});
     a.store.settings = {accuracyDesign, graphDesign: 'timeline2', engineDesign: 'focus'};
     await a.start();
-    assert.equal(a.store.settings.accuracyDesign, 'phases-modern');
+    assert.equal(a.store.settings.accuracyDesign, 'phases-band');
     assert.equal(a.store.settings.graphDesign, 'bars3');
     assert.equal(a.store.settings.engineDesign, 'original');
   }
@@ -149,7 +149,7 @@ test('Full height moves remove both frame strips and retain the mounted moves an
   assert.equal(doc.querySelector('.moves-head,.moves-foot'), null);
   assert.equal(doc.querySelector('.moves-panel').lastElementChild.id, 'movesBody');
   assert.equal(doc.querySelector('#movesBody').firstChild, list);
-  assert.equal(a.state.idx, 3); assert.equal(a.state.settings.accuracyDesign, 'phases-modern');
+  assert.equal(a.state.idx, 3); assert.equal(a.state.settings.accuracyDesign, 'phases-band');
 });
 
 test('switching designs during analysis rebuilds the correct counters and keeps updates live', async t => {
@@ -200,9 +200,9 @@ test('saved choices survive startup and Visual reset restores the latest designs
   assert.equal(doc.querySelector('.accuracy-panel').dataset.design, 'original');
   assert.equal(doc.querySelector('.moves-panel').dataset.design, 'original');
   await a.call('resetVisualSettings');
-  assert.equal(a.store.settings.accuracyDesign, 'phases-modern');
+  assert.equal(a.store.settings.accuracyDesign, 'phases-band');
   assert.equal(a.store.settings.movesDesign, 'zoom20');
-  assert.equal(doc.querySelector('.accuracy-panel').dataset.design, 'phases-modern');
+  assert.equal(doc.querySelector('.accuracy-panel').dataset.design, 'phases-band');
   assert.equal(doc.querySelector('.moves-foot,.moves-head'), null);
 });
 
@@ -211,5 +211,5 @@ test('invalid or missing saved designs fall back to supported defaults', () => {
   assert.equal(normalizePanelDesigns(settings), true);
   assert.deepEqual(settings, Object.fromEntries(PANEL_DESIGNS.map(design => [design.setting, design.default])));
   assert.equal(normalizePanelDesigns(settings), false);
-  assert.equal(panelDesign('accuracy', {}), 'phases-modern');
+  assert.equal(panelDesign('accuracy', {}), 'phases-band');
 });

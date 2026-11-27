@@ -19,7 +19,7 @@ export async function auditLearning({review, call, evaluate, waitFor, sleep, out
   await waitFor(review, "!document.querySelector('#startup')", 'Startup finished');
   await resize(1920, 919);
   await run("import('./analysis.js').then(async m=>{await m.applyUiSetup('modern');m.S.settings.moveAnim=false})");
-  assert.equal(await run("import('./analysis.js').then(m=>m.S.settings.accuracyDesign)"), 'phases-modern', 'Modern defaults to the Modern report');
+  assert.equal(await run("import('./analysis.js').then(m=>m.S.settings.accuracyDesign)"), 'phases-band', 'Modern defaults to the band-coloured report');
   await run(`document.querySelector('[aria-label="Settings"]').click();
     [...document.querySelectorAll('.set-sect-head')].find(n=>n.textContent==='Tabs').click();
     document.querySelector('[data-setting="accuracyDesign"][data-value="phases-modern"]').click()`);

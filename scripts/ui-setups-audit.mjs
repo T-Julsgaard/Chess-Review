@@ -59,7 +59,7 @@ export async function auditLearning({review,call,evaluate,waitFor,sleep,out}) {
   for(const [key,box]of Object.entries(supplied.displayedLayout))for(const prop of ['x','y','w','h','scale'])
     assert.ok(Math.abs(modern[key][prop]-box[prop])<1e-8,`${key}.${prop}`);
   const designs=await run("import('./analysis.js').then(m=>Object.fromEntries(Object.entries(m.S.settings).filter(([key])=>key.endsWith('Design'))))");
-  assert.equal(designs.accuracyDesign,'phases-modern');assert.equal(designs.movesDesign,'zoom20');
+  assert.equal(designs.accuracyDesign,'phases-band');assert.equal(designs.movesDesign,'zoom20');
   const {UI_SETUPS}=await import('../lib/ui-setups.js');
   for(const [key,value]of Object.entries(UI_SETUPS.modern.designs))assert.equal(designs[key],value);
   await screenshot('modern');

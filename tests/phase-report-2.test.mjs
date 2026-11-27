@@ -13,7 +13,7 @@ test('retired phase reports migrate to Game phases', async t => {
   a.replace('resetSettingsForRelease',async()=>{});
   a.store.settings={accuracyDesign:'phases2'};
   await a.start();
-  assert.equal(a.store.settings.accuracyDesign,'phases-modern');
+  assert.equal(a.store.settings.accuracyDesign,'phases-band');
   assert.ok(a.dom.window.document.querySelector('.accuracy-phase-modern'));
 });
 
